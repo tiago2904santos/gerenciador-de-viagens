@@ -53,13 +53,10 @@
   --bd: 1px solid var(--cv-border);
   --bd-strong: 2px solid var(--cv-border);
 
-  /* ---- halo de foco: e COR; a forma sai no ponto de uso ------------------ */
-  --focus-ring: color-mix(in srgb, var(--color-accent) 40%, transparent);
-
-  /* ---- elevacao ---------------------------------------------------------- */
-  --sh-sm: 0 2px 8px color-mix(in srgb, var(--cv-ink) 10%, transparent);
-  --sh-md: 0 8px 24px color-mix(in srgb, var(--cv-ink) 14%, transparent);
-  --sh-lg: 0 18px 48px color-mix(in srgb, var(--cv-ink) 18%, transparent);
+  /* ---- elevacao: UMA sombra, minima (decisao de produto, 04/08/2026) -------
+     Nao ha escada de elevacao. O que se destaca do fundo se destaca pela
+     superficie da paleta e pela borda; a sombra so encosta a peca no papel. */
+  --sh-sm: 0 1px 2px color-mix(in srgb, var(--cv-ink) 8%, transparent);
 
   /* ---- raio: escala fechada; o zero e `0` literal ------------------------ */
   --r-sm: 8px;

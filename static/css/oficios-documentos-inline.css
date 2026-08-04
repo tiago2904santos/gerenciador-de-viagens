@@ -915,7 +915,7 @@ margin-inline: 0;
 .assinatura-page-wrap {
   position: relative;
   display: inline-block;
-  box-shadow: 0 4px 18px rgba(7, 26, 51, 0.12);
+  box-shadow: var(--sh-sm);
   border-radius: var(--r-sm);
   overflow: visible;
   background: #fff;
@@ -937,18 +937,18 @@ margin-inline: 0;
   user-select: none;
   border-radius: var(--r-sm);
   overflow: hidden;
-  box-shadow: 0 3px 10px rgba(7, 26, 51, 0.18);
+  box-shadow: var(--sh-sm);
 }
 
 .assinatura-label--preview {
   position: relative;
   cursor: default;
-  box-shadow: 0 2px 8px rgba(7, 26, 51, 0.1);
+  box-shadow: var(--sh-sm);
 }
 
 .assinatura-label--draggable:active {
   cursor: grabbing;
-  box-shadow: 0 5px 16px rgba(7, 26, 51, 0.22);
+  box-shadow: var(--sh-sm);
 }
 
 .assinatura-label__logo {

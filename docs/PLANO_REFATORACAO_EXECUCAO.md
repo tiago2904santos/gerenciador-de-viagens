@@ -850,10 +850,31 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
       arredondamento de geometria.
     - Suite **1.314 → 1.316** verdes (dois gates novos). Catraca de frontend segue em
       **212** e as excecoes em **2** — a 3b nao mexe em literal de cor.
-  - [ ] **Fase 3c — sombra e foco.** Sombra 202 → **136** (teto 4). O anel de foco
-    sai de `box-shadow` para `outline`: com quatro valores distintos de `box-shadow`
-    nao cabe halo de foco. `--focus-ring` ja e **cor** (nao forma), entao a troca e
-    no ponto de uso.
+  - [x] **Fase 3c — sombra minima e fim do foco.** O alvo do prompt (≤ 4 sombras, anel
+    de foco migrando para `outline`) foi **substituido por duas decisoes de produto**
+    de 04/08:
+    - **Uma sombra so, minima.** `box-shadow` 129 → **2** valores (`var(--sh-sm)`,
+      `none`). O degrau encolheu de `0 2px 8px` a 10% para `0 1px 2px` a 8%;
+      `--sh-md` e `--sh-lg` sairam da camada. O que se destaca do fundo passa a se
+      destacar pela superficie da paleta e pela borda.
+    - **O sistema nao sinaliza foco.** Nem anel, nem halo, nem contorno: `outline`
+      ficou com **um** valor (`none`), as 109 sombras de foco sairam e `--focus-ring`
+      deixou de existir. Vocabulario 57 → **54** tokens.
+      **REGRESSAO CONSCIENTE:** e falha de WCAG 2.4.7 (Focus Visible) — quem navega
+      por teclado perde a unica pista de onde esta. Levantei antes de executar, a
+      decisao foi reafirmada, e esta registrada aqui e em `static/css/base.css` para
+      ninguem descobrir por acidente. Se voltar, volta pelo reset global, num lugar so.
+    - **A faixa de acento virou borda.** Os 21 `inset 4px 0 0 var(--color-accent)`
+      nunca foram sombra: eram uma faixa a esquerda desenhada com `inset`. Agora sao
+      `border-inline-start`, que e o que sempre foram.
+    - **`NOVO-33` 🟠 nove focos invalidos herdados da 3a** — a substituicao daquela
+      fase emitiu a *forma* do halo dentro de declaracoes que ja tinham forma
+      (`outline: 2px solid 2px solid var(--focus-ring)`,
+      `box-shadow: 0 0 0 2px 0 0 0 3px var(--focus-ring)`). O navegador descartava as
+      nove, entao esses focos nao pintavam nada desde a 3a. Sumiram junto com o foco;
+      quem achou foi a medicao de abertura da fatia seguinte, nao a suite.
+    - Suite **1.316 → 1.320** verdes (4 gates novos, os dois principais com canario).
+      Catraca de frontend **212 → 210**.
 - [ ] **Fase 4 — fim das excecoes e do `!important`.**
 - [ ] **Fase 5 — apagar o CSS antigo.**
 

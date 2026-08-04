@@ -147,7 +147,6 @@
   color: var(--on-accent);
 }
 
-
   .cv-list-tab {
 }
 
@@ -156,18 +155,13 @@
   .cv-list-tab--active:is(:hover, :focus-visible) {
   background: color-mix(in srgb, color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)) 72%, var(--color-accent, #d8a21b) 28%);
   border-color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  box-shadow: none;
   color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
 }
 
-
   .cv-list-tab:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, 0 0 0 3px var(--focus-ring) 28%, transparent);
 }
 
-
   .cv-list-tab--active:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent, #d8a21b) 32%, transparent);
 }
 
 @media (max-width: 600px) {
@@ -176,7 +170,6 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
 
     .cv-list-tab {
     justify-content: space-between;

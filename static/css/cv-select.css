@@ -218,7 +218,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
   list-style: none;
   margin: 0;
   max-height: 280px;
@@ -325,7 +325,7 @@
 /* Estado aberto — o trigger pode receber classe is-open via JS */
 .cv-action-dropdown--open > [data-cv-dropdown-trigger],
 .cv-action-dropdown > [data-cv-dropdown-trigger][aria-expanded="true"] {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 22%, transparent);
+  box-shadow: var(--sh-sm);
 }
 
 /* =========================================================
@@ -369,8 +369,6 @@
 .cv-filter-dropdown__trigger:focus-visible,
 .cv-filter-dropdown--open .cv-filter-dropdown__trigger,
 .cv-filter-dropdown__trigger[aria-expanded="true"] {
-  border-color: var(--focus-ring);
-  box-shadow: 0 0 0 3px var(--focus-ring);
   outline: none;
 }
 
@@ -394,7 +392,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
   left: 0;
   list-style: none;
   margin: 0;
@@ -518,7 +516,7 @@
   border: var(--bd);
     border-color: transparent;
   border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   color: var(--cv-ink);
   cursor: pointer;
   display: inline-flex;
@@ -585,7 +583,7 @@
   border: var(--bd);
     border-color: transparent;
   border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   box-sizing: border-box;
   color: var(--cv-ink);
   cursor: pointer;
@@ -674,7 +672,7 @@
   border-start-end-radius: 0;
   border-end-end-radius: var(--r-md);
   border-end-start-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   box-sizing: border-box;
   left: 0;
   list-style: none;

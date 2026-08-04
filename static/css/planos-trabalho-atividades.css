@@ -109,12 +109,10 @@
   background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-block));
   background-image: none;
   border: 0;
-  box-shadow: none;
   color: var(--color-accent);
-  outline: 0;
+  outline: none;
   transform: none;
 }
-
 
   [data-travel-document-wizard-step1]
   .pt-activity__toolbar--panel
@@ -132,7 +130,6 @@
   transform: none;
 }
 
-
   [data-travel-document-wizard-step1]
   .pt-activity__toolbar--panel
   :is(
@@ -146,9 +143,8 @@
   background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-block));
   background-image: none;
   border: 0;
-  box-shadow: none;
   color: var(--color-accent);
-  outline: 0;
+  outline: none;
   transform: none;
 }
 
@@ -218,7 +214,6 @@
 }
 
 .pt-activity-card:focus-within {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent, #d9a40f) 26%, transparent);
 }
 
 /* checkbox nativo escondido (mantém foco por teclado) */
@@ -260,7 +255,8 @@
 /* ── Estado selecionado (dourado) ───────────────────────────────────────── */
 .pt-activity-card.is-selected {
   background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-next));
-  box-shadow: inset 4px 0 0 var(--color-accent);
+  border-inline-start: var(--bd-strong);
+  border-inline-start-color: var(--color-accent);
 }
 
 .pt-activity-card.is-selected .pt-activity-card__check {
@@ -441,11 +437,12 @@
 
 /* Metas: acento dourado · Recursos: acento azul. */
 .pt-live-col--metas .pt-live-entry {
-  box-shadow: inset 3px 0 0 var(--color-accent, #d9a40f);
+  box-shadow: none;
 }
 
 .pt-live-col--recursos .pt-live-entry {
-  box-shadow: inset 3px 0 0 var(--color-accent);
+  border-inline-start: var(--bd-strong);
+border-inline-start-color: var(--color-accent);
 }
 
 .pt-live-empty {
@@ -601,7 +598,8 @@
     var(--cv-surface-card)
   );
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: inset 4px 0 0 var(--color-accent);
+  border-inline-start: var(--bd-strong);
+  border-inline-start-color: var(--color-accent);
 }
 
 .pt-preset-activity-grid label:has(input:checked)::before {
@@ -614,5 +612,4 @@
 }
 
 .pt-preset-activity-grid label:focus-within {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 26%, transparent);
 }

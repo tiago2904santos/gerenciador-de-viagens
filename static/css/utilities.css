@@ -238,7 +238,6 @@ margin-inline: 0;
 
   /* Muted / Neutro — herda do state-neutral */
 
-
   /* Filtro e Entidade — herdam do info (azul), mesma família do Retificado */
 
   /* Info — mesma fórmula do state-success com --color-info */
@@ -253,7 +252,6 @@ margin-inline: 0;
 
   /* info/pending/entity — success/warning/danger/neutral já herdam via --state-* */
 
-
 }
 
 /* Light explícito — bg espelha 6% do state button + glow 30% mais suave */
@@ -267,14 +265,12 @@ margin-inline: 0;
   --_cv-chip-bg:     var(--cv-surface-block);
   --_cv-chip-border: var(--cv-border);
   --_cv-chip-color:  var(--cv-ink);
-  --_cv-chip-glow:   var(--focus-ring);
   align-items: center;
   background: var(--_cv-chip-bg);
   border: var(--bd);
   border-color: var(--_cv-chip-border);
   border-radius: var(--r-pill);
-  /* Mesma lógica do cv-state-button: glow semântico + sombra genérica */
-  box-shadow: var(--_cv-chip-glow), var(--sh-sm);
+  box-shadow: var(--sh-sm);
   box-sizing: border-box;
   color: var(--_cv-chip-color);
   display: inline-flex;
@@ -295,13 +291,12 @@ margin-inline: 0;
 
 .cv-chip:hover,
 .status-chip:hover {
-  box-shadow: var(--_cv-chip-glow), var(--sh-md);
+  box-shadow: var(--sh-sm);
   transform: translateY(-1px);
 }
 
 .cv-chip:focus-visible,
 .status-chip:focus-visible {
-  box-shadow: var(--_cv-chip-glow), 0 0 0 3px var(--focus-ring);
   outline: none;
 }
 
@@ -317,7 +312,7 @@ margin-inline: 0;
 }
 
 .cv-chip.is-selected {
-  box-shadow: var(--_cv-chip-glow), var(--sh-md), 0 0 0 2px var(--_cv-chip-border);
+  box-shadow: var(--sh-sm);
 }
 
 .cv-chip.is-disabled {
@@ -357,7 +352,6 @@ margin-inline: 0;
   --_cv-chip-bg: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
   --_cv-chip-border: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
   --_cv-chip-color: var(--cv-state-success);
-  --_cv-chip-glow: var(--focus-ring);
 }
 
 .cv-chip--warning,
@@ -366,7 +360,6 @@ margin-inline: 0;
   --_cv-chip-bg: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   --_cv-chip-border: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
   --_cv-chip-color: var(--cv-state-warning);
-  --_cv-chip-glow: var(--focus-ring);
 }
 
 .cv-chip--danger,
@@ -374,7 +367,6 @@ margin-inline: 0;
   --_cv-chip-bg: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   --_cv-chip-border: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
   --_cv-chip-color: var(--cv-state-danger);
-  --_cv-chip-glow: var(--focus-ring);
 }
 
 .cv-chip--info,
@@ -382,7 +374,6 @@ margin-inline: 0;
   --_cv-chip-bg: var(--color-accent);
   --_cv-chip-border: color-mix(in srgb, var(--color-accent) 45%, transparent);
   --_cv-chip-color: var(--color-accent);
-  --_cv-chip-glow: var(--focus-ring);
 }
 
 .cv-chip--pending,
@@ -390,7 +381,6 @@ margin-inline: 0;
   --_cv-chip-bg: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   --_cv-chip-border: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
   --_cv-chip-color: var(--cv-state-warning);
-  --_cv-chip-glow: var(--focus-ring);
 }
 
 .cv-chip--muted,
@@ -398,28 +388,24 @@ margin-inline: 0;
   --_cv-chip-bg: var(--cv-ink-muted);
   --_cv-chip-border: var(--cv-border);
   --_cv-chip-color: var(--cv-ink-muted);
-  --_cv-chip-glow: var(--focus-ring);
 }
 
 .cv-chip--neutral {
   --_cv-chip-bg: var(--cv-surface-block);
   --_cv-chip-border: var(--cv-border);
   --_cv-chip-color: var(--cv-surface-block);
-  --_cv-chip-glow: var(--focus-ring);
 }
 
 .cv-chip--entity {
   --_cv-chip-bg: var(--cv-surface-card);
   --_cv-chip-border: var(--cv-border);
   --_cv-chip-color: var(--cv-surface-card);
-  --_cv-chip-glow: var(--focus-ring);
 }
 
 .cv-chip--filter {
   --_cv-chip-bg: var(--cv-surface-block);
   --_cv-chip-border: var(--cv-border);
   --_cv-chip-color: var(--cv-surface-block);
-  --_cv-chip-glow: var(--focus-ring);
 }
 
 /* --------------------------------------------------------------------------
@@ -433,7 +419,6 @@ margin-inline: 0;
 }
 
 .cv-data-table-shell:focus-visible {
-  box-shadow: 0 0 0 3px 0 0 0 3px var(--focus-ring);
   outline: none;
 }
 

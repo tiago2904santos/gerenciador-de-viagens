@@ -49,7 +49,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-lg);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   box-sizing: border-box;
   padding-block: var(--sp-3);
   padding-inline: var(--sp-5);
@@ -104,7 +104,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-xl);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  box-shadow: var(--sh-sm);
   margin-bottom: 0;
   overflow: visible;
   padding: 0;
@@ -112,7 +112,7 @@
 }
 
 .roteiro-editor__main.card:hover {
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
   transform: none;
 }
 
@@ -203,7 +203,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-lg);
-  box-shadow: 0 18px 36px rgba(15, 34, 54, 0.08);
+  box-shadow: var(--sh-sm);
   overflow: hidden;
   padding: 0;
 }
@@ -260,7 +260,7 @@
   border: var(--bd);
   border-color: rgba(15, 95, 143, 0.25);
   border-radius: var(--r-pill);
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+  box-shadow: var(--sh-sm);
   color: var(--cv-ink);
   font-size: 11px;
   font-weight: 800;
@@ -383,18 +383,17 @@
 
 .roteiro-editor__choice-card:hover {
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: 0 6px 14px rgba(28, 49, 72, 0.08);
+  box-shadow: var(--sh-sm);
 }
 
 .roteiro-editor__choice-card:focus-within {
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
 .roteiro-editor__choice-card:has(input:checked) {
   background: var(--cv-surface-block);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, transparent);
+  box-shadow: var(--sh-sm);
 }
 
 .roteiro-editor__choice-card:has(input:disabled) {
@@ -454,7 +453,7 @@
   background: var(--cv-surface-block);
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow: 0 8px 18px rgba(28, 49, 72, 0.05);
+  box-shadow: var(--sh-sm);
   gap: var(--sp-3);
   height: 100%;
   transition:
@@ -465,16 +464,14 @@
 
 .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-card:hover {
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: 0 10px 20px rgba(28, 49, 72, 0.08);
+  box-shadow: var(--sh-sm);
   transform: translateY(-1px);
 }
 
 .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-card:has(input:checked) {
   background: var(--cv-surface-block);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, transparent),
-    0 10px 22px rgba(28, 49, 72, 0.08);
+  box-shadow: var(--sh-sm);
 }
 
 .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-input {
@@ -519,9 +516,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.7) inset,
-    0 8px 18px rgba(28, 49, 72, 0.05);
+  box-shadow: var(--sh-sm);
   margin-top: var(--sp-1);
   padding: var(--sp-4);
 }
@@ -684,20 +679,18 @@
 .roteiro-editor--avulso .related-route-item:hover {
   background: var(--cv-surface-block);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: 0 8px 14px rgba(23, 50, 77, 0.08);
+  box-shadow: var(--sh-sm);
 }
 
 .related-route-item.is-active {
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: 0 0 0 2px 0 0 0 3px var(--focus-ring);
+  box-shadow: var(--sh-sm);
 }
 
 .roteiro-editor--avulso .related-route-item.is-active {
   background: var(--cv-surface-block);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow:
-    0 0 0 2px rgba(47, 128, 201, 0.16),
-    0 10px 16px rgba(23, 50, 77, 0.1);
+  box-shadow: var(--sh-sm);
 }
 
 .related-route-item .related-route-title {
@@ -1030,7 +1023,6 @@ border-style: dashed;
   background-color: var(--cv-surface-block) !important;
   border-color: transparent !important;
   border-radius: var(--r-sm) !important;
-  box-shadow: none !important;
   transition: none !important;
 }
 
@@ -1044,7 +1036,6 @@ border-style: dashed;
   ) {
   background: var(--cv-surface-card) !important;
   border: 0 !important;
-  box-shadow: none !important;
   color: var(--cv-ink) !important;
 }
 
@@ -1053,9 +1044,8 @@ border-style: dashed;
   .cv-date-picker__trigger--icon:is(:hover, :focus-visible) {
   background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-block)) !important;
   border: 0 !important;
-  box-shadow: none !important;
   color: var(--color-accent) !important;
-  outline: 0;
+  outline: none;
 }
 
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .travel-period-block--split + .route-destinos-block--split,
@@ -1290,7 +1280,6 @@ border-style: dashed;
   background: var(--cv-surface-block) !important;
   background-color: var(--cv-surface-block) !important;
   border-color: transparent !important;
-  box-shadow: none !important;
   transition: none !important;
 }
 
@@ -1359,7 +1348,6 @@ border-style: dashed;
   border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
   color: var(--cv-ink);
 }
-
 
 .roteiro-editor--oficio .oficio-roteiro-bate-volta__leg.route-bate-volta-leg.cv-form-block--split {
   align-items: center;
@@ -1511,7 +1499,7 @@ border-style: dashed;
 }
 
 .roteiro-editor__destination-card.destination-row.is-drop-target {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 45%, transparent);
+  box-shadow: var(--sh-sm);
 }
 
 .roteiro-editor__drag-col {
@@ -1652,7 +1640,7 @@ border-style: dashed;
   background: var(--cv-surface-block);
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow: 0 10px 22px rgba(28, 49, 72, 0.04);
+  box-shadow: var(--sh-sm);
   gap: calc(var(--sp-3) + 2px);
   padding-block: var(--sp-4) var(--sp-2);
   padding-inline: var(--sp-4);
@@ -1824,7 +1812,7 @@ border-style: dashed;
 }
 
 .destination-row.is-dragging {
-  box-shadow: 0 16px 34px color-mix(in srgb, var(--color-accent) 24%, transparent);
+  box-shadow: var(--sh-sm);
   cursor: grabbing;
   opacity: 0.72;
   transform: scale(0.985);
@@ -1832,9 +1820,7 @@ border-style: dashed;
 }
 
 .destination-row.is-drop-target {
-  box-shadow:
-    0 0 0 2px var(--color-accent),
-    0 12px 28px color-mix(in srgb, var(--color-accent) 20%, transparent);
+  box-shadow: var(--sh-sm);
   transform: translateY(-1px);
 }
 
@@ -1872,7 +1858,7 @@ border-style: dashed;
 
 @keyframes destino-reordered-pulse {
   0% {
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 75%, transparent);
+    box-shadow: var(--sh-sm);
     transform: scale(1.012);
   }
   100% {
@@ -1944,8 +1930,7 @@ border-style: dashed;
   background: color-mix(in srgb, color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface)) 86%, var(--cv-ink) 14%);
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
   color: var(--cv-state-danger);
-  outline: 2px solid color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  outline-offset: -2px;
+  outline: none;
 }
 
 .roteiro-destino-grid {
@@ -2175,7 +2160,6 @@ border-style: dashed;
   background: var(--cv-surface-block);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   color: var(--color-accent);
-  box-shadow: var(--sh-sm);
   transform: none;
 }
 
@@ -2507,7 +2491,7 @@ margin-inline: var(--sp-1);
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-lg);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--sh-sm);
   border-bottom: 0;
   overflow: hidden;
   padding: 0;
@@ -2631,7 +2615,7 @@ margin-inline: var(--sp-1);
   background: var(--cv-surface-block);
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow: 0 8px 20px rgba(28, 49, 72, 0.05);
+  box-shadow: var(--sh-sm);
   margin: 0;
   padding: var(--sp-4);
 }
@@ -2829,7 +2813,7 @@ margin-inline: var(--sp-1);
 .roteiro-editor--avulso .cv-summary-item {
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow: 0 10px 20px rgba(15, 34, 54, 0.05);
+  box-shadow: var(--sh-sm);
   padding-block: var(--sp-3);
   padding-inline: var(--sp-4);
 }
@@ -2837,9 +2821,7 @@ margin-inline: var(--sp-1);
 .roteiro-editor--avulso .cv-summary-item--principal {
   background: var(--cv-surface-card);
   border-color: var(--cv-border);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.88) inset,
-    0 14px 24px rgba(15, 34, 54, 0.07);
+  box-shadow: var(--sh-sm);
   height: 100%;
   position: relative;
 }
@@ -2931,9 +2913,7 @@ margin-inline: var(--sp-1);
   border-radius: var(--r-lg);
   border: var(--bd);
   border-color: rgba(11, 58, 102, 0.14);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.82) inset,
-    0 18px 38px rgba(15, 34, 54, 0.1);
+  box-shadow: var(--sh-sm);
   background: var(--cv-surface-card);
   overflow: hidden;
 }
@@ -3127,9 +3107,7 @@ margin-inline: 0;
   background: linear-gradient(180deg, #1d6ea7 0%, #0f4f86 100%);
   border: var(--bd);
   border-color: rgba(10, 58, 102, 0.42);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.18) inset,
-    0 10px 22px rgba(11, 58, 102, 0.24);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
 }
 
@@ -3137,9 +3115,6 @@ margin-inline: 0;
 .roteiro-mapa__action-btn--primary:focus-visible {
   background: linear-gradient(180deg, #2479b6 0%, #125a94 100%);
   border-color: rgba(10, 58, 102, 0.52);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.22) inset,
-    0 12px 24px rgba(11, 58, 102, 0.28);
   color: var(--on-accent);
   transform: translateY(-1px);
 }
@@ -3148,7 +3123,7 @@ margin-inline: 0;
   background: var(--cv-surface-card);
   border-color: rgba(255, 255, 255, 0.5);
   color: #123e67;
-  box-shadow: 0 8px 18px rgba(2, 23, 40, 0.16);
+  box-shadow: var(--sh-sm);
 }
 
 .roteiro-mapa__action-btn--secondary:hover,
@@ -3232,7 +3207,7 @@ border-color: currentColor;
   border-color: color-mix(in srgb, var(--color-accent) 35%, var(--cv-border));
   border-radius: var(--r-pill);
   bottom: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  box-shadow: var(--sh-sm);
   color: var(--cv-ink);
   display: inline-flex;
   font-size: 0.8125rem;
@@ -3347,18 +3322,16 @@ border-color: currentColor;
 
  .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-card:has(input:checked) {
   border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--cv-state-warning) 40%, transparent),
-    0 10px 22px rgba(216, 162, 27, 0.14);
+  box-shadow: var(--sh-sm);
 }
 
 /* ── Ofício wizard roteiro: zero visual de foco (pedido explícito) ─ */
 [data-travel-document-wizard-roteiro] .oficio-roteiro-body,
 .roteiro-editor--oficio .oficio-roteiro-body {
-  /* Anéis e bordas de foco: borda em repouso, sem destaque colorido.
-     NOVO-30 fase 3a: eram 13 tokens de foco zerados um a um na camada de
-     token. Com um halo só, apagar o halo é uma declaração só. */
-  --focus-ring: transparent;
+  /* NOVO-30 fase 3c: esta regra existia para apagar o halo de foco AQUI.
+     O halo saiu do sistema inteiro (decisao de produto), entao ela perdeu o
+     objeto — o que resta e o `outline: none` global de base.css. */
+  outline: none;
 }
 
 [data-travel-document-wizard-roteiro] .oficio-roteiro-body :is(:focus, :focus-visible),
@@ -3367,9 +3340,7 @@ border-color: currentColor;
 .roteiro-editor--oficio .oficio-roteiro-body :is(:focus, :focus-visible)::before,
 [data-travel-document-wizard-roteiro] .oficio-roteiro-body :is(:focus, :focus-visible)::after,
 .roteiro-editor--oficio .oficio-roteiro-body :is(:focus, :focus-visible)::after {
-  outline: none !important;
-  outline-offset: 0 !important;
-  box-shadow: none !important;
+  outline: none !important;;
 }
 
 /* Contêineres que pintam anel via :focus-within (picker, select, date, choice) */
@@ -3413,9 +3384,7 @@ border-color: currentColor;
 .roteiro-editor--oficio .oficio-roteiro-body .cv-search-picker__field:focus-within .cv-search-picker__control,
 [data-travel-document-wizard-roteiro] .oficio-roteiro-body .cv-select-wrapper:focus-within::after,
 .roteiro-editor--oficio .oficio-roteiro-body .cv-select-wrapper:focus-within::after {
-  outline: none !important;
-  outline-offset: 0 !important;
-  box-shadow: none !important;
+  outline: none !important;;
 }
 
 [data-travel-document-wizard-roteiro] .oficio-roteiro-body .roteiro-editor__choice-card:focus-within,
@@ -3428,9 +3397,7 @@ border-color: currentColor;
   [data-travel-document-wizard-roteiro] .oficio-roteiro-body :is(button, a, input, select, textarea, [tabindex]):focus-visible,
 
   .roteiro-editor--oficio .oficio-roteiro-body :is(button, a, input, select, textarea, [tabindex]):focus-visible {
-  outline: none !important;
-  outline-offset: 0 !important;
-  box-shadow: none !important;
+  outline: none !important;;
 }
 
 /* ========================================================================

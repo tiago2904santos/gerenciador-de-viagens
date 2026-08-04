@@ -75,7 +75,10 @@ class DarkRedesignContractTests(SimpleTestCase):
         escuro redeclara SO cor.
         """
         required_tokens = (
-            "--cv-ink:", "--cv-ink-muted:", "--cv-border:", "--focus-ring:",
+            # NOVO-30 fase 3c: `--focus-ring` saiu — o sistema deixou de
+            # sinalizar foco por decisao de produto — e a escada de elevacao
+            # virou um degrau so.
+            "--cv-ink:", "--cv-ink-muted:", "--cv-border:",
             "--cv-state-success:", "--cv-state-warning:", "--cv-state-danger:",
             "--sh-sm:", "--r-md:", "--sp-4:", "--fs-sm:", "--h-md:",
             "--tr-base:", "--z-modal:",

@@ -48,7 +48,7 @@
   background: var(--cv-surface-block);
   border: var(--bd);
   border-radius: var(--r-xl);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   overflow: hidden;
 }
 
@@ -67,7 +67,7 @@
 .document-card:hover,
 .summary-card:hover {
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
   transform: translateY(-2px);
 }
 
@@ -179,7 +179,7 @@ border-left-width: 6px;
   border-left-color: var(--color-accent);
   border-left-width: 6px;
   border-radius: var(--r-xl);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   display: grid;
   gap: var(--sp-4);
   padding: var(--sp-5);
@@ -249,7 +249,7 @@ border-left-width: 6px;
   background: var(--cv-surface-block);
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   padding: var(--sp-5);
 }
 

@@ -10,9 +10,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-lg);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.65) inset,
-    0 20px 44px rgba(15, 34, 54, 0.1);
+  box-shadow: var(--sh-sm);
   box-sizing: border-box;
   padding-block: clamp(var(--sp-4), 2.2vw, var(--sp-6));
   padding-inline: clamp(var(--sp-4), 2.5vw, var(--sp-6));
@@ -34,7 +32,7 @@
   background: var(--cv-surface-block);
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   padding: var(--sp-5);
 }
 
@@ -236,7 +234,6 @@
 }
 
 .app-page--roteiros-form .btn:focus-visible {
-  box-shadow: 0 0 0 3px 0 0 0 3px var(--focus-ring), var(--sh-sm);
   outline: none;
 }
 
@@ -283,9 +280,7 @@
 .roteiro-editor__actions .btn-primary {
   background: var(--color-accent);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.12) inset,
-    0 8px 18px rgba(11, 58, 102, 0.28);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
 }
 
@@ -364,9 +359,7 @@
 
 .app-card-toggle__input:focus-visible ~ .app-card-toggle__icon,
 .app-card-toggle:focus-within {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cv-state-success) 22%, transparent);
-  outline: 2px solid color-mix(in srgb, var(--cv-state-success) 55%, transparent);
-  outline-offset: 2px;
+  outline: none;
 }
 
 .app-card-toggle__icon {
@@ -500,7 +493,6 @@
 }
 
 .field-option-card:focus-within {
-  box-shadow: 0 0 0 3px 0 0 0 3px var(--focus-ring);
   outline: none;
 }
 
@@ -771,7 +763,7 @@ textarea[readonly] {
   background: var(--cv-surface-block);
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   padding: var(--sp-5);
 }
 
@@ -813,7 +805,7 @@ textarea[readonly] {
   background: var(--cv-surface-block);
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
   overflow: hidden;
 }
 

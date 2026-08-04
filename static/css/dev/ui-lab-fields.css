@@ -22,7 +22,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-lg);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   display: grid;
   gap: var(--sp-4);
   padding-block: clamp(var(--sp-5), 2.4vw, var(--sp-6));
@@ -408,10 +408,8 @@ border-bottom-color: currentColor;
 }
 
 .cv-field--focus-demo .cv-select__control {
-  background:
-    linear-gradient(color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)), color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface))) padding-box,
-    linear-gradient(var(--focus-ring), var(--focus-ring)) border-box;
-  box-shadow: 0 0 0 3px var(--focus-ring);
+  background: linear-gradient(color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)), color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface))) padding-box, linear-gradient(var(--cv-border), var(--cv-border)) border-box;
+  box-shadow: var(--sh-sm);
 }
 
 .cv-field--hover-demo .cv-select__control {
@@ -421,7 +419,7 @@ border-bottom-color: currentColor;
 }
 
 .cv-field--focus-demo .cv-select__wrapper::after {
-  color: var(--focus-ring);
+  color: var(--cv-border);
   transform: translateY(calc(var(--sp-1) * -1)) rotate(225deg);
 }
 
@@ -457,7 +455,6 @@ border-bottom-color: currentColor;
 
 .cv-select--error .cv-select__control:focus-visible,
 .cv-select__control[aria-invalid="true"]:focus-visible {
-  box-shadow: var(--sh-sm);
 }
 
 .cv-select--error::after {
@@ -597,7 +594,7 @@ border-bottom-color: currentColor;
   border: var(--bd);
     border-color: transparent;
   border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   color: var(--cv-ink);
   cursor: pointer;
   display: inline-flex;
@@ -681,13 +678,13 @@ border-bottom-color: currentColor;
 
 .cv-field--focus-demo .cv-field__control,
 .cv-field-state-card--focus .cv-field__control {
-  border-color: var(--focus-ring);
-  box-shadow: 0 0 0 3px var(--focus-ring);
+  border-color: var(--cv-border);
+  box-shadow: var(--sh-sm);
 }
 
 .cv-field--focus-demo .cv-multiselect__control {
-  border-color: var(--focus-ring);
-  box-shadow: 0 0 0 3px var(--focus-ring);
+  border-color: var(--cv-border);
+  box-shadow: var(--sh-sm);
 }
 
 .cv-field--hover-demo .cv-field__control,
@@ -759,7 +756,6 @@ border-bottom-color: currentColor;
 
 .cv-multiselect__search:focus,
 .cv-multiselect__search:focus-visible {
-  box-shadow: none;
   outline: none;
 }
 
@@ -852,7 +848,7 @@ border-bottom-color: currentColor;
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-lg);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   display: grid;
   gap: var(--sp-1);
   max-height: calc(var(--h-md) * 5 + var(--sp-4));
@@ -861,7 +857,6 @@ border-bottom-color: currentColor;
 }
 
 .cv-multiselect:focus-within .cv-multiselect__dropdown {
-  box-shadow: 0 0 0 3px var(--focus-ring), var(--sh-md);
   clip-path: inset(0 calc(var(--sp-1) * -1) calc(var(--sp-1) * -1) calc(var(--sp-1) * -1));
 }
 
@@ -1027,7 +1022,6 @@ border-bottom-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   }
 }
 
-
 /* ==========================================================================
    Custom Select Premium — .cv-custom-select
    Dropdown 100% customizado. O <select> nativo permanece oculto apenas
@@ -1069,7 +1063,7 @@ border-bottom-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   border: var(--bd);
     border-color: transparent;
   border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   box-sizing: border-box;
   color: var(--cv-ink);
   cursor: pointer;
@@ -1130,7 +1124,7 @@ border-bottom-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
 .cv-custom-select--open .cv-custom-select__chevron {
-  color: var(--focus-ring);
+  color: var(--cv-border);
 }
 
 .cv-custom-select--open .cv-custom-select__chevron svg {
@@ -1153,7 +1147,7 @@ border-bottom-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-start-end-radius: 0;
   border-end-end-radius: var(--r-md);
   border-end-start-radius: var(--r-md);
-  box-shadow:     var(--sh-md);
+  box-shadow: var(--sh-sm);
   box-sizing:     border-box;
   left:           0;
   list-style:     none;

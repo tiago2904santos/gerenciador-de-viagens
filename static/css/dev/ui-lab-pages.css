@@ -8,7 +8,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-lg);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   display: flex;
   gap: var(--sp-4);
   justify-content: space-between;
@@ -102,7 +102,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-lg);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   display: grid;
 }
 
@@ -114,7 +114,6 @@
 
 .ui-lab-overview-card:hover,
 .ui-lab-overview-card:focus-within {
-  box-shadow: var(--sh-md), 0 0 0 1px 0 0 0 3px var(--focus-ring);
   transform: translateY(-1px);
 }
 
@@ -292,7 +291,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-lg);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
 }
 
 .ui-lab-status-showcase {
@@ -364,7 +363,7 @@
 
 .ui-lab-section--headers .ui-lab-header-band-demo {
   border-radius: var(--r-lg);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   overflow: hidden;
 }
 
@@ -494,8 +493,7 @@
 }
 
 .ui-lab-header-inline-create .cv-inline-create__toggle:focus-visible {
-  outline: 2px solid 2px solid var(--focus-ring);
-  outline-offset: -2px;
+  outline: none;
 }
 
 .ui-lab-header-inline-create .cv-inline-create__toggle.is-active,
@@ -578,8 +576,7 @@
 }
 
 .ui-lab-structure-inline-create .cv-inline-create__toggle:focus-visible {
-  outline: 2px solid 2px solid var(--focus-ring);
-  outline-offset: -2px;
+  outline: none;
 }
 
 .ui-lab-structure-inline-create .cv-inline-create__toggle.is-active,
@@ -1082,7 +1079,6 @@ textarea.cv-field-control__input {
 }
 
 .cv-field-side-action:focus-visible {
-  box-shadow: 0 0 0 3px var(--focus-ring), var(--sh-sm);
   outline: none;
 }
 
@@ -1127,42 +1123,42 @@ textarea.cv-field-control__input {
 .cv-field-side-action--success {
   background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
-  box-shadow: 0 0 0 3px var(--focus-ring), var(--sh-sm);
+  box-shadow: var(--sh-sm);
   color: var(--cv-state-success);
 }
 
 .cv-field-side-action--success:hover {
   background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
-  box-shadow: 0 0 0 3px var(--focus-ring), var(--sh-md);
+  box-shadow: var(--sh-sm);
   color: var(--cv-state-success);
 }
 
 .cv-field-side-action--warning {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
-  box-shadow: 0 0 0 3px var(--focus-ring), var(--sh-sm);
+  box-shadow: var(--sh-sm);
   color: var(--cv-state-warning);
 }
 
 .cv-field-side-action--warning:hover {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
-  box-shadow: 0 0 0 3px var(--focus-ring), var(--sh-md);
+  box-shadow: var(--sh-sm);
   color: var(--cv-state-warning);
 }
 
 .cv-field-side-action--danger {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  box-shadow: 0 0 0 3px var(--focus-ring), var(--sh-sm);
+  box-shadow: var(--sh-sm);
   color: var(--cv-state-danger);
 }
 
 .cv-field-side-action--danger:hover {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  box-shadow: 0 0 0 3px var(--focus-ring), var(--sh-md);
+  box-shadow: var(--sh-sm);
   color: var(--cv-state-danger);
 }
 
@@ -1186,18 +1182,18 @@ textarea.cv-field-control__input {
 .cv-field-side-action--state.is-active::before,
 .cv-field-side-action--state.cv-field-side-action--success::before {
   background: var(--cv-state-success);
-  box-shadow: 0 0 0 3px var(--focus-ring);
+  box-shadow: var(--sh-sm);
 }
 
 .cv-field-side-action--state.cv-field-side-action--warning::before {
   background: var(--cv-state-warning);
-  box-shadow: 0 0 0 3px var(--focus-ring);
+  box-shadow: var(--sh-sm);
 }
 
 .cv-field-side-action--state.is-inactive::before,
 .cv-field-side-action--state.cv-field-side-action--danger::before {
   background: var(--cv-state-danger);
-  box-shadow: 0 0 0 3px var(--focus-ring);
+  box-shadow: var(--sh-sm);
 }
 
 .cv-state-button {
@@ -1207,7 +1203,7 @@ textarea.cv-field-control__input {
   border: var(--bd);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: var(--r-md);
-  box-shadow: 0 0 0 3px var(--focus-ring), var(--sh-sm);
+  box-shadow: var(--sh-sm);
   color: var(--color-accent);
   cursor: pointer;
   display: inline-flex;
@@ -1233,7 +1229,7 @@ textarea.cv-field-control__input {
 .cv-state-button::before {
   background: var(--color-accent);
   border-radius: var(--r-pill);
-  box-shadow: 0 0 0 3px var(--focus-ring);
+  box-shadow: var(--sh-sm);
   content: "";
   flex: 0 0 auto;
   height: var(--sp-2);
@@ -1244,12 +1240,10 @@ textarea.cv-field-control__input {
 .cv-state-button:focus {
   background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: 0 0 0 3px var(--focus-ring), var(--sh-md);
   transform: translateY(-1px);
 }
 
 .cv-state-button:focus-visible {
-  box-shadow: 0 0 0 3px var(--focus-ring), 0 0 0 3px var(--focus-ring), var(--sh-sm);
   outline: none;
 }
 
@@ -1355,7 +1349,7 @@ textarea.cv-field-control__input {
 .cv-btn--next {
   background: var(--color-accent);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: 0 6px 14px rgba(11, 58, 102, 0.16);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
 }
 
@@ -1365,13 +1359,12 @@ textarea.cv-field-control__input {
 .cv-btn--next:focus {
   background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: 0 10px 18px rgba(11, 58, 102, 0.22);
 }
 
 .cv-btn--primary-success {
   background: linear-gradient(180deg, #2f9f77, #217d5f);
   border-color: #176349;
-  box-shadow: 0 6px 14px rgba(31, 126, 92, 0.18);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
 }
 
@@ -1379,7 +1372,6 @@ textarea.cv-field-control__input {
 .cv-btn--primary-success:focus {
   background: linear-gradient(180deg, #279166, #1b694f);
   border-color: #14553e;
-  box-shadow: 0 10px 18px rgba(31, 126, 92, 0.24);
 }
 
 .cv-btn--cancel {
@@ -1399,7 +1391,7 @@ textarea.cv-field-control__input {
 .cv-btn--sign {
   background: var(--color-accent);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: 0 6px 14px rgba(11, 58, 102, 0.16);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
 }
 
@@ -1486,20 +1478,20 @@ textarea.cv-field-control__input {
 .cv-demo-state-tile--hover .cv-btn {
   background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: 0 8px 16px rgba(11, 58, 102, 0.14);
+  box-shadow: var(--sh-sm);
   transform: translateY(-1px);
 }
 
 .cv-demo-state-tile--active .cv-btn {
   background: var(--cv-surface-card);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
+  box-shadow: var(--sh-sm);
   filter: brightness(0.985);
   transform: translateY(1px);
 }
 
 .cv-demo-state-tile--focus .cv-btn {
-  box-shadow: 0 0 0 3px var(--focus-ring);
+  box-shadow: var(--sh-sm);
   outline: none;
 }
 

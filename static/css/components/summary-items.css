@@ -73,14 +73,12 @@
   color: var(--color-accent);
 }
 
-/* Foco por outline, nao por box-shadow: no tema escuro o
-   --cv-field-focus-ring resolve para --focus-ring, que vale `none` por decisao
-   de design (la o foco e sinalizado pela borda do controle). Um link nao tem
-   borda para mudar, entao herdar esse contrato deixaria o foco invisivel. */
+/* NOVO-30 fase 3c: o sistema deixou de sinalizar foco (decisao de produto).
+   A regra fica so pelo que ela ainda faz — o `outline: none` global de
+   base.css ja cobre o contorno. */
 .summary-items > li > a:focus-visible {
   border-radius: var(--r-sm);
-  outline: 2px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
-  outline-offset: 2px;
+  outline: none;
 }
 
 .summary-items > li > span {

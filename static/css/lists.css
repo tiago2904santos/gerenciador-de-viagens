@@ -15,7 +15,7 @@
   background: var(--cv-surface-block);
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-3);
@@ -135,7 +135,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   display: flex;
   flex-direction: column;
   overflow: hidden;

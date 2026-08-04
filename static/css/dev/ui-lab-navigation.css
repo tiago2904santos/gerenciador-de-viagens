@@ -14,7 +14,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-lg);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   color: var(--color-accent);
   display: flex;
   gap: var(--sp-3);
@@ -27,8 +27,6 @@
 .ui-lab-nav__link:hover,
 .ui-lab-nav__link:focus-visible,
 .ui-lab-nav__link.is-active {
-  border-color: var(--focus-ring);
-  box-shadow: var(--sh-md), 0 0 0 1px 0 0 0 3px var(--focus-ring);
   transform: translateY(-1px);
 }
 

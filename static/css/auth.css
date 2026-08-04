@@ -26,7 +26,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-xl);
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(380px, 0.95fr);
   max-width: 980px;
@@ -223,7 +223,6 @@ padding-inline: clamp(var(--sp-7), 6vw, var(--sp-8));
 
 .auth-submit:active { transform: translateY(1px); }
 .auth-submit:focus-visible {
-  box-shadow: 0 0 0 2px 0 0 0 3px var(--focus-ring);
   outline: none;
 }
 

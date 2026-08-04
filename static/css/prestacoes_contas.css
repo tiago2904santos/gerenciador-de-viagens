@@ -321,7 +321,7 @@ padding-inline: 0;
   align-items: center;
   background: color-mix(in srgb, var(--color-accent) 10%, var(--cv-surface-card));
   border: var(--bd);
-  border-color: var(--focus-ring);
+  border-color: var(--cv-border);
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   color: var(--color-accent);
@@ -342,13 +342,11 @@ padding-inline: 0;
 
 .prestacao-file-selection__toggle:hover {
   background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  border-color: var(--focus-ring);
+  border-color: var(--cv-border);
 }
 
 .prestacao-file-selection__toggle:focus-visible {
-  border-color: var(--focus-ring);
-  box-shadow: 0 0 0 3px var(--focus-ring);
-  outline: 0;
+  outline: none;
 }
 
 .prestacao-file-selection__toggle [data-file-selection-summary] {
@@ -385,7 +383,7 @@ border-bottom-color: currentColor;
 .prestacao-file-selection__menu {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-color: var(--focus-ring);
+  border-color: var(--cv-border);
   border-start-start-radius: 0;
   border-start-end-radius: 0;
   border-end-end-radius: var(--r-md);
@@ -398,7 +396,7 @@ border-bottom-color: currentColor;
 
 .prestacao-file-selection__toggle[hidden] + .prestacao-file-selection__menu {
   border-top: var(--bd);
-border-top-color: var(--focus-ring);
+border-top-color: var(--cv-border);
   border-top-left-radius: var(--r-md);
   border-top-right-radius: var(--r-md);
 }
@@ -421,7 +419,6 @@ border-top-color: var(--focus-ring);
   padding-inline: var(--sp-6);
   transition: background var(--tr-fast);
 }
-
 
 .prestacao-file-selection__item:hover {
   background: color-mix(in srgb, var(--color-accent) 18%, transparent);
@@ -530,8 +527,6 @@ border-top-color: var(--focus-ring);
 }
 
 .prestacao-file-picker:focus-within {
-  border-color: var(--focus-ring);
-  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .prestacao-file-picker__value {
@@ -1017,7 +1012,6 @@ border-top-style: dashed;
 .consolidado-wizard-card .oficio-documentos-card--travellers > .oficio-documentos-card__body {
   padding: 0;
 }
-
 
 /* Modal anexar assinado: item selecionado sem hover (esta folha carrega depois do shell). */
 #attach-signed-modal .prestacao-file-selection__item,

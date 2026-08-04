@@ -30,7 +30,7 @@
   background-image: none;
   border: 0;
   border-radius: var(--r-md);
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
   font-weight: var(--fw-bold);
   text-shadow: none;
@@ -40,7 +40,7 @@
  .perfil-form-page .cv-form-block__actions .cv-btn--primary:hover {
   background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
   background-image: none;
-  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
 }
 

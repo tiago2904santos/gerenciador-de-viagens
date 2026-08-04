@@ -56,7 +56,6 @@
     var(--cv-surface-next)
   );
   border: 0;
-  box-shadow: none;
 }
 
 .cv-record-row:not(:has(.cv-record-row__identity)) {

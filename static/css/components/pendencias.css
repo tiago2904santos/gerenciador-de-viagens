@@ -15,14 +15,14 @@
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
   border-color: var(--cv-state-danger);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
 }
 
 .cv-pendencias--warning {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
   border-color: var(--cv-state-warning);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
 }
 
 .cv-pendencias__inner {
@@ -95,7 +95,6 @@
   background: color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-block));
   border-color: color-mix(in srgb, var(--cv-state-danger) 55%, transparent);
 }
-
 
   .cv-pendencias--warning {
   background: color-mix(in srgb, var(--cv-state-warning) 14%, var(--cv-surface-block));

@@ -37,7 +37,6 @@
 /* Garante que [hidden] esconda elementos mesmo quando o componente define display explícito. */
 [hidden] { display: none !important; }
 
-
 /* =========================================================
    01. Design Tokens — Estrutura, Layout e Aliases
    ========================================================= */
@@ -89,7 +88,6 @@
   /* --- Texto semântico --- */
 }
 
-
 /* =========================================================
    02. Theme Tokens — Dark
    ========================================================= */
@@ -100,11 +98,7 @@
 
 
 
-
-
-
 /* mesmo fundo das seções de formulário */
-
 
 
   /* Stepper — estados */
@@ -126,7 +120,6 @@
   /* Stepper — estados adicionais */
 }
 
-
 /* =========================================================
    03. Theme Tokens — Light (Silver Frost)
    ========================================================= */
@@ -137,11 +130,7 @@
 
 
 
-
-
-
 /* mesmo fundo das seções de formulário */
-
 
 
   /* Stepper — estados */
@@ -159,14 +148,12 @@
   /* Stepper — estados adicionais */
 }
 
-
 /* =========================================================
    04. Background
    O background atmosférico é gerenciado por ui-lab.css no UI Lab
    e pelo base global em páginas reais. Este arquivo não define
    gradientes de fundo — apenas consome tokens de superfície.
    ========================================================= */
-
 
 /* =========================================================
    05. Page Shell Base
@@ -183,7 +170,6 @@
   width:          100%;
   z-index:        var(--z-sidebar);
 }
-
 
 /* =========================================================
    06. Page Shell Variants
@@ -208,7 +194,6 @@
 
 /* Standard, Wizard e List preservam a largura integral do shell. */
 
-
 /* =========================================================
    07. Page Header — Limpo
    Etiqueta limpa da página. Nunca contém botões.
@@ -218,7 +203,7 @@
 /* Container: card com radius e sombra */
 .page-header--clean {
   border-radius: var(--r-lg);
-  box-shadow:    var(--sh-lg);
+  box-shadow: var(--sh-sm);
   overflow:      hidden;
   width:         100%;
 }
@@ -226,7 +211,7 @@
 /* Stage: fundo dark — eyebrow + título */
 .page-header--clean .page-header__stage {
   background: var(--cv-surface-card);
-  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: none;
   padding-block: var(--sp-5);
   padding-inline: var(--sp-6);
 }
@@ -275,7 +260,7 @@
 /* Ribbon: faixa gradiente no rodapé */
 .page-header--clean .page-header__ribbon {
   background: var(--cv-surface-block);
-  box-shadow: 0 1px 2px rgba(7, 26, 51, 0.08);
+  box-shadow: var(--sh-sm);
   height:     3px;
   width:      100%;
 }
@@ -322,7 +307,6 @@
   border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
   color:      var(--cv-state-success);
 }
-
 
 /* =========================================================
    08. Stepper / Navegação em Etapas
@@ -490,7 +474,6 @@
   transition: color var(--tr-base), opacity var(--tr-base);
 }
 
-
 /* ─── Estado: Concluído (.is-complete) ──────────────────── */
 
 .page-stepper__item.is-complete .page-stepper__connector {
@@ -517,15 +500,13 @@
   opacity: 1;
 }
 
-
 /* ─── Estado: Atual / em andamento (.is-current | .is-active) ── */
 
 .page-stepper__item.is-current .page-stepper__marker,
 .page-stepper__item.is-active  .page-stepper__number {
   background:   var(--color-accent);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow:   0 0 0 3px var(--cv-surface-block),
-                0 0 0 5px var(--color-accent);
+  box-shadow: var(--sh-sm);
   color:        var(--on-accent);
 }
 
@@ -540,7 +521,6 @@
   color:   var(--color-accent);
   opacity: 1;
 }
-
 
 /* ─── Estado: Com pendência / faltando algo (.is-missing) ── */
 
@@ -559,7 +539,6 @@
   opacity: 1;
 }
 
-
 /* ─── Estado: Desabilitado / bloqueado (.is-disabled) ────── */
 
 .page-stepper__item.is-disabled {
@@ -567,13 +546,11 @@
   pointer-events: none;
 }
 
-
 /* ─── Foco acessível ─────────────────────────────────────── */
 
 .page-stepper__item:focus-visible .page-stepper__marker,
 .page-stepper__marker--link:focus-visible {
-  outline:        2px solid 2px solid var(--focus-ring);
-  outline-offset: 3px;
+  outline: none;
 }
 
 .page-stepper__marker--link {
@@ -675,7 +652,6 @@
   z-index: var(--z-sticky);
 }
 
-
 /* =========================================================
    09. Main Form Panel
    Superfície central do formulário. Separa o conteúdo funcional
@@ -686,7 +662,7 @@
   background:     var(--cv-surface-card);
   border: var(--bd);
   border-radius:  var(--r-lg);
-  box-shadow:     var(--sh-lg);
+  box-shadow: var(--sh-sm);
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
@@ -734,7 +710,6 @@
   padding:       0;
 }
 
-
 /* =========================================================
    Footer colado ao último card do stack.
    Aplica-se em 100% das páginas que usam .cv-form-section-stack.
@@ -749,7 +724,7 @@
   border-end-end-radius: var(--r-xl);
   border-end-start-radius: var(--r-xl);
   border-top: var(--bd);
-  box-shadow:    var(--sh-lg);
+  box-shadow: var(--sh-sm);
   margin-top:    calc(-1 * var(--_stack-gap, var(--sp-4)));
 }
 
@@ -760,7 +735,7 @@
   background:    var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-xl);
-  box-shadow:    var(--sh-lg);
+  box-shadow: var(--sh-sm);
   overflow:      hidden;
   width:         100%;
 }
@@ -786,7 +761,6 @@
   padding-block: var(--sp-5);
 padding-inline: var(--sp-6);
 }
-
 
 /* =========================================================
    10. Form Section
@@ -814,7 +788,6 @@ padding-inline: var(--sp-6);
 .main-form-panel .form-section:last-of-type {
   border-bottom: 0;
 }
-
 
 /* =========================================================
    11. Section Header
@@ -858,7 +831,6 @@ padding-inline: var(--sp-6);
   gap:         var(--sp-2);
 }
 
-
 /* =========================================================
    11b. cv-form-section — Cards independentes por seção do wizard
    Substitui o padrão de sections separadas por border-bottom
@@ -895,7 +867,7 @@ padding-inline: var(--sp-6);
   background:    var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-xl);
-  box-shadow:    var(--sh-lg);
+  box-shadow: var(--sh-sm);
   overflow:      hidden;
   width:         100%;
 
@@ -966,10 +938,7 @@ padding-inline: var(--sp-6);
 .cv-form-section-header::before {
   background:    linear-gradient(180deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 50%, transparent) 100%);
   border-radius: var(--r-pill);
-  box-shadow:
-    0 0 5px 1px  color-mix(in srgb, var(--color-accent) 35%, transparent),
-    0 0 12px 2px color-mix(in srgb, var(--color-accent) 15%, transparent),
-    0 0 22px 4px color-mix(in srgb, var(--color-accent) 6%, transparent);
+  box-shadow: var(--sh-sm);
   content:       "";
   /* O filete acompanha todo o bloco de conteúdo, inclusive subtítulos e ações. */
   bottom:        var(--_wizard-filete-inset-block);
@@ -1052,7 +1021,7 @@ padding-inline: var(--sp-6);
 .cv-form-section-header--standalone {
   border: var(--bd);
   border-radius: var(--r-xl);
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
   min-height: 0;
   overflow: hidden;
   padding-block: var(--sp-4);
@@ -1093,7 +1062,6 @@ padding-inline: var(--sp-6);
   padding-top: var(--sp-5);
 }
 
-
 /* =========================================================
    12. Field Grid
    Grade de 4 colunas. Controla a distribuição dos campos.
@@ -1115,7 +1083,6 @@ padding-inline: var(--sp-6);
   width:     100%;
 }
 
-
 /* =========================================================
    13. Field Sizes
    Quatro tamanhos de campo baseados em colunas do grid.
@@ -1133,7 +1100,6 @@ padding-inline: var(--sp-6);
 
 /* Linha inteira: justificativa, observações, descrição, textarea */
 .field-size-4 { grid-column: 1 / -1; }
-
 
 /* =========================================================
    14. Field Group
@@ -1173,7 +1139,6 @@ padding-inline: var(--sp-6);
   flex-direction: column;
   gap:            var(--sp-3);
 }
-
 
 /* =========================================================
    15. Footer Actions
@@ -1221,7 +1186,7 @@ padding-inline: var(--sp-6);
    bundle, então um modificador definido aqui nunca chegava a valer. */
 
 .cv-floating-action__button {
-  box-shadow: 0 18px 32px rgba(11, 58, 102, 0.18);
+  box-shadow: var(--sh-sm);
 }
 
 .quick-create-panel--page {
@@ -1267,7 +1232,6 @@ padding-inline: var(--sp-6);
   }
 }
 
-
 /* =========================================================
    16. List Panel / Filters
    Painel principal das páginas de lista.
@@ -1279,7 +1243,7 @@ padding-inline: var(--sp-6);
   background:     var(--cv-surface-card);
   border: var(--bd);
   border-radius:  var(--r-lg);
-  box-shadow:     var(--sh-lg);
+  box-shadow: var(--sh-sm);
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
@@ -1568,7 +1532,7 @@ body.has-delete-modal-open {
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-lg);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+  box-shadow: var(--sh-sm);
   box-sizing: border-box;
   display: grid;
   gap: var(--sp-4);
@@ -1672,7 +1636,6 @@ body.has-delete-modal-open {
   background: transparent;
   border: 0;
   border-radius: 0;
-  box-shadow: none;
   min-height: 96px;
   outline: none;
   resize: vertical;
@@ -1693,7 +1656,7 @@ body.has-delete-modal-open {
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--sh-sm);
   display: none;
   flex-direction: column;
   gap: 2px;
@@ -1808,7 +1771,6 @@ body.has-delete-modal-open {
   width: 100%;
 }
 
-
 /* =========================================================
    17. Quick Create Inline
    Subvariação do List / Filters para mini-cadastros auxiliares.
@@ -1916,7 +1878,6 @@ body.has-delete-modal-open {
   padding-block: 0 var(--sp-3);
   padding-inline: var(--sp-5);
 }
-
 
 /* =========================================================
    18. Responsive
@@ -2066,7 +2027,6 @@ body.has-delete-modal-open {
   }
 }
 
-
 /* =========================================================
    19. Field Layout / Field Rows
    Camada complementar ao Field Grid para controle de colunas
@@ -2139,7 +2099,6 @@ body.has-delete-modal-open {
   }
 }
 
-
 /* =========================================================
    21. Page Header Stack
    Nomenclatura canônica para headers do design system.
@@ -2149,11 +2108,10 @@ body.has-delete-modal-open {
 
 .page-header-stack {
   border-radius: var(--r-lg);
-  box-shadow:    var(--sh-lg);
+  box-shadow: var(--sh-sm);
   overflow:      hidden;
   width:         100%;
 }
-
 
 /* =========================================================
    22. Page Header Band — Faixa Escura
@@ -2164,7 +2122,7 @@ body.has-delete-modal-open {
 .page-header-band {
   align-items:    flex-start;
   background:     var(--cv-surface-card);
-  box-shadow:     inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: none;
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
@@ -2266,7 +2224,6 @@ body.has-delete-modal-open {
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
   color:      var(--cv-state-danger);
 }
-
 
 /* =========================================================
    23. Page Header Rail — Faixa Clara Obrigatória
@@ -2477,8 +2434,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 }
 
 .cv-inline-create__toggle:focus-visible {
-  outline:        2px solid 2px solid var(--focus-ring);
-  outline-offset: -2px;
+  outline: none;
 }
 
 .cv-inline-create__toggle.is-active,
@@ -2492,14 +2448,14 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   animation:    inline-create-btn-fill 0.4s cubic-bezier(0, 0, 0.2, 1) forwards;
   background:   var(--color-accent);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow:   0 6px 14px rgba(11, 58, 102, 0.16);
+  box-shadow: var(--sh-sm);
   color:        var(--on-accent);
 }
 
 .cv-inline-create__toggle.is-filled:hover {
   background:   color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow:   0 10px 18px rgba(11, 58, 102, 0.22);
+  box-shadow: var(--sh-sm);
 }
 
 @keyframes inline-create-btn-fill {
@@ -2560,7 +2516,6 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   font-weight: var(--fw-bold);
 }
 
-
 /* =========================================================
    24. Simple List
    Lista linear de itens com avatar, título, meta e ações.
@@ -2588,7 +2543,6 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   border-top-right-radius: 0;
 }
 
-
 /* =========================================================
    25. Card List
    Grade de cards com hover. Uso: roteiros, ofícios,
@@ -2608,7 +2562,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   background:     var(--cv-surface-card);
   border: var(--bd);
   border-radius:  var(--r-md);
-  box-shadow:     var(--sh-md);
+  box-shadow: var(--sh-sm);
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
@@ -2621,7 +2575,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 
 .list-card:hover {
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow:   var(--sh-md);
+  box-shadow: var(--sh-sm);
 }
 
 .list-card__header {
@@ -2670,7 +2624,6 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   margin-top:      auto;
   padding-top:     var(--sp-3);
 }
-
 
 /* =========================================================
    26. Quick Add Inline
@@ -2721,7 +2674,6 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 
 .cv-inline-create__tab:hover,
 .cv-inline-create__tab:focus-visible {
-  box-shadow: var(--sh-md);
   color:      var(--cv-ink);
 }
 
@@ -2730,8 +2682,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 }
 
 .cv-inline-create__tab:focus-visible {
-  outline:        2px solid 2px solid var(--focus-ring);
-  outline-offset: -2px;
+  outline: none;
 }
 
 /* Aberta: aba conectada visivelmente ao painel */
@@ -2872,7 +2823,6 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   padding-inline: var(--sp-5);
 }
 
-
 /* =========================================================
    27. Field Grid — Variantes com Colunagem Explícita
    Complementam o .field-grid padrão de 4 colunas.
@@ -2925,7 +2875,6 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
     grid-template-columns: minmax(0, 1fr);
   }
 }
-
 
 /* =========================================================
    28. Responsive — Header Stack, Listas e Quick Add Inline
@@ -3008,7 +2957,6 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
     width: 100%;
   }
 }
-
 
 /* =========================================================
    29. Header Filter Bar
@@ -3110,7 +3058,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   color:         var(--cv-ink);
   font-size:     var(--fs-sm);
   height:        var(--h-md);
-  outline:       none;
+  outline: none;
   padding-block: 0;
   padding-inline: var(--sp-3);
   transition:    border-color var(--tr-base);
@@ -3135,7 +3083,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   cursor:        pointer;
   font-size:     var(--fs-sm);
   height:        var(--h-md);
-  outline:       none;
+  outline: none;
   padding-block: 0;
   padding-inline: var(--sp-3) var(--sp-4);
   transition:    border-color var(--tr-base);
@@ -3173,7 +3121,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 .header-filter-button:focus-visible {
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   color:        var(--cv-ink);
-  outline:      none;
+  outline: none;
 }
 
 /* Variante primária */
@@ -3522,7 +3470,6 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 
 
 
-
 /* =========================================================
    Tinta do acento e fim das bordas de foco (NOVO-28)
 
@@ -3541,7 +3488,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 :where(input, select, textarea, button, a, summary, [tabindex]):focus-visible {
   background-color: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
   border-color: transparent;
-  outline: 0;
+  outline: none;
 }
 
 /* Botao cheio e excecao declarada: ja e o acento, entao a tinta nao apareceria.

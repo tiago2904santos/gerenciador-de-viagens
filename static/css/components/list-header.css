@@ -9,7 +9,7 @@
   background: var(--cv-surface-card);
   border: 0;
   border-radius: var(--r-xl);
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -266,7 +266,6 @@
 .list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:focus,
 .list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:focus-visible {
   border: 0;
-  box-shadow: none;
   outline: none;
 }
 
@@ -277,8 +276,6 @@
 .list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:focus,
 .list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:focus-visible {
   border: var(--bd);
-border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
-  box-shadow: 0 0 0 2px color-mix(in srgb, 0 0 0 3px var(--focus-ring) 12%, transparent);
   outline: none;
 }
 
@@ -361,7 +358,6 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
   background: var(--cv-surface-next);
   border: 0;
   border-radius: var(--r-md);
-  box-shadow: none;
   box-sizing: border-box;
   color: var(--cv-ink);
   font-size: var(--fs-sm);
@@ -405,7 +401,6 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
 .list-header--inline-create .cv-inline-create__panel
   .cv-search-picker__control:focus-within {
   border: 0;
-  box-shadow: none;
   outline: none;
 }
 
@@ -429,7 +424,6 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
   border: var(--bd);
   border-color: var(--cv-state-danger);
 }
-
 
 .list-header .cv-inline-create__body {
   align-items: flex-end;
@@ -485,8 +479,7 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
 }
 
 .list-header .cv-inline-create__toggle:focus-visible {
-  outline: 2px solid 2px solid var(--focus-ring);
-  outline-offset: -2px;
+  outline: none;
 }
 
 .list-header .cv-inline-create__toggle.is-active,
@@ -499,7 +492,7 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
   animation: list-header-inline-create-fill 0.35s ease forwards;
   background: var(--color-accent);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
 }
 
@@ -551,11 +544,10 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
    Tema escuro
    ========================================================= */
 
-
   .list-header {
   background: var(--cv-surface-block);
   border-color: var(--cv-border);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
 }
 
 /* Mesma cor do cabeçalho dos cards (.cv-entity-card__header) */
@@ -564,11 +556,9 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
   background: var(--cv-surface-block);
 }
 
-
   .list-header__eyebrow {
   color: var(--color-accent);
 }
-
 
   .list-header__title {
   color: var(--cv-ink);
@@ -603,7 +593,6 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
   box-shadow: none;
 }
 
-
   .travel-period-filter--filled
   .travel-period-filter__btn,
 
@@ -614,13 +603,11 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
   box-shadow: none;
 }
 
-
   .list-header__search-input,
 
   .list-header .header-filter-input {
   color: var(--cv-ink);
 }
-
 
   .list-header__search-icon {
   color: var(--cv-ink-muted);
@@ -630,7 +617,6 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
 
   .list-header__rail .cv-custom-select--v2 {
 }
-
 
   .list-header__rail
   .cv-custom-select__trigger--v2
@@ -646,7 +632,6 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
   color: var(--color-accent);
 }
 
-
   .list-header__rail
   .cv-custom-select__trigger--v2
   .cv-custom-select__chevron
@@ -656,13 +641,11 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
   stroke: currentColor;
 }
 
-
   .list-header .cv-inline-create__toggle {
   background: var(--cv-surface-card);
   border-top-color: var(--cv-border);
   color: var(--cv-ink);
 }
-
 
   .list-header .cv-inline-create__toggle:hover,
 
@@ -672,12 +655,10 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
   background: color-mix(in srgb, var(--cv-surface-card) 72%, var(--cv-surface-card) 10%);
 }
 
-
   .list-header .cv-inline-create__toggle-icon {
   background: color-mix(in srgb, var(--color-accent) 16%, transparent);
   color: var(--color-accent);
 }
-
 
   .list-header .cv-inline-create__toggle.is-filled {
   background: var(--color-accent);
@@ -685,12 +666,10 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
   color: var(--on-accent);
 }
 
-
   .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon {
   background: color-mix(in srgb, var(--cv-surface-card) 16%, transparent);
   color: inherit;
 }
-
 
   .list-header .cv-inline-create__panel.is-open {
   border-top-color: var(--cv-border);
@@ -790,7 +769,7 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
   border: var(--bd);
     border-color: transparent;
   border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   color: var(--cv-ink);
   cursor: pointer;
   display: inline-flex;
@@ -813,10 +792,6 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
 }
 
 .travel-period-filter__btn:focus-visible {
-  background:
-    linear-gradient(color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)), color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface))) padding-box,
-    linear-gradient(var(--focus-ring), var(--focus-ring)) border-box;
-  box-shadow: 0 0 0 3px var(--focus-ring);
   outline: none;
 }
 
@@ -886,7 +861,7 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
 
 .list-header--wizard-band,
 .list-header--wizard-stepper {
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   transition:
     border-radius 240ms ease,
     box-shadow 240ms ease;
@@ -912,7 +887,7 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
 
 .list-header--wizard-band.is-detached {
   border-radius: var(--r-lg);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
 }
 
 .list-header--wizard-band .list-header__band {
@@ -949,7 +924,7 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
 
 .list-header--wizard-stepper.is-detached {
   border-radius: var(--r-lg);
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
 }
 
 .list-header__rail--wizard {
@@ -1012,7 +987,6 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
   transform: none;
 }
 
-
   .list-header--wizard-band
   .list-header__wizard-back.cv-btn--secondary:hover,
 
@@ -1021,12 +995,10 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
   background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-block));
   background-image: none;
   border: 0;
-  box-shadow: none;
   color: var(--color-accent);
-  outline: 0;
+  outline: none;
   transform: none;
 }
-
 
   .list-header--wizard-band
   .list-header__wizard-back
@@ -1034,19 +1006,16 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
   color: inherit;
 }
 
-
   .list-header--wizard-stepper
   .list-header__wizard-stepper
   .page-stepper {
   background: transparent;
 }
 
-
   .list-header--wizard-stepper
   .page-stepper__eyebrow {
   display: none;
 }
-
 
   .list-header--wizard-stepper
   .page-stepper__label {
@@ -1055,13 +1024,11 @@ border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
   letter-spacing: -0.01em;
 }
 
-
   .list-header--wizard-stepper
   .page-stepper__status {
   font-size: 0.68rem;
   font-weight: 600;
 }
-
 
   .list-header--wizard-stepper
   .page-stepper__item.is-missing

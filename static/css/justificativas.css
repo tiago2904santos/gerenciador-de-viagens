@@ -34,7 +34,6 @@
  .justificativas-page .cv-record-row:focus-within {
   background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-next));
   border: 0;
-  box-shadow: none;
 }
 
 /* Aberto: sem linha; gap só o do rail (mesmo ritmo do padding). */
@@ -96,7 +95,6 @@
   gap: 0 !important;
 }
 
-
   [data-justificativa-quick-add]
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker
@@ -107,7 +105,6 @@
   .cv-search-picker__field {
   gap: 7px !important;
 }
-
 
   [data-justificativa-quick-add]
   [data-travel-document-wizard-step1]
@@ -292,7 +289,7 @@
   background: var(--color-accent);
   background-image: none;
   border: 0;
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
   font-weight: var(--fw-bold);
 }
@@ -308,7 +305,6 @@
   background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
   background-image: none;
   border: 0;
-  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
   color: var(--on-accent);
 }
 
@@ -325,7 +321,6 @@
   opacity: 0;
   transform: translateY(4px);
 }
-
 
 @media (max-width: 720px) {
   .justificativas-page .list-header--inline-create .justificativa-quick-add__actions {
