@@ -18,6 +18,7 @@
 
 .cv-search-picker__native,
 .cv-search-picker__termos-native {
+  /* !important: vence o `display` que o agente do usuario da ao `<select>` nativo. */
   display: none !important;
 }
 

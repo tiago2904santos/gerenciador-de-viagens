@@ -1022,7 +1022,7 @@ border-top-style: dashed;
 #attach-signed-modal .cv-file-selection__item:focus,
 #attach-signed-modal .prestacao-file-selection__item:focus-within,
 #attach-signed-modal .cv-file-selection__item:focus-within {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
-  transition: none !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
+  transition: none;
 }

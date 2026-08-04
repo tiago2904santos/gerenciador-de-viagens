@@ -25,21 +25,15 @@ TEMPLATE_EXCEPTIONS: dict[str, dict] = {
     },
 }
 
+# A camada de token e o unico lugar do sistema onde uma cor pode ser escrita a
+# mao — nao e "excecao", e a definicao da regra. Carrega-la como dispensa era o
+# auditor nao conhecer a propria arquitetura (NOVO-30 fase 4).
+CAMADA_DE_TOKEN = frozenset({
+    "static/css/00-palette.css",
+    "static/css/01-tokens.css",
+})
+
 CSS_EXCEPTIONS: dict[str, dict] = {
-    # NOVO-30 fase 3a: `--route-*` e os hex deste arquivo morreram com os
-    # aliases; so o seletor de dominio continua pendente (fase 4).
-    "static/css/forms.css": {
-        "reason": ".roteiro-editor__* permanece como dominio em CSS global (pendente da fase 4).",
-        "rules": {"domain_selector_in_global"},
-    },
-    "static/css/cards.css": {
-        "reason": ".oficio-card em cards.css: domínio a mover para oficios.css (Prompt 5).",
-        "rules": {"domain_selector_in_global"},
-    },
-    "static/css/01-tokens.css": {
-        "reason": "Camada unica de tokens e temas (NOVO-30).",
-        "rules": {"hex_color_outside_tokens"},
-    },
     "static/css/shell.bundle.css": {
         "reason": "Bundle gerado (NOVO-12) — literais e seletores vêm das fontes; auditar as fontes.",
         "rules": {
@@ -231,8 +225,9 @@ def audit_css() -> list[tuple]:
                             level = "EXCEC" if is_exc else "AVISO"
                             findings.append((level, rp, idx, rule_name, message, line.strip(), reason))
 
-                # Hex colors outside tokens/theme — in any CSS file
-                if _CSS_VALUE_LINE.search(line):
+                # Hex colors outside tokens/theme — em qualquer CSS que NAO
+                # seja a camada de token (onde as sementes moram por definicao).
+                if _CSS_VALUE_LINE.search(line) and rp not in CAMADA_DE_TOKEN:
                     is_exc, reason = check_exception(rp, "hex_color_outside_tokens", CSS_EXCEPTIONS)
                     level = "EXCEC" if is_exc else "AVISO"
                     findings.append((level, rp, idx, "hex_color_outside_tokens",

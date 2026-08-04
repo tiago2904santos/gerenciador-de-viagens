@@ -5,7 +5,7 @@
   padding-block: clamp(var(--sp-6), 6vw, var(--sp-8));
   padding-inline: clamp(var(--sp-6), 6vw, var(--sp-8));
   place-items: center;
-  background: var(--cv-surface-block) !important;
+  background: var(--cv-surface-block);
   color: var(--cv-ink);
 }
 
@@ -18,7 +18,7 @@
   padding-inline: clamp(var(--sp-6), 5vw, var(--sp-8));
   border: 0;
   border-radius: var(--r-xl);
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   text-align: center;
 }
 

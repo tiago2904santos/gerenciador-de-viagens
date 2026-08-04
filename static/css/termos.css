@@ -25,7 +25,7 @@
   .related-route-picker.termo-oficio-picker.cv-search-picker--people.cv-search-picker--roster,
 .document-form-page .related-route-picker.termo-oficio-picker.cv-search-picker--people.cv-search-picker--roster,
 .termo-oficio-picker.cv-search-picker--people.cv-search-picker--roster {
-  gap: 0 !important;
+  gap: 0;
 }
 
 .termo-oficio-picker .cv-search-picker__field,
@@ -33,7 +33,7 @@
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker
   .cv-search-picker__field {
-  gap: 7px !important;
+  gap: 7px;
 }
 
 .termo-oficio-summary-panel {
@@ -55,7 +55,7 @@
   .related-route-picker.termo-oficio-picker
   :is(.cv-search-picker__selected-list, #termo-oficio-lista, #os-oficio-lista) {
   display: grid;
-  gap: 8px !important;
+  gap: 8px;
   margin-top: var(--sp-2);
   max-height: 280px;
   overflow: auto;

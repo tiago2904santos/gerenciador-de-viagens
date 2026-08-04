@@ -124,8 +124,8 @@ margin-inline: 0;
 }
 
 #id_roteiro_seed_source_label:empty {
-  margin: 0 !important;
-  padding: 0 !important;
+  margin: 0;
+  padding: 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -463,7 +463,7 @@ margin-inline: 0;
 }
 
 .cv-data-table__actions {
-  text-align: right !important;
+  text-align: right;
   width: 1%;
 }
 

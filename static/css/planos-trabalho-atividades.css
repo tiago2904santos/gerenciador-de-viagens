@@ -73,12 +73,12 @@
   input.cv-field__control.pt-activity__search-input,
 .pt-activity__preset-select .cv-custom-select__trigger,
 .pt-activity__search .pt-activity__search-input {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
-  background-image: none !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
+  background-image: none;
+  border-color: transparent;
   border-radius: var(--r-md);
-  box-shadow: none !important;
+  box-shadow: none;
 }
 
 .pt-activity__preset-select .cv-custom-select__trigger {

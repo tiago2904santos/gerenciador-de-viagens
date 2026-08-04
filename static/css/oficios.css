@@ -1346,6 +1346,8 @@
    Usa !important porque .form-field--hidden compete com .field-grid em
    especificidade em alguns contextos do wizard. */
 .oficio-viatura-manual.form-field--hidden {
+  /* !important: vence o `.field-grid` do wizard, que declara `display: grid`
+     com a mesma especificidade e vem depois na cascata. */
   display: none !important;
 }
 
@@ -3075,8 +3077,7 @@ margin-inline: 0;
    fica inválida e o campo colapsa para a altura do texto (~19px) em vez de 44px.
    Mesmo remédio já usado em .related-route-picker (dark-redesign.css). */
 .evento-doc-source-picker {
-  /* gap:0 — o select oculto no meio do grid dobraria qualquer gap. */
-  gap: 0 !important;
+  gap: 0;
 }
 
 .evento-doc-source-picker .cv-search-picker__field {
@@ -3102,7 +3103,7 @@ margin-inline: 0;
    selecionados; aqui a lista reaproveita o scroll de 220px do roteiro-editor,
    então sem overflow:auto os cards vazam para fora do card do documento. */
 .evento-doc-summary-panel .cv-search-picker__selected-list {
-  overflow-y: auto !important;
+  overflow-y: auto;
 }
 
 /* Destaque do card marcado (Documentos vinculados). .related-route-item.is-active
