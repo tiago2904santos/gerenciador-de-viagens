@@ -1,0 +1,18 @@
+{% comment %}
+  Ação do header do card "Usuários da área". Escrita à mão, e não por
+  `button.html`, porque o gatilho precisa dos `data-*` do overlay — mesma razão
+  do botão de vincular em `components/lists/simple_list_row.html`.
+{% endcomment %}
+<button
+  type="button"
+  class="cv-btn cv-btn--secondary"
+  data-overlay-trigger
+  data-overlay-kind="dialog"
+  data-overlay-target="vincular-usuario-modal"
+  data-vincular-url="{{ vinculo_action_url }}"
+  data-vincular-usuario-label="{{ area.sigla }}"
+  aria-label="Vincular um usuário à área {{ area.sigla }}"
+>
+  <span class="cv-btn__icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon="link" only %}</span>
+  <span>Vincular usuário</span>
+</button>

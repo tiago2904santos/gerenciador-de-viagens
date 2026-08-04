@@ -1,0 +1,58 @@
+<div
+  id="vincular-usuario-modal"
+  class="cv-dialog cv-dialog--document delete-confirm-modal vincular-usuario-modal"
+  data-vincular-usuario-modal
+  data-overlay-panel
+  hidden
+>
+  <div class="cv-dialog__backdrop delete-confirm-modal__backdrop" data-overlay-close></div>
+  <section
+    class="cv-dialog__panel cv-dialog__panel--sm delete-confirm-modal__dialog vincular-usuario-modal__dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="vincular-usuario-title"
+    aria-describedby="vincular-usuario-description"
+    tabindex="-1"
+  >
+    {% include "components/ui/modals/dialog_header.html" with icon="link" tone="document" eyebrow="Administração" title="Vincular usuário" title_id="vincular-usuario-title" data_cancel_modal_cancel=True only %}
+
+    <form method="post" class="cv-dialog__form vincular-usuario-modal__form" data-vincular-usuario-form>
+      {% csrf_token %}
+      {{ vincular_form.usuario }}
+      <div class="cv-dialog__body vincular-usuario-modal__body">
+        <p class="cv-dialog__message vincular-usuario-modal__intro" id="vincular-usuario-description">
+          {% include "components/ui/icons/icon.html" with icon="link" only %}
+          <span>
+            Escolha a área e o perfil de
+            <strong data-vincular-usuario-label>este usuário</strong>.
+          </span>
+        </p>
+
+        {% if vincular_form.non_field_errors %}
+          {% include "components/ui/feedback/field_error.html" with errors=vincular_form.non_field_errors only %}
+        {% endif %}
+
+        <div
+          class="vincular-usuario-modal__fields cv-form-stack document-form-page"
+          data-travel-document-wizard-step1
+        >
+          {% include "components/ui/forms/field.html" with field=vincular_form.area size_class="field-size-1" only %}
+          {% include "components/ui/forms/field.html" with field=vincular_form.papel size_class="field-size-1" only %}
+        </div>
+      </div>
+      <div class="cv-dialog__footer vincular-usuario-modal__footer cv-form-card__footer">
+        <section class="cv-card-footer-section">
+          <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
+          <footer class="cv-card-footer">
+            <div class="cv-card-footer__secondary">
+              {% include "components/ui/buttons/button.html" with label="Cancelar" variant="secondary" type="button" icon="arrow-left" data_cancel_modal_cancel=True only %}
+            </div>
+            <div class="cv-card-footer__primary">
+              {% include "components/ui/buttons/button.html" with label="Salvar vínculo" variant="primary" type="submit" icon="arrow-right" icon_after=True only %}
+            </div>
+          </footer>
+        </section>
+      </div>
+    </form>
+  </section>
+</div>
