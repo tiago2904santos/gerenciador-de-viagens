@@ -39,7 +39,7 @@
     .cv-search-picker__control,
     .cv-date-picker__control
   ) {
-  background: var(--cv-surface-block) !important;
+  background: var(--cv-surface-block);
 }
 
 
@@ -53,7 +53,7 @@
   .cadastros-form-page[data-configuracoes-shell]
   .cv-date-picker__control
   :is(.cv-field__control, input) {
-  background: transparent !important;
+  background: transparent;
   border: var(--bd-0);
   border-radius: var(--r-0);
   box-shadow: var(--sh-md);

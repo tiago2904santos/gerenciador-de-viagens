@@ -798,7 +798,16 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
   propriedades reduziu `!important` de **497 para 331**; o restante pertence a
   Fase 4. Auditor frontend: **335 -> 191** avisos; auditor visual estatico:
   **4.988 -> 3.448** ocorrencias suspeitas.
-- [ ] **Fase 4 — fim das excecoes e do `!important`.**
+- [x] **Fase 4 — fim das excecoes e do `!important`:** excecoes por arquivo
+  removidas do auditor e do gate de tokens (**2 -> 0 ativas**); seletores de
+  dominio do editor foram retirados de `forms.css` e consolidados em
+  `roteiros.css`; `!important` caiu de **331 para 0**. O auditor frontend caiu
+  de **191 para 10 avisos**, todos `href="#"` preexistentes em templates e fora
+  do escopo CSS fechado desta fase; **0 erros e 0 excecoes**. A precedencia de
+  `[hidden]` foi preservada sem `!important` por especificidade estrutural.
+  Auditor visual estatico medido sobre a `main` mergeada: **3.643 -> 3.490**;
+  `medir_paleta.py` produziu resultado identico antes/depois nas cinco paginas
+  e nos dois temas.
 - [ ] **Fase 5 — apagar o CSS antigo.**
 
 ---

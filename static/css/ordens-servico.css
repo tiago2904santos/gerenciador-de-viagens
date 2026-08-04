@@ -10,12 +10,12 @@
   contain: paint;
   margin-top: 8px;
   max-height: min(280px, 36vh);
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
+  overflow-x: hidden;
+  overflow-y: auto;
   overscroll-behavior: contain;
-  scrollbar-color: var(--cv-border) transparent !important;
+  scrollbar-color: var(--cv-border) transparent;
   scrollbar-gutter: stable;
-  scrollbar-width: thin !important;
+  scrollbar-width: thin;
 }
 
 /* Scrollbar canônica (mesmo padrão do custom-select v2 / Metas). */
@@ -241,7 +241,7 @@
 }
 
 .os-servidor-role-panel__toggle .cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {
-  background: color-mix(in srgb, #fff 5%, transparent);
+  background: color-mix(in srgb, var(--on-accent) 5%, transparent);
   color: var(--cv-ink);
 }
 
@@ -308,11 +308,11 @@
 
   .os-page .os-form-card #os-card-servidores .cv-search-picker__field:focus-within
   .cv-search-picker__control {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
+  border-color: transparent;
   box-shadow: var(--sh-md);
-  transition: none !important;
+  transition: none;
 }
 
 
@@ -353,45 +353,45 @@
 
   .os-page .os-form-card #os-oficio-lista
   .cv-search-picker__selected-card:not(.is-active):not([aria-pressed="true"]) {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
 }
 
 
   .os-page .os-form-card #os-oficio-lista
   .cv-search-picker__selected-card:not(.is-active):not([aria-pressed="true"]):hover {
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-block)) !important;
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-block));
 }
 
 /* Cards de servidores no poço dos campos; destaque dourado só na função ativa. */
 
   .os-page #os-card-servidores
   .cv-search-picker__selected-card:not(.cv-search-picker__selected-card--driver) {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
 }
 
 
   .os-page #os-card-servidores
   .cv-search-picker__selected-card:not(.cv-search-picker__selected-card--driver):hover {
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-block)) !important;
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-block));
 }
 
 /* Equipe da OS: flat como Documentos vinculados (busca + lista próximas). */
 .os-page #os-card-servidores
   .cv-search-picker--people.cv-search-picker--roster {
-  background: transparent !important;
+  background: transparent;
   border: var(--bd-0);
   border-radius: var(--r-0);
   box-shadow: var(--sh-md);
-  gap: 0 !important;
+  gap: 0;
   padding: 0;
 }
 
 .os-page #os-card-servidores
   .cv-search-picker--people.cv-search-picker--roster
   .cv-search-picker__selected-panel {
-  background: transparent !important;
+  background: transparent;
   border: var(--bd-0);
   border-radius: var(--r-0);
   box-shadow: var(--sh-md);

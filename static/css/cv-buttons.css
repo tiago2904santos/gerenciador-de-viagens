@@ -95,7 +95,7 @@
   opacity: 0.45;
   cursor: not-allowed;
   pointer-events: none;
-  transform: none !important;
+  transform: none;
 }
 
 .cv-btn.is-loading {
@@ -203,31 +203,31 @@
 
 /* --- Danger (excluir — acao permanente no banco) --- */
 .cv-btn--danger {
-  background: linear-gradient(135deg, #c0392b 0%, var(--cv-state-danger) 100%);
-  border-color: #8f1f18;
+  background: linear-gradient(135deg, var(--cv-state-danger) 0%, var(--cv-state-danger) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 76%, var(--cv-ink));
   box-shadow: var(--sh-md);
   color: var(--on-accent);
 }
 
 .cv-btn--danger:hover,
 .cv-btn--danger:focus {
-  background: linear-gradient(135deg, #a93328 0%, #951f18 100%);
-  border-color: #7a1a14;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--cv-state-danger) 88%, var(--cv-ink)) 0%, color-mix(in srgb, var(--cv-state-danger) 80%, var(--cv-ink)) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 68%, var(--cv-ink));
   box-shadow: var(--sh-md);
 }
 
 /* --- Soft-danger (remover — remocao local, reversivel) --- */
 .cv-btn--soft-danger {
-  background: linear-gradient(135deg, #c0392b 0%, var(--cv-state-danger) 100%);
-  border-color: #8f1f18;
+  background: linear-gradient(135deg, var(--cv-state-danger) 0%, var(--cv-state-danger) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 76%, var(--cv-ink));
   box-shadow: var(--sh-md);
   color: var(--on-accent);
 }
 
 .cv-btn--soft-danger:hover,
 .cv-btn--soft-danger:focus {
-  background: linear-gradient(135deg, #a93328 0%, #951f18 100%);
-  border-color: #7a1a14;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--cv-state-danger) 88%, var(--cv-ink)) 0%, color-mix(in srgb, var(--cv-state-danger) 80%, var(--cv-ink)) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 68%, var(--cv-ink));
   box-shadow: var(--sh-md);
 }
 
@@ -508,28 +508,28 @@
 
 /* Delete — vermelho destrutivo */
 .cv-icon-btn--delete {
-  background: linear-gradient(135deg, #c0392b 0%, var(--cv-state-danger) 100%);
-  border-color: #8f1f18;
+  background: linear-gradient(135deg, var(--cv-state-danger) 0%, var(--cv-state-danger) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 76%, var(--cv-ink));
   color: var(--on-accent);
 }
 
 .cv-icon-btn--delete:hover,
 .cv-icon-btn--delete:focus {
-  background: linear-gradient(135deg, #a93328 0%, #951f18 100%);
-  border-color: #7a1a14;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--cv-state-danger) 88%, var(--cv-ink)) 0%, color-mix(in srgb, var(--cv-state-danger) 80%, var(--cv-ink)) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 68%, var(--cv-ink));
 }
 
 /* Cancelar — amber de alerta (distinto do vermelho de exclusão) */
 .cv-icon-btn--cancel {
-  background: linear-gradient(135deg, #b8860b 0%, var(--cv-state-warning) 100%);
-  border-color: #8a660a;
+  background: linear-gradient(135deg, var(--cv-state-warning) 0%, var(--cv-state-warning) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-warning) 76%, var(--cv-ink));
   color: var(--on-accent);
 }
 
 .cv-icon-btn--cancel:hover,
 .cv-icon-btn--cancel:focus {
-  background: linear-gradient(135deg, #9c7209 0%, #b8860b 100%);
-  border-color: #75570a;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--cv-state-warning) 88%, var(--cv-ink)) 0%, var(--cv-state-warning) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-warning) 68%, var(--cv-ink));
 }
 
 /* Preview — teal informativo (olho) */
@@ -605,41 +605,41 @@
 
 /* Sign — já assinado: mesmo verde de "Concluir", indicador compacto sem badge de texto */
 .cv-icon-btn--sign.is-assinado {
-  background: linear-gradient(135deg, #1f8f4e 0%, var(--cv-state-success) 100%);
-  border-color: #167039;
+  background: linear-gradient(135deg, var(--cv-state-success) 0%, var(--cv-state-success) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-success) 76%, var(--cv-ink));
   color: var(--on-accent);
 }
 
 .cv-icon-btn--sign.is-assinado:hover,
 .cv-icon-btn--sign.is-assinado:focus {
-  background: linear-gradient(135deg, #1a7a43 0%, #1f8f4e 100%);
-  border-color: #125d30;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--cv-state-success) 88%, var(--cv-ink)) 0%, var(--cv-state-success) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-success) 68%, var(--cv-ink));
 }
 
 /* Edit (⋯ menu de ações) — já assinado: mesmo indicador verde compacto do --sign */
 .cv-icon-btn--edit.is-assinado {
-  background: linear-gradient(135deg, #1f8f4e 0%, var(--cv-state-success) 100%);
-  border-color: #167039;
+  background: linear-gradient(135deg, var(--cv-state-success) 0%, var(--cv-state-success) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-success) 76%, var(--cv-ink));
   color: var(--on-accent);
 }
 
 .cv-icon-btn--edit.is-assinado:hover,
 .cv-icon-btn--edit.is-assinado:focus {
-  background: linear-gradient(135deg, #1a7a43 0%, #1f8f4e 100%);
-  border-color: #125d30;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--cv-state-success) 88%, var(--cv-ink)) 0%, var(--cv-state-success) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-success) 68%, var(--cv-ink));
 }
 
 /* Settings (pasta / ações) — já assinado: mesmo indicador verde compacto do --sign */
 .cv-icon-btn--settings.is-assinado {
-  background: linear-gradient(135deg, #1f8f4e 0%, var(--cv-state-success) 100%);
-  border-color: #167039;
+  background: linear-gradient(135deg, var(--cv-state-success) 0%, var(--cv-state-success) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-success) 76%, var(--cv-ink));
   color: var(--on-accent);
 }
 
 .cv-icon-btn--settings.is-assinado:hover,
 .cv-icon-btn--settings.is-assinado:focus {
-  background: linear-gradient(135deg, #1a7a43 0%, #1f8f4e 100%);
-  border-color: #125d30;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--cv-state-success) 88%, var(--cv-ink)) 0%, var(--cv-state-success) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-success) 68%, var(--cv-ink));
 }
 
 /* Signature — gerar assinatura (primary soft preenchido) */
@@ -658,28 +658,28 @@
 
 /* Concluir — verde de sucesso, preenchido (finalizar prestação) */
 .cv-icon-btn--complete {
-  background: linear-gradient(135deg, #1f8f4e 0%, var(--cv-state-success) 100%);
-  border-color: #167039;
+  background: linear-gradient(135deg, var(--cv-state-success) 0%, var(--cv-state-success) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-success) 76%, var(--cv-ink));
   color: var(--on-accent);
 }
 
 .cv-icon-btn--complete:hover,
 .cv-icon-btn--complete:focus {
-  background: linear-gradient(135deg, #1a7a43 0%, #1f8f4e 100%);
-  border-color: #125d30;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--cv-state-success) 88%, var(--cv-ink)) 0%, var(--cv-state-success) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-success) 68%, var(--cv-ink));
 }
 
 /* WhatsApp — verde característico, preenchido (aviso de liberação de diárias) */
 .cv-icon-btn--whatsapp {
-  background: linear-gradient(135deg, #1fa855 0%, #25d366 100%);
-  border-color: #178a45;
-  color: #fff;
+  background: linear-gradient(135deg, var(--cv-state-success) 0%, color-mix(in srgb, var(--cv-state-success) 84%, var(--on-accent)) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-success) 80%, var(--cv-ink));
+  color: var(--on-accent);
 }
 
 .cv-icon-btn--whatsapp:hover,
 .cv-icon-btn--whatsapp:focus {
-  background: linear-gradient(135deg, #178a45 0%, #1fa855 100%);
-  border-color: #12703a;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--cv-state-success) 80%, var(--cv-ink)) 0%, var(--cv-state-success) 100%);
+  border-color: color-mix(in srgb, var(--cv-state-success) 70%, var(--cv-ink));
 }
 
 /* Arquivar — âmbar sóbrio; desarquivar/reabrir usam o neutro (--edit) */
@@ -701,7 +701,7 @@
   background: var(--cv-surface-card);
   border-color: rgba(145, 41, 31, 0.92);
   box-shadow: var(--sh-md);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .cv-icon-btn--pdf:hover,
@@ -716,7 +716,7 @@
   background: var(--cv-surface-card);
   border-color: rgba(24, 69, 125, 0.92);
   box-shadow: var(--sh-md);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .cv-icon-btn--docx:hover,

@@ -16,44 +16,6 @@ CSS_DIR = ROOT / "static" / "css"
 JS_DIR = ROOT / "static" / "js"
 
 # ---------------------------------------------------------------------------
-# Exceções documentadas — chave: caminho relativo ao ROOT (posix)
-# ---------------------------------------------------------------------------
-TEMPLATE_EXCEPTIONS: dict[str, dict] = {
-    "templates/core/dashboard.html": {
-        "reason": "Shell dashboard-login-inspired e excecao oficial -- usa 100% CSS vars.",
-        "rules": {"legacy_page_header"},
-    },
-}
-
-CSS_EXCEPTIONS: dict[str, dict] = {
-    "static/css/forms.css": {
-        "reason": ".roteiro-editor__* permanece como dominio em CSS global; --route-* sao variaveis globais de tema.",
-        "rules": {"domain_selector_in_global", "route_token_in_global", "hex_color_outside_tokens"},
-    },
-    "static/css/cards.css": {
-        "reason": ".oficio-card em cards.css: domínio a mover para oficios.css (Prompt 5).",
-        "rules": {"domain_selector_in_global"},
-    },
-    "static/css/01-tokens.css": {
-        "reason": "Camada unica de tokens e temas (NOVO-30).",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/dashboard.css": {
-        "reason": "Dashboard e excecao oficial -- hex restantes sao fallbacks de var() no botao do hero.",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/shell.bundle.css": {
-        "reason": "Bundle gerado (NOVO-12) — literais e seletores vêm das fontes; auditar as fontes.",
-        "rules": {
-            "hex_color_outside_tokens",
-            "domain_selector_in_global",
-            "route_token_in_global",
-            "legacy_page_header_in_css",
-        },
-    },
-}
-
-# ---------------------------------------------------------------------------
 # Regras de templates
 # ---------------------------------------------------------------------------
 TEMPLATE_RULES_ERRO = [
@@ -74,7 +36,7 @@ TEMPLATE_RULES_ERRO = [
 
 TEMPLATE_RULES_AVISO = [
     ("href_hash",            re.compile(r'\bhref="#"'),                'href="#" — checar se é intencional'),
-    ("legacy_page_header",   re.compile(r'class="[^"]*\bpage-header\b'), 'Classe page-header legada — migrar para app-page-hero'),
+    ("legacy_page_header",   re.compile(r'class="[^"]*\bpage-header\b(?![-_])'), 'Classe page-header legada — migrar para app-page-hero'),
     ("script_inline",        re.compile(r'<script(?![^>]*\bsrc=)[^>]*>(?!\s*<)'), '<script> inline (sem src) — mover para arquivo .js'),
 ]
 
@@ -98,7 +60,7 @@ _DOMAIN_SELECTOR_PAT = re.compile(
     r'^\s*\.(?:oficio|motivo|roteiro|diario|prestacao|plano|termo|ordem|justificativa)[_-]'
 )
 _ROUTE_TOKEN_PAT = re.compile(r'--route-')
-_LEGACY_PAGE_HEADER_PAT = re.compile(r'^\s*\.page-header\b')
+_LEGACY_PAGE_HEADER_PAT = re.compile(r'^\s*\.page-header\b(?![-_])')
 # Hex color fora de tokens/theme: match #rgb / #rrggbb / #rrggbbaa em valor CSS (não em comentário)
 _HEX_COLOR_PAT = re.compile(r'(?<![\w#])#([0-9a-fA-F]{3,8})\b')
 _CSS_COMMENT_LINE = re.compile(r'^\s*/\*')
@@ -168,14 +130,6 @@ def rel(path: Path) -> str:
     return path.relative_to(ROOT).as_posix()
 
 
-def check_exception(rel_path: str, rule_name: str, exceptions: dict) -> tuple[bool, str]:
-    """Return (is_exception, reason)."""
-    exc = exceptions.get(rel_path, {})
-    if rule_name in exc.get("rules", set()):
-        return True, exc["reason"]
-    return False, ""
-
-
 # ---------------------------------------------------------------------------
 # Checkers
 # ---------------------------------------------------------------------------
@@ -193,15 +147,11 @@ def audit_templates() -> list[tuple]:
         for idx, line in enumerate(lines, start=1):
             for rule_name, pattern, message in TEMPLATE_RULES_ERRO:
                 if pattern.search(line):
-                    is_exc, reason = check_exception(rp, rule_name, TEMPLATE_EXCEPTIONS)
-                    level = "EXCEC" if is_exc else "ERRO"
-                    findings.append((level, rp, idx, rule_name, message, line.strip(), reason))
+                    findings.append(("ERRO", rp, idx, rule_name, message, line.strip(), ""))
 
             for rule_name, pattern, message in TEMPLATE_RULES_AVISO:
                 if pattern.search(line):
-                    is_exc, reason = check_exception(rp, rule_name, TEMPLATE_EXCEPTIONS)
-                    level = "EXCEC" if is_exc else "AVISO"
-                    findings.append((level, rp, idx, rule_name, message, line.strip(), reason))
+                    findings.append(("AVISO", rp, idx, rule_name, message, line.strip(), ""))
 
     return findings
 
@@ -229,17 +179,13 @@ def audit_css() -> list[tuple]:
                 if is_global:
                     for rule_name, pattern, message in CSS_RULES_AVISO:
                         if pattern.search(line):
-                            is_exc, reason = check_exception(rp, rule_name, CSS_EXCEPTIONS)
-                            level = "EXCEC" if is_exc else "AVISO"
-                            findings.append((level, rp, idx, rule_name, message, line.strip(), reason))
+                            findings.append(("AVISO", rp, idx, rule_name, message, line.strip(), ""))
 
                 # Hex colors outside tokens/theme — in any CSS file
-                if _CSS_VALUE_LINE.search(line):
-                    is_exc, reason = check_exception(rp, "hex_color_outside_tokens", CSS_EXCEPTIONS)
-                    level = "EXCEC" if is_exc else "AVISO"
-                    findings.append((level, rp, idx, "hex_color_outside_tokens",
+                if path.name not in {"00-palette.css", "01-tokens.css"} and _CSS_VALUE_LINE.search(line):
+                    findings.append(("AVISO", rp, idx, "hex_color_outside_tokens",
                                      "Cor hex em valor CSS — usar var() de token",
-                                     line.strip(), reason))
+                                     line.strip(), ""))
 
     return findings
 

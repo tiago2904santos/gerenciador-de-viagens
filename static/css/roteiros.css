@@ -433,7 +433,7 @@
   align-items: stretch;
   gap: var(--sp-3);
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-bottom: 14px !important;
+  margin-bottom: 14px;
 }
 
 .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-card {
@@ -566,7 +566,7 @@
 
 /* Picker de roteiro salvo (ofício): mesmo ritmo do picker de Documentos vinculados. */
 .related-route-picker.cv-search-picker--people.cv-search-picker--roster {
-  gap: 0 !important;
+  gap: 0;
 }
 
 .related-route-picker .cv-search-picker__field {
@@ -869,17 +869,17 @@
 .roteiro-editor--oficio .route-sede-block.cv-form-block--split,
 .roteiro-editor--oficio .route-sede-block.cv-form-block--split:hover {
   align-items: center;
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   border: var(--bd-0);
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
   column-gap: var(--sp-4);
-  filter: none !important;
+  filter: none;
   grid-template-columns: 14rem minmax(0, 1fr);
   margin: 0;
   padding: var(--sp-3);
-  transform: none !important;
-  transition: none !important;
+  transform: none;
+  transition: none;
 }
 
 .roteiro-editor--oficio .route-sede-block.cv-form-block--split > .cv-form-block__header {
@@ -896,7 +896,7 @@
 
 .roteiro-editor--oficio .route-sede-block .field-grid.roteiro-sede-grid {
   gap: var(--sp-3) var(--sp-4);
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   width: 100%;
 }
 
@@ -906,30 +906,30 @@
   .cv-search-picker__control:hover,
   .cv-search-picker__input:hover
 ) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
+  border-color: transparent;
   box-shadow: var(--sh-md);
-  transition: none !important;
+  transition: none;
 }
 
 /* Período: mesmo card/split dos Destinos (rail 14rem | datas). */
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .travel-period-block.travel-period-block--split,
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .travel-period-block.travel-period-block--split:hover {
   align-items: center;
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   border: var(--bd-0);
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
   column-gap: var(--sp-4);
   display: grid;
-  filter: none !important;
+  filter: none;
   grid-template-columns: 14rem minmax(0, 1fr);
   margin: 0;
   padding: var(--sp-3);
   row-gap: 0;
-  transform: none !important;
-  transition: none !important;
+  transform: none;
+  transition: none;
 }
 
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .travel-period-block--split > .travel-period-block__rail {
@@ -975,7 +975,7 @@
 
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .travel-period-block--split .field-grid.field-grid--cols-2 {
   gap: var(--sp-3) var(--sp-4);
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   width: 100%;
 }
 
@@ -998,12 +998,12 @@
   .cv-date-picker__control .cv-field__control:hover,
   .cv-date-picker__control .cv-field__control:focus
 ) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
+  border-color: transparent;
   border-radius: var(--r-sm);
   box-shadow: var(--sh-md);
-  transition: none !important;
+  transition: none;
 }
 
 /* Calendário do período: mesmo filled soft de "Novo viajante". */
@@ -1014,19 +1014,19 @@
     .cv-date-picker__control:focus-within .cv-date-picker__trigger--icon,
     .cv-date-picker--open .cv-date-picker__trigger--icon
   ) {
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   border: var(--bd-0);
   box-shadow: var(--sh-md);
-  color: var(--cv-ink) !important;
+  color: var(--cv-ink);
 }
 
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1])
   .travel-period-block--split
   .cv-date-picker__trigger--icon:is(:hover, :focus-visible) {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-ink-muted)) !important;
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-ink-muted));
   border: var(--bd-0);
   box-shadow: var(--sh-md);
-  color: var(--color-accent) !important;
+  color: var(--color-accent);
   outline: 0;
 }
 
@@ -1040,19 +1040,19 @@
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .route-destinos-block.route-destinos-block--split,
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .route-destinos-block.route-destinos-block--split:hover {
   align-items: start;
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   border: var(--bd-0);
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
   column-gap: var(--sp-4);
   display: grid;
-  filter: none !important;
+  filter: none;
   grid-template-columns: 14rem minmax(0, 1fr);
   margin: var(--sp-4) 0 0;
   padding: var(--sp-3);
   row-gap: 0;
-  transform: none !important;
-  transition: none !important;
+  transform: none;
+  transition: none;
 }
 
 /* No schedule do termo o gap do container já é o espaçamento Sede↔Destinos. */
@@ -1101,7 +1101,7 @@
 }
 
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .route-destinos-block--split .route-destinos-trechos[hidden] {
-  display: none !important;
+  display: none;
 }
 
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .route-destinos-block--split .route-destinos-trechos__item {
@@ -1145,7 +1145,7 @@
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .route-destinos-block .destination-row,
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .route-destinos-block .destination-row:hover {
   align-items: center;
-  background: transparent !important;
+  background: transparent;
   border: var(--bd-0);
   box-shadow: var(--sh-md);
   /* Duas metades iguais à sede: [drag + add + UF] | [Cidade + ×] */
@@ -1154,7 +1154,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   min-height: 0;
   padding: 0;
-  transition: none !important;
+  transition: none;
 }
 
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single,
@@ -1209,7 +1209,7 @@
 }
 
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .route-destinos-block .cv-ordered-field-row__badge.sr-only {
-  display: none !important;
+  display: none;
 }
 
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .route-destinos-block .route-destinos-add,
@@ -1232,10 +1232,10 @@
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .route-destinos-block .cv-ordered-field-row__remove,
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .route-destinos-block .destination-remove-button {
   align-items: center;
-  background: color-mix(in srgb, var(--cv-state-danger) 12%, var(--cv-surface-card)) !important;
+  background: color-mix(in srgb, var(--cv-state-danger) 12%, var(--cv-surface-card));
   border: var(--bd-0);
   border-radius: var(--r-sm);
-  color: var(--cv-ink) !important;
+  color: var(--cv-ink);
   cursor: pointer;
   display: inline-flex;
   flex: 0 0 auto;
@@ -1244,9 +1244,9 @@
   justify-content: center;
   margin: 0;
   min-width: 44px;
-  opacity: 1 !important;
+  opacity: 1;
   padding: 0;
-  transform: none !important;
+  transform: none;
   width: 44px;
 }
 
@@ -1258,11 +1258,11 @@
   .cv-search-picker__control:focus-within,
   .cv-search-picker__input:focus
 ) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
+  border-color: transparent;
   box-shadow: var(--sh-md);
-  transition: none !important;
+  transition: none;
 }
 
 @media (max-width: 720px) {
@@ -1285,7 +1285,7 @@
 @media (max-width: 600px) {
   .roteiro-editor--oficio .route-sede-block .field-grid.roteiro-sede-grid,
   :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .travel-period-block--split .field-grid.field-grid--cols-2 {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1393,8 +1393,8 @@
   border: var(--bd);
   border-radius: var(--r-md);
   display: grid;
-  gap: 0 !important;
-  grid-template-columns: minmax(9rem, 0.85fr) minmax(0, 1.15fr) !important;
+  gap: 0;
+  grid-template-columns: minmax(9rem, 0.85fr) minmax(0, 1.15fr);
   overflow: hidden;
   padding: 0;
   width: 100%;
@@ -1441,7 +1441,7 @@
 
 @media (max-width: 600px) {
   .roteiro-editor--oficio .route-location-pair {
-    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .roteiro-editor--oficio .route-location-pair > .field + .field {
@@ -1556,7 +1556,7 @@
 
 .roteiro-editor__icon-btn.destination-remove-button:hover {
   background: var(--cv-state-danger);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .roteiro-editor__add-btn#btn-adicionar-destino {
@@ -1821,7 +1821,7 @@
 
 .is-dragging-destination,
 .is-dragging-destination * {
-  cursor: grabbing !important;
+  cursor: grabbing;
 }
 
 @keyframes destino-reordered-pulse {
@@ -1849,7 +1849,7 @@
 }
 
 .destination-row--single > .destination-remove-button {
-  display: none !important;
+  display: none;
 }
 
 .destination-row > .cv-search-picker__selected-main {
@@ -2381,9 +2381,9 @@
 }
 
 #diarias-status[data-state="stale"] {
-  background: #3a2323;
+  background: color-mix(in srgb, var(--cv-state-danger) 18%, var(--cv-surface-card));
   border: var(--bd);
-  color: #ffd4d4;
+  color: var(--cv-state-danger);
 }
 
 #diarias-status[data-state="updated"] {
@@ -2393,9 +2393,9 @@
 }
 
 #diarias-status[data-state="error"] {
-  background: #3a2323;
+  background: color-mix(in srgb, var(--cv-state-danger) 18%, var(--cv-surface-card));
   border: var(--bd);
-  color: #ffd4d4;
+  color: var(--cv-state-danger);
 }
 
 .roteiro-editor__diarias-note {
@@ -2429,7 +2429,7 @@
 
 #diarias-error:empty,
 #diarias-error.d-none {
-  display: none !important;
+  display: none;
   margin: 0;
   padding: 0;
 }
@@ -2918,7 +2918,7 @@
   align-items: center;
   background: var(--cv-surface-card);
   border-radius: var(--r-pill);
-  color: #0f5f8f;
+  color: var(--color-accent);
   display: inline-flex;
   flex: 0 0 auto;
   height: 38px;
@@ -3029,7 +3029,7 @@
 }
 
 .roteiro-mapa__action-btn--primary {
-  background: linear-gradient(180deg, #1d6ea7 0%, #0f4f86 100%);
+  background: linear-gradient(180deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 82%, var(--cv-ink)) 100%);
   border: var(--bd);
   box-shadow: var(--sh-md);
   color: var(--on-accent);
@@ -3037,7 +3037,7 @@
 
 .roteiro-mapa__action-btn--primary:hover,
 .roteiro-mapa__action-btn--primary:focus-visible {
-  background: linear-gradient(180deg, #2479b6 0%, #125a94 100%);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-accent) 84%, var(--on-accent)) 0%, color-mix(in srgb, var(--color-accent) 88%, var(--cv-ink)) 100%);
   border-color: rgba(10, 58, 102, 0.52);
   box-shadow: var(--sh-md);
   color: var(--on-accent);
@@ -3047,7 +3047,7 @@
 .roteiro-mapa__action-btn--secondary {
   background: var(--cv-surface-card);
   border-color: rgba(255, 255, 255, 0.5);
-  color: #123e67;
+  color: var(--color-accent);
   box-shadow: var(--sh-md);
 }
 
@@ -3055,7 +3055,7 @@
 .roteiro-mapa__action-btn--secondary:focus-visible {
   background: var(--cv-surface-card);
   border-color: rgba(255, 255, 255, 0.72);
-  color: #0b3457;
+  color: color-mix(in srgb, var(--color-accent) 82%, var(--cv-ink));
   transform: translateY(-1px);
 }
 
@@ -3145,7 +3145,7 @@
 }
 
 .roteiro-mapa__loading[hidden] {
-  display: none !important;
+  display: none;
 }
 
 .roteiro-mapa__loading-spinner {
@@ -3258,8 +3258,8 @@
 .roteiro-editor--oficio .oficio-roteiro-body :is(:focus, :focus-visible)::before,
 [data-travel-document-wizard-roteiro] .oficio-roteiro-body :is(:focus, :focus-visible)::after,
 .roteiro-editor--oficio .oficio-roteiro-body :is(:focus, :focus-visible)::after {
-  outline: none !important;
-  outline-offset: 0 !important;
+  outline: none;
+  outline-offset: 0;
   box-shadow: var(--sh-md);
 }
 
@@ -3304,14 +3304,14 @@
 .roteiro-editor--oficio .oficio-roteiro-body .cv-search-picker__field:focus-within .cv-search-picker__control,
 [data-travel-document-wizard-roteiro] .oficio-roteiro-body .cv-select-wrapper:focus-within::after,
 .roteiro-editor--oficio .oficio-roteiro-body .cv-select-wrapper:focus-within::after {
-  outline: none !important;
-  outline-offset: 0 !important;
+  outline: none;
+  outline-offset: 0;
   box-shadow: var(--sh-md);
 }
 
 [data-travel-document-wizard-roteiro] .oficio-roteiro-body .roteiro-editor__choice-card:focus-within,
 .roteiro-editor--oficio .oficio-roteiro-body .roteiro-editor__choice-card:focus-within {
-  border-color: var(--cv-border) !important;
+  border-color: var(--cv-border);
 }
 
 /* Sobrescreve o focus canônico do dark-redesign neste escopo */
@@ -3319,8 +3319,8 @@
   [data-travel-document-wizard-roteiro] .oficio-roteiro-body :is(button, a, input, select, textarea, [tabindex]):focus-visible,
 
   .roteiro-editor--oficio .oficio-roteiro-body :is(button, a, input, select, textarea, [tabindex]):focus-visible {
-  outline: none !important;
-  outline-offset: 0 !important;
+  outline: none;
+  outline-offset: 0;
   box-shadow: var(--sh-md);
 }
 
@@ -3354,9 +3354,95 @@
     .cv-field__control[readonly],
     input[readonly]
   ) {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
   box-shadow: var(--sh-md);
   color: var(--cv-ink);
   opacity: 1;
+}
+
+/* Regras de dominio retiradas de forms.css (NOVO-30/4). */
+.roteiro-editor__grid {
+  background: var(--cv-surface-block);
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--sp-4);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  min-width: 0;
+}
+
+.roteiro-editor__grid.align-items-end {
+  align-items: end;
+}
+
+.roteiro-editor__grid > .field-span-6 {
+  grid-column: span 6;
+}
+
+.roteiro-editor__grid > .field-span-4 {
+  grid-column: span 4;
+}
+
+.roteiro-editor__grid > .field-span-12 {
+  grid-column: span 12;
+}
+
+.roteiro-editor__actions {
+  align-items: center;
+  background: var(--cv-surface-card);
+  border: var(--bd);
+  border-radius: var(--r-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  justify-content: flex-end;
+  margin-top: var(--sp-1);
+  padding: var(--sp-3) var(--sp-4);
+}
+
+.roteiro-editor__actions--avulso {
+  justify-content: space-between;
+}
+
+.roteiro-form--legacy-roteiro .travel-document-wizard-footer-actions .btn,
+.roteiro-editor__actions .btn {
+  border-radius: var(--r-pill);
+  min-height: 48px;
+  padding-left: var(--sp-5);
+  padding-right: var(--sp-5);
+}
+
+.roteiro-editor__actions .btn-primary,
+.roteiro-editor__actions .btn-primary:hover,
+.roteiro-editor__actions .btn-primary:focus-visible {
+  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
+  color: var(--color-accent);
+}
+
+.roteiro-editor__actions .btn-primary {
+  box-shadow: var(--sh-md);
+}
+
+.roteiro-editor__actions .btn-outline-secondary,
+.roteiro-editor__actions .btn-secondary {
+  background: var(--cv-surface-card);
+  border-color: var(--cv-border);
+  color: var(--cv-ink-muted);
+}
+
+.roteiro-editor__actions .btn-outline-secondary:hover,
+.roteiro-editor__actions .btn-outline-secondary:focus-visible,
+.roteiro-editor__actions .btn-secondary:hover,
+.roteiro-editor__actions .btn-secondary:focus-visible {
+  background: var(--cv-surface-block);
+  border-color: var(--cv-border);
+  color: var(--cv-ink-muted);
+}
+
+@media (max-width: 720px) {
+  .roteiro-editor__grid > .field-span-6,
+  .roteiro-editor__grid > .field-span-4 {
+    grid-column: span 12;
+  }
 }

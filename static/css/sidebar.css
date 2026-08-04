@@ -261,7 +261,7 @@
 }
 
 .sidebar-account__name {
-  color: #ffffff;
+  color: var(--on-accent);
   font-size: 0.9rem;
   line-height: 1.2;
   overflow: hidden;

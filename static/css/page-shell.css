@@ -34,10 +34,6 @@
    3. Field Grid usa sempre 4 colunas no desktop.
    ========================================================================== */
 
-/* Garante que [hidden] esconda elementos mesmo quando o componente define display explícito. */
-[hidden] { display: none !important; }
-
-
 /* =========================================================
    01. Design Tokens — Estrutura, Layout e Aliases
    ========================================================= */
@@ -1710,12 +1706,12 @@ body.has-delete-modal-open {
 }
 
 .cv-action-menu__item--whatsapp {
-  color: #1fa855;
+  color: var(--cv-state-success);
 }
 
 .cv-action-menu__item--whatsapp:hover,
 .cv-action-menu__item--whatsapp:focus-visible {
-  background: color-mix(in srgb, #1fa855 14%, transparent);
+  background: color-mix(in srgb, var(--cv-state-success) 14%, transparent);
 }
 
 /* Ações de documento (termo, ofício etc.) — cor do ícone acompanha o botão
@@ -2457,7 +2453,7 @@ body.has-delete-modal-open {
 }
 
  .cv-inline-create__toggle {
-  background: var(--cv-surface-block); /* #213246 */
+  background: var(--cv-surface-block);
   color:      var(--cv-ink);
 }
 
@@ -2467,7 +2463,7 @@ body.has-delete-modal-open {
 
  .cv-inline-create__toggle.is-active,
  .cv-inline-create__toggle[aria-expanded="true"] {
-  background:   var(--cv-surface-block); /* #213246 — igual ao estado fechado */
+  background:   var(--cv-surface-block); /* igual ao estado fechado */
   border-color: var(--cv-border);
   color:        var(--cv-ink);
 }

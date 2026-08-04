@@ -520,17 +520,17 @@ html {
  .cv-date-picker .cv-date-picker__day--multi-middle,
  .cv-date-picker .cv-date-picker__day--multi-end,
  .cv-date-picker .cv-date-picker__day--multi-single {
-  background-color: transparent !important;
-  background-image: none !important;
-  border-color: transparent !important;
+  background-color: transparent;
+  background-image: none;
+  border-color: transparent;
   box-shadow: var(--sh-md);
-  color: var(--cv-ink) !important;
+  color: var(--cv-ink);
 }
 
  .cv-date-picker .cv-date-picker__day--multi-single::before,
  .cv-date-picker .cv-date-picker__day--multi-single::before {
-  background: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  border-color: transparent;
   box-shadow: var(--sh-md);
 }
 

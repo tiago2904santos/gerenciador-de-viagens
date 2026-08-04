@@ -18,7 +18,7 @@
 
 .cv-search-picker__native,
 .cv-search-picker__termos-native {
-  display: none !important;
+  display: none;
 }
 
 .cv-search-picker__field {

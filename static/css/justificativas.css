@@ -81,7 +81,7 @@
     .termo-oficio-summary-panel .related-route-list,
     #termo-oficio-lista
   ) {
-  max-height: 160px !important;
+  max-height: 160px;
 }
 
 /* Picker: sem gap extra no bloco; cards da lista mantêm 8px. */
@@ -92,7 +92,7 @@
 [data-justificativa-quick-add]
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker {
-  gap: 0 !important;
+  gap: 0;
 }
 
 
@@ -104,7 +104,7 @@
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker
   .cv-search-picker__field {
-  gap: 7px !important;
+  gap: 7px;
 }
 
 
@@ -116,7 +116,7 @@
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker
   :is(.cv-search-picker__selected-list, #termo-oficio-lista) {
-  gap: 8px !important;
+  gap: 8px;
   margin-top: 8px;
 }
 

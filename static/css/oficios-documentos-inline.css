@@ -82,7 +82,7 @@
 .oficio-documentos-info-section .oficio-documentos-card--vehicle,
 .oficio-documentos-route-section .oficio-documentos-route-card,
 .oficio-documentos-justification-section .oficio-documentos-card--justification {
-  background: transparent !important;
+  background: transparent;
   border: var(--bd-0);
   border-radius: var(--r-0);
   box-shadow: var(--sh-md);
@@ -91,7 +91,7 @@
 
 .oficio-documentos-route-section .oficio-documentos-route-card__diarias-box,
 .oficio-documentos-route-section .oficio-documentos-route-card__body {
-  background: transparent !important;
+  background: transparent;
   border: var(--bd-0);
   box-shadow: var(--sh-md);
 }
@@ -296,8 +296,8 @@
 
 /* Mesmo fundo visual da seção (vence .cv-summary-item com color-card-muted) */
 .oficio-documentos-route-section .oficio-documentos-route-trecho-scroll-item {
-  background: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  border-color: transparent;
   box-shadow: var(--sh-md);
   flex-shrink: 0;
 }
@@ -502,7 +502,7 @@
   .document-inline-card--termos
   .document-inline-card--nested
   > .document-inline-card__header {
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
 }
 
 .document-inline-card__header {
@@ -901,7 +901,7 @@
   box-shadow: var(--sh-md);
   border-radius: var(--r-sm);
   overflow: visible;
-  background: #fff;
+  background: var(--on-accent);
 }
 
 .assinatura-page-canvas {
@@ -942,8 +942,8 @@
   font-size: 0.48rem;
   font-weight: 800;
   letter-spacing: 0.06em;
-  color: #fff;
-  background: #082042;
+  color: var(--on-accent);
+  background: var(--color-accent);
   text-align: center;
   padding: 0;
 }
@@ -952,8 +952,8 @@
   flex: 1 1 auto;
   min-width: 0;
   padding: var(--sp-1);
-  background: #0b2b4a;
-  color: #fff;
+  background: color-mix(in srgb, var(--color-accent) 82%, var(--cv-ink));
+  color: var(--on-accent);
 }
 
 .assinatura-label__title {
@@ -991,11 +991,11 @@
 
 .assinatura-label__qr {
   flex: 0 0 2.4rem;
-  background: #fff;
+  background: var(--on-accent);
 }
 
 .assinatura-pdf-error {
   margin-top: var(--sp-3);
-  color: #b42318;
+  color: var(--cv-state-danger);
   font-size: 14px;
 }

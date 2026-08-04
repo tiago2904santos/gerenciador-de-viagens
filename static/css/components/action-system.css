@@ -644,7 +644,7 @@
 }
 
  #attach-signed-modal .attach-signed-modal__dialog {
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
 }
 
 .attach-signed-modal__dialog > .cv-dialog__header {
@@ -988,12 +988,12 @@
   .prestacao-file-widget:focus-within,
   .cv-file-widget:focus-within
 ) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
   border: var(--bd-0);
   box-shadow: var(--sh-md);
-  outline: none !important;
-  transition: none !important;
+  outline: none;
+  transition: none;
 }
 
 #attach-signed-modal :is(
@@ -1010,12 +1010,12 @@
   .prestacao-file-widget.is-dragover .prestacao-file-picker,
   .cv-file-widget.is-dragover .cv-file-picker
 ) {
-  background: transparent !important;
-  background-color: transparent !important;
+  background: transparent;
+  background-color: transparent;
   border: var(--bd-0);
   box-shadow: var(--sh-md);
-  outline: none !important;
-  transition: none !important;
+  outline: none;
+  transition: none;
 }
 
 #attach-signed-modal :is(
@@ -1024,12 +1024,12 @@
   .prestacao-file-selection__menu:hover,
   .cv-file-selection__menu:hover
 ) {
-  background: transparent !important;
-  background-color: transparent !important;
+  background: transparent;
+  background-color: transparent;
   border: var(--bd-0);
   box-shadow: var(--sh-md);
-  outline: none !important;
-  transition: none !important;
+  outline: none;
+  transition: none;
 }
 
 #attach-signed-modal :is(
@@ -1044,72 +1044,72 @@
   .prestacao-file-selection__item:focus-within,
   .cv-file-selection__item:focus-within
 ) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
   border: var(--bd-0);
   box-shadow: var(--sh-md);
-  outline: none !important;
-  transition: none !important;
+  outline: none;
+  transition: none;
 }
 
 #attach-signed-modal :is(
   .prestacao-file-picker__action,
   .cv-file-picker__action
 ) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
   border: var(--bd-0);
   border-radius: var(--r-md);
-  color: var(--cv-ink) !important;
-  font-size: 14px !important;
-  font-weight: 700 !important;
-  min-height: 48px !important;
+  color: var(--cv-ink);
+  font-size: 14px;
+  font-weight: 700;
+  min-height: 48px;
   padding: var(--sp-2) var(--sp-3);
   box-shadow: var(--sh-md);
-  outline: none !important;
-  transform: none !important;
+  outline: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
   .prestacao-file-picker__action,
   .cv-file-picker__action
 ):is(:hover, :focus-visible) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
   border: var(--bd-0);
-  color: var(--cv-ink) !important;
+  color: var(--cv-ink);
   box-shadow: var(--sh-md);
-  outline: none !important;
-  transform: none !important;
+  outline: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
   .prestacao-file-picker__upload,
   .cv-file-picker__upload
 ):not(:disabled) {
-  background: var(--color-accent) !important;
-  background-color: var(--color-accent) !important;
-  background-image: none !important;
+  background: var(--color-accent);
+  background-color: var(--color-accent);
+  background-image: none;
   border: var(--bd-0);
   box-shadow: var(--sh-md);
-  color: var(--color-accent) !important;
-  outline: none !important;
-  transition: background 140ms ease, box-shadow 140ms ease !important;
-  transform: none !important;
+  color: var(--color-accent);
+  outline: none;
+  transition: background 140ms ease, box-shadow 140ms ease;
+  transform: none;
 }
 
 #attach-signed-modal :is(
   .prestacao-file-picker__upload,
   .cv-file-picker__upload
 ):is(:hover, :focus-visible):not(:disabled) {
-  background: var(--color-accent) !important;
-  background-color: var(--color-accent) !important;
-  background-image: none !important;
+  background: var(--color-accent);
+  background-color: var(--color-accent);
+  background-image: none;
   border: var(--bd-0);
   box-shadow: var(--sh-md);
-  color: var(--color-accent) !important;
-  outline: none !important;
-  transform: none !important;
+  color: var(--color-accent);
+  outline: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
@@ -1118,14 +1118,14 @@
   .cv-icon-btn--preview:focus,
   .cv-icon-btn--preview:focus-visible
 ) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
   border: var(--bd);
-  color: var(--cv-ink) !important;
+  color: var(--cv-ink);
   box-shadow: var(--sh-md);
-  outline: none !important;
-  transition: none !important;
-  transform: none !important;
+  outline: none;
+  transition: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
@@ -1134,14 +1134,14 @@
   .cv-icon-btn--delete:focus,
   .cv-icon-btn--delete:focus-visible
 ) {
-  background: color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card)) !important;
-  background-color: color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card)) !important;
+  background: color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card));
+  background-color: color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card));
   border: var(--bd);
-  color: var(--cv-state-danger) !important;
+  color: var(--cv-state-danger);
   box-shadow: var(--sh-md);
-  outline: none !important;
-  transition: none !important;
-  transform: none !important;
+  outline: none;
+  transition: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
@@ -1150,15 +1150,15 @@
   .attach-signed-modal__cancel:focus,
   .attach-signed-modal__cancel:focus-visible
 ) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
-  background-image: none !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
+  background-image: none;
   border: var(--bd-0);
-  color: var(--cv-ink) !important;
+  color: var(--cv-ink);
   box-shadow: var(--sh-md);
-  outline: none !important;
-  transition: none !important;
-  transform: none !important;
+  outline: none;
+  transition: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
@@ -1166,10 +1166,10 @@
   .attach-signed-modal__kind-option:hover,
   .attach-signed-modal__kind-option:focus-visible
 ) {
-  background: transparent !important;
-  color: var(--cv-ink-muted) !important;
-  outline: none !important;
-  transition: none !important;
+  background: transparent;
+  color: var(--cv-ink-muted);
+  outline: none;
+  transition: none;
 }
 
 #attach-signed-modal :is(
@@ -1177,8 +1177,8 @@
   .attach-signed-modal__kind-option.is-active:hover,
   .attach-signed-modal__kind-option.is-active:focus-visible
 ) {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card)) !important;
-  color: var(--color-accent) !important;
+  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
+  color: var(--color-accent);
 }
 
 @media (min-width: 841px) {

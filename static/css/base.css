@@ -4,7 +4,7 @@
 
 /* Garante que o atributo `hidden` sempre esconda elementos,
    mesmo quando o componente define display explícito. */
-[hidden] { display: none !important; }
+html [hidden] { display: none; }
 
 body {
   margin: 0;
