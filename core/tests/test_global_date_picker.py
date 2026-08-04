@@ -110,13 +110,10 @@ class GlobalDatePickerTests(SimpleTestCase):
             / "cv-date-picker.css"
         )
         css = css_path.read_text(encoding="utf-8")
-        tokens = (
-            Path(settings.BASE_DIR) / "static" / "css" / "01-tokens.css"
-        ).read_text(encoding="utf-8")
-        self.assertIn("--cv-date-picker-day-gap: 2px;", tokens)
         self.assertNotIn("scale(1.03)", css)
-        self.assertIn("column-gap: var(--cv-date-picker-day-gap);", css)
-        self.assertIn("row-gap: var(--cv-date-picker-day-gap);", css)
+        self.assertIn("column-gap: var(--sp-1);", css)
+        self.assertIn("row-gap: var(--sp-1);", css)
+        self.assertNotIn("--cv-date-picker-day-gap", css)
 
     def test_calendar_markup_exists_only_in_the_global_partial(self):
         templates_root = Path(settings.BASE_DIR) / "templates"

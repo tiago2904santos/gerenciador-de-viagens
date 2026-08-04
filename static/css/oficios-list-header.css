@@ -27,52 +27,52 @@
 
 /* Ações individuais: pasta amarela (warning), WhatsApp verde (success). */
 .cv-icon-btn--documents {
-  background: var(--action-warning-bg);
-  border-color: var(--action-warning-border);
-  box-shadow: var(--action-shadow);
-  color: var(--action-warning-text);
+  background: color-mix(in srgb, var(--cv-state-warning) 16%, var(--cv-surface-card));
+  border-color: color-mix(in srgb, var(--cv-state-warning) 55%, var(--cv-border));
+  box-shadow: var(--sh-md);
+  color: var(--cv-state-warning);
 }
 
 .cv-icon-btn--documents:hover,
 .cv-icon-btn--documents:focus {
-  background: var(--action-warning-hover-bg);
-  border-color: var(--action-warning-border);
-  color: var(--action-warning-text);
+  background: color-mix(in srgb, var(--cv-state-warning) 16%, var(--cv-surface-card));
+  border-color: color-mix(in srgb, var(--cv-state-warning) 55%, var(--cv-border));
+  color: var(--cv-state-warning);
 }
 
 .cv-icon-btn--whatsapp {
-  background: var(--action-success-bg);
-  border-color: var(--action-success-border);
-  box-shadow: var(--action-shadow);
-  color: var(--action-success-text);
+  background: color-mix(in srgb, var(--cv-state-success) 16%, var(--cv-surface-card));
+  border-color: color-mix(in srgb, var(--cv-state-success) 55%, var(--cv-border));
+  box-shadow: var(--sh-md);
+  color: var(--cv-state-success);
 }
 
 .cv-icon-btn--whatsapp:hover,
 .cv-icon-btn--whatsapp:focus {
-  background: var(--action-success-hover-bg);
-  border-color: var(--action-success-border);
-  color: var(--action-success-text);
+  background: color-mix(in srgb, var(--cv-state-success) 16%, var(--cv-surface-card));
+  border-color: color-mix(in srgb, var(--cv-state-success) 55%, var(--cv-border));
+  color: var(--cv-state-success);
 }
 
 /* Os menus são movidos para o body por CV.overlay, por isso o escopo
    precisa estar na própria classe do widget. */
 .cv-action-menu {
-  background: color-mix(in srgb, var(--surface-list-panel) 96%, transparent);
-  border: 1px solid color-mix(in srgb, var(--border-list-panel) 78%, #7c9ab8);
-  border-radius: 16px;
-  box-shadow: 0 20px 48px rgba(13, 35, 58, 0.24);
+  background: color-mix(in srgb, var(--cv-surface-card) 96%, transparent);
+  border: var(--bd);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-lg);
   gap: 5px;
   min-width: 270px;
-  padding: 10px;
+  padding: var(--sp-2);
 }
 
 .cv-action-menu__heading {
   align-items: center;
-  border-bottom: 1px solid var(--color-border-soft, rgba(110, 140, 170, 0.2));
+  border-bottom: 1px solid var(--cv-border);
   display: flex;
   gap: 10px;
-  margin: 0 2px 5px;
-  padding: 4px 5px 10px;
+  margin: 0 0 var(--sp-1);
+  padding: var(--sp-1);
 }
 
 .cv-action-menu__heading > span:last-child,
@@ -84,7 +84,7 @@
 
 .cv-action-menu__heading strong,
 .cv-action-menu__item strong {
-  color: var(--theme-text-heading);
+  color: var(--cv-ink);
   font-size: 0.84rem;
   font-weight: 750;
   line-height: 1.2;
@@ -92,7 +92,7 @@
 
 .cv-action-menu__heading small,
 .cv-action-menu__item small {
-  color: var(--theme-text-muted);
+  color: var(--cv-ink-muted);
   font-size: 0.68rem;
   line-height: 1.35;
   margin-top: 2px;
@@ -102,8 +102,8 @@
 .cv-action-menu__item-icon {
   align-items: center;
   background: rgba(69, 105, 143, 0.1);
-  border: 1px solid rgba(69, 105, 143, 0.16);
-  border-radius: 10px;
+  border: var(--bd);
+  border-radius: var(--r-sm);
   color: #426b91;
   display: inline-flex;
   flex: 0 0 34px;
@@ -118,18 +118,18 @@
 }
 
 .cv-action-menu__item {
-  border: 1px solid transparent;
-  border-radius: 11px;
+  border: var(--bd);
+  border-radius: var(--r-md);
   gap: 10px;
   min-height: 52px;
-  padding: 7px;
+  padding: var(--sp-2);
   text-decoration: none;
 }
 
 .cv-action-menu__item:hover,
 .cv-action-menu__item:focus-visible {
-  background: color-mix(in srgb, var(--color-surface-muted) 78%, transparent);
-  border-color: var(--color-border-soft, rgba(110, 140, 170, 0.2));
+  background: color-mix(in srgb, var(--cv-ink-muted) 78%, transparent);
+  border-color: var(--cv-border);
   outline: none;
 }
 
@@ -173,7 +173,7 @@
  .cv-action-menu {
   background: rgba(14, 30, 45, 0.98);
   border-color: rgba(120, 153, 181, 0.28);
-  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.48);
+  box-shadow: var(--sh-lg);
 }
 
  .cv-action-menu__item:hover,
@@ -186,7 +186,7 @@
  .cv-record-card .cv-icon-btn--complete {
   background: linear-gradient(145deg, #1d4439, #17372f);
   border-color: #3e6f5e;
-  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--sh-md);
   color: #b7e8d3;
 }
 
@@ -201,7 +201,7 @@
 .cv-record-card__footer-actions--manage {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2, 8px);
+  gap: var(--sp-2);
   margin-left: auto;
 }
 

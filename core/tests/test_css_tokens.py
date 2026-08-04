@@ -27,6 +27,25 @@ _RGB_COLOR = re.compile(r"\brgba?\(\s*[\d.%]+")
 _CSS_COMMENT = re.compile(r"/\*.*?\*/")
 _CSS_VALUE = re.compile(r":\s*.+")
 
+CANONICAL_CUSTOM_PROPERTIES = frozenset({
+    "--r-0", "--r-sm", "--r-md", "--r-lg", "--r-xl", "--r-pill",
+    "--sp-1", "--sp-2", "--sp-3", "--sp-4", "--sp-5", "--sp-6",
+    "--sp-7", "--sp-8", "--cv-ink", "--cv-ink-muted",
+    "--cv-state-danger", "--cv-state-success", "--cv-state-warning",
+    "--cv-border", "--bd", "--bd-0", "--bd-strong", "--sh-sm",
+    "--sh-md", "--sh-lg", "--sh-none", "--cv-surface-page",
+    "--cv-surface-card", "--cv-surface-block", "--cv-surface",
+    "--cv-surface-next", "--color-accent", "--on-accent", "--accent-tint",
+})
+
+GEOMETRY_VALUE_LIMITS = {
+    "border-radius": 6,
+    "padding": 8,
+    "margin": 8,
+    "border": 3,
+    "box-shadow": 4,
+}
+
 # Arquivos novos da fase 13 — devem estar 100% livres de literais.
 STRICT_COLOR_LITERAL_FILES = {
     "static/css/components/cv-notice.css",
@@ -133,6 +152,64 @@ def _css_bundle_text() -> str:
 
 
 class CssTokenGateTests(SimpleTestCase):
+    def test_novo30_phase3_uses_only_the_canonical_custom_property_vocabulary(self):
+        """NOVO-30/3: aliases temporarios morreram e componentes nao declaram tokens."""
+        definitions_outside_layers: list[str] = []
+        unknown_references: list[str] = []
+
+        for path in sorted(CSS_DIR.rglob("*.css")):
+            if path.name.endswith(".bundle.css"):
+                continue
+            text = path.read_text(encoding="utf-8")
+            without_comments = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+            rel = _rel_css(path)
+            definitions = set(
+                re.findall(r"^\s*(--[\w-]+)\s*:", without_comments, re.M)
+            )
+            if path.name not in {"00-palette.css", "01-tokens.css"}:
+                definitions_outside_layers.extend(
+                    f"{rel}: {name}" for name in sorted(definitions)
+                )
+            for name in re.findall(r"var\(\s*(--[\w-]+)", without_comments):
+                if name not in CANONICAL_CUSTOM_PROPERTIES and not name.startswith("--bs-"):
+                    unknown_references.append(f"{rel}: {name}")
+
+        token_definitions = set(
+            re.findall(
+                r"^\s*(--[\w-]+)\s*:",
+                (CSS_DIR / "01-tokens.css").read_text(encoding="utf-8"),
+                re.M,
+            )
+        )
+        expected_token_definitions = CANONICAL_CUSTOM_PROPERTIES - {
+            "--cv-surface-page", "--cv-surface-card", "--cv-surface-block",
+            "--cv-surface", "--cv-surface-next", "--color-accent",
+            "--on-accent", "--accent-tint",
+        }
+        self.assertEqual(token_definitions, expected_token_definitions)
+        self.assertEqual(definitions_outside_layers, [])
+        self.assertEqual(sorted(set(unknown_references)), [])
+
+    def test_novo30_phase3_geometry_uses_the_closed_scales(self):
+        """Gate literal do plano: cada propriedade cabe no teto da escala fechada."""
+        for prop, limit in GEOMETRY_VALUE_LIMITS.items():
+            values: set[str] = set()
+            for path in CSS_DIR.rglob("*.css"):
+                if path.name == "shell.bundle.css":
+                    continue
+                values.update(
+                    re.findall(
+                        rf"{prop}:\s*([^;]+)",
+                        path.read_text(encoding="utf-8"),
+                    )
+                )
+            with self.subTest(property=prop):
+                self.assertLessEqual(
+                    len(values),
+                    limit,
+                    f"{prop} fora da escala ({len(values)} > {limit}): {sorted(values)}",
+                )
+
     def test_canonical_component_stylesheets_have_no_color_literals(self):
         """Novos componentes cv-notice/cv-metric devem usar apenas var() de token."""
         violations: list[str] = []

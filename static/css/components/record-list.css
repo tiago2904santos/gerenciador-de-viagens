@@ -9,14 +9,14 @@
 
 /* Painel intermediário — mesmo tom --step1-panel dos formulários. */
 .cv-collection-panel {
-  background: var(--step1-panel);
-  border: 0;
-  border-radius: 14px;
-  box-shadow: none;
+  background: var(--cv-surface-card);
+  border: var(--bd-0);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-none);
   display: grid;
   gap: 12px;
   min-width: 0;
-  padding: 14px;
+  padding: var(--sp-3);
 }
 
 .cv-collection-panel > .list-toolbar {
@@ -29,23 +29,23 @@
 }
 
 .cv-collection-panel .pagination-shell__controls {
-  background: var(--step1-surface);
+  background: var(--cv-surface-card);
 }
 
 .cv-record-row {
   align-items: center;
-  background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted, var(--color-card-muted))));
-  border: 0;
-  border-radius: 12px;
-  box-shadow: none;
+  background: var(--cv-surface-block);
+  border: var(--bd-0);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-none);
   column-gap: 12px;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   min-height: 64px;
   min-width: 0;
-  padding: 11px 12px;
+  padding: var(--sp-3);
   position: relative;
-  transition: background-color var(--transition-fast, 140ms ease);
+  transition: background-color 140ms ease;
 }
 
 .cv-record-row:hover,
@@ -53,10 +53,10 @@
   background: color-mix(
     in srgb,
     var(--color-accent) 5%,
-    var(--step1-field, var(--color-input-bg, var(--color-surface-muted)))
+    var(--cv-surface-block)
   );
-  border: 0;
-  box-shadow: none;
+  border: var(--bd-0);
+  box-shadow: var(--sh-none);
 }
 
 .cv-record-row:not(:has(.cv-record-row__identity)) {
@@ -65,13 +65,13 @@
 
 .cv-record-row__identity {
   align-items: center;
-  background: var(--color-accent-soft, color-mix(in srgb, var(--color-accent) 18%, transparent));
-  border: 1px solid var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 55%, transparent));
-  border-radius: 12px;
-  color: var(--color-accent-text, var(--color-accent));
+  background: var(--color-accent);
+  border: var(--bd);
+  border-radius: var(--r-md);
+  color: var(--color-accent);
   display: inline-flex;
   flex-shrink: 0;
-  font-size: var(--font-size-xs, 0.75rem);
+  font-size: 12px;
   font-weight: 800;
   height: 42px;
   justify-content: center;
@@ -96,12 +96,12 @@
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2, 8px);
+  gap: var(--sp-2);
   min-width: 0;
 }
 
 .cv-record-row__title {
-  font-size: var(--font-size-sm, 0.875rem);
+  font-size: 14px;
   font-weight: 800;
   letter-spacing: -0.01em;
   line-height: 1.25;
@@ -115,15 +115,15 @@
   align-items: center;
   display: inline-flex;
   flex-wrap: wrap;
-  gap: var(--space-2, 8px);
+  gap: var(--sp-2);
 }
 
 /* Mesmo chip do Motorista (cv-person-row__badge). */
 .cv-record-row__badge {
   align-items: center;
   background: color-mix(in srgb, var(--color-accent) 18%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
-  border-radius: 999px;
+  border: var(--bd);
+  border-radius: var(--r-pill);
   color: var(--color-accent);
   display: inline-flex;
   flex-shrink: 0;
@@ -131,14 +131,14 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   min-height: 21px;
-  padding: 2px 8px;
+  padding: var(--sp-1);
   text-transform: uppercase;
   white-space: nowrap;
 }
 
 .cv-record-row__subtitle {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs, 0.75rem);
+  color: var(--cv-ink-muted);
+  font-size: 12px;
   font-weight: 500;
   line-height: 1.35;
   margin: 0;
@@ -150,10 +150,10 @@
 
 .cv-record-row__facts {
   align-items: baseline;
-  color: var(--color-muted);
+  color: var(--cv-ink-muted);
   display: flex;
   flex-wrap: wrap;
-  font-size: var(--font-size-xs, 0.75rem);
+  font-size: 12px;
   gap: 2px 0;
   line-height: 1.4;
   margin-top: 2px;
@@ -174,14 +174,14 @@
 }
 
 .cv-record-row__fact-value {
-  color: var(--color-text);
+  color: var(--cv-ink);
   font-weight: 500;
   overflow-wrap: anywhere;
 }
 
 .cv-record-row__facts-sep {
-  color: var(--color-muted);
-  margin: 0 0.45em;
+  color: var(--cv-ink-muted);
+  margin: 0;
   opacity: 0.7;
 }
 
@@ -189,7 +189,7 @@
   align-items: center;
   display: inline-flex;
   flex-shrink: 0;
-  gap: var(--space-2, 8px);
+  gap: var(--sp-2);
   justify-content: flex-end;
 }
 
@@ -203,9 +203,9 @@
 .list-panel:has(> .cv-record-list),
 .cv-collection-panel > .list-panel {
   background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
+  border: var(--bd-0);
+  border-radius: var(--r-0);
+  box-shadow: var(--sh-none);
   padding: 0;
 }
 
@@ -213,7 +213,7 @@
   .cv-record-row {
     align-items: start;
     grid-template-columns: auto minmax(0, 1fr);
-    padding: 12px 14px;
+    padding: var(--sp-3);
     row-gap: 10px;
   }
 
@@ -242,16 +242,16 @@
 .page-shell--cards > .list-panel,
 .cv-page--collection-cards > .list-panel {
   background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
+  border: var(--bd-0);
+  border-radius: var(--r-0);
+  box-shadow: var(--sh-none);
 }
 
 .page-shell--cards .cv-card-grid,
 .cv-page--collection-cards .cv-card-grid {
   box-sizing: border-box;
   display: grid;
-  gap: var(--space-6);
+  gap: var(--sp-6);
   grid-template-columns: minmax(0, 1fr);
   width: 100%;
 }

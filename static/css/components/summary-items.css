@@ -7,18 +7,18 @@
    ======================================================================== */
 
 .cv-summary-item {
-  background: var(--route-card-inner-bg);
-  border: 1px solid var(--route-card-inner-border);
-  border-radius: var(--radius-md);
+  background: var(--cv-surface-block);
+  border: var(--bd);
+  border-radius: var(--r-md);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--sp-2);
   min-height: 76px;
-  padding: var(--space-3);
+  padding: var(--sp-3);
 }
 
 .cv-summary-label {
-  color: var(--theme-text-muted);
+  color: var(--cv-ink-muted);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -26,7 +26,7 @@
 }
 
 .cv-summary-value {
-  color: var(--theme-stat-value);
+  color: var(--cv-ink);
   font-size: 1.05rem;
   font-weight: 800;
   line-height: 1.25;
@@ -37,7 +37,7 @@
    ate a etapa dedicada de renomeacao. */
 .summary-items {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--sp-2);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -45,46 +45,46 @@
 
 .summary-items > li {
   align-items: center;
-  background: var(--route-card-inner-bg);
-  border: 1px solid var(--route-card-inner-border);
-  border-radius: var(--radius-md);
+  background: var(--cv-surface-block);
+  border: var(--bd);
+  border-radius: var(--r-md);
   display: grid;
-  gap: var(--space-3);
+  gap: var(--sp-3);
   grid-template-columns: minmax(0, 1fr) auto;
-  padding: var(--space-3) var(--space-4);
-  transition: var(--transition-fast);
+  padding: var(--sp-3) var(--sp-4);
+  transition: 140ms ease;
 }
 
 .summary-items > li:hover {
-  background: var(--color-surface-soft);
-  border-color: var(--color-border-strong);
+  background: var(--cv-surface-block);
+  border-color: var(--cv-border);
 }
 
 .summary-items > li > a {
-  color: var(--color-heading);
-  font-weight: var(--font-weight-bold);
+  color: var(--cv-ink);
+  font-weight: 700;
   min-width: 0;
   overflow-wrap: anywhere;
   text-decoration: none;
 }
 
 .summary-items > li > a:hover {
-  color: var(--color-primary-bright);
+  color: var(--color-accent);
 }
 
-/* Foco por outline, nao por box-shadow: no tema escuro o
+/* Foco por outline, sem sombra: no tema escuro o
    --cv-field-focus-ring resolve para --focus-ring, que vale `none` por decisao
    de design (la o foco e sinalizado pela borda do controle). Um link nao tem
    borda para mudar, entao herdar esse contrato deixaria o foco invisivel. */
 .summary-items > li > a:focus-visible {
-  border-radius: var(--radius-sm);
-  outline: 2px solid var(--color-accent-border-strong);
+  border-radius: var(--r-sm);
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
   outline-offset: 2px;
 }
 
 .summary-items > li > span {
-  color: var(--theme-text-muted);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  color: var(--cv-ink-muted);
+  font-size: 14px;
+  font-weight: 600;
   white-space: nowrap;
 }

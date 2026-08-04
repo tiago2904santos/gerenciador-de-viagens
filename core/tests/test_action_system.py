@@ -30,8 +30,8 @@ class GlobalActionSystemTests(SimpleTestCase):
     def test_icon_groups_do_not_receive_an_outer_box(self):
         group_rule = self.css.split(".cv-icon-btn-group {", 1)[1].split("}", 1)[0]
         self.assertIn("background: transparent;", group_rule)
-        self.assertIn("border: 0;", group_rule)
-        self.assertIn("box-shadow: none;", group_rule)
+        self.assertIn("border: var(--bd-0);", group_rule)
+        self.assertIn("box-shadow: var(--sh-none);", group_rule)
 
     def test_rich_menu_and_shared_modal_primitives_exist(self):
         self.assertIn(".cv-action-menu--rich {", self.css)
@@ -61,9 +61,18 @@ class GlobalActionSystemTests(SimpleTestCase):
         self.assertIn("download", item)
 
     def test_document_action_tones_are_distinct_and_motion_can_be_reduced(self):
-        for tone in ("pdf", "docx", "preview", "edit"):
-            self.assertIn(f"--action-{tone}-bg:", self.tokens)
-            self.assertIn(f".cv-action-menu__item-icon--{tone} {{", self.css)
+        expected_inks = {
+            "pdf": "var(--cv-state-danger)",
+            "docx": "var(--color-accent)",
+            "preview": "var(--cv-state-success)",
+            "edit": "var(--cv-ink-muted)",
+        }
+        for tone, ink in expected_inks.items():
+            marker = f".cv-action-menu__item-icon--{tone} {{"
+            self.assertIn(marker, self.css)
+            rule = self.css.split(marker, 1)[1].split("}", 1)[0]
+            self.assertIn(f"color: {ink};", rule)
+            self.assertNotIn(f"--action-{tone}-", self.tokens + self.css)
         self.assertIn("@media (prefers-reduced-motion: reduce)", self.css)
 
     def test_simple_list_document_menu_accepts_dictionary_without_pk(self):

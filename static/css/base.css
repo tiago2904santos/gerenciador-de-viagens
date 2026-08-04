@@ -8,17 +8,17 @@
 
 body {
   margin: 0;
-  background: var(--app-body-bg);
-  color: var(--color-text);
-  font-family: var(--font-sans);
-  font-size: var(--font-size-md);
+  background: var(--cv-surface-page);
+  color: var(--cv-ink);
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 16px;
   line-height: 1.5;
   min-height: 100vh;
 }
 
 ::selection {
   background: rgba(37, 99, 168, 0.22);
-  color: var(--color-heading);
+  color: var(--cv-ink);
 }
 
 a {
@@ -36,7 +36,7 @@ p {
 h1,
 h2,
 h3 {
-  color: var(--color-heading);
+  color: var(--cv-ink);
 }
 
 button,
@@ -55,25 +55,25 @@ a:focus-visible {
 input,
 select,
 textarea {
-  background: var(--color-card);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  color: var(--color-text);
-  min-height: var(--control-height-md);
-  padding: 0 var(--space-3);
+  background: var(--cv-surface-card);
+  border: var(--bd);
+  border-radius: var(--r-md);
+  color: var(--cv-ink);
+  min-height: 48px;
+  padding: var(--sp-2) var(--sp-3);
 }
 
 textarea {
-  min-height: var(--text-area-height-md);
-  padding-bottom: var(--space-3);
-  padding-top: var(--space-3);
+  min-height: 88px;
+  padding-bottom: var(--sp-3);
+  padding-top: var(--sp-3);
   resize: vertical;
 }
 
 input::placeholder,
 select::placeholder,
 textarea::placeholder {
-  color: var(--color-input-placeholder, var(--color-subtle));
+  color: var(--cv-ink-muted);
   opacity: 1;
 }
 
@@ -93,8 +93,8 @@ textarea:disabled,
 input[readonly],
 select[readonly],
 textarea[readonly] {
-  background: var(--color-input-bg-disabled, var(--color-input-disabled-bg, var(--color-surface-muted)));
-  border-color: var(--color-border);
-  color: var(--color-input-disabled-text, var(--color-text-muted, var(--color-muted)));
+  background: var(--cv-surface-block);
+  border-color: var(--cv-border);
+  color: var(--cv-ink-muted);
   opacity: 1;
 }
