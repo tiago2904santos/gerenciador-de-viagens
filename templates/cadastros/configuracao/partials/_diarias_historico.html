@@ -1,0 +1,27 @@
+{% if diarias_vigentes %}
+  <table class="cv-data-table">
+    <caption class="cv-field__hint">Histórico de valores por faixa.</caption>
+    <thead>
+      <tr>
+        <th scope="col">Faixa</th>
+        <th scope="col">Vigente a partir de</th>
+        <th scope="col">24 horas</th>
+        <th scope="col">15%</th>
+        <th scope="col">30%</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tabela in diarias_vigentes %}
+        <tr>
+          <td>{{ tabela.get_faixa_display }}</td>
+          <td>{{ tabela.vigencia_inicio|date:"d/m/Y" }}</td>
+          <td>R$ {{ tabela.valor_24h|floatformat:2 }}</td>
+          <td>R$ {{ tabela.valor_15|floatformat:2 }}</td>
+          <td>R$ {{ tabela.valor_30|floatformat:2 }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  {% include "components/ui/feedback/empty_state.html" with message="Nenhuma vigência cadastrada." variant="compact" only %}
+{% endif %}

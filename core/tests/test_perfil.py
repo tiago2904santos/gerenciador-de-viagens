@@ -34,6 +34,10 @@ class PerfilUsuarioTests(TestCase):
         self.assertContains(response, "Conta e segurança")
         self.assertContains(response, "Dados pessoais")
         self.assertContains(response, "Sair do sistema")
+        self.assertContains(response, "document-form-page")
+        self.assertContains(response, "travel-document-wizard__form")
+        self.assertContains(response, "perfil-form-page")
+        self.assertNotContains(response, "Resumo da conta")
 
     def test_perfil_nao_faz_n_mais_um_nas_pendencias_do_drive(self):
         self.client.force_login(self.user)

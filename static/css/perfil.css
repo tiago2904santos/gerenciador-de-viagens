@@ -1,0 +1,134 @@
+/*
+ * Meu perfil — um card mestre com blocos internos (padrão área/config form).
+ * Vocabulário gdrive-* permanece em gdrive-config.css (H-13 fora deste PR).
+ */
+
+.perfil-form-page .travel-document-body {
+  display: grid;
+  gap: var(--space-5, 1.25rem);
+}
+
+.perfil-form-page .perfil-form-section {
+  display: grid;
+  gap: var(--space-3, 0.75rem);
+  margin: 0;
+}
+
+/* Ações Salvar / Alterar senha: sem recuo lateral, padding vertical curto. */
+.perfil-form-page .perfil-block-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: var(--space-2, 0.5rem) 0 0;
+  padding: 0;
+}
+
+/* Primary dourado no header do bloco (mesmo accent do footer de formulário). */
+.perfil-form-page .cv-form-block__actions .cv-btn--primary,
+:is(html[data-theme="dark"]) .perfil-form-page .cv-form-block__actions .cv-btn--primary {
+  background: var(--color-accent);
+  background-image: none;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  color: var(--color-on-accent, #19232d);
+  font-weight: var(--font-weight-bold);
+  text-shadow: none;
+}
+
+.perfil-form-page .cv-form-block__actions .cv-btn--primary:hover,
+:is(html[data-theme="dark"]) .perfil-form-page .cv-form-block__actions .cv-btn--primary:hover {
+  background: var(--color-accent-hover, var(--color-accent));
+  background-image: none;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
+  color: var(--color-on-accent, #19232d);
+}
+
+.perfil-form-page .cv-form-block__actions .cv-btn--primary .cv-btn__icon {
+  color: inherit;
+}
+
+.perfil-form-page .cv-form-block .cv-card-footer-section,
+.perfil-form-page .cv-form-block .cv-form-card__footer {
+  margin: 0;
+  padding: 0;
+  width: auto;
+}
+
+.perfil-form-page .cv-form-block .cv-card-footer-section__divider {
+  margin: 0;
+}
+
+.perfil-form-page .cv-form-block .cv-card-footer,
+:is(html[data-theme="dark"]) .perfil-form-page .cv-form-block .cv-card-footer {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
+  padding: var(--space-2, 0.5rem) 0 0;
+}
+
+.perfil-form-page .cv-record-list.simple-list,
+:is(html[data-theme="dark"]) .perfil-form-page .cv-record-list.simple-list {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.perfil-form-page .empty-state,
+:is(html[data-theme="dark"]) .perfil-form-page .empty-state {
+  background: var(--step1-field, var(--color-input-bg));
+  border: 0;
+  box-shadow: none;
+}
+
+.perfil-form-page .gdrive-block.travel-document-block,
+:is(html[data-theme="dark"]) .perfil-form-page .gdrive-block.travel-document-block {
+  border: 0;
+  box-shadow: none;
+}
+
+/* Pendências — lista canônica cv-record-row, sem ilha gdrive-pend. */
+.perfil-form-page .perfil-pendencias-list {
+  max-height: min(28rem, 50vh);
+  overflow: auto;
+}
+
+.perfil-form-page .perfil-pendencia__motivo {
+  color: var(--color-danger-text, var(--color-danger, #f07178));
+}
+
+.perfil-form-page .perfil-pendencia__detalhe {
+  margin-top: var(--space-2, 0.5rem);
+}
+
+.perfil-form-page .perfil-pendencia__detalhe summary {
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: var(--font-size-sm, 0.875rem);
+  list-style: none;
+}
+
+.perfil-form-page .perfil-pendencia__detalhe summary::-webkit-details-marker {
+  display: none;
+}
+
+.perfil-form-page .perfil-pendencia__detalhe summary:hover {
+  color: var(--color-heading, var(--color-text));
+}
+
+.perfil-form-page .perfil-pendencia__erro {
+  background: var(--step1-field, var(--color-input-bg));
+  border: 0;
+  border-radius: var(--radius-sm, 8px);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--font-size-xs, 0.75rem);
+  margin: var(--space-2, 0.5rem) 0 0;
+  overflow-x: auto;
+  padding: var(--space-3, 0.75rem);
+  white-space: pre-wrap;
+  word-break: break-word;
+}

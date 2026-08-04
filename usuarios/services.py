@@ -84,4 +84,4 @@ def excluir_usuario(usuario, *, solicitante):
         raise UsuarioNaoPodeSerExcluido(
             "Não foi possível excluir a conta porque há registros vinculados a ela."
         ) from exc
-
+

@@ -1,27 +1,3 @@
-<section class="cv-form-block" aria-labelledby="config-unidade-section">
-  <div class="field-grid">
-    {% include "components/ui/forms/field.html" with field=form.unidade size_class="field-size-4" only %}
-  </div>
-</section>
+{% include "components/ui/forms/form_block.html" with element_id="config-unidade" section_id="config-unidade-title" variant="split" extra_class="travel-document-block document-form-block" title="Unidade" description="Unidade operacional desta área" body_template="cadastros/configuracao/partials/_unidade_fields.html" heading_level=3 %}
 
-<section class="cv-form-block" aria-labelledby="config-endereco-section">
-  <header class="cv-form-block__header">
-    <h4 class="cv-form-block__title" id="config-endereco-section">Endereço dos documentos</h4>
-  </header>
-  <div class="field-grid">
-    {% include "components/ui/forms/field.html" with field=form.cep size_class="field-size-1" only %}
-    {% include "components/ui/forms/field.html" with field=form.numero size_class="field-size-1" only %}
-    {% include "components/ui/forms/field.html" with field=form.logradouro size_class="field-size-2" only %}
-  </div>
-  <div class="field-grid">
-    {% include "components/ui/forms/field.html" with field=form.bairro size_class="field-size-2" only %}
-    {% include "components/ui/forms/field.html" with field=form.cidade_endereco size_class="field-size-1" only %}
-    {% include "components/ui/forms/field.html" with field=form.uf_nome size_class="field-size-1" only %}
-    {{ form.uf }}
-  </div>
-  <div class="field-grid">
-    {% include "components/ui/forms/field.html" with field=form.email size_class="field-size-2" only %}
-    {% include "components/ui/forms/field.html" with field=form.telefone size_class="field-size-1" only %}
-    {% include "components/ui/forms/field.html" with field=form.ramal size_class="field-size-1" only %}
-  </div>
-</section>
+{% include "components/ui/forms/form_block.html" with element_id="config-endereco" section_id="config-endereco-section" variant="split" extra_class="travel-document-block document-form-block" title="Endereço dos documentos" description="CEP, logradouro e contato usados nos PDFs" body_template="cadastros/configuracao/partials/_endereco_fields.html" heading_level=3 %}

@@ -1,45 +1,29 @@
-{% extends "base.html" %}
+{% extends "components/page/flow_base.html" %}
 {% load static %}
 
-{% block title %}{{ page_title }}{% endblock %}
+{% comment %}
+  Meu perfil — casco de formulário com UM card mestre e blocos internos
+  (mesmo gesto do gerenciador de área). Conta e senha são POSTs separados
+  dentro do corpo do card, sem aninhar `<form>` em `<form>`.
+{% endcomment %}
 
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/gdrive-config.css' %}">
+  <link rel="stylesheet" href="{% static 'css/perfil.css' %}?v=20260803-5">
 {% endblock %}
 
-{% block content %}
-  <div class="page-shell page-shell--standard">
-    {% include "components/ui/headers/page_header.html" with eyebrow="CONTA" title=page_title description=page_description icon_label="PF" module_label="Conta e segurança" status_label="Sessão ativa" status_variant="complete" only %}
+{% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
+{% block flow_shell_extra %} document-form-page perfil-form-page{% endblock %}
 
-    <div class="main-form-panel main-form-panel--stack">
-      <div class="cv-form-section-stack cv-form-section-stack--comfortable">
-        {% with user_label=request.user.get_full_name|default:request.user.get_username username=request.user.get_username %}
-          {% if request.user.email %}
-            {% with card_description=user_label|add:" · @"|add:username|add:" · "|add:request.user.email %}
-              {% include "components/form/card.html" with title="Resumo da conta" description=card_description title_id="perfil-resumo-title" heading_level=2 body_template="core/partials/_perfil_resumo_body.html" footer_template="core/partials/_perfil_resumo_footer.html" %}
-            {% endwith %}
-          {% else %}
-            {% with card_description=user_label|add:" · @"|add:username %}
-              {% include "components/form/card.html" with title="Resumo da conta" description=card_description title_id="perfil-resumo-title" heading_level=2 body_template="core/partials/_perfil_resumo_body.html" footer_template="core/partials/_perfil_resumo_footer.html" %}
-            {% endwith %}
-          {% endif %}
-        {% endwith %}
+{% block flow_header %}
+  <header class="list-header list-header--wizard-band" data-wizard-sticky-band>
+    {% include "components/ui/headers/_list_header_band.html" with title=page_title eyebrow=flow_eyebrow status_label=flow_status_label status_variant=flow_status_variant only %}
+  </header>
+{% endblock %}
 
-        <form method="post" novalidate>
-          {% csrf_token %}
-          {% include "components/form/card.html" with title="Dados pessoais" description="Informações usadas para identificar sua conta no sistema." title_id="perfil-dados-title" heading_level=2 body_template="core/partials/_perfil_dados_body.html" footer_template="core/partials/_perfil_dados_footer.html" %}
-        </form>
-
-        <form method="post" novalidate>
-          {% csrf_token %}
-          {% include "components/form/card.html" with title="Senha de acesso" description="Use uma senha forte e diferente das utilizadas em outros serviços." title_id="perfil-senha-title" heading_level=2 body_template="core/partials/_perfil_senha_body.html" footer_template="core/partials/_perfil_senha_footer.html" %}
-        </form>
-
-        {% include "components/form/card.html" with title="Áreas de trabalho" description="Espaços aos quais sua conta possui acesso." title_id="perfil-areas-title" heading_level=2 meta_template="core/partials/_perfil_areas_header_meta.html" body_template="core/partials/_perfil_areas_body.html" %}
-
-        {% include "components/perfil/gdrive_card.html" %}
-      </div>
-    </div>
+{% block flow_body %}
+  <div class="cv-form-section-stack cv-form-section-stack--comfortable" data-travel-document-wizard-step1>
+    {% include "components/form/card.html" with title="Conta e segurança" description=page_description title_id="perfil-conta-title" heading_level=2 extra_class="travel-document-card" body_extra_class="travel-document-body" meta_template="core/partials/_perfil_areas_header_meta.html" body_template="core/partials/_perfil_card_body.html" footer_template="core/partials/_perfil_logout_footer.html" %}
   </div>
 {% endblock %}
 

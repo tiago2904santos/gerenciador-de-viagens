@@ -1,7 +1,0 @@
-{% with default_area=vinculos_area.0.area.sigla|default:"—" %}
-  <div class="cv-summary-grid cv-summary-grid--3" role="list">
-    {% include "components/cards/summary_card.html" with label="Áreas de trabalho" value=vinculos_area|length description="Vínculos ativos" only %}
-    {% include "components/cards/summary_card.html" with label="Área padrão" value=default_area description="Contexto inicial da sessão" only %}
-    {% include "components/cards/summary_card.html" with label="Sessão" value="Ativa" description="Acesso autenticado" only %}
-  </div>
-{% endwith %}

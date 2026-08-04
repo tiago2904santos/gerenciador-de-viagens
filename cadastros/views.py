@@ -68,6 +68,54 @@ from .services_via_cep import ViaCEPServiceError
 
 CADASTROS_PER_PAGE = 15
 
+CONFIG_ABAS = (
+    ("instituicao", "Instituição"),
+    ("oficio", "Ofício"),
+    ("roteiros", "Roteiros"),
+)
+CONFIG_ABA_KEYS = {key for key, _label in CONFIG_ABAS}
+CONFIG_ABA_DEFAULT = "instituicao"
+
+CONFIG_ABA_META = {
+    "instituicao": {
+        "page_title": "Instituição",
+        "page_description": "Unidade, endereço e contato usados nos documentos.",
+    },
+    "oficio": {
+        "page_title": "Ofício",
+        "page_description": "Assinantes padrão e destinatário do ofício.",
+    },
+    "roteiros": {
+        "page_title": "Roteiros e diárias",
+        "page_description": "Tabela de valores de diária por faixa e vigência.",
+    },
+}
+
+
+def _url_configuracao(aba):
+    if aba == CONFIG_ABA_DEFAULT:
+        return reverse("cadastros:configuracao")
+    return reverse("cadastros:configuracao_aba", kwargs={"aba": aba})
+
+
+def _abas_configuracao(*, ativa):
+    return [
+        {
+            "key": key,
+            "label": label,
+            "url": _url_configuracao(key),
+            "is_active": ativa == key,
+        }
+        for key, label in CONFIG_ABAS
+    ]
+
+
+def _resolver_aba_configuracao(aba):
+    ativa = aba or CONFIG_ABA_DEFAULT
+    if ativa not in CONFIG_ABA_KEYS:
+        raise Http404("Aba de configuração desconhecida.")
+    return ativa
+
 
 def cidades_index(request):
     q = request.GET.get("q", "").strip()
@@ -569,26 +617,34 @@ def viatura_update(request, pk):
     )
 
 
-def configuracao_sistema(request):
+def configuracao_sistema(request, aba=None):
     from .models import ConfiguracaoSistema
 
+    ativa = _resolver_aba_configuracao(aba)
     obj = ConfiguracaoSistema.get_for_area(getattr(request, "area", None))
     form_id = request.POST.get("form_id") if request.method == "POST" else None
-    is_post_dados = request.method == "POST" and form_id not in {"destinatarios", "diarias"}
-    is_post_destinatarios = form_id == "destinatarios"
-    is_post_diarias = form_id == "diarias"
+    redirect_url = _url_configuracao(ativa)
 
-    post_data = request.POST if is_post_dados else None
-    form = ConfiguracaoSistemaForm(post_data, instance=obj)
-    assinaturas_form = ConfiguracaoAssinaturasForm(post_data, configuracao=obj)
+    is_post_instituicao = request.method == "POST" and form_id in {None, "", "instituicao"}
+    is_post_oficio = request.method == "POST" and form_id == "oficio"
+    is_post_diarias = request.method == "POST" and form_id == "diarias"
+
+    form = ConfiguracaoSistemaForm(
+        request.POST if is_post_instituicao else None,
+        instance=obj,
+    )
+    assinaturas_form = ConfiguracaoAssinaturasForm(
+        request.POST if is_post_oficio else None,
+        configuracao=obj,
+    )
     destinatario_form = ConfiguracaoDestinatarioForm(
-        request.POST if is_post_destinatarios else None, instance=obj,
+        request.POST if is_post_oficio else None,
+        instance=obj,
     )
     diaria_form = TabelaDiariaForm(request.POST if is_post_diarias else None)
 
-    if is_post_dados and form.is_valid() and assinaturas_form.is_valid():
+    if is_post_instituicao and form.is_valid():
         _, cidade_resolvida = salvar_configuracao_sistema(form)
-        assinaturas_form.save(obj)
         if (
             "uf" in form.cleaned_data
             and (form.cleaned_data.get("uf") or form.cleaned_data.get("cidade_endereco"))
@@ -599,12 +655,13 @@ def configuracao_sistema(request):
                 "Base geográfica não importada ou cidade não encontrada; cidade sede padrão não foi definida.",
             )
         messages.success(request, "Configurações salvas com sucesso.")
-        return redirect("cadastros:configuracao")
+        return redirect(redirect_url)
 
-    if is_post_destinatarios and destinatario_form.is_valid():
+    if is_post_oficio and assinaturas_form.is_valid() and destinatario_form.is_valid():
+        assinaturas_form.save(obj)
         destinatario_form.save()
-        messages.success(request, "Destinatário salvo com sucesso.")
-        return redirect("cadastros:configuracao")
+        messages.success(request, "Configurações de ofício salvas com sucesso.")
+        return redirect(redirect_url)
 
     if is_post_diarias and diaria_form.is_valid():
         tabela = diaria_form.save()
@@ -613,27 +670,34 @@ def configuracao_sistema(request):
             f"Valores de {tabela.get_faixa_display()} valendo a partir de "
             f"{tabela.vigencia_inicio:%d/%m/%Y}. Roteiros anteriores mantêm o valor da época.",
         )
-        return redirect("cadastros:configuracao")
+        return redirect(redirect_url)
 
-    return render(
-        request,
-        "cadastros/configuracao/form.html",
-        {
-            "page_title": "Configurações do sistema",
-            "page_description": "Unidade, cidade em documentos e assinantes padrão por tipo.",
-            "flow_eyebrow": "CADASTROS",
-            "flow_back_label": "Voltar",
-            "flow_back_url": reverse("core:dashboard"),
-            "form": form,
-            "assinaturas_form": assinaturas_form,
-            "destinatario_form": destinatario_form,
-            "diaria_form": diaria_form,
-            "diarias_vigentes": listar_tabelas_diaria(),
-            "submit_label": "Salvar configuração",
-            "submit_icon": "check",
-            "back_url": reverse("core:dashboard"),
-        },
-    )
+    meta = CONFIG_ABA_META[ativa]
+    context = {
+        "page_title": meta["page_title"],
+        "page_description": meta["page_description"],
+        "flow_eyebrow": "Configurações",
+        "flow_back_label": "Voltar",
+        "flow_back_url": reverse("core:dashboard"),
+        "aba": ativa,
+        "abas": _abas_configuracao(ativa=ativa),
+        "tabs_aria_label": "Alternar seção de configurações",
+        "config_action_url": redirect_url,
+        "submit_label": "Salvar",
+        "submit_icon": "check",
+        "back_url": reverse("core:dashboard"),
+    }
+
+    if ativa == "instituicao":
+        context["form"] = form
+    elif ativa == "oficio":
+        context["assinaturas_form"] = assinaturas_form
+        context["destinatario_form"] = destinatario_form
+    else:
+        context["diaria_form"] = diaria_form
+        context["diarias_vigentes"] = listar_tabelas_diaria()
+
+    return render(request, "cadastros/configuracao/form.html", context)
 
 
 def api_consulta_cep(request, cep):

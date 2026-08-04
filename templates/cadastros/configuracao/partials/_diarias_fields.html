@@ -1,0 +1,29 @@
+{% if diaria_form.non_field_errors %}
+  {% include "components/ui/feedback/field_error.html" with errors=diaria_form.non_field_errors only %}
+{% endif %}
+
+<div class="field-layout">
+  <div class="field-row field-row--3">
+    {% include "components/ui/forms/field.html" with field=diaria_form.faixa only %}
+    {% include "components/ui/forms/date_picker.html" with mode="single" picker_id="diaria-vigencia-picker" single_field=diaria_form.vigencia_inicio only %}
+    {% include "components/ui/forms/field.html" with field=diaria_form.valor_24h only %}
+  </div>
+
+  <div class="field-row field-row--2">
+    <div class="cv-field">
+      <label class="cv-field__label" for="diaria-calc-15">15% (calculado)</label>
+      <input class="form-control cv-field__control" id="diaria-calc-15" type="text"
+             data-diaria-derivado="0.15" readonly disabled aria-describedby="diaria-calc-ajuda">
+    </div>
+    <div class="cv-field">
+      <label class="cv-field__label" for="diaria-calc-30">30% (calculado)</label>
+      <input class="form-control cv-field__control" id="diaria-calc-30" type="text"
+             data-diaria-derivado="0.30" readonly disabled aria-describedby="diaria-calc-ajuda">
+    </div>
+  </div>
+
+  <p class="cv-field__hint" id="diaria-calc-ajuda">
+    Prévia do cálculo. Os percentuais não são editáveis e são gravados pelo
+    servidor a partir do valor de 24 horas.
+  </p>
+</div>

@@ -7,6 +7,7 @@ app_name = "cadastros"
 urlpatterns = [
     path("", views.index, name="index"),
     path("configuracao/", views.configuracao_sistema, name="configuracao"),
+    path("configuracao/<slug:aba>/", views.configuracao_sistema, name="configuracao_aba"),
     path("api/cep/<str:cep>/", views.api_consulta_cep, name="api_consulta_cep"),
     path("estados/", views.estados_index, name="estados_index"),
     path("estados/<int:pk>/editar/", views.estado_update, name="estado_update"),
