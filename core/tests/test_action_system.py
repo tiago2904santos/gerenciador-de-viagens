@@ -15,10 +15,13 @@ class GlobalActionSystemTests(SimpleTestCase):
             / "action-system.css"
         )
         self.css = self.css_path.read_text(encoding="utf-8")
+        self.tokens = (
+            Path(settings.BASE_DIR) / "static" / "css" / "01-tokens.css"
+        ).read_text(encoding="utf-8")
 
     def test_global_layer_covers_new_and_legacy_buttons_in_both_themes(self):
-        self.assertIn(":root {", self.css)
-        self.assertIn('html[data-theme="dark"] {', self.css)
+        self.assertIn(":root {", self.tokens)
+        self.assertIn('html[data-theme="dark"] {', self.tokens)
         self.assertIn(".cv-btn,", self.css)
         self.assertIn(".btn,", self.css)
         self.assertIn(".app-btn {", self.css)
@@ -59,7 +62,7 @@ class GlobalActionSystemTests(SimpleTestCase):
 
     def test_document_action_tones_are_distinct_and_motion_can_be_reduced(self):
         for tone in ("pdf", "docx", "preview", "edit"):
-            self.assertIn(f"--action-{tone}-bg:", self.css)
+            self.assertIn(f"--action-{tone}-bg:", self.tokens)
             self.assertIn(f".cv-action-menu__item-icon--{tone} {{", self.css)
         self.assertIn("@media (prefers-reduced-motion: reduce)", self.css)
 

@@ -10,7 +10,6 @@
   flex-direction: column;
   gap: 0;
   /* Vermelho nítido do botão Desconectar (variante escura no bloco de tema). */
-  --gd-unlink: var(--color-danger);
 }
 
 /* ── Blocos internos, separados por divisória sutil ───────────────────────── */
@@ -857,21 +856,12 @@
    ------------------------------------------------------------------------------ */
 html[data-theme="dark"] .gdrive-body {
   /* Verde (pasta selecionada, status concluído) */
-  --color-success: #5bd6a4;
-  --color-success-soft: rgba(34, 170, 120, 0.14);
-  --color-success-border-soft: rgba(66, 200, 148, 0.40);
 
   /* Vermelho (status com erro, desconectar) */
-  --color-danger: #ff9a90;
-  --color-danger-soft: rgba(210, 70, 60, 0.16);
-  --color-danger-border-soft: rgba(235, 110, 100, 0.42);
 
   /* Azul (aba ativa, pasta destacada, links, barra de progresso) */
-  --color-primary-bright: #5aa6e6;
-  --color-primary-soft: rgba(60, 130, 205, 0.22);
 
   /* Vermelho do Desconectar mais vivo no escuro (não o dark-red apagado) */
-  --gd-unlink: #ff6a5e;
 }
 
 /* Trilha do segmented control no escuro: navy recuado (não o quase-preto do

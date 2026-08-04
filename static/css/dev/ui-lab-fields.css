@@ -4,68 +4,9 @@
    ========================================================================== */
 
 .ui-lab-page {
-  --cv-field-height: var(--control-height-md);
-  --cv-field-radius: var(--radius-control);
-  --cv-field-padding-x: var(--space-3);
-  --cv-field-padding-y: 0;
-  --cv-field-font-size: var(--font-size-sm);
-  --cv-field-label-size: var(--font-size-sm);
-  --cv-field-label-weight: var(--font-weight-semibold);
-  --cv-field-bg: var(--theme-input-bg);
-  --cv-field-bg-hover: var(--theme-surface-card);
-  --cv-field-color: var(--theme-input-text);
-  --cv-field-border: var(--theme-input-border);
-  --cv-field-border-hover: var(--color-border-strong);
-  --cv-field-border-focus: var(--route-button-primary-border);
-  --cv-field-shadow: var(--shadow-xs);
-  --cv-field-shadow-focus: 0 0 0 var(--space-1) var(--cv-field-focus-ring), var(--shadow-xs);
-  --cv-field-placeholder: var(--color-input-placeholder);
-  --cv-field-focus-border: var(--route-button-primary-border);
-  --cv-field-focus-ring: var(--route-focus-ring);
-  --cv-field-error: var(--color-danger);
-  --cv-field-error-bg: var(--color-danger-soft);
-  --cv-field-error-border: var(--color-danger-border-strong);
-  --cv-field-error-shadow: 0 0 0 var(--space-1) var(--color-danger-border-soft), var(--shadow-xs);
-  --cv-field-success: var(--color-success);
-  --cv-field-success-shadow: 0 0 0 var(--space-1) var(--color-success-soft), var(--shadow-xs);
-  --cv-field-disabled-bg: var(--color-input-disabled-bg);
-  --cv-field-readonly-bg: var(--route-field-disabled-bg);
-  --cv-field-help-color: var(--color-help);
-  --cv-field-grid-gap: var(--space-4);
-  --cv-field-section-gap: var(--space-4);
-  --cv-select-bg: var(--cv-field-bg);
-  --cv-select-bg-hover: var(--cv-field-bg-hover);
-  --cv-select-border: var(--cv-field-border);
-  --cv-select-border-hover: var(--cv-field-border-hover);
-  --cv-select-border-focus: var(--cv-field-border-focus);
-  --cv-select-chevron: var(--cv-field-placeholder);
-  --cv-select-shadow: var(--shadow-xs);
-  --cv-select-focus-shadow: var(--cv-field-shadow-focus);
-  --cv-select-error-shadow: var(--cv-field-error-shadow);
-  --cv-chip-bg: var(--color-primary-soft);
-  --cv-chip-bg-hover: var(--theme-list-row-hover);
-  --cv-chip-border: var(--color-info-border-strong);
-  --cv-chip-color: var(--color-primary-strong);
-  --cv-chip-remove-bg-hover: var(--color-danger-soft);
-  --cv-chip-remove-color: var(--theme-text-muted);
-  --cv-dropdown-bg: var(--theme-surface-card);
-  --cv-dropdown-border: var(--theme-border-card);
-  --cv-dropdown-shadow: var(--shadow-soft);
-  --cv-option-hover-bg: var(--theme-list-row-hover);
-  --cv-option-selected-bg: var(--color-primary-soft);
-  --cv-option-selected-border: var(--color-info-border-strong);
-  --cv-option-marker-bg: var(--color-primary);
-  --cv-option-marker-color: var(--color-white);
 }
 
 html[data-theme="dark"] .ui-lab-page {
-  --cv-field-bg-hover: var(--theme-surface-card-soft);
-  --cv-field-error-bg: var(--cv-field-bg);
-  --cv-chip-bg: var(--color-info-bg);
-  --cv-chip-border: var(--color-info-border);
-  --cv-chip-color: var(--color-info-text);
-  --cv-option-selected-bg: var(--color-info-bg);
-  --cv-option-selected-border: var(--color-info-border);
 }
 
 /* =========================================================
@@ -245,19 +186,15 @@ html[data-theme="dark"] .ui-lab-page {
 }
 
 .cv-field-grid--2 {
-  --cv-field-grid-columns: 2;
 }
 
 .cv-field-grid--1 {
-  --cv-field-grid-columns: 1;
 }
 
 .cv-field-grid--3 {
-  --cv-field-grid-columns: 3;
 }
 
 .cv-field-grid--4 {
-  --cv-field-grid-columns: 4;
 }
 
 .cv-field--span-2 {
@@ -1032,7 +969,6 @@ html[data-theme="dark"] .ui-lab-page {
 @media (max-width: 1080px) {
   .cv-field-grid--3,
   .cv-field-grid--4 {
-    --cv-field-grid-columns: 2;
   }
 }
 
@@ -1040,7 +976,6 @@ html[data-theme="dark"] .ui-lab-page {
   .cv-field-grid--2,
   .cv-field-grid--3,
   .cv-field-grid--4 {
-    --cv-field-grid-columns: 1;
   }
 
   .cv-field--span-2,
@@ -1081,25 +1016,9 @@ html[data-theme="dark"] .ui-lab-page {
 
 /* ─── Tokens do menu e opções ──────────────────────────────────────────── */
 .ui-lab-page {
-  --cv-cs-trigger-shadow:          var(--shadow-sm);
-  --cv-cs-chevron-color:           var(--theme-text-muted);
-  --cv-cs-value-weight:            var(--font-weight-medium);
-  --cv-cs-menu-bg:                 var(--cv-dropdown-bg);
-  --cv-cs-menu-border:             var(--cv-dropdown-border);
-  --cv-cs-menu-shadow:             var(--shadow-md);
-  --cv-cs-menu-radius:             var(--cv-field-radius);
-  --cv-cs-option-hover-bg:         var(--cv-option-hover-bg);
-  --cv-cs-option-selected-bg:      var(--cv-option-selected-bg);
-  --cv-cs-option-selected-color:   var(--color-primary);
-  --cv-cs-option-selected-weight:  var(--font-weight-semibold);
-  --cv-cs-option-check-color:      var(--cv-option-marker-bg);
-  --cv-cs-option-padding-x:        var(--space-4);
-  --cv-cs-z-index:                 200;
 }
 
 html[data-theme="dark"] .ui-lab-page {
-  --cv-cs-trigger-shadow:          none;
-  --cv-cs-option-selected-color:   var(--color-info-text);
 }
 
 /* ─── Wrapper root ──────────────────────────────────────────────────────── */

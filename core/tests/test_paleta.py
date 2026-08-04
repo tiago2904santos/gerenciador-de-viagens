@@ -116,8 +116,10 @@ class PaletaTresCoresTests(SimpleTestCase):
         Se alguem tirar uma delas, os filhos herdam o par do avo e a alternancia
         para de acontecer — sem erro, so com a tela ficando de uma cor so.
         """
-        secoes = (CSS / "components" / "form-sections.css").read_text(encoding="utf-8")
-        shell = (CSS / "page-shell.css").read_text(encoding="utf-8")
+        # NOVO-30 fase 1 centraliza inclusive os overrides contextuais; os
+        # componentes apenas consomem as propriedades customizadas.
+        secoes = (CSS / "01-tokens.css").read_text(encoding="utf-8")
+        shell = secoes
 
         bloco = _declaracoes(_bloco(secoes, ".cv-form-block"))
         self.assertEqual(bloco.get("--cv-surface"), "var(--cv-surface-block)")
@@ -143,7 +145,7 @@ class PaletaTresCoresTests(SimpleTestCase):
                     "prestacoes_contas/assinatura/base_publico.html"):
             with self.subTest(template=rel):
                 texto = (base / rel).read_text(encoding="utf-8")
-                escuro = texto.find("03-theme-dark.css")
+                escuro = texto.find("01-tokens.css")
                 paleta = texto.find("00-palette.css")
                 self.assertNotEqual(paleta, -1, "a pagina nao carrega 00-palette.css")
                 self.assertLess(escuro, paleta, "paleta precisa vir depois do tema escuro")

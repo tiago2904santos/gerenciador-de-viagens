@@ -217,111 +217,39 @@
    -------------------------------------------------------------------------- */
 :root {
   /* Dimensões — chip é menor que o state button (control-height-md = 44px) */
-  --cv-chip-radius:            var(--radius-pill);
-  --cv-chip-height:            26px;
-  --cv-chip-height-compact:    20px;
-  --cv-chip-padding-x:         var(--space-3);
-  --cv-chip-padding-x-compact: var(--space-2);
-  --cv-chip-gap:               6px;
-  --cv-chip-icon-size:         13px;
-  --cv-chip-font-size:         var(--font-size-2xs);
-  --cv-chip-font-weight:       var(--font-weight-bold);
-  --cv-chip-letter-spacing:    0.055em;
-  --cv-chip-border-width:      1px;
-  --cv-chip-focus-ring:        0 0 0 3px rgba(21, 91, 154, 0.22);
-  --cv-chip-disabled-opacity:  0.48;
 
   /* Base (neutro) — herda direto do state-neutral */
-  --cv-chip-bg:     var(--state-neutral-bg);
-  --cv-chip-border: var(--state-neutral-border);
-  --cv-chip-color:  var(--state-neutral-text);
-  --cv-chip-glow:   var(--state-neutral-glow);
 
   /* Sucesso — herda direto do state-success */
-  --cv-chip-success-bg:     var(--state-success-bg);
-  --cv-chip-success-border: var(--state-success-border);
-  --cv-chip-success-color:  var(--state-success-text);
-  --cv-chip-success-glow:   var(--state-success-glow);
 
   /* Aviso — herda direto do state-warning */
-  --cv-chip-warning-bg:     var(--state-warning-bg);
-  --cv-chip-warning-border: var(--state-warning-border);
-  --cv-chip-warning-color:  var(--state-warning-text);
-  --cv-chip-warning-glow:   var(--state-warning-glow);
 
   /* Perigo — herda direto do state-danger */
-  --cv-chip-danger-bg:     var(--state-danger-bg);
-  --cv-chip-danger-border: var(--state-danger-border);
-  --cv-chip-danger-color:  var(--state-danger-text);
-  --cv-chip-danger-glow:   var(--state-danger-glow);
 
   /* Muted / Neutro — herda do state-neutral */
-  --cv-chip-muted-bg:     var(--state-neutral-bg);
-  --cv-chip-muted-border: var(--state-neutral-border);
-  --cv-chip-muted-color:  var(--state-neutral-text);
-  --cv-chip-muted-glow:   var(--state-neutral-glow);
 
-  --cv-chip-neutral-bg:     var(--state-neutral-bg);
-  --cv-chip-neutral-border: var(--state-neutral-border);
-  --cv-chip-neutral-color:  var(--state-neutral-text);
-  --cv-chip-neutral-glow:   var(--state-neutral-glow);
 
   /* Filtro e Entidade — herdam do info (azul), mesma família do Retificado */
-  --cv-chip-filter-bg:     var(--cv-chip-info-bg);
-  --cv-chip-filter-border: var(--cv-chip-info-border);
-  --cv-chip-filter-color:  var(--cv-chip-info-color);
-  --cv-chip-filter-glow:   var(--cv-chip-info-glow);
 
   /* Info — mesma fórmula do state-success com --color-info */
-  --cv-chip-info-bg:     color-mix(in srgb, var(--color-info) 16%, var(--theme-surface-card, var(--color-surface)) 84%);
-  --cv-chip-info-border: color-mix(in srgb, var(--color-info) 68%, var(--theme-border-card, var(--color-border)) 32%);
-  --cv-chip-info-color:  color-mix(in srgb, var(--color-info) 84%, var(--color-heading) 16%);
-  --cv-chip-info-glow:   0 0 0 1px color-mix(in srgb, var(--color-info) 20%, transparent), 0 0 14px color-mix(in srgb, var(--color-info) 26%, transparent);
 
   /* Pendente — mesma fórmula com --color-primary */
-  --cv-chip-pending-bg:     color-mix(in srgb, var(--color-primary) 14%, var(--theme-surface-card, var(--color-surface)) 86%);
-  --cv-chip-pending-border: color-mix(in srgb, var(--color-primary) 62%, var(--theme-border-card, var(--color-border)) 38%);
-  --cv-chip-pending-color:  color-mix(in srgb, var(--color-primary) 82%, var(--color-heading) 18%);
-  --cv-chip-pending-glow:   0 0 0 1px color-mix(in srgb, var(--color-primary) 18%, transparent), 0 0 12px color-mix(in srgb, var(--color-primary) 22%, transparent);
 
   /* Entidade — primário mais rico */
-  --cv-chip-entity-bg:     color-mix(in srgb, var(--color-primary) 16%, var(--theme-surface-card, var(--color-surface)) 84%);
-  --cv-chip-entity-border: color-mix(in srgb, var(--color-primary) 70%, var(--theme-border-card, var(--color-border)) 30%);
-  --cv-chip-entity-color:  color-mix(in srgb, var(--color-primary) 86%, var(--color-heading) 14%);
-  --cv-chip-entity-glow:   0 0 0 1px color-mix(in srgb, var(--color-primary) 20%, transparent), 0 0 14px color-mix(in srgb, var(--color-primary) 24%, transparent);
 }
 
 /* Dark — espelha o padrão do state button (16% → 26% bg, text misturado com white) */
 html[data-theme="dark"] {
-  --cv-chip-focus-ring: 0 0 0 3px rgba(112, 184, 255, 0.32);
 
   /* info/pending/entity — success/warning/danger/neutral já herdam via --state-* */
-  --cv-chip-info-bg:       color-mix(in srgb, var(--color-info) 26%, var(--theme-surface-card) 74%);
-  --cv-chip-info-color:    color-mix(in srgb, var(--color-info) 48%, var(--color-white) 52%);
 
-  --cv-chip-pending-bg:    color-mix(in srgb, var(--color-primary) 22%, var(--theme-surface-card) 78%);
-  --cv-chip-pending-color: color-mix(in srgb, var(--color-primary) 52%, var(--color-white) 48%);
 
-  --cv-chip-entity-bg:     color-mix(in srgb, var(--color-primary) 22%, var(--theme-surface-card) 78%);
-  --cv-chip-entity-color:  color-mix(in srgb, var(--color-primary) 52%, var(--color-white) 48%);
 }
 
 /* Light explícito — bg espelha 6% do state button + glow 30% mais suave */
 html[data-theme="light"] {
-  --cv-chip-info-bg:    color-mix(in srgb, var(--color-info) 6%, var(--theme-surface-card, var(--color-surface)) 94%);
-  --cv-chip-pending-bg: color-mix(in srgb, var(--color-primary) 5%, var(--theme-surface-card, var(--color-surface)) 95%);
-  --cv-chip-entity-bg:  color-mix(in srgb, var(--color-primary) 5%, var(--theme-surface-card, var(--color-surface)) 95%);
 
   /* Glow reduzido: outer blur 18→10px, percentagens -30% */
-  --cv-chip-success-glow: 0 0 0 1px color-mix(in srgb, var(--color-success) 16%, transparent), 0 0 10px color-mix(in srgb, var(--color-success) 22%, transparent);
-  --cv-chip-warning-glow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 16%, transparent), 0 0 10px color-mix(in srgb, var(--color-accent) 20%, transparent);
-  --cv-chip-danger-glow:  0 0 0 1px color-mix(in srgb, var(--color-danger) 14%, transparent), 0 0 10px color-mix(in srgb, var(--color-danger) 20%, transparent);
-  --cv-chip-neutral-glow: 0 0 0 1px color-mix(in srgb, var(--theme-text-muted) 10%, transparent), 0 0 8px color-mix(in srgb, var(--theme-text-muted) 10%, transparent);
-  --cv-chip-muted-glow:   var(--cv-chip-neutral-glow);
-  --cv-chip-info-glow:    0 0 0 1px color-mix(in srgb, var(--color-info) 14%, transparent), 0 0 9px color-mix(in srgb, var(--color-info) 18%, transparent);
-  --cv-chip-pending-glow: 0 0 0 1px color-mix(in srgb, var(--color-primary) 12%, transparent), 0 0 8px color-mix(in srgb, var(--color-primary) 16%, transparent);
-  --cv-chip-entity-glow:  0 0 0 1px color-mix(in srgb, var(--color-primary) 14%, transparent), 0 0 9px color-mix(in srgb, var(--color-primary) 18%, transparent);
-  --cv-chip-filter-glow:  var(--cv-chip-info-glow);
 }
 
 .cv-chip,

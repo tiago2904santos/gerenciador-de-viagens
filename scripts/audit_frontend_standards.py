@@ -34,16 +34,8 @@ CSS_EXCEPTIONS: dict[str, dict] = {
         "reason": ".oficio-card em cards.css: domínio a mover para oficios.css (Prompt 5).",
         "rules": {"domain_selector_in_global"},
     },
-    "static/css/tokens.css": {
-        "reason": "Arquivo de tokens — cores hex são a definição original, permitidas aqui.",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/theme.css": {
-        "reason": "Arquivo de tema — cores hex são a definição original, permitidas aqui.",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/03-theme-dark.css": {
-        "reason": "Official dark-theme token layer; literal values define semantic tokens.",
+    "static/css/01-tokens.css": {
+        "reason": "Camada unica de tokens e temas (NOVO-30).",
         "rules": {"hex_color_outside_tokens"},
     },
     "static/css/components/theme-dark-components.css": {

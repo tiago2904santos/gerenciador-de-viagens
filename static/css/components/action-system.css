@@ -5,138 +5,28 @@
    ========================================================================== */
 
 :root {
-  --action-height: var(--control-height-md);
-  --action-radius: 12px;
-  --action-radius-sm: 10px;
-  --action-group-radius: 16px;
-  --action-gap: 7px;
-  --action-padding-x: 15px;
-  --action-font-size: 0.84rem;
-  --action-font-weight: 720;
 
-  --action-bg: #ffffff;
-  --action-bg-soft: #f3f7fb;
-  --action-bg-hover: #eaf2f9;
-  --action-border: #c8d6e5;
-  --action-border-strong: #9fb5cb;
-  --action-text: #24445f;
-  --action-text-strong: #102f4b;
-  --action-muted: #627b92;
 
-  --action-primary-bg: linear-gradient(145deg, #1769aa, #0f568f);
-  --action-primary-hover-bg: linear-gradient(145deg, #1d75bb, #125f9d);
-  --action-primary-border: #0d4c80;
-  --action-primary-text: #ffffff;
-  --action-primary-shadow: 0 7px 18px rgba(15, 86, 143, 0.2);
 
-  --action-danger-bg: #fff2f0;
-  --action-danger-hover-bg: #ffe7e3;
-  --action-danger-border: #e3a49d;
-  --action-danger-text: #a23b31;
 
-  --action-success-bg: #edf8f2;
-  --action-success-hover-bg: #e0f2e8;
-  --action-success-border: #98c8ae;
-  --action-success-text: #236b4a;
 
-  --action-warning-bg: #fff8e9;
-  --action-warning-hover-bg: #fff0cd;
-  --action-warning-border: #dfc07a;
-  --action-warning-text: #876317;
 
-  --action-info-bg: #edf5fb;
-  --action-info-hover-bg: #e0eef8;
-  --action-info-border: #a8c4db;
-  --action-info-text: #315f84;
 
-  --action-pdf-bg: #fff0ed;
-  --action-pdf-border: #e68a7f;
-  --action-pdf-text: #b72f27;
-  --action-docx-bg: #eaf2ff;
-  --action-docx-border: #78a9e3;
-  --action-docx-text: #125da8;
-  --action-preview-bg: #e4faf7;
-  --action-preview-border: #69c9bd;
-  --action-preview-text: #08776e;
-  --action-edit-bg: #f1f4f7;
-  --action-edit-border: #b8c5d0;
-  --action-edit-text: #4b6275;
 
-  --action-focus: 0 0 0 3px rgba(28, 113, 178, 0.22);
-  --action-shadow: 0 3px 10px rgba(21, 55, 86, 0.08);
-  --action-shadow-hover: 0 7px 17px rgba(21, 55, 86, 0.13);
 
-  --action-group-bg: rgba(244, 248, 252, 0.9);
-  --action-group-border: rgba(151, 174, 197, 0.38);
-  --action-group-shadow: 0 5px 16px rgba(21, 55, 86, 0.07);
 
-  --action-modal-bg: rgba(255, 255, 255, 0.985);
-  --action-modal-border: rgba(151, 174, 197, 0.5);
-  --action-modal-shadow: 0 28px 80px rgba(8, 28, 47, 0.3);
-  --action-modal-backdrop: rgba(7, 18, 31, 0.68);
 }
 
 html[data-theme="dark"] {
-  --action-bg: #172638;
-  --action-bg-soft: #132131;
-  --action-bg-hover: #20354a;
-  --action-border: #385068;
-  --action-border-strong: #55728e;
-  --action-text: #d4e2ef;
-  --action-text-strong: #f3f8fc;
-  --action-muted: #9eb1c4;
 
-  --action-primary-bg: linear-gradient(145deg, #205f8f, #16486f);
-  --action-primary-hover-bg: linear-gradient(145deg, #286fa4, #1b557f);
-  --action-primary-border: #3f7096;
-  --action-primary-text: #ffffff;
-  --action-primary-shadow: 0 7px 18px rgba(0, 0, 0, 0.22);
 
-  --action-danger-bg: #382322;
-  --action-danger-hover-bg: #472927;
-  --action-danger-border: #7e4b47;
-  --action-danger-text: #f1b5ae;
 
-  --action-success-bg: #19352e;
-  --action-success-hover-bg: #20433a;
-  --action-success-border: #426f60;
-  --action-success-text: #a9dec7;
 
-  --action-warning-bg: #362f20;
-  --action-warning-hover-bg: #443a25;
-  --action-warning-border: #72613a;
-  --action-warning-text: #e5cb89;
 
-  --action-info-bg: #192d40;
-  --action-info-hover-bg: #20394f;
-  --action-info-border: #426581;
-  --action-info-text: #b1d1e9;
 
-  --action-pdf-bg: #442326;
-  --action-pdf-border: #a84f55;
-  --action-pdf-text: #ffaaa4;
-  --action-docx-bg: #173559;
-  --action-docx-border: #397dc0;
-  --action-docx-text: #9ed0ff;
-  --action-preview-bg: #103b3b;
-  --action-preview-border: #2d8f87;
-  --action-preview-text: #91e5dc;
-  --action-edit-bg: #202d39;
-  --action-edit-border: #50677a;
-  --action-edit-text: #bfd0de;
 
-  --action-focus: 0 0 0 3px rgba(100, 177, 232, 0.25);
-  --action-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
-  --action-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.26);
 
-  --action-group-bg: rgba(15, 29, 43, 0.84);
-  --action-group-border: rgba(91, 120, 147, 0.34);
-  --action-group-shadow: 0 7px 20px rgba(0, 0, 0, 0.18);
 
-  --action-modal-bg: rgba(15, 29, 43, 0.985);
-  --action-modal-border: rgba(102, 135, 164, 0.36);
-  --action-modal-shadow: 0 30px 86px rgba(0, 0, 0, 0.58);
-  --action-modal-backdrop: rgba(2, 8, 15, 0.78);
 }
 
 /* Text buttons: novo e legado compartilham a mesma geometria. */
@@ -748,8 +638,6 @@ html[data-theme="dark"] .cv-action-menu {
 /* Modal de documento assinado. */
 .attach-signed-modal__dialog.delete-confirm-modal__dialog,
 .attach-signed-modal__dialog {
-  --step1-surface: var(--cv-surface-card);
-  --step1-panel: var(--cv-surface-block);
   background: var(--step1-surface);
   gap: 0;
   max-width: min(100%, 610px);
@@ -1084,20 +972,6 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
  * Nunca use inherit aqui (puxa cor do pai e parece “hover”).
  */
 #attach-signed-modal {
-  --asm-panel: var(--step1-panel, var(--color-surface-soft));
-  --asm-action-bg: var(--step1-panel, var(--color-surface-soft));
-  --asm-action-border: transparent;
-  --asm-action-text: var(--color-heading);
-  --asm-accent: var(--color-accent);
-  --asm-accent-text: var(--color-on-accent, #19232d);
-  --asm-preview-bg: var(--action-preview-bg);
-  --asm-preview-border: var(--action-preview-border);
-  --asm-preview-text: var(--action-preview-text);
-  --asm-danger-bg: var(--action-danger-bg);
-  --asm-danger-border: var(--action-danger-border);
-  --asm-danger-text: var(--action-danger-text);
-  --asm-cancel-bg: var(--step1-panel, var(--color-surface-soft));
-  --asm-cancel-text: var(--color-heading);
 }
 
 #attach-signed-modal :is(

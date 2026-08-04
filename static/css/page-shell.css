@@ -44,120 +44,49 @@
 
 :root {
   /* --- Layout --- */
-  --layout-page-max-width:              var(--page-max-width);
-  --layout-page-padding-x:             var(--space-8);
-  --layout-page-padding-y:             var(--space-6);
-  --layout-shell-gap:                  var(--space-6);
-  --layout-section-gap:                var(--space-5);
-  --layout-form-panel-max-width:       960px;
---layout-list-panel-max-width:       var(--page-max-width);
-  --layout-field-grid-gap:             var(--space-4);
 
   /* --- Espaçamento estendido --- */
-  --space-12: 48px;
 
   /* --- Radius estendido --- */
-  --radius-2xl: 40px;
 
   /* --- Page Shell --- */
-  --page-shell-gap:       var(--space-6);
-  --page-shell-padding-y: var(--space-6);
-  --page-shell-max-width: var(--page-max-width);
 
   /* --- Form Panel --- */
-  --form-panel-radius: var(--radius-lg);
 
   /* --- Form Section --- */
-  --form-section-padding-x: var(--space-6);
-  --form-section-padding-y: var(--space-5);
-  --form-section-inner-gap: var(--space-5);
 
   /* --- Field Grid --- */
-  --field-grid-gap: var(--space-4);
 
   /* --- Field Group --- */
-  --field-group-padding: var(--space-4);
-  --field-group-radius:  var(--radius-sm);
-  --field-group-gap:     var(--space-3);
 
   /* --- Wizard Section Cards --- */
-  --cv-form-section-bg:             var(--cv-surface-card);
-  --cv-form-section-header-bg:      var(--cv-surface-block);
-  --cv-form-section-border:         var(--border-form-section);
-  --cv-form-section-shadow:         var(--shadow-strong);
-  --cv-form-section-radius:         var(--radius-card);
-  --cv-form-section-header-padding: var(--space-4) var(--space-6) var(--space-4) var(--space-10);
-  --cv-form-section-body-padding:   var(--space-5) var(--space-6);
-  --cv-form-section-stack-gap:             var(--space-4);
-  --cv-form-section-stack-gap-comfortable: var(--space-8);
 
   /* --- Stepper --- */
-  --stepper-padding-x:   var(--space-6);
-  --stepper-padding-y:   var(--space-4);
-  --stepper-radius:      var(--radius-lg);
-  --stepper-item-size:   28px;           /* legado — mantido para compat */
-  --stepper-marker-size: 40px;           /* marcador premium (novo) */
-  --stepper-connector-h: 2px;            /* espessura da linha conectora */
-  --stepper-gap:         var(--space-2);
+/* legado — mantido para compat */
+/* marcador premium (novo) */
+/* espessura da linha conectora */
 
   /* --- Header Band --- */
-  --header-band-gap:            var(--space-4);
 
   /* --- Header Filter Bar --- */
-  --filter-search-min-width:    200px;
-  --filter-field-min-width:     130px;
-  --filter-input-height:        var(--control-height-md);
 
   /* --- Quick Add Folder Tab --- */
-  --inline-create-tab-radius:     var(--radius-md);  /* 14px — aba mais arredondada */
-  --inline-create-tab-px:         var(--space-5);    /* 20px — aba mais larga      */
-  --inline-create-tab-py:         var(--space-3);    /* 12px — aba mais alta        */
-  --inline-create-tab-icon-size:  var(--space-5);    /* 20px — círculo do ícone     */
-  --inline-create-tab-width:      230px;
-  --inline-create-tab-height:     35px;
-  --inline-create-tab-clip-path:  path("M 0 0 H 230 V 35 H 46 Q 38 35 33 32 Q 11 11 2 0 Z");
-  --inline-create-tab-shadow:     -1px -3px 12px rgba(0, 0, 0, 0.15), 1px -3px 12px rgba(0, 0, 0, 0.10);
-  --inline-create-actions-offset: 1px;
-  --inline-create-primary-border: rgba(255, 255, 255, 0.4);
+/* 14px — aba mais arredondada */
+/* 20px — aba mais larga      */
+/* 12px — aba mais alta        */
+/* 20px — círculo do ícone     */
 
   /* --- Footer Actions --- */
-  --footer-actions-padding-x: var(--form-section-padding-x);
-  --footer-actions-padding-y: var(--space-4);
-  --footer-actions-gap:       var(--space-3);
-  --footer-actions-padding-bottom: 0;
 
   /* --- List Panel --- */
-  --list-panel-radius:    var(--radius-lg);
-  --filter-bar-padding-x: var(--space-5);
-  --filter-bar-padding-y: var(--space-3);
-  --filter-bar-gap:       var(--space-3);
-  --list-row-padding-x:   var(--space-5);
-  --list-row-padding-y:   var(--space-3);
-  --list-row-avatar-size: 36px;
-  --pagination-padding-x: var(--space-6);
-  --pagination-padding-y: var(--space-4);
 
   /* --- Quick Create Inline --- */
-  --layout-quick-create-gap:          var(--space-3);
-  --layout-quick-create-actions-width: 200px;
 
   /* --- Sombras semânticas --- */
-  --shadow-soft:     var(--shadow-sm);
-  --shadow-medium:   var(--shadow-md);
-  --shadow-shell:    var(--shadow-panel);
-  --shadow-elevated: var(--shadow-lg);
 
   /* --- Bordas semânticas --- */
-  --border-subtle: var(--color-border-soft);
-  --border-strong: var(--color-border-strong);
-  --border-focus:  var(--color-primary);
-  --border-active: var(--color-accent);
 
   /* --- Texto semântico --- */
-  --text-primary:   var(--theme-text-heading);
-  --text-secondary: var(--theme-text-body);
-  --text-muted:     var(--theme-text-muted);
-  --text-inverse:   var(--color-white);
 }
 
 
@@ -166,106 +95,35 @@
    ========================================================= */
 
 html[data-theme="dark"] {
-  --surface-page-shell:     transparent;
-  --surface-page-header:    transparent;
 
-  --surface-stepper:        var(--cv-surface-card);
-  --border-stepper:         var(--theme-border-card);
-  --shadow-stepper:         var(--theme-shadow-stat);
 
-  --surface-form-panel:     var(--cv-surface-card);
-  --border-form-panel:      var(--theme-border-card);
-  --shadow-form-panel:      var(--theme-shadow-hero);
 
-  --surface-form-section:   var(--cv-surface-card);
-  --border-form-section:    var(--color-border-soft);
-  --shadow-form-section:    none;
 
-  --surface-field-group:    var(--cv-surface-block);
-  --border-field-group:     rgba(255, 255, 255, 0.09);
 
-  --cv-form-section-bg:        var(--cv-surface-card);
-  --cv-form-section-header-bg: var(--cv-surface-block);
-  --cv-form-section-border:    var(--theme-border-card);
-  --cv-form-section-shadow:    var(--shadow-strong);
 
-  --surface-list-panel:     var(--cv-surface-card);
-  --border-list-panel:      var(--theme-border-card);
-  --shadow-list-panel:      var(--theme-shadow-hero);
 
-  --surface-filter-bar:     var(--cv-surface-block);
-  --border-filter-bar:      var(--theme-border-card);
 
-  --surface-list-row:       var(--cv-surface-card); /* mesmo fundo das seções de formulário */
-  --border-list-row:        rgba(255, 255, 255, 0.07);
-  --surface-list-row-hover: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+/* mesmo fundo das seções de formulário */
 
-  --surface-footer-actions: var(--cv-surface-block);
-  --border-footer-actions:  var(--theme-border-card);
 
-  --surface-pagination:     transparent;
-  --border-pagination:      var(--theme-border-card);
 
   /* Stepper — estados */
-  --stepper-idle-bg:       rgba(255, 255, 255, 0.07);
-  --stepper-idle-border:   rgba(255, 255, 255, 0.14);
-  --stepper-idle-color:    rgba(255, 255, 255, 0.45);
-  --stepper-active-bg:     var(--color-accent);
-  --stepper-active-border: transparent;
-  --stepper-active-color:  var(--color-white);
-  --stepper-done-bg:       rgba(216, 162, 27, 0.16);
-  --stepper-done-border:   rgba(216, 162, 27, 0.42);
-  --stepper-done-color:    var(--color-accent);
-  --stepper-connector:     rgba(255, 255, 255, 0.12);
-  --stepper-connector-on:  var(--color-accent);
-  --stepper-label-idle:    var(--theme-text-muted);
-  --stepper-label-active:  var(--theme-text-heading);
-  --stepper-label-done:    var(--theme-text-muted);
 
   /* Badges do header */
-  --surface-header-count: rgba(21, 91, 154, 0.28);
-  --text-header-count:    #9fd0ff;
 
   /* Quick Create Inline */
-  --surface-quick-create:        var(--cv-surface-block);
-  --surface-quick-create-header: var(--cv-surface-card);
-  --border-quick-create:         rgba(255, 255, 255, 0.08);
-  --shadow-quick-create:         none;
 
   /* Quick Add Folder Tab */
-  --surface-inline-create-tab:        var(--cv-surface-card);   /* azul primário com opacidade */
-  --border-inline-create-tab:         rgba(255, 255, 255, 0.22);
-  --color-inline-create-tab:          #ccdff5;                   /* texto claro sobre fundo escuro */
-  --color-inline-create-tab-icon-bg:  var(--color-accent);       /* círculo dourado */
-  --color-inline-create-tab-icon-fg:  var(--color-primary-dark); /* texto escuro sobre dourado */
+/* azul primário com opacidade */
+/* texto claro sobre fundo escuro */
+/* círculo dourado */
+/* texto escuro sobre dourado */
 
   /* Header Filter Bar */
-  --surface-filter-input:         var(--cv-surface-block);
-  --border-filter-input:          rgba(255, 255, 255, 0.12);
-  --surface-filter-chip:          var(--surface-filter-input);
-  --border-filter-chip:           var(--border-filter-input);
-  --color-filter-placeholder:     rgba(255, 255, 255, 0.35);
-  --color-filter-text:            var(--theme-text-body);
-  --surface-filter-button:        var(--cv-surface-block);
-  --border-filter-button:         rgba(255, 255, 255, 0.14);
-  --color-filter-button:          var(--theme-text-muted);
 
   /* Filtros aplicados — chips */
-  --surface-applied-chip:         var(--cv-surface-block);
-  --border-applied-chip:          rgba(255, 255, 255, 0.16);
-  --color-applied-chip:           var(--theme-text-muted);
 
   /* Stepper — estados adicionais */
-  --stepper-missing-bg:           rgba(180, 35, 24, 0.16);
-  --stepper-missing-border:       rgba(180, 35, 24, 0.40);
-  --stepper-missing-color:        var(--color-danger);
-  --stepper-missing-connector:    rgba(180, 35, 24, 0.25);
-  --stepper-disabled-opacity:     0.38;
-  --stepper-eyebrow-color:        var(--stepper-label-idle);
-  --stepper-label-missing:        #e57d78;
-  --stepper-status-done-color:    var(--stepper-done-color);
-  --stepper-status-current-color: var(--color-accent);
-  --stepper-status-missing-color: #e57d78;
 }
 
 
@@ -274,106 +132,31 @@ html[data-theme="dark"] {
    ========================================================= */
 
 html[data-theme="light"] {
-  --surface-page-shell:     transparent;
-  --surface-page-header:    transparent;
 
-  --surface-stepper:        var(--cv-surface-card);
-  --border-stepper:         #d4dde9;
-  --shadow-stepper:         var(--shadow-xs);
 
-  --surface-form-panel:     var(--cv-surface-card);
-  --border-form-panel:      #d4dde9;
-  --shadow-form-panel:      var(--theme-shadow-hero);
 
-  --surface-form-section:   var(--cv-surface-card);
-  --border-form-section:    #dde6ef;
-  --shadow-form-section:    none;
 
-  --surface-field-group:    var(--cv-surface-block);
-  --border-field-group:     #d0dce8;
 
-  --cv-form-section-bg:        var(--cv-surface-card);
-  --cv-form-section-header-bg: var(--cv-surface-block);
-  --cv-form-section-border:    var(--border-form-section);
-  --cv-form-section-shadow:    var(--shadow-strong);
 
-  --surface-list-panel:     var(--cv-surface-card);
-  --border-list-panel:      #d4dde9;
-  --shadow-list-panel:      var(--theme-shadow-hero);
 
-  --surface-filter-bar:     var(--cv-surface-block);
-  --border-filter-bar:      #dde6ef;
 
-  --surface-list-row:       var(--cv-surface-card); /* mesmo fundo das seções de formulário */
-  --border-list-row:        #e5edf5;
-  --surface-list-row-hover: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+/* mesmo fundo das seções de formulário */
 
-  --surface-footer-actions: var(--cv-surface-block);
-  --border-footer-actions:  #d4dde9;
 
-  --surface-pagination:     transparent;
-  --border-pagination:      #d4dde9;
 
   /* Stepper — estados */
-  --stepper-idle-bg:       var(--color-bg-strong);
-  --stepper-idle-border:   var(--color-border);
-  --stepper-idle-color:    var(--color-muted);
-  --stepper-active-bg:     var(--color-primary);
-  --stepper-active-border: transparent;
-  --stepper-active-color:  var(--color-white);
-  --stepper-done-bg:       var(--color-primary-soft);
-  --stepper-done-border:   rgba(11, 58, 102, 0.35);
-  --stepper-done-color:    var(--color-primary);
-  --stepper-connector:     var(--color-border);
-  --stepper-connector-on:  var(--color-primary-bright);
-  --stepper-label-idle:    var(--theme-text-muted);
-  --stepper-label-active:  var(--theme-text-heading);
-  --stepper-label-done:    var(--theme-text-muted);
 
   /* Badges do header */
-  --surface-header-count: var(--color-primary-soft);
-  --text-header-count:    var(--color-primary);
 
   /* Quick Create Inline */
-  --surface-quick-create:        var(--cv-surface-block);
-  --surface-quick-create-header: var(--cv-surface-card);
-  --border-quick-create:         #d4dde9;
-  --shadow-quick-create:         none;
 
   /* Quick Add Folder Tab */
-  --surface-inline-create-tab:        var(--cv-surface-card);
-  --border-inline-create-tab:         #a8c5de;
-  --color-inline-create-tab:          var(--color-primary-strong);
-  --color-inline-create-tab-icon-bg:  var(--color-primary);
-  --color-inline-create-tab-icon-fg:  var(--color-white);
 
   /* Header Filter Bar */
-  --surface-filter-input:         var(--cv-surface-block);
-  --border-filter-input:          var(--color-border);
-  --surface-filter-chip:          var(--surface-filter-input);
-  --border-filter-chip:           var(--border-filter-input);
-  --color-filter-placeholder:     var(--theme-text-muted);
-  --color-filter-text:            var(--theme-text-body);
-  --surface-filter-button:        var(--cv-surface-block);
-  --border-filter-button:         var(--color-border);
-  --color-filter-button:          var(--theme-text-muted);
 
   /* Filtros aplicados — chips */
-  --surface-applied-chip:         var(--cv-surface-block);
-  --border-applied-chip:          rgba(11, 58, 102, 0.18);
-  --color-applied-chip:           var(--color-primary-strong);
 
   /* Stepper — estados adicionais */
-  --stepper-missing-bg:           var(--color-danger-soft);
-  --stepper-missing-border:       var(--color-danger-border-soft);
-  --stepper-missing-color:        var(--color-danger);
-  --stepper-missing-connector:    rgba(180, 35, 24, 0.14);
-  --stepper-disabled-opacity:     0.42;
-  --stepper-eyebrow-color:        var(--stepper-label-idle);
-  --stepper-label-missing:        var(--color-danger);
-  --stepper-status-done-color:    var(--color-primary);
-  --stepper-status-current-color: var(--color-accent);
-  --stepper-status-missing-color: var(--color-danger);
 }
 
 
@@ -1102,8 +885,6 @@ html[data-theme="light"] {
   overflow:      hidden;
   width:         100%;
 
-  --cv-surface:      var(--cv-surface-card);
-  --cv-surface-next: var(--cv-surface-block);
 }
 
 /* =========================================================

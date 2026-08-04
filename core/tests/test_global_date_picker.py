@@ -110,7 +110,10 @@ class GlobalDatePickerTests(SimpleTestCase):
             / "cv-date-picker.css"
         )
         css = css_path.read_text(encoding="utf-8")
-        self.assertIn("--cv-date-picker-day-gap: 2px;", css)
+        tokens = (
+            Path(settings.BASE_DIR) / "static" / "css" / "01-tokens.css"
+        ).read_text(encoding="utf-8")
+        self.assertIn("--cv-date-picker-day-gap: 2px;", tokens)
         self.assertNotIn("scale(1.03)", css)
         self.assertIn("column-gap: var(--cv-date-picker-day-gap);", css)
         self.assertIn("row-gap: var(--cv-date-picker-day-gap);", css)

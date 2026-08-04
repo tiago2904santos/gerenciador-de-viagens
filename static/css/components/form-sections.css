@@ -31,15 +31,11 @@
   grid-template-columns: minmax(0, 1fr);
   min-width: 0;
 
-  --cv-surface:      var(--cv-surface-block);
-  --cv-surface-next: var(--cv-surface-card);
 }
 
 .cv-form-block .cv-form-block {
   background: var(--cv-surface-card);
 
-  --cv-surface:      var(--cv-surface-card);
-  --cv-surface-next: var(--cv-surface-block);
 }
 
 .cv-form-block__header {
