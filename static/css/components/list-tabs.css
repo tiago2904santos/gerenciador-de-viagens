@@ -144,12 +144,12 @@
   color: var(--cv-list-tab-active-count-color);
 }
 
-:is(html[data-theme="dark"])
+
   .cv-list-tab {
 }
 
 /* Aba ativa: hover sobe no dourado (não vai para branco) e sem barra esquerda. */
-:is(html[data-theme="dark"])
+
   .cv-list-tab--active:is(:hover, :focus-visible) {
   background: color-mix(in srgb, var(--color-accent-soft, #3b3320) 72%, var(--color-accent, #d8a21b) 28%);
   border-color: var(--color-accent-hover, #e0ab3c);
@@ -157,24 +157,24 @@
   color: var(--color-accent-hover, #e0ab3c);
 }
 
-:is(html[data-theme="dark"])
+
   .cv-list-tab:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-focus, #74aae0) 28%, transparent);
 }
 
-:is(html[data-theme="dark"])
+
   .cv-list-tab--active:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent, #d8a21b) 32%, transparent);
 }
 
 @media (max-width: 600px) {
-  :is(html[data-theme="dark"])
+
     .cv-list-tabs {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  :is(html[data-theme="dark"])
+
     .cv-list-tab {
     justify-content: space-between;
     min-width: 0;
@@ -196,7 +196,7 @@
 }
 
 @media (max-width: 420px) {
-  :is(html[data-theme="dark"])
+
     .cv-list-tabs {
     grid-template-columns: minmax(0, 1fr);
   }

@@ -40,12 +40,12 @@ SHELL_CSS: tuple[str, ...] = (
     "css/components/summary-items.css",
     "css/components/cv-notice.css",
     "css/components/cv-metric.css",
-    "css/components/app-shell.css",
     "css/components/content-cards.css",
     "css/components/document-viewer.css",
     "css/components/dialog.css",
     "css/components/document-download-loading.css",
-    "css/components/theme-dark-components.css",
+    # Camada institucional canônica, depois dos componentes que consolida.
+    "css/components/app-shell.css",
     "css/components/list-header.css",
 )
 

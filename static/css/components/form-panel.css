@@ -55,7 +55,7 @@
   padding: 18px clamp(20px, 3vw, 30px);
 }
 
-:is(html[data-theme="dark"]) .cv-confirm-page {
+ .cv-confirm-page {
   background: var(--step1-surface);
 }
 

@@ -1,4 +1,4 @@
-/* Login standalone — usa tokens globais; respeita html[data-theme]. */
+/* Login standalone — usa os tokens globais dos temas oficiais. */
 
 .auth-page {
   background: var(--auth-bg);

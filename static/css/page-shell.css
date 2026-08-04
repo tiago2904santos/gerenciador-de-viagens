@@ -94,7 +94,7 @@
    02. Theme Tokens — Dark
    ========================================================= */
 
-html[data-theme="dark"] {
+:root {
 
 
 
@@ -131,7 +131,7 @@ html[data-theme="dark"] {
    03. Theme Tokens — Light (Silver Frost)
    ========================================================= */
 
-html[data-theme="light"] {
+:root {
 
 
 
@@ -2468,23 +2468,23 @@ body.has-delete-modal-open {
   }
 }
 
-html[data-theme="dark"] .cv-inline-create__toggle {
+ .cv-inline-create__toggle {
   background: var(--color-card-muted); /* #213246 */
   color:      var(--theme-text-body);
 }
 
-html[data-theme="dark"] .cv-inline-create__toggle:hover {
+ .cv-inline-create__toggle:hover {
   background: color-mix(in srgb, var(--color-card-muted) 80%, var(--color-white) 20%);
 }
 
-html[data-theme="dark"] .cv-inline-create__toggle.is-active,
-html[data-theme="dark"] .cv-inline-create__toggle[aria-expanded="true"] {
+ .cv-inline-create__toggle.is-active,
+ .cv-inline-create__toggle[aria-expanded="true"] {
   background:   var(--color-card-muted); /* #213246 — igual ao estado fechado */
   border-color: var(--border-filter-bar);
   color:        var(--theme-text-body);
 }
 
-html[data-theme="dark"] .cv-inline-create__toggle.is-filled {
+ .cv-inline-create__toggle.is-filled {
   animation-name:     inline-create-btn-fill-dark;
   animation-duration: 0.4s;
   animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
@@ -2502,7 +2502,7 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled {
   }
 }
 
-html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
+ .cv-inline-create__toggle.is-filled:hover {
   background:   var(--cv-btn-primary-hover-bg);
   border-color: var(--cv-btn-primary-hover-border);
 }
