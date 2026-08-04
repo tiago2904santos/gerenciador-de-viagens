@@ -24,7 +24,7 @@
 
 /* Primary dourado no header do bloco (mesmo accent do footer de formulário). */
 .perfil-form-page .cv-form-block__actions .cv-btn--primary,
-:is(html[data-theme="dark"]) .perfil-form-page .cv-form-block__actions .cv-btn--primary {
+ .perfil-form-page .cv-form-block__actions .cv-btn--primary {
   background: var(--color-accent);
   background-image: none;
   border: 0;
@@ -36,7 +36,7 @@
 }
 
 .perfil-form-page .cv-form-block__actions .cv-btn--primary:hover,
-:is(html[data-theme="dark"]) .perfil-form-page .cv-form-block__actions .cv-btn--primary:hover {
+ .perfil-form-page .cv-form-block__actions .cv-btn--primary:hover {
   background: var(--color-accent-hover, var(--color-accent));
   background-image: none;
   box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
@@ -59,7 +59,7 @@
 }
 
 .perfil-form-page .cv-form-block .cv-card-footer,
-:is(html[data-theme="dark"]) .perfil-form-page .cv-form-block .cv-card-footer {
+ .perfil-form-page .cv-form-block .cv-card-footer {
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -69,7 +69,7 @@
 }
 
 .perfil-form-page .cv-record-list.simple-list,
-:is(html[data-theme="dark"]) .perfil-form-page .cv-record-list.simple-list {
+ .perfil-form-page .cv-record-list.simple-list {
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -78,14 +78,14 @@
 }
 
 .perfil-form-page .empty-state,
-:is(html[data-theme="dark"]) .perfil-form-page .empty-state {
+ .perfil-form-page .empty-state {
   background: var(--step1-field, var(--color-input-bg));
   border: 0;
   box-shadow: none;
 }
 
 .perfil-form-page .gdrive-block.travel-document-block,
-:is(html[data-theme="dark"]) .perfil-form-page .gdrive-block.travel-document-block {
+ .perfil-form-page .gdrive-block.travel-document-block {
   border: 0;
   box-shadow: none;
 }

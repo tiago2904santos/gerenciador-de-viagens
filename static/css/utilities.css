@@ -239,7 +239,7 @@
 }
 
 /* Dark — espelha o padrão do state button (16% → 26% bg, text misturado com white) */
-html[data-theme="dark"] {
+:root {
 
   /* info/pending/entity — success/warning/danger/neutral já herdam via --state-* */
 
@@ -247,7 +247,7 @@ html[data-theme="dark"] {
 }
 
 /* Light explícito — bg espelha 6% do state button + glow 30% mais suave */
-html[data-theme="light"] {
+:root {
 
   /* Glow reduzido: outer blur 18→10px, percentagens -30% */
 }

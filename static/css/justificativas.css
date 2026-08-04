@@ -3,26 +3,26 @@
   gap: var(--space-5);
 }
 
-:is(html[data-theme="dark"]) .justificativas-page {
+ .justificativas-page {
 }
 
 /* Lista (rail, botão e linhas) na superfície step1; band = cabeçalho dos ofícios. */
 .justificativas-page .list-header,
 .justificativas-page .list-header__rail,
 .justificativas-page .list-header .cv-inline-create__toggle,
-:is(html[data-theme="dark"]) .justificativas-page .list-header,
-:is(html[data-theme="dark"]) .justificativas-page .list-header__rail,
-:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle {
+ .justificativas-page .list-header,
+ .justificativas-page .list-header__rail,
+ .justificativas-page .list-header .cv-inline-create__toggle {
   background: var(--step1-surface);
 }
 
 .justificativas-page .list-header__band,
-:is(html[data-theme="dark"]) .justificativas-page .list-header__band {
+ .justificativas-page .list-header__band {
   background: var(--color-surface-muted);
 }
 
 .justificativas-page .cv-record-row,
-:is(html[data-theme="dark"]) .justificativas-page .cv-record-row {
+ .justificativas-page .cv-record-row {
   background: var(--step1-field, var(--step1-surface));
   border: 0;
   box-shadow: none;
@@ -30,8 +30,8 @@
 
 .justificativas-page .cv-record-row:hover,
 .justificativas-page .cv-record-row:focus-within,
-:is(html[data-theme="dark"]) .justificativas-page .cv-record-row:hover,
-:is(html[data-theme="dark"]) .justificativas-page .cv-record-row:focus-within {
+ .justificativas-page .cv-record-row:hover,
+ .justificativas-page .cv-record-row:focus-within {
   background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field, var(--step1-surface)));
   border: 0;
   box-shadow: none;
@@ -44,7 +44,7 @@
 }
 
 .justificativas-page .list-header .cv-inline-create__panel.is-open,
-:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__panel.is-open {
+ .justificativas-page .list-header .cv-inline-create__panel.is-open {
   border-top: 0;
   padding-top: 0;
 }
@@ -70,11 +70,11 @@
   padding: 0;
 }
 
-:is(html[data-theme="dark"]) [data-justificativa-quick-add] .justificativa-quick-add__scope {
+ [data-justificativa-quick-add] .justificativa-quick-add__scope {
 }
 
 /* Lista do Ofício vinculado: mesma do termo, só um pouco mais baixa. */
-:is(html[data-theme="dark"])
+
   [data-justificativa-quick-add]
   :is(
     .termo-oficio-summary-panel .cv-search-picker__selected-list,
@@ -85,7 +85,7 @@
 }
 
 /* Picker: sem gap extra no bloco; cards da lista mantêm 8px. */
-:is(html[data-theme="dark"])
+
   [data-justificativa-quick-add]
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker,
@@ -95,7 +95,7 @@
   gap: 0 !important;
 }
 
-:is(html[data-theme="dark"])
+
   [data-justificativa-quick-add]
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker
@@ -107,7 +107,7 @@
   gap: 7px !important;
 }
 
-:is(html[data-theme="dark"])
+
   [data-justificativa-quick-add]
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker
@@ -282,10 +282,10 @@
 .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready,
 .justificativas-page .list-header .cv-inline-create__toggle.is-filled[aria-expanded="true"],
 .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready[aria-expanded="true"],
-:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.is-filled,
-:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready,
-:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.is-filled[aria-expanded="true"],
-:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready[aria-expanded="true"] {
+ .justificativas-page .list-header .cv-inline-create__toggle.is-filled,
+ .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready,
+ .justificativas-page .list-header .cv-inline-create__toggle.is-filled[aria-expanded="true"],
+ .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready[aria-expanded="true"] {
   animation: none;
   background: var(--color-accent);
   background-image: none;
@@ -299,10 +299,10 @@
 .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:hover,
 .justificativas-page .list-header .cv-inline-create__toggle.is-filled:focus-visible,
 .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:focus-visible,
-:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.is-filled:hover,
-:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:hover,
-:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.is-filled:focus-visible,
-:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:focus-visible {
+ .justificativas-page .list-header .cv-inline-create__toggle.is-filled:hover,
+ .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:hover,
+ .justificativas-page .list-header .cv-inline-create__toggle.is-filled:focus-visible,
+ .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:focus-visible {
   background: var(--color-accent-hover, var(--color-accent));
   background-image: none;
   border: 0;
@@ -312,8 +312,8 @@
 
 .justificativas-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
 .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready .cv-inline-create__toggle-icon,
-:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
-:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready .cv-inline-create__toggle-icon {
+ .justificativas-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
+ .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready .cv-inline-create__toggle-icon {
   background: color-mix(in srgb, var(--color-on-accent, #19232d) 14%, transparent);
   color: inherit;
 }

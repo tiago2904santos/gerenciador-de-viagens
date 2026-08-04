@@ -761,10 +761,12 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
   de card, com titulo em tinta normal e eyebrow no acento — exatamente onde o acento
   aparece no login. Mais 7 superficies do rail de filtros e do quick-create entraram na
   paleta. Avisos de frontend 387 -> **384**.
-- [ ] **PR B** — dissolver `components/theme-dark-components.css` (5.843 linhas, 665
-  regras com `:is(...)`/`[data-*]`). **E o que impede o tema escuro de obedecer a paleta:**
-  medido com `scripts/medir_paleta.py`, o claro ficou com o nucleo na paleta e o escuro
-  com 18 cores fora so no Dashboard.
+- [x] **PR B** — `components/theme-dark-components.css` dissolvido na camada institucional
+  existente (`components/app-shell.css`); os seletores de componente passaram a consumir
+  o mesmo contrato nos dois temas. As 1.098 ocorrencias atuais de `data-theme` em 31
+  arquivos cairam para **0** fora de `00-palette.css`, `01-tokens.css` e do bundle gerado.
+  Na medicao das cinco rotas, as cores fora da paleta cairam de `6/7/4/5/0` para
+  `6/6/4/5/0` no claro e de `16/14/9/8/0` para `9/10/7/5/0` no escuro.
 - [ ] **PR C** — as 318 regras de `hover`/`focus` que ainda mexem em borda.
 - [ ] **PR D** — os ~620 literais restantes fora dos arquivos de token.
 
@@ -784,8 +786,10 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
   camada canonica tem 27 tokens e os nomes antigos permanecem apenas como
   compatibilidade temporaria ate a fase 3. Declaracoes `--*` fora de
   `00-palette.css` e `01-tokens.css`: **0**. Auditor frontend: **384 -> 335**.
-- [ ] **Fase 2 — regra do espelho:** eliminar `data-theme` dos componentes e
-  dissolver `components/theme-dark-components.css`.
+- [x] **Fase 2 — regra do espelho:** `data-theme` eliminado dos componentes e
+  `components/theme-dark-components.css` dissolvido em `components/app-shell.css`, sem
+  criar ou renomear classes. Gate estrutural: **1.098 -> 0**; auditor frontend mantido em
+  **335** avisos; auditor visual estatico: **5.192 -> 4.988** ocorrencias suspeitas.
 - [ ] **Fase 3 — geometria padronizada e fim dos aliases.**
 - [ ] **Fase 4 — fim das excecoes e do `!important`.**
 - [ ] **Fase 5 — apagar o CSS antigo.**

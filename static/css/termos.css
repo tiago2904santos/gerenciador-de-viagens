@@ -20,7 +20,7 @@
 
 /* Mesmo ritmo do picker de Documentos vinculados (Eventos):
    busca e lista próximas (8px), sem gap do grid (select oculto no meio). */
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker.cv-search-picker--people.cv-search-picker--roster,
 .document-form-page .related-route-picker.termo-oficio-picker.cv-search-picker--people.cv-search-picker--roster,
@@ -29,7 +29,7 @@
 }
 
 .termo-oficio-picker .cv-search-picker__field,
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker
   .cv-search-picker__field {
@@ -50,7 +50,7 @@
 .termo-oficio-picker .roteiro-editor__route-list,
 .termo-oficio-summary-panel .cv-search-picker__selected-list,
 .termo-oficio-summary-panel .related-route-list,
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker
   :is(.cv-search-picker__selected-list, #termo-oficio-lista, #os-oficio-lista) {

@@ -19,7 +19,6 @@ CSS_DIR = ROOT / "static" / "css"
 COLOR_LITERAL_ALLOWED = {
     "static/css/00-palette.css",
     "static/css/01-tokens.css",
-    "static/css/components/theme-dark-components.css",  # transitório — dissolver nas fases seguintes
     "static/css/shell.bundle.css",  # gerado (NOVO-12); literais vêm das fontes acima
 }
 

@@ -3063,13 +3063,13 @@
   color: var(--color-white);
 }
 
-html[data-theme="dark"] #evento-card-documentos-d .related-route-item.is-active {
+ #evento-card-documentos-d .related-route-item.is-active {
   background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-muted));
   border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border-soft));
   box-shadow: inset 4px 0 0 var(--color-accent);
 }
 
-html[data-theme="dark"] #evento-card-documentos-d .related-route-item.is-active .cv-search-picker__selected-avatar {
+ #evento-card-documentos-d .related-route-item.is-active .cv-search-picker__selected-avatar {
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: var(--color-on-accent);
@@ -3119,17 +3119,17 @@ html[data-theme="dark"] #evento-card-documentos-d .related-route-item.is-active 
 }
 
 /* ── Tema escuro — inativo ─────────────────────────────────────── */
-html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle {
+ [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle {
   background:   var(--selected-card-bg);
   border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border-soft));
   color:        color-mix(in srgb, var(--color-accent) 75%, var(--color-text));
 }
 
 /* ── Tema escuro — hover / focus / ativo ───────────────────────── */
-html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle:hover,
-html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle:focus-visible,
-html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle--active,
-html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle[aria-pressed="true"] {
+ [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle:hover,
+ [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle:focus-visible,
+ [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle--active,
+ [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle[aria-pressed="true"] {
   background:   color-mix(in srgb, var(--color-accent) 22%, var(--selected-card-bg));
   border-color: var(--color-accent);
   box-shadow:   0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent),
@@ -3142,7 +3142,7 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker__d
  * Os tokens --driver-* são declarados em .cv-search-picker (não em :root),
  * então o override precisa ser no mesmo nível ou mais específico.
  */
-html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
+ [data-travel-document-wizard-step1] .cv-search-picker {
 }
 
 /* Equipe (step1): cards selecionados em até 2 colunas quando houver espaço.
@@ -3492,12 +3492,12 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
   color: var(--color-on-accent);
 }
 
-html[data-theme="light"] .cv-person-row--highlight {
+ .cv-person-row--highlight {
   background: color-mix(in srgb, var(--color-accent) 8%, var(--color-card-muted));
   border-color: var(--color-accent-border-soft, var(--color-border-soft));
 }
 
-html[data-theme="light"] .cv-person-row--highlight .cv-person-row__name {
+ .cv-person-row--highlight .cv-person-row__name {
   color: var(--color-heading);
 }
 
@@ -4285,7 +4285,7 @@ html[data-theme="light"] .cv-person-row--highlight .cv-person-row__name {
   z-index: 100;
 }
 
-html[data-theme="dark"] .cv-fab-container > .cv-btn--primary {
+ .cv-fab-container > .cv-btn--primary {
   background: var(--color-accent);
   background-image: none;
   border: 0;
@@ -4298,8 +4298,8 @@ html[data-theme="dark"] .cv-fab-container > .cv-btn--primary {
   text-shadow: none;
 }
 
-html[data-theme="dark"] .cv-fab-container > .cv-btn--primary:hover,
-html[data-theme="dark"] .cv-fab-container > .cv-btn--primary:focus-visible {
+ .cv-fab-container > .cv-btn--primary:hover,
+ .cv-fab-container > .cv-btn--primary:focus-visible {
   background: var(--color-accent-hover);
   background-image: none;
   border: 0;
@@ -4307,7 +4307,7 @@ html[data-theme="dark"] .cv-fab-container > .cv-btn--primary:focus-visible {
   color: var(--color-on-accent, #19232d);
 }
 
-html[data-theme="dark"] .cv-fab-container > .cv-btn--primary .cv-btn__icon {
+ .cv-fab-container > .cv-btn--primary .cv-btn__icon {
   color: inherit;
 }
 

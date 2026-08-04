@@ -99,13 +99,13 @@
   margin-top: var(--space-4);
 }
 
-html[data-theme="dark"] .empty-state {
+.empty-state {
   background: color-mix(in srgb, var(--color-surface) 38%, #0b1422);
   border-color: color-mix(in srgb, var(--color-border-soft) 55%, transparent);
 }
 
-html[data-theme="dark"] .empty-state__message,
-html[data-theme="dark"] .empty-state p {
+.empty-state__message,
+.empty-state p {
   color: color-mix(in srgb, var(--theme-text-body) 82%, white);
 }
 

@@ -25,7 +25,7 @@
   padding: 10px 12px;
 }
 
-html[data-theme="dark"] .pt-activity__toolbar--panel {
+ .pt-activity__toolbar--panel {
   background: var(--step1-field);
 }
 
@@ -55,17 +55,17 @@ html[data-theme="dark"] .pt-activity__toolbar--panel {
   O seletor global do wizard usa :is(input:not(...), .cv-custom-select__trigger)
   e herda especificidade (0,5,2) dos :not — precisa empatar/vencer isso.
 */
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .pt-activity__toolbar--panel
   .pt-activity__preset-select
   button.cv-custom-select__trigger.cv-custom-select__trigger--v2,
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .pt-activity__toolbar--panel
   .pt-activity__preset-select.cv-custom-select--open
   button.cv-custom-select__trigger.cv-custom-select__trigger--v2,
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .pt-activity__toolbar--panel
   .pt-activity__search
@@ -113,7 +113,7 @@ html[data-theme="dark"] .pt-activity__toolbar--panel {
   transform: none;
 }
 
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .pt-activity__toolbar--panel
   :is(.pt-activity__preset .cv-btn, .pt-activity__preset .cv-btn--secondary, .pt-activity__clear) {
@@ -129,7 +129,7 @@ html[data-theme="dark"] .pt-activity__toolbar--panel {
   transform: none;
 }
 
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .pt-activity__toolbar--panel
   :is(
@@ -206,7 +206,7 @@ html[data-theme="dark"] .pt-activity__toolbar--panel {
   transition: background .15s ease, box-shadow .15s ease;
 }
 
-html[data-theme="dark"] .pt-activity-card {
+ .pt-activity-card {
   background: var(--step1-field);
 }
 
@@ -290,7 +290,7 @@ html[data-theme="dark"] .pt-activity-card {
 
 /* Subtítulo do form_block Atividades — mesmo 2xs do Efetivo. */
 [data-pt-atividades] .travel-document-block .cv-form-block__description,
-:is(html[data-theme="dark"])
+
   [data-pt-atividades]
   .travel-document-block
   .cv-form-block__description {
@@ -319,7 +319,7 @@ html[data-theme="dark"] .pt-activity-card {
   background: var(--step1-field, var(--color-surface-muted));
 }
 
-html[data-theme="dark"] .pt-live-col {
+ .pt-live-col {
   background: var(--step1-field);
 }
 
