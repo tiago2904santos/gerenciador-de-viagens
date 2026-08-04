@@ -20,7 +20,7 @@ Cole estes números no prompt: sem alvo numérico o Codex escolhe o próprio esc
 | `padding` distintos | 247 | 214 → **8** (3b) | 8 |
 | `margin` distintos | 53 | 50 → **3** (3b) | 8 |
 | `border` distintos | 321 | 58 → **3** (3b) | 3 |
-| `box-shadow` distintos | 184 (medido: 202) | 136 | 4 |
+| `box-shadow` distintos | 184 (medido: 202) | 136 → **2** (3c) | 4 → **2** (decisao de produto) |
 | exceções de arquivo no auditor | 8 (medido: 3) | 2 | 0 |
 | avisos do `audit_frontend_standards` | 384 | 212 | 0 |
 
@@ -141,8 +141,10 @@ Ao fim desta fase, `components/theme-dark-components.css` **não existe mais**.
 > 2.078 declarações**, 88 blocos de regra de componente e linhas de 11.959 caracteres. O
 > gate da fase 1 media token **fora** da camada e nunca dentro. Medido de novo, a fase 3
 > tinha 8.287 referências `var()` e 3.622 declarações de geometria — não cabia num PR, e
-> saiu em três: **3a** (camada de token, feita), **3b** (raio/espaço/borda, feita), **3c**
-> (sombra e foco).
+> saiu em três: **3a** (camada de token), **3b** (raio/espaço/borda) e **3c** (sombra e
+> foco) — as três feitas. Na 3c o alvo mudou por decisão de produto: **uma** sombra
+> mínima em vez de quatro, e **nenhum** indicador de foco em vez de migrar o anel para
+> `outline` (regressão de WCAG 2.4.7 registrada no plano).
 >
 > Duas correções ao método, que valem para as fases seguintes:
 >

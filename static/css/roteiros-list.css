@@ -1,7 +1,7 @@
 /* Lista de roteiros/ofícios: cards compactos, status por borda lateral. */
 
 .app-page-hero--roteiros-list {
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
 }
 
 .app-page-hero--roteiros-list .app-page-hero__stage {
@@ -55,7 +55,7 @@ padding-inline: var(--sp-5);
   border-left: var(--bd-strong);
   border-left-color: var(--cv-ink-muted);
   border-left-width: 8px;
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   box-sizing: border-box;
   display: grid;
   gap: var(--sp-2);
@@ -68,7 +68,7 @@ padding-inline: var(--sp-5);
 
 .roteiro-list-card:hover {
   border-color: var(--cv-border);
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
 }
 
 .roteiro-list-card--faixa-rascunho-atrasado {

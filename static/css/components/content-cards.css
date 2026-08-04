@@ -4,7 +4,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-xl);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   display: grid;
   gap: var(--sp-2);
   min-width: 0;
@@ -16,7 +16,7 @@
 }
 
 .cv-summary-tile:hover {
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
 }
 
 .cv-summary-tile__label,
@@ -67,7 +67,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   display: grid;
   gap: 0;
   padding: 0;
@@ -90,7 +90,7 @@
 }
 
 .cv-document-card:hover {
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
 }
 
 .cv-document-card__header,

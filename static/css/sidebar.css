@@ -223,7 +223,8 @@ border-color: transparent;
   background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: inset 4px 0 0 var(--color-accent);
+  border-inline-start: var(--bd-strong);
+  border-inline-start-color: var(--color-accent);
   color: var(--cv-ink);
   font-weight: 600;
 }
@@ -344,7 +345,7 @@ border-color: transparent;
    -------------------------------------------------------------------------- */
 @media (max-width: 840px) {
   .sidebar {
-    box-shadow: var(--sh-md);
+    box-shadow: var(--sh-sm);
     min-height: unset;
     position: relative;
   }
@@ -459,8 +460,7 @@ border-color: transparent;
 }
 
 .app-theme-grid__btn:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
+  outline: none;
 }
 
 .app-theme-grid__btn small {

@@ -342,12 +342,10 @@
 }
 
 .cv-segment-toggle__btn:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 1px;
+  outline: none;
 }
 
  .cv-segment-toggle__btn:focus-visible {
-  outline-color: var(--color-accent);
 }
 
 .cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {
@@ -363,10 +361,7 @@
 .cv-segment-toggle__btn[aria-pressed="true"] {
   background: linear-gradient(135deg, var(--color-accent), color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink)));
   border-color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.30),
-    0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  box-shadow: var(--sh-sm);
   color: #071a33;
   transform: scale(1.01);
 }
@@ -441,10 +436,7 @@
  .cv-segment-toggle__btn[aria-pressed="true"] {
   background: var(--color-accent);
   border-color: color-mix(in srgb, var(--color-accent) 70%, #000);
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.18),
-    0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.20);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
   transform: scale(1.01);
 }

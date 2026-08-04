@@ -22,7 +22,7 @@
   border-radius: var(--r-lg);
   background: var(--cv-surface-card);
   color: var(--cv-ink);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   text-align: left;
 }
 

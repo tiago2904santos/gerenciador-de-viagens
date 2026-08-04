@@ -110,7 +110,6 @@ html {
 .cv-date-picker--open .cv-date-picker__trigger--icon {
   background: var(--cv-surface-block);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: var(--sh-sm);
   color: var(--color-accent);
   opacity: 1;
   pointer-events: auto;
@@ -129,7 +128,6 @@ html {
 }
 
 .cv-date-picker__trigger--icon:focus-visible {
-  box-shadow: 0 0 0 3px var(--focus-ring);
   opacity: 1;
   pointer-events: auto;
 }
@@ -171,7 +169,7 @@ html {
   background: var(--cv-surface-block);
   border: var(--bd);
   border-radius: var(--r-xl);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   box-sizing: border-box;
   display: grid;
   gap: var(--sp-3);
@@ -348,7 +346,7 @@ html {
   border: var(--bd);
   border-color: var(--color-accent);
   border-radius: var(--r-pill);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--sh-sm);
   color: var(--color-accent);
   display: inline-flex;
   font-size: 9px;
@@ -400,7 +398,7 @@ html {
   background: var(--color-accent);
   border-radius: var(--r-pill);
   bottom: 4px;
-  box-shadow: 0 0 0 1px var(--cv-surface-block);
+  box-shadow: var(--sh-sm);
   content: "";
   height: 5px;
   left: 50%;
@@ -415,7 +413,7 @@ html {
 .cv-date-picker__day--today.cv-date-picker__day--range::after,
 .cv-date-picker__day--today.cv-date-picker__day--multi-selected::after {
   background: var(--on-accent);
-  box-shadow: 0 0 0 1px var(--sh-sm);
+  box-shadow: var(--sh-sm);
 }
 
 .cv-date-picker__day--selected,
@@ -583,7 +581,6 @@ html {
 }
 
 .cv-date-picker__day:focus-visible {
-  box-shadow: 0 0 0 3px var(--focus-ring);
   outline: none;
   z-index: 1;
 }

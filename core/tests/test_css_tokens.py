@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+import collections
 import re
 from pathlib import Path
 
@@ -463,3 +464,64 @@ class EscadaDeGeometriaTests(SimpleTestCase):
             fora, [],
             f"comprimento fora da escada fechada: {sorted(set(fora))[:12]}",
         )
+
+
+# ===========================================================================
+# NOVO-30 fase 3c — uma sombra so, e nenhum foco
+#
+# DECISAO DE PRODUTO (04/08/2026), com a consequencia escrita:
+#   1. Elevacao tem UM degrau, minimo. O que se destaca do fundo se destaca
+#      pela superficie da paleta e pela borda.
+#   2. O sistema NAO sinaliza foco — nem anel, nem halo, nem contorno.
+#      Isto e falha de WCAG 2.4.7 (Focus Visible): quem navega por teclado
+#      perde a unica pista de onde esta. Esta travado por teste para nao
+#      voltar por acidente, nao porque seja boa pratica.
+# ===========================================================================
+
+SOMBRAS_PERMITIDAS = frozenset({"var(--sh-sm)", "none"})
+_REGRA_DE_FOCO = re.compile(r":focus(?:-visible|-within)?\b")
+
+
+class SombraEFocoTests(SimpleTestCase):
+    def test_existe_uma_sombra_so(self):
+        vistas = collections.Counter()
+        for arquivo in _css_fontes():
+            for prop, valor in _declaracoes_css(arquivo.read_text(encoding="utf-8")):
+                if prop in ("box-shadow", "-webkit-box-shadow"):
+                    vistas[valor] += 1
+        self.assertEqual(
+            set(vistas) - SOMBRAS_PERMITIDAS, set(),
+            f"sombra fora do degrau unico: {sorted(set(vistas) - SOMBRAS_PERMITIDAS)[:8]}",
+        )
+
+    def test_a_camada_declara_um_degrau_de_elevacao(self):
+        tokens = (CSS_DIR / "01-tokens.css").read_text(encoding="utf-8")
+        self.assertIn("--sh-sm:", tokens)
+        for morto in ("--sh-md:", "--sh-lg:", "--focus-ring:"):
+            with self.subTest(token=morto):
+                self.assertNotIn(morto, tokens)
+
+    def test_nenhuma_regra_sinaliza_foco(self):
+        """O contorno padrao do navegador tambem conta — dai o reset global."""
+        acusados = []
+        for arquivo in _css_fontes():
+            texto = _COMENTARIO.sub("", arquivo.read_text(encoding="utf-8"))
+            for seletor, corpo in re.findall(r"([^{}]+)\{([^{}]*)\}", texto):
+                if not _REGRA_DE_FOCO.search(seletor):
+                    continue
+                for pedaco in corpo.split(";"):
+                    if ":" not in pedaco:
+                        continue
+                    prop, _, valor = pedaco.partition(":")
+                    prop, valor = prop.strip(), " ".join(valor.split())
+                    if prop in ("box-shadow", "-webkit-box-shadow") and valor not in ("none", ""):
+                        acusados.append(f"{_rel_css(arquivo)}: {seletor.strip()[:40]} — {prop}")
+                    if prop.startswith("outline") and valor.replace("!important", "").strip() not in ("none", "0", ""):
+                        acusados.append(f"{_rel_css(arquivo)}: {seletor.strip()[:40]} — {prop}: {valor}")
+        self.assertEqual(acusados, [], f"indicador de foco de volta: {acusados[:8]}")
+
+    def test_o_reset_global_de_foco_existe(self):
+        base = (CSS_DIR / "base.css").read_text(encoding="utf-8")
+        bloco = base.split(":focus,", 1)
+        self.assertEqual(len(bloco), 2, "base.css sem o reset global de foco")
+        self.assertIn("outline: none", bloco[1].split("}", 1)[0])

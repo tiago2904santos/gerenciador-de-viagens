@@ -14,7 +14,7 @@
   border-left-color: var(--color-accent);
   border-left-width: 5px;
   border-radius: var(--r-xl);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   display: grid;
   gap: var(--sp-4);
   padding: var(--sp-5);
@@ -23,7 +23,7 @@
 
 .oficio-card:hover {
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
   transform: translateY(-2px);
 }
 
@@ -172,9 +172,7 @@
 .travel-document-wizard .cv-field__control:-webkit-autofill,
 .travel-document-wizard .cv-field__control:-webkit-autofill:hover,
 .travel-document-wizard .cv-field__control:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px var(--cv-surface-next) inset, 0 0 0 3px var(--focus-ring);
   -webkit-text-fill-color: var(--cv-ink);
-  border-color: var(--focus-ring);
   caret-color: var(--cv-ink);
   color: var(--cv-ink);
 }
@@ -342,7 +340,7 @@
 .app-multiselect__chip-remove:focus {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   color: var(--cv-state-danger);
-  outline: 0;
+  outline: none;
 }
 
 .app-multiselect__search {
@@ -353,7 +351,7 @@
   font: inherit;
   min-height: 30px;
   min-width: 160px;
-  outline: 0;
+  outline: none;
   padding: 0;
 }
 
@@ -376,7 +374,7 @@
   background: var(--cv-surface-block);
   border: var(--bd);
   border-radius: var(--r-lg);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   display: none;
   left: 0;
   margin-top: var(--sp-2);
@@ -527,7 +525,7 @@
   color: var(--cv-ink);
   font: inherit;
   min-height: var(--h-lg);
-  outline: 0;
+  outline: none;
   padding-block: 0;
   padding-inline: var(--sp-4);
   transition: border-color 0.16s ease, box-shadow 0.16s ease;
@@ -547,7 +545,7 @@
   background: var(--cv-surface-block);
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   left: 0;
   margin-top: 0;
   max-height: 320px;
@@ -703,7 +701,7 @@
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
   color: var(--cv-state-danger);
-  outline: 0;
+  outline: none;
 }
 
 .oficio-equipe-picker__selected-empty {
@@ -719,7 +717,7 @@
 
 .oficio-viajante-card--termo {
   border-color: rgba(22, 128, 90, 0.28);
-  box-shadow: 0 0 0 1px rgba(22, 128, 90, 0.28), var(--sh-sm);
+  box-shadow: var(--sh-sm);
 }
 
 .oficio-viajante-card__termo {
@@ -772,7 +770,7 @@
 .oficio-viajante-card__termo-option:hover,
 .oficio-viajante-card__termo-option:focus {
   color: var(--cv-ink);
-  outline: 0;
+  outline: none;
 }
 
 .oficio-viajante-card__termo-option--no.oficio-viajante-card__termo-option--active {
@@ -824,7 +822,7 @@
   background: var(--cv-surface-block);
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
   overflow: hidden;
 }
 
@@ -942,7 +940,7 @@
 .oficio-stepper__item--current .oficio-stepper__link {
   background: var(--color-accent);
   border-color: var(--color-accent);
-  box-shadow: 0 2px 12px rgba(21, 91, 154, 0.5);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
 }
 
@@ -1261,7 +1259,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   left: 0;
   margin-top: var(--sp-1);
   max-height: 280px;
@@ -1514,7 +1512,7 @@
   border-left-color: var(--color-accent);
   border-left-width: 4px;
   border-radius: var(--r-xl);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   display: grid;
   gap: var(--sp-3);
   padding: var(--sp-4);
@@ -1662,7 +1660,7 @@ padding-inline: var(--sp-5);
   align-items: flex-start;
   border: var(--bd);
   border-radius: var(--r-xl);
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-4);
@@ -1753,7 +1751,7 @@ padding-inline: var(--sp-5);
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-pill);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   color: var(--cv-ink);
   flex-shrink: 0;
   font-size: var(--fs-sm);
@@ -1813,7 +1811,8 @@ padding-inline: var(--sp-5);
 .oficio-documentos-traveller-tile--motorista {
   background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-block));
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: inset 4px 0 0 var(--color-accent);
+  border-inline-start: var(--bd-strong);
+  border-inline-start-color: var(--color-accent);
 }
 
 .oficio-documentos-traveller-tile__avatar {
@@ -1953,7 +1952,8 @@ padding-inline: var(--sp-5);
 
 /* Motorista (legado lines): só filete — mesmo fundo do line base */
 .oficio-documentos-traveller-line--motorista {
-  box-shadow: inset 2px 0 0 var(--color-accent);
+  border-inline-start: var(--bd-strong);
+border-inline-start-color: var(--color-accent);
 }
 
 .oficio-documentos-traveller-line__name-row {
@@ -2127,7 +2127,7 @@ padding-inline: var(--sp-5);
   background: var(--cv-surface-block);
   border: var(--bd);
   border-radius: var(--r-xl);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   overflow: hidden;
 }
 
@@ -2757,7 +2757,7 @@ padding-inline: var(--sp-5);
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-xl);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
@@ -2794,7 +2794,7 @@ padding-inline: var(--sp-5);
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-xl);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
@@ -2960,7 +2960,7 @@ margin-inline: 0;
 .viatura-sugestao-chip--active {
   background: var(--cv-surface-block);
   border-color: var(--color-accent);
-  outline: 0;
+  outline: none;
 }
 
 .viatura-sugestao-chip strong {
@@ -3113,7 +3113,8 @@ margin-inline: 0;
 #evento-card-documentos-d .related-route-item.is-active {
   background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-block));
   border-color: color-mix(in srgb, var(--color-accent) 45%, var(--cv-border));
-  box-shadow: inset 4px 0 0 var(--color-accent);
+  border-inline-start: var(--bd-strong);
+  border-inline-start-color: var(--color-accent);
 }
 
 #evento-card-documentos-d .related-route-item.is-active .cv-search-picker__selected-avatar {
@@ -3125,7 +3126,8 @@ margin-inline: 0;
  #evento-card-documentos-d .related-route-item.is-active {
   background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-block));
   border-color: color-mix(in srgb, var(--color-accent) 45%, var(--cv-border));
-  box-shadow: inset 4px 0 0 var(--color-accent);
+  border-inline-start: var(--bd-strong);
+  border-inline-start-color: var(--color-accent);
 }
 
  #evento-card-documentos-d .related-route-item.is-active .cv-search-picker__selected-avatar {
@@ -3172,8 +3174,6 @@ margin-inline: 0;
 [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle[aria-pressed="true"] {
   background:   color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-card));
   border-color: var(--color-accent);
-  box-shadow:   0 0 0 1px color-mix(in srgb, var(--color-accent) 30%, transparent),
-                0 2px 8px  color-mix(in srgb, var(--color-accent) 18%, transparent);
   color:        var(--color-accent);
 }
 
@@ -3191,8 +3191,6 @@ margin-inline: 0;
  [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle[aria-pressed="true"] {
   background:   color-mix(in srgb, var(--color-accent) 22%, var(--cv-surface-card));
   border-color: var(--color-accent);
-  box-shadow:   0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent),
-                0 2px 10px color-mix(in srgb, var(--color-accent) 22%, transparent);
   color:        var(--color-accent);
 }
 
@@ -3286,7 +3284,7 @@ margin-inline: 0;
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-xl);
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
   overflow: hidden;
   transition:
     box-shadow var(--tr-base),
@@ -3294,7 +3292,7 @@ margin-inline: 0;
 }
 
 .cv-record-card:hover {
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
   transform: none;
 }
 
@@ -3320,10 +3318,7 @@ margin-inline: 0;
 .cv-record-card__id-row::before {
   background: linear-gradient(180deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 50%, transparent) 100%);
   border-radius: var(--r-pill);
-  box-shadow:
-    0 0 5px 1px color-mix(in srgb, var(--color-accent) 35%, transparent),
-    0 0 12px 2px color-mix(in srgb, var(--color-accent) 15%, transparent),
-    0 0 22px 4px color-mix(in srgb, var(--color-accent) 6%, transparent);
+  box-shadow: var(--sh-sm);
   content: "";
   height: 2.9em;
   left: var(--sp-6);
@@ -3544,7 +3539,8 @@ padding-inline: var(--sp-6);
 .cv-person-row--highlight {
   background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-block));
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: inset 4px 0 0 var(--color-accent);
+  border-inline-start: var(--bd-strong);
+  border-inline-start-color: var(--color-accent);
 }
 
 .cv-person-row--highlight .cv-person-row__name {
@@ -4369,7 +4365,7 @@ padding-inline: var(--sp-6);
   background-image: none;
   border: 0;
   border-radius: var(--r-md);
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
   font-weight: var(--fw-bold);
   min-height: var(--h-md);
@@ -4383,7 +4379,6 @@ padding-inline: var(--sp-6);
   background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
   background-image: none;
   border: 0;
-  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
   color: var(--on-accent);
 }
 
@@ -4392,7 +4387,7 @@ padding-inline: var(--sp-6);
 }
 
 .cv-fab-container .cv-fab {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--sh-sm);
 }
 
 /* Motorista externo — painel contextual dentro da seção de transporte. */

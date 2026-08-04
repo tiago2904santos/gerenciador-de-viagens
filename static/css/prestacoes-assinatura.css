@@ -98,7 +98,7 @@ body.asgn {
   border: var(--bd);
   border-radius: var(--r-md);
   padding: var(--sp-5);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
 }
 .asgn-card--wide { padding: var(--sp-4); }
 .asgn-card--center { text-align: center; }
@@ -244,7 +244,7 @@ margin-inline: 0;
 .asgn-stage canvas {
   display: block;
   background: var(--on-accent);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
 }
 .asgn-drag {
   position: absolute;
@@ -327,7 +327,7 @@ margin-inline: 0; }
 .asgn-fontchip--simples { font-family: "Sacramento", cursive; }
 .asgn-fontchip--natural { font-family: "Allura", cursive; }
 .asgn-fontchip--luxuosa { font-family: "Herr Von Muellerhoff", cursive; }
-.asgn-fontchip.is-selected { border-color: var(--color-accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 20%, transparent); }
+.asgn-fontchip.is-selected { border-color: var(--color-accent); box-shadow: var(--sh-sm); }
 
 .asgn-drawwrap {
   border: var(--bd);

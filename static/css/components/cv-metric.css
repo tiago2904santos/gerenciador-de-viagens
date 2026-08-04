@@ -55,7 +55,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-xl);
-  box-shadow: var(--sh-md);
+  box-shadow: var(--sh-sm);
   display: grid;
   gap: var(--sp-2);
   min-width: 0;
@@ -68,7 +68,7 @@
 
 .cv-metric--tile:hover,
 .cv-summary-tile:hover {
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--sh-sm);
 }
 
 /* Rótulo */

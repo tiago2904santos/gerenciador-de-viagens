@@ -1,0 +1,82 @@
+logado em: http://127.0.0.1:8000/
+
+=== dashboard [light] === body=rgb(236, 238, 241)  OK
+    21x  rgb(236, 238, 241)     block      button.sidebar-link.sidebar-link--module
+    18x  rgb(255, 255, 255)     card       a.cv-skip-link
+     8x  color(srgb 0.79902 0.846863 0.893922)   <<< FORA DA PALETA a.sidebar-link.sidebar-link--module
+     7x  rgb(21, 91, 154)       acento     span.sidebar-brand-badge
+     1x  color(srgb 0.807255 0.865098 0.855098)   <<< FORA DA PALETA span.cv-chip.cv-chip--success
+  ---> 2 cor(es) fora da paleta
+
+=== oficios-lista [light] === body=rgb(236, 238, 241)  OK
+    21x  rgb(236, 238, 241)     block      a.sidebar-link.sidebar-link--module
+     8x  rgb(255, 255, 255)     card       a.cv-skip-link
+     8x  color(srgb 0.79902 0.846863 0.893922)   <<< FORA DA PALETA span.sidebar-item-icon
+     3x  rgb(21, 91, 154)       acento     span.sidebar-brand-badge
+     2x  color(srgb 0.0811765 0.323333 0.546275)   <<< FORA DA PALETA a.cv-list-tab.cv-list-tab--active
+  ---> 2 cor(es) fora da paleta
+
+=== oficio-novo [light] === body=rgb(236, 238, 241)  OK
+    11x  rgb(236, 238, 241)     block      a.sidebar-link.sidebar-link--module
+     8x  color(srgb 0.79902 0.846863 0.893922)   <<< FORA DA PALETA span.sidebar-item-icon
+     4x  rgb(255, 255, 255)     card       a.cv-skip-link
+     2x  rgb(21, 91, 154)       acento     span.sidebar-brand-badge
+  ---> 1 cor(es) fora da paleta
+
+=== configuracoes [light] === body=rgb(236, 238, 241)  OK
+    16x  rgb(255, 255, 255)     card       a.cv-skip-link
+    14x  rgb(236, 238, 241)     block      a.sidebar-link.sidebar-link--module
+     9x  color(srgb 0.79902 0.846863 0.893922)   <<< FORA DA PALETA span.sidebar-item-icon
+     3x  rgb(21, 91, 154)       acento     span.sidebar-brand-badge
+  ---> 1 cor(es) fora da paleta
+
+=== perfil [light] === body=rgb(236, 238, 241)  OK
+    16x  rgb(236, 238, 241)     block      a.sidebar-link.sidebar-link--module
+    12x  rgb(255, 255, 255)     card       a.cv-skip-link
+     7x  rgb(21, 91, 154)       acento     span.sidebar-brand-badge
+     7x  color(srgb 0.79902 0.846863 0.893922)   <<< FORA DA PALETA span.sidebar-item-icon
+     1x  rgb(82, 101, 122)        <<< FORA DA PALETA span.cv-chip.cv-chip--muted
+  ---> 2 cor(es) fora da paleta
+
+=== dashboard [dark] === body=rgb(13, 15, 17)  OK
+    20x  rgb(35, 39, 43)        block      button.sidebar-link.sidebar-link--module
+    18x  rgb(25, 28, 31)        card       a.cv-skip-link
+     8x  color(srgb 0.170392 0.145294 0.072549)   <<< FORA DA PALETA a.sidebar-link.sidebar-link--module
+     7x  rgb(216, 162, 27)      acento     span.sidebar-brand-badge
+     1x  rgb(13, 15, 17)        page       div.sidebar-footer
+     1x  color(srgb 0.095098 0.166471 0.143725)   <<< FORA DA PALETA span.cv-chip.cv-chip--success
+  ---> 2 cor(es) fora da paleta
+
+=== oficios-lista [dark] === body=rgb(13, 15, 17)  OK
+    17x  rgb(35, 39, 43)        block      a.sidebar-link.sidebar-link--module
+     8x  rgb(25, 28, 31)        card       a.cv-skip-link
+     8x  color(srgb 0.170392 0.145294 0.072549)   <<< FORA DA PALETA span.sidebar-item-icon
+     4x  rgb(13, 15, 17)        page       div.sidebar-footer
+     3x  rgb(216, 162, 27)      acento     span.sidebar-brand-badge
+     2x  color(srgb 0.864118 0.685294 0.235882)   <<< FORA DA PALETA a.cv-list-tab.cv-list-tab--active
+  ---> 2 cor(es) fora da paleta
+
+=== oficio-novo [dark] === body=rgb(13, 15, 17)  OK
+    10x  rgb(35, 39, 43)        block      a.sidebar-link.sidebar-link--module
+     8x  color(srgb 0.170392 0.145294 0.072549)   <<< FORA DA PALETA span.sidebar-item-icon
+     4x  rgb(25, 28, 31)        card       a.cv-skip-link
+     2x  rgb(216, 162, 27)      acento     span.sidebar-brand-badge
+     1x  rgb(13, 15, 17)        page       div.sidebar-footer
+  ---> 1 cor(es) fora da paleta
+
+=== configuracoes [dark] === body=rgb(13, 15, 17)  OK
+    16x  rgb(25, 28, 31)        card       a.cv-skip-link
+    13x  rgb(35, 39, 43)        block      a.sidebar-link.sidebar-link--module
+     9x  color(srgb 0.170392 0.145294 0.072549)   <<< FORA DA PALETA span.sidebar-item-icon
+     3x  rgb(216, 162, 27)      acento     span.sidebar-brand-badge
+     1x  rgb(13, 15, 17)        page       div.sidebar-footer
+  ---> 1 cor(es) fora da paleta
+
+=== perfil [dark] === body=rgb(13, 15, 17)  OK
+    15x  rgb(35, 39, 43)        block      a.sidebar-link.sidebar-link--module
+    12x  rgb(25, 28, 31)        card       a.cv-skip-link
+     7x  rgb(216, 162, 27)      acento     span.sidebar-brand-badge
+     7x  color(srgb 0.170392 0.145294 0.072549)   <<< FORA DA PALETA span.sidebar-item-icon
+     1x  rgb(13, 15, 17)        page       div.sidebar-footer
+     1x  rgb(174, 185, 193)       <<< FORA DA PALETA span.cv-chip.cv-chip--muted
+  ---> 2 cor(es) fora da paleta

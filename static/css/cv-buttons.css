@@ -32,15 +32,9 @@
 
 
 
-
-
-
-
 }
 
 :root {
-
-
 
 
 
@@ -83,7 +77,6 @@
 
 .cv-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px var(--focus-ring), var(--sh-sm);
 }
 
 .cv-btn:active {
@@ -115,7 +108,7 @@
 .cv-btn--primary {
   background: var(--color-accent);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: 0 6px 14px rgba(11, 58, 102, 0.16);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
 }
 
@@ -123,7 +116,6 @@
 .cv-btn--primary:focus {
   background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: 0 10px 18px rgba(11, 58, 102, 0.22);
 }
 
 /* --- Secondary --- */
@@ -168,7 +160,6 @@
 .cv-btn--ghost:focus {
   background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
   border-color: transparent;
-  box-shadow: none;
   transform: none;
 }
 
@@ -207,7 +198,7 @@
 .cv-btn--danger {
   background: linear-gradient(135deg, #c0392b 0%, var(--cv-state-danger) 100%);
   border-color: #8f1f18;
-  box-shadow: 0 6px 14px rgba(180, 35, 24, 0.22);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
 }
 
@@ -215,14 +206,13 @@
 .cv-btn--danger:focus {
   background: linear-gradient(135deg, #a93328 0%, #951f18 100%);
   border-color: #7a1a14;
-  box-shadow: 0 10px 18px rgba(180, 35, 24, 0.28);
 }
 
 /* --- Soft-danger (remover — remocao local, reversivel) --- */
 .cv-btn--soft-danger {
   background: linear-gradient(135deg, #c0392b 0%, var(--cv-state-danger) 100%);
   border-color: #8f1f18;
-  box-shadow: 0 6px 14px rgba(180, 35, 24, 0.22);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
 }
 
@@ -230,7 +220,6 @@
 .cv-btn--soft-danger:focus {
   background: linear-gradient(135deg, #a93328 0%, #951f18 100%);
   border-color: #7a1a14;
-  box-shadow: 0 10px 18px rgba(180, 35, 24, 0.28);
 }
 
 /* --- Preview (visualizar — teal informativo) --- */
@@ -253,7 +242,7 @@
 .cv-btn--pdf {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: rgba(145, 41, 31, 0.92);
-  box-shadow: 0 4px 10px rgba(190, 56, 43, 0.18);
+  box-shadow: var(--sh-sm);
   color: var(--cv-state-danger);
   font-weight: var(--fw-bold);
 }
@@ -262,14 +251,13 @@
 .cv-btn--pdf:focus {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: rgba(125, 34, 26, 0.95);
-  box-shadow: 0 7px 14px rgba(190, 56, 43, 0.24);
 }
 
 /* --- DOCX (azul-arquivo) --- */
 .cv-btn--docx {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border-color: rgba(24, 69, 125, 0.92);
-  box-shadow: 0 4px 10px rgba(26, 84, 152, 0.16);
+  box-shadow: var(--sh-sm);
   color: var(--cv-state-warning);
   font-weight: var(--fw-bold);
 }
@@ -278,7 +266,6 @@
 .cv-btn--docx:focus {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border-color: rgba(18, 55, 102, 0.96);
-  box-shadow: 0 7px 14px rgba(26, 84, 152, 0.2);
 }
 
 /* --- Tool (acoes operacionais: calcular, tracar rota, limpar filtros) --- */
@@ -384,7 +371,7 @@
    ========================================================= */
 .cv-btn.is-selected,
 .cv-btn[aria-pressed="true"] {
-  box-shadow: 0 0 0 3px var(--focus-ring), var(--sh-sm);
+  box-shadow: var(--sh-sm);
   outline: none;
 }
 
@@ -450,7 +437,6 @@
 
 .cv-icon-btn:hover,
 .cv-icon-btn:focus {
-  box-shadow: var(--sh-md);
   transform: translateY(-1px);
 }
 
@@ -460,7 +446,6 @@
 }
 
 .cv-icon-btn:focus-visible {
-  box-shadow: 0 0 0 3px var(--focus-ring);
   outline: none;
 }
 
@@ -707,7 +692,7 @@
 .cv-icon-btn--pdf {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: rgba(145, 41, 31, 0.92);
-  box-shadow: 0 4px 10px rgba(190, 56, 43, 0.18);
+  box-shadow: var(--sh-sm);
   color: #fff;
 }
 
@@ -715,14 +700,13 @@
 .cv-icon-btn--pdf:focus {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: rgba(125, 34, 26, 0.95);
-  box-shadow: 0 6px 14px rgba(190, 56, 43, 0.24);
 }
 
 /* DOCX — azul arquivo, preenchido */
 .cv-icon-btn--docx {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border-color: rgba(24, 69, 125, 0.92);
-  box-shadow: 0 4px 10px rgba(26, 84, 152, 0.18);
+  box-shadow: var(--sh-sm);
   color: #fff;
 }
 
@@ -730,7 +714,6 @@
 .cv-icon-btn--docx:focus {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border-color: rgba(18, 55, 102, 0.96);
-  box-shadow: 0 6px 14px rgba(26, 84, 152, 0.24);
 }
 
 /* --- Tooltip CSS (scoped em cv-icon-btn) --- */
@@ -754,7 +737,7 @@
   transform: translateX(-50%) translateY(4px);
   transition: opacity var(--tr-fast), transform var(--tr-fast);
   white-space: nowrap;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--sh-sm);
   z-index: var(--z-dropdown);
 }
 
@@ -803,7 +786,7 @@
   background: var(--cv-surface-page);
   border: var(--bd);
   border-radius: var(--r-sm);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+  box-shadow: var(--sh-sm);
   color: var(--cv-ink);
   font-family: var(--font-sans);
   font-size: 11px;
@@ -831,7 +814,7 @@
 .cv-global-tooltip.cv-global-tooltip--accent {
   background: var(--color-accent);
   border-color: var(--color-accent);
-  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-accent) 35%, transparent);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
 }
 
@@ -890,7 +873,6 @@
 }
 
 .cv-field-action:focus-visible {
-  box-shadow: 0 0 0 3px var(--focus-ring);
   outline: none;
 }
 
@@ -947,7 +929,7 @@
 .cv-field-action--calculate {
   background: var(--color-accent);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: 0 6px 14px rgba(11, 58, 102, 0.16);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
 }
 
@@ -1036,7 +1018,6 @@
 }
 
 .cv-footer-action:focus-visible {
-  box-shadow: 0 0 0 3px var(--focus-ring);
   outline: none;
 }
 

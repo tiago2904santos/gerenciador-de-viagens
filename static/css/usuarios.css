@@ -35,7 +35,6 @@
  .usuarios-page .cv-record-row:focus-within {
   background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-next));
   border: 0;
-  box-shadow: none;
 }
 
 .usuarios-page .cv-record-row__vincular {
@@ -80,7 +79,7 @@
   background: var(--color-accent);
   background-image: none;
   border: 0;
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  box-shadow: var(--sh-sm);
   color: var(--on-accent);
   font-weight: var(--fw-bold);
 }
@@ -100,7 +99,6 @@
   background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
   background-image: none;
   border: 0;
-  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
   color: var(--on-accent);
 }
 

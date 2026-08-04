@@ -46,10 +46,21 @@ textarea {
   font: inherit;
 }
 
-button:focus-visible,
-a:focus-visible {
-  outline: 2px solid rgba(37, 99, 168, 0.45);
-  outline-offset: 2px;
+/* NOVO-30 fase 3c — DECISAO DE PRODUTO (04/08/2026): o sistema nao sinaliza
+   foco. Nem anel, nem halo, nem contorno, em nenhuma situacao.
+
+   Esta regra e o que faz a decisao valer: apagar as regras do projeto nao
+   basta, porque o navegador desenha o proprio anel por padrao. Ela precisa
+   alcancar `:focus` E `:focus-visible`.
+
+   REGRESSAO CONHECIDA: e falha de WCAG 2.4.7 (Focus Visible). Quem navega por
+   teclado perde a unica pista de onde esta. Registrada no plano de execucao
+   como decisao consciente, nao como descuido — se um dia voltar, volta por
+   aqui, num lugar so. */
+:focus,
+:focus-visible,
+:focus-within {
+  outline: none;
 }
 
 input,
