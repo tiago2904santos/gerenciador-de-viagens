@@ -17,9 +17,8 @@ CSS_DIR = ROOT / "static" / "css"
 
 # Mesma política de exceção do audit_frontend_standards.py (Etapa 7 gate).
 COLOR_LITERAL_ALLOWED = {
-    "static/css/tokens.css",
-    "static/css/theme.css",
-    "static/css/03-theme-dark.css",
+    "static/css/00-palette.css",
+    "static/css/01-tokens.css",
     "static/css/components/theme-dark-components.css",  # transitório — dissolver nas fases seguintes
     "static/css/shell.bundle.css",  # gerado (NOVO-12); literais vêm das fontes acima
 }
@@ -41,7 +40,7 @@ STRICT_COLOR_LITERAL_FILES = {
 # so desce (AGENTS.md, regra 5).
 COLOR_LITERAL_BASELINE = 620
 
-# Escala fechada R-01 — espelha o comentário em static/css/tokens.css (Breakpoints).
+# Escala fechada R-01 — espelha a camada canônica em static/css/01-tokens.css.
 ALLOWED_MEDIA_BREAKPOINTS = frozenset({
     420, 520, 600, 640, 720, 721, 768, 800, 820, 840, 841, 900,
     1080, 1180, 1181, 1400, 1480,
@@ -146,7 +145,7 @@ class CssTokenGateTests(SimpleTestCase):
         self.assertEqual(violations, [], "\n".join(violations))
 
     def test_media_breakpoints_use_closed_scale(self):
-        """Gate R-01: @media width usa somente a escala documentada em tokens.css."""
+        """Gate R-01: @media width usa somente a escala documentada em 01-tokens.css."""
         violations = _find_media_width_violations()
         self.assertEqual(
             violations,

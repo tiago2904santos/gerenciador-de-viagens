@@ -271,8 +271,6 @@
 }
 
 .ui-lab-section--status {
-  --ui-lab-status-card-min: calc(var(--space-10) * 7);
-  --ui-lab-status-showcase-min: calc(var(--space-10) * 9);
 }
 
 .ui-lab-chips-canvas {
@@ -1167,15 +1165,6 @@ textarea.cv-field-control__input {
 }
 
 .cv-state-button {
-  --state-button-bg: var(--state-neutral-bg);
-  --state-button-bg-hover: var(--state-neutral-bg-hover);
-  --state-button-bg-active: var(--state-neutral-bg-active);
-  --state-button-border: var(--state-neutral-border);
-  --state-button-border-hover: var(--state-neutral-border-hover);
-  --state-button-text: var(--state-neutral-text);
-  --state-button-text-active: var(--state-neutral-text-active);
-  --state-button-dot: var(--state-neutral-dot);
-  --state-button-glow: var(--state-neutral-glow);
   align-items: center;
   appearance: none;
   background: var(--state-button-bg);
@@ -1251,51 +1240,15 @@ textarea.cv-field-control__input {
 }
 
 .cv-state-button--success {
-  --state-button-bg: var(--state-success-bg);
-  --state-button-bg-hover: var(--state-success-bg-hover);
-  --state-button-bg-active: var(--state-success-bg-active);
-  --state-button-border: var(--state-success-border);
-  --state-button-border-hover: var(--state-success-border-hover);
-  --state-button-text: var(--state-success-text);
-  --state-button-text-active: var(--state-success-text-active);
-  --state-button-dot: var(--state-success-dot);
-  --state-button-glow: var(--state-success-glow);
 }
 
 .cv-state-button--warning {
-  --state-button-bg: var(--state-warning-bg);
-  --state-button-bg-hover: var(--state-warning-bg-hover);
-  --state-button-bg-active: var(--state-warning-bg-active);
-  --state-button-border: var(--state-warning-border);
-  --state-button-border-hover: var(--state-warning-border-hover);
-  --state-button-text: var(--state-warning-text);
-  --state-button-text-active: var(--state-warning-text-active);
-  --state-button-dot: var(--state-warning-dot);
-  --state-button-glow: var(--state-warning-glow);
 }
 
 .cv-state-button--danger {
-  --state-button-bg: var(--state-danger-bg);
-  --state-button-bg-hover: var(--state-danger-bg-hover);
-  --state-button-bg-active: var(--state-danger-bg-active);
-  --state-button-border: var(--state-danger-border);
-  --state-button-border-hover: var(--state-danger-border-hover);
-  --state-button-text: var(--state-danger-text);
-  --state-button-text-active: var(--state-danger-text-active);
-  --state-button-dot: var(--state-danger-dot);
-  --state-button-glow: var(--state-danger-glow);
 }
 
 .cv-state-button--neutral {
-  --state-button-bg: var(--state-neutral-bg);
-  --state-button-bg-hover: var(--state-neutral-bg-hover);
-  --state-button-bg-active: var(--state-neutral-bg-active);
-  --state-button-border: var(--state-neutral-border);
-  --state-button-border-hover: var(--state-neutral-border-hover);
-  --state-button-text: var(--state-neutral-text);
-  --state-button-text-active: var(--state-neutral-text-active);
-  --state-button-dot: var(--state-neutral-dot);
-  --state-button-glow: var(--state-neutral-glow);
 }
 
 .cv-state-button--icon::before {
@@ -1674,7 +1627,4 @@ html[data-theme="dark"] .app-main:has(.ui-lab-page) {
 }
 
 html[data-theme="dark"] :is(.ui-lab-page, .ui-lab-page__shell, .ui-lab-layout) {
-  --ui-lab-bg: transparent;
-  --ui-lab-surface: var(--color-surface);
-  --ui-lab-border: var(--color-border);
 }

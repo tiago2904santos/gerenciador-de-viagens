@@ -6,7 +6,6 @@
    ========================================================= */
 
 .list-header {
-  --list-header-control-height: var(--filter-input-height);
   background: var(--cv-surface-card);
   border: 0;
   border-radius: var(--radius-card);
@@ -234,7 +233,6 @@
  * cv-select sem elevar artificialmente a especificidade.
  */
 .list-header__rail {
-  --list-header-control-bg: var(--step1-panel, var(--color-surface-soft, var(--color-card-soft)));
 }
 
 .list-header__rail .list-header__search-input.header-filter-input,
@@ -573,7 +571,6 @@
   .list-header__rail {
   background: var(--cv-card-family-bg);
   border-top-color: var(--color-border);
-  --list-header-control-bg: var(--step1-panel, var(--color-surface-soft, var(--color-card-soft)));
 }
 
 /* Controles do filtro: soft panel (#223348 / --color-surface-soft). */
@@ -624,7 +621,6 @@
 /* Select do rail: chevron sempre accent (fechado = aberto). */
 :is(html[data-theme="dark"])
   .list-header__rail .cv-custom-select--v2 {
-  --cv-cs-chevron-color: var(--color-accent);
 }
 
 :is(html[data-theme="dark"])
@@ -1030,11 +1026,6 @@
   .list-header--wizard-stepper
   .list-header__wizard-stepper
   .page-stepper {
-  --stepper-marker-size: 32px;
-  --stepper-missing-bg: color-mix(in srgb, var(--color-danger) 12%, transparent);
-  --stepper-missing-border: color-mix(in srgb, var(--color-danger) 30%, transparent);
-  --stepper-missing-color: color-mix(in srgb, var(--color-danger) 72%, #e8eef6);
-  --stepper-status-missing-color: color-mix(in srgb, var(--color-danger) 62%, #b8c7d8);
   background: transparent;
 }
 

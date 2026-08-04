@@ -38,15 +38,6 @@
 }
 
 :root {
-  --asgn-bg: var(--cv-surface-page);
-  --asgn-card: var(--cv-surface-card);
-  --asgn-ink: var(--color-heading);
-  --asgn-muted: var(--color-muted);
-  --asgn-line: var(--color-border);
-  --asgn-primary: var(--color-accent);
-  --asgn-primary-ink: var(--on-accent);
-  --asgn-danger: var(--color-danger);
-  --asgn-ok: var(--color-success);
 }
 
 * { box-sizing: border-box; }

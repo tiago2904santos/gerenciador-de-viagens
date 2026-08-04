@@ -23,11 +23,7 @@ STATIC = ROOT / "static"
 # theme-shared.js / theme-init.js ficam fora do bundle JS (head, sem defer).
 SHELL_CSS: tuple[str, ...] = (
     "css/style.css",
-    "css/03-theme-dark.css",
-    # Depois do tema escuro de proposito: os dois declaram em
-    # `html[data-theme="dark"]`, entao quem vem por ultimo vence. Antes dele, o
-    # acento da paleta seria ignorado no escuro. E nao pode vir antes de
-    # style.css: as declaracoes invalidariam os `@import` daquele arquivo.
+    # Depois de style.css/01-tokens.css: as sementes medidas da paleta vencem.
     "css/00-palette.css",
     "css/utilities.css",
     "css/page-shell.css",

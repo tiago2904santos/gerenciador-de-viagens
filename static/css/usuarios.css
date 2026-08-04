@@ -1,17 +1,11 @@
 /* Usuários — lista + quick-add no padrão das justificativas. */
 
 .usuarios-page {
-  --step1-surface: var(--cv-surface-card);
-  --step1-panel: var(--cv-surface-block);
-  --step1-field: var(--cv-surface-next);
   display: grid;
   gap: var(--space-5);
 }
 
 :is(html[data-theme="dark"]) .usuarios-page {
-  --step1-surface: var(--cv-surface-card);
-  --step1-panel: var(--cv-surface-block);
-  --step1-field: var(--cv-surface-next);
 }
 
 .usuarios-page .list-header,
@@ -147,10 +141,6 @@
 
 [data-usuario-quick-add] .usuario-quick-add__scope,
 [data-area-quick-add] .area-quick-add__scope {
-  --step1-surface: var(--cv-surface-card);
-  --step1-panel: var(--cv-surface-block);
-  --step1-field: var(--cv-surface-next);
-  --step1-empty: var(--cv-surface-next);
   display: grid;
   gap: 10px;
   background: transparent;
@@ -161,10 +151,6 @@
 
 :is(html[data-theme="dark"]) [data-usuario-quick-add] .usuario-quick-add__scope,
 :is(html[data-theme="dark"]) [data-area-quick-add] .area-quick-add__scope {
-  --step1-surface: var(--cv-surface-card);
-  --step1-panel: var(--cv-surface-block);
-  --step1-field: var(--cv-surface-next);
-  --step1-empty: var(--cv-surface-next);
 }
 
 [data-usuario-quick-add] .travel-document-block,
@@ -189,9 +175,6 @@
 /* Modal Vincular usuário — mesmo contrato visual do anexar assinado. */
 .vincular-usuario-modal__dialog.delete-confirm-modal__dialog,
 .vincular-usuario-modal__dialog {
-  --step1-surface: var(--cv-surface-card);
-  --step1-panel: var(--cv-surface-block);
-  --step1-field: var(--cv-surface-next);
   background: var(--step1-surface);
   gap: 0;
   max-width: min(100%, 520px);
@@ -256,9 +239,6 @@
 :is(html[data-theme="dark"]) .vincular-usuario-modal__fields.cv-form-stack,
 .vincular-usuario-modal__fields.cv-form-stack,
 .vincular-usuario-modal__fields {
-  --step1-field: var(--cv-surface-next);
-  --color-input-bg: var(--step1-field);
-  --cv-field-bg: var(--step1-field);
   background: var(--step1-panel, var(--color-surface-soft));
   border-radius: 15px;
   display: grid;

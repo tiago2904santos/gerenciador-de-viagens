@@ -303,8 +303,6 @@
 
 .cv-file-widget__action,
 .prestacao-file-widget__action {
-  --cv-icon-btn-size: 42px;
-  --cv-icon-btn-icon-size: 18px;
 }
 
 @media (max-width: 640px) {

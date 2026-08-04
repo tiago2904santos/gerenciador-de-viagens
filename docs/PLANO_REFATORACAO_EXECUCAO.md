@@ -773,8 +773,22 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
 > declarada, entao `--color-input-bg: var(--cv-surface-next)` no `:root` congelaria o valor
 > da raiz e o rodizio morreria em silencio — os 35 fundos de controle foram trocados no
 > **ponto de uso**. A segunda: a ordem de carga importa e nao aparece no tema claro. A
-> paleta precisa vir **depois** de `03-theme-dark.css`, porque os dois declaram no mesmo
+> paleta precisa vir **depois** de `01-tokens.css`, porque os dois declaram no mesmo
 > seletor `html[data-theme="dark"]`; antes dele, o acento novo e ignorado so no escuro.
+
+### Reescrita completa do CSS — `NOVO-30`
+
+- [x] **Fase 1 — camada unica de tokens:** `tokens.css`, `theme.css` e
+  `03-theme-dark.css` foram consolidados em `01-tokens.css`; imports, paginas
+  publicas, bundle, auditores e testes agora apontam para a camada unica. A
+  camada canonica tem 27 tokens e os nomes antigos permanecem apenas como
+  compatibilidade temporaria ate a fase 3. Declaracoes `--*` fora de
+  `00-palette.css` e `01-tokens.css`: **0**. Auditor frontend: **384 -> 335**.
+- [ ] **Fase 2 — regra do espelho:** eliminar `data-theme` dos componentes e
+  dissolver `components/theme-dark-components.css`.
+- [ ] **Fase 3 — geometria padronizada e fim dos aliases.**
+- [ ] **Fase 4 — fim das excecoes e do `!important`.**
+- [ ] **Fase 5 — apagar o CSS antigo.**
 
 ---
 

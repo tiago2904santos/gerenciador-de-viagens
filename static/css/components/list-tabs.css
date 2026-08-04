@@ -10,7 +10,6 @@
 
 /* Toolbar: abas + paginação soltos (sem card/caixa envolvente). */
 .list-toolbar {
-  --list-toolbar-h: 44px;
   align-items: center;
   background: transparent;
   border: 0;
@@ -98,18 +97,6 @@
 }
 
 .cv-list-tab {
-  --cv-list-tab-bg: var(--color-surface-soft, rgba(255, 255, 255, 0.04));
-  --cv-list-tab-border: var(--color-border, rgba(255, 255, 255, 0.12));
-  --cv-list-tab-color: var(--color-text-secondary, rgba(255, 255, 255, 0.7));
-  --cv-list-tab-hover-bg: var(--color-surface-strong, rgba(255, 255, 255, 0.08));
-  --cv-list-tab-hover-border: var(--color-border-strong, rgba(255, 255, 255, 0.2));
-  --cv-list-tab-hover-color: var(--color-text, #fff);
-  --cv-list-tab-count-bg: var(--color-surface-strong, rgba(255, 255, 255, 0.1));
-  --cv-list-tab-active-bg: var(--color-primary-soft, rgba(99, 165, 255, 0.16));
-  --cv-list-tab-active-border: var(--color-primary-bright, rgba(99, 165, 255, 0.6));
-  --cv-list-tab-active-color: var(--color-primary-bright, #63a5ff);
-  --cv-list-tab-active-count-bg: var(--color-primary-bright, #63a5ff);
-  --cv-list-tab-active-count-color: var(--color-white, #fff);
   align-items: center;
   background: var(--cv-list-tab-bg);
   border: 1px solid var(--cv-list-tab-border);
@@ -159,18 +146,6 @@
 
 :is(html[data-theme="dark"])
   .cv-list-tab {
-  --cv-list-tab-bg: var(--color-card-soft);
-  --cv-list-tab-border: var(--color-border-soft);
-  --cv-list-tab-color: var(--theme-text-muted, #b8c8dc);
-  --cv-list-tab-hover-bg: color-mix(in srgb, var(--color-card-soft) 82%, #fff 18%);
-  --cv-list-tab-hover-border: var(--color-border-strong, rgba(214, 227, 244, 0.5));
-  --cv-list-tab-hover-color: var(--color-muted-strong, #d3dfef);
-  --cv-list-tab-count-bg: rgba(255, 255, 255, 0.12);
-  --cv-list-tab-active-bg: var(--color-accent-soft, #3b3320);
-  --cv-list-tab-active-border: var(--color-accent-border-strong, #a5851f);
-  --cv-list-tab-active-color: #f3d680;
-  --cv-list-tab-active-count-bg: var(--color-accent, #d8a21b);
-  --cv-list-tab-active-count-color: #211806;
 }
 
 /* Aba ativa: hover sobe no dourado (não vai para branco) e sem barra esquerda. */
