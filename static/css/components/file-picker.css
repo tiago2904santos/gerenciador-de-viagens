@@ -15,7 +15,7 @@
 .cv-file-widget,
 .prestacao-file-widget {
   display: grid;
-  gap: var(--sp-3);
+  gap: var(--space-3);
   min-width: 0;
 }
 
@@ -28,65 +28,65 @@
 .cv-file-picker,
 .prestacao-file-picker {
   align-items: stretch;
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-radius: var(--r-sm);
-  box-shadow: var(--sh-md);
+  background: var(--cv-field-bg, var(--color-surface));
+  border: var(--cv-field-border, 1px solid var(--color-border));
+  border-radius: var(--radius-control, 10px);
+  box-shadow: var(--cv-field-shadow, none);
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
   min-height: 56px;
   min-width: 0;
   overflow: hidden;
-  transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
 }
 
 .cv-file-widget.is-selected .cv-file-picker,
 .prestacao-file-widget.is-selected .prestacao-file-picker {
-  border-color: color-mix(in srgb, var(--color-accent) 64%, var(--cv-border));
+  border-color: color-mix(in srgb, var(--color-primary) 64%, var(--color-border-strong));
 }
 
 .cv-file-widget.is-dragover .cv-file-picker,
 .prestacao-file-widget.is-dragover .prestacao-file-picker {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-block));
-  border-color: var(--color-accent);
-  box-shadow: var(--sh-md);
+  background: color-mix(in srgb, var(--color-primary) 16%, var(--cv-field-bg, var(--color-surface)));
+  border-color: var(--color-primary);
+  box-shadow: var(--cv-field-focus-ring, var(--focus-ring));
 }
 
 .cv-file-widget.is-error .cv-file-picker,
 .prestacao-file-widget.is-error .prestacao-file-picker {
-  border-color: var(--cv-state-danger);
+  border-color: var(--color-danger);
 }
 
 .cv-file-picker:hover,
 .prestacao-file-picker:hover {
-  border-color: var(--cv-border);
+  border-color: var(--cv-field-border-hover, var(--color-border-strong));
 }
 
 .cv-file-picker:focus-within,
 .prestacao-file-picker:focus-within {
-  border-color: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  box-shadow: var(--sh-md);
+  border-color: var(--cv-field-border-focus, var(--color-focus));
+  box-shadow: var(--cv-field-shadow-focus, var(--cv-field-focus-ring, var(--focus-ring)));
 }
 
 .cv-file-picker__action,
 .prestacao-file-picker__action {
   align-items: center;
-  background: color-mix(in srgb, var(--color-accent) 20%, var(--cv-surface-block));
-  border-right: 1px solid var(--cv-border);
-  color: var(--cv-ink);
+  background: color-mix(in srgb, var(--color-primary) 20%, var(--cv-field-bg, var(--color-surface)));
+  border-right: 1px solid var(--color-border);
+  color: var(--color-heading);
   cursor: pointer;
   display: inline-flex;
-  font-weight: 700;
-  gap: var(--sp-2);
+  font-weight: var(--font-weight-bold, 750);
+  gap: var(--space-2);
   justify-content: center;
   min-width: 172px;
-  padding: var(--sp-2) var(--sp-3);
-  transition: background 140ms ease, color 140ms ease;
+  padding: 0 var(--space-4);
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 
 .cv-file-picker__action-icon {
   align-items: center;
-  color: var(--color-accent);
+  color: var(--color-primary-bright, var(--color-primary));
   display: inline-flex;
   flex: 0 0 auto;
 }
@@ -98,53 +98,53 @@
 
 .cv-file-picker__action:hover,
 .prestacao-file-picker__action:hover {
-  background: color-mix(in srgb, var(--color-accent) 32%, var(--cv-surface-block));
-  color: var(--cv-ink);
+  background: color-mix(in srgb, var(--color-primary) 32%, var(--cv-field-bg, var(--color-surface)));
+  color: var(--color-heading);
 }
 
 .cv-file-picker__value,
 .prestacao-file-picker__value {
   align-items: center;
-  color: var(--cv-ink-muted);
+  color: var(--color-muted);
   display: flex;
   min-width: 0;
   overflow: hidden;
-  padding: var(--sp-2) var(--sp-3);
+  padding: 0 var(--space-4);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .cv-file-picker__value.prestacao-file-picker__value--selected,
 .prestacao-file-picker__value--selected {
-  color: var(--cv-ink);
-  font-weight: 600;
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold, 650);
 }
 
 .cv-file-picker__upload,
 .prestacao-file-picker__upload,
 .prestacao-file-picker__clear {
   align-items: center;
-  border: var(--bd-0);
-  border-left: 1px solid var(--cv-border);
+  border: 0;
+  border-left: 1px solid var(--color-border);
   cursor: pointer;
   display: inline-flex;
   font: inherit;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold, 750);
   justify-content: center;
   min-width: 112px;
-  padding: var(--sp-2) var(--sp-3);
-  transition: background 140ms ease, color 140ms ease, opacity 140ms ease;
+  padding: 0 var(--space-4);
+  transition: background var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast);
 }
 
 .cv-file-picker__upload,
 .prestacao-file-picker__upload {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  color: var(--color-accent);
+  background: var(--cv-btn-primary-bg, var(--color-primary));
+  color: var(--cv-btn-primary-color, var(--color-white));
 }
 
 .cv-file-picker__upload:hover:not(:disabled),
 .prestacao-file-picker__upload:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
+  background: var(--cv-btn-primary-hover-bg, var(--color-primary-hover));
 }
 
 .cv-file-picker__upload:disabled,
@@ -154,21 +154,21 @@
 
 .prestacao-file-picker__clear {
   background: transparent;
-  color: var(--cv-ink-muted);
+  color: var(--color-muted-strong);
 }
 
 .prestacao-file-picker__clear:hover {
-  background: var(--cv-surface-block);
-  color: var(--cv-ink);
+  background: var(--color-secondary-soft);
+  color: var(--color-text);
 }
 
 .cv-file-picker__inline-actions,
 .prestacao-file-picker__inline-actions {
   align-items: center;
-  border-left: 1px solid var(--cv-border);
+  border-left: 1px solid var(--color-border);
   display: flex;
-  gap: var(--sp-1);
-  padding: var(--sp-2) var(--sp-3);
+  gap: var(--space-1);
+  padding: 0 var(--space-3);
 }
 
 .cv-file-picker__inline-actions[hidden],
@@ -185,25 +185,25 @@
 .cv-file-selection__toggle,
 .prestacao-file-selection__toggle {
   align-items: center;
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-radius: var(--r-sm);
-  color: var(--cv-ink);
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-control, 10px);
+  color: var(--color-text);
   cursor: pointer;
   display: flex;
   font: inherit;
-  font-weight: 700;
-  gap: var(--sp-3);
+  font-weight: var(--font-weight-bold, 750);
+  gap: var(--space-3);
   justify-content: space-between;
   min-height: 54px;
-  padding: var(--sp-2) var(--sp-3);
+  padding: 0 var(--space-4);
   text-align: left;
   width: 100%;
 }
 
 .cv-file-selection__toggle:focus-visible,
 .prestacao-file-selection__toggle:focus-visible {
-  box-shadow: var(--sh-md);
+  box-shadow: var(--cv-field-focus-ring, var(--focus-ring));
   outline: 0;
 }
 
@@ -211,7 +211,7 @@
 .prestacao-file-selection__chevron {
   border-bottom: 1.5px solid currentColor;
   border-right: 1.5px solid currentColor;
-  color: var(--color-accent);
+  color: var(--color-accent, var(--color-primary));
   height: 7px;
   transform: rotate(45deg);
   width: 7px;
@@ -220,10 +220,10 @@
 .cv-file-selection__menu,
 .prestacao-file-selection__menu,
 .prestacao-file-list {
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-radius: var(--r-sm);
-  box-shadow: var(--sh-md);
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-control, 10px);
+  box-shadow: var(--shadow-xs, none);
   min-width: 0;
   overflow: hidden;
 }
@@ -246,24 +246,24 @@
 .prestacao-file-list__item {
   align-items: center;
   display: flex;
-  gap: var(--sp-4);
+  gap: var(--space-4);
   justify-content: space-between;
   min-height: 64px;
   min-width: 0;
-  padding: var(--sp-3) var(--sp-4);
-  transition: background 140ms ease;
+  padding: var(--space-3) var(--space-4);
+  transition: background var(--transition-fast);
 }
 
 .cv-file-selection__item:hover,
 .prestacao-file-selection__item:hover,
 .prestacao-file-list__item:hover {
-  background: color-mix(in srgb, var(--color-accent) 9%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 9%, transparent);
 }
 
 .cv-file-selection__item + .cv-file-selection__item,
 .prestacao-file-selection__item + .prestacao-file-selection__item,
 .prestacao-file-list__item + .prestacao-file-list__item {
-  border-top: 1px solid var(--cv-border);
+  border-top: 1px solid var(--color-border);
 }
 
 .cv-file-widget__meta,
@@ -275,9 +275,9 @@
 
 .cv-file-widget__name,
 .prestacao-file-widget__name {
-  color: var(--cv-ink);
+  color: var(--color-text);
   display: block;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold, 650);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -285,9 +285,9 @@
 
 .cv-file-widget__subtitle,
 .prestacao-file-widget__subtitle {
-  color: var(--cv-ink-muted);
+  color: var(--color-muted);
   display: block;
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -298,11 +298,13 @@
   align-items: center;
   display: flex;
   flex: 0 0 auto;
-  gap: var(--sp-2);
+  gap: var(--space-2);
 }
 
 .cv-file-widget__action,
 .prestacao-file-widget__action {
+  --cv-icon-btn-size: 42px;
+  --cv-icon-btn-icon-size: 18px;
 }
 
 @media (max-width: 640px) {
@@ -313,7 +315,7 @@
 
   .cv-file-picker__action,
   .prestacao-file-picker__action {
-    border-bottom: 1px solid var(--cv-border);
+    border-bottom: 1px solid var(--color-border);
     border-right: 0;
     min-height: 46px;
   }
@@ -327,7 +329,7 @@
   .prestacao-file-picker__upload,
   .prestacao-file-picker__clear {
     border-left: 0;
-    border-top: 1px solid var(--cv-border);
+    border-top: 1px solid var(--color-border);
     min-height: 44px;
   }
 

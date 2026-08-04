@@ -7,7 +7,9 @@
   <script src="{% static 'js/core/theme-shared.js' %}"></script>
   <script src="{% static 'js/core/theme-init.js' %}"></script>
   <title>{% block title %}Assinatura de documento{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'css/01-tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+  <link rel="stylesheet" href="{% static 'css/03-theme-dark.css' %}">
   {% comment %}
     Depois do tema escuro, mesma razao do bundle: os dois declaram em
     html[data-theme="dark"], entao quem vem por ultimo vence.

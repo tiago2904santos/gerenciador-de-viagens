@@ -116,19 +116,20 @@ class PaletaTresCoresTests(SimpleTestCase):
         Se alguem tirar uma delas, os filhos herdam o par do avo e a alternancia
         para de acontecer — sem erro, so com a tela ficando de uma cor so.
         """
-        # NOVO-30 fase 3 remove os aliases contextuais: as ancoras passam a
-        # consumir diretamente as tres sementes canonicas da paleta.
         secoes = (CSS / "components" / "form-sections.css").read_text(encoding="utf-8")
         shell = (CSS / "page-shell.css").read_text(encoding="utf-8")
 
-        bloco = _bloco(secoes, ".cv-form-block")
-        self.assertIn("background: var(--cv-surface-block);", bloco)
+        bloco = _declaracoes(_bloco(secoes, ".cv-form-block"))
+        self.assertEqual(bloco.get("--cv-surface"), "var(--cv-surface-block)")
+        self.assertEqual(bloco.get("--cv-surface-next"), "var(--cv-surface-card)")
 
-        aninhado = _bloco(secoes, ".cv-form-block .cv-form-block")
-        self.assertIn("background: var(--cv-surface-card);", aninhado)
+        aninhado = _declaracoes(_bloco(secoes, ".cv-form-block .cv-form-block"))
+        self.assertEqual(aninhado.get("--cv-surface"), "var(--cv-surface-card)")
+        self.assertEqual(aninhado.get("--cv-surface-next"), "var(--cv-surface-block)")
 
-        card = _bloco(shell, ".cv-form-section-card")
-        self.assertRegex(card, r"background:\s+var\(--cv-surface-card\);")
+        card = _declaracoes(_bloco(shell, ".cv-form-section-card"))
+        self.assertEqual(card.get("--cv-surface"), "var(--cv-surface-card)")
+        self.assertEqual(card.get("--cv-surface-next"), "var(--cv-surface-block)")
 
     def test_login_e_assinatura_carregam_a_paleta_depois_do_tema_escuro(self):
         """Ordem importa: os dois arquivos declaram em html[data-theme="dark"].
@@ -142,7 +143,7 @@ class PaletaTresCoresTests(SimpleTestCase):
                     "prestacoes_contas/assinatura/base_publico.html"):
             with self.subTest(template=rel):
                 texto = (base / rel).read_text(encoding="utf-8")
-                escuro = texto.find("01-tokens.css")
+                escuro = texto.find("03-theme-dark.css")
                 paleta = texto.find("00-palette.css")
                 self.assertNotEqual(paleta, -1, "a pagina nao carrega 00-palette.css")
                 self.assertLess(escuro, paleta, "paleta precisa vir depois do tema escuro")

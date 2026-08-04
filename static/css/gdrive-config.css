@@ -10,21 +10,22 @@
   flex-direction: column;
   gap: 0;
   /* Vermelho nítido do botão Desconectar (variante escura no bloco de tema). */
+  --gd-unlink: var(--color-danger);
 }
 
 /* ── Blocos internos, separados por divisória sutil ───────────────────────── */
 .gdrive-block {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
-  padding: 0;
+  gap: var(--space-4);
+  padding: var(--space-5) 0;
 }
 
-.gdrive-block:first-child { padding-top: var(--sp-1); }
+.gdrive-block:first-child { padding-top: var(--space-1); }
 .gdrive-block:last-child { padding-bottom: 0; }
 
 .gdrive-block + .gdrive-block {
-  border-top: 1px solid var(--cv-border);
+  border-top: 1px solid var(--color-border-soft);
 }
 
 .gdrive-block.is-disabled {
@@ -37,7 +38,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--sp-2) var(--sp-3);
+  gap: var(--space-2) var(--space-3);
 }
 
 .gdrive-block__headtext {
@@ -50,17 +51,17 @@
 
 .gdrive-block__title {
   margin: 0;
-  color: var(--cv-ink);
-  font-size: 14px;
-  font-weight: 700;
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .gdrive-block__sub {
   margin: 0;
-  color: var(--cv-ink-muted);
-  font-size: 12px;
+  color: var(--color-text-soft);
+  font-size: var(--font-size-xs);
   line-height: 1.45;
 }
 
@@ -73,13 +74,13 @@
   flex: 0 0 auto;
   width: 40px;
   height: 40px;
-  border-radius: var(--r-md);
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  box-shadow: var(--sh-md);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border-soft);
+  box-shadow: var(--shadow-xs);
   font-size: 18px;
   line-height: 1;
-  color: var(--color-accent);
+  color: var(--color-primary-bright);
 }
 
 .gdrive-block__icon .cv-icon {
@@ -91,34 +92,34 @@
 .gdrive-meta {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  gap: var(--sp-2);
+  gap: var(--space-2);
   margin: 0;
 }
 
 .gdrive-meta__item {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-1);
-  padding: var(--sp-3) var(--sp-4);
-  border-radius: var(--r-md);
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  box-shadow: var(--sh-md);
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border-soft);
+  box-shadow: var(--shadow-xs);
 }
 
 .gdrive-meta__label {
-  color: var(--cv-ink-muted);
-  font-size: 11px;
-  font-weight: 600;
+  color: var(--color-text-soft);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .gdrive-meta__value {
   margin: 0;
-  color: var(--cv-ink);
-  font-size: 16px;
-  font-weight: 600;
+  color: var(--color-heading);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
   font-variant-numeric: tabular-nums;
 }
 
@@ -126,24 +127,24 @@
 .gdrive-scope-alert {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-1);
-  padding: var(--sp-3) var(--sp-4);
-  border-radius: var(--r-md);
-  background: var(--cv-state-danger);
-  border: var(--bd);
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-danger-soft);
+  border: 1px solid var(--color-danger-border-soft);
 }
 
 .gdrive-scope-alert__title {
   margin: 0;
-  color: var(--cv-state-danger);
-  font-size: 14px;
-  font-weight: 700;
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
 }
 
 .gdrive-scope-alert__text {
   margin: 0;
-  color: var(--cv-ink-muted);
-  font-size: 12px;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
   line-height: 1.5;
 }
 
@@ -152,7 +153,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--sp-2);
+  gap: var(--space-2);
 }
 
 .gdrive-actions form {
@@ -171,22 +172,22 @@
 /* Desconectar — contorno vermelho nítido; preenche no hover (nada de pastel) */
 .gdrive-btn-unlink {
   background: transparent;
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+  border-color: var(--gd-unlink);
+  color: var(--gd-unlink);
 }
 
 .gdrive-btn-unlink:hover,
 .gdrive-btn-unlink:focus-visible {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--on-accent);
+  background: var(--gd-unlink);
+  border-color: var(--gd-unlink);
+  color: var(--color-white);
 }
 
 /* Texto de ajuda */
 .gdrive-hint {
   margin: 0;
-  color: var(--cv-ink);
-  font-size: 12px;
+  color: var(--color-help);
+  font-size: var(--font-size-xs);
   line-height: 1.5;
 }
 
@@ -194,13 +195,13 @@
 .gdrive-pasta-atual {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
+  gap: var(--space-2);
 }
 
 .gdrive-pasta-atual__label {
-  color: var(--cv-ink-muted);
-  font-size: 11px;
-  font-weight: 600;
+  color: var(--color-text-soft);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -208,14 +209,14 @@
 .gdrive-pasta-selecionada {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
+  gap: var(--space-2);
   /* padding vertical +3px vs. --space-3: compensa o line-height menor do nome
      da pasta (24px) frente ao valor numérico do stat ao lado (30px), para
      as duas caixas terminarem com a mesma altura total. */
-  padding: var(--sp-1);
-  border-radius: var(--r-md);
-  background: var(--cv-state-success);
-  border: var(--bd);
+  padding: calc(var(--space-3) + 3px) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-success-soft);
+  border: 1px solid var(--color-success-border-soft);
 }
 
 .gdrive-pasta-selecionada__icon {
@@ -223,7 +224,7 @@
   flex: 0 0 auto;
   width: 18px;
   height: 18px;
-  color: var(--cv-state-success);
+  color: var(--color-success);
 }
 
 .gdrive-pasta-selecionada__icon .cv-icon {
@@ -233,8 +234,8 @@
 
 .gdrive-pasta-selecionada__nome {
   overflow: hidden;
-  color: var(--cv-ink);
-  font-weight: 600;
+  color: var(--color-heading);
+  font-weight: var(--font-weight-semibold);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -242,9 +243,9 @@
 .gdrive-pasta-selecionada__link {
   flex: 0 0 auto;
   margin-left: auto;
-  color: var(--color-accent);
-  font-size: 12px;
-  font-weight: 600;
+  color: var(--color-primary-bright);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -255,17 +256,17 @@
 .gdrive-folder-browser {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-3);
-  padding: var(--sp-4);
-  border-radius: var(--r-md);
-  background: var(--cv-surface-block);
-  border: var(--bd);
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border-soft);
 }
 
 .gdrive-browser-toolbar {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
+  gap: var(--space-2);
 }
 
 /* Linha de navegação (Voltar + trilha de pastas). Fica ~invisível no root
@@ -273,13 +274,13 @@
 .gdrive-navrow {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
+  gap: var(--space-2);
   min-height: 0;
 }
 
 .gdrive-breadcrumb {
-  color: var(--cv-ink-muted);
-  font-size: 12px;
+  color: var(--color-text-soft);
+  font-size: var(--font-size-xs);
 }
 
 /* Abas de origem — segmented control de colunas iguais.
@@ -289,41 +290,41 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2px;
-  padding: var(--sp-1);
-  border-radius: var(--r-md);
-  background: var(--cv-surface-page);
-  border: var(--bd);
-  box-shadow: var(--sh-sm);
+  padding: 3px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-soft);
+  box-shadow: inset 0 1px 2px rgba(7, 26, 51, 0.05);
 }
 
 .gdrive-root-tab {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--sp-2);
-  border: var(--bd);
-  border-radius: var(--r-md);
+  padding: var(--space-2) var(--space-2);
+  border: 1px solid transparent;
+  border-radius: calc(var(--radius-md) - 3px);
   background: transparent;
-  color: var(--cv-ink-muted);
+  color: var(--color-text-soft);
   font: inherit;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
   line-height: 1.25;
   text-align: center;
   cursor: pointer;
   transition:
-    background 140ms ease,
-    color 140ms ease,
-    box-shadow 140ms ease;
+    background var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
-.gdrive-root-tab:hover { color: var(--cv-ink); }
+.gdrive-root-tab:hover { color: var(--color-heading); }
 
 .gdrive-root-tab.is-active {
-  background: var(--cv-surface-card);
-  border-color: var(--cv-border);
-  color: var(--color-accent);
-  box-shadow: var(--sh-md);
+  background: var(--color-surface);
+  border-color: var(--color-border-soft);
+  color: var(--color-primary-bright);
+  box-shadow: var(--shadow-xs);
 }
 
 @media (max-width: 520px) {
@@ -335,7 +336,7 @@
 .gdrive-folder-list {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-1);
+  gap: var(--space-1);
   max-height: 280px;
   overflow-y: auto;
 }
@@ -344,32 +345,32 @@
 .gdrive-folder-item {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
-  padding: 0;
-  border-radius: var(--r-sm);
-  border: var(--bd);
+  gap: var(--space-2);
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
   transition:
-    background 140ms ease,
-    border-color 140ms ease;
+    background var(--transition-fast),
+    border-color var(--transition-fast);
 }
 
-.gdrive-folder-item:hover { background: var(--cv-ink); }
+.gdrive-folder-item:hover { background: var(--color-surface); }
 
 .gdrive-folder-item.is-selected {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary-bright);
 }
 
 .gdrive-folder-item__select {
   display: flex;
   flex: 1 1 auto;
   align-items: center;
-  gap: var(--sp-2);
+  gap: var(--space-2);
   min-width: 0;
-  padding: var(--sp-2);
+  padding: var(--space-2);
   background: none;
-  border: var(--bd-0);
-  color: var(--cv-ink);
+  border: 0;
+  color: var(--color-text);
   cursor: pointer;
   font: inherit;
   text-align: left;
@@ -380,7 +381,7 @@
   flex: 0 0 auto;
   width: 16px;
   height: 16px;
-  color: var(--cv-ink-muted);
+  color: var(--color-text-soft);
 }
 
 .gdrive-folder-item__icon .cv-icon {
@@ -396,36 +397,36 @@
 
 .gdrive-folder-item__enter {
   flex: 0 0 auto;
-  padding: var(--sp-1);
+  padding: var(--space-1) var(--space-2);
   background: none;
-  border: var(--bd-0);
-  border-radius: var(--r-sm);
-  color: var(--color-accent);
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: var(--color-primary-bright);
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
 }
 
-.gdrive-folder-item__enter:hover { background: var(--cv-ink); }
+.gdrive-folder-item__enter:hover { background: var(--color-surface); }
 
 .gdrive-folder-empty,
 .gdrive-error {
   margin: 0;
-  padding: var(--sp-3);
-  color: var(--cv-ink-muted);
-  font-size: 12px;
+  padding: var(--space-3);
+  color: var(--color-text-soft);
+  font-size: var(--font-size-xs);
 }
 
-.gdrive-error { color: var(--cv-state-danger); }
+.gdrive-error { color: var(--color-danger); }
 
 /* Loading + spinner */
 .gdrive-loading {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
-  padding: var(--sp-2);
-  color: var(--cv-ink-muted);
-  font-size: 12px;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  color: var(--color-text-soft);
+  font-size: var(--font-size-xs);
 }
 
 .gdrive-spinner,
@@ -434,9 +435,9 @@
   flex: 0 0 auto;
   width: 14px;
   height: 14px;
-  border: var(--bd-strong);
-  border-top-color: var(--color-accent);
-  border-radius: var(--r-pill);
+  border: 2px solid var(--color-border-strong);
+  border-top-color: var(--color-primary-bright);
+  border-radius: 50%;
   animation: gdrive-spin 0.7s linear infinite;
 }
 
@@ -453,12 +454,12 @@
 .gdrive-new-folder {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-1);
+  gap: var(--space-1);
 }
 
 .gdrive-new-folder__form {
   display: flex;
-  gap: var(--sp-2);
+  gap: var(--space-2);
 }
 
 .gdrive-new-folder__form .cv-input { flex: 1 1 auto; }
@@ -468,7 +469,7 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: var(--sp-2);
+  gap: var(--space-2);
 }
 
 /* ── Stat pill (arquivos enviados / eventos) ──────────────────────────────── */
@@ -476,11 +477,11 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-3) var(--sp-4);
-  border-radius: var(--r-md);
-  background: var(--cv-surface-block);
-  border: var(--bd);
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border-soft);
 }
 
 .gdrive-stat__icon {
@@ -488,7 +489,7 @@
   flex: 0 0 auto;
   width: 18px;
   height: 18px;
-  color: var(--color-accent);
+  color: var(--color-primary-bright);
 }
 
 .gdrive-stat__icon .cv-icon {
@@ -498,28 +499,28 @@
 
 .gdrive-stat__text {
   margin-right: auto;
-  color: var(--cv-ink-muted);
-  font-size: 14px;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
 }
 
 .gdrive-stat__value {
-  color: var(--cv-ink);
-  font-size: 20px;
-  font-weight: 700;
+  color: var(--color-heading);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;
 }
 
 .gdrive-mock-note {
   margin: 0;
-  color: var(--cv-state-warning);
-  font-size: 11px;
+  color: var(--color-warning);
+  font-size: var(--font-size-2xs);
 }
 
 /* Números do diretório lado a lado (arquivos enviados + eventos) */
 .gdrive-stats-row {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sp-2);
+  gap: var(--space-2);
 }
 
 .gdrive-stats-row .gdrive-stat {
@@ -530,16 +531,16 @@
 .gdrive-subsection {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-3);
-  padding-top: var(--sp-4);
-  border-top: 1px dashed var(--cv-border);
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px dashed var(--color-border-soft);
 }
 
 .gdrive-subsection__head {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--sp-2) var(--sp-3);
+  gap: var(--space-2) var(--space-3);
 }
 
 .gdrive-subsection__headtext {
@@ -552,44 +553,44 @@
 
 .gdrive-subsection__title {
   margin: 0;
-  color: var(--cv-ink);
-  font-size: 14px;
-  font-weight: 600;
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
 }
 
 .gdrive-massa {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-3);
+  gap: var(--space-3);
 }
 
 .gdrive-status {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-3);
-  padding: var(--sp-3) var(--sp-4);
-  border-radius: var(--r-md);
-  background: var(--color-accent);
-  border: var(--bd);
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-info-bg);
+  border: 1px solid var(--color-info-border);
 }
 
 .gdrive-status__row {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
+  gap: var(--space-3);
 }
 
 .gdrive-status__spinner { display: none; }
 .gdrive-status.is-running .gdrive-status__spinner { display: inline-block; }
 
 .gdrive-status.is-done {
-  background: var(--cv-state-success);
-  border-color: color-mix(in srgb, var(--cv-state-success) 55%, var(--cv-border));
+  background: var(--color-success-soft);
+  border-color: var(--color-success-border-soft);
 }
 
 .gdrive-status.is-error {
-  background: var(--cv-state-danger);
-  border-color: color-mix(in srgb, var(--cv-state-danger) 55%, var(--cv-border));
+  background: var(--color-danger-soft);
+  border-color: var(--color-danger-border-soft);
 }
 
 .gdrive-status__body {
@@ -600,52 +601,52 @@
 }
 
 .gdrive-status__label {
-  color: var(--cv-ink-muted);
-  font-size: 11px;
-  font-weight: 600;
+  color: var(--color-text-soft);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .gdrive-status__text {
-  color: var(--color-accent);
-  font-size: 14px;
-  font-weight: 500;
+  color: var(--color-info-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
 }
 
-.gdrive-status.is-done .gdrive-status__text { color: var(--cv-state-success); }
-.gdrive-status.is-error .gdrive-status__text { color: var(--cv-state-danger); }
+.gdrive-status.is-done .gdrive-status__text { color: var(--color-success); }
+.gdrive-status.is-error .gdrive-status__text { color: var(--color-danger-text, var(--color-danger)); }
 
 .gdrive-status__percent {
   margin-left: auto;
-  color: var(--color-accent);
-  font-size: 14px;
-  font-weight: 700;
+  color: var(--color-info-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
   font-variant-numeric: tabular-nums;
 }
 
-.gdrive-status.is-done .gdrive-status__percent { color: var(--cv-state-success); }
+.gdrive-status.is-done .gdrive-status__percent { color: var(--color-success); }
 .gdrive-status.is-error .gdrive-status__percent { display: none; }
 
 /* Barra de progresso da reorganização em massa */
 .gdrive-progress {
   width: 100%;
   height: 6px;
-  border-radius: var(--r-pill);
-  background: var(--cv-surface-card);
-  border: var(--bd);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-soft);
   overflow: hidden;
 }
 
 .gdrive-progress__fill {
   width: 0;
   height: 100%;
-  border-radius: var(--r-pill);
-  background: var(--color-accent);
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-bright);
   transition: width 0.4s ease;
 }
 
-.gdrive-status.is-done .gdrive-progress__fill { background: var(--cv-state-success); }
+.gdrive-status.is-done .gdrive-progress__fill { background: var(--color-success); }
 .gdrive-status.is-error .gdrive-progress { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -656,17 +657,17 @@
 .gdrive-previa {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
-  padding: var(--sp-3) var(--sp-4);
-  border-radius: var(--r-md);
-  background: var(--cv-surface-block);
-  border: var(--bd);
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border-soft);
 }
 
 .gdrive-previa__label {
-  color: var(--cv-ink-muted);
-  font-size: 11px;
-  font-weight: 600;
+  color: var(--color-text-soft);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -680,16 +681,16 @@
   max-height: 240px;
   overflow-y: auto;
   list-style: none;
-  color: var(--cv-ink-muted);
+  color: var(--color-text-muted);
   font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-  font-size: 12px;
+  font-size: var(--font-size-xs);
 }
 
 .gdrive-previa-lista li {
   overflow: hidden;
-  padding: var(--sp-1);
-  border-radius: var(--r-sm);
-  background: var(--cv-surface-card);
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -698,7 +699,7 @@
 .gdrive-pend-lista {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   max-height: 340px;
@@ -710,29 +711,29 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: var(--sp-2) var(--sp-3);
-  border-radius: var(--r-md);
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-left: 3px solid color-mix(in srgb, var(--cv-state-danger) 55%, var(--cv-border));
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border-soft);
+  border-left: 3px solid var(--color-danger-border-soft);
 }
 
 /* Linha única: tag + título (com contexto embutido) + quando */
 .gdrive-pend__top {
   display: flex;
   align-items: baseline;
-  gap: var(--sp-2);
+  gap: var(--space-2);
 }
 
 .gdrive-pend__tipo {
   flex: 0 0 auto;
-  padding: var(--sp-1);
-  border-radius: var(--r-pill);
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  color: var(--cv-ink-muted);
-  font-size: 11px;
-  font-weight: 600;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-soft);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-semibold);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   align-self: center;
@@ -743,23 +744,23 @@
   min-width: 0;
   overflow: hidden;
   margin: 0;
-  color: var(--cv-ink);
-  font-size: 14px;
-  font-weight: 600;
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .gdrive-pend__contexto {
-  color: var(--cv-ink-muted);
-  font-size: 12px;
+  color: var(--color-text-soft);
+  font-size: var(--font-size-xs);
   font-weight: normal;
 }
 
 .gdrive-pend__quando {
   flex: 0 0 auto;
-  color: var(--cv-ink-muted);
-  font-size: 11px;
+  color: var(--color-text-soft);
+  font-size: var(--font-size-2xs);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -767,17 +768,17 @@
 /* Linha única: motivo (destacado) + ação (neutra) */
 .gdrive-pend__causa {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   line-height: 1.4;
 }
 
 .gdrive-pend__motivo {
-  color: var(--cv-state-danger);
-  font-weight: 500;
+  color: var(--color-danger);
+  font-weight: var(--font-weight-medium);
 }
 
 .gdrive-pend__acao {
-  color: var(--cv-ink-muted);
+  color: var(--color-text-muted);
 }
 
 .gdrive-pend__acao::before {
@@ -785,28 +786,28 @@
 }
 
 .gdrive-pend__det {
-  font-size: 11px;
+  font-size: var(--font-size-2xs);
 }
 
 .gdrive-pend__det summary {
   width: fit-content;
-  color: var(--cv-ink-muted);
+  color: var(--color-text-soft);
   cursor: pointer;
   user-select: none;
 }
 
-.gdrive-pend__det summary:hover { color: var(--cv-ink); }
+.gdrive-pend__det summary:hover { color: var(--color-heading); }
 
 .gdrive-pend__erro {
   display: block;
-  margin-top: var(--sp-1);
-  padding: var(--sp-2);
-  border-radius: var(--r-sm);
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  color: var(--cv-ink-muted);
+  margin-top: var(--space-1);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-soft);
+  color: var(--color-text-muted);
   font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-  font-size: 11px;
+  font-size: var(--font-size-2xs);
   line-height: 1.45;
   white-space: pre-wrap;
   word-break: break-word;
@@ -817,7 +818,7 @@
 .gdrive-previa-lista,
 .gdrive-folder-list {
   scrollbar-width: thin;
-  scrollbar-color: var(--cv-border) transparent;
+  scrollbar-color: var(--color-border-strong) transparent;
 }
 
 .gdrive-pend-lista::-webkit-scrollbar,
@@ -836,16 +837,16 @@
 .gdrive-pend-lista::-webkit-scrollbar-thumb,
 .gdrive-previa-lista::-webkit-scrollbar-thumb,
 .gdrive-folder-list::-webkit-scrollbar-thumb {
-  border: var(--bd-strong);
-  border-radius: var(--r-pill);
-  background-color: var(--cv-border);
+  border: 2px solid transparent;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-border-strong);
   background-clip: padding-box;
 }
 
 .gdrive-pend-lista::-webkit-scrollbar-thumb:hover,
 .gdrive-previa-lista::-webkit-scrollbar-thumb:hover,
 .gdrive-folder-list::-webkit-scrollbar-thumb:hover {
-  background-color: var(--cv-ink-muted);
+  background-color: var(--color-text-soft);
 }
 
 /* ── Tema escuro ──────────────────────────────────────────────────────────────
@@ -854,21 +855,30 @@
    redefinimos ESCOPADOS ao card do Drive, de modo que todas as regras acima
    passem a usar tons translúcidos que combinam com o navy do tema escuro.
    ------------------------------------------------------------------------------ */
- .gdrive-body {
+html[data-theme="dark"] .gdrive-body {
   /* Verde (pasta selecionada, status concluído) */
+  --color-success: #5bd6a4;
+  --color-success-soft: rgba(34, 170, 120, 0.14);
+  --color-success-border-soft: rgba(66, 200, 148, 0.40);
 
   /* Vermelho (status com erro, desconectar) */
+  --color-danger: #ff9a90;
+  --color-danger-soft: rgba(210, 70, 60, 0.16);
+  --color-danger-border-soft: rgba(235, 110, 100, 0.42);
 
   /* Azul (aba ativa, pasta destacada, links, barra de progresso) */
+  --color-primary-bright: #5aa6e6;
+  --color-primary-soft: rgba(60, 130, 205, 0.22);
 
   /* Vermelho do Desconectar mais vivo no escuro (não o dark-red apagado) */
+  --gd-unlink: #ff6a5e;
 }
 
 /* Trilha do segmented control no escuro: navy recuado (não o quase-preto do
    --color-bg), com a aba ativa numa superfície mais clara por cima. */
- .gdrive-root-tabs {
-  background: var(--cv-surface-block);
-  box-shadow: var(--sh-sm);
+html[data-theme="dark"] .gdrive-root-tabs {
+  background: #101c2b;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 /* ── Responsivo ───────────────────────────────────────────────────────────── */

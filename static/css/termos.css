@@ -1,7 +1,7 @@
 /* Cadastro de termos — shell alinhado ao wizard de ofícios */
 
 .document-form-page .travel-document-wizard__main {
-  gap: var(--sp-5);
+  gap: var(--space-5);
 }
 
 .document-form .cv-form-section-card,
@@ -20,27 +20,27 @@
 
 /* Mesmo ritmo do picker de Documentos vinculados (Eventos):
    busca e lista próximas (8px), sem gap do grid (select oculto no meio). */
-
+:is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker.cv-search-picker--people.cv-search-picker--roster,
 .document-form-page .related-route-picker.termo-oficio-picker.cv-search-picker--people.cv-search-picker--roster,
 .termo-oficio-picker.cv-search-picker--people.cv-search-picker--roster {
-  gap: 0;
+  gap: 0 !important;
 }
 
 .termo-oficio-picker .cv-search-picker__field,
-
+:is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker
   .cv-search-picker__field {
-  gap: 7px;
+  gap: 7px !important;
 }
 
 .termo-oficio-summary-panel {
   background: transparent;
-  border: var(--bd-0);
-  border-radius: var(--r-0);
-  box-shadow: var(--sh-none);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   margin-top: 0;
   padding: 0;
 }
@@ -50,12 +50,12 @@
 .termo-oficio-picker .roteiro-editor__route-list,
 .termo-oficio-summary-panel .cv-search-picker__selected-list,
 .termo-oficio-summary-panel .related-route-list,
-
+:is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker
   :is(.cv-search-picker__selected-list, #termo-oficio-lista, #os-oficio-lista) {
   display: grid;
-  gap: 8px;
+  gap: 8px !important;
   margin-top: 8px;
   max-height: 280px;
   overflow: auto;
@@ -79,7 +79,7 @@
 }
 
 .termo-evento-periodo {
-  margin-bottom: var(--sp-4);
+  margin-bottom: var(--space-4);
 }
 
 /* Dentro do stack: o gap já separa as seções — evita margem/padding extras. */
@@ -94,12 +94,12 @@
 
 /* Compat: formulários antigos / preview cadastro */
 .termos-page .main-form-panel {
-  gap: var(--sp-5);
+  gap: var(--space-5);
 }
 
 .termo-card__body {
   display: grid;
-  gap: var(--sp-4);
+  gap: var(--space-4);
 }
 
 /* ── Card da lista: no maximo 2 colunas ──

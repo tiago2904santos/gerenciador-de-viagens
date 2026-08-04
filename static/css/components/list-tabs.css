@@ -3,21 +3,22 @@
 .cv-list-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sp-2);
+  gap: var(--space-2, 8px);
   margin: 0;
   padding: 0;
 }
 
 /* Toolbar: abas + paginação soltos (sem card/caixa envolvente). */
 .list-toolbar {
+  --list-toolbar-h: 44px;
   align-items: center;
   background: transparent;
-  border: var(--bd-0);
-  border-radius: var(--r-0);
-  box-shadow: var(--sh-none);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sp-2);
+  gap: var(--space-2, 8px);
   justify-content: space-between;
   padding: 0;
   width: 100%;
@@ -27,10 +28,10 @@
 .cv-page--collection > .list-toolbar,
 .cv-collection-panel > .list-toolbar {
   background: transparent;
-  border: var(--bd-0);
-  box-shadow: var(--sh-none);
-  margin-top: calc(-1 * var(--sp-1));
-  padding: 0;
+  border: 0;
+  box-shadow: none;
+  margin-top: calc(-1 * var(--space-1, 4px));
+  padding: var(--space-3, 12px) 0 var(--space-1, 4px);
 }
 
 .cv-collection-panel > .list-toolbar {
@@ -75,106 +76,130 @@
 
 .list-toolbar .pagination-shell__controls {
   box-sizing: border-box;
-  height: 44px;
-  min-height: 44px;
-  padding: var(--sp-1);
+  height: var(--list-toolbar-h);
+  min-height: var(--list-toolbar-h);
+  padding: 3px;
 }
 
 .list-toolbar :is(.pagination-shell__nav, .pagination-shell__page) {
   box-sizing: border-box;
-  height: calc(44px - 6px);
-  min-height: calc(44px - 6px);
-  min-width: calc(44px - 6px);
-  width: calc(44px - 6px);
+  height: calc(var(--list-toolbar-h) - 6px);
+  min-height: calc(var(--list-toolbar-h) - 6px);
+  min-width: calc(var(--list-toolbar-h) - 6px);
+  width: calc(var(--list-toolbar-h) - 6px);
 }
 
 /* Conexão visual com o header flat: abas logo abaixo do divisor. */
 .page-shell--list > .cv-list-tabs,
 .cv-page--collection > .cv-list-tabs {
-  margin-top: calc(-1 * var(--sp-1));
-  padding-bottom: var(--sp-1);
-  padding-top: var(--sp-3);
+  margin-top: calc(-1 * var(--space-1, 4px));
+  padding-bottom: var(--space-1, 4px);
+  padding-top: var(--space-3, 12px);
 }
 
 .cv-list-tab {
+  --cv-list-tab-bg: var(--color-surface-soft, rgba(255, 255, 255, 0.04));
+  --cv-list-tab-border: var(--color-border, rgba(255, 255, 255, 0.12));
+  --cv-list-tab-color: var(--color-text-secondary, rgba(255, 255, 255, 0.7));
+  --cv-list-tab-hover-bg: var(--color-surface-strong, rgba(255, 255, 255, 0.08));
+  --cv-list-tab-hover-border: var(--color-border-strong, rgba(255, 255, 255, 0.2));
+  --cv-list-tab-hover-color: var(--color-text, #fff);
+  --cv-list-tab-count-bg: var(--color-surface-strong, rgba(255, 255, 255, 0.1));
+  --cv-list-tab-active-bg: var(--color-primary-soft, rgba(99, 165, 255, 0.16));
+  --cv-list-tab-active-border: var(--color-primary-bright, rgba(99, 165, 255, 0.6));
+  --cv-list-tab-active-color: var(--color-primary-bright, #63a5ff);
+  --cv-list-tab-active-count-bg: var(--color-primary-bright, #63a5ff);
+  --cv-list-tab-active-count-color: var(--color-white, #fff);
   align-items: center;
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-pill);
+  background: var(--cv-list-tab-bg);
+  border: 1px solid var(--cv-list-tab-border);
+  border-radius: var(--radius-pill, 999px);
   box-sizing: border-box;
-  color: var(--cv-ink);
+  color: var(--cv-list-tab-color);
   display: inline-flex;
-  font-size: 14px;
+  font-size: var(--font-size-sm, 0.875rem);
   font-weight: 600;
-  gap: var(--sp-2);
+  gap: var(--space-2, 8px);
   line-height: 1;
-  min-height: 44px;
-  padding: var(--sp-2) var(--sp-3);
+  min-height: var(--list-toolbar-h, 44px);
+  padding: 0 14px;
   text-decoration: none;
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .cv-list-tab:hover,
 .cv-list-tab:focus-visible {
-  background: var(--cv-surface-block);
-  border-color: var(--cv-border);
-  color: var(--cv-ink);
+  background: var(--cv-list-tab-hover-bg);
+  border-color: var(--cv-list-tab-hover-border);
+  color: var(--cv-list-tab-hover-color);
   outline: none;
 }
 
 .cv-list-tab--active {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
-  color: var(--color-accent);
+  background: var(--cv-list-tab-active-bg);
+  border-color: var(--cv-list-tab-active-border);
+  color: var(--cv-list-tab-active-color);
 }
 
 .cv-list-tab__count {
-  background: var(--cv-surface-card);
-  border-radius: var(--r-pill);
+  background: var(--cv-list-tab-count-bg);
+  border-radius: var(--radius-pill, 999px);
   color: inherit;
-  font-size: 11px;
+  font-size: var(--font-size-2xs, 0.72rem);
   font-variant-numeric: tabular-nums;
   min-width: 1.5em;
-  padding: var(--sp-1);
+  padding: 2px 7px;
   text-align: center;
 }
 
 .cv-list-tab--active .cv-list-tab__count {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  color: var(--color-accent);
+  background: var(--cv-list-tab-active-count-bg);
+  color: var(--cv-list-tab-active-count-color);
 }
 
-
+:is(html[data-theme="dark"])
   .cv-list-tab {
+  --cv-list-tab-bg: var(--color-card-soft);
+  --cv-list-tab-border: var(--color-border-soft);
+  --cv-list-tab-color: var(--theme-text-muted, #b8c8dc);
+  --cv-list-tab-hover-bg: color-mix(in srgb, var(--color-card-soft) 82%, #fff 18%);
+  --cv-list-tab-hover-border: var(--color-border-strong, rgba(214, 227, 244, 0.5));
+  --cv-list-tab-hover-color: var(--color-muted-strong, #d3dfef);
+  --cv-list-tab-count-bg: rgba(255, 255, 255, 0.12);
+  --cv-list-tab-active-bg: var(--color-accent-soft, #3b3320);
+  --cv-list-tab-active-border: var(--color-accent-border-strong, #a5851f);
+  --cv-list-tab-active-color: #f3d680;
+  --cv-list-tab-active-count-bg: var(--color-accent, #d8a21b);
+  --cv-list-tab-active-count-color: #211806;
 }
 
 /* Aba ativa: hover sobe no dourado (não vai para branco) e sem barra esquerda. */
-
+:is(html[data-theme="dark"])
   .cv-list-tab--active:is(:hover, :focus-visible) {
-  background: color-mix(in srgb, var(--color-accent) 72%, var(--color-accent) 28%);
-  border-color: var(--color-accent);
-  box-shadow: var(--sh-none);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent-soft, #3b3320) 72%, var(--color-accent, #d8a21b) 28%);
+  border-color: var(--color-accent-hover, #e0ab3c);
+  box-shadow: none;
+  color: var(--color-accent-hover, #e0ab3c);
 }
 
-
+:is(html[data-theme="dark"])
   .cv-list-tab:focus-visible {
-  box-shadow: var(--sh-sm);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-focus, #74aae0) 28%, transparent);
 }
 
-
+:is(html[data-theme="dark"])
   .cv-list-tab--active:focus-visible {
-  box-shadow: var(--sh-sm);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent, #d8a21b) 32%, transparent);
 }
 
 @media (max-width: 600px) {
-
+  :is(html[data-theme="dark"])
     .cv-list-tabs {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-
+  :is(html[data-theme="dark"])
     .cv-list-tab {
     justify-content: space-between;
     min-width: 0;
@@ -196,7 +221,7 @@
 }
 
 @media (max-width: 420px) {
-
+  :is(html[data-theme="dark"])
     .cv-list-tabs {
     grid-template-columns: minmax(0, 1fr);
   }

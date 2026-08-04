@@ -5,28 +5,138 @@
    ========================================================================== */
 
 :root {
+  --action-height: var(--control-height-md);
+  --action-radius: 12px;
+  --action-radius-sm: 10px;
+  --action-group-radius: 16px;
+  --action-gap: 7px;
+  --action-padding-x: 15px;
+  --action-font-size: 0.84rem;
+  --action-font-weight: 720;
 
+  --action-bg: #ffffff;
+  --action-bg-soft: #f3f7fb;
+  --action-bg-hover: #eaf2f9;
+  --action-border: #c8d6e5;
+  --action-border-strong: #9fb5cb;
+  --action-text: #24445f;
+  --action-text-strong: #102f4b;
+  --action-muted: #627b92;
 
+  --action-primary-bg: linear-gradient(145deg, #1769aa, #0f568f);
+  --action-primary-hover-bg: linear-gradient(145deg, #1d75bb, #125f9d);
+  --action-primary-border: #0d4c80;
+  --action-primary-text: #ffffff;
+  --action-primary-shadow: 0 7px 18px rgba(15, 86, 143, 0.2);
 
+  --action-danger-bg: #fff2f0;
+  --action-danger-hover-bg: #ffe7e3;
+  --action-danger-border: #e3a49d;
+  --action-danger-text: #a23b31;
 
+  --action-success-bg: #edf8f2;
+  --action-success-hover-bg: #e0f2e8;
+  --action-success-border: #98c8ae;
+  --action-success-text: #236b4a;
 
+  --action-warning-bg: #fff8e9;
+  --action-warning-hover-bg: #fff0cd;
+  --action-warning-border: #dfc07a;
+  --action-warning-text: #876317;
 
+  --action-info-bg: #edf5fb;
+  --action-info-hover-bg: #e0eef8;
+  --action-info-border: #a8c4db;
+  --action-info-text: #315f84;
 
+  --action-pdf-bg: #fff0ed;
+  --action-pdf-border: #e68a7f;
+  --action-pdf-text: #b72f27;
+  --action-docx-bg: #eaf2ff;
+  --action-docx-border: #78a9e3;
+  --action-docx-text: #125da8;
+  --action-preview-bg: #e4faf7;
+  --action-preview-border: #69c9bd;
+  --action-preview-text: #08776e;
+  --action-edit-bg: #f1f4f7;
+  --action-edit-border: #b8c5d0;
+  --action-edit-text: #4b6275;
 
+  --action-focus: 0 0 0 3px rgba(28, 113, 178, 0.22);
+  --action-shadow: 0 3px 10px rgba(21, 55, 86, 0.08);
+  --action-shadow-hover: 0 7px 17px rgba(21, 55, 86, 0.13);
 
+  --action-group-bg: rgba(244, 248, 252, 0.9);
+  --action-group-border: rgba(151, 174, 197, 0.38);
+  --action-group-shadow: 0 5px 16px rgba(21, 55, 86, 0.07);
 
+  --action-modal-bg: rgba(255, 255, 255, 0.985);
+  --action-modal-border: rgba(151, 174, 197, 0.5);
+  --action-modal-shadow: 0 28px 80px rgba(8, 28, 47, 0.3);
+  --action-modal-backdrop: rgba(7, 18, 31, 0.68);
 }
 
-:root {
+html[data-theme="dark"] {
+  --action-bg: #172638;
+  --action-bg-soft: #132131;
+  --action-bg-hover: #20354a;
+  --action-border: #385068;
+  --action-border-strong: #55728e;
+  --action-text: #d4e2ef;
+  --action-text-strong: #f3f8fc;
+  --action-muted: #9eb1c4;
 
+  --action-primary-bg: linear-gradient(145deg, #205f8f, #16486f);
+  --action-primary-hover-bg: linear-gradient(145deg, #286fa4, #1b557f);
+  --action-primary-border: #3f7096;
+  --action-primary-text: #ffffff;
+  --action-primary-shadow: 0 7px 18px rgba(0, 0, 0, 0.22);
 
+  --action-danger-bg: #382322;
+  --action-danger-hover-bg: #472927;
+  --action-danger-border: #7e4b47;
+  --action-danger-text: #f1b5ae;
 
+  --action-success-bg: #19352e;
+  --action-success-hover-bg: #20433a;
+  --action-success-border: #426f60;
+  --action-success-text: #a9dec7;
 
+  --action-warning-bg: #362f20;
+  --action-warning-hover-bg: #443a25;
+  --action-warning-border: #72613a;
+  --action-warning-text: #e5cb89;
 
+  --action-info-bg: #192d40;
+  --action-info-hover-bg: #20394f;
+  --action-info-border: #426581;
+  --action-info-text: #b1d1e9;
 
+  --action-pdf-bg: #442326;
+  --action-pdf-border: #a84f55;
+  --action-pdf-text: #ffaaa4;
+  --action-docx-bg: #173559;
+  --action-docx-border: #397dc0;
+  --action-docx-text: #9ed0ff;
+  --action-preview-bg: #103b3b;
+  --action-preview-border: #2d8f87;
+  --action-preview-text: #91e5dc;
+  --action-edit-bg: #202d39;
+  --action-edit-border: #50677a;
+  --action-edit-text: #bfd0de;
 
+  --action-focus: 0 0 0 3px rgba(100, 177, 232, 0.25);
+  --action-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  --action-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.26);
 
+  --action-group-bg: rgba(15, 29, 43, 0.84);
+  --action-group-border: rgba(91, 120, 147, 0.34);
+  --action-group-shadow: 0 7px 20px rgba(0, 0, 0, 0.18);
 
+  --action-modal-bg: rgba(15, 29, 43, 0.985);
+  --action-modal-border: rgba(102, 135, 164, 0.36);
+  --action-modal-shadow: 0 30px 86px rgba(0, 0, 0, 0.58);
+  --action-modal-backdrop: rgba(2, 8, 15, 0.78);
 }
 
 /* Text buttons: novo e legado compartilham a mesma geometria. */
@@ -34,20 +144,20 @@
 .btn,
 .app-btn {
   align-items: center;
-  border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  border: 1px solid var(--action-border);
+  border-radius: var(--action-radius);
+  box-shadow: var(--action-shadow);
   box-sizing: border-box;
   cursor: pointer;
   display: inline-flex;
-  font-family: "Segoe UI", Arial, sans-serif;
-  font-size: 0.84rem;
-  font-weight: 720;
-  gap: var(--sp-2);
+  font-family: var(--font-sans);
+  font-size: var(--action-font-size);
+  font-weight: var(--action-font-weight);
+  gap: var(--action-gap);
   justify-content: center;
   line-height: 1;
-  min-height: 48px;
-  padding: var(--sp-2) var(--sp-3);
+  min-height: var(--action-height);
+  padding: 0 var(--action-padding-x);
   text-decoration: none;
   transition:
     background-color 150ms ease,
@@ -61,21 +171,21 @@
 .cv-btn:hover,
 .btn:hover,
 .app-btn:hover {
-  box-shadow: var(--sh-md);
+  box-shadow: var(--action-shadow-hover);
   transform: translateY(-1px);
 }
 
 .cv-btn:active,
 .btn:active,
 .app-btn:active {
-  box-shadow: var(--sh-md);
+  box-shadow: var(--action-shadow);
   transform: translateY(0);
 }
 
 .cv-btn:focus-visible,
 .btn:focus-visible,
 .app-btn:focus-visible {
-  box-shadow: var(--sh-md);
+  box-shadow: var(--action-focus), var(--action-shadow);
   outline: none;
 }
 
@@ -85,7 +195,7 @@
 .btn[aria-disabled="true"],
 .app-btn:disabled,
 .app-btn[aria-disabled="true"] {
-  box-shadow: var(--sh-none);
+  box-shadow: none;
   cursor: not-allowed;
   opacity: 0.48;
   pointer-events: none;
@@ -97,10 +207,10 @@
 .cv-btn--next,
 .btn-primary,
 .app-btn--primary {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
-  box-shadow: var(--sh-md);
-  color: var(--color-accent);
+  background: var(--action-primary-bg);
+  border-color: var(--action-primary-border);
+  box-shadow: var(--action-primary-shadow);
+  color: var(--action-primary-text);
 }
 
 .cv-btn--primary:hover,
@@ -113,9 +223,9 @@
 .btn-primary:focus,
 .app-btn--primary:hover,
 .app-btn--primary:focus {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
-  color: var(--color-accent);
+  background: var(--action-primary-hover-bg);
+  border-color: var(--action-primary-border);
+  color: var(--action-primary-text);
 }
 
 .cv-btn--secondary,
@@ -131,10 +241,10 @@
 .btn-muted,
 .app-btn--secondary,
 .app-btn--muted {
-  background: var(--cv-surface-card);
-  border-color: var(--cv-border);
-  box-shadow: var(--sh-md);
-  color: var(--cv-ink);
+  background: var(--action-bg);
+  border-color: var(--action-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-text);
 }
 
 .cv-btn--secondary:hover,
@@ -150,25 +260,25 @@
 .btn-muted:hover,
 .app-btn--secondary:hover,
 .app-btn--muted:hover {
-  background: var(--cv-surface-block);
-  border-color: var(--cv-border);
-  color: var(--cv-ink);
+  background: var(--action-bg-hover);
+  border-color: var(--action-border-strong);
+  color: var(--action-text-strong);
 }
 
 .cv-btn--ghost,
 .btn--ghost {
   background: transparent;
   border-color: transparent;
-  box-shadow: var(--sh-none);
-  color: var(--cv-ink);
+  box-shadow: none;
+  color: var(--action-text);
 }
 
 .cv-btn--ghost:hover,
 .btn--ghost:hover {
-  background: var(--cv-surface-block);
+  background: var(--action-bg-soft);
   border-color: transparent;
-  box-shadow: var(--sh-none);
-  color: var(--cv-ink);
+  box-shadow: none;
+  color: var(--action-text-strong);
   transform: none;
 }
 
@@ -176,68 +286,68 @@
 .cv-btn--soft-danger,
 .btn-danger,
 .app-btn--danger {
-  background: color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--cv-state-danger) 55%, var(--cv-border));
-  box-shadow: var(--sh-none);
-  color: var(--cv-state-danger);
+  background: var(--action-danger-bg);
+  border-color: var(--action-danger-border);
+  box-shadow: none;
+  color: var(--action-danger-text);
 }
 
 .cv-btn--danger:hover,
 .cv-btn--soft-danger:hover,
 .btn-danger:hover,
 .app-btn--danger:hover {
-  background: color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--cv-state-danger) 55%, var(--cv-border));
-  color: var(--cv-state-danger);
+  background: var(--action-danger-hover-bg);
+  border-color: var(--action-danger-border);
+  color: var(--action-danger-text);
 }
 
 .cv-btn--primary-success {
-  background: color-mix(in srgb, var(--cv-state-success) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--cv-state-success) 55%, var(--cv-border));
-  box-shadow: var(--sh-none);
-  color: var(--cv-state-success);
+  background: var(--action-success-bg);
+  border-color: var(--action-success-border);
+  box-shadow: none;
+  color: var(--action-success-text);
 }
 
 .cv-btn--primary-success:hover {
-  background: color-mix(in srgb, var(--cv-state-success) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--cv-state-success) 55%, var(--cv-border));
-  color: var(--cv-state-success);
+  background: var(--action-success-hover-bg);
+  border-color: var(--action-success-border);
+  color: var(--action-success-text);
 }
 
 .cv-btn--preview,
 .cv-btn--tool {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
-  box-shadow: var(--sh-none);
-  color: var(--color-accent);
+  background: var(--action-info-bg);
+  border-color: var(--action-info-border);
+  box-shadow: none;
+  color: var(--action-info-text);
 }
 
 .cv-btn--preview:hover,
 .cv-btn--tool:hover {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
-  color: var(--color-accent);
+  background: var(--action-info-hover-bg);
+  border-color: var(--action-info-border);
+  color: var(--action-info-text);
 }
 
 .cv-btn--pdf,
 .cv-btn--docx {
-  background: var(--cv-surface-card);
-  border-color: var(--cv-border);
-  box-shadow: var(--sh-md);
-  color: var(--cv-ink);
+  background: var(--action-bg);
+  border-color: var(--action-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-text);
 }
 
 .cv-btn--pdf .cv-btn__icon {
-  color: var(--cv-state-danger);
+  color: var(--action-danger-text);
 }
 
 .cv-btn--docx .cv-btn__icon {
-  color: var(--color-accent);
+  color: var(--action-info-text);
 }
 
 .cv-btn--xs,
 .btn--compact {
-  border-radius: var(--r-sm);
+  border-radius: 9px;
   min-height: 30px;
   padding-inline: 9px;
 }
@@ -246,7 +356,7 @@
 .btn-sm,
 .btn--sm,
 .app-btn--sm {
-  border-radius: var(--r-sm);
+  border-radius: var(--action-radius-sm);
   min-height: 34px;
   padding-inline: 11px;
 }
@@ -259,10 +369,10 @@
 
 /* Icon buttons: cores semanticas suaves, legiveis nos dois temas. */
 .cv-icon-btn {
-  background: var(--cv-surface-card);
-  border-color: var(--cv-border);
-  box-shadow: var(--sh-md);
-  color: var(--cv-ink);
+  background: var(--action-bg);
+  border-color: var(--action-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-text);
   transition:
     background-color 150ms ease,
     border-color 150ms ease,
@@ -273,28 +383,28 @@
 
 .cv-icon-btn:hover,
 .cv-icon-btn:focus {
-  background: var(--cv-surface-block);
-  border-color: var(--cv-border);
-  box-shadow: var(--sh-md);
-  color: var(--cv-ink);
+  background: var(--action-bg-hover);
+  border-color: var(--action-border-strong);
+  box-shadow: var(--action-shadow-hover);
+  color: var(--action-text-strong);
   transform: translateY(-1px);
 }
 
 .cv-icon-btn:active {
-  box-shadow: var(--sh-md);
+  box-shadow: var(--action-shadow);
   transform: translateY(0);
 }
 
 .cv-icon-btn--delete {
-  background: color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--cv-state-danger) 55%, var(--cv-border));
-  color: var(--cv-state-danger);
+  background: var(--action-danger-bg);
+  border-color: var(--action-danger-border);
+  color: var(--action-danger-text);
 }
 
 .cv-icon-btn--cancel {
-  background: color-mix(in srgb, var(--cv-state-warning) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--cv-state-warning) 55%, var(--cv-border));
-  color: var(--cv-state-warning);
+  background: var(--action-warning-bg);
+  border-color: var(--action-warning-border);
+  color: var(--action-warning-text);
 }
 
 .cv-icon-btn--complete,
@@ -302,81 +412,81 @@
 .cv-icon-btn--edit.is-assinado,
 .cv-icon-btn--settings.is-assinado,
 .cv-icon-btn--whatsapp {
-  background: color-mix(in srgb, var(--cv-state-success) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--cv-state-success) 55%, var(--cv-border));
-  box-shadow: var(--sh-md);
-  color: var(--cv-state-success);
+  background: var(--action-success-bg);
+  border-color: var(--action-success-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-success-text);
 }
 
 .cv-icon-btn--preview {
-  background: var(--cv-surface-card);
-  border-color: var(--cv-border);
-  box-shadow: var(--sh-md);
-  color: var(--cv-ink);
+  background: var(--action-preview-bg);
+  border-color: var(--action-preview-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-preview-text);
 }
 
 .cv-icon-btn--docx {
-  background: var(--cv-surface-card);
-  border-color: var(--cv-border);
-  box-shadow: var(--sh-md);
-  color: var(--cv-ink);
+  background: var(--action-docx-bg);
+  border-color: var(--action-docx-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-docx-text);
 }
 
 .cv-icon-btn--documents {
-  background: color-mix(in srgb, var(--cv-state-warning) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--cv-state-warning) 55%, var(--cv-border));
-  box-shadow: var(--sh-md);
-  color: var(--cv-state-warning);
+  background: var(--action-warning-bg);
+  border-color: var(--action-warning-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-warning-text);
 }
 
 .cv-icon-btn--edit:not(.is-assinado),
 .cv-icon-btn--settings:not(.is-assinado),
 .cv-icon-btn--signature {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
-  box-shadow: var(--sh-md);
-  color: var(--color-accent);
+  background: var(--action-info-bg);
+  border-color: var(--action-info-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-info-text);
 }
 
 .cv-icon-btn--pdf {
-  background: var(--cv-surface-card);
-  border-color: var(--cv-border);
-  box-shadow: var(--sh-md);
-  color: var(--cv-ink);
+  background: var(--action-pdf-bg);
+  border-color: var(--action-pdf-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-pdf-text);
 }
 
 .cv-icon-btn--archive {
-  background: var(--cv-surface-card);
-  border-color: var(--cv-border);
-  color: var(--cv-ink);
+  background: var(--action-bg);
+  border-color: var(--action-border);
+  color: var(--action-text);
 }
 
 .cv-icon-btn--pdf:hover,
 .cv-icon-btn--pdf:focus {
-  background: color-mix(in srgb, var(--cv-surface-card) 82%, var(--cv-ink) 18%);
-  border-color: var(--cv-state-danger);
-  color: var(--cv-ink);
+  background: color-mix(in srgb, var(--action-pdf-bg) 82%, var(--action-pdf-text) 18%);
+  border-color: var(--action-pdf-text);
+  color: var(--action-pdf-text);
 }
 
 .cv-icon-btn--docx:hover,
 .cv-icon-btn--docx:focus {
-  background: color-mix(in srgb, var(--cv-surface-card) 82%, var(--cv-ink) 18%);
-  border-color: var(--color-accent);
-  color: var(--cv-ink);
+  background: color-mix(in srgb, var(--action-docx-bg) 82%, var(--action-docx-text) 18%);
+  border-color: var(--action-docx-text);
+  color: var(--action-docx-text);
 }
 
 .cv-icon-btn--preview:hover,
 .cv-icon-btn--preview:focus {
-  background: color-mix(in srgb, var(--cv-surface-card) 82%, var(--cv-ink) 18%);
-  border-color: var(--cv-state-success);
-  color: var(--cv-ink);
+  background: color-mix(in srgb, var(--action-preview-bg) 82%, var(--action-preview-text) 18%);
+  border-color: var(--action-preview-text);
+  color: var(--action-preview-text);
 }
 
 .cv-icon-btn--edit:not(.is-assinado):hover,
 .cv-icon-btn--edit:not(.is-assinado):focus {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
-  color: var(--color-accent);
+  background: var(--action-info-hover-bg);
+  border-color: var(--action-info-border);
+  color: var(--action-info-text);
 }
 
 .cv-icon-btn--edit.is-assinado:hover,
@@ -385,30 +495,30 @@
 .cv-icon-btn--settings.is-assinado:focus,
 .cv-icon-btn--sign.is-assinado:hover,
 .cv-icon-btn--sign.is-assinado:focus {
-  background: color-mix(in srgb, var(--cv-state-success) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--cv-state-success) 55%, var(--cv-border));
-  color: var(--cv-state-success);
+  background: var(--action-success-hover-bg);
+  border-color: var(--action-success-border);
+  color: var(--action-success-text);
 }
 
 /* Agrupamentos: uma unica superficie reduz ruido e organiza a hierarquia. */
 .cv-btn-group,
 .btn-group {
   align-items: center;
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  background: var(--action-group-bg);
+  border: 1px solid var(--action-group-border);
+  border-radius: var(--action-group-radius);
+  box-shadow: var(--action-group-shadow);
   display: inline-flex;
   flex-wrap: wrap;
   gap: 4px;
-  padding: var(--sp-1);
+  padding: 4px;
 }
 
 .cv-icon-btn-group {
   align-items: center;
   background: transparent;
-  border: var(--bd-0);
-  box-shadow: var(--sh-none);
+  border: 0;
+  box-shadow: none;
   display: inline-flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -419,37 +529,37 @@
 .btn-group .btn,
 .btn-group .app-btn,
 .cv-icon-btn-group .cv-icon-btn {
-  box-shadow: var(--sh-none);
+  box-shadow: none;
 }
 
 /* Menus globais com a mesma linguagem dos grupos. */
 .cv-action-menu {
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-lg);
+  background: var(--action-modal-bg);
+  border: 1px solid var(--action-modal-border);
+  border-radius: 16px;
+  box-shadow: 0 20px 52px rgba(5, 22, 38, 0.28);
   gap: 4px;
-  padding: var(--sp-2);
+  padding: 8px;
 }
 
- .cv-action-menu {
-  box-shadow: var(--sh-lg);
+html[data-theme="dark"] .cv-action-menu {
+  box-shadow: 0 22px 58px rgba(0, 0, 0, 0.5);
 }
 
 .cv-action-menu__item {
-  border: var(--bd);
-  border-radius: var(--r-sm);
-  color: var(--cv-ink);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--action-text);
   min-height: 38px;
-  padding: var(--sp-2);
+  padding: 8px 10px;
   transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
 }
 
 .cv-action-menu__item:hover,
 .cv-action-menu__item:focus-visible {
-  background: var(--cv-surface-block);
-  border-color: var(--cv-border);
-  color: var(--cv-ink);
+  background: var(--action-bg-hover);
+  border-color: var(--action-border);
+  color: var(--action-text-strong);
   outline: none;
 }
 
@@ -457,25 +567,25 @@
 .cv-action-menu--rich {
   gap: 5px;
   min-width: 276px;
-  padding: var(--sp-2);
+  padding: 10px;
 }
 
 .cv-action-menu__heading {
   align-items: center;
-  border-bottom: 1px solid var(--cv-border);
+  border-bottom: 1px solid var(--action-group-border);
   display: flex;
   gap: 10px;
-  margin: 0 0 var(--sp-1);
-  padding: var(--sp-1);
+  margin: 0 2px 5px;
+  padding: 4px 5px 10px;
 }
 
 .cv-action-menu__heading-icon,
 .cv-action-menu__item-icon {
   align-items: center;
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  border: var(--bd);
-  border-radius: var(--r-sm);
-  color: var(--color-accent);
+  background: var(--action-info-bg);
+  border: 1px solid var(--action-info-border);
+  border-radius: 10px;
+  color: var(--action-info-text);
   display: inline-flex;
   flex: 0 0 34px;
   height: 34px;
@@ -497,7 +607,7 @@
 
 .cv-action-menu__heading-copy strong,
 .cv-action-menu__item-copy strong {
-  color: var(--cv-ink);
+  color: var(--action-text-strong);
   font-size: 0.84rem;
   font-weight: 760;
   line-height: 1.2;
@@ -505,67 +615,67 @@
 
 .cv-action-menu__heading-copy small,
 .cv-action-menu__item-copy small {
-  color: var(--cv-ink-muted);
+  color: var(--action-muted);
   font-size: 0.68rem;
   line-height: 1.35;
   margin-top: 2px;
 }
 
 .cv-action-menu__item--rich {
-  border: var(--bd);
-  border-radius: var(--r-md);
+  border: 1px solid transparent;
+  border-radius: 11px;
   gap: 10px;
   min-height: 52px;
-  padding: var(--sp-2);
+  padding: 7px;
   text-decoration: none;
 }
 
 .cv-action-menu__item--rich:hover,
 .cv-action-menu__item--rich:focus-visible {
-  background: var(--cv-surface-block);
-  border-color: var(--cv-border);
+  background: var(--action-bg-hover);
+  border-color: var(--action-border);
 }
 
 .cv-action-menu__item-icon--pdf {
-  background: color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--cv-state-danger) 55%, var(--cv-border));
-  color: var(--cv-state-danger);
+  background: var(--action-pdf-bg);
+  border-color: var(--action-pdf-border);
+  color: var(--action-pdf-text);
 }
 
 .cv-action-menu__item-icon--docx {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
-  color: var(--color-accent);
+  background: var(--action-docx-bg);
+  border-color: var(--action-docx-border);
+  color: var(--action-docx-text);
 }
 
 .cv-action-menu__item-icon--preview {
-  background: color-mix(in srgb, var(--cv-state-success) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--cv-state-success) 55%, var(--cv-border));
-  color: var(--cv-state-success);
+  background: var(--action-preview-bg);
+  border-color: var(--action-preview-border);
+  color: var(--action-preview-text);
 }
 
 .cv-action-menu__item-icon--edit {
-  background: var(--cv-surface-block);
-  border-color: var(--cv-border);
-  color: var(--cv-ink-muted);
+  background: var(--action-edit-bg);
+  border-color: var(--action-edit-border);
+  color: var(--action-edit-text);
 }
 
 .cv-action-menu__item-icon--danger {
-  background: color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--cv-state-danger) 55%, var(--cv-border));
-  color: var(--cv-state-danger);
+  background: var(--action-danger-bg);
+  border-color: var(--action-danger-border);
+  color: var(--action-danger-text);
 }
 
 .cv-action-menu__item-icon--warning {
-  background: color-mix(in srgb, var(--cv-state-warning) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--cv-state-warning) 55%, var(--cv-border));
-  color: var(--cv-state-warning);
+  background: var(--action-warning-bg);
+  border-color: var(--action-warning-border);
+  color: var(--action-warning-text);
 }
 
 .cv-action-menu__item-icon--success {
-  background: color-mix(in srgb, var(--cv-state-success) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--cv-state-success) 55%, var(--cv-border));
-  color: var(--cv-state-success);
+  background: var(--action-success-bg);
+  border-color: var(--action-success-border);
+  color: var(--action-success-text);
 }
 
 .cv-action-menu__item--rich.is-disabled,
@@ -577,19 +687,19 @@
 
 /* Modal shell global. */
 .delete-confirm-modal__backdrop {
-  background: var(--cv-ink);
+  background: var(--action-modal-backdrop);
   backdrop-filter: blur(10px) saturate(0.85);
 }
 
 .delete-confirm-modal__dialog {
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-xl);
-  box-shadow: var(--sh-md);
+  background: var(--action-modal-bg);
+  border: 1px solid var(--action-modal-border);
+  border-radius: 24px;
+  box-shadow: var(--action-modal-shadow);
   gap: 18px;
   max-width: min(100%, 560px);
   overflow: hidden;
-  padding: var(--sp-4) var(--sp-6);
+  padding: 24px;
 }
 
 .delete-confirm-modal__header {
@@ -598,39 +708,39 @@
 }
 
 .delete-confirm-modal__icon {
-  background: color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--cv-state-danger) 55%, var(--cv-border));
-  border-radius: var(--r-md);
-  color: var(--cv-state-danger);
+  background: var(--action-danger-bg);
+  border-color: var(--action-danger-border);
+  border-radius: 13px;
+  color: var(--action-danger-text);
   flex-basis: 46px;
   height: 46px;
   width: 46px;
 }
 
 .delete-confirm-modal__eyebrow {
-  color: var(--cv-ink-muted);
+  color: var(--action-muted);
   font-size: 0.68rem;
   letter-spacing: 0.13em;
 }
 
 .delete-confirm-modal__title {
-  color: var(--cv-ink);
+  color: var(--action-text-strong);
   font-size: 1.32rem;
   letter-spacing: -0.015em;
 }
 
 .delete-confirm-modal__message {
-  color: var(--cv-ink-muted);
+  color: var(--action-muted);
   font-size: 0.88rem;
   line-height: 1.65;
 }
 
 .delete-confirm-modal__message strong {
-  color: var(--cv-ink);
+  color: var(--action-text-strong);
 }
 
 .delete-confirm-modal__actions {
-  border-top: 1px solid var(--cv-border);
+  border-top: 1px solid var(--action-group-border);
   gap: 7px;
   padding-top: 16px;
 }
@@ -638,24 +748,26 @@
 /* Modal de documento assinado. */
 .attach-signed-modal__dialog.delete-confirm-modal__dialog,
 .attach-signed-modal__dialog {
-  background: var(--cv-surface-card);
+  --step1-surface: var(--cv-surface-card);
+  --step1-panel: var(--cv-surface-block);
+  background: var(--step1-surface);
   gap: 0;
   max-width: min(100%, 610px);
 }
 
- #attach-signed-modal .attach-signed-modal__dialog {
-  background: var(--cv-surface-card);
+html[data-theme="dark"] #attach-signed-modal .attach-signed-modal__dialog {
+  background: var(--step1-surface) !important;
 }
 
 .attach-signed-modal__dialog > .cv-dialog__header {
   /* Header mantém o tom do diálogo; o restante do painel é --step1-surface. */
-  margin: 0;
+  margin: -1px -1px 0;
 }
 
 .attach-signed-modal__icon {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
-  color: var(--color-accent);
+  background: var(--action-info-bg);
+  border-color: var(--action-info-border);
+  color: var(--action-info-text);
 }
 
 .attach-signed-modal__close {
@@ -666,20 +778,20 @@
 
 .attach-signed-modal__intro {
   align-items: flex-start;
-  background: var(--cv-surface-card);
-  border: var(--bd-0);
-  border-radius: var(--r-md);
-  color: var(--cv-ink-muted);
+  background: var(--step1-panel, var(--color-surface-soft));
+  border: 0;
+  border-radius: 15px;
+  color: var(--action-muted);
   display: flex;
   font-size: 0.84rem;
   gap: 10px;
   line-height: 1.55;
-  margin: 0 0 var(--sp-1);
-  padding: var(--sp-3);
+  margin: 0 0 4px;
+  padding: 10px 12px;
 }
 
 .attach-signed-modal__intro .cv-icon {
-  color: var(--color-accent);
+  color: var(--action-info-text);
   flex: 0 0 18px;
   height: 18px;
   margin-top: 2px;
@@ -706,19 +818,19 @@
 }
 
 .attach-signed-modal__kind-label {
-  color: var(--cv-ink);
+  color: var(--action-text-strong);
   font-size: 0.78rem;
   font-weight: 720;
 }
 
 .attach-signed-modal__kind-options {
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-md);
+  background: var(--step1-panel, var(--action-bg-soft));
+  border: 1px solid var(--action-border);
+  border-radius: 12px;
   display: grid;
   gap: 4px;
   grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
-  padding: var(--sp-1);
+  padding: 4px;
 }
 
 .attach-signed-modal__kind-option[hidden] {
@@ -727,28 +839,28 @@
 
 .attach-signed-modal__kind-option {
   background: transparent;
-  border: var(--bd-0);
-  border-radius: var(--r-sm);
-  color: var(--cv-ink-muted);
+  border: 0;
+  border-radius: 9px;
+  color: var(--action-muted);
   cursor: pointer;
   font: inherit;
   font-size: 0.78rem;
   font-weight: 720;
   min-height: 38px;
-  padding: var(--sp-2) var(--sp-3);
+  padding: 7px 12px;
 }
 
 .attach-signed-modal__kind-option:hover,
 .attach-signed-modal__kind-option:focus-visible {
-  background: var(--cv-surface-block);
-  color: var(--cv-ink);
+  background: var(--action-bg-hover);
+  color: var(--action-text);
   outline: none;
 }
 
 .attach-signed-modal__kind-option.is-active {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  box-shadow: var(--sh-sm);
-  color: var(--color-accent);
+  background: var(--action-info-bg);
+  box-shadow: inset 0 0 0 1px var(--action-info-border);
+  color: var(--action-info-text);
 }
 
 .attach-signed-modal__form > .app-form-field {
@@ -772,13 +884,13 @@
 /* Área de arquivo: --step1-panel, sem borda e sem hover. */
 .attach-signed-modal__form .prestacao-file-widget,
 .attach-signed-modal__form .cv-file-widget {
-  background: var(--cv-surface-card);
-  border: var(--bd-0);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-none);
+  background: var(--step1-panel, var(--color-surface-soft));
+  border: 0;
+  border-radius: 15px;
+  box-shadow: none;
   display: grid;
   gap: 8px;
-  padding: var(--sp-3);
+  padding: 13px;
   transition: none;
 }
 
@@ -786,17 +898,17 @@
 .attach-signed-modal__form .cv-file-widget:hover,
 .attach-signed-modal__form .prestacao-file-widget:focus-within,
 .attach-signed-modal__form .cv-file-widget:focus-within {
-  background: var(--cv-surface-card);
-  border: var(--bd-0);
-  box-shadow: var(--sh-none);
+  background: var(--step1-panel, var(--color-surface-soft));
+  border: 0;
+  box-shadow: none;
 }
 
 .attach-signed-modal__form .prestacao-file-picker,
 .attach-signed-modal__form .cv-file-picker {
   background: transparent;
-  border: var(--bd-0);
-  border-radius: var(--r-0);
-  box-shadow: var(--sh-none);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   display: grid;
   gap: 8px;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -809,39 +921,39 @@
 .attach-signed-modal__form .prestacao-file-picker:focus-within,
 .attach-signed-modal__form .cv-file-picker:focus-within {
   background: transparent;
-  border: var(--bd-0);
-  box-shadow: var(--sh-none);
+  border: 0;
+  box-shadow: none;
 }
 
 .attach-signed-modal__form .prestacao-file-picker__action,
 .attach-signed-modal__form .cv-file-picker__action {
   align-items: center;
   align-self: start;
-  background: var(--cv-surface-card);
-  border: var(--bd-0);
-  border-radius: var(--r-md);
-  color: var(--cv-ink);
+  background: var(--step1-panel, var(--color-surface-soft));
+  border: 0;
+  border-radius: 12px;
+  color: var(--color-heading);
   display: inline-flex;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
   grid-column: 1;
   grid-row: 1;
   justify-content: center;
-  min-height: 48px;
-  padding: var(--sp-2) var(--sp-3);
+  min-height: var(--control-height-md, 44px);
+  padding: 0 18px;
   width: fit-content;
 }
 
 .attach-signed-modal__form .prestacao-file-picker__action:hover,
 .attach-signed-modal__form .cv-file-picker__action:hover {
-  background: var(--cv-surface-card);
-  color: var(--cv-ink);
+  background: var(--step1-panel, var(--color-surface-soft));
+  color: var(--color-heading);
 }
 
 .attach-signed-modal__form .prestacao-file-picker__value,
 .attach-signed-modal__form .cv-file-picker__value {
   align-self: end;
-  color: var(--cv-ink-muted);
+  color: var(--action-muted);
   font-size: 0.78rem;
   grid-column: 1 / -1;
   grid-row: 2;
@@ -858,34 +970,34 @@
   align-self: start;
   background: var(--color-accent);
   background-image: none;
-  border: var(--bd-0);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
-  color: var(--color-accent);
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  color: var(--color-on-accent, #19232d);
   font-size: 0.8rem;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold, 750);
   grid-column: 2;
   grid-row: 1;
   min-height: 38px;
-  padding: var(--sp-2) var(--sp-3);
+  padding: 0 14px;
   text-shadow: none;
 }
 
 .attach-signed-modal__form .prestacao-file-picker__upload:hover:not(:disabled),
 .attach-signed-modal__form .cv-file-picker__upload:hover:not(:disabled) {
-  background: var(--color-accent);
+  background: var(--color-accent-hover, var(--color-accent));
   background-image: none;
-  border: var(--bd-0);
-  box-shadow: var(--sh-md);
-  color: var(--color-accent);
+  border: 0;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
+  color: var(--color-on-accent, #19232d);
 }
 
 .attach-signed-modal__form .prestacao-file-picker__upload:disabled,
 .attach-signed-modal__form .cv-file-picker__upload:disabled {
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  box-shadow: var(--sh-none);
-  color: var(--cv-ink-muted);
+  background: var(--action-bg);
+  border: 1px solid var(--action-border);
+  box-shadow: none;
+  color: var(--action-muted);
   display: none;
   opacity: 0.52;
 }
@@ -898,15 +1010,15 @@
 .attach-signed-modal__form .cv-file-selection__menu,
 .attach-signed-modal [data-attach-signed-current] {
   background: transparent;
-  border: var(--bd-0);
-  border-radius: var(--r-0);
-  box-shadow: var(--sh-none);
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .attach-signed-modal__form .prestacao-file-selection__toggle[hidden] + .prestacao-file-selection__menu,
 .attach-signed-modal__form .cv-file-selection__toggle[hidden] + .cv-file-selection__menu {
-  border: var(--bd-0);
-  border-radius: var(--r-0);
+  border: 0 !important;
+  border-radius: 0;
 }
 
 .attach-signed-modal__form .prestacao-file-selection,
@@ -916,18 +1028,18 @@
 
 .attach-signed-modal__form .prestacao-file-selection__item,
 .attach-signed-modal__form .cv-file-selection__item {
-  background: var(--cv-surface-card);
-  border: var(--bd-0);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-none);
+  background: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
   min-height: 0;
-  padding: var(--sp-2);
+  padding: 8px 10px;
   transition: none;
 }
 
 .attach-signed-modal__form .prestacao-file-selection__item:hover,
 .attach-signed-modal__form .cv-file-selection__item:hover {
-  background: var(--cv-surface-card);
+  background: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
 }
 
 .attach-signed-modal__form .prestacao-file-selection__item + .prestacao-file-selection__item,
@@ -936,34 +1048,34 @@
 }
 
 /* Ícones Visualizar / Remover: cores canônicas (vence o reset dark de .cv-icon-btn). */
- #attach-signed-modal .cv-icon-btn.cv-icon-btn--preview,
+html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--preview,
 #attach-signed-modal .cv-icon-btn.cv-icon-btn--preview {
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  box-shadow: var(--sh-md);
-  color: var(--cv-ink);
+  background: var(--action-preview-bg);
+  border: 1px solid var(--action-preview-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-preview-text);
 }
 
- #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
+html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
 #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete {
-  background: color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card));
-  border: var(--bd);
-  box-shadow: var(--sh-md);
-  color: var(--cv-state-danger);
+  background: var(--action-danger-bg);
+  border: 1px solid var(--action-danger-border);
+  box-shadow: var(--action-shadow);
+  color: var(--action-danger-text);
 }
 
 /* Cancelar = mesmo soft do Voltar do cadastro de ofícios. */
 .attach-signed-modal__cancel.cv-btn,
 .attach-signed-modal__cancel.cv-btn--secondary {
-  background: var(--cv-surface-card);
+  background: var(--step1-panel, var(--color-surface-soft));
   background-image: none;
-  border: var(--bd-0);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-none);
-  color: var(--cv-ink);
-  font-weight: 700;
-  min-height: 48px;
-  padding: var(--sp-2) var(--sp-3);
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
+  color: var(--color-heading);
+  font-weight: var(--font-weight-bold);
+  min-height: var(--control-height-md, 44px);
+  padding: 0 18px;
   transform: none;
 }
 
@@ -972,6 +1084,20 @@
  * Nunca use inherit aqui (puxa cor do pai e parece “hover”).
  */
 #attach-signed-modal {
+  --asm-panel: var(--step1-panel, var(--color-surface-soft));
+  --asm-action-bg: var(--step1-panel, var(--color-surface-soft));
+  --asm-action-border: transparent;
+  --asm-action-text: var(--color-heading);
+  --asm-accent: var(--color-accent);
+  --asm-accent-text: var(--color-on-accent, #19232d);
+  --asm-preview-bg: var(--action-preview-bg);
+  --asm-preview-border: var(--action-preview-border);
+  --asm-preview-text: var(--action-preview-text);
+  --asm-danger-bg: var(--action-danger-bg);
+  --asm-danger-border: var(--action-danger-border);
+  --asm-danger-text: var(--action-danger-text);
+  --asm-cancel-bg: var(--step1-panel, var(--color-surface-soft));
+  --asm-cancel-text: var(--color-heading);
 }
 
 #attach-signed-modal :is(
@@ -988,12 +1114,12 @@
   .prestacao-file-widget:focus-within,
   .cv-file-widget:focus-within
 ) {
-  background: var(--cv-surface-card);
-  background-color: var(--cv-surface-card);
-  border: var(--bd-0);
-  box-shadow: var(--sh-md);
-  outline: none;
-  transition: none;
+  background: var(--asm-panel) !important;
+  background-color: var(--asm-panel) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: none !important;
 }
 
 #attach-signed-modal :is(
@@ -1010,12 +1136,12 @@
   .prestacao-file-widget.is-dragover .prestacao-file-picker,
   .cv-file-widget.is-dragover .cv-file-picker
 ) {
-  background: transparent;
-  background-color: transparent;
-  border: var(--bd-0);
-  box-shadow: var(--sh-md);
-  outline: none;
-  transition: none;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: none !important;
 }
 
 #attach-signed-modal :is(
@@ -1024,12 +1150,12 @@
   .prestacao-file-selection__menu:hover,
   .cv-file-selection__menu:hover
 ) {
-  background: transparent;
-  background-color: transparent;
-  border: var(--bd-0);
-  box-shadow: var(--sh-md);
-  outline: none;
-  transition: none;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: none !important;
 }
 
 #attach-signed-modal :is(
@@ -1044,72 +1170,72 @@
   .prestacao-file-selection__item:focus-within,
   .cv-file-selection__item:focus-within
 ) {
-  background: var(--cv-surface-card);
-  background-color: var(--cv-surface-card);
-  border: var(--bd-0);
-  box-shadow: var(--sh-md);
-  outline: none;
-  transition: none;
+  background: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%)) !important;
+  background-color: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%)) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: none !important;
 }
 
 #attach-signed-modal :is(
   .prestacao-file-picker__action,
   .cv-file-picker__action
 ) {
-  background: var(--cv-surface-card);
-  background-color: var(--cv-surface-card);
-  border: var(--bd-0);
-  border-radius: var(--r-md);
-  color: var(--cv-ink);
-  font-size: 14px;
-  font-weight: 700;
-  min-height: 48px;
-  padding: var(--sp-2) var(--sp-3);
-  box-shadow: var(--sh-md);
-  outline: none;
-  transform: none;
+  background: var(--asm-action-bg) !important;
+  background-color: var(--asm-action-bg) !important;
+  border: 0 !important;
+  border-radius: 12px !important;
+  color: var(--asm-action-text) !important;
+  font-size: var(--font-size-sm) !important;
+  font-weight: var(--font-weight-bold) !important;
+  min-height: var(--control-height-md, 44px) !important;
+  padding: 0 18px !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transform: none !important;
 }
 
 #attach-signed-modal :is(
   .prestacao-file-picker__action,
   .cv-file-picker__action
 ):is(:hover, :focus-visible) {
-  background: var(--cv-surface-card);
-  background-color: var(--cv-surface-card);
-  border: var(--bd-0);
-  color: var(--cv-ink);
-  box-shadow: var(--sh-md);
-  outline: none;
-  transform: none;
+  background: var(--asm-action-bg) !important;
+  background-color: var(--asm-action-bg) !important;
+  border: 0 !important;
+  color: var(--asm-action-text) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transform: none !important;
 }
 
 #attach-signed-modal :is(
   .prestacao-file-picker__upload,
   .cv-file-picker__upload
 ):not(:disabled) {
-  background: var(--color-accent);
-  background-color: var(--color-accent);
-  background-image: none;
-  border: var(--bd-0);
-  box-shadow: var(--sh-md);
-  color: var(--color-accent);
-  outline: none;
-  transition: background 140ms ease, box-shadow 140ms ease;
-  transform: none;
+  background: var(--asm-accent) !important;
+  background-color: var(--asm-accent) !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent) !important;
+  color: var(--asm-accent-text) !important;
+  outline: none !important;
+  transition: background var(--transition-fast, 0.15s ease), box-shadow var(--transition-fast, 0.15s ease) !important;
+  transform: none !important;
 }
 
 #attach-signed-modal :is(
   .prestacao-file-picker__upload,
   .cv-file-picker__upload
 ):is(:hover, :focus-visible):not(:disabled) {
-  background: var(--color-accent);
-  background-color: var(--color-accent);
-  background-image: none;
-  border: var(--bd-0);
-  box-shadow: var(--sh-md);
-  color: var(--color-accent);
-  outline: none;
-  transform: none;
+  background: var(--color-accent-hover, var(--asm-accent)) !important;
+  background-color: var(--color-accent-hover, var(--asm-accent)) !important;
+  background-image: none !important;
+  border: 0 !important;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent) !important;
+  color: var(--asm-accent-text) !important;
+  outline: none !important;
+  transform: none !important;
 }
 
 #attach-signed-modal :is(
@@ -1118,14 +1244,14 @@
   .cv-icon-btn--preview:focus,
   .cv-icon-btn--preview:focus-visible
 ) {
-  background: var(--cv-surface-card);
-  background-color: var(--cv-surface-card);
-  border: var(--bd);
-  color: var(--cv-ink);
-  box-shadow: var(--sh-md);
-  outline: none;
-  transition: none;
-  transform: none;
+  background: var(--asm-preview-bg) !important;
+  background-color: var(--asm-preview-bg) !important;
+  border: 1px solid var(--asm-preview-border) !important;
+  color: var(--asm-preview-text) !important;
+  box-shadow: var(--action-shadow) !important;
+  outline: none !important;
+  transition: none !important;
+  transform: none !important;
 }
 
 #attach-signed-modal :is(
@@ -1134,14 +1260,14 @@
   .cv-icon-btn--delete:focus,
   .cv-icon-btn--delete:focus-visible
 ) {
-  background: color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card));
-  background-color: color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card));
-  border: var(--bd);
-  color: var(--cv-state-danger);
-  box-shadow: var(--sh-md);
-  outline: none;
-  transition: none;
-  transform: none;
+  background: var(--asm-danger-bg) !important;
+  background-color: var(--asm-danger-bg) !important;
+  border: 1px solid var(--asm-danger-border) !important;
+  color: var(--asm-danger-text) !important;
+  box-shadow: var(--action-shadow) !important;
+  outline: none !important;
+  transition: none !important;
+  transform: none !important;
 }
 
 #attach-signed-modal :is(
@@ -1150,15 +1276,15 @@
   .attach-signed-modal__cancel:focus,
   .attach-signed-modal__cancel:focus-visible
 ) {
-  background: var(--cv-surface-card);
-  background-color: var(--cv-surface-card);
-  background-image: none;
-  border: var(--bd-0);
-  color: var(--cv-ink);
-  box-shadow: var(--sh-md);
-  outline: none;
-  transition: none;
-  transform: none;
+  background: var(--asm-cancel-bg) !important;
+  background-color: var(--asm-cancel-bg) !important;
+  background-image: none !important;
+  border: 0 !important;
+  color: var(--asm-cancel-text) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: none !important;
+  transform: none !important;
 }
 
 #attach-signed-modal :is(
@@ -1166,10 +1292,10 @@
   .attach-signed-modal__kind-option:hover,
   .attach-signed-modal__kind-option:focus-visible
 ) {
-  background: transparent;
-  color: var(--cv-ink-muted);
-  outline: none;
-  transition: none;
+  background: transparent !important;
+  color: var(--action-muted) !important;
+  outline: none !important;
+  transition: none !important;
 }
 
 #attach-signed-modal :is(
@@ -1177,15 +1303,15 @@
   .attach-signed-modal__kind-option.is-active:hover,
   .attach-signed-modal__kind-option.is-active:focus-visible
 ) {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  color: var(--color-accent);
+  background: var(--action-info-bg) !important;
+  color: var(--action-info-text) !important;
 }
 
 @media (min-width: 841px) {
   .delete-confirm-modal {
     box-sizing: border-box;
-    padding-left: calc(15% + var(--sp-4));
-    padding-right: var(--sp-4);
+    padding-left: calc(var(--sidebar-width) + var(--space-4));
+    padding-right: var(--space-4);
   }
 }
 
@@ -1200,8 +1326,8 @@
   }
 
   .delete-confirm-modal__dialog {
-    border-radius: var(--r-lg);
-    padding: var(--sp-4);
+    border-radius: 20px;
+    padding: 19px;
   }
 
   .attach-signed-modal__form .prestacao-file-picker {

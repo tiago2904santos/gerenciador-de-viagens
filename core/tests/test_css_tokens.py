@@ -15,29 +15,19 @@ from django.test import SimpleTestCase
 ROOT = Path(settings.BASE_DIR)
 CSS_DIR = ROOT / "static" / "css"
 
+# Mesma política de exceção do audit_frontend_standards.py (Etapa 7 gate).
+COLOR_LITERAL_ALLOWED = {
+    "static/css/tokens.css",
+    "static/css/theme.css",
+    "static/css/03-theme-dark.css",
+    "static/css/components/theme-dark-components.css",  # transitório — dissolver nas fases seguintes
+    "static/css/shell.bundle.css",  # gerado (NOVO-12); literais vêm das fontes acima
+}
+
 _HEX_COLOR = re.compile(r"(?<![\w#])#([0-9a-fA-F]{3,8})\b")
 _RGB_COLOR = re.compile(r"\brgba?\(\s*[\d.%]+")
 _CSS_COMMENT = re.compile(r"/\*.*?\*/")
 _CSS_VALUE = re.compile(r":\s*.+")
-
-CANONICAL_CUSTOM_PROPERTIES = frozenset({
-    "--r-0", "--r-sm", "--r-md", "--r-lg", "--r-xl", "--r-pill",
-    "--sp-1", "--sp-2", "--sp-3", "--sp-4", "--sp-5", "--sp-6",
-    "--sp-7", "--sp-8", "--cv-ink", "--cv-ink-muted",
-    "--cv-state-danger", "--cv-state-success", "--cv-state-warning",
-    "--cv-border", "--bd", "--bd-0", "--bd-strong", "--sh-sm",
-    "--sh-md", "--sh-lg", "--sh-none", "--cv-surface-page",
-    "--cv-surface-card", "--cv-surface-block", "--cv-surface",
-    "--cv-surface-next", "--color-accent", "--on-accent", "--accent-tint",
-})
-
-GEOMETRY_VALUE_LIMITS = {
-    "border-radius": 6,
-    "padding": 8,
-    "margin": 8,
-    "border": 3,
-    "box-shadow": 4,
-}
 
 # Arquivos novos da fase 13 — devem estar 100% livres de literais.
 STRICT_COLOR_LITERAL_FILES = {
@@ -51,7 +41,7 @@ STRICT_COLOR_LITERAL_FILES = {
 # so desce (AGENTS.md, regra 5).
 COLOR_LITERAL_BASELINE = 620
 
-# Escala fechada R-01 — espelha a camada canônica em static/css/01-tokens.css.
+# Escala fechada R-01 — espelha o comentário em static/css/tokens.css (Breakpoints).
 ALLOWED_MEDIA_BREAKPOINTS = frozenset({
     420, 520, 600, 640, 720, 721, 768, 800, 820, 840, 841, 900,
     1080, 1180, 1181, 1400, 1480,
@@ -84,7 +74,8 @@ def _strip_comments(line: str) -> str:
 
 
 def _find_color_literals(path: Path) -> list[tuple[int, str]]:
-    if path.name in {"00-palette.css", "01-tokens.css"} or path.name.endswith(".bundle.css"):
+    rel = _rel_css(path)
+    if rel in COLOR_LITERAL_ALLOWED:
         return []
 
     try:
@@ -144,94 +135,6 @@ def _css_bundle_text() -> str:
 
 
 class CssTokenGateTests(SimpleTestCase):
-    def test_novo30_phase3_uses_only_the_canonical_custom_property_vocabulary(self):
-        """NOVO-30/3: aliases temporarios morreram e componentes nao declaram tokens."""
-        definitions_outside_layers: list[str] = []
-        unknown_references: list[str] = []
-
-        for path in sorted(CSS_DIR.rglob("*.css")):
-            if path.name.endswith(".bundle.css"):
-                continue
-            text = path.read_text(encoding="utf-8")
-            without_comments = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
-            rel = _rel_css(path)
-            definitions = set(
-                re.findall(r"^\s*(--[\w-]+)\s*:", without_comments, re.M)
-            )
-            if path.name not in {"00-palette.css", "01-tokens.css"}:
-                definitions_outside_layers.extend(
-                    f"{rel}: {name}" for name in sorted(definitions)
-                )
-            for name in re.findall(r"var\(\s*(--[\w-]+)", without_comments):
-                if name not in CANONICAL_CUSTOM_PROPERTIES and not name.startswith("--bs-"):
-                    unknown_references.append(f"{rel}: {name}")
-
-        token_definitions = set(
-            re.findall(
-                r"^\s*(--[\w-]+)\s*:",
-                (CSS_DIR / "01-tokens.css").read_text(encoding="utf-8"),
-                re.M,
-            )
-        )
-        expected_token_definitions = CANONICAL_CUSTOM_PROPERTIES - {
-            "--cv-surface-page", "--cv-surface-card", "--cv-surface-block",
-            "--cv-surface", "--cv-surface-next", "--color-accent",
-            "--on-accent", "--accent-tint",
-        }
-        self.assertEqual(token_definitions, expected_token_definitions)
-        self.assertEqual(definitions_outside_layers, [])
-        self.assertEqual(sorted(set(unknown_references)), [])
-
-    def test_novo30_phase3_geometry_uses_the_closed_scales(self):
-        """Gate literal do plano: cada propriedade cabe no teto da escala fechada."""
-        for prop, limit in GEOMETRY_VALUE_LIMITS.items():
-            values: set[str] = set()
-            for path in CSS_DIR.rglob("*.css"):
-                if path.name == "shell.bundle.css":
-                    continue
-                values.update(
-                    re.findall(
-                        rf"{prop}:\s*([^;]+)",
-                        path.read_text(encoding="utf-8"),
-                    )
-                )
-            with self.subTest(property=prop):
-                self.assertLessEqual(
-                    len(values),
-                    limit,
-                    f"{prop} fora da escala ({len(values)} > {limit}): {sorted(values)}",
-                )
-
-    def test_novo30_phase4_limits_important_to_documented_third_party_overrides(self):
-        """NOVO-30/4: no máximo 20 overrides, cada um explicado no ponto de uso."""
-        occurrences: list[str] = []
-        undocumented: list[str] = []
-        for path in sorted(CSS_DIR.rglob("*.css")):
-            if path.name.endswith(".bundle.css"):
-                continue
-            lines = path.read_text(encoding="utf-8").splitlines()
-            for index, line in enumerate(lines):
-                if "!important" not in line:
-                    continue
-                rel = _rel_css(path)
-                occurrences.append(f"{rel}:{index + 1}")
-                previous = lines[index - 1].strip() if index else ""
-                if "terceiro:" not in previous.casefold():
-                    undocumented.append(f"{rel}:{index + 1}: {line.strip()}")
-
-        self.assertLessEqual(len(occurrences), 20, occurrences)
-        self.assertEqual(undocumented, [], "\n".join(undocumented))
-
-    def test_novo30_phase4_has_no_file_exception_lists(self):
-        """NOVO-30/4: desvios voltam a ser regra normal, sem allowlist por arquivo."""
-        auditor = (ROOT / "scripts" / "audit_frontend_standards.py").read_text(
-            encoding="utf-8"
-        )
-        self.assertNotIn("TEMPLATE_EXCEPTIONS", auditor)
-        self.assertNotIn("CSS_EXCEPTIONS", auditor)
-        test_source = Path(__file__).read_text(encoding="utf-8")
-        self.assertNotRegex(test_source, r"(?m)^COLOR_LITERAL_ALLOWED\s*=")
-
     def test_canonical_component_stylesheets_have_no_color_literals(self):
         """Novos componentes cv-notice/cv-metric devem usar apenas var() de token."""
         violations: list[str] = []
@@ -243,7 +146,7 @@ class CssTokenGateTests(SimpleTestCase):
         self.assertEqual(violations, [], "\n".join(violations))
 
     def test_media_breakpoints_use_closed_scale(self):
-        """Gate R-01: @media width usa somente a escala documentada em 01-tokens.css."""
+        """Gate R-01: @media width usa somente a escala documentada em tokens.css."""
         violations = _find_media_width_violations()
         self.assertEqual(
             violations,

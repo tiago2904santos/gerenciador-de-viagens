@@ -1,41 +1,47 @@
 /* Usuários — lista + quick-add no padrão das justificativas. */
 
 .usuarios-page {
+  --step1-surface: var(--cv-surface-card);
+  --step1-panel: var(--cv-surface-block);
+  --step1-field: var(--cv-surface-next);
   display: grid;
-  gap: var(--sp-5);
+  gap: var(--space-5);
 }
 
- .usuarios-page {
+:is(html[data-theme="dark"]) .usuarios-page {
+  --step1-surface: var(--cv-surface-card);
+  --step1-panel: var(--cv-surface-block);
+  --step1-field: var(--cv-surface-next);
 }
 
 .usuarios-page .list-header,
 .usuarios-page .list-header__rail,
 .usuarios-page .list-header .cv-inline-create__toggle:not(.is-filled):not(.usuario-quick-add__toggle--ready):not(.area-quick-add__toggle--ready),
- .usuarios-page .list-header,
- .usuarios-page .list-header__rail,
- .usuarios-page .list-header .cv-inline-create__toggle:not(.is-filled):not(.usuario-quick-add__toggle--ready):not(.area-quick-add__toggle--ready) {
-  background: var(--cv-surface-card);
+:is(html[data-theme="dark"]) .usuarios-page .list-header,
+:is(html[data-theme="dark"]) .usuarios-page .list-header__rail,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle:not(.is-filled):not(.usuario-quick-add__toggle--ready):not(.area-quick-add__toggle--ready) {
+  background: var(--step1-surface);
 }
 
 .usuarios-page .list-header__band,
- .usuarios-page .list-header__band {
-  background: var(--cv-surface-block);
+:is(html[data-theme="dark"]) .usuarios-page .list-header__band {
+  background: var(--color-surface-muted);
 }
 
 .usuarios-page .cv-record-row,
- .usuarios-page .cv-record-row {
-  background: var(--cv-surface-block);
-  border: var(--bd-0);
-  box-shadow: var(--sh-none);
+:is(html[data-theme="dark"]) .usuarios-page .cv-record-row {
+  background: var(--step1-field, var(--step1-surface));
+  border: 0;
+  box-shadow: none;
 }
 
 .usuarios-page .cv-record-row:hover,
 .usuarios-page .cv-record-row:focus-within,
- .usuarios-page .cv-record-row:hover,
- .usuarios-page .cv-record-row:focus-within {
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-block));
-  border: var(--bd-0);
-  box-shadow: var(--sh-none);
+:is(html[data-theme="dark"]) .usuarios-page .cv-record-row:hover,
+:is(html[data-theme="dark"]) .usuarios-page .cv-record-row:focus-within {
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field, var(--step1-surface)));
+  border: 0;
+  box-shadow: none;
 }
 
 .usuarios-page .cv-record-row__vincular {
@@ -70,19 +76,19 @@
 .usuarios-page .list-header .cv-inline-create__toggle.is-filled[aria-expanded="true"],
 .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready[aria-expanded="true"],
 .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready[aria-expanded="true"],
- .usuarios-page .list-header .cv-inline-create__toggle.is-filled,
- .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready,
- .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready,
- .usuarios-page .list-header .cv-inline-create__toggle.is-filled[aria-expanded="true"],
- .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready[aria-expanded="true"],
- .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready[aria-expanded="true"] {
+:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.is-filled,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.is-filled[aria-expanded="true"],
+:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready[aria-expanded="true"],
+:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready[aria-expanded="true"] {
   animation: none;
   background: var(--color-accent);
   background-image: none;
-  border: var(--bd-0);
-  box-shadow: var(--sh-md);
-  color: var(--color-accent);
-  font-weight: 700;
+  border: 0;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  color: var(--color-on-accent, #19232d);
+  font-weight: var(--font-weight-bold);
 }
 
 .usuarios-page .list-header .cv-inline-create__toggle.is-filled:hover,
@@ -91,26 +97,26 @@
 .usuarios-page .list-header .cv-inline-create__toggle.is-filled:focus-visible,
 .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready:focus-visible,
 .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready:focus-visible,
- .usuarios-page .list-header .cv-inline-create__toggle.is-filled:hover,
- .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready:hover,
- .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready:hover,
- .usuarios-page .list-header .cv-inline-create__toggle.is-filled:focus-visible,
- .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready:focus-visible,
- .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready:focus-visible {
-  background: var(--color-accent);
+:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.is-filled:hover,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready:hover,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready:hover,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.is-filled:focus-visible,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready:focus-visible,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready:focus-visible {
+  background: var(--color-accent-hover, var(--color-accent));
   background-image: none;
-  border: var(--bd-0);
-  box-shadow: var(--sh-md);
-  color: var(--color-accent);
+  border: 0;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
+  color: var(--color-on-accent, #19232d);
 }
 
 .usuarios-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
 .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready .cv-inline-create__toggle-icon,
 .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready .cv-inline-create__toggle-icon,
- .usuarios-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
- .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready .cv-inline-create__toggle-icon,
- .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready .cv-inline-create__toggle-icon {
-  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready .cv-inline-create__toggle-icon,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready .cv-inline-create__toggle-icon {
+  background: color-mix(in srgb, var(--color-on-accent, #19232d) 14%, transparent);
   color: inherit;
 }
 
@@ -123,12 +129,12 @@
 }
 
 .usuarios-page .list-header__rail--inline-create {
-  gap: var(--sp-3);
-  padding: var(--sp-4);
+  gap: var(--space-3);
+  padding: var(--space-3) clamp(var(--space-4), 2vw, var(--space-5));
 }
 
 .usuarios-page .list-header .cv-inline-create__panel.is-open,
- .usuarios-page .list-header .cv-inline-create__panel.is-open {
+:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__panel.is-open {
   border-top: 0;
   padding-top: 0;
 }
@@ -136,30 +142,38 @@
 .usuario-quick-add,
 .area-quick-add {
   display: grid;
-  gap: var(--sp-3);
+  gap: var(--space-3);
 }
 
 [data-usuario-quick-add] .usuario-quick-add__scope,
 [data-area-quick-add] .area-quick-add__scope {
+  --step1-surface: var(--cv-surface-card);
+  --step1-panel: var(--cv-surface-block);
+  --step1-field: var(--cv-surface-next);
+  --step1-empty: var(--cv-surface-next);
   display: grid;
   gap: 10px;
   background: transparent;
-  border: var(--bd-0);
-  box-shadow: var(--sh-none);
+  border: 0;
+  box-shadow: none;
   padding: 0;
 }
 
- [data-usuario-quick-add] .usuario-quick-add__scope,
- [data-area-quick-add] .area-quick-add__scope {
+:is(html[data-theme="dark"]) [data-usuario-quick-add] .usuario-quick-add__scope,
+:is(html[data-theme="dark"]) [data-area-quick-add] .area-quick-add__scope {
+  --step1-surface: var(--cv-surface-card);
+  --step1-panel: var(--cv-surface-block);
+  --step1-field: var(--cv-surface-next);
+  --step1-empty: var(--cv-surface-next);
 }
 
 [data-usuario-quick-add] .travel-document-block,
 [data-area-quick-add] .travel-document-block {
-  background: var(--cv-surface-card);
-  border: var(--bd-0);
-  border-radius: var(--r-md);
+  background: var(--step1-panel);
+  border: 0;
+  border-radius: 14px;
   margin: 0;
-  padding: var(--sp-3);
+  padding: 14px;
 }
 
 [data-usuario-quick-add] .cv-form-block--split,
@@ -175,20 +189,23 @@
 /* Modal Vincular usuário — mesmo contrato visual do anexar assinado. */
 .vincular-usuario-modal__dialog.delete-confirm-modal__dialog,
 .vincular-usuario-modal__dialog {
-  background: var(--cv-surface-card);
+  --step1-surface: var(--cv-surface-card);
+  --step1-panel: var(--cv-surface-block);
+  --step1-field: var(--cv-surface-next);
+  background: var(--step1-surface);
   gap: 0;
   max-width: min(100%, 520px);
   overflow: hidden;
   padding: 0;
 }
 
- #vincular-usuario-modal .vincular-usuario-modal__dialog {
-  background: var(--cv-surface-card);
+:is(html[data-theme="dark"]) #vincular-usuario-modal .vincular-usuario-modal__dialog {
+  background: var(--step1-surface) !important;
 }
 
 .vincular-usuario-modal__dialog > .cv-dialog__header {
   margin: 0;
-  padding: var(--sp-4) var(--sp-6);
+  padding: 18px 22px 16px;
 }
 
 .vincular-usuario-modal__form.cv-dialog__form {
@@ -207,25 +224,25 @@
 .vincular-usuario-modal__body {
   display: grid;
   gap: 12px;
-  padding: var(--sp-4) var(--sp-6);
+  padding: 18px 22px 16px !important;
 }
 
 .vincular-usuario-modal__intro {
   align-items: flex-start;
-  background: var(--cv-surface-card);
-  border: var(--bd-0);
-  border-radius: var(--r-md);
-  color: var(--cv-ink-muted);
+  background: var(--step1-panel, var(--color-surface-soft));
+  border: 0;
+  border-radius: 15px;
+  color: var(--action-muted, var(--theme-text-muted));
   display: flex;
   font-size: 0.84rem;
   gap: 10px;
   line-height: 1.55;
   margin: 0;
-  padding: var(--sp-3);
+  padding: 10px 12px;
 }
 
 .vincular-usuario-modal__intro .cv-icon {
-  color: var(--color-accent);
+  color: var(--action-info-text, var(--color-info));
   flex: 0 0 18px;
   height: 18px;
   margin-top: 2px;
@@ -233,18 +250,21 @@
 }
 
 .vincular-usuario-modal__intro strong {
-  color: var(--cv-ink);
+  color: var(--action-text-strong, var(--theme-text-heading));
 }
 
- .vincular-usuario-modal__fields.cv-form-stack,
+:is(html[data-theme="dark"]) .vincular-usuario-modal__fields.cv-form-stack,
 .vincular-usuario-modal__fields.cv-form-stack,
 .vincular-usuario-modal__fields {
-  background: var(--cv-surface-card);
-  border-radius: var(--r-md);
+  --step1-field: var(--cv-surface-next);
+  --color-input-bg: var(--step1-field);
+  --cv-field-bg: var(--step1-field);
+  background: var(--step1-panel, var(--color-surface-soft));
+  border-radius: 15px;
   display: grid;
   gap: 18px;
   margin: 0;
-  padding: var(--sp-3);
+  padding: 14px;
 }
 
 .vincular-usuario-modal__fields > .field,
@@ -273,23 +293,23 @@
   .cv-custom-select__trigger,
   .cv-custom-select__trigger--v2
 ) {
-  background: var(--cv-surface-block);
-  border: var(--bd-0);
-  border-radius: var(--r-sm);
-  box-shadow: var(--sh-md);
+  background: var(--step1-field, var(--color-input-bg)) !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
 }
 
 .vincular-usuario-modal__fields .cv-custom-select__trigger--v2 .cv-custom-select__value {
-  padding: var(--sp-2) var(--sp-3);
+  padding: 0 14px;
 }
 
 .vincular-usuario-modal__fields .cv-search-picker__control {
-  min-height: 48px;
+  min-height: var(--control-height-md, 44px);
   padding-inline: 12px;
 }
 
 .vincular-usuario-modal__dialog .cv-dialog__footer,
- #vincular-usuario-modal .cv-dialog__footer {
+:is(html[data-theme="dark"]) #vincular-usuario-modal .cv-dialog__footer {
   align-items: stretch;
   background: transparent;
   border-top: 0;
@@ -311,12 +331,12 @@
 .vincular-usuario-modal__footer .cv-card-footer {
   align-items: center;
   background: transparent;
-  border: var(--bd-0);
-  box-shadow: var(--sh-none);
-  gap: var(--sp-3);
+  border: 0;
+  box-shadow: none;
+  gap: var(--space-3);
   justify-content: space-between;
   min-height: 0;
-  padding: var(--sp-4) var(--sp-6);
+  padding: 12px 22px 16px;
 }
 
 /* Evita o secondary esticar e parecer um bloco maior que o primary. */
@@ -324,12 +344,12 @@
 #vincular-usuario-modal .cv-card-footer__primary .cv-btn {
   align-self: center;
   box-sizing: border-box;
-  height: 48px;
-  min-height: 48px;
+  height: var(--control-height-md, 44px);
+  min-height: var(--control-height-md, 44px);
 }
 
 .vincular-usuario-modal__footer .cv-card-footer-section__divider {
-  border-top: 1px solid var(--cv-border);
+  border-top: 1px solid var(--color-border-soft, var(--action-group-border, var(--color-border)));
   display: block;
 }
 
@@ -344,7 +364,7 @@
  * bloco.
  */
 .usuarios-area-form .cv-record-list {
-  gap: var(--sp-2);
+  gap: var(--space-2);
 }
 
 /*
@@ -367,11 +387,11 @@
  * tem moldura nenhuma; aqui só desfazemos a herança acidental.
  */
 .usuarios-area-form .cv-record-list.simple-list,
- .usuarios-area-form .cv-record-list.simple-list {
+:is(html[data-theme="dark"]) .usuarios-area-form .cv-record-list.simple-list {
   background: transparent;
-  border: var(--bd-0);
-  border-radius: var(--r-0);
-  box-shadow: var(--sh-none);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   overflow: visible;
 }
 
@@ -380,8 +400,8 @@
  * superfície dos `form-control` do formulário.
  */
 .usuarios-area-form .empty-state,
- .usuarios-area-form .empty-state {
-  background: var(--cv-surface-block);
-  border: var(--bd-0);
-  box-shadow: var(--sh-none);
+:is(html[data-theme="dark"]) .usuarios-area-form .empty-state {
+  background: var(--step1-field, var(--color-input-bg));
+  border: 0;
+  box-shadow: none;
 }
