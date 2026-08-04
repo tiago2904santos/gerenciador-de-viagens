@@ -323,16 +323,16 @@ como input livre.
 
 Uma etapa por PR, na ordem. Cada uma entrega página funcionando.
 
-| # | Etapa | Risco | Entrega |
-| --- | --- | --- | --- |
-| 1 | Casco e navegação | baixo | Rota `<slug:aba>`, faixa de abas, redirect pós-save para a aba certa. As 4 seções de hoje redistribuídas em Instituição / Ofício / Roteiros. Nenhum campo novo. |
-| 2 | Assinantes completos | baixo | `TERMO` e `RELATORIO_TECNICO` no `TIPO_CHOICES`; abas Termo e Prestação nascem com o card de assinante. |
-| 3 | Numeração por documento | **médio** | Campos de numeração + leitura nos três geradores. Exige plan mode: mexe em `_assign_numero` e no contador com lock. |
-| 4 | Textos e preferências de geração | médio | Frases do ofício, prazo da justificativa, preferências de Termo/OS/PT. Cada leitura de constante vira leitura de config com o default de hoje. |
-| 5 | Prestação e Diário | médio | Preferências da aba 7, ligadas ao wizard de prestação. |
-| 6 | Integrações | médio | Drive movido do Perfil; painel de pendências. |
-| 7 | Modelos de documento | **alto** | Só depois de resolvido o sandbox do `docxtpl`. Pode entregar em duas metades (baixar/restaurar, depois upload). |
-| 8 | Painel de pendências | baixo | `pendencias_card` no topo de cada aba. |
+| # | Etapa | Risco | Status | Entrega |
+| --- | --- | --- | --- | --- |
+| 1 | Casco e navegação | baixo | feito | Rota `<slug:aba>`, faixa de abas, redirect pós-save para a aba certa. As 4 seções de hoje redistribuídas em Instituição / Ofício / Roteiros. Nenhum campo novo. |
+| 2 | Assinantes completos | baixo | pendente | `TERMO` e `RELATORIO_TECNICO` no `TIPO_CHOICES`; abas Termo e Prestação nascem com o card de assinante. |
+| 3 | Numeração por documento | **médio** | pendente | Campos de numeração + leitura nos três geradores. Exige plan mode: mexe em `_assign_numero` e no contador com lock. |
+| 4 | Textos e preferências de geração | médio | pendente | Frases do ofício, prazo da justificativa, preferências de Termo/OS/PT. Cada leitura de constante vira leitura de config com o default de hoje. |
+| 5 | Prestação e Diário | médio | pendente | Preferências da aba 7, ligadas ao wizard de prestação. |
+| 6 | Integrações | médio | pendente | Drive movido do Perfil; painel de pendências. |
+| 7 | Modelos de documento | **alto** | pendente | Só depois de resolvido o sandbox do `docxtpl`. Pode entregar em duas metades (baixar/restaurar, depois upload). |
+| 8 | Painel de pendências | baixo | pendente | `pendencias_card` no topo de cada aba. |
 
 ---
 

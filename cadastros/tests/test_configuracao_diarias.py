@@ -30,7 +30,7 @@ class ConfiguracaoDiariasTests(TestCase):
             usuario=self.user, area=self.area, area_padrao=True, ativo=True
         )
         self.client.force_login(self.user)
-        self.url = reverse("cadastros:configuracao")
+        self.url = reverse("cadastros:configuracao_aba", kwargs={"aba": "roteiros"})
 
     def postar(self, **campos):
         dados = {"form_id": "diarias"}

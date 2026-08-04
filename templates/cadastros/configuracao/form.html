@@ -1,40 +1,59 @@
 {% extends "components/page/flow_base.html" %}
 {% load static %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/cadastros-config.css' %}?v=20260804-3">
+{% endblock %}
+
 {% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
 {% block flow_shell_extra %} document-form-page cadastros-form-page{% endblock %}
 {% block flow_shell_attrs %} data-configuracoes-shell{% endblock %}
 
+{% block flow_header %}
+  <header class="list-header list-header--wizard-band" data-wizard-sticky-band>
+    {% include "components/ui/headers/_list_header_band.html" with title=page_title eyebrow=flow_eyebrow band_tabs_template="components/lists/list_toggle.html" abas=abas tabs_aria_label=tabs_aria_label only %}
+  </header>
+{% endblock %}
+
 {% block flow_body %}
+  {# data-travel-document-wizard-step1: poço dos inputs (step1-field) sem borda. #}
   <div class="cv-form-section-stack cv-form-section-stack--comfortable" data-travel-document-wizard-step1>
-    <form
-      method="post"
-      class="document-form travel-document-wizard__form"
-      novalidate
-      data-configuracoes-form
-      data-cep-lookup-url-template="{% url 'cadastros:api_consulta_cep' '00000000' %}"
-    >
-      {% csrf_token %}
-      {% include "components/form/card.html" with title="Dados da unidade e endereço" description="Unidade operacional e endereço usado nos documentos." title_id="config-card-unidade-endereco-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_unidade_endereco_body.html" %}
-      {% include "components/form/card.html" with title="Assinantes padrão por documento" description="Servidores que assinam cada tipo de documento por padrão." title_id="config-card-assinantes-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_assinantes_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
-    </form>
+    {% if aba == "instituicao" %}
+      <form
+        method="post"
+        action="{{ config_action_url }}"
+        class="document-form travel-document-wizard__form"
+        novalidate
+        data-configuracoes-form
+        data-cep-lookup-url-template="{% url 'cadastros:api_consulta_cep' '00000000' %}"
+      >
+        {% csrf_token %}
+        <input type="hidden" name="form_id" value="instituicao">
+        {% include "components/form/card.html" with title="Dados da unidade e endereço" description="Unidade operacional e endereço usado nos documentos." title_id="config-card-unidade-endereco-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_unidade_endereco_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
+      </form>
 
-    <form method="post" class="document-form travel-document-wizard__form" novalidate>
-      {% csrf_token %}
-      <input type="hidden" name="form_id" value="diarias">
-      {% include "components/form/card.html" with title="Valores de diária" description="Informe apenas o valor de 24 horas; 15% e 30% são calculados. Cada tabela vale a partir da data de vigência, e roteiros com saída anterior mantêm o valor que valia na época." title_id="config-card-diarias-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_diarias_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
-    </form>
+    {% elif aba == "oficio" %}
+      <form method="post" action="{{ config_action_url }}" class="document-form travel-document-wizard__form" data-destinatario-form novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="form_id" value="oficio">
+        {{ destinatario_form.destinatario_oficio_nome }}
+        {% include "components/form/card.html" with title="Assinantes e destinatário" description="Padrões usados na emissão do ofício e documentos relacionados." title_id="config-card-oficio-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_oficio_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
+      </form>
 
-    <form method="post" action="{% url 'cadastros:configuracao' %}" class="document-form travel-document-wizard__form" data-destinatario-form>
-      {% csrf_token %}
-      <input type="hidden" name="form_id" value="destinatarios">
-      {{ destinatario_form.destinatario_oficio_nome }}
-      {% include "components/form/card.html" with title="Destinatário padrão do Ofício" description="Busque um servidor cadastrado (cargo e unidade são preenchidos automaticamente) ou digite os dados manualmente." title_id="config-card-destinatario-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_destinatario_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
-    </form>
+    {% elif aba == "roteiros" %}
+      <form method="post" action="{{ config_action_url }}" class="document-form travel-document-wizard__form" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="form_id" value="diarias">
+        {% include "components/form/card.html" with title="Valores de diária" description="Informe apenas o valor de 24 horas; 15% e 30% são calculados. Cada tabela vale a partir da data de vigência, e roteiros com saída anterior mantêm o valor que valia na época." title_id="config-card-diarias-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_diarias_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
+      </form>
+    {% endif %}
   </div>
 {% endblock %}
 
 {% block extra_js %}
-  <script src="{% static 'js/components/diaria-derivados.js' %}" defer></script>
-  <script src="{% static 'js/pages/configuracoes.js' %}" defer></script>
+  {% if aba == "instituicao" or aba == "oficio" %}
+    <script src="{% static 'js/pages/configuracoes.js' %}" defer></script>
+  {% elif aba == "roteiros" %}
+    <script src="{% static 'js/components/diaria-derivados.js' %}" defer></script>
+  {% endif %}
 {% endblock %}
