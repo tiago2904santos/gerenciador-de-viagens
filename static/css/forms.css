@@ -159,7 +159,7 @@
 }
 
 .form-control {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border-color: var(--color-input-border);
   border-radius: var(--radius-control);
   color: var(--color-input-text);
@@ -168,7 +168,7 @@
 }
 
 .form-select {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border-color: var(--color-input-border);
   border-radius: var(--radius-control);
   color: var(--color-input-text);

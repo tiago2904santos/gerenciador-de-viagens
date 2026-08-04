@@ -81,8 +81,8 @@
   --field-group-gap:     var(--space-3);
 
   /* --- Wizard Section Cards --- */
-  --cv-form-section-bg:             var(--surface-form-section);
-  --cv-form-section-header-bg:      var(--surface-form-panel);
+  --cv-form-section-bg:             var(--cv-surface-card);
+  --cv-form-section-header-bg:      var(--cv-surface-block);
   --cv-form-section-border:         var(--border-form-section);
   --cv-form-section-shadow:         var(--shadow-sm);
   --cv-form-section-radius:         var(--radius-card);
@@ -169,38 +169,38 @@ html[data-theme="dark"] {
   --surface-page-shell:     transparent;
   --surface-page-header:    transparent;
 
-  --surface-stepper:        var(--theme-surface-card);
+  --surface-stepper:        var(--cv-surface-card);
   --border-stepper:         var(--theme-border-card);
   --shadow-stepper:         var(--theme-shadow-stat);
 
-  --surface-form-panel:     var(--theme-surface-card);
+  --surface-form-panel:     var(--cv-surface-card);
   --border-form-panel:      var(--theme-border-card);
   --shadow-form-panel:      var(--theme-shadow-hero);
 
-  --surface-form-section:   var(--color-surface);
+  --surface-form-section:   var(--cv-surface-card);
   --border-form-section:    var(--color-border-soft);
   --shadow-form-section:    none;
 
-  --surface-field-group:    rgba(255, 255, 255, 0.04);
+  --surface-field-group:    var(--cv-surface-block);
   --border-field-group:     rgba(255, 255, 255, 0.09);
 
-  --cv-form-section-bg:        var(--surface-form-section);
-  --cv-form-section-header-bg: var(--surface-form-panel);
+  --cv-form-section-bg:        var(--cv-surface-card);
+  --cv-form-section-header-bg: var(--cv-surface-block);
   --cv-form-section-border:    var(--theme-border-card);
   --cv-form-section-shadow:    var(--theme-shadow-hero);
 
-  --surface-list-panel:     var(--theme-surface-card);
+  --surface-list-panel:     var(--cv-surface-card);
   --border-list-panel:      var(--theme-border-card);
   --shadow-list-panel:      var(--theme-shadow-hero);
 
-  --surface-filter-bar:     rgba(255, 255, 255, 0.03);
+  --surface-filter-bar:     var(--cv-surface-block);
   --border-filter-bar:      var(--theme-border-card);
 
   --surface-list-row:       var(--surface-form-section); /* mesmo fundo das seções de formulário */
   --border-list-row:        rgba(255, 255, 255, 0.07);
-  --surface-list-row-hover: rgba(255, 255, 255, 0.08);
+  --surface-list-row-hover: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
 
-  --surface-footer-actions: var(--color-surface-muted);
+  --surface-footer-actions: var(--cv-surface-block);
   --border-footer-actions:  var(--theme-border-card);
 
   --surface-pagination:     transparent;
@@ -277,38 +277,38 @@ html[data-theme="light"] {
   --surface-page-shell:     transparent;
   --surface-page-header:    transparent;
 
-  --surface-stepper:        var(--color-surface);
+  --surface-stepper:        var(--cv-surface-card);
   --border-stepper:         #d4dde9;
   --shadow-stepper:         var(--shadow-xs);
 
-  --surface-form-panel:     var(--color-surface);
+  --surface-form-panel:     var(--cv-surface-card);
   --border-form-panel:      #d4dde9;
   --shadow-form-panel:      var(--theme-shadow-hero);
 
-  --surface-form-section:   #f6f9fc;
+  --surface-form-section:   var(--cv-surface-card);
   --border-form-section:    #dde6ef;
   --shadow-form-section:    none;
 
-  --surface-field-group:    #edf3f9;
+  --surface-field-group:    var(--cv-surface-block);
   --border-field-group:     #d0dce8;
 
-  --cv-form-section-bg:        var(--surface-form-panel);
-  --cv-form-section-header-bg: var(--surface-form-section);
+  --cv-form-section-bg:        var(--cv-surface-card);
+  --cv-form-section-header-bg: var(--cv-surface-block);
   --cv-form-section-border:    var(--border-form-section);
   --cv-form-section-shadow:    var(--shadow-sm);
 
-  --surface-list-panel:     var(--color-surface);
+  --surface-list-panel:     var(--cv-surface-card);
   --border-list-panel:      #d4dde9;
   --shadow-list-panel:      var(--theme-shadow-hero);
 
-  --surface-filter-bar:     #f4f8fc;
+  --surface-filter-bar:     var(--cv-surface-block);
   --border-filter-bar:      #dde6ef;
 
   --surface-list-row:       var(--surface-form-section); /* mesmo fundo das seções de formulário */
   --border-list-row:        #e5edf5;
-  --surface-list-row-hover: var(--color-primary-soft);
+  --surface-list-row-hover: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
 
-  --surface-footer-actions: #f4f8fc;
+  --surface-footer-actions: var(--cv-surface-block);
   --border-footer-actions:  #d4dde9;
 
   --surface-pagination:     transparent;
@@ -1091,6 +1091,9 @@ html[data-theme="light"] {
   width:          100%;
 }
 
+/* O card de secao assume a cor 2 e oferece a cor 3 aos filhos — a outra ponta
+   do rodizio de superficies (NOVO-28); o par inverso esta em
+   components/form-sections.css, no .cv-form-block. */
 .cv-form-section-card {
   background:    var(--cv-form-section-bg);
   border:        1px solid var(--cv-form-section-border);
@@ -1098,6 +1101,9 @@ html[data-theme="light"] {
   box-shadow:    var(--cv-form-section-shadow);
   overflow:      hidden;
   width:         100%;
+
+  --cv-surface:      var(--cv-surface-card);
+  --cv-surface-next: var(--cv-surface-block);
 }
 
 /* =========================================================
@@ -3607,7 +3613,7 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 }
 
 #quick-add-modelo-motivo .cv-field__control--textarea {
-  background: var(--cv-field-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--cv-field-border);
   border-radius: var(--cv-field-radius);
   box-shadow: var(--cv-field-shadow);
@@ -3649,7 +3655,7 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 }
 
 #quick-add-atividade .cv-field__control--textarea {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--cv-field-border);
   border-radius: var(--cv-field-radius);
   box-shadow: var(--cv-field-shadow);
@@ -3675,3 +3681,32 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 }
 
 
+
+
+/* =========================================================
+   Tinta do acento e fim das bordas de foco (NOVO-28)
+
+   Um bloco so, no fim do arquivo, para vencer por ordem sem precisar de
+   especificidade inventada. `--cv-surface` e herdada, entao o color-mix
+   resolve no contexto em que o elemento caiu — a cor de fundo nao se repete
+   em declaracao nenhuma.
+
+   Acessibilidade: o foco NAO desapareceu, mudou de veiculo. Era borda/outline,
+   virou troca de tinta. Medido em dE (a razao WCAG so enxerga brilho e
+   subestima mudanca de matiz): 11,1 no claro e 18,0 no escuro, contra 5 que ja
+   e "obviamente diferente". Sem isso, apagar o outline quebraria navegacao por
+   teclado e desfaria N-03/D-06.
+   ========================================================= */
+
+:where(input, select, textarea, button, a, summary, [tabindex]):focus-visible {
+  background-color: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-color: transparent;
+  outline: 0;
+}
+
+/* Botao cheio e excecao declarada: ja e o acento, entao a tinta nao apareceria.
+   Clareia em vez de trocar de fundo. */
+:where(.cv-btn--primary, .cv-btn--accent):focus-visible {
+  background-color: var(--color-accent);
+  filter: brightness(1.14);
+}

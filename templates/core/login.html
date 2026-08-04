@@ -10,6 +10,11 @@
   <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
   <link rel="stylesheet" href="{% static 'css/theme.css' %}">
   <link rel="stylesheet" href="{% static 'css/03-theme-dark.css' %}">
+  {% comment %}
+    Depois do tema escuro, mesma razao do bundle: os dois declaram em
+    html[data-theme="dark"], entao quem vem por ultimo vence.
+  {% endcomment %}
+  <link rel="stylesheet" href="{% static 'css/00-palette.css' %}">
   <link rel="stylesheet" href="{% static 'css/auth.css' %}">
 </head>
 <body class="auth-page">

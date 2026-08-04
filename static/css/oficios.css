@@ -140,7 +140,7 @@
 /* Textarea de Motivo no wizard: visual idêntico ao input, só com altura maior */
 .travel-document-wizard .cv-field__control,
 .travel-document-wizard .cv-field__select {
-  background: var(--cv-field-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--cv-field-border);
   border-radius: var(--cv-field-radius);
   box-shadow: var(--cv-field-shadow);
@@ -266,7 +266,7 @@
 
 .app-multiselect__control {
   align-items: center;
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--color-input-border);
   border-radius: var(--radius-control);
   box-shadow: var(--shadow-inner-light);
@@ -512,7 +512,7 @@
 }
 
 .oficio-equipe-picker__input {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--color-input-border);
   border-radius: var(--radius-control);
   box-shadow: var(--shadow-inner-light);
@@ -728,7 +728,7 @@
 }
 
 .oficio-viajante-card__termo-choice {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-control);
   display: grid;
@@ -1162,7 +1162,7 @@
 
 .oficio-data-info__value {
   align-items: center;
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--color-input-border);
   border-radius: var(--radius-control);
   box-shadow: var(--shadow-inner-light);

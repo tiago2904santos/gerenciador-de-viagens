@@ -1,23 +1,23 @@
 /* Login standalone — usa tokens globais; respeita html[data-theme]. */
 
 .auth-page {
-  --auth-bg: var(--color-bg-strong);
-  --auth-shell: var(--color-shell);
-  --auth-surface: var(--color-surface);
-  --auth-surface-strong: var(--color-surface-elevated, var(--color-surface-soft));
-  --auth-field: var(--color-surface-muted);
+  --auth-bg: var(--cv-surface-page);
+  --auth-shell: var(--cv-surface-page);
+  --auth-surface: var(--cv-surface-card);
+  --auth-surface-strong: var(--cv-surface-block);
+  --auth-field: var(--cv-surface-block);
   --auth-border: var(--color-border);
   --auth-border-strong: var(--color-border-strong);
   --auth-text: var(--color-text);
   --auth-heading: var(--color-heading);
   --auth-muted: var(--color-muted);
   --auth-subtle: var(--color-subtle);
-  --auth-primary: var(--color-primary-bright, var(--color-primary));
-  --auth-primary-hover: var(--color-primary-hover);
+  --auth-primary: var(--color-accent);
+  --auth-primary-hover: color-mix(in srgb, var(--color-accent) 85%, var(--cv-surface-page));
   --auth-accent: var(--color-accent);
-  --auth-accent-text: var(--color-accent-hover, var(--color-accent));
-  --auth-danger: var(--color-danger, #ef7d77);
-  --auth-danger-soft: var(--color-danger-soft, color-mix(in srgb, var(--color-danger, #ef7d77) 18%, var(--color-surface)));
+  --auth-accent-text: var(--color-accent);
+  --auth-danger: var(--color-danger);
+  --auth-danger-soft: var(--color-danger-soft, color-mix(in srgb, var(--color-danger) 18%, var(--color-surface)));
   background: var(--auth-bg);
   color: var(--auth-text);
   font-family: var(--font-sans, system-ui, -apple-system, "Segoe UI", sans-serif);
@@ -43,7 +43,7 @@
   background: var(--auth-surface);
   border: 1px solid var(--auth-border);
   border-radius: var(--radius-xl, 20px);
-  box-shadow: var(--shadow-strong, 0 26px 70px rgb(0 0 0 / 38%));
+  box-shadow: var(--shadow-strong);
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(380px, 0.95fr);
   max-width: 980px;
@@ -75,7 +75,7 @@
   align-items: center;
   background: var(--auth-accent);
   border-radius: var(--radius-md, 12px);
-  color: var(--color-on-accent, #19232d);
+  color: var(--on-accent);
   display: flex;
   font-size: 0.78rem;
   font-weight: 900;
@@ -219,7 +219,7 @@
   background: var(--auth-primary);
   border: 1px solid color-mix(in srgb, var(--auth-primary) 70%, var(--auth-border-strong));
   border-radius: var(--radius-md, 11px);
-  color: var(--color-on-primary, #ffffff);
+  color: var(--on-accent);
   cursor: pointer;
   font: inherit;
   font-weight: 800;
@@ -234,7 +234,7 @@
 
 .auth-submit:active { transform: translateY(1px); }
 .auth-submit:focus-visible {
-  box-shadow: 0 0 0 2px var(--color-focus-ring, rgb(134 169 194 / 24%));
+  box-shadow: 0 0 0 2px var(--color-focus-ring);
   outline: none;
 }
 
@@ -250,7 +250,7 @@
 }
 
 .auth-footer__dot {
-  background: var(--color-success, #58c694);
+  background: var(--color-success);
   border-radius: 50%;
   height: 7px;
   width: 7px;

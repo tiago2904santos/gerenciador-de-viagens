@@ -1,6 +1,6 @@
 .document-generation-embedded {
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-panel: var(--color-surface-soft);
+  --step1-surface: var(--cv-surface-card);
+  --step1-panel: var(--cv-surface-block);
   display: grid;
   min-height: 100vh;
   margin: 0;

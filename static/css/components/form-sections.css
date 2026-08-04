@@ -12,12 +12,34 @@
   gap: 10px;
 }
 
+/* ------------------------------------------------------------------------
+   Rodizio de superficies (NOVO-28)
+
+   O bloco assume a cor 3 e devolve a cor 2 aos filhos; o card de secao faz o
+   inverso (regra em page-shell.css, junto do resto do .cv-form-section-card).
+   Bloco dentro de bloco reinverte o par, senao dois niveis aninhados ficariam
+   com a mesma cor e a hierarquia sumiria — que e justamente o que as bordas
+   faziam antes de serem retiradas.
+
+   Definicoes de paleta: static/css/00-palette.css
+   ------------------------------------------------------------------------ */
 .cv-form-block {
   align-items: start;
+  background: var(--cv-surface-block);
   display: grid;
   gap: var(--space-4);
   grid-template-columns: minmax(0, 1fr);
   min-width: 0;
+
+  --cv-surface:      var(--cv-surface-block);
+  --cv-surface-next: var(--cv-surface-card);
+}
+
+.cv-form-block .cv-form-block {
+  background: var(--cv-surface-card);
+
+  --cv-surface:      var(--cv-surface-card);
+  --cv-surface-next: var(--cv-surface-block);
 }
 
 .cv-form-block__header {
