@@ -923,12 +923,6 @@ html[data-theme="dark"] input[type="checkbox"] {
    ========================================================================== */
 
 .main-form-panel {
-  --field-bg: var(--cv-field-bg);
-  --field-bg-soft: var(--cv-field-bg-hover);
-  --field-border: var(--cv-field-border);
-  --field-border-hover: var(--cv-field-border-hover);
-  --field-border-focus: var(--cv-field-border-focus);
-  --field-text: var(--cv-field-color);
 }
 
 .main-form-panel > .field-grid-rows {
@@ -940,14 +934,6 @@ html[data-theme="dark"] input[type="checkbox"] {
 .main-form-panel .field,
 .main-form-panel .app-form-field,
 .main-form-panel .cv-field {
-  --field-bg: var(--cv-field-bg);
-  --field-bg-soft: var(--cv-field-bg-hover);
-  --field-border: var(--cv-field-border);
-  --field-border-hover: var(--cv-field-border-hover);
-  --field-border-focus: var(--cv-field-border-focus);
-  --field-text: var(--cv-field-color);
-  --field-focus-ring: var(--cv-field-focus-ring);
-  --form-control-height: var(--control-height-md);
   align-content: start;
   gap: var(--space-2);
 }
@@ -1073,8 +1059,6 @@ html[data-theme="dark"] input[type="checkbox"] {
 
 /* Gerenciar: input encolhe no hover; botão absoluto por cima, à direita */
 .main-form-panel .cv-field-with-action--manage-reveal {
-  --field-manage-btn-size: var(--form-control-height);
-  --field-manage-btn-gap: var(--space-2);
   display: block;
   gap: 0;
   min-height: var(--form-control-height);

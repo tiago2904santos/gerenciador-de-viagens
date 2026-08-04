@@ -9,7 +9,7 @@ class DarkRedesignContractTests(SimpleTestCase):
     def setUp(self):
         self.base_path = Path(settings.BASE_DIR) / "templates" / "base.html"
         css_root = Path(settings.BASE_DIR) / "static" / "css"
-        self.tokens_path = css_root / "03-theme-dark.css"
+        self.tokens_path = css_root / "01-tokens.css"
         self.components_path = css_root / "components" / "theme-dark-components.css"
         self.base = self.base_path.read_text(encoding="utf-8")
         self.tokens_css = self.tokens_path.read_text(encoding="utf-8")
@@ -22,7 +22,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR) / "static" / "css" / "shell.bundle.css"
         ).read_text(encoding="utf-8")
         style_index = bundle.index(">>> css/style.css >>>")
-        theme_dark_tokens_index = bundle.index(">>> css/03-theme-dark.css >>>")
+        theme_tokens_index = bundle.index("@import url(\"./01-tokens.css\")")
         file_picker_index = bundle.index(">>> css/components/file-picker.css >>>")
         action_system_index = bundle.index(">>> css/components/action-system.css >>>")
         record_list_index = bundle.index(">>> css/components/record-list.css >>>")
@@ -40,7 +40,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         extra_css_index = self.base.index("{% block extra_css %}")
         shell_bundle_index = self.base.index("css/shell.bundle.css")
 
-        self.assertLess(style_index, theme_dark_tokens_index)
+        self.assertLessEqual(style_index, theme_tokens_index)
         self.assertNotIn("css/dark-redesign.css", self.base)
         self.assertNotIn("css/dark-redesign.css", bundle)
         self.assertLess(shell_bundle_index, extra_css_index)
@@ -720,13 +720,18 @@ class DarkRedesignContractTests(SimpleTestCase):
             "--route-button-primary-bg:",
         ):
             with self.subTest(token=token):
-                declaration = next(
+                declarations = [
                     line.strip()
                     for line in self.tokens_css.splitlines()
                     if line.strip().startswith(token)
+                ]
+                self.assertTrue(
+                    any("var(--color-primary" in item for item in declarations),
+                    f"{token} sem alias para a familia primaria",
                 )
-                self.assertIn("var(--color-primary", declaration)
-                self.assertNotIn("var(--color-accent", declaration)
+                self.assertTrue(
+                    all("var(--color-accent" not in item for item in declarations)
+                )
 
     def test_dark_wizard_filete_stays_gold_and_tracks_header_content(self):
         page_shell = (

@@ -1,23 +1,6 @@
 /* Login standalone — usa tokens globais; respeita html[data-theme]. */
 
 .auth-page {
-  --auth-bg: var(--cv-surface-page);
-  --auth-shell: var(--cv-surface-page);
-  --auth-surface: var(--cv-surface-card);
-  --auth-surface-strong: var(--cv-surface-block);
-  --auth-field: var(--cv-surface-block);
-  --auth-border: var(--color-border);
-  --auth-border-strong: var(--color-border-strong);
-  --auth-text: var(--color-text);
-  --auth-heading: var(--color-heading);
-  --auth-muted: var(--color-muted);
-  --auth-subtle: var(--color-subtle);
-  --auth-primary: var(--color-accent);
-  --auth-primary-hover: color-mix(in srgb, var(--color-accent) 85%, var(--cv-surface-page));
-  --auth-accent: var(--color-accent);
-  --auth-accent-text: var(--color-accent);
-  --auth-danger: var(--color-danger);
-  --auth-danger-soft: var(--color-danger-soft, color-mix(in srgb, var(--color-danger) 18%, var(--color-surface)));
   background: var(--auth-bg);
   color: var(--auth-text);
   font-family: var(--font-sans, system-ui, -apple-system, "Segoe UI", sans-serif);

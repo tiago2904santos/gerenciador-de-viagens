@@ -12,194 +12,42 @@
    ========================================================= */
 :root {
   /* Régua única — tokens canônicos definidos em tokens.css */
-  --cv-btn-size: var(--cv-btn-height);
-  --cv-btn-font-size: 0.86rem;
-  --cv-btn-font-weight: 700;
-  --cv-btn-control-radius: var(--radius-control);
 
   /* Alturas derivadas */
-  --cv-btn-height-xs:      28px;
-  --cv-btn-height-sm:      32px;
-  --cv-btn-height-md:      var(--cv-btn-height);
-  --cv-btn-height-lg:      var(--control-height-lg);
-  --cv-btn-height-control: var(--control-height-md); /* 44px — emparelha com inputs */
+/* 44px — emparelha com inputs */
 
   /* Padding por tamanho, mantido para compatibilidade */
-  --cv-btn-padding-x-xs:      9px;
-  --cv-btn-padding-x-sm:      11px;
-  --cv-btn-padding-x-md:      var(--cv-btn-padding-x);
-  --cv-btn-padding-x-lg:      15px;
-  --cv-btn-padding-x-control: 16px;
 
   /* Transicao — reusa token existente */
-  --cv-btn-transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast),
-    color var(--transition-fast),
-    transform var(--transition-fast);
 
   /* Acessibilidade */
-  --cv-btn-focus-ring: 0 0 0 3px rgba(21, 91, 154, 0.28);
 
   /* Estado disabled */
-  --cv-btn-disabled-opacity: 0.45;
 
   /* Tokens semânticos */
-  --cv-btn-primary-bg: linear-gradient(180deg, var(--color-secondary), var(--color-primary));
-  --cv-btn-primary-hover-bg: linear-gradient(180deg, var(--color-secondary-hover), var(--color-primary-dark));
-  --cv-btn-primary-border: rgba(255, 255, 255, 0.18);
-  --cv-btn-primary-hover-border: rgba(255, 255, 255, 0.24);
-  --cv-btn-primary-color: var(--color-white);
 
-  --cv-btn-secondary-bg: var(--color-surface);
-  --cv-btn-secondary-border: var(--color-border-strong);
-  --cv-btn-secondary-color: var(--color-primary-strong);
-  --cv-btn-secondary-hover-bg: var(--color-secondary-soft);
-  --cv-btn-secondary-hover-border: var(--color-secondary);
-  --cv-btn-secondary-hover-color: var(--color-heading);
-  --cv-btn-secondary-active-bg: var(--color-primary-soft);
-  --cv-btn-secondary-active-border: var(--color-primary);
-  --cv-btn-secondary-active-color: var(--color-primary-strong);
 
-  --cv-btn-neutral-bg: var(--color-surface-muted);
-  --cv-btn-neutral-border: var(--color-border);
-  --cv-btn-neutral-color: var(--color-muted-strong);
-  --cv-btn-neutral-hover-bg: var(--color-surface-soft);
-  --cv-btn-neutral-hover-border: var(--color-border-strong);
-  --cv-btn-neutral-hover-color: var(--color-text);
 
-  --state-success-bg: color-mix(in srgb, var(--color-success) 16%, var(--theme-surface-card, var(--color-surface)) 84%);
-  --state-success-bg-hover: color-mix(in srgb, var(--color-success) 22%, var(--theme-surface-card, var(--color-surface)) 78%);
-  --state-success-bg-active: color-mix(in srgb, var(--color-success) 82%, var(--theme-surface-card, var(--color-surface)) 18%);
-  --state-success-border: color-mix(in srgb, var(--color-success) 68%, var(--theme-border-card, var(--color-border)) 32%);
-  --state-success-border-hover: color-mix(in srgb, var(--color-success) 82%, var(--theme-border-card, var(--color-border)) 18%);
-  --state-success-text: color-mix(in srgb, var(--color-success) 84%, var(--color-heading) 16%);
-  --state-success-text-active: var(--color-white);
-  --state-success-dot: var(--color-success);
-  --state-success-glow: 0 0 0 1px color-mix(in srgb, var(--color-success) 24%, transparent), 0 0 18px color-mix(in srgb, var(--color-success) 32%, transparent);
 
-  --state-warning-bg: color-mix(in srgb, var(--color-accent) 16%, var(--theme-surface-card, var(--color-surface)) 84%);
-  --state-warning-bg-hover: color-mix(in srgb, var(--color-accent) 23%, var(--theme-surface-card, var(--color-surface)) 77%);
-  --state-warning-bg-active: color-mix(in srgb, var(--color-accent) 78%, var(--theme-surface-card, var(--color-surface)) 22%);
-  --state-warning-border: color-mix(in srgb, var(--color-accent) 66%, var(--theme-border-card, var(--color-border)) 34%);
-  --state-warning-border-hover: color-mix(in srgb, var(--color-accent) 80%, var(--theme-border-card, var(--color-border)) 20%);
-  --state-warning-text: color-mix(in srgb, var(--color-accent) 78%, var(--color-heading) 22%);
-  --state-warning-text-active: var(--color-primary-strong);
-  --state-warning-dot: var(--color-accent);
-  --state-warning-glow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 24%, transparent), 0 0 18px color-mix(in srgb, var(--color-accent) 28%, transparent);
 
-  --state-danger-bg: color-mix(in srgb, var(--color-danger) 15%, var(--theme-surface-card, var(--color-surface)) 85%);
-  --state-danger-bg-hover: color-mix(in srgb, var(--color-danger) 22%, var(--theme-surface-card, var(--color-surface)) 78%);
-  --state-danger-bg-active: color-mix(in srgb, var(--color-danger) 80%, var(--theme-surface-card, var(--color-surface)) 20%);
-  --state-danger-border: color-mix(in srgb, var(--color-danger) 68%, var(--theme-border-card, var(--color-border)) 32%);
-  --state-danger-border-hover: color-mix(in srgb, var(--color-danger) 82%, var(--theme-border-card, var(--color-border)) 18%);
-  --state-danger-text: color-mix(in srgb, var(--color-danger) 84%, var(--color-heading) 16%);
-  --state-danger-text-active: var(--color-white);
-  --state-danger-dot: var(--color-danger);
-  --state-danger-glow: 0 0 0 1px color-mix(in srgb, var(--color-danger) 22%, transparent), 0 0 18px color-mix(in srgb, var(--color-danger) 30%, transparent);
 
-  --state-neutral-bg: color-mix(in srgb, var(--theme-text-muted, var(--color-muted)) 10%, var(--theme-surface-card, var(--color-surface)) 90%);
-  --state-neutral-bg-hover: color-mix(in srgb, var(--theme-text-muted, var(--color-muted)) 16%, var(--theme-surface-card, var(--color-surface)) 84%);
-  --state-neutral-bg-active: color-mix(in srgb, var(--color-primary) 18%, var(--theme-surface-card, var(--color-surface)) 82%);
-  --state-neutral-border: color-mix(in srgb, var(--theme-text-muted, var(--color-muted)) 42%, var(--theme-border-card, var(--color-border)) 58%);
-  --state-neutral-border-hover: color-mix(in srgb, var(--theme-text-muted, var(--color-muted)) 58%, var(--theme-border-card, var(--color-border)) 42%);
-  --state-neutral-text: var(--theme-text-muted-strong, var(--color-muted-strong));
-  --state-neutral-text-active: var(--theme-text-heading, var(--color-heading));
-  --state-neutral-dot: var(--theme-text-muted, var(--color-muted));
-  --state-neutral-glow: 0 0 0 1px color-mix(in srgb, var(--theme-text-muted, var(--color-muted)) 16%, transparent), 0 0 14px color-mix(in srgb, var(--theme-text-muted, var(--color-muted)) 16%, transparent);
 
-  --cv-btn-preview-bg: var(--cv-btn-secondary-bg);
-  --cv-btn-preview-hover-bg: var(--cv-btn-secondary-hover-bg);
-  --cv-btn-preview-color: var(--cv-btn-secondary-color);
 
-  --cv-btn-pdf-bg: linear-gradient(135deg, #c0392b 0%, var(--color-danger) 100%);
-  --cv-btn-pdf-hover-bg: linear-gradient(135deg, #a93328 0%, #951f18 100%);
-  --cv-btn-pdf-color: var(--color-white);
 
-  --cv-btn-docx-bg: linear-gradient(180deg, #2f67aa 0%, #1f5493 100%);
-  --cv-btn-docx-hover-bg: linear-gradient(180deg, #3b76b9 0%, #224f88 100%);
-  --cv-btn-docx-color: var(--color-white);
 
-  --cv-btn-footer-bg: var(--color-surface-muted);
-  --cv-btn-footer-hover-bg: var(--color-surface-soft);
-  --cv-btn-footer-border: var(--color-border-soft);
-  --cv-btn-footer-hover-border: var(--color-border-strong);
-  --cv-btn-footer-color: var(--color-muted-strong);
-  --cv-btn-footer-hover-color: var(--color-primary);
 
-  --cv-icon-btn-tooltip-bg: rgba(7, 26, 51, 0.96);
-  --cv-icon-btn-tooltip-color: var(--color-white);
-  --cv-icon-btn-tooltip-border: rgba(255, 255, 255, 0.08);
 }
 
 html[data-theme="dark"] {
-  --cv-btn-secondary-bg: #1b2839;
-  --cv-btn-secondary-border: #50657c;
-  --cv-btn-secondary-color: #edf5ff;
-  --cv-btn-secondary-hover-bg: #24394f;
-  --cv-btn-secondary-hover-border: #7c97b0;
-  --cv-btn-secondary-hover-color: #ffffff;
-  --cv-btn-secondary-active-bg: #162131;
-  --cv-btn-secondary-active-border: #5d768e;
-  --cv-btn-secondary-active-color: #f7fbff;
 
-  --cv-btn-neutral-bg: #141f2f;
-  --cv-btn-neutral-border: #31455b;
-  --cv-btn-neutral-color: #d1deec;
-  --cv-btn-neutral-hover-bg: #1d2b3e;
-  --cv-btn-neutral-hover-border: #496078;
-  --cv-btn-neutral-hover-color: #ffffff;
 
-  --cv-btn-preview-bg: var(--cv-btn-secondary-bg);
-  --cv-btn-preview-hover-bg: var(--cv-btn-secondary-hover-bg);
-  --cv-btn-preview-color: var(--cv-btn-secondary-color);
 
-  --cv-btn-pdf-bg: linear-gradient(135deg, #c0392b 0%, var(--color-danger) 100%);
-  --cv-btn-pdf-hover-bg: linear-gradient(135deg, #a93328 0%, #951f18 100%);
-  --cv-btn-docx-bg: linear-gradient(180deg, #3e74b9 0%, #295b9a 100%);
-  --cv-btn-docx-hover-bg: linear-gradient(180deg, #4a85c9 0%, #2d5f9d 100%);
 
-  --cv-btn-footer-bg: #162132;
-  --cv-btn-footer-hover-bg: #1d2a3c;
-  --cv-btn-footer-border: #2f4258;
-  --cv-btn-footer-hover-border: #4f647b;
-  --cv-btn-footer-color: #cddbeb;
-  --cv-btn-footer-hover-color: #ffffff;
 
-  --state-success-bg: color-mix(in srgb, var(--color-success) 26%, var(--theme-surface-card) 74%);
-  --state-success-bg-hover: color-mix(in srgb, var(--color-success) 34%, var(--theme-surface-card) 66%);
-  --state-success-bg-active: color-mix(in srgb, var(--color-success) 58%, var(--theme-surface-card) 42%);
-  --state-success-text: color-mix(in srgb, var(--color-success) 48%, var(--color-white) 52%);
-  --state-warning-bg: color-mix(in srgb, var(--color-accent) 26%, var(--theme-surface-card) 74%);
-  --state-warning-bg-hover: color-mix(in srgb, var(--color-accent) 34%, var(--theme-surface-card) 66%);
-  --state-warning-bg-active: color-mix(in srgb, var(--color-accent) 54%, var(--theme-surface-card) 46%);
-  --state-warning-text: color-mix(in srgb, var(--color-accent) 48%, var(--color-white) 52%);
-  --state-warning-text-active: var(--theme-text-heading);
-  --state-danger-bg: color-mix(in srgb, var(--color-danger) 20%, var(--theme-surface-card) 80%);
-  --state-danger-bg-hover: color-mix(in srgb, var(--color-danger) 30%, var(--theme-surface-card) 70%);
-  --state-danger-bg-active: color-mix(in srgb, var(--color-danger) 56%, var(--theme-surface-card) 44%);
-  --state-danger-border: color-mix(in srgb, var(--color-danger) 86%, var(--theme-border-card) 14%);
-  --state-danger-text: color-mix(in srgb, var(--color-danger) 64%, var(--color-white) 36%);
-  --state-danger-glow: 0 0 0 1px color-mix(in srgb, var(--color-danger) 44%, transparent), 0 0 26px color-mix(in srgb, var(--color-danger) 58%, transparent);
-  --state-neutral-bg: color-mix(in srgb, var(--theme-text-muted) 18%, var(--theme-surface-card) 82%);
-  --state-neutral-bg-hover: color-mix(in srgb, var(--theme-text-muted) 26%, var(--theme-surface-card) 74%);
-  --state-neutral-bg-active: color-mix(in srgb, var(--color-primary-bright) 28%, var(--theme-surface-card) 72%);
 
-  --cv-icon-btn-tooltip-bg: rgba(7, 17, 29, 0.98);
-  --cv-icon-btn-tooltip-color: #f7fbff;
-  --cv-icon-btn-tooltip-border: rgba(191, 211, 234, 0.22);
 }
 
 html[data-theme="light"] {
-  --state-success-bg: color-mix(in srgb, var(--color-success) 6%, var(--theme-surface-card, var(--color-surface)) 94%);
-  --state-success-bg-hover: color-mix(in srgb, var(--color-success) 12%, var(--theme-surface-card, var(--color-surface)) 88%);
-  --state-warning-bg: color-mix(in srgb, var(--color-accent) 6%, var(--theme-surface-card, var(--color-surface)) 94%);
-  --state-warning-bg-hover: color-mix(in srgb, var(--color-accent) 12%, var(--theme-surface-card, var(--color-surface)) 88%);
-  --state-danger-bg: color-mix(in srgb, var(--color-danger) 6%, var(--theme-surface-card, var(--color-surface)) 94%);
-  --state-danger-bg-hover: color-mix(in srgb, var(--color-danger) 12%, var(--theme-surface-card, var(--color-surface)) 88%);
-  --state-neutral-bg: color-mix(in srgb, var(--theme-text-muted, var(--color-muted)) 5%, var(--theme-surface-card, var(--color-surface)) 95%);
-  --state-neutral-bg-hover: color-mix(in srgb, var(--theme-text-muted, var(--color-muted)) 10%, var(--theme-surface-card, var(--color-surface)) 90%);
 }
 
 /* =========================================================
@@ -559,14 +407,9 @@ html[data-theme="light"] {
    ========================================================= */
 
 :root {
-  --cv-icon-btn-size: var(--cv-btn-size);
-  --cv-icon-btn-size-sm: 32px;
-  --cv-icon-btn-size-lg: 40px;
-  --cv-icon-btn-icon-size: 18px;
 }
 
 .cv-icon-btn {
-  --cv-icon-btn-icon-size: 18px;
   align-items: center;
   background: var(--cv-btn-neutral-bg);
   border: 1px solid var(--cv-btn-neutral-border);
@@ -624,13 +467,11 @@ html[data-theme="light"] {
 
 /* Tamanhos */
 .cv-icon-btn--sm {
-  --cv-icon-btn-icon-size: 17px;
   height: var(--cv-icon-btn-size-sm);
   width: var(--cv-icon-btn-size-sm);
 }
 
 .cv-icon-btn--lg {
-  --cv-icon-btn-icon-size: 19px;
   height: var(--cv-icon-btn-size-lg);
   width: var(--cv-icon-btn-size-lg);
 }
@@ -993,7 +834,6 @@ html[data-theme="light"] {
    ========================================================= */
 
 :root {
-  --cv-field-action-radius: var(--cv-btn-control-radius);
 }
 
 .cv-field-action {

@@ -773,7 +773,7 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
 > declarada, entao `--color-input-bg: var(--cv-surface-next)` no `:root` congelaria o valor
 > da raiz e o rodizio morreria em silencio — os 35 fundos de controle foram trocados no
 > **ponto de uso**. A segunda: a ordem de carga importa e nao aparece no tema claro. A
-> paleta precisa vir **depois** de `03-theme-dark.css`, porque os dois declaram no mesmo
+> paleta precisa vir **depois** de `01-tokens.css`, porque os dois declaram no mesmo
 > seletor `html[data-theme="dark"]`; antes dele, o acento novo e ignorado so no escuro.
 
 ### Reescrita completa do CSS — `NOVO-30`
@@ -782,8 +782,11 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
 > para refazer do zero, uma fase por PR, com a coordenação visual institucional
 > (card → bloco → campo; claro espelho do escuro).
 
-- [ ] **Fase 1 — camada unica de tokens:** fundir `tokens.css`, `theme.css` e
-  `03-theme-dark.css` em `01-tokens.css` (≤ 60 tokens canônicos + aliases temporários).
+- [x] **Fase 1 — camada unica de tokens (refazer):** `tokens.css`, `theme.css` e
+  `03-theme-dark.css` consolidados em `01-tokens.css` (27 tokens canônicos +
+  aliases temporários remapeados para a paleta institucional). Declaracoes `--*`
+  fora de `00-palette.css` / `01-tokens.css`: **0**. Coordenacao visual: superfícies
+  e tinta dos aliases espelham card → bloco → campo das imagens de referencia.
 - [ ] **Fase 2 — regra do espelho:** zerar `data-theme` fora de `00-palette.css` /
   `01-tokens.css`; eliminar `components/theme-dark-components.css`.
 - [ ] **Fase 3 — geometria padronizada e fim dos aliases.**

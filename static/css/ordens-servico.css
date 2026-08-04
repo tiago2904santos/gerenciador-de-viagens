@@ -196,7 +196,6 @@
 
 .os-servidor-role-panel__picker {
   min-width: 0;
-  --form-control-height: var(--control-height-md, 44px);
 }
 
 .os-servidor-role-panel__picker .cv-search-picker__field {

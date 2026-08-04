@@ -3016,7 +3016,6 @@
    fica inválida e o campo colapsa para a altura do texto (~19px) em vez de 44px.
    Mesmo remédio já usado em .related-route-picker (dark-redesign.css). */
 .evento-doc-source-picker {
-  --form-control-height: var(--control-height-md, 44px);
   /* gap:0 — o select oculto no meio do grid dobraria qualquer gap. */
   gap: 0 !important;
 }
@@ -3144,9 +3143,6 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker__d
  * então o override precisa ser no mesmo nível ou mais específico.
  */
 html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
-  --driver-bg:     color-mix(in srgb, var(--color-accent) 18%, transparent);
-  --driver-border: color-mix(in srgb, var(--color-accent) 65%, transparent);
-  --driver-text:   var(--color-accent);
 }
 
 /* Equipe (step1): cards selecionados em até 2 colunas quando houver espaço.
@@ -3203,10 +3199,6 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
 /* ── Etapa 1 / Roteiro: painéis por seção (layout estrutural) ─ */
 .page-shell--wizard.travel-document-wizard,
 .cv-page--flow.travel-document-wizard {
-  --stepper-missing-bg: color-mix(in srgb, var(--color-danger) 10%, transparent);
-  --stepper-missing-border: color-mix(in srgb, var(--color-danger) 28%, transparent);
-  --stepper-missing-color: color-mix(in srgb, var(--color-danger) 78%, var(--color-heading));
-  --stepper-status-missing-color: color-mix(in srgb, var(--color-danger) 68%, var(--color-muted));
 }
 
 :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-consolidado]) :is(.travel-document-body, .oficio-roteiro-body, .oficio-justificativa-body, .oficio-documentos-body) {

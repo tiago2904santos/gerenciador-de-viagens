@@ -21,7 +21,7 @@
 
    ORDEM DE CARGA (importa)
 
-   Entra depois de 03-theme-dark.css no bundle: o bloco escuro daquele arquivo
+   Entra depois de 01-tokens.css no bundle: o bloco escuro daquele arquivo
    usa o mesmo seletor `html[data-theme="dark"]`, entao quem vem por ultimo
    vence. Antes dele, o acento novo seria ignorado.
 

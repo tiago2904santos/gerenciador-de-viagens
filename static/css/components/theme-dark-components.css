@@ -1,6 +1,6 @@
 /*
  * theme-dark-components.css — transitional dark-theme component overrides.
- * Tokens live in 03-theme-dark.css. Long-term: dissolve into owning component files.
+ * Tokens live in 01-tokens.css. NOVO-30 phase 2 dissolves this file.
  * Extracted from dark-redesign.css (Etapa 7, Fase 6).
  */
 
@@ -330,8 +330,6 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 
 :is(html[data-theme="dark"])
   .cv-search-picker {
-  --cv-search-picker-focus-shadow: none;
-  --field-border-focus: var(--color-accent-border-strong);
 }
 
 /* O picker é um único controle visual. O input de busca interno não desenha
@@ -356,8 +354,6 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
    ========================================================= */
 :is(html[data-theme="dark"])
   :is(.page-shell--wizard, .cv-page--flow) {
-  --cv-form-section-header-padding: 12px 18px 12px 30px;
-  --cv-form-section-body-padding: 16px 18px;
 }
 
 /* Título livre do evento: quebra em até duas linhas no list-header. */
@@ -428,12 +424,6 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
    ======================================================================== */
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-step1] .travel-document-card, [data-travel-document-wizard-rt] .travel-document-card, [data-travel-document-wizard-diario] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card, [data-travel-document-wizard-roteiro] .oficio-roteiro-card, [data-travel-document-wizard-justificativa] .oficio-justificativa-card, [data-travel-document-wizard-documentos] .oficio-documentos-unified-card, [data-travel-document-wizard-documentos] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card) {
-  --step1-surface: var(--cv-surface-card);
-  --step1-panel: var(--cv-surface-block);
-  --step1-field: var(--cv-surface-next);
-  --step1-empty: var(--cv-surface-next);
-  --color-input-bg: var(--step1-field);
-  --cv-field-bg: var(--step1-field);
   background: var(--step1-surface);
   border-color: color-mix(in srgb, var(--color-border) 40%, transparent);
   box-shadow:
@@ -696,7 +686,6 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 /* Menu do select reanexado ao <body> por CV.overlay. */
 :is(html[data-theme="dark"])
   .cv-custom-select__menu--v2.cv-floating-dropdown--active:is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) {
-  --cv-cs-menu-bg: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
   background: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
   border-color: color-mix(in srgb, var(--color-border) 55%, transparent);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
@@ -1442,8 +1431,6 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 /* Busca de roteiro salvo: mesma altura do picker de Equipe. */
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker {
-  --form-control-height: var(--control-height-md, 44px);
-  --cv-search-picker-height: var(--control-height-md, 44px);
 }
 
 :is(html[data-theme="dark"])
@@ -5272,9 +5259,6 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .cv-collection-panel {
-  --step1-panel: var(--cv-surface-block);
-  --step1-surface: var(--cv-surface-card);
-  --step1-field: var(--cv-surface-next);
   background: var(--step1-panel);
   border: 0;
   box-shadow: none;
@@ -5283,9 +5267,6 @@ html[data-theme="dark"] *::after {
 :is(html[data-theme="dark"])
   .cv-collection-panel
   .cv-list-tab {
-  --cv-list-tab-bg: var(--step1-surface);
-  --cv-list-tab-hover-bg: color-mix(in srgb, var(--step1-surface) 82%, #fff 18%);
-  --cv-list-tab-count-bg: color-mix(in srgb, #fff 12%, transparent);
 }
 
 :is(html[data-theme="dark"])
@@ -5526,7 +5507,6 @@ html[data-theme="dark"] *::after {
 /* Chevron v2: accent dourado em TODOS os estados (fechado/hover/focus/open). */
 :is(html[data-theme="dark"])
   .cv-custom-select--v2 {
-  --cv-cs-chevron-color: var(--color-accent);
 }
 
 :is(html[data-theme="dark"])
@@ -5586,7 +5566,6 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .cv-custom-select__menu--v2 {
-  --cv-cs-menu-bg: var(--color-input-bg);
   animation: none;
   background: var(--cv-surface-next);
   border: 1px solid var(--color-border-strong);

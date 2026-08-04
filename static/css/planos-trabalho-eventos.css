@@ -569,8 +569,6 @@ html[data-theme="dark"] .pt-add-evento__btn:focus-visible {
 
 /* Etapa 4 · conferência e documentos */
 .travel-document-wizard__form:has([data-travel-document-wizard-documentos]) {
-  --step1-surface: var(--cv-surface-card);
-  --step1-panel: var(--cv-surface-block);
 }
 
 .pt-documentos-stage .oficio-documentos-body {

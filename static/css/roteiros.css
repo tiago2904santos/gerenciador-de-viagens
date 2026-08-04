@@ -13,9 +13,6 @@
 
 /* Shell do wizard: sem â€œburacoâ€ visual; intro legÃ­vel em todos os temas */
 .roteiro-editor {
-  --re-accent: var(--theme-accent-eyebrow);
-  --re-accent-border: rgba(11, 58, 102, 0.55);
-  --re-choice-ring: rgba(21, 91, 154, 0.22);
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
@@ -2196,8 +2193,6 @@
 }
 
 .roteiro-editor--avulso #retorno-card .row.g-3 {
-  --bs-gutter-x: 16px;
-  --bs-gutter-y: 16px;
   display: grid;
   gap: var(--space-4);
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2274,8 +2269,6 @@
 }
 
 .roteiro-editor--avulso .route-segment-card .card-body > .row.g-3 {
-  --bs-gutter-x: 16px;
-  --bs-gutter-y: 16px;
   display: grid;
   gap: var(--space-4);
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2976,8 +2969,6 @@
 }
 
 .roteiro-mapa__canvas-shell {
-  --roteiro-mapa-toolbar-bg: var(--cv-form-section-header-bg, var(--route-card-bg));
-  --roteiro-mapa-toolbar-border: transparent;
   background: var(--cv-form-section-bg, var(--route-card-bg));
   border: 0;
   border-radius: var(--cv-form-section-radius, 13px);
@@ -3276,25 +3267,7 @@ html[data-theme="light"] .roteiro-editor--avulso .roteiro-editor__reference-bloc
 [data-travel-document-wizard-roteiro] .oficio-roteiro-body,
 .roteiro-editor--oficio .oficio-roteiro-body {
   /* Anéis / shadows de foco */
-  --cv-btn-focus-ring: none;
-  --cv-field-focus-ring: none;
-  --cv-field-shadow-focus: none;
-  --cv-search-picker-focus-shadow: none;
-  --cv-select-focus-ring: none;
-  --cv-select-focus-shadow: none;
-  --cv-sp-field-focus-ring: none;
-  --field-focus-ring: none;
-  --focus-ring: none;
-  --route-focus-ring: none;
-  --sidebar-focus-ring: transparent;
   /* Bordas de foco = borda em repouso (sem destaque colorido) */
-  --border-focus: var(--color-border, transparent);
-  --color-focus: var(--color-border, transparent);
-  --cv-field-border-focus: var(--cv-field-border, var(--color-border, transparent));
-  --cv-field-focus-border: var(--cv-field-border, var(--color-border, transparent));
-  --cv-select-border-focus: var(--cv-select-border, var(--color-border, transparent));
-  --cv-sp-field-border-focus: var(--cv-sp-field-border, var(--color-border, transparent));
-  --field-border-focus: var(--field-border, var(--color-border, transparent));
 }
 
 [data-travel-document-wizard-roteiro] .oficio-roteiro-body :is(:focus, :focus-visible),
