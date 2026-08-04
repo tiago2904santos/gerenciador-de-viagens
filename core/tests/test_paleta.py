@@ -51,6 +51,15 @@ SUPERFICIES_DO_SHELL = (
     "--surface-footer-actions",
     "--cv-form-section-bg",
     "--cv-form-section-header-bg",
+    # NOVO-29: superficies do rail de filtros e do quick-create entraram junto
+    # com a geometria do login.
+    "--surface-filter-input",
+    "--surface-filter-button",
+    "--surface-applied-chip",
+    "--surface-quick-create",
+    "--surface-quick-create-header",
+    "--surface-inline-create-tab",
+    "--surface-list-row",
 )
 TRES = {"var(--cv-surface-page)", "var(--cv-surface-card)", "var(--cv-surface-block)"}
 

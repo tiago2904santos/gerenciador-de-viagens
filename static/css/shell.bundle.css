@@ -1106,7 +1106,7 @@ html[data-theme="light"] {
   --cv-form-section-bg:             var(--cv-surface-card);
   --cv-form-section-header-bg:      var(--cv-surface-block);
   --cv-form-section-border:         var(--border-form-section);
-  --cv-form-section-shadow:         var(--shadow-sm);
+  --cv-form-section-shadow:         var(--shadow-strong);
   --cv-form-section-radius:         var(--radius-card);
   --cv-form-section-header-padding: var(--space-4) var(--space-6) var(--space-4) var(--space-10);
   --cv-form-section-body-padding:   var(--space-5) var(--space-6);
@@ -1209,7 +1209,7 @@ html[data-theme="dark"] {
   --cv-form-section-bg:        var(--cv-surface-card);
   --cv-form-section-header-bg: var(--cv-surface-block);
   --cv-form-section-border:    var(--theme-border-card);
-  --cv-form-section-shadow:    var(--theme-shadow-hero);
+  --cv-form-section-shadow:    var(--shadow-strong);
 
   --surface-list-panel:     var(--cv-surface-card);
   --border-list-panel:      var(--theme-border-card);
@@ -1218,7 +1218,7 @@ html[data-theme="dark"] {
   --surface-filter-bar:     var(--cv-surface-block);
   --border-filter-bar:      var(--theme-border-card);
 
-  --surface-list-row:       var(--surface-form-section); /* mesmo fundo das seções de formulário */
+  --surface-list-row:       var(--cv-surface-card); /* mesmo fundo das seções de formulário */
   --border-list-row:        rgba(255, 255, 255, 0.07);
   --surface-list-row-hover: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
 
@@ -1249,31 +1249,31 @@ html[data-theme="dark"] {
   --text-header-count:    #9fd0ff;
 
   /* Quick Create Inline */
-  --surface-quick-create:        rgba(255, 255, 255, 0.02);
-  --surface-quick-create-header: rgba(255, 255, 255, 0.04);
+  --surface-quick-create:        var(--cv-surface-block);
+  --surface-quick-create-header: var(--cv-surface-card);
   --border-quick-create:         rgba(255, 255, 255, 0.08);
   --shadow-quick-create:         none;
 
   /* Quick Add Folder Tab */
-  --surface-inline-create-tab:        rgba(11, 58, 102, 0.50);   /* azul primário com opacidade */
+  --surface-inline-create-tab:        var(--cv-surface-card);   /* azul primário com opacidade */
   --border-inline-create-tab:         rgba(255, 255, 255, 0.22);
   --color-inline-create-tab:          #ccdff5;                   /* texto claro sobre fundo escuro */
   --color-inline-create-tab-icon-bg:  var(--color-accent);       /* círculo dourado */
   --color-inline-create-tab-icon-fg:  var(--color-primary-dark); /* texto escuro sobre dourado */
 
   /* Header Filter Bar */
-  --surface-filter-input:         rgba(255, 255, 255, 0.05);
+  --surface-filter-input:         var(--cv-surface-block);
   --border-filter-input:          rgba(255, 255, 255, 0.12);
   --surface-filter-chip:          var(--surface-filter-input);
   --border-filter-chip:           var(--border-filter-input);
   --color-filter-placeholder:     rgba(255, 255, 255, 0.35);
   --color-filter-text:            var(--theme-text-body);
-  --surface-filter-button:        rgba(255, 255, 255, 0.06);
+  --surface-filter-button:        var(--cv-surface-block);
   --border-filter-button:         rgba(255, 255, 255, 0.14);
   --color-filter-button:          var(--theme-text-muted);
 
   /* Filtros aplicados — chips */
-  --surface-applied-chip:         rgba(255, 255, 255, 0.07);
+  --surface-applied-chip:         var(--cv-surface-block);
   --border-applied-chip:          rgba(255, 255, 255, 0.16);
   --color-applied-chip:           var(--theme-text-muted);
 
@@ -1317,7 +1317,7 @@ html[data-theme="light"] {
   --cv-form-section-bg:        var(--cv-surface-card);
   --cv-form-section-header-bg: var(--cv-surface-block);
   --cv-form-section-border:    var(--border-form-section);
-  --cv-form-section-shadow:    var(--shadow-sm);
+  --cv-form-section-shadow:    var(--shadow-strong);
 
   --surface-list-panel:     var(--cv-surface-card);
   --border-list-panel:      #d4dde9;
@@ -1326,7 +1326,7 @@ html[data-theme="light"] {
   --surface-filter-bar:     var(--cv-surface-block);
   --border-filter-bar:      #dde6ef;
 
-  --surface-list-row:       var(--surface-form-section); /* mesmo fundo das seções de formulário */
+  --surface-list-row:       var(--cv-surface-card); /* mesmo fundo das seções de formulário */
   --border-list-row:        #e5edf5;
   --surface-list-row-hover: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
 
@@ -1357,31 +1357,31 @@ html[data-theme="light"] {
   --text-header-count:    var(--color-primary);
 
   /* Quick Create Inline */
-  --surface-quick-create:        #eef3f8;
-  --surface-quick-create-header: #e6edf5;
+  --surface-quick-create:        var(--cv-surface-block);
+  --surface-quick-create-header: var(--cv-surface-card);
   --border-quick-create:         #d4dde9;
   --shadow-quick-create:         none;
 
   /* Quick Add Folder Tab */
-  --surface-inline-create-tab:        #dbeaf8;
+  --surface-inline-create-tab:        var(--cv-surface-card);
   --border-inline-create-tab:         #a8c5de;
   --color-inline-create-tab:          var(--color-primary-strong);
   --color-inline-create-tab-icon-bg:  var(--color-primary);
   --color-inline-create-tab-icon-fg:  var(--color-white);
 
   /* Header Filter Bar */
-  --surface-filter-input:         var(--color-surface);
+  --surface-filter-input:         var(--cv-surface-block);
   --border-filter-input:          var(--color-border);
   --surface-filter-chip:          var(--surface-filter-input);
   --border-filter-chip:           var(--border-filter-input);
   --color-filter-placeholder:     var(--theme-text-muted);
   --color-filter-text:            var(--theme-text-body);
-  --surface-filter-button:        var(--color-surface);
+  --surface-filter-button:        var(--cv-surface-block);
   --border-filter-button:         var(--color-border);
   --color-filter-button:          var(--theme-text-muted);
 
   /* Filtros aplicados — chips */
-  --surface-applied-chip:         var(--color-primary-soft);
+  --surface-applied-chip:         var(--cv-surface-block);
   --border-applied-chip:          rgba(11, 58, 102, 0.18);
   --color-applied-chip:           var(--color-primary-strong);
 
@@ -16715,10 +16715,10 @@ html[data-theme="dark"] *::after {
 
 .list-header {
   --list-header-control-height: var(--filter-input-height);
-  background: var(--app-hero-body-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  background: var(--cv-surface-card);
+  border: 0;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-strong);
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -16730,7 +16730,10 @@ html[data-theme="dark"] *::after {
 
 /* Faixa de título — compacta */
 .list-header__band {
-  background: var(--app-hero-stage-bg);
+  /* NOVO-29: acento pontual. A faixa era o acento cheio (--app-hero-stage-bg,
+     um gradiente); virou superficie de card, com o titulo em texto normal. O
+     acento agora aparece so onde aparece no login: botao, rotulo e tinta. */
+  background: var(--cv-surface-card);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -16762,7 +16765,7 @@ html[data-theme="dark"] *::after {
 }
 
 .list-header__eyebrow {
-  color: var(--app-hero-eyebrow);
+  color: var(--color-accent);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--letter-spacing-eyebrow);
@@ -16780,7 +16783,7 @@ html[data-theme="dark"] *::after {
 }
 
 .list-header__title {
-  color: var(--app-hero-title);
+  color: var(--color-heading);
   font-size: clamp(1.2rem, 1.8vw, 1.55rem);
   font-weight: var(--font-weight-extrabold);
   letter-spacing: -0.02em;
