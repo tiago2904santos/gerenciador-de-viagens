@@ -925,7 +925,7 @@ html[data-theme="dark"] {
 /* Temporary aliases migrated from static/css/03-theme-dark.css. */
 /*
  * 03-theme-dark.css — semantic dark theme tokens only.
- * Component appearance overrides live in components/theme-dark-components.css.
+ * Component appearance is theme-agnostic in components/app-shell.css.
  * Extracted from dark-redesign.css (Etapa 7, Fase 6).
  */
 
@@ -1462,7 +1462,7 @@ html[data-theme="dark"] {
 /* Compatibility layer migrated from static/css/03-theme-dark.css. */
 /*
  * 03-theme-dark.css — semantic dark theme tokens only.
- * Component appearance overrides live in components/theme-dark-components.css.
+ * Component appearance is theme-agnostic in components/app-shell.css.
  * Extracted from dark-redesign.css (Etapa 7, Fase 6).
  */
 
@@ -1541,7 +1541,7 @@ html {--cv-date-picker-selected-bg-start: var(--stepper-active-bg, var(--color-a
 /* Compatibility declarations moved from static/css/components/record-list.css. */
 .cv-collection-panel {--step1-panel: var(--cv-surface-block);--step1-surface: var(--cv-surface-card);--step1-field: var(--cv-surface-next);}.cv-collection-panel .cv-list-tab {--cv-list-tab-bg: var(--step1-surface);--cv-list-tab-hover-bg: color-mix(in srgb, var(--step1-surface) 86%, #fff 14%);--cv-list-tab-count-bg: color-mix(in srgb, var(--step1-panel) 55%, transparent);}
 
-/* Compatibility declarations moved from static/css/components/theme-dark-components.css. */
+/* Compatibility declarations retained until NOVO-30 phase 3. */
 :is(html[data-theme="dark"])
   .cv-search-picker {--cv-search-picker-focus-shadow: none;--field-border-focus: var(--color-accent-border-strong);}:is(html[data-theme="dark"])
   :is(.page-shell--wizard, .cv-page--flow) {--cv-form-section-header-padding: 12px 18px 12px 30px;--cv-form-section-body-padding: 16px 18px;}:is(html[data-theme="dark"])

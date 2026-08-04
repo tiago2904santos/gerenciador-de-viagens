@@ -17,7 +17,7 @@
 
 }
 
-html[data-theme="dark"] {
+:root {
 
 
 
@@ -432,7 +432,7 @@ html[data-theme="dark"] {
   padding: 8px;
 }
 
-html[data-theme="dark"] .cv-action-menu {
+ .cv-action-menu {
   box-shadow: 0 22px 58px rgba(0, 0, 0, 0.5);
 }
 
@@ -643,7 +643,7 @@ html[data-theme="dark"] .cv-action-menu {
   max-width: min(100%, 610px);
 }
 
-html[data-theme="dark"] #attach-signed-modal .attach-signed-modal__dialog {
+ #attach-signed-modal .attach-signed-modal__dialog {
   background: var(--step1-surface) !important;
 }
 
@@ -936,7 +936,7 @@ html[data-theme="dark"] #attach-signed-modal .attach-signed-modal__dialog {
 }
 
 /* Ícones Visualizar / Remover: cores canônicas (vence o reset dark de .cv-icon-btn). */
-html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--preview,
+ #attach-signed-modal .cv-icon-btn.cv-icon-btn--preview,
 #attach-signed-modal .cv-icon-btn.cv-icon-btn--preview {
   background: var(--action-preview-bg);
   border: 1px solid var(--action-preview-border);
@@ -944,7 +944,7 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--preview,
   color: var(--action-preview-text);
 }
 
-html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
+ #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
 #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete {
   background: var(--action-danger-bg);
   border: 1px solid var(--action-danger-border);

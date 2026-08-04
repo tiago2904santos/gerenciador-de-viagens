@@ -531,7 +531,7 @@
   flex: 0 0 auto;
 }
 
-html[data-theme="dark"] .pt-add-evento__btn {
+ .pt-add-evento__btn {
   min-height: var(--control-height-md, 44px);
   padding: 0 18px;
   border: 0;
@@ -545,7 +545,7 @@ html[data-theme="dark"] .pt-add-evento__btn {
   transform: none;
 }
 
-html[data-theme="dark"] .pt-add-evento__btn:hover {
+ .pt-add-evento__btn:hover {
   border: 0;
   background: var(--color-accent-hover);
   background-image: none;
@@ -554,7 +554,7 @@ html[data-theme="dark"] .pt-add-evento__btn:hover {
   transform: none;
 }
 
-html[data-theme="dark"] .pt-add-evento__btn:focus-visible {
+ .pt-add-evento__btn:focus-visible {
   border: 0;
   box-shadow:
     0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent),
@@ -845,7 +845,7 @@ html[data-theme="dark"] .pt-add-evento__btn:focus-visible {
   scrollbar-width: thin;
 }
 
-html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
+ .pt-texto-block .cv-field__control--textarea {
   background: var(--step1-panel) !important;
   background-color: var(--step1-panel) !important;
 }
@@ -995,11 +995,11 @@ html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
 
 .pt-efetivo-section .route-destinos-block__subtitle,
 .pt-efetivo-section .route-destinos-block__description,
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block--split
   .route-destinos-block__subtitle,
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block--split
   .route-destinos-block__description {
@@ -1007,10 +1007,10 @@ html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
   line-height: 1.4;
 }
 
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block.route-destinos-block--split,
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block.route-destinos-block--split:hover {
   background: var(--step1-panel) !important;
@@ -1030,11 +1030,11 @@ html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
   grid-template-columns: 44px minmax(0, 1fr);
 }
 
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block
   .pt-efetivo-card.destination-row,
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block
   .pt-efetivo-card.destination-row:hover {
@@ -1042,11 +1042,11 @@ html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
   grid-template-columns: 44px minmax(0, 1fr) 44px !important;
 }
 
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block
   .pt-efetivo-card.destination-row--single,
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block
   .pt-efetivo-card.destination-row--single:hover {
@@ -1088,7 +1088,7 @@ html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 8rem;
 }
 
-:is(html[data-theme="dark"])
+
   :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1])
   .cv-ordered-field-row__fields.pt-efetivo-fields {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 8rem;
@@ -1108,7 +1108,7 @@ html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
   width: 100%;
 }
 
-html[data-theme="dark"] .pt-efetivo-fields .pt-quantidade-stepper {
+ .pt-efetivo-fields .pt-quantidade-stepper {
   background: var(--step1-field) !important;
 }
 
@@ -1168,11 +1168,11 @@ html[data-theme="dark"] .pt-efetivo-fields .pt-quantidade-stepper {
   min-height: 44px;
 }
 
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block--split
   .pt-efetivo-card.destination-row,
-:is(html[data-theme="dark"])
+
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block--split
   .pt-efetivo-card.destination-row:hover {
@@ -1189,7 +1189,7 @@ html[data-theme="dark"] .pt-efetivo-fields .pt-quantidade-stepper {
   }
 
   .cv-ordered-field-row__fields.pt-efetivo-fields,
-  :is(html[data-theme="dark"])
+
     :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1])
     .cv-ordered-field-row__fields.pt-efetivo-fields {
     grid-template-columns: 1fr;
@@ -1224,7 +1224,7 @@ html[data-theme="dark"] .pt-efetivo-fields .pt-quantidade-stepper {
 
 /* Etapa 4 do evento: documentos de solicitação seguem a lista canônica de
    registros, com cartões independentes em vez de uma única caixa de upload. */
-:is(html[data-theme="dark"]) .evento-solicitacao-list {
+ .evento-solicitacao-list {
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -1234,7 +1234,7 @@ html[data-theme="dark"] .pt-efetivo-fields .pt-quantidade-stepper {
   overflow: visible;
 }
 
-:is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-list__item {
+ .evento-solicitacao-list .prestacao-file-list__item {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg, 14px);
@@ -1244,7 +1244,7 @@ html[data-theme="dark"] .pt-efetivo-fields .pt-quantidade-stepper {
   position: relative;
 }
 
-:is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-list__item::before {
+ .evento-solicitacao-list .prestacao-file-list__item::before {
   background: var(--color-accent);
   border-radius: 999px;
   content: "";
@@ -1253,43 +1253,43 @@ html[data-theme="dark"] .pt-efetivo-fields .pt-quantidade-stepper {
   width: 6px;
 }
 
-:is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-list__item:hover {
+ .evento-solicitacao-list .prestacao-file-list__item:hover {
   background: var(--color-surface-soft);
   border-color: var(--color-border-strong);
   box-shadow: var(--shadow-sm);
 }
 
-:is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-list__item:hover::before {
+ .evento-solicitacao-list .prestacao-file-list__item:hover::before {
   background: var(--color-accent-hover);
 }
 
-:is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-list__item + .prestacao-file-list__item {
+ .evento-solicitacao-list .prestacao-file-list__item + .prestacao-file-list__item {
   border-top: 1px solid var(--color-border);
 }
 
-:is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-widget__name {
+ .evento-solicitacao-list .prestacao-file-widget__name {
   color: var(--color-heading);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold, 650);
   letter-spacing: 0.01em;
 }
 
-:is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-widget__subtitle {
+ .evento-solicitacao-list .prestacao-file-widget__subtitle {
   color: var(--color-muted);
   font-size: var(--font-size-xs);
 }
 
-:is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-widget__actions {
+ .evento-solicitacao-list .prestacao-file-widget__actions {
   border-left: 1px solid var(--color-border-soft);
   padding-left: 14px;
 }
 
 @media (max-width: 640px) {
-  :is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-list__item {
+   .evento-solicitacao-list .prestacao-file-list__item {
     padding: 14px 14px 14px 26px;
   }
 
-  :is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-widget__actions {
+   .evento-solicitacao-list .prestacao-file-widget__actions {
     border-left: 0;
     border-top: 1px solid var(--color-border-soft);
     padding-left: 0;

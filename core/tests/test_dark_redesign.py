@@ -10,7 +10,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.base_path = Path(settings.BASE_DIR) / "templates" / "base.html"
         css_root = Path(settings.BASE_DIR) / "static" / "css"
         self.tokens_path = css_root / "01-tokens.css"
-        self.components_path = css_root / "components" / "theme-dark-components.css"
+        self.components_path = css_root / "components" / "app-shell.css"
         self.base = self.base_path.read_text(encoding="utf-8")
         self.tokens_css = self.tokens_path.read_text(encoding="utf-8")
         self.components_css = self.components_path.read_text(encoding="utf-8")
@@ -28,15 +28,12 @@ class DarkRedesignContractTests(SimpleTestCase):
         record_list_index = bundle.index(">>> css/components/record-list.css >>>")
         filter_header_index = bundle.index(">>> css/components/filter-header.css >>>")
         form_panel_index = bundle.index(">>> css/components/form-panel.css >>>")
-        app_shell_index = bundle.index(">>> css/components/app-shell.css >>>")
         content_cards_index = bundle.index(">>> css/components/content-cards.css >>>")
         document_viewer_index = bundle.index(
             ">>> css/components/document-viewer.css >>>"
         )
         dialog_index = bundle.index(">>> css/components/dialog.css >>>")
-        theme_dark_components_index = bundle.index(
-            ">>> css/components/theme-dark-components.css >>>"
-        )
+        app_shell_index = bundle.index(">>> css/components/app-shell.css >>>")
         extra_css_index = self.base.index("{% block extra_css %}")
         shell_bundle_index = self.base.index("css/shell.bundle.css")
 
@@ -49,19 +46,25 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertLess(action_system_index, record_list_index)
         self.assertLess(record_list_index, filter_header_index)
         self.assertLess(filter_header_index, form_panel_index)
-        self.assertLess(form_panel_index, app_shell_index)
-        self.assertLess(app_shell_index, content_cards_index)
+        self.assertLess(form_panel_index, content_cards_index)
         self.assertLess(content_cards_index, document_viewer_index)
         self.assertLess(document_viewer_index, dialog_index)
         self.assertLess(content_cards_index, dialog_index)
-        self.assertLess(dialog_index, theme_dark_components_index)
-        self.assertLess(action_system_index, theme_dark_components_index)
+        self.assertLess(dialog_index, app_shell_index)
+        self.assertLess(action_system_index, app_shell_index)
 
-    def test_theme_layer_does_not_target_official_light_theme(self):
-        for layer_css in (self.tokens_css, self.components_css):
-            self.assertNotIn('html[data-theme="light"]', layer_css)
-            self.assertNotIn('html[data-theme="light-light"]', layer_css)
-            self.assertNotIn('html[data-theme="dark-light"]', layer_css)
+    def test_component_css_does_not_target_any_theme(self):
+        css_root = Path(settings.BASE_DIR) / "static" / "css"
+        allowed = {"00-palette.css", "01-tokens.css", "shell.bundle.css"}
+        offenders = []
+
+        for stylesheet in css_root.rglob("*.css"):
+            if stylesheet.name in allowed:
+                continue
+            if "data-theme" in stylesheet.read_text(encoding="utf-8"):
+                offenders.append(stylesheet.relative_to(css_root).as_posix())
+
+        self.assertEqual(offenders, [], f"tema dentro de componente: {offenders}")
 
     def test_semantic_dark_contract_covers_core_component_needs(self):
         required_tokens = (
