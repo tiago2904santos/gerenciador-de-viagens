@@ -1,0 +1,114 @@
+/* =========================================================================
+   01-tokens.css — a camada de tokens do sistema (NOVO-30 fase 1)
+   =========================================================================
+
+   Substitui tokens.css (284 linhas), theme.css (589) e 03-theme-dark.css (324),
+   que declaravam 499 tokens em blocos que se sobrescreviam. Destes, 140 nao
+   eram referenciados por ninguem.
+
+   REGRA DO ESPELHO — e a razao de este arquivo existir
+
+   Um componente declara aparencia UMA vez, em token semantico. Um tema e so um
+   mapa de valores. Por isso existe exatamente um bloco `:root` e exatamente um
+   `html[data-theme="dark"]` aqui, e o bloco escuro redeclara SOMENTE cor.
+   Geometria, tipografia, sombra e movimento sao iguais nos dois temas — se um
+   componente parecer exigir raio diferente no escuro, a regra dele esta errada.
+
+   Consequencia pratica: mudanca feita no escuro aparece no claro sozinha,
+   porque so existe uma regra. Nao e disciplina, e construcao.
+
+   As tres superficies e o acento NAO estao aqui — vivem em 00-palette.css, que
+   carrega antes e e o unico arquivo onde uma cor de superficie pode ser escrita
+   a mao. Este arquivo deriva tudo o mais delas.
+   ========================================================================= */
+
+:root {
+  /* --- Tinta -------------------------------------------------------------
+     Derivada por mistura sobre a superficie, nao escolhida a olho. */
+  --cv-ink:        #0c1420;                                          /* titulo */
+  --cv-ink-body:   color-mix(in srgb, var(--cv-ink) 88%, var(--cv-surface-card));
+  --cv-ink-muted:  color-mix(in srgb, var(--cv-ink) 62%, var(--cv-surface-card));
+  --cv-ink-soft:   color-mix(in srgb, var(--cv-ink) 44%, var(--cv-surface-card));
+
+  /* --- Borda -------------------------------------------------------------
+     Tres, e todas saem da tinta: borda e sempre tinta diluida na superficie. */
+  --cv-border:        color-mix(in srgb, var(--cv-ink) 14%, var(--cv-surface-card));
+  --cv-border-soft:   color-mix(in srgb, var(--cv-ink) 8%,  var(--cv-surface-card));
+  --cv-border-strong: color-mix(in srgb, var(--cv-ink) 26%, var(--cv-surface-card));
+
+  /* --- Estados semanticos ------------------------------------------------
+     A excecao declarada a regra das tres cores: sao convencao de significado,
+     nao estetica. O `-soft` e sempre a mesma mistura a 12%. */
+  --cv-danger:  #b42318;
+  --cv-success: #16805a;
+  --cv-warning: #b0790a;
+  --cv-danger-soft:  color-mix(in srgb, var(--cv-danger) 12%,  var(--cv-surface-card));
+  --cv-success-soft: color-mix(in srgb, var(--cv-success) 12%, var(--cv-surface-card));
+  --cv-warning-soft: color-mix(in srgb, var(--cv-warning) 12%, var(--cv-surface-card));
+
+  /* --- Raio (escala fechada) --------------------------------------------- */
+  --cv-r-0:    0;
+  --cv-r-sm:   8px;
+  --cv-r-md:   14px;   /* campo — o do login */
+  --cv-r-lg:   20px;
+  --cv-r-xl:   28px;   /* card — o do login */
+  --cv-r-pill: 999px;
+
+  /* --- Espaco (escala fechada) ------------------------------------------- */
+  --cv-sp-1: 4px;
+  --cv-sp-2: 8px;
+  --cv-sp-3: 12px;
+  --cv-sp-4: 16px;
+  --cv-sp-5: 20px;
+  --cv-sp-6: 24px;
+  --cv-sp-7: 32px;
+  --cv-sp-8: 48px;
+
+  /* --- Sombra ------------------------------------------------------------ */
+  --cv-sh-none: none;
+  --cv-sh-sm:   0 1px 2px color-mix(in srgb, var(--cv-ink) 8%, transparent);
+  --cv-sh-md:   0 6px 16px color-mix(in srgb, var(--cv-ink) 10%, transparent);
+  --cv-sh-lg:   0 20px 44px color-mix(in srgb, var(--cv-ink) 12%, transparent);
+
+  /* --- Tipografia -------------------------------------------------------- */
+  --cv-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --cv-fs-xs: 12px;
+  --cv-fs-sm: 14px;
+  --cv-fs-md: 16px;
+  --cv-fs-lg: 20px;
+  --cv-fs-xl: 26px;
+  --cv-fw-normal: 400;
+  --cv-fw-medium: 560;
+  --cv-fw-bold:   700;
+  --cv-lh:        1.5;
+  --cv-ls-eyebrow: 0.12em;
+
+  /* --- Medidas ----------------------------------------------------------- */
+  --cv-h-control: 48px;   /* altura de campo e botao — a do login */
+  --cv-h-control-sm: 36px;
+  --cv-w-page: 1280px;
+
+  /* --- Movimento --------------------------------------------------------- */
+  --cv-t-fast: 120ms ease;
+  --cv-t-base: 200ms ease;
+
+  /* --- Empilhamento ------------------------------------------------------ */
+  --cv-z-base:     1;
+  --cv-z-sticky:   100;
+  --cv-z-dropdown: 500;
+  --cv-z-overlay:  1000;
+  --cv-z-toast:    2000;
+}
+
+/* =========================================================================
+   Tema escuro — SOMENTE cor. Nenhuma geometria, nenhuma regra de componente.
+   As superficies vem de 00-palette.css; aqui so muda a tinta e os estados,
+   que precisam clarear para funcionar sobre fundo escuro.
+   ========================================================================= */
+html[data-theme="dark"] {
+  --cv-ink: #eef3fa;
+
+  --cv-danger:  #e57d78;
+  --cv-success: #4cc294;
+  --cv-warning: #e0ab3c;
+}
