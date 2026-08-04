@@ -7,10 +7,10 @@
 
 .list-header {
   --list-header-control-height: var(--filter-input-height);
-  background: var(--app-hero-body-bg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  background: var(--cv-surface-card);
+  border: 0;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-strong);
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -22,7 +22,10 @@
 
 /* Faixa de título — compacta */
 .list-header__band {
-  background: var(--app-hero-stage-bg);
+  /* NOVO-29: acento pontual. A faixa era o acento cheio (--app-hero-stage-bg,
+     um gradiente); virou superficie de card, com o titulo em texto normal. O
+     acento agora aparece so onde aparece no login: botao, rotulo e tinta. */
+  background: var(--cv-surface-card);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -54,7 +57,7 @@
 }
 
 .list-header__eyebrow {
-  color: var(--app-hero-eyebrow);
+  color: var(--color-accent);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--letter-spacing-eyebrow);
@@ -72,7 +75,7 @@
 }
 
 .list-header__title {
-  color: var(--app-hero-title);
+  color: var(--color-heading);
   font-size: clamp(1.2rem, 1.8vw, 1.55rem);
   font-weight: var(--font-weight-extrabold);
   letter-spacing: -0.02em;

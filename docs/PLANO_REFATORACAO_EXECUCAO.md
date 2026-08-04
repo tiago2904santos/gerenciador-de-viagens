@@ -754,6 +754,13 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
   ancoras, reaponte de 22 tokens de superficie do shell, 48 do `--step1-*` e 35 fundos de
   controle, fim das bordas de foco, login e assinatura publica. Catraca de literais
   **660 -> 620**; `auth.css` deixou de ser excecao nos dois auditores (zero literal).
+- [x] **PR A2** (`NOVO-29`) — **o login virou o modelo padrao**, por decisao de produto.
+  Geometria: raio do card 16 -> **28px**, sombra `sm` -> **`strong`**, campo 12 -> **14px**
+  e 44 -> **48px** de altura. E o acento virou **pontual**: a faixa cheia do cabecalho
+  (`list-header__band`, que usava o gradiente `--app-hero-stage-bg`) passou a superficie
+  de card, com titulo em tinta normal e eyebrow no acento — exatamente onde o acento
+  aparece no login. Mais 7 superficies do rail de filtros e do quick-create entraram na
+  paleta. Avisos de frontend 387 -> **384**.
 - [ ] **PR B** — dissolver `components/theme-dark-components.css` (5.843 linhas, 665
   regras com `:is(...)`/`[data-*]`). **E o que impede o tema escuro de obedecer a paleta:**
   medido com `scripts/medir_paleta.py`, o claro ficou com o nucleo na paleta e o escuro

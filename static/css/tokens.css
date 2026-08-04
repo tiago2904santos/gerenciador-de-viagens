@@ -100,9 +100,9 @@
   --radius-md: 14px;
   --radius-lg: 20px;
   --radius-xl: 28px;
-  --radius-control: 12px;
+  --radius-control: 14px;   /* NOVO-29: emparelha com o campo do login */
   --radius-control-lg: var(--radius-md);
-  --radius-card: 16px;
+  --radius-card: 28px;      /* NOVO-29: o raio do card do login virou o padrao */
   --radius-panel: 18px;
   --radius-section: 18px;
   --radius-shell: 22px;
@@ -138,7 +138,7 @@
      Controles e interacao
      -------------------------------------------------------------------------- */
   --control-height-sm: 34px;
-  --control-height-md: 44px;
+  --control-height-md: 48px; /* NOVO-29: altura do campo do login */
   --control-height-lg: 52px;
   --text-area-height-md: 88px;
   --text-area-height-lg: 176px;
