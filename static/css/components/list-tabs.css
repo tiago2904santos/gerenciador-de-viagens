@@ -3,7 +3,7 @@
 .cv-list-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2, 8px);
+  gap: var(--sp-2);
   margin: 0;
   padding: 0;
 }
@@ -12,12 +12,12 @@
 .list-toolbar {
   align-items: center;
   background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
+  border: var(--bd-0);
+  border-radius: var(--r-0);
+  box-shadow: var(--sh-none);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2, 8px);
+  gap: var(--sp-2);
   justify-content: space-between;
   padding: 0;
   width: 100%;
@@ -27,10 +27,10 @@
 .cv-page--collection > .list-toolbar,
 .cv-collection-panel > .list-toolbar {
   background: transparent;
-  border: 0;
-  box-shadow: none;
-  margin-top: calc(-1 * var(--space-1, 4px));
-  padding: var(--space-3, 12px) 0 var(--space-1, 4px);
+  border: var(--bd-0);
+  box-shadow: var(--sh-none);
+  margin-top: calc(-1 * var(--sp-1));
+  padding: 0;
 }
 
 .cv-collection-panel > .list-toolbar {
@@ -75,73 +75,73 @@
 
 .list-toolbar .pagination-shell__controls {
   box-sizing: border-box;
-  height: var(--list-toolbar-h);
-  min-height: var(--list-toolbar-h);
-  padding: 3px;
+  height: 44px;
+  min-height: 44px;
+  padding: var(--sp-1);
 }
 
 .list-toolbar :is(.pagination-shell__nav, .pagination-shell__page) {
   box-sizing: border-box;
-  height: calc(var(--list-toolbar-h) - 6px);
-  min-height: calc(var(--list-toolbar-h) - 6px);
-  min-width: calc(var(--list-toolbar-h) - 6px);
-  width: calc(var(--list-toolbar-h) - 6px);
+  height: calc(44px - 6px);
+  min-height: calc(44px - 6px);
+  min-width: calc(44px - 6px);
+  width: calc(44px - 6px);
 }
 
 /* Conexão visual com o header flat: abas logo abaixo do divisor. */
 .page-shell--list > .cv-list-tabs,
 .cv-page--collection > .cv-list-tabs {
-  margin-top: calc(-1 * var(--space-1, 4px));
-  padding-bottom: var(--space-1, 4px);
-  padding-top: var(--space-3, 12px);
+  margin-top: calc(-1 * var(--sp-1));
+  padding-bottom: var(--sp-1);
+  padding-top: var(--sp-3);
 }
 
 .cv-list-tab {
   align-items: center;
-  background: var(--cv-list-tab-bg);
-  border: 1px solid var(--cv-list-tab-border);
-  border-radius: var(--radius-pill, 999px);
+  background: var(--cv-surface-card);
+  border: var(--bd);
+  border-radius: var(--r-pill);
   box-sizing: border-box;
-  color: var(--cv-list-tab-color);
+  color: var(--cv-ink);
   display: inline-flex;
-  font-size: var(--font-size-sm, 0.875rem);
+  font-size: 14px;
   font-weight: 600;
-  gap: var(--space-2, 8px);
+  gap: var(--sp-2);
   line-height: 1;
-  min-height: var(--list-toolbar-h, 44px);
-  padding: 0 14px;
+  min-height: 44px;
+  padding: var(--sp-2) var(--sp-3);
   text-decoration: none;
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .cv-list-tab:hover,
 .cv-list-tab:focus-visible {
-  background: var(--cv-list-tab-hover-bg);
-  border-color: var(--cv-list-tab-hover-border);
-  color: var(--cv-list-tab-hover-color);
+  background: var(--cv-surface-block);
+  border-color: var(--cv-border);
+  color: var(--cv-ink);
   outline: none;
 }
 
 .cv-list-tab--active {
-  background: var(--cv-list-tab-active-bg);
-  border-color: var(--cv-list-tab-active-border);
-  color: var(--cv-list-tab-active-color);
+  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
+  color: var(--color-accent);
 }
 
 .cv-list-tab__count {
-  background: var(--cv-list-tab-count-bg);
-  border-radius: var(--radius-pill, 999px);
+  background: var(--cv-surface-card);
+  border-radius: var(--r-pill);
   color: inherit;
-  font-size: var(--font-size-2xs, 0.72rem);
+  font-size: 11px;
   font-variant-numeric: tabular-nums;
   min-width: 1.5em;
-  padding: 2px 7px;
+  padding: var(--sp-1);
   text-align: center;
 }
 
 .cv-list-tab--active .cv-list-tab__count {
-  background: var(--cv-list-tab-active-count-bg);
-  color: var(--cv-list-tab-active-count-color);
+  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
+  color: var(--color-accent);
 }
 
 
@@ -151,20 +151,20 @@
 /* Aba ativa: hover sobe no dourado (não vai para branco) e sem barra esquerda. */
 
   .cv-list-tab--active:is(:hover, :focus-visible) {
-  background: color-mix(in srgb, var(--color-accent-soft, #3b3320) 72%, var(--color-accent, #d8a21b) 28%);
-  border-color: var(--color-accent-hover, #e0ab3c);
-  box-shadow: none;
-  color: var(--color-accent-hover, #e0ab3c);
+  background: color-mix(in srgb, var(--color-accent) 72%, var(--color-accent) 28%);
+  border-color: var(--color-accent);
+  box-shadow: var(--sh-none);
+  color: var(--color-accent);
 }
 
 
   .cv-list-tab:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-focus, #74aae0) 28%, transparent);
+  box-shadow: var(--sh-sm);
 }
 
 
   .cv-list-tab--active:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent, #d8a21b) 32%, transparent);
+  box-shadow: var(--sh-sm);
 }
 
 @media (max-width: 600px) {

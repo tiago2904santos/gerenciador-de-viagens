@@ -790,7 +790,14 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
   `components/theme-dark-components.css` dissolvido em `components/app-shell.css`, sem
   criar ou renomear classes. Gate estrutural: **1.098 -> 0**; auditor frontend mantido em
   **335** avisos; auditor visual estatico: **5.192 -> 4.988** ocorrencias suspeitas.
-- [ ] **Fase 3 — geometria padronizada e fim dos aliases.**
+- [x] **Fase 3 — geometria padronizada e fim dos aliases:** aliases temporarios
+  removidos e vocabulario fechado em 35 propriedades canonicas (27 em
+  `01-tokens.css` + 8 sementes em `00-palette.css`), sem declaracoes `--*` nos
+  componentes. Gate geometrico: raio **6/6**, padding **8/8**, margin **8/8**,
+  borda **3/3** e sombra **4/4** valores distintos. A normalizacao das cinco
+  propriedades reduziu `!important` de **497 para 331**; o restante pertence a
+  Fase 4. Auditor frontend: **335 -> 191** avisos; auditor visual estatico:
+  **4.988 -> 3.448** ocorrencias suspeitas.
 - [ ] **Fase 4 — fim das excecoes e do `!important`.**
 - [ ] **Fase 5 — apagar o CSS antigo.**
 

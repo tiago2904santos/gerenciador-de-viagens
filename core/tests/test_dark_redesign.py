@@ -10,9 +10,11 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.base_path = Path(settings.BASE_DIR) / "templates" / "base.html"
         css_root = Path(settings.BASE_DIR) / "static" / "css"
         self.tokens_path = css_root / "01-tokens.css"
+        self.palette_path = css_root / "00-palette.css"
         self.components_path = css_root / "components" / "app-shell.css"
         self.base = self.base_path.read_text(encoding="utf-8")
         self.tokens_css = self.tokens_path.read_text(encoding="utf-8")
+        self.palette_css = self.palette_path.read_text(encoding="utf-8")
         self.components_css = self.components_path.read_text(encoding="utf-8")
         self.css = f"{self.tokens_css}\n{self.components_css}"
 
@@ -68,24 +70,20 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_semantic_dark_contract_covers_core_component_needs(self):
         required_tokens = (
-            "--color-bg:",
-            "--color-surface:",
-            "--color-surface-elevated:",
-            "--color-text:",
-            "--color-text-muted:",
-            "--color-border:",
-            "--color-focus:",
-            "--color-success:",
-            "--color-info:",
-            "--color-warning:",
-            "--color-danger:",
-            "--color-input-bg:",
-            "--sidebar-width:",
+            "--cv-ink:",
+            "--cv-ink-muted:",
+            "--cv-state-success:",
+            "--cv-state-warning:",
+            "--cv-state-danger:",
+            "--cv-surface-page:",
+            "--cv-surface-card:",
+            "--cv-surface-block:",
+            "--color-accent:",
         )
 
         for token in required_tokens:
             with self.subTest(token=token):
-                self.assertIn(token, self.tokens_css)
+                self.assertIn(token, self.tokens_css + self.palette_css)
 
     def test_reduced_motion_and_mobile_shell_are_explicit(self):
         self.assertIn("@media (prefers-reduced-motion: reduce)", self.components_css)
@@ -717,43 +715,32 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("@media (prefers-reduced-motion: reduce)", auth_css)
 
     def test_dark_primary_actions_stay_in_the_primary_blue_family(self):
-        for token in (
-            "--action-primary-bg:",
-            "--cv-btn-primary-bg:",
-            "--route-button-primary-bg:",
-        ):
-            with self.subTest(token=token):
-                declarations = [
-                    line.strip()
-                    for line in self.tokens_css.splitlines()
-                    if line.strip().startswith(token)
-                ]
-                self.assertTrue(
-                    any("var(--color-primary" in item for item in declarations),
-                    f"{token} sem alias para a familia primaria",
-                )
-                self.assertTrue(
-                    all("var(--color-accent" not in item for item in declarations)
-                )
+        buttons = (
+            Path(settings.BASE_DIR) / "static" / "css" / "cv-buttons.css"
+        ).read_text(encoding="utf-8")
+        self.assertIn("background: var(--color-accent);", buttons)
+        self.assertIn("color: var(--on-accent);", buttons)
+        self.assertNotIn("--action-primary-bg", self.tokens_css + buttons)
+        self.assertNotIn("--cv-btn-primary-bg", self.tokens_css + buttons)
+        self.assertNotIn("--route-button-primary-bg", self.tokens_css + buttons)
 
     def test_dark_wizard_filete_stays_gold_and_tracks_header_content(self):
         page_shell = (
             Path(settings.BASE_DIR) / "static" / "css" / "page-shell.css"
         ).read_text(encoding="utf-8")
 
-        self.assertIn("--_wizard-filete-inset-block", page_shell)
-        self.assertIn("bottom:        var(--_wizard-filete-inset-block);", page_shell)
-        self.assertIn("top:           var(--_wizard-filete-inset-block);", page_shell)
+        self.assertIn("bottom:        var(--r-0);", page_shell)
+        self.assertIn("top:           var(--r-0);", page_shell)
         self.assertIn("height:        auto;", page_shell)
         self.assertIn(
-            "padding: var(--space-3) var(--space-4) var(--space-3) var(--space-8);",
+            "padding: var(--sp-4) var(--sp-6);",
             page_shell,
         )
 
         dark_filete_rule = self.css.split(".cv-form-section-header::before", 1)[1]
         dark_filete_rule = dark_filete_rule.split("}", 1)[0]
-        self.assertIn("var(--cv-card-family-accent-bg)", dark_filete_rule)
-        self.assertNotIn("var(--color-primary-bright)", dark_filete_rule)
+        self.assertIn("var(--color-accent)", dark_filete_rule)
+        self.assertNotIn("--cv-card-family", dark_filete_rule)
 
     def test_standard_simple_centers_a_tokenized_compact_panel(self):
         page_shell = (
@@ -766,7 +753,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         # Pula aliases agrupados até o bloco `{ ... }`
         standard_simple = standard_simple.split("{", 1)[1].split("}", 1)[0]
 
-        self.assertIn("max-width: var(--layout-form-panel-max-width);", standard_simple)
+        self.assertIn("max-width: 960px;", standard_simple)
         self.assertIn("margin-inline: auto;", standard_simple)
         self.assertIn("css/shell.bundle.css", self.base)
         bundle = (
@@ -775,27 +762,15 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn(">>> css/page-shell.css >>>", bundle)
 
     def test_list_and_form_cards_share_the_dark_card_family(self):
-        for token in (
-            "--cv-card-family-bg:",
-            "--cv-card-family-header-bg:",
-            "--cv-card-family-header-image:",
-            "--cv-card-family-border:",
-            "--cv-card-family-shadow:",
-            "--cv-card-family-accent-bg:",
-            "--cv-card-family-accent-width:",
-        ):
-            with self.subTest(token=token):
-                self.assertIn(token, self.tokens_css)
-
         wizard_header = self.css.rsplit(".cv-form-section-header {", 1)[1]
         wizard_header = wizard_header.split("}", 1)[0]
         list_header = self.css.split(".cv-record-card__id-row {", 1)[1]
         list_header = list_header.split("}", 1)[0]
 
         for shared_token in (
-            "var(--cv-card-family-header-bg)",
-            "var(--cv-card-family-header-image)",
-            "var(--cv-card-family-border-strong)",
+            "var(--cv-surface-card)",
+            "var(--color-accent)",
+            "var(--cv-border)",
         ):
             with self.subTest(shared_token=shared_token):
                 self.assertIn(shared_token, wizard_header)
@@ -810,7 +785,8 @@ class DarkRedesignContractTests(SimpleTestCase):
             ".main-form-panel > .form-section > .section-header::before {", 1
         )[1].split("}", 1)[0]
 
-        self.assertIn("var(--cv-card-family-header-bg)", simple_form_header)
-        self.assertIn("var(--cv-card-family-header-image)", simple_form_header)
-        self.assertIn("var(--cv-card-family-accent-bg)", simple_form_filete)
-        self.assertIn("var(--cv-card-family-accent-width)", simple_form_filete)
+        self.assertIn("var(--cv-surface-card)", simple_form_header)
+        self.assertIn("var(--color-accent)", simple_form_header)
+        self.assertIn("var(--color-accent)", simple_form_filete)
+        self.assertIn("width: 8px;", simple_form_filete)
+        self.assertNotIn("--cv-card-family", self.tokens_css + self.components_css)

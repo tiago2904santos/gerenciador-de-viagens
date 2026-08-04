@@ -53,7 +53,7 @@
 }
 
 .evento-lc .cv-person-row__unidade-sep {
-  color: var(--color-muted);
+  color: var(--cv-ink-muted);
 }
 
 @media (max-width: 640px) {

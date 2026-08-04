@@ -6,30 +6,30 @@
    1. Estrutura base da linha de fases
    -------------------------------------------------------------------------- */
 .stage-track {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  background: var(--cv-surface-card);
+  border: var(--bd);
+  border-radius: var(--r-md);
   display: grid;
-  gap: var(--space-3);
+  gap: var(--sp-3);
   grid-template-columns: repeat(4, minmax(0, 1fr));
   list-style: none;
   margin: 0;
-  padding: var(--space-4);
+  padding: var(--sp-4);
 }
 
 .stage-track-item {
   align-items: center;
-  color: var(--color-muted);
+  color: var(--cv-ink-muted);
   display: flex;
-  font-size: var(--font-size-sm);
+  font-size: 14px;
   font-weight: 700;
-  gap: var(--space-2);
+  gap: var(--sp-2);
 }
 
 .stage-track-item span {
   align-items: center;
-  background: var(--color-bg-subtle);
-  border-radius: var(--radius-pill);
+  background: var(--cv-surface-block);
+  border-radius: var(--r-pill);
   display: inline-flex;
   height: 28px;
   justify-content: center;
@@ -40,17 +40,17 @@
    2. Estados e acoes
    -------------------------------------------------------------------------- */
 .stage-track-item.is-active {
-  color: var(--color-primary-strong);
+  color: var(--color-accent);
 }
 
 .stage-track-item.is-active span {
-  background: var(--color-primary);
-  color: var(--color-white);
+  background: var(--color-accent);
+  color: var(--on-accent);
 }
 
 .stage-track-actions {
   display: flex;
-  gap: var(--space-3);
+  gap: var(--sp-3);
   justify-content: flex-end;
 }
 
