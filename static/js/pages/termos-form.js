@@ -276,7 +276,10 @@
 
   function syncAddDestinationButton(form) {
     if (form.dataset.termoDestinosManaged === "true") return;
-    var button = form.querySelector("#termo-btn-adicionar-destino");
+    // No layout `split` o botao mora dentro da linha, sem id proprio; o id so
+    // existe no layout com header. Sem o fallback isto virava no-op silencioso.
+    var button = form.querySelector("#termo-btn-adicionar-destino")
+      || form.querySelector("#termo-evento-destinos [data-location-add]");
     var destinationSection = form.querySelector("#termo-evento-destinos");
     if (!button || !destinationSection) return;
 

@@ -119,4 +119,8 @@ class OrcamentoDeQueriesOrdemServicoTests(TestCase):
     # para dentro do laco dos cards.
     QUERIES_LISTA = 22
     QUERIES_LISTA_BUSCA = 22
-    QUERIES_EDITAR = 26
+    # 26 -> 30 na edicao, sem N+1: a lista segue em 22, entao nada voltou para
+    # dentro do laco dos cards. Os quatro sao custo constante da previa de
+    # destinos, que resolve a sede das Configuracoes e rele o singleton por
+    # request (4x ConfiguracaoSistema + 4x AreaTrabalho). Registrado NOVO-27.
+    QUERIES_EDITAR = 30

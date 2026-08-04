@@ -687,6 +687,50 @@ auditoria; criar o banco deixava 23 eventos sem ator. Corrigido na raiz, com reg
   (`.list-header--wizard` + stepper no rail + sticky `is-detached`).
   Substitui o `page-header-stack` horizontal dos wizards.
 
+### Regressões da remodelagem visual (04/08/2026)
+
+A reescrita visual de Administração, Termos e Usuários entrou direto no `main`, sem
+PR e sem atualizar teste no mesmo commit. Resultado medido em 04/08: **13 testes
+vermelhos e o CI reprovando desde 31/07** (último verde às 15:32 daquele dia).
+Quatro eram defeito de código, oito eram asserção envelhecida e uma era teste frágil.
+A separação importa: só as quatro primeiras mudavam o comportamento do sistema.
+
+- [x] `NOVO-25` 🟠 **`?v=` manual voltou em 12 templates** — `base.html`,
+  `usuarios/index.html`, `usuarios/areas/*`, `eventos/detalhe.html`,
+  `planos_trabalho/wizard_*`, entre outros, mais um `@import` em `style.css`.
+  Desfazia o `J-13`: com a `VersionedStaticFilesStorage` o nome já sai com hash,
+  então o parâmetro só quebrava o cache de longo prazo sem ganho nenhum.
+- [x] `NOVO-26` 🟠 **N+1 em Termos, o que faltava do `NOVO-07`** —
+  `termo_cadastro_assinado_info` consultava `DocumentoArtefato` uma vez por
+  servidor na tela de edição. Novo selector `mapa_artefatos_pdf_termo_cadastro`
+  resolve o termo inteiro numa query. Medido com 3 servidores: **4 → 1**
+  consulta à tabela; e o total parou de crescer com a equipe (9 servidores não
+  custam mais que 3). O orçamento da tela vai de 21 para 28 — os 7 restantes
+  são o `NOVO-27`, que é constante.
+- [x] **Catraca de ORM 36 → 30** — o rótulo da sede das Configurações voltou
+  copiado **byte a byte** nas views de Eventos, Termos e Ordens de Serviço
+  (mesmo md5 nas três). Centralizado em `cadastros.selectors.rotulo_da_sede_configurada`.
+  Junto, dois breakpoints fora da escala fechada do `R-01`
+  (`planos-trabalho-eventos.css`: 700px → 720px, 620px → 640px; ambos sobem, que
+  é a direção que não abre janela de overflow).
+- [x] **Chip de status sumido do wizard** — achado ao investigar a asserção
+  vencida, e **não era asserção vencida**: `wizard_page_header.html` (o header do
+  `NOVO-20`) deixou de emitir o chip, e `eventos/detalhe.html` **já passava**
+  `status_label`/`status_variant` para ele. Ou seja, Eventos também estava sem
+  status na tela, em silêncio. O parâmetro voltou, pelo mesmo componente que a
+  band das listas usa — que era o objetivo declarado do `NOVO-20`.
+- [x] **Teste frágil por data** — `test_eventos_index_filtra_area_do_usuario`
+  criava evento em 01/08 fixo. Quando o calendário passou de 04/08 o evento caiu
+  na aba "anteriores" e o teste acusou **vazamento de área** onde só havia data
+  vencida. Ancorado em `localdate() + 7 dias`.
+
+> **Pendência aberta:** `NOVO-27` 🟡 — `ConfiguracaoSistema.get_singleton()` é
+> relido várias vezes por request (4× em Ordens de Serviço, mais 4× `AreaTrabalho`),
+> e `resolver_sede_ids_desde_configuracao` busca a `Cidade` com `select_related`,
+> descarta o objeto e devolve só os IDs, obrigando quem chama a consultar a mesma
+> linha de novo. Custo constante, não escala com dados — por isso ficou fora deste
+> PR, mas é a explicação dos +7/+4 nos orçamentos de query.
+
 ---
 
 ## 7.1 Escopo novo, fora das oito etapas

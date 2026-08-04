@@ -64,7 +64,10 @@ class ViewModuleBoundaryTests(SimpleTestCase):
         counts = contar_orm_em_views()
 
         self.assertEqual(counts["oficios"], 4)
-        self.assertEqual(sum(counts.values()), 32)
+        # 32 → 30: NOVO-24 zerou `usuarios` e NOVO-25 tirou das views de
+        # Eventos, Termos e OS as tres copias do rotulo da sede. O numero
+        # so desce (AGENTS.md, regra 5).
+        self.assertEqual(sum(counts.values()), 30)
 
     def test_views_nao_executam_geradores_documentais_pesados(self):
         self.assertEqual(sync_document_generations_in_views(), [])

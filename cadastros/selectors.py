@@ -74,6 +74,28 @@ def buscar_estado_por_sigla(sigla):
     return Estado.objects.filter(sigla=sigla).first()
 
 
+def rotulo_da_sede_configurada():
+    """Nome da sede das Configuracoes — origem fixa da previa de Destinos.
+
+    Morava copiada nas views de Eventos, Termos e Ordens de Servico (tres
+    copias identicas, byte a byte). E consulta, entao vive aqui: as tres
+    telas so consomem o rotulo. Devolve string vazia quando a configuracao
+    nao aponta cidade nem estado — quem chama decide o que exibir.
+    """
+    from .services import resolver_sede_ids_desde_configuracao
+
+    estado_id, cidade_id, _aviso = resolver_sede_ids_desde_configuracao()
+    if cidade_id:
+        cidade = Cidade.objects.filter(pk=cidade_id).only("nome").first()
+        if cidade and cidade.nome:
+            return cidade.nome
+    if estado_id:
+        estado = Estado.objects.filter(pk=estado_id).only("sigla", "nome").first()
+        if estado:
+            return estado.sigla or estado.nome
+    return ""
+
+
 def listar_cargos(q=None):
     queryset = filter_queryset_by_area(Cargo.objects).order_by("nome")
     if q:

@@ -610,18 +610,29 @@ def pdf_termo_cadastro_assinado_ou_gerado(termo: TermoAutorizacao, servidor: Ser
     return gerar_termo_cadastro_um(termo, servidor, DocumentoFormato.PDF).conteudo
 
 
-def termo_cadastro_assinado_info(termo: TermoAutorizacao, servidor_id: int | None) -> dict:
+def termo_cadastro_assinado_info(
+    termo: TermoAutorizacao,
+    servidor_id: int | None,
+    artefatos: dict | None = None,
+) -> dict:
     """Dados de assinatura de um termo avulso (genérico ou por servidor) para presenters de lista.
 
     Retorna ``assinado``, ``anexar_assinado_url``, ``assinado_nome_original`` e
     ``assinado_view_url`` prontos para uso em cards/linhas de lista e no modal
     "anexar assinado" (termos/views.py e eventos/views.py).
+
+    Quem chama em laço sobre servidores passa ``artefatos`` — o mapa devolvido
+    por `mapa_artefatos_pdf_termo_cadastro`, que custa uma query só. Sem ele,
+    cada chamada consulta por conta própria e o custo cresce com a equipe.
     """
     from django.urls import reverse
 
     from documentos.selectors import get_latest_artefato_pdf_termo_cadastro
 
-    artefato = get_latest_artefato_pdf_termo_cadastro(termo.pk, servidor_id)
+    if artefatos is not None:
+        artefato = artefatos.get(servidor_id)
+    else:
+        artefato = get_latest_artefato_pdf_termo_cadastro(termo.pk, servidor_id)
     if artefato is not None:
         assinado = artefato.esta_assinado
         return {
