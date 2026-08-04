@@ -1,0 +1,5 @@
+﻿medir_paleta.py (refazer NOVO-30 fase 1) — cores fora da paleta
+light: dashboard 6, oficios-lista 7, oficio-novo 4, configuracoes 5, perfil 0
+dark:  dashboard 16, oficios-lista 14, oficio-novo 9, configuracoes 8, perfil 0
+Body page OK nos dois temas em todas as rotas.
+Divida escura concentrada em theme-dark-components / sidebar (Fase 2).

@@ -34,14 +34,14 @@
    02. Theme overrides — Dark
    ========================================================= */
 
-:root {
+html[data-theme="dark"] {
 }
 
 /* =========================================================
    03. Theme overrides — Light
    ========================================================= */
 
-:root {
+html[data-theme="light"] {
 }
 
 /* =========================================================
@@ -51,7 +51,7 @@
    ========================================================= */
 
 .cv-select-wrapper {
-  border-radius: var(--r-sm);
+  border-radius: var(--cv-select-radius);
   display: grid;
   min-width: 0;
   position: relative;
@@ -60,19 +60,19 @@
 
 /* Seta customizada via pseudo-elemento */
 .cv-select-wrapper::after {
-  border-bottom: 2px solid var(--cv-ink);
-  border-right: 2px solid var(--cv-ink);
+  border-bottom: 2px solid var(--cv-select-icon-color);
+  border-right: 2px solid var(--cv-select-icon-color);
   content: "";
   height: 8px;
   pointer-events: none;
   position: absolute;
-  right: var(--sp-4);
+  right: var(--space-4);
   top: 50%;
   transform: translateY(-65%) rotate(45deg);
   transform-origin: center;
   transition:
-    border-color 140ms ease,
-    transform 140ms ease;
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
   width: 8px;
   z-index: 1;
 }
@@ -81,23 +81,23 @@
 .cv-select-wrapper select,
 .cv-select-native {
   appearance: none;
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-sm);
-  box-shadow: var(--sh-md);
+  background: var(--cv-select-bg);
+  border: 1px solid var(--cv-select-border);
+  border-radius: var(--cv-select-radius);
+  box-shadow: var(--cv-select-shadow);
   box-sizing: border-box;
-  color: var(--cv-ink);
+  color: var(--cv-select-color);
   cursor: pointer;
   font-family: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  height: 48px;
+  font-size: var(--cv-select-font-size);
+  font-weight: var(--cv-select-font-weight);
+  height: var(--cv-select-height);
   line-height: 1.2;
-  padding: 0;
+  padding: 0 calc(var(--space-6) + var(--space-4)) 0 var(--cv-select-padding-x);
   transition:
-    background-color 140ms ease,
-    border-color 140ms ease,
-    box-shadow 140ms ease;
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
   width: 100%;
 }
 
@@ -111,7 +111,7 @@
 /* Placeholder (primeira opção vazia) */
 .cv-select-wrapper select option[value=""],
 .cv-select-native option[value=""] {
-  color: var(--cv-ink-muted);
+  color: var(--cv-select-placeholder);
 }
 
 /* Disabled */
@@ -122,43 +122,43 @@
 
 .cv-select-wrapper select:disabled,
 .cv-select-native:disabled {
-  background: var(--cv-surface-block);
-  border-color: var(--cv-border);
-  color: var(--cv-ink-muted);
+  background: var(--cv-select-disabled-bg);
+  border-color: var(--cv-select-disabled-border);
+  color: var(--cv-select-disabled-color);
   cursor: not-allowed;
   opacity: 1;
 }
 
 .cv-select-wrapper--disabled::after {
-  border-color: var(--cv-ink-muted);
+  border-color: var(--cv-select-disabled-color);
   opacity: 0.45;
 }
 
 /* Error */
 .cv-select-wrapper--error select,
 .cv-select-wrapper--error .cv-select-native {
-  border-color: color-mix(in srgb, var(--cv-state-danger) 55%, var(--cv-border));
+  border-color: var(--cv-select-error-border);
 }
 
 .cv-select-wrapper--error::after {
-  border-color: color-mix(in srgb, var(--cv-state-danger) 55%, var(--cv-border));
+  border-color: var(--cv-select-error-border);
 }
 
 /* Success */
 .cv-select-wrapper--success select,
 .cv-select-wrapper--success .cv-select-native {
-  border-color: color-mix(in srgb, var(--cv-state-success) 55%, var(--cv-border));
+  border-color: var(--cv-select-success-border);
 }
 
 .cv-select-wrapper--success::after {
-  border-color: color-mix(in srgb, var(--cv-state-success) 55%, var(--cv-border));
+  border-color: var(--cv-select-success-border);
 }
 
 /* Opções no tema escuro */
- .cv-select-wrapper select option,
- .cv-select-native option {
-  background: var(--cv-surface-card);
-  color: var(--cv-ink);
+html[data-theme="dark"] .cv-select-wrapper select option,
+html[data-theme="dark"] .cv-select-native option {
+  background: var(--theme-surface-card);
+  color: var(--theme-text-body);
 }
 
 /* =========================================================
@@ -176,21 +176,21 @@
   appearance: none;
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352657a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
-    no-repeat right var(--sp-3) center / 16px 16px,
-    var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-sm);
-  box-shadow: var(--sh-md);
+    no-repeat right var(--space-3) center / 16px 16px,
+    var(--cv-select-bg);
+  border: 1px solid var(--cv-select-border);
+  border-radius: var(--cv-select-radius);
+  box-shadow: var(--cv-select-shadow);
   box-sizing: border-box;
-  color: var(--cv-ink);
+  color: var(--cv-select-color);
   cursor: pointer;
   font-family: inherit;
-  font-size: 14px;
-  height: 48px;
-  padding: 0;
+  font-size: var(--cv-select-font-size);
+  height: var(--cv-select-height);
+  padding: 0 calc(var(--space-6) + var(--space-2)) 0 var(--cv-select-padding-x);
   transition:
-    border-color 140ms ease,
-    box-shadow 140ms ease;
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
   width: 100%;
 }
 
@@ -213,23 +213,23 @@
 /* Menu flutuante */
 .cv-action-dropdown__menu {
   animation: cv-dropdown-enter 160ms ease both;
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  background: var(--cv-dropdown-menu-bg);
+  border: 1px solid var(--cv-dropdown-menu-border);
+  border-radius: var(--cv-dropdown-menu-radius);
+  box-shadow: var(--cv-dropdown-menu-shadow);
   list-style: none;
   margin: 0;
-  max-height: 280px;
+  max-height: var(--cv-dropdown-max-height);
   min-width: 180px;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: var(--sp-1);
+  padding: var(--space-1);
   position: absolute;
   right: 0;
   scrollbar-width: thin;
-  top: calc(100% + var(--sp-1));
+  top: calc(100% + var(--space-1));
   white-space: nowrap;
-  z-index: 200;
+  z-index: var(--cv-dropdown-z-index);
 }
 
 /* Alinhamento a esquerda */
@@ -240,7 +240,7 @@
 
 /* Abertura para cima */
 .cv-action-dropdown__menu--up {
-  bottom: calc(100% + var(--sp-1));
+  bottom: calc(100% + var(--space-1));
   top: auto;
 }
 
@@ -252,32 +252,32 @@
 /* Item de acao */
 .cv-action-dropdown__item {
   align-items: center;
-  border-radius: var(--r-0);
-  color: var(--cv-ink);
+  border-radius: calc(var(--cv-dropdown-menu-radius) - var(--space-1));
+  color: var(--color-text);
   cursor: pointer;
   display: flex;
-  font-size: 14px;
-  font-weight: 500;
-  gap: var(--sp-2);
-  min-height: 40px;
-  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--cv-select-font-size);
+  font-weight: var(--cv-select-font-weight);
+  gap: var(--space-2);
+  min-height: var(--cv-dropdown-item-height);
+  padding: 0 var(--cv-dropdown-item-px);
   text-decoration: none;
-  transition: background-color 140ms ease, color 140ms ease;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
   user-select: none;
   width: 100%;
 }
 
 .cv-action-dropdown__item:hover,
 .cv-action-dropdown__item:focus-visible {
-  background: var(--color-accent);
-  color: var(--color-accent);
+  background: var(--cv-dropdown-item-hover);
+  color: var(--cv-dropdown-item-active-color);
   outline: none;
 }
 
 /* Item desabilitado */
 .cv-action-dropdown__item:disabled,
 .cv-action-dropdown__item[aria-disabled="true"] {
-  color: var(--cv-ink-muted);
+  color: var(--cv-select-placeholder);
   cursor: not-allowed;
   opacity: 0.55;
   pointer-events: none;
@@ -285,13 +285,13 @@
 
 /* Item destrutivo / danger */
 .cv-action-dropdown__item--danger {
-  color: var(--cv-state-danger);
+  color: var(--cv-dropdown-item-danger-color);
 }
 
 .cv-action-dropdown__item--danger:hover,
 .cv-action-dropdown__item--danger:focus-visible {
-  background: var(--cv-state-danger);
-  color: var(--cv-state-danger);
+  background: var(--cv-dropdown-item-danger-hover);
+  color: var(--cv-dropdown-item-danger-color);
 }
 
 /* Ícone dentro do item */
@@ -312,16 +312,16 @@
 
 /* Separador */
 .cv-action-dropdown__separator {
-  background: var(--cv-border);
-  border: var(--bd-0);
+  background: var(--cv-dropdown-separator);
+  border: 0;
   height: 1px;
-  margin: var(--sp-1) 0 0;
+  margin: var(--space-1) calc(var(--cv-dropdown-item-px) * -1 + var(--space-1));
 }
 
 /* Estado aberto — o trigger pode receber classe is-open via JS */
 .cv-action-dropdown--open > [data-cv-dropdown-trigger],
 .cv-action-dropdown > [data-cv-dropdown-trigger][aria-expanded="true"] {
-  box-shadow: var(--sh-sm);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 22%, transparent);
 }
 
 /* =========================================================
@@ -336,93 +336,93 @@
 
 .cv-filter-dropdown__trigger {
   align-items: center;
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-pill);
-  box-shadow: var(--sh-md);
+  background: var(--cv-select-bg);
+  border: 1px solid var(--cv-select-border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--cv-select-shadow);
   box-sizing: border-box;
-  color: var(--cv-ink);
+  color: var(--cv-select-color);
   cursor: pointer;
   display: inline-flex;
   font-family: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  gap: var(--r-0);
-  height: 48px;
-  padding: 0;
+  font-size: var(--cv-select-font-size);
+  font-weight: var(--cv-select-font-weight);
+  gap: var(--cv-select-gap);
+  height: var(--cv-select-height);
+  padding: 0 var(--cv-select-padding-x);
   transition:
-    background-color 140ms ease,
-    border-color 140ms ease,
-    box-shadow 140ms ease;
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
   white-space: nowrap;
 }
 
 .cv-filter-dropdown__trigger:hover:not(:disabled) {
-  border-color: var(--cv-border);
+  border-color: var(--cv-select-border-hover);
 }
 
 .cv-filter-dropdown__trigger:focus-visible,
 .cv-filter-dropdown--open .cv-filter-dropdown__trigger,
 .cv-filter-dropdown__trigger[aria-expanded="true"] {
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
-  box-shadow: var(--sh-md);
+  border-color: var(--cv-select-border-focus);
+  box-shadow: var(--cv-select-focus-ring);
   outline: none;
 }
 
 .cv-filter-dropdown__trigger-badge {
   align-items: center;
-  background: var(--color-accent);
-  border-radius: var(--r-pill);
-  color: var(--on-accent);
+  background: var(--color-primary);
+  border-radius: var(--radius-pill);
+  color: var(--color-white);
   display: inline-flex;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
   height: 18px;
   justify-content: center;
   min-width: 18px;
-  padding: 0;
+  padding: 0 var(--space-1);
 }
 
 .cv-filter-dropdown__menu {
   animation: cv-dropdown-enter 160ms ease both;
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-md);
+  background: var(--cv-dropdown-menu-bg);
+  border: 1px solid var(--cv-dropdown-menu-border);
+  border-radius: var(--cv-dropdown-menu-radius);
+  box-shadow: var(--cv-dropdown-menu-shadow);
   left: 0;
   list-style: none;
   margin: 0;
-  max-height: 280px;
+  max-height: var(--cv-dropdown-max-height);
   min-width: 220px;
   overflow-y: auto;
-  padding: var(--sp-1);
+  padding: var(--space-1);
   position: absolute;
-  top: calc(100% + var(--sp-1));
-  z-index: 200;
+  top: calc(100% + var(--space-1));
+  z-index: var(--cv-dropdown-z-index);
 }
 
 .cv-filter-dropdown__option {
   align-items: center;
-  border-radius: var(--r-0);
-  color: var(--cv-ink);
+  border-radius: calc(var(--cv-dropdown-menu-radius) - var(--space-1));
+  color: var(--color-text);
   cursor: pointer;
   display: flex;
-  font-size: 14px;
-  gap: var(--sp-2);
-  min-height: 40px;
-  padding: var(--sp-2) var(--sp-3);
-  transition: background-color 140ms ease;
+  font-size: var(--cv-select-font-size);
+  gap: var(--space-2);
+  min-height: var(--cv-dropdown-item-height);
+  padding: 0 var(--cv-dropdown-item-px);
+  transition: background-color var(--transition-fast);
   user-select: none;
 }
 
 .cv-filter-dropdown__option:hover {
-  background: var(--color-accent);
+  background: var(--cv-dropdown-item-hover);
 }
 
 .cv-filter-dropdown__option--selected {
-  background: var(--color-accent);
-  color: var(--color-accent);
-  font-weight: 600;
+  background: var(--cv-dropdown-item-active);
+  color: var(--cv-dropdown-item-active-color);
+  font-weight: var(--font-weight-semibold);
 }
 
 .cv-filter-dropdown__option-check {
@@ -436,7 +436,7 @@
 }
 
 .cv-filter-dropdown__option--selected .cv-filter-dropdown__option-check {
-  color: var(--color-accent);
+  color: var(--color-primary);
   opacity: 1;
 }
 
@@ -460,20 +460,20 @@
 :root {
 }
 
-:root {
+html[data-theme="dark"] {
 }
 
 .cv-field {
   display: grid;
-  gap: var(--sp-2);
+  gap: var(--space-2);
   min-width: 0;
 }
 
 .app-form-field .cv-field__label,
 .cv-field__label {
-  color: var(--cv-ink);
-  font-size: 14px;
-  font-weight: 600;
+  color: var(--color-label-strong);
+  font-size: var(--cv-field-label-size);
+  font-weight: var(--cv-field-label-weight);
   line-height: 1.2;
 }
 
@@ -481,7 +481,7 @@
 .cv-field__label-row {
   align-items: center;
   display: flex;
-  gap: var(--sp-2);
+  gap: var(--space-2);
   justify-content: space-between;
   min-width: 0;
 }
@@ -490,7 +490,7 @@
 .cv-field-with-action {
   align-items: center;
   display: flex;
-  gap: var(--sp-2);
+  gap: var(--space-2);
   min-width: 0;
 }
 
@@ -506,49 +506,49 @@
   align-items: center;
   appearance: none;
   background:
-    linear-gradient(var(--cv-surface-card), var(--cv-surface-card)) padding-box,
-    linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-  border: var(--bd);
-  border-radius: var(--r-sm);
-  box-shadow: var(--sh-md);
-  color: var(--cv-ink);
+    linear-gradient(var(--theme-surface-card), var(--theme-surface-card)) padding-box,
+    linear-gradient(var(--cv-field-border), var(--cv-field-border)) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--cv-field-radius);
+  box-shadow: var(--shadow-sm);
+  color: var(--theme-text-body);
   cursor: pointer;
   display: inline-flex;
   font-family: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  gap: var(--sp-2);
-  height: 48px;
+  font-size: var(--cv-field-font-size);
+  font-weight: var(--font-weight-medium);
+  gap: var(--space-2);
+  height: var(--cv-field-height);
   justify-content: center;
-  padding: var(--sp-2) var(--sp-3);
+  padding: 0 var(--space-4);
   text-decoration: none;
-  transition: background 140ms ease, box-shadow 140ms ease;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
   white-space: nowrap;
 }
 
 .cv-field-action:hover:not(:disabled) {
   background:
-    linear-gradient(var(--cv-surface-block), var(--cv-surface-block)) padding-box,
-    linear-gradient(var(--cv-border), var(--cv-border)) border-box;
+    linear-gradient(var(--cv-field-bg-hover), var(--cv-field-bg-hover)) padding-box,
+    linear-gradient(var(--cv-field-border-hover), var(--cv-field-border-hover)) border-box;
 }
 
 .cv-field-action--clear {
-  color: var(--cv-state-danger);
+  color: var(--cv-field-error);
 }
 
 .cv-field-action--clear:hover:not(:disabled) {
   background:
-    linear-gradient(var(--cv-state-danger), var(--cv-state-danger)) padding-box,
-    linear-gradient(color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card)), color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card))) border-box;
+    linear-gradient(var(--color-danger-soft), var(--color-danger-soft)) padding-box,
+    linear-gradient(var(--cv-field-error-border), var(--cv-field-error-border)) border-box;
 }
 
 .cv-field__control-row .cv-field-action,
 .cv-field-with-action .cv-field-action {
   align-self: center;
   flex: 0 0 auto;
-  height: 48px;
-  max-height: 48px;
-  min-height: 48px;
+  height: var(--cv-field-height);
+  max-height: var(--cv-field-height);
+  min-height: var(--cv-field-height);
 }
 
 .cv-custom-select {
@@ -571,24 +571,24 @@
 .cv-custom-select__trigger {
   align-items: center;
   background:
-    linear-gradient(var(--cv-surface-card), var(--cv-surface-card)) padding-box,
-    linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-  border: var(--bd);
-  border-radius: var(--r-sm);
-  box-shadow: var(--sh-md);
+    linear-gradient(var(--cv-select-bg), var(--cv-select-bg)) padding-box,
+    linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--cv-field-radius);
+  box-shadow: var(--cv-cs-trigger-shadow);
   box-sizing: border-box;
-  color: var(--cv-ink);
+  color: var(--cv-field-color);
   cursor: pointer;
   display: flex;
   font-family: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  gap: var(--sp-2);
-  height: 48px;
+  font-size: var(--cv-field-font-size);
+  font-weight: var(--cv-cs-value-weight);
+  gap: var(--space-2);
+  height: var(--cv-field-height);
   max-width: 100%;
-  min-height: 48px;
+  min-height: var(--cv-field-height);
   min-width: 0;
-  padding: 0;
+  padding: 0 var(--cv-field-padding-x);
   text-align: left;
   transition: background 150ms ease, box-shadow 150ms ease;
   width: 100%;
@@ -601,11 +601,11 @@
 
 .cv-custom-select--open:not(.cv-custom-select--menu-portal) .cv-custom-select__trigger {
   background:
-    linear-gradient(var(--cv-surface-block), var(--cv-surface-block)) padding-box,
-    linear-gradient(var(--cv-border), var(--cv-border)) border-box;
+    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
+    linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
-  box-shadow: var(--sh-none);
+  box-shadow: none;
 }
 
 .cv-custom-select__value {
@@ -616,12 +616,12 @@
 }
 
 .cv-custom-select__value--placeholder {
-  color: var(--cv-ink-muted);
+  color: var(--cv-field-placeholder);
 }
 
 .cv-custom-select__chevron {
   align-items: center;
-  color: var(--cv-ink);
+  color: var(--cv-cs-chevron-color);
   display: flex;
   flex-shrink: 0;
   transition: color 150ms ease;
@@ -633,18 +633,18 @@
 }
 
 .cv-custom-select--open .cv-custom-select__chevron {
-  color: var(--cv-ink);
+  color: var(--cv-cs-chevron-color);
 }
 
 .cv-custom-select--open .cv-custom-select__chevron svg {
   transform: rotate(180deg);
 }
 
- .cv-custom-select--v2 {
+html[data-theme="dark"] .cv-custom-select--v2 {
 }
 
- .cv-custom-select--v2 .cv-custom-select__chevron,
- .cv-custom-select--v2 .cv-custom-select__chevron svg {
+html[data-theme="dark"] .cv-custom-select--v2 .cv-custom-select__chevron,
+html[data-theme="dark"] .cv-custom-select--v2 .cv-custom-select__chevron svg {
   color: var(--color-accent);
   stroke: currentColor;
 }
@@ -656,11 +656,11 @@
 
 .cv-custom-select__menu {
   animation: cv-cs-menu-enter 160ms ease both;
-  background: var(--cv-surface-card);
-  border: var(--bd);
+  background: var(--cv-cs-menu-bg);
+  border: 1px solid var(--cv-select-border);
   border-top: none;
-  border-radius: var(--r-0);
-  box-shadow: var(--sh-md);
+  border-radius: 0 0 var(--cv-cs-menu-radius) var(--cv-cs-menu-radius);
+  box-shadow: var(--cv-cs-menu-shadow);
   box-sizing: border-box;
   left: 0;
   list-style: none;
@@ -676,76 +676,76 @@
   top: 100%;
   transform-origin: top;
   width: 100%;
-  z-index: 200;
+  z-index: var(--cv-cs-z-index);
 }
 
 .cv-custom-select__menu.cv-floating-dropdown--active {
-  background: var(--cv-surface-card);
-  border-radius: var(--r-md);
-  border-top: 1px solid var(--cv-border);
+  background: var(--cv-cs-menu-bg);
+  border-radius: var(--cv-cs-menu-radius);
+  border-top: 1px solid var(--cv-select-border);
   overflow: hidden;
   /* Portal no body: acima do modal, mesmo contrato do search-picker. */
-  z-index: calc(100 + 20);
+  z-index: calc(var(--z-modal, 100) + 20);
 }
 
 .cv-custom-select__menu::-webkit-scrollbar { width: 4px; }
 .cv-custom-select__menu::-webkit-scrollbar-track { background: transparent; }
 .cv-custom-select__menu::-webkit-scrollbar-thumb {
-  background: var(--cv-border);
-  border-radius: var(--r-sm);
+  background: var(--cv-cs-menu-border);
+  border-radius: 4px;
 }
 
 .cv-custom-select__option {
   align-items: center;
   cursor: pointer;
   display: flex;
-  font-size: 14px;
-  gap: var(--sp-2);
-  min-height: 34px;
-  padding: 0;
+  font-size: var(--cv-field-font-size);
+  gap: var(--space-2);
+  min-height: var(--control-height-sm);
+  padding: var(--space-2) var(--cv-field-padding-x);
   transition: background 80ms ease;
   user-select: none;
 }
 
 .cv-custom-select__option:first-child {
-  border-top-left-radius: calc(var(--r-sm) - var(--sp-1));
-  border-top-right-radius: calc(var(--r-sm) - var(--sp-1));
+  border-top-left-radius: calc(var(--cv-cs-menu-radius) - var(--space-1));
+  border-top-right-radius: calc(var(--cv-cs-menu-radius) - var(--space-1));
 }
 
 .cv-custom-select__option:last-child {
-  border-bottom-left-radius: calc(var(--r-sm) - var(--sp-1));
-  border-bottom-right-radius: calc(var(--r-sm) - var(--sp-1));
+  border-bottom-left-radius: calc(var(--cv-cs-menu-radius) - var(--space-1));
+  border-bottom-right-radius: calc(var(--cv-cs-menu-radius) - var(--space-1));
 }
 
 .cv-custom-select__option:hover:not(.cv-custom-select__option--disabled) {
-  background: var(--cv-surface-block);
+  background: var(--cv-cs-option-hover-bg);
 }
 
 .cv-custom-select__option--focused {
-  background: var(--cv-surface-block);
+  background: var(--cv-cs-option-hover-bg);
 }
 
 .cv-custom-select__option--selected {
-  background: var(--cv-surface-card);
-  color: var(--cv-ink);
-  font-weight: 600;
+  background: var(--cv-cs-option-selected-bg);
+  color: var(--cv-cs-option-selected-color);
+  font-weight: var(--cv-cs-option-selected-weight);
 }
 
 .cv-custom-select__option--selected:hover:not(.cv-custom-select__option--disabled),
 .cv-custom-select__option--selected.cv-custom-select__option--focused {
-  background: var(--cv-surface-card);
+  background: var(--cv-cs-option-selected-bg);
   filter: brightness(0.97);
 }
 
 .cv-custom-select__option--disabled {
-  color: var(--cv-ink-muted);
+  color: var(--cv-field-placeholder);
   cursor: not-allowed;
   opacity: 0.55;
 }
 
 .cv-custom-select__option-check {
   align-items: center;
-  color: var(--cv-ink);
+  color: var(--cv-cs-option-check-color);
   display: flex;
   flex-shrink: 0;
   opacity: 0;
@@ -766,9 +766,9 @@
 .cv-custom-select--disabled .cv-custom-select__trigger,
 .cv-custom-select__trigger:disabled {
   background:
-    linear-gradient(var(--cv-surface-block), var(--cv-surface-block)) padding-box,
-    linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-  color: var(--cv-ink-muted);
+    linear-gradient(var(--cv-field-disabled-bg), var(--cv-field-disabled-bg)) padding-box,
+    linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
+  color: var(--color-input-disabled-text);
   cursor: not-allowed;
   opacity: 0.7;
 }
@@ -779,16 +779,16 @@
 
 .cv-custom-select--error .cv-custom-select__trigger {
   background:
-    linear-gradient(color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card)), color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card))) padding-box,
-    linear-gradient(color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card)), color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-card))) border-box;
+    linear-gradient(var(--cv-field-error-bg), var(--cv-field-error-bg)) padding-box,
+    linear-gradient(var(--cv-field-error-border), var(--cv-field-error-border)) border-box;
 }
 
 .cv-custom-select--error.cv-custom-select--open .cv-custom-select__trigger {
-  box-shadow: var(--sh-md);
+  box-shadow: var(--cv-select-error-shadow);
 }
 
 .cv-custom-select--error .cv-custom-select__chevron {
-  color: var(--cv-state-danger);
+  color: var(--cv-field-error);
 }
 
 @media (max-width: 600px) {

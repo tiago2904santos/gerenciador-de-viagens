@@ -2,10 +2,10 @@
   display: grid;
   min-height: 100vh;
   margin: 0;
-  padding: var(--sp-4) var(--sp-6);
+  padding: clamp(1.5rem, 6vw, 4rem);
   place-items: center;
-  background: var(--cv-surface-card);
-  color: var(--cv-ink);
+  background: var(--step1-panel) !important;
+  color: var(--color-text);
 }
 
 .document-generation-embedded__panel {
@@ -13,10 +13,10 @@
   width: min(100%, 31rem);
   flex-direction: column;
   align-items: center;
-  padding: var(--sp-4) var(--sp-6);
-  border: var(--bd-0);
-  border-radius: var(--r-lg);
-  background: var(--cv-surface-card);
+  padding: clamp(1.75rem, 5vw, 3rem);
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--step1-surface) !important;
   text-align: center;
 }
 
@@ -24,11 +24,11 @@
   display: grid;
   width: 3.5rem;
   height: 3.5rem;
-  margin-bottom: var(--sp-4);
+  margin-bottom: var(--space-4);
   place-items: center;
-  border: var(--bd-0);
-  border-radius: var(--r-sm);
-  background: var(--cv-surface-card);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--step1-panel);
   color: var(--color-accent);
 }
 
@@ -40,17 +40,17 @@
 .document-generation-embedded__spinner {
   width: 1.25rem;
   height: 1.25rem;
-  margin-bottom: var(--sp-3);
-  border-radius: var(--r-pill);
+  margin-bottom: var(--space-3);
+  border-radius: 50%;
   background: conic-gradient(transparent 20%, var(--color-accent));
   mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 0);
   animation: document-generation-spin 0.8s linear infinite;
 }
 
 .document-generation-embedded__eyebrow {
-  margin: 0 0 var(--sp-2);
+  margin: 0 0 var(--space-2);
   color: var(--color-accent);
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -58,14 +58,14 @@
 
 .document-generation-embedded h1 {
   margin: 0;
-  color: var(--cv-ink);
+  color: var(--color-heading);
   font-size: clamp(1.25rem, 4vw, 1.65rem);
 }
 
 .document-generation-embedded__message {
   max-width: 27rem;
-  margin: var(--sp-2) 0 0;
-  color: var(--cv-ink-muted);
+  margin: var(--space-3) 0 0;
+  color: var(--color-muted);
   line-height: 1.55;
 }
 

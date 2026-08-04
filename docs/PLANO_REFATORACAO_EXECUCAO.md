@@ -761,12 +761,10 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
   de card, com titulo em tinta normal e eyebrow no acento — exatamente onde o acento
   aparece no login. Mais 7 superficies do rail de filtros e do quick-create entraram na
   paleta. Avisos de frontend 387 -> **384**.
-- [x] **PR B** — `components/theme-dark-components.css` dissolvido na camada institucional
-  existente (`components/app-shell.css`); os seletores de componente passaram a consumir
-  o mesmo contrato nos dois temas. As 1.098 ocorrencias atuais de `data-theme` em 31
-  arquivos cairam para **0** fora de `00-palette.css`, `01-tokens.css` e do bundle gerado.
-  Na medicao das cinco rotas, as cores fora da paleta cairam de `6/7/4/5/0` para
-  `6/6/4/5/0` no claro e de `16/14/9/8/0` para `9/10/7/5/0` no escuro.
+- [ ] **PR B** — dissolver `components/theme-dark-components.css` (5.843 linhas, 665
+  regras com `:is(...)`/`[data-*]`). **E o que impede o tema escuro de obedecer a paleta:**
+  medido com `scripts/medir_paleta.py`, o claro ficou com o nucleo na paleta e o escuro
+  com 18 cores fora so no Dashboard.
 - [ ] **PR C** — as 318 regras de `hover`/`focus` que ainda mexem em borda.
 - [ ] **PR D** — os ~620 literais restantes fora dos arquivos de token.
 
@@ -780,34 +778,19 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
 
 ### Reescrita completa do CSS — `NOVO-30`
 
-- [x] **Fase 1 — camada unica de tokens:** `tokens.css`, `theme.css` e
-  `03-theme-dark.css` foram consolidados em `01-tokens.css`; imports, paginas
-  publicas, bundle, auditores e testes agora apontam para a camada unica. A
-  camada canonica tem 27 tokens e os nomes antigos permanecem apenas como
-  compatibilidade temporaria ate a fase 3. Declaracoes `--*` fora de
-  `00-palette.css` e `01-tokens.css`: **0**. Auditor frontend: **384 -> 335**.
-- [x] **Fase 2 — regra do espelho:** `data-theme` eliminado dos componentes e
-  `components/theme-dark-components.css` dissolvido em `components/app-shell.css`, sem
-  criar ou renomear classes. Gate estrutural: **1.098 -> 0**; auditor frontend mantido em
-  **335** avisos; auditor visual estatico: **5.192 -> 4.988** ocorrencias suspeitas.
-- [x] **Fase 3 — geometria padronizada e fim dos aliases:** aliases temporarios
-  removidos e vocabulario fechado em 35 propriedades canonicas (27 em
-  `01-tokens.css` + 8 sementes em `00-palette.css`), sem declaracoes `--*` nos
-  componentes. Gate geometrico: raio **6/6**, padding **8/8**, margin **8/8**,
-  borda **3/3** e sombra **4/4** valores distintos. A normalizacao das cinco
-  propriedades reduziu `!important` de **497 para 331**; o restante pertence a
-  Fase 4. Auditor frontend: **335 -> 191** avisos; auditor visual estatico:
-  **4.988 -> 3.448** ocorrencias suspeitas.
-- [x] **Fase 4 — fim das excecoes e do `!important`:** excecoes por arquivo
-  removidas do auditor e do gate de tokens (**2 -> 0 ativas**); seletores de
-  dominio do editor foram retirados de `forms.css` e consolidados em
-  `roteiros.css`; `!important` caiu de **331 para 0**. O auditor frontend caiu
-  de **191 para 10 avisos**, todos `href="#"` preexistentes em templates e fora
-  do escopo CSS fechado desta fase; **0 erros e 0 excecoes**. A precedencia de
-  `[hidden]` foi preservada sem `!important` por especificidade estrutural.
-  Auditor visual estatico medido sobre a `main` mergeada: **3.643 -> 3.490**;
-  `medir_paleta.py` produziu resultado identico antes/depois nas cinco paginas
-  e nos dois temas.
+> **Refazer (04/08/2026):** as fases 1–4 mergeadas nos PRs #156–#159 foram revertidas
+> para refazer do zero, uma fase por PR, com a coordenação visual institucional
+> (card → bloco → campo; claro espelho do escuro).
+
+- [x] **Fase 1 — camada unica de tokens (refazer):** `tokens.css`, `theme.css` e
+  `03-theme-dark.css` consolidados em `01-tokens.css` (27 tokens canônicos +
+  aliases temporários remapeados para a paleta institucional). Declaracoes `--*`
+  fora de `00-palette.css` / `01-tokens.css`: **0**. Coordenacao visual: superfícies
+  e tinta dos aliases espelham card → bloco → campo das imagens de referencia.
+- [ ] **Fase 2 — regra do espelho:** zerar `data-theme` fora de `00-palette.css` /
+  `01-tokens.css`; eliminar `components/theme-dark-components.css`.
+- [ ] **Fase 3 — geometria padronizada e fim dos aliases.**
+- [ ] **Fase 4 — fim das excecoes e do `!important`.**
 - [ ] **Fase 5 — apagar o CSS antigo.**
 
 ---

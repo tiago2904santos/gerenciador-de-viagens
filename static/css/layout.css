@@ -8,20 +8,20 @@
    -------------------------------------------------------------------------- */
 .app-shell {
   display: grid;
-  grid-template-columns: 15% minmax(0, 1fr);
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   min-height: 100vh;
 }
 
 .app-main {
   box-sizing: border-box;
   min-width: 0;
-  padding: var(--sp-4) var(--sp-6);
+  padding: 32px;
   width: 100%;
 }
 
 .content-wrap {
   margin: 0;
-  max-width: 100%;
+  max-width: var(--page-max-width);
   padding: 0;
   width: 100%;
 }
@@ -35,7 +35,7 @@
   display: block;
   font-size: 12px;
   font-weight: 700;
-  margin-bottom: var(--sp-1);
+  margin-bottom: var(--space-1);
   text-transform: uppercase;
 }
 
@@ -48,19 +48,19 @@
   }
 
   .app-main {
-    padding: var(--sp-4) var(--sp-6);
+    padding: 24px;
   }
 }
 
 @media (max-width: 600px) {
   .app-main {
-    padding: var(--sp-4);
+    padding: 16px;
   }
 }
 
 @media (max-width: 420px) {
   .app-main {
-    padding: var(--sp-3);
+    padding: 12px;
   }
 }
 

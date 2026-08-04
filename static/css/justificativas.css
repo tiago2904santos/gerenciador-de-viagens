@@ -1,62 +1,62 @@
 .justificativas-page {
   display: grid;
-  gap: var(--sp-5);
+  gap: var(--space-5);
 }
 
- .justificativas-page {
+:is(html[data-theme="dark"]) .justificativas-page {
 }
 
 /* Lista (rail, botão e linhas) na superfície step1; band = cabeçalho dos ofícios. */
 .justificativas-page .list-header,
 .justificativas-page .list-header__rail,
 .justificativas-page .list-header .cv-inline-create__toggle,
- .justificativas-page .list-header,
- .justificativas-page .list-header__rail,
- .justificativas-page .list-header .cv-inline-create__toggle {
-  background: var(--cv-surface-card);
+:is(html[data-theme="dark"]) .justificativas-page .list-header,
+:is(html[data-theme="dark"]) .justificativas-page .list-header__rail,
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle {
+  background: var(--step1-surface);
 }
 
 .justificativas-page .list-header__band,
- .justificativas-page .list-header__band {
-  background: var(--cv-surface-block);
+:is(html[data-theme="dark"]) .justificativas-page .list-header__band {
+  background: var(--color-surface-muted);
 }
 
 .justificativas-page .cv-record-row,
- .justificativas-page .cv-record-row {
-  background: var(--cv-surface-block);
-  border: var(--bd-0);
-  box-shadow: var(--sh-none);
+:is(html[data-theme="dark"]) .justificativas-page .cv-record-row {
+  background: var(--step1-field, var(--step1-surface));
+  border: 0;
+  box-shadow: none;
 }
 
 .justificativas-page .cv-record-row:hover,
 .justificativas-page .cv-record-row:focus-within,
- .justificativas-page .cv-record-row:hover,
- .justificativas-page .cv-record-row:focus-within {
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-block));
-  border: var(--bd-0);
-  box-shadow: var(--sh-none);
+:is(html[data-theme="dark"]) .justificativas-page .cv-record-row:hover,
+:is(html[data-theme="dark"]) .justificativas-page .cv-record-row:focus-within {
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field, var(--step1-surface)));
+  border: 0;
+  box-shadow: none;
 }
 
 /* Aberto: sem linha; gap só o do rail (mesmo ritmo do padding). */
 .justificativas-page .list-header__rail--inline-create {
-  gap: var(--sp-3);
-  padding: var(--sp-4);
+  gap: var(--space-3);
+  padding: var(--space-3) clamp(var(--space-4), 2vw, var(--space-5));
 }
 
 .justificativas-page .list-header .cv-inline-create__panel.is-open,
- .justificativas-page .list-header .cv-inline-create__panel.is-open {
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__panel.is-open {
   border-top: 0;
   padding-top: 0;
 }
 
 .justificativa-quick-add {
   display: grid;
-  gap: var(--sp-3);
+  gap: var(--space-3);
 }
 
 .justificativa-oficio-picker {
   display: grid;
-  gap: var(--sp-3);
+  gap: var(--space-3);
 }
 
 /* Tokens do step1 sem a caixa travel-document-card. */
@@ -65,37 +65,37 @@
   gap: 10px;
   /* document-form-page no escopo só para herdar regras de lista 1 coluna. */
   background: transparent;
-  border: var(--bd-0);
-  box-shadow: var(--sh-none);
+  border: 0;
+  box-shadow: none;
   padding: 0;
 }
 
- [data-justificativa-quick-add] .justificativa-quick-add__scope {
+:is(html[data-theme="dark"]) [data-justificativa-quick-add] .justificativa-quick-add__scope {
 }
 
 /* Lista do Ofício vinculado: mesma do termo, só um pouco mais baixa. */
-
+:is(html[data-theme="dark"])
   [data-justificativa-quick-add]
   :is(
     .termo-oficio-summary-panel .cv-search-picker__selected-list,
     .termo-oficio-summary-panel .related-route-list,
     #termo-oficio-lista
   ) {
-  max-height: 160px;
+  max-height: 160px !important;
 }
 
 /* Picker: sem gap extra no bloco; cards da lista mantêm 8px. */
-
+:is(html[data-theme="dark"])
   [data-justificativa-quick-add]
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker,
 [data-justificativa-quick-add]
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker {
-  gap: 0;
+  gap: 0 !important;
 }
 
-
+:is(html[data-theme="dark"])
   [data-justificativa-quick-add]
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker
@@ -104,10 +104,10 @@
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker
   .cv-search-picker__field {
-  gap: 7px;
+  gap: 7px !important;
 }
 
-
+:is(html[data-theme="dark"])
   [data-justificativa-quick-add]
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker
@@ -116,7 +116,7 @@
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker
   :is(.cv-search-picker__selected-list, #termo-oficio-lista) {
-  gap: 8px;
+  gap: 8px !important;
   margin-top: 8px;
 }
 
@@ -138,24 +138,24 @@
 .justificativas-page .list-header--inline-create .justificativa-quick-add__body {
   align-items: stretch;
   display: grid;
-  gap: var(--sp-4);
-  padding: 0;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
 }
 
 .justificativa-quick-add__body {
   display: grid;
-  gap: var(--sp-4);
+  gap: var(--space-4);
 }
 
 .justificativa-quick-add__fields {
   display: grid;
-  gap: var(--sp-4);
+  gap: var(--space-4);
   width: 100%;
 }
 
 .justificativa-quick-add__section {
   display: grid;
-  gap: var(--sp-3);
+  gap: var(--space-3);
 }
 
 .justificativa-quick-add__field {
@@ -171,7 +171,7 @@
 
 .justificativa-quick-add .cv-field-with-action {
   align-items: center;
-  min-height: 48px;
+  min-height: var(--form-control-height, var(--control-height-md));
 }
 
 .justificativa-quick-add .cv-field-with-action .cv-custom-select,
@@ -187,7 +187,7 @@
 .justificativa-quick-add .cv-field-with-action--manage-reveal {
   display: block;
   gap: 0;
-  min-height: 48px;
+  min-height: var(--form-control-height, var(--control-height-md));
   overflow: visible;
   position: relative;
 }
@@ -202,7 +202,7 @@
   max-width: 100%;
   min-width: 0;
   position: relative;
-  transition: width 140ms ease, max-width 140ms ease;
+  transition: width var(--transition-fast), max-width var(--transition-fast);
   width: 100%;
   z-index: 2;
 }
@@ -217,22 +217,22 @@
 .justificativa-quick-add .cv-field-with-action--manage-reveal:focus-within > .form-select,
 .justificativa-quick-add .cv-field-with-action--manage-reveal:hover > select,
 .justificativa-quick-add .cv-field-with-action--manage-reveal:focus-within > select {
-  max-width: calc(100% - 48px - var(--r-0));
-  width: calc(100% - 48px - var(--r-0));
+  max-width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
+  width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
 }
 
 .justificativa-quick-add .cv-field-with-action--manage-reveal > .cv-icon-btn--field-manage {
-  height: 48px;
-  max-height: 48px;
-  min-height: 48px;
+  height: var(--field-manage-btn-size);
+  max-height: var(--field-manage-btn-size);
+  min-height: var(--field-manage-btn-size);
   opacity: 0;
   pointer-events: none;
   position: absolute;
   right: 0;
   top: 50%;
   transform: translateY(-50%);
-  transition: opacity 140ms ease;
-  width: 48px;
+  transition: opacity var(--transition-fast);
+  width: var(--field-manage-btn-size);
   z-index: 1;
 }
 
@@ -254,7 +254,7 @@
 }
 
 .justificativa-quick-add .cv-field__control--textarea {
-  min-height: 220px;
+  min-height: var(--text-area-height-justificativa);
 }
 
 /*
@@ -282,39 +282,39 @@
 .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready,
 .justificativas-page .list-header .cv-inline-create__toggle.is-filled[aria-expanded="true"],
 .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready[aria-expanded="true"],
- .justificativas-page .list-header .cv-inline-create__toggle.is-filled,
- .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready,
- .justificativas-page .list-header .cv-inline-create__toggle.is-filled[aria-expanded="true"],
- .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready[aria-expanded="true"] {
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.is-filled,
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready,
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.is-filled[aria-expanded="true"],
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready[aria-expanded="true"] {
   animation: none;
   background: var(--color-accent);
   background-image: none;
-  border: var(--bd-0);
-  box-shadow: var(--sh-md);
-  color: var(--color-accent);
-  font-weight: 700;
+  border: 0;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  color: var(--color-on-accent, #19232d);
+  font-weight: var(--font-weight-bold);
 }
 
 .justificativas-page .list-header .cv-inline-create__toggle.is-filled:hover,
 .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:hover,
 .justificativas-page .list-header .cv-inline-create__toggle.is-filled:focus-visible,
 .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:focus-visible,
- .justificativas-page .list-header .cv-inline-create__toggle.is-filled:hover,
- .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:hover,
- .justificativas-page .list-header .cv-inline-create__toggle.is-filled:focus-visible,
- .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:focus-visible {
-  background: var(--color-accent);
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.is-filled:hover,
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:hover,
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.is-filled:focus-visible,
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:focus-visible {
+  background: var(--color-accent-hover, var(--color-accent));
   background-image: none;
-  border: var(--bd-0);
-  box-shadow: var(--sh-md);
-  color: var(--color-accent);
+  border: 0;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
+  color: var(--color-on-accent, #19232d);
 }
 
 .justificativas-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
 .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready .cv-inline-create__toggle-icon,
- .justificativas-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
- .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready .cv-inline-create__toggle-icon {
-  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
+:is(html[data-theme="dark"]) .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready .cv-inline-create__toggle-icon {
+  background: color-mix(in srgb, var(--color-on-accent, #19232d) 14%, transparent);
   color: inherit;
 }
 

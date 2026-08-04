@@ -12,7 +12,7 @@
   display: flex;
   gap: 18px;
   justify-content: space-between;
-  padding: var(--sp-4) var(--sp-6);
+  padding: 20px 22px;
 }
 
 .dashboard-page__welcome-header h2,
@@ -37,7 +37,7 @@
 
 .dashboard-page__brand-mark {
   align-items: center;
-  border-radius: var(--r-pill);
+  border-radius: 50%;
   display: flex;
   flex: 0 0 auto;
   font-size: 0.78rem;
@@ -50,7 +50,7 @@
 .dashboard-page__welcome-body {
   display: grid;
   gap: 7px;
-  padding: var(--sp-4) var(--sp-6);
+  padding: 18px 22px 21px;
 }
 
 .dashboard-page__welcome-note {

@@ -7,10 +7,10 @@
 }
 
 .document-inline-card {
-  border: var(--bd);
-  border-radius: var(--r-sm);
-  background: var(--cv-surface-card);
-  box-shadow: var(--sh-none);
+  border: 1px solid var(--cv-form-section-border, var(--color-border-soft, #e3eaf2));
+  border-radius: var(--radius-control, 12px);
+  background: var(--surface-form-section, var(--color-surface, #fff));
+  box-shadow: none;
   overflow: hidden;
   margin: 0;
 }
@@ -20,8 +20,8 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: var(--sp-2) var(--sp-3);
-  padding: var(--sp-4);
+  gap: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  padding: var(--space-4, 1rem) var(--space-4, 1rem);
   cursor: pointer;
   list-style: none;
 }
@@ -32,7 +32,7 @@
 
 .document-inline-card__title {
   font-weight: 600;
-  color: var(--cv-ink);
+  color: var(--color-heading, #071a33);
   flex: 1 1 12rem;
   min-width: 0;
   text-align: left;
@@ -43,19 +43,19 @@
   align-items: center;
   justify-content: flex-end;
   flex-wrap: wrap;
-  gap: var(--sp-3);
+  gap: var(--space-3, 0.75rem);
   flex: 0 1 auto;
 }
 
 .document-inline-card__body {
-  padding: var(--sp-4);
+  padding: 0 var(--space-4, 1rem) var(--space-4, 1rem);
 }
 
 .document-inline-viewer {
-  border: var(--bd);
-  border-radius: var(--r-sm);
+  border: 1px solid var(--color-border-soft, #e3eaf2);
+  border-radius: var(--radius-control, 12px);
   overflow: hidden;
-  background: var(--cv-surface-block);
+  background: var(--color-surface-muted, #f8fafd);
   min-height: 200px;
 }
 
@@ -63,7 +63,7 @@
   display: block;
   width: 100%;
   height: min(78vh, 820px);
-  border: var(--bd-0);
+  border: 0;
 }
 
 @media (max-width: 1080px) {
@@ -81,13 +81,13 @@
 .document-inline-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sp-3);
-  margin-top: var(--sp-3);
+  gap: var(--space-3, 0.75rem);
+  margin-top: var(--space-3, 0.75rem);
 }
 
 .document-inline-actions--header {
   margin-top: 0;
-  gap: var(--sp-2);
+  gap: var(--space-2, 0.5rem);
 }
 
 @media (max-width: 520px) {
@@ -104,7 +104,7 @@
 
 .document-inline-empty {
   margin: 0;
-  padding: var(--sp-3);
-  color: var(--cv-ink-muted);
-  font-size: 14px;
+  padding: var(--space-3, 0.75rem);
+  color: var(--color-muted, #52657a);
+  font-size: var(--font-size-sm, 0.875rem);
 }
