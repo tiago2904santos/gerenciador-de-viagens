@@ -86,6 +86,12 @@ def coletar():
                     print(f"  {nome} [{tema}] nao abriu: {str(e)[:60]}", file=sys.stderr)
                     continue
                 pag.evaluate(f"document.documentElement.setAttribute('data-theme','{tema}')")
+                # Estaciona o ponteiro fora do conteudo: sem isso o elemento sob
+                # o mouse e capturado em :hover e a comparacao acusa mudanca que
+                # nao existe. Foi o que aconteceu na primeira medicao da fase 5a
+                # — seis propriedades "mudaram" num card que so estava sob o
+                # cursor.
+                pag.mouse.move(2, 2)
                 pag.wait_for_timeout(250)
                 dados[f"{nome}/{tema}"] = pag.evaluate(JS, PROPS)
         nav.close()

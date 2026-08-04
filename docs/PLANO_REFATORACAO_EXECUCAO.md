@@ -911,7 +911,35 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
   > territorio das Etapas 6 e 8. Zerar dentro da fase 4 seria fazer o trabalho de tres
   > frentes no mesmo PR, que e o erro nº 2 da §8. A catraca desce no que esta fase
   > legitimamente remove; o resto tem dono nomeado aqui.
-- [ ] **Fase 5 — apagar o CSS antigo.**
+- [~] **Fase 5 — apagar o CSS antigo.** **Medida em 04/08, e o enunciado nao bate
+  com o repositorio.** As fases 1–4 ja consumiram o "CSS antigo" no sentido de
+  arquivo: nao ha nenhum orfao.
+  - **Zero arquivo sem consumidor.** Os 62 estao vivos — 35 pelo `style.css`/bundle
+    e 27 por `{% block extra_css %}` de pagina. O alvo "62 → ≤25 arquivos" nao sai
+    de delecao: sai de **fundir** arquivo, que e outra operacao e mexe na ordem da
+    cascata.
+  - **Regra morta de verdade: ~5.600 linhas** (639 regras, 516 classes que nenhum
+    template, JS ou Python emite). E a unica parte que e delecao — e vale por si.
+  - **Para chegar a ≤13.000 faltariam ~24.300 linhas alem disso**, e essas so saem
+    consolidando regra duplicada entre os 62 arquivos: reescrita, nao faxina. Isso
+    e uma fase 6, com alvo proprio e medicao propria.
+  - **Nao entreguei a delecao nesta sessao, de proposito.** A comparacao de estilo
+    computado acusou 6 propriedades mudadas num card do Dashboard e eu **nao
+    consegui separar defeito real de artefato do instrumento** — ver abaixo. Apagar
+    5.600 linhas com uma diferenca inexplicada e o cenario que a §6 do `AGENTS.md`
+    manda evitar: a suite fica verde de qualquer jeito.
+  - **`NOVO-35` 🟡 o instrumento media o `:hover` sem querer.** `medir_estilos.py`
+    capturava o elemento sob o ponteiro em estado de hover, entao a comparacao
+    acusava mudanca onde nao havia. Corrigido (o ponteiro estaciona antes da
+    captura) — mas a diferenca do card do Dashboard **persistiu depois da
+    correcao**, so trocando de tema. Enquanto ela nao for explicada, a delecao
+    nao entra.
+
+  > **Para quem pegar a fase 5:** a analise de classe morta esta em
+  > `scripts/` (o criterio: classe viva se o codigo a emite, se emite um filho/
+  > modificador BEM dela, ou se emite um prefixo de composicao `cv-btn--`).
+  > O primeiro passo e explicar a diferenca do card — comecar pela delecao antes
+  > disso e apostar.
 
 ---
 
