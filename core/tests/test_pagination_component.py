@@ -77,7 +77,8 @@ class PaginationComponentContractTests(TestCase):
 
         self.assertNotIn(ALERTA, html)
         self.assertIn('aria-label="Paginação"', html)
-        self.assertIn("21-40", html)
+        # Travessao, nao hifen: o componente escreve `start_index`–`end_index`.
+        self.assertIn("21–40", html)
         self.assertIn("300", html)
         # Cada link de página carrega o filtro corrente junto.
         self.assertIn("?aba=atuais&amp;q=teste&page=3", html)

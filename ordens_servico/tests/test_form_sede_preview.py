@@ -18,7 +18,7 @@ class OrdemServicoFormSedePreviewTests(TestCase):
         self.estado = Estado.objects.create(nome="Parana", sigla="PR")
         self.cidade = Cidade.objects.create(nome="Curitiba", estado=self.estado, uf="PR")
 
-    @mock.patch("ordens_servico.views.resolver_sede_ids_desde_configuracao")
+    @mock.patch("cadastros.services.resolver_sede_ids_desde_configuracao")
     def test_form_expoe_sede_das_configuracoes_na_previa_de_destinos(self, m_resolver):
         m_resolver.return_value = (self.estado.pk, self.cidade.pk, "")
         response = self.client.get(reverse("ordens_servico:nova"))

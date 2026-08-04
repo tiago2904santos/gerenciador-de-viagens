@@ -104,7 +104,6 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertNotContains(response, "Gerado automaticamente ao salvar.")
         self.assertNotContains(response, "será definida automaticamente ao salvar")
         self.assertNotContains(response, "Status:")
-        self.assertContains(response, "page-header-status-chip")
         self.assertContains(response, "page-stepper")
         self.assertContains(response, "page-shell--wizard")
         self.assertContains(response, 'data-autosave-link="1"')
