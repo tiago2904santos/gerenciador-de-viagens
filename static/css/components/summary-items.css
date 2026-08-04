@@ -8,7 +8,7 @@
 
 .cv-summary-item {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   display: flex;
   flex-direction: column;
@@ -46,12 +46,13 @@
 .summary-items > li {
   align-items: center;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   display: grid;
   gap: var(--sp-3);
   grid-template-columns: minmax(0, 1fr) auto;
-  padding: var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
   transition: var(--tr-fast);
 }
 

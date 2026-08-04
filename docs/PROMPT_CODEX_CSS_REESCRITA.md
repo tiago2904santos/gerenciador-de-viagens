@@ -16,10 +16,10 @@ Cole estes números no prompt: sem alvo numérico o Codex escolhe o próprio esc
 | `data-theme` fora dos arquivos de token | **1.106** | 0 | **0** |
 | `!important` | 497 | — | ≤ 20 |
 | literais de cor fora dos tokens | 620 | — | 0 |
-| `border-radius` distintos | 99 | 53 | 6 |
-| `padding` distintos | 247 | 214 | 8 |
-| `margin` distintos | 53 | 50 | 8 |
-| `border` distintos | 321 | 58 | 3 |
+| `border-radius` distintos | 99 | 53 → **6** (3b) | 6 |
+| `padding` distintos | 247 | 214 → **8** (3b) | 8 |
+| `margin` distintos | 53 | 50 → **3** (3b) | 8 |
+| `border` distintos | 321 | 58 → **3** (3b) | 3 |
 | `box-shadow` distintos | 184 (medido: 202) | 136 | 4 |
 | exceções de arquivo no auditor | 8 (medido: 3) | 2 | 0 |
 | avisos do `audit_frontend_standards` | 384 | 212 | 0 |
@@ -141,7 +141,7 @@ Ao fim desta fase, `components/theme-dark-components.css` **não existe mais**.
 > 2.078 declarações**, 88 blocos de regra de componente e linhas de 11.959 caracteres. O
 > gate da fase 1 media token **fora** da camada e nunca dentro. Medido de novo, a fase 3
 > tinha 8.287 referências `var()` e 3.622 declarações de geometria — não cabia num PR, e
-> saiu em três: **3a** (camada de token, feita), **3b** (raio/espaço/borda), **3c**
+> saiu em três: **3a** (camada de token, feita), **3b** (raio/espaço/borda, feita), **3c**
 > (sombra e foco).
 >
 > Duas correções ao método, que valem para as fases seguintes:

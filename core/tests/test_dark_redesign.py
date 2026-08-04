@@ -749,10 +749,11 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("bottom:        var(--_wizard-filete-inset-block);", page_shell)
         self.assertIn("top:           var(--_wizard-filete-inset-block);", page_shell)
         self.assertIn("height:        auto;", page_shell)
-        self.assertIn(
-            "padding:          var(--sp-4) var(--sp-6) var(--sp-4) var(--sp-7);",
-            page_shell,
-        )
+        # NOVO-30 fase 3b: padding assimetrico saiu da forma curta (que agora so
+        # aceita valor da escada) para a forma logica. Mesmo recuo, mesma origem
+        # do filete — `padding-inline-start` e o `--_wizard-filete-left`.
+        self.assertIn("padding-block: var(--sp-4);", page_shell)
+        self.assertIn("padding-inline: var(--sp-7) var(--sp-6);", page_shell)
 
         dark_filete_rule = self.css.split(".cv-form-section-header::before", 1)[1]
         dark_filete_rule = dark_filete_rule.split("}", 1)[0]

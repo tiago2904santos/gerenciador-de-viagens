@@ -59,7 +59,8 @@
   display: grid;
   gap: 7px;
   min-width: 0;
-  padding: 14px 16px;
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
 }
 
 .cv-document-card {
@@ -76,7 +77,10 @@
 
 .cv-document-card::before {
   background: var(--color-accent);
-  border-radius: 0 0 var(--sp-1) var(--sp-1);
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+  border-end-end-radius: var(--r-sm);
+  border-end-start-radius: var(--r-sm);
   content: "";
   height: 3px;
   left: var(--sp-5);
@@ -94,7 +98,7 @@
 .cv-document-card__body,
 .cv-document-card__actions {
   margin: 0;
-  padding: 16px 18px;
+  padding: var(--sp-4);
 }
 
 .cv-document-card__header {
@@ -127,13 +131,13 @@
 
 .cv-document-card__meta {
   background: var(--cv-surface-block);
-  border-block: 1px solid var(--cv-border);
+  border-block: var(--bd);
 }
 
 .cv-document-card__actions {
   align-items: center;
   background: var(--cv-surface-block);
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-2);
@@ -222,7 +226,7 @@
 .cv-module-card__header,
 .cv-module-card__body,
 .cv-module-card__footer {
-  padding: 16px 18px;
+  padding: var(--sp-4);
 }
 
 .cv-module-card__header {
@@ -276,8 +280,8 @@
   .cv-document-card__meta,
   .cv-document-card__body,
   .cv-document-card__actions {
-    padding-left: 14px;
-    padding-right: 14px;
+    padding-left: var(--sp-3);
+    padding-right: var(--sp-3);
   }
 
   .cv-signature-card__header,

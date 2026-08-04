@@ -12,7 +12,7 @@
 .ui-lab-nav__link {
   align-items: center;
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   box-shadow: var(--sh-md);
   color: var(--color-accent);
@@ -46,13 +46,15 @@
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
   letter-spacing: 0.04em;
-  padding: 4px 10px;
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
   white-space: nowrap;
 }
 
 .ui-lab-status-pill--draft {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
-  border: 1px solid color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
   color: var(--cv-state-warning);
 }
 
@@ -61,7 +63,8 @@
 .ui-lab-status-pill--active,
 .ui-lab-status-pill--on {
   background: var(--cv-surface-block);
-  border: 1px solid color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
   color: var(--cv-state-success);
 }
 
@@ -77,7 +80,8 @@
 .ui-lab-status-pill--corrected,
 .ui-lab-status-pill--off {
   background: var(--cv-surface-block);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   color: var(--color-accent);
 }
 

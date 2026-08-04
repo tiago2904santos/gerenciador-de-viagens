@@ -7,7 +7,7 @@
 }
 
 .document-inline-card {
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   background: var(--cv-surface-card);
   box-shadow: none;
@@ -21,7 +21,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: var(--sp-2) var(--sp-3);
-  padding: var(--sp-4) var(--sp-4);
+  padding: var(--sp-4);
   cursor: pointer;
   list-style: none;
 }
@@ -48,11 +48,12 @@
 }
 
 .document-inline-card__body {
-  padding: 0 var(--sp-4) var(--sp-4);
+  padding-block: 0 var(--sp-4);
+padding-inline: var(--sp-4);
 }
 
 .document-inline-viewer {
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   overflow: hidden;
   background: var(--cv-surface-block);

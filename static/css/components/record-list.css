@@ -11,12 +11,12 @@
 .cv-collection-panel {
   background: var(--cv-surface-block);
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--r-md);
   box-shadow: none;
   display: grid;
   gap: 12px;
   min-width: 0;
-  padding: 14px;
+  padding: var(--sp-3);
 }
 
 .cv-collection-panel > .list-toolbar {
@@ -36,14 +36,14 @@
   align-items: center;
   background: var(--cv-surface-next);
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--r-md);
   box-shadow: none;
   column-gap: 12px;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   min-height: 64px;
   min-width: 0;
-  padding: 11px 12px;
+  padding: var(--sp-3);
   position: relative;
   transition: background-color var(--tr-fast);
 }
@@ -66,8 +66,9 @@
 .cv-record-row__identity {
   align-items: center;
   background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
-  border-radius: 12px;
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-radius: var(--r-md);
   color: var(--color-accent);
   display: inline-flex;
   flex-shrink: 0;
@@ -122,8 +123,9 @@
 .cv-record-row__badge {
   align-items: center;
   background: color-mix(in srgb, var(--color-accent) 18%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
-  border-radius: 999px;
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  border-radius: var(--r-pill);
   color: var(--color-accent);
   display: inline-flex;
   flex-shrink: 0;
@@ -131,7 +133,8 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   min-height: 21px;
-  padding: 2px 8px;
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -156,7 +159,7 @@
   font-size: var(--fs-xs);
   gap: 2px 0;
   line-height: 1.4;
-  margin-top: 2px;
+  margin-top: var(--sp-1);
   min-width: 0;
 }
 
@@ -181,7 +184,8 @@
 
 .cv-record-row__facts-sep {
   color: var(--cv-ink-muted);
-  margin: 0 0.45em;
+  margin-block: 0;
+  margin-inline: var(--sp-2);
   opacity: 0.7;
 }
 
@@ -213,7 +217,7 @@
   .cv-record-row {
     align-items: start;
     grid-template-columns: auto minmax(0, 1fr);
-    padding: 12px 14px;
+    padding: var(--sp-3);
     row-gap: 10px;
   }
 
@@ -224,7 +228,7 @@
   .cv-record-row__actions {
     grid-column: 1 / -1;
     justify-content: flex-end;
-    padding-top: 2px;
+    padding-top: var(--sp-1);
     width: 100%;
   }
 

@@ -2,7 +2,8 @@
    Cards de opção (radio-cards) + grupos condicionais, no tema do sistema. */
 
 .dmv-lede {
-  margin: 0 0 var(--sp-2);
+  margin-block: 0 var(--sp-2);
+margin-inline: 0;
   color: var(--cv-ink-muted);
   font-size: var(--fs-sm);
   line-height: 1.55;
@@ -13,7 +14,8 @@
   width: 1px;
   height: 1px;
   padding: 0;
-  margin: -1px;
+  margin-block: calc(var(--sp-1) * -1);
+  margin-inline: calc(var(--sp-1) * -1);
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
@@ -40,7 +42,7 @@
   align-items: flex-start;
   gap: var(--sp-3);
   padding: var(--sp-4);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   background: var(--cv-surface-card);
   cursor: pointer;
@@ -68,9 +70,9 @@
   flex: 0 0 auto;
   width: 20px;
   height: 20px;
-  margin-top: 1px;
-  border: 2px solid var(--cv-border);
-  border-radius: 50%;
+  margin-top: var(--sp-1);
+  border: var(--bd-strong);
+  border-radius: var(--r-pill);
   background: transparent;
   transition: border-color var(--tr-fast);
 }
@@ -120,7 +122,7 @@
 .dmv-group {
   margin-top: var(--sp-4);
   padding: var(--sp-4);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   background: var(--cv-surface-block);
   animation: dmv-reveal 0.18s ease;
@@ -151,8 +153,11 @@
   align-items: flex-start;
   gap: var(--sp-3);
   margin-bottom: var(--sp-4);
-  padding: var(--sp-3) var(--sp-4);
-  border: 1px dashed color-mix(in srgb, var(--color-accent) 45%, transparent);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-style: dashed;
   border-radius: var(--r-md);
   background: color-mix(in srgb, var(--color-accent) 7%, transparent);
 }
@@ -163,7 +168,7 @@
   place-items: center;
   width: 34px;
   height: 34px;
-  border-radius: 50%;
+  border-radius: var(--r-pill);
   color: var(--color-accent);
   background: color-mix(in srgb, var(--color-accent) 16%, transparent);
 }

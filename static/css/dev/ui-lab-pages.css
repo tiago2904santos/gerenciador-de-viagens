@@ -6,13 +6,14 @@
 .ui-lab-hero {
   align-items: end;
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   box-shadow: var(--sh-md);
   display: flex;
   gap: var(--sp-4);
   justify-content: space-between;
-  padding: clamp(20px, 3vw, 32px);
+  padding-block: clamp(var(--sp-5), 3vw, var(--sp-7));
+  padding-inline: clamp(var(--sp-5), 3vw, var(--sp-7));
 }
 
 .ui-lab-hero__copy {
@@ -99,7 +100,7 @@
 .ui-lab-preview-card,
 .ui-lab-placeholder {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   box-shadow: var(--sh-md);
   display: grid;
@@ -121,7 +122,7 @@
   align-items: center;
   aspect-ratio: 1;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   color: var(--cv-ink);
   display: inline-flex;
@@ -215,7 +216,7 @@
 
 .ui-lab-demo-field__input {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   height: var(--h-md);
 }
@@ -223,14 +224,15 @@
 .ui-lab-demo-input {
   align-items: center;
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-sizing: border-box;
   color: var(--cv-ink-muted);
   display: flex;
   font-size: var(--fs-sm);
   height: var(--h-md);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
 }
 
 .ui-lab-demo-input--search {
@@ -248,25 +250,29 @@
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
   letter-spacing: 0.04em;
-  padding: 3px 10px;
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
   white-space: nowrap;
 }
 
 .ui-lab-demo-chip--draft {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
-  border: 1px solid color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
   color: var(--cv-state-warning);
 }
 
 .ui-lab-demo-chip--done {
   background: var(--cv-surface-block);
-  border: 1px solid color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
   color: var(--cv-state-success);
 }
 
 .ui-lab-demo-chip--review {
   background: var(--cv-surface-block);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   color: var(--color-accent);
 }
 
@@ -284,7 +290,7 @@
 .ui-lab-status-showcase,
 .ui-lab-status-card {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   box-shadow: var(--sh-md);
 }
@@ -428,14 +434,15 @@
 .ui-lab-section--headers .header-applied-chip {
   align-items: center;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-pill);
   color: var(--cv-ink-muted);
   display: inline-flex;
   gap: var(--sp-1);
   font-size: var(--fs-xs);
   line-height: 1.1;
-  padding: 4px 8px;
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
 }
 
 .ui-lab-section--headers .page-header-rail--filters,
@@ -465,8 +472,11 @@
   align-items: center;
   appearance: none;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
-  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  border: var(--bd);
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+  border-end-end-radius: var(--r-lg);
+  border-end-start-radius: var(--r-lg);
   box-sizing: border-box;
   color: var(--color-accent);
   cursor: pointer;
@@ -474,7 +484,8 @@
   gap: var(--sp-2);
   height: var(--h-md);
   justify-content: center;
-  padding: 0 var(--sp-4);
+  padding-block: 0;
+  padding-inline: var(--sp-4);
   width: 100%;
 }
 
@@ -504,7 +515,7 @@
 .ui-lab-header-inline-create__rail .cv-inline-create__panel {
   background: transparent;
   border: 0;
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
   box-shadow: none;
   width: 100%;
 }
@@ -513,7 +524,8 @@
   align-items: flex-end;
   display: flex;
   gap: var(--sp-3);
-  padding: var(--sp-4) 0;
+  padding-block: var(--sp-4);
+  padding-inline: 0;
   width: 100%;
 }
 
@@ -544,8 +556,11 @@
   align-items: center;
   appearance: none;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
-  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  border: var(--bd);
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+  border-end-end-radius: var(--r-lg);
+  border-end-start-radius: var(--r-lg);
   box-sizing: border-box;
   color: var(--color-accent);
   cursor: pointer;
@@ -553,7 +568,8 @@
   gap: var(--sp-2);
   height: var(--h-md);
   justify-content: center;
-  padding: 0 var(--sp-4);
+  padding-block: 0;
+  padding-inline: var(--sp-4);
   width: 100%;
 }
 
@@ -583,7 +599,7 @@
 .ui-lab-structure-inline-create__rail .cv-inline-create__panel {
   background: transparent;
   border: 0;
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
   box-shadow: none;
   width: 100%;
 }
@@ -592,7 +608,8 @@
   align-items: flex-end;
   display: flex;
   gap: var(--sp-3);
-  padding: var(--sp-4) 0;
+  padding-block: var(--sp-4);
+  padding-inline: 0;
   width: 100%;
 }
 
@@ -784,19 +801,23 @@
 .ui-lab-demo-chip--applied {
   align-items: center;
   background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-pill);
   color: var(--color-accent);
   display: inline-flex;
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
   gap: var(--sp-1);
-  padding: 3px var(--sp-2);
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
 }
 
 /* Input demo com borda direita apenas (para field-addon) */
 .ui-lab-demo-input--addon-left {
-  border-radius: var(--r-md) 0 0 var(--r-md);
+  border-start-start-radius: var(--r-md);
+border-start-end-radius: 0;
+border-end-end-radius: 0;
+border-end-start-radius: var(--r-md);
   min-width: 160px;
 }
 
@@ -813,7 +834,7 @@
 /* Container simulando um card para demonstrar cv-footer-action */
 .ui-lab-demo-card {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-xl);
   box-shadow: var(--sh-sm);
   overflow: hidden;
@@ -827,7 +848,8 @@
   color: var(--cv-ink);
   font-size: var(--fs-sm);
   font-weight: var(--fw-bold);
-  margin: 0 0 var(--sp-2);
+  margin-block: 0 var(--sp-2);
+  margin-inline: 0;
 }
 
 .ui-lab-demo-card__text {
@@ -845,24 +867,28 @@
 
 .ui-lab-demo-input {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   color: var(--cv-ink);
   font-family: var(--font-sans);
   font-size: var(--fs-sm);
   min-height: var(--h-md);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
 }
 
 /* Input preparado para receber botão acoplado à direita */
 .ui-lab-demo-input--for-addon {
-  border-radius: var(--r-md) 0 0 var(--r-md);
+  border-start-start-radius: var(--r-md);
+border-start-end-radius: 0;
+border-end-end-radius: 0;
+border-end-start-radius: var(--r-md);
   min-width: 180px;
 }
 
 .cv-demo-footer-card {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-xl);
   box-shadow: var(--sh-sm);
   overflow: hidden;
@@ -876,7 +902,8 @@
   color: var(--cv-ink);
   font-size: var(--fs-sm);
   font-weight: var(--fw-bold);
-  margin: 0 0 var(--sp-2);
+  margin-block: 0 var(--sp-2);
+  margin-inline: 0;
 }
 
 .cv-demo-footer-card__text {
@@ -917,7 +944,8 @@
 .cv-demo-input,
 .cv-demo-select {
   background: var(--cv-surface-card);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: var(--r-md);
   box-sizing: border-box;
   color: var(--cv-ink);
@@ -925,7 +953,8 @@
   font-size: var(--fs-sm);
   height: var(--h-md);
   min-height: var(--h-md);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   width: 100%;
 }
 
@@ -936,8 +965,11 @@
 
 .cv-demo-field-row--attached .cv-demo-input,
 .cv-demo-field-row--attached .cv-demo-select {
-  border-radius: var(--r-md) 0 0 var(--r-md);
-  border-right: none;
+  border-start-start-radius: var(--r-md);
+border-start-end-radius: 0;
+border-end-end-radius: 0;
+border-end-start-radius: var(--r-md);
+  border-right: 0;
 }
 
 .cv-field-row {
@@ -979,7 +1011,8 @@
 .cv-field-control__input,
 .cv-field-control__select {
   background: var(--cv-surface-card);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: var(--r-md);
   box-sizing: border-box;
   color: var(--cv-ink);
@@ -987,7 +1020,8 @@
   font-size: var(--fs-sm);
   height: var(--h-md);
   min-height: var(--h-md);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   width: 100%;
 }
 
@@ -1008,7 +1042,8 @@ textarea.cv-field-control__input {
 .cv-field-side-action {
   align-items: center;
   border-radius: var(--r-md);
-  border: 1px solid transparent;
+  border: var(--bd);
+  border-color: transparent;
   box-shadow: var(--sh-sm);
   box-sizing: border-box;
   cursor: pointer;
@@ -1020,7 +1055,8 @@ textarea.cv-field-control__input {
   height: var(--h-md);
   justify-content: center;
   min-height: var(--h-md);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   transition:
     background-color var(--tr-fast),
     border-color var(--tr-fast),
@@ -1140,7 +1176,7 @@ textarea.cv-field-control__input {
 }
 
 .cv-field-side-action--state::before {
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   content: "";
   display: inline-block;
   height: 8px;
@@ -1168,7 +1204,8 @@ textarea.cv-field-control__input {
   align-items: center;
   appearance: none;
   background: var(--cv-surface-block);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: var(--r-md);
   box-shadow: 0 0 0 3px var(--focus-ring), var(--sh-sm);
   color: var(--color-accent);
@@ -1180,7 +1217,8 @@ textarea.cv-field-control__input {
   gap: var(--sp-2);
   justify-content: center;
   min-height: var(--h-md);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   transition:
     background-color var(--tr-fast),
     border-color var(--tr-fast),
@@ -1262,7 +1300,8 @@ textarea.cv-field-control__input {
 
 .cv-state-segmented {
   background: var(--color-accent);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: var(--r-md);
   display: inline-grid;
   gap: var(--sp-1);
@@ -1422,7 +1461,7 @@ textarea.cv-field-control__input {
 .cv-demo-state-tile {
   align-items: center;
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-xl);
   display: grid;
   gap: var(--sp-3);
@@ -1482,7 +1521,7 @@ textarea.cv-field-control__input {
 .cv-demo-field-row--attached {
   align-items: stretch;
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   gap: 0;
@@ -1495,18 +1534,20 @@ textarea.cv-field-control__input {
 }
 
 .cv-demo-field-row--attached .cv-demo-field__label {
-  padding: var(--sp-2) var(--sp-3) var(--sp-1);
+  padding-block: var(--sp-2) var(--sp-1);
+padding-inline: var(--sp-3);
 }
 
 .cv-demo-field-row--attached .cv-demo-input,
 .cv-demo-field-row--attached .cv-demo-select {
   background: transparent;
-  border: none;
+  border: 0;
   border-radius: 0;
   box-shadow: none;
   height: var(--h-md);
   min-height: var(--h-md);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
 }
 
 .cv-demo-field-row--attached .cv-demo-field--grow {
@@ -1534,14 +1575,15 @@ textarea.cv-field-control__input {
 .cv-demo-input,
 .cv-demo-select {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-sizing: border-box;
   color: var(--cv-ink);
   font-family: var(--font-sans);
   font-size: var(--fs-sm);
   min-height: var(--h-md);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   width: 100%;
 }
 
@@ -1553,13 +1595,14 @@ textarea.cv-field-control__input {
 .cv-demo-list-row {
   align-items: center;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-xl);
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-3);
   justify-content: space-between;
-  padding: var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
 }
 
 .cv-demo-list-row__meta {
@@ -1583,7 +1626,7 @@ textarea.cv-field-control__input {
 
 .cv-demo-surface {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-xl);
   box-shadow: var(--sh-sm);
   display: grid;

@@ -29,7 +29,8 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  padding: var(--sp-4) clamp(var(--sp-4), 2vw, var(--sp-5)) var(--sp-3);
+  padding-block: var(--sp-4) var(--sp-3);
+  padding-inline: clamp(var(--sp-4), 2vw, var(--sp-5));
   width: 100%;
 }
 
@@ -86,12 +87,13 @@
 .list-header__rail {
   /* Mesmo token da área interna dos cards (.cv-record-card__band). */
   background: var(--cv-surface-card);
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
   box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-3);
-  padding: var(--sp-3) clamp(var(--sp-4), 2vw, var(--sp-5));
+  padding-block: var(--sp-3);
+  padding-inline: clamp(var(--sp-4), 2vw, var(--sp-5));
   width: 100%;
 }
 
@@ -141,25 +143,26 @@
 
 .list-header__search-input {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-sizing: border-box;
   color: var(--cv-ink);
   font-size: var(--fs-sm);
   height: var(--h-md);
   outline: none;
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   transition: border-color var(--tr-fast), box-shadow var(--tr-fast);
   width: 100%;
 }
 
 .list-header__search--with-icon .list-header__search-input {
-  padding-left: 38px;
+  padding-left: var(--sp-7);
 }
 
 /* Compat header-filter-input redefine padding shorthand — preservar folga do ícone. */
 .list-header__search--with-icon .list-header__search-input.header-filter-input {
-  padding-left: 38px;
+  padding-left: var(--sp-7);
 }
 
 .list-header__search-input::placeholder {
@@ -211,14 +214,15 @@
 /* Compat: inputs que ainda usam classes antigas */
 .list-header .header-filter-input {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-sizing: border-box;
   color: var(--cv-ink);
   font-size: var(--fs-sm);
   height: var(--h-md);
   outline: none;
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   width: 100%;
 }
 
@@ -272,7 +276,8 @@
 .travel-period-filter--filled .travel-period-filter__btn:focus-visible,
 .list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:focus,
 .list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:focus-visible {
-  border: 1px solid color-mix(in srgb, var(--focus-ring) 42%, transparent);
+  border: var(--bd);
+border-color: color-mix(in srgb, var(--focus-ring) 42%, transparent);
   box-shadow: 0 0 0 2px color-mix(in srgb, 0 0 0 3px var(--focus-ring) 12%, transparent);
   outline: none;
 }
@@ -322,10 +327,11 @@
 }
 
 .list-header .cv-inline-create__panel.is-open {
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
   max-height: 640px;
   opacity: 1;
-  padding: var(--sp-3) 0 0;
+  padding-block: var(--sp-3) 0;
+  padding-inline: 0;
   transform: translateY(0);
 }
 
@@ -420,7 +426,8 @@
     .cv-custom-select__trigger,
     .cv-search-picker__control
   ) {
-  border: 1px solid var(--cv-state-danger);
+  border: var(--bd);
+  border-color: var(--cv-state-danger);
 }
 
 
@@ -452,7 +459,7 @@
   background: var(--cv-surface-card);
   border: 0;
   border-radius: 0;
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
   box-shadow: none;
   color: var(--cv-ink);
   cursor: pointer;
@@ -463,7 +470,8 @@
   justify-content: center;
   margin: 0;
   min-height: var(--h-md);
-  padding: var(--sp-2) var(--sp-4);
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-4);
   transition:
     background 0.2s ease,
     border-color 0.2s ease,
@@ -511,7 +519,7 @@
 .list-header .cv-inline-create__toggle-icon {
   align-items: center;
   background: color-mix(in srgb, var(--color-accent) 12%, transparent);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   color: var(--color-accent);
   display: inline-flex;
   flex-shrink: 0;
@@ -779,7 +787,8 @@
   background:
     linear-gradient(var(--cv-surface-card), var(--cv-surface-card)) padding-box,
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-  border: 1px solid transparent;
+  border: var(--bd);
+    border-color: transparent;
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
   color: var(--cv-ink);
@@ -791,7 +800,8 @@
   gap: var(--sp-2);
   height: var(--h-md);
   min-height: var(--h-md);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   transition: background var(--tr-fast), box-shadow var(--tr-fast);
   white-space: nowrap;
 }
@@ -860,7 +870,7 @@
 
 /* Anula o gap do scope entre band e stepper (colados). */
 .wizard-sticky-scope > .list-header--wizard-stepper {
-  margin-top: calc(-1 * var(--sp-6));
+  margin-top: calc(var(--sp-6) * -1);
 }
 
 /* Sem borda dupla na junção enquanto colados. */
@@ -920,7 +930,8 @@
 
 .list-header__wizard-back {
   min-height: var(--h-md);
-  padding: 0 18px;
+  padding-block: 0;
+  padding-inline: var(--sp-4);
 }
 
 /* Stepper: sticky no scope alto. Colado → topo reto; descola → topo com radius.
@@ -947,7 +958,8 @@
   flex-wrap: wrap;
   gap: var(--sp-3);
   justify-content: stretch;
-  padding: 10px clamp(var(--sp-4), 2vw, var(--sp-5));
+  padding-block: var(--sp-2);
+  padding-inline: clamp(var(--sp-4), 2vw, var(--sp-5));
 }
 
 .list-header__wizard-stepper {
@@ -993,7 +1005,7 @@
   background: var(--cv-surface-block);
   background-image: none;
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--r-md);
   box-shadow: none;
   color: var(--cv-ink);
   font-weight: var(--fw-bold);

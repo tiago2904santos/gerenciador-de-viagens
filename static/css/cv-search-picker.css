@@ -53,7 +53,8 @@
   background:
     linear-gradient(var(--cv-surface-card), var(--cv-surface-card)) padding-box,
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-  border: 1px solid transparent;
+  border: var(--bd);
+    border-color: transparent;
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   box-sizing: border-box;
@@ -61,7 +62,8 @@
   gap: var(--sp-2);
   min-height: var(--h-md);
   min-width: 0;
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   transition:
     background var(--tr-fast),
     border-color var(--tr-fast),
@@ -85,7 +87,8 @@
 }
 
 .cv-search-picker__icon::before {
-  border: 2px solid currentColor;
+  border: var(--bd-strong);
+border-color: currentColor;
   border-radius: var(--r-pill);
   box-sizing: border-box;
   content: "";
@@ -147,7 +150,8 @@
   align-items: center;
   appearance: none;
   background: transparent;
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: var(--r-pill);
   color: var(--cv-ink-muted);
   cursor: pointer;
@@ -189,8 +193,12 @@
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   align-self: stretch;
   border: 0;
-  border-radius: calc(var(--r-md) - 1px) 0 0 calc(var(--r-md) - 1px);
-  border-right: 1px solid color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  border-start-start-radius: var(--r-md);
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+  border-end-start-radius: var(--r-md);
+  border-right: var(--bd);
+  border-right-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
   box-shadow: none;
   color: var(--cv-state-danger);
   font-size: var(--fs-xs);
@@ -198,7 +206,8 @@
   grid-column: 1;
   grid-row: 1;
   height: auto;
-  margin: calc(var(--sp-3) * -1) 0 calc(var(--sp-3) * -1) calc(var(--sp-3) * -1);
+  margin-block: calc(var(--sp-3) * -1);
+  margin-inline: calc(var(--sp-3) * -1) 0;
   min-width: 0;
   opacity: 0;
   overflow: hidden;
@@ -265,8 +274,11 @@
 .cv-search-picker__dropdown {
   animation: cv-search-picker-menu-in var(--tr-base) both;
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
-  border-radius: 0 0 var(--r-md) var(--r-md);
+  border: var(--bd);
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+  border-end-end-radius: var(--r-md);
+  border-end-start-radius: var(--r-md);
   border-top: 0;
   box-shadow: var(--sh-lg);
   box-sizing: border-box;
@@ -282,7 +294,7 @@
 .cv-search-picker__dropdown.cv-floating-dropdown--active {
   background: var(--cv-surface-card);
   border-radius: var(--r-md);
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
   overflow: hidden;
   /* Portal no body: precisa ficar acima do modal (--z-modal), senão o menu
      some atrás do painel do diálogo (ex.: Vincular usuário). */
@@ -333,7 +345,8 @@
   align-items: center;
   appearance: none;
   background: transparent;
-  border: 1px solid transparent;
+  border: var(--bd);
+  border-color: transparent;
   border-radius: var(--r-md);
   color: var(--cv-ink);
   cursor: pointer;
@@ -342,7 +355,8 @@
   gap: var(--sp-3);
   min-height: var(--h-md);
   min-width: 0;
-  padding: var(--sp-2) var(--sp-3);
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
   text-align: left;
   transition:
     background-color var(--tr-fast),
@@ -352,13 +366,13 @@
 }
 
 .cv-search-picker__option:first-child {
-  border-top-left-radius: calc(var(--r-md) - var(--sp-1));
-  border-top-right-radius: calc(var(--r-md) - var(--sp-1));
+  border-top-left-radius: var(--r-sm);
+  border-top-right-radius: var(--r-sm);
 }
 
 .cv-search-picker__option:last-child {
-  border-bottom-left-radius: calc(var(--r-md) - var(--sp-1));
-  border-bottom-right-radius: calc(var(--r-md) - var(--sp-1));
+  border-bottom-left-radius: var(--r-sm);
+  border-bottom-right-radius: var(--r-sm);
 }
 
 .cv-search-picker__option:hover,
@@ -373,7 +387,7 @@
 
 .cv-search-picker__option-marker {
   align-items: center;
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-pill);
   box-sizing: border-box;
   color: var(--on-accent);
@@ -407,8 +421,10 @@
 }
 
 .cv-search-picker__option--selected .cv-search-picker__option-marker::after {
-  border-bottom: 2px solid currentColor;
-  border-right: 2px solid currentColor;
+  border-bottom: var(--bd-strong);
+border-bottom-color: currentColor;
+  border-right: var(--bd-strong);
+  border-right-color: currentColor;
   content: "";
   height: var(--sp-2);
   transform: translateY(calc(var(--sp-1) * -1)) rotate(45deg);
@@ -450,7 +466,9 @@
 .cv-search-picker__empty,
 .cv-search-picker__selected-empty {
   background: var(--cv-surface-next);
-  border: 1px dashed color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-style: dashed;
   border-radius: var(--r-md);
   color: var(--cv-ink-muted);
   font-size: var(--fs-sm);
@@ -467,7 +485,8 @@
 
 .cv-search-picker__selected-panel {
   background: var(--cv-surface-block);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: var(--r-xl);
   display: grid;
   gap: var(--sp-3);
@@ -496,7 +515,8 @@
 .cv-search-picker__selected-count {
   align-items: center;
   background: var(--color-accent);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: var(--r-pill);
   color: var(--on-accent);
   display: inline-flex;
@@ -506,7 +526,8 @@
   justify-content: center;
   min-height: var(--sp-6);
   min-width: var(--sp-6);
-  padding: 0 var(--sp-2);
+  padding-block: 0;
+  padding-inline: var(--sp-2);
 }
 
 .cv-search-picker__selected-list {
@@ -528,7 +549,8 @@
 .cv-search-picker__selected-card {
   align-items: start;
   background: var(--cv-surface-card);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   display: grid;
@@ -593,7 +615,7 @@
 
 .cv-search-picker__driver-chip {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-pill);
   color: var(--cv-ink);
   display: none;
@@ -601,7 +623,8 @@
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
   line-height: 1;
-  padding: var(--sp-1) var(--sp-2);
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
 }
 
 .cv-search-picker__selected-card--driver .cv-search-picker__driver-chip {
@@ -712,7 +735,8 @@
   align-items: center;
   appearance: none;
   background: var(--cv-surface-next);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: var(--r-md);
   color: var(--cv-ink);
   cursor: pointer;
@@ -722,7 +746,8 @@
   font-weight: var(--fw-semibold);
   gap: var(--sp-2);
   min-height: var(--h-md);
-  padding: var(--sp-2) var(--sp-4);
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-4);
   text-align: left;
   transition:
     background-color var(--tr-fast),
@@ -745,7 +770,8 @@
 }
 
 .cv-search-picker__driver-marker {
-  border: 1px solid currentColor;
+  border: var(--bd);
+border-color: currentColor;
   border-radius: var(--r-pill);
   display: inline-flex;
   flex: 0 0 auto;
@@ -780,7 +806,8 @@
   font-size: var(--fs-xs);
   font-weight: var(--fw-semibold);
   line-height: 1.45;
-  margin: calc(var(--sp-2) * -1) 0 0;
+  margin-block: calc(var(--sp-2) * -1) 0;
+  margin-inline: 0;
 }
 
 .cv-search-picker--disabled {
@@ -842,7 +869,8 @@
   }
 
   .cv-search-picker__term-control {
-    border-top: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+    border-top: var(--bd);
+  border-top-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
     grid-column: 2 / -1;
     grid-row: auto;
     grid-template-columns: 1fr;
@@ -859,7 +887,8 @@
 
 
 .cv-search-picker--single.cv-search-picker--detailed .cv-search-picker__selected-card > .cv-search-picker__remove {
-  margin: calc(var(--sp-4) * -1) 0 calc(var(--sp-4) * -1) calc(var(--sp-5) * -1);
+  margin-block: calc(var(--sp-4) * -1);
+margin-inline: calc(var(--sp-5) * -1) 0;
 }
 
 .cv-search-picker--single.cv-search-picker--detailed .cv-search-picker__selected-name {

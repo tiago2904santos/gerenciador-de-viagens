@@ -70,7 +70,8 @@
 .oficio-documentos-info-section .oficio-documentos-admin-facts > .oficio-documentos-card__body {
   display: grid;
   gap: 10px;
-  padding: 2px 0 0;
+  padding-block: var(--sp-1) 0;
+  padding-inline: 0;
 }
 
 .oficio-documentos-info-section .oficio-documentos-summary__status {
@@ -111,12 +112,14 @@
 .oficio-documentos-route-section .oficio-documentos-route-card__head,
 .oficio-documentos-justification-section .oficio-documentos-card__header {
   border-bottom: 0;
-  padding: 12px 0 8px;
+  padding-block: var(--sp-3) var(--sp-2);
+  padding-inline: 0;
 }
 
 .oficio-documentos-route-section .oficio-documentos-route-card__head {
   margin-bottom: 0;
-  padding: 12px 0 8px;
+  padding-block: var(--sp-3) var(--sp-2);
+  padding-inline: 0;
 }
 
 .oficio-documentos-route-section .oficio-documentos-route-card__title {
@@ -263,8 +266,8 @@
 /* Scroll list (4+ trechos): wrapper = poço do valor-card; itens = painel da seção */
 .oficio-documentos-route-trechos-scroll-card {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
-  border-radius: 10px;
+  border: var(--bd);
+  border-radius: var(--r-sm);
   box-shadow: none;
   display: flex;
   flex-direction: column;
@@ -272,13 +275,15 @@
   height: 100%;
   max-height: 180px;
   min-width: 0;
-  padding: 10px 12px;
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
 }
 
 .oficio-documentos-route-trechos-scroll-card > .cv-summary-label {
   flex-shrink: 0;
   margin: 0;
-  padding: 0 2px;
+  padding-block: 0;
+  padding-inline: var(--sp-1);
 }
 
 .oficio-documentos-route-trechos-scroll-list {
@@ -289,7 +294,8 @@
   max-height: 220px;
   min-height: 0;
   overflow-y: auto;
-  padding: 0 2px 2px 0;
+  padding-block: 0 var(--sp-1);
+  padding-inline: 0 var(--sp-1);
   scrollbar-color: rgba(191, 211, 234, 0.6) transparent;
   scrollbar-width: thin;
 }
@@ -378,15 +384,16 @@
 }
 
 .oficio-documentos-info-section .oficio-documentos-fact {
-  border-radius: 10px;
-  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
 }
 
 .oficio-documentos-info-section .oficio-documentos-fact dt {
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.06em;
-  margin-bottom: 3px;
+  margin-bottom: var(--sp-1);
 }
 
 .oficio-documentos-info-section .oficio-documentos-fact dd {
@@ -400,8 +407,9 @@
 }
 
 .oficio-documentos-info-section .oficio-documentos-traveller-tile {
-  border-radius: 10px;
-  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
 }
 
 .oficio-documentos-info-section .oficio-documentos-traveller-tile__name {
@@ -417,13 +425,14 @@
 .oficio-documentos-info-section .cv-summary-item,
 .oficio-documentos-route-section .cv-summary-item {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
-  border-radius: 10px;
+  border: var(--bd);
+  border-radius: var(--r-sm);
   display: flex;
   flex-direction: column;
   gap: 3px;
   min-height: 0;
-  padding: 10px 12px;
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
 }
 
 .oficio-documentos-info-section .cv-summary-label,
@@ -477,7 +486,7 @@
 }
 
 .document-inline-card {
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   background: var(--cv-surface-card);
   box-shadow: none;
@@ -511,7 +520,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: var(--sp-2) var(--sp-3);
-  padding: var(--sp-4) var(--sp-4);
+  padding: var(--sp-4);
   cursor: pointer;
   list-style: none;
 }
@@ -538,7 +547,8 @@
 }
 
 .document-inline-card__body {
-  padding: 0 var(--sp-4) var(--sp-4);
+  padding-block: 0 var(--sp-4);
+padding-inline: var(--sp-4);
 }
 
 .document-inline-card__body--termos {
@@ -546,7 +556,7 @@
 }
 
 .document-inline-viewer {
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   overflow: hidden;
   background: var(--cv-surface-block);
@@ -638,11 +648,12 @@
 .oficio-documentos-sig-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem 0.6rem;
-  border-radius: 999px;
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
+  border-radius: var(--r-pill);
   font-size: var(--fs-sm);
   font-weight: 600;
-  margin-inline: 0.25rem;
+  margin-inline: var(--sp-1);
 }
 
 .oficio-documentos-sig-badge--unsigned {
@@ -656,7 +667,7 @@
 }
 
 .oficio-documentos-sig-hint {
-  margin-inline: 0.25rem;
+  margin-inline: var(--sp-1);
   max-width: 22rem;
   line-height: 1.35;
 }
@@ -673,7 +684,8 @@
   font-size: var(--fs-xl);
   font-weight: 700;
   color: var(--cv-ink);
-  margin: 0 0 var(--sp-2);
+  margin-block: 0 var(--sp-2);
+  margin-inline: 0;
 }
 
 .oficio-assinatura-pdf__subtitle {
@@ -705,13 +717,14 @@
 .oficio-assinatura-pdf__mvp {
   margin-bottom: var(--sp-5);
   padding: var(--sp-4);
-  border-radius: 12px;
+  border-radius: var(--r-md);
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
 }
 
 .oficio-assinatura-pdf__mvp-title {
-  margin: 0 0 var(--sp-2);
+  margin-block: 0 var(--sp-2);
+margin-inline: 0;
   font-size: var(--fs-md);
   font-weight: 600;
   color: var(--cv-ink);
@@ -743,11 +756,12 @@
 }
 
 .oficios-assinaturas-tabs__btn {
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   background: var(--cv-surface-card);
   color: var(--cv-ink);
-  border-radius: 999px;
-  padding: 0.45rem 1rem;
+  border-radius: var(--r-pill);
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-4);
   font-size: var(--fs-sm);
   font-weight: 600;
   cursor: pointer;
@@ -786,9 +800,10 @@
 
 .oficios-assinaturas-termo-toolbar__select {
   min-width: 12rem;
-  padding: 0.4rem 0.65rem;
-  border-radius: 8px;
-  border: 1px solid var(--cv-border);
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
+  border-radius: var(--r-sm);
+  border: var(--bd);
   font-size: var(--fs-sm);
 }
 
@@ -803,7 +818,7 @@
 .oficios-assinaturas-footer {
   margin-top: var(--sp-6);
   padding-top: var(--sp-4);
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
 }
 
 .assinatura-oficio-instrucao {
@@ -835,13 +850,14 @@
   position: sticky;
   top: var(--sp-3);
   padding: var(--sp-4);
-  border-radius: 14px;
-  border: 1px solid var(--cv-border);
+  border-radius: var(--r-md);
+  border: var(--bd);
   background: var(--cv-surface-block);
 }
 
 .assinatura-oficio-aside__title {
-  margin: 0 0 var(--sp-3);
+  margin-block: 0 var(--sp-3);
+margin-inline: 0;
   font-size: var(--fs-sm);
   font-weight: 700;
   color: var(--cv-ink);
@@ -854,8 +870,8 @@
 }
 
 .assinatura-pdf-editor {
-  border: 1px solid var(--cv-border);
-  border-radius: 14px;
+  border: var(--bd);
+  border-radius: var(--r-md);
   background: var(--cv-surface-block);
   overflow: hidden;
 }
@@ -866,9 +882,10 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--sp-3);
-  padding: var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
   background: var(--cv-surface-card);
-  border-bottom: 1px solid var(--cv-border);
+  border-bottom: var(--bd);
 }
 
 .assinatura-pdf-editor__meta {
@@ -899,7 +916,7 @@
   position: relative;
   display: inline-block;
   box-shadow: 0 4px 18px rgba(7, 26, 51, 0.12);
-  border-radius: 4px;
+  border-radius: var(--r-sm);
   overflow: visible;
   background: #fff;
 }
@@ -918,7 +935,7 @@
   z-index: 3;
   cursor: move;
   user-select: none;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   overflow: hidden;
   box-shadow: 0 3px 10px rgba(7, 26, 51, 0.18);
 }
@@ -945,13 +962,15 @@
   color: #fff;
   background: #082042;
   text-align: center;
-  padding: 0 0.15rem;
+  padding-block: 0;
+  padding-inline: var(--sp-1);
 }
 
 .assinatura-label__body {
   flex: 1 1 auto;
   min-width: 0;
-  padding: 0.35rem 0.45rem 0.35rem 0.35rem;
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-1) var(--sp-2);
   background: #0b2b4a;
   color: #fff;
 }
@@ -961,14 +980,14 @@
   font-weight: 700;
   letter-spacing: 0.03em;
   line-height: 1.2;
-  margin-bottom: 0.12rem;
+  margin-bottom: var(--sp-1);
 }
 
 .assinatura-label__name {
   font-size: 0.5rem;
   font-weight: 600;
   line-height: 1.2;
-  margin-bottom: 0.1rem;
+  margin-bottom: var(--sp-1);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -985,7 +1004,7 @@
 
 .assinatura-label__code {
   font-size: 0.42rem;
-  margin-top: 0.08rem;
+  margin-top: var(--sp-1);
   opacity: 0.88;
 }
 

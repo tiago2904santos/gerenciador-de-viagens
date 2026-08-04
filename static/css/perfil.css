@@ -18,7 +18,8 @@
 .perfil-form-page .perfil-block-actions {
   display: flex;
   justify-content: flex-end;
-  margin: var(--sp-2) 0 0;
+  margin-block: var(--sp-2) 0;
+  margin-inline: 0;
   padding: 0;
 }
 
@@ -28,7 +29,7 @@
   background: var(--color-accent);
   background-image: none;
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--r-md);
   box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
   color: var(--on-accent);
   font-weight: var(--fw-bold);
@@ -65,7 +66,8 @@
   border-radius: 0;
   box-shadow: none;
   margin: 0;
-  padding: var(--sp-2) 0 0;
+  padding-block: var(--sp-2) 0;
+  padding-inline: 0;
 }
 
 .perfil-form-page .cv-record-list.simple-list,
@@ -126,7 +128,8 @@
   color: var(--cv-ink-muted);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: var(--fs-xs);
-  margin: var(--sp-2) 0 0;
+  margin-block: var(--sp-2) 0;
+  margin-inline: 0;
   overflow-x: auto;
   padding: var(--sp-3);
   white-space: pre-wrap;

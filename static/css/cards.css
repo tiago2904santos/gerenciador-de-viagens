@@ -46,7 +46,7 @@
 .summary-card,
 .page-card {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-xl);
   box-shadow: var(--sh-md);
   overflow: hidden;
@@ -89,13 +89,17 @@
    2. Variantes de card
    -------------------------------------------------------------------------- */
 .module-card {
-  border-top: 3px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-top: var(--bd-strong);
+border-top-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+border-top-width: 3px;
   display: grid;
   gap: var(--sp-2);
 }
 
 .document-card {
-  border-left: 6px solid var(--color-accent);
+  border-left: var(--bd-strong);
+border-left-color: var(--color-accent);
+border-left-width: 6px;
   display: grid;
   gap: var(--sp-3);
 }
@@ -115,9 +119,9 @@
 
 .document-meta > div {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
-  padding: 8px 10px;
+  padding: var(--sp-2);
 }
 
 .document-meta dt {
@@ -170,8 +174,10 @@
   background:
     linear-gradient(145deg, rgba(11, 58, 102, 0.06), rgba(216, 162, 27, 0.04)),
     var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
-  border-left: 6px solid var(--color-accent);
+  border: var(--bd);
+  border-left: var(--bd-strong);
+  border-left-color: var(--color-accent);
+  border-left-width: 6px;
   border-radius: var(--r-xl);
   box-shadow: var(--sh-md);
   display: grid;
@@ -241,14 +247,14 @@
    -------------------------------------------------------------------------- */
 .app-panel {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
   padding: var(--sp-5);
 }
 
 .app-panel__header {
-  border-bottom: 1px solid var(--cv-border);
+  border-bottom: var(--bd);
   margin-bottom: var(--sp-4);
   padding-bottom: var(--sp-3);
 }

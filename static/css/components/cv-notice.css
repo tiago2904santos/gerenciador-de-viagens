@@ -19,14 +19,15 @@
 .alert,
 .cv-alert {
   align-items: flex-start;
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   display: grid;
   font-weight: 600;
   gap: var(--sp-1) var(--sp-2);
   grid-template-columns: auto minmax(0, 1fr);
-  padding: var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
   position: relative;
 }
 
@@ -45,7 +46,8 @@
   grid-column: 1;
   grid-row: 1 / -1;
   height: 8px;
-  margin: 6px 0 0;
+  margin-block: var(--sp-1) 0;
+  margin-inline: 0;
   width: 8px;
 }
 
@@ -129,7 +131,9 @@
 .diario-diaria-alert {
   background: color-mix(in srgb, var(--cv-state-warning) 7%, transparent);
   border: 0;
-  border-left: 3px solid var(--cv-state-warning);
+  border-left: var(--bd-strong);
+  border-left-color: var(--cv-state-warning);
+  border-left-width: 3px;
   border-radius: var(--r-sm);
   color: var(--cv-ink-muted);
   font-size: var(--fs-sm);
@@ -205,7 +209,8 @@
   gap: var(--sp-3);
   grid-template-columns: unset;
   justify-content: space-between;
-  margin: 0 0 var(--sp-4);
+  margin-block: 0 var(--sp-4);
+  margin-inline: 0;
 }
 
 .cv-notice--action::before,

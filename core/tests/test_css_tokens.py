@@ -358,3 +358,108 @@ class CamadaUnicaDeTokenTests(SimpleTestCase):
                     if nome.startswith(FAMILIAS_DE_COR) and prop in PROPS_DE_MEDIDA:
                         fora.append(f"{_rel_css(arquivo)}: {prop}: var({nome}) — cor como medida")
         self.assertEqual(fora, [], f"token na propriedade errada: {sorted(set(fora))[:10]}")
+
+
+# ===========================================================================
+# NOVO-30 fase 3b — geometria na escada fechada
+#
+# O gate do prompt media so a forma curta (`padding:`, `border:`,
+# `border-radius:`). `padding-inline`, `border-color` e
+# `border-start-start-radius` passavam por baixo dele — dava para zerar o
+# contador empurrando o valor para a forma longa, com a suite verde e o
+# objetivo intacto. Este mede as duas: teto de string na curta, escada fechada
+# em toda forma longa.
+# ===========================================================================
+
+TETO_DA_FORMA_CURTA = {
+    "border-radius": 6,
+    "padding": 8,
+    "margin": 8,
+    "border": 3,
+}
+
+# Tudo que uma medida de geometria pode valer, em qualquer forma.
+_ESCADA = re.compile(
+    r"var\(--(?:sp-[1-8]|r-(?:sm|md|lg|xl|pill)|bd|bd-strong|h-(?:sm|md|lg))\)"
+)
+_NEUTROS = frozenset({
+    "0", "auto", "inherit", "initial", "unset", "revert", "none", "transparent",
+    "currentColor", "solid", "dashed", "dotted", "double", "hidden",
+})
+# Funcao (calc/clamp/color-mix/env) e cor sao conferidas por outros gates; aqui
+# so interessa comprimento solto.
+_FUNCAO = ("calc(", "clamp(", "min(", "max(", "env(", "color-mix(", "rgba(", "rgb(", "var(")
+
+_PROPS_LONGAS = re.compile(
+    r"^(?:padding|margin)(?:-(?:block|inline)(?:-(?:start|end))?|-(?:top|right|bottom|left))$"
+    r"|^border-(?:start|end)-(?:start|end)-radius$"
+    r"|^border-(?:top|bottom)-(?:left|right)-radius$"
+    r"|^border(?:-(?:block|inline))?(?:-(?:start|end|top|right|bottom|left))?$"
+)
+
+
+def _componentes(valor):
+    """Componentes de topo do valor, respeitando parenteses."""
+    out, atual, prof = [], "", 0
+    for c in valor:
+        if c == "(":
+            prof += 1
+        elif c == ")":
+            prof -= 1
+        if c.isspace() and prof == 0:
+            if atual:
+                out.append(atual)
+                atual = ""
+            continue
+        atual += c
+    if atual:
+        out.append(atual)
+    return out
+
+
+def _declaracoes_css(texto):
+    """(prop, valor) de cada declaracao, sem comentario."""
+    limpo = _COMENTARIO.sub("", texto)
+    for corpo in re.findall(r"\{([^{}]*)\}", limpo):
+        for pedaco in corpo.split(";"):
+            if ":" not in pedaco:
+                continue
+            prop, _, valor = pedaco.partition(":")
+            prop = prop.strip()
+            if re.fullmatch(r"-{0,2}[a-zA-Z][-a-zA-Z0-9]*", prop):
+                yield prop, " ".join(valor.replace("!important", "").split())
+
+
+class EscadaDeGeometriaTests(SimpleTestCase):
+    """A escala e fechada: seis raios, oito espacos, tres bordas."""
+
+    def test_forma_curta_nao_passa_do_teto(self):
+        """`!important` sai antes de contar: ele e alvo da fase 4, nao desta."""
+        vistos = {prop: set() for prop in TETO_DA_FORMA_CURTA}
+        for arquivo in _css_fontes():
+            for prop, valor in _declaracoes_css(arquivo.read_text(encoding="utf-8")):
+                if prop in vistos:
+                    vistos[prop].add(valor)
+        for prop, teto in TETO_DA_FORMA_CURTA.items():
+            with self.subTest(prop=prop):
+                self.assertLessEqual(
+                    len(vistos[prop]), teto,
+                    f"{prop}: {len(vistos[prop])} valores distintos (teto {teto}) "
+                    f"— {sorted(vistos[prop])}",
+                )
+
+    def test_forma_longa_tambem_vem_da_escada(self):
+        """Sem isto, `padding-inline: 13px` zeraria o contador da forma curta."""
+        fora = []
+        for arquivo in _css_fontes():
+            for prop, valor in _declaracoes_css(arquivo.read_text(encoding="utf-8")):
+                if not _PROPS_LONGAS.fullmatch(prop):
+                    continue
+                for c in _componentes(valor):
+                    if c in _NEUTROS or _ESCADA.fullmatch(c) or c.startswith(_FUNCAO):
+                        continue
+                    fora.append(f"{_rel_css(arquivo)}: {prop}: {c}")
+        self.assertEqual(
+            fora, [],
+            f"comprimento fora da escada fechada: {sorted(set(fora))[:12]}",
+        )

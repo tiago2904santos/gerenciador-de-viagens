@@ -8,13 +8,14 @@
 
 .app-page__shell > .roteiro-form-shell {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.65) inset,
     0 20px 44px rgba(15, 34, 54, 0.1);
   box-sizing: border-box;
-  padding: clamp(18px, 2.2vw, 26px) clamp(18px, 2.5vw, 28px);
+  padding-block: clamp(var(--sp-4), 2.2vw, var(--sp-6));
+  padding-inline: clamp(var(--sp-4), 2.5vw, var(--sp-6));
   width: 100%;
 }
 
@@ -31,14 +32,14 @@
 
 .form-section {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
   padding: var(--sp-5);
 }
 
 .form-section-header {
-  border-bottom: 1px solid var(--cv-border);
+  border-bottom: var(--bd);
   margin-bottom: var(--sp-4);
   padding-bottom: var(--sp-3);
 }
@@ -105,7 +106,7 @@
 }
 
 .app-form-grid-panel {
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   padding: var(--sp-4);
 }
@@ -242,24 +243,29 @@
 .form-actions,
 .app-form-actions {
   align-items: center;
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
   display: flex;
   gap: var(--sp-3);
   justify-content: flex-end;
-  padding: var(--sp-3) var(--sp-5) var(--sp-3) 0;
+  padding-block: var(--sp-3);
+  padding-inline: 0 var(--sp-5);
 }
 
 .roteiro-editor__actions {
   align-items: center;
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
-  border-radius: 0 0 var(--r-md) var(--r-md);
+  border: var(--bd);
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+  border-end-end-radius: var(--r-md);
+  border-end-start-radius: var(--r-md);
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-3);
   justify-content: flex-end;
   margin-top: var(--sp-1);
-  padding: var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
 }
 
 .roteiro-editor__actions--avulso {
@@ -327,7 +333,8 @@
 .app-card-toggle {
   align-items: center;
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
-  border: 1px solid color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
   border-radius: var(--r-xl);
   box-shadow: none;
   cursor: pointer;
@@ -335,7 +342,8 @@
   gap: 10px;
   grid-template-columns: auto minmax(0, 1fr) auto;
   min-height: 56px;
-  padding: 10px 12px;
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
   position: relative;
   transition: background var(--tr-base), border-color var(--tr-base), box-shadow var(--tr-base), transform var(--tr-base);
   max-width: 100%;
@@ -345,7 +353,8 @@
 .app-card-toggle__input {
   clip: rect(0, 0, 0, 0);
   height: 1px;
-  margin: -1px;
+  margin-block: calc(var(--sp-1) * -1);
+  margin-inline: calc(var(--sp-1) * -1);
   overflow: hidden;
   padding: 0;
   position: absolute;
@@ -363,8 +372,9 @@
 .app-card-toggle__icon {
   align-items: center;
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
-  border: 1px solid color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  border-radius: 10px;
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  border-radius: var(--r-sm);
   /* Mix com heading: escurece no light e clareia no dark (≥ 4,5:1). */
   color: color-mix(in srgb, var(--cv-state-danger) 75%, var(--cv-ink));
   display: inline-flex;
@@ -374,7 +384,8 @@
   justify-content: center;
   letter-spacing: 0;
   min-width: 32px;
-  padding: 0 8px;
+  padding-block: 0;
+  padding-inline: var(--sp-2);
 }
 
 .app-card-toggle__content {
@@ -417,7 +428,8 @@
   justify-content: center;
   letter-spacing: 0;
   min-width: 74px;
-  padding: 0 12px;
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -468,13 +480,14 @@
 .field-option-card {
   align-items: center;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   cursor: pointer;
   display: flex;
   gap: var(--sp-3);
   min-height: var(--h-md);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   transition:
     border-color var(--tr-base),
     background var(--tr-base);
@@ -510,7 +523,7 @@
   font-size: var(--fs-xs);
   font-weight: 500;
   line-height: 1.3;
-  margin-top: 2px;
+  margin-top: var(--sp-1);
 }
 
 /* --------------------------------------------------------------------------
@@ -532,14 +545,15 @@
   align-items: center;
   align-self: center;
   background: none;
-  border: none;
+  border: 0;
   color: var(--color-accent);
   display: inline-flex;
   flex-shrink: 0;
   font-size: var(--fs-sm);
   font-weight: 600;
   gap: var(--sp-1);
-  padding: 0 var(--sp-1);
+  padding-block: 0;
+  padding-inline: var(--sp-1);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -639,7 +653,7 @@ textarea[readonly] {
 .app-input-addon {
   align-items: stretch;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-sizing: border-box;
   display: flex;
@@ -654,7 +668,7 @@ textarea[readonly] {
 
 .app-input-addon__control {
   background: transparent;
-  border: none !important;
+  border: 0 !important;
   border-radius: 0 !important;
   box-shadow: none !important;
   flex: 1;
@@ -669,14 +683,15 @@ textarea[readonly] {
 .app-input-addon__suffix {
   align-items: center;
   background: var(--cv-surface-card);
-  border-left: 1px solid var(--cv-border);
+  border-left: var(--bd);
   color: var(--cv-ink-muted);
   display: flex;
   flex-shrink: 0;
   font-size: var(--fs-md);
   font-variant-numeric: tabular-nums;
   font-weight: 600;
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   user-select: none;
   white-space: nowrap;
 }
@@ -754,14 +769,14 @@ textarea[readonly] {
 
 .app-form-section {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
   padding: var(--sp-5);
 }
 
 .app-form-section__header {
-  border-bottom: 1px solid var(--cv-border);
+  border-bottom: var(--bd);
   margin-bottom: var(--sp-4);
   padding-bottom: var(--sp-3);
 }
@@ -796,7 +811,7 @@ textarea[readonly] {
 
 .app-wizard__top {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-lg);
   overflow: hidden;
@@ -813,7 +828,8 @@ textarea[readonly] {
   gap: var(--sp-4);
   justify-content: space-between;
   min-height: 108px;
-  padding: var(--sp-5) var(--sp-5) var(--sp-6);
+  padding-block: var(--sp-5) var(--sp-6);
+  padding-inline: var(--sp-5);
 }
 
 .app-wizard__header-copy {
@@ -876,7 +892,7 @@ textarea[readonly] {
 .app-stepper__link {
   align-items: center;
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   color: var(--cv-ink);
   display: grid;
@@ -890,7 +906,7 @@ textarea[readonly] {
 .app-stepper__number {
   align-items: center;
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   display: inline-flex;
   font-weight: 900;
@@ -927,7 +943,8 @@ textarea[readonly] {
 
 .main-form-panel > .field-grid-rows {
   box-sizing: border-box;
-  padding: var(--sp-5) var(--sp-6);
+  padding-block: var(--sp-5);
+  padding-inline: var(--sp-6);
   width: 100%;
 }
 
@@ -954,7 +971,8 @@ textarea[readonly] {
   background:
     linear-gradient(var(--cv-surface-card), var(--cv-surface-card)) padding-box,
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-  border: 1px solid transparent;
+  border: var(--bd);
+    border-color: transparent;
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   box-sizing: border-box;
@@ -963,7 +981,8 @@ textarea[readonly] {
   line-height: 1.25;
   max-height: var(--h-md);
   min-height: var(--h-md);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   transition:
     background var(--tr-fast),
     box-shadow var(--tr-fast);
@@ -987,7 +1006,8 @@ textarea[readonly] {
     no-repeat right var(--sp-3) center / 16px 16px,
     linear-gradient(var(--cv-surface-card), var(--cv-surface-card)) padding-box,
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-  border: 1px solid transparent;
+  border: var(--bd);
+    border-color: transparent;
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   box-sizing: border-box;
@@ -995,7 +1015,8 @@ textarea[readonly] {
   height: var(--h-md);
   max-height: var(--h-md);
   min-height: var(--h-md);
-  padding: 0 calc(var(--sp-6) + var(--sp-2)) 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3) var(--sp-7);
   transition:
     background var(--tr-fast),
     box-shadow var(--tr-fast);
@@ -1014,7 +1035,8 @@ textarea[readonly] {
   background:
     linear-gradient(var(--cv-surface-card), var(--cv-surface-card)) padding-box,
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-  border: 1px solid transparent;
+  border: var(--bd);
+    border-color: transparent;
   box-shadow: var(--sh-sm);
   color: var(--cv-ink);
 }
@@ -1039,7 +1061,8 @@ textarea[readonly] {
 .main-form-panel .cv-search-picker__input {
   line-height: 1.25;
   min-height: 0;
-  padding: 0 5px;
+  padding-block: 0;
+  padding-inline: var(--sp-1);
 }
 
 .main-form-panel .cv-field-with-action {

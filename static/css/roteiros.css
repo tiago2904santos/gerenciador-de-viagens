@@ -33,7 +33,7 @@
 }
 
 .roteiro-editor__section--fonte {
-  margin-top: calc(-1 * var(--sp-7));
+  margin-top: calc(var(--sp-7) * -1);
 }
 
 .roteiro-editor .app-page-shell__inner.travel-document-wizard-shell {
@@ -47,17 +47,21 @@
 /* Intro compacto */
 .roteiro-editor__intro {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   box-shadow: var(--sh-md);
   box-sizing: border-box;
-  padding: var(--sp-3) var(--sp-5);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-5);
   position: relative;
 }
 
 .roteiro-editor__intro::before {
   background: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  border-start-start-radius: var(--r-lg);
+  border-start-end-radius: var(--r-lg);
+  border-end-end-radius: 0;
+  border-end-start-radius: 0;
   content: "";
   height: 3px;
   left: 0;
@@ -83,7 +87,8 @@
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.2;
-  margin: 0 0 var(--sp-2);
+  margin-block: 0 var(--sp-2);
+  margin-inline: 0;
 }
 
 .roteiro-editor__intro-text {
@@ -97,7 +102,7 @@
 /* Card principal */
 .roteiro-editor__main.card {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-xl);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
   margin-bottom: 0;
@@ -125,10 +130,11 @@
 .roteiro-editor__section {
   background: var(--cv-surface-card);
   border: 0;
-  border-bottom: 1px solid var(--cv-border);
+  border-bottom: var(--bd);
   border-radius: 0;
   box-sizing: border-box;
-  padding: 0 0 var(--sp-4);
+  padding-block: 0 var(--sp-4);
+  padding-inline: 0;
 }
 
 .roteiro-editor__section:last-of-type {
@@ -145,7 +151,8 @@
   font-size: 1.06rem;
   font-weight: 900;
   letter-spacing: -0.02em;
-  margin: 0 0 var(--sp-2);
+  margin-block: 0 var(--sp-2);
+  margin-inline: 0;
 }
 
 .roteiro-editor__section-desc {
@@ -194,7 +201,7 @@
 
 .roteiro-editor--avulso .roteiro-editor__reference-block {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   box-shadow: 0 18px 36px rgba(15, 34, 54, 0.08);
   overflow: hidden;
@@ -203,12 +210,14 @@
 
 .roteiro-editor--avulso .roteiro-editor__reference-top {
   background: var(--cv-surface-card);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: var(--bd);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
   justify-content: center;
   min-height: 52px;
-  padding: 10px 20px;
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-5);
 }
 
 .roteiro-editor--avulso .roteiro-editor__reference-eyebrow {
@@ -217,7 +226,7 @@
   font-weight: 900;
   letter-spacing: 0.12em;
   line-height: 1;
-  margin-bottom: 12px;
+  margin-bottom: var(--sp-3);
 }
 
 .roteiro-editor--avulso .roteiro-editor__reference-title {
@@ -230,7 +239,8 @@
 
 .roteiro-editor--avulso .roteiro-editor__reference-body {
   background: var(--cv-surface-card);
-  padding: 18px 20px 20px;
+  padding-block: var(--sp-4) var(--sp-5);
+  padding-inline: var(--sp-5);
 }
 
 .roteiro-editor__reference-body {
@@ -242,19 +252,21 @@
 }
 
 .roteiro-editor--avulso .roteiro-editor__section-header {
-  margin-bottom: 22px;
+  margin-bottom: var(--sp-5);
 }
 
 .roteiro-mapa__city-tooltip {
   background: var(--cv-surface-card);
-  border: 1px solid rgba(15, 95, 143, 0.25);
+  border: var(--bd);
+  border-color: rgba(15, 95, 143, 0.25);
   border-radius: var(--r-pill);
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
   color: var(--cv-ink);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.04em;
-  padding: 4px 8px;
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
   text-transform: uppercase;
   white-space: nowrap;
   cursor: pointer;
@@ -280,7 +292,7 @@
   font-size: 16px;
   font-weight: 900;
   letter-spacing: 0;
-  margin-bottom: 6px;
+  margin-bottom: var(--sp-1);
 }
 
 .roteiro-editor--avulso .roteiro-editor__section-desc {
@@ -292,7 +304,8 @@
   border: 0;
   clip: rect(0 0 0 0);
   height: 1px;
-  margin: -1px;
+  margin-block: calc(var(--sp-1) * -1);
+  margin-inline: calc(var(--sp-1) * -1);
   overflow: hidden;
   padding: 0;
   position: absolute;
@@ -305,7 +318,7 @@
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.06em;
-  margin-bottom: 8px;
+  margin-bottom: var(--sp-2);
   text-transform: uppercase;
 }
 
@@ -353,7 +366,7 @@
 .roteiro-editor__choice-card {
   align-items: flex-start;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   cursor: pointer;
   display: flex;
@@ -401,7 +414,7 @@
   accent-color: var(--color-accent);
   flex-shrink: 0;
   height: 18px;
-  margin-top: 2px;
+  margin-top: var(--sp-1);
   width: 18px;
 }
 
@@ -433,13 +446,13 @@
   align-items: stretch;
   gap: var(--sp-3);
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-bottom: 14px !important;
+  margin-bottom: var(--sp-3) !important;
 }
 
 .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-card {
   align-items: center;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: 0 8px 18px rgba(28, 49, 72, 0.05);
   gap: var(--sp-3);
@@ -466,7 +479,7 @@
 
 .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__choice-input {
   height: 18px;
-  margin-top: 2px;
+  margin-top: var(--sp-1);
   width: 18px;
 }
 
@@ -499,17 +512,17 @@
 }
 
 .roteiro-editor--avulso .roteiro-editor__reference-block--source .roteiro-editor__section-header {
-  margin-bottom: 14px;
+  margin-bottom: var(--sp-3);
 }
 
 .roteiro-editor--avulso .roteiro-editor__routes-panel--source {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.7) inset,
     0 8px 18px rgba(28, 49, 72, 0.05);
-  margin-top: 6px;
+  margin-top: var(--sp-1);
   padding: var(--sp-4);
 }
 
@@ -518,8 +531,8 @@
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.13em;
-  margin-left: 2px;
-  margin-bottom: 10px;
+  margin-left: var(--sp-1);
+  margin-bottom: var(--sp-2);
   text-transform: uppercase;
 }
 
@@ -527,7 +540,8 @@
   color: var(--cv-ink-muted);
   font-size: 10px;
   letter-spacing: 0.08em;
-  margin: 0 2px 5px;
+  margin-block: 0 var(--sp-1);
+  margin-inline: var(--sp-1);
 }
 
 .roteiro-editor--avulso .roteiro-editor__routes-panel--source .roteiro-editor__grid {
@@ -537,17 +551,18 @@
 #id_roteiro_busca.roteiro-editor__input,
 .roteiro-editor__input {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-sm);
   color: var(--cv-ink);
   font-size: 14px;
   min-height: var(--h-md);
-  padding: 0 var(--sp-4);
+  padding-block: 0;
+  padding-inline: var(--sp-4);
 }
 
 .roteiro-editor--avulso .roteiro-editor__routes-panel--source .roteiro-editor__input {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-sm);
   min-height: calc(var(--h-md) - 2px);
 }
@@ -556,7 +571,7 @@
   color: var(--cv-ink-muted);
   font-size: 12px;
   line-height: 1.4;
-  margin-top: 9px;
+  margin-top: var(--sp-2);
 }
 
 .roteiro-editor__route-list {
@@ -579,7 +594,7 @@
 
 .related-route-picker .cv-search-picker__selected-list.roteiro-editor__route-list {
   gap: 8px;
-  margin-top: 8px;
+  margin-top: var(--sp-2);
 }
 
 .roteiro-routes-panel__header {
@@ -604,7 +619,8 @@
 
 .related-route-list::-webkit-scrollbar-track {
   background: transparent;
-  margin: var(--sp-1) 0;
+  margin-block: var(--sp-1);
+  margin-inline: 0;
 }
 
 .related-route-list::-webkit-scrollbar-thumb {
@@ -625,21 +641,23 @@
   background: var(--cv-surface-card);
   border: 0;
   border-radius: 0;
-  margin-top: 10px;
+  margin-top: var(--sp-2);
   max-height: 280px;
-  padding: 0 2px 0 0;
+  padding-block: 0;
+  padding-inline: 0 var(--sp-1);
 }
 
 .related-route-item {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   color: var(--cv-ink);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: var(--sp-2) var(--sp-3);
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
   text-align: left;
   transition:
     background-color var(--tr-fast),
@@ -648,9 +666,9 @@
 
 .roteiro-editor--avulso .related-route-item {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
-  padding: 12px 13px;
+  padding: var(--sp-3);
   width: 100%;
   transition:
     border-color var(--tr-base),
@@ -706,7 +724,8 @@
 }
 
 .related-route-empty {
-  border: 1px dashed var(--cv-border);
+  border: var(--bd);
+border-style: dashed;
   border-radius: var(--r-md);
   color: var(--cv-ink-muted);
   font-size: 13px;
@@ -722,14 +741,14 @@
 /* SuperfÃ­cies internas (substitui bg-white) */
 .roteiro-editor__panel-surface {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   padding: var(--sp-3);
 }
 
 .roteiro-editor__bate-volta-head {
   align-items: flex-start;
-  border-bottom: 1px solid var(--cv-border);
+  border-bottom: var(--bd);
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-4);
@@ -803,21 +822,24 @@
   color: var(--cv-ink);
   font-size: 16px;
   font-weight: 900;
-  margin: 0 0 var(--sp-1);
+  margin-block: 0 var(--sp-1);
+  margin-inline: 0;
 }
 
 .roteiro-editor__chip {
   background: var(--cv-surface-block);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: var(--r-pill);
   color: var(--color-accent);
   display: inline-block;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  padding: 4px 10px;
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
   text-transform: uppercase;
-    margin-left: 5px;
+    margin-left: var(--sp-1);
 
 }
 
@@ -877,13 +899,13 @@
   align-items: center;
   background: var(--cv-surface-card) !important;
   border: 0 !important;
-  border-radius: 14px;
+  border-radius: var(--r-md);
   box-shadow: none !important;
   column-gap: var(--sp-4);
   filter: none !important;
   grid-template-columns: 14rem minmax(0, 1fr);
   margin: 0;
-  padding: 14px;
+  padding: var(--sp-3);
   transform: none !important;
   transition: none !important;
 }
@@ -925,14 +947,14 @@
   align-items: center;
   background: var(--cv-surface-card) !important;
   border: 0 !important;
-  border-radius: 14px;
+  border-radius: var(--r-md);
   box-shadow: none !important;
   column-gap: var(--sp-4);
   display: grid;
   filter: none !important;
   grid-template-columns: 14rem minmax(0, 1fr);
   margin: 0;
-  padding: 14px;
+  padding: var(--sp-3);
   row-gap: 0;
   transform: none !important;
   transition: none !important;
@@ -1007,7 +1029,7 @@
   background: var(--cv-surface-block) !important;
   background-color: var(--cv-surface-block) !important;
   border-color: transparent !important;
-  border-radius: 10px !important;
+  border-radius: var(--r-sm) !important;
   box-shadow: none !important;
   transition: none !important;
 }
@@ -1048,14 +1070,15 @@
   align-items: start;
   background: var(--cv-surface-card) !important;
   border: 0 !important;
-  border-radius: 14px;
+  border-radius: var(--r-md);
   box-shadow: none !important;
   column-gap: var(--sp-4);
   display: grid;
   filter: none !important;
   grid-template-columns: 14rem minmax(0, 1fr);
-  margin: 14px 0 0;
-  padding: 14px;
+  margin-block: var(--sp-3) 0;
+  margin-inline: 0;
+  padding: var(--sp-3);
   row-gap: 0;
   transform: none !important;
   transition: none !important;
@@ -1186,7 +1209,7 @@
   align-items: center;
   background: transparent;
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--r-sm);
   color: var(--cv-ink-muted);
   cursor: grab;
   display: inline-flex;
@@ -1223,7 +1246,7 @@
   align-items: center;
   background: color-mix(in srgb, var(--cv-state-success) 14%, var(--cv-surface-block));
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--r-sm);
   color: var(--cv-ink);
   cursor: pointer;
   display: inline-flex;
@@ -1240,7 +1263,7 @@
   align-items: center;
   background: color-mix(in srgb, var(--cv-state-danger) 12%, var(--cv-surface-block)) !important;
   border: 0 !important;
-  border-radius: 10px !important;
+  border-radius: var(--r-sm) !important;
   color: var(--cv-ink) !important;
   cursor: pointer;
   display: inline-flex;
@@ -1304,8 +1327,8 @@
 
 .roteiro-editor--oficio .oficio-roteiro-bate-volta-toggle .cv-field-side-action--toggle {
   align-items: center;
-  border: 1px solid var(--cv-border);
-  border-radius: 12px;
+  border: var(--bd);
+  border-radius: var(--r-md);
   box-shadow: none;
   display: inline-flex;
   font-size: 0.8125rem;
@@ -1315,7 +1338,8 @@
   justify-content: center;
   min-height: 38px;
   min-width: 11.5rem;
-  padding: 0 14px;
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   text-transform: none;
   transform: none;
 }
@@ -1341,11 +1365,11 @@
   align-items: center;
   background: var(--cv-surface-card);
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--r-md);
   column-gap: var(--sp-4);
   grid-template-columns: 14rem minmax(0, 1fr);
   margin: 0;
-  padding: 12px 14px;
+  padding: var(--sp-3);
   row-gap: 0;
 }
 
@@ -1396,8 +1420,8 @@
 .roteiro-editor--oficio .route-location-pair {
   align-items: stretch;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
-  border-radius: 14px;
+  border: var(--bd);
+  border-radius: var(--r-md);
   display: grid;
   gap: 0 !important;
   grid-template-columns: minmax(9rem, 0.85fr) minmax(0, 1.15fr) !important;
@@ -1411,12 +1435,13 @@
   gap: 6px;
   margin: 0;
   min-width: 0;
-  padding: 10px 14px 12px;
+  padding-block: var(--sp-2) var(--sp-3);
+  padding-inline: var(--sp-3);
   width: 100%;
 }
 
 .roteiro-editor--oficio .route-location-pair > .field + .field {
-  border-left: 1px solid var(--cv-border);
+  border-left: var(--bd);
 }
 
 .roteiro-editor--oficio .route-location-pair__cap {
@@ -1452,7 +1477,7 @@
 
   .roteiro-editor--oficio .route-location-pair > .field + .field {
     border-left: 0;
-    border-top: 1px solid var(--cv-border);
+    border-top: var(--bd);
   }
 }
 
@@ -1465,7 +1490,7 @@
 .roteiro-editor__destination-card.destination-row {
   align-items: stretch;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   display: grid;
   gap: 0;
@@ -1493,13 +1518,14 @@
   align-items: center;
   display: flex;
   justify-content: center;
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
 }
 
 .roteiro-editor__drag-handle {
   align-items: center;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-pill);
   color: var(--cv-ink-muted);
   cursor: grab;
@@ -1544,9 +1570,13 @@
 .roteiro-editor__icon-btn.destination-remove-button {
   align-items: center;
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
-  border: none;
-  border-left: 1px solid color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  border-radius: 0 var(--r-md) var(--r-md) 0;
+  border: 0;
+  border-left: var(--bd);
+  border-left-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  border-start-start-radius: 0;
+  border-start-end-radius: var(--r-md);
+  border-end-end-radius: var(--r-md);
+  border-end-start-radius: 0;
   color: var(--cv-state-danger);
   cursor: pointer;
   display: flex;
@@ -1556,7 +1586,8 @@
   justify-content: center;
   line-height: 1;
   min-width: 44px;
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   transition: background var(--tr-fast), color var(--tr-fast);
 }
 
@@ -1568,7 +1599,8 @@
 .roteiro-editor__add-btn#btn-adicionar-destino {
   align-items: center;
   background: var(--cv-surface-card);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   color: var(--color-accent);
   display: inline-flex;
   font-weight: 700;
@@ -1586,11 +1618,11 @@
 }
 
 .roteiro-editor--avulso .roteiro-editor__reference-block--sede-destinos .roteiro-editor__reference-body {
-  padding-bottom: 22px;
+  padding-bottom: var(--sp-5);
 }
 
 .roteiro-editor--avulso .roteiro-editor__reference-body > .roteiro-editor__nest-block {
-  margin-top: 16px;
+  margin-top: var(--sp-4);
 }
 
 .roteiro-editor--avulso .roteiro-editor__reference-body > .roteiro-editor__nest-block:first-of-type {
@@ -1602,7 +1634,8 @@
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.04em;
-  margin: 0 0 6px;
+  margin-block: 0 var(--sp-1);
+  margin-inline: 0;
   text-transform: uppercase;
 }
 
@@ -1610,22 +1643,25 @@
   color: var(--cv-ink-muted);
   font-size: 12px;
   line-height: 1.45;
-  margin: 0 0 12px;
+  margin-block: 0 var(--sp-3);
+  margin-inline: 0;
   max-width: 68ch;
 }
 
 .roteiro-editor--avulso .roteiro-editor__nest-block--destinos .roteiro-editor__destinos-stack {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: 0 10px 22px rgba(28, 49, 72, 0.04);
   gap: calc(var(--sp-3) + 2px);
-  padding: 16px 18px 10px;
+  padding-block: var(--sp-4) var(--sp-2);
+  padding-inline: var(--sp-4);
 }
 
 .roteiro-editor--avulso .roteiro-editor__nest-block--destinos .roteiro-editor__destinos-card-header {
   color: var(--cv-ink);
-  margin: 0 2px -2px;
+  margin-block: 0 calc(var(--sp-1) * -1);
+  margin-inline: var(--sp-1);
 }
 
 .roteiro-editor--avulso .roteiro-editor__nest-block--destinos .roteiro-editor__destinos-card-header .roteiro-editor__nest-title {
@@ -1633,7 +1669,8 @@
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 0;
-  margin: 0 0 4px;
+  margin-block: 0 var(--sp-1);
+  margin-inline: 0;
   text-transform: none;
 }
 
@@ -1658,7 +1695,7 @@
   gap: 8px;
   grid-template-columns: 150px minmax(0, 1fr) 150px;
   padding: 0;
-  margin-bottom: 8px;
+  margin-bottom: var(--sp-2);
 }
 
 .roteiro-editor--avulso .roteiro-editor__drag-col,
@@ -1669,7 +1706,7 @@
 
 .roteiro-editor--avulso .roteiro-editor__drag-handle {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   color: var(--cv-ink);
   font-size: 0;
@@ -1695,12 +1732,13 @@
   font-size: 13px;
   font-weight: 800;
   min-height: var(--h-md);
-  padding-left: 16px;
+  padding-left: var(--sp-4);
 }
 
 .roteiro-editor--avulso .roteiro-editor__icon-btn.destination-remove-button {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
-  border: 1px solid color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
   border-radius: var(--r-md);
   color: var(--cv-state-danger);
   font-size: 0;
@@ -1803,7 +1841,7 @@
 .destination-row.is-drop-target::before,
 .destination-row.is-drop-target::after {
   background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   content: "";
   height: 3px;
   left: var(--sp-3);
@@ -1869,14 +1907,19 @@
   align-self: stretch;
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border: 0;
-  border-left: 1px solid color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  border-radius: 0 calc(var(--r-md) - 1px) calc(var(--r-md) - 1px) 0;
+  border-left: var(--bd);
+  border-left-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  border-start-start-radius: 0;
+  border-start-end-radius: var(--r-md);
+  border-end-end-radius: var(--r-md);
+  border-end-start-radius: 0;
   box-shadow: none;
   grid-column: 2;
   grid-row: 1;
   justify-self: end;
   height: auto;
-  margin: calc(var(--sp-3) * -1) calc(var(--sp-3) * -1) calc(var(--sp-3) * -1) 0;
+  margin-block: calc(var(--sp-3) * -1);
+  margin-inline: 0 calc(var(--sp-3) * -1);
   min-width: 0;
   opacity: 0;
   overflow: hidden;
@@ -1941,13 +1984,15 @@
 .roteiro-editor__empty {
   align-items: center;
   background: var(--cv-surface-card);
-  border: 1px dashed var(--cv-border);
+  border: var(--bd);
+  border-style: dashed;
   border-radius: var(--r-md);
   color: var(--cv-ink-muted);
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
-  padding: var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
   text-align: center;
 }
 
@@ -1990,13 +2035,14 @@
   flex-direction: column;
   gap: var(--sp-3);
   overflow: visible;
-  padding: var(--sp-4) 0;
+  padding-block: var(--sp-4);
+  padding-inline: 0;
 }
 
 /* Divisor sutil entre trechos consecutivos e antes do retorno. */
 .roteiro-trechos-stack .roteiro-deslocamento + .roteiro-deslocamento,
 .roteiro-deslocamento--retorno {
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
 }
 
 /* Primeiro bloco não precisa de respiro superior. */
@@ -2046,20 +2092,22 @@
 
 .roteiro-trecho-card__leg {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   display: flex;
   flex-direction: column;
   height: 100%;
   min-width: 0;
-  padding: var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
 }
 
 .roteiro-trecho-card__leg-title {
   color: var(--cv-ink);
   font-size: 14px;
   font-weight: 800;
-  margin: 0 0 var(--sp-3);
+  margin-block: 0 var(--sp-3);
+  margin-inline: 0;
 }
 
 .roteiro-trecho-card__leg-grid {
@@ -2138,7 +2186,7 @@
 
 .card.roteiro-editor__trecho-card {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   overflow: hidden;
   transition: none;
@@ -2154,29 +2202,32 @@
 
 .roteiro-editor__trecho-card .card-header {
   background: var(--cv-surface-block);
-  border-bottom: 1px solid var(--cv-border);
-  padding: 14px 16px 12px;
+  border-bottom: var(--bd);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
 }
 
 .roteiro-editor__trecho-card .roteiro-editor__trecho-route {
   color: var(--cv-ink-muted);
   font-size: 12px;
-  margin-top: 2px;
+  margin-top: var(--sp-1);
 }
 
 .roteiro-editor__subpanel {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-sm);
   height: 100%;
-  padding: var(--sp-2) var(--sp-3);
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
 }
 
 .roteiro-editor__subpanel-title {
   color: var(--cv-ink);
   font-size: 14px;
   font-weight: 800;
-  margin: 0 0 var(--sp-3);
+  margin-block: 0 var(--sp-3);
+  margin-inline: 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -2189,7 +2240,8 @@
 }
 
 .roteiro-editor--avulso .roteiro-editor__reference-block--retorno .roteiro-editor__reference-body {
-  padding: 0 24px 0 24px;
+  padding-block: 0;
+padding-inline: var(--sp-6);
 }
 
 .roteiro-editor--avulso #retorno-card .row.g-3 {
@@ -2231,28 +2283,29 @@
 
 .roteiro-editor--avulso #retorno-card .roteiro-editor__subpanel {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: none;
-  padding: 20px 18px;
+  padding-block: var(--sp-5);
+  padding-inline: var(--sp-4);
 }
 
 .roteiro-editor--avulso #retorno-card .roteiro-editor__subpanel-title {
   color: var(--cv-ink);
   font-size: 14px;
   font-weight: 800;
-  margin-bottom: 22px;
+  margin-bottom: var(--sp-5);
 }
 
 .roteiro-editor--avulso #retorno-card .form-control {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   color: var(--cv-ink);
   font-size: 14px;
   min-height: var(--h-md);
-  padding-left: 14px;
-  padding-right: 14px;
+  padding-left: var(--sp-3);
+  padding-right: var(--sp-3);
 }
 
 .roteiro-editor--avulso #retorno-card .form-control[readonly] {
@@ -2261,7 +2314,8 @@
 }
 
 .roteiro-editor--avulso .route-segment-card .card-header {
-  margin: 0 2px 16px;
+  margin-block: 0 var(--sp-4);
+margin-inline: var(--sp-1);
   color: var(--cv-ink);
   font-size: 15px;
   font-weight: 900;
@@ -2308,28 +2362,29 @@
 
 .roteiro-editor--avulso .route-segment-card .roteiro-editor__subpanel {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: none;
-  padding: 20px 18px;
+  padding-block: var(--sp-5);
+  padding-inline: var(--sp-4);
 }
 
 .roteiro-editor--avulso .route-segment-card .roteiro-editor__subpanel-title {
   color: var(--cv-ink);
   font-size: 14px;
   font-weight: 800;
-  margin-bottom: 22px;
+  margin-bottom: var(--sp-5);
 }
 
 .roteiro-editor--avulso .route-segment-card .form-control {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   color: var(--cv-ink);
   font-size: 14px;
   min-height: var(--h-md);
-  padding-left: 14px;
-  padding-right: 14px;
+  padding-left: var(--sp-3);
+  padding-right: var(--sp-3);
 }
 
 .roteiro-editor--avulso .route-segment-card .form-control[readonly] {
@@ -2379,30 +2434,35 @@
   border-radius: var(--r-pill);
   font-size: 12px;
   font-weight: 700;
-  padding: 6px 12px;
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-3);
 }
 
 #diarias-status[data-state="pending"] {
   background: var(--cv-surface-block);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   color: var(--color-accent);
 }
 
 #diarias-status[data-state="stale"] {
   background: #3a2323;
-  border: 1px solid #9a4e4e;
+  border: var(--bd);
+  border-color: #9a4e4e;
   color: #ffd4d4;
 }
 
 #diarias-status[data-state="updated"] {
   background: var(--cv-surface-block);
-  border: 1px solid color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
   color: var(--cv-state-success);
 }
 
 #diarias-status[data-state="error"] {
   background: #3a2323;
-  border: 1px solid #9a4e4e;
+  border: var(--bd);
+  border-color: #9a4e4e;
   color: #ffd4d4;
 }
 
@@ -2445,7 +2505,7 @@
 /* Roteiro avulso: sections internas com titulo real da etapa. */
 .roteiro-editor--avulso .roteiro-editor__section {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
   border-bottom: 0;
@@ -2494,8 +2554,9 @@
 
 /* Footer integrado ao card de diárias */
 .roteiro-editor__section--diarias > .footer-actions {
-  border-top:     1px solid var(--cv-border);
-  padding:        var(--sp-4) var(--sp-6);
+  border-top: var(--bd);
+  padding-block: var(--sp-4);
+  padding-inline: var(--sp-6);
 }
 
 .roteiro-editor--avulso .roteiro-editor__section:not(.roteiro-editor__reference-block) > .roteiro-editor__section-header .roteiro-editor__section-title {
@@ -2507,10 +2568,14 @@
 
 .roteiro-editor--avulso .roteiro-editor__section:not(.roteiro-editor__reference-block) > .roteiro-editor__section-header {
   background: var(--cv-surface-card);
-  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  border-start-start-radius: var(--r-lg);
+  border-start-end-radius: var(--r-lg);
+  border-end-end-radius: 0;
+  border-end-start-radius: 0;
   margin: 0;
   min-height: 50px;
-  padding: 9px 20px;
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-5);
 }
 
 .roteiro-editor--avulso .roteiro-editor__section:not(.roteiro-editor__reference-block) > .roteiro-editor__section-header::before {
@@ -2521,7 +2586,7 @@
   font-weight: 800;
   letter-spacing: 0.14em;
   line-height: 1;
-  margin-bottom: 4px;
+  margin-bottom: var(--sp-1);
   text-transform: uppercase;
 }
 
@@ -2540,7 +2605,7 @@
 
 .roteiro-editor--avulso .roteiro-editor__section:not(.roteiro-editor__reference-block) > .roteiro-editor__section-header .roteiro-editor__section-desc {
   font-size: 11px;
-  margin-top: 4px;
+  margin-top: var(--sp-1);
   opacity: 0.88;
 }
 
@@ -2549,7 +2614,7 @@
 }
 
 .roteiro-editor--avulso .roteiro-editor__reference-block > .roteiro-editor__reference-body > .roteiro-editor__section-header {
-  margin-bottom: 18px;
+  margin-bottom: var(--sp-4);
 }
 
 .roteiro-editor--avulso .roteiro-editor__reference-block--sede-destinos > .roteiro-editor__reference-body > .roteiro-editor__section-header {
@@ -2564,7 +2629,7 @@
 .roteiro-editor--avulso .roteiro-editor__section--bate-volta > .roteiro-editor__panel-surface,
 .roteiro-editor--avulso .roteiro-editor__section--diarias > .roteiro-editor__diarias {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: 0 8px 20px rgba(28, 49, 72, 0.05);
   margin: 0;
@@ -2580,7 +2645,8 @@
 .roteiro-editor--avulso .roteiro-editor__nest-block--sede .roteiro-editor__sede-card-header {
   color: var(--cv-ink);
   grid-column: 1 / -1;
-  margin: 0 2px -2px;
+  margin-block: 0 calc(var(--sp-1) * -1);
+  margin-inline: var(--sp-1);
 }
 
 .roteiro-editor--avulso .roteiro-editor__nest-block--sede .roteiro-editor__sede-card-header .roteiro-editor__nest-title {
@@ -2588,7 +2654,8 @@
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 0;
-  margin: 0 0 4px;
+  margin-block: 0 var(--sp-1);
+  margin-inline: 0;
   text-transform: none;
 }
 
@@ -2605,7 +2672,7 @@
 
 .roteiro-editor--avulso .roteiro-editor__section--bate-volta > .roteiro-editor__panel-surface {
   border-radius: var(--r-md);
-  margin: 18px 18px;
+  margin: var(--sp-4);
 }
 
 .roteiro-editor--avulso .roteiro-editor__section--trechos > .roteiro-editor__trechos-wrap {
@@ -2614,18 +2681,18 @@
   box-shadow: none;
   padding: 0;
   border-radius: var(--r-md);
-  margin: 18px 18px;
+  margin: var(--sp-4);
 }
 
 .roteiro-editor--avulso .roteiro-editor__section--diarias > .roteiro-editor__diarias {
   border-radius: var(--r-md);
-  margin: 18px 18px;
+  margin: var(--sp-4);
 }
 
 .roteiro-editor--avulso .roteiro-editor__bate-volta-head {
   align-items: flex-start;
   background: transparent;
-  border-bottom: 1px solid var(--cv-border);
+  border-bottom: var(--bd);
 }
 
 .roteiro-editor--avulso .roteiro-editor__bate-volta-title {
@@ -2656,11 +2723,13 @@
 .roteiro-editor--avulso .roteiro-editor__section--trechos .roteiro-editor__empty {
   align-items: flex-start;
   background: var(--cv-surface-card);
-  border: 1px dashed var(--cv-border);
+  border: var(--bd);
+  border-style: dashed;
   border-radius: var(--r-md);
   gap: 0;
   min-height: 0;
-  padding: 13px 15px;
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
   text-align: left;
 }
 
@@ -2693,8 +2762,8 @@
   font-weight: 900;
   letter-spacing: -0.02em;
   line-height: 1.2;
-  margin-bottom: 4px;
-  margin-left: 5px;
+  margin-bottom: var(--sp-1);
+  margin-left: var(--sp-1);
 }
 
 .roteiro-editor--avulso .roteiro-editor__diarias-subtitle {
@@ -2702,7 +2771,8 @@
   font-size: 12px;
   font-weight: 700;
   line-height: 1.35;
-  margin: 0 0 6px;
+  margin-block: 0 var(--sp-1);
+  margin-inline: 0;
 }
 
 .roteiro-editor--avulso .roteiro-editor__section--diarias .roteiro-editor__diarias-eyebrow {
@@ -2710,7 +2780,7 @@
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.13em;
-  margin-bottom: 5px;
+  margin-bottom: var(--sp-1);
 }
 
 .roteiro-editor--avulso .roteiro-editor__diarias-note {
@@ -2722,13 +2792,15 @@
 .roteiro-editor--avulso .roteiro-editor__section--diarias #diarias-status {
   align-self: flex-start;
   background: var(--cv-surface-card);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   color: var(--color-accent);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.02em;
   min-height: 32px;
-  padding: 7px 12px;
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
 }
 
 .roteiro-editor--avulso .roteiro-editor__diarias-finance-grid {
@@ -2755,10 +2827,11 @@
 }
 
 .roteiro-editor--avulso .cv-summary-item {
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: 0 10px 20px rgba(15, 34, 54, 0.05);
-  padding: 14px 16px;
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
 }
 
 .roteiro-editor--avulso .cv-summary-item--principal {
@@ -2801,8 +2874,9 @@
 }
 
 .roteiro-editor--avulso .roteiro-editor__summary-divider {
-  border-top: 1px solid var(--cv-border);
-  margin: 4px 0 2px;
+  border-top: var(--bd);
+  margin-block: var(--sp-1);
+  margin-inline: 0;
 }
 
 .roteiro-editor--avulso #diarias-extenso {
@@ -2852,10 +2926,11 @@
 
 /* Mapa do roteiro (Leaflet) */
 .roteiro-editor__map-card {
-  margin-top: 2px;
+  margin-top: var(--sp-1);
   margin-bottom: var(--sp-3);
   border-radius: var(--r-lg);
-  border: 1px solid rgba(11, 58, 102, 0.14);
+  border: var(--bd);
+  border-color: rgba(11, 58, 102, 0.14);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.82) inset,
     0 18px 38px rgba(15, 34, 54, 0.1);
@@ -2867,8 +2942,10 @@
   background: var(--cv-surface-card);
   margin: 0;
   min-height: 72px;
-  padding: 14px 20px 14px 22px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-5);
+  border-bottom: var(--bd);
+  border-bottom-color: rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2882,7 +2959,7 @@
   font-weight: 900;
   letter-spacing: 0.16em;
   line-height: 1;
-  margin-bottom: 6px;
+  margin-bottom: var(--sp-1);
   text-transform: uppercase;
 }
 
@@ -2906,7 +2983,8 @@
 
 .roteiro-editor__map-card .card-body {
   background: var(--cv-surface-card);
-  padding: clamp(16px, 2vw, 22px);
+  padding-block: clamp(var(--sp-4), 2vw, var(--sp-5));
+  padding-inline: clamp(var(--sp-4), 2vw, var(--sp-5));
 }
 
 .roteiro-mapa__header {
@@ -2915,8 +2993,9 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--sp-3);
-  margin-bottom: 16px;
-  padding: 0 2px;
+  margin-bottom: var(--sp-4);
+  padding-block: 0;
+  padding-inline: var(--sp-1);
 }
 
 .roteiro-mapa__heading {
@@ -2961,7 +3040,8 @@
 }
 
 .roteiro-mapa__subtitle {
-  margin: 4px 0 0;
+  margin-block: var(--sp-1) 0;
+margin-inline: 0;
   font-size: 12px;
   line-height: 1.45;
   color: var(--cv-ink-muted);
@@ -2994,7 +3074,8 @@
   gap: 10px;
   justify-content: flex-end;
   margin: 0;
-  padding: 8px 12px;
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
   width: 100%;
 }
 
@@ -3003,7 +3084,8 @@
   height: var(--h-md);
   max-height: var(--h-md);
   min-height: var(--h-md);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
 }
 
 .roteiro-mapa__actions {
@@ -3028,7 +3110,8 @@
   font-weight: 900;
   letter-spacing: 0.01em;
   min-height: calc(var(--h-md) - 4px);
-  padding: 0 17px;
+  padding-block: 0;
+  padding-inline: var(--sp-4);
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -3042,7 +3125,8 @@
 
 .roteiro-mapa__action-btn--primary {
   background: linear-gradient(180deg, #1d6ea7 0%, #0f4f86 100%);
-  border: 1px solid rgba(10, 58, 102, 0.42);
+  border: var(--bd);
+  border-color: rgba(10, 58, 102, 0.42);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.18) inset,
     0 10px 22px rgba(11, 58, 102, 0.24);
@@ -3076,8 +3160,9 @@
 }
 
 .roteiro-mapa__action-icon {
-  border: 1.8px solid currentColor;
-  border-radius: 50%;
+  border: var(--bd-strong);
+border-color: currentColor;
+  border-radius: var(--r-pill);
   display: inline-block;
   height: 14px;
   opacity: 0.9;
@@ -3112,14 +3197,15 @@
 .roteiro-editor__section--mapa .cv-field__control {
   appearance: none;
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   box-sizing: border-box;
   color: var(--cv-ink);
   font-size: var(--fs-sm);
   min-height: var(--h-md);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   width: 100%;
 }
 
@@ -3142,8 +3228,9 @@
 .roteiro-mapa__loading {
   align-items: center;
   background: color-mix(in srgb, var(--cv-surface-card) 78%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, var(--cv-border));
-  border-radius: 999px;
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 35%, var(--cv-border));
+  border-radius: var(--r-pill);
   bottom: 16px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
   color: var(--cv-ink);
@@ -3153,7 +3240,8 @@
   gap: 10px;
   left: 50%;
   letter-spacing: 0.01em;
-  padding: 10px 16px;
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-4);
   pointer-events: none;
   position: absolute;
   transform: translateX(-50%);
@@ -3166,8 +3254,9 @@
 
 .roteiro-mapa__loading-spinner {
   animation: roteiro-mapa-spin 0.8s linear infinite;
-  border: 2px solid color-mix(in srgb, var(--color-accent) 28%, transparent);
-  border-radius: 999px;
+  border: var(--bd-strong);
+  border-color: color-mix(in srgb, var(--color-accent) 28%, transparent);
+  border-radius: var(--r-pill);
   border-top-color: var(--color-accent, #d8a21b);
   display: block;
   flex: 0 0 auto;
@@ -3197,7 +3286,7 @@
   min-height: 640px;
   height: 640px;
   width: 100%;
-  border-radius: 13px;
+  border-radius: var(--r-md);
   overflow: hidden;
   border: 0;
   margin-top: 0;

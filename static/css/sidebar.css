@@ -7,7 +7,7 @@
    -------------------------------------------------------------------------- */
 .sidebar {
   background: var(--cv-surface-card);
-  border-right: 1px solid var(--cv-border);
+  border-right: var(--bd);
   box-shadow: var(--sh-sm);
   box-sizing: border-box;
   color: var(--cv-ink-muted);
@@ -23,8 +23,9 @@
 }
 
 .sidebar-header {
-  border-bottom: 1px solid var(--cv-border);
-  padding: var(--sp-5) var(--sp-5) var(--sp-4);
+  border-bottom: var(--bd);
+  padding-block: var(--sp-5) var(--sp-4);
+  padding-inline: var(--sp-5);
 }
 
 .sidebar-brand {
@@ -41,7 +42,8 @@
 .sidebar-brand-badge {
   align-items: center;
   background: var(--color-accent);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: var(--r-pill);
   color: var(--on-accent);
   display: inline-flex;
@@ -62,7 +64,8 @@
   flex: 1;
   gap: var(--sp-2);
   overflow-y: auto;
-  padding: calc(var(--sp-3) + 2px) var(--sp-3) var(--sp-5);
+  padding-block: var(--sp-3) var(--sp-5);
+  padding-inline: var(--sp-3);
 }
 
 .sidebar-item {
@@ -91,7 +94,7 @@
 .sidebar-link--module {
   align-items: center;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-sizing: border-box;
   color: var(--cv-ink);
@@ -101,7 +104,8 @@
   font-weight: 500;
   min-height: calc(var(--h-md) - 2px);
   min-width: 0;
-  padding: 10px 13px;
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
 }
 
 .sidebar-module-expand {
@@ -181,23 +185,26 @@
 }
 
 .sidebar-panel {
-  border-left: 2px solid var(--cv-border);
+  border-left: var(--bd-strong);
   display: flex;
   flex-direction: column;
   gap: var(--sp-1);
-  margin: 6px 0 4px 14px;
-  padding: 6px 0 4px 10px;
+  margin-block: var(--sp-1);
+  margin-inline: var(--sp-3) 0;
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2) 0;
 }
 
 .sidebar-link--cadastros {
-  border: 1px solid transparent;
+  border: var(--bd);
+border-color: transparent;
   border-radius: var(--r-md);
   box-sizing: border-box;
   color: var(--cv-ink);
   display: block;
   font-size: 0.9rem;
   font-weight: 500;
-  padding: 8px 10px;
+  padding: var(--sp-2);
 }
 
 .sidebar-link--module:hover,
@@ -214,34 +221,36 @@
 .sidebar-module-expand.is-active,
 .sidebar-link--cadastros.is-active {
   background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   box-shadow: inset 4px 0 0 var(--color-accent);
   color: var(--cv-ink);
   font-weight: 600;
 }
 
 .sidebar-link--cadastros.is-active {
-  border-left: none;
+  border-left: 0;
 }
 
 /* --------------------------------------------------------------------------
    3. Rodape e logout
    -------------------------------------------------------------------------- */
 .sidebar-footer {
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
   color: var(--cv-ink-muted);
   display: flex;
   flex-direction: column;
   gap: calc(var(--sp-2) + 2px);
   font-size: 12px;
-  padding: 14px 20px 16px;
+  padding-block: var(--sp-3) var(--sp-4);
+  padding-inline: var(--sp-5);
 }
 
 .sidebar-account {
   display: grid;
   gap: 10px;
-  padding: 10px;
-  border: 1px solid var(--cv-border);
+  padding: var(--sp-2);
+  border: var(--bd);
   border-radius: var(--r-md);
   background: var(--cv-surface-block);
 }
@@ -284,7 +293,7 @@
 .sidebar-account__link {
   align-items: center;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-sm);
   color: var(--cv-ink);
   display: inline-flex;
@@ -292,7 +301,7 @@
   font-weight: 700;
   justify-content: center;
   min-height: 34px;
-  padding: 7px 10px;
+  padding: var(--sp-2);
   text-decoration: none;
   transition: background-color var(--tr-base), border-color var(--tr-base);
 }
@@ -309,14 +318,14 @@
 
 .sidebar-logout-btn {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-sm);
   color: var(--cv-ink);
   cursor: pointer;
   font-size: 12px;
   font-weight: 700;
   min-height: 34px;
-  padding: 7px 10px;
+  padding: var(--sp-2);
   transition: background-color var(--tr-base), border-color var(--tr-base);
   width: 100%;
 }
@@ -341,13 +350,14 @@
   }
 
   .sidebar-nav {
-    padding: 12px;
+    padding: var(--sp-3);
   }
 }
 
 @media (max-width: 600px) {
   .sidebar-header {
-    padding: 12px 14px 10px;
+    padding-block: var(--sp-3) var(--sp-2);
+  padding-inline: var(--sp-3);
   }
 
   .sidebar-brand {
@@ -360,14 +370,14 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     max-height: 260px;
     overflow-y: auto;
-    padding: 10px;
+    padding: var(--sp-2);
   }
 
   .sidebar-link--module {
     border-radius: var(--r-md);
     font-size: 0.86rem;
     min-height: 42px;
-    padding: 8px 10px;
+    padding: var(--sp-2);
   }
 
   .sidebar-item-icon {
@@ -376,17 +386,17 @@
   }
 
   .sidebar-panel {
-    margin-left: 6px;
-    padding-left: 8px;
+    margin-left: var(--sp-1);
+    padding-left: var(--sp-2);
   }
 
   .sidebar-link--cadastros {
     font-size: 0.82rem;
-    padding: 7px 8px;
+    padding: var(--sp-2);
   }
 
   .sidebar-footer {
-    padding: 10px;
+    padding: var(--sp-2);
   }
 }
 

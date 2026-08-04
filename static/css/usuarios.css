@@ -124,7 +124,8 @@
 
 .usuarios-page .list-header__rail--inline-create {
   gap: var(--sp-3);
-  padding: var(--sp-3) clamp(var(--sp-4), 2vw, var(--sp-5));
+  padding-block: var(--sp-3);
+  padding-inline: clamp(var(--sp-4), 2vw, var(--sp-5));
 }
 
 .usuarios-page .list-header .cv-inline-create__panel.is-open,
@@ -157,9 +158,9 @@
 [data-area-quick-add] .travel-document-block {
   background: var(--cv-surface-block);
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--r-md);
   margin: 0;
-  padding: 14px;
+  padding: var(--sp-3);
 }
 
 [data-usuario-quick-add] .cv-form-block--split,
@@ -188,7 +189,8 @@
 
 .vincular-usuario-modal__dialog > .cv-dialog__header {
   margin: 0;
-  padding: 18px 22px 16px;
+  padding-block: var(--sp-4);
+  padding-inline: var(--sp-5);
 }
 
 .vincular-usuario-modal__form.cv-dialog__form {
@@ -207,28 +209,30 @@
 .vincular-usuario-modal__body {
   display: grid;
   gap: 12px;
-  padding: 18px 22px 16px !important;
+  padding-block: var(--sp-4) !important;
+  padding-inline: var(--sp-5) !important;
 }
 
 .vincular-usuario-modal__intro {
   align-items: flex-start;
   background: var(--cv-surface-block);
   border: 0;
-  border-radius: 15px;
+  border-radius: var(--r-md);
   color: var(--cv-ink-muted);
   display: flex;
   font-size: 0.84rem;
   gap: 10px;
   line-height: 1.55;
   margin: 0;
-  padding: 10px 12px;
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
 }
 
 .vincular-usuario-modal__intro .cv-icon {
   color: var(--color-accent);
   flex: 0 0 18px;
   height: 18px;
-  margin-top: 2px;
+  margin-top: var(--sp-1);
   width: 18px;
 }
 
@@ -240,11 +244,11 @@
 .vincular-usuario-modal__fields.cv-form-stack,
 .vincular-usuario-modal__fields {
   background: var(--cv-surface-block);
-  border-radius: 15px;
+  border-radius: var(--r-md);
   display: grid;
   gap: 18px;
   margin: 0;
-  padding: 14px;
+  padding: var(--sp-3);
 }
 
 .vincular-usuario-modal__fields > .field,
@@ -275,17 +279,18 @@
 ) {
   background: var(--cv-surface-next) !important;
   border: 0 !important;
-  border-radius: 10px !important;
+  border-radius: var(--r-sm) !important;
   box-shadow: none !important;
 }
 
 .vincular-usuario-modal__fields .cv-custom-select__trigger--v2 .cv-custom-select__value {
-  padding: 0 14px;
+  padding-block: 0;
+padding-inline: var(--sp-3);
 }
 
 .vincular-usuario-modal__fields .cv-search-picker__control {
   min-height: var(--h-md);
-  padding-inline: 12px;
+  padding-inline: var(--sp-3);
 }
 
 .vincular-usuario-modal__dialog .cv-dialog__footer,
@@ -316,7 +321,8 @@
   gap: var(--sp-3);
   justify-content: space-between;
   min-height: 0;
-  padding: 12px 22px 16px;
+  padding-block: var(--sp-3) var(--sp-4);
+  padding-inline: var(--sp-5);
 }
 
 /* Evita o secondary esticar e parecer um bloco maior que o primary. */
@@ -329,7 +335,7 @@
 }
 
 .vincular-usuario-modal__footer .cv-card-footer-section__divider {
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
   display: block;
 }
 

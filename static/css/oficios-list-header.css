@@ -14,7 +14,7 @@
 .cv-record-card__inline-range .travel-period-filter__btn {
   gap: 5px;
   min-width: 0;
-  padding-inline: 10px;
+  padding-inline: var(--sp-2);
   width: 100%;
 }
 
@@ -58,21 +58,24 @@
    precisa estar na própria classe do widget. */
 .cv-action-menu {
   background: color-mix(in srgb, var(--cv-surface-card) 96%, transparent);
-  border: 1px solid color-mix(in srgb, var(--cv-border) 78%, #7c9ab8);
-  border-radius: 16px;
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-border) 78%, #7c9ab8);
+  border-radius: var(--r-md);
   box-shadow: 0 20px 48px rgba(13, 35, 58, 0.24);
   gap: 5px;
   min-width: 270px;
-  padding: 10px;
+  padding: var(--sp-2);
 }
 
 .cv-action-menu__heading {
   align-items: center;
-  border-bottom: 1px solid var(--cv-border);
+  border-bottom: var(--bd);
   display: flex;
   gap: 10px;
-  margin: 0 2px 5px;
-  padding: 4px 5px 10px;
+  margin-block: 0 var(--sp-1);
+  margin-inline: var(--sp-1);
+  padding-block: var(--sp-1) var(--sp-2);
+  padding-inline: var(--sp-1);
 }
 
 .cv-action-menu__heading > span:last-child,
@@ -95,15 +98,16 @@
   color: var(--cv-ink-muted);
   font-size: 0.68rem;
   line-height: 1.35;
-  margin-top: 2px;
+  margin-top: var(--sp-1);
 }
 
 .cv-action-menu__heading-icon,
 .cv-action-menu__item-icon {
   align-items: center;
   background: rgba(69, 105, 143, 0.1);
-  border: 1px solid rgba(69, 105, 143, 0.16);
-  border-radius: 10px;
+  border: var(--bd);
+  border-color: rgba(69, 105, 143, 0.16);
+  border-radius: var(--r-sm);
   color: #426b91;
   display: inline-flex;
   flex: 0 0 34px;
@@ -118,11 +122,12 @@
 }
 
 .cv-action-menu__item {
-  border: 1px solid transparent;
-  border-radius: 11px;
+  border: var(--bd);
+border-color: transparent;
+  border-radius: var(--r-sm);
   gap: 10px;
   min-height: 52px;
-  padding: 7px;
+  padding: var(--sp-2);
   text-decoration: none;
 }
 

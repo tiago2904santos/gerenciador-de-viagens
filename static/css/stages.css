@@ -7,7 +7,7 @@
    -------------------------------------------------------------------------- */
 .stage-track {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   display: grid;
   gap: var(--sp-3);

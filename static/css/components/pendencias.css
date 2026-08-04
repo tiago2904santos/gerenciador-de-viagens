@@ -13,13 +13,15 @@
 
 .cv-pendencias--danger {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
-  border: 1px solid var(--cv-state-danger);
+  border: var(--bd);
+  border-color: var(--cv-state-danger);
   box-shadow: var(--sh-md);
 }
 
 .cv-pendencias--warning {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
-  border: 1px solid var(--cv-state-warning);
+  border: var(--bd);
+  border-color: var(--cv-state-warning);
   box-shadow: var(--sh-md);
 }
 
@@ -60,13 +62,15 @@
   font-size: var(--fs-md);
   font-weight: 800;
   letter-spacing: 0.02em;
-  margin: 0 0 var(--sp-2);
+  margin-block: 0 var(--sp-2);
+  margin-inline: 0;
 }
 
 .cv-pendencias__lead {
   color: var(--cv-ink-muted);
   font-size: var(--fs-sm);
-  margin: 0 0 var(--sp-3);
+  margin-block: 0 var(--sp-3);
+  margin-inline: 0;
   max-width: 42rem;
 }
 
