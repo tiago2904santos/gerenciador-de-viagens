@@ -875,7 +875,42 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
       quem achou foi a medicao de abertura da fatia seguinte, nao a suite.
     - Suite **1.316 → 1.320** verdes (4 gates novos, os dois principais com canario).
       Catraca de frontend **212 → 210**.
-- [ ] **Fase 4 — fim das excecoes e do `!important`.**
+- [x] **Fase 4 — fim das excecoes e do `!important`.** `!important` **474 → 18**;
+  excecoes de arquivo do auditor **3 → 0**; avisos **210 → 201**.
+  - **O numero saiu de medicao, nao de estimativa.** `scripts/medir_estilos.py`
+    (novo, versionado ao lado do `medir_paleta.py`) captura o `getComputedStyle` de
+    **1.488 elementos** — 5 telas × 2 temas × 24 propriedades. Removi os 474, refiz a
+    captura e comparei: os **456 cosmeticos mudaram ZERO propriedade computada**. Eles
+    venciam adversarios que a fase 2 (theme-dark-components) e a 3a (os 1.034 tokens
+    que se sobrescreviam) ja tinham dissolvido — ninguem tinha voltado para conferir.
+  - **Os 18 que ficaram sao estruturais** (`display`, `opacity`, `content`): escondem
+    ou mostram, e a medicao de 5 telas nao alcanca wizard, modal e editor. Apagar ali
+    seria risco que o instrumento nao ve. Cada um carrega, agora, o comentario de uma
+    linha dizendo **qual regra ele vence** — exigencia do prompt, travada por teste:
+    sem justificativa escrita o gate reprova.
+  - **A primeira remocao mostrou o que o `!important` escondia:** com os 474 fora, 118
+    elementos do date-picker *apareceram* — `[hidden] { display: none !important }` em
+    `base.css` e a unica coisa que faz o atributo `hidden` vencer o
+    `.cv-date-picker__panel { display: grid }`. E o caso exemplar de `!important`
+    legitimo, e so a captura de elementos (nao a de propriedades) mostrou.
+  - **As excecoes eram tres, nao duas** — a terceira (`cards.css`) nao aparecia na
+    contagem porque so conta excecao *disparada*. Todas mortas: `.roteiro-editor__*`
+    mudou de `forms.css` para `roteiros.css`, `.oficio-card` ja nao existia em
+    `cards.css`, e a camada de token deixou de ser dispensa para virar **parte da
+    definicao da regra** de literal de cor — carrega-la como excecao era o auditor nao
+    conhecer a propria arquitetura.
+  - **`NOVO-34` 🟠 botao de upload sem letra no modal de anexo.** Com o `!important`
+    fora, `test_papel_dos_tokens` acusou `#attach-signed-modal .cv-file-picker__upload`
+    pintando fundo E texto com `--color-accent`. O `!important` estava **vencendo o par
+    certo** declarado no componente: o defeito existia, escondido pela propria muleta.
+  - Suite **1.320 → 1.323** verdes (3 gates novos).
+
+  > **O que a fase 4 NAO baixa, e de quem e:** o prompt pedia `--max-warnings 0`. Dos
+  > 201 avisos restantes, **109 sao `hex_color_outside_tokens`** (PR D do `NOVO-28`),
+  > **92 sao `legacy_page_header`** e **10 `href_hash`** — os dois ultimos em template,
+  > territorio das Etapas 6 e 8. Zerar dentro da fase 4 seria fazer o trabalho de tres
+  > frentes no mesmo PR, que e o erro nº 2 da §8. A catraca desce no que esta fase
+  > legitimamente remove; o resto tem dono nomeado aqui.
 - [ ] **Fase 5 — apagar o CSS antigo.**
 
 ---

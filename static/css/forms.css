@@ -88,20 +88,6 @@
   grid-column: span 2;
 }
 
-/* ============================================================
-   Painel grid (design system) — base visual de .roteiro-editor__grid
-   Tokens de rota; caixa extra só em .app-form-grid-panel.
-   ============================================================ */
-
-.app-form-grid-panel,
-.roteiro-editor__grid {
-  background: var(--cv-surface-block);
-  box-sizing: border-box;
-  display: grid;
-  gap: var(--sp-4);
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  min-width: 0;
-}
 
 .app-form-grid-panel {
   border: var(--bd);
@@ -109,33 +95,11 @@
   padding: var(--sp-4);
 }
 
-.app-form-grid-panel.align-items-end,
-.roteiro-editor__grid.align-items-end {
-  align-items: end;
-}
 
-.app-form-grid-panel > .field-span-6,
-.roteiro-editor__grid > .field-span-6 {
-  grid-column: span 6;
-}
 
-.app-form-grid-panel > .field-span-4,
-.roteiro-editor__grid > .field-span-4 {
-  grid-column: span 4;
-}
 
-.app-form-grid-panel > .field-span-12,
-.roteiro-editor__grid > .field-span-12 {
-  grid-column: span 12;
-}
 
 @media (max-width: 720px) {
-  .app-form-grid-panel > .field-span-6,
-  .app-form-grid-panel > .field-span-4,
-  .roteiro-editor__grid > .field-span-6,
-  .roteiro-editor__grid > .field-span-4 {
-    grid-column: span 12;
-  }
 }
 /* --------------------------------------------------------------------------
    2. Campos e controles
@@ -248,64 +212,12 @@
   padding-inline: 0 var(--sp-5);
 }
 
-.roteiro-editor__actions {
-  align-items: center;
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-start-start-radius: 0;
-  border-start-end-radius: 0;
-  border-end-end-radius: var(--r-md);
-  border-end-start-radius: var(--r-md);
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-3);
-  justify-content: flex-end;
-  margin-top: var(--sp-1);
-  padding-block: var(--sp-3);
-  padding-inline: var(--sp-4);
-}
 
-.roteiro-editor__actions--avulso {
-  justify-content: space-between;
-}
 
-.roteiro-form--legacy-roteiro .travel-document-wizard-footer-actions .btn,
-.roteiro-editor__actions .btn {
-  border-radius: var(--r-pill);
-  min-height: var(--h-md);
-  padding-left: var(--sp-5);
-  padding-right: var(--sp-5);
-}
 
-.roteiro-editor__actions .btn-primary {
-  background: var(--color-accent);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: var(--sh-sm);
-  color: var(--on-accent);
-}
 
-.roteiro-editor__actions .btn-primary:hover,
-.roteiro-editor__actions .btn-primary:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
-}
 
-.roteiro-editor__actions .btn-outline-secondary,
-.roteiro-editor__actions .btn-secondary {
-  background: var(--cv-surface-card);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
-}
 
-.roteiro-editor__actions .btn-outline-secondary:hover,
-.roteiro-editor__actions .btn-outline-secondary:focus-visible,
-.roteiro-editor__actions .btn-secondary:hover,
-.roteiro-editor__actions .btn-secondary:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
-}
 
 /* --------------------------------------------------------------------------
    3. Responsividade da grade
@@ -660,9 +572,9 @@ textarea[readonly] {
 
 .app-input-addon__control {
   background: transparent;
-  border: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   flex: 1;
   min-width: 0;
 }

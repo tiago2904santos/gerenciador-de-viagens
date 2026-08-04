@@ -208,8 +208,8 @@ margin-inline: 0;
 }
 
 #id_roteiro_seed_source_label:empty {
-  margin: 0 !important;
-  padding: 0 !important;
+  margin: 0;
+  padding: 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -547,7 +547,7 @@ margin-inline: 0;
 }
 
 .cv-data-table__actions {
-  text-align: right !important;
+  text-align: right;
   width: 1%;
 }
 
@@ -4214,7 +4214,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   opacity: 0.45;
   cursor: not-allowed;
   pointer-events: none;
-  transform: none !important;
+  transform: none;
 }
 
 .cv-btn.is-loading {
@@ -5762,18 +5762,18 @@ html {
  .cv-date-picker .cv-date-picker__day--multi-middle,
  .cv-date-picker .cv-date-picker__day--multi-end,
  .cv-date-picker .cv-date-picker__day--multi-single {
-  background-color: transparent !important;
-  background-image: none !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  color: var(--on-accent) !important;
+  background-color: transparent;
+  background-image: none;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--on-accent);
 }
 
  .cv-date-picker .cv-date-picker__day--multi-single::before,
  .cv-date-picker .cv-date-picker__day--multi-single::before {
-  background: var(--color-accent) !important;
-  border-color: transparent !important;
-  box-shadow: var(--sh-sm) !important;
+  background: var(--color-accent);
+  border-color: transparent;
+  box-shadow: var(--sh-sm);
 }
 
  .cv-date-picker .cv-date-picker__day--multi-selected:hover,
@@ -6825,7 +6825,7 @@ border-color: transparent;
 }
 
  #attach-signed-modal .attach-signed-modal__dialog {
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
 }
 
 .attach-signed-modal__dialog > .cv-dialog__header {
@@ -7082,14 +7082,14 @@ margin-inline: calc(var(--sp-1) * -1);
 .attach-signed-modal__form .cv-file-selection__menu,
 .attach-signed-modal [data-attach-signed-current] {
   background: transparent;
-  border: 0 !important;
+  border: 0;
   border-radius: 0;
   box-shadow: none;
 }
 
 .attach-signed-modal__form .prestacao-file-selection__toggle[hidden] + .prestacao-file-selection__menu,
 .attach-signed-modal__form .cv-file-selection__toggle[hidden] + .cv-file-selection__menu {
-  border: 0 !important;
+  border: 0;
   border-radius: 0;
 }
 
@@ -7175,11 +7175,11 @@ margin-inline: calc(var(--sp-1) * -1);
   .prestacao-file-widget:focus-within,
   .cv-file-widget:focus-within
 ) {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
-  border: 0 !important;
-  outline: none !important;
-  transition: none !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
+  border: 0;
+  outline: none;
+  transition: none;
 }
 
 #attach-signed-modal :is(
@@ -7196,11 +7196,11 @@ margin-inline: calc(var(--sp-1) * -1);
   .prestacao-file-widget.is-dragover .prestacao-file-picker,
   .cv-file-widget.is-dragover .cv-file-picker
 ) {
-  background: transparent !important;
-  background-color: transparent !important;
-  border: 0 !important;
-  outline: none !important;
-  transition: none !important;
+  background: transparent;
+  background-color: transparent;
+  border: 0;
+  outline: none;
+  transition: none;
 }
 
 #attach-signed-modal :is(
@@ -7209,12 +7209,12 @@ margin-inline: calc(var(--sp-1) * -1);
   .prestacao-file-selection__menu:hover,
   .cv-file-selection__menu:hover
 ) {
-  background: transparent !important;
-  background-color: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  outline: none !important;
-  transition: none !important;
+  background: transparent;
+  background-color: transparent;
+  border: 0;
+  box-shadow: none;
+  outline: none;
+  transition: none;
 }
 
 #attach-signed-modal :is(
@@ -7229,70 +7229,73 @@ margin-inline: calc(var(--sp-1) * -1);
   .prestacao-file-selection__item:focus-within,
   .cv-file-selection__item:focus-within
 ) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
-  border: 0 !important;
-  outline: none !important;
-  transition: none !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
+  border: 0;
+  outline: none;
+  transition: none;
 }
 
 #attach-signed-modal :is(
   .prestacao-file-picker__action,
   .cv-file-picker__action
 ) {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
-  border: 0 !important;
-  border-radius: var(--r-md) !important;
-  color: var(--cv-ink) !important;
-  font-size: var(--fs-sm) !important;
-  font-weight: var(--fw-bold) !important;
-  min-height: var(--h-md) !important;
-  padding-block: 0 !important;
-  padding-inline: var(--sp-4) !important;
-  box-shadow: none !important;
-  outline: none !important;
-  transform: none !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
+  border: 0;
+  border-radius: var(--r-md);
+  color: var(--cv-ink);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  min-height: var(--h-md);
+  padding-block: 0;
+  padding-inline: var(--sp-4);
+  box-shadow: none;
+  outline: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
   .prestacao-file-picker__action,
   .cv-file-picker__action
 ):is(:hover, :focus-visible) {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
-  border: 0 !important;
-  color: var(--cv-ink) !important;
-  outline: none !important;
-  transform: none !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
+  border: 0;
+  color: var(--cv-ink);
+  outline: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
   .prestacao-file-picker__upload,
   .cv-file-picker__upload
 ):not(:disabled) {
-  background: var(--color-accent) !important;
-  background-color: var(--color-accent) !important;
-  background-image: none !important;
-  border: 0 !important;
-  box-shadow: var(--sh-sm) !important;
-  color: var(--color-accent) !important;
-  outline: none !important;
-  transition: background var(--tr-fast), box-shadow var(--tr-fast) !important;
-  transform: none !important;
+  background: var(--color-accent);
+  background-color: var(--color-accent);
+  background-image: none;
+  border: 0;
+  box-shadow: var(--sh-sm);
+  /* Botao cheio de acento: a tinta e o par do acento. Enquanto o `color` daqui
+     carregava `!important`, ele vencia o par certo declarado no componente e a
+     letra sumia — so apareceu quando o `!important` saiu (NOVO-30 fase 4). */
+  color: var(--on-accent);
+  outline: none;
+  transition: background var(--tr-fast), box-shadow var(--tr-fast);
+  transform: none;
 }
 
 #attach-signed-modal :is(
   .prestacao-file-picker__upload,
   .cv-file-picker__upload
 ):is(:hover, :focus-visible):not(:disabled) {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink)) !important;
-  background-color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink)) !important;
-  background-image: none !important;
-  border: 0 !important;
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background-color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background-image: none;
+  border: 0;
   color: var(--on-accent);
-  outline: none !important;
-  transform: none !important;
+  outline: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
@@ -7301,14 +7304,14 @@ margin-inline: calc(var(--sp-1) * -1);
   .cv-icon-btn--preview:focus,
   .cv-icon-btn--preview:focus-visible
 ) {
-  background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface)) !important;
-  background-color: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface)) !important;
-  border: var(--bd) !important;
-  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent) !important;
-  color: var(--cv-state-success) !important;
-  outline: none !important;
-  transition: none !important;
-  transform: none !important;
+  background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
+  background-color: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  color: var(--cv-state-success);
+  outline: none;
+  transition: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
@@ -7317,14 +7320,14 @@ margin-inline: calc(var(--sp-1) * -1);
   .cv-icon-btn--delete:focus,
   .cv-icon-btn--delete:focus-visible
 ) {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
-  border: var(--bd) !important;
-  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent) !important;
-  color: var(--cv-state-danger) !important;
-  outline: none !important;
-  transition: none !important;
-  transform: none !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  color: var(--cv-state-danger);
+  outline: none;
+  transition: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
@@ -7333,14 +7336,14 @@ margin-inline: calc(var(--sp-1) * -1);
   .attach-signed-modal__cancel:focus,
   .attach-signed-modal__cancel:focus-visible
 ) {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
-  background-image: none !important;
-  border: 0 !important;
-  color: var(--cv-ink) !important;
-  outline: none !important;
-  transition: none !important;
-  transform: none !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
+  background-image: none;
+  border: 0;
+  color: var(--cv-ink);
+  outline: none;
+  transition: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
@@ -7348,10 +7351,10 @@ margin-inline: calc(var(--sp-1) * -1);
   .attach-signed-modal__kind-option:hover,
   .attach-signed-modal__kind-option:focus-visible
 ) {
-  background: transparent !important;
-  color: var(--cv-ink-muted) !important;
-  outline: none !important;
-  transition: none !important;
+  background: transparent;
+  color: var(--cv-ink-muted);
+  outline: none;
+  transition: none;
 }
 
 #attach-signed-modal :is(
@@ -7359,8 +7362,8 @@ margin-inline: calc(var(--sp-1) * -1);
   .attach-signed-modal__kind-option.is-active:hover,
   .attach-signed-modal__kind-option.is-active:focus-visible
 ) {
-  background: var(--cv-surface-block) !important;
-  color: var(--color-accent) !important;
+  background: var(--cv-surface-block);
+  color: var(--color-accent);
 }
 
 @media (min-width: 841px) {
@@ -10442,19 +10445,19 @@ margin-inline: 0;
     .cv-search-picker__input,
     .cv-search-picker__control
   ) {
-  background: var(--cv-surface-next) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-next);
+  border-color: transparent;
   border-radius: var(--r-sm);
-  box-shadow: none !important;
+  box-shadow: none;
 }
 
 /* Open state do select: mesmo poço; sem chrome extra de hover/focus nos campos. */
 
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .cv-custom-select--open .cv-custom-select__trigger {
-  background: var(--cv-surface-next) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-next);
+  border-color: transparent;
   border-radius: var(--r-sm);
-  box-shadow: none !important;
+  box-shadow: none;
 }
 
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .cv-composite-field__suffix {
@@ -10471,28 +10474,28 @@ margin-inline: 0;
     .cv-search-picker--people.cv-search-picker--roster,
     .cv-search-picker--vehicle
   ) {
-  background: transparent !important;
-  border: 0 !important;
+  background: transparent;
+  border: 0;
   border-radius: 0;
-  box-shadow: none !important;
+  box-shadow: none;
   gap: 10px;
-  padding: 0 !important;
+  padding: 0;
 }
 
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .cv-search-picker__selected-panel {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
   gap: 8px;
-  padding: 0 !important;
+  padding: 0;
 }
 
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .cv-search-picker__selected-empty {
-  background: var(--cv-surface-card) !important;
-  border: 0 !important;
+  background: var(--cv-surface-card);
+  border: 0;
   border-radius: var(--r-sm);
   color: var(--cv-ink-muted);
-  padding: var(--sp-3) !important;
+  padding: var(--sp-3);
   text-align: left;
 }
 
@@ -10622,17 +10625,17 @@ margin-inline: 0;
 
   [data-travel-document-wizard-roteiro] .route-sede-block.cv-form-block--split:hover {
   align-items: center;
-  background: var(--cv-surface-card) !important;
-  border: 0 !important;
+  background: var(--cv-surface-card);
+  border: 0;
   border-radius: var(--r-md);
-  box-shadow: none !important;
+  box-shadow: none;
   column-gap: 16px;
-  filter: none !important;
+  filter: none;
   grid-template-columns: 14rem minmax(0, 1fr);
   margin: 0;
   padding: var(--sp-3);
-  transform: none !important;
-  transition: none !important;
+  transform: none;
+  transition: none;
 }
 
   [data-travel-document-wizard-roteiro] .route-sede-block.cv-form-block--split > .cv-form-block__header {
@@ -10649,7 +10652,7 @@ margin-inline: 0;
 
   [data-travel-document-wizard-roteiro] .route-sede-block .field-grid.roteiro-sede-grid {
   gap: 10px 12px;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   width: 100%;
 }
 
@@ -10662,10 +10665,10 @@ margin-inline: 0;
     .cv-search-picker__input:hover,
     .cv-search-picker__input:focus
   ) {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
-  border-color: transparent !important;
-  transition: none !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
+  border-color: transparent;
+  transition: none;
 }
 
 /* Período: mesmo card/split dos Destinos; rail 14rem | datas. */
@@ -10674,19 +10677,19 @@ margin-inline: 0;
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block.travel-period-block--split:hover {
   align-items: center;
-  background: var(--cv-surface-card) !important;
-  border: 0 !important;
+  background: var(--cv-surface-card);
+  border: 0;
   border-radius: var(--r-md);
-  box-shadow: none !important;
+  box-shadow: none;
   column-gap: 16px;
   display: grid;
-  filter: none !important;
+  filter: none;
   grid-template-columns: 14rem minmax(0, 1fr);
   margin: 0;
   padding: var(--sp-3);
   row-gap: 0;
-  transform: none !important;
-  transition: none !important;
+  transform: none;
+  transition: none;
 }
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block--split > .travel-period-block__rail {
@@ -10745,7 +10748,7 @@ margin-inline: 0;
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block--split .field-grid.field-grid--cols-2 {
   gap: 12px 16px;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   width: 100%;
 }
 
@@ -10768,11 +10771,11 @@ margin-inline: 0;
     .cv-date-picker__control .cv-field__control:hover,
     .cv-date-picker__control .cv-field__control:focus
   ) {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
-  border-color: transparent !important;
-  border-radius: var(--r-sm) !important;
-  transition: none !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
+  border-color: transparent;
+  border-radius: var(--r-sm);
+  transition: none;
 }
 
 /* Calendário do período: mesmo filled soft de "Novo viajante". */
@@ -10784,17 +10787,17 @@ margin-inline: 0;
     .cv-date-picker__control:focus-within .cv-date-picker__trigger--icon,
     .cv-date-picker--open .cv-date-picker__trigger--icon
   ) {
-  background: var(--cv-surface-card) !important;
-  border: 0 !important;
-  color: var(--cv-ink) !important;
+  background: var(--cv-surface-card);
+  border: 0;
+  color: var(--cv-ink);
 }
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1])
   .travel-period-block--split
   .cv-date-picker__trigger--icon:is(:hover, :focus-visible) {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-block)) !important;
-  border: 0 !important;
-  color: var(--color-accent) !important;
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-block));
+  border: 0;
+  color: var(--color-accent);
   outline: none;
 }
 
@@ -10811,20 +10814,20 @@ margin-inline: 0;
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block.route-destinos-block--split:hover {
   align-items: start;
-  background: var(--cv-surface-card) !important;
-  border: 0 !important;
+  background: var(--cv-surface-card);
+  border: 0;
   border-radius: var(--r-md);
-  box-shadow: none !important;
+  box-shadow: none;
   column-gap: 16px;
   display: grid;
-  filter: none !important;
+  filter: none;
   grid-template-columns: 14rem minmax(0, 1fr);
   margin-block: var(--sp-3) 0;
   margin-inline: 0;
   padding: var(--sp-3);
   row-gap: 0;
-  transform: none !important;
-  transition: none !important;
+  transform: none;
+  transition: none;
 }
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1])
@@ -10876,6 +10879,7 @@ margin-inline: 0;
 }
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split .route-destinos-trechos[hidden] {
+  /* !important: vence o `display: grid/flex` do proprio componente, que tem a mesma especificidade e vem depois na cascata. */
   display: none !important;
 }
 
@@ -10922,16 +10926,16 @@ margin-inline: 0;
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row:hover {
   align-items: center;
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
   /* Duas metades iguais à sede: [drag + add + UF] | [Cidade + ×] */
   column-gap: 12px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   min-height: 0;
-  padding: 0 !important;
-  transition: none !important;
+  padding: 0;
+  transition: none;
 }
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single,
@@ -10956,6 +10960,7 @@ margin-inline: 0;
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .cv-ordered-field-row__badge.sr-only {
   clip: rect(0, 0, 0, 0);
+  /* !important: vence o `display: grid/flex` do proprio componente, que tem a mesma especificidade e vem depois na cascata. */
   display: none !important;
   height: 1px;
   overflow: hidden;
@@ -11004,39 +11009,42 @@ margin-inline: 0;
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-remove-button {
   align-items: center;
-  border: 0 !important;
-  border-radius: var(--r-sm) !important;
-  box-shadow: none !important;
+  border: 0;
+  border-radius: var(--r-sm);
+  box-shadow: none;
   cursor: pointer;
   display: inline-flex;
   flex: 0 0 auto;
   height: 44px;
   justify-content: center;
   line-height: 1;
-  margin: 0 !important;
+  margin: 0;
+  /* !important: vence a animacao de entrada do componente, que anima opacity de 0 a 1. */
   opacity: 1 !important;
-  padding: 0 !important;
-  transform: none !important;
+  padding: 0;
+  transform: none;
   transition: none;
   width: 44px;
 }
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .route-destinos-add {
-  background: color-mix(in srgb, var(--cv-state-success) 14%, var(--cv-surface-block)) !important;
-  color: var(--cv-ink) !important;
+  background: color-mix(in srgb, var(--cv-state-success) 14%, var(--cv-surface-block));
+  color: var(--cv-ink);
 }
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .cv-ordered-field-row__remove,
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-remove-button {
-  background: color-mix(in srgb, var(--cv-state-danger) 12%, var(--cv-surface-block)) !important;
-  color: var(--cv-ink) !important;
+  background: color-mix(in srgb, var(--cv-state-danger) 12%, var(--cv-surface-block));
+  color: var(--cv-ink);
   font-size: 1.25rem;
   justify-self: auto;
 }
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .cv-ordered-field-row__remove::before {
+  /* !important: vence o `content: ""` do pseudo-elemento decorativo declarado no componente. */
   content: none !important;
+  /* !important: vence o `display: grid/flex` do proprio componente, que tem a mesma especificidade e vem depois na cascata. */
   display: none !important;
 }
 
@@ -11049,10 +11057,10 @@ margin-inline: 0;
     .cv-search-picker__input:hover,
     .cv-search-picker__input:focus
   ) {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
-  border-color: transparent !important;
-  transition: none !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
+  border-color: transparent;
+  transition: none;
 }
 
 @media (max-width: 720px) {
@@ -11079,14 +11087,14 @@ margin-inline: 0;
     [data-travel-document-wizard-roteiro] .route-sede-block .field-grid.roteiro-sede-grid,
 
     :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block--split .field-grid.field-grid--cols-2 {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 600px) {
 
     [data-travel-document-wizard-roteiro] .route-sede-block .field-grid.roteiro-sede-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr;
   }
 }
 
@@ -11114,18 +11122,18 @@ margin-inline: 0;
     .oficio-documentos-vehicle-lines,
     .oficio-documentos-facts
   ) {
-  background: transparent !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
 }
 
 /* trechos-many: scroll-card = poço (--step1-field); itens = painel da seção (--step1-panel) */
 
   [data-travel-document-wizard-documentos]
   .oficio-documentos-route-trechos-scroll-card {
-  background: var(--cv-surface-next) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
+  background: var(--cv-surface-next);
+  border-color: transparent;
+  box-shadow: none;
 }
 
   [data-travel-document-wizard-documentos]
@@ -11140,8 +11148,8 @@ margin-inline: 0;
     .oficio-documentos-route-card__fallback-fact,
     .oficio-documentos-route-card__trecho
   ) {
-  background: var(--cv-surface-next) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-next);
+  border-color: transparent;
   border-radius: var(--r-sm);
 }
 
@@ -11150,9 +11158,9 @@ margin-inline: 0;
   [data-travel-document-wizard-documentos]
   .oficio-documentos-route-section
   .oficio-documentos-route-trecho-scroll-item {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
+  box-shadow: none;
 }
 
 /* Termos aninhados: mesmo fundo da seção de preview (--step1-panel), não o poço */
@@ -11167,7 +11175,7 @@ margin-inline: 0;
   .document-inline-card--termos
   .document-inline-card--nested
   > .document-inline-card__header {
-  background: var(--cv-surface-block) !important;
+  background: var(--cv-surface-block);
 }
 
   [data-travel-document-wizard-documentos]
@@ -11182,7 +11190,7 @@ margin-inline: 0;
     .oficio-documentos-route-card__fallback-fact,
     .oficio-documentos-route-card__trecho
   ) {
-  box-shadow: none !important;
+  box-shadow: none;
 }
 
 /* Termos: preview dentro de Dados do termo — poços iguais à etapa 4 do ofício (só dark). */
@@ -11197,10 +11205,10 @@ margin-inline: 0;
   .document-form-page
   .termo-documentos-preview
   .document-inline-card {
-  background: var(--cv-surface-next) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-next);
+  border-color: transparent;
   border-radius: var(--r-sm);
-  box-shadow: none !important;
+  box-shadow: none;
 }
 
 /* Os termos internos usam uma única superfície no cabeçalho e no corpo,
@@ -11216,8 +11224,8 @@ margin-inline: 0;
   .document-inline-card--termos
   .document-inline-card--nested
   > :is(.document-inline-card__header, .document-inline-card__body) {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
 }
 
   .document-form-page
@@ -11252,14 +11260,10 @@ margin-inline: 0;
     .oficio-documentos-traveller-tile--motorista,
     .oficio-documentos-traveller-line--motorista
   ) {
-  background: color-mix(
-    in srgb,
-    var(--color-accent) 12%,
-    var(--cv-surface-block)
-  ) !important;
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent) !important;
-  border-inline-start: var(--bd-strong) !important;
-  border-inline-start-color: var(--color-accent) !important;
+  background: color-mix( in srgb, var(--color-accent) 12%, var(--cv-surface-block) );
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-inline-start: var(--bd-strong);
+  border-inline-start-color: var(--color-accent);
 }
 
   [data-travel-document-wizard-documentos] .oficio-documentos-traveller-tile__avatar {
@@ -11307,10 +11311,10 @@ margin-inline: 0;
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .cv-search-picker__control {
   align-items: center;
-  background: var(--cv-surface-next) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-next);
+  border-color: transparent;
   border-radius: var(--r-sm);
-  box-shadow: none !important;
+  box-shadow: none;
   box-sizing: border-box;
   display: flex;
   gap: 8px;
@@ -11322,9 +11326,9 @@ margin-inline: 0;
 }
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .cv-search-picker__input {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
   flex: 1 1 auto;
   line-height: 1.25;
   min-height: 0;
@@ -11567,17 +11571,17 @@ margin-inline: 0;
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row:hover {
   align-items: center;
-  background: transparent !important;
-  border: 0 !important;
+  background: transparent;
+  border: 0;
   border-radius: 0;
-  box-shadow: none !important;
+  box-shadow: none;
   column-gap: 12px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   min-height: 0;
-  padding: 0 !important;
+  padding: 0;
   row-gap: 0;
-  transition: none !important;
+  transition: none;
 }
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single,
@@ -11606,15 +11610,16 @@ margin-inline: 0;
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-remove-button {
   align-self: center;
-  border: 0 !important;
-  border-radius: var(--r-sm) !important;
+  border: 0;
+  border-radius: var(--r-sm);
   cursor: pointer;
   flex: 0 0 auto;
   height: 44px;
-  margin: 0 !important;
+  margin: 0;
   min-width: 44px;
+  /* !important: vence a animacao de entrada do componente, que anima opacity de 0 a 1. */
   opacity: 1 !important;
-  transform: none !important;
+  transform: none;
   width: 44px;
 }
 
@@ -11640,6 +11645,8 @@ margin-inline: 0;
 
   [data-travel-document-wizard-roteiro]
   #sec-mapa-rota > .cv-form-block__header {
+  /* !important: vence o `display: flex` do proprio `.cv-form-block__header`,
+     que tem especificidade maior por vir de um seletor de componente. */
   display: none !important;
 }
 
@@ -11802,11 +11809,11 @@ margin-inline: 0;
     .cv-date-picker__control .cv-field__control:hover,
     .cv-date-picker__control .cv-field__control:focus
   ) {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
+  border-color: transparent;
   border-radius: var(--r-sm);
-  transition: none !important;
+  transition: none;
 }
 
 @media (max-width: 720px) {
@@ -11916,9 +11923,9 @@ margin-inline: 0;
     .cv-date-picker__input,
     input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"])
   ) {
-  background: var(--cv-surface-next) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
+  background: var(--cv-surface-next);
+  border-color: transparent;
+  box-shadow: none;
   color: var(--cv-ink);
 }
 
@@ -11929,9 +11936,9 @@ margin-inline: 0;
   [data-travel-document-wizard-roteiro]
   #retorno-card
   :is(.cv-field--readonly .cv-field__control, .cv-field__control[readonly], input[readonly]) {
-  background: var(--cv-surface-next) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
+  background: var(--cv-surface-next);
+  border-color: transparent;
+  box-shadow: none;
   color: var(--cv-ink);
   opacity: 1;
 }
@@ -11971,9 +11978,9 @@ margin-inline: 0;
     select,
     textarea
   ) {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
+  box-shadow: none;
   color: var(--cv-ink);
 }
 
@@ -11986,9 +11993,9 @@ margin-inline: 0;
   #retorno-card
   .roteiro-trecho-card__leg
   :is(.cv-field--readonly .cv-field__control, .cv-field__control[readonly], input[readonly]) {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
+  box-shadow: none;
   color: var(--cv-ink);
   opacity: 1;
 }
@@ -12029,7 +12036,7 @@ margin-inline: 0;
   border: var(--bd);
   border-color: transparent;
   border-radius: var(--r-md);
-  box-shadow: none !important;
+  box-shadow: none;
   cursor: pointer;
   display: inline-flex;
   font-size: 0.8125rem;
@@ -12044,7 +12051,7 @@ margin-inline: 0;
   padding-block: 0;
   padding-inline: var(--sp-3);
   text-transform: none;
-  transform: none !important;
+  transform: none;
   transition:
     background-color 140ms ease,
     border-color 140ms ease,
@@ -12056,7 +12063,7 @@ margin-inline: 0;
   .oficio-roteiro-bate-volta-toggle
   .cv-field-side-action--toggle:is(:hover, :focus, :focus-visible, :active) {
   filter: none;
-  transform: none !important;
+  transform: none;
 }
 
   [data-travel-document-wizard-roteiro]
@@ -12074,9 +12081,9 @@ margin-inline: 0;
   [data-travel-document-wizard-roteiro]
   .oficio-roteiro-bate-volta-toggle
   .cv-field-side-action--toggle:is(.cv-field-side-action--danger, .is-inactive):is(:hover, :focus, :focus-visible) {
-  background: var(--cv-surface-block) !important;
-  border-color: color-mix(in srgb, var(--cv-border) 55%, transparent) !important;
-  color: var(--cv-ink-muted) !important;
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--cv-border) 55%, transparent);
+  color: var(--cv-ink-muted);
 }
 
 /* ON — success soft filled (evita texto/fill dourado do accent) */
@@ -12088,23 +12095,23 @@ margin-inline: 0;
   [data-travel-document-wizard-roteiro]
   .oficio-roteiro-bate-volta-toggle
   .cv-field-side-action--toggle:is(.cv-field-side-action--success, .is-active, [aria-pressed="true"]):is(:hover, :focus, :focus-visible) {
-  background: color-mix(in srgb, var(--cv-state-success) 22%, var(--cv-surface-block)) !important;
-  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent) !important;
-  color: var(--cv-ink) !important;
+  background: color-mix(in srgb, var(--cv-state-success) 22%, var(--cv-surface-block));
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  color: var(--cv-ink);
 }
 
   [data-travel-document-wizard-roteiro]
   .oficio-roteiro-bate-volta-toggle
   .cv-field-side-action--toggle:is(.cv-field-side-action--danger, .is-inactive):is(:hover, :focus-visible) {
-  background: color-mix(in srgb, var(--cv-surface-card) 4%, var(--cv-surface-block)) !important;
-  border-color: color-mix(in srgb, var(--cv-border) 70%, transparent) !important;
+  background: color-mix(in srgb, var(--cv-surface-card) 4%, var(--cv-surface-block));
+  border-color: color-mix(in srgb, var(--cv-border) 70%, transparent);
 }
 
   [data-travel-document-wizard-roteiro]
   .oficio-roteiro-bate-volta-toggle
   .cv-field-side-action--state::before {
   border-radius: var(--r-pill);
-  box-shadow: none !important;
+  box-shadow: none;
   flex: 0 0 auto;
   height: 7px;
   width: 7px;
@@ -12113,13 +12120,13 @@ margin-inline: 0;
   [data-travel-document-wizard-roteiro]
   .oficio-roteiro-bate-volta-toggle
   .cv-field-side-action--state:is(.cv-field-side-action--success, .is-active)::before {
-  background: var(--cv-state-success) !important;
+  background: var(--cv-state-success);
 }
 
   [data-travel-document-wizard-roteiro]
   .oficio-roteiro-bate-volta-toggle
   .cv-field-side-action--state:is(.cv-field-side-action--danger, .is-inactive)::before {
-  background: var(--cv-ink-muted) !important;
+  background: var(--cv-ink-muted);
 }
 
 /* Bate-volta fechado: uma coluna, header em flex (título + toggle).
@@ -12379,8 +12386,8 @@ margin-inline: 0;
  .cv-composite-field__control .form-control:hover,
  .cv-composite-field__control .form-control:focus,
  .cv-composite-field__control .form-control:focus-visible {
-  background: transparent !important;
-  border: 0 !important;
+  background: transparent;
+  border: 0;
   outline: none;
 }
 
@@ -12557,8 +12564,8 @@ margin-inline: 0;
   .cv-search-picker--vehicle .cv-search-picker__selected-card:hover {
   align-items: center;
   background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-block));
-  border: 0 !important;
-  border-color: transparent !important;
+  border: 0;
+  border-color: transparent;
   border-radius: var(--r-md);
   border-inline-start: var(--bd-strong);
   border-inline-start-color: var(--color-accent);
@@ -12998,13 +13005,13 @@ margin-inline: 0;
   color: inherit;
   display: block;
   flex: 0 0 20px;
-  height: 20px !important;
+  height: 20px;
   max-height: 20px;
   max-width: 20px;
   min-height: 20px;
   min-width: 20px;
   overflow: visible;
-  width: 20px !important;
+  width: 20px;
 }
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .cv-search-picker__selected-avatar .related-route-icon circle {
@@ -13810,9 +13817,9 @@ margin-inline: 0;
     .cv-file-selection__item:focus-within,
     .prestacao-file-selection__item:focus-within
   ) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
-  transition: none !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
+  transition: none;
 }
 
   :is(.cv-file-picker__action, .prestacao-file-picker__action) {
@@ -14179,19 +14186,19 @@ margin-inline: 0;
 }
 
   .oficio-external-driver .cv-search-picker__control {
-  background: var(--cv-surface-next) !important;
-  border: var(--bd) !important;
+  background: var(--cv-surface-next);
+  border: var(--bd);
   border-radius: var(--r-sm);
-  box-shadow: none !important;
+  box-shadow: none;
   min-height: var(--h-md);
   padding-block: 0;
   padding-inline: var(--sp-3);
 }
 
   .oficio-external-driver .cv-search-picker__input {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
   min-height: 44px;
   padding: 0;
 }
@@ -14204,10 +14211,10 @@ margin-inline: 0;
    *,
  *::before,
  *::after {
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
   }
 }
 
@@ -14738,13 +14745,13 @@ margin-inline: 0;
 }
 
   .cv-itinerary__leg {
-  background: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  border-color: transparent;
 }
 
   .cv-itinerary__leg:hover {
-  background: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  border-color: transparent;
 }
 
   .cv-person-row--highlight .cv-person-row__badge {
@@ -14987,13 +14994,13 @@ margin-inline: 0;
 /* Linhas de trecho: mesmo fundo da seção do card. */
 
   .cv-itinerary__leg {
-  background: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  border-color: transparent;
 }
 
   .cv-itinerary__leg:hover {
-  background: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  border-color: transparent;
 }
 
 /* Cabeçalho de filtros: campos assentados na superfície suave, foco consistente. */
@@ -15291,9 +15298,9 @@ margin-inline: 0;
     input.cv-field__control[readonly],
     input[readonly]
   ) {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
+  box-shadow: none;
 }
 
 /* ========================================================================
@@ -15329,9 +15336,9 @@ margin-inline: 0;
     select,
     textarea
   ) {
-  background: var(--cv-surface-next) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
+  background: var(--cv-surface-next);
+  border-color: transparent;
+  box-shadow: none;
   color: var(--cv-ink);
 }
 
@@ -15351,9 +15358,9 @@ margin-inline: 0;
     .cv-field__control[readonly],
     input[readonly]
   ) {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
+  box-shadow: none;
   color: var(--cv-ink);
   opacity: 1;
 }

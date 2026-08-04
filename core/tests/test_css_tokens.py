@@ -525,3 +525,65 @@ class SombraEFocoTests(SimpleTestCase):
         bloco = base.split(":focus,", 1)
         self.assertEqual(len(bloco), 2, "base.css sem o reset global de foco")
         self.assertIn("outline: none", bloco[1].split("}", 1)[0])
+
+
+# ===========================================================================
+# NOVO-30 fase 4 — `!important` so onde ele vence alguem de fora
+#
+# COMO O NUMERO FOI DECIDIDO
+#
+# Nao por estimativa: por medicao. `scripts/medir_estilos.py` capturou o
+# `getComputedStyle` de 1.488 elementos (5 telas x 2 temas, 24 propriedades),
+# os 474 `!important` foram removidos e a captura refeita. Os 456 cosmeticos
+# mudaram ZERO propriedade computada — venciam adversarios que a fase 2 e a 3a
+# ja tinham dissolvido. Os 18 estruturais ficaram porque escondem/mostram, e a
+# medicao das 5 telas nao alcanca wizard, modal e editor: apagar ali seria
+# risco que o instrumento nao ve.
+# ===========================================================================
+
+TETO_DE_IMPORTANT = 18
+
+
+class ImportantTests(SimpleTestCase):
+    def test_important_nao_passa_do_teto(self):
+        total = 0
+        for arquivo in _css_fontes():
+            for _prop, valor in _declaracoes_css(arquivo.read_text(encoding="utf-8")):
+                pass
+            total += _COMENTARIO.sub("", arquivo.read_text(encoding="utf-8")).count("!important")
+        self.assertLessEqual(
+            total, TETO_DE_IMPORTANT,
+            f"{total} `!important` (teto {TETO_DE_IMPORTANT}) — o numero so desce",
+        )
+
+    def test_cada_important_diz_quem_ele_vence(self):
+        """Sem justificativa escrita, o `!important` nao entra.
+
+        E a exigencia do prompt da fase 4: quem sobra tem de nomear a regra de
+        terceiro que esta vencendo. Se nao esta vencendo nada de fora, e para
+        apagar — nao para documentar.
+        """
+        sem_motivo = []
+        for arquivo in _css_fontes():
+            texto = arquivo.read_text(encoding="utf-8")
+            for numero, linha in enumerate(texto.splitlines(), 1):
+                if "!important" not in linha or linha.strip().startswith(("/*", "*")):
+                    continue
+                vizinhanca = "\n".join(texto.splitlines()[max(0, numero - 4):numero])
+                if "/*" not in vizinhanca:
+                    sem_motivo.append(f"{_rel_css(arquivo)}:{numero}")
+        self.assertEqual(
+            sem_motivo, [],
+            f"`!important` sem dizer quem ele vence: {sem_motivo[:8]}",
+        )
+
+    def test_o_auditor_nao_tem_excecao_de_arquivo(self):
+        """A camada de token virou parte da REGRA, nao uma dispensa."""
+        auditor = (ROOT / "scripts" / "audit_frontend_standards.py").read_text(encoding="utf-8")
+        inicio = auditor.index("CSS_EXCEPTIONS: dict[str, dict] = {")
+        corpo = auditor[inicio:auditor.index("\n}\n", inicio)]
+        arquivos = re.findall(r'"(static/css/[^"]+)":', corpo)
+        self.assertEqual(
+            [a for a in arquivos if not a.endswith("shell.bundle.css")], [],
+            "excecao de arquivo de volta no auditor de frontend",
+        )

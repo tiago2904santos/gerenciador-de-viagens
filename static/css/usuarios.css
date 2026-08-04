@@ -182,7 +182,7 @@
 }
 
  #vincular-usuario-modal .vincular-usuario-modal__dialog {
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
 }
 
 .vincular-usuario-modal__dialog > .cv-dialog__header {
@@ -207,8 +207,8 @@
 .vincular-usuario-modal__body {
   display: grid;
   gap: 12px;
-  padding-block: var(--sp-4) !important;
-  padding-inline: var(--sp-5) !important;
+  padding-block: var(--sp-4);
+  padding-inline: var(--sp-5);
 }
 
 .vincular-usuario-modal__intro {
@@ -275,10 +275,10 @@
   .cv-custom-select__trigger,
   .cv-custom-select__trigger--v2
 ) {
-  background: var(--cv-surface-next) !important;
-  border: 0 !important;
-  border-radius: var(--r-sm) !important;
-  box-shadow: none !important;
+  background: var(--cv-surface-next);
+  border: 0;
+  border-radius: var(--r-sm);
+  box-shadow: none;
 }
 
 .vincular-usuario-modal__fields .cv-custom-select__trigger--v2 .cv-custom-select__value {

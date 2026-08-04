@@ -10,12 +10,12 @@
   contain: paint;
   margin-top: var(--sp-2);
   max-height: min(280px, 36vh);
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
+  overflow-x: hidden;
+  overflow-y: auto;
   overscroll-behavior: contain;
-  scrollbar-color: var(--cv-border) transparent !important;
+  scrollbar-color: var(--cv-border) transparent;
   scrollbar-gutter: stable;
-  scrollbar-width: thin !important;
+  scrollbar-width: thin;
 }
 
 /* Scrollbar canônica (mesmo padrão do custom-select v2 / Metas). */
@@ -309,10 +309,10 @@ margin-inline: 0;
 
   .os-page .os-form-card #os-card-servidores .cv-search-picker__field:focus-within
   .cv-search-picker__control {
-  background: var(--cv-surface-next) !important;
-  background-color: var(--cv-surface-next) !important;
-  border-color: transparent !important;
-  transition: none !important;
+  background: var(--cv-surface-next);
+  background-color: var(--cv-surface-next);
+  border-color: transparent;
+  transition: none;
 }
 
   .os-page .os-form-card .os-model-card {
@@ -329,7 +329,7 @@ margin-inline: 0;
 
   .os-page .os-form-card .os-model-card.is-selected {
   background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-next));
-  border: 0 !important;
+  border: 0;
   border-inline-start: var(--bd-strong);
   border-inline-start-color: var(--color-accent);
 }
@@ -348,49 +348,49 @@ margin-inline: 0;
 
   .os-page .os-form-card #os-oficio-lista
   .cv-search-picker__selected-card:not(.is-active):not([aria-pressed="true"]) {
-  background: var(--cv-surface-next) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-next);
+  border-color: transparent;
 }
 
   .os-page .os-form-card #os-oficio-lista
   .cv-search-picker__selected-card:not(.is-active):not([aria-pressed="true"]):hover {
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-next)) !important;
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-next));
 }
 
 /* Cards de servidores no poço dos campos; destaque dourado só na função ativa. */
 
   .os-page #os-card-servidores
   .cv-search-picker__selected-card:not(.cv-search-picker__selected-card--driver) {
-  background: var(--cv-surface-next) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-next);
+  border-color: transparent;
 }
 
   .os-page #os-card-servidores
   .cv-search-picker__selected-card:not(.cv-search-picker__selected-card--driver):hover {
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-next)) !important;
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-next));
 }
 
 /* Equipe da OS: flat como Documentos vinculados (busca + lista próximas). */
 .os-page #os-card-servidores
   .cv-search-picker--people.cv-search-picker--roster {
-  background: transparent !important;
-  border: 0 !important;
+  background: transparent;
+  border: 0;
   border-radius: 0;
-  box-shadow: none !important;
-  gap: 0 !important;
-  padding: 0 !important;
+  box-shadow: none;
+  gap: 0;
+  padding: 0;
 }
 
 .os-page #os-card-servidores
   .cv-search-picker--people.cv-search-picker--roster
   .cv-search-picker__selected-panel {
-  background: transparent !important;
-  border: 0 !important;
+  background: transparent;
+  border: 0;
   border-radius: 0;
-  box-shadow: none !important;
+  box-shadow: none;
   gap: 8px;
   margin-top: var(--sp-2);
-  padding: 0 !important;
+  padding: 0;
 }
 
 .os-page #os-card-servidores

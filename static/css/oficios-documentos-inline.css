@@ -83,18 +83,18 @@
 .oficio-documentos-info-section .oficio-documentos-card--vehicle,
 .oficio-documentos-route-section .oficio-documentos-route-card,
 .oficio-documentos-justification-section .oficio-documentos-card--justification {
-  background: transparent !important;
-  border: 0 !important;
+  background: transparent;
+  border: 0;
   border-radius: 0;
-  box-shadow: none !important;
+  box-shadow: none;
   overflow: visible;
 }
 
 .oficio-documentos-route-section .oficio-documentos-route-card__diarias-box,
 .oficio-documentos-route-section .oficio-documentos-route-card__body {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 
 .oficio-documentos-route-section .oficio-documentos-route-card__diarias-box {
@@ -302,9 +302,9 @@
 
 /* Mesmo fundo visual da seção (vence .cv-summary-item com color-card-muted) */
 .oficio-documentos-route-section .oficio-documentos-route-trecho-scroll-item {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
+  box-shadow: none;
   flex-shrink: 0;
 }
 
@@ -511,7 +511,7 @@
   .document-inline-card--termos
   .document-inline-card--nested
   > .document-inline-card__header {
-  background: var(--cv-surface-block) !important;
+  background: var(--cv-surface-block);
 }
 
 .document-inline-card__header {

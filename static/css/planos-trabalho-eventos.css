@@ -661,9 +661,9 @@
 }
 
 .pt-document-preview__actions .cv-icon-btn {
-  border: 0 !important;
-  background: var(--cv-surface-card) !important;
-  box-shadow: none !important;
+  border: 0;
+  background: var(--cv-surface-card);
+  box-shadow: none;
 }
 
 .pt-document-preview__body {
@@ -673,30 +673,30 @@
 }
 
 .pt-documentos-stage .document-inline-viewer {
-  border: 0 !important;
+  border: 0;
   border-radius: var(--r-lg);
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
 }
 
 .pt-documentos-stage > .cv-form-section-card {
-  border: 0 !important;
-  background: var(--cv-surface-card) !important;
-  box-shadow: none !important;
+  border: 0;
+  background: var(--cv-surface-card);
+  box-shadow: none;
 }
 
 .pt-documentos-stage > .cv-form-section-card > .cv-form-section-header {
-  background: var(--cv-surface-card) !important;
-  border: 0 !important;
-  border-bottom: var(--bd) !important;
-  box-shadow: none !important;
+  background: var(--cv-surface-card);
+  border: 0;
+  border-bottom: var(--bd);
+  box-shadow: none;
 }
 
 .pt-documentos-stage > .cv-form-section-card > .cv-form-card__footer,
 .pt-documentos-stage > .cv-form-section-card .cv-card-footer,
 .pt-documentos-stage > .cv-form-section-card .cv-card-footer-section {
-  border: 0 !important;
-  background: var(--cv-surface-card) !important;
-  box-shadow: none !important;
+  border: 0;
+  background: var(--cv-surface-card);
+  box-shadow: none;
 }
 
 .pt-documentos-stage > .cv-form-section-card .cv-card-footer-section__divider {
@@ -709,14 +709,14 @@
 
 .pt-add-evento {
   margin: 0;
-  border: 0 !important;
-  background: var(--cv-surface-card) !important;
-  box-shadow: none !important;
+  border: 0;
+  background: var(--cv-surface-card);
+  box-shadow: none;
 }
 
 .pt-add-evento > .pt-add-evento__inner {
-  border: 0 !important;
-  background: var(--cv-surface-card) !important;
+  border: 0;
+  background: var(--cv-surface-card);
 }
 
 @media (max-width: 720px) {
@@ -785,8 +785,8 @@
   .cv-custom-select__trigger--v2,
   .cv-custom-select--open .cv-custom-select__trigger
 ) {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
 }
 
 @media (max-width: 720px) {
@@ -857,8 +857,8 @@
 }
 
  .pt-texto-block .cv-field__control--textarea {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
 }
 
 .pt-texto-block .cv-field__control--textarea::-webkit-scrollbar {
@@ -1024,9 +1024,9 @@
 
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block.route-destinos-block--split:hover {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
-  margin: 0 !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
+  margin: 0;
 }
 
 .pt-efetivo-section.route-destinos-block--split .pt-efetivo-card.destination-row {
@@ -1048,8 +1048,8 @@
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block
   .pt-efetivo-card.destination-row:hover {
-  align-items: start !important;
-  grid-template-columns: 44px minmax(0, 1fr) 44px !important;
+  align-items: start;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
 }
 
   [data-travel-document-wizard-step1]
@@ -1059,8 +1059,8 @@
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block
   .pt-efetivo-card.destination-row--single:hover {
-  align-items: start !important;
-  grid-template-columns: 44px minmax(0, 1fr) !important;
+  align-items: start;
+  grid-template-columns: 44px minmax(0, 1fr);
 }
 
 .pt-efetivo-section.route-destinos-block--split .pt-efetivo-card .pt-efetivo-card__body {
@@ -1069,6 +1069,7 @@
 }
 
 .pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .cv-ordered-field-row__badge.sr-only {
+  /* !important: vence o `display: grid` do card, de mesma especificidade e posterior na cascata. */
   display: none !important;
 }
 
@@ -1117,22 +1118,22 @@
 }
 
  .pt-efetivo-fields .pt-quantidade-stepper {
-  background: var(--cv-surface-next) !important;
+  background: var(--cv-surface-next);
 }
 
 .pt-efetivo-fields .pt-quantidade-stepper > .cv-field__control,
 .pt-efetivo-fields .pt-quantidade-stepper > input {
   appearance: textfield;
   -moz-appearance: textfield;
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  height: 44px !important;
-  min-height: 44px !important;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  height: 44px;
+  min-height: 44px;
   min-width: 0;
-  padding-block: 0 !important;
-  padding-inline: var(--sp-1) !important;
+  padding-block: 0;
+  padding-inline: var(--sp-1);
   text-align: center;
   width: 100%;
 }
@@ -1184,7 +1185,7 @@
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block--split
   .pt-efetivo-card.destination-row:hover {
-  align-items: start !important;
+  align-items: start;
 }
 
 @media (max-width: 720px) {

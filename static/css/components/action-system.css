@@ -642,7 +642,7 @@ border-color: transparent;
 }
 
  #attach-signed-modal .attach-signed-modal__dialog {
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
 }
 
 .attach-signed-modal__dialog > .cv-dialog__header {
@@ -899,14 +899,14 @@ margin-inline: calc(var(--sp-1) * -1);
 .attach-signed-modal__form .cv-file-selection__menu,
 .attach-signed-modal [data-attach-signed-current] {
   background: transparent;
-  border: 0 !important;
+  border: 0;
   border-radius: 0;
   box-shadow: none;
 }
 
 .attach-signed-modal__form .prestacao-file-selection__toggle[hidden] + .prestacao-file-selection__menu,
 .attach-signed-modal__form .cv-file-selection__toggle[hidden] + .cv-file-selection__menu {
-  border: 0 !important;
+  border: 0;
   border-radius: 0;
 }
 
@@ -992,11 +992,11 @@ margin-inline: calc(var(--sp-1) * -1);
   .prestacao-file-widget:focus-within,
   .cv-file-widget:focus-within
 ) {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
-  border: 0 !important;
-  outline: none !important;
-  transition: none !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
+  border: 0;
+  outline: none;
+  transition: none;
 }
 
 #attach-signed-modal :is(
@@ -1013,11 +1013,11 @@ margin-inline: calc(var(--sp-1) * -1);
   .prestacao-file-widget.is-dragover .prestacao-file-picker,
   .cv-file-widget.is-dragover .cv-file-picker
 ) {
-  background: transparent !important;
-  background-color: transparent !important;
-  border: 0 !important;
-  outline: none !important;
-  transition: none !important;
+  background: transparent;
+  background-color: transparent;
+  border: 0;
+  outline: none;
+  transition: none;
 }
 
 #attach-signed-modal :is(
@@ -1026,12 +1026,12 @@ margin-inline: calc(var(--sp-1) * -1);
   .prestacao-file-selection__menu:hover,
   .cv-file-selection__menu:hover
 ) {
-  background: transparent !important;
-  background-color: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  outline: none !important;
-  transition: none !important;
+  background: transparent;
+  background-color: transparent;
+  border: 0;
+  box-shadow: none;
+  outline: none;
+  transition: none;
 }
 
 #attach-signed-modal :is(
@@ -1046,70 +1046,73 @@ margin-inline: calc(var(--sp-1) * -1);
   .prestacao-file-selection__item:focus-within,
   .cv-file-selection__item:focus-within
 ) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
-  border: 0 !important;
-  outline: none !important;
-  transition: none !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
+  border: 0;
+  outline: none;
+  transition: none;
 }
 
 #attach-signed-modal :is(
   .prestacao-file-picker__action,
   .cv-file-picker__action
 ) {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
-  border: 0 !important;
-  border-radius: var(--r-md) !important;
-  color: var(--cv-ink) !important;
-  font-size: var(--fs-sm) !important;
-  font-weight: var(--fw-bold) !important;
-  min-height: var(--h-md) !important;
-  padding-block: 0 !important;
-  padding-inline: var(--sp-4) !important;
-  box-shadow: none !important;
-  outline: none !important;
-  transform: none !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
+  border: 0;
+  border-radius: var(--r-md);
+  color: var(--cv-ink);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  min-height: var(--h-md);
+  padding-block: 0;
+  padding-inline: var(--sp-4);
+  box-shadow: none;
+  outline: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
   .prestacao-file-picker__action,
   .cv-file-picker__action
 ):is(:hover, :focus-visible) {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
-  border: 0 !important;
-  color: var(--cv-ink) !important;
-  outline: none !important;
-  transform: none !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
+  border: 0;
+  color: var(--cv-ink);
+  outline: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
   .prestacao-file-picker__upload,
   .cv-file-picker__upload
 ):not(:disabled) {
-  background: var(--color-accent) !important;
-  background-color: var(--color-accent) !important;
-  background-image: none !important;
-  border: 0 !important;
-  box-shadow: var(--sh-sm) !important;
-  color: var(--color-accent) !important;
-  outline: none !important;
-  transition: background var(--tr-fast), box-shadow var(--tr-fast) !important;
-  transform: none !important;
+  background: var(--color-accent);
+  background-color: var(--color-accent);
+  background-image: none;
+  border: 0;
+  box-shadow: var(--sh-sm);
+  /* Botao cheio de acento: a tinta e o par do acento. Enquanto o `color` daqui
+     carregava `!important`, ele vencia o par certo declarado no componente e a
+     letra sumia — so apareceu quando o `!important` saiu (NOVO-30 fase 4). */
+  color: var(--on-accent);
+  outline: none;
+  transition: background var(--tr-fast), box-shadow var(--tr-fast);
+  transform: none;
 }
 
 #attach-signed-modal :is(
   .prestacao-file-picker__upload,
   .cv-file-picker__upload
 ):is(:hover, :focus-visible):not(:disabled) {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink)) !important;
-  background-color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink)) !important;
-  background-image: none !important;
-  border: 0 !important;
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background-color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background-image: none;
+  border: 0;
   color: var(--on-accent);
-  outline: none !important;
-  transform: none !important;
+  outline: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
@@ -1118,14 +1121,14 @@ margin-inline: calc(var(--sp-1) * -1);
   .cv-icon-btn--preview:focus,
   .cv-icon-btn--preview:focus-visible
 ) {
-  background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface)) !important;
-  background-color: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface)) !important;
-  border: var(--bd) !important;
-  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent) !important;
-  color: var(--cv-state-success) !important;
-  outline: none !important;
-  transition: none !important;
-  transform: none !important;
+  background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
+  background-color: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  color: var(--cv-state-success);
+  outline: none;
+  transition: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
@@ -1134,14 +1137,14 @@ margin-inline: calc(var(--sp-1) * -1);
   .cv-icon-btn--delete:focus,
   .cv-icon-btn--delete:focus-visible
 ) {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
-  border: var(--bd) !important;
-  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent) !important;
-  color: var(--cv-state-danger) !important;
-  outline: none !important;
-  transition: none !important;
-  transform: none !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  color: var(--cv-state-danger);
+  outline: none;
+  transition: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
@@ -1150,14 +1153,14 @@ margin-inline: calc(var(--sp-1) * -1);
   .attach-signed-modal__cancel:focus,
   .attach-signed-modal__cancel:focus-visible
 ) {
-  background: var(--cv-surface-block) !important;
-  background-color: var(--cv-surface-block) !important;
-  background-image: none !important;
-  border: 0 !important;
-  color: var(--cv-ink) !important;
-  outline: none !important;
-  transition: none !important;
-  transform: none !important;
+  background: var(--cv-surface-block);
+  background-color: var(--cv-surface-block);
+  background-image: none;
+  border: 0;
+  color: var(--cv-ink);
+  outline: none;
+  transition: none;
+  transform: none;
 }
 
 #attach-signed-modal :is(
@@ -1165,10 +1168,10 @@ margin-inline: calc(var(--sp-1) * -1);
   .attach-signed-modal__kind-option:hover,
   .attach-signed-modal__kind-option:focus-visible
 ) {
-  background: transparent !important;
-  color: var(--cv-ink-muted) !important;
-  outline: none !important;
-  transition: none !important;
+  background: transparent;
+  color: var(--cv-ink-muted);
+  outline: none;
+  transition: none;
 }
 
 #attach-signed-modal :is(
@@ -1176,8 +1179,8 @@ margin-inline: calc(var(--sp-1) * -1);
   .attach-signed-modal__kind-option.is-active:hover,
   .attach-signed-modal__kind-option.is-active:focus-visible
 ) {
-  background: var(--cv-surface-block) !important;
-  color: var(--color-accent) !important;
+  background: var(--cv-surface-block);
+  color: var(--color-accent);
 }
 
 @media (min-width: 841px) {

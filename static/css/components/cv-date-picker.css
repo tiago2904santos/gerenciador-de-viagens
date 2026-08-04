@@ -528,18 +528,18 @@ html {
  .cv-date-picker .cv-date-picker__day--multi-middle,
  .cv-date-picker .cv-date-picker__day--multi-end,
  .cv-date-picker .cv-date-picker__day--multi-single {
-  background-color: transparent !important;
-  background-image: none !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  color: var(--on-accent) !important;
+  background-color: transparent;
+  background-image: none;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--on-accent);
 }
 
  .cv-date-picker .cv-date-picker__day--multi-single::before,
  .cv-date-picker .cv-date-picker__day--multi-single::before {
-  background: var(--color-accent) !important;
-  border-color: transparent !important;
-  box-shadow: var(--sh-sm) !important;
+  background: var(--color-accent);
+  border-color: transparent;
+  box-shadow: var(--sh-sm);
 }
 
  .cv-date-picker .cv-date-picker__day--multi-selected:hover,
