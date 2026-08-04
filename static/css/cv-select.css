@@ -60,8 +60,8 @@
 
 /* Seta customizada via pseudo-elemento */
 .cv-select-wrapper::after {
-  border-bottom: 2px solid var(--cv-border);
-  border-right: 2px solid var(--cv-border);
+  border-bottom: var(--bd-strong);
+  border-right: var(--bd-strong);
   content: "";
   height: 8px;
   pointer-events: none;
@@ -82,7 +82,7 @@
 .cv-select-native {
   appearance: none;
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   box-sizing: border-box;
@@ -93,7 +93,8 @@
   font-weight: var(--fw-medium);
   height: var(--h-md);
   line-height: 1.2;
-  padding: 0 calc(var(--sp-6) + var(--sp-4)) 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3) var(--sp-7);
   transition:
     background-color var(--tr-fast),
     border-color var(--tr-fast),
@@ -178,7 +179,7 @@
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352657a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
     no-repeat right var(--sp-3) center / 16px 16px,
     var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   box-sizing: border-box;
@@ -187,7 +188,8 @@
   font-family: inherit;
   font-size: var(--fs-sm);
   height: var(--h-md);
-  padding: 0 calc(var(--sp-6) + var(--sp-2)) 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3) var(--sp-7);
   transition:
     border-color var(--tr-fast),
     box-shadow var(--tr-fast);
@@ -214,7 +216,7 @@
 .cv-action-dropdown__menu {
   animation: cv-dropdown-enter 160ms ease both;
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-lg);
   list-style: none;
@@ -252,7 +254,7 @@
 /* Item de acao */
 .cv-action-dropdown__item {
   align-items: center;
-  border-radius: calc(var(--r-md) - var(--sp-1));
+  border-radius: var(--r-sm);
   color: var(--cv-ink);
   cursor: pointer;
   display: flex;
@@ -260,7 +262,8 @@
   font-weight: var(--fw-medium);
   gap: var(--sp-2);
   min-height: var(--h-sm);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   text-decoration: none;
   transition: background-color var(--tr-fast), color var(--tr-fast);
   user-select: none;
@@ -315,7 +318,8 @@
   background: var(--cv-surface-block);
   border: 0;
   height: 1px;
-  margin: var(--sp-1) calc(var(--sp-3) * -1 + var(--sp-1));
+  margin-block: var(--sp-1);
+  margin-inline: calc(var(--sp-2) * -1);
 }
 
 /* Estado aberto — o trigger pode receber classe is-open via JS */
@@ -337,7 +341,7 @@
 .cv-filter-dropdown__trigger {
   align-items: center;
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-pill);
   box-shadow: var(--sh-sm);
   box-sizing: border-box;
@@ -349,7 +353,8 @@
   font-weight: var(--fw-medium);
   gap: var(--sp-2);
   height: var(--h-md);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   transition:
     background-color var(--tr-fast),
     border-color var(--tr-fast),
@@ -380,13 +385,14 @@
   height: 18px;
   justify-content: center;
   min-width: 18px;
-  padding: 0 var(--sp-1);
+  padding-block: 0;
+  padding-inline: var(--sp-1);
 }
 
 .cv-filter-dropdown__menu {
   animation: cv-dropdown-enter 160ms ease both;
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-lg);
   left: 0;
@@ -403,14 +409,15 @@
 
 .cv-filter-dropdown__option {
   align-items: center;
-  border-radius: calc(var(--r-md) - var(--sp-1));
+  border-radius: var(--r-sm);
   color: var(--cv-ink);
   cursor: pointer;
   display: flex;
   font-size: var(--fs-sm);
   gap: var(--sp-2);
   min-height: var(--h-sm);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   transition: background-color var(--tr-fast);
   user-select: none;
 }
@@ -508,7 +515,8 @@
   background:
     linear-gradient(var(--cv-surface-card), var(--cv-surface-card)) padding-box,
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-  border: 1px solid transparent;
+  border: var(--bd);
+    border-color: transparent;
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
   color: var(--cv-ink);
@@ -520,7 +528,8 @@
   gap: var(--sp-2);
   height: var(--h-md);
   justify-content: center;
-  padding: 0 var(--sp-4);
+  padding-block: 0;
+  padding-inline: var(--sp-4);
   text-decoration: none;
   transition: background var(--tr-fast), box-shadow var(--tr-fast);
   white-space: nowrap;
@@ -573,7 +582,8 @@
   background:
     linear-gradient(var(--cv-surface-card), var(--cv-surface-card)) padding-box,
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-  border: 1px solid transparent;
+  border: var(--bd);
+    border-color: transparent;
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
   box-sizing: border-box;
@@ -588,7 +598,8 @@
   max-width: 100%;
   min-height: var(--h-md);
   min-width: 0;
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   text-align: left;
   transition: background 150ms ease, box-shadow 150ms ease;
   width: 100%;
@@ -657,9 +668,12 @@
 .cv-custom-select__menu {
   animation: cv-cs-menu-enter 160ms ease both;
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
-  border-top: none;
-  border-radius: 0 0 var(--r-md) var(--r-md);
+  border: var(--bd);
+  border-top: 0;
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+  border-end-end-radius: var(--r-md);
+  border-end-start-radius: var(--r-md);
   box-shadow: var(--sh-md);
   box-sizing: border-box;
   left: 0;
@@ -682,7 +696,7 @@
 .cv-custom-select__menu.cv-floating-dropdown--active {
   background: var(--cv-surface-card);
   border-radius: var(--r-md);
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
   overflow: hidden;
   /* Portal no body: acima do modal, mesmo contrato do search-picker. */
   z-index: calc(var(--z-modal, 100) + 20);
@@ -692,7 +706,7 @@
 .cv-custom-select__menu::-webkit-scrollbar-track { background: transparent; }
 .cv-custom-select__menu::-webkit-scrollbar-thumb {
   background: var(--cv-border);
-  border-radius: 4px;
+  border-radius: var(--r-sm);
 }
 
 .cv-custom-select__option {
@@ -702,19 +716,20 @@
   font-size: var(--fs-sm);
   gap: var(--sp-2);
   min-height: var(--h-sm);
-  padding: var(--sp-2) var(--sp-3);
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
   transition: background 80ms ease;
   user-select: none;
 }
 
 .cv-custom-select__option:first-child {
-  border-top-left-radius: calc(var(--r-md) - var(--sp-1));
-  border-top-right-radius: calc(var(--r-md) - var(--sp-1));
+  border-top-left-radius: var(--r-sm);
+  border-top-right-radius: var(--r-sm);
 }
 
 .cv-custom-select__option:last-child {
-  border-bottom-left-radius: calc(var(--r-md) - var(--sp-1));
-  border-bottom-right-radius: calc(var(--r-md) - var(--sp-1));
+  border-bottom-left-radius: var(--r-sm);
+  border-bottom-right-radius: var(--r-sm);
 }
 
 .cv-custom-select__option:hover:not(.cv-custom-select__option--disabled) {

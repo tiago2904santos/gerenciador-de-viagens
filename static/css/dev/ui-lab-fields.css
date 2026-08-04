@@ -20,12 +20,13 @@
 
 .cv-field-panel {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   box-shadow: var(--sh-md);
   display: grid;
   gap: var(--sp-4);
-  padding: clamp(20px, 2.4vw, 28px);
+  padding-block: clamp(var(--sp-5), 2.4vw, var(--sp-6));
+  padding-inline: clamp(var(--sp-5), 2.4vw, var(--sp-6));
 }
 
 .cv-field-panel__header {
@@ -63,11 +64,12 @@
 
 .cv-field-panel__note {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   color: var(--cv-ink-muted);
   line-height: 1.5;
-  padding: var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
 }
 
 /* =========================================================
@@ -76,7 +78,7 @@
 
 .cv-date-picker-demo {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   display: grid;
   gap: var(--sp-4);
@@ -113,7 +115,7 @@
 
 .cv-search-picker-demo-card {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-xl);
   box-shadow: var(--sh-sm);
   display: grid;
@@ -138,7 +140,8 @@
   color: var(--cv-ink-muted);
   font-size: var(--fs-sm);
   line-height: 1.5;
-  margin: calc(var(--sp-2) * -1) 0 var(--sp-1);
+  margin-block: calc(var(--sp-2) * -1) var(--sp-1);
+  margin-inline: 0;
 }
 
 #fields-search-picker .cv-field-grid {
@@ -151,7 +154,7 @@
 
 .cv-field-surface {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   padding: var(--sp-4);
 }
@@ -160,7 +163,8 @@
   color: var(--cv-ink);
   font-size: var(--fs-md);
   font-weight: var(--fw-bold);
-  margin: 0 0 var(--sp-2);
+  margin-block: 0 var(--sp-2);
+  margin-inline: 0;
 }
 
 .cv-field-surface__description {
@@ -215,7 +219,7 @@
 
 .cv-field-group {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   display: grid;
   gap: var(--sp-4);
@@ -223,7 +227,7 @@
 }
 
 .cv-field-group__header {
-  border-bottom: 1px solid var(--cv-border);
+  border-bottom: var(--bd);
   display: grid;
   gap: var(--sp-1);
   padding-bottom: var(--sp-3);
@@ -287,14 +291,15 @@
 .cv-field__control {
   appearance: none;
   background: var(--cv-surface-next);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   box-sizing: border-box;
   color: var(--cv-ink);
   font-size: var(--fs-sm);
   min-height: var(--h-md);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   transition:
     background-color var(--tr-fast),
     border-color var(--tr-fast),
@@ -330,7 +335,7 @@
     linear-gradient(var(--cv-surface-card), var(--cv-surface-card)) padding-box,
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
   cursor: pointer;
-  padding-right: calc(var(--sp-6) + var(--sp-2));
+  padding-right: var(--sp-7);
 }
 
 .cv-field__control--select option,
@@ -350,8 +355,10 @@
 }
 
 .cv-select__wrapper::after {
-  border-bottom: 2px solid currentColor;
-  border-right: 2px solid currentColor;
+  border-bottom: var(--bd-strong);
+border-bottom-color: currentColor;
+  border-right: var(--bd-strong);
+  border-right-color: currentColor;
   content: "";
   height: var(--sp-2);
   pointer-events: none;
@@ -373,7 +380,8 @@
   background:
     linear-gradient(var(--cv-surface-card), var(--cv-surface-card)) padding-box,
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-  border: 1px solid transparent;
+  border: var(--bd);
+    border-color: transparent;
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   box-sizing: border-box;
@@ -384,7 +392,8 @@
   font-weight: var(--fw-semibold);
   height: var(--h-md);
   line-height: 1.2;
-  padding: 0 calc(var(--sp-6) + var(--sp-4)) 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3) var(--sp-7);
   transition:
     background-color var(--tr-fast),
     border-color var(--tr-fast),
@@ -549,14 +558,15 @@
 .cv-field__tag {
   align-items: center;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-pill);
   color: var(--cv-ink-muted);
   display: inline-flex;
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
   gap: var(--sp-2);
-  padding: var(--sp-1) var(--sp-2);
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
 }
 
 /* =========================================================
@@ -584,7 +594,8 @@
   background:
     linear-gradient(var(--cv-surface-card), var(--cv-surface-card)) padding-box,
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-  border: 1px solid transparent;
+  border: var(--bd);
+    border-color: transparent;
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
   color: var(--cv-ink);
@@ -596,7 +607,8 @@
   gap: var(--sp-2);
   height: var(--h-md);
   justify-content: center;
-  padding: 0 var(--sp-4);
+  padding-block: 0;
+  padding-inline: var(--sp-4);
   transition: background var(--tr-fast), box-shadow var(--tr-fast);
   white-space: nowrap;
 }
@@ -636,7 +648,7 @@
 
 .cv-field-state-card {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   display: grid;
   gap: var(--sp-3);
@@ -699,7 +711,7 @@
 
 .cv-multiselect__control {
   background: var(--cv-surface-next);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   display: flex;
@@ -722,12 +734,13 @@
   height: var(--h-md);
   justify-content: space-between;
   min-width: 0;
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
 }
 
 /* Separador quando há chips abaixo */
 .cv-multiselect__chips:not(:empty) {
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
 }
 
 .cv-multiselect__search {
@@ -774,7 +787,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-2);
-  padding: var(--sp-2) var(--sp-3) var(--sp-3);
+  padding-block: var(--sp-2) var(--sp-3);
+  padding-inline: var(--sp-3);
 }
 
 .cv-multiselect__chips:empty {
@@ -784,13 +798,14 @@
 .cv-multiselect__chip {
   align-items: center;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-pill);
   color: var(--cv-ink);
   display: inline-flex;
   gap: var(--sp-2);
   min-height: var(--h-sm);
-  padding: 0 var(--sp-2) 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3) var(--sp-2);
   transition:
     background-color var(--tr-fast),
     border-color var(--tr-fast),
@@ -835,7 +850,7 @@
 
 .cv-multiselect__dropdown {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   box-shadow: var(--sh-md);
   display: grid;
@@ -857,7 +872,8 @@
   display: flex;
   gap: var(--sp-2);
   min-height: var(--h-md);
-  padding: var(--sp-2) var(--sp-3);
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
   transition:
     background-color var(--tr-fast),
     color var(--tr-fast);
@@ -874,7 +890,7 @@
 
 .cv-multiselect__option-marker {
   align-items: center;
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-pill);
   display: inline-flex;
   flex: 0 0 auto;
@@ -890,8 +906,10 @@
 }
 
 .cv-multiselect__option--selected .cv-multiselect__option-marker::after {
-  border-bottom: 2px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
-  border-right: 2px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-bottom: var(--bd-strong);
+border-bottom-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-right: var(--bd-strong);
+  border-right-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   content: "";
   height: var(--sp-2);
   left: 50%;
@@ -918,18 +936,20 @@
 
 .cv-multiselect__count {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-pill);
   color: var(--cv-ink);
   flex: 0 0 auto;
   font-size: var(--fs-xs);
   font-weight: var(--fw-semibold);
-  padding: var(--sp-1) var(--sp-3);
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-3);
 }
 
 .cv-multiselect__empty {
   background: var(--cv-surface-block);
-  border: 1px dashed var(--cv-border);
+  border: var(--bd);
+  border-style: dashed;
   border-radius: var(--r-md);
   padding: var(--sp-3);
 }
@@ -1046,7 +1066,8 @@
   background:
     linear-gradient(var(--cv-surface-card), var(--cv-surface-card)) padding-box,
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-  border: 1px solid transparent;
+  border: var(--bd);
+    border-color: transparent;
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
   box-sizing: border-box;
@@ -1061,7 +1082,8 @@
   max-width: 100%;
   min-height: var(--h-md);
   min-width: 0;
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   text-align: left;
   transition: background 150ms ease, box-shadow 150ms ease;
   width: 100%;
@@ -1125,9 +1147,12 @@
 .cv-custom-select__menu {
   animation:      cv-cs-menu-enter 160ms ease both;
   background:     var(--cv-surface-card);
-  border:         1px solid var(--cv-border);
-  border-top:     none;
-  border-radius:  0 0 var(--r-md) var(--r-md);
+  border: var(--bd);
+  border-top: 0;
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+  border-end-end-radius: var(--r-md);
+  border-end-start-radius: var(--r-md);
   box-shadow:     var(--sh-md);
   box-sizing:     border-box;
   left:           0;
@@ -1150,7 +1175,7 @@
 .cv-custom-select__menu::-webkit-scrollbar-track  { background: transparent; }
 .cv-custom-select__menu::-webkit-scrollbar-thumb  {
   background:    var(--cv-border);
-  border-radius: 4px;
+  border-radius: var(--r-sm);
 }
 
 /* ─── Opções ────────────────────────────────────────────────────────────── */
@@ -1161,7 +1186,8 @@
   font-size:    var(--fs-sm);
   gap:          var(--sp-2);
   min-height:   var(--h-sm);
-  padding:      var(--sp-2) var(--sp-3);
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
   transition:   background 80ms ease;
   user-select:  none;
 }

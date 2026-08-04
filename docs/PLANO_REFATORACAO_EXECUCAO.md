@@ -828,9 +828,28 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
     - **Um defeito de tela pura:** `.sidebar-account__name` era `#ffffff` literal.
       Com a sidebar clara, o nome do usuario ficou branco no branco. Nenhum teste
       pega isso; o print pegou.
-  - [ ] **Fase 3b — geometria: raio, espaco e borda.** Linha de base ja medida
-    **depois** da 3a: raio 99 → **53** (teto 6) · padding 247 → **214** (8) ·
-    margem 53 → **50** (8) · borda 321 → **58** (3).
+  - [x] **Fase 3b — geometria: raio, espaco e borda.** As quatro escadas fechadas:
+    raio **53 → 6** · padding **214 → 8** · margem **50 → 3** · borda **58 → 3**.
+    - **A regra que organizou a fatia:** a forma curta ficou reservada para valor da
+      escada; **assimetria foi para a forma logica** (`padding-block`/`padding-inline`,
+      `margin-block`, `border-color`/`border-style`/`border-width`,
+      `border-start-start-radius`). Sem isso nao fecha: so as 450 paddings
+      assimetricas ja estouram qualquer teto de string. E como o gate entregue mede
+      **as duas formas**, o valor nao tem para onde se esconder — o canario prova
+      (`padding-inline: 13px` e `border-radius: 7px` reprovam os dois testes).
+    - **Piso e teto da escada, de novo.** `1px`/`2px` de borda continuam literais
+      (traco, nao espaco) e `max-width: 960px` continua literal (layout). O que a
+      escada cobre e o meio.
+    - **`!important` sai antes de contar.** Ele e alvo declarado da fase 4; se
+      contasse, `border-radius: 0 !important` seria uma string a mais e a 3b teria de
+      resolver `!important` junto — o erro nº 2 da §8.
+    - **`NOVO-32` 🟡 borda que nunca foi pintada.** `.prestacao-file-picker` declarava
+      `border: var(--cv-border)` — forma curta so com cor, entao o estilo vale `none`
+      e o navegador nao pinta nada. Preservei o comportamento (`border: 0`) com o
+      motivo escrito no arquivo: restaurar a borda e decisao de produto, nao
+      arredondamento de geometria.
+    - Suite **1.314 → 1.316** verdes (dois gates novos). Catraca de frontend segue em
+      **212** e as excecoes em **2** — a 3b nao mexe em literal de cor.
   - [ ] **Fase 3c — sombra e foco.** Sombra 202 → **136** (teto 4). O anel de foco
     sai de `box-shadow` para `outline`: com quatro valores distintos de `box-shadow`
     nao cabe halo de foco. `--focus-ring` ja e **cor** (nao forma), entao a troca e

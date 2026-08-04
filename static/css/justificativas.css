@@ -40,7 +40,8 @@
 /* Aberto: sem linha; gap só o do rail (mesmo ritmo do padding). */
 .justificativas-page .list-header__rail--inline-create {
   gap: var(--sp-3);
-  padding: var(--sp-3) clamp(var(--sp-4), 2vw, var(--sp-5));
+  padding-block: var(--sp-3);
+  padding-inline: clamp(var(--sp-4), 2vw, var(--sp-5));
 }
 
 .justificativas-page .list-header .cv-inline-create__panel.is-open,
@@ -117,7 +118,7 @@
   .related-route-picker.termo-oficio-picker
   :is(.cv-search-picker__selected-list, #termo-oficio-lista) {
   gap: 8px !important;
-  margin-top: 8px;
+  margin-top: var(--sp-2);
 }
 
 [data-justificativa-quick-add] .oficio-motivo-field .cv-field__control--textarea,
@@ -139,7 +140,8 @@
   align-items: stretch;
   display: grid;
   gap: var(--sp-4);
-  padding: var(--sp-4) 0;
+  padding-block: var(--sp-4);
+  padding-inline: 0;
 }
 
 .justificativa-quick-add__body {

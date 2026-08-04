@@ -20,9 +20,10 @@
   font-size: var(--fs-xs);
   color: var(--cv-ink-muted);
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-pill);
-  padding: 2px 10px;
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
 }
 
 .ui-lab2-component__note {
@@ -33,7 +34,8 @@
 
 /* Superficie onde o clone e renderizado */
 .ui-lab2-component__preview {
-  border: 1px dashed var(--cv-border);
+  border: var(--bd);
+border-style: dashed;
   border-radius: var(--r-lg);
   background: var(--cv-surface-card);
   padding: var(--sp-4);
@@ -68,12 +70,13 @@
 
 /* Bloco "Usado em" */
 .ui-lab2-usage {
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
   padding-top: var(--sp-3);
 }
 
 .ui-lab2-usage__title {
-  margin: 0 0 var(--sp-2);
+  margin-block: 0 var(--sp-2);
+margin-inline: 0;
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
   color: var(--cv-ink);
@@ -84,12 +87,13 @@
 .ui-lab2-usage__count {
   display: inline-block;
   min-width: 18px;
-  margin-left: 4px;
-  padding: 0 6px;
+  margin-left: var(--sp-1);
+  padding-block: 0;
+  padding-inline: var(--sp-1);
   text-align: center;
   border-radius: var(--r-pill);
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   color: var(--cv-ink-muted);
 }
 
@@ -122,7 +126,8 @@
 }
 
 .ui-lab2-placeholder {
-  border: 1px dashed var(--cv-border);
+  border: var(--bd);
+border-style: dashed;
   border-radius: var(--r-lg);
   background: var(--cv-surface-card);
   padding: var(--sp-6);

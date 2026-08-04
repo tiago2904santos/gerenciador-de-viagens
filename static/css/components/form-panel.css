@@ -15,12 +15,13 @@
 
 .main-form-panel > .form-section > .section-header {
   align-items: center;
-  padding: 18px clamp(20px, 3vw, 30px);
+  padding-block: var(--sp-4);
+  padding-inline: clamp(var(--sp-5), 3vw, var(--sp-7));
   position: relative;
 }
 
 .main-form-panel > .form-section > .section-header::before {
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   content: "";
   height: 28px;
   left: 0;
@@ -29,7 +30,8 @@
 }
 
 .main-form-panel > .form-section > :not(.section-header) {
-  padding: clamp(20px, 3vw, 30px);
+  padding-block: clamp(var(--sp-5), 3vw, var(--sp-7));
+padding-inline: clamp(var(--sp-5), 3vw, var(--sp-7));
 }
 
 .main-form-panel > .cv-card-footer {
@@ -39,7 +41,7 @@
 .cv-confirm-page {
   background: var(--cv-surface-card);
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--r-md);
   display: grid;
   gap: 0;
   overflow: hidden;
@@ -52,7 +54,8 @@
   display: grid;
   gap: var(--sp-4);
   grid-template-columns: auto minmax(0, 1fr);
-  padding: 18px clamp(20px, 3vw, 30px);
+  padding-block: var(--sp-4);
+  padding-inline: clamp(var(--sp-5), 3vw, var(--sp-7));
 }
 
  .cv-confirm-page {
@@ -62,7 +65,8 @@
 .cv-confirm-page__icon {
   align-items: center;
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
-  border: 1px solid color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
   border-radius: var(--r-md);
   color: var(--cv-state-danger);
   display: inline-flex;
@@ -89,11 +93,12 @@
 
 .cv-confirm-page__preview {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   display: grid;
   gap: var(--sp-2);
-  padding: var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
 }
 
 .cv-confirm-page__preview p {
@@ -103,7 +108,8 @@
 
 .cv-confirm-page__notice {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
-  border: 1px solid color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
   border-radius: var(--r-md);
   color: var(--cv-state-danger);
   margin: 0;
@@ -123,7 +129,7 @@
   .main-form-panel > .form-section > .section-header,
   .main-form-panel > .form-section > :not(.section-header),
   .main-form-panel > .cv-card-footer {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: var(--sp-4);
+    padding-right: var(--sp-4);
   }
 }

@@ -48,9 +48,11 @@
 .ui-lab-page {
   display: grid;
   gap: var(--sp-6);
-  margin: 0 auto;
+  margin-block: 0;
+  margin-inline: auto;
   max-width: 1440px;
-  padding: clamp(24px, 4vw, 48px) var(--sp-4) var(--sp-7);
+  padding-block: clamp(var(--sp-6), 4vw, var(--sp-8)) var(--sp-7);
+  padding-inline: var(--sp-4);
   position: relative;
   width: 100%;
   z-index: 1;

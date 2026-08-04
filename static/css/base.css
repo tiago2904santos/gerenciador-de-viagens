@@ -56,11 +56,12 @@ input,
 select,
 textarea {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   color: var(--cv-ink);
   min-height: var(--h-md);
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
 }
 
 textarea {

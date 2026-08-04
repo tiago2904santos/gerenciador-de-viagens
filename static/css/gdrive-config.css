@@ -17,14 +17,15 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
-  padding: var(--sp-5) 0;
+  padding-block: var(--sp-5);
+  padding-inline: 0;
 }
 
 .gdrive-block:first-child { padding-top: var(--sp-1); }
 .gdrive-block:last-child { padding-bottom: 0; }
 
 .gdrive-block + .gdrive-block {
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
 }
 
 .gdrive-block.is-disabled {
@@ -75,7 +76,7 @@
   height: 40px;
   border-radius: var(--r-md);
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   box-shadow: var(--sh-sm);
   font-size: 18px;
   line-height: 1;
@@ -99,10 +100,11 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-1);
-  padding: var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
   border-radius: var(--r-md);
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   box-shadow: var(--sh-sm);
 }
 
@@ -127,10 +129,12 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-1);
-  padding: var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
   border-radius: var(--r-md);
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
-  border: 1px solid color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
 }
 
 .gdrive-scope-alert__title {
@@ -209,13 +213,11 @@
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  /* padding vertical +3px vs. --space-3: compensa o line-height menor do nome
-     da pasta (24px) frente ao valor numérico do stat ao lado (30px), para
-     as duas caixas terminarem com a mesma altura total. */
-  padding: calc(var(--sp-3) + 3px) var(--sp-4);
+  padding: var(--sp-4);
   border-radius: var(--r-md);
   background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
-  border: 1px solid color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
 }
 
 .gdrive-pasta-selecionada__icon {
@@ -259,7 +261,7 @@
   padding: var(--sp-4);
   border-radius: var(--r-md);
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
 }
 
 .gdrive-browser-toolbar {
@@ -289,10 +291,10 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 2px;
-  padding: 3px;
+  padding: var(--sp-1);
   border-radius: var(--r-md);
   background: var(--cv-surface-page);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   box-shadow: inset 0 1px 2px rgba(7, 26, 51, 0.05);
 }
 
@@ -300,9 +302,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--sp-2) var(--sp-2);
-  border: 1px solid transparent;
-  border-radius: calc(var(--r-md) - 3px);
+  padding: var(--sp-2);
+  border: var(--bd);
+  border-color: transparent;
+  border-radius: var(--r-sm);
   background: transparent;
   color: var(--cv-ink-muted);
   font: inherit;
@@ -345,9 +348,10 @@
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  padding: 2px;
+  padding: var(--sp-1);
   border-radius: var(--r-sm);
-  border: 1px solid transparent;
+  border: var(--bd);
+  border-color: transparent;
   transition:
     background var(--tr-fast),
     border-color var(--tr-fast);
@@ -396,7 +400,8 @@
 
 .gdrive-folder-item__enter {
   flex: 0 0 auto;
-  padding: var(--sp-1) var(--sp-2);
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
   background: none;
   border: 0;
   border-radius: var(--r-sm);
@@ -434,9 +439,9 @@
   flex: 0 0 auto;
   width: 14px;
   height: 14px;
-  border: 2px solid var(--cv-border);
+  border: var(--bd-strong);
   border-top-color: var(--color-accent);
-  border-radius: 50%;
+  border-radius: var(--r-pill);
   animation: gdrive-spin 0.7s linear infinite;
 }
 
@@ -477,10 +482,11 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--sp-3);
-  padding: var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
   border-radius: var(--r-md);
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
 }
 
 .gdrive-stat__icon {
@@ -532,7 +538,8 @@
   flex-direction: column;
   gap: var(--sp-3);
   padding-top: var(--sp-4);
-  border-top: 1px dashed var(--cv-border);
+  border-top: var(--bd);
+  border-top-style: dashed;
 }
 
 .gdrive-subsection__head {
@@ -567,10 +574,12 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
-  padding: var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
   border-radius: var(--r-md);
   background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
 .gdrive-status__row {
@@ -633,7 +642,7 @@
   height: 6px;
   border-radius: var(--r-pill);
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   overflow: hidden;
 }
 
@@ -657,10 +666,11 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
-  padding: var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
   border-radius: var(--r-md);
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
 }
 
 .gdrive-previa__label {
@@ -687,7 +697,8 @@
 
 .gdrive-previa-lista li {
   overflow: hidden;
-  padding: 3px var(--sp-2);
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
   border-radius: var(--r-sm);
   background: var(--cv-surface-card);
   text-overflow: ellipsis;
@@ -710,11 +721,14 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: var(--sp-2) var(--sp-3);
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
   border-radius: var(--r-md);
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
-  border-left: 3px solid color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  border: var(--bd);
+  border-left: var(--bd-strong);
+  border-left-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  border-left-width: 3px;
 }
 
 /* Linha única: tag + título (com contexto embutido) + quando */
@@ -726,10 +740,11 @@
 
 .gdrive-pend__tipo {
   flex: 0 0 auto;
-  padding: 1px var(--sp-2);
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
   border-radius: var(--r-pill);
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   color: var(--cv-ink-muted);
   font-size: var(--fs-2xs);
   font-weight: var(--fw-semibold);
@@ -803,7 +818,7 @@
   padding: var(--sp-2);
   border-radius: var(--r-sm);
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   color: var(--cv-ink-muted);
   font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
   font-size: var(--fs-2xs);
@@ -836,7 +851,8 @@
 .gdrive-pend-lista::-webkit-scrollbar-thumb,
 .gdrive-previa-lista::-webkit-scrollbar-thumb,
 .gdrive-folder-list::-webkit-scrollbar-thumb {
-  border: 2px solid transparent;
+  border: var(--bd-strong);
+border-color: transparent;
   border-radius: var(--r-pill);
   background-color: var(--cv-border);
   background-clip: padding-box;

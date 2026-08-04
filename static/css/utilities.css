@@ -9,7 +9,8 @@
 .visually-hidden {
   clip: rect(0, 0, 0, 0);
   height: 1px;
-  margin: -1px;
+  margin-block: calc(var(--sp-1) * -1);
+  margin-inline: calc(var(--sp-1) * -1);
   overflow: hidden;
   padding: 0;
   position: absolute;
@@ -41,8 +42,9 @@
    shared templates while keeping page CSS focused on composition. */
 .cv-divider {
   border: 0;
-  border-top: 1px solid var(--cv-border);
-  margin: var(--sp-2) 0 0;
+  border-top: var(--bd);
+  margin-block: var(--sp-2) 0;
+  margin-inline: 0;
 }
 
 .cv-inline-form {
@@ -56,7 +58,8 @@
   flex-wrap: wrap;
   gap: var(--sp-3);
   justify-content: space-between;
-  margin: 0 0 var(--sp-4);
+  margin-block: 0 var(--sp-4);
+  margin-inline: 0;
 }
 
 .cv-content-spaced {
@@ -87,25 +90,30 @@
 }
 
 .delete-confirm-copy {
-  margin: 0 0 var(--sp-3);
+  margin-block: 0 var(--sp-3);
+margin-inline: 0;
 }
 
 .delete-confirm-preview__label {
-  margin: 0 0 var(--sp-2);
+  margin-block: 0 var(--sp-2);
+margin-inline: 0;
 }
 
 .delete-confirm-preview__body {
   color: var(--cv-ink-muted);
-  margin: 0 0 var(--sp-4);
+  margin-block: 0 var(--sp-4);
+  margin-inline: 0;
 }
 
 .document-preview-heading {
-  margin: 0 0 var(--sp-3);
+  margin-block: 0 var(--sp-3);
+margin-inline: 0;
 }
 
 .document-preview-list {
   color: var(--cv-ink-muted);
-  margin: 0 0 var(--sp-4);
+  margin-block: 0 var(--sp-4);
+  margin-inline: 0;
   padding-left: var(--sp-5);
 }
 
@@ -125,14 +133,15 @@
    -------------------------------------------------------------------------- */
 .alert {
   align-items: flex-start;
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   display: grid;
   font-weight: 600;
   gap: var(--sp-1) var(--sp-2);
   grid-template-columns: auto minmax(0, 1fr);
-  padding: var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
   position: relative;
 }
 
@@ -148,7 +157,8 @@
   grid-column: 1;
   grid-row: 1 / -1;
   height: 8px;
-  margin: 6px 0 0;
+  margin-block: var(--sp-1) 0;
+  margin-inline: 0;
   width: 8px;
 }
 
@@ -260,7 +270,8 @@
   --_cv-chip-glow:   var(--focus-ring);
   align-items: center;
   background: var(--_cv-chip-bg);
-  border: 1px solid var(--_cv-chip-border);
+  border: var(--bd);
+  border-color: var(--_cv-chip-border);
   border-radius: var(--r-pill);
   /* Mesma lógica do cv-state-button: glow semântico + sombra genérica */
   box-shadow: var(--_cv-chip-glow), var(--sh-sm);
@@ -274,7 +285,8 @@
   min-height: var(--sp-6);
   line-height: 1;
   margin: 0;
-  padding: 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   text-transform: uppercase;
   transition: border-color var(--tr-fast), box-shadow var(--tr-fast), transform var(--tr-fast);
   vertical-align: middle;
@@ -333,7 +345,8 @@
   border-radius: var(--r-pill);
   color: var(--_cv-chip-color);
   min-width: 20px;
-  padding: 2px var(--sp-2);
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
 }
 
 .cv-chip--success,
@@ -413,7 +426,7 @@
    4. Data table canônica
    -------------------------------------------------------------------------- */
 .cv-data-table-shell {
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   max-width: 100%;
   overflow-x: auto;
@@ -431,8 +444,9 @@
 }
 
 .cv-data-table :is(th, td) {
-  border-bottom: 1px solid var(--cv-border);
-  padding: var(--sp-3) var(--sp-4);
+  border-bottom: var(--bd);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
   text-align: left;
   vertical-align: middle;
 }
@@ -460,7 +474,7 @@
 .cv-data-table__detail {
   color: var(--cv-ink-muted);
   font-size: var(--fs-sm);
-  margin-top: 2px;
+  margin-top: var(--sp-1);
 }
 
 .cv-data-table__actions {
@@ -489,7 +503,7 @@
   }
 
   .cv-data-table tr {
-    border-bottom: 1px solid var(--cv-border);
+    border-bottom: var(--bd);
     padding: var(--sp-3);
   }
 

@@ -56,7 +56,7 @@
   :is(.cv-search-picker__selected-list, #termo-oficio-lista, #os-oficio-lista) {
   display: grid;
   gap: 8px !important;
-  margin-top: 8px;
+  margin-top: var(--sp-2);
   max-height: 280px;
   overflow: auto;
 }

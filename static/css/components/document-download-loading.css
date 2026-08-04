@@ -16,9 +16,10 @@
   grid-template-columns: auto 1fr;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px;
-  border: 1px solid var(--cv-border);
-  border-radius: 18px;
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
+  border: var(--bd);
+  border-radius: var(--r-lg);
   background: var(--cv-surface-card);
   color: var(--cv-ink);
   box-shadow: var(--sh-md);
@@ -29,9 +30,11 @@
   grid-row: 1 / span 2;
   width: 30px;
   height: 30px;
-  border: 3px solid color-mix(in srgb, var(--color-accent) 24%, transparent);
+  border: var(--bd-strong);
+  border-color: color-mix(in srgb, var(--color-accent) 24%, transparent);
+  border-width: 3px;
   border-top-color: var(--color-accent);
-  border-radius: 50%;
+  border-radius: var(--r-pill);
   animation: cv-document-loading-spin 0.72s linear infinite;
 }
 
@@ -43,7 +46,8 @@
 }
 
 .cv-document-loading__detail {
-  margin: -8px 0 0;
+  margin-block: calc(var(--sp-2) * -1) 0;
+margin-inline: 0;
   color: var(--cv-ink-muted);
   font-size: 0.875rem;
   line-height: 1.45;

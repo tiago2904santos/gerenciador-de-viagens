@@ -43,7 +43,7 @@
 .cv-metric,
 .cv-summary-item {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   min-height: 76px;
   padding: var(--sp-3);

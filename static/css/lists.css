@@ -13,14 +13,15 @@
 .list-toolbar {
   align-items: center;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-3);
   justify-content: space-between;
-  padding: var(--sp-4) var(--sp-5);
+  padding-block: var(--sp-4);
+  padding-inline: var(--sp-5);
 }
 
 .list-search {
@@ -35,7 +36,7 @@
   border-color: var(--cv-border);
   border-radius: var(--r-md);
   min-height: var(--h-md);
-  padding-left: 64px;
+  padding-left: var(--sp-8);
   width: 100%;
 }
 
@@ -76,7 +77,9 @@
    -------------------------------------------------------------------------- */
 .empty-state {
   background: color-mix(in srgb, var(--cv-surface-card) 72%, transparent);
-  border: 1px dashed color-mix(in srgb, var(--cv-border) 82%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-border) 82%, transparent);
+  border-style: dashed;
   border-radius: var(--r-md);
   color: var(--cv-ink-muted);
   grid-column: 1 / -1;
@@ -89,7 +92,8 @@
   color: var(--cv-ink-muted);
   font-size: var(--fs-md);
   font-weight: 600;
-  margin: 0 auto;
+  margin-block: 0;
+  margin-inline: auto;
   max-width: 48ch;
 }
 
@@ -129,7 +133,7 @@
    -------------------------------------------------------------------------- */
 .simple-list {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
   display: flex;
@@ -139,13 +143,14 @@
 
 .simple-list__row {
   align-items: center;
-  border-bottom: 1px solid var(--cv-border);
+  border-bottom: var(--bd);
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-3);
   justify-content: space-between;
   min-height: var(--h-lg);
-  padding: var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
   transition: background-color var(--tr-fast);
 }
 
@@ -186,13 +191,15 @@
   font-size: var(--fs-xs);
   font-weight: 800;
   letter-spacing: 0.04em;
-  padding: 4px 10px;
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
   text-transform: uppercase;
 }
 
 .simple-list__badge--accent {
   background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
 }
 
@@ -223,7 +230,7 @@
 .simple-list__meta-label {
   color: var(--cv-ink-muted);
   font-weight: 600;
-  margin-right: 0.25rem;
+  margin-right: var(--sp-1);
 }
 
 .simple-list__meta-value {
@@ -272,7 +279,7 @@
 
 .app-list,
 .simple-list {
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-xl);
   overflow: hidden;
 }
@@ -280,16 +287,18 @@
 .app-list__row,
 .simple-list__row {
   align-items: center;
-  border-bottom: 1px solid var(--cv-border);
+  border-bottom: var(--bd);
   display: flex;
   gap: var(--sp-4);
   justify-content: space-between;
-  padding: var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
 }
 
 .app-empty-state,
 .empty-state {
-  padding: var(--sp-7) var(--sp-4);
+  padding-block: var(--sp-7);
+padding-inline: var(--sp-4);
   text-align: center;
 }
 
@@ -297,7 +306,8 @@
   border-radius: var(--r-pill);
   font-size: var(--fs-xs);
   font-weight: 700;
-  padding: 2px 10px;
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
   text-transform: uppercase;
 }
 

@@ -227,7 +227,8 @@
 .page-header--clean .page-header__stage {
   background: var(--cv-surface-card);
   box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08);
-  padding:    var(--sp-5) var(--sp-6);
+  padding-block: var(--sp-5);
+  padding-inline: var(--sp-6);
 }
 
 .page-header--clean .page-header__eyebrow {
@@ -260,13 +261,15 @@
   font-size:     var(--fs-sm);
   font-weight:   var(--fw-bold);
   line-height:   1;
-  padding:       3px 10px;
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
 }
 
 /* Body: fundo claro — brand mark + subtítulo + metadados */
 .page-header--clean .page-header__body {
   background: var(--cv-surface-card);
-  padding:    var(--sp-4) var(--sp-6);
+  padding-block: var(--sp-4);
+  padding-inline: var(--sp-6);
 }
 
 /* Ribbon: faixa gradiente no rodapé */
@@ -302,18 +305,21 @@
   font-size:      var(--fs-xs);
   font-weight:    var(--fw-bold);
   letter-spacing: 0.04em;
-  padding:        3px 10px;
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
 }
 
 .page-header__badge--draft {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
-  border:     1px solid color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
   color:      var(--cv-state-warning);
 }
 
 .page-header__badge--sent {
   background: var(--cv-surface-block);
-  border:     1px solid color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
   color:      var(--cv-state-success);
 }
 
@@ -340,12 +346,13 @@
 /* Contêiner — card branco com scroll horizontal */
 .page-stepper {
   background:      var(--cv-surface-card);
-  border:          1px solid var(--cv-border);
+  border: var(--bd);
   border-radius:   var(--r-lg);
   box-shadow:      var(--sh-sm);
   box-sizing:      border-box;
   overflow-x:      auto;
-  padding:         var(--sp-4) var(--sp-6);
+  padding-block: var(--sp-4);
+  padding-inline: var(--sp-6);
   scrollbar-width: none;
   width:           100%;
   z-index:         var(--z-sidebar);
@@ -379,7 +386,7 @@
 .page-stepper__track {
   align-items: center;
   display:     flex;
-  margin-inline: calc(var(--sp-7) / -2);
+  margin-inline: calc(var(--sp-4) * -1);
   width:       calc(100% + var(--sp-7));
 }
 
@@ -400,7 +407,7 @@
 .page-stepper__marker {
   align-items:     center;
   background:      var(--cv-surface-block);
-  border:          2px solid var(--cv-border);
+  border: var(--bd-strong);
   border-radius:   var(--r-pill);
   color:           var(--cv-ink);
   display:         inline-flex;
@@ -430,7 +437,7 @@
 .page-stepper__number {
   align-items:     center;
   background:      var(--cv-surface-block);
-  border:          1px solid var(--cv-border);
+  border: var(--bd);
   border-radius:   var(--r-pill);
   color:           var(--cv-ink);
   display:         inline-flex;
@@ -452,7 +459,8 @@
   display:        flex;
   flex-direction: column;
   gap:            2px;
-  padding:        0 var(--sp-1);
+  padding-block: 0;
+  padding-inline: var(--sp-1);
   text-align:     center;
 }
 
@@ -600,7 +608,7 @@
 }
 
 .wizard-inner-section + .wizard-inner-section {
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
   padding-top: var(--sp-4);
 }
 
@@ -676,7 +684,7 @@
 
 .main-form-panel {
   background:     var(--cv-surface-card);
-  border:         1px solid var(--cv-border);
+  border: var(--bd);
   border-radius:  var(--r-lg);
   box-shadow:     var(--sh-lg);
   box-sizing:     border-box;
@@ -709,7 +717,7 @@
 
 .main-form-panel--inline-create {
   background: transparent;
-  border: none;
+  border: 0;
   box-shadow: none;
   gap: var(--sp-4);
   overflow: visible;
@@ -718,7 +726,7 @@
 /* Stack de cards independentes — remove o card único que envolve todas as sections */
 .main-form-panel--stack {
   background:    transparent;
-  border:        none;
+  border: 0;
   border-radius: 0;
   box-shadow:    none;
   gap:           var(--sp-4);
@@ -736,8 +744,11 @@
 .cv-form-section-stack > .footer-actions,
 .cv-form-section-stack > form > .footer-actions {
   background:    var(--cv-surface-card);
-  border-radius: 0 0 var(--r-xl) var(--r-xl);
-  border-top:    1px solid var(--cv-border);
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+  border-end-end-radius: var(--r-xl);
+  border-end-start-radius: var(--r-xl);
+  border-top: var(--bd);
   box-shadow:    var(--sh-lg);
   margin-top:    calc(-1 * var(--_stack-gap, var(--sp-4)));
 }
@@ -747,7 +758,7 @@
 .main-form-panel--stack .roteiro-editor--avulso .roteiro-editor__section,
 .main-form-panel--stack .roteiro-editor--oficio .roteiro-editor__section {
   background:    var(--cv-surface-card);
-  border:        1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-xl);
   box-shadow:    var(--sh-lg);
   overflow:      hidden;
@@ -757,9 +768,10 @@
 .main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section > .form-section-header {
   background:       var(--cv-surface-block);
   background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 7%, transparent) 0px, transparent 76px);
-  border-bottom:    1px solid var(--cv-border);
+  border-bottom: var(--bd);
   margin:           0;
-  padding:          var(--sp-4) var(--sp-6) var(--sp-4) var(--sp-7);
+  padding-block: var(--sp-4);
+  padding-inline: var(--sp-7) var(--sp-6);
 }
 
 .main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section > .form-section-header .app-form-section__title {
@@ -771,7 +783,8 @@
 }
 
 .main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section > :not(.form-section-header) {
-  padding: var(--sp-5) var(--sp-6);
+  padding-block: var(--sp-5);
+padding-inline: var(--sp-6);
 }
 
 
@@ -784,8 +797,8 @@
 
 .main-form-panel .form-section {
   background:     var(--cv-surface-card);
-  border:         none;
-  border-bottom:  1px solid var(--cv-border);
+  border: 0;
+  border-bottom: var(--bd);
   border-radius:  0;
   box-shadow:     none;
   box-sizing:     border-box;
@@ -793,12 +806,13 @@
   flex-direction: column;
   gap:            var(--sp-5);
   margin:         0;
-  padding:        var(--sp-5) var(--sp-6);
+  padding-block: var(--sp-5);
+  padding-inline: var(--sp-6);
   width:          100%;
 }
 
 .main-form-panel .form-section:last-of-type {
-  border-bottom: none;
+  border-bottom: 0;
 }
 
 
@@ -879,7 +893,7 @@
    components/form-sections.css, no .cv-form-block. */
 .cv-form-section-card {
   background:    var(--cv-surface-card);
-  border:        1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-xl);
   box-shadow:    var(--sh-lg);
   overflow:      hidden;
@@ -894,11 +908,12 @@
    ========================================================= */
 .cv-card-footer {
   align-items:     center;
-  border-top:      1px solid var(--cv-border);
+  border-top: var(--bd);
   display:         flex;
   gap:             var(--sp-3);
   justify-content: space-between;
-  padding:         var(--sp-4) var(--sp-6);
+  padding-block: var(--sp-4);
+  padding-inline: var(--sp-6);
 }
 
 .cv-card-footer__secondary,
@@ -917,7 +932,7 @@
 }
 
 .cv-card-footer-section__divider {
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
 }
 
 .cv-card-footer-section > .cv-card-footer {
@@ -926,7 +941,7 @@
 
 /* Dentro de form-section (páginas de formulário simples) */
 .form-section > .cv-card-footer {
-  margin-inline: calc(-1 * var(--sp-6));
+  margin-inline: calc(var(--sp-6) * -1);
   padding-inline: var(--sp-6);
 }
 
@@ -937,13 +952,14 @@
   align-items:      center;
   background:       var(--cv-surface-block);
   background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 7%, transparent) 0px, transparent 76px);
-  border-bottom:    1px solid var(--cv-border);
+  border-bottom: var(--bd);
   display:          flex;
   gap:              var(--sp-4);
   justify-content:  space-between;
   /* altura fixa: garante consistência com ou sem botões/toggles no header */
   min-height:       calc(2 * var(--sp-4) + var(--h-sm));
-  padding:          var(--sp-4) var(--sp-6) var(--sp-4) var(--sp-7);
+  padding-block: var(--sp-4);
+  padding-inline: var(--sp-7) var(--sp-6);
   position:         relative;
 }
 
@@ -998,7 +1014,8 @@
   height:     var(--h-sm);
   min-height: var(--h-sm);
   max-height: var(--h-sm);
-  padding:    0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
 }
 
 .cv-form-section-subtitle {
@@ -1033,7 +1050,7 @@
 }
 
 .cv-form-section-header--standalone {
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-xl);
   box-shadow: var(--sh-lg);
   min-height: 0;
@@ -1060,7 +1077,8 @@
   display:        flex;
   flex-direction: column;
   gap:            var(--sp-5);
-  padding:        var(--sp-5) var(--sp-6);
+  padding-block: var(--sp-5);
+  padding-inline: var(--sp-6);
 }
 
 .cv-form-section-body--sections {
@@ -1125,7 +1143,7 @@
 
 .field-group {
   background:     var(--cv-surface-block);
-  border:         1px solid var(--cv-border);
+  border: var(--bd);
   border-radius:  var(--r-sm);
   box-sizing:     border-box;
   display:        flex;
@@ -1166,13 +1184,14 @@
 .footer-actions {
   align-items:     center;
   background:      var(--cv-surface-block);
-  border-top:      1px solid var(--cv-border);
+  border-top: var(--bd);
   box-sizing:      border-box;
   display:         flex;
   flex-wrap:       wrap;
   gap:             var(--sp-3);
   justify-content: space-between;
-  padding:         var(--sp-4) var(--sp-6) 0;
+  padding-block: var(--sp-4) 0;
+  padding-inline: var(--sp-6);
 }
 
 .form-section > .footer-actions {
@@ -1207,7 +1226,7 @@
 
 .quick-create-panel--page {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   box-shadow: none;
 }
@@ -1258,7 +1277,7 @@
 /* List Panel */
 .list-panel {
   background:     var(--cv-surface-card);
-  border:         1px solid var(--cv-border);
+  border: var(--bd);
   border-radius:  var(--r-lg);
   box-shadow:     var(--sh-lg);
   box-sizing:     border-box;
@@ -1279,13 +1298,14 @@
 .filter-bar {
   align-items:     center;
   background:      var(--cv-surface-block);
-  border-bottom:   1px solid var(--cv-border);
+  border-bottom: var(--bd);
   box-sizing:      border-box;
   display:         flex;
   flex-wrap:       wrap;
   gap:             var(--sp-3);
   justify-content: space-between;
-  padding:         var(--sp-3) var(--sp-5);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-5);
 }
 
 .filter-bar__controls {
@@ -1323,7 +1343,8 @@
   flex-wrap: wrap;
   gap: var(--sp-3);
   justify-content: space-between;
-  padding: var(--sp-4) var(--sp-6);
+  padding-block: var(--sp-4);
+  padding-inline: var(--sp-6);
 }
 
 .pagination-shell--controls-only {
@@ -1395,14 +1416,14 @@
 .pagination-shell__controls {
   align-items: center;
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-pill);
   display: flex;
   flex: 0 0 auto;
   flex-wrap: nowrap;
   gap: 2px;
   justify-content: flex-end;
-  padding: 3px;
+  padding: var(--sp-1);
 }
 
 .pagination-shell__pages {
@@ -1417,7 +1438,7 @@
 .pagination-shell__page,
 .pagination-shell__ellipsis {
   align-items: center;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   box-sizing: border-box;
   display: inline-flex;
   font-size: var(--fs-sm);
@@ -1436,7 +1457,8 @@
 .pagination-shell__nav,
 .pagination-shell__page {
   background: transparent;
-  border: 1px solid transparent;
+  border: var(--bd);
+  border-color: transparent;
   color: var(--cv-ink-muted);
 }
 
@@ -1481,7 +1503,7 @@
 
 .pagination-shell__nav--prev,
 .pagination-shell__nav--next {
-  border-radius: 999px;
+  border-radius: var(--r-pill);
 }
 
 .pagination-shell__nav.is-disabled {
@@ -1493,7 +1515,7 @@
   border: 0;
   color: var(--cv-ink-muted);
   min-width: 20px;
-  padding-inline: 2px;
+  padding-inline: var(--sp-1);
 }
 
 .pagination-shell__icon {
@@ -1509,13 +1531,15 @@
 
 .pagination-shell__erro {
   background: color-mix(in srgb, var(--cv-state-danger) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--cv-state-danger) 46%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 46%, transparent);
   border-radius: var(--r-md);
   color: var(--cv-state-danger);
   display: block;
   font-size: var(--fs-sm);
   font-weight: var(--fw-semibold);
-  padding: 10px 16px;
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-4);
   width: 100%;
 }
 
@@ -1542,7 +1566,7 @@ body.has-delete-modal-open {
 
 .delete-confirm-modal__dialog {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-lg);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
   box-sizing: border-box;
@@ -1563,7 +1587,8 @@ body.has-delete-modal-open {
 .delete-confirm-modal__icon {
   align-items: center;
   background: color-mix(in srgb, var(--cv-state-danger) 18%, transparent);
-  border: 1px solid color-mix(in srgb, var(--cv-state-danger) 52%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 52%, transparent);
   border-radius: var(--r-pill);
   color: var(--cv-state-danger);
   display: inline-flex;
@@ -1595,7 +1620,8 @@ body.has-delete-modal-open {
   color: var(--cv-ink);
   font-size: 1.25rem;
   line-height: 1.2;
-  margin: var(--sp-1) 0 0;
+  margin-block: var(--sp-1) 0;
+  margin-inline: 0;
 }
 
 .delete-confirm-modal__message {
@@ -1665,7 +1691,7 @@ body.has-delete-modal-open {
 /* Menu de ações (⋮) — junta Cancelar/Excluir num único botão */
 .cv-action-menu {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
   display: none;
@@ -1683,14 +1709,15 @@ body.has-delete-modal-open {
 .cv-action-menu__item {
   align-items: center;
   background: transparent;
-  border: none;
+  border: 0;
   border-radius: var(--r-sm);
   color: var(--cv-ink);
   cursor: pointer;
   display: flex;
   font-size: var(--fs-sm);
   gap: var(--sp-2);
-  padding: var(--sp-2) var(--sp-3);
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
   text-align: left;
   width: 100%;
 }
@@ -1771,9 +1798,9 @@ body.has-delete-modal-open {
 }
 
 .cv-action-menu__divider {
-  border: none;
-  border-top: 1px solid var(--cv-border);
-  margin: var(--sp-1) var(--sp-1);
+  border: 0;
+  border-top: var(--bd);
+  margin: var(--sp-1);
 }
 
 .cv-action-menu__form {
@@ -1793,7 +1820,7 @@ body.has-delete-modal-open {
 /* Painel: oculto por padrão, revelado via .is-open */
 .quick-create-panel {
   background:    var(--cv-surface-block);
-  border-bottom: 1px solid var(--cv-border);
+  border-bottom: var(--bd);
   box-shadow:    none;
   box-sizing:    border-box;
   display:       none;
@@ -1809,12 +1836,13 @@ body.has-delete-modal-open {
 .quick-create-panel__header {
   align-items:     center;
   background:      var(--cv-surface-card);
-  border-bottom:   1px solid var(--cv-border);
+  border-bottom: var(--bd);
   box-sizing:      border-box;
   display:         flex;
   gap:             var(--sp-3);
   justify-content: space-between;
-  padding:         var(--sp-2) var(--sp-5);
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-5);
 }
 
 .quick-create-panel__title {
@@ -1827,7 +1855,7 @@ body.has-delete-modal-open {
 .quick-create-panel__close {
   align-items:      center;
   background:       transparent;
-  border:           none;
+  border: 0;
   border-radius:    var(--r-sm);
   color:            var(--cv-ink-muted);
   cursor:           pointer;
@@ -1851,7 +1879,8 @@ body.has-delete-modal-open {
   box-sizing: border-box;
   display:    flex;
   gap:        var(--sp-3);
-  padding:    var(--sp-4) var(--sp-5);
+  padding-block: var(--sp-4);
+  padding-inline: var(--sp-5);
   width:      100%;
 }
 
@@ -1875,7 +1904,7 @@ body.has-delete-modal-open {
   display:     flex;
   flex-shrink: 0;
   gap:         var(--sp-2);
-  padding-bottom: 1px;
+  padding-bottom: var(--sp-1);
   width:       200px;
 }
 
@@ -1884,7 +1913,8 @@ body.has-delete-modal-open {
   box-sizing:  border-box;
   color:       var(--cv-ink-muted);
   font-size:   var(--fs-xs);
-  padding:     0 var(--sp-5) var(--sp-3);
+  padding-block: 0 var(--sp-3);
+  padding-inline: var(--sp-5);
 }
 
 
@@ -1899,7 +1929,8 @@ body.has-delete-modal-open {
   }
 
   .page-stepper {
-    padding: var(--sp-3) var(--sp-4);
+    padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
   }
 
   .main-form-panel .form-section {
@@ -1910,7 +1941,8 @@ body.has-delete-modal-open {
   .cv-form-section-header {
     --_wizard-filete-inset-block: var(--sp-3);
     --_wizard-filete-left:        var(--sp-4);
-    padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-7);
+    padding-block: var(--sp-3);
+    padding-inline: var(--sp-7) var(--sp-4);
   }
 
   .cv-form-section-card--compact .cv-form-section-header {
@@ -1925,7 +1957,7 @@ body.has-delete-modal-open {
     align-items:    stretch;
     flex-direction: column-reverse;
     gap:            var(--sp-2);
-    padding:        var(--sp-4) var(--sp-4);
+    padding: var(--sp-4);
   }
 
   .footer-actions__secondary,
@@ -2137,7 +2169,8 @@ body.has-delete-modal-open {
   display:        flex;
   flex-direction: column;
   gap:            var(--sp-2);
-  padding:        var(--sp-5) var(--sp-6);
+  padding-block: var(--sp-5);
+  padding-inline: var(--sp-6);
 }
 
 .page-header-band__eyebrow {
@@ -2186,44 +2219,51 @@ body.has-delete-modal-open {
   font-size:      var(--fs-xs);
   font-weight:    var(--fw-bold);
   letter-spacing: 0.04em;
-  padding:        3px var(--sp-3);
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-3);
   white-space:    nowrap;
 }
 
 .page-header-status-chip--draft {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
-  border:     1px solid color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
   color:      var(--cv-state-warning);
 }
 
 .page-header-status-chip--active {
   background: var(--cv-surface-block);
-  border:     1px solid color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
   color:      var(--cv-state-success);
 }
 
 .page-header-status-chip--pending {
   background: var(--cv-surface-block);
-  border:     1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   color:      var(--color-accent);
 }
 
 .page-header-status-chip--danger {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
-  border:     1px solid color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
   color:      var(--cv-state-danger);
 }
 
 /* Alerta inline simples (ex.: aviso de cancelamento) */
 .cv-alert {
   border-radius: var(--r-md);
-  padding:       var(--sp-3) var(--sp-4);
+  padding-block: var(--sp-3);
+  padding-inline: var(--sp-4);
   font-size:     var(--fs-sm);
 }
 
 .cv-alert--danger {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
-  border:     1px solid color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
   color:      var(--cv-state-danger);
 }
 
@@ -2241,7 +2281,8 @@ body.has-delete-modal-open {
   box-sizing:  border-box;
   display:     flex;
   gap:         var(--sp-3);
-  padding:     var(--sp-4) var(--sp-5);
+  padding-block: var(--sp-4);
+  padding-inline: var(--sp-5);
   width:       100%;
 }
 
@@ -2249,7 +2290,7 @@ body.has-delete-modal-open {
 .page-header-rail__marker {
   align-items:     center;
   background:      color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  border:          1px solid var(--cv-border);
+  border: var(--bd);
   border-radius:   var(--r-pill);
   color:           var(--color-accent);
   display:         inline-flex;
@@ -2344,7 +2385,7 @@ body.has-delete-modal-open {
 .page-header-rail--filters-inline-create .cv-inline-create__panel {
   background:  transparent;
   border:      0;
-  border-top:  1px solid var(--cv-border);
+  border-top: var(--bd);
   box-shadow:  none;
   width:       100%;
 }
@@ -2353,7 +2394,8 @@ body.has-delete-modal-open {
   align-items: flex-end;
   display:     flex;
   gap:         var(--sp-3);
-  padding:     var(--sp-4) 0;
+  padding-block: var(--sp-4);
+  padding-inline: 0;
   width:       100%;
 }
 
@@ -2366,16 +2408,16 @@ body.has-delete-modal-open {
    Sem label, sem botão e com o divisor indo de ponta a ponta do card. */
 
 .header-stack--inline-create-compact .cv-inline-create__body {
-  padding: var(--sp-3) 0 0; /* só o gap entre o divisor e o input */
+  padding-block: var(--sp-3) 0;
+padding-inline: 0; /* só o gap entre o divisor e o input */
 }
 
 .header-stack--inline-create-compact .page-header-rail--filters-inline-create .cv-inline-create__panel {
   border-radius: 0;
   box-shadow:    none;
   flex-shrink:   0;             /* não deixa o flex encolher de volta */
-  width:         calc(100% + (2 * var(--sp-5)));  /* estica até as bordas do card */
-  margin-left:   calc(-1 * var(--sp-5));
-  margin-right:  calc(-1 * var(--sp-5));
+  width:         calc(100% + (2 * var(--sp-5)));  margin-left: calc(var(--sp-5) * -1);
+  margin-right: calc(var(--sp-5) * -1);
   padding-left:  var(--sp-5);
   padding-right: var(--sp-5);
 }
@@ -2412,8 +2454,8 @@ body.has-delete-modal-open {
   align-items:     center;
   appearance:      none;
   background:      var(--cv-surface-block);
-  border:          none;
-  border-top:      1px solid var(--cv-border);
+  border: 0;
+  border-top: var(--bd);
   border-radius:   0;
   box-shadow:      none;
   box-sizing:      border-box;
@@ -2424,7 +2466,8 @@ body.has-delete-modal-open {
   gap:             var(--sp-2);
   height:          var(--h-md);
   justify-content: center;
-  padding:         0 var(--sp-4);
+  padding-block: 0;
+  padding-inline: var(--sp-4);
   transition:      background 0.3s cubic-bezier(0.4, 0, 1, 1), color 0.3s cubic-bezier(0.4, 0, 1, 1), border-color 0.3s cubic-bezier(0.4, 0, 1, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 1, 1);
   width:           100%;
 }
@@ -2563,7 +2606,7 @@ body.has-delete-modal-open {
 
 .list-card {
   background:     var(--cv-surface-card);
-  border:         1px solid var(--cv-border);
+  border: var(--bd);
   border-radius:  var(--r-md);
   box-shadow:     var(--sh-md);
   box-sizing:     border-box;
@@ -2620,7 +2663,7 @@ body.has-delete-modal-open {
 
 .list-card__footer {
   align-items:     center;
-  border-top:      1px solid var(--cv-border);
+  border-top: var(--bd);
   display:         flex;
   gap:             var(--sp-2);
   justify-content: flex-end;
@@ -2656,7 +2699,10 @@ body.has-delete-modal-open {
   width: 230px;
   height: var(--h-sm);
   padding-inline: var(--sp-4);
-  border-radius: 0 0 var(--r-md) 0;
+  border-start-start-radius: 0;
+  border-start-end-radius: 0;
+  border-end-end-radius: var(--r-md);
+  border-end-start-radius: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2729,8 +2775,11 @@ body.has-delete-modal-open {
 /* Painel: visualmente unido à aba acima */
 .cv-inline-create__panel {
   background:    var(--cv-surface-block);
-  border:        1px solid var(--cv-border);
-  border-radius: 0 var(--r-sm) var(--r-sm) var(--r-sm);
+  border: var(--bd);
+  border-start-start-radius: 0;
+  border-start-end-radius: var(--r-sm);
+  border-end-end-radius: var(--r-sm);
+  border-end-start-radius: var(--r-sm);
   box-shadow:    none;
   box-sizing:    border-box;
   width:         100%;
@@ -2745,12 +2794,13 @@ body.has-delete-modal-open {
 .cv-inline-create__header {
   align-items:     center;
   background:      var(--cv-surface-card);
-  border-bottom:   1px solid var(--cv-border);
+  border-bottom: var(--bd);
   box-sizing:      border-box;
   display:         flex;
   gap:             var(--sp-3);
   justify-content: space-between;
-  padding:         var(--sp-2) var(--sp-5);
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-5);
 }
 
 .cv-inline-create__title {
@@ -2763,7 +2813,7 @@ body.has-delete-modal-open {
 .cv-inline-create__close {
   align-items:     center;
   background:      transparent;
-  border:          none;
+  border: 0;
   border-radius:   var(--r-sm);
   color:           var(--cv-ink-muted);
   cursor:          pointer;
@@ -2787,7 +2837,8 @@ body.has-delete-modal-open {
   box-sizing:  border-box;
   display:     flex;
   gap:         var(--sp-3);
-  padding:     var(--sp-4) var(--sp-5);
+  padding-block: var(--sp-4);
+  padding-inline: var(--sp-5);
   width:       100%;
 }
 
@@ -2801,7 +2852,7 @@ body.has-delete-modal-open {
   display:        flex;
   flex-shrink:    0;
   gap:            var(--sp-2);
-  padding-bottom: 1px;
+  padding-bottom: var(--sp-1);
   width:          200px;
 }
 
@@ -2817,7 +2868,8 @@ body.has-delete-modal-open {
   box-sizing: border-box;
   color:      var(--cv-ink-muted);
   font-size:  var(--fs-xs);
-  padding:    0 var(--sp-5) var(--sp-3);
+  padding-block: 0 var(--sp-3);
+  padding-inline: var(--sp-5);
 }
 
 
@@ -2944,7 +2996,7 @@ body.has-delete-modal-open {
 
   /* Stepper: scroll horizontal sem overflow da página */
   .page-stepper {
-    padding: var(--sp-4) var(--sp-4);
+    padding: var(--sp-4);
   }
 
   .page-stepper__list {
@@ -3037,28 +3089,30 @@ body.has-delete-modal-open {
 .header-applied-chip {
   align-items:     center;
   background:      var(--cv-surface-block);
-  border:          1px solid var(--cv-border);
+  border: var(--bd);
   border-radius:   var(--r-pill);
   color:           var(--cv-ink);
   cursor:          default;
   display:         inline-flex;
   font-size:       var(--fs-xs);
   gap:             var(--sp-1);
-  padding:         2px var(--sp-2);
+  padding-block: var(--sp-1);
+  padding-inline: var(--sp-2);
   white-space:     nowrap;
 }
 
 /* Input de texto / busca */
 .header-filter-input {
   background:    var(--cv-surface-block);
-  border:        1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-sizing:    border-box;
   color:         var(--cv-ink);
   font-size:     var(--fs-sm);
   height:        var(--h-md);
   outline:       none;
-  padding:       0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   transition:    border-color var(--tr-base);
   width:         100%;
 }
@@ -3074,7 +3128,7 @@ body.has-delete-modal-open {
 .header-filter-select {
   appearance:    none;
   background:    var(--cv-surface-block);
-  border:        1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-sizing:    border-box;
   color:         var(--cv-ink);
@@ -3082,7 +3136,8 @@ body.has-delete-modal-open {
   font-size:     var(--fs-sm);
   height:        var(--h-md);
   outline:       none;
-  padding:       0 var(--sp-4) 0 var(--sp-3);
+  padding-block: 0;
+  padding-inline: var(--sp-3) var(--sp-4);
   transition:    border-color var(--tr-base);
   width:         100%;
 }
@@ -3096,7 +3151,7 @@ body.has-delete-modal-open {
 .header-filter-button {
   align-items:     center;
   background:      var(--cv-surface-block);
-  border:          1px solid var(--cv-border);
+  border: var(--bd);
   border-radius:   var(--r-md);
   color:           var(--cv-ink);
   cursor:          pointer;
@@ -3105,7 +3160,8 @@ body.has-delete-modal-open {
   font-weight:     var(--fw-semibold);
   height:          var(--h-md);
   justify-content: center;
-  padding:         0 var(--sp-4);
+  padding-block: 0;
+  padding-inline: var(--sp-4);
   transition:
     background   var(--tr-base),
     border-color var(--tr-base),
@@ -3153,14 +3209,15 @@ body.has-delete-modal-open {
   cursor:     pointer;
   min-height: unset;
   height:     var(--h-md);
-  padding-right: calc(var(--sp-2) * 2 + 30px);
+  padding-right: var(--sp-8);
 }
 
 /* Botão do calendário — sempre visível, posicionado sobre o input */
 .header-filter-datepicker .cv-date-picker__trigger--icon {
   align-items:      center;
   background:       transparent;
-  border:           1px solid transparent;
+  border: var(--bd);
+  border-color: transparent;
   border-radius:    var(--r-sm);
   color:            var(--cv-ink);
   cursor:           pointer;
@@ -3257,7 +3314,7 @@ body.has-delete-modal-open {
 
   .page-header-band,
   .page-header-rail {
-    padding: 14px;
+    padding: var(--sp-3);
   }
 
   .page-header-rail--filters .page-header-rail__marker {
@@ -3300,7 +3357,8 @@ body.has-delete-modal-open {
   }
 
   .page-stepper {
-    padding: 12px 10px;
+    padding-block: var(--sp-3);
+  padding-inline: var(--sp-2);
   }
 
   .page-stepper__list {
@@ -3309,7 +3367,7 @@ body.has-delete-modal-open {
   }
 
   .page-stepper__track {
-    margin-inline: calc(var(--sp-2) / -2);
+    margin-inline: calc(var(--sp-1) * -1);
     width: calc(100% + var(--sp-2));
   }
 
@@ -3330,7 +3388,8 @@ body.has-delete-modal-open {
     --_wizard-filete-inset-block: var(--sp-4);
     --_wizard-filete-left:        var(--sp-4);
     min-height: 0;
-    padding: var(--sp-4) var(--sp-4) var(--sp-4) var(--sp-7);
+    padding-block: var(--sp-4);
+    padding-inline: var(--sp-7) var(--sp-4);
   }
 
   .cv-form-section-card--compact .cv-form-section-header {
@@ -3395,7 +3454,7 @@ body.has-delete-modal-open {
 
 #quick-add-modelo-motivo .cv-field__control--textarea {
   background: var(--cv-surface-next);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   box-sizing: border-box;
@@ -3404,7 +3463,7 @@ body.has-delete-modal-open {
   height: 88px;
   line-height: 1.5;
   min-height: 88px;
-  padding: var(--sp-3) var(--sp-3);
+  padding: var(--sp-3);
   resize: vertical;
   transition:
     background-color var(--tr-fast),
@@ -3437,7 +3496,7 @@ body.has-delete-modal-open {
 
 #quick-add-atividade .cv-field__control--textarea {
   background: var(--cv-surface-next);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   box-sizing: border-box;
@@ -3446,7 +3505,7 @@ body.has-delete-modal-open {
   height: 88px;
   line-height: 1.5;
   min-height: 88px;
-  padding: var(--sp-3) var(--sp-3);
+  padding: var(--sp-3);
   resize: vertical;
   transition:
     background-color var(--tr-fast),

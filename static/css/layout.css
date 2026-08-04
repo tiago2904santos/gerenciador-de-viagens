@@ -15,7 +15,7 @@
 .app-main {
   box-sizing: border-box;
   min-width: 0;
-  padding: 32px;
+  padding: var(--sp-7);
   width: 100%;
 }
 
@@ -48,19 +48,19 @@
   }
 
   .app-main {
-    padding: 24px;
+    padding: var(--sp-6);
   }
 }
 
 @media (max-width: 600px) {
   .app-main {
-    padding: 16px;
+    padding: var(--sp-4);
   }
 }
 
 @media (max-width: 420px) {
   .app-main {
-    padding: 12px;
+    padding: var(--sp-3);
   }
 }
 

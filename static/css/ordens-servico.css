@@ -8,7 +8,7 @@
   .os-oficio-picker
   #os-oficio-lista {
   contain: paint;
-  margin-top: 8px;
+  margin-top: var(--sp-2);
   max-height: min(280px, 36vh);
   overflow-x: hidden !important;
   overflow-y: auto !important;
@@ -26,15 +26,17 @@
 .os-oficio-picker #os-oficio-lista::-webkit-scrollbar-track,
 .os-oficio-picker #os-oficio-lista::-webkit-scrollbar-track-piece {
   background: transparent;
-  border: none;
+  border: 0;
   box-shadow: none;
-  margin-block: 8px;
+  margin-block: var(--sp-2);
 }
 
 .os-oficio-picker #os-oficio-lista::-webkit-scrollbar-thumb {
   background-clip: padding-box;
   background-color: var(--cv-border);
-  border: 4px solid transparent;
+  border: var(--bd-strong);
+  border-color: transparent;
+  border-width: 4px;
   border-radius: var(--r-pill);
 }
 
@@ -49,7 +51,7 @@
 .os-oficio-picker #os-oficio-lista::-webkit-scrollbar-button:vertical:start:decrement,
 .os-oficio-picker #os-oficio-lista::-webkit-scrollbar-button:vertical:end:increment {
   background: transparent;
-  border: none;
+  border: 0;
   display: none;
   height: 0;
   width: 0;
@@ -88,7 +90,7 @@
   padding: var(--sp-4);
   box-sizing: border-box;
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--r-md);
   background: var(--cv-surface-next);
   box-shadow: none;
   cursor: pointer;
@@ -114,9 +116,9 @@
   flex: 0 0 auto;
   width: 20px;
   height: 20px;
-  margin-top: 1px;
-  border: 2px solid var(--cv-border);
-  border-radius: 50%;
+  margin-top: var(--sp-1);
+  border: var(--bd-strong);
+  border-radius: var(--r-pill);
 }
 
 .os-model-card__body {
@@ -160,7 +162,7 @@
 .os-model-fields {
   padding: var(--sp-4);
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--r-md);
   background: var(--cv-surface-next);
 }
 
@@ -173,7 +175,8 @@
 }
 
 .os-model-fields__title {
-  margin: 0 0 var(--sp-1);
+  margin-block: 0 var(--sp-1);
+margin-inline: 0;
   color: var(--cv-ink);
   font-size: var(--fs-md);
   font-weight: var(--fw-bold);
@@ -211,21 +214,21 @@
 .os-servidor-role-panel__toggle.cv-segment-toggle {
   background: var(--cv-surface-next);
   border-color: transparent;
-  border-radius: 10px;
+  border-radius: var(--r-sm);
   box-shadow: none;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 2px;
-  padding: 3px;
+  padding: var(--sp-1);
   width: 100%;
 }
 
 .os-servidor-role-panel__toggle .cv-segment-toggle__btn {
-  border-radius: 7px;
+  border-radius: var(--r-sm);
   color: var(--cv-ink-muted);
   justify-content: center;
   min-height: 34px;
-  padding: 7px 10px;
+  padding: var(--sp-2);
   text-align: center;
   transform: none;
   width: 100%;
@@ -258,8 +261,10 @@
   display: inline-flex;
   align-items: center;
   min-height: var(--sp-6);
-  padding: 0 var(--sp-3);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 42%, var(--cv-border));
+  padding-block: 0;
+  padding-inline: var(--sp-3);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 42%, var(--cv-border));
   border-radius: var(--r-pill);
   background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-card));
   color: var(--cv-ink);
@@ -271,7 +276,7 @@
 
 
   .os-page .os-form-card .cv-form-card__footer .cv-card-footer-section__divider {
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
   display: block;
 }
 
@@ -396,7 +401,7 @@
   border-radius: 0;
   box-shadow: none !important;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: var(--sp-2);
   padding: 0 !important;
 }
 

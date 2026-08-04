@@ -34,7 +34,7 @@
 .btn,
 .app-btn {
   align-items: center;
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   box-sizing: border-box;
@@ -47,7 +47,8 @@
   justify-content: center;
   line-height: 1;
   min-height: var(--h-md);
-  padding: 0 var(--sp-4);
+  padding-block: 0;
+  padding-inline: var(--sp-4);
   text-decoration: none;
   transition:
     background-color 150ms ease,
@@ -237,9 +238,9 @@
 
 .cv-btn--xs,
 .btn--compact {
-  border-radius: 9px;
+  border-radius: var(--r-sm);
   min-height: 30px;
-  padding-inline: 9px;
+  padding-inline: var(--sp-2);
 }
 
 .cv-btn--sm,
@@ -248,13 +249,13 @@
 .app-btn--sm {
   border-radius: var(--r-sm);
   min-height: 34px;
-  padding-inline: 11px;
+  padding-inline: var(--sp-3);
 }
 
 .cv-btn--lg,
 .btn--lg {
   min-height: 48px;
-  padding-inline: 20px;
+  padding-inline: var(--sp-5);
 }
 
 /* Icon buttons: cores semanticas suaves, legiveis nos dois temas. */
@@ -395,13 +396,13 @@
 .btn-group {
   align-items: center;
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
   display: inline-flex;
   flex-wrap: wrap;
   gap: 4px;
-  padding: 4px;
+  padding: var(--sp-1);
 }
 
 .cv-icon-btn-group {
@@ -425,11 +426,11 @@
 /* Menus globais com a mesma linguagem dos grupos. */
 .cv-action-menu {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
-  border-radius: 16px;
+  border: var(--bd);
+  border-radius: var(--r-md);
   box-shadow: 0 20px 52px rgba(5, 22, 38, 0.28);
   gap: 4px;
-  padding: 8px;
+  padding: var(--sp-2);
 }
 
  .cv-action-menu {
@@ -437,11 +438,12 @@
 }
 
 .cv-action-menu__item {
-  border: 1px solid transparent;
-  border-radius: 10px;
+  border: var(--bd);
+border-color: transparent;
+  border-radius: var(--r-sm);
   color: var(--cv-ink);
   min-height: 38px;
-  padding: 8px 10px;
+  padding: var(--sp-2);
   transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
 }
 
@@ -457,24 +459,27 @@
 .cv-action-menu--rich {
   gap: 5px;
   min-width: 276px;
-  padding: 10px;
+  padding: var(--sp-2);
 }
 
 .cv-action-menu__heading {
   align-items: center;
-  border-bottom: 1px solid var(--cv-border);
+  border-bottom: var(--bd);
   display: flex;
   gap: 10px;
-  margin: 0 2px 5px;
-  padding: 4px 5px 10px;
+  margin-block: 0 var(--sp-1);
+  margin-inline: var(--sp-1);
+  padding-block: var(--sp-1) var(--sp-2);
+  padding-inline: var(--sp-1);
 }
 
 .cv-action-menu__heading-icon,
 .cv-action-menu__item-icon {
   align-items: center;
   background: var(--cv-surface-block);
-  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
-  border-radius: 10px;
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-radius: var(--r-sm);
   color: var(--color-accent);
   display: inline-flex;
   flex: 0 0 34px;
@@ -508,15 +513,16 @@
   color: var(--cv-ink-muted);
   font-size: 0.68rem;
   line-height: 1.35;
-  margin-top: 2px;
+  margin-top: var(--sp-1);
 }
 
 .cv-action-menu__item--rich {
-  border: 1px solid transparent;
-  border-radius: 11px;
+  border: var(--bd);
+border-color: transparent;
+  border-radius: var(--r-sm);
   gap: 10px;
   min-height: 52px;
-  padding: 7px;
+  padding: var(--sp-2);
   text-decoration: none;
 }
 
@@ -583,24 +589,24 @@
 
 .delete-confirm-modal__dialog {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
-  border-radius: 24px;
+  border: var(--bd);
+  border-radius: var(--r-lg);
   box-shadow: var(--sh-lg);
   gap: 18px;
   max-width: min(100%, 560px);
   overflow: hidden;
-  padding: 24px;
+  padding: var(--sp-6);
 }
 
 .delete-confirm-modal__header {
   gap: 13px;
-  padding-right: 38px;
+  padding-right: var(--sp-7);
 }
 
 .delete-confirm-modal__icon {
   background: var(--cv-surface-block);
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  border-radius: 13px;
+  border-radius: var(--r-md);
   color: var(--cv-state-danger);
   flex-basis: 46px;
   height: 46px;
@@ -630,9 +636,9 @@
 }
 
 .delete-confirm-modal__actions {
-  border-top: 1px solid var(--cv-border);
+  border-top: var(--bd);
   gap: 7px;
-  padding-top: 16px;
+  padding-top: var(--sp-4);
 }
 
 /* Modal de documento assinado. */
@@ -648,8 +654,8 @@
 }
 
 .attach-signed-modal__dialog > .cv-dialog__header {
-  /* Header mantém o tom do diálogo; o restante do painel é --step1-surface. */
-  margin: -1px -1px 0;
+  margin-block: calc(var(--sp-1) * -1) 0;
+margin-inline: calc(var(--sp-1) * -1);
 }
 
 .attach-signed-modal__icon {
@@ -668,21 +674,23 @@
   align-items: flex-start;
   background: var(--cv-surface-block);
   border: 0;
-  border-radius: 15px;
+  border-radius: var(--r-md);
   color: var(--cv-ink-muted);
   display: flex;
   font-size: 0.84rem;
   gap: 10px;
   line-height: 1.55;
-  margin: 0 0 4px;
-  padding: 10px 12px;
+  margin-block: 0 var(--sp-1);
+  margin-inline: 0;
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
 }
 
 .attach-signed-modal__intro .cv-icon {
   color: var(--color-accent);
   flex: 0 0 18px;
   height: 18px;
-  margin-top: 2px;
+  margin-top: var(--sp-1);
   width: 18px;
 }
 
@@ -713,12 +721,12 @@
 
 .attach-signed-modal__kind-options {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
-  border-radius: 12px;
+  border: var(--bd);
+  border-radius: var(--r-md);
   display: grid;
   gap: 4px;
   grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
-  padding: 4px;
+  padding: var(--sp-1);
 }
 
 .attach-signed-modal__kind-option[hidden] {
@@ -728,14 +736,15 @@
 .attach-signed-modal__kind-option {
   background: transparent;
   border: 0;
-  border-radius: 9px;
+  border-radius: var(--r-sm);
   color: var(--cv-ink-muted);
   cursor: pointer;
   font: inherit;
   font-size: 0.78rem;
   font-weight: 720;
   min-height: 38px;
-  padding: 7px 12px;
+  padding-block: var(--sp-2);
+  padding-inline: var(--sp-3);
 }
 
 .attach-signed-modal__kind-option:hover,
@@ -774,11 +783,11 @@
 .attach-signed-modal__form .cv-file-widget {
   background: var(--cv-surface-block);
   border: 0;
-  border-radius: 15px;
+  border-radius: var(--r-md);
   box-shadow: none;
   display: grid;
   gap: 8px;
-  padding: 13px;
+  padding: var(--sp-3);
   transition: none;
 }
 
@@ -819,7 +828,7 @@
   align-self: start;
   background: var(--cv-surface-block);
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--r-md);
   color: var(--cv-ink);
   display: inline-flex;
   font-size: var(--fs-sm);
@@ -828,7 +837,8 @@
   grid-row: 1;
   justify-content: center;
   min-height: var(--h-md);
-  padding: 0 18px;
+  padding-block: 0;
+  padding-inline: var(--sp-4);
   width: fit-content;
 }
 
@@ -859,7 +869,7 @@
   background: var(--color-accent);
   background-image: none;
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--r-md);
   box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
   color: var(--on-accent);
   font-size: 0.8rem;
@@ -867,7 +877,8 @@
   grid-column: 2;
   grid-row: 1;
   min-height: 38px;
-  padding: 0 14px;
+  padding-block: 0;
+  padding-inline: var(--sp-3);
   text-shadow: none;
 }
 
@@ -883,7 +894,7 @@
 .attach-signed-modal__form .prestacao-file-picker__upload:disabled,
 .attach-signed-modal__form .cv-file-picker__upload:disabled {
   background: var(--cv-surface-block);
-  border: 1px solid var(--cv-border);
+  border: var(--bd);
   box-shadow: none;
   color: var(--cv-ink-muted);
   display: none;
@@ -911,17 +922,17 @@
 
 .attach-signed-modal__form .prestacao-file-selection,
 .attach-signed-modal__form .cv-file-selection {
-  margin-top: 2px;
+  margin-top: var(--sp-1);
 }
 
 .attach-signed-modal__form .prestacao-file-selection__item,
 .attach-signed-modal__form .cv-file-selection__item {
   background: var(--cv-surface-card);
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--r-md);
   box-shadow: none;
   min-height: 0;
-  padding: 8px 10px;
+  padding: var(--sp-2);
   transition: none;
 }
 
@@ -939,7 +950,8 @@
  #attach-signed-modal .cv-icon-btn.cv-icon-btn--preview,
 #attach-signed-modal .cv-icon-btn.cv-icon-btn--preview {
   background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
-  border: 1px solid color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
   box-shadow: var(--sh-sm);
   color: var(--cv-state-success);
 }
@@ -947,7 +959,8 @@
  #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
 #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete {
   background: var(--cv-surface-block);
-  border: 1px solid color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
   box-shadow: var(--sh-sm);
   color: var(--cv-state-danger);
 }
@@ -958,12 +971,13 @@
   background: var(--cv-surface-block);
   background-image: none;
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--r-md);
   box-shadow: none;
   color: var(--cv-ink);
   font-weight: var(--fw-bold);
   min-height: var(--h-md);
-  padding: 0 18px;
+  padding-block: 0;
+  padding-inline: var(--sp-4);
   transform: none;
 }
 
@@ -1059,12 +1073,13 @@
   background: var(--cv-surface-block) !important;
   background-color: var(--cv-surface-block) !important;
   border: 0 !important;
-  border-radius: 12px !important;
+  border-radius: var(--r-md) !important;
   color: var(--cv-ink) !important;
   font-size: var(--fs-sm) !important;
   font-weight: var(--fw-bold) !important;
   min-height: var(--h-md) !important;
-  padding: 0 18px !important;
+  padding-block: 0 !important;
+  padding-inline: var(--sp-4) !important;
   box-shadow: none !important;
   outline: none !important;
   transform: none !important;
@@ -1120,7 +1135,8 @@
 ) {
   background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface)) !important;
   background-color: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface)) !important;
-  border: 1px solid color-mix(in srgb, var(--cv-state-success) 40%, transparent) !important;
+  border: var(--bd) !important;
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent) !important;
   color: var(--cv-state-success) !important;
   box-shadow: var(--sh-sm) !important;
   outline: none !important;
@@ -1136,7 +1152,8 @@
 ) {
   background: var(--cv-surface-block) !important;
   background-color: var(--cv-surface-block) !important;
-  border: 1px solid color-mix(in srgb, var(--cv-state-danger) 40%, transparent) !important;
+  border: var(--bd) !important;
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent) !important;
   color: var(--cv-state-danger) !important;
   box-shadow: var(--sh-sm) !important;
   outline: none !important;
@@ -1200,8 +1217,8 @@
   }
 
   .delete-confirm-modal__dialog {
-    border-radius: 20px;
-    padding: 19px;
+    border-radius: var(--r-lg);
+    padding: var(--sp-5);
   }
 
   .attach-signed-modal__form .prestacao-file-picker {

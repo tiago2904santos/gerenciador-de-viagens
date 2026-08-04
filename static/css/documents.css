@@ -1,12 +1,12 @@
 .document-preview {
   background: var(--cv-surface-card);
-  border: 1px solid var(--cv-border);
-  border-radius: 16px;
+  border: var(--bd);
+  border-radius: var(--r-md);
   padding: var(--sp-6);
 }
 
 .document-card-body {
   color: var(--cv-ink-muted);
   font-size: var(--fs-sm);
-  margin-top: -2px;
+  margin-top: calc(var(--sp-1) * -1);
 }
