@@ -1,0 +1,62 @@
+/* =========================================================================
+   00-palette.css — as tres cores do sistema (NOVO-28)
+   =========================================================================
+
+   O sistema inteiro se pinta com tres superficies que se revezam, mais um
+   acento. Nada mais. Botoes cheios e estados semanticos (erro/sucesso/alerta)
+   sao as excecoes declaradas, e estao na allowlist de
+   core/tests/test_css_tokens.py.
+
+   COMO O RODIZIO FUNCIONA
+
+   Um componente nunca escolhe a propria cor: ele recebe `--cv-surface-next`
+   de quem o contem. O card de secao assume a cor 2 e oferece a 3; o bloco
+   assume a 3 e devolve a 2. Um campo dentro do bloco fica branco; o mesmo
+   campo dentro do card fica cinza. Ver .cv-form-section-card e .cv-form-block
+   em components/form-sections.css.
+
+   `--cv-surface` guarda a cor em que o elemento esta pousado. Como e herdada,
+   `color-mix(... , var(--cv-surface))` resolve sozinha no contexto certo — e
+   por isso a cor de fundo nao precisa ser repetida em lugar nenhum.
+
+   ORDEM DE CARGA (importa)
+
+   Entra depois de 03-theme-dark.css no bundle: o bloco escuro daquele arquivo
+   usa o mesmo seletor `html[data-theme="dark"]`, entao quem vem por ultimo
+   vence. Antes dele, o acento novo seria ignorado.
+
+   Este arquivo nao depende de nenhum outro: as sementes sao literais aqui e
+   so aqui. E o que permite o login e a assinatura publica — que nao carregam
+   o bundle global — puxarem so ele.
+
+   Valores medidos, nao escolhidos no olho. Texto sobre card 18,48 (claro) e
+   15,35 (escuro) em razao WCAG; card x bloco 6,2 e 5,4 em dE; tinta 11,1 e
+   18,0 em dE. Metodo e numeros no laboratorio de paleta.
+   ========================================================================= */
+
+:root {
+  /* As tres. */
+  --cv-surface-page:  #eceef1;   /* fundo do site */
+  --cv-surface-card:  #ffffff;   /* .cv-form-section-card */
+  --cv-surface-block: #eceef1;   /* .cv-form-block — no claro, igual ao fundo:
+                                    dentro do card branco vira um poco rebaixado */
+
+  /* O acento muda de matiz por tema: azul no claro, ouro no escuro. */
+  --color-accent: #155b9a;
+  --on-accent:    #ffffff;       /* texto sobre o acento cheio */
+  --accent-tint:  15%;           /* detalhe, hover de lista e foco */
+
+  /* Par corrente/seguinte. A raiz e o fundo do site; o primeiro filho que se
+     pinta usa a cor do card. */
+  --cv-surface:      var(--cv-surface-page);
+  --cv-surface-next: var(--cv-surface-card);
+}
+
+html[data-theme="dark"] {
+  --cv-surface-page:  #0d0f11;
+  --cv-surface-card:  #191c1f;
+  --cv-surface-block: #23272b;   /* no escuro os tres sao degraus distintos */
+
+  --color-accent: #d8a21b;
+  --on-accent:    #20180a;
+}

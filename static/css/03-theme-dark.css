@@ -245,10 +245,9 @@ html[data-theme="dark"] {
   --sidebar-focus-ring: rgba(131, 188, 232, 0.52);
   --sidebar-theme-active-bg: rgba(75, 143, 197, 0.23);
 
-  --app-body-bg:
-    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(21, 91, 154, 0.16), transparent 55%),
-    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(216, 162, 27, 0.06), transparent 60%),
-    linear-gradient(180deg, #0e1928 0%, #060d16 100%);
+  /* Chapado (NOVO-28). Eram dois radiais mais um linear; gradiente e, por
+     definicao, mais de uma cor, entao nao cabe na regra das tres. */
+  --app-body-bg: var(--cv-surface-page);
   --app-main-bg: transparent;
   --app-featured-bg: var(--color-surface);
   --app-hero-stage-start: #0d1725;

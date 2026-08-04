@@ -9,9 +9,9 @@
 
 /* Painel intermediário — mesmo tom --step1-panel dos formulários. */
 .cv-collection-panel {
-  --step1-panel: var(--color-surface-soft, var(--color-card-soft));
-  --step1-surface: var(--color-surface-muted, var(--color-card-muted, var(--color-input-bg)));
-  --step1-field: var(--step1-surface);
+  --step1-panel: var(--cv-surface-block);
+  --step1-surface: var(--cv-surface-card);
+  --step1-field: var(--cv-surface-next);
   background: var(--step1-panel);
   border: 0;
   border-radius: 14px;

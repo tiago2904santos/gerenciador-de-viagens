@@ -21,7 +21,6 @@ COLOR_LITERAL_ALLOWED = {
     "static/css/theme.css",
     "static/css/03-theme-dark.css",
     "static/css/components/theme-dark-components.css",  # transitório — dissolver nas fases seguintes
-    "static/css/auth.css",  # transitório — login fora do bundle global
     "static/css/shell.bundle.css",  # gerado (NOVO-12); literais vêm das fontes acima
 }
 
@@ -37,7 +36,10 @@ STRICT_COLOR_LITERAL_FILES = {
 }
 
 # Baseline medido em 30/07/2026 antes da fase 14; o gate falha se a dívida subir.
-COLOR_LITERAL_BASELINE = 660
+# 660 -> 620 no NOVO-28: a paleta de tres cores tokenizou o login e a
+# assinatura publica por inteiro (os dois sairam com ZERO literal). O numero
+# so desce (AGENTS.md, regra 5).
+COLOR_LITERAL_BASELINE = 620
 
 # Escala fechada R-01 — espelha o comentário em static/css/tokens.css (Breakpoints).
 ALLOWED_MEDIA_BREAKPOINTS = frozenset({

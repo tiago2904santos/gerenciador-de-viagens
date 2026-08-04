@@ -1,15 +1,15 @@
 .justificativas-page {
-  --step1-surface: var(--color-surface-muted, var(--color-card));
-  --step1-panel: var(--color-surface-soft, var(--color-card));
-  --step1-field: var(--step1-surface);
+  --step1-surface: var(--cv-surface-card);
+  --step1-panel: var(--cv-surface-block);
+  --step1-field: var(--cv-surface-next);
   display: grid;
   gap: var(--space-5);
 }
 
 :is(html[data-theme="dark"]) .justificativas-page {
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-panel: var(--color-surface-soft);
-  --step1-field: var(--step1-surface);
+  --step1-surface: var(--cv-surface-card);
+  --step1-panel: var(--cv-surface-block);
+  --step1-field: var(--cv-surface-next);
 }
 
 /* Lista (rail, botão e linhas) na superfície step1; band = cabeçalho dos ofícios. */
@@ -67,10 +67,10 @@
 
 /* Tokens do step1 sem a caixa travel-document-card. */
 [data-justificativa-quick-add] .justificativa-quick-add__scope {
-  --step1-surface: var(--color-surface-muted, var(--color-card));
-  --step1-panel: var(--color-surface-soft, var(--color-card));
-  --step1-field: var(--step1-surface);
-  --step1-empty: var(--step1-field);
+  --step1-surface: var(--cv-surface-card);
+  --step1-panel: var(--cv-surface-block);
+  --step1-field: var(--cv-surface-next);
+  --step1-empty: var(--cv-surface-next);
   display: grid;
   gap: 10px;
   /* document-form-page no escopo só para herdar regras de lista 1 coluna. */
@@ -81,10 +81,10 @@
 }
 
 :is(html[data-theme="dark"]) [data-justificativa-quick-add] .justificativa-quick-add__scope {
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-panel: var(--color-surface-soft);
-  --step1-field: var(--step1-surface);
-  --step1-empty: var(--step1-field);
+  --step1-surface: var(--cv-surface-card);
+  --step1-panel: var(--cv-surface-block);
+  --step1-field: var(--cv-surface-next);
+  --step1-empty: var(--cv-surface-next);
   --color-input-bg: var(--step1-field);
   --cv-field-bg: var(--step1-field);
 }

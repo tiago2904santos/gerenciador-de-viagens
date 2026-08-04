@@ -275,7 +275,7 @@ html[data-theme="dark"] .page-header-rail__subtitle {
 
 /* Fields, custom selects and pickers */
 html[data-theme="dark"] :is(input, select, textarea) {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border-color: var(--color-input-border);
   color: var(--color-input-text);
 }
@@ -284,7 +284,7 @@ html[data-theme="dark"] :is(input, select, textarea) {
    escuro, os controles passam a ter uma caixa sólida e claramente delimitada. */
 :is(html[data-theme="dark"])
   .main-form-panel :is(.form-control, .form-select, select.form-select) {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--color-input-border);
   box-shadow: none;
 }
@@ -323,7 +323,7 @@ html[data-theme="dark"] :is(input, select, textarea):disabled {
 }
 
 html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input, .cv-search-picker__control, .cv-date-picker__input, .cv-date-picker .cv-field__control) {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border-color: var(--color-input-border);
   color: var(--color-input-text);
 }
@@ -428,10 +428,10 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
    ======================================================================== */
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-step1] .travel-document-card, [data-travel-document-wizard-rt] .travel-document-card, [data-travel-document-wizard-diario] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card, [data-travel-document-wizard-roteiro] .oficio-roteiro-card, [data-travel-document-wizard-justificativa] .oficio-justificativa-card, [data-travel-document-wizard-documentos] .oficio-documentos-unified-card, [data-travel-document-wizard-documentos] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card) {
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-panel: var(--color-surface-soft);
-  --step1-field: var(--step1-surface);
-  --step1-empty: var(--step1-field);
+  --step1-surface: var(--cv-surface-card);
+  --step1-panel: var(--cv-surface-block);
+  --step1-field: var(--cv-surface-next);
+  --step1-empty: var(--cv-surface-next);
   --color-input-bg: var(--step1-field);
   --cv-field-bg: var(--step1-field);
   background: var(--step1-surface);
@@ -1880,7 +1880,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 
 :is(html[data-theme="dark"])
   .roteiro-editor--oficio .roteiro-editor__switch-row .cv-field-side-action--danger {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border-color: var(--color-border);
   box-shadow: none;
   color: var(--color-muted-strong);
@@ -1888,7 +1888,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 
 :is(html[data-theme="dark"])
   .roteiro-editor--oficio .roteiro-editor__switch-row .cv-field-side-action--danger:hover {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border-color: color-mix(in srgb, var(--color-border) 78%, var(--color-text) 22%);
   box-shadow: none;
 }
@@ -2512,7 +2512,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 
 :is(html[data-theme="dark"])
   .cv-resource-picker {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border: 1px dashed color-mix(in srgb, var(--color-border) 78%, var(--color-muted) 22%);
   border-radius: 12px;
   padding: 12px;
@@ -2522,7 +2522,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
    foco. O número e o ano formam um único controle composto. */
 :is(html[data-theme="dark"])
   .cv-form-card :is(.form-control, .cv-custom-select__trigger, textarea) {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--color-border);
   border-radius: 10px;
   box-shadow: none;
@@ -2551,7 +2551,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 :is(html[data-theme="dark"])
   .cv-composite-field__control {
   align-items: stretch;
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--color-border);
   border-radius: 10px;
   display: grid;
@@ -2767,7 +2767,7 @@ html[data-theme="dark"] .cv-composite-field__control .form-control:focus-visible
 
 :is(html[data-theme="dark"])
   .cv-search-picker--vehicle .cv-search-picker__control {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border-color: var(--color-input-border);
 }
 
@@ -2932,7 +2932,7 @@ html[data-theme="dark"] .cv-composite-field__control .form-control:focus-visible
 
 :is(html[data-theme="dark"])
   .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__control {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border-color: var(--color-input-border);
 }
 
@@ -2965,7 +2965,7 @@ html[data-theme="dark"] .cv-composite-field__control .form-control:focus-visible
 :is(html[data-theme="dark"])
   .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-card:hover {
   align-items: center;
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border: 0;
   border-radius: 12px;
   box-shadow: none;
@@ -4104,7 +4104,7 @@ html[data-theme="dark"] .empty-state__title {
 
 :is(html[data-theme="dark"])
   :is(.cv-file-picker, .prestacao-file-picker, .prestacao-file-widget__current, .prestacao-file-list, .cv-file-selection__menu, .prestacao-file-selection__menu) {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border-color: var(--color-input-border);
   color: var(--color-text);
 }
@@ -4333,7 +4333,7 @@ html[data-theme="dark"] .empty-state__title {
   .cv-search-picker__option-visual {
   align-items: center;
   align-self: center;
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--color-border);
   border-radius: 10px;
   color: var(--color-accent-text);
@@ -4417,7 +4417,7 @@ html[data-theme="dark"] .empty-state__title {
   .cv-search-picker__selected-card,
 :is(html[data-theme="dark"])
   .cv-search-picker__selected-card:hover {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border-color: transparent;
   box-shadow: none;
   transform: none;
@@ -4531,7 +4531,7 @@ html[data-theme="dark"] .empty-state__title {
 
 :is(html[data-theme="dark"])
   .oficio-external-driver .cv-search-picker__control {
-  background: var(--color-input-bg) !important;
+  background: var(--cv-surface-next) !important;
   border: 1px solid var(--color-border) !important;
   border-radius: 10px;
   box-shadow: none !important;
@@ -4626,7 +4626,7 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .cv-summary-card .pt-resumo-box {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--color-border-soft);
   border-radius: 11px;
   box-shadow: none;
@@ -4657,7 +4657,7 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .cv-summary-card .oficio-documentos-fact {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border-color: var(--color-border-soft);
   border-radius: 11px;
   box-shadow: none;
@@ -4842,7 +4842,7 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .cv-signature-card__link {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--color-border-strong);
   border-radius: 10px;
   color: var(--color-text);
@@ -5238,7 +5238,7 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .cv-filter-bar__search {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--color-input-border);
   border-radius: var(--radius-control);
 }
@@ -5272,9 +5272,9 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .cv-collection-panel {
-  --step1-panel: var(--color-surface-soft);
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-field: var(--step1-surface);
+  --step1-panel: var(--cv-surface-block);
+  --step1-surface: var(--cv-surface-card);
+  --step1-field: var(--cv-surface-next);
   background: var(--step1-panel);
   border: 0;
   box-shadow: none;
@@ -5496,7 +5496,7 @@ html[data-theme="dark"] *::after {
 :is(html[data-theme="dark"])
   .cv-custom-select__trigger--v2 {
   align-items: stretch;
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--color-input-border);
   border-radius: 10px;
   box-shadow: none;
@@ -5588,7 +5588,7 @@ html[data-theme="dark"] *::after {
   .cv-custom-select__menu--v2 {
   --cv-cs-menu-bg: var(--color-input-bg);
   animation: none;
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--color-border-strong);
   border-radius: 12px;
   box-shadow: 0 12px 28px rgb(2 10 18 / 0.28);
@@ -5601,7 +5601,7 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .cv-custom-select__menu--v2.cv-floating-dropdown--active {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--color-border-strong);
   border-radius: 12px;
   overflow-x: hidden;
@@ -5731,7 +5731,7 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .cv-custom-select--v2.cv-custom-select--error .cv-custom-select__trigger--v2 {
-  background: var(--color-input-bg);
+  background: var(--cv-surface-next);
   border-color: var(--color-danger);
   box-shadow: none;
 }

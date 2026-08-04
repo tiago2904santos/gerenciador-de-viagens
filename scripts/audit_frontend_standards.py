@@ -50,10 +50,6 @@ CSS_EXCEPTIONS: dict[str, dict] = {
         "reason": "Transitional dark-theme component overrides; literals allowed until dissolved into components.",
         "rules": {"hex_color_outside_tokens"},
     },
-    "static/css/auth.css": {
-        "reason": "CSS de autenticação — isolado, pode ter cores específicas.",
-        "rules": {"hex_color_outside_tokens"},
-    },
     "static/css/dashboard.css": {
         "reason": "Dashboard e excecao oficial -- hex restantes sao fallbacks de var() no botao do hero.",
         "rules": {"hex_color_outside_tokens"},

@@ -731,6 +731,44 @@ A separação importa: só as quatro primeiras mudavam o comportamento do sistem
 > linha de novo. Custo constante, não escala com dados — por isso ficou fora deste
 > PR, mas é a explicação dos +7/+4 nos orçamentos de query.
 
+### Paleta de tres cores (04/08/2026) — `NOVO-28`
+
+Decisao de produto tomada num laboratorio de paleta interativo, com as cores medidas
+antes de escolhidas. O sistema passa a se pintar com **tres superficies que se revezam**
+mais um acento; botoes cheios e estados semanticos sao as unicas excecoes, e estao
+declaradas no gate.
+
+| | claro | escuro |
+|---|---|---|
+| fundo do site | `#eceef1` | `#0d0f11` |
+| `cv-form-section-card` | `#ffffff` | `#191c1f` |
+| `cv-form-block` | `#eceef1` (= fundo) | `#23272b` |
+| acento | `#155b9a` | `#d8a21b` |
+
+A regra: **um componente nunca escolhe a propria cor** — recebe `--cv-surface-next` de
+quem o contem. Campo dentro de bloco fica com a cor do card; o mesmo campo dentro do card
+fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a 15% sobre
+`--cv-surface`, que e herdada — a cor de fundo nao se repete em declaracao nenhuma.
+
+- [x] **PR A** — camada de sementes (`static/css/00-palette.css`), rodizio nos dois
+  ancoras, reaponte de 22 tokens de superficie do shell, 48 do `--step1-*` e 35 fundos de
+  controle, fim das bordas de foco, login e assinatura publica. Catraca de literais
+  **660 -> 620**; `auth.css` deixou de ser excecao nos dois auditores (zero literal).
+- [ ] **PR B** — dissolver `components/theme-dark-components.css` (5.843 linhas, 665
+  regras com `:is(...)`/`[data-*]`). **E o que impede o tema escuro de obedecer a paleta:**
+  medido com `scripts/medir_paleta.py`, o claro ficou com o nucleo na paleta e o escuro
+  com 18 cores fora so no Dashboard.
+- [ ] **PR C** — as 318 regras de `hover`/`focus` que ainda mexem em borda.
+- [ ] **PR D** — os ~620 literais restantes fora dos arquivos de token.
+
+> **Duas licoes do PR A.** A primeira: `--cv-surface-next` **nao pode** ser intermediado por
+> um token declarado no `:root`. Propriedade customizada e substituida no elemento onde e
+> declarada, entao `--color-input-bg: var(--cv-surface-next)` no `:root` congelaria o valor
+> da raiz e o rodizio morreria em silencio — os 35 fundos de controle foram trocados no
+> **ponto de uso**. A segunda: a ordem de carga importa e nao aparece no tema claro. A
+> paleta precisa vir **depois** de `03-theme-dark.css`, porque os dois declaram no mesmo
+> seletor `html[data-theme="dark"]`; antes dele, o acento novo e ignorado so no escuro.
+
 ---
 
 ## 7.1 Escopo novo, fora das oito etapas

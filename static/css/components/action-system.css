@@ -748,8 +748,8 @@ html[data-theme="dark"] .cv-action-menu {
 /* Modal de documento assinado. */
 .attach-signed-modal__dialog.delete-confirm-modal__dialog,
 .attach-signed-modal__dialog {
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-panel: var(--color-surface-soft);
+  --step1-surface: var(--cv-surface-card);
+  --step1-panel: var(--cv-surface-block);
   background: var(--step1-surface);
   gap: 0;
   max-width: min(100%, 610px);

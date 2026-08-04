@@ -38,15 +38,15 @@
 }
 
 :root {
-  --asgn-bg: var(--color-bg);
-  --asgn-card: var(--color-surface);
+  --asgn-bg: var(--cv-surface-page);
+  --asgn-card: var(--cv-surface-card);
   --asgn-ink: var(--color-heading);
   --asgn-muted: var(--color-muted);
   --asgn-line: var(--color-border);
-  --asgn-primary: var(--color-primary-bright, var(--color-primary));
-  --asgn-primary-ink: var(--color-on-primary, #ffffff);
-  --asgn-danger: var(--color-danger, #c0392b);
-  --asgn-ok: var(--color-success, #1e9e62);
+  --asgn-primary: var(--color-accent);
+  --asgn-primary-ink: var(--on-accent);
+  --asgn-danger: var(--color-danger);
+  --asgn-ok: var(--color-success);
 }
 
 * { box-sizing: border-box; }
@@ -72,7 +72,7 @@ body.asgn {
   gap: 0.6rem;
   padding: 0.9rem 1.1rem;
   background: var(--asgn-ink);
-  color: #fff;
+  color: var(--on-accent);
 }
 .asgn-top__mark {
   display: inline-grid;
@@ -106,7 +106,7 @@ body.asgn {
   border: 1px solid var(--asgn-line);
   border-radius: 1rem;
   padding: 1.25rem;
-  box-shadow: 0 12px 30px rgba(11, 31, 51, 0.06);
+  box-shadow: var(--shadow-sm);
 }
 .asgn-card--wide { padding: 1rem; }
 .asgn-card--center { text-align: center; }
@@ -145,7 +145,7 @@ body.asgn {
   line-height: 1;
 }
 .asgn-btn--primary { background: var(--asgn-primary); color: var(--asgn-primary-ink); }
-.asgn-btn--primary:disabled { background: #9bb8e6; cursor: not-allowed; }
+.asgn-btn--primary:disabled { background: color-mix(in srgb, var(--color-accent) 40%, var(--cv-surface-card)); cursor: not-allowed; }
 .asgn-btn--ghost { background: var(--asgn-card); color: var(--asgn-ink); border-color: var(--asgn-line); }
 .asgn-btn--block { width: 100%; margin-top: 0.8rem; }
 .asgn-btn--sm { padding: 0.5rem 0.8rem; font-size: 0.85rem; }
@@ -232,7 +232,7 @@ body.asgn {
 
 /* Viewer / stage / drag box */
 .asgn-viewer {
-  background: #44546a;
+  background: var(--cv-surface-block);
   border-radius: 0.7rem;
   padding: 0.6rem;
   overflow: auto;
@@ -242,13 +242,13 @@ body.asgn {
 .asgn-stage { position: relative; }
 .asgn-stage canvas {
   display: block;
-  background: #fff;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  background: var(--on-accent);
+  box-shadow: var(--shadow-md);
 }
 .asgn-drag {
   position: absolute;
   border: 1.5px dashed var(--asgn-primary);
-  background: rgba(31, 111, 235, 0.06);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface-card));
   touch-action: none;
   cursor: move;
 }
@@ -261,7 +261,7 @@ body.asgn {
   height: 18px;
   border-radius: 50%;
   background: var(--asgn-primary);
-  border: 2px solid #fff;
+  border: 2px solid var(--on-accent);
   cursor: nwse-resize;
   touch-action: none;
 }
@@ -269,7 +269,7 @@ body.asgn {
 
 /* Bottom-sheet do builder */
 .asgn-sheet { position: fixed; inset: 0; z-index: 50; }
-.asgn-sheet__backdrop { position: absolute; inset: 0; background: rgba(11, 31, 51, 0.45); }
+.asgn-sheet__backdrop { position: absolute; inset: 0; background: color-mix(in srgb, var(--cv-surface-page) 70%, transparent); }
 .asgn-sheet__panel {
   position: absolute;
   left: 0;
@@ -292,7 +292,7 @@ body.asgn {
   cursor: pointer;
   color: var(--asgn-muted);
 }
-.asgn-tab.is-active { background: var(--asgn-primary); color: #fff; border-color: var(--asgn-primary); }
+.asgn-tab.is-active { background: var(--asgn-primary); color: var(--on-accent); border-color: var(--asgn-primary); }
 
 .asgn-tabpane { display: grid; gap: 0.8rem; }
 .asgn-fontlist { display: grid; gap: 0.6rem; }
@@ -317,13 +317,13 @@ body.asgn {
 .asgn-fontchip--simples { font-family: "Sacramento", cursive; }
 .asgn-fontchip--natural { font-family: "Allura", cursive; }
 .asgn-fontchip--luxuosa { font-family: "Herr Von Muellerhoff", cursive; }
-.asgn-fontchip.is-selected { border-color: var(--asgn-primary); box-shadow: 0 0 0 2px rgba(31, 111, 235, 0.2); }
+.asgn-fontchip.is-selected { border-color: var(--asgn-primary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 20%, transparent); }
 
 .asgn-drawwrap {
   border: 1px dashed var(--asgn-line);
   border-radius: 0.7rem;
   background:
-    repeating-linear-gradient(0deg, #fff, #fff 23px, #eef2f7 24px);
+    repeating-linear-gradient(0deg, var(--on-accent), var(--on-accent) 23px, var(--cv-surface-page) 24px);
 }
 .asgn-draw { display: block; width: 100%; height: 180px; touch-action: none; }
 
@@ -340,10 +340,10 @@ body.asgn {
   border-radius: 50%;
   font-size: 1.8rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--on-accent);
 }
 .asgn-success { background: var(--asgn-ok); }
-.asgn-warn { background: #e0a800; }
+.asgn-warn { background: var(--color-warning); }
 
 .asgn-sign-head {
   display: flex;

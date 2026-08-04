@@ -349,7 +349,7 @@ html[data-theme="dark"] .ui-lab-page {
 
 .cv-field__control {
   appearance: none;
-  background: var(--cv-field-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--cv-field-border);
   border-radius: var(--cv-field-radius);
   box-shadow: var(--cv-field-shadow);
@@ -761,7 +761,7 @@ html[data-theme="dark"] .ui-lab-page {
 }
 
 .cv-multiselect__control {
-  background: var(--cv-field-bg);
+  background: var(--cv-surface-next);
   border: 1px solid var(--cv-field-border);
   border-radius: var(--cv-field-radius);
   box-shadow: var(--cv-field-shadow);
