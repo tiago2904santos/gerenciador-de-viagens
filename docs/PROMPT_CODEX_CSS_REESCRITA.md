@@ -8,20 +8,21 @@ por vez**; só abra a seguinte com a anterior mergeada. Convenção de branch:
 
 Cole estes números no prompt: sem alvo numérico o Codex escolhe o próprio escopo.
 
-| | hoje | alvo |
-|---|---:|---:|
-| arquivos CSS | 65 | ≤ 25 |
-| linhas de CSS | 42.496 | ≤ 13.000 |
-| tokens `--*` | **1.010** | **≤ 60** |
-| `data-theme` fora dos arquivos de token | **1.106** | **0** |
-| `!important` | 497 | ≤ 20 |
-| literais de cor fora dos tokens | 620 | 0 |
-| `border-radius` distintos | 99 | 6 |
-| `padding` distintos | 247 | 8 |
-| `margin` distintos | 53 | 8 |
-| `border` distintos | 321 | 3 |
-| `box-shadow` distintos | 184 | 4 |
-| exceções de arquivo no auditor | 8 | 0 |
+| | 04/08 (base) | depois da 3a | alvo |
+|---|---:|---:|---:|
+| arquivos CSS | 65 | 62 | ≤ 25 |
+| linhas de CSS | 42.496 | 40.375 | ≤ 13.000 |
+| tokens `--*` | **1.010** (medido depois: 1.034) | **57** | **≤ 60** |
+| `data-theme` fora dos arquivos de token | **1.106** | 0 | **0** |
+| `!important` | 497 | — | ≤ 20 |
+| literais de cor fora dos tokens | 620 | — | 0 |
+| `border-radius` distintos | 99 | 53 | 6 |
+| `padding` distintos | 247 | 214 | 8 |
+| `margin` distintos | 53 | 50 | 8 |
+| `border` distintos | 321 | 58 | 3 |
+| `box-shadow` distintos | 184 (medido: 202) | 136 | 4 |
+| exceções de arquivo no auditor | 8 (medido: 3) | 2 | 0 |
+| avisos do `audit_frontend_standards` | 384 | 212 | 0 |
 
 ---
 
@@ -134,6 +135,27 @@ Ao fim desta fase, `components/theme-dark-components.css` **não existe mais**.
 ---
 
 ## Fase 3 — geometria padronizada e fim dos aliases
+
+> **Corrigido em 04/08/2026 (`NOVO-31`).** A linha de base desta fase estava errada: o
+> enunciado supunha "27 tokens canônicos + aliases", e o arquivo tinha **1.034 nomes em
+> 2.078 declarações**, 88 blocos de regra de componente e linhas de 11.959 caracteres. O
+> gate da fase 1 media token **fora** da camada e nunca dentro. Medido de novo, a fase 3
+> tinha 8.287 referências `var()` e 3.622 declarações de geometria — não cabia num PR, e
+> saiu em três: **3a** (camada de token, feita), **3b** (raio/espaço/borda), **3c**
+> (sombra e foco).
+>
+> Duas correções ao método, que valem para as fases seguintes:
+>
+> 1. **O gate abaixo mede só a forma curta.** `padding-inline`, `border-color` e
+>    `border-start-start-radius` passam por baixo dele — dá para "zerar" o contador
+>    empurrando o valor para a forma longa. O gate entregue mede as duas, e mede também
+>    a *família* do token: `padding: var(--sh-lg)` é sintaticamente válido, o navegador
+>    descarta a declaração e o card fica sem respiro, sem quebrar teste nenhum. Foi
+>    exatamente o que aconteceu ao consolidar um token que guardava `12px 16px 12px 32px`.
+> 2. **Escala fechada tem piso e teto.** Abaixo de 4px é espessura de traço (1px de borda
+>    virava 4px — quatro vezes mais grossa) e acima de 48px é medida de layout
+>    (`max-width: 960px` virava 48px). Nos dois extremos o valor fica literal; a escada
+>    não se estica para cobri-los.
 
 **TAREFA:** trocar todo valor solto pelas escalas da fase 1 e apagar os aliases temporários.
 

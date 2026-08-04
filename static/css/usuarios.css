@@ -2,7 +2,7 @@
 
 .usuarios-page {
   display: grid;
-  gap: var(--space-5);
+  gap: var(--sp-5);
 }
 
  .usuarios-page {
@@ -14,17 +14,17 @@
  .usuarios-page .list-header,
  .usuarios-page .list-header__rail,
  .usuarios-page .list-header .cv-inline-create__toggle:not(.is-filled):not(.usuario-quick-add__toggle--ready):not(.area-quick-add__toggle--ready) {
-  background: var(--step1-surface);
+  background: var(--cv-surface-card);
 }
 
 .usuarios-page .list-header__band,
  .usuarios-page .list-header__band {
-  background: var(--color-surface-muted);
+  background: var(--cv-surface-block);
 }
 
 .usuarios-page .cv-record-row,
  .usuarios-page .cv-record-row {
-  background: var(--step1-field, var(--step1-surface));
+  background: var(--cv-surface-next);
   border: 0;
   box-shadow: none;
 }
@@ -33,7 +33,7 @@
 .usuarios-page .cv-record-row:focus-within,
  .usuarios-page .cv-record-row:hover,
  .usuarios-page .cv-record-row:focus-within {
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field, var(--step1-surface)));
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-next));
   border: 0;
   box-shadow: none;
 }
@@ -81,8 +81,8 @@
   background-image: none;
   border: 0;
   box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
-  color: var(--color-on-accent, #19232d);
-  font-weight: var(--font-weight-bold);
+  color: var(--on-accent);
+  font-weight: var(--fw-bold);
 }
 
 .usuarios-page .list-header .cv-inline-create__toggle.is-filled:hover,
@@ -97,11 +97,11 @@
  .usuarios-page .list-header .cv-inline-create__toggle.is-filled:focus-visible,
  .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready:focus-visible,
  .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready:focus-visible {
-  background: var(--color-accent-hover, var(--color-accent));
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
   background-image: none;
   border: 0;
   box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
-  color: var(--color-on-accent, #19232d);
+  color: var(--on-accent);
 }
 
 .usuarios-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
@@ -110,7 +110,7 @@
  .usuarios-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
  .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready .cv-inline-create__toggle-icon,
  .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready .cv-inline-create__toggle-icon {
-  background: color-mix(in srgb, var(--color-on-accent, #19232d) 14%, transparent);
+  background: color-mix(in srgb, var(--on-accent) 14%, transparent);
   color: inherit;
 }
 
@@ -123,8 +123,8 @@
 }
 
 .usuarios-page .list-header__rail--inline-create {
-  gap: var(--space-3);
-  padding: var(--space-3) clamp(var(--space-4), 2vw, var(--space-5));
+  gap: var(--sp-3);
+  padding: var(--sp-3) clamp(var(--sp-4), 2vw, var(--sp-5));
 }
 
 .usuarios-page .list-header .cv-inline-create__panel.is-open,
@@ -136,7 +136,7 @@
 .usuario-quick-add,
 .area-quick-add {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--sp-3);
 }
 
 [data-usuario-quick-add] .usuario-quick-add__scope,
@@ -155,7 +155,7 @@
 
 [data-usuario-quick-add] .travel-document-block,
 [data-area-quick-add] .travel-document-block {
-  background: var(--step1-panel);
+  background: var(--cv-surface-block);
   border: 0;
   border-radius: 14px;
   margin: 0;
@@ -175,7 +175,7 @@
 /* Modal Vincular usuário — mesmo contrato visual do anexar assinado. */
 .vincular-usuario-modal__dialog.delete-confirm-modal__dialog,
 .vincular-usuario-modal__dialog {
-  background: var(--step1-surface);
+  background: var(--cv-surface-card);
   gap: 0;
   max-width: min(100%, 520px);
   overflow: hidden;
@@ -183,7 +183,7 @@
 }
 
  #vincular-usuario-modal .vincular-usuario-modal__dialog {
-  background: var(--step1-surface) !important;
+  background: var(--cv-surface-card) !important;
 }
 
 .vincular-usuario-modal__dialog > .cv-dialog__header {
@@ -212,10 +212,10 @@
 
 .vincular-usuario-modal__intro {
   align-items: flex-start;
-  background: var(--step1-panel, var(--color-surface-soft));
+  background: var(--cv-surface-block);
   border: 0;
   border-radius: 15px;
-  color: var(--action-muted, var(--theme-text-muted));
+  color: var(--cv-ink-muted);
   display: flex;
   font-size: 0.84rem;
   gap: 10px;
@@ -225,7 +225,7 @@
 }
 
 .vincular-usuario-modal__intro .cv-icon {
-  color: var(--action-info-text, var(--color-info));
+  color: var(--color-accent);
   flex: 0 0 18px;
   height: 18px;
   margin-top: 2px;
@@ -233,13 +233,13 @@
 }
 
 .vincular-usuario-modal__intro strong {
-  color: var(--action-text-strong, var(--theme-text-heading));
+  color: var(--cv-ink);
 }
 
  .vincular-usuario-modal__fields.cv-form-stack,
 .vincular-usuario-modal__fields.cv-form-stack,
 .vincular-usuario-modal__fields {
-  background: var(--step1-panel, var(--color-surface-soft));
+  background: var(--cv-surface-block);
   border-radius: 15px;
   display: grid;
   gap: 18px;
@@ -273,7 +273,7 @@
   .cv-custom-select__trigger,
   .cv-custom-select__trigger--v2
 ) {
-  background: var(--step1-field, var(--color-input-bg)) !important;
+  background: var(--cv-surface-next) !important;
   border: 0 !important;
   border-radius: 10px !important;
   box-shadow: none !important;
@@ -284,7 +284,7 @@
 }
 
 .vincular-usuario-modal__fields .cv-search-picker__control {
-  min-height: var(--control-height-md, 44px);
+  min-height: var(--h-md);
   padding-inline: 12px;
 }
 
@@ -313,7 +313,7 @@
   background: transparent;
   border: 0;
   box-shadow: none;
-  gap: var(--space-3);
+  gap: var(--sp-3);
   justify-content: space-between;
   min-height: 0;
   padding: 12px 22px 16px;
@@ -324,12 +324,12 @@
 #vincular-usuario-modal .cv-card-footer__primary .cv-btn {
   align-self: center;
   box-sizing: border-box;
-  height: var(--control-height-md, 44px);
-  min-height: var(--control-height-md, 44px);
+  height: var(--h-md);
+  min-height: var(--h-md);
 }
 
 .vincular-usuario-modal__footer .cv-card-footer-section__divider {
-  border-top: 1px solid var(--color-border-soft, var(--action-group-border, var(--color-border)));
+  border-top: 1px solid var(--cv-border);
   display: block;
 }
 
@@ -344,7 +344,7 @@
  * bloco.
  */
 .usuarios-area-form .cv-record-list {
-  gap: var(--space-2);
+  gap: var(--sp-2);
 }
 
 /*
@@ -381,7 +381,7 @@
  */
 .usuarios-area-form .empty-state,
  .usuarios-area-form .empty-state {
-  background: var(--step1-field, var(--color-input-bg));
+  background: var(--cv-surface-next);
   border: 0;
   box-shadow: none;
 }

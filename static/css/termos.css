@@ -1,7 +1,7 @@
 /* Cadastro de termos — shell alinhado ao wizard de ofícios */
 
 .document-form-page .travel-document-wizard__main {
-  gap: var(--space-5);
+  gap: var(--sp-5);
 }
 
 .document-form .cv-form-section-card,
@@ -79,7 +79,7 @@
 }
 
 .termo-evento-periodo {
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--sp-4);
 }
 
 /* Dentro do stack: o gap já separa as seções — evita margem/padding extras. */
@@ -94,12 +94,12 @@
 
 /* Compat: formulários antigos / preview cadastro */
 .termos-page .main-form-panel {
-  gap: var(--space-5);
+  gap: var(--sp-5);
 }
 
 .termo-card__body {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--sp-4);
 }
 
 /* ── Card da lista: no maximo 2 colunas ──

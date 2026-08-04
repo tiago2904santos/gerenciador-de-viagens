@@ -42,14 +42,14 @@
    no espaço útil (viewport menos a sidebar) em vez da viewport inteira. */
 @media (min-width: 841px) {
   .cv-dialog__panel {
-    left: calc(50% + var(--sidebar-width, 0px) / 2);
+    left: calc(50% + 15% / 2);
   }
 }
 
 .cv-dialog__header {
   align-items: center;
   display: grid;
-  gap: var(--space-3);
+  gap: var(--sp-3);
   grid-template-columns: auto minmax(0, 1fr) auto;
   min-width: 0;
 }
@@ -80,62 +80,62 @@
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
+  gap: var(--sp-3);
   justify-content: flex-end;
 }
 
 /* Variantes semanticas globais. Os seletores incluem o modificador do dialogo
    para que o tom continue visivel sobre a aparencia-base do tema escuro. */
  .cv-dialog--danger .cv-dialog__panel {
-  border-color: var(--color-danger-border-strong);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
 }
 
  .cv-dialog--danger .cv-dialog__header {
-  background: var(--color-danger-soft);
-  border-bottom-color: var(--color-danger-border-soft);
+  background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
+  border-bottom-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
 }
 
  .cv-dialog--danger :is(.cv-dialog__icon, .cv-dialog__eyebrow) {
-  color: var(--color-danger);
+  color: var(--cv-state-danger);
 }
 
  .cv-dialog--warning .cv-dialog__panel {
-  border-color: var(--color-accent-border-strong);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
  .cv-dialog--warning .cv-dialog__header {
-  background: var(--color-warning-soft);
-  border-bottom-color: var(--color-accent-border-soft);
+  background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
+  border-bottom-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
  .cv-dialog--warning :is(.cv-dialog__icon, .cv-dialog__eyebrow) {
-  color: var(--color-warning);
+  color: var(--cv-state-warning);
 }
 
  .cv-dialog--success .cv-dialog__panel {
-  border-color: var(--color-success-border-soft);
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
 }
 
  .cv-dialog--success .cv-dialog__header {
-  background: var(--color-success-soft);
-  border-bottom-color: var(--color-success-border-soft);
+  background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
+  border-bottom-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
 }
 
  .cv-dialog--success :is(.cv-dialog__icon, .cv-dialog__eyebrow) {
-  color: var(--color-success);
+  color: var(--cv-state-success);
 }
 
  .cv-dialog--document .cv-dialog__panel {
-  border-color: var(--color-info-border-strong);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
  .cv-dialog--document .cv-dialog__header {
-  background: var(--color-info-soft);
-  border-bottom-color: var(--color-info-border);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-bottom-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
  .cv-dialog--document :is(.cv-dialog__icon, .cv-dialog__eyebrow) {
-  color: var(--color-info);
+  color: var(--color-accent);
 }
 
 @media (max-width: 600px) {

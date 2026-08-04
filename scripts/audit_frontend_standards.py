@@ -26,9 +26,11 @@ TEMPLATE_EXCEPTIONS: dict[str, dict] = {
 }
 
 CSS_EXCEPTIONS: dict[str, dict] = {
+    # NOVO-30 fase 3a: `--route-*` e os hex deste arquivo morreram com os
+    # aliases; so o seletor de dominio continua pendente (fase 4).
     "static/css/forms.css": {
-        "reason": ".roteiro-editor__* permanece como dominio em CSS global; --route-* sao variaveis globais de tema.",
-        "rules": {"domain_selector_in_global", "route_token_in_global", "hex_color_outside_tokens"},
+        "reason": ".roteiro-editor__* permanece como dominio em CSS global (pendente da fase 4).",
+        "rules": {"domain_selector_in_global"},
     },
     "static/css/cards.css": {
         "reason": ".oficio-card em cards.css: domínio a mover para oficios.css (Prompt 5).",
@@ -36,10 +38,6 @@ CSS_EXCEPTIONS: dict[str, dict] = {
     },
     "static/css/01-tokens.css": {
         "reason": "Camada unica de tokens e temas (NOVO-30).",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/dashboard.css": {
-        "reason": "Dashboard e excecao oficial -- hex restantes sao fallbacks de var() no botao do hero.",
         "rules": {"hex_color_outside_tokens"},
     },
     "static/css/shell.bundle.css": {

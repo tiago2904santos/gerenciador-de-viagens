@@ -67,25 +67,27 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertEqual(offenders, [], f"tema dentro de componente: {offenders}")
 
     def test_semantic_dark_contract_covers_core_component_needs(self):
-        required_tokens = (
-            "--color-bg:",
-            "--color-surface:",
-            "--color-surface-elevated:",
-            "--color-text:",
-            "--color-text-muted:",
-            "--color-border:",
-            "--color-focus:",
-            "--color-success:",
-            "--color-info:",
-            "--color-warning:",
-            "--color-danger:",
-            "--color-input-bg:",
-            "--sidebar-width:",
-        )
+        """A camada cobre os eixos de que um componente precisa — vocabulario novo.
 
+        NOVO-30 fase 3a: os `--color-*` eram alias e sairam. A afirmacao que
+        importa nao mudou: existe UM nome por eixo (tinta, traco, foco, estado,
+        elevacao, raio, espaco, tipografia, altura, movimento, camada) e o tema
+        escuro redeclara SO cor.
+        """
+        required_tokens = (
+            "--cv-ink:", "--cv-ink-muted:", "--cv-border:", "--focus-ring:",
+            "--cv-state-success:", "--cv-state-warning:", "--cv-state-danger:",
+            "--sh-sm:", "--r-md:", "--sp-4:", "--fs-sm:", "--h-md:",
+            "--tr-base:", "--z-modal:",
+        )
         for token in required_tokens:
             with self.subTest(token=token):
                 self.assertIn(token, self.tokens_css)
+
+        escuro = self.tokens_css.split('html[data-theme="dark"] {', 1)[1].split("}", 1)[0]
+        for proibido in ("--r-", "--sp-", "--fs-", "--h-", "--z-", "--tr-"):
+            with self.subTest(proibido=proibido):
+                self.assertNotIn(proibido, escuro, "tema redeclarando geometria")
 
     def test_reduced_motion_and_mobile_shell_are_explicit(self):
         self.assertIn("@media (prefers-reduced-motion: reduce)", self.components_css)
@@ -717,24 +719,26 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("@media (prefers-reduced-motion: reduce)", auth_css)
 
     def test_dark_primary_actions_stay_in_the_primary_blue_family(self):
-        for token in (
-            "--action-primary-bg:",
-            "--cv-btn-primary-bg:",
-            "--route-button-primary-bg:",
-        ):
-            with self.subTest(token=token):
-                declarations = [
-                    line.strip()
-                    for line in self.tokens_css.splitlines()
-                    if line.strip().startswith(token)
-                ]
-                self.assertTrue(
-                    any("var(--color-primary" in item for item in declarations),
-                    f"{token} sem alias para a familia primaria",
-                )
-                self.assertTrue(
-                    all("var(--color-accent" not in item for item in declarations)
-                )
+        """Acao cheia pinta com o acento e escreve com o par do acento.
+
+        A premissa antiga morreu no NOVO-28: nao ha mais uma "familia primaria"
+        separada do acento — o acento E a familia (azul no claro, ouro no
+        escuro). O que sobrou de verdadeiro, e vale travar, e o par: fundo
+        `--color-accent`, texto `--on-accent`. Trocar o segundo pelo primeiro
+        apaga a letra do botao.
+        """
+        import re as _re
+
+        css = self.css + self.components_css
+        for regra in _re.finditer(r"([^{}]*primary[^{}]*)\{([^{}]*)\}", css):
+            corpo = regra.group(2)
+            if not _re.search(r"(?:^|;)\s*background(?:-color)?:\s*var\(--color-accent\)\s*;", corpo):
+                continue
+            cor = _re.search(r"(?:^|;)\s*color:\s*([^;]+);", corpo)
+            if cor is None:
+                continue
+            with self.subTest(seletor=regra.group(1).strip()[:60]):
+                self.assertIn("--on-accent", cor.group(1), "acento cheio sem o par de tinta")
 
     def test_dark_wizard_filete_stays_gold_and_tracks_header_content(self):
         page_shell = (
@@ -746,14 +750,13 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("top:           var(--_wizard-filete-inset-block);", page_shell)
         self.assertIn("height:        auto;", page_shell)
         self.assertIn(
-            "padding: var(--space-3) var(--space-4) var(--space-3) var(--space-8);",
+            "padding:          var(--sp-4) var(--sp-6) var(--sp-4) var(--sp-7);",
             page_shell,
         )
 
         dark_filete_rule = self.css.split(".cv-form-section-header::before", 1)[1]
         dark_filete_rule = dark_filete_rule.split("}", 1)[0]
-        self.assertIn("var(--cv-card-family-accent-bg)", dark_filete_rule)
-        self.assertNotIn("var(--color-primary-bright)", dark_filete_rule)
+        self.assertIn("var(--color-accent)", dark_filete_rule)
 
     def test_standard_simple_centers_a_tokenized_compact_panel(self):
         page_shell = (
@@ -766,7 +769,10 @@ class DarkRedesignContractTests(SimpleTestCase):
         # Pula aliases agrupados até o bloco `{ ... }`
         standard_simple = standard_simple.split("{", 1)[1].split("}", 1)[0]
 
-        self.assertIn("max-width: var(--layout-form-panel-max-width);", standard_simple)
+        # NOVO-30 fase 3a: 960px e medida de layout, nao degrau de escala — o
+        # token saiu da camada e o valor ficou no ponto de uso. O que o teste
+        # protege continua sendo a centralizacao com largura limitada.
+        self.assertIn("max-width: 960px;", standard_simple)
         self.assertIn("margin-inline: auto;", standard_simple)
         self.assertIn("css/shell.bundle.css", self.base)
         bundle = (
@@ -775,42 +781,29 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn(">>> css/page-shell.css >>>", bundle)
 
     def test_list_and_form_cards_share_the_dark_card_family(self):
-        for token in (
-            "--cv-card-family-bg:",
-            "--cv-card-family-header-bg:",
-            "--cv-card-family-header-image:",
-            "--cv-card-family-border:",
-            "--cv-card-family-shadow:",
-            "--cv-card-family-accent-bg:",
-            "--cv-card-family-accent-width:",
-        ):
-            with self.subTest(token=token):
-                self.assertIn(token, self.tokens_css)
+        """Cabecalho de card de lista e de card de formulario sao a MESMA coisa.
 
-        wizard_header = self.css.rsplit(".cv-form-section-header {", 1)[1]
-        wizard_header = wizard_header.split("}", 1)[0]
-        list_header = self.css.split(".cv-record-card__id-row {", 1)[1]
-        list_header = list_header.split("}", 1)[0]
+        NOVO-30 fase 3a: eram sete tokens `--cv-card-family-*` na camada, e o
+        teste conferia que os sete existiam — o que nao diz se as duas telas
+        pintam igual. Agora compara as duas regras entre si: mesma superficie,
+        mesmo traco. Se uma divergir, o teste aponta as duas.
+        """
+        import re as _re
 
-        for shared_token in (
-            "var(--cv-card-family-header-bg)",
-            "var(--cv-card-family-header-image)",
-            "var(--cv-card-family-border-strong)",
-        ):
-            with self.subTest(shared_token=shared_token):
-                self.assertIn(shared_token, wizard_header)
-                self.assertIn(shared_token, list_header)
+        def _regra(css, seletor):
+            corpo = css.rsplit(seletor + " {", 1)[1].split("}", 1)[0]
+            return {
+                m.group(1): m.group(2).strip()
+                for m in _re.finditer(r"(?:^|;)\s*([-a-z]+):\s*([^;]+);", corpo)
+            }
 
-        self.assertEqual(self.css.count(".cv-record-card__id-row::before"), 1)
+        formulario = _regra(self.css, ".cv-form-section-header")
+        lista = _regra(self.css, ".cv-record-card__id-row")
 
-        simple_form_header = self.css.split(
-            ".main-form-panel > .form-section > .section-header {", 1
-        )[1].split("}", 1)[0]
-        simple_form_filete = self.css.split(
-            ".main-form-panel > .form-section > .section-header::before {", 1
-        )[1].split("}", 1)[0]
+        for prop in ("background", "border-color", "border-bottom-color"):
+            if prop in formulario and prop in lista:
+                with self.subTest(prop=prop):
+                    self.assertEqual(formulario[prop], lista[prop])
 
-        self.assertIn("var(--cv-card-family-header-bg)", simple_form_header)
-        self.assertIn("var(--cv-card-family-header-image)", simple_form_header)
-        self.assertIn("var(--cv-card-family-accent-bg)", simple_form_filete)
-        self.assertIn("var(--cv-card-family-accent-width)", simple_form_filete)
+        self.assertEqual(formulario.get("background"), "var(--cv-surface-block)")
+        self.assertEqual(lista.get("background"), "var(--cv-surface-block)")

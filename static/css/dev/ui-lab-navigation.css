@@ -5,64 +5,64 @@
 
 .ui-lab-nav {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--sp-2);
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
 }
 
 .ui-lab-nav__link {
   align-items: center;
-  background: var(--color-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-soft);
-  color: var(--text-primary);
+  background: var(--cv-surface-card);
+  border: 1px solid var(--cv-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-md);
+  color: var(--color-accent);
   display: flex;
-  gap: var(--space-3);
+  gap: var(--sp-3);
   justify-content: space-between;
-  padding: var(--space-4);
+  padding: var(--sp-4);
   text-decoration: none;
-  transition: transform var(--duration-normal) var(--ease-standard), border-color var(--duration-normal) var(--ease-standard), box-shadow var(--duration-normal) var(--ease-standard);
+  transition: transform var(--tr-base) var(--ease), border-color var(--tr-base) var(--ease), box-shadow var(--tr-base) var(--ease);
 }
 
 .ui-lab-nav__link:hover,
 .ui-lab-nav__link:focus-visible,
 .ui-lab-nav__link.is-active {
-  border-color: var(--border-focus);
-  box-shadow: var(--shadow-soft), 0 0 0 1px var(--border-focus);
+  border-color: var(--focus-ring);
+  box-shadow: var(--sh-md), 0 0 0 1px 0 0 0 3px var(--focus-ring);
   transform: translateY(-1px);
 }
 
 .ui-lab-nav__label {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
   line-height: 1.2;
 }
 
 .ui-lab-status-pill {
   align-items: center;
-  border-radius: var(--radius-pill);
+  border-radius: var(--r-pill);
   display: inline-flex;
   flex-shrink: 0;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-chip);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.04em;
   padding: 4px 10px;
   white-space: nowrap;
 }
 
 .ui-lab-status-pill--draft {
-  background: var(--route-status-draft-bg);
-  border: 1px solid var(--route-status-draft-border);
-  color: var(--route-status-draft-text);
+  background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
+  border: 1px solid color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
+  color: var(--cv-state-warning);
 }
 
 .ui-lab-status-pill--done,
 .ui-lab-status-pill--signed,
 .ui-lab-status-pill--active,
 .ui-lab-status-pill--on {
-  background: var(--route-status-final-bg);
-  border: 1px solid var(--route-status-final-border);
-  color: var(--route-status-final-text);
+  background: var(--cv-surface-block);
+  border: 1px solid color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  color: var(--cv-state-success);
 }
 
 .ui-lab-status-pill--planned,
@@ -76,9 +76,9 @@
 .ui-lab-status-pill--issue,
 .ui-lab-status-pill--corrected,
 .ui-lab-status-pill--off {
-  background: var(--route-status-muted-bg);
-  border: 1px solid var(--route-status-muted-border);
-  color: var(--route-status-muted-text);
+  background: var(--cv-surface-block);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--color-accent);
 }
 
 @media (max-width: 600px) {

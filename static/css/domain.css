@@ -17,7 +17,7 @@
 }
 
 .domain-block__title {
-  color: var(--color-section-title);
+  color: var(--cv-ink);
   font-size: 1rem;
   font-weight: 700;
   margin: 0;
@@ -26,7 +26,7 @@
 .domain-block__description {
   margin: 0;
   font-size: 0.875rem;
-  color: var(--color-description);
+  color: var(--cv-ink-muted);
 }
 
 /* --------------------------------------------------------------------------
@@ -57,15 +57,15 @@
 }
 
 .route-card {
-  border-radius: var(--radius-control);
-  border: 1px solid var(--route-section-border, var(--color-border-soft));
+  border-radius: var(--r-md);
+  border: 1px solid var(--cv-border);
   padding: 0.75rem 1rem;
-  background: var(--route-card-bg, var(--color-card));
+  background: var(--cv-surface-card);
 }
 
 .route-card__meta {
   font-size: 0.875rem;
-  color: var(--color-description);
+  color: var(--cv-ink-muted);
 }
 
 .route-card__actions {

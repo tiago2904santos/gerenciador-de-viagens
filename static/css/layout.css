@@ -8,7 +8,7 @@
    -------------------------------------------------------------------------- */
 .app-shell {
   display: grid;
-  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  grid-template-columns: 15% minmax(0, 1fr);
   min-height: 100vh;
 }
 
@@ -21,7 +21,7 @@
 
 .content-wrap {
   margin: 0;
-  max-width: var(--page-max-width);
+  max-width: 100%;
   padding: 0;
   width: 100%;
 }
@@ -35,7 +35,7 @@
   display: block;
   font-size: 12px;
   font-weight: 700;
-  margin-bottom: var(--space-1);
+  margin-bottom: var(--sp-1);
   text-transform: uppercase;
 }
 

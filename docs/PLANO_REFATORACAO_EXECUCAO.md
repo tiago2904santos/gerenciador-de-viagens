@@ -789,7 +789,52 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
   e tinta dos aliases espelham card → bloco → campo das imagens de referencia.
 - [x] **Fase 2 — regra do espelho (refazer):** `data-theme` eliminado dos componentes; `theme-dark-components.css` dissolvido em `app-shell.css` (regras theme-agnostic + tokens). Gate estrutural: **1.098 -> 0**. Coordenacao visual institucional nos dois temas.
 
-- [ ] **Fase 3 — geometria padronizada e fim dos aliases.**
+- [x] **`NOVO-31` 🔴 a fase 1 mediu o lado errado — e por isso "27 tokens" eram 1.034.**
+  Medido em 04/08 ao abrir a fase 3: `01-tokens.css` tinha **1.034 nomes distintos
+  em 2.078 declaracoes**, 88 blocos de regra de componente, **duas copias literais**
+  do mesmo bloco (`.sidebar-theme` / `.app-theme-grid`) e linhas de **11.959
+  caracteres** — o mesmo artefato que o `AGENTS.md` §6 descreve como reprovado.
+  O gate da fase 1 contava token declarado **fora** da camada e dava zero; nunca
+  olhou para dentro. E o regex era ancorado em inicio de linha, entao um `:root`
+  minificado de 3.902 caracteres contava como **um** token. A fase 2 entao empurrou
+  para la os blocos `data-theme` que precisava tirar dos componentes, e o gate dela
+  (1.098 → 0) tambem passou. **Licao:** quando o alvo e um numero do artefato, o gate
+  tem de contar o artefato inteiro — nao a borda dele.
+
+- Pela dimensao medida (8.287 referencias `var()`, 761 aliases vivos, 3.622
+  declaracoes de geometria), a fase 3 foi **fatiada em tres PRs** antes de comecar
+  (`AGENTS.md` §6):
+  - [x] **Fase 3a — a camada de token de verdade.** 1.034 → **57** tokens (teto 60);
+    `01-tokens.css` de 1.639 → **125** linhas, um `:root` e um `html[data-theme]`,
+    zero regra de componente, zero linha acima de 200 caracteres. As 7.775
+    referencias repontadas para o vocabulario canonico, com decisao de **papel** por
+    familia — nao por proximidade de valor. Eixos que a fase 1 esqueceu (tipografia,
+    altura de controle, movimento, camada) entraram como token canonico; o resto
+    saiu por `color-mix()` no ponto de uso. **A sidebar entrou na paleta** (decisao
+    de produto, 04/08): superficie de card, tinta normal, icone e ativo no acento.
+    Catraca de frontend **335 → 212**; excecoes de arquivo **3 → 2**. Cores fora da
+    paleta medidas em 10 telas: **60 → 16** (as 16 restantes sao as derivacoes
+    declaradas do `NOVO-28` — hover e detalhe em `color-mix` do acento).
+    Suite **1.308 → 1.314** verdes (6 gates novos).
+    - **Tres defeitos que a suite verde nao pegaria**, achados na tela e no diff:
+      as tres ancoras do rodizio (`.cv-form-section-card`, `.cv-form-block`,
+      `.cv-form-block .cv-form-block`) moravam na camada de token e teriam sumido —
+      voltaram para `components/form-sections.css`, que e onde o proprio
+      `00-palette.css` diz que elas vivem; um token que guardava
+      `12px 16px 12px 32px` casou com a regex de sombra e virou
+      `padding: var(--sh-lg)` no cabecalho do card; e `--cv-chip-border-width: 1px`
+      arredondou para o primeiro degrau da escada de espaco, **engrossando a borda
+      do chip em quatro vezes**. Dai os gates novos de *familia* e de *escada*.
+    - **Um defeito de tela pura:** `.sidebar-account__name` era `#ffffff` literal.
+      Com a sidebar clara, o nome do usuario ficou branco no branco. Nenhum teste
+      pega isso; o print pegou.
+  - [ ] **Fase 3b — geometria: raio, espaco e borda.** Linha de base ja medida
+    **depois** da 3a: raio 99 → **53** (teto 6) · padding 247 → **214** (8) ·
+    margem 53 → **50** (8) · borda 321 → **58** (3).
+  - [ ] **Fase 3c — sombra e foco.** Sombra 202 → **136** (teto 4). O anel de foco
+    sai de `box-shadow` para `outline`: com quatro valores distintos de `box-shadow`
+    nao cabe halo de foco. `--focus-ring` ja e **cor** (nao forma), entao a troca e
+    no ponto de uso.
 - [ ] **Fase 4 — fim das excecoes e do `!important`.**
 - [ ] **Fase 5 — apagar o CSS antigo.**
 

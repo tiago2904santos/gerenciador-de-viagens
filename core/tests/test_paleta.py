@@ -66,7 +66,7 @@ TRES = {"var(--cv-surface-page)", "var(--cv-surface-card)", "var(--cv-surface-bl
 
 def _bloco(texto: str, seletor: str) -> str:
     m = re.search(rf"{re.escape(seletor)}\s*\{{(.*?)\}}", texto, re.S)
-    assert m, f"bloco {seletor} nao encontrado em 00-palette.css"
+    assert m, f"bloco {seletor} nao encontrado"
     return m.group(1)
 
 
@@ -116,9 +116,10 @@ class PaletaTresCoresTests(SimpleTestCase):
         Se alguem tirar uma delas, os filhos herdam o par do avo e a alternancia
         para de acontecer — sem erro, so com a tela ficando de uma cor so.
         """
-        # NOVO-30 fase 1 centraliza inclusive os overrides contextuais; os
-        # componentes apenas consomem as propriedades customizadas.
-        secoes = (CSS / "01-tokens.css").read_text(encoding="utf-8")
+        # NOVO-30 fase 3a: as ancoras voltaram para o componente. A camada de
+        # token nao pode ancorar rodizio — o par depende de ONDE o elemento
+        # esta, nao do tema, e a fase 1 as levou para la junto com o resto.
+        secoes = (CSS / "components" / "form-sections.css").read_text(encoding="utf-8")
         shell = secoes
 
         bloco = _declaracoes(_bloco(secoes, ".cv-form-block"))

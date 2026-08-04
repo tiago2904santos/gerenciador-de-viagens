@@ -9,7 +9,7 @@
 
 /* Painel intermediário — mesmo tom --step1-panel dos formulários. */
 .cv-collection-panel {
-  background: var(--step1-panel);
+  background: var(--cv-surface-block);
   border: 0;
   border-radius: 14px;
   box-shadow: none;
@@ -29,12 +29,12 @@
 }
 
 .cv-collection-panel .pagination-shell__controls {
-  background: var(--step1-surface);
+  background: var(--cv-surface-card);
 }
 
 .cv-record-row {
   align-items: center;
-  background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted, var(--color-card-muted))));
+  background: var(--cv-surface-next);
   border: 0;
   border-radius: 12px;
   box-shadow: none;
@@ -45,7 +45,7 @@
   min-width: 0;
   padding: 11px 12px;
   position: relative;
-  transition: background-color var(--transition-fast, 140ms ease);
+  transition: background-color var(--tr-fast);
 }
 
 .cv-record-row:hover,
@@ -53,7 +53,7 @@
   background: color-mix(
     in srgb,
     var(--color-accent) 5%,
-    var(--step1-field, var(--color-input-bg, var(--color-surface-muted)))
+    var(--cv-surface-next)
   );
   border: 0;
   box-shadow: none;
@@ -65,13 +65,13 @@
 
 .cv-record-row__identity {
   align-items: center;
-  background: var(--color-accent-soft, color-mix(in srgb, var(--color-accent) 18%, transparent));
-  border: 1px solid var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 55%, transparent));
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: 12px;
-  color: var(--color-accent-text, var(--color-accent));
+  color: var(--color-accent);
   display: inline-flex;
   flex-shrink: 0;
-  font-size: var(--font-size-xs, 0.75rem);
+  font-size: var(--fs-xs);
   font-weight: 800;
   height: 42px;
   justify-content: center;
@@ -96,12 +96,12 @@
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2, 8px);
+  gap: var(--sp-2);
   min-width: 0;
 }
 
 .cv-record-row__title {
-  font-size: var(--font-size-sm, 0.875rem);
+  font-size: var(--fs-sm);
   font-weight: 800;
   letter-spacing: -0.01em;
   line-height: 1.25;
@@ -115,7 +115,7 @@
   align-items: center;
   display: inline-flex;
   flex-wrap: wrap;
-  gap: var(--space-2, 8px);
+  gap: var(--sp-2);
 }
 
 /* Mesmo chip do Motorista (cv-person-row__badge). */
@@ -137,8 +137,8 @@
 }
 
 .cv-record-row__subtitle {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs, 0.75rem);
+  color: var(--cv-ink-muted);
+  font-size: var(--fs-xs);
   font-weight: 500;
   line-height: 1.35;
   margin: 0;
@@ -150,10 +150,10 @@
 
 .cv-record-row__facts {
   align-items: baseline;
-  color: var(--color-muted);
+  color: var(--cv-ink-muted);
   display: flex;
   flex-wrap: wrap;
-  font-size: var(--font-size-xs, 0.75rem);
+  font-size: var(--fs-xs);
   gap: 2px 0;
   line-height: 1.4;
   margin-top: 2px;
@@ -174,13 +174,13 @@
 }
 
 .cv-record-row__fact-value {
-  color: var(--color-text);
+  color: var(--cv-ink);
   font-weight: 500;
   overflow-wrap: anywhere;
 }
 
 .cv-record-row__facts-sep {
-  color: var(--color-muted);
+  color: var(--cv-ink-muted);
   margin: 0 0.45em;
   opacity: 0.7;
 }
@@ -189,7 +189,7 @@
   align-items: center;
   display: inline-flex;
   flex-shrink: 0;
-  gap: var(--space-2, 8px);
+  gap: var(--sp-2);
   justify-content: flex-end;
 }
 
@@ -251,7 +251,7 @@
 .cv-page--collection-cards .cv-card-grid {
   box-sizing: border-box;
   display: grid;
-  gap: var(--space-6);
+  gap: var(--sp-6);
   grid-template-columns: minmax(0, 1fr);
   width: 100%;
 }
