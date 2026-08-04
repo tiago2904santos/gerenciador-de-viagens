@@ -4,7 +4,7 @@
     class="list-header list-header--inline-create cv-filter-header{% if quick_add_compact %} list-header--inline-create-compact{% endif %}"
     {% if can_edit_area %}data-travel-document-wizard-step1{% endif %}
   >
-    {% include "components/ui/headers/_list_header_band.html" with title=title eyebrow=eyebrow only %}
+    {% include "components/ui/headers/_list_header_band.html" with title=title eyebrow=eyebrow band_tabs_template=band_tabs_template abas=abas tabs_aria_label=tabs_aria_label only %}
 
     <div class="list-header__rail list-header__rail--inline-create">
       <form class="list-header__filters" method="get" action="{{ request.path }}" data-collection-form>
@@ -87,7 +87,7 @@
   </div>
 
   {% if delete_modal_enabled %}
-    {% include "components/ui/modals/delete_confirm_modal.html" %}
+    {% include "components/ui/modals/delete_confirm_modal.html" with delete_modal_title=delete_modal_title delete_modal_entity=delete_modal_entity %}
   {% endif %}
 
   {% if back_url %}

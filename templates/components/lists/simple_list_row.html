@@ -67,6 +67,20 @@
       </form>
     {% endif %}
     <div class="cv-icon-btn-group">
+      {% if row.vincular_url %}
+        <button
+          type="button"
+          class="cv-icon-btn cv-icon-btn--link cv-record-row__vincular"
+          data-overlay-trigger
+          data-overlay-kind="dialog"
+          data-overlay-target="vincular-usuario-modal"
+          data-vincular-url="{{ row.vincular_url }}"
+          data-vincular-usuario-id="{{ row.vincular_usuario_id }}"
+          data-vincular-usuario-label="{{ row.vincular_usuario_label }}"
+          aria-label="Vincular {{ row.title }} a uma área"
+          data-tooltip="Vincular a uma área"
+        >{% include "components/ui/icons/icon.html" with icon="link" only %}</button>
+      {% endif %}
       {% if row.pdf_url or row.docx_url or row.anexar_assinado_url %}
         {% with menu_suffix=row_index|default:"item" %}
           <button

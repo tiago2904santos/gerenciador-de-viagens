@@ -4271,6 +4271,7 @@ html[data-theme="dark"] .empty-state__title {
   border-radius: 14px;
   overflow: hidden;
   padding: 6px;
+  z-index: calc(var(--z-modal, 100) + 20);
 }
 
 :is(html[data-theme="dark"])

@@ -651,6 +651,20 @@ html[data-theme="light"] {
   color: var(--cv-btn-secondary-hover-color);
 }
 
+/* Link / vincular — mesmo neutro do editar */
+.cv-icon-btn--link {
+  background: var(--cv-btn-neutral-bg);
+  border-color: var(--cv-btn-neutral-border);
+  color: var(--cv-btn-neutral-color);
+}
+
+.cv-icon-btn--link:hover,
+.cv-icon-btn--link:focus {
+  background: var(--cv-btn-secondary-hover-bg);
+  border-color: var(--cv-btn-secondary-hover-border);
+  color: var(--cv-btn-secondary-hover-color);
+}
+
 /* Delete — vermelho destrutivo */
 .cv-icon-btn--delete {
   background: linear-gradient(135deg, #c0392b 0%, var(--color-danger) 100%);

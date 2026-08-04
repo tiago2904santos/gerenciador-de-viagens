@@ -11,11 +11,15 @@ from django.urls import reverse
 
 from . import selectors
 from . import services
+from .forms import AreaTrabalhoEditForm
 from .forms import AreaTrabalhoForm
 from .forms import UsuarioAreaCreationForm
+from .forms import UsuarioEditForm
+from .forms import VinculoNaAreaForm
 from .forms import VinculoUsuarioAreaForm
 from .presenters import apresentar_linha_lista_simples_area
 from .presenters import apresentar_linha_lista_simples_usuario
+from .presenters import apresentar_linha_lista_simples_vinculo
 
 
 ADMIN_PER_PAGE = 25
@@ -69,13 +73,34 @@ def _abas_administracao(*, ativa, contadores):
 
 @somente_administrador
 def index(request):
-    """Lista de contas — uma linha por pessoa, com as áreas na própria linha."""
+    """Lista de contas — criação inline (quick-add) no padrão das justificativas."""
     q = request.GET.get("q", "").strip()
+    quick_add_form = UsuarioAreaCreationForm(prefix="usuario")
+
+    if request.method == "POST":
+        quick_add_form = UsuarioAreaCreationForm(request.POST, prefix="usuario")
+        if quick_add_form.is_valid():
+            user = services.criar_usuario(quick_add_form)
+            messages.success(request, f"Usuário {user.get_username()} criado e vinculado à área.")
+            return redirect("usuarios:index")
 
     usuarios = selectors.listar_usuarios(q=q)
     paginator = Paginator(usuarios, ADMIN_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
-    rows = [apresentar_linha_lista_simples_usuario(usuario) for usuario in page_obj.object_list]
+    vincular_url = reverse("usuarios:vinculo_create")
+    rows = [
+        apresentar_linha_lista_simples_usuario(
+            usuario,
+            vincular_url=vincular_url,
+            edit_url=reverse("usuarios:usuario_update", args=[usuario.pk]),
+            delete_url=(
+                None
+                if usuario.pk == request.user.pk
+                else reverse("usuarios:usuario_delete", args=[usuario.pk])
+            ),
+        )
+        for usuario in page_obj.object_list
+    ]
 
     contadores = selectors.contadores_administracao()
 
@@ -92,8 +117,8 @@ def index(request):
             "page_querystring": urlencode({"q": q}) if q else "",
             "abas": _abas_administracao(ativa="usuarios", contadores=contadores),
             "tabs_aria_label": "Alternar entre usuários e áreas",
-            "novo_usuario_url": reverse("usuarios:usuario_create"),
-            "vincular_url": reverse("usuarios:vinculo_create"),
+            "quick_add_form": quick_add_form,
+            "vincular_form": VinculoUsuarioAreaForm(prefix="vinculo"),
             # A página já passa por `somente_administrador`, permissão mais forte
             # que editor — sem isto o staff sem vínculo não veria o botão de criar.
             "can_edit_area": True,
@@ -104,13 +129,27 @@ def index(request):
 
 @somente_administrador
 def areas_index(request):
-    """Lista de áreas — sigla, nome e quantas contas têm acesso."""
+    """Lista de áreas — criação inline (quick-add) no padrão das justificativas."""
     q = request.GET.get("q", "").strip()
+    quick_add_form = AreaTrabalhoForm(prefix="area")
+
+    if request.method == "POST":
+        quick_add_form = AreaTrabalhoForm(request.POST, prefix="area")
+        if quick_add_form.is_valid():
+            area = services.criar_area(quick_add_form)
+            messages.success(request, f"Área {area.sigla} criada com sucesso.")
+            return redirect("usuarios:areas_index")
 
     areas = selectors.listar_areas(q=q)
     paginator = Paginator(areas, ADMIN_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
-    rows = [apresentar_linha_lista_simples_area(area) for area in page_obj.object_list]
+    rows = [
+        apresentar_linha_lista_simples_area(
+            area,
+            edit_url=reverse("usuarios:area_update", args=[area.pk]),
+        )
+        for area in page_obj.object_list
+    ]
 
     contadores = selectors.contadores_administracao()
 
@@ -127,7 +166,7 @@ def areas_index(request):
             "page_querystring": urlencode({"q": q}) if q else "",
             "abas": _abas_administracao(ativa="areas", contadores=contadores),
             "tabs_aria_label": "Alternar entre usuários e áreas",
-            "nova_area_url": reverse("usuarios:area_create"),
+            "quick_add_form": quick_add_form,
             # Mesma razão do `index`: o gate da página já é administrador.
             "can_edit_area": True,
             **contadores,
@@ -136,78 +175,137 @@ def areas_index(request):
 
 
 @somente_administrador
-def usuario_create(request):
-    form = UsuarioAreaCreationForm(request.POST or None, prefix="usuario")
+def area_update(request, pk):
+    """Gerenciador da área: dados + contas vinculadas."""
+    area = selectors.get_area_by_id(pk)
+    form = AreaTrabalhoEditForm(request.POST or None, instance=area, prefix="area")
+    vinculo_form = VinculoNaAreaForm(prefix="vinculo", area=area)
+
     if request.method == "POST" and form.is_valid():
-        user = services.criar_usuario(form)
-        messages.success(request, f"Usuário {user.get_username()} criado e vinculado à área.")
-        return redirect("usuarios:index")
+        area = services.atualizar_area(form)
+        messages.success(request, f"Área {area.sigla} atualizada com sucesso.")
+        return redirect("usuarios:area_update", pk=area.pk)
+
+    vinculos = selectors.listar_vinculos_da_area(area)
+    rows = [
+        apresentar_linha_lista_simples_vinculo(
+            vinculo,
+            delete_url=reverse("usuarios:vinculo_delete", args=[vinculo.pk]),
+        )
+        for vinculo in vinculos
+    ]
 
     return render(
         request,
-        "usuarios/form.html",
+        "usuarios/areas/form.html",
         {
-            "page_title": "Novo usuário",
+            "page_title": f"Área {area.sigla}",
+            "page_description": "Edite os dados da área e as contas com acesso a ela.",
             "flow_eyebrow": "Administração",
             "flow_back_label": "Voltar",
-            "flow_back_url": reverse("usuarios:index"),
-            "page_description": "Conta, senha e a área em que a pessoa entra por padrão.",
-            "usuario_form": form,
+            "flow_back_url": reverse("usuarios:areas_index"),
             "form": form,
-            "card_title": "Dados do usuário",
-            "body_template": "usuarios/partials/_criar_usuario_fields.html",
-            "submit_label": "Criar usuário",
+            "area": area,
+            "rows": rows,
+            "vinculo_form": vinculo_form,
+            "vinculo_action_url": reverse("usuarios:vinculo_create_na_area", args=[area.pk]),
+            "submit_label": "Salvar área",
+            "can_edit_area": True,
         },
     )
+
+
+@somente_administrador
+def usuario_create(request):
+    """Compat: redireciona para a lista, onde a criação passou a ser inline."""
+    return redirect("usuarios:index")
+
+
+@somente_administrador
+def usuario_update(request, pk):
+    """POST do quick-edit na lista. GET só redireciona — sem página dedicada."""
+    if request.method != "POST":
+        return redirect("usuarios:index")
+
+    usuario = selectors.get_usuario_by_id(pk)
+    form = UsuarioEditForm(request.POST, instance=usuario, prefix="usuario")
+    if form.is_valid():
+        usuario = services.atualizar_usuario(form)
+        messages.success(request, f"Usuário {usuario.get_username()} atualizado.")
+    else:
+        messages.error(request, "Não foi possível salvar o usuário. Confira os dados informados.")
+    return redirect("usuarios:index")
+
+
+@somente_administrador
+def usuario_delete(request, pk):
+    """Exclui a conta via modal de confirmação da lista."""
+    if request.method != "POST":
+        return redirect("usuarios:index")
+
+    usuario = selectors.get_usuario_by_id(pk)
+    username = usuario.get_username()
+    try:
+        services.excluir_usuario(usuario, solicitante=request.user)
+    except services.UsuarioNaoPodeSerExcluido as exc:
+        messages.error(request, exc.messages[0] if exc.messages else str(exc))
+        return redirect("usuarios:index")
+
+    messages.success(request, f"Usuário {username} excluído.")
+    return redirect("usuarios:index")
 
 
 @somente_administrador
 def area_create(request):
-    form = AreaTrabalhoForm(request.POST or None, prefix="area")
-    if request.method == "POST" and form.is_valid():
-        area = services.criar_area(form)
-        messages.success(request, f"Área {area.sigla} criada com sucesso.")
-        return redirect("usuarios:areas_index")
-
-    return render(
-        request,
-        "usuarios/form.html",
-        {
-            "page_title": "Nova área",
-            "flow_eyebrow": "Administração",
-            "flow_back_label": "Voltar",
-            "flow_back_url": reverse("usuarios:areas_index"),
-            "page_description": "Nome e sigla da unidade de trabalho.",
-            "area_form": form,
-            "form": form,
-            "card_title": "Dados da área",
-            "body_template": "usuarios/partials/_criar_area_fields.html",
-            "submit_label": "Criar área",
-        },
-    )
+    """Compat: redireciona para a lista, onde a criação passou a ser inline."""
+    return redirect("usuarios:areas_index")
 
 
 @somente_administrador
 def vinculo_create(request):
-    form = VinculoUsuarioAreaForm(request.POST or None, prefix="vinculo")
-    if request.method == "POST" and form.is_valid():
-        vinculo = services.vincular_usuario(form)
-        messages.success(request, f"Vínculo de {vinculo.usuario} com {vinculo.area} salvo.")
+    """POST do modal na lista. GET só redireciona — a página dedicada foi removida."""
+    if request.method != "POST":
         return redirect("usuarios:index")
 
-    return render(
-        request,
-        "usuarios/form.html",
-        {
-            "page_title": "Vincular usuário",
-            "flow_eyebrow": "Administração",
-            "flow_back_label": "Voltar",
-            "flow_back_url": reverse("usuarios:index"),
-            "page_description": "Dá a uma conta existente acesso a outra área.",
-            "vinculo_form": form,
-            "form": form,
-            "card_title": "Dados do vínculo",
-            "body_template": "usuarios/partials/_vincular_usuario_fields.html",
-            "submit_label": "Salvar vínculo",
-        },
-    )
+    form = VinculoUsuarioAreaForm(request.POST, prefix="vinculo")
+    if form.is_valid():
+        vinculo = services.vincular_usuario(form)
+        messages.success(request, f"Vínculo de {vinculo.usuario} com {vinculo.area} salvo.")
+    else:
+        messages.error(
+            request,
+            "Não foi possível salvar o vínculo. Confira a área e o perfil informados.",
+        )
+    return redirect("usuarios:index")
+
+
+@somente_administrador
+def vinculo_create_na_area(request, pk):
+    """POST do formulário de vínculo dentro do gerenciador da área."""
+    area = selectors.get_area_by_id(pk)
+    if request.method != "POST":
+        return redirect("usuarios:area_update", pk=pk)
+
+    form = VinculoNaAreaForm(request.POST, prefix="vinculo", area=area)
+    if form.is_valid():
+        vinculo = services.vincular_usuario(form)
+        messages.success(request, f"{vinculo.usuario} vinculado à área {area.sigla}.")
+    else:
+        messages.error(
+            request,
+            "Não foi possível vincular o usuário. Confira a conta e o perfil.",
+        )
+    return redirect("usuarios:area_update", pk=pk)
+
+
+@somente_administrador
+def vinculo_delete(request, pk):
+    """Remove o vínculo e volta ao gerenciador da área."""
+    vinculo = selectors.get_vinculo_by_id(pk)
+    area_pk = vinculo.area_id
+    if request.method != "POST":
+        return redirect("usuarios:area_update", pk=area_pk)
+
+    services.remover_vinculo(vinculo)
+    messages.success(request, "Vínculo removido da área.")
+    return redirect("usuarios:area_update", pk=area_pk)

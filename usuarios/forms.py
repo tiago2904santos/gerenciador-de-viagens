@@ -53,6 +53,68 @@ class AreaTrabalhoForm(EstiloCamposMixin, forms.ModelForm):
         }
 
 
+class AreaTrabalhoEditForm(AreaTrabalhoForm):
+    """Edição no gerenciador: inclui o interruptor de área ativa."""
+
+    class Meta(AreaTrabalhoForm.Meta):
+        fields = ["nome", "sigla", "ativa"]
+        labels = {
+            **AreaTrabalhoForm.Meta.labels,
+            "ativa": "Área ativa",
+        }
+
+
+class UsuarioEditForm(EstiloCamposMixin, forms.ModelForm):
+    """Edição da conta na lista de usuários."""
+
+    nome_completo = forms.CharField(
+        label="Nome completo",
+        widget=forms.TextInput(
+            attrs={
+                "autocomplete": "name",
+                "placeholder": "Nome e sobrenome",
+            }
+        ),
+    )
+
+    class Meta:
+        model = get_user_model()
+        fields = ["username", "email", "nome_completo"]
+        labels = {
+            "username": "Nome de usuário",
+            "email": "E-mail institucional",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["email"].required = True
+        self.fields["username"].widget.attrs.update(
+            {
+                "autocomplete": "username",
+                "placeholder": "ex.: adm.tsantos",
+            }
+        )
+        self.fields["email"].widget.attrs.update(
+            {
+                "autocomplete": "email",
+                "placeholder": "adm.tsantos@pc.pr.gov.br",
+            }
+        )
+        if self.instance and self.instance.pk:
+            nome = f"{self.instance.first_name} {self.instance.last_name}".strip()
+            self.fields["nome_completo"].initial = nome or self.instance.get_username()
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        nome_completo = self.cleaned_data["nome_completo"].strip()
+        partes_nome = nome_completo.split(" ", 1)
+        user.first_name = partes_nome[0]
+        user.last_name = partes_nome[1].strip() if len(partes_nome) > 1 else ""
+        if commit:
+            user.save()
+        return user
+
+
 class UsuarioAreaCreationForm(EstiloCamposMixin, UserCreationForm):
     nome_completo = forms.CharField(
         label="Nome completo",
@@ -123,6 +185,7 @@ class UsuarioAreaCreationForm(EstiloCamposMixin, UserCreationForm):
         user.email = self.cleaned_data["email"]
         user.first_name = partes_nome[0]
         user.last_name = partes_nome[1].strip() if len(partes_nome) > 1 else ""
+        user.is_active = True
         user.is_staff = False
         if commit:
             user.save()
@@ -139,6 +202,8 @@ class UsuarioAreaCreationForm(EstiloCamposMixin, UserCreationForm):
 
 
 class VinculoUsuarioAreaForm(EstiloCamposMixin, forms.ModelForm):
+    """Vínculo a partir da lista: o usuário vem oculto; área e perfil no modal."""
+
     class Meta:
         model = VinculoUsuarioArea
         fields = ["usuario", "area", "papel"]
@@ -148,18 +213,19 @@ class VinculoUsuarioAreaForm(EstiloCamposMixin, forms.ModelForm):
             "papel": "Perfil na área",
         }
         widgets = {
-            "usuario": forms.Select(
-                attrs=_cv_picker_single_attrs(
-                    label="Usuário existente",
-                    placeholder="Buscar usuário...",
-                    empty_message="Nenhum usuário encontrado.",
-                )
-            ),
+            "usuario": forms.HiddenInput(),
             "area": forms.Select(
                 attrs=_cv_picker_single_attrs(
                     label="Área de trabalho",
                     placeholder="Buscar área...",
                     empty_message="Nenhuma área encontrada.",
+                )
+            ),
+            "papel": forms.Select(
+                attrs=_cv_picker_single_attrs(
+                    label="Perfil na área",
+                    placeholder="Buscar perfil...",
+                    empty_message="Nenhum perfil encontrado.",
                 )
             ),
         }
@@ -168,3 +234,56 @@ class VinculoUsuarioAreaForm(EstiloCamposMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["usuario"].queryset = get_user_model().objects.order_by("username")
         self.fields["area"].queryset = AreaTrabalho.objects.filter(ativa=True).order_by("sigla")
+
+
+class VinculoNaAreaForm(EstiloCamposMixin, forms.ModelForm):
+    """Vínculo a partir do gerenciador da área: área fixa, escolher a conta."""
+
+    class Meta:
+        model = VinculoUsuarioArea
+        fields = ["usuario", "area", "papel"]
+        labels = {
+            "usuario": "Usuário",
+            "area": "Área de trabalho",
+            "papel": "Perfil na área",
+        }
+        widgets = {
+            "area": forms.HiddenInput(),
+            "usuario": forms.Select(
+                attrs=_cv_picker_single_attrs(
+                    label="Usuário",
+                    placeholder="Buscar usuário...",
+                    empty_message="Nenhum usuário disponível.",
+                )
+            ),
+            # Mesmo picker do modal da lista: os dois campos do diálogo têm de
+            # ser o mesmo controle, senão um vira busca e o outro select nativo.
+            "papel": forms.Select(
+                attrs=_cv_picker_single_attrs(
+                    label="Perfil na área",
+                    placeholder="Buscar perfil...",
+                    empty_message="Nenhum perfil encontrado.",
+                )
+            ),
+        }
+
+    def __init__(self, *args, area=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._area = area
+        if area is not None:
+            self.fields["area"].initial = area.pk
+            self.fields["area"].queryset = AreaTrabalho.objects.filter(pk=area.pk)
+            ja_vinculados = area.vinculos_usuario.values_list("usuario_id", flat=True)
+            self.fields["usuario"].queryset = (
+                get_user_model()
+                .objects.exclude(pk__in=ja_vinculados)
+                .order_by("username")
+            )
+        else:
+            self.fields["usuario"].queryset = get_user_model().objects.order_by("username")
+            self.fields["area"].queryset = AreaTrabalho.objects.filter(ativa=True).order_by("sigla")
+
+    def clean_area(self):
+        if self._area is not None:
+            return self._area
+        return self.cleaned_data["area"]

@@ -353,7 +353,9 @@
   border-radius: var(--cv-search-picker-radius);
   border-top: 1px solid var(--dropdown-border);
   overflow: hidden;
-  z-index: calc(var(--z-dropdown) + 10);
+  /* Portal no body: precisa ficar acima do modal (--z-modal), senão o menu
+     some atrás do painel do diálogo (ex.: Vincular usuário). */
+  z-index: calc(var(--z-modal, 100) + 20);
 }
 
 .cv-search-picker--open .cv-search-picker__dropdown {

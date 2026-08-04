@@ -813,7 +813,8 @@ html[data-theme="dark"] .cv-custom-select--v2 .cv-custom-select__chevron svg {
   border-radius: var(--cv-cs-menu-radius);
   border-top: 1px solid var(--cv-select-border);
   overflow: hidden;
-  z-index: calc(var(--cv-cs-z-index) + 10);
+  /* Portal no body: acima do modal, mesmo contrato do search-picker. */
+  z-index: calc(var(--z-modal, 100) + 20);
 }
 
 .cv-custom-select__menu::-webkit-scrollbar { width: 4px; }

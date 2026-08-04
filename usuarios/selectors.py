@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Count
 from django.db.models import Prefetch
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 
 from .models import AreaTrabalho
 from .models import VinculoUsuarioArea
@@ -74,3 +75,36 @@ def contadores_administracao():
         "total_usuarios": get_user_model().objects.count(),
         "total_vinculos": VinculoUsuarioArea.objects.count(),
     }
+
+
+def get_area_by_id(pk):
+    return get_object_or_404(queryset_areas_base(), pk=pk)
+
+
+def listar_vinculos_da_area(area, q=""):
+    """Contas vinculadas a uma área, com o usuário já carregado."""
+    queryset = (
+        VinculoUsuarioArea.objects.filter(area=area)
+        .select_related("usuario")
+        .order_by("usuario__first_name", "usuario__username")
+    )
+    if q:
+        queryset = queryset.filter(
+            Q(usuario__username__icontains=q)
+            | Q(usuario__first_name__icontains=q)
+            | Q(usuario__last_name__icontains=q)
+            | Q(usuario__email__icontains=q)
+            | Q(papel__icontains=q)
+        )
+    return queryset
+
+
+def get_usuario_by_id(pk):
+    return get_object_or_404(queryset_usuarios_base(), pk=pk)
+
+
+def get_vinculo_by_id(pk):
+    return get_object_or_404(
+        VinculoUsuarioArea.objects.select_related("usuario", "area"),
+        pk=pk,
+    )

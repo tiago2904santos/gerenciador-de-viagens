@@ -2425,6 +2425,21 @@ document.documentElement.dataset.appReady = "true";
       label: "[data-confirm-action-label]",
       labelAttribute: "data-confirm-action-label-text",
     },
+    {
+      target: "vincular-usuario-modal",
+      modal: "[data-vincular-usuario-modal]",
+      cancel: "[data-overlay-close]",
+      form: "[data-vincular-usuario-form]",
+      action: "data-vincular-url",
+      label: "[data-vincular-usuario-label]",
+      labelAttribute: "data-vincular-usuario-label",
+      valueFields: [
+        {
+          selector: "input[name='vinculo-usuario']",
+          attribute: "data-vincular-usuario-id",
+        },
+      ],
+    },
   ];
 
   function focusableElements(container) {
@@ -2679,6 +2694,11 @@ document.documentElement.dataset.appReady = "true";
         trigger.getAttribute(config.titleAttribute) ||
         title.dataset.overlayDefaultTitle;
     }
+    (config.valueFields || []).forEach(function (field) {
+      var input = modal.querySelector(field.selector);
+      if (!input) return;
+      input.value = trigger.getAttribute(field.attribute) || "";
+    });
     var initialFocus = config.initialFocus
       ? modal.querySelector(config.initialFocus)
       : modal.querySelector('[role="dialog"]');

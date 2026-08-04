@@ -210,8 +210,13 @@
 
 .vincular-usuario-modal__form {
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
   min-height: 0;
+}
+
+.vincular-usuario-modal__dialog.cv-dialog__panel {
+  grid-template-rows: auto auto;
+  height: auto;
 }
 
 .vincular-usuario-modal__body {
@@ -294,8 +299,13 @@
   padding-inline: 12px;
 }
 
-.vincular-usuario-modal__dialog .cv-dialog__footer {
+.vincular-usuario-modal__dialog .cv-dialog__footer,
+:is(html[data-theme="dark"]) #vincular-usuario-modal .cv-dialog__footer {
+  align-items: stretch;
+  background: transparent;
   border-top: 0;
+  display: block;
+  justify-content: stretch;
   margin: 0;
   padding: 0;
 }
@@ -310,10 +320,29 @@
 }
 
 .vincular-usuario-modal__footer .cv-card-footer {
+  align-items: center;
   background: transparent;
+  border: 0;
+  box-shadow: none;
   gap: var(--space-3);
   justify-content: space-between;
-  padding: 16px 22px;
+  min-height: 0;
+  padding: 14px 22px 18px;
+}
+
+.vincular-usuario-modal__footer .cv-card-footer__secondary,
+.vincular-usuario-modal__footer .cv-card-footer__primary {
+  align-items: center;
+  align-self: center;
+  display: flex;
+  flex: 0 0 auto;
+  min-height: 0;
+}
+
+.vincular-usuario-modal__footer .cv-card-footer__secondary .cv-btn,
+.vincular-usuario-modal__footer .cv-card-footer__primary .cv-btn {
+  height: var(--control-height-md, 44px);
+  min-height: var(--control-height-md, 44px);
 }
 
 .vincular-usuario-modal__footer .cv-card-footer-section__divider {

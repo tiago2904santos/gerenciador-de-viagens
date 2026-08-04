@@ -1,13 +1,20 @@
 {% extends "base.html" %}
-{% block title %}Usuários{% endblock %}
-{% block content %}
-  {% include "components/lists/list_page_standard.html" with eyebrow="Administração" title=page_title search_placeholder="Buscar por nome, usuário, e-mail ou área" search_aria_label="Buscar usuários" tabs_aria_label=tabs_aria_label band_tabs_template="components/lists/list_toggle.html" action_label="Novo usuário" action_url=novo_usuario_url action_aria_label="Cadastrar usuário" empty_message="Nenhum usuário encontrado." empty_action_label="Novo usuário" empty_action_url=novo_usuario_url rows=rows q=q disable_realtime_filter=True hide_realtime_count=True %}
+{% load static %}
 
-  {% comment %}
-    Segunda ação da página: dar a uma conta que já existe acesso a outra área.
-    Fica fora do include porque `list_page_standard` só tem o slot da ação
-    principal; `.cv-floating-action` é `position: fixed`, então o lugar no DOM
-    não muda onde ela aparece.
-  {% endcomment %}
-  {% include "components/ui/buttons/floating_action.html" with href=vincular_url label="Vincular usuário" icon="link" variant="secondary" aria_label="Vincular usuário existente a uma área" extra_class="cv-floating-action--stacked" only %}
+{% block title %}Usuários{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/usuarios.css' %}">
+{% endblock %}
+
+{% block content %}
+  <div class="usuarios-page">
+    {% include "components/lists/list_page_quick_add.html" with title=page_title eyebrow="Administração" search_placeholder="Buscar por nome, usuário, e-mail ou área" empty_message="Nenhum usuário encontrado." rows=rows q=q page_obj=page_obj pagination_pages=pagination_pages page_querystring=page_querystring quick_add_form=quick_add_form quick_add_panel_id="quick-add-usuario" quick_add_label="Cadastrar usuário" quick_add_submit_label="Criar usuário" quick_add_body_template="usuarios/partials/_quick_add_usuario_fields.html" quick_add_compact=True hide_realtime_count=True band_tabs_template="components/lists/list_toggle.html" abas=abas tabs_aria_label=tabs_aria_label can_edit_area=can_edit_area delete_modal_enabled=True delete_modal_title="Excluir usuário?" delete_modal_entity="este usuário" %}
+
+    {% include "usuarios/partials/_vincular_usuario_modal.html" %}
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/pages/usuarios-admin.js' %}" defer></script>
 {% endblock %}

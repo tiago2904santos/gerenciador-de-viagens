@@ -29,22 +29,35 @@ class UsuariosAdminPageTests(TestCase):
     def test_todas_as_paginas_da_administracao_exigem_administrador(self):
         comum = get_user_model().objects.create_user(username="outro_comum", password="123456")
         self.client.force_login(comum)
+        area = AreaTrabalho.objects.create(nome="ASCOM", sigla="ASCOM")
+        user = get_user_model().objects.create_user(username="alvo", password="123456")
+        vinculo = VinculoUsuarioArea.objects.create(
+            usuario=user,
+            area=area,
+            papel=VinculoUsuarioArea.PAPEL_EDITOR,
+        )
 
-        for nome in (
-            "usuarios:index",
-            "usuarios:areas_index",
-            "usuarios:usuario_create",
-            "usuarios:area_create",
-            "usuarios:vinculo_create",
-        ):
-            with self.subTest(rota=nome):
-                self.assertEqual(self.client.get(reverse(nome)).status_code, 403)
+        rotas = [
+            reverse("usuarios:index"),
+            reverse("usuarios:areas_index"),
+            reverse("usuarios:usuario_create"),
+            reverse("usuarios:area_create"),
+            reverse("usuarios:vinculo_create"),
+            reverse("usuarios:usuario_update", args=[user.pk]),
+            reverse("usuarios:usuario_delete", args=[user.pk]),
+            reverse("usuarios:area_update", args=[area.pk]),
+            reverse("usuarios:vinculo_create_na_area", args=[area.pk]),
+            reverse("usuarios:vinculo_delete", args=[vinculo.pk]),
+        ]
+        for url in rotas:
+            with self.subTest(url=url):
+                self.assertEqual(self.client.get(url).status_code, 403)
 
     def test_cria_area_pela_pagina(self):
         self.client.force_login(self.admin)
 
         response = self.client.post(
-            reverse("usuarios:area_create"),
+            reverse("usuarios:areas_index"),
             {
                 "area-nome": "Assessoria de Comunicacao Social",
                 "area-sigla": "ASCOM",
@@ -55,23 +68,97 @@ class UsuariosAdminPageTests(TestCase):
         self.assertRedirects(response, reverse("usuarios:areas_index"))
         self.assertTrue(AreaTrabalho.objects.filter(sigla="ASCOM").exists())
 
+    def test_rota_nova_area_redireciona_para_lista(self):
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse("usuarios:area_create"))
+        self.assertRedirects(response, reverse("usuarios:areas_index"))
+
+    def test_lista_de_areas_tem_quick_add(self):
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse("usuarios:areas_index"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="quick-add-area"')
+        self.assertContains(response, "Cadastrar área")
+
+    def test_lista_de_areas_abre_gerenciador(self):
+        self.client.force_login(self.admin)
+        area = AreaTrabalho.objects.create(nome="Assessoria", sigla="ASCOM")
+
+        response = self.client.get(reverse("usuarios:areas_index"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, reverse("usuarios:area_update", args=[area.pk]))
+
+    def test_gerenciador_atualiza_area_e_vincula_usuario(self):
+        self.client.force_login(self.admin)
+        area = AreaTrabalho.objects.create(nome="Assessoria", sigla="ASCOM")
+        user = get_user_model().objects.create_user(
+            username="operador",
+            password="123456",
+            first_name="Operador",
+        )
+
+        response = self.client.get(reverse("usuarios:area_update", args=[area.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Dados da área")
+        self.assertContains(response, "Usuários da área")
+
+        response = self.client.post(
+            reverse("usuarios:area_update", args=[area.pk]),
+            {
+                "area-nome": "Assessoria de Comunicacao",
+                "area-sigla": "ASCOM",
+                "area-ativa": "on",
+            },
+        )
+        self.assertRedirects(response, reverse("usuarios:area_update", args=[area.pk]))
+        area.refresh_from_db()
+        self.assertEqual(area.nome, "Assessoria de Comunicacao")
+
+        response = self.client.post(
+            reverse("usuarios:vinculo_create_na_area", args=[area.pk]),
+            {
+                "vinculo-usuario": str(user.pk),
+                "vinculo-area": str(area.pk),
+                "vinculo-papel": VinculoUsuarioArea.PAPEL_EDITOR,
+            },
+        )
+        self.assertRedirects(response, reverse("usuarios:area_update", args=[area.pk]))
+        vinculo = VinculoUsuarioArea.objects.get(usuario=user, area=area)
+        self.assertEqual(vinculo.papel, VinculoUsuarioArea.PAPEL_EDITOR)
+
+        response = self.client.get(reverse("usuarios:area_update", args=[area.pk]))
+        self.assertContains(response, "Operador")
+        self.assertContains(response, reverse("usuarios:vinculo_delete", args=[vinculo.pk]))
+
+        response = self.client.post(reverse("usuarios:vinculo_delete", args=[vinculo.pk]))
+        self.assertRedirects(response, reverse("usuarios:area_update", args=[area.pk]))
+        self.assertFalse(VinculoUsuarioArea.objects.filter(pk=vinculo.pk).exists())
+
     def test_renderiza_cv_pickers_single_nos_formularios(self):
         self.client.force_login(self.admin)
 
-        response = self.client.get(reverse("usuarios:usuario_create"))
+        response = self.client.get(reverse("usuarios:index"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'data-entity-picker="true"', count=1)
-
-        response = self.client.get(reverse("usuarios:vinculo_create"))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'data-entity-picker="true"', count=2)
+        # Quick-add (área) + modal (área + perfil) usam search-picker.
+        self.assertContains(response, 'data-entity-picker="true"', count=3)
+        self.assertContains(response, 'id="quick-add-usuario"')
+        self.assertContains(response, 'id="vincular-usuario-modal"')
+        self.assertContains(response, "vincular-usuario-modal__fields")
+        self.assertContains(response, "vincular-usuario-modal__intro")
+        self.assertContains(response, 'id="id_vinculo-area"')
+        self.assertContains(response, 'id="id_vinculo-papel"')
+        self.assertContains(response, "Buscar área...")
+        self.assertContains(response, "Buscar perfil...")
+        # Só o perfil do quick-add continua como select.
+        self.assertContains(response, 'data-entity-picker-renderer="select"', count=1)
 
     def test_cria_usuario_vinculado_a_area(self):
         self.client.force_login(self.admin)
         area = AreaTrabalho.objects.create(nome="DPCAP", sigla="DPCAP")
 
         response = self.client.post(
-            reverse("usuarios:usuario_create"),
+            reverse("usuarios:index"),
             {
                 "usuario-username": "adm.tsantos",
                 "usuario-email": "adm.tsantos@pc.pr.gov.br",
@@ -99,6 +186,11 @@ class UsuariosAdminPageTests(TestCase):
             ).exists()
         )
 
+    def test_rota_novo_usuario_redireciona_para_lista(self):
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse("usuarios:usuario_create"))
+        self.assertRedirects(response, reverse("usuarios:index"))
+
     def test_vincula_usuario_existente_a_area(self):
         self.client.force_login(self.admin)
         user = get_user_model().objects.create_user(username="operador", password="123456")
@@ -124,6 +216,85 @@ class UsuariosAdminPageTests(TestCase):
                 ativo=True,
             ).exists()
         )
+
+    def test_lista_de_usuarios_tem_modal_de_vinculo_no_card(self):
+        self.client.force_login(self.admin)
+        user = get_user_model().objects.create_user(username="operador", password="123456")
+
+        response = self.client.get(reverse("usuarios:index"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "cv-record-row__vincular")
+        self.assertContains(response, "cv-icon-btn--link")
+        self.assertContains(response, 'data-overlay-target="vincular-usuario-modal"')
+        self.assertContains(response, f'data-vincular-usuario-id="{user.pk}"')
+        self.assertContains(response, f'data-vincular-url="{reverse("usuarios:vinculo_create")}"')
+        self.assertContains(response, 'id="vincular-usuario-modal"')
+        self.assertContains(response, 'name="vinculo-usuario"')
+        self.assertContains(response, 'data-quick-edit')
+        self.assertContains(response, reverse("usuarios:usuario_update", args=[user.pk]))
+        self.assertContains(response, reverse("usuarios:usuario_delete", args=[user.pk]))
+        self.assertContains(response, 'data-overlay-target="delete-confirm-modal"')
+        self.assertContains(response, "cv-icon-btn--delete")
+        self.assertContains(response, "Excluir usuário?")
+        # A própria conta logada não oferece exclusão.
+        self.assertNotContains(
+            response,
+            reverse("usuarios:usuario_delete", args=[self.admin.pk]),
+        )
+        self.assertNotContains(response, "usuario-qa-permissoes")
+        self.assertNotContains(response, "usuario-is_active")
+        self.assertNotContains(response, "usuario-is_staff")
+        self.assertNotContains(response, "cv-floating-action--stacked")
+
+    def test_exclui_usuario_pela_lista(self):
+        self.client.force_login(self.admin)
+        user = get_user_model().objects.create_user(username="para_excluir", password="123456")
+
+        response = self.client.post(reverse("usuarios:usuario_delete", args=[user.pk]))
+
+        self.assertRedirects(response, reverse("usuarios:index"))
+        self.assertFalse(get_user_model().objects.filter(pk=user.pk).exists())
+
+    def test_nao_permite_excluir_a_propria_conta(self):
+        self.client.force_login(self.admin)
+
+        response = self.client.post(reverse("usuarios:usuario_delete", args=[self.admin.pk]))
+
+        self.assertRedirects(response, reverse("usuarios:index"))
+        self.assertTrue(get_user_model().objects.filter(pk=self.admin.pk).exists())
+
+    def test_edita_usuario_pelo_quick_add(self):
+        self.client.force_login(self.admin)
+        user = get_user_model().objects.create_user(
+            username="operador",
+            password="123456",
+            first_name="Operador",
+            email="operador@pc.pr.gov.br",
+        )
+
+        response = self.client.get(reverse("usuarios:usuario_update", args=[user.pk]))
+        self.assertRedirects(response, reverse("usuarios:index"))
+
+        response = self.client.post(
+            reverse("usuarios:usuario_update", args=[user.pk]),
+            {
+                "usuario-username": "operador.editado",
+                "usuario-email": "operador.editado@pc.pr.gov.br",
+                "usuario-nome_completo": "Operador Editado",
+            },
+        )
+
+        self.assertRedirects(response, reverse("usuarios:index"))
+        user.refresh_from_db()
+        self.assertEqual(user.username, "operador.editado")
+        self.assertEqual(user.get_full_name(), "Operador Editado")
+        self.assertEqual(user.email, "operador.editado@pc.pr.gov.br")
+
+    def test_rota_de_vinculo_get_redireciona_para_lista(self):
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse("usuarios:vinculo_create"))
+        self.assertRedirects(response, reverse("usuarios:index"))
 
     def test_busca_filtra_a_lista_de_areas(self):
         self.client.force_login(self.admin)

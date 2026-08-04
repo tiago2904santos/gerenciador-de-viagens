@@ -4,6 +4,8 @@ Sem HTML e sem consulta: os vínculos chegam pré-carregados pelo
 `selectors.queryset_usuarios_base`.
 """
 
+import json
+
 from core.presenters.badges import build_badge
 from core.presenters.meta import build_meta
 
@@ -21,7 +23,7 @@ def _nome_exibido(usuario):
     return usuario.get_full_name().strip() or usuario.get_username()
 
 
-def apresentar_linha_lista_simples_area(area):
+def apresentar_linha_lista_simples_area(area, *, edit_url=None):
     """Sigla como título, nome como subtítulo, contagem de contas como fato.
 
     Sem `avatar`: a inicial de uma sigla é a própria sigla, e repetir "AS" ao
@@ -33,7 +35,7 @@ def apresentar_linha_lista_simples_area(area):
         badges.append(build_badge("Inativa", "draft"))
     if total == 0:
         badges.append(build_badge("Sem usuários", "muted"))
-    return {
+    row = {
         "title": area.sigla,
         "badges": badges,
         "subtitle": area.nome,
@@ -42,9 +44,43 @@ def apresentar_linha_lista_simples_area(area):
             build_meta("Usuários", str(total)),
         ],
     }
+    if edit_url:
+        row["edit_url"] = edit_url
+    return row
 
 
-def apresentar_linha_lista_simples_usuario(usuario):
+def apresentar_linha_lista_simples_vinculo(vinculo, *, delete_url=None):
+    """Linha de uma conta dentro do gerenciador da área."""
+    usuario = vinculo.usuario
+    badges = []
+    if vinculo.area_padrao:
+        badges.append(build_badge("Área padrão", "info"))
+    if not vinculo.ativo:
+        badges.append(build_badge("Inativo", "draft"))
+    if not usuario.is_active:
+        badges.append(build_badge("Conta inativa", "draft"))
+
+    username = usuario.get_username()
+    email = (usuario.email or "").strip()
+    subtitle = f"@{username} · {email}" if email else f"@{username}"
+
+    row = {
+        "avatar": _iniciais(_nome_exibido(usuario), "US"),
+        "title": _nome_exibido(usuario),
+        "badges": badges,
+        "subtitle": subtitle,
+        "search_extra": f"{username} {email}",
+        "facts": [
+            build_meta("Perfil", vinculo.get_papel_display()),
+        ],
+    }
+    if delete_url:
+        row["delete_url"] = delete_url
+        row["delete_modal"] = True
+    return row
+
+
+def apresentar_linha_lista_simples_usuario(usuario, *, vincular_url=None, edit_url=None, delete_url=None):
     """Uma linha por pessoa: as áreas viram fatos na própria linha.
 
     A área padrão vem primeiro (ordenação do `Prefetch`) e é a única marcada,
@@ -73,7 +109,7 @@ def apresentar_linha_lista_simples_usuario(usuario):
     email = (usuario.email or "").strip()
     subtitle = f"@{username} · {email}" if email else f"@{username}"
 
-    return {
+    row = {
         "avatar": _iniciais(_nome_exibido(usuario), "US"),
         "title": _nome_exibido(usuario),
         "badges": badges,
@@ -81,3 +117,21 @@ def apresentar_linha_lista_simples_usuario(usuario):
         "search_extra": f"{username} {email}",
         "facts": facts,
     }
+    if vincular_url:
+        row["vincular_url"] = vincular_url
+        row["vincular_usuario_id"] = usuario.pk
+        row["vincular_usuario_label"] = _nome_exibido(usuario)
+    if edit_url:
+        row["edit_url"] = edit_url
+        row["edit_fields_json"] = json.dumps(
+            {
+                "usuario-username": username,
+                "usuario-email": email,
+                "usuario-nome_completo": _nome_exibido(usuario),
+            },
+            ensure_ascii=False,
+        )
+    if delete_url:
+        row["delete_url"] = delete_url
+        row["delete_modal"] = True
+    return row
