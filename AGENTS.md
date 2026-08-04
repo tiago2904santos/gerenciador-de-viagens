@@ -96,17 +96,38 @@ Etapa N do docs/PLANO_REFATORACAO_EXECUCAO.md
 (escopo deliberadamente deixado de fora, com o ID do defeito)
 ```
 
-## 6. Divisão de trabalho entre as três ferramentas
+## 6. Uma ferramenta só (decisão de 04/08/2026)
 
-Resumo; o detalhe por etapa está em `docs/PLANO_REFATORACAO_EXECUCAO.md` §4.
+**O trabalho passou a ser todo do Claude Code.** Cursor e Codex saíram. A tabela de
+três ferramentas que existia aqui está no histórico do git, se algum dia voltar a fazer
+sentido.
 
-| Ferramenta | Faz bem aqui | Não use para |
-|---|---|---|
-| **Claude Code** | Tarefas que exigem ler muitos arquivos, rodar a suíte, decidir arquitetura: testes de Prestações, motor de diárias, motores JS, camada de selectors | Ajuste fino de aparência que precisa de olho humano na tela |
-| **Cursor** | Trabalho visual com feedback imediato: contraste, tokens de cor, aparência de componente, revisão página a página no navegador | Refactor mecânico em 60 arquivos (caro e lento no editor) |
-| **Codex** | Tarefas mecânicas, bem especificadas, verificáveis por comando: apagar arquivos mortos, trocar literal por token, higiene de repositório, migrar `fetch()` → `CV.http` | Decisão de regra de negócio ou qualquer coisa sem critério objetivo de pronto |
+O que motivou: em 04/08 o Codex entregou quatro fases da reescrita de CSS
+(`NOVO-30`) e **duas foram recusadas**. A fase 1 fundiu três arquivos de token sem
+consolidar nada — 519 tokens viraram 1.032, num arquivo de 1.637 linhas com sete blocos
+`:root` intercalados e linhas de 11.959 caracteres. As fases 3 e 4 colapsaram tokens por
+proximidade de valor sem olhar o **papel** de cada um, e produziram **96 regras com
+`background` e `color` no mesmo token** — botão sem letra, chip vazio, sidebar sem
+largura. Todas as quatro passaram com a suíte verde e todos os gates.
 
-**Regra de paralelismo:** duas ferramentas nunca trabalham na mesma camada ao mesmo tempo.
+A lição que fica, e que vale para mim também:
+
+> **A suíte prova que nada quebrou; não prova que o objetivo foi atingido.** Quando a
+> tarefa tem um alvo mensurável (número de tokens, número de blocos, ausência de
+> seletor), o gate tem de olhar **o artefato**, não o comportamento. E quando a tarefa
+> é visual, nada substitui abrir a tela: nas três regressões visuais do dia, o que
+> achou foi print, não teste.
+
+### O que isso muda na prática
+
+- **Verificação visual é obrigação minha, não terceirizada.** `scripts/medir_paleta.py`
+  sobe as telas nos dois temas, lista toda cor fora da paleta e salva os prints. A
+  saída dele entra no corpo do PR, como o `grep` de deleção já entra (regra 6).
+- **O limite agora é contexto por sessão, não paralelismo.** Uma etapa que não caiba
+  em uma sessão com verificação junto precisa ser fatiada antes de começar — entregar
+  metade sem verificar é o defeito que esta seção existe para lembrar.
+- **A regra de paralelismo perdeu o objeto.** Uma ferramenta só nunca trabalha em duas
+  camadas ao mesmo tempo; o que permanece é não misturar etapas no mesmo PR (limite 1).
 CSS e JS podem correr em paralelo; CSS e HTML não.
 
 ## 7. Comandos do projeto
