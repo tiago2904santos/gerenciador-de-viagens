@@ -183,7 +183,7 @@
 }
 
  #vincular-usuario-modal .vincular-usuario-modal__dialog {
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
 }
 
 .vincular-usuario-modal__dialog > .cv-dialog__header {
@@ -273,7 +273,7 @@
   .cv-custom-select__trigger,
   .cv-custom-select__trigger--v2
 ) {
-  background: var(--cv-surface-block) !important;
+  background: var(--cv-surface-block);
   border: var(--bd-0);
   border-radius: var(--r-sm);
   box-shadow: var(--sh-md);

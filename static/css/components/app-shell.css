@@ -645,8 +645,8 @@
     .cv-search-picker__input,
     .cv-search-picker__control
   ) {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
   border-radius: var(--r-sm);
   box-shadow: var(--sh-md);
 }
@@ -654,8 +654,8 @@
 /* Open state do select: mesmo poço; sem chrome extra de hover/focus nos campos. */
 
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .cv-custom-select--open .cv-custom-select__trigger {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
   border-radius: var(--r-sm);
   box-shadow: var(--sh-md);
 }
@@ -675,7 +675,7 @@
     .cv-search-picker--people.cv-search-picker--roster,
     .cv-search-picker--vehicle
   ) {
-  background: transparent !important;
+  background: transparent;
   border: var(--bd-0);
   border-radius: var(--r-0);
   box-shadow: var(--sh-md);
@@ -685,7 +685,7 @@
 
 
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .cv-search-picker__selected-panel {
-  background: transparent !important;
+  background: transparent;
   border: var(--bd-0);
   box-shadow: var(--sh-md);
   gap: 8px;
@@ -694,7 +694,7 @@
 
 
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .cv-search-picker__selected-empty {
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   border: var(--bd-0);
   border-radius: var(--r-sm);
   color: var(--cv-ink-muted);
@@ -831,17 +831,17 @@
 
   [data-travel-document-wizard-roteiro] .route-sede-block.cv-form-block--split:hover {
   align-items: center;
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   border: var(--bd-0);
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
   column-gap: 16px;
-  filter: none !important;
+  filter: none;
   grid-template-columns: 14rem minmax(0, 1fr);
   margin: 0;
   padding: var(--sp-3);
-  transform: none !important;
-  transition: none !important;
+  transform: none;
+  transition: none;
 }
 
 
@@ -861,7 +861,7 @@
 
   [data-travel-document-wizard-roteiro] .route-sede-block .field-grid.roteiro-sede-grid {
   gap: 10px 12px;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   width: 100%;
 }
 
@@ -875,11 +875,11 @@
     .cv-search-picker__input:hover,
     .cv-search-picker__input:focus
   ) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
+  border-color: transparent;
   box-shadow: var(--sh-md);
-  transition: none !important;
+  transition: none;
 }
 
 /* Período: mesmo card/split dos Destinos; rail 14rem | datas. */
@@ -888,19 +888,19 @@
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block.travel-period-block--split:hover {
   align-items: center;
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   border: var(--bd-0);
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
   column-gap: 16px;
   display: grid;
-  filter: none !important;
+  filter: none;
   grid-template-columns: 14rem minmax(0, 1fr);
   margin: 0;
   padding: var(--sp-3);
   row-gap: 0;
-  transform: none !important;
-  transition: none !important;
+  transform: none;
+  transition: none;
 }
 
 
@@ -966,7 +966,7 @@
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block--split .field-grid.field-grid--cols-2 {
   gap: 12px 16px;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   width: 100%;
 }
 
@@ -991,12 +991,12 @@
     .cv-date-picker__control .cv-field__control:hover,
     .cv-date-picker__control .cv-field__control:focus
   ) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
+  border-color: transparent;
   border-radius: var(--r-sm);
   box-shadow: var(--sh-md);
-  transition: none !important;
+  transition: none;
 }
 
 /* Calendário do período: mesmo filled soft de "Novo viajante". */
@@ -1008,20 +1008,20 @@
     .cv-date-picker__control:focus-within .cv-date-picker__trigger--icon,
     .cv-date-picker--open .cv-date-picker__trigger--icon
   ) {
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   border: var(--bd-0);
   box-shadow: var(--sh-md);
-  color: var(--cv-ink) !important;
+  color: var(--cv-ink);
 }
 
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1])
   .travel-period-block--split
   .cv-date-picker__trigger--icon:is(:hover, :focus-visible) {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-ink-muted)) !important;
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-ink-muted));
   border: var(--bd-0);
   box-shadow: var(--sh-md);
-  color: var(--color-accent) !important;
+  color: var(--color-accent);
   outline: 0;
 }
 
@@ -1039,19 +1039,19 @@
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block.route-destinos-block--split:hover {
   align-items: start;
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   border: var(--bd-0);
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
   column-gap: 16px;
   display: grid;
-  filter: none !important;
+  filter: none;
   grid-template-columns: 14rem minmax(0, 1fr);
   margin: var(--sp-4) 0 0;
   padding: var(--sp-3);
   row-gap: 0;
-  transform: none !important;
-  transition: none !important;
+  transform: none;
+  transition: none;
 }
 
 
@@ -1110,7 +1110,7 @@
 
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block--split .route-destinos-trechos[hidden] {
-  display: none !important;
+  display: none;
 }
 
 
@@ -1162,7 +1162,7 @@
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row:hover {
   align-items: center;
-  background: transparent !important;
+  background: transparent;
   border: var(--bd-0);
   box-shadow: var(--sh-md);
   /* Duas metades iguais à sede: [drag + add + UF] | [Cidade + ×] */
@@ -1171,7 +1171,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   min-height: 0;
   padding: 0;
-  transition: none !important;
+  transition: none;
 }
 
 
@@ -1200,7 +1200,7 @@
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .cv-ordered-field-row__badge.sr-only {
   clip: rect(0, 0, 0, 0);
-  display: none !important;
+  display: none;
   height: 1px;
   overflow: hidden;
   position: absolute;
@@ -1263,33 +1263,33 @@
   justify-content: center;
   line-height: 1;
   margin: 0;
-  opacity: 1 !important;
+  opacity: 1;
   padding: 0;
-  transform: none !important;
+  transform: none;
   transition: none;
   width: 44px;
 }
 
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .route-destinos-add {
-  background: color-mix(in srgb, var(--cv-state-success) 14%, var(--cv-surface-card)) !important;
-  color: var(--cv-ink) !important;
+  background: color-mix(in srgb, var(--cv-state-success) 14%, var(--cv-surface-card));
+  color: var(--cv-ink);
 }
 
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .cv-ordered-field-row__remove,
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-remove-button {
-  background: color-mix(in srgb, var(--cv-state-danger) 12%, var(--cv-surface-card)) !important;
-  color: var(--cv-ink) !important;
+  background: color-mix(in srgb, var(--cv-state-danger) 12%, var(--cv-surface-card));
+  color: var(--cv-ink);
   font-size: 1.25rem;
   justify-self: auto;
 }
 
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .cv-ordered-field-row__remove::before {
-  content: none !important;
-  display: none !important;
+  content: none;
+  display: none;
 }
 
 
@@ -1302,11 +1302,11 @@
     .cv-search-picker__input:hover,
     .cv-search-picker__input:focus
   ) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
+  border-color: transparent;
   box-shadow: var(--sh-md);
-  transition: none !important;
+  transition: none;
 }
 
 @media (max-width: 720px) {
@@ -1335,14 +1335,14 @@
     [data-travel-document-wizard-roteiro] .route-sede-block .field-grid.roteiro-sede-grid,
 
     :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block--split .field-grid.field-grid--cols-2 {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 600px) {
 
     [data-travel-document-wizard-roteiro] .route-sede-block .field-grid.roteiro-sede-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1370,8 +1370,8 @@
     .oficio-documentos-vehicle-lines,
     .oficio-documentos-facts
   ) {
-  background: transparent !important;
-  border-color: transparent !important;
+  background: transparent;
+  border-color: transparent;
   box-shadow: var(--sh-md);
 }
 
@@ -1379,8 +1379,8 @@
 
   [data-travel-document-wizard-documentos]
   .oficio-documentos-route-trechos-scroll-card {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
   box-shadow: var(--sh-md);
 }
 
@@ -1397,8 +1397,8 @@
     .oficio-documentos-route-card__fallback-fact,
     .oficio-documentos-route-card__trecho
   ) {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
   border-radius: var(--r-sm);
 }
 
@@ -1407,8 +1407,8 @@
   [data-travel-document-wizard-documentos]
   .oficio-documentos-route-section
   .oficio-documentos-route-trecho-scroll-item {
-  background: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  border-color: transparent;
   box-shadow: var(--sh-md);
 }
 
@@ -1424,7 +1424,7 @@
   .document-inline-card--termos
   .document-inline-card--nested
   > .document-inline-card__header {
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
 }
 
 
@@ -1456,8 +1456,8 @@
   .document-form-page
   .termo-documentos-preview
   .document-inline-card {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
   border-radius: var(--r-sm);
   box-shadow: var(--sh-md);
 }
@@ -1475,8 +1475,8 @@
   .document-inline-card--termos
   .document-inline-card--nested
   > :is(.document-inline-card__header, .document-inline-card__body) {
-  background: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  border-color: transparent;
 }
 
 
@@ -1519,8 +1519,8 @@
     in srgb,
     var(--color-accent) 12%,
     var(--cv-ink-muted)
-  ) !important;
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border)) !important;
+  );
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
   box-shadow: var(--sh-sm);
 }
 
@@ -1575,8 +1575,8 @@
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .cv-search-picker__control {
   align-items: center;
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
   border-radius: var(--r-sm);
   box-shadow: var(--sh-md);
   box-sizing: border-box;
@@ -1590,7 +1590,7 @@
 
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .cv-search-picker__input {
-  background: transparent !important;
+  background: transparent;
   border: var(--bd-0);
   box-shadow: var(--sh-md);
   flex: 1 1 auto;
@@ -1845,7 +1845,7 @@
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row:hover {
   align-items: center;
-  background: transparent !important;
+  background: transparent;
   border: var(--bd-0);
   border-radius: var(--r-0);
   box-shadow: var(--sh-md);
@@ -1855,7 +1855,7 @@
   min-height: 0;
   padding: 0;
   row-gap: 0;
-  transition: none !important;
+  transition: none;
 }
 
 
@@ -1895,8 +1895,8 @@
   height: 44px;
   margin: 0;
   min-width: 44px;
-  opacity: 1 !important;
-  transform: none !important;
+  opacity: 1;
+  transform: none;
   width: 44px;
 }
 
@@ -1923,7 +1923,7 @@
 
   [data-travel-document-wizard-roteiro]
   #sec-mapa-rota > .cv-form-block__header {
-  display: none !important;
+  display: none;
 }
 
 
@@ -2100,12 +2100,12 @@
     .cv-date-picker__control .cv-field__control:hover,
     .cv-date-picker__control .cv-field__control:focus
   ) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
+  border-color: transparent;
   border-radius: var(--r-sm);
   box-shadow: var(--sh-md);
-  transition: none !important;
+  transition: none;
 }
 
 @media (max-width: 720px) {
@@ -2219,8 +2219,8 @@
     .cv-date-picker__input,
     input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"])
   ) {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
   box-shadow: var(--sh-md);
   color: var(--cv-ink);
 }
@@ -2233,8 +2233,8 @@
   [data-travel-document-wizard-roteiro]
   #retorno-card
   :is(.cv-field--readonly .cv-field__control, .cv-field__control[readonly], input[readonly]) {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
   box-shadow: var(--sh-md);
   color: var(--cv-ink);
   opacity: 1;
@@ -2275,8 +2275,8 @@
     select,
     textarea
   ) {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
   box-shadow: var(--sh-md);
   color: var(--cv-ink);
 }
@@ -2291,8 +2291,8 @@
   #retorno-card
   .roteiro-trecho-card__leg
   :is(.cv-field--readonly .cv-field__control, .cv-field__control[readonly], input[readonly]) {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
   box-shadow: var(--sh-md);
   color: var(--cv-ink);
   opacity: 1;
@@ -2349,7 +2349,7 @@
   min-width: 11.5rem;
   padding: var(--sp-2) var(--sp-3);
   text-transform: none;
-  transform: none !important;
+  transform: none;
   transition:
     background-color 140ms ease,
     border-color 140ms ease,
@@ -2363,7 +2363,7 @@
   .cv-field-side-action--toggle:is(:hover, :focus, :focus-visible, :active) {
   box-shadow: var(--sh-md);
   filter: none;
-  transform: none !important;
+  transform: none;
 }
 
 
@@ -2383,9 +2383,9 @@
   [data-travel-document-wizard-roteiro]
   .oficio-roteiro-bate-volta-toggle
   .cv-field-side-action--toggle:is(.cv-field-side-action--danger, .is-inactive):is(:hover, :focus, :focus-visible) {
-  background: var(--cv-surface-card) !important;
-  border-color: color-mix(in srgb, var(--cv-border) 55%, transparent) !important;
-  color: var(--cv-ink-muted) !important;
+  background: var(--cv-surface-card);
+  border-color: color-mix(in srgb, var(--cv-border) 55%, transparent);
+  color: var(--cv-ink-muted);
 }
 
 /* ON — success soft filled (evita texto/fill dourado do accent) */
@@ -2397,17 +2397,17 @@
   [data-travel-document-wizard-roteiro]
   .oficio-roteiro-bate-volta-toggle
   .cv-field-side-action--toggle:is(.cv-field-side-action--success, .is-active, [aria-pressed="true"]):is(:hover, :focus, :focus-visible) {
-  background: color-mix(in srgb, var(--cv-state-success) 22%, var(--cv-surface-card)) !important;
-  border-color: color-mix(in srgb, var(--cv-state-success) 55%, var(--cv-border)) !important;
-  color: var(--cv-ink) !important;
+  background: color-mix(in srgb, var(--cv-state-success) 22%, var(--cv-surface-card));
+  border-color: color-mix(in srgb, var(--cv-state-success) 55%, var(--cv-border));
+  color: var(--cv-ink);
 }
 
 
   [data-travel-document-wizard-roteiro]
   .oficio-roteiro-bate-volta-toggle
   .cv-field-side-action--toggle:is(.cv-field-side-action--danger, .is-inactive):is(:hover, :focus-visible) {
-  background: color-mix(in srgb, var(--on-accent) 4%, var(--cv-surface-card)) !important;
-  border-color: color-mix(in srgb, var(--cv-border) 70%, transparent) !important;
+  background: color-mix(in srgb, var(--on-accent) 4%, var(--cv-surface-card));
+  border-color: color-mix(in srgb, var(--cv-border) 70%, transparent);
 }
 
 
@@ -2425,14 +2425,14 @@
   [data-travel-document-wizard-roteiro]
   .oficio-roteiro-bate-volta-toggle
   .cv-field-side-action--state:is(.cv-field-side-action--success, .is-active)::before {
-  background: var(--cv-state-success) !important;
+  background: var(--cv-state-success);
 }
 
 
   [data-travel-document-wizard-roteiro]
   .oficio-roteiro-bate-volta-toggle
   .cv-field-side-action--state:is(.cv-field-side-action--danger, .is-inactive)::before {
-  background: var(--cv-ink-muted) !important;
+  background: var(--cv-ink-muted);
 }
 
 /* Bate-volta fechado: uma coluna, header em flex (título + toggle).
@@ -2717,7 +2717,7 @@
  .cv-composite-field__control .form-control:hover,
  .cv-composite-field__control .form-control:focus,
  .cv-composite-field__control .form-control:focus-visible {
-  background: transparent !important;
+  background: transparent;
   border: var(--bd-0);
   box-shadow: var(--sh-md);
   outline: none;
@@ -2915,7 +2915,7 @@
   align-items: center;
   background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-ink-muted));
   border: var(--bd-0);
-  border-color: transparent !important;
+  border-color: transparent;
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   column-gap: 12px;
@@ -3384,13 +3384,13 @@
   color: inherit;
   display: block;
   flex: 0 0 20px;
-  height: 20px !important;
+  height: 20px;
   max-height: 20px;
   max-width: 20px;
   min-height: 20px;
   min-width: 20px;
   overflow: visible;
-  width: 20px !important;
+  width: 20px;
 }
 
 
@@ -4237,9 +4237,9 @@
     .cv-file-selection__item:focus-within,
     .prestacao-file-selection__item:focus-within
   ) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
-  transition: none !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
+  transition: none;
 }
 
 
@@ -4639,7 +4639,7 @@
 
 
   .oficio-external-driver .cv-search-picker__control {
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-sm);
   box-shadow: var(--sh-md);
@@ -4650,7 +4650,7 @@
 
 
   .oficio-external-driver .cv-search-picker__input {
-  background: transparent !important;
+  background: transparent;
   border: var(--bd-0);
   box-shadow: var(--sh-md);
   min-height: 44px;
@@ -4666,10 +4666,10 @@
    *,
  *::before,
  *::after {
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
   }
 }
 
@@ -5272,14 +5272,14 @@
 
 
   .cv-itinerary__leg {
-  background: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  border-color: transparent;
 }
 
 
   .cv-itinerary__leg:hover {
-  background: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  border-color: transparent;
 }
 
 
@@ -5553,14 +5553,14 @@
 /* Linhas de trecho: mesmo fundo da seção do card. */
 
   .cv-itinerary__leg {
-  background: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  border-color: transparent;
 }
 
 
   .cv-itinerary__leg:hover {
-  background: var(--cv-surface-card) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  border-color: transparent;
 }
 
 /* Cabeçalho de filtros: campos assentados na superfície suave, foco consistente. */
@@ -5872,8 +5872,8 @@
     input.cv-field__control[readonly],
     input[readonly]
   ) {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
   box-shadow: var(--sh-md);
 }
 
@@ -5912,8 +5912,8 @@
     select,
     textarea
   ) {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
   box-shadow: var(--sh-md);
   color: var(--cv-ink);
 }
@@ -5935,8 +5935,8 @@
     .cv-field__control[readonly],
     input[readonly]
   ) {
-  background: var(--cv-surface-block) !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-block);
+  border-color: transparent;
   box-shadow: var(--sh-md);
   color: var(--cv-ink);
   opacity: 1;

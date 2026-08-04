@@ -72,10 +72,10 @@
   input.cv-field__control.pt-activity__search-input,
 .pt-activity__preset-select .cv-custom-select__trigger,
 .pt-activity__search .pt-activity__search-input {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
-  background-image: none !important;
-  border-color: transparent !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
+  background-image: none;
+  border-color: transparent;
   border-radius: var(--r-md);
   box-shadow: var(--sh-md);
 }
@@ -262,7 +262,7 @@
 
 .pt-activity-card.is-selected .pt-activity-card__check {
   background: var(--color-accent);
-  color: #1a1200;
+  color: var(--cv-ink);
 }
 
 .pt-activity-card.is-selected .pt-activity-card__name {
@@ -406,7 +406,7 @@
   margin: 0;
   padding: var(--sp-3);
   border: var(--bd-0);
-  border-bottom: 1px solid color-mix(in srgb, #fff 8%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--on-accent) 8%, transparent);
   border-radius: var(--r-0);
   background: transparent;
   box-shadow: var(--sh-none);

@@ -1324,10 +1324,10 @@
 }
 
 /* Painel manual de viatura — escondido quando há viatura cadastrada vinculada.
-   Usa !important porque .form-field--hidden compete com .field-grid em
+   Usa porque .form-field--hidden compete com .field-grid em
    especificidade em alguns contextos do wizard. */
 .oficio-viatura-manual.form-field--hidden {
-  display: none !important;
+  display: none;
 }
 
 /* Picker de viatura: variação tonal do chip de motivo (Motorista / Unidade)
@@ -2994,7 +2994,7 @@
 }
 
 .evento-doc-toggle .cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {
-  background: color-mix(in srgb, #fff 5%, transparent);
+  background: color-mix(in srgb, var(--on-accent) 5%, transparent);
   color: var(--cv-ink);
 }
 
@@ -3016,7 +3016,7 @@
    Mesmo remédio já usado em .related-route-picker (dark-redesign.css). */
 .evento-doc-source-picker {
   /* gap:0 — o select oculto no meio do grid dobraria qualquer gap. */
-  gap: 0 !important;
+  gap: 0;
 }
 
 .evento-doc-source-picker .cv-search-picker__field {
@@ -3042,7 +3042,7 @@
    selecionados; aqui a lista reaproveita o scroll de 220px do roteiro-editor,
    então sem overflow:auto os cards vazam para fora do card do documento. */
 .evento-doc-summary-panel .cv-search-picker__selected-list {
-  overflow-y: auto !important;
+  overflow-y: auto;
 }
 
 /* Destaque do card marcado (Documentos vinculados). .related-route-item.is-active

@@ -4,7 +4,7 @@
   margin: 0;
   padding: var(--sp-4) var(--sp-6);
   place-items: center;
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   color: var(--cv-ink);
 }
 
@@ -16,7 +16,7 @@
   padding: var(--sp-4) var(--sp-6);
   border: var(--bd-0);
   border-radius: var(--r-lg);
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   text-align: center;
 }
 

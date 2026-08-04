@@ -58,9 +58,9 @@ jobs:
           python manage.py check --settings=config.settings.test
 
       - name: Block new frontend standards debt
-        # Catraca: este número só desce. A Etapa 1 levou 465 → 449; a Etapa 7
-        # levou 449 → 438 na fase 2 e 438 → 417 na fase 1.
-        run: python scripts/audit_frontend_standards.py --max-warnings 401
+        # Catraca: este número só desce. O NOVO-30/4 eliminou a dívida CSS;
+        # restam apenas dez href="#" já inventariados em templates.
+        run: python scripts/audit_frontend_standards.py --max-warnings 10
 
       - name: Block backend architecture regressions (P-01, P-05)
         # Catraca: este número só desce. O P-01 fechou os quatro apps do

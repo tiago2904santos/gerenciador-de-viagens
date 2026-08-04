@@ -88,12 +88,10 @@
 }
 
 /* ============================================================
-   Painel grid (design system) — base visual de .roteiro-editor__grid
-   Tokens de rota; caixa extra só em .app-form-grid-panel.
+   Painel grid do design system. Regras de domínio ficam nos módulos.
    ============================================================ */
 
-.app-form-grid-panel,
-.roteiro-editor__grid {
+.app-form-grid-panel {
   background: var(--cv-surface-block);
   box-sizing: border-box;
   display: grid;
@@ -108,31 +106,25 @@
   padding: var(--sp-4);
 }
 
-.app-form-grid-panel.align-items-end,
-.roteiro-editor__grid.align-items-end {
+.app-form-grid-panel.align-items-end {
   align-items: end;
 }
 
-.app-form-grid-panel > .field-span-6,
-.roteiro-editor__grid > .field-span-6 {
+.app-form-grid-panel > .field-span-6 {
   grid-column: span 6;
 }
 
-.app-form-grid-panel > .field-span-4,
-.roteiro-editor__grid > .field-span-4 {
+.app-form-grid-panel > .field-span-4 {
   grid-column: span 4;
 }
 
-.app-form-grid-panel > .field-span-12,
-.roteiro-editor__grid > .field-span-12 {
+.app-form-grid-panel > .field-span-12 {
   grid-column: span 12;
 }
 
 @media (max-width: 720px) {
   .app-form-grid-panel > .field-span-6,
-  .app-form-grid-panel > .field-span-4,
-  .roteiro-editor__grid > .field-span-6,
-  .roteiro-editor__grid > .field-span-4 {
+  .app-form-grid-panel > .field-span-4 {
     grid-column: span 12;
   }
 }
@@ -245,61 +237,6 @@
   gap: var(--sp-3);
   justify-content: flex-end;
   padding: var(--sp-3);
-}
-
-.roteiro-editor__actions {
-  align-items: center;
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-md);
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-3);
-  justify-content: flex-end;
-  margin-top: var(--sp-1);
-  padding: var(--sp-3) var(--sp-4);
-}
-
-.roteiro-editor__actions--avulso {
-  justify-content: space-between;
-}
-
-.roteiro-form--legacy-roteiro .travel-document-wizard-footer-actions .btn,
-.roteiro-editor__actions .btn {
-  border-radius: var(--r-pill);
-  min-height: 48px;
-  padding-left: var(--sp-5);
-  padding-right: var(--sp-5);
-}
-
-.roteiro-editor__actions .btn-primary {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
-  box-shadow: var(--sh-md);
-  color: var(--color-accent);
-}
-
-.roteiro-editor__actions .btn-primary:hover,
-.roteiro-editor__actions .btn-primary:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
-  color: var(--color-accent);
-}
-
-.roteiro-editor__actions .btn-outline-secondary,
-.roteiro-editor__actions .btn-secondary {
-  background: var(--cv-surface-card);
-  border-color: var(--cv-border);
-  color: var(--cv-ink-muted);
-}
-
-.roteiro-editor__actions .btn-outline-secondary:hover,
-.roteiro-editor__actions .btn-outline-secondary:focus-visible,
-.roteiro-editor__actions .btn-secondary:hover,
-.roteiro-editor__actions .btn-secondary:focus-visible {
-  background: var(--cv-surface-block);
-  border-color: var(--cv-border);
-  color: var(--cv-ink-muted);
 }
 
 /* --------------------------------------------------------------------------
@@ -781,7 +718,7 @@ textarea[readonly] {
 /* ==========================================================================
    ALIASES CANONICOS DO DESIGN SYSTEM — Fase 10: Wizard shell
    .app-wizard-* e .app-stepper-* como aliases de .travel-document-wizard-* e
-   .oficio-stepper-*. Classes originais nao removidas.
+   Classes antigas do stepper permanecem durante a migracao.
    Tratamento visual completo aqui: garante que o wizard funcione mesmo
    sem oficios.css carregado (ex.: cache antigo de style.css).
    ========================================================================== */

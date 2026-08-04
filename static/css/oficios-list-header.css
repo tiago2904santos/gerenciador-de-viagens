@@ -104,7 +104,7 @@
   background: rgba(69, 105, 143, 0.1);
   border: var(--bd);
   border-radius: var(--r-sm);
-  color: #426b91;
+  color: var(--color-accent);
   display: inline-flex;
   flex: 0 0 34px;
   height: 34px;
@@ -142,32 +142,32 @@
 .cv-action-menu__item-icon--wa {
   background: rgba(38, 139, 91, 0.1);
   border-color: rgba(38, 139, 91, 0.18);
-  color: #23734f;
+  color: var(--cv-state-success);
 }
 
 .cv-action-menu__item-icon--business {
   background: rgba(26, 112, 109, 0.1);
   border-color: rgba(26, 112, 109, 0.18);
-  color: #1d6f6c;
+  color: var(--color-accent);
 }
 
 .cv-action-menu__item-icon--pdf {
   background: rgba(171, 64, 54, 0.09);
   border-color: rgba(171, 64, 54, 0.16);
-  color: #a0443b;
+  color: var(--cv-state-danger);
 }
 
 .cv-action-menu__item-icon--route {
   background: rgba(49, 99, 151, 0.09);
   border-color: rgba(49, 99, 151, 0.16);
-  color: #315f8c;
+  color: var(--color-accent);
 }
 
 .cv-action-menu__item-icon--package,
 .cv-action-menu__item-icon--copy {
   background: rgba(104, 82, 149, 0.09);
   border-color: rgba(104, 82, 149, 0.16);
-  color: #65528b;
+  color: var(--cv-ink-muted);
 }
 
  .cv-action-menu {
@@ -184,17 +184,17 @@
 
 /* Finalizar: sucesso sóbrio no tema escuro, sem o verde fluorescente. */
  .cv-record-card .cv-icon-btn--complete {
-  background: linear-gradient(145deg, #1d4439, #17372f);
-  border-color: #3e6f5e;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--cv-state-success) 24%, var(--cv-surface-card)), color-mix(in srgb, var(--cv-state-success) 16%, var(--cv-surface-card)));
+  border-color: color-mix(in srgb, var(--cv-state-success) 52%, var(--cv-border));
   box-shadow: var(--sh-md);
-  color: #b7e8d3;
+  color: var(--cv-state-success);
 }
 
  .cv-record-card .cv-icon-btn--complete:hover,
  .cv-record-card .cv-icon-btn--complete:focus {
-  background: linear-gradient(145deg, #245143, #1c4036);
-  border-color: #568776;
-  color: #d2f3e4;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--cv-state-success) 30%, var(--cv-surface-card)), color-mix(in srgb, var(--cv-state-success) 22%, var(--cv-surface-card)));
+  border-color: color-mix(in srgb, var(--cv-state-success) 62%, var(--cv-border));
+  color: var(--cv-state-success);
 }
 
 /* Ações de gerenciamento do card de prestação (finalizar / arquivar) */

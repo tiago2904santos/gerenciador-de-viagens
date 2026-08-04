@@ -651,7 +651,7 @@
 
 .pt-document-preview__actions .cv-icon-btn {
   border: var(--bd-0);
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   box-shadow: var(--sh-md);
 }
 
@@ -664,19 +664,19 @@
 .pt-documentos-stage .document-inline-viewer {
   border: var(--bd-0);
   border-radius: var(--r-lg);
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
 }
 
 .pt-documentos-stage > .cv-form-section-card {
   border: var(--bd-0);
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   box-shadow: var(--sh-md);
 }
 
 .pt-documentos-stage > .cv-form-section-card > .cv-form-section-header {
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   border: var(--bd-0);
-  border-bottom: 1px solid var(--cv-border) !important;
+  border-bottom: 1px solid var(--cv-border);
   box-shadow: var(--sh-md);
 }
 
@@ -684,7 +684,7 @@
 .pt-documentos-stage > .cv-form-section-card .cv-card-footer,
 .pt-documentos-stage > .cv-form-section-card .cv-card-footer-section {
   border: var(--bd-0);
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   box-shadow: var(--sh-md);
 }
 
@@ -699,13 +699,13 @@
 .pt-add-evento {
   margin: 0;
   border: var(--bd-0);
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
   box-shadow: var(--sh-md);
 }
 
 .pt-add-evento > .pt-add-evento__inner {
   border: var(--bd-0);
-  background: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
 }
 
 @media (max-width: 720px) {
@@ -773,8 +773,8 @@
   .cv-custom-select__trigger--v2,
   .cv-custom-select--open .cv-custom-select__trigger
 ) {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
 }
 
 @media (max-width: 720px) {
@@ -844,8 +844,8 @@
 }
 
  .pt-texto-block .cv-field__control--textarea {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
 }
 
 .pt-texto-block .cv-field__control--textarea::-webkit-scrollbar {
@@ -1011,8 +1011,8 @@
 
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block.route-destinos-block--split:hover {
-  background: var(--cv-surface-card) !important;
-  background-color: var(--cv-surface-card) !important;
+  background: var(--cv-surface-card);
+  background-color: var(--cv-surface-card);
   margin: 0;
 }
 
@@ -1036,8 +1036,8 @@
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block
   .pt-efetivo-card.destination-row:hover {
-  align-items: start !important;
-  grid-template-columns: 44px minmax(0, 1fr) 44px !important;
+  align-items: start;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
 }
 
 
@@ -1048,8 +1048,8 @@
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block
   .pt-efetivo-card.destination-row--single:hover {
-  align-items: start !important;
-  grid-template-columns: 44px minmax(0, 1fr) !important;
+  align-items: start;
+  grid-template-columns: 44px minmax(0, 1fr);
 }
 
 .pt-efetivo-section.route-destinos-block--split .pt-efetivo-card .pt-efetivo-card__body {
@@ -1058,7 +1058,7 @@
 }
 
 .pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .cv-ordered-field-row__badge.sr-only {
-  display: none !important;
+  display: none;
 }
 
 /* + e × sobem junto dos rótulos se alinhados ao topo; descem a altura do label+gap. */
@@ -1107,19 +1107,19 @@
 }
 
  .pt-efetivo-fields .pt-quantidade-stepper {
-  background: var(--cv-surface-block) !important;
+  background: var(--cv-surface-block);
 }
 
 .pt-efetivo-fields .pt-quantidade-stepper > .cv-field__control,
 .pt-efetivo-fields .pt-quantidade-stepper > input {
   appearance: textfield;
   -moz-appearance: textfield;
-  background: transparent !important;
+  background: transparent;
   border: var(--bd-0);
   border-radius: var(--r-0);
   box-shadow: var(--sh-md);
-  height: 44px !important;
-  min-height: 44px !important;
+  height: 44px;
+  min-height: 44px;
   min-width: 0;
   padding: 0;
   text-align: center;
@@ -1174,7 +1174,7 @@
   [data-travel-document-wizard-step1]
   .pt-efetivo-section.route-destinos-block--split
   .pt-efetivo-card.destination-row:hover {
-  align-items: start !important;
+  align-items: start;
 }
 
 @media (max-width: 720px) {

@@ -15,13 +15,6 @@ from django.test import SimpleTestCase
 ROOT = Path(settings.BASE_DIR)
 CSS_DIR = ROOT / "static" / "css"
 
-# Mesma política de exceção do audit_frontend_standards.py (Etapa 7 gate).
-COLOR_LITERAL_ALLOWED = {
-    "static/css/00-palette.css",
-    "static/css/01-tokens.css",
-    "static/css/shell.bundle.css",  # gerado (NOVO-12); literais vêm das fontes acima
-}
-
 _HEX_COLOR = re.compile(r"(?<![\w#])#([0-9a-fA-F]{3,8})\b")
 _RGB_COLOR = re.compile(r"\brgba?\(\s*[\d.%]+")
 _CSS_COMMENT = re.compile(r"/\*.*?\*/")
@@ -91,8 +84,7 @@ def _strip_comments(line: str) -> str:
 
 
 def _find_color_literals(path: Path) -> list[tuple[int, str]]:
-    rel = _rel_css(path)
-    if rel in COLOR_LITERAL_ALLOWED:
+    if path.name in {"00-palette.css", "01-tokens.css"} or path.name.endswith(".bundle.css"):
         return []
 
     try:
@@ -209,6 +201,36 @@ class CssTokenGateTests(SimpleTestCase):
                     limit,
                     f"{prop} fora da escala ({len(values)} > {limit}): {sorted(values)}",
                 )
+
+    def test_novo30_phase4_limits_important_to_documented_third_party_overrides(self):
+        """NOVO-30/4: no máximo 20 overrides, cada um explicado no ponto de uso."""
+        occurrences: list[str] = []
+        undocumented: list[str] = []
+        for path in sorted(CSS_DIR.rglob("*.css")):
+            if path.name.endswith(".bundle.css"):
+                continue
+            lines = path.read_text(encoding="utf-8").splitlines()
+            for index, line in enumerate(lines):
+                if "!important" not in line:
+                    continue
+                rel = _rel_css(path)
+                occurrences.append(f"{rel}:{index + 1}")
+                previous = lines[index - 1].strip() if index else ""
+                if "terceiro:" not in previous.casefold():
+                    undocumented.append(f"{rel}:{index + 1}: {line.strip()}")
+
+        self.assertLessEqual(len(occurrences), 20, occurrences)
+        self.assertEqual(undocumented, [], "\n".join(undocumented))
+
+    def test_novo30_phase4_has_no_file_exception_lists(self):
+        """NOVO-30/4: desvios voltam a ser regra normal, sem allowlist por arquivo."""
+        auditor = (ROOT / "scripts" / "audit_frontend_standards.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotIn("TEMPLATE_EXCEPTIONS", auditor)
+        self.assertNotIn("CSS_EXCEPTIONS", auditor)
+        test_source = Path(__file__).read_text(encoding="utf-8")
+        self.assertNotRegex(test_source, r"(?m)^COLOR_LITERAL_ALLOWED\s*=")
 
     def test_canonical_component_stylesheets_have_no_color_literals(self):
         """Novos componentes cv-notice/cv-metric devem usar apenas var() de token."""
