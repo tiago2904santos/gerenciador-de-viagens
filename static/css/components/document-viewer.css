@@ -1,7 +1,7 @@
 .cv-document-viewer {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4, 1rem);
+  gap: var(--sp-4);
   min-height: calc(100vh - 120px);
   min-width: 0;
 }
@@ -14,9 +14,9 @@
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3, 0.75rem);
+  gap: var(--sp-3);
   justify-content: space-between;
-  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  padding: var(--sp-3) var(--sp-4);
 }
 
 .doc-pdf-toolbar__left,
@@ -25,7 +25,7 @@
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2, 0.5rem);
+  gap: var(--sp-2);
 }
 
 .doc-pdf-toolbar__title {
@@ -45,7 +45,7 @@
 .doc-pdf-zoom {
   align-items: center;
   display: flex;
-  font-size: var(--font-size-sm, 0.875rem);
+  font-size: var(--fs-sm);
   gap: 0.35rem;
 }
 
@@ -54,20 +54,20 @@
 .doc-pdf-body {
   display: grid;
   flex: 1;
-  gap: var(--space-4, 1rem);
+  gap: var(--sp-4);
   grid-template-columns: minmax(120px, 160px) minmax(0, 1fr);
   min-height: 0;
 }
 
 .doc-pdf-sidebar {
   overflow: auto;
-  padding: var(--space-2, 0.5rem);
+  padding: var(--sp-2);
 }
 
 .doc-pdf-thumbs {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2, 0.5rem);
+  gap: var(--sp-2);
 }
 
 .doc-pdf-thumb {
@@ -92,8 +92,8 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  gap: var(--space-4, 1rem);
-  padding: var(--space-4, 1rem);
+  gap: var(--sp-4);
+  padding: var(--sp-4);
 }
 
 .doc-pdf-canvas-wrap canvas {
@@ -108,8 +108,8 @@
 }
 
 .doc-pdf-error {
-  margin: var(--space-4, 1rem);
-  padding: var(--space-3, 0.75rem);
+  margin: var(--sp-4);
+  padding: var(--sp-3);
 }
 
 .cv-document-viewer__thumb-paper {

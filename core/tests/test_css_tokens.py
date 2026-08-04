@@ -202,3 +202,159 @@ class CssTokenGateTests(SimpleTestCase):
         )
         self.assertIn(">>> css/components/cv-notice.css >>>", bundle)
         self.assertIn(">>> css/components/cv-metric.css >>>", bundle)
+
+
+# ===========================================================================
+# NOVO-30 fase 3a — a camada unica de token
+#
+# POR QUE ESTES GATES EXISTEM
+#
+# O gate da fase 1 contava token declarado FORA da camada, e dava zero. Nunca
+# olhou para dentro: `01-tokens.css` chegou na fase 3 com 1.034 nomes distintos
+# em 2.078 declaracoes, 88 blocos de regra de componente, duas copias literais
+# do mesmo bloco e linhas de 11.959 caracteres — exatamente o artefato que a
+# §6 do AGENTS.md descreve como reprovado. Medir o lado errado e o defeito;
+# esta bateria mede o lado certo (NOVO-31).
+# ===========================================================================
+
+TETO_DE_TOKENS = 60
+
+# Prefixo `--_` marca variavel PRIVADA de componente (declarada e consumida no
+# mesmo arquivo). Nao e token de design e nao entra na contagem — mas tambem
+# nao pode aparecer na camada, senao vira alias com outro nome.
+_DECL_TOKEN = re.compile(r"(?:^|[{;])\s*(--[a-zA-Z0-9_-]+)\s*:\s*([^;}]*)", re.M)
+CAMADA_DE_TOKEN = {"00-palette.css", "01-tokens.css"}
+
+# Familia de token x propriedade que pode consumi-la. `padding: var(--sh-lg)` e
+# sintaticamente valido: o navegador descarta a declaracao e o card fica sem
+# respiro, sem quebrar teste nenhum. Foi assim que um token de padding guardado
+# como `12px 16px 12px 32px` virou sombra na consolidacao.
+FAMILIA_EXCLUSIVA = {
+    "--sh-": ("box-shadow", "filter", "backdrop-filter", "text-shadow"),
+    "--tr-": ("transition", "animation"),
+    "--z-": ("z-index",),
+}
+# `border-radius` tem "border" no nome e e medida, nao cor: a checagem e por
+# nome inteiro, nao por pedaco.
+PROPS_DE_COR = frozenset({
+    "color", "background", "background-color", "background-image", "border-color",
+    "border-top-color", "border-right-color", "border-bottom-color",
+    "border-left-color", "outline-color", "fill", "stroke", "caret-color",
+    "accent-color", "text-decoration-color", "scrollbar-color",
+})
+PROPS_DE_MEDIDA = frozenset({
+    "padding", "margin", "gap", "row-gap", "column-gap", "width", "height",
+    "min-width", "min-height", "max-width", "max-height", "font-size", "z-index",
+    "border-radius", "inset", "top", "right", "bottom", "left", "flex-basis",
+    "border-width", "letter-spacing", "line-height",
+})
+FAMILIAS_DE_MEDIDA = ("--sp-", "--r-", "--h-", "--fs-", "--fw-")
+FAMILIAS_DE_COR = (
+    "--cv-ink", "--cv-border", "--cv-state", "--cv-surface", "--color-accent",
+    "--on-accent", "--focus-ring", "--accent-tint",
+)
+
+
+_COMENTARIO = re.compile(r"/\*.*?\*/", re.S)
+
+
+def _css_fontes() -> list[Path]:
+    return [f for f in sorted(CSS_DIR.rglob("*.css")) if f.name != "shell.bundle.css"]
+
+
+def _declaracoes(texto: str) -> list[tuple[str, str]]:
+    return _DECL_TOKEN.findall(_COMENTARIO.sub("", texto))
+
+
+class CamadaUnicaDeTokenTests(SimpleTestCase):
+    def test_o_vocabulario_inteiro_cabe_no_teto(self):
+        """Contando TODAS as declaracoes, nao so as que comecam a linha.
+
+        A fase 1 usou `^\\s*--nome:` e por isso um `:root {--a: 1;--b: 2;...}`
+        de 3.902 caracteres numa linha so contava como um token.
+        """
+        nomes = set()
+        for arquivo in _css_fontes():
+            for nome, _valor in _declaracoes(arquivo.read_text(encoding="utf-8")):
+                if not nome.startswith("--_"):
+                    nomes.add(nome)
+        self.assertLessEqual(
+            len(nomes),
+            TETO_DE_TOKENS,
+            f"{len(nomes)} tokens declarados (teto {TETO_DE_TOKENS}): {sorted(nomes)}",
+        )
+
+    def test_nome_novo_de_token_so_nasce_na_camada(self):
+        """Componente pode REDECLARAR um token canonico num contexto — e assim que
+        o rodizio de superficies funciona — mas nao pode inventar nome."""
+        da_camada = set()
+        for nome_arquivo in CAMADA_DE_TOKEN:
+            for nome, _v in _declaracoes((CSS_DIR / nome_arquivo).read_text(encoding="utf-8")):
+                da_camada.add(nome)
+
+        inventados = []
+        for arquivo in _css_fontes():
+            if arquivo.name in CAMADA_DE_TOKEN:
+                continue
+            for nome, _v in _declaracoes(arquivo.read_text(encoding="utf-8")):
+                if nome.startswith("--_") or nome in da_camada:
+                    continue
+                inventados.append(f"{_rel_css(arquivo)}: {nome}")
+        self.assertEqual(inventados, [], f"token fora da camada unica: {inventados[:10]}")
+
+    def test_a_camada_nao_estiliza_componente(self):
+        """So `:root` e `html[data-theme="dark"]`. Regra de componente ali dentro
+        foi como a fase 2 zerou o contador de `data-theme` sem dissolver nada."""
+        for nome_arquivo in sorted(CAMADA_DE_TOKEN):
+            texto = _COMENTARIO.sub("", (CSS_DIR / nome_arquivo).read_text(encoding="utf-8"))
+            seletores = [s.strip() for s in re.findall(r"(?:^|\})\s*([^{}@]+?)\s*\{", texto)]
+            fora = [s for s in seletores if s not in (":root", 'html[data-theme="dark"]')]
+            with self.subTest(arquivo=nome_arquivo):
+                self.assertEqual(fora, [], f"{nome_arquivo} estilizando componente: {fora}")
+
+    def test_a_camada_e_legivel(self):
+        """Linha minificada esconde token do olho e do gate por linha."""
+        for nome_arquivo in sorted(CAMADA_DE_TOKEN):
+            texto = (CSS_DIR / nome_arquivo).read_text(encoding="utf-8")
+            longas = [i for i, linha in enumerate(texto.splitlines(), 1) if len(linha) > 200]
+            with self.subTest(arquivo=nome_arquivo):
+                self.assertEqual(longas, [], f"{nome_arquivo}: linhas > 200 chars {longas}")
+
+    def test_nenhuma_referencia_aponta_para_token_inexistente(self):
+        declarados = set()
+        for arquivo in _css_fontes():
+            declarados.update(nome for nome, _v in _declaracoes(arquivo.read_text(encoding="utf-8")))
+
+        orfas = []
+        for arquivo in _css_fontes():
+            texto = _COMENTARIO.sub("", arquivo.read_text(encoding="utf-8"))
+            for nome in re.findall(r"var\(\s*(--[a-zA-Z0-9_-]+)\s*[,)]", texto):
+                if nome not in declarados:
+                    orfas.append(f"{_rel_css(arquivo)}: {nome}")
+        self.assertEqual(orfas, [], f"var() sem token: {sorted(set(orfas))[:10]}")
+
+    def test_cada_familia_de_token_so_cabe_onde_faz_sentido(self):
+        fora = []
+        for arquivo in _css_fontes():
+            texto = _COMENTARIO.sub("", arquivo.read_text(encoding="utf-8"))
+            for corpo in re.findall(r"\{([^{}]*)\}", texto):
+                for declaracao in corpo.split(";"):
+                    if ":" not in declaracao:
+                        continue
+                    prop, valor = declaracao.split(":", 1)
+                    prop = prop.strip()
+                    if prop.startswith("--"):
+                        continue
+                    sozinho = re.fullmatch(r"\s*var\(\s*(--[a-zA-Z0-9_-]+)\s*\)\s*", valor)
+                    for nome in re.findall(r"var\(\s*(--[a-zA-Z0-9_-]+)", valor):
+                        for prefixo, permitidas in FAMILIA_EXCLUSIVA.items():
+                            if nome.startswith(prefixo) and prop not in permitidas:
+                                fora.append(f"{_rel_css(arquivo)}: {prop}: var({nome})")
+                    if not sozinho:
+                        continue
+                    nome = sozinho.group(1)
+                    if nome.startswith(FAMILIAS_DE_MEDIDA) and prop in PROPS_DE_COR:
+                        fora.append(f"{_rel_css(arquivo)}: {prop}: var({nome}) — medida como cor")
+                    if nome.startswith(FAMILIAS_DE_COR) and prop in PROPS_DE_MEDIDA:
+                        fora.append(f"{_rel_css(arquivo)}: {prop}: var({nome}) — cor como medida")
+        self.assertEqual(fora, [], f"token na propriedade errada: {sorted(set(fora))[:10]}")

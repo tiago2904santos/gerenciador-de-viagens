@@ -1,0 +1,110 @@
+logado em: http://127.0.0.1:8000/
+
+=== dashboard [light] === body=rgb(236, 238, 241)  OK
+    22x  rgb(255, 255, 255)     card       a.cv-skip-link
+     7x  rgba(255, 255, 255, 0.06)   <<< FORA DA PALETA button.sidebar-link.sidebar-link--module
+     7x  rgb(236, 238, 241)     block      div.sidebar-footer
+     6x  rgba(216, 162, 27, 0.18)   <<< FORA DA PALETA span.sidebar-item-icon
+     6x  rgb(21, 91, 154)       acento     div.page-header-rail__marker
+     1x  rgba(255, 255, 255, 0.1)   <<< FORA DA PALETA a.sidebar-link.sidebar-link--module
+     1x  rgba(4, 24, 46, 0.55)    <<< FORA DA PALETA button.sidebar-logout-btn
+     1x  rgb(42, 59, 80)          <<< FORA DA PALETA button.app-theme-grid__btn
+  ---> 7 cor(es) fora da paleta
+
+=== oficios-lista [light] === body=rgb(236, 238, 241)  OK
+    10x  rgb(248, 250, 253)       <<< FORA DA PALETA input.list-header__search-input.header-filte
+     7x  rgba(255, 255, 255, 0.06)   <<< FORA DA PALETA a.sidebar-link.sidebar-link--module
+     6x  rgba(216, 162, 27, 0.18)   <<< FORA DA PALETA span.sidebar-item-icon
+     5x  rgb(236, 238, 241)     block      div.sidebar-footer
+     4x  rgb(255, 255, 255)     card       a.cv-skip-link
+     2x  rgb(21, 91, 154)       acento     span.cv-list-tab__count
+     1x  rgba(255, 255, 255, 0.1)   <<< FORA DA PALETA button.sidebar-link.sidebar-link--module
+     1x  rgba(4, 24, 46, 0.55)    <<< FORA DA PALETA button.sidebar-logout-btn
+  ---> 7 cor(es) fora da paleta
+
+=== oficio-novo [light] === body=rgb(236, 238, 241)  OK
+     7x  rgba(255, 255, 255, 0.06)   <<< FORA DA PALETA a.sidebar-link.sidebar-link--module
+     6x  rgba(216, 162, 27, 0.18)   <<< FORA DA PALETA span.sidebar-item-icon
+     3x  rgb(255, 255, 255)     card       a.cv-skip-link
+     1x  rgba(255, 255, 255, 0.1)   <<< FORA DA PALETA button.sidebar-link.sidebar-link--module
+     1x  rgb(236, 238, 241)     block      div.sidebar-footer
+     1x  rgba(4, 24, 46, 0.55)    <<< FORA DA PALETA button.sidebar-logout-btn
+     1x  rgb(42, 59, 80)          <<< FORA DA PALETA button.app-theme-grid__btn
+  ---> 5 cor(es) fora da paleta
+
+=== configuracoes [light] === body=rgb(236, 238, 241)  OK
+     7x  rgba(255, 255, 255, 0.06)   <<< FORA DA PALETA a.sidebar-link.sidebar-link--module
+     6x  rgba(216, 162, 27, 0.18)   <<< FORA DA PALETA span.sidebar-item-icon
+     3x  rgb(255, 255, 255)     card       a.cv-skip-link
+     2x  rgba(255, 255, 255, 0.1)   <<< FORA DA PALETA button.sidebar-link.sidebar-link--module
+     2x  rgb(236, 238, 241)     block      div.sidebar-footer
+     2x  rgb(248, 250, 253)       <<< FORA DA PALETA nav.cv-segment-toggle.cv-segment-toggle--nav
+     2x  rgb(21, 91, 154)       acento     a.cv-segment-toggle__btn
+     1x  rgba(4, 24, 46, 0.55)    <<< FORA DA PALETA button.sidebar-logout-btn
+  ---> 6 cor(es) fora da paleta
+
+=== perfil [light] === body=rgb(236, 238, 241)  OK
+     8x  rgba(255, 255, 255, 0.06)   <<< FORA DA PALETA a.sidebar-link.sidebar-link--module
+     6x  rgba(216, 162, 27, 0.18)   <<< FORA DA PALETA span.sidebar-item-icon
+     5x  rgb(21, 91, 154)       acento     button.cv-btn.cv-btn--primary
+     4x  rgb(255, 255, 255)     card       a.cv-skip-link
+     2x  rgb(236, 238, 241)     block      div.sidebar-footer
+     1x  rgba(4, 24, 46, 0.55)    <<< FORA DA PALETA button.sidebar-logout-btn
+     1x  rgb(42, 59, 80)          <<< FORA DA PALETA button.app-theme-grid__btn
+     1x  color(srgb 0.966078 0.969804 0.973922)   <<< FORA DA PALETA span.cv-chip.cv-chip--muted
+  ---> 6 cor(es) fora da paleta
+
+=== dashboard [dark] === body=rgb(13, 15, 17)  OK
+    17x  rgb(25, 28, 31)        card       a.cv-skip-link
+     7x  rgb(35, 39, 43)        block      div.page-header-rail
+     6x  rgb(33, 51, 66)          <<< FORA DA PALETA span.sidebar-item-icon
+     6x  rgb(216, 162, 27)      acento     div.page-header-rail__marker
+     4x  rgb(39, 55, 69)          <<< FORA DA PALETA a.cv-btn.cv-btn--secondary
+     1x  rgb(16, 28, 41)          <<< FORA DA PALETA aside.sidebar
+     1x  rgb(30, 58, 80)          <<< FORA DA PALETA a.sidebar-link.sidebar-link--module
+     1x  rgb(13, 15, 17)        page       div.sidebar-footer
+  ---> 7 cor(es) fora da paleta
+
+=== oficios-lista [dark] === body=rgb(13, 15, 17)  OK
+     8x  rgb(35, 39, 43)        block      form.list-header.cv-filter-header
+     6x  rgb(33, 51, 66)          <<< FORA DA PALETA span.sidebar-item-icon
+     4x  rgb(25, 28, 31)        card       a.cv-skip-link
+     3x  rgb(34, 51, 72)          <<< FORA DA PALETA a.cv-list-tab
+     3x  rgba(255, 255, 255, 0.12)   <<< FORA DA PALETA span.cv-list-tab__count
+     2x  rgb(216, 162, 27)      acento     span.cv-list-tab__count
+     1x  rgb(16, 28, 41)          <<< FORA DA PALETA aside.sidebar
+     1x  rgb(30, 58, 80)          <<< FORA DA PALETA button.sidebar-link.sidebar-link--module
+  ---> 8 cor(es) fora da paleta
+
+=== oficio-novo [dark] === body=rgb(13, 15, 17)  OK
+     6x  rgb(33, 51, 66)          <<< FORA DA PALETA span.sidebar-item-icon
+     3x  rgb(25, 28, 31)        card       a.cv-skip-link
+     1x  rgb(16, 28, 41)          <<< FORA DA PALETA aside.sidebar
+     1x  rgb(30, 58, 80)          <<< FORA DA PALETA button.sidebar-link.sidebar-link--module
+     1x  rgb(13, 15, 17)        page       div.sidebar-footer
+     1x  rgba(75, 143, 197, 0.23)   <<< FORA DA PALETA button.app-theme-grid__btn
+     1x  rgb(35, 39, 43)        block      header.cv-form-section-header
+     1x  rgb(39, 55, 69)          <<< FORA DA PALETA a.cv-btn.cv-btn--secondary
+  ---> 5 cor(es) fora da paleta
+
+=== configuracoes [dark] === body=rgb(13, 15, 17)  OK
+    16x  rgb(35, 39, 43)        block      div.list-header__band.list-header__band--wit
+     6x  rgb(33, 51, 66)          <<< FORA DA PALETA span.sidebar-item-icon
+     4x  rgb(25, 28, 31)        card       a.cv-skip-link
+     2x  rgb(30, 58, 80)          <<< FORA DA PALETA button.sidebar-link.sidebar-link--module
+     2x  rgb(216, 162, 27)      acento     a.cv-segment-toggle__btn
+     1x  rgb(16, 28, 41)          <<< FORA DA PALETA aside.sidebar
+     1x  rgb(13, 15, 17)        page       div.sidebar-footer
+     1x  rgba(75, 143, 197, 0.23)   <<< FORA DA PALETA button.app-theme-grid__btn
+  ---> 4 cor(es) fora da paleta
+
+=== perfil [dark] === body=rgb(13, 15, 17)  OK
+    13x  rgb(35, 39, 43)        block      div.list-header__band
+     6x  rgb(33, 51, 66)          <<< FORA DA PALETA span.sidebar-item-icon
+     5x  rgb(216, 162, 27)      acento     button.cv-btn.cv-btn--primary
+     4x  rgb(25, 28, 31)        card       a.cv-skip-link
+     1x  rgb(16, 28, 41)          <<< FORA DA PALETA aside.sidebar
+     1x  rgb(13, 15, 17)        page       div.sidebar-footer
+     1x  rgba(75, 143, 197, 0.23)   <<< FORA DA PALETA button.app-theme-grid__btn
+     1x  rgb(43, 63, 82)          <<< FORA DA PALETA span.cv-chip.cv-chip--muted
+  ---> 5 cor(es) fora da paleta

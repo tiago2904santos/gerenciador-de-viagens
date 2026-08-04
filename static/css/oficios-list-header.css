@@ -27,38 +27,38 @@
 
 /* Ações individuais: pasta amarela (warning), WhatsApp verde (success). */
 .cv-icon-btn--documents {
-  background: var(--action-warning-bg);
-  border-color: var(--action-warning-border);
-  box-shadow: var(--action-shadow);
-  color: var(--action-warning-text);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
+  box-shadow: var(--sh-sm);
+  color: var(--cv-state-warning);
 }
 
 .cv-icon-btn--documents:hover,
 .cv-icon-btn--documents:focus {
-  background: var(--action-warning-hover-bg);
-  border-color: var(--action-warning-border);
-  color: var(--action-warning-text);
+  background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
+  color: var(--cv-state-warning);
 }
 
 .cv-icon-btn--whatsapp {
-  background: var(--action-success-bg);
-  border-color: var(--action-success-border);
-  box-shadow: var(--action-shadow);
-  color: var(--action-success-text);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  box-shadow: var(--sh-sm);
+  color: var(--cv-state-success);
 }
 
 .cv-icon-btn--whatsapp:hover,
 .cv-icon-btn--whatsapp:focus {
-  background: var(--action-success-hover-bg);
-  border-color: var(--action-success-border);
-  color: var(--action-success-text);
+  background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  color: var(--cv-state-success);
 }
 
 /* Os menus são movidos para o body por CV.overlay, por isso o escopo
    precisa estar na própria classe do widget. */
 .cv-action-menu {
-  background: color-mix(in srgb, var(--surface-list-panel) 96%, transparent);
-  border: 1px solid color-mix(in srgb, var(--border-list-panel) 78%, #7c9ab8);
+  background: color-mix(in srgb, var(--cv-surface-card) 96%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cv-border) 78%, #7c9ab8);
   border-radius: 16px;
   box-shadow: 0 20px 48px rgba(13, 35, 58, 0.24);
   gap: 5px;
@@ -68,7 +68,7 @@
 
 .cv-action-menu__heading {
   align-items: center;
-  border-bottom: 1px solid var(--color-border-soft, rgba(110, 140, 170, 0.2));
+  border-bottom: 1px solid var(--cv-border);
   display: flex;
   gap: 10px;
   margin: 0 2px 5px;
@@ -84,7 +84,7 @@
 
 .cv-action-menu__heading strong,
 .cv-action-menu__item strong {
-  color: var(--theme-text-heading);
+  color: var(--cv-ink);
   font-size: 0.84rem;
   font-weight: 750;
   line-height: 1.2;
@@ -92,7 +92,7 @@
 
 .cv-action-menu__heading small,
 .cv-action-menu__item small {
-  color: var(--theme-text-muted);
+  color: var(--cv-ink-muted);
   font-size: 0.68rem;
   line-height: 1.35;
   margin-top: 2px;
@@ -128,8 +128,8 @@
 
 .cv-action-menu__item:hover,
 .cv-action-menu__item:focus-visible {
-  background: color-mix(in srgb, var(--color-surface-muted) 78%, transparent);
-  border-color: var(--color-border-soft, rgba(110, 140, 170, 0.2));
+  background: color-mix(in srgb, var(--cv-surface-block) 78%, transparent);
+  border-color: var(--cv-border);
   outline: none;
 }
 
@@ -201,7 +201,7 @@
 .cv-record-card__footer-actions--manage {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2, 8px);
+  gap: var(--sp-2);
   margin-left: auto;
 }
 

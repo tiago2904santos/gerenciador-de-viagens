@@ -34,20 +34,20 @@
 .btn,
 .app-btn {
   align-items: center;
-  border: 1px solid var(--action-border);
-  border-radius: var(--action-radius);
-  box-shadow: var(--action-shadow);
+  border: 1px solid var(--cv-border);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-sm);
   box-sizing: border-box;
   cursor: pointer;
   display: inline-flex;
   font-family: var(--font-sans);
-  font-size: var(--action-font-size);
-  font-weight: var(--action-font-weight);
-  gap: var(--action-gap);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  gap: var(--sp-2);
   justify-content: center;
   line-height: 1;
-  min-height: var(--action-height);
-  padding: 0 var(--action-padding-x);
+  min-height: var(--h-md);
+  padding: 0 var(--sp-4);
   text-decoration: none;
   transition:
     background-color 150ms ease,
@@ -61,21 +61,21 @@
 .cv-btn:hover,
 .btn:hover,
 .app-btn:hover {
-  box-shadow: var(--action-shadow-hover);
+  box-shadow: var(--sh-md);
   transform: translateY(-1px);
 }
 
 .cv-btn:active,
 .btn:active,
 .app-btn:active {
-  box-shadow: var(--action-shadow);
+  box-shadow: var(--sh-sm);
   transform: translateY(0);
 }
 
 .cv-btn:focus-visible,
 .btn:focus-visible,
 .app-btn:focus-visible {
-  box-shadow: var(--action-focus), var(--action-shadow);
+  box-shadow: 0 0 0 3px var(--focus-ring), var(--sh-sm);
   outline: none;
 }
 
@@ -97,10 +97,10 @@
 .cv-btn--next,
 .btn-primary,
 .app-btn--primary {
-  background: var(--action-primary-bg);
-  border-color: var(--action-primary-border);
-  box-shadow: var(--action-primary-shadow);
-  color: var(--action-primary-text);
+  background: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  box-shadow: var(--sh-md);
+  color: var(--on-accent);
 }
 
 .cv-btn--primary:hover,
@@ -113,9 +113,9 @@
 .btn-primary:focus,
 .app-btn--primary:hover,
 .app-btn--primary:focus {
-  background: var(--action-primary-hover-bg);
-  border-color: var(--action-primary-border);
-  color: var(--action-primary-text);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--on-accent);
 }
 
 .cv-btn--secondary,
@@ -131,10 +131,10 @@
 .btn-muted,
 .app-btn--secondary,
 .app-btn--muted {
-  background: var(--action-bg);
-  border-color: var(--action-border);
-  box-shadow: var(--action-shadow);
-  color: var(--action-text);
+  background: var(--cv-surface-block);
+  border-color: var(--cv-border);
+  box-shadow: var(--sh-sm);
+  color: var(--cv-ink);
 }
 
 .cv-btn--secondary:hover,
@@ -150,9 +150,9 @@
 .btn-muted:hover,
 .app-btn--secondary:hover,
 .app-btn--muted:hover {
-  background: var(--action-bg-hover);
-  border-color: var(--action-border-strong);
-  color: var(--action-text-strong);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-color: var(--cv-border);
+  color: var(--cv-ink);
 }
 
 .cv-btn--ghost,
@@ -160,15 +160,15 @@
   background: transparent;
   border-color: transparent;
   box-shadow: none;
-  color: var(--action-text);
+  color: var(--cv-ink);
 }
 
 .cv-btn--ghost:hover,
 .btn--ghost:hover {
-  background: var(--action-bg-soft);
+  background: var(--cv-surface-block);
   border-color: transparent;
   box-shadow: none;
-  color: var(--action-text-strong);
+  color: var(--cv-ink);
   transform: none;
 }
 
@@ -176,63 +176,63 @@
 .cv-btn--soft-danger,
 .btn-danger,
 .app-btn--danger {
-  background: var(--action-danger-bg);
-  border-color: var(--action-danger-border);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
   box-shadow: none;
-  color: var(--action-danger-text);
+  color: var(--cv-state-danger);
 }
 
 .cv-btn--danger:hover,
 .cv-btn--soft-danger:hover,
 .btn-danger:hover,
 .app-btn--danger:hover {
-  background: var(--action-danger-hover-bg);
-  border-color: var(--action-danger-border);
-  color: var(--action-danger-text);
+  background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  color: var(--cv-state-danger);
 }
 
 .cv-btn--primary-success {
-  background: var(--action-success-bg);
-  border-color: var(--action-success-border);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
   box-shadow: none;
-  color: var(--action-success-text);
+  color: var(--cv-state-success);
 }
 
 .cv-btn--primary-success:hover {
-  background: var(--action-success-hover-bg);
-  border-color: var(--action-success-border);
-  color: var(--action-success-text);
+  background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  color: var(--cv-state-success);
 }
 
 .cv-btn--preview,
 .cv-btn--tool {
-  background: var(--action-info-bg);
-  border-color: var(--action-info-border);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   box-shadow: none;
-  color: var(--action-info-text);
+  color: var(--color-accent);
 }
 
 .cv-btn--preview:hover,
 .cv-btn--tool:hover {
-  background: var(--action-info-hover-bg);
-  border-color: var(--action-info-border);
-  color: var(--action-info-text);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--on-accent);
 }
 
 .cv-btn--pdf,
 .cv-btn--docx {
-  background: var(--action-bg);
-  border-color: var(--action-border);
-  box-shadow: var(--action-shadow);
-  color: var(--action-text);
+  background: var(--cv-surface-block);
+  border-color: var(--cv-border);
+  box-shadow: var(--sh-sm);
+  color: var(--cv-ink);
 }
 
 .cv-btn--pdf .cv-btn__icon {
-  color: var(--action-danger-text);
+  color: var(--cv-state-danger);
 }
 
 .cv-btn--docx .cv-btn__icon {
-  color: var(--action-info-text);
+  color: var(--color-accent);
 }
 
 .cv-btn--xs,
@@ -246,7 +246,7 @@
 .btn-sm,
 .btn--sm,
 .app-btn--sm {
-  border-radius: var(--action-radius-sm);
+  border-radius: var(--r-sm);
   min-height: 34px;
   padding-inline: 11px;
 }
@@ -259,10 +259,10 @@
 
 /* Icon buttons: cores semanticas suaves, legiveis nos dois temas. */
 .cv-icon-btn {
-  background: var(--action-bg);
-  border-color: var(--action-border);
-  box-shadow: var(--action-shadow);
-  color: var(--action-text);
+  background: var(--cv-surface-block);
+  border-color: var(--cv-border);
+  box-shadow: var(--sh-sm);
+  color: var(--cv-ink);
   transition:
     background-color 150ms ease,
     border-color 150ms ease,
@@ -273,28 +273,28 @@
 
 .cv-icon-btn:hover,
 .cv-icon-btn:focus {
-  background: var(--action-bg-hover);
-  border-color: var(--action-border-strong);
-  box-shadow: var(--action-shadow-hover);
-  color: var(--action-text-strong);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-color: var(--cv-border);
+  box-shadow: var(--sh-md);
+  color: var(--cv-ink);
   transform: translateY(-1px);
 }
 
 .cv-icon-btn:active {
-  box-shadow: var(--action-shadow);
+  box-shadow: var(--sh-sm);
   transform: translateY(0);
 }
 
 .cv-icon-btn--delete {
-  background: var(--action-danger-bg);
-  border-color: var(--action-danger-border);
-  color: var(--action-danger-text);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  color: var(--cv-state-danger);
 }
 
 .cv-icon-btn--cancel {
-  background: var(--action-warning-bg);
-  border-color: var(--action-warning-border);
-  color: var(--action-warning-text);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
+  color: var(--cv-state-warning);
 }
 
 .cv-icon-btn--complete,
@@ -302,81 +302,81 @@
 .cv-icon-btn--edit.is-assinado,
 .cv-icon-btn--settings.is-assinado,
 .cv-icon-btn--whatsapp {
-  background: var(--action-success-bg);
-  border-color: var(--action-success-border);
-  box-shadow: var(--action-shadow);
-  color: var(--action-success-text);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  box-shadow: var(--sh-sm);
+  color: var(--cv-state-success);
 }
 
 .cv-icon-btn--preview {
-  background: var(--action-preview-bg);
-  border-color: var(--action-preview-border);
-  box-shadow: var(--action-shadow);
-  color: var(--action-preview-text);
+  background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  box-shadow: var(--sh-sm);
+  color: var(--cv-state-success);
 }
 
 .cv-icon-btn--docx {
-  background: var(--action-docx-bg);
-  border-color: var(--action-docx-border);
-  box-shadow: var(--action-shadow);
-  color: var(--action-docx-text);
+  background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
+  box-shadow: var(--sh-sm);
+  color: var(--cv-state-warning);
 }
 
 .cv-icon-btn--documents {
-  background: var(--action-warning-bg);
-  border-color: var(--action-warning-border);
-  box-shadow: var(--action-shadow);
-  color: var(--action-warning-text);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
+  box-shadow: var(--sh-sm);
+  color: var(--cv-state-warning);
 }
 
 .cv-icon-btn--edit:not(.is-assinado),
 .cv-icon-btn--settings:not(.is-assinado),
 .cv-icon-btn--signature {
-  background: var(--action-info-bg);
-  border-color: var(--action-info-border);
-  box-shadow: var(--action-shadow);
-  color: var(--action-info-text);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  box-shadow: var(--sh-sm);
+  color: var(--color-accent);
 }
 
 .cv-icon-btn--pdf {
-  background: var(--action-pdf-bg);
-  border-color: var(--action-pdf-border);
-  box-shadow: var(--action-shadow);
-  color: var(--action-pdf-text);
+  background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  box-shadow: var(--sh-sm);
+  color: var(--cv-state-danger);
 }
 
 .cv-icon-btn--archive {
-  background: var(--action-bg);
-  border-color: var(--action-border);
-  color: var(--action-text);
+  background: var(--cv-surface-block);
+  border-color: var(--cv-border);
+  color: var(--cv-ink);
 }
 
 .cv-icon-btn--pdf:hover,
 .cv-icon-btn--pdf:focus {
-  background: color-mix(in srgb, var(--action-pdf-bg) 82%, var(--action-pdf-text) 18%);
-  border-color: var(--action-pdf-text);
-  color: var(--action-pdf-text);
+  background: color-mix(in srgb, color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface)) 82%, var(--cv-state-danger) 18%);
+  border-color: var(--cv-state-danger);
+  color: var(--cv-state-danger);
 }
 
 .cv-icon-btn--docx:hover,
 .cv-icon-btn--docx:focus {
-  background: color-mix(in srgb, var(--action-docx-bg) 82%, var(--action-docx-text) 18%);
-  border-color: var(--action-docx-text);
-  color: var(--action-docx-text);
+  background: color-mix(in srgb, color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface)) 82%, var(--cv-state-warning) 18%);
+  border-color: var(--cv-state-warning);
+  color: var(--cv-state-warning);
 }
 
 .cv-icon-btn--preview:hover,
 .cv-icon-btn--preview:focus {
-  background: color-mix(in srgb, var(--action-preview-bg) 82%, var(--action-preview-text) 18%);
-  border-color: var(--action-preview-text);
-  color: var(--action-preview-text);
+  background: color-mix(in srgb, color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface)) 82%, var(--cv-state-success) 18%);
+  border-color: var(--cv-state-success);
+  color: var(--cv-state-success);
 }
 
 .cv-icon-btn--edit:not(.is-assinado):hover,
 .cv-icon-btn--edit:not(.is-assinado):focus {
-  background: var(--action-info-hover-bg);
-  border-color: var(--action-info-border);
-  color: var(--action-info-text);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--on-accent);
 }
 
 .cv-icon-btn--edit.is-assinado:hover,
@@ -385,19 +385,19 @@
 .cv-icon-btn--settings.is-assinado:focus,
 .cv-icon-btn--sign.is-assinado:hover,
 .cv-icon-btn--sign.is-assinado:focus {
-  background: var(--action-success-hover-bg);
-  border-color: var(--action-success-border);
-  color: var(--action-success-text);
+  background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  color: var(--cv-state-success);
 }
 
 /* Agrupamentos: uma unica superficie reduz ruido e organiza a hierarquia. */
 .cv-btn-group,
 .btn-group {
   align-items: center;
-  background: var(--action-group-bg);
-  border: 1px solid var(--action-group-border);
-  border-radius: var(--action-group-radius);
-  box-shadow: var(--action-group-shadow);
+  background: var(--cv-surface-card);
+  border: 1px solid var(--cv-border);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-md);
   display: inline-flex;
   flex-wrap: wrap;
   gap: 4px;
@@ -424,8 +424,8 @@
 
 /* Menus globais com a mesma linguagem dos grupos. */
 .cv-action-menu {
-  background: var(--action-modal-bg);
-  border: 1px solid var(--action-modal-border);
+  background: var(--cv-surface-card);
+  border: 1px solid var(--cv-border);
   border-radius: 16px;
   box-shadow: 0 20px 52px rgba(5, 22, 38, 0.28);
   gap: 4px;
@@ -439,7 +439,7 @@
 .cv-action-menu__item {
   border: 1px solid transparent;
   border-radius: 10px;
-  color: var(--action-text);
+  color: var(--cv-ink);
   min-height: 38px;
   padding: 8px 10px;
   transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
@@ -447,9 +447,9 @@
 
 .cv-action-menu__item:hover,
 .cv-action-menu__item:focus-visible {
-  background: var(--action-bg-hover);
-  border-color: var(--action-border);
-  color: var(--action-text-strong);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-color: var(--cv-border);
+  color: var(--cv-ink);
   outline: none;
 }
 
@@ -462,7 +462,7 @@
 
 .cv-action-menu__heading {
   align-items: center;
-  border-bottom: 1px solid var(--action-group-border);
+  border-bottom: 1px solid var(--cv-border);
   display: flex;
   gap: 10px;
   margin: 0 2px 5px;
@@ -472,10 +472,10 @@
 .cv-action-menu__heading-icon,
 .cv-action-menu__item-icon {
   align-items: center;
-  background: var(--action-info-bg);
-  border: 1px solid var(--action-info-border);
+  background: var(--cv-surface-block);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: 10px;
-  color: var(--action-info-text);
+  color: var(--color-accent);
   display: inline-flex;
   flex: 0 0 34px;
   height: 34px;
@@ -497,7 +497,7 @@
 
 .cv-action-menu__heading-copy strong,
 .cv-action-menu__item-copy strong {
-  color: var(--action-text-strong);
+  color: var(--cv-ink);
   font-size: 0.84rem;
   font-weight: 760;
   line-height: 1.2;
@@ -505,7 +505,7 @@
 
 .cv-action-menu__heading-copy small,
 .cv-action-menu__item-copy small {
-  color: var(--action-muted);
+  color: var(--cv-ink-muted);
   font-size: 0.68rem;
   line-height: 1.35;
   margin-top: 2px;
@@ -522,50 +522,50 @@
 
 .cv-action-menu__item--rich:hover,
 .cv-action-menu__item--rich:focus-visible {
-  background: var(--action-bg-hover);
-  border-color: var(--action-border);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-color: var(--cv-border);
 }
 
 .cv-action-menu__item-icon--pdf {
-  background: var(--action-pdf-bg);
-  border-color: var(--action-pdf-border);
-  color: var(--action-pdf-text);
+  background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  color: var(--cv-state-danger);
 }
 
 .cv-action-menu__item-icon--docx {
-  background: var(--action-docx-bg);
-  border-color: var(--action-docx-border);
-  color: var(--action-docx-text);
+  background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
+  color: var(--cv-state-warning);
 }
 
 .cv-action-menu__item-icon--preview {
-  background: var(--action-preview-bg);
-  border-color: var(--action-preview-border);
-  color: var(--action-preview-text);
+  background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  color: var(--cv-state-success);
 }
 
 .cv-action-menu__item-icon--edit {
-  background: var(--action-edit-bg);
-  border-color: var(--action-edit-border);
-  color: var(--action-edit-text);
+  background: var(--cv-surface-block);
+  border-color: var(--cv-border);
+  color: var(--cv-ink);
 }
 
 .cv-action-menu__item-icon--danger {
-  background: var(--action-danger-bg);
-  border-color: var(--action-danger-border);
-  color: var(--action-danger-text);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  color: var(--cv-state-danger);
 }
 
 .cv-action-menu__item-icon--warning {
-  background: var(--action-warning-bg);
-  border-color: var(--action-warning-border);
-  color: var(--action-warning-text);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
+  color: var(--cv-state-warning);
 }
 
 .cv-action-menu__item-icon--success {
-  background: var(--action-success-bg);
-  border-color: var(--action-success-border);
-  color: var(--action-success-text);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  color: var(--cv-state-success);
 }
 
 .cv-action-menu__item--rich.is-disabled,
@@ -577,15 +577,15 @@
 
 /* Modal shell global. */
 .delete-confirm-modal__backdrop {
-  background: var(--action-modal-backdrop);
+  background: var(--cv-surface-page);
   backdrop-filter: blur(10px) saturate(0.85);
 }
 
 .delete-confirm-modal__dialog {
-  background: var(--action-modal-bg);
-  border: 1px solid var(--action-modal-border);
+  background: var(--cv-surface-card);
+  border: 1px solid var(--cv-border);
   border-radius: 24px;
-  box-shadow: var(--action-modal-shadow);
+  box-shadow: var(--sh-lg);
   gap: 18px;
   max-width: min(100%, 560px);
   overflow: hidden;
@@ -598,39 +598,39 @@
 }
 
 .delete-confirm-modal__icon {
-  background: var(--action-danger-bg);
-  border-color: var(--action-danger-border);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
   border-radius: 13px;
-  color: var(--action-danger-text);
+  color: var(--cv-state-danger);
   flex-basis: 46px;
   height: 46px;
   width: 46px;
 }
 
 .delete-confirm-modal__eyebrow {
-  color: var(--action-muted);
+  color: var(--cv-ink-muted);
   font-size: 0.68rem;
   letter-spacing: 0.13em;
 }
 
 .delete-confirm-modal__title {
-  color: var(--action-text-strong);
+  color: var(--cv-ink);
   font-size: 1.32rem;
   letter-spacing: -0.015em;
 }
 
 .delete-confirm-modal__message {
-  color: var(--action-muted);
+  color: var(--cv-ink-muted);
   font-size: 0.88rem;
   line-height: 1.65;
 }
 
 .delete-confirm-modal__message strong {
-  color: var(--action-text-strong);
+  color: var(--cv-ink);
 }
 
 .delete-confirm-modal__actions {
-  border-top: 1px solid var(--action-group-border);
+  border-top: 1px solid var(--cv-border);
   gap: 7px;
   padding-top: 16px;
 }
@@ -638,13 +638,13 @@
 /* Modal de documento assinado. */
 .attach-signed-modal__dialog.delete-confirm-modal__dialog,
 .attach-signed-modal__dialog {
-  background: var(--step1-surface);
+  background: var(--cv-surface-card);
   gap: 0;
   max-width: min(100%, 610px);
 }
 
  #attach-signed-modal .attach-signed-modal__dialog {
-  background: var(--step1-surface) !important;
+  background: var(--cv-surface-card) !important;
 }
 
 .attach-signed-modal__dialog > .cv-dialog__header {
@@ -653,9 +653,9 @@
 }
 
 .attach-signed-modal__icon {
-  background: var(--action-info-bg);
-  border-color: var(--action-info-border);
-  color: var(--action-info-text);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--color-accent);
 }
 
 .attach-signed-modal__close {
@@ -666,10 +666,10 @@
 
 .attach-signed-modal__intro {
   align-items: flex-start;
-  background: var(--step1-panel, var(--color-surface-soft));
+  background: var(--cv-surface-block);
   border: 0;
   border-radius: 15px;
-  color: var(--action-muted);
+  color: var(--cv-ink-muted);
   display: flex;
   font-size: 0.84rem;
   gap: 10px;
@@ -679,7 +679,7 @@
 }
 
 .attach-signed-modal__intro .cv-icon {
-  color: var(--action-info-text);
+  color: var(--color-accent);
   flex: 0 0 18px;
   height: 18px;
   margin-top: 2px;
@@ -706,14 +706,14 @@
 }
 
 .attach-signed-modal__kind-label {
-  color: var(--action-text-strong);
+  color: var(--cv-ink);
   font-size: 0.78rem;
   font-weight: 720;
 }
 
 .attach-signed-modal__kind-options {
-  background: var(--step1-panel, var(--action-bg-soft));
-  border: 1px solid var(--action-border);
+  background: var(--cv-surface-block);
+  border: 1px solid var(--cv-border);
   border-radius: 12px;
   display: grid;
   gap: 4px;
@@ -729,7 +729,7 @@
   background: transparent;
   border: 0;
   border-radius: 9px;
-  color: var(--action-muted);
+  color: var(--cv-ink-muted);
   cursor: pointer;
   font: inherit;
   font-size: 0.78rem;
@@ -740,15 +740,15 @@
 
 .attach-signed-modal__kind-option:hover,
 .attach-signed-modal__kind-option:focus-visible {
-  background: var(--action-bg-hover);
-  color: var(--action-text);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  color: var(--cv-ink);
   outline: none;
 }
 
 .attach-signed-modal__kind-option.is-active {
-  background: var(--action-info-bg);
-  box-shadow: inset 0 0 0 1px var(--action-info-border);
-  color: var(--action-info-text);
+  background: var(--cv-surface-block);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--color-accent);
 }
 
 .attach-signed-modal__form > .app-form-field {
@@ -772,7 +772,7 @@
 /* Área de arquivo: --step1-panel, sem borda e sem hover. */
 .attach-signed-modal__form .prestacao-file-widget,
 .attach-signed-modal__form .cv-file-widget {
-  background: var(--step1-panel, var(--color-surface-soft));
+  background: var(--cv-surface-block);
   border: 0;
   border-radius: 15px;
   box-shadow: none;
@@ -786,7 +786,7 @@
 .attach-signed-modal__form .cv-file-widget:hover,
 .attach-signed-modal__form .prestacao-file-widget:focus-within,
 .attach-signed-modal__form .cv-file-widget:focus-within {
-  background: var(--step1-panel, var(--color-surface-soft));
+  background: var(--cv-surface-block);
   border: 0;
   box-shadow: none;
 }
@@ -817,31 +817,31 @@
 .attach-signed-modal__form .cv-file-picker__action {
   align-items: center;
   align-self: start;
-  background: var(--step1-panel, var(--color-surface-soft));
+  background: var(--cv-surface-block);
   border: 0;
   border-radius: 12px;
-  color: var(--color-heading);
+  color: var(--cv-ink);
   display: inline-flex;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
   grid-column: 1;
   grid-row: 1;
   justify-content: center;
-  min-height: var(--control-height-md, 44px);
+  min-height: var(--h-md);
   padding: 0 18px;
   width: fit-content;
 }
 
 .attach-signed-modal__form .prestacao-file-picker__action:hover,
 .attach-signed-modal__form .cv-file-picker__action:hover {
-  background: var(--step1-panel, var(--color-surface-soft));
-  color: var(--color-heading);
+  background: var(--cv-surface-block);
+  color: var(--cv-ink);
 }
 
 .attach-signed-modal__form .prestacao-file-picker__value,
 .attach-signed-modal__form .cv-file-picker__value {
   align-self: end;
-  color: var(--action-muted);
+  color: var(--cv-ink-muted);
   font-size: 0.78rem;
   grid-column: 1 / -1;
   grid-row: 2;
@@ -861,9 +861,9 @@
   border: 0;
   border-radius: 12px;
   box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
-  color: var(--color-on-accent, #19232d);
+  color: var(--on-accent);
   font-size: 0.8rem;
-  font-weight: var(--font-weight-bold, 750);
+  font-weight: var(--fw-bold);
   grid-column: 2;
   grid-row: 1;
   min-height: 38px;
@@ -873,19 +873,19 @@
 
 .attach-signed-modal__form .prestacao-file-picker__upload:hover:not(:disabled),
 .attach-signed-modal__form .cv-file-picker__upload:hover:not(:disabled) {
-  background: var(--color-accent-hover, var(--color-accent));
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
   background-image: none;
   border: 0;
   box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
-  color: var(--color-on-accent, #19232d);
+  color: var(--on-accent);
 }
 
 .attach-signed-modal__form .prestacao-file-picker__upload:disabled,
 .attach-signed-modal__form .cv-file-picker__upload:disabled {
-  background: var(--action-bg);
-  border: 1px solid var(--action-border);
+  background: var(--cv-surface-block);
+  border: 1px solid var(--cv-border);
   box-shadow: none;
-  color: var(--action-muted);
+  color: var(--cv-ink-muted);
   display: none;
   opacity: 0.52;
 }
@@ -916,7 +916,7 @@
 
 .attach-signed-modal__form .prestacao-file-selection__item,
 .attach-signed-modal__form .cv-file-selection__item {
-  background: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
+  background: var(--cv-surface-card);
   border: 0;
   border-radius: 12px;
   box-shadow: none;
@@ -927,7 +927,7 @@
 
 .attach-signed-modal__form .prestacao-file-selection__item:hover,
 .attach-signed-modal__form .cv-file-selection__item:hover {
-  background: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
+  background: var(--cv-surface-card);
 }
 
 .attach-signed-modal__form .prestacao-file-selection__item + .prestacao-file-selection__item,
@@ -938,31 +938,31 @@
 /* Ícones Visualizar / Remover: cores canônicas (vence o reset dark de .cv-icon-btn). */
  #attach-signed-modal .cv-icon-btn.cv-icon-btn--preview,
 #attach-signed-modal .cv-icon-btn.cv-icon-btn--preview {
-  background: var(--action-preview-bg);
-  border: 1px solid var(--action-preview-border);
-  box-shadow: var(--action-shadow);
-  color: var(--action-preview-text);
+  background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
+  border: 1px solid color-mix(in srgb, var(--cv-state-success) 40%, transparent);
+  box-shadow: var(--sh-sm);
+  color: var(--cv-state-success);
 }
 
  #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
 #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete {
-  background: var(--action-danger-bg);
-  border: 1px solid var(--action-danger-border);
-  box-shadow: var(--action-shadow);
-  color: var(--action-danger-text);
+  background: var(--cv-surface-block);
+  border: 1px solid color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
+  box-shadow: var(--sh-sm);
+  color: var(--cv-state-danger);
 }
 
 /* Cancelar = mesmo soft do Voltar do cadastro de ofícios. */
 .attach-signed-modal__cancel.cv-btn,
 .attach-signed-modal__cancel.cv-btn--secondary {
-  background: var(--step1-panel, var(--color-surface-soft));
+  background: var(--cv-surface-block);
   background-image: none;
   border: 0;
   border-radius: 12px;
   box-shadow: none;
-  color: var(--color-heading);
-  font-weight: var(--font-weight-bold);
-  min-height: var(--control-height-md, 44px);
+  color: var(--cv-ink);
+  font-weight: var(--fw-bold);
+  min-height: var(--h-md);
   padding: 0 18px;
   transform: none;
 }
@@ -988,8 +988,8 @@
   .prestacao-file-widget:focus-within,
   .cv-file-widget:focus-within
 ) {
-  background: var(--asm-panel) !important;
-  background-color: var(--asm-panel) !important;
+  background: var(--cv-surface-block) !important;
+  background-color: var(--cv-surface-block) !important;
   border: 0 !important;
   box-shadow: none !important;
   outline: none !important;
@@ -1044,8 +1044,8 @@
   .prestacao-file-selection__item:focus-within,
   .cv-file-selection__item:focus-within
 ) {
-  background: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%)) !important;
-  background-color: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%)) !important;
+  background: var(--cv-surface-card) !important;
+  background-color: var(--cv-surface-card) !important;
   border: 0 !important;
   box-shadow: none !important;
   outline: none !important;
@@ -1056,14 +1056,14 @@
   .prestacao-file-picker__action,
   .cv-file-picker__action
 ) {
-  background: var(--asm-action-bg) !important;
-  background-color: var(--asm-action-bg) !important;
+  background: var(--cv-surface-block) !important;
+  background-color: var(--cv-surface-block) !important;
   border: 0 !important;
   border-radius: 12px !important;
-  color: var(--asm-action-text) !important;
-  font-size: var(--font-size-sm) !important;
-  font-weight: var(--font-weight-bold) !important;
-  min-height: var(--control-height-md, 44px) !important;
+  color: var(--cv-ink) !important;
+  font-size: var(--fs-sm) !important;
+  font-weight: var(--fw-bold) !important;
+  min-height: var(--h-md) !important;
   padding: 0 18px !important;
   box-shadow: none !important;
   outline: none !important;
@@ -1074,10 +1074,10 @@
   .prestacao-file-picker__action,
   .cv-file-picker__action
 ):is(:hover, :focus-visible) {
-  background: var(--asm-action-bg) !important;
-  background-color: var(--asm-action-bg) !important;
+  background: var(--cv-surface-block) !important;
+  background-color: var(--cv-surface-block) !important;
   border: 0 !important;
-  color: var(--asm-action-text) !important;
+  color: var(--cv-ink) !important;
   box-shadow: none !important;
   outline: none !important;
   transform: none !important;
@@ -1087,14 +1087,14 @@
   .prestacao-file-picker__upload,
   .cv-file-picker__upload
 ):not(:disabled) {
-  background: var(--asm-accent) !important;
-  background-color: var(--asm-accent) !important;
+  background: var(--color-accent) !important;
+  background-color: var(--color-accent) !important;
   background-image: none !important;
   border: 0 !important;
   box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent) !important;
-  color: var(--asm-accent-text) !important;
+  color: var(--color-accent) !important;
   outline: none !important;
-  transition: background var(--transition-fast, 0.15s ease), box-shadow var(--transition-fast, 0.15s ease) !important;
+  transition: background var(--tr-fast), box-shadow var(--tr-fast) !important;
   transform: none !important;
 }
 
@@ -1102,12 +1102,12 @@
   .prestacao-file-picker__upload,
   .cv-file-picker__upload
 ):is(:hover, :focus-visible):not(:disabled) {
-  background: var(--color-accent-hover, var(--asm-accent)) !important;
-  background-color: var(--color-accent-hover, var(--asm-accent)) !important;
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink)) !important;
+  background-color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink)) !important;
   background-image: none !important;
   border: 0 !important;
   box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent) !important;
-  color: var(--asm-accent-text) !important;
+  color: var(--on-accent);
   outline: none !important;
   transform: none !important;
 }
@@ -1118,11 +1118,11 @@
   .cv-icon-btn--preview:focus,
   .cv-icon-btn--preview:focus-visible
 ) {
-  background: var(--asm-preview-bg) !important;
-  background-color: var(--asm-preview-bg) !important;
-  border: 1px solid var(--asm-preview-border) !important;
-  color: var(--asm-preview-text) !important;
-  box-shadow: var(--action-shadow) !important;
+  background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface)) !important;
+  background-color: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface)) !important;
+  border: 1px solid color-mix(in srgb, var(--cv-state-success) 40%, transparent) !important;
+  color: var(--cv-state-success) !important;
+  box-shadow: var(--sh-sm) !important;
   outline: none !important;
   transition: none !important;
   transform: none !important;
@@ -1134,11 +1134,11 @@
   .cv-icon-btn--delete:focus,
   .cv-icon-btn--delete:focus-visible
 ) {
-  background: var(--asm-danger-bg) !important;
-  background-color: var(--asm-danger-bg) !important;
-  border: 1px solid var(--asm-danger-border) !important;
-  color: var(--asm-danger-text) !important;
-  box-shadow: var(--action-shadow) !important;
+  background: var(--cv-surface-block) !important;
+  background-color: var(--cv-surface-block) !important;
+  border: 1px solid color-mix(in srgb, var(--cv-state-danger) 40%, transparent) !important;
+  color: var(--cv-state-danger) !important;
+  box-shadow: var(--sh-sm) !important;
   outline: none !important;
   transition: none !important;
   transform: none !important;
@@ -1150,11 +1150,11 @@
   .attach-signed-modal__cancel:focus,
   .attach-signed-modal__cancel:focus-visible
 ) {
-  background: var(--asm-cancel-bg) !important;
-  background-color: var(--asm-cancel-bg) !important;
+  background: var(--cv-surface-block) !important;
+  background-color: var(--cv-surface-block) !important;
   background-image: none !important;
   border: 0 !important;
-  color: var(--asm-cancel-text) !important;
+  color: var(--cv-ink) !important;
   box-shadow: none !important;
   outline: none !important;
   transition: none !important;
@@ -1167,7 +1167,7 @@
   .attach-signed-modal__kind-option:focus-visible
 ) {
   background: transparent !important;
-  color: var(--action-muted) !important;
+  color: var(--cv-ink-muted) !important;
   outline: none !important;
   transition: none !important;
 }
@@ -1177,15 +1177,15 @@
   .attach-signed-modal__kind-option.is-active:hover,
   .attach-signed-modal__kind-option.is-active:focus-visible
 ) {
-  background: var(--action-info-bg) !important;
-  color: var(--action-info-text) !important;
+  background: var(--cv-surface-block) !important;
+  color: var(--color-accent) !important;
 }
 
 @media (min-width: 841px) {
   .delete-confirm-modal {
     box-sizing: border-box;
-    padding-left: calc(var(--sidebar-width) + var(--space-4));
-    padding-right: var(--space-4);
+    padding-left: calc(15% + var(--sp-4));
+    padding-right: var(--sp-4);
   }
 }
 

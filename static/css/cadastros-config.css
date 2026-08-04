@@ -39,13 +39,13 @@
     .cv-search-picker__control,
     .cv-date-picker__control
   ) {
-  background: var(--step1-field, var(--color-input-bg)) !important;
+  background: var(--cv-surface-next) !important;
 }
 
 
   .cadastros-form-page[data-configuracoes-shell]
   .cv-date-picker__control {
-  border-radius: var(--radius-control, 10px) !important;
+  border-radius: var(--r-md) !important;
   overflow: hidden;
 }
 

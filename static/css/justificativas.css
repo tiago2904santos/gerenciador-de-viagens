@@ -1,6 +1,6 @@
 .justificativas-page {
   display: grid;
-  gap: var(--space-5);
+  gap: var(--sp-5);
 }
 
  .justificativas-page {
@@ -13,17 +13,17 @@
  .justificativas-page .list-header,
  .justificativas-page .list-header__rail,
  .justificativas-page .list-header .cv-inline-create__toggle {
-  background: var(--step1-surface);
+  background: var(--cv-surface-card);
 }
 
 .justificativas-page .list-header__band,
  .justificativas-page .list-header__band {
-  background: var(--color-surface-muted);
+  background: var(--cv-surface-block);
 }
 
 .justificativas-page .cv-record-row,
  .justificativas-page .cv-record-row {
-  background: var(--step1-field, var(--step1-surface));
+  background: var(--cv-surface-next);
   border: 0;
   box-shadow: none;
 }
@@ -32,15 +32,15 @@
 .justificativas-page .cv-record-row:focus-within,
  .justificativas-page .cv-record-row:hover,
  .justificativas-page .cv-record-row:focus-within {
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field, var(--step1-surface)));
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-next));
   border: 0;
   box-shadow: none;
 }
 
 /* Aberto: sem linha; gap só o do rail (mesmo ritmo do padding). */
 .justificativas-page .list-header__rail--inline-create {
-  gap: var(--space-3);
-  padding: var(--space-3) clamp(var(--space-4), 2vw, var(--space-5));
+  gap: var(--sp-3);
+  padding: var(--sp-3) clamp(var(--sp-4), 2vw, var(--sp-5));
 }
 
 .justificativas-page .list-header .cv-inline-create__panel.is-open,
@@ -51,12 +51,12 @@
 
 .justificativa-quick-add {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--sp-3);
 }
 
 .justificativa-oficio-picker {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--sp-3);
 }
 
 /* Tokens do step1 sem a caixa travel-document-card. */
@@ -138,24 +138,24 @@
 .justificativas-page .list-header--inline-create .justificativa-quick-add__body {
   align-items: stretch;
   display: grid;
-  gap: var(--space-4);
-  padding: var(--space-4) 0;
+  gap: var(--sp-4);
+  padding: var(--sp-4) 0;
 }
 
 .justificativa-quick-add__body {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--sp-4);
 }
 
 .justificativa-quick-add__fields {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--sp-4);
   width: 100%;
 }
 
 .justificativa-quick-add__section {
   display: grid;
-  gap: var(--space-3);
+  gap: var(--sp-3);
 }
 
 .justificativa-quick-add__field {
@@ -171,7 +171,7 @@
 
 .justificativa-quick-add .cv-field-with-action {
   align-items: center;
-  min-height: var(--form-control-height, var(--control-height-md));
+  min-height: var(--h-md);
 }
 
 .justificativa-quick-add .cv-field-with-action .cv-custom-select,
@@ -187,7 +187,7 @@
 .justificativa-quick-add .cv-field-with-action--manage-reveal {
   display: block;
   gap: 0;
-  min-height: var(--form-control-height, var(--control-height-md));
+  min-height: var(--h-md);
   overflow: visible;
   position: relative;
 }
@@ -202,7 +202,7 @@
   max-width: 100%;
   min-width: 0;
   position: relative;
-  transition: width var(--transition-fast), max-width var(--transition-fast);
+  transition: width var(--tr-fast), max-width var(--tr-fast);
   width: 100%;
   z-index: 2;
 }
@@ -217,22 +217,22 @@
 .justificativa-quick-add .cv-field-with-action--manage-reveal:focus-within > .form-select,
 .justificativa-quick-add .cv-field-with-action--manage-reveal:hover > select,
 .justificativa-quick-add .cv-field-with-action--manage-reveal:focus-within > select {
-  max-width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
-  width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
+  max-width: calc(100% - var(--sp-8) - var(--sp-2));
+  width: calc(100% - var(--sp-8) - var(--sp-2));
 }
 
 .justificativa-quick-add .cv-field-with-action--manage-reveal > .cv-icon-btn--field-manage {
-  height: var(--field-manage-btn-size);
-  max-height: var(--field-manage-btn-size);
-  min-height: var(--field-manage-btn-size);
+  height: var(--sp-8);
+  max-height: var(--sp-8);
+  min-height: var(--sp-8);
   opacity: 0;
   pointer-events: none;
   position: absolute;
   right: 0;
   top: 50%;
   transform: translateY(-50%);
-  transition: opacity var(--transition-fast);
-  width: var(--field-manage-btn-size);
+  transition: opacity var(--tr-fast);
+  width: var(--sp-8);
   z-index: 1;
 }
 
@@ -254,7 +254,7 @@
 }
 
 .justificativa-quick-add .cv-field__control--textarea {
-  min-height: var(--text-area-height-justificativa);
+  min-height: 220px;
 }
 
 /*
@@ -291,8 +291,8 @@
   background-image: none;
   border: 0;
   box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
-  color: var(--color-on-accent, #19232d);
-  font-weight: var(--font-weight-bold);
+  color: var(--on-accent);
+  font-weight: var(--fw-bold);
 }
 
 .justificativas-page .list-header .cv-inline-create__toggle.is-filled:hover,
@@ -303,18 +303,18 @@
  .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:hover,
  .justificativas-page .list-header .cv-inline-create__toggle.is-filled:focus-visible,
  .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:focus-visible {
-  background: var(--color-accent-hover, var(--color-accent));
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
   background-image: none;
   border: 0;
   box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
-  color: var(--color-on-accent, #19232d);
+  color: var(--on-accent);
 }
 
 .justificativas-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
 .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready .cv-inline-create__toggle-icon,
  .justificativas-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
  .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready .cv-inline-create__toggle-icon {
-  background: color-mix(in srgb, var(--color-on-accent, #19232d) 14%, transparent);
+  background: color-mix(in srgb, var(--on-accent) 14%, transparent);
   color: inherit;
 }
 

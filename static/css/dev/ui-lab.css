@@ -47,10 +47,10 @@
 
 .ui-lab-page {
   display: grid;
-  gap: var(--space-6);
+  gap: var(--sp-6);
   margin: 0 auto;
   max-width: 1440px;
-  padding: clamp(24px, 4vw, 48px) var(--space-4) var(--space-10);
+  padding: clamp(24px, 4vw, 48px) var(--sp-4) var(--sp-7);
   position: relative;
   width: 100%;
   z-index: 1;

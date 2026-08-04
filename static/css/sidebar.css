@@ -6,11 +6,11 @@
    1. Shell e branding institucional
    -------------------------------------------------------------------------- */
 .sidebar {
-  background: var(--sidebar-surface);
-  border-right: 1px solid var(--sidebar-border);
-  box-shadow: var(--sidebar-shadow);
+  background: var(--cv-surface-card);
+  border-right: 1px solid var(--cv-border);
+  box-shadow: var(--sh-sm);
   box-sizing: border-box;
-  color: var(--sidebar-fg-soft);
+  color: var(--cv-ink-muted);
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -23,27 +23,27 @@
 }
 
 .sidebar-header {
-  border-bottom: 1px solid var(--sidebar-border);
-  padding: var(--space-5) var(--space-5) var(--space-4);
+  border-bottom: 1px solid var(--cv-border);
+  padding: var(--sp-5) var(--sp-5) var(--sp-4);
 }
 
 .sidebar-brand {
   align-items: center;
-  color: var(--sidebar-brand-fg);
+  color: var(--cv-ink);
   display: inline-flex;
-  gap: calc(var(--space-2) + 2px);
+  gap: calc(var(--sp-2) + 2px);
   font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.01em;
-  transition: color var(--transition-slow);
+  transition: color var(--tr-slow);
 }
 
 .sidebar-brand-badge {
   align-items: center;
-  background: var(--sidebar-badge-bg);
-  border: 1px solid rgba(255, 243, 207, 0.5);
-  border-radius: var(--radius-pill);
-  color: var(--color-white);
+  background: var(--color-accent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-radius: var(--r-pill);
+  color: var(--on-accent);
   display: inline-flex;
   font-size: 11px;
   font-weight: 800;
@@ -60,9 +60,9 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  gap: var(--space-2);
+  gap: var(--sp-2);
   overflow-y: auto;
-  padding: calc(var(--space-3) + 2px) var(--space-3) var(--space-section-y);
+  padding: calc(var(--sp-3) + 2px) var(--sp-3) var(--sp-5);
 }
 
 .sidebar-item {
@@ -79,27 +79,27 @@
 .sidebar-row--top {
   align-items: stretch;
   display: flex;
-  gap: var(--space-2);
+  gap: var(--sp-2);
   min-width: 0;
 }
 
 .sidebar-link {
   text-decoration: none;
-  transition: background-color var(--transition-slow), border-color var(--transition-slow), color var(--transition-slow), box-shadow var(--transition-slow);
+  transition: background-color var(--tr-slow), border-color var(--tr-slow), color var(--tr-slow), box-shadow var(--tr-slow);
 }
 
 .sidebar-link--module {
   align-items: center;
-  background: var(--sidebar-link-surface);
-  border: 1px solid var(--sidebar-link-border);
-  border-radius: var(--radius-control-lg);
+  background: var(--cv-surface-block);
+  border: 1px solid var(--cv-border);
+  border-radius: var(--r-md);
   box-sizing: border-box;
-  color: var(--sidebar-link-fg);
+  color: var(--cv-ink);
   display: flex;
   flex: 1;
   font-size: 0.93rem;
   font-weight: 500;
-  min-height: calc(var(--control-height-md) - 2px);
+  min-height: calc(var(--h-md) - 2px);
   min-width: 0;
   padding: 10px 13px;
 }
@@ -119,14 +119,14 @@
 }
 
 .sidebar-module-expand__chevron {
-  color: var(--sidebar-fg-heading);
+  color: var(--cv-ink);
   flex-shrink: 0;
   font-size: 0.82rem;
   line-height: 1;
-  margin-left: var(--space-2);
+  margin-left: var(--sp-2);
   opacity: 0.92;
   transform: rotate(-90deg);
-  transition: transform var(--transition-slow);
+  transition: transform var(--tr-slow);
 }
 
 .sidebar-item--collapsible.is-open > .sidebar-row--top .sidebar-module-expand__chevron {
@@ -136,15 +136,15 @@
 .sidebar-item-main {
   align-items: center;
   display: inline-flex;
-  gap: calc(var(--space-2) + 2px);
+  gap: calc(var(--sp-2) + 2px);
   min-width: 0;
 }
 
 .sidebar-item-icon {
   align-items: center;
-  background: var(--sidebar-icon-bg);
-  border-radius: var(--radius-sm);
-  color: var(--sidebar-icon-fg);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-radius: var(--r-sm);
+  color: var(--color-accent);
   display: inline-flex;
   flex-shrink: 0;
   font-size: 10px;
@@ -158,7 +158,7 @@
 .sidebar-accordion {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows var(--transition-slow);
+  transition: grid-template-rows var(--tr-slow);
 }
 
 .sidebar-item--collapsible.is-open > .sidebar-accordion {
@@ -181,19 +181,19 @@
 }
 
 .sidebar-panel {
-  border-left: 2px solid var(--sidebar-panel-border);
+  border-left: 2px solid var(--cv-border);
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--sp-1);
   margin: 6px 0 4px 14px;
   padding: 6px 0 4px 10px;
 }
 
 .sidebar-link--cadastros {
   border: 1px solid transparent;
-  border-radius: var(--radius-control);
+  border-radius: var(--r-md);
   box-sizing: border-box;
-  color: var(--sidebar-link-fg);
+  color: var(--cv-ink);
   display: block;
   font-size: 0.9rem;
   font-weight: 500;
@@ -206,17 +206,17 @@
 .sidebar-module-expand:focus-visible,
 .sidebar-link--cadastros:hover,
 .sidebar-link--cadastros:focus-visible {
-  background: var(--sidebar-link-hover-bg);
-  color: var(--sidebar-brand-fg);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  color: var(--cv-ink);
 }
 
 .sidebar-link--module.is-active,
 .sidebar-module-expand.is-active,
 .sidebar-link--cadastros.is-active {
-  background: var(--sidebar-active-bg);
-  border: 1px solid var(--sidebar-active-border);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
   box-shadow: inset 4px 0 0 var(--color-accent);
-  color: var(--sidebar-active-fg);
+  color: var(--cv-ink);
   font-weight: 600;
 }
 
@@ -228,11 +228,11 @@
    3. Rodape e logout
    -------------------------------------------------------------------------- */
 .sidebar-footer {
-  border-top: 1px solid var(--sidebar-border);
-  color: var(--sidebar-footer-fg);
+  border-top: 1px solid var(--cv-border);
+  color: var(--cv-ink-muted);
   display: flex;
   flex-direction: column;
-  gap: calc(var(--space-2) + 2px);
+  gap: calc(var(--sp-2) + 2px);
   font-size: 12px;
   padding: 14px 20px 16px;
 }
@@ -241,9 +241,9 @@
   display: grid;
   gap: 10px;
   padding: 10px;
-  border: 1px solid var(--sidebar-link-border);
-  border-radius: var(--radius-control);
-  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--cv-border);
+  border-radius: var(--r-md);
+  background: var(--cv-surface-block);
 }
 
 .sidebar-account__identity {
@@ -253,7 +253,7 @@
 }
 
 .sidebar-account__label {
-  color: var(--sidebar-footer-fg);
+  color: var(--cv-ink-muted);
   font-size: 0.68rem;
   font-weight: 700;
   opacity: 0.72;
@@ -261,7 +261,7 @@
 }
 
 .sidebar-account__name {
-  color: #ffffff;
+  color: var(--cv-ink);
   font-size: 0.9rem;
   line-height: 1.2;
   overflow: hidden;
@@ -270,7 +270,7 @@
 }
 
 .sidebar-account__area {
-  color: var(--sidebar-footer-fg);
+  color: var(--cv-ink-muted);
   font-size: 0.76rem;
   font-weight: 700;
 }
@@ -283,10 +283,10 @@
 
 .sidebar-account__link {
   align-items: center;
-  background: var(--sidebar-link-surface);
-  border: 1px solid var(--sidebar-link-border);
-  border-radius: var(--radius-sm);
-  color: var(--sidebar-link-fg);
+  background: var(--cv-surface-block);
+  border: 1px solid var(--cv-border);
+  border-radius: var(--r-sm);
+  color: var(--cv-ink);
   display: inline-flex;
   font-size: 12px;
   font-weight: 700;
@@ -294,13 +294,13 @@
   min-height: 34px;
   padding: 7px 10px;
   text-decoration: none;
-  transition: background-color var(--transition-base), border-color var(--transition-base);
+  transition: background-color var(--tr-base), border-color var(--tr-base);
 }
 
 .sidebar-account__link:hover,
 .sidebar-account__link:focus-visible {
-  background: var(--sidebar-link-hover-bg);
-  border-color: rgba(255, 243, 207, 0.35);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
 .sidebar-logout-form {
@@ -308,22 +308,22 @@
 }
 
 .sidebar-logout-btn {
-  background: var(--sidebar-logout-bg);
-  border: 1px solid var(--sidebar-logout-border);
-  border-radius: var(--radius-sm);
-  color: var(--sidebar-logout-fg);
+  background: var(--cv-surface-block);
+  border: 1px solid var(--cv-border);
+  border-radius: var(--r-sm);
+  color: var(--cv-ink);
   cursor: pointer;
   font-size: 12px;
   font-weight: 700;
   min-height: 34px;
   padding: 7px 10px;
-  transition: background-color var(--transition-base), border-color var(--transition-base);
+  transition: background-color var(--tr-base), border-color var(--tr-base);
   width: 100%;
 }
 
 .sidebar-logout-btn:hover {
-  background: rgba(216, 162, 27, 0.2);
-  border-color: rgba(255, 243, 207, 0.35);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
 .sidebar-footer-note {
@@ -335,7 +335,7 @@
    -------------------------------------------------------------------------- */
 @media (max-width: 840px) {
   .sidebar {
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+    box-shadow: var(--sh-md);
     min-height: unset;
     position: relative;
   }
@@ -364,7 +364,7 @@
   }
 
   .sidebar-link--module {
-    border-radius: var(--radius-control);
+    border-radius: var(--r-md);
     font-size: 0.86rem;
     min-height: 42px;
     padding: 8px 10px;
@@ -388,4 +388,76 @@
   .sidebar-footer {
     padding: 10px;
   }
+}
+
+/* =========================================================================
+   Seletor de tema — dono unico das regras (NOVO-30 fase 3a)
+   Estavam em 01-tokens.css, em duas copias identicas. Camada de token nao
+   estiliza componente; a regra vive onde o componente vive.
+   ========================================================================= */
+.sidebar-theme {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.sidebar-theme__label {
+  color: var(--cv-ink-muted);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.app-theme-grid {
+  display: grid;
+  gap: var(--sp-2);
+  grid-template-columns: 1fr 1fr;
+}
+
+.app-theme-grid__btn {
+  background: var(--cv-surface-block);
+  border: var(--bd);
+  border-radius: var(--r-sm);
+  color: var(--cv-ink-muted);
+  cursor: pointer;
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  min-height: var(--h-md);
+  padding: var(--sp-2);
+  text-align: center;
+  transition:
+    background-color var(--tr-base),
+    color var(--tr-base),
+    box-shadow var(--tr-base),
+    border-color var(--tr-base);
+}
+
+.app-theme-grid__btn:hover,
+.app-theme-grid__btn:focus-visible {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--cv-ink);
+}
+
+.app-theme-grid__btn[aria-pressed="true"],
+.app-theme-grid__btn[aria-checked="true"] {
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--cv-ink);
+}
+
+.app-theme-grid__btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.app-theme-grid__btn small {
+  display: block;
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.03em;
+  margin-top: var(--sp-1);
+  opacity: 0.88;
 }

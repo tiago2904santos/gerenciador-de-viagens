@@ -57,22 +57,22 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--cv-btn-gap);
-  min-height: var(--cv-btn-height);
-  padding: 0 var(--cv-btn-padding-x);
-  border-radius: var(--cv-btn-radius);
+  gap: var(--sp-1);
+  min-height: var(--h-md);
+  padding: 0 var(--sp-3);
+  border-radius: var(--r-pill);
   border: 1px solid transparent;
   font-family: var(--font-sans);
-  font-size: var(--cv-btn-font-size);
-  font-weight: var(--cv-btn-font-weight);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
   line-height: 1;
   cursor: pointer;
   text-decoration: none;
   white-space: nowrap;
   user-select: none;
-  transition: var(--cv-btn-transition);
+  transition: var(--tr-fast);
   box-sizing: border-box;
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--sh-sm);
 }
 
 .cv-btn:hover {
@@ -81,18 +81,18 @@
 
 .cv-btn:focus-visible {
   outline: none;
-  box-shadow: var(--cv-btn-focus-ring), var(--shadow-xs);
+  box-shadow: 0 0 0 3px var(--focus-ring), var(--sh-sm);
 }
 
 .cv-btn:active {
   transform: translateY(1px) scale(0.985);
   filter: brightness(0.985);
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--sh-sm);
 }
 
 .cv-btn:disabled,
 .cv-btn[aria-disabled="true"] {
-  opacity: var(--cv-btn-disabled-opacity);
+  opacity: 0.45;
   cursor: not-allowed;
   pointer-events: none;
   transform: none !important;
@@ -111,47 +111,47 @@
 
 /* --- Primary --- */
 .cv-btn--primary {
-  background: var(--cv-btn-primary-bg);
-  border-color: var(--cv-btn-primary-border);
+  background: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   box-shadow: 0 6px 14px rgba(11, 58, 102, 0.16);
-  color: var(--cv-btn-primary-color);
+  color: var(--on-accent);
 }
 
 .cv-btn--primary:hover,
 .cv-btn--primary:focus {
-  background: var(--cv-btn-primary-hover-bg);
-  border-color: var(--cv-btn-primary-hover-border);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   box-shadow: 0 10px 18px rgba(11, 58, 102, 0.22);
 }
 
 /* --- Secondary --- */
 .cv-btn--secondary {
-  background: var(--cv-btn-secondary-bg);
-  border-color: var(--cv-btn-secondary-border);
-  box-shadow: var(--shadow-xs);
-  color: var(--cv-btn-secondary-color);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  box-shadow: var(--sh-sm);
+  color: var(--color-accent);
 }
 
 .cv-btn--secondary:hover,
 .cv-btn--secondary:focus {
-  background: var(--cv-btn-secondary-hover-bg);
-  border-color: var(--cv-btn-secondary-hover-border);
-  color: var(--cv-btn-secondary-hover-color);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--on-accent);
 }
 
 /* --- Neutral (secondary mais neutro, sem cor de marca) --- */
 .cv-btn--neutral {
-  background: var(--cv-btn-neutral-bg);
-  border-color: var(--cv-btn-neutral-border);
+  background: var(--cv-surface-next);
+  border-color: var(--cv-border);
   box-shadow: none;
-  color: var(--cv-btn-neutral-color);
+  color: var(--cv-ink);
 }
 
 .cv-btn--neutral:hover,
 .cv-btn--neutral:focus {
-  background: var(--cv-btn-neutral-hover-bg);
-  border-color: var(--cv-btn-neutral-hover-border);
-  color: var(--cv-btn-neutral-hover-color);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-color: var(--cv-border);
+  color: var(--cv-ink);
 }
 
 /* --- Ghost (sem background, sem borda) --- */
@@ -159,12 +159,12 @@
   background: transparent;
   border-color: transparent;
   box-shadow: none;
-  color: var(--color-primary);
+  color: var(--color-accent);
 }
 
 .cv-btn--ghost:hover,
 .cv-btn--ghost:focus {
-  background: var(--color-primary-soft);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
   border-color: transparent;
   box-shadow: none;
   transform: none;
@@ -172,41 +172,41 @@
 
 /* --- Back (voltar — secondary sutil, discreta) --- */
 .cv-btn--back {
-  background: var(--cv-btn-neutral-bg);
-  border-color: var(--cv-btn-neutral-border);
+  background: var(--cv-surface-next);
+  border-color: var(--cv-border);
   box-shadow: none;
-  color: var(--cv-btn-neutral-color);
+  color: var(--cv-ink);
 }
 
 .cv-btn--back:hover,
 .cv-btn--back:focus {
-  background: var(--cv-btn-neutral-hover-bg);
-  border-color: var(--cv-btn-neutral-hover-border);
-  color: var(--cv-btn-neutral-hover-color);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-color: var(--cv-border);
+  color: var(--cv-ink);
 }
 
 /* --- Back-list (volta ao indice — levemente mais distinto que --back) --- */
 .cv-btn--back-list {
-  background: var(--cv-btn-secondary-bg);
-  border-color: var(--cv-btn-secondary-border);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   box-shadow: none;
-  color: var(--color-heading);
-  font-weight: var(--font-weight-bold);
+  color: var(--cv-ink);
+  font-weight: var(--fw-bold);
 }
 
 .cv-btn--back-list:hover,
 .cv-btn--back-list:focus {
-  background: var(--cv-btn-secondary-hover-bg);
-  border-color: var(--cv-btn-secondary-hover-border);
-  color: var(--color-heading);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--cv-ink);
 }
 
 /* --- Danger (excluir — acao permanente no banco) --- */
 .cv-btn--danger {
-  background: linear-gradient(135deg, #c0392b 0%, var(--color-danger) 100%);
+  background: linear-gradient(135deg, #c0392b 0%, var(--cv-state-danger) 100%);
   border-color: #8f1f18;
   box-shadow: 0 6px 14px rgba(180, 35, 24, 0.22);
-  color: var(--color-white);
+  color: var(--on-accent);
 }
 
 .cv-btn--danger:hover,
@@ -218,10 +218,10 @@
 
 /* --- Soft-danger (remover — remocao local, reversivel) --- */
 .cv-btn--soft-danger {
-  background: linear-gradient(135deg, #c0392b 0%, var(--color-danger) 100%);
+  background: linear-gradient(135deg, #c0392b 0%, var(--cv-state-danger) 100%);
   border-color: #8f1f18;
   box-shadow: 0 6px 14px rgba(180, 35, 24, 0.22);
-  color: var(--color-white);
+  color: var(--on-accent);
 }
 
 .cv-btn--soft-danger:hover,
@@ -233,76 +233,76 @@
 
 /* --- Preview (visualizar — teal informativo) --- */
 .cv-btn--preview {
-  background: var(--cv-btn-preview-bg);
-  border-color: var(--cv-btn-secondary-border);
-  box-shadow: var(--shadow-xs);
-  color: var(--cv-btn-preview-color);
-  font-weight: var(--font-weight-semibold);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  box-shadow: var(--sh-sm);
+  color: var(--cv-state-success);
+  font-weight: var(--fw-semibold);
 }
 
 .cv-btn--preview:hover,
 .cv-btn--preview:focus {
-  background: var(--cv-btn-preview-hover-bg);
-  border-color: var(--cv-btn-secondary-hover-border);
-  color: var(--cv-btn-preview-color);
+  background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--cv-state-success);
 }
 
 /* --- PDF (vermelho-documental) --- */
 .cv-btn--pdf {
-  background: var(--cv-btn-pdf-bg);
+  background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: rgba(145, 41, 31, 0.92);
   box-shadow: 0 4px 10px rgba(190, 56, 43, 0.18);
-  color: var(--cv-btn-pdf-color);
-  font-weight: var(--font-weight-bold);
+  color: var(--cv-state-danger);
+  font-weight: var(--fw-bold);
 }
 
 .cv-btn--pdf:hover,
 .cv-btn--pdf:focus {
-  background: var(--cv-btn-pdf-hover-bg);
+  background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: rgba(125, 34, 26, 0.95);
   box-shadow: 0 7px 14px rgba(190, 56, 43, 0.24);
 }
 
 /* --- DOCX (azul-arquivo) --- */
 .cv-btn--docx {
-  background: var(--cv-btn-docx-bg);
+  background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border-color: rgba(24, 69, 125, 0.92);
   box-shadow: 0 4px 10px rgba(26, 84, 152, 0.16);
-  color: var(--cv-btn-docx-color);
-  font-weight: var(--font-weight-bold);
+  color: var(--cv-state-warning);
+  font-weight: var(--fw-bold);
 }
 
 .cv-btn--docx:hover,
 .cv-btn--docx:focus {
-  background: var(--cv-btn-docx-hover-bg);
+  background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border-color: rgba(18, 55, 102, 0.96);
   box-shadow: 0 7px 14px rgba(26, 84, 152, 0.2);
 }
 
 /* --- Tool (acoes operacionais: calcular, tracar rota, limpar filtros) --- */
 .cv-btn--tool {
-  background: var(--color-surface-muted);
-  border-color: var(--color-border);
+  background: var(--cv-surface-block);
+  border-color: var(--cv-border);
   box-shadow: none;
-  color: var(--color-muted-strong);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  color: var(--cv-ink-muted);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
 }
 
 .cv-btn--tool:hover,
 .cv-btn--tool:focus {
-  background: var(--color-secondary-soft);
-  border-color: var(--color-border-strong);
-  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-color: var(--cv-border);
+  color: var(--color-accent);
   transform: none;
 }
 
 /* --- Icon (padding quadrado, compacto) --- */
 .cv-btn--icon {
   aspect-ratio: 1;
-  min-height: var(--cv-btn-height-md);
+  min-height: var(--h-md);
   padding: 0;
-  width: var(--cv-btn-height-md);
+  width: var(--h-md);
 }
 
 /* --- Pill (border-radius 999px explicito) --- */
@@ -315,42 +315,42 @@
    ========================================================= */
 
 .cv-btn--xs {
-  min-height: var(--cv-btn-height-xs);
-  padding: 0 var(--cv-btn-padding-x-xs);
+  min-height: var(--sp-6);
+  padding: 0 var(--sp-2);
   font-size: 0.7rem;
 }
 
 .cv-btn--sm {
-  min-height: var(--cv-btn-height-sm);
-  padding: 0 var(--cv-btn-padding-x-sm);
+  min-height: var(--h-sm);
+  padding: 0 var(--sp-3);
   font-size: 0.8rem;
 }
 
 /* md e o default — sem classe adicional necessaria */
 
 .cv-btn--lg {
-  min-height: var(--cv-btn-height-lg);
-  padding: 0 var(--cv-btn-padding-x-lg);
+  min-height: var(--h-lg);
+  padding: 0 var(--sp-4);
   font-size: 1rem;
 }
 
 /* Altura de controle — emparelha com inputs (--control-height-md: 44px).
    Regra absoluta: todo botão ao lado de um input deve usar esta variante. */
 .cv-btn--control {
-  min-height: var(--cv-btn-height-control);
-  padding: 0 var(--cv-btn-padding-x-control);
-  border-radius: var(--cv-btn-control-radius);
+  min-height: var(--h-md);
+  padding: 0 var(--sp-4);
+  border-radius: var(--r-md);
 }
 
 /* Icon sizes */
 .cv-btn--icon.cv-btn--sm {
-  width: var(--cv-btn-height-sm);
-  min-height: var(--cv-btn-height-sm);
+  width: var(--h-sm);
+  min-height: var(--h-sm);
 }
 
 .cv-btn--icon.cv-btn--xs {
-  width: var(--cv-btn-height-xs);
-  min-height: var(--cv-btn-height-xs);
+  width: var(--sp-6);
+  min-height: var(--sp-6);
 }
 
 /* =========================================================
@@ -364,7 +364,7 @@
   border-top-color: transparent;
   border-radius: 50%;
   animation: cv-btn-spin 0.6s linear infinite;
-  margin-left: var(--cv-btn-gap);
+  margin-left: var(--sp-1);
   flex-shrink: 0;
 }
 
@@ -377,16 +377,16 @@
    ========================================================= */
 .cv-btn.is-selected,
 .cv-btn[aria-pressed="true"] {
-  box-shadow: var(--cv-btn-focus-ring), var(--shadow-xs);
+  box-shadow: 0 0 0 3px var(--focus-ring), var(--sh-sm);
   outline: none;
 }
 
 /* Selected sobre secondary */
 .cv-btn--secondary.is-selected,
 .cv-btn--secondary[aria-pressed="true"] {
-  background: var(--color-secondary-soft);
-  border-color: var(--color-secondary);
-  color: var(--color-secondary);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
 /* Selected sobre neutral/tool */
@@ -394,9 +394,9 @@
 .cv-btn--neutral[aria-pressed="true"],
 .cv-btn--tool.is-selected,
 .cv-btn--tool[aria-pressed="true"] {
-  background: var(--color-primary-soft);
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 /* =========================================================
@@ -411,49 +411,49 @@
 
 .cv-icon-btn {
   align-items: center;
-  background: var(--cv-btn-neutral-bg);
-  border: 1px solid var(--cv-btn-neutral-border);
+  background: var(--cv-surface-next);
+  border: 1px solid var(--cv-border);
   border-radius: 50%;
-  box-shadow: var(--shadow-xs);
-  color: var(--cv-btn-neutral-color);
+  box-shadow: var(--sh-sm);
+  color: var(--cv-ink);
   cursor: pointer;
   display: inline-flex;
   flex-shrink: 0;
-  height: var(--cv-icon-btn-size);
+  height: var(--h-md);
   justify-content: center;
   overflow: visible;
   padding: 0;
   position: relative;
   transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast),
-    color var(--transition-fast),
-    transform var(--transition-fast);
+    background-color var(--tr-fast),
+    border-color var(--tr-fast),
+    box-shadow var(--tr-fast),
+    color var(--tr-fast),
+    transform var(--tr-fast);
   user-select: none;
-  width: var(--cv-icon-btn-size);
+  width: var(--h-md);
 }
 
 .cv-icon-btn svg {
   flex-shrink: 0;
-  height: var(--cv-icon-btn-icon-size);
+  height: var(--sp-4);
   pointer-events: none;
-  width: var(--cv-icon-btn-icon-size);
+  width: var(--sp-4);
 }
 
 .cv-icon-btn:hover,
 .cv-icon-btn:focus {
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--sh-md);
   transform: translateY(-1px);
 }
 
 .cv-icon-btn:active {
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--sh-sm);
   transform: translateY(1px) scale(0.97);
 }
 
 .cv-icon-btn:focus-visible {
-  box-shadow: var(--cv-btn-focus-ring);
+  box-shadow: 0 0 0 3px var(--focus-ring);
   outline: none;
 }
 
@@ -467,50 +467,50 @@
 
 /* Tamanhos */
 .cv-icon-btn--sm {
-  height: var(--cv-icon-btn-size-sm);
-  width: var(--cv-icon-btn-size-sm);
+  height: var(--h-sm);
+  width: var(--h-sm);
 }
 
 .cv-icon-btn--lg {
-  height: var(--cv-icon-btn-size-lg);
-  width: var(--cv-icon-btn-size-lg);
+  height: var(--h-sm);
+  width: var(--h-sm);
 }
 
 /* --- Variantes semânticas --- */
 
 /* Edit — neutro com hover azul discreto */
 .cv-icon-btn--edit {
-  background: var(--cv-btn-neutral-bg);
-  border-color: var(--cv-btn-neutral-border);
-  color: var(--cv-btn-neutral-color);
+  background: var(--cv-surface-next);
+  border-color: var(--cv-border);
+  color: var(--cv-ink);
 }
 
 .cv-icon-btn--edit:hover,
 .cv-icon-btn--edit:focus {
-  background: var(--cv-btn-secondary-hover-bg);
-  border-color: var(--cv-btn-secondary-hover-border);
-  color: var(--cv-btn-secondary-hover-color);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--on-accent);
 }
 
 /* Link / vincular — mesmo neutro do editar */
 .cv-icon-btn--link {
-  background: var(--cv-btn-neutral-bg);
-  border-color: var(--cv-btn-neutral-border);
-  color: var(--cv-btn-neutral-color);
+  background: var(--cv-surface-next);
+  border-color: var(--cv-border);
+  color: var(--cv-ink);
 }
 
 .cv-icon-btn--link:hover,
 .cv-icon-btn--link:focus {
-  background: var(--cv-btn-secondary-hover-bg);
-  border-color: var(--cv-btn-secondary-hover-border);
-  color: var(--cv-btn-secondary-hover-color);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--on-accent);
 }
 
 /* Delete — vermelho destrutivo */
 .cv-icon-btn--delete {
-  background: linear-gradient(135deg, #c0392b 0%, var(--color-danger) 100%);
+  background: linear-gradient(135deg, #c0392b 0%, var(--cv-state-danger) 100%);
   border-color: #8f1f18;
-  color: var(--color-white);
+  color: var(--on-accent);
 }
 
 .cv-icon-btn--delete:hover,
@@ -521,9 +521,9 @@
 
 /* Cancelar — amber de alerta (distinto do vermelho de exclusão) */
 .cv-icon-btn--cancel {
-  background: linear-gradient(135deg, #b8860b 0%, var(--color-warning) 100%);
+  background: linear-gradient(135deg, #b8860b 0%, var(--cv-state-warning) 100%);
   border-color: #8a660a;
-  color: var(--color-white);
+  color: var(--on-accent);
 }
 
 .cv-icon-btn--cancel:hover,
@@ -534,80 +534,80 @@
 
 /* Preview — teal informativo (olho) */
 .cv-icon-btn--preview {
-  background: var(--cv-btn-preview-bg);
-  border-color: var(--cv-btn-secondary-border);
-  color: var(--cv-btn-preview-color);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--cv-state-success);
 }
 
 .cv-icon-btn--preview:hover,
 .cv-icon-btn--preview:focus {
-  background: var(--cv-btn-preview-hover-bg);
-  border-color: var(--cv-btn-secondary-hover-border);
-  color: var(--cv-btn-preview-color);
+  background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--cv-state-success);
 }
 
 /* Settings — gerenciar cadastros auxiliares (engrenagem) */
 .cv-icon-btn--settings {
-  background: var(--cv-btn-neutral-bg);
-  border-color: var(--cv-btn-neutral-border);
-  color: var(--cv-btn-neutral-color);
+  background: var(--cv-surface-next);
+  border-color: var(--cv-border);
+  color: var(--cv-ink);
 }
 
 .cv-icon-btn--settings:hover,
 .cv-icon-btn--settings:focus {
-  background: var(--cv-btn-secondary-hover-bg);
-  border-color: var(--cv-btn-secondary-hover-border);
-  color: var(--cv-btn-secondary-hover-color);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--on-accent);
 }
 
 /* Gerenciar modelos (engrenagem ao lado do campo) — accent dourado. */
 .cv-icon-btn--field-manage.cv-icon-btn--settings {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface-soft, var(--cv-btn-neutral-bg)));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border, transparent));
+  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-block));
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
   color: var(--color-accent);
 }
 
 .cv-icon-btn--field-manage.cv-icon-btn--settings:hover,
 .cv-icon-btn--field-manage.cv-icon-btn--settings:focus,
 .cv-icon-btn--field-manage.cv-icon-btn--settings:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 26%, var(--color-surface-muted, var(--cv-btn-neutral-bg)));
+  background: color-mix(in srgb, var(--color-accent) 26%, var(--cv-surface-block));
   border-color: var(--color-accent);
-  color: var(--color-accent-text, var(--color-accent));
+  color: var(--color-accent);
 }
 
 /* Star — definir como padrão (accent) */
 .cv-icon-btn--star {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface-soft, var(--cv-btn-neutral-bg)));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border, transparent));
+  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-block));
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
   color: var(--color-accent);
 }
 
 .cv-icon-btn--star:hover,
 .cv-icon-btn--star:focus {
-  background: color-mix(in srgb, var(--color-accent) 26%, var(--color-surface-muted, var(--cv-btn-neutral-bg)));
+  background: color-mix(in srgb, var(--color-accent) 26%, var(--cv-surface-block));
   border-color: var(--color-accent);
-  color: var(--color-accent-text, var(--color-accent));
+  color: var(--color-accent);
 }
 
 /* Sign — assinar (primary blue, caneta) */
 .cv-icon-btn--sign {
-  background: var(--cv-btn-primary-bg);
-  border-color: var(--cv-btn-primary-border);
-  color: var(--cv-btn-primary-color);
+  background: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--on-accent);
 }
 
 .cv-icon-btn--sign:hover,
 .cv-icon-btn--sign:focus {
-  background: var(--cv-btn-primary-hover-bg);
-  border-color: var(--cv-btn-primary-hover-border);
-  color: var(--cv-btn-primary-color);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--on-accent);
 }
 
 /* Sign — já assinado: mesmo verde de "Concluir", indicador compacto sem badge de texto */
 .cv-icon-btn--sign.is-assinado {
-  background: linear-gradient(135deg, #1f8f4e 0%, var(--color-success, #24a25b) 100%);
+  background: linear-gradient(135deg, #1f8f4e 0%, var(--cv-state-success) 100%);
   border-color: #167039;
-  color: var(--color-white, #fff);
+  color: var(--on-accent);
 }
 
 .cv-icon-btn--sign.is-assinado:hover,
@@ -618,9 +618,9 @@
 
 /* Edit (⋯ menu de ações) — já assinado: mesmo indicador verde compacto do --sign */
 .cv-icon-btn--edit.is-assinado {
-  background: linear-gradient(135deg, #1f8f4e 0%, var(--color-success, #24a25b) 100%);
+  background: linear-gradient(135deg, #1f8f4e 0%, var(--cv-state-success) 100%);
   border-color: #167039;
-  color: var(--color-white, #fff);
+  color: var(--on-accent);
 }
 
 .cv-icon-btn--edit.is-assinado:hover,
@@ -631,9 +631,9 @@
 
 /* Settings (pasta / ações) — já assinado: mesmo indicador verde compacto do --sign */
 .cv-icon-btn--settings.is-assinado {
-  background: linear-gradient(135deg, #1f8f4e 0%, var(--color-success, #24a25b) 100%);
+  background: linear-gradient(135deg, #1f8f4e 0%, var(--cv-state-success) 100%);
   border-color: #167039;
-  color: var(--color-white, #fff);
+  color: var(--on-accent);
 }
 
 .cv-icon-btn--settings.is-assinado:hover,
@@ -644,23 +644,23 @@
 
 /* Signature — gerar assinatura (primary soft preenchido) */
 .cv-icon-btn--signature {
-  background: var(--cv-btn-secondary-bg);
-  border-color: var(--cv-btn-secondary-border);
-  color: var(--cv-btn-secondary-color);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--color-accent);
 }
 
 .cv-icon-btn--signature:hover,
 .cv-icon-btn--signature:focus {
-  background: var(--cv-btn-secondary-hover-bg);
-  border-color: var(--cv-btn-secondary-hover-border);
-  color: var(--cv-btn-secondary-hover-color);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--on-accent);
 }
 
 /* Concluir — verde de sucesso, preenchido (finalizar prestação) */
 .cv-icon-btn--complete {
-  background: linear-gradient(135deg, #1f8f4e 0%, var(--color-success, #24a25b) 100%);
+  background: linear-gradient(135deg, #1f8f4e 0%, var(--cv-state-success) 100%);
   border-color: #167039;
-  color: var(--color-white, #fff);
+  color: var(--on-accent);
 }
 
 .cv-icon-btn--complete:hover,
@@ -684,21 +684,21 @@
 
 /* Arquivar — âmbar sóbrio; desarquivar/reabrir usam o neutro (--edit) */
 .cv-icon-btn--archive {
-  background: var(--cv-btn-neutral-bg);
-  border-color: var(--cv-btn-neutral-border);
-  color: var(--cv-btn-neutral-color);
+  background: var(--cv-surface-next);
+  border-color: var(--cv-border);
+  color: var(--cv-ink);
 }
 
 .cv-icon-btn--archive:hover,
 .cv-icon-btn--archive:focus {
-  background: var(--cv-btn-secondary-hover-bg);
-  border-color: var(--cv-btn-secondary-hover-border);
-  color: var(--cv-btn-secondary-hover-color);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--on-accent);
 }
 
 /* PDF — vermelho documental, preenchido */
 .cv-icon-btn--pdf {
-  background: var(--cv-btn-pdf-bg);
+  background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: rgba(145, 41, 31, 0.92);
   box-shadow: 0 4px 10px rgba(190, 56, 43, 0.18);
   color: #fff;
@@ -706,14 +706,14 @@
 
 .cv-icon-btn--pdf:hover,
 .cv-icon-btn--pdf:focus {
-  background: var(--cv-btn-pdf-hover-bg);
+  background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: rgba(125, 34, 26, 0.95);
   box-shadow: 0 6px 14px rgba(190, 56, 43, 0.24);
 }
 
 /* DOCX — azul arquivo, preenchido */
 .cv-icon-btn--docx {
-  background: var(--cv-btn-docx-bg);
+  background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border-color: rgba(24, 69, 125, 0.92);
   box-shadow: 0 4px 10px rgba(26, 84, 152, 0.18);
   color: #fff;
@@ -721,18 +721,18 @@
 
 .cv-icon-btn--docx:hover,
 .cv-icon-btn--docx:focus {
-  background: var(--cv-btn-docx-hover-bg);
+  background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border-color: rgba(18, 55, 102, 0.96);
   box-shadow: 0 6px 14px rgba(26, 84, 152, 0.24);
 }
 
 /* --- Tooltip CSS (scoped em cv-icon-btn) --- */
 .cv-icon-btn[data-tooltip]::after {
-  background: var(--cv-icon-btn-tooltip-bg);
-  border: 1px solid var(--cv-icon-btn-tooltip-border);
+  background: var(--cv-surface-page);
+  border: 1px solid var(--cv-border);
   border-radius: 7px;
   bottom: calc(100% + 6px);
-  color: var(--cv-icon-btn-tooltip-color);
+  color: var(--cv-ink);
   content: attr(data-tooltip);
   font-family: var(--font-sans);
   font-size: 11px;
@@ -744,7 +744,7 @@
   pointer-events: none;
   position: absolute;
   transform: translateX(-50%) translateY(4px);
-  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  transition: opacity var(--tr-fast), transform var(--tr-fast);
   white-space: nowrap;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
   z-index: var(--z-dropdown);
@@ -770,7 +770,7 @@
 .cv-icon-btn-group {
   align-items: center;
   display: flex;
-  gap: var(--space-2);
+  gap: var(--sp-2);
   overflow: visible;
 }
 
@@ -792,11 +792,11 @@
 }
 
 .cv-global-tooltip {
-  background: var(--cv-icon-btn-tooltip-bg);
-  border: 1px solid var(--cv-icon-btn-tooltip-border);
+  background: var(--cv-surface-page);
+  border: 1px solid var(--cv-border);
   border-radius: 7px;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
-  color: var(--cv-icon-btn-tooltip-color);
+  color: var(--cv-ink);
   font-family: var(--font-sans);
   font-size: 11px;
   font-weight: 700;
@@ -808,7 +808,7 @@
   position: fixed;
   text-align: center;
   transform: translateY(4px);
-  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  transition: opacity var(--tr-fast), transform var(--tr-fast);
   white-space: nowrap;
   z-index: calc(var(--z-modal, 1000) + 20);
 }
@@ -823,7 +823,7 @@
   background: var(--color-accent);
   border-color: var(--color-accent);
   box-shadow: 0 10px 24px color-mix(in srgb, var(--color-accent) 35%, transparent);
-  color: var(--color-on-accent, #19232d);
+  color: var(--on-accent);
 }
 
 /* =========================================================
@@ -838,26 +838,26 @@
 
 .cv-field-action {
   align-items: center;
-  background: var(--cv-btn-neutral-bg);
-  border: 1px solid var(--cv-btn-neutral-border);
-  border-radius: var(--cv-field-action-radius);
-  box-shadow: var(--shadow-xs);
+  background: var(--cv-surface-next);
+  border: 1px solid var(--cv-border);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-sm);
   box-sizing: border-box;
-  color: var(--cv-btn-neutral-color);
+  color: var(--cv-ink);
   cursor: pointer;
   display: inline-flex;
   font-family: var(--font-sans);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  gap: var(--space-2);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  gap: var(--sp-2);
   justify-content: center;
-  height: var(--cv-btn-height);
-  min-height: var(--cv-btn-height);
-  padding: 0 var(--cv-btn-padding-x);
+  height: var(--h-md);
+  min-height: var(--h-md);
+  padding: 0 var(--sp-3);
   transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    color var(--transition-fast);
+    background-color var(--tr-fast),
+    border-color var(--tr-fast),
+    color var(--tr-fast);
   user-select: none;
   white-space: nowrap;
 }
@@ -869,9 +869,9 @@
 
 .cv-field-action:hover,
 .cv-field-action:focus {
-  background: var(--cv-btn-neutral-hover-bg);
-  border-color: var(--cv-btn-neutral-hover-border);
-  color: var(--cv-btn-neutral-hover-color);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-color: var(--cv-border);
+  color: var(--cv-ink);
 }
 
 .cv-field-action:active {
@@ -880,7 +880,7 @@
 }
 
 .cv-field-action:focus-visible {
-  box-shadow: var(--cv-btn-focus-ring);
+  box-shadow: 0 0 0 3px var(--focus-ring);
   outline: none;
 }
 
@@ -892,8 +892,8 @@
 
 /* Acoplado à direita de um input (sem borda esquerda, sem radius esquerdo) */
 .cv-field-action--attached {
-  border-left: 1px solid var(--cv-btn-neutral-border);
-  border-radius: 0 var(--cv-field-action-radius) var(--cv-field-action-radius) 0;
+  border-left: 1px solid var(--cv-border);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
   box-shadow: none;
   align-self: stretch;
   margin-left: -1px;
@@ -903,76 +903,76 @@
 
 /* Neutral — ação operacional genérica */
 .cv-field-action--neutral {
-  background: var(--cv-btn-neutral-bg);
-  border-color: var(--cv-btn-neutral-border);
-  color: var(--cv-btn-neutral-color);
+  background: var(--cv-surface-next);
+  border-color: var(--cv-border);
+  color: var(--cv-ink);
 }
 
 .cv-field-action--neutral:hover,
 .cv-field-action--neutral:focus {
-  background: var(--cv-btn-neutral-hover-bg);
-  border-color: var(--cv-btn-neutral-hover-border);
-  color: var(--cv-btn-neutral-hover-color);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-color: var(--cv-border);
+  color: var(--cv-ink);
 }
 
 /* Clear — limpar filtro/campo (muito discreto) */
 .cv-field-action--clear {
-  background: linear-gradient(180deg, var(--cv-btn-neutral-bg), var(--cv-btn-neutral-hover-bg));
-  border-color: var(--cv-btn-neutral-border);
-  box-shadow: var(--shadow-xs);
-  color: var(--cv-btn-neutral-color);
+  background: linear-gradient(180deg, var(--cv-surface-next), color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)));
+  border-color: var(--cv-border);
+  box-shadow: var(--sh-sm);
+  color: var(--cv-ink);
 }
 
 .cv-field-action--clear:hover,
 .cv-field-action--clear:focus {
-  background: linear-gradient(180deg, var(--cv-btn-neutral-hover-bg), var(--cv-btn-neutral-bg));
-  border-color: var(--cv-btn-neutral-hover-border);
-  color: var(--cv-btn-neutral-hover-color);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)), var(--cv-surface-next));
+  border-color: var(--cv-border);
+  color: var(--cv-ink);
 }
 
 /* Calculate — calcular (destaque azul sutil) */
 .cv-field-action--calculate {
-  background: var(--cv-btn-primary-bg);
-  border-color: var(--cv-btn-primary-border);
+  background: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   box-shadow: 0 6px 14px rgba(11, 58, 102, 0.16);
-  color: var(--cv-btn-primary-color);
+  color: var(--on-accent);
 }
 
 .cv-field-action--calculate:hover,
 .cv-field-action--calculate:focus {
-  background: var(--cv-btn-primary-hover-bg);
-  border-color: var(--cv-btn-primary-hover-border);
-  color: var(--cv-btn-primary-color);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--on-accent);
 }
 
 /* Manage — gerenciar select (ação moderada) */
 .cv-field-action--manage {
-  background: var(--cv-btn-secondary-bg);
-  border-color: var(--cv-btn-secondary-border);
-  color: var(--cv-btn-secondary-color);
-  font-weight: var(--font-weight-bold);
-  box-shadow: var(--shadow-xs);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--color-accent);
+  font-weight: var(--fw-bold);
+  box-shadow: var(--sh-sm);
 }
 
 .cv-field-action--manage:hover,
 .cv-field-action--manage:focus {
-  background: var(--cv-btn-secondary-hover-bg);
-  border-color: var(--cv-btn-secondary-hover-border);
-  color: var(--cv-btn-secondary-hover-color);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--on-accent);
 }
 
 .cv-field-action--secondary {
-  background: var(--cv-btn-secondary-bg);
-  border-color: var(--cv-btn-secondary-border);
-  box-shadow: var(--shadow-xs);
-  color: var(--cv-btn-secondary-color);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  box-shadow: var(--sh-sm);
+  color: var(--color-accent);
 }
 
 .cv-field-action--secondary:hover,
 .cv-field-action--secondary:focus {
-  background: var(--cv-btn-secondary-hover-bg);
-  border-color: var(--cv-btn-secondary-hover-border);
-  color: var(--cv-btn-secondary-hover-color);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--on-accent);
 }
 
 /* =========================================================
@@ -984,33 +984,33 @@
 
 .cv-footer-action {
   align-items: center;
-  background: var(--cv-btn-footer-bg);
+  background: var(--cv-surface-block);
   border: none;
-  border-radius: 0 0 var(--radius-card) var(--radius-card);
-  border-top: 1px solid var(--cv-btn-footer-border);
-  color: var(--cv-btn-footer-color);
+  border-radius: 0 0 var(--r-xl) var(--r-xl);
+  border-top: 1px solid var(--cv-border);
+  color: var(--cv-ink);
   cursor: pointer;
   display: flex;
   font-family: var(--font-sans);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  gap: var(--space-2);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  gap: var(--sp-2);
   justify-content: center;
-  min-height: var(--cv-btn-height);
+  min-height: var(--h-md);
   text-decoration: none;
   transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    color var(--transition-fast);
+    background-color var(--tr-fast),
+    border-color var(--tr-fast),
+    color var(--tr-fast);
   user-select: none;
   width: 100%;
 }
 
 .cv-footer-action:hover,
 .cv-footer-action:focus {
-  background: var(--cv-btn-footer-hover-bg);
-  border-top-color: var(--cv-btn-footer-hover-border);
-  color: var(--cv-btn-footer-hover-color);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-top-color: var(--cv-border);
+  color: var(--cv-ink);
   transform: translateY(-1px);
 }
 
@@ -1020,13 +1020,13 @@
 }
 
 .cv-footer-action:focus-visible {
-  box-shadow: var(--cv-btn-focus-ring);
+  box-shadow: 0 0 0 3px var(--focus-ring);
   outline: none;
 }
 
 .cv-footer-action:disabled {
   cursor: not-allowed;
-  opacity: var(--cv-btn-disabled-opacity);
+  opacity: 0.45;
   pointer-events: none;
 }
 
@@ -1036,17 +1036,17 @@
    ========================================================= */
 
 .cv-floating-action {
-  bottom: var(--space-6);
+  bottom: var(--sp-6);
   position: fixed;
-  right: var(--space-6);
+  right: var(--sp-6);
   z-index: var(--z-dropdown);
 }
 
 @media (max-width: 640px) {
   .cv-floating-action {
-    bottom: var(--space-4);
-    left: var(--space-4);
-    right: var(--space-4);
+    bottom: var(--sp-4);
+    left: var(--sp-4);
+    right: var(--sp-4);
     width: auto;
   }
 }
@@ -1059,52 +1059,52 @@
    falar sobre a propriedade. Enquanto o modificador morou lá, ele era vencido
    pela base daqui e as duas ações caíam uma em cima da outra (NOVO-23). */
 .cv-floating-action--stacked {
-  bottom: calc(var(--space-6) + var(--control-height-md) + var(--space-3));
+  bottom: calc(var(--sp-6) + var(--h-md) + var(--sp-3));
 }
 
 @media (max-width: 640px) {
   .cv-floating-action--stacked {
-    bottom: calc(var(--space-4) + var(--control-height-md) + var(--space-3));
+    bottom: calc(var(--sp-4) + var(--h-md) + var(--sp-3));
   }
 }
 
 /* Add — ação de adição com plus */
 .cv-footer-action--add {
-  background: var(--cv-btn-footer-bg);
-  color: var(--cv-btn-footer-color);
+  background: var(--cv-surface-block);
+  color: var(--cv-ink);
 }
 
 .cv-footer-action--add:hover,
 .cv-footer-action--add:focus {
-  background: var(--cv-btn-footer-hover-bg);
-  border-top-color: var(--cv-btn-footer-hover-border);
-  color: var(--cv-btn-footer-hover-color);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-top-color: var(--cv-border);
+  color: var(--cv-ink);
 }
 
 /* Primary — criação mais destacada */
 .cv-footer-action--primary {
-  background: var(--cv-btn-primary-bg);
+  background: var(--color-accent);
   border-top-color: transparent;
-  color: var(--cv-btn-primary-color);
+  color: var(--on-accent);
 }
 
 .cv-footer-action--primary:hover,
 .cv-footer-action--primary:focus {
-  background: var(--cv-btn-primary-hover-bg);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
   border-top-color: transparent;
-  color: var(--cv-btn-primary-color);
+  color: var(--on-accent);
 }
 
 /* Neutral — ação discreta, borda tracejada */
 .cv-footer-action--neutral {
   background: transparent;
-  border-top: 1px solid var(--cv-btn-footer-border);
-  color: var(--cv-btn-footer-color);
+  border-top: 1px solid var(--cv-border);
+  color: var(--cv-ink);
 }
 
 .cv-footer-action--neutral:hover,
 .cv-footer-action--neutral:focus {
-  background: var(--cv-btn-footer-hover-bg);
-  border-top-color: var(--cv-btn-footer-hover-border);
-  color: var(--cv-btn-footer-hover-color);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-top-color: var(--cv-border);
+  color: var(--cv-ink);
 }

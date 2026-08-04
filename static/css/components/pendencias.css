@@ -6,48 +6,48 @@
    ======================================================================== */
 
 .cv-pendencias {
-  border-radius: var(--radius-card);
-  margin-bottom: var(--space-4);
+  border-radius: var(--r-xl);
+  margin-bottom: var(--sp-4);
   overflow: hidden;
 }
 
 .cv-pendencias--danger {
-  background: var(--color-danger-soft);
-  border: 1px solid var(--color-danger);
-  box-shadow: var(--shadow-soft);
+  background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
+  border: 1px solid var(--cv-state-danger);
+  box-shadow: var(--sh-md);
 }
 
 .cv-pendencias--warning {
-  background: var(--color-warning-soft);
-  border: 1px solid var(--color-warning);
-  box-shadow: var(--shadow-soft);
+  background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
+  border: 1px solid var(--cv-state-warning);
+  box-shadow: var(--sh-md);
 }
 
 .cv-pendencias__inner {
   align-items: flex-start;
   display: flex;
-  gap: var(--space-3);
-  padding: var(--space-4);
+  gap: var(--sp-3);
+  padding: var(--sp-4);
 }
 
 .cv-pendencias__marker {
-  background: var(--color-danger);
-  border-radius: var(--radius-pill);
+  background: var(--cv-state-danger);
+  border-radius: var(--r-pill);
   flex-shrink: 0;
   height: 2.25rem;
-  margin-top: var(--space-1);
+  margin-top: var(--sp-1);
   position: relative;
   width: 2.25rem;
 }
 
 .cv-pendencias--warning .cv-pendencias__marker {
-  background: var(--color-warning);
+  background: var(--cv-state-warning);
 }
 
 .cv-pendencias__marker::after {
-  color: var(--color-card);
+  color: var(--cv-surface-block);
   content: "!";
-  font-size: var(--font-size-lg);
+  font-size: var(--fs-lg);
   font-weight: 800;
   left: 50%;
   position: absolute;
@@ -56,29 +56,29 @@
 }
 
 .cv-pendencias__title {
-  color: var(--color-heading);
-  font-size: var(--font-size-md);
+  color: var(--cv-ink);
+  font-size: var(--fs-md);
   font-weight: 800;
   letter-spacing: 0.02em;
-  margin: 0 0 var(--space-2);
+  margin: 0 0 var(--sp-2);
 }
 
 .cv-pendencias__lead {
-  color: var(--color-muted);
-  font-size: var(--font-size-sm);
-  margin: 0 0 var(--space-3);
+  color: var(--cv-ink-muted);
+  font-size: var(--fs-sm);
+  margin: 0 0 var(--sp-3);
   max-width: 42rem;
 }
 
 .cv-pendencias__items {
-  color: var(--color-heading);
-  font-size: var(--font-size-sm);
+  color: var(--cv-ink);
+  font-size: var(--fs-sm);
   margin: 0;
-  padding-left: var(--space-5);
+  padding-left: var(--sp-5);
 }
 
 .cv-pendencias__items li {
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--sp-2);
 }
 
 .cv-pendencias__items li:last-child {
@@ -88,12 +88,12 @@
 /* Tokens *-soft não têm variante escura — redefinir escopado no dark. */
 
   .cv-pendencias--danger {
-  background: color-mix(in srgb, var(--color-danger) 16%, var(--color-card, #142132));
-  border-color: color-mix(in srgb, var(--color-danger) 55%, transparent);
+  background: color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-block));
+  border-color: color-mix(in srgb, var(--cv-state-danger) 55%, transparent);
 }
 
 
   .cv-pendencias--warning {
-  background: color-mix(in srgb, var(--color-warning) 14%, var(--color-card, #142132));
-  border-color: color-mix(in srgb, var(--color-warning) 55%, transparent);
+  background: color-mix(in srgb, var(--cv-state-warning) 14%, var(--cv-surface-block));
+  border-color: color-mix(in srgb, var(--cv-state-warning) 55%, transparent);
 }

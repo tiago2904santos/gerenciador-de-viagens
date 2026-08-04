@@ -59,7 +59,7 @@ jobs:
 
       - name: Block new frontend standards debt
         # Catraca: este número só desce. NOVO-30 fase 1 (refazer): 384 → 335.
-        run: python scripts/audit_frontend_standards.py --max-warnings 335
+        run: python scripts/audit_frontend_standards.py --max-warnings 212
 
       - name: Block backend architecture regressions (P-01, P-05)
         # Catraca: este número só desce. O P-01 fechou os quatro apps do

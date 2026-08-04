@@ -3,7 +3,7 @@
 .cv-list-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2, 8px);
+  gap: var(--sp-2);
   margin: 0;
   padding: 0;
 }
@@ -17,7 +17,7 @@
   box-shadow: none;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2, 8px);
+  gap: var(--sp-2);
   justify-content: space-between;
   padding: 0;
   width: 100%;
@@ -29,8 +29,8 @@
   background: transparent;
   border: 0;
   box-shadow: none;
-  margin-top: calc(-1 * var(--space-1, 4px));
-  padding: var(--space-3, 12px) 0 var(--space-1, 4px);
+  margin-top: calc(-1 * var(--sp-1));
+  padding: var(--sp-3) 0 var(--sp-1);
 }
 
 .cv-collection-panel > .list-toolbar {
@@ -75,40 +75,40 @@
 
 .list-toolbar .pagination-shell__controls {
   box-sizing: border-box;
-  height: var(--list-toolbar-h);
-  min-height: var(--list-toolbar-h);
+  height: var(--h-md);
+  min-height: var(--h-md);
   padding: 3px;
 }
 
 .list-toolbar :is(.pagination-shell__nav, .pagination-shell__page) {
   box-sizing: border-box;
-  height: calc(var(--list-toolbar-h) - 6px);
-  min-height: calc(var(--list-toolbar-h) - 6px);
-  min-width: calc(var(--list-toolbar-h) - 6px);
-  width: calc(var(--list-toolbar-h) - 6px);
+  height: calc(var(--h-md) - 6px);
+  min-height: calc(var(--h-md) - 6px);
+  min-width: calc(var(--h-md) - 6px);
+  width: calc(var(--h-md) - 6px);
 }
 
 /* Conexão visual com o header flat: abas logo abaixo do divisor. */
 .page-shell--list > .cv-list-tabs,
 .cv-page--collection > .cv-list-tabs {
-  margin-top: calc(-1 * var(--space-1, 4px));
-  padding-bottom: var(--space-1, 4px);
-  padding-top: var(--space-3, 12px);
+  margin-top: calc(-1 * var(--sp-1));
+  padding-bottom: var(--sp-1);
+  padding-top: var(--sp-3);
 }
 
 .cv-list-tab {
   align-items: center;
-  background: var(--cv-list-tab-bg);
-  border: 1px solid var(--cv-list-tab-border);
-  border-radius: var(--radius-pill, 999px);
+  background: var(--cv-surface-card);
+  border: 1px solid var(--cv-border);
+  border-radius: var(--r-pill);
   box-sizing: border-box;
-  color: var(--cv-list-tab-color);
+  color: var(--cv-ink);
   display: inline-flex;
-  font-size: var(--font-size-sm, 0.875rem);
+  font-size: var(--fs-sm);
   font-weight: 600;
-  gap: var(--space-2, 8px);
+  gap: var(--sp-2);
   line-height: 1;
-  min-height: var(--list-toolbar-h, 44px);
+  min-height: var(--h-md);
   padding: 0 14px;
   text-decoration: none;
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
@@ -116,23 +116,23 @@
 
 .cv-list-tab:hover,
 .cv-list-tab:focus-visible {
-  background: var(--cv-list-tab-hover-bg);
-  border-color: var(--cv-list-tab-hover-border);
-  color: var(--cv-list-tab-hover-color);
+  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  border-color: var(--cv-border);
+  color: var(--cv-ink);
   outline: none;
 }
 
 .cv-list-tab--active {
-  background: var(--cv-list-tab-active-bg);
-  border-color: var(--cv-list-tab-active-border);
-  color: var(--cv-list-tab-active-color);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--on-accent);
 }
 
 .cv-list-tab__count {
-  background: var(--cv-list-tab-count-bg);
-  border-radius: var(--radius-pill, 999px);
+  background: var(--cv-surface-page);
+  border-radius: var(--r-pill);
   color: inherit;
-  font-size: var(--font-size-2xs, 0.72rem);
+  font-size: var(--fs-2xs);
   font-variant-numeric: tabular-nums;
   min-width: 1.5em;
   padding: 2px 7px;
@@ -140,8 +140,8 @@
 }
 
 .cv-list-tab--active .cv-list-tab__count {
-  background: var(--cv-list-tab-active-count-bg);
-  color: var(--cv-list-tab-active-count-color);
+  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  color: var(--on-accent);
 }
 
 
@@ -151,15 +151,15 @@
 /* Aba ativa: hover sobe no dourado (não vai para branco) e sem barra esquerda. */
 
   .cv-list-tab--active:is(:hover, :focus-visible) {
-  background: color-mix(in srgb, var(--color-accent-soft, #3b3320) 72%, var(--color-accent, #d8a21b) 28%);
-  border-color: var(--color-accent-hover, #e0ab3c);
+  background: color-mix(in srgb, color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)) 72%, var(--color-accent, #d8a21b) 28%);
+  border-color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
   box-shadow: none;
-  color: var(--color-accent-hover, #e0ab3c);
+  color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
 }
 
 
   .cv-list-tab:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-focus, #74aae0) 28%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, 0 0 0 3px var(--focus-ring) 28%, transparent);
 }
 
 
