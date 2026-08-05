@@ -28,7 +28,7 @@ jobs:
           echo "Secret FIELD_ENCRYPTION_KEYS presente (len=${#FIELD_ENCRYPTION_KEYS})."
 
       - name: Aplicar chave no .env e reiniciar serviços
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.5
         env:
           FIELD_ENCRYPTION_KEYS: ${{ secrets.FIELD_ENCRYPTION_KEYS }}
           SSH_PUBKEY: ${{ inputs.chave_ssh_publica }}
