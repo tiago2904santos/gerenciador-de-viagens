@@ -1964,10 +1964,6 @@ body.has-delete-modal-open {
     padding-block: var(--sp-3);
   }
 
-  .cv-form-section-body {
-    padding: var(--sp-4);
-  }
-
   .footer-actions {
     align-items:    stretch;
     flex-direction: column-reverse;
@@ -4685,12 +4681,6 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   z-index: 2;
 }
 
-.cv-date-picker__day--multi-selected.cv-date-picker__day--multi-start::before,
-.cv-date-picker__day--multi-single::before {
-  border-bottom-left-radius: var(--r-pill);
-  border-top-left-radius: var(--r-pill);
-}
-
 .cv-date-picker__day--multi-middle {
   border-left-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: 0;
@@ -4701,12 +4691,6 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 .cv-date-picker__day--multi-end {
   border-left-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   z-index: 2;
-}
-
-.cv-date-picker__day--multi-selected.cv-date-picker__day--multi-end::before,
-.cv-date-picker__day--multi-single::before {
-  border-bottom-right-radius: var(--r-pill);
-  border-top-right-radius: var(--r-pill);
 }
 
 .cv-date-picker__day--multi-selected:nth-child(7n)::before {
@@ -9813,20 +9797,6 @@ margin-inline: 0;
   transition: none;
 }
 
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single,
-
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single:hover {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-}
-
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row__half {
-  align-items: center;
-  display: flex;
-  gap: 10px;
-  min-width: 0;
-  width: 100%;
-}
-
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row__field {
   flex: 1 1 auto;
   margin: 0;
@@ -9870,10 +9840,6 @@ margin-inline: 0;
   display: block;
   height: 16px;
   width: 16px;
-}
-
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single .cv-ordered-field-row__drag-handle {
-  display: none;
 }
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .route-destinos-add,
@@ -12719,10 +12685,6 @@ margin-inline: 0;
   border-color: transparent;
 }
 
-  .doc-pdf-thumb--active {
-  border-color: var(--color-accent);
-}
-
 @keyframes cv-skeleton-pulse {
   to { background-position: -200% 0; }
 }
@@ -13581,16 +13543,6 @@ margin-inline: 0;
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: var(--on-accent);
-}
-
-  .cv-itinerary__leg {
-  background: var(--cv-surface-card);
-  border-color: transparent;
-}
-
-  .cv-itinerary__leg:hover {
-  background: var(--cv-surface-card);
-  border-color: transparent;
 }
 
   .cv-person-row--highlight .cv-person-row__badge {

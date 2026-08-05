@@ -312,10 +312,6 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-.travel-document-wizard__main {
-  min-width: 0;
-}
-
 .travel-document-wizard__actions {
   background: var(--cv-surface-card);
   flex-wrap:  wrap;
@@ -1479,24 +1475,6 @@
   overflow-y: auto;
 }
 
-/* Destaque do card marcado (Documentos vinculados). .related-route-item.is-active
-   (roteiros.css) depende de --re-accent-border/--re-choice-ring, que só existem
-   dentro de .roteiro-editor; e o destaque do tema escuro (dark-redesign.css) só
-   existe dentro de .related-route-picker. Nenhum dos dois envolve este card, então
-   o clique marcava o item (select/aria-pressed) sem qualquer sinal visual. */
-#evento-card-documentos-d .related-route-item.is-active {
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-block));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--cv-border));
-  border-inline-start: var(--bd-strong);
-  border-inline-start-color: var(--color-accent);
-}
-
-#evento-card-documentos-d .related-route-item.is-active .cv-search-picker__selected-avatar {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--on-accent);
-}
-
  #evento-card-documentos-d .related-route-item.is-active {
   background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-block));
   border-color: color-mix(in srgb, var(--color-accent) 45%, var(--cv-border));
@@ -1857,10 +1835,6 @@ padding-inline: var(--sp-6);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-inline-start: var(--bd-strong);
   border-inline-start-color: var(--color-accent);
-}
-
-.cv-person-row--highlight .cv-person-row__name {
-  color: var(--cv-ink);
 }
 
 .cv-person-row--highlight .cv-person-row__avatar {
