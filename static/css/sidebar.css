@@ -336,10 +336,6 @@ border-color: transparent;
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
 }
 
-.sidebar-footer-note {
-  opacity: 0.92;
-}
-
 /* --------------------------------------------------------------------------
    4. Responsividade
    -------------------------------------------------------------------------- */

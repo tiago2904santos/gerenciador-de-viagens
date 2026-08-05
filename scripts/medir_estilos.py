@@ -29,12 +29,43 @@ from playwright.sync_api import sync_playwright
 
 BASE = "http://127.0.0.1:8000"
 
+# A lista existe para cobrir os ARQUIVOS de CSS, nao para passear pelo sistema:
+# cada folha grande precisa de pelo menos uma tela que a carregue, senao a medicao
+# diz "0 mudou" sobre codigo que ninguem abriu. Foi ampliada na fase 5a, quando o
+# corte pegou `roteiros.css` (1.526 linhas) e `oficios.css` (998) — nenhum dos dois
+# coberto pelas cinco telas originais.
 PAGINAS = [
-    ("dashboard", "/"),
-    ("oficios-lista", "/oficios/"),
+    ("dashboard", "/"),                                  # dashboard, cards
+    ("oficios-lista", "/oficios/"),                      # oficios, list-header, tabs
     ("oficio-novo", "/oficios/novo/"),
-    ("configuracoes", "/cadastros/configuracao/"),
+    ("oficios-modelos", "/oficios/modelos-motivo/"),
+    ("oficios-modelo-novo", "/oficios/modelos-motivo/novo/"),
+    ("configuracoes", "/cadastros/configuracao/"),       # cadastros-config, gdrive
     ("perfil", "/perfil/"),
+    ("roteiros-lista", "/roteiros/"),                    # roteiros-list
+    ("roteiro-novo", "/roteiros/novo/"),                 # roteiros (o maior corte)
+    ("eventos-lista", "/eventos/"),                      # eventos-list
+    ("evento-novo", "/eventos/novo/"),
+    ("termos-lista", "/termos/"),                        # termos, stages
+    ("termo-novo", "/termos/novo/"),
+    ("justificativas", "/justificativas/"),              # justificativas
+    ("justificativa-nova", "/justificativas/novo/"),
+    ("planos-lista", "/planos-trabalho/"),               # planos-trabalho-eventos
+    ("plano-novo", "/planos-trabalho/novo/"),
+    ("planos-atividades", "/planos-trabalho/atividades/"),  # planos-trabalho-atividades
+    ("ordens-lista", "/ordens-servico/"),                # ordens-servico
+    ("ordem-nova", "/ordens-servico/nova/"),
+    ("prestacoes", "/prestacoes-contas/"),               # prestacoes_contas
+    ("prestacoes-modelos", "/prestacoes-contas/modelos-texto/"),
+    ("diario-bordo", "/diario-bordo/"),                  # diario-troca
+    ("documentos", "/documentos/"),                      # documents
+    ("cadastros", "/cadastros/"),
+    ("servidores", "/cadastros/servidores/"),            # lists, record-list
+    ("servidor-novo", "/cadastros/servidores/novo/"),    # forms, cv-select
+    ("viaturas", "/cadastros/viaturas/"),
+    ("cidades", "/cadastros/cidades/"),
+    ("usuarios", "/usuarios/"),                          # usuarios
+    ("usuario-novo", "/usuarios/novo/"),
 ]
 
 # As propriedades que os `!important` deste repositorio tocam.
@@ -92,7 +123,20 @@ def coletar():
                 # — seis propriedades "mudaram" num card que so estava sob o
                 # cursor.
                 pag.mouse.move(2, 2)
-                pag.wait_for_timeout(250)
+                # Trocar de tema dispara `transition` de cor. Esperar por tempo nao
+                # resolve: sobrou uma transicao a meio caminho e a leitura saiu
+                # `rgb(150,...)` numa execucao e `rgb(151,...)` na seguinte, com o
+                # CSS identico. Era esse o ruido que travou a fase 5a — seis
+                # propriedades "mudadas" num card do Dashboard, sem causa no CSS.
+                # Agora as transicoes sao levadas ao fim antes da leitura; as
+                # infinitas (spinner) recusam `finish()` e ficam de fora, que e o
+                # certo — elemento que nunca para nao tem valor estavel para medir.
+                pag.evaluate("""() => {
+                  for (const a of document.getAnimations()) {
+                    try { a.finish(); } catch (e) { /* infinita: sem estado final */ }
+                  }
+                }""")
+                pag.wait_for_timeout(120)
                 dados[f"{nome}/{tema}"] = pag.evaluate(JS, PROPS)
         nav.close()
     return dados

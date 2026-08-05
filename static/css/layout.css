@@ -63,7 +63,3 @@
     padding: var(--sp-3);
   }
 }
-
-.app-page__list-card--placeholder {
-  padding: 0;
-}

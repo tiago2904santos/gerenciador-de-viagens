@@ -1,17 +1,4 @@
-/* ==========================================================================
-   CARDS
-   ========================================================================== */
 
-/* --------------------------------------------------------------------------
-   0. Classes canonicas do design system
-   .app-card  → superfície genérica (alias de .card)
-   .app-panel → painel com borda/padding mais denso (alias de .form-section)
-   .app-section → wrapper estrutural de conteúdo (novo)
-   -------------------------------------------------------------------------- */
-.app-section {
-  display: grid;
-  gap: var(--sp-4);
-}
 
 .app-section__header {
   display: grid;
@@ -43,8 +30,7 @@
 .app-card,
 .module-card,
 .document-card,
-.summary-card,
-.page-card {
+.summary-card {
   background: var(--cv-surface-block);
   border: var(--bd);
   border-radius: var(--r-xl);
@@ -219,28 +205,6 @@ border-left-width: 6px;
   align-items: center;
   display: flex;
   justify-content: flex-start;
-}
-
-/* --------------------------------------------------------------------------
-   3. Page card
-   -------------------------------------------------------------------------- */
-.page-card {
-  box-sizing: border-box;
-  margin-inline: 0;
-  max-width: 100%;
-  padding: var(--sp-6);
-  width: 100%;
-}
-
-.page-card h2 {
-  font-size: calc(var(--fs-lg) + 2px);
-  line-height: 1.25;
-  margin-bottom: var(--sp-2);
-}
-
-.page-card p {
-  color: var(--cv-ink-muted);
-  margin-bottom: 0;
 }
 /* --------------------------------------------------------------------------
    5. app-panel — alias semantico de .form-section

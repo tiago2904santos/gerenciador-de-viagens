@@ -92,11 +92,6 @@
   padding-top: 0;
 }
 
-/* Compat: formulários antigos / preview cadastro */
-.termos-page .main-form-panel {
-  gap: var(--sp-5);
-}
-
 .termo-card__body {
   display: grid;
   gap: var(--sp-4);
@@ -111,7 +106,6 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.cv-record-card--termo .cv-person-list--n0,
 .cv-record-card--termo .cv-person-list--n1 {
   grid-template-columns: minmax(0, 1fr);
 }

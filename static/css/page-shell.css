@@ -38,117 +38,6 @@
 [hidden] { display: none !important; }
 
 /* =========================================================
-   01. Design Tokens — Estrutura, Layout e Aliases
-   ========================================================= */
-
-:root {
-  /* --- Layout --- */
-
-  /* --- Espaçamento estendido --- */
-
-  /* --- Radius estendido --- */
-
-  /* --- Page Shell --- */
-
-  /* --- Form Panel --- */
-
-  /* --- Form Section --- */
-
-  /* --- Field Grid --- */
-
-  /* --- Field Group --- */
-
-  /* --- Wizard Section Cards --- */
-
-  /* --- Stepper --- */
-/* legado — mantido para compat */
-/* marcador premium (novo) */
-/* espessura da linha conectora */
-
-  /* --- Header Band --- */
-
-  /* --- Header Filter Bar --- */
-
-  /* --- Quick Add Folder Tab --- */
-/* 14px — aba mais arredondada */
-/* 20px — aba mais larga      */
-/* 12px — aba mais alta        */
-/* 20px — círculo do ícone     */
-
-  /* --- Footer Actions --- */
-
-  /* --- List Panel --- */
-
-  /* --- Quick Create Inline --- */
-
-  /* --- Sombras semânticas --- */
-
-  /* --- Bordas semânticas --- */
-
-  /* --- Texto semântico --- */
-}
-
-/* =========================================================
-   02. Theme Tokens — Dark
-   ========================================================= */
-
-:root {
-
-
-
-
-
-/* mesmo fundo das seções de formulário */
-
-
-  /* Stepper — estados */
-
-  /* Badges do header */
-
-  /* Quick Create Inline */
-
-  /* Quick Add Folder Tab */
-/* azul primário com opacidade */
-/* texto claro sobre fundo escuro */
-/* círculo dourado */
-/* texto escuro sobre dourado */
-
-  /* Header Filter Bar */
-
-  /* Filtros aplicados — chips */
-
-  /* Stepper — estados adicionais */
-}
-
-/* =========================================================
-   03. Theme Tokens — Light (Silver Frost)
-   ========================================================= */
-
-:root {
-
-
-
-
-
-/* mesmo fundo das seções de formulário */
-
-
-  /* Stepper — estados */
-
-  /* Badges do header */
-
-  /* Quick Create Inline */
-
-  /* Quick Add Folder Tab */
-
-  /* Header Filter Bar */
-
-  /* Filtros aplicados — chips */
-
-  /* Stepper — estados adicionais */
-}
-
-/* =========================================================
    04. Background
    O background atmosférico é gerenciado por ui-lab.css no UI Lab
    e pelo base global em páginas reais. Este arquivo não define
@@ -257,14 +146,6 @@
   padding-inline: var(--sp-6);
 }
 
-/* Ribbon: faixa gradiente no rodapé */
-.page-header--clean .page-header__ribbon {
-  background: var(--cv-surface-block);
-  box-shadow: var(--sh-sm);
-  height:     3px;
-  width:      100%;
-}
-
 /* Metadados opcionais no body (wizard: status, etapa) */
 .page-header__meta {
   align-items: center;
@@ -274,17 +155,6 @@
   margin-top:  var(--sp-2);
 }
 
-.page-header__meta-sep {
-  color:   var(--cv-ink-muted);
-  opacity: 0.45;
-}
-
-.page-header__meta-item {
-  color:       var(--cv-ink-muted);
-  font-size:   var(--fs-xs);
-  font-weight: var(--fw-medium);
-}
-
 .page-header__badge {
   border-radius:  var(--r-pill);
   font-size:      var(--fs-xs);
@@ -292,20 +162,6 @@
   letter-spacing: 0.04em;
   padding-block: var(--sp-1);
   padding-inline: var(--sp-2);
-}
-
-.page-header__badge--draft {
-  background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
-  color:      var(--cv-state-warning);
-}
-
-.page-header__badge--sent {
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
-  color:      var(--cv-state-success);
 }
 
 /* =========================================================
@@ -417,26 +273,6 @@
   pointer-events: none;
 }
 
-/* Alias legado para __marker */
-.page-stepper__number {
-  align-items:     center;
-  background:      var(--cv-surface-block);
-  border: var(--bd);
-  border-radius:   var(--r-pill);
-  color:           var(--cv-ink);
-  display:         inline-flex;
-  flex-shrink:     0;
-  font-size:       var(--fs-xs);
-  font-weight:     var(--fw-bold);
-  height:          var(--sp-6);
-  justify-content: center;
-  transition:
-    background   var(--tr-base),
-    color        var(--tr-base),
-    border-color var(--tr-base);
-  width:           var(--sp-6);
-}
-
 /* Bloco textual centralizado abaixo do marcador */
 .page-stepper__content {
   align-items:    center;
@@ -484,8 +320,7 @@
   background: var(--color-accent);
 }
 
-.page-stepper__item.is-complete .page-stepper__marker,
-.page-stepper__item.is-complete .page-stepper__number {
+.page-stepper__item.is-complete .page-stepper__marker {
   background:   color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
   color:        var(--cv-state-success);
@@ -502,8 +337,7 @@
 
 /* ─── Estado: Atual / em andamento (.is-current | .is-active) ── */
 
-.page-stepper__item.is-current .page-stepper__marker,
-.page-stepper__item.is-active  .page-stepper__number {
+.page-stepper__item.is-current .page-stepper__marker {
   background:   var(--color-accent);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   box-shadow: var(--sh-sm);
@@ -595,20 +429,6 @@
   gap:            var(--sp-1);
 }
 
-.wizard-inner-section__header--actions {
-  align-items:     flex-start;
-  flex-direction:  row;
-  gap:             var(--sp-3);
-  justify-content: space-between;
-}
-
-.wizard-inner-section__header-copy {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--sp-1);
-  min-width:      0;
-}
-
 .wizard-inner-section__title {
   color:          var(--cv-ink);
   font-size:      var(--fs-sm);
@@ -623,22 +443,6 @@
   font-size:   var(--fs-sm);
   line-height: 1.45;
   margin:      0;
-}
-
-.field__static-value {
-  color:       var(--cv-ink);
-  font-size:   var(--fs-md);
-  font-weight: var(--fw-semibold);
-  margin:      0;
-  white-space: nowrap;
-}
-
-.footer-actions--primary-only {
-  justify-content: flex-end;
-}
-
-.footer-actions--primary-only .footer-actions__primary {
-  margin-left: auto;
 }
 
 /* Stepper legado como irmão do header — UI Lab / demos.
@@ -682,7 +486,6 @@
 }
 
 .main-form-panel .field-grid,
-.main-form-panel .field-grid-rows,
 .main-form-panel .field,
 .main-form-panel .cv-field,
 .main-form-panel .cv-search-picker,
@@ -1050,18 +853,6 @@ padding-inline: var(--sp-6);
   padding-inline: var(--sp-6);
 }
 
-.cv-form-section-body--sections {
-  gap: 0;
-}
-
-.cv-form-section-body--sections > .wizard-inner-section:not(:last-child) {
-  padding-bottom: var(--sp-5);
-}
-
-.cv-form-section-body--sections > .wizard-inner-section + .wizard-inner-section {
-  padding-top: var(--sp-5);
-}
-
 /* =========================================================
    12. Field Grid
    Grade de 4 colunas. Controla a distribuição dos campos.
@@ -1100,23 +891,6 @@ padding-inline: var(--sp-6);
 
 /* Linha inteira: justificativa, observações, descrição, textarea */
 .field-size-4 { grid-column: 1 / -1; }
-
-/* =========================================================
-   14. Field Group
-   Agrupamento leve dentro de uma Form Section.
-   Usado para blocos condicionais ou campos muito relacionados.
-   ========================================================= */
-
-.field-group {
-  background:     var(--cv-surface-block);
-  border: var(--bd);
-  border-radius:  var(--r-sm);
-  box-sizing:     border-box;
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--sp-3);
-  padding:        var(--sp-4);
-}
 
 .field-group__header {
   align-items:     center;
@@ -1181,21 +955,6 @@ padding-inline: var(--sp-6);
   z-index: calc(var(--z-sidebar) + 20);
 }
 
-/* `.cv-floating-action--stacked` mora em `cv-buttons.css` (NOVO-23): aquele
-   arquivo redeclara `.cv-floating-action { bottom }` e vem depois deste no
-   bundle, então um modificador definido aqui nunca chegava a valer. */
-
-.cv-floating-action__button {
-  box-shadow: var(--sh-sm);
-}
-
-.quick-create-panel--page {
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: none;
-}
-
 .quick-create-panel__copy {
   display: grid;
   gap: var(--sp-1);
@@ -1217,18 +976,10 @@ padding-inline: var(--sp-6);
   margin: 0;
 }
 
-.quick-create-panel__body--page {
-  padding-block: var(--sp-4);
-}
-
 @media (max-width: 640px) {
   .cv-floating-action {
     left: clamp(var(--sp-3), 2vw, var(--sp-4));
     right: clamp(var(--sp-3), 2vw, var(--sp-4));
-  }
-
-  .cv-floating-action__button {
-    width: 100%;
   }
 }
 
@@ -1696,70 +1447,6 @@ body.has-delete-modal-open {
   width: 16px;
 }
 
-.cv-action-menu__item--cancel {
-  color: var(--cv-state-warning);
-}
-
-.cv-action-menu__item--delete {
-  color: var(--cv-state-danger);
-}
-
-.cv-action-menu__item--retificar,
-.cv-action-menu__item--complementar {
-  color: var(--color-accent);
-}
-
-.cv-action-menu__item--whatsapp {
-  color: #1fa855;
-}
-
-.cv-action-menu__item--whatsapp:hover,
-.cv-action-menu__item--whatsapp:focus-visible {
-  background: color-mix(in srgb, #1fa855 14%, transparent);
-}
-
-/* Ações de documento (termo, ofício etc.) — cor do ícone acompanha o botão
-   sólido equivalente (preview/pdf/docx), com leve tingimento no hover. */
-.cv-action-menu__item--preview {
-  color: var(--cv-state-success);
-}
-
-.cv-action-menu__item--pdf {
-  color: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
-}
-
-.cv-action-menu__item--pdf:hover,
-.cv-action-menu__item--pdf:focus-visible {
-  background: color-mix(in srgb, color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface)) 14%, transparent);
-}
-
-.cv-action-menu__item--docx {
-  color: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
-}
-
-.cv-action-menu__item--docx:hover,
-.cv-action-menu__item--docx:focus-visible {
-  background: color-mix(in srgb, color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface)) 14%, transparent);
-}
-
-.cv-action-menu__item--sign {
-  color: var(--color-accent);
-}
-
-.cv-action-menu__item--sign:hover,
-.cv-action-menu__item--sign:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
-}
-
-.cv-action-menu__item--sign.is-assinado {
-  color: var(--cv-state-success);
-}
-
-.cv-action-menu__item--sign.is-assinado:hover,
-.cv-action-menu__item--sign.is-assinado:focus-visible {
-  background: color-mix(in srgb, var(--cv-state-success) 16%, transparent);
-}
-
 .cv-action-menu__divider {
   border: 0;
   border-top: var(--bd);
@@ -1769,29 +1456,6 @@ body.has-delete-modal-open {
 .cv-action-menu__form {
   display: block;
   width: 100%;
-}
-
-/* =========================================================
-   17. Quick Create Inline
-   Subvariação do List / Filters para mini-cadastros auxiliares.
-   Exibe-se abaixo da Filter Bar como extensão visual do painel.
-   Visível apenas quando .is-open.
-   Regra: botões ficam em .quick-create-actions, nunca no .field-grid.
-   ========================================================= */
-
-/* Painel: oculto por padrão, revelado via .is-open */
-.quick-create-panel {
-  background:    var(--cv-surface-block);
-  border-bottom: var(--bd);
-  box-shadow:    none;
-  box-sizing:    border-box;
-  display:       none;
-  flex-direction: column;
-  width:         100%;
-}
-
-.quick-create-panel.is-open {
-  display: flex;
 }
 
 /* Cabeçalho: título + botão de fechar */
@@ -1853,21 +1517,6 @@ body.has-delete-modal-open {
   flex:        1;
   gap:         var(--sp-3);
   min-width:   0;
-}
-
-/* Field Grid dentro do Quick Create ocupa o espaço restante */
-.quick-create-panel .field-grid {
-  flex: 1;
-}
-
-/* Ações: área exclusiva para Cancelar / Salvar */
-.quick-create-actions {
-  align-items: flex-end;
-  display:     flex;
-  flex-shrink: 0;
-  gap:         var(--sp-2);
-  padding-bottom: var(--sp-1);
-  width:       200px;
 }
 
 /* Mensagem auxiliar opcional */
@@ -1959,11 +1608,6 @@ body.has-delete-modal-open {
   .quick-create-panel__row {
     flex-direction: column;
     align-items:    stretch;
-  }
-
-  .quick-create-actions {
-    width:          100%;
-    justify-content: flex-end;
   }
 
   /* Header clean: stage com padding reduzido */
@@ -2060,11 +1704,6 @@ body.has-delete-modal-open {
   width:     100%;
 }
 
-/* 1 coluna — linha inteira: textarea, observações, campo único amplo */
-.field-row--1 {
-  grid-template-columns: minmax(0, 1fr);
-}
-
 /* 2 colunas — pares: datas, telefone + e-mail, valor + tipo */
 .field-row--2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2091,10 +1730,9 @@ body.has-delete-modal-open {
 /* Mobile (600px): todos os rows viram 1 coluna */
 @media (max-width: 600px) {
   .field-row,
-  .field-row--1,
-  .field-row--2,
-  .field-row--3,
-  .field-row--4 {
+.field-row--2,
+.field-row--3,
+.field-row--4 {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -2603,11 +2241,6 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   gap:       var(--sp-1) var(--sp-3);
 }
 
-.list-card__meta-item {
-  display: flex;
-  gap:     var(--sp-1);
-}
-
 .list-card__body {
   color:       var(--cv-ink-muted);
   flex:        1;
@@ -2821,20 +2454,6 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   font-size:  var(--fs-xs);
   padding-block: 0 var(--sp-3);
   padding-inline: var(--sp-5);
-}
-
-/* =========================================================
-   27. Field Grid — Variantes com Colunagem Explícita
-   Complementam o .field-grid padrão de 4 colunas.
-   Usar quando a seção inteira precisa de colunagem diferente.
-   ========================================================= */
-
-/* Empilha várias grades (linhas) com o mesmo espaçamento entre campos */
-.field-grid-rows {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--sp-4);
-  width:          100%;
 }
 
 /* 3 colunas: trios de campos — nome + CPF + telefone */
@@ -3095,35 +2714,6 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   outline: none;
 }
 
-/* Botão secundário da filter bar */
-.header-filter-button {
-  align-items:     center;
-  background:      var(--cv-surface-block);
-  border: var(--bd);
-  border-radius:   var(--r-md);
-  color:           var(--cv-ink);
-  cursor:          pointer;
-  display:         inline-flex;
-  font-size:       var(--fs-sm);
-  font-weight:     var(--fw-semibold);
-  height:          var(--h-md);
-  justify-content: center;
-  padding-block: 0;
-  padding-inline: var(--sp-4);
-  transition:
-    background   var(--tr-base),
-    border-color var(--tr-base),
-    color        var(--tr-base);
-  white-space: nowrap;
-}
-
-.header-filter-button:hover,
-.header-filter-button:focus-visible {
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color:        var(--cv-ink);
-  outline: none;
-}
-
 /* Variante primária */
 .header-filter-button--primary {
   background:   var(--color-accent);
@@ -3138,68 +2728,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   color:        var(--on-accent);
 }
 
-/* ── cv-date-picker como campo de formulário na filter bar ── */
-.header-filter-datepicker {
-  flex:         2 1 200px;
-  min-width:    160px;
-}
-
-/* Layout do controle (roteiros.css não carregado nesta página) */
-.header-filter-datepicker .cv-date-picker__control {
-  align-items: stretch;
-  display:     flex;
-  gap:         0;
-  position:    relative;
-}
-
-.header-filter-datepicker .cv-date-picker__control .cv-field__control {
-  flex:       1 1 auto;
-  cursor:     pointer;
-  min-height: unset;
-  height:     var(--h-md);
-  padding-right: var(--sp-8);
-}
-
-/* Botão do calendário — sempre visível, posicionado sobre o input */
-.header-filter-datepicker .cv-date-picker__trigger--icon {
-  align-items:      center;
-  background:       transparent;
-  border: var(--bd);
-  border-color: transparent;
-  border-radius:    var(--r-sm);
-  color:            var(--cv-ink);
-  cursor:           pointer;
-  display:          flex;
-  flex-shrink:      0;
-  height:           28px;
-  justify-content:  center;
-  opacity:          1;
-  padding:          0;
-  pointer-events:   auto;
-  position:         absolute;
-  right:            var(--sp-2);
-  top:              50%;
-  transform:        translateY(-50%);
-  transition:       background var(--tr-fast), border-color var(--tr-fast);
-  width:            28px;
-  z-index:          2;
-}
-
-.header-filter-datepicker .cv-date-picker__trigger--icon:hover {
-  background:   rgba(255, 255, 255, 0.1);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-}
-
-.header-filter-datepicker .cv-date-picker__panel {
-  left:  auto;
-  right: 0;
-}
-
 @media (max-width: 840px) {
-  .header-filter-datepicker {
-    flex:      0 0 100%;
-    min-width: 0;
-  }
 }
 
 @media (max-width: 840px) {
@@ -3230,12 +2759,6 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   .page-header-rail__actions .cv-btn {
     flex: 1 1 12rem;
     min-width: 0;
-  }
-
-  .header-filter-datepicker .cv-date-picker__panel {
-    left: 0;
-    max-width: min(100%, 320px);
-    right: auto;
   }
 
   .cv-form-section-header {
@@ -3289,8 +2812,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
     flex: 0 0 auto;
   }
 
-  .header-filter-field,
-  .header-filter-datepicker {
+  .header-filter-field {
     flex: 0 0 100%;
   }
 
@@ -3467,8 +2989,6 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 #quick-add-atividade .cv-field__control--textarea:focus-visible {
   outline: none;
 }
-
-
 
 /* =========================================================
    Tinta do acento e fim das bordas de foco (NOVO-28)

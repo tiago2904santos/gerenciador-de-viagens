@@ -456,9 +456,6 @@
   color: var(--cv-ink);
 }
 
-  .cv-search-picker {
-}
-
 /* O picker é um único controle visual. O input de busca interno não desenha
    uma segunda caixa nem recebe o outline global de campos. */
 
@@ -471,15 +468,6 @@
   border: 0;
   border-radius: 0;
   outline: none;
-}
-
-/* =========================================================
-   Canonical dark wizard and form composition
-   Header de wizard passou a ser `.list-header--wizard` (NOVO-20).
-   O contrato visual do band/rail antigo (grid horizontal) foi removido.
-   ========================================================= */
-
-  :is(.page-shell--wizard, .cv-page--flow) {
 }
 
 /* Título livre do evento: quebra em até duas linhas no list-header. */
@@ -1476,11 +1464,6 @@
   gap: 8px;
   max-height: 280px;
   overflow: auto;
-}
-
-/* Busca de roteiro salvo: mesma altura do picker de Equipe. */
-
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker {
 }
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .cv-search-picker__field {
@@ -2480,15 +2463,6 @@
   color: var(--cv-ink-muted);
   font-size: var(--fs-xs);
   line-height: 1.45;
-}
-
-  .cv-resource-picker {
-  background: var(--cv-surface-next);
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--cv-border) 78%, var(--cv-ink-muted) 22%);
-  border-style: dashed;
-  border-radius: var(--r-md);
-  padding: var(--sp-3);
 }
 
 /* Controles da ficha: superfícies sólidas, raios menores e nenhuma luz de
@@ -4051,14 +4025,6 @@
   border-color: var(--color-accent);
 }
 
-.cv-skeleton {
-  animation: cv-skeleton-pulse 1.4s ease-in-out infinite;
-  background: linear-gradient(90deg, var(--cv-surface-block) 25%, var(--cv-surface-block) 50%, var(--cv-surface-block) 75%);
-  background-size: 200% 100%;
-  border-radius: var(--r-md);
-  color: transparent;
-}
-
 @keyframes cv-skeleton-pulse {
   to { background-position: -200% 0; }
 }
@@ -4502,16 +4468,6 @@
   color: var(--cv-ink);
 }
 
-  .cv-summary-card .rt-summary-card__section-ribbon::before {
-  background: var(--cv-border);
-}
-
-  .cv-summary-card .oficio-documentos-traveller-line {
-  background: var(--cv-surface-block);
-  border-color: var(--cv-border);
-  box-shadow: none;
-}
-
   .cv-summary-card .oficio-documentos-card__title {
   color: var(--cv-ink);
 }
@@ -4951,12 +4907,6 @@
   border-top-color: var(--cv-border);
 }
 
-  .cv-operation-card {
-  display: grid;
-  gap: 0;
-  padding: 0;
-}
-
   .cv-operation-card__body {
   padding-block: clamp(var(--sp-5), 3vw, var(--sp-7));
   padding-inline: clamp(var(--sp-5), 3vw, var(--sp-7));
@@ -5026,10 +4976,6 @@
   background: var(--cv-surface-block);
   border: 0;
   box-shadow: none;
-}
-
-  .cv-collection-panel
-  .cv-list-tab {
 }
 
   .cv-collection-panel
@@ -5194,27 +5140,10 @@
   background: var(--cv-surface-block);
 }
 
-  .oficios-filter-bar .header-filter-input:focus,
-
-  .oficios-filter-bar .header-filter-input:focus-visible {
-  outline: none;
-}
-
 /* Grid de cards: respiro vertical consistente. */
 
   :is(.page-shell--cards, .cv-page--collection-cards) .cv-card-grid {
   gap: var(--sp-6);
-}
-
-/* Exceção de composição: no formulário de Termos, o painel selecionado não
-   cria um segundo card ao redor dos cartões de resultado. */
-
-  .termos-page .termo-oficio-summary-panel.cv-search-picker__selected-panel {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  padding: 0;
 }
 
 /* Custom Select v2 — controle dividido e menu de opções destacado. A classe
@@ -5246,11 +5175,6 @@
   min-width: 0;
   padding-block: 0;
   padding-inline: var(--sp-3);
-}
-
-/* Chevron v2: accent dourado em TODOS os estados (fechado/hover/focus/open). */
-
-  .cv-custom-select--v2 {
 }
 
   .cv-custom-select__trigger--v2 .cv-custom-select__chevron,

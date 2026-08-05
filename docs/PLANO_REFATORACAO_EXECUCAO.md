@@ -911,35 +911,47 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
   > territorio das Etapas 6 e 8. Zerar dentro da fase 4 seria fazer o trabalho de tres
   > frentes no mesmo PR, que e o erro nº 2 da §8. A catraca desce no que esta fase
   > legitimamente remove; o resto tem dono nomeado aqui.
-- [~] **Fase 5 — apagar o CSS antigo.** **Medida em 04/08, e o enunciado nao bate
-  com o repositorio.** As fases 1–4 ja consumiram o "CSS antigo" no sentido de
-  arquivo: nao ha nenhum orfao.
-  - **Zero arquivo sem consumidor.** Os 62 estao vivos — 35 pelo `style.css`/bundle
-    e 27 por `{% block extra_css %}` de pagina. O alvo "62 → ≤25 arquivos" nao sai
-    de delecao: sai de **fundir** arquivo, que e outra operacao e mexe na ordem da
-    cascata.
-  - **Regra morta de verdade: ~5.600 linhas** (639 regras, 516 classes que nenhum
-    template, JS ou Python emite). E a unica parte que e delecao — e vale por si.
-  - **Para chegar a ≤13.000 faltariam ~24.300 linhas alem disso**, e essas so saem
-    consolidando regra duplicada entre os 62 arquivos: reescrita, nao faxina. Isso
-    e uma fase 6, com alvo proprio e medicao propria.
-  - **Nao entreguei a delecao nesta sessao, de proposito.** A comparacao de estilo
-    computado acusou 6 propriedades mudadas num card do Dashboard e eu **nao
-    consegui separar defeito real de artefato do instrumento** — ver abaixo. Apagar
-    5.600 linhas com uma diferenca inexplicada e o cenario que a §6 do `AGENTS.md`
-    manda evitar: a suite fica verde de qualquer jeito.
-  - **`NOVO-35` 🟡 o instrumento media o `:hover` sem querer.** `medir_estilos.py`
-    capturava o elemento sob o ponteiro em estado de hover, entao a comparacao
-    acusava mudanca onde nao havia. Corrigido (o ponteiro estaciona antes da
-    captura) — mas a diferenca do card do Dashboard **persistiu depois da
-    correcao**, so trocando de tema. Enquanto ela nao for explicada, a delecao
-    nao entra.
+- [x] **Fase 5a — apagar a regra que ninguem alcanca. Feita em 05/08.**
+  O enunciado original ("62 → ≤25 arquivos, ≤13.000 linhas") nao bate com o
+  repositorio depois das fases 1–4, e continua nao batendo: **nao ha arquivo
+  orfao**. Os 63 estao vivos — 35 pelo `style.css`/bundle e 28 por
+  `{% block extra_css %}`. "62 → ≤25" nao sai de delecao, sai de **fundir**
+  arquivo, que e outra operacao e mexe na ordem da cascata. O que era delecao de
+  verdade foi feito:
+  - **5.404 linhas fora**, 783 cortes, **429 classes que nenhum template, JS ou
+    Python emite**. A lista completa em `docs/evidencias/`. Os maiores: `roteiros.css`
+    (1.420), `oficios.css` (992), `page-shell.css` (492).
+  - **Instrumento: `scripts/css_classes_mortas.py`**, agora versionado — na
+    passagem anterior a analise nao foi commitada e so o resultado sobreviveu,
+    entao ninguem podia repetir a medicao. O criterio esta no docstring dele.
+  - **Prova de que a tela nao mudou:** `medir_estilos.py --diff`, **8.070 elementos
+    em 60 telas** (30 paginas × 2 temas), **0 propriedade computada alterada**.
+    A lista de paginas foi ampliada de 5 para 30 exatamente porque as cinco
+    originais nao carregavam `roteiros.css` nem metade do que o corte pegou.
+  - **Para chegar a ≤13.000 linhas faltariam ~24.000 alem disso**, e essas so
+    saem consolidando regra duplicada entre os 63 arquivos: reescrita, nao
+    faxina. Fica como **fase 5b**, com alvo e medicao proprios.
+  - **`NOVO-35` ✅ o instrumento media transicao em voo.** Duas causas, nao uma. A
+    primeira (elemento capturado sob o ponteiro, em `:hover`) ja tinha sido
+    corrigida. A segunda so apareceu quando se rodou o instrumento **duas vezes
+    contra o mesmo CSS**: trocar de tema dispara `transition` de cor, e a leitura
+    saia `rgb(150,138,70)` numa execucao e `rgb(151,138,70)` na seguinte. Era esse
+    o ruido dos "6 propriedades num card do Dashboard" que travou a fase 5 em
+    04/08 — instrumento, nao defeito. Corrigido levando toda animacao ao fim antes
+    da captura; a partir dai duas execucoes iguais dao diferenca **0**, e so entao
+    o instrumento serve de gate.
+  - **`NOVO-36` ✅ gate novo: sintaxe de CSS** (`core/tests/test_css_sintaxe.py`).
+    A primeira aplicacao do corte partiu um `:is(` multilinha ao meio. O efeito
+    nao e local: o navegador descarta **todas as regras seguintes** — 716 de 1.878
+    no bundle, e os icones sumiram do sistema inteiro. E o que passou incolume:
+    a suite (1.323 verdes, nenhum teste le CSS), o balanco de chaves,
+    `collectstatic` e `build_shell_bundles --check`. So a medicao no navegador viu.
+    O gate agora recusa parentese aberto em seletor e item vazio em lista de
+    seletores, sem precisar de navegador — e foi conferido com canario.
 
-  > **Para quem pegar a fase 5:** a analise de classe morta esta em
-  > `scripts/` (o criterio: classe viva se o codigo a emite, se emite um filho/
-  > modificador BEM dela, ou se emite um prefixo de composicao `cv-btn--`).
-  > O primeiro passo e explicar a diferenca do card — comecar pela delecao antes
-  > disso e apostar.
+  > **Para quem pegar a fase 5b:** o alvo e regra **duplicada** entre arquivos,
+  > nao regra morta — essa acabou. A ordem da cascata e o risco, entao a medicao
+  > tem de ser a mesma: `medir_estilos.py --diff` com as 30 paginas, exigindo 0.
 
 ---
 

@@ -81,8 +81,7 @@
 .oficio-documentos-info-section .oficio-documentos-card,
 .oficio-documentos-info-section .oficio-documentos-card--travellers,
 .oficio-documentos-info-section .oficio-documentos-card--vehicle,
-.oficio-documentos-route-section .oficio-documentos-route-card,
-.oficio-documentos-justification-section .oficio-documentos-card--justification {
+.oficio-documentos-route-section .oficio-documentos-route-card {
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -366,7 +365,6 @@
 .oficio-documentos-info-section .oficio-documentos-vehicle-executive__label,
 .oficio-documentos-route-section .oficio-documentos-route-card__eyebrow,
 .oficio-documentos-route-section .oficio-documentos-route-card__subtitle,
-.oficio-documentos-route-section .oficio-documentos-route-card__tagline,
 .oficio-documentos-justification-section .oficio-documentos-card__eyebrow,
 .oficio-documentos-justification-section .oficio-documentos-card__subtitle,
 .oficio-documentos-justification-section .oficio-documentos-model-card__label,
@@ -645,37 +643,6 @@ padding-inline: var(--sp-4);
   font-size: var(--fs-sm);
 }
 
-.oficio-documentos-sig-badge {
-  display: inline-flex;
-  align-items: center;
-  padding-block: var(--sp-1);
-  padding-inline: var(--sp-2);
-  border-radius: var(--r-pill);
-  font-size: var(--fs-sm);
-  font-weight: 600;
-  margin-inline: var(--sp-1);
-}
-
-.oficio-documentos-sig-badge--unsigned {
-  background: var(--cv-surface-block);
-  color: var(--cv-ink-muted);
-}
-
-.oficio-documentos-sig-badge--signed {
-  background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
-  color: var(--cv-state-success);
-}
-
-.oficio-documentos-sig-hint {
-  margin-inline: var(--sp-1);
-  max-width: 22rem;
-  line-height: 1.35;
-}
-
-.oficio-documentos-sig-hint code {
-  font-size: 0.85em;
-}
-
 .oficio-assinatura-pdf__intro {
   margin-bottom: var(--sp-5);
 }
@@ -714,45 +681,10 @@ padding-inline: var(--sp-4);
   margin-bottom: var(--sp-5);
 }
 
-.oficio-assinatura-pdf__mvp {
-  margin-bottom: var(--sp-5);
-  padding: var(--sp-4);
-  border-radius: var(--r-md);
-  background: var(--cv-surface-block);
-  border: var(--bd);
-}
-
-.oficio-assinatura-pdf__mvp-title {
-  margin-block: 0 var(--sp-2);
-margin-inline: 0;
-  font-size: var(--fs-md);
-  font-weight: 600;
-  color: var(--cv-ink);
-}
-
-.oficio-assinatura-pdf__mvp-text {
-  margin: 0;
-  font-size: var(--fs-sm);
-  color: var(--cv-ink-muted);
-  line-height: 1.45;
-}
-
 .oficio-assinatura-pdf__actions {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--sp-3);
-}
-
-.oficio-assinatura-pdf__confirm-form {
-  display: inline-flex;
-  margin-inline-start: auto;
-}
-
-.oficios-assinaturas-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-  margin-bottom: var(--sp-5);
 }
 
 .oficios-assinaturas-tabs__btn {
@@ -773,25 +705,6 @@ margin-inline: 0;
   background: var(--cv-surface-block);
 }
 
-.oficios-assinaturas-tabs__btn--active {
-  border-color: var(--color-accent);
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  color: var(--color-accent);
-}
-
-.oficios-assinaturas-panel__viewer {
-  min-height: 50vh;
-  margin-top: var(--sp-4);
-}
-
-.oficios-assinaturas-termo-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--sp-3);
-  margin-bottom: var(--sp-3);
-}
-
 .oficios-assinaturas-termo-toolbar__label {
   font-weight: 600;
   font-size: var(--fs-sm);
@@ -807,35 +720,7 @@ margin-inline: 0;
   font-size: var(--fs-sm);
 }
 
-.oficios-assinaturas-termo-erro {
-  margin-bottom: var(--sp-3);
-}
-
-.oficios-assinaturas-termo-meta {
-  margin-bottom: var(--sp-3);
-}
-
-.oficios-assinaturas-footer {
-  margin-top: var(--sp-6);
-  padding-top: var(--sp-4);
-  border-top: var(--bd);
-}
-
-.assinatura-oficio-instrucao {
-  margin-bottom: var(--sp-4);
-}
-
-.assinatura-oficio-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
-  gap: var(--sp-5);
-  align-items: flex-start;
-}
-
 @media (max-width: 900px) {
-  .assinatura-oficio-layout {
-    grid-template-columns: 1fr;
-  }
 
   .assinatura-oficio-layout__aside {
     position: static;
@@ -865,17 +750,6 @@ margin-inline: 0;
   letter-spacing: 0.04em;
 }
 
-.assinatura-oficio-actions {
-  margin-top: var(--sp-4);
-}
-
-.assinatura-pdf-editor {
-  border: var(--bd);
-  border-radius: var(--r-md);
-  background: var(--cv-surface-block);
-  overflow: hidden;
-}
-
 .assinatura-pdf-editor__toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -893,18 +767,6 @@ margin-inline: 0;
   color: var(--cv-ink-muted);
 }
 
-.assinatura-pdf-editor__zoom {
-  display: flex;
-  gap: var(--sp-2);
-  flex-wrap: wrap;
-}
-
-.assinatura-pdf-editor__scroller {
-  max-height: min(72vh, 820px);
-  overflow: auto;
-  padding: var(--sp-4);
-}
-
 .assinatura-pdf-editor__pages {
   display: flex;
   flex-direction: column;
@@ -912,58 +774,10 @@ margin-inline: 0;
   gap: var(--sp-4);
 }
 
-.assinatura-page-wrap {
-  position: relative;
-  display: inline-block;
-  box-shadow: var(--sh-sm);
-  border-radius: var(--r-sm);
-  overflow: visible;
-  background: #fff;
-}
-
-.assinatura-page-canvas {
-  display: block;
-  vertical-align: top;
-}
-
-.assinatura-label {
-  position: absolute;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  z-index: 3;
-  cursor: move;
-  user-select: none;
-  border-radius: var(--r-sm);
-  overflow: hidden;
-  box-shadow: var(--sh-sm);
-}
-
 .assinatura-label--preview {
   position: relative;
   cursor: default;
   box-shadow: var(--sh-sm);
-}
-
-.assinatura-label--draggable:active {
-  cursor: grabbing;
-  box-shadow: var(--sh-sm);
-}
-
-.assinatura-label__logo {
-  flex: 0 0 1.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.48rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  color: #fff;
-  background: #082042;
-  text-align: center;
-  padding-block: 0;
-  padding-inline: var(--sp-1);
 }
 
 .assinatura-label__body {
@@ -1006,15 +820,4 @@ margin-inline: 0;
   font-size: 0.42rem;
   margin-top: var(--sp-1);
   opacity: 0.88;
-}
-
-.assinatura-label__qr {
-  flex: 0 0 2.4rem;
-  background: #fff;
-}
-
-.assinatura-pdf-error {
-  margin-top: var(--sp-3);
-  color: #b42318;
-  font-size: var(--fs-sm);
 }

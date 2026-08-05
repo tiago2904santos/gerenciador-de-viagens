@@ -5,9 +5,6 @@
   gap: var(--sp-5);
 }
 
- .usuarios-page {
-}
-
 .usuarios-page .list-header,
 .usuarios-page .list-header__rail,
 .usuarios-page .list-header .cv-inline-create__toggle:not(.is-filled):not(.usuario-quick-add__toggle--ready):not(.area-quick-add__toggle--ready),
@@ -146,10 +143,6 @@
   border: 0;
   box-shadow: none;
   padding: 0;
-}
-
- [data-usuario-quick-add] .usuario-quick-add__scope,
- [data-area-quick-add] .area-quick-add__scope {
 }
 
 [data-usuario-quick-add] .travel-document-block,

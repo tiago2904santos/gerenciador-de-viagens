@@ -1,12 +1,4 @@
-/* ==========================================================================
-   cv-search-picker
-   Campo customizado de busca, dropdown e selecao. O select nativo permanece
-   oculto apenas para compatibilidade de formulario.
-   ========================================================================== */
 
-/* Tokens globais — o dropdown flutuante (body) precisa destes valores */
-:root {
-}
 
 .cv-search-picker {
   display: grid;
@@ -42,11 +34,6 @@
   color: var(--cv-ink-muted);
   font-size: var(--fs-xs);
   line-height: 1.45;
-}
-
-/* Controle e dropdown repetem tokens — dropdown no body não herda do .cv-search-picker */
-.cv-search-picker__control,
-.cv-search-picker__dropdown {
 }
 
 .cv-search-picker__control {
@@ -226,10 +213,6 @@ border-color: currentColor;
 /* Com driver: remove cobre as 2 linhas (corpo + driver-control) */
 .cv-search-picker__selected-card--with-driver > .cv-search-picker__remove {
   grid-row: 1 / span 2;
-}
-
-/* Cards simples (sem term nem driver): rail de excluir mais estreito */
-.cv-search-picker__selected-card:not(.cv-search-picker__selected-card--with-term):not(.cv-search-picker__selected-card--with-driver) {
 }
 
 .cv-search-picker__selected-card:hover > .cv-search-picker__remove {
@@ -792,20 +775,8 @@ border-color: currentColor;
   white-space: nowrap;
 }
 
-.cv-search-picker--error {
-}
-
 .cv-search-picker--error .cv-search-picker__selected-panel {
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-}
-
-.cv-search-picker__error-msg {
-  color: var(--cv-state-danger);
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-semibold);
-  line-height: 1.45;
-  margin-block: calc(var(--sp-2) * -1) 0;
-  margin-inline: 0;
 }
 
 .cv-search-picker--disabled {
@@ -881,7 +852,6 @@ border-color: currentColor;
     grid-row: 1 / span 2;
   }
 }
-
 
 .cv-search-picker--single.cv-search-picker--detailed .cv-search-picker__selected-card > .cv-search-picker__remove {
   margin-block: calc(var(--sp-4) * -1);

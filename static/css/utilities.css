@@ -23,28 +23,8 @@
   gap: var(--sp-4);
 }
 
-.cluster {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-3);
-}
-
-.cluster--between {
-  justify-content: space-between;
-}
-
 .cluster--start {
   align-items: flex-start;
-}
-
-/* Canonical content helpers. These replace one-off inline declarations in
-   shared templates while keeping page CSS focused on composition. */
-.cv-divider {
-  border: 0;
-  border-top: var(--bd);
-  margin-block: var(--sp-2) 0;
-  margin-inline: 0;
 }
 
 .cv-inline-form {
@@ -66,10 +46,6 @@
   margin-top: var(--sp-3);
 }
 
-.cv-section-spaced {
-  margin-top: var(--sp-5);
-}
-
 .cv-field--full-width {
   align-self: stretch;
   width: 100%;
@@ -87,11 +63,6 @@
   height: 36px;
   padding: 0;
   width: 36px;
-}
-
-.delete-confirm-copy {
-  margin-block: 0 var(--sp-3);
-margin-inline: 0;
 }
 
 .delete-confirm-preview__label {
@@ -218,46 +189,6 @@ margin-inline: 0;
 
 .alert-info::before {
   background: var(--color-accent);
-}
-
-/* --------------------------------------------------------------------------
-   3. Chips / badges / status
-   Derivação compacta dos cv-state-buttons: mesma gramática de cor,
-   pill border-radius, altura menor, text-transform uppercase.
-   -------------------------------------------------------------------------- */
-:root {
-  /* Dimensões — chip é menor que o state button (control-height-md = 44px) */
-
-  /* Base (neutro) — herda direto do state-neutral */
-
-  /* Sucesso — herda direto do state-success */
-
-  /* Aviso — herda direto do state-warning */
-
-  /* Perigo — herda direto do state-danger */
-
-  /* Muted / Neutro — herda do state-neutral */
-
-  /* Filtro e Entidade — herdam do info (azul), mesma família do Retificado */
-
-  /* Info — mesma fórmula do state-success com --color-info */
-
-  /* Pendente — mesma fórmula com --color-primary */
-
-  /* Entidade — primário mais rico */
-}
-
-/* Dark — espelha o padrão do state button (16% → 26% bg, text misturado com white) */
-:root {
-
-  /* info/pending/entity — success/warning/danger/neutral já herdam via --state-* */
-
-}
-
-/* Light explícito — bg espelha 6% do state button + glow 30% mais suave */
-:root {
-
-  /* Glow reduzido: outer blur 18→10px, percentagens -30% */
 }
 
 .cv-chip,

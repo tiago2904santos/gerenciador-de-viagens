@@ -1,120 +1,13 @@
-.rt-summary-card .cv-form-section-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-4);
-  padding-top: 0;
-}
 
-.rt-summary-card .oficio-documentos-grid {
-  gap: var(--sp-4);
-  margin: 0;
-}
-
-.rt-summary-card .oficio-documentos-grid > * + *:not(.rt-summary-card__section-ribbon)::before {
-  content: none;
-}
-
-.rt-summary-card__section-ribbon {
-  align-items: center;
-  display: flex;
-  min-height: 0;
-  position: relative;
-}
-
-.rt-summary-card .oficio-documentos-grid > .rt-summary-card__section-ribbon {
-  grid-column: 1 / -1;
-}
-
-.rt-summary-card__section-ribbon::before {
-  background: var(--cv-border);
-  content: "";
-  display: block;
-  height: 1px;
-  width: 100%;
-}
-
-.rt-summary-card .oficio-documentos-admin-facts {
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  overflow: visible;
-}
-
-.rt-summary-card .oficio-documentos-admin-facts > .oficio-documentos-card__body {
-  padding-block: var(--sp-5) 0;
-padding-inline: 0;
-}
-
-.rt-summary-card .oficio-documentos-facts {
-  display: grid;
-  gap: var(--sp-3);
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin: 0;
-}
-
-.rt-summary-card .oficio-documentos-fact {
-  min-width: 0;
-}
-
-.rt-summary-card .oficio-documentos-fact dd {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Motorista/origem do diário: mais largos e com quebra, para caber nome + CPF + chip. */
-.rt-summary-card .oficio-documentos-fact.diario-motorista-fact {
-  grid-column: span 2;
-}
-
-.rt-summary-card .oficio-documentos-fact.diario-motorista-fact dd {
-  align-items: center;
-  column-gap: var(--sp-2);
-  display: flex;
-  flex-wrap: wrap;
-  overflow: visible;
-  row-gap: var(--sp-1);
-  text-overflow: clip;
-  white-space: normal;
-}
 
 .diario-motorista-fact__cpf {
   color: var(--cv-ink-muted);
   font-weight: 600;
 }
 
-.rt-summary-card .rt-summary-card__traveller-card {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  overflow: visible;
-}
-
-.rt-summary-card .rt-summary-card__traveller-card > .oficio-documentos-card__header {
-  border-bottom: 0;
-  padding-block: var(--sp-2);
-  padding-inline: 0;
-}
-
-.rt-summary-card .rt-summary-card__traveller-card > .oficio-documentos-card__body {
-  padding: 0;
-}
-
-.rt-summary-card .rt-summary-card__traveller-card .oficio-documentos-card__eyebrow,
-.rt-summary-card .rt-summary-card__traveller-card .oficio-documentos-card__subtitle {
-  display: none;
-}
-
-.rt-summary-card .rt-summary-card__traveller-card .oficio-documentos-card__title {
-  font-size: var(--fs-md);
-  margin: 0;
-}
-
 /* Servidores do RT: colunas dinâmicas por quantidade (até 3 por linha), como
    nos Viajantes do ofício — o modificador --nX no container define o flex-basis. */
 
-.rt-summary-card__cost-grid,
 .rt-custeios-grid {
   display: grid;
   gap: var(--sp-3);
@@ -428,27 +321,6 @@ border-top-color: var(--cv-border);
   border-top: 0;
 }
 
-.prestacao-file-widget__current {
-  align-items: center;
-  background: color-mix(in srgb, var(--color-accent) 8%, var(--cv-surface-card));
-  border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
-  display: flex;
-  gap: var(--sp-4);
-  justify-content: space-between;
-  min-height: 76px;
-  min-width: 0;
-  padding-block: var(--sp-3);
-  padding-inline: var(--sp-4);
-}
-
-.prestacao-file-widget__change {
-  display: grid;
-  gap: var(--sp-2);
-  min-width: 0;
-}
-
 .prestacao-file-widget__meta {
   display: grid;
   gap: 3px;
@@ -496,19 +368,6 @@ border-top-color: var(--cv-border);
   margin: 0;
 }
 
-.prestacao-file-widget__clear-input {
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-  height: 1px;
-  overflow: hidden;
-  position: absolute;
-  white-space: nowrap;
-  width: 1px;
-}
-
-.prestacao-file-widget__action {
-}
-
 .prestacao-file-picker {
   align-items: stretch;
   background: var(--cv-surface-card);
@@ -524,9 +383,6 @@ border-top-color: var(--cv-border);
 
 .prestacao-file-picker:hover {
   border-color: var(--cv-border);
-}
-
-.prestacao-file-picker:focus-within {
 }
 
 .prestacao-file-picker__value {
@@ -623,26 +479,17 @@ border-top-color: var(--cv-border);
 }
 
 @media (max-width: 900px) {
-  .rt-summary-card .oficio-documentos-facts,
-  .rt-summary-card__cost-grid,
   .rt-custeios-grid,
-  .diario-wizard-card .oficio-documentos-facts {
+.diario-wizard-card .oficio-documentos-facts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
 }
 
 @media (max-width: 600px) {
-  .rt-summary-card .oficio-documentos-facts,
-  .rt-summary-card__cost-grid,
   .rt-custeios-grid,
-  .diario-wizard-card .oficio-documentos-facts {
+.diario-wizard-card .oficio-documentos-facts {
     grid-template-columns: 1fr;
-  }
-
-  .prestacao-file-widget__current {
-    align-items: stretch;
-    flex-direction: column;
   }
 
   .prestacao-file-list__item {
@@ -717,10 +564,6 @@ border-top-color: var(--cv-border);
   color: var(--color-accent);
   font-weight: 600;
 }
-
-/* ── Card de assinatura eletrônica ──────────────────────────────── */
-/* PDF Final: prontidão dos itens compartilhados + rótulo do card por servidor */
-.prestacao-final-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: var(--sp-3); }
 .prestacao-final-servidor__name { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; font-weight: 600; }
 .prestacao-final-servidor__meta { display: block; margin-top: var(--sp-1); font-weight: 400; font-size: 0.8125rem; color: var(--cv-ink-muted); }
 
@@ -786,28 +629,6 @@ border-top-style: dashed;
   padding: 0;
 }
 
-.docs-attach-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.docs-attach-item {
-  align-items: center;
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-md);
-  display: flex;
-  gap: var(--sp-3);
-  justify-content: space-between;
-  min-width: 0;
-  padding-block: var(--sp-3);
-  padding-inline: var(--sp-4);
-}
-
 .docs-attach-item--ok {
   border-color: color-mix(in srgb, var(--cv-state-success) 35%, var(--cv-border));
 }
@@ -831,10 +652,6 @@ border-top-style: dashed;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.docs-attach-item__meta--muted {
-  color: var(--cv-ink-muted);
 }
 
 .docs-attach-item__actions {

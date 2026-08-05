@@ -1,15 +1,4 @@
-/* --------------------------------------------------------------------------
-   cv-date-picker — componente compartilhado
-   -------------------------------------------------------------------------- */
 
-html {
-}
-
-:root {
-}
-
-:root {
-}
 
 .cv-date-picker {
   display: grid;
@@ -24,12 +13,6 @@ html {
   gap: var(--sp-2);
   min-width: 0;
   position: relative;
-}
-
-.cv-date-picker__display {
-  cursor: pointer;
-  flex: 1 1 auto;
-  min-width: 0;
 }
 
 /* Campo de input: chrome de field. Gatilhos action-button (.cv-btn) e
@@ -143,25 +126,6 @@ html {
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-2);
-}
-
-.cv-date-picker__pill {
-  align-items: center;
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-radius: var(--r-pill);
-  color: var(--cv-ink-muted);
-  display: inline-flex;
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-semibold);
-  gap: var(--sp-1);
-  padding-block: var(--sp-1);
-  padding-inline: var(--sp-3);
-}
-
-.cv-date-picker__pill strong {
-  color: var(--cv-ink);
-  font-weight: var(--fw-bold);
 }
 
 .cv-date-picker__panel {

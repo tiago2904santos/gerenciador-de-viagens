@@ -1,16 +1,4 @@
-/* ===========================================================================
-   Google Drive — card de integração (página de Configurações)
-   Conta Google, diretório de destino, navegador de pastas e organização em
-   massa. Consome tokens semânticos: adapta-se aos temas claro e escuro.
-   IDs/classes com hooks de JS (gdrive_config.js) são preservados.
-   =========================================================================== */
 
-.gdrive-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  /* Vermelho nítido do botão Desconectar (variante escura no bloco de tema). */
-}
 
 /* ── Blocos internos, separados por divisória sutil ───────────────────────── */
 .gdrive-block {
@@ -66,7 +54,6 @@
 }
 
 /* Tile do logo do Drive / ícone do bloco */
-.gdrive-logo,
 .gdrive-block__icon {
   display: inline-flex;
   align-items: center;
@@ -705,18 +692,6 @@
   white-space: nowrap;
 }
 
-/* ── Lista de pendências — cartões legíveis, altura limitada ───────────────── */
-.gdrive-pend-lista {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-  margin: 0;
-  padding: 0;
-  max-height: 340px;
-  overflow-y: auto;
-  list-style: none;
-}
-
 .gdrive-pend {
   display: flex;
   flex-direction: column;
@@ -753,64 +728,10 @@
   align-self: center;
 }
 
-.gdrive-pend__titulo {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  margin: 0;
-  color: var(--cv-ink);
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-semibold);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.gdrive-pend__contexto {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-xs);
-  font-weight: normal;
-}
-
-.gdrive-pend__quando {
-  flex: 0 0 auto;
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-2xs);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-/* Linha única: motivo (destacado) + ação (neutra) */
-.gdrive-pend__causa {
-  margin: 0;
-  font-size: var(--fs-xs);
-  line-height: 1.4;
-}
-
 .gdrive-pend__motivo {
   color: var(--cv-state-danger);
   font-weight: var(--fw-medium);
 }
-
-.gdrive-pend__acao {
-  color: var(--cv-ink-muted);
-}
-
-.gdrive-pend__acao::before {
-  content: "— ";
-}
-
-.gdrive-pend__det {
-  font-size: var(--fs-2xs);
-}
-
-.gdrive-pend__det summary {
-  width: fit-content;
-  color: var(--cv-ink-muted);
-  cursor: pointer;
-  user-select: none;
-}
-
-.gdrive-pend__det summary:hover { color: var(--cv-ink); }
 
 .gdrive-pend__erro {
   display: block;
@@ -828,27 +749,23 @@
 }
 
 /* ── Barras de rolagem temáticas (o scrollbar claro nativo fica feio no escuro) */
-.gdrive-pend-lista,
 .gdrive-previa-lista,
 .gdrive-folder-list {
   scrollbar-width: thin;
   scrollbar-color: var(--cv-border) transparent;
 }
 
-.gdrive-pend-lista::-webkit-scrollbar,
 .gdrive-previa-lista::-webkit-scrollbar,
 .gdrive-folder-list::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
-.gdrive-pend-lista::-webkit-scrollbar-track,
 .gdrive-previa-lista::-webkit-scrollbar-track,
 .gdrive-folder-list::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.gdrive-pend-lista::-webkit-scrollbar-thumb,
 .gdrive-previa-lista::-webkit-scrollbar-thumb,
 .gdrive-folder-list::-webkit-scrollbar-thumb {
   border: var(--bd-strong);
@@ -858,26 +775,9 @@ border-color: transparent;
   background-clip: padding-box;
 }
 
-.gdrive-pend-lista::-webkit-scrollbar-thumb:hover,
 .gdrive-previa-lista::-webkit-scrollbar-thumb:hover,
 .gdrive-folder-list::-webkit-scrollbar-thumb:hover {
   background-color: var(--cv-ink-muted);
-}
-
-/* ── Tema escuro ──────────────────────────────────────────────────────────────
-   Os tokens "*-soft" (success/danger/primary) só têm variante clara em
-   tokens.css; sem override viravam caixas claras sobre o fundo escuro. Aqui os
-   redefinimos ESCOPADOS ao card do Drive, de modo que todas as regras acima
-   passem a usar tons translúcidos que combinam com o navy do tema escuro.
-   ------------------------------------------------------------------------------ */
- .gdrive-body {
-  /* Verde (pasta selecionada, status concluído) */
-
-  /* Vermelho (status com erro, desconectar) */
-
-  /* Azul (aba ativa, pasta destacada, links, barra de progresso) */
-
-  /* Vermelho do Desconectar mais vivo no escuro (não o dark-red apagado) */
 }
 
 /* Trilha do segmented control no escuro: navy recuado (não o quase-preto do

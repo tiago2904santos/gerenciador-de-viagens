@@ -1,27 +1,4 @@
-/* ==========================================================================
-   ACTION SYSTEM 2.0
-   Camada visual unificada para .cv-btn, botoes legados, icones, grupos,
-   menus de acao e modais. Carregada por ultimo para permitir migracao gradual.
-   ========================================================================== */
 
-:root {
-
-
-
-
-
-
-
-}
-
-:root {
-
-
-
-
-
-
-}
 
 /* Text buttons: novo e legado compartilham a mesma geometria. */
 .cv-btn,
@@ -122,7 +99,6 @@
 .cv-btn--document,
 .cv-btn--copy-link,
 .btn-secondary,
-.btn-muted,
 .app-btn--secondary,
 .app-btn--muted {
   background: var(--cv-surface-block);
@@ -141,7 +117,6 @@
 .cv-btn--document:hover,
 .cv-btn--copy-link:hover,
 .btn-secondary:hover,
-.btn-muted:hover,
 .app-btn--secondary:hover,
 .app-btn--muted:hover {
   background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
@@ -168,7 +143,6 @@
 
 .cv-btn--danger,
 .cv-btn--soft-danger,
-.btn-danger,
 .app-btn--danger {
   background: var(--cv-surface-block);
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
@@ -178,7 +152,6 @@
 
 .cv-btn--danger:hover,
 .cv-btn--soft-danger:hover,
-.btn-danger:hover,
 .app-btn--danger:hover {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
@@ -237,7 +210,6 @@
 }
 
 .cv-btn--sm,
-.btn-sm,
 .btn--sm,
 .app-btn--sm {
   border-radius: var(--r-sm);
@@ -383,20 +355,6 @@
   color: var(--cv-state-success);
 }
 
-/* Agrupamentos: uma unica superficie reduz ruido e organiza a hierarquia. */
-.cv-btn-group,
-.btn-group {
-  align-items: center;
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  padding: var(--sp-1);
-}
-
 .cv-icon-btn-group {
   align-items: center;
   background: transparent;
@@ -408,9 +366,6 @@
   padding: 0;
 }
 
-.cv-btn-group .cv-btn,
-.btn-group .btn,
-.btn-group .app-btn,
 .cv-icon-btn-group .cv-icon-btn {
   box-shadow: none;
 }
@@ -971,13 +926,6 @@ margin-inline: calc(var(--sp-1) * -1);
   transform: none;
 }
 
-/*
- * Cores FIXAS no modal — sem hover, sem focus, sem dragover.
- * Nunca use inherit aqui (puxa cor do pai e parece “hover”).
- */
-#attach-signed-modal {
-}
-
 #attach-signed-modal :is(
   .prestacao-file-widget,
   .cv-file-widget,
@@ -1192,10 +1140,6 @@ margin-inline: calc(var(--sp-1) * -1);
 }
 
 @media (max-width: 640px) {
-  .cv-btn-group,
-  .btn-group {
-    max-width: 100%;
-  }
 
   .cv-icon-btn-group {
     max-width: 100%;

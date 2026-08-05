@@ -1,22 +1,4 @@
-/* ==========================================================================
-   UI Lab Fields / Inputs
-   Gramatica visual definitiva para campos do sistema.
-   ========================================================================== */
 
-.ui-lab-page {
-}
-
- .ui-lab-page {
-}
-
-/* =========================================================
-   Field panels
-   ========================================================= */
-
-.cv-field-lab {
-  display: grid;
-  gap: var(--sp-5);
-}
 
 .cv-field-panel {
   background: var(--cv-surface-card);
@@ -113,17 +95,6 @@
   gap: var(--sp-5);
 }
 
-.cv-search-picker-demo-card {
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-xl);
-  box-shadow: var(--sh-sm);
-  display: grid;
-  gap: var(--sp-3);
-  min-width: 0;
-  padding: var(--sp-4);
-}
-
 .cv-search-picker-demo-card--wide {
   grid-column: 1 / -1;
 }
@@ -146,17 +117,6 @@
 
 #fields-search-picker .cv-field-grid {
   align-items: stretch;
-}
-
-#fields-search-picker .cv-field-grid > .cv-search-picker-demo-card {
-  height: 100%;
-}
-
-.cv-field-surface {
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-lg);
-  padding: var(--sp-4);
 }
 
 .cv-field-surface__title {
@@ -185,45 +145,8 @@
   min-width: 0;
 }
 
-.cv-field-grid .cv-multiselect {
-  grid-column: 1 / -1;
-}
-
-.cv-field-grid--2 {
-}
-
-.cv-field-grid--1 {
-}
-
-.cv-field-grid--3 {
-}
-
-.cv-field-grid--4 {
-}
-
-.cv-field--span-2 {
-  grid-column: span 2;
-}
-
-.cv-field--span-3 {
-  grid-column: span 3;
-}
-
 .cv-field--full {
   grid-column: 1 / -1;
-}
-
-/* =========================================================
-   Field group
-   ========================================================= */
-
-.cv-field-group {
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-lg);
-  display: grid;
-  gap: var(--sp-4);
-  padding: var(--sp-4);
 }
 
 .cv-field-group__header {
@@ -267,25 +190,6 @@
   font-size: var(--fs-sm);
   font-weight: var(--fw-semibold);
   line-height: 1.2;
-}
-
-.cv-field__label-row {
-  align-items: center;
-  display: flex;
-  gap: var(--sp-2);
-  justify-content: space-between;
-  min-width: 0;
-}
-
-.cv-field__required {
-  color: var(--cv-state-danger);
-  font-weight: var(--fw-bold);
-}
-
-.cv-field__optional {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-semibold);
 }
 
 .cv-field__control {
@@ -344,37 +248,6 @@
   color: var(--cv-ink);
 }
 
-.cv-select__wrapper {
-  color: var(--cv-ink-muted);
-  border-radius: var(--r-md);
-  display: grid;
-  flex: 1 1 auto;
-  min-width: 0;
-  position: relative;
-  width: 100%;
-}
-
-.cv-select__wrapper::after {
-  border-bottom: var(--bd-strong);
-border-bottom-color: currentColor;
-  border-right: var(--bd-strong);
-  border-right-color: currentColor;
-  content: "";
-  height: var(--sp-2);
-  pointer-events: none;
-  position: absolute;
-  right: var(--sp-4);
-  top: 50%;
-  transform: translateY(calc(var(--sp-1) * -1)) rotate(45deg);
-  transform-origin: center;
-  transition:
-    border-color var(--tr-fast),
-    color var(--tr-fast),
-    transform var(--tr-fast);
-  width: var(--sp-2);
-  z-index: 1;
-}
-
 .cv-select__control {
   appearance: none;
   background:
@@ -407,22 +280,6 @@ border-bottom-color: currentColor;
   outline: none;
 }
 
-.cv-field--focus-demo .cv-select__control {
-  background: linear-gradient(color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)), color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface))) padding-box, linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-  box-shadow: var(--sh-sm);
-}
-
-.cv-field--hover-demo .cv-select__control {
-  background:
-    linear-gradient(color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)), color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface))) padding-box,
-    linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-}
-
-.cv-field--focus-demo .cv-select__wrapper::after {
-  color: var(--cv-border);
-  transform: translateY(calc(var(--sp-1) * -1)) rotate(225deg);
-}
-
 .cv-select__control:disabled,
 .cv-select--disabled .cv-select__control {
   background:
@@ -453,20 +310,8 @@ border-bottom-color: currentColor;
     linear-gradient(color-mix(in srgb, var(--cv-state-danger) 40%, transparent), color-mix(in srgb, var(--cv-state-danger) 40%, transparent)) border-box;
 }
 
-.cv-select--error .cv-select__control:focus-visible,
-.cv-select__control[aria-invalid="true"]:focus-visible {
-}
-
 .cv-select--error::after {
   color: var(--cv-state-danger);
-}
-
-/* Tamanho único — um só select, mesmo tamanho dos inputs */
-
-.cv-field__control--numeric,
-.cv-field__control--money {
-  font-variant-numeric: tabular-nums;
-  text-align: right;
 }
 
 .cv-field__control:disabled,
@@ -515,20 +360,9 @@ border-bottom-color: currentColor;
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
 }
 
-.cv-field__help,
-.cv-field__success,
 .cv-field__error {
   font-size: var(--fs-xs);
   line-height: 1.45;
-}
-
-.cv-field__help {
-  color: var(--cv-ink-muted);
-}
-
-.cv-field__success {
-  color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
-  font-weight: var(--fw-semibold);
 }
 
 .cv-field__error {
@@ -537,40 +371,10 @@ border-bottom-color: currentColor;
   margin: 0;
 }
 
-.cv-field__error-badge {
-  color: var(--cv-state-danger);
-  flex: 0 0 auto;
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-bold);
-  line-height: 1;
-}
-
-.cv-field__status-line {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-}
-
-.cv-field__tag {
-  align-items: center;
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-radius: var(--r-pill);
-  color: var(--cv-ink-muted);
-  display: inline-flex;
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-bold);
-  gap: var(--sp-2);
-  padding-block: var(--sp-1);
-  padding-inline: var(--sp-2);
-}
-
 /* =========================================================
    Inline action
    ========================================================= */
 
-.cv-field__control-row,
 .cv-field-with-action {
   align-items: stretch;
   display: flex;
@@ -578,78 +382,9 @@ border-bottom-color: currentColor;
   min-width: 0;
 }
 
-.cv-field__control-row .cv-field__control,
-.cv-field-with-action .cv-field__control,
-.cv-field-with-action .cv-select__wrapper {
+.cv-field-with-action .cv-field__control {
   flex: 1 1 auto;
   min-width: 0;
-}
-
-.cv-field-action {
-  align-items: center;
-  appearance: none;
-  background:
-    linear-gradient(var(--cv-surface-card), var(--cv-surface-card)) padding-box,
-    linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-  border: var(--bd);
-    border-color: transparent;
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
-  color: var(--cv-ink);
-  cursor: pointer;
-  display: inline-flex;
-  font-family: inherit;
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-medium);
-  gap: var(--sp-2);
-  height: var(--h-md);
-  justify-content: center;
-  padding-block: 0;
-  padding-inline: var(--sp-4);
-  transition: background var(--tr-fast), box-shadow var(--tr-fast);
-  white-space: nowrap;
-}
-
-.cv-field-action:hover:not(:disabled) {
-  background:
-    linear-gradient(color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)), color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface))) padding-box,
-    linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-}
-
-.cv-field-action--clear {
-  color: var(--cv-state-danger);
-}
-
-.cv-field-action--clear:hover:not(:disabled) {
-  background:
-    linear-gradient(color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface)), color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface))) padding-box,
-    linear-gradient(color-mix(in srgb, var(--cv-state-danger) 40%, transparent), color-mix(in srgb, var(--cv-state-danger) 40%, transparent)) border-box;
-}
-
-.cv-field__control-row .cv-field-action,
-.cv-field-with-action .cv-field-action {
-  align-self: stretch;
-  flex: 0 0 auto;
-  height: auto;
-}
-
-/* =========================================================
-   Demo states
-   ========================================================= */
-
-.cv-field-state-grid {
-  display: grid;
-  gap: var(--sp-4);
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-
-.cv-field-state-card {
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-lg);
-  display: grid;
-  gap: var(--sp-3);
-  padding: var(--sp-4);
 }
 
 .cv-field-state-card__title {
@@ -665,45 +400,8 @@ border-bottom-color: currentColor;
   margin: 0;
 }
 
-.cv-state-button-demo-row {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-3);
-}
-
-.cv-field-state-card .cv-field__control {
-  min-height: var(--h-md);
-}
-
-.cv-field--focus-demo .cv-field__control,
-.cv-field-state-card--focus .cv-field__control {
-  border-color: var(--cv-border);
-  box-shadow: var(--sh-sm);
-}
-
-.cv-field--focus-demo .cv-multiselect__control {
-  border-color: var(--cv-border);
-  box-shadow: var(--sh-sm);
-}
-
-.cv-field--hover-demo .cv-field__control,
-.cv-field-state-card--hover .cv-field__control {
-  border-color: var(--cv-border);
-}
-
-.cv-field--filled-demo .cv-field__control,
 .cv-field-state-card--filled .cv-field__control {
   color: var(--cv-ink);
-}
-
-/* =========================================================
-   Multiselect visual model
-   ========================================================= */
-
-.cv-multiselect {
-  display: grid;
-  gap: var(--sp-3);
 }
 
 .cv-multiselect__control {
@@ -812,38 +510,6 @@ border-bottom-color: currentColor;
   background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
 }
 
-.cv-multiselect__chip-label {
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-bold);
-}
-
-.cv-multiselect__chip-remove {
-  align-items: center;
-  background: transparent;
-  border: 0;
-  border-radius: var(--r-pill);
-  color: var(--cv-state-danger);
-  cursor: pointer;
-  display: inline-flex;
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-bold);
-  height: var(--sp-5);
-  justify-content: center;
-  line-height: 1;
-  padding: 0;
-  transition:
-    background-color var(--tr-fast),
-    color var(--tr-fast);
-  width: var(--sp-5);
-}
-
-.cv-multiselect__chip-remove:hover,
-.cv-multiselect__chip-remove:focus-visible {
-  background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
-  color: var(--cv-state-danger);
-  outline: none;
-}
-
 .cv-multiselect__dropdown {
   background: var(--cv-surface-card);
   border: var(--bd);
@@ -854,10 +520,6 @@ border-bottom-color: currentColor;
   max-height: calc(var(--h-md) * 5 + var(--sp-4));
   overflow: auto;
   padding: var(--sp-2);
-}
-
-.cv-multiselect:focus-within .cv-multiselect__dropdown {
-  clip-path: inset(0 calc(var(--sp-1) * -1) calc(var(--sp-1) * -1) calc(var(--sp-1) * -1));
 }
 
 .cv-multiselect__option {
@@ -972,41 +634,21 @@ border-bottom-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   color: var(--cv-ink-muted);
 }
 
-.cv-multiselect--disabled .cv-multiselect__chip-remove {
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
 /* =========================================================
    Responsive
    ========================================================= */
 
 @media (max-width: 1080px) {
-  .cv-field-grid--3,
-  .cv-field-grid--4 {
-  }
 }
 
 @media (max-width: 720px) {
-  .cv-field-grid--2,
-  .cv-field-grid--3,
-  .cv-field-grid--4 {
-  }
 
-  .cv-field--span-2,
-  .cv-field--span-3,
   .cv-field--full {
     grid-column: 1 / -1;
   }
 
-  .cv-field__control-row,
   .cv-field-with-action {
     flex-direction: column;
-  }
-
-  .cv-field__control-row .cv-field-action,
-  .cv-field-with-action .cv-field-action {
-    width: 100%;
   }
 
   .cv-date-picker__control {
@@ -1020,19 +662,6 @@ border-bottom-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   .cv-multiselect__chip {
     width: fit-content;
   }
-}
-
-/* ==========================================================================
-   Custom Select Premium — .cv-custom-select
-   Dropdown 100% customizado. O <select> nativo permanece oculto apenas
-   para submissão do formulário — o usuário nunca interage com ele.
-   ========================================================================== */
-
-/* ─── Tokens do menu e opções ──────────────────────────────────────────── */
-.ui-lab-page {
-}
-
- .ui-lab-page {
 }
 
 /* ─── Wrapper root ──────────────────────────────────────────────────────── */

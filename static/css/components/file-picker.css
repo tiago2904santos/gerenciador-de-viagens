@@ -1,8 +1,7 @@
 /* Canonical file picker and attached-file list. Page CSS may position it, not skin it. */
 
 .cv-file-input,
-.prestacao-file-input,
-.prestacao-file-widget__clear-input {
+.prestacao-file-input {
   clip: rect(0 0 0 0);
   clip-path: inset(50%);
   height: 1px;
@@ -60,10 +59,6 @@
 .cv-file-picker:hover,
 .prestacao-file-picker:hover {
   border-color: var(--cv-border);
-}
-
-.cv-file-picker:focus-within,
-.prestacao-file-picker:focus-within {
 }
 
 .cv-file-picker__action,
@@ -304,10 +299,6 @@ border-bottom-color: currentColor;
   display: flex;
   flex: 0 0 auto;
   gap: var(--sp-2);
-}
-
-.cv-file-widget__action,
-.prestacao-file-widget__action {
 }
 
 @media (max-width: 640px) {

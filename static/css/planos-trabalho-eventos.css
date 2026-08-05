@@ -251,32 +251,6 @@
   padding-top: var(--sp-5);
 }
 
-.pt-resumo-evento__tag {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
-  align-self: flex-start;
-  color: var(--cv-ink);
-  font-size: var(--fs-sm);
-  font-weight: 800;
-  letter-spacing: 0.02em;
-}
-
-.pt-resumo-evento__tag-num {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.6rem;
-  height: 1.6rem;
-  border-radius: var(--r-pill);
-  background: color-mix(in srgb, var(--color-accent, #d9a40f) 18%, transparent);
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent, #d9a40f) 55%, transparent);
-  color: var(--color-accent, #d9a40f);
-  font-size: var(--fs-xs);
-  font-weight: 900;
-}
-
 /* ── Grades de linhas ──────────────────────────────────────────────────── */
 .pt-resumo-grid {
   display: grid;
@@ -286,19 +260,6 @@
 .pt-resumo-grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .pt-resumo-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .pt-resumo-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-
-.pt-resumo-block {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-}
-
-.pt-resumo-subhead {
-  color: var(--cv-ink);
-  font-size: var(--fs-sm);
-  font-weight: 800;
-  letter-spacing: 0.01em;
-}
 
 /* ── Caixa de campo ────────────────────────────────────────────────────── */
 .pt-resumo-box {
@@ -339,12 +300,6 @@
   font-weight: 800;
 }
 
-.pt-resumo-box__value--xl {
-  font-size: clamp(1.5rem, 2.9vw, 2.2rem);
-  font-weight: 900;
-  line-height: 1.05;
-}
-
 .pt-resumo-box__sub {
   color: var(--cv-ink-muted);
   font-size: var(--fs-sm);
@@ -383,13 +338,6 @@
   overflow-wrap: normal;
   word-break: keep-all;
   margin-bottom: var(--sp-2);
-}
-
-.pt-resumo-valor__extenso {
-  color: var(--cv-ink);
-  font-size: var(--fs-sm);
-  font-weight: 700;
-  line-height: 1.35;
 }
 
 /* ── Listas roláveis (Efetivo e Atividades) ────────────────────────────── */
@@ -574,10 +522,6 @@
 @media (max-width: 600px) {
   .pt-add-evento__inner { grid-template-columns: 1fr; }
   .pt-add-evento__btn { width: 100%; }
-}
-
-/* Etapa 4 · conferência e documentos */
-.travel-document-wizard__form:has([data-travel-document-wizard-documentos]) {
 }
 
 .pt-documentos-stage .oficio-documentos-body {
