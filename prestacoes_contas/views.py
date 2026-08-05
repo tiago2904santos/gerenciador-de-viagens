@@ -13,7 +13,6 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import escape
-from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from core.autosave import AutosavePayloadError
@@ -24,6 +23,7 @@ from core.normalizers import normalize_spaces
 from core.normalizers import remove_accents
 from core.presenters.meta import build_meta
 from core.private_media import private_file_response
+from core.retorno import voltar_para
 from core.tenancy import filter_queryset_by_area
 from core.tenancy import get_current_area
 from core.utils.masks import format_cpf
@@ -380,8 +380,7 @@ def _salvar_solicitacoes_em_lote(request):
 
 def _redirect_lista(request, _obj=None):
     """Volta para a lista preservando a aba/filtros de onde a ação foi disparada."""
-    destino = request.POST.get("next") or reverse("prestacoes_contas:index")
-    return redirect(destino)
+    return redirect(voltar_para(request, reverse("prestacoes_contas:index")))
 
 
 @require_POST
