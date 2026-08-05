@@ -592,14 +592,14 @@ class ImportantTests(SimpleTestCase):
 class CssMortoRatchetTests(SimpleTestCase):
     """Teto de regras de CSS sem consumidor (NOVO-37).
 
-    O criterio esta em `scripts/audit_css_morto.py`. O teto e a divida MEDIDA,
-    nao zero: a fase 5a ja cortou 5.404 linhas e sobraram 314 regras que aquela
-    varredura nao alcancava — `@media` aninhado, e o que so o parser deste
-    auditor enxerga. Cortar essas 314 e um PR proprio, com medicao propria;
-    aqui a catraca so impede que o numero suba.
+    O criterio esta em `scripts/audit_css_morto.py`. O teto e ZERO desde a fase
+    5b: as 314 regras que a varredura da 5a nao alcancava — `@media` aninhado,
+    o que so um parser que conta chaves enxerga — sairam. Nao ha divida residual
+    a tolerar, entao regra nova sem consumidor reprova aqui em vez de virar as
+    proximas milhares de linhas.
     """
 
-    TETO = 314
+    TETO = 0
 
     def test_o_css_sem_consumidor_nao_cresce(self):
         import importlib.util

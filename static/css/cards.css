@@ -1,28 +1,5 @@
 
 
-.app-section__header {
-  display: grid;
-  gap: var(--sp-1);
-}
-
-.app-section__title {
-  color: var(--cv-ink);
-  font-size: var(--fs-lg);
-  font-weight: 700;
-  margin: 0;
-}
-
-.app-section__subtitle {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-sm);
-  margin: 0;
-}
-
-.app-section__body {
-  display: grid;
-  gap: var(--sp-3);
-}
-
 /* --------------------------------------------------------------------------
    1. Base de superficie
    -------------------------------------------------------------------------- */

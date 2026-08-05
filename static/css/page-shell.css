@@ -892,28 +892,6 @@ padding-inline: var(--sp-6);
 /* Linha inteira: justificativa, observações, descrição, textarea */
 .field-size-4 { grid-column: 1 / -1; }
 
-.field-group__header {
-  align-items:     center;
-  display:         flex;
-  gap:             var(--sp-2);
-  justify-content: space-between;
-}
-
-.field-group__title {
-  color:          var(--cv-ink-muted);
-  font-size:      var(--fs-xs);
-  font-weight:    var(--fw-bold);
-  letter-spacing: 0.12em;
-  margin:         0;
-  text-transform: uppercase;
-}
-
-.field-group__body {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--sp-3);
-}
-
 /* =========================================================
    15. Footer Actions
    Rodapé de ações do formulário. Sempre ao final do Main Form Panel.
@@ -953,27 +931,6 @@ padding-inline: var(--sp-6);
   right: clamp(var(--sp-4), 2vw, var(--sp-5));
   bottom: clamp(var(--sp-4), 2vw, var(--sp-5));
   z-index: calc(var(--z-sidebar) + 20);
-}
-
-.quick-create-panel__copy {
-  display: grid;
-  gap: var(--sp-1);
-  min-width: 0;
-}
-
-.quick-create-panel__eyebrow {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-bold);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.quick-create-panel__subtitle {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-sm);
-  line-height: 1.45;
-  margin: 0;
 }
 
 @media (max-width: 640px) {
@@ -1458,76 +1415,6 @@ body.has-delete-modal-open {
   width: 100%;
 }
 
-/* Cabeçalho: título + botão de fechar */
-.quick-create-panel__header {
-  align-items:     center;
-  background:      var(--cv-surface-card);
-  border-bottom: var(--bd);
-  box-sizing:      border-box;
-  display:         flex;
-  gap:             var(--sp-3);
-  justify-content: space-between;
-  padding-block: var(--sp-2);
-  padding-inline: var(--sp-5);
-}
-
-.quick-create-panel__title {
-  color:       var(--cv-ink);
-  font-size:   var(--fs-sm);
-  font-weight: var(--fw-bold);
-  margin:      0;
-}
-
-.quick-create-panel__close {
-  align-items:      center;
-  background:       transparent;
-  border: 0;
-  border-radius:    var(--r-sm);
-  color:            var(--cv-ink-muted);
-  cursor:           pointer;
-  display:          flex;
-  font-size:        var(--fs-md);
-  height:           28px;
-  justify-content:  center;
-  line-height:      1;
-  padding:          0;
-  transition:       color var(--tr-base), background var(--tr-base);
-  width:            28px;
-}
-
-.quick-create-panel__close:hover {
-  background: var(--cv-border);
-  color:      var(--cv-ink);
-}
-
-/* Corpo: linha de campos + ações em flex row no desktop */
-.quick-create-panel__body {
-  box-sizing: border-box;
-  display:    flex;
-  gap:        var(--sp-3);
-  padding-block: var(--sp-4);
-  padding-inline: var(--sp-5);
-  width:      100%;
-}
-
-/* Row: field-grid + quick-create-actions lado a lado */
-.quick-create-panel__row {
-  align-items: flex-end;
-  display:     flex;
-  flex:        1;
-  gap:         var(--sp-3);
-  min-width:   0;
-}
-
-/* Mensagem auxiliar opcional */
-.quick-create-panel__hint {
-  box-sizing:  border-box;
-  color:       var(--cv-ink-muted);
-  font-size:   var(--fs-xs);
-  padding-block: 0 var(--sp-3);
-  padding-inline: var(--sp-5);
-}
-
 /* =========================================================
    18. Responsive
    ========================================================= */
@@ -1598,16 +1485,6 @@ body.has-delete-modal-open {
 
   .filter-bar__controls {
     flex-wrap: wrap;
-  }
-
-  /* Quick Create: campos e ações empilham no tablet */
-  .quick-create-panel__body {
-    flex-direction: column;
-  }
-
-  .quick-create-panel__row {
-    flex-direction: column;
-    align-items:    stretch;
   }
 
   /* Header clean: stage com padding reduzido */
@@ -2216,38 +2093,6 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   box-shadow: var(--sh-sm);
 }
 
-.list-card__header {
-  align-items:     center;
-  display:         flex;
-  gap:             var(--sp-2);
-  justify-content: space-between;
-}
-
-.list-card__title {
-  color:         var(--cv-ink);
-  font-size:     var(--fs-sm);
-  font-weight:   var(--fw-bold);
-  margin:        0;
-  overflow:      hidden;
-  text-overflow: ellipsis;
-  white-space:   nowrap;
-}
-
-.list-card__meta {
-  color:     var(--cv-ink-muted);
-  display:   flex;
-  flex-wrap: wrap;
-  font-size: var(--fs-xs);
-  gap:       var(--sp-1) var(--sp-3);
-}
-
-.list-card__body {
-  color:       var(--cv-ink-muted);
-  flex:        1;
-  font-size:   var(--fs-xs);
-  line-height: 1.5;
-}
-
 .list-card__footer {
   align-items:     center;
   border-top: var(--bd);
@@ -2712,23 +2557,6 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 .header-filter-select:focus,
 .header-filter-select:focus-visible {
   outline: none;
-}
-
-/* Variante primária */
-.header-filter-button--primary {
-  background:   var(--color-accent);
-  border-color: var(--color-accent);
-  color:        var(--on-accent);
-}
-
-.header-filter-button--primary:hover,
-.header-filter-button--primary:focus-visible {
-  background:   color-mix(in srgb, var(--color-accent) 45%, transparent);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color:        var(--on-accent);
-}
-
-@media (max-width: 840px) {
 }
 
 @media (max-width: 840px) {

@@ -1,13 +1,5 @@
 
 
-/* --------------------------------------------------------------------------
-   1. Estrutura de pagina e secoes
-   -------------------------------------------------------------------------- */
-.form-page {
-  display: grid;
-  gap: var(--sp-6);
-}
-
 /* Compatibilidade visual para seções legadas completas. Novas composições usam
    ui/forms/form_block.html, que possui abertura e fechamento do próprio shell. */
 
@@ -17,17 +9,6 @@
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   padding: var(--sp-5);
-}
-
-.form-section-header {
-  border-bottom: var(--bd);
-  margin-bottom: var(--sp-4);
-  padding-bottom: var(--sp-3);
-}
-
-.form-section-header h3 {
-  font-size: var(--fs-lg);
-  margin-bottom: var(--sp-1);
 }
 
 .form-section-header p,
@@ -61,8 +42,6 @@
   padding: var(--sp-4);
 }
 
-@media (max-width: 720px) {
-}
 /* --------------------------------------------------------------------------
    2. Campos e controles
    -------------------------------------------------------------------------- */
@@ -94,13 +73,6 @@
   color: var(--cv-ink);
   min-height: var(--h-md);
   width: 100%;
-}
-
-.form-check-input {
-  accent-color: var(--color-accent);
-  height: 18px;
-  min-height: 18px;
-  width: 18px;
 }
 
 .field-error {
@@ -332,32 +304,10 @@
   margin-top: var(--sp-1);
 }
 
-/* Select + ação lateral */
-.form-field-with-action__row {
-  align-items: stretch;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-3);
-}
-
-.form-field-with-action__control {
-  flex: 1 1 220px;
-  min-width: 0;
-}
-
-.form-field-with-action__button {
-  align-self: center;
-  flex: 0 0 auto;
-  white-space: nowrap;
-}
-
 /* --------------------------------------------------------------------------
    5. Responsividade de acao lateral
    -------------------------------------------------------------------------- */
 @media (max-width: 640px) {
-  .form-field-with-action__button {
-    width: 100%;
-  }
 
   .app-card-toggle {
     align-items: start;
@@ -406,44 +356,8 @@ textarea[readonly] {
   font-size: var(--fs-xs);
   font-weight: 700;
 }
-
- .form-check-input,
- input[type="radio"],
- input[type="checkbox"] {
-  accent-color: var(--color-accent);
-}
 .form-field--hidden {
   display: none;
-}
-
-.app-input-addon__control {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  flex: 1;
-  min-width: 0;
-}
-
-.app-input-addon__control:focus,
-.app-input-addon__control:focus-visible {
-  outline: none;
-}
-
-.app-input-addon__suffix {
-  align-items: center;
-  background: var(--cv-surface-card);
-  border-left: var(--bd);
-  color: var(--cv-ink-muted);
-  display: flex;
-  flex-shrink: 0;
-  font-size: var(--fs-md);
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  padding-block: 0;
-  padding-inline: var(--sp-3);
-  user-select: none;
-  white-space: nowrap;
 }
 
 /* ==========================================================================
@@ -588,52 +502,6 @@ textarea[readonly] {
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-3);
-}
-
-.app-stepper__list {
-  display: grid;
-  gap: var(--sp-3);
-  grid-template-columns: repeat(auto-fit, minmax(156px, 1fr));
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.app-stepper__item {
-  min-width: 0;
-}
-
-.app-stepper__link {
-  align-items: center;
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-md);
-  color: var(--cv-ink);
-  display: grid;
-  gap: var(--sp-3);
-  grid-template-columns: auto minmax(0, 1fr);
-  min-height: 76px;
-  padding: var(--sp-3);
-  text-decoration: none;
-}
-
-.app-stepper__copy {
-  display: grid;
-  gap: var(--sp-1);
-  min-width: 0;
-}
-
-.app-stepper__state {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-xs);
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.app-stepper__title {
-  font-size: var(--fs-sm);
-  font-weight: 900;
-  line-height: 1.2;
 }
 
 .main-form-panel .field,

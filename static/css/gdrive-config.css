@@ -692,62 +692,6 @@
   white-space: nowrap;
 }
 
-.gdrive-pend {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-block: var(--sp-2);
-  padding-inline: var(--sp-3);
-  border-radius: var(--r-md);
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-left: var(--bd-strong);
-  border-left-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  border-left-width: 3px;
-}
-
-/* Linha única: tag + título (com contexto embutido) + quando */
-.gdrive-pend__top {
-  display: flex;
-  align-items: baseline;
-  gap: var(--sp-2);
-}
-
-.gdrive-pend__tipo {
-  flex: 0 0 auto;
-  padding-block: var(--sp-1);
-  padding-inline: var(--sp-2);
-  border-radius: var(--r-pill);
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-2xs);
-  font-weight: var(--fw-semibold);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  align-self: center;
-}
-
-.gdrive-pend__motivo {
-  color: var(--cv-state-danger);
-  font-weight: var(--fw-medium);
-}
-
-.gdrive-pend__erro {
-  display: block;
-  margin-top: var(--sp-1);
-  padding: var(--sp-2);
-  border-radius: var(--r-sm);
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  color: var(--cv-ink-muted);
-  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
-  font-size: var(--fs-2xs);
-  line-height: 1.45;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
 /* ── Barras de rolagem temáticas (o scrollbar claro nativo fica feio no escuro) */
 .gdrive-previa-lista,
 .gdrive-folder-list {

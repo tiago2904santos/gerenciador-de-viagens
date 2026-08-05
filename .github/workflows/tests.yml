@@ -59,15 +59,14 @@ jobs:
 
       - name: Block new frontend standards debt
         # Catraca: este número só desce. NOVO-30 fase 1 (refazer): 384 → 335.
-        run: python scripts/audit_frontend_standards.py --max-warnings 184
+        run: python scripts/audit_frontend_standards.py --max-warnings 182
 
       - name: Block CSS without a consumer (NOVO-37)
-        # Catraca: este número só desce. A fase 5a cortou 5.404 linhas; sobraram
-        # 314 regras que aquela varredura não alcançava (`@media` aninhado). O
-        # alvo é zero, num PR próprio com medição própria — aqui o número só não
-        # sobe. O critério deste auditor preserva nome composto
+        # Teto ZERO desde a fase 5b: as 314 regras que a varredura da 5a não
+        # alcançava (`@media` aninhado) saíram, e não há dívida residual a
+        # tolerar. O critério deste auditor preserva nome composto
         # (`cv-person-list--n{{ contagem }}`), que foi o que a 5a apagou.
-        run: python scripts/audit_css_morto.py --max-regras 314
+        run: python scripts/audit_css_morto.py --max-regras 0
 
       - name: Block backend architecture regressions (P-01, P-05)
         # Catraca: este número só desce. O P-01 fechou os quatro apps do

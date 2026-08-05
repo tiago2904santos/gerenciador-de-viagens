@@ -25,6 +25,7 @@ import json
 import os
 import sys
 
+from playwright.sync_api import TimeoutError as PWTimeout
 from playwright.sync_api import sync_playwright
 
 BASE = "http://127.0.0.1:8000"
@@ -66,6 +67,25 @@ PAGINAS = [
     ("cidades", "/cadastros/cidades/"),
     ("usuarios", "/usuarios/"),                          # usuarios
     ("usuario-novo", "/usuarios/novo/"),
+    # `static/css/dev/*` so e alcancado por aqui. Sem estas rotas, o segundo e o
+    # terceiro maiores blocos de corte da fase 5 ficariam sem medicao nenhuma.
+    ("ui-lab", "/dev/ui-lab/"),                          # dev/ui-lab-pages
+    ("ui-lab-2", "/dev/ui-lab-2/"),
+    ("ui-lab-buttons", "/dev/ui-lab/buttons/"),
+    ("ui-lab-cards", "/dev/ui-lab/cards/"),
+    ("ui-lab-documents", "/dev/ui-lab/documents/"),
+    ("ui-lab-eventos-cadastro", "/dev/ui-lab/eventos/cadastro/"),
+    ("ui-lab-eventos-lista", "/dev/ui-lab/eventos/lista/"),
+    ("ui-lab-feedback", "/dev/ui-lab/feedback/"),
+    ("ui-lab-fields", "/dev/ui-lab/fields/"),            # dev/ui-lab-fields
+    ("ui-lab-headers", "/dev/ui-lab/headers/"),
+    ("ui-lab-lists", "/dev/ui-lab/lists/"),
+    ("ui-lab-overlays", "/dev/ui-lab/overlays/"),
+    ("ui-lab-selects-filters", "/dev/ui-lab/selects-filters/"),
+    ("ui-lab-signature", "/dev/ui-lab/signature/"),
+    ("ui-lab-status", "/dev/ui-lab/status/"),
+    ("ui-lab-structures", "/dev/ui-lab/structures/"),
+    ("ui-lab-tables", "/dev/ui-lab/tables/"),
 ]
 
 # As propriedades que os `!important` deste repositorio tocam.
@@ -98,7 +118,7 @@ JS = """(props) => {
 
 
 def coletar():
-    dados = {}
+    dados, falhou = {}, []
     with sync_playwright() as pw:
         nav = pw.chromium.launch(
             executable_path="/opt/pw-browsers/chromium-1194/chrome-linux/chrome")
@@ -112,9 +132,27 @@ def coletar():
         for tema in ("light", "dark"):
             for nome, rota in PAGINAS:
                 try:
-                    pag.goto(BASE + rota, wait_until="networkidle", timeout=25000)
+                    try:
+                        resp = pag.goto(BASE + rota, wait_until="networkidle",
+                                        timeout=25000)
+                    except PWTimeout:
+                        # Tela que nunca fica ociosa (mapa, polling) nao pode
+                        # ficar de fora da medicao: cai para `load`. O
+                        # `roteiro-novo` — a pagina do MAIOR bloco de corte —
+                        # estava saindo por este motivo, sem ninguem notar.
+                        resp = pag.goto(BASE + rota, wait_until="load", timeout=40000)
+                        pag.wait_for_timeout(3000)
                 except Exception as e:
                     print(f"  {nome} [{tema}] nao abriu: {str(e)[:60]}", file=sys.stderr)
+                    falhou.append(f"{nome}/{tema}")
+                    # Uma tela que morre no meio da navegacao interrompe a
+                    # proxima e derruba o resto da varredura em cascata.
+                    # `about:blank` corta o encadeamento.
+                    pag.goto("about:blank")
+                    continue
+                if resp is not None and resp.status >= 400:
+                    print(f"  {nome} [{tema}] respondeu {resp.status}", file=sys.stderr)
+                    falhou.append(f"{nome}/{tema}")
                     continue
                 pag.evaluate(f"document.documentElement.setAttribute('data-theme','{tema}')")
                 # Tira o ponteiro da tela: sem isso o elemento sob o mouse e
@@ -155,6 +193,11 @@ def coletar():
                         f"captura contaminada por :hover em {nome} [{tema}]: {sujo}")
                 dados[f"{nome}/{tema}"] = pag.evaluate(JS, PROPS)
         nav.close()
+    if falhou:
+        # Tela que nao abriu nao entra na evidencia; dizer quais e o que impede
+        # a varredura de parecer mais larga do que foi.
+        print(f"telas fora da medicao ({len(falhou)}): {', '.join(falhou)}",
+              file=sys.stderr)
     return dados
 
 

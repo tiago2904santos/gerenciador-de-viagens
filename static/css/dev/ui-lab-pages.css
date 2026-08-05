@@ -212,32 +212,6 @@
   height: var(--h-md);
 }
 
-.ui-lab-demo-input--select {
-  min-width: 110px;
-  width: auto;
-}
-
-.ui-lab-demo-chip--draft {
-  background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
-  color: var(--cv-state-warning);
-}
-
-.ui-lab-demo-chip--done {
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
-  color: var(--cv-state-success);
-}
-
-.ui-lab-demo-chip--review {
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
-}
-
 .ui-lab-chips-canvas {
   background: #ffffff;
   border-radius: var(--r-xl);
@@ -641,11 +615,6 @@
 .ui-lab-overlay-grid {
     grid-template-columns: 1fr;
   }
-
-  .ui-lab-demo-input--select {
-    min-width: 0;
-    width: 100%;
-  }
 }
 @media (min-width: 841px) {
   .ui-lab-mobile-only-action {
@@ -668,24 +637,6 @@
 .ui-lab-stack {
   display: grid;
   gap: var(--sp-4);
-}
-
-.ui-lab-demo-card__body {
-  padding: var(--sp-4);
-}
-
-.ui-lab-demo-card__title {
-  color: var(--cv-ink);
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-bold);
-  margin-block: 0 var(--sp-2);
-  margin-inline: 0;
-}
-
-.ui-lab-demo-card__text {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-sm);
-  margin: 0;
 }
 
 .cv-demo-footer-card {
@@ -776,49 +727,6 @@
 
 .cv-field-row > .cv-field-side-action {
   flex: 0 0 auto;
-}
-
-.cv-field-control--grow {
-  flex: 1 1 260px;
-}
-
-.cv-field-control__label {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-bold);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.cv-field-control__input,
-.cv-field-control__select {
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  border-radius: var(--r-md);
-  box-sizing: border-box;
-  color: var(--cv-ink);
-  font-family: var(--font-sans);
-  font-size: var(--fs-sm);
-  height: var(--h-md);
-  min-height: var(--h-md);
-  padding-block: 0;
-  padding-inline: var(--sp-3);
-  width: 100%;
-}
-
-textarea.cv-field-control__input {
-  height: 88px;
-  min-height: 88px;
-  padding-bottom: var(--sp-3);
-  padding-top: var(--sp-3);
-  resize: vertical;
-  line-height: 1.5;
-}
-
-.cv-field-control__select {
-  appearance: none;
-  padding-right: var(--sp-6);
 }
 
 .cv-field-side-action {
@@ -981,21 +889,6 @@ textarea.cv-field-control__input {
   box-shadow: var(--sh-sm);
 }
 
-.cv-state-button--active {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
-}
-
-.cv-state-button--icon::before {
-  margin: 0;
-}
-
-.cv-state-button--icon {
-  min-width: var(--h-md);
-  padding: 0;
-}
-
 @media (max-width: 640px) {
   .cv-field-row {
     align-items: stretch;
@@ -1132,20 +1025,6 @@ textarea.cv-field-control__input {
   color: var(--on-accent);
 }
 
-.cv-demo-state-tile__label {
-  color: var(--cv-ink);
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-bold);
-  margin: 0;
-}
-
-.cv-demo-state-tile__description {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-xs);
-  margin: 0;
-  text-align: center;
-}
-
 .cv-demo-state-tile--active .cv-btn {
   background: var(--cv-surface-card);
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
@@ -1200,43 +1079,6 @@ textarea.cv-field-control__input {
 .cv-demo-select {
   appearance: none;
   padding-right: var(--sp-6);
-}
-
-.cv-demo-list-row__meta {
-  display: grid;
-  gap: var(--sp-1);
-  min-width: 0;
-}
-
-.cv-demo-list-row__title {
-  color: var(--cv-ink);
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-bold);
-  margin: 0;
-}
-
-.cv-demo-list-row__subtitle {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-xs);
-  margin: 0;
-}
-
-.cv-demo-surface__body {
-  display: grid;
-  gap: var(--sp-3);
-}
-
-.cv-demo-surface__title {
-  color: var(--cv-ink);
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-bold);
-  margin: 0;
-}
-
-.cv-demo-surface__text {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-sm);
-  margin: 0;
 }
 
  :is(.ui-lab-chips-canvas, .ui-lab-status-showcase, .ui-lab-status-card) {

@@ -250,13 +250,3 @@
 padding-inline: var(--sp-4);
   text-align: center;
 }
-
-.app-badge--accent {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  color: var(--color-accent);
-}
-
-.app-badge--muted {
-  background: var(--cv-surface-block);
-  color: var(--cv-ink-muted);
-}

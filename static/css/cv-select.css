@@ -1,33 +1,5 @@
 
 
-/* Disabled */
-.cv-select-wrapper--disabled::after {
-  opacity: 0.45;
-}
-
-.cv-select-wrapper--disabled::after {
-  border-color: var(--cv-ink-muted);
-  opacity: 0.45;
-}
-
-/* Error */
-.cv-select-wrapper--error select {
-  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-}
-
-.cv-select-wrapper--error::after {
-  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-}
-
-/* Success */
-.cv-select-wrapper--success select {
-  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
-}
-
-.cv-select-wrapper--success::after {
-  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
-}
-
 /* =========================================================
    05. Global native select styling
    Todo <select> dentro de .main-form-panel e .list-panel
@@ -253,24 +225,6 @@
   padding-inline: var(--sp-1);
 }
 
-.cv-filter-dropdown__menu {
-  animation: cv-dropdown-enter 160ms ease both;
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
-  left: 0;
-  list-style: none;
-  margin: 0;
-  max-height: 280px;
-  min-width: 220px;
-  overflow-y: auto;
-  padding: var(--sp-1);
-  position: absolute;
-  top: calc(100% + var(--sp-1));
-  z-index: var(--z-toast);
-}
-
 .cv-filter-dropdown__option {
   align-items: center;
   border-radius: var(--r-sm);
@@ -294,16 +248,6 @@
   background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
   color: var(--color-accent);
   font-weight: var(--fw-semibold);
-}
-
-.cv-filter-dropdown__option-check {
-  align-items: center;
-  display: inline-flex;
-  flex-shrink: 0;
-  height: 16px;
-  justify-content: center;
-  opacity: 0;
-  width: 16px;
 }
 
 .cv-filter-dropdown__option--selected .cv-filter-dropdown__option-check {
