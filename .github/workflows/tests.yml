@@ -227,3 +227,35 @@ jobs:
                   print(f"::error title=Coverage floor regression::{failure}")
               sys.exit(1)
           PY
+
+      - name: Enforce list performance ceilings (PF-07)
+        # Último passo do job de propósito: é o mais caro (~2min30 medidos, dos
+        # quais ~1min é semeadura de 20.000 registros por domínio em 9 domínios).
+        # Os gates baratos já falharam antes de chegar aqui.
+        #
+        # `--repeticoes 1` porque tempo **não** é catraca aqui (ver o docstring do
+        # script): repetição só melhoraria a mediana de um número que é
+        # diagnóstico, não gate. Consulta e byte são determinísticos — medidos
+        # iguais em duas execuções seguidas — e uma passada basta.
+        #
+        # A régua exige PostgreSQL e recusa rodar em SQLite; as DB_* e o
+        # TEST_USE_POSTGRES do env do job já apontam para o serviço acima.
+        #
+        # `pipefail` não é decoração: o shell default da action é `bash -e`, sem
+        # ele o código de saída do `tee` é que valeria e o gate passaria verde
+        # justamente quando a régua reprovasse.
+        run: |
+          set -o pipefail
+          python scripts/medir_desempenho.py --repeticoes 1 | tee "$RUNNER_TEMP/desempenho.txt"
+
+      - name: Publish the performance report
+        # Roda mesmo com a régua vermelha: o relatório é justamente o que se lê
+        # para entender por que ela reprovou.
+        if: always()
+        run: |
+          {
+            echo '### Régua de desempenho (PF-07)'
+            echo '```'
+            cat "$RUNNER_TEMP/desempenho.txt" 2>/dev/null || echo '(a régua não chegou a produzir relatório)'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

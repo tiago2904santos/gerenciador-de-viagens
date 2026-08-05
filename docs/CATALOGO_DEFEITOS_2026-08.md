@@ -580,13 +580,42 @@ de queries.
 `/usuarios/` emite 2 queries idênticas repetidas; `/prestacoes-contas/`, 1. Sintoma de consulta
 refeita em camada diferente.
 
-### PF-07 🟠 Cinco listas nunca foram medidas com volume · MED · 3–4 d
+### PF-07 ✅ RESOLVIDO · 🟠 Cinco listas nunca foram medidas com volume · MED · 3–4 d
 
 Termos, Prestações, Eventos, Planos de Trabalho, OS e Justificativas responderam com base vazia. O
 ciclo antigo registrou que **Termos tinha 54 queries por página** e a correção nunca foi
 confirmada.
 **Correção:** `scripts/medir_desempenho.py` no repositório, semeando cada domínio em dois volumes
 (200 e 20.000), com teto por rota no CI. É a Etapa D1 e vem antes de qualquer otimização.
+
+> **Medido em 05/08, em PostgreSQL, página cheia nos dois volumes.** Contagem de consulta e KB
+> viraram teto em `scripts/tetos_desempenho.json`; o passo do CI reprova quem passar.
+>
+> | rota | linhas/pág. | consultas | KB @200 | KB @20.000 | ms @20.000 |
+> |---|---:|---:|---:|---:|---:|
+> | `core:dashboard` | — | 11 | 23,8 | 23,8 | 27 |
+> | `oficios:index` | 20 | 17 | 450,3 | 451,5 | 1.659 |
+> | `roteiros:index` | 15 | 32 | 87,9 | 87,9 | 1.132 |
+> | `termos:index` | 15 | **55** | 508,9 | 510,0 | 492 |
+> | `eventos:index` | 20 | **296** | 589,9 | 632,9 | 1.096 |
+> | `planos_trabalho:index` | 20 | 16 | 216,9 | 258,7 | 555 |
+> | `ordens_servico:index` | 20 | 19 | 213,4 | 213,8 | 2.619 |
+> | `justificativas:index` | 15 | 17 | 289,1 | **15.295** | **19.726** |
+> | `prestacoes_contas:index` | 20 | **138** | 497,3 | 581,5 | 614 |
+>
+> **O "54 por página" de Termos era real e continua lá** — 55 hoje, e nunca tinha sido confirmado.
+> **Prestações está em 138**, número que ninguém tinha medido. **Eventos em 296**, invisível na
+> linha de base porque o banco estava vazio. Os três viram `NOVO-08`.
+>
+> A contagem de consulta é **igual nos dois volumes** em todas as rotas: os N+1 são por linha da
+> página, não por tamanho do banco. O que escala com volume é tempo — e o HTML de Justificativas,
+> que é o `NOVO-07`.
+>
+> **Duas correções de rumo minhas, registradas porque mudam a conclusão:** (1) a primeira medição
+> rodou em **SQLite** e reportava `planos_trabalho:index` em 22 s — artefato do planejador do
+> SQLite; em PostgreSQL são 555 ms, e o script agora **recusa** rodar fora do Postgres. (2) As datas
+> semeadas caíam fora da aba padrão (`futuras`), então a página 1 do volume 200 vinha com poucas
+> linhas e a diferença entre os volumes media *quantas linhas a página tem*, não o tamanho do banco.
 
 ---
 
@@ -1300,6 +1329,55 @@ sistemática, isso não é "ligar uma regra": é um projeto com fase de adoção
 de agendar.
 
 **Não confundir com dívida nova:** é dívida existente que o gate ainda não vigia.
+
+### NOVO-06 🔴 A lista de justificativas mostra as de todas as áreas · COR · 1 d
+
+`justificativas/selectors.py:20` — `listar_justificativas()` devolve
+`Justificativa.objects.select_related(...)` **sem nenhum recorte de área**, e `views.py:83` pagina
+esse queryset direto.
+
+**Medido em 05/08** com 20.000 justificativas em três áreas: `page_obj.paginator.count` = **20.000**
+contra **6.666** na área ativa do usuário. Não é lentidão — é o usuário de uma área vendo o
+protocolo, o assunto e a justificativa das outras.
+
+Agrava: `views.py:30`, `_oficios_summary_for_quick_add()`, monta o *picker* de ofícios com
+`Oficio.objects` cru — **20.000 entradas contra 6.666 da área** — e o resultado vai para o HTML por
+`json_script` (`templates/justificativas/index.html:15`). O dado de outra área não só é contado:
+é entregue ao navegador.
+
+**Complicador estrutural, e por isso 1 dia e não 0,25:** `Justificativa` **não tem campo `area`**.
+`filter_queryset_by_area` não se aplica direto; o recorte precisa vir por `oficio__area` (ou por um
+campo `area` novo, com migração e backfill — aí vira `DB`, não `COR`). A decisão entre os dois
+caminhos é parte da tarefa.
+
+### NOVO-07 🟠 A tela de justificativas cresce com a tabela inteira: 15 MB de HTML · MED · 0,5 d
+
+Consequência direta do `_oficios_summary_for_quick_add()` do `NOVO-06`: sem recorte e **sem
+limite**, ele serializa todo ofício do banco no HTML da lista.
+
+**Medido:** 289 KB com 200 ofícios, **15.295 KB com 20.000** — e 19,7 s de resposta. Cresce linear
+com a tabela, não com o que a página mostra (15 linhas nos dois casos). É a única rota medida cujo
+HTML escala com volume.
+
+O recorte por área do `NOVO-06` divide por três; não resolve. O *picker* precisa de paginação ou de
+busca sob demanda, como os outros seletores do sistema já fazem.
+
+### NOVO-08 🟠 N+1 por linha em três listas: 296, 138 e 55 consultas · MED · 2–3 d
+
+Medido pela régua do `PF-07`, **igual nos dois volumes** — é por linha da página, não por tamanho do
+banco:
+
+| rota | consultas | linhas | por linha | onde |
+|---|---:|---:|---:|---|
+| `eventos:index` | 296 | 20 | ~15 | 123× `cadastros_estado` + 105× `cadastros_cidade` + 20× `justificativas_justificativa` + 20× `planos_trabalho_planodestino` |
+| `prestacoes_contas:index` | 138 | 20 | ~7 | a medir por família |
+| `termos:index` | 55 | 15 | ~3,7 | o "54 por página" do ciclo antigo, nunca corrigido |
+
+`eventos:index` é o pior e o mais claro: o cartão resolve estado e cidade de cada destino sem
+`select_related`/`prefetch_related`. Some 228 das 296.
+
+**Não estava visível na linha de base** porque a linha de base mediu com o banco vazio — é
+exatamente o buraco que o `PF-07` existiu para tapar.
 
 ### QA-17 ⚪ Treze PRs abertos sem triagem · MED · 1 d
 
