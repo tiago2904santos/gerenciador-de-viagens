@@ -59,7 +59,11 @@ jobs:
 
       - name: Block new frontend standards debt
         # Catraca: este número só desce. NOVO-30 fase 1 (refazer): 384 → 335.
-        run: python scripts/audit_frontend_standards.py --max-warnings 184
+        # NOVO-39: 184 → 92. Os 92 `legacy_page_header` eram falso positivo — a
+        # regra acusava a família do componente canônico e mandava migrar para
+        # `app-page-hero`, que não existe no repositório. Corrigida a regra, não
+        # o template; ver core/tests/test_auditor_page_header.py.
+        run: python scripts/audit_frontend_standards.py --max-warnings 92
 
       - name: Block CSS without a consumer (NOVO-37)
         # Catraca: este número só desce. A fase 5a cortou 5.404 linhas; sobraram
