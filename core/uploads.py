@@ -40,7 +40,18 @@ def validate_private_document_upload(uploaded_file):
                     warnings.simplefilter("error", Image.DecompressionBombWarning)
                     image = Image.open(uploaded_file)
                     image.verify()
-            except (UnidentifiedImageError, OSError, ValueError, Image.DecompressionBombWarning) as exc:
+            # `SyntaxError` entrou na lista por medição, não por precaução: um PNG com
+            # CRC quebrado faz `Image.verify()` levantar `SyntaxError` de dentro do
+            # `PngImagePlugin`, que não descende de `OSError` nem de `ValueError`. Sem
+            # ele, arquivo corrompido virava 500 em vez de recusa com mensagem. O
+            # caminho nunca havia sido exercitado porque a política não rodava (QA-04).
+            except (
+                UnidentifiedImageError,
+                OSError,
+                ValueError,
+                SyntaxError,
+                Image.DecompressionBombWarning,
+            ) as exc:
                 raise ValidationError("O conteúdo não corresponde a uma imagem válida.") from exc
     finally:
         uploaded_file.seek(position)

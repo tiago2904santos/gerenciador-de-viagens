@@ -162,22 +162,22 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 
 ### Fase 0 — Defeitos que atingem o usuário agora
 - [ ] `BE-01` wizard de plano de trabalho não finaliza e "Voltar" avança
-- [ ] `BE-02` exclusão de anexo por `GET`, sem CSRF
-- [ ] `JS-01` XSS: nome de pasta do Drive cru em `aria-label`
+- [x] `BE-02` exclusão de anexo por `GET`, sem CSRF
+- [x] `JS-01` XSS: nome de pasta do Drive cru em `aria-label`
 - [ ] `HT-01` foco de teclado invisível em todo campo, inclusive no login
 - [ ] `BE-04` formulário de evento oferece documentos de outras áreas
 - [ ] `BE-03` filtro de data da lista de ofícios descartado em silêncio
 - [ ] `BE-05` seletor de modelo de motivo da OS expõe outras áreas
 - [ ] `BE-06` relatório técnico sai com a cidade-sede de outra área
 - [ ] `BE-07` exclusão de anexo dá 500 e deixa registro órfão
-- [ ] `BE-08` seis redirects seguem o que o POST mandar
+- [x] `BE-08` oito redirects seguem o que o POST mandar
 - [ ] `JS-04` `.then()` sem `.catch` no editor de roteiros
 - [ ] `HT-09` login sem skip link e sem erro associado
 - [ ] `HT-11` campos de formulário renderizados sem nome acessível (5 medidos em 2 telas)
-- [ ] `QA-01` login do Django Admin sem rate limit nenhum
-- [ ] `QA-02` rate limit depende de um Redis que nenhum ambiente declara
-- [ ] `QA-04` 🔴 a validação central de upload nunca roda, nos 5 tipos de anexo
-- [ ] `QA-09` dois templates de `.env` de produção divergentes
+- [x] `QA-01` login do Django Admin sem rate limit nenhum
+- [x] `QA-02` rate limit depende de um Redis que nenhum ambiente declara
+- [x] `QA-04` 🔴 a validação central de upload nunca roda, nos 5 tipos de anexo
+- [x] `QA-09` dois templates de `.env` de produção divergentes
 - [ ] `JS-11` `maskCep` duplicada e `onlyDigits` em 4 cópias
 - [ ] `JS-12` `CV.registry` e `CV.componentRegistry` são o mesmo objeto
 

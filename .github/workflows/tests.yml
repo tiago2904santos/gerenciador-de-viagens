@@ -85,6 +85,10 @@ jobs:
           CSRF_TRUSTED_ORIGINS: "https://localhost"
           DOCUMENTOS_DEFAULT_PDF_ENGINE: "unoserver"
           DOCUMENTOS_UNOSERVER_URL: "http://127.0.0.1:2003"
+          # QA-02: prod passou a exigir REDIS_URL — o cache é compartilhado entre os
+          # workers e sustenta o rate limit de login. Aqui nada conecta: o
+          # `check --deploy` só lê a configuração, não abre socket.
+          REDIS_URL: "redis://127.0.0.1:6379/1"
         # A chave é gerada aqui, não commitada: o `check --deploy` só exige que
         # ela exista e seja válida — não cifra nada. Um literal no arquivo seria
         # indistinguível de um segredo de verdade, para o scanner e para quem lê.

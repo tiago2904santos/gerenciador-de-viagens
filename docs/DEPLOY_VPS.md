@@ -147,6 +147,19 @@ Preencha:
 - `MEDIA_ROOT` — `/var/www/gerenciador-viagens/media`
 - `STATIC_ROOT` — `/var/www/gerenciador-viagens/staticfiles`
 - `DJANGO_SETTINGS_MODULE` — `config.settings.prod`
+- `FIELD_ENCRYPTION_KEYS` — cifragem dos tokens do Drive; `prod.py` recusa subir sem ela
+- `REDIS_URL` — `redis://127.0.0.1:6379/1` (o Redis do passo 2.3)
+
+> **`REDIS_URL` passou a ser obrigatória (`QA-02`).** O Redis já era exigido aqui como
+> broker do Celery, mas o Django não o usava como cache: sem a variável ele caía para
+> `LocMemCache`, que é **por processo**. Com os 3 workers do gunicorn, o rate limit de
+> login (5 tentativas / 15 min) virava até ~15 antes de um worker bloquear sozinho, e
+> zerava a cada `systemctl restart` — que o próprio deploy executa. `/metrics/` sofria
+> do mesmo: contava só o worker que atendeu à requisição.
+>
+> `config/settings/prod.py` agora recusa subir sem ela, em vez de degradar em silêncio.
+> **Num servidor já no ar, acrescente a linha ao `.env` antes do próximo deploy** — o
+> `migrate` do `deploy.yml` roda com settings de produção e vai falhar sem ela.
 
 ### 4.4 Crie os diretórios de mídia
 

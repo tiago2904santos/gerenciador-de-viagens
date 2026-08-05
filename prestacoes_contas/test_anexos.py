@@ -196,6 +196,23 @@ class AnexoExclusaoTests(PrestacaoFixturesMixin, TestCase):
         # Apagar só a linha deixaria o arquivo órfão no storage.
         self.assertFalse(caminho.exists())
 
+    def test_exclusao_por_get_e_recusada_e_o_anexo_sobrevive(self):
+        """BE-02 — apagar é efeito colateral; `GET` não pode causá-lo.
+
+        Sem `@require_POST`, qualquer requisição autenticada apagava o anexo e o
+        arquivo do storage: prefetch do navegador, `<img src>` em página de terceiro,
+        crawler interno, link colado em chat. Prestação não tem lixeira.
+        """
+        caminho = Path(self.anexo.arquivo.path)
+
+        response = self.client.get(self.url())
+
+        self.assertEqual(response.status_code, 405)
+        self.assertTrue(
+            PrestacaoDocumentoAnexo.objects.filter(pk=self.anexo.pk).exists()
+        )
+        self.assertTrue(caminho.exists())
+
     def test_exclusao_marca_servidor_em_preenchimento(self):
         self.client.post(self.url())
 

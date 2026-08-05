@@ -4,8 +4,15 @@ from django.contrib import admin
 from django.urls import include
 from django.urls import path
 
+from core.admin_login import admin_login_com_limite
+
 
 urlpatterns = [
+    # QA-01: precisa vir ANTES de admin.site.urls — o resolver casa a primeira rota,
+    # e é assim que o login do admin passa a ter o mesmo limite de tentativas do
+    # login da aplicação. `reverse("admin:login")` continua devolvendo /admin/login/,
+    # que é justamente esta view.
+    path("admin/login/", admin_login_com_limite, name="admin_login"),
     path("admin/", admin.site.urls),
     path("", include("core.urls")),
     path("usuarios/", include("usuarios.urls")),

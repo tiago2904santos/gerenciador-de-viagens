@@ -84,7 +84,7 @@ que apaga os próprios erros ensina a confiar demais nele.
 imports em `identification_views.py`, `per_diem_views.py`, `activity_views.py`,
 `document_views.py`. Teste de caracterização antes.
 
-### BE-02 🔴 Exclusão de anexo de prestação por `GET`, sem CSRF · AUD · 0,5 d · risco baixo
+### BE-02 ✅ RESOLVIDO (504d6bd7) · 🔴 Exclusão de anexo de prestação por `GET`, sem CSRF · AUD · 0,5 d · risco baixo
 
 `prestacoes_contas/document_views.py:341` — `prestacao_documento_excluir` não tem decorator
 nenhum. `require_POST` está **importado na linha 9 e nunca aplicado** neste arquivo. O corpo faz
@@ -152,7 +152,7 @@ Com `nome_original` vazio (`blank=True, default=""`), `__str__` devolve `None`.
 **Efeito:** 500 na exclusão; o arquivo some do disco e a linha fica na tabela.
 **Correção:** `str(instance or "")` com fallback `f"{label}#{pk}"`; inverter a ordem no view.
 
-### BE-08 🟠 Oito redirects seguem o que o POST mandar · AUD+VER · 0,5 d
+### BE-08 ✅ RESOLVIDO (5115d04d) · 🟠 Oito redirects seguem o que o POST mandar · AUD+VER · 0,5 d
 
 `core/retorno.py` existe para isso e documenta o risco de open redirect no próprio docstring
 (linhas 22-28), validando com `url_has_allowed_host_and_scheme`. Não é usado em
@@ -597,7 +597,7 @@ O que o projeto decidiu automatizar, funcionou: **zero** `fetch()` cru, **zero**
 as fontes (`build_shell_bundles.py --check` = OK, 25 JS + 24 CSS). Os defeitos abaixo estão todos
 **fora** do que o auditor de CI mede.
 
-### JS-01 🔴 XSS por nome de pasta do Google Drive não escapado · AUD · 0,25 d
+### JS-01 ✅ RESOLVIDO (9d87cad9) · 🔴 XSS por nome de pasta do Google Drive não escapado · AUD · 0,25 d
 
 `static/js/pages/gdrive_config.js:112` e `:117` — `pasta.name` é interpolado cru dentro de
 `aria-label="…"` num template literal atribuído a `item.innerHTML`. **Duas linhas abaixo, na 114,
@@ -1053,7 +1053,7 @@ estão **fora desse perímetro**.
 
 Cobertura total dos 15 apps do CI: **73,21%** (19.955/27.258 statements).
 
-### QA-01 🟠 Login do Django Admin sem rate limit nenhum · AUD · 1 d
+### QA-01 ✅ RESOLVIDO (c4fd659f) · 🟠 Login do Django Admin sem rate limit nenhum · AUD · 1 d
 
 `config/urls.py:9` monta `admin.site.urls` sem `AdminSite` customizado. O único rate limit do
 sistema é `core/views.py:969-1006` (`LoginView`), que cobre só `core:login`. O admin usa a própria
@@ -1062,7 +1062,7 @@ nem equivalente em `requirements/*.txt`.
 **Efeito:** `/admin/` concede superusuário e é a porta sem nenhuma fricção contra força bruta — só
 a política de senha (mínimo 12 caracteres) a segura. São 223 rotas de admin no resolver.
 
-### QA-02 🟠 O rate limit depende de um Redis que nenhum ambiente declara · AUD · 0,5 d
+### QA-02 ✅ RESOLVIDO (fe43b1d8) · 🟠 O rate limit depende de um Redis que nenhum ambiente declara · AUD · 0,5 d
 
 `config/settings/base.py:113-122` cai para `LocMemCache` quando `REDIS_URL` está vazio. **Nenhum**
 dos quatro templates de env declara `REDIS_URL` (`.env.example`, `.env.production.example`,
@@ -1086,7 +1086,7 @@ produção, mas a frase não está na checklist de campos obrigatórios do `DEPL
 health check em `:116-119`), o `trap ERR` devolve o código antigo rodando contra um schema que ele
 não entende. O backup existe e não é usado — a recuperação vira intervenção manual sob pressão.
 
-### QA-04 🔴 A validação central de upload nunca roda, nos 5 tipos de anexo · AUD+VER · 1,5 d
+### QA-04 ✅ RESOLVIDO (c021ce25) · 🔴 A validação central de upload nunca roda, nos 5 tipos de anexo · AUD+VER · 1,5 d
 
 > **Este ID foi agravado pela verificação (05/08).** A versão original dizia que **um** campo
 > (`despacho_assinado`) escapava da política central, e que era o único. A verificação achou algo
@@ -1169,7 +1169,7 @@ defasagem, não de vulnerabilidade confirmada.
 `docxtpl` e `redis` seguem em uso e entram no `pip-compile --upgrade` trimestral, com a suíte
 completa a cada bump.
 
-### QA-09 🟡 Dois templates de `.env` de produção divergentes · AUD · 0,25 d
+### QA-09 ✅ RESOLVIDO (fe43b1d8) · 🟡 Dois templates de `.env` de produção divergentes · AUD · 0,25 d
 
 `diff .env.production.example .env.producao.example`: nomes de banco diferentes
 (`viagens_prod`/`viagens_user` contra `central_viagens_prod`/`central_viagens_prod_user`), caminhos

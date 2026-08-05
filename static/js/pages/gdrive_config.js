@@ -108,13 +108,18 @@
         item.dataset.nome = pasta.name;
         item.setAttribute("aria-pressed", "false");
 
+        // JS-01: o nome vem do Drive e pode conter aspas — em pasta compartilhada,
+        // quem tem escrita escolhe o nome. Sem escape, o atributo fecha e o resto
+        // do texto vira atributo do elemento (ex.: onmouseover), executado na
+        // página autenticada. A linha do meio já escapava; faltavam os aria-label.
+        const nomeSeguro = window.CV.util.escapeHtml(pasta.name);
         item.innerHTML = `
-          <button type="button" class="gdrive-folder-item__select" aria-label="Selecionar pasta ${pasta.name}">
+          <button type="button" class="gdrive-folder-item__select" aria-label="Selecionar pasta ${nomeSeguro}">
             <span class="gdrive-folder-item__icon" aria-hidden="true">${icon}</span>
-            <span class="gdrive-folder-item__name">${window.CV.util.escapeHtml(pasta.name)}</span>
+            <span class="gdrive-folder-item__name">${nomeSeguro}</span>
           </button>
           <button type="button" class="gdrive-folder-item__enter cv-btn cv-btn--ghost cv-btn--xs"
-                  aria-label="Abrir pasta ${pasta.name}">
+                  aria-label="Abrir pasta ${nomeSeguro}">
             Abrir →
           </button>
         `;

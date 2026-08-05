@@ -13,6 +13,7 @@ from core.forms.widgets import WidgetStyle
 from core.forms.widgets import widget_attrs
 from core.normalizers import normalize_spaces
 from core.tenancy import filter_queryset_by_area
+from core.uploads import validate_private_document_upload
 from core.utils.masks import normalize_protocolo
 
 from .models import DiarioBordo
@@ -399,17 +400,41 @@ class PrestacaoMultipleFileField(forms.FileField):
     def clean(self, data, initial=None):
         if not data:
             return []
-        single_file_clean = super().clean
         if isinstance(data, (list, tuple)):
-            return [single_file_clean(item, initial) for item in data]
-        return [single_file_clean(data, initial)]
+            return [self._clean_um(item, initial) for item in data]
+        return [self._clean_um(data, initial)]
+
+    def _clean_um(self, item, initial):
+        """Guarda o nome recebido antes de validar.
+
+        `validate_private_document_upload` normaliza `uploaded_file.name` como efeito
+        colateral (é o nome com que o arquivo vai para o disco). Quem lê o nome depois
+        da validação recebe "Saque-Agosto.pdf" onde o usuário enviou "Saque Agosto.pdf"
+        — e `nome_original` existe justamente para mostrar o que o usuário enviou.
+        """
+        nome_recebido = Path(getattr(item, "name", "") or "").name
+        limpo = super().clean(item, initial)
+        if limpo is not None:
+            limpo.nome_recebido = nome_recebido
+        return limpo
+
+
+def _nome_recebido(arquivo):
+    """Nome como o usuário enviou, não o nome normalizado para o disco (ver `_clean_um`)."""
+    guardado = getattr(arquivo, "nome_recebido", None)
+    return guardado or Path(getattr(arquivo, "name", "") or "").name
 
 
 def _anexo_multiple_file_field(label):
     return PrestacaoMultipleFileField(
         label=label,
         required=False,
-        validators=[FileExtensionValidator(PRESTACAO_DOCUMENTO_EXTENSOES)],
+        # QA-04: a política central precisa rodar aqui. O modelo declara
+        # `validate_private_document_upload` em `arquivo`, mas os três caminhos de
+        # escrita gravam por `.objects.create()`, e validador de campo não roda em
+        # `create()`. Validar no formulário devolve erro de campo ao usuário, em vez
+        # de aceitar arquivo que mente sobre o próprio conteúdo.
+        validators=[validate_private_document_upload],
         help_text="Anexe PDF, PNG, JPG ou JPEG.",
         widget=PrestacaoMultipleFileInput(
             attrs={
@@ -442,7 +467,7 @@ class PrestacaoDespachoForm(forms.ModelForm):
                 servidor_prestacao=None,
                 tipo=PrestacaoDocumentoAnexo.TIPO_DESPACHO,
                 arquivo=arquivo,
-                nome_original=Path(getattr(arquivo, "name", "") or "").name,
+                nome_original=_nome_recebido(arquivo),
             )
 
 
@@ -485,7 +510,7 @@ class PrestacaoServidorDocumentosForm(forms.ModelForm):
                 servidor_prestacao=servidor_prestacao,
                 tipo=tipo,
                 arquivo=arquivo,
-                nome_original=Path(getattr(arquivo, "name", "") or "").name,
+                nome_original=_nome_recebido(arquivo),
             )
 
     def save_anexos(self, servidor_prestacao):
