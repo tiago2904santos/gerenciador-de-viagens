@@ -11,7 +11,9 @@ from core.autosave import parse_autosave_payload
 from .services import atividades_catalogo_ativas
 from .services import presets_atividades_ativos
 from .services import sincronizar_atividades
-from .view_helpers import _get_plano, _wizard_normalizar_acao, _redirect_plano_lista, _wizard_shell_ctx, _plano_autosave_version
+from core.wizard import normalizar_acao_do_wizard
+
+from .view_helpers import _get_plano, _redirect_plano_lista, _wizard_shell_ctx, _plano_autosave_version
 
 
 def _atividades_context(*, plano, catalogo, selected_codes):
@@ -114,7 +116,7 @@ def wizard_atividades(request, pk):
     plano = _get_plano(pk)
     catalogo = atividades_catalogo_ativas()
     if request.method == "POST":
-        nav_action = _wizard_normalizar_acao(request.POST)
+        nav_action = normalizar_acao_do_wizard(request.POST)
         codigos = request.POST.getlist("atividades_codigos")
         selecionadas = [item for item in catalogo if item.codigo in codigos]
         plano.atividades_selecionadas.set(selecionadas)

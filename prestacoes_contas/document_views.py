@@ -358,9 +358,13 @@ def prestacao_documento_excluir(request, pc_pk, anexo_pk):
         prestacao=prestacao,
     )
     ps_marcar = anexo.servidor_prestacao
-    if anexo.arquivo:
-        anexo.arquivo.delete(save=False)
+    # BE-07: apagar o arquivo primeiro zera `FieldFile.name`, e com `nome_original`
+    # vazio o `__str__` do anexo passava a devolver None — o que derrubava o sinal
+    # de auditoria no pre_delete. A linha sai primeiro; o arquivo, depois.
+    arquivo = anexo.arquivo if anexo.arquivo else None
     anexo.delete()
+    if arquivo:
+        arquivo.delete(save=False)
     if ps_marcar is not None:
         _marcar_servidor_em_preenchimento(ps_marcar)
     else:

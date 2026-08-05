@@ -59,7 +59,7 @@ que apaga os próprios erros ensina a confiar demais nele.
 
 ## BE — Arquitetura backend
 
-### BE-01 🔴 "Finalizar plano" não finaliza e "Voltar" avança · AUD · 0,5 d · risco baixo
+### BE-01 ✅ RESOLVIDO · 🔴 "Finalizar plano" não finaliza e "Voltar" avança · AUD · 0,5 d · risco baixo
 
 `planos_trabalho/view_helpers.py:22` lê apenas `post.get("action")` e cai no default
 `"wizard_next"`. Os botões do wizard vêm de `_documentos_preview_footer.html` →
@@ -97,7 +97,7 @@ lixeira.
 **Correção:** `@require_POST`; garantir que o JS chame por POST; auditar template que monte a URL
 como `<a href>`. Regressão: `GET` deve devolver 405 e o anexo continuar existindo.
 
-### BE-03 🟠 Filtro "criado de/até" da lista de ofícios é descartado em silêncio · AUD · 0,5 d
+### BE-03 ✅ RESOLVIDO · 🟠 Filtro "criado de/até" da lista de ofícios é descartado em silêncio · AUD · 0,5 d
 
 `oficios/selectors.py:103-112` usa `data_criacao__date__gte`/`__date__lte`, mas
 `Oficio.data_criacao` é `DateField` (`oficios/models.py:49`). Medido:
@@ -143,7 +143,7 @@ modelo tem `area`. Teste com A1/A2: o queryset devolveu os dois.
 **Efeito:** área recém-criada, que ainda não configurou nada, emite documento oficial com o
 município de outra.
 
-### BE-07 🟠 Exclusão de anexo dá 500 e deixa registro órfão · AUD · 0,5 d
+### BE-07 ✅ RESOLVIDO · 🟠 Exclusão de anexo dá 500 e deixa registro órfão · AUD · 0,5 d
 
 `core/audit.py:146` faz `str(instance)[:255]` em `capture_before_delete`.
 `prestacoes_contas/models.py:307` — `__str__` devolve `self.nome_original or self.arquivo.name`, e

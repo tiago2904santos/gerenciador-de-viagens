@@ -37,7 +37,6 @@ from .view_helpers import (
     _plano_lista_url,
     _querydict_from_pairs,
     _redirect_plano_lista,
-    _wizard_normalizar_acao,
     _wizard_shell_ctx,
     _wizard_steps_ctx,
 )

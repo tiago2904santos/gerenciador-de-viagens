@@ -1,7 +1,10 @@
+from datetime import date
+
 from django.db.models import Prefetch
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.dateparse import parse_date
 
 from core.normalizers import normalize_plate
 from core.normalizers import remove_accents
@@ -26,6 +29,17 @@ _SORT_MAP = {
     "numero_desc":  ["-numero", "-ano"],
     "numero_asc":   ["numero",  "ano"],
 }
+
+
+def _como_data(valor):
+    """Aceita `date` ou string ISO do querystring; devolve `None` para o resto.
+
+    Existe para que a lista não estoure com `?criacao_de=abc`, sem voltar ao
+    `except Exception: pass` que escondia o `FieldError` do BE-03.
+    """
+    if not valor or isinstance(valor, date):
+        return valor or None
+    return parse_date(str(valor))
 
 
 def listar_oficios(
@@ -100,16 +114,19 @@ def listar_oficios(
             except (ValueError, IndexError):
                 pass
         queryset = queryset.filter(filters).distinct()
+    # BE-03: `data_criacao` é DateField, e `__date` só existe em DateTimeField —
+    # o lookup levantava FieldError, que dois `except Exception: pass` engoliam.
+    # O usuário preenchia o intervalo e recebia a lista inteira, sem aviso.
+    #
+    # A view passa string crua do querystring, então a data é normalizada aqui,
+    # em vez de engolida: texto que não é data vira `None` e o filtro não se
+    # aplica — mas erro de *consulta* deixa de ser silenciado, que era o defeito.
+    criacao_de = _como_data(criacao_de)
+    criacao_ate = _como_data(criacao_ate)
     if criacao_de:
-        try:
-            queryset = queryset.filter(data_criacao__date__gte=criacao_de)
-        except Exception:
-            pass
+        queryset = queryset.filter(data_criacao__gte=criacao_de)
     if criacao_ate:
-        try:
-            queryset = queryset.filter(data_criacao__date__lte=criacao_ate)
-        except Exception:
-            pass
+        queryset = queryset.filter(data_criacao__lte=criacao_ate)
     # Sobreposição de período: mostra ofícios cuja viagem cruza com [viagem_de, viagem_ate].
     # Condição de sobreposição: saida <= viagem_ate  E  chegada >= viagem_de
     if viagem_de or viagem_ate:

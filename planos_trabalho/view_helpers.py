@@ -18,13 +18,6 @@ def _get_plano(pk) -> PlanoTrabalho:
     return get_plano_by_id(pk)
 
 
-def _wizard_normalizar_acao(post, *, default: str = "wizard_next") -> str:
-    action = (post.get("action") or default).strip()
-    if action == "save_continue":
-        return "wizard_next"
-    return action
-
-
 def _evento_etapa_url(evento_id):
     if evento_id:
         return reverse("eventos:guiado_etapa", kwargs={"pk": evento_id, "etapa": 4})

@@ -64,6 +64,27 @@ def _json_value(value):
     return str(value)
 
 
+def _repr_seguro(instance) -> str:
+    """Rótulo do objeto para a trilha, tolerante a `__str__` mal-comportado (BE-07).
+
+    Os sinais estão conectados globalmente a 11 apps, então esta função roda para
+    todo modelo auditado — e um `__str__` que devolve `None` fazia o próprio
+    `str()` levantar `TypeError`, derrubando a operação que a auditoria só deveria
+    observar. Foi o que acontecia ao excluir anexo de prestação com
+    `nome_original` vazio: 500, e a linha ficava órfã no banco.
+
+    Perder o rótulo legível é aceitável; perder o rastro do objeto não — daí o
+    fallback carregar o rótulo do modelo e a pk.
+    """
+    try:
+        rotulo = str(instance)
+    except Exception:
+        rotulo = None
+    if isinstance(rotulo, str) and rotulo:
+        return rotulo[:255]
+    return f"{instance._meta.label}#{instance.pk}"[:255]
+
+
 def _snapshot(instance):
     values = {}
     for field in instance._meta.concrete_fields:
@@ -129,7 +150,7 @@ def capture_after_save(sender, instance, created=False, raw=False, **kwargs):
         "action": action,
         "model_label": instance._meta.label,
         "object_id": str(instance.pk),
-        "object_repr": str(instance)[:255],
+        "object_repr": _repr_seguro(instance),
         "changes": changes,
     }
     transaction.on_commit(lambda payload=payload: _write_event(payload))
@@ -143,7 +164,7 @@ def capture_before_delete(sender, instance, **kwargs):
         "action": "DELETE",
         "model_label": instance._meta.label,
         "object_id": str(instance.pk),
-        "object_repr": str(instance)[:255],
+        "object_repr": _repr_seguro(instance),
         "changes": {"old": _snapshot(instance)},
     }
     transaction.on_commit(lambda payload=payload: _write_event(payload))

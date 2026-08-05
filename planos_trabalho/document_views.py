@@ -14,7 +14,9 @@ from .services import montar_efetivo_texto
 from .services import sincronizar_scratchpad
 from .services import montar_texto_coordenacao
 from .services import montar_valor_do_plano_texto
-from .view_helpers import _get_plano, _wizard_normalizar_acao, _redirect_plano_lista, _wizard_shell_ctx
+from core.wizard import normalizar_acao_do_wizard
+
+from .view_helpers import _get_plano, _redirect_plano_lista, _wizard_shell_ctx
 
 
 def wizard_documentos(request, pk):
@@ -25,7 +27,7 @@ def wizard_documentos(request, pk):
     pendencias = avaliar_pendencias_documento(plano)
 
     if request.method == "POST":
-        nav_action = _wizard_normalizar_acao(request.POST, default="save_draft")
+        nav_action = normalizar_acao_do_wizard(request.POST, default="save_draft")
         if nav_action == "finalizar":
             if pendencias:
                 for msg in pendencias:

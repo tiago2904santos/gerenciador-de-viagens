@@ -20,7 +20,9 @@ from .services import texto_padrao_consideracao_final
 from .services import texto_padrao_coordenacao
 from .services import texto_padrao_contextualizacao
 from .services import textos_padrao_templates
-from .view_helpers import _get_plano, _wizard_normalizar_acao, _redirect_plano_lista, _wizard_shell_ctx, _plano_autosave_version, _querydict_from_pairs, _merge_payload_fields, _autosave_form_errors
+from core.wizard import normalizar_acao_do_wizard
+
+from .view_helpers import _get_plano, _redirect_plano_lista, _wizard_shell_ctx, _plano_autosave_version, _querydict_from_pairs, _merge_payload_fields, _autosave_form_errors
 
 
 def _plano_identificacao_autosave_data(plano: PlanoTrabalho):
@@ -145,7 +147,7 @@ def wizard_identificacao(request, pk):
     plano = _get_plano(pk)
     form = PlanoIdentificacaoForm(request.POST or None, instance=plano)
     if request.method == "POST":
-        nav_action = _wizard_normalizar_acao(request.POST)
+        nav_action = normalizar_acao_do_wizard(request.POST)
         if form.is_valid():
             plano = form.save()
             plano.contextualizacao_auto = (request.POST.get("contextualizacao_auto", "1") or "0").strip() != "0"

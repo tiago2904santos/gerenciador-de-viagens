@@ -24,7 +24,9 @@ from .view_navigation import cadastro_create_url as _cadastro_create_url
 from .view_navigation import oficio_back_label as _oficio_back_label
 from .view_navigation import oficio_back_url as _oficio_back_url
 from .view_navigation import url_with_next as _url_with_next
-from .view_helpers import _redirect_lista_oficio, _wizard_normalizar_acao, _wizard_persist_action_para_dados_viajantes, _wizard_footer_ctx, _wizard_shell_ctx, _motorista_oficio_numero_display, _prepare_dados_viajantes_form, _prepare_transporte_form, _merge_payload_fields, _oficio_dados_viajantes_autosave_data, _oficio_transporte_autosave_data, _oficio_autosave_version, _autosave_form_errors
+from core.wizard import normalizar_acao_do_wizard
+
+from .view_helpers import _redirect_lista_oficio, _wizard_persist_action_para_dados_viajantes, _wizard_footer_ctx, _wizard_shell_ctx, _motorista_oficio_numero_display, _prepare_dados_viajantes_form, _prepare_transporte_form, _merge_payload_fields, _oficio_dados_viajantes_autosave_data, _oficio_transporte_autosave_data, _oficio_autosave_version, _autosave_form_errors
 
 
 def _wizard_dados_viajantes_context(
@@ -227,7 +229,7 @@ def dados_viajantes(request, pk):
     _prepare_dados_viajantes_form(form)
     _prepare_transporte_form(transporte_form)
     if request.method == "POST":
-        nav_action = _wizard_normalizar_acao(request.POST)
+        nav_action = normalizar_acao_do_wizard(request.POST)
         dados_ok = form.is_valid()
         save_transport = request.POST.get("transporte_embed") == "1"
         transporte_valido = bool(save_transport and transporte_form.is_valid())
@@ -319,7 +321,7 @@ def transporte(request, pk):
     form = OficioTransporteForm(request.POST or None, instance=oficio)
     _prepare_transporte_form(form)
     if request.method == "POST" and form.is_valid():
-        nav_action = _wizard_normalizar_acao(request.POST)
+        nav_action = normalizar_acao_do_wizard(request.POST)
         oficio = atualizar_oficio_transporte(
             oficio,
             form,
