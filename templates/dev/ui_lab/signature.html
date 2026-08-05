@@ -20,7 +20,7 @@
         <span class="ui-lab-preview-card__label">Solicitação de assinatura</span>
         <span class="ui-lab-status-pill ui-lab-status-pill--done">Componente real</span>
       </div>
-      {% include "components/documents/signature_card.html" with signature=ui_lab_signature next_url="#" only %}
+      {% include "components/documents/signature_card.html" with signature=ui_lab_signature next_url=request.path only %}
     </article>
   </section>
 {% endblock %}
