@@ -4,6 +4,20 @@ set -euo pipefail
 : "${DB_NAME:?DB_NAME obrigatório}"
 : "${BACKUP_ENCRYPTION_KEY:?BACKUP_ENCRYPTION_KEY obrigatório}"
 
+# pg_dump lê PGHOST/PGPORT/PGUSER/PGPASSWORD, nunca DB_*. Quem chama isto com
+# o .env da aplicação (cron diário, execução manual na VPS) só tem DB_*, e sem
+# esta ponte o pg_dump tenta o socket Unix usando o usuário do SO como role —
+# que não existe no Postgres. Quem já exporta PG* explicitamente continua
+# mandando: é o caso do CI, que fala com um service container por TCP.
+export PGHOST="${PGHOST:-${DB_HOST:-127.0.0.1}}"
+export PGPORT="${PGPORT:-${DB_PORT:-5432}}"
+if [[ -z "${PGUSER:-}" && -n "${DB_USER:-}" ]]; then
+  export PGUSER="${DB_USER}"
+fi
+if [[ -z "${PGPASSWORD:-}" && -n "${DB_PASSWORD:-}" ]]; then
+  export PGPASSWORD="${DB_PASSWORD}"
+fi
+
 APP_ROOT="${APP_ROOT:-/var/www/gerenciador-viagens/app}"
 MEDIA_ROOT="${MEDIA_ROOT:-/var/www/gerenciador-viagens/media}"
 BACKUP_ROOT="${BACKUP_ROOT:-/var/backups/gerenciador-viagens}"

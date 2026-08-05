@@ -731,6 +731,40 @@ A separação importa: só as quatro primeiras mudavam o comportamento do sistem
 > linha de novo. Custo constante, não escala com dados — por isso ficou fora deste
 > PR, mas é a explicação dos +7/+4 nos orçamentos de query.
 
+### Revert da reescrita de CSS e o deploy travado (05/08/2026)
+
+Duas coisas no mesmo PR, e é deliberado: uma não sobe sem a outra.
+
+**Revert dos PRs #153–#177.** Por decisão do usuário, a reescrita de CSS `NOVO-30`
+inteira e o que veio junto foram descartados. O revert é **de conteúdo, não de
+histórico**: a árvore voltou byte a byte para `ae37d635`, os 62 commits continuam no
+histórico do `main` e os PRs seguem mesclados — qualquer parte volta por cherry-pick.
+Nenhuma migração entrou naquele intervalo, então o banco não é afetado.
+
+Efeito colateral a saber: os IDs `NOVO-28` a `NOVO-55` foram gastos nos commits
+revertidos e este catálogo voltou a terminar no `NOVO-27`. **Não reaproveite `NOVO-28`
+em diante** — a numeração nova continua do `NOVO-56`, senão um cherry-pick futuro
+colide com o ID.
+
+- [x] `NOVO-56` 🔴 **backup pré-deploy nunca recebeu as credenciais do Postgres, e por
+  isso produção ficou 9 dias sem deploy.** O passo de backup entrou em `39f16be1`
+  (27/07). `scripts/backup_production.sh` chama `pg_dump` sem `--host`/`--username`,
+  e `pg_dump` lê `PGHOST`/`PGPORT`/`PGUSER`/`PGPASSWORD` — **nunca** `DB_*`. O
+  `deploy.yml` faz `source .env`, o que exporta só os `DB_*`, então na VPS o `pg_dump`
+  caía no socket Unix usando o usuário do SSH como role: `role "***" does not exist`.
+  Com `set -Eeuo pipefail`, isso derruba o deploy **antes** do `git checkout` — e como
+  o `trap ... ERR` só é armado depois do backup, a reversão automática nunca rodou.
+  Todo deploy desde 27/07 falhou assim; o último bem-sucedido é `e97a41c3`, de 27/07.
+  O CI nunca pegou porque `tests.yml` exporta os `PG*` na mão para falar com o service
+  container (é o próprio comentário lá que diz que `pg_dump` não lê `DB_*`).
+  Corrigido nos dois lados: `deploy.yml` exporta os `PG*` a partir dos `DB_*` do
+  `.env` (e agora exige `DB_USER`/`DB_PASSWORD` na pré-checagem), e o script passou a
+  derivar `PG*` de `DB_*` quando o chamador não os define — este segundo lado é o que
+  conserta o backup diário por cron de `OPERACAO_SEGURANCA_PRIVACIDADE.md`, que falhava
+  em silêncio pelo mesmo motivo. O `deploy.yml` precisava do conserto próprio porque o
+  backup roda a partir do checkout **antigo** da VPS, e o script corrigido só chega lá
+  depois de um deploy dar certo.
+
 ---
 
 ## 7.1 Escopo novo, fora das oito etapas
