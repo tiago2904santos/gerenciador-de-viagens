@@ -47,7 +47,7 @@
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Contrato data-*</span>
         </div>
         <div data-collection data-collection-mode="client">
-          {% include "components/ui/headers/filter_page_header.html" with eyebrow="Registros" title="Filtrar documentos" icon_label="FL" search_name="q" search_placeholder="Buscar por título" search_clear_url="#" status_options=ui_lab_filter_options status_name="status" status_label="Status" only %}
+          {% include "components/ui/headers/filter_page_header.html" with eyebrow="Registros" title="Filtrar documentos" icon_label="FL" search_name="q" search_placeholder="Buscar por título" search_clear_url=request.path status_options=ui_lab_filter_options status_name="status" status_label="Status" only %}
           <div class="simple-list" role="list">
             {% for row in ui_lab_simple_rows %}
               {% include "components/lists/simple_list_row.html" with row=row only %}

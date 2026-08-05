@@ -520,6 +520,7 @@ def _categories_with_urls():
 def _base_context(active_slug):
     categories = _categories_with_urls()
     current = next((c for c in categories if c["slug"] == active_slug), None)
+    vitrine = reverse("ui_lab2:index")
     return {
         "ui_lab2_categories": categories,
         "ui_lab2_current": current,
@@ -529,11 +530,13 @@ def _base_context(active_slug):
         "demo_form": UiLab2DemoForm(),
         "demo_form_bound": UiLab2DemoForm(data={"texto_obrigatorio": ""}),
         "demo_steps": UI_LAB2_DEMO_STEPS,
+        # Vitrine: link de demonstracao aponta para a propria vitrine, nao
+        # para `#` — ancora vazia so pula a pagina para o topo (NOVO-40).
         "dropdown_items": [
-            {"label": "Abrir", "href": "#"},
-            {"label": "Editar", "href": "#"},
-            {"label": "Baixar DOCX", "href": "#"},
-            {"label": "Excluir", "href": "#", "danger": True, "separator_before": True},
+            {"label": "Abrir", "href": vitrine},
+            {"label": "Editar", "href": vitrine},
+            {"label": "Baixar DOCX", "href": vitrine},
+            {"label": "Excluir", "href": vitrine, "danger": True, "separator_before": True},
         ],
     }
 

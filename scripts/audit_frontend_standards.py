@@ -18,12 +18,13 @@ JS_DIR = ROOT / "static" / "js"
 # ---------------------------------------------------------------------------
 # Exceções documentadas — chave: caminho relativo ao ROOT (posix)
 # ---------------------------------------------------------------------------
-TEMPLATE_EXCEPTIONS: dict[str, dict] = {
-    "templates/core/dashboard.html": {
-        "reason": "Shell dashboard-login-inspired e excecao oficial -- usa 100% CSS vars.",
-        "rules": {"legacy_page_header"},
-    },
-}
+# Vazio de proposito. A unica entrada que existia dispensava
+# `templates/core/dashboard.html` de `legacy_page_header` — e o dashboard nao
+# escreve `page-header` em lugar nenhum desde a reescrita. A dispensa sobrevivia
+# a um defeito da regra, nao a um uso real (NOVO-39). Excecao de ARQUIVO esconde
+# divida: se a regra esta certa, o codigo se ajusta; se esta errada, corrige-se a
+# regra. Foi a decisao da fase 4 para o CSS, e vale igual aqui.
+TEMPLATE_EXCEPTIONS: dict[str, dict] = {}
 
 # A camada de token e o unico lugar do sistema onde uma cor pode ser escrita a
 # mao — nao e "excecao", e a definicao da regra. Carrega-la como dispensa era o
@@ -65,8 +66,16 @@ TEMPLATE_RULES_ERRO = [
 ]
 
 TEMPLATE_RULES_AVISO = [
-    ("href_hash",            re.compile(r'\bhref="#"'),                'href="#" — checar se é intencional'),
-    ("legacy_page_header",   re.compile(r'class="[^"]*\bpage-header\b'), 'Classe page-header legada — migrar para app-page-hero'),
+    # Nao basta olhar `href="#"` escrito a mao: a ancora vazia tambem chega ao
+    # HTML por PARAMETRO de componente — `secondary_url="#"`, `back_url="#"`,
+    # `primary_action_url="#"`. Eram 19 ocorrencias invisiveis para a regra
+    # anterior, contra 10 visiveis (NOVO-40).
+    ("href_hash",            re.compile(r'\b[a-z_]*(?:href|url|link)[a-z_]*=(["\'])#\1'),
+     'Âncora vazia — link que só pula a página para o topo; usar URL real ou <button>'),
+    # Ver `_LEGACY_PAGE_HEADER_PAT`: o alvo e a classe CRUA `page-header`, nao a
+    # familia `page-header-band`/`-stack`/`-rail`, que e o componente canonico.
+    ("legacy_page_header",   re.compile(r'class="[^"]*\bpage-header(?![-\w])'),
+     'Classe page-header crua — o componente é templates/components/ui/headers/page_header.html'),
     ("script_inline",        re.compile(r'<script(?![^>]*\bsrc=)[^>]*>(?!\s*<)'), '<script> inline (sem src) — mover para arquivo .js'),
 ]
 
@@ -90,7 +99,11 @@ _DOMAIN_SELECTOR_PAT = re.compile(
     r'^\s*\.(?:oficio|motivo|roteiro|diario|prestacao|plano|termo|ordem|justificativa)[_-]'
 )
 _ROUTE_TOKEN_PAT = re.compile(r'--route-')
-_LEGACY_PAGE_HEADER_PAT = re.compile(r'^\s*\.page-header\b')
+# `\b` trata o hifen como fronteira, entao `\.page-header\b` casava a familia
+# CANONICA inteira — `.page-header-band`, `.page-header-stack`, `.page-header-rail`
+# — e nao a classe crua que a regra existe para pegar. Sao 60 linhas de CSS e 92
+# de template de puro falso positivo (NOVO-39). O `(?![-\w])` fecha isso.
+_LEGACY_PAGE_HEADER_PAT = re.compile(r'^\s*\.page-header(?![-\w])')
 # Hex color fora de tokens/theme: match #rgb / #rrggbb / #rrggbbaa em valor CSS (não em comentário)
 _HEX_COLOR_PAT = re.compile(r'(?<![\w#])#([0-9a-fA-F]{3,8})\b')
 _CSS_COMMENT_LINE = re.compile(r'^\s*/\*')
