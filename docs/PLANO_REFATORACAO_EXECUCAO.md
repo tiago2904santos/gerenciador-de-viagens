@@ -949,9 +949,48 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
     O gate agora recusa parentese aberto em seletor e item vazio em lista de
     seletores, sem precisar de navegador — e foi conferido com canario.
 
+- [x] **Fase 5a — correcao: o corte apagou CSS em uso.** 05/08/2026.
+  - **`NOVO-37` 🔴 nome composto apagado: card de 3 e de 5+ servidores perdeu uma
+    coluna.** O template escreve `cv-person-list--n{{ card.servidores_count }}` em
+    **cinco** partials (oficios, termos, planos, ordens de servico, eventos). O nome
+    final **nunca existe inteiro** em lugar nenhum, entao uma varredura literal
+    conclui que `.cv-person-list--n3` nao tem consumidor. A fase 5a apagou `--n0`,
+    `--n3` e `--n5..--n9`; sobrou `--n1`, que aparece literal num template. Efeito:
+    card com 3 ou 5 a 9 servidores caiu de **tres colunas para as duas** da regra
+    base. Medido no navegador: **7 variantes erradas** antes, **0** depois.
+  - **Por que nenhuma das provas da 5a viu.** A suite nao le CSS. O gate de sintaxe
+    so olha sintaxe. E a medicao de estilo computado **depende do dado**: nao existe,
+    nos dados de desenvolvimento, card com 3 ou 5+ servidores nas 30 paginas — o
+    seletor nem chega a ser exercitado. Ampliar a lista de paginas nao resolveria;
+    o furo e de dado, nao de cobertura de rota.
+  - **A defesa entra em dois niveis.** `core/tests/test_css_nome_composto.py` declara
+    a familia e exige a regra de cada variante que existe — canario rodado, reprova
+    exatamente `--n3` e `--n5..--n9`. E `scripts/audit_css_morto.py`, cujo criterio
+    considera viva a classe cujo **bloco base** o codigo emite; e o que impede o
+    proximo corte de repetir o erro. Catraca em **314** (`--max-regras`), medida:
+    sao as regras que a varredura da 5a nao alcancava (`@media` aninhado).
+  - **O que NAO era regressao:** outras cinco classes emitidas tambem perderam toda
+    regra — `cv-fact-block--valor`, `cv-field-grid--2`, `cv-file-widget__action`,
+    `prestacao-file-widget__action`, `ui-lab-section--status`. Todas tinham corpo
+    **vazio** ou so comentario. Nao pintam nada; ficaram apagadas.
+  - **`NOVO-38` 🟠 `NameError` na tela de modelo de texto do RT.** Segue igual: era o
+    `NOVO-36` da sessao paralela, que ficou com o numero mas nao com a correcao.
+    `prestacoes_contas/model_views.py` usa `_CAMPO_LABELS` sem definir nem importar;
+    todo GET de "novo modelo" e de "editar" leva 500 e **nenhum teste tocava nessas
+    rotas**. Corrigido, com `prestacoes_contas/test_modelos_texto_crud.py`.
+  - **`NOVO-35` reaberto e fechado de novo.** A causa `:hover` tinha uma segunda
+    camada: `page.click` no login deixa o ponteiro em (1007, 593) e o Playwright nao
+    o devolve na navegacao — cai dentro do 4o card do Dashboard. `mouse.move(2, 2)`
+    nao resolve porque (2, 2) e a sidebar. Agora o ponteiro sai da tela e o
+    instrumento **aborta** se algo abaixo do `<body>` seguir em `:hover`. O `--diff`
+    tambem passou a acusar **elemento que sumiu**: area < 2px sai da captura, entao
+    um colapso de layout sumia em vez de virar diferenca.
+
   > **Para quem pegar a fase 5b:** o alvo e regra **duplicada** entre arquivos,
   > nao regra morta — essa acabou. A ordem da cascata e o risco, entao a medicao
   > tem de ser a mesma: `medir_estilos.py --diff` com as 30 paginas, exigindo 0.
+  > E antes disso ha **314 regras sem consumidor** que a 5a nao alcancou, com a
+  > catraca ja no lugar; cortar essas e um PR proprio.
 
 ---
 

@@ -2633,8 +2633,25 @@ padding-inline: var(--sp-6);
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+/* NOVO-37: o modificador vem do template como `cv-person-list--n{{ contagem }}`
+   — nome composto, que nenhuma varredura literal encontra. A fase 5a apagou
+   --n0, --n3 e --n5..--n9 por isso, e card com 3 ou 5+ servidores caiu para as
+   duas colunas da regra base. */
+.cv-person-list--n0,
 .cv-person-list--n1 {
   grid-template-columns: minmax(0, 1fr);
+}
+
+.cv-person-list--n3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.cv-person-list--n5,
+.cv-person-list--n6,
+.cv-person-list--n7,
+.cv-person-list--n8,
+.cv-person-list--n9 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 /* base card — alinhado ao tile de Documentos / Equipe */
@@ -2684,6 +2701,7 @@ padding-inline: var(--sp-6);
   justify-content: center;
 }
 
+.cv-person-list--n0 .cv-person-row,
 .cv-person-list--n1 .cv-person-row {
   grid-column: 1 / -1;
 }

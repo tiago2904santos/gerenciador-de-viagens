@@ -61,6 +61,14 @@ jobs:
         # Catraca: este número só desce. NOVO-30 fase 1 (refazer): 384 → 335.
         run: python scripts/audit_frontend_standards.py --max-warnings 184
 
+      - name: Block CSS without a consumer (NOVO-37)
+        # Catraca: este número só desce. A fase 5a cortou 5.404 linhas; sobraram
+        # 314 regras que aquela varredura não alcançava (`@media` aninhado). O
+        # alvo é zero, num PR próprio com medição própria — aqui o número só não
+        # sobe. O critério deste auditor preserva nome composto
+        # (`cv-person-list--n{{ contagem }}`), que foi o que a 5a apagou.
+        run: python scripts/audit_css_morto.py --max-regras 314
+
       - name: Block backend architecture regressions (P-01, P-05)
         # Catraca: este número só desce. O P-01 fechou os quatro apps do
         # escopo: eventos 61 → 46, termos → 40, ordens_servico → 37,

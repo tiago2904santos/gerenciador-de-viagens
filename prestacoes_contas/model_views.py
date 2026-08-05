@@ -15,6 +15,12 @@ from core.tenancy import filter_queryset_by_area
 from .forms import ModeloTextoRelatorioTecnicoForm
 from .models import ModeloTextoRelatorioTecnico
 
+# NOVO-38: o modulo usava `_CAMPO_LABELS` sem definir nem importar — todo GET
+# de "novo modelo de texto" e de "editar" morria em NameError. O nome nasceu em
+# `views.py`; aqui ele e derivado da mesma fonte, o proprio model, para nao
+# criar dependencia circular entre os dois modulos de view.
+_CAMPO_LABELS = dict(ModeloTextoRelatorioTecnico.CAMPO_CHOICES)
+
 
 def modelos_index(request):
     q = (request.GET.get("q") or "").strip()
