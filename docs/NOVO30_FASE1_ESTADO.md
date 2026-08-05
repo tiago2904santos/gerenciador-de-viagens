@@ -1,5 +1,11 @@
 # `NOVO-30` fase 1 — estado da fusão da camada de tokens
 
+> **Superado em 05/08.** As fases 2–4 fizeram a fusão da camada de tokens por
+> outro caminho (o que está em `static/css/01-tokens.css` hoje é o resultado
+> delas, não desta proposta). Este documento e o `docs/PROPOSTA_01_TOKENS.css`
+> ficam como registro do inventário medido — os números continuam válidos e
+> foram o insumo das fases seguintes —, não como plano a executar.
+
 **04/08/2026.** Documento de passagem: o que foi medido, o que foi decidido e o que
 falta. Existe porque a fusão é maior do que uma sessão comporta com verificação
 honesta, e a metade sem verificação não vale nada.
