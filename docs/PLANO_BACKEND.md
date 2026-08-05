@@ -13,7 +13,7 @@ tem arquivo:linha, saída de comando ou teste funcional atrás dela.
 
 O ciclo de julho entregou o que era mecânico. As camadas existem nos 14 apps, `P-04` (classe CSS
 dentro de `attrs={}` em forms) está em **zero**, as views emagreceram — 315 funções somam 6.880
-linhas e só 3 passam de 100 LOC — e a suíte tem 1.301 testes verdes em 11,7 s.
+linhas e só 3 passam de 100 LOC — e a suíte tem 1.306 testes verdes em ~10 s.
 
 O que sobrou não é estilo. É risco, e está concentrado em três lugares:
 

@@ -76,7 +76,7 @@ segue o `PADRAO_*` correspondente; divergência é defeito, não estilo pessoal.
 7. Abrir PR com o template da seção 5.
 ```
 
-Suíte de referência: **1.301 testes verdes** em PostgreSQL, ~12 s com `--parallel 4`
+Suíte de referência: **1.306 testes verdes** em PostgreSQL, ~10 s com `--parallel 4`
 (medido em 05/08/2026). Um PR que reduz o número de testes verdes ou aumenta o tempo em mais
 de 20% precisa justificar no corpo.
 

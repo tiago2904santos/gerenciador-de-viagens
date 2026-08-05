@@ -70,6 +70,14 @@ que apaga os próprios erros ensina a confiar demais nele.
 `oficios/view_helpers.py:25` lê `wizard_action` primeiro, com comentário explicando que
 `name="action"` colide com `form.action` no DOM. As duas cópias divergiram.
 
+> **Atenção, e conferido em 05/08 depois do merge do PR #182.** Aquele PR
+> (`fix(planos-trabalho): destrava as etapas 1 e 2 do wizard`, `NOVO-58..61`) mexeu **no mesmo
+> wizard** e corrigiu quatro defeitos vizinhos — contextualização, *date picker* das diárias, linha
+> em branco do efetivo e validação. **Não fechou este.** Verificado contra a `main` de agora:
+> `planos_trabalho/view_helpers.py:21` continua lendo só `post.get("action")`, e os templates do
+> app seguem com zero `name="action"`. O `BE-01` permanece aberto — não presuma cobertura por
+> proximidade.
+
 **Efeito:** o plano não finaliza (o clique recarrega a mesma página, sem mensagem), e cada
 "Voltar" empurra o usuário para a etapa seguinte. Quatro telas afetadas.
 **Correção:** mover o helper para `core/wizard.py` com a implementação de ofícios e trocar os

@@ -32,7 +32,7 @@ Este ciclo começa com medição nova. Tudo aqui foi medido em **05/08/2026**, p
 
 | medida | valor | como |
 |---|---|---|
-| Suíte | **1.301 testes**, 0 falhas, 4 skips, **11,96 s** | `manage.py test --settings=config.settings.test --parallel 4` |
+| Suíte | **1.306 testes**, 0 falhas, 4 skips, **9,9 s** | `manage.py test --settings=config.settings.test --parallel 4` |
 | Auditor de front | **392 avisos**, 0 erros (teto do CI: 401) | `scripts/audit_frontend_standards.py` |
 | ORM em módulo de view | **30** (google_drive 10, core 9, documentos 4, oficios 4, roteiros 2, justificativas 1) | `scripts/audit_django_architecture.py` |
 | Classe CSS dentro de `attrs={}` em forms | **0** | grep em todos os `forms.py` |
