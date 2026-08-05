@@ -25,6 +25,7 @@ from prestacoes_contas.models import PrestacaoDocumentoAnexo
 from prestacoes_contas.models import RelatorioTecnico
 from prestacoes_contas.presenters import apresentar_prestacao_servidor_card
 from prestacoes_contas.services import build_relatorio_tecnico_context
+from prestacoes_contas.test_helpers import imagem_bytes
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroTrecho
 
@@ -474,9 +475,9 @@ class PrestacaoAssinadoUploadTests(TestCase):
             args=[self.ps_servidor.pk, PrestacaoDocumentoAnexo.TIPO_RT_ASSINADO],
         )
         formatos = (
-            ("relatorio.png", b"\x89PNG\r\n\x1a\n", "image/png"),
-            ("relatorio.jpg", b"\xff\xd8\xff\xe0", "image/jpeg"),
-            ("relatorio.jpeg", b"\xff\xd8\xff\xe0", "image/jpeg"),
+            ("relatorio.png", imagem_bytes("PNG"), "image/png"),
+            ("relatorio.jpg", imagem_bytes("JPEG"), "image/jpeg"),
+            ("relatorio.jpeg", imagem_bytes("JPEG"), "image/jpeg"),
         )
         with tempfile.TemporaryDirectory() as tmpdir, override_settings(MEDIA_ROOT=tmpdir):
             for nome, conteudo, content_type in formatos:
@@ -790,13 +791,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
                     f"ps-{self.ps.pk}-comprovante_arquivos": [
                         SimpleUploadedFile(
                             "comprovante.png",
-                            (
-                                b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR"
-                                b"\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02"
-                                b"\x00\x00\x00\x90wS\xde\x00\x00\x00\x0cIDAT"
-                                b"\x08\xd7c\xf8\xff\xff?\x00\x05\xfe\x02\xfeA"
-                                b"\xe2!\xbc\x00\x00\x00\x00IEND\xaeB`\x82"
-                            ),
+                            imagem_bytes("PNG"),
                             content_type="image/png",
                         ),
                     ],

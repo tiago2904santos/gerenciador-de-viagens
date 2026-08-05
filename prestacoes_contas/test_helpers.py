@@ -1,5 +1,6 @@
 """Fixtures reutilizáveis para as fatias de testes de prestações de contas."""
 
+import io
 from dataclasses import dataclass
 from datetime import date
 from datetime import datetime
@@ -14,6 +15,24 @@ from oficios.models import Oficio
 from prestacoes_contas.models import PrestacaoContas
 from usuarios.models import AreaTrabalho
 from usuarios.models import VinculoUsuarioArea
+
+
+def imagem_bytes(formato="PNG"):
+    """Imagem 1×1 de verdade, gerada pelo Pillow.
+
+    Existe porque `core.uploads.validate_private_document_upload` abre e verifica o
+    arquivo: cabeçalho truncado (`b"\\x89PNG\\r\\n\\x1a\\n"`) passava enquanto a política
+    não rodava (QA-04) e agora é recusado — com razão. Teste de "aceita PNG" precisa
+    enviar um PNG.
+    """
+    from PIL import Image
+
+    buffer = io.BytesIO()
+    Image.new("RGB", (1, 1), color=(255, 255, 255)).save(buffer, format=formato)
+    return buffer.getvalue()
+
+
+PDF_MINIMO = b"%PDF-1.4\n%%EOF\n"
 
 
 @dataclass(frozen=True)

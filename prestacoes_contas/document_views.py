@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -10,6 +11,7 @@ from django.views.decorators.http import require_POST
 
 from core.autosave import autosave_json_response
 from core.private_media import private_file_response
+from core.uploads import validate_private_document_upload
 
 from .forms import PrestacaoDespachoForm, PrestacaoServidorDocumentosForm, PrestacaoSolicitacaoForm
 from .models import PrestacaoDocumentoAnexo
@@ -271,10 +273,19 @@ def _prestacao_assinado_upload(
         return redirect(destino)
 
     nome_original = Path(getattr(arquivo, "name", "") or "").name
-    if Path(nome_original).suffix.lower() not in {".pdf", ".png", ".jpg", ".jpeg"}:
-        messages.error(request, "O documento deve ser enviado em PDF, PNG, JPG ou JPEG.")
+    # QA-04: a política central (tamanho, magic bytes, bomba de descompressão,
+    # antivírus) precisa rodar antes de qualquer escrita. Conferir só o sufixo
+    # aceitava arquivo que mente sobre o próprio conteúdo — e ele ainda era
+    # sincronizado com o Google Drive depois.
+    try:
+        validate_private_document_upload(arquivo)
+    except ValidationError as exc:
+        for mensagem in exc.messages:
+            messages.error(request, mensagem)
         return redirect(destino)
 
+    # A validação vem antes da exclusão dos anteriores de propósito: recusar um
+    # arquivo novo não pode custar o que já estava anexado.
     anteriores = PrestacaoDocumentoAnexo.objects.filter(prestacao=prestacao, tipo=tipo)
     if not substituir_todos_do_tipo:
         anteriores = anteriores.filter(servidor_prestacao=servidor_prestacao)
