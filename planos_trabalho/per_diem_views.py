@@ -24,7 +24,9 @@ from .services import calcular_diarias_plano
 from .services import adicionar_evento_ao_plano
 from .services import editar_evento_no_scratchpad
 from .services import remover_evento
-from .view_helpers import _get_plano, _wizard_normalizar_acao, _redirect_plano_lista, _wizard_shell_ctx, _plano_autosave_version, _querydict_from_pairs, _merge_payload_fields, _autosave_form_errors
+from core.wizard import normalizar_acao_do_wizard
+
+from .view_helpers import _get_plano, _redirect_plano_lista, _wizard_shell_ctx, _plano_autosave_version, _querydict_from_pairs, _merge_payload_fields, _autosave_form_errors
 
 
 def _diarias_selected_dates_json(form):
@@ -191,7 +193,7 @@ def wizard_efetivo_diarias(request, pk):
     formset = EfetivoPlanoFormSet(request.POST or None, instance=plano, prefix="efetivo")
     diarias_form = PlanoDiariasForm(request.POST or None, instance=plano)
     if request.method == "POST":
-        nav_action = _wizard_normalizar_acao(request.POST)
+        nav_action = normalizar_acao_do_wizard(request.POST)
         if formset.is_valid() and diarias_form.is_valid():
             # Reconcilia por id (e não via management form), pois o autosave pode
             # ter criado efetivos após o carregamento da página — o que deixaria

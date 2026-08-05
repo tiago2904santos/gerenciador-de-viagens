@@ -13,6 +13,8 @@ from .presenters import apresentar_oficio_wizard_steps
 from .selectors import listar_servidores_para_oficio
 from .selectors import listar_viaturas_para_oficio
 from .services import oficio_esta_completo_para_finalizar
+from core.wizard import normalizar_acao_do_wizard
+
 
 
 def _redirect_lista_oficio(request, oficio, message):
@@ -22,16 +24,10 @@ def _redirect_lista_oficio(request, oficio, message):
     return redirect("oficios:index")
 
 
-def _wizard_normalizar_acao(post, *, default: str = "wizard_next") -> str:
-    # Preferir wizard_action: name="action" colide com form.action no DOM
-    # (RadioNodeList) e quebra JS que lê a URL de submit do formulário.
-    raw = post.get("wizard_action")
-    if raw in (None, ""):
-        raw = post.get("action")
-    action = (raw or default).strip()
-    if action == "save_continue":
-        return "wizard_next"
-    return action
+# BE-01: a implementação mora em core/wizard.py, compartilhada com planos de
+# trabalho. O alias sobrevive porque `oficios.views._wizard_normalizar_acao` é
+# contrato de um teste existente.
+_wizard_normalizar_acao = normalizar_acao_do_wizard
 
 
 def _wizard_persist_action_para_dados_viajantes(nav_action: str) -> str:

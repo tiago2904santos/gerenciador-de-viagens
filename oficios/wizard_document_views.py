@@ -24,7 +24,9 @@ from .services import validar_oficio_para_documento
 from .view_navigation import oficio_back_label as _oficio_back_label
 from .view_navigation import oficio_back_url as _oficio_back_url
 from .view_navigation import url_with_next as _url_with_next
-from .view_helpers import _redirect_lista_oficio, _wizard_normalizar_acao, _wizard_footer_ctx, _wizard_shell_ctx, _wizard_roteiro_step_status, _merge_payload_fields, _oficio_autosave_version, _justificativa_autosave_data, _autosave_form_errors
+from core.wizard import normalizar_acao_do_wizard
+
+from .view_helpers import _redirect_lista_oficio, _wizard_footer_ctx, _wizard_shell_ctx, _wizard_roteiro_step_status, _merge_payload_fields, _oficio_autosave_version, _justificativa_autosave_data, _autosave_form_errors
 
 
 def wizard_justificativa(request, pk):
@@ -45,7 +47,7 @@ def wizard_justificativa(request, pk):
     )
 
     if request.method == "POST" and form.is_valid():
-        nav_action = _wizard_normalizar_acao(request.POST)
+        nav_action = normalizar_acao_do_wizard(request.POST)
         atualizar_justificativa_oficio(
             oficio,
             form,
@@ -140,7 +142,7 @@ def wizard_documentos(request, pk):
     doc_status = "complete" if aval_doc["status"] == "complete" else "incomplete"
 
     if request.method == "POST":
-        nav_action = _wizard_normalizar_acao(request.POST, default="save_draft")
+        nav_action = normalizar_acao_do_wizard(request.POST, default="save_draft")
 
         if nav_action == "finalizar":
             aval = validar_oficio_para_documento(oficio)

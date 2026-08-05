@@ -25,7 +25,9 @@ from .services import vincular_roteiro_ao_oficio_sem_copia
 from .services import tocar_data_criacao_oficio
 from .view_navigation import oficio_back_label as _oficio_back_label
 from .view_navigation import oficio_back_url as _oficio_back_url
-from .view_helpers import _redirect_lista_oficio, _wizard_normalizar_acao, _wizard_footer_ctx, _wizard_shell_ctx, _wizard_roteiro_step_status
+from core.wizard import normalizar_acao_do_wizard
+
+from .view_helpers import _redirect_lista_oficio, _wizard_footer_ctx, _wizard_shell_ctx, _wizard_roteiro_step_status
 
 
 def _resolver_roteiro_rascunho_autosave(post, *, oficio):
@@ -143,7 +145,7 @@ def wizard_roteiro(request, pk):
                     oficio.roteiro = roteiro_salvo
                     oficio.save(update_fields=["roteiro", "updated_at"])
             oficio = tocar_data_criacao_oficio(oficio)
-            nav_action = _wizard_normalizar_acao(request.POST)
+            nav_action = normalizar_acao_do_wizard(request.POST)
             if nav_action == "wizard_next":
                 messages.success(
                     request,
@@ -160,7 +162,7 @@ def wizard_roteiro(request, pk):
             messages.success(request, "Rascunho do roteiro salvo.")
             return redirect("oficios:wizard_roteiro", pk=oficio.pk)
 
-        nav_action = _wizard_normalizar_acao(request.POST)
+        nav_action = normalizar_acao_do_wizard(request.POST)
         if nav_action in ("wizard_next", "wizard_back"):
             # Soft-advance: grava rascunho parcial e deixa navegar sem validação completa.
             if roteiro_vinculado is None or roteiro_vinculado.status != Roteiro.STATUS_RASCUNHO:

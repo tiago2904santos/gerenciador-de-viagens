@@ -161,15 +161,15 @@ deliberadamente fora desta rodada, porque mexer nele reabre a regra de dinheiro 
 para uma rodada futura, com `DB-01` como pré-requisito.
 
 ### Fase 0 — Defeitos que atingem o usuário agora
-- [ ] `BE-01` wizard de plano de trabalho não finaliza e "Voltar" avança
+- [x] `BE-01` wizard de plano de trabalho não finaliza e "Voltar" avança
 - [x] `BE-02` exclusão de anexo por `GET`, sem CSRF
 - [x] `JS-01` XSS: nome de pasta do Drive cru em `aria-label`
 - [ ] `HT-01` foco de teclado invisível em todo campo, inclusive no login
 - [x] `BE-04` formulário de evento oferece documentos de outras áreas
-- [ ] `BE-03` filtro de data da lista de ofícios descartado em silêncio
+- [x] `BE-03` filtro de data da lista de ofícios descartado em silêncio
 - [x] `BE-05` seletor de modelo de motivo da OS expõe outras áreas
 - [x] `BE-06` relatório técnico sai com a cidade-sede de outra área
-- [ ] `BE-07` exclusão de anexo dá 500 e deixa registro órfão
+- [x] `BE-07` exclusão de anexo dá 500 e deixa registro órfão
 - [x] `BE-08` oito redirects seguem o que o POST mandar
 - [ ] `JS-04` `.then()` sem `.catch` no editor de roteiros
 - [ ] `HT-09` login sem skip link e sem erro associado
