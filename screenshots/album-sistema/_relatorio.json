@@ -1,0 +1,4394 @@
+[
+  {
+    "ordem": 1,
+    "grupo": "Acesso",
+    "titulo": "Login",
+    "rota": "/login/",
+    "tema": "light",
+    "arquivo": "light/001-acesso-login.png",
+    "status": 200,
+    "url_final": "/login/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/001-acesso-login.webp",
+    "webp_bytes": 12906,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 2,
+    "grupo": "Acesso",
+    "titulo": "Perfil do usuário",
+    "rota": "/perfil/",
+    "tema": "light",
+    "arquivo": "light/002-acesso-perfil-do-usuario.png",
+    "status": 200,
+    "url_final": "/perfil/",
+    "altura": 1082,
+    "recortada": false,
+    "webp": "light/002-acesso-perfil-do-usuario.webp",
+    "webp_bytes": 23964,
+    "webp_size": [
+      880,
+      661
+    ]
+  },
+  {
+    "ordem": 3,
+    "grupo": "Painel",
+    "titulo": "Dashboard",
+    "rota": "/",
+    "tema": "light",
+    "arquivo": "light/003-painel-dashboard.png",
+    "status": 200,
+    "url_final": "/",
+    "altura": 1320,
+    "recortada": false,
+    "webp": "light/003-painel-dashboard.webp",
+    "webp_bytes": 37712,
+    "webp_size": [
+      880,
+      807
+    ]
+  },
+  {
+    "ordem": 4,
+    "grupo": "Eventos",
+    "titulo": "Lista de eventos",
+    "rota": "/eventos/",
+    "tema": "light",
+    "arquivo": "light/004-eventos-lista-de-eventos.png",
+    "status": 200,
+    "url_final": "/eventos/",
+    "altura": 1274,
+    "recortada": false,
+    "webp": "light/004-eventos-lista-de-eventos.webp",
+    "webp_bytes": 26692,
+    "webp_size": [
+      880,
+      779
+    ]
+  },
+  {
+    "ordem": 5,
+    "grupo": "Eventos",
+    "titulo": "Novo evento",
+    "rota": "/eventos/novo/",
+    "tema": "light",
+    "arquivo": "light/005-eventos-novo-evento.png",
+    "status": 200,
+    "url_final": "/eventos/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/005-eventos-novo-evento.webp",
+    "webp_bytes": 9870,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 6,
+    "grupo": "Eventos",
+    "titulo": "Detalhe do evento",
+    "rota": "/eventos/1/",
+    "tema": "light",
+    "arquivo": "light/006-eventos-detalhe-do-evento.png",
+    "status": 200,
+    "url_final": "/eventos/1/",
+    "altura": 1283,
+    "recortada": false,
+    "webp": "light/006-eventos-detalhe-do-evento.webp",
+    "webp_bytes": 29338,
+    "webp_size": [
+      880,
+      784
+    ]
+  },
+  {
+    "ordem": 7,
+    "grupo": "Eventos",
+    "titulo": "Editar evento",
+    "rota": "/eventos/1/editar/",
+    "tema": "light",
+    "arquivo": "light/007-eventos-editar-evento.png",
+    "status": 200,
+    "url_final": "/eventos/1/editar/",
+    "altura": 1603,
+    "recortada": false,
+    "webp": "light/007-eventos-editar-evento.webp",
+    "webp_bytes": 26480,
+    "webp_size": [
+      880,
+      980
+    ]
+  },
+  {
+    "ordem": 8,
+    "grupo": "Eventos",
+    "titulo": "Fluxo guiado — etapa 1",
+    "rota": "/eventos/1/guiado/",
+    "tema": "light",
+    "arquivo": "light/008-eventos-fluxo-guiado-etapa-1.png",
+    "status": 200,
+    "url_final": "/eventos/1/guiado/",
+    "altura": 1283,
+    "recortada": false,
+    "webp": "light/008-eventos-fluxo-guiado-etapa-1.webp",
+    "webp_bytes": 29338,
+    "webp_size": [
+      880,
+      784
+    ]
+  },
+  {
+    "ordem": 9,
+    "grupo": "Eventos",
+    "titulo": "Fluxo guiado — etapa 2",
+    "rota": "/eventos/1/guiado/etapa-2/",
+    "tema": "light",
+    "arquivo": "light/009-eventos-fluxo-guiado-etapa-2.png",
+    "status": 200,
+    "url_final": "/eventos/1/guiado/etapa-2/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/009-eventos-fluxo-guiado-etapa-2.webp",
+    "webp_bytes": 15654,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 10,
+    "grupo": "Eventos",
+    "titulo": "Fluxo guiado — etapa 3",
+    "rota": "/eventos/1/guiado/etapa-3/",
+    "tema": "light",
+    "arquivo": "light/010-eventos-fluxo-guiado-etapa-3.png",
+    "status": 200,
+    "url_final": "/eventos/1/guiado/etapa-3/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/010-eventos-fluxo-guiado-etapa-3.webp",
+    "webp_bytes": 15608,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 11,
+    "grupo": "Eventos",
+    "titulo": "Fluxo guiado — etapa 4",
+    "rota": "/eventos/1/guiado/etapa-4/",
+    "tema": "light",
+    "arquivo": "light/011-eventos-fluxo-guiado-etapa-4.png",
+    "status": 200,
+    "url_final": "/eventos/1/guiado/etapa-4/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/011-eventos-fluxo-guiado-etapa-4.webp",
+    "webp_bytes": 15728,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 12,
+    "grupo": "Eventos",
+    "titulo": "Fluxo guiado — termos",
+    "rota": "/eventos/1/guiado_termos/",
+    "tema": "light",
+    "arquivo": "light/012-eventos-fluxo-guiado-termos.png",
+    "status": 200,
+    "url_final": "/eventos/1/guiado_termos/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/012-eventos-fluxo-guiado-termos.webp",
+    "webp_bytes": 15606,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 13,
+    "grupo": "Eventos",
+    "titulo": "Tipos de evento",
+    "rota": "/eventos/tipos/",
+    "tema": "light",
+    "arquivo": "light/013-eventos-tipos-de-evento.png",
+    "status": 200,
+    "url_final": "/eventos/tipos/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/013-eventos-tipos-de-evento.webp",
+    "webp_bytes": 14636,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 14,
+    "grupo": "Ofícios",
+    "titulo": "Lista de ofícios",
+    "rota": "/oficios/",
+    "tema": "light",
+    "arquivo": "light/014-oficios-lista-de-oficios.png",
+    "status": 200,
+    "url_final": "/oficios/",
+    "altura": 2982,
+    "recortada": false,
+    "webp": "light/014-oficios-lista-de-oficios.webp",
+    "webp_bytes": 87610,
+    "webp_size": [
+      880,
+      1822
+    ]
+  },
+  {
+    "ordem": 15,
+    "grupo": "Ofícios",
+    "titulo": "Novo ofício",
+    "rota": "/oficios/novo/",
+    "tema": "light",
+    "arquivo": "light/015-oficios-novo-oficio.png",
+    "status": 200,
+    "url_final": "/oficios/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/015-oficios-novo-oficio.webp",
+    "webp_bytes": 9980,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 16,
+    "grupo": "Ofícios",
+    "titulo": "Assistente — dados e viajantes",
+    "rota": "/oficios/6/dados-viajantes/",
+    "tema": "light",
+    "arquivo": "light/016-oficios-assistente-dados-e-viajantes.png",
+    "status": 200,
+    "url_final": "/oficios/6/dados-viajantes/",
+    "altura": 1382,
+    "recortada": false,
+    "webp": "light/016-oficios-assistente-dados-e-viajantes.webp",
+    "webp_bytes": 28392,
+    "webp_size": [
+      880,
+      845
+    ]
+  },
+  {
+    "ordem": 17,
+    "grupo": "Ofícios",
+    "titulo": "Assistente — transporte",
+    "rota": "/oficios/6/transporte/",
+    "tema": "light",
+    "arquivo": "light/017-oficios-assistente-transporte.png",
+    "status": 200,
+    "url_final": "/oficios/6/transporte/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/017-oficios-assistente-transporte.webp",
+    "webp_bytes": 20396,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 18,
+    "grupo": "Ofícios",
+    "titulo": "Assistente — roteiro",
+    "rota": "/oficios/6/roteiro/",
+    "tema": "light",
+    "arquivo": "light/018-oficios-assistente-roteiro.png",
+    "status": 200,
+    "url_final": "/oficios/6/roteiro/",
+    "altura": 2636,
+    "recortada": false,
+    "webp": "light/018-oficios-assistente-roteiro.webp",
+    "webp_bytes": 41930,
+    "webp_size": [
+      880,
+      1611
+    ]
+  },
+  {
+    "ordem": 19,
+    "grupo": "Ofícios",
+    "titulo": "Assistente — justificativa",
+    "rota": "/oficios/6/justificativa/",
+    "tema": "light",
+    "arquivo": "light/019-oficios-assistente-justificativa.png",
+    "status": 200,
+    "url_final": "/oficios/6/justificativa/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/019-oficios-assistente-justificativa.webp",
+    "webp_bytes": 16500,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 20,
+    "grupo": "Ofícios",
+    "titulo": "Assistente — resumo",
+    "rota": "/oficios/6/resumo/",
+    "tema": "light",
+    "arquivo": "light/020-oficios-assistente-resumo.png",
+    "status": 200,
+    "url_final": "/oficios/6/resumo/",
+    "altura": 1347,
+    "recortada": false,
+    "webp": "light/020-oficios-assistente-resumo.webp",
+    "webp_bytes": 32952,
+    "webp_size": [
+      880,
+      823
+    ]
+  },
+  {
+    "ordem": 21,
+    "grupo": "Ofícios",
+    "titulo": "Assistente — documentos",
+    "rota": "/oficios/6/documentos/",
+    "tema": "light",
+    "arquivo": "light/021-oficios-assistente-documentos.png",
+    "status": 200,
+    "url_final": "/oficios/6/documentos/",
+    "altura": 1347,
+    "recortada": false,
+    "webp": "light/021-oficios-assistente-documentos.webp",
+    "webp_bytes": 32952,
+    "webp_size": [
+      880,
+      823
+    ]
+  },
+  {
+    "ordem": 22,
+    "grupo": "Ofícios",
+    "titulo": "Modelos de motivo",
+    "rota": "/oficios/modelos-motivo/",
+    "tema": "light",
+    "arquivo": "light/022-oficios-modelos-de-motivo.png",
+    "status": 200,
+    "url_final": "/oficios/modelos-motivo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/022-oficios-modelos-de-motivo.webp",
+    "webp_bytes": 23726,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 23,
+    "grupo": "Ofícios",
+    "titulo": "Novo modelo de motivo",
+    "rota": "/oficios/modelos-motivo/novo/",
+    "tema": "light",
+    "arquivo": "light/023-oficios-novo-modelo-de-motivo.png",
+    "status": 200,
+    "url_final": "/oficios/modelos-motivo/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/023-oficios-novo-modelo-de-motivo.webp",
+    "webp_bytes": 23752,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 24,
+    "grupo": "Roteiros",
+    "titulo": "Lista de roteiros",
+    "rota": "/roteiros/",
+    "tema": "light",
+    "arquivo": "light/024-roteiros-lista-de-roteiros.png",
+    "status": 200,
+    "url_final": "/roteiros/",
+    "altura": 2112,
+    "recortada": false,
+    "webp": "light/024-roteiros-lista-de-roteiros.webp",
+    "webp_bytes": 50022,
+    "webp_size": [
+      880,
+      1291
+    ]
+  },
+  {
+    "ordem": 25,
+    "grupo": "Roteiros",
+    "titulo": "Novo roteiro",
+    "rota": "/roteiros/novo/",
+    "tema": "light",
+    "arquivo": "light/025-roteiros-novo-roteiro.png",
+    "status": 200,
+    "url_final": "/roteiros/novo/",
+    "altura": 2224,
+    "recortada": false,
+    "webp": "light/025-roteiros-novo-roteiro.webp",
+    "webp_bytes": 29416,
+    "webp_size": [
+      880,
+      1359
+    ]
+  },
+  {
+    "ordem": 26,
+    "grupo": "Roteiros",
+    "titulo": "Editar roteiro",
+    "rota": "/roteiros/6/editar/",
+    "tema": "light",
+    "arquivo": "light/026-roteiros-editar-roteiro.png",
+    "status": 200,
+    "url_final": "/roteiros/6/editar/",
+    "altura": 2545,
+    "recortada": false,
+    "webp": "light/026-roteiros-editar-roteiro.webp",
+    "webp_bytes": 40656,
+    "webp_size": [
+      880,
+      1555
+    ]
+  },
+  {
+    "ordem": 27,
+    "grupo": "Termos",
+    "titulo": "Lista de termos",
+    "rota": "/termos/",
+    "tema": "light",
+    "arquivo": "light/027-termos-lista-de-termos.png",
+    "status": 200,
+    "url_final": "/termos/",
+    "altura": 1879,
+    "recortada": false,
+    "webp": "light/027-termos-lista-de-termos.webp",
+    "webp_bytes": 46418,
+    "webp_size": [
+      880,
+      1148
+    ]
+  },
+  {
+    "ordem": 28,
+    "grupo": "Termos",
+    "titulo": "Novo termo",
+    "rota": "/termos/novo/",
+    "tema": "light",
+    "arquivo": "light/028-termos-novo-termo.png",
+    "status": 200,
+    "url_final": "/termos/novo/",
+    "altura": 1420,
+    "recortada": false,
+    "webp": "light/028-termos-novo-termo.webp",
+    "webp_bytes": 28940,
+    "webp_size": [
+      880,
+      868
+    ]
+  },
+  {
+    "ordem": 29,
+    "grupo": "Termos",
+    "titulo": "Editar termo",
+    "rota": "/termos/6/editar/",
+    "tema": "light",
+    "arquivo": "light/029-termos-editar-termo.png",
+    "status": 200,
+    "url_final": "/termos/6/editar/",
+    "altura": 1726,
+    "recortada": false,
+    "webp": "light/029-termos-editar-termo.webp",
+    "webp_bytes": 36996,
+    "webp_size": [
+      880,
+      1055
+    ]
+  },
+  {
+    "ordem": 30,
+    "grupo": "Justificativas",
+    "titulo": "Lista de justificativas",
+    "rota": "/justificativas/",
+    "tema": "light",
+    "arquivo": "light/030-justificativas-lista-de-justificativas.png",
+    "status": 200,
+    "url_final": "/justificativas/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/030-justificativas-lista-de-justificativas.webp",
+    "webp_bytes": 26042,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 31,
+    "grupo": "Justificativas",
+    "titulo": "Modelos de justificativa",
+    "rota": "/justificativas/modelos/",
+    "tema": "light",
+    "arquivo": "light/031-justificativas-modelos-de-justificativa.png",
+    "status": 200,
+    "url_final": "/justificativas/modelos/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/031-justificativas-modelos-de-justificativa.webp",
+    "webp_bytes": 23222,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 32,
+    "grupo": "Justificativas",
+    "titulo": "Novo modelo de justificativa",
+    "rota": "/justificativas/modelos/novo/",
+    "tema": "light",
+    "arquivo": "light/032-justificativas-novo-modelo-de-justificativa.png",
+    "status": 200,
+    "url_final": "/justificativas/modelos/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/032-justificativas-novo-modelo-de-justificativa.webp",
+    "webp_bytes": 23222,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 33,
+    "grupo": "Planos de trabalho",
+    "titulo": "Lista de planos",
+    "rota": "/planos-trabalho/",
+    "tema": "light",
+    "arquivo": "light/033-planos-de-trabalho-lista-de-planos.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/",
+    "altura": 2523,
+    "recortada": false,
+    "webp": "light/033-planos-de-trabalho-lista-de-planos.webp",
+    "webp_bytes": 74450,
+    "webp_size": [
+      880,
+      1542
+    ]
+  },
+  {
+    "ordem": 34,
+    "grupo": "Planos de trabalho",
+    "titulo": "Assistente — efetivo e diárias",
+    "rota": "/planos-trabalho/6/efetivo-diarias/",
+    "tema": "light",
+    "arquivo": "light/034-planos-de-trabalho-assistente-efetivo-e-diarias.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/6/efetivo-diarias/",
+    "altura": 944,
+    "recortada": false,
+    "webp": "light/034-planos-de-trabalho-assistente-efetivo-e-diarias.webp",
+    "webp_bytes": 28972,
+    "webp_size": [
+      880,
+      577
+    ]
+  },
+  {
+    "ordem": 35,
+    "grupo": "Planos de trabalho",
+    "titulo": "Assistente — atividades",
+    "rota": "/planos-trabalho/6/atividades/",
+    "tema": "light",
+    "arquivo": "light/035-planos-de-trabalho-assistente-atividades.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/6/atividades/",
+    "altura": 952,
+    "recortada": false,
+    "webp": "light/035-planos-de-trabalho-assistente-atividades.webp",
+    "webp_bytes": 28834,
+    "webp_size": [
+      880,
+      582
+    ]
+  },
+  {
+    "ordem": 36,
+    "grupo": "Planos de trabalho",
+    "titulo": "Assistente — documentos",
+    "rota": "/planos-trabalho/6/documentos/",
+    "tema": "light",
+    "arquivo": "light/036-planos-de-trabalho-assistente-documentos.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/6/documentos/",
+    "altura": 1257,
+    "recortada": false,
+    "webp": "light/036-planos-de-trabalho-assistente-documentos.webp",
+    "webp_bytes": 22534,
+    "webp_size": [
+      880,
+      768
+    ]
+  },
+  {
+    "ordem": 37,
+    "grupo": "Planos de trabalho",
+    "titulo": "Programas solicitantes",
+    "rota": "/planos-trabalho/programas/",
+    "tema": "light",
+    "arquivo": "light/037-planos-de-trabalho-programas-solicitantes.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/programas/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/037-planos-de-trabalho-programas-solicitantes.webp",
+    "webp_bytes": 17334,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 38,
+    "grupo": "Planos de trabalho",
+    "titulo": "Novo programa solicitante",
+    "rota": "/planos-trabalho/programas/novo/",
+    "tema": "light",
+    "arquivo": "light/038-planos-de-trabalho-novo-programa-solicitante.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/programas/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/038-planos-de-trabalho-novo-programa-solicitante.webp",
+    "webp_bytes": 17334,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 39,
+    "grupo": "Planos de trabalho",
+    "titulo": "Horários de atendimento",
+    "rota": "/planos-trabalho/horarios/",
+    "tema": "light",
+    "arquivo": "light/039-planos-de-trabalho-horarios-de-atendimento.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/horarios/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/039-planos-de-trabalho-horarios-de-atendimento.webp",
+    "webp_bytes": 15906,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 40,
+    "grupo": "Planos de trabalho",
+    "titulo": "Novo horário de atendimento",
+    "rota": "/planos-trabalho/horarios/novo/",
+    "tema": "light",
+    "arquivo": "light/040-planos-de-trabalho-novo-horario-de-atendimento.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/horarios/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/040-planos-de-trabalho-novo-horario-de-atendimento.webp",
+    "webp_bytes": 15906,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 41,
+    "grupo": "Planos de trabalho",
+    "titulo": "Atividades",
+    "rota": "/planos-trabalho/atividades/",
+    "tema": "light",
+    "arquivo": "light/041-planos-de-trabalho-atividades.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/atividades/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/041-planos-de-trabalho-atividades.webp",
+    "webp_bytes": 28768,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 42,
+    "grupo": "Planos de trabalho",
+    "titulo": "Presets de atividades",
+    "rota": "/planos-trabalho/presets/",
+    "tema": "light",
+    "arquivo": "light/042-planos-de-trabalho-presets-de-atividades.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/presets/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/042-planos-de-trabalho-presets-de-atividades.webp",
+    "webp_bytes": 13156,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 43,
+    "grupo": "Ordens de serviço",
+    "titulo": "Lista de ordens de serviço",
+    "rota": "/ordens-servico/",
+    "tema": "light",
+    "arquivo": "light/043-ordens-de-servico-lista-de-ordens-de-servico.png",
+    "status": 200,
+    "url_final": "/ordens-servico/",
+    "altura": 1995,
+    "recortada": false,
+    "webp": "light/043-ordens-de-servico-lista-de-ordens-de-servico.webp",
+    "webp_bytes": 46368,
+    "webp_size": [
+      880,
+      1219
+    ]
+  },
+  {
+    "ordem": 44,
+    "grupo": "Ordens de serviço",
+    "titulo": "Nova ordem de serviço",
+    "rota": "/ordens-servico/nova/",
+    "tema": "light",
+    "arquivo": "light/044-ordens-de-servico-nova-ordem-de-servico.png",
+    "status": 200,
+    "url_final": "/ordens-servico/nova/",
+    "altura": 1789,
+    "recortada": false,
+    "webp": "light/044-ordens-de-servico-nova-ordem-de-servico.webp",
+    "webp_bytes": 38746,
+    "webp_size": [
+      880,
+      1093
+    ]
+  },
+  {
+    "ordem": 45,
+    "grupo": "Ordens de serviço",
+    "titulo": "Editar ordem de serviço",
+    "rota": "/ordens-servico/6/editar/",
+    "tema": "light",
+    "arquivo": "light/045-ordens-de-servico-editar-ordem-de-servico.png",
+    "status": 200,
+    "url_final": "/ordens-servico/6/editar/",
+    "altura": 1814,
+    "recortada": false,
+    "webp": "light/045-ordens-de-servico-editar-ordem-de-servico.webp",
+    "webp_bytes": 41022,
+    "webp_size": [
+      880,
+      1109
+    ]
+  },
+  {
+    "ordem": 46,
+    "grupo": "Prestações de contas",
+    "titulo": "Lista de prestações",
+    "rota": "/prestacoes-contas/",
+    "tema": "light",
+    "arquivo": "light/046-prestacoes-de-contas-lista-de-prestacoes.png",
+    "status": 200,
+    "url_final": "/prestacoes-contas/",
+    "altura": 4790,
+    "recortada": false,
+    "webp": "light/046-prestacoes-de-contas-lista-de-prestacoes.webp",
+    "webp_bytes": 137224,
+    "webp_size": [
+      880,
+      2927
+    ]
+  },
+  {
+    "ordem": 47,
+    "grupo": "Prestações de contas",
+    "titulo": "Documentos do servidor",
+    "rota": "/prestacoes-contas/servidor-prestacao/11/documentos/",
+    "tema": "light",
+    "arquivo": "light/047-prestacoes-de-contas-documentos-do-servidor.png",
+    "status": 200,
+    "url_final": "/prestacoes-contas/servidor-prestacao/11/documentos/",
+    "altura": 1271,
+    "recortada": false,
+    "webp": "light/047-prestacoes-de-contas-documentos-do-servidor.webp",
+    "webp_bytes": 29880,
+    "webp_size": [
+      880,
+      777
+    ]
+  },
+  {
+    "ordem": 48,
+    "grupo": "Prestações de contas",
+    "titulo": "Relatório de viagem",
+    "rota": "/prestacoes-contas/servidor-prestacao/11/rt/",
+    "tema": "light",
+    "arquivo": "light/048-prestacoes-de-contas-relatorio-de-viagem.png",
+    "status": 200,
+    "url_final": "/prestacoes-contas/servidor-prestacao/11/rt/",
+    "altura": 2463,
+    "recortada": false,
+    "webp": "light/048-prestacoes-de-contas-relatorio-de-viagem.webp",
+    "webp_bytes": 51388,
+    "webp_size": [
+      880,
+      1505
+    ]
+  },
+  {
+    "ordem": 49,
+    "grupo": "Prestações de contas",
+    "titulo": "Diário de bordo",
+    "rota": "/prestacoes-contas/servidor-prestacao/11/diario/",
+    "tema": "light",
+    "arquivo": "light/049-prestacoes-de-contas-diario-de-bordo.png",
+    "status": 200,
+    "url_final": "/prestacoes-contas/servidor-prestacao/11/diario/",
+    "altura": 1219,
+    "recortada": false,
+    "webp": "light/049-prestacoes-de-contas-diario-de-bordo.webp",
+    "webp_bytes": 29754,
+    "webp_size": [
+      880,
+      745
+    ]
+  },
+  {
+    "ordem": 50,
+    "grupo": "Prestações de contas",
+    "titulo": "Diário — motorista",
+    "rota": "/prestacoes-contas/servidor-prestacao/11/diario/motorista/",
+    "tema": "light",
+    "arquivo": "light/050-prestacoes-de-contas-diario-motorista.png",
+    "status": 200,
+    "url_final": "/prestacoes-contas/servidor-prestacao/11/diario/motorista/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/050-prestacoes-de-contas-diario-motorista.webp",
+    "webp_bytes": 24024,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 51,
+    "grupo": "Prestações de contas",
+    "titulo": "Diário — editar roteiro",
+    "rota": "/prestacoes-contas/servidor-prestacao/11/diario/editar-roteiro/",
+    "tema": "light",
+    "arquivo": "light/051-prestacoes-de-contas-diario-editar-roteiro.png",
+    "status": 200,
+    "url_final": "/roteiros/11/editar/?next=%2Fprestacoes-contas%2Fservidor-prestacao%2F11%2Fdiario%2F",
+    "altura": 2545,
+    "recortada": false,
+    "webp": "light/051-prestacoes-de-contas-diario-editar-roteiro.webp",
+    "webp_bytes": 40500,
+    "webp_size": [
+      880,
+      1555
+    ]
+  },
+  {
+    "ordem": 52,
+    "grupo": "Prestações de contas",
+    "titulo": "Consolidado do servidor",
+    "rota": "/prestacoes-contas/servidor-prestacao/11/consolidado/",
+    "tema": "light",
+    "arquivo": "light/052-prestacoes-de-contas-consolidado-do-servidor.png",
+    "status": 200,
+    "url_final": "/prestacoes-contas/servidor-prestacao/11/consolidado/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/052-prestacoes-de-contas-consolidado-do-servidor.webp",
+    "webp_bytes": 23456,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 53,
+    "grupo": "Prestações de contas",
+    "titulo": "Modelos de texto",
+    "rota": "/prestacoes-contas/modelos-texto/",
+    "tema": "light",
+    "arquivo": "light/053-prestacoes-de-contas-modelos-de-texto.png",
+    "status": 200,
+    "url_final": "/prestacoes-contas/modelos-texto/",
+    "altura": 1921,
+    "recortada": false,
+    "webp": "light/053-prestacoes-de-contas-modelos-de-texto.webp",
+    "webp_bytes": 31962,
+    "webp_size": [
+      880,
+      1174
+    ]
+  },
+  {
+    "ordem": 54,
+    "grupo": "Prestações de contas",
+    "titulo": "Novo modelo de texto",
+    "rota": "/prestacoes-contas/modelos-texto/novo/",
+    "tema": "light",
+    "arquivo": "light/054-prestacoes-de-contas-novo-modelo-de-texto.png",
+    "status": 200,
+    "url_final": "/prestacoes-contas/modelos-texto/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/054-prestacoes-de-contas-novo-modelo-de-texto.webp",
+    "webp_bytes": 13928,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 55,
+    "grupo": "Diário de bordo",
+    "titulo": "Lista do diário de bordo",
+    "rota": "/diario-bordo/",
+    "tema": "light",
+    "arquivo": "light/055-diario-de-bordo-lista-do-diario-de-bordo.png",
+    "status": 200,
+    "url_final": "/diario-bordo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/055-diario-de-bordo-lista-do-diario-de-bordo.webp",
+    "webp_bytes": 15526,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 56,
+    "grupo": "Documentos",
+    "titulo": "Central de documentos",
+    "rota": "/documentos/",
+    "tema": "light",
+    "arquivo": "light/056-documentos-central-de-documentos.png",
+    "status": 200,
+    "url_final": "/documentos/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/056-documentos-central-de-documentos.webp",
+    "webp_bytes": 17686,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 57,
+    "grupo": "Cadastros",
+    "titulo": "Índice de cadastros",
+    "rota": "/cadastros/",
+    "tema": "light",
+    "arquivo": "light/057-cadastros-indice-de-cadastros.png",
+    "status": 200,
+    "url_final": "/cadastros/",
+    "altura": 1341,
+    "recortada": false,
+    "webp": "light/057-cadastros-indice-de-cadastros.webp",
+    "webp_bytes": 27608,
+    "webp_size": [
+      880,
+      820
+    ]
+  },
+  {
+    "ordem": 58,
+    "grupo": "Cadastros",
+    "titulo": "Configuração — instituição",
+    "rota": "/cadastros/configuracao/",
+    "tema": "light",
+    "arquivo": "light/058-cadastros-configuracao-instituicao.png",
+    "status": 200,
+    "url_final": "/cadastros/configuracao/",
+    "altura": 1017,
+    "recortada": false,
+    "webp": "light/058-cadastros-configuracao-instituicao.webp",
+    "webp_bytes": 19634,
+    "webp_size": [
+      880,
+      622
+    ]
+  },
+  {
+    "ordem": 59,
+    "grupo": "Cadastros",
+    "titulo": "Configuração — ofício",
+    "rota": "/cadastros/configuracao/oficio/",
+    "tema": "light",
+    "arquivo": "light/059-cadastros-configuracao-oficio.png",
+    "status": 200,
+    "url_final": "/cadastros/configuracao/oficio/",
+    "altura": 1129,
+    "recortada": false,
+    "webp": "light/059-cadastros-configuracao-oficio.webp",
+    "webp_bytes": 21952,
+    "webp_size": [
+      880,
+      690
+    ]
+  },
+  {
+    "ordem": 60,
+    "grupo": "Cadastros",
+    "titulo": "Configuração — roteiros",
+    "rota": "/cadastros/configuracao/roteiros/",
+    "tema": "light",
+    "arquivo": "light/060-cadastros-configuracao-roteiros.png",
+    "status": 200,
+    "url_final": "/cadastros/configuracao/roteiros/",
+    "altura": 941,
+    "recortada": false,
+    "webp": "light/060-cadastros-configuracao-roteiros.webp",
+    "webp_bytes": 24058,
+    "webp_size": [
+      880,
+      575
+    ]
+  },
+  {
+    "ordem": 61,
+    "grupo": "Cadastros",
+    "titulo": "Servidores",
+    "rota": "/cadastros/servidores/",
+    "tema": "light",
+    "arquivo": "light/061-cadastros-servidores.png",
+    "status": 200,
+    "url_final": "/cadastros/servidores/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/061-cadastros-servidores.webp",
+    "webp_bytes": 25374,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 62,
+    "grupo": "Cadastros",
+    "titulo": "Novo servidor",
+    "rota": "/cadastros/servidores/novo/",
+    "tema": "light",
+    "arquivo": "light/062-cadastros-novo-servidor.png",
+    "status": 200,
+    "url_final": "/cadastros/servidores/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/062-cadastros-novo-servidor.webp",
+    "webp_bytes": 15496,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 63,
+    "grupo": "Cadastros",
+    "titulo": "Editar servidor",
+    "rota": "/cadastros/servidores/11/editar/",
+    "tema": "light",
+    "arquivo": "light/063-cadastros-editar-servidor.png",
+    "status": 200,
+    "url_final": "/cadastros/servidores/11/editar/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/063-cadastros-editar-servidor.webp",
+    "webp_bytes": 16492,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 64,
+    "grupo": "Cadastros",
+    "titulo": "Viaturas",
+    "rota": "/cadastros/viaturas/",
+    "tema": "light",
+    "arquivo": "light/064-cadastros-viaturas.png",
+    "status": 200,
+    "url_final": "/cadastros/viaturas/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/064-cadastros-viaturas.webp",
+    "webp_bytes": 25374,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 65,
+    "grupo": "Cadastros",
+    "titulo": "Nova viatura",
+    "rota": "/cadastros/viaturas/nova/",
+    "tema": "light",
+    "arquivo": "light/065-cadastros-nova-viatura.png",
+    "status": 200,
+    "url_final": "/cadastros/viaturas/nova/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/065-cadastros-nova-viatura.webp",
+    "webp_bytes": 17194,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 66,
+    "grupo": "Cadastros",
+    "titulo": "Editar viatura",
+    "rota": "/cadastros/viaturas/11/editar/",
+    "tema": "light",
+    "arquivo": "light/066-cadastros-editar-viatura.png",
+    "status": 200,
+    "url_final": "/cadastros/viaturas/11/editar/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/066-cadastros-editar-viatura.webp",
+    "webp_bytes": 19208,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 67,
+    "grupo": "Cadastros",
+    "titulo": "Unidades",
+    "rota": "/cadastros/unidades/",
+    "tema": "light",
+    "arquivo": "light/067-cadastros-unidades.png",
+    "status": 200,
+    "url_final": "/cadastros/unidades/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/067-cadastros-unidades.webp",
+    "webp_bytes": 18590,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 68,
+    "grupo": "Cadastros",
+    "titulo": "Nova unidade",
+    "rota": "/cadastros/unidades/nova/",
+    "tema": "light",
+    "arquivo": "light/068-cadastros-nova-unidade.png",
+    "status": 200,
+    "url_final": "/cadastros/unidades/nova/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/068-cadastros-nova-unidade.webp",
+    "webp_bytes": 18590,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 69,
+    "grupo": "Cadastros",
+    "titulo": "Cargos",
+    "rota": "/cadastros/cargos/",
+    "tema": "light",
+    "arquivo": "light/069-cadastros-cargos.png",
+    "status": 200,
+    "url_final": "/cadastros/cargos/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/069-cadastros-cargos.webp",
+    "webp_bytes": 16150,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 70,
+    "grupo": "Cadastros",
+    "titulo": "Novo cargo",
+    "rota": "/cadastros/cargos/novo/",
+    "tema": "light",
+    "arquivo": "light/070-cadastros-novo-cargo.png",
+    "status": 200,
+    "url_final": "/cadastros/cargos/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/070-cadastros-novo-cargo.webp",
+    "webp_bytes": 16150,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 71,
+    "grupo": "Cadastros",
+    "titulo": "Combustíveis",
+    "rota": "/cadastros/combustiveis/",
+    "tema": "light",
+    "arquivo": "light/071-cadastros-combustiveis.png",
+    "status": 200,
+    "url_final": "/cadastros/combustiveis/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/071-cadastros-combustiveis.webp",
+    "webp_bytes": 14822,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 72,
+    "grupo": "Cadastros",
+    "titulo": "Novo combustível",
+    "rota": "/cadastros/combustiveis/novo/",
+    "tema": "light",
+    "arquivo": "light/072-cadastros-novo-combustivel.png",
+    "status": 200,
+    "url_final": "/cadastros/combustiveis/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/072-cadastros-novo-combustivel.webp",
+    "webp_bytes": 14822,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 73,
+    "grupo": "Cadastros",
+    "titulo": "Cidades",
+    "rota": "/cadastros/cidades/",
+    "tema": "light",
+    "arquivo": "light/073-cadastros-cidades.png",
+    "status": 200,
+    "url_final": "/cadastros/cidades/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/073-cadastros-cidades.webp",
+    "webp_bytes": 13860,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 74,
+    "grupo": "Cadastros",
+    "titulo": "Nova cidade",
+    "rota": "/cadastros/cidades/nova/",
+    "tema": "light",
+    "arquivo": "light/074-cadastros-nova-cidade.png",
+    "status": 200,
+    "url_final": "/cadastros/cidades/nova/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/074-cadastros-nova-cidade.webp",
+    "webp_bytes": 13634,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 75,
+    "grupo": "Cadastros",
+    "titulo": "Estados",
+    "rota": "/cadastros/estados/",
+    "tema": "light",
+    "arquivo": "light/075-cadastros-estados.png",
+    "status": 200,
+    "url_final": "/cadastros/estados/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/075-cadastros-estados.webp",
+    "webp_bytes": 15536,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 76,
+    "grupo": "Usuários e áreas",
+    "titulo": "Lista de usuários",
+    "rota": "/usuarios/",
+    "tema": "light",
+    "arquivo": "light/076-usuarios-e-areas-lista-de-usuarios.png",
+    "status": 200,
+    "url_final": "/usuarios/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/076-usuarios-e-areas-lista-de-usuarios.webp",
+    "webp_bytes": 11252,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 77,
+    "grupo": "Usuários e áreas",
+    "titulo": "Áreas de trabalho",
+    "rota": "/usuarios/areas/",
+    "tema": "light",
+    "arquivo": "light/077-usuarios-e-areas-areas-de-trabalho.png",
+    "status": 200,
+    "url_final": "/usuarios/areas/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/077-usuarios-e-areas-areas-de-trabalho.webp",
+    "webp_bytes": 10390,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 78,
+    "grupo": "Usuários e áreas",
+    "titulo": "Detalhe da área",
+    "rota": "/usuarios/areas/3/",
+    "tema": "light",
+    "arquivo": "light/078-usuarios-e-areas-detalhe-da-area.png",
+    "status": 200,
+    "url_final": "/usuarios/areas/3/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/078-usuarios-e-areas-detalhe-da-area.webp",
+    "webp_bytes": 15772,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 79,
+    "grupo": "UI Lab",
+    "titulo": "Índice",
+    "rota": "/dev/ui-lab/",
+    "tema": "light",
+    "arquivo": "light/079-ui-lab-indice.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/",
+    "altura": 2034,
+    "recortada": false,
+    "webp": "light/079-ui-lab-indice.webp",
+    "webp_bytes": 65080,
+    "webp_size": [
+      880,
+      1243
+    ]
+  },
+  {
+    "ordem": 80,
+    "grupo": "UI Lab",
+    "titulo": "Structures",
+    "rota": "/dev/ui-lab/structures/",
+    "tema": "light",
+    "arquivo": "light/080-ui-lab-structures.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/structures/",
+    "altura": 4899,
+    "recortada": false,
+    "webp": "light/080-ui-lab-structures.webp",
+    "webp_bytes": 69024,
+    "webp_size": [
+      880,
+      2994
+    ]
+  },
+  {
+    "ordem": 81,
+    "grupo": "UI Lab",
+    "titulo": "Lists",
+    "rota": "/dev/ui-lab/lists/",
+    "tema": "light",
+    "arquivo": "light/081-ui-lab-lists.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/lists/",
+    "altura": 3924,
+    "recortada": false,
+    "webp": "light/081-ui-lab-lists.webp",
+    "webp_bytes": 74386,
+    "webp_size": [
+      880,
+      2398
+    ]
+  },
+  {
+    "ordem": 82,
+    "grupo": "UI Lab",
+    "titulo": "Headers",
+    "rota": "/dev/ui-lab/headers/",
+    "tema": "light",
+    "arquivo": "light/082-ui-lab-headers.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/headers/",
+    "altura": 2185,
+    "recortada": false,
+    "webp": "light/082-ui-lab-headers.webp",
+    "webp_bytes": 42502,
+    "webp_size": [
+      880,
+      1335
+    ]
+  },
+  {
+    "ordem": 83,
+    "grupo": "UI Lab",
+    "titulo": "Buttons",
+    "rota": "/dev/ui-lab/buttons/",
+    "tema": "light",
+    "arquivo": "light/083-ui-lab-buttons.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/buttons/",
+    "altura": 1820,
+    "recortada": false,
+    "webp": "light/083-ui-lab-buttons.webp",
+    "webp_bytes": 41012,
+    "webp_size": [
+      880,
+      1112
+    ]
+  },
+  {
+    "ordem": 84,
+    "grupo": "UI Lab",
+    "titulo": "Fields",
+    "rota": "/dev/ui-lab/fields/",
+    "tema": "light",
+    "arquivo": "light/084-ui-lab-fields.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/fields/",
+    "altura": 2688,
+    "recortada": false,
+    "webp": "light/084-ui-lab-fields.webp",
+    "webp_bytes": 50560,
+    "webp_size": [
+      880,
+      1643
+    ]
+  },
+  {
+    "ordem": 85,
+    "grupo": "UI Lab",
+    "titulo": "Selects e filtros",
+    "rota": "/dev/ui-lab/selects-filters/",
+    "tema": "light",
+    "arquivo": "light/085-ui-lab-selects-e-filtros.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/selects-filters/",
+    "altura": 1902,
+    "recortada": false,
+    "webp": "light/085-ui-lab-selects-e-filtros.webp",
+    "webp_bytes": 43236,
+    "webp_size": [
+      880,
+      1162
+    ]
+  },
+  {
+    "ordem": 86,
+    "grupo": "UI Lab",
+    "titulo": "Status",
+    "rota": "/dev/ui-lab/status/",
+    "tema": "light",
+    "arquivo": "light/086-ui-lab-status.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/status/",
+    "altura": 1835,
+    "recortada": false,
+    "webp": "light/086-ui-lab-status.webp",
+    "webp_bytes": 53254,
+    "webp_size": [
+      880,
+      1121
+    ]
+  },
+  {
+    "ordem": 87,
+    "grupo": "UI Lab",
+    "titulo": "Feedback",
+    "rota": "/dev/ui-lab/feedback/",
+    "tema": "light",
+    "arquivo": "light/087-ui-lab-feedback.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/feedback/",
+    "altura": 1221,
+    "recortada": false,
+    "webp": "light/087-ui-lab-feedback.webp",
+    "webp_bytes": 38084,
+    "webp_size": [
+      880,
+      746
+    ]
+  },
+  {
+    "ordem": 88,
+    "grupo": "UI Lab",
+    "titulo": "Cards",
+    "rota": "/dev/ui-lab/cards/",
+    "tema": "light",
+    "arquivo": "light/088-ui-lab-cards.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/cards/",
+    "altura": 2203,
+    "recortada": false,
+    "webp": "light/088-ui-lab-cards.webp",
+    "webp_bytes": 55294,
+    "webp_size": [
+      880,
+      1346
+    ]
+  },
+  {
+    "ordem": 89,
+    "grupo": "UI Lab",
+    "titulo": "Overlays",
+    "rota": "/dev/ui-lab/overlays/",
+    "tema": "light",
+    "arquivo": "light/089-ui-lab-overlays.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/overlays/",
+    "altura": 1365,
+    "recortada": false,
+    "webp": "light/089-ui-lab-overlays.webp",
+    "webp_bytes": 42300,
+    "webp_size": [
+      880,
+      834
+    ]
+  },
+  {
+    "ordem": 90,
+    "grupo": "UI Lab",
+    "titulo": "Tables",
+    "rota": "/dev/ui-lab/tables/",
+    "tema": "light",
+    "arquivo": "light/090-ui-lab-tables.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/tables/",
+    "altura": 1273,
+    "recortada": false,
+    "webp": "light/090-ui-lab-tables.webp",
+    "webp_bytes": 31758,
+    "webp_size": [
+      880,
+      778
+    ]
+  },
+  {
+    "ordem": 91,
+    "grupo": "UI Lab",
+    "titulo": "Documents",
+    "rota": "/dev/ui-lab/documents/",
+    "tema": "light",
+    "arquivo": "light/091-ui-lab-documents.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/documents/",
+    "altura": 2038,
+    "recortada": false,
+    "webp": "light/091-ui-lab-documents.webp",
+    "webp_bytes": 36152,
+    "webp_size": [
+      880,
+      1245
+    ]
+  },
+  {
+    "ordem": 92,
+    "grupo": "UI Lab",
+    "titulo": "Signature",
+    "rota": "/dev/ui-lab/signature/",
+    "tema": "light",
+    "arquivo": "light/092-ui-lab-signature.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/signature/",
+    "altura": 1428,
+    "recortada": false,
+    "webp": "light/092-ui-lab-signature.webp",
+    "webp_bytes": 38350,
+    "webp_size": [
+      880,
+      873
+    ]
+  },
+  {
+    "ordem": 93,
+    "grupo": "UI Lab",
+    "titulo": "Eventos — cadastro",
+    "rota": "/dev/ui-lab/eventos/cadastro/",
+    "tema": "light",
+    "arquivo": "light/093-ui-lab-eventos-cadastro.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/eventos/cadastro/",
+    "altura": 4257,
+    "recortada": false,
+    "webp": "light/093-ui-lab-eventos-cadastro.webp",
+    "webp_bytes": 71114,
+    "webp_size": [
+      880,
+      2602
+    ]
+  },
+  {
+    "ordem": 94,
+    "grupo": "UI Lab",
+    "titulo": "Eventos — lista",
+    "rota": "/dev/ui-lab/eventos/lista/",
+    "tema": "light",
+    "arquivo": "light/094-ui-lab-eventos-lista.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/eventos/lista/",
+    "altura": 3851,
+    "recortada": false,
+    "webp": "light/094-ui-lab-eventos-lista.webp",
+    "webp_bytes": 70252,
+    "webp_size": [
+      880,
+      2353
+    ]
+  },
+  {
+    "ordem": 95,
+    "grupo": "UI Lab 2",
+    "titulo": "Índice",
+    "rota": "/dev/ui-lab-2/",
+    "tema": "light",
+    "arquivo": "light/095-ui-lab-2-indice.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/",
+    "altura": 2070,
+    "recortada": false,
+    "webp": "light/095-ui-lab-2-indice.webp",
+    "webp_bytes": 68062,
+    "webp_size": [
+      880,
+      1265
+    ]
+  },
+  {
+    "ordem": 96,
+    "grupo": "UI Lab 2",
+    "titulo": "Shells",
+    "rota": "/dev/ui-lab-2/shells/",
+    "tema": "light",
+    "arquivo": "light/096-ui-lab-2-shells.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/shells/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/096-ui-lab-2-shells.webp",
+    "webp_bytes": 27526,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 97,
+    "grupo": "UI Lab 2",
+    "titulo": "Headers",
+    "rota": "/dev/ui-lab-2/headers/",
+    "tema": "light",
+    "arquivo": "light/097-ui-lab-2-headers.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/headers/",
+    "altura": 3561,
+    "recortada": false,
+    "webp": "light/097-ui-lab-2-headers.webp",
+    "webp_bytes": 72926,
+    "webp_size": [
+      880,
+      2176
+    ]
+  },
+  {
+    "ordem": 98,
+    "grupo": "UI Lab 2",
+    "titulo": "Steppers",
+    "rota": "/dev/ui-lab-2/steppers/",
+    "tema": "light",
+    "arquivo": "light/098-ui-lab-2-steppers.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/steppers/",
+    "altura": 1251,
+    "recortada": false,
+    "webp": "light/098-ui-lab-2-steppers.webp",
+    "webp_bytes": 35244,
+    "webp_size": [
+      880,
+      764
+    ]
+  },
+  {
+    "ordem": 99,
+    "grupo": "UI Lab 2",
+    "titulo": "Section cards",
+    "rota": "/dev/ui-lab-2/section-cards/",
+    "tema": "light",
+    "arquivo": "light/099-ui-lab-2-section-cards.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/section-cards/",
+    "altura": 1631,
+    "recortada": false,
+    "webp": "light/099-ui-lab-2-section-cards.webp",
+    "webp_bytes": 36898,
+    "webp_size": [
+      880,
+      997
+    ]
+  },
+  {
+    "ordem": 100,
+    "grupo": "UI Lab 2",
+    "titulo": "Fields",
+    "rota": "/dev/ui-lab-2/fields/",
+    "tema": "light",
+    "arquivo": "light/100-ui-lab-2-fields.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/fields/",
+    "altura": 3202,
+    "recortada": false,
+    "webp": "light/100-ui-lab-2-fields.webp",
+    "webp_bytes": 61730,
+    "webp_size": [
+      880,
+      1957
+    ]
+  },
+  {
+    "ordem": 101,
+    "grupo": "UI Lab 2",
+    "titulo": "Selects",
+    "rota": "/dev/ui-lab-2/selects/",
+    "tema": "light",
+    "arquivo": "light/101-ui-lab-2-selects.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/selects/",
+    "altura": 3088,
+    "recortada": false,
+    "webp": "light/101-ui-lab-2-selects.webp",
+    "webp_bytes": 60050,
+    "webp_size": [
+      880,
+      1887
+    ]
+  },
+  {
+    "ordem": 102,
+    "grupo": "UI Lab 2",
+    "titulo": "Calendars",
+    "rota": "/dev/ui-lab-2/calendars/",
+    "tema": "light",
+    "arquivo": "light/102-ui-lab-2-calendars.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/calendars/",
+    "altura": 2195,
+    "recortada": false,
+    "webp": "light/102-ui-lab-2-calendars.webp",
+    "webp_bytes": 63440,
+    "webp_size": [
+      880,
+      1341
+    ]
+  },
+  {
+    "ordem": 103,
+    "grupo": "UI Lab 2",
+    "titulo": "Buttons",
+    "rota": "/dev/ui-lab-2/buttons/",
+    "tema": "light",
+    "arquivo": "light/103-ui-lab-2-buttons.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/buttons/",
+    "altura": 2668,
+    "recortada": false,
+    "webp": "light/103-ui-lab-2-buttons.webp",
+    "webp_bytes": 85788,
+    "webp_size": [
+      880,
+      1630
+    ]
+  },
+  {
+    "ordem": 104,
+    "grupo": "UI Lab 2",
+    "titulo": "Footers",
+    "rota": "/dev/ui-lab-2/footers/",
+    "tema": "light",
+    "arquivo": "light/104-ui-lab-2-footers.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/footers/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/104-ui-lab-2-footers.webp",
+    "webp_bytes": 26292,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 105,
+    "grupo": "UI Lab 2",
+    "titulo": "Badges",
+    "rota": "/dev/ui-lab-2/badges/",
+    "tema": "light",
+    "arquivo": "light/105-ui-lab-2-badges.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/badges/",
+    "altura": 2479,
+    "recortada": false,
+    "webp": "light/105-ui-lab-2-badges.webp",
+    "webp_bytes": 56932,
+    "webp_size": [
+      880,
+      1515
+    ]
+  },
+  {
+    "ordem": 106,
+    "grupo": "UI Lab 2",
+    "titulo": "Feedback",
+    "rota": "/dev/ui-lab-2/feedback/",
+    "tema": "light",
+    "arquivo": "light/106-ui-lab-2-feedback.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/feedback/",
+    "altura": 3149,
+    "recortada": false,
+    "webp": "light/106-ui-lab-2-feedback.webp",
+    "webp_bytes": 66680,
+    "webp_size": [
+      880,
+      1924
+    ]
+  },
+  {
+    "ordem": 107,
+    "grupo": "UI Lab 2",
+    "titulo": "Modals",
+    "rota": "/dev/ui-lab-2/modals/",
+    "tema": "light",
+    "arquivo": "light/107-ui-lab-2-modals.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/modals/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/107-ui-lab-2-modals.webp",
+    "webp_bytes": 26482,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 108,
+    "grupo": "UI Lab 2",
+    "titulo": "Domain cards",
+    "rota": "/dev/ui-lab-2/domain-cards/",
+    "tema": "light",
+    "arquivo": "light/108-ui-lab-2-domain-cards.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/domain-cards/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/108-ui-lab-2-domain-cards.webp",
+    "webp_bytes": 26486,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 109,
+    "grupo": "UI Lab 2",
+    "titulo": "Signatures",
+    "rota": "/dev/ui-lab-2/signatures/",
+    "tema": "light",
+    "arquivo": "light/109-ui-lab-2-signatures.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/signatures/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/109-ui-lab-2-signatures.webp",
+    "webp_bytes": 26064,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 110,
+    "grupo": "UI Lab 2",
+    "titulo": "Documents",
+    "rota": "/dev/ui-lab-2/documents/",
+    "tema": "light",
+    "arquivo": "light/110-ui-lab-2-documents.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/documents/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/110-ui-lab-2-documents.webp",
+    "webp_bytes": 26910,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 111,
+    "grupo": "Cadastros",
+    "titulo": "Editar unidade (em linha)",
+    "rota": "/cadastros/unidades/",
+    "tema": "light",
+    "arquivo": "light/111-cadastros-editar-unidade-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 938,
+    "recortada": false,
+    "webp": "light/111-cadastros-editar-unidade-em-linha.webp",
+    "webp_bytes": 20252,
+    "webp_size": [
+      880,
+      573
+    ]
+  },
+  {
+    "ordem": 112,
+    "grupo": "Cadastros",
+    "titulo": "Editar cargo (em linha)",
+    "rota": "/cadastros/cargos/",
+    "tema": "light",
+    "arquivo": "light/112-cadastros-editar-cargo-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/112-cadastros-editar-cargo-em-linha.webp",
+    "webp_bytes": 16910,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 113,
+    "grupo": "Cadastros",
+    "titulo": "Editar combustível (em linha)",
+    "rota": "/cadastros/combustiveis/",
+    "tema": "light",
+    "arquivo": "light/113-cadastros-editar-combustivel-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/113-cadastros-editar-combustivel-em-linha.webp",
+    "webp_bytes": 15336,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 114,
+    "grupo": "Cadastros",
+    "titulo": "Editar estado (em linha)",
+    "rota": "/cadastros/estados/",
+    "tema": "light",
+    "arquivo": "light/114-cadastros-editar-estado-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 938,
+    "recortada": false,
+    "webp": "light/114-cadastros-editar-estado-em-linha.webp",
+    "webp_bytes": 16418,
+    "webp_size": [
+      880,
+      573
+    ]
+  },
+  {
+    "ordem": 115,
+    "grupo": "Cadastros",
+    "titulo": "Confirmar exclusão de servidor",
+    "rota": "/cadastros/servidores/",
+    "tema": "light",
+    "arquivo": "light/115-cadastros-confirmar-exclusao-de-servidor.png",
+    "status": 200,
+    "interacao": "[data-overlay-target=\"delete-confirm-modal\"]",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/115-cadastros-confirmar-exclusao-de-servidor.webp",
+    "webp_bytes": 6870,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 116,
+    "grupo": "Ofícios",
+    "titulo": "Editar modelo de motivo (em linha)",
+    "rota": "/oficios/modelos-motivo/",
+    "tema": "light",
+    "arquivo": "light/116-oficios-editar-modelo-de-motivo-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 1013,
+    "recortada": false,
+    "webp": "light/116-oficios-editar-modelo-de-motivo-em-linha.webp",
+    "webp_bytes": 25942,
+    "webp_size": [
+      880,
+      619
+    ]
+  },
+  {
+    "ordem": 117,
+    "grupo": "Justificativas",
+    "titulo": "Editar modelo (em linha)",
+    "rota": "/justificativas/modelos/",
+    "tema": "light",
+    "arquivo": "light/117-justificativas-editar-modelo-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 1017,
+    "recortada": false,
+    "webp": "light/117-justificativas-editar-modelo-em-linha.webp",
+    "webp_bytes": 25580,
+    "webp_size": [
+      880,
+      622
+    ]
+  },
+  {
+    "ordem": 118,
+    "grupo": "Planos de trabalho",
+    "titulo": "Editar programa (em linha)",
+    "rota": "/planos-trabalho/programas/",
+    "tema": "light",
+    "arquivo": "light/118-planos-de-trabalho-editar-programa-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 973,
+    "recortada": false,
+    "webp": "light/118-planos-de-trabalho-editar-programa-em-linha.webp",
+    "webp_bytes": 18440,
+    "webp_size": [
+      880,
+      595
+    ]
+  },
+  {
+    "ordem": 119,
+    "grupo": "Planos de trabalho",
+    "titulo": "Editar horário (em linha)",
+    "rota": "/planos-trabalho/horarios/",
+    "tema": "light",
+    "arquivo": "light/119-planos-de-trabalho-editar-horario-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 973,
+    "recortada": false,
+    "webp": "light/119-planos-de-trabalho-editar-horario-em-linha.webp",
+    "webp_bytes": 17418,
+    "webp_size": [
+      880,
+      595
+    ]
+  },
+  {
+    "ordem": 120,
+    "grupo": "Planos de trabalho",
+    "titulo": "Editar atividade (em linha)",
+    "rota": "/planos-trabalho/atividades/",
+    "tema": "light",
+    "arquivo": "light/120-planos-de-trabalho-editar-atividade-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 1153,
+    "recortada": false,
+    "webp": "light/120-planos-de-trabalho-editar-atividade-em-linha.webp",
+    "webp_bytes": 32718,
+    "webp_size": [
+      880,
+      705
+    ]
+  },
+  {
+    "ordem": 121,
+    "grupo": "Usuários e áreas",
+    "titulo": "Novo usuário (em diálogo)",
+    "rota": "/usuarios/",
+    "tema": "light",
+    "arquivo": "light/121-usuarios-e-areas-novo-usuario-em-dialogo.png",
+    "status": 200,
+    "interacao": "[data-overlay-kind=\"dialog\"]",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/121-usuarios-e-areas-novo-usuario-em-dialogo.webp",
+    "webp_bytes": 5792,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 122,
+    "grupo": "Usuários e áreas",
+    "titulo": "Nova área (em diálogo)",
+    "rota": "/usuarios/areas/",
+    "tema": "light",
+    "arquivo": "light/122-usuarios-e-areas-nova-area-em-dialogo.png",
+    "status": 200,
+    "interacao": "[data-overlay-kind=\"dialog\"]",
+    "altura": 900,
+    "recortada": false,
+    "webp": "light/122-usuarios-e-areas-nova-area-em-dialogo.webp",
+    "webp_bytes": 5818,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 1,
+    "grupo": "Acesso",
+    "titulo": "Login",
+    "rota": "/login/",
+    "tema": "dark",
+    "arquivo": "dark/001-acesso-login.png",
+    "status": 200,
+    "url_final": "/login/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/001-acesso-login.webp",
+    "webp_bytes": 12994,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 2,
+    "grupo": "Acesso",
+    "titulo": "Perfil do usuário",
+    "rota": "/perfil/",
+    "tema": "dark",
+    "arquivo": "dark/002-acesso-perfil-do-usuario.png",
+    "status": 200,
+    "url_final": "/perfil/",
+    "altura": 1082,
+    "recortada": false,
+    "webp": "dark/002-acesso-perfil-do-usuario.webp",
+    "webp_bytes": 23376,
+    "webp_size": [
+      880,
+      661
+    ]
+  },
+  {
+    "ordem": 3,
+    "grupo": "Painel",
+    "titulo": "Dashboard",
+    "rota": "/",
+    "tema": "dark",
+    "arquivo": "dark/003-painel-dashboard.png",
+    "status": 200,
+    "url_final": "/",
+    "altura": 1320,
+    "recortada": false,
+    "webp": "dark/003-painel-dashboard.webp",
+    "webp_bytes": 37726,
+    "webp_size": [
+      880,
+      807
+    ]
+  },
+  {
+    "ordem": 4,
+    "grupo": "Eventos",
+    "titulo": "Lista de eventos",
+    "rota": "/eventos/",
+    "tema": "dark",
+    "arquivo": "dark/004-eventos-lista-de-eventos.png",
+    "status": 200,
+    "url_final": "/eventos/",
+    "altura": 1274,
+    "recortada": false,
+    "webp": "dark/004-eventos-lista-de-eventos.webp",
+    "webp_bytes": 27168,
+    "webp_size": [
+      880,
+      779
+    ]
+  },
+  {
+    "ordem": 5,
+    "grupo": "Eventos",
+    "titulo": "Novo evento",
+    "rota": "/eventos/novo/",
+    "tema": "dark",
+    "arquivo": "dark/005-eventos-novo-evento.png",
+    "status": 200,
+    "url_final": "/eventos/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/005-eventos-novo-evento.webp",
+    "webp_bytes": 10036,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 6,
+    "grupo": "Eventos",
+    "titulo": "Detalhe do evento",
+    "rota": "/eventos/1/",
+    "tema": "dark",
+    "arquivo": "dark/006-eventos-detalhe-do-evento.png",
+    "status": 200,
+    "url_final": "/eventos/1/",
+    "altura": 1283,
+    "recortada": false,
+    "webp": "dark/006-eventos-detalhe-do-evento.webp",
+    "webp_bytes": 28792,
+    "webp_size": [
+      880,
+      784
+    ]
+  },
+  {
+    "ordem": 7,
+    "grupo": "Eventos",
+    "titulo": "Editar evento",
+    "rota": "/eventos/1/editar/",
+    "tema": "dark",
+    "arquivo": "dark/007-eventos-editar-evento.png",
+    "status": 200,
+    "url_final": "/eventos/1/editar/",
+    "altura": 1603,
+    "recortada": false,
+    "webp": "dark/007-eventos-editar-evento.webp",
+    "webp_bytes": 26562,
+    "webp_size": [
+      880,
+      980
+    ]
+  },
+  {
+    "ordem": 8,
+    "grupo": "Eventos",
+    "titulo": "Fluxo guiado — etapa 1",
+    "rota": "/eventos/1/guiado/",
+    "tema": "dark",
+    "arquivo": "dark/008-eventos-fluxo-guiado-etapa-1.png",
+    "status": 200,
+    "url_final": "/eventos/1/guiado/",
+    "altura": 1283,
+    "recortada": false,
+    "webp": "dark/008-eventos-fluxo-guiado-etapa-1.webp",
+    "webp_bytes": 28792,
+    "webp_size": [
+      880,
+      784
+    ]
+  },
+  {
+    "ordem": 9,
+    "grupo": "Eventos",
+    "titulo": "Fluxo guiado — etapa 2",
+    "rota": "/eventos/1/guiado/etapa-2/",
+    "tema": "dark",
+    "arquivo": "dark/009-eventos-fluxo-guiado-etapa-2.png",
+    "status": 200,
+    "url_final": "/eventos/1/guiado/etapa-2/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/009-eventos-fluxo-guiado-etapa-2.webp",
+    "webp_bytes": 15746,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 10,
+    "grupo": "Eventos",
+    "titulo": "Fluxo guiado — etapa 3",
+    "rota": "/eventos/1/guiado/etapa-3/",
+    "tema": "dark",
+    "arquivo": "dark/010-eventos-fluxo-guiado-etapa-3.png",
+    "status": 200,
+    "url_final": "/eventos/1/guiado/etapa-3/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/010-eventos-fluxo-guiado-etapa-3.webp",
+    "webp_bytes": 15588,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 11,
+    "grupo": "Eventos",
+    "titulo": "Fluxo guiado — etapa 4",
+    "rota": "/eventos/1/guiado/etapa-4/",
+    "tema": "dark",
+    "arquivo": "dark/011-eventos-fluxo-guiado-etapa-4.png",
+    "status": 200,
+    "url_final": "/eventos/1/guiado/etapa-4/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/011-eventos-fluxo-guiado-etapa-4.webp",
+    "webp_bytes": 15760,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 12,
+    "grupo": "Eventos",
+    "titulo": "Fluxo guiado — termos",
+    "rota": "/eventos/1/guiado_termos/",
+    "tema": "dark",
+    "arquivo": "dark/012-eventos-fluxo-guiado-termos.png",
+    "status": 200,
+    "url_final": "/eventos/1/guiado_termos/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/012-eventos-fluxo-guiado-termos.webp",
+    "webp_bytes": 15664,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 13,
+    "grupo": "Eventos",
+    "titulo": "Tipos de evento",
+    "rota": "/eventos/tipos/",
+    "tema": "dark",
+    "arquivo": "dark/013-eventos-tipos-de-evento.png",
+    "status": 200,
+    "url_final": "/eventos/tipos/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/013-eventos-tipos-de-evento.webp",
+    "webp_bytes": 14006,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 14,
+    "grupo": "Ofícios",
+    "titulo": "Lista de ofícios",
+    "rota": "/oficios/",
+    "tema": "dark",
+    "arquivo": "dark/014-oficios-lista-de-oficios.png",
+    "status": 200,
+    "url_final": "/oficios/",
+    "altura": 2982,
+    "recortada": false,
+    "webp": "dark/014-oficios-lista-de-oficios.webp",
+    "webp_bytes": 87634,
+    "webp_size": [
+      880,
+      1822
+    ]
+  },
+  {
+    "ordem": 15,
+    "grupo": "Ofícios",
+    "titulo": "Novo ofício",
+    "rota": "/oficios/novo/",
+    "tema": "dark",
+    "arquivo": "dark/015-oficios-novo-oficio.png",
+    "status": 200,
+    "url_final": "/oficios/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/015-oficios-novo-oficio.webp",
+    "webp_bytes": 9986,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 16,
+    "grupo": "Ofícios",
+    "titulo": "Assistente — dados e viajantes",
+    "rota": "/oficios/6/dados-viajantes/",
+    "tema": "dark",
+    "arquivo": "dark/016-oficios-assistente-dados-e-viajantes.png",
+    "status": 200,
+    "url_final": "/oficios/6/dados-viajantes/",
+    "altura": 1382,
+    "recortada": false,
+    "webp": "dark/016-oficios-assistente-dados-e-viajantes.webp",
+    "webp_bytes": 27470,
+    "webp_size": [
+      880,
+      845
+    ]
+  },
+  {
+    "ordem": 17,
+    "grupo": "Ofícios",
+    "titulo": "Assistente — transporte",
+    "rota": "/oficios/6/transporte/",
+    "tema": "dark",
+    "arquivo": "dark/017-oficios-assistente-transporte.png",
+    "status": 200,
+    "url_final": "/oficios/6/transporte/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/017-oficios-assistente-transporte.webp",
+    "webp_bytes": 20026,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 18,
+    "grupo": "Ofícios",
+    "titulo": "Assistente — roteiro",
+    "rota": "/oficios/6/roteiro/",
+    "tema": "dark",
+    "arquivo": "dark/018-oficios-assistente-roteiro.png",
+    "status": 200,
+    "url_final": "/oficios/6/roteiro/",
+    "altura": 2636,
+    "recortada": false,
+    "webp": "dark/018-oficios-assistente-roteiro.webp",
+    "webp_bytes": 40374,
+    "webp_size": [
+      880,
+      1611
+    ]
+  },
+  {
+    "ordem": 19,
+    "grupo": "Ofícios",
+    "titulo": "Assistente — justificativa",
+    "rota": "/oficios/6/justificativa/",
+    "tema": "dark",
+    "arquivo": "dark/019-oficios-assistente-justificativa.png",
+    "status": 200,
+    "url_final": "/oficios/6/justificativa/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/019-oficios-assistente-justificativa.webp",
+    "webp_bytes": 16096,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 20,
+    "grupo": "Ofícios",
+    "titulo": "Assistente — resumo",
+    "rota": "/oficios/6/resumo/",
+    "tema": "dark",
+    "arquivo": "dark/020-oficios-assistente-resumo.png",
+    "status": 200,
+    "url_final": "/oficios/6/resumo/",
+    "altura": 1347,
+    "recortada": false,
+    "webp": "dark/020-oficios-assistente-resumo.webp",
+    "webp_bytes": 31414,
+    "webp_size": [
+      880,
+      823
+    ]
+  },
+  {
+    "ordem": 21,
+    "grupo": "Ofícios",
+    "titulo": "Assistente — documentos",
+    "rota": "/oficios/6/documentos/",
+    "tema": "dark",
+    "arquivo": "dark/021-oficios-assistente-documentos.png",
+    "status": 200,
+    "url_final": "/oficios/6/documentos/",
+    "altura": 1347,
+    "recortada": false,
+    "webp": "dark/021-oficios-assistente-documentos.webp",
+    "webp_bytes": 31414,
+    "webp_size": [
+      880,
+      823
+    ]
+  },
+  {
+    "ordem": 22,
+    "grupo": "Ofícios",
+    "titulo": "Modelos de motivo",
+    "rota": "/oficios/modelos-motivo/",
+    "tema": "dark",
+    "arquivo": "dark/022-oficios-modelos-de-motivo.png",
+    "status": 200,
+    "url_final": "/oficios/modelos-motivo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/022-oficios-modelos-de-motivo.webp",
+    "webp_bytes": 23552,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 23,
+    "grupo": "Ofícios",
+    "titulo": "Novo modelo de motivo",
+    "rota": "/oficios/modelos-motivo/novo/",
+    "tema": "dark",
+    "arquivo": "dark/023-oficios-novo-modelo-de-motivo.png",
+    "status": 200,
+    "url_final": "/oficios/modelos-motivo/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/023-oficios-novo-modelo-de-motivo.webp",
+    "webp_bytes": 23552,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 24,
+    "grupo": "Roteiros",
+    "titulo": "Lista de roteiros",
+    "rota": "/roteiros/",
+    "tema": "dark",
+    "arquivo": "dark/024-roteiros-lista-de-roteiros.png",
+    "status": 200,
+    "url_final": "/roteiros/",
+    "altura": 2476,
+    "recortada": false,
+    "webp": "dark/024-roteiros-lista-de-roteiros.webp",
+    "webp_bytes": 57452,
+    "webp_size": [
+      880,
+      1513
+    ]
+  },
+  {
+    "ordem": 25,
+    "grupo": "Roteiros",
+    "titulo": "Novo roteiro",
+    "rota": "/roteiros/novo/",
+    "tema": "dark",
+    "arquivo": "dark/025-roteiros-novo-roteiro.png",
+    "status": 200,
+    "url_final": "/roteiros/novo/",
+    "altura": 2224,
+    "recortada": false,
+    "webp": "dark/025-roteiros-novo-roteiro.webp",
+    "webp_bytes": 28542,
+    "webp_size": [
+      880,
+      1359
+    ]
+  },
+  {
+    "ordem": 26,
+    "grupo": "Roteiros",
+    "titulo": "Editar roteiro",
+    "rota": "/roteiros/6/editar/",
+    "tema": "dark",
+    "arquivo": "dark/026-roteiros-editar-roteiro.png",
+    "status": 200,
+    "url_final": "/roteiros/6/editar/",
+    "altura": 2545,
+    "recortada": false,
+    "webp": "dark/026-roteiros-editar-roteiro.webp",
+    "webp_bytes": 39150,
+    "webp_size": [
+      880,
+      1555
+    ]
+  },
+  {
+    "ordem": 27,
+    "grupo": "Termos",
+    "titulo": "Lista de termos",
+    "rota": "/termos/",
+    "tema": "dark",
+    "arquivo": "dark/027-termos-lista-de-termos.png",
+    "status": 200,
+    "url_final": "/termos/",
+    "altura": 1879,
+    "recortada": false,
+    "webp": "dark/027-termos-lista-de-termos.webp",
+    "webp_bytes": 47326,
+    "webp_size": [
+      880,
+      1148
+    ]
+  },
+  {
+    "ordem": 28,
+    "grupo": "Termos",
+    "titulo": "Novo termo",
+    "rota": "/termos/novo/",
+    "tema": "dark",
+    "arquivo": "dark/028-termos-novo-termo.png",
+    "status": 200,
+    "url_final": "/termos/novo/",
+    "altura": 1420,
+    "recortada": false,
+    "webp": "dark/028-termos-novo-termo.webp",
+    "webp_bytes": 28010,
+    "webp_size": [
+      880,
+      868
+    ]
+  },
+  {
+    "ordem": 29,
+    "grupo": "Termos",
+    "titulo": "Editar termo",
+    "rota": "/termos/6/editar/",
+    "tema": "dark",
+    "arquivo": "dark/029-termos-editar-termo.png",
+    "status": 200,
+    "url_final": "/termos/6/editar/",
+    "altura": 1726,
+    "recortada": false,
+    "webp": "dark/029-termos-editar-termo.webp",
+    "webp_bytes": 35662,
+    "webp_size": [
+      880,
+      1055
+    ]
+  },
+  {
+    "ordem": 30,
+    "grupo": "Justificativas",
+    "titulo": "Lista de justificativas",
+    "rota": "/justificativas/",
+    "tema": "dark",
+    "arquivo": "dark/030-justificativas-lista-de-justificativas.png",
+    "status": 200,
+    "url_final": "/justificativas/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/030-justificativas-lista-de-justificativas.webp",
+    "webp_bytes": 26042,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 31,
+    "grupo": "Justificativas",
+    "titulo": "Modelos de justificativa",
+    "rota": "/justificativas/modelos/",
+    "tema": "dark",
+    "arquivo": "dark/031-justificativas-modelos-de-justificativa.png",
+    "status": 200,
+    "url_final": "/justificativas/modelos/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/031-justificativas-modelos-de-justificativa.webp",
+    "webp_bytes": 22882,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 32,
+    "grupo": "Justificativas",
+    "titulo": "Novo modelo de justificativa",
+    "rota": "/justificativas/modelos/novo/",
+    "tema": "dark",
+    "arquivo": "dark/032-justificativas-novo-modelo-de-justificativa.png",
+    "status": 200,
+    "url_final": "/justificativas/modelos/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/032-justificativas-novo-modelo-de-justificativa.webp",
+    "webp_bytes": 22882,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 33,
+    "grupo": "Planos de trabalho",
+    "titulo": "Lista de planos",
+    "rota": "/planos-trabalho/",
+    "tema": "dark",
+    "arquivo": "dark/033-planos-de-trabalho-lista-de-planos.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/",
+    "altura": 2523,
+    "recortada": false,
+    "webp": "dark/033-planos-de-trabalho-lista-de-planos.webp",
+    "webp_bytes": 73018,
+    "webp_size": [
+      880,
+      1542
+    ]
+  },
+  {
+    "ordem": 34,
+    "grupo": "Planos de trabalho",
+    "titulo": "Assistente — efetivo e diárias",
+    "rota": "/planos-trabalho/6/efetivo-diarias/",
+    "tema": "dark",
+    "arquivo": "dark/034-planos-de-trabalho-assistente-efetivo-e-diarias.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/6/efetivo-diarias/",
+    "altura": 944,
+    "recortada": false,
+    "webp": "dark/034-planos-de-trabalho-assistente-efetivo-e-diarias.webp",
+    "webp_bytes": 28406,
+    "webp_size": [
+      880,
+      577
+    ]
+  },
+  {
+    "ordem": 35,
+    "grupo": "Planos de trabalho",
+    "titulo": "Assistente — atividades",
+    "rota": "/planos-trabalho/6/atividades/",
+    "tema": "dark",
+    "arquivo": "dark/035-planos-de-trabalho-assistente-atividades.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/6/atividades/",
+    "altura": 952,
+    "recortada": false,
+    "webp": "dark/035-planos-de-trabalho-assistente-atividades.webp",
+    "webp_bytes": 28784,
+    "webp_size": [
+      880,
+      582
+    ]
+  },
+  {
+    "ordem": 36,
+    "grupo": "Planos de trabalho",
+    "titulo": "Assistente — documentos",
+    "rota": "/planos-trabalho/6/documentos/",
+    "tema": "dark",
+    "arquivo": "dark/036-planos-de-trabalho-assistente-documentos.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/6/documentos/",
+    "altura": 1257,
+    "recortada": false,
+    "webp": "dark/036-planos-de-trabalho-assistente-documentos.webp",
+    "webp_bytes": 22664,
+    "webp_size": [
+      880,
+      768
+    ]
+  },
+  {
+    "ordem": 37,
+    "grupo": "Planos de trabalho",
+    "titulo": "Programas solicitantes",
+    "rota": "/planos-trabalho/programas/",
+    "tema": "dark",
+    "arquivo": "dark/037-planos-de-trabalho-programas-solicitantes.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/programas/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/037-planos-de-trabalho-programas-solicitantes.webp",
+    "webp_bytes": 16816,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 38,
+    "grupo": "Planos de trabalho",
+    "titulo": "Novo programa solicitante",
+    "rota": "/planos-trabalho/programas/novo/",
+    "tema": "dark",
+    "arquivo": "dark/038-planos-de-trabalho-novo-programa-solicitante.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/programas/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/038-planos-de-trabalho-novo-programa-solicitante.webp",
+    "webp_bytes": 16816,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 39,
+    "grupo": "Planos de trabalho",
+    "titulo": "Horários de atendimento",
+    "rota": "/planos-trabalho/horarios/",
+    "tema": "dark",
+    "arquivo": "dark/039-planos-de-trabalho-horarios-de-atendimento.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/horarios/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/039-planos-de-trabalho-horarios-de-atendimento.webp",
+    "webp_bytes": 15708,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 40,
+    "grupo": "Planos de trabalho",
+    "titulo": "Novo horário de atendimento",
+    "rota": "/planos-trabalho/horarios/novo/",
+    "tema": "dark",
+    "arquivo": "dark/040-planos-de-trabalho-novo-horario-de-atendimento.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/horarios/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/040-planos-de-trabalho-novo-horario-de-atendimento.webp",
+    "webp_bytes": 15708,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 41,
+    "grupo": "Planos de trabalho",
+    "titulo": "Atividades",
+    "rota": "/planos-trabalho/atividades/",
+    "tema": "dark",
+    "arquivo": "dark/041-planos-de-trabalho-atividades.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/atividades/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/041-planos-de-trabalho-atividades.webp",
+    "webp_bytes": 29058,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 42,
+    "grupo": "Planos de trabalho",
+    "titulo": "Presets de atividades",
+    "rota": "/planos-trabalho/presets/",
+    "tema": "dark",
+    "arquivo": "dark/042-planos-de-trabalho-presets-de-atividades.png",
+    "status": 200,
+    "url_final": "/planos-trabalho/presets/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/042-planos-de-trabalho-presets-de-atividades.webp",
+    "webp_bytes": 13324,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 43,
+    "grupo": "Ordens de serviço",
+    "titulo": "Lista de ordens de serviço",
+    "rota": "/ordens-servico/",
+    "tema": "dark",
+    "arquivo": "dark/043-ordens-de-servico-lista-de-ordens-de-servico.png",
+    "status": 200,
+    "url_final": "/ordens-servico/",
+    "altura": 1995,
+    "recortada": false,
+    "webp": "dark/043-ordens-de-servico-lista-de-ordens-de-servico.webp",
+    "webp_bytes": 46644,
+    "webp_size": [
+      880,
+      1219
+    ]
+  },
+  {
+    "ordem": 44,
+    "grupo": "Ordens de serviço",
+    "titulo": "Nova ordem de serviço",
+    "rota": "/ordens-servico/nova/",
+    "tema": "dark",
+    "arquivo": "dark/044-ordens-de-servico-nova-ordem-de-servico.png",
+    "status": 200,
+    "url_final": "/ordens-servico/nova/",
+    "altura": 1789,
+    "recortada": false,
+    "webp": "dark/044-ordens-de-servico-nova-ordem-de-servico.webp",
+    "webp_bytes": 37404,
+    "webp_size": [
+      880,
+      1093
+    ]
+  },
+  {
+    "ordem": 45,
+    "grupo": "Ordens de serviço",
+    "titulo": "Editar ordem de serviço",
+    "rota": "/ordens-servico/6/editar/",
+    "tema": "dark",
+    "arquivo": "dark/045-ordens-de-servico-editar-ordem-de-servico.png",
+    "status": 200,
+    "url_final": "/ordens-servico/6/editar/",
+    "altura": 1814,
+    "recortada": false,
+    "webp": "dark/045-ordens-de-servico-editar-ordem-de-servico.webp",
+    "webp_bytes": 39914,
+    "webp_size": [
+      880,
+      1109
+    ]
+  },
+  {
+    "ordem": 46,
+    "grupo": "Prestações de contas",
+    "titulo": "Lista de prestações",
+    "rota": "/prestacoes-contas/",
+    "tema": "dark",
+    "arquivo": "dark/046-prestacoes-de-contas-lista-de-prestacoes.png",
+    "status": 200,
+    "url_final": "/prestacoes-contas/",
+    "altura": 4790,
+    "recortada": false,
+    "webp": "dark/046-prestacoes-de-contas-lista-de-prestacoes.webp",
+    "webp_bytes": 135948,
+    "webp_size": [
+      880,
+      2927
+    ]
+  },
+  {
+    "ordem": 47,
+    "grupo": "Prestações de contas",
+    "titulo": "Documentos do servidor",
+    "rota": "/prestacoes-contas/servidor-prestacao/11/documentos/",
+    "tema": "dark",
+    "arquivo": "dark/047-prestacoes-de-contas-documentos-do-servidor.png",
+    "status": 200,
+    "url_final": "/prestacoes-contas/servidor-prestacao/11/documentos/",
+    "altura": 1271,
+    "recortada": false,
+    "webp": "dark/047-prestacoes-de-contas-documentos-do-servidor.webp",
+    "webp_bytes": 28746,
+    "webp_size": [
+      880,
+      777
+    ]
+  },
+  {
+    "ordem": 48,
+    "grupo": "Prestações de contas",
+    "titulo": "Relatório de viagem",
+    "rota": "/prestacoes-contas/servidor-prestacao/11/rt/",
+    "tema": "dark",
+    "arquivo": "dark/048-prestacoes-de-contas-relatorio-de-viagem.png",
+    "status": 200,
+    "url_final": "/prestacoes-contas/servidor-prestacao/11/rt/",
+    "altura": 2463,
+    "recortada": false,
+    "webp": "dark/048-prestacoes-de-contas-relatorio-de-viagem.webp",
+    "webp_bytes": 49094,
+    "webp_size": [
+      880,
+      1505
+    ]
+  },
+  {
+    "ordem": 49,
+    "grupo": "Prestações de contas",
+    "titulo": "Diário de bordo",
+    "rota": "/prestacoes-contas/servidor-prestacao/11/diario/",
+    "tema": "dark",
+    "arquivo": "dark/049-prestacoes-de-contas-diario-de-bordo.png",
+    "status": 200,
+    "url_final": "/prestacoes-contas/servidor-prestacao/11/diario/",
+    "altura": 1219,
+    "recortada": false,
+    "webp": "dark/049-prestacoes-de-contas-diario-de-bordo.webp",
+    "webp_bytes": 29674,
+    "webp_size": [
+      880,
+      745
+    ]
+  },
+  {
+    "ordem": 50,
+    "grupo": "Prestações de contas",
+    "titulo": "Diário — motorista",
+    "rota": "/prestacoes-contas/servidor-prestacao/11/diario/motorista/",
+    "tema": "dark",
+    "arquivo": "dark/050-prestacoes-de-contas-diario-motorista.png",
+    "status": 200,
+    "url_final": "/prestacoes-contas/servidor-prestacao/11/diario/motorista/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/050-prestacoes-de-contas-diario-motorista.webp",
+    "webp_bytes": 24556,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 51,
+    "grupo": "Prestações de contas",
+    "titulo": "Diário — editar roteiro",
+    "rota": "/prestacoes-contas/servidor-prestacao/11/diario/editar-roteiro/",
+    "tema": "dark",
+    "arquivo": "dark/051-prestacoes-de-contas-diario-editar-roteiro.png",
+    "status": 200,
+    "url_final": "/roteiros/11/editar/?next=%2Fprestacoes-contas%2Fservidor-prestacao%2F11%2Fdiario%2F",
+    "altura": 2545,
+    "recortada": false,
+    "webp": "dark/051-prestacoes-de-contas-diario-editar-roteiro.webp",
+    "webp_bytes": 38990,
+    "webp_size": [
+      880,
+      1555
+    ]
+  },
+  {
+    "ordem": 52,
+    "grupo": "Prestações de contas",
+    "titulo": "Consolidado do servidor",
+    "rota": "/prestacoes-contas/servidor-prestacao/11/consolidado/",
+    "tema": "dark",
+    "arquivo": "dark/052-prestacoes-de-contas-consolidado-do-servidor.png",
+    "status": 200,
+    "url_final": "/prestacoes-contas/servidor-prestacao/11/consolidado/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/052-prestacoes-de-contas-consolidado-do-servidor.webp",
+    "webp_bytes": 23068,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 53,
+    "grupo": "Prestações de contas",
+    "titulo": "Modelos de texto",
+    "rota": "/prestacoes-contas/modelos-texto/",
+    "tema": "dark",
+    "arquivo": "dark/053-prestacoes-de-contas-modelos-de-texto.png",
+    "status": 200,
+    "url_final": "/prestacoes-contas/modelos-texto/",
+    "altura": 1921,
+    "recortada": false,
+    "webp": "dark/053-prestacoes-de-contas-modelos-de-texto.webp",
+    "webp_bytes": 31422,
+    "webp_size": [
+      880,
+      1174
+    ]
+  },
+  {
+    "ordem": 54,
+    "grupo": "Prestações de contas",
+    "titulo": "Novo modelo de texto",
+    "rota": "/prestacoes-contas/modelos-texto/novo/",
+    "tema": "dark",
+    "arquivo": "dark/054-prestacoes-de-contas-novo-modelo-de-texto.png",
+    "status": 200,
+    "url_final": "/prestacoes-contas/modelos-texto/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/054-prestacoes-de-contas-novo-modelo-de-texto.webp",
+    "webp_bytes": 13694,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 55,
+    "grupo": "Diário de bordo",
+    "titulo": "Lista do diário de bordo",
+    "rota": "/diario-bordo/",
+    "tema": "dark",
+    "arquivo": "dark/055-diario-de-bordo-lista-do-diario-de-bordo.png",
+    "status": 200,
+    "url_final": "/diario-bordo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/055-diario-de-bordo-lista-do-diario-de-bordo.webp",
+    "webp_bytes": 16082,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 56,
+    "grupo": "Documentos",
+    "titulo": "Central de documentos",
+    "rota": "/documentos/",
+    "tema": "dark",
+    "arquivo": "dark/056-documentos-central-de-documentos.png",
+    "status": 200,
+    "url_final": "/documentos/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/056-documentos-central-de-documentos.webp",
+    "webp_bytes": 17976,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 57,
+    "grupo": "Cadastros",
+    "titulo": "Índice de cadastros",
+    "rota": "/cadastros/",
+    "tema": "dark",
+    "arquivo": "dark/057-cadastros-indice-de-cadastros.png",
+    "status": 200,
+    "url_final": "/cadastros/",
+    "altura": 1341,
+    "recortada": false,
+    "webp": "dark/057-cadastros-indice-de-cadastros.webp",
+    "webp_bytes": 27874,
+    "webp_size": [
+      880,
+      820
+    ]
+  },
+  {
+    "ordem": 58,
+    "grupo": "Cadastros",
+    "titulo": "Configuração — instituição",
+    "rota": "/cadastros/configuracao/",
+    "tema": "dark",
+    "arquivo": "dark/058-cadastros-configuracao-instituicao.png",
+    "status": 200,
+    "url_final": "/cadastros/configuracao/",
+    "altura": 1017,
+    "recortada": false,
+    "webp": "dark/058-cadastros-configuracao-instituicao.webp",
+    "webp_bytes": 19434,
+    "webp_size": [
+      880,
+      622
+    ]
+  },
+  {
+    "ordem": 59,
+    "grupo": "Cadastros",
+    "titulo": "Configuração — ofício",
+    "rota": "/cadastros/configuracao/oficio/",
+    "tema": "dark",
+    "arquivo": "dark/059-cadastros-configuracao-oficio.png",
+    "status": 200,
+    "url_final": "/cadastros/configuracao/oficio/",
+    "altura": 1129,
+    "recortada": false,
+    "webp": "dark/059-cadastros-configuracao-oficio.webp",
+    "webp_bytes": 21596,
+    "webp_size": [
+      880,
+      690
+    ]
+  },
+  {
+    "ordem": 60,
+    "grupo": "Cadastros",
+    "titulo": "Configuração — roteiros",
+    "rota": "/cadastros/configuracao/roteiros/",
+    "tema": "dark",
+    "arquivo": "dark/060-cadastros-configuracao-roteiros.png",
+    "status": 200,
+    "url_final": "/cadastros/configuracao/roteiros/",
+    "altura": 941,
+    "recortada": false,
+    "webp": "dark/060-cadastros-configuracao-roteiros.webp",
+    "webp_bytes": 24116,
+    "webp_size": [
+      880,
+      575
+    ]
+  },
+  {
+    "ordem": 61,
+    "grupo": "Cadastros",
+    "titulo": "Servidores",
+    "rota": "/cadastros/servidores/",
+    "tema": "dark",
+    "arquivo": "dark/061-cadastros-servidores.png",
+    "status": 200,
+    "url_final": "/cadastros/servidores/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/061-cadastros-servidores.webp",
+    "webp_bytes": 25370,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 62,
+    "grupo": "Cadastros",
+    "titulo": "Novo servidor",
+    "rota": "/cadastros/servidores/novo/",
+    "tema": "dark",
+    "arquivo": "dark/062-cadastros-novo-servidor.png",
+    "status": 200,
+    "url_final": "/cadastros/servidores/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/062-cadastros-novo-servidor.webp",
+    "webp_bytes": 15062,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 63,
+    "grupo": "Cadastros",
+    "titulo": "Editar servidor",
+    "rota": "/cadastros/servidores/11/editar/",
+    "tema": "dark",
+    "arquivo": "dark/063-cadastros-editar-servidor.png",
+    "status": 200,
+    "url_final": "/cadastros/servidores/11/editar/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/063-cadastros-editar-servidor.webp",
+    "webp_bytes": 15980,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 64,
+    "grupo": "Cadastros",
+    "titulo": "Viaturas",
+    "rota": "/cadastros/viaturas/",
+    "tema": "dark",
+    "arquivo": "dark/064-cadastros-viaturas.png",
+    "status": 200,
+    "url_final": "/cadastros/viaturas/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/064-cadastros-viaturas.webp",
+    "webp_bytes": 25404,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 65,
+    "grupo": "Cadastros",
+    "titulo": "Nova viatura",
+    "rota": "/cadastros/viaturas/nova/",
+    "tema": "dark",
+    "arquivo": "dark/065-cadastros-nova-viatura.png",
+    "status": 200,
+    "url_final": "/cadastros/viaturas/nova/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/065-cadastros-nova-viatura.webp",
+    "webp_bytes": 16702,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 66,
+    "grupo": "Cadastros",
+    "titulo": "Editar viatura",
+    "rota": "/cadastros/viaturas/11/editar/",
+    "tema": "dark",
+    "arquivo": "dark/066-cadastros-editar-viatura.png",
+    "status": 200,
+    "url_final": "/cadastros/viaturas/11/editar/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/066-cadastros-editar-viatura.webp",
+    "webp_bytes": 18796,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 67,
+    "grupo": "Cadastros",
+    "titulo": "Unidades",
+    "rota": "/cadastros/unidades/",
+    "tema": "dark",
+    "arquivo": "dark/067-cadastros-unidades.png",
+    "status": 200,
+    "url_final": "/cadastros/unidades/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/067-cadastros-unidades.webp",
+    "webp_bytes": 18200,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 68,
+    "grupo": "Cadastros",
+    "titulo": "Nova unidade",
+    "rota": "/cadastros/unidades/nova/",
+    "tema": "dark",
+    "arquivo": "dark/068-cadastros-nova-unidade.png",
+    "status": 200,
+    "url_final": "/cadastros/unidades/nova/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/068-cadastros-nova-unidade.webp",
+    "webp_bytes": 18200,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 69,
+    "grupo": "Cadastros",
+    "titulo": "Cargos",
+    "rota": "/cadastros/cargos/",
+    "tema": "dark",
+    "arquivo": "dark/069-cadastros-cargos.png",
+    "status": 200,
+    "url_final": "/cadastros/cargos/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/069-cadastros-cargos.webp",
+    "webp_bytes": 15924,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 70,
+    "grupo": "Cadastros",
+    "titulo": "Novo cargo",
+    "rota": "/cadastros/cargos/novo/",
+    "tema": "dark",
+    "arquivo": "dark/070-cadastros-novo-cargo.png",
+    "status": 200,
+    "url_final": "/cadastros/cargos/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/070-cadastros-novo-cargo.webp",
+    "webp_bytes": 15924,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 71,
+    "grupo": "Cadastros",
+    "titulo": "Combustíveis",
+    "rota": "/cadastros/combustiveis/",
+    "tema": "dark",
+    "arquivo": "dark/071-cadastros-combustiveis.png",
+    "status": 200,
+    "url_final": "/cadastros/combustiveis/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/071-cadastros-combustiveis.webp",
+    "webp_bytes": 14702,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 72,
+    "grupo": "Cadastros",
+    "titulo": "Novo combustível",
+    "rota": "/cadastros/combustiveis/novo/",
+    "tema": "dark",
+    "arquivo": "dark/072-cadastros-novo-combustivel.png",
+    "status": 200,
+    "url_final": "/cadastros/combustiveis/novo/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/072-cadastros-novo-combustivel.webp",
+    "webp_bytes": 14702,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 73,
+    "grupo": "Cadastros",
+    "titulo": "Cidades",
+    "rota": "/cadastros/cidades/",
+    "tema": "dark",
+    "arquivo": "dark/073-cadastros-cidades.png",
+    "status": 200,
+    "url_final": "/cadastros/cidades/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/073-cadastros-cidades.webp",
+    "webp_bytes": 13558,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 74,
+    "grupo": "Cadastros",
+    "titulo": "Nova cidade",
+    "rota": "/cadastros/cidades/nova/",
+    "tema": "dark",
+    "arquivo": "dark/074-cadastros-nova-cidade.png",
+    "status": 200,
+    "url_final": "/cadastros/cidades/nova/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/074-cadastros-nova-cidade.webp",
+    "webp_bytes": 13558,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 75,
+    "grupo": "Cadastros",
+    "titulo": "Estados",
+    "rota": "/cadastros/estados/",
+    "tema": "dark",
+    "arquivo": "dark/075-cadastros-estados.png",
+    "status": 200,
+    "url_final": "/cadastros/estados/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/075-cadastros-estados.webp",
+    "webp_bytes": 14968,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 76,
+    "grupo": "Usuários e áreas",
+    "titulo": "Lista de usuários",
+    "rota": "/usuarios/",
+    "tema": "dark",
+    "arquivo": "dark/076-usuarios-e-areas-lista-de-usuarios.png",
+    "status": 200,
+    "url_final": "/usuarios/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/076-usuarios-e-areas-lista-de-usuarios.webp",
+    "webp_bytes": 11308,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 77,
+    "grupo": "Usuários e áreas",
+    "titulo": "Áreas de trabalho",
+    "rota": "/usuarios/areas/",
+    "tema": "dark",
+    "arquivo": "dark/077-usuarios-e-areas-areas-de-trabalho.png",
+    "status": 200,
+    "url_final": "/usuarios/areas/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/077-usuarios-e-areas-areas-de-trabalho.webp",
+    "webp_bytes": 10422,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 78,
+    "grupo": "Usuários e áreas",
+    "titulo": "Detalhe da área",
+    "rota": "/usuarios/areas/3/",
+    "tema": "dark",
+    "arquivo": "dark/078-usuarios-e-areas-detalhe-da-area.png",
+    "status": 200,
+    "url_final": "/usuarios/areas/3/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/078-usuarios-e-areas-detalhe-da-area.webp",
+    "webp_bytes": 15618,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 79,
+    "grupo": "UI Lab",
+    "titulo": "Índice",
+    "rota": "/dev/ui-lab/",
+    "tema": "dark",
+    "arquivo": "dark/079-ui-lab-indice.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/",
+    "altura": 2034,
+    "recortada": false,
+    "webp": "dark/079-ui-lab-indice.webp",
+    "webp_bytes": 64520,
+    "webp_size": [
+      880,
+      1243
+    ]
+  },
+  {
+    "ordem": 80,
+    "grupo": "UI Lab",
+    "titulo": "Structures",
+    "rota": "/dev/ui-lab/structures/",
+    "tema": "dark",
+    "arquivo": "dark/080-ui-lab-structures.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/structures/",
+    "altura": 4899,
+    "recortada": false,
+    "webp": "dark/080-ui-lab-structures.webp",
+    "webp_bytes": 68264,
+    "webp_size": [
+      880,
+      2994
+    ]
+  },
+  {
+    "ordem": 81,
+    "grupo": "UI Lab",
+    "titulo": "Lists",
+    "rota": "/dev/ui-lab/lists/",
+    "tema": "dark",
+    "arquivo": "dark/081-ui-lab-lists.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/lists/",
+    "altura": 3924,
+    "recortada": false,
+    "webp": "dark/081-ui-lab-lists.webp",
+    "webp_bytes": 73302,
+    "webp_size": [
+      880,
+      2398
+    ]
+  },
+  {
+    "ordem": 82,
+    "grupo": "UI Lab",
+    "titulo": "Headers",
+    "rota": "/dev/ui-lab/headers/",
+    "tema": "dark",
+    "arquivo": "dark/082-ui-lab-headers.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/headers/",
+    "altura": 2185,
+    "recortada": false,
+    "webp": "dark/082-ui-lab-headers.webp",
+    "webp_bytes": 42472,
+    "webp_size": [
+      880,
+      1335
+    ]
+  },
+  {
+    "ordem": 83,
+    "grupo": "UI Lab",
+    "titulo": "Buttons",
+    "rota": "/dev/ui-lab/buttons/",
+    "tema": "dark",
+    "arquivo": "dark/083-ui-lab-buttons.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/buttons/",
+    "altura": 1820,
+    "recortada": false,
+    "webp": "dark/083-ui-lab-buttons.webp",
+    "webp_bytes": 39390,
+    "webp_size": [
+      880,
+      1112
+    ]
+  },
+  {
+    "ordem": 84,
+    "grupo": "UI Lab",
+    "titulo": "Fields",
+    "rota": "/dev/ui-lab/fields/",
+    "tema": "dark",
+    "arquivo": "dark/084-ui-lab-fields.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/fields/",
+    "altura": 2688,
+    "recortada": false,
+    "webp": "dark/084-ui-lab-fields.webp",
+    "webp_bytes": 50692,
+    "webp_size": [
+      880,
+      1643
+    ]
+  },
+  {
+    "ordem": 85,
+    "grupo": "UI Lab",
+    "titulo": "Selects e filtros",
+    "rota": "/dev/ui-lab/selects-filters/",
+    "tema": "dark",
+    "arquivo": "dark/085-ui-lab-selects-e-filtros.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/selects-filters/",
+    "altura": 1902,
+    "recortada": false,
+    "webp": "dark/085-ui-lab-selects-e-filtros.webp",
+    "webp_bytes": 42472,
+    "webp_size": [
+      880,
+      1162
+    ]
+  },
+  {
+    "ordem": 86,
+    "grupo": "UI Lab",
+    "titulo": "Status",
+    "rota": "/dev/ui-lab/status/",
+    "tema": "dark",
+    "arquivo": "dark/086-ui-lab-status.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/status/",
+    "altura": 1835,
+    "recortada": false,
+    "webp": "dark/086-ui-lab-status.webp",
+    "webp_bytes": 53514,
+    "webp_size": [
+      880,
+      1121
+    ]
+  },
+  {
+    "ordem": 87,
+    "grupo": "UI Lab",
+    "titulo": "Feedback",
+    "rota": "/dev/ui-lab/feedback/",
+    "tema": "dark",
+    "arquivo": "dark/087-ui-lab-feedback.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/feedback/",
+    "altura": 1221,
+    "recortada": false,
+    "webp": "dark/087-ui-lab-feedback.webp",
+    "webp_bytes": 37962,
+    "webp_size": [
+      880,
+      746
+    ]
+  },
+  {
+    "ordem": 88,
+    "grupo": "UI Lab",
+    "titulo": "Cards",
+    "rota": "/dev/ui-lab/cards/",
+    "tema": "dark",
+    "arquivo": "dark/088-ui-lab-cards.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/cards/",
+    "altura": 2203,
+    "recortada": false,
+    "webp": "dark/088-ui-lab-cards.webp",
+    "webp_bytes": 54352,
+    "webp_size": [
+      880,
+      1346
+    ]
+  },
+  {
+    "ordem": 89,
+    "grupo": "UI Lab",
+    "titulo": "Overlays",
+    "rota": "/dev/ui-lab/overlays/",
+    "tema": "dark",
+    "arquivo": "dark/089-ui-lab-overlays.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/overlays/",
+    "altura": 1365,
+    "recortada": false,
+    "webp": "dark/089-ui-lab-overlays.webp",
+    "webp_bytes": 41754,
+    "webp_size": [
+      880,
+      834
+    ]
+  },
+  {
+    "ordem": 90,
+    "grupo": "UI Lab",
+    "titulo": "Tables",
+    "rota": "/dev/ui-lab/tables/",
+    "tema": "dark",
+    "arquivo": "dark/090-ui-lab-tables.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/tables/",
+    "altura": 1273,
+    "recortada": false,
+    "webp": "dark/090-ui-lab-tables.webp",
+    "webp_bytes": 32974,
+    "webp_size": [
+      880,
+      778
+    ]
+  },
+  {
+    "ordem": 91,
+    "grupo": "UI Lab",
+    "titulo": "Documents",
+    "rota": "/dev/ui-lab/documents/",
+    "tema": "dark",
+    "arquivo": "dark/091-ui-lab-documents.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/documents/",
+    "altura": 2038,
+    "recortada": false,
+    "webp": "dark/091-ui-lab-documents.webp",
+    "webp_bytes": 35254,
+    "webp_size": [
+      880,
+      1245
+    ]
+  },
+  {
+    "ordem": 92,
+    "grupo": "UI Lab",
+    "titulo": "Signature",
+    "rota": "/dev/ui-lab/signature/",
+    "tema": "dark",
+    "arquivo": "dark/092-ui-lab-signature.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/signature/",
+    "altura": 1428,
+    "recortada": false,
+    "webp": "dark/092-ui-lab-signature.webp",
+    "webp_bytes": 38152,
+    "webp_size": [
+      880,
+      873
+    ]
+  },
+  {
+    "ordem": 93,
+    "grupo": "UI Lab",
+    "titulo": "Eventos — cadastro",
+    "rota": "/dev/ui-lab/eventos/cadastro/",
+    "tema": "dark",
+    "arquivo": "dark/093-ui-lab-eventos-cadastro.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/eventos/cadastro/",
+    "altura": 4257,
+    "recortada": false,
+    "webp": "dark/093-ui-lab-eventos-cadastro.webp",
+    "webp_bytes": 71380,
+    "webp_size": [
+      880,
+      2602
+    ]
+  },
+  {
+    "ordem": 94,
+    "grupo": "UI Lab",
+    "titulo": "Eventos — lista",
+    "rota": "/dev/ui-lab/eventos/lista/",
+    "tema": "dark",
+    "arquivo": "dark/094-ui-lab-eventos-lista.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab/eventos/lista/",
+    "altura": 3851,
+    "recortada": false,
+    "webp": "dark/094-ui-lab-eventos-lista.webp",
+    "webp_bytes": 71664,
+    "webp_size": [
+      880,
+      2353
+    ]
+  },
+  {
+    "ordem": 95,
+    "grupo": "UI Lab 2",
+    "titulo": "Índice",
+    "rota": "/dev/ui-lab-2/",
+    "tema": "dark",
+    "arquivo": "dark/095-ui-lab-2-indice.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/",
+    "altura": 2070,
+    "recortada": false,
+    "webp": "dark/095-ui-lab-2-indice.webp",
+    "webp_bytes": 67582,
+    "webp_size": [
+      880,
+      1265
+    ]
+  },
+  {
+    "ordem": 96,
+    "grupo": "UI Lab 2",
+    "titulo": "Shells",
+    "rota": "/dev/ui-lab-2/shells/",
+    "tema": "dark",
+    "arquivo": "dark/096-ui-lab-2-shells.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/shells/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/096-ui-lab-2-shells.webp",
+    "webp_bytes": 25516,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 97,
+    "grupo": "UI Lab 2",
+    "titulo": "Headers",
+    "rota": "/dev/ui-lab-2/headers/",
+    "tema": "dark",
+    "arquivo": "dark/097-ui-lab-2-headers.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/headers/",
+    "altura": 3561,
+    "recortada": false,
+    "webp": "dark/097-ui-lab-2-headers.webp",
+    "webp_bytes": 72574,
+    "webp_size": [
+      880,
+      2176
+    ]
+  },
+  {
+    "ordem": 98,
+    "grupo": "UI Lab 2",
+    "titulo": "Steppers",
+    "rota": "/dev/ui-lab-2/steppers/",
+    "tema": "dark",
+    "arquivo": "dark/098-ui-lab-2-steppers.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/steppers/",
+    "altura": 1251,
+    "recortada": false,
+    "webp": "dark/098-ui-lab-2-steppers.webp",
+    "webp_bytes": 35212,
+    "webp_size": [
+      880,
+      764
+    ]
+  },
+  {
+    "ordem": 99,
+    "grupo": "UI Lab 2",
+    "titulo": "Section cards",
+    "rota": "/dev/ui-lab-2/section-cards/",
+    "tema": "dark",
+    "arquivo": "dark/099-ui-lab-2-section-cards.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/section-cards/",
+    "altura": 1631,
+    "recortada": false,
+    "webp": "dark/099-ui-lab-2-section-cards.webp",
+    "webp_bytes": 37050,
+    "webp_size": [
+      880,
+      997
+    ]
+  },
+  {
+    "ordem": 100,
+    "grupo": "UI Lab 2",
+    "titulo": "Fields",
+    "rota": "/dev/ui-lab-2/fields/",
+    "tema": "dark",
+    "arquivo": "dark/100-ui-lab-2-fields.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/fields/",
+    "altura": 3202,
+    "recortada": false,
+    "webp": "dark/100-ui-lab-2-fields.webp",
+    "webp_bytes": 62274,
+    "webp_size": [
+      880,
+      1957
+    ]
+  },
+  {
+    "ordem": 101,
+    "grupo": "UI Lab 2",
+    "titulo": "Selects",
+    "rota": "/dev/ui-lab-2/selects/",
+    "tema": "dark",
+    "arquivo": "dark/101-ui-lab-2-selects.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/selects/",
+    "altura": 3088,
+    "recortada": false,
+    "webp": "dark/101-ui-lab-2-selects.webp",
+    "webp_bytes": 59052,
+    "webp_size": [
+      880,
+      1887
+    ]
+  },
+  {
+    "ordem": 102,
+    "grupo": "UI Lab 2",
+    "titulo": "Calendars",
+    "rota": "/dev/ui-lab-2/calendars/",
+    "tema": "dark",
+    "arquivo": "dark/102-ui-lab-2-calendars.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/calendars/",
+    "altura": 2195,
+    "recortada": false,
+    "webp": "dark/102-ui-lab-2-calendars.webp",
+    "webp_bytes": 65366,
+    "webp_size": [
+      880,
+      1341
+    ]
+  },
+  {
+    "ordem": 103,
+    "grupo": "UI Lab 2",
+    "titulo": "Buttons",
+    "rota": "/dev/ui-lab-2/buttons/",
+    "tema": "dark",
+    "arquivo": "dark/103-ui-lab-2-buttons.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/buttons/",
+    "altura": 2668,
+    "recortada": false,
+    "webp": "dark/103-ui-lab-2-buttons.webp",
+    "webp_bytes": 86388,
+    "webp_size": [
+      880,
+      1630
+    ]
+  },
+  {
+    "ordem": 104,
+    "grupo": "UI Lab 2",
+    "titulo": "Footers",
+    "rota": "/dev/ui-lab-2/footers/",
+    "tema": "dark",
+    "arquivo": "dark/104-ui-lab-2-footers.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/footers/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/104-ui-lab-2-footers.webp",
+    "webp_bytes": 24162,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 105,
+    "grupo": "UI Lab 2",
+    "titulo": "Badges",
+    "rota": "/dev/ui-lab-2/badges/",
+    "tema": "dark",
+    "arquivo": "dark/105-ui-lab-2-badges.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/badges/",
+    "altura": 2479,
+    "recortada": false,
+    "webp": "dark/105-ui-lab-2-badges.webp",
+    "webp_bytes": 56712,
+    "webp_size": [
+      880,
+      1515
+    ]
+  },
+  {
+    "ordem": 106,
+    "grupo": "UI Lab 2",
+    "titulo": "Feedback",
+    "rota": "/dev/ui-lab-2/feedback/",
+    "tema": "dark",
+    "arquivo": "dark/106-ui-lab-2-feedback.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/feedback/",
+    "altura": 3149,
+    "recortada": false,
+    "webp": "dark/106-ui-lab-2-feedback.webp",
+    "webp_bytes": 66078,
+    "webp_size": [
+      880,
+      1924
+    ]
+  },
+  {
+    "ordem": 107,
+    "grupo": "UI Lab 2",
+    "titulo": "Modals",
+    "rota": "/dev/ui-lab-2/modals/",
+    "tema": "dark",
+    "arquivo": "dark/107-ui-lab-2-modals.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/modals/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/107-ui-lab-2-modals.webp",
+    "webp_bytes": 24524,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 108,
+    "grupo": "UI Lab 2",
+    "titulo": "Domain cards",
+    "rota": "/dev/ui-lab-2/domain-cards/",
+    "tema": "dark",
+    "arquivo": "dark/108-ui-lab-2-domain-cards.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/domain-cards/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/108-ui-lab-2-domain-cards.webp",
+    "webp_bytes": 24378,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 109,
+    "grupo": "UI Lab 2",
+    "titulo": "Signatures",
+    "rota": "/dev/ui-lab-2/signatures/",
+    "tema": "dark",
+    "arquivo": "dark/109-ui-lab-2-signatures.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/signatures/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/109-ui-lab-2-signatures.webp",
+    "webp_bytes": 23934,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 110,
+    "grupo": "UI Lab 2",
+    "titulo": "Documents",
+    "rota": "/dev/ui-lab-2/documents/",
+    "tema": "dark",
+    "arquivo": "dark/110-ui-lab-2-documents.png",
+    "status": 200,
+    "url_final": "/dev/ui-lab-2/documents/",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/110-ui-lab-2-documents.webp",
+    "webp_bytes": 24858,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 111,
+    "grupo": "Cadastros",
+    "titulo": "Editar unidade (em linha)",
+    "rota": "/cadastros/unidades/",
+    "tema": "dark",
+    "arquivo": "dark/111-cadastros-editar-unidade-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 938,
+    "recortada": false,
+    "webp": "dark/111-cadastros-editar-unidade-em-linha.webp",
+    "webp_bytes": 19768,
+    "webp_size": [
+      880,
+      573
+    ]
+  },
+  {
+    "ordem": 112,
+    "grupo": "Cadastros",
+    "titulo": "Editar cargo (em linha)",
+    "rota": "/cadastros/cargos/",
+    "tema": "dark",
+    "arquivo": "dark/112-cadastros-editar-cargo-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/112-cadastros-editar-cargo-em-linha.webp",
+    "webp_bytes": 16634,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 113,
+    "grupo": "Cadastros",
+    "titulo": "Editar combustível (em linha)",
+    "rota": "/cadastros/combustiveis/",
+    "tema": "dark",
+    "arquivo": "dark/113-cadastros-editar-combustivel-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/113-cadastros-editar-combustivel-em-linha.webp",
+    "webp_bytes": 15174,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 114,
+    "grupo": "Cadastros",
+    "titulo": "Editar estado (em linha)",
+    "rota": "/cadastros/estados/",
+    "tema": "dark",
+    "arquivo": "dark/114-cadastros-editar-estado-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 938,
+    "recortada": false,
+    "webp": "dark/114-cadastros-editar-estado-em-linha.webp",
+    "webp_bytes": 16188,
+    "webp_size": [
+      880,
+      573
+    ]
+  },
+  {
+    "ordem": 115,
+    "grupo": "Cadastros",
+    "titulo": "Confirmar exclusão de servidor",
+    "rota": "/cadastros/servidores/",
+    "tema": "dark",
+    "arquivo": "dark/115-cadastros-confirmar-exclusao-de-servidor.png",
+    "status": 200,
+    "interacao": "[data-overlay-target=\"delete-confirm-modal\"]",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/115-cadastros-confirmar-exclusao-de-servidor.webp",
+    "webp_bytes": 7040,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 116,
+    "grupo": "Ofícios",
+    "titulo": "Editar modelo de motivo (em linha)",
+    "rota": "/oficios/modelos-motivo/",
+    "tema": "dark",
+    "arquivo": "dark/116-oficios-editar-modelo-de-motivo-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 1013,
+    "recortada": false,
+    "webp": "dark/116-oficios-editar-modelo-de-motivo-em-linha.webp",
+    "webp_bytes": 25888,
+    "webp_size": [
+      880,
+      619
+    ]
+  },
+  {
+    "ordem": 117,
+    "grupo": "Justificativas",
+    "titulo": "Editar modelo (em linha)",
+    "rota": "/justificativas/modelos/",
+    "tema": "dark",
+    "arquivo": "dark/117-justificativas-editar-modelo-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 1017,
+    "recortada": false,
+    "webp": "dark/117-justificativas-editar-modelo-em-linha.webp",
+    "webp_bytes": 25542,
+    "webp_size": [
+      880,
+      622
+    ]
+  },
+  {
+    "ordem": 118,
+    "grupo": "Planos de trabalho",
+    "titulo": "Editar programa (em linha)",
+    "rota": "/planos-trabalho/programas/",
+    "tema": "dark",
+    "arquivo": "dark/118-planos-de-trabalho-editar-programa-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 973,
+    "recortada": false,
+    "webp": "dark/118-planos-de-trabalho-editar-programa-em-linha.webp",
+    "webp_bytes": 17692,
+    "webp_size": [
+      880,
+      595
+    ]
+  },
+  {
+    "ordem": 119,
+    "grupo": "Planos de trabalho",
+    "titulo": "Editar horário (em linha)",
+    "rota": "/planos-trabalho/horarios/",
+    "tema": "dark",
+    "arquivo": "dark/119-planos-de-trabalho-editar-horario-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 973,
+    "recortada": false,
+    "webp": "dark/119-planos-de-trabalho-editar-horario-em-linha.webp",
+    "webp_bytes": 17014,
+    "webp_size": [
+      880,
+      595
+    ]
+  },
+  {
+    "ordem": 120,
+    "grupo": "Planos de trabalho",
+    "titulo": "Editar atividade (em linha)",
+    "rota": "/planos-trabalho/atividades/",
+    "tema": "dark",
+    "arquivo": "dark/120-planos-de-trabalho-editar-atividade-em-linha.png",
+    "status": 200,
+    "interacao": "[data-quick-edit], [data-row-edit-modal]",
+    "altura": 1153,
+    "recortada": false,
+    "webp": "dark/120-planos-de-trabalho-editar-atividade-em-linha.webp",
+    "webp_bytes": 32926,
+    "webp_size": [
+      880,
+      705
+    ]
+  },
+  {
+    "ordem": 121,
+    "grupo": "Usuários e áreas",
+    "titulo": "Novo usuário (em diálogo)",
+    "rota": "/usuarios/",
+    "tema": "dark",
+    "arquivo": "dark/121-usuarios-e-areas-novo-usuario-em-dialogo.png",
+    "status": 200,
+    "interacao": "[data-overlay-kind=\"dialog\"]",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/121-usuarios-e-areas-novo-usuario-em-dialogo.webp",
+    "webp_bytes": 5944,
+    "webp_size": [
+      880,
+      550
+    ]
+  },
+  {
+    "ordem": 122,
+    "grupo": "Usuários e áreas",
+    "titulo": "Nova área (em diálogo)",
+    "rota": "/usuarios/areas/",
+    "tema": "dark",
+    "arquivo": "dark/122-usuarios-e-areas-nova-area-em-dialogo.png",
+    "status": 200,
+    "interacao": "[data-overlay-kind=\"dialog\"]",
+    "altura": 900,
+    "recortada": false,
+    "webp": "dark/122-usuarios-e-areas-nova-area-em-dialogo.webp",
+    "webp_bytes": 5950,
+    "webp_size": [
+      880,
+      550
+    ]
+  }
+]
