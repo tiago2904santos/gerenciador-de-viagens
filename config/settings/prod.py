@@ -27,6 +27,18 @@ if missing_db_vars:
         f"Variaveis de banco ausentes no ambiente: {', '.join(missing_db_vars)}"
     )
 
+# QA-02: sem REDIS_URL o `base.py` cai para LocMemCache, que é por processo. Com os
+# 3 workers do gunicorn documentados em DEPLOY_VPS.md, o rate limit de login
+# (core/views.py: 5 tentativas / 15 min) vira até ~15 tentativas antes de um worker
+# bloquear sozinho — e zera a cada `systemctl restart`, que o próprio deploy executa.
+# O mesmo cache alimenta /metrics/, que passa a contar só o worker que atendeu.
+# Falhar cedo, como já se faz com FIELD_ENCRYPTION_KEYS, em vez de degradar calado.
+if not os.getenv("REDIS_URL", "").strip():
+    raise RuntimeError(
+        "REDIS_URL é obrigatória em producao: o cache é compartilhado entre os "
+        "workers do gunicorn e sustenta o rate limit de login e as métricas.",
+    )
+
 DATABASES = {
     "default": {
         "ENGINE": os.environ.get("DB_ENGINE", "django.db.backends.postgresql"),
