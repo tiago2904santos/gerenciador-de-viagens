@@ -42,7 +42,7 @@
       {% include "ui_lab2/partials/_component_open.html" with name="button.html (componente)" source="components/ui/buttons/button.html" note="Include parametrizavel por responsabilidade: href, variant, size e icon." %}
         <div class="ui-lab2-row">
           {% include "components/ui/buttons/button.html" with label="Salvar" variant="primary" icon="check" type="button" only %}
-          {% include "components/ui/buttons/button.html" with label="Cancelar" variant="secondary" href="#" only %}
+          {% include "components/ui/buttons/button.html" with label="Cancelar" variant="secondary" href=request.path only %}
           {% include "components/ui/buttons/button.html" with label="Adicionar" variant="secondary" icon="plus" type="button" only %}
           {% include "components/ui/buttons/button.html" with label="Avancar" variant="primary" icon="arrow-right" icon_after=True type="button" only %}
         </div>
@@ -51,7 +51,7 @@
       {# ── field_manage_button (engrenagem) ─────────────────────── #}
       {% include "ui_lab2/partials/_component_open.html" with name="field_manage_button" source="components/ui/buttons/field_manage_button.html" note="Botao circular de engrenagem acoplado a selects (gerenciar opcoes). Renderizado por field.html." %}
         <div class="ui-lab2-row">
-          {% include "components/ui/buttons/field_manage_button.html" with href="#" action_label="Gerenciar unidades" only %}
+          {% include "components/ui/buttons/field_manage_button.html" with href=request.path action_label="Gerenciar unidades" only %}
           {% include "components/ui/buttons/field_manage_button.html" with action_label="Gerenciar opcoes" only %}
         </div>
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.field_manage_button %}
@@ -67,10 +67,10 @@
       {# ── icon_button ──────────────────────────────────────────── #}
       {% include "ui_lab2/partials/_component_open.html" with name="icon_button" source="components/ui/buttons/icon_button.html" note="Botao so de icone com tooltip. action define icone e cor (edit, delete, preview, download...)." %}
         <div class="ui-lab2-row">
-          {% include "components/ui/buttons/icon_button.html" with action="edit" aria_label="Editar" tooltip="Editar" href="#" only %}
+          {% include "components/ui/buttons/icon_button.html" with action="edit" aria_label="Editar" tooltip="Editar" href=request.path only %}
           {% include "components/ui/buttons/icon_button.html" with action="delete" aria_label="Excluir" tooltip="Excluir" only %}
-          {% include "components/ui/buttons/icon_button.html" with action="preview" aria_label="Pre-visualizar" tooltip="Pre-visualizar" href="#" only %}
-          {% include "components/ui/buttons/icon_button.html" with action="download" aria_label="Baixar" tooltip="Baixar" href="#" only %}
+          {% include "components/ui/buttons/icon_button.html" with action="preview" aria_label="Pre-visualizar" tooltip="Pre-visualizar" href=request.path only %}
+          {% include "components/ui/buttons/icon_button.html" with action="download" aria_label="Baixar" tooltip="Baixar" href=request.path only %}
         </div>
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.icon_button %}
 

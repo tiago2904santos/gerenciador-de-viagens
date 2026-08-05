@@ -66,7 +66,12 @@ TEMPLATE_RULES_ERRO = [
 ]
 
 TEMPLATE_RULES_AVISO = [
-    ("href_hash",            re.compile(r'\bhref="#"'),                'href="#" — checar se é intencional'),
+    # Nao basta olhar `href="#"` escrito a mao: a ancora vazia tambem chega ao
+    # HTML por PARAMETRO de componente — `secondary_url="#"`, `back_url="#"`,
+    # `primary_action_url="#"`. Eram 19 ocorrencias invisiveis para a regra
+    # anterior, contra 10 visiveis (NOVO-40).
+    ("href_hash",            re.compile(r'\b[a-z_]*(?:href|url|link)[a-z_]*=(["\'])#\1'),
+     'Âncora vazia — link que só pula a página para o topo; usar URL real ou <button>'),
     # Ver `_LEGACY_PAGE_HEADER_PAT`: o alvo e a classe CRUA `page-header`, nao a
     # familia `page-header-band`/`-stack`/`-rail`, que e o componente canonico.
     ("legacy_page_header",   re.compile(r'class="[^"]*\bpage-header(?![-\w])'),
