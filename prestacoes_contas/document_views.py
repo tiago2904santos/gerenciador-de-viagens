@@ -349,6 +349,7 @@ def prestacao_servidor_assinado_anexar(request, ps_pk, tipo):
     )
 
 
+@require_POST
 def prestacao_documento_excluir(request, pc_pk, anexo_pk):
     prestacao = get_object_or_404(_prestacao_queryset(), pk=pc_pk)
     anexo = get_object_or_404(
