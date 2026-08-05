@@ -1121,6 +1121,49 @@ perde o prazo e a Etapa 2 perde a rede.
 | Ação flutuante secundária empilhada | — | ✅ NOVO-23 — modificador `--stacked` era vencido pela base de `cv-buttons.css` |
 | Usuários/Áreas em duas listas (`list_page_standard`) | 1 PR | ✅ NOVO-24 — camadas `selectors`/`presenters`/`services` no app `usuarios`; ORM em view 39 → 36 |
 | [Arquitetura de configurações](PROPOSTA_CONFIGURACOES.md) — tela por seções declaradas, config por documento, preferências por usuário | 17–28 dias | **aguardando decisão** de posição na fila |
+| [Etapa 9 — HTML e biblioteca de componentes globais](PLANO_HTML_COMPONENTES_GLOBAIS.md) — taxonomia única, um componente por função, casco de página único | 12 PRs | 📋 plano escrito 05/08; Fase 0 a começar |
+
+### Etapa 9 — Reescrita do HTML e da biblioteca de componentes (05/08/2026)
+
+A Etapa 6 fechou os defeitos de HTML que a auditoria catalogou (`H-02`..`H-10`, `D-41`). Ela
+não unificou a biblioteca, e não prometia isso. O que sobrou é propriedade do conjunto, não
+defeito de tela: **`templates/components/` abriga hoje duas taxonomias paralelas**
+(`components/<família>/` e `components/ui/<família>/`, com 8 famílias existindo nas duas), e a
+página escolhe entre elas por acidente histórico.
+
+Medido no `main` de 05/08 (`1336` testes verdes, auditor em `184` avisos): 96 componentes, 5
+órfãos, 9 vivos só por UI Lab/teste, 10 aliases de uma linha, 4 sistemas de confirmação de
+exclusão, 7 componentes de botão, 10 grupos de partials byte-idênticos, 12 páginas
+`confirm_delete.html` quase iguais, 2 cascos de wizard divergindo em 5 linhas, 46 páginas
+montando `page-shell` à mão contra 18 no `flow_base`, e **390 de 1.262 includes sem `only`** —
+o gate declarado na tabela da §6 para a Etapa 6 nunca foi construído.
+
+Catálogo `NOVO-39` a `NOVO-54`, arquitetura alvo, as 12 fases, os gates novos e o dicionário de
+renomeação completo estão em [`PLANO_HTML_COMPONENTES_GLOBAIS.md`](PLANO_HTML_COMPONENTES_GLOBAIS.md).
+
+- [ ] `NOVO-39` 🟠 duas taxonomias paralelas de componentes (8 famílias duplicadas)
+- [ ] `NOVO-40` 🟠 5 componentes órfãos · 9 vivos só por UI Lab/teste (`main_list_card`, 167 linhas, é mantido vivo por uma asserção)
+- [ ] `NOVO-41` 🟠 10 aliases de uma linha — a padronização de 22/07 declarou tê-los eliminado
+- [ ] `NOVO-42` 🔴 4 sistemas de confirmação de exclusão, dois com nome quase igual e comportamento diferente
+- [ ] `NOVO-43` 🟠 7 componentes de botão para um `<button>`
+- [ ] `NOVO-44` 🟠 3 sistemas de alerta
+- [ ] `NOVO-45` 🟠 2 sistemas de card de formulário (102 e 112 linhas), que precisaram da **mesma** correção de vazamento duas vezes (`H-04`, `H-05`)
+- [ ] `NOVO-46` 🟠 2 sistemas de item de lista
+- [ ] `NOVO-47` 🟠 10 grupos de partials locais byte-idênticos (SHA-256)
+- [ ] `NOVO-48` 🟠 2 cascos de wizard divergindo em 5 linhas; nenhum usa o `flow_base` criado para isso
+- [ ] `NOVO-49` 🟠 não existe casco de página único (46 × 18)
+- [ ] `NOVO-50` 🟠 12 páginas `confirm_delete.html` idênticas exceto por 3 strings
+- [ ] `NOVO-51` 🟠 390 de 1.262 includes sem `only`; gate da Etapa 6 nunca construído
+- [ ] `NOVO-52` 🟡 nenhum componente declara contrato; zero templatetags, kwargs soltos
+- [ ] `NOVO-53` 🟡 `PADRAO_TEMPLATES.md` descreve estrutura de diretórios que não existe
+- [ ] `NOVO-54` 🟡 nomenclatura mista (pt/en, prefixo `_` inconsistente, 3 convenções de sufixo)
+
+> **Correção de método registrada antes de virar erro.** A primeira contagem de órfãos deste
+> plano deu 21 — estava errada. Ela procurava só `{% include "caminho" %}`, e o projeto passa
+> caminho de template **como valor de parâmetro** (`band_tabs_template=`, `body_template=`).
+> Contando as referências por string, os órfãos reais são 5. Não é detalhe de contagem: neste
+> repositório o grafo entre templates **não é sintático**, e ferramenta que só olhe `include`
+> apaga arquivo vivo. O `grep` de prova da regra 6 do `AGENTS.md` tem de ser pelo caminho.
 
 ---
 
