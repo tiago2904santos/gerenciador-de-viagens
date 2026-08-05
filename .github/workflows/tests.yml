@@ -59,21 +59,22 @@ jobs:
 
       - name: Block new frontend standards debt
         # Catraca: este número só desce. NOVO-30 fase 1 (refazer): 384 → 335.
-        # NOVO-39: 184 → 92. Os 92 `legacy_page_header` eram falso positivo — a
-        # regra acusava a família do componente canônico e mandava migrar para
+        # Fase 5b (CSS morto, #171): 184 → 182 — avisos que saíram junto com as
+        # regras apagadas.
+        # NOVO-39: os 92 `legacy_page_header` eram falso positivo — a regra
+        # acusava a família do componente canônico e mandava migrar para
         # `app-page-hero`, que não existe no repositório. Corrigida a regra, não
         # o template; ver core/tests/test_auditor_page_header.py.
-        # NOVO-40: 92 → 82. A âncora vazia saiu das vitrines — e a regra passou a
-        # ver também a forma que chega por parâmetro de componente.
-        run: python scripts/audit_frontend_standards.py --max-warnings 82
+        # NOVO-40: os 10 `href_hash` saíram junto com as 72 âncoras vazias que a
+        # regra não via; ver core/tests/test_ancora_vazia.py.
+        run: python scripts/audit_frontend_standards.py --max-warnings 80
 
       - name: Block CSS without a consumer (NOVO-37)
-        # Catraca: este número só desce. A fase 5a cortou 5.404 linhas; sobraram
-        # 314 regras que aquela varredura não alcançava (`@media` aninhado). O
-        # alvo é zero, num PR próprio com medição própria — aqui o número só não
-        # sobe. O critério deste auditor preserva nome composto
+        # Teto ZERO desde a fase 5b: as 314 regras que a varredura da 5a não
+        # alcançava (`@media` aninhado) saíram, e não há dívida residual a
+        # tolerar. O critério deste auditor preserva nome composto
         # (`cv-person-list--n{{ contagem }}`), que foi o que a 5a apagou.
-        run: python scripts/audit_css_morto.py --max-regras 314
+        run: python scripts/audit_css_morto.py --max-regras 0
 
       - name: Block backend architecture regressions (P-01, P-05)
         # Catraca: este número só desce. O P-01 fechou os quatro apps do

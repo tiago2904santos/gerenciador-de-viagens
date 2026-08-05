@@ -1020,11 +1020,27 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
     tambem passou a acusar **elemento que sumiu**: area < 2px sai da captura, entao
     um colapso de layout sumia em vez de virar diferenca.
 
-  > **Para quem pegar a fase 5b:** o alvo e regra **duplicada** entre arquivos,
-  > nao regra morta — essa acabou. A ordem da cascata e o risco, entao a medicao
-  > tem de ser a mesma: `medir_estilos.py --diff` com as 30 paginas, exigindo 0.
-  > E antes disso ha **314 regras sem consumidor** que a 5a nao alcancou, com a
-  > catraca ja no lugar; cortar essas e um PR proprio.
+- [x] **Fase 5b — as 314 regras que a 5a nao alcancava.** 05/08/2026.
+  - **314 regras, 248 classes, 2.706 linhas** em 21 arquivos. Sao as que a varredura
+    da 5a nao via: ela era regex com lookbehind em `}` e pulava a primeira regra de
+    dentro de cada `@media`. O parser que conta chaves enxerga.
+    Fontes de CSS: **35.120 → 32.741 linhas**. Catraca de `audit_css_morto` **314 → 0**,
+    na CI e na suite.
+  - **A varredura de tela cresceu para 48 paginas / 96 telas / 20.284 elementos.**
+    Faltavam as 16 rotas de `/dev/ui-lab/*` — unico consumidor de `static/css/dev/*`,
+    que era o **segundo e o terceiro maiores blocos do corte**. E o `roteiro-novo`,
+    a pagina do maior bloco, estava **saindo da medicao por timeout** de
+    `networkidle` sem ninguem notar; agora cai para `load`. Resultado: **0
+    propriedades mudadas, 0 elementos sumiram**.
+  - **A checagem que pegou o `NOVO-37` foi refeita aqui, antes de commitar:** das 217
+    classes que perderam toda regra, **nenhuma e emitida** por template ou JS.
+  - Catraca de avisos **184 → 182**.
+
+  > **Para quem pegar a fase 6 (consolidacao):** o alvo e regra **duplicada** entre
+  > arquivos, nao regra morta — essa acabou, e a catraca esta em zero. Sao 62
+  > arquivos e 32.741 linhas para os alvos de ≤25 e ≤13.000, e eles so saem
+  > **fundindo arquivo**, o que mexe na ordem da cascata. A medicao tem de ser a
+  > mesma: `medir_estilos.py --diff` com as 48 paginas, exigindo 0.
 
 ---
 

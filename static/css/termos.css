@@ -78,10 +78,6 @@
   grid-column: 1 / -1;
 }
 
-.termo-evento-periodo {
-  margin-bottom: var(--sp-4);
-}
-
 /* Dentro do stack: o gap já separa as seções — evita margem/padding extras. */
 .cv-form-stack > .termo-evento-periodo {
   margin-bottom: 0;
