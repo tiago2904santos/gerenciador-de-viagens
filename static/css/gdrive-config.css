@@ -727,7 +727,7 @@ border-color: transparent;
 /* Trilha do segmented control no escuro: navy recuado (não o quase-preto do
    --color-bg), com a aba ativa numa superfície mais clara por cima. */
  .gdrive-root-tabs {
-  background: #101c2b;
+  background: color-mix(in srgb, var(--cv-surface-card) 70%, black);
   box-shadow: none;
 }
 

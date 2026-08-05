@@ -192,7 +192,7 @@
 }
 
 .related-route-list::-webkit-scrollbar-thumb:hover {
-  background: var(--color-accent, #d8a21b);
+  background: var(--color-accent);
 }
 
 .related-route-list::-webkit-scrollbar-button {
@@ -1403,10 +1403,10 @@ border-style: dashed;
 }
 
 #diarias-status[data-state="stale"] {
-  background: #3a2323;
+  background: color-mix(in srgb, var(--cv-state-danger) 22%, var(--cv-surface-card));
   border: var(--bd);
-  border-color: #9a4e4e;
-  color: #ffd4d4;
+  border-color: color-mix(in srgb, var(--cv-state-danger) 55%, var(--cv-surface-card));
+  color: color-mix(in srgb, var(--cv-state-danger) 30%, white);
 }
 
 #diarias-status[data-state="updated"] {
@@ -1417,10 +1417,10 @@ border-style: dashed;
 }
 
 #diarias-status[data-state="error"] {
-  background: #3a2323;
+  background: color-mix(in srgb, var(--cv-state-danger) 22%, var(--cv-surface-card));
   border: var(--bd);
-  border-color: #9a4e4e;
-  color: #ffd4d4;
+  border-color: color-mix(in srgb, var(--cv-state-danger) 55%, var(--cv-surface-card));
+  color: color-mix(in srgb, var(--cv-state-danger) 30%, white);
 }
 
 /* Base de .cv-summary-item/-label/-value: components/summary-items.css */
@@ -1777,7 +1777,7 @@ border-style: dashed;
   border: var(--bd-strong);
   border-color: color-mix(in srgb, var(--color-accent) 28%, transparent);
   border-radius: var(--r-pill);
-  border-top-color: var(--color-accent, #d8a21b);
+  border-top-color: var(--color-accent);
   display: block;
   flex: 0 0 auto;
   height: 14px;

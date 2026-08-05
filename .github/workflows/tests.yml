@@ -67,7 +67,14 @@ jobs:
         # o template; ver core/tests/test_auditor_page_header.py.
         # NOVO-40: os 10 `href_hash` saíram junto com as 72 âncoras vazias que a
         # regra não via; ver core/tests/test_ancora_vazia.py.
-        run: python scripts/audit_frontend_standards.py --max-warnings 80
+        # NOVO-41: os literais de cor viraram derivação de token — e com eles os
+        # 71 `rgba()` que a regra nem contava, mais o `domain_selector_in_global`
+        # que era um seletor citado dentro de um comentário de bloco.
+        #
+        # Chega a ZERO. É o alvo que o prompt do NOVO-30 fixou na fase 4 e que
+        # ficou quatro fases em aberto, com dono nomeado em cada uma. Daqui em
+        # diante o auditor não tem dívida para tolerar: aviso novo reprova.
+        run: python scripts/audit_frontend_standards.py --max-warnings 0
 
       - name: Block CSS without a consumer (NOVO-37)
         # Teto ZERO desde a fase 5b: as 314 regras que a varredura da 5a não

@@ -225,9 +225,25 @@ def audit_css() -> list[tuple]:
 
         is_global = rp in GLOBAL_CSS
 
+        # Comentario de BLOCO: `_CSS_COMMENT_LINE` so reconhece a linha que
+        # ABRE o comentario. As linhas de dentro passavam por codigo — e um
+        # cabecalho que citava `.oficio-stepper-*` em prosa era acusado de
+        # seletor de dominio em CSS global (NOVO-41). Aqui o estado do bloco e
+        # levado de uma linha para a outra.
+        dentro_de_bloco = False
+
         for idx, line in enumerate(lines, start=1):
-            # Skip pure comment lines for most rules
-            is_comment = _CSS_COMMENT_LINE.match(line) is not None
+            abre = line.count("/*")
+            fecha = line.count("*/")
+            comeca_dentro = dentro_de_bloco
+            if abre or fecha:
+                dentro_de_bloco = abre > fecha if abre != fecha else dentro_de_bloco
+                if abre and not fecha:
+                    dentro_de_bloco = True
+                elif fecha and not abre:
+                    dentro_de_bloco = False
+
+            is_comment = comeca_dentro or _CSS_COMMENT_LINE.match(line) is not None
 
             if not is_comment:
                 # Domain selectors / route tokens — only in global CSS files
