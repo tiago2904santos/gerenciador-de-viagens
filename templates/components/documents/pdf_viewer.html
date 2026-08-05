@@ -24,8 +24,13 @@
     </div>
     <div class="doc-pdf-toolbar__right">
       {% if is_demo %}
-        {% include "components/ui/buttons/button.html" with label="Abrir PDF" variant="preview" size="sm" href="#" only %}
-        {% include "components/ui/buttons/button.html" with label="Baixar" variant="pdf" size="sm" href="#" only %}
+        {% comment %}
+          Demo: sem `href` o componente rende <button>, e `disabled` deixa claro
+          que nao ha PDF por tras — mesmo tratamento que o zoom logo acima. Um
+          href de ancora vazia daria um link que pula a pagina para o topo.
+        {% endcomment %}
+        {% include "components/ui/buttons/button.html" with label="Abrir PDF" variant="preview" size="sm" disabled=True only %}
+        {% include "components/ui/buttons/button.html" with label="Baixar" variant="pdf" size="sm" disabled=True only %}
       {% else %}
         {% include "components/ui/buttons/button.html" with label="Abrir PDF" variant="preview" size="sm" href=pdf_url link_target="_blank" link_rel="noopener" only %}
         <a class="cv-btn cv-btn--pdf cv-btn--sm doc-pdf-toolbar__btn" href="{{ pdf_url }}" download="{{ filename }}">Baixar</a>
