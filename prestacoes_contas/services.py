@@ -114,11 +114,24 @@ def _data_relatorio_tecnico(oficio):
     return min(hoje, limite)
 
 
-def _sede() -> str:
+def _sede(area) -> str:
+    """Cidade-sede da área informada.
+
+    BE-06: lia `ConfiguracaoSistema.objects.first()` — a configuração de qualquer
+    área, sem recorte. Era o único ponto de produção que fazia isso; todo o resto
+    resolve por área (`get_singleton`/`get_for_area`). O sintoma aparecia
+    justamente na área recém-criada, a que ainda não configurou nada: o relatório
+    técnico saía impresso com o município de outra unidade, sem erro visível.
+
+    Sem área, devolve vazio de propósito — documento oficial com campo em branco é
+    problema; com a cidade errada é outro, pior, e silencioso.
+    """
+    if area is None:
+        return ""
     try:
         from cadastros.models import ConfiguracaoSistema
-        cfg = ConfiguracaoSistema.objects.first()
-        return cfg.cidade_endereco if cfg else ""
+
+        return ConfiguracaoSistema.get_for_area(area).cidade_endereco or ""
     except Exception:
         return ""
 
@@ -340,7 +353,7 @@ def build_relatorio_tecnico_context(relatorio: RelatorioTecnico, servidor_presta
     return {
         "oficio": oficio.numero_formatado,
         "assunto_oficio": _assunto_relatorio_tecnico(oficio),
-        "sede": format_document_display(inst.get("cidade_endereco") or _sede()),
+        "sede": format_document_display(inst.get("cidade_endereco") or _sede(area)),
         "data_atual_extenso": _data_extenso(data_rt),
         "divisao": divisao_cabecalho,
         "unidade_cabecalho": unidade_cabecalho,
