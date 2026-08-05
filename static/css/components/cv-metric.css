@@ -11,7 +11,7 @@
 .cv-metric-grid,
 .cv-summary-grid {
   display: grid;
-  gap: var(--sp-3);
+  gap: var(--space-3);
   min-width: 0;
 }
 
@@ -36,39 +36,39 @@
 .pt-resumo-box {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
+  gap: var(--space-2);
   min-width: 0;
 }
 
 .cv-metric,
 .cv-summary-item {
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-radius: var(--r-panel);
+  background: var(--route-card-inner-bg, var(--color-surface-soft));
+  border: 1px solid var(--route-card-inner-border, var(--color-border-soft));
+  border-radius: var(--radius-md);
   min-height: 76px;
-  padding: var(--sp-3);
+  padding: var(--space-3);
 }
 
 /* Tile de métrica — card de dashboard/resumo */
 .cv-metric--tile,
 .cv-summary-tile {
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-card);
-  box-shadow: var(--sh-raised);
+  background: var(--cv-card-bg);
+  border: var(--cv-card-border);
+  border-radius: var(--cv-card-radius);
+  box-shadow: var(--cv-card-shadow);
   display: grid;
-  gap: var(--sp-2);
+  gap: var(--space-2);
   min-width: 0;
-  padding: var(--sp-4);
+  padding: var(--space-4);
   transition:
-    background-color var(--tr-fast),
-    border-color var(--tr-fast),
-    box-shadow var(--tr-fast);
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .cv-metric--tile:hover,
 .cv-summary-tile:hover {
-  box-shadow: var(--sh-raised);
+  box-shadow: var(--shadow-panel);
 }
 
 /* Rótulo */
@@ -76,21 +76,21 @@
 .cv-summary-label,
 .cv-summary-tile__label,
 .pt-resumo-box__label {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-bold);
+  color: var(--theme-text-muted, var(--color-muted));
+  font-size: var(--font-size-xs, 11px);
+  font-weight: var(--font-weight-bold, 700);
   letter-spacing: 0.06em;
   margin: 0;
   text-transform: uppercase;
 }
 
 .cv-summary-tile__label {
-  letter-spacing: 0.06em;
+  letter-spacing: var(--letter-spacing-label);
 }
 
 .pt-resumo-box__label--accent,
 .cv-metric__label--accent {
-  color: var(--color-primary);
+  color: var(--color-accent);
 }
 
 /* Valor */
@@ -98,7 +98,7 @@
 .cv-summary-value,
 .cv-summary-tile__value,
 .pt-resumo-box__value {
-  color: var(--color-primary);
+  color: var(--theme-stat-value, var(--color-heading));
   font-size: 1.05rem;
   font-weight: 800;
   line-height: 1.25;
@@ -108,8 +108,8 @@
 }
 
 .cv-summary-tile__value {
-  font-size: clamp(var(--fs-lg), 2vw, 1.55rem);
-  font-weight: var(--fw-bold);
+  font-size: clamp(var(--font-size-lg), 2vw, 1.55rem);
+  font-weight: var(--font-weight-bold, 800);
   line-height: 1.2;
 }
 
@@ -119,12 +119,19 @@
   font-weight: 800;
 }
 
+.pt-resumo-box__value--xl,
+.cv-metric__value--xl {
+  font-size: clamp(1.5rem, 2.9vw, 2.2rem);
+  font-weight: 900;
+  line-height: 1.05;
+}
+
 /* Descrição / subtexto */
 .cv-metric__description,
 .cv-summary-tile__description,
 .pt-resumo-box__sub {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-sm);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm, 0.85rem);
   line-height: 1.35;
   margin: 0;
 }

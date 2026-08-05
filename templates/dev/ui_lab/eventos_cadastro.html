@@ -21,7 +21,7 @@
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Componente real</span>
         </div>
         <div class="page-shell page-shell--wizard">
-          {% include "components/ui/headers/page_header.html" with eyebrow="EVENTOS" title="Cadastro de Evento" description="Agrupe documentos, roteiros e anexos sem tornar o evento obrigatorio." icon_label="EV" module_label="Eventos" back_label="Voltar à lista" back_url=request.path status_label="Novo" status_variant="draft" only %}
+          {% include "components/ui/headers/page_header.html" with eyebrow="EVENTOS" title="Cadastro de Evento" description="Agrupe documentos, roteiros e anexos sem tornar o evento obrigatorio." icon_label="EV" module_label="Eventos" back_label="Voltar à lista" back_url="#" status_label="Novo" status_variant="draft" only %}
           <main class="main-form-panel main-form-panel--stack">
             <form method="post" action="#">
               <div class="cv-form-section-stack cv-form-section-stack--comfortable">
@@ -46,7 +46,7 @@
           <span class="ui-lab-status-pill ui-lab-status-pill--done">Comparacao</span>
         </div>
         <div class="page-shell page-shell--wizard">
-          {% include "components/ui/headers/page_header.html" with eyebrow="EVENTOS" title="Editar Evento" description="Agrupe documentos, roteiros e anexos sem tornar o evento obrigatorio." icon_label="EV" module_label="Eventos" back_label="Voltar à lista" back_url=request.path status_label=evento_edit_mock.get_status_display status_variant="active" only %}
+          {% include "components/ui/headers/page_header.html" with eyebrow="EVENTOS" title="Editar Evento" description="Agrupe documentos, roteiros e anexos sem tornar o evento obrigatorio." icon_label="EV" module_label="Eventos" back_label="Voltar à lista" back_url="#" status_label=evento_edit_mock.get_status_display status_variant="active" only %}
           <main class="main-form-panel main-form-panel--stack">
             <form method="post" action="#">
               <div class="cv-form-section-stack cv-form-section-stack--comfortable">

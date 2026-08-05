@@ -58,30 +58,9 @@ jobs:
           python manage.py check --settings=config.settings.test
 
       - name: Block new frontend standards debt
-        # Catraca: este número só desce. NOVO-30 fase 1 (refazer): 384 → 335.
-        # Fase 5b (CSS morto, #171): 184 → 182 — avisos que saíram junto com as
-        # regras apagadas.
-        # NOVO-39: os 92 `legacy_page_header` eram falso positivo — a regra
-        # acusava a família do componente canônico e mandava migrar para
-        # `app-page-hero`, que não existe no repositório. Corrigida a regra, não
-        # o template; ver core/tests/test_auditor_page_header.py.
-        # NOVO-40: os 10 `href_hash` saíram junto com as 72 âncoras vazias que a
-        # regra não via; ver core/tests/test_ancora_vazia.py.
-        # NOVO-41: os literais de cor viraram derivação de token — e com eles os
-        # 71 `rgba()` que a regra nem contava, mais o `domain_selector_in_global`
-        # que era um seletor citado dentro de um comentário de bloco.
-        #
-        # Chega a ZERO. É o alvo que o prompt do NOVO-30 fixou na fase 4 e que
-        # ficou quatro fases em aberto, com dono nomeado em cada uma. Daqui em
-        # diante o auditor não tem dívida para tolerar: aviso novo reprova.
-        run: python scripts/audit_frontend_standards.py --max-warnings 0
-
-      - name: Block CSS without a consumer (NOVO-37)
-        # Teto ZERO desde a fase 5b: as 314 regras que a varredura da 5a não
-        # alcançava (`@media` aninhado) saíram, e não há dívida residual a
-        # tolerar. O critério deste auditor preserva nome composto
-        # (`cv-person-list--n{{ contagem }}`), que foi o que a 5a apagou.
-        run: python scripts/audit_css_morto.py --max-regras 0
+        # Catraca: este número só desce. A Etapa 1 levou 465 → 449; a Etapa 7
+        # levou 449 → 438 na fase 2 e 438 → 417 na fase 1.
+        run: python scripts/audit_frontend_standards.py --max-warnings 401
 
       - name: Block backend architecture regressions (P-01, P-05)
         # Catraca: este número só desce. O P-01 fechou os quatro apps do

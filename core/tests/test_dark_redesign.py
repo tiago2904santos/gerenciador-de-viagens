@@ -9,8 +9,8 @@ class DarkRedesignContractTests(SimpleTestCase):
     def setUp(self):
         self.base_path = Path(settings.BASE_DIR) / "templates" / "base.html"
         css_root = Path(settings.BASE_DIR) / "static" / "css"
-        self.tokens_path = css_root / "01-tokens.css"
-        self.components_path = css_root / "components" / "app-shell.css"
+        self.tokens_path = css_root / "03-theme-dark.css"
+        self.components_path = css_root / "components" / "theme-dark-components.css"
         self.base = self.base_path.read_text(encoding="utf-8")
         self.tokens_css = self.tokens_path.read_text(encoding="utf-8")
         self.components_css = self.components_path.read_text(encoding="utf-8")
@@ -22,22 +22,25 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR) / "static" / "css" / "shell.bundle.css"
         ).read_text(encoding="utf-8")
         style_index = bundle.index(">>> css/style.css >>>")
-        theme_tokens_index = bundle.index("@import url(\"./01-tokens.css\")")
+        theme_dark_tokens_index = bundle.index(">>> css/03-theme-dark.css >>>")
         file_picker_index = bundle.index(">>> css/components/file-picker.css >>>")
         action_system_index = bundle.index(">>> css/components/action-system.css >>>")
         record_list_index = bundle.index(">>> css/components/record-list.css >>>")
         filter_header_index = bundle.index(">>> css/components/filter-header.css >>>")
         form_panel_index = bundle.index(">>> css/components/form-panel.css >>>")
+        app_shell_index = bundle.index(">>> css/components/app-shell.css >>>")
         content_cards_index = bundle.index(">>> css/components/content-cards.css >>>")
         document_viewer_index = bundle.index(
             ">>> css/components/document-viewer.css >>>"
         )
         dialog_index = bundle.index(">>> css/components/dialog.css >>>")
-        app_shell_index = bundle.index(">>> css/components/app-shell.css >>>")
+        theme_dark_components_index = bundle.index(
+            ">>> css/components/theme-dark-components.css >>>"
+        )
         extra_css_index = self.base.index("{% block extra_css %}")
         shell_bundle_index = self.base.index("css/shell.bundle.css")
 
-        self.assertLessEqual(style_index, theme_tokens_index)
+        self.assertLess(style_index, theme_dark_tokens_index)
         self.assertNotIn("css/dark-redesign.css", self.base)
         self.assertNotIn("css/dark-redesign.css", bundle)
         self.assertLess(shell_bundle_index, extra_css_index)
@@ -46,54 +49,40 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertLess(action_system_index, record_list_index)
         self.assertLess(record_list_index, filter_header_index)
         self.assertLess(filter_header_index, form_panel_index)
-        self.assertLess(form_panel_index, content_cards_index)
+        self.assertLess(form_panel_index, app_shell_index)
+        self.assertLess(app_shell_index, content_cards_index)
         self.assertLess(content_cards_index, document_viewer_index)
         self.assertLess(document_viewer_index, dialog_index)
         self.assertLess(content_cards_index, dialog_index)
-        self.assertLess(dialog_index, app_shell_index)
-        self.assertLess(action_system_index, app_shell_index)
+        self.assertLess(dialog_index, theme_dark_components_index)
+        self.assertLess(action_system_index, theme_dark_components_index)
 
-    def test_component_css_does_not_target_any_theme(self):
-        css_root = Path(settings.BASE_DIR) / "static" / "css"
-        allowed = {"00-palette.css", "01-tokens.css", "shell.bundle.css"}
-        offenders = []
-
-        for stylesheet in css_root.rglob("*.css"):
-            if stylesheet.name in allowed:
-                continue
-            if "data-theme" in stylesheet.read_text(encoding="utf-8"):
-                offenders.append(stylesheet.relative_to(css_root).as_posix())
-
-        self.assertEqual(offenders, [], f"tema dentro de componente: {offenders}")
+    def test_theme_layer_does_not_target_official_light_theme(self):
+        for layer_css in (self.tokens_css, self.components_css):
+            self.assertNotIn('html[data-theme="light"]', layer_css)
+            self.assertNotIn('html[data-theme="light-light"]', layer_css)
+            self.assertNotIn('html[data-theme="dark-light"]', layer_css)
 
     def test_semantic_dark_contract_covers_core_component_needs(self):
-        """A camada cobre os eixos de que um componente precisa — vocabulario novo.
-
-        NOVO-30 fase 3a: os `--color-*` eram alias e sairam. A afirmacao que
-        importa nao mudou: existe UM nome por eixo (tinta, traco, foco, estado,
-        elevacao, raio, espaco, tipografia, altura, movimento, camada) e o tema
-        escuro redeclara SO cor.
-        """
         required_tokens = (
-            # NOVO-30 fase 3c: `--focus-ring` saiu — o sistema deixou de
-            # sinalizar foco por decisao de produto.
-            # NOVO-55: elevacao e raio passaram a ser nomeados por PAPEL
-            # (`raised`/`overlay`, `control`/`panel`/`card`) em vez de tamanho
-            # (`sm`/`md`). O eixo continua existindo — e o que este teste
-            # afirma —, so que agora o nome diz onde a peca cabe.
-            "--cv-ink:", "--cv-ink-muted:", "--cv-border:",
-            "--cv-state-success:", "--cv-state-warning:", "--cv-state-danger:",
-            "--sh-raised:", "--r-panel:", "--sp-4:", "--fs-sm:", "--h-md:",
-            "--tr-base:", "--z-modal:",
+            "--color-bg:",
+            "--color-surface:",
+            "--color-surface-elevated:",
+            "--color-text:",
+            "--color-text-muted:",
+            "--color-border:",
+            "--color-focus:",
+            "--color-success:",
+            "--color-info:",
+            "--color-warning:",
+            "--color-danger:",
+            "--color-input-bg:",
+            "--sidebar-width:",
         )
+
         for token in required_tokens:
             with self.subTest(token=token):
                 self.assertIn(token, self.tokens_css)
-
-        escuro = self.tokens_css.split('html[data-theme="dark"] {', 1)[1].split("}", 1)[0]
-        for proibido in ("--r-", "--sp-", "--fs-", "--h-", "--z-", "--tr-"):
-            with self.subTest(proibido=proibido):
-                self.assertNotIn(proibido, escuro, "tema redeclarando geometria")
 
     def test_reduced_motion_and_mobile_shell_are_explicit(self):
         self.assertIn("@media (prefers-reduced-motion: reduce)", self.components_css)
@@ -725,26 +714,19 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("@media (prefers-reduced-motion: reduce)", auth_css)
 
     def test_dark_primary_actions_stay_in_the_primary_blue_family(self):
-        """Acao cheia pinta com o acento e escreve com o par do acento.
-
-        A premissa antiga morreu no NOVO-28: nao ha mais uma "familia primaria"
-        separada do acento — o acento E a familia (azul no claro, ouro no
-        escuro). O que sobrou de verdadeiro, e vale travar, e o par: fundo
-        `--color-accent`, texto `--on-accent`. Trocar o segundo pelo primeiro
-        apaga a letra do botao.
-        """
-        import re as _re
-
-        css = self.css + self.components_css
-        for regra in _re.finditer(r"([^{}]*primary[^{}]*)\{([^{}]*)\}", css):
-            corpo = regra.group(2)
-            if not _re.search(r"(?:^|;)\s*background(?:-color)?:\s*var\(--color-accent\)\s*;", corpo):
-                continue
-            cor = _re.search(r"(?:^|;)\s*color:\s*([^;]+);", corpo)
-            if cor is None:
-                continue
-            with self.subTest(seletor=regra.group(1).strip()[:60]):
-                self.assertIn("--on-accent", cor.group(1), "acento cheio sem o par de tinta")
+        for token in (
+            "--action-primary-bg:",
+            "--cv-btn-primary-bg:",
+            "--route-button-primary-bg:",
+        ):
+            with self.subTest(token=token):
+                declaration = next(
+                    line.strip()
+                    for line in self.tokens_css.splitlines()
+                    if line.strip().startswith(token)
+                )
+                self.assertIn("var(--color-primary", declaration)
+                self.assertNotIn("var(--color-accent", declaration)
 
     def test_dark_wizard_filete_stays_gold_and_tracks_header_content(self):
         page_shell = (
@@ -755,15 +737,15 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("bottom:        var(--_wizard-filete-inset-block);", page_shell)
         self.assertIn("top:           var(--_wizard-filete-inset-block);", page_shell)
         self.assertIn("height:        auto;", page_shell)
-        # NOVO-30 fase 3b: padding assimetrico saiu da forma curta (que agora so
-        # aceita valor da escada) para a forma logica. Mesmo recuo, mesma origem
-        # do filete — `padding-inline-start` e o `--_wizard-filete-left`.
-        self.assertIn("padding-block: var(--sp-4);", page_shell)
-        self.assertIn("padding-inline: var(--sp-7) var(--sp-6);", page_shell)
+        self.assertIn(
+            "padding: var(--space-3) var(--space-4) var(--space-3) var(--space-8);",
+            page_shell,
+        )
 
         dark_filete_rule = self.css.split(".cv-form-section-header::before", 1)[1]
         dark_filete_rule = dark_filete_rule.split("}", 1)[0]
-        self.assertIn("var(--color-accent)", dark_filete_rule)
+        self.assertIn("var(--cv-card-family-accent-bg)", dark_filete_rule)
+        self.assertNotIn("var(--color-primary-bright)", dark_filete_rule)
 
     def test_standard_simple_centers_a_tokenized_compact_panel(self):
         page_shell = (
@@ -776,10 +758,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         # Pula aliases agrupados até o bloco `{ ... }`
         standard_simple = standard_simple.split("{", 1)[1].split("}", 1)[0]
 
-        # NOVO-30 fase 3a: 960px e medida de layout, nao degrau de escala — o
-        # token saiu da camada e o valor ficou no ponto de uso. O que o teste
-        # protege continua sendo a centralizacao com largura limitada.
-        self.assertIn("max-width: 960px;", standard_simple)
+        self.assertIn("max-width: var(--layout-form-panel-max-width);", standard_simple)
         self.assertIn("margin-inline: auto;", standard_simple)
         self.assertIn("css/shell.bundle.css", self.base)
         bundle = (
@@ -788,29 +767,42 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn(">>> css/page-shell.css >>>", bundle)
 
     def test_list_and_form_cards_share_the_dark_card_family(self):
-        """Cabecalho de card de lista e de card de formulario sao a MESMA coisa.
+        for token in (
+            "--cv-card-family-bg:",
+            "--cv-card-family-header-bg:",
+            "--cv-card-family-header-image:",
+            "--cv-card-family-border:",
+            "--cv-card-family-shadow:",
+            "--cv-card-family-accent-bg:",
+            "--cv-card-family-accent-width:",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, self.tokens_css)
 
-        NOVO-30 fase 3a: eram sete tokens `--cv-card-family-*` na camada, e o
-        teste conferia que os sete existiam — o que nao diz se as duas telas
-        pintam igual. Agora compara as duas regras entre si: mesma superficie,
-        mesmo traco. Se uma divergir, o teste aponta as duas.
-        """
-        import re as _re
+        wizard_header = self.css.rsplit(".cv-form-section-header {", 1)[1]
+        wizard_header = wizard_header.split("}", 1)[0]
+        list_header = self.css.split(".cv-record-card__id-row {", 1)[1]
+        list_header = list_header.split("}", 1)[0]
 
-        def _regra(css, seletor):
-            corpo = css.rsplit(seletor + " {", 1)[1].split("}", 1)[0]
-            return {
-                m.group(1): m.group(2).strip()
-                for m in _re.finditer(r"(?:^|;)\s*([-a-z]+):\s*([^;]+);", corpo)
-            }
+        for shared_token in (
+            "var(--cv-card-family-header-bg)",
+            "var(--cv-card-family-header-image)",
+            "var(--cv-card-family-border-strong)",
+        ):
+            with self.subTest(shared_token=shared_token):
+                self.assertIn(shared_token, wizard_header)
+                self.assertIn(shared_token, list_header)
 
-        formulario = _regra(self.css, ".cv-form-section-header")
-        lista = _regra(self.css, ".cv-record-card__id-row")
+        self.assertEqual(self.css.count(".cv-record-card__id-row::before"), 1)
 
-        for prop in ("background", "border-color", "border-bottom-color"):
-            if prop in formulario and prop in lista:
-                with self.subTest(prop=prop):
-                    self.assertEqual(formulario[prop], lista[prop])
+        simple_form_header = self.css.split(
+            ".main-form-panel > .form-section > .section-header {", 1
+        )[1].split("}", 1)[0]
+        simple_form_filete = self.css.split(
+            ".main-form-panel > .form-section > .section-header::before {", 1
+        )[1].split("}", 1)[0]
 
-        self.assertEqual(formulario.get("background"), "var(--cv-surface-block)")
-        self.assertEqual(lista.get("background"), "var(--cv-surface-block)")
+        self.assertIn("var(--cv-card-family-header-bg)", simple_form_header)
+        self.assertIn("var(--cv-card-family-header-image)", simple_form_header)
+        self.assertIn("var(--cv-card-family-accent-bg)", simple_form_filete)
+        self.assertIn("var(--cv-card-family-accent-width)", simple_form_filete)

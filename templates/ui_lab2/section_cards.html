@@ -62,7 +62,7 @@
                 <p class="cv-form-block__description">Seleção e ação contextual</p>
               </div>
               <div class="cv-form-block__actions">
-                {% include "components/ui/buttons/button.html" with href=request.path label="Novo recurso" variant="secondary" only %}
+                {% include "components/ui/buttons/button.html" with href="#" label="Novo recurso" variant="secondary" only %}
               </div>
             </header>
             <div class="cv-form-block__body">
@@ -75,7 +75,7 @@
         </div>
 
         <div class="cv-form-card__footer">
-          {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_url=request.path primary_label="Salvar" only %}
+          {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_url="#" primary_label="Salvar" only %}
         </div>
       </section>
     {% include "ui_lab2/partials/_component_close.html" %}

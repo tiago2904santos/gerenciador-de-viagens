@@ -35,7 +35,22 @@ jobs:
             # Pré-checagens: qualquer coisa que falte precisa abortar ANTES do
             # checkout, senão produção fica com código novo e serviço antigo.
             : "${DB_NAME:?DB_NAME ausente no .env da VPS}"
+            : "${DB_USER:?DB_USER ausente no .env da VPS}"
+            : "${DB_PASSWORD:?DB_PASSWORD ausente no .env da VPS}"
             : "${BACKUP_ENCRYPTION_KEY:?BACKUP_ENCRYPTION_KEY ausente no .env da VPS}"
+            # config/settings/prod.py levanta RuntimeError sem esta variável, e o
+            # erro só apareceria no `migrate` — depois do checkout, com o serviço
+            # ainda no código velho. Aqui aborta antes de mexer em qualquer coisa.
+            : "${FIELD_ENCRYPTION_KEYS:?FIELD_ENCRYPTION_KEYS ausente no .env da VPS — gere com: python -c \"from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())\"}"
+
+            # pg_dump lê PGHOST/PGPORT/PGUSER/PGPASSWORD, não DB_*. Sem estes
+            # ele tenta o socket Unix com o usuário do SSH como role, falha com
+            # `role "..." does not exist` e derruba o deploy inteiro no backup,
+            # antes do checkout. Os defaults são os mesmos de config/settings/prod.py.
+            export PGHOST="${DB_HOST:-127.0.0.1}"
+            export PGPORT="${DB_PORT:-5432}"
+            export PGUSER="$DB_USER"
+            export PGPASSWORD="$DB_PASSWORD"
 
             git fetch origin "$TARGET_SHA"
 

@@ -6,32 +6,22 @@
    1. Shell principal
    Sidebar fixa + area principal fluida sem overflow horizontal.
    -------------------------------------------------------------------------- */
-/* Largura FIXA, nao porcentagem (NOVO-55).
-   `15%` e o "problema critico do shell" registrado na linha de base do
-   docs/DARK_UI_REDESIGN_INVENTORY.md: o menu media 192px num notebook de 1280
-   e 288px num monitor de 1920. O conteudo dele — rotulo de modulo, sigla e
-   chevron — nao escala com a tela, entao a coluna tambem nao deve: no monitor
-   sobrava vazio e no notebook "Execucao e prestacao" quebrava em duas linhas
-   muito antes do breakpoint movel.
-
-   252px e a medida do rotulo mais longo em uma linha, com o respiro da escada.
-   Abaixo de 840px a coluna some e o menu vira gaveta, como ja era. */
 .app-shell {
   display: grid;
-  grid-template-columns: 252px minmax(0, 1fr);
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   min-height: 100vh;
 }
 
 .app-main {
   box-sizing: border-box;
   min-width: 0;
-  padding: var(--sp-7);
+  padding: 32px;
   width: 100%;
 }
 
 .content-wrap {
   margin: 0;
-  max-width: 100%;
+  max-width: var(--page-max-width);
   padding: 0;
   width: 100%;
 }
@@ -41,11 +31,11 @@
    Gradiente institucional congelado por contrato visual global.
    -------------------------------------------------------------------------- */
 .eyebrow {
-  color: color-mix(in srgb, var(--color-accent) 72%, var(--cv-ink));
+  color: var(--color-accent);
   display: block;
   font-size: 12px;
   font-weight: 700;
-  margin-bottom: var(--sp-1);
+  margin-bottom: var(--space-1);
   text-transform: uppercase;
 }
 
@@ -58,18 +48,22 @@
   }
 
   .app-main {
-    padding: var(--sp-6);
+    padding: 24px;
   }
 }
 
 @media (max-width: 600px) {
   .app-main {
-    padding: var(--sp-4);
+    padding: 16px;
   }
 }
 
 @media (max-width: 420px) {
   .app-main {
-    padding: var(--sp-3);
+    padding: 12px;
   }
+}
+
+.app-page__list-card--placeholder {
+  padding: 0;
 }
