@@ -10,10 +10,10 @@
 .oficio-card {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-left: var(--bd-strong);
+  border-left: var(--bd);
   border-left-color: var(--color-accent);
   border-left-width: 5px;
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
   box-shadow: var(--sh-sm);
   display: grid;
   gap: var(--sp-4);
@@ -22,7 +22,7 @@
 }
 
 .oficio-card:hover {
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   box-shadow: var(--sh-sm);
   transform: translateY(-2px);
 }
@@ -117,7 +117,7 @@
 
 .oficio-justificativa-card .cv-field__control--textarea::-webkit-scrollbar-thumb {
   background: var(--cv-border);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
 }
 
 /* Textarea de Motivo no wizard: visual idêntico ao input, só com altura maior */
@@ -280,9 +280,9 @@
   align-items: center;
   background:
     linear-gradient(135deg, rgba(11, 58, 102, 0.96), rgba(21, 91, 154, 0.92)),
-    var(--color-accent);
+    var(--color-primary);
   border: 0;
-  color: var(--on-accent);
+  color: var(--on-primary);
   display: flex;
   gap: var(--sp-4);
   justify-content: space-between;
@@ -292,14 +292,14 @@
 }
 
 .travel-document-wizard__title {
-  color: var(--on-accent);
+  color: var(--on-primary);
   font-size: var(--fs-2xl);
   line-height: 1.1;
   margin: 0;
 }
 
 .travel-document-wizard__subtitle {
-  color: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  color: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   font-size: var(--fs-lg);
   font-weight: 800;
   margin: 0;
@@ -441,15 +441,15 @@
 /* Picker de viatura: variação tonal do chip de motivo (Motorista / Unidade)
    sobre a base visual do .cv-search-picker__driver-chip. */
 .oficio-viatura-reason--motorista {
-  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 18%, transparent);
   border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
   color: var(--color-accent, var(--cv-state-success));
 }
 
 .oficio-viatura-reason--unidade {
-  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 14%, transparent);
   border-color: var(--cv-border);
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 /* Card da viatura selecionada — usa o slot do __driver-control para o
@@ -503,7 +503,7 @@
 .oficio-documentos-summary {
   align-items: flex-start;
   border: var(--bd);
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
   box-shadow: var(--sh-sm);
   display: flex;
   flex-wrap: wrap;
@@ -549,7 +549,7 @@
   align-items: center;
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   column-gap: 12px;
   display: grid;
   grid-template-columns: 40px minmax(0, 1fr) auto;
@@ -560,9 +560,9 @@
 
 /* Motorista: mesmos tokens do roster Equipe (tint + borda + filete) */
 .oficio-documentos-traveller-tile--motorista {
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-block));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  border-inline-start: var(--bd-strong);
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--cv-surface-block));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  border-inline-start: var(--bd);
   border-inline-start-color: var(--color-accent);
 }
 
@@ -570,7 +570,7 @@
   align-items: center;
   background: color-mix(in srgb, var(--cv-ink) 8%, transparent);
   border: var(--bd);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink);
   display: inline-flex;
   font-size: var(--fs-xs);
@@ -582,9 +582,9 @@
 }
 
 .oficio-documentos-traveller-tile--motorista .oficio-documentos-traveller-tile__avatar {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--on-accent);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--on-primary);
 }
 
 .oficio-documentos-traveller-tile__main {
@@ -615,9 +615,9 @@
 
 .oficio-documentos-traveller-tile__badge {
   align-items: center;
-  background: var(--color-accent);
+  background: var(--color-primary);
   border-radius: var(--r-pill);
-  color: var(--on-accent);
+  color: var(--on-primary);
   display: inline-flex;
   flex-shrink: 0;
   font-size: 10px;
@@ -729,7 +729,7 @@
 .oficio-documentos-card {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
   box-shadow: var(--sh-sm);
   overflow: hidden;
 }
@@ -790,7 +790,7 @@
 .oficio-documentos-fact {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   padding-block: var(--sp-2);
   padding-inline: var(--sp-3);
 }
@@ -898,8 +898,8 @@
 .oficio-documentos-route-card__status-chip.status-chip--muted,
 .oficio-documentos-route-card__status-chip.cv-chip--muted {
   background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
 }
 
 .oficio-documentos-route-card__subtitle {
@@ -1338,7 +1338,7 @@
 .viatura-sugestao-chip:focus-visible,
 .viatura-sugestao-chip--active {
   background: var(--cv-surface-block);
-  border-color: var(--color-accent);
+  border-color: var(--color-primary);
   outline: none;
 }
 
@@ -1360,15 +1360,15 @@
 }
 
 .viatura-sugestao-badge--motorista {
-  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .viatura-sugestao-badge--unidade {
-  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .viatura-sugestao-badge--ativa {
@@ -1395,7 +1395,7 @@
 .evento-doc-toggle.cv-segment-toggle {
   background: var(--cv-surface-next);
   border-color: transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: none;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -1405,7 +1405,7 @@
 }
 
 .evento-doc-toggle .cv-segment-toggle__btn {
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink-muted);
   justify-content: center;
   min-height: 34px;
@@ -1417,10 +1417,10 @@
 }
 
 .evento-doc-toggle .cv-segment-toggle__btn[aria-pressed="true"] {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
   box-shadow: none;
-  color: var(--on-accent);
+  color: var(--on-primary);
   transform: none;
 }
 
@@ -1476,16 +1476,16 @@
 }
 
  #evento-card-documentos-d .related-route-item.is-active {
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-block));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--cv-border));
-  border-inline-start: var(--bd-strong);
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--cv-surface-block));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, var(--cv-border));
+  border-inline-start: var(--bd);
   border-inline-start-color: var(--color-accent);
 }
 
  #evento-card-documentos-d .related-route-item.is-active .cv-search-picker__selected-avatar {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--on-accent);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--on-primary);
 }
 
 [data-oficio-motorista-servidor],
@@ -1515,8 +1515,8 @@
 /* ── Tema claro — inativo ──────────────────────────────────────── */
 [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle {
   background:   var(--cv-surface-card);
-  border-color: color-mix(in srgb, var(--color-accent) 50%, var(--cv-border));
-  color:        color-mix(in srgb, var(--color-accent) 75%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 50%, var(--cv-border));
+  color:        color-mix(in srgb, var(--color-primary) 75%, var(--cv-ink));
 }
 
 /* ── Tema claro — hover / focus / ativo ────────────────────────── */
@@ -1524,16 +1524,16 @@
 [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle:focus-visible,
 [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle--active,
 [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle[aria-pressed="true"] {
-  background:   color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-card));
-  border-color: var(--color-accent);
-  color:        var(--color-accent);
+  background:   color-mix(in srgb, var(--color-primary) 14%, var(--cv-surface-card));
+  border-color: var(--color-primary);
+  color:        var(--color-primary);
 }
 
 /* ── Tema escuro — inativo ─────────────────────────────────────── */
  [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle {
   background:   var(--cv-surface-card);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--cv-border));
-  color:        color-mix(in srgb, var(--color-accent) 75%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, var(--cv-border));
+  color:        color-mix(in srgb, var(--color-primary) 75%, var(--cv-ink));
 }
 
 /* ── Tema escuro — hover / focus / ativo ───────────────────────── */
@@ -1541,9 +1541,9 @@
  [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle:focus-visible,
  [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle--active,
  [data-travel-document-wizard-step1] .cv-search-picker__driver-toggle[aria-pressed="true"] {
-  background:   color-mix(in srgb, var(--color-accent) 22%, var(--cv-surface-card));
-  border-color: var(--color-accent);
-  color:        var(--color-accent);
+  background:   color-mix(in srgb, var(--color-primary) 22%, var(--cv-surface-card));
+  border-color: var(--color-primary);
+  color:        var(--color-primary);
 }
 
 /* Equipe (step1): cards selecionados em até 2 colunas quando houver espaço.
@@ -1622,7 +1622,7 @@
 .cv-record-card {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
   box-shadow: var(--sh-sm);
   overflow: hidden;
   transition:
@@ -1643,7 +1643,7 @@
 .cv-record-card__id-row {
   align-items: center;
   background: var(--cv-surface-block);
-  background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 7%, transparent) 0px, transparent 76px);
+  background-image: linear-gradient(to right, color-mix(in srgb, var(--color-primary) 7%, transparent) 0px, transparent 76px);
   border-bottom: var(--bd);
   display: flex;
   flex-wrap: wrap;
@@ -1655,7 +1655,7 @@
 }
 
 .cv-record-card__id-row::before {
-  background: linear-gradient(180deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 50%, transparent) 100%);
+  background: linear-gradient(180deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 50%, transparent) 100%);
   border-radius: var(--r-pill);
   box-shadow: var(--sh-sm);
   content: "";
@@ -1777,12 +1777,18 @@ padding-inline: var(--sp-6);
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-/* base card — alinhado ao tile de Documentos / Equipe */
+/* base card — alinhado ao tile de Documentos / Equipe.
+   NOVO-55: painel EMBUTIDO no card pousa na terceira superficie, nao na do
+   card. Com as duas iguais o painel encostava no fundo e sumia — e sem borda
+   nao sobrava nada para separar. */
+/* NOVO-55: TODO painel interno do card usa `--r-md`. Estavam em tres raios
+   diferentes (linha de pessoa 8, bloco de fatos 14, trecho 8) dentro de um
+   card de 28 — a escala existia, mas cada componente escolheu um degrau. */
 .cv-person-row {
   align-items: center;
-  background: var(--cv-surface-card);
+  background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   column-gap: 12px;
   display: grid;
   grid-template-columns: 40px minmax(0, 1fr) auto;
@@ -1799,7 +1805,7 @@ padding-inline: var(--sp-6);
   align-items: center;
   background: color-mix(in srgb, var(--cv-ink) 8%, transparent);
   border: var(--bd);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink);
   display: inline-flex;
   flex-shrink: 0;
@@ -1831,21 +1837,21 @@ padding-inline: var(--sp-6);
 
 /* Motorista — mesmos tokens da Equipe / Documentos */
 .cv-person-row--highlight {
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-block));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  border-inline-start: var(--bd-strong);
+  background: var(--cv-surface-block);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  border-inline-start: var(--bd);
   border-inline-start-color: var(--color-accent);
 }
 
 .cv-person-row--highlight .cv-person-row__avatar {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--on-accent);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--on-primary);
 }
 
  .cv-person-row--highlight {
-  background: color-mix(in srgb, var(--color-accent) 8%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--cv-surface-card));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
 }
 
  .cv-person-row--highlight .cv-person-row__name {
@@ -1853,7 +1859,7 @@ padding-inline: var(--sp-6);
 }
 
 .cv-fact-row {
-  background: var(--cv-surface-card);
+  background: var(--cv-surface-block);
   border-color: var(--cv-border);
   min-height: 68px;
 }
@@ -1895,13 +1901,15 @@ padding-inline: var(--sp-6);
   min-width: 0;
 }
 
+/* "MOTORISTA" e um SELO — diz o que a pessoa e, nao oferece um clique. Vai no
+   dourado cheio, como no visual antigo (NOVO-55). */
 .cv-person-row__badge {
   align-items: center;
-  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  background: var(--color-accent);
   border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  border-color: transparent;
   border-radius: var(--r-pill);
-  color: var(--color-accent);
+  color: var(--on-accent);
   display: inline-flex;
   flex-shrink: 0;
   font-size: 10px;
@@ -1914,6 +1922,9 @@ padding-inline: var(--sp-6);
   white-space: nowrap;
 }
 
+/* "MOTORISTA" e selo, nao botao: dourado (NOVO-55). Esta regra vinha depois
+   da base em .cv-person-row__badge e a vencia — era o ultimo azul sobrando no
+   papel de destaque. */
 .cv-person-row--highlight .cv-person-row__badge {
   background: var(--color-accent);
   border: 0;
@@ -1940,7 +1951,7 @@ padding-inline: var(--sp-6);
 }
 
 .cv-fact-block {
-  background: var(--cv-surface-card);
+  background: var(--cv-surface-block);
   border: var(--bd);
   border-radius: var(--r-md);
   container-type: inline-size;
@@ -1956,6 +1967,8 @@ padding-inline: var(--sp-6);
   min-height: 170px;
 }
 
+/* PLACA / MODELO / VALOR TOTAL sao ROTULOS de destaque, nao acao — dourado
+   derivado da tinta, que escurece sozinho quando o card e branco (NOVO-55). */
 .cv-fact-block__label {
   color: var(--color-accent);
   font-size: 10px;
@@ -2031,14 +2044,18 @@ padding-inline: var(--sp-6);
 
 .cv-itinerary::-webkit-scrollbar-thumb {
   background: var(--cv-border);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
 }
 
+/* A linha de trecho pousa na superficie do CARD (NOVO-55). O bloco de fatos e
+   a terceira superficie; o trecho volta para a segunda, um degrau abaixo dele.
+   E o que faz cada trecho ler como linha recuada dentro do painel. Estava
+   `transparent`, entao herdava o bloco e sumia. */
 .cv-itinerary__leg {
-  background: transparent;
+  background: var(--cv-surface-card);
   border: var(--bd);
   border-color: transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   padding-block: var(--sp-2);
   padding-inline: var(--sp-3);
 }
@@ -2185,8 +2202,8 @@ padding-inline: var(--sp-6);
 }
 
 .cv-record-card__badge--warning {
-  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  color: var(--color-primary);
 }
 
 .cv-record-card__temporal-chip {
@@ -2517,12 +2534,12 @@ padding-inline: var(--sp-6);
 }
 
  .cv-fab-container > .cv-btn--primary {
-  background: var(--color-accent);
+  background: var(--color-primary);
   background-image: none;
   border: 0;
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
   font-weight: var(--fw-bold);
   min-height: var(--h-md);
   padding-block: 0;
@@ -2532,10 +2549,10 @@ padding-inline: var(--sp-6);
 
  .cv-fab-container > .cv-btn--primary:hover,
  .cv-fab-container > .cv-btn--primary:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
   background-image: none;
   border: 0;
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
  .cv-fab-container > .cv-btn--primary .cv-btn__icon {

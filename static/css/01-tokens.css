@@ -12,6 +12,10 @@
    1. Um tema e um mapa de VALORES DE COR. O bloco escuro abaixo redeclara
       cor e nada mais — nunca raio, nunca espaco, nunca regra de componente.
       Se o escuro precisasse de geometria propria, a regra estaria errada.
+      A UNICA excecao e `--sh-sm`, e ela prova a regra: sombra e cor (a
+      ausencia dela), e a do escuro nao pode ser a do claro mais forte — tem
+      de ser outra, com brilho interno no lugar do traco. O motivo esta
+      escrito no ponto da declaracao.
    2. Nenhum arquivo de componente declara token. A prova esta em
       core/tests/test_css_tokens.py, que conta as declaracoes de TODO
       static/css — e nao so as ancoradas em inicio de linha, que foi como
@@ -42,6 +46,7 @@
   /* ---- tinta ----------------------------------------------------------- */
   --cv-ink: #132238;
   --cv-ink-muted: #52657a;
+  --cv-ink-strong: #071a33;   /* titulo — um degrau acima do corpo */
 
   /* ---- estados semanticos (as unicas cores fora da paleta) -------------- */
   --cv-state-danger: #c0392b;
@@ -77,32 +82,81 @@
   --tone-route: #315f8c;
   --tone-package: #65528b;
 
-  /* ---- traco ------------------------------------------------------------ */
-  --cv-border: color-mix(in srgb, var(--cv-ink) 18%, transparent);
+  /* ---- traco: o mais discreto possivel (decisao de produto, 05/08/2026) ---
+     O sistema NAO desenha borda como recurso visual. Os tres nomes continuam
+     existindo, com valor quase transparente, e nao apagados: `border:
+     var(--bd)` aparece em centenas de regras e a escada fechada da fase 3b so
+     aceita `var(--bd)` como valor de borda. Baixar o token apaga o traco em
+     toda parte de uma vez; apagar o token exigiria reescrever as regras.
+
+     8% e uma linha que se sente e nao se ve — o suficiente para o campo nao
+     encostar no card quando os dois caem na mesma superficie, sem virar
+     grade. `--bd-strong` SAIU: com o traco neste nivel, "2px" era so o mesmo
+     nada em dobro, e alias e o que esta camada nao admite. */
+  --cv-border: color-mix(in srgb, var(--cv-ink) 8%, transparent);
   --bd: 1px solid var(--cv-border);
-  --bd-strong: 2px solid var(--cv-border);
 
-  /* ---- elevacao: UMA sombra, minima (decisao de produto, 04/08/2026) -------
-     Nao ha escada de elevacao. O que se destaca do fundo se destaca pela
-     superficie da paleta e pela borda; a sombra so encosta a peca no papel. */
-  --sh-sm: 0 1px 2px color-mix(in srgb, var(--cv-ink) 8%, transparent);
+  /* ---- elevacao: UM degrau, e ele e o separador (05/08/2026) -------------
+     REVERTE a decisao de 04/08 que zerou a sombra. Com a borda fora, sobrou
+     um sistema em que nada separava nada: card, campo e pagina viravam o
+     mesmo borrao. A sombra voltou a ser o recurso que encosta a peca no
+     papel — continua sendo UM degrau so (SombraEFocoTests segue valendo:
+     `var(--sh-sm)` ou `none`, nada mais).
 
-  /* ---- raio: escala fechada; o zero e `0` literal ------------------------ */
-  --r-sm: 8px;
-  --r-md: 14px;
-  --r-lg: 20px;
-  --r-xl: 28px;
+     A cor da sombra e literal e TROCA com o tema, ao contrario de tudo o mais
+     aqui: derivar de `--cv-ink` faria a sombra virar um halo BRANCO no
+     escuro, porque a tinta la e clara. Sombra e sempre a ausencia de luz. */
+  --sh-sm:
+    0 1px 2px rgba(7, 17, 29, 0.07),
+    0 8px 24px rgba(7, 17, 29, 0.08);
+
+  /* ---- raio: DOIS raios e uma forma (NOVO-55) ---------------------------
+     Eram quatro degraus (sm/md/lg/xl) e o problema nunca foi o valor deles —
+     era o USO. Medido antes de mexer: 321 declaracoes em `--r-md`, 197 em
+     `--r-sm`, 65 em `--r-lg`, 40 em `--r-xl`. Ou seja, quatro tokens para
+     dizer a mesma coisa em contextos parecidos, e cada componente escolhendo
+     o seu — dois paineis irmaos dentro do mesmo card com raios diferentes.
+
+     `--r-sm` foi dissolvido em `--r-md` e `--r-xl` em `--r-lg` (156 trocas).
+     Sobram DOIS raios, e a distancia entre eles e curta de proposito: 12 e 16
+     leem como a mesma familia, nao como duas decisoes.
+
+       --r-md   raio de trabalho: campo, botao, painel, linha de lista.
+                E o padrao. Na duvida, e este.
+       --r-lg   superficie grande: card, modal, casca de pagina.
+       --r-pill forma, nao raio: chip, aba, avatar.
+
+     Nao ha terceiro degrau para escolher errado. */
+  --r-md: 12px;
+  --r-lg: 16px;
   --r-pill: 999px;
 
-  /* ---- espaco: 4 / 8 / 12 / 16 / 20 / 24 / 32 / 48 ----------------------- */
+  /* ---- espaco: 4 / 8 / 14 / 20 / 26 / 32 / 44 / 60 (NOVO-55) -------------
+     Tentei apertar a escada (2/4/8/12/16/20/24/32) e ficou errado: o sistema
+     virou planilha. Este e o caminho contrario, e passa do ponto de partida —
+     nao e so desfazer o aperto.
+
+     O miolo, que e onde vive padding e gap de componente, anda de SEIS em
+     seis: 8 -> 14 -> 20 -> 26 -> 32. E previsivel como a escada de 4 era, mas
+     cada degrau abre mais espaco que o anterior abria, e e isso que produz
+     respiro em vez de folga solta em um lugar so.
+
+     Os extremos ficam fora do ritmo de proposito: `--sp-1` (4px) e o fio de
+     cabelo entre rotulo e campo, e os dois ultimos (44 e 60) saltam porque
+     separam BLOCO de bloco — respiro da area principal e distancia entre
+     cards —, nao elemento de elemento.
+
+     Continua na camada, e nao nos componentes: padding e gap estao em
+     milhares de declaracoes, e mexer um a um daria uma tela folgada e outra
+     nao. Um degrau aqui e o respiro inteiro de uma vez. */
   --sp-1: 4px;
   --sp-2: 8px;
-  --sp-3: 12px;
-  --sp-4: 16px;
-  --sp-5: 20px;
-  --sp-6: 24px;
-  --sp-7: 32px;
-  --sp-8: 48px;
+  --sp-3: 14px;
+  --sp-4: 20px;
+  --sp-5: 26px;
+  --sp-6: 32px;
+  --sp-7: 44px;
+  --sp-8: 60px;
 
   /* ---- tipografia -------------------------------------------------------- */
   --font-sans: "Segoe UI", Arial, sans-serif;
@@ -119,10 +173,16 @@
   --fw-semibold: 600;
   --fw-bold: 700;
 
-  /* ---- altura de controle ------------------------------------------------ */
-  --h-sm: 34px;
-  --h-md: 48px;   /* NOVO-29: a altura do campo do login virou o padrao */
-  --h-lg: 52px;
+  /* ---- altura de controle: 30 / 40 / 46 (NOVO-55) ------------------------
+     O NOVO-29 tinha promovido a altura do campo do LOGIN (48px) a padrao do
+     sistema. Funciona numa tela com tres campos no meio do nada; numa lista
+     com busca, dois selects, filtro de periodo e quatro abas, os mesmos 48px
+     viram uma parede de controles altos — e e daí que vem a maior parte da
+     sensacao de sistema solto. 40px e a altura de formulario denso; 30px e a
+     do controle secundario. */
+  --h-sm: 30px;
+  --h-md: 40px;
+  --h-lg: 46px;
 
   /* ---- movimento --------------------------------------------------------- */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -142,12 +202,21 @@
 html[data-theme="dark"] {
   color-scheme: dark;
 
-  --cv-ink: #f5f7f8;
-  --cv-ink-muted: #aeb9c1;
+  /* Tinta AZULADA, nao cinza: sobre marinho, um branco neutro fica sujo. */
+  --cv-ink: #edf4ff;
+  --cv-ink-muted: #aebfd4;
+  --cv-ink-strong: #f7fbff;
 
   --cv-state-danger: #ef7d77;
   --cv-state-success: #58c694;
   --cv-state-warning: #e6b95d;
   /* No escuro as cores de estado sao CLARAS; a tinta em cima tem de escurecer. */
   --on-state: #20180a;
+
+  /* Sombra mais funda e mais opaca: sobre marinho profundo, a sombra clara do
+     tema claro simplesmente nao aparece. O brilho interno de 1px no topo e o
+     que da a borda de luz que o card tinha no visual antigo — sem borda. */
+  --sh-sm:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 10px 28px rgba(0, 0, 0, 0.38);
 }

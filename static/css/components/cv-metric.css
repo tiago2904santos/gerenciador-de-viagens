@@ -54,7 +54,7 @@
 .cv-summary-tile {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
   box-shadow: var(--sh-sm);
   display: grid;
   gap: var(--sp-2);
@@ -90,7 +90,7 @@
 
 .pt-resumo-box__label--accent,
 .cv-metric__label--accent {
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 /* Valor */
@@ -98,7 +98,7 @@
 .cv-summary-value,
 .cv-summary-tile__value,
 .pt-resumo-box__value {
-  color: var(--color-accent);
+  color: var(--color-primary);
   font-size: 1.05rem;
   font-weight: 800;
   line-height: 1.25;

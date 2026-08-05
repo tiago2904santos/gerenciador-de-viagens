@@ -15,7 +15,7 @@
   border: var(--bd);
   border-radius: var(--r-lg);
   box-shadow: var(--sh-sm);
-  color: var(--color-accent);
+  color: var(--color-primary);
   display: flex;
   gap: var(--sp-3);
   justify-content: space-between;
@@ -79,8 +79,8 @@
 .ui-lab-status-pill--off {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
 }
 
 @media (max-width: 600px) {

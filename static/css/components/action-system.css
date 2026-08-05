@@ -68,10 +68,10 @@
 .cv-btn--next,
 .btn-primary,
 .app-btn--primary {
-  background: var(--color-accent);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
 .cv-btn--primary:hover,
@@ -84,9 +84,9 @@
 .btn-primary:focus,
 .app-btn--primary:hover,
 .app-btn--primary:focus {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 
 .cv-btn--secondary,
@@ -119,7 +119,7 @@
 .btn-secondary:hover,
 .app-btn--secondary:hover,
 .app-btn--muted:hover {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border-color: var(--cv-border);
   color: var(--cv-ink);
 }
@@ -174,16 +174,16 @@
 .cv-btn--preview,
 .cv-btn--tool {
   background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   box-shadow: none;
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 .cv-btn--preview:hover,
 .cv-btn--tool:hover {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 
 .cv-btn--pdf,
@@ -199,12 +199,12 @@
 }
 
 .cv-btn--docx .cv-btn__icon {
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 .cv-btn--xs,
 .btn--compact {
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   min-height: 30px;
   padding-inline: var(--sp-2);
 }
@@ -212,7 +212,7 @@
 .cv-btn--sm,
 .btn--sm,
 .app-btn--sm {
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   min-height: 34px;
   padding-inline: var(--sp-3);
 }
@@ -239,7 +239,7 @@
 
 .cv-icon-btn:hover,
 .cv-icon-btn:focus {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border-color: var(--cv-border);
   color: var(--cv-ink);
   transform: translateY(-1px);
@@ -298,9 +298,9 @@
 .cv-icon-btn--settings:not(.is-assinado),
 .cv-icon-btn--signature {
   background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   box-shadow: var(--sh-sm);
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 .cv-icon-btn--pdf {
@@ -339,9 +339,9 @@
 
 .cv-icon-btn--edit:not(.is-assinado):hover,
 .cv-icon-btn--edit:not(.is-assinado):focus {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 
 .cv-icon-btn--edit.is-assinado:hover,
@@ -387,7 +387,7 @@
 .cv-action-menu__item {
   border: var(--bd);
 border-color: transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink);
   min-height: 38px;
   padding: var(--sp-2);
@@ -396,7 +396,7 @@ border-color: transparent;
 
 .cv-action-menu__item:hover,
 .cv-action-menu__item:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border-color: var(--cv-border);
   color: var(--cv-ink);
   outline: none;
@@ -425,9 +425,9 @@ border-color: transparent;
   align-items: center;
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  border-radius: var(--r-sm);
-  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  border-radius: var(--r-md);
+  color: var(--color-primary);
   display: inline-flex;
   flex: 0 0 34px;
   height: 34px;
@@ -466,7 +466,7 @@ border-color: transparent;
 .cv-action-menu__item--rich {
   border: var(--bd);
 border-color: transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   gap: 10px;
   min-height: 52px;
   padding: var(--sp-2);
@@ -475,7 +475,7 @@ border-color: transparent;
 
 .cv-action-menu__item--rich:hover,
 .cv-action-menu__item--rich:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border-color: var(--cv-border);
 }
 
@@ -607,8 +607,8 @@ margin-inline: calc(var(--sp-1) * -1);
 
 .attach-signed-modal__icon {
   background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
 }
 
 .attach-signed-modal__close {
@@ -634,7 +634,7 @@ margin-inline: calc(var(--sp-1) * -1);
 }
 
 .attach-signed-modal__intro .cv-icon {
-  color: var(--color-accent);
+  color: var(--color-primary);
   flex: 0 0 18px;
   height: 18px;
   margin-top: var(--sp-1);
@@ -683,7 +683,7 @@ margin-inline: calc(var(--sp-1) * -1);
 .attach-signed-modal__kind-option {
   background: transparent;
   border: 0;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink-muted);
   cursor: pointer;
   font: inherit;
@@ -696,7 +696,7 @@ margin-inline: calc(var(--sp-1) * -1);
 
 .attach-signed-modal__kind-option:hover,
 .attach-signed-modal__kind-option:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   color: var(--cv-ink);
   outline: none;
 }
@@ -704,7 +704,7 @@ margin-inline: calc(var(--sp-1) * -1);
 .attach-signed-modal__kind-option.is-active {
   background: var(--cv-surface-block);
   box-shadow: none;
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 .attach-signed-modal__form > .app-form-field {
@@ -811,12 +811,12 @@ margin-inline: calc(var(--sp-1) * -1);
 .attach-signed-modal__form .prestacao-file-picker__upload,
 .attach-signed-modal__form .cv-file-picker__upload {
   align-self: start;
-  background: var(--color-accent);
+  background: var(--color-primary);
   background-image: none;
   border: 0;
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
   font-size: 0.8rem;
   font-weight: var(--fw-bold);
   grid-column: 2;
@@ -829,11 +829,11 @@ margin-inline: calc(var(--sp-1) * -1);
 
 .attach-signed-modal__form .prestacao-file-picker__upload:hover:not(:disabled),
 .attach-signed-modal__form .cv-file-picker__upload:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
   background-image: none;
   border: 0;
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
 .attach-signed-modal__form .prestacao-file-picker__upload:disabled,
@@ -1036,15 +1036,15 @@ margin-inline: calc(var(--sp-1) * -1);
   .prestacao-file-picker__upload,
   .cv-file-picker__upload
 ):not(:disabled) {
-  background: var(--color-accent);
-  background-color: var(--color-accent);
+  background: var(--color-primary);
+  background-color: var(--color-primary);
   background-image: none;
   border: 0;
   box-shadow: var(--sh-sm);
   /* Botao cheio de acento: a tinta e o par do acento. Enquanto o `color` daqui
      carregava `!important`, ele vencia o par certo declarado no componente e a
      letra sumia — so apareceu quando o `!important` saiu (NOVO-30 fase 4). */
-  color: var(--on-accent);
+  color: var(--on-primary);
   outline: none;
   transition: background var(--tr-fast), box-shadow var(--tr-fast);
   transform: none;
@@ -1054,11 +1054,11 @@ margin-inline: calc(var(--sp-1) * -1);
   .prestacao-file-picker__upload,
   .cv-file-picker__upload
 ):is(:hover, :focus-visible):not(:disabled) {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  background-color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  background-color: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
   background-image: none;
   border: 0;
-  color: var(--on-accent);
+  color: var(--on-primary);
   outline: none;
   transform: none;
 }
@@ -1128,7 +1128,7 @@ margin-inline: calc(var(--sp-1) * -1);
   .attach-signed-modal__kind-option.is-active:focus-visible
 ) {
   background: var(--cv-surface-block);
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 @media (min-width: 841px) {

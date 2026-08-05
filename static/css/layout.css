@@ -31,7 +31,7 @@
    Gradiente institucional congelado por contrato visual global.
    -------------------------------------------------------------------------- */
 .eyebrow {
-  color: var(--color-accent);
+  color: color-mix(in srgb, var(--color-accent) 72%, var(--cv-ink));
   display: block;
   font-size: 12px;
   font-weight: 700;

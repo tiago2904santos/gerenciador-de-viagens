@@ -28,7 +28,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-lg);
-  border-left: var(--bd-strong);
+  border-left: var(--bd);
   border-left-color: var(--cv-ink-muted);
   border-left-width: 8px;
   box-shadow: var(--sh-sm);
@@ -115,8 +115,8 @@
 
 .roteiro-list-card__status-chip.status-chip--muted {
   background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
 }
 
 .roteiro-list-card__subtitle {

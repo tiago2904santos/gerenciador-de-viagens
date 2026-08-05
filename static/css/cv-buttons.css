@@ -62,31 +62,31 @@
 
 /* --- Primary --- */
 .cv-btn--primary {
-  background: var(--color-accent);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
 .cv-btn--primary:hover,
 .cv-btn--primary:focus {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
 }
 
 /* --- Secondary --- */
 .cv-btn--secondary {
   background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   box-shadow: var(--sh-sm);
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 .cv-btn--secondary:hover,
 .cv-btn--secondary:focus {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 
 /* --- Neutral (secondary mais neutro, sem cor de marca) --- */
@@ -99,7 +99,7 @@
 
 .cv-btn--neutral:hover,
 .cv-btn--neutral:focus {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border-color: var(--cv-border);
   color: var(--cv-ink);
 }
@@ -109,12 +109,12 @@
   background: transparent;
   border-color: transparent;
   box-shadow: none;
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 .cv-btn--ghost:hover,
 .cv-btn--ghost:focus {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border-color: transparent;
   transform: none;
 }
@@ -129,7 +129,7 @@
 
 .cv-btn--back:hover,
 .cv-btn--back:focus {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border-color: var(--cv-border);
   color: var(--cv-ink);
 }
@@ -137,7 +137,7 @@
 /* --- Back-list (volta ao indice — levemente mais distinto que --back) --- */
 .cv-btn--back-list {
   background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   box-shadow: none;
   color: var(--cv-ink);
   font-weight: var(--fw-bold);
@@ -145,8 +145,8 @@
 
 .cv-btn--back-list:hover,
 .cv-btn--back-list:focus {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   color: var(--cv-ink);
 }
 
@@ -155,7 +155,7 @@
   background: linear-gradient(135deg, var(--cv-state-danger) 0%, var(--cv-state-danger) 100%);
   border-color: color-mix(in srgb, var(--cv-state-danger) 70%, black);
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
 .cv-btn--danger:hover,
@@ -169,7 +169,7 @@
   background: linear-gradient(135deg, var(--cv-state-danger) 0%, var(--cv-state-danger) 100%);
   border-color: color-mix(in srgb, var(--cv-state-danger) 70%, black);
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
 .cv-btn--soft-danger:hover,
@@ -181,7 +181,7 @@
 /* --- Preview (visualizar — teal informativo) --- */
 .cv-btn--preview {
   background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   box-shadow: var(--sh-sm);
   color: var(--cv-state-success);
   font-weight: var(--fw-semibold);
@@ -190,7 +190,7 @@
 .cv-btn--preview:hover,
 .cv-btn--preview:focus {
   background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   color: var(--cv-state-success);
 }
 
@@ -236,9 +236,9 @@
 
 .cv-btn--tool:hover,
 .cv-btn--tool:focus {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border-color: var(--cv-border);
-  color: var(--color-accent);
+  color: var(--color-primary);
   transform: none;
 }
 
@@ -309,7 +309,7 @@
   content: '';
   width: 14px;
   height: 14px;
-  border: var(--bd-strong);
+  border: var(--bd);
   border-color: currentColor;
   border-top-color: transparent;
   border-radius: var(--r-pill);
@@ -334,9 +334,9 @@
 /* Selected sobre secondary */
 .cv-btn--secondary.is-selected,
 .cv-btn--secondary[aria-pressed="true"] {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: color-mix(in srgb, var(--color-primary) 45%, transparent);
 }
 
 /* Selected sobre neutral/tool */
@@ -344,9 +344,9 @@
 .cv-btn--neutral[aria-pressed="true"],
 .cv-btn--tool.is-selected,
 .cv-btn--tool[aria-pressed="true"] {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 .cv-icon-btn {
@@ -425,9 +425,9 @@
 
 .cv-icon-btn--edit:hover,
 .cv-icon-btn--edit:focus {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 
 /* Link / vincular — mesmo neutro do editar */
@@ -439,16 +439,16 @@
 
 .cv-icon-btn--link:hover,
 .cv-icon-btn--link:focus {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 
 /* Delete — vermelho destrutivo */
 .cv-icon-btn--delete {
   background: linear-gradient(135deg, var(--cv-state-danger) 0%, var(--cv-state-danger) 100%);
   border-color: color-mix(in srgb, var(--cv-state-danger) 70%, black);
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
 .cv-icon-btn--delete:hover,
@@ -461,7 +461,7 @@
 .cv-icon-btn--cancel {
   background: linear-gradient(135deg, color-mix(in srgb, var(--cv-state-warning) 95%, white) 0%, var(--cv-state-warning) 100%);
   border-color: color-mix(in srgb, var(--cv-state-warning) 85%, black);
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
 .cv-icon-btn--cancel:hover,
@@ -473,14 +473,14 @@
 /* Preview — teal informativo (olho) */
 .cv-icon-btn--preview {
   background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   color: var(--cv-state-success);
 }
 
 .cv-icon-btn--preview:hover,
 .cv-icon-btn--preview:focus {
   background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   color: var(--cv-state-success);
 }
 
@@ -493,59 +493,59 @@
 
 .cv-icon-btn--settings:hover,
 .cv-icon-btn--settings:focus {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 
 /* Gerenciar modelos (engrenagem ao lado do campo) — accent dourado. */
 .cv-icon-btn--field-manage.cv-icon-btn--settings {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-block));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) 16%, var(--cv-surface-block));
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--cv-border));
+  color: var(--color-primary);
 }
 
 .cv-icon-btn--field-manage.cv-icon-btn--settings:hover,
 .cv-icon-btn--field-manage.cv-icon-btn--settings:focus,
 .cv-icon-btn--field-manage.cv-icon-btn--settings:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 26%, var(--cv-surface-block));
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) 26%, var(--cv-surface-block));
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 /* Star — definir como padrão (accent) */
 .cv-icon-btn--star {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-block));
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) 16%, var(--cv-surface-block));
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--cv-border));
+  color: var(--color-primary);
 }
 
 .cv-icon-btn--star:hover,
 .cv-icon-btn--star:focus {
-  background: color-mix(in srgb, var(--color-accent) 26%, var(--cv-surface-block));
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) 26%, var(--cv-surface-block));
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 /* Sign — assinar (primary blue, caneta) */
 .cv-icon-btn--sign {
-  background: var(--color-accent);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 
 .cv-icon-btn--sign:hover,
 .cv-icon-btn--sign:focus {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 
 /* Sign — já assinado: mesmo verde de "Concluir", indicador compacto sem badge de texto */
 .cv-icon-btn--sign.is-assinado {
   background: linear-gradient(135deg, color-mix(in srgb, var(--cv-state-success) 96%, white) 0%, var(--cv-state-success) 100%);
   border-color: color-mix(in srgb, var(--cv-state-success) 80%, black);
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
 .cv-icon-btn--sign.is-assinado:hover,
@@ -558,7 +558,7 @@
 .cv-icon-btn--edit.is-assinado {
   background: linear-gradient(135deg, color-mix(in srgb, var(--cv-state-success) 96%, white) 0%, var(--cv-state-success) 100%);
   border-color: color-mix(in srgb, var(--cv-state-success) 80%, black);
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
 .cv-icon-btn--edit.is-assinado:hover,
@@ -571,7 +571,7 @@
 .cv-icon-btn--settings.is-assinado {
   background: linear-gradient(135deg, color-mix(in srgb, var(--cv-state-success) 96%, white) 0%, var(--cv-state-success) 100%);
   border-color: color-mix(in srgb, var(--cv-state-success) 80%, black);
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
 .cv-icon-btn--settings.is-assinado:hover,
@@ -583,22 +583,22 @@
 /* Signature — gerar assinatura (primary soft preenchido) */
 .cv-icon-btn--signature {
   background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
 }
 
 .cv-icon-btn--signature:hover,
 .cv-icon-btn--signature:focus {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 
 /* Concluir — verde de sucesso, preenchido (finalizar prestação) */
 .cv-icon-btn--complete {
   background: linear-gradient(135deg, color-mix(in srgb, var(--cv-state-success) 96%, white) 0%, var(--cv-state-success) 100%);
   border-color: color-mix(in srgb, var(--cv-state-success) 80%, black);
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
 .cv-icon-btn--complete:hover,
@@ -629,9 +629,9 @@
 
 .cv-icon-btn--archive:hover,
 .cv-icon-btn--archive:focus {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 
 /* PDF — vermelho documental, preenchido */
@@ -666,7 +666,7 @@
 .cv-icon-btn[data-tooltip]::after {
   background: var(--cv-surface-page);
   border: var(--bd);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   bottom: calc(100% + 6px);
   color: var(--cv-ink);
   content: attr(data-tooltip);
@@ -731,7 +731,7 @@
 .cv-global-tooltip {
   background: var(--cv-surface-page);
   border: var(--bd);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
   color: var(--cv-ink);
   font-family: var(--font-sans);
@@ -758,10 +758,10 @@
 
 /* Tooltip do botão Gerenciar modelos — amarelo dourado (accent). */
 .cv-global-tooltip.cv-global-tooltip--accent {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
 /* =========================================================
@@ -777,8 +777,8 @@
   border: 0;
   border-start-start-radius: 0;
   border-start-end-radius: 0;
-  border-end-end-radius: var(--r-xl);
-  border-end-start-radius: var(--r-xl);
+  border-end-end-radius: var(--r-lg);
+  border-end-start-radius: var(--r-lg);
   border-top: var(--bd);
   color: var(--cv-ink);
   cursor: pointer;
@@ -800,7 +800,7 @@
 
 .cv-footer-action:hover,
 .cv-footer-action:focus {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border-top-color: var(--cv-border);
   color: var(--cv-ink);
   transform: translateY(-1px);
@@ -867,23 +867,23 @@
 
 .cv-footer-action--add:hover,
 .cv-footer-action--add:focus {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border-top-color: var(--cv-border);
   color: var(--cv-ink);
 }
 
 /* Primary — criação mais destacada */
 .cv-footer-action--primary {
-  background: var(--color-accent);
+  background: var(--color-primary);
   border-top-color: transparent;
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
 .cv-footer-action--primary:hover,
 .cv-footer-action--primary:focus {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
   border-top-color: transparent;
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
 /* Neutral — ação discreta, borda tracejada */
@@ -895,7 +895,7 @@
 
 .cv-footer-action--neutral:hover,
 .cv-footer-action--neutral:focus {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border-top-color: var(--cv-border);
   color: var(--cv-ink);
 }

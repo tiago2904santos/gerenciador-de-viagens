@@ -100,12 +100,12 @@
 }
 
  .cv-dialog--warning .cv-dialog__panel {
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
 }
 
  .cv-dialog--warning .cv-dialog__header {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
-  border-bottom-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
 }
 
  .cv-dialog--warning :is(.cv-dialog__icon, .cv-dialog__eyebrow) {
@@ -126,16 +126,16 @@
 }
 
  .cv-dialog--document .cv-dialog__panel {
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
 }
 
  .cv-dialog--document .cv-dialog__header {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  border-bottom-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
+  border-bottom-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
 }
 
  .cv-dialog--document :is(.cv-dialog__icon, .cv-dialog__eyebrow) {
-  color: var(--color-accent);
+  color: color-mix(in srgb, var(--color-accent) 72%, var(--cv-ink));
 }
 
 @media (max-width: 600px) {

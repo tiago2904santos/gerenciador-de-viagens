@@ -116,7 +116,7 @@
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
   box-shadow: none;
   cursor: pointer;
   display: grid;
@@ -153,7 +153,7 @@
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   /* Mix com heading: escurece no light e clareia no dark (≥ 4,5:1). */
   color: color-mix(in srgb, var(--cv-state-danger) 75%, var(--cv-ink));
   display: inline-flex;
@@ -275,7 +275,7 @@
 }
 
 .field-option-card:hover {
-  border-color: var(--color-accent);
+  border-color: var(--color-primary);
 }
 
 .field-option-card:focus-within {
@@ -283,7 +283,7 @@
 }
 
 .field-option-card input[type="checkbox"] {
-  accent-color: var(--color-accent);
+  accent-color: var(--color-primary);
   flex-shrink: 0;
   height: 18px;
   width: 18px;
@@ -464,9 +464,9 @@ textarea[readonly] {
   align-items: center;
   background:
     linear-gradient(135deg, rgba(11, 58, 102, 0.96), rgba(21, 91, 154, 0.92)),
-    var(--color-accent);
+    var(--color-primary);
   border: 0;
-  color: var(--on-accent);
+  color: var(--on-primary);
   display: flex;
   gap: var(--sp-4);
   justify-content: space-between;
@@ -476,7 +476,7 @@ textarea[readonly] {
 }
 
 .app-wizard__title {
-  color: var(--on-accent);
+  color: var(--on-primary);
   font-size: var(--fs-2xl);
   font-weight: 800;
   line-height: 1.1;
@@ -484,7 +484,7 @@ textarea[readonly] {
 }
 
 .app-wizard__subtitle {
-  color: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  color: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   font-size: var(--fs-lg);
   font-weight: 800;
   margin: 0;

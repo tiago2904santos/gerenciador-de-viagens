@@ -74,15 +74,15 @@
 .alert-info,
 .alert--info,
 .pte-events__banner {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
 }
 
 .cv-notice--info::before,
 .alert-info::before,
 .alert--info::before {
-  background: var(--color-accent);
+  background: var(--color-primary);
 }
 
 /* Banner PTE: layout flex com ícone (sem marcador circular) */
@@ -131,10 +131,10 @@
 .diario-diaria-alert {
   background: color-mix(in srgb, var(--cv-state-warning) 7%, transparent);
   border: 0;
-  border-left: var(--bd-strong);
+  border-left: var(--bd);
   border-left-color: var(--cv-state-warning);
   border-left-width: 3px;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink-muted);
   font-size: var(--fs-sm);
   grid-template-columns: minmax(0, 1fr);
@@ -163,7 +163,7 @@
 
 .diario-diaria-alert a,
 .cv-notice--warning a {
-  color: var(--color-accent);
+  color: var(--color-primary);
   font-weight: 600;
 }
 

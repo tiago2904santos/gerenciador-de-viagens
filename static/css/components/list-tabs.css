@@ -118,15 +118,18 @@
 
 .cv-list-tab:hover,
 .cv-list-tab:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border-color: var(--cv-border);
   color: var(--cv-ink);
   outline: none;
 }
 
+/* Aba ativa e DESTAQUE, nao acao (NOVO-55): dourado cheio. O comentario do
+   hover logo abaixo ja dizia "sobe no dourado" — a aba tinha sido levada para
+   o azul quando os dois acentos viraram um so, e o comentario ficou orfao. */
 .cv-list-tab--active {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: var(--color-accent);
+  border-color: transparent;
   color: var(--on-accent);
 }
 
@@ -143,16 +146,16 @@
 }
 
 .cv-list-tab--active .cv-list-tab__count {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background: color-mix(in srgb, var(--on-accent) 16%, var(--color-accent));
   color: var(--on-accent);
 }
 
 /* Aba ativa: hover sobe no dourado (não vai para branco) e sem barra esquerda. */
 
   .cv-list-tab--active:is(:hover, :focus-visible) {
-  background: color-mix(in srgb, color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)) 72%, var(--color-accent) 28%);
-  border-color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background: color-mix(in srgb, var(--on-accent) 10%, var(--color-accent));
+  border-color: transparent;
+  color: var(--on-accent);
 }
 
 @media (max-width: 600px) {

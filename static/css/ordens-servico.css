@@ -34,7 +34,7 @@
 .os-oficio-picker #os-oficio-lista::-webkit-scrollbar-thumb {
   background-clip: padding-box;
   background-color: var(--cv-border);
-  border: var(--bd-strong);
+  border: var(--bd);
   border-color: transparent;
   border-width: 4px;
   border-radius: var(--r-pill);
@@ -100,7 +100,7 @@
 }
 
 .os-model-card:hover {
-  background: color-mix(in srgb, var(--color-accent) 6%, var(--cv-surface-next));
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--cv-surface-next));
 }
 
 .os-model-card input[type="radio"] {
@@ -117,7 +117,7 @@
   width: 20px;
   height: 20px;
   margin-top: var(--sp-1);
-  border: var(--bd-strong);
+  border: var(--bd);
   border-radius: var(--r-pill);
 }
 
@@ -143,16 +143,16 @@
 
 .os-model-card:has(input:checked),
 .os-model-card.is-selected {
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-next));
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--cv-surface-next));
   border: 0;
-  border-inline-start: var(--bd-strong);
+  border-inline-start: var(--bd);
   border-inline-start-color: var(--color-accent);
 }
 
 .os-model-card:has(input:checked) .os-model-card__mark,
 .os-model-card.is-selected .os-model-card__mark {
-  border-color: var(--color-accent);
-  background: radial-gradient(circle at center, var(--color-accent) 0 5px, transparent 6px);
+  border-color: var(--color-primary);
+  background: radial-gradient(circle at center, var(--color-primary) 0 5px, transparent 6px);
 }
 
 .os-model-card:has(input:focus-visible) {
@@ -191,7 +191,7 @@
 .os-servidor-role-panel__toggle.cv-segment-toggle {
   background: var(--cv-surface-next);
   border-color: transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: none;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -201,7 +201,7 @@
 }
 
 .os-servidor-role-panel__toggle .cv-segment-toggle__btn {
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink-muted);
   justify-content: center;
   min-height: 34px;
@@ -213,10 +213,10 @@
 }
 
 .os-servidor-role-panel__toggle .cv-segment-toggle__btn[aria-pressed="true"] {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
   box-shadow: none;
-  color: var(--on-accent);
+  color: var(--on-primary);
   transform: none;
 }
 
@@ -230,8 +230,8 @@
 }
 
 .os-servidor-role-card--assigned {
-  border-color: var(--color-accent);
-  background: color-mix(in srgb, var(--color-accent) 10%, var(--cv-surface-card));
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 10%, var(--cv-surface-card));
 }
 
 .os-servidor-role-badge {
@@ -241,9 +241,9 @@
   padding-block: 0;
   padding-inline: var(--sp-3);
   border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 42%, var(--cv-border));
+  border-color: color-mix(in srgb, var(--color-primary) 42%, var(--cv-border));
   border-radius: var(--r-pill);
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-card));
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--cv-surface-card));
   color: var(--cv-ink);
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
@@ -299,23 +299,23 @@
 }
 
   .os-page .os-form-card .os-model-card:hover {
-  background: color-mix(in srgb, var(--color-accent) 6%, var(--cv-surface-next));
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--cv-surface-next));
 }
 
   .os-page .os-form-card .os-model-card:has(input:checked),
 
   .os-page .os-form-card .os-model-card.is-selected {
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-next));
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--cv-surface-next));
   border: 0;
-  border-inline-start: var(--bd-strong);
+  border-inline-start: var(--bd);
   border-inline-start-color: var(--color-accent);
 }
 
   .os-page .os-form-card .os-model-card:has(input:checked) .os-model-card__mark,
 
   .os-page .os-form-card .os-model-card.is-selected .os-model-card__mark {
-  border-color: var(--color-accent);
-  background: radial-gradient(circle at center, var(--color-accent) 0 5px, transparent 6px);
+  border-color: var(--color-primary);
+  background: radial-gradient(circle at center, var(--color-primary) 0 5px, transparent 6px);
 }
 
   .os-page .os-form-card .os-model-fields {
@@ -331,7 +331,7 @@
 
   .os-page .os-form-card #os-oficio-lista
   .cv-search-picker__selected-card:not(.is-active):not([aria-pressed="true"]):hover {
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-next));
+  background: color-mix(in srgb, var(--color-primary) 5%, var(--cv-surface-next));
 }
 
 /* Cards de servidores no poço dos campos; destaque dourado só na função ativa. */
@@ -344,7 +344,7 @@
 
   .os-page #os-card-servidores
   .cv-search-picker__selected-card:not(.cv-search-picker__selected-card--driver):hover {
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-next));
+  background: color-mix(in srgb, var(--color-primary) 5%, var(--cv-surface-next));
 }
 
 /* Equipe da OS: flat como Documentos vinculados (busca + lista próximas). */

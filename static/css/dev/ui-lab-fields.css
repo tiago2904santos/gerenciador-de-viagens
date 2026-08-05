@@ -409,7 +409,7 @@
 
 .cv-custom-select--open .cv-custom-select__trigger {
   background:
-    linear-gradient(color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)), color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface))) padding-box,
+    linear-gradient(color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface)), color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface))) padding-box,
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
@@ -488,7 +488,7 @@
 .cv-custom-select__menu::-webkit-scrollbar-track  { background: transparent; }
 .cv-custom-select__menu::-webkit-scrollbar-thumb  {
   background:    var(--cv-border);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
 }
 
 /* ─── Opções ────────────────────────────────────────────────────────────── */
@@ -506,16 +506,16 @@
 }
 
 .cv-custom-select__option:hover:not(.cv-custom-select__option--disabled) {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
 }
 
 .cv-custom-select__option--focused {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
 }
 
 .cv-custom-select__option--selected {
-  background:  color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  color:       var(--color-accent);
+  background:  color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
+  color:       var(--color-primary);
   font-weight: var(--fw-semibold);
 }
 

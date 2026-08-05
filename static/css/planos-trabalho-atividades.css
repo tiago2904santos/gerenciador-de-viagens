@@ -106,10 +106,10 @@
 .pt-activity__preset .cv-btn:focus-visible,
 .pt-activity__clear:hover,
 .pt-activity__clear:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--cv-surface-block));
   background-image: none;
   border: 0;
-  color: var(--color-accent);
+  color: var(--color-primary);
   outline: none;
   transform: none;
 }
@@ -140,10 +140,10 @@
     .pt-activity__clear:hover,
     .pt-activity__clear:focus-visible
   ) {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--cv-surface-block));
   background-image: none;
   border: 0;
-  color: var(--color-accent);
+  color: var(--color-primary);
   outline: none;
   transform: none;
 }
@@ -194,7 +194,7 @@
   align-items: center;
   background: var(--cv-surface-next);
   border: 0;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: none;
   column-gap: 10px;
   cursor: pointer;
@@ -210,7 +210,7 @@
 }
 
 .pt-activity-card:not(.is-selected):hover {
-  background: color-mix(in srgb, var(--color-accent) 6%, var(--cv-surface-next));
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--cv-surface-next));
 }
 
 /* checkbox nativo escondido (mantém foco por teclado) */
@@ -229,7 +229,7 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   border: 0;
   background: var(--cv-surface-block);
   color: transparent;
@@ -251,14 +251,14 @@
 
 /* ── Estado selecionado (dourado) ───────────────────────────────────────── */
 .pt-activity-card.is-selected {
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-next));
-  border-inline-start: var(--bd-strong);
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--cv-surface-next));
+  border-inline-start: var(--bd);
   border-inline-start-color: var(--color-accent);
 }
 
 .pt-activity-card.is-selected .pt-activity-card__check {
-  background: var(--color-accent);
-  color: var(--on-accent);
+  background: var(--color-primary);
+  color: var(--on-primary);
 }
 
 .pt-activity-card.is-selected .pt-activity-card__name {
@@ -347,7 +347,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   padding: 0;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   background: var(--cv-surface-block);
   scrollbar-color: var(--cv-border) transparent;
   scrollbar-gutter: stable;
@@ -374,7 +374,7 @@
 .pt-live-list::-webkit-scrollbar-thumb {
   background-clip: padding-box;
   background-color: var(--cv-border);
-  border: var(--bd-strong);
+  border: var(--bd);
   border-color: transparent;
   border-width: 4px;
   border-radius: var(--r-pill);
@@ -419,7 +419,7 @@
 }
 
 .pt-live-entry:hover {
-  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 6%, transparent);
   transform: none;
 }
 
@@ -438,7 +438,7 @@
 }
 
 .pt-live-col--recursos .pt-live-entry {
-  border-inline-start: var(--bd-strong);
+  border-inline-start: var(--bd);
 border-inline-start-color: var(--color-accent);
 }
 
@@ -451,7 +451,7 @@ border-inline-start-color: var(--color-accent);
   min-height: 72px;
   padding: var(--sp-3);
   border: 0;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   background: var(--cv-surface-block);
   color: var(--cv-ink-muted);
   text-align: center;
@@ -546,7 +546,7 @@ border-inline-start-color: var(--color-accent);
   margin: 0;
   padding: var(--sp-2);
   border: var(--bd);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   background: var(--cv-surface-card);
   color: var(--cv-ink);
   cursor: pointer;
@@ -562,7 +562,7 @@ border-inline-start-color: var(--color-accent);
   width: 32px;
   height: 32px;
   border: var(--bd);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   background: var(--cv-surface-block);
 }
 
@@ -573,9 +573,9 @@ border-inline-start-color: var(--color-accent);
   top: 50%;
   width: 11px;
   height: 6px;
-  border-left: var(--bd-strong);
+  border-left: var(--bd);
   border-left-color: transparent;
-  border-bottom: var(--bd-strong);
+  border-bottom: var(--bd);
   border-bottom-color: transparent;
   transform: translateY(-65%) rotate(-45deg);
 }
@@ -591,19 +591,19 @@ border-inline-start-color: var(--color-accent);
 .pt-preset-activity-grid label:has(input:checked) {
   background: color-mix(
     in srgb,
-    var(--color-accent) 12%,
+    var(--color-primary) 12%,
     var(--cv-surface-card)
   );
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  border-inline-start: var(--bd-strong);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  border-inline-start: var(--bd);
   border-inline-start-color: var(--color-accent);
 }
 
 .pt-preset-activity-grid label:has(input:checked)::before {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .pt-preset-activity-grid label:has(input:checked)::after {
-  border-color: var(--on-accent);
+  border-color: var(--on-primary);
 }

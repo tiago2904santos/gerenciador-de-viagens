@@ -41,13 +41,13 @@
 
 .cv-file-widget.is-selected .cv-file-picker,
 .prestacao-file-widget.is-selected .prestacao-file-picker {
-  border-color: color-mix(in srgb, var(--color-accent) 64%, var(--cv-border));
+  border-color: color-mix(in srgb, var(--color-primary) 64%, var(--cv-border));
 }
 
 .cv-file-widget.is-dragover .cv-file-picker,
 .prestacao-file-widget.is-dragover .prestacao-file-picker {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-card));
-  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) 16%, var(--cv-surface-card));
+  border-color: var(--color-primary);
   box-shadow: var(--sh-sm);
 }
 
@@ -64,7 +64,7 @@
 .cv-file-picker__action,
 .prestacao-file-picker__action {
   align-items: center;
-  background: color-mix(in srgb, var(--color-accent) 20%, var(--cv-surface-card));
+  background: color-mix(in srgb, var(--color-primary) 20%, var(--cv-surface-card));
   border-right: var(--bd);
   color: var(--cv-ink);
   cursor: pointer;
@@ -80,7 +80,7 @@
 
 .cv-file-picker__action-icon {
   align-items: center;
-  color: var(--color-accent);
+  color: var(--color-primary);
   display: inline-flex;
   flex: 0 0 auto;
 }
@@ -92,7 +92,7 @@
 
 .cv-file-picker__action:hover,
 .prestacao-file-picker__action:hover {
-  background: color-mix(in srgb, var(--color-accent) 32%, var(--cv-surface-card));
+  background: color-mix(in srgb, var(--color-primary) 32%, var(--cv-surface-card));
   color: var(--cv-ink);
 }
 
@@ -134,13 +134,13 @@
 
 .cv-file-picker__upload,
 .prestacao-file-picker__upload {
-  background: var(--color-accent);
-  color: var(--on-accent);
+  background: var(--color-primary);
+  color: var(--on-primary);
 }
 
 .cv-file-picker__upload:hover:not(:disabled),
 .prestacao-file-picker__upload:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
 }
 
 .cv-file-picker__upload:disabled,
@@ -154,7 +154,7 @@
 }
 
 .prestacao-file-picker__clear:hover {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   color: var(--cv-ink);
 }
 
@@ -206,11 +206,11 @@
 
 .cv-file-selection__chevron,
 .prestacao-file-selection__chevron {
-  border-bottom: var(--bd-strong);
+  border-bottom: var(--bd);
 border-bottom-color: currentColor;
-  border-right: var(--bd-strong);
+  border-right: var(--bd);
   border-right-color: currentColor;
-  color: var(--color-accent, var(--color-accent));
+  color: var(--color-accent, var(--color-primary));
   height: 7px;
   transform: rotate(45deg);
   width: 7px;
@@ -257,7 +257,7 @@ border-bottom-color: currentColor;
 .cv-file-selection__item:hover,
 .prestacao-file-selection__item:hover,
 .prestacao-file-list__item:hover {
-  background: color-mix(in srgb, var(--color-accent) 9%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 9%, transparent);
 }
 
 .cv-file-selection__item + .cv-file-selection__item,

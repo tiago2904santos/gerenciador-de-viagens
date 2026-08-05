@@ -8,7 +8,7 @@
 .list-header {
   background: var(--cv-surface-card);
   border: 0;
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
   box-shadow: var(--sh-sm);
   display: flex;
   flex-direction: column;
@@ -21,10 +21,18 @@
 
 /* Faixa de título — compacta */
 .list-header__band {
-  /* NOVO-29: acento pontual. A faixa era o acento cheio (--app-hero-stage-bg,
-     um gradiente); virou superficie de card, com o titulo em texto normal. O
-     acento agora aparece so onde aparece no login: botao, rotulo e tinta. */
-  background: var(--cv-surface-card);
+  /* NOVO-29 tinha achatado a faixa em superficie de card. NOVO-55 devolve a
+     faixa cheia — agora no MARINHO do menu, nao no azul de acao: cabecalho e
+     menu passam a ser a mesma peca de chrome, e o azul fica reservado para o
+     que se clica. Mesmo mecanismo do .sidebar: redeclara o par e a tinta, e
+     tudo que mora dentro acompanha. */
+  --cv-surface: var(--cv-surface-shell);
+  --cv-surface-next: var(--cv-surface-shell);
+  --cv-ink: var(--on-shell);
+  --cv-ink-strong: var(--on-shell);
+  --cv-ink-muted: color-mix(in srgb, var(--on-shell) 70%, var(--cv-surface-shell));
+
+  background: var(--cv-surface-shell);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -57,7 +65,7 @@
 }
 
 .list-header__eyebrow {
-  color: var(--color-accent);
+  color: color-mix(in srgb, var(--color-accent) 72%, var(--cv-ink));
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
   letter-spacing: 0.12em;
@@ -126,7 +134,7 @@
   align-items: center;
   color: var(--cv-ink-muted);
   display: inline-flex;
-  left: 12px;
+  left: var(--sp-3);
   pointer-events: none;
   position: absolute;
   top: 50%;
@@ -156,13 +164,18 @@
   width: 100%;
 }
 
+/* O recuo do texto e DERIVADO da geometria do icone, nao escolhido num degrau
+   da escada: recuo do icone + largura dele + o mesmo recuo de novo. Assim a
+   folga antes e depois do icone e sempre igual, e mudar a escada de espaco
+   nao encavala o placeholder nem o joga longe — foi o que aconteceu duas
+   vezes hoje, primeiro apertando `--sp-7` e depois soltando `--sp-8`. */
 .list-header__search--with-icon .list-header__search-input {
-  padding-left: var(--sp-7);
+  padding-left: calc(var(--sp-3) + 16px + var(--sp-3));
 }
 
 /* Compat header-filter-input redefine padding shorthand — preservar folga do ícone. */
 .list-header__search--with-icon .list-header__search-input.header-filter-input {
-  padding-left: var(--sp-7);
+  padding-left: calc(var(--sp-3) + 16px + var(--sp-3));
 }
 
 .list-header__search-input::placeholder {
@@ -467,7 +480,7 @@
 }
 
 .list-header .cv-inline-create__toggle:hover {
-  background: color-mix(in srgb, color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)) 70%, var(--cv-surface-card));
+  background: color-mix(in srgb, color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface)) 70%, var(--cv-surface-card));
 }
 
 .list-header .cv-inline-create__toggle:focus-visible {
@@ -476,26 +489,26 @@
 
 .list-header .cv-inline-create__toggle.is-active,
 .list-header .cv-inline-create__toggle[aria-expanded="true"] {
-  background: color-mix(in srgb, color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)) 55%, var(--cv-surface-card));
+  background: color-mix(in srgb, color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface)) 55%, var(--cv-surface-card));
   box-shadow: none;
 }
 
 .list-header .cv-inline-create__toggle.is-filled {
   animation: list-header-inline-create-fill 0.35s ease forwards;
-  background: var(--color-accent);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
 .list-header .cv-inline-create__toggle.is-filled:hover {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
 }
 
 @keyframes list-header-inline-create-fill {
   from {
-    background: color-mix(in srgb, color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)) 55%, var(--cv-surface-card));
+    background: color-mix(in srgb, color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface)) 55%, var(--cv-surface-card));
     box-shadow: none;
     color: var(--cv-ink);
   }
@@ -503,9 +516,9 @@
 
 .list-header .cv-inline-create__toggle-icon {
   align-items: center;
-  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
   border-radius: var(--r-pill);
-  color: var(--color-accent);
+  color: var(--color-primary);
   display: inline-flex;
   flex-shrink: 0;
   font-size: 1.05rem;
@@ -542,14 +555,17 @@
   box-shadow: var(--sh-sm);
 }
 
-/* Mesma cor do cabeçalho dos cards (.cv-entity-card__header) */
+/* A faixa e chrome institucional, nao cabecalho de card (NOVO-55): mesma
+   superficie do menu. Esta regra vinha DEPOIS da declaracao da faixa, com a
+   mesma especificidade, e por isso vencia — a faixa recebia a tinta clara la
+   de cima e o fundo claro daqui, o que dava titulo branco sobre branco. */
 
   .list-header__band {
-  background: var(--cv-surface-block);
+  background: var(--cv-surface-shell);
 }
 
   .list-header__eyebrow {
-  color: var(--color-accent);
+  color: color-mix(in srgb, var(--color-accent) 72%, var(--cv-ink));
 }
 
   .list-header__title {
@@ -616,14 +632,14 @@
   .list-header__rail
   .cv-custom-select--v2.cv-custom-select--open
   .cv-custom-select__chevron {
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
   .list-header__rail
   .cv-custom-select__trigger--v2
   .cv-custom-select__chevron
   svg {
-  color: var(--color-accent);
+  color: var(--color-primary);
   fill: none;
   stroke: currentColor;
 }
@@ -643,14 +659,14 @@
 }
 
   .list-header .cv-inline-create__toggle-icon {
-  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
+  color: var(--color-primary);
 }
 
   .list-header .cv-inline-create__toggle.is-filled {
-  background: var(--color-accent);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 
   .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon {
@@ -774,7 +790,7 @@
 
 .travel-period-filter__btn:hover:not(:disabled) {
   background:
-    linear-gradient(color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)), color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface))) padding-box,
+    linear-gradient(color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface)), color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface))) padding-box,
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
 }
 
@@ -795,18 +811,18 @@
 }
 
 .travel-period-filter--active .travel-period-filter__btn {
-  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
-  border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 55%, transparent);
   color: var(--cv-ink);
 }
 
 .travel-period-filter--active .travel-period-filter__btn .cv-btn__icon {
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 .travel-period-filter--active .travel-period-filter__btn:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-accent) 20%, transparent);
-  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) 20%, transparent);
+  border-color: var(--color-primary);
 }
 
 /* =========================================================
@@ -946,8 +962,12 @@
   border-color: var(--cv-border);
 }
 
+/* A faixa do wizard e a MESMA faixa das listas (NOVO-55): superficie do menu.
+   Este seletor tem especificidade maior que `.list-header__band`, entao sem
+   esta linha a faixa ficava clara com a tinta clara herdada de la — titulo
+   branco sobre branco na pagina de configuracoes. */
  .list-header--wizard-band .list-header__band {
-  background: var(--cv-surface-block);
+  background: var(--cv-surface-shell);
 }
 
  .list-header--wizard-stepper {
@@ -979,10 +999,10 @@
 
   .list-header--wizard-band
   .list-header__wizard-back.cv-btn--secondary:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--cv-surface-block));
   background-image: none;
   border: 0;
-  color: var(--color-accent);
+  color: var(--color-primary);
   outline: none;
   transform: none;
 }

@@ -29,7 +29,7 @@
 .roteiro-editor__main.card {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
   box-shadow: var(--sh-sm);
   margin-bottom: 0;
   overflow: visible;
@@ -192,7 +192,7 @@
 }
 
 .related-route-list::-webkit-scrollbar-thumb:hover {
-  background: var(--color-accent);
+  background: var(--color-primary);
 }
 
 .related-route-list::-webkit-scrollbar-button {
@@ -230,23 +230,23 @@
 
 .related-route-item:hover {
   background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
 }
 
 .roteiro-editor--avulso .related-route-item:hover {
   background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   box-shadow: var(--sh-sm);
 }
 
 .related-route-item.is-active {
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   box-shadow: var(--sh-sm);
 }
 
 .roteiro-editor--avulso .related-route-item.is-active {
   background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   box-shadow: var(--sh-sm);
 }
 
@@ -480,7 +480,7 @@ border-style: dashed;
   background: var(--cv-surface-block);
   background-color: var(--cv-surface-block);
   border-color: transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   transition: none;
 }
 
@@ -500,9 +500,9 @@ border-style: dashed;
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1])
   .travel-period-block--split
   .cv-date-picker__trigger--icon:is(:hover, :focus-visible) {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--cv-surface-block));
   border: 0;
-  color: var(--color-accent);
+  color: var(--color-primary);
   outline: none;
 }
 
@@ -658,7 +658,7 @@ border-style: dashed;
   align-items: center;
   background: transparent;
   border: 0;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink-muted);
   cursor: grab;
   display: inline-flex;
@@ -696,7 +696,7 @@ border-style: dashed;
   align-items: center;
   background: color-mix(in srgb, var(--cv-state-success) 14%, var(--cv-surface-block));
   border: 0;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink);
   cursor: pointer;
   display: inline-flex;
@@ -713,7 +713,7 @@ border-style: dashed;
   align-items: center;
   background: color-mix(in srgb, var(--cv-state-danger) 12%, var(--cv-surface-block));
   border: 0;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink);
   cursor: pointer;
   display: inline-flex;
@@ -996,7 +996,7 @@ border-style: dashed;
 
 .destination-row.is-drop-target::before,
 .destination-row.is-drop-target::after {
-  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
   border-radius: var(--r-pill);
   content: "";
   height: 3px;
@@ -1314,8 +1314,8 @@ border-style: dashed;
 :is(.roteiro-time-calc-stepper, .roteiro-trecho-card__time-stepper)
   .cv-btn--control:focus:not(:focus-visible):not(:hover):not(:active) {
   background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
   transform: none;
 }
 
@@ -1398,8 +1398,8 @@ border-style: dashed;
 #diarias-status[data-state="pending"] {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
 }
 
 #diarias-status[data-state="stale"] {
@@ -1553,8 +1553,8 @@ border-style: dashed;
   align-self: flex-start;
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.02em;
@@ -1616,7 +1616,7 @@ border-style: dashed;
 }
 
 .roteiro-editor--avulso .cv-summary-value--principal {
-  color: var(--color-accent);
+  color: var(--color-primary);
   font-size: 3.5rem;
   letter-spacing: -0.02em;
 }
@@ -1661,7 +1661,7 @@ border-style: dashed;
 .roteiro-mapa__canvas-shell {
   background: var(--cv-surface-card);
   border: 0;
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
   box-shadow: none;
   isolation: isolate;
   overflow: hidden;
@@ -1675,7 +1675,7 @@ border-style: dashed;
   background: var(--cv-surface-block);
   background-image: linear-gradient(
     to right,
-    color-mix(in srgb, var(--color-accent) 6%, transparent) 0,
+    color-mix(in srgb, var(--color-primary) 6%, transparent) 0,
     transparent 72px
   );
   border-bottom: 0;
@@ -1748,7 +1748,7 @@ border-style: dashed;
   align-items: center;
   background: color-mix(in srgb, var(--cv-surface-card) 78%, transparent);
   border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 35%, var(--cv-border));
+  border-color: color-mix(in srgb, var(--color-primary) 35%, var(--cv-border));
   border-radius: var(--r-pill);
   bottom: 16px;
   box-shadow: var(--sh-sm);
@@ -1774,10 +1774,10 @@ border-style: dashed;
 
 .roteiro-mapa__loading-spinner {
   animation: roteiro-mapa-spin 0.8s linear infinite;
-  border: var(--bd-strong);
-  border-color: color-mix(in srgb, var(--color-accent) 28%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-primary) 28%, transparent);
   border-radius: var(--r-pill);
-  border-top-color: var(--color-accent);
+  border-top-color: var(--color-primary);
   display: block;
   flex: 0 0 auto;
   height: 14px;
@@ -1796,7 +1796,7 @@ border-style: dashed;
 @media (prefers-reduced-motion: reduce) {
   .roteiro-mapa__loading-spinner {
     animation: none;
-    border-top-color: color-mix(in srgb, var(--color-accent) 28%, transparent);
+    border-top-color: color-mix(in srgb, var(--color-primary) 28%, transparent);
     opacity: 0.7;
   }
 }
@@ -1988,25 +1988,25 @@ border-style: dashed;
   padding-right: var(--sp-5);
 }
 .roteiro-editor__actions .btn-primary {
-  background: var(--color-accent);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 .roteiro-editor__actions .btn-primary:hover,
 .roteiro-editor__actions .btn-primary:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 .roteiro-editor__actions .btn-secondary {
   background: var(--cv-surface-card);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
 }
 .roteiro-editor__actions .btn-secondary:hover,
 .roteiro-editor__actions .btn-secondary:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }

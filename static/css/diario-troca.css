@@ -52,8 +52,8 @@ margin-inline: 0;
 }
 
 .dmv-option:hover {
-  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--cv-border));
-  background: color-mix(in srgb, var(--color-accent) 6%, var(--cv-surface-card));
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--cv-border));
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--cv-surface-card));
 }
 
 /* Radio nativo escondido — o card inteiro é o alvo. */
@@ -71,7 +71,7 @@ margin-inline: 0;
   width: 20px;
   height: 20px;
   margin-top: var(--sp-1);
-  border: var(--bd-strong);
+  border: var(--bd);
   border-radius: var(--r-pill);
   background: transparent;
   transition: border-color var(--tr-fast);
@@ -100,16 +100,16 @@ margin-inline: 0;
 /* Selecionado (via :has moderno + fallback .is-selected do JS). */
 .dmv-option:has(input:checked),
 .dmv-option.is-selected {
-  border-color: var(--color-accent);
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-card));
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--cv-surface-card));
   box-shadow: none;
 }
 
 .dmv-option:has(input:checked) .dmv-option__mark,
 .dmv-option.is-selected .dmv-option__mark {
-  border-color: var(--color-accent);
+  border-color: var(--color-primary);
   background:
-    radial-gradient(circle at center, var(--color-accent) 0 5px, transparent 6px);
+    radial-gradient(circle at center, var(--color-primary) 0 5px, transparent 6px);
 }
 
 /* Acessibilidade: foco pelo teclado destaca o card. */
@@ -155,10 +155,10 @@ margin-inline: 0;
   padding-block: var(--sp-3);
   padding-inline: var(--sp-4);
   border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   border-style: dashed;
   border-radius: var(--r-md);
-  background: color-mix(in srgb, var(--color-accent) 7%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 7%, transparent);
 }
 
 .dmv-prefill__icon {
@@ -168,8 +168,8 @@ margin-inline: 0;
   width: 34px;
   height: 34px;
   border-radius: var(--r-pill);
-  color: var(--color-accent);
-  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
 }
 
 .dmv-prefill__icon .cv-icon {

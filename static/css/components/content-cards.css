@@ -3,7 +3,7 @@
 .cv-summary-tile {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
   box-shadow: var(--sh-sm);
   display: grid;
   gap: var(--sp-2);
@@ -76,11 +76,11 @@
 }
 
 .cv-document-card::before {
-  background: var(--color-accent);
+  background: var(--color-primary);
   border-start-start-radius: 0;
   border-start-end-radius: 0;
-  border-end-end-radius: var(--r-sm);
-  border-end-start-radius: var(--r-sm);
+  border-end-end-radius: var(--r-md);
+  border-end-start-radius: var(--r-md);
   content: "";
   height: 3px;
   left: var(--sp-5);
@@ -237,7 +237,7 @@
 
 .cv-module-card__mark {
   align-items: center;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   display: flex;
   flex: 0 0 auto;
   font-size: var(--fs-2xs);

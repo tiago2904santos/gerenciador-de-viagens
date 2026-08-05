@@ -191,7 +191,7 @@
 }
 
  .sidebar-link--module {
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   font-size: 0.875rem;
   min-height: 40px;
   padding: var(--sp-2);
@@ -199,8 +199,8 @@
 
  .sidebar-item-icon {
   border: var(--bd);
- border-color: color-mix(in srgb, var(--on-accent) 5.5%, transparent);
-  border-radius: var(--r-sm);
+ border-color: color-mix(in srgb, var(--on-primary) 5.5%, transparent);
+  border-radius: var(--r-md);
   height: 24px;
   width: 24px;
 }
@@ -208,7 +208,7 @@
  .sidebar-link--module.is-active,
  .sidebar-module-expand.is-active,
  .sidebar-link--cadastros.is-active {
-  border-inline-start: var(--bd-strong);
+  border-inline-start: var(--bd);
  border-inline-start-color: var(--color-accent);
 }
 
@@ -232,7 +232,7 @@
 }
 
   :is(.sidebar-account__link, .sidebar-logout-btn):hover {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border-color: var(--cv-border);
 }
 
@@ -255,17 +255,17 @@
 }
 
   :is(.app-mobile-bar__toggle, .sidebar-drawer-close) {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink);
 }
 
   .app-mobile-bar__toggle:hover,
 
   .sidebar-drawer-close:hover {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
 }
 
   .app-mobile-bar__toggle > span {
@@ -294,14 +294,16 @@
 }
 
  .page-header-band {
-  background: var(--cv-surface-card);
+  /* Superficie do menu (NOVO-55). Esta camada entra DEPOIS de page-shell.css
+     no bundle, entao a faixa so fica escura se as duas concordarem. */
+  background: var(--cv-surface-shell);
   box-shadow: none;
   padding-block: clamp(var(--sp-5), 2.6vw, var(--sp-7)) var(--sp-2);
   padding-inline: clamp(var(--sp-5), 3vw, var(--sp-7));
 }
 
  .page-header-band__eyebrow {
-  color: var(--color-accent);
+  color: color-mix(in srgb, var(--color-accent) 72%, var(--cv-ink));
   letter-spacing: 0.12em;
 }
 
@@ -317,15 +319,15 @@
 }
 
  .page-header-rail__marker {
-  background: var(--color-accent);
+  background: var(--color-primary);
   border: var(--bd);
-  border-color: var(--color-accent);
+  border-color: var(--color-primary);
   border-radius: var(--r-md);
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
  .page-header-rail__eyebrow {
-  color: var(--color-accent);
+  color: color-mix(in srgb, var(--color-accent) 72%, var(--cv-ink));
 }
 
  .page-header-rail__subtitle {
@@ -341,7 +343,7 @@
 }
 
   :is(.page-shell--list, .cv-page--collection) .page-header-stack:not(.list-header) .page-header-band {
-  background: var(--cv-surface-card);
+  background: var(--cv-surface-shell);
   padding-block: var(--sp-5) var(--sp-4);
   padding-inline: clamp(var(--sp-5), 2.4vw, var(--sp-7));
 }
@@ -375,10 +377,10 @@
 }
 
   .empty-state--compact .empty-state__mark {
-  background: var(--color-accent);
+  background: var(--color-primary);
   border: var(--bd);
-  border-color: var(--color-accent);
-  color: var(--on-accent);
+  border-color: var(--color-primary);
+  color: var(--on-primary);
   grid-row: 1 / span 2;
 }
 
@@ -620,7 +622,7 @@
   ) {
   background: var(--cv-surface-next);
   border-color: transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: none;
 }
 
@@ -629,14 +631,14 @@
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .cv-custom-select--open .cv-custom-select__trigger {
   background: var(--cv-surface-next);
   border-color: transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: none;
 }
 
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .cv-composite-field__suffix {
-  background: color-mix(in srgb, var(--color-accent) 8%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--cv-surface-block));
   border-left-color: color-mix(in srgb, var(--cv-border) 45%, transparent);
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 /* Pickers sem casca extra — o painel da seção já é a camada intermediária. */
@@ -666,7 +668,7 @@
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .cv-search-picker__selected-empty {
   background: var(--cv-surface-card);
   border: 0;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink-muted);
   padding: var(--sp-3);
   text-align: left;
@@ -689,7 +691,7 @@
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .viatura-sugestao-chip:hover,
 
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .viatura-sugestao-chip:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-next));
+  background: color-mix(in srgb, var(--color-primary) 5%, var(--cv-surface-next));
   outline: none;
 }
 
@@ -698,7 +700,7 @@
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .viatura-sugestao-chip--active:hover,
 
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .viatura-sugestao-chip--active:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--cv-surface-block));
   border: 0;
   outline: none;
 }
@@ -738,10 +740,10 @@
 
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .viatura-sugestao-chip--active .viatura-sugestao-badge--ativa {
   align-items: center;
-  background: var(--color-accent);
+  background: var(--color-primary);
   border: 0;
   border-radius: var(--r-pill);
-  color: var(--on-accent);
+  color: var(--on-primary);
   display: inline-flex;
   font-size: 10px;
   font-weight: var(--fw-bold);
@@ -770,16 +772,16 @@
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .cv-form-block__actions .cv-btn--secondary:hover,
 
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .cv-form-block__actions .cv-btn--secondary:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--cv-surface-block));
   border: 0;
-  color: var(--color-accent);
+  color: var(--color-primary);
   outline: none;
 }
 
 /* Menu do select reanexado ao <body> por CV.overlay. */
 
   .cv-custom-select__menu--v2.cv-floating-dropdown--active:is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) {
-  background: color-mix(in srgb, var(--cv-surface-block) 88%, var(--color-accent) 12%);
+  background: color-mix(in srgb, var(--cv-surface-block) 88%, var(--color-primary) 12%);
   border-color: color-mix(in srgb, var(--cv-border) 55%, transparent);
   box-shadow: var(--sh-sm);
 }
@@ -947,7 +949,7 @@
   background: var(--cv-surface-block);
   background-color: var(--cv-surface-block);
   border-color: transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   transition: none;
 }
 
@@ -968,9 +970,9 @@
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1])
   .travel-period-block--split
   .cv-date-picker__trigger--icon:is(:hover, :focus-visible) {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--cv-surface-block));
   border: 0;
-  color: var(--color-accent);
+  color: var(--color-primary);
   outline: none;
 }
 
@@ -1131,7 +1133,7 @@
   align-items: center;
   background: transparent;
   border: 0;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink-muted);
   cursor: grab;
   display: inline-flex;
@@ -1165,7 +1167,7 @@
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-remove-button {
   align-items: center;
   border: 0;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: none;
   cursor: pointer;
   display: inline-flex;
@@ -1305,7 +1307,7 @@
   ) {
   background: var(--cv-surface-next);
   border-color: transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
 }
 
 /* Depois do poço geral: itens do scroll usam o mesmo fundo do form-block da seção */
@@ -1362,7 +1364,7 @@
   .document-inline-card {
   background: var(--cv-surface-next);
   border-color: transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: none;
 }
 
@@ -1415,9 +1417,9 @@
     .oficio-documentos-traveller-tile--motorista,
     .oficio-documentos-traveller-line--motorista
   ) {
-  background: color-mix( in srgb, var(--color-accent) 12%, var(--cv-surface-block) );
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  border-inline-start: var(--bd-strong);
+  background: color-mix( in srgb, var(--color-primary) 12%, var(--cv-surface-block) );
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  border-inline-start: var(--bd);
   border-inline-start-color: var(--color-accent);
 }
 
@@ -1430,9 +1432,9 @@
   [data-travel-document-wizard-documentos]
   .oficio-documentos-traveller-tile--motorista
   .oficio-documentos-traveller-tile__avatar {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--on-accent);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--on-primary);
 }
 
   [data-travel-document-wizard-documentos] .oficio-documentos-traveller-tile__name {
@@ -1463,7 +1465,7 @@
   align-items: center;
   background: var(--cv-surface-next);
   border-color: transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: none;
   box-sizing: border-box;
   display: flex;
@@ -1546,7 +1548,7 @@
 }
 
   :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row.destination-row:hover {
-  background: color-mix(in srgb, var(--color-accent) 6%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--cv-surface-block));
   border-color: color-mix(in srgb, var(--cv-border) 70%, transparent);
 }
 
@@ -1558,11 +1560,11 @@
 
   :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .cv-ordered-field-row__badge {
   align-items: center;
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   border-radius: var(--r-md);
-  color: var(--color-accent);
+  color: var(--color-primary);
   display: inline-flex;
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
@@ -1608,8 +1610,8 @@
   border-left: var(--bd);
   border-left-color: color-mix(in srgb, var(--cv-border) 55%, transparent);
   border-start-start-radius: 0;
-  border-start-end-radius: var(--r-sm);
-  border-end-end-radius: var(--r-sm);
+  border-start-end-radius: var(--r-md);
+  border-end-end-radius: var(--r-md);
   border-end-start-radius: 0;
   box-shadow: none;
   color: transparent;
@@ -1701,8 +1703,8 @@
     border-top-color: color-mix(in srgb, var(--cv-border) 55%, transparent);
     border-start-start-radius: 0;
     border-start-end-radius: 0;
-    border-end-end-radius: var(--r-sm);
-    border-end-start-radius: var(--r-sm);
+    border-end-end-radius: var(--r-md);
+    border-end-start-radius: var(--r-md);
     grid-column: 1 / -1;
     margin-block: 0 calc(var(--sp-3) * -1);
     margin-inline: calc(var(--sp-3) * -1) calc(var(--sp-2) * -1);
@@ -1761,7 +1763,7 @@
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-remove-button {
   align-self: center;
   border: 0;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   cursor: pointer;
   flex: 0 0 auto;
   height: 44px;
@@ -1814,7 +1816,7 @@
 
   [data-travel-document-wizard-roteiro]
   .roteiro-mapa__canvas-head {
-  background: color-mix(in srgb, var(--cv-surface-block) 88%, var(--color-accent) 12%);
+  background: color-mix(in srgb, var(--cv-surface-block) 88%, var(--color-primary) 12%);
   background-image: none;
   border-bottom: 0;
 }
@@ -1842,10 +1844,10 @@
   [data-travel-document-wizard-roteiro]
   .roteiro-mapa__canvas-head
   .cv-btn--secondary:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--cv-surface-block));
   background-image: none;
   border: 0;
-  color: var(--color-accent);
+  color: var(--color-primary);
   outline: none;
   transform: none;
 }
@@ -1962,7 +1964,7 @@
   background: var(--cv-surface-block);
   background-color: var(--cv-surface-block);
   border-color: transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   transition: none;
 }
 
@@ -2171,9 +2173,9 @@
     :focus-visible,
     :active
   ) {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--cv-surface-block));
   border: 0;
-  color: var(--color-accent);
+  color: var(--color-primary);
   outline: none;
 }
 
@@ -2453,7 +2455,7 @@
   .cv-form-card :is(.form-control, .cv-custom-select__trigger, textarea) {
   background: var(--cv-surface-next);
   border: var(--bd);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: none;
   color: var(--cv-ink);
   min-height: var(--h-md);
@@ -2466,7 +2468,7 @@
 }
 
   .cv-form-card .cv-custom-select__chevron {
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
   .cv-form-card textarea.form-control {
@@ -2478,7 +2480,7 @@
   align-items: stretch;
   background: var(--cv-surface-next);
   border: var(--bd);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   display: grid;
   gap: 0;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -2496,9 +2498,9 @@
 
   .cv-composite-field__suffix {
   align-items: center;
-  background: color-mix(in srgb, var(--color-accent) 8%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--cv-surface-block));
   border-left: var(--bd);
-  color: var(--color-accent);
+  color: var(--color-primary);
   display: inline-flex;
   font-size: var(--fs-xs);
   padding-block: 0;
@@ -2612,9 +2614,9 @@
 }
 
   .cv-search-picker--people .cv-search-picker__driver-toggle--active {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
 }
 
   .cv-search-picker--people .cv-search-picker__term-control {
@@ -2656,7 +2658,7 @@
    pessoas, preservando placa, modelo e unidade em uma linha independente. */
 
   .cv-search-picker--vehicle {
-  background: color-mix(in srgb, var(--cv-surface-block) 88%, var(--color-accent) 12%);
+  background: color-mix(in srgb, var(--cv-surface-block) 88%, var(--color-primary) 12%);
   border: var(--bd);
   border-style: dashed;
   border-radius: var(--r-md);
@@ -2704,11 +2706,11 @@
 
   .cv-search-picker--vehicle .cv-search-picker__selected-card:hover {
   align-items: center;
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--cv-surface-block));
   border: 0;
   border-color: transparent;
   border-radius: var(--r-md);
-  border-inline-start: var(--bd-strong);
+  border-inline-start: var(--bd);
   border-inline-start-color: var(--color-accent);
   column-gap: 12px;
   display: grid;
@@ -2722,11 +2724,11 @@
 
   .cv-search-picker--vehicle .cv-search-picker__selected-avatar {
   align-items: center;
-  background: var(--color-accent);
+  background: var(--color-primary);
   border: var(--bd);
-  border-color: var(--color-accent);
+  border-color: var(--color-primary);
   border-radius: var(--r-md);
-  color: var(--on-accent);
+  color: var(--on-primary);
   display: inline-flex;
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
@@ -2757,9 +2759,9 @@
 
   .cv-search-picker--vehicle .cv-search-picker__vehicle-chip {
   align-items: center;
-  background: var(--color-accent);
+  background: var(--color-primary);
   border-radius: var(--r-pill);
-  color: var(--on-accent);
+  color: var(--on-primary);
   display: inline-flex;
   font-size: 10px;
   font-weight: var(--fw-bold);
@@ -2810,7 +2812,7 @@
    Identidade e ações deixam de competir dentro de um card colorido. */
 
   .cv-search-picker--people.cv-search-picker--roster {
-  background: color-mix(in srgb, var(--cv-surface-block) 88%, var(--color-accent) 12%);
+  background: color-mix(in srgb, var(--cv-surface-block) 88%, var(--color-primary) 12%);
   border: var(--bd);
   border-style: dashed;
   border-radius: var(--r-md);
@@ -2842,7 +2844,7 @@
 }
 
   .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-title {
-  color: var(--color-accent);
+  color: var(--color-primary);
   padding-block: 0;
   padding-inline: var(--sp-1);
 }
@@ -2874,15 +2876,15 @@
 }
 
   .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-card:hover {
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-card));
+  background: color-mix(in srgb, var(--color-primary) 5%, var(--cv-surface-card));
 }
 
   .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-card--driver,
 
   .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-card--driver:hover {
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--cv-surface-block));
   border: 0;
-  border-inline-start: var(--bd-strong);
+  border-inline-start: var(--bd);
   border-inline-start-color: var(--color-accent);
 }
 
@@ -2892,11 +2894,11 @@
 
   .cv-search-picker--roster .cv-search-picker__selected-avatar {
   align-items: center;
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   border-radius: var(--r-md);
-  color: var(--color-accent);
+  color: var(--color-primary);
   display: inline-flex;
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
@@ -2911,9 +2913,9 @@
 }
 
   .cv-search-picker--roster .cv-search-picker__selected-card--driver .cv-search-picker__selected-avatar {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--on-accent);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--on-primary);
 }
 
   .cv-search-picker--roster .cv-search-picker__selected-main {
@@ -2927,9 +2929,9 @@
 
   .cv-search-picker--roster .cv-search-picker__driver-chip {
   align-items: center;
-  background: var(--color-accent);
+  background: var(--color-primary);
   border-radius: var(--r-pill);
-  color: var(--on-accent);
+  color: var(--on-primary);
   display: none;
   font-size: 10px;
   font-weight: var(--fw-bold);
@@ -3002,7 +3004,7 @@
   .cv-search-picker--roster .cv-search-picker__selected-actions :is(.cv-search-picker__driver-toggle, .cv-field-side-action)[aria-pressed="true"] {
   background: transparent;
   border-color: transparent;
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 /* Termo: texto puro (sem chip) — tipografia forte; sim=sucesso, não=perigo.
@@ -3118,7 +3120,7 @@
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker.cv-search-picker--people.cv-search-picker--roster
   .cv-search-picker__selected-card.related-route-item:hover {
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-card));
+  background: color-mix(in srgb, var(--color-primary) 5%, var(--cv-surface-card));
   border-color: var(--cv-border);
 }
 
@@ -3127,9 +3129,9 @@
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker.cv-search-picker--people.cv-search-picker--roster
   .cv-search-picker__selected-card.related-route-item.is-active:hover {
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-block));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  border-inline-start: var(--bd-strong);
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--cv-surface-block));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  border-inline-start: var(--bd);
   border-inline-start-color: var(--color-accent);
 }
 
@@ -3177,9 +3179,9 @@
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker
   .cv-search-picker__selected-card.related-route-item[aria-pressed="true"]
   .cv-search-picker__selected-avatar {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--on-accent);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--on-primary);
 }
 
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker.cv-search-picker--people.cv-search-picker--roster
@@ -3261,10 +3263,10 @@
   .cv-form-card__footer
   .cv-card-footer__secondary
   .cv-btn--secondary:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--cv-surface-block));
   background-image: none;
   border: 0;
-  color: var(--color-accent);
+  color: var(--color-primary);
   outline: none;
   transform: none;
 }
@@ -3280,12 +3282,12 @@
 
   .cv-form-card__footer
   .cv-card-footer__primary .cv-btn {
-  background: var(--color-accent);
+  background: var(--color-primary);
   background-image: none;
   border: 0;
   border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
   font-weight: var(--fw-bold);
   min-height: var(--h-md);
   padding-block: 0;
@@ -3301,11 +3303,11 @@
 
   .cv-form-card__footer
   .cv-card-footer__primary .cv-btn:hover {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
   background-image: none;
   border: 0;
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
   transform: none;
 }
 
@@ -3380,7 +3382,7 @@
   background: var(--cv-surface-block);
   background-image: none;
   border: 0;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: none;
   color: var(--cv-ink);
   font-weight: var(--fw-bold);
@@ -3392,21 +3394,21 @@
 
  .cv-date-picker__footer .cv-date-picker__footer-action:hover,
  .cv-date-picker__footer .cv-date-picker__footer-action:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-primary) 14%, var(--cv-surface-block));
   background-image: none;
   border: 0;
-  color: var(--color-accent);
+  color: var(--color-primary);
   outline: none;
   transform: none;
 }
 
  .cv-date-picker__footer .cv-btn.cv-btn--primary {
-  background: var(--color-accent);
+  background: var(--color-primary);
   background-image: none;
   border: 0;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
   font-weight: var(--fw-bold);
   min-height: var(--h-sm);
   padding-block: 0;
@@ -3416,11 +3418,11 @@
 }
 
  .cv-date-picker__footer .cv-btn.cv-btn--primary:hover {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
   background-image: none;
   border: 0;
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
   transform: none;
 }
 
@@ -3434,15 +3436,15 @@
 }
 
  :is(.cv-custom-select__option--selected, .cv-search-picker__option--selected) {
-  background: var(--color-accent);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 
  :is(.cv-custom-select__option--selected:hover, .cv-custom-select__option--selected.cv-custom-select__option--focused, .cv-search-picker__option--selected:hover) {
-  background: color-mix(in srgb, color-mix(in srgb, var(--color-accent) 45%, transparent) 35%, var(--color-accent));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: color-mix(in srgb, color-mix(in srgb, var(--color-primary) 45%, transparent) 35%, var(--color-primary));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 
  :is(.cv-search-picker__selected-panel, .cv-search-picker__selected-card) {
@@ -3453,25 +3455,25 @@
 
 /* Buttons and icon actions */
  :is(.cv-btn--primary, .btn-primary, .app-primary-action) {
-  background: var(--color-accent);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   box-shadow: none;
-  color: var(--on-accent);
+  color: var(--on-primary);
   text-shadow: none;
 }
 
  :is(.cv-btn--primary-action, .cv-btn--next, .cv-btn--sign) {
-  background: var(--color-accent);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   box-shadow: none;
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
  .cv-btn--primary-success {
   background: var(--cv-state-success);
   border-color: var(--cv-state-success);
   box-shadow: none;
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
  :is(.cv-btn--back, .cv-btn--back-list, .cv-btn--cancel, .cv-btn--preview, .cv-btn--signature, .cv-btn--document, .cv-btn--copy-link) {
@@ -3485,7 +3487,7 @@
   background: linear-gradient(180deg, var(--cv-state-danger) 0%, var(--cv-state-danger) 100%);
   border-color: var(--cv-state-danger);
   box-shadow: none;
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
  .cv-btn--soft-danger {
@@ -3496,26 +3498,26 @@
 }
 
  :is(.cv-footer-action--primary, .cv-field-side-action--primary) {
-  background: var(--color-accent);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 
  :is(.cv-btn--primary, .btn-primary, .app-primary-action):hover {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: var(--color-primary);
   transform: translateY(-1px);
 }
 
  :is(.cv-btn--secondary, .btn-secondary, .btn-outline-primary, .cv-icon-btn) {
   background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
 }
 
  :is(.cv-btn--secondary, .btn-secondary, .btn-outline-primary, .cv-icon-btn):hover {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   color: var(--cv-ink);
 }
 
@@ -3570,28 +3572,28 @@
 
  :is(.cv-icon-btn--edit, .cv-icon-btn--settings):not(.is-assinado) {
   background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
 }
 
  :is(.cv-icon-btn--edit, .cv-icon-btn--settings):not(.is-assinado):is(:hover, :focus) {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 
 /* Engrenagem "Gerenciar modelos" no dark: accent dourado (vence o info acima. */
 
   .cv-icon-btn--field-manage.cv-icon-btn--settings:not(.is-assinado) {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-block));
-  border-color: color-mix(in srgb, var(--color-accent) 50%, transparent);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) 16%, var(--cv-surface-block));
+  border-color: color-mix(in srgb, var(--color-primary) 50%, transparent);
+  color: var(--color-primary);
 }
 
   .cv-icon-btn--field-manage.cv-icon-btn--settings:not(.is-assinado):is(:hover, :focus, :focus-visible) {
-  background: color-mix(in srgb, var(--color-accent) 28%, var(--cv-surface-block));
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) 28%, var(--cv-surface-block));
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 
 /* Termo/documento anexado: tom esverdeado (success). */
@@ -3618,15 +3620,15 @@
   :is(.cv-record-card__footer, .cv-entity-card__footer, .cv-record-card__footer-actions)
   :is(.cv-icon-btn--edit, .cv-icon-btn--settings):not(.is-assinado) {
   background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
 }
 
   :is(.cv-record-card__footer, .cv-entity-card__footer, .cv-record-card__footer-actions)
   :is(.cv-icon-btn--edit, .cv-icon-btn--settings):not(.is-assinado):is(:hover, :focus) {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--on-primary);
 }
 
   :is(.cv-record-card__footer, .cv-entity-card__footer, .cv-record-card__footer-actions)
@@ -3683,10 +3685,10 @@
 
  .alert {
   align-items: flex-start;
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
+  border-color: var(--color-primary);
   box-shadow: none;
-  color: var(--color-accent);
+  color: var(--color-primary);
   display: grid;
   gap: 3px 10px;
   grid-template-columns: auto minmax(0, 1fr);
@@ -3717,10 +3719,10 @@
  :is(.alert-warning, .alert--warning) {
   background: color-mix(in srgb, var(--cv-state-warning) 10%, var(--cv-surface-block));
   border: 0;
-  border-left: var(--bd-strong);
+  border-left: var(--bd);
   border-left-color: var(--cv-state-warning);
   border-left-width: 3px;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: none;
   color: var(--cv-ink-muted);
   font-weight: var(--fw-semibold);
@@ -3740,9 +3742,9 @@
 
  .empty-state__mark {
   align-items: center;
-  background: var(--color-accent);
+  background: var(--color-primary);
   border-radius: var(--r-md);
-  color: var(--on-accent);
+  color: var(--on-primary);
   display: inline-flex;
   font-size: var(--fs-xs);
   font-weight: var(--fw-bold);
@@ -3759,7 +3761,7 @@
 /* Complex shared components: one visual contract across modules. */
 
   .cv-dialog__backdrop {
-  background: color-mix(in srgb, var(--color-accent) 78%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 78%, transparent);
   backdrop-filter: blur(6px) saturate(0.8);
 }
 
@@ -3780,11 +3782,11 @@
 }
 
   .cv-dialog__icon {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   border-radius: var(--r-md);
-  color: var(--color-accent);
+  color: var(--color-primary);
   flex-basis: 44px;
   height: 44px;
   width: 44px;
@@ -3803,7 +3805,7 @@
 }
 
   .cv-dialog__eyebrow {
-  color: var(--color-accent);
+  color: color-mix(in srgb, var(--color-accent) 72%, var(--cv-ink));
   font-size: var(--fs-2xs);
   font-weight: 850;
   letter-spacing: 0.12em;
@@ -3851,7 +3853,7 @@
   .cv-dialog__notice--danger {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  color: color-mix(in srgb, var(--cv-state-danger) 55%, var(--on-accent));
+  color: color-mix(in srgb, var(--cv-state-danger) 55%, var(--on-primary));
 }
 
   .cv-dialog__footer {
@@ -3879,22 +3881,22 @@
 }
 
   :is(.pagination-shell__nav, .pagination-shell__page):is(:hover, :focus-visible) {
-  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
 }
 
   .pagination-shell__page.is-current {
-  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
-  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
+  border-color: var(--color-primary);
   box-shadow: none;
   color: var(--cv-ink);
 }
 
   .pagination-shell__page.is-current:is(:hover, :focus-visible) {
-  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
-  border-color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background: color-mix(in srgb, var(--color-primary) 22%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  color: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
 }
 
   .pagination-shell__nav--primary {
@@ -3917,6 +3919,8 @@
 }
 
   .cv-form-section-header::before {
+  /* Dourado: o filete e destaque. Contrato antigo, em
+     core/tests/test_dark_redesign ("stays gold"). */
   background: var(--color-accent);
   box-shadow: var(--sh-sm);
 }
@@ -3960,7 +3964,7 @@
 }
 
   :is(.cv-file-picker__action, .prestacao-file-picker__action) {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border-color: var(--cv-border);
   color: var(--cv-ink);
 }
@@ -3973,10 +3977,10 @@
 }
 
   .cv-global-tooltip.cv-global-tooltip--accent {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
   :is(.gdrive-loading, .cv-loading) {
@@ -3985,7 +3989,7 @@
 
   :is(.gdrive-spinner, .gdrive-status__spinner, .cv-spinner) {
   border-color: var(--cv-border);
-  border-top-color: var(--color-accent);
+  border-top-color: var(--color-primary);
 }
 
   :is(.doc-pdf-toolbar, .doc-pdf-sidebar, .doc-pdf-stage, .document-inline-viewer, .asgn-viewer) {
@@ -4088,7 +4092,7 @@
   align-items: center;
   background: transparent;
   border: 0;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: none;
   column-gap: 12px;
   display: grid;
@@ -4101,7 +4105,7 @@
 }
 
   :is(.cv-search-picker__option:first-child, .cv-search-picker__option:last-child) {
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
 }
 
   .cv-search-picker__option:hover,
@@ -4118,9 +4122,9 @@
   .cv-search-picker__option--selected:hover,
 
   .cv-search-picker__option--selected.cv-search-picker__option--active {
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--cv-surface-card));
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--cv-surface-card));
   border: 0;
-  border-inline-start: var(--bd-strong);
+  border-inline-start: var(--bd);
   border-inline-start-color: var(--color-accent);
 }
 
@@ -4133,8 +4137,8 @@
   align-self: center;
   background: var(--cv-surface-next);
   border: var(--bd);
-  border-radius: var(--r-sm);
-  color: var(--color-accent);
+  border-radius: var(--r-md);
+  color: var(--color-primary);
   display: inline-grid;
   font-size: 0.7rem;
   font-weight: var(--fw-bold);
@@ -4145,14 +4149,14 @@
 }
 
   .cv-search-picker__option--vehicle .cv-search-picker__option-visual {
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink-muted);
 }
 
   .cv-search-picker__option--selected .cv-search-picker__option-visual {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--on-accent);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--on-primary);
 }
 
   .cv-search-picker__option-content {
@@ -4194,7 +4198,7 @@
 }
 
   .cv-search-picker__option--selected .cv-search-picker__option-status {
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 /* Lista selecionada: linhas sólidas e estáveis; remoção simples e sem vermelho. */
@@ -4227,7 +4231,7 @@
   .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-card--driver,
 
   .cv-search-picker--people.cv-search-picker--roster .cv-search-picker__selected-card--driver:hover {
-  border-inline-start: var(--bd-strong);
+  border-inline-start: var(--bd);
   border-inline-start-color: var(--color-accent);
 }
 
@@ -4269,7 +4273,7 @@
   :is(.oficio-external-driver, [data-travel-document-wizard-roteiro]) .cv-segment-toggle {
   background: var(--cv-surface-next);
   border-color: transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: none;
   display: inline-grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -4277,7 +4281,7 @@
 }
 
   :is(.oficio-external-driver, [data-travel-document-wizard-roteiro]) .cv-segment-toggle__btn {
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink-muted);
   justify-content: center;
   min-height: 32px;
@@ -4290,10 +4294,10 @@
 }
 
   :is(.oficio-external-driver, [data-travel-document-wizard-roteiro]) .cv-segment-toggle__btn[aria-pressed="true"] {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
   box-shadow: none;
-  color: var(--on-accent);
+  color: var(--on-primary);
   transform: none;
 }
 
@@ -4313,7 +4317,7 @@
   .oficio-external-driver .cv-search-picker__control {
   background: var(--cv-surface-next);
   border: var(--bd);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: none;
   min-height: var(--h-md);
   padding-block: 0;
@@ -4398,12 +4402,12 @@
   .cv-summary-card .pt-resumo-box {
   background: var(--cv-surface-next);
   border: var(--bd);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: none;
 }
 
   .cv-summary-card .pt-resumo-box:hover {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border-color: var(--cv-border);
 }
 
@@ -4414,7 +4418,7 @@
 }
 
   .cv-summary-card .pt-resumo-box__label--accent {
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
   .cv-summary-card :is(.pt-resumo-box__value, .pt-resumo-valor__amount) {
@@ -4424,12 +4428,12 @@
   .cv-summary-card .oficio-documentos-fact {
   background: var(--cv-surface-next);
   border-color: var(--cv-border);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: none;
 }
 
   .cv-summary-card .oficio-documentos-fact:hover {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border-color: var(--cv-border);
 }
 
@@ -4455,11 +4459,11 @@
 }
 
   .cv-document-card::before {
-  background: var(--color-accent);
+  background: var(--color-primary);
   border-start-start-radius: 0;
   border-start-end-radius: 0;
-  border-end-end-radius: var(--r-sm);
-  border-end-start-radius: var(--r-sm);
+  border-end-end-radius: var(--r-md);
+  border-end-start-radius: var(--r-md);
   content: "";
   height: 3px;
   left: 18px;
@@ -4518,9 +4522,9 @@
 
   .doc-pdf-thumb {
   background: var(--cv-surface-card);
-  border: var(--bd-strong);
+  border: var(--bd);
   border-color: transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink-muted);
 }
 
@@ -4529,7 +4533,7 @@
 }
 
   .doc-pdf-thumb--active {
-  border-color: var(--color-accent);
+  border-color: var(--color-primary);
 }
 
   .cv-document-viewer__thumb-paper {
@@ -4545,7 +4549,7 @@
 
   .cv-document-viewer__paper-mark {
   background: var(--cv-surface-block);
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
   .cv-document-viewer__paper-line {
@@ -4553,7 +4557,7 @@
 }
 
   .cv-document-viewer__paper-line--title {
-  background: var(--color-accent);
+  background: var(--color-primary);
 }
 
 /* Signature card shares the same solid document hierarchy. */
@@ -4570,13 +4574,13 @@
 }
 
   :is(.cv-signature-card__eyebrow, .cv-signature-card__link-label) {
-  color: var(--color-accent);
+  color: color-mix(in srgb, var(--color-accent) 72%, var(--cv-ink));
 }
 
   .cv-signature-card__link {
   background: var(--cv-surface-next);
   border: var(--bd);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink);
   padding-block: 0;
   padding-inline: var(--sp-3);
@@ -4586,7 +4590,7 @@
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
   border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-state-warning);
   padding: var(--sp-3);
 }
@@ -4620,16 +4624,16 @@
 }
 
   .cv-module-card__mark {
-  background: var(--color-accent);
+  background: var(--color-primary);
   border: var(--bd);
-  border-color: var(--color-accent);
-  color: var(--on-accent);
+  border-color: var(--color-primary);
+  color: var(--on-primary);
 }
 
   .cv-module-card__eyebrow,
 
   .dashboard-page__eyebrow {
-  color: var(--color-accent);
+  color: color-mix(in srgb, var(--color-accent) 72%, var(--cv-ink));
 }
 
   .cv-module-card__title {
@@ -4646,8 +4650,8 @@
 }
 
   .dashboard-page__brand-mark {
-  background: var(--color-accent);
-  color: var(--on-accent);
+  background: var(--color-primary);
+  color: var(--on-primary);
 }
 
   :is(.dashboard-page__welcome-header, .dashboard-page__welcome-body) {
@@ -4678,7 +4682,7 @@
 }
 
   .main-form-panel > .form-section > .section-header::before {
-  background: var(--color-accent);
+  background: var(--color-primary);
   bottom: var(--sp-4);
   box-shadow: var(--sh-sm);
   height: auto;
@@ -4744,7 +4748,7 @@
   border: var(--bd);
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
   border-radius: var(--r-md);
-  color: color-mix(in srgb, var(--cv-state-danger) 55%, var(--on-accent));
+  color: color-mix(in srgb, var(--cv-state-danger) 55%, var(--on-primary));
   padding: var(--sp-3);
 }
 
@@ -4777,7 +4781,7 @@
 }
 
   .cv-record-card__id-row::before {
-  background: var(--color-accent);
+  background: var(--color-primary);
   box-shadow: var(--sh-sm);
   width: var(--sp-2);
 }
@@ -4804,7 +4808,7 @@
   font-size: clamp(0.92rem, 1.15vw, 1.05rem);
   font-weight: var(--fw-bold);
   letter-spacing: 0.05em;
-  text-shadow: 0 1px 6px color-mix(in srgb, var(--color-accent) 20%, transparent);
+  text-shadow: 0 1px 6px color-mix(in srgb, var(--color-primary) 20%, transparent);
   text-transform: uppercase;
 }
 
@@ -4827,18 +4831,16 @@
 }
 
   .cv-fact-block__label {
-  color: var(--color-accent);
+  color: var(--color-primary);
   letter-spacing: 0.09em;
 }
 
+/* A linha do motorista NAO tinge a superficie (NOVO-55). Misturar dourado em
+   marinho e misturar quente com frio: 12% davam rgb(41,48,54), um cinza que
+   destoava das irmas. Quem destaca sao o avatar e o selo dourados, que ja
+   dizem a mesma coisa sem sujar o fundo. */
   .cv-person-row--highlight {
-  background: color-mix(
-    in srgb,
-    var(--color-accent) 12%,
-    var(--cv-surface-block)
-  );
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  border-inline-start: var(--bd-strong);
+  border-inline-start: var(--bd);
   border-inline-start-color: var(--color-accent);
 }
 
@@ -4848,11 +4850,14 @@
 
   .cv-person-row__avatar {
   /* Mesmo tom do chip Pendente (.cv-person-row__badge) */
-  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
-  border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 55%, transparent);
+  color: var(--color-primary);
 }
 
+/* A linha em destaque e o motorista: avatar e selo vao no DOURADO (NOVO-55).
+   Estavam no azul de acao, e um selo que nao clica pintado de cor de botao
+   ensina a leitura errada — foi o que o print do DevTools apontou. */
   .cv-person-row--highlight .cv-person-row__avatar {
   background: var(--color-accent);
   border-color: var(--color-accent);
@@ -4889,7 +4894,7 @@
 }
 
   .cv-dialog__icon--document {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border-color: var(--cv-border);
   color: var(--cv-ink);
 }
@@ -4919,14 +4924,14 @@
 
   .cv-record-row:focus-within {
   /* Mesmo hover do Ofício vinculado (#termo-oficio-lista / related-route). */
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-next));
+  background: color-mix(in srgb, var(--color-primary) 5%, var(--cv-surface-next));
   border: 0;
 }
 
   .cv-record-row__identity {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
 }
 
   .cv-record-row__title {
@@ -5023,7 +5028,7 @@
 }
 
   .cv-fact-block__label {
-  color: var(--color-accent);
+  color: var(--color-primary);
   font-size: 0.64rem;
 }
 
@@ -5055,6 +5060,7 @@
   border-color: transparent;
 }
 
+/* Hover nao muda a superficie: o trecho nao e clicavel. */
   .cv-itinerary__leg:hover {
   background: var(--cv-surface-card);
   border-color: transparent;
@@ -5079,7 +5085,7 @@
   align-items: stretch;
   background: var(--cv-surface-next);
   border: var(--bd);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   box-shadow: none;
   color: var(--cv-ink);
   gap: 0;
@@ -5121,7 +5127,7 @@
   align-items: center;
   align-self: stretch;
   background: var(--cv-surface-block);
-  color: var(--color-accent);
+  color: var(--color-primary);
   display: inline-flex;
   justify-content: center;
   transform: none;
@@ -5144,7 +5150,7 @@
   .cv-custom-select--v2.cv-custom-select--disabled .cv-custom-select__chevron svg,
 
   .list-header__rail .cv-custom-select__trigger--v2 .cv-custom-select__chevron svg {
-  color: var(--color-accent);
+  color: var(--color-primary);
   fill: none;
   stroke: currentColor;
 }
@@ -5197,7 +5203,7 @@
   .cv-custom-select__menu--v2::-webkit-scrollbar-thumb {
   background-clip: padding-box;
   background-color: var(--cv-border);
-  border: var(--bd-strong);
+  border: var(--bd);
   border-color: transparent;
   border-width: 4px;
   border-radius: var(--r-pill);
@@ -5230,7 +5236,7 @@
 }
 
   .cv-custom-select__menu--v2 .cv-custom-select__option {
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink-muted);
   gap: 10px;
   margin-block: var(--sp-1);
@@ -5249,8 +5255,8 @@
 }
 
   .cv-custom-select__menu--v2 .cv-custom-select__option--selected {
-  background: color-mix(in srgb, var(--color-accent) 10%, var(--cv-surface-block));
-  border-inline-start: var(--bd-strong);
+  background: color-mix(in srgb, var(--color-primary) 10%, var(--cv-surface-block));
+  border-inline-start: var(--bd);
   border-inline-start-color: var(--color-accent);
   color: var(--cv-ink);
   font-weight: var(--fw-bold);
@@ -5259,8 +5265,8 @@
   .cv-custom-select__menu--v2 .cv-custom-select__option--selected:hover:not(.cv-custom-select__option--disabled),
 
   .cv-custom-select__menu--v2 .cv-custom-select__option--selected.cv-custom-select__option--focused {
-  background: color-mix(in srgb, var(--color-accent) 16%, var(--cv-surface-block));
-  border-inline-start: var(--bd-strong);
+  background: color-mix(in srgb, var(--color-primary) 16%, var(--cv-surface-block));
+  border-inline-start: var(--bd);
   border-inline-start-color: var(--color-accent);
   color: var(--cv-ink);
   filter: none;
@@ -5268,9 +5274,9 @@
 
   .cv-custom-select__menu--v2 .cv-custom-select__option-check {
   align-items: center;
-  background: var(--color-accent);
-  border-radius: var(--r-sm);
-  color: var(--on-accent);
+  background: var(--color-primary);
+  border-radius: var(--r-md);
+  color: var(--on-primary);
   height: 26px;
   justify-content: center;
   margin-left: auto;

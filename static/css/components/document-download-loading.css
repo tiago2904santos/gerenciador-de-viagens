@@ -30,10 +30,10 @@
   grid-row: 1 / span 2;
   width: 30px;
   height: 30px;
-  border: var(--bd-strong);
-  border-color: color-mix(in srgb, var(--color-accent) 24%, transparent);
+  border: var(--bd);
+  border-color: color-mix(in srgb, var(--color-primary) 24%, transparent);
   border-width: 3px;
-  border-top-color: var(--color-accent);
+  border-top-color: var(--color-primary);
   border-radius: var(--r-pill);
   animation: cv-document-loading-spin 0.72s linear infinite;
 }

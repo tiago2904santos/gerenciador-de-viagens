@@ -26,7 +26,7 @@
 }
 
 .cv-summary-value {
-  color: var(--color-accent);
+  color: var(--color-primary);
   font-size: 1.05rem;
   font-weight: 800;
   line-height: 1.25;
@@ -70,14 +70,14 @@
 }
 
 .summary-items > li > a:hover {
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 /* NOVO-30 fase 3c: o sistema deixou de sinalizar foco (decisao de produto).
    A regra fica so pelo que ela ainda faz — o `outline: none` global de
    base.css ja cobre o contorno. */
 .summary-items > li > a:focus-visible {
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   outline: none;
 }
 

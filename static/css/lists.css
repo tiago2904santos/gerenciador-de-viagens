@@ -136,7 +136,7 @@
 }
 
 .simple-list__row:hover {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
 }
 
 .simple-list__main {
@@ -229,7 +229,7 @@
 .app-list,
 .simple-list {
   border: var(--bd);
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
   overflow: hidden;
 }
 

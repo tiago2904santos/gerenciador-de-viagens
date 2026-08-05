@@ -10,7 +10,7 @@
 .summary-card {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
   box-shadow: var(--sh-sm);
   overflow: hidden;
 }
@@ -29,7 +29,7 @@
 .module-card:hover,
 .document-card:hover,
 .summary-card:hover {
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   box-shadow: var(--sh-sm);
   transform: translateY(-2px);
 }
@@ -52,15 +52,15 @@
    2. Variantes de card
    -------------------------------------------------------------------------- */
 .module-card {
-  border-top: var(--bd-strong);
-border-top-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  border-top: var(--bd);
+border-top-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
 border-top-width: 3px;
   display: grid;
   gap: var(--sp-2);
 }
 
 .document-card {
-  border-left: var(--bd-strong);
+  border-left: var(--bd);
 border-left-color: var(--color-accent);
 border-left-width: 6px;
   display: grid;
@@ -138,10 +138,10 @@ border-left-width: 6px;
     linear-gradient(145deg, rgba(11, 58, 102, 0.06), rgba(216, 162, 27, 0.04)),
     var(--cv-surface-block);
   border: var(--bd);
-  border-left: var(--bd-strong);
+  border-left: var(--bd);
   border-left-color: var(--color-accent);
   border-left-width: 6px;
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
   box-shadow: var(--sh-sm);
   display: grid;
   gap: var(--sp-4);

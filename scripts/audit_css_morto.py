@@ -70,7 +70,7 @@ def tokens_do_produto() -> set[str]:
             continue
         if any(p in IGNORAR for p in f.parts) or f == pathlib.Path(__file__).resolve():
             continue
-        tk |= set(re.findall(r"[\w-]+", f.read_text(errors="replace")))
+        tk |= set(re.findall(r"[\w-]+", f.read_text(encoding="utf-8", errors="replace")))
     return tk
 
 
@@ -160,7 +160,7 @@ def analisa():
     mortas: collections.Counter = collections.Counter()
     alvo: dict[pathlib.Path, list[tuple[int, int]]] = collections.defaultdict(list)
     for f in fontes_css():
-        texto = f.read_text()
+        texto = f.read_text(encoding="utf-8")
         for ini, fim, seletor, _prof in regras(texto):
             classes = _CLASSE.findall(seletor)
             if not classes or any(viva(c, tk) for c in classes):
@@ -198,7 +198,7 @@ def main() -> int:
     total = sum(len(v) for v in alvo.values())
     linhas = sum(t[a:b].count("\n") + 1
                  for f, faixas in alvo.items()
-                 for t in [f.read_text()] for a, b in faixas)
+                 for t in [f.read_text(encoding="utf-8")] for a, b in faixas)
     print(f"regras mortas: {total} em {len(alvo)} arquivos (~{linhas} linhas) "
           f"· classes distintas: {len(mortas)}")
     for f, faixas in sorted(alvo.items(), key=lambda kv: -len(kv[1])):
@@ -210,7 +210,7 @@ def main() -> int:
 
     if args.aplicar:
         for f, faixas in alvo.items():
-            f.write_text(poda(f.read_text(), faixas))
+            f.write_text(poda(f.read_text(encoding="utf-8"), faixas), encoding="utf-8")
         print("APLICADO")
         return 0
 

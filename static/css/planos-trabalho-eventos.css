@@ -36,10 +36,10 @@
   padding-block: var(--sp-3);
   padding-inline: var(--sp-4);
   border-radius: var(--r-md);
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
   font-size: var(--fs-sm);
   line-height: 1.4;
 }
@@ -99,8 +99,8 @@
   height: 1.65rem;
   flex: 0 0 auto;
   border-radius: var(--r-pill);
-  background: var(--color-accent);
-  color: var(--on-accent);
+  background: var(--color-primary);
+  color: var(--on-primary);
   font-size: 0.8rem;
   font-weight: 700;
 }
@@ -170,7 +170,7 @@
   font-size: 1.05rem;
   font-weight: 700;
   /* primary-strong é azul-marinho no dark (≈1,3:1); info acompanha o tema. */
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 .pte-card__chips {
@@ -278,7 +278,7 @@
 }
 
 .pt-resumo-box__label--accent {
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 .pt-resumo-box__value {
@@ -357,10 +357,10 @@
   padding-block: var(--sp-2);
   padding-inline: var(--sp-3);
   border-radius: var(--r-md);
-  background: color-mix(in srgb, var(--color-accent) 8%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--cv-surface-block));
   border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  color: var(--color-primary);
   font-size: var(--fs-sm);
   font-weight: 700;
   line-height: 1.3;
@@ -388,8 +388,8 @@
   padding-block: 0;
   padding-inline: var(--sp-1);
   border-radius: var(--r-md);
-  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
+  color: var(--color-primary);
   font-size: var(--fs-sm);
   font-weight: 900;
 }
@@ -413,7 +413,7 @@
 .pt-resumo-atividades__list::-webkit-scrollbar { width: 6px; }
 .pt-resumo-list::-webkit-scrollbar-thumb,
 .pt-resumo-atividades__list::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--color-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 40%, transparent);
   border-radius: var(--r-pill);
 }
 
@@ -470,7 +470,7 @@
   flex: 0 0 auto;
   width: 1.4rem;
   height: 1.4rem;
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 .pt-add-evento__text {
@@ -490,10 +490,10 @@
   padding-inline: var(--sp-4);
   border: 0;
   border-radius: var(--r-md);
-  background: var(--color-accent);
+  background: var(--color-primary);
   background-image: none;
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
   font-weight: var(--fw-bold);
   text-shadow: none;
   transform: none;
@@ -501,10 +501,10 @@
 
  .pt-add-evento__btn:hover {
   border: 0;
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
   background-image: none;
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
   transform: none;
 }
 
@@ -526,7 +526,7 @@
 .pt-document-preview {
   overflow: hidden;
   border: 0;
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
   background: var(--cv-surface-card);
 }
 
@@ -556,7 +556,7 @@
   border: 0;
   border-radius: var(--r-md);
   background: var(--cv-surface-card);
-  color: var(--color-accent);
+  color: var(--color-primary);
 }
 
 .pt-document-preview__icon svg {
@@ -572,7 +572,7 @@
 }
 
 .pt-document-preview__eyebrow {
-  color: var(--color-accent);
+  color: color-mix(in srgb, var(--color-accent) 72%, var(--cv-ink));
   font-size: var(--fs-xs);
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -809,7 +809,7 @@
 
 .pt-texto-block .cv-field__control--textarea::-webkit-scrollbar-thumb {
   background: var(--cv-border);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
 }
 
 /* ── Etapa 2 · Deslocamento e diárias ────────────────────────────────────────
@@ -1045,7 +1045,7 @@
 .pt-efetivo-fields .pt-quantidade-stepper {
   align-items: stretch;
   background: var(--cv-surface-next);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   display: grid;
   gap: 0;
   grid-template-columns: 2.25rem minmax(2rem, 1fr) 2.25rem;
@@ -1103,8 +1103,8 @@
 
 .pt-efetivo-fields .pt-quantidade-stepper__btn:hover,
 .pt-efetivo-fields .pt-quantidade-stepper__btn:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  color: var(--color-primary);
   outline: none;
 }
 
@@ -1193,7 +1193,7 @@
 }
 
  .evento-solicitacao-list .prestacao-file-list__item::before {
-  background: var(--color-accent);
+  background: var(--color-primary);
   border-radius: var(--r-pill);
   content: "";
   inset: 14px auto 14px 16px;
@@ -1208,7 +1208,7 @@
 }
 
  .evento-solicitacao-list .prestacao-file-list__item:hover::before {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
 }
 
  .evento-solicitacao-list .prestacao-file-list__item + .prestacao-file-list__item {

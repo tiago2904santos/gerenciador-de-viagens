@@ -107,7 +107,7 @@
   background: color-mix(in srgb, var(--tone-neutral) 10%, transparent);
   border: var(--bd);
   border-color: color-mix(in srgb, var(--tone-neutral) 16%, transparent);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--tone-neutral);
   display: inline-flex;
   flex: 0 0 34px;
@@ -124,7 +124,7 @@
 .cv-action-menu__item {
   border: var(--bd);
 border-color: transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   gap: 10px;
   min-height: 52px;
   padding: var(--sp-2);

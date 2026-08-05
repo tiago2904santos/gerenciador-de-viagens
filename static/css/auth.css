@@ -25,7 +25,7 @@
 .auth-card {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-xl);
+  border-radius: var(--r-lg);
   box-shadow: var(--sh-sm);
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(380px, 0.95fr);
@@ -57,9 +57,9 @@ padding-inline: clamp(var(--sp-7), 6vw, var(--sp-8));
 
 .auth-logo {
   align-items: center;
-  background: var(--color-accent);
+  background: var(--color-primary);
   border-radius: var(--r-md);
-  color: var(--on-accent);
+  color: var(--on-primary);
   display: flex;
   font-size: 0.78rem;
   font-weight: 900;
@@ -80,7 +80,7 @@ padding-inline: clamp(var(--sp-7), 6vw, var(--sp-8));
 }
 
 .auth-eyebrow {
-  color: var(--color-accent);
+  color: color-mix(in srgb, var(--color-accent) 72%, var(--cv-ink));
   display: block;
   font-size: 0.7rem;
   font-weight: 800;
@@ -123,7 +123,7 @@ padding-inline: clamp(var(--sp-7), 6vw, var(--sp-8));
 }
 
 .auth-benefits li span {
-  color: var(--color-accent);
+  color: var(--color-primary);
   font-size: 0.68rem;
   font-weight: 900;
   letter-spacing: 0.06em;
@@ -204,11 +204,11 @@ padding-inline: clamp(var(--sp-7), 6vw, var(--sp-8));
 }
 
 .auth-submit {
-  background: var(--color-accent);
+  background: var(--color-primary);
   border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 70%, var(--cv-border));
+  border-color: color-mix(in srgb, var(--color-primary) 70%, var(--cv-border));
   border-radius: var(--r-md);
-  color: var(--on-accent);
+  color: var(--on-primary);
   cursor: pointer;
   font: inherit;
   font-weight: 800;
@@ -217,7 +217,7 @@ padding-inline: clamp(var(--sp-7), 6vw, var(--sp-8));
 }
 
 .auth-submit:hover {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
   border-color: var(--cv-border);
 }
 

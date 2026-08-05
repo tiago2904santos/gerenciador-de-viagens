@@ -218,7 +218,28 @@ class CssTokenGateTests(SimpleTestCase):
 # esta bateria mede o lado certo (NOVO-31).
 # ===========================================================================
 
-TETO_DE_TOKENS = 60
+# 60 -> 64 no NOVO-55, e a subida esta justificada nome a nome porque um teto
+# que sobe sem explicacao deixa de ser teto:
+#
+#   +--color-gold, +--on-gold      o par de DESTAQUE. O NOVO-28 tinha um acento
+#                                  so, que trocava de matiz por tema — e por
+#                                  isso o botao virava dourado no escuro. Sao
+#                                  dois papeis distintos; dois nomes.
+#   +--cv-surface-shell, +--on-shell   o menu e a faixa de cabecalho sao
+#                                  marinhos nos DOIS temas. Nao cabem no
+#                                  rodizio de tres superficies: nao alternam,
+#                                  nao herdam, e precisam de tinta propria.
+#   +--cv-ink-strong               titulo um degrau acima do corpo.
+#   ---bd-strong                   saiu: com o traco em 8%, "2px" era o mesmo
+#                                  nada em dobro, e alias e o que esta camada
+#                                  nao admite (51 usos viraram `var(--bd)`).
+#   ---r-sm, ---r-xl               sairam: quatro raios para contextos
+#                                  parecidos viravam quatro escolhas no olho.
+#                                  156 usos foram para `--r-md`/`--r-lg`.
+#
+# O teto continua sendo teto: o proximo nome precisa da mesma justificativa,
+# ou desce. E ele DESCEU de 64 para 62 nesta rodada.
+TETO_DE_TOKENS = 62
 
 # Prefixo `--_` marca variavel PRIVADA de componente (declarada e consumida no
 # mesmo arquivo). Nao e token de design e nao entra na contagem — mas tambem
@@ -380,8 +401,11 @@ TETO_DA_FORMA_CURTA = {
 }
 
 # Tudo que uma medida de geometria pode valer, em qualquer forma.
+# NOVO-55: `--r-sm`/`--r-xl` sairam (dissolvidos em md/lg) e `--bd-strong`
+# tambem. A escada e o que EXISTE na camada; deixar nomes mortos aqui faria o
+# gate aceitar de volta o que acabou de ser removido.
 _ESCADA = re.compile(
-    r"var\(--(?:sp-[1-8]|r-(?:sm|md|lg|xl|pill)|bd|bd-strong|h-(?:sm|md|lg))\)"
+    r"var\(--(?:sp-[1-8]|r-(?:md|lg|pill)|bd|h-(?:sm|md|lg))\)"
 )
 _NEUTROS = frozenset({
     "0", "auto", "inherit", "initial", "unset", "revert", "none", "transparent",

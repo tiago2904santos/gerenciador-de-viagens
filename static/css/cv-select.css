@@ -92,7 +92,7 @@
 /* Item de acao */
 .cv-action-dropdown__item {
   align-items: center;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink);
   cursor: pointer;
   display: flex;
@@ -110,8 +110,8 @@
 
 .cv-action-dropdown__item:hover,
 .cv-action-dropdown__item:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
+  color: var(--color-primary);
   outline: none;
 }
 
@@ -212,9 +212,9 @@
 
 .cv-filter-dropdown__trigger-badge {
   align-items: center;
-  background: var(--color-accent);
+  background: var(--color-primary);
   border-radius: var(--r-pill);
-  color: var(--on-accent);
+  color: var(--on-primary);
   display: inline-flex;
   font-size: var(--fs-2xs);
   font-weight: var(--fw-bold);
@@ -227,7 +227,7 @@
 
 .cv-filter-dropdown__option {
   align-items: center;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   color: var(--cv-ink);
   cursor: pointer;
   display: flex;
@@ -241,17 +241,17 @@
 }
 
 .cv-filter-dropdown__option:hover {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
 }
 
 .cv-filter-dropdown__option--selected {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
+  color: var(--color-primary);
   font-weight: var(--fw-semibold);
 }
 
 .cv-filter-dropdown__option--selected .cv-filter-dropdown__option-check {
-  color: var(--color-accent);
+  color: var(--color-primary);
   opacity: 1;
 }
 
@@ -346,7 +346,7 @@
 
 .cv-custom-select--open:not(.cv-custom-select--menu-portal) .cv-custom-select__trigger {
   background:
-    linear-gradient(color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)), color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface))) padding-box,
+    linear-gradient(color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface)), color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface))) padding-box,
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
@@ -387,7 +387,7 @@
 
  .cv-custom-select--v2 .cv-custom-select__chevron,
  .cv-custom-select--v2 .cv-custom-select__chevron svg {
-  color: var(--color-accent);
+  color: var(--color-primary);
   stroke: currentColor;
 }
 
@@ -437,7 +437,7 @@
 .cv-custom-select__menu::-webkit-scrollbar-track { background: transparent; }
 .cv-custom-select__menu::-webkit-scrollbar-thumb {
   background: var(--cv-border);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
 }
 
 .cv-custom-select__option {
@@ -454,32 +454,32 @@
 }
 
 .cv-custom-select__option:first-child {
-  border-top-left-radius: var(--r-sm);
-  border-top-right-radius: var(--r-sm);
+  border-top-left-radius: var(--r-md);
+  border-top-right-radius: var(--r-md);
 }
 
 .cv-custom-select__option:last-child {
-  border-bottom-left-radius: var(--r-sm);
-  border-bottom-right-radius: var(--r-sm);
+  border-bottom-left-radius: var(--r-md);
+  border-bottom-right-radius: var(--r-md);
 }
 
 .cv-custom-select__option:hover:not(.cv-custom-select__option--disabled) {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
 }
 
 .cv-custom-select__option--focused {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
 }
 
 .cv-custom-select__option--selected {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
+  color: var(--color-primary);
   font-weight: var(--fw-semibold);
 }
 
 .cv-custom-select__option--selected:hover:not(.cv-custom-select__option--disabled),
 .cv-custom-select__option--selected.cv-custom-select__option--focused {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
+  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   filter: brightness(0.97);
 }
 

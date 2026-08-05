@@ -149,7 +149,7 @@ margin-inline: 0;
 .alert-warning {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border-color: rgba(183, 121, 31, 0.3);
-  color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  color: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
 }
 
 .alert-warning::before {
@@ -267,9 +267,9 @@ margin-inline: 0;
 
 .cv-chip--info,
 .status-chip--info {
-  --_cv-chip-bg: var(--color-accent);
-  --_cv-chip-border: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  --_cv-chip-color: var(--color-accent);
+  --_cv-chip-bg: var(--color-primary);
+  --_cv-chip-border: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  --_cv-chip-color: var(--color-primary);
 }
 
 .cv-chip--pending,

@@ -13,9 +13,10 @@
   background: var(--cv-surface-card);
 }
 
+/* NOVO-55: a faixa e a mesma peca de chrome em toda lista — inclusive aqui. */
 .justificativas-page .list-header__band,
  .justificativas-page .list-header__band {
-  background: var(--cv-surface-block);
+  background: var(--cv-surface-shell);
 }
 
 .justificativas-page .cv-record-row,
@@ -29,7 +30,7 @@
 .justificativas-page .cv-record-row:focus-within,
  .justificativas-page .cv-record-row:hover,
  .justificativas-page .cv-record-row:focus-within {
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--cv-surface-next));
+  background: color-mix(in srgb, var(--color-primary) 5%, var(--cv-surface-next));
   border: 0;
 }
 
@@ -270,11 +271,11 @@
  .justificativas-page .list-header .cv-inline-create__toggle.is-filled[aria-expanded="true"],
  .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready[aria-expanded="true"] {
   animation: none;
-  background: var(--color-accent);
+  background: var(--color-primary);
   background-image: none;
   border: 0;
   box-shadow: var(--sh-sm);
-  color: var(--on-accent);
+  color: var(--on-primary);
   font-weight: var(--fw-bold);
 }
 
@@ -286,17 +287,17 @@
  .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:hover,
  .justificativas-page .list-header .cv-inline-create__toggle.is-filled:focus-visible,
  .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready:focus-visible {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
+  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
   background-image: none;
   border: 0;
-  color: var(--on-accent);
+  color: var(--on-primary);
 }
 
 .justificativas-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
 .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready .cv-inline-create__toggle-icon,
  .justificativas-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
  .justificativas-page .list-header .cv-inline-create__toggle.justificativa-quick-add__toggle--ready .cv-inline-create__toggle-icon {
-  background: color-mix(in srgb, var(--on-accent) 14%, transparent);
+  background: color-mix(in srgb, var(--on-primary) 14%, transparent);
   color: inherit;
 }
 
