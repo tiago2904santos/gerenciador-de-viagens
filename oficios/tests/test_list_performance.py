@@ -1,6 +1,7 @@
 """Paginação e orçamento de queries da lista de Ofícios (defeito N-02).
 
-A auditoria (`docs/AUDITORIA_FINAL_CORRECAO_E_CUSTO.md` §4.2/§4.3) mediu 16
+A auditoria (`docs/historico/2026-07-refactor/auditorias/AUDITORIA_FINAL_CORRECAO_E_CUSTO.md`
+§4.2/§4.3) mediu 16
 queries fixas — sem N+1 — mas nenhuma paginação: 300 ofícios saíam numa resposta
 só, com 5,9 MB de HTML e 300 cards no DOM. Estes testes fixam os dois lados do
 contrato: página de tamanho fixo e nº de queries que **não cresce** com a base.

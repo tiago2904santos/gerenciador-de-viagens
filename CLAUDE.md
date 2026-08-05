@@ -9,10 +9,13 @@ Este arquivo cobre apenas o que é específico do Claude Code.
 ## Ordem de leitura
 
 1. `AGENTS.md` — regras.
-2. `docs/PLANO_REFATORACAO_EXECUCAO.md` — o que fazer agora e qual é o gate da etapa.
-3. Apenas a seção da auditoria citada na tarefa (os documentos têm 900+ linhas; ler inteiro
-   queima contexto sem ganho).
-4. `docs/PROMPTS_REFATORACAO.md` — se a tarefa veio de um prompt padronizado.
+2. `docs/PLANO_MESTRE_REFATORACAO.md` — o que fazer agora e qual é o gate da etapa.
+3. O plano da etapa (`PLANO_BACKEND.md`, `PLANO_FRONTEND.md` ou `PLANO_DESEMPENHO.md`).
+4. Apenas as linhas do `docs/CATALOGO_DEFEITOS_2026-08.md` citadas na tarefa — o catálogo é
+   longo; ler inteiro queima contexto sem ganho.
+
+O ciclo anterior está em `docs/historico/2026-07-refactor/`. Consulte só quando precisar
+entender por que uma decisão antiga foi tomada; os IDs de lá não são unidade de trabalho.
 
 ## Especificidades do Claude Code
 
@@ -24,8 +27,10 @@ Este arquivo cobre apenas o que é específico do Claude Code.
   PostgreSQL e roda `migrate` pelo hook `.claude/hooks/session-start.sh`.
 - **Subagentes** só quando a etapa pedir varredura ampla (ex.: "encontre todas as cópias do
   sistema de destinos"). Para editar, trabalhe no fio principal.
-- **Não reescreva as auditorias.** Elas são registro histórico datado. Correção de rumo entra
-  como linha nova no catálogo, marcada `NOVO`, ou como nota no plano de execução.
+- **Não reescreva `docs/historico/`.** É registro datado. Correção de rumo entra como linha
+  nova no `CATALOGO_DEFEITOS_2026-08.md`, marcada `NOVO`, ou como nota no plano da etapa.
+- **A máquina tem 4 núcleos:** workflow roda 2 agentes por vez. Fan-out largo demora; prefira
+  poucos agentes com escopo grande a muitos com escopo pequeno.
 
 ## Uso da tela
 

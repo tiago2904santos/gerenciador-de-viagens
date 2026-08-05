@@ -2,7 +2,7 @@
 
 Este documento registra o que foi copiado, adaptado ou descartado ao alinhar o modulo `cadastros` ao comportamento util do legado (`legacy/central de viagens 2.0`), mantendo as decisoes do projeto 3.0.
 
-Fontes de verdade usadas: `docs/LEGACY_*_MAP.md` e arquivos em `legacy/.../cadastros` e `legacy/.../core/utils/masks.py`.
+Fontes de verdade usadas: `docs/historico/2026-07-refactor/mapas-legado/LEGACY_*_MAP.md` e arquivos em `legacy/.../cadastros` e `legacy/.../core/utils/masks.py`.
 
 ## Mascaras e normalizacao
 
