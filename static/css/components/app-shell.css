@@ -3678,10 +3678,6 @@
   color: var(--cv-ink-muted);
 }
 
- :is(tr, .list-row):hover {
-  background: var(--cv-surface-block);
-}
-
  :is(.modal, .cv-modal__dialog, .drawer, [role="dialog"]) {
   background-color: var(--cv-surface-card);
   border-color: var(--cv-border);
@@ -4907,26 +4903,6 @@
   border-top-color: var(--cv-border);
 }
 
-  .cv-operation-card__body {
-  padding-block: clamp(var(--sp-5), 3vw, var(--sp-7));
-  padding-inline: clamp(var(--sp-5), 3vw, var(--sp-7));
-}
-
-  .cv-operation-card__footer {
-  background: var(--cv-surface-card);
-  border-top: var(--bd);
-  justify-content: flex-end;
-  padding-block: var(--sp-4);
-  padding-inline: clamp(var(--sp-5), 3vw, var(--sp-7));
-}
-
-  .cv-operation-card__message {
-  color: var(--cv-ink);
-  font-size: var(--fs-md);
-  line-height: 1.65;
-  margin: 0;
-}
-
   .cv-filter-header:not(.list-header) {
   background: var(--cv-surface-card);
   border-color: var(--cv-border);
@@ -4942,24 +4918,6 @@
   background: var(--cv-surface-card);
   border-top-color: var(--cv-border);
   padding-top: var(--sp-4);
-}
-
-  .cv-filter-bar__search {
-  background: var(--cv-surface-next);
-  border: var(--bd);
-  border-radius: var(--r-md);
-}
-
-  .cv-filter-bar__search-input {
-  border-color: transparent;
-  box-shadow: none;
-}
-
-  .cv-filter-bar__search-input:focus,
-
-  .cv-filter-bar__search-input:focus-visible {
-  border-color: transparent;
-  outline: none;
 }
 
   .cv-dialog__icon--document {

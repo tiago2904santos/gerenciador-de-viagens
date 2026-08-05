@@ -764,36 +764,6 @@
   color: var(--on-accent);
 }
 
-/* Manage — gerenciar select (ação moderada) */
-.cv-field-action--manage {
-  background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
-  font-weight: var(--fw-bold);
-  box-shadow: var(--sh-sm);
-}
-
-.cv-field-action--manage:hover,
-.cv-field-action--manage:focus {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
-}
-
-.cv-field-action--secondary {
-  background: var(--cv-surface-block);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  box-shadow: var(--sh-sm);
-  color: var(--color-accent);
-}
-
-.cv-field-action--secondary:hover,
-.cv-field-action--secondary:focus {
-  background: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--on-accent);
-}
-
 /* =========================================================
    9. Botão de Rodapé — .cv-footer-action
    Uso: adicionar itens dentro de cards/blocos.

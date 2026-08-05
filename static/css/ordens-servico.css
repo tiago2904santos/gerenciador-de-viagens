@@ -159,29 +159,6 @@
   outline: none;
 }
 
-.os-model-fields {
-  padding: var(--sp-4);
-  border: 0;
-  border-radius: var(--r-md);
-  background: var(--cv-surface-next);
-}
-
-.os-model-fields[hidden] {
-  display: none;
-}
-
-.os-model-fields__header {
-  margin-bottom: var(--sp-4);
-}
-
-.os-model-fields__title {
-  margin-block: 0 var(--sp-1);
-margin-inline: 0;
-  color: var(--cv-ink);
-  font-size: var(--fs-md);
-  font-weight: var(--fw-bold);
-}
-
 /* Função na equipe: ritmo de Documentos vinculados — toggle → busca → lista. */
 .os-servidor-role-panel {
   display: grid;

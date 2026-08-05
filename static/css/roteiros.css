@@ -25,37 +25,6 @@
   margin-top: calc(var(--sp-7) * -1);
 }
 
-/* --------------------------------------------------------------------------
-   2. Cabecalhos de secao
-   -------------------------------------------------------------------------- */
-
-/* Intro compacto */
-.roteiro-editor__intro {
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
-  box-sizing: border-box;
-  padding-block: var(--sp-3);
-  padding-inline: var(--sp-5);
-  position: relative;
-}
-
-.roteiro-editor__intro::before {
-  background: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  border-start-start-radius: var(--r-lg);
-  border-start-end-radius: var(--r-lg);
-  border-end-end-radius: 0;
-  border-end-start-radius: 0;
-  content: "";
-  height: 3px;
-  left: 0;
-  opacity: 0.85;
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-
 /* Card principal */
 .roteiro-editor__main.card {
   background: var(--cv-surface-card);
@@ -162,24 +131,9 @@
   color: var(--cv-ink);
 }
 
-@media (max-width: 720px) {
-}
-
 /* Painel roteiros salvos */
 .roteiro-editor__routes-panel .roteiro-editor__grid {
   margin-top: var(--sp-3);
-}
-
-#id_roteiro_busca.roteiro-editor__input,
-.roteiro-editor__input {
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-radius: var(--r-sm);
-  color: var(--cv-ink);
-  font-size: 14px;
-  min-height: var(--h-md);
-  padding-block: 0;
-  padding-inline: var(--sp-4);
 }
 
 .roteiro-editor__route-list {
@@ -354,23 +308,6 @@ border-style: dashed;
   display: grid;
   gap: var(--sp-3) var(--sp-4);
   grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.roteiro-editor__chip {
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  border-radius: var(--r-pill);
-  color: var(--color-accent);
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  padding-block: var(--sp-1);
-  padding-inline: var(--sp-2);
-  text-transform: uppercase;
-    margin-left: var(--sp-1);
-
 }
 
 .roteiro-editor__chip.is-on {
@@ -993,38 +930,6 @@ border-style: dashed;
   }
 }
 
-@media (max-width: 720px) {
-}
-
-.roteiro-editor__drag-handle {
-  align-items: center;
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-radius: var(--r-pill);
-  color: var(--cv-ink-muted);
-  cursor: grab;
-  display: inline-flex;
-  height: 36px;
-  justify-content: center;
-  padding: 0;
-  width: 36px;
-}
-
-.roteiro-editor__drag-handle:active {
-  cursor: grabbing;
-}
-
-@media (max-width: 720px) {
-}
-
-/* Wrapper de cada picker (UF / Cidade) dentro do destination-row */
-.destino-picker-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-1);
-  min-width: 0;
-}
-
 .roteiro-editor--avulso .roteiro-editor__drag-handle {
   background: var(--cv-surface-block);
   border: var(--bd);
@@ -1419,15 +1324,6 @@ border-style: dashed;
   align-items: end;
 }
 
-/* --------------------------------------------------------------------------
-   7. Retorno final
-   -------------------------------------------------------------------------- */
-
-/* Retorno */
-#retorno-card .roteiro-editor__grid {
-  align-items: start;
-}
-
 .roteiro-editor--avulso #retorno-card .row.g-3 {
   display: grid;
   gap: var(--sp-4);
@@ -1762,45 +1658,6 @@ border-style: dashed;
   }
 }
 
-.roteiro-mapa__header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--sp-3);
-  margin-bottom: var(--sp-4);
-  padding-block: 0;
-  padding-inline: var(--sp-1);
-}
-
-.roteiro-mapa__heading {
-  align-items: center;
-  display: flex;
-  gap: 10px;
-  min-width: min(100%, 440px);
-}
-
-.roteiro-mapa__title-block {
-  min-width: 0;
-}
-
-.roteiro-mapa__title {
-  font-size: 1.02rem;
-  font-weight: 900;
-  color: var(--cv-ink);
-  line-height: 1.25;
-  margin: 0;
-}
-
-.roteiro-mapa__subtitle {
-  margin-block: var(--sp-1) 0;
-margin-inline: 0;
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--cv-ink-muted);
-  font-weight: 600;
-}
-
 .roteiro-mapa__canvas-shell {
   background: var(--cv-surface-card);
   border: 0;
@@ -1850,37 +1707,6 @@ margin-inline: 0;
 
 .roteiro-mapa__actions--canvas {
   justify-content: flex-end;
-}
-
-.roteiro-mapa__action-icon {
-  border: var(--bd-strong);
-border-color: currentColor;
-  border-radius: var(--r-pill);
-  display: inline-block;
-  height: 14px;
-  opacity: 0.9;
-  position: relative;
-  width: 14px;
-}
-
-.roteiro-mapa__action-icon::before,
-.roteiro-mapa__action-icon::after {
-  background: currentColor;
-  content: "";
-  left: 50%;
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.roteiro-mapa__action-icon::before {
-  height: 7px;
-  width: 1.8px;
-}
-
-.roteiro-mapa__action-icon::after {
-  height: 1.8px;
-  width: 7px;
 }
 
 .roteiro-editor__section--mapa .roteiro-mapa__metrics {
@@ -2154,22 +1980,6 @@ border-color: currentColor;
 .app-form-grid-panel > .field-span-12,
 .roteiro-editor__grid > .field-span-12 {
   grid-column: span 12;
-}
-.roteiro-editor__actions {
-  align-items: center;
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-start-start-radius: 0;
-  border-start-end-radius: 0;
-  border-end-end-radius: var(--r-md);
-  border-end-start-radius: var(--r-md);
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-3);
-  justify-content: flex-end;
-  margin-top: var(--sp-1);
-  padding-block: var(--sp-3);
-  padding-inline: var(--sp-4);
 }
 .roteiro-editor__actions .btn {
   border-radius: var(--r-pill);
