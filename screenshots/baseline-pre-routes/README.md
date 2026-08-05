@@ -39,4 +39,4 @@ Relatório JSON: `_baseline_report.json` (inclui erros/warnings de console colet
 
 ## Observação
 
-Se o script não rodar (servidor parado ou Playwright indisponível), o baseline visual fica como **checklist manual** documentado em `docs/RELATORIO_BASELINE_PRE_ROTAS.md`.
+Se o script não rodar (servidor parado ou Playwright indisponível), o baseline visual fica como **checklist manual** documentado em `docs/historico/2026-07-refactor/relatorios/RELATORIO_BASELINE_PRE_ROTAS.md`.

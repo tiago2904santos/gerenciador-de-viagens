@@ -11,31 +11,34 @@ o Claude Code lê via `CLAUDE.md`, que aponta para cá.
 
 ## 1. Onde está a verdade
 
-O sistema foi auditado em 27–28/07/2026. As auditorias são a **especificação** do refactor.
-Nenhum agente deve "descobrir sozinho" o que precisa ser feito: o defeito já tem número.
+O sistema foi reauditado em **05/08/2026**, ao fim do ciclo de julho. O catálogo novo é a
+**especificação** do refactor. Nenhum agente deve "descobrir sozinho" o que precisa ser feito:
+o defeito já tem número.
 
 | Documento | Domínio | IDs de defeito |
 |---|---|---|
-| `docs/AUDITORIA_VISUAL_DARK_PAGINA_A_PAGINA.md` | CSS, tokens, tema escuro | `D-xx` |
-| `docs/AUDITORIA_HTML_JS_PAGINA_A_PAGINA.md` | Templates, semântica, motores JS | `H-xx`, `J-xx` |
-| `docs/AUDITORIA_BACKEND_INFRA_COMPLETA.md` | Python, settings, testes, infra | `P-xx`, `S-xx`, `T-xx`, `D-0x`, `R-xx`, `G-xx` |
-| `docs/AUDITORIA_FINAL_CORRECAO_E_CUSTO.md` | Regra de negócio, desempenho, a11y medidos | `N-xx` |
-| `docs/AUDITORIA_COMPLETA_SISTEMA_2026-07-27.md` | Segurança e privacidade (já remediada em parte) | — |
-| `docs/PLANO_REFATORACAO_EXECUCAO.md` | **Ordem de execução, dono e gate de cada etapa** | — |
-| `docs/PROMPTS_REFATORACAO.md` | Prompts prontos por etapa e por ferramenta | — |
+| `docs/CATALOGO_DEFEITOS_2026-08.md` | **Todos os defeitos vigentes, com evidência medida** | `BE`, `DB`, `UI`, `HT`, `JS`, `PF`, `QA` |
+| `docs/PLANO_MESTRE_REFATORACAO.md` | **Ordem de execução, gate e critério de pronto de cada etapa** | — |
+| `docs/PLANO_BACKEND.md` | Python, camadas, dados, migrações | `BE-xx`, `DB-xx` |
+| `docs/PLANO_FRONTEND.md` | CSS, templates, JS, acessibilidade | `UI-xx`, `HT-xx`, `JS-xx` |
+| `docs/PLANO_DESEMPENHO.md` | Queries, cache, assets, documentos | `PF-xx` |
+
+O ciclo anterior está congelado em `docs/historico/2026-07-refactor/` — leia o `README.md` de
+lá se precisar do contexto de uma decisão antiga. **Os IDs antigos (`D-`, `H-`, `J-`, `P-`,
+`S-`, `T-`, `N-`, `NOVO-`) não são mais unidade de trabalho**; descrevem o código de julho.
 
 Os documentos `docs/PADRAO_*.md` descrevem o contrato de camadas **já vigente**. Código novo
 segue o `PADRAO_*` correspondente; divergência é defeito, não estilo pessoal.
 
 ## 2. Regra de ouro: o ID do defeito é a unidade de trabalho
 
-- Toda tarefa começa citando um ou mais IDs (`D-01`, `J-02`, `N-01`…).
-- Todo commit cita o ID: `fix(css): define fundo e sombra do toast de download (D-01)`.
+- Toda tarefa começa citando um ou mais IDs (`BE-01`, `PF-03`, `UI-07`…).
+- Todo commit cita o ID: `fix(perf): elimina N+1 na lista de termos (PF-02)`.
 - Todo PR lista os IDs resolvidos e marca a linha correspondente em
-  `docs/PLANO_REFATORACAO_EXECUCAO.md` **no mesmo PR**.
+  `docs/CATALOGO_DEFEITOS_2026-08.md` e no plano da etapa **no mesmo PR**.
 - **Não existe trabalho fora de ID.** Se você encontrar um defeito não catalogado, adicione
-  uma linha nova no catálogo da auditoria correspondente (com `NOVO` na coluna de origem) e
-  só então conserte — ou registre e siga em frente, se estiver fora do escopo da etapa.
+  uma linha nova em `docs/CATALOGO_DEFEITOS_2026-08.md` (com `NOVO` na coluna de origem) e só
+  então conserte — ou registre e siga em frente, se estiver fora do escopo da etapa.
 
 ## 3. Limites invioláveis
 
@@ -69,36 +72,40 @@ segue o `PADRAO_*` correspondente; divergência é defeito, não estilo pessoal.
      python scripts/audit_frontend_standards.py --max-warnings <N atual>
      python scripts/audit_django_architecture.py
      python scripts/audit_ui_patterns.py
-6. Atualizar docs/PLANO_REFATORACAO_EXECUCAO.md (status da linha) e o catálogo da auditoria.
+6. Atualizar docs/CATALOGO_DEFEITOS_2026-08.md (status da linha) e o plano da etapa.
 7. Abrir PR com o template da seção 5.
 ```
 
-Suíte de referência: **924 testes verdes** (eram 812 até `NOVO-08` devolver ao runner os 95
-testes de `core/tests/`, que nunca foram descobertos). Um PR que reduz o número de testes
-verdes ou aumenta o tempo em mais de 20% precisa justificar no corpo.
+Suíte de referência: **1.301 testes verdes** em PostgreSQL, ~12 s com `--parallel 4`
+(medido em 05/08/2026). Um PR que reduz o número de testes verdes ou aumenta o tempo em mais
+de 20% precisa justificar no corpo.
 
 ## 5. Corpo de PR obrigatório
 
 ```markdown
 ## Etapa
-Etapa N do docs/PLANO_REFATORACAO_EXECUCAO.md
+Etapa N do docs/PLANO_MESTRE_REFATORACAO.md
 
 ## Defeitos resolvidos
-- D-01 — toast sem fundo (static/css/components/document-download-loading.css)
-- D-04 — variant="muted" inexistente
+- PF-02 — N+1 na lista de termos (termos/presenters.py:118)
+- UI-05 — 4 camadas de token com valor conflitante
 
 ## Como verifiquei
 - [ ] Suíte completa verde (N testes, Xs)
-- [ ] audit_frontend_standards: 449 → 445 avisos
+- [ ] audit_frontend_standards: 392 → 388 avisos
+- [ ] Números de desempenho antes/depois, quando a etapa for de desempenho
 - [ ] Telas afetadas conferidas em tema claro e escuro (print no PR)
 
 ## O que NÃO fiz
 (escopo deliberadamente deixado de fora, com o ID do defeito)
 ```
 
-## 6. Divisão de trabalho entre as três ferramentas
+## 6. Divisão de trabalho entre as ferramentas
 
-Resumo; o detalhe por etapa está em `docs/PLANO_REFATORACAO_EXECUCAO.md` §4.
+**Desde 05/08/2026 o Claude Code é o dono do refactor de ponta a ponta** — condução das
+etapas, decisão de arquitetura e fechamento do sistema. Cursor e Codex passam a ser apoio
+opcional, usados quando a etapa se beneficia do que cada um faz melhor. O detalhe por etapa
+está em `docs/PLANO_MESTRE_REFATORACAO.md` §4.
 
 | Ferramenta | Faz bem aqui | Não use para |
 |---|---|---|
@@ -117,7 +124,10 @@ python manage.py test --settings=config.settings.test        # suíte completa
 python manage.py test <app> --settings=config.settings.test  # suíte de um app
 python manage.py check --deploy --settings=config.settings.prod
 python manage.py makemigrations --check --dry-run --settings=config.settings.test
-python scripts/audit_frontend_standards.py --max-warnings 449   # teto atual; confira em tests.yml
+python scripts/audit_frontend_standards.py --max-warnings 401   # teto atual; confira em tests.yml
+python scripts/audit_django_architecture.py
+python scripts/audit_ui_patterns.py
+python scripts/build_shell_bundles.py --check                   # bundles do shell em dia
 python manage.py runserver 0.0.0.0:8000
 ```
 

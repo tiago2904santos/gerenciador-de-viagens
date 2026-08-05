@@ -12,6 +12,18 @@ No estado atual, `cadastros` e `roteiros` sao os modulos maduros de referencia. 
 
 Documentos sao o centro da arquitetura. Eventos podem agrupar documentos, mas nao sao obrigatorios para criar ou evoluir fluxos.
 
+## Refatoração em curso
+
+O sistema está no ciclo de refactor aberto em 05/08/2026. Antes de escrever código, leia:
+
+1. [`AGENTS.md`](AGENTS.md) — regras de conduta, limites invioláveis, corpo de PR.
+2. [`docs/PLANO_MESTRE_REFATORACAO.md`](docs/PLANO_MESTRE_REFATORACAO.md) — o que fazer agora e
+   qual é o gate da etapa.
+3. [`docs/CATALOGO_DEFEITOS_2026-08.md`](docs/CATALOGO_DEFEITOS_2026-08.md) — todo defeito
+   vigente, com evidência medida. **Não existe trabalho fora de ID.**
+
+O ciclo anterior está congelado em [`docs/historico/2026-07-refactor/`](docs/historico/2026-07-refactor/README.md).
+
 ## Criar ambiente virtual
 
 > **Desempenho local (`G-03` / `N-12`):** não clone nem rode o projeto de dentro do
