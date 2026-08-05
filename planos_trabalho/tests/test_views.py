@@ -420,6 +420,84 @@ class PlanoWizardViewsTests(TestCase):
         plano.refresh_from_db()
         self.assertEqual(plano.efetivos.count(), 2)
 
+    def test_post_efetivo_diarias_ignora_linha_em_branco_do_formset(self):
+        """Linha vazia (usuário abriu e removeu, ou o TOTAL_FORMS ficou adiantado)
+        não pode barrar o wizard com 'Este campo é obrigatório'."""
+        plano = criar_plano_maringa(self.maringa, efetivo=6)
+        efetivo = plano.efetivos.first()
+        response = self.client.post(
+            reverse("planos_trabalho:wizard_efetivo_diarias", args=[plano.pk]),
+            {
+                "action": "wizard_next",
+                "efetivo-TOTAL_FORMS": "2",
+                "efetivo-INITIAL_FORMS": "1",
+                "efetivo-MIN_NUM_FORMS": "1",
+                "efetivo-MAX_NUM_FORMS": "1000",
+                "efetivo-0-id": efetivo.pk,
+                "efetivo-0-plano": plano.pk,
+                "efetivo-0-unidade": efetivo.unidade_id,
+                "efetivo-0-cargo": efetivo.cargo_id,
+                "efetivo-0-quantidade": "6",
+                "efetivo-1-id": "",
+                "efetivo-1-plano": plano.pk,
+                "efetivo-1-unidade": "",
+                "efetivo-1-cargo": "",
+                "efetivo-1-quantidade": "",
+                "saida_sede_data": "2026-06-24",
+                "saida_sede_hora": "07:00",
+                "chegada_sede_data": "2026-06-28",
+                "chegada_sede_hora": "14:00",
+            },
+        )
+        self.assertRedirects(
+            response,
+            reverse("planos_trabalho:wizard_atividades", args=[plano.pk]),
+        )
+        plano.refresh_from_db()
+        self.assertEqual(plano.efetivos.count(), 1)
+        self.assertEqual(plano.saida_sede_data.isoformat(), "2026-06-24")
+        self.assertEqual(plano.chegada_sede_data.isoformat(), "2026-06-28")
+
+    def test_post_efetivo_diarias_acusa_linha_pela_metade(self):
+        plano = criar_plano_maringa(self.maringa, efetivo=6)
+        efetivo = plano.efetivos.first()
+        response = self.client.post(
+            reverse("planos_trabalho:wizard_efetivo_diarias", args=[plano.pk]),
+            {
+                "action": "wizard_next",
+                "efetivo-TOTAL_FORMS": "2",
+                "efetivo-INITIAL_FORMS": "1",
+                "efetivo-MIN_NUM_FORMS": "1",
+                "efetivo-MAX_NUM_FORMS": "1000",
+                "efetivo-0-id": efetivo.pk,
+                "efetivo-0-plano": plano.pk,
+                "efetivo-0-unidade": efetivo.unidade_id,
+                "efetivo-0-cargo": efetivo.cargo_id,
+                "efetivo-0-quantidade": "6",
+                "efetivo-1-id": "",
+                "efetivo-1-plano": plano.pk,
+                "efetivo-1-unidade": "",
+                "efetivo-1-cargo": "",
+                "efetivo-1-quantidade": "4",
+                "saida_sede_data": "2026-06-24",
+                "saida_sede_hora": "07:00",
+                "chegada_sede_data": "2026-06-28",
+                "chegada_sede_hora": "14:00",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Selecione o cargo.")
+
+    def test_campos_de_data_da_etapa_2_estao_ligados_ao_date_picker(self):
+        """Sem os data-cv-date-picker-*-value o calendário escreve só no input de
+        exibição e a saída/chegada chega vazia no POST (cálculo e persistência)."""
+        plano = criar_plano_maringa(self.maringa, efetivo=6)
+        response = self.client.get(
+            reverse("planos_trabalho:wizard_efetivo_diarias", args=[plano.pk]),
+        )
+        self.assertContains(response, "data-cv-date-picker-start-value")
+        self.assertContains(response, "data-cv-date-picker-end-value")
+
     def test_api_calcular_diarias_ao_vivo(self):
         plano = criar_plano_maringa(self.maringa, efetivo=6)
         url = reverse("planos_trabalho:api_calcular_diarias", args=[plano.pk])

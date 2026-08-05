@@ -441,9 +441,11 @@
     if (removeBtn && row.dataset.ptEfetivoRemoveReady !== "true") {
       row.dataset.ptEfetivoRemoveReady = "true";
       removeBtn.addEventListener("click", function () {
+        // Marca DELETE e esconde em vez de tirar do DOM: arrancar a linha deixaria
+        // TOTAL_FORMS maior que o número de prefixos enviados e o Django montaria
+        // uma linha fantasma em branco no POST.
         var deleteInput = row.querySelector("input[name$='-DELETE']");
-        var idInput = row.querySelector("input[name$='-id']");
-        if (deleteInput && idInput && idInput.value) {
+        if (deleteInput) {
           deleteInput.checked = true;
           row.hidden = true;
         } else {
