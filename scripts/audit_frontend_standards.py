@@ -18,23 +18,46 @@ JS_DIR = ROOT / "static" / "js"
 # ---------------------------------------------------------------------------
 # Exceções documentadas — chave: caminho relativo ao ROOT (posix)
 # ---------------------------------------------------------------------------
-# Vazio de proposito. A unica entrada que existia dispensava
-# `templates/core/dashboard.html` de `legacy_page_header` — e o dashboard nao
-# escreve `page-header` em lugar nenhum desde a reescrita. A dispensa sobrevivia
-# a um defeito da regra, nao a um uso real (NOVO-39). Excecao de ARQUIVO esconde
-# divida: se a regra esta certa, o codigo se ajusta; se esta errada, corrige-se a
-# regra. Foi a decisao da fase 4 para o CSS, e vale igual aqui.
-TEMPLATE_EXCEPTIONS: dict[str, dict] = {}
-
-# A camada de token e o unico lugar do sistema onde uma cor pode ser escrita a
-# mao — nao e "excecao", e a definicao da regra. Carrega-la como dispensa era o
-# auditor nao conhecer a propria arquitetura (NOVO-30 fase 4).
-CAMADA_DE_TOKEN = frozenset({
-    "static/css/00-palette.css",
-    "static/css/01-tokens.css",
-})
+TEMPLATE_EXCEPTIONS: dict[str, dict] = {
+    "templates/core/dashboard.html": {
+        "reason": "Shell dashboard-login-inspired e excecao oficial -- usa 100% CSS vars.",
+        "rules": {"legacy_page_header"},
+    },
+}
 
 CSS_EXCEPTIONS: dict[str, dict] = {
+    "static/css/forms.css": {
+        "reason": ".roteiro-editor__* permanece como dominio em CSS global; --route-* sao variaveis globais de tema.",
+        "rules": {"domain_selector_in_global", "route_token_in_global", "hex_color_outside_tokens"},
+    },
+    "static/css/cards.css": {
+        "reason": ".oficio-card em cards.css: domínio a mover para oficios.css (Prompt 5).",
+        "rules": {"domain_selector_in_global"},
+    },
+    "static/css/tokens.css": {
+        "reason": "Arquivo de tokens — cores hex são a definição original, permitidas aqui.",
+        "rules": {"hex_color_outside_tokens"},
+    },
+    "static/css/theme.css": {
+        "reason": "Arquivo de tema — cores hex são a definição original, permitidas aqui.",
+        "rules": {"hex_color_outside_tokens"},
+    },
+    "static/css/03-theme-dark.css": {
+        "reason": "Official dark-theme token layer; literal values define semantic tokens.",
+        "rules": {"hex_color_outside_tokens"},
+    },
+    "static/css/components/theme-dark-components.css": {
+        "reason": "Transitional dark-theme component overrides; literals allowed until dissolved into components.",
+        "rules": {"hex_color_outside_tokens"},
+    },
+    "static/css/auth.css": {
+        "reason": "CSS de autenticação — isolado, pode ter cores específicas.",
+        "rules": {"hex_color_outside_tokens"},
+    },
+    "static/css/dashboard.css": {
+        "reason": "Dashboard e excecao oficial -- hex restantes sao fallbacks de var() no botao do hero.",
+        "rules": {"hex_color_outside_tokens"},
+    },
     "static/css/shell.bundle.css": {
         "reason": "Bundle gerado (NOVO-12) — literais e seletores vêm das fontes; auditar as fontes.",
         "rules": {
@@ -66,16 +89,8 @@ TEMPLATE_RULES_ERRO = [
 ]
 
 TEMPLATE_RULES_AVISO = [
-    # Nao basta olhar `href="#"` escrito a mao: a ancora vazia tambem chega ao
-    # HTML por PARAMETRO de componente — `secondary_url="#"`, `back_url="#"`,
-    # `primary_action_url="#"`. Eram 19 ocorrencias invisiveis para a regra
-    # anterior, contra 10 visiveis (NOVO-40).
-    ("href_hash",            re.compile(r'\b[a-z_]*(?:href|url|link)[a-z_]*=(["\'])#\1'),
-     'Âncora vazia — link que só pula a página para o topo; usar URL real ou <button>'),
-    # Ver `_LEGACY_PAGE_HEADER_PAT`: o alvo e a classe CRUA `page-header`, nao a
-    # familia `page-header-band`/`-stack`/`-rail`, que e o componente canonico.
-    ("legacy_page_header",   re.compile(r'class="[^"]*\bpage-header(?![-\w])'),
-     'Classe page-header crua — o componente é templates/components/ui/headers/page_header.html'),
+    ("href_hash",            re.compile(r'\bhref="#"'),                'href="#" — checar se é intencional'),
+    ("legacy_page_header",   re.compile(r'class="[^"]*\bpage-header\b'), 'Classe page-header legada — migrar para app-page-hero'),
     ("script_inline",        re.compile(r'<script(?![^>]*\bsrc=)[^>]*>(?!\s*<)'), '<script> inline (sem src) — mover para arquivo .js'),
 ]
 
@@ -99,11 +114,7 @@ _DOMAIN_SELECTOR_PAT = re.compile(
     r'^\s*\.(?:oficio|motivo|roteiro|diario|prestacao|plano|termo|ordem|justificativa)[_-]'
 )
 _ROUTE_TOKEN_PAT = re.compile(r'--route-')
-# `\b` trata o hifen como fronteira, entao `\.page-header\b` casava a familia
-# CANONICA inteira — `.page-header-band`, `.page-header-stack`, `.page-header-rail`
-# — e nao a classe crua que a regra existe para pegar. Sao 60 linhas de CSS e 92
-# de template de puro falso positivo (NOVO-39). O `(?![-\w])` fecha isso.
-_LEGACY_PAGE_HEADER_PAT = re.compile(r'^\s*\.page-header(?![-\w])')
+_LEGACY_PAGE_HEADER_PAT = re.compile(r'^\s*\.page-header\b')
 # Hex color fora de tokens/theme: match #rgb / #rrggbb / #rrggbbaa em valor CSS (não em comentário)
 _HEX_COLOR_PAT = re.compile(r'(?<![\w#])#([0-9a-fA-F]{3,8})\b')
 _CSS_COMMENT_LINE = re.compile(r'^\s*/\*')
@@ -225,25 +236,9 @@ def audit_css() -> list[tuple]:
 
         is_global = rp in GLOBAL_CSS
 
-        # Comentario de BLOCO: `_CSS_COMMENT_LINE` so reconhece a linha que
-        # ABRE o comentario. As linhas de dentro passavam por codigo — e um
-        # cabecalho que citava `.oficio-stepper-*` em prosa era acusado de
-        # seletor de dominio em CSS global (NOVO-41). Aqui o estado do bloco e
-        # levado de uma linha para a outra.
-        dentro_de_bloco = False
-
         for idx, line in enumerate(lines, start=1):
-            abre = line.count("/*")
-            fecha = line.count("*/")
-            comeca_dentro = dentro_de_bloco
-            if abre or fecha:
-                dentro_de_bloco = abre > fecha if abre != fecha else dentro_de_bloco
-                if abre and not fecha:
-                    dentro_de_bloco = True
-                elif fecha and not abre:
-                    dentro_de_bloco = False
-
-            is_comment = comeca_dentro or _CSS_COMMENT_LINE.match(line) is not None
+            # Skip pure comment lines for most rules
+            is_comment = _CSS_COMMENT_LINE.match(line) is not None
 
             if not is_comment:
                 # Domain selectors / route tokens — only in global CSS files
@@ -254,9 +249,8 @@ def audit_css() -> list[tuple]:
                             level = "EXCEC" if is_exc else "AVISO"
                             findings.append((level, rp, idx, rule_name, message, line.strip(), reason))
 
-                # Hex colors outside tokens/theme — em qualquer CSS que NAO
-                # seja a camada de token (onde as sementes moram por definicao).
-                if _CSS_VALUE_LINE.search(line) and rp not in CAMADA_DE_TOKEN:
+                # Hex colors outside tokens/theme — in any CSS file
+                if _CSS_VALUE_LINE.search(line):
                     is_exc, reason = check_exception(rp, "hex_color_outside_tokens", CSS_EXCEPTIONS)
                     level = "EXCEC" if is_exc else "AVISO"
                     findings.append((level, rp, idx, "hex_color_outside_tokens",

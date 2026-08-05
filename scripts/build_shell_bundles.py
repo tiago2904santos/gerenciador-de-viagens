@@ -23,8 +23,7 @@ STATIC = ROOT / "static"
 # theme-shared.js / theme-init.js ficam fora do bundle JS (head, sem defer).
 SHELL_CSS: tuple[str, ...] = (
     "css/style.css",
-    # Depois de style.css/01-tokens.css: as sementes medidas da paleta vencem.
-    "css/00-palette.css",
+    "css/03-theme-dark.css",
     "css/utilities.css",
     "css/page-shell.css",
     "css/cv-buttons.css",
@@ -40,12 +39,12 @@ SHELL_CSS: tuple[str, ...] = (
     "css/components/summary-items.css",
     "css/components/cv-notice.css",
     "css/components/cv-metric.css",
+    "css/components/app-shell.css",
     "css/components/content-cards.css",
     "css/components/document-viewer.css",
     "css/components/dialog.css",
     "css/components/document-download-loading.css",
-    # Camada institucional canônica, depois dos componentes que consolida.
-    "css/components/app-shell.css",
+    "css/components/theme-dark-components.css",
     "css/components/list-header.css",
 )
 

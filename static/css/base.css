@@ -8,17 +8,17 @@
 
 body {
   margin: 0;
-  background: var(--cv-surface-page);
-  color: var(--cv-ink);
+  background: var(--app-body-bg);
+  color: var(--color-text);
   font-family: var(--font-sans);
-  font-size: var(--fs-md);
+  font-size: var(--font-size-md);
   line-height: 1.5;
   min-height: 100vh;
 }
 
 ::selection {
   background: rgba(37, 99, 168, 0.22);
-  color: var(--cv-ink);
+  color: var(--color-heading);
 }
 
 a {
@@ -36,7 +36,7 @@ p {
 h1,
 h2,
 h3 {
-  color: var(--cv-ink);
+  color: var(--color-heading);
 }
 
 button,
@@ -46,46 +46,34 @@ textarea {
   font: inherit;
 }
 
-/* NOVO-30 fase 3c — DECISAO DE PRODUTO (04/08/2026): o sistema nao sinaliza
-   foco. Nem anel, nem halo, nem contorno, em nenhuma situacao.
-
-   Esta regra e o que faz a decisao valer: apagar as regras do projeto nao
-   basta, porque o navegador desenha o proprio anel por padrao. Ela precisa
-   alcancar `:focus` E `:focus-visible`.
-
-   REGRESSAO CONHECIDA: e falha de WCAG 2.4.7 (Focus Visible). Quem navega por
-   teclado perde a unica pista de onde esta. Registrada no plano de execucao
-   como decisao consciente, nao como descuido — se um dia voltar, volta por
-   aqui, num lugar so. */
-:focus,
-:focus-visible,
-:focus-within {
-  outline: none;
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgba(37, 99, 168, 0.45);
+  outline-offset: 2px;
 }
 
 input,
 select,
 textarea {
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-radius: var(--r-control);
-  color: var(--cv-ink);
-  min-height: var(--h-md);
-  padding-block: 0;
-  padding-inline: var(--sp-3);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  min-height: var(--control-height-md);
+  padding: 0 var(--space-3);
 }
 
 textarea {
-  min-height: 88px;
-  padding-bottom: var(--sp-3);
-  padding-top: var(--sp-3);
+  min-height: var(--text-area-height-md);
+  padding-bottom: var(--space-3);
+  padding-top: var(--space-3);
   resize: vertical;
 }
 
 input::placeholder,
 select::placeholder,
 textarea::placeholder {
-  color: var(--cv-ink-muted);
+  color: var(--color-input-placeholder, var(--color-subtle));
   opacity: 1;
 }
 
@@ -105,8 +93,8 @@ textarea:disabled,
 input[readonly],
 select[readonly],
 textarea[readonly] {
-  background: var(--cv-surface-next);
-  border-color: var(--cv-border);
-  color: var(--cv-ink-muted);
+  background: var(--color-input-bg-disabled, var(--color-input-disabled-bg, var(--color-surface-muted)));
+  border-color: var(--color-border);
+  color: var(--color-input-disabled-text, var(--color-text-muted, var(--color-muted)));
   opacity: 1;
 }

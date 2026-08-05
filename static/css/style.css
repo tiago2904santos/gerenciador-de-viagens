@@ -1,4 +1,5 @@
-@import url("./01-tokens.css");
+@import url("./tokens.css");
+@import url("./theme.css");
 @import url("./base.css");
 @import url("./layout.css");
 @import url("./sidebar.css");

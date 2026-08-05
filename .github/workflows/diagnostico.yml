@@ -70,9 +70,11 @@ jobs:
               if [ -n "${!nome:-}" ]; then echo "${nome}: definido"; else echo "${nome}: AUSENTE"; fi
             done
 
-            echo "--- pg_dump pelo mesmo caminho do backup ---"
-            # shellcheck source=scripts/lib/pg_env.sh
-            . scripts/lib/pg_env.sh
+            echo "--- pg_dump pela mesma ponte DB_* -> PG* do backup ---"
+            export PGHOST="${PGHOST:-${DB_HOST:-127.0.0.1}}"
+            export PGPORT="${PGPORT:-${DB_PORT:-5432}}"
+            [ -n "${DB_USER:-}" ] && export PGUSER="${DB_USER}"
+            [ -n "${DB_PASSWORD:-}" ] && export PGPASSWORD="${DB_PASSWORD}"
             pg_dump --no-password --schema-only --file=/tmp/diag-dump-test.sql \
               "${DB_NAME}" 2>&1 | head -5 && ls -lh /tmp/diag-dump-test.sql
             rm -f /tmp/diag-dump-test.sql

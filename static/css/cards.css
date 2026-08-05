@@ -1,4 +1,40 @@
+/* ==========================================================================
+   CARDS
+   ========================================================================== */
 
+/* --------------------------------------------------------------------------
+   0. Classes canonicas do design system
+   .app-card  → superfície genérica (alias de .card)
+   .app-panel → painel com borda/padding mais denso (alias de .form-section)
+   .app-section → wrapper estrutural de conteúdo (novo)
+   -------------------------------------------------------------------------- */
+.app-section {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.app-section__header {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.app-section__title {
+  color: var(--color-heading);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  margin: 0;
+}
+
+.app-section__subtitle {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+.app-section__body {
+  display: grid;
+  gap: var(--space-3);
+}
 
 /* --------------------------------------------------------------------------
    1. Base de superficie
@@ -7,11 +43,12 @@
 .app-card,
 .module-card,
 .document-card,
-.summary-card {
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-radius: var(--r-card);
-  box-shadow: var(--sh-raised);
+.summary-card,
+.page-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
 }
 
@@ -20,8 +57,8 @@
 .module-card,
 .document-card,
 .summary-card {
-  padding: var(--sp-4);
-  transition: border-color var(--tr-base), box-shadow var(--tr-base), transform var(--tr-base);
+  padding: var(--space-4);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
 }
 
 .card:hover,
@@ -29,42 +66,38 @@
 .module-card:hover,
 .document-card:hover,
 .summary-card:hover {
-  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-raised);
+  border-color: var(--color-accent-border-strong);
+  box-shadow: var(--shadow-panel);
   transform: translateY(-2px);
 }
 
 .card h3,
 .module-card h3,
 .document-card h3 {
-  color: var(--cv-ink);
-  font-size: var(--fs-lg);
+  color: var(--color-heading);
+  font-size: var(--font-size-lg);
   line-height: 1.25;
-  margin-bottom: var(--sp-2);
+  margin-bottom: var(--space-2);
 }
 
 .card p,
 .module-card p {
-  color: var(--cv-ink-muted);
+  color: var(--color-muted);
 }
 
 /* --------------------------------------------------------------------------
    2. Variantes de card
    -------------------------------------------------------------------------- */
 .module-card {
-  border-top: var(--bd);
-border-top-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-border-top-width: 3px;
+  border-top: 3px solid var(--color-accent-border-strong);
   display: grid;
-  gap: var(--sp-2);
+  gap: var(--space-2);
 }
 
 .document-card {
-  border-left: var(--bd);
-border-left-color: var(--color-accent);
-border-left-width: 6px;
+  border-left: 6px solid var(--color-accent);
   display: grid;
-  gap: var(--sp-3);
+  gap: var(--space-3);
 }
 
 .document-card-header {
@@ -75,27 +108,27 @@ border-left-width: 6px;
 
 .document-meta {
   display: grid;
-  gap: var(--sp-2);
+  gap: var(--space-2);
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   margin: 0;
 }
 
 .document-meta > div {
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-panel);
-  padding: var(--sp-2);
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  padding: 8px 10px;
 }
 
 .document-meta dt {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-xs);
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
   font-weight: 700;
   text-transform: uppercase;
 }
 
 .document-meta dd {
-  color: var(--cv-ink);
+  color: var(--color-heading);
   font-weight: 600;
   margin: 0;
 }
@@ -103,79 +136,77 @@ border-left-width: 6px;
 .document-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sp-2);
-  padding-top: var(--sp-2);
+  gap: var(--space-2);
+  padding-top: var(--space-2);
 }
 
 .document-card-body {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-sm);
+  color: var(--color-muted-strong);
+  font-size: var(--font-size-sm);
 }
 
 .summary-card {
   display: grid;
-  gap: var(--sp-1);
+  gap: var(--space-1);
 }
 
 .summary-label {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-xs);
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
   font-weight: 700;
   text-transform: uppercase;
 }
 
 .summary-card strong {
-  font-size: var(--fs-xl);
+  font-size: var(--font-size-xl);
 }
 
 .summary-card p {
-  color: var(--cv-ink-muted);
+  color: var(--color-muted);
   margin-bottom: 0;
 }
 
 .module-placeholder-card {
   background:
     linear-gradient(145deg, rgba(11, 58, 102, 0.06), rgba(216, 162, 27, 0.04)),
-    var(--cv-surface-block);
-  border: var(--bd);
-  border-left: var(--bd);
-  border-left-color: var(--color-accent);
-  border-left-width: 6px;
-  border-radius: var(--r-card);
-  box-shadow: var(--sh-raised);
+    var(--color-card);
+  border: 1px solid var(--color-border);
+  border-left: 6px solid var(--color-accent);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
   display: grid;
-  gap: var(--sp-4);
-  padding: var(--sp-5);
+  gap: var(--space-4);
+  padding: var(--space-5);
 }
 
 .module-placeholder-card h2 {
-  color: var(--cv-ink);
-  font-size: var(--fs-xl);
-  margin-bottom: var(--sp-2);
+  color: var(--color-heading);
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--space-2);
 }
 
 .module-placeholder-card h3 {
-  color: var(--cv-ink);
-  font-size: var(--fs-sm);
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
   font-weight: 700;
-  margin-bottom: var(--sp-2);
+  margin-bottom: var(--space-2);
   text-transform: uppercase;
 }
 
 .module-placeholder-card__description {
-  color: var(--cv-ink-muted);
+  color: var(--color-muted-strong);
   margin-bottom: 0;
   max-width: 72ch;
 }
 
 .module-placeholder-card__deps ul {
-  color: var(--cv-ink-muted);
+  color: var(--color-description);
   margin: 0;
-  padding-left: var(--sp-4);
+  padding-left: var(--space-4);
 }
 
 .module-placeholder-card__deps li + li {
-  margin-top: var(--sp-1);
+  margin-top: var(--space-1);
 }
 
 .module-placeholder-card__actions {
@@ -183,30 +214,52 @@ border-left-width: 6px;
   display: flex;
   justify-content: flex-start;
 }
+
+/* --------------------------------------------------------------------------
+   3. Page card
+   -------------------------------------------------------------------------- */
+.page-card {
+  box-sizing: border-box;
+  margin-inline: 0;
+  max-width: var(--page-max-width);
+  padding: var(--space-6);
+  width: 100%;
+}
+
+.page-card h2 {
+  font-size: calc(var(--font-size-lg) + 2px);
+  line-height: 1.25;
+  margin-bottom: var(--space-2);
+}
+
+.page-card p {
+  color: var(--color-muted);
+  margin-bottom: 0;
+}
 /* --------------------------------------------------------------------------
    5. app-panel — alias semantico de .form-section
    -------------------------------------------------------------------------- */
 .app-panel {
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-radius: var(--r-panel);
-  box-shadow: var(--sh-raised);
-  padding: var(--sp-5);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+  padding: var(--space-5);
 }
 
 .app-panel__header {
-  border-bottom: var(--bd);
-  margin-bottom: var(--sp-4);
-  padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--color-border-soft);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
 }
 
 .app-panel__title {
-  font-size: var(--fs-lg);
-  margin-bottom: var(--sp-1);
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--space-1);
 }
 
 .app-panel__description {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-sm);
+  color: var(--color-help);
+  font-size: var(--font-size-sm);
   margin-bottom: 0;
 }

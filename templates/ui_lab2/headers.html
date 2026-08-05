@@ -14,11 +14,11 @@
     <div class="ui-lab2-col">
 
       {% include "ui_lab2/partials/_component_open.html" with name="page_header_back_action" source="components/ui/headers/page_header.html" note="Cabecalho dos cadastros/wizards: band + rail com acao 'voltar a lista' ou acao primaria." %}
-        {% include "components/ui/headers/page_header.html" with eyebrow="OFICIOS" title="Novo oficio" description="Cadastro do documento em etapas." icon_label="OF" module_label="Oficios" status_label="Rascunho" status_variant="draft" back_label="Voltar a lista" back_url=request.path only %}
+        {% include "components/ui/headers/page_header.html" with eyebrow="OFICIOS" title="Novo oficio" description="Cadastro do documento em etapas." icon_label="OF" module_label="Oficios" status_label="Rascunho" status_variant="draft" back_label="Voltar a lista" back_url="#" only %}
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.page_header_back_action %}
 
       {% include "ui_lab2/partials/_component_open.html" with name="page_header_back_action · acao primaria" source="primary_action_label" note="Mesma estrutura, com botao primario (salvar) no lugar do voltar." %}
-        {% include "components/ui/headers/page_header.html" with eyebrow="EVENTOS" title="Editar evento" description="Atualize os dados do agrupador." icon_label="EV" module_label="Eventos" status_label="Em preparacao" status_variant="pending" primary_action_label="Salvar evento" primary_action_url=request.path only %}
+        {% include "components/ui/headers/page_header.html" with eyebrow="EVENTOS" title="Editar evento" description="Atualize os dados do agrupador." icon_label="EV" module_label="Eventos" status_label="Em preparacao" status_variant="pending" primary_action_label="Salvar evento" primary_action_url="#" only %}
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.page_header_back_action %}
 
       {% include "ui_lab2/partials/_component_open.html" with name="page_header_simple" source="components/ui/headers/page_header.html" note="Cabecalho dos cadastros base (sem acoes no rail)." %}

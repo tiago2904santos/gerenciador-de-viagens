@@ -14,7 +14,7 @@
     .cv-search-picker__input,
     .cv-date-picker__control
   ),
-
+:is(html[data-theme="dark"])
   .cadastros-form-page[data-configuracoes-shell]
   :is(
     .form-control,
@@ -25,11 +25,11 @@
     .cv-search-picker__input,
     .cv-date-picker__control
   ) {
-  border: 0;
-  box-shadow: none;
+  border: 0 !important;
+  box-shadow: none !important;
 }
 
-
+:is(html[data-theme="dark"])
   .cadastros-form-page[data-configuracoes-shell]
   :is(
     .form-control,
@@ -39,22 +39,22 @@
     .cv-search-picker__control,
     .cv-date-picker__control
   ) {
-  background: var(--cv-surface-next);
+  background: var(--step1-field, var(--color-input-bg)) !important;
 }
 
-
+:is(html[data-theme="dark"])
   .cadastros-form-page[data-configuracoes-shell]
   .cv-date-picker__control {
-  border-radius: var(--r-control);
+  border-radius: var(--radius-control, 10px) !important;
   overflow: hidden;
 }
 
-
+:is(html[data-theme="dark"])
   .cadastros-form-page[data-configuracoes-shell]
   .cv-date-picker__control
   :is(.cv-field__control, input) {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }

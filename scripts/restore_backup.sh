@@ -13,8 +13,17 @@ fi
   exit 2
 }
 
-# shellcheck source=scripts/lib/pg_env.sh
-source "$(dirname -- "${BASH_SOURCE[0]}")/lib/pg_env.sh"
+# Mesma ponte DB_* -> PG* do backup_production.sh, e pelo mesmo motivo: quem
+# restaura na VPS tem o .env da aplicação, e `pg_restore` só lê as PG*. Inline
+# nos dois porque cada script tem de rodar sozinho a partir do checkout.
+export PGHOST="${PGHOST:-${DB_HOST:-127.0.0.1}}"
+export PGPORT="${PGPORT:-${DB_PORT:-5432}}"
+if [[ -z "${PGUSER:-}" && -n "${DB_USER:-}" ]]; then
+  export PGUSER="${DB_USER}"
+fi
+if [[ -z "${PGPASSWORD:-}" && -n "${DB_PASSWORD:-}" ]]; then
+  export PGPASSWORD="${DB_PASSWORD}"
+fi
 
 ENCRYPTED="$(readlink -f "$1")"
 MEDIA_ROOT="${MEDIA_ROOT:-/var/www/gerenciador-viagens/media}"

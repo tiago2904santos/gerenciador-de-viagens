@@ -1,12 +1,13 @@
 .document-generation-embedded {
+  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  --step1-panel: var(--color-surface-soft);
   display: grid;
   min-height: 100vh;
   margin: 0;
-  padding-block: clamp(var(--sp-6), 6vw, var(--sp-8));
-  padding-inline: clamp(var(--sp-6), 6vw, var(--sp-8));
+  padding: clamp(1.5rem, 6vw, 4rem);
   place-items: center;
-  background: var(--cv-surface-block);
-  color: var(--cv-ink);
+  background: var(--step1-panel) !important;
+  color: var(--color-text);
 }
 
 .document-generation-embedded__panel {
@@ -14,11 +15,10 @@
   width: min(100%, 31rem);
   flex-direction: column;
   align-items: center;
-  padding-block: clamp(var(--sp-6), 5vw, var(--sp-8));
-  padding-inline: clamp(var(--sp-6), 5vw, var(--sp-8));
+  padding: clamp(1.75rem, 5vw, 3rem);
   border: 0;
-  border-radius: var(--r-card);
-  background: var(--cv-surface-card);
+  border-radius: var(--radius-card);
+  background: var(--step1-surface) !important;
   text-align: center;
 }
 
@@ -26,12 +26,12 @@
   display: grid;
   width: 3.5rem;
   height: 3.5rem;
-  margin-bottom: var(--sp-4);
+  margin-bottom: var(--space-4);
   place-items: center;
   border: 0;
-  border-radius: var(--r-panel);
-  background: var(--cv-surface-block);
-  color: var(--color-primary);
+  border-radius: var(--radius-control);
+  background: var(--step1-panel);
+  color: var(--color-accent);
 }
 
 .document-generation-embedded__icon svg {
@@ -42,18 +42,17 @@
 .document-generation-embedded__spinner {
   width: 1.25rem;
   height: 1.25rem;
-  margin-bottom: var(--sp-3);
-  border-radius: var(--r-pill);
-  background: conic-gradient(transparent 20%, var(--color-primary));
+  margin-bottom: var(--space-3);
+  border-radius: 50%;
+  background: conic-gradient(transparent 20%, var(--color-accent));
   mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 0);
   animation: document-generation-spin 0.8s linear infinite;
 }
 
 .document-generation-embedded__eyebrow {
-  margin-block: 0 var(--sp-2);
-margin-inline: 0;
-  color: color-mix(in srgb, var(--color-accent) 72%, var(--cv-ink));
-  font-size: var(--fs-xs);
+  margin: 0 0 var(--space-2);
+  color: var(--color-accent);
+  font-size: var(--font-size-xs);
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -61,15 +60,14 @@ margin-inline: 0;
 
 .document-generation-embedded h1 {
   margin: 0;
-  color: var(--cv-ink);
+  color: var(--color-heading);
   font-size: clamp(1.25rem, 4vw, 1.65rem);
 }
 
 .document-generation-embedded__message {
   max-width: 27rem;
-  margin-block: var(--sp-3) 0;
-  margin-inline: 0;
-  color: var(--cv-ink-muted);
+  margin: var(--space-3) 0 0;
+  color: var(--color-muted);
   line-height: 1.55;
 }
 

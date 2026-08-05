@@ -15,13 +15,10 @@ class GlobalActionSystemTests(SimpleTestCase):
             / "action-system.css"
         )
         self.css = self.css_path.read_text(encoding="utf-8")
-        self.tokens = (
-            Path(settings.BASE_DIR) / "static" / "css" / "01-tokens.css"
-        ).read_text(encoding="utf-8")
 
     def test_global_layer_covers_new_and_legacy_buttons_in_both_themes(self):
-        self.assertIn(":root {", self.tokens)
-        self.assertIn('html[data-theme="dark"] {', self.tokens)
+        self.assertIn(":root {", self.css)
+        self.assertIn('html[data-theme="dark"] {', self.css)
         self.assertIn(".cv-btn,", self.css)
         self.assertIn(".btn,", self.css)
         self.assertIn(".app-btn {", self.css)
@@ -61,27 +58,9 @@ class GlobalActionSystemTests(SimpleTestCase):
         self.assertIn("download", item)
 
     def test_document_action_tones_are_distinct_and_motion_can_be_reduced(self):
-        """Os quatro tons de acao continuam distinguiveis a olho.
-
-        NOVO-30 fase 3a: a afirmacao e a mesma, a prova mudou de lugar. Antes
-        havia um token `--action-<tom>-bg` por tom na camada; agora cada tom
-        deriva do estado semantico no ponto de uso. Conferir que o NOME existe
-        nao provava nada sobre a tela — conferir que as quatro regras pintam
-        cores DIFERENTES prova.
-        """
-        import re as _re
-
-        tons = {}
         for tone in ("pdf", "docx", "preview", "edit"):
-            regra = _re.search(
-                rf"\.cv-action-menu__item-icon--{tone} \{{(.*?)\}}", self.css, _re.S
-            )
-            self.assertIsNotNone(regra, f"tom {tone} sem regra")
-            cor = _re.search(r"(?:^|;)\s*color:\s*([^;]+);", regra.group(1))
-            self.assertIsNotNone(cor, f"tom {tone} sem cor de tinta")
-            tons[tone] = cor.group(1).strip()
-
-        self.assertEqual(len(set(tons.values())), 4, f"tons colidiram: {tons}")
+            self.assertIn(f"--action-{tone}-bg:", self.css)
+            self.assertIn(f".cv-action-menu__item-icon--{tone} {{", self.css)
         self.assertIn("@media (prefers-reduced-motion: reduce)", self.css)
 
     def test_simple_list_document_menu_accepts_dictionary_without_pk(self):

@@ -1,22 +1,22 @@
 /* Canonical summary and document cards. Theme-specific appearance is separate. */
 
 .cv-summary-tile {
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-card);
-  box-shadow: var(--sh-raised);
+  background: var(--cv-card-bg);
+  border: var(--cv-card-border);
+  border-radius: var(--cv-card-radius);
+  box-shadow: var(--cv-card-shadow);
   display: grid;
-  gap: var(--sp-2);
+  gap: var(--space-2);
   min-width: 0;
-  padding: var(--sp-4);
+  padding: var(--space-4);
   transition:
-    background-color var(--tr-fast),
-    border-color var(--tr-fast),
-    box-shadow var(--tr-fast);
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .cv-summary-tile:hover {
-  box-shadow: var(--sh-raised);
+  box-shadow: var(--shadow-panel);
 }
 
 .cv-summary-tile__label,
@@ -26,16 +26,16 @@
 }
 
 .cv-summary-tile__label {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-semibold);
-  letter-spacing: 0.06em;
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-label);
   text-transform: uppercase;
 }
 
 .cv-summary-tile__value {
-  color: var(--cv-ink);
-  font-size: clamp(var(--fs-lg), 2vw, 1.55rem);
+  color: var(--color-heading);
+  font-size: clamp(var(--font-size-lg), 2vw, 1.55rem);
   line-height: 1.2;
   overflow-wrap: anywhere;
 }
@@ -59,38 +59,34 @@
   display: grid;
   gap: 7px;
   min-width: 0;
-  padding-block: var(--sp-3);
-  padding-inline: var(--sp-4);
+  padding: 14px 16px;
 }
 
 .cv-document-card {
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-panel);
-  box-shadow: var(--sh-raised);
+  background: var(--cv-card-bg);
+  border: var(--cv-card-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--cv-card-shadow);
   display: grid;
   gap: 0;
   padding: 0;
   position: relative;
-  transition: box-shadow var(--tr-fast);
+  transition: box-shadow var(--transition-fast);
 }
 
 .cv-document-card::before {
-  background: var(--color-primary);
-  border-start-start-radius: 0;
-  border-start-end-radius: 0;
-  border-end-end-radius: var(--r-panel);
-  border-end-start-radius: var(--r-panel);
+  background: var(--color-accent);
+  border-radius: 0 0 var(--space-1) var(--space-1);
   content: "";
   height: 3px;
-  left: var(--sp-5);
+  left: var(--space-5);
   position: absolute;
   top: 0;
   width: 42px;
 }
 
 .cv-document-card:hover {
-  box-shadow: var(--sh-raised);
+  box-shadow: var(--shadow-panel);
 }
 
 .cv-document-card__header,
@@ -98,14 +94,14 @@
 .cv-document-card__body,
 .cv-document-card__actions {
   margin: 0;
-  padding: var(--sp-4);
+  padding: 16px 18px;
 }
 
 .cv-document-card__header {
   align-items: start;
-  background: var(--cv-surface-block);
+  background: var(--color-surface-muted);
   display: flex;
-  gap: var(--sp-3);
+  gap: var(--space-3);
   justify-content: space-between;
 }
 
@@ -121,26 +117,26 @@
 }
 
 .cv-document-card__title {
-  color: var(--cv-ink);
+  color: var(--color-heading);
 }
 
 .cv-document-card__subtitle,
 .cv-document-card__body {
-  color: var(--cv-ink-muted);
+  color: var(--color-muted-strong);
 }
 
 .cv-document-card__meta {
-  background: var(--cv-surface-block);
-  border-block: var(--bd);
+  background: var(--color-surface-soft);
+  border-block: 1px solid var(--color-border-soft);
 }
 
 .cv-document-card__actions {
   align-items: center;
-  background: var(--cv-surface-block);
-  border-top: var(--bd);
+  background: var(--color-surface-muted);
+  border-top: 1px solid var(--color-border);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sp-2);
+  gap: var(--space-2);
 }
 
 /* Shared structural contract for rich entity cards across product modules. */
@@ -226,7 +222,7 @@
 .cv-module-card__header,
 .cv-module-card__body,
 .cv-module-card__footer {
-  padding: var(--sp-4);
+  padding: 16px 18px;
 }
 
 .cv-module-card__header {
@@ -237,14 +233,14 @@
 
 .cv-module-card__mark {
   align-items: center;
-  border-radius: var(--r-panel);
+  border-radius: var(--radius-sm);
   display: flex;
   flex: 0 0 auto;
-  font-size: var(--fs-2xs);
-  font-weight: var(--fw-bold);
-  height: var(--h-sm);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-black);
+  height: var(--control-height-sm);
   justify-content: center;
-  width: var(--h-sm);
+  width: var(--control-height-sm);
 }
 
 .cv-module-card__eyebrow,
@@ -280,8 +276,8 @@
   .cv-document-card__meta,
   .cv-document-card__body,
   .cv-document-card__actions {
-    padding-left: var(--sp-3);
-    padding-right: var(--sp-3);
+    padding-left: 14px;
+    padding-right: 14px;
   }
 
   .cv-signature-card__header,

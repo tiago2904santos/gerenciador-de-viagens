@@ -110,12 +110,10 @@ class GlobalDatePickerTests(SimpleTestCase):
             / "cv-date-picker.css"
         )
         css = css_path.read_text(encoding="utf-8")
-        # NOVO-30 fase 3a: o vao perdeu o token proprio (2px estava fora da
-        # escada de espaco) e virou o primeiro degrau. A afirmacao e a mesma:
-        # inteiro, e igual nos dois eixos.
+        self.assertIn("--cv-date-picker-day-gap: 2px;", css)
         self.assertNotIn("scale(1.03)", css)
-        self.assertIn("column-gap: var(--sp-1);", css)
-        self.assertIn("row-gap: var(--sp-1);", css)
+        self.assertIn("column-gap: var(--cv-date-picker-day-gap);", css)
+        self.assertIn("row-gap: var(--cv-date-picker-day-gap);", css)
 
     def test_calendar_markup_exists_only_in_the_global_partial(self):
         templates_root = Path(settings.BASE_DIR) / "templates"

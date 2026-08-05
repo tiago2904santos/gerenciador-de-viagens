@@ -12,55 +12,18 @@
   gap: 10px;
 }
 
-/* ------------------------------------------------------------------------
-   Rodizio de superficies (NOVO-28)
-
-   O bloco assume a cor 3 e devolve a cor 2 aos filhos; o card de secao faz o
-   inverso (regra em page-shell.css, junto do resto do .cv-form-section-card).
-   Bloco dentro de bloco reinverte o par, senao dois niveis aninhados ficariam
-   com a mesma cor e a hierarquia sumiria — que e justamente o que as bordas
-   faziam antes de serem retiradas.
-
-   Definicoes de paleta: static/css/00-palette.css
-
-   NOVO-30 fase 3a: as tres declaracoes do par corrente/seguinte voltaram para
-   ca. Estavam em 01-tokens.css desde a fase 2 — e a camada de token nao pode
-   ancorar rodizio, porque o par depende de ONDE o elemento esta, nao do tema.
-   ------------------------------------------------------------------------ */
-.cv-form-section-card {
-  --cv-surface: var(--cv-surface-card);
-  --cv-surface-next: var(--cv-surface-block);
-}
-
-.cv-form-block {
-  --cv-surface: var(--cv-surface-block);
-  --cv-surface-next: var(--cv-surface-card);
-}
-
-.cv-form-block .cv-form-block {
-  --cv-surface: var(--cv-surface-card);
-  --cv-surface-next: var(--cv-surface-block);
-}
-
 .cv-form-block {
   align-items: start;
-  background: var(--cv-surface-block);
   display: grid;
-  gap: var(--sp-4);
+  gap: var(--space-4);
   grid-template-columns: minmax(0, 1fr);
   min-width: 0;
-
-}
-
-.cv-form-block .cv-form-block {
-  background: var(--cv-surface-card);
-
 }
 
 .cv-form-block__header {
   align-items: baseline;
   display: flex;
-  gap: var(--sp-3);
+  gap: var(--space-3);
   justify-content: space-between;
   min-width: 0;
 }
@@ -75,7 +38,7 @@
   .cv-form-block__header .cv-form-block__copy {
   align-items: baseline;
   display: flex;
-  gap: var(--sp-3);
+  gap: var(--space-3);
   justify-content: space-between;
   width: 100%;
 }
@@ -87,7 +50,7 @@
 
 .cv-form-block__body {
   display: grid;
-  gap: var(--sp-3);
+  gap: var(--space-3);
   min-width: 0;
 }
 
@@ -95,7 +58,7 @@
   align-items: center;
   display: flex;
   flex-shrink: 0;
-  gap: var(--sp-2);
+  gap: var(--space-2);
 }
 
 .cv-form-block--split {
@@ -116,7 +79,7 @@
 
 .cv-form-stack {
   display: grid;
-  gap: var(--sp-3);
+  gap: var(--space-3);
   min-width: 0;
 }
 
@@ -135,7 +98,7 @@
 .cv-travel-schedule__period-fields {
   align-items: start;
   display: grid;
-  gap: var(--sp-3) var(--sp-4);
+  gap: var(--space-3) var(--space-4);
   grid-template-columns: minmax(0, 1fr);
   min-width: 0;
 }
@@ -155,13 +118,13 @@
 
 .cv-form-subsection {
   display: grid;
-  gap: var(--sp-3);
+  gap: var(--space-3);
   min-width: 0;
 }
 
 .cv-form-subsection + .cv-form-subsection {
-  border-top: var(--bd);
-  padding-top: var(--sp-3);
+  border-top: 1px solid var(--color-border-soft);
+  padding-top: var(--space-3);
 }
 
 .cv-form-subsection--split {
@@ -185,7 +148,7 @@
 .cv-resource-picker__header {
   align-items: baseline;
   display: flex;
-  gap: var(--sp-3);
+  gap: var(--space-3);
   justify-content: space-between;
   min-width: 0;
 }
@@ -202,6 +165,24 @@
 .cv-resource-picker__title,
 .cv-resource-picker__description {
   margin: 0;
+}
+
+.cv-resource-picker {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.cv-resource-picker__actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.cv-resource-picker__list {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
 }
 
 .cv-composite-field__control {
@@ -281,33 +262,30 @@
 /* Segmented control canônico para opções mutuamente exclusivas. */
 .cv-segment-toggle {
   align-items: center;
-  background: color-mix(in srgb, var(--color-primary) 12%, var(--cv-surface-card));
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-primary) 35%, var(--cv-border));
-  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-strong));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+  border-radius: var(--radius-pill);
   display: inline-flex;
   flex-shrink: 0;
   gap: 2px;
-  padding: var(--sp-1);
+  padding: 3px;
 }
 
 .cv-segment-toggle__btn {
   align-items: center;
   background: transparent;
-  border: var(--bd);
-  border-color: transparent;
-  border-radius: var(--r-pill);
-  color: color-mix(in srgb, var(--color-primary) 60%, var(--cv-ink-muted));
+  border: 1px solid transparent;
+  border-radius: calc(var(--radius-pill) - 2px);
+  color: color-mix(in srgb, var(--color-accent) 60%, var(--color-muted-strong));
   cursor: pointer;
   display: inline-flex;
   font-family: var(--font-sans);
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-semibold);
-  gap: var(--sp-1);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  gap: var(--space-1);
   letter-spacing: 0.02em;
   line-height: 1;
-  padding-block: var(--sp-1);
-  padding-inline: var(--sp-3);
+  padding: 5px var(--space-3);
   transition:
     background 200ms cubic-bezier(0.4, 0, 0.2, 1),
     border-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
@@ -319,28 +297,36 @@
   will-change: transform, background;
 }
 
- .cv-segment-toggle__btn {
-  color: color-mix(in srgb, var(--color-primary) 60%, var(--cv-ink-muted));
+html[data-theme="light"] .cv-segment-toggle__btn {
+  color: color-mix(in srgb, var(--color-primary-bright) 60%, var(--color-muted-strong));
 }
 
 .cv-segment-toggle__btn:focus-visible {
-  outline: none;
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+html[data-theme="light"] .cv-segment-toggle__btn:focus-visible {
+  outline-color: var(--color-primary-bright);
 }
 
 .cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {
-  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
-  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  color: var(--color-accent);
 }
 
- .cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {
-  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
-  color: var(--color-primary);
+html[data-theme="light"] .cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {
+  background: color-mix(in srgb, var(--color-primary-bright) 10%, transparent);
+  color: var(--color-primary-bright);
 }
 
 .cv-segment-toggle__btn[aria-pressed="true"] {
-  background: linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink)));
-  border-color: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
-  box-shadow: var(--sh-raised);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+  border-color: var(--color-accent-hover);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.30),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
   color: #071a33;
   transform: scale(1.01);
 }
@@ -352,39 +338,38 @@
    automaticas, nao width:100%), e os segmentos sao links — link nao aceita
    aria-pressed, entao o ativo vem de aria-current="page". */
 .cv-segment-toggle--nav.cv-segment-toggle {
-  background: var(--cv-surface-block);
+  background: var(--step1-panel, var(--color-surface-soft));
   border-color: transparent;
-  border-radius: var(--r-panel);
+  border-radius: 10px;
   box-shadow: none;
   display: inline-grid;
   gap: 2px;
   grid-auto-columns: minmax(0, 1fr);
   grid-auto-flow: column;
-  padding: var(--sp-1);
+  padding: 3px;
 }
 
 .cv-segment-toggle--nav .cv-segment-toggle__btn {
-  border-radius: var(--r-control);
-  color: var(--cv-ink-muted);
+  border-radius: 7px;
+  color: var(--color-muted-strong);
   justify-content: center;
   min-height: 34px;
-  padding-block: var(--sp-2);
-  padding-inline: var(--sp-3);
+  padding: 7px var(--space-3);
   text-align: center;
   text-decoration: none;
   transition:
-    background-color var(--tr-fast),
-    color var(--tr-fast),
+    background-color var(--transition-fast),
+    color var(--transition-fast),
     box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1),
     transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
   will-change: transform, background;
 }
 
 .cv-segment-toggle--nav .cv-segment-toggle__btn[aria-current="page"] {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
   box-shadow: none;
-  color: var(--on-primary);
+  color: var(--color-on-accent);
   transform: scale(1.01);
 }
 
@@ -393,36 +378,39 @@
 }
 
 .cv-segment-toggle--nav .cv-segment-toggle__btn:hover:not([aria-current="page"]) {
-  background: color-mix(in srgb, white 5%, transparent);
-  color: var(--cv-ink);
+  background: color-mix(in srgb, #fff 5%, transparent);
+  color: var(--color-text);
 }
 
- .cv-segment-toggle--nav .cv-segment-toggle__btn:hover:not([aria-current="page"]) {
+html[data-theme="light"] .cv-segment-toggle--nav .cv-segment-toggle__btn:hover:not([aria-current="page"]) {
   background: color-mix(in srgb, #000 4%, transparent);
-  color: var(--cv-ink);
+  color: var(--color-text);
 }
 
 /* contador herda a cor do segmento, entao funciona nos dois estados */
 .cv-segment-toggle__count {
   background: color-mix(in srgb, currentColor 16%, transparent);
-  border-radius: var(--r-pill);
+  border-radius: var(--radius-pill);
   font-size: 0.9em;
-  font-weight: var(--fw-bold);
+  font-weight: var(--font-weight-bold);
   line-height: 1;
-  padding: var(--sp-1);
+  padding: 2px 6px;
 }
 
- .cv-segment-toggle__btn[aria-pressed="true"] {
-  background: var(--color-primary);
-  border-color: color-mix(in srgb, var(--color-primary) 70%, #000);
-  box-shadow: var(--sh-raised);
-  color: var(--on-primary);
+html[data-theme="light"] .cv-segment-toggle__btn[aria-pressed="true"] {
+  background: var(--color-primary-bright);
+  border-color: color-mix(in srgb, var(--color-primary-bright) 70%, #000);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.18),
+    0 0 0 1px color-mix(in srgb, var(--color-primary-bright) 45%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20);
+  color: #fff;
   transform: scale(1.01);
 }
 
- .cv-segment-toggle {
-  background: color-mix(in srgb, var(--color-primary) 10%, var(--cv-surface-card));
-  border-color: color-mix(in srgb, var(--color-primary) 35%, var(--cv-border));
+html[data-theme="light"] .cv-segment-toggle {
+  background: color-mix(in srgb, var(--color-primary-bright) 10%, var(--color-surface-strong));
+  border-color: color-mix(in srgb, var(--color-primary-bright) 35%, var(--color-border));
 }
 
 @keyframes cv-segment-pop {

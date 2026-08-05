@@ -731,397 +731,74 @@ A separação importa: só as quatro primeiras mudavam o comportamento do sistem
 > linha de novo. Custo constante, não escala com dados — por isso ficou fora deste
 > PR, mas é a explicação dos +7/+4 nos orçamentos de query.
 
-### Paleta de tres cores (04/08/2026) — `NOVO-28`
+### Revert da reescrita de CSS e o deploy travado (05/08/2026)
 
-Decisao de produto tomada num laboratorio de paleta interativo, com as cores medidas
-antes de escolhidas. O sistema passa a se pintar com **tres superficies que se revezam**
-mais um acento; botoes cheios e estados semanticos sao as unicas excecoes, e estao
-declaradas no gate.
+Duas coisas no mesmo PR, e é deliberado: uma não sobe sem a outra.
 
-| | claro | escuro |
-|---|---|---|
-| fundo do site | `#eceef1` | `#0d0f11` |
-| `cv-form-section-card` | `#ffffff` | `#191c1f` |
-| `cv-form-block` | `#eceef1` (= fundo) | `#23272b` |
-| acento | `#155b9a` | `#d8a21b` |
+**Revert dos PRs #153–#177.** Por decisão do usuário, a reescrita de CSS `NOVO-30`
+inteira e o que veio junto foram descartados. O revert é **de conteúdo, não de
+histórico**: a árvore voltou byte a byte para `ae37d635`, os 62 commits continuam no
+histórico do `main` e os PRs seguem mesclados — qualquer parte volta por cherry-pick.
+Nenhuma migração entrou naquele intervalo, então o banco não é afetado.
 
-A regra: **um componente nunca escolhe a propria cor** — recebe `--cv-surface-next` de
-quem o contem. Campo dentro de bloco fica com a cor do card; o mesmo campo dentro do card
-fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a 15% sobre
-`--cv-surface`, que e herdada — a cor de fundo nao se repete em declaracao nenhuma.
+Efeito colateral a saber: os IDs `NOVO-28` a `NOVO-55` foram gastos nos commits
+revertidos e este catálogo voltou a terminar no `NOVO-27`. **Não reaproveite `NOVO-28`
+em diante** — a numeração nova continua do `NOVO-56`, senão um cherry-pick futuro
+colide com o ID.
 
-- [x] **PR A** — camada de sementes (`static/css/00-palette.css`), rodizio nos dois
-  ancoras, reaponte de 22 tokens de superficie do shell, 48 do `--step1-*` e 35 fundos de
-  controle, fim das bordas de foco, login e assinatura publica. Catraca de literais
-  **660 -> 620**; `auth.css` deixou de ser excecao nos dois auditores (zero literal).
-- [x] **PR A2** (`NOVO-29`) — **o login virou o modelo padrao**, por decisao de produto.
-  Geometria: raio do card 16 -> **28px**, sombra `sm` -> **`strong`**, campo 12 -> **14px**
-  e 44 -> **48px** de altura. E o acento virou **pontual**: a faixa cheia do cabecalho
-  (`list-header__band`, que usava o gradiente `--app-hero-stage-bg`) passou a superficie
-  de card, com titulo em tinta normal e eyebrow no acento — exatamente onde o acento
-  aparece no login. Mais 7 superficies do rail de filtros e do quick-create entraram na
-  paleta. Avisos de frontend 387 -> **384**.
-- [ ] **PR B** — dissolver `components/theme-dark-components.css` (5.843 linhas, 665
-  regras com `:is(...)`/`[data-*]`). **E o que impede o tema escuro de obedecer a paleta:**
-  medido com `scripts/medir_paleta.py`, o claro ficou com o nucleo na paleta e o escuro
-  com 18 cores fora so no Dashboard.
-- [ ] **PR C** — as 318 regras de `hover`/`focus` que ainda mexem em borda.
-- [ ] **PR D** — os ~620 literais restantes fora dos arquivos de token.
-
-> **Duas licoes do PR A.** A primeira: `--cv-surface-next` **nao pode** ser intermediado por
-> um token declarado no `:root`. Propriedade customizada e substituida no elemento onde e
-> declarada, entao `--color-input-bg: var(--cv-surface-next)` no `:root` congelaria o valor
-> da raiz e o rodizio morreria em silencio — os 35 fundos de controle foram trocados no
-> **ponto de uso**. A segunda: a ordem de carga importa e nao aparece no tema claro. A
-> paleta precisa vir **depois** de `01-tokens.css`, porque os dois declaram no mesmo
-> seletor `html[data-theme="dark"]`; antes dele, o acento novo e ignorado so no escuro.
-
-### Reescrita completa do CSS — `NOVO-30`
-
-> **Refazer (04/08/2026):** as fases 1–4 mergeadas nos PRs #156–#159 foram revertidas
-> para refazer do zero, uma fase por PR, com a coordenação visual institucional
-> (card → bloco → campo; claro espelho do escuro).
-
-- [x] **Fase 1 — camada unica de tokens (refazer):** `tokens.css`, `theme.css` e
-  `03-theme-dark.css` consolidados em `01-tokens.css` (27 tokens canônicos +
-  aliases temporários remapeados para a paleta institucional). Declaracoes `--*`
-  fora de `00-palette.css` / `01-tokens.css`: **0**. Coordenacao visual: superfícies
-  e tinta dos aliases espelham card → bloco → campo das imagens de referencia.
-- [x] **Fase 2 — regra do espelho (refazer):** `data-theme` eliminado dos componentes; `theme-dark-components.css` dissolvido em `app-shell.css` (regras theme-agnostic + tokens). Gate estrutural: **1.098 -> 0**. Coordenacao visual institucional nos dois temas.
-
-- [x] **`NOVO-31` 🔴 a fase 1 mediu o lado errado — e por isso "27 tokens" eram 1.034.**
-  Medido em 04/08 ao abrir a fase 3: `01-tokens.css` tinha **1.034 nomes distintos
-  em 2.078 declaracoes**, 88 blocos de regra de componente, **duas copias literais**
-  do mesmo bloco (`.sidebar-theme` / `.app-theme-grid`) e linhas de **11.959
-  caracteres** — o mesmo artefato que o `AGENTS.md` §6 descreve como reprovado.
-  O gate da fase 1 contava token declarado **fora** da camada e dava zero; nunca
-  olhou para dentro. E o regex era ancorado em inicio de linha, entao um `:root`
-  minificado de 3.902 caracteres contava como **um** token. A fase 2 entao empurrou
-  para la os blocos `data-theme` que precisava tirar dos componentes, e o gate dela
-  (1.098 → 0) tambem passou. **Licao:** quando o alvo e um numero do artefato, o gate
-  tem de contar o artefato inteiro — nao a borda dele.
-
-- Pela dimensao medida (8.287 referencias `var()`, 761 aliases vivos, 3.622
-  declaracoes de geometria), a fase 3 foi **fatiada em tres PRs** antes de comecar
-  (`AGENTS.md` §6):
-  - [x] **Fase 3a — a camada de token de verdade.** 1.034 → **57** tokens (teto 60);
-    `01-tokens.css` de 1.639 → **125** linhas, um `:root` e um `html[data-theme]`,
-    zero regra de componente, zero linha acima de 200 caracteres. As 7.775
-    referencias repontadas para o vocabulario canonico, com decisao de **papel** por
-    familia — nao por proximidade de valor. Eixos que a fase 1 esqueceu (tipografia,
-    altura de controle, movimento, camada) entraram como token canonico; o resto
-    saiu por `color-mix()` no ponto de uso. **A sidebar entrou na paleta** (decisao
-    de produto, 04/08): superficie de card, tinta normal, icone e ativo no acento.
-    Catraca de frontend **335 → 212**; excecoes de arquivo **3 → 2**. Cores fora da
-    paleta medidas em 10 telas: **60 → 16** (as 16 restantes sao as derivacoes
-    declaradas do `NOVO-28` — hover e detalhe em `color-mix` do acento).
-    Suite **1.308 → 1.314** verdes (6 gates novos).
-    - **Tres defeitos que a suite verde nao pegaria**, achados na tela e no diff:
-      as tres ancoras do rodizio (`.cv-form-section-card`, `.cv-form-block`,
-      `.cv-form-block .cv-form-block`) moravam na camada de token e teriam sumido —
-      voltaram para `components/form-sections.css`, que e onde o proprio
-      `00-palette.css` diz que elas vivem; um token que guardava
-      `12px 16px 12px 32px` casou com a regex de sombra e virou
-      `padding: var(--sh-lg)` no cabecalho do card; e `--cv-chip-border-width: 1px`
-      arredondou para o primeiro degrau da escada de espaco, **engrossando a borda
-      do chip em quatro vezes**. Dai os gates novos de *familia* e de *escada*.
-    - **Um defeito de tela pura:** `.sidebar-account__name` era `#ffffff` literal.
-      Com a sidebar clara, o nome do usuario ficou branco no branco. Nenhum teste
-      pega isso; o print pegou.
-  - [x] **Fase 3b — geometria: raio, espaco e borda.** As quatro escadas fechadas:
-    raio **53 → 6** · padding **214 → 8** · margem **50 → 3** · borda **58 → 3**.
-    - **A regra que organizou a fatia:** a forma curta ficou reservada para valor da
-      escada; **assimetria foi para a forma logica** (`padding-block`/`padding-inline`,
-      `margin-block`, `border-color`/`border-style`/`border-width`,
-      `border-start-start-radius`). Sem isso nao fecha: so as 450 paddings
-      assimetricas ja estouram qualquer teto de string. E como o gate entregue mede
-      **as duas formas**, o valor nao tem para onde se esconder — o canario prova
-      (`padding-inline: 13px` e `border-radius: 7px` reprovam os dois testes).
-    - **Piso e teto da escada, de novo.** `1px`/`2px` de borda continuam literais
-      (traco, nao espaco) e `max-width: 960px` continua literal (layout). O que a
-      escada cobre e o meio.
-    - **`!important` sai antes de contar.** Ele e alvo declarado da fase 4; se
-      contasse, `border-radius: 0 !important` seria uma string a mais e a 3b teria de
-      resolver `!important` junto — o erro nº 2 da §8.
-    - **`NOVO-32` 🟡 borda que nunca foi pintada.** `.prestacao-file-picker` declarava
-      `border: var(--cv-border)` — forma curta so com cor, entao o estilo vale `none`
-      e o navegador nao pinta nada. Preservei o comportamento (`border: 0`) com o
-      motivo escrito no arquivo: restaurar a borda e decisao de produto, nao
-      arredondamento de geometria.
-    - Suite **1.314 → 1.316** verdes (dois gates novos). Catraca de frontend segue em
-      **212** e as excecoes em **2** — a 3b nao mexe em literal de cor.
-  - [x] **Fase 3c — sombra minima e fim do foco.** O alvo do prompt (≤ 4 sombras, anel
-    de foco migrando para `outline`) foi **substituido por duas decisoes de produto**
-    de 04/08:
-    - **Uma sombra so, minima.** `box-shadow` 129 → **2** valores (`var(--sh-sm)`,
-      `none`). O degrau encolheu de `0 2px 8px` a 10% para `0 1px 2px` a 8%;
-      `--sh-md` e `--sh-lg` sairam da camada. O que se destaca do fundo passa a se
-      destacar pela superficie da paleta e pela borda.
-    - **O sistema nao sinaliza foco.** Nem anel, nem halo, nem contorno: `outline`
-      ficou com **um** valor (`none`), as 109 sombras de foco sairam e `--focus-ring`
-      deixou de existir. Vocabulario 57 → **54** tokens.
-      **REGRESSAO CONSCIENTE:** e falha de WCAG 2.4.7 (Focus Visible) — quem navega
-      por teclado perde a unica pista de onde esta. Levantei antes de executar, a
-      decisao foi reafirmada, e esta registrada aqui e em `static/css/base.css` para
-      ninguem descobrir por acidente. Se voltar, volta pelo reset global, num lugar so.
-    - **A faixa de acento virou borda.** Os 21 `inset 4px 0 0 var(--color-accent)`
-      nunca foram sombra: eram uma faixa a esquerda desenhada com `inset`. Agora sao
-      `border-inline-start`, que e o que sempre foram.
-    - **`NOVO-33` 🟠 nove focos invalidos herdados da 3a** — a substituicao daquela
-      fase emitiu a *forma* do halo dentro de declaracoes que ja tinham forma
-      (`outline: 2px solid 2px solid var(--focus-ring)`,
-      `box-shadow: 0 0 0 2px 0 0 0 3px var(--focus-ring)`). O navegador descartava as
-      nove, entao esses focos nao pintavam nada desde a 3a. Sumiram junto com o foco;
-      quem achou foi a medicao de abertura da fatia seguinte, nao a suite.
-    - Suite **1.316 → 1.320** verdes (4 gates novos, os dois principais com canario).
-      Catraca de frontend **212 → 210**.
-- [x] **Fase 4 — fim das excecoes e do `!important`.** `!important` **474 → 18**;
-  excecoes de arquivo do auditor **3 → 0**; avisos **210 → 201**.
-  - **O numero saiu de medicao, nao de estimativa.** `scripts/medir_estilos.py`
-    (novo, versionado ao lado do `medir_paleta.py`) captura o `getComputedStyle` de
-    **1.488 elementos** — 5 telas × 2 temas × 24 propriedades. Removi os 474, refiz a
-    captura e comparei: os **456 cosmeticos mudaram ZERO propriedade computada**. Eles
-    venciam adversarios que a fase 2 (theme-dark-components) e a 3a (os 1.034 tokens
-    que se sobrescreviam) ja tinham dissolvido — ninguem tinha voltado para conferir.
-  - **Os 18 que ficaram sao estruturais** (`display`, `opacity`, `content`): escondem
-    ou mostram, e a medicao de 5 telas nao alcanca wizard, modal e editor. Apagar ali
-    seria risco que o instrumento nao ve. Cada um carrega, agora, o comentario de uma
-    linha dizendo **qual regra ele vence** — exigencia do prompt, travada por teste:
-    sem justificativa escrita o gate reprova.
-  - **A primeira remocao mostrou o que o `!important` escondia:** com os 474 fora, 118
-    elementos do date-picker *apareceram* — `[hidden] { display: none !important }` em
-    `base.css` e a unica coisa que faz o atributo `hidden` vencer o
-    `.cv-date-picker__panel { display: grid }`. E o caso exemplar de `!important`
-    legitimo, e so a captura de elementos (nao a de propriedades) mostrou.
-  - **As excecoes eram tres, nao duas** — a terceira (`cards.css`) nao aparecia na
-    contagem porque so conta excecao *disparada*. Todas mortas: `.roteiro-editor__*`
-    mudou de `forms.css` para `roteiros.css`, `.oficio-card` ja nao existia em
-    `cards.css`, e a camada de token deixou de ser dispensa para virar **parte da
-    definicao da regra** de literal de cor — carrega-la como excecao era o auditor nao
-    conhecer a propria arquitetura.
-  - **`NOVO-34` 🟠 botao de upload sem letra no modal de anexo.** Com o `!important`
-    fora, `test_papel_dos_tokens` acusou `#attach-signed-modal .cv-file-picker__upload`
-    pintando fundo E texto com `--color-accent`. O `!important` estava **vencendo o par
-    certo** declarado no componente: o defeito existia, escondido pela propria muleta.
-  - Suite **1.320 → 1.323** verdes (3 gates novos).
-
-  > **O que a fase 4 NAO baixa, e de quem e:** o prompt pedia `--max-warnings 0`. Dos
-  > 201 avisos restantes, **109 sao `hex_color_outside_tokens`** (PR D do `NOVO-28`),
-  > **92 sao `legacy_page_header`** e **10 `href_hash`** — os dois ultimos em template,
-  > territorio das Etapas 6 e 8. Zerar dentro da fase 4 seria fazer o trabalho de tres
-  > frentes no mesmo PR, que e o erro nº 2 da §8. A catraca desce no que esta fase
-  > legitimamente remove; o resto tem dono nomeado aqui.
-- [x] **`NOVO-39` 🟡 os 92 `legacy_page_header` eram defeito da regra, nao divida do
-  template.** 05/08/2026. A regra era `class="[^"]*\bpage-header\b`, e `\b` trata o
-  hifen como fronteira: ela casava `page-header-band`, `page-header-stack` e
-  `page-header-rail` — a familia do **componente canonico**, cujo proprio cabecalho se
-  declara "Cabecalho canonico de pagina". A classe crua `page-header`, alvo real da
-  regra, aparece **zero** vezes. E a mensagem mandava migrar para **`app-page-hero`,
-  que nao existe** no repositorio — nem em CSS, nem em template, nem em JS. Seguir o
-  aviso teria renomeado **106 usos do componente vigente** para um componente
-  inexistente.
-  Corrigida a **regra**, nao o template. A regra irma no CSS tinha o mesmo defeito, com
-  60 falsos positivos latentes (nao apareciam porque so roda em `GLOBAL_CSS`). A
-  excecao de arquivo do dashboard caiu junto: sobrevivia ao defeito, nao a um uso —
-  `TEMPLATE_EXCEPTIONS` fica vazio, como o `CSS_EXCEPTIONS` ficou na fase 4.
-  Catraca **184 → 92**. `core/tests/test_auditor_page_header.py` trava os dois lados: a
-  familia canonica nao pode ser acusada, **e** a classe crua tem de continuar sendo —
-  senao a correcao vira afrouxamento. Um terceiro teste exige que o caminho citado na
-  mensagem exista; aviso que aponta para lugar nenhum ensina a ignorar o auditor.
-  Canario rodado.
-- [x] **`NOVO-40` 🟡 a ancora vazia chegava por tres caminhos; a regra via um.**
-  05/08/2026. `href="#"` nao e link: e link que **pula a pagina para o topo**. O
-  `DESIGN_SYSTEM.md` ja proibia e o auditor tinha regra — que olhava so o literal
-  escrito no template. Os outros dois caminhos:
-  **(2) parametro de componente** — `secondary_url="#"`, `back_url="#"`,
-  `primary_action_url="#"`: **19** ocorrencias, contra 10 visiveis;
-  **(3) dado de contexto** — **43** valores `"#"` nas constantes de demonstracao de
-  `core/views.py` e `ui_lab2/views.py`, que nenhuma regra sobre arquivo de template
-  alcanca, porque o `#` nao esta no `.html`. Uma unica pagina de vitrine entregava
-  **180** ancoras vazias.
-  Os 72 usos passaram a apontar para a **propria vitrine**: demonstra a variante
-  ancora do componente sem pular a pagina. A regra do auditor passou a ver a forma
-  (2). A forma (3) so cai renderizando, entao o gate e
-  `core/tests/test_ancora_vazia.py`: **renderiza as 22 telas de vitrine mais o
-  dashboard e o perfil e conta `href="#"` no HTML entregue**. Canario rodado nos
-  dois. Catraca **92 → 82**.
-- [x] **Fase 5a — apagar a regra que ninguem alcanca. Feita em 05/08.**
-  O enunciado original ("62 → ≤25 arquivos, ≤13.000 linhas") nao bate com o
-  repositorio depois das fases 1–4, e continua nao batendo: **nao ha arquivo
-  orfao**. Os 63 estao vivos — 35 pelo `style.css`/bundle e 28 por
-  `{% block extra_css %}`. "62 → ≤25" nao sai de delecao, sai de **fundir**
-  arquivo, que e outra operacao e mexe na ordem da cascata. O que era delecao de
-  verdade foi feito:
-  - **5.404 linhas fora**, 783 cortes, **429 classes que nenhum template, JS ou
-    Python emite**. A lista completa em `docs/evidencias/`. Os maiores: `roteiros.css`
-    (1.420), `oficios.css` (992), `page-shell.css` (492).
-  - **Instrumento: `scripts/css_classes_mortas.py`**, agora versionado — na
-    passagem anterior a analise nao foi commitada e so o resultado sobreviveu,
-    entao ninguem podia repetir a medicao. O criterio esta no docstring dele.
-  - **Prova de que a tela nao mudou:** `medir_estilos.py --diff`, **8.070 elementos
-    em 60 telas** (30 paginas × 2 temas), **0 propriedade computada alterada**.
-    A lista de paginas foi ampliada de 5 para 30 exatamente porque as cinco
-    originais nao carregavam `roteiros.css` nem metade do que o corte pegou.
-  - **Para chegar a ≤13.000 linhas faltariam ~24.000 alem disso**, e essas so
-    saem consolidando regra duplicada entre os 63 arquivos: reescrita, nao
-    faxina. Fica como **fase 5b**, com alvo e medicao proprios.
-  - **`NOVO-35` ✅ o instrumento media transicao em voo.** Duas causas, nao uma. A
-    primeira (elemento capturado sob o ponteiro, em `:hover`) ja tinha sido
-    corrigida. A segunda so apareceu quando se rodou o instrumento **duas vezes
-    contra o mesmo CSS**: trocar de tema dispara `transition` de cor, e a leitura
-    saia `rgb(150,138,70)` numa execucao e `rgb(151,138,70)` na seguinte. Era esse
-    o ruido dos "6 propriedades num card do Dashboard" que travou a fase 5 em
-    04/08 — instrumento, nao defeito. Corrigido levando toda animacao ao fim antes
-    da captura; a partir dai duas execucoes iguais dao diferenca **0**, e so entao
-    o instrumento serve de gate.
-  - **`NOVO-36` ✅ gate novo: sintaxe de CSS** (`core/tests/test_css_sintaxe.py`).
-    A primeira aplicacao do corte partiu um `:is(` multilinha ao meio. O efeito
-    nao e local: o navegador descarta **todas as regras seguintes** — 716 de 1.878
-    no bundle, e os icones sumiram do sistema inteiro. E o que passou incolume:
-    a suite (1.323 verdes, nenhum teste le CSS), o balanco de chaves,
-    `collectstatic` e `build_shell_bundles --check`. So a medicao no navegador viu.
-    O gate agora recusa parentese aberto em seletor e item vazio em lista de
-    seletores, sem precisar de navegador — e foi conferido com canario.
-
-- [x] **Fase 5a — correcao: o corte apagou CSS em uso.** 05/08/2026.
-  - **`NOVO-37` 🔴 nome composto apagado: card de 3 e de 5+ servidores perdeu uma
-    coluna.** O template escreve `cv-person-list--n{{ card.servidores_count }}` em
-    **cinco** partials (oficios, termos, planos, ordens de servico, eventos). O nome
-    final **nunca existe inteiro** em lugar nenhum, entao uma varredura literal
-    conclui que `.cv-person-list--n3` nao tem consumidor. A fase 5a apagou `--n0`,
-    `--n3` e `--n5..--n9`; sobrou `--n1`, que aparece literal num template. Efeito:
-    card com 3 ou 5 a 9 servidores caiu de **tres colunas para as duas** da regra
-    base. Medido no navegador: **7 variantes erradas** antes, **0** depois.
-  - **Por que nenhuma das provas da 5a viu.** A suite nao le CSS. O gate de sintaxe
-    so olha sintaxe. E a medicao de estilo computado **depende do dado**: nao existe,
-    nos dados de desenvolvimento, card com 3 ou 5+ servidores nas 30 paginas — o
-    seletor nem chega a ser exercitado. Ampliar a lista de paginas nao resolveria;
-    o furo e de dado, nao de cobertura de rota.
-  - **A defesa entra em dois niveis.** `core/tests/test_css_nome_composto.py` declara
-    a familia e exige a regra de cada variante que existe — canario rodado, reprova
-    exatamente `--n3` e `--n5..--n9`. E `scripts/audit_css_morto.py`, cujo criterio
-    considera viva a classe cujo **bloco base** o codigo emite; e o que impede o
-    proximo corte de repetir o erro. Catraca em **314** (`--max-regras`), medida:
-    sao as regras que a varredura da 5a nao alcancava (`@media` aninhado).
-  - **O que NAO era regressao:** outras cinco classes emitidas tambem perderam toda
-    regra — `cv-fact-block--valor`, `cv-field-grid--2`, `cv-file-widget__action`,
-    `prestacao-file-widget__action`, `ui-lab-section--status`. Todas tinham corpo
-    **vazio** ou so comentario. Nao pintam nada; ficaram apagadas.
-  - **`NOVO-38` 🟠 `NameError` na tela de modelo de texto do RT.** Segue igual: era o
-    `NOVO-36` da sessao paralela, que ficou com o numero mas nao com a correcao.
-    `prestacoes_contas/model_views.py` usa `_CAMPO_LABELS` sem definir nem importar;
-    todo GET de "novo modelo" e de "editar" leva 500 e **nenhum teste tocava nessas
-    rotas**. Corrigido, com `prestacoes_contas/test_modelos_texto_crud.py`.
-  - **`NOVO-35` reaberto e fechado de novo.** A causa `:hover` tinha uma segunda
-    camada: `page.click` no login deixa o ponteiro em (1007, 593) e o Playwright nao
-    o devolve na navegacao — cai dentro do 4o card do Dashboard. `mouse.move(2, 2)`
-    nao resolve porque (2, 2) e a sidebar. Agora o ponteiro sai da tela e o
-    instrumento **aborta** se algo abaixo do `<body>` seguir em `:hover`. O `--diff`
-    tambem passou a acusar **elemento que sumiu**: area < 2px sai da captura, entao
-    um colapso de layout sumia em vez de virar diferenca.
-
-- [x] **Fase 5b — as 314 regras que a 5a nao alcancava.** 05/08/2026.
-  - **314 regras, 248 classes, 2.706 linhas** em 21 arquivos. Sao as que a varredura
-    da 5a nao via: ela era regex com lookbehind em `}` e pulava a primeira regra de
-    dentro de cada `@media`. O parser que conta chaves enxerga.
-    Fontes de CSS: **35.120 → 32.741 linhas**. Catraca de `audit_css_morto` **314 → 0**,
-    na CI e na suite.
-  - **A varredura de tela cresceu para 48 paginas / 96 telas / 20.284 elementos.**
-    Faltavam as 16 rotas de `/dev/ui-lab/*` — unico consumidor de `static/css/dev/*`,
-    que era o **segundo e o terceiro maiores blocos do corte**. E o `roteiro-novo`,
-    a pagina do maior bloco, estava **saindo da medicao por timeout** de
-    `networkidle` sem ninguem notar; agora cai para `load`. Resultado: **0
-    propriedades mudadas, 0 elementos sumiram**.
-  - **A checagem que pegou o `NOVO-37` foi refeita aqui, antes de commitar:** das 217
-    classes que perderam toda regra, **nenhuma e emitida** por template ou JS.
-  - Catraca de avisos **184 → 182**.
-
-- [x] **`NOVO-41` 🟡 literais de cor: 81 hex + 71 `rgba()` que a regra nem via.**
-  05/08/2026. Decisao de produto do usuario: **derivar dos tokens**, aceitando que a
-  cor pintada mude. O que se descobriu no caminho:
-  - **A regra so olhava `#hex`.** Havia **71 literais `rgba()`** invisiveis para ela —
-    quase tantos quanto os 81 contados. O menu de acoes tinha uma paleta inteira de
-    categoria (mensagem, oficial, documento, rota, pacote) escrita em `rgba()`.
-  - **Dois falsos positivos da propria regra:** hex dentro de comentario de BLOCO
-    (o auditor so pulava a linha que ABRE o comentario) e hex em comentario de fim de
-    linha documentando valor velho. Corrigido o rastreio de bloco no auditor.
-  - **Quase entrou um defeito de contraste meu:** trocar `color: #fff` por
-    `var(--on-accent)` poe tinta quase preta sobre gradiente vermelho no tema escuro
-    (`--on-accent` segue o acento, que la e dourado). Dai `--on-state`, que segue o
-    **estado**: branco no claro (5,4:1 no perigo) e escuro no escuro (6,6:1) — medido.
-  - **`NOVO-42` 🟠 contraste do botao WhatsApp.** Branco sobre `#25d366` da **1,98:1**,
-    reprova qualquer criterio. Preexistente. Trocado por tinta escura: **8,85:1**.
-  - **O teto de 60 tokens reprovou em 63 e nao foi levantado.** Tres dos que eu tinha
-    criado sairam derivados: "mensagem" e o proprio `--cv-state-success` (delta maximo
-    de 9/255), "documento" e o perigo abafado, e a tinta de marca virou `color-mix`.
-    Ficou em **52**.
-  - Efeito medido: **241 propriedades em 54 elementos**, todas de cor, so em tela de
-    vitrine — porque e la que os botoes de estado aparecem com os dados de
-    desenvolvimento. **Isso e limite do dado, nao prova de que producao nao mudou** —
-    a mesma armadilha do `NOVO-37`. Prints antes/depois em `docs/evidencias/novo30-cores/`.
-  - Catraca **129 → 0**. Medido na base com o #171 e o #172 dentro: `--max-warnings 0`
-    **passa**. E o alvo que o prompt do `NOVO-30` fixou na fase 4 e que ficou quatro
-    fases em aberto, com dono nomeado em cada uma — 109 literais de cor (`NOVO-41`),
-    92 `legacy_page_header` (`NOVO-39`, que era defeito da regra), 10 `href_hash`
-    (`NOVO-40`) e 1 `domain_selector_in_global` (seletor citado dentro de comentario
-    de bloco). Daqui em diante o auditor nao tem divida a tolerar: aviso novo reprova.
-
-- [x] **`NOVO-43` 🔴 os alvos "≤25 arquivos" e "≤13.000 linhas" NAO sao alcancaveis por
-  consolidacao — medido, nao estimado.** 05/08/2026.
-  - **Fundir arquivo quebra a cascata.** Tentei: 17 arquivos de pagina em 6, na ordem
-    exata que os templates carregam. Resultado medido: **13.118 propriedades mudadas**
-    em 96 telas. O motivo e estrutural — CSS de pagina e escopado POR PAGINA; fundido,
-    cada pagina passa a receber as regras da outra. `/cadastros/` herdou `usuarios.css`
-    e mexeu ate na sidebar. Revertido.
-  - **Nao ha 19.000 linhas de duplicata para tirar.** A duplicata EXATA no repositorio
-    inteiro e de **~700 linhas** (96 copias), e dessas so **110** saem com seguranca:
-    o resto e a mesma regra dentro e fora de um `@media`, que nao e a mesma regra. Com
-    a profundidade do at-rule na chave, a poda deu **0 propriedades mudadas**.
-  - **A conta nao fecha:** 4.221 regras para 32.678 linhas dao ~7,7 linhas por regra.
-    Chegar a 13.000 exigiria apagar ~60% das REGRAS — apagar estilo em uso, nao
-    consolidar. E o que nao tinha consumidor ja saiu na 5b, com a catraca em zero.
-  - **"≤25 arquivos" tambem briga com o `NOVO-12`,** que decidiu de proposito manter os
-    arquivos-fonte como unidade de edicao e resolver o waterfall com bundle. Os 23 do
-    shell ja chegam ao navegador como **um** arquivo. Fundir as fontes desfaria essa
-    decisao para melhorar um numero que o usuario nao sente.
-  - **Se o alvo tiver de valer**, o caminho e outro: escopar cada folha de pagina por
-    uma classe de pagina antes de fundir. E reconstrucao de cascata, com alvo e
-    medicao proprios — nao cabe nesta fase e nao e faxina.
-
-  > **Para quem pegar a fase 6 (consolidacao):** o alvo e regra **duplicada** entre
-  > arquivos, nao regra morta — essa acabou, e a catraca esta em zero. Sao 62
-  > arquivos e 32.741 linhas para os alvos de ≤25 e ≤13.000, e eles so saem
-  > **fundindo arquivo**, o que mexe na ordem da cascata. A medicao tem de ser a
-  > mesma: `medir_estilos.py --diff` com as 48 paginas, exigindo 0.
+- [x] `NOVO-56` 🔴 **backup pré-deploy nunca recebeu as credenciais do Postgres, e por
+  isso produção ficou 9 dias sem deploy.** O passo de backup entrou em `39f16be1`
+  (27/07). `scripts/backup_production.sh` chama `pg_dump` sem `--host`/`--username`,
+  e `pg_dump` lê `PGHOST`/`PGPORT`/`PGUSER`/`PGPASSWORD` — **nunca** `DB_*`. O
+  `deploy.yml` faz `source .env`, o que exporta só os `DB_*`, então na VPS o `pg_dump`
+  caía no socket Unix usando o usuário do SSH como role: `role "***" does not exist`.
+  Com `set -Eeuo pipefail`, isso derruba o deploy **antes** do `git checkout` — e como
+  o `trap ... ERR` só é armado depois do backup, a reversão automática nunca rodou.
+  Todo deploy desde 27/07 falhou assim; o último bem-sucedido é `e97a41c3`, de 27/07.
+  O CI nunca pegou porque `tests.yml` exporta os `PG*` na mão para falar com o service
+  container (é o próprio comentário lá que diz que `pg_dump` não lê `DB_*`).
+  Corrigido nos dois lados: `deploy.yml` exporta os `PG*` a partir dos `DB_*` do
+  `.env` (e agora exige `DB_USER`/`DB_PASSWORD` na pré-checagem), e o script passou a
+  derivar `PG*` de `DB_*` quando o chamador não os define — este segundo lado é o que
+  conserta o backup diário por cron de `OPERACAO_SEGURANCA_PRIVACIDADE.md`, que falhava
+  em silêncio pelo mesmo motivo. O `deploy.yml` precisava do conserto próprio porque o
+  backup roda a partir do checkout **antigo** da VPS, e o script corrigido só chega lá
+  depois de um deploy dar certo.
 
 ---
 
 ## 7.1 Escopo novo, fora das oito etapas
 
-### Deploy de produção (05/08/2026) — `NOVO-55`
+### Deploy de produção, o que sobrou depois do `NOVO-56` (05/08/2026)
 
-- [x] **`NOVO-55` 🔴 o deploy automático nunca implantou nada.** 26 execuções desde
-  04/08, 26 falhas, sempre no mesmo ponto: `pg_dump: FATAL: role "..." does not exist`
-  no backup pré-checkout. `pg_dump`/`pg_restore` leem `PGHOST/PGPORT/PGUSER/PGPASSWORD`
-  e o `.env` da VPS só tem `DB_*`, então o cliente ia ao socket Unix local com o
-  usuário do SSH como role. A tradução passou para `scripts/lib/pg_env.sh`, onde vale
-  para todo chamador — inclusive o agendamento diário que `OPERACAO_SEGURANCA_PRIVACIDADE.md`
-  recomenda, que estava quebrado pelo mesmo motivo e sem ninguém olhando.
+- [x] **`NOVO-57` 🔴 o health check reprovaria justamente o deploy que o `NOVO-56`
+  destravou.** Com o backup consertado, o deploy chega até o fim e morre na última
+  linha: `curl --fail http://127.0.0.1:8000/health/`. Medido contra
+  `config.settings.prod`, não lido no código:
 
-  **O gate existia e não viu.** O drill de restore do CI definia as `PG*` no próprio
-  passo, então exercitava um caminho que produção não usa. Ele agora roda sem `PG*`,
-  com as `DB_*` do job — a mesma entrada da VPS. Antes desta correção, esse passo
-  falha; é a prova do defeito.
+  | requisição | resposta | efeito |
+  |---|---|---|
+  | `Host: 127.0.0.1`, sem `X-Forwarded-Proto` (o que havia) | **400** `DisallowedHost` | `curl --fail` → `reverter` de um deploy são |
+  | `Host` de `ALLOWED_HOSTS`, sem `X-Forwarded-Proto` | **301** do `SECURE_SSL_REDIRECT` | passa sem tocar o banco — verde falso |
+  | `Host` correto + `X-Forwarded-Proto: https` | **200** `{"status": "ok"}` | verifica app + PostgreSQL |
 
-  Atrás do primeiro erro havia dois que só apareceriam com ele resolvido, um deles
-  capaz de reverter um deploy correto:
-  - health check em `http://127.0.0.1:8000/health/`, onde **nada escuta** — gunicorn
-    serve por socket unix (`config/settings/prod.py:88`) — e ainda sem `Host` de
-    `ALLOWED_HOSTS` (400) e sem `X-Forwarded-Proto` (301 do `SECURE_SSL_REDIRECT`);
-  - `DJANGO_SETTINGS_MODULE` dependendo de o `.env` trazê-lo: ausente, `migrate` roda
-    com settings de desenvolvimento.
+  E a porta é a errada de qualquer jeito: gunicorn serve por socket unix
+  (`config/settings/prod.py:88`), onde `127.0.0.1:8000` não escuta. O check novo usa o
+  socket quando ele existe e cai para TCP quando não — `DEPLOY_VPS.md` ainda documenta
+  `--bind 127.0.0.1:8000` e não dá para saber daqui qual dos dois está no ar.
 
-  Fica também um `workflow_dispatch` no deploy, para reimplantar sem commit vazio.
+  Junto, três coisas da mesma família:
+  - **`restore_backup.sh` ficou de fora do `NOVO-56`.** `pg_restore` lê as mesmas `PG*`
+    e falharia igual na hora em que mais importa. A ponte agora está nos dois scripts.
+  - **O gate que não viu.** O drill de restore do CI definia as `PG*` no próprio passo,
+    exercitando um caminho que produção não usa. Ele agora entra pelas `DB_*` do job —
+    a mesma entrada da VPS — e cobre os dois scripts. Sem a ponte, esse passo falha.
+  - **`DJANGO_SETTINGS_MODULE` dependia de o `.env` trazê-lo:** ausente, `migrate` roda
+    com settings de desenvolvimento. Explícito no workflow, como em `deploy_update.sh`.
+
+  Fica também um `workflow_dispatch` no deploy (reimplantar sem commit vazio) e um modo
+  `infra` no workflow de diagnóstico, somente leitura, que responde o que não deu para
+  verificar daqui: socket ou TCP, roles do Postgres, commit no ar.
 
 ### Rascunhos antigos triados em 29/07
 
@@ -1146,49 +823,6 @@ perde o prazo e a Etapa 2 perde a rede.
 | Ação flutuante secundária empilhada | — | ✅ NOVO-23 — modificador `--stacked` era vencido pela base de `cv-buttons.css` |
 | Usuários/Áreas em duas listas (`list_page_standard`) | 1 PR | ✅ NOVO-24 — camadas `selectors`/`presenters`/`services` no app `usuarios`; ORM em view 39 → 36 |
 | [Arquitetura de configurações](PROPOSTA_CONFIGURACOES.md) — tela por seções declaradas, config por documento, preferências por usuário | 17–28 dias | **aguardando decisão** de posição na fila |
-| [Etapa 9 — HTML e biblioteca de componentes globais](PLANO_HTML_COMPONENTES_GLOBAIS.md) — taxonomia única, um componente por função, casco de página único | 12 PRs | 📋 plano escrito 05/08; Fase 0 a começar |
-
-### Etapa 9 — Reescrita do HTML e da biblioteca de componentes (05/08/2026)
-
-A Etapa 6 fechou os defeitos de HTML que a auditoria catalogou (`H-02`..`H-10`, `D-41`). Ela
-não unificou a biblioteca, e não prometia isso. O que sobrou é propriedade do conjunto, não
-defeito de tela: **`templates/components/` abriga hoje duas taxonomias paralelas**
-(`components/<família>/` e `components/ui/<família>/`, com 8 famílias existindo nas duas), e a
-página escolhe entre elas por acidente histórico.
-
-Medido no `main` de 05/08 (`1336` testes verdes, auditor em `184` avisos): 96 componentes, 5
-órfãos, 9 vivos só por UI Lab/teste, 10 aliases de uma linha, 4 sistemas de confirmação de
-exclusão, 7 componentes de botão, 10 grupos de partials byte-idênticos, 12 páginas
-`confirm_delete.html` quase iguais, 2 cascos de wizard divergindo em 5 linhas, 46 páginas
-montando `page-shell` à mão contra 18 no `flow_base`, e **390 de 1.262 includes sem `only`** —
-o gate declarado na tabela da §6 para a Etapa 6 nunca foi construído.
-
-Catálogo `NOVO-39` a `NOVO-54`, arquitetura alvo, as 12 fases, os gates novos e o dicionário de
-renomeação completo estão em [`PLANO_HTML_COMPONENTES_GLOBAIS.md`](PLANO_HTML_COMPONENTES_GLOBAIS.md).
-
-- [ ] `NOVO-39` 🟠 duas taxonomias paralelas de componentes (8 famílias duplicadas)
-- [ ] `NOVO-40` 🟠 5 componentes órfãos · 9 vivos só por UI Lab/teste (`main_list_card`, 167 linhas, é mantido vivo por uma asserção)
-- [ ] `NOVO-41` 🟠 10 aliases de uma linha — a padronização de 22/07 declarou tê-los eliminado
-- [ ] `NOVO-42` 🔴 4 sistemas de confirmação de exclusão, dois com nome quase igual e comportamento diferente
-- [ ] `NOVO-43` 🟠 7 componentes de botão para um `<button>`
-- [ ] `NOVO-44` 🟠 3 sistemas de alerta
-- [ ] `NOVO-45` 🟠 2 sistemas de card de formulário (102 e 112 linhas), que precisaram da **mesma** correção de vazamento duas vezes (`H-04`, `H-05`)
-- [ ] `NOVO-46` 🟠 2 sistemas de item de lista
-- [ ] `NOVO-47` 🟠 10 grupos de partials locais byte-idênticos (SHA-256)
-- [ ] `NOVO-48` 🟠 2 cascos de wizard divergindo em 5 linhas; nenhum usa o `flow_base` criado para isso
-- [ ] `NOVO-49` 🟠 não existe casco de página único (46 × 18)
-- [ ] `NOVO-50` 🟠 12 páginas `confirm_delete.html` idênticas exceto por 3 strings
-- [ ] `NOVO-51` 🟠 390 de 1.262 includes sem `only`; gate da Etapa 6 nunca construído
-- [ ] `NOVO-52` 🟡 nenhum componente declara contrato; zero templatetags, kwargs soltos
-- [ ] `NOVO-53` 🟡 `PADRAO_TEMPLATES.md` descreve estrutura de diretórios que não existe
-- [ ] `NOVO-54` 🟡 nomenclatura mista (pt/en, prefixo `_` inconsistente, 3 convenções de sufixo)
-
-> **Correção de método registrada antes de virar erro.** A primeira contagem de órfãos deste
-> plano deu 21 — estava errada. Ela procurava só `{% include "caminho" %}`, e o projeto passa
-> caminho de template **como valor de parâmetro** (`band_tabs_template=`, `body_template=`).
-> Contando as referências por string, os órfãos reais são 5. Não é detalhe de contagem: neste
-> repositório o grafo entre templates **não é sintático**, e ferramenta que só olhe `include`
-> apaga arquivo vivo. O `grep` de prova da regra 6 do `AGENTS.md` tem de ser pelo caminho.
 
 ---
 
