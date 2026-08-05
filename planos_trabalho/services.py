@@ -299,59 +299,74 @@ def _cargo_rotulo(nome: str, *, plural: bool) -> str:
     return format_document_display(" ".join(partes))
 
 
-def montar_efetivo_texto(plano: PlanoTrabalho) -> str:
-    """Texto do efetivo por cargo: '6 Policiais Civis' / '4 Investigadores, 2 Papiloscopistas'.
-
-    No modo multi-evento, soma o efetivo de todos os eventos (por cargo).
-    """
-    partes: list[str] = []
-    if plano.is_multi_evento and plano.pk:
-        agregados: dict[int, tuple[str, int]] = {}
-        for evento in plano.eventos.all():
-            for item in evento.efetivos.select_related("cargo"):
-                if not item.quantidade or not item.cargo_id:
-                    continue
-                cargo_nome = (item.cargo.nome or "").strip()
-                if not cargo_nome:
-                    continue
-                anterior_nome, anterior_qtd = agregados.get(item.cargo_id, (cargo_nome, 0))
-                agregados[item.cargo_id] = (anterior_nome, anterior_qtd + int(item.quantidade))
-        for _cargo_id, (cargo_nome, quantidade) in sorted(
-            agregados.items(), key=lambda kv: kv[1][0]
-        ):
-            rotulo = _cargo_rotulo(cargo_nome, plural=quantidade > 1)
-            partes.append(f"{quantidade} {rotulo}")
-        return ", ".join(partes)
-
-    for item in plano.efetivos.select_related("cargo").order_by("cargo__nome"):
-        if not item.quantidade:
-            continue
-        cargo_nome = (item.cargo.nome or "").strip() if item.cargo_id else ""
-        if not cargo_nome:
-            continue
-        rotulo = _cargo_rotulo(cargo_nome, plural=item.quantidade > 1)
-        partes.append(f"{int(item.quantidade)} {rotulo}")
-    return ", ".join(partes)
+def _efetivo_unidade_rotulo(unidade) -> str:
+    """Sigla da unidade (ou o nome, se não houver sigla) para o sufixo entre parênteses."""
+    if unidade is None:
+        return ""
+    sigla = (getattr(unidade, "sigla", "") or "").strip()
+    return sigla or (getattr(unidade, "nome", "") or "").strip()
 
 
-def montar_efetivo_evento_texto(evento: EventoPlano) -> str:
-    """Texto do efetivo de um evento específico (uso multi-evento)."""
-    partes: list[str] = []
-    for item in evento.efetivos.select_related("cargo", "unidade").order_by("cargo__nome"):
+def _efetivo_linha(cargo_nome: str, unidade_nome: str, quantidade: int) -> str:
+    """'2 Agentes de Polícia Judiciária (ASCOM)' — unidade só aparece quando informada."""
+    rotulo = _cargo_rotulo(cargo_nome, plural=quantidade > 1)
+    sufixo = f" ({unidade_nome})" if unidade_nome else ""
+    return f"{quantidade} {rotulo}{sufixo}"
+
+
+def _montar_efetivo_linhas(itens) -> str:
+    """Uma linha por cargo/unidade, na ordem unidade → cargo."""
+    linhas: list[str] = []
+    for item in itens:
         if not item.quantidade or not item.cargo_id:
             continue
         cargo_nome = (item.cargo.nome or "").strip()
         if not cargo_nome:
             continue
-        rotulo = _cargo_rotulo(cargo_nome, plural=item.quantidade > 1)
-        unidade = ""
-        if item.unidade_id and item.unidade:
-            sigla = (item.unidade.sigla or "").strip() if hasattr(item.unidade, "sigla") else ""
-            nome_unid = sigla or (item.unidade.nome or "").strip()
-            if nome_unid:
-                unidade = f" da {nome_unid}"
-        partes.append(f"{int(item.quantidade)} {rotulo}{unidade}")
-    return ", ".join(partes)
+        unidade = item.unidade if item.unidade_id else None
+        linhas.append(_efetivo_linha(cargo_nome, _efetivo_unidade_rotulo(unidade), int(item.quantidade)))
+    return "\n".join(linhas)
+
+
+def montar_efetivo_texto(plano: PlanoTrabalho) -> str:
+    """Texto do efetivo, uma linha por cargo/unidade:
+
+        2 Agentes de Polícia Judiciária (ASCOM)
+        8 Papiloscopistas (IIPR)
+
+    No modo multi-evento, soma o efetivo de todos os eventos (por cargo + unidade).
+    """
+    if plano.is_multi_evento and plano.pk:
+        agregados: dict[tuple[int, int | None], tuple[str, str, int]] = {}
+        for evento in plano.eventos.all():
+            for item in evento.efetivos.select_related("cargo", "unidade"):
+                if not item.quantidade or not item.cargo_id:
+                    continue
+                cargo_nome = (item.cargo.nome or "").strip()
+                if not cargo_nome:
+                    continue
+                unidade_nome = _efetivo_unidade_rotulo(item.unidade if item.unidade_id else None)
+                chave = (item.cargo_id, item.unidade_id)
+                _c, _u, anterior_qtd = agregados.get(chave, (cargo_nome, unidade_nome, 0))
+                agregados[chave] = (cargo_nome, unidade_nome, anterior_qtd + int(item.quantidade))
+        linhas = [
+            _efetivo_linha(cargo_nome, unidade_nome, quantidade)
+            for cargo_nome, unidade_nome, quantidade in sorted(
+                agregados.values(), key=lambda v: (v[1], v[0])
+            )
+        ]
+        return "\n".join(linhas)
+
+    return _montar_efetivo_linhas(
+        plano.efetivos.select_related("cargo", "unidade").order_by("unidade__nome", "cargo__nome")
+    )
+
+
+def montar_efetivo_evento_texto(evento: EventoPlano) -> str:
+    """Texto do efetivo de um evento específico (uso multi-evento)."""
+    return _montar_efetivo_linhas(
+        evento.efetivos.select_related("cargo", "unidade").order_by("unidade__nome", "cargo__nome")
+    )
 
 
 # ── Diárias ──────────────────────────────────────────────────────────────────
@@ -1306,9 +1321,8 @@ def criar_plano_rascunho(evento=None) -> PlanoTrabalho:
             plano.horario_atendimento = (
                 f"{evento.horario_inicio:%H:%M} ate {evento.horario_fim:%H:%M}"
             )
-    motivo = (seed.get("motivo") or "").strip()
-    if motivo:
-        plano.contextualizacao = motivo
-        plano.contextualizacao_auto = False
+    # A contextualização NÃO herda o motivo do evento: o motivo é texto curto de
+    # agenda, não o parágrafo de abertura do plano. Fica no modo automático
+    # (destino + programa) até o usuário editar à mão.
     plano.save()
     return plano

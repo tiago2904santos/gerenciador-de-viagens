@@ -810,6 +810,57 @@ colide com o ID.
   nunca "retificação"/"complementação" — o rótulo do número virou campo separado.
 - [x] **#27** — substituído pelo #106 (recursão do editor de roteiro).
 
+### Wizard de Planos de Trabalho, etapas 1 e 2 (05/08/2026)
+
+Quatro defeitos achados de uma vez ao percorrer o wizard com um plano real
+(`04/2026/ASCOM`, dois efetivos, ASCOM + IIPR).
+
+- [x] **`NOVO-58` 🟠 a contextualização de um plano criado a partir de evento vinha
+  com o motivo do evento e travava o texto padrão.** `criar_plano_rascunho()` copiava
+  `seed["motivo"]` para `contextualizacao` **e** desligava `contextualizacao_auto`.
+  O motivo é texto curto de agenda, não o parágrafo de abertura do plano — e com o
+  flag em `False` o texto nunca mais se regenerava, nem ao trocar destino ou programa.
+  O bloco saiu; o plano vindo de evento agora nasce igual ao criado do zero.
+  Planos já gravados continuam com o motivo (o flag está `False` no banco); reverter
+  isso pediria uma migração de dados, deixada de fora de propósito.
+
+- [x] **`NOVO-59` 🔴 o cálculo de diárias nunca rodava e as datas de saída/chegada
+  sumiam ao avançar e voltar — o mesmo defeito.** `date_picker.html` em `mode="range"`
+  renderiza o `BoundField` como veio e procura o hidden por
+  `[data-cv-date-picker-start-value]` / `[data-cv-date-picker-end-value]`. Os widgets de
+  `PlanoDiariasForm` só traziam os `data-pt-diarias-*`, então `startHidden`/`endHidden`
+  ficavam `null` em `cv-date-picker.js:184`: o calendário escrevia apenas no input de
+  exibição. A tela mostrava `12/08/2026`, o POST mandava vazio — daí "Informe data e
+  hora de saída da sede" com os campos visivelmente preenchidos, e o campo em branco na
+  volta. A etapa 1 já tinha os atributos; só a 2 divergiu.
+
+- [x] **`NOVO-60` 🟠 linha em branco do efetivo barrava o wizard com "Este campo é
+  obrigatório" e reaparecia a cada tentativa.** Duas causas somadas:
+  1. `bindEfetivoInputs` fazia `row.remove()` em linha ainda não salva sem baixar
+     `efetivo-TOTAL_FORMS`. O Django remontava o prefixo órfão como linha fantasma.
+  2. A linha vazia não escapava pelo `empty_permitted`: `quantidade` tem `default=1` no
+     modelo, logo `initial=1` no form, e o valor vazio conta como `changed` — a validação
+     de campo rodava e disparava o `required` antes do `clean()`, que já sabia descartar
+     linha totalmente vazia.
+  Corrigidos os dois: remover agora marca `DELETE` e esconde (o `TOTAL_FORMS` nunca
+  descola do DOM), e `cargo`/`quantidade` passaram a `required=False` no nível do campo
+  nos dois forms de efetivo — quem decide é o `clean()`, que segue acusando linha pela
+  metade.
+
+- [x] **`NOVO-61` 🔵 pedido: o efetivo do documento agora sai uma linha por cargo, com a
+  sigla da unidade entre parênteses.** Era `"2 Agentes de Polícia Judiciária, 8
+  Papiloscopistas"` — vírgula e sem unidade, apesar de a unidade estar gravada em
+  `EfetivoPlano.unidade`. Passa a ser:
+
+  ```
+  2 Agentes de Polícia Judiciária (ASCOM)
+  8 Papiloscopistas (IIPR)
+  ```
+
+  Vale para o modo multi-evento também (a agregação passou a chavear por cargo **e**
+  unidade, em vez de só cargo), e `montar_efetivo_evento_texto` largou o `" da SIGLA"`
+  para usar o mesmo formato. Sem unidade, não abre parênteses.
+
 Pedidos que não vieram das auditorias entram aqui, com posição decidida antes de
 começarem. Escopo novo que se infiltra numa etapa em curso é como a Etapa 1
 perde o prazo e a Etapa 2 perde a rede.

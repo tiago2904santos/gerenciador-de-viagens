@@ -57,7 +57,7 @@ class DocxtplContextTests(TestCase):
         self.assertEqual(contexto["destinos"], "Maringá/PR")
         self.assertEqual(contexto["data_evento"], "25 a 27 de junho de 2026")
         self.assertEqual(contexto["horario_de_atendimento"], "09:00 até 17:00")
-        self.assertEqual(contexto["efetivos"], "6 Policiais Civis")
+        self.assertEqual(contexto["efetivos"], "6 Policiais Civis (ASCOM)")
         self.assertIn("Valor total: R$7.234,68", contexto["valor_do_plano"])
         self.assertIn("4 x 100% + 1 x 15%", contexto["valor_do_plano"])
         self.assertIn("R$1.205,78", contexto["valor_do_plano"])
