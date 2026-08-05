@@ -1,28 +1,4 @@
-/* Lista de roteiros/ofícios: cards compactos, status por borda lateral. */
 
-.app-page-hero--roteiros-list {
-  box-shadow: var(--sh-sm);
-}
-
-.app-page-hero--roteiros-list .app-page-hero__stage {
-  padding-block: var(--sp-4);
-padding-inline: var(--sp-5);
-}
-
-.app-page-hero--roteiros-list .app-page-hero__stage::after {
-  background: none;
-  opacity: 1;
-}
-
-.app-page-hero--roteiros-list .app-page-hero__eyebrow {
-  margin-bottom: var(--sp-1);
-}
-
-.app-page-hero--roteiros-list .app-page-hero__title {
-  font-size: clamp(1.2rem, 1.65vw, 1.45rem);
-  margin-block: 0 var(--sp-1);
-  margin-inline: 0;
-}
 
 /* ── Reuso do card de ofício (cv-record-card) na lista de roteiros ── */
 

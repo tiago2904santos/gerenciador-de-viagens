@@ -204,12 +204,6 @@
   margin: 0;
 }
 
-.cv-resource-picker {
-  display: grid;
-  gap: var(--sp-3);
-  min-width: 0;
-}
-
 .cv-resource-picker__actions {
   align-items: center;
   display: flex;
@@ -343,9 +337,6 @@
 
 .cv-segment-toggle__btn:focus-visible {
   outline: none;
-}
-
- .cv-segment-toggle__btn:focus-visible {
 }
 
 .cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {

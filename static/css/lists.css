@@ -1,14 +1,4 @@
-/* ==========================================================================
-   LISTS
-   ========================================================================== */
 
-/* --------------------------------------------------------------------------
-   1. Shell de listagem e toolbar
-   -------------------------------------------------------------------------- */
-.list-page {
-  display: grid;
-  gap: var(--sp-5);
-}
 
 .list-toolbar {
   align-items: center;
@@ -63,15 +53,6 @@
   gap: var(--sp-4);
 }
 
-.list-grid--oficios {
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-}
-
-.list-stack {
-  display: grid;
-  gap: var(--sp-3);
-}
-
 /* --------------------------------------------------------------------------
    2. Estado vazio
    -------------------------------------------------------------------------- */
@@ -111,10 +92,6 @@
 .empty-state__message,
 .empty-state p {
   color: color-mix(in srgb, var(--cv-ink) 82%, white);
-}
-
-.list-pagination {
-  min-height: var(--sp-6);
 }
 
 @media (max-width: 720px) {
@@ -196,17 +173,6 @@
   text-transform: uppercase;
 }
 
-.simple-list__badge--accent {
-  background: color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface));
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
-}
-
-.simple-list__title-text {
-  min-width: 0;
-}
-
 .simple-list__inline-form {
   display: inline;
   margin: 0;
@@ -220,22 +186,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-3) var(--sp-4);
-}
-
-.simple-list__meta-item {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-sm);
-}
-
-.simple-list__meta-label {
-  color: var(--cv-ink-muted);
-  font-weight: 600;
-  margin-right: var(--sp-1);
-}
-
-.simple-list__meta-value {
-  color: var(--cv-ink-muted);
-  font-weight: 500;
 }
 
 .simple-list__actions {
@@ -262,7 +212,6 @@
    .app-list-* como joint selectors das classes legadas.
    ========================================================================== */
 
-.app-list-toolbar,
 .list-toolbar {
   align-items: center;
   display: flex;
@@ -300,15 +249,6 @@
   padding-block: var(--sp-7);
 padding-inline: var(--sp-4);
   text-align: center;
-}
-
-.app-badge {
-  border-radius: var(--r-pill);
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  padding-block: var(--sp-1);
-  padding-inline: var(--sp-2);
-  text-transform: uppercase;
 }
 
 .app-badge--accent {

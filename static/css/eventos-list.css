@@ -52,10 +52,6 @@
   letter-spacing: inherit;
 }
 
-.evento-lc .cv-person-row__unidade-sep {
-  color: var(--cv-ink-muted);
-}
-
 @media (max-width: 640px) {
   .evento-lc .cv-itinerary__leg--documento {
     align-items: stretch;

@@ -1,16 +1,4 @@
-/* ==========================================================================
-   DOMAIN BLOCKS
-   Blocos reutilizaveis compartilhados entre modulos.
-   ========================================================================== */
 
-/* --------------------------------------------------------------------------
-   1. Estrutura base
-   Mantem contrato semantico para reuso fora do wizard de roteiros.
-   -------------------------------------------------------------------------- */
-
-.domain-block {
-  margin-block-end: var(--sp-5);
-}
 
 .domain-block__header {
   margin-block-end: var(--sp-2);
@@ -29,24 +17,10 @@
   color: var(--cv-ink-muted);
 }
 
-/* --------------------------------------------------------------------------
-   2. Grid de composicao
-   -------------------------------------------------------------------------- */
-.domain-grid {
-  display: grid;
-  gap: 0.75rem;
-}
-
 @media (min-width: 768px) {
   .domain-grid--2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-}
-
-.destination-panel,
-.destination-list,
-.destination-item {
-  /* Herdam layout do roteiro-editor / Bootstrap dentro do form; classe para contrato semantico. */
 }
 
 /* --------------------------------------------------------------------------
@@ -73,15 +47,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-}
-
-.calculator-panel,
-.return-panel {
-  /* Superficies do wizard usam roteiro-editor__section; estas classes marcam o bloco no DOM. */
-}
-
-.route-summary {
-  /* Conteudo interno do detalhe de roteiro permanece no componente de domínio. */
 }
 
 .route-summary[data-route-summary] {

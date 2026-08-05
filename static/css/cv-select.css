@@ -1,133 +1,8 @@
-/* ==========================================================================
-   cv-select.css
-   Sistema global de select / dropdown / multiselect
-   Central de Viagens 3.0
 
-   Componentes:
-     .cv-select-wrapper      — wrapper de <select> nativo com seta customizada
-     .cv-action-dropdown     — dropdown de acoes (botao trigger + menu flutuante)
-     .cv-filter-dropdown     — variante de filtro com chips integrados
-
-   Tokens sao definidos aqui em :root e sobrescritos por tema.
-   Nenhum hex de cor nas regras de componente — apenas tokens.
-   ========================================================================== */
-
-/* =========================================================
-   01. Design Tokens — :root
-   ========================================================= */
-
-:root {
-  /* Sizing */
-
-  /* Colors — adapts to theme via tokens */
-
-  /* Disabled */
-
-  /* Error / Success */
-
-  /* Dropdown menu */
-
-  /* Action button dropdown trigger */
-}
-
-/* =========================================================
-   02. Theme overrides — Dark
-   ========================================================= */
-
-:root {
-}
-
-/* =========================================================
-   03. Theme overrides — Light
-   ========================================================= */
-
-:root {
-}
-
-/* =========================================================
-   04. Native Select Wrapper — .cv-select-wrapper
-   Envolve um <select> nativo com seta visual customizada.
-   Nao remove name/id/required — compativel com Django forms.
-   ========================================================= */
-
-.cv-select-wrapper {
-  border-radius: var(--r-md);
-  display: grid;
-  min-width: 0;
-  position: relative;
-  width: 100%;
-}
-
-/* Seta customizada via pseudo-elemento */
-.cv-select-wrapper::after {
-  border-bottom: var(--bd-strong);
-  border-right: var(--bd-strong);
-  content: "";
-  height: 8px;
-  pointer-events: none;
-  position: absolute;
-  right: var(--sp-4);
-  top: 50%;
-  transform: translateY(-65%) rotate(45deg);
-  transform-origin: center;
-  transition:
-    border-color var(--tr-fast),
-    transform var(--tr-fast);
-  width: 8px;
-  z-index: 1;
-}
-
-/* <select> dentro do wrapper — reseta aparencia nativa */
-.cv-select-wrapper select,
-.cv-select-native {
-  appearance: none;
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
-  box-sizing: border-box;
-  color: var(--cv-ink);
-  cursor: pointer;
-  font-family: inherit;
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-medium);
-  height: var(--h-md);
-  line-height: 1.2;
-  padding-block: 0;
-  padding-inline: var(--sp-3) var(--sp-7);
-  transition:
-    background-color var(--tr-fast),
-    border-color var(--tr-fast),
-    box-shadow var(--tr-fast);
-  width: 100%;
-}
-
-.cv-select-wrapper select:focus,
-.cv-select-wrapper select:focus-visible,
-.cv-select-native:focus,
-.cv-select-native:focus-visible {
-  outline: none;
-}
-
-/* Placeholder (primeira opção vazia) */
-.cv-select-wrapper select option[value=""],
-.cv-select-native option[value=""] {
-  color: var(--cv-ink-muted);
-}
 
 /* Disabled */
-.cv-select-wrapper--disabled::after,
-.cv-select-wrapper select:disabled + * {
+.cv-select-wrapper--disabled::after {
   opacity: 0.45;
-}
-
-.cv-select-wrapper select:disabled,
-.cv-select-native:disabled {
-  background: var(--cv-surface-next);
-  border-color: var(--cv-border);
-  color: var(--cv-ink-muted);
-  cursor: not-allowed;
-  opacity: 1;
 }
 
 .cv-select-wrapper--disabled::after {
@@ -136,8 +11,7 @@
 }
 
 /* Error */
-.cv-select-wrapper--error select,
-.cv-select-wrapper--error .cv-select-native {
+.cv-select-wrapper--error select {
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
 }
 
@@ -146,20 +20,12 @@
 }
 
 /* Success */
-.cv-select-wrapper--success select,
-.cv-select-wrapper--success .cv-select-native {
+.cv-select-wrapper--success select {
   border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
 }
 
 .cv-select-wrapper--success::after {
   border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
-}
-
-/* Opções no tema escuro */
- .cv-select-wrapper select option,
- .cv-select-native option {
-  background: var(--cv-surface-card);
-  color: var(--cv-ink);
 }
 
 /* =========================================================
@@ -457,17 +323,6 @@
   }
 }
 
-/* ==========================================================================
-   UI Lab clone — Custom Select Premium / Inline Action
-   Fonte 1:1: static/css/dev/ui-lab-fields.css + templates/dev/ui_lab/selects_filters.html
-   ========================================================================== */
-
-:root {
-}
-
-:root {
-}
-
 .cv-field {
   display: grid;
   gap: var(--sp-2);
@@ -482,16 +337,6 @@
   line-height: 1.2;
 }
 
-/* Label row: label à esquerda, controle auxiliar à direita */
-.cv-field__label-row {
-  align-items: center;
-  display: flex;
-  gap: var(--sp-2);
-  justify-content: space-between;
-  min-width: 0;
-}
-
-.cv-field__control-row,
 .cv-field-with-action {
   align-items: center;
   display: flex;
@@ -499,63 +344,10 @@
   min-width: 0;
 }
 
-.cv-field__control-row .cv-field__control,
 .cv-field-with-action .cv-field__control,
-.cv-field-with-action .cv-select__wrapper,
 .cv-field-with-action .cv-custom-select {
   flex: 1 1 auto;
   min-width: 0;
-}
-
-.cv-field-action {
-  align-items: center;
-  appearance: none;
-  background:
-    linear-gradient(var(--cv-surface-card), var(--cv-surface-card)) padding-box,
-    linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-  border: var(--bd);
-    border-color: transparent;
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
-  color: var(--cv-ink);
-  cursor: pointer;
-  display: inline-flex;
-  font-family: inherit;
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-medium);
-  gap: var(--sp-2);
-  height: var(--h-md);
-  justify-content: center;
-  padding-block: 0;
-  padding-inline: var(--sp-4);
-  text-decoration: none;
-  transition: background var(--tr-fast), box-shadow var(--tr-fast);
-  white-space: nowrap;
-}
-
-.cv-field-action:hover:not(:disabled) {
-  background:
-    linear-gradient(color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)), color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface))) padding-box,
-    linear-gradient(var(--cv-border), var(--cv-border)) border-box;
-}
-
-.cv-field-action--clear {
-  color: var(--cv-state-danger);
-}
-
-.cv-field-action--clear:hover:not(:disabled) {
-  background:
-    linear-gradient(color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface)), color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface))) padding-box,
-    linear-gradient(color-mix(in srgb, var(--cv-state-danger) 40%, transparent), color-mix(in srgb, var(--cv-state-danger) 40%, transparent)) border-box;
-}
-
-.cv-field__control-row .cv-field-action,
-.cv-field-with-action .cv-field-action {
-  align-self: center;
-  flex: 0 0 auto;
-  height: var(--h-md);
-  max-height: var(--h-md);
-  min-height: var(--h-md);
 }
 
 .cv-custom-select {
@@ -647,9 +439,6 @@
 
 .cv-custom-select--open .cv-custom-select__chevron svg {
   transform: rotate(180deg);
-}
-
- .cv-custom-select--v2 {
 }
 
  .cv-custom-select--v2 .cv-custom-select__chevron,

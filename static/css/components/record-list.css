@@ -24,10 +24,6 @@
   padding: 0;
 }
 
-/* Controles elevados sobre o poço --step1-panel (abas + cápsula de páginas). */
-.cv-collection-panel .cv-list-tab {
-}
-
 .cv-collection-panel .pagination-shell__controls {
   background: var(--cv-surface-card);
 }
