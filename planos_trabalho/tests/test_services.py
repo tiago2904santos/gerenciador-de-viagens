@@ -156,3 +156,28 @@ class EfetivoTextoTests(TestCase):
         texto = montar_efetivo_texto(plano)
         self.assertIn("1 Papiloscopista", texto)
         self.assertIn("6 Policiais Civis", texto)
+
+    def test_efetivo_texto_traz_sigla_da_unidade_uma_linha_por_cargo(self):
+        from cadastros.models import Cargo
+        from cadastros.models import Unidade
+        from planos_trabalho.models import EfetivoPlano
+
+        plano = criar_plano_maringa(self.maringa, efetivo=2)  # 2 Policiais Civis (ASCOM)
+        iipr = Unidade.objects.create(nome="Instituto de Identificação do Paraná", sigla="IIPR")
+        papiloscopista = Cargo.objects.create(nome="Papiloscopista")
+        EfetivoPlano.objects.create(plano=plano, unidade=iipr, cargo=papiloscopista, quantidade=8)
+
+        self.assertEqual(
+            montar_efetivo_texto(plano),
+            "2 Policiais Civis (ASCOM)\n8 Papiloscopistas (IIPR)",
+        )
+
+    def test_efetivo_texto_sem_unidade_nao_abre_parenteses(self):
+        from planos_trabalho.models import EfetivoPlano
+
+        plano = criar_plano_maringa(self.maringa, efetivo=6)
+        cargo = plano.efetivos.first().cargo
+        plano.efetivos.all().delete()
+        EfetivoPlano.objects.create(plano=plano, cargo=cargo, quantidade=3)
+
+        self.assertEqual(montar_efetivo_texto(plano), "3 Policiais Civis")

@@ -478,12 +478,27 @@ class PlanoDiariasForm(forms.ModelForm):
             "chegada_sede_hora",
         ]
         widgets = {
-            "saida_sede_data": forms.HiddenInput(attrs={"data-pt-diarias-saida-data": "true", "data-pt-diarias-input": "true"}),
+            # data-cv-date-picker-*-value é o que liga o hidden ao componente de
+            # calendário (date_picker.html em mode="range"); sem isso o picker só
+            # escreve no input de exibição e o form chega vazio no POST.
+            "saida_sede_data": forms.HiddenInput(
+                attrs={
+                    "data-cv-date-picker-start-value": "true",
+                    "data-pt-diarias-saida-data": "true",
+                    "data-pt-diarias-input": "true",
+                },
+            ),
             "saida_sede_hora": forms.TimeInput(
                 attrs={"type": "time", **widget_attrs(WidgetStyle.FIELD_CONTROL), "data-pt-diarias-input": "true"},
                 format="%H:%M",
             ),
-            "chegada_sede_data": forms.HiddenInput(attrs={"data-pt-diarias-chegada-data": "true", "data-pt-diarias-input": "true"}),
+            "chegada_sede_data": forms.HiddenInput(
+                attrs={
+                    "data-cv-date-picker-end-value": "true",
+                    "data-pt-diarias-chegada-data": "true",
+                    "data-pt-diarias-input": "true",
+                },
+            ),
             "chegada_sede_hora": forms.TimeInput(
                 attrs={"type": "time", **widget_attrs(WidgetStyle.FIELD_CONTROL), "data-pt-diarias-input": "true"},
                 format="%H:%M",
@@ -538,6 +553,11 @@ class EfetivoPlanoForm(forms.ModelForm):
         self.fields["unidade"].required = False
         self.fields["cargo"].queryset = filter_queryset_by_area(Cargo.objects).order_by("nome")
         self.fields["cargo"].empty_label = "Selecione o cargo"
+        # A obrigatoriedade é decidida em clean(): linha totalmente em branco é
+        # descartada, linha pela metade acusa erro. Deixar required no nível do
+        # campo faria a linha vazia do formset barrar o wizard inteiro.
+        self.fields["cargo"].required = False
+        self.fields["quantidade"].required = False
 
     def clean(self):
         cleaned = super().clean()
@@ -645,6 +665,9 @@ class EfetivoEventoForm(forms.ModelForm):
         self.fields["unidade"].required = False
         self.fields["cargo"].queryset = filter_queryset_by_area(Cargo.objects).order_by("nome")
         self.fields["cargo"].empty_label = "Selecione o cargo"
+        # Mesma regra do EfetivoPlanoForm: quem valida é clean().
+        self.fields["cargo"].required = False
+        self.fields["quantidade"].required = False
 
     def clean(self):
         cleaned = super().clean()
