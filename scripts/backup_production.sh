@@ -36,7 +36,10 @@ cleanup() {
 }
 trap cleanup EXIT
 
-pg_dump --format=custom --file="${WORK_DIR}/database.dump" "${DB_NAME}"
+# --no-password: sem terminal, a senha ausente vira prompt que só morre no
+# command_timeout do deploy (10 min). Falhar na hora diz o que faltou.
+pg_dump --no-password --format=custom \
+  --file="${WORK_DIR}/database.dump" "${DB_NAME}"
 tar -C "${MEDIA_ROOT}" -czf "${WORK_DIR}/media.tar.gz" .
 git -C "${APP_ROOT}" rev-parse HEAD > "${WORK_DIR}/commit-sha.txt"
 (

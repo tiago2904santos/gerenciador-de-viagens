@@ -769,6 +769,37 @@ colide com o ID.
 
 ## 7.1 Escopo novo, fora das oito etapas
 
+### Deploy de produção, o que sobrou depois do `NOVO-56` (05/08/2026)
+
+- [x] **`NOVO-57` 🔴 o health check reprovaria justamente o deploy que o `NOVO-56`
+  destravou.** Com o backup consertado, o deploy chega até o fim e morre na última
+  linha: `curl --fail http://127.0.0.1:8000/health/`. Medido contra
+  `config.settings.prod`, não lido no código:
+
+  | requisição | resposta | efeito |
+  |---|---|---|
+  | `Host: 127.0.0.1`, sem `X-Forwarded-Proto` (o que havia) | **400** `DisallowedHost` | `curl --fail` → `reverter` de um deploy são |
+  | `Host` de `ALLOWED_HOSTS`, sem `X-Forwarded-Proto` | **301** do `SECURE_SSL_REDIRECT` | passa sem tocar o banco — verde falso |
+  | `Host` correto + `X-Forwarded-Proto: https` | **200** `{"status": "ok"}` | verifica app + PostgreSQL |
+
+  E a porta é a errada de qualquer jeito: gunicorn serve por socket unix
+  (`config/settings/prod.py:88`), onde `127.0.0.1:8000` não escuta. O check novo usa o
+  socket quando ele existe e cai para TCP quando não — `DEPLOY_VPS.md` ainda documenta
+  `--bind 127.0.0.1:8000` e não dá para saber daqui qual dos dois está no ar.
+
+  Junto, três coisas da mesma família:
+  - **`restore_backup.sh` ficou de fora do `NOVO-56`.** `pg_restore` lê as mesmas `PG*`
+    e falharia igual na hora em que mais importa. A ponte agora está nos dois scripts.
+  - **O gate que não viu.** O drill de restore do CI definia as `PG*` no próprio passo,
+    exercitando um caminho que produção não usa. Ele agora entra pelas `DB_*` do job —
+    a mesma entrada da VPS — e cobre os dois scripts. Sem a ponte, esse passo falha.
+  - **`DJANGO_SETTINGS_MODULE` dependia de o `.env` trazê-lo:** ausente, `migrate` roda
+    com settings de desenvolvimento. Explícito no workflow, como em `deploy_update.sh`.
+
+  Fica também um `workflow_dispatch` no deploy (reimplantar sem commit vazio) e um modo
+  `infra` no workflow de diagnóstico, somente leitura, que responde o que não deu para
+  verificar daqui: socket ou TCP, roles do Postgres, commit no ar.
+
 ### Rascunhos antigos triados em 29/07
 
 - [x] **#32** — destino em CAIXA ALTA no documento da Ordem de Serviço. Confirmado

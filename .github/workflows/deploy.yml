@@ -5,6 +5,15 @@ on:
     workflows: ["Tests"]
     types: [completed]
     branches: [main]
+  # Reimplantar sem commit novo: depois de consertar algo na VPS, o caminho
+  # automático só volta a rodar no próximo push, e forçar um commit vazio para
+  # reimplantar o mesmo código é pior do que um botão.
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: "SHA a implantar (vazio = HEAD da branch escolhida)"
+        required: false
+        default: ""
 
 concurrency:
   group: deploy-producao
@@ -12,7 +21,7 @@ concurrency:
 
 jobs:
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -26,11 +35,16 @@ jobs:
             set -Eeuo pipefail
             cd /var/www/gerenciador-viagens/app
             BEFORE_SHA="$(git rev-parse HEAD)"
-            TARGET_SHA="${{ github.event.workflow_run.head_sha }}"
+            TARGET_SHA="${{ github.event.workflow_run.head_sha || inputs.commit_sha || github.sha }}"
             source /var/www/gerenciador-viagens/venv/bin/activate
             set -a
             source .env
             set +a
+
+            # O .env de produção deve trazer o settings; se não trouxer, o
+            # manage.py cai no default de desenvolvimento e migraria o banco
+            # errado. Explícito aqui, como já é em scripts/deploy_update.sh.
+            export DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE:-config.settings.prod}"
 
             # Pré-checagens: qualquer coisa que falte precisa abortar ANTES do
             # checkout, senão produção fica com código novo e serviço antigo.
@@ -78,8 +92,29 @@ jobs:
             systemctl restart gerenciador-viagens
             systemctl restart gerenciador-viagens-celery
 
+            # Health check pelo mesmo caminho por onde o Nginx fala com o app:
+            # gunicorn escuta em socket unix (config/settings/prod.py), o Host
+            # precisa estar em ALLOWED_HOSTS (senão 400) e o X-Forwarded-Proto
+            # evita o 301 do SECURE_SSL_REDIRECT — sem os três, o check passava
+            # por acidente ou reprovava um deploy são.
+            saude() {
+              local host="${ALLOWED_HOSTS:-}"
+              host="${host%%,*}"
+              host="${host// /}"
+              host="${host:-127.0.0.1}"
+              local sock=/var/www/gerenciador-viagens/gunicorn.sock
+              local args=(--fail --silent --show-error --max-time 15
+                          --header "Host: ${host}"
+                          --header "X-Forwarded-Proto: https")
+              if [ -S "${sock}" ]; then
+                curl "${args[@]}" --unix-socket "${sock}" "http://${host}/health/"
+              else
+                curl "${args[@]}" "http://127.0.0.1:8000/health/"
+              fi
+            }
+
             trap - ERR
-            if ! curl --fail --silent --show-error --max-time 15 http://127.0.0.1:8000/health/; then
+            if ! saude; then
               reverter
               exit 1
             fi

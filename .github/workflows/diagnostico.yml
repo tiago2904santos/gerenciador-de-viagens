@@ -2,13 +2,95 @@ name: Diagnostico manual (leitura)
 
 on:
   workflow_dispatch:
+    inputs:
+      modo:
+        description: "O que inspecionar na VPS"
+        type: choice
+        options:
+          - infra
+          - drive
+        default: infra
 
 jobs:
   diagnostico:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Rodar comando de leitura via SSH
+      - name: Infra do deploy (servico, socket, health, postgres)
+        if: ${{ inputs.modo == 'infra' }}
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            set -uo pipefail
+            cd /var/www/gerenciador-viagens/app
+
+            echo "=== Commit em producao ==="
+            git rev-parse HEAD
+            git log -1 --format='%h %ad %s' --date=iso
+
+            echo "=== Servicos ==="
+            systemctl is-active gerenciador-viagens || true
+            systemctl is-active gerenciador-viagens-celery || true
+            systemctl show gerenciador-viagens --property=ExecStart --no-pager || true
+
+            echo "=== Escuta de rede / socket ==="
+            (ss -ltnp 2>/dev/null || netstat -ltnp 2>/dev/null) | grep -E ':8000|gunicorn' || echo "nada escutando em 8000"
+            ls -l /var/www/gerenciador-viagens/gunicorn.sock 2>/dev/null || echo "gunicorn.sock ausente"
+
+            echo "=== Chaves presentes no .env (somente nomes) ==="
+            grep -oE '^[A-Za-z_][A-Za-z0-9_]*=' .env | tr -d '=' | sort
+
+            set -a
+            . ./.env
+            set +a
+
+            echo "=== Health (mesmo caminho do deploy) ==="
+            HEALTH_HOST="${ALLOWED_HOSTS:-}"
+            HEALTH_HOST="${HEALTH_HOST%%,*}"
+            HEALTH_HOST="${HEALTH_HOST// /}"
+            HEALTH_HOST="${HEALTH_HOST:-127.0.0.1}"
+            if [ -S /var/www/gerenciador-viagens/gunicorn.sock ]; then
+              curl -s -o /dev/null -w 'socket: %{http_code}\n' --max-time 10 \
+                --unix-socket /var/www/gerenciador-viagens/gunicorn.sock \
+                -H "Host: ${HEALTH_HOST}" -H 'X-Forwarded-Proto: https' \
+                "http://${HEALTH_HOST}/health/" || echo "socket: falhou"
+            fi
+            curl -s -o /dev/null -w 'tcp8000: %{http_code}\n' --max-time 10 \
+              -H "Host: ${HEALTH_HOST}" -H 'X-Forwarded-Proto: https' \
+              http://127.0.0.1:8000/health/ || echo "tcp8000: falhou"
+
+            echo "=== Postgres ==="
+            pg_dump --version
+            echo "DB_HOST=${DB_HOST:-<vazio>} DB_PORT=${DB_PORT:-<vazio>}"
+            # Presenca, nunca valor: o diagnostico e lido no log publico da Action.
+            for nome in DB_NAME DB_USER DB_PASSWORD BACKUP_ENCRYPTION_KEY; do
+              if [ -n "${!nome:-}" ]; then echo "${nome}: definido"; else echo "${nome}: AUSENTE"; fi
+            done
+
+            echo "--- pg_dump pela mesma ponte DB_* -> PG* do backup ---"
+            export PGHOST="${PGHOST:-${DB_HOST:-127.0.0.1}}"
+            export PGPORT="${PGPORT:-${DB_PORT:-5432}}"
+            [ -n "${DB_USER:-}" ] && export PGUSER="${DB_USER}"
+            [ -n "${DB_PASSWORD:-}" ] && export PGPASSWORD="${DB_PASSWORD}"
+            pg_dump --no-password --schema-only --file=/tmp/diag-dump-test.sql \
+              "${DB_NAME}" 2>&1 | head -5 && ls -lh /tmp/diag-dump-test.sql
+            rm -f /tmp/diag-dump-test.sql
+
+            echo "=== Espaco e destino do backup ==="
+            df -h /var | tail -1
+            ls -ld /var/backups/gerenciador-viagens 2>/dev/null || echo "/var/backups/gerenciador-viagens ausente"
+            echo "MEDIA_ROOT=${MEDIA_ROOT:-<vazio>}"
+            ls -ld "${MEDIA_ROOT:-/var/www/gerenciador-viagens/media}" 2>/dev/null || echo "MEDIA_ROOT ausente"
+            echo "BACKUP_RCLONE_REMOTE=${BACKUP_RCLONE_REMOTE:-<nao definido>}"
+            command -v rclone >/dev/null && rclone version | head -1 || echo "rclone nao instalado"
+
+            echo "=== FIM ==="
+
+      - name: Google Drive (pasta raiz e credenciais)
+        if: ${{ inputs.modo == 'drive' }}
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}

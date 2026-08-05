@@ -131,13 +131,13 @@ jobs:
 
       - name: Exercise encrypted database and media restore
         env:
-          # O Postgres do CI é um service container, alcançável só por TCP.
-          # pg_dump/pg_restore leem PGHOST/PGPORT/PGUSER (não DB_HOST/DB_USER);
-          # sem isto tentam o socket Unix local, que não existe no runner.
-          PGHOST: 127.0.0.1
-          PGPORT: "5432"
-          PGUSER: postgres
-          PGPASSWORD: postgres
+          # Sem PG* de propósito: pg_dump/pg_restore leem PGHOST/PGPORT/PGUSER,
+          # não DB_HOST/DB_USER, e quem chama o script em produção só tem o
+          # .env com DB_*. Enquanto o drill definia as PG* aqui, ele testava um
+          # caminho que produção não usa — e o deploy quebrou 26 vezes seguidas
+          # com `role "..." does not exist` sem o CI ver nada (`NOVO-56`).
+          # Agora o passo entra pelas DB_* do env do job, que é a mesma entrada
+          # da VPS, e exercita a ponte dos dois scripts (`NOVO-57`).
           BACKUP_ENCRYPTION_KEY: "ci-restore-drill-only-key"
           RESTORE_CONFIRM: "RESTAURAR"
         run: |
