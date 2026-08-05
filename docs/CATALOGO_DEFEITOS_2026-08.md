@@ -1166,6 +1166,27 @@ justificativa.
 é bloqueado. Mover a flag para um dict de kwargs, ou abrir um segundo caminho de renderização sem
 ela, passa no teste e regride a mitigação que sustenta o *ignore* da CVE.
 
+> **Fechado no PR #186, e depois corrigido de novo.** Foram três formulações, e a terceira só
+> existe porque a segunda tinha uma asserção de auto-diagnóstico. Registro porque a lição vale para
+> qualquer teste deste repositório que gere documento:
+>
+> 1. Comparar **bytes do PDF** contra uma referência reconstruída à mão. Reprovou no CI, passou
+>    local. Diagnóstico na hora: acoplamento ao ambiente.
+> 2. Comparar **o adaptador contra o próprio adaptador**, trocando só a flag, por digest. Reprovou
+>    no CI de novo — mas com a mensagem certa: *"duas renderizações idênticas deram documentos
+>    diferentes"*.
+> 3. **A saída em bytes do WeasyPrint não é reproduzível no runner**, nem entre duas chamadas
+>    iguais no mesmo processo, e o efeito é **intermitente** (a mesma suíte passou numa execução e
+>    reprovou na seguinte). Logo, comparação de byte, digest ou tamanho é inutilizável aqui: ou
+>    reprova sozinha, ou passa vazia — todo `assertNotEqual` entre bytes vira verdadeiro por
+>    acidente.
+>
+> A versão que ficou **não serializa PDF nenhum**: olha o estilo computado da árvore de caixas, que
+> é onde a dica de apresentação age e onde o resultado é determinístico. Com as dicas ligadas,
+> `bgcolor="#ff0000"` vira fundo vermelho na `<table>` e `color="#00ff00"` vira texto verde no
+> `<font>`; desligadas, transparente e preto. É literalmente o que a CVE explora.
+> Medido: 8 execuções seguidas, 8 verdes; invertendo a flag no adaptador, 2 de 3 reprovam.
+
 ### QA-07 🟡 Nenhum gate de lint, formatação ou tipo em Python · AUD · 1 d
 
 `grep -i "ruff\|black\|flake8\|mypy\|isort\|pylint"` em `requirements/*.txt`,
