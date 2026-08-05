@@ -911,6 +911,24 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
   > territorio das Etapas 6 e 8. Zerar dentro da fase 4 seria fazer o trabalho de tres
   > frentes no mesmo PR, que e o erro nº 2 da §8. A catraca desce no que esta fase
   > legitimamente remove; o resto tem dono nomeado aqui.
+- [x] **`NOVO-39` 🟡 os 92 `legacy_page_header` eram defeito da regra, nao divida do
+  template.** 05/08/2026. A regra era `class="[^"]*\bpage-header\b`, e `\b` trata o
+  hifen como fronteira: ela casava `page-header-band`, `page-header-stack` e
+  `page-header-rail` — a familia do **componente canonico**, cujo proprio cabecalho se
+  declara "Cabecalho canonico de pagina". A classe crua `page-header`, alvo real da
+  regra, aparece **zero** vezes. E a mensagem mandava migrar para **`app-page-hero`,
+  que nao existe** no repositorio — nem em CSS, nem em template, nem em JS. Seguir o
+  aviso teria renomeado **106 usos do componente vigente** para um componente
+  inexistente.
+  Corrigida a **regra**, nao o template. A regra irma no CSS tinha o mesmo defeito, com
+  60 falsos positivos latentes (nao apareciam porque so roda em `GLOBAL_CSS`). A
+  excecao de arquivo do dashboard caiu junto: sobrevivia ao defeito, nao a um uso —
+  `TEMPLATE_EXCEPTIONS` fica vazio, como o `CSS_EXCEPTIONS` ficou na fase 4.
+  Catraca **184 → 92**. `core/tests/test_auditor_page_header.py` trava os dois lados: a
+  familia canonica nao pode ser acusada, **e** a classe crua tem de continuar sendo —
+  senao a correcao vira afrouxamento. Um terceiro teste exige que o caminho citado na
+  mensagem exista; aviso que aponta para lugar nenhum ensina a ignorar o auditor.
+  Canario rodado.
 - [x] **Fase 5a — apagar a regra que ninguem alcanca. Feita em 05/08.**
   O enunciado original ("62 → ≤25 arquivos, ≤13.000 linhas") nao bate com o
   repositorio depois das fases 1–4, e continua nao batendo: **nao ha arquivo
