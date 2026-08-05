@@ -445,7 +445,7 @@
 /* Picker de viatura: variação tonal do chip de motivo (Motorista / Unidade)
    sobre a base visual do .cv-search-picker__driver-chip. */
 .oficio-viatura-reason--motorista {
-  background: color-mix(in srgb, var(--color-accent, #d8a21b) 18%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
   border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
   color: var(--color-accent, var(--cv-state-success));
 }
@@ -1429,7 +1429,7 @@
 }
 
 .evento-doc-toggle .cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {
-  background: color-mix(in srgb, #fff 5%, transparent);
+  background: color-mix(in srgb, white 5%, transparent);
   color: var(--cv-ink);
 }
 

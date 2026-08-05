@@ -150,7 +150,7 @@
 /* Aba ativa: hover sobe no dourado (não vai para branco) e sem barra esquerda. */
 
   .cv-list-tab--active:is(:hover, :focus-visible) {
-  background: color-mix(in srgb, color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)) 72%, var(--color-accent, #d8a21b) 28%);
+  background: color-mix(in srgb, color-mix(in srgb, var(--color-accent) var(--accent-tint), var(--cv-surface)) 72%, var(--color-accent) 28%);
   border-color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
   color: color-mix(in srgb, var(--color-accent) 85%, var(--cv-ink));
 }

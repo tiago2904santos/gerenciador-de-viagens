@@ -48,6 +48,35 @@
   --cv-state-success: #237a58;
   --cv-state-warning: #9b6b18;
 
+  /* ---- marca de terceiro -----------------------------------------------
+     Nao e cor do sistema: e a cor pela qual o WhatsApp e reconhecido, e a
+     unica funcao dela e essa. Derivar de `--cv-state-success` faria o botao
+     deixar de ser identificavel. Fica aqui, nomeada, em vez de solta no
+     componente — e por ser marca, NAO muda com o tema. */
+  --brand-whatsapp: #25d366;
+
+  /* Tinta sobre superficie de ESTADO (perigo/sucesso/aviso). Ela ACOMPANHA o
+     tema porque a superficie acompanha: no claro o vermelho e #c0392b (branco
+     da 5,4:1), no escuro e #ef7d77 (branco daria 2,7:1 — reprova). Medido, nao
+     estimado. Nao confundir com `--on-accent`, que segue o acento. */
+  --on-state: #ffffff;
+
+
+  /* ---- tom de icone por categoria --------------------------------------
+     Isto nao e "cor solta": e um vocabulario. O menu de acoes usa a cor para
+     dizer DE QUE TIPO e a acao — mensagem, oficial, documento, rota, pacote.
+     Derivar tudo de `--cv-state-*` colapsaria cinco categorias em tres cores e
+     apagaria a informacao. Ficam nomeadas aqui; fundo e borda de cada uma saem
+     dela por `color-mix()`, em vez de tres literais por categoria.
+
+     Sao QUATRO, nao seis: "mensagem" e o proprio `--cv-state-success` (delta
+     maximo de 9/255 — nao merecia nome) e "documento" e o vermelho de perigo
+     abafado. Nome proprio so para o que nao da para derivar. */
+  --tone-neutral: #426b91;
+  --tone-official: #1d6f6c;
+  --tone-route: #315f8c;
+  --tone-package: #65528b;
+
   /* ---- traco ------------------------------------------------------------ */
   --cv-border: color-mix(in srgb, var(--cv-ink) 18%, transparent);
   --bd: 1px solid var(--cv-border);
@@ -119,4 +148,6 @@ html[data-theme="dark"] {
   --cv-state-danger: #ef7d77;
   --cv-state-success: #58c694;
   --cv-state-warning: #e6b95d;
+  /* No escuro as cores de estado sao CLARAS; a tinta em cima tem de escurecer. */
+  --on-state: #20180a;
 }

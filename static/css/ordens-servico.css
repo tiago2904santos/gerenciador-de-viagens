@@ -221,7 +221,7 @@
 }
 
 .os-servidor-role-panel__toggle .cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {
-  background: color-mix(in srgb, #fff 5%, transparent);
+  background: color-mix(in srgb, white 5%, transparent);
   color: var(--cv-ink);
 }
 

@@ -257,8 +257,8 @@
 }
 
 .pt-activity-card.is-selected .pt-activity-card__check {
-  background: var(--color-accent, #d9a40f);
-  color: #1a1200;
+  background: var(--color-accent);
+  color: var(--on-accent);
 }
 
 .pt-activity-card.is-selected .pt-activity-card__name {
@@ -407,7 +407,7 @@
   padding-inline: var(--sp-3);
   border: 0;
   border-bottom: var(--bd);
-  border-bottom-color: color-mix(in srgb, #fff 8%, transparent);
+  border-bottom-color: color-mix(in srgb, white 8%, transparent);
   border-radius: 0;
   background: transparent;
   box-shadow: none;

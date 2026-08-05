@@ -85,7 +85,7 @@
 }
 
 .empty-state {
-  background: color-mix(in srgb, var(--cv-surface-card) 38%, #0b1422);
+  background: color-mix(in srgb, var(--cv-surface-card) 38%, black);
   border-color: color-mix(in srgb, var(--cv-border) 55%, transparent);
 }
 

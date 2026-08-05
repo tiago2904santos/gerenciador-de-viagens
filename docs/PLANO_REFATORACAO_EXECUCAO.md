@@ -1002,6 +1002,32 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
     classes que perderam toda regra, **nenhuma e emitida** por template ou JS.
   - Catraca de avisos **184 → 182**.
 
+- [x] **`NOVO-41` 🟡 literais de cor: 81 hex + 71 `rgba()` que a regra nem via.**
+  05/08/2026. Decisao de produto do usuario: **derivar dos tokens**, aceitando que a
+  cor pintada mude. O que se descobriu no caminho:
+  - **A regra so olhava `#hex`.** Havia **71 literais `rgba()`** invisiveis para ela —
+    quase tantos quanto os 81 contados. O menu de acoes tinha uma paleta inteira de
+    categoria (mensagem, oficial, documento, rota, pacote) escrita em `rgba()`.
+  - **Dois falsos positivos da propria regra:** hex dentro de comentario de BLOCO
+    (o auditor so pulava a linha que ABRE o comentario) e hex em comentario de fim de
+    linha documentando valor velho. Corrigido o rastreio de bloco no auditor.
+  - **Quase entrou um defeito de contraste meu:** trocar `color: #fff` por
+    `var(--on-accent)` poe tinta quase preta sobre gradiente vermelho no tema escuro
+    (`--on-accent` segue o acento, que la e dourado). Dai `--on-state`, que segue o
+    **estado**: branco no claro (5,4:1 no perigo) e escuro no escuro (6,6:1) — medido.
+  - **`NOVO-42` 🟠 contraste do botao WhatsApp.** Branco sobre `#25d366` da **1,98:1**,
+    reprova qualquer criterio. Preexistente. Trocado por tinta escura: **8,85:1**.
+  - **O teto de 60 tokens reprovou em 63 e nao foi levantado.** Tres dos que eu tinha
+    criado sairam derivados: "mensagem" e o proprio `--cv-state-success` (delta maximo
+    de 9/255), "documento" e o perigo abafado, e a tinta de marca virou `color-mix`.
+    Ficou em **52**.
+  - Efeito medido: **241 propriedades em 54 elementos**, todas de cor, so em tela de
+    vitrine — porque e la que os botoes de estado aparecem com os dados de
+    desenvolvimento. **Isso e limite do dado, nao prova de que producao nao mudou** —
+    a mesma armadilha do `NOVO-37`. Prints antes/depois em `docs/evidencias/novo30-cores/`.
+  - Catraca **129 → 102**; `hex_color_outside_tokens` e `domain_selector_in_global`
+    zerados.
+
   > **Para quem pegar a fase 6 (consolidacao):** o alvo e regra **duplicada** entre
   > arquivos, nao regra morta — essa acabou, e a catraca esta em zero. Sao 62
   > arquivos e 32.741 linhas para os alvos de ≤25 e ≤13.000, e eles so saem

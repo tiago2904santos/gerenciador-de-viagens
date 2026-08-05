@@ -1983,7 +1983,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 }
 
  .cv-inline-create__toggle {
-  background: var(--cv-surface-card); /* #213246 */
+  background: var(--cv-surface-card);
   color:      var(--cv-ink);
 }
 
@@ -1993,7 +1993,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 
  .cv-inline-create__toggle.is-active,
  .cv-inline-create__toggle[aria-expanded="true"] {
-  background:   var(--cv-surface-card); /* #213246 — igual ao estado fechado */
+  background:   var(--cv-surface-card);
   border-color: var(--cv-border);
   color:        var(--cv-ink);
 }
