@@ -1098,6 +1098,31 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
 
 ## 7.1 Escopo novo, fora das oito etapas
 
+### Deploy de produção (05/08/2026) — `NOVO-55`
+
+- [x] **`NOVO-55` 🔴 o deploy automático nunca implantou nada.** 26 execuções desde
+  04/08, 26 falhas, sempre no mesmo ponto: `pg_dump: FATAL: role "..." does not exist`
+  no backup pré-checkout. `pg_dump`/`pg_restore` leem `PGHOST/PGPORT/PGUSER/PGPASSWORD`
+  e o `.env` da VPS só tem `DB_*`, então o cliente ia ao socket Unix local com o
+  usuário do SSH como role. A tradução passou para `scripts/lib/pg_env.sh`, onde vale
+  para todo chamador — inclusive o agendamento diário que `OPERACAO_SEGURANCA_PRIVACIDADE.md`
+  recomenda, que estava quebrado pelo mesmo motivo e sem ninguém olhando.
+
+  **O gate existia e não viu.** O drill de restore do CI definia as `PG*` no próprio
+  passo, então exercitava um caminho que produção não usa. Ele agora roda sem `PG*`,
+  com as `DB_*` do job — a mesma entrada da VPS. Antes desta correção, esse passo
+  falha; é a prova do defeito.
+
+  Atrás do primeiro erro havia dois que só apareceriam com ele resolvido, um deles
+  capaz de reverter um deploy correto:
+  - health check em `http://127.0.0.1:8000/health/`, onde **nada escuta** — gunicorn
+    serve por socket unix (`config/settings/prod.py:88`) — e ainda sem `Host` de
+    `ALLOWED_HOSTS` (400) e sem `X-Forwarded-Proto` (301 do `SECURE_SSL_REDIRECT`);
+  - `DJANGO_SETTINGS_MODULE` dependendo de o `.env` trazê-lo: ausente, `migrate` roda
+    com settings de desenvolvimento.
+
+  Fica também um `workflow_dispatch` no deploy, para reimplantar sem commit vazio.
+
 ### Rascunhos antigos triados em 29/07
 
 - [x] **#32** — destino em CAIXA ALTA no documento da Ordem de Serviço. Confirmado

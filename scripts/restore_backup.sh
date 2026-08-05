@@ -13,6 +13,9 @@ fi
   exit 2
 }
 
+# shellcheck source=scripts/lib/pg_env.sh
+source "$(dirname -- "${BASH_SOURCE[0]}")/lib/pg_env.sh"
+
 ENCRYPTED="$(readlink -f "$1")"
 MEDIA_ROOT="${MEDIA_ROOT:-/var/www/gerenciador-viagens/media}"
 WORK_DIR="$(mktemp -d)"
@@ -33,7 +36,7 @@ tar -C "${WORK_DIR}/payload" -xzf "${WORK_DIR}/backup.tar.gz"
   sha256sum --check SHA256SUMS
 )
 
-pg_restore --clean --if-exists --no-owner --dbname="${DB_NAME}" \
+pg_restore --no-password --clean --if-exists --no-owner --dbname="${DB_NAME}" \
   "${WORK_DIR}/payload/database.dump"
 mkdir -p "${MEDIA_ROOT}"
 tar -C "${MEDIA_ROOT}" -xzf "${WORK_DIR}/payload/media.tar.gz"

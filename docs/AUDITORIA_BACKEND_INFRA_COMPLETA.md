@@ -317,6 +317,7 @@ Pares off-by-one (`720/721`, `840/841`, `1180/1181`, `767/768`, `599/600`, `479/
 | G-01 | 🟡 | 161 arquivos indevidos no git (screenshots, tmp, logs, backups) | §8.1 |
 | G-02 | 🟡 | 20+ docs datados competindo com os duráveis | §8.2 |
 | G-03 | 🟠 | Repositório dentro do OneDrive (pip trava; sync de `.venv`/`legacy`) | §8.3 |
+| NOVO-55 | 🔴 | **O deploy automático nunca implantou nada: 26 execuções, 26 falhas** (04–05/08/2026), todas em `scripts/backup_production.sh` com `pg_dump: FATAL: role "..." does not exist`. `pg_dump`/`pg_restore` leem `PGHOST/PGPORT/PGUSER/PGPASSWORD`; o `.env` da VPS só tem `DB_*`, então o cliente caía no socket Unix local com o usuário do SSH como role. O drill de restore do CI passava porque definia as `PG*` no próprio passo — testava um caminho que produção não usa. Atrás desse, dois defeitos que só apareceriam depois: o health check batia em `127.0.0.1:8000`, onde nada escuta (gunicorn serve por socket unix, `config/settings/prod.py:88`), sem `Host` de `ALLOWED_HOSTS` (400) nem `X-Forwarded-Proto` (301 do `SECURE_SSL_REDIRECT`) — reprovaria e reverteria um deploy são; e `DJANGO_SETTINGS_MODULE` dependia de o `.env` trazê-lo, sem o qual `migrate` roda com settings de desenvolvimento | NOVO |
 
 ---
 

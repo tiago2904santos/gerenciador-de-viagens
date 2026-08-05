@@ -4,6 +4,9 @@ set -euo pipefail
 : "${DB_NAME:?DB_NAME obrigatório}"
 : "${BACKUP_ENCRYPTION_KEY:?BACKUP_ENCRYPTION_KEY obrigatório}"
 
+# shellcheck source=scripts/lib/pg_env.sh
+source "$(dirname -- "${BASH_SOURCE[0]}")/lib/pg_env.sh"
+
 APP_ROOT="${APP_ROOT:-/var/www/gerenciador-viagens/app}"
 MEDIA_ROOT="${MEDIA_ROOT:-/var/www/gerenciador-viagens/media}"
 BACKUP_ROOT="${BACKUP_ROOT:-/var/backups/gerenciador-viagens}"
@@ -22,7 +25,10 @@ cleanup() {
 }
 trap cleanup EXIT
 
-pg_dump --format=custom --file="${WORK_DIR}/database.dump" "${DB_NAME}"
+# --no-password: sem terminal, a senha ausente vira prompt que só morre no
+# command_timeout do deploy (10 min). Falhar na hora diz o que faltou.
+pg_dump --no-password --format=custom \
+  --file="${WORK_DIR}/database.dump" "${DB_NAME}"
 tar -C "${MEDIA_ROOT}" -czf "${WORK_DIR}/media.tar.gz" .
 git -C "${APP_ROOT}" rev-parse HEAD > "${WORK_DIR}/commit-sha.txt"
 (
