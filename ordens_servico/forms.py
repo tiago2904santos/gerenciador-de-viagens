@@ -248,8 +248,12 @@ class OrdemServicoForm(forms.ModelForm):
 
         self.fields["tipo_necessidade"].required = True
         self.fields["motivo"].required = False
+        # BE-05: `ModeloMotivoOficio` tem área, e o texto do modelo entra literalmente
+        # no documento gerado. `oficios/forms.py:289` já recortava; aqui faltava.
         self.fields["modelo_motivo"].queryset = (
-            ModeloMotivoOficio.objects.filter(ativo=True).order_by("ordem", "nome")
+            filter_queryset_by_area(ModeloMotivoOficio.objects)
+            .filter(ativo=True)
+            .order_by("ordem", "nome")
         )
         self.destination_rows = self._build_destination_rows(estado_id, cidade_id)
 

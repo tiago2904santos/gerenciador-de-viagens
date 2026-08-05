@@ -260,19 +260,29 @@ class EventoNovoCadastroForm(forms.ModelForm):
             .filter(nao_vinculado_ou_deste_evento)
             .order_by("-data_criacao", "-created_at")
         )
+        # BE-04: os cinco pickers precisam do mesmo recorte por área. A linha de
+        # ofícios acima já tinha; estes quatro não, e ofereciam documento de outra
+        # unidade. Selecionar um fazia `validate_cross_area_foreign_keys` levantar
+        # ValidationError dentro do pre_save — 500, não erro de formulário.
         self.fields["ordens_servico_vinculadas"].queryset = (
-            OrdemServico.objects.filter(nao_vinculado_ou_deste_evento).order_by("-ano", "-numero")
+            filter_queryset_by_area(OrdemServico.objects)
+            .filter(nao_vinculado_ou_deste_evento)
+            .order_by("-ano", "-numero")
         )
         self.fields["planos_trabalho_vinculados"].queryset = (
-            PlanoTrabalho.objects.filter(nao_vinculado_ou_deste_evento).order_by("-ano", "-numero")
+            filter_queryset_by_area(PlanoTrabalho.objects)
+            .filter(nao_vinculado_ou_deste_evento)
+            .order_by("-ano", "-numero")
         )
         self.fields["termos_vinculados"].queryset = (
-            TermoAutorizacao.objects.select_related("destino_cidade", "destino_estado")
+            filter_queryset_by_area(TermoAutorizacao.objects)
+            .select_related("destino_cidade", "destino_estado")
             .filter(nao_vinculado_ou_deste_evento)
             .order_by("-created_at")
         )
         self.fields["roteiros_vinculados"].queryset = (
-            Roteiro.objects.select_related("origem_cidade", "origem_estado")
+            filter_queryset_by_area(Roteiro.objects)
+            .select_related("origem_cidade", "origem_estado")
             .filter(nao_vinculado_ou_deste_evento)
             .order_by("-created_at")
         )

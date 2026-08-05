@@ -116,7 +116,7 @@ filtro foi descartado.
 **Correção:** `data_criacao__gte`/`__lte`; remover os quatro `except` mudos — validar formato é
 papel do form. Teste que filtra por intervalo e exige contagem.
 
-### BE-04 🔴 Formulário de evento oferece documentos de outras áreas · AUD · 0,5 d
+### BE-04 ✅ RESOLVIDO · 🔴 Formulário de evento oferece documentos de outras áreas · AUD · 0,5 d
 
 `eventos/forms.py:258` filtra ofícios com `filter_queryset_by_area(Oficio.objects)` — correto. Nas
 16 linhas seguintes, `:264` `OrdemServico.objects`, `:267` `PlanoTrabalho.objects`, `:270`
@@ -129,13 +129,13 @@ um deles faz `core/tenancy.validate_cross_area_foreign_keys` levantar `Validatio
 **Correção:** envolver os quatro em `filter_queryset_by_area`. Teste de duas áreas cobrindo os
 cinco campos.
 
-### BE-05 🟠 Seletor de modelo de motivo da OS expõe outras áreas · AUD · 0,25 d
+### BE-05 ✅ RESOLVIDO · 🟠 Seletor de modelo de motivo da OS expõe outras áreas · AUD · 0,25 d
 
 `ordens_servico/forms.py:252` — `ModeloMotivoOficio.objects.filter(ativo=True)` sem recorte, e o
 modelo tem `area`. Teste com A1/A2: o queryset devolveu os dois.
 **Efeito:** o texto padrão de motivo de outra unidade entra literalmente no documento gerado.
 
-### BE-06 🟠 Relatório técnico sai com a cidade-sede de outra área · AUD · 0,25 d
+### BE-06 ✅ RESOLVIDO · 🟠 Relatório técnico sai com a cidade-sede de outra área · AUD · 0,25 d
 
 `prestacoes_contas/services.py:117-124` — `_sede()` faz `ConfiguracaoSistema.objects.first()`. É o
 único ponto de produção que lê `ConfiguracaoSistema` sem área; todo o resto resolve por área
