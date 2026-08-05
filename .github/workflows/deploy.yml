@@ -38,6 +38,10 @@ jobs:
             : "${DB_USER:?DB_USER ausente no .env da VPS}"
             : "${DB_PASSWORD:?DB_PASSWORD ausente no .env da VPS}"
             : "${BACKUP_ENCRYPTION_KEY:?BACKUP_ENCRYPTION_KEY ausente no .env da VPS}"
+            # config/settings/prod.py levanta RuntimeError sem esta variável, e o
+            # erro só apareceria no `migrate` — depois do checkout, com o serviço
+            # ainda no código velho. Aqui aborta antes de mexer em qualquer coisa.
+            : "${FIELD_ENCRYPTION_KEYS:?FIELD_ENCRYPTION_KEYS ausente no .env da VPS — gere com: python -c \"from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())\"}"
 
             # pg_dump lê PGHOST/PGPORT/PGUSER/PGPASSWORD, não DB_*. Sem estes
             # ele tenta o socket Unix com o usuário do SSH como role, falha com
