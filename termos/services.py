@@ -6,8 +6,6 @@ import logging
 
 from django.conf import settings
 
-logger = logging.getLogger(__name__)
-
 from cadastros.models import Servidor
 from cadastros.models import Viatura
 from cadastros.selectors import build_configuracao_context
@@ -39,6 +37,8 @@ from oficios.documents import build_termo_payload
 from oficios.models import Oficio
 
 from .models import TermoAutorizacao
+
+logger = logging.getLogger(__name__)
 
 
 _TEMPLATE_DOCX_BY_VARIANTE = {

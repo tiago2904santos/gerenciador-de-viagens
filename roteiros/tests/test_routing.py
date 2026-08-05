@@ -26,7 +26,6 @@ from roteiros.services.routing.route_exceptions import (
     RouteAuthenticationError,
     RouteCoordinateError,
     RouteProviderUnavailable,
-    RouteValidationError,
 )
 from roteiros.services.routing.route_metrics import summarize_route_leg_metrics
 from roteiros.services.routing.route_time_rules import (

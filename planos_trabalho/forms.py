@@ -281,7 +281,7 @@ class PlanoIdentificacaoForm(forms.ModelForm):
         try:
             return filter_queryset_by_area(ProgramaSolicitante.objects).get(pk=valor, ativo=True)
         except (ProgramaSolicitante.DoesNotExist, TypeError, ValueError):
-            raise forms.ValidationError("Selecione um programa válido.")
+            raise forms.ValidationError("Selecione um programa válido.") from None
 
     def clean_horario_atendimento(self):
         return (self.cleaned_data.get("horario_atendimento") or "").strip()

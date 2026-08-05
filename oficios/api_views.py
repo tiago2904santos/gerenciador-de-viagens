@@ -1,4 +1,3 @@
-import logging
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from .selectors import get_oficio_by_id

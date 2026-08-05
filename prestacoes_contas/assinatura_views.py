@@ -18,8 +18,6 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.templatetags.static import static
 from django.urls import reverse
-from django.utils import timezone
-from django.views.decorators.http import require_POST
 
 from .assinatura_services import AssinaturaError
 from .assinatura_services import aplicar_assinatura

@@ -6,7 +6,6 @@ from core.normalizers import remove_accents
 from core.tenancy import filter_queryset_by_area
 from core.tenancy import get_current_area
 
-from .models import AssinaturaConfiguracao
 from .models import Cargo
 from .models import ConfiguracaoSistema
 from .models import Cidade

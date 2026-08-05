@@ -3,12 +3,10 @@
 from __future__ import annotations
 
 import json
-import re
 from copy import deepcopy
 from datetime import datetime
 from decimal import ROUND_HALF_UP
 from decimal import Decimal
-from decimal import InvalidOperation
 from types import SimpleNamespace
 
 from django.db.models import Q
@@ -22,7 +20,6 @@ from roteiros.services.diarias import (
     calculate_periodized_diarias,
     formatar_valor_diarias,
     infer_tipo_destino_from_paradas,
-    locations_equivalent,
 )
 from roteiros.models import Roteiro, RoteiroDestino, RoteiroTrecho
 from roteiros.services.editor_context import (
@@ -47,7 +44,6 @@ from roteiros.services.editor_state import (
     roteiro_trecho_duplica_retorno,
 )
 from roteiros.services.map_defaults import build_roteiro_map_defaults
-from roteiros.services.valor_extenso import valor_por_extenso_ptbr
 
 ROTEIRO_MODO_EVENTO = "EVENTO_EXISTENTE"
 ROTEIRO_MODO_PROPRIO = "ROTEIRO_PROPRIO"
@@ -112,7 +108,6 @@ def _estrutura_trechos(roteiro, destinos_list=None):
     ordem, tipo, origem_estado, origem_cidade, destino_estado, destino_cidade,
     saida_dt, chegada_dt (do DB se existir), origem_nome, destino_nome, id (pk do trecho se existir).
     """
-    from datetime import datetime
     if not roteiro.origem_estado_id and not roteiro.origem_cidade_id:
         return []
     if destinos_list is None:
@@ -1363,7 +1358,6 @@ def _roteiro_virtual_para_trechos(initial):
     Objeto estilo roteiro (sem pk) para usar em _estrutura_trechos no cadastro novo.
     initial deve ter 'origem_estado' e/ou 'origem_cidade'. Retorna objeto com pk=None e atributos de origem.
     """
-    from types import SimpleNamespace
     r = SimpleNamespace(pk=None, origem_estado_id=None, origem_cidade_id=None, origem_estado=None, origem_cidade=None)
     r.origem_estado_id = initial.get('origem_estado')
     r.origem_cidade_id = initial.get('origem_cidade')
@@ -1410,7 +1404,6 @@ def _build_roteiro_avulso_route_options(evento=None, excluir_pk=None):
 
 def _build_avulso_roteiro_state_from_post(request, route_state_map=None):
     """Reutiliza o parser do editor com aliases avulsos (origem_* -> sede_*)."""
-    from types import SimpleNamespace
 
     post_data = request.POST.copy()
     if 'sede_estado' not in post_data and 'origem_estado' in post_data:
@@ -1456,7 +1449,6 @@ def _calculate_avulso_diarias_from_state(state, *, quantidade_servidores: int = 
 
 
 def _build_roteiro_diarias_from_request(request, *, roteiro=None, evento=None):
-    from types import SimpleNamespace
 
     post_data = request.POST.copy()
     if 'roteiro_modo' not in post_data:

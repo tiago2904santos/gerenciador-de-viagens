@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
-from django.views.decorators.http import require_POST
 
 from core.retorno import voltar_para
 from documentos.services.exceptions import DocumentValidationError

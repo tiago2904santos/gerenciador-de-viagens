@@ -36,11 +36,9 @@ from .services.routing.route_exceptions import (
 from .services.routing.route_service import calcular_rota_para_roteiro
 from .services.routing.route_preview_service import calculate_route_preview
 
-logger = logging.getLogger(__name__)
 from .models import Roteiro
 from .presenters import (
     apresentar_contexto_formulario_roteiro_avulso,
-    apresentar_linha_lista_simples_roteiro,
     apresentar_roteiro_card,
 )
 from .selectors import (
@@ -70,6 +68,8 @@ from .services.autosave import (
 )
 from .services.estimativa_local import ROTA_FONTE_ESTIMATIVA_LOCAL
 from .services.routing.trecho_route_service import calcular_rota_trecho
+
+logger = logging.getLogger(__name__)
 
 ROTEIROS_PER_PAGE = 15
 

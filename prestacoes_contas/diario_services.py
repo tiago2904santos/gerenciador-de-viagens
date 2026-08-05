@@ -242,7 +242,7 @@ def alteracoes_datas_horarios_roteiro(prestacao) -> list[str]:
     itens = []
     for tipo, trechos_novos in agrupar_por_tipo(copia).items():
         trechos_velhos = originais_por_tipo.get(tipo, [])
-        for t_novo, t_velho in zip(trechos_novos, trechos_velhos):
+        for t_novo, t_velho in zip(trechos_novos, trechos_velhos, strict=False):
             rota = (
                 f"{format_document_display(_cidade_label(t_novo.origem_cidade, t_novo.origem_estado))}"
                 f" → {format_document_display(_cidade_label(t_novo.destino_cidade, t_novo.destino_estado))}"

@@ -2,10 +2,8 @@ import re
 from urllib.parse import urlencode
 
 from django.contrib import messages
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.views.decorators.http import require_POST
 
 from core.autosave import AutosavePayloadError, autosave_json_response, parse_autosave_payload
 from core.normalizers import normalize_spaces
@@ -36,7 +34,6 @@ from .view_common import (
     _prestacao_queryset,
     _prestacao_servidor_full,
     _prestacao_servidor_queryset,
-    _primeiro_servidor,
     _redirect_primeiro_servidor,
 )
 
@@ -144,7 +141,7 @@ def diario_servidor(request, ps_pk):
     linhas = list(queryset)
     trechos = [
         {"form": form, "display": _trecho_display(linha)}
-        for form, linha in zip(formset.forms, linhas)
+        for form, linha in zip(formset.forms, linhas, strict=True)
     ]
 
     return render(
@@ -221,8 +218,6 @@ def diario_editar_roteiro(request, pc_pk):
 
 def diario_servidor_editar_roteiro(request, ps_pk):
     """Abre o editor de roteiro sobre a cópia da prestação (clona do ofício na 1ª vez)."""
-    from urllib.parse import urlencode
-
     ps = get_object_or_404(
         _prestacao_servidor_queryset().select_related("prestacao__oficio__roteiro"),
         pk=ps_pk,
@@ -264,7 +259,6 @@ def _sincronizar_info_complementares_rt(prestacao):
 
 def _oficio_prefill_dados(oficio) -> dict:
     """Dados de um ofício para auto-preencher o formulário de troca (motorista + viatura)."""
-    from .diario_services import _viatura_dados  # uso interno no mesmo app
 
     nome, cpf = motorista_do_oficio(oficio)
     numero = str(oficio.numero or "").strip()

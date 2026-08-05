@@ -2,7 +2,6 @@ import re
 from pathlib import Path
 
 from django import forms
-from django.core.validators import FileExtensionValidator
 from django.forms import modelformset_factory
 from django.forms.renderers import TemplatesSetting
 
@@ -19,7 +18,6 @@ from core.utils.masks import normalize_protocolo
 from .models import DiarioBordo
 from .models import DiarioBordoTrecho
 from .models import ModeloTextoRelatorioTecnico
-from .models import PRESTACAO_DOCUMENTO_EXTENSOES
 from .models import PrestacaoContas
 from .models import PrestacaoDocumentoAnexo
 from .models import PrestacaoServidor

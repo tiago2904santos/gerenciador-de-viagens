@@ -280,15 +280,16 @@ COMPONENT_USAGE = {
         "templates/oficios/partials/assinatura_etiqueta_actions.html",
         "templates/planos_trabalho/wizard_atividades.html",
     ],
+    # NOVO-04: `status_badge` estava declarado duas vezes. Em literal de dict a
+    # segunda ocorrência descarta a primeira em silêncio, então o inventário do
+    # UI Lab perdia `confirm_delete.html` — que é exatamente a tela que alguém
+    # consulta antes de mexer no componente. Listas unidas.
     "status_badge": [
         "templates/components/ui/modals/confirm_delete.html",
-    ],
-    "status_badge": [
         "templates/oficios/wizard_documentos.html",
         "templates/components/cards/document_card.html",
     ],
     "page_header_status_chip": [
-        "templates/components/ui/headers/page_header.html",
         "templates/components/ui/headers/page_header.html",
     ],
     # Feedback

@@ -1,10 +1,8 @@
 import re
 
 from django.contrib import messages
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.views.decorators.http import require_POST
 
 from core.autosave import (
     AutosavePayloadError,
@@ -27,7 +25,6 @@ from .models import PrestacaoServidor, RelatorioTecnico
 from .services import (
     aplicar_diaria_recebida,
     diaria_inicial_da_prestacao,
-    diaria_recebida_display,
     garantir_campos_padrao_relatorio_tecnico,
 )
 from .view_common import (

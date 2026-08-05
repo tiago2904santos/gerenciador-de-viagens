@@ -294,20 +294,20 @@ def print_findings(findings: list[tuple]) -> tuple[int, int]:
 
     if erros:
         print("\n=== ERROS (devem ser corrigidos) ===")
-        for level, rp, ln, rule, msg, text, reason in erros:
+        for _level, rp, ln, rule, msg, text, _reason in erros:
             print(f"  {rp}:{ln} [{rule}] {msg}")
             print(f"    > {text[:120]}")
 
     if avisos:
         print("\n=== AVISOS (dívida técnica conhecida) ===")
-        for level, rp, ln, rule, msg, text, reason in avisos:
+        for _level, rp, ln, rule, msg, text, _reason in avisos:
             print(f"  {rp}:{ln} [{rule}] {msg}")
             print(f"    > {text[:120]}")
 
     unique_excecoes: set[str] = set()
     if excecoes:
         print("\n=== EXCECOES documentadas (informativo) ===")
-        for level, rp, ln, rule, msg, text, reason in excecoes:
+        for _level, rp, _ln, rule, _msg, _text, reason in excecoes:
             key = f"{rp}:{rule}"
             if key not in unique_excecoes:
                 print(f"  {rp} [{rule}] -- {reason}")

@@ -1,4 +1,3 @@
-import logging
 from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import redirect

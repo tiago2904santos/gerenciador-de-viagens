@@ -42,8 +42,10 @@ def colapsar_por_oficio(apps, schema_editor):
     for oficio_id, prestacoes in grupos.items():
         motorista_id = motoristas.get(oficio_id)
 
+        # `score` é consumido pelo `max()` logo abaixo, ainda dentro desta
+        # iteração — `motorista_id` não muda entre definir e chamar.
         def score(pc):
-            is_mot = 1 if (motorista_id and pc.servidor_id == motorista_id) else 0
+            is_mot = 1 if (motorista_id and pc.servidor_id == motorista_id) else 0  # noqa: B023
             rt = RelatorioTecnico.objects.filter(prestacao=pc).first()
             rt_len = 0
             if rt is not None:

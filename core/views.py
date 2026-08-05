@@ -1045,7 +1045,6 @@ def perfil(request):
     from integracoes.google_drive import status as drive_status
     from integracoes.google_drive.models import (
         DriveArquivo,
-        DriveCredenciais,
         DriveReorganizacaoJob,
     )
     from integracoes.google_drive.services import (

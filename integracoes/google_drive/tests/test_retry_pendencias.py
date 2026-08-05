@@ -116,7 +116,7 @@ class SignalRetryTests(TestCase):
                 "integracoes.google_drive.organizer.organizar_artefato"
             ) as organizar_mock:
                 with self.captureOnCommitCallbacks(execute=True):
-                    art = DocumentoArtefato.objects.create(
+                    DocumentoArtefato.objects.create(
                         tipo="oficio", formato="pdf", oficio=self.oficio,
                         hash_sha256=digest, arquivo=arquivo,
                     )

@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_not_required
 from django.core.signing import BadSignature
 from django.core.signing import SignatureExpired
 from django.http import Http404
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -77,7 +76,7 @@ def artefato_pdf_conteudo_publico(request):
     try:
         payload = parse_artefato_pdf_temp_token(token)
     except (BadSignature, SignatureExpired):
-        raise Http404()
+        raise Http404() from None
     pk = payload.get("pk")
     if not pk:
         raise Http404()

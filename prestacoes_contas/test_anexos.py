@@ -11,7 +11,6 @@ encontrado vira linha ``NOVO``; correção é outro PR.
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 from django.core.files.uploadedfile import SimpleUploadedFile

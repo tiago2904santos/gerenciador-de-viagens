@@ -1,36 +1,20 @@
-from pathlib import Path
 import datetime
-import json
 import re
 
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils import timezone
-from django.utils.html import escape
 from django.views.decorators.http import require_POST
 
 from core.autosave import AutosavePayloadError
 from core.autosave import autosave_json_response
-from core.autosave import filter_allowed_fields
 from core.autosave import parse_autosave_payload
 from core.normalizers import normalize_spaces
-from core.normalizers import remove_accents
-from core.presenters.meta import build_meta
-from core.private_media import private_file_response
 from core.retorno import voltar_para
-from core.tenancy import filter_queryset_by_area
-from core.tenancy import get_current_area
-from core.utils.masks import format_cpf
-from core.utils.masks import format_placa
-from core.utils.masks import format_protocolo
 from documentos.services.async_generation import enfileirar_documento
-from oficios.models import Oficio
 
 from .diario_views import (
     diario_autosave,
@@ -172,6 +156,129 @@ from .view_common import (
     _preview_error_response,
     _relatorio_queryset,
 )
+
+# QA-07 — a superfície pública deste módulo, escrita.
+#
+# Aqui a fachada do P-06 está pela metade: 98 nomes vêm de módulos irmãos e
+# 16 ainda são definidos neste arquivo. Os dois grupos entram, porque `urls.py`
+# chega em todos por `views.<nome>`. Sem `__all__` o ruff acusava cada
+# re-export como import morto (`F401`) e escondia os que realmente eram.
+__all__ = [
+    "ABA_ARQUIVADOS",
+    "ABA_FINALIZADOS",
+    "ABA_LIBERADAS",
+    "ABA_NAO_LIBERADAS",
+    "AssinaturaDocumento",
+    "AssinaturaError",
+    "CAMPOS_COM_MODELO",
+    "CAMPOS_CUSTEIO_COM_OUTRO",
+    "DiarioBordo",
+    "DiarioBordoTrechoFormSet",
+    "DiarioMotoristaForm",
+    "ModeloTextoRelatorioTecnico",
+    "ModeloTextoRelatorioTecnicoForm",
+    "OUTRO_VALUE",
+    "PrestacaoContas",
+    "PrestacaoDespachoForm",
+    "PrestacaoDocumentoAnexo",
+    "PrestacaoServidor",
+    "PrestacaoServidorDiariaForm",
+    "PrestacaoServidorDocumentosForm",
+    "PrestacaoSolicitacaoForm",
+    "RelatorioTecnico",
+    "RelatorioTecnicoForm",
+    "_anexo_assinado_info",
+    "_assinatura_db_card",
+    "_assinatura_rt_card",
+    "_autosave_form_errors",
+    "_autosave_version",
+    "_build_abas",
+    "_build_campos_custeio",
+    "_build_campos_modelo",
+    "_build_identificacao",
+    "_date_autosave_value",
+    "_diario_queryset",
+    "_is_inline_request",
+    "_marcar_servidor_em_preenchimento",
+    "_marcar_servidores_pendentes",
+    "_parse_iso_date",
+    "_prestacao_full",
+    "_prestacao_queryset",
+    "_prestacao_servidor_full",
+    "_prestacao_servidor_queryset",
+    "_preview_error_response",
+    "_primeiro_servidor",
+    "_redirect_lista",
+    "_redirect_primeiro_servidor",
+    "_relatorio_queryset",
+    "_salvar_solicitacoes_em_lote",
+    "_servidor_consolidado_ctx",
+    "_solicitacao_autosave_value",
+    "apresentar_prestacao_servidor_card",
+    "assinatura_db",
+    "assinatura_db_cancelar",
+    "assinatura_db_gerar",
+    "assinatura_rt",
+    "assinatura_rt_cancelar",
+    "assinatura_rt_gerar",
+    "cancelar_assinatura_db",
+    "cancelar_assinatura_rt",
+    "consolidado",
+    "consolidado_download",
+    "consolidado_servidor",
+    "contar_por_aba",
+    "contexto_do_fluxo",
+    "diaria_info",
+    "diaria_inicial_da_prestacao",
+    "diario_autosave",
+    "diario_criar",
+    "diario_download",
+    "diario_editar_roteiro",
+    "diario_motorista",
+    "diario_servidor",
+    "diario_servidor_autosave",
+    "diario_servidor_editar_roteiro",
+    "diario_servidor_motorista",
+    "documentos",
+    "documentos_servidor",
+    "emitir_link_db",
+    "emitir_link_rt",
+    "garantir_campos_padrao_relatorio_tecnico",
+    "garantir_roteiro_ajustado",
+    "get_custeio_valores_fixos",
+    "index",
+    "listar_prestacoes",
+    "marcar_agrupamento_cards",
+    "modelo_editar",
+    "modelo_excluir",
+    "modelo_novo",
+    "modelos_index",
+    "motorista_diario",
+    "motorista_do_oficio",
+    "normalizar_aba",
+    "prestacao_arquivar",
+    "prestacao_arquivo_autosave",
+    "prestacao_despacho_assinado_anexar",
+    "prestacao_documento_conteudo",
+    "prestacao_documento_excluir",
+    "prestacao_finalizar",
+    "prestacao_oficio_assinado_anexar",
+    "prestacao_servidor_arquivar",
+    "prestacao_servidor_arquivo_autosave",
+    "prestacao_servidor_assinado_anexar",
+    "prestacao_servidor_finalizar",
+    "prestacao_servidor_solicitacao_autosave",
+    "rt_autosave",
+    "rt_criar",
+    "rt_download_servidor",
+    "rt_servidor",
+    "rt_servidor_autosave",
+    "signer_db",
+    "signer_rt",
+    "sincronizar_trechos",
+    "viatura_resumo_diario",
+    "viatura_resumo_oficio",
+]
 
 
 
@@ -315,7 +422,7 @@ def index(request):
             "has_filters": has_filters,
             "search_clear_url": f"{reverse('prestacoes_contas:index')}?aba={aba}",
             "status_options": [{"value": "", "label": "Todos os status"}]
-            + [{"value": v, "label": l} for v, l in PrestacaoServidor.STATUS_CHOICES],
+            + [{"value": valor, "label": rotulo} for valor, rotulo in PrestacaoServidor.STATUS_CHOICES],
             "empty_message": _ABA_EMPTY_MESSAGE.get(aba, "Nenhuma prestação de contas encontrada."),
             "sort_options": [
                 {"value": "criacao_desc",  "label": "Criação: mais recente"},
@@ -626,8 +733,5 @@ def consolidado_download(request, ps_pk):
     )
 
 
-# ─────────────────────────────────────────────────────────────────
-# Gerenciamento de modelos de texto do RT
-# ─────────────────────────────────────────────────────────────────
-
-_CAMPO_LABELS = dict(ModeloTextoRelatorioTecnico.CAMPO_CHOICES)
+# O gerenciamento de modelos de texto do RT vive em `model_views.py` — as views
+# estão re-exportadas no topo deste arquivo. `_CAMPO_LABELS` foi junto (`NOVO-03`).

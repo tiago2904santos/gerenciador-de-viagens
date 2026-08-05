@@ -184,10 +184,13 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 ### Fase 1 — Réguas e rede de segurança
 - [ ] `PF-07` `scripts/medir_desempenho.py` com dois volumes, no CI
 - [ ] `QA-03` rollback de deploy não desfaz migração
-- [ ] `QA-06` teste da CVE do WeasyPrint verifica texto-fonte, não comportamento
-- [ ] `QA-07` sem lint/formatação/tipo em Python no CI (e ORM-em-view com folga zero)
-- [ ] `QA-11` `reparar-producao.yml` em UTF-16LE
-- [ ] `QA-12` sem Dependabot, sem CodeQL, sem gate de acessibilidade
+- [x] `QA-06` teste da CVE do WeasyPrint verifica texto-fonte, não comportamento
+- [x] `QA-07` sem lint/formatação/tipo em Python no CI — **lint fechado** (`ruff` em zero,
+      gate em `tests.yml`). Formatação e tipo seguem abertos como `NOVO-05`. A folga zero do
+      `--max-orm-em-view 30` continua de pé: qualquer ORM novo em view reprova o CI.
+- [x] `QA-11` `reparar-producao.yml` em UTF-16LE
+- [x] `QA-12` sem Dependabot, sem CodeQL, sem gate de acessibilidade — **Dependabot entrou**;
+      CodeQL e gate de acessibilidade seguem abertos
 
 ### Fase 2 — Isolamento por área
 - [ ] `DB-03` limpeza de rascunhos apaga rascunho de outra área

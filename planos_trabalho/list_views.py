@@ -71,7 +71,7 @@ def index(request):
             "programas_url": reverse("planos_trabalho:programas_index"),
             "horarios_url": reverse("planos_trabalho:horarios_index"),
             "status_options": [{"value": "", "label": "Todos os status"}]
-            + [{"value": v, "label": l} for v, l in PlanoTrabalho.STATUS_CHOICES],
+            + [{"value": valor, "label": rotulo} for valor, rotulo in PlanoTrabalho.STATUS_CHOICES],
             "sort_options": [
                 {"value": "numero_desc", "label": "Número: maior"},
                 {"value": "numero_asc", "label": "Número: menor"},

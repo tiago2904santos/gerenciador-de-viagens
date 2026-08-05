@@ -226,7 +226,7 @@ class ProgramasTests(CatalogoCaracterizacaoMixin, TestCase):
         response = self.client.get(self._index())
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("PROGRAMA A", [l["title"] for l in response.context["linhas"]])
+        self.assertIn("PROGRAMA A", [linha["title"] for linha in response.context["linhas"]])
         # Este catálogo não tem busca: o `q` do contexto é sempre vazio.
         self.assertEqual(response.context["q"], "")
 
@@ -247,7 +247,7 @@ class ProgramasTests(CatalogoCaracterizacaoMixin, TestCase):
         ProgramaSolicitante.objects.create(nome="INATIVO", ordem=1, ativo=False)
 
         linhas = self.client.get(self._index()).context["linhas"]
-        linha = next(l for l in linhas if l["title"] == "INATIVO")
+        linha = next(item for item in linhas if item["title"] == "INATIVO")
 
         self.assertEqual(len(linha["badges"]), 1)
 
@@ -271,7 +271,7 @@ class HorariosTests(CatalogoCaracterizacaoMixin, TestCase):
         response = self.client.get(self._index())
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("07:15 até 11:45", [l["title"] for l in response.context["linhas"]])
+        self.assertIn("07:15 até 11:45", [linha["title"] for linha in response.context["linhas"]])
 
     def test_criacao_e_edicao_avisam_com_as_frases_do_horario(self):
         response = self.client.post(

@@ -7,7 +7,6 @@ from django.utils.html import escape
 
 from core.tenancy import filter_queryset_by_area, get_current_area
 from core.utils.masks import format_protocolo
-from documentos.services.exceptions import DocumentValidationError
 
 from .forms import CAMPOS_COM_MODELO, CAMPOS_CUSTEIO_COM_OUTRO
 from .models import DiarioBordo, PrestacaoContas, PrestacaoServidor, RelatorioTecnico

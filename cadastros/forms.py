@@ -10,7 +10,6 @@ from core.normalizers import normalize_upper
 from core.tenancy import filter_queryset_by_area
 from core.utils.masks import (
     RG_NAO_POSSUI_CANONICAL,
-    RG_NAO_POSSUI_DISPLAY,
     format_cpf,
     format_cep,
     format_placa,

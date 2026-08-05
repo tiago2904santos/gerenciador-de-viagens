@@ -45,7 +45,7 @@ def _destinos_display(ordem: OrdemServico) -> str:
     nomes = [format_document_display(d.nome) or str(d.nome) for d in destinos]
     parts = [
         f"{nome}/{d.estado.sigla}" if d.estado_id else nome
-        for d, nome in zip(destinos, nomes)
+        for d, nome in zip(destinos, nomes, strict=True)
     ]
     if len(parts) == 1:
         return parts[0]

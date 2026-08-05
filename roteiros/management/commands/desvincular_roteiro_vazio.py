@@ -44,7 +44,7 @@ class Command(BaseCommand):
         try:
             roteiro = Roteiro.objects.get(pk=pk)
         except Roteiro.DoesNotExist:
-            raise CommandError(f"Roteiro #{pk} não encontrado.")
+            raise CommandError(f"Roteiro #{pk} não encontrado.") from None
 
         if roteiro.destinos.exists() or roteiro.trechos.exists():
             raise CommandError(

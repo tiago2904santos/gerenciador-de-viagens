@@ -52,6 +52,20 @@ jobs:
           python -m pip install -r requirements/test-lock.txt
           python -m pip install "pip-audit>=2.9,<3.0"
 
+      - name: Block Python lint regressions (QA-07)
+        # Primeiro gate do job de propósito: não precisa de banco nem de Django,
+        # roda em menos de um segundo e pega a classe de defeito que nenhum outro
+        # passo pega. A primeira execução achou `_CAMPO_LABELS` indefinido em
+        # `prestacoes_contas/model_views.py` (`NOVO-03`) — `NameError` em rota viva
+        # que a suíte não cobria, porque não havia teste nenhum naquelas 4 views.
+        #
+        # Sem teto: o conjunto selecionado em `ruff.toml` está em zero e fica em
+        # zero. Ampliar o conjunto (`I`, `UP`, `S`, `RUF`) é ID próprio — os
+        # números medidos estão anotados lá.
+        run: |
+          python -m pip install -r requirements/lint.txt
+          python -m ruff check .
+
       - name: Validate migrations and Django configuration
         run: |
           python manage.py makemigrations --check --dry-run --settings=config.settings.test

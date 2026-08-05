@@ -1,4 +1,3 @@
-import logging
 import re
 from django.contrib import messages
 from django.http import QueryDict

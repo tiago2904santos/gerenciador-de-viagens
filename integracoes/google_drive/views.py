@@ -16,7 +16,6 @@ from integracoes.google_drive.models import (
     DriveReorganizacaoJob,
 )
 
-logger = logging.getLogger(__name__)
 from integracoes.google_drive.services import (
     _SCOPES,
     _reset_client,
@@ -26,6 +25,8 @@ from integracoes.google_drive.services import (
     get_client,
     get_pasta_raiz_id,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def _usuario_atual(request):

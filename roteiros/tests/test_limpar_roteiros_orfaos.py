@@ -3,7 +3,7 @@ from io import StringIO
 from django.core.management import call_command
 from django.test import TestCase
 
-from cadastros.models import Cidade, Estado, Servidor
+from cadastros.models import Cidade, Estado
 from eventos.models import Evento
 from oficios.models import Oficio
 from prestacoes_contas.models import PrestacaoContas

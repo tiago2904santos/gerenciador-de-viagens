@@ -50,7 +50,7 @@ class ImportacaoBaseGeograficaTests(TestCase):
             "4106902;PR;Curitiba;-49.2733;-25.4284\n"
             "4113700;PR;Londrina;-51.1628;-23.3045\n",
         )
-        r = importar_base_geografica(
+        importar_base_geografica(
             e_est,
             municipios_code_path=mun,
             dry_run=False,

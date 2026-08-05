@@ -1,6 +1,6 @@
 import hashlib
 from datetime import date
-from unittest.mock import ANY, patch
+from unittest.mock import patch
 
 from django.core.files.base import ContentFile
 from django.test import TestCase, override_settings
@@ -249,10 +249,10 @@ class OrganizerTests(TestCase):
         (pasta global) — dentro do evento existe só um atalho, no nível do
         evento (não dentro da pasta do ofício)."""
         art_os = self._artefato("ordem_servico", name="os.pdf")
-        art_plano = self._artefato("plano_trabalho", name="plano.pdf")
+        self._artefato("plano_trabalho", name="plano.pdf")
         linhas = organizer.planejar_oficio(self.oficio)
-        self.assertTrue(any(l.startswith("Ordens de serviço/") for l in linhas), linhas)
-        self.assertTrue(any(l.startswith("Planos de trabalho/") for l in linhas), linhas)
+        self.assertTrue(any(linha.startswith("Ordens de serviço/") for linha in linhas), linhas)
+        self.assertTrue(any(linha.startswith("Planos de trabalho/") for linha in linhas), linhas)
 
         organizer.organizar_artefato(art_os)
         reg_os = DriveArquivo.objects.get(artefato=art_os)
