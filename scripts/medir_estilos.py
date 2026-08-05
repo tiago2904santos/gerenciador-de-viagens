@@ -117,12 +117,17 @@ def coletar():
                     print(f"  {nome} [{tema}] nao abriu: {str(e)[:60]}", file=sys.stderr)
                     continue
                 pag.evaluate(f"document.documentElement.setAttribute('data-theme','{tema}')")
-                # Estaciona o ponteiro fora do conteudo: sem isso o elemento sob
-                # o mouse e capturado em :hover e a comparacao acusa mudanca que
-                # nao existe. Foi o que aconteceu na primeira medicao da fase 5a
-                # — seis propriedades "mudaram" num card que so estava sob o
-                # cursor.
-                pag.mouse.move(2, 2)
+                # Tira o ponteiro da tela: sem isso o elemento sob o mouse e
+                # capturado em `:hover` e a comparacao acusa mudanca que nao
+                # existe. A origem e o login — `page.click` move o ponteiro para
+                # o botao, em (1007, 593) neste viewport, e o Playwright NAO o
+                # devolve na navegacao; esse ponto cai dentro do 4o card do
+                # Dashboard. As seis propriedades que a fase 5a leu como
+                # diferenca eram exatamente `.summary-card:hover` (cards.css).
+                #
+                # Coordenada negativa, nao (2, 2): no canto superior esquerdo
+                # mora a sidebar, que ficaria em `:hover` no lugar do card.
+                pag.mouse.move(-5, -5)
                 # Trocar de tema dispara `transition` de cor. Esperar por tempo nao
                 # resolve: sobrou uma transicao a meio caminho e a leitura saiu
                 # `rgb(150,...)` numa execucao e `rgb(151,...)` na seguinte, com o
@@ -137,21 +142,41 @@ def coletar():
                   }
                 }""")
                 pag.wait_for_timeout(120)
+                # Guarda: se ainda houver algo em `:hover` abaixo do <body>, a
+                # captura esta contaminada e nao serve de evidencia. Melhor
+                # parar do que comparar lixo — foi comparando lixo que a fase 5a
+                # perdeu um dia.
+                sujo = pag.evaluate(
+                    "() => [...document.querySelectorAll(':hover')]"
+                    ".filter(e => !['HTML', 'BODY'].includes(e.tagName))"
+                    ".map(e => e.tagName + '.' + (e.className || '')).slice(0, 3)")
+                if sujo:
+                    raise SystemExit(
+                        f"captura contaminada por :hover em {nome} [{tema}]: {sujo}")
                 dados[f"{nome}/{tema}"] = pag.evaluate(JS, PROPS)
         nav.close()
     return dados
 
 
 def diferenca(a, b):
-    mudou = []
+    """Propriedades mudadas, elementos que sumiram e elementos que surgiram.
+
+    Sumir importa tanto quanto mudar: `JS` descarta o que tem area < 2px, entao
+    um elemento que colapsou por causa da regra apagada some da captura em vez
+    de aparecer como diferenca. Comparar so a intersecao esconderia exatamente
+    o estrago que uma fase de delecao pode causar.
+    """
+    mudou, sumiu, surgiu = [], [], []
     for tela in sorted(set(a) | set(b)):
         ea, eb = a.get(tela, {}), b.get(tela, {})
+        sumiu += [(tela, k) for k in sorted(set(ea) - set(eb))]
+        surgiu += [(tela, k) for k in sorted(set(eb) - set(ea))]
         for chave in sorted(set(ea) & set(eb)):
             for prop, valor in ea[chave].items():
                 novo = eb[chave].get(prop)
                 if novo != valor:
                     mudou.append((tela, chave, prop, valor, novo))
-    return mudou
+    return mudou, sumiu, surgiu
 
 
 if __name__ == "__main__":
@@ -160,14 +185,20 @@ if __name__ == "__main__":
         a = json.load(open(sys.argv[i + 1]))
         b = json.load(open(sys.argv[i + 2]))
         comparados = sum(len(set(a.get(t, {})) & set(b.get(t, {}))) for t in set(a) | set(b))
-        mudou = diferenca(a, b)
+        mudou, sumiu, surgiu = diferenca(a, b)
         print(f"elementos comparados: {comparados}")
         print(f"propriedades que mudaram: {len(mudou)}")
         for tela, chave, prop, va, vb in mudou[:60]:
             print(f"  {tela:24s} {chave[:46]:48s} {prop:20s} {va[:26]:28s} -> {vb[:26]}")
         if len(mudou) > 60:
             print(f"  … mais {len(mudou) - 60}")
-        sys.exit(1 if mudou else 0)
+        for rotulo, lista in (("sumiram", sumiu), ("surgiram", surgiu)):
+            print(f"elementos que {rotulo}: {len(lista)}")
+            for tela, chave in lista[:20]:
+                print(f"  {tela:24s} {chave}")
+            if len(lista) > 20:
+                print(f"  … mais {len(lista) - 20}")
+        sys.exit(1 if (mudou or sumiu or surgiu) else 0)
 
     destino = sys.argv[sys.argv.index("--salvar") + 1] if "--salvar" in sys.argv else "estilos.json"
     d = coletar()
