@@ -1066,6 +1066,28 @@ fica com a do bloco. Detalhe, hover de lista e foco usam `color-mix` do acento a
     (`NOVO-40`) e 1 `domain_selector_in_global` (seletor citado dentro de comentario
     de bloco). Daqui em diante o auditor nao tem divida a tolerar: aviso novo reprova.
 
+- [x] **`NOVO-43` 🔴 os alvos "≤25 arquivos" e "≤13.000 linhas" NAO sao alcancaveis por
+  consolidacao — medido, nao estimado.** 05/08/2026.
+  - **Fundir arquivo quebra a cascata.** Tentei: 17 arquivos de pagina em 6, na ordem
+    exata que os templates carregam. Resultado medido: **13.118 propriedades mudadas**
+    em 96 telas. O motivo e estrutural — CSS de pagina e escopado POR PAGINA; fundido,
+    cada pagina passa a receber as regras da outra. `/cadastros/` herdou `usuarios.css`
+    e mexeu ate na sidebar. Revertido.
+  - **Nao ha 19.000 linhas de duplicata para tirar.** A duplicata EXATA no repositorio
+    inteiro e de **~700 linhas** (96 copias), e dessas so **110** saem com seguranca:
+    o resto e a mesma regra dentro e fora de um `@media`, que nao e a mesma regra. Com
+    a profundidade do at-rule na chave, a poda deu **0 propriedades mudadas**.
+  - **A conta nao fecha:** 4.221 regras para 32.678 linhas dao ~7,7 linhas por regra.
+    Chegar a 13.000 exigiria apagar ~60% das REGRAS — apagar estilo em uso, nao
+    consolidar. E o que nao tinha consumidor ja saiu na 5b, com a catraca em zero.
+  - **"≤25 arquivos" tambem briga com o `NOVO-12`,** que decidiu de proposito manter os
+    arquivos-fonte como unidade de edicao e resolver o waterfall com bundle. Os 23 do
+    shell ja chegam ao navegador como **um** arquivo. Fundir as fontes desfaria essa
+    decisao para melhorar um numero que o usuario nao sente.
+  - **Se o alvo tiver de valer**, o caminho e outro: escopar cada folha de pagina por
+    uma classe de pagina antes de fundir. E reconstrucao de cascata, com alvo e
+    medicao proprios — nao cabe nesta fase e nao e faxina.
+
   > **Para quem pegar a fase 6 (consolidacao):** o alvo e regra **duplicada** entre
   > arquivos, nao regra morta — essa acabou, e a catraca esta em zero. Sao 62
   > arquivos e 32.741 linhas para os alvos de ≤25 e ≤13.000, e eles so saem

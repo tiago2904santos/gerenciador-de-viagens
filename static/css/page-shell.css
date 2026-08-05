@@ -1446,10 +1446,6 @@ body.has-delete-modal-open {
     padding-block: var(--sp-3);
   }
 
-  .cv-form-section-body {
-    padding: var(--sp-4);
-  }
-
   .footer-actions {
     align-items:    stretch;
     flex-direction: column-reverse;

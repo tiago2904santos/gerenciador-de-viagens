@@ -665,13 +665,6 @@
   margin: 0;
 }
 
-.cv-demo-field-row {
-  align-items: end;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-}
-
 .cv-demo-field {
   display: grid;
   gap: var(--sp-1);
@@ -680,14 +673,6 @@
 
 .cv-demo-field--grow {
   flex: 1 1 240px;
-}
-
-.cv-demo-field__label {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-bold);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 }
 
 .cv-demo-select {
@@ -704,11 +689,6 @@
   padding-block: 0;
   padding-inline: var(--sp-3);
   width: 100%;
-}
-
-.cv-demo-select {
-  appearance: none;
-  padding-right: var(--sp-6);
 }
 
 .cv-field-row {

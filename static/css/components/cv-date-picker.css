@@ -413,12 +413,6 @@
   z-index: 2;
 }
 
-.cv-date-picker__day--multi-selected.cv-date-picker__day--multi-start::before,
-.cv-date-picker__day--multi-single::before {
-  border-bottom-left-radius: var(--r-pill);
-  border-top-left-radius: var(--r-pill);
-}
-
 .cv-date-picker__day--multi-middle {
   border-left-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   border-radius: 0;
@@ -429,12 +423,6 @@
 .cv-date-picker__day--multi-end {
   border-left-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
   z-index: 2;
-}
-
-.cv-date-picker__day--multi-selected.cv-date-picker__day--multi-end::before,
-.cv-date-picker__day--multi-single::before {
-  border-bottom-right-radius: var(--r-pill);
-  border-top-right-radius: var(--r-pill);
 }
 
 .cv-date-picker__day--multi-selected:nth-child(7n)::before {
