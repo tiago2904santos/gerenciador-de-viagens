@@ -1157,6 +1157,16 @@ renomeação completo estão em [`PLANO_HTML_COMPONENTES_GLOBAIS.md`](PLANO_HTML
 - [ ] `NOVO-52` 🟡 nenhum componente declara contrato; zero templatetags, kwargs soltos
 - [ ] `NOVO-53` 🟡 `PADRAO_TEMPLATES.md` descreve estrutura de diretórios que não existe
 - [ ] `NOVO-54` 🟡 nomenclatura mista (pt/en, prefixo `_` inconsistente, 3 convenções de sufixo)
+- [x] `NOVO-55` 🔴 `NOVO` — a paleta de três cores apagou a identidade do produto e fundiu dois
+  acentos em um. O `NOVO-28` trocou o azul-marinho por grafite neutro e colapsou `--color-accent`
+  (dourado, destaque) com o azul de ação, fazendo o acento trocar de matiz por tema: o botão
+  "Novo ofício" vinha azul no claro e dourado no escuro, e o dourado passou a significar tanto
+  "clique" quanto "estado". Somado ao traço e à sombra zerados, o resultado media três
+  superfícies quase idênticas (card `#ebebeb` sobre página `#eceef1`) sem nenhum separador —
+  telas com cara de rascunho. Restaura o marinho (`#07111d`/`#1a2638`/`#223348`), separa
+  `--color-accent` de `--color-primary`, devolve profundidade por superfície + sombra (sem
+  borda, por decisão do usuário), e corrige o "problema crítico do shell" que a linha de base do
+  `DARK_UI_REDESIGN_INVENTORY.md` registra e nunca foi resolvido (menu em `15%` da viewport).
 
 > **Correção de método registrada antes de virar erro.** A primeira contagem de órfãos deste
 > plano deu 21 — estava errada. Ela procurava só `{% include "caminho" %}`, e o projeto passa
