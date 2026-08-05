@@ -7,33 +7,32 @@
   container-type: inline-size;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-3);
+  gap: var(--space-3);
 }
 
 /* ── Barra: presets + busca (faixa/poço step1) ───────────────────────────── */
 .pt-activity__toolbar {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
+  gap: var(--space-3);
   flex-wrap: wrap;
 }
 
 .pt-activity__toolbar--panel {
-  background: var(--cv-surface-next);
-  border-radius: var(--r-panel);
+  background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted)));
+  border-radius: 12px;
   gap: 10px 12px;
-  padding-block: var(--sp-2);
-  padding-inline: var(--sp-3);
+  padding: 10px 12px;
 }
 
- .pt-activity__toolbar--panel {
-  background: var(--cv-surface-next);
+html[data-theme="dark"] .pt-activity__toolbar--panel {
+  background: var(--step1-field);
 }
 
 .pt-activity__preset {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
+  gap: var(--space-2);
   flex: 1 1 280px;
   min-width: 0;
 }
@@ -56,29 +55,29 @@
   O seletor global do wizard usa :is(input:not(...), .cv-custom-select__trigger)
   e herda especificidade (0,5,2) dos :not — precisa empatar/vencer isso.
 */
-
+:is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .pt-activity__toolbar--panel
   .pt-activity__preset-select
   button.cv-custom-select__trigger.cv-custom-select__trigger--v2,
-
+:is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .pt-activity__toolbar--panel
   .pt-activity__preset-select.cv-custom-select--open
   button.cv-custom-select__trigger.cv-custom-select__trigger--v2,
-
+:is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .pt-activity__toolbar--panel
   .pt-activity__search
   input.cv-field__control.pt-activity__search-input,
 .pt-activity__preset-select .cv-custom-select__trigger,
 .pt-activity__search .pt-activity__search-input {
-  background: var(--cv-surface-block);
-  background-color: var(--cv-surface-block);
-  background-image: none;
-  border-color: transparent;
-  border-radius: var(--r-control);
-  box-shadow: none;
+  background: var(--step1-panel, var(--color-surface-soft)) !important;
+  background-color: var(--step1-panel, var(--color-surface-soft)) !important;
+  background-image: none !important;
+  border-color: transparent !important;
+  border-radius: 12px;
+  box-shadow: none !important;
 }
 
 .pt-activity__preset-select .cv-custom-select__trigger {
@@ -88,17 +87,16 @@
 /* Gerenciar presets / Limpar seleção = mesmo soft do Voltar do footer. */
 .pt-activity__preset .cv-btn,
 .pt-activity__clear {
-  background: var(--cv-surface-block);
+  background: var(--step1-panel, var(--color-surface-soft));
   background-image: none;
   border: 0;
-  border-radius: var(--r-control);
+  border-radius: 12px;
   box-shadow: none;
-  color: var(--cv-ink);
+  color: var(--color-heading);
   flex: 0 0 auto;
-  font-weight: var(--fw-bold);
-  min-height: var(--h-md);
-  padding-block: 0;
-  padding-inline: var(--sp-4);
+  font-weight: var(--font-weight-bold);
+  min-height: var(--control-height-md, 44px);
+  padding: 0 18px;
   transform: none;
 }
 
@@ -106,30 +104,32 @@
 .pt-activity__preset .cv-btn:focus-visible,
 .pt-activity__clear:hover,
 .pt-activity__clear:focus-visible {
-  background: color-mix(in srgb, var(--color-primary) 14%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted));
   background-image: none;
   border: 0;
-  color: var(--color-primary);
-  outline: none;
+  box-shadow: none;
+  color: var(--color-accent-text);
+  outline: 0;
   transform: none;
 }
 
+:is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .pt-activity__toolbar--panel
   :is(.pt-activity__preset .cv-btn, .pt-activity__preset .cv-btn--secondary, .pt-activity__clear) {
-  background: var(--cv-surface-block);
+  background: var(--step1-panel, var(--color-surface-soft));
   background-image: none;
   border: 0;
-  border-radius: var(--r-control);
+  border-radius: 12px;
   box-shadow: none;
-  color: var(--cv-ink);
-  font-weight: var(--fw-bold);
-  min-height: var(--h-md);
-  padding-block: 0;
-  padding-inline: var(--sp-4);
+  color: var(--color-heading);
+  font-weight: var(--font-weight-bold);
+  min-height: var(--control-height-md, 44px);
+  padding: 0 18px;
   transform: none;
 }
 
+:is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .pt-activity__toolbar--panel
   :is(
@@ -140,11 +140,12 @@
     .pt-activity__clear:hover,
     .pt-activity__clear:focus-visible
   ) {
-  background: color-mix(in srgb, var(--color-primary) 14%, var(--cv-surface-block));
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted));
   background-image: none;
   border: 0;
-  color: var(--color-primary);
-  outline: none;
+  box-shadow: none;
+  color: var(--color-accent-text);
+  outline: 0;
   transform: none;
 }
 
@@ -162,7 +163,7 @@
   z-index: 1;
   display: inline-flex;
   align-items: center;
-  color: var(--cv-ink-muted);
+  color: var(--color-muted);
   pointer-events: none;
 }
 
@@ -172,19 +173,19 @@
 }
 
 .pt-activity__search .pt-activity__search-input {
-  padding-left: var(--sp-8);
+  padding-left: 42px;
   width: 100%;
 }
 
 .pt-activity__search .pt-activity__search-input::placeholder {
-  color: var(--cv-ink-muted);
+  color: var(--color-muted);
 }
 
 /* ── Grade de cards clicáveis (tokens step1) ────────────────────────────── */
 .pt-activity__grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--sp-2);
+  gap: var(--space-2);
 }
 
 .pt-activity-card {
@@ -192,25 +193,29 @@
   display: grid;
   grid-template-columns: 32px minmax(0, 1fr);
   align-items: center;
-  background: var(--cv-surface-next);
+  background: var(--step1-field, var(--color-surface-muted));
   border: 0;
-  border-radius: var(--r-panel);
+  border-radius: 10px;
   box-shadow: none;
   column-gap: 10px;
   cursor: pointer;
   margin: 0;
   min-height: 50px;
   min-width: 0;
-  padding: var(--sp-2);
+  padding: 8px 10px;
   transition: background .15s ease, box-shadow .15s ease;
 }
 
- .pt-activity-card {
-  background: var(--cv-surface-next);
+html[data-theme="dark"] .pt-activity-card {
+  background: var(--step1-field);
 }
 
 .pt-activity-card:not(.is-selected):hover {
-  background: color-mix(in srgb, var(--color-primary) 6%, var(--cv-surface-next));
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--step1-field, var(--color-surface-muted)));
+}
+
+.pt-activity-card:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent, #d9a40f) 26%, transparent);
 }
 
 /* checkbox nativo escondido (mantém foco por teclado) */
@@ -229,9 +234,9 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: var(--r-panel);
+  border-radius: 8px;
   border: 0;
-  background: var(--cv-surface-block);
+  background: var(--step1-panel, var(--color-surface-soft));
   color: transparent;
   transition: background .15s ease, color .15s ease;
 }
@@ -242,8 +247,8 @@
 }
 
 .pt-activity-card__name {
-  color: var(--cv-ink);
-  font-size: var(--fs-xs);
+  color: var(--color-heading);
+  font-size: var(--font-size-xs, .8rem);
   font-weight: 600;
   line-height: 1.25;
   overflow-wrap: anywhere;
@@ -251,18 +256,17 @@
 
 /* ── Estado selecionado (dourado) ───────────────────────────────────────── */
 .pt-activity-card.is-selected {
-  background: color-mix(in srgb, var(--color-primary) 12%, var(--cv-surface-next));
-  border-inline-start: var(--bd);
-  border-inline-start-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--step1-field, var(--color-surface-muted)));
+  box-shadow: inset 4px 0 0 var(--color-accent);
 }
 
 .pt-activity-card.is-selected .pt-activity-card__check {
-  background: var(--color-primary);
-  color: var(--on-primary);
+  background: var(--color-accent, #d9a40f);
+  color: #1a1200;
 }
 
 .pt-activity-card.is-selected .pt-activity-card__name {
-  color: var(--cv-ink);
+  color: var(--color-heading);
 }
 
 @container (min-width: 430px) {
@@ -279,18 +283,18 @@
 
 .pt-activity__empty {
   margin: 0;
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-sm);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
   font-style: italic;
 }
 
 /* Subtítulo do form_block Atividades — mesmo 2xs do Efetivo. */
 [data-pt-atividades] .travel-document-block .cv-form-block__description,
-
+:is(html[data-theme="dark"])
   [data-pt-atividades]
   .travel-document-block
   .cv-form-block__description {
-  font-size: var(--fs-2xs);
+  font-size: var(--font-size-2xs);
   line-height: 1.4;
 }
 
@@ -309,28 +313,27 @@
   gap: 8px;
   min-width: 0;
   max-height: min(280px, 36vh);
-  padding-block: var(--sp-2);
-  padding-inline: var(--sp-3);
+  padding: 10px 12px;
   border: 0;
-  border-radius: var(--r-panel);
-  background: var(--cv-surface-next);
+  border-radius: 12px;
+  background: var(--step1-field, var(--color-surface-muted));
 }
 
- .pt-live-col {
-  background: var(--cv-surface-next);
+html[data-theme="dark"] .pt-live-col {
+  background: var(--step1-field);
 }
 
 .pt-live-col__head {
   display: flex;
   align-items: center;
   flex: 0 0 auto;
-  gap: var(--sp-2);
+  gap: var(--space-2);
   min-height: 28px;
 }
 
 .pt-live-col__title {
-  color: var(--cv-ink);
-  font-size: var(--fs-xs);
+  color: var(--color-heading);
+  font-size: var(--font-size-xs, .8rem);
   font-weight: 800;
   letter-spacing: .02em;
   text-transform: uppercase;
@@ -347,9 +350,9 @@
   overflow-x: hidden;
   overflow-y: auto;
   padding: 0;
-  border-radius: var(--r-panel);
-  background: var(--cv-surface-block);
-  scrollbar-color: var(--cv-border) transparent;
+  border-radius: 10px;
+  background: var(--step1-panel, var(--color-surface-soft));
+  scrollbar-color: var(--color-border-strong) transparent;
   scrollbar-gutter: stable;
   scrollbar-width: thin;
 }
@@ -366,22 +369,20 @@
 .pt-live-list::-webkit-scrollbar-track,
 .pt-live-list::-webkit-scrollbar-track-piece {
   background: transparent;
-  border: 0;
+  border: none;
   box-shadow: none;
-  margin-block: var(--sp-2);
+  margin-block: 8px;
 }
 
 .pt-live-list::-webkit-scrollbar-thumb {
   background-clip: padding-box;
-  background-color: var(--cv-border);
-  border: var(--bd);
-  border-color: transparent;
-  border-width: 4px;
-  border-radius: var(--r-pill);
+  background-color: var(--color-border-strong);
+  border: 4px solid transparent;
+  border-radius: var(--radius-pill, 999px);
 }
 
 .pt-live-list::-webkit-scrollbar-thumb:hover {
-  background-color: color-mix(in srgb, var(--cv-ink-muted) 55%, transparent);
+  background-color: color-mix(in srgb, var(--color-muted) 55%, transparent);
 }
 
 .pt-live-list::-webkit-scrollbar-button,
@@ -391,7 +392,7 @@
 .pt-live-list::-webkit-scrollbar-button:vertical:start:decrement,
 .pt-live-list::-webkit-scrollbar-button:vertical:end:increment {
   background: transparent;
-  border: 0;
+  border: none;
   display: none;
   height: 0;
   width: 0;
@@ -403,11 +404,9 @@
 
 .pt-live-entry {
   margin: 0;
-  padding-block: var(--sp-2);
-  padding-inline: var(--sp-3);
+  padding: 10px 12px 10px 14px;
   border: 0;
-  border-bottom: var(--bd);
-  border-bottom-color: color-mix(in srgb, white 8%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, #fff 8%, transparent);
   border-radius: 0;
   background: transparent;
   box-shadow: none;
@@ -419,14 +418,14 @@
 }
 
 .pt-live-entry:hover {
-  background: color-mix(in srgb, var(--color-primary) 6%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
   transform: none;
 }
 
 .pt-live-entry-text {
   display: block;
-  color: var(--cv-ink);
-  font-size: var(--fs-xs);
+  color: var(--color-heading);
+  font-size: var(--font-size-xs, .8rem);
   font-weight: 500;
   line-height: 1.45;
   overflow-wrap: anywhere;
@@ -434,12 +433,11 @@
 
 /* Metas: acento dourado · Recursos: acento azul. */
 .pt-live-col--metas .pt-live-entry {
-  box-shadow: none;
+  box-shadow: inset 3px 0 0 var(--color-accent, #d9a40f);
 }
 
 .pt-live-col--recursos .pt-live-entry {
-  border-inline-start: var(--bd);
-border-inline-start-color: var(--color-accent);
+  box-shadow: inset 3px 0 0 var(--color-info, #3b82f6);
 }
 
 .pt-live-empty {
@@ -449,21 +447,21 @@ border-inline-start-color: var(--color-accent);
   justify-content: center;
   gap: 2px;
   min-height: 72px;
-  padding: var(--sp-3);
+  padding: 12px;
   border: 0;
-  border-radius: var(--r-panel);
-  background: var(--cv-surface-block);
-  color: var(--cv-ink-muted);
+  border-radius: 10px;
+  background: var(--step1-panel, var(--color-surface-soft));
+  color: var(--color-muted);
   text-align: center;
 }
 
 .pt-live-empty strong {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-xs);
+  color: var(--color-muted-strong, var(--color-heading));
+  font-size: var(--font-size-xs);
 }
 
 .pt-live-empty span {
-  font-size: var(--fs-2xs);
+  font-size: var(--font-size-2xs, .72rem);
   line-height: 1.35;
 }
 
@@ -481,12 +479,12 @@ border-inline-start-color: var(--color-accent);
 .pt-preset-activities-panel {
   container-type: inline-size;
   display: grid;
-  gap: var(--sp-3);
-  margin-top: var(--sp-3);
-  padding: var(--sp-3);
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: 14px;
   border: 0;
-  border-radius: var(--r-panel);
-  background: var(--cv-surface-block);
+  border-radius: 14px;
+  background: var(--list-header-control-bg, var(--color-card-muted));
 }
 
 .pt-preset-activities-panel__header {
@@ -500,24 +498,24 @@ border-inline-start-color: var(--color-accent);
 }
 
 .pt-preset-activities-panel__title {
-  color: var(--cv-ink);
-  font-size: var(--fs-md);
+  color: var(--color-heading);
+  font-size: var(--font-size-md, 1rem);
   font-weight: 800;
 }
 
 .pt-preset-activities-panel__description {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-xs);
+  color: var(--color-muted);
+  font-size: var(--font-size-xs, .8rem);
   line-height: 1.45;
 }
 
 .pt-preset-activity-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--sp-2);
+  gap: var(--space-2);
   max-height: 360px;
   overflow-y: auto;
-  padding: var(--sp-1);
+  padding: var(--space-1);
 }
 
 @container (min-width: 430px) {
@@ -544,13 +542,13 @@ border-inline-start-color: var(--color-accent);
   gap: 10px;
   min-height: 50px;
   margin: 0;
-  padding: var(--sp-2);
-  border: var(--bd);
-  border-radius: var(--r-panel);
-  background: var(--cv-surface-card);
-  color: var(--cv-ink);
+  padding: 8px 10px;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 9px;
+  background: var(--cv-card-family-bg, var(--color-surface));
+  color: var(--color-heading);
   cursor: pointer;
-  font-size: var(--fs-xs);
+  font-size: var(--font-size-xs, .8rem);
   font-weight: 600;
   line-height: 1.25;
   transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
@@ -561,9 +559,9 @@ border-inline-start-color: var(--color-accent);
   box-sizing: border-box;
   width: 32px;
   height: 32px;
-  border: var(--bd);
-  border-radius: var(--r-panel);
-  background: var(--cv-surface-block);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 8px;
+  background: var(--list-header-control-bg, var(--color-card-muted));
 }
 
 .pt-preset-activity-grid label::after {
@@ -573,10 +571,8 @@ border-inline-start-color: var(--color-accent);
   top: 50%;
   width: 11px;
   height: 6px;
-  border-left: var(--bd);
-  border-left-color: transparent;
-  border-bottom: var(--bd);
-  border-bottom-color: transparent;
+  border-left: 2px solid transparent;
+  border-bottom: 2px solid transparent;
   transform: translateY(-65%) rotate(-45deg);
 }
 
@@ -591,19 +587,22 @@ border-inline-start-color: var(--color-accent);
 .pt-preset-activity-grid label:has(input:checked) {
   background: color-mix(
     in srgb,
-    var(--color-primary) 12%,
-    var(--cv-surface-card)
+    var(--color-accent) 12%,
+    var(--cv-card-family-bg, var(--color-surface))
   );
-  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  border-inline-start: var(--bd);
-  border-inline-start-color: var(--color-accent);
+  border-color: var(--color-accent-border-soft);
+  box-shadow: inset 4px 0 0 var(--color-accent);
 }
 
 .pt-preset-activity-grid label:has(input:checked)::before {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
 }
 
 .pt-preset-activity-grid label:has(input:checked)::after {
-  border-color: var(--on-primary);
+  border-color: var(--color-on-accent);
+}
+
+.pt-preset-activity-grid label:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 26%, transparent);
 }

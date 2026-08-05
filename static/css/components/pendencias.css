@@ -6,50 +6,48 @@
    ======================================================================== */
 
 .cv-pendencias {
-  border-radius: var(--r-card);
-  margin-bottom: var(--sp-4);
+  border-radius: var(--radius-card);
+  margin-bottom: var(--space-4);
   overflow: hidden;
 }
 
 .cv-pendencias--danger {
-  background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
-  border: var(--bd);
-  border-color: var(--cv-state-danger);
-  box-shadow: var(--sh-raised);
+  background: var(--color-danger-soft);
+  border: 1px solid var(--color-danger);
+  box-shadow: var(--shadow-soft);
 }
 
 .cv-pendencias--warning {
-  background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
-  border: var(--bd);
-  border-color: var(--cv-state-warning);
-  box-shadow: var(--sh-raised);
+  background: var(--color-warning-soft);
+  border: 1px solid var(--color-warning);
+  box-shadow: var(--shadow-soft);
 }
 
 .cv-pendencias__inner {
   align-items: flex-start;
   display: flex;
-  gap: var(--sp-3);
-  padding: var(--sp-4);
+  gap: var(--space-3);
+  padding: var(--space-4);
 }
 
 .cv-pendencias__marker {
-  background: var(--cv-state-danger);
-  border-radius: var(--r-pill);
+  background: var(--color-danger);
+  border-radius: var(--radius-pill);
   flex-shrink: 0;
   height: 2.25rem;
-  margin-top: var(--sp-1);
+  margin-top: var(--space-1);
   position: relative;
   width: 2.25rem;
 }
 
 .cv-pendencias--warning .cv-pendencias__marker {
-  background: var(--cv-state-warning);
+  background: var(--color-warning);
 }
 
 .cv-pendencias__marker::after {
-  color: var(--cv-surface-block);
+  color: var(--color-card);
   content: "!";
-  font-size: var(--fs-lg);
+  font-size: var(--font-size-lg);
   font-weight: 800;
   left: 50%;
   position: absolute;
@@ -58,31 +56,29 @@
 }
 
 .cv-pendencias__title {
-  color: var(--cv-ink);
-  font-size: var(--fs-md);
+  color: var(--color-heading);
+  font-size: var(--font-size-md);
   font-weight: 800;
   letter-spacing: 0.02em;
-  margin-block: 0 var(--sp-2);
-  margin-inline: 0;
+  margin: 0 0 var(--space-2);
 }
 
 .cv-pendencias__lead {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-sm);
-  margin-block: 0 var(--sp-3);
-  margin-inline: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  margin: 0 0 var(--space-3);
   max-width: 42rem;
 }
 
 .cv-pendencias__items {
-  color: var(--cv-ink);
-  font-size: var(--fs-sm);
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
   margin: 0;
-  padding-left: var(--sp-5);
+  padding-left: var(--space-5);
 }
 
 .cv-pendencias__items li {
-  margin-bottom: var(--sp-2);
+  margin-bottom: var(--space-2);
 }
 
 .cv-pendencias__items li:last-child {
@@ -90,13 +86,14 @@
 }
 
 /* Tokens *-soft não têm variante escura — redefinir escopado no dark. */
-
+:is(html[data-theme="dark"])
   .cv-pendencias--danger {
-  background: color-mix(in srgb, var(--cv-state-danger) 16%, var(--cv-surface-block));
-  border-color: color-mix(in srgb, var(--cv-state-danger) 55%, transparent);
+  background: color-mix(in srgb, var(--color-danger) 16%, var(--color-card, #142132));
+  border-color: color-mix(in srgb, var(--color-danger) 55%, transparent);
 }
 
+:is(html[data-theme="dark"])
   .cv-pendencias--warning {
-  background: color-mix(in srgb, var(--cv-state-warning) 14%, var(--cv-surface-block));
-  border-color: color-mix(in srgb, var(--cv-state-warning) 55%, transparent);
+  background: color-mix(in srgb, var(--color-warning) 14%, var(--color-card, #142132));
+  border-color: color-mix(in srgb, var(--color-warning) 55%, transparent);
 }

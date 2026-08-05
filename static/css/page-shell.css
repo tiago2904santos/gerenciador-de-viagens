@@ -37,12 +37,353 @@
 /* Garante que [hidden] esconda elementos mesmo quando o componente define display explícito. */
 [hidden] { display: none !important; }
 
+
+/* =========================================================
+   01. Design Tokens — Estrutura, Layout e Aliases
+   ========================================================= */
+
+:root {
+  /* --- Layout --- */
+  --layout-page-max-width:              var(--page-max-width);
+  --layout-page-padding-x:             var(--space-8);
+  --layout-page-padding-y:             var(--space-6);
+  --layout-shell-gap:                  var(--space-6);
+  --layout-section-gap:                var(--space-5);
+  --layout-form-panel-max-width:       960px;
+--layout-list-panel-max-width:       var(--page-max-width);
+  --layout-field-grid-gap:             var(--space-4);
+
+  /* --- Espaçamento estendido --- */
+  --space-12: 48px;
+
+  /* --- Radius estendido --- */
+  --radius-2xl: 40px;
+
+  /* --- Page Shell --- */
+  --page-shell-gap:       var(--space-6);
+  --page-shell-padding-y: var(--space-6);
+  --page-shell-max-width: var(--page-max-width);
+
+  /* --- Form Panel --- */
+  --form-panel-radius: var(--radius-lg);
+
+  /* --- Form Section --- */
+  --form-section-padding-x: var(--space-6);
+  --form-section-padding-y: var(--space-5);
+  --form-section-inner-gap: var(--space-5);
+
+  /* --- Field Grid --- */
+  --field-grid-gap: var(--space-4);
+
+  /* --- Field Group --- */
+  --field-group-padding: var(--space-4);
+  --field-group-radius:  var(--radius-sm);
+  --field-group-gap:     var(--space-3);
+
+  /* --- Wizard Section Cards --- */
+  --cv-form-section-bg:             var(--surface-form-section);
+  --cv-form-section-header-bg:      var(--surface-form-panel);
+  --cv-form-section-border:         var(--border-form-section);
+  --cv-form-section-shadow:         var(--shadow-sm);
+  --cv-form-section-radius:         var(--radius-card);
+  --cv-form-section-header-padding: var(--space-4) var(--space-6) var(--space-4) var(--space-10);
+  --cv-form-section-body-padding:   var(--space-5) var(--space-6);
+  --cv-form-section-stack-gap:             var(--space-4);
+  --cv-form-section-stack-gap-comfortable: var(--space-8);
+
+  /* --- Stepper --- */
+  --stepper-padding-x:   var(--space-6);
+  --stepper-padding-y:   var(--space-4);
+  --stepper-radius:      var(--radius-lg);
+  --stepper-item-size:   28px;           /* legado — mantido para compat */
+  --stepper-marker-size: 40px;           /* marcador premium (novo) */
+  --stepper-connector-h: 2px;            /* espessura da linha conectora */
+  --stepper-gap:         var(--space-2);
+
+  /* --- Header Band --- */
+  --header-band-gap:            var(--space-4);
+
+  /* --- Header Filter Bar --- */
+  --filter-search-min-width:    200px;
+  --filter-field-min-width:     130px;
+  --filter-input-height:        var(--control-height-md);
+
+  /* --- Quick Add Folder Tab --- */
+  --inline-create-tab-radius:     var(--radius-md);  /* 14px — aba mais arredondada */
+  --inline-create-tab-px:         var(--space-5);    /* 20px — aba mais larga      */
+  --inline-create-tab-py:         var(--space-3);    /* 12px — aba mais alta        */
+  --inline-create-tab-icon-size:  var(--space-5);    /* 20px — círculo do ícone     */
+  --inline-create-tab-width:      230px;
+  --inline-create-tab-height:     35px;
+  --inline-create-tab-clip-path:  path("M 0 0 H 230 V 35 H 46 Q 38 35 33 32 Q 11 11 2 0 Z");
+  --inline-create-tab-shadow:     -1px -3px 12px rgba(0, 0, 0, 0.15), 1px -3px 12px rgba(0, 0, 0, 0.10);
+  --inline-create-actions-offset: 1px;
+  --inline-create-primary-border: rgba(255, 255, 255, 0.4);
+
+  /* --- Footer Actions --- */
+  --footer-actions-padding-x: var(--form-section-padding-x);
+  --footer-actions-padding-y: var(--space-4);
+  --footer-actions-gap:       var(--space-3);
+  --footer-actions-padding-bottom: 0;
+
+  /* --- List Panel --- */
+  --list-panel-radius:    var(--radius-lg);
+  --filter-bar-padding-x: var(--space-5);
+  --filter-bar-padding-y: var(--space-3);
+  --filter-bar-gap:       var(--space-3);
+  --list-row-padding-x:   var(--space-5);
+  --list-row-padding-y:   var(--space-3);
+  --list-row-avatar-size: 36px;
+  --pagination-padding-x: var(--space-6);
+  --pagination-padding-y: var(--space-4);
+
+  /* --- Quick Create Inline --- */
+  --layout-quick-create-gap:          var(--space-3);
+  --layout-quick-create-actions-width: 200px;
+
+  /* --- Sombras semânticas --- */
+  --shadow-soft:     var(--shadow-sm);
+  --shadow-medium:   var(--shadow-md);
+  --shadow-shell:    var(--shadow-panel);
+  --shadow-elevated: var(--shadow-lg);
+
+  /* --- Bordas semânticas --- */
+  --border-subtle: var(--color-border-soft);
+  --border-strong: var(--color-border-strong);
+  --border-focus:  var(--color-primary);
+  --border-active: var(--color-accent);
+
+  /* --- Texto semântico --- */
+  --text-primary:   var(--theme-text-heading);
+  --text-secondary: var(--theme-text-body);
+  --text-muted:     var(--theme-text-muted);
+  --text-inverse:   var(--color-white);
+}
+
+
+/* =========================================================
+   02. Theme Tokens — Dark
+   ========================================================= */
+
+html[data-theme="dark"] {
+  --surface-page-shell:     transparent;
+  --surface-page-header:    transparent;
+
+  --surface-stepper:        var(--theme-surface-card);
+  --border-stepper:         var(--theme-border-card);
+  --shadow-stepper:         var(--theme-shadow-stat);
+
+  --surface-form-panel:     var(--theme-surface-card);
+  --border-form-panel:      var(--theme-border-card);
+  --shadow-form-panel:      var(--theme-shadow-hero);
+
+  --surface-form-section:   var(--color-surface);
+  --border-form-section:    var(--color-border-soft);
+  --shadow-form-section:    none;
+
+  --surface-field-group:    rgba(255, 255, 255, 0.04);
+  --border-field-group:     rgba(255, 255, 255, 0.09);
+
+  --cv-form-section-bg:        var(--surface-form-section);
+  --cv-form-section-header-bg: var(--surface-form-panel);
+  --cv-form-section-border:    var(--theme-border-card);
+  --cv-form-section-shadow:    var(--theme-shadow-hero);
+
+  --surface-list-panel:     var(--theme-surface-card);
+  --border-list-panel:      var(--theme-border-card);
+  --shadow-list-panel:      var(--theme-shadow-hero);
+
+  --surface-filter-bar:     rgba(255, 255, 255, 0.03);
+  --border-filter-bar:      var(--theme-border-card);
+
+  --surface-list-row:       var(--surface-form-section); /* mesmo fundo das seções de formulário */
+  --border-list-row:        rgba(255, 255, 255, 0.07);
+  --surface-list-row-hover: rgba(255, 255, 255, 0.08);
+
+  --surface-footer-actions: var(--color-surface-muted);
+  --border-footer-actions:  var(--theme-border-card);
+
+  --surface-pagination:     transparent;
+  --border-pagination:      var(--theme-border-card);
+
+  /* Stepper — estados */
+  --stepper-idle-bg:       rgba(255, 255, 255, 0.07);
+  --stepper-idle-border:   rgba(255, 255, 255, 0.14);
+  --stepper-idle-color:    rgba(255, 255, 255, 0.45);
+  --stepper-active-bg:     var(--color-accent);
+  --stepper-active-border: transparent;
+  --stepper-active-color:  var(--color-white);
+  --stepper-done-bg:       rgba(216, 162, 27, 0.16);
+  --stepper-done-border:   rgba(216, 162, 27, 0.42);
+  --stepper-done-color:    var(--color-accent);
+  --stepper-connector:     rgba(255, 255, 255, 0.12);
+  --stepper-connector-on:  var(--color-accent);
+  --stepper-label-idle:    var(--theme-text-muted);
+  --stepper-label-active:  var(--theme-text-heading);
+  --stepper-label-done:    var(--theme-text-muted);
+
+  /* Badges do header */
+  --surface-header-count: rgba(21, 91, 154, 0.28);
+  --text-header-count:    #9fd0ff;
+
+  /* Quick Create Inline */
+  --surface-quick-create:        rgba(255, 255, 255, 0.02);
+  --surface-quick-create-header: rgba(255, 255, 255, 0.04);
+  --border-quick-create:         rgba(255, 255, 255, 0.08);
+  --shadow-quick-create:         none;
+
+  /* Quick Add Folder Tab */
+  --surface-inline-create-tab:        rgba(11, 58, 102, 0.50);   /* azul primário com opacidade */
+  --border-inline-create-tab:         rgba(255, 255, 255, 0.22);
+  --color-inline-create-tab:          #ccdff5;                   /* texto claro sobre fundo escuro */
+  --color-inline-create-tab-icon-bg:  var(--color-accent);       /* círculo dourado */
+  --color-inline-create-tab-icon-fg:  var(--color-primary-dark); /* texto escuro sobre dourado */
+
+  /* Header Filter Bar */
+  --surface-filter-input:         rgba(255, 255, 255, 0.05);
+  --border-filter-input:          rgba(255, 255, 255, 0.12);
+  --surface-filter-chip:          var(--surface-filter-input);
+  --border-filter-chip:           var(--border-filter-input);
+  --color-filter-placeholder:     rgba(255, 255, 255, 0.35);
+  --color-filter-text:            var(--theme-text-body);
+  --surface-filter-button:        rgba(255, 255, 255, 0.06);
+  --border-filter-button:         rgba(255, 255, 255, 0.14);
+  --color-filter-button:          var(--theme-text-muted);
+
+  /* Filtros aplicados — chips */
+  --surface-applied-chip:         rgba(255, 255, 255, 0.07);
+  --border-applied-chip:          rgba(255, 255, 255, 0.16);
+  --color-applied-chip:           var(--theme-text-muted);
+
+  /* Stepper — estados adicionais */
+  --stepper-missing-bg:           rgba(180, 35, 24, 0.16);
+  --stepper-missing-border:       rgba(180, 35, 24, 0.40);
+  --stepper-missing-color:        var(--color-danger);
+  --stepper-missing-connector:    rgba(180, 35, 24, 0.25);
+  --stepper-disabled-opacity:     0.38;
+  --stepper-eyebrow-color:        var(--stepper-label-idle);
+  --stepper-label-missing:        #e57d78;
+  --stepper-status-done-color:    var(--stepper-done-color);
+  --stepper-status-current-color: var(--color-accent);
+  --stepper-status-missing-color: #e57d78;
+}
+
+
+/* =========================================================
+   03. Theme Tokens — Light (Silver Frost)
+   ========================================================= */
+
+html[data-theme="light"] {
+  --surface-page-shell:     transparent;
+  --surface-page-header:    transparent;
+
+  --surface-stepper:        var(--color-surface);
+  --border-stepper:         #d4dde9;
+  --shadow-stepper:         var(--shadow-xs);
+
+  --surface-form-panel:     var(--color-surface);
+  --border-form-panel:      #d4dde9;
+  --shadow-form-panel:      var(--theme-shadow-hero);
+
+  --surface-form-section:   #f6f9fc;
+  --border-form-section:    #dde6ef;
+  --shadow-form-section:    none;
+
+  --surface-field-group:    #edf3f9;
+  --border-field-group:     #d0dce8;
+
+  --cv-form-section-bg:        var(--surface-form-panel);
+  --cv-form-section-header-bg: var(--surface-form-section);
+  --cv-form-section-border:    var(--border-form-section);
+  --cv-form-section-shadow:    var(--shadow-sm);
+
+  --surface-list-panel:     var(--color-surface);
+  --border-list-panel:      #d4dde9;
+  --shadow-list-panel:      var(--theme-shadow-hero);
+
+  --surface-filter-bar:     #f4f8fc;
+  --border-filter-bar:      #dde6ef;
+
+  --surface-list-row:       var(--surface-form-section); /* mesmo fundo das seções de formulário */
+  --border-list-row:        #e5edf5;
+  --surface-list-row-hover: var(--color-primary-soft);
+
+  --surface-footer-actions: #f4f8fc;
+  --border-footer-actions:  #d4dde9;
+
+  --surface-pagination:     transparent;
+  --border-pagination:      #d4dde9;
+
+  /* Stepper — estados */
+  --stepper-idle-bg:       var(--color-bg-strong);
+  --stepper-idle-border:   var(--color-border);
+  --stepper-idle-color:    var(--color-muted);
+  --stepper-active-bg:     var(--color-primary);
+  --stepper-active-border: transparent;
+  --stepper-active-color:  var(--color-white);
+  --stepper-done-bg:       var(--color-primary-soft);
+  --stepper-done-border:   rgba(11, 58, 102, 0.35);
+  --stepper-done-color:    var(--color-primary);
+  --stepper-connector:     var(--color-border);
+  --stepper-connector-on:  var(--color-primary-bright);
+  --stepper-label-idle:    var(--theme-text-muted);
+  --stepper-label-active:  var(--theme-text-heading);
+  --stepper-label-done:    var(--theme-text-muted);
+
+  /* Badges do header */
+  --surface-header-count: var(--color-primary-soft);
+  --text-header-count:    var(--color-primary);
+
+  /* Quick Create Inline */
+  --surface-quick-create:        #eef3f8;
+  --surface-quick-create-header: #e6edf5;
+  --border-quick-create:         #d4dde9;
+  --shadow-quick-create:         none;
+
+  /* Quick Add Folder Tab */
+  --surface-inline-create-tab:        #dbeaf8;
+  --border-inline-create-tab:         #a8c5de;
+  --color-inline-create-tab:          var(--color-primary-strong);
+  --color-inline-create-tab-icon-bg:  var(--color-primary);
+  --color-inline-create-tab-icon-fg:  var(--color-white);
+
+  /* Header Filter Bar */
+  --surface-filter-input:         var(--color-surface);
+  --border-filter-input:          var(--color-border);
+  --surface-filter-chip:          var(--surface-filter-input);
+  --border-filter-chip:           var(--border-filter-input);
+  --color-filter-placeholder:     var(--theme-text-muted);
+  --color-filter-text:            var(--theme-text-body);
+  --surface-filter-button:        var(--color-surface);
+  --border-filter-button:         var(--color-border);
+  --color-filter-button:          var(--theme-text-muted);
+
+  /* Filtros aplicados — chips */
+  --surface-applied-chip:         var(--color-primary-soft);
+  --border-applied-chip:          rgba(11, 58, 102, 0.18);
+  --color-applied-chip:           var(--color-primary-strong);
+
+  /* Stepper — estados adicionais */
+  --stepper-missing-bg:           var(--color-danger-soft);
+  --stepper-missing-border:       var(--color-danger-border-soft);
+  --stepper-missing-color:        var(--color-danger);
+  --stepper-missing-connector:    rgba(180, 35, 24, 0.14);
+  --stepper-disabled-opacity:     0.42;
+  --stepper-eyebrow-color:        var(--stepper-label-idle);
+  --stepper-label-missing:        var(--color-danger);
+  --stepper-status-done-color:    var(--color-primary);
+  --stepper-status-current-color: var(--color-accent);
+  --stepper-status-missing-color: var(--color-danger);
+}
+
+
 /* =========================================================
    04. Background
    O background atmosférico é gerenciado por ui-lab.css no UI Lab
    e pelo base global em páginas reais. Este arquivo não define
    gradientes de fundo — apenas consome tokens de superfície.
    ========================================================= */
+
 
 /* =========================================================
    05. Page Shell Base
@@ -53,12 +394,13 @@
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
-  gap:            var(--sp-6);
-  max-width:      100%;
+  gap:            var(--page-shell-gap);
+  max-width:      var(--page-shell-max-width);
   position:       relative;
   width:          100%;
-  z-index:        var(--z-sidebar);
+  z-index:        var(--z-page-shell);
 }
+
 
 /* =========================================================
    06. Page Shell Variants
@@ -73,7 +415,7 @@
 .page-shell--standard-simple > .main-form-panel,
 .cv-page--narrow > .main-form-panel {
   margin-inline: auto;
-  max-width: 960px;
+  max-width: var(--layout-form-panel-max-width);
   width: 100%;
 }
 
@@ -83,6 +425,7 @@
 
 /* Standard, Wizard e List preservam a largura integral do shell. */
 
+
 /* =========================================================
    07. Page Header — Limpo
    Etiqueta limpa da página. Nunca contém botões.
@@ -91,37 +434,36 @@
 
 /* Container: card com radius e sombra */
 .page-header--clean {
-  border-radius: var(--r-card);
-  box-shadow: var(--sh-raised);
+  border-radius: var(--radius-lg);
+  box-shadow:    var(--shadow-lg);
   overflow:      hidden;
   width:         100%;
 }
 
 /* Stage: fundo dark — eyebrow + título */
 .page-header--clean .page-header__stage {
-  background: var(--cv-surface-card);
-  box-shadow: none;
-  padding-block: var(--sp-5);
-  padding-inline: var(--sp-6);
+  background: var(--app-hero-stage-bg);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+  padding:    var(--space-5) var(--space-6);
 }
 
 .page-header--clean .page-header__eyebrow {
-  color:          color-mix(in srgb, var(--color-accent) 72%, var(--cv-ink));
+  color:          var(--app-hero-eyebrow);
   display:        block;
-  font-size:      var(--fs-xs);
-  font-weight:    var(--fw-bold);
-  letter-spacing: 0.12em;
-  margin-bottom:  var(--sp-1);
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  margin-bottom:  var(--space-1);
   text-transform: uppercase;
 }
 
 .page-header--clean .page-header__title {
   align-items:    center;
-  color:          var(--cv-ink);
+  color:          var(--app-hero-title);
   display:        flex;
   font-size:      clamp(1.4rem, 2.2vw, 2.2rem);
-  font-weight:    var(--fw-bold);
-  gap:            var(--sp-2);
+  font-weight:    var(--font-weight-extrabold);
+  gap:            var(--space-2);
   letter-spacing: -0.03em;
   line-height:    1.12;
   margin:         0;
@@ -130,20 +472,26 @@
 /* Count badge — sempre sobre stage escuro */
 .page-header--clean .page-header__count {
   background:    rgba(255, 255, 255, 0.15);
-  border-radius: var(--r-pill);
+  border-radius: var(--radius-pill);
   color:         rgba(255, 255, 255, 0.9);
-  font-size:     var(--fs-sm);
-  font-weight:   var(--fw-bold);
+  font-size:     var(--font-size-sm);
+  font-weight:   var(--font-weight-bold);
   line-height:   1;
-  padding-block: var(--sp-1);
-  padding-inline: var(--sp-2);
+  padding:       3px 10px;
 }
 
 /* Body: fundo claro — brand mark + subtítulo + metadados */
 .page-header--clean .page-header__body {
-  background: var(--cv-surface-card);
-  padding-block: var(--sp-4);
-  padding-inline: var(--sp-6);
+  background: var(--app-hero-body-bg);
+  padding:    var(--space-4) var(--space-6);
+}
+
+/* Ribbon: faixa gradiente no rodapé */
+.page-header--clean .page-header__ribbon {
+  background: var(--app-hero-ribbon);
+  box-shadow: 0 1px 2px rgba(7, 26, 51, 0.08);
+  height:     3px;
+  width:      100%;
 }
 
 /* Metadados opcionais no body (wizard: status, etapa) */
@@ -151,18 +499,41 @@
   align-items: center;
   display:     flex;
   flex-wrap:   wrap;
-  gap:         var(--sp-2);
-  margin-top:  var(--sp-2);
+  gap:         var(--space-2);
+  margin-top:  var(--space-2);
+}
+
+.page-header__meta-sep {
+  color:   var(--theme-text-muted);
+  opacity: 0.45;
+}
+
+.page-header__meta-item {
+  color:       var(--theme-text-muted);
+  font-size:   var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
 }
 
 .page-header__badge {
-  border-radius:  var(--r-pill);
-  font-size:      var(--fs-xs);
-  font-weight:    var(--fw-bold);
-  letter-spacing: 0.04em;
-  padding-block: var(--sp-1);
-  padding-inline: var(--sp-2);
+  border-radius:  var(--radius-pill);
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-chip);
+  padding:        3px 10px;
 }
+
+.page-header__badge--draft {
+  background: var(--route-status-draft-bg);
+  border:     1px solid var(--route-status-draft-border);
+  color:      var(--route-status-draft-text);
+}
+
+.page-header__badge--sent {
+  background: var(--route-status-final-bg);
+  border:     1px solid var(--route-status-final-border);
+  color:      var(--route-status-final-text);
+}
+
 
 /* =========================================================
    08. Stepper / Navegação em Etapas
@@ -185,17 +556,16 @@
 
 /* Contêiner — card branco com scroll horizontal */
 .page-stepper {
-  background:      var(--cv-surface-card);
-  border: var(--bd);
-  border-radius:   var(--r-card);
-  box-shadow:      var(--sh-raised);
+  background:      var(--surface-stepper);
+  border:          1px solid var(--border-stepper);
+  border-radius:   var(--stepper-radius);
+  box-shadow:      var(--shadow-stepper);
   box-sizing:      border-box;
   overflow-x:      auto;
-  padding-block: var(--sp-4);
-  padding-inline: var(--sp-6);
+  padding:         var(--stepper-padding-y) var(--stepper-padding-x);
   scrollbar-width: none;
   width:           100%;
-  z-index:         var(--z-sidebar);
+  z-index:         var(--z-stepper);
 }
 
 .page-stepper::-webkit-scrollbar { display: none; }
@@ -204,7 +574,7 @@
 .page-stepper__list {
   align-items: flex-start;
   display:     flex;
-  gap:         var(--sp-7);
+  gap:         var(--space-8);
   list-style:  none;
   margin:      0;
   padding:     0;
@@ -217,7 +587,7 @@
   display:        flex;
   flex:           1 1 0;
   flex-direction: column;
-  gap:            var(--sp-2);
+  gap:            var(--space-2);
   min-width:      0;
   padding:        0;
 }
@@ -226,17 +596,17 @@
 .page-stepper__track {
   align-items: center;
   display:     flex;
-  margin-inline: calc(var(--sp-4) * -1);
-  width:       calc(100% + var(--sp-7));
+  margin-inline: calc(var(--space-8) / -2);
+  width:       calc(100% + var(--space-8));
 }
 
 /* Linha conectora entre marcadores */
 .page-stepper__connector {
-  background: var(--cv-surface-block);
+  background: var(--stepper-connector);
   flex:       1;
-  height:     var(--sp-1);
-  min-width:  var(--sp-2);
-  transition: background var(--tr-base);
+  height:     var(--stepper-connector-h);
+  min-width:  var(--space-2);
+  transition: background var(--transition-base);
 }
 
 /* Extremidades invisíveis para alinhamento centrado */
@@ -246,31 +616,51 @@
 /* Marcador circular premium */
 .page-stepper__marker {
   align-items:     center;
-  background:      var(--cv-surface-block);
-  border: var(--bd);
-  border-radius:   var(--r-pill);
-  color:           var(--cv-ink);
+  background:      var(--stepper-idle-bg);
+  border:          2px solid var(--stepper-idle-border);
+  border-radius:   var(--radius-pill);
+  color:           var(--stepper-idle-color);
   display:         inline-flex;
   flex-shrink:     0;
-  font-size:       var(--fs-sm);
-  font-weight:     var(--fw-bold);
-  height:          var(--sp-7);
+  font-size:       var(--font-size-sm);
+  font-weight:     var(--font-weight-bold);
+  height:          var(--stepper-marker-size);
   justify-content: center;
   line-height:     1;
   transition:
-    background   var(--tr-base),
-    border-color var(--tr-base),
-    box-shadow   var(--tr-base),
-    color        var(--tr-base);
-  width:           var(--sp-7);
+    background   var(--transition-base),
+    border-color var(--transition-base),
+    box-shadow   var(--transition-base),
+    color        var(--transition-base);
+  width:           var(--stepper-marker-size);
 }
 
 /* Ícone interno do marcador (✓, ✕, número) */
 .page-stepper__marker-icon {
-  font-size:   var(--fs-sm);
-  font-weight: var(--fw-bold);
+  font-size:   var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
   line-height: 1;
   pointer-events: none;
+}
+
+/* Alias legado para __marker */
+.page-stepper__number {
+  align-items:     center;
+  background:      var(--stepper-idle-bg);
+  border:          1px solid var(--stepper-idle-border);
+  border-radius:   var(--radius-pill);
+  color:           var(--stepper-idle-color);
+  display:         inline-flex;
+  flex-shrink:     0;
+  font-size:       var(--font-size-xs);
+  font-weight:     var(--font-weight-bold);
+  height:          var(--stepper-item-size);
+  justify-content: center;
+  transition:
+    background   var(--transition-base),
+    color        var(--transition-base),
+    border-color var(--transition-base);
+  width:           var(--stepper-item-size);
 }
 
 /* Bloco textual centralizado abaixo do marcador */
@@ -279,112 +669,120 @@
   display:        flex;
   flex-direction: column;
   gap:            2px;
-  padding-block: 0;
-  padding-inline: var(--sp-1);
+  padding:        0 var(--space-1);
   text-align:     center;
 }
 
 /* Número da etapa (eyebrow) */
 .page-stepper__eyebrow {
-  color:          color-mix(in srgb, var(--color-accent) 72%, var(--cv-ink));
+  color:          var(--stepper-eyebrow-color);
   font-size:      10px;
-  font-weight:    var(--fw-bold);
-  letter-spacing: 0.12em;
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
 }
 
 /* Título da etapa */
 .page-stepper__label {
-  color:       var(--cv-ink);
-  font-size:   var(--fs-xs);
-  font-weight: var(--fw-semibold);
+  color:       var(--stepper-label-idle);
+  font-size:   var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
   line-height: 1.3;
-  transition:  color var(--tr-base);
+  transition:  color var(--transition-base);
 }
 
 /* Status da etapa (Concluída, Em andamento…) */
 .page-stepper__status {
-  color:     var(--cv-ink);
+  color:     var(--stepper-label-idle);
   font-size: 10px;
   opacity:   0.7;
-  transition: color var(--tr-base), opacity var(--tr-base);
+  transition: color var(--transition-base), opacity var(--transition-base);
 }
+
 
 /* ─── Estado: Concluído (.is-complete) ──────────────────── */
 
 .page-stepper__item.is-complete .page-stepper__connector {
-  background: var(--color-primary);
+  background: var(--stepper-connector-on);
 }
 
 .page-stepper__item.is-complete + .page-stepper__item .page-stepper__connector--before {
-  background: var(--color-primary);
+  background: var(--stepper-connector-on);
 }
 
-.page-stepper__item.is-complete .page-stepper__marker {
-  background:   color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
-  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
-  color:        var(--cv-state-success);
+.page-stepper__item.is-complete .page-stepper__marker,
+.page-stepper__item.is-complete .page-stepper__number {
+  background:   var(--stepper-done-bg);
+  border-color: var(--stepper-done-border);
+  color:        var(--stepper-done-color);
 }
 
 .page-stepper__item.is-complete .page-stepper__label {
-  color: var(--cv-state-success);
+  color: var(--stepper-label-done);
 }
 
 .page-stepper__item.is-complete .page-stepper__status {
-  color:   var(--cv-state-success);
+  color:   var(--stepper-status-done-color);
   opacity: 1;
 }
 
+
 /* ─── Estado: Atual / em andamento (.is-current | .is-active) ── */
 
-.page-stepper__item.is-current .page-stepper__marker {
-  background:   var(--color-primary);
-  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-raised);
-  color:        var(--on-primary);
+.page-stepper__item.is-current .page-stepper__marker,
+.page-stepper__item.is-active  .page-stepper__number {
+  background:   var(--stepper-active-bg);
+  border-color: var(--stepper-active-border);
+  box-shadow:   0 0 0 3px var(--stepper-idle-bg),
+                0 0 0 5px var(--stepper-active-bg);
+  color:        var(--stepper-active-color);
 }
 
 .page-stepper__item.is-current .page-stepper__label,
 .page-stepper__item.is-active  .page-stepper__label {
-  color:       var(--color-primary);
-  font-weight: var(--fw-bold);
+  color:       var(--stepper-label-active);
+  font-weight: var(--font-weight-bold);
 }
 
 .page-stepper__item.is-current .page-stepper__status,
 .page-stepper__item.is-active  .page-stepper__status {
-  color:   var(--color-primary);
+  color:   var(--stepper-status-current-color);
   opacity: 1;
 }
+
 
 /* ─── Estado: Com pendência / faltando algo (.is-missing) ── */
 
 .page-stepper__item.is-missing .page-stepper__marker {
-  background:   color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
-  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  color:        var(--cv-state-danger);
+  background:   var(--stepper-missing-bg);
+  border-color: var(--stepper-missing-border);
+  color:        var(--stepper-missing-color);
 }
 
 .page-stepper__item.is-missing .page-stepper__label {
-  color: var(--cv-state-danger);
+  color: var(--stepper-label-missing, var(--stepper-label-idle));
 }
 
 .page-stepper__item.is-missing .page-stepper__status {
-  color:   var(--cv-state-danger);
+  color:   var(--stepper-status-missing-color);
   opacity: 1;
 }
+
 
 /* ─── Estado: Desabilitado / bloqueado (.is-disabled) ────── */
 
 .page-stepper__item.is-disabled {
-  opacity:        0.45;
+  opacity:        var(--stepper-disabled-opacity);
   pointer-events: none;
 }
+
 
 /* ─── Foco acessível ─────────────────────────────────────── */
 
 .page-stepper__item:focus-visible .page-stepper__marker,
 .page-stepper__marker--link:focus-visible {
-  outline: none;
+  outline:        2px solid var(--border-focus);
+  outline-offset: 3px;
 }
 
 .page-stepper__marker--link {
@@ -404,14 +802,14 @@
 }
 
 .page-stepper__content-link:hover .page-stepper__label {
-  color: var(--color-primary);
+  color: var(--stepper-label-active);
 }
 
 /* Seções internas leves dentro de um card wizard */
 .wizard-inner-section {
   display:        flex;
   flex-direction: column;
-  gap:            var(--sp-5);
+  gap:            var(--form-section-inner-gap);
 }
 
 .wizard-inner-section:last-child {
@@ -419,42 +817,73 @@
 }
 
 .wizard-inner-section + .wizard-inner-section {
-  border-top: var(--bd);
-  padding-top: var(--sp-4);
+  border-top: 1px solid var(--border-form-section);
+  padding-top: var(--space-4);
 }
 
 .wizard-inner-section__header {
   display:        flex;
   flex-direction: column;
-  gap:            var(--sp-1);
+  gap:            var(--space-1);
+}
+
+.wizard-inner-section__header--actions {
+  align-items:     flex-start;
+  flex-direction:  row;
+  gap:             var(--space-3);
+  justify-content: space-between;
+}
+
+.wizard-inner-section__header-copy {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-1);
+  min-width:      0;
 }
 
 .wizard-inner-section__title {
-  color:          var(--cv-ink);
-  font-size:      var(--fs-sm);
-  font-weight:    var(--fw-bold);
+  color:          var(--theme-text-heading);
+  font-size:      var(--font-size-sm);
+  font-weight:    var(--font-weight-bold);
   letter-spacing: 0.04em;
   margin:         0;
   text-transform: uppercase;
 }
 
 .wizard-inner-section__description {
-  color:       var(--cv-ink-muted);
-  font-size:   var(--fs-sm);
+  color:       var(--theme-text-muted);
+  font-size:   var(--font-size-sm);
   line-height: 1.45;
   margin:      0;
+}
+
+.field__static-value {
+  color:       var(--theme-text-heading);
+  font-size:   var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  margin:      0;
+  white-space: nowrap;
+}
+
+.footer-actions--primary-only {
+  justify-content: flex-end;
+}
+
+.footer-actions--primary-only .footer-actions__primary {
+  margin-left: auto;
 }
 
 /* Stepper legado como irmão do header — UI Lab / demos.
    Wizards de produção embutem o stepper no `.list-header--wizard` (NOVO-20). */
 .page-shell--wizard > .page-stepper,
 .cv-page--flow > .page-stepper {
-  background: var(--cv-surface-card);
+  background: var(--surface-stepper);
   isolation: isolate;
   position: sticky;
   top: 24px;
-  z-index: var(--z-sticky);
+  z-index: var(--z-sticky-stepper);
 }
+
 
 /* =========================================================
    09. Main Form Panel
@@ -463,10 +892,10 @@
    ========================================================= */
 
 .main-form-panel {
-  background:     var(--cv-surface-card);
-  border: var(--bd);
-  border-radius:  var(--r-card);
-  box-shadow: var(--sh-raised);
+  background:     var(--surface-form-panel);
+  border:         1px solid var(--border-form-panel);
+  border-radius:  var(--form-panel-radius);
+  box-shadow:     var(--shadow-form-panel);
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
@@ -476,16 +905,17 @@
 
 /* Primeira seção e rodapé seguem o radius do painel (evita quinas no topo/base) */
 .main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) > .form-section:first-child {
-  border-top-left-radius:  var(--r-card);
-  border-top-right-radius: var(--r-card);
+  border-top-left-radius:  var(--form-panel-radius);
+  border-top-right-radius: var(--form-panel-radius);
 }
 
 .main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) > .footer-actions:last-child {
-  border-bottom-left-radius:  var(--r-card);
-  border-bottom-right-radius: var(--r-card);
+  border-bottom-left-radius:  var(--form-panel-radius);
+  border-bottom-right-radius: var(--form-panel-radius);
 }
 
 .main-form-panel .field-grid,
+.main-form-panel .field-grid-rows,
 .main-form-panel .field,
 .main-form-panel .cv-field,
 .main-form-panel .cv-search-picker,
@@ -496,22 +926,23 @@
 
 .main-form-panel--inline-create {
   background: transparent;
-  border: 0;
+  border: none;
   box-shadow: none;
-  gap: var(--sp-4);
+  gap: var(--space-4);
   overflow: visible;
 }
 
 /* Stack de cards independentes — remove o card único que envolve todas as sections */
 .main-form-panel--stack {
   background:    transparent;
-  border: 0;
+  border:        none;
   border-radius: 0;
   box-shadow:    none;
-  gap:           var(--sp-4);
+  gap:           var(--cv-form-section-stack-gap);
   overflow:      visible;
   padding:       0;
 }
+
 
 /* =========================================================
    Footer colado ao último card do stack.
@@ -521,49 +952,45 @@
    ========================================================= */
 .cv-form-section-stack > .footer-actions,
 .cv-form-section-stack > form > .footer-actions {
-  background:    var(--cv-surface-card);
-  border-start-start-radius: 0;
-  border-start-end-radius: 0;
-  border-end-end-radius: var(--r-card);
-  border-end-start-radius: var(--r-card);
-  border-top: var(--bd);
-  box-shadow: var(--sh-raised);
-  margin-top:    calc(-1 * var(--_stack-gap, var(--sp-4)));
+  background:    var(--cv-form-section-bg);
+  border-radius: 0 0 var(--cv-form-section-radius) var(--cv-form-section-radius);
+  border-top:    1px solid var(--cv-form-section-border);
+  box-shadow:    var(--cv-form-section-shadow);
+  margin-top:    calc(-1 * var(--_stack-gap, var(--cv-form-section-stack-gap)));
 }
 
 /* Ponte: seções legadas do wizard dentro do stack (ofícios/roteiros) */
 .main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section,
 .main-form-panel--stack .roteiro-editor--avulso .roteiro-editor__section,
 .main-form-panel--stack .roteiro-editor--oficio .roteiro-editor__section {
-  background:    var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-card);
-  box-shadow: var(--sh-raised);
+  background:    var(--cv-form-section-bg);
+  border:        1px solid var(--cv-form-section-border);
+  border-radius: var(--cv-form-section-radius);
+  box-shadow:    var(--cv-form-section-shadow);
   overflow:      hidden;
   width:         100%;
 }
 
 .main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section > .form-section-header {
-  background:       var(--cv-surface-block);
-  background-image: linear-gradient(to right, color-mix(in srgb, var(--color-primary) 7%, transparent) 0px, transparent 76px);
-  border-bottom: var(--bd);
+  background:       var(--cv-form-section-header-bg);
+  background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 7%, transparent) 0px, transparent 76px);
+  border-bottom:    1px solid var(--cv-form-section-border);
   margin:           0;
-  padding-block: var(--sp-4);
-  padding-inline: var(--sp-7) var(--sp-6);
+  padding:          var(--cv-form-section-header-padding);
 }
 
 .main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section > .form-section-header .app-form-section__title {
-  color:          var(--cv-ink);
-  font-size:      var(--fs-md);
-  font-weight:    var(--fw-bold);
+  color:          var(--theme-text-heading);
+  font-size:      var(--font-size-md);
+  font-weight:    var(--font-weight-bold);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
 .main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section > :not(.form-section-header) {
-  padding-block: var(--sp-5);
-padding-inline: var(--sp-6);
+  padding: var(--cv-form-section-body-padding);
 }
+
 
 /* =========================================================
    10. Form Section
@@ -573,24 +1000,24 @@ padding-inline: var(--sp-6);
    ========================================================= */
 
 .main-form-panel .form-section {
-  background:     var(--cv-surface-card);
-  border: 0;
-  border-bottom: var(--bd);
+  background:     var(--surface-form-section);
+  border:         none;
+  border-bottom:  1px solid var(--border-form-panel);
   border-radius:  0;
-  box-shadow:     none;
+  box-shadow:     var(--shadow-form-section);
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
-  gap:            var(--sp-5);
+  gap:            var(--form-section-inner-gap);
   margin:         0;
-  padding-block: var(--sp-5);
-  padding-inline: var(--sp-6);
+  padding:        var(--form-section-padding-y) var(--form-section-padding-x);
   width:          100%;
 }
 
 .main-form-panel .form-section:last-of-type {
-  border-bottom: 0;
+  border-bottom: none;
 }
+
 
 /* =========================================================
    11. Section Header
@@ -600,29 +1027,29 @@ padding-inline: var(--sp-6);
 .section-header {
   align-items:     flex-start;
   display:         flex;
-  gap:             var(--sp-4);
+  gap:             var(--space-4);
   justify-content: space-between;
 }
 
 .section-header__copy {
   display:        flex;
   flex-direction: column;
-  gap:            var(--sp-1);
+  gap:            var(--space-1);
   min-width:      0;
 }
 
 .section-header__title {
-  color:          var(--cv-ink);
-  font-size:      var(--fs-md);
-  font-weight:    var(--fw-bold);
+  color:          var(--theme-text-heading);
+  font-size:      var(--font-size-md);
+  font-weight:    var(--font-weight-bold);
   letter-spacing: -0.01em;
   line-height:    1.3;
   margin:         0;
 }
 
 .section-header__description {
-  color:       var(--cv-ink-muted);
-  font-size:   var(--fs-sm);
+  color:       var(--theme-text-muted);
+  font-size:   var(--font-size-sm);
   line-height: 1.5;
   margin:      0;
 }
@@ -631,8 +1058,9 @@ padding-inline: var(--sp-6);
   align-items: center;
   display:     flex;
   flex-shrink: 0;
-  gap:         var(--sp-2);
+  gap:         var(--space-2);
 }
+
 
 /* =========================================================
    11b. cv-form-section — Cards independentes por seção do wizard
@@ -642,7 +1070,7 @@ padding-inline: var(--sp-6);
    ========================================================= */
 
 .cv-form-section-stack {
-  --_stack-gap:   var(--sp-4);
+  --_stack-gap:   var(--cv-form-section-stack-gap);
   display:        flex;
   flex-direction: column;
   gap:            var(--_stack-gap);
@@ -650,7 +1078,7 @@ padding-inline: var(--sp-6);
 }
 
 .cv-form-section-stack--comfortable {
-  --_stack-gap: var(--sp-7);
+  --_stack-gap: var(--cv-form-section-stack-gap-comfortable);
   gap:          var(--_stack-gap);
 }
 
@@ -659,21 +1087,17 @@ padding-inline: var(--sp-6);
 .cv-form-section-stack > form {
   display:        flex;
   flex-direction: column;
-  gap:            var(--_stack-gap, var(--sp-4));
+  gap:            var(--_stack-gap, var(--cv-form-section-stack-gap));
   width:          100%;
 }
 
-/* O card de secao assume a cor 2 e oferece a cor 3 aos filhos — a outra ponta
-   do rodizio de superficies (NOVO-28); o par inverso esta em
-   components/form-sections.css, no .cv-form-block. */
 .cv-form-section-card {
-  background:    var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-card);
-  box-shadow: var(--sh-raised);
+  background:    var(--cv-form-section-bg);
+  border:        1px solid var(--cv-form-section-border);
+  border-radius: var(--cv-form-section-radius);
+  box-shadow:    var(--cv-form-section-shadow);
   overflow:      hidden;
   width:         100%;
-
 }
 
 /* =========================================================
@@ -683,19 +1107,18 @@ padding-inline: var(--sp-6);
    ========================================================= */
 .cv-card-footer {
   align-items:     center;
-  border-top: var(--bd);
+  border-top:      1px solid var(--cv-form-section-border, var(--border-form-section));
   display:         flex;
-  gap:             var(--sp-3);
+  gap:             var(--space-3);
   justify-content: space-between;
-  padding-block: var(--sp-4);
-  padding-inline: var(--sp-6);
+  padding:         var(--space-4) var(--space-6);
 }
 
 .cv-card-footer__secondary,
 .cv-card-footer__primary {
   align-items: center;
   display:     flex;
-  gap:         var(--sp-3);
+  gap:         var(--space-3);
 }
 
 .cv-card-footer--end {
@@ -707,7 +1130,7 @@ padding-inline: var(--sp-6);
 }
 
 .cv-card-footer-section__divider {
-  border-top: var(--bd);
+  border-top: 1px solid var(--cv-form-section-border, var(--border-form-section));
 }
 
 .cv-card-footer-section > .cv-card-footer {
@@ -716,35 +1139,34 @@ padding-inline: var(--sp-6);
 
 /* Dentro de form-section (páginas de formulário simples) */
 .form-section > .cv-card-footer {
-  margin-inline: calc(var(--sp-6) * -1);
-  padding-inline: var(--sp-6);
+  margin-inline: calc(-1 * var(--form-section-padding-x, var(--space-6)));
+  padding-inline: var(--form-section-padding-x, var(--space-6));
 }
 
 .cv-form-section-header {
-  --_wizard-filete-inset-block: var(--sp-4);
-  --_wizard-filete-left:        var(--sp-6);
+  --_wizard-filete-inset-block: var(--space-4);
+  --_wizard-filete-left:        var(--space-6);
   --_wizard-filete-width:       6px;
   align-items:      center;
-  background:       var(--cv-surface-block);
-  background-image: linear-gradient(to right, color-mix(in srgb, var(--color-primary) 7%, transparent) 0px, transparent 76px);
-  border-bottom: var(--bd);
+  background:       var(--cv-form-section-header-bg);
+  background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 7%, transparent) 0px, transparent 76px);
+  border-bottom:    1px solid var(--cv-form-section-border);
   display:          flex;
-  gap:              var(--sp-4);
+  gap:              var(--space-4);
   justify-content:  space-between;
   /* altura fixa: garante consistência com ou sem botões/toggles no header */
-  min-height:       calc(2 * var(--sp-4) + var(--h-sm));
-  padding-block: var(--sp-4);
-  padding-inline: var(--sp-7) var(--sp-6);
+  min-height:       calc(2 * var(--space-4) + var(--control-height-sm));
+  padding:          var(--cv-form-section-header-padding);
   position:         relative;
 }
 
 .cv-form-section-header::before {
-  /* Dourado — o filete e DESTAQUE, e o contrato ja dizia isso desde sempre
-     (core/tests/test_dark_redesign: "stays gold"). Ele so ficou azul enquanto
-     `--color-accent` guardou o azul, entre o NOVO-28 e o NOVO-55. */
   background:    linear-gradient(180deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 50%, transparent) 100%);
-  border-radius: var(--r-pill);
-  box-shadow: var(--sh-raised);
+  border-radius: var(--radius-pill);
+  box-shadow:
+    0 0 5px 1px  color-mix(in srgb, var(--color-accent) 35%, transparent),
+    0 0 12px 2px color-mix(in srgb, var(--color-accent) 15%, transparent),
+    0 0 22px 4px color-mix(in srgb, var(--color-accent) 6%, transparent);
   content:       "";
   /* O filete acompanha todo o bloco de conteúdo, inclusive subtítulos e ações. */
   bottom:        var(--_wizard-filete-inset-block);
@@ -759,7 +1181,7 @@ padding-inline: var(--sp-6);
 .cv-form-section-header__copy {
   display:        flex;
   flex-direction: column;
-  gap:            var(--sp-1);
+  gap:            var(--space-1);
   min-width:      0;
 }
 
@@ -767,17 +1189,17 @@ padding-inline: var(--sp-6);
   align-items: center;
   display:     flex;
   flex-shrink: 0;
-  gap:         var(--sp-2);
+  gap:         var(--space-2);
 }
 
 .cv-form-section-title {
-  color:          var(--cv-ink);
-  font-size:      var(--fs-lg);
-  font-weight:    var(--fw-bold);
+  color:          var(--theme-text-heading);
+  font-size:      var(--font-size-lg);
+  font-weight:    var(--font-weight-extrabold);
   letter-spacing: 0.06em;
   line-height:    1.2;
   margin:         0;
-  text-shadow:    0 1px 6px color-mix(in srgb, var(--color-primary) 20%, transparent);
+  text-shadow:    0 1px 6px color-mix(in srgb, var(--color-accent) 20%, transparent);
   text-transform: uppercase;
 }
 
@@ -785,12 +1207,11 @@ padding-inline: var(--sp-6);
 .cv-form-section-header__actions .btn,
 .cv-form-section-header__actions .app-btn,
 .cv-form-section-header__actions .cv-btn {
-  font-size:  var(--fs-xs);
-  height:     var(--h-sm);
-  min-height: var(--h-sm);
-  max-height: var(--h-sm);
-  padding-block: 0;
-  padding-inline: var(--sp-3);
+  font-size:  var(--font-size-xs);
+  height:     var(--control-height-sm);
+  min-height: var(--control-height-sm);
+  max-height: var(--control-height-sm);
+  padding:    0 var(--space-3);
 }
 
 .cv-form-section-subtitle {
@@ -815,7 +1236,7 @@ padding-inline: var(--sp-6);
    envolver cards de lista em outra superfície. */
 .cv-wizard-collection {
   display: grid;
-  gap: var(--sp-4);
+  gap: var(--space-4);
   min-width: 0;
   width: 100%;
 }
@@ -825,18 +1246,18 @@ padding-inline: var(--sp-6);
 }
 
 .cv-form-section-header--standalone {
-  border: var(--bd);
-  border-radius: var(--r-card);
-  box-shadow: var(--sh-raised);
+  border: 1px solid var(--cv-form-section-border);
+  border-radius: var(--cv-form-section-radius);
+  box-shadow: var(--cv-form-section-shadow);
   min-height: 0;
   overflow: hidden;
-  padding-block: var(--sp-4);
+  padding-block: var(--space-4);
 }
 
 .cv-form-section-card--compact .cv-form-section-header {
   --_wizard-filete-width: 4px;
   min-height: 0;
-  padding-block: var(--sp-4);
+  padding-block: var(--space-4);
 }
 
 .cv-form-section-card--compact .cv-form-section-header::before {
@@ -844,17 +1265,29 @@ padding-inline: var(--sp-6);
 }
 
 .cv-form-section-card--compact .cv-form-section-title {
-  font-size: var(--fs-md);
+  font-size: var(--font-size-md);
   letter-spacing: 0.045em;
 }
 
 .cv-form-section-body {
   display:        flex;
   flex-direction: column;
-  gap:            var(--sp-5);
-  padding-block: var(--sp-5);
-  padding-inline: var(--sp-6);
+  gap:            var(--form-section-inner-gap);
+  padding:        var(--cv-form-section-body-padding);
 }
+
+.cv-form-section-body--sections {
+  gap: 0;
+}
+
+.cv-form-section-body--sections > .wizard-inner-section:not(:last-child) {
+  padding-bottom: var(--space-5);
+}
+
+.cv-form-section-body--sections > .wizard-inner-section + .wizard-inner-section {
+  padding-top: var(--space-5);
+}
+
 
 /* =========================================================
    12. Field Grid
@@ -865,7 +1298,7 @@ padding-inline: var(--sp-6);
 .field-grid {
   align-items:           start;
   display:               grid;
-  gap:                   var(--sp-4);
+  gap:                   var(--field-grid-gap);
   width:                 100%;
 }
 
@@ -876,6 +1309,7 @@ padding-inline: var(--sp-6);
   min-width: 0;
   width:     100%;
 }
+
 
 /* =========================================================
    13. Field Sizes
@@ -895,6 +1329,47 @@ padding-inline: var(--sp-6);
 /* Linha inteira: justificativa, observações, descrição, textarea */
 .field-size-4 { grid-column: 1 / -1; }
 
+
+/* =========================================================
+   14. Field Group
+   Agrupamento leve dentro de uma Form Section.
+   Usado para blocos condicionais ou campos muito relacionados.
+   ========================================================= */
+
+.field-group {
+  background:     var(--surface-field-group);
+  border:         1px solid var(--border-field-group);
+  border-radius:  var(--field-group-radius);
+  box-sizing:     border-box;
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--field-group-gap);
+  padding:        var(--field-group-padding);
+}
+
+.field-group__header {
+  align-items:     center;
+  display:         flex;
+  gap:             var(--space-2);
+  justify-content: space-between;
+}
+
+.field-group__title {
+  color:          var(--theme-text-muted-strong);
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  margin:         0;
+  text-transform: uppercase;
+}
+
+.field-group__body {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-3);
+}
+
+
 /* =========================================================
    15. Footer Actions
    Rodapé de ações do formulário. Sempre ao final do Main Form Panel.
@@ -903,15 +1378,14 @@ padding-inline: var(--sp-6);
 
 .footer-actions {
   align-items:     center;
-  background:      var(--cv-surface-block);
-  border-top: var(--bd);
+  background:      var(--surface-footer-actions);
+  border-top:      1px solid var(--border-footer-actions);
   box-sizing:      border-box;
   display:         flex;
   flex-wrap:       wrap;
-  gap:             var(--sp-3);
+  gap:             var(--footer-actions-gap);
   justify-content: space-between;
-  padding-block: var(--sp-4) 0;
-  padding-inline: var(--sp-6);
+  padding:         var(--footer-actions-padding-y) var(--footer-actions-padding-x) var(--footer-actions-padding-bottom);
 }
 
 .form-section > .footer-actions {
@@ -922,26 +1396,71 @@ padding-inline: var(--sp-6);
 .footer-actions__primary {
   align-items: center;
   display:     flex;
-  gap:         var(--sp-3);
+  gap:         var(--footer-actions-gap);
 }
 
 .cv-floating-action {
   align-items: flex-end;
   display: flex;
   justify-content: flex-end;
-  margin-top: var(--sp-4);
+  margin-top: var(--space-4);
   position: fixed;
-  right: clamp(var(--sp-4), 2vw, var(--sp-5));
-  bottom: clamp(var(--sp-4), 2vw, var(--sp-5));
-  z-index: calc(var(--z-sidebar) + 20);
+  right: clamp(var(--space-4), 2vw, var(--space-5));
+  bottom: clamp(var(--space-4), 2vw, var(--space-5));
+  z-index: calc(var(--z-footer-actions-fixed) + 20);
+}
+
+/* `.cv-floating-action--stacked` mora em `cv-buttons.css` (NOVO-23): aquele
+   arquivo redeclara `.cv-floating-action { bottom }` e vem depois deste no
+   bundle, então um modificador definido aqui nunca chegava a valer. */
+
+.cv-floating-action__button {
+  box-shadow: 0 18px 32px rgba(11, 58, 102, 0.18);
+}
+
+.quick-create-panel--page {
+  background: var(--surface-quick-create);
+  border: 1px solid var(--border-quick-create);
+  border-radius: var(--radius-shell);
+  box-shadow: var(--shadow-quick-create);
+}
+
+.quick-create-panel__copy {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.quick-create-panel__eyebrow {
+  color: var(--theme-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+}
+
+.quick-create-panel__subtitle {
+  color: var(--theme-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.quick-create-panel__body--page {
+  padding-block: var(--space-4);
 }
 
 @media (max-width: 640px) {
   .cv-floating-action {
-    left: clamp(var(--sp-3), 2vw, var(--sp-4));
-    right: clamp(var(--sp-3), 2vw, var(--sp-4));
+    left: clamp(var(--space-3), 2vw, var(--space-4));
+    right: clamp(var(--space-3), 2vw, var(--space-4));
+  }
+
+  .cv-floating-action__button {
+    width: 100%;
   }
 }
+
 
 /* =========================================================
    16. List Panel / Filters
@@ -951,10 +1470,10 @@ padding-inline: var(--sp-6);
 
 /* List Panel */
 .list-panel {
-  background:     var(--cv-surface-card);
-  border: var(--bd);
-  border-radius:  var(--r-card);
-  box-shadow: var(--sh-raised);
+  background:     var(--surface-list-panel);
+  border:         1px solid var(--border-list-panel);
+  border-radius:  var(--list-panel-radius);
+  box-shadow:     var(--shadow-list-panel);
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
@@ -972,15 +1491,14 @@ padding-inline: var(--sp-6);
 /* Filter Bar: controles de busca/filtro à esquerda, ações à direita */
 .filter-bar {
   align-items:     center;
-  background:      var(--cv-surface-block);
-  border-bottom: var(--bd);
+  background:      var(--surface-filter-bar);
+  border-bottom:   1px solid var(--border-filter-bar);
   box-sizing:      border-box;
   display:         flex;
   flex-wrap:       wrap;
-  gap:             var(--sp-3);
+  gap:             var(--filter-bar-gap);
   justify-content: space-between;
-  padding-block: var(--sp-3);
-  padding-inline: var(--sp-5);
+  padding:         var(--filter-bar-padding-y) var(--filter-bar-padding-x);
 }
 
 .filter-bar__controls {
@@ -988,7 +1506,7 @@ padding-inline: var(--sp-6);
   display:     flex;
   flex:        1;
   flex-wrap:   wrap;
-  gap:         var(--sp-2);
+  gap:         var(--space-2);
   min-width:   0;
 }
 
@@ -996,7 +1514,7 @@ padding-inline: var(--sp-6);
   align-items: center;
   display:     flex;
   flex-shrink: 0;
-  gap:         var(--sp-2);
+  gap:         var(--space-2);
 }
 
 /* List Content */
@@ -1004,22 +1522,21 @@ padding-inline: var(--sp-6);
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
-  padding-block:  var(--sp-3);
+  padding-block:  var(--space-3);
   width:          100%;
 }
 
 /* Pagination — segmented control em cápsula */
 .pagination-shell {
   align-items: center;
-  background: var(--cv-surface-page);
+  background: var(--surface-pagination);
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: var(--sp-3);
+  gap: var(--space-3);
   justify-content: space-between;
-  padding-block: var(--sp-4);
-  padding-inline: var(--sp-6);
+  padding: var(--pagination-padding-y) var(--pagination-padding-x);
 }
 
 .pagination-shell--controls-only {
@@ -1035,7 +1552,7 @@ padding-inline: var(--sp-6);
   display: flex;
   justify-content: flex-start;
   margin: 0;
-  padding-block: var(--sp-2);
+  padding-block: var(--space-2);
 }
 
 .pagination-shell__info {
@@ -1051,10 +1568,10 @@ padding-inline: var(--sp-6);
   background: transparent;
   border: 0;
   border-radius: 0;
-  color: var(--cv-ink-muted);
+  color: var(--theme-text-muted);
   display: inline-flex;
   flex-wrap: wrap;
-  font-size: var(--fs-xs);
+  font-size: var(--font-size-xs);
   gap: 0.4em;
   justify-content: flex-start;
   line-height: 1.35;
@@ -1064,10 +1581,10 @@ padding-inline: var(--sp-6);
 }
 
 .pagination-shell__info-pill strong {
-  color: var(--cv-ink);
-  font-size: var(--fs-sm);
+  color: var(--theme-text-heading);
+  font-size: var(--font-size-sm);
   font-variant-numeric: tabular-nums;
-  font-weight: var(--fw-bold);
+  font-weight: var(--font-weight-extrabold);
   letter-spacing: -0.01em;
   line-height: 1;
 }
@@ -1075,9 +1592,9 @@ padding-inline: var(--sp-6);
 .pagination-shell__info-label,
 .pagination-shell__info-separator,
 .pagination-shell__info-unit {
-  color: var(--cv-ink-muted);
+  color: var(--theme-text-muted);
   font-size: 0.6875rem;
-  font-weight: var(--fw-bold);
+  font-weight: var(--font-weight-bold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -1090,15 +1607,15 @@ padding-inline: var(--sp-6);
 /* Cápsula única: setas + páginas */
 .pagination-shell__controls {
   align-items: center;
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-radius: var(--r-pill);
+  background: var(--color-surface-soft, var(--surface-filter-button));
+  border: 1px solid var(--color-border-soft, var(--border-filter-button));
+  border-radius: var(--radius-pill);
   display: flex;
   flex: 0 0 auto;
   flex-wrap: nowrap;
   gap: 2px;
   justify-content: flex-end;
-  padding: var(--sp-1);
+  padding: 3px;
 }
 
 .pagination-shell__pages {
@@ -1113,28 +1630,27 @@ padding-inline: var(--sp-6);
 .pagination-shell__page,
 .pagination-shell__ellipsis {
   align-items: center;
-  border-radius: var(--r-pill);
+  border-radius: 999px;
   box-sizing: border-box;
   display: inline-flex;
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-bold);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
   justify-content: center;
   min-height: 36px;
   min-width: 36px;
   padding: 0;
   text-decoration: none;
   transition:
-    background var(--tr-base),
-    border-color var(--tr-base),
-    color var(--tr-base);
+    background var(--transition-base),
+    border-color var(--transition-base),
+    color var(--transition-base);
 }
 
 .pagination-shell__nav,
 .pagination-shell__page {
   background: transparent;
-  border: var(--bd);
-  border-color: transparent;
-  color: var(--cv-ink-muted);
+  border: 1px solid transparent;
+  color: var(--theme-text-muted, var(--color-filter-button));
 }
 
 .pagination-shell__page {
@@ -1149,36 +1665,36 @@ padding-inline: var(--sp-6);
 .pagination-shell__nav:focus-visible,
 .pagination-shell__page:hover,
 .pagination-shell__page:focus-visible {
-  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
-  border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
-  color: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
+  color: var(--color-accent-hover, var(--color-accent));
   outline: none;
 }
 
 .pagination-shell__page.is-current {
-  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
-  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  border-color: var(--color-accent);
   box-shadow: none;
-  color: var(--cv-ink);
+  color: var(--theme-text-heading, var(--color-heading));
 }
 
 .pagination-shell__page.is-current:hover,
 .pagination-shell__page.is-current:focus-visible {
-  background: color-mix(in srgb, var(--color-primary) 22%, transparent);
-  border-color: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
-  color: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  border-color: var(--color-accent-hover, var(--color-accent));
+  color: var(--color-accent-hover, var(--color-accent));
 }
 
 /* “Próxima” deixa de ser primary azul — só a página atual destaca */
 .pagination-shell__nav--primary {
   background: transparent;
   border-color: transparent;
-  color: var(--cv-ink-muted);
+  color: var(--theme-text-muted, var(--color-filter-button));
 }
 
 .pagination-shell__nav--prev,
 .pagination-shell__nav--next {
-  border-radius: var(--r-pill);
+  border-radius: 999px;
 }
 
 .pagination-shell__nav.is-disabled {
@@ -1188,9 +1704,9 @@ padding-inline: var(--sp-6);
 
 .pagination-shell__ellipsis {
   border: 0;
-  color: var(--cv-ink-muted);
+  color: var(--theme-text-muted);
   min-width: 20px;
-  padding-inline: var(--sp-1);
+  padding-inline: 2px;
 }
 
 .pagination-shell__icon {
@@ -1205,16 +1721,14 @@ padding-inline: var(--sp-6);
 }
 
 .pagination-shell__erro {
-  background: color-mix(in srgb, var(--cv-state-danger) 12%, transparent);
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--cv-state-danger) 46%, transparent);
-  border-radius: var(--r-panel);
-  color: var(--cv-state-danger);
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 46%, transparent);
+  border-radius: var(--radius-md);
+  color: var(--color-danger);
   display: block;
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-semibold);
-  padding-block: var(--sp-2);
-  padding-inline: var(--sp-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  padding: 10px 16px;
   width: 100%;
 }
 
@@ -1227,7 +1741,7 @@ body.has-delete-modal-open {
   display: flex;
   inset: 0;
   justify-content: center;
-  padding: var(--sp-4);
+  padding: var(--space-4);
   position: fixed;
   z-index: var(--z-modal, 1000);
 }
@@ -1240,15 +1754,15 @@ body.has-delete-modal-open {
 }
 
 .delete-confirm-modal__dialog {
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-card);
-  box-shadow: var(--sh-raised);
+  background: var(--surface-list-panel);
+  border: 1px solid var(--border-list-panel);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
   box-sizing: border-box;
   display: grid;
-  gap: var(--sp-4);
+  gap: var(--space-4);
   max-width: min(100%, 520px);
-  padding: var(--sp-5);
+  padding: var(--space-5);
   position: relative;
   width: 100%;
 }
@@ -1256,16 +1770,15 @@ body.has-delete-modal-open {
 .delete-confirm-modal__header {
   align-items: center;
   display: flex;
-  gap: var(--sp-3);
+  gap: var(--space-3);
 }
 
 .delete-confirm-modal__icon {
   align-items: center;
-  background: color-mix(in srgb, var(--cv-state-danger) 18%, transparent);
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--cv-state-danger) 52%, transparent);
-  border-radius: var(--r-pill);
-  color: var(--cv-state-danger);
+  background: color-mix(in srgb, var(--color-danger) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 52%, transparent);
+  border-radius: var(--radius-pill);
+  color: var(--color-danger);
   display: inline-flex;
   flex: 0 0 42px;
   height: 42px;
@@ -1283,38 +1796,37 @@ body.has-delete-modal-open {
 }
 
 .delete-confirm-modal__eyebrow {
-  color: var(--cv-state-danger);
+  color: var(--color-danger);
   display: block;
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-bold);
-  letter-spacing: 0.12em;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
 }
 
 .delete-confirm-modal__title {
-  color: var(--cv-ink);
+  color: var(--theme-text-heading);
   font-size: 1.25rem;
   line-height: 1.2;
-  margin-block: var(--sp-1) 0;
-  margin-inline: 0;
+  margin: var(--space-1) 0 0;
 }
 
 .delete-confirm-modal__message {
-  color: var(--cv-ink-muted);
-  font-size: var(--fs-sm);
+  color: var(--theme-text-muted);
+  font-size: var(--font-size-sm);
   line-height: 1.55;
   margin: 0;
 }
 
 .delete-confirm-modal__message strong {
-  color: var(--cv-ink);
+  color: var(--theme-text-heading);
 }
 
 .delete-confirm-modal__actions {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sp-2);
+  gap: var(--space-2);
   justify-content: flex-end;
   margin: 0;
 }
@@ -1332,7 +1844,7 @@ body.has-delete-modal-open {
 
 .cancel-reason-modal__form {
   display: grid;
-  gap: var(--sp-4);
+  gap: var(--space-4);
 }
 
 .cancel-reason-modal__field {
@@ -1347,6 +1859,7 @@ body.has-delete-modal-open {
   background: transparent;
   border: 0;
   border-radius: 0;
+  box-shadow: none;
   min-height: 96px;
   outline: none;
   resize: vertical;
@@ -1355,7 +1868,7 @@ body.has-delete-modal-open {
 
 .attach-signed-modal__form {
   display: grid;
-  gap: var(--sp-4);
+  gap: var(--space-4);
 }
 
 .attach-signed-modal__field {
@@ -1364,15 +1877,15 @@ body.has-delete-modal-open {
 
 /* Menu de ações (⋮) — junta Cancelar/Excluir num único botão */
 .cv-action-menu {
-  background: var(--cv-surface-card);
-  border: var(--bd);
-  border-radius: var(--r-panel);
-  box-shadow: var(--sh-overlay);
+  background: var(--surface-list-panel);
+  border: 1px solid var(--border-list-panel);
+  border-radius: var(--radius-md);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
   display: none;
   flex-direction: column;
   gap: 2px;
   min-width: 180px;
-  padding: var(--sp-2);
+  padding: var(--space-2);
   z-index: var(--z-modal, 1000);
 }
 
@@ -1383,22 +1896,21 @@ body.has-delete-modal-open {
 .cv-action-menu__item {
   align-items: center;
   background: transparent;
-  border: 0;
-  border-radius: var(--r-panel);
-  color: var(--cv-ink);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--theme-text-heading);
   cursor: pointer;
   display: flex;
-  font-size: var(--fs-sm);
-  gap: var(--sp-2);
-  padding-block: var(--sp-2);
-  padding-inline: var(--sp-3);
+  font-size: var(--font-size-sm);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   text-align: left;
   width: 100%;
 }
 
 .cv-action-menu__item:hover,
 .cv-action-menu__item:focus-visible {
-  background: var(--cv-surface-block);
+  background: var(--color-surface-muted);
 }
 
 .cv-action-menu__item .cv-icon {
@@ -1407,10 +1919,74 @@ body.has-delete-modal-open {
   width: 16px;
 }
 
+.cv-action-menu__item--cancel {
+  color: var(--color-warning);
+}
+
+.cv-action-menu__item--delete {
+  color: var(--color-danger);
+}
+
+.cv-action-menu__item--retificar,
+.cv-action-menu__item--complementar {
+  color: var(--color-info);
+}
+
+.cv-action-menu__item--whatsapp {
+  color: #1fa855;
+}
+
+.cv-action-menu__item--whatsapp:hover,
+.cv-action-menu__item--whatsapp:focus-visible {
+  background: color-mix(in srgb, #1fa855 14%, transparent);
+}
+
+/* Ações de documento (termo, ofício etc.) — cor do ícone acompanha o botão
+   sólido equivalente (preview/pdf/docx), com leve tingimento no hover. */
+.cv-action-menu__item--preview {
+  color: var(--cv-btn-preview-color, var(--color-info));
+}
+
+.cv-action-menu__item--pdf {
+  color: var(--cv-btn-pdf-bg, var(--color-danger));
+}
+
+.cv-action-menu__item--pdf:hover,
+.cv-action-menu__item--pdf:focus-visible {
+  background: color-mix(in srgb, var(--cv-btn-pdf-bg, var(--color-danger)) 14%, transparent);
+}
+
+.cv-action-menu__item--docx {
+  color: var(--cv-btn-docx-bg, var(--color-primary));
+}
+
+.cv-action-menu__item--docx:hover,
+.cv-action-menu__item--docx:focus-visible {
+  background: color-mix(in srgb, var(--cv-btn-docx-bg, var(--color-primary)) 14%, transparent);
+}
+
+.cv-action-menu__item--sign {
+  color: var(--cv-btn-primary-bg, var(--color-primary));
+}
+
+.cv-action-menu__item--sign:hover,
+.cv-action-menu__item--sign:focus-visible {
+  background: color-mix(in srgb, var(--cv-btn-primary-bg, var(--color-primary)) 14%, transparent);
+}
+
+.cv-action-menu__item--sign.is-assinado {
+  color: var(--color-success, #24a25b);
+}
+
+.cv-action-menu__item--sign.is-assinado:hover,
+.cv-action-menu__item--sign.is-assinado:focus-visible {
+  background: color-mix(in srgb, var(--color-success, #24a25b) 16%, transparent);
+}
+
 .cv-action-menu__divider {
-  border: 0;
-  border-top: var(--bd);
-  margin: var(--sp-1);
+  border: none;
+  border-top: 1px solid var(--color-border-soft, rgba(255, 255, 255, 0.08));
+  margin: var(--space-1) var(--space-1);
 }
 
 .cv-action-menu__form {
@@ -1418,42 +1994,151 @@ body.has-delete-modal-open {
   width: 100%;
 }
 
+
+/* =========================================================
+   17. Quick Create Inline
+   Subvariação do List / Filters para mini-cadastros auxiliares.
+   Exibe-se abaixo da Filter Bar como extensão visual do painel.
+   Visível apenas quando .is-open.
+   Regra: botões ficam em .quick-create-actions, nunca no .field-grid.
+   ========================================================= */
+
+/* Painel: oculto por padrão, revelado via .is-open */
+.quick-create-panel {
+  background:    var(--surface-quick-create);
+  border-bottom: 1px solid var(--border-quick-create);
+  box-shadow:    var(--shadow-quick-create);
+  box-sizing:    border-box;
+  display:       none;
+  flex-direction: column;
+  width:         100%;
+}
+
+.quick-create-panel.is-open {
+  display: flex;
+}
+
+/* Cabeçalho: título + botão de fechar */
+.quick-create-panel__header {
+  align-items:     center;
+  background:      var(--surface-quick-create-header);
+  border-bottom:   1px solid var(--border-quick-create);
+  box-sizing:      border-box;
+  display:         flex;
+  gap:             var(--space-3);
+  justify-content: space-between;
+  padding:         var(--space-2) var(--filter-bar-padding-x);
+}
+
+.quick-create-panel__title {
+  color:       var(--theme-text-heading);
+  font-size:   var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  margin:      0;
+}
+
+.quick-create-panel__close {
+  align-items:      center;
+  background:       transparent;
+  border:           none;
+  border-radius:    var(--radius-sm);
+  color:            var(--theme-text-muted);
+  cursor:           pointer;
+  display:          flex;
+  font-size:        var(--font-size-md);
+  height:           28px;
+  justify-content:  center;
+  line-height:      1;
+  padding:          0;
+  transition:       color var(--transition-base), background var(--transition-base);
+  width:            28px;
+}
+
+.quick-create-panel__close:hover {
+  background: var(--border-quick-create);
+  color:      var(--theme-text-heading);
+}
+
+/* Corpo: linha de campos + ações em flex row no desktop */
+.quick-create-panel__body {
+  box-sizing: border-box;
+  display:    flex;
+  gap:        var(--layout-quick-create-gap);
+  padding:    var(--space-4) var(--filter-bar-padding-x);
+  width:      100%;
+}
+
+/* Row: field-grid + quick-create-actions lado a lado */
+.quick-create-panel__row {
+  align-items: flex-end;
+  display:     flex;
+  flex:        1;
+  gap:         var(--layout-quick-create-gap);
+  min-width:   0;
+}
+
+/* Field Grid dentro do Quick Create ocupa o espaço restante */
+.quick-create-panel .field-grid {
+  flex: 1;
+}
+
+/* Ações: área exclusiva para Cancelar / Salvar */
+.quick-create-actions {
+  align-items: flex-end;
+  display:     flex;
+  flex-shrink: 0;
+  gap:         var(--space-2);
+  padding-bottom: 1px;
+  width:       var(--layout-quick-create-actions-width);
+}
+
+/* Mensagem auxiliar opcional */
+.quick-create-panel__hint {
+  box-sizing:  border-box;
+  color:       var(--theme-text-muted);
+  font-size:   var(--font-size-xs);
+  padding:     0 var(--filter-bar-padding-x) var(--space-3);
+}
+
+
 /* =========================================================
    18. Responsive
    ========================================================= */
 
 @media (max-width: 840px) {
   .page-shell {
-    gap:           var(--sp-4);
-    padding-block: var(--sp-4);
+    gap:           var(--space-4);
+    padding-block: var(--space-4);
   }
 
   .page-stepper {
-    padding-block: var(--sp-3);
-  padding-inline: var(--sp-4);
+    padding: var(--space-3) var(--space-4);
   }
 
   .main-form-panel .form-section {
-    gap:     var(--sp-4);
-    padding: var(--sp-4);
+    gap:     var(--space-4);
+    padding: var(--space-4);
   }
 
   .cv-form-section-header {
-    --_wizard-filete-inset-block: var(--sp-3);
-    --_wizard-filete-left:        var(--sp-4);
-    padding-block: var(--sp-3);
-    padding-inline: var(--sp-7) var(--sp-4);
+    --_wizard-filete-inset-block: var(--space-3);
+    --_wizard-filete-left:        var(--space-4);
+    padding: var(--space-3) var(--space-4) var(--space-3) var(--space-8);
   }
 
   .cv-form-section-card--compact .cv-form-section-header {
-    padding-block: var(--sp-3);
+    padding-block: var(--space-3);
+  }
+
+  .cv-form-section-body {
+    padding: var(--space-4);
   }
 
   .footer-actions {
     align-items:    stretch;
     flex-direction: column-reverse;
-    gap:            var(--sp-2);
-    padding: var(--sp-4);
+    gap:            var(--space-2);
+    padding:        var(--space-4) var(--space-4);
   }
 
   .footer-actions__secondary,
@@ -1486,10 +2171,25 @@ body.has-delete-modal-open {
     flex-wrap: wrap;
   }
 
+  /* Quick Create: campos e ações empilham no tablet */
+  .quick-create-panel__body {
+    flex-direction: column;
+  }
+
+  .quick-create-panel__row {
+    flex-direction: column;
+    align-items:    stretch;
+  }
+
+  .quick-create-actions {
+    width:          100%;
+    justify-content: flex-end;
+  }
+
   /* Header clean: stage com padding reduzido */
   .page-header--clean .page-header__stage,
   .page-header--clean .page-header__body {
-    padding: var(--sp-4);
+    padding: var(--space-4);
   }
 }
 
@@ -1517,7 +2217,7 @@ body.has-delete-modal-open {
   .pagination-shell {
     align-items: stretch;
     flex-direction: column;
-    gap: var(--sp-2);
+    gap: var(--space-2);
     text-align: center;
   }
 
@@ -1547,6 +2247,7 @@ body.has-delete-modal-open {
   }
 }
 
+
 /* =========================================================
    19. Field Layout / Field Rows
    Camada complementar ao Field Grid para controle de colunas
@@ -1568,16 +2269,21 @@ body.has-delete-modal-open {
 .field-layout {
   display:        flex;
   flex-direction: column;
-  gap:            var(--sp-4);
+  gap:            var(--layout-field-grid-gap);
   width:          100%;
 }
 
 /* Linha base — grade com largura total */
 .field-row {
   display:   grid;
-  gap:       var(--sp-4);
+  gap:       var(--layout-field-grid-gap);
   min-width: 0;
   width:     100%;
+}
+
+/* 1 coluna — linha inteira: textarea, observações, campo único amplo */
+.field-row--1 {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 /* 2 colunas — pares: datas, telefone + e-mail, valor + tipo */
@@ -1606,12 +2312,14 @@ body.has-delete-modal-open {
 /* Mobile (600px): todos os rows viram 1 coluna */
 @media (max-width: 600px) {
   .field-row,
-.field-row--2,
-.field-row--3,
-.field-row--4 {
+  .field-row--1,
+  .field-row--2,
+  .field-row--3,
+  .field-row--4 {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
 
 /* =========================================================
    21. Page Header Stack
@@ -1621,11 +2329,12 @@ body.has-delete-modal-open {
    ========================================================= */
 
 .page-header-stack {
-  border-radius: var(--r-card);
-  box-shadow: var(--sh-raised);
+  border-radius: var(--radius-lg);
+  box-shadow:    var(--shadow-lg);
   overflow:      hidden;
   width:         100%;
 }
+
 
 /* =========================================================
    22. Page Header Band — Faixa Escura
@@ -1633,45 +2342,34 @@ body.has-delete-modal-open {
    Não recebe filtros, stepper nem botões funcionais.
    ========================================================= */
 
-/* "Faixa Escura" (o titulo desta secao) voltou a ser escura de verdade
-   (NOVO-55): a superficie do menu, para cabecalho e menu lerem como a mesma
-   peca de chrome. Redeclara o par e a tinta, como .sidebar e
-   .list-header__band — tudo que mora dentro acompanha sem saber onde esta. */
 .page-header-band {
-  --cv-surface: var(--cv-surface-shell);
-  --cv-surface-next: var(--cv-surface-shell);
-  --cv-ink: var(--on-shell);
-  --cv-ink-strong: var(--on-shell);
-  --cv-ink-muted: color-mix(in srgb, var(--on-shell) 70%, var(--cv-surface-shell));
-
   align-items:    flex-start;
-  background:     var(--cv-surface-shell);
-  box-shadow: none;
+  background:     var(--app-hero-stage-bg);
+  box-shadow:     inset 0 -1px 0 rgba(255, 255, 255, 0.08);
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
-  gap:            var(--sp-2);
-  padding-block: var(--sp-5);
-  padding-inline: var(--sp-6);
+  gap:            var(--space-2);
+  padding:        var(--space-5) var(--space-6);
 }
 
 .page-header-band__eyebrow {
-  color:          color-mix(in srgb, var(--color-accent) 72%, var(--cv-ink));
-  font-size:      var(--fs-xs);
-  font-weight:    var(--fw-bold);
-  letter-spacing: 0.12em;
+  color:          var(--app-hero-eyebrow);
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   margin:         0;
   text-transform: uppercase;
 }
 
 .page-header-band__title {
   align-items:    center;
-  color:          var(--cv-ink);
+  color:          var(--app-hero-title);
   display:        flex;
   flex-wrap:      wrap;
   font-size:      clamp(1.4rem, 2.2vw, 2.2rem);
-  font-weight:    var(--fw-bold);
-  gap:            var(--sp-2);
+  font-weight:    var(--font-weight-extrabold);
+  gap:            var(--space-2);
   letter-spacing: -0.03em;
   line-height:    1.12;
   margin:         0;
@@ -1681,7 +2379,7 @@ body.has-delete-modal-open {
 .page-header-band__content {
   align-items:     center;
   display:         flex;
-  gap:             var(--sp-4);
+  gap:             var(--header-band-gap);
   justify-content: space-between;
   min-width:       0;
   width:           100%;
@@ -1691,63 +2389,57 @@ body.has-delete-modal-open {
 .page-header-band__text {
   display:        flex;
   flex-direction: column;
-  gap:            var(--sp-1);
+  gap:            var(--space-1);
   min-width:      0;
 }
 
 /* Chip de status dentro do Band */
 .page-header-status-chip {
-  border-radius:  var(--r-pill);
-  font-size:      var(--fs-xs);
-  font-weight:    var(--fw-bold);
-  letter-spacing: 0.04em;
-  padding-block: var(--sp-1);
-  padding-inline: var(--sp-3);
+  border-radius:  var(--radius-pill);
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-chip);
+  padding:        3px var(--space-3);
   white-space:    nowrap;
 }
 
 .page-header-status-chip--draft {
-  background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
-  color:      var(--cv-state-warning);
+  background: var(--route-status-draft-bg);
+  border:     1px solid var(--route-status-draft-border);
+  color:      var(--route-status-draft-text);
 }
 
 .page-header-status-chip--active {
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
-  color:      var(--cv-state-success);
+  background: var(--route-status-final-bg);
+  border:     1px solid var(--route-status-final-border);
+  color:      var(--route-status-final-text);
 }
 
 .page-header-status-chip--pending {
-  background: var(--cv-surface-block);
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  color:      var(--color-primary);
+  background: var(--route-status-muted-bg);
+  border:     1px solid var(--route-status-muted-border);
+  color:      var(--route-status-muted-text);
 }
 
 .page-header-status-chip--danger {
-  background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  color:      var(--cv-state-danger);
+  background: var(--color-danger-soft);
+  border:     1px solid var(--color-danger-border-soft);
+  color:      var(--color-danger);
 }
 
 /* Alerta inline simples (ex.: aviso de cancelamento) */
 .cv-alert {
-  border-radius: var(--r-panel);
-  padding-block: var(--sp-3);
-  padding-inline: var(--sp-4);
-  font-size:     var(--fs-sm);
+  border-radius: var(--radius-md, 8px);
+  padding:       var(--space-3) var(--space-4);
+  font-size:     var(--font-size-sm);
 }
 
 .cv-alert--danger {
-  background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
-  border: var(--bd);
-  border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  color:      var(--cv-state-danger);
+  background: var(--color-danger-soft);
+  border:     1px solid var(--color-danger-border-soft);
+  color:      var(--color-danger);
 }
+
 
 /* =========================================================
    23. Page Header Rail — Faixa Clara Obrigatória
@@ -1758,26 +2450,25 @@ body.has-delete-modal-open {
 
 .page-header-rail {
   align-items: center;
-  background:  var(--cv-surface-card);
+  background:  var(--app-hero-body-bg);
   box-sizing:  border-box;
   display:     flex;
-  gap:         var(--sp-3);
-  padding-block: var(--sp-4);
-  padding-inline: var(--sp-5);
+  gap:         var(--space-3);
+  padding:     var(--space-4) var(--space-5);
   width:       100%;
 }
 
 /* Marcador circular de módulo */
 .page-header-rail__marker {
   align-items:     center;
-  background:      color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
-  border: var(--bd);
-  border-radius:   var(--r-pill);
+  background:      var(--color-primary-soft);
+  border:          1px solid var(--color-border);
+  border-radius:   var(--radius-pill);
   color:           var(--color-primary);
   display:         inline-flex;
   flex-shrink:     0;
-  font-size:       var(--fs-sm);
-  font-weight:     var(--fw-bold);
+  font-size:       var(--font-size-sm);
+  font-weight:     var(--font-weight-extrabold);
   height:          44px;
   justify-content: center;
   letter-spacing:  -0.01em;
@@ -1789,30 +2480,30 @@ body.has-delete-modal-open {
   display:        flex;
   flex:           1;
   flex-direction: column;
-  gap:            var(--sp-1);
+  gap:            var(--space-1);
   min-width:      0;
 }
 
 .page-header-rail__eyebrow {
-  color:          var(--cv-ink-muted);
-  font-size:      var(--fs-xs);
-  font-weight:    var(--fw-bold);
-  letter-spacing: 0.12em;
+  color:          var(--theme-text-muted);
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
   text-transform: uppercase;
 }
 
 .page-header-rail__title {
-  color:          var(--cv-ink);
-  font-size:      var(--fs-md);
-  font-weight:    var(--fw-bold);
+  color:          var(--theme-text-heading);
+  font-size:      var(--font-size-md);
+  font-weight:    var(--font-weight-bold);
   letter-spacing: -0.01em;
   line-height:    1.3;
   margin:         0;
 }
 
 .page-header-rail__subtitle {
-  color:       var(--cv-ink-muted);
-  font-size:   var(--fs-sm);
+  color:       var(--theme-text-muted);
+  font-size:   var(--font-size-sm);
   line-height: 1.5;
   margin:      0;
 }
@@ -1822,7 +2513,7 @@ body.has-delete-modal-open {
   align-items: center;
   display:     flex;
   flex-shrink: 0;
-  gap:         var(--sp-2);
+  gap:         var(--space-2);
 }
 
 /* Área de filtros no Rail */
@@ -1831,7 +2522,7 @@ body.has-delete-modal-open {
   display:     flex;
   flex:        1;
   flex-wrap:   wrap;
-  gap:         var(--sp-2);
+  gap:         var(--space-2);
   min-width:   0;
 }
 
@@ -1854,19 +2545,19 @@ body.has-delete-modal-open {
 .page-header-rail--filters,
 .page-header-rail--filters-inline-create {
   flex-wrap: wrap;
-  gap:       var(--sp-4);
+  gap:       var(--space-4);
 }
 
 .page-header-rail--stepper {
   flex-wrap: wrap;
-  gap:       var(--sp-4);
+  gap:       var(--space-4);
 }
 
 /* Painel inline dentro do rail quick-add */
 .page-header-rail--filters-inline-create .cv-inline-create__panel {
   background:  transparent;
   border:      0;
-  border-top: var(--bd);
+  border-top:  1px solid var(--border-filter-bar);
   box-shadow:  none;
   width:       100%;
 }
@@ -1874,9 +2565,8 @@ body.has-delete-modal-open {
 .page-header-rail--filters-inline-create .cv-inline-create__body {
   align-items: flex-end;
   display:     flex;
-  gap:         var(--sp-3);
-  padding-block: var(--sp-4);
-  padding-inline: 0;
+  gap:         var(--layout-quick-create-gap);
+  padding:     var(--space-4) 0;
   width:       100%;
 }
 
@@ -1889,18 +2579,18 @@ body.has-delete-modal-open {
    Sem label, sem botão e com o divisor indo de ponta a ponta do card. */
 
 .header-stack--inline-create-compact .cv-inline-create__body {
-  padding-block: var(--sp-3) 0;
-padding-inline: 0; /* só o gap entre o divisor e o input */
+  padding: var(--space-3) 0 0; /* só o gap entre o divisor e o input */
 }
 
 .header-stack--inline-create-compact .page-header-rail--filters-inline-create .cv-inline-create__panel {
   border-radius: 0;
   box-shadow:    none;
   flex-shrink:   0;             /* não deixa o flex encolher de volta */
-  width:         calc(100% + (2 * var(--sp-5)));  margin-left: calc(var(--sp-5) * -1);
-  margin-right: calc(var(--sp-5) * -1);
-  padding-left:  var(--sp-5);
-  padding-right: var(--sp-5);
+  width:         calc(100% + (2 * var(--space-5)));  /* estica até as bordas do card */
+  margin-left:   calc(-1 * var(--space-5));
+  margin-right:  calc(-1 * var(--space-5));
+  padding-left:  var(--space-5);
+  padding-right: var(--space-5);
 }
 
 /* =========================================================
@@ -1934,100 +2624,100 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 .cv-inline-create__toggle {
   align-items:     center;
   appearance:      none;
-  background:      var(--cv-surface-block);
-  border: 0;
-  border-top: var(--bd);
+  background:      var(--surface-filter-bar);
+  border:          none;
+  border-top:      1px solid var(--border-filter-bar);
   border-radius:   0;
   box-shadow:      none;
   box-sizing:      border-box;
-  color:           var(--cv-ink);
+  color:           var(--theme-text-body);
   cursor:          pointer;
   display:         flex;
-  font-size:       var(--fs-sm);
-  gap:             var(--sp-2);
-  height:          var(--h-md);
+  font-size:       var(--font-size-sm);
+  gap:             var(--space-2);
+  height:          var(--control-height-md);
   justify-content: center;
-  padding-block: 0;
-  padding-inline: var(--sp-4);
+  padding:         0 var(--space-4);
   transition:      background 0.3s cubic-bezier(0.4, 0, 1, 1), color 0.3s cubic-bezier(0.4, 0, 1, 1), border-color 0.3s cubic-bezier(0.4, 0, 1, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 1, 1);
   width:           100%;
 }
 
 .cv-inline-create__toggle:hover {
-  background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
+  background: var(--surface-list-row-hover);
 }
 
 .cv-inline-create__toggle:focus-visible {
-  outline: none;
+  outline:        2px solid var(--border-focus);
+  outline-offset: -2px;
 }
 
 .cv-inline-create__toggle.is-active,
 .cv-inline-create__toggle[aria-expanded="true"] {
-  background:   var(--cv-surface-block);
-  border-color: var(--cv-border);
+  background:   var(--surface-filter-bar);
+  border-color: var(--border-filter-bar);
   box-shadow:   none;
 }
 
 .cv-inline-create__toggle.is-filled {
   animation:    inline-create-btn-fill 0.4s cubic-bezier(0, 0, 0.2, 1) forwards;
-  background:   var(--color-primary);
-  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-raised);
-  color:        var(--on-primary);
+  background:   var(--cv-btn-primary-bg);
+  border-color: var(--cv-btn-primary-border);
+  box-shadow:   0 6px 14px rgba(11, 58, 102, 0.16);
+  color:        var(--cv-btn-primary-color);
 }
 
 .cv-inline-create__toggle.is-filled:hover {
-  background:   color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-raised);
+  background:   var(--cv-btn-primary-hover-bg);
+  border-color: var(--cv-btn-primary-hover-border);
+  box-shadow:   0 10px 18px rgba(11, 58, 102, 0.22);
 }
 
 @keyframes inline-create-btn-fill {
   from {
-    background:   var(--cv-surface-block);
-    border-color: var(--cv-border);
+    background:   var(--surface-filter-bar);
+    border-color: var(--border-filter-bar);
     box-shadow:   none;
-    color:        var(--cv-ink);
+    color:        var(--theme-text-body);
   }
 }
 
- .cv-inline-create__toggle {
-  background: var(--cv-surface-card);
-  color:      var(--cv-ink);
+html[data-theme="dark"] .cv-inline-create__toggle {
+  background: var(--color-card-muted); /* #213246 */
+  color:      var(--theme-text-body);
 }
 
- .cv-inline-create__toggle:hover {
-  background: color-mix(in srgb, var(--cv-surface-card) 80%, var(--cv-surface-card) 20%);
+html[data-theme="dark"] .cv-inline-create__toggle:hover {
+  background: color-mix(in srgb, var(--color-card-muted) 80%, var(--color-white) 20%);
 }
 
- .cv-inline-create__toggle.is-active,
- .cv-inline-create__toggle[aria-expanded="true"] {
-  background:   var(--cv-surface-card);
-  border-color: var(--cv-border);
-  color:        var(--cv-ink);
+html[data-theme="dark"] .cv-inline-create__toggle.is-active,
+html[data-theme="dark"] .cv-inline-create__toggle[aria-expanded="true"] {
+  background:   var(--color-card-muted); /* #213246 — igual ao estado fechado */
+  border-color: var(--border-filter-bar);
+  color:        var(--theme-text-body);
 }
 
- .cv-inline-create__toggle.is-filled {
+html[data-theme="dark"] .cv-inline-create__toggle.is-filled {
   animation-name:     inline-create-btn-fill-dark;
   animation-duration: 0.4s;
   animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-  background:     var(--color-primary);
-  border-color:   color-mix(in srgb, var(--color-primary) 45%, transparent);
-  color:          var(--on-primary);
+  background:     var(--cv-btn-primary-bg);
+  border-color:   var(--cv-btn-primary-border);
+  color:          var(--cv-btn-primary-color);
 }
 
 @keyframes inline-create-btn-fill-dark {
   from {
-    background:   var(--cv-surface-card);
-    border-color: var(--cv-border);
+    background:   var(--color-card-muted);
+    border-color: var(--border-filter-bar);
     box-shadow:   none;
-    color:        var(--cv-ink);
+    color:        var(--theme-text-body);
   }
 }
 
- .cv-inline-create__toggle.is-filled:hover {
-  background:   color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
-  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
+  background:   var(--cv-btn-primary-hover-bg);
+  border-color: var(--cv-btn-primary-hover-border);
 }
 
 .cv-inline-create__toggle-icon {
@@ -2037,8 +2727,9 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 }
 
 .cv-inline-create__toggle-label {
-  font-weight: var(--fw-bold);
+  font-weight: var(--font-weight-bold);
 }
+
 
 /* =========================================================
    24. Simple List
@@ -2059,13 +2750,14 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   border-radius: 0;
   box-shadow: none;
   overflow: visible;
-  border-radius: var(--r-card);
+  border-radius: var(--radius-lg);
 }
 
 .list-panel > .pagination-shell + .simple-list {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
+
 
 /* =========================================================
    25. Card List
@@ -2076,41 +2768,79 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 .card-list {
   box-sizing:            border-box;
   display:               grid;
-  gap:                   var(--sp-4);
+  gap:                   var(--space-4);
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  padding:               var(--sp-4);
+  padding:               var(--space-4);
   width:                 100%;
 }
 
 .list-card {
-  background:     var(--cv-surface-card);
-  border: var(--bd);
-  border-radius:  var(--r-panel);
-  box-shadow: var(--sh-raised);
+  background:     var(--surface-form-panel);
+  border:         1px solid var(--border-form-panel);
+  border-radius:  var(--radius-md);
+  box-shadow:     var(--shadow-soft);
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
-  gap:            var(--sp-3);
-  padding:        var(--sp-4);
+  gap:            var(--space-3);
+  padding:        var(--space-4);
   transition:
-    border-color var(--tr-base),
-    box-shadow   var(--tr-base);
+    border-color var(--transition-base),
+    box-shadow   var(--transition-base);
 }
 
 .list-card:hover {
-  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-raised);
+  border-color: var(--border-active);
+  box-shadow:   var(--shadow-medium);
+}
+
+.list-card__header {
+  align-items:     center;
+  display:         flex;
+  gap:             var(--space-2);
+  justify-content: space-between;
+}
+
+.list-card__title {
+  color:         var(--theme-text-heading);
+  font-size:     var(--font-size-sm);
+  font-weight:   var(--font-weight-bold);
+  margin:        0;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+}
+
+.list-card__meta {
+  color:     var(--theme-text-muted);
+  display:   flex;
+  flex-wrap: wrap;
+  font-size: var(--font-size-xs);
+  gap:       var(--space-1) var(--space-3);
+}
+
+.list-card__meta-item {
+  display: flex;
+  gap:     var(--space-1);
+}
+
+.list-card__body {
+  color:       var(--theme-text-muted);
+  flex:        1;
+  font-size:   var(--font-size-xs);
+  line-height: 1.5;
 }
 
 .list-card__footer {
   align-items:     center;
-  border-top: var(--bd);
+  border-top:      1px solid var(--border-subtle);
   display:         flex;
-  gap:             var(--sp-2);
+  gap:             var(--space-2);
   justify-content: flex-end;
   margin-top:      auto;
-  padding-top:     var(--sp-3);
+  padding-top:     var(--space-3);
 }
+
 
 /* =========================================================
    26. Quick Add Inline
@@ -2136,72 +2866,71 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 
 /* Aba / gatilho de abertura — estilo pasta física */
 .cv-inline-create__tab {
-  width: 230px;
-  height: var(--h-sm);
-  padding-inline: var(--sp-4);
-  border-start-start-radius: 0;
-  border-start-end-radius: 0;
-  border-end-end-radius: var(--r-panel);
-  border-end-start-radius: 0;
+  width: var(--inline-create-tab-width);
+  height: var(--inline-create-tab-height);
+  padding-inline: var(--space-4);
+  border-radius: 0 0 var(--radius-md) 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--sp-2);
+  gap: var(--space-2);
 
-  background: var(--cv-surface-block);
-  color: var(--color-primary);
+  background: var(--surface-filter-bar);
+  color: var(--text-primary);
   font-weight: 700;
-  font-size: var(--fs-sm);
+  font-size: var(--font-size-sm);
 
   border: 0;
   cursor: pointer;
 
-  clip-path: path("M 0 0 H 230 V 35 H 46 Q 38 35 33 32 Q 11 11 2 0 Z");
+  clip-path: var(--inline-create-tab-clip-path);
 }
 
 .cv-inline-create__tab:hover,
 .cv-inline-create__tab:focus-visible {
-  color:      var(--cv-ink);
+  box-shadow: var(--inline-create-tab-shadow);
+  color:      var(--theme-text-heading);
 }
 
 .cv-inline-create__tab:hover .cv-inline-create__tab-icon {
-  background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
+  background: var(--color-accent-hover, var(--color-accent));
 }
 
 .cv-inline-create__tab:focus-visible {
-  outline: none;
+  outline:        2px solid var(--border-focus);
+  outline-offset: -2px;
 }
 
 /* Aberta: aba conectada visivelmente ao painel */
 .cv-inline-create__tab[aria-expanded="true"] {
-  background: var(--cv-surface-card);
+  background: var(--surface-quick-create-header);
   box-shadow: none;
-  color:      var(--cv-ink);
+  color:      var(--theme-text-heading);
 }
 
 .cv-inline-create__tab[aria-expanded="true"] .cv-inline-create__tab-icon {
-  background: var(--color-primary);
+  background: var(--color-accent);
   transform:  rotate(45deg);
 }
 
 /* Ícone — círculo colorido com sinal + (gira 45° para virar ×) */
 .cv-inline-create__tab-icon {
   align-items:     center;
-  background:      var(--cv-border);
-  border-radius:   var(--r-pill);
-  color:           var(--cv-ink);
+  background:      var(--color-inline-create-tab-icon-bg);
+  border-radius:   var(--radius-pill);
+  color:           var(--color-inline-create-tab-icon-fg);
   display:         inline-flex;
   flex-shrink:     0;
-  font-size:       var(--fs-xs);
-  font-weight:     var(--fw-bold);
-  height:          var(--sp-5);
+  font-size:       var(--font-size-xs);
+  font-weight:     var(--font-weight-bold);
+  height:          var(--inline-create-tab-icon-size);
   justify-content: center;
   line-height:     1;
   pointer-events:  none;
   transition:
-    background  var(--tr-base),
-    transform   var(--tr-base);
-  width:           var(--sp-5);
+    background  var(--transition-base),
+    transform   var(--transition-base);
+  width:           var(--inline-create-tab-icon-size);
 }
 
 /* Label do texto */
@@ -2212,13 +2941,10 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 
 /* Painel: visualmente unido à aba acima */
 .cv-inline-create__panel {
-  background:    var(--cv-surface-block);
-  border: var(--bd);
-  border-start-start-radius: 0;
-  border-start-end-radius: var(--r-panel);
-  border-end-end-radius: var(--r-panel);
-  border-end-start-radius: var(--r-panel);
-  box-shadow:    none;
+  background:    var(--surface-quick-create);
+  border:        1px solid var(--border-quick-create);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) var(--radius-sm);
+  box-shadow:    var(--shadow-quick-create);
   box-sizing:    border-box;
   width:         100%;
 }
@@ -2231,52 +2957,50 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 
 .cv-inline-create__header {
   align-items:     center;
-  background:      var(--cv-surface-card);
-  border-bottom: var(--bd);
+  background:      var(--surface-quick-create-header);
+  border-bottom:   1px solid var(--border-quick-create);
   box-sizing:      border-box;
   display:         flex;
-  gap:             var(--sp-3);
+  gap:             var(--space-3);
   justify-content: space-between;
-  padding-block: var(--sp-2);
-  padding-inline: var(--sp-5);
+  padding:         var(--space-2) var(--filter-bar-padding-x);
 }
 
 .cv-inline-create__title {
-  color:       var(--cv-ink);
-  font-size:   var(--fs-sm);
-  font-weight: var(--fw-bold);
+  color:       var(--theme-text-heading);
+  font-size:   var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
   margin:      0;
 }
 
 .cv-inline-create__close {
   align-items:     center;
   background:      transparent;
-  border: 0;
-  border-radius:   var(--r-panel);
-  color:           var(--cv-ink-muted);
+  border:          none;
+  border-radius:   var(--radius-sm);
+  color:           var(--theme-text-muted);
   cursor:          pointer;
   display:         flex;
-  font-size:       var(--fs-md);
+  font-size:       var(--font-size-md);
   height:          28px;
   justify-content: center;
   line-height:     1;
   padding:         0;
-  transition:      color var(--tr-base), background var(--tr-base);
+  transition:      color var(--transition-base), background var(--transition-base);
   width:           28px;
 }
 
 .cv-inline-create__close:hover {
-  background: var(--cv-border);
-  color:      var(--cv-ink);
+  background: var(--border-quick-create);
+  color:      var(--theme-text-heading);
 }
 
 .cv-inline-create__body {
   align-items: flex-end;
   box-sizing:  border-box;
   display:     flex;
-  gap:         var(--sp-3);
-  padding-block: var(--sp-4);
-  padding-inline: var(--sp-5);
+  gap:         var(--layout-quick-create-gap);
+  padding:     var(--space-4) var(--filter-bar-padding-x);
   width:       100%;
 }
 
@@ -2289,38 +3013,52 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   align-items:    flex-end;
   display:        flex;
   flex-shrink:    0;
-  gap:            var(--sp-2);
-  padding-bottom: var(--sp-1);
-  width:          200px;
+  gap:            var(--space-2);
+  padding-bottom: var(--inline-create-actions-offset);
+  width:          var(--layout-quick-create-actions-width);
 }
 
 .cv-inline-create__actions .btn {
-  border-radius: var(--r-panel);
+  border-radius: var(--radius-md);
 }
 
 .cv-inline-create__actions .btn-primary {
-  border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  border-color: var(--inline-create-primary-border);
 }
 
 .cv-inline-create__hint {
   box-sizing: border-box;
-  color:      var(--cv-ink-muted);
-  font-size:  var(--fs-xs);
-  padding-block: 0 var(--sp-3);
-  padding-inline: var(--sp-5);
+  color:      var(--theme-text-muted);
+  font-size:  var(--font-size-xs);
+  padding:    0 var(--filter-bar-padding-x) var(--space-3);
+}
+
+
+/* =========================================================
+   27. Field Grid — Variantes com Colunagem Explícita
+   Complementam o .field-grid padrão de 4 colunas.
+   Usar quando a seção inteira precisa de colunagem diferente.
+   ========================================================= */
+
+/* Empilha várias grades (linhas) com o mesmo espaçamento entre campos */
+.field-grid-rows {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--field-grid-gap);
+  width:          100%;
 }
 
 /* 3 colunas: trios de campos — nome + CPF + telefone */
 .field-grid--cols-2 {
   display: grid;
-  gap: var(--sp-4);
+  gap: var(--field-grid-gap);
   grid-template-columns: repeat(2, minmax(0, 1fr));
   width: 100%;
 }
 
 .field-grid--cols-3 {
   display:               grid;
-  gap:                   var(--sp-4);
+  gap:                   var(--field-grid-gap);
   grid-template-columns: repeat(3, minmax(0, 1fr));
   width:                 100%;
 }
@@ -2328,7 +3066,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 /* 4 colunas: alias explícito do .field-grid padrão */
 .field-grid--cols-4 {
   display:               grid;
-  gap:                   var(--sp-4);
+  gap:                   var(--field-grid-gap);
   grid-template-columns: repeat(4, minmax(0, 1fr));
   width:                 100%;
 }
@@ -2349,18 +3087,19 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   }
 }
 
+
 /* =========================================================
    28. Responsive — Header Stack, Listas e Quick Add Inline
    ========================================================= */
 
 @media (max-width: 840px) {
   .page-header-band {
-    padding: var(--sp-4);
+    padding: var(--space-4);
   }
 
   .page-header-rail {
     flex-wrap: wrap;
-    padding:   var(--sp-4);
+    padding:   var(--space-4);
   }
 
   .card-list {
@@ -2396,7 +3135,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   }
 
   .header-applied-filters {
-    padding-top: var(--sp-2);
+    padding-top: var(--space-2);
   }
 }
 
@@ -2408,17 +3147,17 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   .page-header-band__content {
     align-items: flex-start;
     flex-wrap:   wrap;
-    gap:         var(--sp-2);
+    gap:         var(--space-2);
   }
 
   .card-list {
     grid-template-columns: 1fr;
-    padding:               var(--sp-3);
+    padding:               var(--space-3);
   }
 
   /* Stepper: scroll horizontal sem overflow da página */
   .page-stepper {
-    padding: var(--sp-4);
+    padding: var(--stepper-padding-y) var(--space-4);
   }
 
   .page-stepper__list {
@@ -2430,6 +3169,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
     width: 100%;
   }
 }
+
 
 /* =========================================================
    29. Header Filter Bar
@@ -2443,14 +3183,14 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   display:     flex;
   flex:        1;
   flex-wrap:   wrap;
-  gap:         var(--sp-2) var(--sp-4);
+  gap:         var(--space-2) var(--space-4);
   min-width:   0;
 }
 
 /* Campo de busca (cresce para preencher espaço) */
 .header-filter-bar__search {
   flex:      1;
-  min-width: 200px;
+  min-width: var(--filter-search-min-width);
 }
 
 /* Botões de ação à direita */
@@ -2458,7 +3198,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   align-items: center;
   display:     flex;
   flex-shrink: 0;
-  gap:         var(--sp-2);
+  gap:         var(--space-2);
 }
 
 /* Variante avançada — busca sozinha na linha 1; campos + ações na linha 2 */
@@ -2478,7 +3218,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   align-items: center;
   display:     flex;
   flex:        0 0 100%;
-  gap:         var(--sp-2) var(--sp-3);
+  gap:         var(--space-2) var(--space-3);
 }
 
 /* Grupo de campos dentro do row */
@@ -2487,7 +3227,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   display:     flex;
   flex:        1 1 auto;
   flex-wrap:   wrap;
-  gap:         var(--sp-2) var(--sp-3);
+  gap:         var(--space-2) var(--space-3);
   min-width:   0;
 }
 
@@ -2503,42 +3243,40 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   display:     flex;
   flex:        0 0 100%;
   flex-wrap:   wrap;
-  gap:         var(--sp-2);
-  padding-top: var(--sp-1);
+  gap:         var(--space-2);
+  padding-top: var(--space-1);
 }
 
 .header-applied-chip {
   align-items:     center;
-  background:      var(--cv-surface-block);
-  border: var(--bd);
-  border-radius:   var(--r-pill);
-  color:           var(--cv-ink);
+  background:      var(--surface-filter-chip);
+  border:          1px solid var(--border-filter-chip);
+  border-radius:   var(--radius-pill, 999px);
+  color:           var(--color-filter-text);
   cursor:          default;
   display:         inline-flex;
-  font-size:       var(--fs-xs);
-  gap:             var(--sp-1);
-  padding-block: var(--sp-1);
-  padding-inline: var(--sp-2);
+  font-size:       var(--font-size-xs);
+  gap:             var(--space-1);
+  padding:         2px var(--space-2);
   white-space:     nowrap;
 }
 
 /* Input de texto / busca */
 .header-filter-input {
-  background:    var(--cv-surface-block);
-  border: var(--bd);
-  border-radius: var(--r-control);
+  background:    var(--surface-filter-input);
+  border:        1px solid var(--border-filter-input);
+  border-radius: var(--radius-control);
   box-sizing:    border-box;
-  color:         var(--cv-ink);
-  font-size:     var(--fs-sm);
-  height:        var(--h-md);
-  outline: none;
-  padding-block: 0;
-  padding-inline: var(--sp-3);
-  transition:    border-color var(--tr-base);
+  color:         var(--color-filter-text);
+  font-size:     var(--font-size-sm);
+  height:        var(--filter-input-height);
+  outline:       none;
+  padding:       0 var(--space-3);
+  transition:    border-color var(--transition-base);
   width:         100%;
 }
 
-.header-filter-input::placeholder { color: var(--cv-ink-muted); }
+.header-filter-input::placeholder { color: var(--color-filter-placeholder); }
 
 .header-filter-input:focus,
 .header-filter-input:focus-visible {
@@ -2548,24 +3286,128 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 /* Select de filtro */
 .header-filter-select {
   appearance:    none;
-  background:    var(--cv-surface-block);
-  border: var(--bd);
-  border-radius: var(--r-control);
+  background:    var(--surface-filter-input);
+  border:        1px solid var(--border-filter-input);
+  border-radius: var(--radius-control);
   box-sizing:    border-box;
-  color:         var(--cv-ink);
+  color:         var(--color-filter-text);
   cursor:        pointer;
-  font-size:     var(--fs-sm);
-  height:        var(--h-md);
-  outline: none;
-  padding-block: 0;
-  padding-inline: var(--sp-3) var(--sp-4);
-  transition:    border-color var(--tr-base);
+  font-size:     var(--font-size-sm);
+  height:        var(--filter-input-height);
+  outline:       none;
+  padding:       0 var(--space-4) 0 var(--space-3);
+  transition:    border-color var(--transition-base);
   width:         100%;
 }
 
 .header-filter-select:focus,
 .header-filter-select:focus-visible {
   outline: none;
+}
+
+/* Botão secundário da filter bar */
+.header-filter-button {
+  align-items:     center;
+  background:      var(--surface-filter-button);
+  border:          1px solid var(--border-filter-button);
+  border-radius:   var(--radius-control);
+  color:           var(--color-filter-button);
+  cursor:          pointer;
+  display:         inline-flex;
+  font-size:       var(--font-size-sm);
+  font-weight:     var(--font-weight-semibold);
+  height:          var(--filter-input-height);
+  justify-content: center;
+  padding:         0 var(--space-4);
+  transition:
+    background   var(--transition-base),
+    border-color var(--transition-base),
+    color        var(--transition-base);
+  white-space: nowrap;
+}
+
+.header-filter-button:hover,
+.header-filter-button:focus-visible {
+  border-color: var(--border-active);
+  color:        var(--theme-text-heading);
+  outline:      none;
+}
+
+/* Variante primária */
+.header-filter-button--primary {
+  background:   var(--color-primary);
+  border-color: var(--color-primary);
+  color:        var(--color-white);
+}
+
+.header-filter-button--primary:hover,
+.header-filter-button--primary:focus-visible {
+  background:   var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color:        var(--color-white);
+}
+
+/* ── cv-date-picker como campo de formulário na filter bar ── */
+.header-filter-datepicker {
+  flex:         2 1 200px;
+  min-width:    160px;
+}
+
+/* Layout do controle (roteiros.css não carregado nesta página) */
+.header-filter-datepicker .cv-date-picker__control {
+  align-items: stretch;
+  display:     flex;
+  gap:         0;
+  position:    relative;
+}
+
+.header-filter-datepicker .cv-date-picker__control .cv-field__control {
+  flex:       1 1 auto;
+  cursor:     pointer;
+  min-height: unset;
+  height:     var(--filter-input-height, 38px);
+  padding-right: calc(var(--space-2) * 2 + 30px);
+}
+
+/* Botão do calendário — sempre visível, posicionado sobre o input */
+.header-filter-datepicker .cv-date-picker__trigger--icon {
+  align-items:      center;
+  background:       transparent;
+  border:           1px solid transparent;
+  border-radius:    var(--radius-sm);
+  color:            var(--cv-field-color, var(--color-filter-text));
+  cursor:           pointer;
+  display:          flex;
+  flex-shrink:      0;
+  height:           28px;
+  justify-content:  center;
+  opacity:          1;
+  padding:          0;
+  pointer-events:   auto;
+  position:         absolute;
+  right:            var(--space-2);
+  top:              50%;
+  transform:        translateY(-50%);
+  transition:       background var(--transition-fast), border-color var(--transition-fast);
+  width:            28px;
+  z-index:          2;
+}
+
+.header-filter-datepicker .cv-date-picker__trigger--icon:hover {
+  background:   rgba(255, 255, 255, 0.1);
+  border-color: var(--border-active);
+}
+
+.header-filter-datepicker .cv-date-picker__panel {
+  left:  auto;
+  right: 0;
+}
+
+@media (max-width: 840px) {
+  .header-filter-datepicker {
+    flex:      0 0 100%;
+    min-width: 0;
+  }
 }
 
 @media (max-width: 840px) {
@@ -2598,10 +3440,16 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
     min-width: 0;
   }
 
+  .header-filter-datepicker .cv-date-picker__panel {
+    left: 0;
+    max-width: min(100%, 320px);
+    right: auto;
+  }
+
   .cv-form-section-header {
     align-items: flex-start;
     flex-wrap: wrap;
-    gap: var(--sp-3);
+    gap: var(--space-3);
   }
 
   .cv-form-section-header__copy,
@@ -2617,12 +3465,12 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 
 @media (max-width: 600px) {
   .page-header-stack {
-    border-radius: var(--r-panel);
+    border-radius: var(--radius-md);
   }
 
   .page-header-band,
   .page-header-rail {
-    padding: var(--sp-3);
+    padding: 14px;
   }
 
   .page-header-rail--filters .page-header-rail__marker {
@@ -2649,7 +3497,8 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
     flex: 0 0 auto;
   }
 
-  .header-filter-field {
+  .header-filter-field,
+  .header-filter-datepicker {
     flex: 0 0 100%;
   }
 
@@ -2664,18 +3513,17 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   }
 
   .page-stepper {
-    padding-block: var(--sp-3);
-  padding-inline: var(--sp-2);
+    padding: 12px 10px;
   }
 
   .page-stepper__list {
-    gap: var(--sp-2);
+    gap: var(--space-2);
     min-width: 0;
   }
 
   .page-stepper__track {
-    margin-inline: calc(var(--sp-1) * -1);
-    width: calc(100% + var(--sp-2));
+    margin-inline: calc(var(--space-2) / -2);
+    width: calc(100% + var(--space-2));
   }
 
   .page-stepper__content {
@@ -2692,15 +3540,14 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   }
 
   .cv-form-section-header {
-    --_wizard-filete-inset-block: var(--sp-4);
-    --_wizard-filete-left:        var(--sp-4);
+    --_wizard-filete-inset-block: var(--space-4);
+    --_wizard-filete-left:        var(--space-4);
     min-height: 0;
-    padding-block: var(--sp-4);
-    padding-inline: var(--sp-7) var(--sp-4);
+    padding: var(--space-4) var(--space-4) var(--space-4) var(--space-8);
   }
 
   .cv-form-section-card--compact .cv-form-section-header {
-    padding-block: var(--sp-4);
+    padding-block: var(--space-4);
   }
 
   .cv-form-section-header__actions,
@@ -2711,13 +3558,13 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   }
 
   .cv-form-section-body {
-    padding: var(--sp-4);
+    padding: var(--space-4);
   }
 
   .cv-card-footer {
     align-items: stretch;
     flex-direction: column;
-    padding: var(--sp-4);
+    padding: var(--space-4);
   }
 
   .cv-card-footer__secondary,
@@ -2746,7 +3593,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 #quick-add-modelo-motivo .cv-inline-create__fields {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
+  gap: var(--space-4);
 }
 
 #quick-add-modelo-motivo .cv-inline-create__fields > .field-grid {
@@ -2756,27 +3603,27 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 #quick-add-modelo-motivo .app-form-field {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
+  gap: var(--space-2);
 }
 
 #quick-add-modelo-motivo .cv-field__control--textarea {
-  background: var(--cv-surface-next);
-  border: var(--bd);
-  border-radius: var(--r-control);
-  box-shadow: var(--sh-raised);
+  background: var(--cv-field-bg);
+  border: 1px solid var(--cv-field-border);
+  border-radius: var(--cv-field-radius);
+  box-shadow: var(--cv-field-shadow);
   box-sizing: border-box;
-  color: var(--cv-ink);
-  font-size: var(--fs-sm);
-  height: 88px;
+  color: var(--cv-field-color);
+  font-size: var(--cv-field-font-size);
+  height: var(--text-area-height-md);
   line-height: 1.5;
-  min-height: 88px;
-  padding: var(--sp-3);
+  min-height: var(--text-area-height-md);
+  padding: var(--space-3) var(--cv-field-padding-x);
   resize: vertical;
   transition:
-    background-color var(--tr-fast),
-    border-color var(--tr-fast),
-    box-shadow var(--tr-fast),
-    color var(--tr-fast);
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    color var(--transition-fast);
   width: 100%;
 }
 
@@ -2788,7 +3635,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 #quick-add-atividade .cv-inline-create__fields {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
+  gap: var(--space-4);
 }
 
 #quick-add-atividade .cv-inline-create__fields > .field-grid {
@@ -2798,27 +3645,27 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 #quick-add-atividade .app-form-field {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
+  gap: var(--space-2);
 }
 
 #quick-add-atividade .cv-field__control--textarea {
-  background: var(--cv-surface-next);
-  border: var(--bd);
-  border-radius: var(--r-control);
-  box-shadow: var(--sh-raised);
+  background: var(--color-input-bg);
+  border: 1px solid var(--cv-field-border);
+  border-radius: var(--cv-field-radius);
+  box-shadow: var(--cv-field-shadow);
   box-sizing: border-box;
-  color: var(--cv-ink);
-  font-size: var(--fs-sm);
-  height: 88px;
+  color: var(--cv-field-color);
+  font-size: var(--cv-field-font-size);
+  height: var(--text-area-height-md);
   line-height: 1.5;
-  min-height: 88px;
-  padding: var(--sp-3);
+  min-height: var(--text-area-height-md);
+  padding: var(--space-3) var(--cv-field-padding-x);
   resize: vertical;
   transition:
-    background-color var(--tr-fast),
-    border-color var(--tr-fast),
-    box-shadow var(--tr-fast),
-    color var(--tr-fast);
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    color var(--transition-fast);
   width: 100%;
 }
 
@@ -2827,30 +3674,4 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   outline: none;
 }
 
-/* =========================================================
-   Tinta do acento e fim das bordas de foco (NOVO-28)
 
-   Um bloco so, no fim do arquivo, para vencer por ordem sem precisar de
-   especificidade inventada. `--cv-surface` e herdada, entao o color-mix
-   resolve no contexto em que o elemento caiu — a cor de fundo nao se repete
-   em declaracao nenhuma.
-
-   Acessibilidade: o foco NAO desapareceu, mudou de veiculo. Era borda/outline,
-   virou troca de tinta. Medido em dE (a razao WCAG so enxerga brilho e
-   subestima mudanca de matiz): 11,1 no claro e 18,0 no escuro, contra 5 que ja
-   e "obviamente diferente". Sem isso, apagar o outline quebraria navegacao por
-   teclado e desfaria N-03/D-06.
-   ========================================================= */
-
-:where(input, select, textarea, button, a, summary, [tabindex]):focus-visible {
-  background-color: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
-  border-color: transparent;
-  outline: none;
-}
-
-/* Botao cheio e excecao declarada: ja e o acento, entao a tinta nao apareceria.
-   Clareia em vez de trocar de fundo. */
-:where(.cv-btn--primary, .cv-btn--accent):focus-visible {
-  background-color: var(--color-primary);
-  filter: brightness(1.14);
-}

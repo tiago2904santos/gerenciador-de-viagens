@@ -28,7 +28,7 @@
     linear-gradient(145deg, #f8fafc 0%, #f1f5f9 18%, #e2e8f0 46%, #f1f5f9 74%, #f8fafc 100%);
 }
 
-.app-shell--ui-lab::before {
+html[data-theme="dark"] .app-shell--ui-lab::before {
   background:
     radial-gradient(ellipse 125% 150% at -68% -20%, rgba(218, 255, 46, 0.22) 10%, rgba(218, 255, 46, 0.12) 18%, rgba(218, 255, 46, 0.08) 44%, transparent 100%),
     radial-gradient(ellipse 95% 72% at 95% 25%, rgba(14, 165, 233, 0.18) 0%, rgba(14, 165, 233, 0.1) 18%, rgba(14, 165, 233, 0.04) 34%, transparent 74%),
@@ -41,18 +41,16 @@
   background: radial-gradient(circle at 50% 42%, transparent 0%, transparent 46%, rgba(104, 128, 152, 0.04) 78%, rgba(104, 128, 152, 0.1) 100%);
 }
 
-.app-shell--ui-lab::after {
+html[data-theme="dark"] .app-shell--ui-lab::after {
   background: radial-gradient(circle at 50% 42%, transparent 0%, transparent 46%, rgba(14, 165, 233, 0.04) 78%, rgba(14, 165, 233, 0.12) 100%);
 }
 
 .ui-lab-page {
   display: grid;
-  gap: var(--sp-6);
-  margin-block: 0;
-  margin-inline: auto;
+  gap: var(--space-6);
+  margin: 0 auto;
   max-width: 1440px;
-  padding-block: clamp(var(--sp-6), 4vw, var(--sp-8)) var(--sp-7);
-  padding-inline: var(--sp-4);
+  padding: clamp(24px, 4vw, 48px) var(--space-4) var(--space-10);
   position: relative;
   width: 100%;
   z-index: 1;

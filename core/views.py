@@ -12,7 +12,6 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 
@@ -504,19 +503,12 @@ UI_LAB_FIELDS = {
     ],
 }
 
-# Vitrine: o link de demonstracao aponta para a propria vitrine.
-# Ancora vazia (`#`) e um link que so pula a pagina para o topo — e ela chegava
-# ao HTML por dado de contexto, onde a regra `href_hash` do auditor nao olhava
-# (NOVO-40). `reverse_lazy` porque isto e constante de modulo.
-UI_LAB_DEMO_URL = reverse_lazy("core:ui_lab")
-
-
 UI_LAB_SIMPLE_ROWS = [
     {
         "avatar": "A1",
         "title": "Servidor com metadados ricos",
-        "edit_url": UI_LAB_DEMO_URL,
-        "delete_url": UI_LAB_DEMO_URL,
+        "edit_url": "#",
+        "delete_url": "#",
         "meta": [
             {"label": "Cargo", "value": "Assessoria técnica"},
             {"label": "CPF", "value": "101.035.329-27"},
@@ -532,8 +524,8 @@ UI_LAB_SIMPLE_ROWS = [
     {
         "avatar": "A2",
         "title": "Item exemplo 2",
-        "edit_url": UI_LAB_DEMO_URL,
-        "delete_url": UI_LAB_DEMO_URL,
+        "edit_url": "#",
+        "delete_url": "#",
         "meta": "Descricao exemplo · Metadado exemplo",
         "status_label": "Status exemplo",
         "status_modifier": "draft",
@@ -543,8 +535,8 @@ UI_LAB_SIMPLE_ROWS = [
     {
         "avatar": "A3",
         "title": "Item exemplo 3",
-        "edit_url": UI_LAB_DEMO_URL,
-        "delete_url": UI_LAB_DEMO_URL,
+        "edit_url": "#",
+        "delete_url": "#",
         "meta": "Descricao exemplo · Metadado exemplo",
         "status_label": "Status exemplo",
         "status_modifier": "review",
@@ -554,8 +546,8 @@ UI_LAB_SIMPLE_ROWS = [
     {
         "avatar": "A4",
         "title": "Item exemplo 4",
-        "edit_url": UI_LAB_DEMO_URL,
-        "delete_url": UI_LAB_DEMO_URL,
+        "edit_url": "#",
+        "delete_url": "#",
         "meta": "Descricao exemplo · Metadado exemplo",
         "status_label": "Status exemplo",
         "status_modifier": "done",
@@ -565,10 +557,10 @@ UI_LAB_SIMPLE_ROWS = [
 ]
 
 UI_LAB_LIST_TABS = [
-    {"label": "Ativos", "count": 12, "url": UI_LAB_DEMO_URL, "is_active": True},
-    {"label": "Em andamento", "count": 4, "url": UI_LAB_DEMO_URL, "is_active": False},
-    {"label": "Finalizados", "count": 8, "url": UI_LAB_DEMO_URL, "is_active": False},
-    {"label": "Cancelados", "count": 1, "url": UI_LAB_DEMO_URL, "is_active": False},
+    {"label": "Ativos", "count": 12, "url": "#", "is_active": True},
+    {"label": "Em andamento", "count": 4, "url": "#", "is_active": False},
+    {"label": "Finalizados", "count": 8, "url": "#", "is_active": False},
+    {"label": "Cancelados", "count": 1, "url": "#", "is_active": False},
 ]
 
 UI_LAB_TABLE_ROWS = [
@@ -578,7 +570,7 @@ UI_LAB_TABLE_ROWS = [
         "reference": f"CV-{2026000 + number}",
         "status_label": "Concluído" if number % 3 == 0 else "Em revisão" if number % 2 == 0 else "Rascunho",
         "status_variant": "success" if number % 3 == 0 else "info" if number % 2 == 0 else "warning",
-        "action_url": UI_LAB_DEMO_URL,
+        "action_url": "#",
     }
     for number in range(1, 14)
 ]
@@ -595,8 +587,8 @@ UI_LAB_CARDS = [
         ],
         "body": "Minuta pronta para conferencia antes da assinatura.",
         "actions": [
-            {"href": UI_LAB_DEMO_URL, "label": "Abrir", "variant": "secondary"},
-            {"href": UI_LAB_DEMO_URL, "label": "Baixar PDF", "variant": "muted"},
+            {"href": "#", "label": "Abrir", "variant": "secondary"},
+            {"href": "#", "label": "Baixar PDF", "variant": "muted"},
         ],
     },
     {
@@ -610,8 +602,8 @@ UI_LAB_CARDS = [
         ],
         "body": "Documento final consolidado e disponivel para consulta.",
         "actions": [
-            {"href": UI_LAB_DEMO_URL, "label": "Visualizar", "variant": "secondary"},
-            {"href": UI_LAB_DEMO_URL, "label": "Excluir", "variant": "danger"},
+            {"href": "#", "label": "Visualizar", "variant": "secondary"},
+            {"href": "#", "label": "Excluir", "variant": "danger"},
         ],
     },
 ]
@@ -632,7 +624,7 @@ UI_LAB_SIGNATURE = {
     "link_absoluto": "https://exemplo.local/assinar/7F4K-92MZ/",
     "whatsapp_phone": "5541999999999",
     "whatsapp_msg": "O documento esta disponivel para assinatura.",
-    "gerar_url": UI_LAB_DEMO_URL,
+    "gerar_url": "#",
 }
 
 UI_LAB_ROTEIROS_CARDS = [
@@ -658,9 +650,9 @@ UI_LAB_ROTEIROS_CARDS = [
         "diaria_moeda": "R$ 150,00",
         "diaria_composicao_linhas": ["2"],
         "actions": [
-            {"href": UI_LAB_DEMO_URL, "label": "Abrir", "variant": "secondary"},
-            {"href": UI_LAB_DEMO_URL, "label": "Editar", "variant": "secondary"},
-            {"href": UI_LAB_DEMO_URL, "label": "Excluir", "variant": "danger"},
+            {"href": "#", "label": "Abrir", "variant": "secondary"},
+            {"href": "#", "label": "Editar", "variant": "secondary"},
+            {"href": "#", "label": "Excluir", "variant": "danger"},
         ],
     },
     {
@@ -685,9 +677,9 @@ UI_LAB_ROTEIROS_CARDS = [
         "diaria_moeda": "R$ 150,00",
         "diaria_composicao_linhas": ["2"],
         "actions": [
-            {"href": UI_LAB_DEMO_URL, "label": "Abrir", "variant": "secondary"},
-            {"href": UI_LAB_DEMO_URL, "label": "Editar", "variant": "secondary"},
-            {"href": UI_LAB_DEMO_URL, "label": "Excluir", "variant": "danger"},
+            {"href": "#", "label": "Abrir", "variant": "secondary"},
+            {"href": "#", "label": "Editar", "variant": "secondary"},
+            {"href": "#", "label": "Excluir", "variant": "danger"},
         ],
     },
     {
@@ -712,9 +704,9 @@ UI_LAB_ROTEIROS_CARDS = [
         "diaria_moeda": "R$ 150,00",
         "diaria_composicao_linhas": ["2"],
         "actions": [
-            {"href": UI_LAB_DEMO_URL, "label": "Abrir", "variant": "secondary"},
-            {"href": UI_LAB_DEMO_URL, "label": "Editar", "variant": "secondary"},
-            {"href": UI_LAB_DEMO_URL, "label": "Excluir", "variant": "danger"},
+            {"href": "#", "label": "Abrir", "variant": "secondary"},
+            {"href": "#", "label": "Editar", "variant": "secondary"},
+            {"href": "#", "label": "Excluir", "variant": "danger"},
         ],
     },
 ]
@@ -745,7 +737,7 @@ def _ui_lab_evento_card(
     documentos,
     pendencias,
     drive,
-    href=UI_LAB_DEMO_URL,
+    href="#",
 ):
     """Monta um card de evento no formato esperado por main_list_card.html.
 
@@ -770,10 +762,10 @@ def _ui_lab_evento_card(
                 "destino_display": destino,
                 "data_evento_display": periodo,
                 "servidores": [],
-                "visualizar_url": UI_LAB_DEMO_URL,
-                "pdf_url": UI_LAB_DEMO_URL,
-                "docx_url": UI_LAB_DEMO_URL,
-                "editar_url": UI_LAB_DEMO_URL,
+                "visualizar_url": "#",
+                "pdf_url": "#",
+                "docx_url": "#",
+                "editar_url": "#",
             }
             for index in range(oficios)
         ],
@@ -783,10 +775,10 @@ def _ui_lab_evento_card(
                 "title": f"Arquivo vinculado {index + 1}",
                 "detail": "Disponivel no Drive" if drive == "Vinculado" else "Pendente de vinculacao",
                 "meta": f"{pendencias} pendencia(s)",
-                "visualizar_url": UI_LAB_DEMO_URL,
-                "pdf_url": UI_LAB_DEMO_URL,
-                "docx_url": UI_LAB_DEMO_URL,
-                "editar_url": UI_LAB_DEMO_URL,
+                "visualizar_url": "#",
+                "pdf_url": "#",
+                "docx_url": "#",
+                "editar_url": "#",
             }
             for index in range(documentos)
         ],
@@ -801,9 +793,9 @@ def _ui_lab_evento_card(
         ],
         "servidores_flat_count": 1,
         "editar_url": href,
-        "cancelar_url": UI_LAB_DEMO_URL,
-        "reativar_url": UI_LAB_DEMO_URL,
-        "excluir_url": UI_LAB_DEMO_URL,
+        "cancelar_url": "#",
+        "reativar_url": "#",
+        "excluir_url": "#",
         "title": titulo,
         "subtitle": f"{destino} · {periodo}",
         "status_variant": status_variant,

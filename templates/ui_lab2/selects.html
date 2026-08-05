@@ -28,7 +28,7 @@
 
       {% include "ui_lab2/partials/_component_open.html" with name="input_with_action" source="components/ui/forms/field.html" note="Campo com botao de gerenciar acoplado (engrenagem)." %}
         <div class="field-grid">
-          {% include "components/ui/forms/field.html" with field=demo_form.uf action_url=request.path action_label="Gerenciar UFs" size_class="field-size-2" only %}
+          {% include "components/ui/forms/field.html" with field=demo_form.uf action_url="#" action_label="Gerenciar UFs" size_class="field-size-2" only %}
         </div>
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.input_with_action %}
 
