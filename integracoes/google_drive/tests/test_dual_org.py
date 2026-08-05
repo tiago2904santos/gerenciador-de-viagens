@@ -144,4 +144,4 @@ class DualOrganizationTests(TestCase):
         self.oficio.save()
         self._art("ordem_servico", oficio=self.oficio, name="os.pdf")
         linhas = organizer.planejar_oficio(self.oficio)
-        self.assertTrue(any(l.startswith("Ordens de serviço/") for l in linhas))
+        self.assertTrue(any(linha.startswith("Ordens de serviço/") for linha in linhas))

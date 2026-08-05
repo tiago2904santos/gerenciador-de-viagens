@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import unicodedata
 from dataclasses import dataclass
-from datetime import date, datetime, time, timedelta
-from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+from datetime import date, datetime
+from decimal import Decimal, ROUND_HALF_UP
 
 from roteiros.services.valor_extenso import valor_por_extenso_ptbr
 

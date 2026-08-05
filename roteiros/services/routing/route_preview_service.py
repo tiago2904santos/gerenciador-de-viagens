@@ -66,7 +66,7 @@ def build_preview_points(payload: Dict[str, Any]) -> List[PreviewPoint]:
     try:
         oid = int(origem_id)
     except (TypeError, ValueError):
-        raise RouteValidationError("Informe cidade de origem.")
+        raise RouteValidationError("Informe cidade de origem.") from None
 
     if not isinstance(destinos, list) or not destinos:
         raise RouteValidationError("Informe ao menos um destino.")
@@ -79,7 +79,7 @@ def build_preview_points(payload: Dict[str, Any]) -> List[PreviewPoint]:
         try:
             cid = int(item.get("cidade_id"))
         except (TypeError, ValueError):
-            raise RouteValidationError(f"Destino #{idx + 1} sem cidade válida.")
+            raise RouteValidationError(f"Destino #{idx + 1} sem cidade válida.") from None
         uuid = str(item.get("uuid") or f"tmp-{idx + 1}")
         destinos_norm.append({"uuid": uuid, "cidade_id": cid})
         cidades_ids.append(cid)
@@ -90,7 +90,7 @@ def build_preview_points(payload: Dict[str, Any]) -> List[PreviewPoint]:
             rid = int(retorno_id)
             cidades_ids.append(rid)
         except (TypeError, ValueError):
-            raise RouteValidationError("Retorno inválido.")
+            raise RouteValidationError("Retorno inválido.") from None
 
     cidades_map = {
         c.pk: c

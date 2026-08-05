@@ -1,4 +1,3 @@
-import logging
 from django.db.models import Q
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -17,7 +16,7 @@ OFICIOS_POR_PAGINA = 20
 
 
 def index(request):
-    from django.db.models import OuterRef, Q
+    from django.db.models import OuterRef
     from core import documento_abas as tabs
     from prestacoes_contas.models import PrestacaoServidor
 
@@ -85,7 +84,7 @@ def index(request):
             "create_url":  reverse("oficios:novo"),
             "search_clear_url": f"{reverse('oficios:index')}?aba={aba}",
             "status_options": [{"value": "", "label": "Todos os status"}]
-            + [{"value": v, "label": l} for v, l in Oficio.STATUS_CHOICES],
+            + [{"value": valor, "label": rotulo} for valor, rotulo in Oficio.STATUS_CHOICES],
             "sort_options": [
                 {"value": "numero_desc",  "label": "Número: maior"},
                 {"value": "numero_asc",   "label": "Número: menor"},

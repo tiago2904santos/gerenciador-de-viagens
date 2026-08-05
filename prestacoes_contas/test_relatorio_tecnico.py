@@ -23,7 +23,6 @@ from django.test import TestCase
 from django.urls import reverse
 
 from oficios.models import Oficio
-from prestacoes_contas.models import PrestacaoServidor
 from prestacoes_contas.models import RelatorioTecnico
 from prestacoes_contas.test_helpers import PrestacaoFixturesMixin
 from roteiros.models import Roteiro

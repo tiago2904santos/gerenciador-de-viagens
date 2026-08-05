@@ -75,7 +75,7 @@ class Command(BaseCommand):
 
         apagados = 0
         with transaction.atomic():
-            for pc, original, copia in candidatos:
+            for pc, _original, copia in candidatos:
                 pc.roteiro_ajustado = None
                 pc.save(update_fields=["roteiro_ajustado", "atualizado_em"])
 

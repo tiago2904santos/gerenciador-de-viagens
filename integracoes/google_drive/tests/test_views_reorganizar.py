@@ -101,7 +101,7 @@ class ReorganizarTudoViewTests(TestCase):
         data = resp.json()
         self.assertFalse(data["truncado"])
         self.assertTrue(
-            any("Ofício 01-2026 protocolo 12.345.678-9 Ana (Maringá).pdf" in l for l in data["linhas"])
+            any("Ofício 01-2026 protocolo 12.345.678-9 Ana (Maringá).pdf" in linha for linha in data["linhas"])
         )
 
     def test_get_index_sem_pasta_nao_mostra_card(self):

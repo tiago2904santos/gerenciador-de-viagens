@@ -1,0 +1,13 @@
+# QA-07 — arquivo próprio, e não uma linha em `dev.txt`, por dois motivos:
+#
+# 1. O CI precisa instalar só isto para rodar o gate. `dev.txt` puxa `base.txt`
+#    inteiro (Django, WeasyPrint, Google API) — dezenas de segundos para uma
+#    checagem que leva menos de um.
+# 2. Fica em `/requirements`, que é o diretório que o Dependabot vigia
+#    (`.github/dependabot.yml`, `QA-12`). Um `pip install` solto dentro do
+#    workflow não seria vigiado por ninguém.
+#
+# Pino exato, não faixa: subir de minor num linter costuma trazer regra nova, e
+# regra nova reprova PR que não tem nada a ver com ela. A atualização entra pelo
+# PR do Dependabot, onde alguém zera os achados novos junto.
+ruff==0.15.8

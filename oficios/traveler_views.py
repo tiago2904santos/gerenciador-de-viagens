@@ -1,4 +1,3 @@
-import logging
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -48,7 +47,6 @@ def _wizard_dados_viajantes_context(
     mostrar_custeio_observacao = custeio_value == "OUTRA_INSTITUICAO"
     modelos_queryset = form.fields["modelo_motivo"].queryset
     equipe_ids = list(oficio.servidores.values_list("pk", flat=True))
-    modo_motorista = oficio.motorista_modo or Oficio.MOTORISTA_MODO_SERVIDOR
     servidores_attrs = form.fields["servidores"].widget.attrs
     if oficio.motorista_id and oficio.motorista_id in equipe_ids:
         servidores_attrs["data-picker-driver-value"] = str(oficio.motorista_id)

@@ -26,8 +26,6 @@ from planos_trabalho.presenters import apresentar_plano_card
 from roteiros.presenters import apresentar_linha_lista_simples_roteiro
 from termos.presenters import apresentar_linha_lista_simples_termo
 
-from prestacoes_contas.forms import PrestacaoMultipleFileField
-from prestacoes_contas.forms import PrestacaoMultipleFileInput
 
 from .forms import EventoForm
 from .forms import EventoNovoCadastroForm
@@ -297,7 +295,6 @@ def detalhe(request, pk, etapa=1):
         form = EventoNovoCadastroForm(instance=evento) if etapa == 1 else None
 
     # — upload de documentos de solicitação (etapa 4) —
-    solicitacao_form_errors = []
     if request.method == "POST" and request.POST.get("action") == "upload_solicitacao":
         from django.core.validators import FileExtensionValidator
         from django.core.exceptions import ValidationError

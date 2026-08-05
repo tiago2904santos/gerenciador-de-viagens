@@ -1,0 +1,53 @@
+# QA-07 — o primeiro gate de análise estática de Python do projeto.
+#
+# Até aqui os únicos auditores eram `scripts/audit_django_architecture.py` e
+# `scripts/audit_frontend_standards.py`: ambos checam regra de arquitetura, nenhum
+# olha o código como código. O custo disso estava medido — a primeira execução do
+# ruff achou `_CAMPO_LABELS` indefinido em `prestacoes_contas/model_views.py`, um
+# `NameError` em rota viva (`NOVO-03`).
+#
+# `ruff.toml` e não `pyproject.toml` de propósito: o repositório não é um pacote
+# instalável, e um `pyproject.toml` sem `[build-system]`/`[project]` faz
+# ferramenta de empacotamento tentar interpretar a raiz como distribuição.
+
+target-version = "py312" # o mesmo do `setup-python` em tests.yml
+
+# Não é catraca de formatação: `E501` não está selecionado. O número existe para
+# que regra que consulta largura (ex.: `B` em expressões longas) tenha referência.
+# Medido nos .py versionados: p95 = 87, p99 = 111.
+line-length = 120
+
+# `extend-exclude`, não `exclude`: `exclude` **substitui** a lista default do ruff,
+# que inclui `.git/`. Há uma branch remota chamada `codex/…-organizer.py`, e o ref
+# dela é um arquivo `.git/refs/remotes/origin/….py` que o ruff tentava analisar.
+extend-exclude = [
+    # Dump de banco + script de importação de um reset de junho/2026. É registro
+    # datado, como `docs/historico/` — não entra em catraca de código vivo.
+    "migration_backups",
+]
+
+[lint]
+# Conjunto default do ruff (`E4`, `E7`, `E9`, `F`) mais `B` (flake8-bugbear).
+#
+# O default cobre o que o `QA-07` nomeia: import morto (`F401`) e nome não
+# definido (`F821`). `B` entra porque `B023` (closure que não captura a variável
+# do laço) e `B905` (`zip()` sem `strict=`) são classe de defeito silencioso —
+# não quebram, só produzem o resultado errado.
+#
+# Fora deste PR, com número medido para quem for ratchetar depois:
+#   `I`   (import order)  351 — reordenação mecânica em quase todo arquivo
+#   `UP`  (pyupgrade)     206
+#   `RUF`                 330
+#   `S`   (bandit)        128 — vale como ID próprio, não como efeito colateral
+#   `SIM`                  56
+# Catraca só desce: quem adicionar um destes zera antes de selecionar.
+select = ["E4", "E7", "E9", "F", "B"]
+
+[lint.per-file-ignores]
+# `from .base import *` é o idioma documentado de settings do Django. O ruff não
+# consegue resolver os nomes através do star import e acusa todo uso.
+"config/settings/*.py" = ["F403", "F405", "E402"]
+
+# Scripts de linha de comando que precisam de `sys.path` e `django.setup()`
+# antes de qualquer import de app — `E402` aqui é o comportamento correto.
+"scripts/*.py" = ["E402"]

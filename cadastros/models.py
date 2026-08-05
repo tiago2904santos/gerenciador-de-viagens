@@ -3,13 +3,10 @@ from decimal import ROUND_HALF_UP, Decimal
 
 from django.db import models, transaction
 from django.db.models import Q, UniqueConstraint
-from django.utils import timezone
 
 from core.normalizers import normalize_digits
 from core.normalizers import normalize_plate
-from core.normalizers import normalize_spaces
 from core.normalizers import normalize_upper
-from core.models import CancelavelModel
 from core.models import TimeStampedModel
 from core.utils.masks import RG_NAO_POSSUI_CANONICAL, format_masked_display, format_placa
 

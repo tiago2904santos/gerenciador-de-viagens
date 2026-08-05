@@ -4,8 +4,6 @@ Viewport: 1440x900 desktop | Full page screenshots
 """
 
 import json
-import os
-import sys
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright

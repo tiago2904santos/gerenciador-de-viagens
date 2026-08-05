@@ -35,7 +35,6 @@ from oficios.docxtpl_context import build_oficio_docxtpl_context
 from .diario_services import alteracoes_datas_horarios_roteiro
 from .diario_services import alteracoes_motorista_viatura
 from .diario_services import diferencas_entre_roteiros
-from .diario_services import gerar_diario_bordo_pdf
 from .diario_services import roteiro_efetivo
 from .diario_services import sincronizar_trechos
 from .forms import DEFAULT_CUSTEIO_VALUES

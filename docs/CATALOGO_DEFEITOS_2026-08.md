@@ -1259,6 +1259,48 @@ testes, ou a ordem de importação — e é o tipo de coisa que só aparece quan
 cobertura de um subconjunto, que é exatamente o que o `QA-15` precisa fazer.
 **Precisa ser reproduzido numa sessão limpa antes de virar trabalho.**
 
+### NOVO-03 🔴 `NameError` em rota viva: `_CAMPO_LABELS` indefinido · COR · FEITO (05/08)
+
+`prestacoes_contas/model_views.py` lia `_CAMPO_LABELS` em duas linhas; o nome estava definido no
+fim de `prestacoes_contas/views.py`, de onde as quatro views tinham saído. `NameError` — HTTP 500 —
+em quatro entradas: `GET /prestacoes-contas/modelos-texto/novo/?campo=…` e o redirect de sucesso de
+**criar, editar e excluir** modelo de texto do RT (`_voltar_modelos_url`).
+
+Nenhum teste tocava nessas views. Achado pelo `ruff` (`F821`) na primeira execução do gate do
+`QA-07` — nenhum dos dois auditores próprios do projeto lê código como código, que é exatamente a
+lacuna que o `QA-07` nomeia.
+**Corrigido:** `_CAMPO_LABELS` mora em `model_views.py`, junto de quem lê.
+`prestacoes_contas/test_modelos_texto.py` cobre as quatro views (7 testes) — provado falhando com
+5 erros antes da correção.
+
+### NOVO-04 🟡 Chave repetida no inventário do UI Lab apagava uma tela · COR · FEITO (05/08)
+
+`ui_lab2/views.py`: `COMPONENT_USAGE` declarava `"status_badge"` duas vezes. Em literal de dict a
+segunda ocorrência descarta a primeira em silêncio, então
+`templates/components/ui/modals/confirm_delete.html` sumiu do inventário — e o inventário é o que
+alguém consulta antes de mexer no componente. `page_header_status_chip` tinha o mesmo caminho
+listado duas vezes.
+Achado pelo `ruff` (`F601`) na mesma execução. **Corrigido:** listas unidas, duplicata removida.
+
+### NOVO-05 ⚪ O que o `QA-07` deixou de fora: mais regras, formatação e tipo · MED · a dimensionar
+
+O `QA-07` fechou **lint**. O enunciado dele nomeia três coisas — "lint, formatação ou tipo" — e as
+outras duas seguem sem gate. Três frentes, deliberadamente separadas:
+
+**1. Ampliar o conjunto do `ruff`.** Entrou `E4`, `E7`, `E9`, `F` (default) e `B`, todos em zero. O
+que ficou de fora, medido em 05/08: `I` (ordem de import) 351 · `RUF` 330 · `UP` (pyupgrade) 206 ·
+`S` (bandit) 128 · `SIM` 56. `I` e `UP` são reescrita mecânica ampla e precisam entrar sozinhos,
+para não afogar um PR de conteúdo. Os números estão anotados em `ruff.toml`.
+
+**2. `S` (bandit) merece ID próprio.** 128 achados de varredura de segurança não são higiene de
+estilo e não devem ser triados junto com ordem de import.
+
+**3. Tipo (`mypy`/`pyright`) não foi sequer medido.** Num código de ~93 k linhas sem anotação
+sistemática, isso não é "ligar uma regra": é um projeto com fase de adoção gradual. Estimar antes
+de agendar.
+
+**Não confundir com dívida nova:** é dívida existente que o gate ainda não vigia.
+
 ### QA-17 ⚪ Treze PRs abertos sem triagem · MED · 1 d
 
 PRs #4, #7, #10, #13, #14, #16, #27, #32, #44, #58, #137, #144 são de maio–julho/2026; #178 é de

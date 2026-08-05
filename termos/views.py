@@ -12,7 +12,6 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils import timezone
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
@@ -32,7 +31,6 @@ from oficios.services import validar_oficio_para_documento
 
 from .forms import TermoAutorizacaoForm
 from .models import TermoAutorizacao
-from .presenters import apresentar_linha_lista_simples_termo
 from .presenters import apresentar_linha_simples_termo
 from .presenters import apresentar_termo_card
 from .selectors import get_servidor_do_termo_do_oficio
@@ -47,9 +45,7 @@ from .services import listar_servidores_com_termo
 from .services import preview_termo_context
 from .services import resolver_artefato_termo_cadastro
 from .services import resolver_artefato_termo_oficio
-from .services import servidores_para_termo_cadastro
 from .services import termo_cadastro_assinado_info
-from .services import termo_cadastro_tem_assinado
 from .services import termo_oficio_tem_assinado
 from cadastros.selectors import rotulo_da_sede_configurada
 

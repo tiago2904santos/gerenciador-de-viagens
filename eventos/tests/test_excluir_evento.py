@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from cadastros.models import Servidor
 from eventos.models import Evento
 from eventos.services import excluir_evento
 from oficios.models import Oficio

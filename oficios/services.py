@@ -8,7 +8,6 @@ from django.db.models import ProtectedError
 from django.db.models import Q
 from django.utils import timezone
 
-from core.normalizers import normalize_spaces
 from core.normalizers import normalize_upper
 from core.tenancy import get_current_area
 from core.utils.masks import format_placa
@@ -35,6 +34,12 @@ from .docxtpl_context import build_justificativa_docxtpl_context
 from .docxtpl_context import build_oficio_docxtpl_context
 from .documents import build_canonical_document_payload
 from .documents import build_justificativa_payload
+from .models import ModeloMotivoOficio
+from .models import Oficio
+from .models import OficioNumeroLacuna
+
+from roteiros.models import Roteiro
+from roteiros.models import RoteiroDestino
 
 logger = logging.getLogger(__name__)
 
@@ -97,13 +102,6 @@ def _try_cached_download(
     )
     response["X-Document-SHA256"] = art.hash_sha256
     return response
-
-
-from .models import ModeloMotivoOficio
-from .models import Oficio
-from .models import OficioNumeroLacuna
-from roteiros.models import Roteiro
-from roteiros.models import RoteiroDestino
 
 
 class OficioVinculadoError(Exception):

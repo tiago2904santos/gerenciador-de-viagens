@@ -11,7 +11,6 @@ from cadastros.models import Cargo
 from cadastros.models import Unidade
 
 from planos_trabalho.forms import PlanoIdentificacaoForm
-from planos_trabalho.models import EfetivoPlano
 from planos_trabalho.models import HorarioAtendimento
 from planos_trabalho.models import PlanoDestino
 from planos_trabalho.models import PlanoTrabalho

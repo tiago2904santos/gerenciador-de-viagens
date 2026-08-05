@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import importlib.util
 import io
-import os
 import platform
 import sys
 from dataclasses import dataclass

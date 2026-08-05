@@ -1,7 +1,6 @@
 """CRUD dos modelos de texto reutilizáveis do relatório técnico."""
 
 from django.contrib import messages
-from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
@@ -14,6 +13,10 @@ from core.tenancy import filter_queryset_by_area
 
 from .forms import ModeloTextoRelatorioTecnicoForm
 from .models import ModeloTextoRelatorioTecnico
+
+# NOVO-03: ficou em `views.py` quando estas quatro views vieram para cá, e as duas
+# leituras abaixo viravam `NameError` em rota viva. Mora aqui, junto de quem lê.
+_CAMPO_LABELS = dict(ModeloTextoRelatorioTecnico.CAMPO_CHOICES)
 
 
 def modelos_index(request):

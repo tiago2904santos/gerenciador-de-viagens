@@ -1023,7 +1023,6 @@ def sincronizar_pasta_evento(evento) -> None:
     if not _evento_dados_completos(evento):
         return
 
-    from .services import get_client
 
     client = _get_client()
     nome_pasta = naming.pasta_evento(evento)

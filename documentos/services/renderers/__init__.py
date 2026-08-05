@@ -8,7 +8,6 @@ from ..placeholders import ensure_required_placeholders
 from ..placeholders import render_template_content
 from ..registry import default_document_registry
 from ..templates import default_template_registry
-from ..types import DocumentoFormato
 from .base import BaseDocumentRenderer
 from .base import DocumentRendererError
 from .base import RenderRequest

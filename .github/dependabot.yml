@@ -1,0 +1,37 @@
+# QA-12 — vigilância de dependência fora do ciclo de commit.
+#
+# O `pip-audit` de tests.yml só roda em push/pull_request: uma CVE divulgada
+# depois do último merge fica invisível até alguém commitar. Num sistema com
+# assinatura de documento e dados pessoais, esse intervalo é o problema.
+#
+# Semanal, não diário: o objetivo é não perder uma CVE por semanas, não gerar
+# ruído que ninguém lê. Agrupado por ecossistema para não abrir 8 PRs de uma vez.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: "/requirements"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      # Atualização de segurança vem sozinha e é a que merece atenção imediata.
+      seguranca:
+        applies-to: security-updates
+        patterns: ["*"]
+      # O resto vem junto, para revisar de uma vez.
+      demais:
+        applies-to: version-updates
+        patterns: ["*"]
+    commit-message:
+      prefix: "chore(deps)"
+
+  # As actions do workflow são código de terceiro com acesso ao segredo do deploy.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore(ci)"

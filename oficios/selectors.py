@@ -3,7 +3,6 @@ from datetime import date
 from django.db.models import Prefetch
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from django.utils.dateparse import parse_date
 
 from core.normalizers import normalize_plate

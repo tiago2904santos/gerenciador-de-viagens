@@ -408,7 +408,7 @@ def roteiro_state_equivalente_ao_roteiro(roteiro, roteiro_state, validated):
     )
     if len(trechos_post) != len(trechos_db):
         return False
-    for posted, db in zip(trechos_post, trechos_db):
+    for posted, db in zip(trechos_post, trechos_db, strict=True):
         if (
             posted.get("origem_estado_id") != db.origem_estado_id
             or posted.get("origem_cidade_id") != db.origem_cidade_id

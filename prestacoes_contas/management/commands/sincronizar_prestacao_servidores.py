@@ -24,7 +24,6 @@ from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
 from django.db import transaction
 
-from oficios.models import Oficio
 from prestacoes_contas.models import PrestacaoContas
 from prestacoes_contas.models import PrestacaoServidor
 
@@ -56,7 +55,7 @@ class Command(BaseCommand):
                 numero_str, ano_str = filtro.split("/")
                 numero, ano = int(numero_str), int(ano_str)
             except (ValueError, TypeError):
-                raise CommandError("--oficio deve estar no formato numero/ano, ex.: 87/2026.")
+                raise CommandError("--oficio deve estar no formato numero/ano, ex.: 87/2026.") from None
             qs = qs.filter(oficio__numero=numero, oficio__ano=ano)
         return qs
 
