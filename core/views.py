@@ -15,6 +15,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 
+from core import login_throttle
 from eventos.forms import EventoForm
 from eventos.models import Evento
 
@@ -971,40 +972,21 @@ class LoginView(DjangoLoginView):
     redirect_authenticated_user = True
     authentication_form = LoginForm
 
-    limit = 5
-    window_seconds = 15 * 60
-
-    def _rate_key(self):
-        import hashlib
-        import ipaddress
-
-        remote_ip = self.request.META.get("REMOTE_ADDR", "")
-        trusted = remote_ip in settings.TRUSTED_PROXY_IPS
-        real_ip = self.request.META.get("HTTP_X_REAL_IP", "") if trusted else remote_ip
-        try:
-            real_ip = str(ipaddress.ip_address(real_ip))
-        except ValueError:
-            real_ip = "invalid"
-        username = (self.request.POST.get("username") or "").strip().casefold()
-        digest = hashlib.sha256(f"{real_ip}|{username}".encode()).hexdigest()
-        return f"login-attempt:{digest}"
+    # A regra vive em core/login_throttle.py, compartilhada com o login do Django
+    # Admin (QA-01) — duas portas para o mesmo sistema não podem ter limites
+    # diferentes.
+    limit = login_throttle.LIMITE
+    window_seconds = login_throttle.JANELA_SEGUNDOS
 
     def dispatch(self, request, *args, **kwargs):
-        if request.method == "POST" and cache.get(self._rate_key(), 0) >= self.limit:
+        if request.method == "POST" and login_throttle.excedeu_limite(request):
             form = self.get_form()
-            form.add_error(
-                None,
-                "Muitas tentativas de acesso. Aguarde 15 minutos e tente novamente.",
-            )
+            form.add_error(None, login_throttle.MENSAGEM)
             return self.render_to_response(self.get_context_data(form=form), status=429)
         return super().dispatch(request, *args, **kwargs)
 
     def form_invalid(self, form):
-        key = self._rate_key()
-        try:
-            cache.incr(key)
-        except ValueError:
-            cache.set(key, 1, timeout=self.window_seconds)
+        login_throttle.registrar_falha(self.request)
         return super().form_invalid(form)
 
     def form_valid(self, form):
