@@ -48,17 +48,17 @@ aqui que se para com o sistema melhor do que estava.
 |---|---|---|---:|
 | `BE-01` 🔴 | "Finalizar plano" não finaliza; "Voltar" avança | `planos_trabalho/view_helpers.py:22` lê só `post.get("action")`; a cadeia `_documentos_preview_footer.html` → `card_footer_section.html` → `card_footer_actions.html:18` emite `name="wizard_action"`. Zero `name="action"` nos templates do app: o helper cai no default `wizard_next` **sempre** | 0,5 |
 | `BE-02` 🔴 | Exclusão de anexo por `GET`, sem CSRF e sem confirmação | `prestacoes_contas/document_views.py:341` — nenhum decorator; `require_POST` está **importado na linha 9 e nunca aplicado** neste arquivo | 0,5 |
-| `BE-03` 🟠 | Filtro "criado de/até" descartado em silêncio | `oficios/selectors.py:103-112` usa `__date__gte` em `DateField`; 4 `except Exception: pass` escondem o `FieldError` | 0,5 |
+| `BE-03` 🟠 | Filtro "criado de/até" descartado em silêncio | `oficios/selectors.py:103-112` usa `__date__gte` em `DateField`; **2** `except Exception: pass` (linhas 106 e 111) escondem o `FieldError` | 0,5 |
 | `BE-04` 🔴 | Formulário de evento oferece documentos de outras áreas | `eventos/forms.py:264,267,270,275` — a linha 259 filtra, as 4 seguintes não | 0,5 |
 | `BE-05` 🟠 | Seletor de modelo de motivo da OS expõe outras áreas | `ordens_servico/forms.py:252` | 0,25 |
 | `BE-06` 🟠 | Relatório técnico sai com a cidade-sede de outra área | `prestacoes_contas/services.py:117` — `ConfiguracaoSistema.objects.first()` | 0,25 |
 | `BE-07` 🟠 | Exclusão de anexo dá 500 e deixa registro órfão | `core/audit.py:146` `str(instance)` quando `__str__` devolve `None` | 0,5 |
-| `BE-08` 🟠 | Seis redirects seguem o que o POST mandar | `prestacoes_contas/views.py:383` e `signature_views.py` (5 sites) ignoram `core/retorno.py` | 0,5 |
+| `BE-08` 🟠 | **Oito** redirects seguem o que o POST mandar | `prestacoes_contas/views.py:383-384` e `signature_views.py` (7 sites, incluindo as duas views de cancelamento) ignoram `core/retorno.py` | 0,5 |
 
 **Gate:** suíte verde; um teste de regressão por defeito; nos dois de área, teste com duas áreas
 afirmando `queryset.filter(area=outra).count() == 0`.
 
-### B1 — Isolamento por área vira invariante · 21 dias · risco alto
+### B1 — Isolamento por área vira invariante · 18 dias · risco alto
 
 A etapa mais importante do plano inteiro. Enquanto o recorte depender de o programador lembrar,
 todo código novo é uma chance de vazar, e a revisão humana é o único portão.
@@ -67,11 +67,17 @@ todo código novo é uma chance de vazar, e a revisão humana é o único portã
 |---|---|---:|
 | `BE-09` 🔴 | `AreaScopedManager` como `objects` nos 28 modelos com `area`, mantendo `all_objects` para migração/comando/backfill. App por app, começando por ofícios, roteiros e prestações | 6 |
 | `BE-10` 🔴 | App `justificativas` sem `area`: lista, pickers e exclusão por URL expõem todos os tenants (`justificativas/selectors.py:20,44,48`, `views.py:32`, `forms.py:105`) | 2 |
-| `DB-01` 🔴 | `TabelaDiaria` não tem `area`: uma área altera o valor pago por todas (`cadastros/models.py:659`) | 4 |
+| `DB-01` 🟠 | Tabela de diárias é **nacional por decisão documentada**, e a tela que a edita não tem portão de papel: qualquer EDITOR altera valor de todas as áreas (`cadastros/views.py:620`) | 1,5 |
 | `DB-02` 🔴 | `area` anulável em 27 dos 28 modelos; sem área ativa, `filter_queryset_by_area` devolve o balde `area IS NULL` inteiro (`core/tenancy.py:63`) | 5 |
 | `DB-03` 🟠 | Limpeza de rascunhos apaga rascunho de outra área (`roteiros/services/roteiro_editor.py:317`) | 1 |
-| `DB-04` 🟠 | Cache de artefato documental não recorta por área (`documentos/services/document_cache.py:105`) | 1,5 |
+| `DB-04` 🟡 | Cache de artefato documental não recorta por área — risco latente, sem caminho alcançável hoje (`documentos/services/document_cache.py:105`) | 1 |
 | `DB-05` 🟠 | Placa de viatura e nome de modelo de justificativa são únicos globalmente | 1,5 |
+
+> **`DB-01` foi reescrito pela verificação de 05/08 e o enunciado original estava invertido.** Ele
+> pedia acrescentar `area` à `TabelaDiaria` — exatamente o que `cadastros/selectors.py:24-28`
+> documenta como decisão deliberada, para impedir que duas áreas cobrem valores diferentes pela
+> mesma viagem. **Não fragmentar a tabela.** O trabalho é o portão de permissão, e casa com o
+> `BE-19` (`require_area_role` com zero usos). O esforço cai de 4 dias para 1,5.
 
 **Ordem interna:** `DB-03` e `BE-04`/`BE-05` primeiro (correções pontuais), depois `BE-09`
 (o manager), e só então `DB-02` (`NOT NULL`), que depende do backfill estar provado.
@@ -100,9 +106,17 @@ Esta etapa é a que o [`PLANO_DESEMPENHO.md`](PLANO_DESEMPENHO.md) mede e não e
 
 | ID | Defeito | Ganho medido | Dias |
 |---|---|---|---:|
-| `DB-09` 🟠 | Lista de roteiros agrega antes do `LIMIT` (`roteiros/selectors.py:36`): trocar `annotate(Count)+exclude` por `Exists()` correlacionado | 24.000 roteiros: 127,7 ms → esperado ~30 ms | 2 |
-| `DB-10` 🟡 | Falta índice composto para a ordenação real das listas (`OrdemServico.Meta.indexes` vazio, ofícios idem) | **1,965 ms → 0,067 ms (29×)** | 0,5 |
-| `DB-11` 🟡 | 80 buscas `__unaccent__icontains` sem índice: 0 GIN e 0 trigram em 390 índices | busca de ofícios: `Seq Scan` em 24.000 linhas, 35,7 ms | 3 |
+| `DB-09` 🟠 | Lista de roteiros agrega antes do `LIMIT` (`roteiros/selectors.py:36`): trocar `annotate(Count)+exclude` por `Exists()` correlacionado | 24.000 roteiros: **56,6–127,7 ms** em duas medições | 2 |
+| `DB-10` 🟡 | Falta índice composto para a ordenação real das listas (`OrdemServico.Meta.indexes` vazio, ofícios idem) | **13× a 29×** em duas medições | 0,5 |
+| `DB-11` 🟡 | 80 buscas `__unaccent__icontains` sem índice: 0 GIN e 0 trigram em 390 índices | busca de ofícios: `Seq Scan` em 24.000 linhas, **31,3–35,7 ms** | 3 |
+
+> **Os três números foram medidos duas vezes, por auditores independentes, e as faixas acima são as
+> duas medições.** Onde divergiram, a promessa que vale é a mais conservadora. O `DB-09` é o caso
+> mais relevante: a segunda medição deu menos da metade do tempo da primeira, com o mesmo volume e
+> o mesmo `rows=48.000` nos dois `Seq Scan` — o padrão estrutural está confirmado, o ganho é menor
+> do que o catálogo prometia. Achado extra da verificação no `DB-10`: o índice único **parcial** já
+> existente não pode ser usado pelo planner nesta consulta, o que reforça a necessidade do
+> composto.
 | `DB-12` 🟡 | Trilha de auditoria sem índice por área/período, sem expurgo, com um `SELECT` extra por `save` (`core/audit.py:78,154`) | — | 3 |
 
 **Gate:** `EXPLAIN (ANALYZE, BUFFERS)` antes e depois no corpo do PR, com o mesmo volume semeado.
@@ -171,7 +185,7 @@ medição depois.
 **B4 pode correr em paralelo com B2/B3** — camadas e esquema são superfícies disjuntas —, mas
 `BE-11`/`BE-12`/`BE-13` nunca em paralelo entre si.
 
-**Total: 66,5 dias-pessoa.**
+**Total: 63,5 dias-pessoa.**
 
 ## 4. O que este plano não faz
 

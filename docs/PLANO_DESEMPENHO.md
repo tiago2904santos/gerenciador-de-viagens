@@ -29,13 +29,17 @@ O ciclo de julho fez esse trabalho. As listas medidas paginam e não emitem quer
 **Onde eu estava errado.** Contagem plana não quer dizer consulta barata. A medição acima usou
 200 registros; com **24.000** o quadro muda, e a diferença está no `EXPLAIN`, não na contagem:
 
-| medição com 24.000 roteiros (2.000 na área ativa) | resultado |
-|---|---|
-| lista de roteiros, 2.000 registros | 23,9 ms |
-| lista de roteiros, 8.000 registros | 37,6 ms |
-| lista de roteiros, 24.000 registros | **127,7 ms** |
-| busca de ofícios (`q="ambi"`) | `Seq Scan` em 24.000 linhas, **35,7 ms** para 20 cards |
-| lista de OS com índice `(area, -ano, -numero)` | 1,965 ms → **0,067 ms** (29×) |
+| medição com 24.000 roteiros (2.000 na área ativa) | 1ª medição | verificação independente |
+|---|---|---|
+| lista de roteiros, 2.000 registros | 23,9 ms | — |
+| lista de roteiros, 8.000 registros | 37,6 ms | — |
+| lista de roteiros, 24.000 registros | 127,7 ms | **56,6 ms** |
+| busca de ofícios (`q="ambi"`), `Seq Scan` em 24.000 linhas | 35,7 ms | **31,3 ms** |
+| lista de OS com índice `(area, -ano, -numero)` | 1,965 → 0,067 ms (29×) | 0,600 → 0,046 ms (**13×**) |
+
+Os três foram medidos duas vezes, por auditores independentes. **A promessa que vale é a coluna
+da direita**, mais conservadora. O padrão estrutural — agregação antes do `LIMIT`, varredura
+sequencial na busca, ausência de índice composto — está confirmado nas duas.
 
 O custo cresce com o **banco inteiro**, não com a área do usuário: cada área paga pelo volume
 das outras. As causas são de modelagem, não de view — `annotate(Count(...))` + `exclude(...)`
@@ -178,16 +182,21 @@ Na mesma página de Ofícios: 60 blocos `cv-action-menu` e 200 `cv-action-menu__
 **Esforço:** 2–3 dias. **Risco:** médio — mexe em interação já testada; exige teste de regressão
 de teclado e leitor de tela.
 
-### 2.5 `PF-05` — a lista de Ofícios leva 127 ms no servidor
+### 2.5 `PF-05` — a lista de Ofícios leva mais de 100 ms no servidor
 
 Com 17 queries planas e 20 cards, o tempo não está no banco:
 
 | rota | ms no servidor |
 |---|---:|
-| `/oficios/?aba=atuais` | **127–129** |
+| `/oficios/?aba=atuais` | **115–166** (três medições) |
 | `/cadastros/servidores/` | 27 |
 | `/justificativas/` | 46 |
 | `/roteiros/` | 20 |
+
+> **Faixa, não número.** A verificação independente mediu 115,1 ms e 165,9 ms nas mesmas
+> condições — variação de ~43% entre execuções. Tempo de parede é sensível ao ambiente; **a
+> contagem de 17 queries é o número sólido aqui**, e o teto do CI deve ser generoso o bastante
+> para não virar teste instável.
 
 É consequência direta de `PF-01` e `PF-04` — renderizar 378 ícones e 60 menus. Fica catalogado
 à parte porque é a **métrica de aceite** deles: a rota precisa cair para a faixa das outras

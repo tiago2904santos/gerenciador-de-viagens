@@ -36,22 +36,23 @@ Este ciclo começa com medição nova. Tudo aqui foi medido em **05/08/2026**, p
 | Auditor de front | **392 avisos**, 0 erros (teto do CI: 401) | `scripts/audit_frontend_standards.py` |
 | ORM em módulo de view | **30** (google_drive 10, core 9, documentos 4, oficios 4, roteiros 2, justificativas 1) | `scripts/audit_django_architecture.py` |
 | Classe CSS dentro de `attrs={}` em forms | **0** | grep em todos os `forms.py` |
-| Código | 93.232 linhas Python · 60.707 CSS · 25.543 JS · 462 templates | `wc -l` |
+| Código (fonte) | 93.232 linhas Python · **43.038 CSS** · **17.859 JS** · 462 templates | `wc -l`, excluindo `shell.bundle.*` |
+| Código (entregue) | `shell.bundle.css` 17.669 linhas · `shell.bundle.js` 7.633 | concatenação das fontes acima — **não somar aos dois** |
 | Modelos e migrações | 54 modelos, 154 migrações, **0 pendentes**, 0 irreversíveis | `makemigrations --check --dry-run` |
 | Constraints | 61 `UniqueConstraint` · **2** `CheckConstraint` | introspecção de `_meta.constraints` |
 | Índices | 390 em 75 tabelas · **0 GIN, 0 trigram** | `pg_indexes` |
 | Isolamento por área | 28 de 54 modelos têm `area`; **27 com `area` anulável**; 123 `.objects.` fora do filtro | introspecção + varredura AST |
-| Classes CSS declaradas | **2.612**, das quais **935** sem uso comprovado | extração + grep em corpus de 4,7 MB |
+| Classes CSS declaradas | **2.612**, das quais **~929** sem uso comprovado | extração + grep em corpus de 4,7 MB, descontando 3 padrões de classe dinâmica |
 | CSS entregue por página | 664–816 KB, **~10% casado** | Chromium via CDP |
 | HTML da lista de Ofícios | **425 KB** para 20 cards, 192 KB só em SVG inline | `test.Client` + contagem |
 
 ## 3. As quatro frentes
 
-**Backend** (`BE`, `DB`) — 66,5 dias. O risco está aqui: isolamento por área é convenção, o banco
+**Backend** (`BE`, `DB`) — 63,5 dias. O risco está aqui: isolamento por área é convenção, o banco
 não impõe integridade, e há defeitos que o usuário encontra hoje.
 
 **Frontend** (`UI`, `HT`, `JS`) — ver [`PLANO_FRONTEND.md`](PLANO_FRONTEND.md). O peso está aqui:
-36% do CSS sem uso comprovado, tema escuro resolvido por 5.843 linhas de exceção com 190
+~36% do CSS sem uso comprovado, tema escuro resolvido por 5.843 linhas de exceção com 190
 `!important`, e CSS de domínio alheio importado em 26 templates.
 
 **Desempenho** (`PF`) — 9 a 13 dias próprios. O trabalho aqui é **medir** e cortar o que a
@@ -67,12 +68,12 @@ configurações segue como proposta sem posição na fila.
 
 | Fase | O que | Frente | Dias | Risco | Por que aqui |
 |---|---|---|---:|---|---|
-| **0** | **Defeitos que atingem o usuário agora** | `BE-01`…`BE-08`, `JS-01`, `JS-04`, `HT-01`, `HT-09`, `JS-11`, `JS-12`, `QA-01`, `QA-02`, `QA-04`, `QA-09` | 7,5 | baixo | Correções isoladas, nenhuma depende de renomear ou mover nada. Se o calendário virar, para-se aqui e o sistema já está melhor. Inclui o wizard de plano de trabalho que não finaliza, a exclusão de anexo por `GET`, um XSS, o foco de teclado invisível em todo campo, o admin sem rate limit e um upload de documento assinado que escapa da validação central. |
+| **0** | **Defeitos que atingem o usuário agora** | `BE-01`…`BE-08`, `JS-01`, `JS-04`, `HT-01`, `HT-09`, `HT-11`, `JS-11`, `JS-12`, `QA-01`, `QA-02`, `QA-04`, `QA-09` | 10 | baixo | Correções isoladas, nenhuma depende de renomear ou mover nada. Se o calendário virar, para-se aqui e o sistema já está melhor. Inclui o wizard de plano de trabalho que não finaliza, a exclusão de anexo por `GET`, um XSS reproduzido no navegador, o foco de teclado invisível em todo campo, campos sem nome acessível, o admin sem rate limit, e a validação central de upload que **nunca roda** nos 5 tipos de anexo de prestação. |
 | **1** | **Réguas e rede de segurança** | `PF-07`, `QA-03`, `QA-06`, `QA-07`, `QA-11`, `QA-12` | 7 | médio | `scripts/medir_desempenho.py` no CI com volume realista, `ruff`, Dependabot, o rollback de deploy que hoje não desfaz migração, e o teste da CVE do WeasyPrint que hoje verifica texto-fonte. Sem régua, toda fase seguinte é afirmação sem prova e a regressão volta no PR seguinte sem ninguém ver. |
-| **2** | **Isolamento por área vira invariante** | `BE-09`, `BE-10`, `DB-01`…`DB-05` | 21 | **alto** | Quatro vazamentos entre tenants já provados por teste. É o maior risco do sistema e toda fase posterior escreve código que precisa respeitar o recorte. |
+| **2** | **Isolamento por área vira invariante** | `BE-09`, `BE-10`, `DB-01`…`DB-05` | 18 | **alto** | Quatro vazamentos entre tenants já provados por teste. É o maior risco do sistema e toda fase posterior escreve código que precisa respeitar o recorte. |
 | **3** | **O banco defende os dados** | `DB-06`…`DB-08` | 8 | médio | Cascata que apaga comprovante e assinatura; 2 `CheckConstraint` em 54 modelos. Depende da fase 2: pôr `NOT NULL` sobre modelo que ainda vaza é lacrar a porta errada. |
 | **4** | **Fundação do front** | `PF-01`, `HT`, `UI` (CSS morto) | ver plano de front | médio | Folha de símbolos de ícone, componentes que faltam, remoção do CSS comprovadamente morto. Fixa **quais classes existem** — pré-requisito da reconstrução. |
-| **5** | **Consulta e índice** | `DB-09`…`DB-12` | 8,5 | médio | Ganho medido de 29× num índice composto; busca livre em varredura sequencial. Depois da fase 3, porque constraint muda plano de consulta. |
+| **5** | **Consulta e índice** | `DB-09`…`DB-12` | 8,5 | médio | Ganho medido de 13× a 29× num índice composto; busca livre em varredura sequencial. Depois da fase 3, porque constraint muda plano de consulta. |
 | **6** | **Camadas e duplicação** | `BE-11`…`BE-17` | 17,5 | alto | Editor de roteiro em 3 cópias, `roteiro_logic.py` com 1.779 linhas fora do contrato. Mexe em roteiro e diárias: **plan mode obrigatório**. |
 | **7** | **Reconstrução do CSS** | `UI` | ver plano de front | médio | A mais visível e a mais reversível. Depois da fase 4, que define os nomes. |
 | **8** | **Observabilidade e autorização** | `BE-18`, `BE-19` | 4 | médio | `capture()` só existe num app; `PAPEL_ADMIN` é decorativo. |
@@ -95,7 +96,7 @@ Fase 9 — a qualquer momento, em branch própria
 
 ### O corte mínimo, se o prazo apertar
 
-**Fases 0 + 1 + 2.** São 28,5 dias e eliminam as duas respostas indefensáveis:
+**Fases 0 + 1 + 2.** São 35 dias e eliminam as duas respostas indefensáveis:
 
 | Pergunta | Antes | Depois |
 |---|---|---|
@@ -153,7 +154,7 @@ Precisam de resposta humana; nenhuma bloqueia a fase 0.
 Marque aqui, no mesmo PR que faz o trabalho. `[ ]` pendente · `[~]` em andamento · `[x]` pronto.
 O detalhe de cada ID está no [`CATALOGO_DEFEITOS_2026-08.md`](CATALOGO_DEFEITOS_2026-08.md).
 
-**São 93 IDs no catálogo e 90 neste quadro.** Os três de fora estão de fora de propósito:
+**São 95 IDs no catálogo e 92 neste quadro.** Os três de fora estão de fora de propósito:
 `PF-02` e `PF-05` são **métricas de aceite** de outros IDs, não trabalho próprio (uso de CSS por
 rota e tempo da lista de Ofícios); `DB-13` (composição da diária como texto livre) está
 deliberadamente fora desta rodada, porque mexer nele reabre a regra de dinheiro — está catalogado
@@ -172,10 +173,10 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [ ] `BE-08` seis redirects seguem o que o POST mandar
 - [ ] `JS-04` `.then()` sem `.catch` no editor de roteiros
 - [ ] `HT-09` login sem skip link e sem erro associado
-- [ ] `HT-11` campos de formulário renderizados sem nome acessível (12 medidos em 3 telas)
+- [ ] `HT-11` campos de formulário renderizados sem nome acessível (5 medidos em 2 telas)
 - [ ] `QA-01` login do Django Admin sem rate limit nenhum
 - [ ] `QA-02` rate limit depende de um Redis que nenhum ambiente declara
-- [ ] `QA-04` upload de despacho assinado escapa da política central
+- [ ] `QA-04` 🔴 a validação central de upload nunca roda, nos 5 tipos de anexo
 - [ ] `QA-09` dois templates de `.env` de produção divergentes
 - [ ] `JS-11` `maskCep` duplicada e `onlyDigits` em 4 cópias
 - [ ] `JS-12` `CV.registry` e `CV.componentRegistry` são o mesmo objeto
@@ -212,7 +213,7 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [ ] `HT-12` `help_text` declarado no form nunca chega à tela
 - [ ] `HT-03` sem padrão único para erro de formulário
 - [ ] `HT-05` `empty_state.html` quebra a ordem de headings
-- [ ] `UI-01` poda das 935 classes candidatas (168 KB) — uma por PR, com prova de grep
+- [ ] `UI-01` poda das ~929 classes candidatas (168 KB) — uma por PR, com prova de grep que cubra concatenação `+`
 - [ ] `HT-06` 10 a 14 componentes mortos, três deles citados como canônicos
 - [ ] `HT-13` `docs/DATA_ATTRIBUTES_JS.md` descreve um contrato que não existe mais
 
@@ -266,5 +267,7 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [ ] `BE-23` vocabulário de rotas divergente
 - [ ] `BE-24` 89 MB de screenshots e 175 arquivos indevidos no repositório
 - [ ] `BE-25` decidir qual UI Lab é o vigente
-- [ ] `QA-08` dependências de assinatura e criptografia atrasadas
+- [ ] `QA-08` dependências atrasadas — e `pyhanko` é dependência **morta**, decidir se sai
+- [ ] `NOVO-01` `ASSINATURA_ETIQUETA_2_COMPAT.md` descreve fluxo que não existe mais
+- [ ] `NOVO-02` suíte trava ao combinar certos grupos de apps — reproduzir antes de virar trabalho
 - [ ] `QA-17` triagem dos 13 PRs abertos

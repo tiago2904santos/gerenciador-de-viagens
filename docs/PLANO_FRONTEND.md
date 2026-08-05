@@ -16,7 +16,7 @@ JavaScript medido por varredura e leitura dirigida. Nada aqui foi herdado das au
 `normalize`, bundle em dia com as fontes. Os 392 avisos do auditor de CI são **todos de CSS** —
 nenhum é de JS.
 
-**O CSS é onde está o peso.** De 2.612 classes declaradas, **937 não aparecem em lugar nenhum** —
+**O CSS é onde está o peso.** De 2.612 classes declaradas, **~929 não aparecem em lugar nenhum** —
 nem em template, nem em JS, nem em Python. São 981 blocos somando 168 KB. E o que sobra também não
 está bem: o navegador recebe 664–816 KB por página e casa **~10%**.
 
@@ -111,16 +111,30 @@ conhecido.
 
 | ID | Defeito | Dias |
 |---|---|---:|
-| `UI-01` 🟠 | 935 classes candidatas em 981 blocos, 168 KB | 4–6 |
+| `UI-01` 🟠 | ~929 classes candidatas em 981 blocos, 168 KB | 4–6 |
 
 **Como fazer, e o que não fazer.** A contagem desta auditoria é o **mapa**, não a licença. O
 `AGENTS.md` §3.6 exige prova de grep por arquivo apagado, colada no PR. Um arquivo por PR, na
 ordem do peso: `oficios.css` (283 blocos, 47 KB), `dev/ui-lab-fields.css`, `dev/ui-lab-pages.css`,
 `page-shell.css`, `roteiros.css`, `cv-buttons.css`.
 
-**As duas exceções conhecidas** — `cv-search-picker--compact` e `cv-search-picker--vehicle` — são
-montadas em tempo de execução por `static/js/components/picker.js:144` e **não podem ser
-apagadas**. São as únicas: em todo o `static/js` existe um único padrão de classe dinâmica.
+**A regra de segurança da poda, corrigida pela verificação de 05/08.** A primeira varredura
+concluiu que existia um único padrão de classe montada em tempo de execução. **Estava errada, e o
+erro era do método** — ela ancorava na aspa de abertura e só procurava `` `${` ``, perdendo
+interpolação no meio da string e toda concatenação com `+`. Existem pelo menos três:
+
+| arquivo | padrão | classes geradas |
+|---|---|---|
+| `components/picker.js:143-144` | `` `cv-search-picker--${mode}` ``, `--${variant}`, `--${presentation}` | `--single`, `--multi`, `--detailed`, `--compact`, `--vehicle` |
+| `pages/usuarios-admin.js:123-124` | `prefix + "__toggle--ready"` / `"--changing"` | `usuario-quick-add__toggle--*`, `area-quick-add__toggle--*` |
+| `pages/oficios-viatura-sugestoes.js:127` | `"viatura-sugestao-badge--" + s.reason` | `--motorista`, `--unidade` |
+
+**Nenhuma dessas pode ser apagada**, e todas as três telas são de produção. O número de candidatas
+cai para no máximo **~929**. Em Python não há padrão equivalente fora do enum `WidgetStyle`.
+
+> **Portanto, o gate de cada PR de poda é:** a prova de grep tem que cobrir concatenação com `+`
+> e interpolação no meio da string, não só `` `${…}` `` no começo. Uma poda guiada pelo método
+> antigo apagaria classe viva.
 
 **Gate:** cada PR fecha com o auditor de front baixando, a suíte verde e uma passada visual nas
 telas do domínio podado, nos dois temas.
@@ -156,7 +170,7 @@ domínio só se sabe depois de saber quais componentes existem.
 
 ### F6 — Teste de JavaScript · 5+ dias · risco baixo · etapa própria
 
-`JS-03` — não há runner, não há `package.json`, não há um único teste para 25.492 linhas. Entra
+`JS-03` — não há runner, não há `package.json`, não há um único teste para 17.859 linhas. Entra
 como etapa própria, aditiva, começando pelos módulos mais críticos e mais testáveis:
 `core/http.js`, o registry de `core/app.js`, `masks.js`, `components/collection.js`.
 

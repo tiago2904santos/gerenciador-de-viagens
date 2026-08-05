@@ -20,8 +20,40 @@ trabalho**.
 | `QA` | Testes, CI, segurança, infraestrutura | [`PLANO_MESTRE_REFATORACAO.md`](PLANO_MESTRE_REFATORACAO.md) |
 
 Severidade: 🔴 crítica · 🟠 alta · 🟡 média · ⚪ baixa.
-Origem: `AUD` = auditoria desta sessão · `MED` = medição direta no fio principal · `NOVO` =
-acrescentado depois da abertura do catálogo.
+Origem: `AUD` = auditoria desta sessão · `MED` = medição direta no fio principal · `VER` =
+enunciado corrigido pela passada de verificação · `NOVO` = acrescentado depois da abertura do
+catálogo.
+
+## A passada de verificação de 05/08
+
+Depois de escrito, o catálogo passou por uma rodada adversarial: um cético independente por
+prefixo, com a tarefa de **derrubar** cada enunciado no código real — não de conferi-lo. Onde o
+achado envolvia número, o cético reproduziu a medição; onde envolvia comportamento, escreveu teste
+temporário ou reproduziu no navegador.
+
+Ela se pagou. O saldo, além de vários números ajustados:
+
+- **Um enunciado invertido.** O `DB-01` pedia acrescentar `area` à tabela de diárias. O código
+  documenta o oposto como decisão deliberada. A correção proposta reintroduziria a inconsistência
+  que o desenho evita — e o defeito real era outro (falta de portão de papel na tela de edição).
+- **Um enunciado refutado.** O `JS-12` dizia que dois nomes apontavam para o mesmo objeto; em
+  runtime, `===` devolve `false`. O defeito existe com outra causa.
+- **Um mecanismo de ataque que não se sustenta.** O `BE-08` alegava vazamento de token por
+  `Referer`. O `Referer` reflete a URL da página que fez o POST, não a flash message.
+- **Uma alegação de método que estava errada.** O `UI-01` afirmava existir um único padrão de
+  classe CSS dinâmica no JS. São pelo menos três — a varredura não cobria concatenação com `+`.
+  Isso muda o gate de todo PR de poda de CSS.
+- **Um "sem retry" que o código contradiz.** O `BE-15` dizia que a numeração de OS não tinha
+  retry; tem, e o cético provou em PostgreSQL forçando colisão.
+- **Duas contagens que estavam pequenas demais**, não grandes: o `BE-08` tem 8 sites e não 6, e o
+  `BE-16` tem 1 uso de `excluir_com_protecao` e não 3.
+- **Erro meu, de método:** os totais de linha somavam os bundles gerados às fontes que os compõem.
+  CSS é 43.038 e não 60.707; JS é 17.859 e não 25.492.
+
+Nenhum dos 93 IDs se revelou fabricado ou sem lastro no código. As correções estão registradas
+**dentro de cada ID**, em citação destacada, em vez de reescritas em silêncio — pelo mesmo motivo
+que as auditorias de julho foram arquivadas sem edição: registro de rumo tem valor, e um catálogo
+que apaga os próprios erros ensina a confiar demais nele.
 
 ---
 
@@ -60,10 +92,16 @@ como `<a href>`. Regressão: `GET` deve devolver 405 e o anexo continuar existin
 ### BE-03 🟠 Filtro "criado de/até" da lista de ofícios é descartado em silêncio · AUD · 0,5 d
 
 `oficios/selectors.py:103-112` usa `data_criacao__date__gte`/`__date__lte`, mas
-`Oficio.data_criacao` é `DateField`. Medido:
+`Oficio.data_criacao` é `DateField` (`oficios/models.py:49`). Medido:
 `Oficio.objects.filter(data_criacao__date__gte='2020-01-01')` levanta
-`FieldError: Unsupported lookup 'date__gte' for DateField`. Quatro blocos
-`try/except Exception: pass` engolem o erro.
+`FieldError: Unsupported lookup 'date__gte' for DateField`, e `listar_oficios(criacao_de=...)`
+devolve a lista inteira. **Dois** blocos `try/except Exception: pass` engolem o erro — linhas 106
+e 111.
+
+> **Escopo corrigido pela verificação (05/08):** o enunciado original falava em quatro blocos. São
+> dois. Um terceiro (`:127`) segue o mesmo antipadrão no filtro de viagem, mas opera sobre
+> `DateTimeField` e **não** dispara este erro; o quarto (`:306`) está em outra função e não tem
+> relação com o defeito. Os dois extras continuam valendo como higiene, não como este ID.
 
 **Efeito:** o usuário preenche o intervalo, o sistema devolve a lista inteira e nada indica que o
 filtro foi descartado.
@@ -106,14 +144,24 @@ Com `nome_original` vazio (`blank=True, default=""`), `__str__` devolve `None`.
 **Efeito:** 500 na exclusão; o arquivo some do disco e a linha fica na tabela.
 **Correção:** `str(instance or "")` com fallback `f"{label}#{pk}"`; inverter a ordem no view.
 
-### BE-08 🟠 Seis redirects seguem o que o POST mandar · AUD · 0,5 d
+### BE-08 🟠 Oito redirects seguem o que o POST mandar · AUD+VER · 0,5 d
 
 `core/retorno.py` existe para isso e documenta o risco de open redirect no próprio docstring
 (linhas 22-28), validando com `url_has_allowed_host_and_scheme`. Não é usado em
-`prestacoes_contas`. Sites crus: `views.py:383` e `signature_views.py:108,115,120,128,140,145`.
-**Efeito:** formulário forjado leva o usuário autenticado para fora do domínio. Em
-`assinatura_rt_gerar`/`assinatura_db_gerar` é pior: a view acabou de pôr o link de assinatura numa
-flash message, e o redirect externo vaza o token pelo `Referer`.
+`prestacoes_contas` (zero imports). Sites crus: `views.py:383-384`,
+`signature_views.py:108,115,120` (`assinatura_rt_gerar`), `:128,140,145`
+(`assinatura_db_gerar`), `:150,155` (`assinatura_rt_cancelar`) e `:160,170`
+(`assinatura_db_cancelar`). O helper `_redirect_lista` é reusado por 4 views.
+
+> **Corrigido pela verificação (05/08), em dois pontos.** O escopo era **maior**: são 8 sites, não
+> 6 — as duas views de cancelamento não estavam catalogadas. Mas o mecanismo de ataque estava
+> **errado**: a alegação de que o redirect externo "vaza o token de assinatura pelo `Referer`" não
+> se sustenta. O `Referer` enviado ao domínio externo reflete a URL da página que fez o POST, não
+> o conteúdo da flash message — que vive em sessão e só é renderizada em página do próprio app. O
+> link com token nunca trafega para fora por esse canal.
+
+**Efeito real:** open redirect / *confused deputy* — formulário forjado leva o usuário autenticado
+para fora do domínio logo depois de uma ação que gera ou cancela link de assinatura.
 
 ### BE-09 🔴 Isolamento por área depende de o programador lembrar · AUD · 6 d · risco alto
 
@@ -177,21 +225,39 @@ primeiras já foram gravadas.
 
 ### BE-15 🟡 Numeração de documento reimplementada 3 vezes · AUD · 2 d · risco alto
 
-(a) `oficios/services.py:428-500` — advisory lock, fallback `select_for_update`, reuso de lacunas,
-retry de 3 tentativas; (b) `ordens_servico/models.py:228-245` — mesmo algoritmo copiado dentro do
-model, **sem reuso de lacuna e sem retry**; (c) uma terceira variante.
-**Efeito:** OS não reaproveita número cancelado e devolve `IntegrityError` cru numa corrida
-perdida.
+(a) `oficios/services.py:425-440` — advisory lock, fallback `select_for_update`, reuso de lacunas,
+retry de 3 tentativas; (b) `ordens_servico/models.py:190-245` — `max+1` com
+`pg_advisory_xact_lock`/`select_for_update`, **sem reuso de lacuna**, mas **com** retry de 3
+tentativas; (c) `planos_trabalho/models.py:537-573` — contador incremental em
+`ConfiguracaoSistema.pt_ultimo_numero`, natureza completamente diferente.
+
+> **Enunciado corrigido pela verificação (05/08):** o original dizia que a Ordem de Serviço era
+> "sem reuso de lacuna e sem retry". A parte do retry é **falsa** —
+> `ordens_servico/models.py:200-214` tem um laço `for attempt in range(3)` que recaptura o
+> `IntegrityError` da constraint e tenta de novo. Provado em PostgreSQL real: forçando colisão na
+> primeira tentativa, o `save()` se recupera na segunda, sem exceção.
+
+**Efeito real:** OS não reaproveita número cancelado, então as lacunas se acumulam; e uma corrida
+perdida devolve `IntegrityError` cru **só depois de esgotar as três tentativas** — bem mais raro
+do que o catálogo sugeria.
 **Correção:** `core/numeracao.py::reservar_numero(...)`. Teste de concorrência com duas threads
 **antes** de qualquer mudança.
 
 ### BE-16 🟡 Abstrações de `core` adotadas pela metade · AUD · 2 d · risco baixo
 
 - `core/pagination.contexto_paginacao`: 2 de 14 listas; as outras 12 instanciam `Paginator` direto
-  e sobrevivem **6 cópias privadas** de `_pagination_pages`.
-- `core/deletion.excluir_com_protecao`: 3 usos contra 45 `.delete()` cru — uma FK `PROTECT` vira
-  500 em 42 sites.
-- `core/retorno`: 5 módulos adotam, 6 sites de prestações não (ver `BE-08`).
+  e sobrevivem **6 cópias privadas** de `_pagination_pages` (`cadastros`, `roteiros`, `usuarios`,
+  `termos`, `justificativas`, `core/catalog.py`).
+- `core/deletion.excluir_com_protecao`: **1 uso** (`cadastros/services.py:30`) contra 45
+  `.delete()` cru — uma FK `PROTECT` vira 500 em 44 sites.
+- `core/retorno`: **6 módulos** adotam (`cadastros/views.py`, `oficios/view_navigation.py`,
+  `eventos/views.py`, `termos/views.py`, `documentos/views.py`, `core/catalog.py`); os 8 sites de
+  prestações não (ver `BE-08`).
+
+> **Corrigido pela verificação (05/08):** o catálogo dizia 3 usos de `excluir_com_protecao` e 5
+> módulos adotando `core/retorno`. São **1** e **6**. No primeiro caso a assimetria de adoção é
+> ainda **pior** do que o registrado.
+
 **Correção:** três PRs mecânicos, verificáveis por grep.
 
 ### BE-17 🟡 `core/views.py` é 75% fixture de UI Lab · AUD · 1,5 d
@@ -248,9 +314,14 @@ mistura internamente.
 **Não viaja com nenhuma outra etapa:** renomear rota exige `urls.py` + `reverse()` + templates +
 testes no mesmo PR.
 
-### BE-24 🟡 Repositório com 106 MB de pack e 175 arquivos indevidos · MED · 1 d
+### BE-24 🟡 Repositório com 133 MB de pack e 175 arquivos indevidos · MED+VER · 1 d
 
-`git count-objects -vH` → **size-pack 106,02 MiB**. `screenshots/` = **89 MB** em 130 arquivos
+`git count-objects -vH` → **size-pack 132,98 MiB** (5 packs), medido na verificação. A primeira
+medição desta sessão deu 106,02 MiB; a diferença são commits entrados depois, na mesma sessão —
+o número estava desatualizado, não errado quando escrito. Vale como lembrete de que medida de
+repositório envelhece rápido e precisa ser refeita no PR que a usa como gate.
+
+`screenshots/` = **89 MB** em 130 arquivos
 rastreados (PNGs de 1,5–2,3 MB do UI Lab). Além deles, 175 arquivos rastreados que não deveriam
 estar: `tmp/` (23), `media_teste/` (6), `migration_backups/` (2, um deles um `.dump` do banco),
 `logs/` (2), `.tmp-footer-check/` (3), `.tmp-sede-destinos-check/` (4), `_tmp_check4.py`,
@@ -268,17 +339,26 @@ estar: `tmp/` (23), `media_teste/` (6), `migration_backups/` (2, um deles um `.d
 
 ## DB — Dados, migrações e integridade
 
-### DB-01 🔴 A tabela de diárias é global · AUD · 4 d · risco alto
+### DB-01 🟠 A tabela de diárias é nacional e qualquer EDITOR a altera · AUD+VER · 1,5 d · risco médio
 
-`cadastros/models.py:659-751` — `TabelaDiaria` tem `faixa`, `vigencia_inicio`, `valor_24h`,
-`valor_15`, `valor_30` e **nenhuma FK para `AreaTrabalho`**. `cadastros/selectors.py:28` devolve
-`TabelaDiaria.objects.all()`; `forms.py:801-839` valida unicidade só por faixa+vigência; a tela é
-editável em `cadastros/views.py:644`.
-**Efeito:** qualquer área que edite a tabela muda o valor calculado para todas as outras, sem que
-elas saibam. É a única tabela de dinheiro do sistema e é a que não tem tenant.
-**Correção:** `area` nullable/PROTECT, seguindo o padrão de `Cargo`/`Combustivel`:
-`UniqueConstraint` global condicionada a `area__isnull=True` para os valores padrão, mais
-`UniqueConstraint(area, faixa, vigencia_inicio)`. `vigente_em` passa a receber a área.
+> **Este ID foi reescrito pela verificação (05/08). O enunciado original estava invertido** — ele
+> pedia exatamente a mudança que o código evita de propósito.
+
+`cadastros/models.py:659-751` — `TabelaDiaria` não tem FK para `AreaTrabalho`, e isso **é decisão
+documentada**, não esquecimento. `cadastros/selectors.py:24-28` explica no docstring: *"os valores
+de diária vêm de norma externa e valem para todas as áreas — separá-los por área abriria a porta
+para duas áreas cobrarem valores diferentes pela mesma viagem"*.
+
+O defeito real é outro, e é de autorização: a tela que edita esses valores
+(`cadastros/views.py:620`, rota `configuracao_sistema`) **não tem controle de papel nenhum** além
+do bloqueio genérico a LEITOR feito pelo `AreaRoleRequiredMiddleware`. Qualquer EDITOR de qualquer
+área altera um parâmetro financeiro **nacional**, sem aviso às demais.
+
+**Correção:** portão de permissão na tela (`require_area_role(PAPEL_ADMIN)` ou permissão de
+sistema dedicada — casa com `BE-19`, que aponta `require_area_role` com zero usos) e confirmação
+explícita na interface de que o valor vale para todas as áreas.
+**O que NÃO fazer:** fragmentar a tabela por área. Reintroduziria exatamente a inconsistência que
+o desenho atual evita, e mexeria na regra de dinheiro fechada no ciclo de julho.
 
 ### DB-02 🔴 `area` anulável em 27 de 28 modelos · AUD · 5 d · risco alto
 
@@ -305,14 +385,22 @@ o dele — sem mensagem.
 **Correção:** `filter_queryset_by_area` na base da consulta **e** recorte por idade
 (`created_at__lt=now()-timedelta(minutes=30)`), para não competir com edição em curso.
 
-### DB-04 🟠 Cache de artefato documental não recorta por área · AUD · 1,5 d
+### DB-04 🟡 Cache de artefato documental não recorta por área — risco latente · AUD+VER · 1 d
 
 `documentos/services/document_cache.py:105-133` monta os filtros com `tipo`, `formato`,
 `cache_key` e os ids de referência; `area` nunca entra, embora `DocumentoArtefato.area` exista com
 índice próprio. A chave (`build_document_cache_key`, `:75-103`) é SHA-256 sem a área.
-**Efeito:** documento gerado por uma área pode ser servido a outra quando os payloads coincidem e
-o tipo não carrega id de referência — vazamento de documento inteiro, já renderizado com os dados
-do órgão de origem.
+
+> **Severidade rebaixada pela verificação (05/08): de alta para média.** O enunciado original
+> dizia que documento de uma área "pode ser servido a outra". A verificação rastreou os **6 pontos
+> de chamada reais** e nenhum é alcançável sem uma referência que já escopa o resultado a um único
+> registro de uma única área: ou passam sempre `oficio_id`/`servidor_id`/`termo_id`, ou pulam a
+> leitura do cache quando não há referência (`if plano.evento_id:`, `if oficio is not None:`).
+> **O vazamento não se reproduz no código de hoje.**
+
+**Efeito:** é lacuna estrutural, não vulnerabilidade ativa. A função deveria receber `area` como
+defesa em profundidade — o próximo chamador que esquecer a referência abre o buraco, e nada no
+código o impede.
 
 ### DB-05 🟡 Placa de viatura única globalmente · AUD · 1,5 d
 
@@ -363,11 +451,17 @@ gerado entre duas visualizações do mesmo roteiro.
 roteiros (2.000 na área ativa): `Seq Scan on roteiros_roteirotrecho rows=48000`,
 `Seq Scan on roteiros_roteirodestino rows=48000`.
 
-| volume | tempo |
-|---:|---:|
-| 2.000 | 23,9 ms |
-| 8.000 | 37,6 ms |
-| 24.000 | **127,7 ms** |
+| volume | tempo (1ª medição) | tempo (verificação) |
+|---:|---:|---:|
+| 2.000 | 23,9 ms | — |
+| 8.000 | 37,6 ms | — |
+| 24.000 | 127,7 ms | **56,6 ms** (`EXPLAIN`) · 60–64 ms (ORM completo) |
+
+> **Número corrigido pela verificação (05/08):** a segunda medição, com o mesmo volume e o mesmo
+> `rows=48.000` nos dois `Seq Scan`, deu **menos da metade** do tempo original. O padrão
+> estrutural é o mesmo e está confirmado — a agregação varre as tabelas filhas inteiras
+> independentemente do filtro de área, que já reduz `Roteiro` a 2.000 por *index scan*. O ganho
+> esperado da correção é menor do que o catálogo prometia.
 
 **Efeito:** o custo cresce com o banco inteiro, não com a área do usuário — cada área paga pelo
 volume das outras.
@@ -378,14 +472,27 @@ linha, permitindo parar no `LIMIT`.
 
 `OrdemServico.Meta.indexes` está vazio, enquanto `ordens_servico/selectors.py:38` ordena por
 `('-ano','-numero')` sobre queryset já recortado por área.
-**Ganho medido: 1,965 ms → 0,067 ms (29×)** com `(area_id, ano DESC, numero DESC)`.
+
+**Ganho medido** com `(area_id, ano DESC, numero DESC)`:
+
+| medição | sem índice | com índice | ganho |
+|---|---:|---:|---:|
+| primeira | 1,965 ms | 0,067 ms | 29× |
+| verificação | 0,600 ms | 0,046 ms | **13×** |
+
+As duas concordam na ordem de grandeza e na direção; a segunda é a mais conservadora e é a que
+vale como promessa. Achado extra da verificação: o índice único **parcial** já existente
+(`(area_id, ano, numero) WHERE ano IS NOT NULL AND numero IS NOT NULL`) **não pode ser usado pelo
+planner** nesta consulta — o que reforça a necessidade do índice proposto em vez de enfraquecê-la.
 Ofícios têm situação análoga.
 
 ### DB-11 🟡 As 80 buscas livres são varredura sequencial · AUD · 3 d
 
-80 ocorrências de `__unaccent__icontains`; extensão `unaccent` instalada; **0 índices GIN ou
-trigram** em 390 índices. Prova direta: busca de ofícios com `q="ambi"` → `Seq Scan` em 24.000
-linhas, 35,7 ms para devolver 20 cards.
+80 ocorrências de `__unaccent__icontains`; extensão `unaccent` instalada, `pg_trgm` ausente;
+**0 índices GIN ou trigram** em 390 índices. Prova direta: busca de ofícios com `q="ambi"` sobre
+24.000 registros → `Seq Scan`, **35,7 ms** na primeira medição e **31,3 ms** (`EXPLAIN`) /
+51,1 ms (ORM completo) na verificação, para devolver 20 cards. Os três números batem na ordem de
+grandeza.
 **Correção em duas frentes:** (1) quando `q` for dígito, trocar `oficio__numero__icontains` por
 `oficio__numero=int(q)` — ganho grande, custo quase zero; (2) `pg_trgm` + índices GIN sobre
 expressão nas 4 ou 5 colunas realmente buscadas.
@@ -393,9 +500,21 @@ expressão nas 4 ou 5 colunas realmente buscadas.
 ### DB-12 🟡 Trilha de auditoria cresce sem limite e encarece toda escrita · AUD · 3 d
 
 `core/audit.py:154-159` conecta `pre_save`/`post_save`/`pre_delete` globalmente para 11 apps.
-`capture_before_save` (`:78`) faz um `SELECT` extra em **cada** save de modelo auditado, e
-`capture_after_save` grava snapshot completo em `JSONField`. `core.AuditEvent` tem um único índice
-além da pkey, por objeto — nenhuma consulta por área ou período tem suporte. Não há expurgo.
+`capture_before_save` (`:78`) faz um `SELECT` extra em cada save de modelo auditado, e
+`capture_after_save` grava snapshot completo em `JSONField`. Não há expurgo nem retenção.
+
+> **Enunciado corrigido pela verificação (05/08), em dois pontos.** O `SELECT` extra só ocorre em
+> **UPDATE** (quando `instance.pk` já existe), não em CREATE com PK autoincremento — o custo por
+> escrita é menor do que o original sugeria. E a afirmação de que `AuditEvent` tinha "um único
+> índice além da pkey, sem suporte para consulta por área ou período" é **falsa**: `\d
+> core_auditevent` mostra **10 índices** além da pkey, com coluna única tanto em `area_id`
+> (auto-criado pela FK) quanto em `created_at` (`db_index=True` explícito). O que falta é o índice
+> **composto** `(area_id, created_at)`, para a consulta que cruza os dois eixos — não suporte
+> nenhum.
+
+**Efeito:** a tabela cresce sem teto e sem ninguém decidir isso, e a consulta que uma tela de
+auditoria realmente faz (uma área, um período) cai em dois índices de coluna única em vez de um
+composto.
 
 ### DB-13 🟡 A composição da diária é texto livre · AUD · 4 d · risco alto · **fora desta rodada**
 
@@ -482,23 +601,31 @@ mesmo bloco e foi esquecido nos dois `aria-label`. O dado vem de `CV.http.fetchJ
 por qualquer pessoa com escrita na pasta.
 **Correção:** as duas interpolações passam por `escapeHtml`, igual à 114.
 
-### JS-02 🟠 Ciclo de vida existe e 15 de 18 componentes não o implementam · AUD · 3–4 d · risco médio
+### JS-02 🟠 Ciclo de vida existe e 14 de 17 componentes não o implementam · AUD+VER · 3–4 d · risco médio
 
 `static/js/core/app.js:126-159` define `CV.registerEnhancer(name, init, destroy)` e
 `CV.registry.destroy(root)`, chamado pelo `MutationObserver` (`:137-141`) quando um nó sai do DOM.
-Dos 18 registros, só **3** passam `destroy`: `overlay.js:475`, `wizard-sticky-header.js:118`,
-`autosave.js:430`.
+São **17** registros (não 18), dos quais só **3** passam `destroy`: `overlay.js:475`,
+`wizard-sticky-header.js:118`, `autosave.js:430` — os outros **14** (não 15) não passam. A
+verificação também descartou a hipótese de remoção por outro mecanismo: o único `AbortController`
+do projeto está em `autosave.js:114-119` e serve para abortar `fetch`, não para desregistrar
+listener de DOM.
 Consequência concreta: `picker.js:828` (`document.addEventListener("click", …)`) e
 `cv-date-picker.js:787-788,794-795` (`document` `click`/`keydown`, `window` `scroll`/`resize`) são
 adicionados por instância e nunca removidos. Quando a linha do formulário é removida
 (`location-rows.js:585-586`), o listener global continua vivo referenciando nós desconectados.
 Sinal agregado: 365 `addEventListener` contra **13** `removeEventListener` nas fontes.
 
-### JS-03 🟠 Zero teste automatizado para 25.492 linhas de JS · AUD · 5+ d · risco baixo
+### JS-03 🟠 Zero teste automatizado para 17.859 linhas de JS · AUD+VER · 5+ d · risco baixo
 
 Não há `package.json`, runner, nem `*.test.js` no repositório. Os únicos scripts com Playwright
-são utilitários de captura de tela, fora da suíte. Toda a lógica client-side — cálculo de diárias
-no editor de roteiros, autosave, upload, máscaras, e o `JS-01` acima — só é validada à mão.
+são utilitários de captura de tela, fora de qualquer workflow do `.github`. Toda a lógica
+client-side — cálculo de diárias no editor de roteiros, autosave, upload, máscaras, e o `JS-01`
+acima — só é validada à mão.
+
+> **Número corrigido pela verificação (05/08): 17.859, não 25.492.** A contagem original somava
+> `shell.bundle.js` (7.633 linhas) às fontes que o compõem — dupla contagem do mesmo código. Vale
+> o mesmo para o CSS: **43.038** linhas de fonte, não 60.707.
 
 ### JS-04 🟠 Cadeia de promise sem `.catch` no editor de roteiros · AUD · 0,5 d
 
@@ -509,18 +636,19 @@ irmã `calculateDiarias()` (`:1386`), na mesma página, trata o erro corretament
 **Efeito:** falha de rede na estimativa de distância não avisa nada — os campos ficam vazios e o
 erro vira promise rejeitada só visível no console.
 
-### JS-05 🟠 O auditor de CI cobre 5 dos ~9 invariantes · AUD · 1–2 d
+### JS-05 🟠 O auditor de CI cobre 6 dos ~9 invariantes · AUD+VER · 1–2 d
 
-`scripts/audit_frontend_standards.py:139-176` tem 5 regras JS (`raw_fetch`,
+`scripts/audit_frontend_standards.py:139-176` tem **6** regras JS — `raw_fetch`,
 `duplicated_csrf_header`, `duplicated_debounce`, `duplicated_escape_html`, `duplicated_normalize`,
-`native_feedback`) e `audit_js()` (`:263-268`) pula `*.bundle.js`. Não existe regra para
-`innerHTML` com dado dinâmico, listener sem remoção, `catch` vazio, nem uso de nome de classe CSS
-como condição de lógica.
+`native_feedback` — e `audit_js()` (`:263-268`) pula `*.bundle.js`. (O enunciado original listava
+as seis e somava cinco.) Não existe regra para `innerHTML` com dado dinâmico, listener sem
+remoção, `catch` vazio, nem uso de nome de classe CSS como condição de lógica.
 **Efeito:** `JS-01`, `JS-02` e `JS-06` podem regredir com o CI verde.
 
-### JS-06 🟡 Nome de classe CSS usado como condição de lógica em 9 arquivos · AUD · 1 d
+### JS-06 🟡 Nome de classe CSS usado como condição de lógica em 7 arquivos · AUD+VER · 1 d
 
-`classList.contains("cv-search-picker")` aparece **10 vezes em 9 arquivos**:
+`classList.contains("cv-search-picker")` aparece **10 vezes em 7 arquivos** (o enunciado original
+dizia 9 arquivos e listava 7):
 `components/location-rows.js:16`, `pages/ordens-servico-form.js:119,406`,
 `pages/viaturas-form.js:62`, `pages/planos-trabalho-wizard.js:14,151,318`,
 `pages/termos-form.js:60`, `pages/servidores-form.js:62`, `pages/configuracoes.js:126`.
@@ -531,22 +659,38 @@ estilo — **antes** de qualquer renomeação de CSS.
 
 ### JS-07 🟡 "Fechar ao clicar fora / Esc" reimplementado 4 vezes · AUD · 2 d · risco médio
 
-`components/picker.js:800,828`, `components/cv-date-picker.js:729,787-788`,
-`cv-select.js:131,179,303,313`, `components/picker-select.js:394,432` — sem função compartilhada,
-e já com comportamento divergente (só `cv-select.js` fecha em `scroll`/`resize`).
+`components/picker.js:798,828`, `components/cv-date-picker.js:728-731,787-788`,
+`cv-select.js:131,179,302,313`, `components/picker-select.js:394,432` — quatro implementações sem
+função compartilhada.
+
+> **Detalhe corrigido pela verificação (05/08): estava invertido.** O enunciado dizia que só
+> `cv-select.js` fechava em `scroll`/`resize`. Ele não tem **nenhum** listener desses. Quem tem é
+> `cv-date-picker.js:794-795` — e mesmo ele apenas **reposiciona** o painel aberto
+> (`if (isOpen) positionPanel()`), não o fecha. **Nenhuma das quatro** fecha em scroll ou resize.
+> A duplicação continua real; a divergência citada, não.
 
 ### JS-08 🟡 11% do bundle global atende menos de 1% das páginas · AUD · 2 d · risco médio
 
 | componente | linhas | templates que usam |
 |---|---:|---:|
-| `cv-select.js` | 343 | 1 |
-| `components/file-picker.js` | 274 | 1 |
+| `cv-select.js` | 343 | 1 (e só sob `DEBUG`, via `ui_lab2/selects.html`) |
+| `components/file-picker.js` | 274 | **≥6** |
 | `components/card-toggle.js` | 110 | 1 |
-| `components/segment-nav.js` | 64 | 1 |
+| `components/segment-nav.js` | 64 | **≥4** |
 | `components/signature-actions.js` | 59 | 3 |
 | `components/extra-download.js` | 27 | 1 |
 
 ~877 das 7.633 linhas do bundle, baixadas e analisadas em toda navegação.
+
+> **Coluna corrigida pela verificação (05/08).** A contagem original parava no arquivo que declara
+> o seletor e não seguia a indireção de `{% include %}` por variável. `segment-nav.js` chega a
+> pelo menos 4 templates de produção via `band_tabs_template` (`usuarios/index.html`,
+> `usuarios/areas/index.html`, `cadastros/configuracao/form.html`, `termos/index.html`), e
+> `file-picker.js` a pelo menos 6 via `attach_signed_modal_enabled` (`list_page_standard.html`,
+> `list_page_cards.html`, `oficios/wizard_documentos.html`, `eventos/detalhe.html`,
+> `termos/form.html`, `prestacoes_contas/documentos_form.html`). Os outros quatro conferem.
+> **Consequência:** o ganho de separar o bundle é menor do que o catálogo prometia, e o corte tem
+> que ser decidido por componente, não pelo bloco inteiro.
 
 ### JS-09 🟡 Tela de espera de documento carrega 264 KB para usar 3,3 KB · AUD · 0,5 d
 
@@ -571,9 +715,20 @@ acha.
 `CV.masks.format(value, 'cep')`. `onlyDigits` está reimplementado em `roteiros_wizard.js:2`,
 `components/document-number-field.js:2`, `components/masks.js:9` e `pages/configuracoes.js:2`.
 
-### JS-12 ⚪ `CV.registry` e `CV.componentRegistry` são o mesmo objeto · AUD · 0,25 d
+### JS-12 ⚪ `CV.registry` e `CV.componentRegistry` são duas definições redundantes · ~~AUD~~ VER · 0,25 d
 
-`core/app.js:148-159` atribui os dois nomes ao mesmo literal. Confusão de API pública.
+> **Enunciado original REFUTADO pela verificação (05/08).** Ele dizia que `core/app.js:148-159`
+> atribuía os dois nomes **ao mesmo literal**. O cético carregou o `app.js` real no Node e testou
+> em runtime: `CV.registry === CV.componentRegistry` devolve **`false`**.
+
+São **dois literais de objeto distintos** (`app.js:148-153` e `:154-159`). Três das quatro
+propriedades — `destroy`, `enhance`, `register` — apontam para as mesmas funções
+(`registry.destroy === componentRegistry.destroy` → `true`), mas `registered` é uma função anônima
+declarada duas vezes, com identidades diferentes.
+
+**O defeito existe, com outra causa:** não é aliasing de um objeto, é duplicação de definição —
+uma API pública redundante que pode divergir com o tempo, e já divergiu numa das quatro
+propriedades.
 
 ---
 
@@ -619,14 +774,23 @@ A aposta é que o JS transfere o rótulo — e ele transfere um rótulo que não
 `usuarios`, `termos`, `planos_trabalho`, `ordens_servico`, `core/forms/__init__.py`,
 `core/forms/widgets.py`), com 21 ocorrências.
 
-**Medido no navegador** (campo sem `aria-label`, sem `aria-labelledby`, sem `<label for>`, sem
-`title` e fora de `<label>`):
+**Medido no navegador**, contando **apenas o controle que o usuário de teclado alcança**:
 
 | tela | campos sem nome acessível |
 |---|---:|
-| `/cadastros/servidores/novo/` | 3 (`#id_cargo`, `#id_unidade`, `.cv-search-picker__input`) |
-| `/termos/novo/` | **9** |
+| `/cadastros/servidores/novo/` | **1** (`.cv-search-picker__input` de "Unidade") |
+| `/termos/novo/` | **4** |
 | `/oficios/novo/` | 0 |
+
+> **Contagem corrigida pela verificação (05/08).** A primeira medição deu 3 e 9, e estava
+> inflada: contava nós do DOM em vez de controles expostos. `#id_cargo` é um *decoy* — tem
+> `aria-hidden="true"` e `tabindex="-1"`, e o controle real é o `<button aria-labelledby>` gerado
+> por `picker-select.js:70-90`, **que tem nome**. `#id_unidade`, `#id_oficio`, `#id_servidores` e
+> `#id_viatura` estão em `display:none`, fora da árvore de acessibilidade e do *tab order*. E
+> `id_oficio_busca` tem `aria-label="Buscar ofício vinculado"` no template. O mecanismo continua
+> real, e a causa é mais precisa do que a original: `picker.js:154` cria um
+> `<div class="cv-search-picker__label">` que **nunca** é associado ao input por `aria-labelledby`
+> nem por `for`.
 
 **Efeito:** leitor de tela anuncia "caixa de combinação" sem dizer de quê. Falha WCAG 4.1.2 (A) —
 severidade maior que a do `HT-02`, porque aqui não há nem o rótulo visual associado.
@@ -804,14 +968,34 @@ produção.**
 
 ### UI-01 🟠 36% das classes declaradas não aparecem em lugar nenhum · MED · ver plano de front
 
-2.612 classes declaradas em `static/css` (fora o bundle, que é concatenação); **937 sem nenhuma
+2.612 classes declaradas em `static/css` (fora o bundle, que é concatenação); **~936 sem nenhuma
 ocorrência** num corpus de 4,7 MB com todos os templates, todo o JS e todo o Python dos 15 apps.
 **981 blocos** cujo seletor só usa classes mortas, somando **168 KB**.
 
-O falso positivo clássico foi medido, não presumido: existe **um único** padrão de classe dinâmica
-em todo o `static/js` — `cv-search-picker--${presentation}`
-(`static/js/components/picker.js:144`), que gera `cv-search-picker--compact` e
-`cv-search-picker--vehicle`. Fora essas duas, restam **935 candidatas**.
+> **Enunciado corrigido pela verificação (05/08).** A versão original deste ID afirmava existir
+> **um único** padrão de classe montada dinamicamente em todo o `static/js`. **É falso, e o erro
+> era do método**: a varredura ancorava na aspa de abertura e só procurava `${`, então perdeu
+> interpolação no meio da string e toda concatenação com `+`. Existem **pelo menos três**
+> padrões, em três arquivos de produção:
+>
+> | arquivo | padrão | classes geradas |
+> |---|---|---|
+> | `static/js/components/picker.js:143-144` | `` `cv-search-picker--${mode} cv-search-picker--${variant}` `` e `--${presentation}` | `--single`, `--multi`, `--detailed`, `--compact`, `--vehicle` |
+> | `static/js/pages/usuarios-admin.js:123-124` | `prefix + "__toggle--ready"` / `"--changing"` | `usuario-quick-add__toggle--*`, `area-quick-add__toggle--*` |
+> | `static/js/pages/oficios-viatura-sugestoes.js:127` | `"viatura-sugestao-badge--" + s.reason` | `--motorista`, `--unidade` |
+>
+> Todas essas classes existem no CSS e estavam sendo contadas como mortas. O número de candidatas
+> cai para **no máximo ~929**, e as três telas envolvidas (`usuarios/index.html`,
+> `usuarios/areas/index.html`, `oficios/wizard_dados_viajantes.html`) são de produção, não de
+> laboratório.
+>
+> **Consequência operacional, mais importante que o número:** a prova de grep exigida pelo
+> `AGENTS.md` §3.6 em cada PR de poda **tem que cobrir concatenação com `+` e interpolação no
+> meio da string**, não só `` `${…}` `` no começo. Uma poda guiada pelo método antigo apagaria
+> classe viva.
+>
+> Em Python não há padrão equivalente: nenhuma classe montada por f-string, `+`, `.format()` ou
+> `.join()` fora do enum estático `WidgetStyle`.
 
 | arquivo | blocos mortos | peso |
 |---|---:|---:|
@@ -894,16 +1078,37 @@ produção, mas a frase não está na checklist de campos obrigatórios do `DEPL
 health check em `:116-119`), o `trap ERR` devolve o código antigo rodando contra um schema que ele
 não entende. O backup existe e não é usado — a recuperação vira intervenção manual sob pressão.
 
-### QA-04 🟠 Upload de despacho assinado escapa da política central · AUD · 0,5 d
+### QA-04 🔴 A validação central de upload nunca roda, nos 5 tipos de anexo · AUD+VER · 1,5 d
 
-`prestacoes_contas/models.py:78-82` — `despacho_assinado` usa só `FileExtensionValidator`. No
-**mesmo arquivo**, `:294-296`, o campo `arquivo` usa `validate_private_document_upload`
-(`core/uploads.py:15-49`), que checa tamanho, *magic bytes* de PDF/imagem, bomba de descompressão
-e antivírus quando `PRIVATE_UPLOAD_REQUIRE_ANTIVIRUS=true`.
-O upload é acessível por `prestacoes_contas/document_views.py:301` e o arquivo depois é
-sincronizado para o Google Drive (`integracoes/google_drive/organizer.py:751-754`).
-**Efeito:** arquivo renomeado para `.pdf` passa sem verificação de conteúdo, sem limite de tamanho
-e sem antivírus. É o **único** `FileField` de anexo privado do sistema com essa lacuna.
+> **Este ID foi agravado pela verificação (05/08).** A versão original dizia que **um** campo
+> (`despacho_assinado`) escapava da política central, e que era o único. A verificação achou algo
+> pior, e provou.
+
+`prestacoes_contas/models.py:78-82` — `despacho_assinado` usa só `FileExtensionValidator`, e
+`:294-296` — `PrestacaoDocumentoAnexo.arquivo` **declara** `validate_private_document_upload`
+(`core/uploads.py:15-49`), que checa tamanho, *magic bytes*, bomba de descompressão e antivírus.
+
+Só que:
+
+1. **`despacho_assinado` é campo legado morto.** Nenhuma view ou form atual escreve nele —
+   confirmado por teste: continua vazio depois de um upload real. O upload de verdade vai para
+   `PrestacaoDocumentoAnexo.arquivo`.
+2. **E o `arquivo`, que tem o validador declarado, nunca o executa.** Todos os caminhos de escrita
+   — `document_views.py` e os forms de despacho, ofício assinado, comprovante, RT assinado e
+   diário assinado — criam o registro com `.objects.create()` direto, **sem `full_clean()`**.
+   Validador de campo não roda em `create()`.
+
+**Provado, não inferido:** um arquivo chamado `despacho.pdf` com conteúdo
+`"nao sou um pdf de verdade..."` — sem os *magic bytes* `%PDF-` — foi aceito pela view real
+`prestacao_despacho_assinado_anexar` e gravado tal qual. Com `PRIVATE_UPLOAD_MAX_BYTES=1`
+sobrescrito, um arquivo de 43 bytes também passou.
+
+**Efeito:** a lacuna não é de um campo, é sistêmica nos **5 tipos de anexo** de prestação de
+contas. O validador central citado como presente é, na prática, **código morto**. E o arquivo
+depois é sincronizado para o Google Drive
+(`integracoes/google_drive/organizer.py:751-754`).
+**Correção:** chamar `full_clean()` nos caminhos de escrita, ou mover a validação para o form/
+service — e decidir se `despacho_assinado` sai do modelo.
 
 ### QA-05 🟡 Cliente real do Google Drive com 42,5% de cobertura · AUD · 3 d
 
@@ -938,10 +1143,23 @@ morto, nome não definido em ramo raro ou incompatibilidade de tipo.
 `pip list --outdated`: `pyHanko 0.25.3 → 0.36.2` (11 minors), `pyhanko-certvalidator 0.26.8 →
 0.31.4`, `redis 5.3.1 → 8.1.0` (3 majors), `reportlab 4.5.1 → 5.0.0`, `weasyprint 68.1 → 69.0`,
 `docxtpl 0.19.1 → 0.20.2`, `setuptools 79.0.1 → 83.0.0`.
-`pip-audit` **não** sinalizou CVE nomeada nessas versões: a lacuna é de defasagem, não de
-vulnerabilidade confirmada. `pyHanko` assina e valida PDF digitalmente, e é onde o atraso pesa.
-**Correção:** `pip-compile --upgrade` trimestral com a suíte completa a cada bump, começando por
-`pyhanko`/`pyhanko-certvalidator` isolados — a biblioteca tem quebra de contrato entre minors.
+`pip-audit` rodado na verificação: **"No known vulnerabilities found, 1 ignored"**. A lacuna é de
+defasagem, não de vulnerabilidade confirmada.
+
+> **Enunciado corrigido pela verificação (05/08).** O original dizia que "`pyHanko` assina e valida
+> PDF digitalmente, e é onde o atraso pesa". **É falso.** `grep -rn "pyhanko"` em todo o `.py` de
+> produção devolve **zero** — nenhum import, em lugar nenhum. O fluxo que os usava foi removido
+> (`documentos/migrations/0003_remove_assinatura_fields.py`), e a assinatura eletrônica de hoje
+> carimba o PDF com `pypdf` + `reportlab`, com hash visual, não PKCS#7/PAdES.
+> `pyhanko>=0.21,<0.26` continua em `requirements/base.txt`: é **dependência morta**.
+>
+> Colateral: `docs/ASSINATURA_ETIQUETA_2_COMPAT.md` descreve o fluxo pyHanko como vigente e está
+> desatualizado. Entra como `NOVO-01` abaixo.
+
+**Correção:** antes de agendar atualização trimestral, **decidir se `pyhanko` e
+`pyhanko-certvalidator` simplesmente saem** — não há nada para quebrar. `reportlab`, `weasyprint`,
+`docxtpl` e `redis` seguem em uso e entram no `pip-compile --upgrade` trimestral, com a suíte
+completa a cada bump.
 
 ### QA-09 🟡 Dois templates de `.env` de produção divergentes · AUD · 0,25 d
 
@@ -997,12 +1215,14 @@ regride.
 lógica de criação, edição e exclusão inteiramente fora da cobertura, incluindo o filtro por área
 (`:25` e `:92`).
 
-### QA-15 ⚪ Caminhos de erro da geração de PDF sem teste · AUD · 1,5 d
+### QA-15 ⚪ Caminhos de erro da geração de PDF sem teste · AUD+VER · 1,5 d
 
-`documentos/services/downloads.py` **0%** (16 statements, trata erro de geração);
-`adapters/word_pdf.py` 37,35%; `adapters/weasyprint_pdf.py` 31,82%; `warm_cache.py` 38,24%;
-`libreoffice_resolve.py` 62,35%. (`adapters/excel_pdf.py` está em 0% mas é Windows-only via COM,
-inatingível no CI Linux — não conta como lacuna.)
+`documentos/services/downloads.py` **0%** (16 statements, trata erro de geração) e
+`adapters/weasyprint_pdf.py` ~32% — os dois **confirmados** na verificação.
+`adapters/word_pdf.py` 37,35%, `libreoffice_resolve.py` 62,35% e `warm_cache.py` 38,24% vieram da
+primeira medição e **não foram confirmados nem contraditados**: medi-los exige a suíte completa, e
+ela travou na verificação (ver `NOVO-02`). (`adapters/excel_pdf.py` está em 0% mas é Windows-only
+via `win32com.client` — não conta como lacuna.)
 **Efeito:** os ramos de erro e *fallback* da função mais central do produto só executam quando algo
 já deu errado — exatamente onde falta prova.
 
@@ -1014,6 +1234,22 @@ log estruturado em stdout, sem agregação, alerta ou agrupamento.
 silenciosa de sincronização com o Drive, por exemplo) se acumula sem que ninguém veja.
 Casa com o `BE-18`: adotar `capture()` nos outros apps só tem valor pleno se houver onde os
 eventos aterrissarem.
+
+### NOVO-01 ⚪ `ASSINATURA_ETIQUETA_2_COMPAT.md` descreve um fluxo que não existe mais · VER · 0,25 d
+
+O documento apresenta o fluxo de assinatura com `pyHanko` como vigente. Ele foi removido
+(`documentos/migrations/0003_remove_assinatura_fields.py`), e a assinatura de hoje usa
+`pypdf` + `reportlab`. Mesma família do `HT-13`: documentação de contrato apontando para o
+passado.
+
+### NOVO-02 ⚪ A suíte trava ao combinar certos grupos de apps · VER · a investigar
+
+Na verificação, rodar `documentos` + `oficios` + `termos` + `prestacoes_contas` + `eventos` juntos
+levantou `AttributeError: 'ModelChoiceField' object has no attribute 'to_field_name'`. A suíte
+completa e a suíte por app passam; a combinação parcial não. Cheira a estado global vazando entre
+testes, ou a ordem de importação — e é o tipo de coisa que só aparece quando alguém tenta medir
+cobertura de um subconjunto, que é exatamente o que o `QA-15` precisa fazer.
+**Precisa ser reproduzido numa sessão limpa antes de virar trabalho.**
 
 ### QA-17 ⚪ Treze PRs abertos sem triagem · MED · 1 d
 
