@@ -237,9 +237,16 @@ class CssTokenGateTests(SimpleTestCase):
 #                                  parecidos viravam quatro escolhas no olho.
 #                                  156 usos foram para `--r-md`/`--r-lg`.
 #
+#   +--sh-overlay, +--r-control    o vocabulario de PAPEL (NOVO-55). Custam
+#                                  dois nomes e devolvem a informacao que a
+#                                  escala t-shirt tinha apagado: onde a peca
+#                                  esta na pilha e o que ela e. Sem isso, cada
+#                                  componente estima, e a tela fica incoerente
+#                                  sem nenhuma regra estar errada.
+#
 # O teto continua sendo teto: o proximo nome precisa da mesma justificativa,
-# ou desce. E ele DESCEU de 64 para 62 nesta rodada.
-TETO_DE_TOKENS = 62
+# ou desce.
+TETO_DE_TOKENS = 64
 
 # Prefixo `--_` marca variavel PRIVADA de componente (declarada e consumida no
 # mesmo arquivo). Nao e token de design e nao entra na contagem — mas tambem
@@ -405,7 +412,7 @@ TETO_DA_FORMA_CURTA = {
 # tambem. A escada e o que EXISTE na camada; deixar nomes mortos aqui faria o
 # gate aceitar de volta o que acabou de ser removido.
 _ESCADA = re.compile(
-    r"var\(--(?:sp-[1-8]|r-(?:md|lg|pill)|bd|h-(?:sm|md|lg))\)"
+    r"var\(--(?:sp-[1-8]|r-(?:control|panel|card|pill)|bd|h-(?:sm|md|lg))\)"
 )
 _NEUTROS = frozenset({
     "0", "auto", "inherit", "initial", "unset", "revert", "none", "transparent",
@@ -502,7 +509,7 @@ class EscadaDeGeometriaTests(SimpleTestCase):
 #      voltar por acidente, nao porque seja boa pratica.
 # ===========================================================================
 
-SOMBRAS_PERMITIDAS = frozenset({"var(--sh-sm)", "none"})
+SOMBRAS_PERMITIDAS = frozenset({"var(--sh-raised)", "var(--sh-overlay)", "none"})
 _REGRA_DE_FOCO = re.compile(r":focus(?:-visible|-within)?\b")
 
 
@@ -518,12 +525,49 @@ class SombraEFocoTests(SimpleTestCase):
             f"sombra fora do degrau unico: {sorted(set(vistas) - SOMBRAS_PERMITIDAS)[:8]}",
         )
 
-    def test_a_camada_declara_um_degrau_de_elevacao(self):
+    def test_a_elevacao_e_nomeada_por_PAPEL_e_nao_por_tamanho(self):
+        """NOVO-55: `raised` (pousado) e `overlay` (flutuando) — nao sm/md/lg.
+
+        Nome de tamanho obriga quem escreve a estimar QUANTO de sombra a peca
+        merece, e a estimativa varia por arquivo. Nome de papel responde
+        sozinho: menu flutua, entao e `overlay`; card pousa, entao e `raised`.
+        """
         tokens = (CSS_DIR / "01-tokens.css").read_text(encoding="utf-8")
-        self.assertIn("--sh-sm:", tokens)
-        for morto in ("--sh-md:", "--sh-lg:", "--focus-ring:"):
+        for vivo in ("--sh-raised:", "--sh-overlay:"):
+            with self.subTest(token=vivo):
+                self.assertIn(vivo, tokens)
+        for morto in ("--sh-sm:", "--sh-md:", "--sh-lg:", "--focus-ring:"):
             with self.subTest(token=morto):
                 self.assertNotIn(morto, tokens)
+
+    def test_o_raio_e_nomeado_por_PAPEL_e_nao_por_tamanho(self):
+        """A escala t-shirt (sm/md/lg/xl) foi a origem da incoerencia visual.
+
+        `--r-md` nao diz onde cabe, entao cada componente escolhia no olho e
+        paineis irmaos acabavam com raios diferentes dentro do mesmo card. O
+        sistema anterior ao refactor ja nomeava por papel (`--radius-control`,
+        `--radius-card`); o NOVO-30 trocou por tamanho e o NOVO-55 desfaz.
+        """
+        tokens = (CSS_DIR / "01-tokens.css").read_text(encoding="utf-8")
+        for vivo in ("--r-control:", "--r-panel:", "--r-card:", "--r-pill:"):
+            with self.subTest(token=vivo):
+                self.assertIn(vivo, tokens)
+        for morto in ("--r-sm:", "--r-md:", "--r-lg:", "--r-xl:"):
+            with self.subTest(token=morto):
+                self.assertNotIn(morto, tokens)
+
+    def test_o_canto_aninhado_cresce_de_dentro_para_fora(self):
+        """control < panel < card. Um raio interno MAIOR que o externo deixa
+        aquela sobra em meia-lua no canto — o defeito classico de canto
+        aninhado, que nenhum teste de comportamento pega."""
+        tokens = (CSS_DIR / "01-tokens.css").read_text(encoding="utf-8")
+        valor = {}
+        for nome in ("--r-control", "--r-panel", "--r-card"):
+            m = re.search(rf"{re.escape(nome)}:\s*(\d+)px", tokens)
+            self.assertIsNotNone(m, f"{nome} ausente ou nao e px")
+            valor[nome] = int(m.group(1))
+        self.assertLess(valor["--r-control"], valor["--r-panel"], "controle >= painel")
+        self.assertLess(valor["--r-panel"], valor["--r-card"], "painel >= card")
 
     def test_nenhuma_regra_sinaliza_foco(self):
         """O contorno padrao do navegador tambem conta — dai o reset global."""

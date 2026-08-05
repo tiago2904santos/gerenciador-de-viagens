@@ -67,7 +67,7 @@ body.asgn {
   place-items: center;
   width: 2rem;
   height: 2rem;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: var(--color-primary);
   font-weight: 700;
   font-size: 0.85rem;
@@ -93,9 +93,9 @@ body.asgn {
 .asgn-card {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   padding: var(--sp-5);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 .asgn-card--wide { padding: var(--sp-4); }
 .asgn-card--center { text-align: center; }
@@ -115,7 +115,7 @@ margin-inline: 0; color: var(--cv-ink-muted); line-height: 1.5; }
   color: var(--cv-state-danger);
   border: var(--bd);
   border-color: color-mix(in srgb, var(--cv-state-danger) 35%, transparent);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   padding: var(--sp-3);
   margin-bottom: var(--sp-4);
   font-size: 0.9rem;
@@ -129,7 +129,7 @@ margin-inline: 0; color: var(--cv-ink-muted); line-height: 1.5; }
   gap: 0.4rem;
   border: var(--bd);
   border-color: transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   padding-block: var(--sp-3);
   padding-inline: var(--sp-4);
   font-size: 1rem;
@@ -148,7 +148,7 @@ padding-inline: var(--sp-3); font-size: 0.85rem; }
 .asgn-iconbtn {
   width: 2.4rem;
   height: 2.4rem;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   border: var(--bd);
   background: var(--cv-surface-card);
   font-size: 1.3rem;
@@ -166,12 +166,12 @@ padding-inline: var(--sp-3); font-size: 0.85rem; }
   font-weight: 700;
   padding: var(--sp-3);
   background: var(--cv-surface-block);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
 }
 .asgn-input {
   width: 100%;
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   padding: var(--sp-3);
   font-size: 1.05rem;
   color: var(--cv-ink);
@@ -198,7 +198,7 @@ margin-inline: 0; padding: 0; display: grid; gap: 0.5rem; }
   padding-block: var(--sp-3);
   padding-inline: var(--sp-4);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
 }
 .asgn-doc.is-done { background: color-mix(in srgb, var(--cv-state-success) 12%, var(--cv-surface-card)); border-color: color-mix(in srgb, var(--cv-state-success) 35%, transparent); }
 .asgn-doc__info { display: grid; gap: 0.15rem; }
@@ -231,7 +231,7 @@ margin-inline: 0;
 /* Viewer / stage / drag box */
 .asgn-viewer {
   background: var(--cv-surface-block);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   padding: var(--sp-2);
   overflow: auto;
   display: flex;
@@ -241,7 +241,7 @@ margin-inline: 0;
 .asgn-stage canvas {
   display: block;
   background: var(--on-primary);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 .asgn-drag {
   position: absolute;
@@ -278,8 +278,8 @@ margin-inline: 0; }
   right: 0;
   bottom: 0;
   background: var(--cv-surface-card);
-  border-start-start-radius: var(--r-lg);
-  border-start-end-radius: var(--r-lg);
+  border-start-start-radius: var(--r-card);
+  border-start-end-radius: var(--r-card);
   border-end-end-radius: 0;
   border-end-start-radius: 0;
   padding-block: var(--sp-4) calc(1rem + env(safe-area-inset-bottom));
@@ -293,7 +293,7 @@ margin-inline: 0; }
   padding: var(--sp-2);
   border: var(--bd);
   background: var(--cv-surface-card);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   font-weight: 600;
   cursor: pointer;
   color: var(--cv-ink-muted);
@@ -304,7 +304,7 @@ margin-inline: 0; }
 .asgn-fontlist { display: grid; gap: 0.6rem; }
 .asgn-fontchip {
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: var(--cv-surface-card);
   padding-block: var(--sp-2);
   padding-inline: var(--sp-4);
@@ -324,12 +324,12 @@ margin-inline: 0; }
 .asgn-fontchip--simples { font-family: "Sacramento", cursive; }
 .asgn-fontchip--natural { font-family: "Allura", cursive; }
 .asgn-fontchip--luxuosa { font-family: "Herr Von Muellerhoff", cursive; }
-.asgn-fontchip.is-selected { border-color: var(--color-primary); box-shadow: var(--sh-sm); }
+.asgn-fontchip.is-selected { border-color: var(--color-primary); box-shadow: var(--sh-raised); }
 
 .asgn-drawwrap {
   border: var(--bd);
 border-style: dashed;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background:
     repeating-linear-gradient(0deg, var(--on-primary), var(--on-primary) 23px, var(--cv-surface-page) 24px);
 }

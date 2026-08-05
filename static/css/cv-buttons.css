@@ -24,7 +24,7 @@
   user-select: none;
   transition: var(--tr-fast);
   box-sizing: border-box;
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .cv-btn:hover {
@@ -38,7 +38,7 @@
 .cv-btn:active {
   transform: translateY(1px) scale(0.985);
   filter: brightness(0.985);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .cv-btn:disabled,
@@ -64,7 +64,7 @@
 .cv-btn--primary {
   background: var(--color-primary);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
 }
 
@@ -78,7 +78,7 @@
 .cv-btn--secondary {
   background: var(--cv-surface-block);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--color-primary);
 }
 
@@ -154,7 +154,7 @@
 .cv-btn--danger {
   background: linear-gradient(135deg, var(--cv-state-danger) 0%, var(--cv-state-danger) 100%);
   border-color: color-mix(in srgb, var(--cv-state-danger) 70%, black);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
 }
 
@@ -168,7 +168,7 @@
 .cv-btn--soft-danger {
   background: linear-gradient(135deg, var(--cv-state-danger) 0%, var(--cv-state-danger) 100%);
   border-color: color-mix(in srgb, var(--cv-state-danger) 70%, black);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
 }
 
@@ -182,7 +182,7 @@
 .cv-btn--preview {
   background: var(--cv-surface-block);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-success);
   font-weight: var(--fw-semibold);
 }
@@ -198,7 +198,7 @@
 .cv-btn--pdf {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: rgba(145, 41, 31, 0.92);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-danger);
   font-weight: var(--fw-bold);
 }
@@ -213,7 +213,7 @@
 .cv-btn--docx {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border-color: rgba(24, 69, 125, 0.92);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-warning);
   font-weight: var(--fw-bold);
 }
@@ -288,7 +288,7 @@
   min-height: var(--h-md);
   padding-block: 0;
   padding-inline: var(--sp-4);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
 }
 
 /* Icon sizes */
@@ -327,7 +327,7 @@
    ========================================================= */
 .cv-btn.is-selected,
 .cv-btn[aria-pressed="true"] {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   outline: none;
 }
 
@@ -354,7 +354,7 @@
   background: var(--cv-surface-next);
   border: var(--bd);
   border-radius: var(--r-pill);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-ink);
   cursor: pointer;
   display: inline-flex;
@@ -387,7 +387,7 @@
 }
 
 .cv-icon-btn:active {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   transform: translateY(1px) scale(0.97);
 }
 
@@ -638,7 +638,7 @@
 .cv-icon-btn--pdf {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: rgba(145, 41, 31, 0.92);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--on-state);
 }
 
@@ -652,7 +652,7 @@
 .cv-icon-btn--docx {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border-color: rgba(24, 69, 125, 0.92);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--on-state);
 }
 
@@ -666,7 +666,7 @@
 .cv-icon-btn[data-tooltip]::after {
   background: var(--cv-surface-page);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   bottom: calc(100% + 6px);
   color: var(--cv-ink);
   content: attr(data-tooltip);
@@ -683,7 +683,7 @@
   transform: translateX(-50%) translateY(4px);
   transition: opacity var(--tr-fast), transform var(--tr-fast);
   white-space: nowrap;
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   z-index: var(--z-dropdown);
 }
 
@@ -731,8 +731,8 @@
 .cv-global-tooltip {
   background: var(--cv-surface-page);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-raised);
   color: var(--cv-ink);
   font-family: var(--font-sans);
   font-size: 11px;
@@ -760,7 +760,7 @@
 .cv-global-tooltip.cv-global-tooltip--accent {
   background: var(--color-primary);
   border-color: var(--color-primary);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
 }
 
@@ -777,8 +777,8 @@
   border: 0;
   border-start-start-radius: 0;
   border-start-end-radius: 0;
-  border-end-end-radius: var(--r-lg);
-  border-end-start-radius: var(--r-lg);
+  border-end-end-radius: var(--r-card);
+  border-end-start-radius: var(--r-card);
   border-top: var(--bd);
   color: var(--cv-ink);
   cursor: pointer;

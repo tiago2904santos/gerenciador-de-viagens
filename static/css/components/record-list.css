@@ -11,7 +11,7 @@
 .cv-collection-panel {
   background: var(--cv-surface-block);
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-shadow: none;
   display: grid;
   gap: 12px;
@@ -32,7 +32,7 @@
   align-items: center;
   background: var(--cv-surface-next);
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-shadow: none;
   column-gap: 12px;
   display: grid;
@@ -63,7 +63,7 @@
   background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--color-primary);
   display: inline-flex;
   flex-shrink: 0;

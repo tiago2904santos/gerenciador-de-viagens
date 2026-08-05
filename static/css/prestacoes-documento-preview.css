@@ -8,7 +8,7 @@
 
 .document-inline-card {
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: var(--cv-surface-card);
   box-shadow: none;
   overflow: hidden;
@@ -54,7 +54,7 @@ padding-inline: var(--sp-4);
 
 .document-inline-viewer {
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   overflow: hidden;
   background: var(--cv-surface-block);
   min-height: 200px;

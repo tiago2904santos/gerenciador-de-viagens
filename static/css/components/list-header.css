@@ -8,8 +8,8 @@
 .list-header {
   background: var(--cv-surface-card);
   border: 0;
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -152,7 +152,7 @@
 .list-header__search-input {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   box-sizing: border-box;
   color: var(--cv-ink);
   font-size: var(--fs-sm);
@@ -228,7 +228,7 @@
 .list-header .header-filter-input {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   box-sizing: border-box;
   color: var(--cv-ink);
   font-size: var(--fs-sm);
@@ -260,7 +260,7 @@
 }
 
 .list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2 {
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   height: var(--h-md);
   min-height: var(--h-md);
 }
@@ -362,7 +362,7 @@
   ):is(:hover, :focus, :focus-within, :focus-visible) {
   background: var(--cv-surface-next);
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-sizing: border-box;
   color: var(--cv-ink);
   font-size: var(--fs-sm);
@@ -497,7 +497,7 @@
   animation: list-header-inline-create-fill 0.35s ease forwards;
   background: var(--color-primary);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
 }
 
@@ -552,7 +552,7 @@
   .list-header {
   background: var(--cv-surface-block);
   border-color: var(--cv-border);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 /* A faixa e chrome institucional, nao cabecalho de card (NOVO-55): mesma
@@ -771,8 +771,8 @@
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
   border: var(--bd);
     border-color: transparent;
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-raised);
   color: var(--cv-ink);
   cursor: pointer;
   display: inline-flex;
@@ -864,7 +864,7 @@
 
 .list-header--wizard-band,
 .list-header--wizard-stepper {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   transition:
     border-radius 240ms ease,
     box-shadow 240ms ease;
@@ -881,16 +881,16 @@
 .list-header--wizard-band {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
-  border-top-left-radius: var(--r-lg);
-  border-top-right-radius: var(--r-lg);
+  border-top-left-radius: var(--r-card);
+  border-top-right-radius: var(--r-card);
   overflow: hidden;
   position: relative;
   z-index: 1;
 }
 
 .list-header--wizard-band.is-detached {
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
 }
 
 .list-header--wizard-band .list-header__band {
@@ -915,8 +915,8 @@
 /* Stepper: sticky no scope alto. Colado → topo reto; descola → topo com radius.
    Base sempre arredondada. */
 .list-header--wizard-stepper {
-  border-bottom-left-radius: var(--r-lg);
-  border-bottom-right-radius: var(--r-lg);
+  border-bottom-left-radius: var(--r-card);
+  border-bottom-right-radius: var(--r-card);
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   overflow: hidden;
@@ -926,8 +926,8 @@
 }
 
 .list-header--wizard-stepper.is-detached {
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
 }
 
 .list-header__rail--wizard {
@@ -987,7 +987,7 @@
   background: var(--cv-surface-block);
   background-image: none;
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   box-shadow: none;
   color: var(--cv-ink);
   font-weight: var(--fw-bold);

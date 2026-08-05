@@ -19,10 +19,10 @@
   padding-block: var(--sp-3);
   padding-inline: var(--sp-4);
   border: var(--bd);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   background: var(--cv-surface-card);
   color: var(--cv-ink);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-overlay);
   text-align: left;
 }
 

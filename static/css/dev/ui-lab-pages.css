@@ -7,8 +7,8 @@
   align-items: end;
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   display: flex;
   gap: var(--sp-4);
   justify-content: space-between;
@@ -93,8 +93,8 @@
 .ui-lab-placeholder {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   display: grid;
 }
 
@@ -114,7 +114,7 @@
   aspect-ratio: 1;
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   color: var(--cv-ink);
   display: inline-flex;
   font-size: var(--fs-lg);
@@ -208,13 +208,13 @@
 .ui-lab-demo-field__input {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   height: var(--h-md);
 }
 
 .ui-lab-chips-canvas {
   background: #ffffff;
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   display: grid;
   gap: var(--sp-5);
   padding: var(--sp-6);
@@ -224,8 +224,8 @@
 .ui-lab-status-card {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
 }
 
 .ui-lab-status-showcase {
@@ -372,8 +372,8 @@
   border: var(--bd);
   border-start-start-radius: 0;
   border-start-end-radius: 0;
-  border-end-end-radius: var(--r-lg);
-  border-end-start-radius: var(--r-lg);
+  border-end-end-radius: var(--r-card);
+  border-end-start-radius: var(--r-card);
   box-sizing: border-box;
   color: var(--color-primary);
   cursor: pointer;
@@ -455,8 +455,8 @@
   border: var(--bd);
   border-start-start-radius: 0;
   border-start-end-radius: 0;
-  border-end-end-radius: var(--r-lg);
-  border-end-start-radius: var(--r-lg);
+  border-end-end-radius: var(--r-card);
+  border-end-start-radius: var(--r-card);
   box-sizing: border-box;
   color: var(--color-primary);
   cursor: pointer;
@@ -642,8 +642,8 @@
 .cv-demo-footer-card {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   overflow: hidden;
 }
 
@@ -679,7 +679,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   box-sizing: border-box;
   color: var(--cv-ink);
   font-family: var(--font-sans);
@@ -711,10 +711,10 @@
 
 .cv-field-side-action {
   align-items: center;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   border: var(--bd);
   border-color: transparent;
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   box-sizing: border-box;
   cursor: pointer;
   display: inline-flex;
@@ -796,42 +796,42 @@
 .cv-field-side-action--success {
   background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-success);
 }
 
 .cv-field-side-action--success:hover {
   background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-success);
 }
 
 .cv-field-side-action--warning {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-warning);
 }
 
 .cv-field-side-action--warning:hover {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-warning);
 }
 
 .cv-field-side-action--danger {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-danger);
 }
 
 .cv-field-side-action--danger:hover {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-danger);
 }
 
@@ -855,18 +855,18 @@
 .cv-field-side-action--state.is-active::before,
 .cv-field-side-action--state.cv-field-side-action--success::before {
   background: var(--cv-state-success);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .cv-field-side-action--state.cv-field-side-action--warning::before {
   background: var(--cv-state-warning);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .cv-field-side-action--state.is-inactive::before,
 .cv-field-side-action--state.cv-field-side-action--danger::before {
   background: var(--cv-state-danger);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 @media (max-width: 640px) {
@@ -910,7 +910,7 @@
 .cv-btn--next {
   background: var(--color-primary);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
 }
 
@@ -925,7 +925,7 @@
 .cv-btn--primary-success {
   background: linear-gradient(180deg, #2f9f77, #217d5f);
   border-color: #176349;
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
 }
 
@@ -952,7 +952,7 @@
 .cv-btn--sign {
   background: var(--color-primary);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
 }
 
@@ -1008,7 +1008,7 @@
 .cv-demo-state-tile--active .cv-btn {
   background: var(--cv-surface-card);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   filter: brightness(0.985);
   transform: translateY(1px);
 }
@@ -1045,7 +1045,7 @@
 .cv-demo-select {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   box-sizing: border-box;
   color: var(--cv-ink);
   font-family: var(--font-sans);

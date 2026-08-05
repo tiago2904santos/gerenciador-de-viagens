@@ -3,8 +3,8 @@
 .cv-field-panel {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   display: grid;
   gap: var(--sp-4);
   padding-block: clamp(var(--sp-5), 2.4vw, var(--sp-6));
@@ -47,7 +47,7 @@
 .cv-field-panel__note {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink-muted);
   line-height: 1.5;
   padding-block: var(--sp-3);
@@ -61,7 +61,7 @@
 .cv-date-picker-demo {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   display: grid;
   gap: var(--sp-4);
   min-width: 0;
@@ -136,8 +136,8 @@
   appearance: none;
   background: var(--cv-surface-next);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-raised);
   box-sizing: border-box;
   color: var(--cv-ink);
   font-size: var(--fs-sm);
@@ -195,8 +195,8 @@
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
   border: var(--bd);
     border-color: transparent;
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-raised);
   box-sizing: border-box;
   color: var(--cv-ink);
   cursor: pointer;
@@ -381,8 +381,8 @@
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
   border: var(--bd);
     border-color: transparent;
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-raised);
   box-sizing: border-box;
   color: var(--cv-ink);
   cursor: pointer;
@@ -464,9 +464,9 @@
   border-top: 0;
   border-start-start-radius: 0;
   border-start-end-radius: 0;
-  border-end-end-radius: var(--r-md);
-  border-end-start-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-end-end-radius: var(--r-panel);
+  border-end-start-radius: var(--r-panel);
+  box-shadow: var(--sh-overlay);
   box-sizing:     border-box;
   left:           0;
   list-style:     none;
@@ -488,7 +488,7 @@
 .cv-custom-select__menu::-webkit-scrollbar-track  { background: transparent; }
 .cv-custom-select__menu::-webkit-scrollbar-thumb  {
   background:    var(--cv-border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
 }
 
 /* ─── Opções ────────────────────────────────────────────────────────────── */
@@ -574,7 +574,7 @@
 }
 
 .cv-custom-select--error.cv-custom-select--open .cv-custom-select__trigger {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .cv-custom-select--error .cv-custom-select__chevron {

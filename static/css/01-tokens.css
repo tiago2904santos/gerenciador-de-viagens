@@ -12,7 +12,7 @@
    1. Um tema e um mapa de VALORES DE COR. O bloco escuro abaixo redeclara
       cor e nada mais — nunca raio, nunca espaco, nunca regra de componente.
       Se o escuro precisasse de geometria propria, a regra estaria errada.
-      A UNICA excecao e `--sh-sm`, e ela prova a regra: sombra e cor (a
+      A UNICA excecao sao as sombras, e elas provam a regra: sombra e cor (a
       ausencia dela), e a do escuro nao pode ser a do claro mais forte — tem
       de ser outra, com brilho interno no lugar do traco. O motivo esta
       escrito no ponto da declaracao.
@@ -106,29 +106,42 @@
      A cor da sombra e literal e TROCA com o tema, ao contrario de tudo o mais
      aqui: derivar de `--cv-ink` faria a sombra virar um halo BRANCO no
      escuro, porque a tinta la e clara. Sombra e sempre a ausencia de luz. */
-  --sh-sm:
-    0 1px 2px rgba(7, 17, 29, 0.07),
-    0 8px 24px rgba(7, 17, 29, 0.08);
+  /* Dois papeis, nao dois tamanhos. `raised` e a peca pousada no papel (card,
+     painel, cabecalho); `overlay` e a que FLUTUA sobre a pagina inteira
+     (modal, menu, dropdown) e precisa dizer isso sozinha, porque nao tem uma
+     superficie sob ela para se apoiar. Nao ha terceiro degrau: se uma peca
+     nao esta pousada nem flutuando, ela nao tem sombra. */
+  --sh-raised:
+    0 1px 2px rgba(7, 17, 29, 0.06),
+    0 6px 16px rgba(7, 17, 29, 0.08);
+  --sh-overlay:
+    0 2px 6px rgba(7, 17, 29, 0.10),
+    0 24px 60px rgba(7, 17, 29, 0.22);
 
-  /* ---- raio: DOIS raios e uma forma (NOVO-55) ---------------------------
-     Eram quatro degraus (sm/md/lg/xl) e o problema nunca foi o valor deles —
-     era o USO. Medido antes de mexer: 321 declaracoes em `--r-md`, 197 em
-     `--r-sm`, 65 em `--r-lg`, 40 em `--r-xl`. Ou seja, quatro tokens para
-     dizer a mesma coisa em contextos parecidos, e cada componente escolhendo
-     o seu — dois paineis irmaos dentro do mesmo card com raios diferentes.
+  /* ---- raio: nome de PAPEL, nao de tamanho (NOVO-55) --------------------
+     A escala t-shirt (sm/md/lg/xl) foi o erro de origem, e nenhum ajuste de
+     valor a conserta: `--r-md` nao diz NADA sobre onde cabe, entao quem
+     escreve escolhe no olho, e dois paineis irmaos acabam com raios
+     diferentes. Foi assim que o card do oficio ficou com painel de 8 ao lado
+     de painel de 14 dentro de moldura de 28.
 
-     `--r-sm` foi dissolvido em `--r-md` e `--r-xl` em `--r-lg` (156 trocas).
-     Sobram DOIS raios, e a distancia entre eles e curta de proposito: 12 e 16
-     leem como a mesma familia, nao como duas decisoes.
+     O sistema ANTES do refactor ja resolvia isto, e o refactor jogou fora:
+     `--radius-control`, `--radius-card`, `--radius-panel`, `--radius-shell`.
+     O componente nao escolhia degrau — dizia o que ele e.
 
-       --r-md   raio de trabalho: campo, botao, painel, linha de lista.
-                E o padrao. Na duvida, e este.
-       --r-lg   superficie grande: card, modal, casca de pagina.
-       --r-pill forma, nao raio: chip, aba, avatar.
+       --r-control  o que se toca: campo, botao, select, date picker.
+       --r-panel    o que agrupa dentro de um card: linha de lista, bloco
+                    de fatos, faixa interna.
+       --r-card     a moldura: card, modal, casca de pagina.
+       --r-pill     forma, nao raio: chip, aba, avatar.
 
-     Nao ha terceiro degrau para escolher errado. */
-  --r-md: 12px;
-  --r-lg: 16px;
+     Os valores CRESCEM de dentro para fora (10 < 12 < 18) porque e assim que
+     canto aninhado se comporta: um raio interno maior que o externo cria
+     aquela sobra em meia-lua no canto. Escrever `--r-card` num input passa a
+     ser obviamente errado ao ler — que e o ponto do vocabulario. */
+  --r-control: 10px;
+  --r-panel: 12px;
+  --r-card: 18px;
   --r-pill: 999px;
 
   /* ---- espaco: 4 / 8 / 14 / 20 / 26 / 32 / 44 / 60 (NOVO-55) -------------
@@ -216,7 +229,10 @@ html[data-theme="dark"] {
   /* Sombra mais funda e mais opaca: sobre marinho profundo, a sombra clara do
      tema claro simplesmente nao aparece. O brilho interno de 1px no topo e o
      que da a borda de luz que o card tinha no visual antigo — sem borda. */
-  --sh-sm:
+  --sh-raised:
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 10px 28px rgba(0, 0, 0, 0.38);
+    0 8px 22px rgba(0, 0, 0, 0.34);
+  --sh-overlay:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 28px 64px rgba(0, 0, 0, 0.55);
 }

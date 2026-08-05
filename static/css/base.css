@@ -68,7 +68,7 @@ select,
 textarea {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   color: var(--cv-ink);
   min-height: var(--h-md);
   padding-block: 0;

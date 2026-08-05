@@ -6,9 +6,19 @@
    1. Shell principal
    Sidebar fixa + area principal fluida sem overflow horizontal.
    -------------------------------------------------------------------------- */
+/* Largura FIXA, nao porcentagem (NOVO-55).
+   `15%` e o "problema critico do shell" registrado na linha de base do
+   docs/DARK_UI_REDESIGN_INVENTORY.md: o menu media 192px num notebook de 1280
+   e 288px num monitor de 1920. O conteudo dele — rotulo de modulo, sigla e
+   chevron — nao escala com a tela, entao a coluna tambem nao deve: no monitor
+   sobrava vazio e no notebook "Execucao e prestacao" quebrava em duas linhas
+   muito antes do breakpoint movel.
+
+   252px e a medida do rotulo mais longo em uma linha, com o respiro da escada.
+   Abaixo de 840px a coluna some e o menu vira gaveta, como ja era. */
 .app-shell {
   display: grid;
-  grid-template-columns: 15% minmax(0, 1fr);
+  grid-template-columns: 252px minmax(0, 1fr);
   min-height: 100vh;
 }
 

@@ -180,8 +180,8 @@
 .prestacao-file-list {
   background: color-mix(in srgb, var(--color-primary) 8%, var(--cv-surface-card));
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-raised);
   list-style: none;
   margin-top: var(--sp-2);
   min-width: 0;
@@ -215,8 +215,8 @@
   background: color-mix(in srgb, var(--color-primary) 10%, var(--cv-surface-card));
   border: var(--bd);
   border-color: var(--cv-border);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-raised);
   color: var(--color-primary);
   cursor: pointer;
   display: flex;
@@ -279,10 +279,10 @@ border-bottom-color: currentColor;
   border-color: var(--cv-border);
   border-start-start-radius: 0;
   border-start-end-radius: 0;
-  border-end-end-radius: var(--r-md);
-  border-end-start-radius: var(--r-md);
+  border-end-end-radius: var(--r-panel);
+  border-end-start-radius: var(--r-panel);
   border-top: 0;
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-overlay);
   min-width: 0;
   overflow: hidden;
 }
@@ -290,8 +290,8 @@ border-bottom-color: currentColor;
 .prestacao-file-selection__toggle[hidden] + .prestacao-file-selection__menu {
   border-top: var(--bd);
 border-top-color: var(--cv-border);
-  border-top-left-radius: var(--r-md);
-  border-top-right-radius: var(--r-md);
+  border-top-left-radius: var(--r-panel);
+  border-top-right-radius: var(--r-panel);
 }
 
 .prestacao-file-selection__list {
@@ -372,8 +372,8 @@ border-top-color: var(--cv-border);
   align-items: stretch;
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-raised);
   display: flex;
   min-height: 54px;
   min-width: 0;
@@ -541,7 +541,7 @@ border-top-color: var(--cv-border);
   border-left: var(--bd);
   border-left-color: var(--cv-state-warning);
   border-left-width: 3px;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink-muted);
   font-size: var(--fs-sm);
   line-height: 1.5;
@@ -637,7 +637,7 @@ border-top-style: dashed;
   align-items: flex-start;
   background: var(--cv-surface-next);
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-shadow: none;
   gap: var(--sp-2);
   padding: var(--sp-4);

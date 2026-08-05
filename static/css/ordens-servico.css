@@ -90,7 +90,7 @@
   padding: var(--sp-4);
   box-sizing: border-box;
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: var(--cv-surface-next);
   box-shadow: none;
   cursor: pointer;
@@ -191,7 +191,7 @@
 .os-servidor-role-panel__toggle.cv-segment-toggle {
   background: var(--cv-surface-next);
   border-color: transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-shadow: none;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -201,7 +201,7 @@
 }
 
 .os-servidor-role-panel__toggle .cv-segment-toggle__btn {
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   color: var(--cv-ink-muted);
   justify-content: center;
   min-height: 34px;

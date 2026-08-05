@@ -25,8 +25,8 @@
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
   border: var(--bd);
     border-color: transparent;
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-raised);
   color: var(--cv-ink);
   cursor: pointer;
   display: inline-flex;
@@ -101,7 +101,7 @@
 .cv-date-picker__trigger--icon:hover {
   background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
   transform: translateY(calc(-50% - 1px));
 }
@@ -132,8 +132,8 @@
   /* Quebra de semana: suaviza apenas as quinas da borda; inicio/fim seguem pill. */
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-overlay);
   box-sizing: border-box;
   display: grid;
   gap: var(--sp-3);
@@ -310,7 +310,7 @@
   border: var(--bd);
   border-color: var(--color-primary);
   border-radius: var(--r-pill);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--color-primary);
   display: inline-flex;
   font-size: 9px;
@@ -362,7 +362,7 @@
   background: var(--color-primary);
   border-radius: var(--r-pill);
   bottom: 4px;
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   content: "";
   height: 5px;
   left: 50%;
@@ -377,7 +377,7 @@
 .cv-date-picker__day--today.cv-date-picker__day--range::after,
 .cv-date-picker__day--today.cv-date-picker__day--multi-selected::after {
   background: var(--on-primary);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .cv-date-picker__day--selected,
@@ -396,7 +396,7 @@
     linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary) 100%);
   border: var(--bd);
     border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .cv-date-picker__day--multi-selected:not(.cv-date-picker__day--multi-single)::before {
@@ -426,13 +426,13 @@
 }
 
 .cv-date-picker__day--multi-selected:nth-child(7n)::before {
-  border-bottom-right-radius: var(--r-md);
-  border-top-right-radius: var(--r-md);
+  border-bottom-right-radius: var(--r-panel);
+  border-top-right-radius: var(--r-panel);
 }
 
 .cv-date-picker__day--multi-selected:nth-child(7n + 1)::before {
-  border-bottom-left-radius: var(--r-md);
-  border-top-left-radius: var(--r-md);
+  border-bottom-left-radius: var(--r-panel);
+  border-top-left-radius: var(--r-panel);
 }
 
 .cv-date-picker__day--multi-selected.cv-date-picker__day--multi-start::before,
@@ -491,7 +491,7 @@
  .cv-date-picker .cv-date-picker__day--multi-single::before {
   background: var(--color-primary);
   border-color: transparent;
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
  .cv-date-picker .cv-date-picker__day--multi-selected:hover,
@@ -509,13 +509,13 @@
 }
 
 .cv-date-picker__day--range:nth-child(7n + 1)::before {
-  border-bottom-left-radius: var(--r-md);
-  border-top-left-radius: var(--r-md);
+  border-bottom-left-radius: var(--r-panel);
+  border-top-left-radius: var(--r-panel);
 }
 
 .cv-date-picker__day--range:nth-child(7n)::before {
-  border-bottom-right-radius: var(--r-md);
-  border-top-right-radius: var(--r-md);
+  border-bottom-right-radius: var(--r-panel);
+  border-top-right-radius: var(--r-panel);
 }
 
 .cv-date-picker__day--range.cv-date-picker__day--range-start::before {

@@ -76,11 +76,14 @@ class DarkRedesignContractTests(SimpleTestCase):
         """
         required_tokens = (
             # NOVO-30 fase 3c: `--focus-ring` saiu — o sistema deixou de
-            # sinalizar foco por decisao de produto — e a escada de elevacao
-            # virou um degrau so.
+            # sinalizar foco por decisao de produto.
+            # NOVO-55: elevacao e raio passaram a ser nomeados por PAPEL
+            # (`raised`/`overlay`, `control`/`panel`/`card`) em vez de tamanho
+            # (`sm`/`md`). O eixo continua existindo — e o que este teste
+            # afirma —, so que agora o nome diz onde a peca cabe.
             "--cv-ink:", "--cv-ink-muted:", "--cv-border:",
             "--cv-state-success:", "--cv-state-warning:", "--cv-state-danger:",
-            "--sh-sm:", "--r-md:", "--sp-4:", "--fs-sm:", "--h-md:",
+            "--sh-raised:", "--r-panel:", "--sp-4:", "--fs-sm:", "--h-md:",
             "--tr-base:", "--z-modal:",
         )
         for token in required_tokens:

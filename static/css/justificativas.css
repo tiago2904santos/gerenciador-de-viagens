@@ -274,7 +274,7 @@
   background: var(--color-primary);
   background-image: none;
   border: 0;
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
   font-weight: var(--fw-bold);
 }

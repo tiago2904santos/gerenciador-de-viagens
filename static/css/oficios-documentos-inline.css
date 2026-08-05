@@ -266,7 +266,7 @@
 .oficio-documentos-route-trechos-scroll-card {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-shadow: none;
   display: flex;
   flex-direction: column;
@@ -382,7 +382,7 @@
 }
 
 .oficio-documentos-info-section .oficio-documentos-fact {
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   padding-block: var(--sp-2);
   padding-inline: var(--sp-3);
 }
@@ -405,7 +405,7 @@
 }
 
 .oficio-documentos-info-section .oficio-documentos-traveller-tile {
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   padding-block: var(--sp-2);
   padding-inline: var(--sp-3);
 }
@@ -424,7 +424,7 @@
 .oficio-documentos-route-section .cv-summary-item {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -485,7 +485,7 @@
 
 .document-inline-card {
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: var(--cv-surface-card);
   box-shadow: none;
   overflow: hidden;
@@ -555,7 +555,7 @@ padding-inline: var(--sp-4);
 
 .document-inline-viewer {
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   overflow: hidden;
   background: var(--cv-surface-block);
   min-height: 200px;

@@ -27,11 +27,11 @@
 .roteiro-list-card {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   border-left: var(--bd);
   border-left-color: var(--cv-ink-muted);
   border-left-width: 8px;
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   box-sizing: border-box;
   display: grid;
   gap: var(--sp-2);
@@ -44,7 +44,7 @@
 
 .roteiro-list-card:hover {
   border-color: var(--cv-border);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .roteiro-list-card--faixa-rascunho-atrasado {
@@ -162,7 +162,7 @@
 .roteiro-list-card__diarias-box {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-sizing: border-box;
   display: flex;
   flex: 1 1 auto;
@@ -200,7 +200,7 @@
   align-items: flex-start;
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -381,7 +381,7 @@ padding-inline: var(--sp-4);
 .roteiro-list-card__diarias-metric {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-sizing: border-box;
   min-width: 0;
   padding-block: var(--sp-3);
@@ -452,7 +452,7 @@ padding-inline: var(--sp-4);
 .roteiro-list-card__trecho {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-sizing: border-box;
   flex-shrink: 0;
   padding-block: var(--sp-2);

@@ -13,8 +13,8 @@
   align-items: center;
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   color: var(--color-primary);
   display: flex;
   gap: var(--sp-3);

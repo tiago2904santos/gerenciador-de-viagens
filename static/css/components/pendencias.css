@@ -6,7 +6,7 @@
    ======================================================================== */
 
 .cv-pendencias {
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   margin-bottom: var(--sp-4);
   overflow: hidden;
 }
@@ -15,14 +15,14 @@
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
   border-color: var(--cv-state-danger);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .cv-pendencias--warning {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
   border-color: var(--cv-state-warning);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .cv-pendencias__inner {

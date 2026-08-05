@@ -29,7 +29,7 @@
 .cv-icon-btn--documents {
   background: var(--cv-surface-block);
   border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-warning);
 }
 
@@ -43,7 +43,7 @@
 .cv-icon-btn--whatsapp {
   background: var(--cv-surface-block);
   border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-success);
 }
 
@@ -60,8 +60,8 @@
   background: color-mix(in srgb, var(--cv-surface-card) 96%, transparent);
   border: var(--bd);
   border-color: color-mix(in srgb, var(--cv-border) 78%, color-mix(in srgb, var(--cv-ink) 60%, white));
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-overlay);
   gap: 5px;
   min-width: 270px;
   padding: var(--sp-2);
@@ -107,7 +107,7 @@
   background: color-mix(in srgb, var(--tone-neutral) 10%, transparent);
   border: var(--bd);
   border-color: color-mix(in srgb, var(--tone-neutral) 16%, transparent);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--tone-neutral);
   display: inline-flex;
   flex: 0 0 34px;
@@ -124,7 +124,7 @@
 .cv-action-menu__item {
   border: var(--bd);
 border-color: transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   gap: 10px;
   min-height: 52px;
   padding: var(--sp-2);
@@ -178,7 +178,7 @@ border-color: transparent;
  .cv-action-menu {
   background: color-mix(in srgb, var(--cv-surface-card) 98%, transparent);
   border-color: color-mix(in srgb, var(--cv-ink) 28%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-overlay);
 }
 
  .cv-action-menu__item:hover,
@@ -191,7 +191,7 @@ border-color: transparent;
  .cv-record-card .cv-icon-btn--complete {
   background: linear-gradient(145deg, color-mix(in srgb, var(--cv-state-success) 55%, black), color-mix(in srgb, var(--cv-state-success) 44%, black));
   border-color: color-mix(in srgb, var(--cv-state-success) 88%, black);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: color-mix(in srgb, var(--cv-state-success) 45%, white);
 }
 

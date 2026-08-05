@@ -91,8 +91,8 @@
 
 /* Container: card com radius e sombra */
 .page-header--clean {
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   overflow:      hidden;
   width:         100%;
 }
@@ -187,8 +187,8 @@
 .page-stepper {
   background:      var(--cv-surface-card);
   border: var(--bd);
-  border-radius:   var(--r-lg);
-  box-shadow:      var(--sh-sm);
+  border-radius:   var(--r-card);
+  box-shadow:      var(--sh-raised);
   box-sizing:      border-box;
   overflow-x:      auto;
   padding-block: var(--sp-4);
@@ -340,7 +340,7 @@
 .page-stepper__item.is-current .page-stepper__marker {
   background:   var(--color-primary);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color:        var(--on-primary);
 }
 
@@ -465,8 +465,8 @@
 .main-form-panel {
   background:     var(--cv-surface-card);
   border: var(--bd);
-  border-radius:  var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius:  var(--r-card);
+  box-shadow: var(--sh-raised);
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
@@ -476,13 +476,13 @@
 
 /* Primeira seção e rodapé seguem o radius do painel (evita quinas no topo/base) */
 .main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) > .form-section:first-child {
-  border-top-left-radius:  var(--r-lg);
-  border-top-right-radius: var(--r-lg);
+  border-top-left-radius:  var(--r-card);
+  border-top-right-radius: var(--r-card);
 }
 
 .main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) > .footer-actions:last-child {
-  border-bottom-left-radius:  var(--r-lg);
-  border-bottom-right-radius: var(--r-lg);
+  border-bottom-left-radius:  var(--r-card);
+  border-bottom-right-radius: var(--r-card);
 }
 
 .main-form-panel .field-grid,
@@ -524,10 +524,10 @@
   background:    var(--cv-surface-card);
   border-start-start-radius: 0;
   border-start-end-radius: 0;
-  border-end-end-radius: var(--r-lg);
-  border-end-start-radius: var(--r-lg);
+  border-end-end-radius: var(--r-card);
+  border-end-start-radius: var(--r-card);
   border-top: var(--bd);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   margin-top:    calc(-1 * var(--_stack-gap, var(--sp-4)));
 }
 
@@ -537,8 +537,8 @@
 .main-form-panel--stack .roteiro-editor--oficio .roteiro-editor__section {
   background:    var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   overflow:      hidden;
   width:         100%;
 }
@@ -669,8 +669,8 @@ padding-inline: var(--sp-6);
 .cv-form-section-card {
   background:    var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   overflow:      hidden;
   width:         100%;
 
@@ -744,7 +744,7 @@ padding-inline: var(--sp-6);
      `--color-accent` guardou o azul, entre o NOVO-28 e o NOVO-55. */
   background:    linear-gradient(180deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 50%, transparent) 100%);
   border-radius: var(--r-pill);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   content:       "";
   /* O filete acompanha todo o bloco de conteúdo, inclusive subtítulos e ações. */
   bottom:        var(--_wizard-filete-inset-block);
@@ -826,8 +826,8 @@ padding-inline: var(--sp-6);
 
 .cv-form-section-header--standalone {
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   min-height: 0;
   overflow: hidden;
   padding-block: var(--sp-4);
@@ -953,8 +953,8 @@ padding-inline: var(--sp-6);
 .list-panel {
   background:     var(--cv-surface-card);
   border: var(--bd);
-  border-radius:  var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius:  var(--r-card);
+  box-shadow: var(--sh-raised);
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
@@ -1208,7 +1208,7 @@ padding-inline: var(--sp-6);
   background: color-mix(in srgb, var(--cv-state-danger) 12%, transparent);
   border: var(--bd);
   border-color: color-mix(in srgb, var(--cv-state-danger) 46%, transparent);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-state-danger);
   display: block;
   font-size: var(--fs-sm);
@@ -1242,8 +1242,8 @@ body.has-delete-modal-open {
 .delete-confirm-modal__dialog {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   box-sizing: border-box;
   display: grid;
   gap: var(--sp-4);
@@ -1366,8 +1366,8 @@ body.has-delete-modal-open {
 .cv-action-menu {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-overlay);
   display: none;
   flex-direction: column;
   gap: 2px;
@@ -1384,7 +1384,7 @@ body.has-delete-modal-open {
   align-items: center;
   background: transparent;
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink);
   cursor: pointer;
   display: flex;
@@ -1621,8 +1621,8 @@ body.has-delete-modal-open {
    ========================================================= */
 
 .page-header-stack {
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   overflow:      hidden;
   width:         100%;
 }
@@ -1736,7 +1736,7 @@ body.has-delete-modal-open {
 
 /* Alerta inline simples (ex.: aviso de cancelamento) */
 .cv-alert {
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   padding-block: var(--sp-3);
   padding-inline: var(--sp-4);
   font-size:     var(--fs-sm);
@@ -1972,14 +1972,14 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   animation:    inline-create-btn-fill 0.4s cubic-bezier(0, 0, 0.2, 1) forwards;
   background:   var(--color-primary);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color:        var(--on-primary);
 }
 
 .cv-inline-create__toggle.is-filled:hover {
   background:   color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 @keyframes inline-create-btn-fill {
@@ -2059,7 +2059,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   border-radius: 0;
   box-shadow: none;
   overflow: visible;
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
 }
 
 .list-panel > .pagination-shell + .simple-list {
@@ -2085,8 +2085,8 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 .list-card {
   background:     var(--cv-surface-card);
   border: var(--bd);
-  border-radius:  var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius:  var(--r-panel);
+  box-shadow: var(--sh-raised);
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
@@ -2099,7 +2099,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 
 .list-card:hover {
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .list-card__footer {
@@ -2141,7 +2141,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   padding-inline: var(--sp-4);
   border-start-start-radius: 0;
   border-start-end-radius: 0;
-  border-end-end-radius: var(--r-md);
+  border-end-end-radius: var(--r-panel);
   border-end-start-radius: 0;
   display: inline-flex;
   align-items: center;
@@ -2215,9 +2215,9 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   background:    var(--cv-surface-block);
   border: var(--bd);
   border-start-start-radius: 0;
-  border-start-end-radius: var(--r-md);
-  border-end-end-radius: var(--r-md);
-  border-end-start-radius: var(--r-md);
+  border-start-end-radius: var(--r-panel);
+  border-end-end-radius: var(--r-panel);
+  border-end-start-radius: var(--r-panel);
   box-shadow:    none;
   box-sizing:    border-box;
   width:         100%;
@@ -2252,7 +2252,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   align-items:     center;
   background:      transparent;
   border: 0;
-  border-radius:   var(--r-md);
+  border-radius:   var(--r-panel);
   color:           var(--cv-ink-muted);
   cursor:          pointer;
   display:         flex;
@@ -2295,7 +2295,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 }
 
 .cv-inline-create__actions .btn {
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
 }
 
 .cv-inline-create__actions .btn-primary {
@@ -2526,7 +2526,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 .header-filter-input {
   background:    var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   box-sizing:    border-box;
   color:         var(--cv-ink);
   font-size:     var(--fs-sm);
@@ -2550,7 +2550,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
   appearance:    none;
   background:    var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   box-sizing:    border-box;
   color:         var(--cv-ink);
   cursor:        pointer;
@@ -2617,7 +2617,7 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 
 @media (max-width: 600px) {
   .page-header-stack {
-    border-radius: var(--r-md);
+    border-radius: var(--r-panel);
   }
 
   .page-header-band,
@@ -2762,8 +2762,8 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 #quick-add-modelo-motivo .cv-field__control--textarea {
   background: var(--cv-surface-next);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-raised);
   box-sizing: border-box;
   color: var(--cv-ink);
   font-size: var(--fs-sm);
@@ -2804,8 +2804,8 @@ padding-inline: 0; /* só o gap entre o divisor e o input */
 #quick-add-atividade .cv-field__control--textarea {
   background: var(--cv-surface-next);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-raised);
   box-sizing: border-box;
   color: var(--cv-ink);
   font-size: var(--fs-sm);

@@ -36,7 +36,7 @@
 .ui-lab2-component__preview {
   border: var(--bd);
 border-style: dashed;
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   background: var(--cv-surface-card);
   padding: var(--sp-4);
   overflow: auto;
@@ -128,7 +128,7 @@ margin-inline: 0;
 .ui-lab2-placeholder {
   border: var(--bd);
 border-style: dashed;
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   background: var(--cv-surface-card);
   padding: var(--sp-6);
   text-align: center;

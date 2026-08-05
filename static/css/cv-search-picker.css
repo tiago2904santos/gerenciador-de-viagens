@@ -43,8 +43,8 @@
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
   border: var(--bd);
     border-color: transparent;
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-raised);
   box-sizing: border-box;
   display: flex;
   gap: var(--sp-2);
@@ -180,10 +180,10 @@ border-color: currentColor;
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   align-self: stretch;
   border: 0;
-  border-start-start-radius: var(--r-md);
+  border-start-start-radius: var(--r-panel);
   border-start-end-radius: 0;
   border-end-end-radius: 0;
-  border-end-start-radius: var(--r-md);
+  border-end-start-radius: var(--r-panel);
   border-right: var(--bd);
   border-right-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
   box-shadow: none;
@@ -258,10 +258,10 @@ border-color: currentColor;
   border: var(--bd);
   border-start-start-radius: 0;
   border-start-end-radius: 0;
-  border-end-end-radius: var(--r-md);
-  border-end-start-radius: var(--r-md);
+  border-end-end-radius: var(--r-panel);
+  border-end-start-radius: var(--r-panel);
   border-top: 0;
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-overlay);
   box-sizing: border-box;
   left: 0;
   overflow: hidden;
@@ -274,7 +274,7 @@ border-color: currentColor;
 
 .cv-search-picker__dropdown.cv-floating-dropdown--active {
   background: var(--cv-surface-card);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   border-top: var(--bd);
   overflow: hidden;
   /* Portal no body: precisa ficar acima do modal (--z-modal), senão o menu
@@ -283,7 +283,7 @@ border-color: currentColor;
 }
 
 .cv-search-picker--open .cv-search-picker__dropdown {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-overlay);
   clip-path: inset(0 calc(var(--sp-1) * -1) calc(var(--sp-1) * -1) calc(var(--sp-1) * -1));
 }
 
@@ -328,7 +328,7 @@ border-color: currentColor;
   background: transparent;
   border: var(--bd);
   border-color: transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink);
   cursor: pointer;
   display: flex;
@@ -347,13 +347,13 @@ border-color: currentColor;
 }
 
 .cv-search-picker__option:first-child {
-  border-top-left-radius: var(--r-md);
-  border-top-right-radius: var(--r-md);
+  border-top-left-radius: var(--r-panel);
+  border-top-right-radius: var(--r-panel);
 }
 
 .cv-search-picker__option:last-child {
-  border-bottom-left-radius: var(--r-md);
-  border-bottom-right-radius: var(--r-md);
+  border-bottom-left-radius: var(--r-panel);
+  border-bottom-right-radius: var(--r-panel);
 }
 
 .cv-search-picker__option:hover,
@@ -386,7 +386,7 @@ border-color: currentColor;
 }
 
 .cv-search-picker__option--unidade .cv-search-picker__option-marker {
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   border-style: dashed;
 }
 
@@ -450,7 +450,7 @@ border-bottom-color: currentColor;
   border: var(--bd);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
   border-style: dashed;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink-muted);
   font-size: var(--fs-sm);
   line-height: 1.45;
@@ -468,7 +468,7 @@ border-bottom-color: currentColor;
   background: var(--cv-surface-block);
   border: var(--bd);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   display: grid;
   gap: var(--sp-3);
   min-width: 0;
@@ -532,8 +532,8 @@ border-bottom-color: currentColor;
   background: var(--cv-surface-card);
   border: var(--bd);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-raised);
   display: grid;
   column-gap: 0;
   grid-template-columns: 0 minmax(0, 1fr) auto;
@@ -566,7 +566,7 @@ border-bottom-color: currentColor;
 
 .cv-search-picker__selected-card--has-term {
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .cv-search-picker__selected-main {
@@ -718,7 +718,7 @@ border-bottom-color: currentColor;
   background: var(--cv-surface-next);
   border: var(--bd);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink);
   cursor: pointer;
   display: flex;

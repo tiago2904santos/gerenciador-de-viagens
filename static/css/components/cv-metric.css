@@ -44,7 +44,7 @@
 .cv-summary-item {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   min-height: 76px;
   padding: var(--sp-3);
 }
@@ -54,8 +54,8 @@
 .cv-summary-tile {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   display: grid;
   gap: var(--sp-2);
   min-width: 0;
@@ -68,7 +68,7 @@
 
 .cv-metric--tile:hover,
 .cv-summary-tile:hover {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 /* Rótulo */

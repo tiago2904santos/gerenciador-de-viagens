@@ -61,10 +61,10 @@
   flex: 0 0 auto;
   width: 40px;
   height: 40px;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: var(--cv-surface-block);
   border: var(--bd);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   font-size: 18px;
   line-height: 1;
   color: var(--color-primary);
@@ -89,10 +89,10 @@
   gap: var(--sp-1);
   padding-block: var(--sp-3);
   padding-inline: var(--sp-4);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: var(--cv-surface-block);
   border: var(--bd);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .gdrive-meta__label {
@@ -118,7 +118,7 @@
   gap: var(--sp-1);
   padding-block: var(--sp-3);
   padding-inline: var(--sp-4);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
@@ -201,7 +201,7 @@
   align-items: center;
   gap: var(--sp-2);
   padding: var(--sp-4);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
   border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
@@ -246,7 +246,7 @@
   flex-direction: column;
   gap: var(--sp-3);
   padding: var(--sp-4);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: var(--cv-surface-block);
   border: var(--bd);
 }
@@ -279,7 +279,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 2px;
   padding: var(--sp-1);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: var(--cv-surface-page);
   border: var(--bd);
   box-shadow: none;
@@ -292,7 +292,7 @@
   padding: var(--sp-2);
   border: var(--bd);
   border-color: transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: transparent;
   color: var(--cv-ink-muted);
   font: inherit;
@@ -313,7 +313,7 @@
   background: var(--cv-surface-card);
   border-color: var(--cv-border);
   color: var(--color-primary);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 @media (max-width: 520px) {
@@ -336,7 +336,7 @@
   align-items: center;
   gap: var(--sp-2);
   padding: var(--sp-1);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   border: var(--bd);
   border-color: transparent;
   transition:
@@ -391,7 +391,7 @@
   padding-inline: var(--sp-2);
   background: none;
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--color-primary);
   cursor: pointer;
   font-size: var(--fs-xs);
@@ -471,7 +471,7 @@
   gap: var(--sp-3);
   padding-block: var(--sp-3);
   padding-inline: var(--sp-4);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: var(--cv-surface-block);
   border: var(--bd);
 }
@@ -563,7 +563,7 @@
   gap: var(--sp-3);
   padding-block: var(--sp-3);
   padding-inline: var(--sp-4);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
@@ -655,7 +655,7 @@
   gap: var(--sp-2);
   padding-block: var(--sp-3);
   padding-inline: var(--sp-4);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: var(--cv-surface-block);
   border: var(--bd);
 }
@@ -686,7 +686,7 @@
   overflow: hidden;
   padding-block: var(--sp-1);
   padding-inline: var(--sp-2);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: var(--cv-surface-card);
   text-overflow: ellipsis;
   white-space: nowrap;

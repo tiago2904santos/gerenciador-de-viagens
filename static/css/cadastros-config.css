@@ -45,7 +45,7 @@
 
   .cadastros-form-page[data-configuracoes-shell]
   .cv-date-picker__control {
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   overflow: hidden;
 }
 

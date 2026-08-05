@@ -29,8 +29,8 @@
   align-items: stretch;
   background: var(--cv-surface-card);
   border: 0;
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-raised);
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
   min-height: 56px;
@@ -48,7 +48,7 @@
 .prestacao-file-widget.is-dragover .prestacao-file-picker {
   background: color-mix(in srgb, var(--color-primary) 16%, var(--cv-surface-card));
   border-color: var(--color-primary);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .cv-file-widget.is-error .cv-file-picker,
@@ -184,7 +184,7 @@
   align-items: center;
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink);
   cursor: pointer;
   display: flex;
@@ -221,8 +221,8 @@ border-bottom-color: currentColor;
 .prestacao-file-list {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-overlay);
   min-width: 0;
   overflow: hidden;
 }

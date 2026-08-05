@@ -35,7 +35,7 @@
   gap: var(--sp-2);
   padding-block: var(--sp-3);
   padding-inline: var(--sp-4);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: color-mix(in srgb, var(--color-primary) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
@@ -61,15 +61,15 @@
   display: flex;
   flex-direction: column;
   border: var(--bd);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   background: var(--cv-surface-block);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   overflow: hidden;
   transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .pte-card:hover {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   border-color: var(--cv-border);
 }
 
@@ -194,7 +194,7 @@
 /* Card destacado quando o evento está sendo editado no rascunho. */
 .pte-card--editing {
   border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .pte-card__badge {
@@ -262,7 +262,7 @@
   gap: var(--sp-1);
   padding-block: var(--sp-3);
   padding-inline: var(--sp-4);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: var(--cv-surface-card);
   border: var(--bd);
   min-width: 0;
@@ -356,7 +356,7 @@
   display: block;
   padding-block: var(--sp-2);
   padding-inline: var(--sp-3);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: color-mix(in srgb, var(--color-primary) 8%, var(--cv-surface-block));
   border: var(--bd);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
@@ -373,7 +373,7 @@
   gap: var(--sp-2);
   padding-block: var(--sp-2);
   padding-inline: var(--sp-3);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: var(--cv-surface-block);
   border: var(--bd);
 }
@@ -387,7 +387,7 @@
   height: 1.6rem;
   padding-block: 0;
   padding-inline: var(--sp-1);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: color-mix(in srgb, var(--color-primary) 16%, transparent);
   color: var(--color-primary);
   font-size: var(--fs-sm);
@@ -489,10 +489,10 @@
   padding-block: 0;
   padding-inline: var(--sp-4);
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   background: var(--color-primary);
   background-image: none;
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
   font-weight: var(--fw-bold);
   text-shadow: none;
@@ -503,7 +503,7 @@
   border: 0;
   background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
   background-image: none;
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
   transform: none;
 }
@@ -526,7 +526,7 @@
 .pt-document-preview {
   overflow: hidden;
   border: 0;
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   background: var(--cv-surface-card);
 }
 
@@ -554,7 +554,7 @@
   flex: 0 0 auto;
   place-items: center;
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: var(--cv-surface-card);
   color: var(--color-primary);
 }
@@ -612,7 +612,7 @@
 
 .pt-documentos-stage .document-inline-viewer {
   border: 0;
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   background: var(--cv-surface-card);
 }
 
@@ -809,7 +809,7 @@
 
 .pt-texto-block .cv-field__control--textarea::-webkit-scrollbar-thumb {
   background: var(--cv-border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
 }
 
 /* ── Etapa 2 · Deslocamento e diárias ────────────────────────────────────────
@@ -869,7 +869,7 @@
 #pt-card-diarias .pt-diarias-summary-card {
   background: var(--cv-surface-next);
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-shadow: none;
   gap: var(--sp-2);
   padding-block: var(--sp-3);
@@ -938,7 +938,7 @@
    Diárias precisa do mesmo --step1-panel dos travel-document-block. */
 .pt-efetivo-section.route-destinos-block.route-destinos-block--split {
   background: var(--cv-surface-block);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   margin: 0;
   padding: var(--sp-3);
 }
@@ -1045,7 +1045,7 @@
 .pt-efetivo-fields .pt-quantidade-stepper {
   align-items: stretch;
   background: var(--cv-surface-next);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   display: grid;
   gap: 0;
   grid-template-columns: 2.25rem minmax(2rem, 1fr) 2.25rem;
@@ -1184,8 +1184,8 @@
  .evento-solicitacao-list .prestacao-file-list__item {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   min-height: 76px;
   padding-block: var(--sp-4);
   padding-inline: var(--sp-7) var(--sp-4);
@@ -1204,7 +1204,7 @@
  .evento-solicitacao-list .prestacao-file-list__item:hover {
   background: var(--cv-surface-block);
   border-color: var(--cv-border);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
  .evento-solicitacao-list .prestacao-file-list__item:hover::before {

@@ -17,7 +17,7 @@
   padding-block: clamp(var(--sp-6), 5vw, var(--sp-8));
   padding-inline: clamp(var(--sp-6), 5vw, var(--sp-8));
   border: 0;
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   background: var(--cv-surface-card);
   text-align: center;
 }
@@ -29,7 +29,7 @@
   margin-bottom: var(--sp-4);
   place-items: center;
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   background: var(--cv-surface-block);
   color: var(--color-primary);
 }

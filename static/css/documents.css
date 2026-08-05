@@ -1,7 +1,7 @@
 .document-preview {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   padding: var(--sp-6);
 }
 

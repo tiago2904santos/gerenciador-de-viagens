@@ -18,8 +18,8 @@
     no-repeat right var(--sp-3) center / 16px 16px,
     var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-raised);
   box-sizing: border-box;
   color: var(--cv-ink);
   cursor: pointer;
@@ -55,8 +55,8 @@
   animation: cv-dropdown-enter 160ms ease both;
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-overlay);
   list-style: none;
   margin: 0;
   max-height: 280px;
@@ -92,7 +92,7 @@
 /* Item de acao */
 .cv-action-dropdown__item {
   align-items: center;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink);
   cursor: pointer;
   display: flex;
@@ -163,7 +163,7 @@
 /* Estado aberto — o trigger pode receber classe is-open via JS */
 .cv-action-dropdown--open > [data-cv-dropdown-trigger],
 .cv-action-dropdown > [data-cv-dropdown-trigger][aria-expanded="true"] {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 /* =========================================================
@@ -181,7 +181,7 @@
   background: var(--cv-surface-card);
   border: var(--bd);
   border-radius: var(--r-pill);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   box-sizing: border-box;
   color: var(--cv-ink);
   cursor: pointer;
@@ -227,7 +227,7 @@
 
 .cv-filter-dropdown__option {
   align-items: center;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink);
   cursor: pointer;
   display: flex;
@@ -318,8 +318,8 @@
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
   border: var(--bd);
     border-color: transparent;
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-raised);
   box-sizing: border-box;
   color: var(--cv-ink);
   cursor: pointer;
@@ -403,9 +403,9 @@
   border-top: 0;
   border-start-start-radius: 0;
   border-start-end-radius: 0;
-  border-end-end-radius: var(--r-md);
-  border-end-start-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-end-end-radius: var(--r-panel);
+  border-end-start-radius: var(--r-panel);
+  box-shadow: var(--sh-overlay);
   box-sizing: border-box;
   left: 0;
   list-style: none;
@@ -426,7 +426,7 @@
 
 .cv-custom-select__menu.cv-floating-dropdown--active {
   background: var(--cv-surface-card);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   border-top: var(--bd);
   overflow: hidden;
   /* Portal no body: acima do modal, mesmo contrato do search-picker. */
@@ -437,7 +437,7 @@
 .cv-custom-select__menu::-webkit-scrollbar-track { background: transparent; }
 .cv-custom-select__menu::-webkit-scrollbar-thumb {
   background: var(--cv-border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
 }
 
 .cv-custom-select__option {
@@ -454,13 +454,13 @@
 }
 
 .cv-custom-select__option:first-child {
-  border-top-left-radius: var(--r-md);
-  border-top-right-radius: var(--r-md);
+  border-top-left-radius: var(--r-panel);
+  border-top-right-radius: var(--r-panel);
 }
 
 .cv-custom-select__option:last-child {
-  border-bottom-left-radius: var(--r-md);
-  border-bottom-right-radius: var(--r-md);
+  border-bottom-left-radius: var(--r-panel);
+  border-bottom-right-radius: var(--r-panel);
 }
 
 .cv-custom-select__option:hover:not(.cv-custom-select__option--disabled) {
@@ -530,7 +530,7 @@
 }
 
 .cv-custom-select--error.cv-custom-select--open .cv-custom-select__trigger {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .cv-custom-select--error .cv-custom-select__chevron {

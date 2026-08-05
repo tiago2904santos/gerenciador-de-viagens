@@ -3,8 +3,8 @@
 .cv-summary-tile {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   display: grid;
   gap: var(--sp-2);
   min-width: 0;
@@ -16,7 +16,7 @@
 }
 
 .cv-summary-tile:hover {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .cv-summary-tile__label,
@@ -66,8 +66,8 @@
 .cv-document-card {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-raised);
   display: grid;
   gap: 0;
   padding: 0;
@@ -79,8 +79,8 @@
   background: var(--color-primary);
   border-start-start-radius: 0;
   border-start-end-radius: 0;
-  border-end-end-radius: var(--r-md);
-  border-end-start-radius: var(--r-md);
+  border-end-end-radius: var(--r-panel);
+  border-end-start-radius: var(--r-panel);
   content: "";
   height: 3px;
   left: var(--sp-5);
@@ -90,7 +90,7 @@
 }
 
 .cv-document-card:hover {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 .cv-document-card__header,
@@ -237,7 +237,7 @@
 
 .cv-module-card__mark {
   align-items: center;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   display: flex;
   flex: 0 0 auto;
   font-size: var(--fs-2xs);

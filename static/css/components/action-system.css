@@ -6,8 +6,8 @@
 .app-btn {
   align-items: center;
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-raised);
   box-sizing: border-box;
   cursor: pointer;
   display: inline-flex;
@@ -33,14 +33,14 @@
 .cv-btn:hover,
 .btn:hover,
 .app-btn:hover {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   transform: translateY(-1px);
 }
 
 .cv-btn:active,
 .btn:active,
 .app-btn:active {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   transform: translateY(0);
 }
 
@@ -70,7 +70,7 @@
 .app-btn--primary {
   background: var(--color-primary);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
 }
 
@@ -103,7 +103,7 @@
 .app-btn--muted {
   background: var(--cv-surface-block);
   border-color: var(--cv-border);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-ink);
 }
 
@@ -190,7 +190,7 @@
 .cv-btn--docx {
   background: var(--cv-surface-block);
   border-color: var(--cv-border);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-ink);
 }
 
@@ -204,7 +204,7 @@
 
 .cv-btn--xs,
 .btn--compact {
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   min-height: 30px;
   padding-inline: var(--sp-2);
 }
@@ -212,7 +212,7 @@
 .cv-btn--sm,
 .btn--sm,
 .app-btn--sm {
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   min-height: 34px;
   padding-inline: var(--sp-3);
 }
@@ -227,7 +227,7 @@
 .cv-icon-btn {
   background: var(--cv-surface-block);
   border-color: var(--cv-border);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-ink);
   transition:
     background-color 150ms ease,
@@ -246,7 +246,7 @@
 }
 
 .cv-icon-btn:active {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   transform: translateY(0);
 }
 
@@ -269,28 +269,28 @@
 .cv-icon-btn--whatsapp {
   background: var(--cv-surface-block);
   border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-success);
 }
 
 .cv-icon-btn--preview {
   background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-success);
 }
 
 .cv-icon-btn--docx {
   background: color-mix(in srgb, var(--cv-state-warning) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-warning);
 }
 
 .cv-icon-btn--documents {
   background: var(--cv-surface-block);
   border-color: color-mix(in srgb, var(--cv-state-warning) 40%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-warning);
 }
 
@@ -299,14 +299,14 @@
 .cv-icon-btn--signature {
   background: var(--cv-surface-block);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--color-primary);
 }
 
 .cv-icon-btn--pdf {
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-danger);
 }
 
@@ -374,20 +374,20 @@
 .cv-action-menu {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-overlay);
   gap: 4px;
   padding: var(--sp-2);
 }
 
  .cv-action-menu {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-overlay);
 }
 
 .cv-action-menu__item {
   border: var(--bd);
 border-color: transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink);
   min-height: 38px;
   padding: var(--sp-2);
@@ -426,7 +426,7 @@ border-color: transparent;
   background: var(--cv-surface-block);
   border: var(--bd);
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--color-primary);
   display: inline-flex;
   flex: 0 0 34px;
@@ -466,7 +466,7 @@ border-color: transparent;
 .cv-action-menu__item--rich {
   border: var(--bd);
 border-color: transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   gap: 10px;
   min-height: 52px;
   padding: var(--sp-2);
@@ -537,8 +537,8 @@ border-color: transparent;
 .delete-confirm-modal__dialog {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   gap: 18px;
   max-width: min(100%, 560px);
   overflow: hidden;
@@ -553,7 +553,7 @@ border-color: transparent;
 .delete-confirm-modal__icon {
   background: var(--cv-surface-block);
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-state-danger);
   flex-basis: 46px;
   height: 46px;
@@ -621,7 +621,7 @@ margin-inline: calc(var(--sp-1) * -1);
   align-items: flex-start;
   background: var(--cv-surface-block);
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink-muted);
   display: flex;
   font-size: 0.84rem;
@@ -669,7 +669,7 @@ margin-inline: calc(var(--sp-1) * -1);
 .attach-signed-modal__kind-options {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   display: grid;
   gap: 4px;
   grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
@@ -683,7 +683,7 @@ margin-inline: calc(var(--sp-1) * -1);
 .attach-signed-modal__kind-option {
   background: transparent;
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink-muted);
   cursor: pointer;
   font: inherit;
@@ -730,7 +730,7 @@ margin-inline: calc(var(--sp-1) * -1);
 .attach-signed-modal__form .cv-file-widget {
   background: var(--cv-surface-block);
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-shadow: none;
   display: grid;
   gap: 8px;
@@ -773,7 +773,7 @@ margin-inline: calc(var(--sp-1) * -1);
   align-self: start;
   background: var(--cv-surface-block);
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink);
   display: inline-flex;
   font-size: var(--fs-sm);
@@ -814,8 +814,8 @@ margin-inline: calc(var(--sp-1) * -1);
   background: var(--color-primary);
   background-image: none;
   border: 0;
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
   font-size: 0.8rem;
   font-weight: var(--fw-bold);
@@ -832,7 +832,7 @@ margin-inline: calc(var(--sp-1) * -1);
   background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
   background-image: none;
   border: 0;
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
 }
 
@@ -874,7 +874,7 @@ margin-inline: calc(var(--sp-1) * -1);
 .attach-signed-modal__form .cv-file-selection__item {
   background: var(--cv-surface-card);
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-shadow: none;
   min-height: 0;
   padding: var(--sp-2);
@@ -897,7 +897,7 @@ margin-inline: calc(var(--sp-1) * -1);
   background: color-mix(in srgb, var(--cv-state-success) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
   border-color: color-mix(in srgb, var(--cv-state-success) 40%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-success);
 }
 
@@ -906,7 +906,7 @@ margin-inline: calc(var(--sp-1) * -1);
   background: var(--cv-surface-block);
   border: var(--bd);
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-state-danger);
 }
 
@@ -916,7 +916,7 @@ margin-inline: calc(var(--sp-1) * -1);
   background: var(--cv-surface-block);
   background-image: none;
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   box-shadow: none;
   color: var(--cv-ink);
   font-weight: var(--fw-bold);
@@ -1008,7 +1008,7 @@ margin-inline: calc(var(--sp-1) * -1);
   background: var(--cv-surface-block);
   background-color: var(--cv-surface-block);
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink);
   font-size: var(--fs-sm);
   font-weight: var(--fw-bold);
@@ -1040,7 +1040,7 @@ margin-inline: calc(var(--sp-1) * -1);
   background-color: var(--color-primary);
   background-image: none;
   border: 0;
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   /* Botao cheio de acento: a tinta e o par do acento. Enquanto o `color` daqui
      carregava `!important`, ele vencia o par certo declarado no componente e a
      letra sumia — so apareceu quando o `!important` saiu (NOVO-30 fase 4). */
@@ -1146,7 +1146,7 @@ margin-inline: calc(var(--sp-1) * -1);
   }
 
   .delete-confirm-modal__dialog {
-    border-radius: var(--r-lg);
+    border-radius: var(--r-card);
     padding: var(--sp-5);
   }
 

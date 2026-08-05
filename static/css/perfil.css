@@ -29,8 +29,8 @@
   background: var(--color-primary);
   background-image: none;
   border: 0;
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
   font-weight: var(--fw-bold);
   text-shadow: none;
@@ -40,7 +40,7 @@
  .perfil-form-page .cv-form-block__actions .cv-btn--primary:hover {
   background: color-mix(in srgb, var(--color-primary) 85%, var(--cv-ink));
   background-image: none;
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
 }
 
@@ -124,7 +124,7 @@
 .perfil-form-page .perfil-pendencia__erro {
   background: var(--cv-surface-next);
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink-muted);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: var(--fs-xs);

@@ -4,8 +4,8 @@
   align-items: center;
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-raised);
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-3);
@@ -24,7 +24,7 @@
 .list-search input {
   background: var(--cv-surface-block);
   border-color: var(--cv-border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   min-height: var(--h-md);
   padding-left: var(--sp-8);
   width: 100%;
@@ -61,7 +61,7 @@
   border: var(--bd);
   border-color: color-mix(in srgb, var(--cv-border) 82%, transparent);
   border-style: dashed;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink-muted);
   grid-column: 1 / -1;
   padding: var(--sp-5);
@@ -111,8 +111,8 @@
 .simple-list {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-raised);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -229,7 +229,7 @@
 .app-list,
 .simple-list {
   border: var(--bd);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   overflow: hidden;
 }
 

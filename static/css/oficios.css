@@ -13,8 +13,8 @@
   border-left: var(--bd);
   border-left-color: var(--color-accent);
   border-left-width: 5px;
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   display: grid;
   gap: var(--sp-4);
   padding: var(--sp-5);
@@ -23,7 +23,7 @@
 
 .oficio-card:hover {
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   transform: translateY(-2px);
 }
 
@@ -70,7 +70,7 @@
 .oficio-card__meta > div {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   padding-block: var(--sp-2);
   padding-inline: var(--sp-3);
 }
@@ -117,7 +117,7 @@
 
 .oficio-justificativa-card .cv-field__control--textarea::-webkit-scrollbar-thumb {
   background: var(--cv-border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
 }
 
 /* Textarea de Motivo no wizard: visual idêntico ao input, só com altura maior */
@@ -125,8 +125,8 @@
 .travel-document-wizard .cv-field__select {
   background: var(--cv-surface-next);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-raised);
   box-sizing: border-box;
   color: var(--cv-ink);
   font-size: var(--fs-sm);
@@ -271,8 +271,8 @@
 .travel-document-wizard__top {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-raised);
   overflow: hidden;
 }
 
@@ -434,7 +434,7 @@
 }
 
 .oficio-viatura-busca__dropdown.cv-floating-dropdown--active {
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   z-index: calc(var(--z-dropdown) + 10);
 }
 
@@ -503,8 +503,8 @@
 .oficio-documentos-summary {
   align-items: flex-start;
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-4);
@@ -549,7 +549,7 @@
   align-items: center;
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   column-gap: 12px;
   display: grid;
   grid-template-columns: 40px minmax(0, 1fr) auto;
@@ -570,7 +570,7 @@
   align-items: center;
   background: color-mix(in srgb, var(--cv-ink) 8%, transparent);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink);
   display: inline-flex;
   font-size: var(--fs-xs);
@@ -699,7 +699,7 @@
 .oficio-documentos-vehicle-executive__driver {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   padding: var(--sp-4);
 }
 
@@ -729,8 +729,8 @@
 .oficio-documentos-card {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   overflow: hidden;
 }
 
@@ -790,7 +790,7 @@
 .oficio-documentos-fact {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   padding-block: var(--sp-2);
   padding-inline: var(--sp-3);
 }
@@ -943,7 +943,7 @@
 .oficio-documentos-route-card__diarias-box {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-sizing: border-box;
   display: flex;
   flex: 1 1 auto;
@@ -982,7 +982,7 @@
   align-items: flex-start;
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -1091,7 +1091,7 @@
 .oficio-documentos-route-card__diarias-metric {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-sizing: border-box;
   min-width: 0;
   padding: var(--sp-4);
@@ -1150,7 +1150,7 @@
 .oficio-documentos-route-card__trecho {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-sizing: border-box;
   flex-shrink: 0;
   padding-block: var(--sp-2);
@@ -1197,7 +1197,7 @@
 .oficio-documentos-route-card__metrics {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   display: grid;
   gap: var(--sp-2);
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1217,7 +1217,7 @@
 .oficio-documentos-route-card__fallback-fact {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   display: flex;
   flex-direction: column;
   gap: var(--sp-1);
@@ -1322,7 +1322,7 @@
   align-items: center;
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink);
   cursor: pointer;
   display: inline-flex;
@@ -1395,7 +1395,7 @@
 .evento-doc-toggle.cv-segment-toggle {
   background: var(--cv-surface-next);
   border-color: transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   box-shadow: none;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -1405,7 +1405,7 @@
 }
 
 .evento-doc-toggle .cv-segment-toggle__btn {
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   color: var(--cv-ink-muted);
   justify-content: center;
   min-height: 34px;
@@ -1622,8 +1622,8 @@
 .cv-record-card {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   overflow: hidden;
   transition:
     box-shadow var(--tr-base),
@@ -1631,7 +1631,7 @@
 }
 
 .cv-record-card:hover {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   transform: none;
 }
 
@@ -1657,7 +1657,7 @@
 .cv-record-card__id-row::before {
   background: linear-gradient(180deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 50%, transparent) 100%);
   border-radius: var(--r-pill);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   content: "";
   height: 2.9em;
   left: var(--sp-6);
@@ -1788,7 +1788,7 @@ padding-inline: var(--sp-6);
   align-items: center;
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   column-gap: 12px;
   display: grid;
   grid-template-columns: 40px minmax(0, 1fr) auto;
@@ -1805,7 +1805,7 @@ padding-inline: var(--sp-6);
   align-items: center;
   background: color-mix(in srgb, var(--cv-ink) 8%, transparent);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink);
   display: inline-flex;
   flex-shrink: 0;
@@ -1941,11 +1941,17 @@ padding-inline: var(--sp-6);
 
 /* ── VIATURA E CONDUÇÃO ── */
 
+/* A grade se ajusta ao que EXISTE (NOVO-55).
+   Era `repeat(3, ...)` fixo: um card com um unico bloco de fatos — que e a
+   maioria, medido — punha "Placa / Nao informado" num terco da largura e
+   deixava 461px de vazio ao lado. Com `auto-fit` o bloco unico ocupa a linha
+   inteira e tres blocos continuam em tres colunas; o minimo de 12rem e o que
+   preserva as tres colunas na largura atual do card. */
 .cv-fact-grid {
   align-items: stretch;
   display: grid;
   gap: var(--sp-3);
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
   min-height: 0;
   max-height: none;
 }
@@ -1953,7 +1959,7 @@ padding-inline: var(--sp-6);
 .cv-fact-block {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   container-type: inline-size;
   display: flex;
   flex-direction: column;
@@ -1964,7 +1970,10 @@ padding-inline: var(--sp-6);
   padding-block: var(--sp-3);
   padding-inline: var(--sp-4);
   max-height: none;
-  min-height: 170px;
+  /* Sem `min-height: 170px`. Aquele literal fazia um dado AUSENTE custar 83%
+     da altura de um dado presente (170px contra 204px, medido). Quando ha
+     varios blocos o `align-items: stretch` da grade ja os iguala pelo mais
+     alto — que e a altura certa, porque vem de conteudo real. */
 }
 
 /* PLACA / MODELO / VALOR TOTAL sao ROTULOS de destaque, nao acao — dourado
@@ -2044,7 +2053,7 @@ padding-inline: var(--sp-6);
 
 .cv-itinerary::-webkit-scrollbar-thumb {
   background: var(--cv-border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
 }
 
 /* A linha de trecho pousa na superficie do CARD (NOVO-55). O bloco de fatos e
@@ -2055,7 +2064,7 @@ padding-inline: var(--sp-6);
   background: var(--cv-surface-card);
   border: var(--bd);
   border-color: transparent;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   padding-block: var(--sp-2);
   padding-inline: var(--sp-3);
 }
@@ -2382,7 +2391,7 @@ padding-inline: var(--sp-6);
   }
 
   .cv-record-card {
-    border-radius: var(--r-lg);
+    border-radius: var(--r-card);
   }
 
   .cv-record-card__id-row {
@@ -2537,8 +2546,8 @@ padding-inline: var(--sp-6);
   background: var(--color-primary);
   background-image: none;
   border: 0;
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-raised);
   color: var(--on-primary);
   font-weight: var(--fw-bold);
   min-height: var(--h-md);
@@ -2560,7 +2569,7 @@ padding-inline: var(--sp-6);
 }
 
 .cv-fab-container .cv-fab {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
 }
 
 /* Motorista externo — painel contextual dentro da seção de transporte. */

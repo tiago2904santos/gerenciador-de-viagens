@@ -6,8 +6,8 @@
 .form-section {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-raised);
   padding: var(--sp-5);
 }
 
@@ -38,7 +38,7 @@
 
 .app-form-grid-panel {
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   padding: var(--sp-4);
 }
 
@@ -60,7 +60,7 @@
 .form-control {
   background: var(--cv-surface-next);
   border-color: var(--cv-border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   color: var(--cv-ink);
   min-height: var(--h-md);
   width: 100%;
@@ -69,7 +69,7 @@
 .form-select {
   background: var(--cv-surface-next);
   border-color: var(--cv-border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-control);
   color: var(--cv-ink);
   min-height: var(--h-md);
   width: 100%;
@@ -116,7 +116,7 @@
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-card);
   box-shadow: none;
   cursor: pointer;
   display: grid;
@@ -153,7 +153,7 @@
   background: color-mix(in srgb, var(--cv-state-danger) var(--accent-tint), var(--cv-surface));
   border: var(--bd);
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   /* Mix com heading: escurece no light e clareia no dark (≥ 4,5:1). */
   color: color-mix(in srgb, var(--cv-state-danger) 75%, var(--cv-ink));
   display: inline-flex;
@@ -215,7 +215,7 @@
 
 .app-card-toggle:hover {
   border-color: color-mix(in srgb, var(--cv-state-danger) 40%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   transform: none;
 }
 
@@ -244,7 +244,7 @@
 }
 
 .app-card-toggle.is-disabled:hover {
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   transform: none;
 }
 
@@ -260,7 +260,7 @@
   align-items: center;
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   cursor: pointer;
   display: flex;
   gap: var(--sp-3);
@@ -418,8 +418,8 @@ textarea[readonly] {
 .app-form-section {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-raised);
   padding: var(--sp-5);
 }
 
@@ -455,8 +455,8 @@ textarea[readonly] {
 .app-wizard__top {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-raised);
   overflow: hidden;
 }
 
@@ -529,8 +529,8 @@ textarea[readonly] {
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
   border: var(--bd);
     border-color: transparent;
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-raised);
   box-sizing: border-box;
   color: var(--cv-ink);
   height: var(--h-md);
@@ -564,8 +564,8 @@ textarea[readonly] {
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
   border: var(--bd);
     border-color: transparent;
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-raised);
   box-sizing: border-box;
   color: var(--cv-ink);
   height: var(--h-md);
@@ -593,7 +593,7 @@ textarea[readonly] {
     linear-gradient(var(--cv-border), var(--cv-border)) border-box;
   border: var(--bd);
     border-color: transparent;
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   color: var(--cv-ink);
 }
 

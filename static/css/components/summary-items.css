@@ -9,7 +9,7 @@
 .cv-summary-item {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
@@ -47,7 +47,7 @@
   align-items: center;
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   display: grid;
   gap: var(--sp-3);
   grid-template-columns: minmax(0, 1fr) auto;
@@ -77,7 +77,7 @@
    A regra fica so pelo que ela ainda faz — o `outline: none` global de
    base.css ja cobre o contorno. */
 .summary-items > li > a:focus-visible {
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   outline: none;
 }
 

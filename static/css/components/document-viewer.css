@@ -77,7 +77,7 @@
 }
 
 .doc-pdf-thumb canvas {
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   display: block;
   height: auto;
   width: 100%;

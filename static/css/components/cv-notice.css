@@ -20,8 +20,8 @@
 .cv-alert {
   align-items: flex-start;
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-raised);
   display: grid;
   font-weight: 600;
   gap: var(--sp-1) var(--sp-2);
@@ -134,7 +134,7 @@
   border-left: var(--bd);
   border-left-color: var(--cv-state-warning);
   border-left-width: 3px;
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   color: var(--cv-ink-muted);
   font-size: var(--fs-sm);
   grid-template-columns: minmax(0, 1fr);

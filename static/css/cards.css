@@ -10,8 +10,8 @@
 .summary-card {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   overflow: hidden;
 }
 
@@ -30,7 +30,7 @@
 .document-card:hover,
 .summary-card:hover {
   border-color: color-mix(in srgb, var(--color-primary) 45%, transparent);
-  box-shadow: var(--sh-sm);
+  box-shadow: var(--sh-raised);
   transform: translateY(-2px);
 }
 
@@ -83,7 +83,7 @@ border-left-width: 6px;
 .document-meta > div {
   background: var(--cv-surface-card);
   border: var(--bd);
-  border-radius: var(--r-md);
+  border-radius: var(--r-panel);
   padding: var(--sp-2);
 }
 
@@ -141,8 +141,8 @@ border-left-width: 6px;
   border-left: var(--bd);
   border-left-color: var(--color-accent);
   border-left-width: 6px;
-  border-radius: var(--r-lg);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-raised);
   display: grid;
   gap: var(--sp-4);
   padding: var(--sp-5);
@@ -189,8 +189,8 @@ border-left-width: 6px;
 .app-panel {
   background: var(--cv-surface-block);
   border: var(--bd);
-  border-radius: var(--r-md);
-  box-shadow: var(--sh-sm);
+  border-radius: var(--r-panel);
+  box-shadow: var(--sh-raised);
   padding: var(--sp-5);
 }
 
