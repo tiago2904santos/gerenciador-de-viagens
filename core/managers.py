@@ -53,6 +53,30 @@ alterada, os caminhos que o Django resolve sozinho a partir do `_default_manager
 O `_base_manager` nunca é afetado: sem `Meta.base_manager_name`, o Django instancia um
 `Manager()` limpo (`db/models/options.py:492`). Travessia de FK, `save()`,
 `refresh_from_db()` e a cascata de delete continuam atravessando fronteira de área.
+
+## A armadilha do modelo histórico — ler antes de migrar o próximo app
+
+`db/migrations/state.py:896-919` só conserva, no `ModelState`, managers que sejam
+`_default_manager`, `_base_manager` ou `use_in_migrations`. O `objects` recortado não
+é nenhum dos três, então **ele deixa de existir no modelo histórico** a partir da
+migração `AlterModelManagers` do app. O `all_objects`, por ser `_default_manager`,
+sobrevive como `Manager` puro — e **antes** daquela migração ele ainda não existe.
+
+Ou seja, dentro de `RunPython` a escolha depende da posição no grafo, não do modelo:
+
+- migração **anterior** ao `AlterModelManagers` do app → só existe `objects`;
+- migração **posterior** → só existe `all_objects`.
+
+Ambos os lados falham alto (`AttributeError` no `migrate`, antes de tocar em dado) —
+por isso não há catraca para isto: `manage.py test` e o deploy já são o gate. O que
+não é óbvio é que o erro pode aparecer numa migração de **outro app**: foi o caso de
+`prestacoes_contas/migrations/0008`, que faz `apps.get_model("oficios", "Oficio")` e
+roda depois de `oficios/0018`. Ao migrar um app, confira `migrate --plan` e corrija
+só as migrações posicionadas **depois** da nova.
+
+Não usar `use_in_migrations = True` para contornar isso: ele congelaria
+`core.managers.AreaScopedManager` dentro de toda migração futura, que é exatamente o
+acoplamento que o modelo histórico existe para evitar.
 """
 
 from __future__ import annotations

@@ -226,7 +226,10 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       silencioso (`NOVO-20`); (2) `_default_manager` fica no manager irrestrito, para não
       neutralizar o guarda m2m, o `core.E001` e os comandos de backfill — o preço é o `NOVO-21`.
   - [x] fatia 1 — mecanismo, catraca, testes de contrato, `termos` e `ordens_servico` (26 restantes)
-  - [ ] fatia 2 — `oficios` (4 modelos; armadilha: o piso de numeração em `oficios/models.py:200`)
+  - [x] fatia 2 — `oficios` (4 modelos, 11 sites de `all_objects`; 22 restantes). Duas
+        descobertas: o modelo histórico de migração **perde** o `objects` a partir do
+        `AlterModelManagers` do app (`core/managers.py` documenta a regra), e a suíte
+        desligava o piso de numeração — `NOVO-22`
   - [ ] fatia 3 — `roteiros` + `eventos`
   - [ ] fatia 4 — `prestacoes_contas` + `documentos`
   - [ ] fatia 5 — `cadastros` (`ConfiguracaoSistema.get_singleton`)
