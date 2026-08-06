@@ -56,13 +56,19 @@ FORA_DO_RECORTE = {"usuarios.VinculoUsuarioArea"}
 
 
 def _preparar_django():
+    """Sobe o registro de apps. Este é o primeiro auditor que precisa do Django.
+
+    O padrão é `config.settings.test`, e não `dev`, porque `dev` faz
+    `load_dotenv()` e **estoura no import** sem `FIELD_ENCRYPTION_KEYS`
+    (`config/settings/dev.py:41`). No CI não existe `.env`, então cair em `dev`
+    trocaria a régua por um `RuntimeError` de bootstrap — vermelho que não fala
+    do defeito que este script existe para medir. O `tests.yml` já trata `dev`
+    como exceção que exige a chave explícita, num passo só.
+
+    `test` serve porque a varredura é sobre `apps.get_models()` e nunca toca no
+    banco; qual banco está configurado é irrelevante aqui.
+    """
     sys.path.insert(0, str(RAIZ))
-    # `config.settings.dev` exige `FIELD_ENCRYPTION_KEYS` no ambiente e o CI não
-    # define a chave: com `dev` este auditor morre em `django.setup()` antes de
-    # olhar um modelo sequer, e reprova todo PR. Passava na máquina de quem
-    # escreveu porque lá existe `.env`. `config.settings.test` gera a própria
-    # chave Fernet (`config/settings/test.py:35`) e é o que a suíte já usa.
-    # `setdefault`: quem exportar o módulo continua mandando.
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.test")
     import django
 

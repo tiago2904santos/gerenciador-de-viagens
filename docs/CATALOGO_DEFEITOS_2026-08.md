@@ -2117,7 +2117,7 @@ mexer no editor na fase 6.
 
 ---
 
-### NOVO-25 ✅ RESOLVIDO · 🔴 `NOVO` Auditor de área reprovava todo PR do repositório por depender do `.env` do desenvolvedor · QA · 0,25 d
+### NOVO-25 ✅ RESOLVIDO (4b162d9) · 🔴 `NOVO` Auditor de área reprovava todo PR do repositório por depender do `.env` do desenvolvedor · QA · 0,25 d
 
 `scripts/audit_area_scoped_managers.py:66` — o gate do `BE-09` sobe o Django de verdade (precisa de
 `apps.get_models()`) e apontava para `config.settings.dev`. Esse módulo **exige**
@@ -2144,6 +2144,14 @@ versão dele não valia nada** e passava com o script defeituoso: `config/settin
 
 `scripts/inspect_area_conflicts.py:18` tem a mesma linha, mas **não é gate de CI** — é ferramenta
 de inspeção manual, e ali `dev` é defensável. Fica anotado, não corrigido.
+
+**Duas sessões acharam isto em paralelo.** A troca de uma linha chegou à `main` pelo PR #207
+(`4b162d9`), por leitura estática, antes de qualquer run do CI ter conseguido runner; aqui ela
+apareceu pelo caminho oposto — o log do run 31122738847 com o traceback. Na junção ficou a versão
+da `main` (a mesma linha, com docstring) mais o teste, que nenhum dos dois lados tinha: sem ele o
+gate volta a `dev` na primeira edição distraída e ninguém percebe até o próximo ambiente limpo.
+
+---
 
 ### NOVO-24 ⚪ `NOVO` `.then` escapa do `try/catch` do `async` na configuração do Drive · QA · 0,25 d
 
