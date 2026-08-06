@@ -618,14 +618,6 @@ def apresentar_pagina_detalhe_oficio(oficio):
     }
 
 
-def apresentar_opcoes_documentais_oficio(oficio):
-    _ = oficio
-    return [
-        {"label": "DOCX (em breve)", "enabled": False},
-        {"label": "PDF (em breve)", "enabled": False},
-    ]
-
-
 def apresentar_acoes_oficio(
     *,
     editar_url: str,
@@ -822,20 +814,6 @@ def apresentar_oficio_wizard_summary(oficio):
         "data_criacao_label": oficio.data_criacao.strftime("%d/%m/%Y"),
         "status_label": oficio.get_status_display(),
         "status_state": str(oficio.status or "").lower(),
-    }
-
-
-def apresentar_modelo_motivo_card(modelo):
-    texto = (modelo.texto or "").strip()
-    if len(texto) > 140:
-        texto = f"{texto[:140]}..."
-    return {
-        "id": modelo.pk,
-        "nome": modelo.nome,
-        "is_padrao": modelo.is_padrao,
-        "texto_preview": texto or "—",
-        "editar_url": reverse("oficios:modelo_motivo_editar", args=[modelo.pk]),
-        "excluir_url": reverse("oficios:modelo_motivo_excluir", args=[modelo.pk]),
     }
 
 

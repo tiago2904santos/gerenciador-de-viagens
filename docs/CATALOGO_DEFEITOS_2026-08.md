@@ -330,11 +330,35 @@ fala de cobertura e não de app inexistente. `core/tests/test_pisos_de_cobertura
 que `coverage-floors.json` e `COVERAGE_APPS` declarem o mesmo conjunto, e que todo piso tenha
 diretório no disco.
 
-### BE-21 🟡 Presenter morto prometendo funcionalidade inexistente · MED · 0,25 d
+### BE-21 ✅ RESOLVIDO · 🟡 Presenter morto prometendo funcionalidade inexistente · MED · 0,25 d
 
 `oficios/presenters.py:621` — `apresentar_opcoes_documentais_oficio()` devolve
 `[{"label": "DOCX (em breve)", "enabled": False}, {"label": "PDF (em breve)", "enabled": False}]`.
 Grep no repositório inteiro: **1 ocorrência, a própria definição**. Zero chamadores.
+
+**Eram duas, não uma.** O enunciado achou a que procurou pelo nome. Varrendo as **12 funções
+públicas** do módulo com AST — contando uso fora *e* dentro dele, que é o que separa morta de
+chamada-só-internamente —, duas têm zero dos dois:
+
+| função | fora | dentro |
+|---|---|---|
+| `apresentar_opcoes_documentais_oficio` | 0 | 0 |
+| `apresentar_modelo_motivo_card` (`:828`) | 0 | 0 |
+
+A segunda é um presenter de **card** para modelo de motivo, logo acima de
+`apresentar_linha_lista_simples_modelo_motivo` (3 usos), que faz o mesmo trabalho em formato de
+linha. A tela migrou de card para lista simples e o presenter de card ficou.
+
+A varredura também desarmou dois falsos positivos: `apresentar_pagina_detalhe_oficio` e
+`apresentar_status_etapa_oficio` não têm chamador externo, mas são chamadas **dentro** do módulo
+(`:878` e `:811`) por funções vivas. Um grep por "quem importa" as teria apagado.
+
+**Removidas as duas.** `ruff` limpo (nenhum import ficou órfão), `reverse` segue com 36 usos no
+módulo, e o texto "em breve" não existe mais em nenhum `.py`, `.html` ou `.js` do repositório.
+
+A primeira era pior que morta: **prometia funcionalidade inexistente**. Se alguém a tivesse ligado a
+um template, a tela mostraria dois botões desabilitados jurando DOCX e PDF que nunca foram
+escritos.
 
 ### BE-22 ✅ RESOLVIDO · 🟡 Dez arquivos `.py` com BOM UTF-8 · AUD · 0,5 d
 

@@ -153,7 +153,7 @@ nem `logger`, com catraca que só desce.
 | ID | Defeito | Dias |
 |---|---|---:|
 | `BE-20` ✅ | `diario_bordo` é app-casca: 33 linhas de Python, 1 rota não linkada em template nenhum, funcionalidade real mora em `prestacoes_contas`. Piso de cobertura de 91,17% mede 33 linhas | 0,5 |
-| `BE-21` 🟡 | Presenter morto que promete funcionalidade inexistente: `oficios/presenters.py:621` devolve "DOCX (em breve)"/"PDF (em breve)" e tem zero chamadores | 0,25 |
+| `BE-21` ✅ | Presenter morto que promete funcionalidade inexistente: `oficios/presenters.py:621` devolve "DOCX (em breve)"/"PDF (em breve)" e tem zero chamadores | 0,25 |
 | `BE-22` ✅ | ~~10 arquivos `.py` com BOM UTF-8 (todos em `cadastros/`), que quebram `ast.parse` em ferramenta de análise~~ — **fechado**; eram 11, e o remendo `utf-8-sig` estava na régua do `S-06` | 0,5 |
 | `BE-23` 🟡 | 307 de 433 rotas nomeadas fora do vocabulário do `PADRAO_APP.md`; 5 apps em português, 2 em inglês | 1 |
 | `BE-24` 🟡 | Repositório com 106 MB de *pack*, 89 MB em `screenshots/`; 175 arquivos rastreados que não deveriam estar (`tmp/`, `media_teste/`, `migration_backups/*.dump`, `logs/`, `.tmp-*/`, `_tmp_check*.py`, `tatus`, `.codex-*.log`) | 1 |
