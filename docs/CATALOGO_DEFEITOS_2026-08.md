@@ -336,9 +336,10 @@ vermelho de bootstrap, do tipo que o `NOVO-25` já custou uma sessão inteira.
 `core/tests/test_sem_bom.py` impede a volta. O `utf-8-sig` fica nos dois de propósito: a rede é o
 teste, e gate que morre no `ast.parse` é o pior lugar para descobrir o problema.
 
-`QA-11` (`reparar-producao.yml` em UTF-16LE) **segue aberto** — ID próprio, e a correção dele exige
-revalidar o workflow com um `workflow_dispatch` de baixo risco. Está nomeado na exceção do teste,
-num caminho só, para não virar porta aberta.
+~~`QA-11` (`reparar-producao.yml` em UTF-16LE) **segue aberto**~~ — **errado, e o erro é meu.** Escrevi
+isso lendo a linha do `QA-11` no catálogo, que estava desatualizada: a correção tinha entrado em
+`993e14c`, em 05/08. Por causa disso o teste nasceu com uma exceção para um arquivo que já estava
+limpo — um buraco na própria rede, por nada. A exceção foi removida junto do fechamento do `QA-11`.
 
 ### BE-23 🟡 Vocabulário de rotas divergente · AUD · 1 d · risco médio
 
@@ -1467,7 +1468,7 @@ Margem sobre o piso de cobertura abaixo de 1 ponto: `integracoes.google_drive` 5
 `diario_bordo` 91,67% contra 91,17% — artefato de arquivo minúsculo (12 statements, 1 linha =
 8,3 pp), que se resolve pelo `BE-20`, não perseguindo a métrica.
 
-### QA-11 🟡 `reparar-producao.yml` em UTF-16LE · AUD · 0,25 d
+### QA-11 ✅ RESOLVIDO (993e14c, 05/08/2026) · 🟡 `reparar-producao.yml` em UTF-16LE · AUD · 0,25 d
 
 `file .github/workflows/*.yml`: os outros três são UTF-8; este é "UTF-16, little-endian, with CRLF".
 `od` confirma BOM `FF FE` e bytes intercalados com `00`. Mesma família do `BE-22` (BOM em arquivos
@@ -1476,6 +1477,25 @@ Python), agora num workflow.
 ter certeza, e este é justamente o workflow de **reparo manual de produção**, ou seja, o que se
 descobriria quebrado durante um incidente.
 **Correção:** reconverter para UTF-8 sem BOM e validar com um `workflow_dispatch` de baixo risco.
+
+> **Esta linha ficou aberta por engano.** A correção entrou em **`993e14c`, em 05/08** — commit cujo
+> próprio título cita o ID (`ci: gates de encoding… (QA-06, QA-07, QA-11, QA-12)`) —, o
+> `docs/PLANO_MESTRE_REFATORACAO.md:215` já marcava `[x]`, e só o catálogo não foi atualizado.
+> Conferido em 06/08: o arquivo é UTF-8 sem BOM, 0 CRLF em 80 linhas, sem mojibake, e
+> `core/tests/test_encoding_dos_workflows.py` guarda os três invariantes (BOM, decodificação e
+> dupla codificação) nos quatro workflows.
+
+**Sobre a validação por `workflow_dispatch` que o enunciado pedia:** existe uma execução, de
+30/07 — `workflow_dispatch`, `conclusion: success`. Ela é **anterior** à conversão, e é justamente
+por isso que serve de evidência: o GitHub rodou o arquivo **mesmo em UTF-16**, então o encoding
+nunca foi o risco de execução. O risco nomeado era a **incerteza**, e quem a remove é a conversão
+mais a catraca. O rastro do defeito ficou congelado no registro daquela execução, cujo campo `name`
+até hoje é `Reparar produ├º├úo (FIELD_ENCRYPTION_KEYS)` — o mojibake que aparecia na interface do
+Actions.
+
+**Não disparei o workflow para "validar".** É o de reparo manual de produção; rodá-lo por
+conferência de encoding seria usar produção como ambiente de teste, e o que se ganharia já está
+provado por outros meios.
 
 ### QA-12 🟡 Sem Dependabot, sem CodeQL, sem gate de acessibilidade · AUD · 0,25 d + 3 d
 
