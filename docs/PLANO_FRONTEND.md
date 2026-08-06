@@ -29,7 +29,7 @@ junto. São 54 imports cruzados em 26 templates.
 `!important` — o tema não é resolvido por token, é resolvido sobrescrevendo componente por
 componente. Nove arquivos definem `--color-*`.
 
-**O que o CI não vê.** O auditor cobre 5 dos ~9 invariantes do projeto. Fora do alcance dele
+**O que o CI não vê.** O auditor cobre 6 dos ~9 invariantes do projeto. Fora do alcance dele
 ficaram um **XSS real** (`JS-01`), 15 de 18 componentes sem `destroy` no ciclo de vida (`JS-02`) e
 o acoplamento de lógica a nome de classe (`JS-06`) — que é justamente o que decide a ordem deste
 plano.
@@ -56,6 +56,11 @@ roteamento de foco em 6 telas — em silêncio, sem erro no console e sem teste 
 existe teste de JS (`JS-03`). Esta é a dependência que define tudo: **o JS larga o nome de classe,
 depois o CSS pode mexer nos nomes.**
 
+> **F1 concluída em 06/08/2026.** O lado do JavaScript está cortado. Falta o lado do **markup**:
+> três templates escrevem o picker à mão e cinco arquivos JS copiam suas classes para montar o
+> "cartão de rota relacionada" (`NOVO-16`) — a renomeação da F5 ainda quebra esses. Não bloqueia
+> F2 nem F3.
+
 **A poda (F3) vem antes dos tokens (F4).** Não faz sentido reconciliar nove camadas de token sobre
 168 KB de regra morta.
 
@@ -77,7 +82,7 @@ Independentes de tudo; podem entrar junto da fase 0 do plano mestre.
 | `JS-04` 🟠 | `.then()` sem `.catch` no editor de roteiros: falha de rede na estimativa de distância não avisa nada (`editor/index.js:790-822`) | 0,5 |
 | `HT-09` ⚪ | Login sem skip link e sem `aria-describedby` no erro de campo | 0,5 |
 | `JS-11` ⚪ | `maskCep` duplicada e `onlyDigits` em 4 cópias | 0,25 |
-| `JS-12` ⚪ | `CV.registry` e `CV.componentRegistry` são o mesmo objeto | 0,25 |
+| `JS-12` ⚪ | `CV.registry` e `CV.componentRegistry` são dois literais distintos (enunciado corrigido) | 0,25 |
 
 **Gate:** teste que prova o escape (entrada com `"` e `<script>`); o `JS-04` verificado com a rede
 derrubada; o `HT-01` conferido com navegação por Tab em tema claro e escuro, com print no PR.
@@ -86,9 +91,9 @@ derrubada; o `HT-01` conferido com navegação por Tab em tema claro e escuro, c
 
 | ID | Defeito | Dias |
 |---|---|---:|
-| `JS-06` 🟡 | Trocar `classList.contains("cv-search-picker")` por `data-entity-picker-root` nos 9 arquivos, no mesmo PR | 1 |
-| `JS-05` 🟠 | Estender o auditor de CI: regra para `innerHTML` com interpolação sem `escapeHtml`, e para `registerEnhancer` sem `destroy` | 1,5 |
-| `JS-02` 🟠 | `destroy` nos componentes que registram listener em `document`/`window` — `picker.js`, `cv-date-picker.js` e os demais 13 | 2,5 |
+| `JS-06` ✅ | Trocar `classList.contains("cv-search-picker")` por `data-entity-picker-root` — **7 arquivos, 10 ocorrências** (o "9 arquivos" era do enunciado antigo), mais as **34 consultas de parte** do `NOVO-13` | 1 |
+| `JS-05` ✅ | Estender o auditor de CI: **4 regras** — `innerHTML` sem `escapeHtml`, `registerEnhancer` sem `destroy`, classe CSS como condição de lógica e `catch` vazio. Cobertura 6 → 10 invariantes | 1,5 |
+| `JS-02` ✅ | `destroy` nos componentes que registram listener em `document`/`window` — **14 de 17** sem `destroy`, dos quais **4 vazavam de fato**: `picker.js`, `cv-date-picker.js`, `location-rows.js` e `attach-signed-modal.js` | 2,5 |
 
 `JS-02` entra aqui e não depois porque a poda de CSS vai remover elementos do DOM em massa durante
 a verificação, e é exatamente aí que listener órfão aparece.

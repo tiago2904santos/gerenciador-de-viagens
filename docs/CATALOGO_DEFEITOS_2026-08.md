@@ -638,7 +638,7 @@ mesmo bloco e foi esquecido nos dois `aria-label`. O dado vem de `CV.http.fetchJ
 por qualquer pessoa com escrita na pasta.
 **Correção:** as duas interpolações passam por `escapeHtml`, igual à 114.
 
-### JS-02 🟠 Ciclo de vida existe e 14 de 17 componentes não o implementam · AUD+VER · 3–4 d · risco médio
+### JS-02 ✅ RESOLVIDO (9195989) · 🟠 Ciclo de vida existe e 14 de 17 componentes não o implementam · AUD+VER · 3–4 d · risco médio
 
 `static/js/core/app.js:126-159` define `CV.registerEnhancer(name, init, destroy)` e
 `CV.registry.destroy(root)`, chamado pelo `MutationObserver` (`:137-141`) quando um nó sai do DOM.
@@ -673,7 +673,7 @@ irmã `calculateDiarias()` (`:1386`), na mesma página, trata o erro corretament
 **Efeito:** falha de rede na estimativa de distância não avisa nada — os campos ficam vazios e o
 erro vira promise rejeitada só visível no console.
 
-### JS-05 🟠 O auditor de CI cobre 6 dos ~9 invariantes · AUD+VER · 1–2 d
+### JS-05 ✅ RESOLVIDO (9e7f7c3) · 🟠 O auditor de CI cobre 6 dos ~9 invariantes · AUD+VER · 1–2 d
 
 `scripts/audit_frontend_standards.py:139-176` tem **6** regras JS — `raw_fetch`,
 `duplicated_csrf_header`, `duplicated_debounce`, `duplicated_escape_html`, `duplicated_normalize`,
@@ -682,7 +682,7 @@ as seis e somava cinco.) Não existe regra para `innerHTML` com dado dinâmico, 
 remoção, `catch` vazio, nem uso de nome de classe CSS como condição de lógica.
 **Efeito:** `JS-01`, `JS-02` e `JS-06` podem regredir com o CI verde.
 
-### JS-06 🟡 Nome de classe CSS usado como condição de lógica em 7 arquivos · AUD+VER · 1 d
+### JS-06 ✅ RESOLVIDO (047090f) · 🟡 Nome de classe CSS usado como condição de lógica em 7 arquivos · AUD+VER · 1 d
 
 `classList.contains("cv-search-picker")` aparece **10 vezes em 7 arquivos** (o enunciado original
 dizia 9 arquivos e listava 7):
@@ -1793,3 +1793,101 @@ PRs seguem abertos.
 **Não foi possível medir daqui se ainda aplicam:** o clone desta sessão é *shallow* (128 commits),
 então `git diff main...branch` responde "no merge base" para todos. Precisa de histórico completo
 ou da API do GitHub. **Decisão humana.**
+
+---
+
+### NOVO-13 ✅ RESOLVIDO (047090f) · 🟡 `NOVO` O JS-06 mirava a raiz do picker; as partes eram 34 seletores a mais · COR · 1 d
+
+O enunciado do `JS-06` conta os 10 `classList.contains("cv-search-picker")` da raiz. Ao abrir o
+trabalho, a varredura achou mais **34 seletores de parte** (`.cv-search-picker__input`, `__clear`,
+`__control`, `__dropdown`, `__driver-toggle`, `__selected-card`…) em 8 arquivos, mais 1
+`classList.contains("cv-search-picker__input")`.
+
+Superfície real: **45 sites em 11 arquivos**, não 10 em 7. Os 34 quebram numa renomeação do bloco
+exatamente como os 10 — deixá-los de fora entregaria o pré-requisito da fase 7 pela metade.
+
+Fechado junto do `JS-06`: `picker.js` marca `data-entity-picker-part` em 16 partes e expõe
+`CV.picker.part/parts/closestPart`. Conferido no navegador em 5 telas, com paridade exata entre a
+contagem por atributo e por classe, e o ciclo completo (digitar → 3 opções → escolher → remover)
+funcionando pelo contrato novo.
+
+---
+
+### NOVO-14 🟡 `NOVO` Doze `classList.contains` ainda leem classe de componente como condição · QA · 1 d
+
+Sobra do `JS-06` fora do picker, agora com teto no auditor (`css_class_as_logic`):
+
+| arquivo | ocorrências | classe |
+|---|---:|---|
+| `static/js/pages/roteiros/editor/index.js` | 6 | `trecho-tempo-viagem-hhmm`, `trecho-tempo-adicional-hhmm` |
+| `static/js/cv-select.js` | 2 | `cv-action-dropdown--open`, `cv-filter-dropdown--open` |
+| `static/js/components/overlay.js` | 1 | `cv-action-menu--open` |
+| `static/js/components/icon-tooltips.js` | 1 | `cv-icon-btn--field-manage` |
+| `static/js/components/picker-select.js` | 1 | `cv-custom-select__option--selected` |
+
+Classe de **estado** (`is-*`, `has-*`) fica de fora da regra de propósito: é vocabulário de
+comportamento, não nome de componente, e não impede renomear o CSS.
+
+**Fila:** as 6 do editor saem com `BE-11` (fase 6); as outras 6 com a reconstrução do CSS (fase 7),
+junto de `HT-08`. Enquanto isso o teto impede que o número suba.
+
+---
+
+### NOVO-15 🟡 `NOVO` Quatorze `innerHTML` com dado dinâmico sem `escapeHtml` · QA · 1–2 d
+
+Achado ao escrever a regra do `JS-05`. **Nenhum é XSS provado** — a maioria interpola constante de
+ícone declarada no próprio arquivo (`ROUTE_AVATAR_ICON`, `DOC_AVATAR_ICON`, `svgChevron()`), e
+`gdrive_config.js` já escapa os dados desde o `JS-01`. São 14 linhas em 10 arquivos, com teto por
+arquivo no auditor.
+
+> **Correção de número.** A primeira varredura desta sessão contou 42. Estava errada: casava
+> `innerHTML` com qualquer `+` ou crase na mesma linha, então somava as 26 limpezas
+> `innerHTML = ""` e as 4 linhas que já chamam `escapeHtml`. Medir a expressão inteira, até o `;`
+> de nível zero, dá **14**. O teto do auditor usa o número medido.
+
+O valor da regra não é a dívida de hoje — é impedir que o próximo `innerHTML` com dado de usuário
+entre sem revisão, que é como o `JS-01` nasceu.
+
+---
+
+### NOVO-16 🟠 `NOVO` O markup do picker está copiado à mão em 3 templates e 5 arquivos JS · QA · 2–3 d
+
+O `JS-06` cortou a dependência do **JavaScript** com a classe do picker. Sobrou o outro lado: há
+markup que **imita** o picker, escrito à mão, e que a renomeação da fase 7 quebraria visualmente.
+
+- **Templates** com a raiz `cv-search-picker` e as partes BEM escritas à mão:
+  `termos/partials/_oficio_body.html`, `ordens_servico/partials/_oficios_body.html`,
+  `justificativas/partials/_oficio_picker.html` (mais `eventos/partials/_documento_panel.html` e
+  `roteiros/partials/roteiro/_fonte_body.html`, só com as partes). Medido no navegador: em
+  `/termos/novo/` há 5 elementos com a classe e 4 com `data-entity-picker-root` — o quinto é o
+  template.
+- **JS** que monta o "cartão de rota relacionada" com as classes do picker, em 5 cópias:
+  `ordens-servico-form.js`, `termos-form.js`, `justificativas-index.js`, `eventos-detalhe.js`,
+  `roteiros/editor/index.js`. Mais `oficios-transporte.js`, que reimplementa o picker inteiro.
+
+**Fila:** fase 7, junto de `HT-15` (bloco `cv-itinerary` duplicado em 5 apps) — é a mesma classe de
+defeito. Não é bloqueio para F2/F3.
+
+---
+
+### NOVO-17 ⚪ `NOVO` `--parallel` esconde a falha real quando o payload do erro não é serializável · QA · 0,5 d
+
+Com uma asserção que falha carregando o arquivo inteiro na mensagem, a suíte em
+`--parallel 4` morre com `TypeError: cannot pickle 'traceback' object` e **não diz qual teste
+falhou**. Em série a mesma falha aparece normal, em 1 linha.
+
+Custa uma rodada de ~40 s para descobrir; o risco é alguém ler o `TypeError` como flakiness de
+infraestrutura e rodar de novo. Vizinho do `NOVO-02` (suíte trava ao combinar certos grupos de
+apps), mas causa diferente e reproduzível.
+
+---
+
+### NOVO-18 ⚪ `NOVO` Dois arquivos JS com CRLF misto reescrevem o diff inteiro · QA · 0,25 d
+
+`static/js/pages/configuracoes.js` (153 linhas CRLF) e `static/js/pages/oficios-transporte.js`
+(603) têm fim de linha misto. Qualquer ferramenta que reescreva o arquivo normaliza tudo e produz
+um diff de arquivo inteiro — 302 e 1.206 linhas para uma troca de uma linha, o que enterra a
+mudança real na revisão. Aconteceu nesta etapa e foi desfeito byte a byte.
+
+Vizinho do `BE-22` (10 arquivos `.py` com BOM), mesma família de higiene de repositório;
+**fila: fase 9**, junto dele.

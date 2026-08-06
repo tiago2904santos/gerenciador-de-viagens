@@ -139,6 +139,39 @@ window.CV.fields.init(panelElement);
 Quick Add e o wizard de ofícios chamam `CV.fields.init(root)` para inicializar
 campos inseridos dinamicamente.
 
+## Picker de entidade (contrato vigente)
+
+O `<select>` fonte declara o componente; a `<div>` que o motor renderiza declara **o que ela é**.
+Quem consome o picker de fora nunca deve procurá-lo pela classe CSS — a classe é estilo e vai ser
+renomeada na reconstrução do CSS (`JS-06`).
+
+| Atributo | Onde | Para quê |
+|---|---|---|
+| `data-entity-picker` | no `<select>` fonte | declara o campo como picker |
+| `data-entity-picker-mode` | no `<select>` | `single` \| `multi` |
+| `data-entity-picker-renderer="select"` | no `<select>` | escolhe o renderer alternativo (`picker-select.js`) |
+| `data-entity-picker-ready` | no `<select>` | marcador de idempotência |
+| **`data-entity-picker-root`** | na raiz **renderizada** | é por aqui que se acha o picker no DOM |
+| **`data-entity-picker-part="…"`** | nas partes renderizadas | `field`, `control`, `input`, `clear`, `dropdown`, `list`, `empty`, `option`, `remove`, `selected-panel`, `selected-card`, `selected-title-row`, `term-control`, `driver-toggle`, `driver-surface`, `driver-text` |
+
+API pública, em `window.CV.picker`:
+
+```js
+CV.picker.rootFor(select)        // raiz renderizada (serve para os dois renderers)
+CV.picker.part(escopo, nome)     // uma parte
+CV.picker.parts(escopo, nome)    // todas as partes
+CV.picker.closestPart(no, nome)  // subindo a partir de um nó
+```
+
+Duas armadilhas medidas no navegador: o **dropdown é portado para `document.body`** pelo overlay
+quando aberto, então `part(root, "dropdown")` devolve `null` nesse estado — use `closest` a partir
+do alvo do evento; e existe markup que **imita** o picker sem ser um (três templates o escrevem à
+mão, `NOVO-16`), que tem as classes mas não os atributos.
+
+> **O resto deste documento está desatualizado** — `HT-13`: descreve 4 arquivos JS que não existem
+> mais e 9 atributos com zero ocorrência no repositório. A correção é da etapa F3 do plano de
+> front; até lá, confie na tabela acima e no código, não no que vem abaixo.
+
 ## Selects / dropdowns (motores individuais)
 
 | Motor | Seletor | API |
