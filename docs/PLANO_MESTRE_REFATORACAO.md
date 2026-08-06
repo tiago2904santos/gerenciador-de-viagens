@@ -202,6 +202,10 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [ ] `NOVO-11` o auditor de ORM em view conta `.objects` dentro de docstring — a catraca mede o
       texto do arquivo, não o código. Achado no `NOVO-07`, quando ela caiu de 30 para 29 por causa
       de uma frase. Correção é contar por `ast`, não por regex.
+- [ ] `NOVO-12` 🔴 nenhuma régua olha a configuração de produção — `SECRET_KEY` de 9 caracteres
+      passou despercebida por todo o ciclo. Achada por uma pessoa rodando `check --deploy` no VPS,
+      não por gate. Chave já trocada; falta a catraca, e ela depende de decidir o `core.E002`
+      antes (produção viola um check que é `Error`).
 - [x] `QA-11` `reparar-producao.yml` em UTF-16LE
 - [x] `QA-12` sem Dependabot, sem CodeQL, sem gate de acessibilidade — **Dependabot entrou**;
       CodeQL e gate de acessibilidade seguem abertos
