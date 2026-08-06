@@ -242,7 +242,10 @@ para uma rodada futura, com `DB-01` como pré-requisito.
         Dois deles falhariam **vazios**, não com erro: o termo genérico do evento e o
         `Prefetch` de servidores. `129` chamadas fora de teste, não 84 — meu grep usava
         `\.objects\.` e a forma dominante aqui é `filter_queryset_by_area(X.objects)`
-  - [ ] fatia 5b — `ConfiguracaoSistema` (singleton por área, `OneToOneField`)
+  - [x] fatia 5b — `ConfiguracaoSistema` (2 sites; 8 restantes). `get_singleton` **não**
+        precisou mudar: a consulta `area IS NULL` dele só é alcançada quando já não há
+        área corrente, por retorno antecipado — a suposição do plano original estava
+        errada. Quem precisou foi `get_for_area` e o lock de `proximo_numero`
   - [ ] fatia 6 — `planos_trabalho`, `justificativas`, `integracoes`, `core.AuditEvent`; fecha o ID
 - [x] `BE-10` app `justificativas` sem isolamento — **já estava resolvido** pelo `NOVO-06` e pelo
       `NOVO-09`; a verificação de 06/08 conferiu os quatro pontos do enunciado um a um. A Fase 2
