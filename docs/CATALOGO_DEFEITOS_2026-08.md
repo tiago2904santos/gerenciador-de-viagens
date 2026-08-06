@@ -437,7 +437,7 @@ o dele — sem mensagem.
 defesa em profundidade — o próximo chamador que esquecer a referência abre o buraco, e nada no
 código o impede.
 
-### DB-05 🟡 Placa de viatura única globalmente · AUD · 1,5 d
+### DB-05 ✅ RESOLVIDO · 🟡 Placa de viatura única globalmente · AUD · 1,5 d
 
 `cadastros/models.py` — `Viatura.placa = CharField(max_length=7, unique=True)` e
 `Viatura.Meta.constraints` vazio. `justificativas/models.py` — `ModeloJustificativa.nome`
@@ -445,6 +445,37 @@ código o impede.
 **Efeito:** uma área bloqueia o cadastro de outra e descobre pela mensagem de erro que a placa já
 existe em algum lugar — vazamento por canal lateral. Viatura transferida entre unidades não pode
 ser registrada nas duas.
+
+
+> **RESOLVIDO em 06/08/2026.** A metade de `ModeloJustificativa.nome` já tinha saído no `NOVO-09`;
+> esta é a de `Viatura.placa`.
+>
+> `unique=True` global virou **duas** `UniqueConstraint` condicionais, espelhando
+> `justificativas/models.py:47-57`: `placa` quando `area IS NULL`, `(area, placa)` quando não.
+> Duas e não um `unique_together` porque em SQL `NULL != NULL` — o composto puro deixaria passar
+> duas linhas globais com a mesma placa.
+>
+> **A constraint sozinha não resolvia.** `ViaturaForm.clean_placa` (`cadastros/forms.py:492`) fazia
+> a própria consulta, sem recorte, e reprovava antes de o banco ser consultado. Pior: a mensagem
+> *"Já existe uma viatura com esta placa"* confirmava a existência de placa de outra unidade — um
+> vazamento pequeno, mas entregue por formulário. Agora o recorte sai da área da instância quando
+> ela existe e da área ativa quando é cadastro novo, e a mensagem diz "nesta área".
+>
+> **Validação de dados** (limite 4 do `AGENTS.md`), contra PostgreSQL: 0 placas repetidas dentro de
+> área, 0 entre as globais. E o resultado não depende do banco: a constraint nova é **estritamente
+> mais permissiva** que a que sai, então nenhum dado existente pode violá-la.
+>
+> **O achado do drill, e é o que importa operacionalmente:** a volta funciona no dia do deploy e
+> **deixa de funcionar depois**. Medido, com duas áreas usando a mesma placa:
+>
+> ```
+> IntegrityError: could not create unique index "cadastros_viatura_placa_af1b9674_uniq"
+> DETAIL: Key (placa)=(DRL0A00) is duplicated.
+> ```
+>
+> É inerente: não se reaperta uma unicidade que os dados já usaram alargada. Na janela em que o
+> `QA-03` age não há duplicata e a volta passa. Depois, reverter exige decidir **qual viatura some**
+> — decisão de gente, não de script. A query que lista o impedimento está no docstring da migração.
 
 ### DB-06 🔴 Cascata apaga comprovante e assinatura já coletados · AUD · 3 d · risco alto
 

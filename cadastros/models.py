@@ -376,7 +376,11 @@ class Viatura(TimeStampedModel):
         related_name="viaturas",
         verbose_name="Area de trabalho",
     )
-    placa = models.CharField(max_length=7, unique=True)
+    # `DB-05`: era `unique=True` — placa unica no sistema inteiro. A area B nao
+    # conseguia cadastrar viatura cuja placa a area A ja tivesse, sem enxergar
+    # nem poder usar a viatura dela. A unicidade agora e por area, nas
+    # constraints do `Meta`.
+    placa = models.CharField(max_length=7)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_RASCUNHO)
     modelo = models.CharField(max_length=120, blank=True)
     combustivel = models.ForeignKey(
@@ -408,6 +412,24 @@ class Viatura(TimeStampedModel):
         verbose_name_plural = "Viaturas"
         indexes = [
             models.Index(fields=["area", "placa"], name="cadastros_viat_area_placa_idx"),
+        ]
+        # `DB-05`, espelhando `justificativas/models.py:47-57` (`NOVO-09`).
+        #
+        # Sao **duas** constraints e nao um `unique_together`, porque `area` e
+        # anulavel e em SQL `NULL != NULL`: um `unique(area, placa)` puro
+        # deixaria passar duas linhas globais com a mesma placa, sem erro
+        # nenhum. A condicional cobre os dois casos separadamente.
+        constraints = [
+            models.UniqueConstraint(
+                fields=["placa"],
+                condition=Q(area__isnull=True),
+                name="viatura_placa_global_unique",
+            ),
+            models.UniqueConstraint(
+                fields=["area", "placa"],
+                condition=Q(area__isnull=False),
+                name="viatura_area_placa_unique",
+            ),
         ]
 
     def __str__(self):
