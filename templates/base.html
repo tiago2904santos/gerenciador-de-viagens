@@ -13,6 +13,7 @@
   {% block extra_css_after_theme %}{% endblock %}
 </head>
 <body>
+  {% include "components/ui/icons/_sprite.html" %}
   <a class="cv-skip-link" href="#main-content">Pular para o conteúdo principal</a>
   <div class="app-shell {% block shell_class %}{% endblock %}" data-app-shell>
     <header class="app-mobile-bar">

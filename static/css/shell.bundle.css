@@ -369,6 +369,15 @@ html[data-theme="dark"] {
   width: 1px;
 }
 
+/* Folha de símbolos do PF-01: só define `<symbol>`, nunca desenha. Fora do
+   fluxo para não ocupar espaço nem virar alvo de rolagem. */
+.cv-icon-sprite {
+  height: 0;
+  overflow: hidden;
+  position: absolute;
+  width: 0;
+}
+
 .stack {
   display: grid;
   gap: var(--space-4);
