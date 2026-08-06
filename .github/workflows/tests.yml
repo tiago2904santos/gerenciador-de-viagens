@@ -88,7 +88,7 @@ jobs:
         # P-05: todo `except Exception` do Drive começa com captura estruturada.
         run: >-
           python scripts/audit_django_architecture.py
-          --max-orm-em-view 30
+          --max-orm-em-view 29
           --max-drive-except-without-capture 0
           --max-sync-document-generations 0
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from django import forms
+from django.urls import reverse_lazy
 
 from cadastros.form_widgets import ServidorEquipeSelectMultiple
 from cadastros.form_widgets import ViaturaSelectSingle
@@ -13,6 +14,7 @@ from core.forms.widgets import WidgetStyle
 from core.forms.widgets import widget_attrs
 from core.tenancy import filter_queryset_by_area
 from oficios.models import Oficio
+from oficios.picker import renderizar_so_os_escolhidos
 
 from .models import TermoAutorizacao
 
@@ -59,6 +61,9 @@ class TermoAutorizacaoForm(forms.ModelForm):
                     **widget_attrs(WidgetStyle.TERM_OFICIO_SOURCE),
                     "hidden": True,
                     "data-source-document": "termos-oficios-summary",
+                    # `NOVO-07`: liga o modo remoto do seletor. Sem este atributo
+                    # ele segue filtrando só o que está no DOM, como antes.
+                    "data-picker-source-url": reverse_lazy("termos:api_buscar_oficios"),
                 },
             ),
             "destino_estado": forms.Select(
@@ -125,6 +130,11 @@ class TermoAutorizacaoForm(forms.ModelForm):
             .select_related("roteiro", "viatura")
             .order_by("-data_criacao", "-created_at")
         )
+        # `NOVO-07`: o campo **aceita** qualquer ofício da área — é o `queryset`
+        # acima que valida o pk vindo do seletor — mas **renderiza** só o que já
+        # está selecionado. Antes ia um `<option>` por ofício da área. A ordem
+        # importa, e o porquê está em `oficios/picker.py`.
+        renderizar_so_os_escolhidos(self, "oficio")
 
         self.fields["destino_estado"].required = False
         self.fields["destino_estado"].empty_label = ""

@@ -1428,7 +1428,7 @@ caminhos é parte da tarefa.
 > `justificativas/tests/test_vazamento_entre_areas.py` — 9 testes, provados falhando (6 falhas +
 > 1 erro) antes da correção.
 
-### NOVO-07 🟠 A tela de justificativas cresce com a tabela inteira: 15 MB de HTML · MED · 0,5 d
+### NOVO-07 ✅ RESOLVIDO · 🟠 A tela de justificativas cresce com a tabela inteira: 15 MB de HTML · MED · 0,5 d
 
 Consequência direta do `_oficios_summary_for_quick_add()` do `NOVO-06`: sem recorte e **sem
 limite**, ele serializa todo ofício do banco no HTML da lista.
@@ -1455,6 +1455,42 @@ busca sob demanda, como os outros seletores do sistema já fazem.
 > regressão funcional silenciosa (some ofício antigo do seletor, e nenhum teste pega); busca sob
 > demanda por endpoint é o certo e é trabalho de front. **Não decidir e só limitar seria pior que
 > deixar como está.**
+
+> **RESOLVIDO em 06/08/2026** (`claude/novo-07-picker-sob-demanda`). A decisão de interface foi
+> tomada — **busca sob demanda por endpoint**, não limite de N — e as três telas foram convertidas.
+>
+> Medido no servidor de desenvolvimento, com **60 ofícios na área**:
+>
+> | tela | `<option>` no HTML | blob do `json_script` | página |
+> |---|---:|---:|---:|
+> | `termos:novo` | 61 → **1** | 45,3 KB → **0 KB** | 92,3 KB → **36,9 KB** |
+> | `ordens_servico:nova` | 60 → **0** | 47,4 KB → **0 KB** | 99,9 KB → **42,2 KB** |
+>
+> E pela régua do `PF-07`, que é a que prova que parou de crescer com a tabela:
+>
+> | `justificativas:index` | 200 ofícios | 20.000 ofícios |
+> |---|---:|---:|
+> | antes (`NOVO-06`) | 199,6 KB | **5.398,3 KB** |
+> | depois | 142,1 KB | **142,5 KB** |
+>
+> A diferença entre os dois volumes era 27×; agora é 0,3%. Consultas da rota: 17 → **10**. Teto do
+> formulário de termo: 26 → **24** consultas — medido depois do `NOVO-08` entrar no `main`, que
+> já havia baixado a mesma catraca de 28 para 26 por outro motivo. As duas quedas somam.
+>
+> **O plano errou uma coisa e o navegador pegou:** ele mandava ligar o modo remoto em
+> `components/picker.js`. Nenhum dos três seletores de ofício é um `picker.js` — os três são
+> artesanais, em `js/pages/`, e o `<select>` deles nem tem `data-entity-picker`. A mudança em
+> `picker.js` foi revertida (seria código morto, §3.6) e o que é comum às três virou
+> `static/js/components/document-search.js`. Só se descobre abrindo a tela.
+>
+> **Mudança de comportamento a registrar:** abrir o seletor sem digitar nada mostrava **todos** os
+> ofícios da área; agora mostra os 30 mais recentes, e digitar refina no servidor. É o preço da
+> decisão tomada, e está visível — não é a regressão silenciosa que o enunciado temia.
+>
+> **Fora do escopo, com ID próprio:** `dmv-oficio-prefill`
+> (`templates/prestacoes_contas/partials/_dmv_motorista_body.html:42`) é o quarto consumidor e tem
+> a mesma doença, mas é um `<select>` nativo — resolver exige trocar o controle por um seletor de
+> busca, o que é mudança de interface.
 
 ### NOVO-08 ✅ RESOLVIDO · 🟠 N+1 por linha em três listas: 296, 138 e 55 consultas · MED · 2–3 d
 
@@ -1589,6 +1625,28 @@ linha. Mais dois testes em `core/tests/test_login_throttle.py`, provados falhand
 não é ORM em view, não é CSS fora de token, e `ruff` não reclama de atributo inexistente
 (`F821` só pega nome livre, não `self.x`). Fica a lição para o `PLANO_MESTRE`: caminho de sucesso
 sem teste é caminho não coberto, por mais óbvio que pareça.
+
+### NOVO-11 🟡 `NOVO` O auditor de ORM em view conta `.objects` dentro de docstring · QA · 0,5 d
+
+`scripts/audit_django_architecture.py`, `contar_orm_em_views`: casa
+`re.compile(r"\.objects\b")` no **texto do arquivo**, sem distinguir código de prosa.
+
+Consequência prática, medida no `NOVO-07`: a catraca caiu de 30 para 29 porque saiu uma ocorrência
+que estava **dentro de uma docstring** — a frase "a versão anterior montava isto de
+`Oficio.objects` cru", escrita no `NOVO-06`. Nenhuma consulta mudou de lugar.
+
+Vale nos dois sentidos, e o pior é o segundo:
+
+- **um comentário segura a catraca no alto**, então ela mede menos do que promete;
+- **explicar em prosa um ORM que você acabou de tirar da view faz o número subir**, e o CI reprova
+  um PR que está certo. Quem bater nisso vai reescrever o comentário em vez de olhar o código.
+
+**Correção:** contar sobre a árvore sintática (`ast`), não sobre o texto — `ast.Attribute` com
+`attr == "objects"`. Aí docstring e comentário deixam de existir para o contador. É o mesmo
+caminho que `sync_document_generations_in_views` já poderia querer.
+
+**Não é urgente e não é regressão:** a catraca continua sendo catraca, só que com uma folga que
+ninguém sabe medir. Entra na fila de `QA` do plano mestre, não à frente de defeito funcional.
 
 ### QA-17 ⚪ Treze PRs abertos sem triagem · MED · 1 d
 

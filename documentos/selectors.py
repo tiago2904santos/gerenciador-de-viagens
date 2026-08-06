@@ -46,7 +46,7 @@ def mapa_artefatos_pdf_termo_cadastro(termo_id: int) -> dict[int | None, Documen
 
     A versão unitária acima custa uma consulta por linha. A tela de edição de
     Termos monta um bloco por servidor, então o custo crescia com o tamanho da
-    equipe (a mesma doença do NOVO-07 em Ordens de Serviço).
+    equipe (a mesma doença do NOVO-07 do ciclo 2026-07 em Ordens de Serviço).
 
     A chave é `servidor_id`, com `None` para o termo genérico. Como a ordenação
     é por `-criado_em`, o primeiro de cada chave é o mais recente — por isso o

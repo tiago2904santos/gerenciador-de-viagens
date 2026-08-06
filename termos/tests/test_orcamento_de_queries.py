@@ -115,4 +115,15 @@ class OrcamentoDeQueriesTermoTests(TestCase):
     #      das Configuracoes, e `ConfiguracaoSistema.get_singleton()` e relido
     #      por request. Nao escala com dados; fica registrado como NOVO-27.
     # Se este numero subir de novo, comece por (a): e o que volta sozinho.
-    QUERIES_EDITAR = 26
+    #
+    # 26 -> 24 (`NOVO-07`): sairam as duas varreduras da tabela de oficios que a
+    # tela fazia sem precisar. Uma montava o `json_script` com a area inteira; a
+    # outra era a renderizacao do `<select>`, um `<option>` por oficio. As duas
+    # cresciam com o banco e nenhuma aparecia na contagem, porque contagem de
+    # query nao mede quantas linhas cada uma traz. Agora o campo renderiza so o
+    # que esta selecionado — aqui, nada — e o resto vem de `api_buscar_oficios`.
+    #
+    # O 26 aqui e o do `NOVO-08`, nao o 28 antigo: os dois IDs baixaram esta
+    # mesma catraca por motivos diferentes e o merge tinha de somar as duas
+    # quedas, nao repetir uma. Este numero e medido depois do merge.
+    QUERIES_EDITAR = 24

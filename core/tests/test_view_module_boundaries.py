@@ -67,7 +67,15 @@ class ViewModuleBoundaryTests(SimpleTestCase):
         # 32 → 30: NOVO-24 zerou `usuarios` e NOVO-25 tirou das views de
         # Eventos, Termos e OS as tres copias do rotulo da sede. O numero
         # so desce (AGENTS.md, regra 5).
-        self.assertEqual(sum(counts.values()), 30)
+        #
+        # 30 → 29 (`NOVO-07`): saiu a unica ocorrencia de `justificativas`. E
+        # aqui vale o aviso, porque o numero engana: ela estava **dentro de uma
+        # docstring** ("a versao anterior montava isto de `Oficio.objects` cru",
+        # escrita no `NOVO-06`). `contar_orm_em_views` casa
+        # `re.compile(r"\.objects\b")` no texto do arquivo, sem distinguir codigo
+        # de prosa — entao um comentario segura a catraca no alto e outro a
+        # derruba. O `NOVO-11` trata disso; este numero e o medido hoje.
+        self.assertEqual(sum(counts.values()), 29)
 
     def test_views_nao_executam_geradores_documentais_pesados(self):
         self.assertEqual(sync_document_generations_in_views(), [])

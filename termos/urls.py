@@ -7,6 +7,7 @@ app_name = "termos"
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("api/oficios/", views.api_buscar_oficios, name="api_buscar_oficios"),
     path("novo/", views.novo, name="novo"),
     path("<int:pk>/editar/", views.editar, name="editar"),
     path("<int:pk>/excluir/", views.excluir, name="excluir"),

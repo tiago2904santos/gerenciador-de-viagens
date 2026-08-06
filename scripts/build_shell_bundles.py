@@ -68,6 +68,7 @@ SHELL_JS: tuple[str, ...] = (
     "js/components/picker-select.js",
     "js/components/location-rows.js",
     "js/components/document-source.js",
+    "js/components/document-search.js",
     "js/components/cv-date-picker.js",
     "js/cv-select.js",
     "js/components/fields-init.js",

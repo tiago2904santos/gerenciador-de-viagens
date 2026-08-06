@@ -7,6 +7,7 @@ app_name = "justificativas"
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("api/oficios/", views.api_buscar_oficios, name="api_buscar_oficios"),
     path("<int:pk>/excluir/", views.justificativa_excluir, name="justificativa_excluir"),
     path("modelos/", views.modelos_index, name="modelos_index"),
     path("modelos/novo/", views.modelos_index, name="modelo_novo"),

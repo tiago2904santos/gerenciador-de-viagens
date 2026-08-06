@@ -183,14 +183,25 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 
 ### Fase 1 — Réguas e rede de segurança
 - [x] `PF-07` `scripts/medir_desempenho.py` com dois volumes, no CI — achou `NOVO-06`
-      (vazamento entre áreas, **fechado**), `NOVO-07` (15 MB de HTML, aberto) e `NOVO-08`
-      (N+1 de 296, 138 e 55, **fechado**: 34, 20 e 11)
+      (vazamento entre áreas, **fechado**), `NOVO-07` (15 MB de HTML, **fechado**) e `NOVO-08`
+      (N+1 de 296, 138 e 55, **fechado**: 34, 20 e 11). Os três saíram da régua; nenhum aparecia
+      na linha de base, que mediu com o banco vazio.
+- [x] `NOVO-07` seletor de ofício sob demanda nas três telas — `justificativas:index` de
+      **5.398 KB para 142,5 KB** com 20.000 ofícios, e a diferença entre os dois volumes caiu de
+      27× para 0,3%: a página parou de crescer com a tabela. Tetos da régua baixados.
+- [x] `NOVO-10` 🔴 entrar com a senha certa devolvia 500 — `LoginView.form_valid` chamava
+      `self._rate_key()`, método que o `QA-01` levou embora. Achado dirigindo o navegador para
+      conferir o `NOVO-07`, não por auditor. **Caminho de sucesso sem teste é caminho não
+      coberto:** havia teste para errar a senha seis vezes e nenhum para acertar uma.
 - [x] `QA-03` rollback de deploy não desfaz migração — `scripts/deploy_rollback.sh` + drill no CI.
       Não restaura backup de propósito: para e instrui. **Fecha a Fase 1.**
 - [x] `QA-06` teste da CVE do WeasyPrint verifica texto-fonte, não comportamento
 - [x] `QA-07` sem lint/formatação/tipo em Python no CI — **lint fechado** (`ruff` em zero,
       gate em `tests.yml`). Formatação e tipo seguem abertos como `NOVO-05`. A folga zero do
       `--max-orm-em-view 30` continua de pé: qualquer ORM novo em view reprova o CI.
+- [ ] `NOVO-11` o auditor de ORM em view conta `.objects` dentro de docstring — a catraca mede o
+      texto do arquivo, não o código. Achado no `NOVO-07`, quando ela caiu de 30 para 29 por causa
+      de uma frase. Correção é contar por `ast`, não por regex.
 - [x] `QA-11` `reparar-producao.yml` em UTF-16LE
 - [x] `QA-12` sem Dependabot, sem CodeQL, sem gate de acessibilidade — **Dependabot entrou**;
       CodeQL e gate de acessibilidade seguem abertos

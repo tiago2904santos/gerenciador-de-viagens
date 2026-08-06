@@ -153,6 +153,22 @@
       renderList(search.value);
     });
 
+    /* NOVO-07: os candidatos deixaram de vir todos no HTML. `items` comeca com
+       o que ja esta selecionado e recebe do servidor conforme se digita. */
+    window.CV.documentSearch.attach({
+      select: select,
+      input: search,
+      onResults: function (novos) {
+        novos.forEach(function (resumo) {
+          var chave = String(resumo.id);
+          if (summaries[chave]) return;
+          summaries[chave] = resumo;
+          items.push(resumo);
+        });
+        renderList(search.value);
+      },
+    });
+
     renderList(search.value);
   }
 

@@ -24,6 +24,8 @@ exceção.
 
 from __future__ import annotations
 
+import json
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -85,13 +87,19 @@ class JustificativasNaoVazamEntreAreasTests(TestCase):
     # 2 — o picker no HTML
 
     def test_o_picker_nao_entrega_oficio_de_outra_area(self):
-        resumo = self._index().context["oficios_summary"]
+        """`NOVO-07` mudou o caminho, não a garantia.
 
-        self.assertNotIn(str(self.oficio_alheio.pk), resumo)
-        self.assertIn(str(self.meu_oficio.pk), resumo)
+        O resumo deixou de ir inteiro no `json_script` e passou a vir do endpoint
+        de busca — que é onde o recorte de área precisa valer agora.
+        """
+        resposta = self.client.get(reverse("justificativas:api_buscar_oficios"))
+        ids = {item["id"] for item in json.loads(resposta.content)["resultados"]}
+
+        self.assertNotIn(self.oficio_alheio.pk, ids)
+        self.assertIn(self.meu_oficio.pk, ids)
 
     def test_o_assunto_de_outra_area_nao_aparece_no_html(self):
-        """`json_script` serializa o resumo inteiro no corpo da página."""
+        """Continua valendo: nada de outra área pode sair no corpo da página."""
         self.assertNotContains(self._index(), "Ofício da área B")
 
     # 3 — o caminho de escrita

@@ -7,6 +7,7 @@ app_name = "ordens_servico"
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("api/oficios/", views.api_buscar_oficios, name="api_buscar_oficios"),
     path("nova/", views.nova, name="nova"),
     path("<int:pk>/editar/", views.editar, name="editar"),
     path("<int:pk>/baixar/", views.baixar_docx, name="baixar_docx"),
