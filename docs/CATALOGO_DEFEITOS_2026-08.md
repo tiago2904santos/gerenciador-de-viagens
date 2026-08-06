@@ -1920,7 +1920,7 @@ ou da API do GitHub. **Decisão humana.**
 
 ---
 
-### NOVO-13 ✅ RESOLVIDO (047090f) · 🟡 `NOVO` O JS-06 mirava a raiz do picker; as partes eram 34 seletores a mais · COR · 1 d
+### NOVO-19 ✅ RESOLVIDO (047090f) · 🟡 `NOVO` O JS-06 mirava a raiz do picker; as partes eram 34 seletores a mais · COR · 1 d
 
 O enunciado do `JS-06` conta os 10 `classList.contains("cv-search-picker")` da raiz. Ao abrir o
 trabalho, a varredura achou mais **34 seletores de parte** (`.cv-search-picker__input`, `__clear`,
@@ -1991,6 +1991,46 @@ markup que **imita** o picker, escrito à mão, e que a renomeação da fase 7 q
 
 **Fila:** fase 7, junto de `HT-15` (bloco `cv-itinerary` duplicado em 5 apps) — é a mesma classe de
 defeito. Não é bloqueio para F2/F3.
+
+---
+
+### NOVO-20 🟠 `NOVO` `CELERY_TASK_ALWAYS_EAGER` faz a suíte rodar a tarefa dentro do request · QA · 1 d
+
+`config/settings/test.py:64` liga `CELERY_TASK_ALWAYS_EAGER = True`. Em teste, toda tarefa executa
+no mesmo thread e no mesmo instante do request que a disparou — com
+`core/middleware.py:17` (`_local.request`) populado. Em produção o worker não tem nada disso.
+
+**Efeito:** a classe inteira de regressão "código que depende de contexto ambiente de request"
+é **inalcançável por teste**. Foi o que decidiu o desenho do `BE-09`: um `AreaScopedManager` que
+recortasse fora de request faria `documentos/tasks.py:33` devolver `None` — engolido pelo
+`if oficio is None: return` da própria task — e a geração de PDF viraria no-op silencioso, sem log,
+sem retry, com os 1.490 testes verdes. Os 12 lookups de `integracoes/google_drive/tasks.py` têm a
+mesma forma.
+
+**Correção:** um helper `sem_request()` público (hoje vive em
+`core/tests/test_area_scoped_manager.py`) e a regra de que toda tarefa Celery com efeito de dados
+ganha ao menos um teste dentro dele. Alternativa mais forte, e mais cara: um grupo de testes com
+`CELERY_TASK_ALWAYS_EAGER = False` e worker de verdade.
+
+**Prioridade:** 🟠 pelo que ela esconde, não pelo trabalho de fechá-la.
+
+---
+
+### NOVO-21 🟡 `NOVO` Campo de FK gerado por `ModelForm` ignora o recorte por área · AUD · 1 d
+
+Decisão deliberada do `BE-09`: `Meta.default_manager_name = "all_objects"`, para não neutralizar o
+guarda m2m de `core/tenancy.py:116`, o check `core.E001` de `core/checks.py:50`, os dois comandos de
+backfill, o admin e `validate_unique`. O preço é que `ForeignKey.formfield`
+(`db/models/fields/related.py:1213`) e `ManyToManyField.formfield` (`:2044`) usam `_default_manager`
+— então um `ModelForm` que **não** declare `queryset` explícito continua oferecendo todas as áreas.
+
+Não é regressão: é o comportamento de hoje, que o `BE-09` deliberadamente não fecha. `BE-04` e
+`BE-05` foram exatamente essa família de defeito, encontrados um a um.
+
+**Medir antes de classificar a severidade:** quantos `ModelForm` sobre modelo com `area` dependem
+do queryset auto-gerado. O repositório já aplica `filter_queryset_by_area` em 64 linhas de
+`forms.py`, então a lacuna pode ser pequena — ou pode não ser. A régua natural é estender
+`scripts/audit_area_scoped_managers.py` com essa varredura.
 
 ---
 

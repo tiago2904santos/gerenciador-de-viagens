@@ -100,6 +100,16 @@ jobs:
           --max-drive-except-without-capture 0
           --max-sync-document-generations 0
 
+      - name: Block area-scoping regressions (BE-09)
+        # Catraca: este número só desce. São 28 modelos com campo `area`; a
+        # fatia 1 fechou `termos` e `ordens_servico`, então restam 26. As
+        # fatias seguintes: oficios (4), roteiros+eventos (4),
+        # prestacoes_contas+documentos (4), cadastros (6), o resto (8).
+        # Alvo final é zero, e aí o `DB-02` pode tornar `area` NOT NULL.
+        # O script também reprova `all_objects` sem comentário em código de
+        # caminho de request — o gate literal de docs/PLANO_BACKEND.md:88.
+        run: python scripts/audit_area_scoped_managers.py --max 26
+
       - name: Validate production security settings
         env:
           SECRET_KEY: "ci-only-not-for-production-7c8d2c39f9f54f6c8d25aa12"

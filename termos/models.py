@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django.db import models
 
+from core.managers import AreaScopedManager
 from core.models import CancelavelModel
 from cadastros.models import Cidade
 from cadastros.models import Estado
@@ -69,7 +70,14 @@ class TermoAutorizacao(TimeStampedModel, CancelavelModel):
         verbose_name="Viatura",
     )
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita
+    # para código que precisa enxergar todas. `default_manager_name` mantém o admin,
+    # as relações reversas e `validate_unique` irrestritos — ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         # A listagem filtra por area e ordena por data (P-03).
         indexes = [
             models.Index(fields=["area", "-created_at"], name="termo_area_created_idx"),

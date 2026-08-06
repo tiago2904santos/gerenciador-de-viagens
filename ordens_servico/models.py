@@ -7,6 +7,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
+from core.managers import AreaScopedManager
 from core.models import CancelavelModel
 from cadastros.models import Cidade
 from cadastros.models import Servidor
@@ -145,8 +146,15 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
     funcoes_servidores = models.JSONField("Funções dos servidores", blank=True, default=dict)
     motivo = models.TextField("Motivo", blank=True, default="")
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita
+    # para código que precisa enxergar todas. `default_manager_name` mantém o admin,
+    # as relações reversas e `validate_unique` irrestritos — ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
         ordering = ["-ano", "-numero"]
+        default_manager_name = "all_objects"
         constraints = [
             models.UniqueConstraint(
                 fields=["area", "ano", "numero"],
@@ -223,7 +231,11 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
 
     def _assign_numero(self):
         ano = timezone.localdate().year
-        queryset = OrdemServico.objects.filter(ano=ano)
+        # `BE-09`: `all_objects` de propósito. O escopo da numeração é o desta OS
+        # (`self.area_id`), decidido nas quatro linhas abaixo — não o da área ativa
+        # do request. Com `objects`, uma OS sem área salva por quem está numa área
+        # daria `area=ativa AND area IS NULL` = vazio, e todo número voltaria a 1.
+        queryset = OrdemServico.all_objects.filter(ano=ano)
         if self.area_id:
             queryset = queryset.filter(area=self.area)
         else:
@@ -247,7 +259,9 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
             area_model.objects.select_for_update().filter(pk=self.area_id).exists()
         else:
             list(
-                OrdemServico.objects.select_for_update()
+                # `BE-09`: mesmo motivo de `_assign_numero` — o lock cobre a faixa
+                # `area IS NULL`, e recortar pela área ativa o deixaria vazio.
+                OrdemServico.all_objects.select_for_update()
                 .filter(area__isnull=True, ano=ano)
                 .exclude(numero__isnull=True)
             )
