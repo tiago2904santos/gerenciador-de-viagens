@@ -1105,7 +1105,7 @@ produção, mas a frase não está na checklist de campos obrigatórios do `DEPL
 **Correção:** exigir `REDIS_URL` em `config/settings/prod.py` (falhar cedo, como já se faz com
 `FIELD_ENCRYPTION_KEYS`) e declarar nos quatro templates. Resolve também o `QA-09`.
 
-### QA-03 🟠 O rollback do deploy não desfaz migração · AUD · 1,5 d · risco médio
+### QA-03 ✅ RESOLVIDO · 🟠 O rollback do deploy não desfaz migração · AUD · 1,5 d · risco médio
 
 `.github/workflows/deploy.yml:77` tira backup **antes** do checkout; `:90` roda
 `migrate --noinput` já no código novo; e `reverter()` (`:79-85`) só faz
@@ -1114,6 +1114,37 @@ produção, mas a frase não está na checklist de campos obrigatórios do `DEPL
 **Efeito:** se uma migração destrutiva for aplicada e um passo posterior falhar (`collectstatic`,
 health check em `:116-119`), o `trap ERR` devolve o código antigo rodando contra um schema que ele
 não entende. O backup existe e não é usado — a recuperação vira intervenção manual sob pressão.
+
+> **Corrigido em 06/08.** `scripts/deploy_rollback.sh` desfaz as migrações que **este** deploy
+> aplicou, comparando o `showmigrations` de antes com o de agora e chamando o desfazer do próprio
+> Django, app por app, em ordem inversa do plano.
+>
+> **Não restaura o backup, e isso é o desenho, não uma lacuna.** Restaurar descarta tudo que foi
+> gravado desde que o backup foi tirado, e `restore_backup.sh` ainda sobrescreve o `MEDIA_ROOT` —
+> perde arquivo enviado por usuário. Um deploy leva minutos, e nesses minutos há gente trabalhando.
+> Trocar uma incidência por outra sem decisão humana não é correção. Quando o desfazer não é
+> possível, o script **para e instrui**, com o caminho real do backup e o comando pronto.
+> Desfazer pelo Django é o único caminho que **preserva as gravações da janela do deploy**.
+>
+> **Dois ajustes no `deploy.yml` que reduzem a janela em vez de só tratá-la:**
+> `collectstatic` passou a rodar **antes** de `migrate` (não depende do schema e é a falha mais
+> provável e mais boba da sequência); e o caminho do `.enc`, que `backup_production.sh` sempre
+> imprimiu e o deploy jogava fora, agora é capturado e citado na instrução.
+>
+> **O rollback roda antes do `git checkout` de volta** — desfazer migração exige os arquivos de
+> migração do commit novo em disco.
+>
+> **Drill no CI** (`tests.yml`, vizinho do drill de restauração): contra Postgres de verdade, com
+> delta em **dois** apps de propósito, porque é onde a ordem inversa importa. Provado pegando dois
+> rollbacks quebrados — um que não faz nada (`o rollback não devolveu o estado de antes`) e um que
+> desfaz só um dos apps (a conferência final do próprio script: `sobraram migrações aplicadas`).
+>
+> Cinco caminhos exercitados localmente contra Postgres: delta vazio, delta reversível, delta em
+> dois apps, migração irreversível (com uma `RunPython` sem `reverse` de verdade) e `manage.py`
+> que não roda. Nos dois últimos o script sai 1 **sem ter tocado no banco**.
+>
+> **Não verificável daqui:** um deploy real contra a VPS. O drill exercita o script; o YAML que o
+> chama só é exercitado de fato no primeiro deploy depois deste merge.
 
 ### QA-04 ✅ RESOLVIDO (c021ce25) · 🔴 A validação central de upload nunca roda, nos 5 tipos de anexo · AUD+VER · 1,5 d
 

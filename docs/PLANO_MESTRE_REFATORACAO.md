@@ -185,7 +185,8 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `PF-07` `scripts/medir_desempenho.py` com dois volumes, no CI — achou `NOVO-06`
       (vazamento entre áreas, **fechado**), `NOVO-07` (15 MB de HTML, aberto) e `NOVO-08`
       (N+1 de 296, 138 e 55, aberto)
-- [ ] `QA-03` rollback de deploy não desfaz migração
+- [x] `QA-03` rollback de deploy não desfaz migração — `scripts/deploy_rollback.sh` + drill no CI.
+      Não restaura backup de propósito: para e instrui. **Fecha a Fase 1.**
 - [x] `QA-06` teste da CVE do WeasyPrint verifica texto-fonte, não comportamento
 - [x] `QA-07` sem lint/formatação/tipo em Python no CI — **lint fechado** (`ruff` em zero,
       gate em `tests.yml`). Formatação e tipo seguem abertos como `NOVO-05`. A folga zero do
