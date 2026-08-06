@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Q
 
+from core.managers import AreaScopedManager
 from core.models import TimeStampedModel
 from core.normalizers import normalize_spaces
 from core.normalizers import normalize_upper
@@ -31,7 +32,14 @@ class ModeloJustificativa(TimeStampedModel):
     ordem = models.PositiveIntegerField(default=100)
     is_padrao = models.BooleanField(default=False)
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita
+    # para código que precisa enxergar todas. `default_manager_name` mantém o admin,
+    # as relações reversas e `validate_unique` irrestritos — ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["ordem", "nome"]
         verbose_name = "Modelo de justificativa"
         verbose_name_plural = "Modelos de justificativa"
@@ -76,7 +84,9 @@ class ModeloJustificativa(TimeStampedModel):
         if self.is_padrao:
             # `NOVO-09`: sem o `.filter(area=self.area)`, marcar um modelo como
             # padrão numa área desmarcava o padrão de **todas** as outras.
-            ModeloJustificativa.objects.exclude(pk=self.pk).filter(area=self.area).update(
+            # `BE-09`: `all_objects`, mesmo motivo de `justificativas/services.py` — o
+            # escopo é o `self.area`, e recortar desfaria o `NOVO-09`.
+            ModeloJustificativa.all_objects.exclude(pk=self.pk).filter(area=self.area).update(
                 is_padrao=False
             )
         super().save(*args, **kwargs)

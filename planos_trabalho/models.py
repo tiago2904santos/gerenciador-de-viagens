@@ -6,6 +6,8 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.text import slugify
 
+from core.managers import AreaScopedManager
+
 from cadastros.models import Cargo
 from core.models import CancelavelModel
 from cadastros.models import Cidade
@@ -34,7 +36,14 @@ class ProgramaSolicitante(TimeStampedModel):
     ativo = models.BooleanField(default=True)
     ordem = models.PositiveIntegerField(default=100)
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita
+    # para código que precisa enxergar todas. `default_manager_name` mantém o admin,
+    # as relações reversas e `validate_unique` irrestritos — ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["ordem", "nome"]
         verbose_name = "Programa solicitante"
         verbose_name_plural = "Programas solicitantes"
@@ -69,7 +78,12 @@ class HorarioAtendimento(TimeStampedModel):
     ativo = models.BooleanField(default=True)
     ordem = models.PositiveIntegerField(default=100)
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["ordem", "faixa"]
         indexes = [
             models.Index(fields=["area", "ordem", "faixa"], name="planos_horario_area_ordem_idx"),
@@ -112,7 +126,12 @@ class AtividadePlanoTrabalho(TimeStampedModel):
     ordem = models.PositiveIntegerField("Ordem", default=100)
     ativo = models.BooleanField("Ativo", default=True)
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["ordem", "nome"]
         indexes = [
             models.Index(fields=["area", "ordem", "nome"], name="planos_ativ_area_ordem_idx"),
@@ -164,7 +183,12 @@ class PresetAtividadesPlanoTrabalho(TimeStampedModel):
         verbose_name="Atividades",
     )
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["ordem", "nome"]
         verbose_name = "Preset de atividades"
         verbose_name_plural = "Presets de atividades"
@@ -202,7 +226,13 @@ class PresetAtividadesPlanoTrabalho(TimeStampedModel):
         self.nome = normalize_upper(self.nome)
         self.descricao = normalize_spaces(self.descricao)
         if self.is_padrao:
-            PresetAtividadesPlanoTrabalho.objects.select_for_update().exclude(pk=self.pk).filter(
+            # `BE-09`: `all_objects` — o escopo é o `self.area` deste registro, na
+            # linha de baixo, e não o do request. Recortado, o padrão anterior não
+            # seria rebaixado e a gravação estouraria na `UniqueConstraint` de padrão
+            # único por área.
+            PresetAtividadesPlanoTrabalho.all_objects.select_for_update().exclude(
+                pk=self.pk,
+            ).filter(
                 area=self.area,
                 is_padrao=True,
             ).update(is_padrao=False)
@@ -405,7 +435,12 @@ class PlanoTrabalho(TimeStampedModel, CancelavelModel):
     recursos_necessarios = models.TextField(blank=True, default="")
     unidade_movel_texto = models.TextField(blank=True, default="")
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["-ano", "-numero", "-created_at"]
         verbose_name = "Plano de Trabalho"
         verbose_name_plural = "Planos de Trabalho"
@@ -561,7 +596,11 @@ class PlanoTrabalho(TimeStampedModel, CancelavelModel):
             if config.pt_ano != ano_atual:
                 config.pt_ano = ano_atual
                 config.pt_ultimo_numero = 0
-            planos = cls.objects.filter(ano=ano_atual)
+            # `BE-09`: `all_objects` — o escopo é a `area` do argumento, aplicado nas
+            # quatro linhas abaixo. Recortar de novo pela área ativa esvaziaria a
+            # agregação e o `max(contador, banco)` perderia o piso real, podendo
+            # reemitir número já usado.
+            planos = cls.all_objects.filter(ano=ano_atual)
             if area is None:
                 planos = planos.filter(area__isnull=True)
             else:
