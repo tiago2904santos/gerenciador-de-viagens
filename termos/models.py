@@ -144,7 +144,16 @@ class TermoAutorizacao(TimeStampedModel, CancelavelModel):
     def servidores_efetivos(self):
         if not self.pk:
             return Servidor.objects.none()
-        selecionados = self.servidores.select_related("cargo", "unidade").order_by("nome")
+        # `NOVO-08`: montar um queryset novo aqui **descarta** o cache de
+        # `prefetch_related("servidores")` — o related manager é clonado. O
+        # resultado era a consulta do prefetch 100% desperdiçada e duas consultas
+        # por linha da lista: o `.exists()` abaixo e a avaliação no presenter.
+        # O prefetch da lista vem por `termos.selectors.prefetch_servidores_efetivos()`,
+        # com o mesmo `select_related` e a mesma ordem desta cascata.
+        if "servidores" in getattr(self, "_prefetched_objects_cache", {}):
+            selecionados = self.servidores.all()
+        else:
+            selecionados = self.servidores.select_related("cargo", "unidade").order_by("nome")
         if selecionados.exists():
             return selecionados
         if self.oficio_id:

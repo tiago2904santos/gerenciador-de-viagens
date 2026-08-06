@@ -180,7 +180,15 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
     def destinos_display(self) -> str:
         if not self.pk:
             return "Sem destino"
-        dest = list(self.destinos.select_related("estado").order_by("nome")[:3])
+        # `NOVO-08`: mesmo contrato do `_destinos_display_os` do card de OS
+        # (`ordens_servico/presenters.py:82`) — a propriedade do model tinha
+        # ficado de fora. Refazer `select_related`/`order_by` aqui descarta o
+        # cache de quem já prefetchou, e custa uma consulta por linha da lista.
+        prefetched = getattr(self, "_prefetched_objects_cache", {}).get("destinos")
+        if prefetched is not None:
+            dest = list(prefetched)[:3]
+        else:
+            dest = list(self.destinos.select_related("estado").order_by("nome")[:3])
         if not dest:
             return "Sem destino"
         parts = [f"{c.nome}/{c.uf}" for c in dest]
