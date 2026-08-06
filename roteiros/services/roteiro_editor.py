@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from datetime import timedelta
 from decimal import Decimal, InvalidOperation
 from types import SimpleNamespace
 
@@ -313,14 +314,48 @@ def encontrar_roteiro_duplicado(validated, roteiro_state, *, evento=None, exclui
     return None
 
 
-def _limpar_rascunhos_vazios(roteiro_atual_pk):
-    """Apaga rascunhos órfãos sem sede, destinos, trechos ou saída — geralmente sobras de race da autosave."""
+# `DB-03`: rascunho mais novo que isto pode ser de alguem editando agora, nao
+# sobra de corrida do autosave. `Roteiro` nao tem dono — so `area`
+# (`roteiros/models.py:46`) — entao o tempo e a unica coisa que separa "meu
+# orfao" de "trabalho alheio em curso".
+#
+# Duas horas e folgado de proposito. Nao ha pressa: rascunho vazio nao aparece
+# em lugar nenhum da interface (`selectors.listar_roteiros` ja exclui roteiro
+# com zero destinos), entao o custo de deixar o orfao mais tempo no banco e
+# zero, e o custo de apagar cedo demais e trabalho perdido de outra pessoa.
+IDADE_MINIMA_RASCUNHO_ORFAO = timedelta(hours=2)
+
+
+def _limpar_rascunhos_vazios(roteiro_atual):
+    """Apaga rascunhos órfãos — sem sede, destinos, trechos ou saída.
+
+    `DB-03`. A versão anterior recebia só o `pk` e varria **o banco inteiro**:
+
+        Roteiro.objects.filter(...).exclude(pk=roteiro_atual_pk).delete()
+
+    Dois problemas, e o segundo não estava no catálogo:
+
+    1. **sem recorte de área** — salvar um roteiro apagava rascunho de outra
+       unidade;
+    2. **sem limite de idade** — e como `Roteiro` não tem dono, isso apagava
+       também o rascunho que outra pessoa da **mesma** área estava editando
+       naquele instante. Recortar por área conserta (1) e não conserta (2).
+
+    O recorte sai do próprio registro (`roteiro_atual.area_id`) e não de
+    `get_current_area()`: a função é chamada de dentro de um serviço, e depender
+    de estado ambiente a tornaria correta no request e silenciosamente destrutiva
+    em qualquer comando, tarefa ou migração que a chamasse.
+
+    Por isso recebe o roteiro, e não o `pk`.
+    """
     Roteiro.objects.filter(
+        area_id=roteiro_atual.area_id,
         destinos__isnull=True,
         trechos__isnull=True,
         saida_dt__isnull=True,
         origem_cidade__isnull=True,
-    ).exclude(pk=roteiro_atual_pk).delete()
+        created_at__lt=timezone.now() - IDADE_MINIMA_RASCUNHO_ORFAO,
+    ).exclude(pk=roteiro_atual.pk).delete()
 
 
 @transaction.atomic
@@ -338,7 +373,7 @@ def criar_roteiro(form, roteiro_state, validated, diarias_resultado, *, evento=N
         roteiro, roteiro_state, validated, diarias_resultado=diarias_para_roteiro
     )
     _apply_saved_map_route_from_post(roteiro, form.data)
-    _limpar_rascunhos_vazios(roteiro.pk)
+    _limpar_rascunhos_vazios(roteiro)
     return roteiro
 
 
@@ -470,7 +505,7 @@ def atualizar_roteiro(instance, form, roteiro_state, validated, diarias_resultad
         roteiro, roteiro_state, validated, diarias_resultado=diarias_para_roteiro
     )
     _apply_saved_map_route_from_post(roteiro, form.data)
-    _limpar_rascunhos_vazios(roteiro.pk)
+    _limpar_rascunhos_vazios(roteiro)
     return roteiro
 
 
