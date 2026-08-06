@@ -327,5 +327,7 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [ ] `BE-25` decidir qual UI Lab é o vigente
 - [ ] `QA-08` dependências atrasadas — e `pyhanko` é dependência **morta**, decidir se sai
 - [ ] `NOVO-01` `ASSINATURA_ETIQUETA_2_COMPAT.md` descreve fluxo que não existe mais
-- [ ] `NOVO-02` suíte trava ao combinar certos grupos de apps — reproduzir antes de virar trabalho
+- [x] `NOVO-02` suíte trava ao combinar certos grupos de apps — **não reproduziu** em 06/08 (a
+      combinação do catálogo passa, inclusive em `--reverse`). A sondagem achou o `NOVO-26`
+      (mapa de capitais memorizado no processo decidindo diária com base velha, **fechado**)
 - [ ] `QA-17` triagem dos 13 PRs abertos
