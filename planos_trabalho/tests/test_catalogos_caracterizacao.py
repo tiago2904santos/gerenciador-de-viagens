@@ -98,7 +98,7 @@ class AtividadesTests(CatalogoCaracterizacaoMixin, TestCase):
         atividade = self._criar(nome="Zebra caracterizacao")
 
         response = self.client.post(
-            reverse("planos_trabalho:atividade_editar", args=[atividade.pk]),
+            reverse("planos_trabalho:atividade_update", args=[atividade.pk]),
             {"nome": "Zebra editada", "meta": "Meta", "recurso_necessario": "Sala"},
         )
 
@@ -110,7 +110,7 @@ class AtividadesTests(CatalogoCaracterizacaoMixin, TestCase):
         atividade = self._criar(nome="Zebra caracterizacao")
 
         response = self.client.post(
-            reverse("planos_trabalho:atividade_excluir", args=[atividade.pk])
+            reverse("planos_trabalho:atividade_delete", args=[atividade.pk])
         )
 
         self.assertFalse(AtividadePlanoTrabalho.objects.filter(pk=atividade.pk).exists())
@@ -122,7 +122,7 @@ class AtividadesTests(CatalogoCaracterizacaoMixin, TestCase):
         atividade = self._criar(nome="Zebra caracterizacao")
 
         response = self.client.get(
-            reverse("planos_trabalho:atividade_excluir", args=[atividade.pk])
+            reverse("planos_trabalho:atividade_delete", args=[atividade.pk])
         )
 
         self.assertEqual(response.status_code, 200)
@@ -210,7 +210,7 @@ class PresetsTests(CatalogoCaracterizacaoMixin, TestCase):
         preset = self._criar()
 
         response = self.client.post(
-            reverse("planos_trabalho:preset_excluir", args=[preset.pk])
+            reverse("planos_trabalho:preset_delete", args=[preset.pk])
         )
 
         self.assertFalse(PresetAtividadesPlanoTrabalho.objects.filter(pk=preset.pk).exists())
@@ -238,7 +238,7 @@ class ProgramasTests(CatalogoCaracterizacaoMixin, TestCase):
 
         programa = ProgramaSolicitante.objects.get(nome="NOVO PROGRAMA")
         response = self.client.post(
-            reverse("planos_trabalho:programa_editar", args=[programa.pk]),
+            reverse("planos_trabalho:programa_update", args=[programa.pk]),
             {"nome": "Programa editado", "ativo": "on", "ordem": "2"},
         )
         self.assertIn("Programa atualizado.", self._mensagens(response))
@@ -255,7 +255,7 @@ class ProgramasTests(CatalogoCaracterizacaoMixin, TestCase):
         programa = ProgramaSolicitante.objects.create(nome="PROGRAMA A", ordem=9)
 
         response = self.client.post(
-            reverse("planos_trabalho:programa_excluir", args=[programa.pk])
+            reverse("planos_trabalho:programa_delete", args=[programa.pk])
         )
 
         self.assertFalse(ProgramaSolicitante.objects.filter(pk=programa.pk).exists())
@@ -281,7 +281,7 @@ class HorariosTests(CatalogoCaracterizacaoMixin, TestCase):
 
         horario = HorarioAtendimento.objects.get(faixa="07:20 até 12:40")
         response = self.client.post(
-            reverse("planos_trabalho:horario_editar", args=[horario.pk]),
+            reverse("planos_trabalho:horario_update", args=[horario.pk]),
             {"faixa": "07:20 até 13:50", "ativo": "on", "ordem": "9"},
         )
         self.assertIn("Horário atualizado.", self._mensagens(response))
@@ -290,7 +290,7 @@ class HorariosTests(CatalogoCaracterizacaoMixin, TestCase):
         horario = HorarioAtendimento.objects.create(faixa="07:15 até 11:45", ordem=9)
 
         response = self.client.post(
-            reverse("planos_trabalho:horario_excluir", args=[horario.pk])
+            reverse("planos_trabalho:horario_delete", args=[horario.pk])
         )
 
         self.assertFalse(HorarioAtendimento.objects.filter(pk=horario.pk).exists())

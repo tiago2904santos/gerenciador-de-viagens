@@ -114,7 +114,7 @@ UI_LAB_PAGE_DEFINITIONS = [
         "summary": "Lista de eventos em cards, filtro em tempo real, chips de status e estado vazio.",
         "status_label": "Pronto",
         "status_modifier": "done",
-        "route_name": "core:ui_lab_eventos_lista",
+        "route_name": "core:ui_lab_eventos_index",
     },
     {
         "slug": "lists",

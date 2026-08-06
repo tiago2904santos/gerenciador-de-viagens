@@ -41,7 +41,7 @@ def apresentar_evento_card(evento):
         "diarias_composicao": (evento.diarias_composicao or "").strip(),
         "atividades": [a.nome for a in atividades],
         "atividades_count": len(atividades),
-        "editar_url": reverse("planos_trabalho:evento_editar", args=[evento.plano_id, evento.pk]),
+        "editar_url": reverse("planos_trabalho:evento_update", args=[evento.plano_id, evento.pk]),
         "excluir_url": reverse("planos_trabalho:evento_remover", args=[evento.plano_id, evento.pk]),
     }
 

@@ -543,7 +543,7 @@ class OficioViewsTests(TestCase):
         self.assertContains(list_response, 'name="texto"')
         self.assertContains(list_response, "cv-field__control--textarea")
 
-        new_get = self.client.get(reverse("oficios:modelo_motivo_novo"))
+        new_get = self.client.get(reverse("oficios:modelo_motivo_create"))
         self.assertEqual(new_get.status_code, 200)
         self.assertContains(new_get, "Novo modelo")
         self.assertContains(new_get, 'name="texto"')
@@ -559,11 +559,11 @@ class OficioViewsTests(TestCase):
         self.assertEqual(new_post.status_code, 302)
         modelo = listar_modelos_motivo().first()
 
-        edit_get = self.client.get(reverse("oficios:modelo_motivo_editar", args=[modelo.pk]))
+        edit_get = self.client.get(reverse("oficios:modelo_motivo_update", args=[modelo.pk]))
         self.assertRedirects(edit_get, reverse("oficios:modelos_motivo_index"))
 
         edit_post = self.client.post(
-            reverse("oficios:modelo_motivo_editar", args=[modelo.pk]),
+            reverse("oficios:modelo_motivo_update", args=[modelo.pk]),
             data={
                 "nome": "Padrao equipe atualizado",
                 "texto": "Texto atualizado",
@@ -574,13 +574,13 @@ class OficioViewsTests(TestCase):
         modelo.refresh_from_db()
         self.assertEqual(modelo.nome, "PADRAO EQUIPE ATUALIZADO")
 
-        delete_post = self.client.post(reverse("oficios:modelo_motivo_excluir", args=[modelo.pk]))
+        delete_post = self.client.post(reverse("oficios:modelo_motivo_delete", args=[modelo.pk]))
         self.assertEqual(delete_post.status_code, 302)
         self.assertFalse(listar_modelos_motivo().filter(pk=modelo.pk).exists())
 
     def test_listagem_modelos_exibe_apenas_badge_padrao(self):
         self.client.post(
-            reverse("oficios:modelo_motivo_novo"),
+            reverse("oficios:modelo_motivo_create"),
             data={
                 "nome": "Modelo Ativo PadrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o",
                 "texto": "Texto ativo padrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â£o",
@@ -588,7 +588,7 @@ class OficioViewsTests(TestCase):
             },
         )
         self.client.post(
-            reverse("oficios:modelo_motivo_novo"),
+            reverse("oficios:modelo_motivo_create"),
             data={
                 "nome": "Modelo Secundario",
                 "texto": "Texto secundario",
@@ -614,11 +614,11 @@ class OficioViewsTests(TestCase):
 
     def test_listagem_modelos_ordenada_alfabeticamente(self):
         self.client.post(
-            reverse("oficios:modelo_motivo_novo"),
+            reverse("oficios:modelo_motivo_create"),
             data={"nome": "Zeta", "texto": "texto zeta", "is_padrao": ""},
         )
         self.client.post(
-            reverse("oficios:modelo_motivo_novo"),
+            reverse("oficios:modelo_motivo_create"),
             data={"nome": "Alfa", "texto": "texto alfa", "is_padrao": ""},
         )
 

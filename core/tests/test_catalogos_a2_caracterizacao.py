@@ -85,7 +85,7 @@ class ModelosMotivoTests(_CatalogoMixin, TestCase):
         modelo = self._criar()
 
         response = self.client.post(
-            reverse("oficios:modelo_motivo_editar", args=[modelo.pk]),
+            reverse("oficios:modelo_motivo_update", args=[modelo.pk]),
             {"nome": "Modelo editado", "texto": "Outro texto."},
         )
 
@@ -99,7 +99,7 @@ class ModelosMotivoTests(_CatalogoMixin, TestCase):
         modelo = self._criar()
 
         response = self.client.post(
-            reverse("oficios:modelo_motivo_editar", args=[modelo.pk]),
+            reverse("oficios:modelo_motivo_update", args=[modelo.pk]),
             {"nome": "", "texto": ""},
         )
 
@@ -123,13 +123,13 @@ class ModelosMotivoTests(_CatalogoMixin, TestCase):
         modelo = self._criar()
 
         resposta_get = self.client.get(
-            reverse("oficios:modelo_motivo_excluir", args=[modelo.pk])
+            reverse("oficios:modelo_motivo_delete", args=[modelo.pk])
         )
         self.assertEqual(resposta_get.status_code, 200)
         self.assertTrue(ModeloMotivoOficio.objects.filter(pk=modelo.pk).exists())
 
         resposta_post = self.client.post(
-            reverse("oficios:modelo_motivo_excluir", args=[modelo.pk])
+            reverse("oficios:modelo_motivo_delete", args=[modelo.pk])
         )
         self.assertFalse(ModeloMotivoOficio.objects.filter(pk=modelo.pk).exists())
         self.assertIn(
@@ -158,11 +158,11 @@ class TiposEventoTests(_CatalogoMixin, TestCase):
         self.assertIn(tipo.nome, [r["title"] for r in response.context["rows"]])
 
         response = self.client.post(
-            reverse("eventos:tipo_editar", args=[tipo.pk]), {"nome": "Congresso"}
+            reverse("eventos:tipo_update", args=[tipo.pk]), {"nome": "Congresso"}
         )
         self.assertIn("Tipo de evento atualizado com sucesso.", self._mensagens(response))
 
-        response = self.client.post(reverse("eventos:tipo_excluir", args=[tipo.pk]))
+        response = self.client.post(reverse("eventos:tipo_delete", args=[tipo.pk]))
         self.assertFalse(TipoEvento.objects.filter(pk=tipo.pk).exists())
         self.assertIn("Tipo de evento excluído com sucesso.", self._mensagens(response))
 
@@ -194,7 +194,7 @@ class TiposEventoTests(_CatalogoMixin, TestCase):
         tipo = TipoEvento.objects.create(nome="Seminario")
 
         response = self.client.post(
-            reverse("eventos:tipo_editar", args=[tipo.pk]), {"nome": ""}
+            reverse("eventos:tipo_update", args=[tipo.pk]), {"nome": ""}
         )
 
         self.assertIn(
@@ -230,7 +230,7 @@ class ModelosJustificativaTests(_CatalogoMixin, TestCase):
         modelo = ModeloJustificativa.objects.get(nome="NOVO J")
 
         response = self.client.post(
-            reverse("justificativas:modelo_editar", args=[modelo.pk]),
+            reverse("justificativas:modelo_update", args=[modelo.pk]),
             {"nome": "J editado", "texto": "Outro."},
         )
         self.assertIn(
@@ -238,7 +238,7 @@ class ModelosJustificativaTests(_CatalogoMixin, TestCase):
         )
 
         response = self.client.post(
-            reverse("justificativas:modelo_excluir", args=[modelo.pk])
+            reverse("justificativas:modelo_delete", args=[modelo.pk])
         )
         self.assertFalse(ModeloJustificativa.objects.filter(pk=modelo.pk).exists())
         self.assertIn(

@@ -416,7 +416,7 @@ isso lendo a linha do `QA-11` no catálogo, que estava desatualizada: a correç�
 `993e14c`, em 05/08. Por causa disso o teste nasceu com uma exceção para um arquivo que já estava
 limpo — um buraco na própria rede, por nada. A exceção foi removida junto do fechamento do `QA-11`.
 
-### BE-23 🟡 Vocabulário de rotas divergente · AUD · 1 d · risco médio
+### BE-23 🟡 PARCIAL — sufixo CRUD padronizado; os outros 75% seguem sem vocabulário · AUD · 1 d · risco médio
 
 Das 433 rotas nomeadas, **307 (71%)** não usam nenhum sufixo do `PADRAO_APP.md`. `cadastros` e
 `usuarios` usam inglês (`_create`/`_update`/`_delete`); `eventos`, `justificativas`, `oficios`,
@@ -424,6 +424,36 @@ Das 433 rotas nomeadas, **307 (71%)** não usam nenhum sufixo do `PADRAO_APP.md`
 mistura internamente.
 **Não viaja com nenhuma outra etapa:** renomear rota exige `urls.py` + `reverse()` + templates +
 testes no mesmo PR.
+
+**Duas unidades de medida, e as duas valem.** As "433 rotas" contam entradas do resolver do Django
+(**436** em 06/08) — cada nome por namespace. Contando declarações `name=` nos `urls.py`, são
+**283**. Nenhum número está errado; eles medem coisas diferentes, e vale registrar qual é qual para
+a próxima medição não parecer contradição.
+
+**Uma parte do enunciado está errada:** *"nenhum app mistura internamente"*. Misturam, todos os
+cinco — `planos_trabalho` 4 nomes em inglês contra 11 em português, `justificativas` 1 e 7,
+`oficios` 1 e 3, `prestacoes_contas` 1 e 4, `eventos` 1 e 2.
+
+**E o recorte "inglês contra português" cobre só 70 das 283.** As outras **213 (75%)** não usam
+nenhum dos dois vocabulários: são `detalhe`, `api_*`, `wizard_*`, `*_pdf`. Padronizar *isso* é
+decidir um vocabulário para o sistema inteiro, não traduzir sufixo — e não foi feito aqui.
+
+**Fechado o recorte do sufixo CRUD:** as **28** rotas em português renomeadas pela regra
+`_novo→_create`, `_editar→_update`, `_excluir→_delete`, `_lista→_index`.
+
+**Só o `name=` mudou.** O `path()` continua igual, então nenhuma URL salva quebra. O nome da *view*
+(`def modelo_excluir`) também ficou: é outra camada, e o `PADRAO_APP.md:12` fala de `urls.py`.
+
+Prova de que foram 28 e só 28: os nomes do resolver antes e depois, **436 → 436**, com o conjunto
+novo batendo exatamente o antigo com a regra aplicada. Toda referência era namespeada
+(`"app:nome"`) — a varredura por `reverse(f"...")` montado por partes deu **zero** —, o que fez a
+troca ser mecânica.
+
+Catraca em `core/tests/test_vocabulario_de_rotas.py`. Ela lê os `urls.py`, **não o resolver**:
+parte das rotas de `core` só existe sob `settings.DEBUG` (`core/urls.py:18`), e das 28 em português
+**uma** (`core:ui_lab_eventos_lista`) estava justamente ali — um teste via resolver teria deixado
+passar. Segundo teste é o piso de 70 nomes com sufixo do padrão, para ninguém "padronizar" apagando
+o sufixo em vez de traduzi-lo.
 
 ### BE-24 🟡 Repositório com 133 MB de pack e 175 arquivos indevidos · MED+VER · 1 d
 

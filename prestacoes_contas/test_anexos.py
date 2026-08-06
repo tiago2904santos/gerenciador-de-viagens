@@ -178,7 +178,7 @@ class AnexoExclusaoTests(PrestacaoFixturesMixin, TestCase):
 
     def url(self, prestacao=None, anexo=None):
         return reverse(
-            "prestacoes_contas:prestacao_documento_excluir",
+            "prestacoes_contas:prestacao_documento_delete",
             args=[(prestacao or self.fixture.prestacao).pk, (anexo or self.anexo).pk],
         )
 

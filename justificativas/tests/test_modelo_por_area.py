@@ -128,7 +128,7 @@ class ModeloJustificativaPorAreaTests(TestCase):
 
     def test_nao_da_para_editar_modelo_de_outra_area_pelo_pk(self):
         resposta = self.client.post(
-            reverse("justificativas:modelo_editar", args=[self.alheio.pk]),
+            reverse("justificativas:modelo_update", args=[self.alheio.pk]),
             {"nome": "SEQUESTRADO", "texto": "Texto", "ordem": 10, "ativo": "on"},
         )
 
@@ -137,7 +137,7 @@ class ModeloJustificativaPorAreaTests(TestCase):
         self.assertEqual(self.alheio.nome, "MODELO DA B")
 
     def test_nao_da_para_excluir_modelo_de_outra_area_pelo_pk(self):
-        resposta = self.client.post(reverse("justificativas:modelo_excluir", args=[self.alheio.pk]))
+        resposta = self.client.post(reverse("justificativas:modelo_delete", args=[self.alheio.pk]))
 
         self.assertEqual(resposta.status_code, 404)
         self.assertTrue(ModeloJustificativa.objects.filter(pk=self.alheio.pk).exists())

@@ -562,14 +562,14 @@ class ProgramasCrudTests(TestCase):
 
     def test_crud_programa(self):
         response = self.client.post(
-            reverse("planos_trabalho:programa_novo"),
+            reverse("planos_trabalho:programa_create"),
             {"nome": "Operação Verão", "ativo": "on", "ordem": "50"},
         )
         self.assertRedirects(response, reverse("planos_trabalho:programas_index"))
         programa = ProgramaSolicitante.objects.get(nome="OPERAÇÃO VERÃO")
 
         response = self.client.post(
-            reverse("planos_trabalho:programa_editar", args=[programa.pk]),
+            reverse("planos_trabalho:programa_update", args=[programa.pk]),
             {"nome": "Operação Verão Maior", "ativo": "on", "ordem": "55"},
         )
         self.assertRedirects(response, reverse("planos_trabalho:programas_index"))
@@ -577,7 +577,7 @@ class ProgramasCrudTests(TestCase):
         self.assertEqual(programa.nome, "OPERAÇÃO VERÃO MAIOR")
 
         response = self.client.post(
-            reverse("planos_trabalho:programa_excluir", args=[programa.pk]),
+            reverse("planos_trabalho:programa_delete", args=[programa.pk]),
         )
         self.assertRedirects(response, reverse("planos_trabalho:programas_index"))
         self.assertFalse(ProgramaSolicitante.objects.filter(pk=programa.pk).exists())
@@ -595,14 +595,14 @@ class HorariosCrudTests(TestCase):
 
     def test_crud_horario(self):
         response = self.client.post(
-            reverse("planos_trabalho:horario_novo"),
+            reverse("planos_trabalho:horario_create"),
             {"faixa": "11:00 até 19:00", "ativo": "on", "ordem": "40"},
         )
         self.assertRedirects(response, reverse("planos_trabalho:horarios_index"))
         horario = HorarioAtendimento.objects.get(faixa="11:00 até 19:00")
 
         response = self.client.post(
-            reverse("planos_trabalho:horario_editar", args=[horario.pk]),
+            reverse("planos_trabalho:horario_update", args=[horario.pk]),
             {"faixa": "11:30 até 19:30", "ativo": "on", "ordem": "45"},
         )
         self.assertRedirects(response, reverse("planos_trabalho:horarios_index"))
@@ -610,7 +610,7 @@ class HorariosCrudTests(TestCase):
         self.assertEqual(horario.faixa, "11:30 até 19:30")
 
         response = self.client.post(
-            reverse("planos_trabalho:horario_excluir", args=[horario.pk]),
+            reverse("planos_trabalho:horario_delete", args=[horario.pk]),
         )
         self.assertRedirects(response, reverse("planos_trabalho:horarios_index"))
         self.assertFalse(HorarioAtendimento.objects.filter(pk=horario.pk).exists())
