@@ -544,9 +544,17 @@ class PlanoTrabalho(TimeStampedModel, CancelavelModel):
         area = get_current_area() if area is None else area
         with transaction.atomic():
             config = (
-                ConfiguracaoSistema.objects.select_for_update().filter(area=area).order_by("pk").first()
+                # `BE-09`: `all_objects` nos dois ramos. O escopo é a `area` recebida no
+                # argumento — `proximo_numero(self.area)`, a área do **plano**, não a
+                # ativa. Recortado, o `SELECT ... FOR UPDATE` não acha a linha, cai no
+                # `get_for_area` abaixo e emite número a partir de outro contador:
+                # plano de trabalho duplicado, sem erro nenhum.
+                ConfiguracaoSistema.all_objects.select_for_update().filter(area=area).order_by("pk").first()
                 if area is not None
-                else ConfiguracaoSistema.objects.select_for_update().filter(area__isnull=True).order_by("pk").first()
+                else ConfiguracaoSistema.all_objects.select_for_update()
+                .filter(area__isnull=True)
+                .order_by("pk")
+                .first()
             )
             if config is None:
                 config = ConfiguracaoSistema.get_for_area(area)

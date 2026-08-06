@@ -574,7 +574,15 @@ class ConfiguracaoSistema(TimeStampedModel):
         help_text="Sufixo aplicado à numeração do plano (ex.: 20/2026/ASCOM).",
     )
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita.
+    # Este modelo é singleton **por área** num `OneToOneField`, então um recorte
+    # errado não devolve lista vazia — duplica linha e estoura o `unique`. Ver os
+    # comentários de `get_singleton` e `get_for_area` logo abaixo.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         verbose_name = "Configuração do sistema"
         verbose_name_plural = "Configurações do sistema"
 
@@ -605,6 +613,11 @@ class ConfiguracaoSistema(TimeStampedModel):
         current_area = get_current_area()
         if current_area is not None:
             return cls.get_for_area(current_area)
+        # `BE-09`: `objects` mesmo, e não `all_objects`, ainda que a linha case com o
+        # padrão de consulta global. Ela **só é alcançada quando `current_area` já
+        # é `None`**, pelo retorno antecipado quatro linhas acima. Aí o manager ou
+        # não recorta (sem request) ou recorta exatamente para `area IS NULL`
+        # (request sem área) — redundante nos dois casos, nunca divergente.
         obj = cls.objects.filter(area__isnull=True).order_by("pk").first()
         if obj is not None:
             return obj
@@ -628,7 +641,14 @@ class ConfiguracaoSistema(TimeStampedModel):
     def get_for_area(cls, area):
         if area is None:
             return cls.get_singleton()
-        obj, _ = cls.objects.get_or_create(area=area, defaults={"prazo_justificativa_dias": 10})
+        # `BE-09`: `all_objects` — aqui a área vem no argumento, e ela **diverge** da
+        # ativa em produção: `cadastros/selectors.py:208`, `planos_trabalho/services.py`
+        # e `prestacoes_contas/services.py:133` (a correção do `BE-06`) chamam com a
+        # área de outro registro. Recortado, o `get` vem vazio, o `create` roda e o
+        # `OneToOneField` estoura com uma segunda configuração para a mesma área.
+        obj, _ = cls.all_objects.get_or_create(
+            area=area, defaults={"prazo_justificativa_dias": 10},
+        )
         return obj
 
     def save(self, *args, **kwargs):
