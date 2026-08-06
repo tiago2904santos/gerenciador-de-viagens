@@ -211,9 +211,13 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       CodeQL e gate de acessibilidade seguem abertos
 
 ### Fase 2 — Isolamento por área
-- [ ] `DB-03` limpeza de rascunhos apaga rascunho de outra área
+- [x] `DB-03` limpeza de rascunhos apaga rascunho de outra área — e mais: sem limite de idade, ela
+      apagava o rascunho que outra pessoa da **mesma** área estava editando, porque `Roteiro` não
+      tem dono. Registrado como `NOVO-13` e corrigido junto (mesmas três linhas de `filter`).
 - [ ] `BE-09` `AreaScopedManager` nos 28 modelos com `area`
-- [ ] `BE-10` app `justificativas` sem isolamento
+- [x] `BE-10` app `justificativas` sem isolamento — **já estava resolvido** pelo `NOVO-06` e pelo
+      `NOVO-09`; a verificação de 06/08 conferiu os quatro pontos do enunciado um a um. A Fase 2
+      tem 6 IDs, não 7.
 - [ ] `DB-01` `TabelaDiaria` sem `area`
 - [ ] `DB-02` `area` anulável em 27 de 28 modelos
 - [ ] `DB-04` cache documental não recorta por área
