@@ -2117,6 +2117,34 @@ mexer no editor na fase 6.
 
 ---
 
+### NOVO-25 ✅ RESOLVIDO · 🔴 `NOVO` Auditor de área reprovava todo PR do repositório por depender do `.env` do desenvolvedor · QA · 0,25 d
+
+`scripts/audit_area_scoped_managers.py:66` — o gate do `BE-09` sobe o Django de verdade (precisa de
+`apps.get_models()`) e apontava para `config.settings.dev`. Esse módulo **exige**
+`FIELD_ENCRYPTION_KEYS` no ambiente, e o CI não define a chave. O auditor morria em
+`django.setup()` antes de olhar um modelo sequer:
+
+```
+RuntimeError: FIELD_ENCRYPTION_KEYS não está definida.
+##[error]Process completed with exit code 1.
+```
+
+Reprovava **todo PR**, com um traceback sem relação nenhuma com o diff. Verde na máquina de quem
+escreveu porque lá existe `.env`; vermelho em qualquer lugar limpo. Foi encontrado quando o CI
+reprovou o PR do `NOVO-23` — cujos passos todos passaram antes deste.
+
+Corrigido para `config.settings.test`, que gera a própria chave Fernet
+(`config/settings/test.py:35`) e é o que a suíte já usa. `setdefault` preservado: quem exportar o
+módulo continua mandando.
+
+O teste (`core/tests/test_auditores_sem_env.py`) roda o script num ambiente cru. **A primeira
+versão dele não valia nada** e passava com o script defeituoso: `config/settings/base.py:16` chama
+`load_dotenv(BASE_DIR / ENV_FILE)` com caminho **absoluto**, então limpar variáveis não esconde o
+`.env` do repositório. É preciso apontar `ENV_FILE` para um arquivo inexistente.
+
+`scripts/inspect_area_conflicts.py:18` tem a mesma linha, mas **não é gate de CI** — é ferramenta
+de inspeção manual, e ali `dev` é defensável. Fica anotado, não corrigido.
+
 ### NOVO-24 ⚪ `NOVO` `.then` escapa do `try/catch` do `async` na configuração do Drive · QA · 0,25 d
 
 `static/js/pages/gdrive_config.js:287` — dentro de um `try` de função `async`,

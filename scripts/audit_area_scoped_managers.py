@@ -57,7 +57,13 @@ FORA_DO_RECORTE = {"usuarios.VinculoUsuarioArea"}
 
 def _preparar_django():
     sys.path.insert(0, str(RAIZ))
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.dev")
+    # `config.settings.dev` exige `FIELD_ENCRYPTION_KEYS` no ambiente e o CI não
+    # define a chave: com `dev` este auditor morre em `django.setup()` antes de
+    # olhar um modelo sequer, e reprova todo PR. Passava na máquina de quem
+    # escreveu porque lá existe `.env`. `config.settings.test` gera a própria
+    # chave Fernet (`config/settings/test.py:35`) e é o que a suíte já usa.
+    # `setdefault`: quem exportar o módulo continua mandando.
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.test")
     import django
 
     django.setup()
