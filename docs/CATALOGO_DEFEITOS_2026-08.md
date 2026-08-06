@@ -2567,3 +2567,46 @@ de graça). Os dois **falham contra o código antigo**. `test_o_custo_nao_cresce
 é a rede anti-N+1 e passa nos dois estados de propósito.
 
 Suíte completa verde nas três formas — série, `--parallel 4` e **`--reverse`**, que era a vermelha.
+
+---
+
+### NOVO-27 ✅ RESOLVIDO · 🟠 `NOVO` Correção do `NOVO-26` virou uma consulta por card na lista de roteiros · COR · 0,25 d
+
+**Regressão minha, achada pelo CI da `main`** — run **651**, passo `Enforce list performance ceilings
+(PF-07)`:
+
+```
+roteiros:index @ 200:    consultas 47 passou do teto 32
+roteiros:index @ 20000:  consultas 47 passou do teto 32
+```
+
+Bisect limpo: run **649** (`9af3e59`, até o #213) verde; run **651** (`b630cc3`, já com o #214)
+vermelho. A lista renderiza **15** cards e 47 − 32 = **15** — uma consulta por card.
+
+**Causa.** O `NOVO-26` tirou o mapa de capitais da memória do processo, e com razão: ele ficava
+velho e `classify` decide valor de diária. Só que `roteiros/views.py` monta um card por roteiro, e
+cada card chamava `capitais_por_uf()` por conta própria (`presenters.py` → `_inferir_tipo_destino`
+→ `infer_tipo_destino_from_paradas`). O cache que saiu **estava fazendo trabalho real ali**: depois
+do primeiro card, os outros catorze saíam de graça.
+
+**A rede do `NOVO-26` mediu o eixo errado.** `test_o_custo_nao_cresce_com_o_numero_de_destinos`
+conta marcadores **dentro de um cálculo**. O que estourou foi **cálculos por página** — eixo que eu
+não testei.
+
+**Corrigido** resolvendo o mapa uma vez por página e passando adiante, no mesmo desenho que
+`classify` e `build_periods` já usavam: `infer_tipo_destino_from_paradas` ganhou o parâmetro
+opcional `capitais`, e `apresentar_roteiro_card` também. Medido com a régua de verdade, contra
+PostgreSQL: **47 → 33**, e nenhuma outra rota se moveu.
+
+**O teto sobe de 32 para 33, de propósito.** Os 32 tinham sido medidos com o cache de processo já
+quente — zero consultas de capitais por página. A consulta que sobra é uma por requisição, e é
+exatamente o que o `NOVO-26` comprou: capital marcada no admin passa a valer na requisição
+seguinte, em vez de só depois de reiniciar o worker. Subido com `--permitir-subir-teto`, que existe
+para isto, e **só** em `consultas` de `roteiros:index` — a régua queria regravar todos os `kb_html`
+com ±0,2 de ruído da minha máquina, e isso foi descartado.
+
+Rede nova: `roteiros/tests/test_custo_da_lista.py`. Ela afirma **o número de cards renderizados**
+antes de medir — a primeira versão passava contra o código defeituoso porque o fixture sem
+`saida_dt` caía fora de todas as abas e a lista vinha vazia. E filtra pelo `WHERE
+"cadastros_cidade"."capital"`, não pela palavra solta: `capital` é coluna e aparece em qualquer
+select de `Cidade`, o que me fez ler 4 consultas onde havia 1.

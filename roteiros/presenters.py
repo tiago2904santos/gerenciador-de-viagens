@@ -78,7 +78,7 @@ def _trechos_visiveis(trechos_payload):
     }
 
 
-def _inferir_tipo_destino(destinos):
+def _inferir_tipo_destino(destinos, capitais=None):
     paradas = []
     for destino in destinos:
         cidade = getattr(destino, "cidade", None)
@@ -87,7 +87,7 @@ def _inferir_tipo_destino(destinos):
         uf = getattr(estado, "sigla", None) or getattr(cidade, "uf", None)
         if cidade_nome or uf:
             paradas.append((cidade_nome, uf))
-    return infer_tipo_destino_from_paradas(paradas) if paradas else ""
+    return infer_tipo_destino_from_paradas(paradas, capitais) if paradas else ""
 
 
 def _roteiro_inicio_fim(roteiro):
@@ -164,7 +164,7 @@ def _roteiro_faixa_lateral_class(roteiro):
     return "roteiro-list-card--faixa-neutro"
 
 
-def apresentar_roteiro_card(roteiro, *, todos_trechos=False):
+def apresentar_roteiro_card(roteiro, *, todos_trechos=False, capitais=None):
     origem_txt = _label_cidade_uf(roteiro.origem_cidade, roteiro.origem_estado)
     destinos_todos = list(roteiro.destinos.all()) if roteiro.pk else []
     destinos_txt_list = [
@@ -263,7 +263,7 @@ def apresentar_roteiro_card(roteiro, *, todos_trechos=False):
         "diaria_resumo": diaria_resumo,
         "diaria_extenso": diaria_extenso,
         "diaria_composicao_linhas": diaria_composicao_linhas,
-        "diaria_tipo_destino": _inferir_tipo_destino(destinos_todos),
+        "diaria_tipo_destino": _inferir_tipo_destino(destinos_todos, capitais),
         "diaria_vazio": diaria_vazio,
         "trechos": trechos_visiveis,
         "trechos_count": trechos_count,

@@ -349,4 +349,6 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `NOVO-02` suíte trava ao combinar certos grupos de apps — **não reproduziu** em 06/08 (a
       combinação do catálogo passa, inclusive em `--reverse`). A sondagem achou o `NOVO-26`
       (mapa de capitais memorizado no processo decidindo diária com base velha, **fechado**)
+- [x] `NOVO-27` regressão do `NOVO-26`: uma consulta de capitais por card na lista de
+      roteiros (teto do `PF-07` 32 → 47). Corrigida; teto sobe a 33 de propósito
 - [ ] `QA-17` triagem dos 13 PRs abertos
