@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django import forms
 from django.db.models import Q
+from django.urls import reverse_lazy
 
 from cadastros.form_widgets import ServidorEquipeSelectMultiple
 from cadastros.form_widgets import ServidorMotoristaSelect
@@ -15,6 +16,7 @@ from core.tenancy import filter_queryset_by_area
 from oficios.forms import ModeloMotivoSelect
 from oficios.models import ModeloMotivoOficio
 from oficios.models import Oficio
+from oficios.picker import renderizar_so_os_escolhidos
 
 from .models import OrdemServico
 
@@ -109,6 +111,9 @@ class OrdemServicoForm(forms.ModelForm):
                 **widget_attrs(WidgetStyle.TERM_OFICIO_OS_SOURCE),
                 "hidden": True,
                 "data-source-document": "os-oficios-summary",
+                # `NOVO-07`: liga o modo remoto do seletor. Sem este atributo
+                # ele segue filtrando só o que está no DOM, como antes.
+                "data-picker-source-url": reverse_lazy("ordens_servico:api_buscar_oficios"),
             }),
             "data_evento_inicio": forms.HiddenInput(attrs={"data-cv-date-picker-start-value": "true"}),
             "data_evento_fim": forms.HiddenInput(attrs={"data-cv-date-picker-end-value": "true"}),
@@ -203,6 +208,11 @@ class OrdemServicoForm(forms.ModelForm):
             .filter(Q(cancelado=False) | Q(pk__in=ja_vinculados))
             .order_by("-data_criacao", "-created_at")
         )
+        # `NOVO-07`: o campo **aceita** qualquer ofício da área — é o `queryset`
+        # acima que valida o pk vindo do seletor — mas **renderiza** só o que já
+        # está selecionado. Antes ia um `<option>` por ofício da área. A ordem
+        # importa, e o porquê está em `oficios/picker.py`.
+        renderizar_so_os_escolhidos(self, "oficios")
 
         self.fields["data_evento_inicio"].required = False
         self.fields["data_evento_fim"].required = False

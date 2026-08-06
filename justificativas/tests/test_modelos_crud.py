@@ -1,3 +1,5 @@
+import json
+
 from urllib.parse import urlencode
 
 from django.contrib.auth import get_user_model
@@ -77,16 +79,22 @@ class JustificativasQuickAddTests(TestCase):
         self.assertContains(response, "Buscar ofício vinculado")
         self.assertContains(response, reverse("justificativas:modelos_index"))
 
-    def test_oficios_summary_ordena_pelo_ultimo_criado(self):
+    def test_a_busca_de_oficios_ordena_pelo_ultimo_criado(self):
+        """A ordem é por `created_at`, não por `data_criacao` — o fixture inverte
+        os dois de propósito para que trocar um pelo outro reprove aqui.
+
+        `NOVO-07`: a lista deixou de vir no `json_script` da página e passou a vir
+        do endpoint de busca. A ordem é a mesma, e é isto que prova.
+        """
         antigo = Oficio.objects.create(numero=150, ano=2026, data_criacao="2026-08-01")
         recente = Oficio.objects.create(numero=5, ano=2026, data_criacao="2026-05-01")
         Oficio.objects.filter(pk=antigo.pk).update(created_at="2026-07-01 12:00:00+00:00")
         Oficio.objects.filter(pk=recente.pk).update(created_at="2026-08-01 18:00:00+00:00")
 
-        response = self.client.get(reverse("justificativas:index"))
-        summaries = response.context["oficios_summary"]
-        ordered = sorted(summaries.values(), key=lambda item: item["order"])
-        self.assertEqual([item["id"] for item in ordered[:2]], [recente.pk, antigo.pk])
+        response = self.client.get(reverse("justificativas:api_buscar_oficios"))
+        resultados = json.loads(response.content)["resultados"]
+
+        self.assertEqual([item["id"] for item in resultados[:2]], [recente.pk, antigo.pk])
 
     def test_quick_add_cria_justificativa_para_varios_oficios(self):
         oficio_a = Oficio.objects.create(numero=1, ano=2026, data_criacao="2026-05-10")

@@ -124,7 +124,8 @@ class OrcamentoDeQueriesEventoComOrdensTests(TestCase):
 
     O fixture da classe acima não tem OS, então ele não exercita esse caminho —
     e sem este teste dá para apagar o `assinante=` do `eventos/views.py` sem
-    nada falhar, devolvendo a consulta por card que o `NOVO-07` tirou.
+    nada falhar, devolvendo a consulta por card que o `NOVO-07` tirou (o do ciclo
+    2026-07 — a numeracao recomecou, e o `NOVO-07` de agosto e outra coisa).
     """
 
     @classmethod

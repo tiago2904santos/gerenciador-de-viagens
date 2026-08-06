@@ -248,6 +248,11 @@ D1 (régua) ──┬──► D2 (ícones) ──► D3 (menus) ──► [acei
 > listas (`NOVO-08`) — nenhum deles visível na linha de base, que mediu com o banco vazio.
 > O `NOVO-08` é trabalho de desempenho e entra nesta fila; o `NOVO-06` é vazamento de dado
 > entre áreas e **não espera a fila de desempenho**.
+>
+> **Os três fechados em 06/08.** O `NOVO-07` foi o que mais rendeu: `justificativas:index` saiu de
+> **5.398 KB para 142,5 KB** com 20.000 ofícios, e a diferença entre os volumes 200 e 20.000 — que
+> era 27× — virou 0,3%. Consultas da rota: 17 → 10. Tetos rebaixados em
+> `scripts/tetos_desempenho.json`, que é onde a catraca fica.
 
 **D1 vem primeiro e não é negociável.** Sem a régua no CI, toda etapa seguinte é afirmação sem
 prova, e a regressão volta no PR seguinte sem ninguém ver. D2 antes de D3 porque o menu carrega

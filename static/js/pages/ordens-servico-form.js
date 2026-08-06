@@ -677,6 +677,23 @@
       renderList(search.value);
     });
 
+    /* NOVO-07: os candidatos deixaram de vir todos no HTML. `summaries` recebe
+       os novos porque e o que `onOficiosChange` consulta para preencher datas,
+       destino e equipe. */
+    window.CV.documentSearch.attach({
+      select: select,
+      input: search,
+      onResults: function (novos) {
+        novos.forEach(function (resumo) {
+          var chave = String(resumo.id);
+          if (summaries[chave]) return;
+          summaries[chave] = resumo;
+          items.push(resumo);
+        });
+        renderList(search.value);
+      },
+    });
+
     renderList(search.value);
   }
 

@@ -245,6 +245,23 @@
       renderList(search.value);
     });
 
+    /* NOVO-07: os candidatos deixaram de vir todos no HTML. Os resumos novos
+       entram em `summaries` tambem, e nao so em `items`, porque e de la que
+       `selectedSummary()` le o que preenche a tela. */
+    window.CV.documentSearch.attach({
+      select: select,
+      input: search,
+      onResults: function (novos) {
+        novos.forEach(function (resumo) {
+          var chave = String(resumo.id);
+          if (summaries[chave]) return;
+          summaries[chave] = resumo;
+          items.push(resumo);
+        });
+        renderList(search.value);
+      },
+    });
+
     renderList(search.value);
     renderSummary();
   }

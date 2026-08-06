@@ -8,6 +8,7 @@ from urllib.parse import urlencode
 from django.contrib import messages
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -20,6 +21,11 @@ from documentos.services.async_generation import enfileirar_documento
 from documentos.services.types import DocumentoFormato
 from eventos.services import build_evento_document_seed
 from eventos.services import resolve_evento_from_request
+
+from oficios.picker import LIMITE_BUSCA
+from oficios.picker import dados_do_option
+from oficios.picker import oficios_ja_escolhidos
+from oficios.selectors import listar_oficios
 
 from .forms import OrdemServicoForm
 from .models import OrdemServico
@@ -76,7 +82,8 @@ def index(request):
     )
 
     paginacao = contexto_paginacao(lista, request, ORDENS_POR_PAGINA)
-    # Um assinante por pagina, nao um por card (`NOVO-07`).
+    # Um assinante por pagina, nao um por card (`NOVO-07` do ciclo 2026-07,
+    # nao o `NOVO-07` deste ciclo — a numeracao recomecou).
     assinante = get_assinante_os(area=getattr(request, "area", None))
     cards = [
         apresentar_ordem_servico_card(ordem, assinante=assinante)
@@ -337,8 +344,9 @@ def _ordem_is_completa(form, evento_display):
     return bool(equipe_ok and tipo_ok and motivo_ok)
 
 
-def _form_context(*, request, form, ordem=None, evento=None):
-    oficios_qs = form.fields["oficios"].queryset.select_related(
+def _com_o_que_o_resumo_le(oficios):
+    """As relações que `_build_oficio_summary` toca, para não gerar N+1."""
+    return oficios.select_related(
         "roteiro",
         "roteiro__origem_cidade",
         "roteiro__origem_estado",
@@ -348,11 +356,56 @@ def _form_context(*, request, form, ordem=None, evento=None):
         "roteiro__destinos__estado",
         "servidores",
     )
+
+
+def _rotulo_do_option(oficio):
+    """O texto que `OficioMultiSelectWidget.create_option` põe no `<option>`.
+
+    Com acento aqui e sem acento em `termos` — é assim desde antes deste ID. O
+    que a busca cria tem de sair igual ao que o Django renderiza, então o rótulo
+    vem do servidor e não de um palpite do JS.
+    """
+    return f"Ofício {oficio.numero_formatado}"
+
+
+def _resumos_de(oficios):
+    """`{str(pk): resumo}` na forma que `CV.documentSource` consome.
+
+    Recebe um iterável já preparado: `select_related` tem de vir **antes** de
+    qualquer fatiamento, e o Django recusa reescrever um queryset já fatiado.
+    """
     summaries = {}
-    for order, oficio in enumerate(oficios_qs):
+    for order, oficio in enumerate(oficios):
         s = _build_oficio_summary(oficio)
         s["order"] = order
+        s["option"] = dados_do_option(oficio, resumo=s, rotulo=_rotulo_do_option, decorar=True)
         summaries[str(s["id"])] = s
+    return summaries
+
+
+@require_GET
+def api_buscar_oficios(request):
+    """Busca de ofícios para o seletor da OS, sob demanda (`NOVO-07`).
+
+    O recorte por área vem de `listar_oficios`. `cancelado=False` espelha o
+    filtro do campo (`forms.py`): ofício cancelado não é oferecido como novo
+    vínculo. Os já vinculados continuam válidos porque o `queryset` do campo os
+    mantém — este endpoint só alimenta a busca, não a validação.
+    """
+    q = (request.GET.get("q") or "").strip()
+    oficios = (
+        listar_oficios(q=q or None)
+        .filter(cancelado=False)
+        .order_by("-data_criacao", "-created_at")[:LIMITE_BUSCA]
+    )
+    return JsonResponse({"resultados": list(_resumos_de(oficios).values())})
+
+
+def _form_context(*, request, form, ordem=None, evento=None):
+    # `NOVO-07`: só os ofícios **já selecionados** vão no `json_script`. Antes
+    # ia a área inteira, ~680 bytes por ofício, e a página crescia com a tabela.
+    # O resto chega por `api_buscar_oficios`.
+    summaries = _resumos_de(_com_o_que_o_resumo_le(oficios_ja_escolhidos(form, "oficios")))
 
     servidor_create_url = (
         f"{reverse('cadastros:servidor_create')}"

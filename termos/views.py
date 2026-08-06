@@ -9,6 +9,7 @@ from django.core.paginator import Paginator
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import Http404
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -25,7 +26,11 @@ from documentos.services.types import DocumentoFormato
 from eventos.services import build_evento_document_seed
 from eventos.services import resolve_evento_from_request
 
+from oficios.picker import LIMITE_BUSCA
+from oficios.picker import dados_do_option
+from oficios.picker import oficios_ja_escolhidos
 from oficios.selectors import get_oficio_by_id
+from oficios.selectors import listar_oficios
 from oficios.services import redirect_para_corrigir_documento_oficio
 from oficios.services import validar_oficio_para_documento
 
@@ -397,11 +402,10 @@ def _termo_preview_documents(termo):
     }
 
 
-def _form_context(*, request, form, termo=None, evento=None):
-    next_url = request.get_full_path()
-    oficios = (
-        form.fields["oficio"]
-        .queryset.select_related(
+def _com_o_que_o_resumo_le(oficios):
+    """As relações que `_oficio_summary` toca, para o resumo não gerar N+1."""
+    return (
+        oficios.select_related(
             "roteiro__origem_cidade",
             "roteiro__origem_estado",
             "viatura",
@@ -420,11 +424,54 @@ def _form_context(*, request, form, termo=None, evento=None):
             "servidores_termo_autorizacao__unidade",
         )
     )
+
+
+def _rotulo_do_option(oficio):
+    """O texto que `OficioSelectSingle.create_option` põe no `<option>`.
+
+    Sem acento, e é assim desde antes deste ID — o que a busca cria tem de sair
+    igual ao que o Django renderiza, então o rótulo vem daqui e não do JS.
+    """
+    return f"Oficio {oficio.numero_formatado}"
+
+
+def _resumos_de(oficios):
+    """`{str(pk): resumo}` na forma que `CV.documentSource` consome.
+
+    Recebe um iterável já preparado: `select_related` tem de vir **antes** de
+    qualquer fatiamento, e o Django recusa reescrever um queryset já fatiado.
+    """
     summaries = {}
     for index, oficio in enumerate(oficios):
         summary = _oficio_summary(oficio)
         summary["order"] = index
+        summary["option"] = dados_do_option(
+            oficio, resumo=summary, rotulo=_rotulo_do_option, decorar=True
+        )
         summaries[str(summary["id"])] = summary
+    return summaries
+
+
+@require_GET
+def api_buscar_oficios(request):
+    """Busca de ofícios para o seletor do termo, sob demanda (`NOVO-07`).
+
+    O recorte por área vem de `listar_oficios`, mesmo caminho da lista de
+    ofícios. A ordenação é a do campo (`-data_criacao, -created_at`) e não o
+    default do selector (`-numero, -ano`): trocar a ordem aqui mudaria a tela
+    sem que nada avisasse.
+    """
+    q = (request.GET.get("q") or "").strip()
+    oficios = listar_oficios(q=q or None).order_by("-data_criacao", "-created_at")[:LIMITE_BUSCA]
+    return JsonResponse({"resultados": list(_resumos_de(oficios).values())})
+
+
+def _form_context(*, request, form, termo=None, evento=None):
+    next_url = request.get_full_path()
+    # `NOVO-07`: só os ofícios **já selecionados** vão no `json_script`. Antes
+    # ia a área inteira, ~680 bytes por ofício, e a página crescia com a tabela.
+    # O resto chega por `api_buscar_oficios`.
+    summaries = _resumos_de(_com_o_que_o_resumo_le(oficios_ja_escolhidos(form, "oficio")))
     index_url = _termo_lista_url(termo=termo, evento=evento)
     back_label = _termo_back_label(termo=termo, evento=evento)
     return {
