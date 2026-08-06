@@ -1,6 +1,8 @@
 import hashlib
 
 from django.db import models
+
+from core.managers import AreaScopedManager
 from django.db.models import Q
 from django.core.validators import FileExtensionValidator
 
@@ -85,7 +87,14 @@ class PrestacaoContas(models.Model):
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita
+    # para código que precisa enxergar todas. `default_manager_name` mantém o admin,
+    # as relações reversas e `validate_unique` irrestritos — ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["-criado_em"]
         indexes = [
             models.Index(fields=["area", "-criado_em"], name="prestacoes_area_criado_idx"),
@@ -643,7 +652,12 @@ class ModeloTextoRelatorioTecnico(models.Model):
     texto = models.TextField()
     ordem = models.PositiveIntegerField(default=100)
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["campo", "ordem", "nome"]
         verbose_name = "Modelo de texto do RT"
         verbose_name_plural = "Modelos de texto do RT"

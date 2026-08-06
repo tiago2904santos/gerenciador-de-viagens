@@ -54,7 +54,21 @@ def _job_key(*, tipo: str, parametros: dict, area_id, usuario_id, disposicao: st
 
 
 def _objeto_do_job(model, *, pk, area_id):
-    obj = model.objects.get(pk=pk)
+    # `BE-09`: `_base_manager`, e não `objects` nem `all_objects`.
+    #
+    # A área vem do **job** (`area_id`) e é conferida à mão nas duas linhas abaixo,
+    # então a leitura aqui tem de ser irrestrita. Depender de `objects` seria
+    # depender de o worker do Celery não ter request — verdade hoje, mas não
+    # contrato, e `CELERY_TASK_ALWAYS_EAGER` faz a task rodar dentro do request nos
+    # testes (`NOVO-20`).
+    #
+    # E `all_objects` não serve porque esta função é genérica sobre cinco modelos
+    # de apps diferentes — `Oficio`, `PlanoTrabalho`, `OrdemServico`,
+    # `TermoAutorizacao` e `Servidor` — que o `BE-09` migra em fatias diferentes;
+    # `Servidor` só ganha `all_objects` na fatia 5. `_base_manager` existe em todo
+    # modelo, nunca recorta, e é o que o próprio Django usa para ler linha por pk
+    # (travessia de FK, `refresh_from_db`).
+    obj = model._base_manager.get(pk=pk)
     object_area_id = getattr(obj, "area_id", None)
     if object_area_id != area_id:
         raise model.DoesNotExist

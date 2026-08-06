@@ -155,7 +155,11 @@ def get_cached_document_artifact(
             filters["termo_id"] = termo_id
         if servidor_id is not None:
             filters["servidor_id"] = servidor_id
-        art = DocumentoArtefato.objects.filter(**filters).order_by("-criado_em").first()
+        # `BE-09`: `all_objects`, pelo mesmo motivo do bloco acima — quem separa as
+        # áreas aqui é a **referência** (obrigatória desde o `DB-04`), não a área
+        # ambiente. Um artefato pertence a uma área só, então filtrar por `oficio_id`
+        # já implica filtrar por área, e a busca continua idêntica no request e na worker.
+        art = DocumentoArtefato.all_objects.filter(**filters).order_by("-criado_em").first()
     except Exception:
         logger.exception("Falha ao consultar cache documental.")
         return None
