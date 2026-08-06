@@ -263,6 +263,19 @@
       if (!open) novaPastaNome.focus();
     });
 
+    function selecionarPastaCriada(pasta) {
+      // Roda depois da recarga, quando a pasta JÁ existe no servidor. Nada aqui
+      // pode virar "não foi possível criar a pasta": se a seleção não acontecer,
+      // a pasta nova continua visível na lista recarregada, só não vem marcada.
+      const id = pasta && pasta.id;
+      if (!id) return;
+      // `CSS.escape` porque o id entra num seletor de atributo: no modo mock o id
+      // é "mock-nova-" + o nome digitado (`services.py:200`), e uma aspa no nome
+      // fazia o `querySelector` estourar `SyntaxError`.
+      const item = folderList.querySelector(`[data-id="${CSS.escape(String(id))}"]`);
+      if (item) item.querySelector(".gdrive-folder-item__select")?.click();
+    }
+
     btnCriar.addEventListener("click", async () => {
       const nome = (novaPastaNome.value || "").trim();
       if (!nome) {
@@ -283,12 +296,13 @@
         novaPastaNome.value = "";
         newFolderPanel.hidden = true;
         btnToggleCriar.textContent = "+ Criar nova pasta aqui";
-        // Selecionar automaticamente a pasta criada e recarregar a lista
-        loadPastas(currentPaiId()).then(() => {
-          // Tentar selecionar a pasta recém-criada
-          const item = folderList.querySelector(`[data-id="${data.pasta.id}"]`);
-          if (item) item.querySelector(".gdrive-folder-item__select")?.click();
-        });
+        // NOVO-24: este `await` era um `.then` solto. Sem ele o callback ficava
+        // FORA do `try` — um erro ali (id ausente, seletor inválido) não chegava
+        // ao `catch` de baixo e sumia no console — e o `finally` reabilitava o
+        // botão por cima da recarga, deixando "Criar pasta" clicável com a lista
+        // ainda em "Carregando…".
+        await loadPastas(currentPaiId());
+        selecionarPastaCriada(data.pasta);
       } catch (err) {
         await window.CV.feedback.alert("Não foi possível criar a pasta: " + err.message);
       } finally {

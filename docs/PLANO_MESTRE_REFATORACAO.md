@@ -173,7 +173,9 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `BE-08` oito redirects seguem o que o POST mandar
 - [x] `JS-04` `.then()` sem `.catch` no editor de roteiros — a fila de estimativa morria inteira
       no primeiro erro, não só o trecho que falhou. Achou `NOVO-22` (`applyingState` travado,
-      **fechado junto**), `NOVO-23` e `NOVO-24`
+      **fechado junto**), `NOVO-23` (remoção de assinado que mentia, **fechado** no PR #208) e
+      `NOVO-24` (`.then` solto na criação de pasta do Drive, **fechado**). Os três achados do
+      inventário estão resolvidos.
 - [x] `HT-09` login sem skip link e sem erro associado
 - [x] `HT-11` campos de formulário renderizados sem nome acessível (5 medidos em 2 telas)
 - [x] `QA-01` login do Django Admin sem rate limit nenhum

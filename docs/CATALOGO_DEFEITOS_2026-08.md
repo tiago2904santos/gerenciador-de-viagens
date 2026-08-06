@@ -2153,12 +2153,33 @@ gate volta a `dev` na primeira edição distraída e ninguém percebe até o pr�
 
 ---
 
-### NOVO-24 ⚪ `NOVO` `.then` escapa do `try/catch` do `async` na configuração do Drive · QA · 0,25 d
+### NOVO-24 ✅ RESOLVIDO · ⚪ `NOVO` `.then` escapa do `try/catch` do `async` na configuração do Drive · QA · 0,25 d
 
 `static/js/pages/gdrive_config.js:287` — dentro de um `try` de função `async`,
 `loadPastas(currentPaiId()).then(function () { … })` é encadeado **sem `await`**, então o `catch` de
 `:292` não o alcança e o `CV.feedback.alert` de `:293` nunca dispara para essa falha.
 
-Efeito: a pasta é criada no servidor, mas a lista não recarrega e a nova pasta não é
-auto-selecionada. O `finally` de `:294` reabilita o botão, então visualmente parece que não
-aconteceu nada. Achado no mesmo inventário.
+**Correção de rumo na descrição original.** O inventário do `JS-04` supôs que "a lista não
+recarrega"; medido no navegador, ela recarrega normalmente — `loadPastas` tem `try/catch` próprio e
+nunca rejeita. O que o `.then` solto de fato causava é outra coisa, e são dois efeitos:
+
+1. **Exceção invisível dentro do callback.** O gatilho real é o modo mock: `services.py:200` monta o
+   id da pasta criada como `"mock-nova-" + nome digitado`, e esse id ia **cru** para dentro de um
+   seletor de atributo. Um nome com aspas — `Ação "2026"` — produzia
+   `Failed to execute 'querySelector' on 'Element': … is not a valid selector`, no console e só no
+   console. Na tela: a pasta aparecia na lista, **não vinha selecionada**, e nada explicava por quê.
+   `data.pasta` ausente dá no mesmo por outro caminho (`TypeError: … reading 'id'`).
+2. **O `finally` passava por cima da recarga.** Medido na ordem dos eventos: o botão voltava a
+   `disabled = false` **antes** de a listagem responder, então "Criar pasta" ficava clicável com a
+   lista ainda em "Carregando…" — dois cliques, duas pastas.
+
+Corrigido com `await loadPastas(currentPaiId())` seguido de `selecionarPastaCriada(data.pasta)`,
+que trata id ausente desistindo (a pasta já existe; a lista recarregada a mostra) e escapa o id com
+`CSS.escape` antes do seletor — o mesmo idioma de `picker.js:489`.
+
+A seleção fica **dentro** do `try` mas depois do ponto em que a criação já deu certo, e não pode
+lançar: falhar ali não pode virar "não foi possível criar a pasta", que seria a mentira que o
+`NOVO-23` acabou de corrigir no modal de assinado.
+
+Teste: `core/tests/test_gdrive_criar_pasta.py` — estático, porque o CI não roda JS (`JS-03`); as 6
+asserções falham contra o código antigo.
