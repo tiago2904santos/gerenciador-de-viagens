@@ -232,13 +232,17 @@ para uma rodada futura, com `DB-01` como pré-requisito.
         desligava o piso de numeração — `NOVO-28`
   - [x] fatia 3 — `roteiros` + `eventos` (4 modelos, 6 sites de `all_objects`; 18
         restantes). Fechou **três vazamentos reais** que não estavam no catálogo
-        (`NOVO-26`) e mostrou que renomear para `all_objects` desinflava a catraca de
+        (`NOVO-30`) e mostrou que renomear para `all_objects` desinflava a catraca de
         ORM-em-view — o auditor passou a contar os dois nomes
   - [x] fatia 4 — `prestacoes_contas` + `documentos` (4 modelos, 4 sites; 14 restantes).
         Encostou no caminho **assíncrono**: `_objeto_do_job` é genérico sobre cinco
         modelos de apps migrados em fatias diferentes, e lá a forma certa é
         `_base_manager`, não `all_objects` — `Servidor` só entra na fatia 5
-  - [ ] fatia 5 — `cadastros` (`ConfiguracaoSistema.get_singleton`)
+  - [x] fatia 5a — `cadastros`, os 5 modelos de cadastro básico (5 sites; 9 restantes).
+        Dois deles falhariam **vazios**, não com erro: o termo genérico do evento e o
+        `Prefetch` de servidores. `129` chamadas fora de teste, não 84 — meu grep usava
+        `\.objects\.` e a forma dominante aqui é `filter_queryset_by_area(X.objects)`
+  - [ ] fatia 5b — `ConfiguracaoSistema` (singleton por área, `OneToOneField`)
   - [ ] fatia 6 — `planos_trabalho`, `justificativas`, `integracoes`, `core.AuditEvent`; fecha o ID
 - [x] `BE-10` app `justificativas` sem isolamento — **já estava resolvido** pelo `NOVO-06` e pelo
       `NOVO-09`; a verificação de 06/08 conferiu os quatro pontos do enunciado um a um. A Fase 2

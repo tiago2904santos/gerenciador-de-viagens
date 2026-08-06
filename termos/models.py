@@ -193,7 +193,11 @@ class TermoAutorizacao(TimeStampedModel, CancelavelModel):
         if not ids:
             return None
         return (
-            Servidor.objects.filter(pk__in=ids)
+            # `BE-09`: `all_objects` — os `ids` vieram dos ofícios do evento, então a
+            # fronteira já é a do evento, não a área ativa. Recortado, o termo genérico
+            # sairia **sem servidores** — vazio, sem erro — e a geração documental roda
+            # em worker, onde não há área ambiente.
+            Servidor.all_objects.filter(pk__in=ids)
             .select_related("cargo", "unidade")
             .order_by("nome")
         )

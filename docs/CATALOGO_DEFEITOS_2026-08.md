@@ -2065,7 +2065,7 @@ para que o padrão da suíte seja o de produção.
 
 ---
 
-### NOVO-26 🟠 `NOVO` Três consultas de roteiro sem recorte de área — fechadas pelo `BE-09` · AUD · 0 d
+### NOVO-30 🟠 `NOVO` Três consultas de roteiro sem recorte de área — fechadas pelo `BE-09` · AUD · 0 d
 
 Apareceram na varredura da fatia 3 do `BE-09`, não no catálogo original. Nenhuma tinha filtro de
 área nenhum:
@@ -2162,6 +2162,42 @@ chega lá.
 
 Vizinho do `NOVO-02`, que em 06/08 **não reproduziu** — mas cuja sondagem achou o `NOVO-26`, esse
 sim um vazamento de estado global entre testes.
+
+### NOVO-31 🟠 `NOVO` `core.E001` não olha nenhum dos seis modelos de `cadastros` · QA · 0,5 d
+
+`core/checks.py:44-68` (`check_operational_records_have_area`, `deploy=True`) reprova o deploy quando
+há registro operacional sem área. Mas `_OPERATIONAL_MODELS` (`core/checks.py:10-19`) tem 8 modelos e
+**nenhum** é de `cadastros`: `Servidor`, `Viatura`, `Unidade`, `Cargo`, `Combustivel` e
+`ConfiguracaoSistema` ficam de fora.
+
+**Efeito:** nada bloqueia hoje um deploy com esses seis cheios de `area IS NULL` — e são justamente
+os que os comandos de seed criam sem área (`seed_cadastros_demo.py:84,93,102,112,125`;
+`resetar_banco_demo.py:170,179,183,197,216`; `importar_estrutura_pcpr.py:330,337,359,429`).
+
+**Vira pré-requisito do `DB-02`:** tornar `area` NOT NULL nesses modelos exige antes saber quantas
+linhas órfãs existem em produção, e o check é o instrumento que deveria dizer.
+
+---
+
+### NOVO-32 🟡 `NOVO` `resetar_banco_demo` recria `ConfiguracaoSistema` sem área · QA · 0,25 d
+
+`cadastros/management/commands/resetar_banco_demo.py:231` instancia `ConfiguracaoSistema()` cru e
+salva, criando linha com `area=NULL`. É exatamente o que o docstring de `get_singleton`
+(`cadastros/models.py:562-563`) promete nunca recriar. A primeira iteração do comando usa
+`get_singleton()` (`:229`); as seguintes, não.
+
+Contradição entre o comando de demonstração e a regra do modelo, e ela repovoa o balde que o
+`backfill_legacy_areas` existe para drenar.
+
+---
+
+### NOVO-33 🟡 `NOVO` `_preencher_roteiro_oficio_com_evento` não tem chamador de produção · BE · 0,25 d
+
+`oficios/services.py:205`. Varredura no repositório inteiro: o único chamador é
+`oficios/tests/test_services.py:221`. Irmão do `NOVO-27`; código morto sai na fase 9, com a prova de
+varredura no PR (`AGENTS.md` §3.6).
+
+---
 
 ---
 
