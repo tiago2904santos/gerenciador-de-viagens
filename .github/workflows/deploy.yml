@@ -73,22 +73,65 @@ jobs:
             # Cria o diretório aqui: o script na VPS ainda é o do commit antigo
             # e pode falhar no mktemp se /var/backups/... não existir.
             mkdir -p /var/backups/gerenciador-viagens
-            APP_ROOT=/var/www/gerenciador-viagens/app \
-              bash scripts/backup_production.sh
+            # QA-03: o caminho do .enc sai no stdout de backup_production.sh e era
+            # jogado fora. É ele que a instrução de recuperação precisa citar — de
+            # nada adianta ter backup se quem está no incidente não sabe qual.
+            # `tail -1` porque a última linha do script é o `printf` do caminho;
+            # a cópia externa opcional (`rclone`, quando BACKUP_RCLONE_REMOTE está
+            # definido) pode falar antes dela, e aí BACKUP_FILE viraria lixo.
+            BACKUP_FILE="$(APP_ROOT=/var/www/gerenciador-viagens/app \
+              bash scripts/backup_production.sh | tail -1)"
+            echo "backup deste deploy: ${BACKUP_FILE}"
+
+            # QA-03: fotografia das migrações aplicadas, para o rollback saber o
+            # que ESTE deploy aplicou. Tirada com o código antigo, antes do
+            # checkout, porque é o estado que ele entende.
+            # `|| true` no grep: sem correspondência ele sai 1 e, com `pipefail`,
+            # derrubaria o deploy num banco ainda sem migração aplicada.
+            ESTADO_MIGRACOES_ANTES="$(mktemp)"
+            python manage.py showmigrations --plan \
+              | { grep '^\[X\]' || true; } | awk '{print $2}' > "$ESTADO_MIGRACOES_ANTES"
 
             reverter() {
               echo "deploy falhou — revertendo para $BEFORE_SHA"
+              # QA-03: o banco volta ANTES do código. Desfazer uma migração exige
+              # os arquivos de migração do commit novo em disco; depois do
+              # checkout de volta eles não existem mais.
+              local rollback=0
+              if [ -f scripts/deploy_rollback.sh ]; then
+                ESTADO_MIGRACOES_ANTES="$ESTADO_MIGRACOES_ANTES" \
+                BACKUP_FILE="$BACKUP_FILE" \
+                APP_ROOT=/var/www/gerenciador-viagens/app \
+                  bash scripts/deploy_rollback.sh || rollback=$?
+              fi
+              # Sem o arquivo, estamos no commit antigo — a falha foi antes do
+              # checkout, então nenhuma migração deste deploy chegou a rodar.
+
               git checkout --detach "$BEFORE_SHA"
               python -m pip install -r requirements/lock.txt --quiet
               systemctl restart gerenciador-viagens
               systemctl restart gerenciador-viagens-celery
+
+              if [ "$rollback" -ne 0 ]; then
+                echo "código revertido, mas o BANCO continua adiante dele — leia a instrução acima."
+                return 1
+              fi
+              echo "revertido: código e banco no estado anterior ao deploy."
             }
-            trap 'reverter; exit 1' ERR
+            # `|| true` no trap: `reverter` devolve 1 quando o banco exigiu
+            # intervenção, e sem isto o `set -e` mataria o handler antes do
+            # `exit 1` — perdendo o código de saída que o Actions lê.
+            trap 'reverter || true; exit 1' ERR
 
             git checkout --detach "$TARGET_SHA"
             python -m pip install -r requirements/lock.txt --quiet
-            python manage.py migrate --noinput
+            # QA-03: `collectstatic` antes de `migrate`. Ele não depende do
+            # schema, e é a falha mais provável e mais boba desta sequência
+            # (disco cheio, permissão). Rodando antes, ela nunca acontece com o
+            # banco já migrado. Depois do `migrate` só restam os dois restarts e
+            # o health check.
             python manage.py collectstatic --noinput --clear
+            python manage.py migrate --noinput
             systemctl restart gerenciador-viagens
             systemctl restart gerenciador-viagens-celery
 
@@ -115,6 +158,6 @@ jobs:
 
             trap - ERR
             if ! saude; then
-              reverter
+              reverter || true
               exit 1
             fi

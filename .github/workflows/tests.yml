@@ -170,6 +170,55 @@ jobs:
             bash scripts/restore_backup.sh "$BACKUP_FILE"
           test "$(cat "$RUNNER_TEMP/media/probe.txt")" = "restore-drill"
 
+      - name: Exercise deploy rollback (QA-03)
+        env:
+          # Banco próprio: o drill migra e desmigra, e não pode interferir no
+          # `gerenciador_test` que os passos vizinhos usam.
+          DB_NAME: drill_rollback
+        run: |
+          set -o pipefail
+          export PGHOST="$DB_HOST" PGPORT="$DB_PORT" PGUSER="$DB_USER" PGPASSWORD="$DB_PASSWORD"
+          export DJANGO_SETTINGS_MODULE=config.settings.test
+          psql -q -c "DROP DATABASE IF EXISTS drill_rollback" postgres
+          psql -q -c "CREATE DATABASE drill_rollback" postgres
+
+          estado() {
+            python manage.py showmigrations --plan | { grep '^\[X\]' || true; } | awk '{print $2}'
+          }
+
+          # Estado "antes do deploy": uma migração atrás em **dois** apps. Dois de
+          # propósito — é onde a ordem inversa entre apps importa, e uma ordem
+          # errada só aparece com mais de um.
+          python manage.py migrate --noinput > /dev/null
+          python manage.py migrate justificativas 0002 --noinput > /dev/null
+          python manage.py migrate termos 0006 --noinput > /dev/null
+          estado > "$RUNNER_TEMP/antes.txt"
+
+          # O "deploy" aplica as duas.
+          python manage.py migrate --noinput > /dev/null
+          estado > "$RUNNER_TEMP/durante.txt"
+          apps_no_delta="$(comm -13 <(sort "$RUNNER_TEMP/antes.txt") <(sort "$RUNNER_TEMP/durante.txt") \
+            | cut -d. -f1 | sort -u | tr '\n' ' ')"
+          # Guarda contra o drill virar vácuo: se o delta parar de cruzar os dois
+          # apps, ele deixou de exercitar a ordenação e isto reprova.
+          test "$apps_no_delta" = "justificativas termos " \
+            || { echo "::error::o drill perdeu o delta de dois apps: [$apps_no_delta]"; exit 1; }
+
+          # O rollback tem de devolver exatamente o estado de antes.
+          ESTADO_MIGRACOES_ANTES="$RUNNER_TEMP/antes.txt" bash scripts/deploy_rollback.sh
+          estado > "$RUNNER_TEMP/depois.txt"
+          diff "$RUNNER_TEMP/antes.txt" "$RUNNER_TEMP/depois.txt" \
+            || { echo "::error::o rollback não devolveu o estado de antes"; exit 1; }
+
+          # Caso mais comum de todos: deploy sem migração nenhuma. Tem de sair 0
+          # e não encostar no banco.
+          ESTADO_MIGRACOES_ANTES="$RUNNER_TEMP/depois.txt" bash scripts/deploy_rollback.sh
+          estado > "$RUNNER_TEMP/depois2.txt"
+          diff "$RUNNER_TEMP/depois.txt" "$RUNNER_TEMP/depois2.txt" \
+            || { echo "::error::o rollback mexeu no banco sem ter o que desfazer"; exit 1; }
+
+          psql -q -c "DROP DATABASE drill_rollback" postgres
+
       - name: Run complete Django test suite with coverage on PostgreSQL
         run: |
           # O omit precisa cobrir tambem os modulos de teste soltos de
