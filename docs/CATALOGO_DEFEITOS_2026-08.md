@@ -2058,15 +2058,41 @@ para que o padrão da suíte seja o de produção.
 
 ---
 
-### NOVO-17 ⚪ `NOVO` `--parallel` esconde a falha real quando o payload do erro não é serializável · QA · 0,5 d
+### NOVO-17 ✅ RESOLVIDO · ⚪ `NOVO` `--parallel` abortava a corrida e não relatava falha nenhuma · QA · 0,5 d
 
-Com uma asserção que falha carregando o arquivo inteiro na mensagem, a suíte em
-`--parallel 4` morre com `TypeError: cannot pickle 'traceback' object` e **não diz qual teste
-falhou**. Em série a mesma falha aparece normal, em 1 linha.
+Enunciado original: *"`--parallel` esconde a falha real quando o payload do erro não é
+serializável"*, culpando "uma asserção que falha carregando o arquivo inteiro na mensagem".
 
-Custa uma rodada de ~40 s para descobrir; o risco é alguém ler o `TypeError` como flakiness de
-infraestrutura e rodar de novo. Vizinho do `NOVO-02` (suíte trava ao combinar certos grupos de
-apps), mas causa diferente e reproduzível.
+**Correção de rumo: o tamanho do payload não tem nada a ver.** A causa é uma dependência ausente.
+O runner paralelo do Django roda cada subsuíte num processo filho e devolve o resultado por
+`multiprocessing`, o que exige **picklar o `sys.exc_info()`**. Objeto `traceback` não é picklável
+pela stdlib; o `tblib` é a biblioteca que ensina o pickle a serializá-lo, e o Django o usa quando
+está instalado (`django/test/runner.py:164`). Ele **não estava em `requirements/`**.
+
+Reproduzido com duas asserções triviais de uma linha:
+
+| | sem `tblib` | com `tblib` |
+|---|---|---|
+| falhas relatadas (`FAIL:`) | **0** | **2** |
+| saída | 125 linhas, terminando em `TypeError: cannot pickle 'traceback' object` | 53 linhas, terminando em `FAILED (failures=2)` |
+
+**Zero, não "escondida":** a corrida abortava no primeiro erro e não relatava nada no formato de
+sempre. O Django até imprime `you should install tblib` **e o nome do teste** — mas no topo da
+saída, soterrado por ~100 linhas de `RemoteTraceback` do `multiprocessing`. Quem lê o fim vê só o
+`TypeError` e conclui instabilidade de infraestrutura, que é exatamente o risco que o enunciado
+antecipou, ainda que pela razão errada.
+
+Corrigido declarando `tblib>=3.0,<4.0` em `requirements/test.txt` e fixando `tblib==3.2.2` em
+`requirements/test-lock.txt`. Suíte completa: **1.530 testes verdes em série (44,7 s) e em
+`--parallel 4` (12,4 s)** — 3,6× mais rápido, e agora utilizável mesmo quando algo falha.
+
+O `tests.yml` roda a suíte **em série**, então o CI nunca viu este defeito: ele custava caro só
+para quem roda localmente. As redes de `core/tests/test_suite_paralela.py` cobrem os dois lados —
+`tblib` importável e `tblib==` presente no lock que o CI instala, porque é o lock que decide o que
+chega lá.
+
+Vizinho do `NOVO-02` (suíte trava ao combinar certos grupos de apps), que segue aberto e tem causa
+diferente.
 
 ---
 
