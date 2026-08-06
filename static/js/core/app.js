@@ -151,13 +151,6 @@ document.documentElement.dataset.appReady = "true";
     register: register,
     registered: function () { return Array.from(enhancers.keys()); },
   };
-  window.CV.componentRegistry = {
-    destroy: destroy,
-    enhance: enhance,
-    register: register,
-    registered: function () { return Array.from(enhancers.keys()); },
-  };
-
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once: true });
   else start();
 }());

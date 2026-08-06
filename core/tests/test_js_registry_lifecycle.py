@@ -52,6 +52,24 @@ class JavascriptRegistryLifecycleTests(SimpleTestCase):
             encoding="utf-8"
         )
 
+    def test_registry_has_a_single_name_without_a_dead_alias(self):
+        """JS-12 — `CV.componentRegistry` era alias sem consumidor.
+
+        O enunciado original dizia que `CV.registry` e `CV.componentRegistry`
+        eram o mesmo objeto; a verificação refutou isso em runtime — eram dois
+        literais distintos, `!==` entre si, com `registered` declarada duas
+        vezes. O defeito real era mais simples: o segundo nome nunca teve um
+        único consumidor em `static/js`, `templates/` ou Python.
+        """
+        static_js = Path(settings.BASE_DIR) / "static" / "js"
+        infratores = [
+            path.relative_to(static_js).as_posix()
+            for path in sorted(static_js.rglob("*.js"))
+            if "componentRegistry" in path.read_text(encoding="utf-8-sig")
+        ]
+        self.assertEqual(infratores, [], f"alias morto de volta em: {infratores}")
+        self.assertIn("window.CV.registry = {", self.registry_source)
+
     def test_registry_exposes_destroy_and_runs_cleanup_for_removed_nodes(self):
         self.assertIn("function destroy(root)", self.registry_source)
         self.assertIn("window.CV.registry = {", self.registry_source)
