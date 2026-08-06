@@ -2314,6 +2314,39 @@ antes** de escrever a entrada, e renumerar as próprias, nunca as alheias — qu
 
 ---
 
+### NOVO-36 ✅ RESOLVIDO · 🟠 `NOVO` Orçamento a frio do LibreOffice calibrado numa geração de runner que não existe mais bloqueia toda prova de CI · QA · 0,25 d
+
+O passo 15 do `tests.yml`, "Enforce real document generation SLA", reprovou três vezes seguidas em
+06/08 — runs 653 e 654 (na `main`) e 657 (PR #226) — **só** no orçamento de partida a frio:
+
+| run | commit | a frio | teto | regime estável | teto |
+|---|---|---|---|---|---|
+| 654 | `b17782a` | **2553,8 ms** | 1500 ms | 96,8 / 98,6 ms | 1000 ms |
+| 657 | `2cb4154` | **1868,4 ms** | 1500 ms | 99,7 / 100,9 ms | 1000 ms |
+
+**Não era código.** O teto de 1500 ms nasceu em 03/08 sobre 1119 ms medidos, e desde então nada
+mudou em `documentos/`, no adaptador de conversão ou em `requirements/lock.txt`. O que mudou foi a
+máquina: o passo "Install LibreOffice" saiu de **28 s** no último run verde (649) para **58, 60 e
+77 s** nos três reprovados. Mesma classe de runner, 2 a 3× mais lenta.
+
+**Efeito, que é o que torna isto 🟠 e não ⚪:** o passo 15 fica **antes** da suíte (18), dos pisos de
+cobertura (19) e da régua do `PF-07` (20). Enquanto ele reprova, os três saem como *skipped* — a
+`main` fica sem prova de CI nenhuma, e todo PR seguinte também. Quatro merges consecutivos entraram
+assim: `BE-23`, `NOVO-31`, `DB-06` e `PF-01`.
+
+**Correção:** `--max-cold-ms` de 1500 para **3000**, com as medições anotadas no próprio passo.
+`--max-ms` fica em 1000 — é ele que mede o custo que o usuário sente em uso normal, e passou com
+folga de 10× nas três reprovações. A partida a frio continua vigiada; o que muda é o orçamento
+caber na máquina de hoje em vez de numa que não temos mais.
+
+**O que este ID NÃO resolve:** a fragilidade de origem. Um número absoluto medido em runner
+compartilhado vai sair de faixa de novo. O desenho que não tem esse problema mede a **razão**
+frio/quente — estável em ~19× nas três amostras, contra um valor absoluto que variou 2,3× — ou
+guarda uma janela das últimas N execuções. Fica catalogado; não entra nesta correção, que existe
+para destravar a catraca hoje.
+
+---
+
 ---
 
 ### NOVO-17 ✅ RESOLVIDO · ⚪ `NOVO` `--parallel` abortava a corrida e não relatava falha nenhuma · QA · 0,5 d

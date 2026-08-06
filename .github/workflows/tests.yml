@@ -159,11 +159,24 @@ jobs:
           # dizia nada sobre o regime estável. Descartar a primeira medição
           # esconderia um custo que o usuário sente na primeira geração depois
           # de ocioso; por isso ela continua vigiada, com limite próprio.
+          #
+          # `--max-cold-ms` foi de 1500 para 3000 em 06/08 (NOVO-28). O teto de
+          # 1500 nasceu em 03/08 sobre 1119 ms medidos; em 06/08 a partida a
+          # frio reprovou três vezes seguidas, com 2553,8 ms (run 654, main),
+          # 1868,4 ms (run 657) e a mesma falha no run 653 — sempre SÓ a frio,
+          # com o regime estável entre 96 e 101 ms, dentro do `--max-ms` de
+          # 1000. Não foi código: nada mudou em `documentos/` nem no lock desde
+          # 03/08, e o passo "Install LibreOffice" saiu de 28 s no último run
+          # verde para 58, 60 e 77 s nos três reprovados — a mesma máquina 2 a
+          # 3× mais lenta. Como o passo fica ANTES da suíte e da régua do
+          # PF-07, um teto calibrado numa geração de runner que não existe mais
+          # bloqueava toda prova de CI do projeto. `--max-ms` fica em 1000: é
+          # ele que mede o custo que o usuário sente em uso normal.
           DOCUMENTOS_UNOSERVER_URL=http://127.0.0.1:2003 \
           DOCUMENTOS_DEFAULT_PDF_ENGINE=unoserver \
           python manage.py documentos_unoserver_check \
             --benchmark --representative-resources --iterations 3 \
-            --max-ms 1000 --max-cold-ms 1500
+            --max-ms 1000 --max-cold-ms 3000
 
       - name: Exercise encrypted database and media restore
         env:
