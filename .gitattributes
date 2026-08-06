@@ -1,0 +1,16 @@
+# Fim de linha (NOVO-18)
+#
+# O repositório mistura CRLF e LF. Medido em 06/08/2026: 164 arquivos com CRLF —
+# 101 `.py`, 21 `.md`, 18 `.html`, 14 `.js`, 7 `.css`, e mais alguns soltos.
+# Qualquer editor que normalize ao salvar reescreve o arquivo inteiro, e a troca
+# de uma linha vira um diff de 1.206 — o que enterra a mudança real na revisão.
+# Aconteceu duas vezes e as duas foram desfeitas editando byte a byte.
+#
+# Esta regra cobre só `*.js` porque `*.js` é o que foi normalizado junto dela:
+# os 14 arquivos de `static/js`. Regra sem normalização não resolve nada — apenas
+# adia o diff de arquivo inteiro para o próximo que tocar no arquivo.
+#
+# Os outros 150 esperam o sweep da fase 9 (`.gitattributes` completo +
+# `git add --renormalize .`), que precisa de fila vazia: renormalizar o
+# repositório inteiro dá conflito em toda branch em voo.
+*.js text eol=lf
