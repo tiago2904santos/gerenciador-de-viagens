@@ -10,7 +10,12 @@ ROOT = Path(__file__).resolve().parents[1]
 # selectors e nunca sobe — mesma convenção do `--max-warnings` do auditor de
 # frontend e do piso de cobertura. O alvo final é zero, mas ele não é atingível
 # num PR só: `core`, `documentos` e `usuarios` estão fora do escopo do `P-01`.
-ORM_EM_VIEW = re.compile(r"\.objects\b")
+# `BE-09`: `all_objects` conta igual. O manager que recorta por área trocou o nome
+# do manager irrestrito, e um `\.objects\b` puro deixaria de casar com
+# `Roteiro.all_objects` — renomear desinflaria esta catraca **sem tirar uma linha
+# de ORM da view**. Pego por `core/tests/test_view_module_boundaries.py`, que
+# existe justamente para impedir que a métrica seja esvaziada por forma.
+ORM_EM_VIEW = re.compile(r"\.(all_)?objects\b")
 DRIVE_ROOT = ROOT / "integracoes" / "google_drive"
 P06_SPLIT_VIEW_MODULES = {
     "oficios/api_views.py",

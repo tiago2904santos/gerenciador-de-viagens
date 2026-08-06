@@ -2032,7 +2032,7 @@ do queryset auto-gerado. O repositório já aplica `filter_queryset_by_area` em 
 `forms.py`, então a lacuna pode ser pequena — ou pode não ser. A régua natural é estender
 `scripts/audit_area_scoped_managers.py` com essa varredura.
 
-### NOVO-22 🟠 `NOVO` A suíte desliga a configuração de numeração e não enxerga o piso do ofício · QA · 0,5 d
+### NOVO-28 🟠 `NOVO` A suíte desliga a configuração de numeração e não enxerga o piso do ofício · QA · 0,5 d
 
 `config/settings/test.py:36` põe `OFICIO_NUMERACAO_USAR_CONFIGURACAO = False`; em produção é
 `True` (`config/settings/base.py:179`). Com ele desligado, `Oficio.get_next_available_numero`
@@ -2053,6 +2053,66 @@ outras duas: `NOVO-20` (`CELERY_TASK_ALWAYS_EAGER` roda a task dentro do request
 **Correção:** decidir se o `False` ainda serve a algum teste — ele foi posto para tornar a
 numeração previsível — e, se servir, invertê-lo (`True` por padrão, `False` só onde for pedido),
 para que o padrão da suíte seja o de produção.
+
+---
+
+### NOVO-26 🟠 `NOVO` Três consultas de roteiro sem recorte de área — fechadas pelo `BE-09` · AUD · 0 d
+
+Apareceram na varredura da fatia 3 do `BE-09`, não no catálogo original. Nenhuma tinha filtro de
+área nenhum:
+
+- `roteiros/roteiro_logic.py:614` (`_get_roteiro_saved_routes`) — o picker de "roteiros salvos" do
+  ofício filtrava só por `status=FINALIZADO`. Uma área via os roteiros finalizados de **todas**.
+- `roteiros/roteiro_logic.py:1088` — validava o `roteiro_evento_id` submetido por `pk` e mais nada;
+  bastava mandar o id de um roteiro alheio para ele ser aceito. (Havia segunda barreira em
+  `vincular_roteiro_ao_oficio_sem_copia`, que compara as áreas — mas ela é a última, não a primeira.)
+- `roteiros/services/roteiro_editor.py:302` (`encontrar_roteiro_duplicado`) — filtrava por sede e
+  destinos. O estrago não seria só ver: a tela usa o retorno para oferecer **sobrescrever** aquele
+  roteiro.
+
+**Efeito:** os dois primeiros expõem sede, destinos e datas de viagem de outra unidade; o terceiro
+permite destruir trabalho alheio.
+
+**Correção:** nenhuma linha de correção própria — o `AreaScopedManager` da fatia 3 fecha os três,
+e é a demonstração do que o `BE-09` prometia: esquecer o filtro deixa de ser vazamento. Cobertos
+por `roteiros/tests/test_recorte_por_area_fatia3.py::VazamentosQueOManagerFechaTests`, que
+reprovam se o manager for retirado.
+
+**0 dias** porque o trabalho já está feito; a linha existe para o defeito ficar registrado, e não
+para ser executada.
+
+---
+
+### NOVO-27 🟡 `NOVO` `oficios/selectors.py:listar_roteiros_para_oficio` não tem chamador · BE · 0,25 d
+
+Varredura da fatia 3: `grep -rn "listar_roteiros_para_oficio"` devolve **só a própria definição**
+(`oficios/selectors.py:162`). Devolve `Roteiro.objects.order_by("-created_at")` sem recorte de área
+— hoje inofensivo, porque ninguém chama, e recortado a partir da fatia 3 de qualquer forma.
+
+Não removido aqui por `AGENTS.md` §3.6: código morto sai com a prova de varredura no PR, e isso é
+assunto da fase 9, não do `BE-09`.
+
+---
+
+### NOVO-29 🟠 `NOVO` Duas sessões alocam ID `NOVO-` sem reserva e colidem · QA · 0,5 d
+
+Terceira colisão em um dia. Cada sessão pega "o próximo número livre" lendo o catálogo, e duas
+sessões que leem ao mesmo tempo pegam o mesmo. Já aconteceu com `NOVO-13` (desfeita renumerando o
+do `JS-06` para `NOVO-19`) e agora com **`NOVO-22`, `NOVO-23` e `NOVO-24`** ao mesmo tempo: a
+sessão paralela registrou `applyingState`, exclusão de documento assinado e `.then` solto; esta
+registrou numeração, consultas de roteiro e selector morto.
+
+**Efeito:** o ID deixa de identificar. Um PR que cita `NOVO-22` passa a ser ambíguo, e o histórico
+de "por que isto foi feito" — que é o valor do catálogo — se perde. Pior: a colisão só aparece no
+merge, quando os dois lados já escreveram corpo de PR e mensagem de commit com o número errado.
+
+**Correção:** trocar o contador global por um ID que não precise de coordenação. Por exemplo,
+prefixo por frente (`NOVO-BE-07`, `NOVO-QA-11`) ou sufixo da data de registro
+(`NOVO-2026-08-06-A`). Qualquer esquema serve desde que duas sessões cheguem ao mesmo número
+**só** quando estiverem falando do mesmo defeito.
+
+**Enquanto isso:** conferir `grep "^### NOVO-" docs/CATALOGO_DEFEITOS_2026-08.md | tail` **imediatamente
+antes** de escrever a entrada, e renumerar as próprias, nunca as alheias — quem chega depois cede.
 
 ---
 

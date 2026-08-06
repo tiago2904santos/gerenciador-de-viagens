@@ -99,7 +99,7 @@ class RecorteChegaNosQuatroModelosTests(TestCase):
 #: produção é `True` (`config/settings/base.py:179`). Com ele desligado o ramo inteiro
 #: de `ConfiguracaoNumeracaoOficio` nem é consultado e `piso` é sempre 1 — ou seja, o
 #: site mais perigoso desta fatia seria **inalcançável pela suíte**. Mesma família do
-#: `NOVO-20` (`CELERY_TASK_ALWAYS_EAGER`), registrada como `NOVO-22`.
+#: `NOVO-20` (`CELERY_TASK_ALWAYS_EAGER`), registrada como `NOVO-28`.
 COMO_EM_PRODUCAO = override_settings(OFICIO_NUMERACAO_USAR_CONFIGURACAO=True)
 
 

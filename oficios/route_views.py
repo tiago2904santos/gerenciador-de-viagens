@@ -40,7 +40,8 @@ def _resolver_roteiro_rascunho_autosave(post, *, oficio):
     except (TypeError, ValueError):
         return None
     return (
-        Roteiro.objects.filter(
+        # `BE-09`: `all_objects` — o escopo é a área do **ofício**, na linha de baixo.
+        Roteiro.all_objects.filter(
             pk=pk,
             area_id=oficio.area_id,
             tipo=Roteiro.TIPO_AVULSO,

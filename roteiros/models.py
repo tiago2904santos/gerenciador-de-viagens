@@ -2,6 +2,8 @@ from decimal import Decimal, InvalidOperation
 
 from django.db import models
 
+from core.managers import AreaScopedManager
+
 from core.models import CancelavelModel
 from cadastros.models import Cidade
 from cadastros.models import Estado
@@ -140,7 +142,14 @@ class Roteiro(CancelavelModel):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita
+    # para código que precisa enxergar todas. `default_manager_name` mantém o admin,
+    # as relações reversas e `validate_unique` irrestritos — ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["-created_at"]
         verbose_name = "Roteiro"
         verbose_name_plural = "Roteiros"

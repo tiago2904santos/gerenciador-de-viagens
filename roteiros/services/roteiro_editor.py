@@ -348,7 +348,12 @@ def _limpar_rascunhos_vazios(roteiro_atual):
 
     Por isso recebe o roteiro, e não o `pk`.
     """
-    Roteiro.objects.filter(
+    # `BE-09`: `all_objects` de propósito, e pelo mesmo motivo do parágrafo acima.
+    # Esta é uma **exclusão**, escopada pela área do roteiro que está sendo salvo
+    # (já no filtro). Recortá-la de novo pela área ativa do request a tornaria
+    # inerte sempre que as duas divergissem — e a função deixaria de varrer o
+    # órfão que ela existe para varrer.
+    Roteiro.all_objects.filter(
         area_id=roteiro_atual.area_id,
         destinos__isnull=True,
         trechos__isnull=True,
