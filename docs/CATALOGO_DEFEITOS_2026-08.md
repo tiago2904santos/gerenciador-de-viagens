@@ -183,7 +183,7 @@ migrations/tests/commands/scripts/admin: **123 ocorrências de `.objects.`** em 
 `all_objects = models.Manager()` para migração, comando e backfill. App por app, começando por
 ofícios, roteiros e prestações.
 
-### BE-10 🔴 App `justificativas` sem isolamento de área · AUD · 2 d · risco médio
+### BE-10 ✅ RESOLVIDO · 🔴 App `justificativas` sem isolamento de área · AUD · 2 d · risco médio
 
 `justificativas/selectors.py:20` (`listar_justificativas`), `:44`, `:48`; `views.py:32`
 (`_oficios_summary_for_quick_add`); `forms.py:105` (queryset do picker de ofícios) — nenhum aplica
@@ -381,7 +381,7 @@ geração documental, comando, signal fora de ciclo) grava com `area=None`.
 `select count(*) where area_id is null` por tabela; (2) `NOT NULL` nos modelos transacionais via
 migração com validação; (3) só então mudar o comportamento de `filter_queryset_by_area` sem área.
 
-### DB-03 🟠 Limpeza de rascunhos apaga rascunho de outra área · AUD · 1 d
+### DB-03 ✅ RESOLVIDO · 🟠 Limpeza de rascunhos apaga rascunho de outra área · AUD · 1 d
 
 `roteiros/services/roteiro_editor.py:317` —
 `Roteiro.objects.filter(destinos__isnull=True, trechos__isnull=True, saida_dt__isnull=True,
@@ -1784,6 +1784,37 @@ mesmo tratamento.
 
 **Prioridade:** 🔴 pelo que o defeito original permitia, não pelo trabalho de fechá-lo. A chave já
 foi trocada; o gate é para a próxima.
+
+### NOVO-13 🟠 `NOVO` A limpeza de rascunhos apagava trabalho em curso de outra pessoa da mesma área · COR · 0,5 d
+
+Achado ao consertar o `DB-03`, e é a metade do defeito que o catálogo não viu.
+
+`roteiros/services/roteiro_editor.py:_limpar_rascunhos_vazios` varria o banco atrás de roteiro sem
+sede, sem destino, sem trecho e sem saída — sobra de corrida do autosave — e apagava. O enunciado
+do `DB-03` diz que faltava recorte de área, e faltava. **Mas recortar por área não bastava**, e a
+razão é que `Roteiro` **não tem dono**: só `area` (`roteiros/models.py:46`). Não há campo de
+usuário, nem em `Roteiro` nem em lugar nenhum do editor.
+
+Consequência: duas pessoas da **mesma** área criando roteiro ao mesmo tempo. A primeira abre o
+formulário — o autosave grava um rascunho ainda vazio. A segunda salva o dela, a limpeza roda, e
+o rascunho da primeira é apagado. Sem aviso, sem desfazer, e sem nada na tela sugerindo que
+aconteceu: rascunho vazio não aparece em `listar_roteiros` (`roteiros/selectors.py:42` já exclui
+roteiro com zero destinos), então a pessoa só descobre quando o formulário para de salvar.
+
+**Corrigido junto com o `DB-03`, e digo por quê** em vez de abrir PR separado: são as mesmas três
+linhas de `filter()`. Consertar só o recorte de área e deixar a perda de dado da mesma área para
+depois seria entregar uma função que eu acabei de reescrever sabendo que ela ainda destrói
+trabalho alheio.
+
+**A correção é um limite de idade**, não um dono: `IDADE_MINIMA_RASCUNHO_ORFAO = 2 horas`. Órfão
+mais novo que isso pode ser de alguém editando agora. Duas horas é folgado de propósito — o custo
+de esperar é zero, porque o órfão é invisível na interface de qualquer jeito, e o custo de apagar
+cedo demais é trabalho perdido.
+
+**O que isso não resolve, e fica anotado:** com o limite, duas pessoas que abram o formulário e
+demorem mais de duas horas ainda colidem. A correção completa é `Roteiro` ter dono — campo de
+usuário criador —, o que é migração e entra em `DB-02`/Fase 2 quando o modelo for mexido de todo
+jeito. Registrado aqui para não se perder.
 
 ### QA-17 ⚪ Treze PRs abertos sem triagem · MED · 1 d
 
