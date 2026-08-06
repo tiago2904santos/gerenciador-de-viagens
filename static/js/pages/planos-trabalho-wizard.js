@@ -10,9 +10,9 @@
     }
     if (!select || select.dataset.entityPickerReady !== "true") return;
     delete select.dataset.entityPickerReady;
-    var next = select.nextElementSibling;
-    if (next && next.classList && next.classList.contains("cv-search-picker")) {
-      next.parentNode.removeChild(next);
+    var rendered = window.CV.picker.rootFor(select);
+    if (rendered && rendered !== select) {
+      rendered.parentNode.removeChild(rendered);
     }
   }
 
@@ -147,10 +147,8 @@
     }
     var manualInput = panel.querySelector("[data-pt-coordenador-nome-manual]");
     var cargoSelect = panel.querySelector("[name='coordenador_" + papel + "_cargo_manual']");
-    var pickerRoot = servidorSelect ? servidorSelect.nextElementSibling : null;
-    var pickerInput = pickerRoot && pickerRoot.classList.contains("cv-search-picker")
-      ? pickerRoot.querySelector(".cv-search-picker__input")
-      : null;
+    var pickerRoot = servidorSelect ? window.CV.picker.rootFor(servidorSelect) : null;
+    var pickerInput = window.CV.picker.part(pickerRoot, "input");
     return {
       nome: ((manualInput && manualInput.value) || (pickerInput && pickerInput.value) || "").trim(),
       cargo: ((cargoSelect && cargoSelect.value) || "").trim(),
@@ -314,11 +312,9 @@
     var manualInput = manualName ? panel.querySelector("[name='" + manualName + "']") : null;
     var cargoSelect = cargoName ? panel.querySelector("[name='" + cargoName + "']") : null;
     var modoInput = modoName ? panel.querySelector("[name='" + modoName + "']") : null;
-    var pickerRoot = servidorSelect.nextElementSibling;
-    var pickerInput = pickerRoot && pickerRoot.classList.contains("cv-search-picker")
-      ? pickerRoot.querySelector(".cv-search-picker__input")
-      : null;
-    var clearButton = pickerRoot ? pickerRoot.querySelector(".cv-search-picker__clear") : null;
+    var pickerRoot = window.CV.picker.rootFor(servidorSelect);
+    var pickerInput = window.CV.picker.part(pickerRoot, "input");
+    var clearButton = window.CV.picker.part(pickerRoot, "clear");
     if (!pickerInput) return;
 
     var syncing = false;

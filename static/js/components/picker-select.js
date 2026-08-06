@@ -447,6 +447,9 @@
     for (var i = 0; i < els.length; i++) {
       if (!els[i]._cvSelect) {
         els[i].setAttribute('data-entity-picker-ready', 'true');
+        /* JS-06 — este renderer é a própria raiz. Marcada para que
+           CV.picker.rootFor responda igual nos dois renderers. */
+        els[i].setAttribute('data-entity-picker-root', 'true');
         var inst = new CustomSelect(els[i]);
         els[i]._cvSelect = inst;
       }

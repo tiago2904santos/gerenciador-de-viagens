@@ -12,9 +12,9 @@
     if (select.dataset) {
       delete select.dataset.entityPickerReady;
     }
-    var nextEl = select.nextElementSibling;
-    if (nextEl && nextEl.classList && nextEl.classList.contains("cv-search-picker")) {
-      nextEl.parentNode.removeChild(nextEl);
+    var rendered = window.CV.picker.rootFor(select);
+    if (rendered && rendered !== select) {
+      rendered.parentNode.removeChild(rendered);
     }
   }
 
@@ -326,11 +326,11 @@
         "textarea",
         "a",
         "[role='button']",
-        ".cv-search-picker__control",
-        ".cv-search-picker__dropdown",
-        ".cv-search-picker__option",
-        ".cv-search-picker__clear",
-        ".cv-search-picker__remove"
+        "[data-entity-picker-part='control']",
+        "[data-entity-picker-part='dropdown']",
+        "[data-entity-picker-part='option']",
+        "[data-entity-picker-part='clear']",
+        "[data-entity-picker-part='remove']"
       ].join(", "));
       var handleSelector = options.dragHandleSelector;
       if (handleSelector && !event.target.closest(handleSelector)) return;
@@ -661,7 +661,7 @@
 
   function focusFirstEmptyPicker(root, options) {
     options = options || {};
-    var inputs = Array.prototype.slice.call(asRoot(root).querySelectorAll(options.inputSelector || ".cv-search-picker__input"))
+    var inputs = Array.prototype.slice.call(asRoot(root).querySelectorAll(options.inputSelector || "[data-entity-picker-part='input']"))
       .filter(function (input) {
         return !input.disabled;
       });

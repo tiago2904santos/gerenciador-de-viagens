@@ -32,7 +32,7 @@
       })
       .filter(Boolean);
     this.pickerRoot = root.querySelector("[data-oficio-vehicle-picker]");
-    this.controlEl = root.querySelector(".cv-search-picker__control");
+    this.controlEl = root.querySelector("[data-entity-picker-part='control']");
     this.clearBtn = root.querySelector("[data-oficio-viatura-clear]");
     this.viaturaFloatingMenu =
       window.CV &&
