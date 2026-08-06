@@ -8,6 +8,7 @@ from core.forms.widgets import widget_attrs
 from core.normalizers import normalize_plate
 from core.normalizers import normalize_upper
 from core.tenancy import filter_queryset_by_area
+from core.tenancy import get_current_area
 from core.utils.masks import (
     RG_NAO_POSSUI_CANONICAL,
     format_cpf,
@@ -489,11 +490,23 @@ class ViaturaForm(BaseCadastroForm):
         raw = normalize_plate(self.cleaned_data.get("placa", ""))
         if not PLACA_RE.match(raw):
             raise forms.ValidationError("Placa deve estar no formato AAA1234 ou AAA1A23.")
-        qs = Viatura.objects.filter(placa=raw)
+        # `DB-05`: esta consulta nao tinha recorte de area, e a mensagem de erro
+        # confirmava a existencia da placa em outra unidade — informacao de
+        # outra area entregue por um formulario. O recorte sai da area da
+        # propria instancia quando ela ja existe (edicao) e da area ativa quando
+        # e cadastro novo, que e a area em que a viatura vai nascer.
+        # `area_id` e nao `pk`: cobre os dois caminhos. Na edicao a viatura ja
+        # tem area; no cadastro novo ela ainda nao tem, porque
+        # `cadastros/services.py:259` so atribui **depois** da validacao — e ai
+        # a area ativa e a area em que a viatura vai nascer. Testar por `pk`
+        # faria a forma ignorar uma area ja atribuida na instancia, que e
+        # exatamente o caso de quem chama o form fora de um request.
+        area = self.instance.area if self.instance.area_id else get_current_area()
+        qs = filter_queryset_by_area(Viatura.objects, area).filter(placa=raw)
         if self.instance.pk:
             qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():
-            raise forms.ValidationError("Já existe uma viatura com esta placa.")
+            raise forms.ValidationError("Já existe uma viatura com esta placa nesta área.")
         return raw
 
     def clean_modelo(self):

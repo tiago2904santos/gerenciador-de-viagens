@@ -223,7 +223,10 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       POST de diárias e não na view, que serve três abas. `require_area_role` segue com zero usos.
 - [ ] `DB-02` `area` anulável em 27 de 28 modelos
 - [ ] `DB-04` cache documental não recorta por área
-- [ ] `DB-05` placa de viatura única globalmente
+- [x] `DB-05` placa de viatura única globalmente — a metade de `ModeloJustificativa` já tinha
+      saído no `NOVO-09`. A constraint sozinha não bastava: `ViaturaForm.clean_placa` consultava
+      sem recorte e a mensagem de erro confirmava placa de outra unidade. Drill mostrou que a
+      **volta da migração deixa de funcionar** depois que duas áreas usarem a mesma placa.
 
 ### Fase 3 — O banco defende os dados
 - [ ] `DB-06` cascata apaga comprovante e assinatura já coletados
