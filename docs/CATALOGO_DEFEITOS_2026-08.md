@@ -1351,7 +1351,7 @@ de agendar.
 
 **Não confundir com dívida nova:** é dívida existente que o gate ainda não vigia.
 
-### NOVO-06 🔴 A lista de justificativas mostra as de todas as áreas · COR · 1 d
+### NOVO-06 ✅ RESOLVIDO · 🔴 A lista de justificativas mostra as de todas as áreas · COR · 1 d
 
 `justificativas/selectors.py:20` — `listar_justificativas()` devolve
 `Justificativa.objects.select_related(...)` **sem nenhum recorte de área**, e `views.py:83` pagina
@@ -1371,6 +1371,32 @@ Agrava: `views.py:30`, `_oficios_summary_for_quick_add()`, monta o *picker* de o
 campo `area` novo, com migração e backfill — aí vira `DB`, não `COR`). A decisão entre os dois
 caminhos é parte da tarefa.
 
+> **Corrigido em 06/08. Eram quatro pontos, não dois — e dois deles não são de leitura:**
+>
+> | # | onde | classe |
+> |---|---|---|
+> | 1 | `selectors.listar_justificativas()` | leitura: a lista contava e renderizava as de todas as áreas |
+> | 2 | `views._oficios_summary_for_quick_add()` | leitura: o *picker* ia inteiro para o HTML por `json_script` |
+> | 3 | `forms.JustificativaQuickAddForm.oficios` | **escrita**: dava para criar justificativa em ofício de outra área |
+> | 4 | `selectors.get_justificativa_by_id()` | **destrutivo**: `justificativa_excluir` apagava por `pk`, sem recorte |
+>
+> **Caminho escolhido: `oficio__area`, sem migração.** `filter_queryset_by_area` ganhou um parâmetro
+> `campo` (default `"area"`, nada mudou para os outros 20+ chamadores). Com `oficio` obrigatório e
+> um-para-um, a área é derivável; uma coluna `area` denormalizada seria uma segunda cópia que pode
+> divergir da do ofício sem ninguém notar.
+>
+> O *picker* passou a ser montado **do queryset do próprio campo do formulário**, não de um queryset
+> paralelo — é o que impede o resumo de voltar a divergir do que o formulário aceita, e é como
+> `termos` e `ordens_servico` já faziam.
+>
+> **Medido pela régua do `PF-07`, em `justificativas:index` com 20.000 registros:**
+> HTML **15.295 KB → 5.141 KB**, tempo **19,7 s → 5,7 s**. A queda é exatamente a razão de áreas
+> (20.000 → 6.666 ofícios), o que confirma que o tamanho era 100% o *picker* sem recorte.
+> Tetos baixados em `scripts/tetos_desempenho.json`.
+>
+> `justificativas/tests/test_vazamento_entre_areas.py` — 9 testes, provados falhando (6 falhas +
+> 1 erro) antes da correção.
+
 ### NOVO-07 🟠 A tela de justificativas cresce com a tabela inteira: 15 MB de HTML · MED · 0,5 d
 
 Consequência direta do `_oficios_summary_for_quick_add()` do `NOVO-06`: sem recorte e **sem
@@ -1382,6 +1408,22 @@ HTML escala com volume.
 
 O recorte por área do `NOVO-06` divide por três; não resolve. O *picker* precisa de paginação ou de
 busca sob demanda, como os outros seletores do sistema já fazem.
+
+> **Escopo corrigido em 06/08, depois do `NOVO-06`.** Duas coisas mudaram no enunciado:
+>
+> **1. Continua aberto, com número novo:** 15.295 KB → **5.141 KB** com 20.000 ofícios. Melhorou
+> 3×, e 5 MB de HTML numa lista de 15 linhas segue sendo defeito.
+>
+> **2. Não é de justificativas — são três telas.** `termos` e `ordens_servico` montam o mesmo
+> resumo (`termos/views.py:423`, `ordens_servico/views.py:351`) e serializam no HTML pelo mesmo
+> `json_script`. Elas já recortavam por área, então nunca vazaram — mas o payload delas também
+> cresce com o número de ofícios **da área**, sem limite. A régua não pegou porque mede a lista de
+> cada domínio, e essas duas são telas de formulário.
+>
+> **Precisa de decisão de interface antes de virar trabalho:** limitar aos N mais recentes é uma
+> regressão funcional silenciosa (some ofício antigo do seletor, e nenhum teste pega); busca sob
+> demanda por endpoint é o certo e é trabalho de front. **Não decidir e só limitar seria pior que
+> deixar como está.**
 
 ### NOVO-08 🟠 N+1 por linha em três listas: 296, 138 e 55 consultas · MED · 2–3 d
 
@@ -1399,6 +1441,28 @@ banco:
 
 **Não estava visível na linha de base** porque a linha de base mediu com o banco vazio — é
 exatamente o buraco que o `PF-07` existiu para tapar.
+
+### NOVO-09 🟠 Modelo de justificativa é global e o "padrão" de uma área derruba o das outras · DB · 1,5 d
+
+`ModeloJustificativa` **não tem campo `area`** — ao contrário de `ModeloMotivoOficio`, que tem
+(`oficios/models.py:345`) e cujo recorte o `BE-05` já tratou. Três consequências, em ordem de
+gravidade:
+
+1. **Efeito colateral entre áreas na escrita.** `models.py:27`:
+   `ModeloJustificativa.objects.exclude(pk=self.pk).update(is_padrao=False)` — **sem filtro**.
+   Marcar um modelo como padrão na área A **desmarca o padrão de todas as outras áreas**. O
+   equivalente em `ModeloMotivoOficio` faz `.filter(area=self.area)` (`oficios/models.py:380`).
+2. **O texto de outra unidade entra no documento.** É o mesmo argumento do `BE-05`: o `texto` do
+   modelo é copiado para a justificativa e vai literalmente para o documento gerado, com a
+   terminologia e os nomes de outra área.
+3. **`nome` é `unique=True` global**, então uma área não consegue criar modelo com nome que outra
+   já usou.
+
+**Correção:** campo `area`, migração com backfill, `unique` virando `(area, nome)`, e o `is_padrao`
+recortado. É `DB`, não `COR` — cai no limite 4 do `AGENTS.md` (migração exige checagem de dados),
+e por isso ficou fora do PR do `NOVO-06`.
+**Decisão humana antes de executar:** os modelos existentes hoje são compartilhados de fato entre
+as áreas? Se forem, o backfill precisa **duplicar** cada modelo por área, não escolher uma.
 
 ### QA-17 ⚪ Treze PRs abertos sem triagem · MED · 1 d
 

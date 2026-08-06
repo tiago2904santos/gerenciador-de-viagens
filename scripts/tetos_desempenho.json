@@ -24,11 +24,11 @@
     "justificativas:index": {
       "200": {
         "consultas": 17,
-        "kb_html": 303.6
+        "kb_html": 199.6
       },
       "20000": {
         "consultas": 17,
-        "kb_html": 16059.8
+        "kb_html": 5398.3
       }
     },
     "oficios:index": {

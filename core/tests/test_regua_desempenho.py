@@ -16,8 +16,11 @@ Um erro em qualquer uma delas deixa o gate verde durante uma regressão, que é 
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
+import tempfile
 from pathlib import Path
+from unittest import mock
 
 from django.conf import settings
 from django.test import SimpleTestCase
@@ -139,3 +142,60 @@ class ArquivoDeTetosTests(SimpleTestCase):
         ]
 
         self.assertEqual(faltando, [], msg=f"sem teto declarado: {faltando}")
+
+
+class GravarTetosNaoSobeTests(SimpleTestCase):
+    """A catraca só desce, e a ferramenta que a escreve precisa saber disso.
+
+    Sem esta guarda, o jeito mais fácil de apagar uma regressão de desempenho
+    seria rodar `--atualizar-tetos` — o comando que existe para registrar melhora.
+    """
+
+    ANTERIORES = {"oficios:index": {"200": {"consultas": 17, "kb_html": 474.1}}}
+
+    def _rodar(self, medidas, anteriores, *, permitir_subir=False):
+        """Roda `gravar_tetos` escrevendo num arquivo temporário, não no do repositório."""
+        with tempfile.TemporaryDirectory() as pasta:
+            destino = Path(pasta) / "tetos.json"
+            with (
+                mock.patch.object(regua, "carregar_tetos", return_value=anteriores),
+                mock.patch.object(regua, "ARQUIVO_TETOS", destino),
+            ):
+                regua.gravar_tetos(medidas, permitir_subir=permitir_subir)
+            return json.loads(destino.read_text(encoding="utf-8"))["rotas"]
+
+    def _gravar(self, medido, *, permitir_subir=False):
+        rotas = self._rodar(
+            {200: {"oficios:index": medido}}, self.ANTERIORES, permitir_subir=permitir_subir
+        )
+        return rotas["oficios:index"]["200"]
+
+    def test_melhora_desce_o_teto(self):
+        novo = self._gravar({"consultas": 12, "kb_html": 100.0})
+
+        self.assertEqual(novo["consultas"], 12)
+        self.assertEqual(novo["kb_html"], regua._teto_de_kb(100.0))
+
+    def test_regressao_nao_sobe_o_teto(self):
+        novo = self._gravar({"consultas": 40, "kb_html": 900.0})
+
+        self.assertEqual(novo["consultas"], 17, msg="a regressão de consulta virou teto novo")
+        self.assertEqual(novo["kb_html"], 474.1, msg="a regressão de bytes virou teto novo")
+
+    def test_subida_deliberada_e_permitida_com_a_flag(self):
+        novo = self._gravar({"consultas": 40, "kb_html": 900.0}, permitir_subir=True)
+
+        self.assertEqual(novo["consultas"], 40)
+
+    def test_uma_metrica_pode_descer_enquanto_a_outra_e_barrada(self):
+        """Consulta e bytes são independentes — a guarda é por métrica, não por rota."""
+        novo = self._gravar({"consultas": 12, "kb_html": 900.0})
+
+        self.assertEqual(novo["consultas"], 12)
+        self.assertEqual(novo["kb_html"], 474.1)
+
+    def test_rota_nova_entra_com_o_valor_medido(self):
+        """Sem teto anterior não há o que comparar — a rota entra pelo que mediu."""
+        rotas = self._rodar({200: {"rota:nova": {"consultas": 9, "kb_html": 50.0}}}, {})
+
+        self.assertEqual(rotas["rota:nova"]["200"]["consultas"], 9)

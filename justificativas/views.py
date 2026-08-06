@@ -9,7 +9,6 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from core.normalizers import remove_accents
-from oficios.models import Oficio
 
 from .catalogs import modelo_definir_padrao  # noqa: F401  (re-export para urls.py)
 from .catalogs import modelo_editar  # noqa: F401
@@ -27,9 +26,20 @@ from .services import excluir_justificativa
 JUSTIFICATIVAS_PER_PAGE = 15
 
 
-def _oficios_summary_for_quick_add():
+def _oficios_summary_for_quick_add(form):
+    """Resumo dos ofícios que alimentam o *picker*, a partir do queryset do campo.
+
+    `NOVO-06`: a versão anterior montava isto de `Oficio.objects` cru — sem recorte
+    de área — e o resultado vai para o corpo da página por `json_script`. Medido com
+    20.000 ofícios em três áreas: **20.000 entradas** contra 6.666 da área ativa.
+
+    Ler do próprio campo, e não de um queryset paralelo, é o que impede o resumo de
+    voltar a divergir do que o formulário aceita: quem apertar o recorte num lugar
+    aperta nos dois. É como `termos` e `ordens_servico` já fazem.
+    """
     oficios = (
-        Oficio.objects.select_related(
+        form.fields["oficios"]
+        .queryset.select_related(
             "roteiro__origem_cidade",
             "roteiro__origem_estado",
             "viatura",
@@ -40,7 +50,6 @@ def _oficios_summary_for_quick_add():
             "servidores",
             "servidores_termo_autorizacao",
         )
-        .order_by("-created_at", "-pk")
     )
     summaries = {}
     for index, oficio in enumerate(oficios):
@@ -97,7 +106,7 @@ def index(request):
             "page_title": "Justificativas",
             "page_description": "Crie justificativas livres vinculadas a um ou mais oficios.",
             "quick_add_form": form,
-            "oficios_summary": _oficios_summary_for_quick_add(),
+            "oficios_summary": _oficios_summary_for_quick_add(form),
             "q": q,
             "rows": rows,
             "modelos_url": reverse("justificativas:modelos_index"),
