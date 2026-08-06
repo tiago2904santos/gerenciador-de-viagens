@@ -215,7 +215,17 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `DB-03` limpeza de rascunhos apaga rascunho de outra área — e mais: sem limite de idade, ela
       apagava o rascunho que outra pessoa da **mesma** área estava editando, porque `Roteiro` não
       tem dono. Registrado como `NOVO-13` e corrigido junto (mesmas três linhas de `filter`).
-- [ ] `BE-09` `AreaScopedManager` nos 28 modelos com `area`
+- [ ] `BE-09` `AreaScopedManager` nos 28 modelos com `area` — **em 6 fatias, catraca em
+      `scripts/audit_area_scoped_managers.py`.** Duas decisões fixaram o desenho: (1) fora de
+      request `objects` **não** recorta — a alternativa faria toda tarefa Celery virar no-op
+      silencioso (`NOVO-20`); (2) `_default_manager` fica no manager irrestrito, para não
+      neutralizar o guarda m2m, o `core.E001` e os comandos de backfill — o preço é o `NOVO-21`.
+  - [x] fatia 1 — mecanismo, catraca, testes de contrato, `termos` e `ordens_servico` (26 restantes)
+  - [ ] fatia 2 — `oficios` (4 modelos; armadilha: o piso de numeração em `oficios/models.py:200`)
+  - [ ] fatia 3 — `roteiros` + `eventos`
+  - [ ] fatia 4 — `prestacoes_contas` + `documentos`
+  - [ ] fatia 5 — `cadastros` (`ConfiguracaoSistema.get_singleton`)
+  - [ ] fatia 6 — `planos_trabalho`, `justificativas`, `integracoes`, `core.AuditEvent`; fecha o ID
 - [x] `BE-10` app `justificativas` sem isolamento — **já estava resolvido** pelo `NOVO-06` e pelo
       `NOVO-09`; a verificação de 06/08 conferiu os quatro pontos do enunciado um a um. A Fase 2
       tem 6 IDs, não 7.
@@ -238,7 +248,7 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [ ] `DB-08` coleções ordenadas aceitam duplicata
 
 ### Fase 4 — Fundação do front
-- [x] `JS-06` JS larga o nome de classe `cv-search-picker` — e as **partes** junto (`NOVO-13`):
+- [x] `JS-06` JS larga o nome de classe `cv-search-picker` — e as **partes** junto (`NOVO-19`):
       a superfície real era 45 sites em 11 arquivos, não 10 em 7. Contrato novo:
       `data-entity-picker-root`/`-part` + `CV.picker.rootFor/part`
 - [x] `JS-05` auditor de CI cobre `innerHTML` e `registerEnhancer` sem `destroy` — 4 regras novas
