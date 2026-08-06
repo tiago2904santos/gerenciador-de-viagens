@@ -36,6 +36,13 @@
           <span class="sr-only" data-attach-signed-file-help>Selecione um único arquivo em formato PDF.</span>
           {% include "components/ui/forms/file_picker.html" with field_id="id-attach-signed-arquivo" field_name="arquivo" accept="application/pdf,.pdf" single=True action_label="Escolher PDF" empty_label="Arraste ou escolha o documento assinado" upload_label="Anexar PDF" only %}
         </div>
+        {% comment %}
+        NOVO-23: remover o assinado é a única ação AJAX deste modal, e ela não
+        tinha onde avisar quando falhava. Classes do design system (cv-notice);
+        [hidden] é forçado por base.css mesmo sobre o display do componente.
+        {% endcomment %}
+        <div class="cv-notice cv-notice--danger" data-attach-signed-error hidden role="alert"></div>
+
         <ul class="prestacao-file-list" data-attach-signed-current hidden>
           <li class="prestacao-file-list__item">
             <div class="prestacao-file-widget__meta">

@@ -2088,7 +2088,7 @@ tinha zerado; no triste, é o que devolve o editor.
 
 ---
 
-### NOVO-23 🟠 `NOVO` Remover documento assinado falha em silêncio e a página recarrega como se tivesse dado certo · QA · 0,25 d
+### NOVO-23 ✅ RESOLVIDO (0b64916) · 🟠 `NOVO` Remover documento assinado falha em silêncio e a página recarrega como se tivesse dado certo · QA · 0,25 d
 
 `static/js/components/attach-signed-modal.js:229` —
 `CV.http.request(currentRemoveUrl, { method: 'POST' }).then(function () { window.location.reload(); })`.
@@ -2099,8 +2099,57 @@ não avisa — o usuário vê o anexo ainda ali e conclui que o clique não pego
 página, dando ao usuário a impressão de que o documento assinado foi removido quando não foi.
 
 Achado no inventário do `JS-04`. É o segundo dos dois únicos sítios de rede sem `.catch` fora do
-editor de roteiros, e o de sintoma mais grave — mexe em documento assinado. **É o próximo da fila
-desta família.**
+editor de roteiros, e o de sintoma mais grave — mexe em documento assinado.
+
+**Medido no navegador em 06/08**, com o gatilho real do componente e a rota interceptada:
+
+| cenário | antes | depois |
+|---|---|---|
+| HTTP 500 | **recarregou a página** | não recarrega; faixa diz que o documento continua anexado |
+| falha de rede | nada na tela, `Unhandled Promise Rejection` | faixa com texto em português |
+| sucesso | recarregou | recarregou (inalterado) |
+
+A conferência achou um defeito na própria correção: a primeira versão jogava `error.message` na
+faixa, e falha de rede virava **"Failed to fetch"** na cara do usuário. Só o texto escrito pelo
+componente chega à tela agora, marcado com `paraUsuario`. **A mesma assimetria existe em
+`calculateDiarias` (`roteiros/editor/index.js:1408`)** e segue lá — registrada aqui para quem
+mexer no editor na fase 6.
+
+---
+
+### NOVO-25 ✅ RESOLVIDO (4b162d9) · 🔴 `NOVO` Auditor de área reprovava todo PR do repositório por depender do `.env` do desenvolvedor · QA · 0,25 d
+
+`scripts/audit_area_scoped_managers.py:66` — o gate do `BE-09` sobe o Django de verdade (precisa de
+`apps.get_models()`) e apontava para `config.settings.dev`. Esse módulo **exige**
+`FIELD_ENCRYPTION_KEYS` no ambiente, e o CI não define a chave. O auditor morria em
+`django.setup()` antes de olhar um modelo sequer:
+
+```
+RuntimeError: FIELD_ENCRYPTION_KEYS não está definida.
+##[error]Process completed with exit code 1.
+```
+
+Reprovava **todo PR**, com um traceback sem relação nenhuma com o diff. Verde na máquina de quem
+escreveu porque lá existe `.env`; vermelho em qualquer lugar limpo. Foi encontrado quando o CI
+reprovou o PR do `NOVO-23` — cujos passos todos passaram antes deste.
+
+Corrigido para `config.settings.test`, que gera a própria chave Fernet
+(`config/settings/test.py:35`) e é o que a suíte já usa. `setdefault` preservado: quem exportar o
+módulo continua mandando.
+
+O teste (`core/tests/test_auditores_sem_env.py`) roda o script num ambiente cru. **A primeira
+versão dele não valia nada** e passava com o script defeituoso: `config/settings/base.py:16` chama
+`load_dotenv(BASE_DIR / ENV_FILE)` com caminho **absoluto**, então limpar variáveis não esconde o
+`.env` do repositório. É preciso apontar `ENV_FILE` para um arquivo inexistente.
+
+`scripts/inspect_area_conflicts.py:18` tem a mesma linha, mas **não é gate de CI** — é ferramenta
+de inspeção manual, e ali `dev` é defensável. Fica anotado, não corrigido.
+
+**Duas sessões acharam isto em paralelo.** A troca de uma linha chegou à `main` pelo PR #207
+(`4b162d9`), por leitura estática, antes de qualquer run do CI ter conseguido runner; aqui ela
+apareceu pelo caminho oposto — o log do run 31122738847 com o traceback. Na junção ficou a versão
+da `main` (a mesma linha, com docstring) mais o teste, que nenhum dos dois lados tinha: sem ele o
+gate volta a `dev` na primeira edição distraída e ninguém percebe até o próximo ambiente limpo.
 
 ---
 
