@@ -336,7 +336,8 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 ### Fase 9 — Finalização e higiene
 - [x] `BE-20` `diario_bordo` é app-casca — **removido**: 33 linhas, rota inalcançável, sem
       migration nem tabela. A funcionalidade real, em `prestacoes_contas`, ficou intacta
-- [ ] `BE-21` presenter morto prometendo "DOCX (em breve)"
+- [x] `BE-21` presenter morto prometendo "DOCX (em breve)" — **removido**; a varredura por AST
+      achou **dois** presenters mortos no módulo, não um
 - [x] `BE-22` 10 arquivos `.py` com BOM — **fechado**: eram 11 (10 `.py` + um `.md`), e o
       `cadastros/views.py` era o único que obrigava o gate do `S-06` a ler com `utf-8-sig`
 - [ ] `BE-23` vocabulário de rotas divergente
