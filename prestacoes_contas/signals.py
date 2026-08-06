@@ -19,7 +19,11 @@ def _sincronizar_prestacao_servidores(oficio):
     if oficio.cancelado:
         return
 
-    prestacao, _ = PrestacaoContas.objects.get_or_create(
+    # `BE-09`: `all_objects` — a prestação pertence à área do **ofício**, na linha
+    # de baixo e no `defaults`. Com `objects` e área do ofício diferente da ativa,
+    # o `get` não acharia a prestação existente e o `create` duplicaria — este
+    # signal roda a cada mudança de equipe do ofício.
+    prestacao, _ = PrestacaoContas.all_objects.get_or_create(
         oficio=oficio,
         defaults={"area": oficio.area},
     )

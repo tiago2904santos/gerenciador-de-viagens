@@ -234,7 +234,10 @@ para uma rodada futura, com `DB-01` como pré-requisito.
         restantes). Fechou **três vazamentos reais** que não estavam no catálogo
         (`NOVO-26`) e mostrou que renomear para `all_objects` desinflava a catraca de
         ORM-em-view — o auditor passou a contar os dois nomes
-  - [ ] fatia 4 — `prestacoes_contas` + `documentos`
+  - [x] fatia 4 — `prestacoes_contas` + `documentos` (4 modelos, 4 sites; 14 restantes).
+        Encostou no caminho **assíncrono**: `_objeto_do_job` é genérico sobre cinco
+        modelos de apps migrados em fatias diferentes, e lá a forma certa é
+        `_base_manager`, não `all_objects` — `Servidor` só entra na fatia 5
   - [ ] fatia 5 — `cadastros` (`ConfiguracaoSistema.get_singleton`)
   - [ ] fatia 6 — `planos_trabalho`, `justificativas`, `integracoes`, `core.AuditEvent`; fecha o ID
 - [x] `BE-10` app `justificativas` sem isolamento — **já estava resolvido** pelo `NOVO-06` e pelo
