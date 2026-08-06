@@ -300,7 +300,12 @@ def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
         area_id=atualizado.area_id,
         ano=atualizado.ano,
     )
-    conflito = Oficio.objects.filter(
+    # `BE-09`: `all_objects` porque a checagem é sobre a área **deste** ofício, já
+    # explícita no filtro. Com `objects`, área do registro diferente da ativa daria
+    # consulta vazia: o conflito passaria batido aqui e voltaria como
+    # `IntegrityError` cru no INSERT, em vez do `OficioNumeroConflitoError` que a
+    # tela sabe apresentar.
+    conflito = Oficio.all_objects.filter(
         area_id=atualizado.area_id,
         ano=atualizado.ano,
         numero=atualizado.numero,
@@ -443,7 +448,9 @@ def _bloquear_escopo_numeracao_oficio(*, area_id: int | None, ano: int | None) -
         area_model.objects.select_for_update().filter(pk=area_id).exists()
     else:
         list(
-            Oficio.objects.select_for_update()
+            # `BE-09`: o lock cobre a faixa `area IS NULL`; recortar pela área ativa
+            # o deixaria vazio e a serialização da numeração deixaria de existir.
+            Oficio.all_objects.select_for_update()
             .filter(area__isnull=True, ano=resolved_ano)
             .exclude(numero__isnull=True)
         )
@@ -800,7 +807,11 @@ def excluir_oficio(instance):
     except ProtectedError as exc:
         raise OficioVinculadoError from exc
     if numero and ano:
-        OficioNumeroLacuna.objects.get_or_create(area=area, ano=ano, numero=numero)
+        # `BE-09`: `all_objects` — a lacuna pertence à área do ofício excluído, que
+        # já vem explícita. Com `objects` e área diferente da ativa, o `get` não
+        # acharia a lacuna existente e o `create` estouraria em
+        # `oficios_lacuna_area_ano_numero_unique`.
+        OficioNumeroLacuna.all_objects.get_or_create(area=area, ano=ano, numero=numero)
 
 
 def cancelar_oficio(instance: Oficio, motivo: str) -> Oficio:
@@ -880,7 +891,13 @@ def criar_modelo_motivo(form):
 
         modelo.area = get_current_area()
     if modelo.is_padrao:
-        ModeloMotivoOficio.objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(is_padrao=False)
+        # `BE-09`: `all_objects` — desmarcar o padrão anterior é sobre a área do
+        # modelo, já no filtro. Recortado pela área ativa, o padrão antigo
+        # sobreviveria e a gravação estouraria em
+        # `oficios_motivo_area_padrao_unique`.
+        ModeloMotivoOficio.all_objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(
+            is_padrao=False,
+        )
     modelo.save()
     return modelo
 
@@ -894,7 +911,13 @@ def atualizar_modelo_motivo(instance, form):
 
         modelo.area = get_current_area()
     if modelo.is_padrao:
-        ModeloMotivoOficio.objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(is_padrao=False)
+        # `BE-09`: `all_objects` — desmarcar o padrão anterior é sobre a área do
+        # modelo, já no filtro. Recortado pela área ativa, o padrão antigo
+        # sobreviveria e a gravação estouraria em
+        # `oficios_motivo_area_padrao_unique`.
+        ModeloMotivoOficio.all_objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(
+            is_padrao=False,
+        )
     modelo.save()
     return modelo
 

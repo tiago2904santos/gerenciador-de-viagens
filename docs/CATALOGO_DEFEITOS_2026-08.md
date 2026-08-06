@@ -2032,6 +2032,30 @@ do queryset auto-gerado. O repositório já aplica `filter_queryset_by_area` em 
 `forms.py`, então a lacuna pode ser pequena — ou pode não ser. A régua natural é estender
 `scripts/audit_area_scoped_managers.py` com essa varredura.
 
+### NOVO-22 🟠 `NOVO` A suíte desliga a configuração de numeração e não enxerga o piso do ofício · QA · 0,5 d
+
+`config/settings/test.py:36` põe `OFICIO_NUMERACAO_USAR_CONFIGURACAO = False`; em produção é
+`True` (`config/settings/base.py:179`). Com ele desligado, `Oficio.get_next_available_numero`
+**nem consulta** `ConfiguracaoNumeracaoOficio` e `piso` é sempre 1.
+
+**Efeito:** o piso de numeração de ofício — inclusive o global semeado por
+`oficios/migrations/0017` (`area=None, ano=2026, numero_inicial=75`), do qual todo ofício de 2026
+depende — não tem cobertura nenhuma por padrão. Descoberto ao migrar `oficios` no `BE-09`: o site
+mais perigoso da fatia (a união `Q(area=area) | Q(area__isnull=True)`) era **inalcançável pela
+suíte**, e um recorte errado ali reiniciaria a numeração em produção com os testes verdes. Os
+testes da fatia usam `override_settings` para alcançá-lo.
+
+**Terceira ocorrência da mesma família em um dia**, e é o padrão que vale registrar: o ambiente de
+teste é mais permissivo que o de produção, e é justamente a diferença que esconde o defeito. As
+outras duas: `NOVO-20` (`CELERY_TASK_ALWAYS_EAGER` roda a task dentro do request) e a catraca do
+`BE-09`, que caía em `config.settings.dev` e só quebrava **sem** `.env`.
+
+**Correção:** decidir se o `False` ainda serve a algum teste — ele foi posto para tornar a
+numeração previsível — e, se servir, invertê-lo (`True` por padrão, `False` só onde for pedido),
+para que o padrão da suíte seja o de produção.
+
+---
+
 ---
 
 ### NOVO-17 ⚪ `NOVO` `--parallel` esconde a falha real quando o payload do erro não é serializável · QA · 0,5 d

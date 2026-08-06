@@ -322,7 +322,10 @@ class OficioDadosViajantesForm(OficioForm):
             raise forms.ValidationError("Informe um número de ofício válido (maior que zero).")
         ano = self.instance.ano or timezone.localdate().year
         area = self.instance.area if self.instance and self.instance.area_id else get_current_area()
-        conflito = Oficio.objects.filter(ano=ano, numero=numero)
+        # `BE-09`: `all_objects` — as quatro linhas abaixo aplicam o escopo do
+        # próprio ofício (instância ou área ativa). Recortar de novo esvaziaria a
+        # checagem e o formulário aceitaria um número já usado.
+        conflito = Oficio.all_objects.filter(ano=ano, numero=numero)
         if area is not None:
             conflito = conflito.filter(area=area)
         else:

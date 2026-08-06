@@ -37,7 +37,14 @@ def colapsar_por_oficio(apps, schema_editor):
     for pc in PrestacaoContas.objects.all():
         grupos[pc.oficio_id].append(pc)
 
-    motoristas = dict(Oficio.objects.values_list("pk", "motorista_id"))
+    # `BE-09`: `all_objects`, e não `objects`. O modelo histórico de migração só
+    # conserva managers que sejam `_default_manager`, `_base_manager` ou
+    # `use_in_migrations` (`db/migrations/state.py:905`). Como `objects` virou o
+    # manager que recorta por área — e nenhum dos três —, ele deixa de existir
+    # aqui. `all_objects` é o `_default_manager`, então sobrevive como `Manager`
+    # puro: mesmo comportamento que `objects` tinha antes desta migração ser
+    # escrita.
+    motoristas = dict(Oficio.all_objects.values_list("pk", "motorista_id"))
 
     for oficio_id, prestacoes in grupos.items():
         motorista_id = motoristas.get(oficio_id)
