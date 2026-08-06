@@ -1,13 +1,6 @@
 (function () {
-  function onlyDigits(value) {
-    return (value || "").replace(/\D/g, "");
-  }
-
-  function maskCep(value) {
-    const digits = onlyDigits(value).slice(0, 8);
-    if (digits.length <= 5) return digits;
-    return `${digits.slice(0, 5)}-${digits.slice(5)}`;
-  }
+  const onlyDigits = window.CV.masks.onlyDigits;
+  const maskCep = (valor) => window.CV.masks.format(valor, "cep");
 
   function setFieldError(input, message) {
     if (!input) return;

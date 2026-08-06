@@ -1,10 +1,10 @@
 (function() {
-  function onlyDigits(value) {
-    return String(value || '').replace(/\D/g, '');
-  }
-
   function formatProtocolDisplay(value) {
-    var digits = onlyDigits(value).slice(0, 9);
+    /* JS-11 — resolvido na chamada, nao no topo do modulo: este arquivo e
+       carregado SEM `defer` (wizard_roteiro.html, roteiro_form_page.html),
+       entao ele executa antes do `shell.bundle.js`, que e `defer`. Capturar
+       `CV.masks` aqui em cima daria TypeError e mataria o wizard inteiro. */
+    var digits = window.CV.masks.onlyDigits(value).slice(0, 9);
     if (!digits) {
       return '';
     }

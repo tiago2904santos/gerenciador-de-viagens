@@ -141,6 +141,10 @@
   }
 
   var MaskEngine = {
+    /* JS-11 — exportado porque tres consumidores reimplementavam esta funcao:
+       era a unica de masks.js sem saida publica, ja que `format` so alcanca
+       os formatadores nomeados no dict `formatters`. */
+    onlyDigits: onlyDigits,
     scan: scan,
     apply: apply,
     format: format,
