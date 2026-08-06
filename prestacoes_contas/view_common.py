@@ -128,10 +128,34 @@ def _servidor_identificacao(ps) -> dict:
     }
 
 
+def _servidor_removido_identificacao(ps) -> dict:
+    """`DB-06`: quem saiu da equipe, com a data e o que ficou guardado dele."""
+    identificacao = _servidor_identificacao(ps)
+    guardados = []
+    if ps.numero_solicitacao.strip():
+        guardados.append("número da solicitação")
+    if ps.documentos_anexos.exists():
+        guardados.append("comprovante")
+    if ps.assinaturas.exists():
+        guardados.append("assinatura")
+    identificacao["removida_em"] = ps.removida_em
+    identificacao["guardados"] = ", ".join(guardados)
+    return identificacao
+
+
 def _build_identificacao(prestacao) -> dict:
     """Identificação de nível ofício + lista de servidores da prestação."""
+    from .selectors import servidores_removidos_da_equipe
+
     oficio = prestacao.oficio
     servidores = [_servidor_identificacao(ps) for ps in prestacao.servidores_prestacao.all()]
+    # `DB-06`: os que saíram da equipe levando dados junto. `objects` os esconde
+    # em todo o resto do sistema — este é o único lugar onde reaparecem, para que
+    # "preservado" não vire "sumido sem deixar endereço".
+    removidos = [
+        _servidor_removido_identificacao(ps)
+        for ps in servidores_removidos_da_equipe(prestacao)
+    ]
     return {
         "numero": oficio.numero_formatado,
         "protocolo": format_protocolo(oficio.protocolo) or "—",
@@ -141,6 +165,7 @@ def _build_identificacao(prestacao) -> dict:
         "periodo": _periodo_display(oficio) or "—",
         "servidores": servidores,
         "servidores_count": len(servidores),
+        "servidores_removidos": removidos,
     }
 
 

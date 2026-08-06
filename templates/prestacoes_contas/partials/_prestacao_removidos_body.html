@@ -1,0 +1,22 @@
+<div class="oficio-documentos-card__body">
+  <p class="prestacao-removidos__intro">
+    Estes servidores saíram da equipe do ofício. Nada do que eles já tinham entregue foi apagado —
+    para voltar a editar, basta incluí-los novamente na equipe do ofício.
+  </p>
+  <div class="oficio-documentos-travellers-grid" role="list">
+    {% for s in identificacao.servidores_removidos %}
+      <article class="oficio-documentos-traveller-tile prestacao-removidos__tile" role="listitem">
+        <span class="oficio-documentos-traveller-tile__avatar" aria-hidden="true">{{ s.iniciais }}</span>
+        <div class="oficio-documentos-traveller-tile__main">
+          <div class="oficio-documentos-traveller-tile__title-row">
+            <strong class="oficio-documentos-traveller-tile__name">{{ s.nome_servidor }}</strong>
+            <span class="oficio-documentos-traveller-tile__badge prestacao-removidos__badge">Fora da equipe</span>
+          </div>
+          <span class="oficio-documentos-traveller-tile__meta">
+            Saiu em {{ s.removida_em|date:"d/m/Y" }}{% if s.guardados %} · guardados: {{ s.guardados }}{% endif %}
+          </span>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+</div>
