@@ -53,16 +53,23 @@ def resolve_area_for_request(request):
     return vinculo.area
 
 
-def filter_queryset_by_area(queryset, area=None):
+def filter_queryset_by_area(queryset, area=None, *, campo="area"):
     """Aplica isolamento estrito pela área de trabalho resolvida.
 
     Registros legados sem área devem ser tratados pelo comando explícito de
     saneamento; eles nunca são compartilhados implicitamente entre áreas.
+
+    ``campo`` existe para os modelos que **não têm** coluna ``area`` própria e
+    herdam a fronteira de um relacionamento obrigatório — hoje só
+    ``Justificativa``, que é um-para-um com ``Oficio`` e por isso usa
+    ``campo="oficio__area"`` (`NOVO-06`). Preferir o caminho a denormalizar a
+    coluna: com o vínculo obrigatório a área é derivável, e uma segunda cópia
+    poderia divergir da do ofício sem ninguém notar.
     """
     area = get_current_area() if area is None else area
     if area is None:
-        return queryset.filter(area__isnull=True)
-    return queryset.filter(area=area)
+        return queryset.filter(**{f"{campo}__isnull": True})
+    return queryset.filter(**{campo: area})
 
 
 def validate_cross_area_foreign_keys(sender, instance, raw=False, **kwargs):

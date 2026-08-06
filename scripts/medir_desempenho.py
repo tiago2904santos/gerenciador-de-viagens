@@ -48,8 +48,10 @@ está lendo o relatório, não como catraca.
     python scripts/medir_desempenho.py --atualizar-tetos     # regrava os tetos medidos
 
 `--atualizar-tetos` é para pessoas, não para o CI: ele **regrava** o arquivo de
-tetos com o que acabou de medir. Rodar isso depois de uma regressão a legitima.
-Catraca só desce — quem subir um teto explica por quê no corpo do PR.
+tetos com o que acabou de medir. Catraca só desce, e o comando **recusa subir** um
+teto: se a medição piorou, ele mantém o valor antigo, imprime o que subiria e
+manda usar `--permitir-subir-teto`. Sem essa guarda, o jeito mais fácil de apagar
+uma regressão seria rodar o comando que existe para registrar melhora.
 
 O script cria e destrói o próprio banco de teste; não toca em banco de trabalho.
 
@@ -601,14 +603,42 @@ def _teto_de_kb(medido):
     return round(max(medido * 1.05, medido + 2), 1)
 
 
-def gravar_tetos(medidas_por_volume):
+def gravar_tetos(medidas_por_volume, *, permitir_subir=False):
+    """Regrava os tetos, **recusando subir** a menos que peçam explicitamente.
+
+    A catraca deste projeto só desce. Sem esta guarda, o jeito mais fácil de
+    apagar uma regressão de desempenho seria rodar `--atualizar-tetos` — o
+    comando que existe justamente para registrar melhora. O aviso é impresso com
+    o valor antigo e o novo, para quem autorizar a subida saber o que está
+    autorizando.
+    """
+    anteriores = carregar_tetos()
+    subidas = []
     rotas = {}
     for volume, medidas in medidas_por_volume.items():
         for nome_rota, medida in medidas.items():
-            rotas.setdefault(nome_rota, {})[str(volume)] = {
+            novo_teto = {
                 "consultas": medida["consultas"],
                 "kb_html": _teto_de_kb(medida["kb_html"]),
             }
+            antigo_teto = anteriores.get(nome_rota, {}).get(str(volume))
+            if antigo_teto:
+                for chave in ("consultas", "kb_html"):
+                    if novo_teto[chave] > antigo_teto[chave]:
+                        subidas.append(
+                            f"{nome_rota} @ {volume}: {chave} {antigo_teto[chave]} → {novo_teto[chave]}"
+                        )
+                        if not permitir_subir:
+                            novo_teto[chave] = antigo_teto[chave]
+            rotas.setdefault(nome_rota, {})[str(volume)] = novo_teto
+
+    if subidas:
+        titulo = "TETOS SUBIRAM" if permitir_subir else "TETOS QUE SUBIRIAM (mantidos no valor antigo)"
+        print(f"\n=== {titulo} ===")
+        for subida in subidas:
+            print(f"  {subida}")
+        if not permitir_subir:
+            print("\n  Use --permitir-subir-teto se a subida for deliberada, e explique no PR.")
     ARQUIVO_TETOS.write_text(
         json.dumps(
             {
@@ -628,7 +658,11 @@ def gravar_tetos(medidas_por_volume):
         + "\n",
         encoding="utf-8",
     )
-    print(f"\ntetos regravados em {ARQUIVO_TETOS.relative_to(RAIZ)}")
+    try:
+        onde = ARQUIVO_TETOS.relative_to(RAIZ)
+    except ValueError:
+        onde = ARQUIVO_TETOS  # destino fora do repositório (teste, sandbox)
+    print(f"\ntetos regravados em {onde}")
 
 
 def conferir_tetos(medidas_por_volume, tetos):
@@ -683,6 +717,11 @@ def main():
         action="store_true",
         help="regrava scripts/tetos_desempenho.json com o que foi medido (não use no CI)",
     )
+    parser.add_argument(
+        "--permitir-subir-teto",
+        action="store_true",
+        help="autoriza --atualizar-tetos a subir um teto; sem isto, subida é recusada",
+    )
     args = parser.parse_args()
 
     volumes = [int(v) for v in args.volumes.split(",") if v.strip()]
@@ -715,7 +754,7 @@ def main():
         print(f"\nrelatório em {args.json}")
 
     if args.atualizar_tetos:
-        gravar_tetos(medidas_por_volume)
+        gravar_tetos(medidas_por_volume, permitir_subir=args.permitir_subir_teto)
         return 0
 
     violacoes = conferir_tetos(medidas_por_volume, tetos)

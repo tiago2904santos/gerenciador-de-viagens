@@ -2,6 +2,7 @@ from django import forms
 
 from core.forms.widgets import WidgetStyle
 from core.forms.widgets import widget_attrs
+from core.tenancy import filter_queryset_by_area
 from oficios.models import Oficio
 
 from .models import Justificativa
@@ -102,7 +103,13 @@ class JustificativaQuickAddForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["oficios"].queryset = Oficio.objects.order_by("-created_at", "-pk")
+        # Sem o recorte, o campo aceitava ofício de outra área e dava para
+        # **criar** justificativa cruzando a fronteira — não é só exibição
+        # (`NOVO-06`). `ordens_servico/forms.py:201` e `termos/forms.py:124`
+        # já faziam assim; justificativas era a exceção.
+        self.fields["oficios"].queryset = filter_queryset_by_area(Oficio.objects).order_by(
+            "-created_at", "-pk"
+        )
         self.fields["modelo"].queryset = listar_modelos_justificativa()
 
     def clean_texto(self):

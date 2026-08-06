@@ -2,6 +2,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from core.normalizers import remove_accents
+from core.tenancy import filter_queryset_by_area
 
 from .models import Justificativa
 from .models import ModeloJustificativa
@@ -17,9 +18,16 @@ def get_or_none_justificativa_by_oficio(oficio):
     return Justificativa.objects.filter(oficio=oficio).first()
 
 
+# `Justificativa` não tem coluna `area`: a fronteira vem do ofício, que é
+# obrigatório e um-para-um. Ver a nota em `core.tenancy.filter_queryset_by_area`
+# sobre por que o caminho é preferível a denormalizar a coluna (`NOVO-06`).
+POR_AREA_DO_OFICIO = "oficio__area"
+
+
 def listar_justificativas():
     return (
-        Justificativa.objects.select_related("oficio", "modelo")
+        filter_queryset_by_area(Justificativa.objects, campo=POR_AREA_DO_OFICIO)
+        .select_related("oficio", "modelo")
         .order_by("-updated_at", "-created_at")
     )
 
@@ -46,4 +54,8 @@ def get_modelo_justificativa_by_id(pk):
 
 
 def get_justificativa_by_id(pk):
-    return get_object_or_404(Justificativa, pk=pk)
+    """Recortado por área: é o que `justificativa_excluir` usa, e sem o recorte
+    dava para apagar justificativa de outra área informando o `pk` (`NOVO-06`)."""
+    return get_object_or_404(
+        filter_queryset_by_area(Justificativa.objects, campo=POR_AREA_DO_OFICIO), pk=pk
+    )
