@@ -787,12 +787,26 @@ export function initRoteirosEditor() {
     }
     recalcCard(card, true);
   }
+  /* JS-04 — a faixa de erro dos trechos. Mesmo par de `roteiros-map.js`, que é
+     o idioma da casa para erro assíncrono: texto inline, não modal. */
+  function clearTrechosError() {
+    var box = $('trechos-error');
+    if (!box) return;
+    box.textContent = '';
+    box.hidden = true;
+  }
+  function showTrechosError(msg) {
+    var box = $('trechos-error');
+    if (!box) return;
+    box.textContent = msg;
+    box.hidden = false;
+  }
   function scheduleAutoEstimarTrechos() {
     clearTimeout(autoEstimarTimer);
     autoEstimarTimer = setTimeout(runAutoEstimarTrechos, 450);
   }
   function runAutoEstimarTrechos() {
-    if (!urlTrechosEstimar || applyingState || isLoopModeActive()) return;
+    if (!urlTrechosEstimar || applyingState || isLoopModeActive()) return Promise.resolve();
     var cards = getTrechoCards();
     var pending = cards.filter(function(card) {
       var distInp = card.querySelector('[name^="trecho_"][name$="_distancia_km"]');
@@ -803,7 +817,10 @@ export function initRoteirosEditor() {
       var dcid = card.dataset.destinoCidadeId;
       return !!(ocid && dcid);
     });
-    pending.reduce(function(seq, card) {
+    if (!pending.length) return Promise.resolve();
+    clearTrechosError();
+    var falhas = 0;
+    return pending.reduce(function(seq, card) {
       return seq.then(function() {
         var ocid = card.dataset.origemCidadeId;
         var dcid = card.dataset.destinoCidadeId;
@@ -812,15 +829,37 @@ export function initRoteirosEditor() {
           form: form,
           body: { origem_cidade_id: parseInt(ocid, 10), destino_cidade_id: parseInt(dcid, 10) }
         }).then(function(result) {
+          /* Normaliza por `throw`, como `calculateDiarias`: status HTTP e o
+             `ok` do payload viram o mesmo erro, com a mensagem do servidor.
+             Antes só `data.ok` era lido, e `data.error` ia para o lixo — 500,
+             401 de sessão expirada e resposta não-JSON saíam todos calados. */
           var data = result && result.data;
-          if (!data || !data.ok) return;
+          if (!result.ok || !data || !data.ok) {
+            throw new Error((data && data.error) || 'Não foi possível estimar este trecho.');
+          }
           applyEstimarPayloadToTrechoCard(card, data);
           updateResumo();
           scheduleRealtimeDiarias();
           scheduleAutosave();
+        }).catch(function(err) {
+          /* O `.catch` fica DENTRO do elo de propósito. Antes não havia nenhum:
+             a rejeição de um card propagava pelo `reduce` e cancelava todos os
+             trechos seguintes da fila, não só o que falhou. */
+          falhas += 1;
+          window.CV.log.error('roteiro-trechos', 'falha ao estimar trecho', err);
         });
       });
-    }, Promise.resolve());
+    }, Promise.resolve()).then(function() {
+      if (!falhas) return;
+      showTrechosError(
+        (falhas === 1
+          ? 'Não foi possível estimar a distância de um trecho.'
+          : 'Não foi possível estimar a distância de ' + falhas + ' trechos.')
+        + ' Preencha a distância e o tempo à mão, ou tente de novo alterando o destino.'
+      );
+    }).catch(function(err) {
+      window.CV.log.error('roteiro-trechos', 'falha na fila de estimativa', err);
+    });
   }
   function getDestinoRows() {
     var container = $('destinos-container');
@@ -1466,6 +1505,15 @@ export function initRoteirosEditor() {
         if ($('id_retorno_saida_cidade') && !$('id_retorno_saida_cidade').value && ret.saida_cidade) $('id_retorno_saida_cidade').value = ret.saida_cidade;
         if ($('id_retorno_chegada_cidade') && !$('id_retorno_chegada_cidade').value && ret.chegada_cidade) $('id_retorno_chegada_cidade').value = ret.chegada_cidade;
         recalcRetorno(false); updateResumo(); applyingState = false; scheduleRealtimeDiarias();
+      })
+      .finally(function() {
+        /* JS-04 — o flag só voltava a false no caminho de sucesso, dentro do
+           `.then` acima. Uma exceção em qualquer callback desta cadeia — ou na
+           carga inicial do editor — deixava `applyingState` travado em true, e
+           a partir daí `runAutoEstimarTrechos` e todos os listeners que checam
+           o flag abortavam para sempre, sem nenhum sinal na tela. No caminho
+           feliz isto é no-op; no triste, é o que devolve o editor. */
+        applyingState = false;
       });
   }
   function dtBr(d,h) { if (!d&&!h) return ''; var p=d?d.split('-'):null; return (p?p[2]+'/'+p[1]+'/'+p[0]:'')+(h?' '+h:''); }
