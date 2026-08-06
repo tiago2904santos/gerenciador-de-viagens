@@ -757,7 +757,7 @@ acima — só é validada à mão.
 > `shell.bundle.js` (7.633 linhas) às fontes que o compõem — dupla contagem do mesmo código. Vale
 > o mesmo para o CSS: **43.038** linhas de fonte, não 60.707.
 
-### JS-04 🟠 Cadeia de promise sem `.catch` no editor de roteiros · AUD · 0,5 d
+### JS-04 ✅ RESOLVIDO (1a51341) · 🟠 Cadeia de promise sem `.catch` no editor de roteiros · AUD · 0,5 d
 
 `static/js/pages/roteiros/editor/index.js:790-822` — `scheduleAutoEstimarTrechos()` dispara
 `runAutoEstimarTrechos` por `setTimeout` (retorno descartado), e o `pending.reduce(...)` (`:806`)
@@ -839,13 +839,13 @@ objetos não são usados em mais lugar nenhum. A lógica real continua nas 1.848
 acha.
 **Decisão:** completar a extração (3+ dias, depois de `BE-13`) ou remover os stubs (0,25 d).
 
-### JS-11 ⚪ Máscara de CEP duplicada e `onlyDigits` em 4 cópias · AUD · 0,25 d
+### JS-11 ✅ RESOLVIDO (f9e3f72) · ⚪ Máscara de CEP duplicada e `onlyDigits` em 4 cópias · AUD · 0,25 d
 
 `pages/configuracoes.js:6-9` reimplementa `maskCep` byte a byte em vez de chamar
 `CV.masks.format(value, 'cep')`. `onlyDigits` está reimplementado em `roteiros_wizard.js:2`,
 `components/document-number-field.js:2`, `components/masks.js:9` e `pages/configuracoes.js:2`.
 
-### JS-12 ⚪ `CV.registry` e `CV.componentRegistry` são duas definições redundantes · ~~AUD~~ VER · 0,25 d
+### JS-12 ✅ RESOLVIDO (bebb379) · ⚪ `CV.registry` e `CV.componentRegistry` são duas definições redundantes · ~~AUD~~ VER · 0,25 d
 
 > **Enunciado original REFUTADO pela verificação (05/08).** Ele dizia que `core/app.js:148-159`
 > atribuía os dois nomes **ao mesmo literal**. O cético carregou o `app.js` real no Node e testou
@@ -2006,12 +2006,70 @@ apps), mas causa diferente e reproduzível.
 
 ---
 
-### NOVO-18 ⚪ `NOVO` Dois arquivos JS com CRLF misto reescrevem o diff inteiro · QA · 0,25 d
+### NOVO-18 ⚪ `NOVO` Oito arquivos JS com CRLF misto reescrevem o diff inteiro · QA · 0,5 d
 
-`static/js/pages/configuracoes.js` (153 linhas CRLF) e `static/js/pages/oficios-transporte.js`
-(603) têm fim de linha misto. Qualquer ferramenta que reescreva o arquivo normaliza tudo e produz
-um diff de arquivo inteiro — 302 e 1.206 linhas para uma troca de uma linha, o que enterra a
-mudança real na revisão. Aconteceu nesta etapa e foi desfeito byte a byte.
+> **Número corrigido em 06/08.** A primeira medição contou 2 arquivos porque olhou só os que a
+> etapa tinha tocado. Varrendo `static/js` inteiro (fora bundle e vendor): **8 com fim de linha
+> misto**, 6 com CRLF puro e 52 só com LF.
+
+| arquivo | linhas CRLF / total |
+|---|---|
+| `static/js/pages/oficios-transporte.js` | 603/617 |
+| `static/js/roteiros_wizard.js` | 373/395 |
+| `static/js/pages/configuracoes.js` | 149/153 |
+| `static/js/components/masks.js` | 137/159 |
+| `static/js/components/document-number-field.js` | 53/87 |
+| `static/js/core/theme-shared.js` | 52/60 |
+| `static/js/pages/oficios-dados-viajantes.js` | 45/96 |
+| `static/js/pages/roteiros/editor/mapa.js` | 20/25 |
+
+Qualquer ferramenta que reescreva o arquivo normaliza tudo e produz um diff de arquivo inteiro —
+302 e 1.206 linhas para uma troca de uma linha, o que enterra a mudança real na revisão. Aconteceu
+duas vezes (F1 e esta etapa) e as duas foram desfeitas editando byte a byte.
 
 Vizinho do `BE-22` (10 arquivos `.py` com BOM), mesma família de higiene de repositório;
 **fila: fase 9**, junto dele.
+
+---
+
+### NOVO-19 ✅ RESOLVIDO (1a51341) · 🟠 `NOVO` `applyingState` travado deixa o editor de roteiro inerte · COR · 0,25 d
+
+Achado ao abrir o `JS-04`. `applyState` (`editor/index.js:1427`) faz `applyingState = true` e só
+devolve `false` em `:1468`, **dentro do `.then` de sucesso**. Uma exceção em qualquer callback da
+cadeia — inclusive na carga inicial do editor (`:1817`) — deixa o flag travado.
+
+A partir daí, `runAutoEstimarTrechos` e os **treze** listeners que checam `if (applyingState) return`
+abortam para sempre: o editor aceita cliques e não faz nada, sem erro na tela e sem pista no
+console. O próprio arquivo já usa o padrão certo no caminho síncrono (`:1035-1048`, `try/finally`
+com `prevApplyingState`); faltava o equivalente assíncrono.
+
+Fechado junto do `JS-04`: o flag volta num `.finally`. No caminho feliz é no-op — o `.then` já o
+tinha zerado; no triste, é o que devolve o editor.
+
+---
+
+### NOVO-20 🟠 `NOVO` Remover documento assinado falha em silêncio e a página recarrega como se tivesse dado certo · QA · 0,25 d
+
+`static/js/components/attach-signed-modal.js:229` —
+`CV.http.request(currentRemoveUrl, { method: 'POST' }).then(function () { window.location.reload(); })`.
+
+Dois buracos no mesmo lugar. Sem `.catch`: falha de rede não remove o documento, não recarrega e
+não avisa — o usuário vê o anexo ainda ali e conclui que o clique não pegou. E usa `request`, não
+`fetchJson`, então **o status HTTP nunca é checado**: um 500 cai no `.then` de sucesso e recarrega a
+página, dando ao usuário a impressão de que o documento assinado foi removido quando não foi.
+
+Achado no inventário do `JS-04`. É o segundo dos dois únicos sítios de rede sem `.catch` fora do
+editor de roteiros, e o de sintoma mais grave — mexe em documento assinado. **É o próximo da fila
+desta família.**
+
+---
+
+### NOVO-21 ⚪ `NOVO` `.then` escapa do `try/catch` do `async` na configuração do Drive · QA · 0,25 d
+
+`static/js/pages/gdrive_config.js:287` — dentro de um `try` de função `async`,
+`loadPastas(currentPaiId()).then(function () { … })` é encadeado **sem `await`**, então o `catch` de
+`:292` não o alcança e o `CV.feedback.alert` de `:293` nunca dispara para essa falha.
+
+Efeito: a pasta é criada no servidor, mas a lista não recarrega e a nova pasta não é
+auto-selecionada. O `finally` de `:294` reabilita o botão, então visualmente parece que não
+aconteceu nada. Achado no mesmo inventário.

@@ -160,7 +160,7 @@ rota e tempo da lista de Ofícios); `DB-13` (composição da diária como texto 
 deliberadamente fora desta rodada, porque mexer nele reabre a regra de dinheiro — está catalogado
 para uma rodada futura, com `DB-01` como pré-requisito.
 
-### Fase 0 — Defeitos que atingem o usuário agora
+### Fase 0 — Defeitos que atingem o usuário agora ✅ **COMPLETA** (06/08/2026)
 - [x] `BE-01` wizard de plano de trabalho não finaliza e "Voltar" avança
 - [x] `BE-02` exclusão de anexo por `GET`, sem CSRF
 - [x] `JS-01` XSS: nome de pasta do Drive cru em `aria-label`
@@ -171,16 +171,19 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `BE-06` relatório técnico sai com a cidade-sede de outra área
 - [x] `BE-07` exclusão de anexo dá 500 e deixa registro órfão
 - [x] `BE-08` oito redirects seguem o que o POST mandar
-- [ ] `JS-04` `.then()` sem `.catch` no editor de roteiros
+- [x] `JS-04` `.then()` sem `.catch` no editor de roteiros — a fila de estimativa morria inteira
+      no primeiro erro, não só o trecho que falhou. Achou `NOVO-19` (`applyingState` travado,
+      **fechado junto**), `NOVO-20` e `NOVO-21`
 - [x] `HT-09` login sem skip link e sem erro associado
 - [x] `HT-11` campos de formulário renderizados sem nome acessível (5 medidos em 2 telas)
 - [x] `QA-01` login do Django Admin sem rate limit nenhum
 - [x] `QA-02` rate limit depende de um Redis que nenhum ambiente declara
 - [x] `QA-04` 🔴 a validação central de upload nunca roda, nos 5 tipos de anexo
 - [x] `QA-09` dois templates de `.env` de produção divergentes
-- [ ] `JS-11` `maskCep` duplicada e `onlyDigits` em 4 cópias
-- [ ] `JS-12` `CV.registry` e `CV.componentRegistry` são **dois literais distintos** com as mesmas
-      funções — o enunciado "mesmo objeto" foi refutado em runtime (ver catálogo)
+- [x] `JS-11` `maskCep` duplicada e `onlyDigits` em 4 cópias — a causa era falta de saída pública
+      em `masks.js`, não desleixo; duas regras novas no auditor impedem a volta
+- [x] `JS-12` `CV.componentRegistry` era alias **sem nenhum consumidor** — o enunciado "mesmo
+      objeto" já tinha sido refutado em runtime; o defeito real era código morto
 
 ### Fase 1 — Réguas e rede de segurança
 - [x] `PF-07` `scripts/medir_desempenho.py` com dois volumes, no CI — achou `NOVO-06`

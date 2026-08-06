@@ -79,10 +79,10 @@ Independentes de tudo; podem entrar junto da fase 0 do plano mestre.
 |---|---|---:|
 | `JS-01` 🔴 | XSS: `pasta.name` cru em `aria-label` (`gdrive_config.js:112,117`), enquanto a linha 114 escapa a mesma variável | 0,25 |
 | `HT-01` 🔴 | Foco de teclado invisível em `input`/`select`/`textarea` no sistema inteiro, inclusive no login | 1–2 |
-| `JS-04` 🟠 | `.then()` sem `.catch` no editor de roteiros: falha de rede na estimativa de distância não avisa nada (`editor/index.js:790-822`) | 0,5 |
+| `JS-04` ✅ | `.then()` sem `.catch` no editor de roteiros. Medido: a falha de rede **cancelava a fila inteira**, não só o trecho que falhou — 1 requisição em vez de 2, 0 de 2 trechos estimados | 0,5 |
 | `HT-09` ⚪ | Login sem skip link e sem `aria-describedby` no erro de campo | 0,5 |
-| `JS-11` ⚪ | `maskCep` duplicada e `onlyDigits` em 4 cópias | 0,25 |
-| `JS-12` ⚪ | `CV.registry` e `CV.componentRegistry` são dois literais distintos (enunciado corrigido) | 0,25 |
+| `JS-11` ✅ | `maskCep` duplicada e `onlyDigits` em 4 cópias — `masks.js` não tinha saída pública para `onlyDigits`; agora tem, com gate no auditor | 0,25 |
+| `JS-12` ✅ | `CV.componentRegistry` era alias sem nenhum consumidor (enunciado "mesmo objeto" refutado em runtime) | 0,25 |
 
 **Gate:** teste que prova o escape (entrada com `"` e `<script>`); o `JS-04` verificado com a rede
 derrubada; o `HT-01` conferido com navegação por Tab em tema claro e escuro, com print no PR.
