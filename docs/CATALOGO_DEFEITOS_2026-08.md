@@ -2088,7 +2088,7 @@ tinha zerado; no triste, é o que devolve o editor.
 
 ---
 
-### NOVO-23 🟠 `NOVO` Remover documento assinado falha em silêncio e a página recarrega como se tivesse dado certo · QA · 0,25 d
+### NOVO-23 ✅ RESOLVIDO (0b64916) · 🟠 `NOVO` Remover documento assinado falha em silêncio e a página recarrega como se tivesse dado certo · QA · 0,25 d
 
 `static/js/components/attach-signed-modal.js:229` —
 `CV.http.request(currentRemoveUrl, { method: 'POST' }).then(function () { window.location.reload(); })`.
@@ -2099,8 +2099,21 @@ não avisa — o usuário vê o anexo ainda ali e conclui que o clique não pego
 página, dando ao usuário a impressão de que o documento assinado foi removido quando não foi.
 
 Achado no inventário do `JS-04`. É o segundo dos dois únicos sítios de rede sem `.catch` fora do
-editor de roteiros, e o de sintoma mais grave — mexe em documento assinado. **É o próximo da fila
-desta família.**
+editor de roteiros, e o de sintoma mais grave — mexe em documento assinado.
+
+**Medido no navegador em 06/08**, com o gatilho real do componente e a rota interceptada:
+
+| cenário | antes | depois |
+|---|---|---|
+| HTTP 500 | **recarregou a página** | não recarrega; faixa diz que o documento continua anexado |
+| falha de rede | nada na tela, `Unhandled Promise Rejection` | faixa com texto em português |
+| sucesso | recarregou | recarregou (inalterado) |
+
+A conferência achou um defeito na própria correção: a primeira versão jogava `error.message` na
+faixa, e falha de rede virava **"Failed to fetch"** na cara do usuário. Só o texto escrito pelo
+componente chega à tela agora, marcado com `paraUsuario`. **A mesma assimetria existe em
+`calculateDiarias` (`roteiros/editor/index.js:1408`)** e segue lá — registrada aqui para quem
+mexer no editor na fase 6.
 
 ---
 
