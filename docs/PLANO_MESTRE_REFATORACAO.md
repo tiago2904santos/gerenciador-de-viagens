@@ -327,7 +327,8 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 ### Fase 9 — Finalização e higiene
 - [ ] `BE-20` `diario_bordo` é app-casca
 - [ ] `BE-21` presenter morto prometendo "DOCX (em breve)"
-- [ ] `BE-22` 10 arquivos `.py` com BOM
+- [x] `BE-22` 10 arquivos `.py` com BOM — **fechado**: eram 11 (10 `.py` + um `.md`), e o
+      `cadastros/views.py` era o único que obrigava o gate do `S-06` a ler com `utf-8-sig`
 - [ ] `BE-23` vocabulário de rotas divergente
 - [ ] `BE-24` 89 MB de screenshots e 175 arquivos indevidos no repositório
 - [ ] `BE-25` decidir qual UI Lab é o vigente

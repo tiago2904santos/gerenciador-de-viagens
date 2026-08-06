@@ -1,4 +1,4 @@
-﻿import csv
+import csv
 from urllib.parse import urlencode
 
 from django.contrib import messages
