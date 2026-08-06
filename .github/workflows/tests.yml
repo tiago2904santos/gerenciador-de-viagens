@@ -30,7 +30,7 @@ jobs:
       DB_PASSWORD: postgres
       DB_HOST: 127.0.0.1
       DB_PORT: "5432"
-      COVERAGE_APPS: "core,usuarios,cadastros,roteiros,eventos,documentos,oficios,termos,justificativas,planos_trabalho,ordens_servico,diario_bordo,integracoes.google_drive,prestacoes_contas,ui_lab2"
+      COVERAGE_APPS: "core,usuarios,cadastros,roteiros,eventos,documentos,oficios,termos,justificativas,planos_trabalho,ordens_servico,integracoes.google_drive,prestacoes_contas,ui_lab2"
 
     steps:
       - uses: actions/checkout@v4

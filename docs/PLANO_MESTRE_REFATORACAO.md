@@ -329,7 +329,8 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [ ] `QA-13` 218 testes "magros" — número a olhar, não meta a perseguir
 
 ### Fase 9 — Finalização e higiene
-- [ ] `BE-20` `diario_bordo` é app-casca
+- [x] `BE-20` `diario_bordo` é app-casca — **removido**: 33 linhas, rota inalcançável, sem
+      migration nem tabela. A funcionalidade real, em `prestacoes_contas`, ficou intacta
 - [ ] `BE-21` presenter morto prometendo "DOCX (em breve)"
 - [x] `BE-22` 10 arquivos `.py` com BOM — **fechado**: eram 11 (10 `.py` + um `.md`), e o
       `cadastros/views.py` era o único que obrigava o gate do `S-06` a ler com `utf-8-sig`
