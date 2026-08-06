@@ -9,6 +9,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
+from cadastros.selectors import get_configuracao_sistema
 from core.autosave import AutosavePayloadError
 from core.autosave import autosave_json_response
 from core.autosave import parse_autosave_payload
@@ -387,8 +388,13 @@ def index(request):
     )
 
     page_obj = Paginator(prestacoes, 20).get_page(request.GET.get("page"))
+    # `NOVO-08`: uma consulta para a página inteira, não uma por card.
+    configuracao = get_configuracao_sistema()
     cards = marcar_agrupamento_cards(
-        [apresentar_prestacao_servidor_card(ps) for ps in page_obj.object_list]
+        [
+            apresentar_prestacao_servidor_card(ps, configuracao=configuracao)
+            for ps in page_obj.object_list
+        ]
     )
     page_querystring = request.GET.copy()
     page_querystring.pop("page", None)
