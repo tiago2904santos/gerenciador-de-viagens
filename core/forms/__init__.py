@@ -27,6 +27,25 @@ class LoginForm(AuthenticationForm):
             }
         )
 
+    def full_clean(self):
+        """`HT-09`: liga cada campo ao `<div>` de erro que o template renderiza.
+
+        Os `id` de erro existiam em `templates/core/login.html` e nunca eram
+        referenciados — quem usa leitor de tela ouvia "Usuário, campo de edição"
+        e nada sobre o que deu errado.
+
+        Feito aqui, e não no `__init__`, porque em `__init__` os erros ainda não
+        existem: `self._errors` só é populado por este `full_clean`. Apontar
+        `aria-describedby` para um `id` ausente seria pior que não apontar — o
+        leitor de tela ignora a referência quebrada e o atributo vira ruído no
+        HTML de toda tela de login que carrega sem erro nenhum.
+        """
+        super().full_clean()
+        for nome in ("username", "password"):
+            if self.has_error(nome):
+                self.fields[nome].widget.attrs["aria-describedby"] = f"id_{nome}-error"
+                self.fields[nome].widget.attrs["aria-invalid"] = "true"
+
 
 class PerfilUsuarioForm(forms.ModelForm):
     nome_completo = forms.CharField(

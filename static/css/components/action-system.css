@@ -1298,6 +1298,24 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   transition: none !important;
 }
 
+/* HT-01 — o unico lugar onde o piso de `base.css` nao alcanca sozinho.
+   Os 15 blocos acima usam `outline: none !important` **e** um ID no seletor:
+   contra `!important` o que decide e a especificidade, e o ID ganha do piso.
+   Esta regra repete o ID para empatar e vem depois para vencer no desempate
+   por ordem. Sem ela, este modal — que e por onde se anexa documento assinado
+   — ficaria como a unica tela do sistema sem foco visivel. */
+#attach-signed-modal :is(
+  button,
+  input,
+  select,
+  textarea,
+  a[href],
+  [tabindex]:not([tabindex="-1"])
+):focus-visible {
+  outline: 1px solid var(--color-focus-visible-ring) !important;
+  outline-offset: 2px !important;
+}
+
 #attach-signed-modal :is(
   .attach-signed-modal__kind-option.is-active,
   .attach-signed-modal__kind-option.is-active:hover,

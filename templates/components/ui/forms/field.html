@@ -13,9 +13,12 @@
   Duas exceções, ambas deliberadas:
   - `checkbox` sai por `card_toggle.html`. É cartão clicável, não campo em
     grade — contrato próprio, de propósito.
-  - o rótulo é omitido quando o widget é um `cv-search-picker__native`: nesse
-    caso o próprio picker desenha o seu rótulo. A condição vale para todos os
-    tipos porque só selects carregam essa classe; aplicá-la ao texto é inócuo.
+  - quando o widget é um `cv-search-picker__native`, o rótulo deixa de ser
+    *visível* — o próprio picker desenha o dele — mas continua **existindo**
+    para leitor de tela (`HT-11`). Antes ele era omitido de vez, e o input que
+    o picker cria ficava sem nome acessível nenhum: `picker.js` procura
+    `label[for=...]` para se nomear e não achava nada. A condição vale para
+    todos os tipos porque só selects carregam essa classe.
 
   Parâmetros: field (obrigatório), label, help_text, size_class,
   action_url / action_label / action_type (botão acoplado ao campo).
@@ -25,7 +28,13 @@
 {% else %}
 {% with classe_do_widget=field.field.widget.attrs.class|default:"" %}
 <div class="field app-form-field cv-field{% if size_class %} {{ size_class }}{% endif %}">
-  {% if "cv-search-picker__native" not in classe_do_widget %}
+  {% if "cv-search-picker__native" in classe_do_widget %}
+    {% comment %}
+      `HT-11`: fora da tela, dentro da árvore de acessibilidade. É daqui que
+      `picker.js` tira o nome do campo de busca que ele cria.
+    {% endcomment %}
+    <label class="sr-only" for="{{ field.id_for_label }}">{{ label|default:field.label }}</label>
+  {% else %}
     <label class="app-form-label cv-field__label" for="{{ field.id_for_label }}">{{ label|default:field.label }}</label>
   {% endif %}
 

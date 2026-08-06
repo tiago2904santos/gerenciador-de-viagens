@@ -776,7 +776,7 @@ Os 96 componentes em `templates/components/` estão mais consolidados do que se 
 e `aria-live`, e **zero ORM disparado por template**. Os defeitos estão em acessibilidade de
 formulário.
 
-### HT-01 🔴 Foco de teclado invisível em todo campo do sistema · AUD · 1–2 d
+### HT-01 ✅ RESOLVIDO · 🔴 Foco de teclado invisível em todo campo do sistema · AUD · 1–2 d
 
 `static/css/base.css:80-87` remove `outline` de `input:focus`, `input:focus-visible`,
 `select:focus`, `select:focus-visible`, `textarea:focus` e `textarea:focus-visible`, com o
@@ -795,7 +795,46 @@ começando pelo login. Falha WCAG 2.4.7 (AA).
 (`box-shadow: 0 0 0 2px var(--color-focus-ring)`), reaproveitando o padrão que já existe para
 `button:focus-visible, a:focus-visible` em `base.css:49-52`.
 
-### HT-11 🔴 Campos de formulário renderizados sem nome acessível · AUD+MED · 1,5 d
+> **RESOLVIDO em 06/08/2026.** Medido no navegador, no campo de usuário do login, com foco de
+> teclado:
+>
+> | | antes (`main`) | depois |
+> |---|---|---|
+> | tema claro | `outline: none 0px` | `outline: 1px solid rgb(21, 91, 154)` offset 2px |
+> | tema escuro | `outline: none 0px` | `outline: 1px solid rgb(224, 171, 60)` offset 2px |
+>
+> **A varredura corrigiu o enunciado: eram 52 blocos, não 3.** O catálogo nomeava os três que
+> tinha olhado. Uma análise declaração a declaração — regex por bloco erra, porque `\s*` retrocede
+> e faz `outline: none` parecer anel declarado — achou **52** blocos que apagam o foco de campo sem
+> pôr nada no lugar. Corrigir 52 daria um diff enorme e ainda deixaria o 53 nascer amanhã.
+>
+> **A correção é um piso, não uma varredura.** Uma regra de `:focus-visible` com `!important`:
+> indicador de foco é chão de acessibilidade, e nenhum componente deveria poder removê-lo. Três
+> decisões que não são óbvias:
+>
+> 1. **`outline`, não `box-shadow`** — os dois blocos que apagam foco com `!important`
+>    (`roteiros.css`, `theme-dark-components.css`) zeram `box-shadow` e `border-color` e **não**
+>    tocam em `outline`. O anel passa por cima deles sem briga de especificidade.
+> 2. **`outline-offset` é requisito, não enfeite** — no escuro o âmbar dá 2,07:1 contra a borda do
+>    campo e reprovaria colado nela; afastado, quem fica ao lado é o fundo (7,76:1).
+> 3. **`button/a:focus-visible` também estava errado** — usava `rgba(37, 99, 168, 0.45)` fixo, que
+>    no tema escuro dá **2,64:1**, reprovando os 3:1 mesmo antes de compor o alfa. Passou a usar o
+>    token, que troca com o tema.
+>
+> **Um erro meu que só o navegador pegou:** a primeira versão pôs o piso só em `base.css` e os
+> testes de contrato passaram — mas o login continuou sem anel, porque **aquela tela não carrega
+> `base.css`**. Era justamente a tela que este defeito destaca. O piso foi duplicado em `auth.css`,
+> com comentário dizendo quando sai.
+>
+> Catraca nova: `scripts/audit_foco_visivel.py --max 44` (47 → 44 medido com a mesma régua nos dois
+> lados). Ela **não** conta `:focus:not(:focus-visible)`, que é o idioma correto — mouse sem anel,
+> teclado com.
+>
+> **Espessura: 1px, por decisão do usuário.** Atende WCAG 2.4.7 (AA), que é o critério citado aqui.
+> Deixa de atender 2.4.13 Aparência do Foco, que pede perímetro de 2px e é **AAA**.
+
+
+### HT-11 ✅ RESOLVIDO · 🔴 Campos de formulário renderizados sem nome acessível · AUD+MED · 1,5 d
 
 `templates/components/ui/forms/field.html` só emite o `<label>` quando a classe do widget **não**
 contém `cv-search-picker__native`:
@@ -831,6 +870,24 @@ A aposta é que o JS transfere o rótulo — e ele transfere um rótulo que não
 
 **Efeito:** leitor de tela anuncia "caixa de combinação" sem dizer de quê. Falha WCAG 4.1.2 (A) —
 severidade maior que a do `HT-02`, porque aqui não há nem o rótulo visual associado.
+
+> **RESOLVIDO em 06/08/2026.** Medido no navegador, contando só controle que o teclado alcança:
+> `/cadastros/servidores/novo/` e `/termos/novo/` foram a **0** campos sem nome acessível, nos dois
+> temas.
+>
+> A causa era a que a verificação de 05/08 já tinha apontado, e a correção tem duas pontas:
+>
+> - **`picker.js`** passou a nomear o input que cria, por três fontes em ordem: o rótulo que o
+>   próprio picker desenha, o `<label for>` da tela, e o `placeholder` como último recurso. O
+>   `<div class="cv-search-picker__label">` *parecia* rótulo, mas `<div>` não rotula nada sem
+>   `aria-labelledby`.
+> - **`field.html`** parou de omitir o `<label>` dos widgets `cv-search-picker__native` e passou a
+>   emiti-lo como `.sr-only`: fora da tela, dentro da árvore de acessibilidade. É de lá que o
+>   `picker.js` tira o nome quando o picker não desenha o dele.
+>
+> A dica (`data-picker-hint`) também era só texto ao lado; virou `aria-describedby` — descrição,
+> lida depois do nome e não no lugar dele.
+
 
 ### HT-12 🟠 `help_text` declarado no form nunca chega à tela · AUD · 0,5 d
 
@@ -966,12 +1023,30 @@ replicada em 80 pontos.
 **Armadilha:** parte deles tem handler de JS amarrado à classe. Conferir `static/js/components/*`
 antes de cada substituição (mesma família do `JS-06`).
 
-### HT-09 ⚪ Login sem skip link e sem erro associado · AUD · 0,5 d
+### HT-09 ✅ RESOLVIDO · ⚪ Login sem skip link e sem erro associado · AUD · 0,5 d
 
 `templates/core/login.html:1-79` não estende `base.html`: duplica `<!doctype>`, `<head>` e tema.
 Medido no navegador: é a **única** das 25 páginas testadas sem `<a class="cv-skip-link">`. Os erros
 de campo (`:56`, `:64`) têm `id`, mas `core/forms/__init__.py:14-27` nunca os referencia por
 `aria-describedby`.
+
+> **RESOLVIDO em 06/08/2026.** Skip link apontando para `#auth-form`, e os erros de campo passaram
+> a ser referenciados por `aria-describedby` + `aria-invalid`.
+>
+> Duas coisas que a implementação óbvia erraria:
+>
+> - **o `.cv-skip-link` mora em `components/app-shell.css`**, que só entra pelo bundle do casco.
+>   Colar a marcação nesta tela deixaria o link **sem estilo**, visível e atravessado no layout. O
+>   estilo foi duplicado em `auth.css`, com comentário dizendo que sai no dia em que o login
+>   estender `base.html`.
+> - **o `aria-describedby` é ligado no `full_clean`, não no `__init__`** — em `__init__` os erros
+>   ainda não existem. Apontar para um `id` ausente seria pior que não apontar: o leitor de tela
+>   ignora a referência quebrada e o atributo vira ruído em toda tela de login sem erro.
+>
+> **O `autofocus` do campo de usuário deixa o skip link fora do Tab para frente** (chega-se a ele
+> por Shift+Tab). Quem ele serve de fato é quem lê em sequência com leitor de tela e hoje atravessa
+> título, subtítulo e a lista de três recursos antes do primeiro campo.
+
 
 ### HT-10 ⚪ Migração de `data-*` de toggle parada no meio · AUD · 0,5–1 d · risco médio
 
