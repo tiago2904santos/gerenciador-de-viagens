@@ -1,4 +1,4 @@
-﻿import re
+import re
 from decimal import ROUND_HALF_UP, Decimal
 
 from django.db import models, transaction

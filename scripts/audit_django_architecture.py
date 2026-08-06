@@ -188,7 +188,11 @@ def drive_excepts_without_capture():
     for path in DRIVE_ROOT.rglob("*.py"):
         if not path.is_file():
             continue
-        text = path.read_text(encoding="utf-8")
+        # `utf-8-sig` igual ao gate irmão abaixo (BE-22): `ast.parse` estoura com
+        # `invalid non-printable character U+FEFF` se o arquivo vier com BOM, e o
+        # gate morre em vez de medir. Hoje nenhum arquivo do Drive tem BOM — isto é
+        # para que o dia em que tiver não vire vermelho de bootstrap.
+        text = path.read_text(encoding="utf-8-sig")
         for line_no in except_exception_without_capture(text):
             findings.append((rel(path), line_no))
     return findings

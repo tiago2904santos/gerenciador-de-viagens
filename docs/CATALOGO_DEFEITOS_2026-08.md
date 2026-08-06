@@ -309,9 +309,36 @@ Era o `P-08` da Etapa 8 do ciclo antigo, nunca decidido.
 `[{"label": "DOCX (em breve)", "enabled": False}, {"label": "PDF (em breve)", "enabled": False}]`.
 Grep no repositório inteiro: **1 ocorrência, a própria definição**. Zero chamadores.
 
-### BE-22 🟡 Dez arquivos `.py` com BOM UTF-8 · AUD · 0,5 d
+### BE-22 ✅ RESOLVIDO · 🟡 Dez arquivos `.py` com BOM UTF-8 · AUD · 0,5 d
 
 Todos em `cadastros/`. Quebram `ast.parse` em ferramenta de análise estática.
+
+**O enunciado estava certo** — primeiro desta rodada. Confirmados os 10 `.py`, todos em
+`cadastros/`; a varredura do repositório inteiro achou mais um, `docs/REGRAS_DE_NEGOCIO.md`, que
+saiu junto por ser o mesmo defeito e 3 bytes.
+
+**E o efeito é maior do que "quebra uma ferramenta".** Lido como `utf-8` — o que praticamente toda
+ferramenta faz — o `U+FEFF` vira caractere no início do módulo:
+
+```
+SyntaxError: invalid non-printable character U+FEFF
+```
+
+`cadastros/views.py` é **o único arquivo do repositório** que obrigava o gate do `S-06`
+(`scripts/audit_django_architecture.py:205`) a ler com `utf-8-sig`. Ou seja: **o remendo estava na
+régua, não no defeito** — e entrou no mesmo commit (`b182e5f`) que trouxe os BOMs e o arquivo
+`tatus` da raiz. Pior, o gate irmão do `P-05` (`drive_excepts_without_capture`) lia com `utf-8`
+puro e só não quebrava porque nenhum arquivo do Drive tinha BOM: estava a **um arquivo** de virar
+vermelho de bootstrap, do tipo que o `NOVO-25` já custou uma sessão inteira.
+
+**Corrigido:** BOM removido dos 11 arquivos (diff de 11 linhas — conferido byte a byte que só os
+3 bytes saíram), o gate do `P-05` passou a ler `utf-8-sig` igual ao irmão, e
+`core/tests/test_sem_bom.py` impede a volta. O `utf-8-sig` fica nos dois de propósito: a rede é o
+teste, e gate que morre no `ast.parse` é o pior lugar para descobrir o problema.
+
+`QA-11` (`reparar-producao.yml` em UTF-16LE) **segue aberto** — ID próprio, e a correção dele exige
+revalidar o workflow com um `workflow_dispatch` de baixo risco. Está nomeado na exceção do teste,
+num caminho só, para não virar porta aberta.
 
 ### BE-23 🟡 Vocabulário de rotas divergente · AUD · 1 d · risco médio
 

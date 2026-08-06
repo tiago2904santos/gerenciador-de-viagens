@@ -1,4 +1,4 @@
-﻿# Regras de Negocio
+# Regras de Negocio
 
 ## Cadastros
 
