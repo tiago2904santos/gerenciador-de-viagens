@@ -287,7 +287,10 @@ def criar_modelo_justificativa(form):
 
         modelo.area = get_current_area()
     if modelo.is_padrao:
-        ModeloJustificativa.objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(
+        # `BE-09`: `all_objects` — escopo é a área do modelo, já no filtro. Recortado,
+        # o padrão anterior sobrevive e a gravação estoura em
+        # `justificativas_modelo_area_padrao_unique` — desfazendo o `NOVO-09`.
+        ModeloJustificativa.all_objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(
             is_padrao=False
         )
     modelo.save()
@@ -303,7 +306,10 @@ def atualizar_modelo_justificativa(instance, form):
 
         modelo.area = get_current_area()
     if modelo.is_padrao:
-        ModeloJustificativa.objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(
+        # `BE-09`: `all_objects` — escopo é a área do modelo, já no filtro. Recortado,
+        # o padrão anterior sobrevive e a gravação estoura em
+        # `justificativas_modelo_area_padrao_unique` — desfazendo o `NOVO-09`.
+        ModeloJustificativa.all_objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(
             is_padrao=False
         )
     modelo.save()

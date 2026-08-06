@@ -1126,7 +1126,8 @@ def perfil(request):
             "drive_pode_reorganizar": bool(drive_pasta_raiz_id)
             and (drive_autorizado or drive_modo == "mock"),
             "drive_total_eventos": filter_queryset_by_area(Evento.objects, area=area_drive).count(),
-            "drive_job_reorg": DriveReorganizacaoJob.objects.filter(
+            # `BE-09`: `all_objects` — `area_drive` é explicita na linha de baixo.
+            "drive_job_reorg": DriveReorganizacaoJob.all_objects.filter(
                 usuario=usuario_drive,
                 area=area_drive,
             ).order_by("-iniciado_em").first(),

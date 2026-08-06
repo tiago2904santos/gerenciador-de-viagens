@@ -101,16 +101,14 @@ jobs:
           --max-sync-document-generations 0
 
       - name: Block area-scoping regressions (BE-09)
-        # Catraca: este número só desce. São 28 modelos com campo `area`.
-        # Fechados: fatia 1 `termos` + `ordens_servico` (2), fatia 2 `oficios` (4),
-        # fatia 3 `roteiros` + `eventos` (4), fatia 4 `prestacoes_contas` +
-        # `documentos` (4), fatia 5a os 5 de cadastro básico, fatia 5b
-        # `ConfiguracaoSistema`. Falta só a fatia 6:
-        # planos_trabalho+justificativas+integracoes+core (8).
-        # Alvo final é zero, e aí o `DB-02` pode tornar `area` NOT NULL.
+        # `BE-09` FECHADO: os 28 modelos com campo `area` recortam sozinhos, em
+        # seis fatias. O teto agora é **zero** e nunca mais sobe — modelo novo com
+        # campo `area` reprova aqui até declarar o par de managers.
+        # Com isto o `DB-02` (`area` NOT NULL) fica desbloqueado; o `NOVO-31` vem
+        # antes, porque `core.E001` ainda não olha os modelos de `cadastros`.
         # O script também reprova `all_objects` sem comentário em código de
         # caminho de request — o gate literal de docs/PLANO_BACKEND.md:88.
-        run: python scripts/audit_area_scoped_managers.py --max 8
+        run: python scripts/audit_area_scoped_managers.py --max 0
 
       - name: Validate production security settings
         env:

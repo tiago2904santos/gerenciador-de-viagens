@@ -171,7 +171,7 @@ Com `nome_original` vazio (`blank=True, default=""`), `__str__` devolve `None`.
 **Efeito real:** open redirect / *confused deputy* — formulário forjado leva o usuário autenticado
 para fora do domínio logo depois de uma ação que gera ou cancela link de assinatura.
 
-### BE-09 🔴 Isolamento por área depende de o programador lembrar · AUD · 6 d · risco alto
+### BE-09 ✅ RESOLVIDO · 🔴 Isolamento por área depende de o programador lembrar · AUD · 6 d · risco alto
 
 `core/tenancy.py:57` — `filter_queryset_by_area(queryset, area=None)` é função livre. Nenhum dos
 54 modelos declara manager próprio (`default_manager=Manager` em todos). Varredura excluindo
@@ -182,6 +182,30 @@ migrations/tests/commands/scripts/admin: **123 ocorrências de `.objects.`** em 
 **Correção:** `AreaScopedManager` como `objects` nos 28 modelos com `area`, com
 `all_objects = models.Manager()` para migração, comando e backfill. App por app, começando por
 ofícios, roteiros e prestações.
+
+**Fechado em 06/08/2026, em seis fatias** (#205, #210, #212, #213, #218, #220 e a fatia 6). Os 28
+modelos com `area` declaram `objects = AreaScopedManager()` e `all_objects = models.Manager()`, com
+`Meta.default_manager_name = "all_objects"`. Catraca em **zero**, travada por
+`scripts/audit_area_scoped_managers.py` no CI e por teste de introspecção
+(`planos_trabalho/tests/test_recorte_por_area_fatia6.py::OIdEstaFechadoTests`).
+
+Duas decisões fixaram o desenho, e as duas estão documentadas em `core/managers.py`:
+
+1. **Fora de request, `objects` não recorta.** A alternativa faria toda tarefa Celery virar no-op
+   silencioso — e `CELERY_TASK_ALWAYS_EAGER` esconderia isso da suíte (`NOVO-20`).
+2. **`_default_manager` fica no manager irrestrito.** Admin, `dumpdata`, relações reversas,
+   `validate_unique`, o guarda m2m de `core/tenancy.py:116` e o check `core.E001` continuam
+   idênticos. O preço é o `NOVO-21`, deliberadamente aberto.
+
+**35 consultas** precisaram de `all_objects`, todas da mesma forma — o escopo é o do próprio
+registro, já explícito no filtro — e todas com comentário obrigatório, que a catraca verifica.
+Cinco delas fechavam defeito de verdade: as três de `Roteiro` do `NOVO-30`, mais o termo genérico do
+evento e o `Prefetch` de servidores, que falhavam **devolvendo vazio**.
+
+**Ainda aberto:** `Justificativa` não tem coluna `area` e herda a fronteira por `oficio__area`
+(`NOVO-06`); o `AreaScopedManager` aceita `campo=` para isso, mas aplicá-lo a um modelo sem coluna é
+decisão própria e não entrou. O `DB-02` (`area` NOT NULL) fica desbloqueado, com o `NOVO-31` na
+frente.
 
 ### BE-10 ✅ RESOLVIDO · 🔴 App `justificativas` sem isolamento de área · AUD · 2 d · risco médio
 

@@ -220,7 +220,7 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `DB-03` limpeza de rascunhos apaga rascunho de outra área — e mais: sem limite de idade, ela
       apagava o rascunho que outra pessoa da **mesma** área estava editando, porque `Roteiro` não
       tem dono. Registrado como `NOVO-13` e corrigido junto (mesmas três linhas de `filter`).
-- [ ] `BE-09` `AreaScopedManager` nos 28 modelos com `area` — **em 6 fatias, catraca em
+- [x] `BE-09` `AreaScopedManager` nos 28 modelos com `area` — **fechado; catraca em **zero**, em 6 fatias, medida por
       `scripts/audit_area_scoped_managers.py`.** Duas decisões fixaram o desenho: (1) fora de
       request `objects` **não** recorta — a alternativa faria toda tarefa Celery virar no-op
       silencioso (`NOVO-20`); (2) `_default_manager` fica no manager irrestrito, para não
@@ -246,7 +246,9 @@ para uma rodada futura, com `DB-01` como pré-requisito.
         precisou mudar: a consulta `area IS NULL` dele só é alcançada quando já não há
         área corrente, por retorno antecipado — a suposição do plano original estava
         errada. Quem precisou foi `get_for_area` e o lock de `proximo_numero`
-  - [ ] fatia 6 — `planos_trabalho`, `justificativas`, `integracoes`, `core.AuditEvent`; fecha o ID
+  - [x] fatia 6 — `planos_trabalho`, `justificativas`, `integracoes`, `core.AuditEvent`
+        (8 modelos, 8 sites; **catraca em 0**). Fecha o ID. `AuditEvent` ganhou teste dos
+        dois lados: a leitura recorta, a escrita continua gravando
 - [x] `BE-10` app `justificativas` sem isolamento — **já estava resolvido** pelo `NOVO-06` e pelo
       `NOVO-09`; a verificação de 06/08 conferiu os quatro pontos do enunciado um a um. A Fase 2
       tem 6 IDs, não 7.
