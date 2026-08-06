@@ -17,8 +17,15 @@ não quebrava porque nenhum arquivo do Drive tinha BOM — um arquivo de distân
 de virar vermelho de bootstrap. Os dois passaram a ler `utf-8-sig`; este teste é
 que impede o BOM de voltar.
 
-Fora de escopo aqui: `QA-11` (`reparar-producao.yml` em UTF-16LE, BOM `FF FE`),
-que tem ID próprio e precisa de um `workflow_dispatch` de validação.
+Este teste nasceu com uma exceção para `.github/workflows/reparar-producao.yml`,
+escrita na crença de que o `QA-11` seguia aberto. **Seguia aberto só no catálogo:**
+a correção tinha entrado em `993e14c`, em 05/08, e o plano mestre já marcava
+`[x]`. A exceção era um buraco nesta rede por nada, e saiu.
+
+Sobreposição deliberada com `core/tests/test_encoding_dos_workflows.py`, que é a
+catraca do `QA-11`: aquele é fundo e estreito (os quatro workflows, e também
+mojibake de dupla codificação); este é raso e largo (todo arquivo de texto do
+repositório, só BOM). Nenhum dos dois substitui o outro.
 """
 
 from __future__ import annotations
@@ -41,11 +48,6 @@ BOMS = {
     b"\xfe\xff": "UTF-16 BE",
 }
 
-#: `QA-11` tem ID próprio e correção própria (revalidar o workflow de reparo de
-#: produção com um disparo de baixo risco). Sai desta rede até lá, nominalmente —
-#: um caminho só, para não virar porta aberta.
-CONHECIDOS = {".github/workflows/reparar-producao.yml"}
-
 EXTENSOES = {".py", ".md", ".html", ".js", ".css", ".txt", ".json", ".yml", ".yaml", ".cfg", ".toml"}
 
 
@@ -57,8 +59,6 @@ class SemBomTests(SimpleTestCase):
                 continue
             relativo = caminho.relative_to(RAIZ)
             if any(parte in IGNORADOS for parte in relativo.parts):
-                continue
-            if str(relativo).replace("\\", "/") in CONHECIDOS:
                 continue
             inicio = caminho.open("rb").read(4)
             for marca, nome in BOMS.items():
