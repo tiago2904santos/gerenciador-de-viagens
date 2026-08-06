@@ -91,6 +91,46 @@ class LoginThrottleParidadeTests(TestCase):
         self.assertEqual(resposta.status_code, 302)
         self.assertTrue(resposta.wsgi_request.user.is_authenticated)
 
+    def test_login_correto_na_aplicacao_continua_funcionando(self):
+        """`NOVO-10` — a porta principal devolvia 500 quando a senha estava certa.
+
+        `LoginView.form_valid` chamava `self._rate_key()`, método que saiu daqui
+        quando a regra virou `core/login_throttle.py` (`QA-01`). A linha só roda
+        no caminho de **sucesso**, e o único teste de login bem-sucedido que
+        existia era o do admin — que passa pelo wrapper, não por esta view. O
+        resto da suíte entra por `force_login`.
+        """
+        resposta = self.client.post(
+            reverse("core:login"),
+            self._credenciais(senha=self.senha),
+        )
+
+        self.assertEqual(
+            resposta.status_code,
+            302,
+            msg="entrar com a senha certa pela porta principal deixou de funcionar",
+        )
+        self.assertTrue(resposta.wsgi_request.user.is_authenticated)
+
+    def test_entrar_certo_zera_as_falhas_anteriores(self):
+        """É o que a linha quebrada deveria fazer: acertar limpa o balde.
+
+        Sem isto, cinco erros de digitação seguidos de um acerto deixariam o
+        usuário a uma falha do bloqueio na próxima vez.
+        """
+        url = reverse("core:login")
+        self._tentar(url, login_throttle.LIMITE - 1)
+
+        self.client.post(url, self._credenciais(senha=self.senha))
+
+        self.assertEqual(cache.get(login_throttle.chave_de_tentativa(self._requisicao(url))), None)
+
+    def _requisicao(self, url):
+        """Uma requisição com o mesmo `POST['username']` que gera a chave do balde."""
+        from django.test import RequestFactory
+
+        return RequestFactory().post(url, {"username": self.usuario})
+
     def test_a_url_do_admin_continua_reversivel_pelo_nome_do_django(self):
         """O wrapper não pode quebrar o `next` nem os redirects internos do admin."""
         self.assertEqual(reverse("admin:login"), "/admin/login/")

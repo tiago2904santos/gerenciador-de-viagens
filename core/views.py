@@ -990,7 +990,13 @@ class LoginView(DjangoLoginView):
         return super().form_invalid(form)
 
     def form_valid(self, form):
-        cache.delete(self._rate_key())
+        # `NOVO-10`: era `self._rate_key()`, método que saiu daqui quando a regra
+        # mudou para `core/login_throttle.py` (`QA-01`). Ninguém percebeu porque
+        # esta linha só roda quando o login **dá certo** — e nenhum teste entrava
+        # por esta porta com a senha correta (todos usam `force_login`, e o único
+        # teste de login bem-sucedido que existia era o do admin, que passa pelo
+        # wrapper e não por aqui). Em produção, acertar a senha devolvia 500.
+        cache.delete(login_throttle.chave_de_tentativa(self.request))
         return super().form_valid(form)
 
 

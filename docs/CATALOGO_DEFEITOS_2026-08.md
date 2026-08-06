@@ -1428,7 +1428,7 @@ caminhos é parte da tarefa.
 > `justificativas/tests/test_vazamento_entre_areas.py` — 9 testes, provados falhando (6 falhas +
 > 1 erro) antes da correção.
 
-### NOVO-07 🟠 A tela de justificativas cresce com a tabela inteira: 15 MB de HTML · MED · 0,5 d
+### NOVO-07 ✅ RESOLVIDO · 🟠 A tela de justificativas cresce com a tabela inteira: 15 MB de HTML · MED · 0,5 d
 
 Consequência direta do `_oficios_summary_for_quick_add()` do `NOVO-06`: sem recorte e **sem
 limite**, ele serializa todo ofício do banco no HTML da lista.
@@ -1551,7 +1551,7 @@ exatamente o buraco que o `PF-07` existiu para tapar.
 > `destino_display` nunca eram exercitados — a régua media um caminho que produção não usa. Isso
 > subiu oito tetos (ver o corpo do PR), todos por medir mais dado, nenhum por regressão.
 
-### NOVO-09 🟠 Modelo de justificativa é global e o "padrão" de uma área derruba o das outras · DB · 1,5 d
+### NOVO-09 ✅ RESOLVIDO · 🟠 Modelo de justificativa é global e o "padrão" de uma área derruba o das outras · DB · 1,5 d
 
 `ModeloJustificativa` **não tem campo `area`** — ao contrário de `ModeloMotivoOficio`, que tem
 (`oficios/models.py:345`) e cujo recorte o `BE-05` já tratou. Três consequências, em ordem de
@@ -1572,6 +1572,59 @@ recortado. É `DB`, não `COR` — cai no limite 4 do `AGENTS.md` (migração ex
 e por isso ficou fora do PR do `NOVO-06`.
 **Decisão humana antes de executar:** os modelos existentes hoje são compartilhados de fato entre
 as áreas? Se forem, o backfill precisa **duplicar** cada modelo por área, não escolher uma.
+
+> **Corrigido em 06/08. Decisão do usuário: duplicar por área** — os modelos de hoje servem a
+> todas as unidades, e atribuir todos a uma só deixaria as demais sem texto até recadastrarem.
+>
+> O model virou espelho de `ModeloMotivoOficio`, e não um desenho novo: mesmo campo `area`, mesmo
+> índice `(area, ordem, nome)`, as mesmas quatro `UniqueConstraint` condicionais (global × por
+> área — quatro, e não um `unique_together`, porque em SQL `NULL != NULL` e um `unique(area, nome)`
+> puro deixaria passar duas linhas globais homônimas) e o mesmo recorte do `is_padrao`. O
+> `create`/`update` do catálogo atribui a área ativa, como `oficios.services.criar_modelo_motivo`.
+>
+> **Um defeito na própria migração, achado drilando o rollback e não em produção.** A **volta**
+> morria com `cannot ALTER TABLE ... because it has pending trigger events`: o `RunPython` mexe nas
+> linhas e, na mesma transação, o Django tenta recriar o `unique` do nome. Resolvido com
+> `SET CONSTRAINTS ALL IMMEDIATE` ao fim de cada sentido, guardado por `vendor == "postgresql"`.
+> Sem isso, um deploy que falhasse depois desta migração teria o rollback do `QA-03` quebrado.
+>
+> **Drill contra dado de verdade** (3 áreas, 2 modelos globais, um deles padrão):
+> ida → 6 linhas, uma por área, `is_padrao` preservado **por área**; volta → 2 globais, sem perda;
+> e um modelo criado numa área **depois** da migração **sobreviveu ao rollback** — a volta só apaga
+> a cópia ainda idêntica a uma linha da primeira área.
+>
+> `justificativas/tests/test_modelo_por_area.py` — 10 testes, provados mordendo: sem o filtro de
+> área no `is_padrao`, 1 reprova; sem o recorte nos selectors, 6 reprovam.
+
+### NOVO-10 ✅ RESOLVIDO · 🔴 Entrar com a senha certa devolve 500: o login da aplicação está quebrado · COR · 0,5 d
+
+`core/views.py:993`, `LoginView.form_valid`: `cache.delete(self._rate_key())`. O método
+`_rate_key` **não existe** — ele saiu de `LoginView` quando a regra de limite virou
+`core/login_throttle.py` no `QA-01`, e esta chamada ficou para trás.
+
+**Medido:** POST em `/login/` com a senha correta →
+`AttributeError: 'LoginView' object has no attribute '_rate_key'` → 500. Reproduzido no `main`
+(`993e14c5`) com `curl`, antes de tocar em qualquer coisa. Senha **errada** funciona normalmente,
+porque o caminho quebrado é só o de sucesso.
+
+Por que a suíte inteira passava com a porta de entrada arrombada:
+
+- todo teste de tela entra por `self.client.force_login(...)`, que não passa por view nenhuma;
+- o único teste de login **bem-sucedido** era `test_login_correto_no_admin_continua_funcionando`,
+  e o admin entra pelo wrapper `core/admin_login.py`, não por esta view;
+- `test_login_da_aplicacao_bloqueia_no_mesmo_ponto` usa esta porta, mas só com senha errada.
+
+Ou seja: havia teste para "errar a senha 6 vezes" e nenhum para "acertar a senha uma vez".
+
+**Correção:** `login_throttle.chave_de_tentativa(self.request)`, que é a mesma chave que
+`registrar_falha` usa — acertar a senha limpa o balde de falhas, que era a intenção original da
+linha. Mais dois testes em `core/tests/test_login_throttle.py`, provados falhando com o exato
+`AttributeError` antes da correção.
+
+**Achado por acaso**, dirigindo o navegador para conferir o `NOVO-07`. Nenhum auditor apontaria:
+não é ORM em view, não é CSS fora de token, e `ruff` não reclama de atributo inexistente
+(`F821` só pega nome livre, não `self.x`). Fica a lição para o `PLANO_MESTRE`: caminho de sucesso
+sem teste é caminho não coberto, por mais óbvio que pareça.
 
 ### NOVO-11 🟡 `NOVO` O auditor de ORM em view conta `.objects` dentro de docstring · QA · 0,5 d
 

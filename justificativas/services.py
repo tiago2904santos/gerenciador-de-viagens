@@ -12,6 +12,7 @@ from django.db import transaction
 from cadastros.models import ConfiguracaoSistema
 
 from .models import Justificativa
+from .models import ModeloJustificativa
 from .selectors import get_or_none_justificativa_by_oficio
 
 
@@ -273,14 +274,40 @@ def avaliar_etapa_justificativa_oficio(oficio) -> dict[str, Any]:
 
 @transaction.atomic
 def criar_modelo_justificativa(form):
-    """Persiste novo modelo (normalização em ModeloJustificativa.save)."""
-    return form.save()
+    """Persiste novo modelo (normalização em ModeloJustificativa.save).
+
+    `NOVO-09`: o modelo nasce na área ativa. Mesma forma de
+    `oficios.services.criar_modelo_motivo`, inclusive o recorte do `is_padrao` —
+    que o `save()` do model também faz, e aqui vale para o caso de o form trazer
+    uma área explícita.
+    """
+    modelo = form.save(commit=False)
+    if not modelo.area_id:
+        from core.tenancy import get_current_area
+
+        modelo.area = get_current_area()
+    if modelo.is_padrao:
+        ModeloJustificativa.objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(
+            is_padrao=False
+        )
+    modelo.save()
+    return modelo
 
 
 @transaction.atomic
 def atualizar_modelo_justificativa(instance, form):
     _ = instance
-    return form.save()
+    modelo = form.save(commit=False)
+    if not modelo.area_id:
+        from core.tenancy import get_current_area
+
+        modelo.area = get_current_area()
+    if modelo.is_padrao:
+        ModeloJustificativa.objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(
+            is_padrao=False
+        )
+    modelo.save()
+    return modelo
 
 
 @transaction.atomic
