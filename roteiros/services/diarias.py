@@ -63,8 +63,6 @@ CAPITAIS_POR_UF = {
     'TO': 'PALMAS',
 }
 
-_CAPITAIS_DA_BASE: dict[str, str] | None = None
-
 
 @dataclass(frozen=True)
 class PeriodMarker:
@@ -157,59 +155,52 @@ def calcular_diarias_com_valor(qtd, valor_unitario, pessoas):
     }
 
 
-def _capitais_da_base() -> dict[str, str]:
-    """Capitais por UF vindas da base geografica, memorizadas no processo.
+def capitais_por_uf() -> dict[str, str]:
+    """Capital de cada UF, resolvida AGORA — uma consulta, sem memoria (NOVO-26).
 
-    ``classify`` roda uma vez por marcador de roteiro; consultar o banco a cada
-    chamada viraria N+1 no editor. Quem importar a base deve chamar
-    ``limpar_cache_capitais()``.
-    """
-    global _CAPITAIS_DA_BASE
-    if _CAPITAIS_DA_BASE is None:
-        from cadastros.models import Cidade
-
-        _CAPITAIS_DA_BASE = {
-            (uf or '').strip().upper(): _normalize_city_name(nome)
-            for nome, uf in Cidade.objects.filter(capital=True).values_list('nome', 'uf')
-            if uf
-        }
-    return _CAPITAIS_DA_BASE
-
-
-def limpar_cache_capitais() -> None:
-    """Esquece as capitais memorizadas (usar apos importar a base geografica)."""
-    global _CAPITAIS_DA_BASE
-    _CAPITAIS_DA_BASE = None
-
-
-def _capital_da_uf(uf_norm: str) -> str | None:
-    """Nome normalizado da capital daquela UF (N-06).
-
-    A base geografica manda; ``CAPITAIS_POR_UF`` so entra quando ela nao tem a
-    UF. Sem esse fallback, um banco sem a base importada faria todo destino
+    A base geografica manda; ``CAPITAIS_POR_UF`` preenche as UFs que ela nao
+    tem. Sem esse fallback, um banco sem a base importada faria todo destino
     virar INTERIOR — que e' exatamente a cobranca a menor que o N-06 existe para
     evitar. A correcao introduziria o defeito.
+
+    Isto ja foi um mapa memorizado no modulo, e a memoria ficava velha: marcar
+    uma capital no admin nao valia ate reiniciar o worker, importar a base nao
+    valia nunca (o importador roda em outro processo), e na suite o mapa
+    atravessava o rollback e contaminava o teste seguinte. Como ``classify``
+    decide CAPITAL vs INTERIOR, isso era dinheiro.
+
+    Quem chama em laco resolve uma vez e passa o resultado adiante — e' o que
+    ``build_periods`` e ``infer_tipo_destino_from_paradas`` fazem. O custo fica
+    em uma consulta por calculo, nao por marcador.
     """
-    da_base = _capitais_da_base().get(uf_norm)
-    if da_base:
-        return da_base
-    return CAPITAIS_POR_UF.get(uf_norm)
+    from cadastros.models import Cidade
+
+    da_base = {
+        (uf or '').strip().upper(): _normalize_city_name(nome)
+        for nome, uf in Cidade.objects.filter(capital=True).values_list('nome', 'uf')
+        if uf
+    }
+    return {**CAPITAIS_POR_UF, **da_base}
 
 
-def classify(cidade: str | None, uf: str | None) -> str:
+def classify(cidade: str | None, uf: str | None, capitais: dict[str, str] | None = None) -> str:
     uf_norm = (uf or '').strip().upper()
     cidade_norm = _normalize_city_name(cidade)
     if uf_norm == 'DF' and cidade_norm == 'BRASILIA':
         return 'BRASILIA'
-    if uf_norm and cidade_norm and _capital_da_uf(uf_norm) == cidade_norm:
+    if not uf_norm or not cidade_norm:
+        return 'INTERIOR'
+    mapa = capitais if capitais is not None else capitais_por_uf()
+    if mapa.get(uf_norm) == cidade_norm:
         return 'CAPITAL'
     return 'INTERIOR'
 
 
 def infer_tipo_destino_from_paradas(paradas: list[tuple[str | None, str | None]]) -> str:
+    capitais = capitais_por_uf()
     tipo_destino = 'INTERIOR'
     for cidade, uf in paradas:
-        tipo = classify(cidade, uf)
+        tipo = classify(cidade, uf, capitais)
         if tipo == 'BRASILIA':
             return tipo
         if tipo == 'CAPITAL':
@@ -296,6 +287,9 @@ def build_periods(
     # decidida pela saída mais antiga. Resolver por trecho abriria a porta para
     # um roteiro que atravessa a virada de vigência cobrar dois valores.
     tabela_por_faixa = tabela_vigente_em(_data_de_referencia(markers))
+    # Uma consulta por calculo, nao por marcador (NOVO-26). Era um mapa
+    # memorizado no modulo, que ficava velho depois de qualquer edicao da base.
+    capitais = capitais_por_uf()
 
     sorted_markers = sorted(markers, key=lambda item: item.saida)
     periodos = []
@@ -342,7 +336,7 @@ def build_periods(
         ):
             continue
 
-        tipo = classify(marker.destino_cidade, marker.destino_uf)
+        tipo = classify(marker.destino_cidade, marker.destino_uf, capitais)
         # Aqui so se monta o esqueleto do periodo (N-08). Dinheiro e' contado
         # uma vez so, mais abaixo, depois que os periodos consecutivos do mesmo
         # grupo viram um trecho. Antes o breakdown era calculado duas vezes: uma

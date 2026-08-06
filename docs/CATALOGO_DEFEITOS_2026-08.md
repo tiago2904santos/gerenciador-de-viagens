@@ -1478,7 +1478,8 @@ lógica de criação, edição e exclusão inteiramente fora da cobertura, inclu
 `adapters/weasyprint_pdf.py` ~32% — os dois **confirmados** na verificação.
 `adapters/word_pdf.py` 37,35%, `libreoffice_resolve.py` 62,35% e `warm_cache.py` 38,24% vieram da
 primeira medição e **não foram confirmados nem contraditados**: medi-los exige a suíte completa, e
-ela travou na verificação (ver `NOVO-02`). (`adapters/excel_pdf.py` está em 0% mas é Windows-only
+ela travou na verificação (ver `NOVO-02` — que em 06/08 **não reproduziu**, então esta medição está
+desbloqueada). (`adapters/excel_pdf.py` está em 0% mas é Windows-only
 via `win32com.client` — não conta como lacuna.)
 **Efeito:** os ramos de erro e *fallback* da função mais central do produto só executam quando algo
 já deu errado — exatamente onde falta prova.
@@ -1499,14 +1500,22 @@ O documento apresenta o fluxo de assinatura com `pyHanko` como vigente. Ele foi 
 `pypdf` + `reportlab`. Mesma família do `HT-13`: documentação de contrato apontando para o
 passado.
 
-### NOVO-02 ⚪ A suíte trava ao combinar certos grupos de apps · VER · a investigar
+### NOVO-02 ✅ NÃO REPRODUZIDO (06/08/2026) · ⚪ A suíte trava ao combinar certos grupos de apps · VER
 
 Na verificação, rodar `documentos` + `oficios` + `termos` + `prestacoes_contas` + `eventos` juntos
 levantou `AttributeError: 'ModelChoiceField' object has no attribute 'to_field_name'`. A suíte
-completa e a suíte por app passam; a combinação parcial não. Cheira a estado global vazando entre
-testes, ou a ordem de importação — e é o tipo de coisa que só aparece quando alguém tenta medir
-cobertura de um subconjunto, que é exatamente o que o `QA-15` precisa fazer.
-**Precisa ser reproduzido numa sessão limpa antes de virar trabalho.**
+completa e a suíte por app passavam; a combinação parcial não. A linha pedia:
+**"Precisa ser reproduzido numa sessão limpa antes de virar trabalho."**
+
+**Reproduzido em 06/08/2026, e não deu.** A combinação exata: **632 testes, OK**, em 22,4 s. A mesma
+combinação com `--reverse`: **632 testes, OK**. `to_field_name` não aparece em lugar nenhum do
+código do projeto, e não existe subclasse de `ModelChoiceField` que pudesse levantá-lo — todos os
+usos são `forms.ModelChoiceField`/`ModelMultipleChoiceField` diretos. O mais provável é ter sido
+corrigido de raspão por algum PR desde 05/08. **Se voltar a aparecer, é linha nova, com a
+combinação que reproduziu.**
+
+A sondagem não foi em vão: forçar dependência de ordem com `--reverse` na **suíte completa** achou
+um vazamento de estado global de verdade, com causa nomeada — está no `NOVO-26`.
 
 ### NOVO-03 🔴 `NameError` em rota viva: `_CAMPO_LABELS` indefinido · COR · FEITO (05/08)
 
@@ -2151,8 +2160,8 @@ para quem roda localmente. As redes de `core/tests/test_suite_paralela.py` cobre
 `tblib` importável e `tblib==` presente no lock que o CI instala, porque é o lock que decide o que
 chega lá.
 
-Vizinho do `NOVO-02` (suíte trava ao combinar certos grupos de apps), que segue aberto e tem causa
-diferente.
+Vizinho do `NOVO-02`, que em 06/08 **não reproduziu** — mas cuja sondagem achou o `NOVO-26`, esse
+sim um vazamento de estado global entre testes.
 
 ---
 
@@ -2293,3 +2302,61 @@ lançar: falhar ali não pode virar "não foi possível criar a pasta", que seri
 
 Teste: `core/tests/test_gdrive_criar_pasta.py` — estático, porque o CI não roda JS (`JS-03`); as 6
 asserções falham contra o código antigo.
+
+---
+
+### NOVO-26 ✅ RESOLVIDO · 🟠 `NOVO` Mapa de capitais memorizado no processo decide diária com base desatualizada · COR · 0,5 d
+
+`roteiros/services/diarias.py:66` — `_CAPITAIS_DA_BASE` era um dicionário lido **uma vez por
+processo** e nunca invalidado. Quem consome é `classify()`, que decide `CAPITAL` vs `INTERIOR`:
+**grupo tarifário, ou seja, valor da diária.**
+
+Achado ao sondar o `NOVO-02`. A combinação de apps que ele descrevia não reproduziu, mas a suíte
+**completa** em `--reverse` ficou vermelha:
+
+```
+FAIL: eventos.tests.test_orcamento_de_queries…test_o_detalhe_custa_o_mesmo_numero_de_queries
+AssertionError: 76 != 77
+```
+
+O diff das duas listas de SQL isola uma consulta só —
+`SELECT nome, uf FROM cadastros_cidade WHERE capital` — presente em ordem normal e ausente em
+`--reverse`, porque algum teste anterior já tinha aquecido o mapa.
+
+**Três caminhos de defasagem, nenhum coberto:**
+
+1. **Testes.** O mapa atravessa o rollback da transação. Só `roteiros/tests/test_diarias_capitais.py`
+   se defendia, chamando `limpar_cache_capitais()` no `setUp` e no `addCleanup`; o resto da suíte
+   estava exposto.
+2. **Importação.** `cadastros/services_importacao.py` escreve `Cidade.capital` por `bulk_create` e
+   `bulk_update`. A docstring do cache dizia *"Quem importar a base deve chamar
+   `limpar_cache_capitais()`"* e **nenhum importador chamava** — mas o remédio anunciado não
+   funcionaria de todo jeito: os importadores são management commands, rodam em processo próprio,
+   e os **workers web continuariam com o mapa velho até reiniciar**.
+3. **Admin.** `CidadeAdmin` (`cadastros/admin.py:49`) expõe `capital`. Marcar uma capital pelo admin
+   não limpava o cache de worker nenhum — nem o do processo que salvou.
+
+**Por que não bastava invalidar:** `django.core.cache` cai em `LocMemCache` sem `REDIS_URL`
+(`config/settings/base.py:115`), que é o caso dos ambientes declarados — mesmo buraco do `QA-02`;
+e invalidar por sinal não pega `bulk_create`/`bulk_update`, que é justamente o que o importador usa.
+
+**Corrigido** trocando o cache de processo por `capitais_por_uf()`, sem memória: uma consulta que
+devolve `{**CAPITAIS_POR_UF, **base}` — mesma precedência de antes, a base mandando por UF e o mapa
+do módulo preenchendo as que faltam, que é o fallback que o `N-06` existe para preservar.
+`classify()` ganhou um terceiro parâmetro opcional com o mapa já resolvido, e os dois únicos
+chamadores em laço (`infer_tipo_destino_from_paradas`, `build_periods`) resolvem uma vez e passam
+adiante: **uma consulta por cálculo, não por marcador**, que era o N+1 que o cache existia para
+evitar. `limpar_cache_capitais()` foi removida em vez de virar no-op — nome de função que promete
+limpeza convida a confiar nela.
+
+**Orçamento de queries não mudou:** `QUERIES_DETALHE` segue **77** e `QUERIES_DETALHE_COM_OS` segue
+**68**. O que mudou é que agora são os mesmos em qualquer ordem — antes o 77 dependia de o cache
+estar frio.
+
+Testes em `roteiros/tests/test_diarias_capitais.py`: `test_a_base_editada_passa_a_valer_na_mesma_execucao`
+(edita a base no meio da execução e reclassifica — modela o caminho do admin) e
+`test_cada_calculo_paga_o_mesmo_custo` (dois cálculos idênticos custam igual; antes o segundo saía
+de graça). Os dois **falham contra o código antigo**. `test_o_custo_nao_cresce_com_o_numero_de_destinos`
+é a rede anti-N+1 e passa nos dois estados de propósito.
+
+Suíte completa verde nas três formas — série, `--parallel 4` e **`--reverse`**, que era a vermelha.
