@@ -48,6 +48,25 @@ def _q_da_aba(aba: str) -> Q:
     return ativa & Q(data_liberacao_diarias__isnull=True)
 
 
+def servidores_removidos_da_equipe(prestacao):
+    """Servidores que saíram da equipe do ofício mas cujos dados foram preservados (`DB-06`).
+
+    Único ponto de leitura que usa `todos` de propósito: em todo o resto do
+    sistema `objects` esconde estas linhas, e é isso que se quer. Aqui elas
+    precisam aparecer — preservar comprovante e assinatura sem lugar nenhum de
+    encontrá-los seria trocar "apagou em silêncio" por "sumiu em silêncio".
+
+    A lista só não é vazia quando havia dado coletado: linha sem nada some de vez
+    no próprio sinal, então o bloco da tela é autolimitado — aparece exatamente
+    quando importa.
+    """
+    return (
+        PrestacaoServidor.todos.filter(prestacao=prestacao, removida_em__isnull=False)
+        .select_related("servidor", "servidor__cargo", "servidor__unidade")
+        .order_by("removida_em", "pk")
+    )
+
+
 def _filter_servidores_by_area(queryset):
     area = get_current_area()
     if area is None:

@@ -1011,3 +1011,27 @@
   background-color: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%)) !important;
   transition: none !important;
 }
+
+
+/* `DB-06` — bloco "Saíram da equipe": servidores retirados do ofício cujos dados
+   foram preservados. Só é renderizado quando a lista não é vazia, então não há
+   estado "sem itens" a estilizar. Tudo em token, nada de cor literal. */
+.prestacao-removidos__intro {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.45;
+  margin: 0 0 12px;
+}
+
+.prestacao-removidos__tile {
+  border-style: dashed;
+}
+
+.prestacao-removidos__tile .oficio-documentos-traveller-tile__name {
+  color: var(--color-muted-strong, var(--color-muted));
+}
+
+.prestacao-removidos__badge {
+  background: var(--color-surface-muted);
+  color: var(--color-muted-strong, var(--color-muted));
+}

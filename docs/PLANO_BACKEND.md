@@ -90,7 +90,7 @@ request.
 
 | ID | Defeito | Dias |
 |---|---|---:|
-| `DB-06` 🔴 | Remover um servidor da equipe do ofício apaga em cascata comprovante e assinatura já coletados (`prestacoes_contas/signals.py:33`) — sem confirmação, sem desfazer, arquivo órfão no disco | 3 |
+| `DB-06` ✅ | ~~Remover um servidor da equipe do ofício apaga em cascata comprovante e assinatura já coletados (`prestacoes_contas/signals.py:33`)~~ — **fechado**: `sair_da_equipe` marca em vez de apagar quem tem dados coletados | 3 |
 | `DB-07` 🟠 | 2 `CheckConstraint` em 54 modelos: 9 pares início/fim sem ordem garantida, dinheiro negativo aceito | 3 |
 | `DB-08` 🟠 | Coleções ordenadas aceitam duplicata: destino repetido é contado duas vezes pelo motor de diárias e impresso duas vezes | 2 |
 
@@ -98,7 +98,39 @@ request.
 dos dados existentes no corpo do PR e o procedimento de backup citado.
 
 **Gate para `DB-06`:** teste que remove um servidor com anexo e assinatura e exige que ambos
-sobrevivam.
+sobrevivam. — **cumprido** por `prestacoes_contas/test_remocao_equipe.py::GateDB06Tests`.
+
+> **`DB-06` fechado. O que a correção resolveu, e o que ela deliberadamente não resolveu.**
+>
+> Reprodução antes de mexer, com 2 servidores, 1 comprovante e 1 assinatura, após
+> `oficio.servidores.set([s1])`: `PrestacaoServidor=1, anexos=0, assinaturas=0`, e o arquivo do
+> comprovante **ainda no disco**, sem dono. Igual ao que o catálogo mediu.
+>
+> A troca não foi "nunca apagar": foi **apagar só o que não custa nada**. Linha sem trabalho de
+> usuário continua sendo excluída — é o que impede a prestação de exibir a equipe semeada de outro
+> ofício, que era o defeito que este sinal existe para resolver. Linha com comprovante, assinatura,
+> número de solicitação, valor de diária, data, status ou arquivamento é marcada (`removida_em`) e
+> some das telas sem perder nada. Readicionar o servidor à equipe desfaz a marca e devolve tudo —
+> é o "desfazer" que o defeito dizia não existir.
+>
+> **O filtro mora no `_default_manager`**, não espalhado pelos ~15 pontos de leitura. Foi decisão de
+> engenharia, não de estilo: `view_common.py:257-262`, `views.py:730` e `selectors.py:100` fazem
+> `prefetch_related` **por string**, que não tem onde receber um filtro. É o inverso da decisão do
+> `BE-09` (onde o `_default_manager` fica irrestrito) porque o recorte aqui é do próprio registro,
+> não do observador — e a diferença está escrita no docstring de `PrestacaoServidorAtivosManager`,
+> travada por teste (`test_default_manager_name_continua_no_manager_que_filtra`).
+>
+> **As dez cláusulas de `tem_dados_coletados()` foram provadas por inversão, uma a uma.** Na
+> primeira rodada, apagar a cláusula da assinatura deixava a suíte **verde** — o teste do gate cria
+> anexo *e* assinatura, então nenhum dos dois decidia nada. Sétimo caso desta refatoração em que um
+> teste meu não provava o que dizia provar. Corrigido com um caso por sinal, com ofício novo em cada
+> um (a primeira versão reaproveitava a prestação e o dado do caso anterior mantinha os seguintes
+> verdes).
+>
+> **Fora do escopo, registrado como `NOVO-35`:** `PrestacaoServidor.servidor` é `CASCADE`, então
+> excluir o servidor no cadastro continua apagando o comprovante. Medido: 1 anexo → 0 após
+> `servidor.delete()`. Só não é pior porque `AssinaturaDocumento.signer` é `PROTECT` e barra quem já
+> assinou. Ficou fora porque muda a UX de exclusão do cadastro e precisa da medição de produção.
 
 ### B3 — Consulta e índice · 8,5 dias · risco médio
 

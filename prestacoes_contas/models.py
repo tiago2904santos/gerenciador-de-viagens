@@ -116,6 +116,45 @@ class PrestacaoContas(models.Model):
         super().save(*args, **kwargs)
 
 
+class PrestacaoServidorAtivosManager(models.Manager):
+    """Esconde as linhas removidas da equipe do ofício (`DB-06`).
+
+    É o `_default_manager` **de propósito**. Django deriva o manager das relações
+    reversas da classe do `_default_manager`
+    (`django/db/models/fields/related_descriptors.py:641`), então
+    `prestacao.servidores_prestacao.all()` e os `prefetch_related` **por string**
+    (`view_common.py:257-262`, `views.py:730`, `selectors.py:100`) herdam o filtro
+    sem que nenhum dos quinze pontos de leitura precise lembrar dele. A
+    alternativa era espalhar `filter(removida_em__isnull=True)` à mão por seis
+    apps — e os prefetch por string não teriam onde recebê-lo.
+
+    É o oposto da escolha do `AreaScopedManager` (`core/managers.py`), e a
+    diferença é o que decide: lá o `_default_manager` **precisa** ficar irrestrito,
+    porque o recorte é do observador (a área ativa) e não pode vazar para o admin
+    nem para `validate_unique`. Aqui o recorte é do próprio registro — a linha saiu
+    da equipe, e isso é verdade para todo mundo que olhar.
+
+    Quem precisa enxergar as removidas usa `PrestacaoServidor.todos`: o sinal que
+    reconcilia a equipe e o comando `sincronizar_prestacao_servidores`. Fora
+    desses dois, ver uma linha removida é bug, não necessidade.
+
+    Duas consequências conhecidas e aceitas:
+
+    - `UniqueConstraint.validate` sai do `_default_manager`, então um `ModelForm`
+      que **criasse** `(prestacao, servidor)` não veria a linha removida e cairia
+      em `IntegrityError` em vez de erro de formulário. Hoje não existe esse form
+      — os dois de `forms.py` editam instância existente — e os `get_or_create` do
+      par usam `todos`.
+    - Em migração de dados este manager vira um `models.Manager()` puro
+      (`db/migrations/state.py`, que só preserva `use_in_migrations`), então
+      `PrestacaoServidor.objects` dentro de migração **não filtra**. É o que se
+      quer: migração enxerga a tabela inteira.
+    """
+
+    def get_queryset(self):
+        return super().get_queryset().filter(removida_em__isnull=True)
+
+
 class PrestacaoServidor(models.Model):
     """Parte individual da prestação de um servidor dentro do ofício.
 
@@ -193,10 +232,22 @@ class PrestacaoServidor(models.Model):
     arquivada_em = models.DateTimeField(null=True, blank=True)
     finalizada = models.BooleanField(default=False)
     finalizada_em = models.DateTimeField(null=True, blank=True)
+    # `DB-06`: o servidor saiu da equipe do ofício mas já tinha entregue alguma
+    # coisa — comprovante de saque, assinatura do RT, número da solicitação. A
+    # linha some das telas (é o `objects` que decide isso) e nada é apagado; se
+    # ele voltar para a equipe, a marca cai e tudo reaparece. Nulo = na equipe.
+    removida_em = models.DateTimeField("Removida da equipe em", null=True, blank=True)
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
 
+    #: Ordem importa: o primeiro declarado vira o `_default_manager`, e é dele que
+    #: saem as relações reversas. `default_manager_name` abaixo torna isso
+    #: explícito em vez de acidental — ver `PrestacaoServidorAtivosManager`.
+    objects = PrestacaoServidorAtivosManager()
+    todos = models.Manager()
+
     class Meta:
+        default_manager_name = "objects"
         ordering = ["prestacao", "pk"]
         verbose_name = "Servidor da prestação"
         verbose_name_plural = "Servidores da prestação"
@@ -267,6 +318,53 @@ class PrestacaoServidor(models.Model):
         if self.status == self.STATUS_PENDENTE:
             self.status = self.STATUS_EM_PREENCHIMENTO
             self.save(update_fields=["status", "atualizado_em"])
+
+    def tem_dados_coletados(self) -> bool:
+        """Há trabalho de usuário nesta linha que uma exclusão destruiria (`DB-06`).
+
+        A lista é exaustiva contra os campos editáveis do modelo, e
+        `CamposConhecidosDoServidorDaPrestacaoTests` reprova quando aparece um
+        campo novo — é a única forma de um campo futuro não voltar a ser apagado
+        em silêncio pela troca de equipe.
+        """
+        return bool(
+            self.numero_solicitacao.strip()
+            or self.diaria_valor_override is not None
+            or self.diaria_valor_override_observacao.strip()
+            or self.data_liberacao_diarias
+            or self.prazo_limite_saque
+            or self.status != self.STATUS_PENDENTE
+            or self.arquivada
+            or self.finalizada
+            # Comprovante de saque e assinatura eletrônica do RT: os dois que a
+            # cascata levava junto, e os dois que ninguém consegue refazer.
+            or self.documentos_anexos.exists()
+            or self.assinaturas.exists()
+        )
+
+    def sair_da_equipe(self) -> bool:
+        """Tira este servidor da equipe corrente. Devolve `True` se preservou a linha.
+
+        Sem nada coletado não há o que preservar, e a linha some de vez — que é o
+        comportamento de sempre e o que impede a prestação de exibir servidores
+        semeados pelo wizard e depois retirados. Com dados, a linha fica marcada.
+        """
+        from django.utils import timezone as _tz
+
+        if not self.tem_dados_coletados():
+            self.delete()
+            return False
+        if self.removida_em is None:
+            self.removida_em = _tz.now()
+            self.save(update_fields=["removida_em", "atualizado_em"])
+        return True
+
+    def voltar_para_equipe(self) -> None:
+        """Desfaz `sair_da_equipe`, e com ela reaparecem anexos e assinaturas."""
+        if self.removida_em is None:
+            return
+        self.removida_em = None
+        self.save(update_fields=["removida_em", "atualizado_em"])
 
 
 class PrestacaoDocumentoAnexo(models.Model):

@@ -645,7 +645,7 @@ ser registrada nas duas.
 > `QA-03` age não há duplicata e a volta passa. Depois, reverter exige decidir **qual viatura some**
 > — decisão de gente, não de script. A query que lista o impedimento está no docstring da migração.
 
-### DB-06 🔴 Cascata apaga comprovante e assinatura já coletados · AUD · 3 d · risco alto
+### DB-06 ✅ RESOLVIDO · 🔴 Cascata apaga comprovante e assinatura já coletados · AUD · 3 d · risco alto
 
 `prestacoes_contas/signals.py:33` —
 `prestacao.servidores_prestacao.exclude(servidor_id__in=ids_atuais).delete()`, disparado por
@@ -657,6 +657,26 @@ pelo servidor, número de solicitação e assinatura eletrônica já coletada. S
 soft-delete, com o arquivo órfão no disco.
 **Correção:** desativação em vez de exclusão (`removida_em`/`ativa`). Enquanto isso não existir,
 bloquear a remoção quando houver anexo ou assinatura não pendente.
+
+> **Resolvido pela desativação, sem a etapa intermediária de bloqueio.** Bloquear a remoção exigiria
+> recusar uma edição já cometida — o sinal roda em `post_remove`, depois de a M2M ter mudado —, e o
+> único jeito seria levantar exceção dentro da transação do formulário: erro 500 numa tela de uso
+> diário. A desativação não precisa recusar nada.
+>
+> Um campo só, `removida_em` (nulo = na equipe), em vez do par `removida_em`/`ativa` que o enunciado
+> sugeria: dois campos podem discordar entre si, um não.
+>
+> **A regra não é "nunca apagar".** `PrestacaoServidor.sair_da_equipe()` apaga quem não tem nada
+> coletado e marca quem tem — as dez cláusulas de `tem_dados_coletados()` estão provadas por
+> inversão individual. Manter tudo faria a prestação voltar a exibir a equipe semeada de outro
+> ofício, que é o motivo de o sinal existir.
+>
+> **Sem `--max`/catraca**, e de propósito: o defeito não é uma contagem que desce. É uma regra, e a
+> regra está travada por `test_default_manager_name_continua_no_manager_que_filtra` — apontar o
+> `_default_manager` para o manager irrestrito desligaria a proteção inteira sem nenhum teste de
+> comportamento reclamar.
+>
+> **Continua aberto pela porta do cadastro:** `NOVO-35`.
 
 ### DB-07 🟠 Dois `CheckConstraint` em 54 modelos · AUD · 3 d · risco médio
 
@@ -2371,6 +2391,31 @@ isso como dívida uniforme. Não é. Há pelo menos três grupos, e eles pedem t
 
 **Correção:** reescrever o enunciado do `DB-02` com esses três grupos antes de escrever qualquer
 migração, e medir o mesmo número em produção — onde o seed convive com dado real.
+
+---
+
+### NOVO-35 🔴 `NOVO` Excluir um servidor do cadastro apaga comprovante de prestação por cascata · DB · 1 d
+
+`PrestacaoServidor.servidor` é `on_delete=models.CASCADE` (`prestacoes_contas/models.py:141`).
+Excluir um servidor em `cadastros` (`cadastros/services.py:252` → `core.deletion.excluir_com_protecao`)
+derruba todas as linhas de prestação dele e, por cascata, os `PrestacaoDocumentoAnexo` presos a
+elas — o comprovante de saque entre eles. Medido em transação revertida (ver `DB-06` no
+`PLANO_BACKEND.md`): 1 servidor com 1 comprovante, `servidor.delete()`, restam **0 anexos**.
+
+É o mesmo defeito do `DB-06` por outra porta. O `DB-06` fechou a porta da equipe do ofício
+(`PrestacaoServidor.sair_da_equipe` preserva quem tem dados coletados); esta continua aberta.
+
+**Protegido hoje só por acidente:** `AssinaturaDocumento.signer` é `on_delete=PROTECT`, então um
+servidor que já assinou algum RT não pode ser excluído — o `ProtectedError` vira a mensagem de
+`core/deletion.py`. Quem tem comprovante mas ainda não assinou não tem essa proteção.
+
+**Correção candidata:** reusar `PrestacaoServidor.tem_dados_coletados()` em `excluir_servidor` e
+levantar `DelecaoProtegidaError` com a contagem, em vez de trocar o `CASCADE` por `PROTECT` — que
+tornaria indelével qualquer servidor que já tenha entrado em um ofício, ou seja, quase todos.
+
+**Ficou fora do `DB-06` de propósito:** muda a UX de exclusão no cadastro (mensagem nova numa tela
+que o `DB-06` não toca) e precisa da medição de quantos servidores ficariam bloqueados em produção
+antes de a regra ser escolhida.
 
 ---
 

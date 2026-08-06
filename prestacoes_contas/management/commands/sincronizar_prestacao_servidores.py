@@ -11,6 +11,13 @@ linhas de servidores que saíram do ofício e cria as que faltam. Servidores que
 permanecem — e seus dados individuais (solicitação, comprovante, assinatura) —
 não são tocados.
 
+``DB-06``: "remover" segue a mesma regra do sinal
+(``PrestacaoServidor.sair_da_equipe``). Linha sem nada coletado é apagada; linha
+com comprovante, assinatura ou número de solicitação é apenas marcada como fora
+da equipe e some das telas, sem perder nada. O dry-run diz qual dos dois vai
+acontecer com cada servidor, porque é essa a diferença que importa revisar antes
+de rodar com ``--confirmar``.
+
 Por padrão roda em modo dry-run (só lista o que mudaria). Só mexe no banco com
 --confirmar.
 
@@ -59,6 +66,16 @@ class Command(BaseCommand):
             qs = qs.filter(oficio__numero=numero, oficio__ano=ano)
         return qs
 
+    def _restaurar(self, prestacao, ids_na_equipe):
+        """Desfaz a marca de quem voltou para a equipe do ofício (`DB-06`)."""
+        marcadas = PrestacaoServidor.todos.filter(
+            prestacao=prestacao,
+            servidor_id__in=ids_na_equipe,
+            removida_em__isnull=False,
+        )
+        for servidor_prestacao in marcadas:
+            servidor_prestacao.voltar_para_equipe()
+
     def handle(self, *args, **options):
         confirmar = options["confirmar"]
         filtro = options["oficio"]
@@ -69,19 +86,36 @@ class Command(BaseCommand):
             return
 
         total_removidos = 0
+        total_preservados = 0
         total_criados = 0
         divergentes = 0
 
         for prestacao in prestacoes:
             oficio = prestacao.oficio
             ids_atuais = set(oficio.servidores.values_list("pk", flat=True))
+            # `todos`: as já marcadas como fora da equipe (`DB-06`) precisam ser
+            # vistas aqui, senão o comando tentaria recriá-las e esbarraria em
+            # `unique_servidor_por_prestacao`.
+            saindo = list(
+                PrestacaoServidor.todos.filter(
+                    prestacao=prestacao, removida_em__isnull=True
+                )
+                .exclude(servidor_id__in=ids_atuais)
+                .select_related("servidor")
+            )
             ids_prestacao = set(
-                prestacao.servidores_prestacao.values_list("servidor_id", flat=True)
+                PrestacaoServidor.todos.filter(prestacao=prestacao).values_list(
+                    "servidor_id", flat=True
+                )
             )
 
-            a_remover = ids_prestacao - ids_atuais
             a_criar = ids_atuais - ids_prestacao
-            if not a_remover and not a_criar:
+            voltando = ids_atuais & ids_prestacao
+            if not saindo and not a_criar:
+                # Alguém pode ter voltado para a equipe sem que nada mais mude;
+                # nesse caso não há divergência a relatar, só a marca a desfazer.
+                if confirmar:
+                    self._restaurar(prestacao, voltando)
                 continue
 
             divergentes += 1
@@ -90,12 +124,15 @@ class Command(BaseCommand):
                     f"Oficio {oficio.numero_formatado} (prestacao {prestacao.pk}):"
                 )
             )
-            if a_remover:
-                nomes = list(
-                    prestacao.servidores_prestacao.filter(servidor_id__in=a_remover)
-                    .values_list("servidor__nome", flat=True)
+            for servidor_prestacao in saindo:
+                destino = (
+                    "preservar (tem dados coletados)"
+                    if servidor_prestacao.tem_dados_coletados()
+                    else "apagar"
                 )
-                self.stdout.write(f"    remover: {', '.join(nomes)}")
+                self.stdout.write(
+                    f"    sair da equipe: {servidor_prestacao.servidor.nome} -> {destino}"
+                )
             if a_criar:
                 from cadastros.models import Servidor
 
@@ -106,18 +143,16 @@ class Command(BaseCommand):
 
             if confirmar:
                 with transaction.atomic():
-                    removidos, _ = (
-                        prestacao.servidores_prestacao.filter(
-                            servidor_id__in=a_remover
-                        ).delete()
-                        if a_remover
-                        else (0, {})
-                    )
+                    for servidor_prestacao in saindo:
+                        if servidor_prestacao.sair_da_equipe():
+                            total_preservados += 1
+                        else:
+                            total_removidos += 1
                     for servidor_id in a_criar:
-                        PrestacaoServidor.objects.get_or_create(
+                        PrestacaoServidor.todos.get_or_create(
                             prestacao=prestacao, servidor_id=servidor_id
                         )
-                total_removidos += len(a_remover)
+                    self._restaurar(prestacao, voltando)
                 total_criados += len(a_criar)
 
         if divergentes == 0:
@@ -128,7 +163,9 @@ class Command(BaseCommand):
             self.stdout.write(
                 self.style.SUCCESS(
                     f"Concluido: {divergentes} prestacoes ajustadas, "
-                    f"{total_removidos} linhas removidas, {total_criados} criadas."
+                    f"{total_removidos} linhas apagadas, "
+                    f"{total_preservados} preservadas fora da equipe, "
+                    f"{total_criados} criadas."
                 )
             )
         else:

@@ -270,7 +270,11 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       **volta da migração deixa de funcionar** depois que duas áreas usarem a mesma placa.
 
 ### Fase 3 — O banco defende os dados
-- [ ] `DB-06` cascata apaga comprovante e assinatura já coletados
+- [x] `DB-06` cascata apaga comprovante e assinatura já coletados — `sair_da_equipe` marca
+      (`removida_em`) quem tem dado coletado e apaga quem não tem; `_default_manager` esconde os
+      marcados, então os ~15 pontos de leitura (inclusive `prefetch_related` por string) herdam o
+      filtro. Readicionar o servidor à equipe restaura tudo. Achado adjacente ficou como `NOVO-35`:
+      excluir o servidor no **cadastro** ainda apaga o comprovante por `CASCADE`.
 - [ ] `DB-07` 2 `CheckConstraint` em 54 modelos
 - [ ] `DB-08` coleções ordenadas aceitam duplicata
 
