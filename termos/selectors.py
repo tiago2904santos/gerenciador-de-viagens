@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from django.db.models import Exists
 from django.db.models import OuterRef
+from django.db.models import Prefetch
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
@@ -18,6 +19,24 @@ from core.normalizers import remove_accents
 from core.tenancy import filter_queryset_by_area
 
 from .models import TermoAutorizacao
+
+
+def prefetch_servidores_efetivos():
+    """Prefetch de `servidores` na forma exata que `servidores_efetivos()` usa.
+
+    O cache do prefetch só dispensa a consulta por linha se trouxer o mesmo
+    `select_related` e a mesma ordenação da primeira cascata de
+    `TermoAutorizacao.servidores_efetivos()`; com um `prefetch_related("servidores")`
+    genérico o model recebe os servidores mas perde cargo e unidade, e cada
+    acesso volta a consultar (`NOVO-08`).
+
+    É função e não constante de módulo de propósito: reaproveitar a mesma
+    instância de `Prefetch` entre querysets diferentes é fonte conhecida de erro.
+    """
+    return Prefetch(
+        "servidores",
+        queryset=Servidor.objects.select_related("cargo", "unidade").order_by("nome"),
+    )
 
 
 def anotar_composicao(termos):
@@ -74,7 +93,7 @@ def listar_termos(q=None, q_digits=None, simples=None):
             "destino_cidade",
             "viatura",
         )
-        .prefetch_related("servidores")
+        .prefetch_related(prefetch_servidores_efetivos())
         .order_by("-created_at")
     )
     if simples is not None:
@@ -111,7 +130,7 @@ def queryset_termo_detalhe():
         "destino_estado",
         "destino_cidade",
         "viatura",
-    ).prefetch_related("servidores")
+    ).prefetch_related(prefetch_servidores_efetivos())
 
 
 def get_termo_by_id(pk):

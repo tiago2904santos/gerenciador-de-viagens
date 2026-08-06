@@ -20,6 +20,7 @@ from core.retorno import voltar_para
 
 
 from documentos.selectors import mapa_artefatos_pdf_termo_cadastro
+from documentos.selectors import mapa_artefatos_pdf_termo_cadastro_em_lote
 from documentos.services.async_generation import enfileirar_documento
 from documentos.services.types import DocumentoFormato
 from eventos.services import build_evento_document_seed
@@ -89,6 +90,11 @@ def index(request):
 
     paginator = Paginator(termos, TERMOS_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get("page"))
+    # `NOVO-08`: uma consulta para os artefatos da página inteira. Sem o mapa,
+    # `termo_cadastro_assinado_info` consultava uma vez por linha.
+    artefatos_por_termo = mapa_artefatos_pdf_termo_cadastro_em_lote(
+        [termo.pk for termo in page_obj.object_list]
+    )
     def _servidor_url(termo_pk):
         def build(servidor_pk, formato):
             return reverse(
@@ -112,7 +118,7 @@ def index(request):
             delete_url=reverse("termos:excluir", args=[termo.pk]),
             pdf_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "pdf"]),
             docx_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "docx"]),
-            **termo_cadastro_assinado_info(termo, None),
+            **termo_cadastro_assinado_info(termo, None, artefatos_por_termo.get(termo.pk, {})),
         )
         for termo in page_obj.object_list
     ] if simples else []
@@ -132,7 +138,7 @@ def index(request):
             viatura_view_url=reverse("termos:termo_cadastro_viatura_pdf_inline", args=[termo.pk]),
             viatura_pdf_url=reverse("termos:baixar_termo_cadastro_viatura", args=[termo.pk, "pdf"]),
             viatura_docx_url=reverse("termos:baixar_termo_cadastro_viatura", args=[termo.pk, "docx"]),
-            **termo_cadastro_assinado_info(termo, None),
+            **termo_cadastro_assinado_info(termo, None, artefatos_por_termo.get(termo.pk, {})),
         )
         for termo in page_obj.object_list
     ]
