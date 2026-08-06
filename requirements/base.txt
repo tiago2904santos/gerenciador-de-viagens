@@ -1,16 +1,16 @@
-Django>=5.2.16,<5.3
+Django>=6.0.7,<6.1
 python-dotenv>=1.0,<2.0
 psycopg[binary]>=3.2,<4.0
 requests>=2.32,<3.0
 python-docx>=1.1,<2.0
-docxtpl>=0.16,<0.20
+docxtpl>=0.20.2,<0.21
 openpyxl>=3.1,<4.0
-weasyprint>=68.1,<69.0
-pyhanko>=0.21,<0.26
+weasyprint>=69.0,<70.0
+pyhanko>=0.36.2,<0.37
 cryptography>=50.0.0,<51
 fpdf2>=2.8,<3.0
 pypdf>=6.14.2,<7.0
-reportlab>=4.4,<5.0
+reportlab>=5.0.0,<6.0
 qrcode>=7.4,<9.0
 Pillow>=12.3.0,<13.0
 idna>=3.18,<4.0
@@ -20,7 +20,7 @@ google-api-python-client>=2.100,<3.0
 google-auth>=2.20,<3.0
 google-auth-oauthlib>=1.0,<2.0
 celery>=5.4,<6.0
-redis>=5.0,<6.0
+redis>=8.1.0,<9.0
 unoserver>=3.4,<4.0
 # Base, não prod-only: `config/staticfiles.py` importa `whitenoise.storage` e é
 # importado pelo teste de contrato de versionamento, que roda em toda suíte.
