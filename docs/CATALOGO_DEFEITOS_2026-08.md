@@ -293,7 +293,7 @@ distingue LEITOR de não-LEITOR.
 **Efeito:** `PAPEL_ADMIN` é decorativo — um EDITOR tem os mesmos poderes dentro da área.
 **Decisão humana necessária:** quais operações exigem ADMIN.
 
-### BE-20 🟡 `diario_bordo` é app-casca morto · MED · 0,5 d
+### BE-20 ✅ RESOLVIDO · 🟡 `diario_bordo` é app-casca morto · MED · 0,5 d
 
 33 linhas de Python no total: `models.py` 49 bytes, `services.py` 54, `forms.py` 66, uma view
 `index` que renderiza um placeholder ("Base futura para geracao de diario de bordo a partir de
@@ -302,6 +302,33 @@ modelo XLSX"). A funcionalidade real mora em `prestacoes_contas`
 `grep -rn "diario_bordo:index\|diario-bordo" templates/` → **zero**: a rota não é alcançável.
 Colateral: o piso de cobertura de 91,17% em `.github/coverage-floors.json` mede 33 linhas.
 Era o `P-08` da Etapa 8 do ciclo antigo, nunca decidido.
+
+**Decidido: o app sai.** Prova de morte (`AGENTS.md` §6), varrendo o repositório inteiro — toda
+referência ao **app** era fiação, nenhuma era uso:
+
+| onde | o que era |
+|---|---|
+| `config/settings/base.py:51` | `INSTALLED_APPS` |
+| `config/urls.py:28` | a rota `diario-bordo/`, que nenhum template, JS ou `reverse()` alcançava |
+| `.github/coverage-floors.json` | o piso de 91,17% sobre 33 linhas |
+| `.github/workflows/tests.yml:33` | `COVERAGE_APPS` |
+| `README.md`, `docs/ESTADO_ATUAL_3_0.md` | listas de apps |
+
+**Zero imports** do app em qualquer lugar; **sem migrations e sem tabela** (`showmigrations` →
+`(no migrations)`). Conferido depois de apagar: `manage.py check` limpo,
+`reverse("diario_bordo:index")` → `NoReverseMatch`, `GET /diario-bordo/` → **404**.
+
+Tudo o mais que casa com `diario_bordo` no repositório é a **funcionalidade**, que fica intacta:
+`prestacoes_contas/diario_views.py` e `diario_services.py`, `documentos/resources/diario_bordo.xlsx`
+com seu golden test, e `naming.nome_diario_bordo` do Drive. O app-casca nunca teve relação com eles
+— era só um nome igual.
+
+**Colateral que quase virou vermelho na `main`:** o gate de cobertura percorre as chaves do
+`coverage-floors.json` e reprova com `no measured production statements` quando um app não tem
+statement medido. Apagar o app e esquecer a chave derrubaria o CI inteiro, com uma mensagem que
+fala de cobertura e não de app inexistente. `core/tests/test_pisos_de_cobertura.py` passa a exigir
+que `coverage-floors.json` e `COVERAGE_APPS` declarem o mesmo conjunto, e que todo piso tenha
+diretório no disco.
 
 ### BE-21 🟡 Presenter morto prometendo funcionalidade inexistente · MED · 0,25 d
 
@@ -2431,9 +2458,16 @@ O diff das duas listas de SQL isola uma consulta só —
 3. **Admin.** `CidadeAdmin` (`cadastros/admin.py:49`) expõe `capital`. Marcar uma capital pelo admin
    não limpava o cache de worker nenhum — nem o do processo que salvou.
 
-**Por que não bastava invalidar:** `django.core.cache` cai em `LocMemCache` sem `REDIS_URL`
-(`config/settings/base.py:115`), que é o caso dos ambientes declarados — mesmo buraco do `QA-02`;
-e invalidar por sinal não pega `bulk_create`/`bulk_update`, que é justamente o que o importador usa.
+**Por que não bastava invalidar:** invalidar por sinal não pega `bulk_create`/`bulk_update`, que é
+justamente o que o importador usa. Cobertura parcial aqui significa "às vezes cobra a menor".
+
+> **Correção de um erro meu (06/08).** A primeira redação desta linha dizia também que
+> `django.core.cache` "cai em `LocMemCache` sem `REDIS_URL`, que é o caso dos ambientes
+> declarados". **Está errado:** `config/settings/prod.py:36` **exige** `REDIS_URL` e levanta
+> `RuntimeError` sem ela — foi o que o `QA-02` fechou. Em produção existe cache compartilhado; o
+> fallback para `LocMemCache` (`base.py:115`) só vale em dev e teste. A conclusão do `NOVO-26` não
+> muda, porque ela se sustenta no argumento dos sinais acima, mas a afirmação sobre produção era
+> falsa e enganaria quem for decidir alguma coisa sobre cache depois.
 
 **Corrigido** trocando o cache de processo por `capitais_por_uf()`, sem memória: uma consulta que
 devolve `{**CAPITAIS_POR_UF, **base}` — mesma precedência de antes, a base mandando por UF e o mapa

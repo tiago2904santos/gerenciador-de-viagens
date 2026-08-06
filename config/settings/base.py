@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     "justificativas",
     "planos_trabalho",
     "ordens_servico",
-    "diario_bordo",
     "integracoes.google_drive",
     "prestacoes_contas",
     "ui_lab2",
