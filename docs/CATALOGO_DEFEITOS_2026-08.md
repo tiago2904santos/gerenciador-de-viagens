@@ -1648,6 +1648,68 @@ caminho que `sync_document_generations_in_views` já poderia querer.
 **Não é urgente e não é regressão:** a catraca continua sendo catraca, só que com uma folga que
 ninguém sabe medir. Entra na fila de `QA` do plano mestre, não à frente de defeito funcional.
 
+### NOVO-12 🔴 `NOVO` Nenhuma régua olha a configuração de produção — `SECRET_KEY` de 9 caracteres · QA · 1 d
+
+**Medido em 06/08/2026, no VPS, com `python manage.py check --deploy`:**
+
+```
+comprimento           : 9   (o Django quer >= 50)
+caracteres distintos  : 8
+prefixo inseguro      : False
+```
+
+Nove caracteres assinando cookie de sessão e token de recuperação de senha. Com essa chave dá para
+**forjar sessão de qualquer usuário**, superusuário incluído. Não era o placeholder do template —
+era uma chave curta escolhida à mão, que é justamente o caso que nenhum `grep` por
+`troque-por-...` pega.
+
+**Corrigido no servidor no mesmo dia** (`secrets.token_urlsafe(64)`, serviços recarregados, login
+reconferido). O defeito que fica **não é a chave** — é o motivo de ela ter durado tanto.
+
+## O buraco
+
+As cinco réguas deste ciclo medem **código e banco**, e nenhuma olha a configuração do ambiente:
+
+| régua | o que mede |
+|---|---|
+| `ruff` (`QA-07`) | sintaxe e nomes livres em `.py` |
+| `audit_django_architecture` | ORM em módulo de view |
+| `audit_frontend_standards` | CSS fora de token |
+| `build_shell_bundles --check` | bundle desatualizado |
+| `medir_desempenho` (`PF-07`) | consultas e KB por rota |
+
+Nenhuma delas pode achar isto, porque o `.env` de produção não existe no CI — e é onde o defeito
+mora. Os dois achados desta sessão saíram de **uma pessoa digitando um comando**, não de gate:
+`REDIS_URL` ausente e `SECRET_KEY` fraca.
+
+## Por que não é só "rodar `check --deploy` no CI"
+
+O CI não tem — e não deve ter — o `.env` de produção. O lugar certo é **na VPS, dentro do
+`deploy.yml`, antes do `migrate`**, junto das pré-checagens que já existem
+(`: "${DB_NAME:?...}"`). Ali a config real está carregada e a falha aborta antes do `git checkout`,
+que é a única hora em que abortar é barato.
+
+**O que impede ligar hoje, e é preciso resolver antes:** `check --deploy` reprova agora com
+`core.E002` — produção está em `DOCUMENTOS_DEFAULT_PDF_ENGINE=auto` e o check exige `unoserver`.
+Ligar o gate sem resolver isso trava todo deploy. São duas coisas, nesta ordem:
+
+1. **decidir o `core.E002`**: subir o unoserver em produção e ligar as duas variáveis, **ou**
+   rebaixar o check de `Error` para `Warning` com justificativa. Hoje ele é `Error` e produção o
+   viola — um check que ninguém pode satisfazer não é catraca, é ruído.
+2. **só então** acrescentar `python manage.py check --deploy --fail-level ERROR` ao `deploy.yml`,
+   antes do `collectstatic`.
+
+## O que a régua nova precisa cobrir, além do que o Django já vê
+
+`check --deploy` pega `SECRET_KEY` fraca, `DEBUG=True`, cookies sem `Secure`. **Não** pega variável
+ausente que só quebra em tempo de execução — `REDIS_URL` só falhou porque o `prod.py` levanta
+`RuntimeError` na importação (`QA-02`). O padrão que funcionou é esse: **falhar cedo, no
+`settings`, em vez de degradar calado.** Vale varrer que outras variáveis de produção merecem o
+mesmo tratamento.
+
+**Prioridade:** 🔴 pelo que o defeito original permitia, não pelo trabalho de fechá-lo. A chave já
+foi trocada; o gate é para a próxima.
+
 ### QA-17 ⚪ Treze PRs abertos sem triagem · MED · 1 d
 
 PRs #4, #7, #10, #13, #14, #16, #27, #32, #44, #58, #137, #144 são de maio–julho/2026; #178 é de
