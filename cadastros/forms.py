@@ -502,7 +502,12 @@ class ViaturaForm(BaseCadastroForm):
         # faria a forma ignorar uma area ja atribuida na instancia, que e
         # exatamente o caso de quem chama o form fora de um request.
         area = self.instance.area if self.instance.area_id else get_current_area()
-        qs = filter_queryset_by_area(Viatura.objects, area).filter(placa=raw)
+        # `BE-09`: `all_objects` — a `area` da linha de cima é a da instância quando
+        # ela existe, e o parágrafo acima explica por quê. Recortar de novo pela área
+        # ativa esvaziaria o queryset quando as duas divergissem, a checagem de placa
+        # passaria em branco e o erro viraria `IntegrityError` em
+        # `viatura_area_placa_unique` — desfazendo justamente o `DB-05`.
+        qs = filter_queryset_by_area(Viatura.all_objects, area).filter(placa=raw)
         if self.instance.pk:
             qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():

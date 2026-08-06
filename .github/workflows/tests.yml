@@ -104,12 +104,13 @@ jobs:
         # Catraca: este número só desce. São 28 modelos com campo `area`.
         # Fechados: fatia 1 `termos` + `ordens_servico` (2), fatia 2 `oficios` (4),
         # fatia 3 `roteiros` + `eventos` (4), fatia 4 `prestacoes_contas` +
-        # `documentos` (4). Faltam: cadastros (6),
-        # planos_trabalho+justificativas+integracoes+core (8).
+        # `documentos` (4), fatia 5a os 5 de cadastro básico. Faltam:
+        # `ConfiguracaoSistema` (5b) e planos_trabalho+justificativas+
+        # integracoes+core (8).
         # Alvo final é zero, e aí o `DB-02` pode tornar `area` NOT NULL.
         # O script também reprova `all_objects` sem comentário em código de
         # caminho de request — o gate literal de docs/PLANO_BACKEND.md:88.
-        run: python scripts/audit_area_scoped_managers.py --max 14
+        run: python scripts/audit_area_scoped_managers.py --max 9
 
       - name: Validate production security settings
         env:

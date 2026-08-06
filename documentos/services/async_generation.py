@@ -64,9 +64,11 @@ def _objeto_do_job(model, *, pk, area_id):
     #
     # E `all_objects` não serve porque esta função é genérica sobre cinco modelos
     # de apps diferentes — `Oficio`, `PlanoTrabalho`, `OrdemServico`,
-    # `TermoAutorizacao` e `Servidor` — que o `BE-09` migra em fatias diferentes;
-    # `Servidor` só ganha `all_objects` na fatia 5. `_base_manager` existe em todo
-    # modelo, nunca recorta, e é o que o próprio Django usa para ler linha por pk
+    # `TermoAutorizacao` e `Servidor`. Os quatro primeiros já têm `all_objects` e
+    # `Servidor` ganhou na fatia 5a, mas `PlanoTrabalho` só entra na 6 — e mesmo
+    # depois que os cinco tiverem, amarrar código genérico ao nome de um manager
+    # de aplicação é o acoplamento errado. `_base_manager` existe em todo modelo,
+    # nunca recorta, e é o que o próprio Django usa para ler linha por pk
     # (travessia de FK, `refresh_from_db`).
     obj = model._base_manager.get(pk=pk)
     object_area_id = getattr(obj, "area_id", None)

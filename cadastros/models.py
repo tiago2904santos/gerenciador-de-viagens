@@ -4,6 +4,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from django.db import models, transaction
 from django.db.models import Q, UniqueConstraint
 
+from core.managers import AreaScopedManager
 from core.normalizers import normalize_digits
 from core.normalizers import normalize_plate
 from core.normalizers import normalize_upper
@@ -23,7 +24,14 @@ class Unidade(TimeStampedModel):
     nome = models.CharField(max_length=255)
     sigla = models.CharField(max_length=50, blank=True)
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita
+    # para código que precisa enxergar todas. `default_manager_name` mantém o admin,
+    # as relações reversas e `validate_unique` irrestritos — ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["nome"]
         verbose_name = "Unidade"
         verbose_name_plural = "Unidades"
@@ -120,7 +128,12 @@ class Cargo(TimeStampedModel):
     nome = models.CharField(max_length=120)
     is_padrao = models.BooleanField(default=False)
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["nome"]
         verbose_name = "Cargo"
         verbose_name_plural = "Cargos"
@@ -155,7 +168,12 @@ class Cargo(TimeStampedModel):
         if self.nome:
             self.nome = normalize_upper(self.nome)
         if self.is_padrao:
-            Cargo.objects.select_for_update().exclude(pk=self.pk).filter(
+            # `BE-09`: `all_objects` porque o escopo é o `self.area` deste registro,
+            # na linha de baixo, e não o do request. `save()` roda também fora de
+            # request e com área diferente da ativa; recortado, o padrão anterior
+            # não seria rebaixado e a gravação estouraria em
+            # `cadastros_cargo_area_padrao_unique`.
+            Cargo.all_objects.select_for_update().exclude(pk=self.pk).filter(
                 area=self.area,
                 is_padrao=True,
             ).update(is_padrao=False)
@@ -177,7 +195,12 @@ class Combustivel(TimeStampedModel):
     nome = models.CharField(max_length=120)
     is_padrao = models.BooleanField(default=False)
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["nome"]
         verbose_name = "Combustível"
         verbose_name_plural = "Combustíveis"
@@ -212,7 +235,12 @@ class Combustivel(TimeStampedModel):
         if self.nome:
             self.nome = normalize_upper(self.nome)
         if self.is_padrao:
-            Combustivel.objects.select_for_update().exclude(pk=self.pk).filter(
+            # `BE-09`: `all_objects` porque o escopo é o `self.area` deste registro,
+            # na linha de baixo, e não o do request. `save()` roda também fora de
+            # request e com área diferente da ativa; recortado, o padrão anterior
+            # não seria rebaixado e a gravação estouraria em
+            # `cadastros_combustivel_area_padrao_unique`.
+            Combustivel.all_objects.select_for_update().exclude(pk=self.pk).filter(
                 area=self.area,
                 is_padrao=True,
             ).update(is_padrao=False)
@@ -259,7 +287,12 @@ class Servidor(TimeStampedModel):
         related_name="servidores",
     )
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["nome"]
         verbose_name = "Servidor"
         verbose_name_plural = "Servidores"
@@ -406,7 +439,12 @@ class Viatura(TimeStampedModel):
         verbose_name="Motoristas",
     )
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["placa"]
         verbose_name = "Viatura"
         verbose_name_plural = "Viaturas"

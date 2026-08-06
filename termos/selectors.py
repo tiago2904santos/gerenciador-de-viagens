@@ -35,7 +35,11 @@ def prefetch_servidores_efetivos():
     """
     return Prefetch(
         "servidores",
-        queryset=Servidor.objects.select_related("cargo", "unidade").order_by("nome"),
+        # `BE-09`: `all_objects` — quem delimita aqui é a própria M2M `servidores` do
+        # termo, não a área ativa. Recortado, o termo renderizado fora da sua área
+        # perderia os servidores em silêncio, e o `NOVO-08` (que este prefetch existe
+        # para resolver) voltaria como lista vazia em vez de N+1.
+        queryset=Servidor.all_objects.select_related("cargo", "unidade").order_by("nome"),
     )
 
 
