@@ -2285,7 +2285,7 @@ chega lá.
 Vizinho do `NOVO-02`, que em 06/08 **não reproduziu** — mas cuja sondagem achou o `NOVO-26`, esse
 sim um vazamento de estado global entre testes.
 
-### NOVO-31 🟠 `NOVO` `core.E001` não olha nenhum dos seis modelos de `cadastros` · QA · 0,5 d
+### NOVO-31 ✅ RESOLVIDO · 🟠 `NOVO` `core.E001` não olha nenhum dos seis modelos de `cadastros` · QA · 0,5 d
 
 `core/checks.py:44-68` (`check_operational_records_have_area`, `deploy=True`) reprova o deploy quando
 há registro operacional sem área. Mas `_OPERATIONAL_MODELS` (`core/checks.py:10-19`) tem 8 modelos e
@@ -2298,6 +2298,49 @@ os que os comandos de seed criam sem área (`seed_cadastros_demo.py:84,93,102,11
 
 **Vira pré-requisito do `DB-02`:** tornar `area` NOT NULL nesses modelos exige antes saber quantas
 linhas órfãs existem em produção, e o check é o instrumento que deveria dizer.
+
+**Resolvido:** a varredura passou a ser por introspecção do registro de apps, e não uma tupla fixa
+que envelhece. Duas severidades, de propósito — `core.E001` (bloqueia o deploy) segue nos oito
+modelos operacionais; `core.W001` (só relata) cobre os demais. Promover os vinte a `Error` de uma
+vez tornaria vermelho todo deploy até alguém rodar o backfill, e isso não é decisão de um check.
+
+`core.AuditEvent` ficou **fora da varredura por projeto**: `area` ali é `SET_NULL`, então evento
+antigo perde a área quando ela é apagada e a trilha precisa sobreviver a isso. Linha sem área ali é
+histórico, não pendência — e por isso ele também não entra no `DB-02`.
+
+---
+
+### NOVO-34 🔴 `NOVO` Cinco modelos nascem com `area IS NULL` por seed de migração — e o `DB-02` conta com o contrário · DB · 1 d
+
+Medido com o `NOVO-31` recém-consertado, num banco **recém-migrado e sem nenhum dado de usuário**:
+
+```
+eventos.TipoEvento=5, oficios.ConfiguracaoNumeracaoOficio=1,
+planos_trabalho.ProgramaSolicitante=3, planos_trabalho.HorarioAtendimento=3,
+planos_trabalho.AtividadePlanoTrabalho=11
+```
+
+Todas criadas por seed de migração (`eventos/0008`, `oficios/0017`, `planos_trabalho/0002` e `0003`,
+mais o seed de atividades). **Não são resíduo a sanear: são o padrão global da instalação.**
+
+O caso que fecha o argumento é `oficios.ConfiguracaoNumeracaoOficio`. A linha global é o piso de
+numeração de 2026 (`numero_inicial=75`), e `Oficio.get_next_available_numero` a busca **de
+propósito** com `Q(area=area) | Q(area__isnull=True)` — foi exatamente o site mais perigoso da fatia
+2 do `BE-09`. Tornar aquela coluna NOT NULL destrói o mecanismo de piso global.
+
+**Efeito sobre o `DB-02`:** o enunciado dele diz "`area` anulável em 27 dos 28 modelos", tratando
+isso como dívida uniforme. Não é. Há pelo menos três grupos, e eles pedem tratamento diferente:
+
+1. **Operacional** — `Oficio`, `Roteiro`, `Evento`, `PrestacaoContas` e afins: `NOT NULL` é o alvo,
+   com backfill antes.
+2. **Catálogo com padrão global** — `TipoEvento`, `ProgramaSolicitante`, `HorarioAtendimento`,
+   `AtividadePlanoTrabalho`: o global é usado hoje? Se sim, `NOT NULL` exige decidir a qual área ele
+   passa a pertencer, ou duplicá-lo por área (foi o caminho do `NOVO-09` para `ModeloJustificativa`).
+3. **Global por projeto** — `ConfiguracaoNumeracaoOficio`: a linha sem área **é** o mecanismo.
+   `NOT NULL` está fora de questão sem redesenhar a numeração.
+
+**Correção:** reescrever o enunciado do `DB-02` com esses três grupos antes de escrever qualquer
+migração, e medir o mesmo número em produção — onde o seed convive com dado real.
 
 ---
 

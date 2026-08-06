@@ -255,7 +255,11 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `DB-01` `TabelaDiaria` sem `area` — o enunciado estava invertido: a tabela é nacional de
       propósito. O trabalho era o portão, e ele ficou em **superusuário** (decisão do usuário), no
       POST de diárias e não na view, que serve três abas. `require_area_role` segue com zero usos.
-- [ ] `DB-02` `area` anulável em 27 de 28 modelos
+- [ ] `DB-02` `area` anulável em 27 de 28 modelos — **o enunciado precisa ser reescrito antes
+      de qualquer migração.** O `NOVO-31` (feito) mediu, e o `NOVO-34` registra: num banco
+      recém-migrado **cinco modelos já nascem com `area IS NULL`**, por seed, e a linha global
+      de `ConfiguracaoNumeracaoOficio` **é** o piso de numeração — `NOT NULL` ali destrói o
+      mecanismo. São três grupos, não uma dívida uniforme.
 - [x] `DB-04` cache documental não recorta por área — latente, como o enunciado dizia, mas por
       outro motivo: quem separa as áreas é a **referência**, que era opcional. Agora é obrigatória
       (`ValueError` sem ela). A afirmação de que todo artefato nascia `area=NULL` **era falsa** —
