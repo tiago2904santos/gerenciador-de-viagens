@@ -55,7 +55,7 @@ urlpatterns = [
         views.prestacao_servidor_assinado_anexar,
         name="prestacao_servidor_assinado_anexar",
     ),
-    path("prestacao/<int:pc_pk>/anexo/<int:anexo_pk>/excluir/", views.prestacao_documento_excluir, name="prestacao_documento_excluir"),
+    path("prestacao/<int:pc_pk>/anexo/<int:anexo_pk>/excluir/", views.prestacao_documento_excluir, name="prestacao_documento_delete"),
     path(
         "prestacao/<int:pc_pk>/anexo/<int:anexo_pk>/conteudo/",
         views.prestacao_documento_conteudo,
@@ -108,7 +108,7 @@ urlpatterns = [
     path("assinar/<str:token>/<str:tipo>/pdf/", assinatura_views.publico_pdf_origem, name="assinatura_pdf_origem"),
     # Modelos de texto reutilizáveis
     path("modelos-texto/", views.modelos_index, name="modelos_index"),
-    path("modelos-texto/novo/", views.modelo_novo, name="modelo_novo"),
-    path("modelos-texto/<int:pk>/editar/", views.modelo_editar, name="modelo_editar"),
-    path("modelos-texto/<int:pk>/excluir/", views.modelo_excluir, name="modelo_excluir"),
+    path("modelos-texto/novo/", views.modelo_novo, name="modelo_create"),
+    path("modelos-texto/<int:pk>/editar/", views.modelo_editar, name="modelo_update"),
+    path("modelos-texto/<int:pk>/excluir/", views.modelo_excluir, name="modelo_delete"),
 ]

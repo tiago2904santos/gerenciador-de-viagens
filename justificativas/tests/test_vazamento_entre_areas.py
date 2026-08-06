@@ -135,7 +135,7 @@ class JustificativasNaoVazamEntreAreasTests(TestCase):
 
     def test_nao_da_para_excluir_justificativa_de_outra_area(self):
         resposta = self.client.post(
-            reverse("justificativas:justificativa_excluir", args=[self.alheia.pk])
+            reverse("justificativas:justificativa_delete", args=[self.alheia.pk])
         )
 
         self.assertEqual(resposta.status_code, 404)
@@ -145,6 +145,6 @@ class JustificativasNaoVazamEntreAreasTests(TestCase):
         )
 
     def test_continua_dando_para_excluir_a_da_propria_area(self):
-        self.client.post(reverse("justificativas:justificativa_excluir", args=[self.minha.pk]))
+        self.client.post(reverse("justificativas:justificativa_delete", args=[self.minha.pk]))
 
         self.assertFalse(Justificativa.objects.filter(pk=self.minha.pk).exists())

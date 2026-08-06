@@ -196,8 +196,13 @@ def classify(cidade: str | None, uf: str | None, capitais: dict[str, str] | None
     return 'INTERIOR'
 
 
-def infer_tipo_destino_from_paradas(paradas: list[tuple[str | None, str | None]]) -> str:
-    capitais = capitais_por_uf()
+def infer_tipo_destino_from_paradas(
+    paradas: list[tuple[str | None, str | None]],
+    capitais: dict[str, str] | None = None,
+) -> str:
+    # `capitais` recebido de fora quando o chamador faz isto em laço — uma lista
+    # de N roteiros custava N consultas depois do NOVO-26 (NOVO-27).
+    capitais = capitais if capitais is not None else capitais_por_uf()
     tipo_destino = 'INTERIOR'
     for cidade, uf in paradas:
         tipo = classify(cidade, uf, capitais)

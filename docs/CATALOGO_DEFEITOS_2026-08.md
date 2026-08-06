@@ -416,7 +416,7 @@ isso lendo a linha do `QA-11` no catálogo, que estava desatualizada: a correç�
 `993e14c`, em 05/08. Por causa disso o teste nasceu com uma exceção para um arquivo que já estava
 limpo — um buraco na própria rede, por nada. A exceção foi removida junto do fechamento do `QA-11`.
 
-### BE-23 🟡 Vocabulário de rotas divergente · AUD · 1 d · risco médio
+### BE-23 🟡 PARCIAL — sufixo CRUD padronizado; os outros 75% seguem sem vocabulário · AUD · 1 d · risco médio
 
 Das 433 rotas nomeadas, **307 (71%)** não usam nenhum sufixo do `PADRAO_APP.md`. `cadastros` e
 `usuarios` usam inglês (`_create`/`_update`/`_delete`); `eventos`, `justificativas`, `oficios`,
@@ -424,6 +424,36 @@ Das 433 rotas nomeadas, **307 (71%)** não usam nenhum sufixo do `PADRAO_APP.md`
 mistura internamente.
 **Não viaja com nenhuma outra etapa:** renomear rota exige `urls.py` + `reverse()` + templates +
 testes no mesmo PR.
+
+**Duas unidades de medida, e as duas valem.** As "433 rotas" contam entradas do resolver do Django
+(**436** em 06/08) — cada nome por namespace. Contando declarações `name=` nos `urls.py`, são
+**283**. Nenhum número está errado; eles medem coisas diferentes, e vale registrar qual é qual para
+a próxima medição não parecer contradição.
+
+**Uma parte do enunciado está errada:** *"nenhum app mistura internamente"*. Misturam, todos os
+cinco — `planos_trabalho` 4 nomes em inglês contra 11 em português, `justificativas` 1 e 7,
+`oficios` 1 e 3, `prestacoes_contas` 1 e 4, `eventos` 1 e 2.
+
+**E o recorte "inglês contra português" cobre só 70 das 283.** As outras **213 (75%)** não usam
+nenhum dos dois vocabulários: são `detalhe`, `api_*`, `wizard_*`, `*_pdf`. Padronizar *isso* é
+decidir um vocabulário para o sistema inteiro, não traduzir sufixo — e não foi feito aqui.
+
+**Fechado o recorte do sufixo CRUD:** as **28** rotas em português renomeadas pela regra
+`_novo→_create`, `_editar→_update`, `_excluir→_delete`, `_lista→_index`.
+
+**Só o `name=` mudou.** O `path()` continua igual, então nenhuma URL salva quebra. O nome da *view*
+(`def modelo_excluir`) também ficou: é outra camada, e o `PADRAO_APP.md:12` fala de `urls.py`.
+
+Prova de que foram 28 e só 28: os nomes do resolver antes e depois, **436 → 436**, com o conjunto
+novo batendo exatamente o antigo com a regra aplicada. Toda referência era namespeada
+(`"app:nome"`) — a varredura por `reverse(f"...")` montado por partes deu **zero** —, o que fez a
+troca ser mecânica.
+
+Catraca em `core/tests/test_vocabulario_de_rotas.py`. Ela lê os `urls.py`, **não o resolver**:
+parte das rotas de `core` só existe sob `settings.DEBUG` (`core/urls.py:18`), e das 28 em português
+**uma** (`core:ui_lab_eventos_lista`) estava justamente ali — um teste via resolver teria deixado
+passar. Segundo teste é o piso de 70 nomes com sufixo do padrão, para ninguém "padronizar" apagando
+o sufixo em vez de traduzi-lo.
 
 ### BE-24 🟡 Repositório com 133 MB de pack e 175 arquivos indevidos · MED+VER · 1 d
 
@@ -2580,3 +2610,46 @@ de graça). Os dois **falham contra o código antigo**. `test_o_custo_nao_cresce
 é a rede anti-N+1 e passa nos dois estados de propósito.
 
 Suíte completa verde nas três formas — série, `--parallel 4` e **`--reverse`**, que era a vermelha.
+
+---
+
+### NOVO-27 ✅ RESOLVIDO · 🟠 `NOVO` Correção do `NOVO-26` virou uma consulta por card na lista de roteiros · COR · 0,25 d
+
+**Regressão minha, achada pelo CI da `main`** — run **651**, passo `Enforce list performance ceilings
+(PF-07)`:
+
+```
+roteiros:index @ 200:    consultas 47 passou do teto 32
+roteiros:index @ 20000:  consultas 47 passou do teto 32
+```
+
+Bisect limpo: run **649** (`9af3e59`, até o #213) verde; run **651** (`b630cc3`, já com o #214)
+vermelho. A lista renderiza **15** cards e 47 − 32 = **15** — uma consulta por card.
+
+**Causa.** O `NOVO-26` tirou o mapa de capitais da memória do processo, e com razão: ele ficava
+velho e `classify` decide valor de diária. Só que `roteiros/views.py` monta um card por roteiro, e
+cada card chamava `capitais_por_uf()` por conta própria (`presenters.py` → `_inferir_tipo_destino`
+→ `infer_tipo_destino_from_paradas`). O cache que saiu **estava fazendo trabalho real ali**: depois
+do primeiro card, os outros catorze saíam de graça.
+
+**A rede do `NOVO-26` mediu o eixo errado.** `test_o_custo_nao_cresce_com_o_numero_de_destinos`
+conta marcadores **dentro de um cálculo**. O que estourou foi **cálculos por página** — eixo que eu
+não testei.
+
+**Corrigido** resolvendo o mapa uma vez por página e passando adiante, no mesmo desenho que
+`classify` e `build_periods` já usavam: `infer_tipo_destino_from_paradas` ganhou o parâmetro
+opcional `capitais`, e `apresentar_roteiro_card` também. Medido com a régua de verdade, contra
+PostgreSQL: **47 → 33**, e nenhuma outra rota se moveu.
+
+**O teto sobe de 32 para 33, de propósito.** Os 32 tinham sido medidos com o cache de processo já
+quente — zero consultas de capitais por página. A consulta que sobra é uma por requisição, e é
+exatamente o que o `NOVO-26` comprou: capital marcada no admin passa a valer na requisição
+seguinte, em vez de só depois de reiniciar o worker. Subido com `--permitir-subir-teto`, que existe
+para isto, e **só** em `consultas` de `roteiros:index` — a régua queria regravar todos os `kb_html`
+com ±0,2 de ruído da minha máquina, e isso foi descartado.
+
+Rede nova: `roteiros/tests/test_custo_da_lista.py`. Ela afirma **o número de cards renderizados**
+antes de medir — a primeira versão passava contra o código defeituoso porque o fixture sem
+`saida_dt` caía fora de todas as abas e a lista vinha vazia. E filtra pelo `WHERE
+"cadastros_cidade"."capital"`, não pela palavra solta: `capital` é coluna e aparece em qualquer
+select de `Cidade`, o que me fez ler 4 consultas onde havia 1.

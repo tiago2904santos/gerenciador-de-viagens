@@ -34,6 +34,7 @@ from .services.routing.route_exceptions import (
     RouteValidationError,
 )
 from .services.routing.route_service import calcular_rota_para_roteiro
+from .services.diarias import capitais_por_uf
 from .services.routing.route_preview_service import calculate_route_preview
 
 from .models import Roteiro
@@ -150,8 +151,12 @@ def index(request):
     page_obj = paginator.get_page(request.GET.get("page"))
     next_url = request.get_full_path()
     cards = []
+    # Uma resolução para a página inteira (NOVO-27). Sem isto cada card paga a
+    # consulta de capitais: 15 cards = 15 consultas a mais, e o teto do PF-07
+    # para `roteiros:index` saiu de 32 para 47.
+    capitais = capitais_por_uf()
     for roteiro in page_obj.object_list:
-        card = apresentar_roteiro_card(roteiro)
+        card = apresentar_roteiro_card(roteiro, capitais=capitais)
         card["footer"]["edit_url"] = f"{reverse('roteiros:editar', args=[roteiro.pk])}?{urlencode({'next': next_url})}"
         card["footer"]["delete_modal_url"] = reverse("roteiros:excluir", args=[roteiro.pk])
         card["footer"]["delete_modal_label"] = card["title"]

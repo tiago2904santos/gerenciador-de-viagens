@@ -44,7 +44,7 @@ def _anexos_rows(prestacao, anexos_qs):
                     args=[prestacao.pk, anexo.pk],
                 ),
                 "delete_url": reverse(
-                    "prestacoes_contas:prestacao_documento_excluir",
+                    "prestacoes_contas:prestacao_documento_delete",
                     args=[prestacao.pk, anexo.pk],
                 ),
             },

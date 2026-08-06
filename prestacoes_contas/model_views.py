@@ -21,7 +21,7 @@ _CAMPO_LABELS = dict(ModeloTextoRelatorioTecnico.CAMPO_CHOICES)
 
 def modelos_index(request):
     q = (request.GET.get("q") or "").strip()
-    novo_base = reverse("prestacoes_contas:modelo_novo")
+    novo_base = reverse("prestacoes_contas:modelo_create")
 
     grupos = []
     for campo, label in ModeloTextoRelatorioTecnico.CAMPO_CHOICES:
@@ -40,8 +40,8 @@ def modelos_index(request):
                     "title": modelo.nome,
                     "badges": [],
                     "meta": [build_meta("Prévia", texto or "—")],
-                    "edit_url": reverse("prestacoes_contas:modelo_editar", args=[modelo.pk]),
-                    "delete_url": reverse("prestacoes_contas:modelo_excluir", args=[modelo.pk]),
+                    "edit_url": reverse("prestacoes_contas:modelo_update", args=[modelo.pk]),
+                    "delete_url": reverse("prestacoes_contas:modelo_delete", args=[modelo.pk]),
                 }
             )
 

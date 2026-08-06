@@ -880,7 +880,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
             )
 
             response = self.client.post(
-                reverse("prestacoes_contas:prestacao_documento_excluir", args=[self.prestacao.pk, anexo.pk]),
+                reverse("prestacoes_contas:prestacao_documento_delete", args=[self.prestacao.pk, anexo.pk]),
                 HTTP_X_REQUESTED_WITH="XMLHttpRequest",
             )
 

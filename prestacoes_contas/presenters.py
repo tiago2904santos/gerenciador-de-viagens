@@ -50,7 +50,7 @@ def _anexo_assinado_info(anexos, *, tipo, anexar_url, prestacao_pk):
             args=[prestacao_pk, atual.pk],
         ),
         "remover_url": reverse(
-            "prestacoes_contas:prestacao_documento_excluir",
+            "prestacoes_contas:prestacao_documento_delete",
             args=[prestacao_pk, atual.pk],
         ),
     }

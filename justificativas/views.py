@@ -136,7 +136,7 @@ def index(request):
     rows = [
         apresentar_linha_lista_simples_justificativa(
             j,
-            delete_url=reverse("justificativas:justificativa_excluir", args=[j.pk]),
+            delete_url=reverse("justificativas:justificativa_delete", args=[j.pk]),
             delete_modal=True,
         )
         for j in page_obj.object_list

@@ -55,7 +55,7 @@ class ModelosJustificativaCrudTests(TestCase):
 
     def test_criar_e_lista(self):
         r = self.client.post(
-            reverse("justificativas:modelo_novo"),
+            reverse("justificativas:modelo_create"),
             data={"nome": "MODELO A", "texto": "Texto base", "is_padrao": "on"},
         )
         self.assertEqual(r.status_code, 302)
