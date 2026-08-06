@@ -4,6 +4,8 @@
   var activeTrigger = null;
   var currentRemoveUrl = "";
   var BOUND = "data-attach-signed-bound";
+  /* JS-02 — uma entrada por modal vivo: { root, desmontar }. */
+  var instancias = [];
 
   /* H-03: aqui havia `KINDS`, uma lista fixa de cinco ordinais latinos, e
    * `kindPrefix`, que traduzia cada ordinal no prefixo dos seus 6 atributos
@@ -232,7 +234,12 @@
       });
     }
 
-    document.addEventListener("click", function (event) {
+    /* JS-02 — este listener é registrado por modal, dentro do `init`, e o
+       guard `BOUND` é por elemento: cada painel novo trazido por AJAX
+       (CV.collection troca o painel inteiro) instala mais um handler em
+       `document`, todos vivos ao mesmo tempo e cada um segurando o modal
+       antigo. Nomeado e registrado para o `destroy` poder removê-lo. */
+    function onDocumentClick(event) {
       var trigger = event.target.closest("[data-attach-signed-trigger]");
       if (trigger) {
         event.preventDefault();
@@ -260,6 +267,14 @@
         event.preventDefault();
         selectDocument(kindButton.getAttribute("data-attach-signed-kind"), true);
       }
+    }
+    document.addEventListener("click", onDocumentClick);
+    instancias.push({
+      root: modal,
+      desmontar: function () {
+        document.removeEventListener("click", onDocumentClick);
+        modal.removeAttribute(BOUND);
+      },
     });
 
     if (form) {
@@ -289,9 +304,21 @@
     return true;
   }
 
+  /* JS-02 — desmonta só os modais que viviam dentro do nó removido. */
+  function destroy(scope) {
+    if (!scope || (scope.nodeType !== 1 && scope.nodeType !== 9)) return;
+    for (var i = instancias.length - 1; i >= 0; i -= 1) {
+      var entrada = instancias[i];
+      if (scope === entrada.root || (scope.contains && scope.contains(entrada.root))) {
+        entrada.desmontar();
+        instancias.splice(i, 1);
+      }
+    }
+  }
+
   window.CV = window.CV || {};
   if (typeof window.CV.registerEnhancer === "function") {
-    window.CV.registerEnhancer("attachSignedModal", init);
+    window.CV.registerEnhancer("attachSignedModal", init, destroy);
   } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () { init(document); });
   } else {

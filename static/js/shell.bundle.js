@@ -2865,6 +2865,8 @@ document.documentElement.dataset.appReady = "true";
   var activeTrigger = null;
   var currentRemoveUrl = "";
   var BOUND = "data-attach-signed-bound";
+  /* JS-02 — uma entrada por modal vivo: { root, desmontar }. */
+  var instancias = [];
 
   /* H-03: aqui havia `KINDS`, uma lista fixa de cinco ordinais latinos, e
    * `kindPrefix`, que traduzia cada ordinal no prefixo dos seus 6 atributos
@@ -3093,7 +3095,12 @@ document.documentElement.dataset.appReady = "true";
       });
     }
 
-    document.addEventListener("click", function (event) {
+    /* JS-02 — este listener é registrado por modal, dentro do `init`, e o
+       guard `BOUND` é por elemento: cada painel novo trazido por AJAX
+       (CV.collection troca o painel inteiro) instala mais um handler em
+       `document`, todos vivos ao mesmo tempo e cada um segurando o modal
+       antigo. Nomeado e registrado para o `destroy` poder removê-lo. */
+    function onDocumentClick(event) {
       var trigger = event.target.closest("[data-attach-signed-trigger]");
       if (trigger) {
         event.preventDefault();
@@ -3121,6 +3128,14 @@ document.documentElement.dataset.appReady = "true";
         event.preventDefault();
         selectDocument(kindButton.getAttribute("data-attach-signed-kind"), true);
       }
+    }
+    document.addEventListener("click", onDocumentClick);
+    instancias.push({
+      root: modal,
+      desmontar: function () {
+        document.removeEventListener("click", onDocumentClick);
+        modal.removeAttribute(BOUND);
+      },
     });
 
     if (form) {
@@ -3150,9 +3165,21 @@ document.documentElement.dataset.appReady = "true";
     return true;
   }
 
+  /* JS-02 — desmonta só os modais que viviam dentro do nó removido. */
+  function destroy(scope) {
+    if (!scope || (scope.nodeType !== 1 && scope.nodeType !== 9)) return;
+    for (var i = instancias.length - 1; i >= 0; i -= 1) {
+      var entrada = instancias[i];
+      if (scope === entrada.root || (scope.contains && scope.contains(entrada.root))) {
+        entrada.desmontar();
+        instancias.splice(i, 1);
+      }
+    }
+  }
+
   window.CV = window.CV || {};
   if (typeof window.CV.registerEnhancer === "function") {
-    window.CV.registerEnhancer("attachSignedModal", init);
+    window.CV.registerEnhancer("attachSignedModal", init, destroy);
   } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () { init(document); });
   } else {
@@ -3506,6 +3533,8 @@ document.documentElement.dataset.appReady = "true";
 
   const SELECTOR = "select[data-entity-picker]";
   const renderers = [];
+  /* JS-02 — uma entrada por picker vivo: { root, desmontar }. */
+  const instancias = [];
 
   /* ── Utilitários ─────────────────────────────────────────────── */
 
@@ -4411,9 +4440,21 @@ document.documentElement.dataset.appReady = "true";
       }
     });
 
-    /* Fecha dropdown ao clicar fora */
-    document.addEventListener("click", (e) => {
+    /* Fecha dropdown ao clicar fora.
+
+       JS-02 — este listener é por instância. Sem `destroy` ele sobrevivia à
+       remoção da linha do formulário (`location-rows`) e ao ciclo de
+       reset+reinit dos wizards, acumulando um handler por picker já morto,
+       cada um segurando a closure inteira do componente. */
+    const onDocumentClick = (e) => {
       if (!root.contains(e.target) && e.target !== select) setOpen(false);
+    };
+    document.addEventListener("click", onDocumentClick);
+    instancias.push({
+      root,
+      desmontar() {
+        document.removeEventListener("click", onDocumentClick);
+      },
     });
 
     /* Sincroniza quando o select nativo muda externamente */
@@ -4461,6 +4502,19 @@ document.documentElement.dataset.appReady = "true";
     init(document);
   }
 
+  /* JS-02 — o registry chama isto quando um nó sai do DOM. Desmonta só os
+     pickers que viviam dentro do nó removido; os demais seguem intactos. */
+  function destroy(scope) {
+    if (!scope || (scope.nodeType !== 1 && scope.nodeType !== 9)) return;
+    for (let i = instancias.length - 1; i >= 0; i -= 1) {
+      const { root, desmontar } = instancias[i];
+      if (scope === root || (scope.contains && scope.contains(root))) {
+        desmontar();
+        instancias.splice(i, 1);
+      }
+    }
+  }
+
   window.CV = window.CV || {};
   window.CV.picker = {
     boot,
@@ -4480,7 +4534,7 @@ document.documentElement.dataset.appReady = "true";
   };
 
   if (typeof window.CV.registerEnhancer === "function") {
-    window.CV.registerEnhancer("picker", init);
+    window.CV.registerEnhancer("picker", init, destroy);
   } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", boot);
   } else {
@@ -4963,6 +5017,20 @@ document.documentElement.dataset.appReady = "true";
 
   var locationCache = {};
 
+  /* JS-02 — uma entrada por container de linhas vivo: { root, desmontar }. */
+  var instancias = [];
+
+  function destroy(scope) {
+    if (!scope || (scope.nodeType !== 1 && scope.nodeType !== 9)) return;
+    for (var i = instancias.length - 1; i >= 0; i -= 1) {
+      var entrada = instancias[i];
+      if (scope === entrada.root || (scope.contains && scope.contains(entrada.root))) {
+        entrada.desmontar();
+        instancias.splice(i, 1);
+      }
+    }
+  }
+
   function asRoot(root) {
     return root || document;
   }
@@ -5218,6 +5286,12 @@ document.documentElement.dataset.appReady = "true";
     root.dataset.locationDragDropReady = "true";
 
     var dragState = null;
+    /* JS-02 — o `cleanup` abaixo já removia os três listeners de ponteiro,
+       mas só era chamado no `pointerup`/`pointercancel`. Se a linha sair do
+       DOM no meio do arraste — troca de aba, painel trocado por AJAX — o
+       arraste nunca termina e os três ficam em `document`. Registrar a
+       instância dá ao `destroy` do registry como acionar a limpeza. */
+    instancias.push({ root: root, desmontar: function () { cleanup(); } });
 
     function cleanup() {
       if (dragState && dragState.row) {
@@ -5668,7 +5742,7 @@ document.documentElement.dataset.appReady = "true";
   };
 
   if (typeof window.CV.registerEnhancer === "function") {
-    window.CV.registerEnhancer("locationRows", init);
+    window.CV.registerEnhancer("locationRows", init, destroy);
   } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () { init(document); });
   } else {
@@ -6014,6 +6088,8 @@ document.documentElement.dataset.appReady = "true";
   'use strict';
 
   var SELECTOR = '[data-cv-date-picker]';
+  /* JS-02 — uma entrada por date picker vivo: { root, desmontar }. */
+  var instancias = [];
   var MONTHS = [
     'Janeiro',
     'Fevereiro',
@@ -6796,6 +6872,10 @@ document.documentElement.dataset.appReady = "true";
       });
     }
 
+    /* JS-02 — os quatro listeners abaixo são por instância. Sem `destroy`
+       eles sobreviviam à remoção do campo (troca de aba, linha de formulário
+       removida, painel trocado por AJAX) e seguiam reposicionando um painel
+       que já não estava no documento. */
     document.addEventListener('click', onDocumentClick);
     document.addEventListener('keydown', onKeydown);
 
@@ -6805,6 +6885,15 @@ document.documentElement.dataset.appReady = "true";
     }
     window.addEventListener('scroll', onScrollOrResize, { passive: true, capture: true });
     window.addEventListener('resize', onScrollOrResize, { passive: true });
+    instancias.push({
+      root: root,
+      desmontar: function () {
+        document.removeEventListener('click', onDocumentClick);
+        document.removeEventListener('keydown', onKeydown);
+        window.removeEventListener('scroll', onScrollOrResize, { capture: true });
+        window.removeEventListener('resize', onScrollOrResize);
+      },
+    });
 
     if (confirmBtn) {
       confirmBtn.addEventListener('click', function () {
@@ -6897,13 +6986,25 @@ document.documentElement.dataset.appReady = "true";
     init(document);
   }
 
+  /* JS-02 — desmonta só os pickers que viviam dentro do nó removido. */
+  function destroy(scope) {
+    if (!scope || (scope.nodeType !== 1 && scope.nodeType !== 9)) return;
+    for (var i = instancias.length - 1; i >= 0; i -= 1) {
+      var entrada = instancias[i];
+      if (scope === entrada.root || (scope.contains && scope.contains(entrada.root))) {
+        entrada.desmontar();
+        instancias.splice(i, 1);
+      }
+    }
+  }
+
   window.CV = window.CV || {};
   window.CV.datePicker = {
     init: init,
     boot: boot,
   };
   if (typeof window.CV.registerEnhancer === 'function') {
-    window.CV.registerEnhancer('datePicker', init);
+    window.CV.registerEnhancer('datePicker', init, destroy);
   } else if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
   } else {

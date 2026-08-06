@@ -3,6 +3,20 @@
 
   var locationCache = {};
 
+  /* JS-02 — uma entrada por container de linhas vivo: { root, desmontar }. */
+  var instancias = [];
+
+  function destroy(scope) {
+    if (!scope || (scope.nodeType !== 1 && scope.nodeType !== 9)) return;
+    for (var i = instancias.length - 1; i >= 0; i -= 1) {
+      var entrada = instancias[i];
+      if (scope === entrada.root || (scope.contains && scope.contains(entrada.root))) {
+        entrada.desmontar();
+        instancias.splice(i, 1);
+      }
+    }
+  }
+
   function asRoot(root) {
     return root || document;
   }
@@ -258,6 +272,12 @@
     root.dataset.locationDragDropReady = "true";
 
     var dragState = null;
+    /* JS-02 — o `cleanup` abaixo já removia os três listeners de ponteiro,
+       mas só era chamado no `pointerup`/`pointercancel`. Se a linha sair do
+       DOM no meio do arraste — troca de aba, painel trocado por AJAX — o
+       arraste nunca termina e os três ficam em `document`. Registrar a
+       instância dá ao `destroy` do registry como acionar a limpeza. */
+    instancias.push({ root: root, desmontar: function () { cleanup(); } });
 
     function cleanup() {
       if (dragState && dragState.row) {
@@ -708,7 +728,7 @@
   };
 
   if (typeof window.CV.registerEnhancer === "function") {
-    window.CV.registerEnhancer("locationRows", init);
+    window.CV.registerEnhancer("locationRows", init, destroy);
   } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () { init(document); });
   } else {

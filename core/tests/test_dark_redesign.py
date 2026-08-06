@@ -343,7 +343,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "components"
             / "attach-signed-modal.js"
         ).read_text(encoding="utf-8")
-        self.assertIn('registerEnhancer("attachSignedModal", init)', attach_script)
+        self.assertIn('registerEnhancer("attachSignedModal", init, destroy)', attach_script)
         self.assertIn("window.CV.overlay.openDialog", attach_script)
         self.assertIn("window.CV.overlay.closeDialog", attach_script)
 

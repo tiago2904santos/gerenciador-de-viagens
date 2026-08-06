@@ -3,6 +3,8 @@
 
   const SELECTOR = "select[data-entity-picker]";
   const renderers = [];
+  /* JS-02 — uma entrada por picker vivo: { root, desmontar }. */
+  const instancias = [];
 
   /* ── Utilitários ─────────────────────────────────────────────── */
 
@@ -908,9 +910,21 @@
       }
     });
 
-    /* Fecha dropdown ao clicar fora */
-    document.addEventListener("click", (e) => {
+    /* Fecha dropdown ao clicar fora.
+
+       JS-02 — este listener é por instância. Sem `destroy` ele sobrevivia à
+       remoção da linha do formulário (`location-rows`) e ao ciclo de
+       reset+reinit dos wizards, acumulando um handler por picker já morto,
+       cada um segurando a closure inteira do componente. */
+    const onDocumentClick = (e) => {
       if (!root.contains(e.target) && e.target !== select) setOpen(false);
+    };
+    document.addEventListener("click", onDocumentClick);
+    instancias.push({
+      root,
+      desmontar() {
+        document.removeEventListener("click", onDocumentClick);
+      },
     });
 
     /* Sincroniza quando o select nativo muda externamente */
@@ -958,6 +972,19 @@
     init(document);
   }
 
+  /* JS-02 — o registry chama isto quando um nó sai do DOM. Desmonta só os
+     pickers que viviam dentro do nó removido; os demais seguem intactos. */
+  function destroy(scope) {
+    if (!scope || (scope.nodeType !== 1 && scope.nodeType !== 9)) return;
+    for (let i = instancias.length - 1; i >= 0; i -= 1) {
+      const { root, desmontar } = instancias[i];
+      if (scope === root || (scope.contains && scope.contains(root))) {
+        desmontar();
+        instancias.splice(i, 1);
+      }
+    }
+  }
+
   window.CV = window.CV || {};
   window.CV.picker = {
     boot,
@@ -977,7 +1004,7 @@
   };
 
   if (typeof window.CV.registerEnhancer === "function") {
-    window.CV.registerEnhancer("picker", init);
+    window.CV.registerEnhancer("picker", init, destroy);
   } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", boot);
   } else {

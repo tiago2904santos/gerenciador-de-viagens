@@ -32,7 +32,7 @@ class PickerContractTests(SimpleTestCase):
 
     def test_one_namespace_and_enhancer_own_all_picker_renderers(self):
         self.assertIn("window.CV.picker = {", self.engine)
-        self.assertIn('window.CV.registerEnhancer("picker", init)', self.engine)
+        self.assertIn('window.CV.registerEnhancer("picker", init, destroy)', self.engine)
         self.assertIn("registerRenderer(renderer)", self.engine)
         self.assertIn(
             "window.CV.picker.registerRenderer(initAll)",
