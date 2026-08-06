@@ -2032,7 +2032,7 @@ Vizinho do `BE-22` (10 arquivos `.py` com BOM), mesma família de higiene de rep
 
 ---
 
-### NOVO-19 ✅ RESOLVIDO (1a51341) · 🟠 `NOVO` `applyingState` travado deixa o editor de roteiro inerte · COR · 0,25 d
+### NOVO-22 ✅ RESOLVIDO (1a51341) · 🟠 `NOVO` `applyingState` travado deixa o editor de roteiro inerte · COR · 0,25 d
 
 Achado ao abrir o `JS-04`. `applyState` (`editor/index.js:1427`) faz `applyingState = true` e só
 devolve `false` em `:1468`, **dentro do `.then` de sucesso**. Uma exceção em qualquer callback da
@@ -2048,7 +2048,7 @@ tinha zerado; no triste, é o que devolve o editor.
 
 ---
 
-### NOVO-20 🟠 `NOVO` Remover documento assinado falha em silêncio e a página recarrega como se tivesse dado certo · QA · 0,25 d
+### NOVO-23 🟠 `NOVO` Remover documento assinado falha em silêncio e a página recarrega como se tivesse dado certo · QA · 0,25 d
 
 `static/js/components/attach-signed-modal.js:229` —
 `CV.http.request(currentRemoveUrl, { method: 'POST' }).then(function () { window.location.reload(); })`.
@@ -2064,7 +2064,7 @@ desta família.**
 
 ---
 
-### NOVO-21 ⚪ `NOVO` `.then` escapa do `try/catch` do `async` na configuração do Drive · QA · 0,25 d
+### NOVO-24 ⚪ `NOVO` `.then` escapa do `try/catch` do `async` na configuração do Drive · QA · 0,25 d
 
 `static/js/pages/gdrive_config.js:287` — dentro de um `try` de função `async`,
 `loadPastas(currentPaiId()).then(function () { … })` é encadeado **sem `await`**, então o `catch` de

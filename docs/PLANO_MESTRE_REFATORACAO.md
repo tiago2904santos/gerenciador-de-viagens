@@ -172,8 +172,8 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `BE-07` exclusão de anexo dá 500 e deixa registro órfão
 - [x] `BE-08` oito redirects seguem o que o POST mandar
 - [x] `JS-04` `.then()` sem `.catch` no editor de roteiros — a fila de estimativa morria inteira
-      no primeiro erro, não só o trecho que falhou. Achou `NOVO-19` (`applyingState` travado,
-      **fechado junto**), `NOVO-20` e `NOVO-21`
+      no primeiro erro, não só o trecho que falhou. Achou `NOVO-22` (`applyingState` travado,
+      **fechado junto**), `NOVO-23` e `NOVO-24`
 - [x] `HT-09` login sem skip link e sem erro associado
 - [x] `HT-11` campos de formulário renderizados sem nome acessível (5 medidos em 2 telas)
 - [x] `QA-01` login do Django Admin sem rate limit nenhum
