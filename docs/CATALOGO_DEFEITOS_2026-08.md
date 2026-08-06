@@ -1560,6 +1560,36 @@ as áreas? Se forem, o backfill precisa **duplicar** cada modelo por área, não
 > `justificativas/tests/test_modelo_por_area.py` — 10 testes, provados mordendo: sem o filtro de
 > área no `is_padrao`, 1 reprova; sem o recorte nos selectors, 6 reprovam.
 
+### NOVO-10 ✅ RESOLVIDO · 🔴 Entrar com a senha certa devolve 500: o login da aplicação está quebrado · COR · 0,5 d
+
+`core/views.py:993`, `LoginView.form_valid`: `cache.delete(self._rate_key())`. O método
+`_rate_key` **não existe** — ele saiu de `LoginView` quando a regra de limite virou
+`core/login_throttle.py` no `QA-01`, e esta chamada ficou para trás.
+
+**Medido:** POST em `/login/` com a senha correta →
+`AttributeError: 'LoginView' object has no attribute '_rate_key'` → 500. Reproduzido no `main`
+(`993e14c5`) com `curl`, antes de tocar em qualquer coisa. Senha **errada** funciona normalmente,
+porque o caminho quebrado é só o de sucesso.
+
+Por que a suíte inteira passava com a porta de entrada arrombada:
+
+- todo teste de tela entra por `self.client.force_login(...)`, que não passa por view nenhuma;
+- o único teste de login **bem-sucedido** era `test_login_correto_no_admin_continua_funcionando`,
+  e o admin entra pelo wrapper `core/admin_login.py`, não por esta view;
+- `test_login_da_aplicacao_bloqueia_no_mesmo_ponto` usa esta porta, mas só com senha errada.
+
+Ou seja: havia teste para "errar a senha 6 vezes" e nenhum para "acertar a senha uma vez".
+
+**Correção:** `login_throttle.chave_de_tentativa(self.request)`, que é a mesma chave que
+`registrar_falha` usa — acertar a senha limpa o balde de falhas, que era a intenção original da
+linha. Mais dois testes em `core/tests/test_login_throttle.py`, provados falhando com o exato
+`AttributeError` antes da correção.
+
+**Achado por acaso**, dirigindo o navegador para conferir o `NOVO-07`. Nenhum auditor apontaria:
+não é ORM em view, não é CSS fora de token, e `ruff` não reclama de atributo inexistente
+(`F821` só pega nome livre, não `self.x`). Fica a lição para o `PLANO_MESTRE`: caminho de sucesso
+sem teste é caminho não coberto, por mais óbvio que pareça.
+
 ### QA-17 ⚪ Treze PRs abertos sem triagem · MED · 1 d
 
 PRs #4, #7, #10, #13, #14, #16, #27, #32, #44, #58, #137, #144 são de maio–julho/2026; #178 é de
