@@ -223,7 +223,7 @@ Enquanto não houver medição com volume, não se sabe.
 
 | # | Etapa | Defeitos | Dias | Risco | Gate |
 |---|---|---|---:|---|---|
-| **D1** | **Régua de desempenho** — `scripts/medir_desempenho.py` no repositório, semeando cada domínio **em dois volumes (200 e 20.000)**, medindo queries, tempo, KB de HTML e uso de CSS por rota; teto por rota no CI | `PF-07` | 3–4 | baixo | O script roda no CI e falha se qualquer rota passar do teto declarado, nos dois volumes |
+| **D1** ✅ | **Régua de desempenho** — `scripts/medir_desempenho.py` no repositório, semeando cada domínio **em dois volumes (200 e 20.000)**, medindo queries, tempo, KB de HTML e uso de CSS por rota; teto por rota no CI | `PF-07` | 3–4 | baixo | O script roda no CI e falha se qualquer rota passar do teto declarado, nos dois volumes |
 | **D2** | **Folha de símbolos de ícone** | `PF-01` | 2–3 | baixo | `/oficios/` abaixo de 250 KB de HTML; suíte verde; telas conferidas nos dois temas |
 | **D3** | **Menu de ação sob demanda** | `PF-04`, `PF-05` | 2–3 | médio | `/oficios/` abaixo de 40 ms e abaixo de 150 KB; teste de teclado e ARIA |
 | **D4** | **Sessão fora do caminho quente** | `PF-03` | 1–2 | médio | Requisição autenticada trivial sem `UPDATE django_session`; decisão de expiração registrada |
@@ -241,6 +241,13 @@ D1 (régua) ──┬──► D2 (ícones) ──► D3 (menus) ──► [acei
              └──► D5 (duplicadas)
                                    PLANO_FRONTEND ──► D6 (aceite CSS)
 ```
+
+> **D1 fechada em 05/08.** A régua está em `scripts/medir_desempenho.py`, os tetos em
+> `scripts/tetos_desempenho.json` e o gate no `tests.yml`. Ela achou de saída um vazamento
+> entre áreas (`NOVO-06`), uma tela de 15 MB (`NOVO-07`) e N+1 de 296/138/55 consultas em três
+> listas (`NOVO-08`) — nenhum deles visível na linha de base, que mediu com o banco vazio.
+> O `NOVO-08` é trabalho de desempenho e entra nesta fila; o `NOVO-06` é vazamento de dado
+> entre áreas e **não espera a fila de desempenho**.
 
 **D1 vem primeiro e não é negociável.** Sem a régua no CI, toda etapa seguinte é afirmação sem
 prova, e a regressão volta no PR seguinte sem ninguém ver. D2 antes de D3 porque o menu carrega
