@@ -229,8 +229,11 @@ para uma rodada futura, com `DB-01` como pré-requisito.
   - [x] fatia 2 — `oficios` (4 modelos, 11 sites de `all_objects`; 22 restantes). Duas
         descobertas: o modelo histórico de migração **perde** o `objects` a partir do
         `AlterModelManagers` do app (`core/managers.py` documenta a regra), e a suíte
-        desligava o piso de numeração — `NOVO-22`
-  - [ ] fatia 3 — `roteiros` + `eventos`
+        desligava o piso de numeração — `NOVO-28`
+  - [x] fatia 3 — `roteiros` + `eventos` (4 modelos, 6 sites de `all_objects`; 18
+        restantes). Fechou **três vazamentos reais** que não estavam no catálogo
+        (`NOVO-26`) e mostrou que renomear para `all_objects` desinflava a catraca de
+        ORM-em-view — o auditor passou a contar os dois nomes
   - [ ] fatia 4 — `prestacoes_contas` + `documentos`
   - [ ] fatia 5 — `cadastros` (`ConfiguracaoSistema.get_singleton`)
   - [ ] fatia 6 — `planos_trabalho`, `justificativas`, `integracoes`, `core.AuditEvent`; fecha o ID

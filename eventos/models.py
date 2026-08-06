@@ -4,6 +4,7 @@ from core.uploads import validate_private_document_upload
 from django.db.models import Q
 from django.utils import timezone
 
+from core.managers import AreaScopedManager
 from core.normalizers import normalize_spaces
 from core.normalizers import normalize_upper
 from core.models import TimeStampedModel
@@ -82,7 +83,14 @@ class Evento(models.Model):
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita
+    # para código que precisa enxergar todas. `default_manager_name` mantém o admin,
+    # as relações reversas e `validate_unique` irrestritos — ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["-data_inicio", "-criado_em"]
         verbose_name = "Evento"
         verbose_name_plural = "Eventos"
@@ -166,7 +174,12 @@ class TipoEvento(TimeStampedModel):
     ativo = models.BooleanField(default=True)
     ordem = models.PositiveIntegerField(default=100)
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["ordem", "nome"]
         verbose_name = "Tipo de evento"
         verbose_name_plural = "Tipos de evento"
@@ -238,7 +251,12 @@ class ModeloMotivoEvento(TimeStampedModel):
     ordem = models.PositiveIntegerField(default=100)
     is_padrao = models.BooleanField(default=False)
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["ordem", "nome"]
         verbose_name = "Modelo de motivo de evento"
         verbose_name_plural = "Modelos de motivo de evento"
@@ -275,7 +293,13 @@ class ModeloMotivoEvento(TimeStampedModel):
         self.nome = normalize_upper(self.nome)
         self.texto = normalize_spaces(self.texto)
         if self.is_padrao:
-            ModeloMotivoEvento.objects.exclude(pk=self.pk).filter(area=self.area).update(is_padrao=False)
+            # `BE-09`: `all_objects` porque o escopo é o `self.area` deste modelo, não
+            # o do request. Com `objects` e área explícita diferente da ativa, o padrão
+            # anterior não seria desmarcado e a gravação estouraria em
+            # `eventos_motivo_area_padrao_unique`.
+            ModeloMotivoEvento.all_objects.exclude(pk=self.pk).filter(area=self.area).update(
+                is_padrao=False,
+            )
         super().save(*args, **kwargs)
 
 

@@ -151,7 +151,10 @@ def obter_roteiro_escolhido_do_post(post, evento=None, area=None):
     condicao = Q(tipo=Roteiro.TIPO_AVULSO)
     if evento is not None:
         condicao |= Q(evento=evento) | Q(oficios__evento=evento)
-    queryset = Roteiro.objects.filter(condicao, pk=roteiro_id)
+    # `BE-09`: `all_objects` — as quatro linhas abaixo aplicam o `area` recebido no
+    # argumento (ou o do evento). Recortar de novo pela área ativa esvaziaria a
+    # consulta sempre que as duas divergissem.
+    queryset = Roteiro.all_objects.filter(condicao, pk=roteiro_id)
     if area is not None:
         queryset = queryset.filter(area=area)
     else:
