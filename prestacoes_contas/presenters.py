@@ -158,7 +158,9 @@ def _servidor_row(ps, solicitacao_form=None, prestacao_anexos=None, diario_pdf_u
     return row
 
 
-def apresentar_prestacao_servidor_card(ps, *, group_position="alone", solicitacao_form=None):
+def apresentar_prestacao_servidor_card(
+    ps, *, group_position="alone", solicitacao_form=None, configuracao=None
+):
     """Monta o card de um único servidor, com cabeçalho do ofício compartilhado.
 
     ``group_position``: ``alone`` | ``start`` | ``middle`` | ``end`` — usado para
@@ -226,7 +228,11 @@ def apresentar_prestacao_servidor_card(ps, *, group_position="alone", solicitaca
             valor_diarias_display = _format_brl_diarias(roteiro.valor_diarias)
             valor_diarias_extenso = (roteiro.valor_diarias_extenso or "").strip()
 
-    configuracao = get_configuracao_sistema()
+    # `NOVO-08`: era uma consulta por card. A configuração é por área e a área
+    # é fixa no request, então os 20 cards da página resolviam sempre o mesmo
+    # objeto. O `None` mantém os demais chamadores (e `tests.py:290`) de pé.
+    if configuracao is None:
+        configuracao = get_configuracao_sistema()
     unidade_sede_display = configuracao.unidade.nome if configuracao.unidade_id else ""
     if destino_display and data_evento_display:
         evento_wa_display = f"{destino_display}, de {data_evento_display}"

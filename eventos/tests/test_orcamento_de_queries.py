@@ -115,7 +115,11 @@ class OrcamentoDeQueriesEventoTests(TestCase):
     # de lugar. Baixar esse número é trabalho de outro defeito, com outra medição.
     QUERIES_LISTA = 18
     QUERIES_LISTA_BUSCA = 18
-    QUERIES_DETALHE = 78
+    # `NOVO-08` (06/08/2026): 78 -> 77. O detalhe do evento passou a usar o
+    # `Prefetch` de servidores na forma que `TermoAutorizacao.servidores_efetivos()`
+    # consome (`termos.selectors.prefetch_servidores_efetivos`), então a
+    # consulta que o prefetch cru desperdiçava deixou de existir.
+    QUERIES_DETALHE = 77
     QUERIES_TIPOS = 7
 
 

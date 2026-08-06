@@ -276,9 +276,14 @@ def build_evento_document_seed(evento) -> dict:
         if not seed["motivo"]:
             seed["motivo"] = (ordem.motivo or "").strip()
 
+    # `NOVO-08`: `TermoAutorizacao.servidores_efetivos()` passou a consumir o cache
+    # do prefetch. Um `prefetch_related("servidores")` cru alimenta o cache sem
+    # `cargo`/`unidade`, e cada acesso a eles voltaria a consultar.
+    from termos.selectors import prefetch_servidores_efetivos
+
     termo = (
         evento.termos_autorizacao.select_related("destino_cidade__estado", "destino_estado", "viatura")
-        .prefetch_related("servidores")
+        .prefetch_related(prefetch_servidores_efetivos())
         .order_by("-updated_at", "-created_at")
         .first()
     )

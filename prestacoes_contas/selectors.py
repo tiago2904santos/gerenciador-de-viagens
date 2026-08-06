@@ -3,6 +3,7 @@ from django.db.models import Q
 
 from core.normalizers import remove_accents
 from core.tenancy import get_current_area
+from roteiros.models import RoteiroDestino
 from roteiros.models import RoteiroTrecho
 
 from .models import PrestacaoServidor
@@ -83,6 +84,17 @@ def _base_servidores(
                 queryset=RoteiroTrecho.objects.select_related(
                     "origem_cidade", "origem_estado", "destino_cidade", "destino_estado"
                 ).order_by("ordem"),
+            ),
+            # `NOVO-08`: `_destino_display_oficio` (`oficios/presenters.py:51-54`)
+            # faz `.destinos.all()` por card e toca `d.cidade` e `d.estado` de
+            # cada um — 100 consultas por página. Forma idêntica à do selector
+            # irmão (`oficios/selectors.py:72-75`), que alimenta o MESMO
+            # presenter. O `order_by("ordem")` é carga útil: o presenter mostra
+            # `destinos[:2]` e escreve "+N", então a ordem decide qual cidade
+            # aparece no cabeçalho.
+            Prefetch(
+                "prestacao__oficio__roteiro__destinos",
+                queryset=RoteiroDestino.objects.select_related("cidade", "estado").order_by("ordem"),
             ),
             Prefetch(
                 "prestacao__servidores_prestacao",
