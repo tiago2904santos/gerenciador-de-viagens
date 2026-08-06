@@ -4,91 +4,91 @@
     "core:dashboard": {
       "200": {
         "consultas": 11,
-        "kb_html": 25.8
+        "kb_html": 40.8
       },
       "20000": {
         "consultas": 11,
-        "kb_html": 25.8
+        "kb_html": 40.8
       }
     },
     "eventos:index": {
       "200": {
         "consultas": 34,
-        "kb_html": 621.1
+        "kb_html": 437.0
       },
       "20000": {
         "consultas": 34,
-        "kb_html": 666.2
+        "kb_html": 482.2
       }
     },
     "justificativas:index": {
       "200": {
         "consultas": 10,
-        "kb_html": 149.2
+        "kb_html": 119.4
       },
       "20000": {
         "consultas": 10,
-        "kb_html": 149.6
+        "kb_html": 119.8
       }
     },
     "oficios:index": {
       "200": {
         "consultas": 17,
-        "kb_html": 472.8
+        "kb_html": 331.1
       },
       "20000": {
         "consultas": 17,
-        "kb_html": 474.1
+        "kb_html": 332.3
       }
     },
     "ordens_servico:index": {
       "200": {
         "consultas": 19,
-        "kb_html": 225.4
+        "kb_html": 175.1
       },
       "20000": {
         "consultas": 19,
-        "kb_html": 225.9
+        "kb_html": 175.6
       }
     },
     "planos_trabalho:index": {
       "200": {
         "consultas": 18,
-        "kb_html": 228.3
+        "kb_html": 177.9
       },
       "20000": {
         "consultas": 18,
-        "kb_html": 272.2
+        "kb_html": 221.8
       }
     },
     "prestacoes_contas:index": {
       "200": {
         "consultas": 20,
-        "kb_html": 522.2
+        "kb_html": 402.3
       },
       "20000": {
         "consultas": 20,
-        "kb_html": 610.6
+        "kb_html": 490.7
       }
     },
     "roteiros:index": {
       "200": {
         "consultas": 33,
-        "kb_html": 92.3
+        "kb_html": 98.4
       },
       "20000": {
         "consultas": 33,
-        "kb_html": 92.3
+        "kb_html": 98.5
       }
     },
     "termos:index": {
       "200": {
         "consultas": 11,
-        "kb_html": 534.3
+        "kb_html": 333.5
       },
       "20000": {
         "consultas": 11,
-        "kb_html": 535.5
+        "kb_html": 334.5
       }
     }
   }

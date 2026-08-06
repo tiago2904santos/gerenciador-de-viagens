@@ -785,7 +785,7 @@ Catalogado para uma rodada futura, com `DB-01` como pré-requisito.
 
 ## PF — Desempenho
 
-### PF-01 🟠 192 KB de SVG repetido por página de lista · MED · 2–3 d
+### PF-01 ✅ 192 KB de SVG repetido por página de lista · MED · 2–3 d
 
 `/oficios/?aba=atuais` com 20 ofícios: 425 KB de HTML, 12.545 linhas, **378 `<svg>` inline
 somando 192 KB (45% da página)**, 854 `<path>`.
@@ -793,6 +793,23 @@ Causa: `templates/components/ui/icons/icon.html` — 222 linhas de `{% if %}/{% 
 que emitem o `<svg>` inteiro a cada inclusão.
 **Correção:** folha de símbolos + `<use href="#cv-icon-…">`. O ícone cai de ~500 para ~60 bytes.
 Sucessor do `R-02` da Etapa 8, que ficou pendente sem o preço medido.
+
+**Fechado em 06/08.** Medido antes de mexer, na régua do `PF-07` (volume 200): 450,4 KB, 380
+`<svg>`, 192,6 KB (43%), 856 `<path>` — o enunciado estava perto. Depois: **315,3 KB**, ícone de
+**519 para 118 bytes**, folha de 15,5 KB uma vez por página. As nove rotas da régua tiveram o teto
+de `kb_html` baixado.
+
+**Duas ressalvas medidas, que o enunciado não previa e o PR registra:**
+
+1. **Comprimido, o ganho é zero.** `gzip -6` da mesma página: **16,4 KB antes, 16,3 KB depois**.
+   380 cópias do mesmo `<svg>` são o caso ideal do compressor. O que encolhe de verdade e o gzip
+   não alcança é o DOM: **1.244 nós de forma para 109** (856 `<path>` → 63). O ganho é de parse,
+   memória e layout — não de rede.
+2. **Página com poucos ícones piora.** A folha custa 15,5 KB fixos: `core:dashboard` foi de 25,8
+   para 38,8 KB e `roteiros:index` de 92,3 para 93,7 KB. Os dois tetos subiram de propósito.
+
+Some da lista o modo de falha antigo (nome errado desenhava interrogação): `id` inexistente não
+desenha nada e não levanta erro. Coberto por `core/tests/test_folha_de_icones.py`.
 
 ### PF-02 🟠 90% do CSS entregue não casa com a página · MED · ver plano de front
 

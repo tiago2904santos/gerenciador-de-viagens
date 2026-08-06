@@ -288,7 +288,7 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `JS-02` `destroy` nos componentes que registram listener global — o número é **14 de 17**,
       não 15, e só 4 vazavam de fato. Um deles (`attach-signed-modal`) não estava no enunciado.
       Medido no navegador: 15→17→19→21 antes, 14→16→14 depois
-- [ ] `PF-01` folha de símbolos de ícone (192 KB por página de lista)
+- [x] `PF-01` folha de símbolos de ícone (192 KB por página de lista) — 06/08
 - [ ] `PF-04` menu de ação sob demanda (60 menus para 20 cards)
 - [ ] `HT-02` erro de campo sem `aria-describedby`/`aria-invalid`/`role="alert"`
 - [ ] `HT-12` `help_text` declarado no form nunca chega à tela
