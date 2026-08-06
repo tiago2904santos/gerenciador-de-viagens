@@ -347,7 +347,7 @@ estar: `tmp/` (23), `media_teste/` (6), `migration_backups/` (2, um deles um `.d
 
 ## DB — Dados, migrações e integridade
 
-### DB-01 🟠 A tabela de diárias é nacional e qualquer EDITOR a altera · AUD+VER · 1,5 d · risco médio
+### DB-01 ✅ RESOLVIDO · 🟠 A tabela de diárias é nacional e qualquer EDITOR a altera · AUD+VER · 1,5 d · risco médio
 
 > **Este ID foi reescrito pela verificação (05/08). O enunciado original estava invertido** — ele
 > pedia exatamente a mudança que o código evita de propósito.
@@ -367,6 +367,33 @@ sistema dedicada — casa com `BE-19`, que aponta `require_area_role` com zero u
 explícita na interface de que o valor vale para todas as áreas.
 **O que NÃO fazer:** fragmentar a tabela por área. Reintroduziria exatamente a inconsistência que
 o desenho atual evita, e mexeria na regra de dinheiro fechada no ciclo de julho.
+
+
+> **RESOLVIDO em 06/08/2026.** Decisão do usuário: **portão de superusuário**, não de papel de
+> área. Valor nacional não é assunto de área nenhuma — nem da que está mais organizada.
+>
+> O portão fica no **POST de diárias** (`cadastros/views.py`), e não como decorador da view. Essa
+> é a armadilha do defeito e o motivo de metade dos testes: `configuracao_sistema` serve **três
+> abas** (`instituicao`, `oficio`, `roteiros`). Um decorador — que é o caminho óbvio — tiraria as
+> configurações de instituição e de ofício de todo mundo que não é superusuário.
+>
+> Ler o valor vigente continua livre para todos: ele entra em todo roteiro calculado. A aba segue
+> aberta, com o histórico de vigências e um aviso de somente leitura, **sem o formulário** — porque
+> mostrar o formulário e recusar no submit faria a pessoa preencher e perder o que digitou.
+>
+> **Consequência que vale registrar:** com a decisão por superusuário, `require_area_role`
+> (`core/permissions.py:28`) **continua com zero usos**. O `BE-19` previa que este ID fosse a
+> estreia dele; não foi. O helper segue esperando um caso de uso real, e a decisão de quais
+> operações exigem `PAPEL_ADMIN` continua pendente na §8 do plano mestre.
+>
+> Sete testes em `cadastros/tests/test_portao_diarias.py`, provados mordendo (EDITOR e ADMIN de
+> área gravavam com `302`). Um deles existe só para separar "portão de superusuário" de "portão de
+> papel": se alguém trocar por `require_area_role(PAPEL_ADMIN)`, ele reprova.
+>
+> `cadastros/tests/test_configuracao_diarias.py` passou a logar como superusuário. Aqueles testes
+> cobrem o **formulário** — 15% e 30% derivados no servidor, valor zero recusado, vigência
+> duplicada recusada —, não a permissão; sem a troca eles passariam a medir o 403 e parariam de
+> medir a regra de dinheiro.
 
 ### DB-02 🔴 `area` anulável em 27 de 28 modelos · AUD · 5 d · risco alto
 

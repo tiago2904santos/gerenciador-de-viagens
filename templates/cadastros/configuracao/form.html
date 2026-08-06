@@ -41,11 +41,22 @@
       </form>
 
     {% elif aba == "roteiros" %}
-      <form method="post" action="{{ config_action_url }}" class="document-form travel-document-wizard__form" novalidate>
-        {% csrf_token %}
-        <input type="hidden" name="form_id" value="diarias">
-        {% include "components/form/card.html" with title="Valores de diária" description="Informe apenas o valor de 24 horas; 15% e 30% são calculados. Cada tabela vale a partir da data de vigência, e roteiros com saída anterior mantêm o valor que valia na época." title_id="config-card-diarias-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_diarias_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
-      </form>
+      {% comment %}
+        `DB-01`: os valores de diária são nacionais e só um administrador do
+        sistema os altera. Para os demais a aba continua aberta — ler o valor
+        vigente é legítimo, ele entra em todo roteiro calculado —, mas sem
+        formulário. Mostrar o formulário e recusar no submit faria a pessoa
+        preencher e perder o que digitou.
+      {% endcomment %}
+      {% if pode_editar_diarias %}
+        <form method="post" action="{{ config_action_url }}" class="document-form travel-document-wizard__form" novalidate>
+          {% csrf_token %}
+          <input type="hidden" name="form_id" value="diarias">
+          {% include "components/form/card.html" with title="Valores de diária" description="Informe apenas o valor de 24 horas; 15% e 30% são calculados. Cada tabela vale a partir da data de vigência, e roteiros com saída anterior mantêm o valor que valia na época." title_id="config-card-diarias-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_diarias_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
+        </form>
+      {% else %}
+        {% include "components/form/card.html" with title="Valores de diária" description="Cada tabela vale a partir da data de vigência, e roteiros com saída anterior mantêm o valor que valia na época." title_id="config-card-diarias-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_diarias_somente_leitura.html" %}
+      {% endif %}
     {% endif %}
   </div>
 {% endblock %}
