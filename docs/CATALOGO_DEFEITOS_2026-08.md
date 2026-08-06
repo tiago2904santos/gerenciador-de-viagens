@@ -420,7 +420,7 @@ o dele — sem mensagem.
 **Correção:** `filter_queryset_by_area` na base da consulta **e** recorte por idade
 (`created_at__lt=now()-timedelta(minutes=30)`), para não competir com edição em curso.
 
-### DB-04 🟡 Cache de artefato documental não recorta por área — risco latente · AUD+VER · 1 d
+### DB-04 ✅ RESOLVIDO · 🟡 Cache de artefato documental não recorta por área — risco latente · AUD+VER · 1 d
 
 `documentos/services/document_cache.py:105-133` monta os filtros com `tipo`, `formato`,
 `cache_key` e os ids de referência; `area` nunca entra, embora `DocumentoArtefato.area` exista com
@@ -436,6 +436,41 @@ o dele — sem mensagem.
 **Efeito:** é lacuna estrutural, não vulnerabilidade ativa. A função deveria receber `area` como
 defesa em profundidade — o próximo chamador que esquecer a referência abre o buraco, e nada no
 código o impede.
+
+
+> **RESOLVIDO em 06/08/2026**, e a classificação de "latente" do enunciado estava certa — mas por
+> um motivo diferente do que ele supunha.
+>
+> **Correção de um erro que quase entrou neste catálogo:** a primeira verificação afirmou que
+> `documentos/services/persistence.py:102` cria o `DocumentoArtefato` **sem** preencher `area`, e
+> que o campo ficaria `NULL` em todo artefato gerado. **Está errado.** O `create()` de fato não
+> passa `area`, mas `DocumentoArtefato.save()` (`documentos/models.py:87-94`) deriva a área do
+> ofício, do evento ou do termo. Ler só o `create()` levava à conclusão contrária — e ela teria
+> mudado a correção inteira, porque com `area=NULL` toda view de PDF assinado daria 404
+> (`documentos/views.py:65` recorta por área). Nada disso acontece.
+>
+> **O defeito de verdade.** A `cache_key` é um SHA-256 de conteúdo (`document_cache.py:91-103`) e
+> não inclui área: dois ofícios de áreas diferentes com o mesmo conteúdo produzem a mesma chave.
+> Quem separa as áreas na busca é a **referência** — e ela é opcional. Os cinco chamadores de hoje
+> passam uma (`oficios/services.py:88`, `oficios/document_generation.py:67`,
+> `ordens_servico/services.py:72`, `termos/services.py:172`, `planos_trabalho/services.py:1208`),
+> e é só por isso que o defeito nunca foi alcançável.
+>
+> **A correção é tornar a chamada sem referência impossível**, e não confiar em quem chama:
+> `get_cached_document_artifact` levanta `ValueError` se as quatro referências vierem vazias.
+>
+> **Por que não recortar por `get_current_area()`:** a geração documental roda **assíncrona**, em
+> worker do Celery (`documentos/services/async_generation.py`), onde não existe área ambiente. Um
+> recorte por estado ambiente ficaria correto no request e devolveria `None` sempre na worker —
+> transformando o cache em nada, silenciosamente. A referência funciona nos dois contextos.
+>
+> **Por que não pôr área na `cache_key`:** mudaria o hash de todo artefato já gravado, invalidando
+> o cache inteiro, para fechar um caminho que a referência já fecha por implicação — um ofício
+> pertence a uma área só.
+>
+> Seis testes em `documentos/tests/test_cache_recorte.py`, sendo o primeiro deles a prova da
+> premissa: o artefato herda a área do ofício. Se esse teste cair, o recorte por referência deixa
+> de implicar recorte por área e a correção inteira perde o chão.
 
 ### DB-05 ✅ RESOLVIDO · 🟡 Placa de viatura única globalmente · AUD · 1,5 d
 
