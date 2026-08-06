@@ -223,7 +223,10 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       propósito. O trabalho era o portão, e ele ficou em **superusuário** (decisão do usuário), no
       POST de diárias e não na view, que serve três abas. `require_area_role` segue com zero usos.
 - [ ] `DB-02` `area` anulável em 27 de 28 modelos
-- [ ] `DB-04` cache documental não recorta por área
+- [x] `DB-04` cache documental não recorta por área — latente, como o enunciado dizia, mas por
+      outro motivo: quem separa as áreas é a **referência**, que era opcional. Agora é obrigatória
+      (`ValueError` sem ela). A afirmação de que todo artefato nascia `area=NULL` **era falsa** —
+      `DocumentoArtefato.save()` deriva a área; está corrigida no catálogo.
 - [x] `DB-05` placa de viatura única globalmente — a metade de `ModeloJustificativa` já tinha
       saído no `NOVO-09`. A constraint sozinha não bastava: `ViaturaForm.clean_placa` consultava
       sem recorte e a mensagem de erro confirmava placa de outra unidade. Drill mostrou que a
