@@ -2,6 +2,7 @@
 from urllib.parse import urlencode
 
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.http import Http404
 from django.http import HttpResponse
@@ -629,6 +630,29 @@ def configuracao_sistema(request, aba=None):
     is_post_oficio = request.method == "POST" and form_id == "oficio"
     is_post_diarias = request.method == "POST" and form_id == "diarias"
 
+    # `DB-01`: a tabela de diarias e **nacional de proposito** — os valores vem
+    # de norma externa e valem para todas as unidades, para impedir que duas
+    # areas cobrem valores diferentes pela mesma viagem
+    # (`cadastros/selectors.py:20-27`). O defeito nao era ela ser nacional; era
+    # qualquer um poder mexer nela: `VinculoUsuarioArea.papel` nasce `EDITOR`,
+    # entao todo usuario novo do sistema alterava o valor de diaria de todo
+    # mundo.
+    #
+    # Superusuario, e nao `require_area_role(PAPEL_ADMIN)`: valor nacional nao e
+    # assunto de area nenhuma. Decisao do usuario, registrada no catalogo.
+    #
+    # O portao fica **aqui**, no POST de diarias, e nao como decorador da view:
+    # `configuracao_sistema` serve tres abas (`instituicao`, `oficio`,
+    # `roteiros`), e travar a view inteira tiraria as outras duas de quem nao e
+    # superusuario. Ler o valor vigente continua livre — ele entra em todo
+    # roteiro calculado.
+    pode_editar_diarias = bool(getattr(request.user, "is_superuser", False))
+    if is_post_diarias and not pode_editar_diarias:
+        raise PermissionDenied(
+            "Os valores de diária valem para todas as unidades e só podem ser "
+            "alterados por um administrador do sistema."
+        )
+
     form = ConfiguracaoSistemaForm(
         request.POST if is_post_instituicao else None,
         instance=obj,
@@ -696,6 +720,10 @@ def configuracao_sistema(request, aba=None):
     else:
         context["diaria_form"] = diaria_form
         context["diarias_vigentes"] = listar_tabelas_diaria()
+        # A tela nao pode oferecer o que ela vai recusar: sem isto, quem nao e
+        # superusuario preenche o formulario, envia e perde o que digitou para
+        # um 403. O 403 continua sendo o portao de verdade.
+        context["pode_editar_diarias"] = pode_editar_diarias
 
     return render(request, "cadastros/configuracao/form.html", context)
 

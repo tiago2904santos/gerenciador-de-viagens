@@ -24,7 +24,16 @@ class ConfiguracaoDiariasTests(TestCase):
     def setUp(self):
         # Sem senha: o acesso é por force_login, então uma senha aqui só
         # criaria um literal para o scanner de segredos reclamar.
-        self.user = get_user_model().objects.create_user(username="config_diarias")
+        #
+        # `DB-01`: superusuário porque a partir dele só um administrador do
+        # sistema altera a tabela nacional de diárias. O que estes testes
+        # cobrem é o **formulário** — 15% e 30% derivados no servidor, valor
+        # zero recusado, vigência duplicada recusada —, não a permissão; quem
+        # cobre a permissão é `test_portao_diarias.py`. Sem isto, todos eles
+        # passariam a medir o 403 e parariam de medir a regra de dinheiro.
+        self.user = get_user_model().objects.create_superuser(
+            username="config_diarias", email="config@exemplo.gov.br"
+        )
         self.area = AreaTrabalho.objects.create(nome="Área Config", sigla="CFG")
         VinculoUsuarioArea.objects.create(
             usuario=self.user, area=self.area, area_padrao=True, ativo=True

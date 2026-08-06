@@ -214,7 +214,9 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [ ] `DB-03` limpeza de rascunhos apaga rascunho de outra área
 - [ ] `BE-09` `AreaScopedManager` nos 28 modelos com `area`
 - [ ] `BE-10` app `justificativas` sem isolamento
-- [ ] `DB-01` `TabelaDiaria` sem `area`
+- [x] `DB-01` `TabelaDiaria` sem `area` — o enunciado estava invertido: a tabela é nacional de
+      propósito. O trabalho era o portão, e ele ficou em **superusuário** (decisão do usuário), no
+      POST de diárias e não na view, que serve três abas. `require_area_role` segue com zero usos.
 - [ ] `DB-02` `area` anulável em 27 de 28 modelos
 - [ ] `DB-04` cache documental não recorta por área
 - [ ] `DB-05` placa de viatura única globalmente
