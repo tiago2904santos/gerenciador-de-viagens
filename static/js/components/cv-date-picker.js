@@ -2,6 +2,8 @@
   'use strict';
 
   var SELECTOR = '[data-cv-date-picker]';
+  /* JS-02 — uma entrada por date picker vivo: { root, desmontar }. */
+  var instancias = [];
   var MONTHS = [
     'Janeiro',
     'Fevereiro',
@@ -784,6 +786,10 @@
       });
     }
 
+    /* JS-02 — os quatro listeners abaixo são por instância. Sem `destroy`
+       eles sobreviviam à remoção do campo (troca de aba, linha de formulário
+       removida, painel trocado por AJAX) e seguiam reposicionando um painel
+       que já não estava no documento. */
     document.addEventListener('click', onDocumentClick);
     document.addEventListener('keydown', onKeydown);
 
@@ -793,6 +799,15 @@
     }
     window.addEventListener('scroll', onScrollOrResize, { passive: true, capture: true });
     window.addEventListener('resize', onScrollOrResize, { passive: true });
+    instancias.push({
+      root: root,
+      desmontar: function () {
+        document.removeEventListener('click', onDocumentClick);
+        document.removeEventListener('keydown', onKeydown);
+        window.removeEventListener('scroll', onScrollOrResize, { capture: true });
+        window.removeEventListener('resize', onScrollOrResize);
+      },
+    });
 
     if (confirmBtn) {
       confirmBtn.addEventListener('click', function () {
@@ -885,13 +900,25 @@
     init(document);
   }
 
+  /* JS-02 — desmonta só os pickers que viviam dentro do nó removido. */
+  function destroy(scope) {
+    if (!scope || (scope.nodeType !== 1 && scope.nodeType !== 9)) return;
+    for (var i = instancias.length - 1; i >= 0; i -= 1) {
+      var entrada = instancias[i];
+      if (scope === entrada.root || (scope.contains && scope.contains(entrada.root))) {
+        entrada.desmontar();
+        instancias.splice(i, 1);
+      }
+    }
+  }
+
   window.CV = window.CV || {};
   window.CV.datePicker = {
     init: init,
     boot: boot,
   };
   if (typeof window.CV.registerEnhancer === 'function') {
-    window.CV.registerEnhancer('datePicker', init);
+    window.CV.registerEnhancer('datePicker', init, destroy);
   } else if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
   } else {

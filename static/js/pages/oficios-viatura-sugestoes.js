@@ -70,7 +70,7 @@
       if (motId) return motId;
       /* Driver toggle ativo na equipe picker */
       var activeToggle = step1 && step1.querySelector(
-        ".cv-search-picker__driver-toggle[aria-pressed='true']"
+        "[data-entity-picker-part='driver-toggle'][aria-pressed='true']"
       );
       return (activeToggle && activeToggle.dataset.value) || "";
     }
@@ -255,7 +255,7 @@
 
     if (step1) {
       step1.addEventListener("click", function (e) {
-        var toggle = e.target.closest(".cv-search-picker__driver-toggle");
+        var toggle = e.target.closest("[data-entity-picker-part='driver-toggle']");
         if (!toggle) return;
         var driverId = toggle.dataset.value || "";
         setTimeout(function () {

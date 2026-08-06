@@ -36,8 +36,13 @@
     atualizar(base, escopo);
   }
 
-  if (window.CV && window.CV.registry && window.CV.registry.register) {
-    window.CV.registry.register("diariaDerivados", iniciar);
+  // JS-02 — registra pelo mesmo nome que todo o resto usa. `CV.registry.register`
+  // e `CV.registerEnhancer` são a mesma função (core/app.js), mas só o segundo
+  // é visível para a catraca que exige `destroy`; pelo primeiro, o componente
+  // passava despercebido. Não há `destroy`: o listener é do próprio campo e
+  // morre com ele, sem nada em `document`/`window` para desfazer.
+  if (typeof window.CV.registerEnhancer === "function") {
+    window.CV.registerEnhancer("diariaDerivados", iniciar);
   } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () {
       iniciar(document);

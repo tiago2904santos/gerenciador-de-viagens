@@ -72,7 +72,7 @@ configurações segue como proposta sem posição na fila.
 | **1** | **Réguas e rede de segurança** | `PF-07`, `QA-03`, `QA-06`, `QA-07`, `QA-11`, `QA-12` | 7 | médio | `scripts/medir_desempenho.py` no CI com volume realista, `ruff`, Dependabot, o rollback de deploy que hoje não desfaz migração, e o teste da CVE do WeasyPrint que hoje verifica texto-fonte. Sem régua, toda fase seguinte é afirmação sem prova e a regressão volta no PR seguinte sem ninguém ver. |
 | **2** | **Isolamento por área vira invariante** | `BE-09`, `BE-10`, `DB-01`…`DB-05` | 18 | **alto** | Quatro vazamentos entre tenants já provados por teste. É o maior risco do sistema e toda fase posterior escreve código que precisa respeitar o recorte. |
 | **3** | **O banco defende os dados** | `DB-06`…`DB-08` | 8 | médio | Cascata que apaga comprovante e assinatura; 2 `CheckConstraint` em 54 modelos. Depende da fase 2: pôr `NOT NULL` sobre modelo que ainda vaza é lacrar a porta errada. |
-| **4** | **Fundação do front** | `PF-01`, `HT`, `UI` (CSS morto) | ver plano de front | médio | Folha de símbolos de ícone, componentes que faltam, remoção do CSS comprovadamente morto. Fixa **quais classes existem** — pré-requisito da reconstrução. |
+| **4** | **Fundação do front** | `PF-01`, `HT`, `UI` (CSS morto) | ver plano de front | médio | Folha de símbolos de ícone, componentes que faltam, remoção do CSS comprovadamente morto. Fixa **quais classes existem** — pré-requisito da reconstrução. **F1 concluída** (`JS-06`, `JS-05`, `JS-02`); faltam F2 e F3. |
 | **5** | **Consulta e índice** | `DB-09`…`DB-12` | 8,5 | médio | Ganho medido de 13× a 29× num índice composto; busca livre em varredura sequencial. Depois da fase 3, porque constraint muda plano de consulta. |
 | **6** | **Camadas e duplicação** | `BE-11`…`BE-17` | 17,5 | alto | Editor de roteiro em 3 cópias, `roteiro_logic.py` com 1.779 linhas fora do contrato. Mexe em roteiro e diárias: **plan mode obrigatório**. |
 | **7** | **Reconstrução do CSS** | `UI` | ver plano de front | médio | A mais visível e a mais reversível. Depois da fase 4, que define os nomes. |
@@ -179,7 +179,8 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `QA-04` 🔴 a validação central de upload nunca roda, nos 5 tipos de anexo
 - [x] `QA-09` dois templates de `.env` de produção divergentes
 - [ ] `JS-11` `maskCep` duplicada e `onlyDigits` em 4 cópias
-- [ ] `JS-12` `CV.registry` e `CV.componentRegistry` são o mesmo objeto
+- [ ] `JS-12` `CV.registry` e `CV.componentRegistry` são **dois literais distintos** com as mesmas
+      funções — o enunciado "mesmo objeto" foi refutado em runtime (ver catálogo)
 
 ### Fase 1 — Réguas e rede de segurança
 - [x] `PF-07` `scripts/medir_desempenho.py` com dois volumes, no CI — achou `NOVO-06`
@@ -234,9 +235,15 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [ ] `DB-08` coleções ordenadas aceitam duplicata
 
 ### Fase 4 — Fundação do front
-- [ ] `JS-06` JS larga o nome de classe `cv-search-picker` (pré-requisito de toda renomeação)
-- [ ] `JS-05` auditor de CI cobre `innerHTML` e `registerEnhancer` sem `destroy`
-- [ ] `JS-02` `destroy` nos 15 componentes que registram listener global
+- [x] `JS-06` JS larga o nome de classe `cv-search-picker` — e as **partes** junto (`NOVO-13`):
+      a superfície real era 45 sites em 11 arquivos, não 10 em 7. Contrato novo:
+      `data-entity-picker-root`/`-part` + `CV.picker.rootFor/part`
+- [x] `JS-05` auditor de CI cobre `innerHTML` e `registerEnhancer` sem `destroy` — 4 regras novas
+      (6 → 10 invariantes), com `JS_EXCEPTIONS` de **teto por arquivo**: dentro do teto é exceção
+      informativa, acima é erro. Achou `NOVO-14` e `NOVO-15`
+- [x] `JS-02` `destroy` nos componentes que registram listener global — o número é **14 de 17**,
+      não 15, e só 4 vazavam de fato. Um deles (`attach-signed-modal`) não estava no enunciado.
+      Medido no navegador: 15→17→19→21 antes, 14→16→14 depois
 - [ ] `PF-01` folha de símbolos de ícone (192 KB por página de lista)
 - [ ] `PF-04` menu de ação sob demanda (60 menus para 20 cards)
 - [ ] `HT-02` erro de campo sem `aria-describedby`/`aria-invalid`/`role="alert"`

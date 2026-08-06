@@ -121,11 +121,7 @@
     const unidadeInput = form.querySelector("#id_destinatario_oficio_unidade");
     if (!select || !nomeHidden) return;
 
-    const picker = select.nextElementSibling;
-    const textInput =
-      picker && picker.classList.contains("cv-search-picker")
-        ? picker.querySelector(".cv-search-picker__input")
-        : null;
+    const textInput = window.CV.picker.part(window.CV.picker.rootFor(select), "input");
 
     if (textInput) {
       textInput.addEventListener("input", () => {

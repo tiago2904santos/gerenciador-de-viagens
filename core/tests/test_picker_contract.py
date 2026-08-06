@@ -1,7 +1,21 @@
+import re
 from pathlib import Path
 
 from django.conf import settings
 from django.test import SimpleTestCase
+
+_BLOCO = re.compile(r"/\*.*?\*/", re.S)
+_LINHA = re.compile(r"//[^\n]*")
+
+
+def sem_comentarios(fonte: str) -> str:
+    """Apaga comentários preservando o número de linhas.
+
+    O contrato do JS-06 é sobre código: citar a classe antiga num comentário
+    que explica por que ela saiu não pode reprovar o teste.
+    """
+    fonte = _BLOCO.sub(lambda m: "\n" * m.group(0).count("\n"), fonte)
+    return _LINHA.sub("", fonte)
 
 
 class PickerContractTests(SimpleTestCase):
@@ -18,7 +32,7 @@ class PickerContractTests(SimpleTestCase):
 
     def test_one_namespace_and_enhancer_own_all_picker_renderers(self):
         self.assertIn("window.CV.picker = {", self.engine)
-        self.assertIn('window.CV.registerEnhancer("picker", init)', self.engine)
+        self.assertIn('window.CV.registerEnhancer("picker", init, destroy)', self.engine)
         self.assertIn("registerRenderer(renderer)", self.engine)
         self.assertIn(
             "window.CV.picker.registerRenderer(initAll)",
@@ -46,6 +60,37 @@ class PickerContractTests(SimpleTestCase):
         self.assertNotIn("data-cv-search-picker", sources)
         self.assertNotIn("data-cv-select", sources)
         self.assertNotIn("data-picker-mode", sources)
+
+    def test_rendered_root_and_parts_are_found_by_attribute_not_by_css_class(self):
+        """JS-06 — o nome da classe CSS não é mais condição de lógica.
+
+        Antes deste contrato, 10 arquivos achavam o picker renderizado com
+        `classList.contains("cv-search-picker")` e suas partes por seletor de
+        classe BEM. Renomear a classe na reconstrução do CSS quebraria o
+        roteamento de foco em 6 telas em silêncio: não há runtime de teste de
+        JS que execute esse caminho.
+        """
+        self.assertIn("dataset.entityPickerRoot", self.engine)
+        self.assertIn("data-entity-picker-part", self.engine)
+        self.assertIn("data-entity-picker-root", self.select_renderer)
+        for exported in ("rootFor,", "part: partOf,", "parts: partsOf,", "closestPart,"):
+            self.assertIn(exported, self.engine)
+
+        js_dir = self.root / "static" / "js"
+        infratores = []
+        for path in sorted(js_dir.rglob("*.js")):
+            if path.name.endswith(".bundle.js"):
+                continue
+            codigo = sem_comentarios(path.read_text(encoding="utf-8"))
+            for numero, linha in enumerate(codigo.splitlines(), start=1):
+                if 'classList.contains("cv-search-picker' in linha or ".cv-search-picker" in linha:
+                    infratores.append(f"{path.relative_to(self.root)}:{numero}")
+        self.assertEqual(
+            infratores,
+            [],
+            "O picker deve ser localizado por data-entity-picker-root/-part, "
+            "nunca pela classe CSS: " + ", ".join(infratores),
+        )
 
     def test_live_contract_declares_renderer_and_selection_mode(self):
         templates = self.root / "templates"

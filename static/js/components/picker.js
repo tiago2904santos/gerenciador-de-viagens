@@ -3,6 +3,8 @@
 
   const SELECTOR = "select[data-entity-picker]";
   const renderers = [];
+  /* JS-02 — uma entrada por picker vivo: { root, desmontar }. */
+  const instancias = [];
 
   /* ── Utilitários ─────────────────────────────────────────────── */
 
@@ -11,6 +13,50 @@
     if (className) node.className = className;
     if (text !== undefined) node.textContent = text;
     return node;
+  }
+
+  /* ── Contrato de identificação (JS-06) ───────────────────────────
+     A `<div>` renderizada abaixo era encontrada de fora por
+     `classList.contains("cv-search-picker")`, e suas partes por seletor de
+     classe BEM. Isso amarra 10 arquivos ao nome da classe: renomeá-la na
+     reconstrução do CSS quebraria o roteamento de foco em silêncio, sem erro
+     no console e sem teste que pegue.
+
+     A classe continua — ela é o estilo. O que muda é quem responde "sou o
+     picker": `data-entity-picker-root` na raiz e `data-entity-picker-part`
+     em cada parte consultada. Use `CV.picker.rootFor` / `CV.picker.part`. */
+
+  function markRoot(node) {
+    node.dataset.entityPickerRoot = "true";
+    return node;
+  }
+
+  function markPart(node, name) {
+    node.dataset.entityPickerPart = name;
+    return node;
+  }
+
+  function rootFor(select) {
+    if (!select || !select.matches) return null;
+    /* No renderer "select" a raiz é o próprio elemento; no picker de busca ela
+       é o irmão que `initPicker` insere logo depois do <select> fonte. */
+    if (select.matches("[data-entity-picker-root]")) return select;
+    const next = select.nextElementSibling;
+    return next && next.matches && next.matches("[data-entity-picker-root]") ? next : null;
+  }
+
+  function partOf(scope, name) {
+    return scope ? scope.querySelector(`[data-entity-picker-part="${name}"]`) : null;
+  }
+
+  function partsOf(scope, name) {
+    return scope
+      ? Array.prototype.slice.call(scope.querySelectorAll(`[data-entity-picker-part="${name}"]`))
+      : [];
+  }
+
+  function closestPart(node, name) {
+    return node ? node.closest(`[data-entity-picker-part="${name}"]`) : null;
   }
 
   function dispatchChange(select) {
@@ -110,7 +156,7 @@
     const freeTextMsg    = select.dataset.pickerFreeTextMessage || "Pressione Enter para confirmar este nome.";
     const forceUppercase = select.dataset.pickerUppercase === "true";
     const isError        = select.dataset.pickerError         === "true";
-    const baseId       = select.id || select.name || `cv-picker-${renderers.length}-${document.querySelectorAll(".cv-search-picker").length}`;
+    const baseId       = select.id || select.name || `cv-picker-${renderers.length}-${document.querySelectorAll("[data-entity-picker-root]").length}`;
     const listboxId    = `${baseId}-results`;
     const initialValue = (select.dataset.pickerInitialValue || "").trim();
 
@@ -141,7 +187,7 @@
 
     /* ── Construção do DOM ──────────────────────────────────────── */
 
-    const root = el("div", `cv-search-picker cv-search-picker--${mode} cv-search-picker--${variant}`);
+    const root = markRoot(el("div", `cv-search-picker cv-search-picker--${mode} cv-search-picker--${variant}`));
     if (presentation !== "default") root.classList.add(`cv-search-picker--${presentation}`);
     if (presentation === "people") root.classList.add("cv-search-picker--roster");
     if (select.disabled)   root.classList.add("cv-search-picker--disabled");
@@ -151,16 +197,16 @@
     const fieldHint  = select.dataset.pickerHint  || "";
 
     /* Área de busca */
-    const field      = el("div",    "cv-search-picker__field");
+    const field      = markPart(el("div",    "cv-search-picker__field"),     "field");
     const labelEl    = fieldLabel ? el("div", "cv-search-picker__label", fieldLabel) : null;
     const hintEl     = fieldHint ? el("div", "cv-search-picker__hint", fieldHint) : null;
-    const control    = el("div",    "cv-search-picker__control");
+    const control    = markPart(el("div",    "cv-search-picker__control"),   "control");
     const icon       = el("span",   "cv-search-picker__icon", "");
-    const input      = el("input",  "cv-search-picker__input");
-    const clearBtn   = el("button", "cv-search-picker__clear", "x");
-    const dropdown   = el("div",    "cv-search-picker__dropdown");
-    const list       = el("div",    "cv-search-picker__list");
-    const emptyEl    = el("div",    "cv-search-picker__empty", emptyMsg);
+    const input      = markPart(el("input",  "cv-search-picker__input"),     "input");
+    const clearBtn   = markPart(el("button", "cv-search-picker__clear", "x"), "clear");
+    const dropdown   = markPart(el("div",    "cv-search-picker__dropdown"),  "dropdown");
+    const list       = markPart(el("div",    "cv-search-picker__list"),      "list");
+    const emptyEl    = markPart(el("div",    "cv-search-picker__empty", emptyMsg), "empty");
 
     input.type         = "search";
     input.placeholder  = placeholder;
@@ -233,7 +279,7 @@
     const showPanel = mode === "multi" || variant === "detailed";
     let panel = null, grid = null, counter = null, panelEmpty = null, panelTitleEl = null;
     if (showPanel) {
-      panel      = el("section", "cv-search-picker__selected-panel");
+      panel      = markPart(el("section", "cv-search-picker__selected-panel"), "selected-panel");
       grid       = el("div",  "cv-search-picker__selected-list");
       panelEmpty = el("p",    "cv-search-picker__selected-empty", emptyPanelMsg);
 
@@ -445,7 +491,8 @@
 
       card.classList.toggle("cv-search-picker__selected-card--has-term", enabled);
 
-      const toggle = card.querySelector(".cv-search-picker__term-control .cv-field-side-action");
+      const termControl = partOf(card, "term-control");
+      const toggle = termControl ? termControl.querySelector(".cv-field-side-action") : null;
       if (toggle) {
         toggle.setAttribute("aria-pressed", enabled ? "true" : "false");
         toggle.textContent = presentation === "people"
@@ -461,15 +508,15 @@
 
     function updateDriverControls() {
       if (!grid) return;
-      grid.querySelectorAll(".cv-search-picker__driver-toggle").forEach((button) => {
+      partsOf(grid, "driver-toggle").forEach((button) => {
         const active = button.dataset.value === driverValue;
-        const card = button.closest(".cv-search-picker__selected-card");
-        const text = button.querySelector(".cv-search-picker__driver-text");
+        const card = closestPart(button, "selected-card");
+        const text = partOf(button, "driver-text");
         button.setAttribute("aria-pressed", active ? "true" : "false");
         button.classList.toggle("cv-search-picker__driver-toggle--active", active);
         if (card) {
           card.classList.toggle("cv-search-picker__selected-card--driver", active);
-          const surface = card.querySelector(".cv-search-picker__driver-surface");
+          const surface = partOf(card, "driver-surface");
           if (surface) {
             surface.setAttribute("aria-pressed", active ? "true" : "false");
             surface.setAttribute(
@@ -499,7 +546,7 @@
     /* ── Render: Resultados do dropdown ─────────────────────────── */
 
     function renderOptionItem(item, index) {
-      const btn    = el("button", "cv-search-picker__option");
+      const btn    = markPart(el("button", "cv-search-picker__option"), "option");
       const marker = el("span",   "cv-search-picker__option-marker", "");
       const visual = el("span",   "cv-search-picker__option-visual", "");
       const body   = el("div",    "cv-search-picker__option-content");
@@ -571,7 +618,7 @@
 
     function buildTermControl(value) {
       const enabled = selectedForTerm.has(value);
-      const row    = el("div",  "cv-search-picker__term-control");
+      const row    = markPart(el("div",  "cv-search-picker__term-control"), "term-control");
       const label  = el("span", "cv-search-picker__term-label", "Termo de Autorizacao");
 
       /* Reutiliza o padrão cv-field-side-action--state (dot colorido + filled bg)
@@ -604,13 +651,13 @@
     function buildDriverControl(item) {
       const active = driverValue === item.value;
       const row = el("div", "cv-search-picker__driver-control");
-      const button = el("button", "cv-search-picker__driver-toggle");
+      const button = markPart(el("button", "cv-search-picker__driver-toggle"), "driver-toggle");
       const marker = el("span", "cv-search-picker__driver-marker", "");
-      const text = el(
+      const text = markPart(el(
         "span",
         "cv-search-picker__driver-text",
         presentation === "people" ? (active ? "Motorista" : "Definir motorista") : "Este servidor e o motorista",
-      );
+      ), "driver-text");
 
       button.type = "button";
       button.dataset.value = item.value;
@@ -627,7 +674,7 @@
 
     function buildDriverSurface(item) {
       const active = driverValue === item.value;
-      const button = el("button", "cv-search-picker__driver-surface");
+      const button = markPart(el("button", "cv-search-picker__driver-surface"), "driver-surface");
       button.type = "button";
       button.dataset.value = item.value;
       button.dataset.label = item.label;
@@ -643,7 +690,7 @@
     /* ── Render: Cards selecionados ─────────────────────────────── */
 
     function buildCard(item) {
-      const card = el("div", "cv-search-picker__selected-card");
+      const card = markPart(el("div", "cv-search-picker__selected-card"), "selected-card");
       card.dataset.value = item.value;
 
       if (presentation === "people" || item.cpf || item.rg) {
@@ -653,7 +700,7 @@
       }
 
       const body  = el("div", "cv-search-picker__selected-main");
-      const title = el("div", "cv-search-picker__selected-title-row");
+      const title = markPart(el("div", "cv-search-picker__selected-title-row"), "selected-title-row");
 
       if (presentation === "people") {
         const name = el("span", "cv-search-picker__selected-name", item.label);
@@ -710,7 +757,7 @@
         }
       }
 
-      const removeBtn = el("button", "cv-search-picker__remove", presentation !== "default" ? "×" : "x");
+      const removeBtn = markPart(el("button", "cv-search-picker__remove", presentation !== "default" ? "×" : "x"), "remove");
       removeBtn.type = "button";
       removeBtn.setAttribute("aria-label", "Remover " + item.label);
       removeBtn.addEventListener("click", () => removeItem(item.value));
@@ -756,7 +803,7 @@
         const initials = (plate.slice(0, 2) || "V").toUpperCase();
         const avatar = el("span", "cv-search-picker__selected-avatar", initials);
         avatar.setAttribute("aria-hidden", "true");
-        const titleRow = body.querySelector(".cv-search-picker__selected-title-row");
+        const titleRow = partOf(body, "selected-title-row");
         if (titleRow) {
           titleRow.appendChild(el("span", "cv-search-picker__vehicle-chip", "Viatura"));
         }
@@ -863,9 +910,21 @@
       }
     });
 
-    /* Fecha dropdown ao clicar fora */
-    document.addEventListener("click", (e) => {
+    /* Fecha dropdown ao clicar fora.
+
+       JS-02 — este listener é por instância. Sem `destroy` ele sobrevivia à
+       remoção da linha do formulário (`location-rows`) e ao ciclo de
+       reset+reinit dos wizards, acumulando um handler por picker já morto,
+       cada um segurando a closure inteira do componente. */
+    const onDocumentClick = (e) => {
       if (!root.contains(e.target) && e.target !== select) setOpen(false);
+    };
+    document.addEventListener("click", onDocumentClick);
+    instancias.push({
+      root,
+      desmontar() {
+        document.removeEventListener("click", onDocumentClick);
+      },
     });
 
     /* Sincroniza quando o select nativo muda externamente */
@@ -913,11 +972,30 @@
     init(document);
   }
 
+  /* JS-02 — o registry chama isto quando um nó sai do DOM. Desmonta só os
+     pickers que viviam dentro do nó removido; os demais seguem intactos. */
+  function destroy(scope) {
+    if (!scope || (scope.nodeType !== 1 && scope.nodeType !== 9)) return;
+    for (let i = instancias.length - 1; i >= 0; i -= 1) {
+      const { root, desmontar } = instancias[i];
+      if (scope === root || (scope.contains && scope.contains(root))) {
+        desmontar();
+        instancias.splice(i, 1);
+      }
+    }
+  }
+
   window.CV = window.CV || {};
   window.CV.picker = {
     boot,
     init,
     initSearch: init,
+    /* JS-06 — o contrato para quem consome o picker de fora. Nenhum
+       consumidor deve conhecer a classe CSS do componente. */
+    rootFor,
+    part: partOf,
+    parts: partsOf,
+    closestPart,
     registerRenderer(renderer) {
       if (typeof renderer === "function" && !renderers.includes(renderer)) {
         renderers.push(renderer);
@@ -926,7 +1004,7 @@
   };
 
   if (typeof window.CV.registerEnhancer === "function") {
-    window.CV.registerEnhancer("picker", init);
+    window.CV.registerEnhancer("picker", init, destroy);
   } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", boot);
   } else {

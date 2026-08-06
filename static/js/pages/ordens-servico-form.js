@@ -99,7 +99,7 @@
 
   function salvageServidorRolePanel(form) {
     var panel = form.querySelector("[data-os-servidor-role-panel]");
-    if (!panel || !panel.closest(".cv-search-picker")) return;
+    if (!panel || !panel.closest("[data-entity-picker-root]")) return;
     var host = form.querySelector("#os-card-servidores .cv-form-block__body") || form;
     host.appendChild(panel);
   }
@@ -115,9 +115,9 @@
     }
     if (!select || select.dataset.entityPickerReady !== "true") return;
     delete select.dataset.entityPickerReady;
-    var next = select.nextElementSibling;
-    if (next && next.classList && next.classList.contains("cv-search-picker")) {
-      next.parentNode.removeChild(next);
+    var rendered = window.CV.picker.rootFor(select);
+    if (rendered && rendered !== select) {
+      rendered.parentNode.removeChild(rendered);
     }
   }
 
@@ -387,7 +387,7 @@
       badge = document.createElement("span");
       badge.className = "os-servidor-role-badge";
       badge.dataset.osRoleBadge = "true";
-      var titleRow = card.querySelector(".cv-search-picker__selected-title-row");
+      var titleRow = window.CV.picker.part(card, "selected-title-row");
       if (titleRow) {
         titleRow.appendChild(badge);
       } else {
@@ -402,8 +402,7 @@
   function servidoresPicker(form) {
     var select = form.querySelector("select[name='servidores']");
     if (!select) return null;
-    var next = select.nextElementSibling;
-    return next && next.classList && next.classList.contains("cv-search-picker") ? next : null;
+    return window.CV.picker.rootFor(select);
   }
 
   function mountServidorRolePanel(form, rolesEnabled) {
@@ -420,16 +419,16 @@
     if (toggle) {
       toggle.setAttribute("aria-label", copy.aria);
     }
-    var field = picker.querySelector(".cv-search-picker__field")
-      || panel.querySelector(".cv-search-picker__field");
-    var selected = picker.querySelector(".cv-search-picker__selected-panel");
+    var field = window.CV.picker.part(picker, "field")
+      || window.CV.picker.part(panel, "field");
+    var selected = window.CV.picker.part(picker, "selected-panel");
     var fieldHost = panel.querySelector("[data-os-servidor-picker-field-host]");
     if (!field || !selected || !fieldHost) return;
 
     var activeEl = document.activeElement;
     var keepPickerFocus = !!(activeEl && (
-      activeEl.classList.contains("cv-search-picker__input")
-      || activeEl.closest(".cv-search-picker__control")
+      activeEl.matches("[data-entity-picker-part='input']")
+      || activeEl.closest("[data-entity-picker-part='control']")
     ));
 
     if (rolesEnabled) {
@@ -458,8 +457,8 @@
     }
 
     if (keepPickerFocus) {
-      var input = picker.querySelector(".cv-search-picker__input")
-        || panel.querySelector(".cv-search-picker__input");
+      var input = window.CV.picker.part(picker, "input")
+        || window.CV.picker.part(panel, "input");
       if (input) {
         window.setTimeout(function () {
           input.focus({ preventScroll: true });
@@ -479,7 +478,8 @@
 
     if (!picker) return;
     var activeRole = activeServidorRole(form);
-    picker.querySelectorAll(".cv-search-picker__selected-card[data-value]").forEach(function (card) {
+    window.CV.picker.parts(picker, "selected-card").forEach(function (card) {
+      if (!card.dataset.value) return;
       var servidorId = String(card.dataset.value || "");
       var role = OS_ROLE_ASSIGNMENTS[servidorId];
       renderServidorRoleCard(card, role, rolesEnabled, rolesEnabled && role === activeRole);
@@ -492,9 +492,9 @@
     form.addEventListener("click", function (event) {
       if (!supportsServidorRoles(form)) return;
       if (event.target.closest("[data-os-role-mode]")) return;
-      if (event.target.closest(".cv-search-picker__remove")) return;
+      if (event.target.closest("[data-entity-picker-part='remove']")) return;
 
-      var card = event.target.closest(".cv-search-picker__selected-card[data-value]");
+      var card = event.target.closest("[data-entity-picker-part='selected-card'][data-value]");
       if (!card || !form.contains(card)) return;
       var picker = servidoresPicker(form);
       if (!picker || !picker.contains(card)) return;

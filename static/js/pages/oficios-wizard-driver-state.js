@@ -20,7 +20,7 @@
   var PANEL_SERVIDOR = '[data-oficio-motorista-servidor]';
   var PANEL_MANUAL   = '[data-oficio-motorista-manual]';
   var MODO_BTN       = '[data-oficio-motorista-modo-btn]';
-  var DRIVER_ACTIVE  = '.cv-search-picker__driver-surface[aria-pressed="true"], .cv-search-picker__driver-toggle[aria-pressed="true"]';
+  var DRIVER_ACTIVE  = '[data-entity-picker-part="driver-surface"][aria-pressed="true"], [data-entity-picker-part="driver-toggle"][aria-pressed="true"]';
 
   /* ── Helpers ─────────────────────────────────────────────────── */
 

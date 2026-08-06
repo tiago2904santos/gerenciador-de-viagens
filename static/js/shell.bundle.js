@@ -2865,6 +2865,8 @@ document.documentElement.dataset.appReady = "true";
   var activeTrigger = null;
   var currentRemoveUrl = "";
   var BOUND = "data-attach-signed-bound";
+  /* JS-02 — uma entrada por modal vivo: { root, desmontar }. */
+  var instancias = [];
 
   /* H-03: aqui havia `KINDS`, uma lista fixa de cinco ordinais latinos, e
    * `kindPrefix`, que traduzia cada ordinal no prefixo dos seus 6 atributos
@@ -3093,7 +3095,12 @@ document.documentElement.dataset.appReady = "true";
       });
     }
 
-    document.addEventListener("click", function (event) {
+    /* JS-02 — este listener é registrado por modal, dentro do `init`, e o
+       guard `BOUND` é por elemento: cada painel novo trazido por AJAX
+       (CV.collection troca o painel inteiro) instala mais um handler em
+       `document`, todos vivos ao mesmo tempo e cada um segurando o modal
+       antigo. Nomeado e registrado para o `destroy` poder removê-lo. */
+    function onDocumentClick(event) {
       var trigger = event.target.closest("[data-attach-signed-trigger]");
       if (trigger) {
         event.preventDefault();
@@ -3121,6 +3128,14 @@ document.documentElement.dataset.appReady = "true";
         event.preventDefault();
         selectDocument(kindButton.getAttribute("data-attach-signed-kind"), true);
       }
+    }
+    document.addEventListener("click", onDocumentClick);
+    instancias.push({
+      root: modal,
+      desmontar: function () {
+        document.removeEventListener("click", onDocumentClick);
+        modal.removeAttribute(BOUND);
+      },
     });
 
     if (form) {
@@ -3150,9 +3165,21 @@ document.documentElement.dataset.appReady = "true";
     return true;
   }
 
+  /* JS-02 — desmonta só os modais que viviam dentro do nó removido. */
+  function destroy(scope) {
+    if (!scope || (scope.nodeType !== 1 && scope.nodeType !== 9)) return;
+    for (var i = instancias.length - 1; i >= 0; i -= 1) {
+      var entrada = instancias[i];
+      if (scope === entrada.root || (scope.contains && scope.contains(entrada.root))) {
+        entrada.desmontar();
+        instancias.splice(i, 1);
+      }
+    }
+  }
+
   window.CV = window.CV || {};
   if (typeof window.CV.registerEnhancer === "function") {
-    window.CV.registerEnhancer("attachSignedModal", init);
+    window.CV.registerEnhancer("attachSignedModal", init, destroy);
   } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () { init(document); });
   } else {
@@ -3506,6 +3533,8 @@ document.documentElement.dataset.appReady = "true";
 
   const SELECTOR = "select[data-entity-picker]";
   const renderers = [];
+  /* JS-02 — uma entrada por picker vivo: { root, desmontar }. */
+  const instancias = [];
 
   /* ── Utilitários ─────────────────────────────────────────────── */
 
@@ -3514,6 +3543,50 @@ document.documentElement.dataset.appReady = "true";
     if (className) node.className = className;
     if (text !== undefined) node.textContent = text;
     return node;
+  }
+
+  /* ── Contrato de identificação (JS-06) ───────────────────────────
+     A `<div>` renderizada abaixo era encontrada de fora por
+     `classList.contains("cv-search-picker")`, e suas partes por seletor de
+     classe BEM. Isso amarra 10 arquivos ao nome da classe: renomeá-la na
+     reconstrução do CSS quebraria o roteamento de foco em silêncio, sem erro
+     no console e sem teste que pegue.
+
+     A classe continua — ela é o estilo. O que muda é quem responde "sou o
+     picker": `data-entity-picker-root` na raiz e `data-entity-picker-part`
+     em cada parte consultada. Use `CV.picker.rootFor` / `CV.picker.part`. */
+
+  function markRoot(node) {
+    node.dataset.entityPickerRoot = "true";
+    return node;
+  }
+
+  function markPart(node, name) {
+    node.dataset.entityPickerPart = name;
+    return node;
+  }
+
+  function rootFor(select) {
+    if (!select || !select.matches) return null;
+    /* No renderer "select" a raiz é o próprio elemento; no picker de busca ela
+       é o irmão que `initPicker` insere logo depois do <select> fonte. */
+    if (select.matches("[data-entity-picker-root]")) return select;
+    const next = select.nextElementSibling;
+    return next && next.matches && next.matches("[data-entity-picker-root]") ? next : null;
+  }
+
+  function partOf(scope, name) {
+    return scope ? scope.querySelector(`[data-entity-picker-part="${name}"]`) : null;
+  }
+
+  function partsOf(scope, name) {
+    return scope
+      ? Array.prototype.slice.call(scope.querySelectorAll(`[data-entity-picker-part="${name}"]`))
+      : [];
+  }
+
+  function closestPart(node, name) {
+    return node ? node.closest(`[data-entity-picker-part="${name}"]`) : null;
   }
 
   function dispatchChange(select) {
@@ -3613,7 +3686,7 @@ document.documentElement.dataset.appReady = "true";
     const freeTextMsg    = select.dataset.pickerFreeTextMessage || "Pressione Enter para confirmar este nome.";
     const forceUppercase = select.dataset.pickerUppercase === "true";
     const isError        = select.dataset.pickerError         === "true";
-    const baseId       = select.id || select.name || `cv-picker-${renderers.length}-${document.querySelectorAll(".cv-search-picker").length}`;
+    const baseId       = select.id || select.name || `cv-picker-${renderers.length}-${document.querySelectorAll("[data-entity-picker-root]").length}`;
     const listboxId    = `${baseId}-results`;
     const initialValue = (select.dataset.pickerInitialValue || "").trim();
 
@@ -3644,7 +3717,7 @@ document.documentElement.dataset.appReady = "true";
 
     /* ── Construção do DOM ──────────────────────────────────────── */
 
-    const root = el("div", `cv-search-picker cv-search-picker--${mode} cv-search-picker--${variant}`);
+    const root = markRoot(el("div", `cv-search-picker cv-search-picker--${mode} cv-search-picker--${variant}`));
     if (presentation !== "default") root.classList.add(`cv-search-picker--${presentation}`);
     if (presentation === "people") root.classList.add("cv-search-picker--roster");
     if (select.disabled)   root.classList.add("cv-search-picker--disabled");
@@ -3654,16 +3727,16 @@ document.documentElement.dataset.appReady = "true";
     const fieldHint  = select.dataset.pickerHint  || "";
 
     /* Área de busca */
-    const field      = el("div",    "cv-search-picker__field");
+    const field      = markPart(el("div",    "cv-search-picker__field"),     "field");
     const labelEl    = fieldLabel ? el("div", "cv-search-picker__label", fieldLabel) : null;
     const hintEl     = fieldHint ? el("div", "cv-search-picker__hint", fieldHint) : null;
-    const control    = el("div",    "cv-search-picker__control");
+    const control    = markPart(el("div",    "cv-search-picker__control"),   "control");
     const icon       = el("span",   "cv-search-picker__icon", "");
-    const input      = el("input",  "cv-search-picker__input");
-    const clearBtn   = el("button", "cv-search-picker__clear", "x");
-    const dropdown   = el("div",    "cv-search-picker__dropdown");
-    const list       = el("div",    "cv-search-picker__list");
-    const emptyEl    = el("div",    "cv-search-picker__empty", emptyMsg);
+    const input      = markPart(el("input",  "cv-search-picker__input"),     "input");
+    const clearBtn   = markPart(el("button", "cv-search-picker__clear", "x"), "clear");
+    const dropdown   = markPart(el("div",    "cv-search-picker__dropdown"),  "dropdown");
+    const list       = markPart(el("div",    "cv-search-picker__list"),      "list");
+    const emptyEl    = markPart(el("div",    "cv-search-picker__empty", emptyMsg), "empty");
 
     input.type         = "search";
     input.placeholder  = placeholder;
@@ -3736,7 +3809,7 @@ document.documentElement.dataset.appReady = "true";
     const showPanel = mode === "multi" || variant === "detailed";
     let panel = null, grid = null, counter = null, panelEmpty = null, panelTitleEl = null;
     if (showPanel) {
-      panel      = el("section", "cv-search-picker__selected-panel");
+      panel      = markPart(el("section", "cv-search-picker__selected-panel"), "selected-panel");
       grid       = el("div",  "cv-search-picker__selected-list");
       panelEmpty = el("p",    "cv-search-picker__selected-empty", emptyPanelMsg);
 
@@ -3948,7 +4021,8 @@ document.documentElement.dataset.appReady = "true";
 
       card.classList.toggle("cv-search-picker__selected-card--has-term", enabled);
 
-      const toggle = card.querySelector(".cv-search-picker__term-control .cv-field-side-action");
+      const termControl = partOf(card, "term-control");
+      const toggle = termControl ? termControl.querySelector(".cv-field-side-action") : null;
       if (toggle) {
         toggle.setAttribute("aria-pressed", enabled ? "true" : "false");
         toggle.textContent = presentation === "people"
@@ -3964,15 +4038,15 @@ document.documentElement.dataset.appReady = "true";
 
     function updateDriverControls() {
       if (!grid) return;
-      grid.querySelectorAll(".cv-search-picker__driver-toggle").forEach((button) => {
+      partsOf(grid, "driver-toggle").forEach((button) => {
         const active = button.dataset.value === driverValue;
-        const card = button.closest(".cv-search-picker__selected-card");
-        const text = button.querySelector(".cv-search-picker__driver-text");
+        const card = closestPart(button, "selected-card");
+        const text = partOf(button, "driver-text");
         button.setAttribute("aria-pressed", active ? "true" : "false");
         button.classList.toggle("cv-search-picker__driver-toggle--active", active);
         if (card) {
           card.classList.toggle("cv-search-picker__selected-card--driver", active);
-          const surface = card.querySelector(".cv-search-picker__driver-surface");
+          const surface = partOf(card, "driver-surface");
           if (surface) {
             surface.setAttribute("aria-pressed", active ? "true" : "false");
             surface.setAttribute(
@@ -4002,7 +4076,7 @@ document.documentElement.dataset.appReady = "true";
     /* ── Render: Resultados do dropdown ─────────────────────────── */
 
     function renderOptionItem(item, index) {
-      const btn    = el("button", "cv-search-picker__option");
+      const btn    = markPart(el("button", "cv-search-picker__option"), "option");
       const marker = el("span",   "cv-search-picker__option-marker", "");
       const visual = el("span",   "cv-search-picker__option-visual", "");
       const body   = el("div",    "cv-search-picker__option-content");
@@ -4074,7 +4148,7 @@ document.documentElement.dataset.appReady = "true";
 
     function buildTermControl(value) {
       const enabled = selectedForTerm.has(value);
-      const row    = el("div",  "cv-search-picker__term-control");
+      const row    = markPart(el("div",  "cv-search-picker__term-control"), "term-control");
       const label  = el("span", "cv-search-picker__term-label", "Termo de Autorizacao");
 
       /* Reutiliza o padrão cv-field-side-action--state (dot colorido + filled bg)
@@ -4107,13 +4181,13 @@ document.documentElement.dataset.appReady = "true";
     function buildDriverControl(item) {
       const active = driverValue === item.value;
       const row = el("div", "cv-search-picker__driver-control");
-      const button = el("button", "cv-search-picker__driver-toggle");
+      const button = markPart(el("button", "cv-search-picker__driver-toggle"), "driver-toggle");
       const marker = el("span", "cv-search-picker__driver-marker", "");
-      const text = el(
+      const text = markPart(el(
         "span",
         "cv-search-picker__driver-text",
         presentation === "people" ? (active ? "Motorista" : "Definir motorista") : "Este servidor e o motorista",
-      );
+      ), "driver-text");
 
       button.type = "button";
       button.dataset.value = item.value;
@@ -4130,7 +4204,7 @@ document.documentElement.dataset.appReady = "true";
 
     function buildDriverSurface(item) {
       const active = driverValue === item.value;
-      const button = el("button", "cv-search-picker__driver-surface");
+      const button = markPart(el("button", "cv-search-picker__driver-surface"), "driver-surface");
       button.type = "button";
       button.dataset.value = item.value;
       button.dataset.label = item.label;
@@ -4146,7 +4220,7 @@ document.documentElement.dataset.appReady = "true";
     /* ── Render: Cards selecionados ─────────────────────────────── */
 
     function buildCard(item) {
-      const card = el("div", "cv-search-picker__selected-card");
+      const card = markPart(el("div", "cv-search-picker__selected-card"), "selected-card");
       card.dataset.value = item.value;
 
       if (presentation === "people" || item.cpf || item.rg) {
@@ -4156,7 +4230,7 @@ document.documentElement.dataset.appReady = "true";
       }
 
       const body  = el("div", "cv-search-picker__selected-main");
-      const title = el("div", "cv-search-picker__selected-title-row");
+      const title = markPart(el("div", "cv-search-picker__selected-title-row"), "selected-title-row");
 
       if (presentation === "people") {
         const name = el("span", "cv-search-picker__selected-name", item.label);
@@ -4213,7 +4287,7 @@ document.documentElement.dataset.appReady = "true";
         }
       }
 
-      const removeBtn = el("button", "cv-search-picker__remove", presentation !== "default" ? "×" : "x");
+      const removeBtn = markPart(el("button", "cv-search-picker__remove", presentation !== "default" ? "×" : "x"), "remove");
       removeBtn.type = "button";
       removeBtn.setAttribute("aria-label", "Remover " + item.label);
       removeBtn.addEventListener("click", () => removeItem(item.value));
@@ -4259,7 +4333,7 @@ document.documentElement.dataset.appReady = "true";
         const initials = (plate.slice(0, 2) || "V").toUpperCase();
         const avatar = el("span", "cv-search-picker__selected-avatar", initials);
         avatar.setAttribute("aria-hidden", "true");
-        const titleRow = body.querySelector(".cv-search-picker__selected-title-row");
+        const titleRow = partOf(body, "selected-title-row");
         if (titleRow) {
           titleRow.appendChild(el("span", "cv-search-picker__vehicle-chip", "Viatura"));
         }
@@ -4366,9 +4440,21 @@ document.documentElement.dataset.appReady = "true";
       }
     });
 
-    /* Fecha dropdown ao clicar fora */
-    document.addEventListener("click", (e) => {
+    /* Fecha dropdown ao clicar fora.
+
+       JS-02 — este listener é por instância. Sem `destroy` ele sobrevivia à
+       remoção da linha do formulário (`location-rows`) e ao ciclo de
+       reset+reinit dos wizards, acumulando um handler por picker já morto,
+       cada um segurando a closure inteira do componente. */
+    const onDocumentClick = (e) => {
       if (!root.contains(e.target) && e.target !== select) setOpen(false);
+    };
+    document.addEventListener("click", onDocumentClick);
+    instancias.push({
+      root,
+      desmontar() {
+        document.removeEventListener("click", onDocumentClick);
+      },
     });
 
     /* Sincroniza quando o select nativo muda externamente */
@@ -4416,11 +4502,30 @@ document.documentElement.dataset.appReady = "true";
     init(document);
   }
 
+  /* JS-02 — o registry chama isto quando um nó sai do DOM. Desmonta só os
+     pickers que viviam dentro do nó removido; os demais seguem intactos. */
+  function destroy(scope) {
+    if (!scope || (scope.nodeType !== 1 && scope.nodeType !== 9)) return;
+    for (let i = instancias.length - 1; i >= 0; i -= 1) {
+      const { root, desmontar } = instancias[i];
+      if (scope === root || (scope.contains && scope.contains(root))) {
+        desmontar();
+        instancias.splice(i, 1);
+      }
+    }
+  }
+
   window.CV = window.CV || {};
   window.CV.picker = {
     boot,
     init,
     initSearch: init,
+    /* JS-06 — o contrato para quem consome o picker de fora. Nenhum
+       consumidor deve conhecer a classe CSS do componente. */
+    rootFor,
+    part: partOf,
+    parts: partsOf,
+    closestPart,
     registerRenderer(renderer) {
       if (typeof renderer === "function" && !renderers.includes(renderer)) {
         renderers.push(renderer);
@@ -4429,7 +4534,7 @@ document.documentElement.dataset.appReady = "true";
   };
 
   if (typeof window.CV.registerEnhancer === "function") {
-    window.CV.registerEnhancer("picker", init);
+    window.CV.registerEnhancer("picker", init, destroy);
   } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", boot);
   } else {
@@ -4888,6 +4993,9 @@ document.documentElement.dataset.appReady = "true";
     for (var i = 0; i < els.length; i++) {
       if (!els[i]._cvSelect) {
         els[i].setAttribute('data-entity-picker-ready', 'true');
+        /* JS-06 — este renderer é a própria raiz. Marcada para que
+           CV.picker.rootFor responda igual nos dois renderers. */
+        els[i].setAttribute('data-entity-picker-root', 'true');
         var inst = new CustomSelect(els[i]);
         els[i]._cvSelect = inst;
       }
@@ -4909,6 +5017,20 @@ document.documentElement.dataset.appReady = "true";
 
   var locationCache = {};
 
+  /* JS-02 — uma entrada por container de linhas vivo: { root, desmontar }. */
+  var instancias = [];
+
+  function destroy(scope) {
+    if (!scope || (scope.nodeType !== 1 && scope.nodeType !== 9)) return;
+    for (var i = instancias.length - 1; i >= 0; i -= 1) {
+      var entrada = instancias[i];
+      if (scope === entrada.root || (scope.contains && scope.contains(entrada.root))) {
+        entrada.desmontar();
+        instancias.splice(i, 1);
+      }
+    }
+  }
+
   function asRoot(root) {
     return root || document;
   }
@@ -4918,9 +5040,9 @@ document.documentElement.dataset.appReady = "true";
     if (select.dataset) {
       delete select.dataset.entityPickerReady;
     }
-    var nextEl = select.nextElementSibling;
-    if (nextEl && nextEl.classList && nextEl.classList.contains("cv-search-picker")) {
-      nextEl.parentNode.removeChild(nextEl);
+    var rendered = window.CV.picker.rootFor(select);
+    if (rendered && rendered !== select) {
+      rendered.parentNode.removeChild(rendered);
     }
   }
 
@@ -5164,6 +5286,12 @@ document.documentElement.dataset.appReady = "true";
     root.dataset.locationDragDropReady = "true";
 
     var dragState = null;
+    /* JS-02 — o `cleanup` abaixo já removia os três listeners de ponteiro,
+       mas só era chamado no `pointerup`/`pointercancel`. Se a linha sair do
+       DOM no meio do arraste — troca de aba, painel trocado por AJAX — o
+       arraste nunca termina e os três ficam em `document`. Registrar a
+       instância dá ao `destroy` do registry como acionar a limpeza. */
+    instancias.push({ root: root, desmontar: function () { cleanup(); } });
 
     function cleanup() {
       if (dragState && dragState.row) {
@@ -5232,11 +5360,11 @@ document.documentElement.dataset.appReady = "true";
         "textarea",
         "a",
         "[role='button']",
-        ".cv-search-picker__control",
-        ".cv-search-picker__dropdown",
-        ".cv-search-picker__option",
-        ".cv-search-picker__clear",
-        ".cv-search-picker__remove"
+        "[data-entity-picker-part='control']",
+        "[data-entity-picker-part='dropdown']",
+        "[data-entity-picker-part='option']",
+        "[data-entity-picker-part='clear']",
+        "[data-entity-picker-part='remove']"
       ].join(", "));
       var handleSelector = options.dragHandleSelector;
       if (handleSelector && !event.target.closest(handleSelector)) return;
@@ -5567,7 +5695,7 @@ document.documentElement.dataset.appReady = "true";
 
   function focusFirstEmptyPicker(root, options) {
     options = options || {};
-    var inputs = Array.prototype.slice.call(asRoot(root).querySelectorAll(options.inputSelector || ".cv-search-picker__input"))
+    var inputs = Array.prototype.slice.call(asRoot(root).querySelectorAll(options.inputSelector || "[data-entity-picker-part='input']"))
       .filter(function (input) {
         return !input.disabled;
       });
@@ -5614,7 +5742,7 @@ document.documentElement.dataset.appReady = "true";
   };
 
   if (typeof window.CV.registerEnhancer === "function") {
-    window.CV.registerEnhancer("locationRows", init);
+    window.CV.registerEnhancer("locationRows", init, destroy);
   } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () { init(document); });
   } else {
@@ -5960,6 +6088,8 @@ document.documentElement.dataset.appReady = "true";
   'use strict';
 
   var SELECTOR = '[data-cv-date-picker]';
+  /* JS-02 — uma entrada por date picker vivo: { root, desmontar }. */
+  var instancias = [];
   var MONTHS = [
     'Janeiro',
     'Fevereiro',
@@ -6742,6 +6872,10 @@ document.documentElement.dataset.appReady = "true";
       });
     }
 
+    /* JS-02 — os quatro listeners abaixo são por instância. Sem `destroy`
+       eles sobreviviam à remoção do campo (troca de aba, linha de formulário
+       removida, painel trocado por AJAX) e seguiam reposicionando um painel
+       que já não estava no documento. */
     document.addEventListener('click', onDocumentClick);
     document.addEventListener('keydown', onKeydown);
 
@@ -6751,6 +6885,15 @@ document.documentElement.dataset.appReady = "true";
     }
     window.addEventListener('scroll', onScrollOrResize, { passive: true, capture: true });
     window.addEventListener('resize', onScrollOrResize, { passive: true });
+    instancias.push({
+      root: root,
+      desmontar: function () {
+        document.removeEventListener('click', onDocumentClick);
+        document.removeEventListener('keydown', onKeydown);
+        window.removeEventListener('scroll', onScrollOrResize, { capture: true });
+        window.removeEventListener('resize', onScrollOrResize);
+      },
+    });
 
     if (confirmBtn) {
       confirmBtn.addEventListener('click', function () {
@@ -6843,13 +6986,25 @@ document.documentElement.dataset.appReady = "true";
     init(document);
   }
 
+  /* JS-02 — desmonta só os pickers que viviam dentro do nó removido. */
+  function destroy(scope) {
+    if (!scope || (scope.nodeType !== 1 && scope.nodeType !== 9)) return;
+    for (var i = instancias.length - 1; i >= 0; i -= 1) {
+      var entrada = instancias[i];
+      if (scope === entrada.root || (scope.contains && scope.contains(entrada.root))) {
+        entrada.desmontar();
+        instancias.splice(i, 1);
+      }
+    }
+  }
+
   window.CV = window.CV || {};
   window.CV.datePicker = {
     init: init,
     boot: boot,
   };
   if (typeof window.CV.registerEnhancer === 'function') {
-    window.CV.registerEnhancer('datePicker', init);
+    window.CV.registerEnhancer('datePicker', init, destroy);
   } else if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
   } else {

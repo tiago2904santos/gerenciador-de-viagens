@@ -58,9 +58,9 @@
     if (!select) return;
     if (select.dataset.entityPickerReady === "true") {
       delete select.dataset.entityPickerReady;
-      var nextEl = select.nextElementSibling;
-      if (nextEl && nextEl.classList && nextEl.classList.contains("cv-search-picker")) {
-        nextEl.parentNode.removeChild(nextEl);
+      var rendered = window.CV.picker.rootFor(select);
+      if (rendered && rendered !== select) {
+        rendered.parentNode.removeChild(rendered);
       }
     }
   }
