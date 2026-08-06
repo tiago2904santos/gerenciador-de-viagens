@@ -333,13 +333,6 @@ document.documentElement.dataset.appReady = "true";
     register: register,
     registered: function () { return Array.from(enhancers.keys()); },
   };
-  window.CV.componentRegistry = {
-    destroy: destroy,
-    enhance: enhance,
-    register: register,
-    registered: function () { return Array.from(enhancers.keys()); },
-  };
-
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once: true });
   else start();
 }());
@@ -1559,6 +1552,10 @@ document.documentElement.dataset.appReady = "true";
   }
 
   var MaskEngine = {
+    /* JS-11 — exportado porque tres consumidores reimplementavam esta funcao:
+       era a unica de masks.js sem saida publica, ja que `format` so alcanca
+       os formatadores nomeados no dict `formatters`. */
+    onlyDigits: onlyDigits,
     scan: scan,
     apply: apply,
     format: format,

@@ -1,7 +1,5 @@
 (function () {
-  function onlyDigits(value) {
-    return (value || "").replace(/\D/g, "");
-  }
+  const onlyDigits = window.CV.masks.onlyDigits;
 
   function resolveYear(wrapper, hidden) {
     const raw =

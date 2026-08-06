@@ -137,6 +137,7 @@ CSS_RULES_AVISO = [
 
 JS_HTTP_OWNER = "static/js/core/http.js"
 JS_UTIL_OWNER = "static/js/core/app.js"
+JS_MASKS_OWNER = "static/js/components/masks.js"
 
 # JS-05 — exceções de JavaScript, com TETO por arquivo.
 #
@@ -255,6 +256,20 @@ JS_RULES_ERRO = [
         re.compile(r"(?<![\w.])(?:window\.)?(?:alert|confirm)\s*\("),
         "Feedback nativo — usar CV.feedback",
         None,
+    ),
+    # JS-11 — a duplicação aconteceu porque `onlyDigits` não tinha saída
+    # pública em `masks.js`; agora tem, e estas duas regras impedem a volta.
+    (
+        "duplicated_only_digits",
+        re.compile(r"\b(?:function\s+onlyDigits\s*\(|(?:const|let|var)\s+onlyDigits\s*=\s*function)"),
+        "Implementação local de onlyDigits — usar CV.masks.onlyDigits",
+        JS_MASKS_OWNER,
+    ),
+    (
+        "duplicated_mask_cep",
+        re.compile(r"\b(?:function\s+maskCep\s*\(|(?:const|let|var)\s+maskCep\s*=\s*function)"),
+        "Máscara de CEP local — usar CV.masks.format(valor, 'cep')",
+        JS_MASKS_OWNER,
     ),
 ]
 
