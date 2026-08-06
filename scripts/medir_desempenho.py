@@ -392,6 +392,7 @@ class Semeador:
         )
 
     def semear_planos(self):
+        from planos_trabalho.models import PlanoDestino
         from planos_trabalho.models import PlanoTrabalho
         from planos_trabalho.models import ProgramaSolicitante
 
@@ -399,7 +400,7 @@ class Semeador:
             [ProgramaSolicitante(nome=f"Programa {i}") for i in range(5)]
         )
         areas = _fatiar_por_area(self.volume, self.areas)
-        PlanoTrabalho.objects.bulk_create(
+        planos = PlanoTrabalho.objects.bulk_create(
             [
                 PlanoTrabalho(
                     area=areas[i],
@@ -416,6 +417,24 @@ class Semeador:
                     coordenador_op=self._servidor(i + 1),
                 )
                 for i in range(self.volume)
+            ]
+        )
+        # `PlanoTrabalho.destino_display` (`planos_trabalho/models.py:439`) tem um
+        # ramo que lê o cache de prefetch e outro que consulta. Sem nenhum
+        # `PlanoDestino` semeado, os dois ramos devolviam vazio e a régua não
+        # media diferença entre eles. Dois por plano, mais um amarrado a evento,
+        # porque a propriedade filtra `evento_id is None` — se o filtro sumir, o
+        # texto muda e agora dá para perceber.
+        PlanoDestino.objects.bulk_create(
+            [
+                PlanoDestino(
+                    plano=plano,
+                    estado=self._estado(i + d),
+                    cidade=self._cidade(i + d),
+                    ordem=d,
+                )
+                for i, plano in enumerate(planos)
+                for d in range(2)
             ]
         )
 
@@ -447,10 +466,18 @@ class Semeador:
                 for s in range(3)
             ]
         )
+        # Quatro destinos por OS, não um. `OrdemServico.destinos_display`
+        # (`ordens_servico/models.py:183`) mostra os **três primeiros** por nome e
+        # resume o resto: com um destino só, o corte `[:3]` e a ordenação nunca
+        # eram exercitados, e a régua media um caminho que produção não usa.
+        # Achado pela verificação adversarial do `NOVO-08`.
         OrdemServico.destinos.through.objects.bulk_create(
             [
-                OrdemServico.destinos.through(ordemservico_id=ordem.pk, cidade_id=self._cidade(i).pk)
+                OrdemServico.destinos.through(
+                    ordemservico_id=ordem.pk, cidade_id=self._cidade(i + d).pk
+                )
                 for i, ordem in enumerate(ordens)
+                for d in range(4)
             ]
         )
 

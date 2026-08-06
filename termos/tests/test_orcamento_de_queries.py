@@ -97,8 +97,15 @@ class OrcamentoDeQueriesTermoTests(TestCase):
     # 54 -> 55: a lista ganhou as abas "Com equipe"/"Sem equipe", e a contagem
     # das duas custa 1 query (agregacao condicional unica sobre a mesma base,
     # nao dois .count()). Ver termos.views.index.
-    QUERIES_LISTA = 55
-    QUERIES_LISTA_BUSCA = 55
+
+    # `NOVO-08` (06/08/2026): a catraca desceu 55 -> 11 na lista e 28 -> 26 na
+    # edição. Três causas, todas por linha da página e nenhuma por tamanho do
+    # banco: `servidores_efetivos()` clonava o related manager e descartava o
+    # cache do prefetch (2 consultas por termo), e `termo_cadastro_assinado_info`
+    # buscava o artefato assinado uma vez por linha (1 por termo). Medido pela
+    # régua do `PF-07` no volume 200: `/termos/` foi de 55 para 11.
+    QUERIES_LISTA = 11
+    QUERIES_LISTA_BUSCA = 11
     # 21 -> 28 na edicao. Duas causas separadas, e so uma era defeito:
     #  (a) N+1 REAL, corrigido: `termo_cadastro_assinado_info` consultava
     #      DocumentoArtefato uma vez por servidor. Agora e uma query so, via
@@ -109,10 +116,14 @@ class OrcamentoDeQueriesTermoTests(TestCase):
     #      por request. Nao escala com dados; fica registrado como NOVO-27.
     # Se este numero subir de novo, comece por (a): e o que volta sozinho.
     #
-    # 28 -> 26 (`NOVO-07`): sairam as duas varreduras da tabela de oficios que a
+    # 26 -> 24 (`NOVO-07`): sairam as duas varreduras da tabela de oficios que a
     # tela fazia sem precisar. Uma montava o `json_script` com a area inteira; a
     # outra era a renderizacao do `<select>`, um `<option>` por oficio. As duas
     # cresciam com o banco e nenhuma aparecia na contagem, porque contagem de
     # query nao mede quantas linhas cada uma traz. Agora o campo renderiza so o
     # que esta selecionado — aqui, nada — e o resto vem de `api_buscar_oficios`.
-    QUERIES_EDITAR = 26
+    #
+    # O 26 aqui e o do `NOVO-08`, nao o 28 antigo: os dois IDs baixaram esta
+    # mesma catraca por motivos diferentes e o merge tinha de somar as duas
+    # quedas, nao repetir uma. Este numero e medido depois do merge.
+    QUERIES_EDITAR = 24

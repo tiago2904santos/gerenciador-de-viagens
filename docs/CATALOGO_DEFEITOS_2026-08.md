@@ -1474,7 +1474,8 @@ busca sob demanda, como os outros seletores do sistema já fazem.
 > | depois | 142,1 KB | **142,5 KB** |
 >
 > A diferença entre os dois volumes era 27×; agora é 0,3%. Consultas da rota: 17 → **10**. Teto do
-> formulário de termo: 28 → **26** consultas.
+> formulário de termo: 26 → **24** consultas — medido depois do `NOVO-08` entrar no `main`, que
+> já havia baixado a mesma catraca de 28 para 26 por outro motivo. As duas quedas somam.
 >
 > **O plano errou uma coisa e o navegador pegou:** ele mandava ligar o modo remoto em
 > `components/picker.js`. Nenhum dos três seletores de ofício é um `picker.js` — os três são
@@ -1491,7 +1492,7 @@ busca sob demanda, como os outros seletores do sistema já fazem.
 > a mesma doença, mas é um `<select>` nativo — resolver exige trocar o controle por um seletor de
 > busca, o que é mudança de interface.
 
-### NOVO-08 🟠 N+1 por linha em três listas: 296, 138 e 55 consultas · MED · 2–3 d
+### NOVO-08 ✅ RESOLVIDO · 🟠 N+1 por linha em três listas: 296, 138 e 55 consultas · MED · 2–3 d
 
 Medido pela régua do `PF-07`, **igual nos dois volumes** — é por linha da página, não por tamanho do
 banco:
@@ -1507,6 +1508,48 @@ banco:
 
 **Não estava visível na linha de base** porque a linha de base mediu com o banco vazio — é
 exatamente o buraco que o `PF-07` existiu para tapar.
+
+> **Corrigido em 06/08.** Medido pela régua do `PF-07`, volume 200 (a contagem é igual nos dois
+> volumes — é por linha da página, não por tamanho do banco):
+>
+> | rota | antes | depois |
+> |---|---:|---:|
+> | `eventos:index` | 296 | **34** |
+> | `prestacoes_contas:index` | 138 | **20** |
+> | `termos:index` | 55 | **11** |
+>
+> **eventos (−262):** o `prefetch_related` cru dos trechos não trazia nenhum dos quatro FKs de
+> cidade/estado que o card lê (−160); o caminho `destinos__cidade__estado` trazia o estado *da
+> cidade*, mas o presenter lê `d.estado`, o FK do próprio destino (−40); `justificativa` é
+> OneToOne reverso lido por ofício (−20); `PlanoTrabalho.destino_display` e
+> `OrdemServico.destinos_display` caíam no ramo que consulta porque o prefetch não existia
+> (−20 cada). O `order_by("nome")` no `Prefetch` dos destinos da OS é carga útil: a propriedade
+> mostra os três primeiros, e sem ele apareceriam outros três.
+>
+> **prestações (−118):** `_destino_display_oficio` percorria `roteiro.destinos.all()` por card e
+> tocava `d.cidade` e `d.estado` de cada um (−99 líquidas); `get_configuracao_sistema()` era
+> chamado dentro de cada card, e a configuração é por área — igual para os 20 (−19). O `Prefetch`
+> ficou na forma exata do selector irmão (`oficios/selectors.py:72-75`), que alimenta o **mesmo**
+> presenter.
+>
+> **termos (−44):** `servidores_efetivos()` clonava o related manager e **descartava** o cache do
+> prefetch, então a consulta do prefetch era 100% desperdiçada e cada linha pagava duas (−30); e
+> `termo_cadastro_assinado_info` buscava o artefato assinado uma vez por linha (−14). O
+> `mapa_..._em_lote` é irmão do `mapa_artefatos_pdf_termo_cadastro` que já existia por termo.
+> **Confirma parcialmente o ciclo de julho:** o "54 por página" era real, mas a causa apontada
+> (`termo_cadastro_assinado_info`) era um terço do problema, não o todo.
+>
+> **Catracas:** `termos` 55→11 e 28→26, `eventos` (detalhe) 78→77, e os tetos da régua para as
+> três rotas. `prestacoes_contas` não tinha **nenhum** `assertNumQueries` — ganhou
+> `test_orcamento_de_queries.py` com duas asserções: o número exato e, mais importante, que
+> **dobrar as linhas não muda a contagem** — a propriedade que define "não é N+1" e que sobrevive
+> a alguém atualizar a constante sem pensar. Provada mordendo: sem o `Prefetch`, 34≠20 e o custo
+> sobe de 34 para 49 ao dobrar.
+>
+> **Achado sobre a própria régua, e corrigido junto:** o semeador dava **um** destino por OS e
+> **zero** `PlanoDestino`. O corte `[:3]` de `destinos_display` e o ramo ciente de prefetch de
+> `destino_display` nunca eram exercitados — a régua media um caminho que produção não usa. Isso
+> subiu oito tetos (ver o corpo do PR), todos por medir mais dado, nenhum por regressão.
 
 ### NOVO-09 🟠 Modelo de justificativa é global e o "padrão" de uma área derruba o das outras · DB · 1,5 d
 

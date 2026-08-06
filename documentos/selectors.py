@@ -61,3 +61,25 @@ def mapa_artefatos_pdf_termo_cadastro(termo_id: int) -> dict[int | None, Documen
     for artefato in artefatos:
         mapa.setdefault(artefato.servidor_id, artefato)
     return mapa
+
+
+def mapa_artefatos_pdf_termo_cadastro_em_lote(
+    termo_ids,
+) -> dict[int, dict[int | None, DocumentoArtefato]]:
+    """O mapa acima para vários termos de uma vez — UMA query para a página inteira.
+
+    A lista de Termos chamava a versão unitária uma vez por linha, então o custo
+    crescia com o tamanho da página e não com o do banco (`NOVO-08`). A chave
+    externa é `termo_id`; a interna é a mesma da versão unitária.
+    """
+    mapa: dict[int, dict[int | None, DocumentoArtefato]] = {}
+    if not termo_ids:
+        return mapa
+    artefatos = DocumentoArtefato.objects.filter(
+        termo_id__in=list(termo_ids),
+        tipo=DocumentoTipo.TERMO_AUTORIZACAO.value,
+        formato="pdf",
+    ).order_by("-criado_em")
+    for artefato in artefatos:
+        mapa.setdefault(artefato.termo_id, {}).setdefault(artefato.servidor_id, artefato)
+    return mapa

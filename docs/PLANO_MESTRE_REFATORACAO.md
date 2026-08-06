@@ -184,8 +184,8 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 ### Fase 1 — Réguas e rede de segurança
 - [x] `PF-07` `scripts/medir_desempenho.py` com dois volumes, no CI — achou `NOVO-06`
       (vazamento entre áreas, **fechado**), `NOVO-07` (15 MB de HTML, **fechado**) e `NOVO-08`
-      (N+1 de 296, 138 e 55, **fechado**). Os três saíram da régua; nenhum aparecia na linha de
-      base, que mediu com o banco vazio.
+      (N+1 de 296, 138 e 55, **fechado**: 34, 20 e 11). Os três saíram da régua; nenhum aparecia
+      na linha de base, que mediu com o banco vazio.
 - [x] `NOVO-07` seletor de ofício sob demanda nas três telas — `justificativas:index` de
       **5.398 KB para 142,5 KB** com 20.000 ofícios, e a diferença entre os dois volumes caiu de
       27× para 0,3%: a página parou de crescer com a tabela. Tetos da régua baixados.
