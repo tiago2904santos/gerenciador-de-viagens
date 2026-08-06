@@ -110,7 +110,8 @@
     const freeTextMsg    = select.dataset.pickerFreeTextMessage || "Pressione Enter para confirmar este nome.";
     const forceUppercase = select.dataset.pickerUppercase === "true";
     const isError        = select.dataset.pickerError         === "true";
-    const listboxId    = `${select.id || select.name || "cv-picker"}-results`;
+    const baseId       = select.id || select.name || `cv-picker-${renderers.length}-${document.querySelectorAll(".cv-search-picker").length}`;
+    const listboxId    = `${baseId}-results`;
     const initialValue = (select.dataset.pickerInitialValue || "").trim();
 
     if (initialValue && !select.value) {
@@ -169,6 +170,44 @@
     input.setAttribute("aria-expanded", "false");
     input.setAttribute("aria-controls", listboxId);
     input.setAttribute("aria-autocomplete", "list");
+
+    /* HT-11 — o input criado aqui nao tinha nome acessivel.
+
+       O `<div class="cv-search-picker__label">` logo abaixo *parece* rotulo,
+       mas `<div>` nao rotula nada: sem `aria-labelledby` ele e so texto ao
+       lado. E o `<label for>` que o Django emite aponta para o `<select>`
+       original, que esta em `display:none` — fora da arvore de acessibilidade.
+       Resultado medido no navegador: 1 campo sem nome em
+       `/cadastros/servidores/novo/` e 4 em `/termos/novo/`.
+
+       Tres fontes, nesta ordem, e a primeira que existir vence:
+         1. o rotulo que o proprio picker desenha (`data-picker-label`);
+         2. o `<label for>` da tela — `field.html` agora o mantem como
+            `.sr-only` justamente para este caso;
+         3. o `placeholder`, que e melhor que nada e nunca falta. */
+    const rotulos = [];
+    if (labelEl) {
+      labelEl.id = labelEl.id || `${baseId}-label`;
+      rotulos.push(labelEl.id);
+    } else if (select.id) {
+      const externo = document.querySelector(`label[for="${CSS.escape(select.id)}"]`);
+      if (externo) {
+        externo.id = externo.id || `${baseId}-label`;
+        rotulos.push(externo.id);
+      }
+    }
+    if (rotulos.length) {
+      input.setAttribute("aria-labelledby", rotulos.join(" "));
+    } else if (placeholder) {
+      input.setAttribute("aria-label", placeholder);
+    }
+
+    /* A dica tambem era so texto ao lado. Descricao, nao nome: entra por
+       `aria-describedby`, para ser lida depois do rotulo e nao no lugar dele. */
+    if (hintEl) {
+      hintEl.id = hintEl.id || `${baseId}-hint`;
+      input.setAttribute("aria-describedby", hintEl.id);
+    }
 
     clearBtn.type = "button";
     clearBtn.setAttribute("aria-label", "Limpar busca");

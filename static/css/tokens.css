@@ -29,6 +29,13 @@
   /* Halo de foco. Era usado sem estar definido, entao .cv-data-table-shell
      ficava sem anel de foco visivel (D-06). */
   --color-focus-ring: rgba(21, 91, 154, 0.22);
+  /* HT-01: o anel de :focus-visible, opaco e com contraste medido. Token
+     proprio, e nao `--color-focus`, porque aquele e redefinido dentro de
+     `roteiros.css:3292` como a cor da borda — um componente nao pode apagar o
+     indicador de foco por acidente. Medido contra o que fica ao lado dele:
+     6,53:1 na pagina, 7,01:1 no card, 5,02:1 na borda do campo (WCAG 2.4.11
+     pede 3:1). */
+  --color-focus-visible-ring: #155b9a;
   --color-secondary: #155b9a;
   --color-secondary-hover: #0f477a;
   --color-secondary-soft: #e3f0fb;

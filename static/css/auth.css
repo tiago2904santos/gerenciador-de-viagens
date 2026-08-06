@@ -205,8 +205,62 @@
   width: 100%;
 }
 
-.auth-field-input:focus,
-.auth-field-input:focus-visible {
+/* HT-01: estes sao os campos de usuario e senha do **login** — a primeira tela
+   de qualquer pessoa, e o arquivo inteiro nao tinha regra alternativa. Mesmo
+   criterio dos demais: o mouse segue sem anel, o teclado passa a ter. */
+/* HT-01 — o piso de foco tambem aqui, e nao so em `base.css`.
+
+   Medido no navegador: no login o anel nao aparecia mesmo depois da correcao
+   em `base.css`, porque **esta tela nao carrega `base.css`**. Ela nao estende
+   `base.html` e traz so quatro folhas (`tokens`, `theme`, `03-theme-dark`,
+   `auth`). Era justamente a tela que o `HT-01` destacava — "comecando pelo
+   login" — e teria passado no PR se eu tivesse confiado na leitura do CSS em
+   vez de abrir o navegador.
+
+   Sai junto com o bloco do skip link no dia em que o login estender o casco. */
+:is(
+  input,
+  select,
+  textarea,
+  button,
+  a[href],
+  [tabindex]:not([tabindex="-1"])
+):focus-visible {
+  outline: 1px solid var(--color-focus-visible-ring) !important;
+  outline-offset: 2px !important;
+}
+
+/* HT-09 — o skip link do login.
+
+   O `.cv-skip-link` canonico mora em `components/app-shell.css`, que so entra
+   pelo bundle do casco. Esta tela nao estende `base.html` e carrega so quatro
+   folhas, entao a classe chegaria **sem estilo**: o link ficaria visivel no
+   canto, atravessado no layout. As propriedades sao as mesmas de
+   `app-shell.css:3-15`; o dia em que o login passar a estender `base.html`,
+   este bloco sai junto.
+
+   A cor vem dos tokens de auth para o link nao sumir contra o fundo escuro
+   desta tela, que e proprio dela. */
+.cv-skip-link {
+  background: var(--auth-card, var(--color-card));
+  border: 1px solid var(--auth-border, var(--color-border));
+  border-radius: var(--radius-md, 8px);
+  color: var(--auth-heading, var(--color-heading));
+  left: 16px;
+  padding: 10px 14px;
+  position: fixed;
+  text-decoration: none;
+  top: 12px;
+  transform: translateY(-160%);
+  transition: transform 120ms ease;
+  z-index: 1010;
+}
+
+.cv-skip-link:focus {
+  transform: translateY(0);
+}
+
+.auth-field-input:focus:not(:focus-visible) {
   outline: none;
 }
 

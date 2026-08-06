@@ -983,8 +983,10 @@ html[data-theme="dark"] input[type="checkbox"] {
     box-shadow var(--transition-fast);
 }
 
-.main-form-panel .form-control:focus,
-.main-form-panel .form-control:focus-visible {
+/* HT-01: `outline: none` sem substituto, em `.form-control` que aparece em 21
+   templates. O `:focus` fica (mouse continua sem chrome, que era a intencao);
+   o `:focus-visible` sai, e quem manda nele agora e o piso em `base.css`. */
+.main-form-panel .form-control:focus:not(:focus-visible) {
   outline: none;
 }
 

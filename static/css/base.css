@@ -46,9 +46,13 @@ textarea {
   font: inherit;
 }
 
+/* HT-01: era `rgba(37, 99, 168, 0.45)` fixo. Medido no tema escuro contra o
+   fundo do campo: 2,64:1 — reprova os 3:1 da WCAG 2.4.11, e isso *antes* de
+   compor o alfa de 0.45, que deixa pior ainda. O token troca de cor com o
+   tema; o valor fixo nao trocava. */
 button:focus-visible,
 a:focus-visible {
-  outline: 2px solid rgba(37, 99, 168, 0.45);
+  outline: 1px solid var(--color-focus-visible-ring);
   outline-offset: 2px;
 }
 
@@ -77,14 +81,48 @@ textarea::placeholder {
   opacity: 1;
 }
 
-/* Campos: sem chrome de hover/focus (temporário). */
-input:focus,
-input:focus-visible,
-select:focus,
-select:focus-visible,
-textarea:focus,
-textarea:focus-visible {
-  outline: none;
+/* HT-01 — piso de foco visivel. Substitui `outline: none` que estava aqui com
+   o comentario "temporário" e sem nada no lugar: quem navega por teclado nao
+   via em qual campo estava, em formulario nenhum, comecando pelo login.
+   Falha WCAG 2.4.7 (AA).
+
+   Tres decisoes que valem explicacao, porque nenhuma e obvia:
+
+   1. **`outline`, e nao `box-shadow`.** Os dois blocos que apagam o foco com
+      `!important` (`roteiros.css:1030` e `theme-dark-components.css:900`)
+      zeram `box-shadow` e `border-color` — e **nao** mexem em `outline`. Um
+      anel de `outline` passa por cima deles sem briga de especificidade. De
+      quebra, `outline` nao ocupa espaco no layout.
+
+   2. **`!important`.** Uma varredura declaracao a declaracao achou **52**
+      blocos que apagam o foco de campo sem por nada no lugar — nao os 3 que o
+      catalogo nomeava. Corrigir 52 blocos daria um diff enorme, tocaria em
+      `dev/ui-lab` e ainda deixaria o 53 nascer amanha. Indicador de foco e
+      **piso de acessibilidade**: nenhum componente deveria poder remove-lo, e
+      e exatamente isso que `!important` diz aqui. O gate novo em
+      `audit_frontend_standards.py` impede que a conta volte a crescer.
+
+   3. **`outline-offset: 2px`.** No tema escuro o anel ambar da 2,07:1 contra a
+      borda do campo — reprovaria colado nela. Com o afastamento, quem fica ao
+      lado do anel e o fundo (7,76:1). O offset e requisito de contraste.
+
+   `:focus-visible` e nao `:focus`: quem clica com o mouse continua sem anel,
+   que era a intencao do estilo original. */
+:is(
+  input,
+  select,
+  textarea,
+  button,
+  summary,
+  a[href],
+  [tabindex]:not([tabindex="-1"]),
+  .cv-field__control,
+  .form-control,
+  .cv-search-picker__input,
+  .cv-custom-select__trigger
+):focus-visible {
+  outline: 1px solid var(--color-focus-visible-ring) !important;
+  outline-offset: 2px !important;
 }
 
 input:disabled,
