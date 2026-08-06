@@ -2165,29 +2165,41 @@ sim um vazamento de estado global entre testes.
 
 ---
 
-### NOVO-18 ⚪ `NOVO` Oito arquivos JS com CRLF misto reescrevem o diff inteiro · QA · 0,5 d
+### NOVO-18 🟡 PARCIAL — `.js` fechado, resto na fase 9 · `NOVO` CRLF misto reescreve o diff inteiro · QA · 0,5 d
 
-> **Número corrigido em 06/08.** A primeira medição contou 2 arquivos porque olhou só os que a
-> etapa tinha tocado. Varrendo `static/js` inteiro (fora bundle e vendor): **8 com fim de linha
-> misto**, 6 com CRLF puro e 52 só com LF.
+> **Número corrigido duas vezes.** A primeira medição contou 2 arquivos porque olhou só os que a
+> etapa tinha tocado. A segunda, em 06/08, varreu `static/js` e achou 8 mistos + 6 CRLF puro. **A
+> terceira varreu o repositório inteiro: são 164 arquivos**, e o título "oito arquivos JS" estava
+> errado por uma ordem de grandeza.
 
-| arquivo | linhas CRLF / total |
+| extensão | arquivos com CRLF |
 |---|---|
-| `static/js/pages/oficios-transporte.js` | 603/617 |
-| `static/js/roteiros_wizard.js` | 373/395 |
-| `static/js/pages/configuracoes.js` | 149/153 |
-| `static/js/components/masks.js` | 137/159 |
-| `static/js/components/document-number-field.js` | 53/87 |
-| `static/js/core/theme-shared.js` | 52/60 |
-| `static/js/pages/oficios-dados-viajantes.js` | 45/96 |
-| `static/js/pages/roteiros/editor/mapa.js` | 20/25 |
+| `.py` | **101** — inclui `roteiros/services/diarias.py` e `roteiro_logic.py`, os dois CRLF puro |
+| `.md` | 21 |
+| `.html` | 18 |
+| `.js` | 14 |
+| `.css` | 7 |
+| outros | 3 (`requirements/base.txt`, um `.json` de screenshots, e um arquivo `tatus` de 195 linhas na raiz — lixo de um `git status` digitado torto, que é assunto do `BE-24`) |
 
 Qualquer ferramenta que reescreva o arquivo normaliza tudo e produz um diff de arquivo inteiro —
 302 e 1.206 linhas para uma troca de uma linha, o que enterra a mudança real na revisão. Aconteceu
-duas vezes (F1 e esta etapa) e as duas foram desfeitas editando byte a byte.
+duas vezes (F1 e a etapa do `JS-04`) e as duas foram desfeitas editando byte a byte.
 
-Vizinho do `BE-22` (10 arquivos `.py` com BOM), mesma família de higiene de repositório;
-**fila: fase 9**, junto dele.
+**Fechado o recorte `.js`:** os 14 arquivos de `static/js` normalizados para LF (2.630 linhas
+trocadas, e o diff é **mecanicamente idêntico** no conteúdo — só o byte de fim de linha muda),
+`.gitattributes` com `*.js text eol=lf`, e a rede em `core/tests/test_fim_de_linha_js.py`.
+Os bundles não mudaram: `build_shell_bundles.py` lê em modo texto e escreve com `newline="\n"`,
+então já normalizava na concatenação.
+
+**Por que só `.js`:** `.gitattributes` **sem** normalização não resolve nada — apenas adia o diff
+de arquivo inteiro para o próximo que tocar no arquivo. Regra e normalização andam juntas, então a
+regra cobre exatamente o que foi normalizado. Fazer os 164 de uma vez
+(`git add --renormalize .`) é o certo, mas **dá conflito em toda branch em voo**, e havia 10 PRs
+abertos e as fatias 5 e 6 do `BE-09` em andamento noutra sessão.
+
+**Resta a fase 9:** `.gitattributes` completo + `git add --renormalize .` nos outros 150, com a fila
+vazia. Vizinho do `BE-22` (10 arquivos `.py` com BOM) — mesma família, e o sweep dos `.py` deveria
+sair junto com ele.
 
 ---
 
