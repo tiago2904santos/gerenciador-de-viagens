@@ -1050,31 +1050,6 @@ html[data-theme="light"] {
   pointer-events: none;
 }
 
-/* Acoplado à direita de um input (sem borda esquerda, sem radius esquerdo) */
-.cv-field-action--attached {
-  border-left: 1px solid var(--cv-btn-neutral-border);
-  border-radius: 0 var(--cv-field-action-radius) var(--cv-field-action-radius) 0;
-  box-shadow: none;
-  align-self: stretch;
-  margin-left: -1px;
-}
-
-/* Variantes */
-
-/* Neutral — ação operacional genérica */
-.cv-field-action--neutral {
-  background: var(--cv-btn-neutral-bg);
-  border-color: var(--cv-btn-neutral-border);
-  color: var(--cv-btn-neutral-color);
-}
-
-.cv-field-action--neutral:hover,
-.cv-field-action--neutral:focus {
-  background: var(--cv-btn-neutral-hover-bg);
-  border-color: var(--cv-btn-neutral-hover-border);
-  color: var(--cv-btn-neutral-hover-color);
-}
-
 /* Clear — limpar filtro/campo (muito discreto) */
 .cv-field-action--clear {
   background: linear-gradient(180deg, var(--cv-btn-neutral-bg), var(--cv-btn-neutral-hover-bg));
@@ -1088,51 +1063,6 @@ html[data-theme="light"] {
   background: linear-gradient(180deg, var(--cv-btn-neutral-hover-bg), var(--cv-btn-neutral-bg));
   border-color: var(--cv-btn-neutral-hover-border);
   color: var(--cv-btn-neutral-hover-color);
-}
-
-/* Calculate — calcular (destaque azul sutil) */
-.cv-field-action--calculate {
-  background: var(--cv-btn-primary-bg);
-  border-color: var(--cv-btn-primary-border);
-  box-shadow: 0 6px 14px rgba(11, 58, 102, 0.16);
-  color: var(--cv-btn-primary-color);
-}
-
-.cv-field-action--calculate:hover,
-.cv-field-action--calculate:focus {
-  background: var(--cv-btn-primary-hover-bg);
-  border-color: var(--cv-btn-primary-hover-border);
-  color: var(--cv-btn-primary-color);
-}
-
-/* Manage — gerenciar select (ação moderada) */
-.cv-field-action--manage {
-  background: var(--cv-btn-secondary-bg);
-  border-color: var(--cv-btn-secondary-border);
-  color: var(--cv-btn-secondary-color);
-  font-weight: var(--font-weight-bold);
-  box-shadow: var(--shadow-xs);
-}
-
-.cv-field-action--manage:hover,
-.cv-field-action--manage:focus {
-  background: var(--cv-btn-secondary-hover-bg);
-  border-color: var(--cv-btn-secondary-hover-border);
-  color: var(--cv-btn-secondary-hover-color);
-}
-
-.cv-field-action--secondary {
-  background: var(--cv-btn-secondary-bg);
-  border-color: var(--cv-btn-secondary-border);
-  box-shadow: var(--shadow-xs);
-  color: var(--cv-btn-secondary-color);
-}
-
-.cv-field-action--secondary:hover,
-.cv-field-action--secondary:focus {
-  background: var(--cv-btn-secondary-hover-bg);
-  border-color: var(--cv-btn-secondary-hover-border);
-  color: var(--cv-btn-secondary-hover-color);
 }
 
 /* =========================================================
