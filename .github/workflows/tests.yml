@@ -74,7 +74,7 @@ jobs:
       - name: Block new frontend standards debt
         # Catraca: este número só desce. A Etapa 1 levou 465 → 449; a Etapa 7
         # levou 449 → 438 na fase 2 e 438 → 417 na fase 1.
-        run: python scripts/audit_frontend_standards.py --max-warnings 401
+        run: python scripts/audit_frontend_standards.py --max-warnings 387
 
       - name: Block new keyboard-focus suppression (HT-01)
         # Catraca: este numero so desce. 47 -> 44 no `HT-01`.
@@ -82,7 +82,7 @@ jobs:
         # sobraram, mas cada bloco novo e um lugar a mais onde alguem vai ter
         # de lembrar do piso — e o script nao conta o idioma correto
         # (`:focus:not(:focus-visible)`), so quem apaga o foco sem substituto.
-        run: python scripts/audit_foco_visivel.py --max 44
+        run: python scripts/audit_foco_visivel.py --max 42
 
       - name: Block backend architecture regressions (P-01, P-05)
         # Catraca: este número só desce. O P-01 fechou os quatro apps do
