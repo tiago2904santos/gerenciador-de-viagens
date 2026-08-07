@@ -159,13 +159,18 @@ def _servidor_row(ps, solicitacao_form=None, prestacao_anexos=None, diario_pdf_u
 
 
 def apresentar_prestacao_servidor_card(
-    ps, *, group_position="alone", solicitacao_form=None, configuracao=None
+    ps, *, group_position="alone", solicitacao_form=None, configuracao=None,
+    menus_sob_demanda=True,
 ):
     """Monta o card de um único servidor, com cabeçalho do ofício compartilhado.
 
     ``group_position``: ``alone`` | ``start`` | ``middle`` | ``end`` — usado para
     agrupar visualmente cards consecutivos do mesmo ofício.
     """
+    menus_src = (
+        reverse("prestacoes_contas:card_menus", args=[ps.pk]) if menus_sob_demanda else ""
+    )
+
     prestacao = ps.prestacao
     oficio = prestacao.oficio
     prestacao_anexos = list(prestacao.documentos_anexos.all())
@@ -327,6 +332,8 @@ def apresentar_prestacao_servidor_card(
         "finalizada": ps.finalizada,
         "arquivar_url": reverse("prestacoes_contas:prestacao_servidor_arquivar", args=[ps.pk]),
         "finalizar_url": reverse("prestacoes_contas:prestacao_servidor_finalizar", args=[ps.pk]),
+        # Os gatilhos de menu do `_prestacao_card_body.html` apontam para cá (PF-04).
+        "menus_url": menus_src,
         "servidores": [servidor],
         "servidores_count": 1,
         "equipe_count": equipe_count,

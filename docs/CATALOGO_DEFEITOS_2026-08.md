@@ -861,7 +861,7 @@ documento abre transação de escrita.
 **Decisão humana necessária:** desligar sem mais nada faz a sessão de 8 h expirar a partir do
 login, não da última ação. Alternativas: backend `cached_db` ou renovar só perto do fim.
 
-### PF-04 🟡 PARCIAL (Ofícios fechado) · 60 menus de ação renderizados para 20 cards · MED · 2–3 d · risco médio
+### PF-04 ✅ RESOLVIDO · 🟡 60 menus de ação renderizados para 20 cards · MED · 2–3 d · risco médio
 
 Mesma página: 60 blocos `cv-action-menu` (3 por card) e 200 `cv-action-menu__item` (10 por card),
 todos no HTML inicial, quando no máximo um fica aberto por vez.
@@ -928,8 +928,34 @@ compara contra esse caminho. A montagem foi para `termos/card_builder.py`, e os 
 `_preview_body.html`, que o enunciado contava entre os menus de `termos`, **não é da lista**: é do
 wizard de conferência. Três caixas numa página de formulário não são o defeito.
 
-**Falta um domínio:** `prestacoes_contas` (40 menus, todos escritos à mão, por servidor da prestação
-e sem `get_*_by_id`).
+**`prestacoes_contas` migrado em 07/08 — o `PF-04` está fechado:**
+
+| `prestacoes_contas:index` | antes | depois | |
+|---|---|---|---|
+| bruto | 383,1 KB | **259,0 KB** | −32% |
+| `gzip -6` | 17,4 KB | **14,3 KB** | −18% |
+| nós de elemento | 3.479 | **2.179** | −37% |
+
+Era o de maior risco e confirmou dois dos três: o domínio não tinha selector de registro único, e
+`PrestacaoServidor.objects` filtra removidos mas **não** recorta por área — quem recorta é
+`_filter_servidores_by_area`. `get_servidor_prestacao_by_id` nasceu reusando esse helper, e o teste
+de área fica vermelho se o endpoint trocar para o manager cru. O terceiro risco, o menu de WhatsApp
+com JS próprio, **não se confirmou**: `prestacoes-diaria-wa.js` já voltava do menu para o gatilho
+pelo `id`, porque o overlay sempre moveu o menu para o `<body>` ao abrir. Conferido no navegador nos
+dois temas.
+
+### Placar do `PF-04`, seis domínios
+
+| rota | antes | depois | nós |
+|---|---|---|---|
+| `oficios:index` | 315,3 KB | 166,5 KB | 3.636 → 1.676 |
+| `eventos:index` | 416,3 KB | 211,9 KB | 4.681 → 2.081 |
+| `termos:index` | 317,6 KB | 147,9 KB | 3.824 → 1.439 |
+| `prestacoes_contas:index` | 383,1 KB | 259,0 KB | 3.479 → 2.179 |
+| `planos_trabalho:index` | 169,5 KB | 129,0 KB | 1.996 → 1.416 |
+| `ordens_servico:index` | 166,8 KB | 126,7 KB | 1.931 → 1.351 |
+
+`roteiros` não entra: não tem menu.
 
 ### PF-05 🟡 A lista de Ofícios leva 127 ms no servidor · MED · —
 

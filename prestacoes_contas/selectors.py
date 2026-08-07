@@ -1,4 +1,5 @@
 from django.db.models import Prefetch
+from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
 from core.normalizers import remove_accents
@@ -72,6 +73,30 @@ def _filter_servidores_by_area(queryset):
     if area is None:
         return queryset.filter(prestacao__area__isnull=True)
     return queryset.filter(prestacao__area=area)
+
+
+def get_servidor_prestacao_by_id(pk):
+    """Um `PrestacaoServidor` da área ativa, ou 404 (`PF-04`).
+
+    Este domínio não tinha um selector de registro único — a lista sempre pediu
+    página inteira. O endpoint de menus precisa de um, e escrever o filtro de área
+    à mão aqui seria repetir a regra que o `BE-09` centralizou. Por isso reusa
+    `_filter_servidores_by_area`, o mesmo que `_base_servidores` usa: `objects`
+    aqui é `PrestacaoServidorAtivosManager`, que filtra removidos mas **não**
+    recorta por área.
+
+    O `select_related` acompanha o que o presenter do card toca, para o fragmento
+    não virar um festival de consultas — ver `NOVO-38`.
+    """
+    queryset = _filter_servidores_by_area(PrestacaoServidor.objects).select_related(
+        "servidor",
+        "servidor__cargo",
+        "servidor__unidade",
+        "prestacao",
+        "prestacao__oficio",
+        "prestacao__oficio__roteiro",
+    )
+    return get_object_or_404(queryset, pk=pk)
 
 
 def _base_servidores(

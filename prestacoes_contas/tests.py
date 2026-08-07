@@ -535,12 +535,29 @@ class PrestacaoAssinadoUploadTests(TestCase):
         )
 
     def test_lista_exibe_uploads_assinados_conforme_o_papel(self):
+        """O item de anexar assinados migrou para o menu sob demanda (`PF-04`).
+
+        O modal e o seletor de tipo continuam na lista — são um por página. O item
+        que os dispara é que passou a vir de `prestacoes_contas:card_menus`, um
+        fragmento por card, e é lá que este teste foi conferir.
+        """
         response = self.client.get(reverse("prestacoes_contas:index"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Anexar documentos assinados", count=2)
         self.assertNotContains(response, "Anexar RT assinado")
         self.assertNotContains(response, "Anexar diário assinado")
+
+        fragmentos = [
+            self.client.get(
+                reverse("prestacoes_contas:card_menus", args=[card["servidores"][0]["ps_pk"]])
+            )
+            for card in response.context["cards"]
+        ]
+        self.assertEqual(len(fragmentos), 2)
+        for fragmento in fragmentos:
+            self.assertContains(fragmento, "Anexar documentos assinados", count=1)
+            self.assertNotContains(fragmento, "Anexar RT assinado")
+            self.assertNotContains(fragmento, "Anexar diário assinado")
         # `H-03`: era medido pelo nome dos atributos ordinais
         # (`...-secondary-url`, `...-tertiary-option-label`). O contrato de
         # verdade é *quais* três documentos o menu do card oferece e com que
@@ -556,7 +573,8 @@ class PrestacaoAssinadoUploadTests(TestCase):
                     ("comprovante", "Comprovante"),
                 ],
             )
-        self.assertContains(response, "data-attach-signed-kinds", count=2)
+        for fragmento in fragmentos:
+            self.assertContains(fragmento, "data-attach-signed-kinds", count=1)
         self.assertContains(response, "data-attach-signed-kind-selector", count=1)
         self.assertContains(response, "Anexar despacho assinado", count=4)
         self.assertContains(response, "data-attach-signed-modal", count=1)

@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from .card_menu_views import card_menus
 from . import assinatura_views
 
 
@@ -65,6 +66,7 @@ urlpatterns = [
     path("servidor-prestacao/<int:ps_pk>/comprovante/autosave/", views.prestacao_servidor_arquivo_autosave, name="prestacao_servidor_arquivo_autosave"),
     path("prestacao/<int:pc_pk>/rt/", views.rt_criar, name="rt_criar"),
     path("rt/<int:pk>/autosave/", views.rt_autosave, name="rt_autosave"),
+    path("<int:pk>/menus/", card_menus, name="card_menus"),
     path(
         "servidor-prestacao/<int:ps_pk>/rt/autosave/",
         views.rt_servidor_autosave,
