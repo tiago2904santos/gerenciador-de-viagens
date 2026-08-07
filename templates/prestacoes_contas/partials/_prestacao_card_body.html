@@ -53,86 +53,9 @@
               aria-controls="prestacao-docs-menu-{{ servidor.ps_pk }}"
               data-overlay-trigger data-overlay-kind="menu"
               data-overlay-target="prestacao-docs-menu-{{ servidor.ps_pk }}"
+              data-overlay-src="{{ card.menus_url }}"
       >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
-      <div class="cv-action-menu cv-action-menu--documents"
-           id="prestacao-docs-menu-{{ servidor.ps_pk }}"
-           role="menu"
-           hidden>
-        <div class="cv-action-menu__heading">
-          <span class="cv-action-menu__heading-icon">
-            {% include "components/ui/icons/icon.html" with icon="download" only %}
-          </span>
-          <span>
-            <strong>Baixar documentos</strong>
-            <small>{{ servidor.name }}</small>
-          </span>
-        </div>
-        <a class="cv-action-menu__item cv-action-menu__item"
-           href="{{ servidor.rt_download_url }}"
-           download
-           role="menuitem">
-          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--pdf">
-            {% include "components/ui/icons/icon.html" with icon="pdf" only %}
-          </span>
-          <span><strong>Relatório técnico</strong><small>Salvar PDF individual</small></span>
-        </a>
-        {% if servidor.diario_pdf_url %}
-        <a class="cv-action-menu__item cv-action-menu__item"
-           href="{{ servidor.diario_pdf_url }}"
-           download
-           role="menuitem">
-          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--route">
-            {% include "components/ui/icons/icon.html" with icon="route" only %}
-          </span>
-          <span><strong>Diário de bordo</strong><small>Salvar PDF do diário</small></span>
-        </a>
-        {% else %}
-        <span class="cv-action-menu__item cv-action-menu__item is-disabled"
-              role="menuitem"
-              aria-disabled="true">
-          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--route">
-            {% include "components/ui/icons/icon.html" with icon="route" only %}
-          </span>
-          <span><strong>Diário de bordo</strong><small>Ainda não foi criado</small></span>
-        </span>
-        {% endif %}
-        {% comment %}
-          Eram 17 atributos ordinais no botão abaixo, e o `primary` deste gatilho
-          era o relatório técnico enquanto o `primary` da etapa Documentos era o
-          despacho — mesmo modal, mesmo nome, documento diferente (H-03). O
-          payload agora vem do presenter, com chave semântica.
-        {% endcomment %}
-        <button
-          type="button"
-          class="cv-action-menu__item cv-action-menu__item{% if servidor.rt_assinado.assinado or servidor.diario_assinado.assinado or servidor.comprovante_anexo.assinado %} is-assinado{% endif %}"
-          role="menuitem"
-          data-attach-signed-trigger
-          data-attach-signed-reopen-key="prestacao-servidor-{{ servidor.ps_pk }}"
-          data-attach-signed-accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg"
-          data-attach-signed-file-description="um arquivo em PDF, PNG ou JPEG"
-          data-attach-signed-file-help="Selecione um único arquivo em PDF, PNG, JPG ou JPEG."
-          data-attach-signed-choose-label="Escolher arquivo"
-          data-attach-signed-upload-label="Anexar arquivo"
-          data-attach-signed-kinds="{{ card.attach_kinds_json }}"
-        >
-          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
-            {% include "components/ui/icons/icon.html" with icon="sign" only %}
-          </span>
-          <span>
-            <strong>{% if servidor.rt_assinado.assinado or servidor.diario_assinado.assinado or servidor.comprovante_anexo.assinado %}Gerenciar documentos assinados{% else %}Anexar documentos assinados{% endif %}</strong>
-            <small>RT, diário ou comprovante</small>
-          </span>
-        </button>
-        <a class="cv-action-menu__item cv-action-menu__item"
-           href="{{ servidor.pacote_url }}"
-           download
-           role="menuitem">
-          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--package">
-            {% include "components/ui/icons/icon.html" with icon="folder" only %}
-          </span>
-          <span><strong>Anexo completo</strong><small>Salvar PDF consolidado</small></span>
-        </a>
-      </div>
+      
       <button type="button"
               class="cv-icon-btn cv-icon-btn--whatsapp"
               aria-label="Enviar aviso de liberação de diárias por WhatsApp"
@@ -142,6 +65,7 @@
               aria-controls="diaria-wa-menu-{{ servidor.ps_pk }}"
               data-overlay-trigger data-overlay-kind="menu"
               data-overlay-target="diaria-wa-menu-{{ servidor.ps_pk }}"
+              data-overlay-src="{{ card.menus_url }}"
               data-wa-phone="{{ servidor.whatsapp_phone }}"
               data-wa-oficio="{{ servidor.whatsapp_oficio }}"
               data-wa-unidade="{{ servidor.whatsapp_unidade }}"
@@ -149,35 +73,7 @@
               data-wa-servidor="{{ servidor.name }}"
               data-wa-diaria="{{ servidor.whatsapp_diaria }}"
       >{% include "components/ui/icons/icon.html" with icon="whatsapp-modern" only %}</button>
-      <div class="cv-action-menu cv-action-menu--whatsapp" id="diaria-wa-menu-{{ servidor.ps_pk }}" role="menu" hidden>
-        <div class="cv-action-menu__heading">
-          <span class="cv-action-menu__heading-icon cv-action-menu__heading-icon--wa">
-            {% include "components/ui/icons/icon.html" with icon="whatsapp-modern" only %}
-          </span>
-          <span>
-            <strong>Aviso de liberação</strong>
-            <small>Escolha como enviar</small>
-          </span>
-        </div>
-        <button type="button" class="cv-action-menu__item cv-action-menu__item cv-action-menu__item--wa" role="menuitem" data-diaria-wa-send data-wa-app="normal">
-          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--wa">
-            {% include "components/ui/icons/icon.html" with icon="whatsapp-modern" only %}
-          </span>
-          <span><strong>WhatsApp</strong><small>Abrir no aplicativo pessoal</small></span>
-        </button>
-        <button type="button" class="cv-action-menu__item cv-action-menu__item cv-action-menu__item--wa" role="menuitem" data-diaria-wa-send data-wa-app="business">
-          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--business">
-            {% include "components/ui/icons/icon.html" with icon="whatsapp-business" only %}
-          </span>
-          <span><strong>WhatsApp Business</strong><small>Abrir no aplicativo profissional</small></span>
-        </button>
-        <button type="button" class="cv-action-menu__item cv-action-menu__item" role="menuitem" data-diaria-wa-copy>
-          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--copy">
-            {% include "components/ui/icons/icon.html" with icon="copy-modern" only %}
-          </span>
-          <span><strong>Copiar mensagem</strong><small>Copiar o texto para a área de transferência</small></span>
-        </button>
-      </div>
+      
     </li>
     {% endfor %}
   </ul>

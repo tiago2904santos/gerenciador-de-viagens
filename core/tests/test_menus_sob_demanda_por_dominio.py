@@ -241,3 +241,67 @@ class TermosMenusTests(RedeDeMenusSobDemanda, TestCase):
         )
         termo.servidores.add(servidor)
         return termo
+
+
+class PrestacoesMenusTests(RedeDeMenusSobDemanda, TestCase):
+    """Prestações é o único domínio cujo card é por servidor, não por documento.
+
+    E o único com menu de JS próprio: `prestacoes-diaria-wa.js` volta do menu para
+    o gatilho pelo `id`, porque o overlay sempre moveu o menu para o `<body>` ao
+    abrir. Materializar sob demanda não muda isso — conferido no navegador.
+
+    O `PrestacaoServidor.objects` filtra removidos mas **não** recorta por área;
+    quem recorta é `_filter_servidores_by_area`. O teste de área é o que garante
+    que o endpoint usa o caminho certo.
+    """
+
+    rota_lista = "prestacoes_contas:index"
+    rota_menus = "prestacoes_contas:card_menus"
+    query_da_lista = ""
+
+    @staticmethod
+    def presenter(registro, **kwargs):
+        from prestacoes_contas.presenters import apresentar_prestacao_servidor_card
+
+        return apresentar_prestacao_servidor_card(registro, **kwargs)
+
+    def criar_registro(self, *, area=None):
+        from cadastros.models import Cargo
+        from cadastros.models import Servidor
+        from oficios.models import Oficio
+        from prestacoes_contas.models import PrestacaoContas
+        from prestacoes_contas.models import PrestacaoServidor
+
+        extra = {"area": area} if area is not None else {}
+        cargo = Cargo.all_objects.create(nome="Analista", **extra)
+        servidor = Servidor.all_objects.create(
+            nome="Servidor" if area is None else "Alheio",
+            cargo=cargo,
+            cpf="9876543210" + ("1" if area is None else "2"),
+            **extra,
+        )
+        oficio = Oficio.all_objects.create(
+            numero=1 if area is None else 99, ano=2026, **extra
+        )
+        # A prestação nasce por sinal junto do ofício — criar outra estoura a
+        # unicidade de `oficio_id`. Pega-se a que já existe.
+        prestacao, _ = PrestacaoContas.all_objects.get_or_create(
+            oficio=oficio, defaults=extra
+        )
+        return PrestacaoServidor.objects.create(prestacao=prestacao, servidor=servidor)
+
+    def test_paridade_de_acoes_com_o_caminho_embutido(self):
+        """Prestações não usa `footer.menus`: os dois menus são escritos à mão.
+
+        A paridade aqui é a do teste de correspondência de gatilho, que já cobre
+        as duas famílias. Sobrescrever é melhor que herdar um teste que afirmaria
+        `assertTrue(esperadas)` sobre um conjunto vazio e falharia por engano.
+        """
+        card = type(self).presenter(self.registro, menus_sob_demanda=False)
+        rodape = card.get("footer") or {}
+
+        self.assertEqual(
+            (rodape.get("menus") or []) + (rodape.get("danger_menus") or []),
+            [],
+            "o domínio ganhou menu de rodapé; a paridade precisa voltar a valer",
+        )

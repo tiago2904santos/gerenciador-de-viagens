@@ -64,11 +64,11 @@
     "prestacoes_contas:index": {
       "200": {
         "consultas": 20,
-        "kb_html": 402.3
+        "kb_html": 271.9
       },
       "20000": {
         "consultas": 20,
-        "kb_html": 490.7
+        "kb_html": 360.0
       }
     },
     "roteiros:index": {
