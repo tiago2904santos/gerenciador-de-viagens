@@ -711,11 +711,6 @@ html[data-theme="dark"] .cv-action-menu {
   padding: 24px;
 }
 
-.delete-confirm-modal__header {
-  gap: 13px;
-  padding-right: 38px;
-}
-
 .delete-confirm-modal__icon {
   background: var(--action-danger-bg);
   border-color: var(--action-danger-border);
@@ -777,12 +772,6 @@ html[data-theme="dark"] #attach-signed-modal .attach-signed-modal__dialog {
   background: var(--action-info-bg);
   border-color: var(--action-info-border);
   color: var(--action-info-text);
-}
-
-.attach-signed-modal__close {
-  position: absolute;
-  right: 18px;
-  top: 18px;
 }
 
 .attach-signed-modal__intro {

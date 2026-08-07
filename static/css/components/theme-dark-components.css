@@ -4,8 +4,6 @@
  * Extracted from dark-redesign.css (Etapa 7, Fase 6).
  */
 
-
-
 /* O passo atual é identificado pela combinação sólida de fundo e borda, sem
    anéis concêntricos que possam ser confundidos com um foco exagerado. */
 :is(html[data-theme="dark"])
@@ -288,7 +286,6 @@ html[data-theme="dark"] :is(input, select, textarea) {
   border: 1px solid var(--color-input-border);
   box-shadow: none;
 }
-
 
 /* Modal cancelar: textarea sem borda/hover/focus. */
 :is(html[data-theme="dark"])
@@ -2510,14 +2507,6 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   line-height: 1.45;
 }
 
-:is(html[data-theme="dark"])
-  .cv-resource-picker {
-  background: var(--color-input-bg);
-  border: 1px dashed color-mix(in srgb, var(--color-border) 78%, var(--color-muted) 22%);
-  border-radius: 12px;
-  padding: 12px;
-}
-
 /* Controles da ficha: superfícies sólidas, raios menores e nenhuma luz de
    foco. O número e o ano formam um único controle composto. */
 :is(html[data-theme="dark"])
@@ -2609,7 +2598,6 @@ html[data-theme="dark"] .cv-composite-field__control .form-control:focus-visible
   box-shadow: none !important;
   outline: none;
 }
-
 
 /* Multipicker de pessoas: uma lista operacional, não uma grade de cards. Cada
    pessoa usa toda a largura e mantém suas ações disponíveis no mouse, teclado
@@ -3804,15 +3792,6 @@ html[data-theme="dark"] :is(table, .table) {
   color: var(--color-text);
 }
 
-html[data-theme="dark"] :is(th, .table__head) {
-  background: var(--color-surface-muted);
-  color: var(--color-muted-strong);
-}
-
-html[data-theme="dark"] :is(tr, .list-row):hover {
-  background: var(--color-surface-soft);
-}
-
 html[data-theme="dark"] :is(.modal, .cv-modal__dialog, .drawer, [role="dialog"]) {
   background-color: var(--color-surface-strong);
   border-color: var(--color-border-strong);
@@ -4186,18 +4165,9 @@ html[data-theme="dark"] .empty-state__title {
   border-color: var(--color-accent);
 }
 
-.cv-skeleton {
-  animation: cv-skeleton-pulse 1.4s ease-in-out infinite;
-  background: linear-gradient(90deg, var(--color-surface-muted) 25%, var(--color-surface-soft) 50%, var(--color-surface-muted) 75%);
-  background-size: 200% 100%;
-  border-radius: var(--radius-control);
-  color: transparent;
-}
-
 @keyframes cv-skeleton-pulse {
   to { background-position: -200% 0; }
 }
-
 
 @media (max-width: 840px) {
   html[data-theme="dark"] .sidebar {
@@ -4539,7 +4509,6 @@ html[data-theme="dark"] .empty-state__title {
   padding: 0 12px;
 }
 
-
 :is(html[data-theme="dark"])
   .oficio-external-driver .cv-search-picker__input {
   background: transparent !important;
@@ -4695,61 +4664,6 @@ html[data-theme="dark"] *::after {
 :is(html[data-theme="dark"])
   .cv-summary-card .oficio-documentos-card__title {
   color: var(--color-heading);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-left-width: 1px;
-  border-radius: 14px;
-  box-shadow: var(--shadow-card);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card::before {
-  background: var(--color-accent);
-  border-radius: 0 0 4px 4px;
-  content: "";
-  height: 3px;
-  left: 18px;
-  position: absolute;
-  top: 0;
-  width: 42px;
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card:hover {
-  box-shadow: var(--shadow-panel);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__header {
-  background: var(--color-surface-muted);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__title {
-  color: var(--color-heading);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__subtitle,
-:is(html[data-theme="dark"])
-  .cv-document-card__body {
-  color: var(--color-muted-strong);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__meta {
-  background: var(--color-surface-soft);
-  border-color: var(--color-border);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__actions {
-  background: var(--color-surface-muted);
-  border-top: 1px solid var(--color-border);
 }
 
 /* Canonical PDF viewer: solid controls around a neutral document canvas. */
@@ -5189,34 +5103,6 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  .cv-operation-card {
-  display: grid;
-  gap: 0;
-  padding: 0;
-}
-
-:is(html[data-theme="dark"])
-  .cv-operation-card__body {
-  padding: clamp(20px, 3vw, 32px);
-}
-
-:is(html[data-theme="dark"])
-  .cv-operation-card__footer {
-  background: var(--color-surface);
-  border-top: 1px solid var(--color-border);
-  justify-content: flex-end;
-  padding: 16px clamp(20px, 3vw, 32px);
-}
-
-:is(html[data-theme="dark"])
-  .cv-operation-card__message {
-  color: var(--color-text);
-  font-size: var(--font-size-md);
-  line-height: 1.65;
-  margin: 0;
-}
-
-:is(html[data-theme="dark"])
   .cv-filter-header:not(.list-header) {
   background: var(--color-surface-strong);
   border-color: var(--color-border-strong);
@@ -5234,28 +5120,6 @@ html[data-theme="dark"] *::after {
   background: var(--color-surface);
   border-top-color: var(--color-border-strong);
   padding-top: 18px;
-}
-
-:is(html[data-theme="dark"])
-  .cv-filter-bar__search {
-  background: var(--color-input-bg);
-  border: 1px solid var(--color-input-border);
-  border-radius: var(--radius-control);
-}
-
-:is(html[data-theme="dark"])
-  .cv-filter-bar__search-input {
-  border-color: transparent;
-  box-shadow: none;
-}
-
-:is(html[data-theme="dark"])
-  .cv-filter-bar__search-input:focus,
-:is(html[data-theme="dark"])
-  .cv-filter-bar__search-input:focus-visible {
-  border-color: transparent;
-  box-shadow: none;
-  outline: none;
 }
 
 :is(html[data-theme="dark"])

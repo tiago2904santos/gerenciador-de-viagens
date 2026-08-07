@@ -848,14 +848,6 @@
   border-color: var(--danger-border);
 }
 
-.cv-search-picker__error-msg {
-  color: var(--danger-text);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  line-height: 1.45;
-  margin: calc(var(--space-2) * -1) 0 0;
-}
-
 .cv-search-picker--disabled {
   opacity: 1;
 }
@@ -928,8 +920,6 @@
     grid-row: 1 / span 2;
   }
 }
-
-
 
 .cv-search-picker--single.cv-search-picker--detailed .cv-search-picker__selected-card > .cv-search-picker__remove {
   margin: calc(var(--space-4) * -1) 0 calc(var(--space-4) * -1) calc(var(--space-5) * -1);

@@ -390,22 +390,6 @@ html[data-theme="dark"] {
   gap: var(--space-3);
 }
 
-.cluster--between {
-  justify-content: space-between;
-}
-
-.cluster--start {
-  align-items: flex-start;
-}
-
-/* Canonical content helpers. These replace one-off inline declarations in
-   shared templates while keeping page CSS focused on composition. */
-.cv-divider {
-  border: 0;
-  border-top: 1px solid var(--color-border-soft);
-  margin: var(--space-2) 0 0;
-}
-
 .cv-inline-form {
   display: inline;
   margin: 0;
@@ -424,40 +408,15 @@ html[data-theme="dark"] {
   margin-top: var(--space-3);
 }
 
-.cv-section-spaced {
-  margin-top: var(--space-5);
-}
-
 .cv-field--full-width {
   align-self: stretch;
   width: 100%;
-}
-
-.cv-demo-width--sm {
-  max-width: 320px;
-}
-
-.cv-demo-width--md {
-  max-width: 360px;
 }
 
 .cv-btn--icon-square {
   height: 36px;
   padding: 0;
   width: 36px;
-}
-
-.delete-confirm-copy {
-  margin: 0 0 var(--space-3);
-}
-
-.delete-confirm-preview__label {
-  margin: 0 0 var(--space-2);
-}
-
-.delete-confirm-preview__body {
-  color: var(--color-text-muted);
-  margin: 0 0 var(--space-4);
 }
 
 .document-preview-heading {
@@ -842,21 +801,6 @@ html[data-theme="light"] {
   --_cv-chip-glow: var(--cv-chip-filter-glow);
 }
 
-/* --------------------------------------------------------------------------
-   4. Data table canônica
-   -------------------------------------------------------------------------- */
-.cv-data-table-shell {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  max-width: 100%;
-  overflow-x: auto;
-}
-
-.cv-data-table-shell:focus-visible {
-  box-shadow: 0 0 0 3px var(--color-focus-ring);
-  outline: none;
-}
-
 .cv-data-table {
   border-collapse: collapse;
   min-width: 680px;
@@ -879,26 +823,6 @@ html[data-theme="light"] {
 
 .cv-data-table tbody tr:last-child td {
   border-bottom: 0;
-}
-
-.cv-data-table__title,
-.cv-data-table__detail {
-  display: block;
-}
-
-.cv-data-table__title {
-  color: var(--color-heading);
-}
-
-.cv-data-table__detail {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  margin-top: 2px;
-}
-
-.cv-data-table__actions {
-  text-align: right !important;
-  width: 1%;
 }
 
 @media (max-width: 600px) {
@@ -1567,26 +1491,6 @@ html[data-theme="light"] {
   pointer-events: none;
 }
 
-/* Alias legado para __marker */
-.page-stepper__number {
-  align-items:     center;
-  background:      var(--stepper-idle-bg);
-  border:          1px solid var(--stepper-idle-border);
-  border-radius:   var(--radius-pill);
-  color:           var(--stepper-idle-color);
-  display:         inline-flex;
-  flex-shrink:     0;
-  font-size:       var(--font-size-xs);
-  font-weight:     var(--font-weight-bold);
-  height:          var(--stepper-item-size);
-  justify-content: center;
-  transition:
-    background   var(--transition-base),
-    color        var(--transition-base),
-    border-color var(--transition-base);
-  width:           var(--stepper-item-size);
-}
-
 /* Bloco textual centralizado abaixo do marcador */
 .page-stepper__content {
   align-items:    center;
@@ -1762,10 +1666,6 @@ html[data-theme="light"] {
   margin:      0;
 }
 
-.footer-actions--primary-only .footer-actions__primary {
-  margin-left: auto;
-}
-
 /* Stepper legado como irmão do header — UI Lab / demos.
    Wizards de produção embutem o stepper no `.list-header--wizard` (NOVO-20). */
 .page-shell--wizard > .page-stepper,
@@ -1813,14 +1713,6 @@ html[data-theme="light"] {
 .main-form-panel .cv-search-picker,
 .main-form-panel .cv-custom-select,
 .main-form-panel .cv-field-with-action {
-  overflow: visible;
-}
-
-.main-form-panel--inline-create {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  gap: var(--space-4);
   overflow: visible;
 }
 
@@ -2133,15 +2025,6 @@ html[data-theme="light"] {
   min-width: 0;
 }
 
-.cv-form-section-header--standalone {
-  border: 1px solid var(--cv-form-section-border);
-  border-radius: var(--cv-form-section-radius);
-  box-shadow: var(--cv-form-section-shadow);
-  min-height: 0;
-  overflow: hidden;
-  padding-block: var(--space-4);
-}
-
 .cv-form-section-card--compact .cv-form-section-header {
   --_wizard-filete-width: 4px;
   min-height: 0;
@@ -2248,13 +2131,6 @@ html[data-theme="light"] {
 
 .form-section > .footer-actions {
   padding-inline: 0;
-}
-
-.footer-actions__secondary,
-.footer-actions__primary {
-  align-items: center;
-  display:     flex;
-  gap:         var(--footer-actions-gap);
 }
 
 .cv-floating-action {
@@ -2571,12 +2447,6 @@ body.has-delete-modal-open {
   width: 100%;
 }
 
-.delete-confirm-modal__header {
-  align-items: center;
-  display: flex;
-  gap: var(--space-3);
-}
-
 .delete-confirm-modal__icon {
   align-items: center;
   background: color-mix(in srgb, var(--color-danger) 18%, transparent);
@@ -2733,39 +2603,8 @@ body.has-delete-modal-open {
   width: 100%;
 }
 
-/* =========================================================
-   17. Quick Create Inline
-   Subvariação do List / Filters para mini-cadastros auxiliares.
-   Exibe-se abaixo da Filter Bar como extensão visual do painel.
-   Visível apenas quando .is-open.
-   Regra: botões ficam em .quick-create-actions, nunca no .field-grid.
-   ========================================================= */
-
-/* Painel: oculto por padrão, revelado via .is-open */
-.quick-create-panel {
-  background:    var(--surface-quick-create);
-  border-bottom: 1px solid var(--border-quick-create);
-  box-shadow:    var(--shadow-quick-create);
-  box-sizing:    border-box;
-  display:       none;
-  flex-direction: column;
-  width:         100%;
-}
-
 .quick-create-panel.is-open {
   display: flex;
-}
-
-/* Cabeçalho: título + botão de fechar */
-.quick-create-panel__header {
-  align-items:     center;
-  background:      var(--surface-quick-create-header);
-  border-bottom:   1px solid var(--border-quick-create);
-  box-sizing:      border-box;
-  display:         flex;
-  gap:             var(--space-3);
-  justify-content: space-between;
-  padding:         var(--space-2) var(--filter-bar-padding-x);
 }
 
 /* Field Grid dentro do Quick Create ocupa o espaço restante */
@@ -3062,24 +2901,6 @@ body.has-delete-modal-open {
   white-space:    nowrap;
 }
 
-.page-header-status-chip--draft {
-  background: var(--route-status-draft-bg);
-  border:     1px solid var(--route-status-draft-border);
-  color:      var(--route-status-draft-text);
-}
-
-.page-header-status-chip--active {
-  background: var(--route-status-final-bg);
-  border:     1px solid var(--route-status-final-border);
-  color:      var(--route-status-final-text);
-}
-
-.page-header-status-chip--pending {
-  background: var(--route-status-muted-bg);
-  border:     1px solid var(--route-status-muted-border);
-  color:      var(--route-status-muted-text);
-}
-
 /* Alerta inline simples (ex.: aviso de cancelamento) */
 .cv-alert {
   border-radius: var(--radius-md, 8px);
@@ -3173,13 +2994,6 @@ body.has-delete-modal-open {
 }
 
 .page-header-rail__stepper::-webkit-scrollbar { display: none; }
-
-/* Variações */
-.page-header-rail--filters,
-.page-header-rail--filters-inline-create {
-  flex-wrap: wrap;
-  gap:       var(--space-4);
-}
 
 .page-header-rail--stepper {
   flex-wrap: wrap;
@@ -3397,21 +3211,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   border-top-right-radius: 0;
 }
 
-/* =========================================================
-   25. Card List
-   Grade de cards com hover. Uso: roteiros, ofícios,
-   documentos e listas com mais informação visual.
-   ========================================================= */
-
-.card-list {
-  box-sizing:            border-box;
-  display:               grid;
-  gap:                   var(--space-4);
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  padding:               var(--space-4);
-  width:                 100%;
-}
-
 .list-card {
   background:     var(--surface-form-panel);
   border:         1px solid var(--border-form-panel);
@@ -3432,33 +3231,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   box-shadow:   var(--shadow-medium);
 }
 
-.list-card__title {
-  color:         var(--theme-text-heading);
-  font-size:     var(--font-size-sm);
-  font-weight:   var(--font-weight-bold);
-  margin:        0;
-  overflow:      hidden;
-  text-overflow: ellipsis;
-  white-space:   nowrap;
-}
-
-.list-card__body {
-  color:       var(--theme-text-muted);
-  flex:        1;
-  font-size:   var(--font-size-xs);
-  line-height: 1.5;
-}
-
-.list-card__footer {
-  align-items:     center;
-  border-top:      1px solid var(--border-subtle);
-  display:         flex;
-  gap:             var(--space-2);
-  justify-content: flex-end;
-  margin-top:      auto;
-  padding-top:     var(--space-3);
-}
-
 /* =========================================================
    26. Quick Add Inline
    Nome genérico para o padrão de cadastro rápido inline.
@@ -3471,89 +3243,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   display:        flex;
   flex-direction: column;
   width:          100%;
-}
-
-/* ─── Folder Tab — orelhinha de pasta física ─────────────── */
-
-/* Linha que contém a aba (não estica a aba) */
-.cv-inline-create__tab-row {
-  display: flex;
-  justify-content: flex-end;
-}
-
-/* Aba / gatilho de abertura — estilo pasta física */
-.cv-inline-create__tab {
-  width: var(--inline-create-tab-width);
-  height: var(--inline-create-tab-height);
-  padding-inline: var(--space-4);
-  border-radius: 0 0 var(--radius-md) 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-
-  background: var(--surface-filter-bar);
-  color: var(--text-primary);
-  font-weight: 700;
-  font-size: var(--font-size-sm);
-
-  border: 0;
-  cursor: pointer;
-
-  clip-path: var(--inline-create-tab-clip-path);
-}
-
-.cv-inline-create__tab:hover,
-.cv-inline-create__tab:focus-visible {
-  box-shadow: var(--inline-create-tab-shadow);
-  color:      var(--theme-text-heading);
-}
-
-.cv-inline-create__tab:hover .cv-inline-create__tab-icon {
-  background: var(--color-accent-hover, var(--color-accent));
-}
-
-.cv-inline-create__tab:focus-visible {
-  outline:        2px solid var(--border-focus);
-  outline-offset: -2px;
-}
-
-/* Aberta: aba conectada visivelmente ao painel */
-.cv-inline-create__tab[aria-expanded="true"] {
-  background: var(--surface-quick-create-header);
-  box-shadow: none;
-  color:      var(--theme-text-heading);
-}
-
-.cv-inline-create__tab[aria-expanded="true"] .cv-inline-create__tab-icon {
-  background: var(--color-accent);
-  transform:  rotate(45deg);
-}
-
-/* Ícone — círculo colorido com sinal + (gira 45° para virar ×) */
-.cv-inline-create__tab-icon {
-  align-items:     center;
-  background:      var(--color-inline-create-tab-icon-bg);
-  border-radius:   var(--radius-pill);
-  color:           var(--color-inline-create-tab-icon-fg);
-  display:         inline-flex;
-  flex-shrink:     0;
-  font-size:       var(--font-size-xs);
-  font-weight:     var(--font-weight-bold);
-  height:          var(--inline-create-tab-icon-size);
-  justify-content: center;
-  line-height:     1;
-  pointer-events:  none;
-  transition:
-    background  var(--transition-base),
-    transform   var(--transition-base);
-  width:           var(--inline-create-tab-icon-size);
-}
-
-/* Label do texto */
-.cv-inline-create__tab-label {
-  letter-spacing: inherit;
-  pointer-events: none;
 }
 
 /* Painel: visualmente unido à aba acima */
@@ -3570,46 +3259,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 .cv-inline-create.is-open > :not(.cv-inline-create__tab-row) {
   display: flex;
   flex-direction: column;
-}
-
-.cv-inline-create__header {
-  align-items:     center;
-  background:      var(--surface-quick-create-header);
-  border-bottom:   1px solid var(--border-quick-create);
-  box-sizing:      border-box;
-  display:         flex;
-  gap:             var(--space-3);
-  justify-content: space-between;
-  padding:         var(--space-2) var(--filter-bar-padding-x);
-}
-
-.cv-inline-create__title {
-  color:       var(--theme-text-heading);
-  font-size:   var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  margin:      0;
-}
-
-.cv-inline-create__close {
-  align-items:     center;
-  background:      transparent;
-  border:          none;
-  border-radius:   var(--radius-sm);
-  color:           var(--theme-text-muted);
-  cursor:          pointer;
-  display:         flex;
-  font-size:       var(--font-size-md);
-  height:          28px;
-  justify-content: center;
-  line-height:     1;
-  padding:         0;
-  transition:      color var(--transition-base), background var(--transition-base);
-  width:           28px;
-}
-
-.cv-inline-create__close:hover {
-  background: var(--border-quick-create);
-  color:      var(--theme-text-heading);
 }
 
 .cv-inline-create__body {
@@ -3641,20 +3290,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 
 .cv-inline-create__actions .btn-primary {
   border-color: var(--inline-create-primary-border);
-}
-
-/* =========================================================
-   27. Field Grid — Variantes com Colunagem Explícita
-   Complementam o .field-grid padrão de 4 colunas.
-   Usar quando a seção inteira precisa de colunagem diferente.
-   ========================================================= */
-
-/* Empilha várias grades (linhas) com o mesmo espaçamento entre campos */
-.field-grid-rows {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--field-grid-gap);
-  width:          100%;
 }
 
 /* 3 colunas: trios de campos — nome + CPF + telefone */
@@ -3776,96 +3411,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
     order: 3;
     width: 100%;
   }
-}
-
-/* =========================================================
-   29. Header Filter Bar
-   Barra de filtros usada dentro do page-header-rail.
-   Suporta busca textual, filtros e botões de ação.
-   ========================================================= */
-
-/* Contêiner principal */
-.header-filter-bar {
-  align-items: center;
-  display:     flex;
-  flex:        1;
-  flex-wrap:   wrap;
-  gap:         var(--space-2) var(--space-4);
-  min-width:   0;
-}
-
-/* Campo de busca (cresce para preencher espaço) */
-.header-filter-bar__search {
-  flex:      1;
-  min-width: var(--filter-search-min-width);
-}
-
-/* Botões de ação à direita */
-.header-filter-bar__actions {
-  align-items: center;
-  display:     flex;
-  flex-shrink: 0;
-  gap:         var(--space-2);
-}
-
-/* Variante avançada — busca sozinha na linha 1; campos + ações na linha 2 */
-.header-filter-bar--advanced {
-  align-items: flex-start;
-  flex-wrap:   wrap;
-}
-
-/* Busca: linha própria dentro da variante avançada */
-.header-filter-bar--advanced .header-filter-bar__search {
-  flex:      0 0 100%;
-  min-width: 0;
-}
-
-/* Row: linha 2 — campos de filtro + botão de ação na mesma linha */
-.header-filter-bar__row {
-  align-items: center;
-  display:     flex;
-  flex:        0 0 100%;
-  gap:         var(--space-2) var(--space-3);
-}
-
-/* Grupo de campos dentro do row */
-.header-filter-bar__fields {
-  align-items: center;
-  display:     flex;
-  flex:        1 1 auto;
-  flex-wrap:   wrap;
-  gap:         var(--space-2) var(--space-3);
-  min-width:   0;
-}
-
-/* Campo individual de filtro */
-.header-filter-field {
-  flex:      1 1 auto;
-  min-width: 120px;
-}
-
-/* Chips de filtros aplicados — linha própria abaixo de tudo */
-.header-applied-filters {
-  align-items: center;
-  display:     flex;
-  flex:        0 0 100%;
-  flex-wrap:   wrap;
-  gap:         var(--space-2);
-  padding-top: var(--space-1);
-}
-
-.header-applied-chip {
-  align-items:     center;
-  background:      var(--surface-filter-chip);
-  border:          1px solid var(--border-filter-chip);
-  border-radius:   var(--radius-pill, 999px);
-  color:           var(--color-filter-text);
-  cursor:          default;
-  display:         inline-flex;
-  font-size:       var(--font-size-xs);
-  gap:             var(--space-1);
-  padding:         2px var(--space-2);
-  white-space:     nowrap;
 }
 
 /* Input de texto / busca */
@@ -5234,73 +4779,9 @@ html[data-theme="light"] {
   --cv-field-action-radius: var(--cv-btn-control-radius);
 }
 
-.cv-field-action {
-  align-items: center;
-  background: var(--cv-btn-neutral-bg);
-  border: 1px solid var(--cv-btn-neutral-border);
-  border-radius: var(--cv-field-action-radius);
-  box-shadow: var(--shadow-xs);
-  box-sizing: border-box;
-  color: var(--cv-btn-neutral-color);
-  cursor: pointer;
-  display: inline-flex;
-  font-family: var(--font-sans);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  gap: var(--space-2);
-  justify-content: center;
-  height: var(--cv-btn-height);
-  min-height: var(--cv-btn-height);
-  padding: 0 var(--cv-btn-padding-x);
-  transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    color var(--transition-fast);
-  user-select: none;
-  white-space: nowrap;
-}
-
 .cv-field-action .cv-btn__icon {
   height: 17px;
   width: 17px;
-}
-
-.cv-field-action:hover,
-.cv-field-action:focus {
-  background: var(--cv-btn-neutral-hover-bg);
-  border-color: var(--cv-btn-neutral-hover-border);
-  color: var(--cv-btn-neutral-hover-color);
-}
-
-.cv-field-action:active {
-  filter: brightness(0.985);
-  transform: translateY(1px);
-}
-
-.cv-field-action:focus-visible {
-  box-shadow: var(--cv-btn-focus-ring);
-  outline: none;
-}
-
-.cv-field-action:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-  pointer-events: none;
-}
-
-/* Clear — limpar filtro/campo (muito discreto) */
-.cv-field-action--clear {
-  background: linear-gradient(180deg, var(--cv-btn-neutral-bg), var(--cv-btn-neutral-hover-bg));
-  border-color: var(--cv-btn-neutral-border);
-  box-shadow: var(--shadow-xs);
-  color: var(--cv-btn-neutral-color);
-}
-
-.cv-field-action--clear:hover,
-.cv-field-action--clear:focus {
-  background: linear-gradient(180deg, var(--cv-btn-neutral-hover-bg), var(--cv-btn-neutral-bg));
-  border-color: var(--cv-btn-neutral-hover-border);
-  color: var(--cv-btn-neutral-hover-color);
 }
 
 /* =========================================================
@@ -5486,12 +4967,6 @@ html[data-theme="light"] {
   position: relative;
 }
 
-.cv-date-picker__display {
-  cursor: pointer;
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
 /* Campo de input: chrome de field. Gatilhos action-button (.cv-btn) e
    ícone embutido (--icon) ficam de fora — cada um tem visual próprio. */
 .cv-date-picker__trigger:not(.cv-btn):not(.cv-date-picker__trigger--icon) {
@@ -5597,30 +5072,6 @@ html[data-theme="light"] {
   font-size: var(--font-size-xs);
   line-height: 1.45;
   margin: 0;
-}
-
-.cv-date-picker__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-.cv-date-picker__pill {
-  align-items: center;
-  background: var(--theme-surface-card-soft);
-  border: 1px solid var(--theme-border-card);
-  border-radius: var(--radius-pill);
-  color: var(--theme-text-muted-strong);
-  display: inline-flex;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  gap: var(--space-1);
-  padding: var(--space-1) var(--space-3);
-}
-
-.cv-date-picker__pill strong {
-  color: var(--theme-text-heading);
-  font-weight: var(--font-weight-extrabold);
 }
 
 .cv-date-picker__panel {
@@ -6203,16 +5654,6 @@ html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single:hove
 .cv-file-picker__upload:disabled,
 .prestacao-file-picker__upload:disabled {
   display: none;
-}
-
-.prestacao-file-picker__clear {
-  background: transparent;
-  color: var(--color-muted-strong);
-}
-
-.prestacao-file-picker__clear:hover {
-  background: var(--color-secondary-soft);
-  color: var(--color-text);
 }
 
 .cv-file-picker__inline-actions,
@@ -7114,11 +6555,6 @@ html[data-theme="dark"] .cv-action-menu {
   padding: 24px;
 }
 
-.delete-confirm-modal__header {
-  gap: 13px;
-  padding-right: 38px;
-}
-
 .delete-confirm-modal__icon {
   background: var(--action-danger-bg);
   border-color: var(--action-danger-border);
@@ -7180,12 +6616,6 @@ html[data-theme="dark"] #attach-signed-modal .attach-signed-modal__dialog {
   background: var(--action-info-bg);
   border-color: var(--action-info-border);
   color: var(--action-info-text);
-}
-
-.attach-signed-modal__close {
-  position: absolute;
-  right: 18px;
-  top: 18px;
 }
 
 .attach-signed-modal__intro {
@@ -8294,15 +7724,6 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   overflow: visible;
 }
 
-.cv-filter-bar__search {
-  min-width: 0;
-  position: relative;
-}
-
-.cv-filter-bar__search-input {
-  width: 100%;
-}
-
 .cv-filter-bar__select {
   min-width: 9.5rem;
 }
@@ -8570,11 +7991,6 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   padding-top: var(--space-3);
 }
 
-.cv-form-subsection--split {
-  align-items: end;
-  grid-template-columns: minmax(160px, 0.7fr) minmax(0, 2fr);
-}
-
 .cv-form-subsection--split > .cv-form-subsection__header {
   align-self: center;
   display: grid;
@@ -8608,24 +8024,6 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
 .cv-resource-picker__title,
 .cv-resource-picker__description {
   margin: 0;
-}
-
-.cv-resource-picker {
-  display: grid;
-  gap: var(--space-3);
-  min-width: 0;
-}
-
-.cv-resource-picker__actions {
-  align-items: center;
-  display: flex;
-  flex: 0 0 auto;
-}
-
-.cv-resource-picker__list {
-  display: grid;
-  gap: var(--space-2);
-  min-width: 0;
 }
 
 .cv-composite-field__control {
@@ -9402,13 +8800,6 @@ html[data-theme="light"] .cv-segment-toggle {
   font-weight: 800;
 }
 
-.pt-resumo-box__value--xl,
-.cv-metric__value--xl {
-  font-size: clamp(1.5rem, 2.9vw, 2.2rem);
-  font-weight: 900;
-  line-height: 1.05;
-}
-
 /* Descrição / subtexto */
 .cv-metric__description,
 .cv-summary-tile__description,
@@ -9637,83 +9028,6 @@ html[data-theme="light"] .cv-segment-toggle {
   gap: 7px;
   min-width: 0;
   padding: 14px 16px;
-}
-
-.cv-document-card {
-  background: var(--cv-card-bg);
-  border: var(--cv-card-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--cv-card-shadow);
-  display: grid;
-  gap: 0;
-  padding: 0;
-  position: relative;
-  transition: box-shadow var(--transition-fast);
-}
-
-.cv-document-card::before {
-  background: var(--color-accent);
-  border-radius: 0 0 var(--space-1) var(--space-1);
-  content: "";
-  height: 3px;
-  left: var(--space-5);
-  position: absolute;
-  top: 0;
-  width: 42px;
-}
-
-.cv-document-card:hover {
-  box-shadow: var(--shadow-panel);
-}
-
-.cv-document-card__header,
-.cv-document-card__meta,
-.cv-document-card__body,
-.cv-document-card__actions {
-  margin: 0;
-  padding: 16px 18px;
-}
-
-.cv-document-card__header {
-  align-items: start;
-  background: var(--color-surface-muted);
-  display: flex;
-  gap: var(--space-3);
-  justify-content: space-between;
-}
-
-.cv-document-card__heading {
-  display: grid;
-  gap: 7px;
-  min-width: 0;
-}
-
-.cv-document-card__title,
-.cv-document-card__subtitle {
-  margin: 0;
-}
-
-.cv-document-card__title {
-  color: var(--color-heading);
-}
-
-.cv-document-card__subtitle,
-.cv-document-card__body {
-  color: var(--color-muted-strong);
-}
-
-.cv-document-card__meta {
-  background: var(--color-surface-soft);
-  border-block: 1px solid var(--color-border-soft);
-}
-
-.cv-document-card__actions {
-  align-items: center;
-  background: var(--color-surface-muted);
-  border-top: 1px solid var(--color-border);
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
 }
 
 /* Shared structural contract for rich entity cards across product modules. */
@@ -10302,8 +9616,6 @@ html[data-theme="dark"] .cv-dialog--document :is(.cv-dialog__icon, .cv-dialog__e
  * Extracted from dark-redesign.css (Etapa 7, Fase 6).
  */
 
-
-
 /* O passo atual é identificado pela combinação sólida de fundo e borda, sem
    anéis concêntricos que possam ser confundidos com um foco exagerado. */
 :is(html[data-theme="dark"])
@@ -10586,7 +9898,6 @@ html[data-theme="dark"] :is(input, select, textarea) {
   border: 1px solid var(--color-input-border);
   box-shadow: none;
 }
-
 
 /* Modal cancelar: textarea sem borda/hover/focus. */
 :is(html[data-theme="dark"])
@@ -12808,14 +12119,6 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   line-height: 1.45;
 }
 
-:is(html[data-theme="dark"])
-  .cv-resource-picker {
-  background: var(--color-input-bg);
-  border: 1px dashed color-mix(in srgb, var(--color-border) 78%, var(--color-muted) 22%);
-  border-radius: 12px;
-  padding: 12px;
-}
-
 /* Controles da ficha: superfícies sólidas, raios menores e nenhuma luz de
    foco. O número e o ano formam um único controle composto. */
 :is(html[data-theme="dark"])
@@ -12907,7 +12210,6 @@ html[data-theme="dark"] .cv-composite-field__control .form-control:focus-visible
   box-shadow: none !important;
   outline: none;
 }
-
 
 /* Multipicker de pessoas: uma lista operacional, não uma grade de cards. Cada
    pessoa usa toda a largura e mantém suas ações disponíveis no mouse, teclado
@@ -14102,15 +13404,6 @@ html[data-theme="dark"] :is(table, .table) {
   color: var(--color-text);
 }
 
-html[data-theme="dark"] :is(th, .table__head) {
-  background: var(--color-surface-muted);
-  color: var(--color-muted-strong);
-}
-
-html[data-theme="dark"] :is(tr, .list-row):hover {
-  background: var(--color-surface-soft);
-}
-
 html[data-theme="dark"] :is(.modal, .cv-modal__dialog, .drawer, [role="dialog"]) {
   background-color: var(--color-surface-strong);
   border-color: var(--color-border-strong);
@@ -14484,18 +13777,9 @@ html[data-theme="dark"] .empty-state__title {
   border-color: var(--color-accent);
 }
 
-.cv-skeleton {
-  animation: cv-skeleton-pulse 1.4s ease-in-out infinite;
-  background: linear-gradient(90deg, var(--color-surface-muted) 25%, var(--color-surface-soft) 50%, var(--color-surface-muted) 75%);
-  background-size: 200% 100%;
-  border-radius: var(--radius-control);
-  color: transparent;
-}
-
 @keyframes cv-skeleton-pulse {
   to { background-position: -200% 0; }
 }
-
 
 @media (max-width: 840px) {
   html[data-theme="dark"] .sidebar {
@@ -14837,7 +14121,6 @@ html[data-theme="dark"] .empty-state__title {
   padding: 0 12px;
 }
 
-
 :is(html[data-theme="dark"])
   .oficio-external-driver .cv-search-picker__input {
   background: transparent !important;
@@ -14993,61 +14276,6 @@ html[data-theme="dark"] *::after {
 :is(html[data-theme="dark"])
   .cv-summary-card .oficio-documentos-card__title {
   color: var(--color-heading);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-left-width: 1px;
-  border-radius: 14px;
-  box-shadow: var(--shadow-card);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card::before {
-  background: var(--color-accent);
-  border-radius: 0 0 4px 4px;
-  content: "";
-  height: 3px;
-  left: 18px;
-  position: absolute;
-  top: 0;
-  width: 42px;
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card:hover {
-  box-shadow: var(--shadow-panel);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__header {
-  background: var(--color-surface-muted);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__title {
-  color: var(--color-heading);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__subtitle,
-:is(html[data-theme="dark"])
-  .cv-document-card__body {
-  color: var(--color-muted-strong);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__meta {
-  background: var(--color-surface-soft);
-  border-color: var(--color-border);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__actions {
-  background: var(--color-surface-muted);
-  border-top: 1px solid var(--color-border);
 }
 
 /* Canonical PDF viewer: solid controls around a neutral document canvas. */
@@ -15487,34 +14715,6 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  .cv-operation-card {
-  display: grid;
-  gap: 0;
-  padding: 0;
-}
-
-:is(html[data-theme="dark"])
-  .cv-operation-card__body {
-  padding: clamp(20px, 3vw, 32px);
-}
-
-:is(html[data-theme="dark"])
-  .cv-operation-card__footer {
-  background: var(--color-surface);
-  border-top: 1px solid var(--color-border);
-  justify-content: flex-end;
-  padding: 16px clamp(20px, 3vw, 32px);
-}
-
-:is(html[data-theme="dark"])
-  .cv-operation-card__message {
-  color: var(--color-text);
-  font-size: var(--font-size-md);
-  line-height: 1.65;
-  margin: 0;
-}
-
-:is(html[data-theme="dark"])
   .cv-filter-header:not(.list-header) {
   background: var(--color-surface-strong);
   border-color: var(--color-border-strong);
@@ -15532,28 +14732,6 @@ html[data-theme="dark"] *::after {
   background: var(--color-surface);
   border-top-color: var(--color-border-strong);
   padding-top: 18px;
-}
-
-:is(html[data-theme="dark"])
-  .cv-filter-bar__search {
-  background: var(--color-input-bg);
-  border: 1px solid var(--color-input-border);
-  border-radius: var(--radius-control);
-}
-
-:is(html[data-theme="dark"])
-  .cv-filter-bar__search-input {
-  border-color: transparent;
-  box-shadow: none;
-}
-
-:is(html[data-theme="dark"])
-  .cv-filter-bar__search-input:focus,
-:is(html[data-theme="dark"])
-  .cv-filter-bar__search-input:focus-visible {
-  border-color: transparent;
-  box-shadow: none;
-  outline: none;
 }
 
 :is(html[data-theme="dark"])

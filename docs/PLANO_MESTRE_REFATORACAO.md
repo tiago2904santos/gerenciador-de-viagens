@@ -148,7 +148,7 @@ Precisam de resposta humana; nenhuma bloqueia a fase 0.
 | ~~Qual UI Lab é o vigente~~ **decidida em 07/08 (PR #247): nenhum — os dois saíram** | `BE-25` (fase 9) | A cascata de componentes órfãos que a decisão deixou é o `NOVO-44`, fechado |
 | Arquitetura de configurações | fora das 9 fases | Proposta de 17–28 dias, em `historico/2026-07-refactor/planos/PROPOSTA_CONFIGURACOES.md`; entra como fase própria ou fica fora do ciclo |
 | Triagem dos 13 PRs abertos | fase 9 | 12 são de maio–julho, anteriores ao refactor; fechar ou reabrir é chamada sua |
-| ~~Catálogo global do `DB-02` (grupo 2)~~ **decidida em 07/08: cópia por área, seguindo o `NOVO-09`** | `DB-02` (fase 2) | Executada nas migrações `eventos/0016` e `planos_trabalho/0024`. **Correção de fato:** as linhas de seed **não** eram "servidas a todas as áreas" — medido nas três áreas, eram vistas por **zero** usuários com área, porque `filter_queryset_by_area` é estrito. Duplicar não repartiu nada: deu a cada área um catálogo que ela não tinha. O resíduo (instalação nova e área criada depois) é o `NOVO-45` |
+| ~~Catálogo global do `DB-02` (grupo 2)~~ **decidida em 07/08: cópia por área, seguindo o `NOVO-09`** | `DB-02` (fase 2) | Executada nas migrações `eventos/0016` e `planos_trabalho/0024`. **Correção de fato:** as linhas de seed **não** eram "servidas a todas as áreas" — medido nas três áreas, eram vistas por **zero** usuários com área, porque `filter_queryset_by_area` é estrito. Duplicar não repartiu nada: deu a cada área um catálogo que ela não tinha. O resíduo (instalação nova e área criada depois) é o `NOVO-49` |
 
 ## 9. Quadro de acompanhamento
 
@@ -300,10 +300,12 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       `Roteiro`, e o par do `RoteiroTrecho`). `scripts/validar_constraints_db07.py` é o
       procedimento do limite 4 do `AGENTS.md`: conta o que cada constraint reprovaria, antes do
       deploy.
-- [~] `DB-08` coleções ordenadas aceitam duplicata — **3 de 5**: `RoteiroDestino`,
-      `PlanoDestino` (par parcial, porque `evento` é anulável) e `EventoPlano`. `RoteiroTrecho` e
-      `DiarioBordoTrecho` reordenam por troca linha a linha e precisam do escritor em dois
-      passos antes da constraint — fatia 2
+- [x] `DB-08` coleções ordenadas aceitam duplicata — **5 de 5**. Fatia 1: `RoteiroDestino`,
+      `PlanoDestino` (par parcial, porque `evento` é anulável) e `EventoPlano`. Fatia 2:
+      `RoteiroTrecho` e `DiarioBordoTrecho`, que reordenam linha a linha e por isso levaram os
+      dois escritores para **dois passos** (bloco livre, depois posições finais) e para dentro de
+      `transaction.atomic` — nenhum dos dois abria transação. A medição de duplicata só vale em
+      produção: quatro das cinco tabelas estão vazias no banco de desenvolvimento
 
 ### Fase 4 — Fundação do front
 - [x] `JS-06` JS larga o nome de classe `cv-search-picker` — e as **partes** junto (`NOVO-19`):
@@ -330,7 +332,10 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `HT-05` `empty_state.html` quebra a ordem de headings — o pulo era **10 de 10** listas, não 9;
       o título vira `<h2>` e `form_block` ganha ramo `h2` (aditivo) para o cadastro rápido de
       justificativas. Sem parâmetro `heading_level`: a inversão mostrou o repasse inerte
-- [ ] `UI-01` poda das ~929 classes candidatas (168 KB) — uma por PR, com prova de grep que cubra concatenação `+`
+- [x] `UI-01` poda das ~929 classes candidatas — **963 blocos, 170,7 KB** removidos; a unidade de PR
+      virou a **família de classe**, não o arquivo, e a verificação virou `getComputedStyle` (0 de
+      41.938 elementos) porque o diff de pixel tinha ruído maior que o efeito. Travado por
+      `scripts/audit_css_morto.py --max 0` no CI. Resíduo declarado: `NOVO-48`
 - [x] `HT-06` 10 a 14 componentes mortos, três deles citados como canônicos — **7 apagados**
       (um deles órfão em cascata, revelado pela própria trava) e **7 do UI Lab mantidos**, porque
       apagá-los é decidir qual dos dois labs é o vigente (`BE-17`). `form_errors` saiu da lista:

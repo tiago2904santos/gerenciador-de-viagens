@@ -116,7 +116,7 @@ class DuplicacaoPorAreaTests(TestCase):
         """Instalação nova: os seeds acabaram de rodar e não existe área ainda.
 
         É o mesmo comportamento do `NOVO-09`, e é por isso que estes quatro modelos
-        **não** podem virar `NOT NULL` nesta fatia — ver o `NOVO-45`.
+        **não** podem virar `NOT NULL` nesta fatia — ver o `NOVO-49`.
         """
         antes = {m._meta.label: m._base_manager.count() for m in CATALOGOS}
 

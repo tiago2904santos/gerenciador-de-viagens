@@ -78,10 +78,6 @@
   grid-column: 1 / -1;
 }
 
-.termo-evento-periodo {
-  margin-bottom: var(--space-4);
-}
-
 /* Dentro do stack: o gap já separa as seções — evita margem/padding extras. */
 .cv-form-stack > .termo-evento-periodo {
   margin-bottom: 0;
@@ -95,11 +91,6 @@
 /* Compat: formulários antigos / preview cadastro */
 .termos-page .main-form-panel {
   gap: var(--space-5);
-}
-
-.termo-card__body {
-  display: grid;
-  gap: var(--space-4);
 }
 
 /* ── Card da lista: no maximo 2 colunas ──

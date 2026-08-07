@@ -45,12 +45,6 @@ html[data-theme="light"] {
   position: relative;
 }
 
-.cv-date-picker__display {
-  cursor: pointer;
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
 /* Campo de input: chrome de field. Gatilhos action-button (.cv-btn) e
    ícone embutido (--icon) ficam de fora — cada um tem visual próprio. */
 .cv-date-picker__trigger:not(.cv-btn):not(.cv-date-picker__trigger--icon) {
@@ -156,30 +150,6 @@ html[data-theme="light"] {
   font-size: var(--font-size-xs);
   line-height: 1.45;
   margin: 0;
-}
-
-.cv-date-picker__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-.cv-date-picker__pill {
-  align-items: center;
-  background: var(--theme-surface-card-soft);
-  border: 1px solid var(--theme-border-card);
-  border-radius: var(--radius-pill);
-  color: var(--theme-text-muted-strong);
-  display: inline-flex;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  gap: var(--space-1);
-  padding: var(--space-1) var(--space-3);
-}
-
-.cv-date-picker__pill strong {
-  color: var(--theme-text-heading);
-  font-weight: var(--font-weight-extrabold);
 }
 
 .cv-date-picker__panel {
