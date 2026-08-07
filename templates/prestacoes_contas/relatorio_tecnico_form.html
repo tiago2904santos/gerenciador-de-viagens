@@ -24,9 +24,7 @@
         data-autosave-object-id="{{ relatorio.pk }}">
     {% csrf_token %}
 
-    {% if form.non_field_errors %}
-      {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
-    {% endif %}
+    {% include "components/ui/feedback/form_errors.html" with form=form only %}
 
     {% if diaria_info.alterada %}
       <div class="cv-notice cv-notice--warning diario-diaria-alert" role="alert">

@@ -25,9 +25,7 @@
     {% csrf_token %}
     {{ formset.management_form }}
 
-    {% if formset.non_form_errors %}
-      {% include "components/ui/feedback/field_error.html" with errors=formset.non_form_errors only %}
-    {% endif %}
+    {% include "components/ui/feedback/form_errors.html" with errors=formset.non_form_errors only %}
 
     {% if diaria_info.alterada %}
       <div class="cv-notice cv-notice--warning diario-diaria-alert" role="alert">

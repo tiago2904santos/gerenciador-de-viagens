@@ -22,9 +22,7 @@
   <div class="cv-form-section-stack cv-form-section-stack--comfortable" data-travel-document-wizard-step1>
     <form method="post" class="document-form travel-document-wizard__form" novalidate>
       {% csrf_token %}
-      {% if form.non_field_errors %}
-        {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
-      {% endif %}
+      {% include "components/ui/feedback/form_errors.html" with form=form only %}
       {% include "components/form/card.html" with title="Dados da área" description="Identificação da unidade de trabalho e contas com acesso a ela." title_id="area-dados-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="usuarios/partials/_editar_area_fields.html" footer_template="usuarios/partials/_form_card_footer.html" %}
     </form>
   </div>

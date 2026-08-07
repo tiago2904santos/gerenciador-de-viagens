@@ -1,6 +1,4 @@
-{% if diaria_form.non_field_errors %}
-  {% include "components/ui/feedback/field_error.html" with errors=diaria_form.non_field_errors only %}
-{% endif %}
+{% include "components/ui/feedback/form_errors.html" with form=diaria_form only %}
 
 <div class="field-layout">
   <div class="field-row field-row--3">

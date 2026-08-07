@@ -1,6 +1,4 @@
-{% if senha_form.non_field_errors %}
-  {% include "components/ui/feedback/field_error.html" with errors=senha_form.non_field_errors only %}
-{% endif %}
+{% include "components/ui/feedback/form_errors.html" with form=senha_form only %}
 <div class="field-grid field-grid--cols-2">
   {% include "components/ui/forms/field.html" with field=senha_form.old_password size_class="field-size-2" only %}
   {% include "components/ui/forms/field.html" with field=senha_form.new_password1 size_class="field-size-1" only %}
