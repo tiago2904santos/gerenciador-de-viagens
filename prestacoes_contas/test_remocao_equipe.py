@@ -26,22 +26,24 @@ from prestacoes_contas.models import AssinaturaDocumento
 from prestacoes_contas.models import PrestacaoContas
 from prestacoes_contas.models import PrestacaoDocumentoAnexo
 from prestacoes_contas.models import PrestacaoServidor
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 PDF_MINIMO = b"%PDF-1.4\n%%EOF\n"
 
 
 class RemocaoDaEquipeBase(TestCase):
     def setUp(self):
-        self.cargo = Cargo.objects.create(nome="Agente")
-        self.servidor_a = Servidor.objects.create(
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Agente")
+        self.servidor_a = Servidor.objects.create(area=area_de_teste(), 
             nome="Servidor A", cargo=self.cargo, cpf="11122233344",
         )
-        self.servidor_b = Servidor.objects.create(
+        self.servidor_b = Servidor.objects.create(area=area_de_teste(), 
             nome="Servidor B", cargo=self.cargo, cpf="55566677788",
         )
         for servidor in (self.servidor_a, self.servidor_b):
             servidor.refresh_from_db()
-        self.oficio = Oficio.objects.create(
+        self.oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=61,
             ano=2026,
             protocolo="606060606",
@@ -203,7 +205,7 @@ class CadaSinalDeDadoColetadoPreservaTests(RemocaoDaEquipeBase):
         qualquer cláusula sozinha já bastava para preservar e sete das dez podiam
         ser apagadas do código sem nenhum teste reclamar.
         """
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=numero,
             ano=2026,
             protocolo=f"7{numero:08d}",
@@ -309,6 +311,7 @@ class BlocoDaTelaTests(RemocaoDaEquipeBase):
             username="tester_db06", password="123456",
         )
         self.client.force_login(self.user)
+        vincular_area(self.user)
 
     def _abrir_rt(self):
         ps_b = PrestacaoServidor.objects.get(

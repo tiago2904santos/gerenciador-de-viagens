@@ -60,7 +60,7 @@ class PrestacaoContas(models.Model):
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
         on_delete=models.PROTECT,
-        null=True,
+        null=False,
         blank=True,
         related_name="prestacoes_contas",
         verbose_name="Area de trabalho",

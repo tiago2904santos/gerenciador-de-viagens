@@ -34,6 +34,8 @@ from cadastros.models import Cidade
 from cadastros.models import Estado
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroDestino
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class CustoDaListaDeRoteirosTests(TestCase):
@@ -46,7 +48,9 @@ class CustoDaListaDeRoteirosTests(TestCase):
         cls.interior = Cidade.objects.create(nome="ABATIA", estado=cls.estado, uf="PR")
 
     def setUp(self):
-        self.client.force_login(get_user_model().objects.create_user(username="lista_roteiros"))
+        usuario = get_user_model().objects.create_user(username="lista_roteiros")
+        vincular_area(usuario)
+        self.client.force_login(usuario)
 
     def _criar_roteiros(self, quantidade):
         """`saida_dt` é obrigatório para o roteiro cair em alguma aba.
@@ -55,7 +59,7 @@ class CustoDaListaDeRoteirosTests(TestCase):
         que foi exatamente o que aconteceu na primeira versão disto.
         """
         for numero in range(quantidade):
-            roteiro = Roteiro.objects.create(
+            roteiro = Roteiro.objects.create(area=area_de_teste(), 
                 origem_estado=self.estado,
                 origem_cidade=self.capital,
                 saida_dt=timezone.now() + timedelta(days=numero + 1),

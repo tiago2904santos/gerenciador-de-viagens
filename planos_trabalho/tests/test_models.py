@@ -3,6 +3,7 @@ from django.utils import timezone
 
 from cadastros.models import ConfiguracaoSistema
 
+from core.testing import area_de_teste
 from planos_trabalho.models import PlanoTrabalho
 
 from .helpers import configurar_sistema
@@ -16,10 +17,10 @@ class NumeracaoPlanoTests(TestCase):
 
     def test_numeracao_sequencial_com_contador_da_configuracao(self):
         ano = timezone.localdate().year
-        p1 = PlanoTrabalho()
+        p1 = PlanoTrabalho(area=area_de_teste())
         p1.atribuir_numero()
         p1.save()
-        p2 = PlanoTrabalho()
+        p2 = PlanoTrabalho(area=area_de_teste())
         p2.atribuir_numero()
         p2.save()
 
@@ -30,7 +31,7 @@ class NumeracaoPlanoTests(TestCase):
         self.assertEqual(config.pt_ano, ano)
 
     def test_numero_formatado_inclui_sufixo(self):
-        plano = PlanoTrabalho()
+        plano = PlanoTrabalho(area=area_de_teste())
         plano.atribuir_numero()
         plano.save()
         ano = timezone.localdate().year
@@ -42,7 +43,7 @@ class NumeracaoPlanoTests(TestCase):
         config.pt_ultimo_numero = 42
         config.save()
 
-        plano = PlanoTrabalho()
+        plano = PlanoTrabalho(area=area_de_teste())
         plano.atribuir_numero()
         plano.save()
 
@@ -50,7 +51,7 @@ class NumeracaoPlanoTests(TestCase):
         self.assertEqual(plano.ano, timezone.localdate().year)
 
     def test_atribuir_numero_nao_sobrescreve_numero_existente(self):
-        plano = PlanoTrabalho(numero=20, ano=2026, sufixo_numero="ASCOM")
+        plano = PlanoTrabalho(area=area_de_teste(), numero=20, ano=2026, sufixo_numero="ASCOM")
         plano.atribuir_numero()
         self.assertEqual((plano.numero, plano.ano), (20, 2026))
         self.assertEqual(plano.numero_formatado, "20/2026/ASCOM")

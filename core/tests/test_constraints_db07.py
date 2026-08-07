@@ -45,6 +45,7 @@ from prestacoes_contas.models import PrestacaoServidor
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroTrecho
 from termos.models import TermoAutorizacao
+from core.testing import area_de_teste
 
 HOJE = date(2026, 8, 10)
 AGORA = timezone.make_aware(datetime(2026, 8, 10, 8, 0))
@@ -54,7 +55,7 @@ class ConstraintsBase(TestCase):
     """Fábricas mínimas — cada uma devolve uma linha que **satisfaz** tudo."""
 
     def _roteiro(self):
-        return Roteiro.objects.create(saida_dt=AGORA, chegada_dt=AGORA + timedelta(hours=2))
+        return Roteiro.objects.create(area=area_de_teste(), saida_dt=AGORA, chegada_dt=AGORA + timedelta(hours=2))
 
     def _roteiro_trecho(self):
         return RoteiroTrecho.objects.create(
@@ -65,17 +66,17 @@ class ConstraintsBase(TestCase):
         )
 
     def _evento(self):
-        return Evento.objects.create(
+        return Evento.objects.create(area=area_de_teste(), 
             titulo="Evento DB-07", data_inicio=HOJE, data_fim=HOJE + timedelta(days=2),
         )
 
     def _termo(self):
-        return TermoAutorizacao.objects.create(
+        return TermoAutorizacao.objects.create(area=area_de_teste(), 
             data_evento_inicio=HOJE, data_evento_fim=HOJE + timedelta(days=2),
         )
 
     def _plano(self):
-        return PlanoTrabalho.objects.create(
+        return PlanoTrabalho.objects.create(area=area_de_teste(), 
             data_evento_inicio=HOJE, data_evento_fim=HOJE + timedelta(days=2),
         )
 
@@ -88,18 +89,18 @@ class ConstraintsBase(TestCase):
         )
 
     def _ordem_servico(self):
-        return OrdemServico.objects.create(
+        return OrdemServico.objects.create(area=area_de_teste(), 
             data_evento_inicio=HOJE, data_evento_fim=HOJE + timedelta(days=2),
         )
 
     def _prestacao_servidor(self):
-        cargo = Cargo.objects.create(nome=f"Cargo {Cargo.objects.count()}")
-        servidor = Servidor.objects.create(
+        cargo = Cargo.objects.create(area=area_de_teste(), nome=f"Cargo {Cargo.objects.count()}")
+        servidor = Servidor.objects.create(area=area_de_teste(), 
             nome=f"Servidor DB07 {Servidor.objects.count()}",
             cargo=cargo,
             cpf=f"{Servidor.objects.count():011d}",
         )
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=800 + Oficio.all_objects.count(), ano=2026, protocolo="800000000",
         )
         oficio.servidores.add(servidor)

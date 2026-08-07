@@ -36,6 +36,7 @@ from cadastros.models import Estado
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroTrecho
 from roteiros.roteiro_logic import _atualizar_datas_roteiro_apos_salvar_trechos
+from core.testing import area_de_teste
 
 DIA_1 = timezone.make_aware(datetime(2026, 5, 1, 8, 0))
 DIA_2 = timezone.make_aware(datetime(2026, 5, 2, 9, 0))
@@ -48,7 +49,7 @@ class CabecalhoDeDatasBase(TestCase):
         self.sede = Cidade.objects.create(estado=self.estado, nome="Curitiba", uf="PR")
         self.destino_a = Cidade.objects.create(estado=self.estado, nome="Londrina", uf="PR")
         self.destino_b = Cidade.objects.create(estado=self.estado, nome="Maringá", uf="PR")
-        self.roteiro = Roteiro.objects.create(
+        self.roteiro = Roteiro.objects.create(area=area_de_teste(), 
             origem_estado=self.estado, origem_cidade=self.sede,
         )
 

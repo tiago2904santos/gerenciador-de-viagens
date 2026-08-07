@@ -20,10 +20,13 @@ from oficios.views import OFICIOS_POR_PAGINA
 from roteiros.models import Roteiro
 from usuarios.models import AreaTrabalho
 from usuarios.models import VinculoUsuarioArea
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 def _criar_oficios(quantidade, *, area=None, primeiro_numero=1):
     """Ofícios já realizados (aba `atuais`), um roteiro cada."""
+    area = area or area_de_teste()
     saida = timezone.now() - timedelta(days=3)
     for numero in range(primeiro_numero, primeiro_numero + quantidade):
         roteiro = Roteiro.objects.create(area=area, saida_dt=saida)
@@ -33,6 +36,7 @@ def _criar_oficios(quantidade, *, area=None, primeiro_numero=1):
 class OficioListPaginacaoTests(TestCase):
     def setUp(self):
         user = get_user_model().objects.create_user(username="oficios_perf", password="x")
+        vincular_area(user)
         self.client.force_login(user)
         self.url = reverse("oficios:index")
 

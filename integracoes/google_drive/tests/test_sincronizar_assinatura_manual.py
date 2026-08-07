@@ -9,6 +9,7 @@ from documentos.models import DocumentoArtefato
 from oficios.models import Oficio
 from integracoes.google_drive import organizer, services
 from integracoes.google_drive.models import DriveArquivo
+from core.testing import area_de_teste
 
 
 def _pdf(name):
@@ -20,15 +21,15 @@ def _pdf(name):
 class SincronizarConteudoAssinadoTests(TestCase):
     def setUp(self):
         services._reset_client()
-        self.cargo = Cargo.objects.create(nome="Cargo Sync")
-        self.ana = Servidor.objects.create(nome="Ana Sync", cargo=self.cargo, cpf="11122233344")
-        self.oficio = Oficio.objects.create(numero=2, ano=2026, protocolo="223456789", motivo="m")
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Cargo Sync")
+        self.ana = Servidor.objects.create(area=area_de_teste(), nome="Ana Sync", cargo=self.cargo, cpf="11122233344")
+        self.oficio = Oficio.objects.create(area=area_de_teste(), numero=2, ano=2026, protocolo="223456789", motivo="m")
         self.oficio.servidores.add(self.ana)
 
     def _artefato(self):
         arquivo, digest = _pdf("termo.pdf")
         with self.captureOnCommitCallbacks(execute=True):
-            return DocumentoArtefato.objects.create(
+            return DocumentoArtefato.objects.create(area=area_de_teste(), 
                 tipo="termo_autorizacao",
                 formato="pdf",
                 oficio=self.oficio,

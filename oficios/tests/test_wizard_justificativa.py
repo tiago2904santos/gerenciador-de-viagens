@@ -14,6 +14,8 @@ from cadastros.models import Viatura
 from justificativas.services import oficio_exige_justificativa
 from oficios.models import Oficio
 from roteiros.models import Roteiro
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class WizardJustificativaTests(TestCase):
@@ -26,17 +28,18 @@ class WizardJustificativaTests(TestCase):
             password="123456",
         )
         self.client.force_login(self.user)
-        self.cargo = Cargo.objects.create(nome="Cargo J")
-        self.comb = Combustivel.objects.create(nome="Flex J")
-        self.servidor_a = Servidor.objects.create(nome="Viajante J", cargo=self.cargo, cpf="11122233344")
-        self.unidade_m = Unidade.objects.create(nome="Unidade J", sigla="UJ")
-        self.motorista_v = Servidor.objects.create(
+        vincular_area(self.user)
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Cargo J")
+        self.comb = Combustivel.objects.create(area=area_de_teste(), nome="Flex J")
+        self.servidor_a = Servidor.objects.create(area=area_de_teste(), nome="Viajante J", cargo=self.cargo, cpf="11122233344")
+        self.unidade_m = Unidade.objects.create(area=area_de_teste(), nome="Unidade J", sigla="UJ")
+        self.motorista_v = Servidor.objects.create(area=area_de_teste(), 
             nome="Motorista J",
             cargo=self.cargo,
             cpf="99988877766",
             unidade=self.unidade_m,
         )
-        self.viatura = Viatura.objects.create(
+        self.viatura = Viatura.objects.create(area=area_de_teste(), 
             placa="JRZ9999",
             modelo="Modelo J",
             combustivel=self.comb,
@@ -81,7 +84,7 @@ class WizardJustificativaTests(TestCase):
     def _roteiro_com_saida(self, oficio, dias_apos_criacao=5):
         base = oficio.data_criacao
         d_saida = base + datetime.timedelta(days=dias_apos_criacao)
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             status=Roteiro.STATUS_RASCUNHO,
             saida_dt=timezone.make_aware(

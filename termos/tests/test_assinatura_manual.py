@@ -19,6 +19,8 @@ from termos.models import TermoAutorizacao
 from termos.services import _persistir_termo_cadastro_artefato
 from termos.services import pdf_termo_cadastro_assinado_ou_gerado
 from termos.services import resolver_artefato_termo_cadastro
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 def _fake_doc(hash_sha256: str = "a" * 64) -> DocumentoGerado:
@@ -35,11 +37,11 @@ def _fake_doc(hash_sha256: str = "a" * 64) -> DocumentoGerado:
 @override_settings(DOCUMENTOS_PERSIST_ARTEFATOS=True)
 class PersistirTermoCadastroArtefatoTests(TestCase):
     def setUp(self):
-        self.cargo = Cargo.objects.create(nome="Cargo Termo")
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Cargo Termo")
         self.estado = Estado.objects.create(nome="Parana", sigla="PR")
         self.cidade = Cidade.objects.create(nome="Curitiba", estado=self.estado, uf="PR")
-        self.servidor = Servidor.objects.create(nome="Servidor Termo", cargo=self.cargo, cpf="33333333333")
-        self.termo = TermoAutorizacao.objects.create(
+        self.servidor = Servidor.objects.create(area=area_de_teste(), nome="Servidor Termo", cargo=self.cargo, cpf="33333333333")
+        self.termo = TermoAutorizacao.objects.create(area=area_de_teste(), 
             destino_estado=self.estado,
             destino_cidade=self.cidade,
             data_evento_inicio=date(2026, 8, 1),
@@ -67,7 +69,7 @@ class PersistirTermoCadastroArtefatoTests(TestCase):
 
     def test_termos_avulsos_diferentes_nao_colidem_sem_servidor(self):
         """Dois termos genéricos (sem ofício, sem servidor) não devem compartilhar artefato."""
-        outro_termo = TermoAutorizacao.objects.create(
+        outro_termo = TermoAutorizacao.objects.create(area=area_de_teste(), 
             destino_estado=self.estado,
             destino_cidade=self.cidade,
             data_evento_inicio=date(2026, 8, 2),
@@ -82,10 +84,10 @@ class PersistirTermoCadastroArtefatoTests(TestCase):
 @override_settings(DOCUMENTOS_PERSIST_ARTEFATOS=True)
 class ResolverArtefatoTermoCadastroTests(TestCase):
     def setUp(self):
-        self.cargo = Cargo.objects.create(nome="Cargo Resolver")
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Cargo Resolver")
         self.estado = Estado.objects.create(nome="Parana", sigla="PR")
         self.cidade = Cidade.objects.create(nome="Curitiba", estado=self.estado, uf="PR")
-        self.termo = TermoAutorizacao.objects.create(
+        self.termo = TermoAutorizacao.objects.create(area=area_de_teste(), 
             destino_estado=self.estado,
             destino_cidade=self.cidade,
             data_evento_inicio=date(2026, 8, 1),
@@ -121,11 +123,11 @@ class PdfTermoCadastroAssinadoOuGeradoTests(TestCase):
     nunca checavam o `DocumentoArtefato` persistido, só regeneravam na hora."""
 
     def setUp(self):
-        self.user_cargo = Cargo.objects.create(nome="Cargo Servir Assinado")
+        self.user_cargo = Cargo.objects.create(area=area_de_teste(), nome="Cargo Servir Assinado")
         self.estado = Estado.objects.create(nome="Parana", sigla="PR")
         self.cidade = Cidade.objects.create(nome="Curitiba", estado=self.estado, uf="PR")
-        self.servidor = Servidor.objects.create(nome="Servidor X", cargo=self.user_cargo, cpf="44444444444")
-        self.termo = TermoAutorizacao.objects.create(
+        self.servidor = Servidor.objects.create(area=area_de_teste(), nome="Servidor X", cargo=self.user_cargo, cpf="44444444444")
+        self.termo = TermoAutorizacao.objects.create(area=area_de_teste(), 
             destino_estado=self.estado,
             destino_cidade=self.cidade,
             data_evento_inicio=date(2026, 8, 1),
@@ -176,11 +178,12 @@ class TermoCadastroServidorPdfInlineAssinadoTests(TestCase):
 
         self.user = get_user_model().objects.create_user(username="assinado_view_u", password="x" * 12)
         self.client.force_login(self.user)
-        self.cargo = Cargo.objects.create(nome="Cargo View Assinado")
+        vincular_area(self.user)
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Cargo View Assinado")
         self.estado = Estado.objects.create(nome="Parana", sigla="PR")
         self.cidade = Cidade.objects.create(nome="Curitiba", estado=self.estado, uf="PR")
-        self.servidor = Servidor.objects.create(nome="Servidor View", cargo=self.cargo, cpf="55555555555")
-        self.termo = TermoAutorizacao.objects.create(
+        self.servidor = Servidor.objects.create(area=area_de_teste(), nome="Servidor View", cargo=self.cargo, cpf="55555555555")
+        self.termo = TermoAutorizacao.objects.create(area=area_de_teste(), 
             destino_estado=self.estado,
             destino_cidade=self.cidade,
             data_evento_inicio=date(2026, 8, 1),

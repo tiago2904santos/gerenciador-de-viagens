@@ -540,65 +540,70 @@ o desenho atual evita, e mexeria na regra de dinheiro fechada no ciclo de julho.
 > duplicada recusada —, não a permissão; sem a troca eles passariam a medir o 403 e parariam de
 > medir a regra de dinheiro.
 
-### DB-02 🔴 `area` anulável em 27 de 28 modelos — três dívidas diferentes, não uma · AUD+VER · 5 d · risco alto
+### DB-02 ✅ RESOLVIDO (07/08/2026) · 🔴 `area` anulável em 27 de 28 modelos — três dívidas diferentes, não uma · AUD+VER · 5 d · risco alto
 
-> **Enunciado reescrito em 07/08/2026**, como o `NOVO-34` exigia. O original tratava
-> os 27 modelos como dívida uniforme ("`NOT NULL` nos transacionais") — e num banco
-> recém-migrado **cinco modelos já nascem com `area IS NULL` por seed de migração**,
-> enquanto a linha global de `ConfiguracaoNumeracaoOficio` **é** o piso de numeração.
-> A migração uniforme destruiria mecanismo desenhado de propósito.
+> **Enunciado reescrito em 07/08/2026**, como o `NOVO-34` exigia, e **grupo operacional migrado
+> no mesmo dia**. O original tratava os 27 modelos como dívida uniforme ("`NOT NULL` nos
+> transacionais") — e num banco recém-migrado **cinco modelos já nascem com `area IS NULL` por
+> seed de migração**, enquanto a linha global de `ConfiguracaoNumeracaoOficio` **é** o piso de
+> numeração. A migração uniforme destruiria mecanismo desenhado de propósito.
 
-Só `usuarios.VinculoUsuarioArea` tem `area` NOT NULL. O efeito segue valendo nos dois
-sentidos: um usuário autenticado sem vínculo de área vê e edita **o balde inteiro** de
-dados sem área (`core/tenancy.py:69-71` devolve `filter(area__isnull=True)` sem área
-ativa), e código que esquece `area` grava no balde. Mas a dívida tem três formas:
+Os dois efeitos do enunciado original fecharam com o grupo 1: o balde `area IS NULL` que um
+usuário sem vínculo enxergava inteiro (`core/tenancy.py:69-71`) passou a ser **vazio por
+construção** para dado operacional, e escrita sem área falha alto (`IntegrityError`) em vez de
+gravar órfão invisível. A dívida tinha três formas:
 
-**Grupo 1 — Operacional: `NOT NULL` é o alvo, com backfill antes.** Os oito modelos do
-`core.E001`: `Oficio`, `Roteiro`, `Evento`, `TermoAutorizacao`, `OrdemServico`,
-`PlanoTrabalho`, `PrestacaoContas`, `DocumentoArtefato`. Linha sem área aqui é dado de
-trabalho órfão, nunca desenho. Sete dos oito já derivavam a área sozinhos no `save()`
-(de `get_current_area()` ou da referência, no caso do artefato); **`Evento` era a
-exceção** — nascia sem área mesmo dentro de request, provado por
-`usuarios/tests/test_area_legado_compat.py`. **Fechado em 07/08/2026**: `Evento.save()`
-deriva como os irmãos, com teste que falharia antes.
+**Grupo 1 — Operacional: `NOT NULL`, feito.** Os oito modelos do `core.E001`: `Oficio`,
+`Roteiro`, `Evento`, `TermoAutorizacao`, `OrdemServico`, `PlanoTrabalho`, `PrestacaoContas`,
+`DocumentoArtefato` — migrações `*_area_obrigatoria` nos oito apps. Sete dos oito já derivavam a
+área sozinhos no `save()`; **`Evento` era a exceção** — nascia sem área mesmo dentro de request —
+e passou a derivar como os irmãos, com teste que falharia antes. A migração não precisou esperar
+produção: o gate do `NOVO-12` roda `check --deploy --fail-level ERROR` **antes do `migrate`**
+(protegido pelo rollback do `QA-03`), e o `core.E001` aborta com a instrução de backfill enquanto
+houver órfão — a migração nunca encontra NULL que o operador não tenha visto.
+`scripts/validar_not_null_db02.py` mede as oito tabelas sem esperar um deploy (limite 4 do
+`AGENTS.md`); o backup já é automático no mesmo fluxo. Dois consertos saíram da janela
+pré-migração: `backfill_legacy_areas` deixou de pular modelo com `field.null=False` (o critério
+de nulidade em memória o esvaziaria justamente quando ele é necessário) e o signal de prestações
+lê `oficio.area_id` (com `null=False`, ler `.area` num órfão levanta `RelatedObjectDoesNotExist`).
 
 **Grupo 2 — Catálogo com padrão global: `NOT NULL` só depois de decisão de produto.**
-`TipoEvento` (5 linhas globais de seed), `ProgramaSolicitante` (3), `HorarioAtendimento`
-(3), `AtividadePlanoTrabalho` (11), os cadastros básicos (`Servidor`, `Viatura`,
-`Unidade`, `Cargo`, `Combustivel`, `ConfiguracaoSistema`) e os modelos de texto
-(`ModeloMotivoEvento`, `ModeloMotivoOficio`, `ModeloJustificativa`,
-`ModeloTextoRelatorioTecnico`, `PresetAtividadesPlanoTrabalho`).
-Os dois auxiliares (`OficioNumeroLacuna`, `DocumentoGeracao`) não são catálogo: a
-linha deles nasce do registro operacional que a origina e o `NOT NULL` deles entra
-junto do grupo 1, no mesmo PR do domínio.
-A linha sem área aqui é o item **global**, servido a todas as áreas
-— as `UniqueConstraint` condicionais em `area__isnull=True` (ex.:
-`eventos_motivo_nome_global_unique`) documentam isso como desenho. `NOT NULL` exige
-decidir, item a item, se o global vira cópia por área (o caminho do `NOVO-09` com
-`ModeloJustificativa`) ou ganha dono. Decisão de produto, não de migração.
+`TipoEvento` (5 linhas globais de seed), `ProgramaSolicitante` (3), `HorarioAtendimento` (3),
+`AtividadePlanoTrabalho` (11), os cadastros básicos (`Servidor`, `Viatura`, `Unidade`, `Cargo`,
+`Combustivel`, `ConfiguracaoSistema`) e os modelos de texto (`ModeloMotivoEvento`,
+`ModeloMotivoOficio`, `ModeloJustificativa`, `ModeloTextoRelatorioTecnico`,
+`PresetAtividadesPlanoTrabalho`). A linha sem área aqui é o item **global** — as
+`UniqueConstraint` condicionais em `area__isnull=True` documentam isso como desenho. `NOT NULL`
+exige decidir, item a item, se o global vira cópia por área (o caminho do `NOVO-09`) ou ganha
+dono. Decisão de produto, não de migração — registrada como `NOVO-45`, com a medição que ela
+precisa: **nenhum picker oferta o global a usuário com área.**
 
-**Grupo 3 — Global por projeto: `NOT NULL` fora de questão.**
-`ConfiguracaoNumeracaoOficio`: a linha sem área é o piso de numeração de 2026
-(`numero_inicial=75`), buscada de propósito com `Q(area=area) | Q(area__isnull=True)`.
-Também fora, por razões próprias: `core.AuditEvent` e `DriveReorganizacaoJob` são
-`SET_NULL` — a trilha e o job sobrevivem à área apagada; linha sem área ali é
-histórico.
+**Grupo 3 — Global por projeto: `NOT NULL` fora de questão.** `ConfiguracaoNumeracaoOficio`: a
+linha sem área é o piso de numeração de 2026 (`numero_inicial=75`), buscada de propósito com
+`Q(area=area) | Q(area__isnull=True)`. Também fora, por razões próprias: `core.AuditEvent` e
+`DriveReorganizacaoJob` são `SET_NULL` — a trilha e o job sobrevivem à área apagada; linha sem
+área ali é histórico. Os dois auxiliares ficaram anuláveis **nesta rodada**, com razão anotada:
+`OficioNumeroLacuna` também serve o piso global (`oficios/models.py:227` filtra lacunas
+`area__isnull` de propósito) e entra num eventual redesenho da numeração; `DocumentoGeracao`
+recebe a área explícita do request e a leitura já recorta.
 
-**Medição em produção:** o gate do `NOVO-12` imprime `core.E001`/`core.W001` a cada
-deploy — a contagem real por modelo, no banco onde seed convive com dado de usuário.
+**O passo 3 da correção original caiu por desnecessário:** com o grupo 1 `NOT NULL`,
+`filter_queryset_by_area` sem área devolve vazio para todo modelo operacional mecanicamente —
+mudar a semântica para os grupos 2/3 é parte da decisão do `NOVO-45`, não deste ID.
 
-**Correção do que resta, na ordem:** (1) rodar
-`backfill_legacy_areas --area SIGLA --commit` em produção, com backup (o deploy já o
-faz), e provar pelo `core.E001`/`core.W001` zerados no grupo 1 no deploy seguinte;
-(2) `NOT NULL` nos oito operacionais via migração com query de validação no PR
-(limite 4) — o gate do deploy roda o check **antes** do `migrate`, então a migração
-nunca encontra linha nula que o operador não tenha visto; (3) só então mudar
-`filter_queryset_by_area` sem área de `filter(area__isnull=True)` para `none()`,
-atualizando no mesmo PR os testes que dependem do balde legado
-(`core/tests/test_area_scoped_manager.py::test_com_request_sem_area_devolve_o_balde_legado`,
-`usuarios/tests/test_area_legado_compat.py`). Os grupos 2 e 3 ficam anuláveis por
-desenho; a decisão de produto do grupo 2 entra na fila do plano mestre (§8) quando
-alguém a puxar.
+**Medição em produção:** o gate do `NOVO-12` imprime `core.E001`/`core.W001` a cada deploy — a
+contagem real por modelo, no banco onde seed convive com dado de usuário. Se houver órfão
+operacional, o primeiro deploy deste ID aborta com a instrução de
+`backfill_legacy_areas --area SIGLA --commit`; rodado o backfill, é só disparar de novo.
+
+Evidência: `core/tests/test_deploy_checks.py` prova o `IntegrityError` que falharia antes;
+`core/tests/test_area_scoped_manager.py` reescreve o contrato (balde operacional vazio; balde de
+catálogo preservado num modelo anulável); a suíte inteira passou a criar dado com área — o custo
+virou instrumento reutilizável, `core/testing.py` (`area_de_teste`, `vincular_area`,
+`com_request`, `sem_request`). A reescrita também revelou e fechou um N+1 real: a lista de
+pendências do Drive materializava a `AreaTrabalho` de cada origem só para comparar pk —
+invisível enquanto o legado tinha `area_id NULL`, porque FK `None` nem vai ao banco
+(`integracoes/google_drive/status.py`).
 
 ### DB-03 ✅ RESOLVIDO · 🟠 Limpeza de rascunhos apaga rascunho de outra área · AUD · 1 d
 
@@ -3327,6 +3332,29 @@ alerta já estava lá.
 
 **Medição que falta:** quantos ofícios já emitidos teriam contagem diferente hoje. Sem isso não dá
 para saber se é dívida histórica ou risco corrente.
+
+---
+
+### NOVO-45 🟠 `NOVO` O catálogo global de seed não é ofertado a usuário com área — os pickers recortam sem fallback · DB · decisão de produto
+
+Medido em 07/08/2026, ao reescrever os testes do `DB-02`. `filter_queryset_by_area` é estrito:
+com área ativa devolve só `area = X`, nunca o global (`area IS NULL`). Consequência: os registros
+que o seed de migração cria como "padrão da instalação" — 5 `TipoEvento`, 3 `ProgramaSolicitante`,
+3 `HorarioAtendimento`, 11 `AtividadePlanoTrabalho` (`NOVO-34`) — não aparecem no picker de um
+usuário com vínculo. Exemplo concreto: o wizard de plano valida `programa` contra
+`filter_queryset_by_area(ProgramaSolicitante.objects)` (`planos_trabalho/forms.py:618`); numa
+instalação recém-migrada a lista vem vazia até a área cadastrar os próprios programas.
+
+**Não é regressão do `DB-02`** — é o comportamento vigente desde o `BE-09`. A reescrita dos testes
+só o tornou visível: o teste antigo "via" o global porque o usuário de teste não tinha vínculo e
+caía no balde `area IS NULL`, exatamente o estado que o `DB-02` eliminou dos modelos operacionais.
+
+**Decisão de produto, dois caminhos — e o grupo 2 do `DB-02` depende dela:**
+
+- ofertar o global como fallback de leitura (`Q(area=X) | Q(area__isnull=True)`) nos pickers de
+  catálogo — e aí `NOT NULL` nesses modelos fica proibido de vez;
+- ou materializar o seed por área na criação de cada área (o caminho que o `NOVO-09` já tomou para
+  `ModeloJustificativa`) — e aí o grupo 2 pode um dia virar `NOT NULL`.
 
 ---
 

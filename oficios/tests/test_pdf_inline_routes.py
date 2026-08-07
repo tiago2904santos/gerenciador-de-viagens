@@ -8,13 +8,16 @@ from django.test import TestCase
 from django.urls import reverse
 
 from oficios.models import Oficio
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class PdfInlineRoutesTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="tester_inline", password="123456")
         self.client.force_login(self.user)
-        self.oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        vincular_area(self.user)
+        self.oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
 
     def _mock_download_pdf(self):
         resp = HttpResponse(b"%PDF-1.4\n", content_type="application/pdf")

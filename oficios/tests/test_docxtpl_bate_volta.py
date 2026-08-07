@@ -6,6 +6,7 @@ from oficios.docxtpl_context import build_oficio_docxtpl_context
 from oficios.models import Oficio
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroTrecho
+from core.testing import area_de_teste
 
 
 class BateVoltaDocxtplTests(TestCase):
@@ -53,7 +54,7 @@ class BateVoltaDocxtplTests(TestCase):
         )
 
     def _roteiro_dois_dias(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.sede,
@@ -67,7 +68,7 @@ class BateVoltaDocxtplTests(TestCase):
 
     def test_idas_e_voltas_separadas_por_direcao(self):
         roteiro = self._roteiro_dois_dias()
-        oficio = Oficio.objects.create(roteiro=roteiro)
+        oficio = Oficio.objects.create(area=area_de_teste(), roteiro=roteiro)
 
         ctx = build_oficio_docxtpl_context(oficio)
 
@@ -87,14 +88,14 @@ class BateVoltaDocxtplTests(TestCase):
 
     def test_roteiro_comum_mantem_split_por_tipo(self):
         # sede -> destino (ida) e destino -> sede (retorno) simples.
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.sede,
         )
         self._ida(roteiro, 0, 6)
         self._volta(roteiro, 1, 6, tipo=RoteiroTrecho.TIPO_RETORNO)
-        oficio = Oficio.objects.create(roteiro=roteiro)
+        oficio = Oficio.objects.create(area=area_de_teste(), roteiro=roteiro)
 
         ctx = build_oficio_docxtpl_context(oficio)
 

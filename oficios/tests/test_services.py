@@ -40,14 +40,19 @@ from oficios.services import redirect_para_corrigir_documento_oficio
 from oficios.services import validar_oficio_para_documento
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroDestino
+from core.testing import area_de_teste
+from core.testing import com_request
 
 
 class OficioServicesTests(TestCase):
     def setUp(self):
-        self.cargo = Cargo.objects.create(nome="Analista")
-        self.servidor = Servidor.objects.create(nome="Servidor Um", cargo=self.cargo, cpf="12345678901")
-        self.viatura = Viatura.objects.create(placa="ABC1234", modelo="Viatura 1")
-        self.modelo = ModeloMotivoOficio.objects.create(nome="PADRAO SERVICO", texto="Texto padrão")
+        # DB-02: selectors/forms/services recortam pela area do request;
+        # chamada direta reproduz o contexto que a view teria.
+        self.enterContext(com_request(area_de_teste()))
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Analista")
+        self.servidor = Servidor.objects.create(area=area_de_teste(), nome="Servidor Um", cargo=self.cargo, cpf="12345678901")
+        self.viatura = Viatura.objects.create(area=area_de_teste(), placa="ABC1234", modelo="Viatura 1")
+        self.modelo = ModeloMotivoOficio.objects.create(area=area_de_teste(), nome="PADRAO SERVICO", texto="Texto padrão")
 
     def test_criar_oficio_dados_viajantes_salva_m2m_e_status(self):
         form = OficioDadosViajantesForm(
@@ -79,12 +84,12 @@ class OficioServicesTests(TestCase):
         _bloqueio,
     ):
         ano = timezone.localdate().year
-        Oficio.objects.create(
+        Oficio.objects.create(area=area_de_teste(), 
             numero=77,
             ano=ano,
             custeio=Oficio.CUSTEIO_UNIDADE_DPC,
         )
-        rascunho = Oficio.objects.create(
+        rascunho = Oficio.objects.create(area=area_de_teste(), 
             custeio=Oficio.CUSTEIO_UNIDADE_DPC,
         )
         original_save = rascunho.save
@@ -107,8 +112,8 @@ class OficioServicesTests(TestCase):
 
     def test_get_next_available_numero_reaproveita_lacuna_apos_exclusao(self):
         ano = timezone.localdate().year
-        primeiro = Oficio.objects.create(numero=1, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
-        Oficio.objects.create(numero=2, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        primeiro = Oficio.objects.create(area=area_de_teste(), numero=1, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        Oficio.objects.create(area=area_de_teste(), numero=2, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         excluir_oficio(primeiro)
         self.assertEqual(get_next_available_numero_oficio(ano), 1)
 
@@ -117,14 +122,14 @@ class OficioServicesTests(TestCase):
         # sugeridos automaticamente, só o 16 (maior + 1).
         ano = timezone.localdate().year
         for numero in range(1, 11):
-            Oficio.objects.create(numero=numero, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
-        Oficio.objects.create(numero=15, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+            Oficio.objects.create(area=area_de_teste(), numero=numero, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        Oficio.objects.create(area=area_de_teste(), numero=15, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         self.assertEqual(get_next_available_numero_oficio(ano), 16)
 
     def test_excluir_oficio_libera_numero_para_reaproveitamento(self):
         ano = timezone.localdate().year
         oficios = [
-            Oficio.objects.create(numero=numero, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+            Oficio.objects.create(area=area_de_teste(), numero=numero, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
             for numero in range(1, 11)
         ]
         excluir_oficio(oficios[6])  # exclui o ofício número 7
@@ -135,8 +140,8 @@ class OficioServicesTests(TestCase):
         # Editar (corrigir) o número de um ofício existente não deve reintroduzir
         # o número antigo como sugestão automática — só a exclusão faz isso.
         ano = timezone.localdate().year
-        oficio = Oficio.objects.create(numero=5, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
-        outro = Oficio.objects.create(numero=8, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=5, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        outro = Oficio.objects.create(area=area_de_teste(), numero=8, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         excluir_oficio(outro)  # libera o número 8 como lacuna
 
         form = OficioDadosViajantesForm(
@@ -158,8 +163,8 @@ class OficioServicesTests(TestCase):
 
     def test_clean_numero_rejeita_numero_ja_usado_no_ano(self):
         ano = timezone.localdate().year
-        Oficio.objects.create(numero=3, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
-        oficio = Oficio.objects.create(numero=9, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        Oficio.objects.create(area=area_de_teste(), numero=3, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=9, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
 
         form = OficioDadosViajantesForm(
             data={
@@ -174,7 +179,7 @@ class OficioServicesTests(TestCase):
 
     def test_servico_rejeita_numero_ocupado_depois_da_validacao(self):
         ano = timezone.localdate().year
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=77,
             ano=ano,
             custeio=Oficio.CUSTEIO_UNIDADE_DPC,
@@ -188,7 +193,7 @@ class OficioServicesTests(TestCase):
             instance=oficio,
         )
         self.assertTrue(form.is_valid(), form.errors)
-        Oficio.objects.create(
+        Oficio.objects.create(area=area_de_teste(), 
             numero=78,
             ano=ano,
             custeio=Oficio.CUSTEIO_UNIDADE_DPC,
@@ -208,7 +213,7 @@ class OficioServicesTests(TestCase):
         config = ConfiguracaoSistema.get_singleton()
         config.cidade_sede_padrao = cidade_sede
         config.save()
-        evento = Evento.objects.create(
+        evento = Evento.objects.create(area=area_de_teste(), 
             destino_uf="PR",
             destino_cidade="Londrina",
             data_inicio=datetime.date(2026, 7, 10),
@@ -216,7 +221,7 @@ class OficioServicesTests(TestCase):
             horario_inicio=datetime.time(9, 30),
             horario_fim=datetime.time(18, 45),
         )
-        roteiro = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
+        roteiro = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
 
         _preencher_roteiro_oficio_com_evento(roteiro, evento)
         roteiro.refresh_from_db()
@@ -230,12 +235,12 @@ class OficioServicesTests(TestCase):
         self.assertIsNone(roteiro.retorno_saida_dt)
 
     def test_criar_oficio_rascunho_herda_motivo_mas_nao_servidores_ou_viatura(self):
-        evento = Evento.objects.create(
+        evento = Evento.objects.create(area=area_de_teste(), 
             destino_uf="PR",
             destino_cidade="Londrina",
             motivo="Motivo do evento",
         )
-        anterior = Oficio.objects.create(evento=evento, custeio=Oficio.CUSTEIO_UNIDADE_DPC, viatura=self.viatura)
+        anterior = Oficio.objects.create(area=area_de_teste(), evento=evento, custeio=Oficio.CUSTEIO_UNIDADE_DPC, viatura=self.viatura)
         anterior.servidores.add(self.servidor)
 
         novo = criar_oficio_rascunho(evento=evento)
@@ -248,7 +253,7 @@ class OficioServicesTests(TestCase):
 
 
     def test_atualizar_oficio_dados_viajantes_preserva_transporte_data_e_numero(self):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             status=Oficio.STATUS_RASCUNHO,
@@ -280,7 +285,7 @@ class OficioServicesTests(TestCase):
         self.assertEqual(atualizado.status, Oficio.STATUS_GERADO)
 
     def test_atualizar_oficio_dados_viajantes_preenche_ano_quando_ausente(self):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=150,
             ano=None,
             status=Oficio.STATUS_RASCUNHO,
@@ -307,13 +312,13 @@ class OficioServicesTests(TestCase):
         self.assertEqual(atualizado.ano, timezone.localdate().year)
 
     def test_avaliar_oficio_dados_viajantes_incomplete_e_complete(self):
-        incompleto = Oficio.objects.create(custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        incompleto = Oficio.objects.create(area=area_de_teste(), custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         avaliacao_incompleta = avaliar_oficio_dados_viajantes(incompleto)
         self.assertEqual(avaliacao_incompleta["status"], "incomplete")
         self.assertIn("Informe o motivo.", avaliacao_incompleta["pendencias"])
         self.assertIn("Selecione ao menos um viajante.", avaliacao_incompleta["pendencias"])
 
-        completo = Oficio.objects.create(
+        completo = Oficio.objects.create(area=area_de_teste(), 
             protocolo="12.345.678-9",
             motivo="Motivo",
             custeio=Oficio.CUSTEIO_UNIDADE_DPC,
@@ -324,7 +329,7 @@ class OficioServicesTests(TestCase):
         self.assertEqual(avaliacao_completa["pendencias"], [])
 
     def test_build_oficio_document_payload_formata_protocolo(self):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             protocolo="123456789",
@@ -353,14 +358,14 @@ class OficioServicesTests(TestCase):
         _m_tpl_sig,
         m_get_cached,
     ):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             motivo="Motivo",
             custeio=Oficio.CUSTEIO_UNIDADE_DPC,
         )
         oficio.servidores.add(self.servidor)
-        artefato = DocumentoArtefato.objects.create(
+        artefato = DocumentoArtefato.objects.create(area=area_de_teste(), 
             tipo="oficio",
             formato="pdf",
             oficio=oficio,
@@ -404,7 +409,7 @@ class OficioServicesTests(TestCase):
 
     def test_validar_bloqueia_sem_roteiro(self):
         ConfiguracaoSistema.get_singleton()
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             motivo="M",
@@ -427,7 +432,7 @@ class OficioServicesTests(TestCase):
             estado=est,
             defaults={"uf": "PR"},
         )
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             status=Roteiro.STATUS_RASCUNHO,
             origem_estado=est,
@@ -440,7 +445,7 @@ class OficioServicesTests(TestCase):
         roteiro.save(update_fields=["saida_dt"])
         RoteiroDestino.objects.create(roteiro=roteiro, estado=est, cidade=cid, ordem=0)
         base = datetime.date(2026, 5, 10)
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             data_criacao=base,

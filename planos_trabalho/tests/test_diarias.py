@@ -13,6 +13,7 @@ from planos_trabalho.models import PlanoTrabalho
 from planos_trabalho.services import atualizar_snapshot_diarias
 from planos_trabalho.services import calcular_diarias_plano
 from planos_trabalho.services import montar_valor_do_plano_texto
+from core.testing import area_de_teste
 
 from .helpers import configurar_sistema
 from .helpers import criar_base_geografica
@@ -36,7 +37,7 @@ class DiariasPlanoTests(TestCase):
         self.assertEqual(resultado["valor_total_display"], "7.234,68")
 
     def test_sarandi_5x100_mais_1x30_por_servidor(self):
-        plano = PlanoTrabalho.objects.create(
+        plano = PlanoTrabalho.objects.create(area=area_de_teste(), 
             destino_estado=self.sarandi.estado,
             destino_cidade=self.sarandi,
             # 5 pernoites + parcial de 9h (acima de 8h) => 5 x 100% + 1 x 30%
@@ -45,7 +46,7 @@ class DiariasPlanoTests(TestCase):
             chegada_sede_data=date(2026, 6, 28),
             chegada_sede_hora=time(16, 0),
         )
-        cargo = Cargo.objects.create(nome="Policial Civil")
+        cargo = Cargo.objects.create(area=area_de_teste(), nome="Policial Civil")
         EfetivoPlano.objects.create(plano=plano, cargo=cargo, quantidade=18)
 
         resultado = calcular_diarias_plano(plano)
@@ -78,7 +79,7 @@ class DiariasPlanoTests(TestCase):
         self.assertEqual(resultado["valor_total"], Decimal("12057.80"))
 
     def test_erros_quando_dados_incompletos(self):
-        plano = PlanoTrabalho.objects.create()
+        plano = PlanoTrabalho.objects.create(area=area_de_teste())
         resultado = calcular_diarias_plano(plano)
         self.assertFalse(resultado["ok"])
         self.assertTrue(resultado["erros"])

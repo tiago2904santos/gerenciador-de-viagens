@@ -29,6 +29,8 @@ from cadastros.models import Servidor
 from oficios.models import Oficio
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroDestino
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class CustoDoFragmentoDeMenusTests(TestCase):
@@ -36,20 +38,22 @@ class CustoDoFragmentoDeMenusTests(TestCase):
     def setUpTestData(cls):
         cls.estado = Estado.objects.create(sigla="PR", nome="Parana")
         cls.cidade = Cidade.objects.create(nome="CURITIBA", estado=cls.estado, uf="PR")
-        cls.cargo = Cargo.objects.create(nome="Analista")
+        cls.cargo = Cargo.objects.create(area=area_de_teste(), nome="Analista")
 
     def setUp(self):
-        self.client.force_login(get_user_model().objects.create_user(username="frag"))
+        usuario = get_user_model().objects.create_user(username="frag")
+        vincular_area(usuario)
+        self.client.force_login(usuario)
 
     def _oficio(self, *, destinos, servidores):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             origem_estado=self.estado, origem_cidade=self.cidade
         )
         for ordem in range(destinos):
             RoteiroDestino.objects.create(
                 roteiro=roteiro, estado=self.estado, cidade=self.cidade, ordem=ordem
             )
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=Oficio.objects.count() + 1,
             ano=2026,
             roteiro=roteiro,
@@ -57,7 +61,7 @@ class CustoDoFragmentoDeMenusTests(TestCase):
         )
         for indice in range(servidores):
             oficio.servidores.add(
-                Servidor.objects.create(
+                Servidor.objects.create(area=area_de_teste(), 
                     nome=f"Servidor {oficio.pk}-{indice}",
                     cargo=self.cargo,
                     cpf=f"{oficio.pk:05d}{indice:06d}",

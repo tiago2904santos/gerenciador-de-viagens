@@ -49,7 +49,7 @@ class Roteiro(CancelavelModel):
 
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
-        null=True,
+        null=False,
         blank=True,
         on_delete=models.PROTECT,
         related_name="roteiros",

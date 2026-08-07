@@ -26,6 +26,8 @@ from cadastros.models import Servidor
 from oficios.models import Oficio
 from oficios.presenters import apresentar_oficio_card
 from usuarios.models import AreaTrabalho
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 CORPO_DE_MENU = re.compile(r'<div[^>]*class="[^"]*\bcv-action-menu\b[^"]*"')
@@ -34,10 +36,11 @@ CORPO_DE_MENU = re.compile(r'<div[^>]*class="[^"]*\bcv-action-menu\b[^"]*"')
 class MenusSobDemandaTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="menus", password="x")
+        vincular_area(self.user)
         self.client.force_login(self.user)
-        cargo = Cargo.objects.create(nome="Analista")
-        self.servidor = Servidor.objects.create(nome="Servidor", cargo=cargo, cpf="12345678901")
-        self.oficio = Oficio.objects.create(
+        cargo = Cargo.objects.create(area=area_de_teste(), nome="Analista")
+        self.servidor = Servidor.objects.create(area=area_de_teste(), nome="Servidor", cargo=cargo, cpf="12345678901")
+        self.oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC
         )
         self.oficio.servidores.add(self.servidor)
