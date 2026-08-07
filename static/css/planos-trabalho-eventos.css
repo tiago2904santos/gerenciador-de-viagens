@@ -54,12 +54,6 @@
   height: 1rem;
 }
 
-.pte-events__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--space-3);
-}
-
 /* ── Card ───────────────────────────────────────────────────────────────── */
 .pte-card {
   display: flex;
@@ -246,31 +240,6 @@
   padding-top: var(--space-5);
 }
 
-.pt-resumo-evento__tag {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  align-self: flex-start;
-  color: var(--color-heading);
-  font-size: var(--font-size-sm, 0.9rem);
-  font-weight: 800;
-  letter-spacing: 0.02em;
-}
-
-.pt-resumo-evento__tag-num {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.6rem;
-  height: 1.6rem;
-  border-radius: var(--radius-pill, 999px);
-  background: color-mix(in srgb, var(--color-accent, #d9a40f) 18%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-accent, #d9a40f) 55%, transparent);
-  color: var(--color-accent, #d9a40f);
-  font-size: var(--font-size-xs, 0.75rem);
-  font-weight: 900;
-}
-
 /* ── Grades de linhas ──────────────────────────────────────────────────── */
 .pt-resumo-grid {
   display: grid;
@@ -280,19 +249,6 @@
 .pt-resumo-grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .pt-resumo-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .pt-resumo-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-
-.pt-resumo-block {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.pt-resumo-subhead {
-  color: var(--color-heading);
-  font-size: var(--font-size-sm, 0.9rem);
-  font-weight: 800;
-  letter-spacing: 0.01em;
-}
 
 /* ── Caixa de campo ────────────────────────────────────────────────────── */
 .pt-resumo-box {
@@ -376,13 +332,6 @@
   overflow-wrap: normal;
   word-break: keep-all;
   margin-bottom: var(--space-2);
-}
-
-.pt-resumo-valor__extenso {
-  color: var(--color-heading);
-  font-size: var(--font-size-sm, 0.9rem);
-  font-weight: 700;
-  line-height: 1.35;
 }
 
 /* ── Listas roláveis (Efetivo e Atividades) ────────────────────────────── */

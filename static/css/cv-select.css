@@ -179,31 +179,6 @@ html[data-theme="light"] {
   opacity: 1;
 }
 
-.cv-select-wrapper--disabled::after {
-  border-color: var(--cv-select-disabled-color);
-  opacity: 0.45;
-}
-
-/* Error */
-.cv-select-wrapper--error select,
-.cv-select-wrapper--error .cv-select-native {
-  border-color: var(--cv-select-error-border);
-}
-
-.cv-select-wrapper--error::after {
-  border-color: var(--cv-select-error-border);
-}
-
-/* Success */
-.cv-select-wrapper--success select,
-.cv-select-wrapper--success .cv-select-native {
-  border-color: var(--cv-select-success-border);
-}
-
-.cv-select-wrapper--success::after {
-  border-color: var(--cv-select-success-border);
-}
-
 /* Opções no tema escuro */
 html[data-theme="dark"] .cv-select-wrapper select option,
 html[data-theme="dark"] .cv-select-native option {
@@ -299,75 +274,6 @@ html[data-theme="dark"] .cv-select-native option {
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Item de acao */
-.cv-action-dropdown__item {
-  align-items: center;
-  border-radius: calc(var(--cv-dropdown-menu-radius) - var(--space-1));
-  color: var(--color-text);
-  cursor: pointer;
-  display: flex;
-  font-size: var(--cv-select-font-size);
-  font-weight: var(--cv-select-font-weight);
-  gap: var(--space-2);
-  min-height: var(--cv-dropdown-item-height);
-  padding: 0 var(--cv-dropdown-item-px);
-  text-decoration: none;
-  transition: background-color var(--transition-fast), color var(--transition-fast);
-  user-select: none;
-  width: 100%;
-}
-
-.cv-action-dropdown__item:hover,
-.cv-action-dropdown__item:focus-visible {
-  background: var(--cv-dropdown-item-hover);
-  color: var(--cv-dropdown-item-active-color);
-  outline: none;
-}
-
-/* Item desabilitado */
-.cv-action-dropdown__item:disabled,
-.cv-action-dropdown__item[aria-disabled="true"] {
-  color: var(--cv-select-placeholder);
-  cursor: not-allowed;
-  opacity: 0.55;
-  pointer-events: none;
-}
-
-/* Item destrutivo / danger */
-.cv-action-dropdown__item--danger {
-  color: var(--cv-dropdown-item-danger-color);
-}
-
-.cv-action-dropdown__item--danger:hover,
-.cv-action-dropdown__item--danger:focus-visible {
-  background: var(--cv-dropdown-item-danger-hover);
-  color: var(--cv-dropdown-item-danger-color);
-}
-
-/* Ícone dentro do item */
-.cv-action-dropdown__item-icon {
-  align-items: center;
-  display: inline-flex;
-  flex-shrink: 0;
-  height: 16px;
-  justify-content: center;
-  opacity: 0.72;
-  width: 16px;
-}
-
-.cv-action-dropdown__item:hover .cv-action-dropdown__item-icon,
-.cv-action-dropdown__item:focus-visible .cv-action-dropdown__item-icon {
-  opacity: 1;
-}
-
-/* Separador */
-.cv-action-dropdown__separator {
-  background: var(--cv-dropdown-separator);
-  border: 0;
-  height: 1px;
-  margin: var(--space-1) calc(var(--cv-dropdown-item-px) * -1 + var(--space-1));
-}
-
 /* Estado aberto — o trigger pode receber classe is-open via JS */
 .cv-action-dropdown--open > [data-cv-dropdown-trigger],
 .cv-action-dropdown > [data-cv-dropdown-trigger][aria-expanded="true"] {
@@ -433,24 +339,6 @@ html[data-theme="dark"] .cv-select-native option {
   padding: 0 var(--space-1);
 }
 
-.cv-filter-dropdown__menu {
-  animation: cv-dropdown-enter 160ms ease both;
-  background: var(--cv-dropdown-menu-bg);
-  border: 1px solid var(--cv-dropdown-menu-border);
-  border-radius: var(--cv-dropdown-menu-radius);
-  box-shadow: var(--cv-dropdown-menu-shadow);
-  left: 0;
-  list-style: none;
-  margin: 0;
-  max-height: var(--cv-dropdown-max-height);
-  min-width: 220px;
-  overflow-y: auto;
-  padding: var(--space-1);
-  position: absolute;
-  top: calc(100% + var(--space-1));
-  z-index: var(--cv-dropdown-z-index);
-}
-
 .cv-filter-dropdown__option {
   align-items: center;
   border-radius: calc(var(--cv-dropdown-menu-radius) - var(--space-1));
@@ -473,16 +361,6 @@ html[data-theme="dark"] .cv-select-native option {
   background: var(--cv-dropdown-item-active);
   color: var(--cv-dropdown-item-active-color);
   font-weight: var(--font-weight-semibold);
-}
-
-.cv-filter-dropdown__option-check {
-  align-items: center;
-  display: inline-flex;
-  flex-shrink: 0;
-  height: 16px;
-  justify-content: center;
-  opacity: 0;
-  width: 16px;
 }
 
 .cv-filter-dropdown__option--selected .cv-filter-dropdown__option-check {
@@ -600,15 +478,6 @@ html[data-theme="dark"] {
   font-size: var(--cv-field-label-size);
   font-weight: var(--cv-field-label-weight);
   line-height: 1.2;
-}
-
-/* Label row: label à esquerda, controle auxiliar à direita */
-.cv-field__label-row {
-  align-items: center;
-  display: flex;
-  gap: var(--space-2);
-  justify-content: space-between;
-  min-width: 0;
 }
 
 .cv-field__control-row,

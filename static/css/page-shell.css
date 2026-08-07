@@ -790,10 +790,6 @@ html[data-theme="light"] {
   margin:      0;
 }
 
-.footer-actions--primary-only .footer-actions__primary {
-  margin-left: auto;
-}
-
 /* Stepper legado como irmão do header — UI Lab / demos.
    Wizards de produção embutem o stepper no `.list-header--wizard` (NOVO-20). */
 .page-shell--wizard > .page-stepper,
@@ -1161,15 +1157,6 @@ html[data-theme="light"] {
   min-width: 0;
 }
 
-.cv-form-section-header--standalone {
-  border: 1px solid var(--cv-form-section-border);
-  border-radius: var(--cv-form-section-radius);
-  box-shadow: var(--cv-form-section-shadow);
-  min-height: 0;
-  overflow: hidden;
-  padding-block: var(--space-4);
-}
-
 .cv-form-section-card--compact .cv-form-section-header {
   --_wizard-filete-width: 4px;
   min-height: 0;
@@ -1276,13 +1263,6 @@ html[data-theme="light"] {
 
 .form-section > .footer-actions {
   padding-inline: 0;
-}
-
-.footer-actions__secondary,
-.footer-actions__primary {
-  align-items: center;
-  display:     flex;
-  gap:         var(--footer-actions-gap);
 }
 
 .cv-floating-action {
@@ -2090,24 +2070,6 @@ body.has-delete-modal-open {
   white-space:    nowrap;
 }
 
-.page-header-status-chip--draft {
-  background: var(--route-status-draft-bg);
-  border:     1px solid var(--route-status-draft-border);
-  color:      var(--route-status-draft-text);
-}
-
-.page-header-status-chip--active {
-  background: var(--route-status-final-bg);
-  border:     1px solid var(--route-status-final-border);
-  color:      var(--route-status-final-text);
-}
-
-.page-header-status-chip--pending {
-  background: var(--route-status-muted-bg);
-  border:     1px solid var(--route-status-muted-border);
-  color:      var(--route-status-muted-text);
-}
-
 /* Alerta inline simples (ex.: aviso de cancelamento) */
 .cv-alert {
   border-radius: var(--radius-md, 8px);
@@ -2201,13 +2163,6 @@ body.has-delete-modal-open {
 }
 
 .page-header-rail__stepper::-webkit-scrollbar { display: none; }
-
-/* Variações */
-.page-header-rail--filters,
-.page-header-rail--filters-inline-create {
-  flex-wrap: wrap;
-  gap:       var(--space-4);
-}
 
 .page-header-rail--stepper {
   flex-wrap: wrap;
@@ -2425,21 +2380,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   border-top-right-radius: 0;
 }
 
-/* =========================================================
-   25. Card List
-   Grade de cards com hover. Uso: roteiros, ofícios,
-   documentos e listas com mais informação visual.
-   ========================================================= */
-
-.card-list {
-  box-sizing:            border-box;
-  display:               grid;
-  gap:                   var(--space-4);
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  padding:               var(--space-4);
-  width:                 100%;
-}
-
 .list-card {
   background:     var(--surface-form-panel);
   border:         1px solid var(--border-form-panel);
@@ -2460,33 +2400,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   box-shadow:   var(--shadow-medium);
 }
 
-.list-card__title {
-  color:         var(--theme-text-heading);
-  font-size:     var(--font-size-sm);
-  font-weight:   var(--font-weight-bold);
-  margin:        0;
-  overflow:      hidden;
-  text-overflow: ellipsis;
-  white-space:   nowrap;
-}
-
-.list-card__body {
-  color:       var(--theme-text-muted);
-  flex:        1;
-  font-size:   var(--font-size-xs);
-  line-height: 1.5;
-}
-
-.list-card__footer {
-  align-items:     center;
-  border-top:      1px solid var(--border-subtle);
-  display:         flex;
-  gap:             var(--space-2);
-  justify-content: flex-end;
-  margin-top:      auto;
-  padding-top:     var(--space-3);
-}
-
 /* =========================================================
    26. Quick Add Inline
    Nome genérico para o padrão de cadastro rápido inline.
@@ -2499,89 +2412,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   display:        flex;
   flex-direction: column;
   width:          100%;
-}
-
-/* ─── Folder Tab — orelhinha de pasta física ─────────────── */
-
-/* Linha que contém a aba (não estica a aba) */
-.cv-inline-create__tab-row {
-  display: flex;
-  justify-content: flex-end;
-}
-
-/* Aba / gatilho de abertura — estilo pasta física */
-.cv-inline-create__tab {
-  width: var(--inline-create-tab-width);
-  height: var(--inline-create-tab-height);
-  padding-inline: var(--space-4);
-  border-radius: 0 0 var(--radius-md) 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-
-  background: var(--surface-filter-bar);
-  color: var(--text-primary);
-  font-weight: 700;
-  font-size: var(--font-size-sm);
-
-  border: 0;
-  cursor: pointer;
-
-  clip-path: var(--inline-create-tab-clip-path);
-}
-
-.cv-inline-create__tab:hover,
-.cv-inline-create__tab:focus-visible {
-  box-shadow: var(--inline-create-tab-shadow);
-  color:      var(--theme-text-heading);
-}
-
-.cv-inline-create__tab:hover .cv-inline-create__tab-icon {
-  background: var(--color-accent-hover, var(--color-accent));
-}
-
-.cv-inline-create__tab:focus-visible {
-  outline:        2px solid var(--border-focus);
-  outline-offset: -2px;
-}
-
-/* Aberta: aba conectada visivelmente ao painel */
-.cv-inline-create__tab[aria-expanded="true"] {
-  background: var(--surface-quick-create-header);
-  box-shadow: none;
-  color:      var(--theme-text-heading);
-}
-
-.cv-inline-create__tab[aria-expanded="true"] .cv-inline-create__tab-icon {
-  background: var(--color-accent);
-  transform:  rotate(45deg);
-}
-
-/* Ícone — círculo colorido com sinal + (gira 45° para virar ×) */
-.cv-inline-create__tab-icon {
-  align-items:     center;
-  background:      var(--color-inline-create-tab-icon-bg);
-  border-radius:   var(--radius-pill);
-  color:           var(--color-inline-create-tab-icon-fg);
-  display:         inline-flex;
-  flex-shrink:     0;
-  font-size:       var(--font-size-xs);
-  font-weight:     var(--font-weight-bold);
-  height:          var(--inline-create-tab-icon-size);
-  justify-content: center;
-  line-height:     1;
-  pointer-events:  none;
-  transition:
-    background  var(--transition-base),
-    transform   var(--transition-base);
-  width:           var(--inline-create-tab-icon-size);
-}
-
-/* Label do texto */
-.cv-inline-create__tab-label {
-  letter-spacing: inherit;
-  pointer-events: none;
 }
 
 /* Painel: visualmente unido à aba acima */
@@ -2598,46 +2428,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 .cv-inline-create.is-open > :not(.cv-inline-create__tab-row) {
   display: flex;
   flex-direction: column;
-}
-
-.cv-inline-create__header {
-  align-items:     center;
-  background:      var(--surface-quick-create-header);
-  border-bottom:   1px solid var(--border-quick-create);
-  box-sizing:      border-box;
-  display:         flex;
-  gap:             var(--space-3);
-  justify-content: space-between;
-  padding:         var(--space-2) var(--filter-bar-padding-x);
-}
-
-.cv-inline-create__title {
-  color:       var(--theme-text-heading);
-  font-size:   var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  margin:      0;
-}
-
-.cv-inline-create__close {
-  align-items:     center;
-  background:      transparent;
-  border:          none;
-  border-radius:   var(--radius-sm);
-  color:           var(--theme-text-muted);
-  cursor:          pointer;
-  display:         flex;
-  font-size:       var(--font-size-md);
-  height:          28px;
-  justify-content: center;
-  line-height:     1;
-  padding:         0;
-  transition:      color var(--transition-base), background var(--transition-base);
-  width:           28px;
-}
-
-.cv-inline-create__close:hover {
-  background: var(--border-quick-create);
-  color:      var(--theme-text-heading);
 }
 
 .cv-inline-create__body {
@@ -2804,96 +2594,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
     order: 3;
     width: 100%;
   }
-}
-
-/* =========================================================
-   29. Header Filter Bar
-   Barra de filtros usada dentro do page-header-rail.
-   Suporta busca textual, filtros e botões de ação.
-   ========================================================= */
-
-/* Contêiner principal */
-.header-filter-bar {
-  align-items: center;
-  display:     flex;
-  flex:        1;
-  flex-wrap:   wrap;
-  gap:         var(--space-2) var(--space-4);
-  min-width:   0;
-}
-
-/* Campo de busca (cresce para preencher espaço) */
-.header-filter-bar__search {
-  flex:      1;
-  min-width: var(--filter-search-min-width);
-}
-
-/* Botões de ação à direita */
-.header-filter-bar__actions {
-  align-items: center;
-  display:     flex;
-  flex-shrink: 0;
-  gap:         var(--space-2);
-}
-
-/* Variante avançada — busca sozinha na linha 1; campos + ações na linha 2 */
-.header-filter-bar--advanced {
-  align-items: flex-start;
-  flex-wrap:   wrap;
-}
-
-/* Busca: linha própria dentro da variante avançada */
-.header-filter-bar--advanced .header-filter-bar__search {
-  flex:      0 0 100%;
-  min-width: 0;
-}
-
-/* Row: linha 2 — campos de filtro + botão de ação na mesma linha */
-.header-filter-bar__row {
-  align-items: center;
-  display:     flex;
-  flex:        0 0 100%;
-  gap:         var(--space-2) var(--space-3);
-}
-
-/* Grupo de campos dentro do row */
-.header-filter-bar__fields {
-  align-items: center;
-  display:     flex;
-  flex:        1 1 auto;
-  flex-wrap:   wrap;
-  gap:         var(--space-2) var(--space-3);
-  min-width:   0;
-}
-
-/* Campo individual de filtro */
-.header-filter-field {
-  flex:      1 1 auto;
-  min-width: 120px;
-}
-
-/* Chips de filtros aplicados — linha própria abaixo de tudo */
-.header-applied-filters {
-  align-items: center;
-  display:     flex;
-  flex:        0 0 100%;
-  flex-wrap:   wrap;
-  gap:         var(--space-2);
-  padding-top: var(--space-1);
-}
-
-.header-applied-chip {
-  align-items:     center;
-  background:      var(--surface-filter-chip);
-  border:          1px solid var(--border-filter-chip);
-  border-radius:   var(--radius-pill, 999px);
-  color:           var(--color-filter-text);
-  cursor:          default;
-  display:         inline-flex;
-  font-size:       var(--font-size-xs);
-  gap:             var(--space-1);
-  padding:         2px var(--space-2);
-  white-space:     nowrap;
 }
 
 /* Input de texto / busca */

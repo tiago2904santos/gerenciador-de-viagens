@@ -779,12 +779,6 @@ html[data-theme="dark"] #attach-signed-modal .attach-signed-modal__dialog {
   color: var(--action-info-text);
 }
 
-.attach-signed-modal__close {
-  position: absolute;
-  right: 18px;
-  top: 18px;
-}
-
 .attach-signed-modal__intro {
   align-items: flex-start;
   background: var(--step1-panel, var(--color-surface-soft));

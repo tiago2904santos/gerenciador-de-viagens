@@ -38,22 +38,6 @@
   gap: var(--space-3);
 }
 
-.cluster--between {
-  justify-content: space-between;
-}
-
-.cluster--start {
-  align-items: flex-start;
-}
-
-/* Canonical content helpers. These replace one-off inline declarations in
-   shared templates while keeping page CSS focused on composition. */
-.cv-divider {
-  border: 0;
-  border-top: 1px solid var(--color-border-soft);
-  margin: var(--space-2) 0 0;
-}
-
 .cv-inline-form {
   display: inline;
   margin: 0;
@@ -72,40 +56,15 @@
   margin-top: var(--space-3);
 }
 
-.cv-section-spaced {
-  margin-top: var(--space-5);
-}
-
 .cv-field--full-width {
   align-self: stretch;
   width: 100%;
-}
-
-.cv-demo-width--sm {
-  max-width: 320px;
-}
-
-.cv-demo-width--md {
-  max-width: 360px;
 }
 
 .cv-btn--icon-square {
   height: 36px;
   padding: 0;
   width: 36px;
-}
-
-.delete-confirm-copy {
-  margin: 0 0 var(--space-3);
-}
-
-.delete-confirm-preview__label {
-  margin: 0 0 var(--space-2);
-}
-
-.delete-confirm-preview__body {
-  color: var(--color-text-muted);
-  margin: 0 0 var(--space-4);
 }
 
 .document-preview-heading {
@@ -490,21 +449,6 @@ html[data-theme="light"] {
   --_cv-chip-glow: var(--cv-chip-filter-glow);
 }
 
-/* --------------------------------------------------------------------------
-   4. Data table canônica
-   -------------------------------------------------------------------------- */
-.cv-data-table-shell {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  max-width: 100%;
-  overflow-x: auto;
-}
-
-.cv-data-table-shell:focus-visible {
-  box-shadow: 0 0 0 3px var(--color-focus-ring);
-  outline: none;
-}
-
 .cv-data-table {
   border-collapse: collapse;
   min-width: 680px;
@@ -527,26 +471,6 @@ html[data-theme="light"] {
 
 .cv-data-table tbody tr:last-child td {
   border-bottom: 0;
-}
-
-.cv-data-table__title,
-.cv-data-table__detail {
-  display: block;
-}
-
-.cv-data-table__title {
-  color: var(--color-heading);
-}
-
-.cv-data-table__detail {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  margin-top: 2px;
-}
-
-.cv-data-table__actions {
-  text-align: right !important;
-  width: 1%;
 }
 
 @media (max-width: 600px) {

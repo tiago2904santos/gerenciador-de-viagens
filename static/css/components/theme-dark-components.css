@@ -4,8 +4,6 @@
  * Extracted from dark-redesign.css (Etapa 7, Fase 6).
  */
 
-
-
 /* O passo atual é identificado pela combinação sólida de fundo e borda, sem
    anéis concêntricos que possam ser confundidos com um foco exagerado. */
 :is(html[data-theme="dark"])
@@ -288,7 +286,6 @@ html[data-theme="dark"] :is(input, select, textarea) {
   border: 1px solid var(--color-input-border);
   box-shadow: none;
 }
-
 
 /* Modal cancelar: textarea sem borda/hover/focus. */
 :is(html[data-theme="dark"])
@@ -2610,7 +2607,6 @@ html[data-theme="dark"] .cv-composite-field__control .form-control:focus-visible
   outline: none;
 }
 
-
 /* Multipicker de pessoas: uma lista operacional, não uma grade de cards. Cada
    pessoa usa toda a largura e mantém suas ações disponíveis no mouse, teclado
    e touch. */
@@ -3804,15 +3800,6 @@ html[data-theme="dark"] :is(table, .table) {
   color: var(--color-text);
 }
 
-html[data-theme="dark"] :is(th, .table__head) {
-  background: var(--color-surface-muted);
-  color: var(--color-muted-strong);
-}
-
-html[data-theme="dark"] :is(tr, .list-row):hover {
-  background: var(--color-surface-soft);
-}
-
 html[data-theme="dark"] :is(.modal, .cv-modal__dialog, .drawer, [role="dialog"]) {
   background-color: var(--color-surface-strong);
   border-color: var(--color-border-strong);
@@ -4186,18 +4173,9 @@ html[data-theme="dark"] .empty-state__title {
   border-color: var(--color-accent);
 }
 
-.cv-skeleton {
-  animation: cv-skeleton-pulse 1.4s ease-in-out infinite;
-  background: linear-gradient(90deg, var(--color-surface-muted) 25%, var(--color-surface-soft) 50%, var(--color-surface-muted) 75%);
-  background-size: 200% 100%;
-  border-radius: var(--radius-control);
-  color: transparent;
-}
-
 @keyframes cv-skeleton-pulse {
   to { background-position: -200% 0; }
 }
-
 
 @media (max-width: 840px) {
   html[data-theme="dark"] .sidebar {
@@ -4538,7 +4516,6 @@ html[data-theme="dark"] .empty-state__title {
   min-height: var(--control-height-md);
   padding: 0 12px;
 }
-
 
 :is(html[data-theme="dark"])
   .oficio-external-driver .cv-search-picker__input {
@@ -5186,34 +5163,6 @@ html[data-theme="dark"] *::after {
   .cv-record-card__footer {
   background: var(--cv-card-family-bg);
   border-top-color: var(--cv-card-family-border);
-}
-
-:is(html[data-theme="dark"])
-  .cv-operation-card {
-  display: grid;
-  gap: 0;
-  padding: 0;
-}
-
-:is(html[data-theme="dark"])
-  .cv-operation-card__body {
-  padding: clamp(20px, 3vw, 32px);
-}
-
-:is(html[data-theme="dark"])
-  .cv-operation-card__footer {
-  background: var(--color-surface);
-  border-top: 1px solid var(--color-border);
-  justify-content: flex-end;
-  padding: 16px clamp(20px, 3vw, 32px);
-}
-
-:is(html[data-theme="dark"])
-  .cv-operation-card__message {
-  color: var(--color-text);
-  font-size: var(--font-size-md);
-  line-height: 1.65;
-  margin: 0;
 }
 
 :is(html[data-theme="dark"])

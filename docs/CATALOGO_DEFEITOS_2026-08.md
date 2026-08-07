@@ -1839,14 +1839,44 @@ do dono. Antes de apagar, verifiquei a fronteira, e o resultado corrigiu uma afi
 (`core/forms/widgets.py:27`) emite `cv-field__control--select` em todo `<select>`, e
 `templates/cadastros/servidores/partials/_form_fields.html:11` emite `cv-field-row` — **nenhuma das
 duas tem CSS por trás em produção.** Contrato de widget apontando para regra que não existe.
-| `dev/ui-lab-fields.css` | 96 | 18 KB |
-| `dev/ui-lab-pages.css` | 79 | 16 KB |
-| `page-shell.css` | 78 | 14 KB |
-| `roteiros.css` | 78 | 14 KB |
-| `cv-buttons.css` | 49 | 11 KB |
+Virou o `NOVO-46`, para deixar de ser nota de rodapé de outro ID.
 
 **A prova de grep exigida pelo `AGENTS.md` §3.6 tem que ser refeita arquivo a arquivo no PR** —
 esta contagem é o mapa, não a licença.
+
+---
+
+**Varredura final, 07/08.** Os seis arquivos do plano estavam fechados, mas o plano nomeou só os
+seis maiores: uma remedição do `static/css` inteiro achou **412 blocos e 71,6 KB** ainda mortos,
+espalhados por **31 arquivos**. O enunciado ("981 blocos, 168 KB") sempre foi do repositório todo;
+foi a *lista de trabalho* que parou nos seis.
+
+O resto saiu em duas levas, separadas pela regra — não pelo arquivo:
+
+| leva | regra | arquivos | blocos | peso |
+|---|---|---:|---:|---:|
+| A | classe morta em código **e** em todo o CSS | 25 | 305 | 49,4 KB |
+| B | classe morta em código, estilizada em ≥2 CSS (por família) | 17 | 102 | 21,5 KB |
+
+**O instrumento de verificação mudou, e essa é a correção de método deste ciclo.** Os PRs
+anteriores provaram "sem regressão" por diff de pixel. Rodando o rastreador **duas vezes com o CSS
+idêntico**, 25 das 88 telas divergiram — antialiasing de texto e um painel de `/usuarios/` que muda
+sozinho. O piso de ruído do instrumento ficou **maior** que qualquer diferença que a poda produziu:
+ele não conseguia separar "não mudou" de "mudou pouco". A afirmação de 15/16 telas idênticas no PR
+do `oficios.css` foi mais sorte que rigor.
+
+A troca foi para `getComputedStyle`: para cada elemento de cada tela, a caixa mais 44 propriedades
+que desenham. Determinístico depois de desligar `transition` e `animation` — duas capturas do mesmo
+CSS dão **0 de 41.938** elementos diferentes. É o valor que o motor resolveu, que é exatamente o que
+uma regra apagada mudaria.
+
+**Resultado da leva A:** 0 de 41.938 elementos com estilo computado diferente, em 88 telas (44
+rotas × 2 temas, descobertas por rastreio a partir da barra lateral, não escritas à mão). Catracas:
+`audit_frontend_standards` 296 → 248, `audit_foco_visivel` 36 → 35.
+
+**A catraca que fecha o ID:** `scripts/audit_css_morto.py --max 0`, no CI. Os 981 blocos não foram
+escritos assim — cada refactor apagou markup e deixou o CSS para trás. Sem catraca o acúmulo
+recomeça no próximo PR. O teto nasce em zero porque é onde a leva A o deixou.
 
 ### UI-02 🟠 Tema escuro é camada de exceção, não de token · MED
 
@@ -3636,3 +3666,38 @@ que faltava — mas não rodou a trava do `HT-06` antes de mesclar: os **7 compo
 a suíte inteira antes do merge — a trava do `HT-06` é local e barata, e teria segurado o
 `main` verde. O run 697 (`NOVO-43`) passou sobre a árvore do #246 por sorte de ordem: o
 vermelho só apareceu quando o #247 entrou.
+
+### NOVO-45 🟡 `NOVO` `faixa_lateral_class` é calculada por card em duas listas e nenhum template a lê · MOR · 0,25 d
+
+`roteiros/presenters.py:261` põe `"faixa_lateral_class": _roteiro_faixa_lateral_class(roteiro)` no
+dicionário do card, e `oficios/presenters.py:37` tem a função gêmea. As duas resolvem status,
+comparam com `timezone.now()` e devolvem uma de cinco classes (`roteiro-list-card--faixa-*`). **Zero
+templates leem a chave** — conferido por grep em `templates/` inteiro.
+
+É o mesmo desenho do `NOVO-37` (`apresentar_acoes_oficio`): trabalho por card numa lista, para um
+consumidor que deixou de existir e não avisou.
+
+**Como apareceu, que é a parte que interessa.** A poda do `UI-01` marcou os 41 blocos de
+`roteiro-list-card__*` como mortos. Antes de apagar fui conferir se o card ainda existia, e achei os
+`--faixa-*` **vivos** — vivos porque o literal está no `.py`, que faz parte do corpus. Só que
+literal em Python vivo e classe aplicada em HTML são coisas diferentes, e a varredura estática não
+distingue as duas. As classes `--faixa-*` continuam no CSS por isso, protegidas pelo prefixo
+dinâmico, estilizando um elemento que ninguém emite.
+
+**Consequência para o `UI-01`:** a proteção por prefixo é generosa de propósito, e o preço é este —
+classe morta que sobrevive porque o nome dela está numa string. Corrigir o `NOVO-45` derruba junto
+os blocos `--faixa-*`.
+
+### NOVO-46 🟡 `NOVO` Contrato de widget e template apontam para CSS que produção nunca carregou · MOR · 0,25 d
+
+Já estava escrito dentro do `UI-01` como "defeito novo, separado"; vira linha para deixar de ser
+nota de rodapé. `WidgetStyle.FORM_SELECT_FIELD_CONTROL` (`core/forms/widgets.py:27`) emite
+`cv-field__control--select` em todo `<select>` do sistema, e
+`templates/cadastros/servidores/partials/_form_fields.html:11` emite `cv-field-row`. As duas só
+tinham regra em `static/css/dev/`, que **apenas** `templates/ui_lab2/base.html` e
+`templates/dev/ui_lab/base.html` linkavam — nenhum dos dois entra no `shell.bundle.css`.
+
+Com o `BE-25` (PR #247) os dois arquivos foram apagados. Nada mudou de aparência, porque produção
+nunca os carregou: as duas classes já eram enfeite. O defeito não é visual, é de contrato — um enum
+de widget que promete um gancho de estilo inexistente convida o próximo a estilizar por cima do que
+ele acha que existe.

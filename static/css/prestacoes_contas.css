@@ -409,7 +409,6 @@
   transition: background var(--transition-fast);
 }
 
-
 .prestacao-file-selection__item:hover {
   background: color-mix(in srgb, var(--color-primary, #0b3a66) 18%, transparent);
 }
@@ -432,24 +431,10 @@
   padding: var(--space-3) var(--space-4);
 }
 
-.prestacao-file-widget__change {
-  display: grid;
-  gap: var(--space-2);
-  min-width: 0;
-}
-
 .prestacao-file-widget__meta {
   display: grid;
   gap: 3px;
   min-width: 0;
-}
-
-.prestacao-file-widget__eyebrow {
-  color: var(--color-muted-strong);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  line-height: 1.2;
-  text-transform: uppercase;
 }
 
 .prestacao-file-widget__name {
@@ -704,12 +689,6 @@
   font-weight: 600;
 }
 
-/* ── Card de assinatura eletrônica ──────────────────────────────── */
-/* PDF Final: prontidão dos itens compartilhados + rótulo do card por servidor */
-.prestacao-final-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.85rem; }
-.prestacao-final-servidor__name { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; font-weight: 600; }
-.prestacao-final-servidor__meta { display: block; margin-top: 0.2rem; font-weight: 400; font-size: 0.8125rem; color: var(--color-text-muted, #52657a); }
-
 /* RT por servidor: campo opcional para sobrescrever a diária de um único servidor */
 .rt-diaria-override-field { max-width: 22rem; margin-bottom: var(--space-4, 1rem); }
 
@@ -769,63 +748,6 @@
 
 .docs-wizard-card .oficio-documentos-card--travellers > .oficio-documentos-card__body {
   padding: 0;
-}
-
-.docs-attach-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.docs-attach-item {
-  align-items: center;
-  background: var(--cv-form-field-bg);
-  border: 1px solid var(--cv-form-section-border, var(--color-border-soft));
-  border-radius: var(--radius-md, 10px);
-  display: flex;
-  gap: var(--space-3);
-  justify-content: space-between;
-  min-width: 0;
-  padding: var(--space-3) var(--space-4);
-}
-
-.docs-attach-item--ok {
-  border-color: color-mix(in srgb, var(--color-success, #22c55e) 35%, var(--cv-form-section-border, var(--color-border-soft)));
-}
-
-.docs-attach-item__copy {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  min-width: 0;
-}
-
-.docs-attach-item__title {
-  color: var(--color-text, #f3f6fb);
-  font-size: var(--font-size-sm, 0.875rem);
-  font-weight: 650;
-}
-
-.docs-attach-item__meta {
-  color: var(--color-text, #e8eef7);
-  font-size: var(--font-size-xs, 0.75rem);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.docs-attach-item__meta--muted {
-  color: var(--color-muted, #8b9bb0);
-}
-
-.docs-attach-item__actions {
-  align-items: center;
-  display: flex;
-  flex-shrink: 0;
-  gap: var(--space-2);
 }
 
 .docs-attach-block .cv-btn.is-assinado {
@@ -997,7 +919,6 @@
   padding: 0;
 }
 
-
 /* Modal anexar assinado: item selecionado sem hover (esta folha carrega depois do shell). */
 #attach-signed-modal .prestacao-file-selection__item,
 #attach-signed-modal .cv-file-selection__item,
@@ -1011,7 +932,6 @@
   background-color: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%)) !important;
   transition: none !important;
 }
-
 
 /* `DB-06` — bloco "Saíram da equipe": servidores retirados do ofício cujos dados
    foram preservados. Só é renderizado quando a lista não é vazia, então não há

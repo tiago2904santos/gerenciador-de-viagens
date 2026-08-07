@@ -105,12 +105,6 @@
   justify-content: space-between;
 }
 
-.cv-document-card__heading {
-  display: grid;
-  gap: 7px;
-  min-width: 0;
-}
-
 .cv-document-card__title,
 .cv-document-card__subtitle {
   margin: 0;
