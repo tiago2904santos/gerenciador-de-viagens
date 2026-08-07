@@ -1,8 +1,8 @@
 <div class="justificativa-quick-add" data-justificativa-quick-add>
   {# step1 só para herdar tokens/estilos; sem travel-document-card (caixa externa). #}
   <div data-travel-document-wizard-step1 class="document-form-page justificativa-quick-add__scope">
-    {% include "components/ui/forms/form_block.html" with element_id="justificativa-block-oficio" section_id="justificativa-oficio-title" extra_class="travel-document-block document-form-block" title="Ofício vinculado" description="Selecione um ou mais ofícios para receber a justificativa." body_extra_class="termo-block__body" body_template="justificativas/partials/_oficio_picker.html" heading_level=3 %}
+    {% include "components/ui/forms/form_block.html" with element_id="justificativa-block-oficio" section_id="justificativa-oficio-title" extra_class="travel-document-block document-form-block" title="Ofício vinculado" description="Selecione um ou mais ofícios para receber a justificativa." body_extra_class="termo-block__body" body_template="justificativas/partials/_oficio_picker.html" heading_level=2 %}
 
-    {% include "components/ui/forms/form_block.html" with element_id="justificativa-block-finalidade" section_id="justificativa-finalidade-title" extra_class="travel-document-block document-form-block" title="Finalidade" description="Modelo e texto da justificativa" body_extra_class="cv-form-stack" body_template="justificativas/partials/_finalidade_fields.html" heading_level=3 %}
+    {% include "components/ui/forms/form_block.html" with element_id="justificativa-block-finalidade" section_id="justificativa-finalidade-title" extra_class="travel-document-block document-form-block" title="Finalidade" description="Modelo e texto da justificativa" body_extra_class="cv-form-stack" body_template="justificativas/partials/_finalidade_fields.html" heading_level=2 %}
   </div>
 </div>
