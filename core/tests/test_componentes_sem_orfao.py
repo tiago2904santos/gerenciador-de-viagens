@@ -42,22 +42,21 @@ COMPONENTES = RAIZ / "templates/components"
 ONDE_PROCURAR = [
     "templates", "static", "core", "cadastros", "oficios", "roteiros", "eventos",
     "termos", "justificativas", "planos_trabalho", "ordens_servico",
-    "prestacoes_contas", "usuarios", "documentos", "google_drive", "ui_lab2",
+    "prestacoes_contas", "usuarios", "documentos", "google_drive",
     "config", "scripts",
 ]
 
-#: Componentes vivos **só** no UI Lab, sob `DEBUG`. Não são órfãos: existe página que
-#: os renderiza. Também não são de produção. A decisão sobre eles é do `BE-17` —
-#: qual dos dois labs é o vigente —, e sair daqui exige essa decisão, não um grep.
-SO_NO_LABORATORIO = {
-    "ui/buttons/field_action_button.html": "dev/ui_lab/buttons.html, ui_lab2/buttons.html",
-    "ui/buttons/floating_primary_action.html": "ui_lab2/buttons.html",
-    "ui/buttons/footer_action.html": "dev/ui_lab/buttons.html, ui_lab2/buttons.html",
-    "ui/forms/dropdown.html": "ui_lab2/selects.html",
-    "ui/layouts/collection_header.html": "dev/ui_lab/structures.html",
-    "lists/list_grid.html": "dev/ui_lab/cards.html, ui_lab2/views.py",
-    "ui/tables/data_table.html": "dev/ui_lab/tables.html",
-}
+#: Vazio desde 07/08, e o vazio é o ponto.
+#:
+#: O `HT-06` criou esta lista com sete componentes que só o laboratório renderizava,
+#: e disse que sair daqui exigia decidir qual dos dois labs era o vigente — decisão
+#: do `BE-17`, não um grep.
+#:
+#: A decisão veio, e foi apagar os dois labs. Com eles, os sete ficaram sem nenhum
+#: renderizador e foram apagados também. A lista fica aqui, vazia, porque o dia em
+#: que alguém precisar reabri-la é o dia em que um componente voltou a existir sem
+#: quem o renderize — e é bom que isso doa.
+SO_NO_LABORATORIO: dict[str, str] = {}
 
 
 def citadores(rel_templates: str) -> list[str]:
@@ -149,5 +148,10 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
                 self.assertFalse((COMPONENTES / rel).exists())
 
     def test_a_varredura_esta_achando_os_componentes(self):
-        """Sem isto, as regras acima passariam com a pasta vazia."""
-        self.assertGreaterEqual(len(self.componentes()), 85)
+        """Sem isto, as regras acima passariam com a pasta vazia.
+
+        Piso de 85 para 83 em 07/08: a remoção dos dois UI Labs deixou sete
+        componentes sem renderizador, e `cards/document_card.html` em cascata —
+        o único que o renderizava era `lists/list_grid.html`, um dos sete.
+        """
+        self.assertGreaterEqual(len(self.componentes()), 83)

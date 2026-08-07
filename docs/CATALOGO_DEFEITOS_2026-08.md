@@ -475,6 +475,18 @@ estar: `tmp/` (23), `media_teste/` (6), `migration_backups/` (2, um deles um `.d
 
 ### BE-25 ✅ RESOLVIDO · 🟡 Dois UI Labs concorrentes, sem regra de qual é o vigente · AUD · 0,75 d
 
+**Sequela, e ela derrubou a `main`.** O PR do lab entrou com o CI vermelho: `core/tests/
+test_componentes_sem_orfao.py`, criado pelo `HT-06` **depois** de eu ramificar, mantinha sete
+componentes numa lista branca de "vivos só no laboratório", com o comentário de que sair dali exigia
+decidir qual lab era o vigente — decisão do `BE-17`. Apagar os dois labs tomou essa decisão e
+transformou os sete em órfãos de verdade.
+
+Eu tinha escrito no PR que esses sete "não quebram nada". Estava errado por uma razão que devia ter
+antecipado: minha suíte local rodou contra um repositório sem aquele teste. Os sete foram apagados,
+mais `cards/document_card.html` **em cascata** — o único que o renderizava era o
+`lists/list_grid.html`, um dos sete. A lista branca ficou vazia de propósito, com o motivo escrito
+dentro dela.
+
 **Fechado em 07/08: não se escolheu um, apagaram-se os dois.** E o código dizia de si mesmo que eram
 duas gerações — `ui_lab2/views.py:166` chamava o outro de "UI Lab 1.0".
 

@@ -359,18 +359,6 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertEqual(template.count('class="cv-fab-container"'), 4)
         self.assertIn('extra_class="cv-fab"', template)
 
-        collection_header = (
-            Path(settings.BASE_DIR)
-            / "templates"
-            / "components"
-            / "ui"
-            / "layouts"
-            / "collection_header.html"
-        ).read_text(encoding="utf-8")
-        self.assertIn("cv-form-section-header--standalone", collection_header)
-        self.assertIn("cv-form-section-header--described", collection_header)
-        self.assertIn("cv-form-section-header__actions", collection_header)
-
         obsolete_wizard = (
             Path(settings.BASE_DIR) / "templates" / "eventos" / "wizard_novo.html"
         )
@@ -432,7 +420,6 @@ class DarkRedesignContractTests(SimpleTestCase):
     def test_summary_and_document_cards_share_global_contracts(self):
         cards = Path(settings.BASE_DIR) / "templates" / "components" / "cards"
         summary = (cards / "summary_card.html").read_text(encoding="utf-8")
-        document = (cards / "document_card.html").read_text(encoding="utf-8")
         plan_summary = (
             Path(settings.BASE_DIR)
             / "templates"
@@ -458,7 +445,6 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("cv-summary-tile", summary)
         self.assertIn("cv-metric", summary)
         self.assertIn("cv-metric--tile", summary)
-        self.assertIn("cv-document-card", document)
         self.assertIn("cv-summary-card", plan_summary)
         # `H-05`: o grid saiu do casco e vive no partial do corpo.
         self.assertIn("cv-summary-grid--4", plan_summary_body)
