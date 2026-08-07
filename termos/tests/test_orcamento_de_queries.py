@@ -24,6 +24,8 @@ from cadastros.models import Estado
 from cadastros.models import Servidor
 from cadastros.models import Unidade
 from termos.models import TermoAutorizacao
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class OrcamentoDeQueriesTermoTests(TestCase):
@@ -31,11 +33,11 @@ class OrcamentoDeQueriesTermoTests(TestCase):
     def setUpTestData(cls):
         cls.estado = Estado.objects.create(nome="Parana", sigla="PR")
         cls.cidade = Cidade.objects.create(nome="Curitiba", estado=cls.estado, uf="PR")
-        cargo = Cargo.objects.create(nome="Investigador")
-        unidade = Unidade.objects.create(nome="Unidade", sigla="UN")
+        cargo = Cargo.objects.create(area=area_de_teste(), nome="Investigador")
+        unidade = Unidade.objects.create(area=area_de_teste(), nome="Unidade", sigla="UN")
 
         cls.servidores = [
-            Servidor.objects.create(
+            Servidor.objects.create(area=area_de_teste(), 
                 nome=f"Servidor {numero}",
                 cargo=cargo,
                 unidade=unidade,
@@ -46,7 +48,7 @@ class OrcamentoDeQueriesTermoTests(TestCase):
         ]
 
         for numero in range(20):
-            termo = TermoAutorizacao.objects.create(
+            termo = TermoAutorizacao.objects.create(area=area_de_teste(), 
                 destino_estado=cls.estado,
                 destino_cidade=cls.cidade,
                 data_evento_inicio=date(2026, 6, 1),
@@ -59,6 +61,7 @@ class OrcamentoDeQueriesTermoTests(TestCase):
     def setUp(self):
         user = get_user_model().objects.create_user(username="termos_orcamento")
         self.client.force_login(user)
+        vincular_area(user)
 
     def _contar(self, url):
         with CaptureQueriesContext(connection) as queries:
@@ -126,4 +129,4 @@ class OrcamentoDeQueriesTermoTests(TestCase):
     # O 26 aqui e o do `NOVO-08`, nao o 28 antigo: os dois IDs baixaram esta
     # mesma catraca por motivos diferentes e o merge tinha de somar as duas
     # quedas, nao repetir uma. Este numero e medido depois do merge.
-    QUERIES_EDITAR = 24
+    QUERIES_EDITAR = 18  # remedido no DB-02: usuário de teste passou a ter vínculo de área

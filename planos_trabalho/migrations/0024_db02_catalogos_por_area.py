@@ -128,7 +128,8 @@ def devolver_ao_global(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("planos_trabalho", "0022_db08_colecoes_ordenadas"),
+        # Ver a irmã em `eventos/0016`: `0023_area_obrigatoria` chegou primeiro.
+        ("planos_trabalho", "0023_area_obrigatoria"),
         ("usuarios", "0001_initial"),
     ]
 

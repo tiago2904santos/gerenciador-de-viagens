@@ -67,7 +67,6 @@ class ContratoDoAreaScopedManagerTests(TestCase):
         with sem_request():
             self.meu = TermoAutorizacao.objects.create(area=self.area)
             self.alheio = TermoAutorizacao.objects.create(area=self.outra)
-            self.legado = TermoAutorizacao.objects.create(area=None)
 
     def _pks(self, queryset):
         return set(queryset.values_list("pk", flat=True))
@@ -84,7 +83,7 @@ class ContratoDoAreaScopedManagerTests(TestCase):
         with sem_request():
             encontrados = self._pks(TermoAutorizacao.objects.all())
 
-        self.assertEqual(encontrados, {self.meu.pk, self.alheio.pk, self.legado.pk})
+        self.assertEqual(encontrados, {self.meu.pk, self.alheio.pk})
 
     def test_com_request_na_area_a_objects_devolve_so_a(self):
         with com_request(self.area):
@@ -93,19 +92,28 @@ class ContratoDoAreaScopedManagerTests(TestCase):
         self.assertEqual(encontrados, {self.meu.pk})
 
     def test_com_request_sem_area_devolve_o_balde_legado(self):
-        """Comportamento de hoje preservado à letra.
+        """`core/tenancy.py:70-71` devolve `area IS NULL` quando não há área ativa.
 
-        `core/tenancy.py:70-71` devolve `area IS NULL` quando não há área ativa, e
-        `usuarios/tests/test_area_legado_compat.py` depende disso. Mudar aqui seria
-        antecipar o `DB-02` sem a migração que ele exige.
+        `DB-02` partiu esse contrato em dois: num modelo **operacional** o balde é
+        vazio por construção — o banco recusa a linha sem área —, então request sem
+        área deixa de enxergar qualquer dado de trabalho. Nos modelos ainda
+        anuláveis (catálogo com padrão global, grupo 2 do enunciado) a semântica
+        segue a de sempre, e é aqui que ela fica cravada.
         """
-        with com_request(None):
-            encontrados = self._pks(TermoAutorizacao.objects.all())
+        from eventos.models import TipoEvento
 
-        self.assertEqual(encontrados, {self.legado.pk})
+        with sem_request():
+            legado_catalogo = TipoEvento.objects.create(area=None, nome="Global MGR")
+
+        with com_request(None):
+            self.assertEqual(self._pks(TermoAutorizacao.objects.all()), set())
+            self.assertIn(
+                legado_catalogo.pk,
+                self._pks(TipoEvento.objects.all()),
+            )
 
     def test_all_objects_devolve_tudo_nos_tres_casos(self):
-        esperado = {self.meu.pk, self.alheio.pk, self.legado.pk}
+        esperado = {self.meu.pk, self.alheio.pk}
 
         with sem_request():
             self.assertEqual(self._pks(TermoAutorizacao.all_objects.all()), esperado)
@@ -152,7 +160,7 @@ class ContratoDoAreaScopedManagerTests(TestCase):
             )
             visiveis = admin.site._registry[TermoAutorizacao].get_queryset(request).count()
 
-        self.assertEqual(visiveis, 3)
+        self.assertEqual(visiveis, 2)
 
     def test_modelo_historico_de_migracao_vem_com_manager_puro(self):
         """`use_in_migrations = False` faz `db/migrations/state.py:905` trocar o
@@ -167,12 +175,12 @@ class ContratoDoAreaScopedManagerTests(TestCase):
     def test_filtro_explicito_continua_dando_o_mesmo_resultado(self):
         """`filter_queryset_by_area(Model.objects.all())` aparece em ~140 sites.
         Dentro de request filtra duas vezes pela mesma área; fora, o manager não faz
-        nada e o filtro explícito continua devolvendo o balde legado. Idêntico ao
-        que fazia antes deste ID."""
+        nada e o filtro explícito devolve o balde legado — que num modelo
+        operacional, depois do `DB-02`, é vazio por construção."""
         casos = [
-            (sem_request(), {self.legado.pk}),
+            (sem_request(), set()),
             (com_request(self.area), {self.meu.pk}),
-            (com_request(None), {self.legado.pk}),
+            (com_request(None), set()),
         ]
         for contexto, esperado in casos:
             with contexto:

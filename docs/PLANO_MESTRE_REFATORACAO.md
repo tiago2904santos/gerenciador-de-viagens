@@ -148,7 +148,7 @@ Precisam de resposta humana; nenhuma bloqueia a fase 0.
 | ~~Qual UI Lab é o vigente~~ **decidida em 07/08 (PR #247): nenhum — os dois saíram** | `BE-25` (fase 9) | A cascata de componentes órfãos que a decisão deixou é o `NOVO-44`, fechado |
 | Arquitetura de configurações | fora das 9 fases | Proposta de 17–28 dias, em `historico/2026-07-refactor/planos/PROPOSTA_CONFIGURACOES.md`; entra como fase própria ou fica fora do ciclo |
 | Triagem dos 13 PRs abertos | fase 9 | 12 são de maio–julho, anteriores ao refactor; fechar ou reabrir é chamada sua |
-| ~~Catálogo global do `DB-02` (grupo 2)~~ **decidida em 07/08: cópia por área, seguindo o `NOVO-09`** | `DB-02` (fase 2) | Executada nas migrações `eventos/0015` e `planos_trabalho/0023`. **Correção de fato:** as linhas de seed **não** eram "servidas a todas as áreas" — medido nas três áreas, eram vistas por **zero** usuários com área, porque `filter_queryset_by_area` é estrito. Duplicar não repartiu nada: deu a cada área um catálogo que ela não tinha. O resíduo (instalação nova e área criada depois) é o `NOVO-45` |
+| ~~Catálogo global do `DB-02` (grupo 2)~~ **decidida em 07/08: cópia por área, seguindo o `NOVO-09`** | `DB-02` (fase 2) | Executada nas migrações `eventos/0016` e `planos_trabalho/0024`. **Correção de fato:** as linhas de seed **não** eram "servidas a todas as áreas" — medido nas três áreas, eram vistas por **zero** usuários com área, porque `filter_queryset_by_area` é estrito. Duplicar não repartiu nada: deu a cada área um catálogo que ela não tinha. O resíduo (instalação nova e área criada depois) é o `NOVO-45` |
 
 ## 9. Quadro de acompanhamento
 
@@ -263,15 +263,19 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `DB-01` `TabelaDiaria` sem `area` — o enunciado estava invertido: a tabela é nacional de
       propósito. O trabalho era o portão, e ele ficou em **superusuário** (decisão do usuário), no
       POST de diárias e não na view, que serve três abas. `require_area_role` segue com zero usos.
-- [~] `DB-02` `area` anulável em 27 de 28 modelos — **enunciado reescrito em 07/08** com os
-      três grupos do `NOVO-34` (operacional / catálogo com padrão global / global por projeto)
-      e o primeiro passo do grupo operacional fechado: `Evento.save()` deriva a área como os
-      outros sete modelos do `core.E001`, com teste que falharia antes. O que resta **depende
-      de produção**, na ordem do enunciado novo: backfill provado pelo gate do `NOVO-12` (que
-      imprime `core.E001`/`W001` a cada deploy), migração `NOT NULL` dos oito operacionais
-      (limite 4 do `AGENTS.md`), e só então `filter_queryset_by_area` sem área vira `none()`.
-      Grupos 2 e 3 seguem anuláveis **por desenho**; a decisão de produto do grupo 2 está
-      no §8.
+- [x] `DB-02` `area` anulável em 27 de 28 modelos — **enunciado reescrito em 07/08** com os
+      três grupos do `NOVO-34` (operacional / catálogo com padrão global / global por projeto),
+      `Evento.save()` derivando a área como os outros sete, e o **grupo operacional migrado no
+      mesmo dia: `NOT NULL` nos 8 modelos do `core.E001`, em oito migrações
+      `*_area_obrigatoria`.** A migração não precisa esperar produção: o gate do `NOVO-12` roda
+      antes do `migrate` (protegido pelo rollback do `QA-03`) e aborta no `core.E001` enquanto
+      houver órfão, então ela nunca encontra NULL — `backfill` primeiro, deploy de novo depois;
+      `scripts/validar_not_null_db02.py` mede sem esperar um deploy (limite 4). O balde legado
+      operacional ficou vazio **por construção**, escrita sem área falha alto, e o passo
+      "`filter_queryset_by_area` sem área vira `none()`" caiu por desnecessário para o grupo 1.
+      Grupos 2 e 3 seguem anuláveis **por desenho**; a decisão de produto do grupo 2 está no §8
+      e no `NOVO-45`. A conversão da suíte rendeu `core/testing.py` (área e vínculo de teste,
+      `com_request`) e fechou de carona um N+1 nas pendências do Drive. **Fecha a Fase 2.**
 - [x] `DB-04` cache documental não recorta por área — latente, como o enunciado dizia, mas por
       outro motivo: quem separa as áreas é a **referência**, que era opcional. Agora é obrigatória
       (`ValueError` sem ela). A afirmação de que todo artefato nascia `area=NULL` **era falsa** —

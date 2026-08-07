@@ -79,7 +79,11 @@ def devolver_ao_global(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("eventos", "0014_evento_periodo_ordenado"),
+        # O `#253` (`DB-02` grupo 1, sessão paralela) levou `0015_area_obrigatoria`
+        # para a `main` depois deste ramo. `TipoEvento` não está entre os oito
+        # modelos operacionais daquela migração, então as duas são independentes;
+        # esta só encadeia depois.
+        ("eventos", "0015_area_obrigatoria"),
         ("usuarios", "0001_initial"),
     ]
 

@@ -16,6 +16,8 @@ from cadastros.models import Unidade
 from cadastros.models import Viatura
 from oficios.models import ModeloMotivoOficio
 from oficios.models import Oficio
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class OficioWizardDadosViajantesTests(TestCase):
@@ -25,17 +27,18 @@ class OficioWizardDadosViajantesTests(TestCase):
             password="123456",
         )
         self.client.force_login(self.user)
-        self.cargo = Cargo.objects.create(nome="Analista Wizard")
-        self.unidade = Unidade.objects.create(nome="Unidade Wizard", sigla="UW")
-        self.servidor = Servidor.objects.create(nome="Servidor Wizard", cargo=self.cargo, cpf="12345678901")
-        self.outro_servidor = Servidor.objects.create(
+        vincular_area(self.user)
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Analista Wizard")
+        self.unidade = Unidade.objects.create(area=area_de_teste(), nome="Unidade Wizard", sigla="UW")
+        self.servidor = Servidor.objects.create(area=area_de_teste(), nome="Servidor Wizard", cargo=self.cargo, cpf="12345678901")
+        self.outro_servidor = Servidor.objects.create(area=area_de_teste(), 
             nome="Outro Servidor Wizard",
             cargo=self.cargo,
             cpf="98765432100",
         )
-        self.viatura = Viatura.objects.create(placa="ABC1234", modelo="Viatura Wizard")
-        self.modelo_ativo = ModeloMotivoOficio.objects.create(nome="PADRAO", texto="Texto padrão ativo", ativo=True)
-        ModeloMotivoOficio.objects.create(nome="INATIVO", texto="Texto inativo", ativo=False)
+        self.viatura = Viatura.objects.create(area=area_de_teste(), placa="ABC1234", modelo="Viatura Wizard")
+        self.modelo_ativo = ModeloMotivoOficio.objects.create(area=area_de_teste(), nome="PADRAO", texto="Texto padrão ativo", ativo=True)
+        ModeloMotivoOficio.objects.create(area=area_de_teste(), nome="INATIVO", texto="Texto inativo", ativo=False)
 
     def _payload(self, **overrides):
         data = {
@@ -196,12 +199,12 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertEqual(list(oficio.servidores_termo_autorizacao.all()), [self.servidor])
 
     def test_get_dados_viajantes_seleciona_modelo_motivo_padrao(self):
-        modelo_padrao = ModeloMotivoOficio.objects.create(
+        modelo_padrao = ModeloMotivoOficio.objects.create(area=area_de_teste(), 
             nome="MODELO PADRAO OFICIO",
             texto="Texto padrao para motivo",
             is_padrao=True,
         )
-        oficio = Oficio.objects.create(numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
 
         response = self.client.get(reverse("oficios:dados_viajantes", args=[oficio.pk]))
 
@@ -221,7 +224,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertEqual(oficio.status, Oficio.STATUS_GERADO)
 
     def test_post_wizard_next_permite_rascunho_incompleto_e_avanca(self):
-        oficio = Oficio.objects.create(numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
 
         response = self.client.post(
             reverse("oficios:dados_viajantes", args=[oficio.pk]),
@@ -242,7 +245,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertEqual(response.url, reverse("oficios:wizard_roteiro", args=[oficio.pk]))
 
     def test_dados_viajantes_autosave_atualiza_campo(self):
-        oficio = Oficio.objects.create(numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         payload = {
             "object_id": str(oficio.pk),
             "form_id": "oficio-form",
@@ -265,7 +268,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertEqual(oficio.numero, 1)
 
     def test_dados_viajantes_autosave_numero_manual(self):
-        oficio = Oficio.objects.create(numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         payload = {
             "object_id": str(oficio.pk),
             "form_id": "oficio-form",
@@ -287,7 +290,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertEqual(oficio.numero, 50)
 
     def test_dados_viajantes_autosave_salva_motorista_da_equipe(self):
-        oficio = Oficio.objects.create(numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         oficio.servidores.add(self.servidor)
         payload = {
             "object_id": str(oficio.pk),
@@ -322,7 +325,8 @@ class OficioWizardDadosViajantesTests(TestCase):
         seleção de servidores nunca era persistida."""
         client = Client(enforce_csrf_checks=True)
         client.force_login(self.user)
-        oficio = Oficio.objects.create(numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        vincular_area(self.user)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
 
         get_response = client.get(reverse("oficios:dados_viajantes", args=[oficio.pk]))
         token = get_token(get_response.wsgi_request)
@@ -347,7 +351,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         )
 
     def test_get_dados_viajantes_renderiza_oficio_existente(self):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             motivo="Motivo existente",
@@ -369,7 +373,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, oficio.get_status_display())
 
     def test_post_dados_viajantes_atualiza_sem_apagar_transporte(self):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             assunto="Antigo",
@@ -400,7 +404,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertEqual(oficio.motorista, self.servidor)
 
     def test_post_dados_viajantes_salva_multiplos_servidores(self):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             assunto="Antigo",
@@ -434,7 +438,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         # nunca envia esse campo. O motorista da equipe precisa ser salvo e permanecer na
         # equipe mesmo assim (regressao: campo obrigatorio sem required=False fazia o form
         # de transporte falhar silenciosamente e o motorista nunca era persistido).
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             motivo="Antigo",
@@ -462,7 +466,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertNotContains(resumo, "Motorista carona")
 
     def test_post_dados_viajantes_salva_apenas_servidores_selecionados_para_termo(self):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             assunto="Antigo",
@@ -486,7 +490,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertEqual(list(oficio.servidores_termo_autorizacao.all()), [self.servidor])
 
     def test_post_dados_viajantes_ignora_termo_fora_da_equipe(self):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             assunto="Antigo",
@@ -510,7 +514,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertEqual(list(oficio.servidores_termo_autorizacao.all()), [])
 
     def test_get_dados_viajantes_reexibe_servidores_de_termo_marcados(self):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             motivo="Motivo existente",
@@ -525,7 +529,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, f'<option value="{self.outro_servidor.pk}" selected')
 
     def test_post_dados_viajantes_remove_termo_quando_servidor_sai_da_equipe(self):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             motivo="Motivo existente",
@@ -550,7 +554,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertEqual(list(oficio.servidores_termo_autorizacao.all()), [self.outro_servidor])
 
     def test_get_editar_redireciona_para_dados_viajantes(self):
-        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
 
         response = self.client.get(reverse("oficios:editar", args=[oficio.pk]))
 
@@ -569,7 +573,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertTrue(Oficio.objects.filter(numero=1, ano=ano, protocolo="123456787").exists())
 
     def test_pendencias_aparecem_apenas_apos_tentativa_documental(self):
-        oficio = Oficio.objects.create(numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
 
         response = self.client.get(reverse("oficios:dados_viajantes", args=[oficio.pk]))
 
@@ -596,7 +600,7 @@ class OficioWizardDadosViajantesTests(TestCase):
 
     def test_index_renderiza_card_com_numero_do_oficio(self):
         ano = timezone.localdate().year
-        Oficio.objects.create(numero=1, ano=ano, motivo="Motivo card", protocolo="123456789", custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        Oficio.objects.create(area=area_de_teste(), numero=1, ano=ano, motivo="Motivo card", protocolo="123456789", custeio=Oficio.CUSTEIO_UNIDADE_DPC)
 
         response = self.client.get(reverse("oficios:index") + "?aba=atuais")
 
@@ -607,7 +611,7 @@ class OficioWizardDadosViajantesTests(TestCase):
 
     def test_index_exibe_referencias_e_layout_compacto_para_motorista_fora_do_oficio(self):
         ano = timezone.localdate().year
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=ano,
             motivo="Viagem com motorista externo",
@@ -662,7 +666,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, "data-custeio-observacao-wrapper")
 
     def test_custeio_observacao_aparece_quando_outra_instituicao(self):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             motivo="Motivo existente",

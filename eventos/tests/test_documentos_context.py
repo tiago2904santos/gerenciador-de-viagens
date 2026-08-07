@@ -3,6 +3,7 @@ from django.test import TestCase
 from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Unidade
 from documentos.services.context import _build_common_context
+from core.testing import area_de_teste
 
 
 class DocumentosContextTests(TestCase):
@@ -17,7 +18,7 @@ class DocumentosContextTests(TestCase):
             "cep": "80000000",
             "telefone": "41999999999",
             "email": "exemplo@pc.pr.gov.br",
-            "unidade": Unidade.objects.create(nome="UNIDADE", sigla="UNI"),
+            "unidade": Unidade.objects.create(area=area_de_teste(), nome="UNIDADE", sigla="UNI"),
         }
         defaults.update(kwargs)
         for key, value in defaults.items():

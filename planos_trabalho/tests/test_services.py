@@ -14,6 +14,7 @@ from .helpers import criar_plano_maringa
 from .helpers import criar_servidor
 
 from datetime import date
+from core.testing import area_de_teste
 
 
 class TextosPadraoTests(TestCase):
@@ -150,7 +151,7 @@ class EfetivoTextoTests(TestCase):
         from planos_trabalho.models import EfetivoPlano
 
         plano = criar_plano_maringa(self.maringa, efetivo=6)
-        papiloscopista = Cargo.objects.create(nome="Papiloscopista")
+        papiloscopista = Cargo.objects.create(area=area_de_teste(), nome="Papiloscopista")
         EfetivoPlano.objects.create(plano=plano, cargo=papiloscopista, quantidade=1)
 
         texto = montar_efetivo_texto(plano)
@@ -163,8 +164,8 @@ class EfetivoTextoTests(TestCase):
         from planos_trabalho.models import EfetivoPlano
 
         plano = criar_plano_maringa(self.maringa, efetivo=2)  # 2 Policiais Civis (ASCOM)
-        iipr = Unidade.objects.create(nome="Instituto de Identificação do Paraná", sigla="IIPR")
-        papiloscopista = Cargo.objects.create(nome="Papiloscopista")
+        iipr = Unidade.objects.create(area=area_de_teste(), nome="Instituto de Identificação do Paraná", sigla="IIPR")
+        papiloscopista = Cargo.objects.create(area=area_de_teste(), nome="Papiloscopista")
         EfetivoPlano.objects.create(plano=plano, unidade=iipr, cargo=papiloscopista, quantidade=8)
 
         self.assertEqual(

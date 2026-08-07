@@ -7,9 +7,10 @@ from django.test import override_settings
 from documentos.models import DocumentoArtefato
 from integracoes.google_drive import services
 from integracoes.google_drive import signals
+from core.testing import area_de_teste
 class DriveSignalAsyncRequestPathTests(TestCase):
     def test_signal_nao_executa_drive_dentro_da_request(self):
-        artefato = DocumentoArtefato.objects.create(
+        artefato = DocumentoArtefato.objects.create(area=area_de_teste(), 
             tipo="teste",
             formato="pdf",
             hash_sha256="b" * 64,
@@ -31,7 +32,7 @@ class ManualSignatureAsyncRequestPathTests(TestCase):
         with mock.patch(
             "integracoes.google_drive.tasks.processar_artefato.delay"
         ):
-            artefato = DocumentoArtefato.objects.create(
+            artefato = DocumentoArtefato.objects.create(area=area_de_teste(), 
                 tipo="oficio",
                 formato="pdf",
                 hash_sha256="a" * 64,

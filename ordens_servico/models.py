@@ -47,7 +47,7 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
 
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
-        null=True,
+        null=False,
         blank=True,
         on_delete=models.PROTECT,
         related_name="ordens_servico",

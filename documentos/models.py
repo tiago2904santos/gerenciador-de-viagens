@@ -15,7 +15,7 @@ class DocumentoArtefato(models.Model):
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
         on_delete=models.PROTECT,
-        null=True,
+        null=False,
         blank=True,
         related_name="documentos_artefatos",
         verbose_name="Area de trabalho",

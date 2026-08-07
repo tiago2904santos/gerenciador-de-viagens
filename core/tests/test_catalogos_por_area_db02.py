@@ -65,10 +65,10 @@ def _duplicar():
     """
     editor = _EditorMinimo()
     import_module(
-        "eventos.migrations.0015_db02_catalogos_por_area",
+        "eventos.migrations.0016_db02_catalogos_por_area",
     ).duplicar_por_area(apps_reais, editor)
     import_module(
-        "planos_trabalho.migrations.0023_db02_catalogos_por_area",
+        "planos_trabalho.migrations.0024_db02_catalogos_por_area",
     ).duplicar_por_area(apps_reais, editor)
 
 
@@ -193,8 +193,8 @@ class ContratoDaMigracaoTests(TestCase):
     """As duas armadilhas que a migração precisa respeitar, escritas como regra."""
 
     ARQUIVOS = (
-        "eventos/migrations/0015_db02_catalogos_por_area.py",
-        "planos_trabalho/migrations/0023_db02_catalogos_por_area.py",
+        "eventos/migrations/0016_db02_catalogos_por_area.py",
+        "planos_trabalho/migrations/0024_db02_catalogos_por_area.py",
     )
 
     def fonte(self, rel: str) -> str:

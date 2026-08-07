@@ -7,6 +7,8 @@ from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
 from eventos.models import Evento
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class EventoListPerformanceTests(TestCase):
@@ -15,12 +17,14 @@ class EventoListPerformanceTests(TestCase):
             username="eventos_performance",
             password="SenhaSegura123!",
         )
+        vincular_area(user)
         self.client.force_login(user)
 
     def test_lista_pagina_e_mantem_orcamento_de_queries(self):
         Evento.objects.bulk_create(
             [
                 Evento(
+                    area=area_de_teste(),
                     titulo=f"Evento {numero}",
                     data_inicio=date(2026, 6, 1),
                     data_fim=date(2026, 6, 2),

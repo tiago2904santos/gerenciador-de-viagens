@@ -17,6 +17,8 @@ from documentos.services.exceptions import ArquivoAssinadoInvalido
 from documentos.services.persistence import anexar_arquivo_assinado
 from documentos.services.persistence import remover_arquivo_assinado
 from oficios.models import Oficio
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 def _pdf_bytes(marker: bytes = b"") -> bytes:
@@ -27,7 +29,7 @@ def _pdf_bytes(marker: bytes = b"") -> bytes:
 class AnexarArquivoAssinadoServiceTests(TestCase):
     def setUp(self):
         raw = _pdf_bytes()
-        self.artefato = DocumentoArtefato.objects.create(
+        self.artefato = DocumentoArtefato.objects.create(area=area_de_teste(), 
             tipo="termo_autorizacao",
             formato="pdf",
             hash_sha256=hashlib.sha256(raw).hexdigest(),
@@ -106,16 +108,17 @@ class ArtefatoAssinadoViewsTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="assinado_u", password="x" * 12)
         self.client.force_login(self.user)
-        self.cargo = Cargo.objects.create(nome="Cargo Assinado")
-        self.servidor = Servidor.objects.create(nome="Serv Assinado", cargo=self.cargo, cpf="98765432100")
-        self.oficio = Oficio.objects.create(
+        vincular_area(self.user)
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Cargo Assinado")
+        self.servidor = Servidor.objects.create(area=area_de_teste(), nome="Serv Assinado", cargo=self.cargo, cpf="98765432100")
+        self.oficio = Oficio.objects.create(area=area_de_teste(), 
             protocolo="11.222.333-4",
             motivo="m",
             custeio=Oficio.CUSTEIO_UNIDADE_DPC,
         )
         self.oficio.servidores.add(self.servidor)
         raw = _pdf_bytes()
-        self.artefato = DocumentoArtefato.objects.create(
+        self.artefato = DocumentoArtefato.objects.create(area=area_de_teste(), 
             tipo="termo_autorizacao",
             formato="pdf",
             oficio=self.oficio,

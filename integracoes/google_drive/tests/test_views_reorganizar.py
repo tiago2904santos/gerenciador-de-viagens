@@ -12,6 +12,8 @@ from eventos.models import Evento
 from eventos.models import TipoEvento
 from oficios.models import Oficio
 from integracoes.google_drive import services
+from core.testing import area_de_teste
+from core.testing import vincular_area
 from integracoes.google_drive.models import (
     DriveArquivo,
     DriveCredenciais,
@@ -26,24 +28,25 @@ class ReorganizarTudoViewTests(TestCase):
         services._reset_client()
         self.user = get_user_model().objects.create_user(username="u_reorg", password="x" * 12)
         self.client.force_login(self.user)
+        vincular_area(self.user)
         # Pasta raiz configurada (mock) — habilita o card e a ação.
         DriveCredenciais.objects.create(
             usuario=self.user,
             access_token="t", refresh_token="r", pasta_raiz_id="mock-raiz", pasta_raiz_nome="Raiz",
         )
-        cargo = Cargo.objects.create(nome="Investigador")
-        ana = Servidor.objects.create(nome="Ana", cargo=cargo, cpf="12345678901")
-        self.evento = Evento.objects.create(
+        cargo = Cargo.objects.create(area=area_de_teste(), nome="Investigador")
+        ana = Servidor.objects.create(area=area_de_teste(), nome="Ana", cargo=cargo, cpf="12345678901")
+        self.evento = Evento.objects.create(area=area_de_teste(), 
             destino_cidade="Maringá", destino_uf="PR",
             data_inicio=date(2026, 7, 22), data_fim=date(2026, 7, 23),
         )
-        self.evento.tipos.add(TipoEvento.objects.get_or_create(nome="PCPR na Comunidade")[0])
-        self.oficio = Oficio.objects.create(
+        self.evento.tipos.add(TipoEvento.objects.get_or_create(area=area_de_teste(), nome="PCPR na Comunidade")[0])
+        self.oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1, ano=2026, protocolo="123456789", motivo="m", evento=self.evento,
         )
         self.oficio.servidores.add(ana)
         raw = b"%PDF-1.4\n%%EOF\n"
-        DocumentoArtefato.objects.create(
+        DocumentoArtefato.objects.create(area=area_de_teste(), 
             tipo="oficio", formato="pdf", oficio=self.oficio,
             hash_sha256=hashlib.sha256(raw).hexdigest(),
             arquivo=ContentFile(raw, name="oficio_feio.pdf"),

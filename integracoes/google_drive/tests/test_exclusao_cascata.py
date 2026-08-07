@@ -11,6 +11,7 @@ from eventos.models import Evento, EventoAnexo
 from integracoes.google_drive import services
 from integracoes.google_drive.models import DriveArquivo, DriveArquivoExterno
 from oficios.models import Oficio
+from core.testing import area_de_teste
 
 
 def _pdf(name):
@@ -25,13 +26,13 @@ class ExclusaoEventoCascataTests(TestCase):
     def setUp(self):
         services._reset_client()
         with self.captureOnCommitCallbacks(execute=True):
-            self.evento = Evento.objects.create(
+            self.evento = Evento.objects.create(area=area_de_teste(), 
                 titulo="Evento de teste", destino_cidade="Curitiba", data_inicio=date(2026, 7, 3),
             )
-        self.oficio = Oficio.objects.create(evento=self.evento, assunto="Assunto teste")
+        self.oficio = Oficio.objects.create(area=area_de_teste(), evento=self.evento, assunto="Assunto teste")
         arquivo, hash_ = _pdf("oficio.pdf")
         with self.captureOnCommitCallbacks(execute=True):
-            self.artefato = DocumentoArtefato.objects.create(
+            self.artefato = DocumentoArtefato.objects.create(area=area_de_teste(), 
                 tipo="oficio", formato="pdf", oficio=self.oficio, evento=self.evento,
                 hash_sha256=hash_, arquivo=arquivo,
             )
@@ -64,7 +65,7 @@ class ExclusaoEventoCascataTests(TestCase):
     def test_excluir_evento_sem_dados_completos_nao_mexe_no_drive(self):
         """Evento que nunca teve dados suficientes (Etapa 1) nunca ganhou pasta
         própria — excluir não deve criar nem tentar trashear nada por ele."""
-        evento_vazio = Evento.objects.create()
+        evento_vazio = Evento.objects.create(area=area_de_teste())
         self.assertEqual(evento_vazio.drive_folder_id, "")
         with patch("integracoes.google_drive.services._MockClient.mover_para_lixeira") as mock_lixeira, patch(
             "integracoes.google_drive.services._MockClient.get_or_create_pasta"
@@ -80,12 +81,12 @@ class ExclusaoDocumentoLimpaDriveTests(TestCase):
 
     def setUp(self):
         services._reset_client()
-        self.evento = Evento.objects.create(titulo="Evento de teste")
+        self.evento = Evento.objects.create(area=area_de_teste(), titulo="Evento de teste")
 
     def test_excluir_artefato_move_arquivo_e_remove_registro_drive(self):
         arquivo, hash_ = _pdf("plano.pdf")
         with self.captureOnCommitCallbacks(execute=True):
-            artefato = DocumentoArtefato.objects.create(
+            artefato = DocumentoArtefato.objects.create(area=area_de_teste(), 
                 tipo="plano_trabalho", formato="pdf", evento=self.evento, hash_sha256=hash_, arquivo=arquivo,
             )
         artefato.refresh_from_db()
@@ -118,7 +119,7 @@ class ExclusaoDocumentoLimpaDriveTests(TestCase):
     def test_drive_desligado_nao_chama_api(self):
         with override_settings(GOOGLE_DRIVE={"MODO": "mock", "UPLOAD_EM_MOCK": False}):
             arquivo, hash_ = _pdf("plano2.pdf")
-            artefato = DocumentoArtefato.objects.create(
+            artefato = DocumentoArtefato.objects.create(area=area_de_teste(), 
                 tipo="plano_trabalho", formato="pdf", evento=self.evento, hash_sha256=hash_, arquivo=arquivo,
             )
             DriveArquivo.objects.create(artefato=artefato, file_id="mock-plano-2", nome="plano2.pdf", mock=True)

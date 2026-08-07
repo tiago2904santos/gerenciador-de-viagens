@@ -6,6 +6,7 @@ from django.test import TestCase
 from cadastros.models import Cidade, Estado
 from oficios.models import Oficio
 from roteiros.models import Roteiro, RoteiroDestino
+from core.testing import area_de_teste
 
 
 class DiagnosticarRoteirosTests(TestCase):
@@ -21,7 +22,7 @@ class DiagnosticarRoteirosTests(TestCase):
         return out.getvalue()
 
     def test_marca_roteiro_vazio_como_vazio_e_orfao(self):
-        Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, origem_estado=self.estado, origem_cidade=self.cidade_sede)
+        Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, origem_estado=self.estado, origem_cidade=self.cidade_sede)
         saida = self._run()
         self.assertIn("VAZIO", saida)
         self.assertIn("ORFAO", saida)
@@ -29,9 +30,9 @@ class DiagnosticarRoteirosTests(TestCase):
         self.assertIn("1 vazios", saida)
 
     def test_roteiro_referenciado_por_oficio_nao_e_orfao(self):
-        roteiro = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, origem_estado=self.estado, origem_cidade=self.cidade_sede)
+        roteiro = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, origem_estado=self.estado, origem_cidade=self.cidade_sede)
         RoteiroDestino.objects.create(roteiro=roteiro, estado=self.estado2, cidade=self.cidade_dest, ordem=0)
-        Oficio.objects.create(numero=1, ano=2026, roteiro=roteiro)
+        Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, roteiro=roteiro)
         saida = self._run()
         self.assertNotIn("ORFAO", saida)
         self.assertIn("oficios=#1/2026", saida)
@@ -39,7 +40,7 @@ class DiagnosticarRoteirosTests(TestCase):
 
     def test_detecta_grupo_duplicado_pela_assinatura(self):
         for _ in range(2):
-            roteiro = Roteiro.objects.create(
+            roteiro = Roteiro.objects.create(area=area_de_teste(), 
                 tipo=Roteiro.TIPO_AVULSO,
                 origem_estado=self.estado,
                 origem_cidade=self.cidade_sede,
@@ -51,8 +52,8 @@ class DiagnosticarRoteirosTests(TestCase):
         self.assertIn("2 em grupos duplicados", saida)
 
     def test_apenas_problemas_omite_roteiros_saudaveis(self):
-        roteiro = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, origem_estado=self.estado, origem_cidade=self.cidade_sede)
+        roteiro = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, origem_estado=self.estado, origem_cidade=self.cidade_sede)
         RoteiroDestino.objects.create(roteiro=roteiro, estado=self.estado2, cidade=self.cidade_dest, ordem=0)
-        Oficio.objects.create(numero=2, ano=2026, roteiro=roteiro)
+        Oficio.objects.create(area=area_de_teste(), numero=2, ano=2026, roteiro=roteiro)
         saida = self._run("--apenas-problemas")
         self.assertNotIn(f"#{roteiro.pk} ", saida)

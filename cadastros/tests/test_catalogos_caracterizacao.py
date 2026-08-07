@@ -18,13 +18,15 @@ from cadastros.models import Combustivel
 from cadastros.models import Estado
 from cadastros.models import Servidor
 from cadastros.models import Unidade
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class _CatalogosCadastrosMixin:
     def setUp(self):
-        self.client.force_login(
-            get_user_model().objects.create_user(username=self.__class__.__name__)
-        )
+        usuario = get_user_model().objects.create_user(username=self.__class__.__name__)
+        vincular_area(usuario)
+        self.client.force_login(usuario)
 
     @staticmethod
     def _mensagens(response):
@@ -124,7 +126,7 @@ class UnidadesCatalogoCaracterizacaoTests(_CatalogosCadastrosMixin, TestCase):
     destino = "/cadastros/servidores/novo/"
 
     def test_lista_preserva_next_somente_nas_urls_que_ja_o_usam(self):
-        unidade = Unidade.objects.create(nome="Unidade A", sigla="UA")
+        unidade = Unidade.objects.create(area=area_de_teste(), nome="Unidade A", sigla="UA")
 
         response = self.client.get(
             reverse("cadastros:unidades_index"),
@@ -174,8 +176,8 @@ class UnidadesCatalogoCaracterizacaoTests(_CatalogosCadastrosMixin, TestCase):
         )
 
     def test_get_exclusao_redireciona_e_vinculo_bloqueia_post(self):
-        unidade = Unidade.objects.create(nome="Unidade A", sigla="UA")
-        Servidor.objects.create(nome="Servidor A", unidade=unidade)
+        unidade = Unidade.objects.create(area=area_de_teste(), nome="Unidade A", sigla="UA")
+        Servidor.objects.create(area=area_de_teste(), nome="Servidor A", unidade=unidade)
         url = self._com_query(
             "cadastros:unidade_delete",
             args=[unidade.pk],
@@ -198,7 +200,7 @@ class CargosCatalogoCaracterizacaoTests(_CatalogosCadastrosMixin, TestCase):
     destino = "/cadastros/servidores/novo/"
 
     def test_urls_de_linha_next_e_definir_padrao_por_get_e_post(self):
-        cargo = Cargo.objects.create(nome="Analista")
+        cargo = Cargo.objects.create(area=area_de_teste(), nome="Analista")
         response = self.client.get(
             reverse("cadastros:cargos_index"), {"next": self.destino}
         )
@@ -253,7 +255,7 @@ class CombustiveisCatalogoCaracterizacaoTests(
     destino = "/cadastros/viaturas/nova/"
 
     def test_urls_de_linha_next_e_definir_padrao_por_get_e_post(self):
-        combustivel = Combustivel.objects.create(nome="Gasolina")
+        combustivel = Combustivel.objects.create(area=area_de_teste(), nome="Gasolina")
         response = self.client.get(
             reverse("cadastros:combustiveis_index"), {"next": self.destino}
         )

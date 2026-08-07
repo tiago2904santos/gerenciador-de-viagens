@@ -20,10 +20,16 @@ from oficios.models import Oficio
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroDestino
 from roteiros.models import RoteiroTrecho
+from core.testing import area_de_teste
+from core.testing import com_request
 
 
 class RegressaoOficio935ContextoTests(TestCase):
     def setUp(self):
+        # DB-02: o contexto do documento resolve a configuração pela área do
+        # ofício; sem request, get_singleton cairia na área técnica e o teste
+        # escreveria a config errada.
+        self.enterContext(com_request(area_de_teste()))
         cfg = ConfiguracaoSistema.get_singleton()
         cfg.email = "Setor.PDF@Instituicao.br"
         cfg.logradouro = "AV. TESTE"
@@ -51,7 +57,7 @@ class RegressaoOficio935ContextoTests(TestCase):
             nome="FLORIANOPOLIS", estado=self.estado_sc, defaults={"uf": "SC"}
         )
 
-        roteiro = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
+        roteiro = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
         roteiro.saida_dt = timezone.make_aware(
             datetime(2026, 6, 15, 7, 0, 0),
             timezone.get_current_timezone(),
@@ -87,10 +93,10 @@ class RegressaoOficio935ContextoTests(TestCase):
             saida_dt=roteiro.saida_dt,
         )
 
-        viajante = Servidor.objects.create(nome="SERVIDOR OFICIO 935")
-        motorista = Servidor.objects.create(nome="MOTORISTA EXTERNO 935")
+        viajante = Servidor.objects.create(area=area_de_teste(), nome="SERVIDOR OFICIO 935")
+        motorista = Servidor.objects.create(area=area_de_teste(), nome="MOTORISTA EXTERNO 935")
 
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             data_criacao=date(2026, 5, 1),
             numero=9,
             ano=2026,
