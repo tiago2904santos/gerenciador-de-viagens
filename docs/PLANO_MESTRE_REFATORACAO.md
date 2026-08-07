@@ -273,9 +273,12 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `DB-06` cascata apaga comprovante e assinatura já coletados — `sair_da_equipe` marca
       (`removida_em`) quem tem dado coletado e apaga quem não tem; `_default_manager` esconde os
       marcados, então os ~15 pontos de leitura (inclusive `prefetch_related` por string) herdam o
-      filtro. Readicionar o servidor à equipe restaura tudo. Achado adjacente ficou como `NOVO-35`:
-      excluir o servidor no **cadastro** ainda apaga o comprovante por `CASCADE`.
-- [x] `DB-07` 2 `CheckConstraint` em 54 modelos — viraram **26**: doze de ordem (o último veio com o `NOVO-36`) e doze de sinal, em
+      filtro. Readicionar o servidor à equipe restaura tudo. O achado adjacente saiu como `NOVO-35`,
+      **também fechado**: excluir o servidor no cadastro passou a ser recusado quando apagaria
+      comprovante, assinatura ou número de solicitação — com predicado próprio, mais estreito que o
+      do `DB-06`, porque prender um cadastro pesa mais do que preservar uma linha.
+- [x] `DB-07` 2 `CheckConstraint` em 54 modelos — viraram **26**: doze de ordem (o último veio com o
+      `NOVO-36`) e doze de sinal, em
       oito modelos de seis apps, saídas de três fábricas em `core/constraints.py`. O levantamento
       por introspecção achou mais pares do que o enunciado (a cadeia de quatro datetimes do
       `Roteiro`, e o par do `RoteiroTrecho`). `scripts/validar_constraints_db07.py` é o

@@ -2609,7 +2609,7 @@ correção.
 
 ---
 
-### NOVO-35 🔴 `NOVO` Excluir um servidor do cadastro apaga comprovante de prestação por cascata · DB · 1 d
+### NOVO-35 ✅ RESOLVIDO · 🔴 `NOVO` Excluir um servidor do cadastro apaga comprovante de prestação por cascata · DB · 1 d
 
 `PrestacaoServidor.servidor` é `on_delete=models.CASCADE` (`prestacoes_contas/models.py:141`).
 Excluir um servidor em `cadastros` (`cadastros/services.py:252` → `core.deletion.excluir_com_protecao`)
@@ -2631,6 +2631,73 @@ tornaria indelével qualquer servidor que já tenha entrado em um ofício, ou se
 **Ficou fora do `DB-06` de propósito:** muda a UX de exclusão no cadastro (mensagem nova numa tela
 que o `DB-06` não toca) e precisa da medição de quantos servidores ficariam bloqueados em produção
 antes de a regra ser escolhida.
+
+> **Resolvido pela guarda no serviço, com predicado próprio — e não com `PROTECT`.** Medido no banco
+> de desenvolvimento: `PROTECT` bloquearia **3 de 4** servidores (todo o que já entrou em qualquer
+> ofício, inclusive quem não tem nada a perder); a regra por dado bloqueia **1 de 4**. O critério
+> passa a ser o dado, não o vínculo.
+>
+> **Predicado novo, `tem_prova_irrefazivel()`, mais estreito que o `tem_dados_coletados()` do
+> `DB-06`** — e a diferença foi imposta pela verificação adversarial. `tem_dados_coletados` inclui
+> `status != PENDENTE`, e `status` é **coletivo**: `view_common._marcar_servidores_pendentes` marca
+> toda a equipe pendente do ofício ao salvar um documento **compartilhado** (despacho, RT, diário).
+> Medido: basta um colega salvar o despacho para que um servidor semeado por engano passe a "ter
+> dados coletados" — e ficasse indelével para sempre, por ação de terceiro. Preservar uma linha e
+> prender um cadastro inteiro são decisões de peso diferente; ficam no predicado só os três que não
+> voltam: comprovante, assinatura e número da solicitação.
+>
+> **A armadilha que o `DB-06` criou, e que quase engoliu esta correção.** A guarda tem de consultar
+> `PrestacaoServidor.todos`. O acessor reverso `servidor.prestacoes_servidor` herda o
+> `_default_manager`, que desde o `DB-06` esconde as linhas com `removida_em` — e o invariante do
+> `DB-06` é que linha marcada é **exatamente** a que tem dados. A relação reversa esconde o conjunto
+> que a guarda existe para achar. Medido: com a reversa, a guarda bloqueava zero. Travado por
+> `RelacaoReversaEscondeAProvaTests`, que não testa a correção — testa a armadilha.
+>
+> **O encanamento da mensagem estava fechado em dois pontos** e foi aberto: `services.py` levantava
+> `CadastroVinculadoError` **sem argumento**, e a view capturava **sem `as exc`**. A mensagem agora
+> nomeia o servidor, os ofícios e o que fazer. `_vinculo_error(request, mensagem=None)` ganhou default
+> para não reescrever os testes de caracterização dos catálogos, que travam o literal antigo.
+>
+> **Um teste meu passava dos dois jeitos, de novo (oitava vez).** `test_assinatura_sozinha_bloqueia`
+> ficava verde sem a guarda, porque `AssinaturaDocumento.signer` é `PROTECT` e já barrava. O que
+> distingue os dois mecanismos é a **mensagem** — o `PROTECT` dá a genérica, a guarda dá a
+> específica. Só com a asserção sobre a mensagem o caso passou a ser atribuível à correção.
+>
+> **O que esta correção NÃO protege, e virou `NOVO-39`:** o valor impresso do ofício e do termo dos
+> **colegas** do servidor excluído.
+
+---
+
+### NOVO-39 🟠 `NOVO` Excluir um servidor muda o valor de diária impresso dos colegas dele · COR · 1 d
+
+Achado pela verificação adversarial do `NOVO-35`, sob a lente "dinheiro e documento", e reproduzido:
+
+```
+diarias_para_servidores() com 2 servidores: R$ 600,00 (quantidade_servidores=2)
+depois de excluir 1 servidor:               R$ 300,00 (quantidade_servidores=1)
+```
+
+`Oficio.diarias_para_servidores()` (`oficios/models.py:263-301`) faz
+`qtd_servidores = self.servidores.count()` e multiplica **em tempo de renderização**. A contagem
+alimenta o ofício (`oficios/documents.py:281`), o **termo de autorização** (`documents.py:341`, via
+`_viagem_payload`) e o DOCX (`oficios/docxtpl_context.py:490`).
+
+**Efeito:** excluir um servidor do cadastro — mesmo um que não tem nada a perder, o caso que o
+`NOVO-35` deliberadamente libera — muda o total de diárias impresso em documento **de outras
+pessoas**. Um ofício reimpresso depois da exclusão não bate com o que foi assinado.
+
+**Por que o `NOVO-35` não resolve:** a guarda dele protege os artefatos do próprio excluído
+(comprovante, assinatura, solicitação). O valor dos colegas não é artefato do excluído — é derivado
+de uma contagem viva. `PROTECT` resolveria por acidente, ao custo de tornar quase todo servidor
+indelével.
+
+**Correção candidata:** congelar a contagem no documento gerado, em vez de recalculá-la a cada
+renderização — que é a mesma família do `DB-06` (`TabelaDiaria` guarda os três valores calculados
+"para congelar o valor que valeu"). Alternativa mais barata: gravar `quantidade_servidores` no
+`Roteiro`/`Oficio` no momento da geração.
+
+**Medição que falta:** quantos ofícios já emitidos teriam contagem diferente hoje. Sem isso não dá
+para saber se é dívida histórica ou risco corrente.
 
 ---
 
