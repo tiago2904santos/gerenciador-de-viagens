@@ -8,10 +8,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TARGETS = [ROOT / "templates", ROOT / "static" / "css"]
 IGNORED_PARTS = {
-    "templates/dev/ui_lab",
     "templates/components/ui",
     "templates/documentos/pdf",
-    "static/css/dev",
 }
 
 PATTERNS: dict[str, str] = {

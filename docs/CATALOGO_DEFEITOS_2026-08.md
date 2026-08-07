@@ -292,7 +292,11 @@ do que o catálogo sugeria.
 
 **Correção:** três PRs mecânicos, verificáveis por grep.
 
-### BE-17 🟡 `core/views.py` é 75% fixture de UI Lab · AUD · 1,5 d
+### BE-17 ✅ RESOLVIDO · 🟡 `core/views.py` é 75% fixture de UI Lab · AUD · 1,5 d
+
+**Fechado em 07/08 pela remoção do UI-lab.** `core/views.py` foi de **1.249 para 237 linhas**: saíram
+`UI_LAB_PAGE_DEFINITIONS` e as 17 views `ui_lab_*`. Ficou o que sempre foi produção — `health`,
+`metrics`, `LoginView`, `dashboard`, `perfil`.
 
 1.261 linhas, das quais **947 (75%)** são símbolos `UI_LAB_*`. O que pertence a `core` — health,
 metrics, LoginView, dashboard, perfil — são 314 linhas. Em paralelo existem **dois** UI Labs:
@@ -469,7 +473,15 @@ estar: `tmp/` (23), `media_teste/` (6), `migration_backups/` (2, um deles um `.d
 `_tmp_check5.py`, `tatus` (um `git status` redirecionado por engano),
 `.codex-runserver-8001.{err,out}.log`.
 
-### BE-25 🟡 Dois UI Labs concorrentes, sem regra de qual é o vigente · AUD · 0,75 d
+### BE-25 ✅ RESOLVIDO · 🟡 Dois UI Labs concorrentes, sem regra de qual é o vigente · AUD · 0,75 d
+
+**Fechado em 07/08: não se escolheu um, apagaram-se os dois.** E o código dizia de si mesmo que eram
+duas gerações — `ui_lab2/views.py:166` chamava o outro de "UI Lab 1.0".
+
+A assimetria explica por que isto custou o que custou: o **2.0** era app isolado (`ui_lab2/`, 657
+linhas) e saiu com `rm -rf` mais duas linhas de registro. O **1.0** não tinha app: vivia dentro de
+`core/views.py`, `core/urls.py`, `core/forms/__init__.py` e `core/navigation.py`. Foi 90% do
+esforço.
 
 `ui_lab2` (656 LOC + 18 templates) e `templates/dev/ui_lab` (19 templates). Ambos só roteados sob
 `DEBUG`, mas `ui_lab2` está em `INSTALLED_APPS` em todos os ambientes
@@ -1720,6 +1732,24 @@ o `+` da concatenação fica no início da linha seguinte (`static/js/pages/ofic
 | `page-shell.css` ✅ | 78 → medido 57 | 14 KB → medido 9,4 KB |
 | `roteiros.css` ✅ | 78 → medido 76 | 14 KB → medido 13,9 KB |
 | `cv-buttons.css` ✅ | 49 → medido 9 | 11 KB → medido 2,1 KB |
+| `dev/ui-lab-fields.css` ✅ | 96 | 18 KB — arquivo apagado inteiro |
+| `dev/ui-lab-pages.css` ✅ | 79 | 16 KB — arquivo apagado inteiro |
+
+**Os dois arquivos do lab não foram podados: foram apagados junto com o laboratório**, por decisão
+do dono. Antes de apagar, verifiquei a fronteira, e o resultado corrigiu uma afirmação minha:
+
+> Eu tinha escrito que apagar os CSS do lab quebraria produção, porque `cv-field-row` e
+> `cv-field__control--select` são usadas em produção e só existiam ali. **Está errado.** Os cinco
+> arquivos de `static/css/dev/` são linkados apenas por `templates/ui_lab2/base.html` e
+> `templates/dev/ui_lab/base.html`, e nenhum entra no `shell.bundle.css` — **produção nunca os
+> carregou**. Logo as duas classes já estavam sem estilo em produção; copiá-las para
+> `cv-select.css`/`forms.css` teria **adicionado** aparência inexistente dentro de um PR de deleção.
+> Desfiz o "resgate".
+
+**Fica um defeito novo, separado:** `WidgetStyle.FORM_SELECT_FIELD_CONTROL`
+(`core/forms/widgets.py:27`) emite `cv-field__control--select` em todo `<select>`, e
+`templates/cadastros/servidores/partials/_form_fields.html:11` emite `cv-field-row` — **nenhuma das
+duas tem CSS por trás em produção.** Contrato de widget apontando para regra que não existe.
 | `dev/ui-lab-fields.css` | 96 | 18 KB |
 | `dev/ui-lab-pages.css` | 79 | 16 KB |
 | `page-shell.css` | 78 | 14 KB |

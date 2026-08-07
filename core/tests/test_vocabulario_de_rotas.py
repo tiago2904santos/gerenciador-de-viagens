@@ -35,7 +35,7 @@ SUFIXOS_PT = ("_novo", "_editar", "_excluir", "_lista", "_listar")
 SUFIXOS_EN = ("_index", "_create", "_update", "_delete")
 
 #: Catraca: este número só sobe. 70 em 06/08/2026, depois do `BE-23`.
-PISO_EN = 70
+PISO_EN = 69
 
 #: Tradução sugerida na mensagem de falha — o mesmo mapa usado na renomeação.
 EQUIVALENTE = {"_novo": "_create", "_editar": "_update", "_excluir": "_delete", "_lista": "_index"}
