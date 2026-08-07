@@ -9,9 +9,7 @@
   <form method="post" class="document-form travel-document-wizard__form" novalidate data-viatura-form>
     {% csrf_token %}
     {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
-    {% if form.non_field_errors %}
-      {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
-    {% endif %}
+    {% include "components/ui/feedback/form_errors.html" with form=form only %}
     <div class="cv-form-section-stack cv-form-section-stack--comfortable" data-travel-document-wizard-step1>
       {% include "components/form/card.html" with title="Dados da viatura" description=page_description title_id="viaturas-form-card-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/viaturas/partials/_form_card_body.html" footer_template="cadastros/viaturas/partials/_form_card_footer.html" %}
     </div>

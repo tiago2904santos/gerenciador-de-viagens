@@ -43,6 +43,19 @@
       >
         {% csrf_token %}
         {% if quick_add_next_url %}<input type="hidden" name="next" value="{{ quick_add_next_url }}">{% endif %}
+        {% comment %}
+          `HT-03`: o painel de cadastro rápido não tinha padrão nenhum para erro de
+          formulário inteiro — nem o certo, nem um dos quatro errados. Erro de
+          `clean()` num quick-add simplesmente **não aparecia**; sobrava a página
+          recarregando com o painel aberto e nenhuma explicação.
+
+          **Fora do `__body`, e isso o navegador ensinou.** A primeira versão punha
+          o resumo dentro dele; `.cv-inline-create__body` é `display: flex` com
+          `align-items: flex-end` (`page-shell.css:2998`), então a faixa virou uma
+          terceira coluna do lado dos campos e empurrou o formulário inteiro. Aqui,
+          filha direta do `<form>`, ela empilha acima como se espera.
+        {% endcomment %}
+        {% include "components/ui/feedback/form_errors.html" with form=quick_add_form only %}
         <div class="cv-inline-create__body">
           <div class="cv-inline-create__fields">
             {% include quick_add_body_template with form=quick_add_form only %}

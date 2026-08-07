@@ -44,9 +44,7 @@
       {% with form=evento_form %}
       <div data-travel-document-wizard-step1>
 
-        {% if form.non_field_errors %}
-          {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
-        {% endif %}
+        {% include "components/ui/feedback/form_errors.html" with form=form only %}
 
         {% include "components/form/card.html" with title="Dados do evento" description="Identificação, período, destinos e documentos vinculados" title_id="evento-step1-title" extra_class="evento-step1-card" body_template="eventos/partials/_detalhe_etapa1_body.html" footer_template="eventos/partials/_detalhe_etapa1_footer.html" %}
       </div>

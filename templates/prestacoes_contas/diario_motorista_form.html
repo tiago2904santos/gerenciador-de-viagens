@@ -19,9 +19,7 @@
         data-diario-motorista-form>
     {% csrf_token %}
 
-    {% if form.non_field_errors %}
-      {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
-    {% endif %}
+    {% include "components/ui/feedback/form_errors.html" with form=form only %}
 
     <p class="dmv-lede">
       Ajuste o <strong>motorista</strong> e a <strong>viatura</strong> apenas deste diário — o

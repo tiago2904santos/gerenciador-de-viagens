@@ -10,9 +10,7 @@
 
 {% block wizard_content %}
   <div data-pt-form data-api-cidades-url="{{ api_cidades_por_estado_url }}" data-travel-document-wizard-step1>
-    {% if form.non_field_errors %}
-      {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
-    {% endif %}
+    {% include "components/ui/feedback/form_errors.html" with form=form only %}
 
     {# ── 0. Eventos já adicionados (modo multi-evento) — cards contextuais acima do card-mestre ── #}
     {% if is_multi_evento %}

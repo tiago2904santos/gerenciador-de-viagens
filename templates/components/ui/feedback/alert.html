@@ -1,5 +1,28 @@
+{% comment %}
+  Aviso em faixa. Params: variant (info|success|warning|danger), title, message,
+  extra_class.
+
+  `HT-03` acrescentou dois, ambos **opcionais e com um chamador só**
+  (`form_errors.html`), para que o resumo de erros de formulário não precisasse
+  reescrever esta marcação por fora:
+
+  - `data_hook`: atributo `data-*` de comportamento, no formato de `form_block.html`.
+    É por ele que `fields-init.js` acha o resumo — nome de classe não vira
+    condição de lógica neste projeto desde o `JS-06`.
+  - `focalizavel`: põe `tabindex="-1"`. Sem ele `focus()` num `<div>` não faz nada.
+
+  **`message` continua escapado, de propósito.** A primeira versão do `HT-03`
+  passava uma `<ul>` montada e pedia `|safe` aqui; seriam 12 chamadores ganhando
+  superfície de injeção para servir a um. O resumo junta as mensagens com `join`,
+  que escapa item a item.
+{% endcomment %}
 {% with alert_variant=variant|default:'info' %}
-<div class="cv-notice cv-notice--{{ alert_variant }} alert alert-{{ alert_variant }} alert--{{ alert_variant }}{% if extra_class %} {{ extra_class }}{% endif %}" role="alert">
+<div
+  class="cv-notice cv-notice--{{ alert_variant }} alert alert-{{ alert_variant }} alert--{{ alert_variant }}{% if extra_class %} {{ extra_class }}{% endif %}"
+  role="alert"
+  {% if data_hook %}data-{{ data_hook }}{% endif %}
+  {% if focalizavel %}tabindex="-1"{% endif %}
+>
   {% if title %}<strong class="cv-notice__title alert__title">{{ title }}</strong>{% endif %}
   <span class="cv-notice__message alert__message">{{ message }}</span>
 </div>

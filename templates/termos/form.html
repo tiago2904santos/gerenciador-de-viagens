@@ -31,9 +31,7 @@
   >
     {% csrf_token %}
 
-    {% if form.non_field_errors %}
-      {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
-    {% endif %}
+    {% include "components/ui/feedback/form_errors.html" with form=form only %}
 
     <div data-termo-wizard-form data-travel-document-wizard-step1>
       {% include "components/form/card.html" with title="Dados do termo" description="Ofício, evento, equipe, transporte e documentos" title_id="termo-form-main-title" body_template="termos/partials/_termo_form_body.html" footer_template="termos/partials/_viatura_footer.html" footer_id="termo-form-footer" %}

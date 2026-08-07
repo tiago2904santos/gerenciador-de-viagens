@@ -233,7 +233,15 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("cv-notice--", alert)
         self.assertIn("action_label and action_url", empty_state)
         self.assertIn('components/ui/buttons/button.html', empty_state)
-        self.assertIn("form.errors or errors", form_errors)
+        # `HT-03`: a guarda era `form.errors or errors`, num `{% if %}` só. Virou dois
+        # ramos porque a forma antiga **estourava** quando o chamador passava `errors`
+        # sem `form`: variável em argumento de filtro levanta `VariableDoesNotExist`
+        # em vez de cair no `string_if_invalid`, e os dois chamadores de formset são
+        # exatamente assim. O contrato afirmado aqui é o mesmo — o componente atende
+        # tanto um formulário quanto uma lista explícita —, e agora são duas asserções
+        # em vez de uma.
+        self.assertIn("{% if errors %}", form_errors)
+        self.assertIn("form.non_field_errors or form.errors", form_errors)
 
     def test_overlay_lab_uses_the_real_confirmation_modal(self):
         lab = (

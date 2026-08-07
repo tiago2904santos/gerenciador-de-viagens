@@ -3581,9 +3581,16 @@ body.has-delete-modal-open {
   width:       100%;
 }
 
+/* `HT-03`: aberto, o painel **rola** em vez de cortar.
+   O `max-height` existe para a transição, e `overflow: hidden` para ela não vazar
+   — mas fechado esse par some com o que passa do teto, sem aviso. Medido em
+   /usuarios/ ao pôr o resumo de erro: `scrollHeight` 696 contra `clientHeight`
+   640, e os 56 px cortados eram o bloco "Primeiro acesso" inteiro. Com `auto`
+   nada mais se perde em silêncio, e o teto continua governando a animação. */
 .cv-inline-create__panel.is-open {
   max-height: 580px;
   opacity:    1;
+  overflow-y: auto;
   transform:  translateY(0);
 }
 
@@ -16948,10 +16955,17 @@ html[data-theme="dark"] *::after {
   width: 100%;
 }
 
+/* `HT-03`: aberto, o painel rola em vez de cortar — ver `page-shell.css:2612`.
+   A regra precisa existir **aqui também**: `.list-header .cv-inline-create__panel`
+   (linha 313) declara `overflow: hidden` com a mesma especificidade da regra de
+   page-shell e vem depois no bundle, então ela vencia e o `overflow-y: auto` de lá
+   não chegava a valer. Duas folhas governando o mesmo painel é o `UI-04`; enquanto
+   ele não sai, as duas precisam concordar. */
 .list-header .cv-inline-create__panel.is-open {
   border-top: 1px solid var(--border-filter-bar);
   max-height: 640px;
   opacity: 1;
+  overflow-y: auto;
   padding: var(--space-3) 0 0;
   transform: translateY(0);
 }

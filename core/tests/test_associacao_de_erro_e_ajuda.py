@@ -288,21 +288,22 @@ class ContratoDosChamadoresTests(SimpleTestCase):
 
         self.assertEqual(faltando, [], "erro de campo sem âncora para o aria-describedby")
 
-    def test_erro_de_formulario_inteiro_nao_finge_ter_campo(self):
-        """`non_field_errors` não tem `auto_id`; `field_id` ali seria `_error` órfão.
+    def test_erro_de_formulario_inteiro_nao_passa_por_aqui(self):
+        """`HT-03`: erro sem campo tem componente próprio, o `form_errors.html`.
 
-        O componente próprio desses é o `form_errors.html`, e é o `HT-03` que vai
-        colocá-lo em uso — hoje ele tem zero chamadores de produção.
+        A primeira versão desta regra dizia só "não passe `field_id` em
+        `non_field_errors`" — e depois que o `HT-03` tirou os 18 chamadores ela
+        ficou **vacuamente verdadeira**: nenhum caso para julgar. Regra que passa
+        por falta de assunto é a mesma armadilha do parâmetro inerte. Agora ela
+        proíbe o uso, que é o que o `HT-03` de fato estabeleceu.
         """
         indevidos = [
-            f"{arquivo}:{linha}"
-            for arquivo, linha, valor, args in chamadores_de_field_error()
-            if valor
-            and valor.endswith(("non_field_errors", "non_form_errors"))
-            and "field_id=" in args
+            f"{arquivo}:{linha} — {valor}"
+            for arquivo, linha, valor, _ in chamadores_de_field_error()
+            if valor and valor.endswith(("non_field_errors", "non_form_errors"))
         ]
 
-        self.assertEqual(indevidos, [])
+        self.assertEqual(indevidos, [], "use components/ui/feedback/form_errors.html")
 
     def test_ninguem_passa_string_literal_em_errors(self):
         """`join` sobre string separa **caractere por caractere**.
@@ -341,10 +342,16 @@ class ContratoDosChamadoresTests(SimpleTestCase):
         self.assertEqual(diretos, [], "include de card_toggle sem description")
 
     def test_a_varredura_esta_achando_os_chamadores(self):
-        """Sem isto, as três regras acima passariam com a varredura vazia."""
+        """Sem isto, as regras acima passariam com a varredura vazia.
+
+        Eram 59 chamadores; o `HT-03` levou 18 para o `form_errors.html` e sobraram
+        **41 erros de campo**, todos com `field_id`. O número desce quando um
+        chamador legítimo sai, e é para isso que ele está escrito aqui em vez de
+        num comentário.
+        """
         achados = list(chamadores_de_field_error())
 
-        self.assertGreaterEqual(len(achados), 55)
+        self.assertGreaterEqual(len(achados), 41)
         self.assertGreaterEqual(sum(1 for _, _, v, a in achados if "field_id=" in a), 39)
 
 

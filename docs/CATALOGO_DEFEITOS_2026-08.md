@@ -1379,7 +1379,7 @@ assim, não é preciso tocar em `_field_control.html`.
 > ajustar um componente. Não há ponteiro quebrado (o Django não emite nenhum) e o texto está na
 > tela; fica registrado como `NOVO-41`.
 
-### HT-03 🟠 Sem padrão único para erro de formulário inteiro · AUD · 2 d
+### HT-03 ✅ RESOLVIDO · 🟠 Sem padrão único para erro de formulário inteiro · AUD · 2 d
 
 `templates/components/ui/feedback/form_errors.html` — o componente feito para isso, que já usa
 `alert.html` com `role="alert"` — tem **zero inclusões em produção**; só aparece em
@@ -1393,6 +1393,47 @@ assim, não é preciso tocar em `_field_control.html`.
 (classes Bootstrap legadas, fora do design system); `core/login.html:47` usa um quarto padrão,
 `auth-error`.
 **Efeito:** na maioria dos casos o erro de submissão não é anunciado ao recarregar a página.
+
+> **RESOLVIDO em 07/08/2026.** São **20 chamadores** agora: os 18 que reaproveitavam
+> `field_error.html`, o editor de roteiros que escrevia `alert alert-danger py-2` à mão, e o painel
+> de cadastro rápido — que **não tinha padrão nenhum**, nem o certo nem um dos quatro errados. Erro
+> de `clean()` num quick-add simplesmente não aparecia na tela.
+>
+> **O componente "certo" jogava a mensagem fora.** Ele sempre imprimia "Revise os campos
+> destacados", mesmo com `non_field_errors` de conteúdo — "As duas senhas não conferem", "Já existe
+> viatura com esta placa nesta área". Adotá-lo como estava teria **perdido informação em 18 telas**,
+> que é o oposto de padronizar. Agora ele mostra o texto real e cai na frase genérica só quando não
+> há o que dizer além dela.
+>
+> **`role="alert"` não fecha o efeito do enunciado, e por isso tem foco.** Região viva anuncia
+> *mudança*, e o resumo já está no HTML quando a página carrega — o comportamento varia por leitor
+> de tela. `fields-init.js` move o foco para o resumo (`tabindex="-1"`), uma vez por carga de
+> página. A trava de "uma vez" não é detalhe: `init` roda de novo a cada re-render parcial, e roubar
+> o foco no meio da digitação trocaria um defeito de acessibilidade por outro pior.
+>
+> **Três coisas que só apareceram por medição, e nenhuma estava no enunciado:**
+>
+> 1. **Os dois chamadores de formset teriam dado 500.** A primeira versão resolvia a origem com
+>    `errors|default:form.non_field_errors` — e variável usada como **argumento de filtro** não cai
+>    no `string_if_invalid` como a principal: levanta `VariableDoesNotExist`, e o `{% include %}`
+>    propaga. Diário de bordo e efetivo do plano passam `errors` **sem** `form`. Viraram dois ramos.
+> 2. **`formset.errors` é verdadeiro sem erro nenhum** — lista com um dict por formulário, e lista
+>    de dicts vazios é `True`. Usá-la de guarda faria toda tela com formset abrir com faixa
+>    vermelha.
+> 3. **O painel de cadastro rápido cortava o que passasse do teto.** Com o resumo, medido em
+>    `/usuarios/`: `scrollHeight` 696 contra `clientHeight` 640 — 56 px sumindo em silêncio, e o que
+>    sumia era o bloco "Primeiro acesso" inteiro. `max-height` + `overflow: hidden` existe para a
+>    animação; virou `overflow-y: auto`, em **duas** folhas, porque `list-header.css` redeclara
+>    `overflow: hidden` com a mesma especificidade e vem depois no bundle (`UI-04`).
+>
+> **O login fica de fora, e é o `HT-09`.** `core/login.html` é HTML autônomo: não estende
+> `base.html`, não carrega `base.css` nem o bundle do shell. Sem `fields-init.js` não há foco, e a
+> faixa do design system entraria sem o CSS que a pinta. A tela inteira é do `HT-09`.
+>
+> **Uma exceção nomeada e conferida:** `roteiros/partials/roteiro/_diarias_body.html` mantém
+> `alert alert-danger` — não é erro de formulário, é container de status preenchido por JS, e o
+> editor escreve `errEl.textContent` direto no elemento, o que apagaria a estrutura interna do
+> `alert.html`. Converter exige mexer no JS do editor: é o `BE-13`.
 
 ### HT-04 🟠 `base.html` carrega ~153 KB de JS de domínio em toda página · AUD · 2–3 d · risco médio
 

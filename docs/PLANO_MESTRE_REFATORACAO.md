@@ -297,13 +297,17 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       não 15, e só 4 vazavam de fato. Um deles (`attach-signed-modal`) não estava no enunciado.
       Medido no navegador: 15→17→19→21 antes, 14→16→14 depois
 - [x] `PF-01` folha de símbolos de ícone (192 KB por página de lista) — 06/08
-- [ ] `PF-04` menu de ação sob demanda (60 menus para 20 cards)
+- [x] `PF-04` menu de ação sob demanda (60 menus para 20 cards) — **os seis domínios**:
+      Ofícios 315,3 → 166,5 KB, Eventos 416,3 → 211,9, Termos 317,6 → 147,9,
+      Prestações 383,1 → 259,0, Planos 169,5 → 129,0, OS 166,8 → 126,7; `roteiros` não tem menu
 - [x] `HT-02` erro de campo sem `aria-describedby`/`aria-invalid`/`role="alert"` — o Django 5.2 já
       emitia os dois atributos; faltava a **âncora**. 39 chamadores passaram a informar `field_id`,
       com varredura estática cobrindo o quadragésimo antes de ele existir
 - [x] `HT-12` `help_text` declarado no form nunca chega à tela — 29 campos em 17 forms declaravam,
       **2 chamadores** de 154 passavam o parâmetro. Residual `use_fieldset` virou `NOVO-41`
-- [ ] `HT-03` sem padrão único para erro de formulário
+- [x] `HT-03` sem padrão único para erro de formulário — eram **quatro** padrões e o componente
+      certo tinha **zero** chamadores; agora são 20, e o resumo mostra a mensagem de verdade em
+      vez de uma frase genérica. O painel de cadastro rápido não tinha padrão **nenhum**
 - [x] `HT-05` `empty_state.html` quebra a ordem de headings — o pulo era **10 de 10** listas, não 9;
       o título vira `<h2>` e `form_block` ganha ramo `h2` (aditivo) para o cadastro rápido de
       justificativas. Sem parâmetro `heading_level`: a inversão mostrou o repasse inerte

@@ -1,6 +1,4 @@
-{% if form.non_field_errors %}
-  {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
-{% endif %}
+{% include "components/ui/feedback/form_errors.html" with form=form only %}
 
 {% include "components/ui/forms/form_block.html" with title="Dados principais" description="Identificação institucional e responsáveis" section_id=section_prefix|add:"-dados-principais" body_template="eventos/partials/form/_main_fields.html" %}
 

@@ -120,6 +120,33 @@
     });
   }
 
+  var resumoDeErrosJaFocado = false;
+
+  /**
+   * `HT-03`: leva o foco ao resumo de erro do formulário.
+   *
+   * `role="alert"` sozinho não resolve: região viva anuncia **mudança**, e o
+   * resumo já está no HTML quando a página carrega — o comportamento varia por
+   * leitor de tela e não dá para contar com ele. Mover o foco para o resumo é o
+   * que garante que quem submeteu chegue à mensagem, e é o padrão de resumo de
+   * erro do WCAG.
+   *
+   * Uma vez por carga de página, e não uma vez por passada do enhancer: `init`
+   * roda de novo a cada re-render parcial, e roubar o foco no meio da digitação
+   * seria pior que o defeito. A trava é a variável de módulo, que morre com a
+   * página.
+   */
+  function initResumoDeErros(root) {
+    return safeCall('formErrors', function () {
+      if (resumoDeErrosJaFocado) return 0;
+      var resumo = resolveRoot(root).querySelector('[data-form-errors]');
+      if (!resumo) return 0;
+      resumoDeErrosJaFocado = true;
+      resumo.focus();
+      return 1;
+    });
+  }
+
   function emitInit(root, counts) {
     try {
       root.dispatchEvent(
@@ -148,6 +175,7 @@
       dropdowns: initDropdowns(scope),
       multiselects: initMultiselects(scope),
       filterableMultiselects: initFilterableMultiselects(scope),
+      resumoDeErros: initResumoDeErros(scope),
     };
     emitInit(scope, counts);
     return counts;
