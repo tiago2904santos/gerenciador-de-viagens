@@ -685,6 +685,34 @@ class PlanoDestino(TimeStampedModel):
     ordem = models.PositiveIntegerField(default=1)
 
     class Meta:
+        # `DB-08`: **duas** constraints, e não uma sobre `(plano, evento, ordem)`.
+        #
+        # `evento` é anulável, e em SQL NULL é distinto de NULL num índice único —
+        # uma constraint só sobre os três campos deixaria justamente o caso mais
+        # comum sem proteção: os destinos de rascunho, que têm `evento IS NULL`
+        # (`forms.py:_save_destinos`). É o mesmo par parcial que o repositório já
+        # usa para separar o balde global do por-área.
+        #
+        # O invariante NÃO é `(plano, ordem)`: um plano guarda ao mesmo tempo o
+        # rascunho e as cópias por evento, e `services.py:968` copia `d.ordem` tal e
+        # qual ao comitar o evento. `(plano, ordem)` reprovaria produção no primeiro
+        # commit.
+        #
+        # Simples, não adiadas: todos os escritores apagam antes de recriar, com o
+        # `delete()` escopado pelo mesmo par (`forms.py:459`, `services.py:964`,
+        # `services.py:1030`).
+        constraints = [
+            models.UniqueConstraint(
+                fields=["plano", "ordem"],
+                condition=models.Q(evento__isnull=True),
+                name="plano_destino_rascunho_ordem_unique",
+            ),
+            models.UniqueConstraint(
+                fields=["evento", "ordem"],
+                condition=models.Q(evento__isnull=False),
+                name="plano_destino_evento_ordem_unique",
+            ),
+        ]
         ordering = ["ordem", "pk"]
         verbose_name = "Destino do plano de trabalho"
         verbose_name_plural = "Destinos do plano de trabalho"
@@ -831,6 +859,13 @@ class EventoPlano(TimeStampedModel):
                 "diarias_valor_unitario", name="evento_plano_diaria_unitaria_nao_negativa",
             ),
             nao_negativo("diarias_valor_total", name="evento_plano_diaria_total_nao_negativa"),
+            # `DB-08`: dois eventos na mesma posição embaralham a sequência impressa
+            # no plano. Simples, não adiada: o único escritor acrescenta ao fim
+            # (`services.py:943`, `ordem = max("ordem") + 1`) — não há troca de
+            # posição neste caminho.
+            models.UniqueConstraint(
+                fields=["plano", "ordem"], name="evento_plano_ordem_unique",
+            ),
         ]
 
     def __str__(self):

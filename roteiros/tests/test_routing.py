@@ -500,9 +500,27 @@ class RoteirosRoutingTests(TestCase):
         roteiro.rota_assinatura = sig
         roteiro.save(update_fields=["rota_assinatura"])
 
-        d0.ordem, d1.ordem = 1, 0
-        d0.save(update_fields=["ordem"])
-        d1.save(update_fields=["ordem"])
+        # `DB-08`: reordenar do jeito que a produo reordena.
+        #
+        # Este teste trocava as posies no lugar (`d0.ordem, d1.ordem = 1, 0`
+        # seguido de dois `save`), e a constraint `roteiro_destino_ordem_unique`
+        # passou a reprovar isso  o primeiro `save` grava `ordem=1` enquanto o
+        # outro destino ainda a ocupa.
+        #
+        # A troca no lugar **no existe em produo**: o nico escritor de
+        # destinos  `roteiro_logic.py:1581`, que faz `destinos.all().delete()` e
+        # recria com `enumerate`. O atalho era do teste, no do sistema.
+        #
+        # A assero no muda de sentido: `mark_stale_when_signature_changed`
+        # recalcula a assinatura a partir dos destinos atuais, no de sinal de
+        # `save()`  a ordem final  a mesma pelos dois caminhos.
+        cidades_invertidas = [d.cidade for d in (d1, d0)]
+        estados_invertidos = [d.estado for d in (d1, d0)]
+        roteiro.destinos.all().delete()
+        for ordem, (estado, cidade) in enumerate(zip(estados_invertidos, cidades_invertidas, strict=True)):
+            RoteiroDestino.objects.create(
+                roteiro=roteiro, estado=estado, cidade=cidade, ordem=ordem
+            )
 
         mark_stale_when_signature_changed(roteiro)
         roteiro.refresh_from_db()
