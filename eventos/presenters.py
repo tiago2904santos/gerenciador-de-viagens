@@ -239,7 +239,15 @@ def _periodo_curto(evento) -> str:
     return f"{inicio} a {evento.data_fim.strftime('%d/%m')}"
 
 
-def apresentar_evento_list_card(evento):
+def apresentar_evento_list_card(evento, *, menus_sob_demanda=True):
+    """Card da lista de eventos.
+
+    `menus_sob_demanda` liga o `PF-04`. São quatro famílias de menu neste card —
+    rodapé, um por ofício, um por documento e um por servidor com termo — e todas
+    saem do HTML da lista quando isto é `True`. Quem serve é `eventos:card_menus`.
+    """
+    menus_src = reverse("eventos:card_menus", args=[evento.pk]) if menus_sob_demanda else ""
+
     oficios = [_oficio_item(oficio) for oficio in evento.oficios.all()]
 
     servidores_flat = []
@@ -317,9 +325,12 @@ def apresentar_evento_list_card(evento):
                     trigger_variant="edit",
                     trigger_aria="Mais ações do evento",
                     trigger_tooltip="Mais ações",
+                    src=menus_src,
                 )
             ],
         ),
+        # Os gatilhos escritos à mão no `_evento_card_body.html` apontam para cá.
+        "menus_url": menus_src,
         "titulo": titulo,
         "status_label": status_label,
         "status_state": status_state,

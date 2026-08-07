@@ -162,3 +162,44 @@ class OrdensServicoMenusTests(RedeDeMenusSobDemanda, TestCase):
         if area is not None:
             campos["area"] = area
         return OrdemServico.all_objects.create(**campos)
+
+
+class EventosMenusTests(RedeDeMenusSobDemanda, TestCase):
+    """Eventos tem quatro famílias de menu, três delas escritas à mão no template.
+
+    O `id` do menu de documento usa `forloop.counter`, então o fragmento precisa
+    percorrer `card.documentos` na mesma ordem que o card. Se a ordem divergir, o
+    gatilho aponta para um `id` que ninguém serve — e é o teste de correspondência
+    de gatilho que pega.
+    """
+
+    rota_lista = "eventos:index"
+    rota_menus = "eventos:card_menus"
+
+    @staticmethod
+    def presenter(registro, **kwargs):
+        from eventos.presenters import apresentar_evento_list_card
+
+        return apresentar_evento_list_card(registro, **kwargs)
+
+    def criar_registro(self, *, area=None):
+        """O evento precisa vir COM ofício vinculado.
+
+        Um `Evento` pelado tem `card.oficios` vazio, e aí as três famílias de menu
+        escritas à mão simplesmente não aparecem: a rede passa sem exercitar nada
+        do que este PR move. Foi o que aconteceu na primeira versão — apagar a
+        família inteira do fragmento não derrubava teste nenhum.
+        """
+        from eventos.models import Evento
+        from oficios.models import Oficio
+
+        campos = {"titulo": "Evento" if area is None else "Evento alheio"}
+        if area is not None:
+            campos["area"] = area
+        evento = Evento.all_objects.create(**campos)
+
+        oficio = {"numero": 1 if area is None else 99, "ano": 2026, "evento": evento}
+        if area is not None:
+            oficio["area"] = area
+        Oficio.all_objects.create(**oficio)
+        return evento
