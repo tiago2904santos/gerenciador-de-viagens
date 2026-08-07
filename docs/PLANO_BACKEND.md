@@ -91,7 +91,7 @@ request.
 | ID | Defeito | Dias |
 |---|---|---:|
 | `DB-06` ✅ | ~~Remover um servidor da equipe do ofício apaga em cascata comprovante e assinatura já coletados (`prestacoes_contas/signals.py:33`)~~ — **fechado**: `sair_da_equipe` marca em vez de apagar quem tem dados coletados | 3 |
-| `DB-07` 🟠 | 2 `CheckConstraint` em 54 modelos: 9 pares início/fim sem ordem garantida, dinheiro negativo aceito | 3 |
+| `DB-07` ✅ | ~~2 `CheckConstraint` em 54 modelos: 9 pares início/fim sem ordem garantida, dinheiro negativo aceito~~ — **fechado**: 25 constraints, 23 novas, provadas por inversão individual | 3 |
 | `DB-08` 🟠 | Coleções ordenadas aceitam duplicata: destino repetido é contado duas vezes pelo motor de diárias e impresso duas vezes | 2 |
 
 **Limite 4 do `AGENTS.md` vale integralmente aqui:** cada migração entra com a query de validação
@@ -131,6 +131,31 @@ sobrevivam. — **cumprido** por `prestacoes_contas/test_remocao_equipe.py::Gate
 > excluir o servidor no cadastro continua apagando o comprovante. Medido: 1 anexo → 0 após
 > `servidor.delete()`. Só não é pior porque `AssinaturaDocumento.signer` é `PROTECT` e barra quem já
 > assinou. Ficou fora porque muda a UX de exclusão do cadastro e precisa da medição de produção.
+
+
+> **`DB-07` fechado. O que o levantamento achou além do enunciado.**
+>
+> Introspecção sobre os 54 modelos, não a lista do catálogo: `Roteiro` tem **quatro** datetimes em
+> cadeia (`saida_dt` → `chegada_dt` → `retorno_saida_dt` → `retorno_chegada_dt`) e `RoteiroTrecho`
+> tem um par próprio — nenhum dos dois estava nos "9 pares". Total final: 11 constraints de ordem e
+> 12 de sinal, mais as 2 que já existiam — o décimo segundo elo de ordem saiu do PR como `NOVO-36`.
+>
+> **Os testes escrevem por `queryset.update()`, não por `save()`.** É o caminho que o defeito
+> descreve — o que escapa da validação de formulário. Um teste que passasse pelo `save()` poderia
+> ficar verde sem constraint nenhuma, porque a normalização do modelo corrigiria o valor antes de
+> ele chegar ao banco.
+>
+> **Duas inversões, e uma delas me pegou.** Tirar as 23 constraints das migrações reprova 24 casos,
+> um por constraint, cada um se nomeando; trocar `gte` por `gt` reprova 22 casos de limite. A que
+> pegou: as condições nasceram com um ramo `Q(campo__isnull=True) |` que eu justifiquei no docstring
+> como necessário ao caminho Python do `full_clean()`. Removido o ramo, **nada mudou em nenhuma das
+> duas camadas** — era inerte. Saiu do código; a garantia virou teste.
+>
+> **`scripts/validar_constraints_db07.py` é o limite 4 do `AGENTS.md` como procedimento**, não como
+> anexo: lê as constraints por introspecção — a mesma verdade que as migrações aplicam, não uma
+> tradução manual delas — e sai com código 1 se alguma linha existente violar. Contra o banco de
+> desenvolvimento: 0 violações em 25 constraints. **Contra produção, ainda não rodado** — e é lá que
+> a resposta importa.
 
 ### B3 — Consulta e índice · 8,5 dias · risco médio
 

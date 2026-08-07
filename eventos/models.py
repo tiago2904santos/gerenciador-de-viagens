@@ -4,6 +4,7 @@ from core.uploads import validate_private_document_upload
 from django.db.models import Q
 from django.utils import timezone
 
+from core.constraints import periodo_ordenado
 from core.managers import AreaScopedManager
 from core.normalizers import normalize_spaces
 from core.normalizers import normalize_upper
@@ -96,6 +97,11 @@ class Evento(models.Model):
         verbose_name_plural = "Eventos"
         indexes = [
             models.Index(fields=["area", "-criado_em"], name="eventos_evento_area_criado_idx"),
+        ]
+        constraints = [
+            # `DB-07`: o período do evento se propaga para ofício, termo, plano e
+            # ordem de serviço — invertido aqui, sai invertido nos cinco.
+            periodo_ordenado("data_inicio", "data_fim", name="evento_periodo_ordenado"),
         ]
 
     def __str__(self) -> str:

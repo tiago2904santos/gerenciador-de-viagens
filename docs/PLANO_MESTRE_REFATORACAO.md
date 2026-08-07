@@ -275,7 +275,12 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       marcados, então os ~15 pontos de leitura (inclusive `prefetch_related` por string) herdam o
       filtro. Readicionar o servidor à equipe restaura tudo. Achado adjacente ficou como `NOVO-35`:
       excluir o servidor no **cadastro** ainda apaga o comprovante por `CASCADE`.
-- [ ] `DB-07` 2 `CheckConstraint` em 54 modelos
+- [x] `DB-07` 2 `CheckConstraint` em 54 modelos — viraram **25**: onze de ordem e doze de sinal, em
+      oito modelos de seis apps, saídas de três fábricas em `core/constraints.py`. O levantamento
+      por introspecção achou mais pares do que o enunciado (a cadeia de quatro datetimes do
+      `Roteiro`, e o par do `RoteiroTrecho`). `scripts/validar_constraints_db07.py` é o
+      procedimento do limite 4 do `AGENTS.md`: conta o que cada constraint reprovaria, antes do
+      deploy.
 - [ ] `DB-08` coleções ordenadas aceitam duplicata
 
 ### Fase 4 — Fundação do front

@@ -2,6 +2,8 @@ import hashlib
 
 from django.db import models
 
+from core.constraints import periodo_ordenado
+from core.constraints import positivo
 from core.managers import AreaScopedManager
 from django.db.models import Q
 from django.core.validators import FileExtensionValidator
@@ -263,10 +265,19 @@ class PrestacaoServidor(models.Model):
             # O teto (não passar do liberado) depende do roteiro e fica no
             # serviço. O piso não depende de nada: dinheiro recebido é
             # positivo, e disso o banco dá conta.
-            models.CheckConstraint(
-                check=models.Q(diaria_valor_override__isnull=True)
-                | models.Q(diaria_valor_override__gt=0),
-                name="prest_serv_diaria_recebida_positiva",
+            #
+            # `DB-07`: era `check=`, depreciado desde o Django 5.1 e removido no
+            # 6.0 — o import do modelo já emitia `RemovedInDjango60Warning`. A
+            # fábrica de `core/constraints.py` produz exatamente a mesma condição,
+            # então a migração que renomeia isto não toca em dado nenhum.
+            positivo("diaria_valor_override", name="prest_serv_diaria_recebida_positiva"),
+            # `DB-07`: o prazo de saque é calculado a partir da liberação. Data
+            # limite anterior à liberação deixa o servidor com prazo negativo e
+            # some da aba de pendentes sem nunca ter sido pago.
+            periodo_ordenado(
+                "data_liberacao_diarias",
+                "prazo_limite_saque",
+                name="prest_serv_prazo_apos_liberacao",
             ),
         ]
 
@@ -575,6 +586,12 @@ class DiarioBordoTrecho(models.Model):
         ordering = ["diario", "ordem", "pk"]
         verbose_name = "Trecho do diário de bordo"
         verbose_name_plural = "Trechos do diário de bordo"
+        constraints = [
+            # `DB-07`: km final antes do inicial dá rodagem negativa no diário de
+            # bordo assinado — que é peça de prestação de contas de combustível.
+            # `gte`, não `gt`: trecho sem deslocamento tem os dois iguais.
+            periodo_ordenado("km_inicial", "km_final", name="diario_trecho_km_ordenado"),
+        ]
 
     def __str__(self):
         return f"Trecho {self.ordem} — {self.diario_id}"

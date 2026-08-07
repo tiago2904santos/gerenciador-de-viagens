@@ -678,7 +678,7 @@ bloquear a remoção quando houver anexo ou assinatura não pendente.
 >
 > **Continua aberto pela porta do cadastro:** `NOVO-35`.
 
-### DB-07 🟠 Dois `CheckConstraint` em 54 modelos · AUD · 3 d · risco médio
+### DB-07 ✅ RESOLVIDO · 🟠 Dois `CheckConstraint` em 54 modelos · AUD · 3 d · risco médio
 
 61 `UniqueConstraint` contra 2 `CheckConstraint`
 (`tabela_diaria_valor_24h_positivo` e `prest_serv_diaria_recebida_positiva`). Nenhum dos **9 pares
@@ -688,6 +688,40 @@ início/fim** tem constraint de ordem: `Evento`, `TermoAutorizacao`, `PlanoTraba
 de formulário — import, comando, migração de dados, correção manual — grava período impossível, e
 o valor viaja para o ofício e para a prestação assinada.
 **Limite 4 do `AGENTS.md`:** cada migração entra com a query de validação dos dados existentes.
+
+> **De 2 para 25 `CheckConstraint`.** Onze de ordem e doze de sinal, em oito modelos de seis apps.
+> O levantamento por introspecção achou **mais** do que o enunciado: `Roteiro` tem **quatro**
+> datetimes em cadeia (`saida_dt` → `chegada_dt` → `retorno_saida_dt` → `retorno_chegada_dt`), não
+> um par, e `RoteiroTrecho` tem outro par que a lista dos "9 pares" não citava.
+>
+> **Entram os três elos consecutivos do roteiro e também o limite externo** (`saida_dt` ≤
+> `retorno_chegada_dt`). Não é redundância: como `CHECK` com resultado nulo passa, um `chegada_dt`
+> vazio quebra a transitividade da cadeia — e o par externo é justamente o que o motor de diárias
+> usa para contar dia de viagem.
+>
+> **`gte`, não `gt`**, nas doze de ordem: evento de um dia tem fim igual ao início, e trecho sem
+> deslocamento tem `km_final == km_inicial`. Provado por inversão — trocar por `gt` reprova 22 casos
+> de limite. E **`nao_negativo` para valor calculado** (zero é plano sem diária), **`positivo` para
+> valor que, existindo, tem de valer alguma coisa**.
+>
+> **O erro que a inversão pegou em mim.** As condições nasceram com
+> `Q(campo__isnull=True) | ...` na frente, e eu havia escrito no docstring que o ramo era necessário
+> para `BaseConstraint.validate()`, o caminho Python do `full_clean()`. **Medido, é falso nos dois
+> caminhos**: removendo o ramo, nem o banco nem o `full_clean()` mudam de comportamento. Era código
+> inerte com aparência de carga útil — pior que um comentário, porque ninguém o removeria sem medo.
+> Saiu; a garantia de que nulo passa virou teste (`NuloContinuaPassandoTests`), que é onde ela é
+> verificável.
+>
+> **Limite 4, operável:** `scripts/validar_constraints_db07.py` lê as constraints por introspecção
+> e conta as linhas que cada uma reprovaria, saindo com código 1 se houver qualquer uma. As 23
+> queries individuais estão nos docstrings das sete migrações, mas 24 queries soltas não são
+> procedimento — o script é. Contra o banco de desenvolvimento com dados reais: **0 violações**.
+>
+> **Não medido em produção.** O banco desta sessão não tem volume para provar coisa alguma sobre a
+> base real; o script existe para ser rodado lá antes do deploy.
+>
+> **De quebra:** `prest_serv_diaria_recebida_positiva` usava o kwarg `check=`, depreciado desde o
+> Django 5.1 e removido no 6.0 — o import do modelo já emitia `RemovedInDjango60Warning`.
 
 ### DB-08 🟠 Coleções ordenadas aceitam duplicata · AUD · 2 d
 
@@ -2441,6 +2475,35 @@ isso como dívida uniforme. Não é. Há pelo menos três grupos, e eles pedem t
 
 **Correção:** reescrever o enunciado do `DB-02` com esses três grupos antes de escrever qualquer
 migração, e medir o mesmo número em produção — onde o seed convive com dado real.
+
+---
+
+### NOVO-36 🟠 `NOVO` Reordenar destinos deixa o roteiro com chegada antes da saída · COR · 1 d
+
+**Achado pela constraint `roteiro_ida_ordenada`, que por isso ficou de fora do `DB-07`.** Ela existiu
+no PR, e `roteiros/tests/test_roteiros_base.py::test_salvar_reordenacao_preserva_dados_dos_trechos_existentes`
+reprovou nos dois bancos com `CHECK constraint failed: roteiro_ida_ordenada`.
+
+`roteiros/roteiro_logic.py:219`, em `_atualizar_datas_roteiro_apos_salvar_trechos`. Ao reordenar os
+destinos, cada trecho **preserva os horários que já tinha** — é o comportamento que o nome do teste
+promete. Só que as datas param de acompanhar a ordem: com dois trechos de ida (01/05 e 02/05)
+invertidos, a função lê `saida_dt` do primeiro trecho da nova ordem (02/05) e `chegada_dt` de
+`trechos[-2]` (01/05). Resultado gravado: **chegada dois dias antes da saída**.
+
+**Efeito:** `roteiro.chegada_dt` é lido como fallback do retorno em cinco pontos
+(`oficios/presenters.py:70` e `:110`, `eventos/presenters.py:183`, `eventos/services.py:314`,
+`eventos/forms.py:33`, todos na forma `retorno_chegada_dt or chegada_dt`). Num roteiro sem trecho de
+retorno, o período impresso no ofício e no card do evento sai invertido.
+
+**Correção candidata:** derivar `chegada_dt` do trecho de ida **cronologicamente** último, não do
+posicionalmente penúltimo — ou não carregar horário através de uma reordenação, que é onde o dado
+deixa de descrever o itinerário. A escolha muda o que `chegada_dt` significa, então pede teste de
+caracterização antes (limite 3 do `AGENTS.md`, pelo espírito: o valor chega ao motor de diárias por
+`eventos/services.py`).
+
+**Por que não foi corrigido junto com o `DB-07`:** pôr o `CHECK` antes de consertar o produtor troca
+dado silenciosamente errado por erro 500 numa tela de uso diário. A constraint entra no mesmo PR da
+correção.
 
 ---
 
