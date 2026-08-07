@@ -1309,7 +1309,7 @@ wizards de ofício/roteiro/termo/prestação. `SHELL_CSS` soma ≈37 KB na mesma
 `{% block extra_css %}` que `base.html:12-13,45` já tem. Mitigar a regressão silenciosa (template
 que esquece de declarar) com regra no auditor ou teste de fumaça por tela.
 
-### HT-05 🟡 `empty_state.html` quebra a ordem de headings · AUD+MED · 0,5 d
+### HT-05 ✅ RESOLVIDO · 🟡 `empty_state.html` quebra a ordem de headings · AUD+MED · 0,5 d
 
 > **Divergência resolvida por medição.** Uma segunda auditoria independente concluiu "zero salto de
 > nível de heading em 412 templates de produção" — análise **estática, por template**, que não
@@ -1324,6 +1324,31 @@ padrão que já existe em `components/form/card.html`. Medido com navegador em `
 `/cadastros/viaturas/`.
 **Efeito:** navegação por headings pula do nível 1 para o 3 sempre que a lista está vazia —
 instalação nova, filtro sem resultado. SC 1.3.1 / 2.4.6.
+
+> **RESOLVIDO em 07/08/2026, e o número do enunciado subiu: o pulo era 10 de 10, não 9.** A décima
+> é `/justificativas/`, e ela precisava de correção **diferente** das outras nove — foi por isso que
+> a auditoria original a deixou de fora. As nove saem com o `<h3>` do estado vazio virando `<h2>`;
+> a de justificativas tem, acima da lista, um painel de cadastro rápido cujos dois `form_block`
+> pediam `heading_level=3` — filhos diretos do `<h1>` da página, sem heading intermediário. O
+> componente só sabia renderizar 3 e 4, então **aquela tela não tinha como não pular nível** por
+> mais que o estado vazio fosse corrigido. `form_block.html` ganhou ramo `h2`, **aditivo**: o
+> default segue `h4` e nenhum dos ~40 chamadores existentes muda de nível.
+>
+> **Sem parâmetro `heading_level` no estado vazio, e a decisão veio da inversão.** A primeira versão
+> tinha um, com default 2 e ramos 3/4/5, repassado por `list_empty.html`. Tirar o repasse não
+> reprovou teste nenhum: nenhum dos sete chamadores passa nível. Foi a **nona** vez nesta etapa que
+> um teste meu passava dos dois jeitos, e a lição é a mesma — parâmetro que ninguém exercita parece
+> contrato e não é. `list_empty.html` voltou a ser idêntico ao `main`. Quando aparecer chamador
+> aninhado sob heading próprio, ele acrescenta o parâmetro junto com o caso que o prova.
+>
+> **A trava é sobre o HTML renderizado, não sobre o template.** `core/tests/test_ordem_de_headings.py`
+> abre as dez listas vazias e derruba a regra "nenhum degrau perdido" na sequência de `<h1>`…`<h6>`
+> de cada resposta. É exatamente a diferença que o box acima registra: a auditoria estática, por
+> template, não enxerga a composição da página e concluiu "zero salto em 412 templates". Tela nova
+> com estado vazio entra na varredura sozinha.
+>
+> Chamador sem `title` não renderiza heading nenhum — é o caso dos dois usos `variant="compact"`
+> (perfil e histórico de diárias), fora deste defeito por construção.
 
 ### HT-06 🟡 Dez a quatorze componentes mortos · AUD · 0,5–1 d
 
