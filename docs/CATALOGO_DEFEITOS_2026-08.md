@@ -891,7 +891,7 @@ gerado entre duas visualizações do mesmo roteiro.
 >
 > Migrações: `roteiros/0013` e `prestacoes_contas/0034`.
 
-### DB-09 🟠 Lista de roteiros agrega antes do `LIMIT` · AUD · 2 d
+### DB-09 ✅ RESOLVIDO · 🟠 Lista de roteiros agrega antes do `LIMIT` · AUD · 2 d
 
 `roteiros/selectors.py:36-47` anota `Count('trechos')` e `Count('destinos')` e usa
 `.exclude(destinos_count=0, trechos_count=0, ...)`. `EXPLAIN (ANALYZE, BUFFERS)` com 24.000
@@ -914,6 +914,44 @@ roteiros (2.000 na área ativa): `Seq Scan on roteiros_roteirotrecho rows=48000`
 volume das outras.
 **Correção:** `Exists()` correlacionado, que o Postgres avalia com semi-join e curto-circuito por
 linha, permitindo parar no `LIMIT`.
+
+> **Fechado em 07/08/2026. O mecanismo prometido não é o que aconteceu — e o ganho é maior do que
+> ele daria.**
+>
+> A correção é mesmo `~Exists(...)` correlacionado, mas **o `LIMIT` não curto-circuita**: o plano
+> depois da troca continua lendo as 6.666 linhas da área e ordenando. O ganho vem de outro lugar —
+> o `GroupAggregate` sobre 26.664 linhas desaparece, e com ele a varredura das duas tabelas filhas.
+> Buffers 7.817 → 659.
+>
+> **E o índice de ordenação entrou junto, porque sozinho ele não vale nada.** Medido com 20.000
+> roteiros em três áreas, mediana de 7 execuções de `EXPLAIN (ANALYZE, BUFFERS)`, tudo no mesmo
+> banco:
+>
+> | forma | ms | buffers | ganho |
+> |---|---:|---:|---:|
+> | `Count` + `exclude` (como estava) | 78,99 | 7.817 | — |
+> | `Exists` | 26,99 | 659 | 2,9× |
+> | **`Exists` + índice `(area, -updated_at)`** | **8,86** | **449** | **8,9×** |
+> | `Count` + `exclude` + índice (**controle**) | 78,18 | 7.776 | **1,0×** |
+>
+> A linha de controle é a que explica o `DB-10`. Lá eu medi este mesmo índice e ele deu 0,9×, e
+> concluí que "roteiros não ganha". Estava certo sobre o número e incompleto sobre a causa:
+> enquanto o `GroupAggregate` varre as tabelas filhas, ele domina o custo e o `Sort` é troco. Os
+> dois são uma unidade — separados, um dá 2,9× e o outro dá 1,0×.
+>
+> **Na rota inteira, 1,54×**: 975,8 → 633,2 ms, medido em processo único com as duas
+> implementações alternadas A-B-A-B sobre o mesmo banco (6 rodadas por lado, 962–1016 ms contra
+> 619–668 ms). São 343 ms a menos na lista mais lenta do sistema. O 8,9× é da consulta; a rota
+> emite 33.
+>
+> **O risco desta troca nunca foi desempenho, foi semântica.** `.exclude()` com quatro argumentos é
+> `NOT (a E b E c E d)`, não quatro exclusões: basta o roteiro ter **um** dos quatro sinais para
+> ficar na lista. Escrever isso como quatro `.exclude()` encadeados — o erro natural de quem lê
+> rápido — some com rascunho legítimo da tela, em silêncio. `test_lista_de_roteiros_db09` trava a
+> tabela-verdade caso a caso, e a inversão para as quatro exclusões separadas reprova exatamente os
+> quatro testes de "só com um sinal".
+>
+> Migração `roteiros/0015` (só o índice; a troca do `exclude` é código).
 
 ### DB-10 ✅ RESOLVIDO · 🟡 Falta índice composto para a ordenação real das listas · AUD · 0,5 d
 
@@ -949,6 +987,11 @@ Ofícios têm situação análoga.
 > | `planos_trabalho` | 125,9 ms | 126,8 ms | 1,0× | idem |
 > | `justificativas` | 24,4 ms | 21,3 ms | 1,1× | e os buffers vão de 664 para 40.384 |
 > | `roteiros` | 555,7 ms | 611,7 ms | **0,9×** | continua ordenando, e fica pior |
+>
+> **Correção ao `roteiros` desta tabela, vinda do `DB-09` no mesmo dia:** o 0,9× estava certo, e a
+> conclusão "não ganha" estava incompleta. O índice não pagava **enquanto a agregação estava lá**.
+> Tirada a agregação, o mesmo índice leva a consulta de 27,0 ms para 8,9 ms. Ele entrou na fatia do
+> `DB-09`, com a linha de controle que prova as duas coisas.
 >
 > Índice nas outras quatro seria custo de escrita sem ganho de leitura. Em `roteiros` o gargalo é a
 > agregação antes do `LIMIT` — o `DB-09`. Em `oficios` e `planos_trabalho` o `Limit` já para em 20
