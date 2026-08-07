@@ -787,7 +787,7 @@ o valor viaja para o ofício e para a prestação assinada.
 > **De quebra:** `prest_serv_diaria_recebida_positiva` usava o kwarg `check=`, depreciado desde o
 > Django 5.1 e removido no 6.0 — o import do modelo já emitia `RemovedInDjango60Warning`.
 
-### DB-08 🟠 PARCIAL — 3 de 5 fechados · Coleções ordenadas aceitam duplicata · AUD · 2 d
+### DB-08 ✅ RESOLVIDO · 🟠 Coleções ordenadas aceitam duplicata · AUD · 2 d
 
 `RoteiroDestino`, `RoteiroTrecho`, `PlanoDestino`, `EventoPlano` e `DiarioBordoTrecho` têm
 `constraints=[]`. Provado em transação real: dois `RoteiroDestino` com a mesma `(roteiro, ordem)`
@@ -831,6 +831,35 @@ gerado entre duas visualizações do mesmo roteiro.
 > Migrações: `roteiros/0012` e `planos_trabalho/0022`, cada uma com o SQL que localiza as linhas em
 > produção (limite 4 do `AGENTS.md`). Medido no banco de desenvolvimento: **0 grupos duplicados**
 > nas três consultas.
+
+> **Fatia 2 fechada em 07/08/2026 — os dois que faltavam, junto com os escritores.**
+>
+> `RoteiroTrecho` e `DiarioBordoTrecho` reaproveitam a linha por `id` de propósito: é o que
+> preserva o campo manual (KM do diário, tempo adicional e fonte da rota do trecho). Trocar dois
+> de lugar colide no meio do laço. Os dois escritores passaram a ter **dois passos** — um `UPDATE`
+> único empurra todas as posições para um bloco livre (`+1.000.000`), o laço traz cada uma de volta
+> já no lugar, e o `delete()` do fim leva as que sobraram. Aí a constraint simples é segura.
+>
+> **Uma colisão que não é troca de lugar.** Três idas (0,1,2) e o retorno em 3; o payload novo traz
+> duas idas, e o retorno passa a valer 2 — posição que a terceira ida ainda ocupa, porque o
+> `delete()` só roda no fim. Não é reordenação, é encolhimento, e nenhum teste cobria.
+>
+> **Os dois escritores viraram `@transaction.atomic`, e isso é correção, não zelo.** Nem
+> `sincronizar_trechos` nem o caminho de autosave do roteiro abriam transação. Sem ela, uma falha
+> entre os dois passos deixa linha estacionada com posição 1.000.001 à vista do usuário, e a
+> gravação seguinte não conserta — o primeiro passo soma outro deslocamento em cima. No roteiro
+> fecha de quebra um buraco anterior: `roteiro.destinos.all().delete()` fora de transação apaga
+> todos os destinos e não os devolve se a recriação falhar.
+>
+> **Correção à fatia 1: aquele "0 grupos duplicados" vale para um modelo, não para os três.**
+> `roteiros_roteirodestino` tem 60 linhas no banco de desenvolvimento e a medição ali é real.
+> `planos_trabalho_planodestino` e `planos_trabalho_eventoplano` têm **0 linhas** — a consulta
+> devolve zero porque não há o que consultar, não porque está limpo. O mesmo vale para os dois
+> modelos desta fatia. É o instrumento cego do `NOVO-45`, e as migrações da fatia 2 dizem isso no
+> docstring em vez de contar a medição como evidência. Quem decide é o SQL rodado **em produção**,
+> antes do deploy.
+>
+> Migrações: `roteiros/0013` e `prestacoes_contas/0034`.
 
 ### DB-09 🟠 Lista de roteiros agrega antes do `LIMIT` · AUD · 2 d
 

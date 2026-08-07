@@ -300,10 +300,12 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       `Roteiro`, e o par do `RoteiroTrecho`). `scripts/validar_constraints_db07.py` é o
       procedimento do limite 4 do `AGENTS.md`: conta o que cada constraint reprovaria, antes do
       deploy.
-- [~] `DB-08` coleções ordenadas aceitam duplicata — **3 de 5**: `RoteiroDestino`,
-      `PlanoDestino` (par parcial, porque `evento` é anulável) e `EventoPlano`. `RoteiroTrecho` e
-      `DiarioBordoTrecho` reordenam por troca linha a linha e precisam do escritor em dois
-      passos antes da constraint — fatia 2
+- [x] `DB-08` coleções ordenadas aceitam duplicata — **5 de 5**. Fatia 1: `RoteiroDestino`,
+      `PlanoDestino` (par parcial, porque `evento` é anulável) e `EventoPlano`. Fatia 2:
+      `RoteiroTrecho` e `DiarioBordoTrecho`, que reordenam linha a linha e por isso levaram os
+      dois escritores para **dois passos** (bloco livre, depois posições finais) e para dentro de
+      `transaction.atomic` — nenhum dos dois abria transação. A medição de duplicata só vale em
+      produção: quatro das cinco tabelas estão vazias no banco de desenvolvimento
 
 ### Fase 4 — Fundação do front
 - [x] `JS-06` JS larga o nome de classe `cv-search-picker` — e as **partes** junto (`NOVO-19`):

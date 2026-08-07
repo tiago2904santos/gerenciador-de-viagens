@@ -613,6 +613,17 @@ class DiarioBordoTrecho(models.Model):
         verbose_name = "Trecho do diário de bordo"
         verbose_name_plural = "Trechos do diário de bordo"
         constraints = [
+            # `DB-08` fatia 2: a posição é a ordem das linhas do diário assinado, e
+            # o diário é peça de prestação de contas — duas linhas na mesma posição
+            # tornam a planilha não determinística entre duas gerações do mesmo
+            # documento.
+            #
+            # Como no `RoteiroTrecho`, o escritor reaproveita a linha por `id` para
+            # preservar o que o usuário digitou (KM e abastecimento). A constraint
+            # só é segura junto com o `sincronizar_trechos` em dois passos.
+            models.UniqueConstraint(
+                fields=["diario", "ordem"], name="diario_trecho_ordem_unique",
+            ),
             # `DB-07`: km final antes do inicial dá rodagem negativa no diário de
             # bordo assinado — que é peça de prestação de contas de combustível.
             # `gte`, não `gt`: trecho sem deslocamento tem os dois iguais.

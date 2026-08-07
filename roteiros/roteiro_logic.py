@@ -9,6 +9,8 @@ from decimal import ROUND_HALF_UP
 from decimal import Decimal
 from types import SimpleNamespace
 
+from django.db import transaction
+from django.db.models import F
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
@@ -1569,8 +1571,26 @@ def _build_roteiro_diarias_fallback(roteiro, *, quantidade_servidores: int = 1):
     }
 
 
+#: `DB-08` fatia 2: bloco livre para onde as posições vão no primeiro passo.
+#: Precisa ficar acima de qualquer posição final — e as finais são
+#: `0..len(trechos_validated)`, uma por trecho do payload do editor. Um milhão dá
+#: folga de sobra e cabe com margem no `PositiveIntegerField` (máx. 2.147.483.647).
+DESLOCAMENTO_ORDEM_TRECHO = 1_000_000
+
+
+@transaction.atomic
 def _salvar_roteiro_avulso_from_roteiro_state(roteiro, roteiro_state, validated, diarias_resultado=None):
-    """Persiste o editor preservando trechos existentes por id e retorno em bloco proprio."""
+    """Persiste o editor preservando trechos existentes por id e retorno em bloco proprio.
+
+    `DB-08` fatia 2: atômica de ponta a ponta. Dois dos quatro caminhos que chegam
+    aqui já vinham dentro de transação (`criar_roteiro` e `atualizar_roteiro` em
+    `roteiros/services/roteiro_editor.py`) — nesses o `atomic` é só um savepoint
+    aninhado. O caminho do autosave (`roteiros/services/autosave.py`, que não tem
+    `atomic` nenhum) é que precisava: sem transação, uma falha no meio deixa as
+    posições estacionadas no bloco de deslocamento, e antes disso já deixava o
+    roteiro **sem destino nenhum**, porque o `delete()` da linha abaixo é
+    irreversível fora de transação.
+    """
     destinos_post = []
     for item in (roteiro_state.get('destinos_atuais') or []):
         estado_id = _parse_int(item.get('estado_id'))
@@ -1608,6 +1628,17 @@ def _salvar_roteiro_avulso_from_roteiro_state(roteiro, roteiro_state, validated,
             sede_cidade_id=roteiro.origem_cidade_id,
         ):
             trechos_validated = trechos_validated[:-1]
+    # `DB-08` fatia 2, **primeiro passo**. As posições finais são gravadas uma a
+    # uma no laço abaixo, e o escritor reaproveita as linhas por `id`: trocar dois
+    # trechos de lugar, ou encolher o roteiro e reposicionar o retorno, colide com
+    # uma linha que ainda não foi reposicionada nem apagada. Este `UPDATE` único
+    # empurra todas para um bloco que nenhuma posição final alcança; o laço as traz
+    # de volta já no lugar certo, e o `delete()` do fim leva as que sobraram.
+    #
+    # `deferrable=DEFERRED` resolveria isso no banco e **não serve**:
+    # `supports_deferrable_unique_constraints` é `False` no SQLite, e a suíte roda
+    # nos dois bancos — a proteção existiria só no PostgreSQL.
+    roteiro.trechos.update(ordem=F('ordem') + DESLOCAMENTO_ORDEM_TRECHO)
     trechos_existentes = {
         trecho.pk: trecho
         for trecho in roteiro.trechos.all()

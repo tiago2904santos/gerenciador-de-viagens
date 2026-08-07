@@ -343,6 +343,20 @@ class RoteiroTrecho(models.Model):
         ]
         ordering = ["roteiro", "ordem"]
         constraints = [
+            # `DB-08` fatia 2: a posição é a sequência do itinerário impresso, e
+            # duas linhas na mesma posição tornam o documento não determinístico —
+            # a mesma tela gera dois PDFs diferentes conforme o desempate de `pk`.
+            # O retorno não disputa posição com a ida: `roteiro_logic.py` dá a ele
+            # `len(trechos_validated)`, uma casa acima de todas as de ida.
+            #
+            # Ao contrário do `RoteiroDestino`, aqui o escritor **não** apaga antes
+            # de recriar: ele reaproveita a linha por `id` para preservar campo
+            # manual (KM, tempo adicional). Por isso a constraint só é segura junto
+            # com o escritor em dois passos — ver
+            # `_salvar_roteiro_avulso_from_roteiro_state`.
+            models.UniqueConstraint(
+                fields=["roteiro", "ordem"], name="roteiro_trecho_ordem_unique",
+            ),
             # `DB-07`: cada trecho tem o proprio par, e a soma deles e' o
             # itinerario impresso. Um trecho invertido nao aparece na tela.
             periodo_ordenado("saida_dt", "chegada_dt", name="roteiro_trecho_ordenado"),
