@@ -244,6 +244,17 @@ class RoteiroDestino(models.Model):
         indexes = [
             models.Index(fields=["roteiro", "ordem"], name="roteiro_destino_ordem_idx"),
         ]
+        # `DB-08`: dois destinos na mesma posição eram aceitos, e o destino
+        # duplicado é contado **duas vezes pelo motor de diárias** — sai no ofício
+        # e no termo. Constraint simples (não adiada) porque o único escritor
+        # apaga tudo antes de recriar: `roteiro_logic.py:1581`
+        # (`roteiro.destinos.all().delete()`), depois `create` com `enumerate`.
+        # Reordenação por troca de posição não existe neste caminho.
+        constraints = [
+            models.UniqueConstraint(
+                fields=["roteiro", "ordem"], name="roteiro_destino_ordem_unique",
+            ),
+        ]
         ordering = ["roteiro", "ordem"]
         verbose_name = "Destino do roteiro"
         verbose_name_plural = "Destinos do roteiro"

@@ -292,7 +292,11 @@ do que o catálogo sugeria.
 
 **Correção:** três PRs mecânicos, verificáveis por grep.
 
-### BE-17 🟡 `core/views.py` é 75% fixture de UI Lab · AUD · 1,5 d
+### BE-17 ✅ RESOLVIDO · 🟡 `core/views.py` é 75% fixture de UI Lab · AUD · 1,5 d
+
+**Fechado em 07/08 pela remoção do UI-lab.** `core/views.py` foi de **1.249 para 237 linhas**: saíram
+`UI_LAB_PAGE_DEFINITIONS` e as 17 views `ui_lab_*`. Ficou o que sempre foi produção — `health`,
+`metrics`, `LoginView`, `dashboard`, `perfil`.
 
 1.261 linhas, das quais **947 (75%)** são símbolos `UI_LAB_*`. O que pertence a `core` — health,
 metrics, LoginView, dashboard, perfil — são 314 linhas. Em paralelo existem **dois** UI Labs:
@@ -469,7 +473,15 @@ estar: `tmp/` (23), `media_teste/` (6), `migration_backups/` (2, um deles um `.d
 `_tmp_check5.py`, `tatus` (um `git status` redirecionado por engano),
 `.codex-runserver-8001.{err,out}.log`.
 
-### BE-25 🟡 Dois UI Labs concorrentes, sem regra de qual é o vigente · AUD · 0,75 d
+### BE-25 ✅ RESOLVIDO · 🟡 Dois UI Labs concorrentes, sem regra de qual é o vigente · AUD · 0,75 d
+
+**Fechado em 07/08: não se escolheu um, apagaram-se os dois.** E o código dizia de si mesmo que eram
+duas gerações — `ui_lab2/views.py:166` chamava o outro de "UI Lab 1.0".
+
+A assimetria explica por que isto custou o que custou: o **2.0** era app isolado (`ui_lab2/`, 657
+linhas) e saiu com `rm -rf` mais duas linhas de registro. O **1.0** não tinha app: vivia dentro de
+`core/views.py`, `core/urls.py`, `core/forms/__init__.py` e `core/navigation.py`. Foi 90% do
+esforço.
 
 `ui_lab2` (656 LOC + 18 templates) e `templates/dev/ui_lab` (19 templates). Ambos só roteados sob
 `DEBUG`, mas `ui_lab2` está em `INSTALLED_APPS` em todos os ambientes
@@ -528,53 +540,70 @@ o desenho atual evita, e mexeria na regra de dinheiro fechada no ciclo de julho.
 > duplicada recusada —, não a permissão; sem a troca eles passariam a medir o 403 e parariam de
 > medir a regra de dinheiro.
 
-### DB-02 ✅ RESOLVIDO (07/08, reescrito pelo `NOVO-34`) · 🔴 `area` anulável — NOT NULL no grupo operacional; anulável com razão nos outros dois · AUD · 5 d · risco alto
+### DB-02 ✅ RESOLVIDO (07/08/2026) · 🔴 `area` anulável em 27 de 28 modelos — três dívidas diferentes, não uma · AUD+VER · 5 d · risco alto
 
-**O enunciado original ("`area` anulável em 27 de 28 modelos", tratado como dívida uniforme)
-estava errado, e a medição do `NOVO-34` o reescreveu em três grupos antes de qualquer migração:**
+> **Enunciado reescrito em 07/08/2026**, como o `NOVO-34` exigia, e **grupo operacional migrado
+> no mesmo dia**. O original tratava os 27 modelos como dívida uniforme ("`NOT NULL` nos
+> transacionais") — e num banco recém-migrado **cinco modelos já nascem com `area IS NULL` por
+> seed de migração**, enquanto a linha global de `ConfiguracaoNumeracaoOficio` **é** o piso de
+> numeração. A migração uniforme destruiria mecanismo desenhado de propósito.
 
-1. **Operacional — `NOT NULL`, feito.** Os oito modelos do `core.E001`: `Roteiro`, `Evento`,
-   `DocumentoArtefato`, `Oficio`, `TermoAutorizacao`, `PlanoTrabalho`, `OrdemServico`,
-   `PrestacaoContas` — migrações `*_area_obrigatoria` nos oito apps. Os dois efeitos do enunciado
-   fecham aqui: o balde `area IS NULL` que um usuário sem vínculo enxergava inteiro
-   (`core/tenancy.py:70-71`) passa a ser **vazio por construção**, e escrita sem área fora de
-   request falha alto (`IntegrityError`) em vez de gravar órfão invisível.
-   A migração nunca encontra NULL em produção pela **ordem** que o `NOVO-12` criou: o
-   `check --deploy --fail-level ERROR` roda nas pré-checagens do `deploy.yml`, antes do
-   backup/checkout, e o `core.E001` (Error) aborta com a instrução de backfill enquanto houver
-   órfão operacional. Validação avulsa: `scripts/validar_not_null_db02.py` (limite 4 do
-   `AGENTS.md`); o backup já é automático no mesmo deploy. Dois consertos de código saíram da
-   janela pré-migração: `backfill_legacy_areas` deixou de pular modelo com `field.null=False`
-   (o critério de nulidade em memória o esvaziaria justamente quando ele é necessário) e o signal
-   de prestações passou a ler `oficio.area_id` (com `null=False`, ler `.area` num órfão levanta
-   `RelatedObjectDoesNotExist`).
-2. **Catálogo com padrão global — segue anulável até decisão de produto.** `TipoEvento`,
-   `ModeloMotivoEvento`, `ModeloMotivoOficio`, `ModeloJustificativa`, `ProgramaSolicitante`,
-   `HorarioAtendimento`, `AtividadePlanoTrabalho`, `PresetAtividadesPlanoTrabalho`,
-   `ModeloTextoRelatorioTecnico` e os cinco de `cadastros` (`Unidade`, `Cargo`, `Combustivel`,
-   `Servidor`, `Viatura`). Cinco nascem com `area IS NULL` por seed de migração (`NOVO-34`) e as
-   constraints condicionais `Q(area__isnull=True)` são deliberadas. `NOT NULL` aqui exige decidir
-   o destino do global — atribuir a uma área ou duplicar por área (caminho do `NOVO-09`). O
-   `NOVO-43` registra a medição que essa decisão precisa.
-3. **Global por projeto — NULL é o mecanismo; não entra.** `ConfiguracaoNumeracaoOficio` (a linha
-   global **é** o piso de numeração de 2026) e `OficioNumeroLacuna` (lacunas do mesmo piso);
-   `ConfiguracaoSistema` (linha global de compatibilidade — `get_singleton` já não a recria); e os
-   `SET_NULL` por projeto, `AuditEvent` (fora desde o `NOVO-31`) e `DriveReorganizacaoJob`
-   (histórico de job sobrevive à área apagada). `DocumentoGeracao` fica anulável nesta rodada: o
-   job recebe a área explícita do request e a leitura já recorta.
+Os dois efeitos do enunciado original fecharam com o grupo 1: o balde `area IS NULL` que um
+usuário sem vínculo enxergava inteiro (`core/tenancy.py:69-71`) passou a ser **vazio por
+construção** para dado operacional, e escrita sem área falha alto (`IntegrityError`) em vez de
+gravar órfão invisível. A dívida tinha três formas:
 
-O passo 3 da correção original ("mudar o comportamento de `filter_queryset_by_area` sem área")
-tornou-se desnecessário para o defeito enunciado: com o grupo 1 `NOT NULL`, `area=None` →
-`filter(area__isnull=True)` devolve vazio para todo modelo operacional, mecanicamente. Mudar a
-semântica para os grupos 2/3 é parte da decisão do `NOVO-43`, não deste ID.
+**Grupo 1 — Operacional: `NOT NULL`, feito.** Os oito modelos do `core.E001`: `Oficio`,
+`Roteiro`, `Evento`, `TermoAutorizacao`, `OrdemServico`, `PlanoTrabalho`, `PrestacaoContas`,
+`DocumentoArtefato` — migrações `*_area_obrigatoria` nos oito apps. Sete dos oito já derivavam a
+área sozinhos no `save()`; **`Evento` era a exceção** — nascia sem área mesmo dentro de request —
+e passou a derivar como os irmãos, com teste que falharia antes. A migração não precisou esperar
+produção: o gate do `NOVO-12` roda `check --deploy --fail-level ERROR` **antes do `migrate`**
+(protegido pelo rollback do `QA-03`), e o `core.E001` aborta com a instrução de backfill enquanto
+houver órfão — a migração nunca encontra NULL que o operador não tenha visto.
+`scripts/validar_not_null_db02.py` mede as oito tabelas sem esperar um deploy (limite 4 do
+`AGENTS.md`); o backup já é automático no mesmo fluxo. Dois consertos saíram da janela
+pré-migração: `backfill_legacy_areas` deixou de pular modelo com `field.null=False` (o critério
+de nulidade em memória o esvaziaria justamente quando ele é necessário) e o signal de prestações
+lê `oficio.area_id` (com `null=False`, ler `.area` num órfão levanta `RelatedObjectDoesNotExist`).
+
+**Grupo 2 — Catálogo com padrão global: `NOT NULL` só depois de decisão de produto.**
+`TipoEvento` (5 linhas globais de seed), `ProgramaSolicitante` (3), `HorarioAtendimento` (3),
+`AtividadePlanoTrabalho` (11), os cadastros básicos (`Servidor`, `Viatura`, `Unidade`, `Cargo`,
+`Combustivel`, `ConfiguracaoSistema`) e os modelos de texto (`ModeloMotivoEvento`,
+`ModeloMotivoOficio`, `ModeloJustificativa`, `ModeloTextoRelatorioTecnico`,
+`PresetAtividadesPlanoTrabalho`). A linha sem área aqui é o item **global** — as
+`UniqueConstraint` condicionais em `area__isnull=True` documentam isso como desenho. `NOT NULL`
+exige decidir, item a item, se o global vira cópia por área (o caminho do `NOVO-09`) ou ganha
+dono. Decisão de produto, não de migração — registrada como `NOVO-45`, com a medição que ela
+precisa: **nenhum picker oferta o global a usuário com área.**
+
+**Grupo 3 — Global por projeto: `NOT NULL` fora de questão.** `ConfiguracaoNumeracaoOficio`: a
+linha sem área é o piso de numeração de 2026 (`numero_inicial=75`), buscada de propósito com
+`Q(area=area) | Q(area__isnull=True)`. Também fora, por razões próprias: `core.AuditEvent` e
+`DriveReorganizacaoJob` são `SET_NULL` — a trilha e o job sobrevivem à área apagada; linha sem
+área ali é histórico. Os dois auxiliares ficaram anuláveis **nesta rodada**, com razão anotada:
+`OficioNumeroLacuna` também serve o piso global (`oficios/models.py:227` filtra lacunas
+`area__isnull` de propósito) e entra num eventual redesenho da numeração; `DocumentoGeracao`
+recebe a área explícita do request e a leitura já recorta.
+
+**O passo 3 da correção original caiu por desnecessário:** com o grupo 1 `NOT NULL`,
+`filter_queryset_by_area` sem área devolve vazio para todo modelo operacional mecanicamente —
+mudar a semântica para os grupos 2/3 é parte da decisão do `NOVO-45`, não deste ID.
+
+**Medição em produção:** o gate do `NOVO-12` imprime `core.E001`/`core.W001` a cada deploy — a
+contagem real por modelo, no banco onde seed convive com dado de usuário. Se houver órfão
+operacional, o primeiro deploy deste ID aborta com a instrução de
+`backfill_legacy_areas --area SIGLA --commit`; rodado o backfill, é só disparar de novo.
 
 Evidência: `core/tests/test_deploy_checks.py` prova o `IntegrityError` que falharia antes;
 `core/tests/test_area_scoped_manager.py` reescreve o contrato (balde operacional vazio; balde de
-catálogo preservado); a suíte inteira passou a criar dado com área — e o custo disso virou
-instrumento reutilizável, `core/testing.py` (`area_de_teste`, `vincular_area`, `com_request`,
-`sem_request`). A reescrita também revelou e fechou um N+1 real: a lista de pendências do Drive
-buscava a `AreaTrabalho` de cada origem só para comparar pk — invisível enquanto o legado tinha
-`area_id NULL`, porque FK `None` nem vai ao banco (`integracoes/google_drive/status.py`).
+catálogo preservado num modelo anulável); a suíte inteira passou a criar dado com área — o custo
+virou instrumento reutilizável, `core/testing.py` (`area_de_teste`, `vincular_area`,
+`com_request`, `sem_request`). A reescrita também revelou e fechou um N+1 real: a lista de
+pendências do Drive materializava a `AreaTrabalho` de cada origem só para comparar pk —
+invisível enquanto o legado tinha `area_id NULL`, porque FK `None` nem vai ao banco
+(`integracoes/google_drive/status.py`).
 
 ### DB-03 ✅ RESOLVIDO · 🟠 Limpeza de rascunhos apaga rascunho de outra área · AUD · 1 d
 
@@ -758,7 +787,7 @@ o valor viaja para o ofício e para a prestação assinada.
 > **De quebra:** `prest_serv_diaria_recebida_positiva` usava o kwarg `check=`, depreciado desde o
 > Django 5.1 e removido no 6.0 — o import do modelo já emitia `RemovedInDjango60Warning`.
 
-### DB-08 🟠 Coleções ordenadas aceitam duplicata · AUD · 2 d
+### DB-08 🟠 PARCIAL — 3 de 5 fechados · Coleções ordenadas aceitam duplicata · AUD · 2 d
 
 `RoteiroDestino`, `RoteiroTrecho`, `PlanoDestino`, `EventoPlano` e `DiarioBordoTrecho` têm
 `constraints=[]`. Provado em transação real: dois `RoteiroDestino` com a mesma `(roteiro, ordem)`
@@ -766,6 +795,42 @@ são aceitos.
 **Efeito:** destino duplicado é contado **duas vezes pelo motor de diárias** e impresso duas vezes
 no ofício e no termo. Ordem repetida torna a sequência não determinística, mudando o documento
 gerado entre duas visualizações do mesmo roteiro.
+
+> **Fatia 1 fechada em 07/08/2026 — e o enunciado errava em três pontos, todos corrigidos por
+> medição antes de escrever constraint.**
+>
+> 1. **`eventos.EventoPlano` não existe.** O modelo é `planos_trabalho.EventoPlano`.
+> 2. **`PlanoDestino` não é `(plano, ordem)`.** Um plano guarda ao mesmo tempo os destinos de
+>    rascunho (`evento IS NULL`) e as cópias por evento, e `planos_trabalho/services.py:968` copia
+>    `d.ordem` tal e qual ao comitar. `(plano, ordem)` **reprovaria produção no primeiro commit de
+>    evento** — está travado por `test_o_rascunho_e_a_copia_do_evento_convivem_na_mesma_posicao`,
+>    que é a inversão nº 3.
+> 3. **Dois dos cinco não aceitam constraint simples.** `RoteiroTrecho`
+>    (`roteiros/roteiro_logic.py:1629`) e `DiarioBordoTrecho`
+>    (`prestacoes_contas/diario_services.py:282`) reaproveitam as linhas por id e gravam `ordem` uma
+>    a uma — trocar duas posições colide no meio do laço. Ficam para a **fatia 2**, junto com a
+>    troca dos dois escritores para dois passos.
+>
+> **A saída óbvia está fechada:** `deferrable=DEFERRED` não serve porque
+> `supports_deferrable_unique_constraints` é `False` no SQLite e a suíte roda nos dois bancos — a
+> constraint existiria só no PostgreSQL e o SQLite passaria sem testar nada. Medido, e travado em
+> `test_o_sqlite_nao_suporta_constraint_adiada`.
+>
+> **A armadilha do NULL.** `PlanoDestino.evento` é anulável, e em SQL NULL é distinto de NULL num
+> índice único: uma constraint só sobre `(plano, evento, ordem)` deixaria **sem proteção justamente
+> o caso mais comum**, o rascunho que o formulário grava. Daí o par parcial. É a inversão nº 2.
+>
+> **Uma reordenação que eu não tinha achado, e quem achou foi a suíte.**
+> `roteiros/tests/test_routing.py:503` trocava as posições no lugar
+> (`d0.ordem, d1.ordem = 1, 0` + dois `save`) e a constraint reprovou nos dois bancos. Conferido por
+> grep: **produção não tem troca no lugar para este modelo** — o único escritor apaga e recria
+> (`roteiro_logic.py:1581`). O atalho era do teste. Reescrito para reordenar como produção, e
+> conferido por inversão que a asserção **não** ficou vácua: quebrar
+> `mark_stale_when_signature_changed` continua reprovando.
+>
+> Migrações: `roteiros/0012` e `planos_trabalho/0022`, cada uma com o SQL que localiza as linhas em
+> produção (limite 4 do `AGENTS.md`). Medido no banco de desenvolvimento: **0 grupos duplicados**
+> nas três consultas.
 
 ### DB-09 🟠 Lista de roteiros agrega antes do `LIMIT` · AUD · 2 d
 
@@ -1610,6 +1675,11 @@ que ele **não** aparece no lab — foi descontinuado e não apagado),
 > A trava é `test_componentes_sem_orfao.py`, e é sobre a **regra**: componente novo que ninguém
 > renderiza reprova, componente que perde o último consumidor reprova, e a lista do laboratório é
 > conferida nos dois sentidos — perder o citador do lab ou ganhar um de produção também reprova.
+>
+> **Adendo de 07/08/2026:** a decisão veio — o `BE-25` (PR #247) apagou os dois labs — e os 7
+> caíram na cascata exatamente como previsto, mais o `document_card` em segunda ordem (os
+> citadores de produção que esta nota lhe media eram `list_grid` e `ui_lab2/views.py`). O
+> fechamento, com prova por arquivo, é o `NOVO-44`.
 
 ### HT-07 🟡 Concatenação condicional com "·" no template · AUD · 1–2 d
 
@@ -1792,6 +1862,24 @@ o `+` da concatenação fica no início da linha seguinte (`static/js/pages/ofic
 | `page-shell.css` ✅ | 78 → medido 57 | 14 KB → medido 9,4 KB |
 | `roteiros.css` ✅ | 78 → medido 76 | 14 KB → medido 13,9 KB |
 | `cv-buttons.css` ✅ | 49 → medido 9 | 11 KB → medido 2,1 KB |
+| `dev/ui-lab-fields.css` ✅ | 96 | 18 KB — arquivo apagado inteiro |
+| `dev/ui-lab-pages.css` ✅ | 79 | 16 KB — arquivo apagado inteiro |
+
+**Os dois arquivos do lab não foram podados: foram apagados junto com o laboratório**, por decisão
+do dono. Antes de apagar, verifiquei a fronteira, e o resultado corrigiu uma afirmação minha:
+
+> Eu tinha escrito que apagar os CSS do lab quebraria produção, porque `cv-field-row` e
+> `cv-field__control--select` são usadas em produção e só existiam ali. **Está errado.** Os cinco
+> arquivos de `static/css/dev/` são linkados apenas por `templates/ui_lab2/base.html` e
+> `templates/dev/ui_lab/base.html`, e nenhum entra no `shell.bundle.css` — **produção nunca os
+> carregou**. Logo as duas classes já estavam sem estilo em produção; copiá-las para
+> `cv-select.css`/`forms.css` teria **adicionado** aparência inexistente dentro de um PR de deleção.
+> Desfiz o "resgate".
+
+**Fica um defeito novo, separado:** `WidgetStyle.FORM_SELECT_FIELD_CONTROL`
+(`core/forms/widgets.py:27`) emite `cv-field__control--select` em todo `<select>`, e
+`templates/cadastros/servidores/partials/_form_fields.html:11` emite `cv-field-row` — **nenhuma das
+duas tem CSS por trás em produção.** Contrato de widget apontando para regra que não existe.
 | `dev/ui-lab-fields.css` | 96 | 18 KB |
 | `dev/ui-lab-pages.css` | 79 | 16 KB |
 | `page-shell.css` | 78 | 14 KB |
@@ -2409,12 +2497,17 @@ não é ORM em view, não é CSS fora de token, e `ruff` não reclama de atribut
 (`F821` só pega nome livre, não `self.x`). Fica a lição para o `PLANO_MESTRE`: caminho de sucesso
 sem teste é caminho não coberto, por mais óbvio que pareça.
 
-### NOVO-11 ✅ RESOLVIDO (07/08) · 🟡 `NOVO` O auditor de ORM em view conta `.objects` dentro de docstring · QA · 0,5 d
+### NOVO-11 ✅ RESOLVIDO · 🟡 `NOVO` O auditor de ORM em view conta `.objects` dentro de docstring · QA · 0,5 d
 
-> **Resolvido como a correção pedia:** `contar_orm_em_views` passou a contar por `ast.Attribute`
-> (`objects` e `all_objects`, mantendo o `BE-09`), com a unidade testável `contar_orm_no_codigo` e
-> teste que prova o defeito — prosa não conta, código conta. O número medido não mudou na troca
-> (29): em 07/08 nenhuma docstring de view citava `.objects`, então a catraca segue em 29.
+> **RESOLVIDO em 07/08/2026.** `contar_orm_em_views` passou a contar sobre a árvore
+> sintática (`contar_orm_no_codigo`, `ast.Attribute` com `attr` em
+> `{objects, all_objects}` — a proteção do `BE-09` contra renomear preservada).
+> A troca **não mudou o número**: 29 por regex e 29 por `ast`, mesmos apps, porque
+> hoje nenhum módulo de view tem `.objects` em prosa — a folga que "ninguém sabia
+> medir" era zero. A catraca segue em 29.
+> `core/tests/test_view_module_boundaries.py::test_orm_em_prosa_nao_conta_e_orm_em_codigo_conta`
+> é o teste que falharia antes: docstring e comentário fora, expressão de f-string
+> dentro (para o `ast`, ela é código).
 
 `scripts/audit_django_architecture.py`, `contar_orm_em_views`: casa
 `re.compile(r"\.objects\b")` no **texto do arquivo**, sem distinguir código de prosa.
@@ -2436,17 +2529,42 @@ caminho que `sync_document_generations_in_views` já poderia querer.
 **Não é urgente e não é regressão:** a catraca continua sendo catraca, só que com uma folga que
 ninguém sabe medir. Entra na fila de `QA` do plano mestre, não à frente de defeito funcional.
 
-### NOVO-12 ✅ RESOLVIDO (07/08) · 🔴 `NOVO` Nenhuma régua olha a configuração de produção — `SECRET_KEY` de 9 caracteres · QA · 1 d
+### NOVO-12 ✅ RESOLVIDO · 🔴 `NOVO` Nenhuma régua olha a configuração de produção — `SECRET_KEY` de 9 caracteres · QA · 1 d
 
-> **Resolvido na ordem que o enunciado exigia.** (1) O `core.E002` foi decidido: virou `core.W002`
-> (`Warning`) — produção roda em `auto`, um `Error` que ninguém pode satisfazer não é catraca, é
-> ruído, e o SLA de conversão já tem gate próprio e medido em `tests.yml`
-> (`documentos_unoserver_check --benchmark`); quando produção ligar o unoserver o aviso some, e
-> voltar a bloquear é trocar uma linha. (2) `python manage.py check --deploy --fail-level ERROR`
-> entrou nas pré-checagens do `deploy.yml`, antes do backup/checkout — o único lugar onde o `.env`
-> real está carregado, onde a `SECRET_KEY` de 9 caracteres teria sido barrada. (3) A varredura de
-> degradação calada fechou com `ALLOWED_HOSTS` e `CSRF_TRUSTED_ORIGINS` falhando cedo no
-> `prod.py`, como `REDIS_URL` e `FIELD_ENCRYPTION_KEYS` já faziam.
+> **RESOLVIDO em 07/08/2026**, nas duas pontas que o enunciado pedia, mais uma que
+> ele não pedia mas o gate exigia:
+>
+> 1. **`core.E002` decidido: rebaixado a `core.W002`** (Warning). Produção roda
+>    `DOCUMENTOS_DEFAULT_PDF_ENGINE=auto` e não tem unoserver no ar; um `Error`
+>    insatisfazível travaria todo deploy — check que ninguém pode satisfazer não é
+>    catraca, é ruído. O SLA real de geração continua medido no CI, com unoserver
+>    de verdade ("Enforce real document generation SLA"). Quando produção subir o
+>    unoserver, repromover a `Error` volta a ser catraca honesta.
+> 2. **`python manage.py check --deploy --fail-level ERROR` no `deploy.yml`**,
+>    logo após o checkout e o `pip install`, antes do `collectstatic` — com o
+>    `.env` real carregado e protegido pelo rollback do `QA-03`. **Depois** do
+>    checkout de propósito, e não junto das pré-checagens como o enunciado
+>    sugeria: os checks têm de ser os do código que vai entrar no ar. Antes do
+>    checkout, o código antigo — com `core.E002` ainda `Error` e produção em
+>    `auto` — reprovaria o próprio deploy que corrige o check, e nenhum deploy
+>    passaria mais.
+> 3. **A ponta que o enunciado não via:** a `SECRET_KEY` fraca que motivou o ID é
+>    `security.W009` — **Warning** — e o gate roda `--fail-level ERROR`; sem mais
+>    nada, o gate não pegaria o próprio defeito que o motivou. `core.E003` promove
+>    os critérios do W009 a `Error` no deploy (≥50 caracteres, ≥5 distintos, sem
+>    prefixo `django-insecure-`). Provado nos dois sentidos: chave de 9 caracteres
+>    reprova com exit 1; a configuração do CI passa limpa.
+>
+> A varredura de "variáveis que merecem falhar cedo" achou uma: `ALLOWED_HOSTS`
+> vazia com `DEBUG=False` responde 400 a toda requisição e o Django só avisa com
+> `security.W020` (Warning). `config/settings/prod.py` agora levanta
+> `RuntimeError`, o mesmo padrão de `REDIS_URL`/`FIELD_ENCRYPTION_KEYS`.
+> `CSRF_TRUSTED_ORIGINS` ficou de fora de propósito: vazia, o fluxo same-origin
+> continua válido — falhar cedo ali seria adivinhar a topologia.
+>
+> Bônus para o `DB-02`: o gate imprime `core.E001`/`core.W001` a cada deploy — a
+> medição em produção que o `NOVO-34` pedia, colhida onde o seed convive com dado
+> real.
 
 **Medido em 06/08/2026, no VPS, com `python manage.py check --deploy`:**
 
@@ -2935,12 +3053,14 @@ histórico, não pendência — e por isso ele também não entra no `DB-02`.
 
 ---
 
-### NOVO-34 ✅ RESOLVIDO (07/08) · 🔴 `NOVO` Cinco modelos nascem com `area IS NULL` por seed de migração — e o `DB-02` conta com o contrário · DB · 1 d
+### NOVO-34 ✅ RESOLVIDO · 🔴 `NOVO` Cinco modelos nascem com `area IS NULL` por seed de migração — e o `DB-02` conta com o contrário · DB · 1 d
 
-> **Resolvido pela reescrita do `DB-02`** nos três grupos abaixo, feita antes de qualquer
-> migração, como a correção pedia. A medição em produção ganhou instrumento permanente: o
-> `check --deploy` do `NOVO-12` roda no início de todo deploy e o `core.W001` imprime a contagem
-> por modelo com o `.env` e o banco reais — não depende mais de alguém lembrar de medir.
+> **RESOLVIDO em 07/08/2026.** As duas metades da correção: o enunciado do `DB-02`
+> foi reescrito com os três grupos abaixo (ver a própria linha do `DB-02`), e a
+> medição em produção ganhou canal permanente — o gate do `NOVO-12` roda
+> `check --deploy` na VPS a cada deploy e imprime `core.E001`/`core.W001` com a
+> contagem por modelo, onde o seed convive com dado real. Melhor que medir uma
+> vez: o número chega sozinho, todo deploy.
 
 Medido com o `NOVO-31` recém-consertado, num banco **recém-migrado e sem nenhum dado de usuário**:
 
@@ -3186,7 +3306,7 @@ para saber se é dívida histórica ou risco corrente.
 
 ---
 
-### NOVO-43 🟠 `NOVO` O catálogo global de seed não é ofertado a usuário com área — os pickers recortam sem fallback · DB · decisão de produto
+### NOVO-45 🟠 `NOVO` O catálogo global de seed não é ofertado a usuário com área — os pickers recortam sem fallback · DB · decisão de produto
 
 Medido em 07/08/2026, ao reescrever os testes do `DB-02`. `filter_queryset_by_area` é estrito:
 com área ativa devolve só `area = X`, nunca o global (`area IS NULL`). Consequência: os registros
@@ -3488,3 +3608,95 @@ antes de medir — a primeira versão passava contra o código defeituoso porque
 `saida_dt` caía fora de todas as abas e a lista vinha vazia. E filtra pelo `WHERE
 "cadastros_cidade"."capital"`, não pela palavra solta: `capital` é coluna e aparece em qualquer
 select de `Cidade`, o que me fez ler 4 consultas onde havia 1.
+
+---
+
+### NOVO-43 🟠 `NOVO` O teto quente do passo 15 nunca foi calibrado contra a amostra que o decide, e reprovar ali anula todos os gates a jusante · CI · 0,5 d
+
+O passo 15 do `tests.yml` roda `documentos_unoserver_check --benchmark --representative-resources
+--iterations 3 --max-ms 1000 --max-cold-ms 3000`. O orçamento **quente** compara `max()` de 4
+amostras com 1000 ms, usando `>=`
+(`documentos/management/commands/documentos_unoserver_check.py:160`).
+
+Em 07/08 ele reprovou no PR #246 por **0,2 ms** — `1000.2` contra `1000`.
+
+**O teto é o `default` do argparse** (`documentos_unoserver_check.py:35`), não um valor medido:
+`git log -S"--max-ms 1000" -- .github/workflows/tests.yml` alcança só `a4739eff`, cuja mensagem é
+`commit`. O comentário do próprio passo justifica mantê-lo em 1000 com "o regime estável entre 96 e
+101 ms" — que é o **docx**, o modelo que o gate quase nunca pega.
+
+**Medição, 30 execuções (runs 667–696, 07/08 entre 04:41Z e 15:05Z):**
+
+| população | mediana | faixa | quem define o `max()` |
+|---|---:|---|---|
+| `ordem_servico_modelos.docx` quente | 100,0 ms | 93–110 (60 amostras) | 1 de 30 |
+| `diario_bordo.xlsx` quente | ~476 ms | 417,3–528,2 | **29 de 30** |
+
+Máximo quente por execução: mediana 486,9 · média 502,4 · máximo 1000,2. **Vinte e nove valores
+entre 417,3 e 528,2, e o intervalo de 528,2 a 1000,2 está vazio** — não há tendência de subida, há
+um pico solitário.
+
+**Folga real sobre quem decide: 2,05× na mediana (1000 / 486,9) e 1,89× no pior verde
+(1000 / 528,2)** — e não os "10×" que o comentário do passo sugere, que é a folga do docx.
+
+**Três defeitos de desenho, independentes do commit:**
+
+1. **O estatístico é `max()` sobre 4 amostras.** `E[max]` cresce com N: aumentar `--iterations`
+   deixa o gate mais **rígido**, não mais preciso.
+2. **Teto único sobre duas populações que diferem 4,8×.** Na prática é um gate do xlsx com margem
+   apertada e decoração para o docx — que precisaria regredir 10× para tropeçar.
+3. **O raio de explosão é anormal.** O passo 15 precede a suíte (18), os pisos de cobertura (19) e a
+   régua do `PF-07` (20). Reprovar ali transforma um pico de um runner em **PR sem prova de CI
+   nenhuma**. A régua irmã já decidiu por escrito o oposto (`scripts/medir_desempenho.py:34-40`:
+   "Tempo não tem teto… este repositório já pagou essa conta") e cita este passo como o exemplo do
+   que não fazer.
+
+**O gate está a um fator 2,05 de deixar de funcionar.** Em 06/08, quando a geração de runner mudou,
+o valor a frio saltou de ~1119 para 1868–2554 ms (1,7 a 2,3×) e o passo reprovou 3 de 3 vezes,
+inclusive na `main` — foi o `NOVO-40`. Uma repetição daquele regime põe a mediana quente em
+~1000–1120 ms e a taxa de reprovação perto de 100%.
+
+**Taxa de falso positivo: 1 em 30 execuções (3,3%) na janela medida.** O intervalo de confiança de
+95% sobre um único evento vai de ~0,1% a ~17%; não dá para estreitar sem mais janela, e a cauda não
+é extrapolável do corpo da distribuição.
+
+**Correção candidata, em ordem de custo/benefício:** preservar `$RUNNER_TEMP/unoserver.log` com
+`if: failure()` + `upload-artifact` (hoje o log some, e por isso a causa da parada é
+indeterminável); mover o passo para depois da suíte ou para job paralelo, o que corta o dano sem
+tocar na estatística; **teto por modelo** em vez de teto global, que devolve margem semelhante às
+duas populações e torna o gate do docx ~5× mais sensível; e `>` em vez de `>=`.
+**Não** adotar razão frio/quente — os dados a refutam (a razão do docx varia 6,06 a 26,14,
+espalhamento de 4,3×, pior que o valor absoluto, 4,0×).
+
+> **Não é regressão do `HT-06`, e a prova é de árvore, não de argumento.** O head que reprovou
+> (`2bb1a37a`) e o merge na `main` (`5f1b6503`) têm a **mesma árvore**,
+> `23c94658943f0f019469691b4fdd0fcc5a50fd2b`, com as 7 deleções. O run 696 reprovou às 15:07; o run
+> **697**, sobre essa árvore idêntica, **passou inteiro** às 15:13, com o máximo quente em 515,7 ms.
+> Mesmos bytes, seis minutos, resultados opostos.
+>
+> Os passos 16 a 20 ficaram `skipped` no run 696 — a suíte, a cobertura e o `PF-07` do `HT-06`
+> ficaram sem prova naquele run, e a têm no 697.
+
+### NOVO-44 ✅ RESOLVIDO · 🔴 `NOVO` O `BE-25` apagou os dois labs e deixou a cascata para trás — `main` vermelho em 8 testes · COR · 0,5 d
+
+O PR #247 (`BE-17`, `BE-25`, `UI-01`) apagou `dev/ui_lab` e `ui_lab2` inteiros — a decisão
+que faltava — mas não rodou a trava do `HT-06` antes de mesclar: os **7 componentes** de
+`SO_NO_LABORATORIO` perderam o último citador naquele commit, e
+`core/tests/test_componentes_sem_orfao.py` reprovou na `main` (runs de `ac6b862` e `669afc4`,
+8 falhas) e em todo PR aberto contra ela. É a cascata que o próprio `HT-06` previu
+("componente que perde o último consumidor também reprova"), na maior escala possível.
+
+**Resolvido em 07/08/2026, no PR #249** (que já estava aberto e precisava da base verde):
+
+- os 7 apagados com prova de grep — zero referências fora de `docs/` — e mais um de
+  **segunda ordem** que a primeira leva revelou: `cards/document_card.html`, que o `HT-06`
+  mediu vivo porque os citadores dele eram exatamente `list_grid.html` e `ui_lab2/views.py`;
+- `SO_NO_LABORATORIO` fica **vazia**, com a trava intacta para o próximo componente que
+  nascer alcançável só por página de laboratório;
+- piso da varredura 85 → 83, deliberado e comentado;
+- `docs/COMPONENTES.md` sem os dois nomes apagados que ainda citava.
+
+**A lição operacional é o motivo de a linha existir:** apagar árvore de template exige rodar
+a suíte inteira antes do merge — a trava do `HT-06` é local e barata, e teria segurado o
+`main` verde. O run 697 (`NOVO-43`) passou sobre a árvore do #246 por sorte de ordem: o
+vermelho só apareceu quando o #247 entrou.

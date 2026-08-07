@@ -191,34 +191,6 @@ class DarkRedesignContractTests(SimpleTestCase):
         canonical = wrapper.parents[1] / "ui" / "forms" / "field.html"
         self.assertTrue(canonical.exists())
 
-    def test_selection_lab_uses_real_field_and_filter_components(self):
-        lab = (
-            Path(settings.BASE_DIR)
-            / "templates"
-            / "dev"
-            / "ui_lab"
-            / "selects_filters.html"
-        ).read_text(encoding="utf-8")
-
-        self.assertIn('components/ui/forms/field.html', lab)
-        self.assertIn('components/ui/headers/filter_page_header.html', lab)
-        self.assertIn('data-collection-mode="client"', lab)
-        self.assertNotIn('<select name="lab-', lab)
-
-    def test_feedback_lab_uses_canonical_feedback_components(self):
-        lab = (
-            Path(settings.BASE_DIR)
-            / "templates"
-            / "dev"
-            / "ui_lab"
-            / "feedback.html"
-        ).read_text(encoding="utf-8")
-
-        self.assertIn('components/ui/feedback/alert.html', lab)
-        self.assertIn('components/ui/feedback/form_errors.html', lab)
-        self.assertIn('components/ui/feedback/empty_state.html', lab)
-        self.assertNotIn("ui-lab-feedback-card", lab)
-
     def test_canonical_feedback_supports_existing_contracts(self):
         feedback = (
             Path(settings.BASE_DIR) / "templates" / "components" / "ui" / "feedback"
@@ -242,52 +214,6 @@ class DarkRedesignContractTests(SimpleTestCase):
         # em vez de uma.
         self.assertIn("{% if errors %}", form_errors)
         self.assertIn("form.non_field_errors or form.errors", form_errors)
-
-    def test_overlay_lab_uses_the_real_confirmation_modal(self):
-        lab = (
-            Path(settings.BASE_DIR)
-            / "templates"
-            / "dev"
-            / "ui_lab"
-            / "overlays.html"
-        ).read_text(encoding="utf-8")
-        overlay_js = (
-            Path(settings.BASE_DIR) / "static" / "js" / "components" / "overlay.js"
-        ).read_text(encoding="utf-8")
-
-        self.assertIn('components/ui/modals/delete_confirm_modal.html', lab)
-        self.assertIn("data_delete_url", lab)
-        self.assertNotIn("ui-lab-overlay-frame", lab)
-        self.assertIn("window.CV.overlay", overlay_js)
-        self.assertIn('event.key === "Tab"', overlay_js)
-        self.assertIn('event.key === "Escape"', overlay_js)
-        self.assertIn('data-overlay-kind="menu"', lab)
-        self.assertIn("data-tooltip", lab)
-        self.assertIn("data-sidebar-drawer-toggle", lab)
-        self.assertIn('components/ui/menus/rich_menu_link.html', lab)
-
-    def test_table_lab_uses_canonical_table_and_pagination(self):
-        lab = (
-            Path(settings.BASE_DIR)
-            / "templates"
-            / "dev"
-            / "ui_lab"
-            / "tables.html"
-        ).read_text(encoding="utf-8")
-        table = (
-            Path(settings.BASE_DIR)
-            / "templates"
-            / "components"
-            / "ui"
-            / "tables"
-            / "data_table.html"
-        ).read_text(encoding="utf-8")
-
-        self.assertIn('components/ui/tables/data_table.html', lab)
-        self.assertIn('components/ui/lists/pagination.html', lab)
-        self.assertNotIn('class="ui-lab-table"', lab)
-        self.assertIn('scope="col"', table)
-        self.assertIn('components/ui/badges/status_badge.html', table)
 
     def test_file_picker_is_a_global_accessible_component(self):
         component = (
@@ -433,17 +359,8 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertEqual(template.count('class="cv-fab-container"'), 4)
         self.assertIn('extra_class="cv-fab"', template)
 
-        collection_header = (
-            Path(settings.BASE_DIR)
-            / "templates"
-            / "components"
-            / "ui"
-            / "layouts"
-            / "collection_header.html"
-        ).read_text(encoding="utf-8")
-        self.assertIn("cv-form-section-header--standalone", collection_header)
-        self.assertIn("cv-form-section-header--described", collection_header)
-        self.assertIn("cv-form-section-header__actions", collection_header)
+        # `collection_header.html` era conferido aqui; saiu na cascata do
+        # `NOVO-44` — o componente só vivia no UI Lab, que o `BE-25` apagou.
 
         obsolete_wizard = (
             Path(settings.BASE_DIR) / "templates" / "eventos" / "wizard_novo.html"
@@ -506,7 +423,9 @@ class DarkRedesignContractTests(SimpleTestCase):
     def test_summary_and_document_cards_share_global_contracts(self):
         cards = Path(settings.BASE_DIR) / "templates" / "components" / "cards"
         summary = (cards / "summary_card.html").read_text(encoding="utf-8")
-        document = (cards / "document_card.html").read_text(encoding="utf-8")
+        # `document_card.html` era lido aqui; saiu na cascata do `NOVO-44` —
+        # os últimos citadores dele eram o UI Lab e o `list_grid`, apagados
+        # pelo `BE-25`.
         plan_summary = (
             Path(settings.BASE_DIR)
             / "templates"
@@ -532,7 +451,6 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("cv-summary-tile", summary)
         self.assertIn("cv-metric", summary)
         self.assertIn("cv-metric--tile", summary)
-        self.assertIn("cv-document-card", document)
         self.assertIn("cv-summary-card", plan_summary)
         # `H-05`: o grid saiu do casco e vive no partial do corpo.
         self.assertIn("cv-summary-grid--4", plan_summary_body)
@@ -561,26 +479,6 @@ class DarkRedesignContractTests(SimpleTestCase):
                 self.assertIn("travel-document-body", html)
                 self.assertIn("cv-form-card__footer", html)
                 self.assertIn(card, html)
-
-    def test_cards_lab_renders_canonical_product_components(self):
-        lab = (
-            Path(settings.BASE_DIR)
-            / "templates"
-            / "dev"
-            / "ui_lab"
-            / "cards.html"
-        ).read_text(encoding="utf-8")
-        views = (Path(settings.BASE_DIR) / "core" / "views.py").read_text(encoding="utf-8")
-
-        self.assertIn('components/cards/summary_card.html', lab)
-        self.assertIn('components/lists/list_grid.html', lab)
-        self.assertIn('components/lists/simple_list.html', lab)
-        self.assertNotIn('dev/ui_lab/partials/_list_card.html', lab)
-        self.assertNotIn('dev/ui_lab/partials/_simple_list_item.html', lab)
-        self.assertIn('"dev/ui_lab/cards.html", "cards"', views)
-        self.assertFalse(
-            (Path(settings.BASE_DIR) / "templates" / "dev" / "ui_lab" / "partials" / "_list_card.html").exists()
-        )
 
     def test_rich_list_cards_share_the_entity_card_contract(self):
         templates = Path(settings.BASE_DIR) / "templates"
@@ -621,8 +519,6 @@ class DarkRedesignContractTests(SimpleTestCase):
             templates / "components" / "documents" / "partials" / "_signature_card_body.html"
         ).read_text(encoding="utf-8")
         viewer_page = (templates / "documentos" / "pdf_viewer.html").read_text(encoding="utf-8")
-        documents_lab = (templates / "dev" / "ui_lab" / "documents.html").read_text(encoding="utf-8")
-        signature_lab = (templates / "dev" / "ui_lab" / "signature.html").read_text(encoding="utf-8")
         signature_js = (
             Path(settings.BASE_DIR) / "static" / "js" / "components" / "signature-actions.js"
         ).read_text(encoding="utf-8")
@@ -630,11 +526,9 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("cv-document-viewer", viewer)
         self.assertIn("doc-pdf-canvas-wrap", viewer)
         self.assertIn('components/documents/pdf_viewer.html', viewer_page)
-        self.assertIn('components/documents/pdf_viewer.html', documents_lab)
         self.assertIn("cv-signature-card", signature)
         # `H-05`: o hook de cópia mora no partial do corpo, não no casco.
         self.assertIn("data-cv-signature-copy", signature_body)
-        self.assertIn('components/documents/signature_card.html', signature_lab)
         self.assertIn('components/documents/signature_card.html', (
             templates / "prestacoes_contas" / "diario_bordo_form.html"
         ).read_text(encoding="utf-8"))
@@ -667,18 +561,6 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("cv-btn cv-btn--secondary", header_actions)
         self.assertNotIn("form-section app-form-section", source)
         self.assertNotIn("btn btn-secondary", source)
-
-    def test_event_labs_render_the_real_form_sections_and_list_card(self):
-        lab_root = Path(settings.BASE_DIR) / "templates" / "dev" / "ui_lab"
-        form_lab = (lab_root / "eventos_cadastro.html").read_text(encoding="utf-8")
-        list_lab = (lab_root / "eventos_lista.html").read_text(encoding="utf-8")
-
-        self.assertIn('eventos/includes/_evento_form_sections.html', form_lab)
-        self.assertIn('eventos/partials/evento_list_card.html', list_lab)
-        self.assertIn('css/eventos-list.css', list_lab)
-        self.assertNotIn('components/lists/main_list_card.html', list_lab)
-        self.assertNotIn("ui-lab-status-pill--review", form_lab)
-        self.assertNotIn("ui-lab-status-pill--review", list_lab)
 
     def test_dashboard_uses_global_header_summary_and_module_cards(self):
         templates = Path(settings.BASE_DIR) / "templates"

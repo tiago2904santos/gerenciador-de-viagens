@@ -1,6 +1,5 @@
 from copy import deepcopy
 
-from django.conf import settings
 from django.urls import NoReverseMatch
 from django.urls import reverse
 
@@ -73,19 +72,6 @@ NAVIGATION_ITEMS = [
         ],
     },
 ]
-
-if settings.DEBUG:
-    NAVIGATION_ITEMS.append(
-        {
-            "id": "ui-lab",
-            "label": "UI Lab",
-            "url_name": "core:ui_lab",
-            "icon": "DV",
-            "active_when": ["core:ui_lab"],
-        }
-    )
-
-
 def build_navigation(request):
     current_view_name = ""
     if request.resolver_match:

@@ -94,6 +94,20 @@ class NovoOficioEventoAreaTests(TestCase):
         self.assertEqual(oficio.area_id, outra.pk)
         self.assertTrue(Oficio.all_objects.filter(pk=oficio.pk, area=outra).exists())
 
+    def test_evento_criado_dentro_de_request_nao_nasce_mais_sem_area(self):
+        """`DB-02`, grupo operacional — o teste que falharia antes.
+
+        `Evento` era o único dos oito modelos do `core.E001` sem derivação de
+        área no `save()`: criado dentro de request por código que esquecesse
+        `area`, nascia no balde `area IS NULL`. Fora de request o comportamento
+        segue o do `BE-09`: nada é derivado, worker grava o que recebe.
+        """
+        self._activate_area()
+
+        evento = Evento.objects.create(titulo="Evento novo em request")
+
+        self.assertEqual(evento.area_id, self.area.pk)
+
     def test_view_novo_oficio_com_evento_redireciona_para_wizard(self):
         self.client.force_login(self.user)
         evento = Evento.objects.create(titulo="Evento com area", area=self.area)

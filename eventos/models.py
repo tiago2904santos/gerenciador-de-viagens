@@ -107,6 +107,19 @@ class Evento(models.Model):
     def __str__(self) -> str:
         return self.titulo or f"Evento #{self.pk or 'novo'}"
 
+    def save(self, *args, **kwargs):
+        # `DB-02`, grupo operacional: era o único dos oito modelos do `core.E001`
+        # sem derivação de área no `save()` — todo evento criado por código que
+        # esquecesse `area` nascia no balde `area IS NULL`, invisível para a
+        # própria área e visível para usuário sem vínculo. Fora de request,
+        # `get_current_area()` devolve `None` e nada muda: worker e comando
+        # continuam gravando o que recebem explicitamente.
+        if self.area_id is None:
+            from core.tenancy import get_current_area
+
+            self.area = get_current_area()
+        super().save(*args, **kwargs)
+
     @property
     def periodo_display(self) -> str:
         if not self.data_inicio:

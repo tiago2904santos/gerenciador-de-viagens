@@ -8,7 +8,7 @@ gravava órfão em silêncio — agora falha alto, no banco.
 **Limite 4 do `AGENTS.md` — valide antes do deploy:**
 
 ```sql
-SELECT count(*) FROM roteiros_roteiro WHERE area_id IS NULL;
+SELECT count(*) FROM planos_trabalho_planotrabalho WHERE area_id IS NULL;
 ```
 
 Tem de devolver 0. Não devolveu? `python manage.py backfill_legacy_areas
@@ -18,7 +18,7 @@ aborta o deploy no `core.E001` enquanto houver órfão — esta migração nunca
 encontra NULL em produção. `scripts/validar_not_null_db02.py` conta as oito
 tabelas de uma vez.
 
-**Volta:** `migrate roteiros 0011_roteiro_roteiro_ida_ordenada`. Nenhum dado muda.
+**Volta:** `migrate planos_trabalho 0022_db08_colecoes_ordenadas`. Nenhum dado muda.
 """
 
 import django.db.models.deletion
@@ -28,18 +28,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("roteiros", "0011_roteiro_roteiro_ida_ordenada"),
+        ("planos_trabalho", "0022_db08_colecoes_ordenadas"),
         ("usuarios", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name="roteiro",
+            model_name="planotrabalho",
             name="area",
             field=models.ForeignKey(
                 blank=True,
                 on_delete=django.db.models.deletion.PROTECT,
-                related_name="roteiros",
+                related_name="planos_trabalho",
                 to="usuarios.areatrabalho",
                 verbose_name="Area de trabalho",
             ),

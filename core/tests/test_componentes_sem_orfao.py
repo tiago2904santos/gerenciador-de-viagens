@@ -17,9 +17,9 @@ era citado por `lists/main_list_card.html`, e virou órfão no instante em que o
 saiu. Quem contasse uma vez e apagasse a lista deixaria este para trás — quem roda a
 regra depois de apagar, não.
 
-Os 7 do laboratório não são decisão desta etapa. Apagá-los é decidir para que serve
-o UI Lab, e existem **dois** labs concorrentes sem regra de qual é o vigente — é o
-`BE-17`. Ficam listados aqui, nominalmente, para que a decisão seja de um passo.
+Os 7 do laboratório não eram decisão daquela etapa: apagá-los era decidir para que
+serve o UI Lab (`BE-17`). A decisão veio com o `BE-25` (PR #247), que apagou os dois
+labs — e os 7 caíram na cascata no mesmo instante, provando a regra pela segunda vez.
 
 A trava é sobre a **regra**, não sobre a lista: componente novo que ninguém renderiza
 reprova aqui, e componente que perde o último consumidor também.
@@ -42,22 +42,17 @@ COMPONENTES = RAIZ / "templates/components"
 ONDE_PROCURAR = [
     "templates", "static", "core", "cadastros", "oficios", "roteiros", "eventos",
     "termos", "justificativas", "planos_trabalho", "ordens_servico",
-    "prestacoes_contas", "usuarios", "documentos", "google_drive", "ui_lab2",
+    "prestacoes_contas", "usuarios", "documentos", "google_drive",
     "config", "scripts",
 ]
 
-#: Componentes vivos **só** no UI Lab, sob `DEBUG`. Não são órfãos: existe página que
-#: os renderiza. Também não são de produção. A decisão sobre eles é do `BE-17` —
-#: qual dos dois labs é o vigente —, e sair daqui exige essa decisão, não um grep.
-SO_NO_LABORATORIO = {
-    "ui/buttons/field_action_button.html": "dev/ui_lab/buttons.html, ui_lab2/buttons.html",
-    "ui/buttons/floating_primary_action.html": "ui_lab2/buttons.html",
-    "ui/buttons/footer_action.html": "dev/ui_lab/buttons.html, ui_lab2/buttons.html",
-    "ui/forms/dropdown.html": "ui_lab2/selects.html",
-    "ui/layouts/collection_header.html": "dev/ui_lab/structures.html",
-    "lists/list_grid.html": "dev/ui_lab/cards.html, ui_lab2/views.py",
-    "ui/tables/data_table.html": "dev/ui_lab/tables.html",
-}
+#: Componentes vivos **só** no UI Lab, sob `DEBUG`. A lista teve 7 nomes até o
+#: `BE-25` apagar os dois labs (PR #247) — no mesmo instante os 7 perderam o último
+#: citador e a regra dos órfãos os reprovou, no `main` inteiro: a cascata prevista
+#: no `HT-06`, na maior escala possível. Foram apagados com prova de grep
+#: (`test_os_apagados_da_cascata_do_be25_nao_voltaram`). A lista fica, vazia, para
+#: o próximo componente que nascer alcançável só por página de laboratório.
+SO_NO_LABORATORIO: dict[str, str] = {}
 
 
 def citadores(rel_templates: str) -> list[str]:
@@ -148,6 +143,38 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
             with self.subTest(componente=rel):
                 self.assertFalse((COMPONENTES / rel).exists())
 
+    def test_os_apagados_da_cascata_do_be25_nao_voltaram(self):
+        """O `BE-25` apagou os dois labs (PR #247); os 7 da lista caíram junto.
+
+        Era a cascata que o `HT-06` previu: perderam o último citador no mesmo
+        commit que removeu `dev/ui_lab` e `ui_lab2`, e a regra dos órfãos parou o
+        `main` inteiro até alguém tratar. Grep de prova no PR que os apagou:
+        zero referências fora de `docs/`.
+        """
+        apagados_com_o_lab = [
+            "ui/buttons/field_action_button.html",
+            "ui/buttons/floating_primary_action.html",
+            "ui/buttons/footer_action.html",
+            "ui/forms/dropdown.html",
+            "ui/layouts/collection_header.html",
+            "lists/list_grid.html",
+            "ui/tables/data_table.html",
+            # Segunda ordem: os citadores dele eram `list_grid.html` (acima) e
+            # `ui_lab2/views.py` (PR #247). O `HT-06` o mediu vivo porque ambos
+            # ainda existiam; os dois sucessores de `status_badge` e `button`
+            # que ele citava seguem com dezenas de citadores próprios.
+            "cards/document_card.html",
+        ]
+
+        for rel in apagados_com_o_lab:
+            with self.subTest(componente=rel):
+                self.assertFalse((COMPONENTES / rel).exists())
+
     def test_a_varredura_esta_achando_os_componentes(self):
-        """Sem isto, as regras acima passariam com a pasta vazia."""
-        self.assertGreaterEqual(len(self.componentes()), 85)
+        """Sem isto, as regras acima passariam com a pasta vazia.
+
+        85 → 83 na cascata do `BE-25`: saíram os 7 do laboratório e o
+        `document_card`, que era de segunda ordem. O piso acompanha exclusão
+        deliberada; queda que ninguém explicou continua reprovando.
+        """
+        self.assertGreaterEqual(len(self.componentes()), 83)

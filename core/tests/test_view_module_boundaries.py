@@ -70,31 +70,30 @@ class ViewModuleBoundaryTests(SimpleTestCase):
         # so desce (AGENTS.md, regra 5).
         #
         # 30 → 29 (`NOVO-07`): saiu a unica ocorrencia de `justificativas` — que
-        # estava dentro de uma docstring, o que motivou o `NOVO-11`. Desde ele a
-        # contagem e por AST; a coincidencia de o numero nao mudar na troca foi
-        # medida: em 07/08 nenhuma docstring de view citava `.objects`.
+        # estava **dentro de uma docstring**, porque a contagem era regex sobre o
+        # texto do arquivo. O `NOVO-11` trocou a contagem para a arvore sintatica
+        # (`contar_orm_no_codigo`); a troca nao mudou o numero — 29 por regex e
+        # 29 por `ast`, mesmos apps, medido em 07/08 — porque hoje nenhum modulo
+        # de view tem `.objects` em prosa. O teste abaixo garante que prosa nunca
+        # mais entra na conta.
         self.assertEqual(sum(counts.values()), 29)
 
-    def test_a_catraca_conta_codigo_e_ignora_prosa(self):
-        # `NOVO-11`: a versao por regex casava `.objects` em docstring e
-        # comentario. Prosa segurava a catraca no alto (numero maior do que o
-        # ORM real) e, no sentido inverso, explicar em texto um ORM recem
-        # removido fazia o CI reprovar um PR correto.
-        so_prosa = (
-            '"""a versao anterior montava isto de `Oficio.objects` cru."""\n'
-            "# e este comentario cita Roteiro.objects.filter(...)\n"
-            "x = 1\n"
-        )
-        self.assertEqual(contar_orm_no_codigo(so_prosa), 0)
+    def test_orm_em_prosa_nao_conta_e_orm_em_codigo_conta(self):
+        """`NOVO-11` — a catraca mede código, não texto.
 
-        codigo_real = (
+        Com a regex antiga este snippet contaria 4 (docstring e comentário
+        inclusos) e o teste reprovaria; por `ast` contam só o acesso real e a
+        expressão de f-string, que É código.
+        """
+        snippet = (
+            '"""Antes montava isto de `Oficio.objects` cru na view."""\n'
             "def lista(request):\n"
-            '    """explica o Evento.objects que saiu daqui."""\n'
-            "    a = Oficio.objects.filter(ativo=True)\n"
-            "    b = Roteiro.all_objects.count()\n"
-            "    return a, b\n"
+            "    # nada de Roteiro.all_objects aqui\n"
+            "    visiveis = Oficio.objects.count()\n"
+            '    return f"{Roteiro.objects.count()} de {visiveis}"\n'
         )
-        self.assertEqual(contar_orm_no_codigo(codigo_real), 2)
+
+        self.assertEqual(contar_orm_no_codigo(snippet), 2)
 
     def test_views_nao_executam_geradores_documentais_pesados(self):
         self.assertEqual(sync_document_generations_in_views(), [])

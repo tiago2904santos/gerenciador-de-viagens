@@ -14,10 +14,10 @@ ROOT = Path(__file__).resolve().parents[1]
 # `Roteiro.all_objects` — renomear desinflaria esta catraca **sem tirar uma linha
 # de ORM da view**. Pego por `core/tests/test_view_module_boundaries.py`, que
 # existe justamente para impedir que a métrica seja esvaziada por forma.
-# `NOVO-11`: a contagem é sobre a árvore sintática, não sobre o texto. Docstring
-# e comentário não existem para o contador — prosa não segura a catraca no alto
-# nem faz o CI reprovar quem explica o ORM que acabou de tirar da view.
-ORM_MANAGER_ATTRS = frozenset({"objects", "all_objects"})
+# `NOVO-11`: a contagem é sobre a árvore sintática, não sobre o texto. A regex
+# antiga casava `.objects` dentro de docstring e comentário — prosa segurava a
+# catraca no alto e explicar um ORM recém-removido fazia o CI reprovar um PR certo.
+ORM_MANAGER_ATTRS = {"objects", "all_objects"}
 DRIVE_ROOT = ROOT / "integracoes" / "google_drive"
 P06_SPLIT_VIEW_MODULES = {
     "oficios/api_views.py",
@@ -135,7 +135,11 @@ def audit_templates():
 
 
 def contar_orm_no_codigo(code: str) -> int:
-    """Acessos reais a `.objects`/`.all_objects` — prosa fica de fora."""
+    """Acessos a `.objects`/`.all_objects` no **código**, via `ast.Attribute`.
+
+    `NOVO-11`: docstring e comentário não existem para este contador. Expressão
+    dentro de f-string continua contando — para o `ast` ela é código.
+    """
     tree = ast.parse(code)
     return sum(
         1
@@ -145,7 +149,7 @@ def contar_orm_no_codigo(code: str) -> int:
 
 
 def contar_orm_em_views():
-    """Conta acessos a `.objects`/`.all_objects` em cada módulo de view, por app."""
+    """Conta acessos de manager em cada módulo de view, por app."""
     por_app = {}
     for path in iter_files(".py"):
         path_rel = rel(path)
@@ -156,6 +160,8 @@ def contar_orm_em_views():
             if path_rel in P06_SPLIT_VIEW_MODULES
             else path_rel.rsplit("/", 1)[0] or "."
         )
+        # `utf-8-sig` pela mesma razão dos gates vizinhos (BE-22): um BOM novo
+        # mataria o `ast.parse` e o gate morreria em vez de medir.
         total = contar_orm_no_codigo(path.read_text(encoding="utf-8-sig"))
         if total:
             por_app[app] = por_app.get(app, 0) + total
