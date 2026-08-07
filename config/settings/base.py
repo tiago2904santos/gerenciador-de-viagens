@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     "ordens_servico",
     "integracoes.google_drive",
     "prestacoes_contas",
-    "ui_lab2",
 ]
 
 _MIDDLEWARE_CORE = [
