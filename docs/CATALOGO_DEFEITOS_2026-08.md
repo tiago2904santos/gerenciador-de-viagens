@@ -915,7 +915,7 @@ volume das outras.
 **Correção:** `Exists()` correlacionado, que o Postgres avalia com semi-join e curto-circuito por
 linha, permitindo parar no `LIMIT`.
 
-### DB-10 🟡 Falta índice composto para a ordenação real das listas · AUD · 0,5 d
+### DB-10 ✅ RESOLVIDO · 🟡 Falta índice composto para a ordenação real das listas · AUD · 0,5 d
 
 `OrdemServico.Meta.indexes` está vazio, enquanto `ordens_servico/selectors.py:38` ordena por
 `('-ano','-numero')` sobre queryset já recortado por área.
@@ -932,6 +932,38 @@ vale como promessa. Achado extra da verificação: o índice único **parcial** 
 (`(area_id, ano, numero) WHERE ano IS NOT NULL AND numero IS NOT NULL`) **não pode ser usado pelo
 planner** nesta consulta — o que reforça a necessidade do índice proposto em vez de enfraquecê-la.
 Ofícios têm situação análoga.
+
+> **Fechado em 07/08/2026, e a última frase do enunciado estava errada: ofícios NÃO têm situação
+> análoga.**
+>
+> O índice entrou só em `OrdemServico`, porque foi o único que a medição sustentou. Antes de
+> escrever, varri as oito rotas de lista com `EXPLAIN (ANALYZE, BUFFERS)` sobre 20.000 registros
+> por domínio em três áreas (semeadura do `scripts/medir_desempenho.py`), e **cinco** ordenavam em
+> memória. Criei o índice análogo em cada uma, no mesmo banco, mediana de 7 execuções dos dois
+> lados:
+>
+> | rota | sem | com | ganho | o que mudou |
+> |---|---:|---:|---:|---|
+> | `ordens_servico` | 8,65 ms | **0,14 ms** | **64×** | `Limit` para na 20ª linha |
+> | `oficios` | 143,2 ms | 120,9 ms | 1,2× | o `Sort` some, o tempo não anda |
+> | `planos_trabalho` | 125,9 ms | 126,8 ms | 1,0× | idem |
+> | `justificativas` | 24,4 ms | 21,3 ms | 1,1× | e os buffers vão de 664 para 40.384 |
+> | `roteiros` | 555,7 ms | 611,7 ms | **0,9×** | continua ordenando, e fica pior |
+>
+> Índice nas outras quatro seria custo de escrita sem ganho de leitura. Em `roteiros` o gargalo é a
+> agregação antes do `LIMIT` — o `DB-09`. Em `oficios` e `planos_trabalho` o `Limit` já para em 20
+> linhas depois do índice, e ainda assim leva ~130 ms: o custo está em `Nested Loop Left Join` com
+> `Join Filter` resolvendo o `select_related`. Registrado como `NOVO-50`, **com a ressalva de que
+> pode ser artefato de semeadura** e precisa de medição com tabela de cidades realista.
+>
+> **O número que o usuário sente é 1,08×, não 64×.** A rota de OS emite 19 consultas; a paginada é
+> uma delas. Medida a rota inteira, 9 requisições por lado no mesmo banco: 110,4 ms → 102,6 ms.
+> O 64× é da consulta isolada e está aqui porque explica o mecanismo, não porque seja a promessa.
+> O que cresce é a diferença: o custo do `top-N heapsort` é proporcional ao tamanho da área
+> (6.666 linhas aqui), enquanto o caminho indexado é constante.
+>
+> Migração `ordens_servico/0013`, com o procedimento de `CREATE INDEX CONCURRENTLY` no docstring
+> para o caso de a tabela em produção ser grande (limite 4 do `AGENTS.md`).
 
 ### DB-11 🟡 As 80 buscas livres são varredura sequencial · AUD · 3 d
 
@@ -3941,3 +3973,28 @@ limpo — que é o banco da suíte, todo dia no CI.
 que dois caminhos consumam — `criar_area`, ao criar a área, e uma migração de saneamento para as
 áreas que já existem. Os seeds históricos ficam onde estão (migração aplicada não se reescreve);
 o que muda é quem passa a ser a fonte da verdade daqui para a frente. Só então `NOT NULL`.
+
+---
+
+### NOVO-50 🟡 `NOVO` Listas de ofícios e planos gastam ~130 ms em 20 linhas resolvendo `select_related` por `Nested Loop` · PF · a medir
+
+Achado ao medir o `DB-10`, e é o motivo de o índice de ordenação não ter ajudado essas duas.
+
+Depois do índice, o `Limit` **já para em 20 linhas** — o plano está certo nessa parte. Mesmo assim
+`oficios:index` leva 120,9 ms e `planos_trabalho:index` 126,8 ms para montar essas 20 linhas. O
+tempo está numa pilha de `Nested Loop Left Join` com `Join Filter`, resolvendo o `select_related`
+contra `cadastros_cidade`, `cadastros_estado`, `cadastros_cargo`, `cadastros_unidade` e
+`cadastros_viatura` sem condição de índice — `Rows Removed by Join Filter: 310`, `90`, `40` por
+nível.
+
+**Ressalva que impede fechar isto como defeito confirmado:** o semeador do
+`scripts/medir_desempenho.py` cria **50 cidades, 5 estados, 5 cargos**. Tabela de dimensão desse
+tamanho torna varredura sequencial mais barata que índice, e o planner escolhe `Nested Loop` com
+razão. Em produção a tabela de cidades tem os municípios do país (ordem de 5.500), e o plano pode
+ser outro — melhor ou pior.
+
+**Primeiro passo:** medir de novo com `cadastros_cidade` em tamanho realista. Se o `Nested Loop`
+sobreviver, é defeito de verdade e a correção provável é reduzir o `select_related` da lista ao que
+o card realmente imprime. Se não sobreviver, esta linha vira nota no `DB-10` e o semeador é que
+precisa de cidade de verdade — o que valeria por si, porque a régua do `PF-07` mede planos com
+tabelas de dimensão irreais.
