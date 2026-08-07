@@ -903,8 +903,17 @@ determinísticos e são o que este catálogo guarda.
 **`roteiros` não tem menu nenhum** — `roteiros/presenters.py:240` monta o rodapé só com `edit_url` e
 `delete_url`. Os 0 menus medidos em `roteiros:index` não eram falta de dado: não há o que migrar.
 
-**Faltam três domínios:** `eventos` (80 menus, 3 escritos à mão por card), `termos` (75, 4 por linha)
-e `prestacoes_contas` (40, todos à mão, por servidor da prestação e sem `get_*_by_id`).
+**`eventos` migrado em 07/08** — o de maior ganho até aqui, porque tem quatro famílias de menu por
+card (rodapé, uma por ofício vinculado, uma por documento e uma por servidor com termo):
+
+| `eventos:index` | antes | depois | |
+|---|---|---|---|
+| bruto | 416,3 KB | **211,9 KB** | −49% |
+| `gzip -6` | 19,4 KB | **14,8 KB** | −24% |
+| nós de elemento | 4.681 | **2.081** | −56% |
+
+**Faltam dois domínios:** `termos` (75 menus, 4 por linha) e `prestacoes_contas` (40, todos escritos
+à mão, por servidor da prestação e sem `get_*_by_id`).
 
 ### PF-05 🟡 A lista de Ofícios leva 127 ms no servidor · MED · —
 

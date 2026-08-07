@@ -14,11 +14,11 @@
     "eventos:index": {
       "200": {
         "consultas": 34,
-        "kb_html": 437.0
+        "kb_html": 222.5
       },
       "20000": {
         "consultas": 34,
-        "kb_html": 482.2
+        "kb_html": 266.9
       }
     },
     "justificativas:index": {
