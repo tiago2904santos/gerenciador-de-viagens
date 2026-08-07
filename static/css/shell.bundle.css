@@ -1009,7 +1009,6 @@ html[data-theme="light"] {
 /* Garante que [hidden] esconda elementos mesmo quando o componente define display explícito. */
 [hidden] { display: none !important; }
 
-
 /* =========================================================
    01. Design Tokens — Estrutura, Layout e Aliases
    ========================================================= */
@@ -1132,7 +1131,6 @@ html[data-theme="light"] {
   --text-inverse:   var(--color-white);
 }
 
-
 /* =========================================================
    02. Theme Tokens — Dark
    ========================================================= */
@@ -1239,7 +1237,6 @@ html[data-theme="dark"] {
   --stepper-status-current-color: var(--color-accent);
   --stepper-status-missing-color: #e57d78;
 }
-
 
 /* =========================================================
    03. Theme Tokens — Light (Silver Frost)
@@ -1348,14 +1345,12 @@ html[data-theme="light"] {
   --stepper-status-missing-color: var(--color-danger);
 }
 
-
 /* =========================================================
    04. Background
    O background atmosférico é gerenciado por ui-lab.css no UI Lab
    e pelo base global em páginas reais. Este arquivo não define
    gradientes de fundo — apenas consome tokens de superfície.
    ========================================================= */
-
 
 /* =========================================================
    05. Page Shell Base
@@ -1372,7 +1367,6 @@ html[data-theme="light"] {
   width:          100%;
   z-index:        var(--z-page-shell);
 }
-
 
 /* =========================================================
    06. Page Shell Variants
@@ -1396,7 +1390,6 @@ html[data-theme="light"] {
 /* List: sem restrição — painel ocupa largura total */
 
 /* Standard, Wizard e List preservam a largura integral do shell. */
-
 
 /* =========================================================
    07. Page Header — Limpo
@@ -1465,47 +1458,6 @@ html[data-theme="light"] {
   height:     3px;
   width:      100%;
 }
-
-/* Metadados opcionais no body (wizard: status, etapa) */
-.page-header__meta {
-  align-items: center;
-  display:     flex;
-  flex-wrap:   wrap;
-  gap:         var(--space-2);
-  margin-top:  var(--space-2);
-}
-
-.page-header__meta-sep {
-  color:   var(--theme-text-muted);
-  opacity: 0.45;
-}
-
-.page-header__meta-item {
-  color:       var(--theme-text-muted);
-  font-size:   var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-}
-
-.page-header__badge {
-  border-radius:  var(--radius-pill);
-  font-size:      var(--font-size-xs);
-  font-weight:    var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-chip);
-  padding:        3px 10px;
-}
-
-.page-header__badge--draft {
-  background: var(--route-status-draft-bg);
-  border:     1px solid var(--route-status-draft-border);
-  color:      var(--route-status-draft-text);
-}
-
-.page-header__badge--sent {
-  background: var(--route-status-final-bg);
-  border:     1px solid var(--route-status-final-border);
-  color:      var(--route-status-final-text);
-}
-
 
 /* =========================================================
    08. Stepper / Navegação em Etapas
@@ -1671,7 +1623,6 @@ html[data-theme="light"] {
   transition: color var(--transition-base), opacity var(--transition-base);
 }
 
-
 /* ─── Estado: Concluído (.is-complete) ──────────────────── */
 
 .page-stepper__item.is-complete .page-stepper__connector {
@@ -1698,7 +1649,6 @@ html[data-theme="light"] {
   opacity: 1;
 }
 
-
 /* ─── Estado: Atual / em andamento (.is-current | .is-active) ── */
 
 .page-stepper__item.is-current .page-stepper__marker,
@@ -1722,7 +1672,6 @@ html[data-theme="light"] {
   opacity: 1;
 }
 
-
 /* ─── Estado: Com pendência / faltando algo (.is-missing) ── */
 
 .page-stepper__item.is-missing .page-stepper__marker {
@@ -1740,14 +1689,12 @@ html[data-theme="light"] {
   opacity: 1;
 }
 
-
 /* ─── Estado: Desabilitado / bloqueado (.is-disabled) ────── */
 
 .page-stepper__item.is-disabled {
   opacity:        var(--stepper-disabled-opacity);
   pointer-events: none;
 }
-
 
 /* ─── Foco acessível ─────────────────────────────────────── */
 
@@ -1799,20 +1746,6 @@ html[data-theme="light"] {
   gap:            var(--space-1);
 }
 
-.wizard-inner-section__header--actions {
-  align-items:     flex-start;
-  flex-direction:  row;
-  gap:             var(--space-3);
-  justify-content: space-between;
-}
-
-.wizard-inner-section__header-copy {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--space-1);
-  min-width:      0;
-}
-
 .wizard-inner-section__title {
   color:          var(--theme-text-heading);
   font-size:      var(--font-size-sm);
@@ -1829,18 +1762,6 @@ html[data-theme="light"] {
   margin:      0;
 }
 
-.field__static-value {
-  color:       var(--theme-text-heading);
-  font-size:   var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
-  margin:      0;
-  white-space: nowrap;
-}
-
-.footer-actions--primary-only {
-  justify-content: flex-end;
-}
-
 .footer-actions--primary-only .footer-actions__primary {
   margin-left: auto;
 }
@@ -1855,7 +1776,6 @@ html[data-theme="light"] {
   top: 24px;
   z-index: var(--z-sticky-stepper);
 }
-
 
 /* =========================================================
    09. Main Form Panel
@@ -1915,7 +1835,6 @@ html[data-theme="light"] {
   padding:       0;
 }
 
-
 /* =========================================================
    Footer colado ao último card do stack.
    Aplica-se em 100% das páginas que usam .cv-form-section-stack.
@@ -1963,7 +1882,6 @@ html[data-theme="light"] {
   padding: var(--cv-form-section-body-padding);
 }
 
-
 /* =========================================================
    10. Form Section
    Unidade modular dentro do Main Form Panel.
@@ -1989,7 +1907,6 @@ html[data-theme="light"] {
 .main-form-panel .form-section:last-of-type {
   border-bottom: none;
 }
-
 
 /* =========================================================
    11. Section Header
@@ -2032,7 +1949,6 @@ html[data-theme="light"] {
   flex-shrink: 0;
   gap:         var(--space-2);
 }
-
 
 /* =========================================================
    11b. cv-form-section — Cards independentes por seção do wizard
@@ -2248,10 +2164,6 @@ html[data-theme="light"] {
   padding:        var(--cv-form-section-body-padding);
 }
 
-.cv-form-section-body--sections {
-  gap: 0;
-}
-
 .cv-form-section-body--sections > .wizard-inner-section:not(:last-child) {
   padding-bottom: var(--space-5);
 }
@@ -2259,7 +2171,6 @@ html[data-theme="light"] {
 .cv-form-section-body--sections > .wizard-inner-section + .wizard-inner-section {
   padding-top: var(--space-5);
 }
-
 
 /* =========================================================
    12. Field Grid
@@ -2282,7 +2193,6 @@ html[data-theme="light"] {
   width:     100%;
 }
 
-
 /* =========================================================
    13. Field Sizes
    Quatro tamanhos de campo baseados em colunas do grid.
@@ -2301,7 +2211,6 @@ html[data-theme="light"] {
 /* Linha inteira: justificativa, observações, descrição, textarea */
 .field-size-4 { grid-column: 1 / -1; }
 
-
 /* =========================================================
    14. Field Group
    Agrupamento leve dentro de uma Form Section.
@@ -2318,29 +2227,6 @@ html[data-theme="light"] {
   gap:            var(--field-group-gap);
   padding:        var(--field-group-padding);
 }
-
-.field-group__header {
-  align-items:     center;
-  display:         flex;
-  gap:             var(--space-2);
-  justify-content: space-between;
-}
-
-.field-group__title {
-  color:          var(--theme-text-muted-strong);
-  font-size:      var(--font-size-xs);
-  font-weight:    var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
-  margin:         0;
-  text-transform: uppercase;
-}
-
-.field-group__body {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--space-3);
-}
-
 
 /* =========================================================
    15. Footer Actions
@@ -2383,44 +2269,7 @@ html[data-theme="light"] {
 }
 
 /* `.cv-floating-action--stacked` mora em `cv-buttons.css` (NOVO-23): aquele
-   arquivo redeclara `.cv-floating-action { bottom }` e vem depois deste no
-   bundle, então um modificador definido aqui nunca chegava a valer. */
-
-.cv-floating-action__button {
-  box-shadow: 0 18px 32px rgba(11, 58, 102, 0.18);
-}
-
-.quick-create-panel--page {
-  background: var(--surface-quick-create);
-  border: 1px solid var(--border-quick-create);
-  border-radius: var(--radius-shell);
-  box-shadow: var(--shadow-quick-create);
-}
-
-.quick-create-panel__copy {
-  display: grid;
-  gap: var(--space-1);
-  min-width: 0;
-}
-
-.quick-create-panel__eyebrow {
-  color: var(--theme-text-muted);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-eyebrow);
-  text-transform: uppercase;
-}
-
-.quick-create-panel__subtitle {
-  color: var(--theme-text-muted);
-  font-size: var(--font-size-sm);
-  line-height: 1.45;
-  margin: 0;
-}
-
-.quick-create-panel__body--page {
-  padding-block: var(--space-4);
-}
+   arquivo redeclara `.cv-floating-action { bottom }
 
 @media (max-width: 640px) {
   .cv-floating-action {
@@ -2432,7 +2281,6 @@ html[data-theme="light"] {
     width: 100%;
   }
 }
-
 
 /* =========================================================
    16. List Panel / Filters
@@ -2471,22 +2319,6 @@ html[data-theme="light"] {
   gap:             var(--filter-bar-gap);
   justify-content: space-between;
   padding:         var(--filter-bar-padding-y) var(--filter-bar-padding-x);
-}
-
-.filter-bar__controls {
-  align-items: center;
-  display:     flex;
-  flex:        1;
-  flex-wrap:   wrap;
-  gap:         var(--space-2);
-  min-width:   0;
-}
-
-.filter-bar__actions {
-  align-items: center;
-  display:     flex;
-  flex-shrink: 0;
-  gap:         var(--space-2);
 }
 
 /* List Content */
@@ -2843,10 +2675,6 @@ body.has-delete-modal-open {
   gap: var(--space-4);
 }
 
-.attach-signed-modal__field {
-  margin: 0;
-}
-
 /* Menu de ações (⋮) — junta Cancelar/Excluir num único botão */
 .cv-action-menu {
   background: var(--surface-list-panel);
@@ -2891,61 +2719,6 @@ body.has-delete-modal-open {
   width: 16px;
 }
 
-.cv-action-menu__item--cancel {
-  color: var(--color-warning);
-}
-
-.cv-action-menu__item--delete {
-  color: var(--color-danger);
-}
-
-.cv-action-menu__item--retificar,
-.cv-action-menu__item--complementar {
-  color: var(--color-info);
-}
-
-.cv-action-menu__item--whatsapp {
-  color: #1fa855;
-}
-
-.cv-action-menu__item--whatsapp:hover,
-.cv-action-menu__item--whatsapp:focus-visible {
-  background: color-mix(in srgb, #1fa855 14%, transparent);
-}
-
-/* Ações de documento (termo, ofício etc.) — cor do ícone acompanha o botão
-   sólido equivalente (preview/pdf/docx), com leve tingimento no hover. */
-.cv-action-menu__item--preview {
-  color: var(--cv-btn-preview-color, var(--color-info));
-}
-
-.cv-action-menu__item--pdf {
-  color: var(--cv-btn-pdf-bg, var(--color-danger));
-}
-
-.cv-action-menu__item--pdf:hover,
-.cv-action-menu__item--pdf:focus-visible {
-  background: color-mix(in srgb, var(--cv-btn-pdf-bg, var(--color-danger)) 14%, transparent);
-}
-
-.cv-action-menu__item--docx {
-  color: var(--cv-btn-docx-bg, var(--color-primary));
-}
-
-.cv-action-menu__item--docx:hover,
-.cv-action-menu__item--docx:focus-visible {
-  background: color-mix(in srgb, var(--cv-btn-docx-bg, var(--color-primary)) 14%, transparent);
-}
-
-.cv-action-menu__item--sign {
-  color: var(--cv-btn-primary-bg, var(--color-primary));
-}
-
-.cv-action-menu__item--sign:hover,
-.cv-action-menu__item--sign:focus-visible {
-  background: color-mix(in srgb, var(--cv-btn-primary-bg, var(--color-primary)) 14%, transparent);
-}
-
 .cv-action-menu__item--sign.is-assinado {
   color: var(--color-success, #24a25b);
 }
@@ -2955,17 +2728,10 @@ body.has-delete-modal-open {
   background: color-mix(in srgb, var(--color-success, #24a25b) 16%, transparent);
 }
 
-.cv-action-menu__divider {
-  border: none;
-  border-top: 1px solid var(--color-border-soft, rgba(255, 255, 255, 0.08));
-  margin: var(--space-1) var(--space-1);
-}
-
 .cv-action-menu__form {
   display: block;
   width: 100%;
 }
-
 
 /* =========================================================
    17. Quick Create Inline
@@ -3002,76 +2768,10 @@ body.has-delete-modal-open {
   padding:         var(--space-2) var(--filter-bar-padding-x);
 }
 
-.quick-create-panel__title {
-  color:       var(--theme-text-heading);
-  font-size:   var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  margin:      0;
-}
-
-.quick-create-panel__close {
-  align-items:      center;
-  background:       transparent;
-  border:           none;
-  border-radius:    var(--radius-sm);
-  color:            var(--theme-text-muted);
-  cursor:           pointer;
-  display:          flex;
-  font-size:        var(--font-size-md);
-  height:           28px;
-  justify-content:  center;
-  line-height:      1;
-  padding:          0;
-  transition:       color var(--transition-base), background var(--transition-base);
-  width:            28px;
-}
-
-.quick-create-panel__close:hover {
-  background: var(--border-quick-create);
-  color:      var(--theme-text-heading);
-}
-
-/* Corpo: linha de campos + ações em flex row no desktop */
-.quick-create-panel__body {
-  box-sizing: border-box;
-  display:    flex;
-  gap:        var(--layout-quick-create-gap);
-  padding:    var(--space-4) var(--filter-bar-padding-x);
-  width:      100%;
-}
-
-/* Row: field-grid + quick-create-actions lado a lado */
-.quick-create-panel__row {
-  align-items: flex-end;
-  display:     flex;
-  flex:        1;
-  gap:         var(--layout-quick-create-gap);
-  min-width:   0;
-}
-
 /* Field Grid dentro do Quick Create ocupa o espaço restante */
 .quick-create-panel .field-grid {
   flex: 1;
 }
-
-/* Ações: área exclusiva para Cancelar / Salvar */
-.quick-create-actions {
-  align-items: flex-end;
-  display:     flex;
-  flex-shrink: 0;
-  gap:         var(--space-2);
-  padding-bottom: 1px;
-  width:       var(--layout-quick-create-actions-width);
-}
-
-/* Mensagem auxiliar opcional */
-.quick-create-panel__hint {
-  box-sizing:  border-box;
-  color:       var(--theme-text-muted);
-  font-size:   var(--font-size-xs);
-  padding:     0 var(--filter-bar-padding-x) var(--space-3);
-}
-
 
 /* =========================================================
    18. Responsive
@@ -3219,7 +2919,6 @@ body.has-delete-modal-open {
   }
 }
 
-
 /* =========================================================
    19. Field Layout / Field Rows
    Camada complementar ao Field Grid para controle de colunas
@@ -3253,11 +2952,6 @@ body.has-delete-modal-open {
   width:     100%;
 }
 
-/* 1 coluna — linha inteira: textarea, observações, campo único amplo */
-.field-row--1 {
-  grid-template-columns: minmax(0, 1fr);
-}
-
 /* 2 colunas — pares: datas, telefone + e-mail, valor + tipo */
 .field-row--2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3266,11 +2960,6 @@ body.has-delete-modal-open {
 /* 3 colunas — trios: nome + CPF + telefone, cargo + RG + status */
 .field-row--3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-/* 4 colunas — quartetos compactos: placa + modelo + tipo + combustível */
-.field-row--4 {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 /* Tablet (840px): rows de 3 e 4 colunas reduzem para 2 */
@@ -3292,7 +2981,6 @@ body.has-delete-modal-open {
   }
 }
 
-
 /* =========================================================
    21. Page Header Stack
    Nomenclatura canônica para headers do design system.
@@ -3306,7 +2994,6 @@ body.has-delete-modal-open {
   overflow:      hidden;
   width:         100%;
 }
-
 
 /* =========================================================
    22. Page Header Band — Faixa Escura
@@ -3393,12 +3080,6 @@ body.has-delete-modal-open {
   color:      var(--route-status-muted-text);
 }
 
-.page-header-status-chip--danger {
-  background: var(--color-danger-soft);
-  border:     1px solid var(--color-danger-border-soft);
-  color:      var(--color-danger);
-}
-
 /* Alerta inline simples (ex.: aviso de cancelamento) */
 .cv-alert {
   border-radius: var(--radius-md, 8px);
@@ -3411,7 +3092,6 @@ body.has-delete-modal-open {
   border:     1px solid var(--color-danger-border-soft);
   color:      var(--color-danger);
 }
-
 
 /* =========================================================
    23. Page Header Rail — Faixa Clara Obrigatória
@@ -3464,15 +3144,6 @@ body.has-delete-modal-open {
   text-transform: uppercase;
 }
 
-.page-header-rail__title {
-  color:          var(--theme-text-heading);
-  font-size:      var(--font-size-md);
-  font-weight:    var(--font-weight-bold);
-  letter-spacing: -0.01em;
-  line-height:    1.3;
-  margin:         0;
-}
-
 .page-header-rail__subtitle {
   color:       var(--theme-text-muted);
   font-size:   var(--font-size-sm);
@@ -3486,16 +3157,6 @@ body.has-delete-modal-open {
   display:     flex;
   flex-shrink: 0;
   gap:         var(--space-2);
-}
-
-/* Área de filtros no Rail */
-.page-header-rail__filters {
-  align-items: center;
-  display:     flex;
-  flex:        1;
-  flex-wrap:   wrap;
-  gap:         var(--space-2);
-  min-width:   0;
 }
 
 /* Stepper embutido no Rail */
@@ -3709,7 +3370,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   font-weight: var(--font-weight-bold);
 }
 
-
 /* =========================================================
    24. Simple List
    Lista linear de itens com avatar, título, meta e ações.
@@ -3736,7 +3396,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
-
 
 /* =========================================================
    25. Card List
@@ -3773,13 +3432,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   box-shadow:   var(--shadow-medium);
 }
 
-.list-card__header {
-  align-items:     center;
-  display:         flex;
-  gap:             var(--space-2);
-  justify-content: space-between;
-}
-
 .list-card__title {
   color:         var(--theme-text-heading);
   font-size:     var(--font-size-sm);
@@ -3788,19 +3440,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   overflow:      hidden;
   text-overflow: ellipsis;
   white-space:   nowrap;
-}
-
-.list-card__meta {
-  color:     var(--theme-text-muted);
-  display:   flex;
-  flex-wrap: wrap;
-  font-size: var(--font-size-xs);
-  gap:       var(--space-1) var(--space-3);
-}
-
-.list-card__meta-item {
-  display: flex;
-  gap:     var(--space-1);
 }
 
 .list-card__body {
@@ -3819,7 +3458,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   margin-top:      auto;
   padding-top:     var(--space-3);
 }
-
 
 /* =========================================================
    26. Quick Add Inline
@@ -4005,14 +3643,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   border-color: var(--inline-create-primary-border);
 }
 
-.cv-inline-create__hint {
-  box-sizing: border-box;
-  color:      var(--theme-text-muted);
-  font-size:  var(--font-size-xs);
-  padding:    0 var(--filter-bar-padding-x) var(--space-3);
-}
-
-
 /* =========================================================
    27. Field Grid — Variantes com Colunagem Explícita
    Complementam o .field-grid padrão de 4 colunas.
@@ -4065,7 +3695,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
     grid-template-columns: minmax(0, 1fr);
   }
 }
-
 
 /* =========================================================
    28. Responsive — Header Stack, Listas e Quick Add Inline
@@ -4148,7 +3777,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
     width: 100%;
   }
 }
-
 
 /* =========================================================
    29. Header Filter Bar
@@ -4282,54 +3910,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 .header-filter-select:focus,
 .header-filter-select:focus-visible {
   outline: none;
-}
-
-/* Botão secundário da filter bar */
-.header-filter-button {
-  align-items:     center;
-  background:      var(--surface-filter-button);
-  border:          1px solid var(--border-filter-button);
-  border-radius:   var(--radius-control);
-  color:           var(--color-filter-button);
-  cursor:          pointer;
-  display:         inline-flex;
-  font-size:       var(--font-size-sm);
-  font-weight:     var(--font-weight-semibold);
-  height:          var(--filter-input-height);
-  justify-content: center;
-  padding:         0 var(--space-4);
-  transition:
-    background   var(--transition-base),
-    border-color var(--transition-base),
-    color        var(--transition-base);
-  white-space: nowrap;
-}
-
-.header-filter-button:hover,
-.header-filter-button:focus-visible {
-  border-color: var(--border-active);
-  color:        var(--theme-text-heading);
-  outline:      none;
-}
-
-/* Variante primária */
-.header-filter-button--primary {
-  background:   var(--color-primary);
-  border-color: var(--color-primary);
-  color:        var(--color-white);
-}
-
-.header-filter-button--primary:hover,
-.header-filter-button--primary:focus-visible {
-  background:   var(--color-primary-hover);
-  border-color: var(--color-primary-hover);
-  color:        var(--color-white);
-}
-
-/* ── cv-date-picker como campo de formulário na filter bar ── */
-.header-filter-datepicker {
-  flex:         2 1 200px;
-  min-width:    160px;
 }
 
 /* Layout do controle (roteiros.css não carregado nesta página) */
@@ -4652,7 +4232,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 #quick-add-atividade .cv-field__control--textarea:focus-visible {
   outline: none;
 }
-
 
 /* <<< css/page-shell.css <<< */
 

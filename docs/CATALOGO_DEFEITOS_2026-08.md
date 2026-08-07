@@ -1650,6 +1650,13 @@ ocorrência** num corpus de 4,7 MB com todos os templates, todo o JS e todo o Py
 > `cv-chip--` não foram fechados (sabe-se que o prefixo é composto, não quais valores existem);
 > `migrations/` não foi varrido; e nada foi executado — a varredura é estática.
 
+**Segunda correção do meu próprio método (07/08).** A derivação de prefixos tratava qualquer
+adjacência a `{% templatetag openblock %}` como composição de sufixo. Mas
+`class="cv-action-menu__item{% templatetag openblock %} if x {% templatetag closeblock %} is-assinado…"`
+emite `" is-assinado"` **com espaço**: é classe separada, não sufixo. A regra passou a exigir que o
+que sai da interpolação **cole** no token, e a lista caiu de 160 prefixos para 41. Conferido que
+`oficios.css` não muda com a regra nova — as mesmas 8 classes protegidas pelos dois métodos.
+
 **`oficios.css` fechado em 07/08.** 106,0 → 65,9 KB (−40,2 KB, −38%), 239 blocos removidos, 178
 classes. Prova: **15 de 16 comparações de tela pixel-idênticas** (8 páginas × 2 temas); a 16ª tem 63
 pixels de antialiasing na borda de um ícone, delta máximo de 4 em 255. Duas catracas desceram junto:
@@ -1664,6 +1671,7 @@ o `+` da concatenação fica no início da linha seguinte (`static/js/pages/ofic
 | arquivo | blocos mortos | peso |
 |---|---:|---:|
 | `oficios.css` ✅ | 283 → medido 239 | 47 KB → medido 40,2 KB |
+| `page-shell.css` ✅ | 78 → medido 57 | 14 KB → medido 9,4 KB |
 | `dev/ui-lab-fields.css` | 96 | 18 KB |
 | `dev/ui-lab-pages.css` | 79 | 16 KB |
 | `page-shell.css` | 78 | 14 KB |
