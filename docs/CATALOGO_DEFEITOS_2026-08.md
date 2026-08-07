@@ -1634,6 +1634,11 @@ que ele **não** aparece no lab — foi descontinuado e não apagado),
 > A trava é `test_componentes_sem_orfao.py`, e é sobre a **regra**: componente novo que ninguém
 > renderiza reprova, componente que perde o último consumidor reprova, e a lista do laboratório é
 > conferida nos dois sentidos — perder o citador do lab ou ganhar um de produção também reprova.
+>
+> **Adendo de 07/08/2026:** a decisão veio — o `BE-25` (PR #247) apagou os dois labs — e os 7
+> caíram na cascata exatamente como previsto, mais o `document_card` em segunda ordem (os
+> citadores de produção que esta nota lhe media eram `list_grid` e `ui_lab2/views.py`). O
+> fechamento, com prova por arquivo, é o `NOVO-44`.
 
 ### HT-07 🟡 Concatenação condicional com "·" no template · AUD · 1–2 d
 
@@ -3607,3 +3612,27 @@ espalhamento de 4,3×, pior que o valor absoluto, 4,0×).
 >
 > Os passos 16 a 20 ficaram `skipped` no run 696 — a suíte, a cobertura e o `PF-07` do `HT-06`
 > ficaram sem prova naquele run, e a têm no 697.
+
+### NOVO-44 ✅ RESOLVIDO · 🔴 `NOVO` O `BE-25` apagou os dois labs e deixou a cascata para trás — `main` vermelho em 8 testes · COR · 0,5 d
+
+O PR #247 (`BE-17`, `BE-25`, `UI-01`) apagou `dev/ui_lab` e `ui_lab2` inteiros — a decisão
+que faltava — mas não rodou a trava do `HT-06` antes de mesclar: os **7 componentes** de
+`SO_NO_LABORATORIO` perderam o último citador naquele commit, e
+`core/tests/test_componentes_sem_orfao.py` reprovou na `main` (runs de `ac6b862` e `669afc4`,
+8 falhas) e em todo PR aberto contra ela. É a cascata que o próprio `HT-06` previu
+("componente que perde o último consumidor também reprova"), na maior escala possível.
+
+**Resolvido em 07/08/2026, no PR #249** (que já estava aberto e precisava da base verde):
+
+- os 7 apagados com prova de grep — zero referências fora de `docs/` — e mais um de
+  **segunda ordem** que a primeira leva revelou: `cards/document_card.html`, que o `HT-06`
+  mediu vivo porque os citadores dele eram exatamente `list_grid.html` e `ui_lab2/views.py`;
+- `SO_NO_LABORATORIO` fica **vazia**, com a trava intacta para o próximo componente que
+  nascer alcançável só por página de laboratório;
+- piso da varredura 85 → 83, deliberado e comentado;
+- `docs/COMPONENTES.md` sem os dois nomes apagados que ainda citava.
+
+**A lição operacional é o motivo de a linha existir:** apagar árvore de template exige rodar
+a suíte inteira antes do merge — a trava do `HT-06` é local e barata, e teria segurado o
+`main` verde. O run 697 (`NOVO-43`) passou sobre a árvore do #246 por sorte de ordem: o
+vermelho só apareceu quando o #247 entrou.
