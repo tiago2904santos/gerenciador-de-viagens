@@ -145,9 +145,10 @@ Precisam de resposta humana; nenhuma bloqueia a fase 0.
 |---|---|---|
 | Comportamento de expiração de sessão | `PF-03` (fase 1) | Tirar a escrita do caminho quente muda se a sessão de 8 h conta do login ou da última ação |
 | Quais operações exigem `PAPEL_ADMIN` | `BE-19` (fase 8) | O modelo de dados promete três papéis; o código aplica dois |
-| Qual UI Lab é o vigente | `BE-25` (fase 9) | Dois laboratórios visuais concorrentes; o outro é apagado |
+| ~~Qual UI Lab é o vigente~~ **decidida em 07/08 (PR #247): nenhum — os dois saíram** | `BE-25` (fase 9) | A cascata de componentes órfãos que a decisão deixou é o `NOVO-44`, fechado |
 | Arquitetura de configurações | fora das 9 fases | Proposta de 17–28 dias, em `historico/2026-07-refactor/planos/PROPOSTA_CONFIGURACOES.md`; entra como fase própria ou fica fora do ciclo |
 | Triagem dos 13 PRs abertos | fase 9 | 12 são de maio–julho, anteriores ao refactor; fechar ou reabrir é chamada sua |
+| Catálogo global do `DB-02` (grupo 2): cada item vira cópia por área ou ganha dono? | `DB-02` (fase 2) | `TipoEvento`, `ProgramaSolicitante`, `HorarioAtendimento`, `AtividadePlanoTrabalho` têm linhas globais de seed servidas a todas as áreas; `NOT NULL` ali exige decidir o destino de cada uma (o `NOVO-09` duplicou `ModeloJustificativa` por área — é um precedente, não uma regra) |
 
 ## 9. Quadro de acompanhamento
 
@@ -187,7 +188,7 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `JS-12` `CV.componentRegistry` era alias **sem nenhum consumidor** — o enunciado "mesmo
       objeto" já tinha sido refutado em runtime; o defeito real era código morto
 
-### Fase 1 — Réguas e rede de segurança
+### Fase 1 — Réguas e rede de segurança ✅ **COMPLETA** (07/08/2026)
 - [x] `PF-07` `scripts/medir_desempenho.py` com dois volumes, no CI — achou `NOVO-06`
       (vazamento entre áreas, **fechado**), `NOVO-07` (15 MB de HTML, **fechado**) e `NOVO-08`
       (N+1 de 296, 138 e 55, **fechado**: 34, 20 e 11). Os três saíram da régua; nenhum aparecia
@@ -205,13 +206,20 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `QA-07` sem lint/formatação/tipo em Python no CI — **lint fechado** (`ruff` em zero,
       gate em `tests.yml`). Formatação e tipo seguem abertos como `NOVO-05`. A folga zero do
       `--max-orm-em-view 30` continua de pé: qualquer ORM novo em view reprova o CI.
-- [ ] `NOVO-11` o auditor de ORM em view conta `.objects` dentro de docstring — a catraca mede o
-      texto do arquivo, não o código. Achado no `NOVO-07`, quando ela caiu de 30 para 29 por causa
-      de uma frase. Correção é contar por `ast`, não por regex.
-- [ ] `NOVO-12` 🔴 nenhuma régua olha a configuração de produção — `SECRET_KEY` de 9 caracteres
-      passou despercebida por todo o ciclo. Achada por uma pessoa rodando `check --deploy` no VPS,
-      não por gate. Chave já trocada; falta a catraca, e ela depende de decidir o `core.E002`
-      antes (produção viola um check que é `Error`).
+- [x] `NOVO-11` o auditor de ORM em view conta `.objects` dentro de docstring — a contagem agora
+      é por `ast` (`contar_orm_no_codigo`), com teste que falharia antes. A troca não mudou o
+      número: 29 por regex e 29 por árvore, mesmos apps — a folga que "ninguém sabia medir" era
+      zero, e a catraca segue em 29.
+- [x] `NOVO-12` 🔴 nenhuma régua olha a configuração de produção — `check --deploy --fail-level
+      ERROR` no `deploy.yml`, após o checkout (os checks têm de ser os do código que entra no
+      ar; antes dele, o E002 antigo travaria o próprio deploy da correção), antes do
+      `collectstatic` e protegido pelo rollback do `QA-03`. O
+      `core.E002` foi decidido: **rebaixado a `core.W002`** (produção roda `auto`; check
+      insatisfazível não é catraca, é ruído — o SLA real segue medido no CI com unoserver de
+      verdade). E a ponta que o enunciado não via: `SECRET_KEY` fraca é `security.W009`,
+      **Warning**, que `--fail-level ERROR` não trava — `core.E003` promove os critérios a
+      `Error`, senão o gate não pegaria o próprio defeito que o motivou. `ALLOWED_HOSTS` vazia
+      passou a falhar cedo no `prod.py`, padrão `REDIS_URL`. **Fecha a Fase 1 inteira.**
 - [x] `QA-11` `reparar-producao.yml` em UTF-16LE
 - [x] `QA-12` sem Dependabot, sem CodeQL, sem gate de acessibilidade — **Dependabot entrou**;
       CodeQL e gate de acessibilidade seguem abertos
@@ -255,11 +263,15 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `DB-01` `TabelaDiaria` sem `area` — o enunciado estava invertido: a tabela é nacional de
       propósito. O trabalho era o portão, e ele ficou em **superusuário** (decisão do usuário), no
       POST de diárias e não na view, que serve três abas. `require_area_role` segue com zero usos.
-- [ ] `DB-02` `area` anulável em 27 de 28 modelos — **o enunciado precisa ser reescrito antes
-      de qualquer migração.** O `NOVO-31` (feito) mediu, e o `NOVO-34` registra: num banco
-      recém-migrado **cinco modelos já nascem com `area IS NULL`**, por seed, e a linha global
-      de `ConfiguracaoNumeracaoOficio` **é** o piso de numeração — `NOT NULL` ali destrói o
-      mecanismo. São três grupos, não uma dívida uniforme.
+- [~] `DB-02` `area` anulável em 27 de 28 modelos — **enunciado reescrito em 07/08** com os
+      três grupos do `NOVO-34` (operacional / catálogo com padrão global / global por projeto)
+      e o primeiro passo do grupo operacional fechado: `Evento.save()` deriva a área como os
+      outros sete modelos do `core.E001`, com teste que falharia antes. O que resta **depende
+      de produção**, na ordem do enunciado novo: backfill provado pelo gate do `NOVO-12` (que
+      imprime `core.E001`/`W001` a cada deploy), migração `NOT NULL` dos oito operacionais
+      (limite 4 do `AGENTS.md`), e só então `filter_queryset_by_area` sem área vira `none()`.
+      Grupos 2 e 3 seguem anuláveis **por desenho**; a decisão de produto do grupo 2 está
+      no §8.
 - [x] `DB-04` cache documental não recorta por área — latente, como o enunciado dizia, mas por
       outro motivo: quem separa as áreas é a **referência**, que era opcional. Agora é obrigatória
       (`ValueError` sem ela). A afirmação de que todo artefato nascia `area=NULL` **era falsa** —
@@ -335,7 +347,9 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [ ] `BE-14` 48 sites de persistência em view, sem transação
 - [ ] `BE-15` numeração reimplementada 3 vezes
 - [ ] `BE-16` abstrações de `core` adotadas pela metade
-- [ ] `BE-17` `core/views.py` é 75% fixture de UI Lab
+- [x] `BE-17` `core/views.py` é 75% fixture de UI Lab — **fechado pelo PR #247**, que apagou os
+      dois labs e as 1.013 linhas de fixture; a cascata de componentes que ele deixou é o
+      `NOVO-44`
 
 ### Fase 7 — Reconstrução do CSS
 - [ ] `UI-03` nove arquivos definem token de cor → duas camadas
@@ -373,7 +387,11 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [~] `BE-23` vocabulário de rotas divergente — **sufixo CRUD fechado** (28 rotas PT→EN,
       com catraca). Resta o vocabulário dos outros 75% dos nomes, que é decisão de sistema
 - [ ] `BE-24` 89 MB de screenshots e 175 arquivos indevidos no repositório
-- [ ] `BE-25` decidir qual UI Lab é o vigente
+- [x] `BE-25` decidir qual UI Lab é o vigente — **decidido e executado no PR #247: nenhum dos
+      dois.** A cascata (7 componentes órfãos + 1 de segunda ordem, `main` vermelho em 8 testes)
+      ficou para trás e foi fechada como `NOVO-44`
+- [x] `NOVO-44` o `BE-25` apagou os labs e deixou a cascata do `HT-06` para trás — 8 componentes
+      apagados com prova de grep, `SO_NO_LABORATORIO` vazia com a trava intacta, piso 85 → 83
 - [ ] `QA-08` dependências atrasadas — e `pyhanko` é dependência **morta**, decidir se sai
 - [ ] `NOVO-01` `ASSINATURA_ETIQUETA_2_COMPAT.md` descreve fluxo que não existe mais
 - [x] `NOVO-02` suíte trava ao combinar certos grupos de apps — **não reproduziu** em 06/08 (a

@@ -73,6 +73,14 @@ todo código novo é uma chance de vazar, e a revisão humana é o único portã
 | `DB-04` 🟡 | Cache de artefato documental não recorta por área — risco latente, sem caminho alcançável hoje (`documentos/services/document_cache.py:105`) | 1 |
 | `DB-05` 🟠 | Placa de viatura e nome de modelo de justificativa são únicos globalmente | 1,5 |
 
+> **`DB-02` foi reescrito em 07/08/2026** (exigência do `NOVO-34`): não é dívida uniforme de
+> 27 modelos, são **três grupos** — operacional (`NOT NULL` com backfill antes; `Evento.save()`
+> já deriva a área, era o único dos oito que não derivava), catálogo com padrão global
+> (`NOT NULL` só depois de decisão de produto) e global por projeto
+> (`ConfiguracaoNumeracaoOficio`: a linha sem área **é** o mecanismo — `NOT NULL` fora de
+> questão). O enunciado vigente, com a ordem do que resta, está na linha do `DB-02` do
+> catálogo; a medição de produção chega sozinha pelo gate do `NOVO-12` a cada deploy.
+
 > **`DB-01` foi reescrito pela verificação de 05/08 e o enunciado original estava invertido.** Ele
 > pedia acrescentar `area` à `TabelaDiaria` — exatamente o que `cadastros/selectors.py:24-28`
 > documenta como decisão deliberada, para impedir que duas áreas cobrem valores diferentes pela

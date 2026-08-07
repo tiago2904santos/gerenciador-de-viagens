@@ -125,6 +125,19 @@ jobs:
 
             git checkout --detach "$TARGET_SHA"
             python -m pip install -r requirements/lock.txt --quiet
+
+            # NOVO-12: a régua olha a configuração REAL de produção — o .env que
+            # nenhum gate do CI enxerga. Foi aqui que uma SECRET_KEY de 9
+            # caracteres viveu um ciclo inteiro sem ninguém ver (core.E003 agora
+            # a reprova, e core.E001 imprime a contagem de linhas sem área que o
+            # DB-02 pede). DEPOIS do checkout de propósito: os checks têm de ser
+            # os do código que vai entrar no ar — antes dele, o código antigo
+            # (com core.E002 ainda Error e produção em `auto`) reprovaria o
+            # próprio deploy que corrige o check, e nenhum deploy passaria mais.
+            # Falhou aqui? O trap reverte código e banco; nada chegou ao usuário.
+            # `--fail-level ERROR` de propósito: core.W001/W002 relatam sem travar.
+            python manage.py check --deploy --fail-level ERROR
+
             # QA-03: `collectstatic` antes de `migrate`. Ele não depende do
             # schema, e é a falha mais provável e mais boba desta sequência
             # (disco cheio, permissão). Rodando antes, ela nunca acontece com o
