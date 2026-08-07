@@ -1672,6 +1672,7 @@ o `+` da concatenação fica no início da linha seguinte (`static/js/pages/ofic
 |---|---:|---:|
 | `oficios.css` ✅ | 283 → medido 239 | 47 KB → medido 40,2 KB |
 | `page-shell.css` ✅ | 78 → medido 57 | 14 KB → medido 9,4 KB |
+| `roteiros.css` ✅ | 78 → medido 76 | 14 KB → medido 13,9 KB |
 | `dev/ui-lab-fields.css` | 96 | 18 KB |
 | `dev/ui-lab-pages.css` | 79 | 16 KB |
 | `page-shell.css` | 78 | 14 KB |
