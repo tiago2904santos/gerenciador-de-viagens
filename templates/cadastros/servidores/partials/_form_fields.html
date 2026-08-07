@@ -9,6 +9,6 @@
   <div class="field app-form-field cv-field field-size-1 field-rg-wrap" data-rg-field-wrap>
     <label class="cv-field__label" for="{{ form.rg.id_for_label }}">{{ form.rg.label }}</label>
     <div class="cv-field-row">{{ form.rg }}</div>
-    {% if form.rg.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.rg.errors only %}{% endif %}
+    {% if form.rg.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.rg.errors field_id=form.rg.auto_id only %}{% endif %}
   </div>
 </div>

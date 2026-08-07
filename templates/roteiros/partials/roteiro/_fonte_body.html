@@ -97,7 +97,7 @@
           {% endfor %}
         </select>
         {% if form.origem_estado.errors %}
-          {% include "components/ui/feedback/field_error.html" with errors=form.origem_estado.errors only %}
+          {% include "components/ui/feedback/field_error.html" with errors=form.origem_estado.errors field_id=form.origem_estado.auto_id only %}
         {% endif %}
       </div>
       <div class="field app-form-field">
@@ -116,7 +116,7 @@
           {% endfor %}
         </select>
         {% if form.origem_cidade.errors %}
-          {% include "components/ui/feedback/field_error.html" with errors=form.origem_cidade.errors only %}
+          {% include "components/ui/feedback/field_error.html" with errors=form.origem_cidade.errors field_id=form.origem_cidade.auto_id only %}
         {% endif %}
       </div>
     </div>

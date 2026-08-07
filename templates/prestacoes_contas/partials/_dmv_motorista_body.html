@@ -18,7 +18,7 @@
       </label>
     {% endfor %}
   </div>
-  {% if form.motorista_modo.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_modo.errors only %}{% endif %}
+  {% if form.motorista_modo.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_modo.errors field_id=form.motorista_modo.auto_id only %}{% endif %}
 </fieldset>
 
 {# Outro servidor do mesmo ofício #}
@@ -26,7 +26,7 @@
   <div class="field cv-field">
     <label class="cv-field__label" for="{{ form.motorista_servidor.id_for_label }}">Servidor deste ofício</label>
     {{ form.motorista_servidor }}
-    {% if form.motorista_servidor.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_servidor.errors only %}{% endif %}
+    {% if form.motorista_servidor.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_servidor.errors field_id=form.motorista_servidor.auto_id only %}{% endif %}
   </div>
 </div>
 
@@ -54,23 +54,29 @@
     <div class="field cv-field dmv-fields__wide">
       <label class="cv-field__label" for="{{ form.motorista_manual_nome.id_for_label }}">Nome do motorista</label>
       {{ form.motorista_manual_nome }}
-      {% if form.motorista_manual_nome.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_manual_nome.errors only %}{% endif %}
+      {% if form.motorista_manual_nome.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_manual_nome.errors field_id=form.motorista_manual_nome.auto_id only %}{% endif %}
     </div>
     <div class="field cv-field">
       <label class="cv-field__label" for="{{ form.motorista_manual_cpf.id_for_label }}">CPF</label>
       {{ form.motorista_manual_cpf }}
-      {% if form.motorista_manual_cpf.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_manual_cpf.errors only %}{% endif %}
+      {% if form.motorista_manual_cpf.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_manual_cpf.errors field_id=form.motorista_manual_cpf.auto_id only %}{% endif %}
     </div>
     <div class="field cv-field">
       <label class="cv-field__label" for="{{ form.motorista_oficio_referencia.id_for_label }}">Ofício do motorista</label>
       {{ form.motorista_oficio_referencia }}
-      <p class="cv-field__hint">Formato número/ano (ex.: 15/2026).</p>
-      {% if form.motorista_oficio_referencia.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_oficio_referencia.errors only %}{% endif %}
+      {% comment %}
+        `HT-02`: este campo declara `help_text` no form (`DiarioMotoristaForm`), então
+        o Django já emite `aria-describedby="id_motorista_oficio_referencia_helptext"`
+        no widget. O `id` estava faltando aqui — a dica existia na tela e o ponteiro
+        do navegador caía no vazio.
+      {% endcomment %}
+      <p class="cv-field__hint" id="{{ form.motorista_oficio_referencia.auto_id }}_helptext">Formato número/ano (ex.: 15/2026).</p>
+      {% if form.motorista_oficio_referencia.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_oficio_referencia.errors field_id=form.motorista_oficio_referencia.auto_id only %}{% endif %}
     </div>
     <div class="field cv-field">
       <label class="cv-field__label" for="{{ form.motorista_protocolo_ref.id_for_label }}">Protocolo do motorista</label>
       {{ form.motorista_protocolo_ref }}
-      {% if form.motorista_protocolo_ref.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_protocolo_ref.errors only %}{% endif %}
+      {% if form.motorista_protocolo_ref.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motorista_protocolo_ref.errors field_id=form.motorista_protocolo_ref.auto_id only %}{% endif %}
     </div>
   </div>
 </div>

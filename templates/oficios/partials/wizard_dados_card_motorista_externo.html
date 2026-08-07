@@ -28,7 +28,7 @@
         <label class="sr-only" for="{{ transporte_form.motorista_manual_nome.id_for_label }}">Nome completo</label>
         {{ transporte_form.motorista_manual_nome }}
         {% if transporte_form.motorista_manual_nome.errors %}
-          {% include "components/ui/feedback/field_error.html" with errors=transporte_form.motorista_manual_nome.errors only %}
+          {% include "components/ui/feedback/field_error.html" with errors=transporte_form.motorista_manual_nome.errors field_id=transporte_form.motorista_manual_nome.auto_id only %}
         {% endif %}
       </div>
     </div>

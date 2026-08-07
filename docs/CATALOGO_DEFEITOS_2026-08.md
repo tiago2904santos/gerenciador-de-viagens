@@ -1277,11 +1277,32 @@ severidade maior que a do `HT-02`, porque aqui não há nem o rótulo visual ass
 > lida depois do nome e não no lugar dele.
 
 
-### HT-12 🟠 `help_text` declarado no form nunca chega à tela · AUD · 0,5 d
+### HT-12 ✅ RESOLVIDO · 🟠 `help_text` declarado no form nunca chega à tela · AUD · 0,5 d
 
 `templates/components/ui/forms/field.html:45` — `{% if help_text %}` imprime **apenas o parâmetro
 do include**, nunca `field.help_text`. Forms de produção que declaram `help_text` no campo não o
 exibem em lugar nenhum.
+
+> **RESOLVIDO em 07/08/2026, junto do `HT-02`** — são o mesmo defeito por dois lados. Medida a
+> superfície: **29 campos em 17 forms** declaram `help_text` e **2 chamadores** (de 154 includes de
+> `field.html`) passam o parâmetro. Ou seja, 29 textos escritos e nenhum na tela.
+>
+> A ajuda passa a sair de `help_text|default:field.help_text` — o parâmetro continua vencendo,
+> porque os dois chamadores que o usam trocam a frase por uma da tela deles.
+>
+> **`|safe`, e não por preguiça.** `UsuarioAreaCreationForm.password1.help_text` é a lista de
+> regras de senha do próprio Django, em `<ul><li>`. Sem `|safe` a tela do administrador passaria a
+> mostrar a marcação como texto — é o mesmo `|safe` de `django/forms/div.html`, e `help_text` é
+> sempre texto de desenvolvedor, nunca de usuário.
+>
+> **Dois campos ficaram de fora, por motivo diferente e verificado:**
+> `PresetAtividadesQuickAddForm.atividades` é `CheckboxSelectMultiple`, e o Django não emite
+> `aria-describedby` para widget com `use_fieldset=True` (`boundfield.py:294`) — o texto já está na
+> tela como descrição do painel, escrito à mão em `presets/partials/_quick_add_fields.html:12`.
+> `TabelaDiariaForm.vigencia_inicio` e `OficioTransporteForm.motorista_oficio_referencia` são
+> `HiddenInput`, e o Django pula campo escondido pelo mesmo motivo. Nenhum dos três precisa de
+> guarda em `field.html`: **nenhum passa por lá**, e guarda que ninguém exercita já custou caro
+> nesta etapa.
 
 ### HT-13 🟠 `docs/DATA_ATTRIBUTES_JS.md` descreve um contrato que não existe mais · AUD · 0,5 d
 
@@ -1300,7 +1321,7 @@ chamador não tem.
 Idêntico byte a byte entre dois deles. Mesma família do `HT-08`: markup de `cv-icon-btn` e
 `cv-action-menu__item` também reescrito à mão em templates de app.
 
-### HT-02 🟠 Erro de campo sem associação programática · AUD · 2–3 d · risco médio
+### HT-02 ✅ RESOLVIDO · 🟠 Erro de campo sem associação programática · AUD · 2–3 d · risco médio
 
 `templates/components/ui/feedback/field_error.html:1` renderiza
 `<p class="field-error app-form-error">{{ errors|striptags }}</p>` — sem `id`, sem `role`, sem
@@ -1321,6 +1342,42 @@ já faz certo (`aria-describedby="{{ field_id }}-error"` no controle e
 **Correção:** dar aos componentes de erro e de ajuda os `id` que o Django já referencia
 (`{{ field.auto_id }}_error`, `{{ field.auto_id }}_helptext`) e acrescentar `role="alert"`. Feito
 assim, não é preciso tocar em `_field_control.html`.
+
+> **RESOLVIDO em 07/08/2026, e o enunciado estava certo em tudo, inclusive na parte otimista:**
+> `_field_control.html` não foi tocado. Os quatro ramos dele (multiselect, search-picker, select,
+> widget cru) e o do checkbox saem todos por `{{ field.as_widget }}`, e o Django 5.2 já põe
+> `aria-invalid="true"` e `aria-describedby` sozinho (`boundfield.py:290-310`). O que faltava era só
+> a âncora do outro lado.
+>
+> **O `field_id` é o `auto_id`, sem sufixo, e o sufixo é escrito pelo componente** — ele é ditado
+> pelo Django, não escolhido por nós. Foram **39 chamadores** que passaram a informá-lo; os que
+> renderizam `non_field_errors` ficaram de fora **de propósito**, porque não têm campo, e são o
+> `HT-03`.
+>
+> **A cobertura dos 39 é estática, e teve de ser.** Teste de componente prova o componente; quem
+> escreve o `id` é o chamador. `ContratoDosChamadoresTests` varre os `include` nos templates e exige
+> `field_id` de todo `errors=X.errors`, proíbe em todo `non_field_errors`, e proíbe string literal
+> em `errors=`. Pega o quadragésimo chamador antes de ele existir.
+>
+> **Dois achados que não estavam no enunciado:**
+>
+> 1. **`{{ errors|striptags }}` grudava mensagens.** `striptags` era aplicado ao `<ul>` inteiro da
+>    `ErrorList` e removia as tags **sem pôr nada no lugar**: dois validadores falhando no mesmo
+>    campo saíam como `…ele possui 3).Só dígitos.`. Trocado por `join:" "`. O efeito colateral é o
+>    motivo de `ui_lab2/feedback.html` ter mudado: ele passava uma **string** em `errors=`, e `join`
+>    sobre string separa caractere por caractere. Agora usa um `BoundField` de verdade — que é o que
+>    a demonstração deveria mostrar desde sempre.
+> 2. **`card_toggle.html` reescrevia o `<p>` de erro por conta própria.** A primeira versão desta
+>    correção deu `id` e `role` à cópia — e **remover qualquer um dos dois não reprovava teste
+>    nenhum** (décima e décima primeira vez nesta etapa que uma edição minha não era atribuível). A
+>    saída não foi cobrir a cópia: foi apagá-la. O checkbox agora inclui `field_error.html` como
+>    todo mundo, e as três propriedades passaram a ser cobertas pelas travas do componente.
+>
+> **Fora de alcance, medido e nomeado:** `PresetAtividadesQuickAddForm.atividades` é
+> `CheckboxSelectMultiple`, e o Django **não** emite `aria-describedby` para widget com
+> `use_fieldset=True` — associar ali exige `<fieldset>`/`<legend>`, que é remodelar o painel, não
+> ajustar um componente. Não há ponteiro quebrado (o Django não emite nenhum) e o texto está na
+> tela; fica registrado como `NOVO-41`.
 
 ### HT-03 🟠 Sem padrão único para erro de formulário inteiro · AUD · 2 d
 
@@ -2549,7 +2606,15 @@ campo novo.
 
 ---
 
-### NOVO-36 ✅ RESOLVIDO · 🟠 `NOVO` Orçamento a frio do LibreOffice calibrado numa geração de runner que não existe mais bloqueia toda prova de CI · QA · 0,25 d
+### NOVO-40 ✅ RESOLVIDO · 🟠 `NOVO` Orçamento a frio do LibreOffice calibrado numa geração de runner que não existe mais bloqueia toda prova de CI · QA · 0,25 d
+
+> **Este item nasceu como `NOVO-36` (commit `cae17bc4`) e foi renumerado em 07/08/2026: duas
+> sessões escreveram o mesmo ID no mesmo dia.** A outra ocupante, "Reordenar destinos deixa o
+> roteiro com chegada antes da saída", ficou com o número porque é citada em **dez** lugares fora do
+> catálogo — duas migrações, `roteiros/models.py`, `roteiro_logic.py`, `roteiro_editor.py`, dois
+> planos e dois testes —, enquanto esta não é citada em lugar nenhum. É a quarta colisão de
+> numeração deste ciclo; a conferência com `grep "^### NOVO-"` **antes** de escrever continua sendo
+> a única defesa.
 
 O passo 15 do `tests.yml`, "Enforce real document generation SLA", reprovou três vezes seguidas em
 06/08 — runs 653 e 654 (na `main`) e 657 (PR #226) — **só** no orçamento de partida a frio:
@@ -2830,6 +2895,61 @@ indelével.
 renderização — que é a mesma família do `DB-06` (`TabelaDiaria` guarda os três valores calculados
 "para congelar o valor que valeu"). Alternativa mais barata: gravar `quantidade_servidores` no
 `Roteiro`/`Oficio` no momento da geração.
+
+---
+
+### NOVO-41 ⚪ `NOVO` Grupo de checkboxes não associa a própria ajuda, e o Django não vai fazer isso · HT · 0,5 d
+
+Achado ao fechar o `HT-02`, e deixado de fora dele **por ser outra correção**, não por cansaço.
+
+`PresetAtividadesQuickAddForm.atividades` é `CheckboxSelectMultiple`. O Django só emite
+`aria-describedby` quando `not self.use_fieldset` (`django/forms/boundfield.py:294`), e
+`use_fieldset` é `True` exatamente para os widgets de múltiplos controles — porque a associação
+correta ali não é um atributo no controle, é `<fieldset>` com `<legend>` envolvendo o grupo.
+
+Hoje o painel escreve o texto à mão, em `planos_trabalho/presets/partials/_quick_add_fields.html:12`
+("Clique nas atividades para incluí-las ou retirá-las deste preset."), e o `help_text` declarado no
+form diz quase a mesma coisa em outras palavras — **texto duplicado, e o do form nunca aparece**.
+
+**Efeito:** leitor de tela que chega ao grupo de checkboxes não recebe a instrução. Não há ponteiro
+quebrado — o Django não emite ponteiro nenhum —, então o `HT-02` fecha verde com este caso aberto.
+**Correção:** trocar a `<section>` do painel por `<fieldset>`/`<legend>`, e a descrição por um
+`<p id="…_helptext">` referenciado por `aria-describedby` no `<fieldset>`. É remodelar o painel;
+cabe na fase de reconstrução, não numa correção de componente.
+
+**Único caso do sistema:** é o único campo de produção com `use_fieldset=True` e `help_text`.
+
+---
+
+### NOVO-42 🟠 `NOVO` Seis telas de catálogo exibem ao usuário o alerta de contrato quebrado do `N-07` · HT · 0,5 d
+
+Visto na tela ao conferir o `HT-02` no navegador, e depois medido por varredura das 20 rotas de
+lista com `test.Client`:
+
+```
+COM o alerta (6):  /eventos/tipos/  /justificativas/modelos/  /oficios/modelos-motivo/
+                   /planos-trabalho/horarios/  /planos-trabalho/programas/  /planos-trabalho/presets/
+sem  (14)
+```
+
+`components/lists/list_page_quick_add.html:84` inclui a paginação com `paginacao_obrigatoria=True`
+— declarando "esta lista É paginada". As seis views acima **não põem `page_obj` no contexto**, e o
+componente cumpre o contrato do `N-07` denunciando na tela:
+
+> Paginação indisponível: esta lista foi renderizada sem `page_obj` no contexto.
+
+Num `<p role="alert">` vermelho, acima da lista, **em produção**. Não há gate de `DEBUG`.
+
+**Efeito:** o usuário de seis catálogos vê uma mensagem de erro técnica, com nome de variável
+Python, toda vez que abre a tela. Funciona: a lista aparece embaixo. Mas o `role="alert"` faz o
+leitor de tela anunciar um erro que não é do usuário.
+
+**O `N-07` não está errado** — ele foi feito exatamente para isso, e achou seis casos reais. O que
+falta é fechá-los: ou as seis views passam a paginar (coerente com as outras catorze), ou as seis
+telas param de declarar `paginacao_obrigatoria`. A primeira é a certa: catálogo cresce.
+
+**Não é regressão desta etapa** — conferido no `main` antes de qualquer edição do `HT-02`, e o
+alerta já estava lá.
 
 **Medição que falta:** quantos ofícios já emitidos teriam contagem diferente hoje. Sem isso não dá
 para saber se é dívida histórica ou risco corrente.

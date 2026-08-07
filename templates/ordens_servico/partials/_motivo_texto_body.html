@@ -8,6 +8,6 @@
   <div class="field field-size-4 app-form-field cv-field oficio-motivo-field oficio-reveal-panel is-open">
     <label class="cv-field__label" for="{{ form.motivo.id_for_label }}">Motivo</label>
     {{ form.motivo }}
-    {% if form.motivo.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motivo.errors only %}{% endif %}
+    {% if form.motivo.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.motivo.errors field_id=form.motivo.auto_id only %}{% endif %}
   </div>
 </div>

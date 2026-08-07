@@ -144,10 +144,10 @@ Modo multi:
       <input type="hidden" name="{{ end_hidden_name }}"{% if end_hidden_id %} id="{{ end_hidden_id }}"{% endif %} value="{{ end_hidden_value|default:'' }}" data-cv-date-picker-end-value{% if filter_date %} data-collection-filter="date"{% endif %}>
     {% endif %}
     {% if start_field.errors %}
-      {% include "components/ui/feedback/field_error.html" with errors=start_field.errors only %}
+      {% include "components/ui/feedback/field_error.html" with errors=start_field.errors field_id=start_field.auto_id only %}
     {% endif %}
     {% if end_field.errors %}
-      {% include "components/ui/feedback/field_error.html" with errors=end_field.errors only %}
+      {% include "components/ui/feedback/field_error.html" with errors=end_field.errors field_id=end_field.auto_id only %}
     {% endif %}
     {% if show_summary|default_if_none:True %}
       <p class="cv-date-picker__summary" data-cv-date-picker-summary></p>
@@ -242,7 +242,7 @@ Modo multi:
       <input type="hidden" name="{{ single_hidden_name }}"{% if single_hidden_id %} id="{{ single_hidden_id }}"{% endif %} value="{{ single_hidden_value|default:'' }}" data-cv-date-picker-value>
     {% endif %}
     {% if single_field.errors %}
-      {% include "components/ui/feedback/field_error.html" with errors=single_field.errors only %}
+      {% include "components/ui/feedback/field_error.html" with errors=single_field.errors field_id=single_field.auto_id only %}
     {% endif %}
   {% endif %}
 
