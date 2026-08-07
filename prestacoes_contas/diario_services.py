@@ -10,6 +10,8 @@ from __future__ import annotations
 from pathlib import Path
 
 from django.conf import settings
+from django.db import transaction
+from django.db.models import F
 from django.utils import timezone
 
 from cadastros.selectors import build_configuracao_context
@@ -259,8 +261,20 @@ def alteracoes_datas_horarios_roteiro(prestacao) -> list[str]:
     return itens
 
 
+#: `DB-08` fatia 2: bloco livre para onde as posições vão no primeiro passo.
+#: Fica acima de qualquer posição final — e as finais são `0..len(trechos)`, uma
+#: por trecho do roteiro. Cabe com folga no `PositiveIntegerField`.
+DESLOCAMENTO_ORDEM_TRECHO = 1_000_000
+
+
+@transaction.atomic
 def sincronizar_trechos(diario: DiarioBordo) -> list[DiarioBordoTrecho]:
-    """Garante uma linha de diário por trecho do roteiro, preservando o que já foi digitado."""
+    """Garante uma linha de diário por trecho do roteiro, preservando o que já foi digitado.
+
+    `DB-08` fatia 2: atômica. Nenhum dos chamadores abre transação — nem as três
+    views de `diario_views.py`, nem `services.py:574` — e sem ela uma falha no meio
+    deixa as posições estacionadas no bloco de deslocamento, à vista do usuário.
+    """
     roteiro = roteiro_efetivo(diario.prestacao)
     trechos = trechos_ordenados(roteiro)
     existentes = list(diario.trechos.all().order_by("ordem", "pk"))
@@ -269,6 +283,14 @@ def sincronizar_trechos(diario: DiarioBordo) -> list[DiarioBordoTrecho]:
     # Linhas cujo trecho deixou de existir (ex.: roteiro foi clonado/recriado):
     # ficam disponíveis para reaproveitar, preservando KM/abastecimento por ordem.
     sobrando = [dt for dt in existentes if dt.trecho_id not in ids_atuais]
+
+    # `DB-08` fatia 2, **primeiro passo**. As posições finais entram uma a uma no
+    # laço abaixo, e a linha é reaproveitada por `id`: quando o roteiro muda de
+    # ordem, a posição que estou gravando ainda pertence a outra linha. Este
+    # `UPDATE` único tira todas do caminho; o laço as traz de volta já no lugar, e
+    # o `delete()` do fim leva as que sobraram. `deferrable=DEFERRED` não serve —
+    # o SQLite não o suporta e a suíte roda nos dois bancos.
+    diario.trechos.update(ordem=F("ordem") + DESLOCAMENTO_ORDEM_TRECHO)
 
     usados = []
     for i, trecho in enumerate(trechos):
