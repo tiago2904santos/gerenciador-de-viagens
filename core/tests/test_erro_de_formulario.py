@@ -263,7 +263,7 @@ class UmPadraoSoTests(SimpleTestCase):
             caminho.relative_to(RAIZ).as_posix()
             for caminho, texto in self.templates()
             if "feedback/form_errors.html" in texto
-            and "ui_lab" not in caminho.as_posix()
+           
         ]
 
         self.assertGreaterEqual(len(producao), 19, "esperava 18 formulários + o editor de roteiros")
