@@ -24,6 +24,7 @@ urlpatterns = [
     path("presets/<int:pk>/padrao/", views.preset_definir_padrao, name="preset_definir_padrao"),
     path("presets/<int:pk>/excluir/", views.preset_excluir, name="preset_delete"),
     path("<int:pk>/editar/", views.editar, name="editar"),
+    path("<int:pk>/menus/", views.card_menus, name="card_menus"),
     path("<int:pk>/identificacao/", views.wizard_identificacao, name="wizard_identificacao"),
     path("<int:pk>/identificacao/autosave/", views.identificacao_autosave, name="identificacao_autosave"),
     path("<int:pk>/efetivo-diarias/", views.wizard_efetivo_diarias, name="wizard_efetivo_diarias"),

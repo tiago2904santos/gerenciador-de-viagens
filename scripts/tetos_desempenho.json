@@ -44,21 +44,21 @@
     "ordens_servico:index": {
       "200": {
         "consultas": 19,
-        "kb_html": 175.1
+        "kb_html": 133.0
       },
       "20000": {
         "consultas": 19,
-        "kb_html": 175.6
+        "kb_html": 133.3
       }
     },
     "planos_trabalho:index": {
       "200": {
         "consultas": 18,
-        "kb_html": 177.9
+        "kb_html": 135.5
       },
       "20000": {
         "consultas": 18,
-        "kb_html": 221.8
+        "kb_html": 179.1
       }
     },
     "prestacoes_contas:index": {
