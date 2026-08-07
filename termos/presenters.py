@@ -1,3 +1,5 @@
+from django.urls import reverse
+
 from core import entity_cards
 from core.presenters.meta import build_meta
 from core.utils.masks import format_placa
@@ -51,6 +53,7 @@ def apresentar_linha_simples_termo(
 def apresentar_termo_card(
     termo,
     *,
+    menus_sob_demanda=True,
     edit_url="#",
     delete_url="#",
     delete_modal=False,
@@ -123,6 +126,8 @@ def apresentar_termo_card(
             "docx_url": viatura_docx_url,
         }
 
+    menus_src = reverse("termos:card_menus", args=[termo.pk]) if menus_sob_demanda else ""
+
     menus = []
     doc_items = []
     if pdf_url:
@@ -159,6 +164,7 @@ def apresentar_termo_card(
             destino,
             doc_items,
             trigger_state_class="is-assinado" if assinado else "",
+            src=menus_src,
         ))
 
     footer_kwargs = {
@@ -197,6 +203,8 @@ def apresentar_termo_card(
         "footer": entity_cards.footer(**footer_kwargs),
         "periodo": periodo,
         "oficio_label": oficio_label or "—",
+        # Os gatilhos de linha (`_termo_linha_menu.html`) apontam para cá (PF-04).
+        "menus_url": menus_src,
         "servidores": servidores_display,
         "servidores_count": len(servidores_display),
         "com_viatura": com_viatura,

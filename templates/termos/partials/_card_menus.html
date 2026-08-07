@@ -1,0 +1,18 @@
+{% comment %}
+Corpos dos menus de um card de Termo, servidos por `termos:card_menus` (PF-04).
+
+Duas famílias: o menu de documentos do rodapé e um por linha — cada servidor mais
+a viatura, quando houver.
+
+O card vem de `termos/card_builder.py`, o mesmo que a lista usa, com
+`menus_sob_demanda=False`. Por construção, o que sai daqui é o que estaria
+embutido.
+{% endcomment %}
+{% for menu in card.footer.menus %}{% include "components/ui/lists/entity_card_menu_body.html" with menu=menu csrf_token=csrf_token only %}{% endfor %}
+{% for menu in card.footer.danger_menus %}{% include "components/ui/lists/entity_card_menu_body.html" with menu=menu csrf_token=csrf_token only %}{% endfor %}
+{% for s in card.servidores %}{% if s.view_url or s.pdf_url or s.docx_url %}
+{% include "termos/partials/_termo_linha_menu_body.html" with menu_id=s.menu_id titulo=card.com_viatura|yesno:"Termo com viatura,Termo do servidor" subtitulo=s.name view_url=s.view_url pdf_url=s.pdf_url docx_url=s.docx_url only %}
+{% endif %}{% endfor %}
+{% if card.viatura_row %}{% if card.viatura_row.view_url or card.viatura_row.pdf_url or card.viatura_row.docx_url %}
+{% include "termos/partials/_termo_linha_menu_body.html" with menu_id=card.viatura_row.menu_id titulo="Termo da viatura" subtitulo=card.viatura_row.name view_url=card.viatura_row.view_url pdf_url=card.viatura_row.pdf_url docx_url=card.viatura_row.docx_url only %}
+{% endif %}{% endif %}

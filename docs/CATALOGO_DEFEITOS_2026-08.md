@@ -912,8 +912,24 @@ card (rodapé, uma por ofício vinculado, uma por documento e uma por servidor c
 | `gzip -6` | 19,4 KB | **14,8 KB** | −24% |
 | nós de elemento | 4.681 | **2.081** | −56% |
 
-**Faltam dois domínios:** `termos` (75 menus, 4 por linha) e `prestacoes_contas` (40, todos escritos
-à mão, por servidor da prestação e sem `get_*_by_id`).
+**`termos` migrado em 07/08** — menu no rodapé mais um por linha (cada servidor e a viatura):
+
+| `termos:index` | antes | depois | |
+|---|---|---|---|
+| bruto | 317,6 KB | **147,9 KB** | −53% |
+| `gzip -6` | 14,9 KB | **11,7 KB** | −21% |
+| nós de elemento | 3.824 | **1.439** | −62% |
+
+O card de termo era montado com uma dúzia de argumentos escritos direto em
+`termos/views.py`. Com o endpoint passou a haver dois chamadores, e repetir os argumentos faria o
+menu servido divergir do embutido em silêncio — inclusive furando o próprio teste de paridade, que
+compara contra esse caminho. A montagem foi para `termos/card_builder.py`, e os dois chamam.
+
+`_preview_body.html`, que o enunciado contava entre os menus de `termos`, **não é da lista**: é do
+wizard de conferência. Três caixas numa página de formulário não são o defeito.
+
+**Falta um domínio:** `prestacoes_contas` (40 menus, todos escritos à mão, por servidor da prestação
+e sem `get_*_by_id`).
 
 ### PF-05 🟡 A lista de Ofícios leva 127 ms no servidor · MED · —
 

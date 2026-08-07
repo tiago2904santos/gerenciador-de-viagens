@@ -38,7 +38,7 @@ from oficios.services import validar_oficio_para_documento
 from .forms import TermoAutorizacaoForm
 from .models import TermoAutorizacao
 from .presenters import apresentar_linha_simples_termo
-from .presenters import apresentar_termo_card
+from .card_builder import montar_card_de_termo
 from .selectors import get_servidor_do_termo_do_oficio
 from .selectors import get_servidor_para_termo
 from .selectors import get_termo_by_id
@@ -128,23 +128,11 @@ def index(request):
         for termo in page_obj.object_list
     ] if simples else []
 
+    # `PF-04`: a montagem mora em `card_builder` porque o endpoint de menus monta o
+    # mesmo card. Repetir a dúzia de argumentos nos dois faria o menu divergir da
+    # lista em silêncio.
     cards = [] if simples else [
-        apresentar_termo_card(
-            termo,
-            edit_url=reverse("termos:editar", args=[termo.pk]),
-            delete_url=reverse("termos:excluir", args=[termo.pk]),
-            delete_modal=True,
-            pdf_url=reverse("termos:baixar_termo_cadastro_pdf", args=[termo.pk]),
-            docx_url=reverse("termos:baixar_termo_cadastro_docx", args=[termo.pk]),
-            generico_pdf_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "pdf"]),
-            generico_docx_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "docx"]),
-            servidor_url_builder=_servidor_url(termo.pk),
-            servidor_view_url_builder=_servidor_view_url(termo.pk),
-            viatura_view_url=reverse("termos:termo_cadastro_viatura_pdf_inline", args=[termo.pk]),
-            viatura_pdf_url=reverse("termos:baixar_termo_cadastro_viatura", args=[termo.pk, "pdf"]),
-            viatura_docx_url=reverse("termos:baixar_termo_cadastro_viatura", args=[termo.pk, "docx"]),
-            **termo_cadastro_assinado_info(termo, None, artefatos_por_termo.get(termo.pk, {})),
-        )
+        montar_card_de_termo(termo, artefatos=artefatos_por_termo.get(termo.pk, {}))
         for termo in page_obj.object_list
     ]
     return render(
