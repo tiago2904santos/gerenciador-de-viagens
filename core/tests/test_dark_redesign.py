@@ -607,13 +607,11 @@ class DarkRedesignContractTests(SimpleTestCase):
                 source = (templates / relative).read_text(encoding="utf-8")
                 self.assertIn('components/ui/lists/entity_card.html', source)
 
-        generic = (
-            templates / "components" / "lists" / "main_list_card.html"
-        ).read_text(encoding="utf-8")
-        self.assertIn("cv-entity-card", generic)
-        self.assertIn("cv-entity-card__header", generic)
-        self.assertIn("cv-entity-card__body", generic)
-        self.assertIn("cv-entity-card__footer", generic)
+        # `HT-06`: `components/lists/main_list_card.html` foi apagado. Ele afirmava o
+        # mesmo contrato de `entity_card.html` e **nada o renderizava** — o único
+        # citador do repositório era este arquivo de teste, e ainda por cima numa
+        # asserção de que ele *não* aparece no lab (linha ~681). O contrato de
+        # `cv-entity-card` continua afirmado logo acima, sobre o componente canônico.
 
     def test_document_viewer_and_signature_use_canonical_components(self):
         templates = Path(settings.BASE_DIR) / "templates"

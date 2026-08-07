@@ -1517,7 +1517,7 @@ instalação nova, filtro sem resultado. SC 1.3.1 / 2.4.6.
 > Chamador sem `title` não renderiza heading nenhum — é o caso dos dois usos `variant="compact"`
 > (perfil e histórico de diárias), fora deste defeito por construção.
 
-### HT-06 🟡 Dez a quatorze componentes mortos · AUD · 0,5–1 d
+### HT-06 ✅ RESOLVIDO · 🟡 Dez a quatorze componentes mortos · AUD · 0,5–1 d
 
 **Duas auditorias independentes contaram diferente: 10 e 14 de 96.** A divergência é de critério —
 uma contou como vivo o componente alcançável a partir de página de laboratório sob `DEBUG`, a
@@ -1538,6 +1538,43 @@ que ele **não** aparece no lab — foi descontinuado e não apagado),
 **Quatro alcançáveis só sob `DEBUG`**, via `dev/ui_lab`: `components/lists/list_filters.html`
 (único includer é o órfão acima), `components/lists/list_grid.html`,
 `components/cards/document_card.html`, `components/ui/tables/data_table.html`.
+
+> **RESOLVIDO em 07/08/2026. As duas auditorias divergiam porque existem TRÊS situações, não duas.**
+> A medição por arquivo (`AGENTS.md` §3.6) separou:
+>
+> | situação | quantos | o que foi feito |
+> |---|---:|---|
+> | nenhum citador em lugar nenhum | 5 | apagados |
+> | citado só por um teste que afirma a **ausência** dele | 1 | apagado |
+> | órfão **em cascata**, revelado pelos anteriores | 1 | apagado |
+> | alcançável a partir do UI Lab, sob `DEBUG` | 7 | **mantidos** |
+>
+> **A cascata é o motivo de a regra valer mais que a lista.** `lists/list_filters.html` só era citado
+> por `lists/main_list_card.html` — o enunciado já suspeitava — e virou órfão no instante em que o
+> outro saiu. Quem contasse uma vez e apagasse a lista deixaria este para trás; quem roda a regra
+> **depois** de apagar, não. Foi o teste que apontou, não eu.
+>
+> **`main_list_card.html` era o caso mais estranho:** o único vestígio dele no repositório era
+> `core/tests/test_dark_redesign.py`, e ainda por cima numa asserção de que ele **não** aparece no
+> lab. Estava sendo mantido vivo pela própria prova de que não era usado.
+>
+> **Os 7 do laboratório não foram apagados, e a razão não é cautela.** Apagá-los é decidir para que
+> serve o UI Lab — e existem **dois** labs concorrentes sem regra de qual é o vigente, que é o
+> `BE-17`. Ficam nominados em `core/tests/test_componentes_sem_orfao.py`, com o citador de cada um,
+> para que a decisão seja de um passo: `field_action_button`, `floating_primary_action`,
+> `footer_action`, `forms/dropdown`, `collection_header`, `list_grid`, `data_table`.
+>
+> **Dois dos "citados como canônicos" saíram do `docs/COMPONENTES.md`** (`list_card_actions` e
+> `main_list_card`) e o terceiro ganhou a ressalva de que só existe no laboratório
+> (`collection_header`). O `form_errors`, que o enunciado citava junto, **deixou de ser morto pelo
+> `HT-03`**: hoje tem 20 chamadores.
+>
+> **`components/cards/document_card.html` não era morto** — o enunciado o listava entre os de
+> `DEBUG`, e a medição mostrou consumidor de produção. Não foi tocado.
+>
+> A trava é `test_componentes_sem_orfao.py`, e é sobre a **regra**: componente novo que ninguém
+> renderiza reprova, componente que perde o último consumidor reprova, e a lista do laboratório é
+> conferida nos dois sentidos — perder o citador do lab ou ganhar um de produção também reprova.
 
 ### HT-07 🟡 Concatenação condicional com "·" no template · AUD · 1–2 d
 
