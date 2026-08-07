@@ -1616,6 +1616,25 @@ emite `" is-assinado"` **com espaço**: é classe separada, não sufixo. A regra
 que sai da interpolação **cole** no token, e a lista caiu de 160 prefixos para 41. Conferido que
 `oficios.css` não muda com a regra nova — as mesmas 8 classes protegidas pelos dois métodos.
 
+**Terceira correção do enunciado: a contagem por arquivo superestima quando a classe é estilizada
+em MAIS DE UM CSS.** Medido em `cv-buttons.css`, o menor dos seis:
+
+| | |
+|---|---|
+| classes no arquivo | 59 |
+| sem nenhuma ocorrência em código | **25** ← é o que a auditoria contou (daí "49 blocos") |
+| dessas, estilizadas por **outro** CSS | **16** |
+| genuinamente órfãs | **9** |
+
+As 16 estão em `action-system.css` (12), `theme-dark-components.css` (5), `cv-select.css` (2),
+`ui-lab-fields.css` (2) e `utilities.css` (1). Elas são mortas de verdade — nenhum template as usa —,
+mas **removê-las por inteiro exige tocar dois arquivos**, e a regra de um-arquivo-por-PR do
+`AGENTS.md` §3.6 não prevê isso. Podar só a metade deixa regra órfã do outro lado.
+
+**Isto precisa de decisão antes de continuar:** ou a regra passa a admitir PR por *família de
+classe* em vez de por arquivo, ou o `UI-01` termina deixando ~16 classes meio-podadas só neste
+arquivo — e o padrão deve se repetir nos demais.
+
 **`oficios.css` fechado em 07/08.** 106,0 → 65,9 KB (−40,2 KB, −38%), 239 blocos removidos, 178
 classes. Prova: **15 de 16 comparações de tela pixel-idênticas** (8 páginas × 2 temas); a 16ª tem 63
 pixels de antialiasing na borda de um ícone, delta máximo de 4 em 255. Duas catracas desceram junto:
@@ -1632,6 +1651,7 @@ o `+` da concatenação fica no início da linha seguinte (`static/js/pages/ofic
 | `oficios.css` ✅ | 283 → medido 239 | 47 KB → medido 40,2 KB |
 | `page-shell.css` ✅ | 78 → medido 57 | 14 KB → medido 9,4 KB |
 | `roteiros.css` ✅ | 78 → medido 76 | 14 KB → medido 13,9 KB |
+| `cv-buttons.css` ✅ | 49 → medido 9 | 11 KB → medido 2,1 KB |
 | `dev/ui-lab-fields.css` | 96 | 18 KB |
 | `dev/ui-lab-pages.css` | 79 | 16 KB |
 | `page-shell.css` | 78 | 14 KB |
