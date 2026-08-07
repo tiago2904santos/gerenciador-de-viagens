@@ -128,8 +128,16 @@ def _temporal_badge_oficio(oficio):
     return f"há {dias} dias", "success"
 
 
-def apresentar_oficio_card(oficio, *, excluir_next_url=None):
+def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=True):
+    """Card da lista de Ofícios.
+
+    `menus_sob_demanda` liga o PF-04: os menus saem com `src` e o corpo deles não
+    vai no HTML da lista — quem serve é `oficios:card_menus`, no primeiro clique.
+    O endpoint chama este mesmo presenter com `False`, para renderizar os corpos.
+    """
     from termos.services import termo_oficio_assinado_info
+
+    menus_src = reverse("oficios:card_menus", args=[oficio.pk]) if menus_sob_demanda else ""
 
     servidores = list(oficio.servidores.all())
     termos_pks = {s.pk for s in oficio.servidores_termo_autorizacao.all()}
@@ -365,6 +373,7 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
                     view_title="Visualizar ofício",
                     docx_description="Arquivo editável do ofício",
                     trigger_aria=f"Abrir documentos do ofício {numero_display}",
+                    src=menus_src,
                 )
             ],
             danger_menus=[
@@ -378,9 +387,13 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
                     trigger_variant="edit",
                     trigger_aria="Mais ações do ofício",
                     trigger_tooltip="Mais ações",
+                    src=menus_src,
                 )
             ],
         ),
+        # Os gatilhos escritos à mão no `_oficio_card_body.html` (termo por
+        # servidor e documentos da justificativa) apontam para cá (PF-04).
+        "menus_url": menus_src,
         "oficio_pk": oficio.pk,
         "numero_display": numero_display,
         "protocolo_display": protocolo_display,

@@ -18,6 +18,7 @@ urlpatterns = [
     ),
     path("modelos-motivo/<int:pk>/excluir/", views.modelo_motivo_excluir, name="modelo_motivo_delete"),
     path("<int:pk>/", views.detalhe, name="detalhe"),
+    path("<int:pk>/menus/", views.card_menus, name="card_menus"),
     path("<int:pk>/editar/", views.editar, name="editar"),
     path("<int:pk>/dados-viajantes/", views.dados_viajantes, name="dados_viajantes"),
     path("<int:pk>/dados-viajantes/autosave/", views.dados_viajantes_autosave, name="dados_viajantes_autosave"),

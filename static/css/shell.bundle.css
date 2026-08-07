@@ -7457,6 +7457,15 @@ html[data-theme="dark"] .cv-action-menu {
   padding: 10px;
 }
 
+/* PF-04: o menu vem do servidor no primeiro clique. Se a busca falhar, o menu
+   abre com este aviso — clicar e não acontecer nada seria falha silenciosa. */
+.cv-action-menu__erro {
+  color: var(--action-danger-text, #b42318);
+  margin: 0;
+  max-width: 34ch;
+  padding: 10px 12px;
+}
+
 .cv-action-menu__heading {
   align-items: center;
   border-bottom: 1px solid var(--action-group-border);
