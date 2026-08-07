@@ -80,13 +80,32 @@ class NovoOficioEventoAreaTests(TestCase):
 
     def test_criar_oficio_em_evento_sem_area_herda_area_atual(self):
         self._activate_area()
+        # `DB-02`: `Evento.save()` agora deriva a área ativa, então o legado de
+        # verdade — linha antiga no banco, anterior ao backfill — é simulado por
+        # `update()`, que não passa pelo `save()`.
         evento = Evento.objects.create(titulo="Evento legado")
+        Evento.all_objects.filter(pk=evento.pk).update(area=None)
+        evento.refresh_from_db()
         self.assertIsNone(evento.area_id)
 
         oficio = criar_oficio_rascunho(evento=evento)
 
         self.assertEqual(oficio.area_id, self.area.pk)
         self.assertTrue(Oficio.objects.filter(pk=oficio.pk, area=self.area).exists())
+
+    def test_evento_criado_dentro_de_request_nao_nasce_mais_sem_area(self):
+        """`DB-02`, grupo operacional — o teste que falharia antes.
+
+        `Evento` era o único dos oito modelos do `core.E001` sem derivação de
+        área no `save()`: criado dentro de request por código que esquecesse
+        `area`, nascia no balde `area IS NULL`. Fora de request o comportamento
+        segue o do `BE-09`: nada é derivado, worker grava o que recebe.
+        """
+        self._activate_area()
+
+        evento = Evento.objects.create(titulo="Evento novo em request")
+
+        self.assertEqual(evento.area_id, self.area.pk)
 
     def test_view_novo_oficio_com_evento_redireciona_para_wizard(self):
         self.client.force_login(self.user)
