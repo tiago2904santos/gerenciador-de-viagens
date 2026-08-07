@@ -1,8 +1,0 @@
-{% if drive_autorizado %}
-  {% include "components/ui/badges/chip.html" with tone="success" label="Conectada" only %}
-{% else %}
-  {% include "components/ui/badges/chip.html" with tone="warning" label="Não conectada" only %}
-{% endif %}
-{% if not drive_modo_ativo %}
-  {% include "components/ui/badges/chip.html" with tone="muted" label="Modo mock" size="compact" only %}
-{% endif %}
