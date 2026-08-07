@@ -34,14 +34,23 @@ class OficioViewsTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_index_usa_modal_para_excluir_oficio(self):
+        """O item de excluir migrou para o menu sob demanda (`PF-04`).
+
+        O modal global continua na lista — ele é um só por página e não depende de
+        card. O item que o dispara é que passou a vir de `oficios:card_menus`, e é
+        lá que este teste foi conferir.
+        """
         oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         # Ofício sem data de viagem cai na aba "Em andamento e realizados" (atuais).
         response = self.client.get(reverse("oficios:index") + "?aba=atuais")
         self.assertContains(response, "data-delete-confirm-modal")
-        self.assertContains(response, 'data-overlay-target="delete-confirm-modal"')
+
+        menus = self.client.get(reverse("oficios:card_menus", args=[oficio.pk]))
+        self.assertContains(menus, 'data-overlay-target="delete-confirm-modal"')
         excluir_url = reverse("oficios:excluir", args=[oficio.pk])
         next_qs = urlencode({"next": reverse("oficios:index")})
-        self.assertContains(response, f'data-delete-url="{excluir_url}?{next_qs}"')
+        self.assertContains(menus, f'data-delete-url="{excluir_url}?{next_qs}"')
+        self.assertNotContains(menus, f'href="{excluir_url}"')
         self.assertNotContains(response, f'href="{excluir_url}"')
 
     def test_get_novo_nao_cria_rascunho(self):
@@ -112,12 +121,27 @@ class OficioViewsTests(TestCase):
         oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         oficio.servidores.add(self.servidor)
         response = self.client.get(reverse("oficios:index") + "?aba=atuais")
-        self.assertContains(response, "Visualizar ofício")
-        self.assertContains(response, reverse("oficios:wizard_documentos", args=[oficio.pk]))
-        self.assertNotContains(
-            response,
-            reverse("termos:termo_servidor_pdf_inline", args=[oficio.pk, self.servidor.pk]),
+        menus = self.client.get(reverse("oficios:card_menus", args=[oficio.pk]))
+
+        # Este teste afirmava que a LISTA continha `oficios:wizard_documentos`, e
+        # passava por acidente: `/oficios/1/documentos/` é prefixo de
+        # `/oficios/1/documentos/pdf/`, que é o link de baixar. O link do wizard
+        # nunca esteve no HTML da lista — `card["actions"]`, que o constrói, não é
+        # renderizado por template nenhum (`NOVO-37`). O que existe de verdade são
+        # os itens do menu de documentos, e depois do `PF-04` eles vivem no
+        # fragmento sob demanda. É isso que se afirma agora, com a URL inteira.
+        self.assertContains(menus, "Visualizar ofício")
+        self.assertContains(
+            menus, reverse("oficios:oficio_pdf_inline", args=[oficio.pk]) + '"'
         )
+        self.assertContains(
+            menus, reverse("oficios:baixar_documento", args=[oficio.pk, "pdf"]) + '"'
+        )
+        for resposta in (response, menus):
+            self.assertNotContains(
+                resposta,
+                reverse("termos:termo_servidor_pdf_inline", args=[oficio.pk, self.servidor.pk]),
+            )
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     @mock.patch(

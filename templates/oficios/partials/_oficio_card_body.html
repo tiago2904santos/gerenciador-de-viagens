@@ -29,44 +29,9 @@
           data-tooltip="{% if s.termo_assinado %}Termo assinado — ações{% else %}Ações do termo{% endif %}"
           data-overlay-trigger data-overlay-kind="menu"
           data-overlay-target="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}"
+          data-overlay-src="{{ card.menus_url }}"
         >{% include "components/ui/icons/icon.html" with icon="more" only %}</button>
-        <div class="cv-action-menu cv-action-menu--rich" id="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}" role="menu" hidden>
-          {% if s.termo_assinado %}
-            {% include "components/ui/menus/rich_menu_header.html" with title="Termo assinado" subtitle=s.name icon="sign" only %}
-          {% else %}
-            {% include "components/ui/menus/rich_menu_header.html" with title="Termo do servidor" subtitle=s.name icon="document" only %}
-          {% endif %}
-          {% if s.termo_open_url %}
-            {% include "components/ui/menus/rich_menu_link.html" with href=s.termo_open_url title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
-          {% endif %}
-          {% if s.termo_pdf_url %}
-            {% include "components/ui/menus/rich_menu_link.html" with href=s.termo_pdf_url title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" download=True only %}
-          {% endif %}
-          {% if s.termo_docx_url %}
-            {% include "components/ui/menus/rich_menu_link.html" with href=s.termo_docx_url title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" download=True only %}
-          {% endif %}
-          {% if s.termo_anexar_assinado_url %}
-          <button
-            type="button"
-            class="cv-action-menu__item cv-action-menu__item--rich{% if s.termo_assinado %} is-assinado{% endif %}"
-            role="menuitem"
-            data-attach-signed-trigger
-            data-attach-signed-url="{{ s.termo_anexar_assinado_url }}"
-            data-attach-signed-doc-label="o termo de {{ s.name }}"
-            data-attach-signed-current-name="{{ s.termo_assinado_nome_original }}"
-            data-attach-signed-current-view-url="{{ s.termo_assinado_view_url }}"
-            data-attach-signed-current-remove-url="{{ s.termo_remover_assinado_url }}"
-          >
-            <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
-              {% include "components/ui/icons/icon.html" with icon="sign" only %}
-            </span>
-            <span class="cv-action-menu__item-copy">
-              <strong>{% if s.termo_assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
-              <small>{% if s.termo_assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
-            </span>
-          </button>
-          {% endif %}
-        </div>
+        
       </div>
       {% endif %}
 
@@ -166,13 +131,9 @@
           data-tooltip="Visualizar e baixar"
           data-overlay-trigger data-overlay-kind="menu"
           data-overlay-target="justificativa-document-menu-{{ card.oficio_pk }}"
+          data-overlay-src="{{ card.menus_url }}"
         >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
-        <div class="cv-action-menu cv-action-menu--rich" id="justificativa-document-menu-{{ card.oficio_pk }}" role="menu" hidden>
-          {% include "components/ui/menus/rich_menu_header.html" with title="Justificativa" subtitle=card.numero_display icon="folder" only %}
-          {% include "components/ui/menus/rich_menu_link.html" with href=card.justificativa_visualizar_url title="Visualizar justificativa" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
-          {% include "components/ui/menus/rich_menu_link.html" with href=card.justificativa_pdf_url title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" download=True only %}
-          {% include "components/ui/menus/rich_menu_link.html" with href=card.justificativa_docx_url title="Baixar DOCX" description="Arquivo editável da justificativa" icon="docx" tone="docx" download=True only %}
-        </div>
+        
       </div>
     </li>
   </ul>

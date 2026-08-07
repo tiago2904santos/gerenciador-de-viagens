@@ -106,7 +106,7 @@ sem `destroy` fora da lista de exceções documentada.
 | ID | Defeito | Dias |
 |---|---|---:|
 | `PF-01` ✅ | Folha de símbolos de ícone: 378 `<svg>` inline = 192 KB por página de lista, vindos de uma cadeia de 222 linhas de `if/elif` — fechado em 06/08: 450,4 → 315,3 KB, 1.244 → 109 nós de forma; comprimido o ganho é nulo, ver catálogo | 2–3 |
-| `PF-04` 🟡 | Menu de ação sob demanda: 60 menus renderizados para 20 cards | 2–3 |
+| `PF-04` 🟡 | Menu de ação sob demanda: 60 menus renderizados para 20 cards — **Ofícios fechado em 07/08**: 315,3 → 166,5 KB, 3.636 → 1.676 nós, 133,8 → 86,1 ms; faltam 6 domínios, a máquina já está pronta | 2–3 |
 | `HT-*` | Componentes que faltam e duplicação estrutural — ver §4 | a definir |
 
 Esta etapa **fixa quais classes existem**. É a fronteira: depois dela, o CSS estiliza um conjunto

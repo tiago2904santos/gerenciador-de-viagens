@@ -34,11 +34,11 @@
     "oficios:index": {
       "200": {
         "consultas": 17,
-        "kb_html": 331.1
+        "kb_html": 174.8
       },
       "20000": {
         "consultas": 17,
-        "kb_html": 332.3
+        "kb_html": 175.5
       }
     },
     "ordens_servico:index": {

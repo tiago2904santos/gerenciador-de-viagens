@@ -827,10 +827,35 @@ documento abre transação de escrita.
 **Decisão humana necessária:** desligar sem mais nada faz a sessão de 8 h expirar a partir do
 login, não da última ação. Alternativas: backend `cached_db` ou renovar só perto do fim.
 
-### PF-04 🟡 60 menus de ação renderizados para 20 cards · MED · 2–3 d · risco médio
+### PF-04 🟡 PARCIAL (Ofícios fechado) · 60 menus de ação renderizados para 20 cards · MED · 2–3 d · risco médio
 
 Mesma página: 60 blocos `cv-action-menu` (3 por card) e 200 `cv-action-menu__item` (10 por card),
 todos no HTML inicial, quando no máximo um fica aberto por vez.
+
+**Os dois números do enunciado estão certos.** Conferi classe por classe: 60 e 200. Eu tinha dito
+"120 e 1.000" no PR do `PF-01` e aqui na sessão — era artefato do meu regex, que casava
+`cv-action-menu__item-icon` como se fosse `cv-action-menu__item`. O catálogo não estava
+subdimensionado; a medição errada era minha.
+
+**O preço, que o enunciado não tinha** (`oficios:index`, volume 200):
+
+| eixo | antes | depois | |
+|---|---|---|---|
+| HTML bruto | 315,3 KB | **166,5 KB** | −47% |
+| HTML `gzip -6` | 16,3 KB | **13,0 KB** | −20% |
+| nós de elemento | 3.636 | **1.676** | −54% |
+| tempo de servidor (mediana de 7) | 133,8 ms | **86,1 ms** | −36% |
+
+Diferente do `PF-01`, aqui o ganho de rede é real: menu é marcação com URL e rótulo por registro,
+não 380 cópias do mesmo `<svg>`.
+
+**Fechado em 07/08 para Ofícios.** A máquina é genérica: `entity_card_menu.html` passou a emitir só
+o gatilho quando o menu tem `src`, e o corpo saiu para `entity_card_menu_body.html`. Sem `src`, o
+corpo continua embutido — é essa regra que mantém os seis domínios não migrados funcionando sem
+tocar em nenhum deles. `oficios:card_menus` serve os três menus de um card de uma vez.
+
+**Falta migrar seis domínios:** `eventos` (80 menus), `termos` (75), `prestacoes_contas` (40),
+`planos_trabalho`, `ordens_servico` e `roteiros`. Cada um é um PR, e a máquina já está pronta.
 
 ### PF-05 🟡 A lista de Ofícios leva 127 ms no servidor · MED · —
 
@@ -2311,6 +2336,47 @@ prefixo por frente (`NOVO-BE-07`, `NOVO-QA-11`) ou sufixo da data de registro
 
 **Enquanto isso:** conferir `grep "^### NOVO-" docs/CATALOGO_DEFEITOS_2026-08.md | tail` **imediatamente
 antes** de escrever a entrada, e renumerar as próprias, nunca as alheias — quem chega depois cede.
+
+---
+
+### NOVO-37 ⚪ `NOVO` `apresentar_acoes_oficio` é construído por card e nunca renderizado · QA · 0,25 d
+
+`oficios/list_views.py:59` faz `card["actions"] = apresentar_acoes_oficio(...)` para cada card da
+lista. Nenhum template lê `card.actions`: o único que consumiria, `list_card_actions.html`, não é
+incluído por arquivo nenhum do projeto — conferido por grep.
+
+São 20 cards × 3 `reverse()` jogados fora por requisição, na página que o `PF-05` cronometra.
+
+**Como apareceu:** o `test_lista_visualizar_documento_aponta_para_etapa_documentos` afirmava que a
+lista continha `oficios:wizard_documentos`, e passava por acidente — `/oficios/1/documentos/` é
+prefixo de `/oficios/1/documentos/pdf/`, que é o link de baixar. O link do wizard nunca esteve no
+HTML da lista. O `PF-04` moveu os itens de menu para o fragmento, a asserção quebrou, e aí o teste
+vacuoso apareceu. O teste foi corrigido para afirmar a URL inteira; a função morta ficou.
+
+**Correção:** apagar a atribuição e, se não sobrar chamador, a função — com a prova de grep que o
+`AGENTS.md` §3.6 exige. Não entrou no `PF-04` porque é outro defeito e o §3.6 pede PR próprio.
+
+---
+
+### NOVO-38 🟡 `NOVO` O fragmento de menus custa 30 consultas para um card · BE · 0,5 d
+
+`oficios:card_menus` (`PF-04`) chama `apresentar_oficio_card` inteiro para montar 3 menus: **30
+consultas e 16,3 ms** por card. A lista faz 17 consultas para 20 cards.
+
+A conta por requisição: `cadastros_cidade` 6, `cadastros_estado` 6, `cargo` 3, `unidade` 3,
+`servidor` 2 — 20 das 30 são cabeçalho e linhas de servidor que o fragmento nem renderiza.
+
+**Foi decisão consciente, não descuido.** O caminho alternativo — um presenter só de menus — faria
+o menu poder divergir da lista sem ninguém notar, que é exatamente o que
+`test_paridade_de_acoes_com_o_caminho_embutido` existe para impedir. Pagar consulta e manter a
+paridade por construção é o lado certo dessa troca **enquanto for um domínio só**.
+
+**Efeito real:** abrir um menu passou de 0 para 30 consultas. Numa visita típica (1 ou 2 menus) a
+página sai de 17 para ~47; abrir todos os 20 cards daria 617.
+
+**Correção:** `select_related`/`prefetch_related` no caminho do fragmento, ou um argumento que
+mande o presenter pular cabeçalho e linhas. Melhor resolver quando os outros seis domínios
+migrarem, para o desenho nascer um só.
 
 ---
 

@@ -2567,11 +2567,99 @@ document.documentElement.dataset.appReady = "true";
       .forEach(closeMenu);
   }
 
+  /** Menus sob demanda (PF-04).
+   *
+   * A lista manda só os gatilhos; o corpo do menu vem de `data-overlay-src` no
+   * primeiro clique. Um card serve todos os seus menus numa requisição só, então
+   * `buscasEmVoo` guarda a promessa por URL: dois cliques rápidos em gatilhos do
+   * mesmo card não viram duas viagens.
+   *
+   * Materializado uma vez, o menu fica no DOM. A segunda abertura é instantânea
+   * e todo o caminho existente (rememberOwner, closeMenu, posicionamento) não
+   * sabe que a origem mudou.
+   */
+  var buscasEmVoo = {};
+
+  function materializarMenus(src) {
+    if (buscasEmVoo[src]) return buscasEmVoo[src];
+    if (!window.CV || !window.CV.http) {
+      return Promise.reject(new Error("CV.http indisponível"));
+    }
+    var promessa = window.CV.http
+      .fetchText(src)
+      .then(function (resultado) {
+        if (!resultado.ok) {
+          throw new Error("HTTP " + resultado.status);
+        }
+        // DOMParser, e não innerHTML: o fragmento é marcação nossa, vinda do
+        // servidor e já escapada pelo Django, então escapá-la de novo a
+        // destruiria — mas parsear fora do documento vivo não executa script e
+        // não é o padrão que o auditor de frontend proíbe.
+        var doc = new DOMParser().parseFromString(resultado.data, "text/html");
+        var inseridos = 0;
+        Array.prototype.slice
+          .call(doc.querySelectorAll(".cv-action-menu"))
+          .forEach(function (bloco) {
+            if (bloco.id && document.getElementById(bloco.id)) return;
+            document.body.appendChild(document.importNode(bloco, true));
+            inseridos += 1;
+          });
+        if (!inseridos) {
+          throw new Error("resposta sem menu");
+        }
+        return inseridos;
+      })
+      .catch(function (erro) {
+        // Sem isto, a falha some: o usuário clica e nada acontece. Solta a
+        // promessa para que o próximo clique tente de novo.
+        delete buscasEmVoo[src];
+        throw erro;
+      });
+    buscasEmVoo[src] = promessa;
+    return promessa;
+  }
+
+  /** Menu de erro, para o clique nunca terminar em silêncio. */
+  function menuDeFalha(id) {
+    var bloco = document.createElement("div");
+    bloco.className = "cv-action-menu cv-action-menu--rich";
+    bloco.id = id;
+    bloco.setAttribute("role", "menu");
+    bloco.hidden = true;
+    var aviso = document.createElement("p");
+    aviso.className = "cv-action-menu__erro";
+    aviso.setAttribute("role", "alert");
+    aviso.textContent =
+      "Não foi possível carregar as ações. Verifique a conexão e tente de novo.";
+    bloco.appendChild(aviso);
+    document.body.appendChild(bloco);
+    return bloco;
+  }
+
   function openMenu(trigger) {
-    var menu = document.getElementById(
-      trigger.getAttribute("data-overlay-target")
-    );
+    var alvo = trigger.getAttribute("data-overlay-target");
+    var src = trigger.getAttribute("data-overlay-src");
+    var menu = document.getElementById(alvo);
+    if (!menu && src) {
+      if (trigger.getAttribute("aria-busy") === "true") return;
+      trigger.setAttribute("aria-busy", "true");
+      materializarMenus(src)
+        .then(function () {
+          trigger.removeAttribute("aria-busy");
+          if (document.getElementById(alvo)) openMenu(trigger);
+          else abrirMenuResolvido(trigger, menuDeFalha(alvo));
+        })
+        .catch(function () {
+          trigger.removeAttribute("aria-busy");
+          abrirMenuResolvido(trigger, menuDeFalha(alvo));
+        });
+      return;
+    }
     if (!menu) return;
+    abrirMenuResolvido(trigger, menu);
+  }
+
+  function abrirMenuResolvido(trigger, menu) {
     var wasOpen = menu.classList.contains("cv-action-menu--open");
     closeMenus();
     if (wasOpen) return;

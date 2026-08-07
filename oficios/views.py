@@ -1,6 +1,7 @@
 """Fachada pública das views de Ofícios (P-06)."""
 
 from .api_views import api_viatura_por_placa
+from .card_menu_views import card_menus
 from .catalogs import (
     modelo_motivo_definir_padrao,
     modelo_motivo_editar,
@@ -49,6 +50,7 @@ __all__ = [
     "baixar_justificativa_documento",
     "baixar_ordem_servico_documento",
     "cancelar",
+    "card_menus",
     "dados_viajantes",
     "dados_viajantes_autosave",
     "detalhe",
