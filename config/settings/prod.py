@@ -19,6 +19,16 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+# NOVO-12, mesma regra do REDIS_URL logo abaixo: falhar cedo no settings em vez
+# de degradar calado. Com DEBUG=False e esta lista vazia, TODA requisição vira
+# 400 — o Django só avisa com `security.W020` (Warning), que o gate
+# `--fail-level ERROR` do deploy não trava.
+if not ALLOWED_HOSTS:
+    raise RuntimeError(
+        "ALLOWED_HOSTS é obrigatória em produção: vazia, toda requisição "
+        "responde 400 com DEBUG=False.",
+    )
+
 required_db_vars = ["DB_NAME", "DB_USER", "DB_PASSWORD"]
 missing_db_vars = [name for name in required_db_vars if not os.getenv(name)]
 

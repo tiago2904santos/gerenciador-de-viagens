@@ -64,6 +64,16 @@ def _contar_sem_area(modelos):
 
 @register(Tags.security, deploy=True)
 def check_document_generation_sla_configuration(app_configs, **kwargs):
+    """`core.W002` — era `core.E002`, rebaixado de propósito (`NOVO-12`).
+
+    Produção roda `DOCUMENTOS_DEFAULT_PDF_ENGINE=auto` e não tem unoserver no ar.
+    Enquanto o check era `Error`, ligar `check --deploy --fail-level ERROR` no
+    `deploy.yml` travaria todo deploy — e um check que ninguém pode satisfazer não
+    é catraca, é ruído. O SLA real de geração continua medido pelo CI ("Enforce
+    real document generation SLA" em `tests.yml`, com unoserver de verdade).
+    Quando produção subir o unoserver e ligar as duas variáveis, este aviso some;
+    repromovê-lo a `Error` aí volta a ser catraca honesta.
+    """
     engine = (
         getattr(settings, "DOCUMENTOS_DEFAULT_PDF_ENGINE", "") or ""
     ).strip().lower()
@@ -71,7 +81,7 @@ def check_document_generation_sla_configuration(app_configs, **kwargs):
     if engine == "unoserver" and url:
         return []
     return [
-        Error(
+        CheckWarning(
             "Produção deve usar o conversor LibreOffice residente (unoserver).",
             hint=(
                 "Defina DOCUMENTOS_DEFAULT_PDF_ENGINE=unoserver e "
@@ -79,7 +89,49 @@ def check_document_generation_sla_configuration(app_configs, **kwargs):
                 "`documentos_unoserver_check --benchmark "
                 "--representative-resources --max-ms 1000 --iterations 3`."
             ),
-            id="core.E002",
+            id="core.W002",
+        ),
+    ]
+
+
+#: Espelho dos critérios de `security.W009` do Django — que é **Warning**, e o
+#: gate do deploy roda com `--fail-level ERROR`. Sem esta promoção, a chave de 9
+#: caracteres que motivou o `NOVO-12` passaria pelo gate que existe por causa dela.
+_SECRET_KEY_MIN_LENGTH = 50
+_SECRET_KEY_MIN_UNIQUE_CHARS = 5
+_SECRET_KEY_INSECURE_PREFIX = "django-insecure-"
+
+
+@register(Tags.security, deploy=True)
+def check_secret_key_strength(app_configs, **kwargs):
+    """`core.E003` — `SECRET_KEY` fraca bloqueia o deploy (`NOVO-12`).
+
+    É ela que assina cookie de sessão e token de recuperação de senha: com uma
+    chave curta dá para forjar sessão de qualquer usuário, superusuário incluído.
+    O defeito medido em 06/08/2026 (9 caracteres, no VPS) era exatamente o caso
+    que nenhum grep por placeholder pega — só uma régua olhando a configuração
+    carregada.
+    """
+    chave = str(getattr(settings, "SECRET_KEY", "") or "")
+    fraca = (
+        len(chave) < _SECRET_KEY_MIN_LENGTH
+        or len(set(chave)) < _SECRET_KEY_MIN_UNIQUE_CHARS
+        or chave.startswith(_SECRET_KEY_INSECURE_PREFIX)
+    )
+    if not fraca:
+        return []
+    return [
+        Error(
+            "SECRET_KEY fraca para produção: são necessários ao menos "
+            f"{_SECRET_KEY_MIN_LENGTH} caracteres, "
+            f"{_SECRET_KEY_MIN_UNIQUE_CHARS} distintos, sem o prefixo "
+            f"'{_SECRET_KEY_INSECURE_PREFIX}'.",
+            hint=(
+                "Gere com `python -c \"import secrets; "
+                "print(secrets.token_urlsafe(64))\"` e troque no .env; sessões "
+                "ativas serão invalidadas."
+            ),
+            id="core.E003",
         ),
     ]
 
