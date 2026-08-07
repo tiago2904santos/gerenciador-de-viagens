@@ -19,6 +19,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from cadastros.models import Cidade
+from cadastros.models import Servidor
 from core import documento_abas as tabs
 from core.normalizers import remove_accents
 from core.tenancy import filter_queryset_by_area
@@ -144,10 +145,21 @@ def queryset_evento_detalhe():
         "unidade_responsavel", "responsavel"
     ).prefetch_related(
         "oficios",
-        "oficios__servidores",
+        # `NOVO-38`: sem o `select_related` aqui, o card do evento consultava
+        # `cargo` e `unidade` de cada servidor — parte das 59 consultas que o
+        # fragmento de menus do `PF-04` custava.
+        Prefetch(
+            "oficios__servidores",
+            queryset=Servidor.objects.select_related("cargo", "unidade").order_by("nome"),
+        ),
         "oficios__servidores_termo_autorizacao",
         "oficios__roteiro__destinos__cidade__estado",
-        "oficios__roteiro__trechos",
+        Prefetch(
+            "oficios__roteiro__trechos",
+            queryset=RoteiroTrecho.objects.select_related(
+                "origem_cidade", "origem_estado", "destino_cidade", "destino_estado"
+            ).order_by("ordem"),
+        ),
         "oficios__viatura",
         "oficios__motorista",
         "roteiros",

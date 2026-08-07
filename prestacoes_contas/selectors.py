@@ -88,13 +88,34 @@ def get_servidor_prestacao_by_id(pk):
     O `select_related` acompanha o que o presenter do card toca, para o fragmento
     não virar um festival de consultas — ver `NOVO-38`.
     """
-    queryset = _filter_servidores_by_area(PrestacaoServidor.objects).select_related(
-        "servidor",
-        "servidor__cargo",
-        "servidor__unidade",
-        "prestacao",
-        "prestacao__oficio",
-        "prestacao__oficio__roteiro",
+    queryset = (
+        _filter_servidores_by_area(PrestacaoServidor.objects)
+        .select_related(
+            "servidor",
+            "servidor__cargo",
+            "servidor__unidade",
+            "prestacao",
+            "prestacao__oficio",
+            "prestacao__oficio__roteiro",
+            "prestacao__oficio__roteiro__origem_cidade",
+            "prestacao__oficio__roteiro__origem_estado",
+            "prestacao__oficio__viatura",
+            "prestacao__oficio__motorista",
+        )
+        .prefetch_related(
+            # `NOVO-38`: a mesma forma de `_base_servidores`. O presenter é o
+            # mesmo, e ele toca `cidade` e `estado` de cada destino e trecho.
+            Prefetch(
+                "prestacao__oficio__roteiro__trechos",
+                queryset=RoteiroTrecho.objects.select_related(
+                    "origem_cidade", "origem_estado", "destino_cidade", "destino_estado"
+                ).order_by("ordem"),
+            ),
+            Prefetch(
+                "prestacao__oficio__roteiro__destinos",
+                queryset=RoteiroDestino.objects.select_related("cidade", "estado").order_by("ordem"),
+            ),
+        )
     )
     return get_object_or_404(queryset, pk=pk)
 

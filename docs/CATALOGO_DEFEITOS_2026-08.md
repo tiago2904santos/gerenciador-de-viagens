@@ -2496,7 +2496,7 @@ O tempo não mudou de forma mensurável (86,7 → 88,4 ms de mediana; a diferen�
 
 ---
 
-### NOVO-38 🟡 `NOVO` O fragmento de menus custa 30 consultas para um card · BE · 0,5 d
+### NOVO-38 ✅ RESOLVIDO · 🟡 `NOVO` O fragmento de menus custa 30 consultas para um card · BE · 0,5 d
 
 `oficios:card_menus` (`PF-04`) chama `apresentar_oficio_card` inteiro para montar 3 menus: **30
 consultas e 16,3 ms** por card. A lista faz 17 consultas para 20 cards.
@@ -2515,6 +2515,37 @@ página sai de 17 para ~47; abrir todos os 20 cards daria 617.
 **Correção:** `select_related`/`prefetch_related` no caminho do fragmento, ou um argumento que
 mande o presenter pular cabeçalho e linhas. Melhor resolver quando os outros seis domínios
 migrarem, para o desenho nascer um só.
+
+**Fechado em 07/08**, com os cinco endpoints já existindo — foi o que permitiu ver que havia **dois
+problemas diferentes** debaixo do mesmo número:
+
+| endpoint | antes | depois | |
+|---|---|---|---|
+| `oficios:card_menus` | 30 | **12** | N+1 real |
+| `prestacoes_contas:card_menus` | 28 | **15** | N+1 real |
+| `eventos:card_menus` | 59 | **45** | quase tudo custo fixo |
+| `ordens_servico:card_menus` | 19 | 19 | custo fixo |
+| `planos_trabalho:card_menus` | 12 | 12 | custo fixo |
+| `termos:card_menus` | 9 | 9 | já estava certo |
+
+**1. N+1 de verdade**, em `oficios` e `prestacoes_contas`: os selectors de registro único não tinham
+a carga que os de lista já tinham desde o `NOVO-08`, e o presenter percorre destinos e trechos
+tocando `cidade` e `estado` de cada um. Corrigido copiando a forma do selector de lista — a página
+de detalhe ganha junto.
+
+**2. Custo fixo de `prefetch_related`, que não é defeito.** Cada nível de `__` numa cadeia de
+prefetch é uma consulta. `queryset_evento_detalhe` tem ~20 entradas, várias com três ou quatro
+níveis. Numa lista de 20 cards isso se amortiza — `eventos:index` faz 34 consultas para a página
+inteira. Para **um** registro, o mesmo custo não amortiza.
+
+Ou seja: comparar "45 consultas para um card" com "34 para vinte" é comparar coisas diferentes.
+Baixar os 45 exigiria um queryset mais magro só para o fragmento, e o card de evento realmente lê
+planos, ordens, convites e termos — magro demais traz o N+1 de volta. Fica como está, medido e
+explicado, em vez de otimizado no escuro.
+
+A rede é `core/tests/test_custo_do_fragmento_de_menus.py`, e guarda o eixo certo: **dobrar o
+tamanho do registro não pode dobrar as consultas**. Contar um número fixo envelheceria no primeiro
+campo novo.
 
 ---
 
