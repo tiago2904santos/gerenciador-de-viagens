@@ -1,9 +1,6 @@
 import json
 
 from core import entity_cards
-from core.presenters.actions import build_action
-from core.presenters.actions import build_delete_action
-from core.presenters.actions import build_edit_action
 from core.presenters.badges import build_badge
 from core.presenters.meta import build_meta
 from core.utils.masks import format_placa
@@ -629,34 +626,6 @@ def apresentar_pagina_detalhe_oficio(oficio):
         "custeio": oficio.get_custeio_display(),
         "custeio_observacao": oficio.custeio_observacao or "—",
     }
-
-
-def apresentar_acoes_oficio(
-    *,
-    editar_url: str,
-    excluir_url: str,
-    visualizar_documento_url: str | None = None,
-    visualizar_documento_nova_aba: bool = False,
-    detalhe_url: str | None = None,
-):
-    """`detalhe_url` é aceito mas ignorado (compatibilidade com chamadas antigas)."""
-    actions = []
-    if visualizar_documento_url:
-        actions.append(
-            build_action(
-                "Visualizar documento",
-                visualizar_documento_url,
-                link_target="_blank" if visualizar_documento_nova_aba else None,
-                link_rel="noopener noreferrer" if visualizar_documento_nova_aba else None,
-            )
-        )
-    actions.extend(
-        [
-            build_edit_action(editar_url),
-            build_delete_action(excluir_url),
-        ],
-    )
-    return [a for a in actions if a]
 
 
 def apresentar_oficio_wizard_header(etapa_atual, oficio=None):
