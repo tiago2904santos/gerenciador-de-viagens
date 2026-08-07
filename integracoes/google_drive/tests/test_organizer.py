@@ -13,6 +13,7 @@ from eventos.models import TipoEvento
 from oficios.models import Oficio
 from integracoes.google_drive import naming, organizer, services
 from integracoes.google_drive.models import DriveArquivo
+from core.testing import area_de_teste
 
 
 def _http_404():
@@ -42,24 +43,24 @@ def _pdf(name):
 class OrganizerTests(TestCase):
     def setUp(self):
         services._reset_client()
-        self.cargo = Cargo.objects.create(nome="Investigador")
-        self.ana = Servidor.objects.create(nome="Ana", cargo=self.cargo, cpf="12345678901")
-        self.bruno = Servidor.objects.create(nome="Bruno", cargo=self.cargo, cpf="98765432100")
-        self.evento = Evento.objects.create(
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Investigador")
+        self.ana = Servidor.objects.create(area=area_de_teste(), nome="Ana", cargo=self.cargo, cpf="12345678901")
+        self.bruno = Servidor.objects.create(area=area_de_teste(), nome="Bruno", cargo=self.cargo, cpf="98765432100")
+        self.evento = Evento.objects.create(area=area_de_teste(), 
             destino_cidade="Maringá",
             destino_uf="PR",
             data_inicio=date(2026, 7, 22),
             data_fim=date(2026, 7, 23),
         )
-        self.evento.tipos.add(TipoEvento.objects.get_or_create(nome="PCPR na Comunidade")[0])
-        self.oficio = Oficio.objects.create(
+        self.evento.tipos.add(TipoEvento.objects.get_or_create(area=area_de_teste(), nome="PCPR na Comunidade")[0])
+        self.oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1, ano=2026, protocolo="123456789", motivo="m", evento=self.evento,
         )
         self.oficio.servidores.add(self.ana, self.bruno)
 
     def _artefato(self, tipo, servidor=None, name="doc.pdf"):
         arquivo, digest = _pdf(name)
-        return DocumentoArtefato.objects.create(
+        return DocumentoArtefato.objects.create(area=area_de_teste(), 
             tipo=tipo, formato="pdf", oficio=self.oficio, servidor=servidor,
             hash_sha256=digest, arquivo=arquivo,
         )
@@ -203,7 +204,7 @@ class OrganizerTests(TestCase):
 
         estado = Estado.objects.create(nome="Paraná", sigla="PR")
         cidade = Cidade.objects.create(nome="Rio Branco do Sul", uf="PR", estado=estado)
-        ordem = OrdemServico.objects.create(
+        ordem = OrdemServico.objects.create(area=area_de_teste(), 
             numero=4, ano=2026,
             data_evento_inicio=date(2026, 7, 17), data_evento_fim=date(2026, 7, 17),
         )
@@ -268,7 +269,7 @@ class OrganizerTests(TestCase):
         recalcular, e "Reorganizar" nunca corrigia."""
         from ordens_servico.models import OrdemServico
 
-        ordem = OrdemServico.objects.create(
+        ordem = OrdemServico.objects.create(area=area_de_teste(), 
             numero=7, ano=2026,
             data_evento_inicio=date(2026, 7, 21), data_evento_fim=date(2026, 7, 27),
         )
@@ -296,14 +297,14 @@ class OrganizerTests(TestCase):
         canônica)."""
         from ordens_servico.models import OrdemServico
 
-        ordem_12 = OrdemServico.objects.create(
+        ordem_12 = OrdemServico.objects.create(area=area_de_teste(), 
             numero=12, ano=2026,
             data_evento_inicio=date(2026, 7, 23), data_evento_fim=date(2026, 7, 26),
         )
         ordem_12.oficios.add(self.oficio)
         ordem_12.servidores.add(self.ana)
 
-        ordem_15 = OrdemServico.objects.create(
+        ordem_15 = OrdemServico.objects.create(area=area_de_teste(), 
             numero=15, ano=2026,
             data_evento_inicio=date(2026, 7, 23), data_evento_fim=date(2026, 7, 26),
         )
@@ -344,22 +345,22 @@ class CancelamentoTests(TestCase):
 
     def setUp(self):
         services._reset_client()
-        self.cargo = Cargo.objects.create(nome="Investigador")
-        self.ana = Servidor.objects.create(nome="Ana", cargo=self.cargo, cpf="12345678901")
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Investigador")
+        self.ana = Servidor.objects.create(area=area_de_teste(), nome="Ana", cargo=self.cargo, cpf="12345678901")
         with self.captureOnCommitCallbacks(execute=True):
-            self.evento = Evento.objects.create(
+            self.evento = Evento.objects.create(area=area_de_teste(), 
                 titulo="Evento de teste", destino_cidade="Maringá", destino_uf="PR",
                 data_inicio=date(2026, 7, 22), data_fim=date(2026, 7, 23),
             )
-        self.evento.tipos.add(TipoEvento.objects.get_or_create(nome="PCPR na Comunidade")[0])
-        self.oficio = Oficio.objects.create(
+        self.evento.tipos.add(TipoEvento.objects.get_or_create(area=area_de_teste(), nome="PCPR na Comunidade")[0])
+        self.oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1, ano=2026, protocolo="123456789", motivo="m", evento=self.evento,
         )
         self.oficio.servidores.add(self.ana)
 
     def _artefato(self, tipo, name="doc.pdf"):
         arquivo, digest = _pdf(name)
-        return DocumentoArtefato.objects.create(
+        return DocumentoArtefato.objects.create(area=area_de_teste(), 
             tipo=tipo, formato="pdf", oficio=self.oficio, hash_sha256=digest, arquivo=arquivo,
         )
 
@@ -487,10 +488,10 @@ class SincronizarPastaEventoTests(TestCase):
         )
         dados.update(overrides)
         with self.captureOnCommitCallbacks(execute=True):
-            return Evento.objects.create(**dados)
+            return Evento.objects.create(area=area_de_teste(), **dados)
 
     def test_sincronizar_pasta_evento_nao_cria_pasta_sem_dados_essenciais(self):
-        evento = Evento.objects.create()
+        evento = Evento.objects.create(area=area_de_teste())
         self.assertEqual(evento.status, Evento.STATUS_RASCUNHO)
 
         with patch(
@@ -576,7 +577,7 @@ class SincronizarPastaEventoTests(TestCase):
         with patch(
             "integracoes.google_drive.services._MockClient.get_or_create_pasta"
         ) as mock_create:
-            Evento.objects.create()
+            Evento.objects.create(area=area_de_teste())
         mock_create.assert_not_called()
 
     def test_evento_ao_salvar_nao_cria_pasta_com_drive_desligado(self):
@@ -593,7 +594,7 @@ class SincronizarPastaEventoTests(TestCase):
         normal do wizard), a MESMA pasta deve ser renomeada — não pode sobrar
         uma pasta órfã com o nome antigo."""
         client = services.get_client()
-        evento = Evento.objects.create()
+        evento = Evento.objects.create(area=area_de_teste())
         pasta_inicial = organizer._pasta_evento_folder(client, evento)
 
         evento.destino_cidade = "Maringá"
@@ -609,7 +610,7 @@ class SincronizarPastaEventoTests(TestCase):
         vida (via registro persistido), não uma recém-criada por busca de nome
         desatualizada — senão a pasta de verdade fica órfã no Drive."""
         client = services.get_client()
-        evento = Evento.objects.create()
+        evento = Evento.objects.create(area=area_de_teste())
         pasta_id = organizer._pasta_evento_folder(client, evento)
 
         evento.destino_cidade = "Maringá"

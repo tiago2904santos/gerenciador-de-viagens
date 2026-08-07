@@ -3,16 +3,21 @@ from django.test import TestCase
 from cadastros.models import ConfiguracaoSistema
 from oficios.docxtpl_context import build_oficio_docxtpl_context
 from oficios.models import Oficio
+from core.testing import area_de_teste
+from core.testing import com_request
 
 
 class RodapeOficioDocxtplTests(TestCase):
     def setUp(self):
+        # DB-02: selectors/forms/services recortam pela area do request;
+        # chamada direta reproduz o contexto que a view teria.
+        self.enterContext(com_request(area_de_teste()))
         self.cfg = ConfiguracaoSistema.get_singleton()
 
     def test_email_minusculo(self):
         self.cfg.email = "Contato@EXEMPLO.GOV.BR"
         self.cfg.save(update_fields=["email"])
-        oficio = Oficio.objects.create()
+        oficio = Oficio.objects.create(area=area_de_teste())
         ctx = build_oficio_docxtpl_context(oficio)
         self.assertEqual(ctx["email"], "contato@exemplo.gov.br")
 
@@ -33,7 +38,7 @@ class RodapeOficioDocxtplTests(TestCase):
                 "cep",
             ],
         )
-        oficio = Oficio.objects.create()
+        oficio = Oficio.objects.create(area=area_de_teste())
         ctx = build_oficio_docxtpl_context(oficio)
         self.assertIn(" - ", ctx["endereco"])
         self.assertIn("Londrina/PR", ctx["endereco"])

@@ -30,9 +30,13 @@ def _sincronizar_prestacao_servidores(oficio):
     # de baixo e no `defaults`. Com `objects` e área do ofício diferente da ativa,
     # o `get` não acharia a prestação existente e o `create` duplicaria — este
     # signal roda a cada mudança de equipe do ofício.
+    # `area_id`, não `area`: com o NOT NULL do `DB-02`, ler `oficio.area` num
+    # ofício órfão levanta `RelatedObjectDoesNotExist` — e este signal roda no
+    # `backfill_legacy_areas`, que é executado justamente sobre o banco
+    # pré-migração, onde o órfão ainda existe.
     prestacao, _ = PrestacaoContas.all_objects.get_or_create(
         oficio=oficio,
-        defaults={"area": oficio.area},
+        defaults={"area_id": oficio.area_id},
     )
     if prestacao.area_id is None and oficio.area_id:
         prestacao.area = oficio.area

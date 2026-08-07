@@ -17,19 +17,22 @@ from oficios.models import Oficio
 from prestacoes_contas.models import PrestacaoContas
 from prestacoes_contas.models import PrestacaoServidor
 from roteiros.models import Roteiro
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class DocumentoAbasOficioTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="abas", password="x")
         self.client.force_login(self.user)
+        vincular_area(self.user)
 
     def _oficio(self, numero, *, saida_offset=None, cancelado=False):
         roteiro = None
         if saida_offset is not None:
             saida = timezone.now() + timedelta(days=saida_offset)
-            roteiro = Roteiro.objects.create(saida_dt=saida)
-        oficio = Oficio.objects.create(numero=numero, ano=2026, roteiro=roteiro, cancelado=cancelado)
+            roteiro = Roteiro.objects.create(area=area_de_teste(), saida_dt=saida)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=numero, ano=2026, roteiro=roteiro, cancelado=cancelado)
         return oficio
 
     def _base_anotada(self, queryset):
@@ -60,7 +63,7 @@ class DocumentoAbasOficioTests(TestCase):
         from cadastros.models import Servidor
 
         oficio = self._oficio(1, saida_offset=-5)
-        servidor = Servidor.objects.create(nome="Servidor A", cpf="12345678901")
+        servidor = Servidor.objects.create(area=area_de_teste(), nome="Servidor A", cpf="12345678901")
         oficio.servidores.add(servidor)
         prestacao = PrestacaoContas.objects.get(oficio=oficio)
         ps = prestacao.servidores_prestacao.get()

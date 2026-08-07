@@ -3,6 +3,7 @@ from django.test import TestCase
 
 from core.models import AuditEvent
 from eventos.models import Evento
+from core.testing import area_de_teste
 
 
 class AuditEventTests(TestCase):
@@ -23,7 +24,7 @@ class AuditEventTests(TestCase):
 
     def test_registra_criacao_e_alteracao_de_dominio(self):
         with self.captureOnCommitCallbacks(execute=True):
-            evento = Evento.objects.create(titulo="Auditado")
+            evento = Evento.objects.create(area=area_de_teste(), titulo="Auditado")
         with self.captureOnCommitCallbacks(execute=True):
             evento.titulo = "Auditado alterado"
             evento.save(update_fields=["titulo", "atualizado_em"])
@@ -54,7 +55,7 @@ class AuditEventTests(TestCase):
         # E o modelo real continua produzindo evento pelo signal.
         antes = AuditEvent.objects.count()
         with self.captureOnCommitCallbacks(execute=True):
-            Evento.objects.create(titulo="Criado por usuário")
+            Evento.objects.create(area=area_de_teste(), titulo="Criado por usuário")
         self.assertEqual(AuditEvent.objects.count(), antes + 1)
 
     def test_evento_de_auditoria_nao_pode_ser_alterado_ou_excluido(self):

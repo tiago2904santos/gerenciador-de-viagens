@@ -12,6 +12,7 @@ from oficios.models import Oficio
 from prestacoes_contas.models import PrestacaoContas
 from integracoes.google_drive import organizer, services
 from integracoes.google_drive.models import DriveArquivo, DriveArquivoExterno
+from core.testing import area_de_teste
 
 
 def _pdf(name="d.pdf"):
@@ -23,21 +24,21 @@ def _pdf(name="d.pdf"):
 class DualOrganizationTests(TestCase):
     def setUp(self):
         services._reset_client()
-        self.cargo = Cargo.objects.create(nome="Investigador")
-        self.ana = Servidor.objects.create(nome="Ana", cargo=self.cargo, cpf="12345678901")
-        self.evento = Evento.objects.create(
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Investigador")
+        self.ana = Servidor.objects.create(area=area_de_teste(), nome="Ana", cargo=self.cargo, cpf="12345678901")
+        self.evento = Evento.objects.create(area=area_de_teste(), 
             destino_cidade="Maringá", destino_uf="PR",
             data_inicio=date(2026, 7, 22), data_fim=date(2026, 7, 23),
         )
-        self.evento.tipos.add(TipoEvento.objects.get_or_create(nome="PCPR na Comunidade")[0])
-        self.oficio = Oficio.objects.create(
+        self.evento.tipos.add(TipoEvento.objects.get_or_create(area=area_de_teste(), nome="PCPR na Comunidade")[0])
+        self.oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1, ano=2026, protocolo="123456789", motivo="m", evento=self.evento,
         )
         self.oficio.servidores.add(self.ana)
 
     def _art(self, tipo, *, evento=None, oficio=None, nome_drive="", name="d.pdf"):
         arquivo, digest = _pdf(name)
-        return DocumentoArtefato.objects.create(
+        return DocumentoArtefato.objects.create(area=area_de_teste(), 
             tipo=tipo, formato="pdf", oficio=oficio, evento=evento,
             nome_drive=nome_drive, hash_sha256=digest, arquivo=arquivo,
         )
@@ -76,7 +77,7 @@ class DualOrganizationTests(TestCase):
         from planos_trabalho.models import PlanoTrabalho
         from integracoes.google_drive import naming
 
-        plano = PlanoTrabalho.objects.create(
+        plano = PlanoTrabalho.objects.create(area=area_de_teste(), 
             evento=self.evento, numero=7, ano=2026,
             data_evento_inicio=date(2026, 7, 21), data_evento_fim=date(2026, 7, 27),
         )
@@ -98,8 +99,8 @@ class DualOrganizationTests(TestCase):
 
         from planos_trabalho.models import PlanoTrabalho
 
-        PlanoTrabalho.objects.create(evento=self.evento, numero=7, ano=2026, data_evento_inicio=date(2026, 7, 21))
-        PlanoTrabalho.objects.create(evento=self.evento, numero=8, ano=2026, data_evento_inicio=date(2026, 8, 1))
+        PlanoTrabalho.objects.create(area=area_de_teste(), evento=self.evento, numero=7, ano=2026, data_evento_inicio=date(2026, 7, 21))
+        PlanoTrabalho.objects.create(area=area_de_teste(), evento=self.evento, numero=8, ano=2026, data_evento_inicio=date(2026, 8, 1))
 
         nome = "Plano de trabalho 05-2026 (Maringá).pdf"
         art = self._art("plano_trabalho", evento=self.evento, oficio=self.oficio, nome_drive=nome, name="plano.pdf")

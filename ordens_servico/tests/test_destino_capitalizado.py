@@ -18,6 +18,7 @@ from django.test import TestCase
 
 from cadastros.models import Cidade
 from cadastros.models import Estado
+from core.testing import area_de_teste
 
 from ..docxtpl_context import build_os_docxtpl_context
 from ..models import OrdemServico
@@ -26,7 +27,7 @@ from ..models import OrdemServico
 class DestinoNoDocumentoTests(TestCase):
     def setUp(self):
         self.estado = Estado.objects.create(nome="PARANA", sigla="PR")
-        self.ordem = OrdemServico.objects.create(
+        self.ordem = OrdemServico.objects.create(area=area_de_teste(), 
             data_evento_inicio=date(2026, 8, 10),
             data_evento_fim=date(2026, 8, 12),
             motivo="evento institucional",

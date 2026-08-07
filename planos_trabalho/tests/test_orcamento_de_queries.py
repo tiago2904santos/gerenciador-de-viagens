@@ -25,6 +25,8 @@ from planos_trabalho.models import EventoPlano
 from planos_trabalho.models import PlanoDestino
 from planos_trabalho.models import PlanoTrabalho
 from planos_trabalho.models import ProgramaSolicitante
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class OrcamentoDeQueriesPlanoTrabalhoTests(TestCase):
@@ -32,13 +34,13 @@ class OrcamentoDeQueriesPlanoTrabalhoTests(TestCase):
     def setUpTestData(cls):
         estado = Estado.objects.create(nome="Parana", sigla="PR")
         cidade = Cidade.objects.create(nome="Curitiba", estado=estado, uf="PR")
-        cargo = Cargo.objects.create(nome="Investigador")
-        unidade = Unidade.objects.create(nome="Unidade", sigla="UN")
-        programa = ProgramaSolicitante.objects.create(nome="Programa", ordem=1)
+        cargo = Cargo.objects.create(area=area_de_teste(), nome="Investigador")
+        unidade = Unidade.objects.create(area=area_de_teste(), nome="Unidade", sigla="UN")
+        programa = ProgramaSolicitante.objects.create(area=area_de_teste(), nome="Programa", ordem=1)
 
         inicio = timezone.localdate() - timedelta(days=3)
         for numero in range(1, 26):
-            plano = PlanoTrabalho.objects.create(
+            plano = PlanoTrabalho.objects.create(area=area_de_teste(), 
                 numero=numero,
                 ano=2026,
                 programa=programa,
@@ -70,6 +72,7 @@ class OrcamentoDeQueriesPlanoTrabalhoTests(TestCase):
     def setUp(self):
         user = get_user_model().objects.create_user(username="pt_orcamento")
         self.client.force_login(user)
+        vincular_area(user)
         # Aquecimento: singleton de configuracao e sessao nao sao da tela medida.
         self.client.get(reverse("planos_trabalho:index") + "?aba=atuais")
 

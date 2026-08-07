@@ -9,12 +9,15 @@ from django.urls import reverse
 from justificativas.models import Justificativa
 from justificativas.models import ModeloJustificativa
 from oficios.models import Oficio
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class ModelosJustificativaCrudTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="j_test", password="x")
         self.client.force_login(self.user)
+        vincular_area(self.user)
 
     def test_listagem_200(self):
         r = self.client.get(reverse("justificativas:modelos_index"))
@@ -68,6 +71,7 @@ class JustificativasQuickAddTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="j_quick", password="x")
         self.client.force_login(self.user)
+        vincular_area(self.user)
 
     def test_index_renderiza_quick_add(self):
         response = self.client.get(reverse("justificativas:index"))
@@ -86,8 +90,8 @@ class JustificativasQuickAddTests(TestCase):
         `NOVO-07`: a lista deixou de vir no `json_script` da página e passou a vir
         do endpoint de busca. A ordem é a mesma, e é isto que prova.
         """
-        antigo = Oficio.objects.create(numero=150, ano=2026, data_criacao="2026-08-01")
-        recente = Oficio.objects.create(numero=5, ano=2026, data_criacao="2026-05-01")
+        antigo = Oficio.objects.create(area=area_de_teste(), numero=150, ano=2026, data_criacao="2026-08-01")
+        recente = Oficio.objects.create(area=area_de_teste(), numero=5, ano=2026, data_criacao="2026-05-01")
         Oficio.objects.filter(pk=antigo.pk).update(created_at="2026-07-01 12:00:00+00:00")
         Oficio.objects.filter(pk=recente.pk).update(created_at="2026-08-01 18:00:00+00:00")
 
@@ -97,9 +101,9 @@ class JustificativasQuickAddTests(TestCase):
         self.assertEqual([item["id"] for item in resultados[:2]], [recente.pk, antigo.pk])
 
     def test_quick_add_cria_justificativa_para_varios_oficios(self):
-        oficio_a = Oficio.objects.create(numero=1, ano=2026, data_criacao="2026-05-10")
-        oficio_b = Oficio.objects.create(numero=2, ano=2026, data_criacao="2026-05-10")
-        modelo = ModeloJustificativa.objects.create(nome="PADRAO", texto="Texto modelo")
+        oficio_a = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, data_criacao="2026-05-10")
+        oficio_b = Oficio.objects.create(area=area_de_teste(), numero=2, ano=2026, data_criacao="2026-05-10")
+        modelo = ModeloJustificativa.objects.create(area=area_de_teste(), nome="PADRAO", texto="Texto modelo")
 
         response = self.client.post(
             reverse("justificativas:index"),

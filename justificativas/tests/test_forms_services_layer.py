@@ -14,22 +14,27 @@ from justificativas.services import justificativa_oficio_esta_completa
 from justificativas.services import oficio_exige_justificativa
 from oficios.models import Oficio
 from roteiros.models import Roteiro
+from core.testing import area_de_teste
+from core.testing import com_request
 
 
 class JustificativaFormServicesLayerTests(TestCase):
     def setUp(self):
+        # DB-02: forms/services recortam pela area do request; a chamada
+        # direta reproduz o contexto que a view teria.
+        self.enterContext(com_request(area_de_teste()))
         ConfiguracaoSistema.get_singleton()
 
     def _oficio_com_saida(self, dias_para_saida=11):
         base = datetime.date(2026, 5, 10)
-        roteiro = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
+        roteiro = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
         d_saida = base + datetime.timedelta(days=dias_para_saida)
         roteiro.saida_dt = timezone.make_aware(
             datetime.datetime.combine(d_saida, datetime.time(8, 0)),
             timezone.get_current_timezone(),
         )
         roteiro.save(update_fields=["saida_dt"])
-        return Oficio.objects.create(data_criacao=base, roteiro=roteiro)
+        return Oficio.objects.create(area=area_de_teste(), data_criacao=base, roteiro=roteiro)
 
     def test_obrigatorio_sem_texto_form_invalido(self):
         oficio = self._oficio_com_saida(5)
@@ -111,7 +116,7 @@ class JustificativaFormServicesLayerTests(TestCase):
         self.assertTrue(justificativa_oficio_esta_completa(oficio))
 
     def test_modelo_opcional_no_form(self):
-        modelo = ModeloJustificativa.objects.create(nome="PADRAO X", texto="Bloco")
+        modelo = ModeloJustificativa.objects.create(area=area_de_teste(), nome="PADRAO X", texto="Bloco")
         oficio = self._oficio_com_saida(11)
         j = get_or_create_justificativa_oficio(oficio)
         form = JustificativaOficioForm(

@@ -15,6 +15,8 @@ from roteiros.models import Roteiro
 from roteiros.models import RoteiroDestino
 from roteiros.models import RoteiroTrecho
 from roteiros import roteiro_logic
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 @override_settings(ALLOWED_HOSTS=["testserver", "localhost"])
@@ -23,6 +25,7 @@ class RoteirosBaseTests(TestCase):
         User = get_user_model()
         self.user = User.objects.create_user(username="roteiros_tester", password="teste")
         self.client.force_login(self.user)
+        vincular_area(self.user)
         self.estado, _ = Estado.objects.get_or_create(sigla="PR", defaults={"nome": "PARANA"})
         self.estado_destino, _ = Estado.objects.get_or_create(sigla="SC", defaults={"nome": "SANTA CATARINA"})
         self.cidade_sede, _ = Cidade.objects.get_or_create(nome="CURITIBA", estado=self.estado, defaults={"uf": "PR"})
@@ -55,7 +58,7 @@ class RoteirosBaseTests(TestCase):
         existente = Roteiro.objects.first()
         self.assertEqual(existente.observacoes, "PRIMEIRA VERSAO")
 
-        oficio = Oficio.objects.create(roteiro=existente)
+        oficio = Oficio.objects.create(area=area_de_teste(), roteiro=existente)
 
         payload2 = self._loop_diario_post_data()
         payload2["observacoes"] = "segunda versao"
@@ -69,7 +72,7 @@ class RoteirosBaseTests(TestCase):
         self.assertEqual(oficio.roteiro_id, existente.pk)
 
     def test_criar_roteiro_minimo_e_destino(self):
-        r = Roteiro.objects.create(
+        r = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,
@@ -83,7 +86,7 @@ class RoteirosBaseTests(TestCase):
         self.assertEqual(r.destinos.count(), 1)
 
     def test_trecho_ida(self):
-        r = Roteiro.objects.create(
+        r = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,
@@ -132,7 +135,7 @@ class RoteirosBaseTests(TestCase):
         )
 
     def test_calculo_diarias_com_roteiro_salvo_sem_evento_id(self):
-        r = Roteiro.objects.create(
+        r = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             status=Roteiro.STATUS_FINALIZADO,
             origem_estado=self.estado,
@@ -164,7 +167,7 @@ class RoteirosBaseTests(TestCase):
         self.assertIn(r.pk, [option["id"] for option in route_options])
 
     def test_salvar_reordenacao_preserva_dados_dos_trechos_existentes(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,
@@ -274,7 +277,7 @@ class RoteirosBaseTests(TestCase):
         self.assertEqual(roteiro.trechos.filter(tipo=RoteiroTrecho.TIPO_IDA).count(), 2)
 
     def test_salvar_trecho_existente_nao_sobrescreve_campos_ausentes(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,
@@ -329,7 +332,7 @@ class RoteirosBaseTests(TestCase):
         self.assertIsNotNone(trecho.chegada_dt)
 
     def test_remover_e_adicionar_destino_apos_reordenar_preserva_item_correto(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,
@@ -446,7 +449,7 @@ class RoteirosBaseTests(TestCase):
         self.assertEqual(ultimo["destino_cidade_id"], self.cidade_dest.pk)
 
     def test_salvar_bate_volta_diario_nao_persiste_retorno_final_como_ida(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,
@@ -482,7 +485,7 @@ class RoteirosBaseTests(TestCase):
         )
 
     def test_reabrir_bate_volta_diario_mantem_retorno_separado(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,

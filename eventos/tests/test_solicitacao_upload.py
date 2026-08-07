@@ -13,6 +13,8 @@ from eventos.models import Evento, EventoDocumentoSolicitacao
 from eventos.services import converter_para_pdf_se_necessario
 from usuarios.models import AreaTrabalho
 from usuarios.models import VinculoUsuarioArea
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 def _png_bytes() -> bytes:
@@ -37,8 +39,9 @@ class ConverterParaPdfSeNecessarioTests(TestCase):
 class UploadSolicitacaoViewTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="tester", password="123456")
+        vincular_area(self.user)
         self.client.force_login(self.user)
-        self.evento = Evento.objects.create(titulo="Evento de teste")
+        self.evento = Evento.objects.create(area=area_de_teste(), titulo="Evento de teste")
         self.url = reverse("eventos:guiado_etapa", kwargs={"pk": self.evento.pk, "etapa": 4})
         self.anexar_url = reverse("eventos:solicitacao_anexar", kwargs={"pk": self.evento.pk})
 

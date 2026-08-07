@@ -8,6 +8,7 @@ from oficios.models import Oficio
 from prestacoes_contas.diario_services import clonar_roteiro
 from prestacoes_contas.models import PrestacaoContas
 from roteiros.models import Roteiro, RoteiroDestino
+from core.testing import area_de_teste
 
 
 class DiagnosticarRoteirosAjustadosTests(TestCase):
@@ -16,7 +17,7 @@ class DiagnosticarRoteirosAjustadosTests(TestCase):
         self.estado2, _ = Estado.objects.get_or_create(sigla="SC", defaults={"nome": "SANTA CATARINA"})
         self.cidade_sede, _ = Cidade.objects.get_or_create(nome="CURITIBA", estado=self.estado, defaults={"uf": "PR"})
         self.cidade_dest, _ = Cidade.objects.get_or_create(nome="FLORIANOPOLIS", estado=self.estado2, defaults={"uf": "SC"})
-        self.servidor = Servidor.objects.create(nome="Servidor Teste")
+        self.servidor = Servidor.objects.create(area=area_de_teste(), nome="Servidor Teste")
 
     def _run(self):
         out = StringIO()
@@ -24,7 +25,7 @@ class DiagnosticarRoteirosAjustadosTests(TestCase):
         return out.getvalue()
 
     def _roteiro_com_destino(self, observacoes=""):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO, origem_estado=self.estado, origem_cidade=self.cidade_sede,
             observacoes=observacoes,
         )
@@ -33,7 +34,7 @@ class DiagnosticarRoteirosAjustadosTests(TestCase):
 
     def test_copia_identica_e_marcada_como_segura(self):
         original = self._roteiro_com_destino()
-        oficio = Oficio.objects.create(numero=1, ano=2026, roteiro=original)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, roteiro=original)
         copia = clonar_roteiro(original)
         oficio.servidores.add(self.servidor)
         prestacao = PrestacaoContas.objects.get(oficio=oficio)
@@ -47,7 +48,7 @@ class DiagnosticarRoteirosAjustadosTests(TestCase):
 
     def test_copia_alterada_e_marcada_como_divergente(self):
         original = self._roteiro_com_destino(observacoes="ORIGINAL")
-        oficio = Oficio.objects.create(numero=2, ano=2026, roteiro=original)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=2, ano=2026, roteiro=original)
         copia = clonar_roteiro(original)
         copia.observacoes = "AJUSTADO"
         copia.save(update_fields=["observacoes"])

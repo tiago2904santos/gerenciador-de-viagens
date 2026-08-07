@@ -10,6 +10,7 @@ from roteiros.presenters import (
     apresentar_roteiro_card,
 )
 from roteiros.services.valor_extenso import valor_por_extenso_ptbr
+from core.testing import area_de_teste
 
 
 class ValorExtensoPtBrTests(SimpleTestCase):
@@ -69,7 +70,7 @@ class ApresentarRoteiroCardTrechosTests(TestCase):
             self.cidades.append(cidade)
 
     def test_todos_trechos_true_nao_trunca_lista(self):
-        roteiro = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO)
+        roteiro = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO)
         for i in range(5):
             RoteiroTrecho.objects.create(
                 roteiro=roteiro,

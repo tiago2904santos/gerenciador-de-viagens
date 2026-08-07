@@ -28,20 +28,22 @@ from cadastros.models import Estado
 from planos_trabalho.models import EventoPlano
 from planos_trabalho.models import PlanoDestino
 from planos_trabalho.models import PlanoTrabalho
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class ListaDePlanosComEventosTests(TestCase):
     def setUp(self):
-        self.client.force_login(
-            get_user_model().objects.create_user(username="pt_multi_evento")
-        )
+        usuario = get_user_model().objects.create_user(username="pt_multi_evento")
+        vincular_area(usuario)
+        self.client.force_login(usuario)
         self.estado = Estado.objects.create(nome="Parana", sigla="PR")
         self.cidade = Cidade.objects.create(nome="Curitiba", estado=self.estado, uf="PR")
         self.inicio = timezone.localdate() - timedelta(days=3)
         self.url = reverse("planos_trabalho:index") + "?aba=atuais"
 
     def _criar_plano(self, numero):
-        return PlanoTrabalho.objects.create(
+        return PlanoTrabalho.objects.create(area=area_de_teste(), 
             numero=numero,
             ano=2026,
             destino_estado=self.estado,

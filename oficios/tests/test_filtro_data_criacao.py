@@ -18,13 +18,18 @@ from django.test import TestCase
 
 from oficios.models import Oficio
 from oficios.selectors import listar_oficios
+from core.testing import area_de_teste
+from core.testing import com_request
 
 
 class FiltroDeDataDeCriacaoTests(TestCase):
     def setUp(self):
-        self.antigo = Oficio.objects.create(numero=1, ano=2026, data_criacao=date(2026, 1, 15))
-        self.meio = Oficio.objects.create(numero=2, ano=2026, data_criacao=date(2026, 6, 10))
-        self.recente = Oficio.objects.create(numero=3, ano=2026, data_criacao=date(2026, 11, 20))
+        # DB-02: selectors/forms/services recortam pela area do request;
+        # chamada direta reproduz o contexto que a view teria.
+        self.enterContext(com_request(area_de_teste()))
+        self.antigo = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, data_criacao=date(2026, 1, 15))
+        self.meio = Oficio.objects.create(area=area_de_teste(), numero=2, ano=2026, data_criacao=date(2026, 6, 10))
+        self.recente = Oficio.objects.create(area=area_de_teste(), numero=3, ano=2026, data_criacao=date(2026, 11, 20))
 
     def _numeros(self, **kwargs):
         return sorted(listar_oficios(**kwargs).values_list("numero", flat=True))

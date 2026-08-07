@@ -11,6 +11,7 @@ from eventos.models import Evento, TipoEvento
 from integracoes.google_drive import naming, organizer, services
 from integracoes.google_drive.models import DriveArquivo, DriveArquivoExterno
 from oficios.models import Oficio
+from core.testing import area_de_teste
 
 
 class DriveClientDouble(services._MockClient):
@@ -112,11 +113,11 @@ class OrganizerContractTests(TestCase):
         self.client_patch.start()
         self.addCleanup(self.client_patch.stop)
 
-        cargo = Cargo.objects.create(nome="Investigador")
-        servidor = Servidor.objects.create(
+        cargo = Cargo.objects.create(area=area_de_teste(), nome="Investigador")
+        servidor = Servidor.objects.create(area=area_de_teste(), 
             nome="Ana Contrato", cargo=cargo, cpf="12345678901"
         )
-        self.evento = Evento.objects.create(
+        self.evento = Evento.objects.create(area=area_de_teste(), 
             titulo="Operação contrato",
             destino_cidade="Maringá",
             destino_uf="PR",
@@ -124,9 +125,9 @@ class OrganizerContractTests(TestCase):
             data_fim=date(2026, 7, 23),
         )
         self.evento.tipos.add(
-            TipoEvento.objects.get_or_create(nome="PCPR na Comunidade")[0]
+            TipoEvento.objects.get_or_create(area=area_de_teste(), nome="PCPR na Comunidade")[0]
         )
-        self.oficio = Oficio.objects.create(
+        self.oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=17,
             ano=2026,
             protocolo="123456789",
@@ -146,7 +147,7 @@ class OrganizerContractTests(TestCase):
             dados["arquivo"] = ContentFile(
                 b"%PDF-1.4\ncontrato\n%%EOF", name="contrato.pdf"
             )
-        return DocumentoArtefato.objects.create(**dados)
+        return DocumentoArtefato.objects.create(area=area_de_teste(), **dados)
 
     def test_repetir_operacao_preserva_arquivo_atalho_e_estado_local(self):
         artefato = self._artefato()

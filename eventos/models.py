@@ -39,7 +39,7 @@ class Evento(models.Model):
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
         on_delete=models.PROTECT,
-        null=True,
+        null=False,
         blank=True,
         related_name="eventos",
         verbose_name="Area de trabalho",

@@ -22,7 +22,9 @@ class FilterQuerysetByAreaLegacyTests(TestCase):
         self.user = get_user_model().objects.create_user(username="area_user", password="x")
         VinculoUsuarioArea.objects.create(usuario=self.user, area=self.area, area_padrao=True)
         self.factory = RequestFactory()
-        self.cargo = Cargo.objects.create(nome="Cargo Legado")
+        # `area=None` de propósito: `Cargo` é catálogo (grupo 2 do `DB-02`),
+        # continua anulável, e o legado sem área é o objeto deste arquivo.
+        self.cargo = Cargo.objects.create(area=None, nome="Cargo Legado")
 
     def _activate_area(self):
         request = self.factory.get("/")
@@ -43,7 +45,7 @@ class FilterQuerysetByAreaLegacyTests(TestCase):
 
     def test_filtro_nao_compartilha_registros_legados_sem_area(self):
         self._activate_area()
-        legado = Servidor.objects.create(nome="Servidor Legado", cargo=self.cargo)
+        legado = Servidor.objects.create(area=None, nome="Servidor Legado", cargo=self.cargo)
         da_area = Servidor.objects.create(nome="Servidor Area", cargo=self.cargo, area=self.area)
         outra = AreaTrabalho.objects.create(nome="Outra", sigla="OUT")
         Servidor.objects.create(nome="Servidor Outra", cargo=self.cargo, area=outra)
@@ -78,20 +80,19 @@ class NovoOficioEventoAreaTests(TestCase):
 
         mw._local.request = None
 
-    def test_criar_oficio_em_evento_sem_area_herda_area_atual(self):
+    def test_criar_oficio_herda_a_area_do_evento_e_nao_a_ativa(self):
+        # DB-02: "evento sem área" deixou de existir — Evento é operacional e a
+        # coluna é NOT NULL. O que resta da derivação em Oficio.save() é a parte
+        # que importa: o ofício herda a área DO EVENTO, mesmo quando a área
+        # ativa do request é outra.
         self._activate_area()
-        # `DB-02`: `Evento.save()` agora deriva a área ativa, então o legado de
-        # verdade — linha antiga no banco, anterior ao backfill — é simulado por
-        # `update()`, que não passa pelo `save()`.
-        evento = Evento.objects.create(titulo="Evento legado")
-        Evento.all_objects.filter(pk=evento.pk).update(area=None)
-        evento.refresh_from_db()
-        self.assertIsNone(evento.area_id)
+        outra = AreaTrabalho.objects.create(nome="Outra", sigla="OUT-OF")
+        evento = Evento.all_objects.create(area=outra, titulo="Evento de outra área")
 
         oficio = criar_oficio_rascunho(evento=evento)
 
-        self.assertEqual(oficio.area_id, self.area.pk)
-        self.assertTrue(Oficio.objects.filter(pk=oficio.pk, area=self.area).exists())
+        self.assertEqual(oficio.area_id, outra.pk)
+        self.assertTrue(Oficio.all_objects.filter(pk=oficio.pk, area=outra).exists())
 
     def test_evento_criado_dentro_de_request_nao_nasce_mais_sem_area(self):
         """`DB-02`, grupo operacional — o teste que falharia antes.

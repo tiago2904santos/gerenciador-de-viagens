@@ -15,6 +15,8 @@ from planos_trabalho.models import HorarioAtendimento
 from planos_trabalho.models import PlanoDestino
 from planos_trabalho.models import PlanoTrabalho
 from planos_trabalho.models import ProgramaSolicitante
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 from .helpers import configurar_sistema
 from .helpers import criar_base_geografica
@@ -26,6 +28,7 @@ class PlanoWizardViewsTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="tester_pt", password="123456")
         self.client.force_login(self.user)
+        vincular_area(self.user)
         _, self.curitiba, self.maringa, _ = criar_base_geografica()
         configurar_sistema(self.curitiba)
 
@@ -40,6 +43,7 @@ class PlanoWizardViewsTests(TestCase):
         PlanoTrabalho.objects.bulk_create(
             [
                 PlanoTrabalho(
+                    area=area_de_teste(),
                     numero=numero,
                     ano=2026,
                     sufixo_numero="ASCOM",
@@ -154,7 +158,12 @@ class PlanoWizardViewsTests(TestCase):
 
     def test_post_identificacao_salva_e_preenche_textos_padrao(self):
         plano = criar_plano_maringa(self.maringa)
+        # DB-02: o picker de programa recorta por área SEM fallback global —
+        # o seed (area NULL) não é ofertado a usuário com área. O teste traz o
+        # programa para a área, como uma instalação real teria de fazer.
         programa = ProgramaSolicitante.objects.get(nome="PROGRAMA JUSTIÇA NO BAIRRO")
+        programa.area = area_de_teste()
+        programa.save()
         servidor = criar_servidor()
         response = self.client.post(
             reverse("planos_trabalho:wizard_identificacao", args=[plano.pk]),
@@ -230,7 +239,7 @@ class PlanoWizardViewsTests(TestCase):
 
     def test_post_identificacao_aceita_coordenador_manual_quando_servidor_nao_existe(self):
         plano = criar_plano_maringa(self.maringa)
-        cargo = Cargo.objects.create(nome="ANALISTA DE PROJETOS")
+        cargo = Cargo.objects.create(area=area_de_teste(), nome="ANALISTA DE PROJETOS")
         response = self.client.post(
             reverse("planos_trabalho:wizard_identificacao", args=[plano.pk]),
             {
@@ -267,7 +276,7 @@ class PlanoWizardViewsTests(TestCase):
     def test_post_identificacao_nome_igual_servidor_sem_fk_continua_manual(self):
         plano = criar_plano_maringa(self.maringa)
         servidor = criar_servidor(nome="Maria da Silva", cargo_nome="Investigadora")
-        cargo = Cargo.objects.create(nome="ANALISTA DE PROJETOS")
+        cargo = Cargo.objects.create(area=area_de_teste(), nome="ANALISTA DE PROJETOS")
         response = self.client.post(
             reverse("planos_trabalho:wizard_identificacao", args=[plano.pk]),
             {
@@ -386,8 +395,8 @@ class PlanoWizardViewsTests(TestCase):
     def test_post_efetivo_diarias_aceita_multiplas_linhas_com_unidades_distintas(self):
         plano = criar_plano_maringa(self.maringa, efetivo=6)
         efetivo = plano.efetivos.first()
-        unidade_extra = Unidade.objects.create(nome="Delegacia Regional", sigla="DR")
-        cargo_extra = Cargo.objects.create(nome="Investigador")
+        unidade_extra = Unidade.objects.create(area=area_de_teste(), nome="Delegacia Regional", sigla="DR")
+        cargo_extra = Cargo.objects.create(area=area_de_teste(), nome="Investigador")
         response = self.client.post(
             reverse("planos_trabalho:wizard_efetivo_diarias", args=[plano.pk]),
             {
@@ -525,7 +534,7 @@ class PlanoWizardViewsTests(TestCase):
         self.assertEqual(plano.status, PlanoTrabalho.STATUS_GERADO)
 
     def test_baixar_documento_bloqueado_quando_incompleto(self):
-        plano = PlanoTrabalho.objects.create()
+        plano = PlanoTrabalho.objects.create(area=area_de_teste())
         response = self.client.get(
             reverse("planos_trabalho:baixar_documento", args=[plano.pk, "docx"]),
         )
@@ -553,6 +562,7 @@ class ProgramasCrudTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="tester_prog", password="123456")
         self.client.force_login(self.user)
+        vincular_area(self.user)
 
     def test_seed_inicial_dos_programas(self):
         nomes = set(ProgramaSolicitante.objects.values_list("nome", flat=True))
@@ -587,6 +597,7 @@ class HorariosCrudTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="tester_horario", password="123456")
         self.client.force_login(self.user)
+        vincular_area(self.user)
 
     def test_seed_inicial_dos_horarios(self):
         faixas = set(HorarioAtendimento.objects.values_list("faixa", flat=True))

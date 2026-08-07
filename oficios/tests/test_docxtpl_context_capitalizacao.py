@@ -12,14 +12,19 @@ from oficios.docxtpl_context import build_oficio_docxtpl_context
 from oficios.models import Oficio
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroDestino
+from core.testing import area_de_teste
+from core.testing import com_request
 
 
 class BuildOficioCapitalizacaoTests(TestCase):
     def setUp(self):
+        # DB-02: selectors/forms/services recortam pela area do request;
+        # chamada direta reproduz o contexto que a view teria.
+        self.enterContext(com_request(area_de_teste()))
         ConfiguracaoSistema.get_singleton()
 
     def test_sem_roteiro_orgao_destino_legivel(self):
-        oficio = Oficio.objects.create()
+        oficio = Oficio.objects.create(area=area_de_teste())
         ctx = build_oficio_docxtpl_context(oficio)
         self.assertEqual(ctx["orgao_destino"], "Gabinete do Delegado Geral Adjunto")
         self.assertIn(" do ", f" {ctx['orgao_destino']} ")
@@ -27,9 +32,9 @@ class BuildOficioCapitalizacaoTests(TestCase):
     def test_cabecalho_institucional_maiusculo_corpo_legivel(self):
         cfg = ConfiguracaoSistema.get_singleton()
         cfg.nome_orgao = "DEPARTAMENTO DE POLÍCIA"
-        cfg.unidade = Unidade.objects.create(nome="DELEGACIA REGIONAL DE POLÍCIA DE LONDRINA")
+        cfg.unidade = Unidade.objects.create(area=area_de_teste(), nome="DELEGACIA REGIONAL DE POLÍCIA DE LONDRINA")
         cfg.save(update_fields=["nome_orgao", "unidade"])
-        oficio = Oficio.objects.create()
+        oficio = Oficio.objects.create(area=area_de_teste())
         ctx = build_oficio_docxtpl_context(oficio)
         self.assertEqual(ctx["nome_orgao_cabecalho"], "DEPARTAMENTO DE POLÍCIA")
         self.assertEqual(ctx["unidade_cabecalho"], "DELEGACIA REGIONAL DE POLÍCIA DE LONDRINA")
@@ -39,16 +44,16 @@ class BuildOficioCapitalizacaoTests(TestCase):
     def test_cabecalho_orgao_maiusculo_com_entrada_title_case(self):
         cfg = ConfiguracaoSistema.get_singleton()
         cfg.nome_orgao = "Departamento de Polícia"
-        cfg.unidade = Unidade.objects.create(nome="Delegacia Regional de Londrina")
+        cfg.unidade = Unidade.objects.create(area=area_de_teste(), nome="Delegacia Regional de Londrina")
         cfg.save(update_fields=["nome_orgao", "unidade"])
-        oficio = Oficio.objects.create()
+        oficio = Oficio.objects.create(area=area_de_teste())
         ctx = build_oficio_docxtpl_context(oficio)
         self.assertEqual(ctx["nome_orgao_cabecalho"], "DEPARTAMENTO DE POLÍCIA")
         self.assertEqual(ctx["unidade_cabecalho"], "DELEGACIA REGIONAL DE LONDRINA")
 
     def test_justificativa_rodape_nao_todo_maiusculo(self):
         cfg = ConfiguracaoSistema.get_singleton()
-        cfg.unidade = Unidade.objects.create(nome="ASSESSORIA DE COMUNICAÇÃO SOCIAL")
+        cfg.unidade = Unidade.objects.create(area=area_de_teste(), nome="ASSESSORIA DE COMUNICAÇÃO SOCIAL")
         cfg.logradouro = "RUA EXEMPLO"
         cfg.numero = "1"
         cfg.bairro = "BAIRRO"
@@ -58,7 +63,7 @@ class BuildOficioCapitalizacaoTests(TestCase):
         cfg.telefone = "4133334444"
         cfg.email = "TESTE@EX.COM"
         cfg.save()
-        oficio = Oficio.objects.create()
+        oficio = Oficio.objects.create(area=area_de_teste())
         ctx = build_justificativa_docxtpl_context(oficio)
         self.assertIn("Assessoria de Comunicação Social", ctx["unidade_rodape"])
         self.assertNotEqual(ctx["unidade_rodape"].strip(), ctx["unidade_rodape"].upper())
@@ -67,7 +72,7 @@ class BuildOficioCapitalizacaoTests(TestCase):
         estado = Estado.objects.create(nome="Parana", sigla="PR")
         sede = Cidade.objects.create(nome="Curitiba", estado=estado, uf="PR")
         destino = Cidade.objects.create(nome="Londrina", estado=estado, uf="PR")
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             origem_estado=estado,
             origem_cidade=sede,
             retorno_saida_dt=timezone.make_aware(
@@ -76,7 +81,7 @@ class BuildOficioCapitalizacaoTests(TestCase):
             ),
         )
         RoteiroDestino.objects.create(roteiro=roteiro, estado=estado, cidade=destino, ordem=1)
-        oficio = Oficio.objects.create(roteiro=roteiro)
+        oficio = Oficio.objects.create(area=area_de_teste(), roteiro=roteiro)
 
         ctx = build_oficio_docxtpl_context(oficio)
 

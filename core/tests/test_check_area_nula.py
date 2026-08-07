@@ -19,7 +19,6 @@ from django.test import TestCase
 from cadastros.models import Servidor
 from core.checks import check_operational_records_have_area
 from core.models import AuditEvent
-from oficios.models import Oficio
 from usuarios.models import AreaTrabalho
 
 
@@ -57,12 +56,22 @@ class VarreduraCobreTodoModeloComAreaTests(TestCase):
             self.assertIn(semeado, problemas["core.W001"].msg)
 
     def test_modelo_operacional_continua_bloqueando_o_deploy(self):
-        Oficio.all_objects.create(area=None, numero=1, ano=2026, assunto="X")
+        # DB-02: o banco migrado recusa Oficio sem área, então o órfão de
+        # verdade só existe na janela que o check vigia — o deploy que roda com
+        # o código novo contra um banco ainda não migrado. Promove-se um modelo
+        # anulável a "operacional" para exercitar a rota de severidade.
+        from unittest import mock
 
-        problemas = _por_id(check_operational_records_have_area(None))
+        from core import checks as core_checks
+        from eventos.models import TipoEvento
+
+        TipoEvento.all_objects.create(area=None, nome="Órfão operacional")
+
+        with mock.patch.object(core_checks, "_OPERATIONAL_MODELS", ("eventos.TipoEvento",)):
+            problemas = _por_id(check_operational_records_have_area(None))
 
         self.assertIn("core.E001", problemas)
-        self.assertIn("oficios.Oficio=1", problemas["core.E001"].msg)
+        self.assertRegex(problemas["core.E001"].msg, r"eventos\.TipoEvento=\d+")
 
     def test_modelo_de_cadastros_passa_a_ser_relatado(self):
         """O defeito: `cadastros.Servidor` não era olhado por check nenhum."""

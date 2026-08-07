@@ -6,13 +6,16 @@ from django.urls import reverse
 
 from cadastros.models import Cidade, Estado
 from roteiros.models import Roteiro, RoteiroDestino, RoteiroTrecho
-from usuarios.models import AreaTrabalho, VinculoUsuarioArea
+from usuarios.models import VinculoUsuarioArea
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class RoteiroAutosaveTests(TestCase):
     def setUp(self):
         User = get_user_model()
         self.user = User.objects.create_user(username="autosave_user", password="123")
+        vincular_area(self.user)
         self.client.force_login(self.user)
         self.estado, _ = Estado.objects.get_or_create(sigla="PR", defaults={"nome": "PARANA"})
         self.estado2, _ = Estado.objects.get_or_create(sigla="SC", defaults={"nome": "SANTA CATARINA"})
@@ -32,7 +35,7 @@ class RoteiroAutosaveTests(TestCase):
         return base
 
     def test_autosave_edicao_atualiza_campo_simples(self):
-        roteiro = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, observacoes="ANTIGO")
+        roteiro = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, observacoes="ANTIGO")
         response = self.client.post(
             reverse("roteiros:roteiro-autosave", args=[roteiro.pk]),
             data=json.dumps(
@@ -50,7 +53,7 @@ class RoteiroAutosaveTests(TestCase):
         self.assertEqual(roteiro.observacoes, "NOVO TEXTO")
 
     def test_campo_ausente_nao_apaga(self):
-        roteiro = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, observacoes="MANTER")
+        roteiro = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, observacoes="MANTER")
         response = self.client.post(
             reverse("roteiros:roteiro-autosave", args=[roteiro.pk]),
             data=json.dumps(self._payload(object_id=str(roteiro.pk))),
@@ -62,7 +65,7 @@ class RoteiroAutosaveTests(TestCase):
         self.assertEqual(roteiro.observacoes, "MANTER")
 
     def test_dirty_com_vazio_limpa_campo(self):
-        roteiro = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, observacoes="LIMPAR")
+        roteiro = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, observacoes="LIMPAR")
         response = self.client.post(
             reverse("roteiros:roteiro-autosave", args=[roteiro.pk]),
             data=json.dumps(
@@ -80,12 +83,8 @@ class RoteiroAutosaveTests(TestCase):
         self.assertEqual(roteiro.observacoes, "")
 
     def test_cria_rascunho_com_conteudo_minimo(self):
-        area = AreaTrabalho.objects.create(nome="Área de autosave", sigla="AUTOSAVE")
-        VinculoUsuarioArea.objects.create(
-            usuario=self.user,
-            area=area,
-            area_padrao=True,
-        )
+        # o vinculo padrao ja vem do setUp (DB-02); a area e a de teste
+        area = area_de_teste()
         response = self.client.post(
             reverse("roteiros:roteiro-autosave-create"),
             data=json.dumps(
@@ -106,6 +105,8 @@ class RoteiroAutosaveTests(TestCase):
         )
 
     def test_nao_cria_rascunho_sem_area_de_trabalho(self):
+        # DB-02: o setUp vincula o usuario; este teste exige o contrario.
+        VinculoUsuarioArea.objects.filter(usuario=self.user).delete()
         response = self.client.post(
             reverse("roteiros:roteiro-autosave-create"),
             data=json.dumps(
@@ -133,7 +134,7 @@ class RoteiroAutosaveTests(TestCase):
         self.assertFalse(Roteiro.objects.exists())
 
     def test_salva_geometry_sem_ors_e_nao_apaga_quando_ausente(self):
-        roteiro = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO)
+        roteiro = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO)
         mapa_snapshot = {
             "roteiro_mapa": {
                 "geometry_json": json.dumps({"type": "LineString", "coordinates": [[-49.2, -25.4], [-48.5, -27.6]]}),
@@ -166,7 +167,7 @@ class RoteiroAutosaveTests(TestCase):
         self.assertEqual(roteiro.rota_geojson, original)
 
     def test_salva_trecho_sem_sobrescrever_nao_enviado(self):
-        roteiro = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, origem_estado=self.estado, origem_cidade=self.cidade_sede)
+        roteiro = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, origem_estado=self.estado, origem_cidade=self.cidade_sede)
         RoteiroDestino.objects.create(roteiro=roteiro, estado=self.estado2, cidade=self.cidade_dest, ordem=0)
         trecho1 = RoteiroTrecho.objects.create(
             roteiro=roteiro, ordem=0, tipo=RoteiroTrecho.TIPO_IDA,
@@ -222,7 +223,7 @@ class RoteiroAutosaveTests(TestCase):
         self.assertEqual(trecho2.tempo_adicional_min, 0)
 
     def test_retorna_json_padrao(self):
-        roteiro = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO)
+        roteiro = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO)
         response = self.client.post(
             reverse("roteiros:roteiro-autosave", args=[roteiro.pk]),
             data=json.dumps(self._payload(object_id=str(roteiro.pk))),

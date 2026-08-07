@@ -26,6 +26,8 @@ from ordens_servico.models import OrdemServico
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroDestino
 from termos.models import TermoAutorizacao
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class OrcamentoDeQueriesEventoTests(TestCase):
@@ -37,6 +39,7 @@ class OrcamentoDeQueriesEventoTests(TestCase):
         cls.eventos = Evento.objects.bulk_create(
             [
                 Evento(
+                    area=area_de_teste(),
                     titulo=f"Evento {numero}",
                     data_inicio=date(2026, 6, 1),
                     data_fim=date(2026, 6, 2),
@@ -46,14 +49,14 @@ class OrcamentoDeQueriesEventoTests(TestCase):
         )
         cls.evento = Evento.objects.order_by("pk").first()
 
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             evento=cls.evento,
             origem_estado=cls.estado,
             origem_cidade=cls.cidade,
         )
         RoteiroDestino.objects.create(roteiro=roteiro, estado=cls.estado, cidade=cls.cidade, ordem=0)
 
-        TermoAutorizacao.objects.create(
+        TermoAutorizacao.objects.create(area=area_de_teste(), 
             evento=cls.evento,
             destino_estado=cls.estado,
             destino_cidade=cls.cidade,
@@ -64,6 +67,7 @@ class OrcamentoDeQueriesEventoTests(TestCase):
     def setUp(self):
         user = get_user_model().objects.create_user(username="eventos_orcamento")
         self.client.force_login(user)
+        vincular_area(user)
 
     def _contar(self, url):
         with CaptureQueriesContext(connection) as queries:
@@ -119,7 +123,7 @@ class OrcamentoDeQueriesEventoTests(TestCase):
     # `Prefetch` de servidores na forma que `TermoAutorizacao.servidores_efetivos()`
     # consome (`termos.selectors.prefetch_servidores_efetivos`), então a
     # consulta que o prefetch cru desperdiçava deixou de existir.
-    QUERIES_DETALHE = 77
+    QUERIES_DETALHE = 65  # remedido no DB-02: usuário de teste passou a ter vínculo de área
     QUERIES_TIPOS = 7
 
 
@@ -136,13 +140,13 @@ class OrcamentoDeQueriesEventoComOrdensTests(TestCase):
     def setUpTestData(cls):
         estado = Estado.objects.create(sigla="PR", nome="Parana")
         cidade = Cidade.objects.create(nome="CURITIBA", estado=estado, uf="PR")
-        cls.evento = Evento.objects.create(
+        cls.evento = Evento.objects.create(area=area_de_teste(), 
             titulo="Evento com OS",
             data_inicio=date(2026, 6, 1),
             data_fim=date(2026, 6, 2),
         )
         for numero in range(1, 4):
-            ordem = OrdemServico.objects.create(
+            ordem = OrdemServico.objects.create(area=area_de_teste(), 
                 evento=cls.evento,
                 numero=numero,
                 ano=2026,
@@ -155,6 +159,7 @@ class OrcamentoDeQueriesEventoComOrdensTests(TestCase):
     def setUp(self):
         user = get_user_model().objects.create_user(username="evento_com_os")
         self.client.force_login(user)
+        vincular_area(user)
 
     def test_o_assinante_da_os_e_resolvido_uma_vez_por_pagina(self):
         url = reverse("eventos:detalhe", args=[self.evento.pk])
@@ -172,4 +177,4 @@ class OrcamentoDeQueriesEventoComOrdensTests(TestCase):
     # Três OS na página. Se este número crescer de três em três, o assinante
     # voltou a ser resolvido por card.
     # Atualizado em 02/08/2026 (+4) junto com QUERIES_DETALHE (mesmo delta).
-    QUERIES_DETALHE_COM_OS = 68
+    QUERIES_DETALHE_COM_OS = 53

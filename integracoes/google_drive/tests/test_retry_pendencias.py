@@ -14,6 +14,8 @@ from eventos.models import Evento, TipoEvento
 from oficios.models import Oficio
 from integracoes.google_drive import organizer, services, status
 from integracoes.google_drive.models import DriveSyncStatus
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 def _pdf(name):
@@ -35,8 +37,8 @@ class ExecutarERastrearTests(TestCase):
     """Testa status.executar_e_rastrear isoladamente (sem Django signals)."""
 
     def setUp(self):
-        cargo = Cargo.objects.create(nome="Investigador")
-        self.servidor = Servidor.objects.create(nome="Ana", cargo=cargo, cpf="12345678901")
+        cargo = Cargo.objects.create(area=area_de_teste(), nome="Investigador")
+        self.servidor = Servidor.objects.create(area=area_de_teste(), nome="Ana", cargo=cargo, cpf="12345678901")
 
     def test_falha_cria_pendencia_e_incrementa_tentativas(self):
         def falha(obj):
@@ -67,14 +69,14 @@ class SignalRetryTests(TestCase):
 
     def setUp(self):
         services._reset_client()
-        cargo = Cargo.objects.create(nome="Investigador")
-        self.ana = Servidor.objects.create(nome="Ana", cargo=cargo, cpf="12345678901")
-        self.evento = Evento.objects.create(
+        cargo = Cargo.objects.create(area=area_de_teste(), nome="Investigador")
+        self.ana = Servidor.objects.create(area=area_de_teste(), nome="Ana", cargo=cargo, cpf="12345678901")
+        self.evento = Evento.objects.create(area=area_de_teste(), 
             destino_cidade="Maringá", destino_uf="PR",
             data_inicio=date(2026, 7, 22), data_fim=date(2026, 7, 23),
         )
-        self.evento.tipos.add(TipoEvento.objects.get_or_create(nome="PCPR na Comunidade")[0])
-        self.oficio = Oficio.objects.create(
+        self.evento.tipos.add(TipoEvento.objects.get_or_create(area=area_de_teste(), nome="PCPR na Comunidade")[0])
+        self.oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1, ano=2026, protocolo="123456789", motivo="m", evento=self.evento,
         )
         self.oficio.servidores.add(self.ana)
@@ -91,7 +93,7 @@ class SignalRetryTests(TestCase):
                 "integracoes.google_drive.tasks.processar_artefato.delay"
             ) as delay_mock:
                 with self.captureOnCommitCallbacks(execute=True):
-                    art = DocumentoArtefato.objects.create(
+                    art = DocumentoArtefato.objects.create(area=area_de_teste(), 
                         tipo="oficio", formato="pdf", oficio=self.oficio,
                         hash_sha256=digest, arquivo=arquivo,
                     )
@@ -116,7 +118,7 @@ class SignalRetryTests(TestCase):
                 "integracoes.google_drive.organizer.organizar_artefato"
             ) as organizar_mock:
                 with self.captureOnCommitCallbacks(execute=True):
-                    DocumentoArtefato.objects.create(
+                    DocumentoArtefato.objects.create(area=area_de_teste(), 
                         tipo="oficio", formato="pdf", oficio=self.oficio,
                         hash_sha256=digest, arquivo=arquivo,
                     )
@@ -139,7 +141,7 @@ class SignalRetryTests(TestCase):
         try:
             with patch("integracoes.google_drive.tasks.processar_artefato.delay"):
                 with self.captureOnCommitCallbacks(execute=True):
-                    DocumentoArtefato.objects.create(
+                    DocumentoArtefato.objects.create(area=area_de_teste(), 
                         tipo="oficio", formato="pdf", oficio=self.oficio,
                         hash_sha256=digest, arquivo=arquivo,
                     )
@@ -162,7 +164,7 @@ class SignalRetryTests(TestCase):
                 side_effect=ConnectionRefusedError("sem broker"),
             ):
                 with self.captureOnCommitCallbacks(execute=True):
-                    art = DocumentoArtefato.objects.create(
+                    art = DocumentoArtefato.objects.create(area=area_de_teste(), 
                         tipo="oficio", formato="pdf", oficio=self.oficio,
                         hash_sha256=digest, arquivo=arquivo,
                     )
@@ -181,19 +183,20 @@ class PainelPendenciasViewTests(TestCase):
         services._reset_client()
         self.user = get_user_model().objects.create_user(username="u_pend", password="x" * 12)
         self.client.force_login(self.user)
-        cargo = Cargo.objects.create(nome="Investigador")
-        ana = Servidor.objects.create(nome="Ana", cargo=cargo, cpf="12345678901")
-        evento = Evento.objects.create(
+        vincular_area(self.user)
+        cargo = Cargo.objects.create(area=area_de_teste(), nome="Investigador")
+        ana = Servidor.objects.create(area=area_de_teste(), nome="Ana", cargo=cargo, cpf="12345678901")
+        evento = Evento.objects.create(area=area_de_teste(), 
             destino_cidade="Maringá", destino_uf="PR",
             data_inicio=date(2026, 7, 22), data_fim=date(2026, 7, 23),
         )
-        evento.tipos.add(TipoEvento.objects.get_or_create(nome="PCPR na Comunidade")[0])
-        self.oficio = Oficio.objects.create(
+        evento.tipos.add(TipoEvento.objects.get_or_create(area=area_de_teste(), nome="PCPR na Comunidade")[0])
+        self.oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1, ano=2026, protocolo="123456789", motivo="m", evento=evento,
         )
         self.oficio.servidores.add(ana)
         arquivo, digest = _pdf("doc.pdf")
-        self.art = DocumentoArtefato.objects.create(
+        self.art = DocumentoArtefato.objects.create(area=area_de_teste(), 
             tipo="oficio", formato="pdf", oficio=self.oficio,
             hash_sha256=digest, arquivo=arquivo,
         )

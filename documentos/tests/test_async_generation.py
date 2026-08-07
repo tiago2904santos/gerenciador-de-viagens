@@ -8,10 +8,11 @@ from django.urls import reverse
 
 from oficios.models import Oficio
 from usuarios.models import AreaTrabalho
-from usuarios.models import VinculoUsuarioArea
 
 from documentos.models import DocumentoGeracao
 from documentos.tasks import gerar_documento_assincrono
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class DocumentoGeracaoModelTests(TestCase):
@@ -51,8 +52,9 @@ class DocumentoGeracaoHttpTests(TestCase):
         self.user = get_user_model().objects.create_user(
             username="s06",
         )
+        vincular_area(self.user)
         self.client.force_login(self.user)
-        self.oficio = Oficio.objects.create(numero=1, ano=2026)
+        self.oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026)
 
     @mock.patch("documentos.tasks.gerar_documento_assincrono.delay")
     @mock.patch(
@@ -98,6 +100,7 @@ class DocumentoGeracaoHttpTests(TestCase):
 
     def test_status_e_resultado_respeitam_area_do_request(self):
         job = DocumentoGeracao.objects.create(
+            area=area_de_teste(),
             tipo="oficio",
             parametros={"object_id": self.oficio.pk, "formato": "pdf"},
         )
@@ -112,6 +115,7 @@ class DocumentoGeracaoHttpTests(TestCase):
 
     def test_resultado_inline_preserva_headers_e_conteudo(self):
         job = DocumentoGeracao.objects.create(
+            area=area_de_teste(),
             tipo="oficio",
             parametros={"object_id": self.oficio.pk, "formato": "pdf"},
             status=DocumentoGeracao.STATUS_CONCLUIDO,
@@ -134,13 +138,7 @@ class DocumentoGeracaoHttpTests(TestCase):
         self.assertEqual(b"".join(response.streaming_content), b"%PDF-1.4\n")
 
     def test_job_de_outra_area_retorna_404(self):
-        area_usuario = AreaTrabalho.objects.create(nome="Área A", sigla="A")
         area_job = AreaTrabalho.objects.create(nome="Área B", sigla="B")
-        VinculoUsuarioArea.objects.create(
-            usuario=self.user,
-            area=area_usuario,
-            area_padrao=True,
-        )
         job = DocumentoGeracao.objects.create(
             area=area_job,
             tipo="oficio",

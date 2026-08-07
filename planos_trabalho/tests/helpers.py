@@ -15,6 +15,7 @@ from cadastros.models import Unidade
 
 from planos_trabalho.models import EfetivoPlano
 from planos_trabalho.models import PlanoTrabalho
+from core.testing import area_de_teste
 
 
 UNIDADE_ASCOM_NOME = "ASSESSORIA DE COMUNICAÇÃO SOCIAL"
@@ -30,9 +31,12 @@ def criar_base_geografica():
 
 
 def configurar_sistema(curitiba):
-    config = ConfiguracaoSistema.get_singleton()
+    # DB-02: sem área corrente o singleton cai na área técnica `__SISTEMA__`,
+    # que diverge da área de teste dos registros e dispara o guarda de FK.
+    # A configuração é da área do plano, como em produção.
+    config = ConfiguracaoSistema.get_for_area(area_de_teste())
     config.cidade_sede_padrao = curitiba
-    config.unidade = Unidade.objects.create(nome=UNIDADE_ASCOM_NOME, sigla=UNIDADE_ASCOM_SIGLA)
+    config.unidade = Unidade.objects.create(area=area_de_teste(), nome=UNIDADE_ASCOM_NOME, sigla=UNIDADE_ASCOM_SIGLA)
     config.cidade_endereco = "Curitiba"
     config.uf = "PR"
     config.nome_chefia = "João Mário Nunes de Góes"
@@ -43,8 +47,8 @@ def configurar_sistema(curitiba):
     # `fallback_geral=False` — `config.nome_chefia` deixou de ser usado como
     # último recurso. Sem uma linha de assinatura, o nome sai vazio. A fixture
     # passou a declarar o assinante de verdade, que é o contrato novo.
-    cargo = Cargo.objects.create(nome="Assessor de Comunicação Social")
-    chefia = Servidor.objects.create(
+    cargo = Cargo.objects.create(area=area_de_teste(), nome="Assessor de Comunicação Social")
+    chefia = Servidor.objects.create(area=area_de_teste(), 
         nome="João Mário Nunes de Góes", cpf="98765432100", cargo=cargo
     )
     AssinaturaConfiguracao.objects.create(
@@ -58,7 +62,7 @@ def configurar_sistema(curitiba):
 
 def criar_plano_maringa(maringa, *, efetivo=6):
     """Plano com os dados do exemplo real 20/2026 (Maringá)."""
-    plano = PlanoTrabalho.objects.create(
+    plano = PlanoTrabalho.objects.create(area=area_de_teste(), 
         numero=20,
         ano=2026,
         sufixo_numero="ASCOM",
@@ -72,8 +76,8 @@ def criar_plano_maringa(maringa, *, efetivo=6):
         chegada_sede_data=date(2026, 6, 28),
         chegada_sede_hora=time(14, 0),
     )
-    cargo = Cargo.objects.get_or_create(nome="Policial Civil")[0]
-    unidade = Unidade.objects.get_or_create(
+    cargo = Cargo.objects.get_or_create(area=area_de_teste(), nome="Policial Civil")[0]
+    unidade = Unidade.objects.get_or_create(area=area_de_teste(), 
         nome=UNIDADE_ASCOM_NOME,
         defaults={"sigla": UNIDADE_ASCOM_SIGLA},
     )[0]
@@ -82,5 +86,5 @@ def criar_plano_maringa(maringa, *, efetivo=6):
 
 
 def criar_servidor(nome="Juliana Villela de Barros", cargo_nome="Papiloscopista"):
-    cargo = Cargo.objects.get_or_create(nome=cargo_nome)[0]
-    return Servidor.objects.create(nome=nome, cargo=cargo)
+    cargo = Cargo.objects.get_or_create(area=area_de_teste(), nome=cargo_nome)[0]
+    return Servidor.objects.create(area=area_de_teste(), nome=nome, cargo=cargo)

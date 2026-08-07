@@ -27,6 +27,7 @@ from documentos.models import DocumentoArtefato
 from documentos.services.facade import DocumentoGerado
 from documentos.services.types import DocumentoFormato, DocumentoTipo
 from oficios.models import Oficio
+from core.testing import area_de_teste
 
 from ..models import OrdemServico
 from ..services import gerar_os_docx_response
@@ -50,7 +51,7 @@ def _doc_gerado(**overrides) -> DocumentoGerado:
 @override_settings(DOCUMENTOS_PERSIST_ARTEFATOS=True, DOCUMENTOS_ARTIFACT_CACHE=False)
 class GerarRespostaOrdemServicoDocumentoTests(TestCase):
     def setUp(self):
-        self.oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        self.oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
 
     @mock.patch("ordens_servico.services.build_canonical_document_payload")
     @mock.patch("ordens_servico.services.build_default_facade")
@@ -83,11 +84,11 @@ class GerarOrdemServicoDocxTests(TestCase):
     def test_caminhao_usa_template_de_modelos(self):
         estado = Estado.objects.create(nome="PARANA", sigla="PR")
         cidade = Cidade.objects.create(nome="CURITIBA", estado=estado, uf="PR")
-        motorista = Servidor.objects.create(nome="MOTORISTA TESTE")
-        tecnico = Servidor.objects.create(nome="TECNICO TESTE")
-        montagem = Servidor.objects.create(nome="APOIO MONTAGEM")
-        escolta = Servidor.objects.create(nome="APOIO ESCOLTA")
-        ordem = OrdemServico.objects.create(
+        motorista = Servidor.objects.create(area=area_de_teste(), nome="MOTORISTA TESTE")
+        tecnico = Servidor.objects.create(area=area_de_teste(), nome="TECNICO TESTE")
+        montagem = Servidor.objects.create(area=area_de_teste(), nome="APOIO MONTAGEM")
+        escolta = Servidor.objects.create(area=area_de_teste(), nome="APOIO ESCOLTA")
+        ordem = OrdemServico.objects.create(area=area_de_teste(), 
             tipo_necessidade=OrdemServico.TIPO_CAMINHAO,
             data_evento_inicio=date(2026, 8, 10),
             data_evento_fim=date(2026, 8, 12),

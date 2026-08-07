@@ -10,6 +10,7 @@ from oficios.assunto_oficio import resolver_assunto_oficio
 from oficios.docxtpl_context import build_oficio_docxtpl_context
 from oficios.models import Oficio
 from roteiros.models import Roteiro
+from core.testing import area_de_teste
 
 
 class ResolverAssuntoOficioTests(TestCase):
@@ -17,14 +18,14 @@ class ResolverAssuntoOficioTests(TestCase):
         ConfiguracaoSistema.get_singleton()
 
     def _roteiro_com_saida(self, dt: datetime.datetime) -> Roteiro:
-        r = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
+        r = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
         r.saida_dt = timezone.make_aware(dt, timezone.get_current_timezone())
         r.save(update_fields=["saida_dt"])
         return r
 
     def test_autorizacao_criacao_antes_da_saida(self):
         roteiro = self._roteiro_com_saida(datetime.datetime(2026, 6, 1, 8, 0, 0))
-        oficio = Oficio.objects.create(data_criacao=datetime.date(2026, 5, 10), roteiro=roteiro)
+        oficio = Oficio.objects.create(area=area_de_teste(), data_criacao=datetime.date(2026, 5, 10), roteiro=roteiro)
         r = resolver_assunto_oficio(oficio)
         self.assertEqual(r["assunto_oficio"], "(Autorização)")
         self.assertEqual(r["assunto_termo"], "autorização")
@@ -32,7 +33,7 @@ class ResolverAssuntoOficioTests(TestCase):
 
     def test_convalidacao_criacao_apos_ou_igual_saida(self):
         roteiro = self._roteiro_com_saida(datetime.datetime(2026, 5, 10, 8, 0, 0))
-        oficio = Oficio.objects.create(data_criacao=datetime.date(2026, 5, 10), roteiro=roteiro)
+        oficio = Oficio.objects.create(area=area_de_teste(), data_criacao=datetime.date(2026, 5, 10), roteiro=roteiro)
         r = resolver_assunto_oficio(oficio)
         self.assertEqual(r["assunto_oficio"], "(Convalidação)")
         self.assertEqual(r["assunto_termo"], "convalidação")
@@ -40,7 +41,7 @@ class ResolverAssuntoOficioTests(TestCase):
 
     def test_retificado_sobre_autorizacao(self):
         roteiro = self._roteiro_com_saida(datetime.datetime(2026, 6, 1, 8, 0, 0))
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             data_criacao=datetime.date(2026, 5, 10),
             roteiro=roteiro,
             retificado_documento=True,
@@ -52,7 +53,7 @@ class ResolverAssuntoOficioTests(TestCase):
 
     def test_complementar_nunca_muda_assunto_termo(self):
         roteiro = self._roteiro_com_saida(datetime.datetime(2026, 6, 1, 8, 0, 0))
-        oficio_autorizacao = Oficio.objects.create(
+        oficio_autorizacao = Oficio.objects.create(area=area_de_teste(), 
             data_criacao=datetime.date(2026, 5, 10),
             roteiro=roteiro,
             complementar_documento=True,
@@ -61,7 +62,7 @@ class ResolverAssuntoOficioTests(TestCase):
         self.assertEqual(r["assunto_termo"], "autorização")
 
         roteiro2 = self._roteiro_com_saida(datetime.datetime(2026, 5, 1, 8, 0, 0))
-        oficio_convalidacao = Oficio.objects.create(
+        oficio_convalidacao = Oficio.objects.create(area=area_de_teste(), 
             data_criacao=datetime.date(2026, 5, 10),
             roteiro=roteiro2,
             complementar_documento=True,
@@ -71,7 +72,7 @@ class ResolverAssuntoOficioTests(TestCase):
 
     def test_retificado_ignorado_se_ja_convalidacao(self):
         roteiro = self._roteiro_com_saida(datetime.datetime(2026, 5, 1, 8, 0, 0))
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             data_criacao=datetime.date(2026, 5, 10),
             roteiro=roteiro,
             retificado_documento=True,
@@ -85,7 +86,7 @@ class AssuntoLinhaNaoUsaCampoWizardTests(TestCase):
         ConfiguracaoSistema.get_singleton()
 
     def test_demo_assunto_nao_aparece_no_contexto(self):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             data_criacao=datetime.date(2026, 5, 10),
             assunto="[DEMO OFICIO] texto livre",
         )
