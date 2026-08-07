@@ -91,7 +91,7 @@ request.
 | ID | Defeito | Dias |
 |---|---|---:|
 | `DB-06` ✅ | ~~Remover um servidor da equipe do ofício apaga em cascata comprovante e assinatura já coletados (`prestacoes_contas/signals.py:33`)~~ — **fechado**: `sair_da_equipe` marca em vez de apagar quem tem dados coletados | 3 |
-| `DB-07` ✅ | ~~2 `CheckConstraint` em 54 modelos: 9 pares início/fim sem ordem garantida, dinheiro negativo aceito~~ — **fechado**: 25 constraints, 23 novas, provadas por inversão individual | 3 |
+| `DB-07` ✅ | ~~2 `CheckConstraint` em 54 modelos: 9 pares início/fim sem ordem garantida, dinheiro negativo aceito~~ — **fechado**: 26 constraints, 24 novas, provadas por inversão individual (a última veio com o `NOVO-36`) | 3 |
 | `DB-08` 🟠 | Coleções ordenadas aceitam duplicata: destino repetido é contado duas vezes pelo motor de diárias e impresso duas vezes | 2 |
 
 **Limite 4 do `AGENTS.md` vale integralmente aqui:** cada migração entra com a query de validação
@@ -146,7 +146,8 @@ sobrevivam. — **cumprido** por `prestacoes_contas/test_remocao_equipe.py::Gate
 > Introspecção sobre os 54 modelos, não a lista do catálogo: `Roteiro` tem **quatro** datetimes em
 > cadeia (`saida_dt` → `chegada_dt` → `retorno_saida_dt` → `retorno_chegada_dt`) e `RoteiroTrecho`
 > tem um par próprio — nenhum dos dois estava nos "9 pares". Total final: 11 constraints de ordem e
-> 12 de sinal, mais as 2 que já existiam — o décimo segundo elo de ordem saiu do PR como `NOVO-36`.
+> 12 de sinal, mais as 2 que já existiam — o décimo segundo elo de ordem saiu do PR como `NOVO-36`,
+> **e voltou junto com a correção dele**, fechando a cadeia em 26.
 >
 > **Os testes escrevem por `queryset.update()`, não por `save()`.** É o caminho que o defeito
 > descreve — o que escapa da validação de formulário. Um teste que passasse pelo `save()` poderia
