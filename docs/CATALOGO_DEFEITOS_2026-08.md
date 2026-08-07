@@ -782,7 +782,7 @@ o valor viaja para o ofício e para a prestação assinada.
 > **De quebra:** `prest_serv_diaria_recebida_positiva` usava o kwarg `check=`, depreciado desde o
 > Django 5.1 e removido no 6.0 — o import do modelo já emitia `RemovedInDjango60Warning`.
 
-### DB-08 🟠 Coleções ordenadas aceitam duplicata · AUD · 2 d
+### DB-08 🟠 PARCIAL — 3 de 5 fechados · Coleções ordenadas aceitam duplicata · AUD · 2 d
 
 `RoteiroDestino`, `RoteiroTrecho`, `PlanoDestino`, `EventoPlano` e `DiarioBordoTrecho` têm
 `constraints=[]`. Provado em transação real: dois `RoteiroDestino` com a mesma `(roteiro, ordem)`
@@ -790,6 +790,42 @@ são aceitos.
 **Efeito:** destino duplicado é contado **duas vezes pelo motor de diárias** e impresso duas vezes
 no ofício e no termo. Ordem repetida torna a sequência não determinística, mudando o documento
 gerado entre duas visualizações do mesmo roteiro.
+
+> **Fatia 1 fechada em 07/08/2026 — e o enunciado errava em três pontos, todos corrigidos por
+> medição antes de escrever constraint.**
+>
+> 1. **`eventos.EventoPlano` não existe.** O modelo é `planos_trabalho.EventoPlano`.
+> 2. **`PlanoDestino` não é `(plano, ordem)`.** Um plano guarda ao mesmo tempo os destinos de
+>    rascunho (`evento IS NULL`) e as cópias por evento, e `planos_trabalho/services.py:968` copia
+>    `d.ordem` tal e qual ao comitar. `(plano, ordem)` **reprovaria produção no primeiro commit de
+>    evento** — está travado por `test_o_rascunho_e_a_copia_do_evento_convivem_na_mesma_posicao`,
+>    que é a inversão nº 3.
+> 3. **Dois dos cinco não aceitam constraint simples.** `RoteiroTrecho`
+>    (`roteiros/roteiro_logic.py:1629`) e `DiarioBordoTrecho`
+>    (`prestacoes_contas/diario_services.py:282`) reaproveitam as linhas por id e gravam `ordem` uma
+>    a uma — trocar duas posições colide no meio do laço. Ficam para a **fatia 2**, junto com a
+>    troca dos dois escritores para dois passos.
+>
+> **A saída óbvia está fechada:** `deferrable=DEFERRED` não serve porque
+> `supports_deferrable_unique_constraints` é `False` no SQLite e a suíte roda nos dois bancos — a
+> constraint existiria só no PostgreSQL e o SQLite passaria sem testar nada. Medido, e travado em
+> `test_o_sqlite_nao_suporta_constraint_adiada`.
+>
+> **A armadilha do NULL.** `PlanoDestino.evento` é anulável, e em SQL NULL é distinto de NULL num
+> índice único: uma constraint só sobre `(plano, evento, ordem)` deixaria **sem proteção justamente
+> o caso mais comum**, o rascunho que o formulário grava. Daí o par parcial. É a inversão nº 2.
+>
+> **Uma reordenação que eu não tinha achado, e quem achou foi a suíte.**
+> `roteiros/tests/test_routing.py:503` trocava as posições no lugar
+> (`d0.ordem, d1.ordem = 1, 0` + dois `save`) e a constraint reprovou nos dois bancos. Conferido por
+> grep: **produção não tem troca no lugar para este modelo** — o único escritor apaga e recria
+> (`roteiro_logic.py:1581`). O atalho era do teste. Reescrito para reordenar como produção, e
+> conferido por inversão que a asserção **não** ficou vácua: quebrar
+> `mark_stale_when_signature_changed` continua reprovando.
+>
+> Migrações: `roteiros/0012` e `planos_trabalho/0022`, cada uma com o SQL que localiza as linhas em
+> produção (limite 4 do `AGENTS.md`). Medido no banco de desenvolvimento: **0 grupos duplicados**
+> nas três consultas.
 
 ### DB-09 🟠 Lista de roteiros agrega antes do `LIMIT` · AUD · 2 d
 
