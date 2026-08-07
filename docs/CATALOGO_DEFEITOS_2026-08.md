@@ -3761,6 +3761,26 @@ nunca os carregou: as duas classes já eram enfeite. O defeito não é visual, �
 de widget que promete um gancho de estilo inexistente convida o próximo a estilizar por cima do que
 ele acha que existe.
 
+### NOVO-47 ✅ RESOLVIDO · 🟠 `NOVO` Duas CVEs do `pypdf` publicadas em 07/08 reprovam o passo 15 na `main` e em todo PR aberto · QA · 0,25 d
+
+`CVE-2026-71852` e `CVE-2026-71870` atingem `pypdf==6.14.2`, a versão travada em
+`requirements/lock.txt`. O passo **Audit Python dependencies** passou a reprovar, e por ser o passo
+**15** ele anula tudo a jusante: a suíte completa, os pisos de cobertura e a régua do `PF-07` ficam
+como `skipped`. Um PR que só mexe em CSS chega vermelho sem ter causado nada — foi assim que
+apareceu, no #254.
+
+**Não é regressão de nenhum PR.** O `lock.txt` do #254 é byte a byte igual ao da `main`; o último
+verde da `main` (`c310aab`, 16:26) é anterior à publicação dos avisos. É a mesma forma do `NOVO-40`:
+gate que depende de fonte externa e envelhece sozinho, sem ninguém tocar no repositório.
+
+**Resolvido em 07/08:** `pypdf` 6.14.2 → 6.15.0, versão de correção indicada pelos dois avisos, em
+`lock.txt` (com os dois hashes) e no piso de `base.txt` — subir só o lock deixaria a faixa aceitando
+a versão vulnerável de volta na próxima recompilação.
+
+Os três consumidores (`termos/services.py`, `prestacoes_contas/services.py` e
+`assinatura_services.py`) usam `PdfReader`/`PdfWriter` na superfície estável; suíte verde, 1.744
+testes, e `pip_audit` sem achado além do `PYSEC-2026-3412` já ignorado com justificativa.
+
 ### NOVO-48 🟡 `NOVO` Setenta nomes de classe morta sobrevivem dentro de seletor agrupado vivo · MOR · 0,5 d
 
 Medido depois de o `UI-01` fechar: **140 partes de seletor** citando **70 classes** que não existem
