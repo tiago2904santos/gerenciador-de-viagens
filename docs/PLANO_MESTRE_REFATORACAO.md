@@ -205,13 +205,16 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `QA-07` sem lint/formatação/tipo em Python no CI — **lint fechado** (`ruff` em zero,
       gate em `tests.yml`). Formatação e tipo seguem abertos como `NOVO-05`. A folga zero do
       `--max-orm-em-view 30` continua de pé: qualquer ORM novo em view reprova o CI.
-- [ ] `NOVO-11` o auditor de ORM em view conta `.objects` dentro de docstring — a catraca mede o
-      texto do arquivo, não o código. Achado no `NOVO-07`, quando ela caiu de 30 para 29 por causa
-      de uma frase. Correção é contar por `ast`, não por regex.
-- [ ] `NOVO-12` 🔴 nenhuma régua olha a configuração de produção — `SECRET_KEY` de 9 caracteres
-      passou despercebida por todo o ciclo. Achada por uma pessoa rodando `check --deploy` no VPS,
-      não por gate. Chave já trocada; falta a catraca, e ela depende de decidir o `core.E002`
-      antes (produção viola um check que é `Error`).
+- [x] `NOVO-11` o auditor de ORM em view conta `.objects` dentro de docstring — **contagem por
+      `ast` desde 07/08** (`ast.Attribute`, cobrindo `objects` e `all_objects` do `BE-09`), com
+      teste que prova que prosa não conta. O número não mudou na troca: 29, e a catraca fica em 29.
+      **Com isto e o `NOVO-12`, a Fase 1 fecha.**
+- [x] `NOVO-12` 🔴 nenhuma régua olha a configuração de produção — **fechado na ordem do
+      enunciado**: `core.E002` decidido (virou `core.W002`; um `Error` que produção não pode
+      satisfazer não é catraca, e o SLA de conversão já tem gate medido em `tests.yml`),
+      `check --deploy --fail-level ERROR` nas pré-checagens do `deploy.yml` (antes do checkout,
+      com o `.env` real), e `ALLOWED_HOSTS`/`CSRF_TRUSTED_ORIGINS` falhando cedo no `prod.py`
+      como `REDIS_URL` já fazia.
 - [x] `QA-11` `reparar-producao.yml` em UTF-16LE
 - [x] `QA-12` sem Dependabot, sem CodeQL, sem gate de acessibilidade — **Dependabot entrou**;
       CodeQL e gate de acessibilidade seguem abertos
@@ -255,11 +258,17 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `DB-01` `TabelaDiaria` sem `area` — o enunciado estava invertido: a tabela é nacional de
       propósito. O trabalho era o portão, e ele ficou em **superusuário** (decisão do usuário), no
       POST de diárias e não na view, que serve três abas. `require_area_role` segue com zero usos.
-- [ ] `DB-02` `area` anulável em 27 de 28 modelos — **o enunciado precisa ser reescrito antes
-      de qualquer migração.** O `NOVO-31` (feito) mediu, e o `NOVO-34` registra: num banco
-      recém-migrado **cinco modelos já nascem com `area IS NULL`**, por seed, e a linha global
-      de `ConfiguracaoNumeracaoOficio` **é** o piso de numeração — `NOT NULL` ali destrói o
-      mecanismo. São três grupos, não uma dívida uniforme.
+- [x] `DB-02` `area` anulável em 27 de 28 modelos — **enunciado reescrito nos três grupos do
+      `NOVO-34` e grupo operacional migrado (07/08): `NOT NULL` nos 8 modelos do `core.E001`,
+      em oito migrações `*_area_obrigatoria`.** A segurança vem da ordem do `NOVO-12`: o
+      `check --deploy` aborta no `core.E001` antes do checkout enquanto houver órfão, então a
+      migração nunca encontra NULL; `scripts/validar_not_null_db02.py` é a validação avulsa do
+      limite 4. O balde legado operacional ficou vazio **por construção** (o passo "mudar
+      `filter_queryset_by_area` sem área" caiu por desnecessário) e escrita sem área falha alto.
+      Grupos 2 (catálogo com padrão global) e 3 (global por projeto) ficam anuláveis com a razão
+      documentada no enunciado; a decisão de produto do grupo 2 está registrada como `NOVO-43`.
+      A reescrita da suíte rendeu `core/testing.py` (área e vínculo de teste, `com_request`) e
+      fechou de carona um N+1 nas pendências do Drive. **Fecha a Fase 2.**
 - [x] `DB-04` cache documental não recorta por área — latente, como o enunciado dizia, mas por
       outro motivo: quem separa as áreas é a **referência**, que era opcional. Agora é obrigatória
       (`ValueError` sem ela). A afirmação de que todo artefato nascia `area=NULL` **era falsa** —

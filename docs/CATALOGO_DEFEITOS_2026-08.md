@@ -528,18 +528,53 @@ o desenho atual evita, e mexeria na regra de dinheiro fechada no ciclo de julho.
 > duplicada recusada —, não a permissão; sem a troca eles passariam a medir o 403 e parariam de
 > medir a regra de dinheiro.
 
-### DB-02 🔴 `area` anulável em 27 de 28 modelos · AUD · 5 d · risco alto
+### DB-02 ✅ RESOLVIDO (07/08, reescrito pelo `NOVO-34`) · 🔴 `area` anulável — NOT NULL no grupo operacional; anulável com razão nos outros dois · AUD · 5 d · risco alto
 
-Só `usuarios.VinculoUsuarioArea` tem `area` NOT NULL. Os outros 27 — `Oficio`, `Roteiro`,
-`PrestacaoContas`, `TermoAutorizacao`, `OrdemServico`, `PlanoTrabalho`, `Evento`, `Servidor`,
-`Viatura`, `DocumentoArtefato`… — aceitam NULL. E `core/tenancy.py:63-67`:
-`if area is None: return queryset.filter(area__isnull=True)`.
-**Efeito, nos dois sentidos:** um usuário autenticado sem vínculo de área vê e edita **o balde
-inteiro** de dados legados sem área; e todo código que roda sem request (tarefa assíncrona de
-geração documental, comando, signal fora de ciclo) grava com `area=None`.
-**Correção em três passos:** (1) rodar `backfill_legacy_areas` e provar com
-`select count(*) where area_id is null` por tabela; (2) `NOT NULL` nos modelos transacionais via
-migração com validação; (3) só então mudar o comportamento de `filter_queryset_by_area` sem área.
+**O enunciado original ("`area` anulável em 27 de 28 modelos", tratado como dívida uniforme)
+estava errado, e a medição do `NOVO-34` o reescreveu em três grupos antes de qualquer migração:**
+
+1. **Operacional — `NOT NULL`, feito.** Os oito modelos do `core.E001`: `Roteiro`, `Evento`,
+   `DocumentoArtefato`, `Oficio`, `TermoAutorizacao`, `PlanoTrabalho`, `OrdemServico`,
+   `PrestacaoContas` — migrações `*_area_obrigatoria` nos oito apps. Os dois efeitos do enunciado
+   fecham aqui: o balde `area IS NULL` que um usuário sem vínculo enxergava inteiro
+   (`core/tenancy.py:70-71`) passa a ser **vazio por construção**, e escrita sem área fora de
+   request falha alto (`IntegrityError`) em vez de gravar órfão invisível.
+   A migração nunca encontra NULL em produção pela **ordem** que o `NOVO-12` criou: o
+   `check --deploy --fail-level ERROR` roda nas pré-checagens do `deploy.yml`, antes do
+   backup/checkout, e o `core.E001` (Error) aborta com a instrução de backfill enquanto houver
+   órfão operacional. Validação avulsa: `scripts/validar_not_null_db02.py` (limite 4 do
+   `AGENTS.md`); o backup já é automático no mesmo deploy. Dois consertos de código saíram da
+   janela pré-migração: `backfill_legacy_areas` deixou de pular modelo com `field.null=False`
+   (o critério de nulidade em memória o esvaziaria justamente quando ele é necessário) e o signal
+   de prestações passou a ler `oficio.area_id` (com `null=False`, ler `.area` num órfão levanta
+   `RelatedObjectDoesNotExist`).
+2. **Catálogo com padrão global — segue anulável até decisão de produto.** `TipoEvento`,
+   `ModeloMotivoEvento`, `ModeloMotivoOficio`, `ModeloJustificativa`, `ProgramaSolicitante`,
+   `HorarioAtendimento`, `AtividadePlanoTrabalho`, `PresetAtividadesPlanoTrabalho`,
+   `ModeloTextoRelatorioTecnico` e os cinco de `cadastros` (`Unidade`, `Cargo`, `Combustivel`,
+   `Servidor`, `Viatura`). Cinco nascem com `area IS NULL` por seed de migração (`NOVO-34`) e as
+   constraints condicionais `Q(area__isnull=True)` são deliberadas. `NOT NULL` aqui exige decidir
+   o destino do global — atribuir a uma área ou duplicar por área (caminho do `NOVO-09`). O
+   `NOVO-43` registra a medição que essa decisão precisa.
+3. **Global por projeto — NULL é o mecanismo; não entra.** `ConfiguracaoNumeracaoOficio` (a linha
+   global **é** o piso de numeração de 2026) e `OficioNumeroLacuna` (lacunas do mesmo piso);
+   `ConfiguracaoSistema` (linha global de compatibilidade — `get_singleton` já não a recria); e os
+   `SET_NULL` por projeto, `AuditEvent` (fora desde o `NOVO-31`) e `DriveReorganizacaoJob`
+   (histórico de job sobrevive à área apagada). `DocumentoGeracao` fica anulável nesta rodada: o
+   job recebe a área explícita do request e a leitura já recorta.
+
+O passo 3 da correção original ("mudar o comportamento de `filter_queryset_by_area` sem área")
+tornou-se desnecessário para o defeito enunciado: com o grupo 1 `NOT NULL`, `area=None` →
+`filter(area__isnull=True)` devolve vazio para todo modelo operacional, mecanicamente. Mudar a
+semântica para os grupos 2/3 é parte da decisão do `NOVO-43`, não deste ID.
+
+Evidência: `core/tests/test_deploy_checks.py` prova o `IntegrityError` que falharia antes;
+`core/tests/test_area_scoped_manager.py` reescreve o contrato (balde operacional vazio; balde de
+catálogo preservado); a suíte inteira passou a criar dado com área — e o custo disso virou
+instrumento reutilizável, `core/testing.py` (`area_de_teste`, `vincular_area`, `com_request`,
+`sem_request`). A reescrita também revelou e fechou um N+1 real: a lista de pendências do Drive
+buscava a `AreaTrabalho` de cada origem só para comparar pk — invisível enquanto o legado tinha
+`area_id NULL`, porque FK `None` nem vai ao banco (`integracoes/google_drive/status.py`).
 
 ### DB-03 ✅ RESOLVIDO · 🟠 Limpeza de rascunhos apaga rascunho de outra área · AUD · 1 d
 
@@ -2374,7 +2409,12 @@ não é ORM em view, não é CSS fora de token, e `ruff` não reclama de atribut
 (`F821` só pega nome livre, não `self.x`). Fica a lição para o `PLANO_MESTRE`: caminho de sucesso
 sem teste é caminho não coberto, por mais óbvio que pareça.
 
-### NOVO-11 🟡 `NOVO` O auditor de ORM em view conta `.objects` dentro de docstring · QA · 0,5 d
+### NOVO-11 ✅ RESOLVIDO (07/08) · 🟡 `NOVO` O auditor de ORM em view conta `.objects` dentro de docstring · QA · 0,5 d
+
+> **Resolvido como a correção pedia:** `contar_orm_em_views` passou a contar por `ast.Attribute`
+> (`objects` e `all_objects`, mantendo o `BE-09`), com a unidade testável `contar_orm_no_codigo` e
+> teste que prova o defeito — prosa não conta, código conta. O número medido não mudou na troca
+> (29): em 07/08 nenhuma docstring de view citava `.objects`, então a catraca segue em 29.
 
 `scripts/audit_django_architecture.py`, `contar_orm_em_views`: casa
 `re.compile(r"\.objects\b")` no **texto do arquivo**, sem distinguir código de prosa.
@@ -2396,7 +2436,17 @@ caminho que `sync_document_generations_in_views` já poderia querer.
 **Não é urgente e não é regressão:** a catraca continua sendo catraca, só que com uma folga que
 ninguém sabe medir. Entra na fila de `QA` do plano mestre, não à frente de defeito funcional.
 
-### NOVO-12 🔴 `NOVO` Nenhuma régua olha a configuração de produção — `SECRET_KEY` de 9 caracteres · QA · 1 d
+### NOVO-12 ✅ RESOLVIDO (07/08) · 🔴 `NOVO` Nenhuma régua olha a configuração de produção — `SECRET_KEY` de 9 caracteres · QA · 1 d
+
+> **Resolvido na ordem que o enunciado exigia.** (1) O `core.E002` foi decidido: virou `core.W002`
+> (`Warning`) — produção roda em `auto`, um `Error` que ninguém pode satisfazer não é catraca, é
+> ruído, e o SLA de conversão já tem gate próprio e medido em `tests.yml`
+> (`documentos_unoserver_check --benchmark`); quando produção ligar o unoserver o aviso some, e
+> voltar a bloquear é trocar uma linha. (2) `python manage.py check --deploy --fail-level ERROR`
+> entrou nas pré-checagens do `deploy.yml`, antes do backup/checkout — o único lugar onde o `.env`
+> real está carregado, onde a `SECRET_KEY` de 9 caracteres teria sido barrada. (3) A varredura de
+> degradação calada fechou com `ALLOWED_HOSTS` e `CSRF_TRUSTED_ORIGINS` falhando cedo no
+> `prod.py`, como `REDIS_URL` e `FIELD_ENCRYPTION_KEYS` já faziam.
 
 **Medido em 06/08/2026, no VPS, com `python manage.py check --deploy`:**
 
@@ -2885,7 +2935,12 @@ histórico, não pendência — e por isso ele também não entra no `DB-02`.
 
 ---
 
-### NOVO-34 🔴 `NOVO` Cinco modelos nascem com `area IS NULL` por seed de migração — e o `DB-02` conta com o contrário · DB · 1 d
+### NOVO-34 ✅ RESOLVIDO (07/08) · 🔴 `NOVO` Cinco modelos nascem com `area IS NULL` por seed de migração — e o `DB-02` conta com o contrário · DB · 1 d
+
+> **Resolvido pela reescrita do `DB-02`** nos três grupos abaixo, feita antes de qualquer
+> migração, como a correção pedia. A medição em produção ganhou instrumento permanente: o
+> `check --deploy` do `NOVO-12` roda no início de todo deploy e o `core.W001` imprime a contagem
+> por modelo com o `.env` e o banco reais — não depende mais de alguém lembrar de medir.
 
 Medido com o `NOVO-31` recém-consertado, num banco **recém-migrado e sem nenhum dado de usuário**:
 
@@ -3128,6 +3183,29 @@ alerta já estava lá.
 
 **Medição que falta:** quantos ofícios já emitidos teriam contagem diferente hoje. Sem isso não dá
 para saber se é dívida histórica ou risco corrente.
+
+---
+
+### NOVO-43 🟠 `NOVO` O catálogo global de seed não é ofertado a usuário com área — os pickers recortam sem fallback · DB · decisão de produto
+
+Medido em 07/08/2026, ao reescrever os testes do `DB-02`. `filter_queryset_by_area` é estrito:
+com área ativa devolve só `area = X`, nunca o global (`area IS NULL`). Consequência: os registros
+que o seed de migração cria como "padrão da instalação" — 5 `TipoEvento`, 3 `ProgramaSolicitante`,
+3 `HorarioAtendimento`, 11 `AtividadePlanoTrabalho` (`NOVO-34`) — não aparecem no picker de um
+usuário com vínculo. Exemplo concreto: o wizard de plano valida `programa` contra
+`filter_queryset_by_area(ProgramaSolicitante.objects)` (`planos_trabalho/forms.py:618`); numa
+instalação recém-migrada a lista vem vazia até a área cadastrar os próprios programas.
+
+**Não é regressão do `DB-02`** — é o comportamento vigente desde o `BE-09`. A reescrita dos testes
+só o tornou visível: o teste antigo "via" o global porque o usuário de teste não tinha vínculo e
+caía no balde `area IS NULL`, exatamente o estado que o `DB-02` eliminou dos modelos operacionais.
+
+**Decisão de produto, dois caminhos — e o grupo 2 do `DB-02` depende dela:**
+
+- ofertar o global como fallback de leitura (`Q(area=X) | Q(area__isnull=True)`) nos pickers de
+  catálogo — e aí `NOT NULL` nesses modelos fica proibido de vez;
+- ou materializar o seed por área na criação de cada área (o caminho que o `NOVO-09` já tomou para
+  `ModeloJustificativa`) — e aí o grupo 2 pode um dia virar `NOT NULL`.
 
 ---
 
