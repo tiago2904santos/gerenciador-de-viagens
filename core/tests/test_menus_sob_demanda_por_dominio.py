@@ -203,3 +203,41 @@ class EventosMenusTests(RedeDeMenusSobDemanda, TestCase):
             oficio["area"] = area
         Oficio.all_objects.create(**oficio)
         return evento
+
+
+class TermosMenusTests(RedeDeMenusSobDemanda, TestCase):
+    """Termos tem menu no rodapé e um por linha — cada servidor mais a viatura.
+
+    O termo da fixture precisa ter servidor: sem linha, os menus de linha não são
+    renderizados e a rede volta a não exercitar o que este PR move — foi o que
+    aconteceu com `eventos`.
+    """
+
+    rota_lista = "termos:index"
+    rota_menus = "termos:card_menus"
+    query_da_lista = ""
+
+    @staticmethod
+    def presenter(registro, **kwargs):
+        from termos.card_builder import montar_card_de_termo
+
+        return montar_card_de_termo(registro, **kwargs)
+
+    def criar_registro(self, *, area=None):
+        from cadastros.models import Cargo
+        from cadastros.models import Servidor
+        from termos.models import TermoAutorizacao
+
+        campos = {}
+        if area is not None:
+            campos["area"] = area
+        termo = TermoAutorizacao.all_objects.create(**campos)
+        cargo = Cargo.all_objects.create(nome="Analista", **({"area": area} if area else {}))
+        servidor = Servidor.all_objects.create(
+            nome="Servidor" if area is None else "Alheio",
+            cargo=cargo,
+            cpf="1234567890" + ("1" if area is None else "2"),
+            **({"area": area} if area else {}),
+        )
+        termo.servidores.add(servidor)
+        return termo

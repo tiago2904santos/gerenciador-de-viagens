@@ -84,11 +84,11 @@
     "termos:index": {
       "200": {
         "consultas": 11,
-        "kb_html": 333.5
+        "kb_html": 155.3
       },
       "20000": {
         "consultas": 11,
-        "kb_html": 334.5
+        "kb_html": 155.8
       }
     }
   }
