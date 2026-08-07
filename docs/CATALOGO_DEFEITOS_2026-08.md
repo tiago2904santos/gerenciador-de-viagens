@@ -1304,11 +1304,38 @@ exibem em lugar nenhum.
 > guarda em `field.html`: **nenhum passa por lá**, e guarda que ninguém exercita já custou caro
 > nesta etapa.
 
-### HT-13 🟠 `docs/DATA_ATTRIBUTES_JS.md` descreve um contrato que não existe mais · AUD · 0,5 d
+### HT-13 ✅ RESOLVIDO · 🟠 `docs/DATA_ATTRIBUTES_JS.md` descreve um contrato que não existe mais · AUD · 0,5 d
 
 O documento cita 4 arquivos JS que já foram removidos e 3 atributos com zero ocorrências no
 repositório, enquanto o contrato realmente em uso (`data-entity-picker`, `data-inline-create-*`)
 não está documentado. É um `PADRAO_*` que aponta para o passado — quem seguir, erra.
+
+> **RESOLVIDO em 07/08/2026, e o defeito era maior do que o enunciado.** Os 4 arquivos conferem
+> (`cv-custom-select.js`, `cv-search-picker.js`, `app-multiselect.js`, `filterable-multiselect.js`).
+> Os atributos mortos eram **7**, não 3 — entram também `quick-add-panel`, `data-cv-select-bound`,
+> `data-cv-search-picker-ready` e `data-app-multiselect-ready`. E a cobertura era de **19%**: 57
+> atributos citados para **298** procurados por JS no repositório.
+>
+> **Rescrever não resolvia sozinho — foi assim que ele apodreceu da primeira vez.** O que fecha o
+> defeito é `core/tests/test_contrato_data_attributes.py`, que confere **nos dois sentidos**:
+> tudo que o documento cita existe no código, e todo atributo que um **motor compartilhado** procura
+> no DOM está citado. A segunda regra é a que se mantém sozinha: atributo novo em
+> `static/js/components/` ou `static/js/core/` reprova a suíte até ser documentado.
+>
+> **A fronteira é medida, não afirmada.** O documento cobre os motores compartilhados (161
+> atributos) e declara não indexar os de uma página só — **137**, cada um com um único consumidor.
+> Esse número está no texto e é conferido por teste: número solto em documentação é exatamente o que
+> apodrece.
+>
+> **O parágrafo que lista os removidos fica fora da varredura**, porque cita os mortos **como**
+> mortos. Para a exceção não virar porta dos fundos, o que ele contém também é afirmado: os nomes
+> precisam estar lá e **não** podem aparecer no corpo vivo.
+>
+> **Três nomes que eu inventei, pegos pela própria trava:** a primeira versão do teste expandia
+> sufixos abreviados do documento (`-trigger`, `-form`) e produziu `data-file-selection-list-item`,
+> `data-cv-filter-dropdown-value` e `data-segment-nav`, nenhum existente. A saída foi tirar a
+> esperteza do teste e pôr o nome cheio no documento — referência que não dá para grepar não é
+> referência.
 
 ### HT-14 🟡 28% dos includes não usam `only` · AUD · 2 d
 

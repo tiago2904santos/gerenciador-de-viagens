@@ -313,7 +313,9 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       justificativas. Sem parâmetro `heading_level`: a inversão mostrou o repasse inerte
 - [ ] `UI-01` poda das ~929 classes candidatas (168 KB) — uma por PR, com prova de grep que cubra concatenação `+`
 - [ ] `HT-06` 10 a 14 componentes mortos, três deles citados como canônicos
-- [ ] `HT-13` `docs/DATA_ATTRIBUTES_JS.md` descreve um contrato que não existe mais
+- [x] `HT-13` `docs/DATA_ATTRIBUTES_JS.md` descreve um contrato que não existe mais — eram **7**
+      atributos mortos, não 3, e a cobertura era de 19% (57 de 298). Rescrito a partir da
+      medição e **travado nos dois sentidos** por teste, que é o que impede de apodrecer de novo
 
 ### Fase 5 — Consulta e índice
 - [ ] `DB-09` lista de roteiros agrega antes do `LIMIT`
