@@ -19,6 +19,16 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+# NOVO-12: mesma regra do REDIS_URL — falhar cedo em vez de degradar calado.
+# ALLOWED_HOSTS vazio vira 400 em toda requisição (o Django só o exige em
+# runtime) e o `check --deploy` o relata como Warning, que o gate de
+# `--fail-level ERROR` não segura.
+if not ALLOWED_HOSTS:
+    raise RuntimeError(
+        "ALLOWED_HOSTS é obrigatória em produção: vazia, toda requisição "
+        "responde 400 atrás do Nginx.",
+    )
+
 required_db_vars = ["DB_NAME", "DB_USER", "DB_PASSWORD"]
 missing_db_vars = [name for name in required_db_vars if not os.getenv(name)]
 
@@ -116,3 +126,11 @@ CSRF_TRUSTED_ORIGINS = [
     for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
     if origin.strip()
 ]
+
+# NOVO-12: vazio, todo POST atrás do proxy leva 403 no login — e nenhum check
+# do Django olha esta variável.
+if not CSRF_TRUSTED_ORIGINS:
+    raise RuntimeError(
+        "CSRF_TRUSTED_ORIGINS é obrigatória em produção: vazia, todo POST "
+        "(inclusive o login) responde 403 atrás do proxy HTTPS.",
+    )

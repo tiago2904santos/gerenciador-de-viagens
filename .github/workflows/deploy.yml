@@ -66,6 +66,15 @@ jobs:
             export PGUSER="$DB_USER"
             export PGPASSWORD="$DB_PASSWORD"
 
+            # NOVO-12: a régua de configuração roda aqui porque é o único lugar
+            # onde o .env real está carregado — o CI não o tem, e foi assim que
+            # uma SECRET_KEY de 9 caracteres atravessou o ciclo inteiro. Antes
+            # do checkout, que é a única hora em que abortar é barato: nada foi
+            # tocado ainda. `--fail-level ERROR`: SECRET_KEY fraca, DEBUG ligado,
+            # cookie sem Secure e registro operacional sem área (core.E001)
+            # abortam; os avisos (core.W001/W002) saem no log sem travar.
+            python manage.py check --deploy --fail-level ERROR
+
             git fetch origin "$TARGET_SHA"
 
             # Backup antes do checkout: o snapshot precisa ser do estado que

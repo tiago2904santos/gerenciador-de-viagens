@@ -64,6 +64,17 @@ def _contar_sem_area(modelos):
 
 @register(Tags.security, deploy=True)
 def check_document_generation_sla_configuration(app_configs, **kwargs):
+    """`NOVO-12` rebaixou este check de `Error` (`core.E002`) para `Warning`.
+
+    Produção roda em `DOCUMENTOS_DEFAULT_PDF_ENGINE=auto` e o check era a única
+    razão de `check --deploy` reprovar lá — um `Error` que ninguém satisfaz não é
+    catraca, é ruído, e ele impedia de ligar o gate do `deploy.yml` que pega a
+    classe de defeito que de fato mordeu (`SECRET_KEY` de 9 caracteres). O SLA de
+    conversão tem gate próprio e medido no CI (`documentos_unoserver_check
+    --benchmark`, em tests.yml); aqui o desvio segue visível a cada deploy, sem
+    segurar o deploy inteiro. Quando produção ligar o unoserver, o aviso some —
+    e voltar a bloquear é trocar uma linha, com o gate já no lugar.
+    """
     engine = (
         getattr(settings, "DOCUMENTOS_DEFAULT_PDF_ENGINE", "") or ""
     ).strip().lower()
@@ -71,7 +82,7 @@ def check_document_generation_sla_configuration(app_configs, **kwargs):
     if engine == "unoserver" and url:
         return []
     return [
-        Error(
+        CheckWarning(
             "Produção deve usar o conversor LibreOffice residente (unoserver).",
             hint=(
                 "Defina DOCUMENTOS_DEFAULT_PDF_ENGINE=unoserver e "
@@ -79,7 +90,7 @@ def check_document_generation_sla_configuration(app_configs, **kwargs):
                 "`documentos_unoserver_check --benchmark "
                 "--representative-resources --max-ms 1000 --iterations 3`."
             ),
-            id="core.E002",
+            id="core.W002",
         ),
     ]
 

@@ -1,3 +1,4 @@
+from django.core import checks
 from django.test import SimpleTestCase
 from django.test import TestCase
 from django.test import override_settings
@@ -29,7 +30,13 @@ class DocumentSLADeployCheckTests(SimpleTestCase):
         DOCUMENTOS_DEFAULT_PDF_ENGINE="auto",
         DOCUMENTOS_UNOSERVER_URL=None,
     )
-    def test_bloqueia_fallback_lento_em_producao(self):
-        errors = check_document_generation_sla_configuration(None)
+    def test_relata_fallback_lento_sem_travar_o_deploy(self):
+        # NOVO-12: Warning, nao Error. O gate do deploy.yml roda com
+        # --fail-level ERROR; se isto voltar a ser Error sem producao ter o
+        # unoserver, todo deploy trava — foi exatamente o que impediu o gate
+        # de existir ate agora.
+        achados = check_document_generation_sla_configuration(None)
 
-        self.assertEqual(errors[0].id, "core.E002")
+        self.assertEqual(achados[0].id, "core.W002")
+        self.assertTrue(achados[0].is_serious(level=checks.WARNING))
+        self.assertFalse(achados[0].is_serious(level=checks.ERROR))
