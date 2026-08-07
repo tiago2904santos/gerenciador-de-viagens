@@ -595,26 +595,6 @@ html[data-theme="light"] {
   pointer-events: none;
 }
 
-/* Alias legado para __marker */
-.page-stepper__number {
-  align-items:     center;
-  background:      var(--stepper-idle-bg);
-  border:          1px solid var(--stepper-idle-border);
-  border-radius:   var(--radius-pill);
-  color:           var(--stepper-idle-color);
-  display:         inline-flex;
-  flex-shrink:     0;
-  font-size:       var(--font-size-xs);
-  font-weight:     var(--font-weight-bold);
-  height:          var(--stepper-item-size);
-  justify-content: center;
-  transition:
-    background   var(--transition-base),
-    color        var(--transition-base),
-    border-color var(--transition-base);
-  width:           var(--stepper-item-size);
-}
-
 /* Bloco textual centralizado abaixo do marcador */
 .page-stepper__content {
   align-items:    center;
@@ -837,14 +817,6 @@ html[data-theme="light"] {
 .main-form-panel .cv-search-picker,
 .main-form-panel .cv-custom-select,
 .main-form-panel .cv-field-with-action {
-  overflow: visible;
-}
-
-.main-form-panel--inline-create {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  gap: var(--space-4);
   overflow: visible;
 }
 
@@ -1579,12 +1551,6 @@ body.has-delete-modal-open {
   width: 100%;
 }
 
-.delete-confirm-modal__header {
-  align-items: center;
-  display: flex;
-  gap: var(--space-3);
-}
-
 .delete-confirm-modal__icon {
   align-items: center;
   background: color-mix(in srgb, var(--color-danger) 18%, transparent);
@@ -1741,39 +1707,8 @@ body.has-delete-modal-open {
   width: 100%;
 }
 
-/* =========================================================
-   17. Quick Create Inline
-   Subvariação do List / Filters para mini-cadastros auxiliares.
-   Exibe-se abaixo da Filter Bar como extensão visual do painel.
-   Visível apenas quando .is-open.
-   Regra: botões ficam em .quick-create-actions, nunca no .field-grid.
-   ========================================================= */
-
-/* Painel: oculto por padrão, revelado via .is-open */
-.quick-create-panel {
-  background:    var(--surface-quick-create);
-  border-bottom: 1px solid var(--border-quick-create);
-  box-shadow:    var(--shadow-quick-create);
-  box-sizing:    border-box;
-  display:       none;
-  flex-direction: column;
-  width:         100%;
-}
-
 .quick-create-panel.is-open {
   display: flex;
-}
-
-/* Cabeçalho: título + botão de fechar */
-.quick-create-panel__header {
-  align-items:     center;
-  background:      var(--surface-quick-create-header);
-  border-bottom:   1px solid var(--border-quick-create);
-  box-sizing:      border-box;
-  display:         flex;
-  gap:             var(--space-3);
-  justify-content: space-between;
-  padding:         var(--space-2) var(--filter-bar-padding-x);
 }
 
 /* Field Grid dentro do Quick Create ocupa o espaço restante */
@@ -2459,20 +2394,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 
 .cv-inline-create__actions .btn-primary {
   border-color: var(--inline-create-primary-border);
-}
-
-/* =========================================================
-   27. Field Grid — Variantes com Colunagem Explícita
-   Complementam o .field-grid padrão de 4 colunas.
-   Usar quando a seção inteira precisa de colunagem diferente.
-   ========================================================= */
-
-/* Empilha várias grades (linhas) com o mesmo espaçamento entre campos */
-.field-grid-rows {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--field-grid-gap);
-  width:          100%;
 }
 
 /* 3 colunas: trios de campos — nome + CPF + telefone */

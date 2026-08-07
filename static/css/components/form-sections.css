@@ -162,12 +162,6 @@
   margin: 0;
 }
 
-.cv-resource-picker {
-  display: grid;
-  gap: var(--space-3);
-  min-width: 0;
-}
-
 .cv-composite-field__control {
   align-items: stretch;
   display: grid;

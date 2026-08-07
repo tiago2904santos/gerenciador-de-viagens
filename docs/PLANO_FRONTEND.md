@@ -119,9 +119,24 @@ conhecido.
 | `UI-01` 🟠 | ~929 classes candidatas em 981 blocos, 168 KB | 4–6 |
 
 **Como fazer, e o que não fazer.** A contagem desta auditoria é o **mapa**, não a licença. O
-`AGENTS.md` §3.6 exige prova de grep por arquivo apagado, colada no PR. Um arquivo por PR, na
-ordem do peso: `oficios.css` (283 blocos, 47 KB), `dev/ui-lab-fields.css`, `dev/ui-lab-pages.css`,
-`page-shell.css`, `roteiros.css`, `cv-buttons.css`.
+`AGENTS.md` §3.6 exige prova de grep por classe apagada, colada no PR.
+
+> **Fechado em 07/08.** A ordem original era um arquivo por PR, na ordem do peso: `oficios.css`
+> (283 blocos, 47 KB), `dev/ui-lab-fields.css`, `dev/ui-lab-pages.css`, `page-shell.css`,
+> `roteiros.css`, `cv-buttons.css`. Os seis saíram, e **a lista estava curta**: ela nomeava os seis
+> maiores, não os seis únicos. Remedindo o `static/css` inteiro sobravam 412 blocos e 71,6 KB em 31
+> arquivos, que saíram em duas levas — por regra, não por arquivo.
+>
+> **A regra de um arquivo por PR morreu no caminho, e a substituta é por família de classe.** Ela
+> quebrava no caso comum: classe estilizada em dois CSS e usada em nenhum template é morta nos dois,
+> e podar só um lado deixa regra órfã do outro. Em `cv-buttons.css`, 16 das 25 classes mortas.
+>
+> **O instrumento de verificação também mudou.** Diff de pixel não servia: rodando o mesmo CSS duas
+> vezes, 25 das 88 telas divergiam. O piso de ruído era maior que o efeito medido. Trocado por
+> `getComputedStyle` — caixa mais 44 propriedades por elemento, determinístico depois de desligar
+> `transition` e `animation`: **0 de 41.938** elementos entre duas capturas do mesmo CSS.
+>
+> A catraca que impede a volta é `scripts/audit_css_morto.py --max 0`, no CI.
 
 **A regra de segurança da poda, corrigida pela verificação de 05/08.** A primeira varredura
 concluiu que existia um único padrão de classe montada em tempo de execução. **Estava errada, e o

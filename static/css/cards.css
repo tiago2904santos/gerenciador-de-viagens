@@ -77,11 +77,6 @@
   gap: var(--space-3);
 }
 
-.document-card-body {
-  color: var(--color-muted-strong);
-  font-size: var(--font-size-sm);
-}
-
 .summary-card {
   display: grid;
   gap: var(--space-1);
@@ -150,28 +145,6 @@
   align-items: center;
   display: flex;
   justify-content: flex-start;
-}
-
-/* --------------------------------------------------------------------------
-   3. Page card
-   -------------------------------------------------------------------------- */
-.page-card {
-  box-sizing: border-box;
-  margin-inline: 0;
-  max-width: var(--page-max-width);
-  padding: var(--space-6);
-  width: 100%;
-}
-
-.page-card h2 {
-  font-size: calc(var(--font-size-lg) + 2px);
-  line-height: 1.25;
-  margin-bottom: var(--space-2);
-}
-
-.page-card p {
-  color: var(--color-muted);
-  margin-bottom: 0;
 }
 /* --------------------------------------------------------------------------
    5. app-panel — alias semantico de .form-section

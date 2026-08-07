@@ -74,7 +74,7 @@ jobs:
       - name: Block new frontend standards debt
         # Catraca: este número só desce. A Etapa 1 levou 465 → 449; a Etapa 7
         # levou 449 → 438 na fase 2 e 438 → 417 na fase 1.
-        run: python scripts/audit_frontend_standards.py --max-warnings 248
+        run: python scripts/audit_frontend_standards.py --max-warnings 246
 
       - name: Block new dead CSS (UI-01)
         # Catraca nova, e o teto nasce em ZERO. O `UI-01` mediu 981 blocos de
@@ -95,7 +95,7 @@ jobs:
         # sobraram, mas cada bloco novo e um lugar a mais onde alguem vai ter
         # de lembrar do piso — e o script nao conta o idioma correto
         # (`:focus:not(:focus-visible)`), so quem apaga o foco sem substituto.
-        run: python scripts/audit_foco_visivel.py --max 35
+        run: python scripts/audit_foco_visivel.py --max 32
 
       - name: Block backend architecture regressions (P-01, P-05)
         # Catraca: este número só desce. O P-01 fechou os quatro apps do

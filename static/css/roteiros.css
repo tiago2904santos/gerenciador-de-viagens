@@ -1783,15 +1783,6 @@
   padding: 14px 16px 12px;
 }
 
-/* --------------------------------------------------------------------------
-   7. Retorno final
-   -------------------------------------------------------------------------- */
-
-/* Retorno */
-#retorno-card .roteiro-editor__grid {
-  align-items: start;
-}
-
 .roteiro-editor--avulso .roteiro-editor__reference-block--retorno .roteiro-editor__reference-body {
   padding: 0 24px 0 24px;
 }

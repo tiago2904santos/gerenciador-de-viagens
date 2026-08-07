@@ -1717,7 +1717,7 @@ produção.**
 
 ## UI — CSS
 
-### UI-01 🟠 PARCIAL (`oficios.css` fechado) · 36% das classes declaradas não aparecem em lugar nenhum · MED · ver plano de front
+### UI-01 ✅ RESOLVIDO · 🟠 36% das classes declaradas não aparecem em lugar nenhum · MED · ver plano de front
 
 2.612 classes declaradas em `static/css` (fora o bundle, que é concatenação); **~936 sem nenhuma
 ocorrência** num corpus de 4,7 MB com todos os templates, todo o JS e todo o Python dos 15 apps.
@@ -1877,6 +1877,29 @@ rotas × 2 temas, descobertas por rastreio a partir da barra lateral, não escri
 **A catraca que fecha o ID:** `scripts/audit_css_morto.py --max 0`, no CI. Os 981 blocos não foram
 escritos assim — cada refactor apagou markup e deixou o CSS para trás. Sem catraca o acúmulo
 recomeça no próximo PR. O teto nasce em zero porque é onde a leva A o deixou.
+
+**Resultado da leva B:** 102 blocos, 21,5 KB, 17 arquivos, 59 classes — todas com estilo em dois ou
+mais CSS, que é o que a regra antiga não sabia podar. Verificação idêntica: **0 de 41.938**
+elementos com estilo computado diferente. Catracas: `audit_frontend_standards` 248 → 246,
+`audit_foco_visivel` 35 → 32.
+
+**Fechamento, com o total.** Somando os seis arquivos do plano e as duas levas finais:
+
+| | blocos | peso |
+|---|---:|---:|
+| seis arquivos do plano (PRs anteriores) | 556 | 99,8 KB |
+| leva A | 305 | 49,4 KB |
+| leva B | 102 | 21,5 KB |
+| **total** | **963** | **170,7 KB** |
+
+Contra o enunciado de **981 blocos e 168 KB** — a diferença de blocos é de método (corpus maior,
+classe citada por outro CSS conta como viva, 46 prefixos dinâmicos protegidos) e está na direção
+segura.
+
+**O que fica declarado como não resolvido**, para o ID não fechar prometendo mais do que entregou:
+seletor de atributo (`[data-state=…]`) nunca entrou em lente nenhuma; os 70 nomes mortos dentro de
+seletor agrupado vivo são o `NOVO-48`; e as classes `roteiro-list-card--faixa-*` continuam no CSS
+protegidas por prefixo, presas ao `NOVO-45`.
 
 ### UI-02 🟠 Tema escuro é camada de exceção, não de token · MED
 
@@ -3701,3 +3724,31 @@ Com o `BE-25` (PR #247) os dois arquivos foram apagados. Nada mudou de aparênci
 nunca os carregou: as duas classes já eram enfeite. O defeito não é visual, é de contrato — um enum
 de widget que promete um gancho de estilo inexistente convida o próximo a estilizar por cima do que
 ele acha que existe.
+
+### NOVO-48 🟡 `NOVO` Setenta nomes de classe morta sobrevivem dentro de seletor agrupado vivo · MOR · 0,5 d
+
+Medido depois de o `UI-01` fechar: **140 partes de seletor** citando **70 classes** que não existem
+em lugar nenhum do código, dentro de blocos que a poda não podia tocar. O caso típico:
+
+```css
+.cv-metric__description,
+.cv-summary-tile__description,
+.pt-resumo-box__sub {   /* <- esta não existe mais */
+  color: var(--color-muted);
+}
+```
+
+`cv-metric__description` é viva, então o bloco fica — e `pt-resumo-box__sub` pega carona.
+
+**Por que não entrou no `UI-01`.** A poda apagou **blocos**; isto exige editar **seletores**, que é
+outra operação e outro risco: errar uma vírgula muda quem recebe o estilo, e nenhum teste pega. A
+catraca `audit_css_morto.py` também não conta estes — ela pergunta "o bloco inteiro está morto?", e
+a resposta aqui é não. Fica declarado como buraco, junto com os seletores de atributo
+(`[data-state=…]`), que continuam fora de todas as lentes.
+
+**Peso é quase zero; o custo é de leitura.** Um nome morto num seletor agrupado faz o próximo leitor
+acreditar que a classe existe, e é assim que ela reaparece num template.
+
+Os campeões, para dar tamanho: `roteiro-editor__*` (6 nomes), `oficio-documentos-*` (7),
+`cv-resource-picker__*` (4), `app-btn--*` e `btn-*` (9 entre os dois vocabulários de botão que o
+`cv-btn--` substituiu).

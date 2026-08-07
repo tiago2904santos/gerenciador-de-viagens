@@ -1491,26 +1491,6 @@ html[data-theme="light"] {
   pointer-events: none;
 }
 
-/* Alias legado para __marker */
-.page-stepper__number {
-  align-items:     center;
-  background:      var(--stepper-idle-bg);
-  border:          1px solid var(--stepper-idle-border);
-  border-radius:   var(--radius-pill);
-  color:           var(--stepper-idle-color);
-  display:         inline-flex;
-  flex-shrink:     0;
-  font-size:       var(--font-size-xs);
-  font-weight:     var(--font-weight-bold);
-  height:          var(--stepper-item-size);
-  justify-content: center;
-  transition:
-    background   var(--transition-base),
-    color        var(--transition-base),
-    border-color var(--transition-base);
-  width:           var(--stepper-item-size);
-}
-
 /* Bloco textual centralizado abaixo do marcador */
 .page-stepper__content {
   align-items:    center;
@@ -1733,14 +1713,6 @@ html[data-theme="light"] {
 .main-form-panel .cv-search-picker,
 .main-form-panel .cv-custom-select,
 .main-form-panel .cv-field-with-action {
-  overflow: visible;
-}
-
-.main-form-panel--inline-create {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  gap: var(--space-4);
   overflow: visible;
 }
 
@@ -2475,12 +2447,6 @@ body.has-delete-modal-open {
   width: 100%;
 }
 
-.delete-confirm-modal__header {
-  align-items: center;
-  display: flex;
-  gap: var(--space-3);
-}
-
 .delete-confirm-modal__icon {
   align-items: center;
   background: color-mix(in srgb, var(--color-danger) 18%, transparent);
@@ -2637,39 +2603,8 @@ body.has-delete-modal-open {
   width: 100%;
 }
 
-/* =========================================================
-   17. Quick Create Inline
-   Subvariação do List / Filters para mini-cadastros auxiliares.
-   Exibe-se abaixo da Filter Bar como extensão visual do painel.
-   Visível apenas quando .is-open.
-   Regra: botões ficam em .quick-create-actions, nunca no .field-grid.
-   ========================================================= */
-
-/* Painel: oculto por padrão, revelado via .is-open */
-.quick-create-panel {
-  background:    var(--surface-quick-create);
-  border-bottom: 1px solid var(--border-quick-create);
-  box-shadow:    var(--shadow-quick-create);
-  box-sizing:    border-box;
-  display:       none;
-  flex-direction: column;
-  width:         100%;
-}
-
 .quick-create-panel.is-open {
   display: flex;
-}
-
-/* Cabeçalho: título + botão de fechar */
-.quick-create-panel__header {
-  align-items:     center;
-  background:      var(--surface-quick-create-header);
-  border-bottom:   1px solid var(--border-quick-create);
-  box-sizing:      border-box;
-  display:         flex;
-  gap:             var(--space-3);
-  justify-content: space-between;
-  padding:         var(--space-2) var(--filter-bar-padding-x);
 }
 
 /* Field Grid dentro do Quick Create ocupa o espaço restante */
@@ -3355,20 +3290,6 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 
 .cv-inline-create__actions .btn-primary {
   border-color: var(--inline-create-primary-border);
-}
-
-/* =========================================================
-   27. Field Grid — Variantes com Colunagem Explícita
-   Complementam o .field-grid padrão de 4 colunas.
-   Usar quando a seção inteira precisa de colunagem diferente.
-   ========================================================= */
-
-/* Empilha várias grades (linhas) com o mesmo espaçamento entre campos */
-.field-grid-rows {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--field-grid-gap);
-  width:          100%;
 }
 
 /* 3 colunas: trios de campos — nome + CPF + telefone */
@@ -4858,73 +4779,9 @@ html[data-theme="light"] {
   --cv-field-action-radius: var(--cv-btn-control-radius);
 }
 
-.cv-field-action {
-  align-items: center;
-  background: var(--cv-btn-neutral-bg);
-  border: 1px solid var(--cv-btn-neutral-border);
-  border-radius: var(--cv-field-action-radius);
-  box-shadow: var(--shadow-xs);
-  box-sizing: border-box;
-  color: var(--cv-btn-neutral-color);
-  cursor: pointer;
-  display: inline-flex;
-  font-family: var(--font-sans);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  gap: var(--space-2);
-  justify-content: center;
-  height: var(--cv-btn-height);
-  min-height: var(--cv-btn-height);
-  padding: 0 var(--cv-btn-padding-x);
-  transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    color var(--transition-fast);
-  user-select: none;
-  white-space: nowrap;
-}
-
 .cv-field-action .cv-btn__icon {
   height: 17px;
   width: 17px;
-}
-
-.cv-field-action:hover,
-.cv-field-action:focus {
-  background: var(--cv-btn-neutral-hover-bg);
-  border-color: var(--cv-btn-neutral-hover-border);
-  color: var(--cv-btn-neutral-hover-color);
-}
-
-.cv-field-action:active {
-  filter: brightness(0.985);
-  transform: translateY(1px);
-}
-
-.cv-field-action:focus-visible {
-  box-shadow: var(--cv-btn-focus-ring);
-  outline: none;
-}
-
-.cv-field-action:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-  pointer-events: none;
-}
-
-/* Clear — limpar filtro/campo (muito discreto) */
-.cv-field-action--clear {
-  background: linear-gradient(180deg, var(--cv-btn-neutral-bg), var(--cv-btn-neutral-hover-bg));
-  border-color: var(--cv-btn-neutral-border);
-  box-shadow: var(--shadow-xs);
-  color: var(--cv-btn-neutral-color);
-}
-
-.cv-field-action--clear:hover,
-.cv-field-action--clear:focus {
-  background: linear-gradient(180deg, var(--cv-btn-neutral-hover-bg), var(--cv-btn-neutral-bg));
-  border-color: var(--cv-btn-neutral-hover-border);
-  color: var(--cv-btn-neutral-hover-color);
 }
 
 /* =========================================================
@@ -5797,16 +5654,6 @@ html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single:hove
 .cv-file-picker__upload:disabled,
 .prestacao-file-picker__upload:disabled {
   display: none;
-}
-
-.prestacao-file-picker__clear {
-  background: transparent;
-  color: var(--color-muted-strong);
-}
-
-.prestacao-file-picker__clear:hover {
-  background: var(--color-secondary-soft);
-  color: var(--color-text);
 }
 
 .cv-file-picker__inline-actions,
@@ -6706,11 +6553,6 @@ html[data-theme="dark"] .cv-action-menu {
   max-width: min(100%, 560px);
   overflow: hidden;
   padding: 24px;
-}
-
-.delete-confirm-modal__header {
-  gap: 13px;
-  padding-right: 38px;
 }
 
 .delete-confirm-modal__icon {
@@ -7882,15 +7724,6 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
   overflow: visible;
 }
 
-.cv-filter-bar__search {
-  min-width: 0;
-  position: relative;
-}
-
-.cv-filter-bar__search-input {
-  width: 100%;
-}
-
 .cv-filter-bar__select {
   min-width: 9.5rem;
 }
@@ -8191,12 +8024,6 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
 .cv-resource-picker__title,
 .cv-resource-picker__description {
   margin: 0;
-}
-
-.cv-resource-picker {
-  display: grid;
-  gap: var(--space-3);
-  min-width: 0;
 }
 
 .cv-composite-field__control {
@@ -8973,13 +8800,6 @@ html[data-theme="light"] .cv-segment-toggle {
   font-weight: 800;
 }
 
-.pt-resumo-box__value--xl,
-.cv-metric__value--xl {
-  font-size: clamp(1.5rem, 2.9vw, 2.2rem);
-  font-weight: 900;
-  line-height: 1.05;
-}
-
 /* Descrição / subtexto */
 .cv-metric__description,
 .cv-summary-tile__description,
@@ -9208,77 +9028,6 @@ html[data-theme="light"] .cv-segment-toggle {
   gap: 7px;
   min-width: 0;
   padding: 14px 16px;
-}
-
-.cv-document-card {
-  background: var(--cv-card-bg);
-  border: var(--cv-card-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--cv-card-shadow);
-  display: grid;
-  gap: 0;
-  padding: 0;
-  position: relative;
-  transition: box-shadow var(--transition-fast);
-}
-
-.cv-document-card::before {
-  background: var(--color-accent);
-  border-radius: 0 0 var(--space-1) var(--space-1);
-  content: "";
-  height: 3px;
-  left: var(--space-5);
-  position: absolute;
-  top: 0;
-  width: 42px;
-}
-
-.cv-document-card:hover {
-  box-shadow: var(--shadow-panel);
-}
-
-.cv-document-card__header,
-.cv-document-card__meta,
-.cv-document-card__body,
-.cv-document-card__actions {
-  margin: 0;
-  padding: 16px 18px;
-}
-
-.cv-document-card__header {
-  align-items: start;
-  background: var(--color-surface-muted);
-  display: flex;
-  gap: var(--space-3);
-  justify-content: space-between;
-}
-
-.cv-document-card__title,
-.cv-document-card__subtitle {
-  margin: 0;
-}
-
-.cv-document-card__title {
-  color: var(--color-heading);
-}
-
-.cv-document-card__subtitle,
-.cv-document-card__body {
-  color: var(--color-muted-strong);
-}
-
-.cv-document-card__meta {
-  background: var(--color-surface-soft);
-  border-block: 1px solid var(--color-border-soft);
-}
-
-.cv-document-card__actions {
-  align-items: center;
-  background: var(--color-surface-muted);
-  border-top: 1px solid var(--color-border);
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
 }
 
 /* Shared structural contract for rich entity cards across product modules. */
@@ -12370,14 +12119,6 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   line-height: 1.45;
 }
 
-:is(html[data-theme="dark"])
-  .cv-resource-picker {
-  background: var(--color-input-bg);
-  border: 1px dashed color-mix(in srgb, var(--color-border) 78%, var(--color-muted) 22%);
-  border-radius: 12px;
-  padding: 12px;
-}
-
 /* Controles da ficha: superfícies sólidas, raios menores e nenhuma luz de
    foco. O número e o ano formam um único controle composto. */
 :is(html[data-theme="dark"])
@@ -14537,61 +14278,6 @@ html[data-theme="dark"] *::after {
   color: var(--color-heading);
 }
 
-:is(html[data-theme="dark"])
-  .cv-document-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-left-width: 1px;
-  border-radius: 14px;
-  box-shadow: var(--shadow-card);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card::before {
-  background: var(--color-accent);
-  border-radius: 0 0 4px 4px;
-  content: "";
-  height: 3px;
-  left: 18px;
-  position: absolute;
-  top: 0;
-  width: 42px;
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card:hover {
-  box-shadow: var(--shadow-panel);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__header {
-  background: var(--color-surface-muted);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__title {
-  color: var(--color-heading);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__subtitle,
-:is(html[data-theme="dark"])
-  .cv-document-card__body {
-  color: var(--color-muted-strong);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__meta {
-  background: var(--color-surface-soft);
-  border-color: var(--color-border);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__actions {
-  background: var(--color-surface-muted);
-  border-top: 1px solid var(--color-border);
-}
-
 /* Canonical PDF viewer: solid controls around a neutral document canvas. */
 :is(html[data-theme="dark"])
   :is(.cv-document-viewer__toolbar, .cv-document-viewer__sidebar, .cv-document-viewer__stage) {
@@ -15046,28 +14732,6 @@ html[data-theme="dark"] *::after {
   background: var(--color-surface);
   border-top-color: var(--color-border-strong);
   padding-top: 18px;
-}
-
-:is(html[data-theme="dark"])
-  .cv-filter-bar__search {
-  background: var(--color-input-bg);
-  border: 1px solid var(--color-input-border);
-  border-radius: var(--radius-control);
-}
-
-:is(html[data-theme="dark"])
-  .cv-filter-bar__search-input {
-  border-color: transparent;
-  box-shadow: none;
-}
-
-:is(html[data-theme="dark"])
-  .cv-filter-bar__search-input:focus,
-:is(html[data-theme="dark"])
-  .cv-filter-bar__search-input:focus-visible {
-  border-color: transparent;
-  box-shadow: none;
-  outline: none;
 }
 
 :is(html[data-theme="dark"])
