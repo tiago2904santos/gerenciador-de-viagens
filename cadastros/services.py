@@ -29,7 +29,10 @@ def _traduz_delecao_protegida(instance):
     try:
         excluir_com_protecao(instance)
     except DelecaoProtegidaError as exc:
-        raise CadastroVinculadoError from exc
+        # `NOVO-35`: a mensagem viaja junto. Antes o `raise` era sem argumento e a
+        # razão morria aqui, então a tela só sabia dizer "está vinculado a outros
+        # registros" — verdadeiro e inútil para quem precisa resolver.
+        raise CadastroVinculadoError(str(exc)) from exc
 
 
 def resolver_cidade_sede_por_endereco(uf, cidade_endereco):
@@ -249,7 +252,54 @@ def atualizar_servidor(instance, form):
     return servidor
 
 
+def prestacoes_com_prova_irrefazivel(servidor):
+    """Linhas de prestação do servidor que a exclusão apagaria sem volta (`NOVO-35`).
+
+    **`PrestacaoServidor.todos`, nunca `servidor.prestacoes_servidor`.** O acessor
+    reverso herda o `_default_manager`, que desde o `DB-06` é o manager que esconde
+    as linhas com `removida_em` preenchido. E o invariante do `DB-06` é justamente
+    que linha marcada é a que TEM dados — a sem dados é apagada de fato. Ou seja: a
+    relação reversa esconde exatamente o conjunto que esta função existe para
+    encontrar. Medido: com a reversa, a guarda bloqueava zero de zero.
+
+    O `Collector` do `delete()` usa `_base_manager` e apaga todas, marcadas
+    inclusive — então a assimetria não é acadêmica, é a diferença entre proteger e
+    fingir que protege.
+    """
+    from prestacoes_contas.models import PrestacaoServidor
+
+    return [
+        ps
+        for ps in PrestacaoServidor.todos.filter(servidor=servidor).select_related(
+            "prestacao__oficio",
+        )
+        if ps.tem_prova_irrefazivel()
+    ]
+
+
 def excluir_servidor(instance):
+    """`NOVO-35`: recusa a exclusão quando ela apagaria prova sem volta.
+
+    `PrestacaoServidor.servidor` é `on_delete=CASCADE` — o único `CASCADE` entre as
+    treze FKs que apontam para `Servidor`; as outras são `SET_NULL`, `PROTECT` ou
+    M2M. Excluir o servidor derrubava as linhas de prestação dele e, por cascata, o
+    comprovante de saque e a assinatura eletrônica. Medido: 1 anexo -> 0.
+
+    A guarda fica aqui, no serviço, e **não** como `PROTECT` no schema: `PROTECT`
+    bloquearia todo servidor que já tenha entrado em qualquer ofício — no banco de
+    desenvolvimento, 3 de 4 — inclusive os que não têm nada a perder. O critério é
+    o dado, não o vínculo.
+    """
+    presas = prestacoes_com_prova_irrefazivel(instance)
+    if presas:
+        oficios = sorted({ps.prestacao.oficio.numero_formatado for ps in presas})
+        raise CadastroVinculadoError(
+            f"Não foi possível excluir {instance.nome}: há prestação de contas com "
+            f"comprovante, assinatura ou número de solicitação em "
+            f"{len(presas)} ofício(s) ({', '.join(oficios)}). "
+            f"Remova o servidor da equipe desses ofícios — os dados dele ficam "
+            f"preservados — e tente de novo.",
+        )
     _traduz_delecao_protegida(instance)
 
 

@@ -127,10 +127,18 @@ sobrevivam. — **cumprido** por `prestacoes_contas/test_remocao_equipe.py::Gate
 > um (a primeira versão reaproveitava a prestação e o dado do caso anterior mantinha os seguintes
 > verdes).
 >
-> **Fora do escopo, registrado como `NOVO-35`:** `PrestacaoServidor.servidor` é `CASCADE`, então
-> excluir o servidor no cadastro continua apagando o comprovante. Medido: 1 anexo → 0 após
-> `servidor.delete()`. Só não é pior porque `AssinaturaDocumento.signer` é `PROTECT` e barra quem já
-> assinou. Ficou fora porque muda a UX de exclusão do cadastro e precisa da medição de produção.
+> **Fora do escopo, registrado como `NOVO-35` — e depois fechado.** `PrestacaoServidor.servidor` é
+> `CASCADE`, então excluir o servidor no cadastro continuava apagando o comprovante. Medido: 1 anexo
+> → 0 após `servidor.delete()`. A correção não trocou o `CASCADE` por `PROTECT` (que bloquearia 3 de
+> 4 servidores no banco de dev contra 1 de 4 da regra por dado): guarda no serviço, com predicado
+> próprio `tem_prova_irrefazivel()`, mais estreito que o `tem_dados_coletados()` daqui. A diferença
+> não é estilo — `tem_dados_coletados` inclui `status`, que é **coletivo**, e um colega salvando o
+> despacho tornaria indelével um servidor semeado por engano.
+>
+> Aquela correção também revelou uma armadilha que **este** ID criou: o acessor reverso
+> `servidor.prestacoes_servidor` herda o `_default_manager` e esconde as linhas com `removida_em` —
+> que são, por construção, exatamente as que têm dados. Uma guarda pela relação reversa bloquearia
+> zero. Está travado por teste em `cadastros/tests/test_exclusao_de_servidor.py`.
 
 
 > **`DB-07` fechado. O que o levantamento achou além do enunciado.**

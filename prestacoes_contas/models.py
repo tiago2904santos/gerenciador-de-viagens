@@ -353,6 +353,32 @@ class PrestacaoServidor(models.Model):
             or self.assinaturas.exists()
         )
 
+    def tem_prova_irrefazivel(self) -> bool:
+        """Só o que ninguém consegue refazer se a linha sumir (`NOVO-35`).
+
+        Predicado deliberadamente MAIS ESTREITO que `tem_dados_coletados()`, e a
+        diferença é de propósito: preservar uma linha e **bloquear um cadastro
+        inteiro** são decisões de peso diferente. Dado barato justifica não
+        apagar; não justifica prender.
+
+        O que ficou de fora, e por quê: `status`, `arquivada`, `finalizada`,
+        `data_liberacao_diarias`, `prazo_limite_saque` e os campos de override são
+        estado de fluxo, refazíveis em segundos. Pior, `status` é **coletivo**:
+        `view_common._marcar_servidores_pendentes` marca toda a equipe pendente do
+        ofício ao salvar um documento COMPARTILHADO (despacho, RT, diário). Medido:
+        basta alguém salvar o despacho para que um servidor semeado por engano
+        passe a "ter dados coletados" sem nunca ter entregue nada — e ficaria
+        indelével para sempre por ação de terceiro.
+
+        Aqui ficam os três que, apagados, não voltam: o arquivo do comprovante, a
+        assinatura eletrônica e o número da solicitação digitado à mão.
+        """
+        return bool(
+            self.documentos_anexos.exists()
+            or self.assinaturas.exists()
+            or self.numero_solicitacao.strip()
+        )
+
     def sair_da_equipe(self) -> bool:
         """Tira este servidor da equipe corrente. Devolve `True` se preservou a linha.
 

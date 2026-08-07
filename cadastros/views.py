@@ -175,10 +175,18 @@ def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
     ]
 
 
-def _vinculo_error(request):
+def _vinculo_error(request, mensagem=None):
+    """`NOVO-35`: a mensagem específica quando existe; a genérica quando não.
+
+    O parâmetro tem default de propósito. Esta função é compartilhada por
+    `viatura_delete` e pelos catálogos, e `cadastros/tests/test_catalogos_caracterizacao.py`
+    trava o literal atual — mudar a assinatura sem default reescreveria testes de
+    caracterização que não têm nada a ver com este defeito.
+    """
     messages.error(
         request,
-        "Não foi possível excluir este cadastro porque ele está vinculado a outros registros.",
+        mensagem
+        or "Não foi possível excluir este cadastro porque ele está vinculado a outros registros.",
     )
 
 
@@ -421,8 +429,9 @@ def servidor_delete(request, pk):
     if request.method == "POST":
         try:
             excluir_servidor(servidor)
-        except CadastroVinculadoError:
-            _vinculo_error(request)
+        except CadastroVinculadoError as exc:
+            # `NOVO-35`: a razão específica chega à tela quando o serviço a dá.
+            _vinculo_error(request, str(exc) or None)
             return redirect(redirect_url)
         messages.success(request, "Servidor excluído com sucesso.")
         return redirect(redirect_url)
