@@ -25,6 +25,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from planos_trabalho.models import PlanoTrabalho
+from core.testing import vincular_area
 
 from .helpers import configurar_sistema
 from .helpers import criar_base_geografica
@@ -35,6 +36,7 @@ class WizardNavegacaoTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="wizard_nav", password="123456")
         self.client.force_login(self.user)
+        vincular_area(self.user)
         _, self.curitiba, self.maringa, _ = criar_base_geografica()
         configurar_sistema(self.curitiba)
         self.plano = criar_plano_maringa(self.maringa)

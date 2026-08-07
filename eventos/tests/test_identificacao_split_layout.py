@@ -6,13 +6,16 @@ from django.test import TestCase
 from django.urls import reverse
 
 from eventos.models import Evento
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class IdentificacaoSplitLayoutTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="ident-split", password="123456")
         self.client.force_login(self.user)
-        self.evento = Evento.objects.create(
+        vincular_area(self.user)
+        self.evento = Evento.objects.create(area=area_de_teste(), 
             titulo="Evento split",
             data_inicio=date(2026, 8, 10),
             data_fim=date(2026, 8, 12),

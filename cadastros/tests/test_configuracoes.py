@@ -11,12 +11,19 @@ from cadastros.models import Estado
 from cadastros.models import Unidade
 from cadastros.services import resolver_sede_ids_desde_configuracao
 from usuarios.models import AreaTrabalho
+from core.testing import area_de_teste
+from core.testing import com_request
 
 
 class ConfiguracaoSistemaFormTests(TestCase):
     def setUp(self):
+        # DB-02: o queryset de `unidade` do form recorta pela área do request;
+        # fora de request ele cai no balde NULL e a unidade da área de teste
+        # viraria "escolha inválida". O form roda como roda em produção: com
+        # área corrente.
+        self.enterContext(com_request(area_de_teste()))
         self.instance = ConfiguracaoSistema.get_singleton()
-        self.unidade = Unidade.objects.create(nome="UNIDADE", sigla="UNI")
+        self.unidade = Unidade.objects.create(area=area_de_teste(), nome="UNIDADE", sigla="UNI")
 
     def _build_valid_data(self):
         return {

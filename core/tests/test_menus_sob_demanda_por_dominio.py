@@ -27,6 +27,8 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
+from core.testing import area_de_teste
+from core.testing import vincular_area
 from usuarios.models import AreaTrabalho
 
 
@@ -49,10 +51,12 @@ class RedeDeMenusSobDemanda:
     presenter = None
 
     def criar_registro(self, *, area=None):
+        """`area=None` significa "a área do usuário logado" (DB-02: sempre há uma)."""
         raise NotImplementedError
 
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="pf04", password="x")
+        vincular_area(self.user)
         self.client.force_login(self.user)
         self.registro = self.criar_registro()
 
@@ -140,8 +144,7 @@ class PlanosTrabalhoMenusTests(RedeDeMenusSobDemanda, TestCase):
         from planos_trabalho.models import PlanoTrabalho
 
         campos = {"numero": 1 if area is None else 99, "ano": 2026}
-        if area is not None:
-            campos["area"] = area
+        campos["area"] = area or area_de_teste()
         return PlanoTrabalho.all_objects.create(**campos)
 
 
@@ -159,8 +162,7 @@ class OrdensServicoMenusTests(RedeDeMenusSobDemanda, TestCase):
         from ordens_servico.models import OrdemServico
 
         campos = {"numero": 1 if area is None else 99, "ano": 2026}
-        if area is not None:
-            campos["area"] = area
+        campos["area"] = area or area_de_teste()
         return OrdemServico.all_objects.create(**campos)
 
 
@@ -194,13 +196,11 @@ class EventosMenusTests(RedeDeMenusSobDemanda, TestCase):
         from oficios.models import Oficio
 
         campos = {"titulo": "Evento" if area is None else "Evento alheio"}
-        if area is not None:
-            campos["area"] = area
+        campos["area"] = area or area_de_teste()
         evento = Evento.all_objects.create(**campos)
 
         oficio = {"numero": 1 if area is None else 99, "ano": 2026, "evento": evento}
-        if area is not None:
-            oficio["area"] = area
+        oficio["area"] = campos["area"]
         Oficio.all_objects.create(**oficio)
         return evento
 
@@ -228,16 +228,15 @@ class TermosMenusTests(RedeDeMenusSobDemanda, TestCase):
         from cadastros.models import Servidor
         from termos.models import TermoAutorizacao
 
-        campos = {}
-        if area is not None:
-            campos["area"] = area
-        termo = TermoAutorizacao.all_objects.create(**campos)
-        cargo = Cargo.all_objects.create(nome="Analista", **({"area": area} if area else {}))
+        propria = area is None
+        area = area or area_de_teste()
+        termo = TermoAutorizacao.all_objects.create(area=area)
+        cargo = Cargo.all_objects.create(nome="Analista", area=area)
         servidor = Servidor.all_objects.create(
-            nome="Servidor" if area is None else "Alheio",
+            nome="Servidor" if propria else "Alheio",
             cargo=cargo,
-            cpf="1234567890" + ("1" if area is None else "2"),
-            **({"area": area} if area else {}),
+            cpf="1234567890" + ("1" if propria else "2"),
+            area=area,
         )
         termo.servidores.add(servidor)
         return termo
@@ -272,16 +271,17 @@ class PrestacoesMenusTests(RedeDeMenusSobDemanda, TestCase):
         from prestacoes_contas.models import PrestacaoContas
         from prestacoes_contas.models import PrestacaoServidor
 
-        extra = {"area": area} if area is not None else {}
+        propria = area is None
+        extra = {"area": area or area_de_teste()}
         cargo = Cargo.all_objects.create(nome="Analista", **extra)
         servidor = Servidor.all_objects.create(
-            nome="Servidor" if area is None else "Alheio",
+            nome="Servidor" if propria else "Alheio",
             cargo=cargo,
-            cpf="9876543210" + ("1" if area is None else "2"),
+            cpf="9876543210" + ("1" if propria else "2"),
             **extra,
         )
         oficio = Oficio.all_objects.create(
-            numero=1 if area is None else 99, ano=2026, **extra
+            numero=1 if propria else 99, ano=2026, **extra
         )
         # A prestação nasce por sinal junto do ofício — criar outra estoura a
         # unicidade de `oficio_id`. Pega-se a que já existe.

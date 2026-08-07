@@ -33,22 +33,24 @@ from prestacoes_contas.models import AssinaturaDocumento
 from prestacoes_contas.models import PrestacaoContas
 from prestacoes_contas.models import PrestacaoDocumentoAnexo
 from prestacoes_contas.models import PrestacaoServidor
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 PDF_MINIMO = b"%PDF-1.4\n%%EOF\n"
 
 
 class ExclusaoDeServidorBase(TestCase):
     def setUp(self):
-        self.cargo = Cargo.objects.create(nome="Agente")
-        self.alvo = Servidor.objects.create(
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Agente")
+        self.alvo = Servidor.objects.create(area=area_de_teste(), 
             nome="Servidor Alvo", cargo=self.cargo, cpf="11122233344",
         )
-        self.colega = Servidor.objects.create(
+        self.colega = Servidor.objects.create(area=area_de_teste(), 
             nome="Servidor Colega", cargo=self.cargo, cpf="55566677788",
         )
         for servidor in (self.alvo, self.colega):
             servidor.refresh_from_db()
-        self.oficio = Oficio.objects.create(
+        self.oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=71, ano=2026, protocolo="717171717", status=Oficio.STATUS_RASCUNHO,
         )
         self.oficio.servidores.add(self.alvo, self.colega)
@@ -212,6 +214,7 @@ class TelaDeExclusaoTests(ExclusaoDeServidorBase):
             username="tester_novo35", password="123456",
         )
         self.client.force_login(self.user)
+        vincular_area(self.user)
 
     def test_post_bloqueado_mostra_a_razao_especifica(self):
         self._anexar_comprovante(self._ps(self.alvo))

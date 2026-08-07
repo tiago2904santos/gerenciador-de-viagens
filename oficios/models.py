@@ -40,7 +40,7 @@ class Oficio(TimeStampedModel, CancelavelModel):
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
         on_delete=models.PROTECT,
-        null=True,
+        null=False,
         blank=True,
         related_name="oficios",
         verbose_name="Area de trabalho",

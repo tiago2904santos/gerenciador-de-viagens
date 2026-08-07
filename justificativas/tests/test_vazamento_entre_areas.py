@@ -35,6 +35,7 @@ from justificativas.models import ModeloJustificativa
 from oficios.models import Oficio
 from usuarios.models import AreaTrabalho
 from usuarios.models import VinculoUsuarioArea
+from core.testing import area_de_teste
 
 
 class JustificativasNaoVazamEntreAreasTests(TestCase):
@@ -49,7 +50,7 @@ class JustificativasNaoVazamEntreAreasTests(TestCase):
         self.oficio_alheio = Oficio.objects.create(
             numero=2, ano=2026, area=self.outra, assunto="Ofício da área B"
         )
-        self.modelo = ModeloJustificativa.objects.create(nome="Modelo", texto="Texto", ativo=True)
+        self.modelo = ModeloJustificativa.objects.create(area=area_de_teste(), nome="Modelo", texto="Texto", ativo=True)
 
         self.minha = Justificativa.objects.create(oficio=self.meu_oficio, texto="Minha justificativa")
         self.alheia = Justificativa.objects.create(

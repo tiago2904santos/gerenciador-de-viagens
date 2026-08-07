@@ -39,6 +39,7 @@ from oficios.models import Oficio
 from prestacoes_contas import assinatura_services as svc
 from prestacoes_contas.models import AssinaturaDocumento
 from prestacoes_contas.models import PrestacaoContas
+from core.testing import area_de_teste
 
 
 def _pdf() -> bytes:
@@ -63,11 +64,11 @@ def _png() -> str:
 
 class AssinaturaPublicaBordasTests(TestCase):
     def setUp(self):
-        self.cargo = Cargo.objects.create(nome="Agente")
-        self.servidor = Servidor.objects.create(
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Agente")
+        self.servidor = Servidor.objects.create(area=area_de_teste(), 
             nome="Servidor RT", cargo=self.cargo, cpf="11122233344"
         )
-        self.oficio = Oficio.objects.create(numero=10, ano=2026, protocolo="123456789")
+        self.oficio = Oficio.objects.create(area=area_de_teste(), numero=10, ano=2026, protocolo="123456789")
         self.oficio.servidores.add(self.servidor)
         self.prestacao = PrestacaoContas.objects.get(oficio=self.oficio)
         self.ps = self.prestacao.servidores_prestacao.get(servidor=self.servidor)

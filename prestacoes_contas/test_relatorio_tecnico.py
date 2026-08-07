@@ -26,6 +26,7 @@ from oficios.models import Oficio
 from prestacoes_contas.models import RelatorioTecnico
 from prestacoes_contas.test_helpers import PrestacaoFixturesMixin
 from roteiros.models import Roteiro
+from core.testing import area_de_teste
 
 
 class DiariaOverrideTests(PrestacaoFixturesMixin, TestCase):
@@ -107,7 +108,7 @@ class DiariaOverrideTests(PrestacaoFixturesMixin, TestCase):
         O servidor pode receber menos do que foi liberado — sacar 87,00 de
         87,17, porque moeda não sai do caixa. Mais do que o liberado, nunca.
         """
-        roteiro = Roteiro.objects.create(valor_diarias=Decimal("87.17"))
+        roteiro = Roteiro.objects.create(area=area_de_teste(), valor_diarias=Decimal("87.17"))
         Oficio.objects.filter(pk=self.fixture.oficio.pk).update(roteiro=roteiro)
 
         recusado = self.autosave_rt(

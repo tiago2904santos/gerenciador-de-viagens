@@ -16,6 +16,8 @@ from justificativas.models import Justificativa
 from oficios.models import Oficio
 from oficios.selectors import listar_modelos_motivo
 from roteiros.models import Roteiro
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class OficioViewsTests(TestCase):
@@ -25,9 +27,10 @@ class OficioViewsTests(TestCase):
             password="123456",
         )
         self.client.force_login(self.user)
-        self.cargo = Cargo.objects.create(nome="Analista Teste")
-        self.unidade = Unidade.objects.create(nome="Unidade Teste", sigla="UT")
-        self.servidor = Servidor.objects.create(nome="Servidor Teste", cargo=self.cargo, cpf="12345678901")
+        vincular_area(self.user)
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Analista Teste")
+        self.unidade = Unidade.objects.create(area=area_de_teste(), nome="Unidade Teste", sigla="UT")
+        self.servidor = Servidor.objects.create(area=area_de_teste(), nome="Servidor Teste", cargo=self.cargo, cpf="12345678901")
 
     def test_get_index_retorna_200(self):
         response = self.client.get(reverse("oficios:index") + "?aba=atuais")
@@ -40,7 +43,7 @@ class OficioViewsTests(TestCase):
         card. O item que o dispara é que passou a vir de `oficios:card_menus`, e é
         lá que este teste foi conferir.
         """
-        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         # Ofício sem data de viagem cai na aba "Em andamento e realizados" (atuais).
         response = self.client.get(reverse("oficios:index") + "?aba=atuais")
         self.assertContains(response, "data-delete-confirm-modal")
@@ -91,7 +94,7 @@ class OficioViewsTests(TestCase):
         )
 
     def test_post_dados_viajantes_valido_atualiza_rascunho(self):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=timezone.localdate().year,
             custeio=Oficio.CUSTEIO_UNIDADE_DPC,
@@ -113,12 +116,12 @@ class OficioViewsTests(TestCase):
         self.assertEqual(oficio.ano, timezone.localdate().year)
 
     def test_lista_continua_exibindo_status_rascunho(self):
-        Oficio.objects.create(numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        Oficio.objects.create(area=area_de_teste(), numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         response = self.client.get(reverse("oficios:index") + "?aba=atuais")
         self.assertContains(response, "Rascunho")
 
     def test_lista_visualizar_documento_aponta_para_etapa_documentos(self):
-        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         oficio.servidores.add(self.servidor)
         response = self.client.get(reverse("oficios:index") + "?aba=atuais")
         menus = self.client.get(reverse("oficios:card_menus", args=[oficio.pk]))
@@ -166,7 +169,7 @@ class OficioViewsTests(TestCase):
         _m_generation,
         _m_cache,
     ):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             motivo="Motivo",
@@ -202,7 +205,7 @@ class OficioViewsTests(TestCase):
         _m_generation,
         _m_cache,
     ):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             motivo="Motivo",
@@ -218,7 +221,7 @@ class OficioViewsTests(TestCase):
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     def test_wizard_documentos_exibe_secao_conferencia(self, _m_cache):
-        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Documentos para conferência")
@@ -230,11 +233,11 @@ class OficioViewsTests(TestCase):
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     def test_wizard_documentos_omite_secao_de_justificativa(self, _m_cache):
-        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
-        roteiro = Roteiro.objects.create(saida_dt=timezone.now() + timedelta(days=7))
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        roteiro = Roteiro.objects.create(area=area_de_teste(), saida_dt=timezone.now() + timedelta(days=7))
         oficio.roteiro = roteiro
         oficio.save(update_fields=["roteiro"])
-        modelo = ModeloJustificativa.objects.create(
+        modelo = ModeloJustificativa.objects.create(area=area_de_teste(), 
             nome="Urgencia operacional",
             texto="Modelo de justificativa para teste.",
         )
@@ -259,7 +262,7 @@ class OficioViewsTests(TestCase):
         _m_service_val,
         _m_cache,
     ):
-        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         html = response.content.decode("utf-8")
         preview_start = html.index('oficio-documentos-preview-section document-inline-stack')
@@ -289,7 +292,7 @@ class OficioViewsTests(TestCase):
         _m_service_val,
         _m_cache,
     ):
-        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         html = response.content.decode("utf-8")
         preview_start = html.index('oficio-documentos-preview-section document-inline-stack')
@@ -309,7 +312,7 @@ class OficioViewsTests(TestCase):
         self.assertNotIn("Ordem", footer)
 
     def test_post_wizard_documentos_save_draft_list_salva_e_redireciona_para_lista(self):
-        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         updated_before = oficio.updated_at
         response = self.client.post(
             reverse("oficios:wizard_documentos", args=[oficio.pk]),
@@ -345,7 +348,7 @@ class OficioViewsTests(TestCase):
         _m_service_val,
         _m_cache,
     ):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             motivo="Motivo",
@@ -395,8 +398,8 @@ class OficioViewsTests(TestCase):
         _m_service_val,
         _m_cache,
     ):
-        servidor_2 = Servidor.objects.create(nome="Servidor Teste 2", cargo=self.cargo, cpf="12345678902")
-        oficio = Oficio.objects.create(
+        servidor_2 = Servidor.objects.create(area=area_de_teste(), nome="Servidor Teste 2", cargo=self.cargo, cpf="12345678902")
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             motivo="Motivo",
@@ -416,7 +419,7 @@ class OficioViewsTests(TestCase):
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     def test_wizard_documentos_omite_motorista_do_transporte_quando_esta_no_oficio(self, _m_cache):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             motivo="Motivo",
@@ -432,8 +435,8 @@ class OficioViewsTests(TestCase):
 
     @mock.patch("documentos.services.warm_cache.ensure_document_artifact_cached")
     def test_wizard_documentos_exibe_motorista_carona_no_transporte_quando_externo(self, _m_cache):
-        motorista = Servidor.objects.create(nome="Motorista Carona", cargo=self.cargo, cpf="12345678903")
-        oficio = Oficio.objects.create(
+        motorista = Servidor.objects.create(area=area_de_teste(), nome="Motorista Carona", cargo=self.cargo, cpf="12345678903")
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             motivo="Motivo",
@@ -470,7 +473,7 @@ class OficioViewsTests(TestCase):
         _m_service_val,
         _m_cache,
     ):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             motivo="Motivo",
@@ -483,19 +486,19 @@ class OficioViewsTests(TestCase):
         self.assertNotContains(response, inline_url)
 
     def test_get_detalhe_redireciona_para_dados_viajantes(self):
-        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         response = self.client.get(reverse("oficios:detalhe", args=[oficio.pk]), follow=False)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("oficios:dados_viajantes", args=[oficio.pk]))
 
     def test_get_editar_redireciona_para_dados_viajantes(self):
-        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         response = self.client.get(reverse("oficios:editar", args=[oficio.pk]))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("oficios:dados_viajantes", args=[oficio.pk]))
 
     def test_post_editar_redireciona_sem_alterar(self):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             motivo="Motivo antigo",
@@ -518,7 +521,7 @@ class OficioViewsTests(TestCase):
         self.assertEqual(oficio.motivo, "Motivo antigo")
 
     def test_post_excluir_remove(self):
-        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         response = self.client.post(reverse("oficios:excluir", args=[oficio.pk]))
         self.assertEqual(response.status_code, 302)
         detail_response = self.client.get(reverse("oficios:detalhe", args=[oficio.pk]))
@@ -527,8 +530,8 @@ class OficioViewsTests(TestCase):
     def test_post_excluir_de_oficio_de_evento_sem_next_volta_para_evento(self):
         from eventos.models import Evento
 
-        evento = Evento.objects.create(motivo="Evento de teste")
-        oficio = Oficio.objects.create(
+        evento = Evento.objects.create(area=area_de_teste(), motivo="Evento de teste")
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC, evento=evento,
         )
         response = self.client.post(reverse("oficios:excluir", args=[oficio.pk]))
@@ -540,8 +543,8 @@ class OficioViewsTests(TestCase):
     def test_post_excluir_de_oficio_de_evento_com_next_da_lista_volta_para_lista(self):
         from eventos.models import Evento
 
-        evento = Evento.objects.create(motivo="Evento de teste")
-        oficio = Oficio.objects.create(
+        evento = Evento.objects.create(area=area_de_teste(), motivo="Evento de teste")
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC, evento=evento,
         )
         excluir_url = reverse("oficios:excluir", args=[oficio.pk])
@@ -551,7 +554,7 @@ class OficioViewsTests(TestCase):
         self.assertEqual(response.url, reverse("oficios:index"))
 
     def test_get_excluir_redireciona_para_lista(self):
-        oficio = Oficio.objects.create(numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         response = self.client.get(reverse("oficios:excluir", args=[oficio.pk]))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("oficios:index"))
@@ -581,7 +584,10 @@ class OficioViewsTests(TestCase):
             },
         )
         self.assertEqual(new_post.status_code, 302)
-        modelo = listar_modelos_motivo().first()
+        from core.testing import com_request
+
+        with com_request(area_de_teste()):
+            modelo = listar_modelos_motivo().first()
 
         edit_get = self.client.get(reverse("oficios:modelo_motivo_update", args=[modelo.pk]))
         self.assertRedirects(edit_get, reverse("oficios:modelos_motivo_index"))

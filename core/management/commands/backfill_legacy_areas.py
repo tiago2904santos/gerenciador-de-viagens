@@ -229,7 +229,13 @@ class Command(BaseCommand):
                 (field for field in model._meta.concrete_fields if field.name == "area"),
                 None,
             )
-            if field is None or not field.null:
+            # Só `field is None`, nunca `not field.null`: com o NOT NULL do
+            # `DB-02` no modelo, o critério de nulidade em memória pularia
+            # exatamente os modelos operacionais que este comando existe para
+            # sanear — ele roda com o código novo sobre o banco PRÉ-migração,
+            # onde o órfão ainda existe. Num banco já migrado a consulta
+            # `area__isnull=True` volta vazia e o modelo é pulado adiante.
+            if field is None:
                 continue
             queryset = model._default_manager.filter(area__isnull=True)
             try:

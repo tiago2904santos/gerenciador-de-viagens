@@ -29,13 +29,15 @@ from django.urls import reverse
 from eventos.models import TipoEvento
 from justificativas.models import ModeloJustificativa
 from oficios.models import ModeloMotivoOficio
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class _CatalogoMixin:
     def setUp(self):
-        self.client.force_login(
-            get_user_model().objects.create_user(username=f"a2_{self.url_index}")
-        )
+        usuario = get_user_model().objects.create_user(username=f"a2_{self.url_index}")
+        vincular_area(usuario)
+        self.client.force_login(usuario)
 
     def _mensagens(self, response):
         return [str(m) for m in get_messages(response.wsgi_request)]
@@ -51,7 +53,7 @@ class ModelosMotivoTests(_CatalogoMixin, TestCase):
     url_index = "oficios:modelos_motivo_index"
 
     def _criar(self, titulo="Modelo A", **kwargs):
-        return ModeloMotivoOficio.objects.create(
+        return ModeloMotivoOficio.objects.create(area=area_de_teste(), 
             nome=titulo, texto="Texto do motivo.", **kwargs
         )
 
@@ -167,8 +169,8 @@ class TiposEventoTests(_CatalogoMixin, TestCase):
         self.assertIn("Tipo de evento excluído com sucesso.", self._mensagens(response))
 
     def test_a_busca_filtra(self):
-        TipoEvento.objects.create(nome="Zebra")
-        TipoEvento.objects.create(nome="Girafa")
+        TipoEvento.objects.create(area=area_de_teste(), nome="Zebra")
+        TipoEvento.objects.create(area=area_de_teste(), nome="Girafa")
 
         response = self.client.get(self._index(q="zebra"))
 
@@ -191,7 +193,7 @@ class TiposEventoTests(_CatalogoMixin, TestCase):
         self.assertEqual(response.context["quick_add_next_url"], destino)
 
     def test_edicao_invalida_avisa_com_a_frase_unica(self):
-        tipo = TipoEvento.objects.create(nome="Seminario")
+        tipo = TipoEvento.objects.create(area=area_de_teste(), nome="Seminario")
 
         response = self.client.post(
             reverse("eventos:tipo_update", args=[tipo.pk]), {"nome": ""}
@@ -207,7 +209,7 @@ class ModelosJustificativaTests(_CatalogoMixin, TestCase):
     url_index = "justificativas:modelos_index"
 
     def _criar(self, titulo="Modelo J", **kwargs):
-        return ModeloJustificativa.objects.create(
+        return ModeloJustificativa.objects.create(area=area_de_teste(), 
             nome=titulo, texto="Texto da justificativa.", **kwargs
         )
 
@@ -279,7 +281,7 @@ class DefinirPadraoNaoAceitaGetTests(TestCase):
         )
 
     def test_modelo_de_motivo_recusa_get(self):
-        modelo = ModeloMotivoOficio.objects.create(nome="M", texto="T")
+        modelo = ModeloMotivoOficio.objects.create(area=area_de_teste(), nome="M", texto="T")
 
         response = self.client.get(
             reverse("oficios:modelo_motivo_definir_padrao", args=[modelo.pk])
@@ -290,7 +292,7 @@ class DefinirPadraoNaoAceitaGetTests(TestCase):
         self.assertFalse(modelo.is_padrao)
 
     def test_modelo_de_justificativa_recusa_get(self):
-        modelo = ModeloJustificativa.objects.create(nome="J", texto="T")
+        modelo = ModeloJustificativa.objects.create(area=area_de_teste(), nome="J", texto="T")
 
         response = self.client.get(
             reverse("justificativas:modelo_definir_padrao", args=[modelo.pk])

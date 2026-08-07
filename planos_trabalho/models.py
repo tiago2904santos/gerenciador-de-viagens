@@ -265,7 +265,7 @@ class PlanoTrabalho(TimeStampedModel, CancelavelModel):
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
         on_delete=models.PROTECT,
-        null=True,
+        null=False,
         blank=True,
         related_name="planos_trabalho",
         verbose_name="Area de trabalho",

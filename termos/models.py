@@ -16,7 +16,7 @@ from oficios.models import Oficio
 class TermoAutorizacao(TimeStampedModel, CancelavelModel):
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
-        null=True,
+        null=False,
         blank=True,
         on_delete=models.PROTECT,
         related_name="termos_autorizacao",

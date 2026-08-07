@@ -51,29 +51,29 @@ def _resolve_area(area=_UNSET):
         return None
 
 
-def _area_origem(origem):
+def _area_origem_id(origem):
+    """Compara por `area_id`, sem materializar a `AreaTrabalho` de cada origem.
+
+    A versão por `getattr(origem, "area")` custava uma consulta por pendência —
+    invisível enquanto o legado tinha `area_id NULL` (FK `None` nem vai ao
+    banco) e revelada pelo `NOT NULL` do `DB-02`: 20 pendências viravam 20
+    buscas de área só para comparar o pk.
+    """
     if origem is None:
         return None
-    area = getattr(origem, "area", None)
-    if area is not None:
-        return area
-    oficio = getattr(origem, "oficio", None)
-    if oficio is not None:
-        return getattr(oficio, "area", None)
-    evento = getattr(origem, "evento", None)
-    if evento is not None:
-        return getattr(evento, "area", None)
-    prestacao = getattr(origem, "prestacao", None)
-    if prestacao is not None:
-        return getattr(prestacao, "area", None)
+    area_id = getattr(origem, "area_id", None)
+    if area_id is not None:
+        return area_id
+    for caminho in ("oficio", "evento", "prestacao"):
+        relacionado = getattr(origem, caminho, None)
+        if relacionado is not None:
+            return getattr(relacionado, "area_id", None)
     return None
 
 
 def _mesma_area(origem, area) -> bool:
-    origem_area = _area_origem(origem)
-    origem_area_id = getattr(origem_area, "pk", origem_area)
     area_id = getattr(area, "pk", area)
-    return origem_area_id == area_id
+    return _area_origem_id(origem) == area_id
 
 
 def registrar_falha(obj, exc: Exception, usuario=None) -> None:

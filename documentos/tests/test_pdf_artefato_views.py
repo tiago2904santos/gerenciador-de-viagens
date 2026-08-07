@@ -13,6 +13,8 @@ from cadastros.models import Servidor
 from documentos.models import DocumentoArtefato
 from documentos.services.temporary_links import create_artefato_pdf_temp_token
 from oficios.models import Oficio
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 def _minimal_pdf_bytes() -> bytes:
@@ -24,9 +26,10 @@ class ArtefatoPdfViewsTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="pdf_viewer_u", password="x" * 12)
         self.client.force_login(self.user)
-        self.cargo = Cargo.objects.create(nome="Cargo PDFV")
-        self.servidor = Servidor.objects.create(nome="Serv PDFV", cargo=self.cargo, cpf="12345678901")
-        self.oficio = Oficio.objects.create(
+        vincular_area(self.user)
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Cargo PDFV")
+        self.servidor = Servidor.objects.create(area=area_de_teste(), nome="Serv PDFV", cargo=self.cargo, cpf="12345678901")
+        self.oficio = Oficio.objects.create(area=area_de_teste(), 
             protocolo="99.888.777-6",
             motivo="m",
             custeio=Oficio.CUSTEIO_UNIDADE_DPC,
@@ -36,7 +39,7 @@ class ArtefatoPdfViewsTests(TestCase):
     def _create_artefato(self) -> DocumentoArtefato:
         raw = _minimal_pdf_bytes()
         digest = hashlib.sha256(raw).hexdigest()
-        return DocumentoArtefato.objects.create(
+        return DocumentoArtefato.objects.create(area=area_de_teste(), 
             tipo="oficio",
             formato="pdf",
             oficio=self.oficio,
@@ -78,7 +81,7 @@ class ArtefatoPdfViewsTests(TestCase):
     def test_docx_artefato_404_on_conteudo(self):
         raw = b"not pdf"
         digest = hashlib.sha256(raw).hexdigest()
-        art = DocumentoArtefato.objects.create(
+        art = DocumentoArtefato.objects.create(area=area_de_teste(), 
             tipo="oficio",
             formato="docx",
             oficio=self.oficio,
