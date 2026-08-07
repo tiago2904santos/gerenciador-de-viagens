@@ -6,7 +6,6 @@ from django.views.decorators.http import require_http_methods
 from core.pagination import contexto_paginacao
 from eventos.services import resolve_evento_from_request
 from .models import Oficio
-from .presenters import apresentar_acoes_oficio
 from .presenters import apresentar_oficio_card
 from .selectors import get_oficio_by_id
 from .selectors import listar_oficios
@@ -55,13 +54,7 @@ def index(request):
     paginacao = contexto_paginacao(oficios, request, OFICIOS_POR_PAGINA)
     cards = []
     for oficio in paginacao["page_obj"].object_list:
-        card = apresentar_oficio_card(oficio, excluir_next_url=reverse("oficios:index"))
-        card["actions"] = apresentar_acoes_oficio(
-            editar_url=reverse("oficios:editar", args=[oficio.pk]),
-            excluir_url=reverse("oficios:excluir", args=[oficio.pk]),
-            visualizar_documento_url=reverse("oficios:wizard_documentos", args=[oficio.pk]),
-        )
-        cards.append(card)
+        cards.append(apresentar_oficio_card(oficio, excluir_next_url=reverse("oficios:index")))
 
     has_filters = any([q, status, criacao_de, criacao_ate, viagem_de, viagem_ate, sort])
 

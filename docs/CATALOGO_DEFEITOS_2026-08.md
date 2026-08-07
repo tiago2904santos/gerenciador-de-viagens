@@ -2373,7 +2373,7 @@ antes** de escrever a entrada, e renumerar as próprias, nunca as alheias — qu
 
 ---
 
-### NOVO-37 ⚪ `NOVO` `apresentar_acoes_oficio` é construído por card e nunca renderizado · QA · 0,25 d
+### NOVO-37 ✅ RESOLVIDO · ⚪ `NOVO` `apresentar_acoes_oficio` é construído por card e nunca renderizado · QA · 0,25 d
 
 `oficios/list_views.py:59` faz `card["actions"] = apresentar_acoes_oficio(...)` para cada card da
 lista. Nenhum template lê `card.actions`: o único que consumiria, `list_card_actions.html`, não é
@@ -2389,6 +2389,19 @@ vacuoso apareceu. O teste foi corrigido para afirmar a URL inteira; a função m
 
 **Correção:** apagar a atribuição e, se não sobrar chamador, a função — com a prova de grep que o
 `AGENTS.md` §3.6 exige. Não entrou no `PF-04` porque é outro defeito e o §3.6 pede PR próprio.
+
+**Fechado em 07/08.** A afirmação original era imprecisa e a verificação corrigiu: **três** templates
+leem `card.actions` — `components/cards/document_card.html`, `components/lists/main_list_card.html` e
+`components/ui/lists/list_card_actions.html`. Nenhum está no caminho da lista de Ofícios, que vai por
+`list_page_cards.html` → `oficios/partials/oficio_list_card.html` → `entity_card.html`, e este não lê
+`actions`. Dos três, `document_card.html` só é alcançado por `list_grid.html`, incluído apenas por
+`dev/ui_lab/cards.html`; os outros dois não são incluídos por arquivo nenhum.
+
+**Prova de que era morto:** o HTML da lista, com o `csrf` normalizado, é **byte a byte idêntico**
+antes e depois — 170.161 bytes, mesmo `sha256`. Consultas e nós de elemento também não se mexeram.
+O tempo não mudou de forma mensurável (86,7 → 88,4 ms de mediana; a diferença é ruído, não ganho).
+
+`main_list_card.html` e `list_card_actions.html` ficam órfãos e são material de `UI-01`, não deste ID.
 
 ---
 
