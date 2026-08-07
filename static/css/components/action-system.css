@@ -711,11 +711,6 @@ html[data-theme="dark"] .cv-action-menu {
   padding: 24px;
 }
 
-.delete-confirm-modal__header {
-  gap: 13px;
-  padding-right: 38px;
-}
-
 .delete-confirm-modal__icon {
   background: var(--action-danger-bg);
   border-color: var(--action-danger-border);

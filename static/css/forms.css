@@ -69,10 +69,6 @@
   grid-column: span 12;
 }
 
-.field-span-6 {
-  grid-column: span 6;
-}
-
 /* ============================================================
    Painel grid (design system) — base visual de .roteiro-editor__grid
    Tokens de rota; caixa extra só em .app-form-grid-panel.
@@ -200,19 +196,6 @@
   color: var(--route-button-secondary-text);
 }
 
-.app-page--roteiros-form .btn-danger {
-  background: var(--route-button-danger-bg);
-  border-color: var(--route-button-danger-border);
-  color: var(--route-button-danger-text);
-}
-
-.app-page--roteiros-form .btn-danger:hover,
-.app-page--roteiros-form .btn-danger:focus-visible {
-  background: var(--route-button-danger-hover-bg);
-  border-color: var(--route-button-danger-hover-border);
-  color: var(--route-button-danger-text);
-}
-
 .app-page--roteiros-form .btn:focus-visible {
   box-shadow: 0 0 0 3px var(--route-focus-ring), var(--shadow-xs);
   outline: none;
@@ -226,19 +209,6 @@
   gap: var(--space-3);
   justify-content: flex-end;
   padding: var(--space-3) var(--space-5) var(--space-3) 0;
-}
-
-.roteiro-editor__actions {
-  align-items: center;
-  background: var(--route-card-bg);
-  border: 1px solid var(--route-section-border);
-  border-radius: 0 0 var(--radius-md) var(--radius-md);
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  justify-content: flex-end;
-  margin-top: var(--space-1);
-  padding: var(--space-3) var(--space-4);
 }
 
 .roteiro-form--legacy-roteiro .travel-document-wizard-footer-actions .btn,
@@ -632,11 +602,6 @@ html[data-theme="dark"] input[type="checkbox"] {
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-soft);
   padding: var(--space-5);
-}
-
-.app-form-section__title {
-  font-size: var(--font-size-lg);
-  margin-bottom: var(--space-1);
 }
 
 /* ==========================================================================

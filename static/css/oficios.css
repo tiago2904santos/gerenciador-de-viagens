@@ -159,26 +159,6 @@
   width: 100%;
 }
 
-.app-multiselect__control {
-  align-items: center;
-  background: var(--color-input-bg);
-  border: 1px solid var(--color-input-border);
-  border-radius: var(--radius-control);
-  box-shadow: var(--shadow-inner-light);
-  cursor: text;
-  display: flex;
-  gap: var(--space-2);
-  min-height: var(--control-height-md);
-  padding: var(--space-2) calc(var(--space-4) + 18px) var(--space-2) var(--space-3);
-  position: relative;
-  transition: border-color 0.16s ease, box-shadow 0.16s ease;
-  width: 100%;
-}
-
-.app-multiselect__control:focus-within {
-  outline: none;
-}
-
 .oficio-equipe-section {
   display: grid;
   gap: var(--space-5);
@@ -244,23 +224,6 @@
 
 .travel-document-wizard__main {
   min-width: 0;
-}
-
-.travel-document-wizard__actions {
-  background: var(--surface-form-section);
-  flex-wrap:  wrap;
-  /* Fica por cima dos cards */
-  position:   relative;
-  z-index:    2;
-  /* Mesmas dimensões do cv-form-section-header */
-  min-height: calc(2 * var(--space-4) + var(--control-height-sm));
-  padding:    var(--space-4) var(--space-6);
-  gap:        var(--space-3);
-  /* Fecha o contorno: page-shell já põe border-top, adicionamos os 3 lados restantes */
-  border-top:    1px solid var(--cv-form-section-border);
-  border-left:   1px solid var(--cv-form-section-border);
-  border-right:  1px solid var(--cv-form-section-border);
-  border-bottom: 1px solid var(--cv-form-section-border);
 }
 
 /* Botões do footer: altura padrão do sistema de botões */
@@ -461,31 +424,6 @@
   padding: var(--space-4);
 }
 
-.oficio-documentos-summary__status {
-  border-radius: var(--radius-pill);
-  flex-shrink: 0;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  padding: 4px 10px;
-  text-transform: uppercase;
-}
-
-.oficio-documentos-grid {
-  display: grid;
-  gap: var(--space-5);
-}
-
-.oficio-documentos-card__eyebrow {
-  color: var(--color-muted);
-  display: block;
-  font-size: var(--font-size-xs);
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  margin-bottom: var(--space-2);
-  text-transform: uppercase;
-}
-
 /* ── Viajantes (Documentos) — tiles iguais aos facts do Resumo ──────── */
 .oficio-documentos-travellers-grid {
   display: grid;
@@ -634,32 +572,6 @@
   border-color: transparent;
 }
 
-/* Legado (prestações / cards antigos) — mantém layout de linhas */
-.oficio-documentos-travellers-lines {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-.oficio-documentos-traveller-line {
-  background: var(--color-card-muted);
-  border: 1px solid var(--color-border-soft);
-  border-radius: 10px;
-  display: flex;
-  flex-basis: 45%;
-  flex-direction: column;
-  flex-grow: 1;
-  flex-shrink: 0;
-  gap: 2px;
-  min-width: 0;
-  padding: 10px 12px;
-}
-
-/* Motorista (legado lines): só filete — mesmo fundo do line base */
-.oficio-documentos-traveller-line--motorista {
-  box-shadow: inset 2px 0 0 var(--color-accent);
-}
-
 .oficio-documentos-travellers-empty {
   color: var(--color-muted);
   font-size: var(--font-size-sm);
@@ -683,14 +595,6 @@
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-control);
   padding: var(--space-4);
-}
-
-.oficio-documentos-vehicle-executive__label {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .oficio-documentos-vehicle-executive__driver {
@@ -738,32 +642,6 @@
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
   overflow: hidden;
-}
-
-.oficio-documentos-card__header {
-  align-items: center;
-  border-bottom: 1px solid var(--color-border-soft);
-  display: flex;
-  gap: var(--space-3);
-  justify-content: space-between;
-  padding: var(--space-4);
-}
-
-.oficio-documentos-card__title {
-  color: var(--color-heading);
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  margin: 0 0 var(--space-1);
-}
-
-.oficio-documentos-card__subtitle {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 500;
-  letter-spacing: 0;
-  margin: 0;
-  text-transform: none;
 }
 
 .oficio-documentos-card__body {
@@ -842,15 +720,6 @@
   font-weight: 800;
   letter-spacing: 0.12em;
   margin: 0 0 var(--space-2);
-  text-transform: uppercase;
-}
-
-.oficio-documentos-route-card__tagline {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  margin: var(--space-2) 0 0;
   text-transform: uppercase;
 }
 
@@ -1152,65 +1021,6 @@
   .oficio-documentos-route-card__diarias-grid {
     grid-template-columns: 1fr;
   }
-}
-
-.oficio-documentos-antecedence-card {
-  background: var(--color-card-muted);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  min-height: 0;
-  min-width: 0;
-  padding: var(--space-3) var(--space-4);
-}
-
-.oficio-documentos-antecedence-card__label {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.oficio-documentos-model-card {
-  background: var(--color-card-muted);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  justify-content: center;
-  min-height: 0;
-  min-width: 0;
-  padding: var(--space-3) var(--space-4);
-}
-
-.oficio-documentos-model-card__label {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.oficio-documentos-justification-text-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  min-width: 0;
-  width: 100%;
-}
-
-.oficio-documentos-justification-text-card__label {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 @media (min-width: 640px) {
@@ -2139,16 +1949,6 @@ html[data-theme="light"] .cv-person-row--highlight .cv-person-row__name {
   font-size: var(--font-size-sm);
   font-style: italic;
   margin: 0;
-}
-
-/* ── SUBCARD de justificativa ── */
-.cv-record-card__subcard {
-  background: var(--color-card-muted);
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-card);
-  display: grid;
-  gap: var(--space-3);
-  padding: var(--space-4);
 }
 
 .cv-record-card__badge {

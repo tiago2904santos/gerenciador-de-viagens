@@ -323,7 +323,10 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `HT-05` `empty_state.html` quebra a ordem de headings — o pulo era **10 de 10** listas, não 9;
       o título vira `<h2>` e `form_block` ganha ramo `h2` (aditivo) para o cadastro rápido de
       justificativas. Sem parâmetro `heading_level`: a inversão mostrou o repasse inerte
-- [ ] `UI-01` poda das ~929 classes candidatas (168 KB) — uma por PR, com prova de grep que cubra concatenação `+`
+- [x] `UI-01` poda das ~929 classes candidatas — **963 blocos, 170,7 KB** removidos; a unidade de PR
+      virou a **família de classe**, não o arquivo, e a verificação virou `getComputedStyle` (0 de
+      41.938 elementos) porque o diff de pixel tinha ruído maior que o efeito. Travado por
+      `scripts/audit_css_morto.py --max 0` no CI. Resíduo declarado: `NOVO-48`
 - [x] `HT-06` 10 a 14 componentes mortos, três deles citados como canônicos — **7 apagados**
       (um deles órfão em cascata, revelado pela própria trava) e **7 do UI Lab mantidos**, porque
       apagá-los é decidir qual dos dois labs é o vigente (`BE-17`). `form_errors` saiu da lista:

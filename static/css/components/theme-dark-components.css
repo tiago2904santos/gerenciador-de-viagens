@@ -2507,14 +2507,6 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
   line-height: 1.45;
 }
 
-:is(html[data-theme="dark"])
-  .cv-resource-picker {
-  background: var(--color-input-bg);
-  border: 1px dashed color-mix(in srgb, var(--color-border) 78%, var(--color-muted) 22%);
-  border-radius: 12px;
-  padding: 12px;
-}
-
 /* Controles da ficha: superfícies sólidas, raios menores e nenhuma luz de
    foco. O número e o ano formam um único controle composto. */
 :is(html[data-theme="dark"])
@@ -4674,61 +4666,6 @@ html[data-theme="dark"] *::after {
   color: var(--color-heading);
 }
 
-:is(html[data-theme="dark"])
-  .cv-document-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-left-width: 1px;
-  border-radius: 14px;
-  box-shadow: var(--shadow-card);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card::before {
-  background: var(--color-accent);
-  border-radius: 0 0 4px 4px;
-  content: "";
-  height: 3px;
-  left: 18px;
-  position: absolute;
-  top: 0;
-  width: 42px;
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card:hover {
-  box-shadow: var(--shadow-panel);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__header {
-  background: var(--color-surface-muted);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__title {
-  color: var(--color-heading);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__subtitle,
-:is(html[data-theme="dark"])
-  .cv-document-card__body {
-  color: var(--color-muted-strong);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__meta {
-  background: var(--color-surface-soft);
-  border-color: var(--color-border);
-}
-
-:is(html[data-theme="dark"])
-  .cv-document-card__actions {
-  background: var(--color-surface-muted);
-  border-top: 1px solid var(--color-border);
-}
-
 /* Canonical PDF viewer: solid controls around a neutral document canvas. */
 :is(html[data-theme="dark"])
   :is(.cv-document-viewer__toolbar, .cv-document-viewer__sidebar, .cv-document-viewer__stage) {
@@ -5183,28 +5120,6 @@ html[data-theme="dark"] *::after {
   background: var(--color-surface);
   border-top-color: var(--color-border-strong);
   padding-top: 18px;
-}
-
-:is(html[data-theme="dark"])
-  .cv-filter-bar__search {
-  background: var(--color-input-bg);
-  border: 1px solid var(--color-input-border);
-  border-radius: var(--radius-control);
-}
-
-:is(html[data-theme="dark"])
-  .cv-filter-bar__search-input {
-  border-color: transparent;
-  box-shadow: none;
-}
-
-:is(html[data-theme="dark"])
-  .cv-filter-bar__search-input:focus,
-:is(html[data-theme="dark"])
-  .cv-filter-bar__search-input:focus-visible {
-  border-color: transparent;
-  box-shadow: none;
-  outline: none;
 }
 
 :is(html[data-theme="dark"])
