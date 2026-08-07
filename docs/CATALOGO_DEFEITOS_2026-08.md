@@ -888,8 +888,23 @@ o gatilho quando o menu tem `src`, e o corpo saiu para `entity_card_menu_body.ht
 corpo continua embutido — é essa regra que mantém os seis domínios não migrados funcionando sem
 tocar em nenhum deles. `oficios:card_menus` serve os três menus de um card de uma vez.
 
-**Falta migrar seis domínios:** `eventos` (80 menus), `termos` (75), `prestacoes_contas` (40),
-`planos_trabalho`, `ordens_servico` e `roteiros`. Cada um é um PR, e a máquina já está pronta.
+**`planos_trabalho` e `ordens_servico` migrados em 07/08**, no mesmo desenho:
+
+| rota | bruto | gzip | nós de elemento |
+|---|---|---|---|
+| `planos_trabalho:index` | 169,5 → **129,0 KB** | 11,1 → 10,2 KB | 1.996 → **1.416** |
+| `ordens_servico:index` | 166,8 → **126,7 KB** | 10,7 → 10,0 KB | 1.931 → **1.351** |
+
+Tempo de servidor caiu nos dois, mas **este contêiner não mede tempo de forma confiável**: duas
+medições da mesma rota, no mesmo código, deram 57,5 e 75,8 ms; a própria régua do `PF-07` já
+registrou 94,9 e 2.464,5 ms para `ordens_servico:index` em execuções diferentes. Bytes e nós são
+determinísticos e são o que este catálogo guarda.
+
+**`roteiros` não tem menu nenhum** — `roteiros/presenters.py:240` monta o rodapé só com `edit_url` e
+`delete_url`. Os 0 menus medidos em `roteiros:index` não eram falta de dado: não há o que migrar.
+
+**Faltam três domínios:** `eventos` (80 menus, 3 escritos à mão por card), `termos` (75, 4 por linha)
+e `prestacoes_contas` (40, todos à mão, por servidor da prestação e sem `get_*_by_id`).
 
 ### PF-05 🟡 A lista de Ofícios leva 127 ms no servidor · MED · —
 

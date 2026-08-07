@@ -292,7 +292,15 @@ def apresentar_plano_wizard_summary(plano):
     }
 
 
-def apresentar_plano_card(plano):
+def apresentar_plano_card(plano, *, menus_sob_demanda=True):
+    """Card do plano.
+
+    `menus_sob_demanda` liga o `PF-04`: o menu sai com `src` e o corpo dele não vai
+    no HTML da lista — quem serve é `planos_trabalho:card_menus`, no primeiro
+    clique. O endpoint chama este mesmo presenter com `False`.
+    """
+    menus_src = reverse("planos_trabalho:card_menus", args=[plano.pk]) if menus_sob_demanda else ""
+
     from roteiros.services.diarias import formatar_valor_diarias
 
     coordenador_nome, _cargo = plano.coordenador_nome_cargo("adm")
@@ -401,6 +409,7 @@ def apresentar_plano_card(plano):
                     view_title="Visualizar plano",
                     docx_description="Arquivo editável do plano",
                     trigger_aria=f"Abrir documentos do plano {numero_label}",
+                    src=menus_src,
                 )
             ],
             delete_modal_url=excluir_url,
