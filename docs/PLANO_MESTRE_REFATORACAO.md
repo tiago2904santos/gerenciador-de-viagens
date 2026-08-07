@@ -346,7 +346,10 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 
 ### Fase 5 — Consulta e índice
 - [ ] `DB-09` lista de roteiros agrega antes do `LIMIT`
-- [ ] `DB-10` índice composto para a ordenação real das listas
+- [x] `DB-10` índice composto para a ordenação real das listas — **um índice, não cinco**.
+      Das cinco listas que ordenavam em memória, só `OrdemServico` ganha (64× na consulta,
+      1,08× na rota); nas outras quatro o índice análogo não move o tempo e em `roteiros`
+      piora. "Ofícios têm situação análoga" era falso, e o que sobra ali é o `NOVO-50`
 - [ ] `DB-11` 80 buscas livres sem índice
 - [ ] `DB-12` trilha de auditoria sem índice, sem expurgo
 - [ ] `PF-03` toda requisição escreve na tabela de sessão (**depende de decisão de produto**)
