@@ -605,6 +605,36 @@ pendências do Drive materializava a `AreaTrabalho` de cada origem só para comp
 invisível enquanto o legado tinha `area_id NULL`, porque FK `None` nem vai ao banco
 (`integracoes/google_drive/status.py`).
 
+> **Grupo 2 executado em 07/08/2026 — e a premissa do enunciado estava errada.**
+>
+> Decisão do usuário: cópia por área, seguindo o `NOVO-09`. Migrações `eventos/0016` e
+> `planos_trabalho/0024`.
+>
+> **O que a medição corrigiu:** o §8 do plano mestre descrevia as linhas globais como "servidas a
+> todas as áreas". **Não eram.** Medido nas três áreas do banco de desenvolvimento: as 22 linhas de
+> seed (`TipoEvento` 5, `AtividadePlanoTrabalho` 11, `ProgramaSolicitante` 3, `HorarioAtendimento`
+> 3) eram vistas por **zero** usuários com área — só quem não tem área as enxergava, porque
+> `filter_queryset_by_area` é estrito e não faz união com o balde nulo. As constraints
+> `*_global_unique` provam que um namespace global foi **projetado**; nenhum leitor o realizava.
+>
+> Isso muda o que a duplicação significa: não repartiu um acervo compartilhado, **deu a cada área um
+> catálogo que ela não tinha**. Para o usuário, conteúdo que aparece.
+>
+> Medido na ida e na volta, num banco de teste: 22 linhas globais → 44 com 2 áreas, **zero** sem
+> dono; a volta devolve exatamente 22, todas globais; a ida de novo reproduz o mesmo estado.
+>
+> **Duas armadilhas herdadas, uma delas cara:**
+> 1. **`_base_manager`, nunca `objects`.** Modelo histórico de migração não recebe o manager
+>    customizado do `BE-09` — `objects` não existe ali. E o erro **só aparece na volta**, porque a
+>    ida sai cedo quando não há área. Apareceu drilando o rollback, não em produção.
+> 2. **`SET CONSTRAINTS ALL IMMEDIATE`** antes do `ALTER TABLE`, herdado do `NOVO-09`: sem ele a
+>    volta morre no PostgreSQL com `cannot ALTER TABLE ... because it has pending trigger events`.
+>
+> **`NOT NULL` nestes quatro continua bloqueado, e agora o motivo tem ID:** o `NOVO-49`. Instalação
+> nova roda os seeds quando ainda não existe área — a duplicação sai sem fazer nada, por guarda
+> explícita — e `criar_area` não semeia catálogo, então área nova nasce com os quatro vazios. É o
+> mesmo comportamento que o `NOVO-09` deixou para `ModeloJustificativa`.
+
 ### DB-03 ✅ RESOLVIDO · 🟠 Limpeza de rascunhos apaga rascunho de outra área · AUD · 1 d
 
 `roteiros/services/roteiro_editor.py:317` —
@@ -855,7 +885,7 @@ gerado entre duas visualizações do mesmo roteiro.
 > `roteiros_roteirodestino` tem 60 linhas no banco de desenvolvimento e a medição ali é real.
 > `planos_trabalho_planodestino` e `planos_trabalho_eventoplano` têm **0 linhas** — a consulta
 > devolve zero porque não há o que consultar, não porque está limpo. O mesmo vale para os dois
-> modelos desta fatia. É o instrumento cego do `NOVO-45`, e as migrações da fatia 2 dizem isso no
+> modelos desta fatia. É o instrumento cego do `NOVO-49`, e as migrações da fatia 2 dizem isso no
 > docstring em vez de contar a medição como evidência. Quem decide é o SQL rodado **em produção**,
 > antes do deploy.
 >
@@ -3409,6 +3439,19 @@ caía no balde `area IS NULL`, exatamente o estado que o `DB-02` eliminou dos mo
 - ou materializar o seed por área na criação de cada área (o caminho que o `NOVO-09` já tomou para
   `ModeloJustificativa`) — e aí o grupo 2 pode um dia virar `NOT NULL`.
 
+> **Decidido em 07/08/2026: o segundo caminho.** O usuário escolheu duplicar por área, seguindo o
+> `NOVO-09`. Executado nas migrações `eventos/0016` e `planos_trabalho/0024`, que dão a cada área
+> os quatro catálogos inteiros — **o acervo existente**.
+>
+> A outra metade da frase, "na criação de cada área", **não** está feita, e a instalação nova
+> também não: `criar_area` não semeia catálogo, e numa base limpa os seeds rodam quando nenhuma
+> área existe. É o `NOVO-49`, e é ele que segura o `NOT NULL` nesses quatro.
+>
+> **Aviso de numeração:** existem hoje duas entradas `NOVO-45` neste arquivo — esta e a do
+> `faixa_lateral_class`, de outra sessão. As duas entraram na `main` antes deste PR e não renomeio
+> ID de outra sessão pela metade (limite 2 do `AGENTS.md`); fica registrado para quem for
+> desempatar.
+
 ---
 
 ### NOVO-32 🟡 `NOVO` `resetar_banco_demo` recria `ConfiguracaoSistema` sem área · QA · 0,25 d
@@ -3818,6 +3861,8 @@ nunca os carregou: as duas classes já eram enfeite. O defeito não é visual, �
 de widget que promete um gancho de estilo inexistente convida o próximo a estilizar por cima do que
 ele acha que existe.
 
+---
+
 ### NOVO-47 ✅ RESOLVIDO · 🟠 `NOVO` Duas CVEs do `pypdf` publicadas em 07/08 reprovam o passo 15 na `main` e em todo PR aberto · QA · 0,25 d
 
 `CVE-2026-71852` e `CVE-2026-71870` atingem `pypdf==6.14.2`, a versão travada em
@@ -3865,3 +3910,34 @@ acreditar que a classe existe, e é assim que ela reaparece num template.
 Os campeões, para dar tamanho: `roteiro-editor__*` (6 nomes), `oficio-documentos-*` (7),
 `cv-resource-picker__*` (4), `app-btn--*` e `btn-*` (9 entre os dois vocabulários de botão que o
 `cv-btn--` substituiu).
+
+---
+
+### NOVO-49 🟠 `NOVO` Área nova nasce sem catálogo, e instalação nova mantém o catálogo no balde sem dono · DB · 1 d
+
+Achado ao executar o grupo 2 do `DB-02`, e é o que **impede** aqueles quatro modelos de virarem
+`NOT NULL` agora.
+
+A duplicação por área (decisão do usuário em 07/08, seguindo o `NOVO-09`) resolve o acervo
+existente: cada área passa a ter `TipoEvento`, `AtividadePlanoTrabalho`, `ProgramaSolicitante` e
+`HorarioAtendimento` — hoje visíveis para **zero** usuários com área. Mas ela não fecha dois casos,
+porque não tem como:
+
+1. **Instalação nova.** Os seeds rodam em `eventos/0008`, `planos_trabalho/0002`, `0003` e `0008`,
+   e nesse momento **não existe área nenhuma** — a migração de duplicação sai sem fazer nada, por
+   guarda explícita. As 22 linhas ficam globais, exatamente como antes.
+2. **Área criada depois.** `usuarios/services.py:criar_area` não semeia catálogo. A área nova nasce
+   com os quatro catálogos **vazios**, e o usuário tem de recadastrar tudo à mão.
+
+**Não é regressão desta fatia:** o caso 2 já vale para `ModeloJustificativa` desde o `NOVO-09`, que
+duplicou o acervo e também não semeou área nova. Esta fatia estende o mesmo comportamento a mais
+quatro modelos — e por isso o defeito fica maior e merece ID próprio em vez de nota de rodapé.
+
+**Efeito sobre o `DB-02`:** enquanto a instalação nova produzir linha sem área, `area` não pode ser
+`NOT NULL` nesses quatro. A migração de `NOT NULL` reprovaria no primeiro `migrate` de um banco
+limpo — que é o banco da suíte, todo dia no CI.
+
+**Correção candidata:** mover a lista canônica de cada catálogo para um módulo de dados iniciais
+que dois caminhos consumam — `criar_area`, ao criar a área, e uma migração de saneamento para as
+áreas que já existem. Os seeds históricos ficam onde estão (migração aplicada não se reescreve);
+o que muda é quem passa a ser a fonte da verdade daqui para a frente. Só então `NOT NULL`.

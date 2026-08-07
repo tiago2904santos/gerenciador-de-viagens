@@ -148,7 +148,7 @@ Precisam de resposta humana; nenhuma bloqueia a fase 0.
 | ~~Qual UI Lab é o vigente~~ **decidida em 07/08 (PR #247): nenhum — os dois saíram** | `BE-25` (fase 9) | A cascata de componentes órfãos que a decisão deixou é o `NOVO-44`, fechado |
 | Arquitetura de configurações | fora das 9 fases | Proposta de 17–28 dias, em `historico/2026-07-refactor/planos/PROPOSTA_CONFIGURACOES.md`; entra como fase própria ou fica fora do ciclo |
 | Triagem dos 13 PRs abertos | fase 9 | 12 são de maio–julho, anteriores ao refactor; fechar ou reabrir é chamada sua |
-| Catálogo global do `DB-02` (grupo 2): cada item vira cópia por área ou ganha dono? | `NOVO-45` (medição e caminhos) | `TipoEvento`, `ProgramaSolicitante`, `HorarioAtendimento`, `AtividadePlanoTrabalho` têm linhas globais de seed — e a medição do `NOVO-45` mostrou que **nenhum picker as oferta** a usuário com área: ou viram fallback de leitura (e `NOT NULL` fica proibido), ou são materializadas por área (caminho do `NOVO-09`) |
+| ~~Catálogo global do `DB-02` (grupo 2)~~ **decidida em 07/08: cópia por área, seguindo o `NOVO-09`** | `DB-02` (fase 2) | Executada nas migrações `eventos/0016` e `planos_trabalho/0024`. **Correção de fato:** as linhas de seed **não** eram "servidas a todas as áreas" — medido nas três áreas, eram vistas por **zero** usuários com área, porque `filter_queryset_by_area` é estrito. Duplicar não repartiu nada: deu a cada área um catálogo que ela não tinha. O resíduo (instalação nova e área criada depois) é o `NOVO-49` |
 
 ## 9. Quadro de acompanhamento
 
