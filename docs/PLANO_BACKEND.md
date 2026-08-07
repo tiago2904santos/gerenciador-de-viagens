@@ -138,7 +138,8 @@ sobrevivam. — **cumprido** por `prestacoes_contas/test_remocao_equipe.py::Gate
 > Introspecção sobre os 54 modelos, não a lista do catálogo: `Roteiro` tem **quatro** datetimes em
 > cadeia (`saida_dt` → `chegada_dt` → `retorno_saida_dt` → `retorno_chegada_dt`) e `RoteiroTrecho`
 > tem um par próprio — nenhum dos dois estava nos "9 pares". Total final: 11 constraints de ordem e
-> 12 de sinal, mais as 2 que já existiam — o décimo segundo elo de ordem saiu do PR como `NOVO-36`.
+> 12 de sinal, mais as 2 que já existiam — o décimo segundo elo de ordem saiu do PR como `NOVO-36`,
+> **e voltou junto com a correção dele**, fechando a cadeia em 26.
 >
 > **Os testes escrevem por `queryset.update()`, não por `save()`.** É o caminho que o defeito
 > descreve — o que escapa da validação de formulário. Um teste que passasse pelo `save()` poderia

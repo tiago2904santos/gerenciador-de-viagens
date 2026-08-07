@@ -145,9 +145,12 @@ class ConstraintsBase(TestCase):
 #: pega demais — é onde `gte` se distingue de `gt`. Uma constraint sem o quarto
 #: caso passaria com `gt` no lugar de `gte` e quebraria evento de um dia em
 #: produção; provado por inversão, a troca reprova 22 destes casos.
-#: `roteiro_ida_ordenada` não está aqui, e a ausência é deliberada: ela reprovou
-#: código de produção (`NOVO-36`) e saiu do PR junto com o caso dela.
+#: `roteiro_ida_ordenada` voltou no `NOVO-36`, junto com a correção do produtor
+#: que a reprovava. Foi esta lista que reprovou quando ela reapareceu sem caso —
+#: era para isso que a régua de introspecção existia.
 CASOS_ORDEM = [
+    ("_roteiro", "roteiro_ida_ordenada",
+     {"chegada_dt": AGORA - timedelta(hours=1)}, {"chegada_dt": AGORA}),
     ("_roteiro", "roteiro_permanencia_ordenada",
      {"chegada_dt": AGORA, "retorno_saida_dt": AGORA - timedelta(hours=1)},
      {"chegada_dt": AGORA, "retorno_saida_dt": AGORA}),
@@ -395,4 +398,4 @@ class TodasAsConstraintsTemTesteTests(TestCase):
             for constraint in modelo._meta.constraints
             if isinstance(constraint, CheckConstraint)
         )
-        self.assertGreaterEqual(total, 25)
+        self.assertGreaterEqual(total, 26)

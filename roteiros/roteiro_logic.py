@@ -203,29 +203,72 @@ def _trechos_list_json_compat(trechos_list):
         rows.append(item)
     return rows, json.dumps(rows)
 def _atualizar_datas_roteiro_apos_salvar_trechos(roteiro):
+    """Deriva o cabeçalho de datas do roteiro a partir dos trechos (`NOVO-36`).
+
+    A regra era POSICIONAL: `trechos[0].saida_dt` para a saída e
+    `trechos[-2].chegada_dt` para a chegada da ida. Isso vale enquanto a posição
+    coincide com a cronologia — e ela deixa de coincidir na REORDENAÇÃO de
+    destinos, que preserva o horário de cada trecho e troca a ordem deles. Com
+    dois trechos de ida (01/05 e 02/05) invertidos, gravava saída=02/05 e
+    chegada=01/05: chegada 23 h ANTES da saída. Achado pela constraint
+    `roteiro_ida_ordenada` do `DB-07`, que por causa disto ficou adiada.
+
+    Agora é CRONOLÓGICA, que é a regra que o resto do sistema já usa: o motor de
+    diárias ordena marcadores por `saida` (`services/diarias.py:299`) e escolhe a
+    vigência por `min(saida)` (`:116-118`); `prestacoes_contas/services.py:89`
+    resolve o fim por `order_by('-chegada_dt')` sobre os trechos. A derivação
+    posicional era a anomalia. Em roteiro cronologicamente bem formado as duas
+    dão o MESMO valor — elas só divergem onde a antiga produzia chegada < saída.
+
+    Três decisões que parecem detalhe e não são:
+
+    1. `chegada_dt` sai EXCLUSIVAMENTE das idas. Cair para o máximo sobre todos
+       os trechos pegaria `retorno.chegada_dt`, que por construção vem depois de
+       `retorno_saida_dt` — e gravaria violação determinística de
+       `roteiro_permanencia_ordenada`, constraint JÁ em produção. Trocaria dado
+       errado por HTTP 500 num caminho que hoje devolve 200.
+    2. O ramo sem retorno também muda. A versão antiga usava `trechos[-1]` ali, e
+       uma correção que mexesse só no ramo com retorno deixaria o roteiro
+       reordenado SEM volta ainda invertido.
+    3. Continua só ATRIBUINDO quando a fonte existe, sem limpar. Escrever `None`
+       cegamente apagaria `retorno_*` de rascunho cujo trecho de retorno existe
+       mas ainda está sem datas — regressão de outra natureza, fora deste ID.
+    """
     trechos_salvos = list(roteiro.trechos.order_by('ordem'))
     if not trechos_salvos:
         return
+
+    idas = [t for t in trechos_salvos if t.tipo != RoteiroTrecho.TIPO_RETORNO]
+    retornos = [t for t in trechos_salvos if t.tipo == RoteiroTrecho.TIPO_RETORNO]
+    retorno = retornos[-1] if retornos else None
+
     update_fields = []
-    primeira_saida = trechos_salvos[0].saida_dt
+
+    saidas_da_ida = [t.saida_dt for t in idas if t.saida_dt is not None]
+    # Sem nenhuma ida com saída, a viagem começa no próprio retorno. É o estado
+    # que o autosave fabrica quando o usuário remove a última linha de destino:
+    # `_salvar_roteiro_avulso_from_roteiro_state` cria o trecho de retorno
+    # incondicionalmente e apaga os demais.
+    primeira_saida = min(saidas_da_ida) if saidas_da_ida else (
+        retorno.saida_dt if retorno else None
+    )
     if primeira_saida is not None:
         roteiro.saida_dt = primeira_saida
         update_fields.append('saida_dt')
-    if trechos_salvos[-1].tipo == RoteiroTrecho.TIPO_RETORNO:
-        ultima_saida_retorno = trechos_salvos[-1].saida_dt
-        if ultima_saida_retorno is not None:
-            roteiro.retorno_saida_dt = ultima_saida_retorno
+
+    chegadas_da_ida = [t.chegada_dt for t in idas if t.chegada_dt is not None]
+    if chegadas_da_ida:
+        roteiro.chegada_dt = max(chegadas_da_ida)
+        update_fields.append('chegada_dt')
+
+    if retorno is not None:
+        if retorno.saida_dt is not None:
+            roteiro.retorno_saida_dt = retorno.saida_dt
             update_fields.append('retorno_saida_dt')
-        if len(trechos_salvos) >= 2 and trechos_salvos[-2].chegada_dt is not None:
-            roteiro.chegada_dt = trechos_salvos[-2].chegada_dt
-            update_fields.append('chegada_dt')
-        if trechos_salvos[-1].chegada_dt is not None:
-            roteiro.retorno_chegada_dt = trechos_salvos[-1].chegada_dt
+        if retorno.chegada_dt is not None:
+            roteiro.retorno_chegada_dt = retorno.chegada_dt
             update_fields.append('retorno_chegada_dt')
-    else:
-        if trechos_salvos[-1].chegada_dt is not None:
-            roteiro.chegada_dt = trechos_salvos[-1].chegada_dt
-            update_fields.append('chegada_dt')
+
     if update_fields:
         update_fields.append('status')
         roteiro.save(update_fields=update_fields)

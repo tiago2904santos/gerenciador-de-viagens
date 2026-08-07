@@ -2544,7 +2544,7 @@ migração, e medir o mesmo número em produção — onde o seed convive com da
 
 ---
 
-### NOVO-36 🟠 `NOVO` Reordenar destinos deixa o roteiro com chegada antes da saída · COR · 1 d
+### NOVO-36 ✅ RESOLVIDO · 🟠 `NOVO` Reordenar destinos deixa o roteiro com chegada antes da saída · COR · 1 d
 
 **Achado pela constraint `roteiro_ida_ordenada`, que por isso ficou de fora do `DB-07`.** Ela existiu
 no PR, e `roteiros/tests/test_roteiros_base.py::test_salvar_reordenacao_preserva_dados_dos_trechos_existentes`
@@ -2570,6 +2570,42 @@ caracterização antes (limite 3 do `AGENTS.md`, pelo espírito: o valor chega a
 **Por que não foi corrigido junto com o `DB-07`:** pôr o `CHECK` antes de consertar o produtor troca
 dado silenciosamente errado por erro 500 numa tela de uso diário. A constraint entra no mesmo PR da
 correção.
+
+> **Resolvido pela derivação cronológica, e a constraint entrou junto.** `saida_dt` passa a ser o
+> `min` das saídas das idas e `chegada_dt` o `max` das chegadas das idas. Não é regra nova no
+> sistema: é a regra que o resto dele já usa — o motor de diárias ordena marcadores por `saida`
+> (`services/diarias.py:299`) e escolhe a vigência por `min(saida)` (`:116-118`), e
+> `prestacoes_contas/services.py:89` resolve o fim por `order_by('-chegada_dt')` sobre os trechos.
+> A derivação posicional do cabeçalho é que era a anomalia.
+>
+> **Não é regra de dinheiro.** Medido: o motor de diárias não lê `saida_dt` nem `chegada_dt` do
+> cabeçalho — ele monta os marcadores a partir de `RoteiroTrecho`. O total é idêntico no caso normal
+> e no reordenado. O dano era de cabeçalho e documento, não de valor.
+>
+> **Duas armadilhas que a verificação adversarial pegou antes de virarem regressão:**
+>
+> 1. **O fallback óbvio produziria erro 500.** "Sem ida com chegada, cair para o máximo sobre todos
+>    os trechos" pegaria `retorno.chegada_dt`, que por construção vem depois de `retorno_saida_dt` —
+>    violação determinística de `roteiro_permanencia_ordenada`, constraint **já em produção** desde o
+>    `DB-07`. O estado é alcançável por gesto banal: remover a última linha de destino faz o autosave
+>    salvar um roteiro cujo único trecho é o de retorno. Hoje esse caminho devolve 200; com o
+>    fallback devolveria 500. Virou o teste `test_roteiro_so_com_trecho_de_retorno`.
+> 2. **Limpar `retorno_*` quando a fonte é nula apagaria rascunho.** Trecho de retorno que existe mas
+>    ainda está sem datas é rascunho legítimo; escrever `None` cegamente descartaria o que o usuário
+>    já tinha digitado. A função continua só atribuindo, nunca limpando.
+>
+> **Leitor acoplado, corrigido junto:** `encontrar_roteiro_duplicado`
+> (`roteiros/services/roteiro_editor.py:288`) derivava o mesmo valor pela mesma regra posicional e
+> casava contra `Roteiro.saida_dt` no banco. Mudar só o escritor faria os dois discordarem
+> exatamente nos roteiros reordenados, e a detecção de duplicata pararia de achá-los em silêncio.
+>
+> **Máscara que existia e não foi removida:** `roteiros/presenters.py:107-108` troca início e fim
+> quando `fim < inicio`. É defesa contra exatamente o dado que este defeito produzia. Fica —
+> agora como cinto de segurança, não como remendo.
+>
+> Quatro inversões: chegada posicional, saída posicional, o fallback e a limpeza incondicional.
+> Cada uma reprova o teste que a descreve, e a do fallback reprova com
+> `IntegrityError: CHECK constraint failed: roteiro_permanencia_ordenada`.
 
 ---
 
