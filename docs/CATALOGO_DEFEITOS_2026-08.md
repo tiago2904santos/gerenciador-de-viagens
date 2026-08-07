@@ -1491,7 +1491,7 @@ produção.**
 
 ## UI — CSS
 
-### UI-01 🟠 36% das classes declaradas não aparecem em lugar nenhum · MED · ver plano de front
+### UI-01 🟠 PARCIAL (`oficios.css` fechado) · 36% das classes declaradas não aparecem em lugar nenhum · MED · ver plano de front
 
 2.612 classes declaradas em `static/css` (fora o bundle, que é concatenação); **~936 sem nenhuma
 ocorrência** num corpus de 4,7 MB com todos os templates, todo o JS e todo o Python dos 15 apps.
@@ -1522,9 +1522,50 @@ ocorrência** num corpus de 4,7 MB com todos os templates, todo o JS e todo o Py
 > Em Python não há padrão equivalente: nenhuma classe montada por f-string, `+`, `.format()` ou
 > `.join()` fora do enum estático `WidgetStyle`.
 
+> **Segunda correção do enunciado (07/08), maior que a primeira.** A revisão de 05/08 disse
+> "**pelo menos** três" padrões de classe montada em runtime, todos em JS, e afirmou que em Python
+> não havia equivalente. Quatro varreduras independentes, com lentes diferentes, e uma consolidação
+> que remediu cada achado contra o inventário de 2.617 classes acharam **25 prefixos**: os 3
+> conhecidos mais **22 novos**. E a assimetria é estrutural — **20 dos 22 estão em templates Django
+> e Python**, superfície que a varredura original nunca olhou.
+>
+> **A afirmação sobre Python está refutada**, com três famílias de contraexemplo lidas no arquivo:
+>
+> | onde | o que monta |
+> |---|---|
+> | `prestacoes_contas/presenters.py:284` e `:398` | f-string → `prestacao-card-group--{start,middle,end}` |
+> | `core/views.py:804` | f-string → `status-chip--{tone}` |
+> | `oficios/presenters.py:37-42`, `roteiros/presenters.py:149-164` | função devolve a classe inteira → `roteiro-list-card--faixa-*` |
+>
+> O que o catálogo acertou: o caminho de widgets está limpo — `WidgetStyle` é enum de 19 literais
+> completos. O erro foi generalizar essa limpeza para todo o Python.
+>
+> **Uma correção de fato no padrão #1:** a montagem está em `picker.js:190-191`, não em `143-144`;
+> aquelas linhas só leem os `data-*`.
+>
+> **O pior caso do repositório** é `cv-search-picker--vehicle`: existe apenas no CSS, em ~22 regras
+> de tema escuro. Apagá-la quebraria **só** o tema escuro do picker de viatura — dano invisível para
+> quem revisa em tema claro.
+>
+> **Buracos que continuam abertos, declarados:** seletores de atributo (`[data-state=…]`) correm o
+> mesmo risco e ficaram fora de todas as lentes; os vocabulários de `cv-btn--`, `cv-icon-btn--` e
+> `cv-chip--` não foram fechados (sabe-se que o prefixo é composto, não quais valores existem);
+> `migrations/` não foi varrido; e nada foi executado — a varredura é estática.
+
+**`oficios.css` fechado em 07/08.** 106,0 → 65,9 KB (−40,2 KB, −38%), 239 blocos removidos, 178
+classes. Prova: **15 de 16 comparações de tela pixel-idênticas** (8 páginas × 2 temas); a 16ª tem 63
+pixels de antialiasing na borda de um ícone, delta máximo de 4 em 255. Duas catracas desceram junto:
+`audit_frontend_standards` 392 → 387 avisos e `audit_foco_visivel` 44 → 42 blocos.
+
+O número medido ficou **abaixo** do enunciado (239 blocos contra 283) por três motivos, todos na
+direção segura: o corpus foi de 9,8 MB em vez de 4,7 MB; classe citada por outro arquivo CSS conta
+como viva; e 8 classes foram salvas por prefixo dinâmico — entre elas
+`oficio-viatura-reason--unidade`, que **a minha própria derivação de prefixos tinha perdido** porque
+o `+` da concatenação fica no início da linha seguinte (`static/js/pages/oficios-transporte.js:254`).
+
 | arquivo | blocos mortos | peso |
 |---|---:|---:|
-| `oficios.css` | 283 | 47 KB |
+| `oficios.css` ✅ | 283 → medido 239 | 47 KB → medido 40,2 KB |
 | `dev/ui-lab-fields.css` | 96 | 18 KB |
 | `dev/ui-lab-pages.css` | 79 | 16 KB |
 | `page-shell.css` | 78 | 14 KB |
