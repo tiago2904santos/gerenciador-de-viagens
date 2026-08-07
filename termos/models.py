@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django.db import models
 
+from core.constraints import periodo_ordenado
 from core.managers import AreaScopedManager
 from core.models import CancelavelModel
 from cadastros.models import Cidade
@@ -81,6 +82,13 @@ class TermoAutorizacao(TimeStampedModel, CancelavelModel):
         # A listagem filtra por area e ordena por data (P-03).
         indexes = [
             models.Index(fields=["area", "-created_at"], name="termo_area_created_idx"),
+        ]
+        constraints = [
+            # `DB-07`: estas duas datas viram o período impresso no termo assinado
+            # (`periodo_display`), que é o documento que autoriza o afastamento.
+            periodo_ordenado(
+                "data_evento_inicio", "data_evento_fim", name="termo_periodo_ordenado",
+            ),
         ]
         ordering = ["-created_at"]
         verbose_name = "Termo de autorizacao"

@@ -6,6 +6,8 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.text import slugify
 
+from core.constraints import nao_negativo
+from core.constraints import periodo_ordenado
 from core.managers import AreaScopedManager
 
 from cadastros.models import Cargo
@@ -457,7 +459,23 @@ class PlanoTrabalho(TimeStampedModel, CancelavelModel):
                 fields=["area", "ano", "numero"],
                 condition=Q(area__isnull=False, ano__isnull=False, numero__isnull=False),
                 name="planos_trabalho_area_ano_numero_unique",
-            )
+            ),
+            # `DB-07`. Os quatro valores abaixo são **calculados** e gravados —
+            # unitário × quantidade, e a variante combinada. Zero é legítimo
+            # (plano sem diária); negativo só sai de conta errada, e daqui viaja
+            # direto para o documento do plano.
+            periodo_ordenado(
+                "data_evento_inicio", "data_evento_fim", name="plano_periodo_ordenado",
+            ),
+            nao_negativo("diarias_valor_unitario", name="plano_diaria_unitaria_nao_negativa"),
+            nao_negativo("diarias_valor_total", name="plano_diaria_total_nao_negativa"),
+            nao_negativo(
+                "diarias_combinada_valor_unitario",
+                name="plano_diaria_comb_unitaria_nao_negativa",
+            ),
+            nao_negativo(
+                "diarias_combinada_valor_total", name="plano_diaria_comb_total_nao_negativa",
+            ),
         ]
 
     def __str__(self):
@@ -802,6 +820,18 @@ class EventoPlano(TimeStampedModel):
         ordering = ["ordem", "data_evento_inicio", "pk"]
         verbose_name = "Evento do plano de trabalho"
         verbose_name_plural = "Eventos do plano de trabalho"
+        constraints = [
+            # `DB-07`: no modo multi-evento é **aqui** que mora o período de cada
+            # evento, e a `Meta.ordering` ordena por `data_evento_inicio` — data
+            # invertida embaralha a sequência impressa no plano.
+            periodo_ordenado(
+                "data_evento_inicio", "data_evento_fim", name="evento_plano_periodo_ordenado",
+            ),
+            nao_negativo(
+                "diarias_valor_unitario", name="evento_plano_diaria_unitaria_nao_negativa",
+            ),
+            nao_negativo("diarias_valor_total", name="evento_plano_diaria_total_nao_negativa"),
+        ]
 
     def __str__(self):
         if self.data_evento_inicio:

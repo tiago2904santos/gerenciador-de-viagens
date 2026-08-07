@@ -2,6 +2,8 @@ from decimal import Decimal, InvalidOperation
 
 from django.db import models
 
+from core.constraints import nao_negativo
+from core.constraints import periodo_ordenado
 from core.managers import AreaScopedManager
 
 from core.models import CancelavelModel
@@ -153,6 +155,37 @@ class Roteiro(CancelavelModel):
         ordering = ["-created_at"]
         verbose_name = "Roteiro"
         verbose_name_plural = "Roteiros"
+        constraints = [
+            # `DB-07`. A cadeia real e' saida -> chegada -> retorno_saida ->
+            # retorno_chegada. Os tres elos consecutivos, mais o limite externo:
+            # com nulo no meio a transitividade se perde, e o par externo e'
+            # justamente o que o motor de diarias usa para contar dia.
+            #
+            # `NOVO-36`: o elo `saida_dt <= chegada_dt` **nao** entra ainda. Ele
+            # existiu neste PR e reprovou codigo de producao: reordenar destinos
+            # preserva os horarios de cada trecho e deixa o roteiro com chegada
+            # antes da saida (`roteiro_logic.py:219`). Por o CHECK antes de
+            # consertar o produtor trocaria dado silenciosamente errado por 500
+            # numa tela de uso diario. Entra junto com a correcao do `NOVO-36`.
+            periodo_ordenado(
+                "chegada_dt", "retorno_saida_dt", name="roteiro_permanencia_ordenada",
+            ),
+            periodo_ordenado(
+                "retorno_saida_dt", "retorno_chegada_dt", name="roteiro_volta_ordenada",
+            ),
+            periodo_ordenado(
+                "saida_dt", "retorno_chegada_dt", name="roteiro_periodo_ordenado",
+            ),
+            # Zero e' legitimo (viagem sem diaria); negativo so sai de conta
+            # errada, e daqui vai para o oficio e para a prestacao assinada.
+            nao_negativo("valor_diarias", name="roteiro_valor_diarias_nao_negativo"),
+            nao_negativo(
+                "rota_distancia_calculada_km", name="roteiro_distancia_calc_nao_negativa",
+            ),
+            nao_negativo(
+                "rota_distancia_manual_km", name="roteiro_distancia_manual_nao_negativa",
+            ),
+        ]
 
     def __str__(self):
         orig = self.origem_cidade or self.origem_estado
@@ -299,6 +332,12 @@ class RoteiroTrecho(models.Model):
             models.Index(fields=["roteiro", "ordem"], name="roteiro_trecho_ordem_idx"),
         ]
         ordering = ["roteiro", "ordem"]
+        constraints = [
+            # `DB-07`: cada trecho tem o proprio par, e a soma deles e' o
+            # itinerario impresso. Um trecho invertido nao aparece na tela.
+            periodo_ordenado("saida_dt", "chegada_dt", name="roteiro_trecho_ordenado"),
+            nao_negativo("distancia_km", name="roteiro_trecho_distancia_nao_negativa"),
+        ]
         verbose_name = "Trecho do roteiro"
         verbose_name_plural = "Trechos do roteiro"
 

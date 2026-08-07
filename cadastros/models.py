@@ -4,6 +4,7 @@ from decimal import ROUND_HALF_UP, Decimal
 from django.db import models, transaction
 from django.db.models import Q, UniqueConstraint
 
+from core.constraints import positivo
 from core.managers import AreaScopedManager
 from core.normalizers import normalize_digits
 from core.normalizers import normalize_plate
@@ -790,6 +791,11 @@ class TabelaDiaria(TimeStampedModel):
                 condition=Q(valor_24h__gt=0),
                 name="tabela_diaria_valor_24h_positivo",
             ),
+            # `DB-07`: os dois derivados tinham a positividade só por consequência
+            # de `valor_24h` — e derivado é exatamente o que um `update()` cru ou
+            # uma migração de dados grava sem passar pelo `save()` que os calcula.
+            positivo("valor_15", name="tabela_diaria_valor_15_positivo"),
+            positivo("valor_30", name="tabela_diaria_valor_30_positivo"),
         ]
         indexes = [
             models.Index(

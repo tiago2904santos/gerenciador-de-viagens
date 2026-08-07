@@ -7,6 +7,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
+from core.constraints import periodo_ordenado
 from core.managers import AreaScopedManager
 from core.models import CancelavelModel
 from cadastros.models import Cidade
@@ -160,6 +161,10 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
                 fields=["area", "ano", "numero"],
                 condition=Q(ano__isnull=False, numero__isnull=False),
                 name="ordens_servico_area_ano_numero_unique",
+            ),
+            # `DB-07`: o período da OS é copiado do evento e reimpresso no documento.
+            periodo_ordenado(
+                "data_evento_inicio", "data_evento_fim", name="os_periodo_ordenado",
             ),
         ]
         verbose_name = "Ordem de Serviço"
