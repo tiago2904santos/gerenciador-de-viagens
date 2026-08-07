@@ -74,7 +74,7 @@ jobs:
       - name: Block new frontend standards debt
         # Catraca: este número só desce. A Etapa 1 levou 465 → 449; a Etapa 7
         # levou 449 → 438 na fase 2 e 438 → 417 na fase 1.
-        run: python scripts/audit_frontend_standards.py --max-warnings 385
+        run: python scripts/audit_frontend_standards.py --max-warnings 380
 
       - name: Block new keyboard-focus suppression (HT-01)
         # Catraca: este numero so desce. 47 -> 44 no `HT-01`.
