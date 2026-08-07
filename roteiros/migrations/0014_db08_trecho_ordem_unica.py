@@ -42,7 +42,10 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("roteiros", "0012_db08_colecoes_ordenadas"),
+        # `0013` (`area_obrigatoria`, o `DB-02` grupo 1 da sessão paralela) entrou
+        # na `main` depois deste ramo. As duas são independentes — colunas
+        # diferentes, nenhuma lê a outra —, então esta só encadeia depois.
+        ("roteiros", "0013_area_obrigatoria"),
     ]
 
     operations = [

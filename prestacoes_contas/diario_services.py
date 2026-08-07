@@ -277,12 +277,6 @@ def sincronizar_trechos(diario: DiarioBordo) -> list[DiarioBordoTrecho]:
     """
     roteiro = roteiro_efetivo(diario.prestacao)
     trechos = trechos_ordenados(roteiro)
-    existentes = list(diario.trechos.all().order_by("ordem", "pk"))
-    por_trecho = {dt.trecho_id: dt for dt in existentes}
-    ids_atuais = {t.id for t in trechos}
-    # Linhas cujo trecho deixou de existir (ex.: roteiro foi clonado/recriado):
-    # ficam disponíveis para reaproveitar, preservando KM/abastecimento por ordem.
-    sobrando = [dt for dt in existentes if dt.trecho_id not in ids_atuais]
 
     # `DB-08` fatia 2, **primeiro passo**. As posições finais entram uma a uma no
     # laço abaixo, e a linha é reaproveitada por `id`: quando o roteiro muda de
@@ -290,7 +284,23 @@ def sincronizar_trechos(diario: DiarioBordo) -> list[DiarioBordoTrecho]:
     # `UPDATE` único tira todas do caminho; o laço as traz de volta já no lugar, e
     # o `delete()` do fim leva as que sobraram. `deferrable=DEFERRED` não serve —
     # o SQLite não o suporta e a suíte roda nos dois bancos.
+    #
+    # **Antes da leitura, não depois.** Lendo primeiro, os objetos em memória
+    # ficariam com a posição antiga enquanto o banco já teria a deslocada, e o
+    # `save()` do laço — que grava todos os campos — devolveria o valor velho por
+    # acidente. Funciona enquanto o laço atribuir `ordem` explicitamente, e é
+    # exatamente o tipo de acerto silencioso que some quando alguém mexe no laço.
+    # Medido: com a leitura antes, o teste do bloco passa mesmo com o laço não
+    # devolvendo linha nenhuma.
     diario.trechos.update(ordem=F("ordem") + DESLOCAMENTO_ORDEM_TRECHO)
+
+    existentes = list(diario.trechos.all().order_by("ordem", "pk"))
+    por_trecho = {dt.trecho_id: dt for dt in existentes}
+    ids_atuais = {t.id for t in trechos}
+    # Linhas cujo trecho deixou de existir (ex.: roteiro foi clonado/recriado):
+    # ficam disponíveis para reaproveitar, preservando KM/abastecimento por ordem.
+    # A ordem relativa sobrevive ao deslocamento: ele soma o mesmo em todas.
+    sobrando = [dt for dt in existentes if dt.trecho_id not in ids_atuais]
 
     usados = []
     for i, trecho in enumerate(trechos):

@@ -278,6 +278,9 @@ class EscritorDeTrechoEmDoisPassosTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        # `DB-02` grupo 1 tornou `area` obrigatória em `Roteiro` e `Oficio`
+        # (`roteiros/0013_area_obrigatoria`); fixture sem área não grava mais.
+        cls.area = AreaTrabalho.objects.create(nome="Área trechos", sigla="TRE")
         cls.estado = Estado.objects.create(nome="Santa Catarina", sigla="SC")
         cls.sede = Cidade.objects.create(nome="Florianópolis", estado=cls.estado)
         cls.destino_a = Cidade.objects.create(nome="Joinville", estado=cls.estado)
@@ -286,6 +289,7 @@ class EscritorDeTrechoEmDoisPassosTests(TestCase):
 
     def setUp(self):
         self.roteiro = Roteiro.objects.create(
+            area=self.area,
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.sede,
@@ -461,9 +465,15 @@ class EscritorDeTrechoEmDoisPassosTests(TestCase):
 class TrechoDeDiarioTests(TestCase):
     """O diário de bordo é peça assinada de prestação de contas de combustível."""
 
+    def setUp(self):
+        self.area = AreaTrabalho.objects.create(nome="Área diário", sigla="DIA")
+
     def diario(self):
         oficio = Oficio.objects.create(
-            numero=900 + Oficio.all_objects.count(), ano=2026, protocolo="900000000",
+            area=self.area,
+            numero=900 + Oficio.all_objects.count(),
+            ano=2026,
+            protocolo="900000000",
         )
         prestacao = PrestacaoContas.objects.get(oficio=oficio)
         return DiarioBordo.objects.create(prestacao=prestacao)
@@ -494,14 +504,16 @@ class SincronizarTrechosEmDoisPassosTests(TestCase):
     """
 
     def setUp(self):
+        self.area = AreaTrabalho.objects.create(nome="Área sincronia", sigla="SIN")
         self.estado = Estado.objects.create(nome="Bahia", sigla="BA")
         self.sede = Cidade.objects.create(nome="Salvador", estado=self.estado)
         self.destino_a = Cidade.objects.create(nome="Ilhéus", estado=self.estado)
         self.destino_b = Cidade.objects.create(nome="Juazeiro", estado=self.estado)
         self.roteiro = Roteiro.objects.create(
-            origem_estado=self.estado, origem_cidade=self.sede,
+            area=self.area, origem_estado=self.estado, origem_cidade=self.sede,
         )
         self.oficio = Oficio.objects.create(
+            area=self.area,
             numero=910 + Oficio.all_objects.count(),
             ano=2026,
             protocolo="910000000",
@@ -550,6 +562,15 @@ class SincronizarTrechosEmDoisPassosTests(TestCase):
         self.assertEqual(self.diario.trechos.get(trecho=self.t_a).km_inicial, 1000)
 
     def test_o_bloco_de_deslocamento_do_diario_fica_vazio_no_fim(self):
+        """Duas sincronias, não uma — e a segunda é a que prova algo.
+
+        Na primeira as linhas ainda não existem: nascem já na posição final e
+        nunca passam pelo bloco. Só na segunda é que o primeiro passo tem o que
+        empurrar, e só aí a asserção morde. Com uma sincronia só, este teste
+        passava mesmo com o laço deixando tudo lá — medido por inversão.
+        """
+        sincronizar_trechos(self.diario)
+
         sincronizar_trechos(self.diario)
 
         self.assertFalse(

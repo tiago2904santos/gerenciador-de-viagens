@@ -27,7 +27,8 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("prestacoes_contas", "0033_prazo_de_saque_e_km_ordenados"),
+        # Ver a irmã em `roteiros/0014`: `0034_area_obrigatoria` chegou primeiro.
+        ("prestacoes_contas", "0034_area_obrigatoria"),
     ]
 
     operations = [
