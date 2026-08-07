@@ -600,6 +600,36 @@ atualizando no mesmo PR os testes que dependem do balde legado
 desenho; a decisão de produto do grupo 2 entra na fila do plano mestre (§8) quando
 alguém a puxar.
 
+> **Grupo 2 executado em 07/08/2026 — e a premissa do enunciado estava errada.**
+>
+> Decisão do usuário: cópia por área, seguindo o `NOVO-09`. Migrações `eventos/0015` e
+> `planos_trabalho/0023`.
+>
+> **O que a medição corrigiu:** o §8 do plano mestre descrevia as linhas globais como "servidas a
+> todas as áreas". **Não eram.** Medido nas três áreas do banco de desenvolvimento: as 22 linhas de
+> seed (`TipoEvento` 5, `AtividadePlanoTrabalho` 11, `ProgramaSolicitante` 3, `HorarioAtendimento`
+> 3) eram vistas por **zero** usuários com área — só quem não tem área as enxergava, porque
+> `filter_queryset_by_area` é estrito e não faz união com o balde nulo. As constraints
+> `*_global_unique` provam que um namespace global foi **projetado**; nenhum leitor o realizava.
+>
+> Isso muda o que a duplicação significa: não repartiu um acervo compartilhado, **deu a cada área um
+> catálogo que ela não tinha**. Para o usuário, conteúdo que aparece.
+>
+> Medido na ida e na volta, num banco de teste: 22 linhas globais → 44 com 2 áreas, **zero** sem
+> dono; a volta devolve exatamente 22, todas globais; a ida de novo reproduz o mesmo estado.
+>
+> **Duas armadilhas herdadas, uma delas cara:**
+> 1. **`_base_manager`, nunca `objects`.** Modelo histórico de migração não recebe o manager
+>    customizado do `BE-09` — `objects` não existe ali. E o erro **só aparece na volta**, porque a
+>    ida sai cedo quando não há área. Apareceu drilando o rollback, não em produção.
+> 2. **`SET CONSTRAINTS ALL IMMEDIATE`** antes do `ALTER TABLE`, herdado do `NOVO-09`: sem ele a
+>    volta morre no PostgreSQL com `cannot ALTER TABLE ... because it has pending trigger events`.
+>
+> **`NOT NULL` nestes quatro continua bloqueado, e agora o motivo tem ID:** o `NOVO-45`. Instalação
+> nova roda os seeds quando ainda não existe área — a duplicação sai sem fazer nada, por guarda
+> explícita — e `criar_area` não semeia catálogo, então área nova nasce com os quatro vazios. É o
+> mesmo comportamento que o `NOVO-09` deixou para `ModeloJustificativa`.
+
 ### DB-03 ✅ RESOLVIDO · 🟠 Limpeza de rascunhos apaga rascunho de outra área · AUD · 1 d
 
 `roteiros/services/roteiro_editor.py:317` —
@@ -3672,3 +3702,34 @@ que faltava — mas não rodou a trava do `HT-06` antes de mesclar: os **7 compo
 a suíte inteira antes do merge — a trava do `HT-06` é local e barata, e teria segurado o
 `main` verde. O run 697 (`NOVO-43`) passou sobre a árvore do #246 por sorte de ordem: o
 vermelho só apareceu quando o #247 entrou.
+
+---
+
+### NOVO-45 🟠 `NOVO` Área nova nasce sem catálogo, e instalação nova mantém o catálogo no balde sem dono · DB · 1 d
+
+Achado ao executar o grupo 2 do `DB-02`, e é o que **impede** aqueles quatro modelos de virarem
+`NOT NULL` agora.
+
+A duplicação por área (decisão do usuário em 07/08, seguindo o `NOVO-09`) resolve o acervo
+existente: cada área passa a ter `TipoEvento`, `AtividadePlanoTrabalho`, `ProgramaSolicitante` e
+`HorarioAtendimento` — hoje visíveis para **zero** usuários com área. Mas ela não fecha dois casos,
+porque não tem como:
+
+1. **Instalação nova.** Os seeds rodam em `eventos/0008`, `planos_trabalho/0002`, `0003` e `0008`,
+   e nesse momento **não existe área nenhuma** — a migração de duplicação sai sem fazer nada, por
+   guarda explícita. As 22 linhas ficam globais, exatamente como antes.
+2. **Área criada depois.** `usuarios/services.py:criar_area` não semeia catálogo. A área nova nasce
+   com os quatro catálogos **vazios**, e o usuário tem de recadastrar tudo à mão.
+
+**Não é regressão desta fatia:** o caso 2 já vale para `ModeloJustificativa` desde o `NOVO-09`, que
+duplicou o acervo e também não semeou área nova. Esta fatia estende o mesmo comportamento a mais
+quatro modelos — e por isso o defeito fica maior e merece ID próprio em vez de nota de rodapé.
+
+**Efeito sobre o `DB-02`:** enquanto a instalação nova produzir linha sem área, `area` não pode ser
+`NOT NULL` nesses quatro. A migração de `NOT NULL` reprovaria no primeiro `migrate` de um banco
+limpo — que é o banco da suíte, todo dia no CI.
+
+**Correção candidata:** mover a lista canônica de cada catálogo para um módulo de dados iniciais
+que dois caminhos consumam — `criar_area`, ao criar a área, e uma migração de saneamento para as
+áreas que já existem. Os seeds históricos ficam onde estão (migração aplicada não se reescreve);
+o que muda é quem passa a ser a fonte da verdade daqui para a frente. Só então `NOT NULL`.
