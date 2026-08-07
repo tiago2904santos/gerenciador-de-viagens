@@ -161,12 +161,11 @@ class Roteiro(CancelavelModel):
             # com nulo no meio a transitividade se perde, e o par externo e'
             # justamente o que o motor de diarias usa para contar dia.
             #
-            # `NOVO-36`: o elo `saida_dt <= chegada_dt` **nao** entra ainda. Ele
-            # existiu neste PR e reprovou codigo de producao: reordenar destinos
-            # preserva os horarios de cada trecho e deixa o roteiro com chegada
-            # antes da saida (`roteiro_logic.py:219`). Por o CHECK antes de
-            # consertar o produtor trocaria dado silenciosamente errado por 500
-            # numa tela de uso diario. Entra junto com a correcao do `NOVO-36`.
+            # `NOVO-36`: este elo ficou de fora do `DB-07` porque reprovava codigo
+            # de producao — a derivacao posicional do cabecalho gravava chegada
+            # antes da saida ao reordenar destinos. O produtor foi corrigido para
+            # derivar cronologicamente, e a constraint entra junto com ele.
+            periodo_ordenado("saida_dt", "chegada_dt", name="roteiro_ida_ordenada"),
             periodo_ordenado(
                 "chegada_dt", "retorno_saida_dt", name="roteiro_permanencia_ordenada",
             ),

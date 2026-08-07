@@ -285,19 +285,27 @@ def encontrar_roteiro_duplicado(validated, roteiro_state, *, evento=None, exclui
     if not destino_ids:
         return None
 
+    # `NOVO-36`: a saída **mais antiga**, não a do primeiro trecho da lista. Esta
+    # função casa contra `Roteiro.saida_dt` no banco, e o produtor daquele campo
+    # (`roteiro_logic._atualizar_datas_roteiro_apos_salvar_trechos`) passou a
+    # derivá-lo cronologicamente. Deixar a regra posicional aqui faria o leitor
+    # discordar do escritor exatamente nos roteiros com destinos reordenados — a
+    # detecção de duplicata pararia de achá-los, em silêncio.
     saida_dt = None
-    trechos = validated.get("trechos") or []
-    if trechos:
-        primeiro = trechos[0]
-        saida_data = primeiro.get("saida_data")
-        saida_hora = primeiro.get("saida_hora")
-        if saida_data and saida_hora:
-            naive = datetime.combine(saida_data, saida_hora)
-            saida_dt = (
-                timezone.make_aware(naive, timezone.get_current_timezone())
-                if timezone.is_naive(naive)
-                else naive
-            )
+    candidatas = []
+    for trecho in validated.get("trechos") or []:
+        saida_data = trecho.get("saida_data")
+        saida_hora = trecho.get("saida_hora")
+        if not (saida_data and saida_hora):
+            continue
+        naive = datetime.combine(saida_data, saida_hora)
+        candidatas.append(
+            timezone.make_aware(naive, timezone.get_current_timezone())
+            if timezone.is_naive(naive)
+            else naive
+        )
+    if candidatas:
+        saida_dt = min(candidatas)
 
     qs = Roteiro.objects.filter(origem_cidade_id=sede_cidade.pk).prefetch_related("destinos")
     if excluir_pk:
