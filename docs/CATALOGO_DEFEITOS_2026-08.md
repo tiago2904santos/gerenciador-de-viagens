@@ -3440,3 +3440,71 @@ antes de medir — a primeira versão passava contra o código defeituoso porque
 `saida_dt` caía fora de todas as abas e a lista vinha vazia. E filtra pelo `WHERE
 "cadastros_cidade"."capital"`, não pela palavra solta: `capital` é coluna e aparece em qualquer
 select de `Cidade`, o que me fez ler 4 consultas onde havia 1.
+
+---
+
+### NOVO-43 🟠 `NOVO` O teto quente do passo 15 nunca foi calibrado contra a amostra que o decide, e reprovar ali anula todos os gates a jusante · CI · 0,5 d
+
+O passo 15 do `tests.yml` roda `documentos_unoserver_check --benchmark --representative-resources
+--iterations 3 --max-ms 1000 --max-cold-ms 3000`. O orçamento **quente** compara `max()` de 4
+amostras com 1000 ms, usando `>=`
+(`documentos/management/commands/documentos_unoserver_check.py:160`).
+
+Em 07/08 ele reprovou no PR #246 por **0,2 ms** — `1000.2` contra `1000`.
+
+**O teto é o `default` do argparse** (`documentos_unoserver_check.py:35`), não um valor medido:
+`git log -S"--max-ms 1000" -- .github/workflows/tests.yml` alcança só `a4739eff`, cuja mensagem é
+`commit`. O comentário do próprio passo justifica mantê-lo em 1000 com "o regime estável entre 96 e
+101 ms" — que é o **docx**, o modelo que o gate quase nunca pega.
+
+**Medição, 30 execuções (runs 667–696, 07/08 entre 04:41Z e 15:05Z):**
+
+| população | mediana | faixa | quem define o `max()` |
+|---|---:|---|---|
+| `ordem_servico_modelos.docx` quente | 100,0 ms | 93–110 (60 amostras) | 1 de 30 |
+| `diario_bordo.xlsx` quente | ~476 ms | 417,3–528,2 | **29 de 30** |
+
+Máximo quente por execução: mediana 486,9 · média 502,4 · máximo 1000,2. **Vinte e nove valores
+entre 417,3 e 528,2, e o intervalo de 528,2 a 1000,2 está vazio** — não há tendência de subida, há
+um pico solitário.
+
+**Folga real sobre quem decide: 2,05× na mediana (1000 / 486,9) e 1,89× no pior verde
+(1000 / 528,2)** — e não os "10×" que o comentário do passo sugere, que é a folga do docx.
+
+**Três defeitos de desenho, independentes do commit:**
+
+1. **O estatístico é `max()` sobre 4 amostras.** `E[max]` cresce com N: aumentar `--iterations`
+   deixa o gate mais **rígido**, não mais preciso.
+2. **Teto único sobre duas populações que diferem 4,8×.** Na prática é um gate do xlsx com margem
+   apertada e decoração para o docx — que precisaria regredir 10× para tropeçar.
+3. **O raio de explosão é anormal.** O passo 15 precede a suíte (18), os pisos de cobertura (19) e a
+   régua do `PF-07` (20). Reprovar ali transforma um pico de um runner em **PR sem prova de CI
+   nenhuma**. A régua irmã já decidiu por escrito o oposto (`scripts/medir_desempenho.py:34-40`:
+   "Tempo não tem teto… este repositório já pagou essa conta") e cita este passo como o exemplo do
+   que não fazer.
+
+**O gate está a um fator 2,05 de deixar de funcionar.** Em 06/08, quando a geração de runner mudou,
+o valor a frio saltou de ~1119 para 1868–2554 ms (1,7 a 2,3×) e o passo reprovou 3 de 3 vezes,
+inclusive na `main` — foi o `NOVO-40`. Uma repetição daquele regime põe a mediana quente em
+~1000–1120 ms e a taxa de reprovação perto de 100%.
+
+**Taxa de falso positivo: 1 em 30 execuções (3,3%) na janela medida.** O intervalo de confiança de
+95% sobre um único evento vai de ~0,1% a ~17%; não dá para estreitar sem mais janela, e a cauda não
+é extrapolável do corpo da distribuição.
+
+**Correção candidata, em ordem de custo/benefício:** preservar `$RUNNER_TEMP/unoserver.log` com
+`if: failure()` + `upload-artifact` (hoje o log some, e por isso a causa da parada é
+indeterminável); mover o passo para depois da suíte ou para job paralelo, o que corta o dano sem
+tocar na estatística; **teto por modelo** em vez de teto global, que devolve margem semelhante às
+duas populações e torna o gate do docx ~5× mais sensível; e `>` em vez de `>=`.
+**Não** adotar razão frio/quente — os dados a refutam (a razão do docx varia 6,06 a 26,14,
+espalhamento de 4,3×, pior que o valor absoluto, 4,0×).
+
+> **Não é regressão do `HT-06`, e a prova é de árvore, não de argumento.** O head que reprovou
+> (`2bb1a37a`) e o merge na `main` (`5f1b6503`) têm a **mesma árvore**,
+> `23c94658943f0f019469691b4fdd0fcc5a50fd2b`, com as 7 deleções. O run 696 reprovou às 15:07; o run
+> **697**, sobre essa árvore idêntica, **passou inteiro** às 15:13, com o máximo quente em 515,7 ms.
+> Mesmos bytes, seis minutos, resultados opostos.
+>
+> Os passos 16 a 20 ficaram `skipped` no run 696 — a suíte, a cobertura e o `PF-07` do `HT-06`
+> ficaram sem prova naquele run, e a têm no 697.
