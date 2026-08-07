@@ -4,10 +4,10 @@
     {{ field.as_widget }}
     <span class="field-option-card__label">{{ title|default:field.label }}</span>
     {% if description %}
-      <span class="field-option-card__hint">{{ description }}</span>
+      <span class="field-option-card__hint" id="{{ field.auto_id }}_helptext">{{ description|safe }}</span>
     {% endif %}
   </label>
-  {% if field.errors %}<p class="field-error">{{ field.errors|striptags }}</p>{% endif %}
+  {% if field.errors %}{% include "components/ui/feedback/field_error.html" with errors=field.errors field_id=field.auto_id only %}{% endif %}
 </div>
 {% else %}
 <div class="field field-card-toggle">
@@ -17,13 +17,13 @@
     <span class="app-card-toggle__content">
       <span class="app-card-toggle__title">{{ title|default:field.label }}</span>
       {% if description %}
-        <span class="app-card-toggle__description">{{ description }}</span>
+        <span class="app-card-toggle__description" id="{{ field.auto_id }}_helptext">{{ description|safe }}</span>
       {% endif %}
     </span>
     <span class="app-card-toggle__state" data-card-toggle-state>
       {% if field.value %}{{ on_label|default:"LIGADA" }}{% else %}{{ off_label|default:"DESLIGADA" }}{% endif %}
     </span>
   </label>
-  {% if field.errors %}<p class="field-error">{{ field.errors|striptags }}</p>{% endif %}
+  {% if field.errors %}{% include "components/ui/feedback/field_error.html" with errors=field.errors field_id=field.auto_id only %}{% endif %}
 </div>
 {% endif %}

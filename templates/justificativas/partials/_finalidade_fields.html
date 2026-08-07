@@ -10,6 +10,6 @@
   <label class="sr-only" for="{{ form.texto.id_for_label }}">Descrição</label>
   {{ form.texto }}
   {% if form.texto.errors %}
-    {% include "components/ui/feedback/field_error.html" with errors=form.texto.errors only %}
+    {% include "components/ui/feedback/field_error.html" with errors=form.texto.errors field_id=form.texto.auto_id only %}
   {% endif %}
 </div>

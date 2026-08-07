@@ -194,7 +194,7 @@ dentro de `{% for %}`). Os defeitos estão concentrados em acessibilidade de for
 | ID | Defeito | Dias | Etapa |
 |---|---|---:|---|
 | `HT-01` 🔴 | **Foco de teclado invisível em todo campo do sistema, inclusive no login** | 1–2 | F0 |
-| `HT-02` 🟠 | Erro de campo sem `aria-describedby`/`aria-invalid`/`role="alert"` — no componente com 152 usos | 2–3 | F2 |
+| `HT-02` ✅ 🟠 | Erro de campo sem `aria-describedby`/`aria-invalid`/`role="alert"` — no componente com **154** usos; fechado junto do `HT-12`, que é o mesmo defeito pelo outro lado | 2–3 | F2 |
 | `HT-03` 🟠 | Sem padrão único para erro de formulário: o componente correto tem **zero** usos em produção | 2 | F2 |
 | `HT-04` 🟠 | `base.html` carrega ~153 KB de JS e ~37 KB de CSS de domínio em toda página | 2–3 | F5 |
 | `HT-05` ✅ 🟡 | `empty_state.html` fixa `<h3>`, quebrando a ordem de headings em **10** das 10 listas | 0,5 | F2 |

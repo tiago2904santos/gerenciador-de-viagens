@@ -25,7 +25,7 @@
       <div class="field app-form-field">
         <label class="cv-field__label app-form-label" for="{{ efetivo_form.unidade.id_for_label }}">Unidade (opcional)</label>
         {{ efetivo_form.unidade }}
-        {% if efetivo_form.unidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.unidade.errors only %}{% endif %}
+        {% if efetivo_form.unidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.unidade.errors field_id=efetivo_form.unidade.auto_id only %}{% endif %}
       </div>
       {% include "components/ui/forms/field.html" with field=efetivo_form.cargo action_url=cargos_url action_label="Gerenciar cargos" only %}
       <div class="field app-form-field">
@@ -35,7 +35,7 @@
           {{ efetivo_form.quantidade }}
           <button type="button" class="pt-quantidade-stepper__btn" data-pt-quantidade-delta="1" aria-label="Aumentar quantidade">+</button>
         </div>
-        {% if efetivo_form.quantidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.quantidade.errors only %}{% endif %}
+        {% if efetivo_form.quantidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.quantidade.errors field_id=efetivo_form.quantidade.auto_id only %}{% endif %}
       </div>
     </div>
   </div>

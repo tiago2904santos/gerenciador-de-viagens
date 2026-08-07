@@ -5,7 +5,7 @@
       {{ form.numero }}
       {% if oficio_numero_ano_hint %}<span class="cv-composite-field__suffix">{{ oficio_numero_ano_hint }}</span>{% endif %}
     </div>
-    {% if form.numero.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.numero.errors only %}{% endif %}
+    {% if form.numero.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.numero.errors field_id=form.numero.auto_id only %}{% endif %}
   </div>
   {% include "components/ui/forms/field.html" with field=form.protocolo label="Protocolo" only %}
   {% include "components/ui/forms/field.html" with field=form.custeio label="Custeio" only %}

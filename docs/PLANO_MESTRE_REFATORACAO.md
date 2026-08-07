@@ -298,8 +298,11 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       Medido no navegador: 15→17→19→21 antes, 14→16→14 depois
 - [x] `PF-01` folha de símbolos de ícone (192 KB por página de lista) — 06/08
 - [ ] `PF-04` menu de ação sob demanda (60 menus para 20 cards)
-- [ ] `HT-02` erro de campo sem `aria-describedby`/`aria-invalid`/`role="alert"`
-- [ ] `HT-12` `help_text` declarado no form nunca chega à tela
+- [x] `HT-02` erro de campo sem `aria-describedby`/`aria-invalid`/`role="alert"` — o Django 5.2 já
+      emitia os dois atributos; faltava a **âncora**. 39 chamadores passaram a informar `field_id`,
+      com varredura estática cobrindo o quadragésimo antes de ele existir
+- [x] `HT-12` `help_text` declarado no form nunca chega à tela — 29 campos em 17 forms declaravam,
+      **2 chamadores** de 154 passavam o parâmetro. Residual `use_fieldset` virou `NOVO-41`
 - [ ] `HT-03` sem padrão único para erro de formulário
 - [x] `HT-05` `empty_state.html` quebra a ordem de headings — o pulo era **10 de 10** listas, não 9;
       o título vira `<h2>` e `form_block` ganha ramo `h2` (aditivo) para o cadastro rápido de

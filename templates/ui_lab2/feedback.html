@@ -22,10 +22,15 @@
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.alert %}
 
       {% include "ui_lab2/partials/_component_open.html" with name="field_error" source="components/ui/feedback/field_error.html" note="Erro abaixo de um campo. Renderizado por field.html quando ha erro de validacao." %}
+        {% comment %}
+          `HT-02`: campo de verdade, e nao input a mao com string literal. O que o
+          componente entrega agora e o `id="…_error"` que o Django referencia em
+          `aria-describedby` — so um `BoundField` com erro real mostra isso.
+        {% endcomment %}
         <div class="field app-form-field">
-          <label class="app-form-label">UF de destino</label>
-          <input type="text" class="cv-field__control" value="PRR">
-          {% include "components/ui/feedback/field_error.html" with errors="Informe a UF com 2 caracteres." only %}
+          <label class="app-form-label" for="{{ demo_form_bound.texto_obrigatorio.id_for_label }}">{{ demo_form_bound.texto_obrigatorio.label }}</label>
+          {{ demo_form_bound.texto_obrigatorio }}
+          {% include "components/ui/feedback/field_error.html" with errors=demo_form_bound.texto_obrigatorio.errors field_id=demo_form_bound.texto_obrigatorio.auto_id only %}
         </div>
       {% include "ui_lab2/partials/_component_close.html" with used_in=usage.field_error %}
 

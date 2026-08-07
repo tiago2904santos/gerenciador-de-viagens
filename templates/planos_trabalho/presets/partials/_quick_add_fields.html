@@ -14,7 +14,7 @@
         {{ form.atividades }}
       </section>
       {% if form.atividades.errors %}
-        {% include "components/ui/feedback/field_error.html" with errors=form.atividades.errors only %}
+        {% include "components/ui/feedback/field_error.html" with errors=form.atividades.errors field_id=form.atividades.auto_id only %}
       {% endif %}
     </div>
   </div>

@@ -20,11 +20,18 @@
     `label[for=...]` para se nomear e não achava nada. A condição vale para
     todos os tipos porque só selects carregam essa classe.
 
+  `HT-12`: a ajuda sai de `help_text|default:field.help_text`. Antes vinha só do
+  parâmetro do include — e como apenas dois chamadores o passam, os 29 campos que
+  declaram `help_text` no form não exibiam nada. `|safe` porque `help_text` é
+  texto de desenvolvedor, nunca de usuário, e um deles é a lista de regras de
+  senha do próprio Django, em `<ul><li>`; é o mesmo `|safe` de
+  `django/forms/div.html`.
+
   Parâmetros: field (obrigatório), label, help_text, size_class,
   action_url / action_label / action_type (botão acoplado ao campo).
 {% endcomment %}
 {% if field.field.widget.input_type == 'checkbox' %}
-  {% include "components/ui/forms/card_toggle.html" with field=field title=label|default:field.label description=help_text size_class=size_class only %}
+  {% include "components/ui/forms/card_toggle.html" with field=field title=label|default:field.label description=help_text|default:field.help_text size_class=size_class only %}
 {% else %}
 {% with classe_do_widget=field.field.widget.attrs.class|default:"" %}
 <div class="field app-form-field cv-field{% if size_class %} {{ size_class }}{% endif %}">
@@ -51,8 +58,21 @@
     {% include "components/ui/forms/_field_control.html" with field=field classe_do_widget=classe_do_widget input_class=input_class only %}
   {% endif %}
 
-  {% if help_text %}<p class="field-help app-form-help">{{ help_text }}</p>{% endif %}
-  {% if field.errors %}{% include "components/ui/feedback/field_error.html" with errors=field.errors only %}{% endif %}
+  {% comment %}
+    `<div>` e não `<p>`, e isso foi o navegador que decidiu. O `help_text` de
+    `password1` é `<ul><li>…` — lista dentro de parágrafo é HTML inválido, então o
+    navegador **fecha o `<p>` antes da lista**. Medido em `/usuarios/`: o
+    `<p id="…_helptext">` ficava vazio, com a `<ul>` de irmã a 16px em vez de 14px.
+    O `aria-describedby` apontava para um elemento sem texto — pior que não apontar.
+
+    O `<p>` não estava dando espaçamento nenhum: o pai é `display: grid` com
+    `gap: 8px` e a margem do parágrafo já vinha zerada pelo reset. Trocar o
+    elemento não muda um pixel.
+  {% endcomment %}
+  {% with ajuda=help_text|default:field.help_text %}
+    {% if ajuda %}<div class="field-help app-form-help" id="{{ field.auto_id }}_helptext">{{ ajuda|safe }}</div>{% endif %}
+  {% endwith %}
+  {% if field.errors %}{% include "components/ui/feedback/field_error.html" with errors=field.errors field_id=field.auto_id only %}{% endif %}
 </div>
 {% endwith %}
 {% endif %}
