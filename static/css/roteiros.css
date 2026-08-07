@@ -60,10 +60,6 @@
   transform: none;
 }
 
-.roteiro-editor__main .card-body {
-  padding: var(--space-5);
-}
-
 .roteiro-editor .oficio-stage-form {
   display: flex;
   flex-direction: column;
@@ -1787,15 +1783,6 @@
   padding: 14px 16px 12px;
 }
 
-/* --------------------------------------------------------------------------
-   7. Retorno final
-   -------------------------------------------------------------------------- */
-
-/* Retorno */
-#retorno-card .roteiro-editor__grid {
-  align-items: start;
-}
-
 .roteiro-editor--avulso .roteiro-editor__reference-block--retorno .roteiro-editor__reference-body {
   padding: 0 24px 0 24px;
 }
@@ -2431,11 +2418,6 @@
 .roteiro-editor--avulso .roteiro-editor__section.roteiro-editor__section--mapa:not(.roteiro-editor__reference-block) > .roteiro-editor__section-header.roteiro-mapa__section-head::before {
   content: none;
   display: none;
-}
-
-.roteiro-editor__map-card .card-body {
-  background: var(--route-card-bg);
-  padding: clamp(16px, 2vw, 22px);
 }
 
 .roteiro-mapa__canvas-shell {

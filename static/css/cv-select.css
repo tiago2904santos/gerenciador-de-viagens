@@ -95,123 +95,6 @@ html[data-theme="light"] {
 }
 
 /* =========================================================
-   04. Native Select Wrapper — .cv-select-wrapper
-   Envolve um <select> nativo com seta visual customizada.
-   Nao remove name/id/required — compativel com Django forms.
-   ========================================================= */
-
-.cv-select-wrapper {
-  border-radius: var(--cv-select-radius);
-  display: grid;
-  min-width: 0;
-  position: relative;
-  width: 100%;
-}
-
-/* Seta customizada via pseudo-elemento */
-.cv-select-wrapper::after {
-  border-bottom: 2px solid var(--cv-select-icon-color);
-  border-right: 2px solid var(--cv-select-icon-color);
-  content: "";
-  height: 8px;
-  pointer-events: none;
-  position: absolute;
-  right: var(--space-4);
-  top: 50%;
-  transform: translateY(-65%) rotate(45deg);
-  transform-origin: center;
-  transition:
-    border-color var(--transition-fast),
-    transform var(--transition-fast);
-  width: 8px;
-  z-index: 1;
-}
-
-/* <select> dentro do wrapper — reseta aparencia nativa */
-.cv-select-wrapper select,
-.cv-select-native {
-  appearance: none;
-  background: var(--cv-select-bg);
-  border: 1px solid var(--cv-select-border);
-  border-radius: var(--cv-select-radius);
-  box-shadow: var(--cv-select-shadow);
-  box-sizing: border-box;
-  color: var(--cv-select-color);
-  cursor: pointer;
-  font-family: inherit;
-  font-size: var(--cv-select-font-size);
-  font-weight: var(--cv-select-font-weight);
-  height: var(--cv-select-height);
-  line-height: 1.2;
-  padding: 0 calc(var(--space-6) + var(--space-4)) 0 var(--cv-select-padding-x);
-  transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast);
-  width: 100%;
-}
-
-.cv-select-wrapper select:focus,
-.cv-select-wrapper select:focus-visible,
-.cv-select-native:focus,
-.cv-select-native:focus-visible {
-  outline: none;
-}
-
-/* Placeholder (primeira opção vazia) */
-.cv-select-wrapper select option[value=""],
-.cv-select-native option[value=""] {
-  color: var(--cv-select-placeholder);
-}
-
-/* Disabled */
-.cv-select-wrapper--disabled::after,
-.cv-select-wrapper select:disabled + * {
-  opacity: 0.45;
-}
-
-.cv-select-wrapper select:disabled,
-.cv-select-native:disabled {
-  background: var(--cv-select-disabled-bg);
-  border-color: var(--cv-select-disabled-border);
-  color: var(--cv-select-disabled-color);
-  cursor: not-allowed;
-  opacity: 1;
-}
-
-.cv-select-wrapper--disabled::after {
-  border-color: var(--cv-select-disabled-color);
-  opacity: 0.45;
-}
-
-/* Error */
-.cv-select-wrapper--error select,
-.cv-select-wrapper--error .cv-select-native {
-  border-color: var(--cv-select-error-border);
-}
-
-.cv-select-wrapper--error::after {
-  border-color: var(--cv-select-error-border);
-}
-
-/* Success */
-.cv-select-wrapper--success select,
-.cv-select-wrapper--success .cv-select-native {
-  border-color: var(--cv-select-success-border);
-}
-
-.cv-select-wrapper--success::after {
-  border-color: var(--cv-select-success-border);
-}
-
-/* Opções no tema escuro */
-html[data-theme="dark"] .cv-select-wrapper select option,
-html[data-theme="dark"] .cv-select-native option {
-  background: var(--theme-surface-card);
-  color: var(--theme-text-body);
-}
-
-/* =========================================================
    05. Global native select styling
    Todo <select> dentro de .main-form-panel e .list-panel
    recebe automaticamente o estilo do design system sem
@@ -299,75 +182,6 @@ html[data-theme="dark"] .cv-select-native option {
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Item de acao */
-.cv-action-dropdown__item {
-  align-items: center;
-  border-radius: calc(var(--cv-dropdown-menu-radius) - var(--space-1));
-  color: var(--color-text);
-  cursor: pointer;
-  display: flex;
-  font-size: var(--cv-select-font-size);
-  font-weight: var(--cv-select-font-weight);
-  gap: var(--space-2);
-  min-height: var(--cv-dropdown-item-height);
-  padding: 0 var(--cv-dropdown-item-px);
-  text-decoration: none;
-  transition: background-color var(--transition-fast), color var(--transition-fast);
-  user-select: none;
-  width: 100%;
-}
-
-.cv-action-dropdown__item:hover,
-.cv-action-dropdown__item:focus-visible {
-  background: var(--cv-dropdown-item-hover);
-  color: var(--cv-dropdown-item-active-color);
-  outline: none;
-}
-
-/* Item desabilitado */
-.cv-action-dropdown__item:disabled,
-.cv-action-dropdown__item[aria-disabled="true"] {
-  color: var(--cv-select-placeholder);
-  cursor: not-allowed;
-  opacity: 0.55;
-  pointer-events: none;
-}
-
-/* Item destrutivo / danger */
-.cv-action-dropdown__item--danger {
-  color: var(--cv-dropdown-item-danger-color);
-}
-
-.cv-action-dropdown__item--danger:hover,
-.cv-action-dropdown__item--danger:focus-visible {
-  background: var(--cv-dropdown-item-danger-hover);
-  color: var(--cv-dropdown-item-danger-color);
-}
-
-/* Ícone dentro do item */
-.cv-action-dropdown__item-icon {
-  align-items: center;
-  display: inline-flex;
-  flex-shrink: 0;
-  height: 16px;
-  justify-content: center;
-  opacity: 0.72;
-  width: 16px;
-}
-
-.cv-action-dropdown__item:hover .cv-action-dropdown__item-icon,
-.cv-action-dropdown__item:focus-visible .cv-action-dropdown__item-icon {
-  opacity: 1;
-}
-
-/* Separador */
-.cv-action-dropdown__separator {
-  background: var(--cv-dropdown-separator);
-  border: 0;
-  height: 1px;
-  margin: var(--space-1) calc(var(--cv-dropdown-item-px) * -1 + var(--space-1));
-}
-
 /* Estado aberto — o trigger pode receber classe is-open via JS */
 .cv-action-dropdown--open > [data-cv-dropdown-trigger],
 .cv-action-dropdown > [data-cv-dropdown-trigger][aria-expanded="true"] {
@@ -433,24 +247,6 @@ html[data-theme="dark"] .cv-select-native option {
   padding: 0 var(--space-1);
 }
 
-.cv-filter-dropdown__menu {
-  animation: cv-dropdown-enter 160ms ease both;
-  background: var(--cv-dropdown-menu-bg);
-  border: 1px solid var(--cv-dropdown-menu-border);
-  border-radius: var(--cv-dropdown-menu-radius);
-  box-shadow: var(--cv-dropdown-menu-shadow);
-  left: 0;
-  list-style: none;
-  margin: 0;
-  max-height: var(--cv-dropdown-max-height);
-  min-width: 220px;
-  overflow-y: auto;
-  padding: var(--space-1);
-  position: absolute;
-  top: calc(100% + var(--space-1));
-  z-index: var(--cv-dropdown-z-index);
-}
-
 .cv-filter-dropdown__option {
   align-items: center;
   border-radius: calc(var(--cv-dropdown-menu-radius) - var(--space-1));
@@ -473,16 +269,6 @@ html[data-theme="dark"] .cv-select-native option {
   background: var(--cv-dropdown-item-active);
   color: var(--cv-dropdown-item-active-color);
   font-weight: var(--font-weight-semibold);
-}
-
-.cv-filter-dropdown__option-check {
-  align-items: center;
-  display: inline-flex;
-  flex-shrink: 0;
-  height: 16px;
-  justify-content: center;
-  opacity: 0;
-  width: 16px;
 }
 
 .cv-filter-dropdown__option--selected .cv-filter-dropdown__option-check {
@@ -602,15 +388,6 @@ html[data-theme="dark"] {
   line-height: 1.2;
 }
 
-/* Label row: label à esquerda, controle auxiliar à direita */
-.cv-field__label-row {
-  align-items: center;
-  display: flex;
-  gap: var(--space-2);
-  justify-content: space-between;
-  min-width: 0;
-}
-
 .cv-field__control-row,
 .cv-field-with-action {
   align-items: center;
@@ -625,46 +402,6 @@ html[data-theme="dark"] {
 .cv-field-with-action .cv-custom-select {
   flex: 1 1 auto;
   min-width: 0;
-}
-
-.cv-field-action {
-  align-items: center;
-  appearance: none;
-  background:
-    linear-gradient(var(--theme-surface-card), var(--theme-surface-card)) padding-box,
-    linear-gradient(var(--cv-field-border), var(--cv-field-border)) border-box;
-  border: 1px solid transparent;
-  border-radius: var(--cv-field-radius);
-  box-shadow: var(--shadow-sm);
-  color: var(--theme-text-body);
-  cursor: pointer;
-  display: inline-flex;
-  font-family: inherit;
-  font-size: var(--cv-field-font-size);
-  font-weight: var(--font-weight-medium);
-  gap: var(--space-2);
-  height: var(--cv-field-height);
-  justify-content: center;
-  padding: 0 var(--space-4);
-  text-decoration: none;
-  transition: background var(--transition-fast), box-shadow var(--transition-fast);
-  white-space: nowrap;
-}
-
-.cv-field-action:hover:not(:disabled) {
-  background:
-    linear-gradient(var(--cv-field-bg-hover), var(--cv-field-bg-hover)) padding-box,
-    linear-gradient(var(--cv-field-border-hover), var(--cv-field-border-hover)) border-box;
-}
-
-.cv-field-action--clear {
-  color: var(--cv-field-error);
-}
-
-.cv-field-action--clear:hover:not(:disabled) {
-  background:
-    linear-gradient(var(--color-danger-soft), var(--color-danger-soft)) padding-box,
-    linear-gradient(var(--cv-field-error-border), var(--cv-field-error-border)) border-box;
 }
 
 .cv-field__control-row .cv-field-action,

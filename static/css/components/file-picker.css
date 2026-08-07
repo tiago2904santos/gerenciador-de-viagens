@@ -152,16 +152,6 @@
   display: none;
 }
 
-.prestacao-file-picker__clear {
-  background: transparent;
-  color: var(--color-muted-strong);
-}
-
-.prestacao-file-picker__clear:hover {
-  background: var(--color-secondary-soft);
-  color: var(--color-text);
-}
-
 .cv-file-picker__inline-actions,
 .prestacao-file-picker__inline-actions {
   align-items: center;

@@ -4,15 +4,6 @@
   overflow: visible;
 }
 
-.cv-filter-bar__search {
-  min-width: 0;
-  position: relative;
-}
-
-.cv-filter-bar__search-input {
-  width: 100%;
-}
-
 .cv-filter-bar__select {
   min-width: 9.5rem;
 }

@@ -168,17 +168,6 @@
   display: none;
 }
 
-.os-model-fields__header {
-  margin-bottom: var(--space-4);
-}
-
-.os-model-fields__title {
-  margin: 0 0 var(--space-1);
-  color: var(--color-heading);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-bold);
-}
-
 /* Função na equipe: ritmo de Documentos vinculados — toggle → busca → lista. */
 .os-servidor-role-panel {
   display: grid;

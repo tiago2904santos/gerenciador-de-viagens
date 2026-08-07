@@ -74,7 +74,20 @@ jobs:
       - name: Block new frontend standards debt
         # Catraca: este número só desce. A Etapa 1 levou 465 → 449; a Etapa 7
         # levou 449 → 438 na fase 2 e 438 → 417 na fase 1.
-        run: python scripts/audit_frontend_standards.py --max-warnings 296
+        run: python scripts/audit_frontend_standards.py --max-warnings 246
+
+      - name: Block new dead CSS (UI-01)
+        # Catraca nova, e o teto nasce em ZERO. O `UI-01` mediu 981 blocos de
+        # CSS cujo seletor só cita classe que ninguém usa — 168 KB. Eles não
+        # foram escritos assim: cada refactor de template apagou markup e deixou
+        # o CSS para trás, ninguém viu, e um ano depois era isso.
+        #
+        # A poda foi feita à mão, com prova de grep por arquivo. Sem catraca o
+        # acúmulo recomeça no próximo PR que apagar um template. Se este passo
+        # reprovar, o seu PR apagou markup sem apagar o CSS junto — ou usou uma
+        # classe montada em tempo de execução cujo prefixo falta em
+        # PREFIXOS_DINAMICOS, e aí o prefixo entra lá com a linha que o monta.
+        run: python scripts/audit_css_morto.py --max 0
 
       - name: Block new keyboard-focus suppression (HT-01)
         # Catraca: este numero so desce. 47 -> 44 no `HT-01`.
@@ -82,7 +95,7 @@ jobs:
         # sobraram, mas cada bloco novo e um lugar a mais onde alguem vai ter
         # de lembrar do piso — e o script nao conta o idioma correto
         # (`:focus:not(:focus-visible)`), so quem apaga o foco sem substituto.
-        run: python scripts/audit_foco_visivel.py --max 36
+        run: python scripts/audit_foco_visivel.py --max 32
 
       - name: Block backend architecture regressions (P-01, P-05)
         # Catraca: este número só desce. O P-01 fechou os quatro apps do
