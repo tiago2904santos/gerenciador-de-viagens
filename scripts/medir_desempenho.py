@@ -116,6 +116,20 @@ def exigir_postgres():
 # não significa nada.
 SEMENTE = 20260805
 
+# ── Tamanho das tabelas de dimensão (`NOVO-50`) ──────────────────────────────
+# Elas não crescem com o `--volumes`: são o cadastro, não o movimento. Mas o
+# tamanho delas decide o plano de consulta, então tem de ser o de produção.
+#: As siglas reais: `Estado.sigla` é `varchar(2)`, então gerar "E00" não cabe —
+#: e uma lista inventada de duas letras teria a mesma distribuição de trigramas
+#: que a de verdade só por acaso.
+SIGLAS_UF = (
+    "AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO"
+).split()
+MUNICIPIOS = 5_570
+#: Órgão estadual de porte médio. O número exato importa menos que a ordem de
+#: grandeza: com centenas de milhares o planner indexa, com dezenas ele varre.
+SERVIDORES = 3_000
+
 
 def _dt(dia, hora=8):
     """Datetime com fuso a partir de `_data(dia)` — `USE_TZ` está ligado."""
@@ -203,18 +217,27 @@ class Semeador:
         self.user.save(update_fields=["password"])
         VinculoUsuarioArea.objects.create(usuario=self.user, area=self.area, area_padrao=True)
 
+        # `NOVO-50`: as tabelas de dimensão têm de ter tamanho de produção, não
+        # tamanho de conveniência. Com 5 estados e 50 cidades, o planner escolhia
+        # varredura sequencial nelas **com razão** — e qualquer medição de índice
+        # de texto ou de `select_related` sobre elas dizia o contrário do que
+        # diria em produção. Foi o que invalidou a medição do `DB-11` (`pg_trgm`
+        # dava 1,03x porque `cadastros_servidor` tinha 100 linhas) e o que deixou
+        # o `NOVO-50` em aberto ao medir o `DB-10`.
+        #
+        # Os números são os do país: 27 unidades federativas e 5.570 municípios.
         self.estados = Estado.objects.bulk_create(
-            [Estado(nome=f"Estado {i}", sigla=f"E{i}") for i in range(5)]
+            [Estado(nome=f"Estado {sigla}", sigla=sigla) for sigla in SIGLAS_UF]
         )
         self.cidades = Cidade.objects.bulk_create(
             [
                 Cidade(
                     estado=self.estados[i % len(self.estados)],
-                    nome=f"Cidade {i}",
+                    nome=f"Cidade {i:04d}",
                     uf=self.estados[i % len(self.estados)].sigla,
-                    capital=(i % 25 == 0),
+                    capital=(i % 206 == 0),
                 )
-                for i in range(50)
+                for i in range(MUNICIPIOS)
             ]
         )
         self.cargos = Cargo.objects.bulk_create([Cargo(nome=f"Cargo {i}") for i in range(5)])
@@ -225,16 +248,19 @@ class Semeador:
         self.viaturas = Viatura.objects.bulk_create(
             [Viatura(placa=f"REG{i:04d}", modelo=f"Modelo {i}") for i in range(10)]
         )
-        # 100 servidores bastam: as listas mostram no máximo algumas dezenas por
-        # página, e o que importa é cada linha ter vínculo para resolver.
+        # `NOVO-50`: eram 100, com a justificativa de que "as listas mostram no
+        # máximo algumas dezenas por página". Verdade para renderização, falso
+        # para plano de consulta: `Servidor.nome` é buscado por `icontains` em
+        # cinco domínios, e com 100 linhas o planner varre sequencialmente por ser
+        # mais barato — escondendo o custo que a mesma busca tem em produção.
         self.servidores = Servidor.objects.bulk_create(
             [
                 Servidor(
-                    nome=f"Servidor {i:03d}",
+                    nome=f"Servidor {i:05d}",
                     cargo=self.cargos[i % len(self.cargos)],
                     unidade=self.unidades[i % len(self.unidades)],
                 )
-                for i in range(100)
+                for i in range(SERVIDORES)
             ]
         )
 

@@ -1045,8 +1045,36 @@ expressão nas 4 ou 5 colunas realmente buscadas.
 > defeito e **não é** — `quantidade_diarias` é `CharField` (`roteiros/models.py:80`), então ali não
 > há cast. Os únicos sites de `icontains` sobre coluna inteira são `termos/selectors.py:115` e `:126`.
 >
-> **A frente (2) é a que paga, e está bloqueada** na confirmação de privilégio para
-> `CREATE EXTENSION pg_trgm` no banco de produção.
+> **A frente (2) também não paga, e agora com o índice sendo usado de verdade.** Medido em
+> 08/08/2026, depois de o semeador ganhar dimensão realista (`NOVO-50`):
+>
+> | | mediana da rota |
+> |---|---:|
+> | sem `pg_trgm` | 1.807,9 ms |
+> | com `pg_trgm` + 5 índices GIN de trigrama | 1.810,1 ms |
+> | | **1,00×** |
+>
+> E não é o instrumento cego desta vez: o `EXPLAIN` direto na coluna mais buscada mostra
+> `Bitmap Index Scan on trgm_cadastros_servidor_nome`. **O índice é escolhido e não adianta.**
+>
+> **A causa, medida.** A busca de termos é *uma* consulta com um `OR` de **15 ramos** aplicado como
+> `Filter` **depois** de uma cadeia de `Hash Left Join` que já expandiu 20.000 termos em **59.994
+> linhas** (a M2M de servidores entra duas vezes). `Rows Removed by Filter: 59700`, e só então o
+> `DISTINCT` reduz para 36. Nenhum índice de coluna serve: um ramo de um `OR` que atravessa várias
+> tabelas não pode ser empurrado para um *index scan*.
+>
+> **E a consulta roda três vezes por requisição** — 636 ms + 636 ms + 459 ms de um total de ~1,8 s.
+> `termos/views.py:78` chama `listar_termos` para a página e `:80` chama de novo, dentro de
+> `anotar_composicao(...).aggregate(...)`, para os contadores das abas.
+>
+> **A correção real é outra, e não é índice.** Duas frentes de verdade: (a) não repetir a consulta
+> três vezes; (b) trocar o `OR` de 15 ramos pós-join por subconsultas por origem
+> (`Q(pk__in=...)`/`Exists()` por tabela), para que cada ramo possa usar o próprio índice — e aí
+> `pg_trgm` volta a fazer sentido. O enunciado do `DB-11` precisa ser reescrito nesses termos.
+>
+> **A pergunta do privilégio era desnecessária:** `CREATE EXTENSION pg_trgm` funciona **sem
+> superusuário** desde o PostgreSQL 13, em que ela é *trusted* — e o `unaccent` deste projeto já
+> tinha sido criado assim.
 
 ### DB-12 ✅ RESOLVIDO (parte do índice) · 🟡 Trilha de auditoria cresce sem limite e encarece toda escrita · AUD · 3 d
 
@@ -4182,7 +4210,28 @@ o card realmente imprime. Se não sobreviver, esta linha vira nota no `DB-10` e 
 precisa de cidade de verdade — o que valeria por si, porque a régua do `PF-07` mede planos com
 tabelas de dimensão irreais.
 
+> **Feito em 08/08/2026, e as duas coisas eram verdade.**
+>
+> O semeador **precisava** de dimensão realista, e passou a ter: 27 unidades federativas com as
+> siglas reais, 5.570 municípios, 3.000 servidores — no lugar de 5, 50 e 100. As tabelas de dimensão
+> não crescem com `--volumes` porque são cadastro, não movimento; mas o tamanho delas decide o plano,
+> e com 50 cidades o planner escolhia varredura sequencial **com razão**.
+>
+> **E o `Nested Loop` sobreviveu.** Com as dimensões de produção, `oficios:index` continua montando
+> 20 linhas por `Nested Loop Left Join` com `Join Filter` (`Rows Removed by Join Filter: 90`), em
+> ~99 ms. Não era artefato de semeadura: é defeito, e continua aberto. A correção provável segue
+> sendo reduzir o `select_related` da lista ao que o card imprime.
+>
+> **O conserto do semeador desbloqueou outra medição na hora:** o `DB-11` (`pg_trgm`) só pôde ser
+> respondido depois dele — ver lá.
+
 ### NOVO-49 ✅ RESOLVIDO · 🟡 `NOVO` O painel de `/` custava cinco consultas por login para uma tela que o dono não queria · MOR · 0,25 d
+
+> **Aviso de numeração (08/08):** este é o **segundo** `NOVO-49` do arquivo — o outro é o de
+> catálogo por área, do `DB-02`. É também a segunda colisão do ciclo: já havia dois `NOVO-45`.
+> Não renumerei nenhum dos dois, porque ID de outra sessão não se renomeia pela metade (limite
+> 2 do `AGENTS.md`) e branch aberta pode citar qualquer um. **A causa é de processo:** cada
+> sessão escolhe "o próximo livre" a partir do próprio instantâneo e duas escolhem o mesmo.
 
 `core/views.py:101` contava total de ofícios, ofícios em rascunho, assinaturas pendentes e prestações
 pendentes, e ainda listava as viagens dos próximos 30 dias — **cinco consultas** montadas a cada
