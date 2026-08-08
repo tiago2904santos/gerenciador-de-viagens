@@ -3,12 +3,12 @@
   "rotas": {
     "core:dashboard": {
       "200": {
-        "consultas": 7,
-        "kb_html": 40.8
+        "consultas": 2,
+        "kb_html": 36.4
       },
       "20000": {
-        "consultas": 7,
-        "kb_html": 40.8
+        "consultas": 2,
+        "kb_html": 36.4
       }
     },
     "eventos:index": {
