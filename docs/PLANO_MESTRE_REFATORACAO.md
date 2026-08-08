@@ -355,7 +355,10 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       piora. "Ofícios têm situação análoga" era falso, e o que sobra ali é o `NOVO-50`
 - [ ] `DB-11` 80 buscas livres sem índice
 - [ ] `DB-12` trilha de auditoria sem índice, sem expurgo
-- [ ] `PF-03` toda requisição escreve na tabela de sessão (**depende de decisão de produto**)
+- [x] `PF-03` toda requisição escreve na tabela de sessão — decisão tomada em 07/08:
+      `cached_db` **mais** renovação periódica, que são uma coisa só (`cached_db` sozinho
+      economiza 1 de 11; as outras 3 dependem de desligar `SESSION_SAVE_EVERY_REQUEST`).
+      11 → 7 consultas em toda requisição autenticada, em todas as nove rotas medidas
 - [ ] `PF-06` queries duplicadas em `/usuarios/` e `/prestacoes-contas/`
 
 ### Fase 6 — Camadas e duplicação

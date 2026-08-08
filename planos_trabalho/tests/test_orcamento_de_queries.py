@@ -118,6 +118,13 @@ class OrcamentoDeQueriesPlanoTrabalhoTests(TestCase):
     # efetivo proprio). O fixture magro que eu tinha antes dava 16/16/21 e nao
     # exercitava os `prefetch_related` — foi exatamente essa cegueira que
     # escondeu o `NOVO-13`.
-    QUERIES_LISTA = 20
-    QUERIES_LISTA_BUSCA = 20
-    QUERIES_WIZARD = 23
+
+    # `PF-03` (07/08/2026): a sessão saiu do caminho de escrita de toda requisição
+    # (`cached_db` + `SESSION_SAVE_EVERY_REQUEST = False` + renovação periódica).
+    # Em regime, some 1 leitura + 1 escrita + 2 comandos de transação = **-4**.
+    # Onde o corte é **-1**, o teste mede a **primeira** requisição depois do
+    # login: ali `core/tenancy.py:52` grava a área na sessão, que por isso é
+    # salva de qualquer jeito, e só a leitura é economizada.
+    QUERIES_LISTA = 16
+    QUERIES_LISTA_BUSCA = 16
+    QUERIES_WIZARD = 19

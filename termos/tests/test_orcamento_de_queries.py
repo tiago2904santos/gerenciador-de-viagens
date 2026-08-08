@@ -107,8 +107,15 @@ class OrcamentoDeQueriesTermoTests(TestCase):
     # cache do prefetch (2 consultas por termo), e `termo_cadastro_assinado_info`
     # buscava o artefato assinado uma vez por linha (1 por termo). Medido pela
     # régua do `PF-07` no volume 200: `/termos/` foi de 55 para 11.
-    QUERIES_LISTA = 11
-    QUERIES_LISTA_BUSCA = 11
+
+    # `PF-03` (07/08/2026): a sessão saiu do caminho de escrita de toda requisição
+    # (`cached_db` + `SESSION_SAVE_EVERY_REQUEST = False` + renovação periódica).
+    # Em regime, some 1 leitura + 1 escrita + 2 comandos de transação = **-4**.
+    # Onde o corte é **-1**, o teste mede a **primeira** requisição depois do
+    # login: ali `core/tenancy.py:52` grava a área na sessão, que por isso é
+    # salva de qualquer jeito, e só a leitura é economizada.
+    QUERIES_LISTA = 10
+    QUERIES_LISTA_BUSCA = 10
     # 21 -> 28 na edicao. Duas causas separadas, e so uma era defeito:
     #  (a) N+1 REAL, corrigido: `termo_cadastro_assinado_info` consultava
     #      DocumentoArtefato uma vez por servidor. Agora e uma query so, via
@@ -129,4 +136,4 @@ class OrcamentoDeQueriesTermoTests(TestCase):
     # O 26 aqui e o do `NOVO-08`, nao o 28 antigo: os dois IDs baixaram esta
     # mesma catraca por motivos diferentes e o merge tinha de somar as duas
     # quedas, nao repetir uma. Este numero e medido depois do merge.
-    QUERIES_EDITAR = 18  # remedido no DB-02: usuário de teste passou a ter vínculo de área
+    QUERIES_EDITAR = 17  # remedido no DB-02: usuário de teste passou a ter vínculo de área

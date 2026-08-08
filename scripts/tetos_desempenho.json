@@ -3,91 +3,91 @@
   "rotas": {
     "core:dashboard": {
       "200": {
-        "consultas": 11,
+        "consultas": 7,
         "kb_html": 40.8
       },
       "20000": {
-        "consultas": 11,
+        "consultas": 7,
         "kb_html": 40.8
       }
     },
     "eventos:index": {
       "200": {
-        "consultas": 34,
+        "consultas": 30,
         "kb_html": 222.5
       },
       "20000": {
-        "consultas": 34,
+        "consultas": 30,
         "kb_html": 266.9
       }
     },
     "justificativas:index": {
       "200": {
-        "consultas": 10,
+        "consultas": 6,
         "kb_html": 119.4
       },
       "20000": {
-        "consultas": 10,
+        "consultas": 6,
         "kb_html": 119.8
       }
     },
     "oficios:index": {
       "200": {
-        "consultas": 17,
+        "consultas": 13,
         "kb_html": 174.8
       },
       "20000": {
-        "consultas": 17,
+        "consultas": 13,
         "kb_html": 175.5
       }
     },
     "ordens_servico:index": {
       "200": {
-        "consultas": 19,
+        "consultas": 15,
         "kb_html": 133.0
       },
       "20000": {
-        "consultas": 19,
+        "consultas": 15,
         "kb_html": 133.3
       }
     },
     "planos_trabalho:index": {
       "200": {
-        "consultas": 18,
+        "consultas": 14,
         "kb_html": 135.5
       },
       "20000": {
-        "consultas": 18,
+        "consultas": 14,
         "kb_html": 179.1
       }
     },
     "prestacoes_contas:index": {
       "200": {
-        "consultas": 20,
+        "consultas": 16,
         "kb_html": 271.9
       },
       "20000": {
-        "consultas": 20,
+        "consultas": 16,
         "kb_html": 360.0
       }
     },
     "roteiros:index": {
       "200": {
-        "consultas": 33,
+        "consultas": 29,
         "kb_html": 98.4
       },
       "20000": {
-        "consultas": 33,
+        "consultas": 29,
         "kb_html": 98.5
       }
     },
     "termos:index": {
       "200": {
-        "consultas": 11,
+        "consultas": 7,
         "kb_html": 155.3
       },
       "20000": {
-        "consultas": 11,
+        "consultas": 7,
         "kb_html": 155.8
       }
     }

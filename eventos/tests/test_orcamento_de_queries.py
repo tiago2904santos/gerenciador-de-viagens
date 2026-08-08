@@ -117,14 +117,21 @@ class OrcamentoDeQueriesEventoTests(TestCase):
     # orçamento re-medido no fixture desta classe.
     # O detalhe é caro e este teste NÃO tenta baratear: o `P-01` move consulta
     # de lugar. Baixar esse número é trabalho de outro defeito, com outra medição.
-    QUERIES_LISTA = 18
-    QUERIES_LISTA_BUSCA = 18
+
+    # `PF-03` (07/08/2026): a sessão saiu do caminho de escrita de toda requisição
+    # (`cached_db` + `SESSION_SAVE_EVERY_REQUEST = False` + renovação periódica).
+    # Em regime, some 1 leitura + 1 escrita + 2 comandos de transação = **-4**.
+    # Onde o corte é **-1**, o teste mede a **primeira** requisição depois do
+    # login: ali `core/tenancy.py:52` grava a área na sessão, que por isso é
+    # salva de qualquer jeito, e só a leitura é economizada.
+    QUERIES_LISTA = 17
+    QUERIES_LISTA_BUSCA = 17
     # `NOVO-08` (06/08/2026): 78 -> 77. O detalhe do evento passou a usar o
     # `Prefetch` de servidores na forma que `TermoAutorizacao.servidores_efetivos()`
     # consome (`termos.selectors.prefetch_servidores_efetivos`), então a
     # consulta que o prefetch cru desperdiçava deixou de existir.
-    QUERIES_DETALHE = 65  # remedido no DB-02: usuário de teste passou a ter vínculo de área
-    QUERIES_TIPOS = 7
+    QUERIES_DETALHE = 64  # remedido no DB-02: usuário de teste passou a ter vínculo de área
+    QUERIES_TIPOS = 6
 
 
 class OrcamentoDeQueriesEventoComOrdensTests(TestCase):
@@ -177,4 +184,4 @@ class OrcamentoDeQueriesEventoComOrdensTests(TestCase):
     # Três OS na página. Se este número crescer de três em três, o assinante
     # voltou a ser resolvido por card.
     # Atualizado em 02/08/2026 (+4) junto com QUERIES_DETALHE (mesmo delta).
-    QUERIES_DETALHE_COM_OS = 53
+    QUERIES_DETALHE_COM_OS = 52

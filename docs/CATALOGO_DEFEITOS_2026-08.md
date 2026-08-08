@@ -1086,7 +1086,7 @@ rota `/prestacoes-contas/`, `oficios.css` (106 KB) chega com **0,0%** de uso.
 O trabalho está no [`PLANO_FRONTEND.md`](PLANO_FRONTEND.md); aqui fica a métrica de aceite:
 **uso acima de 35% por rota** ao fim da reconstrução.
 
-### PF-03 🟡 Toda requisição escreve na tabela de sessão · MED · 1–2 d · risco médio
+### PF-03 ✅ RESOLVIDO · 🟡 Toda requisição escreve na tabela de sessão · MED · 1–2 d · risco médio
 
 `config/settings/base.py:111` — `SESSION_SAVE_EVERY_REQUEST = True`. Custo fixo de uma requisição
 autenticada trivial (`/health/`): **7 queries**, três delas a escrita da sessão
@@ -1094,6 +1094,47 @@ autenticada trivial (`/health/`): **7 queries**, três delas a escrita da sessã
 documento abre transação de escrita.
 **Decisão humana necessária:** desligar sem mais nada faz a sessão de 8 h expirar a partir do
 login, não da última ação. Alternativas: backend `cached_db` ou renovar só perto do fim.
+
+> **Fechado em 07/08/2026, e as duas alternativas da frase acima eram uma só.**
+>
+> `cached_db` **ou** renovar perto do fim não resolvia: são as duas juntas. Medido com
+> `CaptureQueriesContext`, quatro combinações na mesma rota (painel):
+>
+> | configuração | consultas | em `django_session` | `BEGIN`/`COMMIT` |
+> |---|---:|---:|---:|
+> | `db` + `save_every=True` (como estava) | 11 | 2 | 2 |
+> | `cached_db` + `save_every=True` | 10 | 1 | 2 |
+> | **`cached_db` + `save_every=False`** | **7** | **0** | **0** |
+> | `cache` puro + `save_every=True` | 7 | 0 | 0 |
+>
+> **`cached_db` sozinho economiza 1 de 11.** Ele tira a leitura, não a escrita:
+> `cached_db.SessionStore.save()` chama o backend de banco **antes** de gravar no cache. Quem tira
+> as outras três é desligar `SESSION_SAVE_EVERY_REQUEST` — e aí volta o defeito que a frase acima
+> antecipava, a sessão contando do login. Daí o `RenovacaoDeSessaoMiddleware`, que grava a cada
+> `SESSION_RENOVACAO_INTERVALO` (padrão: um oitavo da janela, 1 h em 8 h) em vez de a cada
+> requisição. A janela efetiva desliza entre 7 h e 8 h.
+>
+> `cache` puro chegaria no mesmo 7 sem middleware nenhum e está fora: a sessão viveria só no Redis,
+> e um reinício dele deslogaria todo mundo de uma vez.
+>
+> **A armadilha, que custou o desenho inteiro.** A forma óbvia de renovar é
+> `set_expiry(agora + idade)`. Ela funciona **e** escreve em `_session_expiry`, o que faz
+> `get_expire_at_browser_close()` devolver `False` (`sessions/backends/base.py:403`): o cookie ganha
+> `expires` e **sobrevive ao fechamento do navegador**, anulando
+> `SESSION_EXPIRE_AT_BROWSER_CLOSE = True` sem ninguém perceber. O middleware usa uma chave privada
+> (`_renovada_em`) justamente para não tocar ali, e a inversão para `set_expiry` reprova os dois
+> testes de `ExpiracaoAoFecharNavegadorTests` — um deles mostrando o `expires` concreto no cookie.
+>
+> **Efeito nas catracas de orçamento de queries:** 16 números desceram, em cinco apps. Em regime o
+> corte é **−4** (1 leitura + 1 escrita + 2 comandos de transação). Onde é **−1**, o teste mede a
+> **primeira** requisição depois do login: ali `core/tenancy.py:52` grava a área na sessão, que por
+> isso é salva de qualquer jeito, e só a leitura é economizada. Os tetos do `PF-07` também desceram,
+> em todas as nove rotas.
+>
+> **Uma nota sobre teste que não prova nada.** A primeira versão do teste de `BEGIN`/`COMMIT`
+> passava dos dois jeitos: dentro de `TestCase` tudo já roda numa transação e os comandos viram
+> `SAVEPOINT`. Foi movido para `TransactionTestCase`, e só aí passou a reprovar quando
+> `SESSION_SAVE_EVERY_REQUEST` volta.
 
 ### PF-04 ✅ RESOLVIDO · 🟡 60 menus de ação renderizados para 20 cards · MED · 2–3 d · risco médio
 
