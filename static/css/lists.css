@@ -57,7 +57,7 @@
 }
 
 html[data-theme="dark"] .empty-state {
-  background: color-mix(in srgb, var(--color-surface) 38%, #0b1422);
+  background: color-mix(in srgb, var(--color-surface) 38%, #0d1725);
   border-color: color-mix(in srgb, var(--color-border-soft) 55%, transparent);
 }
 

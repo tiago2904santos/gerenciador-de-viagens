@@ -215,7 +215,7 @@ html[data-theme="dark"] .pt-activity-card {
 }
 
 .pt-activity-card:focus-within {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent, #d9a40f) 26%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent, #d8a21b) 26%, transparent);
 }
 
 /* checkbox nativo escondido (mantém foco por teclado) */
@@ -261,7 +261,7 @@ html[data-theme="dark"] .pt-activity-card {
 }
 
 .pt-activity-card.is-selected .pt-activity-card__check {
-  background: var(--color-accent, #d9a40f);
+  background: var(--color-accent, #d8a21b);
   color: #1a1200;
 }
 
@@ -433,7 +433,7 @@ html[data-theme="dark"] .pt-live-col {
 
 /* Metas: acento dourado · Recursos: acento azul. */
 .pt-live-col--metas .pt-live-entry {
-  box-shadow: inset 3px 0 0 var(--color-accent, #d9a40f);
+  box-shadow: inset 3px 0 0 var(--color-accent, #d8a21b);
 }
 
 .pt-live-col--recursos .pt-live-entry {

@@ -58,7 +58,7 @@
    precisa estar na própria classe do widget. */
 .cv-action-menu {
   background: color-mix(in srgb, var(--surface-list-panel) 96%, transparent);
-  border: 1px solid color-mix(in srgb, var(--border-list-panel) 78%, #7c9ab8);
+  border: 1px solid color-mix(in srgb, var(--border-list-panel) 78%, #7e9ebf);
   border-radius: 16px;
   box-shadow: 0 20px 48px rgba(13, 35, 58, 0.24);
   gap: 5px;
@@ -104,7 +104,7 @@
   background: rgba(69, 105, 143, 0.1);
   border: 1px solid rgba(69, 105, 143, 0.16);
   border-radius: 10px;
-  color: #426b91;
+  color: #3f7096;
   display: inline-flex;
   flex: 0 0 34px;
   height: 34px;
@@ -160,7 +160,7 @@
 .cv-action-menu__item-icon--route {
   background: rgba(49, 99, 151, 0.09);
   border-color: rgba(49, 99, 151, 0.16);
-  color: #315f8c;
+  color: #315f84;
 }
 
 .cv-action-menu__item-icon--package,
@@ -184,15 +184,15 @@ html[data-theme="dark"] .cv-action-menu__item:focus-visible {
 
 /* Finalizar: sucesso sóbrio no tema escuro, sem o verde fluorescente. */
 html[data-theme="dark"] .cv-record-card .cv-icon-btn--complete {
-  background: linear-gradient(145deg, #1d4439, #17372f);
-  border-color: #3e6f5e;
+  background: linear-gradient(145deg, #20433a, #19352e);
+  border-color: #426f60;
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.2);
   color: #b7e8d3;
 }
 
 html[data-theme="dark"] .cv-record-card .cv-icon-btn--complete:hover,
 html[data-theme="dark"] .cv-record-card .cv-icon-btn--complete:focus {
-  background: linear-gradient(145deg, #245143, #1c4036);
+  background: linear-gradient(145deg, #245143, #20433a);
   border-color: #568776;
   color: #d2f3e4;
 }

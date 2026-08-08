@@ -943,7 +943,7 @@
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .route-destinos-block .route-destinos-add,
 :is(.roteiro-editor--oficio, [data-travel-document-wizard-step1]) .route-destinos-block .cv-ordered-field-row__add {
   align-items: center;
-  background: color-mix(in srgb, var(--color-success, #16a34a) 14%, var(--step1-panel, var(--color-card)));
+  background: color-mix(in srgb, var(--color-success, #1fa855) 14%, var(--step1-panel, var(--color-card)));
   border: 0;
   border-radius: 10px;
   color: var(--color-heading, inherit);
@@ -2507,12 +2507,12 @@
 
 .roteiro-mapa__loading {
   align-items: center;
-  background: color-mix(in srgb, var(--color-surface-strong, #0f1722) 78%, transparent);
+  background: color-mix(in srgb, var(--color-surface-strong, #0d1725) 78%, transparent);
   border: 1px solid color-mix(in srgb, var(--color-accent) 35%, var(--color-border, #334155));
   border-radius: 999px;
   bottom: 16px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
-  color: var(--color-heading, #f8fafc);
+  color: var(--color-heading, #ffffff);
   display: inline-flex;
   font-size: 0.8125rem;
   font-weight: 650;

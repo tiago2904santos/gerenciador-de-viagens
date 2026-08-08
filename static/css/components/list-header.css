@@ -1037,8 +1037,8 @@
   --stepper-marker-size: 32px;
   --stepper-missing-bg: color-mix(in srgb, var(--color-danger) 12%, transparent);
   --stepper-missing-border: color-mix(in srgb, var(--color-danger) 30%, transparent);
-  --stepper-missing-color: color-mix(in srgb, var(--color-danger) 72%, #e8eef6);
-  --stepper-status-missing-color: color-mix(in srgb, var(--color-danger) 62%, #b8c7d8);
+  --stepper-missing-color: color-mix(in srgb, var(--color-danger) 72%, #e3eaf2);
+  --stepper-status-missing-color: color-mix(in srgb, var(--color-danger) 62%, #afc0d3);
   background: transparent;
 }
 

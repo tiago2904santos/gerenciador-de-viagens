@@ -118,7 +118,7 @@
   --cv-btn-pdf-color: var(--color-white);
 
   --cv-btn-docx-bg: linear-gradient(180deg, #2f67aa 0%, #1f5493 100%);
-  --cv-btn-docx-hover-bg: linear-gradient(180deg, #3b76b9 0%, #224f88 100%);
+  --cv-btn-docx-hover-bg: linear-gradient(180deg, #3b76b9 0%, #1f5493 100%);
   --cv-btn-docx-color: var(--color-white);
 
   --cv-btn-footer-bg: var(--color-surface-muted);
@@ -134,21 +134,21 @@
 }
 
 html[data-theme="dark"] {
-  --cv-btn-secondary-bg: #1b2839;
-  --cv-btn-secondary-border: #50657c;
-  --cv-btn-secondary-color: #edf5ff;
-  --cv-btn-secondary-hover-bg: #24394f;
+  --cv-btn-secondary-bg: #132538;
+  --cv-btn-secondary-border: #52657a;
+  --cv-btn-secondary-color: #e3eaf2;
+  --cv-btn-secondary-hover-bg: #223348;
   --cv-btn-secondary-hover-border: #7c97b0;
   --cv-btn-secondary-hover-color: #ffffff;
-  --cv-btn-secondary-active-bg: #162131;
+  --cv-btn-secondary-active-bg: #111e2f;
   --cv-btn-secondary-active-border: #5d768e;
   --cv-btn-secondary-active-color: #f7fbff;
 
-  --cv-btn-neutral-bg: #141f2f;
-  --cv-btn-neutral-border: #31455b;
-  --cv-btn-neutral-color: #d1deec;
-  --cv-btn-neutral-hover-bg: #1d2b3e;
-  --cv-btn-neutral-hover-border: #496078;
+  --cv-btn-neutral-bg: #111e2f;
+  --cv-btn-neutral-border: #2b3f52;
+  --cv-btn-neutral-color: #d4dde9;
+  --cv-btn-neutral-hover-bg: #132538;
+  --cv-btn-neutral-hover-border: #52657a;
   --cv-btn-neutral-hover-color: #ffffff;
 
   --cv-btn-preview-bg: var(--cv-btn-secondary-bg);
@@ -157,14 +157,14 @@ html[data-theme="dark"] {
 
   --cv-btn-pdf-bg: linear-gradient(135deg, #c0392b 0%, var(--color-danger) 100%);
   --cv-btn-pdf-hover-bg: linear-gradient(135deg, #a93328 0%, #951f18 100%);
-  --cv-btn-docx-bg: linear-gradient(180deg, #3e74b9 0%, #295b9a 100%);
-  --cv-btn-docx-hover-bg: linear-gradient(180deg, #4a85c9 0%, #2d5f9d 100%);
+  --cv-btn-docx-bg: linear-gradient(180deg, #3b76b9 0%, #155b9a 100%);
+  --cv-btn-docx-hover-bg: linear-gradient(180deg, #4a85c9 0%, #155b9a 100%);
 
-  --cv-btn-footer-bg: #162132;
-  --cv-btn-footer-hover-bg: #1d2a3c;
-  --cv-btn-footer-border: #2f4258;
-  --cv-btn-footer-hover-border: #4f647b;
-  --cv-btn-footer-color: #cddbeb;
+  --cv-btn-footer-bg: #132238;
+  --cv-btn-footer-hover-bg: #132538;
+  --cv-btn-footer-border: #2b3f52;
+  --cv-btn-footer-hover-border: #52657a;
+  --cv-btn-footer-color: #d4dde9;
   --cv-btn-footer-hover-color: #ffffff;
 
   --state-success-bg: color-mix(in srgb, var(--color-success) 26%, var(--theme-surface-card) 74%);
@@ -356,7 +356,7 @@ html[data-theme="light"] {
 /* --- Danger (excluir — acao permanente no banco) --- */
 .cv-btn--danger {
   background: linear-gradient(135deg, #c0392b 0%, var(--color-danger) 100%);
-  border-color: #8f1f18;
+  border-color: #951f18;
   box-shadow: 0 6px 14px rgba(180, 35, 24, 0.22);
   color: var(--color-white);
 }
@@ -371,7 +371,7 @@ html[data-theme="light"] {
 /* --- Soft-danger (remover — remocao local, reversivel) --- */
 .cv-btn--soft-danger {
   background: linear-gradient(135deg, #c0392b 0%, var(--color-danger) 100%);
-  border-color: #8f1f18;
+  border-color: #951f18;
   box-shadow: 0 6px 14px rgba(180, 35, 24, 0.22);
   color: var(--color-white);
 }
@@ -668,7 +668,7 @@ html[data-theme="light"] {
 /* Delete — vermelho destrutivo */
 .cv-icon-btn--delete {
   background: linear-gradient(135deg, #c0392b 0%, var(--color-danger) 100%);
-  border-color: #8f1f18;
+  border-color: #951f18;
   color: var(--color-white);
 }
 
@@ -681,7 +681,7 @@ html[data-theme="light"] {
 /* Cancelar — amber de alerta (distinto do vermelho de exclusão) */
 .cv-icon-btn--cancel {
   background: linear-gradient(135deg, #b8860b 0%, var(--color-warning) 100%);
-  border-color: #8a660a;
+  border-color: #876317;
   color: var(--color-white);
 }
 
@@ -831,14 +831,14 @@ html[data-theme="light"] {
 /* WhatsApp — verde característico, preenchido (aviso de liberação de diárias) */
 .cv-icon-btn--whatsapp {
   background: linear-gradient(135deg, #1fa855 0%, #25d366 100%);
-  border-color: #178a45;
+  border-color: #1f8f4e;
   color: #fff;
 }
 
 .cv-icon-btn--whatsapp:hover,
 .cv-icon-btn--whatsapp:focus {
-  background: linear-gradient(135deg, #178a45 0%, #1fa855 100%);
-  border-color: #12703a;
+  background: linear-gradient(135deg, #1f8f4e 0%, #1fa855 100%);
+  border-color: #167039;
 }
 
 /* Arquivar — âmbar sóbrio; desarquivar/reabrir usam o neutro (--edit) */

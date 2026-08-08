@@ -88,12 +88,12 @@
 /* Tokens *-soft não têm variante escura — redefinir escopado no dark. */
 :is(html[data-theme="dark"])
   .cv-pendencias--danger {
-  background: color-mix(in srgb, var(--color-danger) 16%, var(--color-card, #142132));
+  background: color-mix(in srgb, var(--color-danger) 16%, var(--color-card, #132238));
   border-color: color-mix(in srgb, var(--color-danger) 55%, transparent);
 }
 
 :is(html[data-theme="dark"])
   .cv-pendencias--warning {
-  background: color-mix(in srgb, var(--color-warning) 14%, var(--color-card, #142132));
+  background: color-mix(in srgb, var(--color-warning) 14%, var(--color-card, #132238));
   border-color: color-mix(in srgb, var(--color-warning) 55%, transparent);
 }

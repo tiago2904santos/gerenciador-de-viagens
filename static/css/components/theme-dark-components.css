@@ -83,7 +83,7 @@ html[data-theme="dark"] .sidebar-footer {
 
 html[data-theme="dark"] .sidebar-account {
   background: #0b1c2a;
-  border-color: #1c3b55;
+  border-color: #1e3a50;
   padding: 10px 12px;
 }
 
@@ -165,7 +165,7 @@ html[data-theme="dark"] .page-header-stack {
 }
 
 html[data-theme="dark"] .page-header-band {
-  background: #0d1d30;
+  background: #132238;
   box-shadow: none;
   padding: clamp(22px, 2.6vw, 34px) clamp(22px, 3vw, 38px) 10px;
 }
@@ -180,7 +180,7 @@ html[data-theme="dark"] .page-header-band__title {
 }
 
 html[data-theme="dark"] .page-header-rail {
-  background: #122238;
+  background: #132238;
   border-top: 1px solid var(--color-border);
   padding: 16px clamp(22px, 3vw, 38px) clamp(22px, 2.6vw, 32px);
 }
@@ -203,20 +203,20 @@ html[data-theme="dark"] .page-header-rail__subtitle {
 /* Listas usam cabeçalho flat (list-header.css) — sem card/sombra no stack. */
 :is(html[data-theme="dark"])
   :is(.page-shell--list, .cv-page--collection) .page-header-stack:not(.list-header) {
-  background: #0d1d30;
+  background: #132238;
   border-color: color-mix(in srgb, var(--color-border) 84%, #31577c);
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.32);
 }
 
 :is(html[data-theme="dark"])
   :is(.page-shell--list, .cv-page--collection) .page-header-stack:not(.list-header) .page-header-band {
-  background: #0d1d30;
+  background: #132238;
   padding: 20px clamp(20px, 2.4vw, 30px) 16px;
 }
 
 :is(html[data-theme="dark"])
   :is(.page-shell--list, .cv-page--collection) .page-header-stack:not(.list-header) .page-header-rail {
-  background: #14263b;
+  background: #132238;
   border-top-color: rgba(152, 184, 218, 0.22);
   padding: 14px clamp(20px, 2.4vw, 30px) 18px;
 }
@@ -230,7 +230,7 @@ html[data-theme="dark"] .page-header-rail__subtitle {
 :is(html[data-theme="dark"])
   .empty-state--compact {
   align-items: center;
-  background: #142338;
+  background: #132238;
   border: 1px solid rgba(152, 184, 218, 0.32);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
   display: grid;
@@ -243,7 +243,7 @@ html[data-theme="dark"] .page-header-rail__subtitle {
 
 :is(html[data-theme="dark"])
   .empty-state--compact .empty-state__mark {
-  background: #0d4d7f;
+  background: #12507f;
   border: 1px solid #397aa8;
   grid-row: 1 / span 2;
 }
@@ -3588,7 +3588,7 @@ html[data-theme="dark"] :is(.cv-btn--primary, .btn-primary, .app-primary-action)
   background: var(--cv-btn-primary-bg);
   border-color: var(--color-primary-hover);
   box-shadow: none;
-  color: #f7fcfd;
+  color: #ffffff;
   text-shadow: none;
 }
 
@@ -3816,9 +3816,9 @@ html[data-theme="dark"] :is(.cv-chip, .status-chip):hover {
 html[data-theme="dark"] .alert {
   align-items: flex-start;
   background: #183b58;
-  border-color: #397cab;
+  border-color: #397aa8;
   box-shadow: none;
-  color: #e6f5ff;
+  color: #e0eef8;
   display: grid;
   gap: 3px 10px;
   grid-template-columns: auto minmax(0, 1fr);
@@ -3842,7 +3842,7 @@ html[data-theme="dark"] .alert__title {
 html[data-theme="dark"] :is(.alert-success, .alert--success) {
   background: #0b4d3c;
   border-color: #238c6c;
-  color: #ddfff3;
+  color: #d8ffef;
 }
 
 html[data-theme="dark"] :is(.alert-warning, .alert--warning) {
@@ -3858,7 +3858,7 @@ html[data-theme="dark"] :is(.alert-warning, .alert--warning) {
 html[data-theme="dark"] :is(.alert-danger, .alert-error, .alert--danger, .alert--error) {
   background: #5d252c;
   border-color: #bd5059;
-  color: #ffe3e5;
+  color: #ffdcde;
 }
 
 html[data-theme="dark"] :is(.empty-state, .app-empty-state) {
@@ -4722,7 +4722,7 @@ html[data-theme="dark"] *::after {
 :is(html[data-theme="dark"])
   .cv-document-viewer__paper-mark {
   background: var(--color-accent);
-  color: #18212a;
+  color: #19232d;
 }
 
 :is(html[data-theme="dark"])
@@ -4732,7 +4732,7 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .cv-document-viewer__paper-line--title {
-  background: #354a5c;
+  background: #334c63;
 }
 
 /* Signature card shares the same solid document hierarchy. */

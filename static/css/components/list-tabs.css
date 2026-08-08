@@ -161,14 +161,14 @@
   .cv-list-tab {
   --cv-list-tab-bg: var(--color-card-soft);
   --cv-list-tab-border: var(--color-border-soft);
-  --cv-list-tab-color: var(--theme-text-muted, #b8c8dc);
+  --cv-list-tab-color: var(--theme-text-muted, #afc0d3);
   --cv-list-tab-hover-bg: color-mix(in srgb, var(--color-card-soft) 82%, #fff 18%);
   --cv-list-tab-hover-border: var(--color-border-strong, rgba(214, 227, 244, 0.5));
-  --cv-list-tab-hover-color: var(--color-muted-strong, #d3dfef);
+  --cv-list-tab-hover-color: var(--color-muted-strong, #d4dde9);
   --cv-list-tab-count-bg: rgba(255, 255, 255, 0.12);
   --cv-list-tab-active-bg: var(--color-accent-soft, #3b3320);
   --cv-list-tab-active-border: var(--color-accent-border-strong, #a5851f);
-  --cv-list-tab-active-color: #f3d680;
+  --cv-list-tab-active-color: #f2d487;
   --cv-list-tab-active-count-bg: var(--color-accent, #d8a21b);
   --cv-list-tab-active-count-color: #211806;
 }

@@ -65,19 +65,19 @@
 
   /* Sidebar institucional (fallback) */
   --sidebar-surface: linear-gradient(180deg, #062847 0%, #031c33 100%);
-  --sidebar-fg: #d8e3f2;
-  --sidebar-fg-soft: #c8d8ea;
-  --sidebar-fg-heading: #f1f7ff;
+  --sidebar-fg: #d4dde9;
+  --sidebar-fg-soft: #cddcf0;
+  --sidebar-fg-heading: #f7fbff;
   --sidebar-border: rgba(175, 192, 211, 0.24);
   --sidebar-shadow: inset -1px 0 0 rgba(175, 192, 211, 0.2), 12px 0 28px rgba(2, 8, 23, 0.34);
-  --sidebar-brand-fg: #f1f7ff;
+  --sidebar-brand-fg: #f7fbff;
   --sidebar-badge-bg: linear-gradient(140deg, rgba(216, 162, 27, 0.62), rgba(185, 135, 18, 0.72));
   --sidebar-link-surface: rgba(255, 255, 255, 0.06);
   --sidebar-link-border: rgba(175, 192, 211, 0.22);
-  --sidebar-link-fg: #c8d8ea;
+  --sidebar-link-fg: #cddcf0;
   --sidebar-link-hover-bg: rgba(255, 255, 255, 0.08);
   --sidebar-icon-bg: rgba(216, 162, 27, 0.18);
-  --sidebar-icon-fg: #deebff;
+  --sidebar-icon-fg: #deebfb;
   --sidebar-active-bg: rgba(255, 255, 255, 0.1);
   --sidebar-active-fg: var(--color-white);
   --sidebar-active-border: rgba(216, 162, 27, 0.45);
@@ -89,22 +89,22 @@
   --sidebar-focus-ring: rgba(216, 162, 27, 0.35);
 
   /* Fallback antes do JS (equivalente a light) */
-  --app-body-bg: linear-gradient(180deg, #f8fbff 0%, #eef4fb 48%, #e3ecf6 100%);
+  --app-body-bg: linear-gradient(180deg, #ffffff 0%, #e3eaf2 48%, #e3eaf2 100%);
   --app-main-bg: transparent;
-  --app-featured-bg-fallback: #bed0e4;
+  --app-featured-bg-fallback: #b9cbe0;
   --app-featured-bg:
     radial-gradient(ellipse 110% 78% at 0% 0%, rgba(216, 162, 27, 0.16), transparent 50%),
     radial-gradient(ellipse 82% 62% at 100% 6%, rgba(21, 91, 154, 0.16), transparent 48%),
     radial-gradient(ellipse 70% 48% at 50% 108%, rgba(11, 58, 102, 0.12), transparent 56%),
-    linear-gradient(168deg, #fcfeff 0%, #eef4fb 26%, #d9e6f2 62%, #c2d3e7 100%);
+    linear-gradient(168deg, #ffffff 0%, #e3eaf2 26%, #d4dde9 62%, #cddcf0 100%);
 
   /* Faixa superior do hero (.app-page-hero__stage) */
-  --app-hero-stage-start: #0a1f35;
-  --app-hero-stage-end: #1a4d7a;
+  --app-hero-stage-start: #132238;
+  --app-hero-stage-end: #17476f;
   --app-hero-stage-bg: linear-gradient(315deg, var(--app-hero-stage-start) -25%, var(--app-hero-stage-end) 25%);
   --app-hero-eyebrow: rgba(255, 248, 230, 0.98);
   --app-hero-title: var(--color-white);
-  --app-hero-body-bg: linear-gradient(180deg, var(--color-white) 0%, #f8fafd 100%);
+  --app-hero-body-bg: linear-gradient(180deg, var(--color-white) 0%, #ffffff 100%);
   --app-hero-ribbon: linear-gradient(
     90deg,
     rgba(216, 162, 27, 0.88) 0%,
@@ -114,7 +114,7 @@
 
   /* Superfície / texto featured (default = div clara) */
   --theme-surface-card: var(--color-white);
-  --theme-surface-card-soft: #f8fafd;
+  --theme-surface-card-soft: #ffffff;
   --theme-border-card: #e3eaf2;
   --theme-text-heading: #071a33;
   --theme-text-body: #132238;
@@ -143,14 +143,14 @@
   --theme-btn-secondary-text: var(--color-primary);
   --theme-btn-secondary-hover-bg: var(--color-secondary-soft);
   --theme-btn-secondary-hover-border: var(--color-secondary);
-  --theme-btn-muted-bg: #e8f2ff;
+  --theme-btn-muted-bg: #f0f6ff;
   --theme-btn-muted-border: #9eb7d2;
   --theme-btn-muted-text: var(--color-primary);
-  --theme-btn-muted-hover-bg: #e0eeff;
+  --theme-btn-muted-hover-bg: #deebfb;
   --theme-btn-muted-hover-border: #7e9ebf;
   --theme-form-section-bg: #ffffff;
-  --theme-form-section-border: #d6e0ea;
-  --theme-empty-bg: #f8fbff;
+  --theme-form-section-border: #d4dde9;
+  --theme-empty-bg: #ffffff;
   --theme-empty-border: #8ca6bf;
   --theme-quick-icon-bg: linear-gradient(165deg, #fff6dc, #fffaeb);
   --theme-quick-icon-border: #d8a21b;
@@ -164,46 +164,46 @@
   --color-danger-border-strong: rgba(180, 35, 24, 0.38);
   --color-info-border-strong: rgba(21, 91, 154, 0.48);
   --color-success-border-soft: rgba(22, 128, 90, 0.28);
-  --sidebar-theme-active-bg: #2a3b50;
+  --sidebar-theme-active-bg: #2b3f52;
 
   --route-card-bg: #ffffff;
-  --route-card-border: #dbe7f2;
+  --route-card-border: #e3eaf2;
   --route-card-inner-bg: #ffffff;
-  --route-card-inner-border: #d8e4ef;
+  --route-card-inner-border: #d4dde9;
   --route-form-shell-bg: var(--route-card-bg);
   --route-section-bg: var(--route-card-bg);
   --route-section-soft-bg: var(--route-card-bg);
-  --route-section-border: #dbe7f2;
-  --route-reference-top-bg: linear-gradient(180deg, #124872 0%, #0c3558 100%);
+  --route-section-border: #e3eaf2;
+  --route-reference-top-bg: linear-gradient(180deg, #17476f 0%, #0b3a66 100%);
   --route-field-bg: var(--color-card);
-  --route-field-border: #bfd2e4;
+  --route-field-border: #b9cbe0;
   --route-field-text: #132238;
   --route-field-placeholder: #71839a;
   --route-card-text: #132238;
-  --route-field-disabled-bg: #edf3f9;
-  --route-field-disabled-text: #63788f;
-  --route-button-primary-bg: linear-gradient(180deg, #0e5088 0%, #0b3a66 100%);
+  --route-field-disabled-bg: #e3eaf2;
+  --route-field-disabled-text: #5d768e;
+  --route-button-primary-bg: linear-gradient(180deg, #12507f 0%, #0b3a66 100%);
   --route-button-primary-border: #0b3a66;
   --route-button-primary-text: #ffffff;
-  --route-button-primary-hover-bg: linear-gradient(180deg, #124f83 0%, #082f55 100%);
+  --route-button-primary-hover-bg: linear-gradient(180deg, #12507f 0%, #082f55 100%);
   --route-button-primary-hover-border: #082f55;
   --route-button-secondary-bg: #f7fbff;
   --route-button-secondary-border: #b9cbe0;
   --route-button-secondary-text: #0b3a66;
-  --route-button-secondary-hover-bg: #eaf3fc;
+  --route-button-secondary-hover-bg: #e3eaf2;
   --route-button-secondary-hover-border: #8fb1d0;
   --route-button-danger-bg: linear-gradient(180deg, #c93636 0%, #a92222 100%);
-  --route-button-danger-border: #8f1f18;
+  --route-button-danger-border: #951f18;
   --route-button-danger-text: #ffffff;
-  --route-button-danger-hover-bg: linear-gradient(180deg, #b92f2f 0%, #941b1b 100%);
-  --route-button-danger-hover-border: #7f1712;
-  --route-status-draft-bg: #fff1cf;
+  --route-button-danger-hover-bg: linear-gradient(180deg, #b72f27 0%, #951f18 100%);
+  --route-button-danger-hover-border: #7a1a14;
+  --route-status-draft-bg: #fff3cf;
   --route-status-draft-border: #d8a21b;
   --route-status-draft-text: #704800;
   --route-status-final-bg: #e5f6ef;
   --route-status-final-border: #16805a;
   --route-status-final-text: #07583c;
-  --route-status-muted-bg: #edf3f9;
+  --route-status-muted-bg: #e3eaf2;
   --route-status-muted-border: #b9cbe0;
   --route-status-muted-text: #334c63;
   --route-focus-ring: rgba(21, 91, 154, 0.18);
@@ -231,62 +231,62 @@
 
 /* ========== 2 tema escuro oficial (inclui aliases legados escuros) ========== */
 html[data-theme="dark"] {
-  --color-bg: #07111d;
-  --color-shell: #081827;
-  --color-surface: #1a2638;
+  --color-bg: #0d1725;
+  --color-shell: #0d1725;
+  --color-surface: #132238;
   --color-surface-soft: #223348;
-  --color-surface-muted: #172638;
+  --color-surface-muted: #132538;
   --color-surface-strong: #111e2f;
-  --color-card: #0f1928;
-  --color-card-soft: #24384e;
-  --color-card-muted: #213246;
-  --color-panel: #162435;
-  --color-panel-strong: #101b2b;
+  --color-card: #111e2f;
+  --color-card-soft: #223348;
+  --color-card-muted: #223348;
+  --color-panel: #111e2f;
+  --color-panel-strong: #111e2f;
   --color-border: rgba(191, 211, 234, 0.28);
   --color-border-soft: rgba(191, 211, 234, 0.2);
   --color-border-strong: rgba(214, 227, 244, 0.38);
-  --color-text: #edf4ff;
+  --color-text: #f0f6ff;
   --color-heading: #f7fbff;
   --color-heading-soft: #deebfb;
-  --color-section-title: #f6fbff;
-  --color-card-title: #ecf5ff;
-  --color-label: #d3dfef;
-  --color-label-strong: #e8f1ff;
-  --color-help: #bdcce0;
-  --color-description: #c6d5e8;
-  --color-text-muted: #c4d1e3;
-  --color-text-soft: #a7b8ce;
+  --color-section-title: #f7fbff;
+  --color-card-title: #e3eaf2;
+  --color-label: #d4dde9;
+  --color-label-strong: #f0f6ff;
+  --color-help: #b9cbe0;
+  --color-description: #cddcf0;
+  --color-text-muted: #b9cbe0;
+  --color-text-soft: #afc0d3;
   --color-icon: #cddcf0;
-  --color-icon-muted: #aec2da;
-  --color-icon-strong: #f0f7ff;
+  --color-icon-muted: #afc0d3;
+  --color-icon-strong: #f7fbff;
   --shadow-card: 0 14px 34px rgba(0, 0, 0, 0.38);
   --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.28);
-  --color-input-bg: #24384d;
-  --color-input-disabled-bg: #152233;
-  --color-input-bg-disabled: #152233;
-  --color-input-text: #f2f7ff;
-  --color-input-placeholder: #b7c7dc;
+  --color-input-bg: #223348;
+  --color-input-disabled-bg: #132238;
+  --color-input-bg-disabled: #132238;
+  --color-input-text: #f7fbff;
+  --color-input-placeholder: #afc0d3;
   --color-input-disabled-text: #9fb1c8;
   --color-input-border: rgba(197, 213, 233, 0.34);
   --color-danger-bg: rgba(180, 35, 24, 0.22);
   --color-danger-text: #ffc8c2;
   --color-info-bg: rgba(40, 96, 148, 0.24);
   --color-info-border: rgba(116, 170, 224, 0.45);
-  --color-info-text: #d7eaff;
+  --color-info-text: #deebfb;
 
   --app-body-bg:
     radial-gradient(ellipse 70% 50% at 50% 0%, rgba(21, 91, 154, 0.14), transparent 55%),
-    linear-gradient(180deg, #0e1928 0%, #081018 100%);
-  --app-featured-bg-fallback: #061f39;
+    linear-gradient(180deg, #111e2f 0%, #050d16 100%);
+  --app-featured-bg-fallback: #132238;
   --app-featured-bg:
     radial-gradient(ellipse 112% 82% at 0% 0%, rgba(216, 162, 27, 0.15), transparent 54%),
     radial-gradient(ellipse 88% 62% at 100% 12%, rgba(21, 91, 154, 0.34), transparent 50%),
     radial-gradient(ellipse 72% 52% at 46% 108%, rgba(8, 28, 48, 0.82), transparent 60%),
-    linear-gradient(168deg, #04192c 0%, #062847 46%, #031521 100%);
+    linear-gradient(168deg, #031c33 0%, #062847 46%, #0b1c2a 100%);
 
   --app-hero-eyebrow: rgba(255, 236, 180, 0.95);
   --app-hero-title: var(--color-white);
-  --app-hero-body-bg: linear-gradient(180deg, #1a2638 0%, #243447 100%);
+  --app-hero-body-bg: linear-gradient(180deg, #132238 0%, #223348 100%);
   --app-hero-ribbon: linear-gradient(
     90deg,
     rgba(216, 162, 27, 0.9) 0%,
@@ -297,11 +297,11 @@ html[data-theme="dark"] {
   --theme-surface-card: var(--color-card);
   --theme-surface-card-soft: var(--color-card-soft);
   --theme-border-card: var(--color-border-soft);
-  --theme-text-heading: #f6fbff;
-  --theme-text-body: #e7f0fb;
-  --theme-text-muted: #b8c8dc;
-  --theme-text-subtle: #8a9bb0;
-  --theme-text-muted-strong: #d3dfef;
+  --theme-text-heading: #f7fbff;
+  --theme-text-body: #e3eaf2;
+  --theme-text-muted: #afc0d3;
+  --theme-text-subtle: #8598af;
+  --theme-text-muted-strong: #d4dde9;
   --theme-accent-eyebrow: #e8c76a;
   --theme-stat-value: #9fd0ff;
   --theme-accent-line: linear-gradient(
@@ -319,67 +319,67 @@ html[data-theme="dark"] {
   --theme-input-text: var(--color-input-text);
   --theme-list-row-hover: rgba(255, 255, 255, 0.06);
   --theme-list-border: rgba(255, 255, 255, 0.1);
-  --theme-btn-secondary-bg: #2a3b50;
-  --theme-btn-secondary-border: #5f7692;
+  --theme-btn-secondary-bg: #2b3f52;
+  --theme-btn-secondary-border: #5d768e;
   --theme-btn-secondary-text: #f0f6ff;
-  --theme-btn-secondary-hover-bg: #32475f;
+  --theme-btn-secondary-hover-bg: #334c63;
   --theme-btn-secondary-hover-border: #7690af;
   --theme-btn-muted-bg: #31465f;
   --theme-btn-muted-border: #607b99;
   --theme-btn-muted-text: #f0f6ff;
   --theme-btn-muted-hover-bg: #3a516d;
-  --theme-btn-muted-hover-border: #7d9bbd;
-  --theme-form-section-bg: #142336;
-  --theme-form-section-border: #4d637b;
-  --theme-empty-bg: #1d2f43;
+  --theme-btn-muted-hover-border: #7e9ebf;
+  --theme-form-section-bg: #132238;
+  --theme-form-section-border: #52657a;
+  --theme-empty-bg: #223348;
   --theme-empty-border: #7ca6d2;
   --theme-quick-icon-bg: linear-gradient(165deg, #4a3a1e, #5a4622);
   --theme-quick-icon-border: #d8a21b;
-  --theme-quick-icon-fg: #e8f4ff;
-  --theme-badge-accent-bg: #4d3d1e;
+  --theme-quick-icon-fg: #f0f6ff;
+  --theme-badge-accent-bg: #4a3a1e;
   --theme-badge-accent-border: #d8a21b;
-  --theme-badge-accent-text: #ffe9a8;
+  --theme-badge-accent-text: #ffe7ac;
 
-  --route-card-bg: #101927;
-  --route-card-border: #2a3d52;
-  --route-card-inner-bg: #162234;
-  --route-card-inner-border: #33475e;
+  --route-card-bg: #111e2f;
+  --route-card-border: #2b3f52;
+  --route-card-inner-bg: #132238;
+  --route-card-inner-border: #334c63;
   --route-form-shell-bg: var(--route-card-bg);
   --route-section-bg: var(--route-card-bg);
   --route-section-soft-bg: var(--route-card-bg);
-  --route-section-border: #2f4359;
-  --route-reference-top-bg: linear-gradient(180deg, #124872 0%, #0c3558 100%);
+  --route-section-border: #2b3f52;
+  --route-reference-top-bg: linear-gradient(180deg, #17476f 0%, #0b3a66 100%);
   --route-field-bg: var(--color-card);
   --route-field-border: #425a72;
-  --route-field-text: #f2f7ff;
-  --route-field-placeholder: #9fb3ca;
-  --route-card-text: #e8f1fb;
+  --route-field-text: #f7fbff;
+  --route-field-placeholder: #9eb7d2;
+  --route-card-text: #e3eaf2;
   --route-field-disabled-bg: var(--route-card-bg);
   --route-field-disabled-text: #9fb1c8;
   --route-button-primary-bg: linear-gradient(180deg, #1a659d 0%, #0b3a66 100%);
-  --route-button-primary-border: #2b6d9d;
+  --route-button-primary-border: #286fa4;
   --route-button-primary-text: #ffffff;
-  --route-button-primary-hover-bg: linear-gradient(180deg, #2474ae 0%, #0d4678 100%);
-  --route-button-primary-hover-border: #3c83b8;
-  --route-button-secondary-bg: #141f2e;
+  --route-button-primary-hover-bg: linear-gradient(180deg, #286fa4 0%, #17476f 100%);
+  --route-button-primary-hover-border: #2f88c7;
+  --route-button-secondary-bg: #111e2f;
   --route-button-secondary-border: #53708c;
   --route-button-secondary-text: #f0f6ff;
-  --route-button-secondary-hover-bg: #2a4058;
-  --route-button-secondary-hover-border: #6d8dad;
+  --route-button-secondary-hover-bg: #2b3f52;
+  --route-button-secondary-hover-border: #7690af;
   --route-button-danger-bg: linear-gradient(180deg, #c93636 0%, #962222 100%);
   --route-button-danger-border: #d75a52;
   --route-button-danger-text: #ffffff;
-  --route-button-danger-hover-bg: linear-gradient(180deg, #d94848 0%, #a92b2b 100%);
-  --route-button-danger-hover-border: #ef766f;
-  --route-status-draft-bg: #3a2f1a;
+  --route-button-danger-hover-bg: linear-gradient(180deg, #d94848 0%, #a92222 100%);
+  --route-button-danger-hover-border: #ef7d77;
+  --route-status-draft-bg: #3b3320;
   --route-status-draft-border: #d8a21b;
-  --route-status-draft-text: #ffe3a3;
+  --route-status-draft-text: #ffe7ac;
   --route-status-final-bg: #14382e;
   --route-status-final-border: #39a87e;
   --route-status-final-text: #bcf4dc;
-  --route-status-muted-bg: #24384e;
+  --route-status-muted-bg: #223348;
   --route-status-muted-border: #53708c;
-  --route-status-muted-text: #d2deeb;
+  --route-status-muted-text: #d4dde9;
   --route-focus-ring: rgba(116, 170, 224, 0.24);
 
   --app-hero-stage-start: #0d1725;
@@ -402,13 +402,13 @@ html[data-theme="dark"] {
 
 /* ========== 3 tema claro oficial (inclui alias legado claro) ========== */
 html[data-theme="light"] {
-  --color-bg: #f2f6fb;
+  --color-bg: #f7fbff;
   --color-surface: var(--color-white);
-  --color-surface-strong: #f8fafd;
-  --color-surface-soft: #f8fafd;
+  --color-surface-strong: #ffffff;
+  --color-surface-soft: #ffffff;
   --color-card: var(--color-white);
-  --color-card-muted: #f8fafd;
-  --color-border: #cbd8e6;
+  --color-card-muted: #ffffff;
+  --color-border: #d4dde9;
   --color-border-strong: #afc0d3;
   --color-text: #132238;
   --color-text-muted: #52657a;
@@ -416,22 +416,22 @@ html[data-theme="light"] {
   --shadow-card: 0 14px 34px rgba(7, 26, 51, 0.16);
   --shadow-soft: 0 6px 16px rgba(7, 26, 51, 0.1);
   --color-input-bg: var(--color-white);
-  --color-input-disabled-bg: #edf3f9;
+  --color-input-disabled-bg: #e3eaf2;
   --color-input-text: #132238;
   --color-input-placeholder: #71839a;
   --color-input-border: rgba(31, 76, 125, 0.22);
 
-  --app-body-bg: linear-gradient(180deg, #f8fbff 0%, #eef4fb 48%, #e3ecf6 100%);
-  --app-featured-bg-fallback: #d2e0ef;
+  --app-body-bg: linear-gradient(180deg, #ffffff 0%, #e3eaf2 48%, #e3eaf2 100%);
+  --app-featured-bg-fallback: #d4dde9;
   --app-featured-bg:
     radial-gradient(ellipse 110% 75% at 0% 0%, rgba(216, 162, 27, 0.12), transparent 52%),
     radial-gradient(ellipse 80% 60% at 100% 8%, rgba(21, 91, 154, 0.11), transparent 50%),
     radial-gradient(ellipse 70% 48% at 50% 105%, rgba(11, 58, 102, 0.08), transparent 58%),
-    linear-gradient(168deg, #f7fbff 0%, #eef4fb 34%, #dde9f5 68%, #d0def0 100%);
+    linear-gradient(168deg, #f7fbff 0%, #e3eaf2 34%, #e3eaf2 68%, #cddcf0 100%);
 
   --app-hero-eyebrow: rgba(255, 248, 230, 0.98);
   --app-hero-title: var(--color-white);
-  --app-hero-body-bg: linear-gradient(180deg, var(--color-white) 0%, #f8fafd 100%);
+  --app-hero-body-bg: linear-gradient(180deg, var(--color-white) 0%, #ffffff 100%);
   --app-hero-ribbon: linear-gradient(
     90deg,
     rgba(216, 162, 27, 0.88) 0%,
@@ -440,7 +440,7 @@ html[data-theme="light"] {
   );
 
   --theme-surface-card: var(--color-white);
-  --theme-surface-card-soft: #f8fafd;
+  --theme-surface-card-soft: #ffffff;
   --theme-border-card: #e3eaf2;
   --theme-text-heading: #071a33;
   --theme-text-body: #132238;
@@ -469,14 +469,14 @@ html[data-theme="light"] {
   --theme-btn-secondary-text: var(--color-primary);
   --theme-btn-secondary-hover-bg: var(--color-secondary-soft);
   --theme-btn-secondary-hover-border: var(--color-secondary);
-  --theme-btn-muted-bg: #e8f2ff;
+  --theme-btn-muted-bg: #f0f6ff;
   --theme-btn-muted-border: #9eb7d2;
   --theme-btn-muted-text: var(--color-primary);
-  --theme-btn-muted-hover-bg: #e0eeff;
+  --theme-btn-muted-hover-bg: #deebfb;
   --theme-btn-muted-hover-border: #7e9ebf;
   --theme-form-section-bg: #ffffff;
-  --theme-form-section-border: #d6e0ea;
-  --theme-empty-bg: #f8fbff;
+  --theme-form-section-border: #d4dde9;
+  --theme-empty-bg: #ffffff;
   --theme-empty-border: #8ca6bf;
   --theme-quick-icon-bg: linear-gradient(165deg, #fff6dc, #fffaeb);
   --theme-quick-icon-border: #d8a21b;
@@ -486,17 +486,17 @@ html[data-theme="light"] {
   --theme-badge-accent-text: var(--color-accent-hover);
 
   --route-card-bg: #ffffff;
-  --route-card-border: #dbe7f2;
+  --route-card-border: #e3eaf2;
   --route-card-inner-bg: #ffffff;
-  --route-card-inner-border: #d8e4ef;
+  --route-card-inner-border: #d4dde9;
   --route-form-shell-bg: var(--route-card-bg);
   --route-section-bg: var(--route-card-bg);
   --route-section-soft-bg: var(--route-card-bg);
-  --route-section-border: #dbe7f2;
-  --route-reference-top-bg: linear-gradient(180deg, #124872 0%, #0c3558 100%);
+  --route-section-border: #e3eaf2;
+  --route-reference-top-bg: linear-gradient(180deg, #17476f 0%, #0b3a66 100%);
 
-  --app-hero-stage-start: #0a2d4d;
-  --app-hero-stage-end: #1d5f93;
+  --app-hero-stage-start: #062847;
+  --app-hero-stage-end: #155b9a;
   --app-hero-stage-bg: linear-gradient(315deg, var(--app-hero-stage-start) -25%, var(--app-hero-stage-end) 25%);
 
   --sidebar-surface: linear-gradient(225deg, var(--app-hero-stage-end) 0%, var(--app-hero-stage-start) 72%);

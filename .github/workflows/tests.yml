@@ -89,6 +89,18 @@ jobs:
         # PREFIXOS_DINAMICOS, e aí o prefixo entra lá com a linha que o monta.
         run: python scripts/audit_css_morto.py --max 0
 
+      - name: Block duplicate colours (UI-03)
+        # Catraca nova, teto ZERO. O sistema tinha 464 valores hex distintos e
+        # 255 deles eram duplicata PERCEPTUAL de outro (ΔE2000 <= 2,5): 26
+        # brancos, 25 azuis pálidos, 16 azuis-marinho. Não é peso: é que ninguém
+        # mantém um sistema com 464 cores — trocar "o azul do cabeçalho" vira
+        # caçada.
+        #
+        # O script não junta cor que distingue ESTADO: se duas cores convivem na
+        # mesma propriedade do mesmo seletor-base (`:hover`, `.is-*`, `--mod`),
+        # elas estão trabalhando e ficam. São 207 pares protegidos assim.
+        run: python scripts/audit_paleta.py --max 0
+
       - name: Block new keyboard-focus suppression (HT-01)
         # Catraca: este numero so desce. 47 -> 44 no `HT-01`.
         # O piso de `:focus-visible` em base.css/auth.css neutraliza os que
