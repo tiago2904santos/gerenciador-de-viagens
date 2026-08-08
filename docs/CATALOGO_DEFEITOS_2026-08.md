@@ -4438,3 +4438,36 @@ e nada falharia: o atributo ficaria no HTML, inerte.
 **Fica declarado o que este ID NÃO faz:** os registros já gravados continuam com a caixa que tinham.
 A máscara vale do próximo cadastro em diante. Uniformizar o histórico é migração de dados, com
 contagem por campo, e é decisão separada.
+
+### NOVO-54 🟠 PARCIAL · `NOVO` `.cv-field__control` não tem regra base — o campo é o elemento cru mais 64 correções · UI · 2 d
+
+A classe de campo com maior alcance do sistema — **11 templates, 30 rotas** — não tinha nenhuma
+regra base. Ela existia só em **64 regras de sobrescrita** espalhadas por **14 arquivos**, com **70
+`!important`**. O que pintava o campo de fato era o seletor de elemento nu `input, select, textarea`
+em `base.css:59`.
+
+**Não é que os campos divergiram: nunca existiu um campo.** Existia o elemento cru do navegador e um
+monte de correção por cima. Daí saem, medidos:
+
+| propriedade | quantos jeitos |
+|---|---:|
+| `background` | **27 cadeias distintas** |
+| `border-radius` | 13 valores — `12px` escrito com 4 nomes de token, mais 4 literais de `10px` |
+| altura | 7, com **5 nomes de token diferentes valendo o mesmo 44px** |
+| borda | 6 formas de declarar a mesma linha de 1px |
+
+**`static/css/components/field.css`** dá o lar que faltava. Os valores são **exatamente** os que
+`base.css` já entrega: este ID cria o lugar, não muda a aparência. Misturar as duas coisas num PR só
+tornaria impossível atribuir qualquer diferença medida a uma delas.
+
+**A correção de método:** a primeira versão usou `.cv-field__control` nua. Especificidade 0,1,0
+contra 0,0,1 do seletor de elemento — a regra base passou a **vencer** estilos de contexto legítimos,
+e a medição pegou: **55 elementos** mudaram, com raio indo de 12px para 14px e borda de 0 para 1px em
+campos deliberadamente sem borda. Com `:where()`, que zera a especificidade, a regra vira o que uma
+base deve ser: vale onde ninguém disse nada e perde para qualquer coisa que diga. **1 elemento de
+41.950.**
+
+**O que muda é o lugar.** A partir daqui existe **um** ponto onde a aparência de um campo é
+decidida, e as 64 sobrescritas viram dívida visível em vez de arquitetura. A ordem seguinte é
+remover as redundantes — as que já declaram o que a base entrega, e cuja remoção é provadamente
+neutra — e depois converter as divergentes, uma medição por vez.
