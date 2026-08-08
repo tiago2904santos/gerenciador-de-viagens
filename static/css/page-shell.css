@@ -233,7 +233,7 @@ html[data-theme="dark"] {
   /* Quick Add Folder Tab */
   --surface-inline-create-tab:        rgba(11, 58, 102, 0.50);   /* azul primário com opacidade */
   --border-inline-create-tab:         rgba(255, 255, 255, 0.22);
-  --color-inline-create-tab:          #ccdff5;                   /* texto claro sobre fundo escuro */
+  --color-inline-create-tab:          #cddcf0;                   /* texto claro sobre fundo escuro */
   --color-inline-create-tab-icon-bg:  var(--color-accent);       /* círculo dourado */
   --color-inline-create-tab-icon-fg:  var(--color-primary-dark); /* texto escuro sobre dourado */
 
@@ -260,10 +260,10 @@ html[data-theme="dark"] {
   --stepper-missing-connector:    rgba(180, 35, 24, 0.25);
   --stepper-disabled-opacity:     0.38;
   --stepper-eyebrow-color:        var(--stepper-label-idle);
-  --stepper-label-missing:        #e57d78;
+  --stepper-label-missing:        #ef7d77;
   --stepper-status-done-color:    var(--stepper-done-color);
   --stepper-status-current-color: var(--color-accent);
-  --stepper-status-missing-color: #e57d78;
+  --stepper-status-missing-color: #ef7d77;
 }
 
 /* =========================================================
@@ -282,12 +282,12 @@ html[data-theme="light"] {
   --border-form-panel:      #d4dde9;
   --shadow-form-panel:      var(--theme-shadow-hero);
 
-  --surface-form-section:   #f6f9fc;
-  --border-form-section:    #dde6ef;
+  --surface-form-section:   #ffffff;
+  --border-form-section:    #e3eaf2;
   --shadow-form-section:    none;
 
-  --surface-field-group:    #edf3f9;
-  --border-field-group:     #d0dce8;
+  --surface-field-group:    #e3eaf2;
+  --border-field-group:     #d4dde9;
 
   --cv-form-section-bg:        var(--surface-form-panel);
   --cv-form-section-header-bg: var(--surface-form-section);
@@ -298,14 +298,14 @@ html[data-theme="light"] {
   --border-list-panel:      #d4dde9;
   --shadow-list-panel:      var(--theme-shadow-hero);
 
-  --surface-filter-bar:     #f4f8fc;
-  --border-filter-bar:      #dde6ef;
+  --surface-filter-bar:     #f7fbff;
+  --border-filter-bar:      #e3eaf2;
 
   --surface-list-row:       var(--surface-form-section); /* mesmo fundo das seções de formulário */
-  --border-list-row:        #e5edf5;
+  --border-list-row:        #e3eaf2;
   --surface-list-row-hover: var(--color-primary-soft);
 
-  --surface-footer-actions: #f4f8fc;
+  --surface-footer-actions: #f7fbff;
   --border-footer-actions:  #d4dde9;
 
   --surface-pagination:     transparent;
@@ -332,14 +332,14 @@ html[data-theme="light"] {
   --text-header-count:    var(--color-primary);
 
   /* Quick Create Inline */
-  --surface-quick-create:        #eef3f8;
-  --surface-quick-create-header: #e6edf5;
+  --surface-quick-create:        #e3eaf2;
+  --surface-quick-create-header: #e3eaf2;
   --border-quick-create:         #d4dde9;
   --shadow-quick-create:         none;
 
   /* Quick Add Folder Tab */
-  --surface-inline-create-tab:        #dbeaf8;
-  --border-inline-create-tab:         #a8c5de;
+  --surface-inline-create-tab:        #deebfb;
+  --border-inline-create-tab:         #a8c4db;
   --color-inline-create-tab:          var(--color-primary-strong);
   --color-inline-create-tab-icon-bg:  var(--color-primary);
   --color-inline-create-tab-icon-fg:  var(--color-white);
@@ -2240,7 +2240,7 @@ body.has-delete-modal-open {
 }
 
 html[data-theme="dark"] .cv-inline-create__toggle {
-  background: var(--color-card-muted); /* #213246 */
+  background: var(--color-card-muted); /* #223348 */
   color:      var(--theme-text-body);
 }
 
@@ -2250,7 +2250,7 @@ html[data-theme="dark"] .cv-inline-create__toggle:hover {
 
 html[data-theme="dark"] .cv-inline-create__toggle.is-active,
 html[data-theme="dark"] .cv-inline-create__toggle[aria-expanded="true"] {
-  background:   var(--color-card-muted); /* #213246 — igual ao estado fechado */
+  background:   var(--color-card-muted); /* #223348 — igual ao estado fechado */
   border-color: var(--border-filter-bar);
   color:        var(--theme-text-body);
 }

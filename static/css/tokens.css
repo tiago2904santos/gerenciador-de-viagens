@@ -2,16 +2,16 @@
   /* --------------------------------------------------------------------------
      Cores base
      -------------------------------------------------------------------------- */
-  --color-bg: #f2f6fb;
-  --color-bg-strong: #e7eff8;
+  --color-bg: #f7fbff;
+  --color-bg-strong: #e3eaf2;
   --color-bg-dark: #062847;
-  --color-bg-subtle: #eaf1f8;
+  --color-bg-subtle: #e3eaf2;
   --color-bg-glow: #f7fbff;
   --color-surface: #ffffff;
-  --color-surface-muted: #f8fafd;
-  --color-surface-soft: #f8fafd;
+  --color-surface-muted: #ffffff;
+  --color-surface-soft: #ffffff;
   --color-surface-glass: #ffffff;
-  --color-border: #cbd8e6;
+  --color-border: #d4dde9;
   --color-border-soft: #e3eaf2;
   --color-border-strong: #afc0d3;
   --color-text: #132238;
@@ -24,7 +24,7 @@
   --color-primary-dark: #062847;
   --color-primary-hover: #082f55;
   --color-primary-bright: #155b9a;
-  --color-primary-soft: #e5eff8;
+  --color-primary-soft: #e3eaf2;
   --color-on-accent: var(--color-primary-dark);
   /* Halo de foco. Era usado sem estar definido, entao .cv-data-table-shell
      ficava sem anel de foco visivel (D-06). */
@@ -37,20 +37,20 @@
      pede 3:1). */
   --color-focus-visible-ring: #155b9a;
   --color-secondary: #155b9a;
-  --color-secondary-hover: #0f477a;
-  --color-secondary-soft: #e3f0fb;
+  --color-secondary-hover: #17476f;
+  --color-secondary-soft: #deebfb;
   --color-accent: #d8a21b;
-  --color-accent-hover: #b98712;
+  --color-accent-hover: #b8860b;
   --color-accent-soft: #fff3cf;
   --color-danger: #b42318;
-  --color-danger-soft: #fdecec;
+  --color-danger-soft: #fff2f0;
   --color-warning: #d8a21b;
   --color-warning-soft: #fff3cf;
   --color-warning-border: var(--color-accent-border-strong);
   --color-success: #16805a;
   --color-success-soft: #e5f6ef;
   --color-info: #155b9a;
-  --color-info-soft: #e3f0fb;
+  --color-info-soft: #deebfb;
   --color-white: #ffffff;
   --color-danger-border-soft: rgba(180, 35, 24, 0.24);
   --color-danger-border-strong: rgba(180, 35, 24, 0.38);

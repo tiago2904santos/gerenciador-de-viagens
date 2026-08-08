@@ -325,7 +325,7 @@
 }
 
 .prestacao-file-selection__menu {
-  background: var(--color-surface, #111d2b);
+  background: var(--color-surface, #111e2f);
   border: 1px solid var(--cv-field-border-focus, var(--color-primary));
   border-radius: 0 0 var(--radius-control, 8px) var(--radius-control, 8px);
   border-top: 0;
@@ -574,9 +574,9 @@
 
 /* Aviso de alteração no valor da diária (diário e RT) */
 .diario-diaria-alert {
-  background: color-mix(in srgb, var(--color-warning, #d9a40f) 7%, transparent);
+  background: color-mix(in srgb, var(--color-warning, #d8a21b) 7%, transparent);
   border: 0;
-  border-left: 3px solid var(--color-warning, #d9a40f);
+  border-left: 3px solid var(--color-warning, #d8a21b);
   border-radius: var(--radius-sm, 6px);
   color: var(--color-text-muted, #52657a);
   font-size: var(--font-size-sm);
@@ -630,7 +630,7 @@
 
 .cv-card-grid > .prestacao-card-group--middle,
 .cv-card-grid > .prestacao-card-group--end {
-  border-top: 1px dashed var(--color-border-soft, #d7e0ea);
+  border-top: 1px dashed var(--color-border-soft, #e3eaf2);
 }
 
 .cv-card-grid > .prestacao-card-group--start::before,

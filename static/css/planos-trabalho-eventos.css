@@ -272,7 +272,7 @@
 }
 
 .pt-resumo-box__label--accent {
-  color: var(--color-accent, #d9a40f);
+  color: var(--color-accent, #d8a21b);
 }
 
 .pt-resumo-box__value {
@@ -342,9 +342,9 @@
   display: block;
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-control, 10px);
-  background: color-mix(in srgb, var(--color-accent, #d9a40f) 8%, var(--color-card));
-  border: 1px solid color-mix(in srgb, var(--color-accent, #d9a40f) 45%, transparent);
-  color: var(--color-accent, #d9a40f);
+  background: color-mix(in srgb, var(--color-accent, #d8a21b) 8%, var(--color-card));
+  border: 1px solid color-mix(in srgb, var(--color-accent, #d8a21b) 45%, transparent);
+  color: var(--color-accent, #d8a21b);
   font-size: var(--font-size-sm, 0.85rem);
   font-weight: 700;
   line-height: 1.3;
@@ -370,8 +370,8 @@
   height: 1.6rem;
   padding: 0 var(--space-1);
   border-radius: var(--radius-control, 8px);
-  background: color-mix(in srgb, var(--color-accent, #d9a40f) 16%, transparent);
-  color: var(--color-accent, #d9a40f);
+  background: color-mix(in srgb, var(--color-accent, #d8a21b) 16%, transparent);
+  color: var(--color-accent, #d8a21b);
   font-size: var(--font-size-sm, 0.85rem);
   font-weight: 900;
 }
@@ -395,7 +395,7 @@
 .pt-resumo-atividades__list::-webkit-scrollbar { width: 6px; }
 .pt-resumo-list::-webkit-scrollbar-thumb,
 .pt-resumo-atividades__list::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--color-accent, #d9a40f) 40%, transparent);
+  background: color-mix(in srgb, var(--color-accent, #d8a21b) 40%, transparent);
   border-radius: 999px;
 }
 
@@ -452,7 +452,7 @@
   flex: 0 0 auto;
   width: 1.4rem;
   height: 1.4rem;
-  color: var(--color-accent, #d9a40f);
+  color: var(--color-accent, #d8a21b);
 }
 
 .pt-add-evento__text {
@@ -1092,7 +1092,7 @@ html[data-theme="dark"] .pt-efetivo-fields .pt-quantidade-stepper {
 
 .pt-efetivo-fields .pt-quantidade-stepper__btn:hover,
 .pt-efetivo-fields .pt-quantidade-stepper__btn:focus-visible {
-  background: color-mix(in srgb, var(--color-accent, #d9a40f) 14%, transparent);
+  background: color-mix(in srgb, var(--color-accent, #d8a21b) 14%, transparent);
   color: var(--color-accent-text, var(--color-heading));
   outline: 0;
 }

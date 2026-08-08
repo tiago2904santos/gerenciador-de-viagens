@@ -55,7 +55,7 @@
   border: 1px solid var(--color-border-soft, #e3eaf2);
   border-radius: var(--radius-control, 12px);
   overflow: hidden;
-  background: var(--color-surface-muted, #f8fafd);
+  background: var(--color-surface-muted, #ffffff);
   min-height: 200px;
 }
 

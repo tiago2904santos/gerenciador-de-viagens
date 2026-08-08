@@ -4221,3 +4221,50 @@ os treze anteriores terem passado.
 Fechada a lacuna: `scripts/audit_css_morto.py` passou a reprovar `@import` apontando para arquivo
 inexistente, e a trava foi conferida com um import falso antes de valer. Custa um segundo, contra o
 passo 14 do CI.
+
+### NOVO-50 ✅ RESOLVIDO · 🟠 `NOVO` 255 das 464 cores do sistema são duplicata perceptual de outra · MED · 1 d
+
+Primeira etapa da padronização que o dono pediu ("as cores do sistema também tudo diferente, mas o
+sistema deve ser todo padronizado").
+
+**Medido por distância perceptual, não por semelhança de texto.** `#d8a21b` e `#d9a40f` não se
+parecem como string e são a mesma cor para o olho; agrupar por prefixo hexadecimal erraria dos dois
+jeitos. A medida é **CIEDE2000** sobre Lab, com corte em ΔE 2,5 — o limiar em que um observador
+treinado começa a distinguir duas amostras lado a lado.
+
+| | |
+|---|---:|
+| valores hex distintos | **464** |
+| duplicatas perceptuais | **255** |
+| restam | **209** |
+
+Os grupos maiores: **26 brancos** em torno de `#ffffff`, **25 azuis pálidos** em torno de `#e3eaf2`,
+**16 azuis-marinho** em torno de `#132238`, **13 cinzas-azulados** em `#d4dde9`. Os três dourados da
+marca (`#d8a21b`, `#d9a40f`, `#e0a800`) viraram um.
+
+**O que NÃO foi colapsado, e é a parte que importa.** Duas cores a ΔE 1,5 podem ser ruído — ou podem
+ser a base e o `:hover` do mesmo botão. Juntar o segundo caso apagaria o feedback de interação **sem
+nenhum teste reprovar**: a página continua renderizando, só para de responder ao mouse. A regra: se
+a mesma propriedade, no mesmo seletor-base, recebe duas cores diferentes em variantes de estado,
+elas ficam. São **207 pares protegidos** assim, e três fusões deixaram de acontecer por causa deles.
+
+**O efeito visual, medido nas 88 telas** (`getComputedStyle`, 41.844 elementos):
+
+| | |
+|---|---:|
+| elementos com alguma cor diferente | 22.670 (54,2%) |
+| ΔE mediano das mudanças | **0,96** |
+| ΔE no percentil 95 | 2,23 |
+| ΔE máximo | **2,48** |
+| mudanças acima de 5 (visível a olho nu) | **0** |
+
+É larga e imperceptível: mais da metade dos elementos mudou, nenhum o suficiente para alguém notar.
+Antes/depois em imagem no corpo do PR.
+
+**Catraca:** `scripts/audit_paleta.py --max 0`, no CI. Sem ela, o próximo PR que escrever `#f8fafd`
+recria a duplicata — e ninguém vê, porque duas cores a ΔE 2 são a mesma cor na tela e valores
+diferentes no arquivo.
+
+**Fica aberto:** os 270 valores `rgb()/rgba()` não entraram nesta conta. E a consolidação de
+`--cv-*` para `--color-*` (309 variáveis), decidida pelo dono, é o próximo passo — cor e nome de
+token são coisas separadas e não viajam no mesmo PR.
