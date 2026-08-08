@@ -4402,3 +4402,39 @@ eram dois. A regra era desnecessária: o anel canônico deste sistema mora no pr
 Apagar o excesso bastava; acrescentar foi o instinto errado.
 
 **Catraca:** `audit_foco_visivel` **32 → 30**.
+
+### NOVO-53 🟠 PARCIAL · `NOVO` A maiúscula dos campos é decidida campo a campo, em dois apps de onze · HT · 1 d
+
+O dono pediu "tudo uppercase" nos campos e escolheu, entre duas opções, a que **muda o valor** —
+máscara — e não `text-transform`. A diferença é de produto: o que chega ao banco vem em maiúscula, e
+o documento gerado sai igual à tela.
+
+A regra já existia, copiada: `cadastros/forms.py:65` e `oficios/forms.py:185` fazem
+`setdefault("data-mask", "upper")` sobre todo `CharField`. Os outros nove apps não fazem.
+
+**Centralizado em `core/forms/widgets.py`**, no caminho que todo formulário estilizado já usa
+(`set_widget_style`). Cobertura medida instanciando todos os formulários dos onze apps: **30 campos
+de texto** passam a receber a máscara pelo caminho central.
+
+**As exceções não são estética, são corretude.** Uma delas obriga a lista a existir:
+
+> `username` maiusculizado faz o usuário enviar `TIAGO` contra um registro gravado `tiago`. O Django
+> compara byte a byte. **O sistema para de autenticar.**
+
+As demais seguem o mesmo princípio — maiusculizar destrói informação: senha vira outra senha; a
+parte local do e-mail é case-sensitive (RFC 5321 §2.4); caminho e query de URL são case-sensitive na
+maioria dos servidores. E `textarea` é a exceção que o próprio dono abriu.
+
+Seis testes fixam o contrato, incluindo um que confere que o **motor de JS conhece o modo `upper`** —
+sem ele, `data-mask="upper"` poderia ser espalhado pelo sistema apontando para um modo inexistente,
+e nada falharia: o atributo ficaria no HTML, inerte.
+
+**Falta, e é onde entra decisão:** **32 campos de texto** declaram o widget inline
+(`forms.TextInput(attrs={**widget_attrs(...)})`) e não passam pelo caminho central —
+`prestacoes_contas` (11), `planos_trabalho` (8), `eventos` (4), `cadastros` (3), `core` (3),
+`oficios` (2), `justificativas` (1). Cobri-los exige decidir campo a campo, porque entre eles estão
+`LoginForm.username` e `PerfilUsuarioForm.username`, que **não podem** receber a máscara.
+
+**Fica declarado o que este ID NÃO faz:** os registros já gravados continuam com a caixa que tinham.
+A máscara vale do próximo cadastro em diante. Uniformizar o histórico é migração de dados, com
+contagem por campo, e é decisão separada.
