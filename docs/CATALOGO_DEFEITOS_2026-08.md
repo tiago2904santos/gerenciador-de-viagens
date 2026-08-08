@@ -1268,10 +1268,50 @@ Com 17 queries planas e 20 cards. As outras listas ficam entre 15 e 46 ms. É co
 `PF-01` e `PF-04`; existe como **métrica de aceite** deles: abaixo de 40 ms sem subir a contagem
 de queries.
 
-### PF-06 ⚪ Queries duplicadas em duas rotas · MED · 0,5 d cada
+### PF-06 ✅ RESOLVIDO (parte) · ⚪ Queries duplicadas em duas rotas · MED · 0,5 d cada
 
 `/usuarios/` emite 2 queries idênticas repetidas; `/prestacoes-contas/`, 1. Sintoma de consulta
 refeita em camada diferente.
+
+> **Fechado em 08/08/2026 — e o pior caso não estava no enunciado.**
+>
+> Varri as **dez** rotas de lista agrupando o SQL por texto **e parâmetros**, com o `traceback` de
+> quem emitiu cada uma. O placar antes:
+>
+> | rota | repetidas | consultas a mais |
+> |---|---:|---:|
+> | **`roteiros:index`** | 5 | **11** |
+> | `eventos:index` | 1 | 1 |
+> | `ordens_servico:index` | 1 | 1 |
+> | `prestacoes_contas:index` | 1 | 1 |
+> | `usuarios:index` | 1 | 1 |
+>
+> `/usuarios/` tinha **1**, não 2. E `roteiros` — que o enunciado não cita — tinha 11.
+>
+> **`roteiros` (corrigido):** o presenter monta "Cidade/UF" com `cidade.estado.sigla`
+> (`presenters.py:19`) e o selector prefetchava só `destinos__cidade`. Cada acesso ao estado voltava
+> ao banco, e como os destinos compartilham estado o **mesmo** `SELECT` saía 3 ou 4 vezes.
+> `destinos__cidade__estado` fecha isso: a rota foi de **29 para 14 consultas**, e o teto do `PF-07`
+> desceu junto nos dois volumes.
+>
+> **`usuarios` (corrigido):** o badge da aba recontava `auth_user` depois de o `Paginator` ter
+> contado o mesmo conjunto — é a "camada diferente" do enunciado, literal. `contadores_administracao`
+> passou a aceitar a contagem já feita, e o `Paginator.count` é `cached_property`, então reaproveitar
+> não custa consulta. **Só sem busca:** com filtro os dois números divergem de propósito, e há teste
+> para isso — a inversão que reaproveita sempre reprova mostrando o badge com o número do filtro.
+>
+> **Os três de 1 consulta que ficaram**, com o mecanismo já identificado para quem retomar:
+> `usuarios` ainda repete o dropdown de área (dois formulários na mesma página montam o mesmo
+> `ModelChoiceField`); `ordens_servico` repete `auth_user` entre o `AuthenticationMiddleware` e
+> `core/tenancy.py:26`; `prestacoes_contas` repete um `COUNT` de `prestacaoservidor`
+> (`views.py:390`). Nenhum passa de 1 consulta e nenhum é do mesmo formato dos dois corrigidos.
+>
+> **Um teste meu mediu a coisa errada duas vezes**, e as duas versões estão descritas no arquivo:
+> a primeira renderizava **zero cards** (a aba padrão filtra por data futura e a fixture não tinha
+> `saida_dt`), então passava com o defeito de volta; a segunda exigia "zero consulta repetida" e
+> **reprovava a correção**, porque `destinos__estado` e `destinos__cidade__estado` são dois
+> prefetches legítimos que emitem SQL idêntico quando os ids coincidem. A asserção final é sobre
+> **crescimento**: o custo de estado não pode aumentar quando a página ganha cards.
 
 ### PF-07 ✅ RESOLVIDO · 🟠 Cinco listas nunca foram medidas com volume · MED · 3–4 d
 

@@ -34,7 +34,12 @@ def listar_roteiros(q=None, status=None):
         filter_queryset_by_area(Roteiro.objects)
         .select_related("origem_estado", "origem_cidade", "origem_cidade__estado")
         .prefetch_related(
-            "destinos__cidade",
+            # `PF-06`: `destinos__cidade__estado`, nao `destinos__cidade`. O
+            # presenter monta "Cidade/UF" com `cidade.estado.sigla`
+            # (`presenters.py:19`), e sem o nivel do estado no prefetch cada
+            # acesso volta ao banco. Medido na lista: **11 consultas a mais**
+            # por pagina, cinco estados repetidos de 3 a 4 vezes cada.
+            "destinos__cidade__estado",
             "destinos__estado",
             Prefetch("trechos", queryset=trechos_qs),
         )

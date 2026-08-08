@@ -73,11 +73,11 @@
     },
     "roteiros:index": {
       "200": {
-        "consultas": 29,
+        "consultas": 14,
         "kb_html": 98.4
       },
       "20000": {
-        "consultas": 29,
+        "consultas": 14,
         "kb_html": 98.5
       }
     },
