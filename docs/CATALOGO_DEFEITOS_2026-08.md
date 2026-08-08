@@ -1019,6 +1019,35 @@ grandeza.
 `oficio__numero=int(q)` — ganho grande, custo quase zero; (2) `pg_trgm` + índices GIN sobre
 expressão nas 4 ou 5 colunas realmente buscadas.
 
+> **Medido em 08/08/2026, e a frente (1) não se sustenta: o ganho é zero.**
+>
+> A promessa era "ganho grande, custo quase zero". Medi a rota de termos com busca numérica
+> (`?q=137`) sobre 20.000 registros em três áreas, em processo único, alternando as duas
+> implementações A-B, 6 rodadas por lado:
+>
+> | forma | mediana |
+> |---|---:|
+> | `oficio__numero__icontains=q` (como está) | 1.836,5 ms |
+> | `oficio__numero=int(q)` quando `q` é dígito | 1.870,5 ms |
+> | | **0,98×** |
+>
+> Indistinguível de ruído. O motivo é estrutural: a mesma consulta tem **12** `unaccent__icontains`
+> sobre colunas de texto, e todas varrem sequencialmente. Tirar o cast de **uma** coluna inteira não
+> muda o plano — o custo já está pago pelos outros doze. Para comparação, a mesma rota **sem busca**
+> responde em ~230 ms; a busca acrescenta ~1,6 s, e não é o inteiro que a paga.
+>
+> **A frente (1) não foi aplicada.** Ela continua defensável como **semântica** — hoje buscar "1"
+> casa com o ofício 100 — mas isso é mudança de comportamento visível ao usuário, e fazê-la em nome
+> de um ganho que a medição diz não existir seria trocar o comportamento por nada. Se for feita,
+> que seja como correção de busca, com esse enunciado.
+>
+> **Correção de escopo:** `roteiros/selectors.py:83` (`quantidade_diarias__icontains`) parece o mesmo
+> defeito e **não é** — `quantidade_diarias` é `CharField` (`roteiros/models.py:80`), então ali não
+> há cast. Os únicos sites de `icontains` sobre coluna inteira são `termos/selectors.py:115` e `:126`.
+>
+> **A frente (2) é a que paga, e está bloqueada** na confirmação de privilégio para
+> `CREATE EXTENSION pg_trgm` no banco de produção.
+
 ### DB-12 ✅ RESOLVIDO (parte do índice) · 🟡 Trilha de auditoria cresce sem limite e encarece toda escrita · AUD · 3 d
 
 `core/audit.py:154-159` conecta `pre_save`/`post_save`/`pre_delete` globalmente para 11 apps.
