@@ -4668,3 +4668,46 @@ vira espelho", como se fosse reorganização de token. Não é. Espelhar signifi
 ao tema claro**, o que muda a aparência de todas as 44 telas no modo claro — fonte, tamanho de texto,
 raio, borda e largura da barra lateral. É trabalho de desenho, não de arrumação, e precisa da decisão
 do dono antes da primeira linha de CSS.
+
+### NOVO-59 ✅ RESOLVIDO · 🔴 `NOVO` Todo ícone de botão é invisível no tema claro, no sistema inteiro · UI · 0,25 d
+
+Primeiro recorte do `NOVO-58`, e o único que **não é redesenho: é defeito**. Por isso vem antes de
+qualquer decisão de desenho — não depende de escolher nada.
+
+`.cv-icon` é um `<svg>` sem `width`/`height` no atributo, e `.cv-btn__icon` nunca teve regra base.
+Quem dava tamanho ao ícone dentro de botão era esta regra, em `theme-dark-components.css:5240`:
+
+```css
+/* Ícones dentro de botões: tamanho e alinhamento consistentes. */
+:is(html[data-theme="dark"]) .cv-btn__icon .cv-icon { … }
+```
+
+O comentário promete consistência; o seletor entrega num tema só. **Sem ninguém dizer o tamanho, o
+SVG colapsa.** No claro, o ícone de "Limpar filtros" mede `0×0`; no escuro, `17×17`. Não é ícone
+diferente entre os temas — é ícone que **não aparece** no claro, em botão nenhum do sistema.
+
+**Correção:** a regra sai do arquivo de tema e vai para `cv-buttons.css`, sem escopo de tema, com
+`:where()` para especificidade zero — mesma razão do `field.css` (`NOVO-54`): base vale onde ninguém
+disse nada e perde para contexto que diga, e existem contextos que dimensionam este ícone por conta
+própria (`list-header.css:1029`, `action-system.css:340`). O token `--cv-btn-icon-size: 17px` já
+morava no `:root` do `tokens.css`, então não foi preciso mover nada de valor.
+
+**Medido nas 88 telas (44 rotas × 2 temas), `getComputedStyle`:**
+
+| | claro antes | claro depois | escuro antes | escuro depois |
+|---|---|---|---|---|
+| `.cv-icon` com caixa | 103 | **176** | 176 | 176 |
+| `.cv-icon` em `0×0` | 323 | **250** | 250 | 250 |
+
+**O claro passou a ser idêntico ao escuro.** Dos 41.950 elementos, 847 mudaram — **todos no tema
+claro, zero no escuro**, que é o resultado que a mudança tinha que ter: mover a regra não podia
+alterar o tema que já a tinha.
+
+Os 250 que continuam em `0×0` **não são defeito e existem igualmente nos dois temas**: conferido com
+`checkVisibility()` em 5 rotas, são **39 ícones dentro de ancestral oculto** (diálogo fechado, menu
+não aberto) e **0 ícones visíveis sem caixa**. Elemento escondido não tem caixa; isso é o navegador
+funcionando.
+
+**O que não entra aqui:** as outras 850 decisões divergentes do `NOVO-58` (fonte do sistema,
+`font-size`, raio, borda, largura da barra lateral). Aquilo é aplicar um redesenho ao tema claro e
+muda a aparência de todas as telas — precisa da decisão do dono, e este PR não a antecipa.
