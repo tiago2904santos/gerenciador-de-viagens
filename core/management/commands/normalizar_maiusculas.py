@@ -26,9 +26,32 @@ O preço é que formulário que não instancia sem argumento não pode ser
 inspecionado. O comando **conta e nomeia** esses casos em vez de ignorá-los em
 silêncio — um inventário que omite o que não conseguiu ler é pior que nenhum.
 
+## Por que a maiúscula é calculada em Python, e não com `UPPER()` do banco
+
+Quem define o que é "maiúscula" neste sistema não é o PostgreSQL: é o
+`toUpperCase()` do navegador, que a máscara aplica enquanto o usuário digita.
+A migração existe para deixar o histórico igual ao que a máscara produziria —
+então ela tem que usar a mesma definição, não uma parecida.
+
+A primeira versão usava `Upper()` do Django, que vira `UPPER()` no SQL. Isso
+delega a regra ao banco, e a regra do banco depende do `LC_CTYPE` dele. A suíte
+mostrou o problema em uma linha: em SQLite, `UPPER('Reunião')` devolve
+`'REUNIãO'` — maiúsculo só no ASCII. O resultado seria um campo em caixa
+**mista**, pior que o estado que a migração veio corrigir, e num sistema em
+português quase todo nome tem acento.
+
+Em PostgreSQL com locale UTF-8 o acento sai certo, e é por isso que o defeito
+não apareceu no banco de desenvolvimento. Mas "certo desde que o servidor esteja
+com o locale certo" não é garantia que se queira num `UPDATE` irreversível sobre
+a base inteira.
+
+`str.upper()` do Python segue o mesmo mapeamento Unicode que o `toUpperCase()`
+do JavaScript. A comparação que decide o que diverge usa a mesma função, então
+contagem e escrita concordam entre si e com a tela.
+
 ## Por que a colisão é decidida pelo banco
 
-`Upper()` sobre uma coluna única pode juntar duas linhas numa chave só:
+Passar tudo para maiúscula numa coluna única pode juntar duas linhas numa chave só:
 "Reunião" e "REUNIÃO" convivem hoje e não convivem depois.
 
 A tentação era procurar esses pares em Python, agrupando por valor. Isso
@@ -56,7 +79,6 @@ from django.core.management.base import BaseCommand
 from django.db import IntegrityError
 from django.db import models
 from django.db import transaction
-from django.db.models.functions import Upper
 
 from core.forms.widgets import NOMES_SEM_MAIUSCULA
 
@@ -164,21 +186,32 @@ class Command(BaseCommand):
         """Modelo com exclusão lógica esconde linhas do gerenciador padrão."""
         return getattr(modelo, "all_objects", modelo._default_manager)
 
-    def _aplicar(self, modelo, campo: str, ids: list) -> tuple[int, str]:
-        """Roda o `UPDATE` num savepoint. Devolve (linhas, erro)."""
+    def _divergentes(self, gerenciador, campo: str) -> list[tuple]:
+        """(pk, valor em maiúscula) das linhas que não estão em maiúscula.
+
+        A comparação é em Python, e isso não é detalhe de implementação.
+        """
+        divergentes = []
+        for pk, valor in gerenciador.values_list("pk", campo):
+            if not valor:
+                continue
+            alto = str(valor).upper()
+            if alto != valor:
+                divergentes.append((pk, alto))
+        return divergentes
+
+    def _aplicar(self, modelo, campo: str, divergentes: list[tuple]) -> tuple[int, str]:
+        """Grava num savepoint. Devolve (linhas, erro)."""
+        objetos = [modelo(pk=pk, **{campo: valor}) for pk, valor in divergentes]
         try:
             with transaction.atomic():
-                afetadas = (
-                    self._gerenciador(modelo)
-                    .filter(pk__in=ids)
-                    # `update` e não `save()`: o `auto_now` de `atualizado_em`
-                    # marcaria toda a base com a data da migração, e mudar a
-                    # caixa não é edição de conteúdo feita por ninguém.
-                    .update(**{campo: Upper(campo)})
-                )
+                # `bulk_update` e não `save()`: o `auto_now` de `atualizado_em`
+                # marcaria toda a base com a data da migração, e mudar a caixa
+                # não é edição de conteúdo feita por ninguém.
+                self._gerenciador(modelo).bulk_update(objetos, [campo], batch_size=500)
         except IntegrityError as erro:
             return 0, " ".join(str(erro).split())
-        return afetadas, ""
+        return len(objetos), ""
 
     def handle(self, *args, **options):
         pares, origens, nao_lidos, reservados = self._campos_com_mascara()
@@ -252,12 +285,7 @@ class Command(BaseCommand):
             modelo = apps.get_model(label)
             gerenciador = self._gerenciador(modelo)
             linhas = gerenciador.count()
-            divergentes = list(
-                gerenciador.exclude(**{f"{campo}__isnull": True})
-                .exclude(**{campo: ""})
-                .exclude(**{campo: Upper(campo)})
-                .values_list("pk", flat=True),
-            )
+            divergentes = self._divergentes(gerenciador, campo)
             total_linhas += linhas
             total_divergem += len(divergentes)
 
