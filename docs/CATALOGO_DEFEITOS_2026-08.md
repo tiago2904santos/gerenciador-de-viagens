@@ -4368,3 +4368,37 @@ mesmos `12px` escritos duas vezes.
 (`static/css/components/summary-items.css:74`): lá o foco é sinalizado pela borda do controle. Eu
 tinha aberto isso como possível falha de acessibilidade e estava errado. Vira decisão quando o
 escuro virar a base.
+
+### NOVO-52 ✅ RESOLVIDO · 🔴 `NOVO` O editor de roteiro não tem foco visível em campo nenhum, nos dois temas · HT · 0,25 d
+
+`static/css/roteiros.css` tinha **dois blocos** com `outline: none !important` mirando 16 classes de
+campo dentro de `.oficio-roteiro-body`. Eles vencem o piso de acessibilidade do `base.css:111` — que
+é `!important` mas perde por ordem de cascata — e apagam o foco de teclado do editor inteiro.
+
+**Medido por navegação de teclado real**, não por leitura de CSS:
+
+| rota | campos alcançados por Tab | com anel de foco |
+|---|---:|---:|
+| `/roteiros/novo/` | 9 | **0** |
+| `/cadastros/configuracao/` | 9 | 9 |
+| `/termos/novo/` | 6 | 6 |
+
+As duas últimas são o controle que prova que a medição funciona. E a verificação foi feita na
+**árvore inteira de ancestrais**: não havia anel em nível nenhum, e a borda do controle é
+transparente — o campo não dava sinal nenhum de estar focado, nos dois temas.
+
+**A intenção dos blocos era legítima**: `:focus-within` casa o container **e** o campo, então sem
+cuidado aparecem dois anéis concêntricos. Mas desligar os dois em toda parte troca um problema
+cosmético por um de acessibilidade.
+
+**Resolvido em 08/08:** os dois blocos apagados, 67 linhas, **sem CSS novo**. O piso do `base.css`
+passa a valer, e é ele que já acende o anel nas telas que funcionavam — ou seja, o editor voltou ao
+comportamento padrão do sistema em vez de ganhar um comportamento próprio.
+
+**Uma tentativa minha que estava errada, registrada porque ensina.** Antes de chegar aqui eu
+adicionei uma regra global de `:focus-within` no container do picker. Ela produziu **anel duplo** —
+confirmado por print, não por medição booleana, que dizia "tem anel" nos dois níveis sem dizer que
+eram dois. A regra era desnecessária: o anel canônico deste sistema mora no próprio controle.
+Apagar o excesso bastava; acrescentar foi o instinto errado.
+
+**Catraca:** `audit_foco_visivel` **32 → 30**.

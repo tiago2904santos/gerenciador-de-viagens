@@ -2653,76 +2653,9 @@ html[data-theme="light"] .roteiro-editor--avulso .roteiro-editor__reference-bloc
   --field-border-focus: var(--field-border, var(--color-border, transparent));
 }
 
-[data-travel-document-wizard-roteiro] .oficio-roteiro-body :is(:focus, :focus-visible),
-.roteiro-editor--oficio .oficio-roteiro-body :is(:focus, :focus-visible),
-[data-travel-document-wizard-roteiro] .oficio-roteiro-body :is(:focus, :focus-visible)::before,
-.roteiro-editor--oficio .oficio-roteiro-body :is(:focus, :focus-visible)::before,
-[data-travel-document-wizard-roteiro] .oficio-roteiro-body :is(:focus, :focus-visible)::after,
-.roteiro-editor--oficio .oficio-roteiro-body :is(:focus, :focus-visible)::after {
-  outline: none !important;
-  outline-offset: 0 !important;
-  box-shadow: none !important;
-}
-
-/* Contêineres que pintam anel via :focus-within (picker, select, date, choice) */
-[data-travel-document-wizard-roteiro] .oficio-roteiro-body :is(
-  .app-multiselect__control,
-  .cv-composite-field,
-  .cv-composite-field__control,
-  .cv-custom-select,
-  .cv-custom-select__trigger,
-  .cv-date-picker,
-  .cv-date-picker__control,
-  .cv-field__control,
-  .cv-file-picker,
-  .cv-filter-bar__search,
-  .cv-multiselect__control,
-  .cv-search-picker__control,
-  .cv-search-picker__field,
-  .cv-select-wrapper,
-  .form-control,
-  .roteiro-editor__choice-card
-):focus-within,
-.roteiro-editor--oficio .oficio-roteiro-body :is(
-  .app-multiselect__control,
-  .cv-composite-field,
-  .cv-composite-field__control,
-  .cv-custom-select,
-  .cv-custom-select__trigger,
-  .cv-date-picker,
-  .cv-date-picker__control,
-  .cv-field__control,
-  .cv-file-picker,
-  .cv-filter-bar__search,
-  .cv-multiselect__control,
-  .cv-search-picker__control,
-  .cv-search-picker__field,
-  .cv-select-wrapper,
-  .form-control,
-  .roteiro-editor__choice-card
-):focus-within,
-[data-travel-document-wizard-roteiro] .oficio-roteiro-body .cv-search-picker__field:focus-within .cv-search-picker__control,
-.roteiro-editor--oficio .oficio-roteiro-body .cv-search-picker__field:focus-within .cv-search-picker__control,
-[data-travel-document-wizard-roteiro] .oficio-roteiro-body .cv-select-wrapper:focus-within::after,
-.roteiro-editor--oficio .oficio-roteiro-body .cv-select-wrapper:focus-within::after {
-  outline: none !important;
-  outline-offset: 0 !important;
-  box-shadow: none !important;
-}
-
 [data-travel-document-wizard-roteiro] .oficio-roteiro-body .roteiro-editor__choice-card:focus-within,
 .roteiro-editor--oficio .oficio-roteiro-body .roteiro-editor__choice-card:focus-within {
   border-color: var(--route-card-inner-border, var(--color-border)) !important;
-}
-
-/* Sobrescreve o focus canônico do dark-redesign neste escopo */
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .oficio-roteiro-body :is(button, a, input, select, textarea, [tabindex]):focus-visible,
-:is(html[data-theme="dark"])
-  .roteiro-editor--oficio .oficio-roteiro-body :is(button, a, input, select, textarea, [tabindex]):focus-visible {
-  outline: none !important;
-  outline-offset: 0 !important;
-  box-shadow: none !important;
 }
 
 /* ========================================================================
