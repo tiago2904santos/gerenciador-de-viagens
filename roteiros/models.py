@@ -153,6 +153,14 @@ class Roteiro(CancelavelModel):
     class Meta:
         default_manager_name = "all_objects"
         ordering = ["-created_at"]
+        # `DB-09`: a lista ordena por `-updated_at`, nao pelo `ordering` acima.
+        # Este indice **so paga depois** que a agregacao saiu do caminho: medido
+        # com ela no lugar, o ganho era 1,0x (o `GroupAggregate` dominava e o
+        # `Sort` era troco); sem ela, 27,0 ms -> 8,9 ms. Foi por isso que o
+        # `DB-10` mediu "roteiros nao ganha" e nao criou o indice la.
+        indexes = [
+            models.Index(fields=["area", "-updated_at"], name="roteiro_area_updated_idx"),
+        ]
         verbose_name = "Roteiro"
         verbose_name_plural = "Roteiros"
         constraints = [

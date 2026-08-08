@@ -345,7 +345,10 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       medição e **travado nos dois sentidos** por teste, que é o que impede de apodrecer de novo
 
 ### Fase 5 — Consulta e índice
-- [ ] `DB-09` lista de roteiros agrega antes do `LIMIT`
+- [x] `DB-09` lista de roteiros agrega antes do `LIMIT` — `~Exists()` no lugar de
+      `Count` + `.exclude(...=0)`, **junto** com o índice `(area, -updated_at)`: separados dão
+      2,9× e 1,0×, juntos 8,9× na consulta e **1,54× na rota** (975,8 → 633,2 ms). O `LIMIT`
+      não curto-circuita como o enunciado previa; quem sai é o `GroupAggregate`
 - [x] `DB-10` índice composto para a ordenação real das listas — **um índice, não cinco**.
       Das cinco listas que ordenavam em memória, só `OrdemServico` ganha (64× na consulta,
       1,08× na rota); nas outras quatro o índice análogo não move o tempo e em `roteiros`
