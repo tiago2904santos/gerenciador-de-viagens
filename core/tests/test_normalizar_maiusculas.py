@@ -106,6 +106,28 @@ class NormalizarMaiusculasTests(TestCase):
         tipo.refresh_from_db()
         self.assertEqual(tipo.nome, "REUNIÃO TÉCNICA")
 
+    def test_acento_sobe_junto_com_a_letra(self):
+        """O que trocou `Upper()` do SQL por `str.upper()` do Python.
+
+        A primeira versão delegava a maiúscula ao banco. A regra do banco
+        depende do `LC_CTYPE` dele: em SQLite, `UPPER('Reunião')` devolve
+        `'REUNIãO'` — maiúsculo só no ASCII. Num sistema em português quase todo
+        nome tem acento, e o resultado seria caixa mista, pior que o estado que
+        a migração veio corrigir.
+
+        Quem define "maiúscula" aqui é o `toUpperCase()` do navegador, que a
+        máscara aplica ao digitar. `str.upper()` segue o mesmo mapeamento
+        Unicode; `UPPER()` do SQL não necessariamente.
+        """
+        acentos = "ãáâàéêíóôõúüç"
+        tipo = TipoEvento.objects.create(area=self.area, nome=acentos)
+
+        rodar("--commit")
+
+        tipo.refresh_from_db()
+        self.assertEqual(tipo.nome, acentos.upper())
+        self.assertEqual(tipo.nome, "ÃÁÂÀÉÊÍÓÔÕÚÜÇ")
+
     def test_commit_nao_toca_no_que_ja_esta_em_maiuscula(self):
         tipo = TipoEvento.objects.create(area=self.area, nome="JÁ ESTÁ ASSIM")
         antes = tipo.atualizado_em if hasattr(tipo, "atualizado_em") else None

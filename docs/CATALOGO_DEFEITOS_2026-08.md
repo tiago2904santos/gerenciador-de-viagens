@@ -4559,6 +4559,25 @@ natureza: "São Paulo" vira "SÃO PAULO" e não volta sem backup.
 do formulário. Campo que ganhar `text_attrs` amanhã entra no relatório sem ninguém editar o arquivo;
 campo que sair da máscara some dele. Foi essa escolha que expôs o `NOVO-56`.
 
+**Um defeito meu, achado pela suíte, e ele era sério.** A primeira versão usava `Upper()` do Django,
+que vira `UPPER()` no SQL. Isso delega ao banco a definição de "maiúscula" — e quem define isso neste
+sistema não é o PostgreSQL, é o `toUpperCase()` do navegador, que a máscara aplica ao digitar. A
+suíte mostrou em uma linha: em SQLite, `UPPER('Reunião')` devolve `'REUNIãO'`, maiúsculo só no
+ASCII. Num sistema em português quase todo nome tem acento, e o resultado seria caixa **mista** —
+pior que o estado que a migração veio corrigir, e irreversível.
+
+Em PostgreSQL com locale UTF-8 o acento sai certo, e é exatamente por isso que não apareceu em
+desenvolvimento: lá os dois caminhos concordam. "Certo desde que o servidor esteja com o locale
+certo" não é garantia aceitável num `UPDATE` sobre a base inteira. Agora a maiúscula e a comparação
+que decide o que diverge usam `str.upper()`, que segue o mesmo mapeamento Unicode do JavaScript. A
+escrita é `bulk_update`, que também não dispara `auto_now`.
+
+**Só encontrei porque errei antes.** Rodei a suíte com `config.settings.dev` em vez do
+`config.settings.test` que o `AGENTS.md` §7 manda — e `dev` liga o limitador de login, que devolveu
+403 em 10 testes de `usuarios.tests.test_admin_page` (reproduzidos na `main` intocada, então não eram
+regressão). Ao repetir com as configurações certas, a suíte caiu em SQLite, e foi o SQLite que expôs
+o defeito do acento. O gate correto pegou o que o gate errado escondia.
+
 **A colisão de unicidade quem decide é o banco.** "Reunião" e "REUNIÃO" convivem hoje e não convivem
 em maiúscula. Agrupar por valor em Python reimplementaria a semântica de unicidade — e ela não é
 simples: `TipoEvento` tem duas `UniqueConstraint` com `condition`, uma só para linhas sem área e
