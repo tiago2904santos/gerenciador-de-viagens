@@ -26,29 +26,16 @@
   --cv-select-gap:            var(--space-2);
 
   /* Colors — adapts to theme via tokens */
-  --cv-select-bg:             var(--color-surface);
   --cv-select-border:         var(--color-border-strong);
-  --cv-select-border-hover:   var(--color-secondary);
   --cv-select-border-focus:   var(--color-primary);
-  --cv-select-color:          var(--color-text);
-  --cv-select-placeholder:    var(--color-subtle);
-  --cv-select-icon-color:     var(--color-muted);
   --cv-select-shadow:         var(--shadow-xs);
   --cv-select-focus-ring:     0 0 0 3px color-mix(in srgb, var(--color-primary) 18%, transparent);
 
   /* Disabled */
-  --cv-select-disabled-bg:    var(--color-surface-muted);
-  --cv-select-disabled-color: var(--color-muted);
-  --cv-select-disabled-border:var(--color-border);
 
   /* Error / Success */
-  --cv-select-error-border:   var(--color-danger);
-  --cv-select-error-ring:     0 0 0 3px color-mix(in srgb, var(--color-danger) 18%, transparent);
-  --cv-select-success-border: var(--color-success);
-  --cv-select-success-ring:   0 0 0 3px color-mix(in srgb, var(--color-success) 18%, transparent);
 
   /* Dropdown menu */
-  --cv-dropdown-menu-bg:      var(--color-surface);
   --cv-dropdown-menu-border:  var(--color-border-strong);
   --cv-dropdown-menu-shadow:  var(--shadow-lg);
   --cv-dropdown-menu-radius:  var(--radius-control);
@@ -56,15 +43,8 @@
   --cv-dropdown-max-height:   280px;
   --cv-dropdown-item-height:  40px;
   --cv-dropdown-item-px:      var(--space-3);
-  --cv-dropdown-item-hover:   var(--color-primary-soft);
-  --cv-dropdown-item-active:  var(--color-primary-soft);
-  --cv-dropdown-item-active-color: var(--color-primary-strong);
-  --cv-dropdown-item-danger-color: var(--color-danger);
-  --cv-dropdown-item-danger-hover: color-mix(in srgb, var(--color-danger) 8%, transparent);
-  --cv-dropdown-separator:    var(--color-border);
 
   /* Action button dropdown trigger */
-  --cv-action-dropdown-trigger-radius: var(--radius-pill);
 }
 
 /* =========================================================
@@ -72,14 +52,7 @@
    ========================================================= */
 
 html[data-theme="dark"] {
-  --cv-select-bg:             var(--theme-surface-card);
   --cv-select-border:         var(--theme-border-card);
-  --cv-select-border-hover:   var(--color-secondary);
-  --cv-select-color:          var(--theme-text-body);
-  --cv-select-placeholder:    var(--theme-text-muted);
-  --cv-select-icon-color:     var(--theme-text-muted);
-  --cv-select-disabled-bg:    color-mix(in srgb, var(--theme-surface-card) 70%, transparent);
-  --cv-dropdown-menu-bg:      var(--theme-surface-card);
   --cv-dropdown-menu-border:  var(--theme-border-card);
 }
 
@@ -88,9 +61,7 @@ html[data-theme="dark"] {
    ========================================================= */
 
 html[data-theme="light"] {
-  --cv-select-bg:             var(--color-surface);
   --cv-select-border:         var(--color-border-strong);
-  --cv-dropdown-menu-bg:      var(--color-surface);
   --cv-dropdown-menu-border:  var(--color-border-strong);
 }
 
@@ -110,12 +81,12 @@ html[data-theme="light"] {
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2352657a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")
     no-repeat right var(--space-3) center / 16px 16px,
-    var(--cv-select-bg);
+    var(--color-card);
   border: 1px solid var(--cv-select-border);
   border-radius: var(--cv-select-radius);
   box-shadow: var(--cv-select-shadow);
   box-sizing: border-box;
-  color: var(--cv-select-color);
+  color: var(--color-text);
   cursor: pointer;
   font-family: inherit;
   font-size: var(--cv-select-font-size);
@@ -146,7 +117,7 @@ html[data-theme="light"] {
 /* Menu flutuante */
 .cv-action-dropdown__menu {
   animation: cv-dropdown-enter 160ms ease both;
-  background: var(--cv-dropdown-menu-bg);
+  background: var(--color-card);
   border: 1px solid var(--cv-dropdown-menu-border);
   border-radius: var(--cv-dropdown-menu-radius);
   box-shadow: var(--cv-dropdown-menu-shadow);
@@ -200,12 +171,12 @@ html[data-theme="light"] {
 
 .cv-filter-dropdown__trigger {
   align-items: center;
-  background: var(--cv-select-bg);
+  background: var(--color-card);
   border: 1px solid var(--cv-select-border);
   border-radius: var(--radius-pill);
   box-shadow: var(--cv-select-shadow);
   box-sizing: border-box;
-  color: var(--cv-select-color);
+  color: var(--color-text);
   cursor: pointer;
   display: inline-flex;
   font-family: inherit;
@@ -222,7 +193,7 @@ html[data-theme="light"] {
 }
 
 .cv-filter-dropdown__trigger:hover:not(:disabled) {
-  border-color: var(--cv-select-border-hover);
+  border-color: var(--color-secondary);
 }
 
 .cv-filter-dropdown__trigger:focus-visible,
@@ -262,12 +233,12 @@ html[data-theme="light"] {
 }
 
 .cv-filter-dropdown__option:hover {
-  background: var(--cv-dropdown-item-hover);
+  background: var(--color-primary-soft);
 }
 
 .cv-filter-dropdown__option--selected {
-  background: var(--cv-dropdown-item-active);
-  color: var(--cv-dropdown-item-active-color);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
   font-weight: var(--font-weight-semibold);
 }
 
@@ -303,49 +274,33 @@ html[data-theme="light"] {
   --cv-field-label-weight: var(--font-weight-semibold);
   --cv-field-bg: var(--theme-input-bg, var(--color-input-bg));
   --cv-field-bg-hover: var(--theme-surface-card);
-  --cv-field-color: var(--theme-input-text);
   --cv-field-border: var(--theme-input-border);
   --cv-field-border-hover: var(--color-border-strong);
   --cv-field-border-focus: var(--route-button-primary-border);
   --cv-field-shadow: var(--shadow-xs);
   --cv-field-shadow-focus: 0 0 0 var(--space-1) var(--cv-field-focus-ring), var(--shadow-xs);
   --cv-field-placeholder: var(--color-input-placeholder);
-  --cv-field-focus-border: var(--route-button-primary-border);
   --cv-field-focus-ring: var(--route-focus-ring);
   --cv-field-error: var(--color-danger);
   --cv-field-error-bg: var(--color-danger-soft);
   --cv-field-error-border: var(--color-danger-border-strong);
   --cv-field-error-shadow: 0 0 0 var(--space-1) var(--color-danger-border-soft), var(--shadow-xs);
-  --cv-field-success: var(--color-success);
-  --cv-field-success-shadow: 0 0 0 var(--space-1) var(--color-success-soft), var(--shadow-xs);
   --cv-field-disabled-bg: var(--color-input-disabled-bg);
   --cv-field-readonly-bg: var(--route-field-disabled-bg);
-  --cv-field-help-color: var(--color-help);
-  --cv-field-grid-gap: var(--space-4);
-  --cv-field-section-gap: var(--space-4);
-  --cv-select-bg: var(--cv-field-bg);
   --cv-select-bg-hover: var(--cv-field-bg-hover);
   --cv-select-border: var(--cv-field-border);
-  --cv-select-border-hover: var(--cv-field-border-hover);
   --cv-select-border-focus: var(--cv-field-border-focus);
-  --cv-select-chevron: var(--cv-field-placeholder);
   --cv-select-shadow: var(--shadow-xs);
   --cv-select-focus-shadow: var(--cv-field-shadow-focus);
   --cv-select-error-shadow: var(--cv-field-error-shadow);
   --cv-chip-bg: var(--color-primary-soft);
-  --cv-chip-bg-hover: var(--theme-list-row-hover);
   --cv-chip-border: var(--color-info-border-strong);
   --cv-chip-color: var(--color-primary-strong);
-  --cv-chip-remove-bg-hover: var(--color-danger-soft);
-  --cv-chip-remove-color: var(--theme-text-muted);
   --cv-dropdown-bg: var(--theme-surface-card);
   --cv-dropdown-border: var(--theme-border-card);
-  --cv-dropdown-shadow: var(--shadow-soft);
   --cv-option-hover-bg: var(--theme-list-row-hover);
   --cv-option-selected-bg: var(--color-primary-soft);
-  --cv-option-selected-border: var(--color-info-border-strong);
   --cv-option-marker-bg: var(--color-primary);
-  --cv-option-marker-color: var(--color-white);
   --cv-cs-trigger-shadow: var(--shadow-sm);
   --cv-cs-chevron-color: var(--theme-text-muted);
   --cv-cs-value-weight: var(--font-weight-medium);
@@ -358,7 +313,6 @@ html[data-theme="light"] {
   --cv-cs-option-selected-color: var(--color-primary);
   --cv-cs-option-selected-weight: var(--font-weight-semibold);
   --cv-cs-option-check-color: var(--cv-option-marker-bg);
-  --cv-cs-option-padding-x: var(--space-4);
   --cv-cs-z-index: 200;
 }
 
@@ -369,7 +323,6 @@ html[data-theme="dark"] {
   --cv-chip-border: var(--color-info-border);
   --cv-chip-color: var(--color-info-text);
   --cv-option-selected-bg: var(--color-info-bg);
-  --cv-option-selected-border: var(--color-info-border);
   --cv-cs-trigger-shadow: none;
   --cv-cs-option-selected-color: var(--color-info-text);
 }
@@ -433,13 +386,13 @@ html[data-theme="dark"] {
 .cv-custom-select__trigger {
   align-items: center;
   background:
-    linear-gradient(var(--cv-select-bg), var(--cv-select-bg)) padding-box,
+    linear-gradient(var(--color-card), var(--color-card)) padding-box,
     linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
   border: 1px solid transparent;
   border-radius: var(--cv-field-radius);
   box-shadow: var(--cv-cs-trigger-shadow);
   box-sizing: border-box;
-  color: var(--cv-field-color);
+  color: var(--color-input-text);
   cursor: pointer;
   display: flex;
   font-family: inherit;

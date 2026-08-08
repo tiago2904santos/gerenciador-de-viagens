@@ -9,16 +9,13 @@
   --cv-sp-field-bg: var(--theme-input-bg, var(--color-input-bg));
   --cv-sp-field-bg-soft: var(--theme-surface-card-soft, var(--color-card-soft));
   --cv-sp-field-border: var(--theme-input-border, var(--color-input-border));
-  --cv-sp-field-border-hover: var(--color-border-strong);
   --cv-sp-field-border-focus: var(--route-button-primary-border, var(--color-secondary));
   --cv-sp-field-text: var(--theme-input-text, var(--color-input-text));
-  --cv-sp-field-placeholder: var(--color-input-placeholder);
   --cv-sp-field-focus-ring: var(--route-focus-ring, var(--color-info-border));
   --cv-sp-dropdown-bg: var(--theme-surface-card, var(--color-card));
   --cv-sp-dropdown-border: var(--cv-sp-field-border-focus);
   --cv-sp-dropdown-shadow: var(--shadow-panel);
   --cv-sp-dropdown-option-hover: var(--theme-list-row-hover, var(--color-primary-soft));
-  --cv-sp-dropdown-option-selected: var(--color-info-bg);
   --cv-sp-selected-panel-bg: var(--theme-surface-card-soft, var(--color-card-soft));
   --cv-sp-selected-panel-border: var(--theme-border-card, var(--color-border));
   --cv-sp-selected-card-bg: var(--theme-surface-card, var(--color-card));
@@ -31,16 +28,16 @@
   --field-bg: var(--cv-sp-field-bg);
   --field-bg-soft: var(--cv-sp-field-bg-soft);
   --field-border: var(--cv-sp-field-border);
-  --field-border-hover: var(--cv-sp-field-border-hover);
+  --field-border-hover: var(--color-border-strong);
   --field-border-focus: var(--cv-sp-field-border-focus);
   --field-text: var(--cv-sp-field-text);
-  --field-placeholder: var(--cv-sp-field-placeholder);
+  --field-placeholder: var(--color-input-placeholder);
   --field-focus-ring: var(--cv-sp-field-focus-ring);
   --dropdown-bg: var(--cv-sp-dropdown-bg);
   --dropdown-border: var(--cv-sp-dropdown-border);
   --dropdown-shadow: var(--cv-sp-dropdown-shadow);
   --dropdown-option-hover: var(--cv-sp-dropdown-option-hover);
-  --dropdown-option-selected: var(--cv-sp-dropdown-option-selected);
+  --dropdown-option-selected: var(--color-info-bg);
   --selected-panel-bg: var(--cv-sp-selected-panel-bg);
   --selected-panel-border: var(--cv-sp-selected-panel-border);
   --selected-card-bg: var(--cv-sp-selected-card-bg);
@@ -56,7 +53,7 @@
   --danger-text: var(--state-danger-text-active);
   --remove-rail-width: calc(var(--space-10) + var(--space-2));
   --selected-card-open-gap: var(--space-2);
-  --driver-bg: var(--cv-btn-secondary-active-bg, var(--color-primary-soft));
+  --driver-bg: var(--color-bg-subtle, var(--color-primary-soft));
   --driver-border: var(--cv-btn-secondary-active-border, var(--color-primary));
   --driver-text: var(--cv-btn-secondary-active-color, var(--color-primary-strong));
   --cv-search-picker-height: var(--control-height-md);
@@ -103,16 +100,16 @@
   --field-bg: var(--cv-sp-field-bg);
   --field-bg-soft: var(--cv-sp-field-bg-soft);
   --field-border: var(--cv-sp-field-border);
-  --field-border-hover: var(--cv-sp-field-border-hover);
+  --field-border-hover: var(--color-border-strong);
   --field-border-focus: var(--cv-sp-field-border-focus);
   --field-text: var(--cv-sp-field-text);
-  --field-placeholder: var(--cv-sp-field-placeholder);
+  --field-placeholder: var(--color-input-placeholder);
   --field-focus-ring: var(--cv-sp-field-focus-ring);
   --dropdown-bg: var(--cv-sp-dropdown-bg);
   --dropdown-border: var(--cv-sp-dropdown-border);
   --dropdown-shadow: var(--cv-sp-dropdown-shadow);
   --dropdown-option-hover: var(--cv-sp-dropdown-option-hover);
-  --dropdown-option-selected: var(--cv-sp-dropdown-option-selected);
+  --dropdown-option-selected: var(--color-info-bg);
   --cv-search-picker-radius: var(--cv-sp-radius);
 }
 

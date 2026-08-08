@@ -52,7 +52,7 @@
 /* Tile de métrica — card de dashboard/resumo */
 .cv-metric--tile,
 .cv-summary-tile {
-  background: var(--cv-card-bg);
+  background: var(--color-card);
   border: var(--cv-card-border);
   border-radius: var(--cv-card-radius);
   box-shadow: var(--cv-card-shadow);

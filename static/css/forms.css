@@ -683,7 +683,7 @@ html[data-theme="dark"] input[type="checkbox"] {
   --field-border: var(--cv-field-border);
   --field-border-hover: var(--cv-field-border-hover);
   --field-border-focus: var(--cv-field-border-focus);
-  --field-text: var(--cv-field-color);
+  --field-text: var(--color-input-text);
 }
 
 .main-form-panel > .field-grid-rows {
@@ -700,7 +700,7 @@ html[data-theme="dark"] input[type="checkbox"] {
   --field-border: var(--cv-field-border);
   --field-border-hover: var(--cv-field-border-hover);
   --field-border-focus: var(--cv-field-border-focus);
-  --field-text: var(--cv-field-color);
+  --field-text: var(--color-input-text);
   --field-focus-ring: var(--cv-field-focus-ring);
   --form-control-height: var(--control-height-md);
   align-content: start;

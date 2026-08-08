@@ -2482,7 +2482,7 @@
   border-radius: var(--cv-field-radius, var(--radius-control));
   box-shadow: var(--cv-field-shadow, var(--shadow-xs));
   box-sizing: border-box;
-  color: var(--cv-field-color, var(--theme-input-text));
+  color: var(--color-input-text, var(--theme-input-text));
   font-size: var(--cv-field-font-size, var(--font-size-sm));
   min-height: var(--cv-field-height, var(--control-height-md));
   padding: var(--cv-field-padding-y, 0) var(--cv-field-padding-x, var(--space-3));
@@ -2493,7 +2493,7 @@
   background: var(--cv-field-readonly-bg, var(--route-field-disabled-bg));
   border-color: var(--color-border-strong);
   box-shadow: none;
-  color: var(--cv-field-color, var(--theme-input-text));
+  color: var(--color-input-text, var(--theme-input-text));
   cursor: default;
   font-weight: var(--font-weight-semibold);
 }
@@ -2648,7 +2648,6 @@ html[data-theme="light"] .roteiro-editor--avulso .roteiro-editor__reference-bloc
   --border-focus: var(--color-border, transparent);
   --color-focus: var(--color-border, transparent);
   --cv-field-border-focus: var(--cv-field-border, var(--color-border, transparent));
-  --cv-field-focus-border: var(--cv-field-border, var(--color-border, transparent));
   --cv-select-border-focus: var(--cv-select-border, var(--color-border, transparent));
   --cv-sp-field-border-focus: var(--cv-sp-field-border, var(--color-border, transparent));
   --field-border-focus: var(--field-border, var(--color-border, transparent));

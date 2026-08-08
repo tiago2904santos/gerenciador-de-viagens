@@ -4268,3 +4268,54 @@ diferentes no arquivo.
 **Fica aberto:** os 270 valores `rgb()/rgba()` não entraram nesta conta. E a consolidação de
 `--cv-*` para `--color-*` (309 variáveis), decidida pelo dono, é o próximo passo — cor e nome de
 token são coisas separadas e não viajam no mesmo PR.
+
+### NOVO-51 🟠 PARCIAL · `NOVO` As 309 variáveis `--cv-*` são apelido de token, não token · MED · 2 d
+
+Segunda etapa da padronização. O dono decidiu que **`--color-*` é a base semântica única** e que as
+`--cv-*` somem. Não é um `sed`: `--cv-card-bg` não tem equivalente pelo nome, tem pelo **valor**. A
+pergunta certa é "o que esta variável resolve no fim da cadeia, e qual `--color-*` resolve o mesmo".
+
+Resolvendo as 309 **por tema** (o mesmo nome vale coisas diferentes no claro e no escuro):
+
+| | |
+|---|---:|
+| apelido puro de um `--color-*` | 37 |
+| definidas e **nunca usadas** | **58** |
+| valor próprio, precisam de token novo | 214 |
+
+**Entrou nesta leva:** as 58 órfãs e 21 dos 37 apelidos. Restam **231** `--cv-*` distintas.
+
+**Três correções de método, cada uma achada por medição e não por leitura.**
+
+1. **Renomear a definição do apelido cria um ciclo.** `--cv-btn-docx-color: var(--color-white)`
+   renomeado vira `--color-white: var(--color-white)`; o CSS invalida a variável e **tudo** que a
+   usa perde o valor. Uma tela sozinha perdeu 60 elementos. O certo é **apagar a definição** do
+   apelido e reescrever só os usos — o apelido some, não muda de nome.
+2. **Variável CSS é escopada.** Um apelido com override local, renomeado, injeta esse override no
+   escopo do token canônico. Ficaram de fora os que têm definição fora da raiz — dos dois lados.
+3. **Definição com fallback não tem valor único.** `--cv-sp-selected-card-border:
+   var(--theme-border-card, var(--color-border-soft))` vale uma coisa onde `--theme-border-card`
+   existe e outra onde não existe; um resolvedor que achata a cadeia erra. Foram 7 apelidos fora da
+   leva, depois de moverem 9 bordas de `#e3eaf2` para `#d4dde9`.
+
+**Prova de neutralidade:** 0 de 41.950 elementos em 88 telas. Renomear token tem de ser invisível, e
+as três correções acima são o que separou 1.602 elementos diferentes de zero.
+
+**O que falta, e é onde entra decisão e não mecânica.** Os 214 de valor próprio, por natureza:
+
+| natureza | quantas | observação |
+|---|---:|---|
+| cor | 99 | viram `--color-*` semânticos novos |
+| **dimensão** | **73** | `--cv-btn-height: 44px`, `--cv-field-radius: 12px` — **não** são cor. Pedem `--size-*`, `--radius-*`, `--space-*` |
+| sombra | 29 | pedem `--shadow-*` |
+| gradiente | 8 | `--cv-btn-primary-bg` é um `linear-gradient` inteiro dentro de um token |
+| borda-shorthand | 2 | `--cv-field-border: 1px solid #afc0d3` — três valores num token só |
+
+As 73 de dimensão são o achado que muda o plano: um terço do que se chamava de token de cor nunca
+foi cor. E há duplicata dentro delas — `--cv-search-picker-radius` e `--cv-field-radius` são os
+mesmos `12px` escritos duas vezes.
+
+**Registro, não defeito:** `--focus-ring: none` no tema escuro é **deliberado e documentado**
+(`static/css/components/summary-items.css:74`): lá o foco é sinalizado pela borda do controle. Eu
+tinha aberto isso como possível falha de acessibilidade e estava errado. Vira decisão quando o
+escuro virar a base.

@@ -115,13 +115,11 @@ html[data-theme="dark"] {
   --color-input-disabled-text: #909da7;
   --color-input-border: #607d93;
   --cv-field-bg: var(--color-input-bg);
-  --cv-field-color: var(--color-input-text);
   --cv-field-border: 1px solid var(--color-input-border);
   --cv-field-focus-ring: var(--focus-ring);
   --cv-field-shadow-focus: none;
   --cv-select-focus-ring: none;
   --cv-select-focus-shadow: none;
-  --cv-card-bg: var(--color-surface);
   --cv-card-border: 1px solid var(--color-border);
   --cv-card-shadow: var(--shadow-card);
   /* Uma única família visual sustenta cards de lista e de formulário. */
@@ -136,8 +134,6 @@ html[data-theme="dark"] {
     0 0 0 1px color-mix(in srgb, var(--color-accent) 18%, transparent),
     0 0 10px color-mix(in srgb, var(--color-accent) 16%, transparent);
   --cv-card-family-accent-width: 8px;
-  --cv-list-card-bg: var(--cv-card-family-bg);
-  --cv-list-card-border: 1px solid var(--cv-card-family-border);
   --theme-surface-card: var(--color-surface);
   --theme-surface-card-soft: var(--color-surface-soft);
   --theme-border-card: var(--color-border);

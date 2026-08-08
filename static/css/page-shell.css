@@ -2221,7 +2221,7 @@ body.has-delete-modal-open {
   background:   var(--cv-btn-primary-bg);
   border-color: var(--cv-btn-primary-border);
   box-shadow:   0 6px 14px rgba(11, 58, 102, 0.16);
-  color:        var(--cv-btn-primary-color);
+  color:        var(--color-white);
 }
 
 .cv-inline-create__toggle.is-filled:hover {
@@ -2261,7 +2261,7 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled {
   animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
   background:     var(--cv-btn-primary-bg);
   border-color:   var(--cv-btn-primary-border);
-  color:          var(--cv-btn-primary-color);
+  color:          var(--color-white);
 }
 
 @keyframes inline-create-btn-fill-dark {
@@ -2583,7 +2583,7 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   background:       transparent;
   border:           1px solid transparent;
   border-radius:    var(--radius-sm);
-  color:            var(--cv-field-color, var(--color-filter-text));
+  color:            var(--color-input-text, var(--color-filter-text));
   cursor:           pointer;
   display:          flex;
   flex-shrink:      0;
@@ -2820,7 +2820,7 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   border-radius: var(--cv-field-radius);
   box-shadow: var(--cv-field-shadow);
   box-sizing: border-box;
-  color: var(--cv-field-color);
+  color: var(--color-input-text);
   font-size: var(--cv-field-font-size);
   height: var(--text-area-height-md);
   line-height: 1.5;
@@ -2862,7 +2862,7 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   border-radius: var(--cv-field-radius);
   box-shadow: var(--cv-field-shadow);
   box-sizing: border-box;
-  color: var(--cv-field-color);
+  color: var(--color-input-text);
   font-size: var(--cv-field-font-size);
   height: var(--text-area-height-md);
   line-height: 1.5;
