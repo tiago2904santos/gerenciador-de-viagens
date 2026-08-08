@@ -421,11 +421,13 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn('type="submit"', component)
 
     def test_summary_and_document_cards_share_global_contracts(self):
-        cards = Path(settings.BASE_DIR) / "templates" / "components" / "cards"
-        summary = (cards / "summary_card.html").read_text(encoding="utf-8")
         # `document_card.html` era lido aqui; saiu na cascata do `NOVO-44` —
         # os últimos citadores dele eram o UI Lab e o `list_grid`, apagados
-        # pelo `BE-25`.
+        # pelo `BE-25`. `summary_card.html` saiu pela MESMA razão, um ID depois:
+        # o único citador era o painel de `/`, esvaziado a pedido do dono, e a
+        # trava de órfãos reprovou antes do merge — o que o `NOVO-44` só
+        # descobriu depois. O vocabulário `cv-metric` não morreu com ele; segue
+        # vivo em `planos_trabalho`, que é o que este teste continua medindo.
         plan_summary = (
             Path(settings.BASE_DIR)
             / "templates"
@@ -448,9 +450,6 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "content-cards.css"
         ).read_text(encoding="utf-8")
 
-        self.assertIn("cv-summary-tile", summary)
-        self.assertIn("cv-metric", summary)
-        self.assertIn("cv-metric--tile", summary)
         self.assertIn("cv-summary-card", plan_summary)
         # `H-05`: o grid saiu do casco e vive no partial do corpo.
         self.assertIn("cv-summary-grid--4", plan_summary_body)
@@ -567,11 +566,16 @@ class DarkRedesignContractTests(SimpleTestCase):
         dashboard = (templates / "core" / "dashboard.html").read_text(encoding="utf-8")
         module_card = (templates / "components" / "cards" / "module_card.html").read_text(encoding="utf-8")
 
-        self.assertIn("page-shell dashboard-page", dashboard)
+        # O painel foi esvaziado a pedido do dono. O contrato mudou de "usa os
+        # tres componentes globais" para "**nao tem vocabulario proprio**": o que
+        # sobrou em `/` e cabecalho de pagina mais cartao de modulo, e nenhuma
+        # classe `dashboard-*` pode voltar — era ela que justificava um CSS so
+        # dela (`dashboard.css`, apagado) e 4 blocos no tema escuro.
+        self.assertIn("page-shell", dashboard)
         self.assertIn('components/ui/headers/page_header.html', dashboard)
-        self.assertIn('components/cards/summary_card.html', dashboard)
         self.assertIn('components/cards/module_card.html', dashboard)
-        self.assertNotIn("dashboard-login-inspired", dashboard)
+        self.assertNotIn("dashboard-page", dashboard)
+        self.assertNotIn("summary_card.html", dashboard)
         self.assertIn("cv-module-card", module_card)
         self.assertIn('components/ui/buttons/button.html', module_card)
 

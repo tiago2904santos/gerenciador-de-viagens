@@ -10,7 +10,6 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
-from django.utils import timezone
 from django.utils.decorators import method_decorator
 
 from core import login_throttle
@@ -99,44 +98,21 @@ class LoginView(DjangoLoginView):
 
 
 def dashboard(request):
-    from datetime import timedelta
+    """Tela inicial. Sem consulta: o painel de indicadores foi apagado.
 
-    from core.tenancy import filter_queryset_by_area
-    from oficios.models import Oficio
-    from prestacoes_contas.models import AssinaturaDocumento
-    from prestacoes_contas.models import PrestacaoContas
-    from prestacoes_contas.models import PrestacaoServidor
-
-    today = timezone.localdate()
-    oficios = filter_queryset_by_area(Oficio.objects)
-    eventos = filter_queryset_by_area(Evento.objects)
-    prestacoes_area = filter_queryset_by_area(PrestacaoContas.objects)
-    proximas_viagens = list(
-        eventos.filter(
-            data_inicio__gte=today,
-            data_inicio__lte=today + timedelta(days=30),
-        )
-        .order_by("data_inicio")
-        .values("id", "titulo", "data_inicio")[:5]
-    )
+    A versao anterior contava oficios, oficios em rascunho, assinaturas
+    pendentes e prestacoes pendentes, e ainda listava as viagens dos proximos
+    30 dias — cinco consultas por acesso, na rota que TODO login abre
+    (`LOGIN_REDIRECT_URL`). O dono apagou o conteudo; as consultas vao junto,
+    senao o custo fica pagando por uma tela que nao mostra mais o resultado.
+    """
     return render(
         request,
         "core/dashboard.html",
         {
             "page_title": "Central de Viagens 3",
-            "page_section": "Dashboard",
-            "page_description": "Fundacao visual para os fluxos documentais do sistema.",
-            "total_oficios": oficios.count(),
-            "oficios_rascunho": oficios.filter(status=Oficio.STATUS_RASCUNHO).count(),
-            "assinaturas_pendentes": AssinaturaDocumento.objects.filter(
-                prestacao__in=prestacoes_area,
-                status=AssinaturaDocumento.STATUS_PENDENTE,
-            ).count(),
-            "prestacoes_pendentes": PrestacaoServidor.objects.filter(
-                prestacao__in=prestacoes_area,
-                finalizada=False,
-            ).count(),
-            "proximas_viagens": proximas_viagens,
+            "page_section": "Inicio",
+            "page_description": "Escolha um modulo para comecar.",
         },
     )
 
