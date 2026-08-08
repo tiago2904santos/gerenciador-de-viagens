@@ -1019,7 +1019,7 @@ grandeza.
 `oficio__numero=int(q)` — ganho grande, custo quase zero; (2) `pg_trgm` + índices GIN sobre
 expressão nas 4 ou 5 colunas realmente buscadas.
 
-### DB-12 🟡 Trilha de auditoria cresce sem limite e encarece toda escrita · AUD · 3 d
+### DB-12 ✅ RESOLVIDO (parte do índice) · 🟡 Trilha de auditoria cresce sem limite e encarece toda escrita · AUD · 3 d
 
 `core/audit.py:154-159` conecta `pre_save`/`post_save`/`pre_delete` globalmente para 11 apps.
 `capture_before_save` (`:78`) faz um `SELECT` extra em cada save de modelo auditado, e
@@ -1033,6 +1033,36 @@ expressão nas 4 ou 5 colunas realmente buscadas.
 > (auto-criado pela FK) quanto em `created_at` (`db_index=True` explícito). O que falta é o índice
 > **composto** `(area_id, created_at)`, para a consulta que cruza os dois eixos — não suporte
 > nenhum.
+
+> **Fechado em 08/08/2026, em duas partes com destinos diferentes.**
+>
+> **O expurgo saiu do escopo, por decisão do usuário.** Trilha de auditoria de órgão público
+> costuma ter retenção regulada, e apagar sem base legal é pior que a tabela crescer. Fica como
+> pergunta de produto, não de engenharia.
+>
+> **O índice entrou, e a medição não o justifica na escala de hoje.** Isso está dito na migração e
+> aqui, porque é o tipo de coisa que alguém encontra daqui a um ano e não entende. Com 60.000
+> eventos:
+>
+> | áreas | sem | com | ganho | plano |
+> |---:|---:|---:|---:|---|
+> | 3 | 0,30 ms | 0,26 ms | 1,1× | ignora o índice novo |
+> | 20 | 0,49 ms | 0,47 ms | 1,0× | ignora o índice novo |
+> | 100 | 1,51 ms | **0,08 ms** | **18,4×** | `Index Scan using core_audit_area_periodo_idx` |
+>
+> Com poucas áreas, a varredura para trás pelo índice de `created_at` acha as 100 linhas da página
+> quase de imediato e o filtro por área sai de graça. O índice entrou como folga de crescimento: o
+> número de áreas em produção **não é observável** do ambiente de desenvolvimento, que tem 3 e as
+> três são artefato de teste.
+>
+> **Achado que muda a leitura do enunciado:** a trilha **não tem leitor em código de aplicação**.
+> Nenhuma view, nenhum selector, nenhum relatório. O único consumidor é o admin do Django
+> (`core/admin.py`), que filtra por `area` e herda o `ordering` do modelo — é dele a consulta que o
+> índice serve. `test_a_trilha_nao_tem_leitor_em_codigo_de_aplicacao` reprova se isso mudar, porque
+> aí a análise inteira precisa ser refeita.
+>
+> Migração `core/0004`, com as duas consultas do limite 4 no docstring — inclusive
+> `SELECT COUNT(DISTINCT area_id)`, que é a que diz se o índice vale alguma coisa hoje.
 
 **Efeito:** a tabela cresce sem teto e sem ninguém decidir isso, e a consulta que uma tela de
 auditoria realmente faz (uma área, um período) cai em dois índices de coluna única em vez de um

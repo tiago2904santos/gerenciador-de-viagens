@@ -354,7 +354,10 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       1,08× na rota); nas outras quatro o índice análogo não move o tempo e em `roteiros`
       piora. "Ofícios têm situação análoga" era falso, e o que sobra ali é o `NOVO-50`
 - [ ] `DB-11` 80 buscas livres sem índice
-- [ ] `DB-12` trilha de auditoria sem índice, sem expurgo
+- [x] `DB-12` trilha de auditoria sem índice, sem expurgo — **só o índice**. O expurgo saiu
+      por decisão do usuário (retenção de trilha de órgão público é pergunta de produto).
+      O índice entrou como folga: medido, o planner só o escolhe por volta de 100 áreas,
+      e produção não é observável daqui. A trilha não tem leitor fora do admin
 - [x] `PF-03` toda requisição escreve na tabela de sessão — decisão tomada em 07/08:
       `cached_db` **mais** renovação periódica, que são uma coisa só (`cached_db` sozinho
       economiza 1 de 11; as outras 3 dependem de desligar `SESSION_SAVE_EVERY_REQUEST`).
