@@ -89,7 +89,12 @@ class AlterarSenhaForm(PasswordChangeForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
-            set_widget_style(field.widget, WidgetStyle.FORM_CONTROL, overwrite=False)
+            set_widget_style(
+                field.widget,
+                WidgetStyle.FORM_CONTROL,
+                overwrite=False,
+                nome=field_name,
+            )
             field.widget.attrs.setdefault(
                 "autocomplete",
                 "current-password" if field_name == "old_password" else "new-password",

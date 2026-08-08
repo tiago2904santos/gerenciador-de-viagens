@@ -181,9 +181,12 @@ class OficioForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
             if isinstance(field.widget, (forms.TextInput, forms.NumberInput)):
-                set_widget_style(field.widget, WidgetStyle.FORM_CONTROL, overwrite=False)
-            if field_name in {"protocolo", "assunto"}:
-                field.widget.attrs.setdefault("data-mask", "upper")
+                set_widget_style(
+                    field.widget,
+                    WidgetStyle.FORM_CONTROL,
+                    overwrite=False,
+                    nome=field_name,
+                )
         for optional_field in (
             "roteiro",
             "solicitante",

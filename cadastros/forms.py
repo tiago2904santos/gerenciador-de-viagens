@@ -55,16 +55,28 @@ def _normalize_nome_obrigatorio(value):
 class BaseCadastroForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for _name, field in self.fields.items():
+        for nome, field in self.fields.items():
             if getattr(field.widget, "attrs", None) is None:
                 continue
             if isinstance(field.widget, forms.CheckboxInput):
-                set_widget_style(field.widget, WidgetStyle.CARD_TOGGLE_SR_ONLY, overwrite=False)
+                set_widget_style(
+                    field.widget,
+                    WidgetStyle.CARD_TOGGLE_SR_ONLY,
+                    overwrite=False,
+                    nome=nome,
+                )
                 field.widget.attrs.setdefault("role", "switch")
                 continue
-            set_widget_style(field.widget, WidgetStyle.FORM_CONTROL, overwrite=False)
-            if isinstance(field, forms.CharField):
-                field.widget.attrs.setdefault("data-mask", "upper")
+            # A máscara sai de `set_widget_style` e não daqui. A regra local era
+            # "todo `CharField`", e `EmailField`/`URLField` são `CharField` — o
+            # dia em que um cadastro ganhasse e-mail, ele seria maiusculizado em
+            # silêncio. A regra central pergunta pelo widget e pelo nome.
+            set_widget_style(
+                field.widget,
+                WidgetStyle.FORM_CONTROL,
+                overwrite=False,
+                nome=nome,
+            )
 
 
 def _servidor_option_attrs(servidor):
