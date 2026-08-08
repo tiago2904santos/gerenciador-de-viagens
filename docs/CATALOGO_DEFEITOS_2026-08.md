@@ -4210,3 +4210,14 @@ piso de componentes 83 → 82.
 
 **A decisão de conteúdo é do dono e está registrada:** ele escolheu manter a rota e trocar o
 conteúdo, entre quatro opções que incluíam redirecionar `/` para Ofícios, Eventos ou Roteiros.
+
+**O PR chegou vermelho, e o defeito é de método.** Apaguei `dashboard.css` com prova de grep em
+templates, JS e Python — e esqueci de olhar **CSS citando CSS**: `static/css/style.css:11` tinha
+`@import url("./dashboard.css")`, e o `style.css` entra no bundle. Nenhum gate local pegou: a poda
+olha bloco, o auditor de front olha linha, e nenhum dos dois resolve caminho de arquivo. Quem pegou
+foi o `collectstatic` de produção (WhiteNoise, `MissingFileError`) — no **passo 14** do CI, depois de
+os treze anteriores terem passado.
+
+Fechada a lacuna: `scripts/audit_css_morto.py` passou a reprovar `@import` apontando para arquivo
+inexistente, e a trava foi conferida com um import falso antes de valer. Custa um segundo, contra o
+passo 14 do CI.
