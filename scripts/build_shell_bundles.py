@@ -27,6 +27,7 @@ SHELL_CSS: tuple[str, ...] = (
     "css/utilities.css",
     "css/page-shell.css",
     "css/cv-buttons.css",
+    "css/components/field.css",
     "css/components/cv-date-picker.css",
     "css/components/file-picker.css",
     "css/components/action-system.css",
