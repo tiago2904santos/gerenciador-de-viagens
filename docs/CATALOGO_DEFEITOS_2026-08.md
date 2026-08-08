@@ -4504,3 +4504,86 @@ O helper `text_attrs` existe para a decisão ficar **no ponto de declaração**:
 um dicionário e não sabe qual widget vai recebê-lo — o mesmo estilo alimenta `TextInput`,
 `EmailInput` e `Textarea`. Quem escreve `text_attrs` está dizendo "este campo é texto simples e vai
 em maiúscula", e um revisor vê a decisão campo a campo.
+
+### NOVO-56 ✅ RESOLVIDO · 🔴 `NOVO` Dois formulários maiusculizam `username` — a exceção existe, mas o nome do campo não chega até ela · COR · 0,25 d
+
+`UsuarioEditForm` e `UsuarioAreaCreationForm` põem `data-mask="upper"` no campo de login. É
+exatamente o caso que o `NOVO-53` documentou como o motivo de a lista de exceções existir:
+
+> `username` maiusculizado faz o usuário enviar "TIAGO" contra um registro gravado "tiago". O
+> Django compara byte a byte. O sistema para de autenticar.
+
+**A regra estava certa; a chamada é que perdia o argumento.** `set_widget_style` recebe `nome` e
+consulta `NOMES_SEM_MAIUSCULA`, mas `EstiloCamposMixin` (`usuarios/forms.py:32`) iterava
+`self.fields.values()` — que descarta o nome. Sem nome, `nome in NOMES_SEM_MAIUSCULA` é sempre
+falso, e a lista de exceções nunca é consultada. O mesmo em mais três laços: `cadastros/forms.py`,
+`oficios/forms.py` e `core/forms/__init__.py`.
+
+**Efeito medido, e ele é dos dois lados:** criar usuário por `UsuarioAreaCreationForm` grava
+`ADM.TSANTOS`, e o login (`LoginForm.username`, este sem máscara) manda `adm.tsantos` contra ele —
+`ModelBackend` usa `get_by_natural_key`, que é `username=` exato. E salvar um usuário existente pelo
+`UsuarioEditForm` **reescreve o username de quem já entrava**, tirando o acesso de quem tinha.
+
+**Como apareceu.** Não foi leitura de código: foi o inventário do `NOVO-57` listando
+`auth.User.username` entre os campos a migrar. Um comando escrito para contar linhas achou um
+defeito de autenticação porque perguntou "quais campos têm a máscara" ao sistema em vez de à
+documentação.
+
+**Por que os testes do `NOVO-53` não pegaram.** Os sete existentes chamam `set_widget_style`
+diretamente, passando `nome="username"` à mão — e passavam, porque a função está correta. Nenhum
+instanciava formulário. A correção traz `MascaraNosFormulariosReaisTests`, que percorre os
+formulários dos apps e olha o `data-mask` que vai para o HTML. Visto vermelho com as duas violações
+nomeadas antes do conserto.
+
+**Segunda correção, no mesmo lugar.** `BaseCadastroForm` decidia a máscara por conta própria
+(`if isinstance(field, forms.CharField): setdefault("data-mask", "upper")`). `EmailField` e
+`URLField` **são** `CharField`: o dia em que um cadastro ganhasse e-mail, ele seria maiusculizado em
+silêncio. A regra local saiu; quem decide agora é a central, que pergunta pelo widget e pelo nome.
+
+**Medição do antes/depois:** 274 campos de formulário inspecionados, **2 alterados**, ambos
+`username`, ambos perdendo a máscara. Nada mais se moveu — as regras locais de `cadastros` e
+`oficios` eram exatamente cobertas pela central. A cobertura da máscara vai de **59 para 57**
+campos; o número 59 registrado no `NOVO-55` estava certo quando foi medido e incluía estes dois.
+
+### NOVO-57 🟠 PARCIAL · `NOVO` A máscara vale do próximo cadastro; os registros já gravados ficam na caixa antiga · DB · 0,5 d
+
+O `NOVO-53`/`NOVO-55` puseram a máscara em 57 campos de texto. Ela age no navegador, então vale do
+próximo salvamento em diante: o que já estava no banco continua como foi digitado. O mesmo campo
+passa a ter duas populações, e quem lê a lista vê a diferença.
+
+`core/management/commands/normalizar_maiusculas.py` fecha a dívida. Sem `--commit` ele só relata,
+como o `backfill_legacy_areas` — e aqui a convenção pesa mais, porque a operação é destrutiva por
+natureza: "São Paulo" vira "SÃO PAULO" e não volta sem backup.
+
+**A lista de campos não está escrita no comando.** Ela é derivada de onde a decisão mora — o widget
+do formulário. Campo que ganhar `text_attrs` amanhã entra no relatório sem ninguém editar o arquivo;
+campo que sair da máscara some dele. Foi essa escolha que expôs o `NOVO-56`.
+
+**A colisão de unicidade quem decide é o banco.** "Reunião" e "REUNIÃO" convivem hoje e não convivem
+em maiúscula. Agrupar por valor em Python reimplementaria a semântica de unicidade — e ela não é
+simples: `TipoEvento` tem duas `UniqueConstraint` com `condition`, uma só para linhas sem área e
+outra só para linhas com área; agrupar ignorando a condição bloquearia campo que está bem. Então o
+`UPDATE` roda dentro de um savepoint por campo. Passou, passou de verdade — com condição, colação e
+índice parcial. Falhou, o savepoint volta, o campo fica de fora e a mensagem do PostgreSQL (que
+nomeia a restrição e o valor duplicado) entra no relatório. O bloqueio é **por campo**, não por
+linha: migrar as outras e deixar o par para trás daria um campo meio migrado, que é o pior estado.
+
+**A simulação escreve e desfaz**, pelo mesmo caminho da aplicação. Um "vai dar certo" que não tentou
+escrever não vale nada num campo com restrição de unicidade.
+
+**Por que fica PARCIAL.** O levantamento abaixo é do banco de **desenvolvimento**, e ele é pequeno
+demais para decidir qualquer coisa — 72 linhas no total. O número que importa é o de produção, e
+este comando existe justamente para que ele possa ser levantado lá sem escrever nada:
+
+| | |
+|---|---|
+| campos de modelo com máscara | 44 |
+| linhas nesses campos (dev) | 72 |
+| linhas divergentes (dev) | 20 |
+| campos bloqueados por unicidade (dev) | 0 |
+
+Os quatro campos com divergência em dev: `eventos.TipoEvento.nome` (5), `AtividadePlanoTrabalho.nome`
+(11), `HorarioAtendimento.faixa` (3), `usuarios.AreaTrabalho.nome` (1).
+
+**Fecha quando** a contagem rodar contra produção, os campos bloqueados (se houver) forem resolvidos
+no sistema, e o `--commit` for aplicado com backup.
