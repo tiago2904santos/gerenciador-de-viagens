@@ -498,7 +498,7 @@
   background: var(--cv-btn-primary-bg);
   border-color: var(--cv-btn-primary-border);
   box-shadow: var(--shadow-sm);
-  color: var(--cv-btn-primary-color);
+  color: var(--color-white);
 }
 
 .list-header .cv-inline-create__toggle.is-filled:hover {
@@ -682,7 +682,7 @@
   .list-header .cv-inline-create__toggle.is-filled {
   background: var(--cv-btn-primary-bg);
   border-color: var(--cv-btn-primary-border);
-  color: var(--cv-btn-primary-color);
+  color: var(--color-white);
 }
 
 :is(html[data-theme="dark"])
@@ -785,12 +785,12 @@
 .travel-period-filter__btn {
   align-items: center;
   background:
-    linear-gradient(var(--cv-select-bg), var(--cv-select-bg)) padding-box,
+    linear-gradient(var(--color-card), var(--color-card)) padding-box,
     linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
   border: 1px solid transparent;
   border-radius: var(--cv-field-radius);
   box-shadow: var(--cv-cs-trigger-shadow);
-  color: var(--cv-field-color);
+  color: var(--color-input-text);
   cursor: pointer;
   display: inline-flex;
   font-family: inherit;
@@ -807,7 +807,7 @@
 .travel-period-filter__btn:hover:not(:disabled) {
   background:
     linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
-    linear-gradient(var(--cv-select-border-hover), var(--cv-select-border-hover)) border-box;
+    linear-gradient(var(--color-secondary), var(--color-secondary)) border-box;
 }
 
 .travel-period-filter__btn:focus-visible {

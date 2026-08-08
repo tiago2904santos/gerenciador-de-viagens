@@ -9,25 +9,14 @@ html {
   --cv-date-picker-selected-color: var(--stepper-active-color, var(--color-white));
   --cv-date-picker-selected-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
   --cv-date-picker-selected-halo: var(--stepper-active-bg, var(--color-accent));
-  --cv-date-picker-day-hover-bg: transparent;
-  --cv-date-picker-day-hover-border: transparent;
-  --cv-date-picker-day-hover-color: inherit;
-  --cv-date-picker-day-hover-shadow: none;
-  --cv-date-picker-selected-hover-bg-start: var(--stepper-active-bg, var(--color-accent));
-  --cv-date-picker-selected-hover-bg-end: var(--stepper-active-bg, var(--color-accent));
-  --cv-date-picker-selected-hover-border: transparent;
-  --cv-date-picker-selected-hover-color: var(--stepper-active-color, var(--color-white));
-  --cv-date-picker-selected-hover-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
 html[data-theme="dark"] {
   --cv-date-picker-selected-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
-  --cv-date-picker-selected-hover-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
 }
 
 html[data-theme="light"] {
   --cv-date-picker-selected-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
-  --cv-date-picker-selected-hover-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
 }
 
 .cv-date-picker {

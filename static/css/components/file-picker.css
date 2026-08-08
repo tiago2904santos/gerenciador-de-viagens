@@ -139,7 +139,7 @@
 .cv-file-picker__upload,
 .prestacao-file-picker__upload {
   background: var(--cv-btn-primary-bg, var(--color-primary));
-  color: var(--cv-btn-primary-color, var(--color-white));
+  color: var(--color-white, var(--color-white));
 }
 
 .cv-file-picker__upload:hover:not(:disabled),
