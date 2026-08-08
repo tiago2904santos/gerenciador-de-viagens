@@ -120,10 +120,17 @@ class OrcamentoDeQueriesOrdemServicoTests(TestCase):
     # fixture; o `NOVO-07` derrubou a lista para 22 ao parar de consultar por
     # card. O numero so desce daqui: se subir, alguem devolveu uma consulta
     # para dentro do laco dos cards.
-    QUERIES_LISTA = 19  # remedido no DB-02: usuário de teste passou a ter vínculo de área
-    QUERIES_LISTA_BUSCA = 19
+
+    # `PF-03` (07/08/2026): a sessão saiu do caminho de escrita de toda requisição
+    # (`cached_db` + `SESSION_SAVE_EVERY_REQUEST = False` + renovação periódica).
+    # Em regime, some 1 leitura + 1 escrita + 2 comandos de transação = **-4**.
+    # Onde o corte é **-1**, o teste mede a **primeira** requisição depois do
+    # login: ali `core/tenancy.py:52` grava a área na sessão, que por isso é
+    # salva de qualquer jeito, e só a leitura é economizada.
+    QUERIES_LISTA = 15  # remedido no DB-02: usuário de teste passou a ter vínculo de área
+    QUERIES_LISTA_BUSCA = 15
     # 26 -> 30 na edicao, sem N+1: a lista segue em 22, entao nada voltou para
     # dentro do laco dos cards. Os quatro sao custo constante da previa de
     # destinos, que resolve a sede das Configuracoes e rele o singleton por
     # request (4x ConfiguracaoSistema + 4x AreaTrabalho). Registrado NOVO-27.
-    QUERIES_EDITAR = 24
+    QUERIES_EDITAR = 20

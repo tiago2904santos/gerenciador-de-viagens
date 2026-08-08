@@ -35,7 +35,9 @@ class OrcamentoDeQueriesPrestacaoTests(PrestacaoFixturesMixin, TestCase):
     # destinos (100 consultas) e `get_configuracao_sistema()` chamado por card
     # (19). Bate com o número da régua porque as duas medem o regime estável —
     # ver o aquecimento em `setUp`.
-    QUERIES_LISTA = 20
+    # `PF-03` (07/08/2026): a sessão saiu do caminho de escrita de toda
+    # requisição — some 1 leitura + 1 escrita + 2 comandos de transação.
+    QUERIES_LISTA = 16
 
     def setUp(self):
         self.setUpPrestacaoFixtures()

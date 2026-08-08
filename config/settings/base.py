@@ -57,6 +57,9 @@ _MIDDLEWARE_CORE = [
     "django.middleware.security.SecurityMiddleware",
     "core.middleware.SecurityHeadersMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    # `PF-03`: logo depois do `SessionMiddleware`, porque precisa de
+    # `request.session` e age na ida — o `SessionMiddleware` grava na volta.
+    "core.middleware.RenovacaoDeSessaoMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -106,7 +109,33 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 SESSION_COOKIE_AGE = int(os.getenv("SESSION_COOKIE_AGE", "28800"))
-SESSION_SAVE_EVERY_REQUEST = True
+
+# `PF-03`. Três decisões que só fazem sentido juntas — medido no painel, com
+# `CaptureQueriesContext`, quatro combinações na mesma rota:
+#
+#     db        + save_every=True  (como estava)   11 consultas   2 em django_session   2 BEGIN/COMMIT
+#     cached_db + save_every=True                  10             1                     2
+#     cached_db + save_every=False                  7             0                     0
+#     cache     + save_every=True                   7             0                     0
+#
+# `cached_db` sozinho economiza **1 de 11**: ele tira a leitura, não a escrita —
+# `cached_db.SessionStore.save()` chama o backend de banco antes de gravar no
+# cache. Quem tira as outras três é desligar `SESSION_SAVE_EVERY_REQUEST`.
+#
+# `cache` puro chegaria no mesmo 7 sem middleware nenhum, e está fora: a sessão
+# viveria só no Redis, e um reinício dele deslogaria todo mundo de uma vez.
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+SESSION_SAVE_EVERY_REQUEST = False
+
+# Com `SESSION_SAVE_EVERY_REQUEST` desligado, a sessão expiraria 8 h depois do
+# **login**, não da última ação. `core.middleware.RenovacaoDeSessaoMiddleware`
+# devolve o deslizamento com uma escrita a cada N segundos. Padrão: um oitavo da
+# janela, ou seja 1 h numa sessão de 8 h — a janela efetiva desliza entre 7 h e
+# 8 h. Zero desliga a renovação (e aí a sessão volta a contar do login).
+SESSION_RENOVACAO_INTERVALO = int(
+    os.getenv("SESSION_RENOVACAO_INTERVALO", str(SESSION_COOKIE_AGE // 8))
+)
+
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 _redis_url = os.getenv("REDIS_URL", "").strip()
