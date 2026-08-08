@@ -182,7 +182,9 @@ class CssTokenGateTests(SimpleTestCase):
         expectations = {
             "templates/components/ui/feedback/alert.html": ("cv-notice", "cv-notice--"),
             "templates/components/feedback/alerts.html": ("cv-notice-stack", "cv-notice"),
-            "templates/components/cards/summary_card.html": ("cv-metric", "cv-metric--tile"),
+            # `summary_card.html` saiu com o painel de `/`; `cv-metric` continua
+            # sendo o canônico e é medido em quem ainda o usa.
+            "templates/planos_trabalho/partials/_resumo_evento_body.html": ("cv-summary-grid",),
             "templates/core/dashboard.html": ("cv-metric-grid",),
         }
         for rel_path, tokens in expectations.items():

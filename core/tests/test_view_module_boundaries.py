@@ -76,7 +76,14 @@ class ViewModuleBoundaryTests(SimpleTestCase):
         # 29 por `ast`, mesmos apps, medido em 07/08 — porque hoje nenhum modulo
         # de view tem `.objects` em prosa. O teste abaixo garante que prosa nunca
         # mais entra na conta.
-        self.assertEqual(sum(counts.values()), 29)
+        #
+        # 29 -> 24: o painel de `/` foi apagado a pedido do dono, e com ele as
+        # cinco consultas que `core.views.dashboard` fazia por acesso — total de
+        # oficios, oficios em rascunho, assinaturas pendentes, prestacoes
+        # pendentes e as viagens dos proximos 30 dias. Era a rota que TODO login
+        # abre (`LOGIN_REDIRECT_URL`), entao a divida mais cara do arquivo caiu
+        # junto com a tela.
+        self.assertEqual(sum(counts.values()), 24)
 
     def test_orm_em_prosa_nao_conta_e_orm_em_codigo_conta(self):
         """`NOVO-11` — a catraca mede código, não texto.

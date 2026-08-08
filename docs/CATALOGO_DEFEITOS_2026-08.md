@@ -4224,3 +4224,49 @@ tabelas de dimensão irreais.
 >
 > **O conserto do semeador desbloqueou outra medição na hora:** o `DB-11` (`pg_trgm`) só pôde ser
 > respondido depois dele — ver lá.
+
+### NOVO-49 ✅ RESOLVIDO · 🟡 `NOVO` O painel de `/` custava cinco consultas por login para uma tela que o dono não queria · MOR · 0,25 d
+
+> **Aviso de numeração (08/08):** este é o **segundo** `NOVO-49` do arquivo — o outro é o de
+> catálogo por área, do `DB-02`. É também a segunda colisão do ciclo: já havia dois `NOVO-45`.
+> Não renumerei nenhum dos dois, porque ID de outra sessão não se renomeia pela metade (limite
+> 2 do `AGENTS.md`) e branch aberta pode citar qualquer um. **A causa é de processo:** cada
+> sessão escolhe "o próximo livre" a partir do próprio instantâneo e duas escolhem o mesmo.
+
+`core/views.py:101` contava total de ofícios, ofícios em rascunho, assinaturas pendentes e prestações
+pendentes, e ainda listava as viagens dos próximos 30 dias — **cinco consultas** montadas a cada
+acesso. E `/` é `LOGIN_REDIRECT_URL`: toda sessão do sistema começa ali.
+
+O dono pediu para apagar a tela. Como `/` também é o link da marca na barra lateral, o da barra
+móvel, o `back_url` de duas telas de `cadastros` e a rota `painel` da régua do `PF-07`, **a rota
+fica e o conteúdo sai** — trocar a rota mexeria em cinco lugares, trocar o conteúdo não mexe em
+nenhum.
+
+**Resolvido em 08/08:**
+
+- as cinco consultas saíram da view; o que sobra é `render` com três strings;
+- `templates/core/dashboard.html` perdeu boas-vindas, indicadores e viagens próximas. O que ficou —
+  cabeçalho de página e quatro cartões de módulo — **não tem vocabulário próprio**: nenhuma classe
+  `dashboard-*` sobreviveu;
+- `static/css/dashboard.css` (138 linhas) apagado, mais 3 blocos e 1 seletor agrupado no tema
+  escuro. A exceção de `hex_color_outside_tokens` que o arquivo tinha no auditor saiu junto;
+- **cascata**: `components/cards/summary_card.html` perdeu o único citador e foi apagado. Desta vez
+  a trava do `HT-06` reprovou **antes do merge** — é a diferença entre este ID e o `NOVO-44`, onde a
+  mesma cascata só apareceu com a `main` já vermelha.
+
+**Catracas que descem:** ORM em view **29 → 24** (é a maior queda de uma vez desde o `P-01`), e o
+piso de componentes 83 → 82.
+
+**A decisão de conteúdo é do dono e está registrada:** ele escolheu manter a rota e trocar o
+conteúdo, entre quatro opções que incluíam redirecionar `/` para Ofícios, Eventos ou Roteiros.
+
+**O PR chegou vermelho, e o defeito é de método.** Apaguei `dashboard.css` com prova de grep em
+templates, JS e Python — e esqueci de olhar **CSS citando CSS**: `static/css/style.css:11` tinha
+`@import url("./dashboard.css")`, e o `style.css` entra no bundle. Nenhum gate local pegou: a poda
+olha bloco, o auditor de front olha linha, e nenhum dos dois resolve caminho de arquivo. Quem pegou
+foi o `collectstatic` de produção (WhiteNoise, `MissingFileError`) — no **passo 14** do CI, depois de
+os treze anteriores terem passado.
+
+Fechada a lacuna: `scripts/audit_css_morto.py` passou a reprovar `@import` apontando para arquivo
+inexistente, e a trava foi conferida com um import falso antes de valer. Custa um segundo, contra o
+passo 14 do CI.
