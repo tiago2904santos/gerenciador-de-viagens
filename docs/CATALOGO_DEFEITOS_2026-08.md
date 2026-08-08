@@ -4606,3 +4606,65 @@ Os quatro campos com divergência em dev: `eventos.TipoEvento.nome` (5), `Ativid
 
 **Fecha quando** a contagem rodar contra produção, os campos bloqueados (se houver) forem resolvidos
 no sistema, e o `--commit` for aplicado com backup.
+
+### NOVO-58 🔴 `NOVO` Claro e escuro não são dois temas do mesmo sistema: são dois desenhos diferentes · UI · a decidir
+
+Medido com `getComputedStyle` nas 44 rotas, comparando o **mesmo elemento** nas duas versões do
+**mesmo documento** e olhando **só propriedades que não são cor** — cor é o que um tema tem direito
+de mudar; o resto deveria ser igual.
+
+| | |
+|---|---|
+| elementos comparados | 20.975 (44 telas) |
+| elementos com ao menos uma diferença não-cor | **20.203 — 96%** |
+| diferenças no total | 45.726 |
+| pares de valor distintos (as *decisões* que divergiram) | **851** |
+| elementos que ainda divergem ignorando a fonte | 6.882 (33%) |
+
+**A maior diferença isolada é a fonte do sistema inteiro.** `tokens.css:176` define
+`--font-sans: "Segoe UI", Arial, sans-serif`, e `theme-dark-components.css:16` sobrescreve o `body`
+com `Inter, "Segoe UI Variable", …`. São **19.896 elementos** com pilha de fonte diferente conforme o
+tema.
+
+> **Cuidado com o que este número é.** Ele mede a pilha **declarada**, não a face que o usuário vê.
+> `Inter` **não está no repositório** — não há `@font-face` nem arquivo (os únicos em
+> `static/vendor/fonts/` são as fontes de assinatura). Então o escuro pede uma fonte que o sistema
+> não entrega, e o que aparece depende do que estiver instalado em cada máquina. **Não dá para
+> determinar daqui** qual face renderiza para o usuário: neste contêiner Linux, `Inter`,
+> `Segoe UI Variable` e `Segoe UI` devolvem largura idêntica (811,06 px para a mesma frase), o que é
+> substituição do fontconfig, não instalação. Medir isso exige uma máquina igual à do usuário.
+
+As demais divergências sistemáticas, com a contagem de elementos:
+
+| propriedade | claro | escuro | elementos |
+|---|---|---|---|
+| `font-size` | 16px | 14px | 533 |
+| `line-height` | 24px | 21px | 533 |
+| `border-*-width` | 0px | 1px | 1.416 |
+| `border-radius` | 14px | 10px | 940 |
+| largura da barra lateral | 191/216px | 231/252px | 976 |
+| `height` de controle | 46px | 42px | 378 |
+| `justify-content` | normal | center | 230 |
+
+Concentradas em `sidebar-*` (2.956 + 2.200 + 880 + 748 + 572 + 440), `cv-custom-select__option`
+(1.604), `cv-dialog__*` (1.151) e `cv-date-picker__footer-action` (640).
+
+**Não é deriva acidental: está escrito no cabeçalho do arquivo.**
+
+> `theme-dark-components.css` — *transitional dark-theme component overrides. Long-term: dissolve
+> into owning component files. **Extracted from dark-redesign.css** (Etapa 7, Fase 6).*
+
+Houve um redesenho, ele foi aplicado **só no escuro**, e o arquivo que deveria ser transitório virou
+5.690 linhas permanentes. O tema claro é o desenho **anterior** ao redesenho — e é o que o sistema
+mostra por padrão para quem não escolheu tema.
+
+**O instrumento.** Diferença de ordem de captura foi descartada como artefato: medindo claro→escuro
+e escuro→claro nas mesmas 3 rotas, 2.820 diferenças nas duas, **0** exclusivas de uma ordem. E a
+transição de tema é desligada antes de medir, senão a captura pega o valor no meio da interpolação
+(erro que já custou 418 elementos de ruído numa medição anterior).
+
+**Por que isto muda o plano.** A etapa estava descrita como "inverter o tema: escuro vira base, claro
+vira espelho", como se fosse reorganização de token. Não é. Espelhar significa **aplicar o redesenho
+ao tema claro**, o que muda a aparência de todas as 44 telas no modo claro — fonte, tamanho de texto,
+raio, borda e largura da barra lateral. É trabalho de desenho, não de arrumação, e precisa da decisão
+do dono antes da primeira linha de CSS.
