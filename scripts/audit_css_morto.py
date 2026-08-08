@@ -163,6 +163,34 @@ def blocos(css: str):
         i = k
 
 
+def imports_quebrados() -> list[tuple[str, str]]:
+    """`@import url("./x.css")` apontando para arquivo que nao existe.
+
+    Um `@import` pendurado nao aparece em nenhum dos gates de CSS deste projeto:
+    a poda olha bloco, o auditor de front olha linha, e nenhum dos dois resolve
+    caminho. Quem pega e o `collectstatic` de producao — porque o WhiteNoise
+    reescreve URL dentro de CSS e reprova com `MissingFileError` —, e ele roda so
+    no passo 14 do CI, depois de tudo que interessa ja ter passado.
+
+    Foi assim que o `NOVO-49` chegou vermelho: `dashboard.css` foi apagado com
+    prova de grep em templates, JS e Python, e ninguem olhou o `@import` do
+    `style.css`, que e CSS citando CSS.
+    """
+    quebrados = []
+    for caminho in sorted(CSS.rglob("*.css")):
+        if caminho.name in IGNORA_ARQUIVO:
+            continue
+        for alvo in re.findall(
+            r"""@import\s+url\(\s*["']([^"')]+)["']\s*\)""",
+            caminho.read_text(encoding="utf-8"),
+        ):
+            if alvo.startswith(("http://", "https://", "//", "data:")):
+                continue
+            if not (caminho.parent / alvo).resolve().is_file():
+                quebrados.append((str(caminho.relative_to(RAIZ)), alvo))
+    return quebrados
+
+
 def mortos():
     codigo = corpus()
     arquivos = sorted(p for p in CSS.rglob("*.css") if p.name not in IGNORA_ARQUIVO)
@@ -207,6 +235,10 @@ def main(argv=None) -> int:
     parser.add_argument("--detalhe", action="store_true", help="lista bloco a bloco")
     args = parser.parse_args(argv)
 
+    quebrados = imports_quebrados()
+    for arquivo, alvo in quebrados:
+        print(f"  IMPORT QUEBRADO  {arquivo} -> {alvo}", file=sys.stderr)
+
     achados = mortos()
     por_arquivo: dict[str, list] = {}
     for arquivo, seletor, classes, tamanho in achados:
@@ -222,6 +254,15 @@ def main(argv=None) -> int:
 
     peso_total = sum(x[3] for x in achados) / 1024
     print(f"\nBlocos de CSS sem nenhuma classe viva: {len(achados)} ({peso_total:.1f} KB)")
+
+    if quebrados:
+        print(
+            f"\nERRO: {len(quebrados)} `@import` apontando para arquivo inexistente.\n"
+            "Isto reprova o `collectstatic` de producao (WhiteNoise, MissingFileError),\n"
+            "mas so no passo 14 do CI. Aqui ele custa um segundo.",
+            file=sys.stderr,
+        )
+        return 1
 
     if args.max is not None and len(achados) > args.max:
         print(

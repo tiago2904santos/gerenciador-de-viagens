@@ -54,10 +54,6 @@ CSS_EXCEPTIONS: dict[str, dict] = {
         "reason": "CSS de autenticação — isolado, pode ter cores específicas.",
         "rules": {"hex_color_outside_tokens"},
     },
-    "static/css/dashboard.css": {
-        "reason": "Dashboard e excecao oficial -- hex restantes sao fallbacks de var() no botao do hero.",
-        "rules": {"hex_color_outside_tokens"},
-    },
     "static/css/shell.bundle.css": {
         "reason": "Bundle gerado (NOVO-12) — literais e seletores vêm das fontes; auditar as fontes.",
         "rules": {

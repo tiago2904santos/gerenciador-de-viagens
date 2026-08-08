@@ -4181,3 +4181,43 @@ sobreviver, é defeito de verdade e a correção provável é reduzir o `select_
 o card realmente imprime. Se não sobreviver, esta linha vira nota no `DB-10` e o semeador é que
 precisa de cidade de verdade — o que valeria por si, porque a régua do `PF-07` mede planos com
 tabelas de dimensão irreais.
+
+### NOVO-49 ✅ RESOLVIDO · 🟡 `NOVO` O painel de `/` custava cinco consultas por login para uma tela que o dono não queria · MOR · 0,25 d
+
+`core/views.py:101` contava total de ofícios, ofícios em rascunho, assinaturas pendentes e prestações
+pendentes, e ainda listava as viagens dos próximos 30 dias — **cinco consultas** montadas a cada
+acesso. E `/` é `LOGIN_REDIRECT_URL`: toda sessão do sistema começa ali.
+
+O dono pediu para apagar a tela. Como `/` também é o link da marca na barra lateral, o da barra
+móvel, o `back_url` de duas telas de `cadastros` e a rota `painel` da régua do `PF-07`, **a rota
+fica e o conteúdo sai** — trocar a rota mexeria em cinco lugares, trocar o conteúdo não mexe em
+nenhum.
+
+**Resolvido em 08/08:**
+
+- as cinco consultas saíram da view; o que sobra é `render` com três strings;
+- `templates/core/dashboard.html` perdeu boas-vindas, indicadores e viagens próximas. O que ficou —
+  cabeçalho de página e quatro cartões de módulo — **não tem vocabulário próprio**: nenhuma classe
+  `dashboard-*` sobreviveu;
+- `static/css/dashboard.css` (138 linhas) apagado, mais 3 blocos e 1 seletor agrupado no tema
+  escuro. A exceção de `hex_color_outside_tokens` que o arquivo tinha no auditor saiu junto;
+- **cascata**: `components/cards/summary_card.html` perdeu o único citador e foi apagado. Desta vez
+  a trava do `HT-06` reprovou **antes do merge** — é a diferença entre este ID e o `NOVO-44`, onde a
+  mesma cascata só apareceu com a `main` já vermelha.
+
+**Catracas que descem:** ORM em view **29 → 24** (é a maior queda de uma vez desde o `P-01`), e o
+piso de componentes 83 → 82.
+
+**A decisão de conteúdo é do dono e está registrada:** ele escolheu manter a rota e trocar o
+conteúdo, entre quatro opções que incluíam redirecionar `/` para Ofícios, Eventos ou Roteiros.
+
+**O PR chegou vermelho, e o defeito é de método.** Apaguei `dashboard.css` com prova de grep em
+templates, JS e Python — e esqueci de olhar **CSS citando CSS**: `static/css/style.css:11` tinha
+`@import url("./dashboard.css")`, e o `style.css` entra no bundle. Nenhum gate local pegou: a poda
+olha bloco, o auditor de front olha linha, e nenhum dos dois resolve caminho de arquivo. Quem pegou
+foi o `collectstatic` de produção (WhiteNoise, `MissingFileError`) — no **passo 14** do CI, depois de
+os treze anteriores terem passado.
+
+Fechada a lacuna: `scripts/audit_css_morto.py` passou a reprovar `@import` apontando para arquivo
+inexistente, e a trava foi conferida com um import falso antes de valer. Custa um segundo, contra o
+passo 14 do CI.

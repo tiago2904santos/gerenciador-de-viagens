@@ -12,7 +12,6 @@
 @import url("./cards.css");
 @import url("./cv-search-picker.css");
 @import url("./cv-select.css");
-@import url("./dashboard.css");
 @import url("./stages.css");
 @import url("./documents.css");
 /* <<< css/style.css <<< */
@@ -14423,9 +14422,8 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  .cv-module-card__eyebrow,
-:is(html[data-theme="dark"])
-  .dashboard-page__eyebrow {
+  .cv-module-card__eyebrow
+{
   color: var(--color-accent-text);
 }
 
@@ -14443,22 +14441,6 @@ html[data-theme="dark"] *::after {
   .cv-module-card__footer {
   background: var(--color-surface);
   border-top: 1px solid var(--color-border);
-}
-
-:is(html[data-theme="dark"])
-  .dashboard-page__brand-mark {
-  background: var(--color-accent);
-  color: #19232d;
-}
-
-:is(html[data-theme="dark"])
-  :is(.dashboard-page__welcome-header, .dashboard-page__welcome-body) {
-  border-color: var(--color-border);
-}
-
-:is(html[data-theme="dark"])
-  :is(.dashboard-page__welcome-note, .dashboard-page__section-heading > p) {
-  color: var(--color-muted);
 }
 
 :is(html[data-theme="dark"])

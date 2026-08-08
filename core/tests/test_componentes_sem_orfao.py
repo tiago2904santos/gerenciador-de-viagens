@@ -174,7 +174,14 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         """Sem isto, as regras acima passariam com a pasta vazia.
 
         85 → 83 na cascata do `BE-25`: saíram os 7 do laboratório e o
-        `document_card`, que era de segunda ordem. O piso acompanha exclusão
-        deliberada; queda que ninguém explicou continua reprovando.
+        `document_card`, que era de segunda ordem. 83 → 82 com o esvaziamento do
+        painel de `/`, que deixou `summary_card.html` sem citador. O piso
+        acompanha exclusão deliberada; queda que ninguém explicou continua
+        reprovando.
+
+        **O piso fica com folga zero de propósito e isso é um custo conhecido:**
+        toda remoção deliberada obriga a editar esta linha. É o preço de o teste
+        também servir de trava contra a pasta esvaziar por acidente — e a
+        obrigação de escrever o motivo aqui é justamente o que se quer.
         """
-        self.assertGreaterEqual(len(self.componentes()), 83)
+        self.assertGreaterEqual(len(self.componentes()), 82)
