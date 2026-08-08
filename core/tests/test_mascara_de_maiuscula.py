@@ -44,6 +44,20 @@ class MascaraDeMaiusculaTests(SimpleTestCase):
 
         self.assertIsNone(widget.attrs.get("data-mask"))
 
+    def test_so_text_input_recebe(self):
+        """`Select`, `CheckboxInput` e `HiddenInput` não são campo de texto.
+
+        A primeira versão da regra invertia a pergunta — "não está na lista de
+        exceções? então marca" — e com isso 17 widgets ganhavam o atributo. Não
+        quebrava nada, porque `masks.js` só liga em `input[data-mask]` e
+        `textarea[data-mask]`. Mas atributo inerte no HTML é exatamente o que o
+        próximo leitor interpreta como contrato.
+        """
+        for widget in (forms.Select(), forms.CheckboxInput(), forms.HiddenInput()):
+            with self.subTest(widget=type(widget).__name__):
+                set_widget_style(widget, WidgetStyle.FORM_CONTROL)
+                self.assertIsNone(widget.attrs.get("data-mask"))
+
     def test_widgets_que_nunca_recebem(self):
         for widget in (
             forms.Textarea(),

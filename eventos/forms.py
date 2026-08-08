@@ -5,6 +5,7 @@ from django.utils import timezone
 from cadastros.models import ConfiguracaoSistema
 from core.forms.widgets import WidgetStyle
 from core.forms.widgets import widget_attrs
+from core.forms.widgets import text_attrs
 from core.tenancy import filter_queryset_by_area
 from core.tenancy import get_current_area
 from oficios.forms import ModeloMotivoSelect
@@ -342,10 +343,10 @@ class EventoForm(forms.ModelForm):
             "drive_folder_url",
         ]
         widgets = {
-            "titulo": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL)}),
+            "titulo": forms.TextInput(attrs={**text_attrs(WidgetStyle.FIELD_CONTROL)}),
             "descricao": forms.Textarea(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA), "rows": 4}),
-            "destino_uf": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "maxlength": 2}),
-            "destino_cidade": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL)}),
+            "destino_uf": forms.TextInput(attrs={**text_attrs(WidgetStyle.FIELD_CONTROL), "maxlength": 2}),
+            "destino_cidade": forms.TextInput(attrs={**text_attrs(WidgetStyle.FIELD_CONTROL)}),
             "data_inicio": forms.HiddenInput(attrs={"data-cv-date-picker-start-value": ""}),
             "data_fim": forms.HiddenInput(attrs={"data-cv-date-picker-end-value": ""}),
             "horario_inicio": forms.TimeInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "type": "time"}),
@@ -384,7 +385,7 @@ class TipoEventoForm(forms.ModelForm):
     nome = forms.CharField(
         label="Nome",
         help_text="Ex.: PCPR na Comunidade, Justiça no Bairro.",
-        widget=forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL)}),
+        widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     ativo = forms.BooleanField(
         label="Ativo",

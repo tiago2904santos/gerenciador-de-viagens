@@ -4,6 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.forms import PasswordChangeForm
 
 from .widgets import set_widget_style
+from .widgets import text_attrs
 from .widgets import WidgetStyle
 from .widgets import widget_attrs
 
@@ -51,7 +52,7 @@ class PerfilUsuarioForm(forms.ModelForm):
     nome_completo = forms.CharField(
         label="Nome completo",
         required=False,
-        widget=forms.TextInput(attrs={"autocomplete": "name", **widget_attrs(WidgetStyle.FORM_CONTROL)}),
+        widget=forms.TextInput(attrs={"autocomplete": "name", **text_attrs(WidgetStyle.FORM_CONTROL)}),
     )
 
     class Meta:

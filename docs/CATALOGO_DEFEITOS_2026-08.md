@@ -4471,3 +4471,36 @@ base deve ser: vale onde ninguém disse nada e perde para qualquer coisa que dig
 decidida, e as 64 sobrescritas viram dívida visível em vez de arquitetura. A ordem seguinte é
 remover as redundantes — as que já declaram o que a base entrega, e cuja remoção é provadamente
 neutra — e depois converter as divergentes, uma medição por vez.
+
+### NOVO-55 ✅ RESOLVIDO · `NOVO` Fecha a máscara de maiúscula nos 29 campos que declaravam o widget inline · HT · 0,5 d
+
+Continuação do `NOVO-53`, com o dono aprovando campo a campo. Os 32 que faltavam declaram o widget
+inline (`forms.TextInput(attrs={**widget_attrs(...)})`) e por isso não passavam pelo caminho central.
+
+**Três ficaram de fora, e a razão é a mesma do `username`** — maiusculizar destrói o propósito do
+campo, não só a estética:
+
+| campo | por quê |
+|---|---|
+| `LoginForm.username` | o Django compara byte a byte; o sistema para de autenticar |
+| `PerfilUsuarioForm.username` | idem |
+| `OficioTransporteForm.transporte_busca_ui` | caixa de busca ("Buscar por placa, unidade…"), não é valor gravado |
+
+**Cobertura final: 59 campos de texto com a máscara, e nenhum widget de outro tipo.**
+
+**Dois defeitos meus, achados medindo depois de aplicar.** Nenhum dos dois quebrava teste.
+
+1. **A substituição por janela vazou uma linha.** Trocar `widget_attrs` por `text_attrs` a partir da
+   âncora do campo pegou o `forms.NumberInput` da linha seguinte, em dois lugares. Revertidos por uma
+   checagem que olha para trás e confirma que o `forms.XxxInput(` que contém a troca é `TextInput`.
+2. **O `NOVO-53` marcava widget que não é campo de texto.** A regra perguntava "não está na lista de
+   exceções? então marca", e com isso `Select` (12), `CheckboxInput` (3) e `HiddenInput` (2) ganhavam
+   `data-mask="upper"` — **17 widgets**. Não quebrava nada: `masks.js` só liga em `input[data-mask]` e
+   `textarea[data-mask]`, então o atributo ficava inerte. Mas atributo inerte no HTML é exatamente o
+   que o próximo leitor interpreta como contrato. A pergunta foi invertida: agora é `isinstance(widget,
+   TextInput)` e não `not isinstance(widget, EXCECOES)`.
+
+O helper `text_attrs` existe para a decisão ficar **no ponto de declaração**: `widget_attrs` devolve
+um dicionário e não sabe qual widget vai recebê-lo — o mesmo estilo alimenta `TextInput`,
+`EmailInput` e `Textarea`. Quem escreve `text_attrs` está dizendo "este campo é texto simples e vai
+em maiúscula", e um revisor vê a decisão campo a campo.

@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 
 from core.forms.widgets import WidgetStyle
 from core.forms.widgets import widget_attrs
+from core.forms.widgets import text_attrs
 from core.tenancy import filter_queryset_by_area
 from oficios.models import Oficio
 from oficios.picker import renderizar_so_os_escolhidos
@@ -136,7 +137,7 @@ class ModeloJustificativaForm(forms.ModelForm):
     nome = forms.CharField(
         label="Nome",
         help_text="Use um nome curto para identificar o modelo.",
-        widget=forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL)}),
+        widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     texto = forms.CharField(
         label="Texto do modelo",

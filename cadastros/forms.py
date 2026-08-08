@@ -5,6 +5,7 @@ from django import forms
 from core.forms.widgets import set_widget_style
 from core.forms.widgets import WidgetStyle
 from core.forms.widgets import widget_attrs
+from core.forms.widgets import text_attrs
 from core.normalizers import normalize_plate
 from core.normalizers import normalize_upper
 from core.tenancy import filter_queryset_by_area
@@ -546,7 +547,7 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
                 }
             ),
             "logradouro": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "data-mask": "upper"}),
-            "numero": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "autocomplete": "off"}),
+            "numero": forms.TextInput(attrs={**text_attrs(WidgetStyle.FORM_CONTROL), "autocomplete": "off"}),
             "bairro": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "data-mask": "upper"}),
             "cidade_endereco": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "data-mask": "upper"}),
             "telefone": forms.TextInput(
@@ -560,7 +561,7 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
             ),
             "ramal": forms.TextInput(
                 attrs={
-                    **widget_attrs(WidgetStyle.FORM_CONTROL),
+                    **text_attrs(WidgetStyle.FORM_CONTROL),
                     "autocomplete": "off",
                     "maxlength": "20",
                     "placeholder": "Ex.: 1234",
@@ -610,7 +611,7 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
             required=False,
             widget=forms.TextInput(
                 attrs={
-                    **widget_attrs(WidgetStyle.FORM_CONTROL),
+                    **text_attrs(WidgetStyle.FORM_CONTROL),
                     "readonly": "readonly",
                     "tabindex": "-1",
                     "data-uf-nome": "true",
