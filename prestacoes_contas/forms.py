@@ -10,6 +10,7 @@ from cadastros.models import Viatura
 from core.forms.widgets import set_widget_style
 from core.forms.widgets import WidgetStyle
 from core.forms.widgets import widget_attrs
+from core.forms.widgets import text_attrs
 from core.normalizers import normalize_spaces
 from core.tenancy import filter_queryset_by_area
 from core.uploads import validate_private_document_upload
@@ -166,14 +167,14 @@ class DiarioMotoristaForm(forms.ModelForm):
             "motorista_modo": forms.RadioSelect(),
             "motorista_manual_nome": forms.TextInput(
                 attrs={
-                    **widget_attrs(WidgetStyle.FIELD_CONTROL),
+                    **text_attrs(WidgetStyle.FIELD_CONTROL),
                     "placeholder": "Nome do motorista",
                     "autocomplete": "off",
                 },
             ),
             "motorista_oficio_referencia": forms.TextInput(
                 attrs={
-                    **widget_attrs(WidgetStyle.FIELD_CONTROL),
+                    **text_attrs(WidgetStyle.FIELD_CONTROL),
                     "placeholder": "15/2026",
                     "autocomplete": "off",
                 },
@@ -181,14 +182,14 @@ class DiarioMotoristaForm(forms.ModelForm):
             "viatura_modo": forms.RadioSelect(),
             "viatura_manual_modelo": forms.TextInput(
                 attrs={
-                    **widget_attrs(WidgetStyle.FIELD_CONTROL),
+                    **text_attrs(WidgetStyle.FIELD_CONTROL),
                     "placeholder": "Ex.: Onix",
                     "autocomplete": "off",
                 },
             ),
             "viatura_manual_combustivel": forms.TextInput(
                 attrs={
-                    **widget_attrs(WidgetStyle.FIELD_CONTROL),
+                    **text_attrs(WidgetStyle.FIELD_CONTROL),
                     "placeholder": "Ex.: Gasolina",
                     "autocomplete": "off",
                 },
@@ -488,7 +489,7 @@ class PrestacaoServidorDocumentosForm(forms.ModelForm):
         widgets = {
             "numero_solicitacao": forms.TextInput(
                 attrs={
-                    **widget_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL),
+                    **text_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL),
                     "placeholder": "Informe o número da solicitação",
                     "autocomplete": "off",
                 },
@@ -533,7 +534,7 @@ class PrestacaoSolicitacaoForm(forms.ModelForm):
         widgets = {
             "numero_solicitacao": forms.TextInput(
                 attrs={
-                    **widget_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL),
+                    **text_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL),
                     "placeholder": "Número da solicitação",
                     "autocomplete": "off",
                 },
@@ -560,7 +561,7 @@ class PrestacaoServidorDiariaForm(forms.Form):
         ),
         widget=forms.TextInput(
             attrs={
-                **widget_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL),
+                **text_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL),
                 "placeholder": "Deixe em branco para usar o valor padrão acima",
                 "autocomplete": "off",
             },
@@ -594,17 +595,17 @@ class RelatorioTecnicoForm(forms.ModelForm):
     translado_outro = forms.CharField(
         label="Translado - outro",
         required=False,
-        widget=forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL), "data-rt-other-input": "translado"}),
+        widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL), "data-rt-other-input": "translado"}),
     )
     combustivel_outro = forms.CharField(
         label="Combustível - outro",
         required=False,
-        widget=forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL), "data-rt-other-input": "combustivel"}),
+        widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL), "data-rt-other-input": "combustivel"}),
     )
     passagem_outro = forms.CharField(
         label="Passagem - outro",
         required=False,
-        widget=forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL), "data-rt-other-input": "passagem"}),
+        widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL), "data-rt-other-input": "passagem"}),
     )
 
     class Meta:
@@ -734,7 +735,7 @@ class ModeloTextoRelatorioTecnicoForm(forms.ModelForm):
     nome = forms.CharField(
         label="Nome",
         help_text="Use um nome curto para identificar o modelo.",
-        widget=forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL)}),
+        widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     texto = forms.CharField(
         label="Texto do modelo",

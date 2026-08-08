@@ -9,7 +9,7 @@ from enum import StrEnum
 from django.forms.widgets import EmailInput
 from django.forms.widgets import NumberInput
 from django.forms.widgets import PasswordInput
-from django.forms.widgets import Textarea
+from django.forms.widgets import TextInput
 from django.forms.widgets import URLInput
 from django.forms.widgets import Widget
 
@@ -50,7 +50,10 @@ class WidgetStyle(StrEnum):
 #:   servidores. `/Documentos` e `/documentos` sao coisas diferentes;
 #: - `PasswordInput` maiusculizar senha destroi a senha;
 #: - `NumberInput` nao tem letra; a mascara so custaria um listener por campo.
-SEM_MAIUSCULA = (Textarea, EmailInput, URLInput, PasswordInput, NumberInput)
+#: Subclasses de `TextInput` que NAO recebem a mascara. `Textarea` nao esta aqui
+#: porque nem chega a ser testada: ela nao e `TextInput`, e a regra abaixo so
+#: olha `TextInput`.
+SEM_MAIUSCULA = (EmailInput, URLInput, PasswordInput, NumberInput)
 
 #: Campos que nunca recebem a mascara, mesmo sendo texto simples.
 #:
@@ -77,7 +80,15 @@ def aplicar_mascara_de_maiuscula(widget: Widget, nome: str = "") -> None:
     `setdefault` de proposito: campo que ja declarou a propria mascara (`cep`,
     `cpf`, `telefone`) continua com a dele.
     """
-    if isinstance(widget, SEM_MAIUSCULA):
+    # So `TextInput` — e nao qualquer widget que nao esteja na lista de excecoes.
+    #
+    # A primeira versao invertia a pergunta ("nao esta na lista? entao marca"), e
+    # com isso `Select`, `CheckboxInput` e `HiddenInput` ganhavam o atributo: 17
+    # widgets, medidos. Nao quebrava nada — `masks.js` so liga em
+    # `input[data-mask]` e `textarea[data-mask]`, entao o atributo ficava inerte
+    # —, mas atributo inerte no HTML e exatamente o tipo de coisa que o proximo
+    # leitor interpreta como contrato.
+    if not isinstance(widget, TextInput) or isinstance(widget, SEM_MAIUSCULA):
         return
     if nome in NOMES_SEM_MAIUSCULA or nome.endswith("_busca_ui"):
         return
@@ -88,6 +99,22 @@ def widget_attrs(style: WidgetStyle) -> dict[str, str]:
     """Build the canonical class attribute for a widget declaration."""
 
     return {"class": style.value}
+
+
+def text_attrs(style: WidgetStyle) -> dict[str, str]:
+    """`widget_attrs` mais a máscara de maiúscula, para campo de texto.
+
+    Existe porque `widget_attrs` devolve um dicionário e **não sabe qual widget
+    vai recebê-lo**: o mesmo estilo alimenta `TextInput`, `EmailInput` e
+    `Textarea`. Decidir a máscara ali maiusculizaria e-mail e texto corrido.
+
+    Então a escolha fica no ponto de declaração, e é explícita: quem escreve
+    `text_attrs` está dizendo "este campo é texto simples e vai em maiúscula".
+    Um revisor vê a decisão campo a campo, que é o que ela exige — a lista de
+    exceções do `NOVO-53` não é estética, é corretude (`username` maiusculizado
+    quebra a autenticação).
+    """
+    return {**widget_attrs(style), "data-mask": "upper"}
 
 
 def set_widget_style(
