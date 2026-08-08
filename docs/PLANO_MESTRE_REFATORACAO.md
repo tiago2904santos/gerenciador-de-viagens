@@ -362,7 +362,10 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       `cached_db` **mais** renovação periódica, que são uma coisa só (`cached_db` sozinho
       economiza 1 de 11; as outras 3 dependem de desligar `SESSION_SAVE_EVERY_REQUEST`).
       11 → 7 consultas em toda requisição autenticada, em todas as nove rotas medidas
-- [ ] `PF-06` queries duplicadas em `/usuarios/` e `/prestacoes-contas/`
+- [x] `PF-06` queries duplicadas em `/usuarios/` e `/prestacoes-contas/` — o pior caso não
+      estava no enunciado: **`roteiros:index` tinha 11 consultas a mais**, e foi de 29 para
+      14. `/usuarios/` tinha 1, não 2, e foi corrigida. Sobram três de 1 consulta, com o
+      mecanismo já identificado no catálogo
 
 ### Fase 6 — Camadas e duplicação
 - [ ] `BE-11` editor de roteiro em 3 cópias

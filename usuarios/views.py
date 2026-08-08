@@ -106,7 +106,11 @@ def index(request):
         for usuario in page_obj.object_list
     ]
 
-    contadores = selectors.contadores_administracao()
+    # `PF-06`: sem busca, `page_obj.paginator.count` é a mesma contagem que o
+    # badge quer, e já está calculada (`cached_property`).
+    contadores = selectors.contadores_administracao(
+        total_usuarios=None if q else page_obj.paginator.count,
+    )
 
     return render(
         request,
@@ -156,7 +160,10 @@ def areas_index(request):
         for area in page_obj.object_list
     ]
 
-    contadores = selectors.contadores_administracao()
+    # Mesma razão do `index`, do outro lado do alternador.
+    contadores = selectors.contadores_administracao(
+        total_areas=None if q else page_obj.paginator.count,
+    )
 
     return render(
         request,
