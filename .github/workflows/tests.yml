@@ -33,7 +33,7 @@ jobs:
       COVERAGE_APPS: "core,usuarios,cadastros,roteiros,eventos,documentos,oficios,termos,justificativas,planos_trabalho,ordens_servico,integracoes.google_drive,prestacoes_contas"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
