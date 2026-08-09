@@ -163,11 +163,9 @@
   font-weight: 600;
 }
 
-/* Variante danger */
 .cv-notice--danger,
 .alert-error,
 .alert-danger,
-.alert--danger,
 .alert--error,
 .cv-alert--danger {
   background: var(--color-danger-bg);
@@ -178,7 +176,6 @@
 .cv-notice--danger::before,
 .alert-error::before,
 .alert-danger::before,
-.alert--danger::before,
 .alert--error::before {
   background: var(--color-danger);
 }

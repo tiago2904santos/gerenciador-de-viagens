@@ -855,22 +855,6 @@ html[data-theme="light"] {
   width:         100%;
 }
 
-.main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section > .form-section-header {
-  background:       var(--cv-form-section-header-bg);
-  background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 7%, transparent) 0px, transparent 76px);
-  border-bottom:    1px solid var(--cv-form-section-border);
-  margin:           0;
-  padding:          var(--cv-form-section-header-padding);
-}
-
-.main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section > .form-section-header .app-form-section__title {
-  color:          var(--theme-text-heading);
-  font-size:      var(--font-size-md);
-  font-weight:    var(--font-weight-bold);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
 .main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section > :not(.form-section-header) {
   padding: var(--cv-form-section-body-padding);
 }

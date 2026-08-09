@@ -265,16 +265,14 @@ html[data-theme="dark"] {
   color: var(--action-text-strong);
 }
 
-.cv-btn--ghost,
-.btn--ghost {
+.cv-btn--ghost{
   background: transparent;
   border-color: transparent;
   box-shadow: none;
   color: var(--action-text);
 }
 
-.cv-btn--ghost:hover,
-.btn--ghost:hover {
+.cv-btn--ghost:hover{
   background: var(--action-bg-soft);
   border-color: transparent;
   box-shadow: none;
@@ -354,15 +352,13 @@ html[data-theme="dark"] {
 
 .cv-btn--sm,
 .btn-sm,
-.btn--sm,
 .app-btn--sm {
   border-radius: var(--action-radius-sm);
   min-height: 34px;
   padding-inline: 11px;
 }
 
-.cv-btn--lg,
-.btn--lg {
+.cv-btn--lg{
   min-height: 48px;
   padding-inline: 20px;
 }
@@ -500,20 +496,6 @@ html[data-theme="dark"] {
   color: var(--action-success-text);
 }
 
-/* Agrupamentos: uma unica superficie reduz ruido e organiza a hierarquia. */
-.cv-btn-group,
-.btn-group {
-  align-items: center;
-  background: var(--action-group-bg);
-  border: 1px solid var(--action-group-border);
-  border-radius: var(--action-group-radius);
-  box-shadow: var(--action-group-shadow);
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  padding: 4px;
-}
-
 .cv-icon-btn-group {
   align-items: center;
   background: transparent;
@@ -524,10 +506,6 @@ html[data-theme="dark"] {
   gap: 6px;
   padding: 0;
 }
-
-.cv-btn-group .cv-btn,
-.btn-group .btn,
-.btn-group .app-btn,
 .cv-icon-btn-group .cv-icon-btn {
   box-shadow: none;
 }
@@ -1332,10 +1310,6 @@ html[data-theme="dark"] #attach-signed-modal .cv-icon-btn.cv-icon-btn--delete,
 }
 
 @media (max-width: 640px) {
-  .cv-btn-group,
-  .btn-group {
-    max-width: 100%;
-  }
 
   .cv-icon-btn-group {
     max-width: 100%;

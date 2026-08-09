@@ -13,14 +13,10 @@
   gap: var(--space-4);
 }
 
-/* --------------------------------------------------------------------------
-   1. Base de superficie
-   -------------------------------------------------------------------------- */
 .card,
 .app-card,
 .module-card,
 .document-card,
-.summary-card,
 .page-card {
   background: var(--color-card);
   border: 1px solid var(--color-border);
@@ -32,8 +28,7 @@
 .card,
 .app-card,
 .module-card,
-.document-card,
-.summary-card {
+.document-card{
   padding: var(--space-4);
   transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
 }
@@ -41,8 +36,7 @@
 .card:hover,
 .app-card:hover,
 .module-card:hover,
-.document-card:hover,
-.summary-card:hover {
+.document-card:hover{
   border-color: var(--color-accent-border-strong);
   box-shadow: var(--shadow-panel);
   transform: translateY(-2px);
@@ -75,27 +69,6 @@
   border-left: 6px solid var(--color-accent);
   display: grid;
   gap: var(--space-3);
-}
-
-.summary-card {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.summary-label {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.summary-card strong {
-  font-size: var(--font-size-xl);
-}
-
-.summary-card p {
-  color: var(--color-muted);
-  margin-bottom: 0;
 }
 
 .module-placeholder-card {
