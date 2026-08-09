@@ -7,6 +7,26 @@ JavaScript medido por varredura e leitura dirigida. Nada aqui foi herdado das au
 [`PLANO_MESTRE_REFATORACAO.md`](PLANO_MESTRE_REFATORACAO.md) · **Defeitos:**
 [`CATALOGO_DEFEITOS_2026-08.md`](CATALOGO_DEFEITOS_2026-08.md) (prefixos `UI`, `HT`, `JS`)
 
+> ## ⚠️ Este documento cobre até a F4. A F5 mudou de casa.
+>
+> **As etapas F0 a F4 abaixo estão fechadas** e o texto delas fica como registro do que foi feito
+> e por quê. A **F5 ("reconstrução por domínio"), que aqui está descrita como "a dimensionar",
+> foi dimensionada em 09/08/2026** e virou documento próprio:
+>
+> ### → [`PLANO_RECONSTRUCAO_FRONT_2026-08.md`](PLANO_RECONSTRUCAO_FRONT_2026-08.md)
+>
+> Lá estão as doze etapas da Fase 7 do plano mestre — componentização por `django-cotton`, desenho
+> único entre os temas, duas camadas de token, fronteira de domínio no CSS e entrega do JS —, cada
+> uma com arquivos, comando de verificação e catraca. **A F6 (`JS-03`, runner de teste) também foi
+> para lá**, como etapa E1, porque deixou de ser aditiva: ela é a rede que segura as etapas de
+> componentização.
+>
+> **Os números deste documento são de 05/08 e envelheceram.** A linha de base vigente, remedida em
+> 09/08 com o comando de cada número ao lado, está no §2 do documento novo. Para dar a ordem de
+> grandeza da diferença: a suíte foi de 1.306 para **1.824 testes**, o auditor de front de 392
+> para **240 avisos**, o CSS de 43.038 para **32.940 linhas** — e os imports de CSS de domínio
+> alheio, que este plano registra em 54, **subiram para 97**.
+
 ---
 
 ## 1. O estado real
@@ -172,7 +192,16 @@ claro e escuro, componente a componente, com print antes/depois no PR.
 **Gate:** `!important` fora do bundle caindo de 497; nenhum token definido em mais de dois
 arquivos; contraste medido (não estimado) nos pares alterados.
 
-### F5 — Reconstrução por domínio · a dimensionar · risco médio
+### F5 — Reconstrução por domínio · **dimensionada em 09/08 → documento próprio**
+
+> **Esta etapa virou [`PLANO_RECONSTRUCAO_FRONT_2026-08.md`](PLANO_RECONSTRUCAO_FRONT_2026-08.md).**
+> Os quatro IDs abaixo continuam válidos e estão distribuídos assim: `UI-04` na etapa E10,
+> `JS-07`/`JS-08`/`JS-09`/`JS-10` na E11. O documento novo acrescenta o que esta tabela não
+> previa — a componentização por `django-cotton` (`NOVO-71`) e o desenho único entre os temas
+> (`NOVO-58`), que são a maior parte do trabalho.
+>
+> A tabela original fica abaixo como registro do dimensionamento de 05/08.
+
 
 | ID | Defeito | Dias |
 |---|---|---:|
@@ -188,11 +217,17 @@ domínio só se sabe depois de saber quais componentes existem.
 **Métrica de aceite da frente inteira:** uso de CSS por rota acima de **35%** (hoje: 10,1% a
 11,8%), medido pelo mesmo script de `PF-02`.
 
-### F6 — Teste de JavaScript · 5+ dias · risco baixo · etapa própria
+### F6 — Teste de JavaScript · **virou a etapa E1 do documento novo**
 
-`JS-03` — não há runner, não há `package.json`, não há um único teste para 17.859 linhas. Entra
-como etapa própria, aditiva, começando pelos módulos mais críticos e mais testáveis:
-`core/http.js`, o registry de `core/app.js`, `masks.js`, `components/collection.js`.
+`JS-03` — não há runner, não há `package.json`, não há um único teste para 17.859 linhas (hoje
+**18.382**). Começa pelos módulos mais críticos e mais testáveis: `core/http.js`, o registry de
+`core/app.js`, `masks.js`, `components/collection.js`.
+
+> **Deixou de ser "etapa própria, aditiva".** O dono aprovou o runner, e a reconstrução o
+> transformou em **pré-requisito**: as etapas de componentização (E4–E6) trocam o motor de
+> renderização de 82 componentes e reescrevem 946 pontos de chamada. Sem teste, a única rede é
+> conferência visual em 43 telas, a cada PR. Por isso ele virou a **E1** — logo depois da régua e
+> antes de qualquer mudança estrutural.
 
 Enquanto isso não existir, **toda etapa deste plano depende de conferência visual** — o que é
 justamente o motivo de F1 vir antes de qualquer renomeação.

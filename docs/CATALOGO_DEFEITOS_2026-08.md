@@ -22,7 +22,23 @@ trabalho**.
 Severidade: 🔴 crítica · 🟠 alta · 🟡 média · ⚪ baixa.
 Origem: `AUD` = auditoria desta sessão · `MED` = medição direta no fio principal · `VER` =
 enunciado corrigido pela passada de verificação · `NOVO` = acrescentado depois da abertura do
-catálogo.
+catálogo · `MOR` = código morto achado por varredura · `COR` = correção de rumo.
+
+> **Cinco números de `NOVO` estão duplicados, e ficam assim de propósito.** `NOVO-27`, `NOVO-45`,
+> `NOVO-49`, `NOVO-50` e `NOVO-51` titulam duas entradas diferentes cada, por acidente de sessões
+> paralelas. Renumerar quebraria o rastro dos PRs que já os citam, então a colisão fica registrada
+> aqui e quem for citar um deles **diz também o domínio** (`NOVO-50/MED` é a paleta; `NOVO-50/PF`,
+> o `Nested Loop`).
+>
+> **A regra que decide entre renumerar e conviver:** o número já foi citado em PR mesclado? Se sim,
+> conviva e desambigue pelo domínio. Se não, renumere — foi o que se fez com o levantamento de
+> 09/08, que nasceu em `NOVO-66`…`73` e virou `NOVO-69`…`76` quando os PRs #283 e #284 chegaram
+> primeiro à `main`.
+>
+> **E a causa, que continua aberta:** a numeração é descoberta lendo o maior `NOVO` do arquivo.
+> Duas sessões que começam juntas leem o mesmo número e reservam o mesmo ID. Cinco colisões em um
+> ciclo não é azar, é o método. Quem for fechar isso, feche com um comando que reserva
+> (`scripts/`), não com disciplina.
 
 ## A passada de verificação de 05/08
 
@@ -472,6 +488,15 @@ estar: `tmp/` (23), `media_teste/` (6), `migration_backups/` (2, um deles um `.d
 `logs/` (2), `.tmp-footer-check/` (3), `.tmp-sede-destinos-check/` (4), `_tmp_check4.py`,
 `_tmp_check5.py`, `tatus` (um `git status` redirecionado por engano),
 `.codex-runserver-8001.{err,out}.log`.
+
+> **Remedido em 09/08: `screenshots/` está em 39 MB**, não 89 — parte dos PNGs do UI Lab saiu junto
+> com os labs no PR #247. A ordem de grandeza do defeito continua; o número, não. E há uma
+> dependência nova: `screenshots/auditoria-telas/_capturar.py` é hoje o **único** lugar do
+> repositório que enumera as telas do sistema, e o `NOVO-67` precisa desse corpus. Tirar
+> `screenshots/` do repositório **depois** da etapa E0, que move o corpus para `scripts/`, ou o
+> `BE-24` leva a régua embora junto com as imagens.
+>
+> `ui_lab2/` também sobreviveu, como diretório de `__pycache__` — virou o `NOVO-69`.
 
 ### BE-25 ✅ RESOLVIDO · 🟡 Dois UI Labs concorrentes, sem regra de qual é o vigente · AUD · 0,75 d
 
@@ -1744,6 +1769,16 @@ não está documentado. É um `PADRAO_*` que aponta para o passado — quem segu
 Componentes leem contexto ambiente do chamador em vez de receber só o que declaram. É como um
 componente passa a depender de uma variável que o chamador tem por acaso — e quebra quando outro
 chamador não tem.
+
+> **Remedido em 09/08: são 275 de 946 includes** (29%), não um percentual solto —
+> `grep -rho '{%\s*include' templates` contra a variante que termina em `only`.
+>
+> **E o enunciado descreve o sintoma, não a causa.** A causa é que nenhum componente **declara**
+> quais parâmetros aceita, então não há contrato para o `only` proteger — é o `NOVO-68`. Por
+> decisão do dono, os dois fecham juntos pela adoção do `django-cotton`, que passa só o atributo
+> declarado: o `only` deixa de ser disciplina de quem escreve o `{% include %}` e vira o
+> comportamento do motor. **Fila:** etapa E5 do
+> [`PLANO_RECONSTRUCAO_FRONT_2026-08.md`](PLANO_RECONSTRUCAO_FRONT_2026-08.md).
 
 ### HT-15 🟡 Bloco `cv-itinerary` duplicado em 5 apps · AUD · 1,5 d
 
@@ -5175,3 +5210,172 @@ barrar. Então a partição fica **fora desta leva**, com o ganho já medido (11
 for investigada com calma.
 
 **O que resta no arquivo:** 590 seletores ainda escopados ao escuro contra 175 já globais.
+
+---
+---
+
+## Levantamento de 09/08/2026 — a reconstrução do front
+
+Oito defeitos achados ao medir o sistema para escrever o
+[`PLANO_RECONSTRUCAO_FRONT_2026-08.md`](PLANO_RECONSTRUCAO_FRONT_2026-08.md), que é a Fase 7 do
+plano mestre. Nenhum deles aparece nas medições de 05/08 — quatro são resíduo de PRs recentes, dois
+são instrumentos que não funcionam, e um é ambiente.
+
+> **Estes IDs nasceram como `NOVO-66`…`NOVO-73` e foram renumerados para `NOVO-69`…`NOVO-76`.** Os
+> PRs #283 e #284 entraram na `main` enquanto este levantamento era escrito, e reservaram
+> `NOVO-66`, `NOVO-67` e `NOVO-68` para outros defeitos. Como estes aqui ainda não tinham sido
+> citados por nenhum PR mesclado, renumerá-los foi mais barato que criar a quinta colisão do
+> catálogo — que é o inverso da decisão tomada para as quatro colisões antigas, e pelo mesmo
+> critério: **o que manda é se o número já está em uso em PR mesclado.**
+>
+> **A colisão não foi acidente de sorte, foi de método.** Dois trabalhos de front correram em
+> paralelo na mesma semana, cada um lendo o "maior `NOVO` do catálogo" no seu próprio ponto de
+> partida. Enquanto a numeração for descoberta por leitura do arquivo, duas sessões simultâneas vão
+> reservar o mesmo número sempre que se cruzarem — e este catálogo já tem cinco provas disso.
+>
+> **O que o PR #283 mudou embaixo deste levantamento:** os 60 arquivos de CSS saíram da raiz para
+> oito pastas por função (`base/`, `layout/`, `fields/`, `actions/`, `lists/`, `feedback/`,
+> `components/`, `pages/`). Todos os caminhos citados abaixo e no plano de reconstrução já são os
+> novos. Os defeitos foram reconferidos depois do merge: **os oito continuam de pé**.
+
+### NOVO-69 🟡 `NOVO` `cv-select.js` está morto desde o PR #247 e continua no bundle de toda página · MOR · 0,25 d
+
+`static/js/cv-select.js` tem **343 linhas** e responde a `[data-cv-dropdown]` e
+`[data-cv-filter-dropdown]`. **Nada no sistema emite esses atributos.** A varredura em `templates/`,
+`static/js/` e nos treze apps devolve só três tipos de sobrevivente, nenhum deles um uso:
+
+- comentário e seletor em `static/css/fields/select.css:99,147-148`;
+- a tabela de contrato em `docs/DATA_ATTRIBUTES_JS.md:118-124`;
+- relatórios em `docs/historico/`.
+
+O `JS-08` já o listava como "343 linhas, 1 template — e só sob `DEBUG`, via `ui_lab2/selects.html`".
+O PR #247 apagou os dois UI Labs, e aquele único uso virou **zero**. O arquivo continua em
+`SHELL_JS` (`scripts/build_shell_bundles.py:74`), então é baixado e analisado em toda navegação.
+
+**A armadilha, para quem for apagar:** `custom-select` **não** é dele. Esse markup é atendido por
+`components/picker-select.js`, via `data-entity-picker` — são 7 templates de produção. Apagar a
+família de CSS junto com o JS quebraria os seletores customizados do sistema inteiro.
+
+**Fila:** etapa E2 do plano de reconstrução.
+
+### NOVO-70 🟠 `NOVO` A métrica de aceite do `PF-02` não tem instrumento no repositório · QA · 1,5 d
+
+O `PF-02` fixa o aceite da frente de front inteira em **uso de CSS acima de 35% por rota**, contra
+os 10,1%–11,8% medidos. **Nenhum script do repositório mede isso.** `scripts/medir_desempenho.py`
+mede consultas, KB de HTML e tempo; a medição original de CSS foi feita à mão, com Chromium via
+CDP, e não ficou. O mesmo vale para a divergência entre temas do `NOVO-58`: o número existe, o
+comando que o produz não.
+
+**Efeito:** a etapa mais cara do ciclo não tem como declarar que terminou, e nenhuma das etapas
+intermediárias tem como provar que não regrediu. É exatamente o buraco que a Fase 1 fechou para
+desempenho e que segue aberto para CSS.
+
+**E o corpus de rotas está podre.** `screenshots/auditoria-telas/_capturar.py` lista 57 telas, das
+quais **14 são rotas de UI Lab que o PR #247 apagou** (`/dev/ui-lab/*` não resolve mais, e
+`ui_lab2` não está em `INSTALLED_APPS`). Sobram **43** reais. O corpus precisa sair de
+`screenshots/` — 39 MB que o `BE-24` quer tirar do repositório — e virar módulo em `scripts/`.
+
+**Fila:** etapa E0 do plano de reconstrução, antes de tudo.
+
+### NOVO-71 🟠 `NOVO` Componente global não tem contrato de parâmetro · HT · 6+ d
+
+**275 dos 946 `{% include %}`** do sistema não usam `only`. O componente lê o contexto que o
+chamador tem por acaso, e quebra quando outro chamador não tem — que é o `HT-14` pelo lado do
+sintoma. O lado da causa é que **não existe declaração**: nenhum componente diz quais parâmetros
+aceita, então nem o autor nem o chamador nem o CI sabem qual é o contrato.
+
+O dono decidiu fechar isso por **`django-cotton`** (2.7.2 no índice; Django 5.2.16 no projeto), que
+passa só o atributo declarado — o `only` deixa de ser disciplina e vira o comportamento do motor.
+
+**O custo escondido é a configuração, não a migração.** O cotton exige `loaders` explícitos em
+`TEMPLATES`, e isso é incompatível com o `APP_DIRS: True` de `config/settings/base.py:161-176`.
+Trocar o carregador muda a resolução de **407 templates** de uma vez, e o modo de falhar é
+`TemplateDoesNotExist` em rota que ninguém abriu no PR.
+
+**Fila:** etapas E3 (instalar), E4 (converter os 82 componentes) e E5 (migrar os call sites).
+
+### NOVO-72 ⚪ `NOVO` `ui_lab2/` sobreviveu à remoção do PR #247 · MOR · 0,1 d
+
+O `BE-25` decidiu que nenhum dos dois UI Labs é o vigente e o PR #247 os apagou. `ui_lab2/` ficou
+para trás como diretório contendo só `__pycache__/*.pyc`. Não está em `INSTALLED_APPS`, não tem
+rota, não tem fonte — é o rastro de um app que não existe mais.
+
+**Fila:** etapa E2.
+
+### NOVO-73 ⚪ `NOVO` Nome e lugar de arquivo JS sem padrão · MOR · 0,5 d
+
+Duas divergências, nenhuma delas cosmética a longo prazo, porque é assim que o próximo
+desenvolvedor aprende o padrão errado:
+
+- **Caixa:** `static/js/roteiros_wizard.js` e `static/js/pages/gdrive_config.js` em snake_case,
+  contra kebab-case nos outros 62 arquivos.
+- **Lugar:** `roteiros.js` (813 linhas em `roteiros-map.js`, mais `roteiros.js` e
+  `roteiros_wizard.js`) mora na **raiz** de `static/js/`, ao lado da infra compartilhada
+  (`autosave.js`, `theme-toggle.js`), enquanto todo o resto do código de domínio está em
+  `static/js/pages/`.
+
+Mover exige atualizar `SHELL_JS` em `scripts/build_shell_bundles.py`, os `{% block extra_js %}` que
+os citam e `docs/DATA_ATTRIBUTES_JS.md`.
+
+**Fila:** etapa E2.
+
+### NOVO-74 🟡 `NOVO` Dois namespaces de componente concorrentes, com quatro pastas fantasma · HT · junto da E5
+
+`templates/components/` tem **duas gerações vivas ao mesmo tempo**:
+
+| o que está lá | o que deveria estar |
+|---|---|
+| `components/buttons/`, `components/forms/`, `components/modals/`, `components/steppers/` — **só `.gitkeep`** | os componentes reais moram em `components/ui/buttons/`, `.../forms/`, `.../modals/` |
+| `components/form/` (singular, **1 arquivo, 37 usos**) | convive com `components/forms/` (plural, **vazia**) |
+| `components/cards/module_card.html` | ao lado de `components/ui/lists/entity_card.html` |
+| `components/feedback/alerts.html` | ao lado de `components/ui/feedback/alert.html` |
+
+Quatro diretórios existem só para segurar um `.gitkeep`, prometendo uma organização que o código
+não seguiu. Quem for criar um botão novo tem dois lugares plausíveis e nenhum critério.
+
+**Fila:** etapa E5, junto da migração dos call sites — mover para `templates/cotton/` resolve os
+dois namespaces de uma vez, em vez de renomear duas vezes.
+
+### NOVO-75 🔴 `NOVO` O comando de suíte do `AGENTS.md` não funciona no ambiente que o projeto monta para os agentes · COR · 0,1 d
+
+`requirements/dev.txt` puxa `base.txt` e `lint.txt`, e **não puxa `test.txt`**. O hook
+`.claude/hooks/session-start.sh:20` instala só o `dev.txt`. Resultado: `tblib` e `coverage` nunca
+entram no ambiente de nenhuma sessão remota.
+
+Sem `tblib`, o comando que o `AGENTS.md` §7 e o `PLANO_MESTRE` §5 mandam rodar —
+`manage.py test --settings=config.settings.test --parallel 4` — **aborta com
+`TypeError: cannot pickle 'traceback' object` sem dizer qual teste falhou**. E dois testes falham:
+`core/tests/test_suite_paralela.py`, que existem justamente para guardar esse contrato e que
+descrevem o sintoma com precisão na própria mensagem de falha.
+
+**Medido hoje.** Com `pip install -r requirements/test.txt`, a suíte vai de 2 falhas para
+**1.824 testes verdes, 7 skips, 14,7 s** com `--parallel 4`.
+
+**Por que é 🔴 apesar de ser uma linha.** Todo gate de todo PR deste ciclo depende de a suíte
+rodar. O defeito não quebra produção — quebra a capacidade de provar qualquer coisa, e o faz de
+um jeito que parece falha do trabalho do agente, não do ambiente.
+
+**Fila:** primeiro commit da etapa E0, antes de qualquer outra coisa.
+
+### NOVO-76 🟡 `NOVO` O `audit_ui_patterns.py` está no ciclo obrigatório e nunca pode passar · COR · 0,5 d
+
+O `AGENTS.md` §4 manda rodar três auditores no passo 5 de toda tarefa, e um deles é
+`scripts/audit_ui_patterns.py`. **Ele sai 1 sempre** — hoje, na `main`, com 5.173 ocorrências
+informativas, das quais a esmagadora maioria é a regra `hex_or_rgba` disparando dentro dos próprios
+arquivos de token (`base/03-theme-dark.css:22-28` etc.), onde a cor literal é a definição e não um
+desvio.
+
+Ele também **não está no `tests.yml`** — os seis auditores do CI são `audit_frontend_standards`,
+`audit_css_morto`, `audit_paleta`, `audit_foco_visivel`, `audit_django_architecture` e
+`audit_area_scoped_managers`. Então é um script que o contrato manda rodar, que sempre reprova, e
+que nada verifica.
+
+**O custo não é o exit code, é o que ele ensina.** Um verificador que nunca passa treina quem o
+roda a ignorar a saída — e no dia em que ele apontar algo real, ninguém vai olhar. As regras
+`IGNORED_PARTS` (`scripts/audit_ui_patterns.py:10`) já reconhecem esse problema para
+`templates/components/ui`; falta o mesmo para os arquivos de token, e falta decidir se ele é
+catraca (com teto, no CI) ou relatório (e aí sai do §4 do `AGENTS.md`).
+
+**Cuidado ao consertar:** a etapa E4 do plano de reconstrução move componentes para
+`templates/cotton/`, e `IGNORED_PARTS` precisa acompanhar no mesmo PR — senão o número se move por
+mudança de escopo, não de qualidade.

@@ -30,6 +30,13 @@ Este ciclo começa com medição nova. Tudo aqui foi medido em **05/08/2026**, p
 
 ## 2. Linha de base medida
 
+> **Esta tabela é de 05/08 e envelheceu — vale o §7.4 deste próprio documento.** Remedida em
+> 09/08: a suíte está em **1.824 testes, 7 skips, 14,7 s** (não 1.306 em 9,9 s), o auditor de front
+> em **240 avisos com teto 246** (não 392 com teto 401), o CSS de fonte em **32.940 linhas** (não
+> 43.038) e o JS em **18.382** (não 17.859). A linha de base vigente do front, com o comando de
+> cada número ao lado, está no §2 do
+> [`PLANO_RECONSTRUCAO_FRONT_2026-08.md`](PLANO_RECONSTRUCAO_FRONT_2026-08.md).
+
 | medida | valor | como |
 |---|---|---|
 | Suíte | **1.306 testes**, 0 falhas, 4 skips, **9,9 s** | `manage.py test --settings=config.settings.test --parallel 4` |
@@ -75,7 +82,7 @@ configurações segue como proposta sem posição na fila.
 | **4** | **Fundação do front** | `PF-01`, `HT`, `UI` (CSS morto) | ver plano de front | médio | Folha de símbolos de ícone, componentes que faltam, remoção do CSS comprovadamente morto. Fixa **quais classes existem** — pré-requisito da reconstrução. **F1 concluída** (`JS-06`, `JS-05`, `JS-02`); faltam F2 e F3. |
 | **5** | **Consulta e índice** | `DB-09`…`DB-12` | 8,5 | médio | Ganho medido de 13× a 29× num índice composto; busca livre em varredura sequencial. Depois da fase 3, porque constraint muda plano de consulta. |
 | **6** | **Camadas e duplicação** | `BE-11`…`BE-17` | 17,5 | alto | Editor de roteiro em 3 cópias, `roteiro_logic.py` com 1.779 linhas fora do contrato. Mexe em roteiro e diárias: **plan mode obrigatório**. |
-| **7** | **Reconstrução do CSS** | `UI` | ver plano de front | médio | A mais visível e a mais reversível. Depois da fase 4, que define os nomes. |
+| **7** | **Reconstrução do front** — CSS, HTML e JS. Dimensionada em 09/08 no [`PLANO_RECONSTRUCAO_FRONT_2026-08.md`](PLANO_RECONSTRUCAO_FRONT_2026-08.md): doze etapas | `UI`, `HT`, `JS` | ver o documento | médio, com a E8 em **alto** | A mais visível e a mais reversível. Depois da fase 4, que define os nomes. Escopo ampliado por decisão do dono: componentização por `django-cotton`, desenho único entre os temas e teste de JS no CI |
 | **8** | **Observabilidade e autorização** | `BE-18`, `BE-19` | 4 | médio | `capture()` só existe num app; `PAPEL_ADMIN` é decorativo. |
 | **9** | **Finalização e higiene** | `BE-20`…`BE-25` | 4 | baixo | Fecha a conta: app-casca, código morto, repositório, PRs abertos, vocabulário de rotas. |
 
@@ -378,21 +385,51 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       dois labs e as 1.013 linhas de fixture; a cascata de componentes que ele deixou é o
       `NOVO-44`
 
-### Fase 7 — Reconstrução do CSS
-- [ ] `UI-03` nove arquivos definem token de cor → duas camadas
-- [ ] `UI-02` tema escuro deixa de ser camada de exceção (5.843 linhas, 190 `!important`)
-- [ ] `UI-04` 54 imports de CSS de outro domínio, em 26 templates
-- [ ] `HT-04` `base.html` carrega ~153 KB de JS de domínio em toda página
-- [ ] `HT-08` 80 `<button>` fora do sistema de componentes
-- [ ] `HT-15` bloco `cv-itinerary` duplicado em 5 apps
-- [ ] `HT-14` 28% dos includes não usam `only`
-- [ ] `HT-07` concatenação condicional com "·" no template
-- [ ] `HT-10` `data-*` de toggle legado em componente compartilhado
-- [ ] `JS-07` "fechar ao clicar fora / Esc" em 4 cópias
-- [ ] `JS-08` 11% do bundle atende menos de 1% das páginas
-- [ ] `JS-09` tela de espera carrega 264 KB para usar 3,3 KB
-- [ ] `JS-10` decidir os stubs do editor de roteiros
-- [ ] `JS-03` runner de teste de JavaScript (etapa própria)
+### Fase 7 — Reconstrução do front (CSS, HTML e JavaScript)
+
+**Dimensionada em 09/08/2026 no [`PLANO_RECONSTRUCAO_FRONT_2026-08.md`](PLANO_RECONSTRUCAO_FRONT_2026-08.md)**,
+que é o documento a seguir para esta fase: doze etapas (E0–E11), cada uma com arquivos, comando de
+verificação e catraca. O escopo cresceu em relação ao que este quadro previa, por três decisões do
+dono: **componentização por `django-cotton`**, **desenho único entre os temas claro e escuro** e
+**runner de teste de JavaScript no CI**.
+
+O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta lista.
+
+- [ ] `NOVO-75` 🔴 `dev.txt` não puxa `test.txt` — o `--parallel 4` aborta em toda sessão remota · **E0**
+- [ ] `NOVO-70` a métrica de aceite do `PF-02` não tem instrumento; corpus de rotas com 14 telas mortas · **E0**
+- [ ] `NOVO-76` `audit_ui_patterns.py` está no ciclo obrigatório do `AGENTS.md` §4 e sai 1 sempre · **E0**
+- [ ] `JS-03` runner de teste de JavaScript — deixou de ser aditivo, virou pré-requisito · **E1**
+- [ ] `NOVO-69` `cv-select.js` (343 linhas) morto desde o PR #247, ainda no bundle · **E2**
+- [ ] `NOVO-72` `ui_lab2/` sobreviveu ao PR #247 · **E2**
+- [ ] `NOVO-73` nome e lugar de arquivo JS sem padrão · **E2**
+- [ ] `NOVO-48` 70 nomes de classe morta dentro de seletor agrupado vivo · **E2**
+- [ ] `NOVO-71` componente global sem contrato de parâmetro → `django-cotton` · **E3, E4, E5**
+- [ ] `HT-14` 275 de 946 includes não usam `only` — fecha por construção no cotton · **E5**
+- [ ] `NOVO-74` dois namespaces de componente, quatro pastas fantasma de `.gitkeep` · **E5**
+- [ ] `HT-08` 82 `<button>` fora do sistema de componentes · **E6**
+- [ ] `HT-15` bloco `cv-itinerary` duplicado em 5 apps · **E6**
+- [ ] `NOVO-16` markup do picker copiado à mão em 3 templates e 5 arquivos JS · **E6**
+- [ ] `HT-10` `data-*` de toggle legado em componente compartilhado · **E6**
+- [ ] `HT-07` concatenação condicional com "·" no template · **E6**
+- [ ] `UI-03` nove arquivos definem token de cor → duas camadas · **E7**
+- [ ] `NOVO-51` as `--cv-*` que ainda são apelido, não token (PARCIAL) · **E7**
+- [ ] `NOVO-54` as 64 sobrescritas de `.cv-field__control` (PARCIAL) · **E7**
+- [ ] `NOVO-58` 🔴 claro e escuro são dois desenhos — o redesenho passa a valer no claro · **E8**
+- [ ] `UI-02` tema escuro deixa de ser camada de exceção (5.619 linhas, 190 `!important`) · **E9**
+- [ ] `UI-04` **97** imports de CSS de outro domínio, em **36** templates · **E10**
+- [ ] `HT-04` `base.html` carrega ~153 KB de JS de domínio em toda página · **E11**
+- [ ] `JS-07` "fechar ao clicar fora / Esc" em 4 cópias · **E11**
+- [ ] `JS-08` 11% do bundle atende menos de 1% das páginas · **E11**
+- [ ] `JS-09` tela de espera carrega 264 KB para usar 3,3 KB · **E11**
+- [ ] `JS-10` decidir os stubs do editor de roteiros — depende do `BE-13` · **E11**
+
+**Fechados nesta fase antes do dimensionamento** (a reconstrução parcial de 07–08/08, que o quadro
+não registrava): `NOVO-50/MED` paleta de 255 cores duplicadas · `NOVO-51` poda dos 55 apelidos
+puros de token · `NOVO-52` foco no editor de roteiro · `NOVO-53`/`NOVO-55`/`NOVO-56`/`NOVO-57`
+máscara de maiúscula · `NOVO-59` ícone de botão invisível no tema claro · `NOVO-60` levantamento da
+renomeação por função · `NOVO-61` dez nomes mortos em seletor agrupado · `NOVO-62` `Inter`
+empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral globalizada ·
+`NOVO-64` 176 tokens sem prefixo · `NOVO-65` 545 classes sem prefixo.
 
 ### Fase 8 — Observabilidade e autorização
 - [ ] `BE-18` `capture()` só existe em um app; 72 `except` mudos
