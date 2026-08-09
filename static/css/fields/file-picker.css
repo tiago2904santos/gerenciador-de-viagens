@@ -1,8 +1,7 @@
 /* Canonical file picker and attached-file list. Page CSS may position it, not skin it. */
 
 .file-input,
-.prestacao-file-input,
-.prestacao-file-widget__clear-input {
+.prestacao-file-input {
   clip: rect(0 0 0 0);
   clip-path: inset(50%);
   height: 1px;
@@ -121,8 +120,7 @@
 }
 
 .file-picker__upload,
-.prestacao-file-picker__upload,
-.prestacao-file-picker__clear {
+.prestacao-file-picker__upload {
   align-items: center;
   border: 0;
   border-left: 1px solid var(--color-border);
@@ -316,8 +314,7 @@
   }
 
   .file-picker__upload,
-  .prestacao-file-picker__upload,
-  .prestacao-file-picker__clear {
+  .prestacao-file-picker__upload {
     border-left: 0;
     border-top: 1px solid var(--color-border);
     min-height: 44px;

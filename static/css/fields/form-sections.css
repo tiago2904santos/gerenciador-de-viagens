@@ -6,8 +6,7 @@
    structure with module-prefixed selectors.
    ======================================================================== */
 
-.form-card > .form-section-body,
-.form-card__body {
+.form-card > .form-section-body {
   display: grid;
   gap: 10px;
 }
@@ -139,8 +138,7 @@
   min-width: 0;
 }
 
-.form-subsection__header,
-.resource-picker__header {
+.form-subsection__header {
   align-items: baseline;
   display: flex;
   gap: var(--space-3);
@@ -148,17 +146,14 @@
   min-width: 0;
 }
 
-.form-subsection__copy,
-.resource-picker__copy {
+.form-subsection__copy {
   display: grid;
   gap: 3px;
   min-width: 0;
 }
 
 .form-subsection__title,
-.form-subsection__description,
-.resource-picker__title,
-.resource-picker__description {
+.form-subsection__description {
   margin: 0;
 }
 
@@ -225,8 +220,7 @@
     width: 100%;
   }
 
-  .form-subsection__header,
-  .resource-picker__header {
+  .form-subsection__header {
     align-items: flex-start;
     flex-direction: column;
   }

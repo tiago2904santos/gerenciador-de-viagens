@@ -57,12 +57,11 @@
 }
 
 /* ============================================================
-   Painel grid (design system) — base visual de .roteiro-editor__grid
+   Painel grid do design system.
    Tokens de rota; caixa extra só em .app-form-grid-panel.
    ============================================================ */
 
-.app-form-grid-panel,
-.roteiro-editor__grid {
+.app-form-grid-panel {
   background: var(--route-card-inner-bg);
   box-sizing: border-box;
   display: grid;
@@ -77,31 +76,25 @@
   padding: var(--space-4);
 }
 
-.app-form-grid-panel.align-items-end,
-.roteiro-editor__grid.align-items-end {
+.app-form-grid-panel.align-items-end {
   align-items: end;
 }
 
-.app-form-grid-panel > .field-span-6,
-.roteiro-editor__grid > .field-span-6 {
+.app-form-grid-panel > .field-span-6 {
   grid-column: span 6;
 }
 
-.app-form-grid-panel > .field-span-4,
-.roteiro-editor__grid > .field-span-4 {
+.app-form-grid-panel > .field-span-4 {
   grid-column: span 4;
 }
 
-.app-form-grid-panel > .field-span-12,
-.roteiro-editor__grid > .field-span-12 {
+.app-form-grid-panel > .field-span-12 {
   grid-column: span 12;
 }
 
 @media (max-width: 720px) {
   .app-form-grid-panel > .field-span-6,
-  .app-form-grid-panel > .field-span-4,
-  .roteiro-editor__grid > .field-span-6,
-  .roteiro-editor__grid > .field-span-4 {
+  .app-form-grid-panel > .field-span-4 {
     grid-column: span 12;
   }
 }
@@ -165,8 +158,7 @@
 }
 
 .app-page--roteiros-form .btn-secondary,
-.app-page--roteiros-form .btn-outline-secondary,
-.app-page--roteiros-form .btn-muted {
+.app-page--roteiros-form .btn-outline-secondary {
   background: var(--route-button-secondary-bg);
   border-color: var(--route-button-secondary-border);
   color: var(--route-button-secondary-text);
@@ -175,9 +167,7 @@
 .app-page--roteiros-form .btn-secondary:hover,
 .app-page--roteiros-form .btn-secondary:focus-visible,
 .app-page--roteiros-form .btn-outline-secondary:hover,
-.app-page--roteiros-form .btn-outline-secondary:focus-visible,
-.app-page--roteiros-form .btn-muted:hover,
-.app-page--roteiros-form .btn-muted:focus-visible {
+.app-page--roteiros-form .btn-outline-secondary:focus-visible {
   background: var(--route-button-secondary-hover-bg);
   border-color: var(--route-button-secondary-hover-border);
   color: var(--route-button-secondary-text);
@@ -671,12 +661,6 @@ html[data-theme="dark"] input[type="checkbox"] {
   --field-border-hover: var(--color-border-strong);
   --field-border-focus: var(--cv-field-border-focus);
   --field-text: var(--color-input-text);
-}
-
-.main-form-panel > .field-grid-rows {
-  box-sizing: border-box;
-  padding: var(--form-section-padding-y) var(--form-section-padding-x);
-  width: 100%;
 }
 
 .main-form-panel .field,

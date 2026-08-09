@@ -1519,8 +1519,7 @@ html[data-theme="light"] {
   background: var(--stepper-connector-on);
 }
 
-.page-stepper__item.is-complete .page-stepper__marker,
-.page-stepper__item.is-complete .page-stepper__number {
+.page-stepper__item.is-complete .page-stepper__marker {
   background:   var(--stepper-done-bg);
   border-color: var(--stepper-done-border);
   color:        var(--stepper-done-color);
@@ -1537,8 +1536,7 @@ html[data-theme="light"] {
 
 /* ─── Estado: Atual / em andamento (.is-current | .is-active) ── */
 
-.page-stepper__item.is-current .page-stepper__marker,
-.page-stepper__item.is-active  .page-stepper__number {
+.page-stepper__item.is-current .page-stepper__marker {
   background:   var(--stepper-active-bg);
   border-color: var(--stepper-active-border);
   box-shadow:   0 0 0 3px var(--stepper-idle-bg),
@@ -1689,7 +1687,6 @@ html[data-theme="light"] {
 }
 
 .main-form-panel .field-grid,
-.main-form-panel .field-grid-rows,
 .main-form-panel .field,
 .main-form-panel .cv-field,
 .main-form-panel .search-picker,
@@ -5537,8 +5534,7 @@ html[data-theme="light"] .date-picker .date-picker__day--multi-single:hover {
 /* Canonical file picker and attached-file list. Page CSS may position it, not skin it. */
 
 .file-input,
-.prestacao-file-input,
-.prestacao-file-widget__clear-input {
+.prestacao-file-input {
   clip: rect(0 0 0 0);
   clip-path: inset(50%);
   height: 1px;
@@ -5657,8 +5653,7 @@ html[data-theme="light"] .date-picker .date-picker__day--multi-single:hover {
 }
 
 .file-picker__upload,
-.prestacao-file-picker__upload,
-.prestacao-file-picker__clear {
+.prestacao-file-picker__upload {
   align-items: center;
   border: 0;
   border-left: 1px solid var(--color-border);
@@ -5852,8 +5847,7 @@ html[data-theme="light"] .date-picker .date-picker__day--multi-single:hover {
   }
 
   .file-picker__upload,
-  .prestacao-file-picker__upload,
-  .prestacao-file-picker__clear {
+  .prestacao-file-picker__upload {
     border-left: 0;
     border-top: 1px solid var(--color-border);
     min-height: 44px;
@@ -6081,8 +6075,7 @@ html[data-theme="dark"] {
 .cv-btn--primary,
 .cv-btn--primary-action,
 .cv-btn--next,
-.btn-primary,
-.app-btn--primary {
+.btn-primary {
   background: var(--action-primary-bg);
   border-color: var(--action-primary-border);
   box-shadow: var(--action-primary-shadow);
@@ -6096,9 +6089,7 @@ html[data-theme="dark"] {
 .cv-btn--next:hover,
 .cv-btn--next:focus,
 .btn-primary:hover,
-.btn-primary:focus,
-.app-btn--primary:hover,
-.app-btn--primary:focus {
+.btn-primary:focus {
   background: var(--action-primary-hover-bg);
   border-color: var(--action-primary-border);
   color: var(--action-primary-text);
@@ -6113,10 +6104,7 @@ html[data-theme="dark"] {
 .cv-btn--signature,
 .cv-btn--document,
 .cv-btn--copy-link,
-.btn-secondary,
-.btn-muted,
-.app-btn--secondary,
-.app-btn--muted {
+.btn-secondary {
   background: var(--action-bg);
   border-color: var(--action-border);
   box-shadow: var(--action-shadow);
@@ -6132,23 +6120,20 @@ html[data-theme="dark"] {
 .cv-btn--signature:hover,
 .cv-btn--document:hover,
 .cv-btn--copy-link:hover,
-.btn-secondary:hover,
-.btn-muted:hover,
-.app-btn--secondary:hover,
-.app-btn--muted:hover {
+.btn-secondary:hover {
   background: var(--action-bg-hover);
   border-color: var(--action-border-strong);
   color: var(--action-text-strong);
 }
 
-.cv-btn--ghost{
+.cv-btn--ghost {
   background: transparent;
   border-color: transparent;
   box-shadow: none;
   color: var(--action-text);
 }
 
-.cv-btn--ghost:hover{
+.cv-btn--ghost:hover {
   background: var(--action-bg-soft);
   border-color: transparent;
   box-shadow: none;
@@ -6157,9 +6142,7 @@ html[data-theme="dark"] {
 }
 
 .cv-btn--danger,
-.cv-btn--soft-danger,
-.btn-danger,
-.app-btn--danger {
+.cv-btn--soft-danger {
   background: var(--action-danger-bg);
   border-color: var(--action-danger-border);
   box-shadow: none;
@@ -6167,9 +6150,7 @@ html[data-theme="dark"] {
 }
 
 .cv-btn--danger:hover,
-.cv-btn--soft-danger:hover,
-.btn-danger:hover,
-.app-btn--danger:hover {
+.cv-btn--soft-danger:hover {
   background: var(--action-danger-hover-bg);
   border-color: var(--action-danger-border);
   color: var(--action-danger-text);
@@ -6219,22 +6200,19 @@ html[data-theme="dark"] {
   color: var(--action-info-text);
 }
 
-.cv-btn--xs,
-.btn--compact {
+.cv-btn--xs {
   border-radius: 9px;
   min-height: 30px;
   padding-inline: 9px;
 }
 
-.cv-btn--sm,
-.btn-sm,
-.app-btn--sm {
+.cv-btn--sm {
   border-radius: var(--action-radius-sm);
   min-height: 34px;
   padding-inline: 11px;
 }
 
-.cv-btn--lg{
+.cv-btn--lg {
   min-height: 48px;
   padding-inline: 20px;
 }
@@ -7876,8 +7854,7 @@ html[data-theme="dark"] #attach-signed-modal .icon-btn.icon-btn--delete,
    structure with module-prefixed selectors.
    ======================================================================== */
 
-.form-card > .form-section-body,
-.form-card__body {
+.form-card > .form-section-body {
   display: grid;
   gap: 10px;
 }
@@ -8009,8 +7986,7 @@ html[data-theme="dark"] #attach-signed-modal .icon-btn.icon-btn--delete,
   min-width: 0;
 }
 
-.form-subsection__header,
-.resource-picker__header {
+.form-subsection__header {
   align-items: baseline;
   display: flex;
   gap: var(--space-3);
@@ -8018,17 +7994,14 @@ html[data-theme="dark"] #attach-signed-modal .icon-btn.icon-btn--delete,
   min-width: 0;
 }
 
-.form-subsection__copy,
-.resource-picker__copy {
+.form-subsection__copy {
   display: grid;
   gap: 3px;
   min-width: 0;
 }
 
 .form-subsection__title,
-.form-subsection__description,
-.resource-picker__title,
-.resource-picker__description {
+.form-subsection__description {
   margin: 0;
 }
 
@@ -8095,8 +8068,7 @@ html[data-theme="dark"] #attach-signed-modal .icon-btn.icon-btn--delete,
     width: 100%;
   }
 
-  .form-subsection__header,
-  .resource-picker__header {
+  .form-subsection__header {
     align-items: flex-start;
     flex-direction: column;
   }
@@ -8699,12 +8671,10 @@ html[data-theme="light"] .segment-toggle {
   min-width: 0;
 }
 
-.metric-grid--2,
 .summary-grid--2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.metric-grid--3,
 .summary-grid--3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -8734,8 +8704,7 @@ html[data-theme="light"] .segment-toggle {
 }
 
 /* Tile de métrica — card de dashboard/resumo */
-.metric--tile,
-.summary-tile {
+.metric--tile {
   background: var(--color-card);
   border: var(--card-border);
   border-radius: var(--radius-card);
@@ -8750,15 +8719,13 @@ html[data-theme="light"] .segment-toggle {
     box-shadow var(--transition-fast);
 }
 
-.metric--tile:hover,
-.summary-tile:hover {
+.metric--tile:hover {
   box-shadow: var(--shadow-panel);
 }
 
 /* Rótulo */
-.metric__label,
+
 .summary-label,
-.summary-tile__label,
 .pt-resumo-box__label {
   color: var(--theme-text-muted, var(--color-muted));
   font-size: var(--font-size-xs, 11px);
@@ -8768,19 +8735,13 @@ html[data-theme="light"] .segment-toggle {
   text-transform: uppercase;
 }
 
-.summary-tile__label {
-  letter-spacing: var(--letter-spacing-label);
-}
-
-.pt-resumo-box__label--accent,
-.metric__label--accent {
+.pt-resumo-box__label--accent {
   color: var(--color-accent);
 }
 
 /* Valor */
-.metric__value,
+
 .summary-value,
-.summary-tile__value,
 .pt-resumo-box__value {
   color: var(--theme-stat-value, var(--color-heading));
   font-size: 1.05rem;
@@ -8791,27 +8752,12 @@ html[data-theme="light"] .segment-toggle {
   word-break: break-word;
 }
 
-.summary-tile__value {
-  font-size: clamp(var(--font-size-lg), 2vw, 1.55rem);
-  font-weight: var(--font-weight-bold, 800);
-  line-height: 1.2;
-}
-
-.pt-resumo-box__value--lg,
-.metric__value--lg {
+.pt-resumo-box__value--lg {
   font-size: clamp(1rem, 1.5vw, 1.2rem);
   font-weight: 800;
 }
 
 /* Descrição / subtexto */
-.metric__description,
-.summary-tile__description,
-.pt-resumo-box__sub {
-  color: var(--color-muted);
-  font-size: var(--font-size-sm, 0.85rem);
-  line-height: 1.35;
-  margin: 0;
-}
 
 @media (max-width: 900px) {
   .metric-grid--4,
@@ -8821,8 +8767,7 @@ html[data-theme="light"] .segment-toggle {
 }
 
 @media (max-width: 640px) {
-  .metric-grid--2,
-  .metric-grid--3,
+
   .metric-grid--4,
   .summary-grid--2,
   .summary-grid--3,
@@ -8970,46 +8915,6 @@ html[data-theme="light"] .segment-toggle {
 
 /* >>> css/lists/content-cards.css >>> */
 /* Canonical summary and document cards. Theme-specific appearance is separate. */
-
-.summary-tile {
-  background: var(--color-card);
-  border: var(--card-border);
-  border-radius: var(--radius-card);
-  box-shadow: var(--card-shadow);
-  display: grid;
-  gap: var(--space-2);
-  min-width: 0;
-  padding: var(--space-4);
-  transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast);
-}
-
-.summary-tile:hover {
-  box-shadow: var(--shadow-panel);
-}
-
-.summary-tile__label,
-.summary-tile__value,
-.summary-tile__description {
-  margin: 0;
-}
-
-.summary-tile__label {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-label);
-  text-transform: uppercase;
-}
-
-.summary-tile__value {
-  color: var(--color-heading);
-  font-size: clamp(var(--font-size-lg), 2vw, 1.55rem);
-  line-height: 1.2;
-  overflow-wrap: anywhere;
-}
 
 .summary-grid {
   display: grid;
@@ -9622,7 +9527,7 @@ html[data-theme="dark"] .cv-dialog--document :is(.cv-dialog__icon, .cv-dialog__e
 /* O passo atual é identificado pela combinação sólida de fundo e borda, sem
    anéis concêntricos que possam ser confundidos com um foco exagerado. */
 :is(html[data-theme="dark"])
-  :is(.page-stepper__item.is-current .page-stepper__marker, .page-stepper__item.is-active .page-stepper__number) {
+  :is(.page-stepper__item.is-current .page-stepper__marker) {
   box-shadow: none;
 }
 
@@ -9638,7 +9543,6 @@ html[data-theme="dark"] ::selection {
   color: var(--color-heading);
 }
 
-                          
 html[data-theme] .app-main {
   padding: clamp(20px, 2.6vw, 40px);
 }
@@ -9805,7 +9709,6 @@ html[data-theme="dark"] .page-header-rail__subtitle {
   padding: 14px clamp(20px, 2.4vw, 30px) 18px;
 }
 
-                                                                                      
 :is(html[data-theme])
   :is(.page-shell--list, .cv-page--collection) .header-filter-input {
   min-height: 44px;
@@ -9973,7 +9876,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   min-height: 58px;
 }
 
-                                                                                                                                                         
 :is(html[data-theme])
   .form-card > .quick-create-panel__header.cv-form-section-header {
   padding-left: 34px;
@@ -10419,7 +10321,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   width: 100%;
 }
 
-                                                                                  
 :is(html[data-theme])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1])
   .travel-period-block--split
@@ -10826,7 +10727,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
     .oficio-documentos-summary-section .oficio-documentos-card,
     .oficio-documentos-summary-section .oficio-documentos-admin-facts,
     .oficio-documentos-route-section .oficio-documentos-route-card,
-    .oficio-documentos-justification-section .oficio-documentos-card,
     .oficio-documentos-route-card__diarias-box,
     .oficio-documentos-route-card__body,
     .oficio-documentos-route-col4,
@@ -10908,7 +10808,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   box-shadow: none !important;
 }
 
-                                                                                            
 :is(html[data-theme])
   .document-form-page
   .termo-documentos-preview
@@ -11010,7 +10909,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   color: var(--color-heading);
 }
 
-                                                                       
 :is(html[data-theme])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__selected-list {
   display: grid;
@@ -11386,7 +11284,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   }
 }
 
-                                                                                   
 :is(html[data-theme])
   [data-travel-document-wizard-roteiro]
   #sec-mapa-rota > .form-block__header {
@@ -11473,7 +11370,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   box-shadow: none;
 }
 
-                                                                                         
 :is(html[data-theme])
   [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta {
   display: block;
@@ -11595,7 +11491,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   }
 }
 
-                                                                                                                                                                                                                                                                                                                                                  
 :is(html[data-theme])
   [data-travel-document-wizard-roteiro] .roteiro-trechos-host,
 :is(html[data-theme])
@@ -11603,7 +11498,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   display: contents;
 }
 
-                                                                             
 :is(html[data-theme])
   [data-travel-document-wizard-roteiro]
   .roteiro-editor__section--trecho
@@ -11899,7 +11793,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   background: var(--color-muted) !important;
 }
 
-                                                                                                                                                                                                                           
 :is(html[data-theme])
   [data-travel-document-wizard-roteiro]
   .roteiro-editor__section--bate-volta.route-section-block:has(#bate-volta-body[hidden]) {
@@ -12005,7 +11898,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   text-align: right;
 }
 
-                                                                                                                                                            
 :is(html[data-theme])
   .form-block--split {
   align-items: end;
@@ -12070,7 +11962,7 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
 }
 
 :is(html[data-theme="dark"])
-  :is(.form-subsection__title, .resource-picker__title) {
+  :is(.form-subsection__title) {
   color: var(--color-heading);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-black);
@@ -12078,7 +11970,7 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
 }
 
 :is(html[data-theme="dark"])
-  :is(.form-subsection__description, .resource-picker__description) {
+  :is(.form-subsection__description) {
   color: var(--color-muted);
   font-size: var(--font-size-xs);
   line-height: 1.45;
@@ -12176,7 +12068,6 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   outline: none;
 }
 
-                                                                                                                                                                            
 :is(html[data-theme])
   .search-picker--people {
   gap: 12px;
@@ -13927,7 +13818,6 @@ html[data-theme="dark"] .empty-state__title {
   color: var(--color-accent-text);
 }
 
-                                                                                   
 :is(html[data-theme])
   .search-picker__selected-list {
   gap: 8px;
@@ -14115,33 +14005,6 @@ html[data-theme="dark"] *::after {
   .entity-card__footer {
   background: var(--color-surface);
   border-top-color: var(--color-border);
-}
-
-:is(html[data-theme="dark"])
-  .summary-tile {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 13px;
-  box-shadow: var(--shadow-xs);
-}
-
-:is(html[data-theme="dark"])
-  .summary-tile:hover {
-  background: var(--color-surface-soft);
-}
-
-:is(html[data-theme="dark"])
-  .summary-tile__label {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 750;
-  letter-spacing: 0.065em;
-  text-transform: uppercase;
-}
-
-:is(html[data-theme="dark"])
-  .summary-tile__value {
-  color: var(--color-heading);
 }
 
 :is(html[data-theme="dark"])
@@ -14483,7 +14346,7 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  :is(.card, .app-card, .module-card, .document-card, .page-card) {
+  :is(.card, .app-card, .module-card, .document-card) {
   background: var(--color-surface);
   border-color: var(--color-border);
   box-shadow: var(--shadow-xs);
@@ -14641,19 +14504,6 @@ html[data-theme="dark"] *::after {
   background: var(--color-surface-strong);
   border-color: var(--color-border-strong);
   box-shadow: var(--shadow-sm);
-}
-
-:is(html[data-theme="dark"])
-  .filter-header:not(.list-header) .filter-header__heading {
-  background: var(--color-surface-strong);
-  padding-bottom: 16px;
-}
-
-:is(html[data-theme="dark"])
-  .filter-header:not(.list-header) .filter-header__controls {
-  background: var(--color-surface);
-  border-top-color: var(--color-border-strong);
-  padding-top: 18px;
 }
 
 :is(html[data-theme="dark"])
@@ -14865,7 +14715,6 @@ html[data-theme="dark"] *::after {
   outline: none;
 }
 
-                                                  
 :is(html[data-theme])
   :is(.page-shell--cards, .cv-page--collection-cards) .card-grid {
   gap: var(--space-6);
@@ -15002,7 +14851,6 @@ html[data-theme="dark"] *::after {
   translate: 0 6px;
 }
 
-                                                                          
 :is(html[data-theme])
   .custom-select__menu--v2::-webkit-scrollbar {
   width: 14px;
@@ -15519,8 +15367,6 @@ html[data-theme="dark"] *::after {
   overflow: hidden;
 }
 
-.list-header .filter-header__heading,
-.list-header .filter-header__controls,
 .list-header .page-header-band,
 .list-header .page-header-rail {
   background: transparent;

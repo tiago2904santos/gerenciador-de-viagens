@@ -138,7 +138,6 @@ html[data-theme="dark"] {
   line-height: 1.2;
 }
 
-.cv-field__control-row,
 .field-with-action {
   align-items: center;
   display: flex;
@@ -146,15 +145,12 @@ html[data-theme="dark"] {
   min-width: 0;
 }
 
-.cv-field__control-row .cv-field__control,
 .field-with-action .cv-field__control,
-.field-with-action .select__wrapper,
 .field-with-action .custom-select {
   flex: 1 1 auto;
   min-width: 0;
 }
 
-.cv-field__control-row .field-action,
 .field-with-action .field-action {
   align-self: center;
   flex: 0 0 auto;

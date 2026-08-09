@@ -125,7 +125,6 @@ html[data-theme="dark"] .empty-state p {
    .app-list-* como joint selectors das classes legadas.
    ========================================================================== */
 
-.app-list-toolbar,
 .list-toolbar {
   align-items: center;
   display: flex;

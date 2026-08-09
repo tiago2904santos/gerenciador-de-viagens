@@ -638,8 +638,7 @@ html[data-theme="light"] {
   background: var(--stepper-connector-on);
 }
 
-.page-stepper__item.is-complete .page-stepper__marker,
-.page-stepper__item.is-complete .page-stepper__number {
+.page-stepper__item.is-complete .page-stepper__marker {
   background:   var(--stepper-done-bg);
   border-color: var(--stepper-done-border);
   color:        var(--stepper-done-color);
@@ -656,8 +655,7 @@ html[data-theme="light"] {
 
 /* ─── Estado: Atual / em andamento (.is-current | .is-active) ── */
 
-.page-stepper__item.is-current .page-stepper__marker,
-.page-stepper__item.is-active  .page-stepper__number {
+.page-stepper__item.is-current .page-stepper__marker {
   background:   var(--stepper-active-bg);
   border-color: var(--stepper-active-border);
   box-shadow:   0 0 0 3px var(--stepper-idle-bg),
@@ -808,7 +806,6 @@ html[data-theme="light"] {
 }
 
 .main-form-panel .field-grid,
-.main-form-panel .field-grid-rows,
 .main-form-panel .field,
 .main-form-panel .cv-field,
 .main-form-panel .search-picker,
