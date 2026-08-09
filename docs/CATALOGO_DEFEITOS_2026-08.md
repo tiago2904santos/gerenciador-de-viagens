@@ -4915,3 +4915,68 @@ quatro arquivos com hash.
 
 **O que muda de aparência:** o tema claro inteiro. É a primeira mudança visual deliberada do
 programa — todas as anteriores foram medidas exigindo zero diferença.
+
+### NOVO-63 ✅ RESOLVIDO · 🟠 `NOVO` A barra lateral tem geometria diferente por tema — 91% da divergência sai daqui · UI · 1 d
+
+Segundo recorte de desenho do `NOVO-58`, e o que o dono chamou de "geometria global". **A medição
+desmentiu o nome, e isso mudou o plano:** dos 533 elementos com `font-size` divergente, **528 são a
+barra lateral**; dos 378 com `height` divergente, **todos**. Não existe uma camada global de
+geometria neste CSS — o que parecia global era a barra, que aparece nas 44 telas e por isso inflava
+a contagem. As duas opções que eu havia oferecido ao dono ("geometria global" e "barra lateral")
+eram a mesma opção.
+
+| | antes | depois |
+|---|---|---|
+| elementos `.sidebar*` divergentes entre temas (não-cor) | 1.096 | **96** |
+| elementos divergentes no total (8 rotas × 3 larguras) | 3.393 | 2.253 |
+
+**Medido em três larguras — 1440, 800 e 500 px — e não só no desktop.** Seis das 23 regras de barra
+lateral do tema escuro vivem dentro de `@media (max-width: 840px|600px)`. Globalizar uma delas sem
+levar a media junto aplicaria geometria de celular em tela cheia, e isso **não apareceria** numa
+medição feita só a 1440px: apareceria no celular de alguém.
+
+**O método foi editar o valor no arquivo do componente, não mover a regra.** Mover muda posição na
+cascata e especificidade de uma vez; alterar o valor onde ele já mora mantém as duas e deixa a
+medição atribuível.
+
+**O defeito que a globalização revelou, e ele já existia.** `.sidebar-module-expand` (o botão que
+abre um módulo) declara `font: inherit` — reset habitual de `<button>`. Só que ele **é** um
+`.sidebar-link--module`, e `font: inherit` zera também o **tamanho**. Vindo depois, com a mesma
+especificidade, ele vencia: o item virava 16px enquanto o item irmão (que não é botão) ficava em
+14px, **na mesma lista**.
+
+Isso nunca apareceu porque a regra do tema escuro, mais específica, devolvia o tamanho — **só no
+escuro**. Tirada a muleta, o defeito ficou visível nos dois temas, e a medição o pegou na hora
+(`font-size 14px → 16px` em 192 elementos do escuro, onde o esperado era zero). Corrigido trocando
+`font: inherit` por `font-family`/`font-weight: inherit`, que preservam o reset sem apagar o
+tamanho.
+
+**A largura da barra era token, e o token divergia:** `15%` no `tokens.css` contra
+`clamp(238px, 17.5vw, 276px)` no tema escuro — 216px contra 252px na mesma janela, e tudo que mora
+dentro herdava a diferença. O `clamp` venceu por ser melhor: prende um mínimo legível e um máximo,
+em vez de encolher junto com a janela. A `@media (max-width: 1080px)` que apertava a barra para
+224px também **só existia no escuro** — foi globalizada em vez de apagada, senão o claro perderia o
+aperto justamente onde o espaço é mais escasso.
+
+**O que ficou de fora, de propósito:** em `@media (max-width: 840px)` o tema escuro põe a barra em
+`position: fixed` com `height: 100dvh`, e o claro usa `position: relative`. Isso não é geometria, é
+**comportamento** — vira gaveta sobreposta em vez de coluna no fluxo, e depende do gatilho e do
+fechamento (`.app-mobile-bar__toggle`, `.sidebar-drawer-close`) se comportarem igual nos dois temas.
+Fica para um passo próprio, com o navegador abrindo e fechando a gaveta.
+
+**Um teste caiu, e o conserto foi tirar a premissa dele, não afrouxá-lo.**
+`test_semantic_dark_contract_covers_core_component_needs` exigia `--sidebar-width:` dentro de
+`03-theme-dark.css`. Todo o resto da lista é `--color-*` — são as cores que um tema precisa
+declarar. Largura de barra nunca foi cor: estava ali porque o tema escuro a redefinia, e a lista só
+registrava esse fato. Com a largura decidida uma vez em `tokens.css`, exigi-la de volta no arquivo
+de tema seria exigir que a divergência voltasse.
+
+**Erro de processo meu, registrado porque quase passou.** Encadeei o commit ao `tail` do resultado
+da suíte em vez de conferir o resultado antes — o `tail` devolveu sucesso, o commit rodou, e a
+falha só apareceu quando fui ler a saída. O commit foi corrigido antes de virar PR, mas a lição é
+que "rodei a suíte" e "li o resultado da suíte" são coisas diferentes.
+
+**Sobre o escuro ter mudado em 500 e 800 px:** as regras não-media do tema escuro venciam as regras
+de `@media` do claro por especificidade, então o escuro ignorava o próprio ajuste de celular.
+Removida a sobrescrita, os dois temas passam a obedecer a mesma media. O valor que prevalece é o
+deliberado para telas pequenas.

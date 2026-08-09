@@ -28,46 +28,17 @@ html[data-theme="dark"] .app-main {
   padding: clamp(20px, 2.6vw, 40px);
 }
 
-html[data-theme="dark"] .sidebar {
-  height: 100vh;
-  max-height: 100vh;
-  overflow: hidden;
-}
-
-html[data-theme="dark"] .sidebar-header {
-  padding: 22px 18px 18px;
-}
-
-html[data-theme="dark"] .sidebar-brand {
-  gap: 12px;
-  line-height: 1.2;
-}
-
 html[data-theme="dark"] .sidebar-brand-badge {
   border: 0;
   box-shadow: none;
-  height: 34px;
-  width: 34px;
 }
 
 html[data-theme="dark"] .sidebar-nav {
-  gap: 3px;
-  padding: 12px 10px 18px;
   scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 }
 
-html[data-theme="dark"] .sidebar-link--module {
-  border-radius: 10px;
-  font-size: 0.875rem;
-  min-height: 40px;
-  padding: 8px 10px;
-}
-
 html[data-theme="dark"] .sidebar-item-icon {
-  border: 1px solid rgba(255, 255, 255, 0.055);
-  border-radius: 7px;
-  height: 24px;
-  width: 24px;
+  border-color: rgba(255, 255, 255, 0.055);
 }
 
 html[data-theme="dark"] .sidebar-link--module.is-active,
@@ -78,14 +49,11 @@ html[data-theme="dark"] .sidebar-link--cadastros.is-active {
 
 html[data-theme="dark"] .sidebar-footer {
   background: rgba(0, 0, 0, 0.12);
-  gap: 12px;
-  padding: 12px 14px 16px;
 }
 
 html[data-theme="dark"] .sidebar-account {
   background: #0b1c2a;
   border-color: #1e3a50;
-  padding: 10px 12px;
 }
 
 :is(html[data-theme="dark"])
@@ -4181,30 +4149,6 @@ html[data-theme="dark"] .empty-state__title {
 @media (max-width: 600px) {
   html[data-theme="dark"] .app-main {
     padding: 14px;
-  }
-
-  html[data-theme="dark"] .sidebar-header {
-    padding: 14px;
-  }
-
-  html[data-theme="dark"] .sidebar-nav {
-    max-height: none;
-    padding: 10px;
-  }
-
-  html[data-theme="dark"] .sidebar-footer {
-    display: flex;
-    gap: 10px;
-    padding: 10px;
-  }
-
-  html[data-theme="dark"] .sidebar-account {
-    gap: 7px;
-    padding: 8px 10px;
-  }
-
-  html[data-theme="dark"] .sidebar-account__actions {
-    gap: 6px;
   }
 
   html[data-theme="dark"] .app-theme-grid {
