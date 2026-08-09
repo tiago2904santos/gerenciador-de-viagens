@@ -11,9 +11,10 @@
   box-shadow: none;
 }
 
+/* `font-family` saiu daqui: virou `--font-sans` em `tokens.css`, valendo nos
+   dois temas (`NOVO-62`). Tipografia não é decisão de tema. */
 html[data-theme="dark"] body {
   background-attachment: fixed;
-  font-family: Inter, "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 

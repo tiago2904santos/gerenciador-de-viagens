@@ -4869,3 +4869,49 @@ morta é **excluída**, não exigida — tratar a parte como morta apagaria uma 
 
 **Verificação: 0 elementos alterados** em 41.950, nas 88 telas. `audit_css_morto` volta a 0 depois
 de incluir o `cv-btn-group` — a catraca acusou o nome recém-exposto, que é exatamente o serviço dela.
+### NOVO-62 ✅ RESOLVIDO · 🟠 `NOVO` A fonte do sistema era pedida e nunca entregue; e só valia num tema · UI · 0,5 d
+
+Primeiro recorte de desenho do `NOVO-58`, com o dono decidindo: **empacotar a Inter**.
+
+O tema escuro declarava `font-family: Inter, …` desde o redesenho
+(`theme-dark-components.css:16`) e o claro usava `--font-sans: "Segoe UI", Arial`
+(`tokens.css:170`) — **19.896 elementos com pilha diferente conforme o tema**. Pior: a `Inter`
+**não estava no repositório**. Sem `@font-face` e sem arquivo, o navegador caía para o próximo item
+da pilha, então a letra que o usuário via dependia do que estivesse instalado na máquina dele.
+
+**Agora a fonte é entregue pelo sistema e vale nos dois temas.**
+
+| | antes | depois |
+|---|---|---|
+| elementos com `font-family` divergente | 19.896 | **0** |
+| elementos que divergem em qualquer propriedade não-cor | 20.203 (96%) | **5.850 (28%)** |
+| diferenças não-cor no total | 45.726 | 24.608 |
+
+**Por que a variável e não os cortes estáticos.** O CSS declara `font-weight` em **650, 720, 750,
+760 e 850**, além dos redondos. Com cortes estáticos esses valores encostam no peso mais próximo —
+720 viraria 700 — e o ajuste que alguém fez sumiria sem aviso. Medido no navegador com o arquivo
+variável, o mesmo texto em 700/720/750/760 sai com largura **diferente** em cada um: o eixo é
+contínuo, não está encostando.
+
+**Por que quatro arquivos.** `unicode-range` faz o navegador baixar só o subconjunto que a página
+usa. Os quatro somam 277 KB no repositório, mas **cada tela baixa 48 KB** — conferido escutando as
+respostas do navegador: `/login/` e `/oficios/` baixam **um** arquivo,
+`inter-latin-wght-normal.woff2`. `latin-ext` só desce se aparecer caractere fora do latim básico, e
+o itálico só onde há itálico.
+
+**A verificação que importava era "a fonte carrega mesmo?".** Declaração não prova rendição —
+`document.fonts.check()` devolve `true` até quando cai no fallback, e foi por isso que a medição
+anterior não conseguiu responder. O teste honesto é largura: o mesmo texto medido com a pilha do
+`body` e com `"Inter Variable"` dá **670 px** nos dois, contra **644,61 px** do fallback genérico.
+A fonte está ativa, nos dois temas.
+
+**Cobertura.** `fonts.css` entra por `@import` em `style.css` (que serve o app inteiro pelo bundle)
+**e** por `<link>` em `templates/core/login.html`, que não carrega o bundle e teria ficado de fora.
+
+Origem: `@fontsource-variable/inter` 5.3.0, SIL Open Font License 1.1. A licença acompanha os
+arquivos em `static/vendor/fonts/inter/LICENSE`, como a OFL exige. O CSP já permitia
+(`font-src 'self' data:`, `core/middleware.py:128`), e o `collectstatic` de produção coleta os
+quatro arquivos com hash.
+
+**O que muda de aparência:** o tema claro inteiro. É a primeira mudança visual deliberada do
+programa — todas as anteriores foram medidas exigindo zero diferença.

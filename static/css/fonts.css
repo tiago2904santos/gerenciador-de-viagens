@@ -1,0 +1,74 @@
+/* ==========================================================================
+   Inter — a fonte que o sistema pedia e não entregava
+   ==========================================================================
+
+   O tema escuro declarava `font-family: Inter, …` desde o redesenho, mas a
+   `Inter` **nunca esteve no repositório**: não havia `@font-face` nem arquivo.
+   O navegador caía para o próximo item da pilha, então o que cada usuário via
+   dependia do que estivesse instalado na máquina dele — e o tema claro usava
+   outra pilha (`"Segoe UI", Arial`), o que fazia 19.896 elementos renderizarem
+   com tipografia diferente conforme o tema (`NOVO-58`).
+
+   Agora a fonte é entregue pelo próprio sistema, e vale nos dois temas.
+
+   ## Por que a variável, e não os pesos estáticos
+
+   O CSS do projeto declara `font-weight` em **650, 720, 750, 760 e 850**, além
+   dos redondos. Com cortes estáticos esses valores encostam no peso mais
+   próximo — 720 vira 700 — e o desenho que alguém ajustou some sem aviso. O
+   arquivo variável cobre 100–900 contínuo e entrega o peso pedido.
+
+   ## Por que quatro arquivos e não um
+
+   `unicode-range` faz o navegador baixar só o subconjunto que a página usa.
+   Texto em português vive quase todo em `latin` (48 KB); `latin-ext` só desce
+   se aparecer um caractere fora dele, e o itálico só desce onde há itálico.
+   Os quatro somam 277 KB no repositório, mas uma tela típica baixa 48 KB.
+
+   Origem: `@fontsource-variable/inter` 5.3.0, SIL Open Font License 1.1 — a
+   licença está em `static/vendor/fonts/inter/LICENSE`, como a OFL exige.
+   ========================================================================== */
+
+@font-face {
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../vendor/fonts/inter/inter-latin-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../vendor/fonts/inter/inter-latin-ext-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Inter Variable";
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../vendor/fonts/inter/inter-latin-wght-italic.woff2") format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Inter Variable";
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../vendor/fonts/inter/inter-latin-ext-wght-italic.woff2") format("woff2-variations");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
