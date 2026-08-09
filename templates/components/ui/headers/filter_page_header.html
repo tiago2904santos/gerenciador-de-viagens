@@ -1,8 +1,8 @@
 {# filter_page_header.html — cabeçalho canônico de listas com filtros. #}
 {% if form_action %}
-  <form class="list-header cv-filter-header{% if extra_class %} {{ extra_class }}{% endif %}" method="get" action="{{ form_action }}" data-collection-form>
+  <form class="list-header filter-header{% if extra_class %} {{ extra_class }}{% endif %}" method="get" action="{{ form_action }}" data-collection-form>
 {% else %}
-  <div class="list-header cv-filter-header{% if extra_class %} {{ extra_class }}{% endif %}">
+  <div class="list-header filter-header{% if extra_class %} {{ extra_class }}{% endif %}">
 {% endif %}
 
   {% include "components/ui/headers/_list_header_band.html" with title=title eyebrow=eyebrow status_label=status_label status_variant=status_variant band_tabs_template=band_tabs_template abas=abas tabs_aria_label=tabs_aria_label only %}
@@ -28,7 +28,7 @@
       {% if current_aba %}<input type="hidden" name="aba" value="{{ current_aba }}">{% endif %}
 
       {% if status_options %}
-      <div class="list-header__select cv-filter-bar__select cv-custom-select" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
+      <div class="list-header__select filter-bar__select custom-select" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
         <select name="{{ status_name|default:'status' }}" aria-label="Status" data-collection-filter="select">
           {% for opt in status_options %}
             <option value="{{ opt.value }}"{% if opt.value == status %} selected{% endif %}>{{ opt.label }}</option>
@@ -38,7 +38,7 @@
       {% endif %}
 
       {% if temporal_options %}
-      <div class="list-header__select cv-filter-bar__select cv-custom-select" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
+      <div class="list-header__select filter-bar__select custom-select" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
         <select name="temporal" aria-label="Período da viagem" data-collection-filter="select">
           {% for opt in temporal_options %}
             <option value="{{ opt.value }}"{% if opt.value == temporal %} selected{% endif %}>{{ opt.label }}</option>
@@ -48,7 +48,7 @@
       {% endif %}
 
       {% if sort_options %}
-      <div class="list-header__select cv-filter-bar__select cv-custom-select" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
+      <div class="list-header__select filter-bar__select custom-select" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
         <select name="sort" aria-label="Ordenar por" data-collection-filter="select">
           {% for opt in sort_options %}
             <option value="{{ opt.value }}"{% if opt.value == sort or not sort and forloop.first %} selected{% endif %}>{{ opt.label }}</option>

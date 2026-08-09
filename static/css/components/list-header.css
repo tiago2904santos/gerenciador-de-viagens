@@ -82,7 +82,7 @@
 
 /* Rail de filtros — faixa clara abaixo do título */
 .list-header__rail {
-  /* Mesmo token da área interna dos cards (.cv-record-card__band). */
+  /* Mesmo token da área interna dos cards (.record-card__band). */
   background: var(--card-family-bg);
   border-top: 1px solid var(--border-filter-bar);
   box-sizing: border-box;
@@ -130,7 +130,7 @@
   z-index: 1;
 }
 
-.list-header__search-icon .cv-icon {
+.list-header__search-icon .icon {
   display: block;
   flex: 0 0 auto;
   height: 16px;
@@ -195,7 +195,7 @@
   white-space: nowrap;
 }
 
-.list-header__filters .cv-date-picker,
+.list-header__filters .date-picker,
 .list-header__filters .travel-period-filter {
   flex: 0 1 auto;
   min-width: 0;
@@ -235,12 +235,12 @@
 }
 
 .list-header__rail .list-header__search-input.header-filter-input,
-.list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2,
+.list-header__rail .custom-select__trigger.custom-select__trigger--v2,
 .list-header__rail .travel-period-filter__btn,
 .travel-period-filter--filled .travel-period-filter__btn,
 .list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control,
 .list-header__rail .list-header__search-input.header-filter-input:hover,
-.list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:hover,
+.list-header__rail .custom-select__trigger.custom-select__trigger--v2:hover,
 .list-header__rail .travel-period-filter__btn:hover:not(:disabled),
 .travel-period-filter--filled .travel-period-filter__btn:hover:not(:disabled),
 .list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:hover {
@@ -249,7 +249,7 @@
   box-shadow: none;
 }
 
-.list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2 {
+.list-header__rail .custom-select__trigger.custom-select__trigger--v2 {
   border-radius: var(--radius-control);
   height: var(--list-header-control-height);
   min-height: var(--list-header-control-height);
@@ -258,8 +258,8 @@
 /* Campos do rail: sem chrome de focus. Botões mantêm foco discreto. */
 .list-header__rail .list-header__search-input.header-filter-input:focus,
 .list-header__rail .list-header__search-input.header-filter-input:focus-visible,
-.list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:focus,
-.list-header__rail .cv-custom-select__trigger.cv-custom-select__trigger--v2:focus-visible {
+.list-header__rail .custom-select__trigger.custom-select__trigger--v2:focus,
+.list-header__rail .custom-select__trigger.custom-select__trigger--v2:focus-visible {
   border: 0;
   box-shadow: none;
   outline: none;
@@ -277,13 +277,13 @@
 }
 
 /* Não herdar estilos de card do dark-redesign / filter-header antigos */
-.list-header.cv-filter-header,
+.list-header.filter-header,
 .list-header.page-header-stack {
   overflow: hidden;
 }
 
-.list-header .cv-filter-header__heading,
-.list-header .cv-filter-header__controls,
+.list-header .filter-header__heading,
+.list-header .filter-header__controls,
 .list-header .page-header-band,
 .list-header .page-header-rail {
   background: transparent;
@@ -301,7 +301,7 @@
   flex-direction: column;
 }
 
-.list-header .cv-inline-create__panel {
+.list-header .inline-create__panel {
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -321,12 +321,12 @@
 }
 
 /* `HT-03`: aberto, o painel rola em vez de cortar — ver `page-shell.css:2612`.
-   A regra precisa existir **aqui também**: `.list-header .cv-inline-create__panel`
+   A regra precisa existir **aqui também**: `.list-header .inline-create__panel`
    (linha 313) declara `overflow: hidden` com a mesma especificidade da regra de
    page-shell e vem depois no bundle, então ela vencia e o `overflow-y: auto` de lá
    não chegava a valer. Duas folhas governando o mesmo painel é o `UI-04`; enquanto
    ele não sai, as duas precisam concordar. */
-.list-header .cv-inline-create__panel.is-open {
+.list-header .inline-create__panel.is-open {
   border-top: 1px solid var(--border-filter-bar);
   max-height: 640px;
   opacity: 1;
@@ -340,23 +340,23 @@
  * Textareas mantêm sua altura própria; selects e controles customizados
  * preservam o comportamento nativo, alterando apenas a camada visual.
  */
-.list-header--inline-create .cv-inline-create__panel
+.list-header--inline-create .inline-create__panel
   :is(
     .form-control,
     .form-select,
     .cv-field__control,
-    .cv-custom-select__trigger,
-    .cv-search-picker__control,
-    .cv-search-picker__input
+    .custom-select__trigger,
+    .search-picker__control,
+    .search-picker__input
   ),
-.list-header--inline-create .cv-inline-create__panel
+.list-header--inline-create .inline-create__panel
   :is(
     .form-control,
     .form-select,
     .cv-field__control,
-    .cv-custom-select__trigger,
-    .cv-search-picker__control,
-    .cv-search-picker__input
+    .custom-select__trigger,
+    .search-picker__control,
+    .search-picker__input
   ):is(:hover, :focus, :focus-within, :focus-visible) {
   background: var(--step1-field, var(--list-header-control-bg, var(--color-input-bg)));
   border: 0;
@@ -368,68 +368,68 @@
   transition: none;
 }
 
-.list-header--inline-create .cv-inline-create__panel
+.list-header--inline-create .inline-create__panel
   :is(
     input.form-control,
     select.form-control,
     .form-select,
     input.cv-field__control,
     select.cv-field__control,
-    .cv-custom-select__trigger,
-    .cv-search-picker__control
+    .custom-select__trigger,
+    .search-picker__control
   ) {
   height: var(--list-header-control-height);
   min-height: var(--list-header-control-height);
 }
 
-.list-header--inline-create .cv-inline-create__panel
-  :is(.form-control, .form-select, .cv-field__control, .cv-search-picker__input)::placeholder {
+.list-header--inline-create .inline-create__panel
+  :is(.form-control, .form-select, .cv-field__control, .search-picker__input)::placeholder {
   color: var(--color-filter-placeholder);
   opacity: 1;
 }
 
-.list-header--inline-create .cv-inline-create__panel
+.list-header--inline-create .inline-create__panel
   :is(
     .form-control,
     .form-select,
     .cv-field__control,
-    .cv-custom-select__trigger
+    .custom-select__trigger
   ):focus,
-.list-header--inline-create .cv-inline-create__panel
+.list-header--inline-create .inline-create__panel
   :is(
     .form-control,
     .form-select,
     .cv-field__control,
-    .cv-custom-select__trigger
+    .custom-select__trigger
   ):focus-visible,
-.list-header--inline-create .cv-inline-create__panel
-  .cv-search-picker__control:focus-within {
+.list-header--inline-create .inline-create__panel
+  .search-picker__control:focus-within {
   border: 0;
   box-shadow: none;
   outline: none;
 }
 
-.list-header--inline-create .cv-inline-create__panel
+.list-header--inline-create .inline-create__panel
   :is(
     .form-control,
     .form-select,
     .cv-field__control,
-    .cv-custom-select__trigger,
-    .cv-search-picker__control
+    .custom-select__trigger,
+    .search-picker__control
   ):is(.is-invalid, [aria-invalid="true"]),
-.list-header--inline-create .cv-inline-create__panel
+.list-header--inline-create .inline-create__panel
   :is(.app-form-field, .cv-field):has(.field-error)
   :is(
     .form-control,
     .form-select,
     .cv-field__control,
-    .cv-custom-select__trigger,
-    .cv-search-picker__control
+    .custom-select__trigger,
+    .search-picker__control
   ) {
   border: 1px solid var(--color-danger);
 }
 
-.list-header .cv-inline-create__body {
+.list-header .inline-create__body {
   align-items: flex-end;
   display: flex;
   flex-wrap: wrap;
@@ -437,21 +437,21 @@
   width: 100%;
 }
 
-.list-header .cv-inline-create__fields {
+.list-header .inline-create__fields {
   flex: 1 1 16rem;
   min-width: 0;
 }
 
-.list-header .cv-inline-create__actions {
+.list-header .inline-create__actions {
   flex-shrink: 0;
   margin-left: auto;
 }
 
-.list-header--inline-create-compact .cv-inline-create__body {
+.list-header--inline-create-compact .inline-create__body {
   padding: 0;
 }
 
-.list-header .cv-inline-create__toggle {
+.list-header .inline-create__toggle {
   align-items: center;
   appearance: none;
   background: var(--card-family-bg);
@@ -477,22 +477,22 @@
   width: 100%;
 }
 
-.list-header .cv-inline-create__toggle:hover {
+.list-header .inline-create__toggle:hover {
   background: color-mix(in srgb, var(--color-primary-soft) 70%, var(--color-white));
 }
 
-.list-header .cv-inline-create__toggle:focus-visible {
+.list-header .inline-create__toggle:focus-visible {
   outline: 2px solid var(--border-focus);
   outline-offset: -2px;
 }
 
-.list-header .cv-inline-create__toggle.is-active,
-.list-header .cv-inline-create__toggle[aria-expanded="true"] {
+.list-header .inline-create__toggle.is-active,
+.list-header .inline-create__toggle[aria-expanded="true"] {
   background: color-mix(in srgb, var(--color-primary-soft) 55%, var(--color-white));
   box-shadow: none;
 }
 
-.list-header .cv-inline-create__toggle.is-filled {
+.list-header .inline-create__toggle.is-filled {
   animation: list-header-inline-create-fill 0.35s ease forwards;
   background: var(--btn-primary-bg);
   border-color: var(--btn-primary-border);
@@ -500,7 +500,7 @@
   color: var(--color-white);
 }
 
-.list-header .cv-inline-create__toggle.is-filled:hover {
+.list-header .inline-create__toggle.is-filled:hover {
   background: var(--btn-primary-hover-bg);
   border-color: var(--btn-primary-hover-border);
 }
@@ -513,7 +513,7 @@
   }
 }
 
-.list-header .cv-inline-create__toggle-icon {
+.list-header .inline-create__toggle-icon {
   align-items: center;
   background: color-mix(in srgb, var(--color-primary) 12%, transparent);
   border-radius: 999px;
@@ -528,18 +528,18 @@
   width: 26px;
 }
 
-.list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon {
+.list-header .inline-create__toggle.is-filled .inline-create__toggle-icon {
   background: color-mix(in srgb, var(--color-white) 18%, transparent);
   color: inherit;
 }
 
-.list-header .cv-inline-create__toggle-label {
+.list-header .inline-create__toggle-label {
   font-weight: var(--font-weight-bold);
 }
 
 /* Abas logo abaixo do header */
-.page-shell--list > .list-header + .cv-list-tabs,
-.cv-page--collection > .list-header + .cv-list-tabs {
+.page-shell--list > .list-header + .list-tabs,
+.cv-page--collection > .list-header + .list-tabs {
   margin-top: 0;
   padding-top: var(--space-3);
 }
@@ -555,7 +555,7 @@
   box-shadow: var(--shadow-md);
 }
 
-/* Mesma cor do cabeçalho dos cards (.cv-entity-card__header) */
+/* Mesma cor do cabeçalho dos cards (.entity-card__header) */
 :is(html[data-theme="dark"])
   .list-header__band {
   background: var(--color-surface-muted);
@@ -571,7 +571,7 @@
   color: var(--color-heading);
 }
 
-/* Mesma cor das seções internas do card (.cv-record-card__band). */
+/* Mesma cor das seções internas do card (.record-card__band). */
 :is(html[data-theme="dark"])
   .list-header__rail {
   background: var(--card-family-bg);
@@ -584,7 +584,7 @@
   .list-header__rail
   :is(
     .list-header__search-input.header-filter-input,
-    .cv-custom-select__trigger.cv-custom-select__trigger--v2,
+    .custom-select__trigger.custom-select__trigger--v2,
     .travel-period-filter__btn,
     .cv-btn.cv-btn--secondary.cv-btn--control
   ),
@@ -592,7 +592,7 @@
   .list-header__rail
   :is(
     .list-header__search-input.header-filter-input,
-    .cv-custom-select__trigger.cv-custom-select__trigger--v2,
+    .custom-select__trigger.custom-select__trigger--v2,
     .travel-period-filter__btn,
     .cv-btn.cv-btn--secondary.cv-btn--control
   ):is(:hover, :hover:not(:disabled)) {
@@ -626,29 +626,29 @@
 
 /* Select do rail: chevron sempre accent (fechado = aberto). */
 :is(html[data-theme="dark"])
-  .list-header__rail .cv-custom-select--v2 {
+  .list-header__rail .custom-select--v2 {
   --cs-chevron-color: var(--color-accent);
 }
 
 :is(html[data-theme="dark"])
   .list-header__rail
-  .cv-custom-select__trigger--v2
-  .cv-custom-select__chevron,
+  .custom-select__trigger--v2
+  .custom-select__chevron,
 :is(html[data-theme="dark"])
   .list-header__rail
-  .cv-custom-select__trigger--v2:is(:hover, :focus, :focus-visible, [aria-expanded="true"])
-  .cv-custom-select__chevron,
+  .custom-select__trigger--v2:is(:hover, :focus, :focus-visible, [aria-expanded="true"])
+  .custom-select__chevron,
 :is(html[data-theme="dark"])
   .list-header__rail
-  .cv-custom-select--v2.cv-custom-select--open
-  .cv-custom-select__chevron {
+  .custom-select--v2.custom-select--open
+  .custom-select__chevron {
   color: var(--color-accent);
 }
 
 :is(html[data-theme="dark"])
   .list-header__rail
-  .cv-custom-select__trigger--v2
-  .cv-custom-select__chevron
+  .custom-select__trigger--v2
+  .custom-select__chevron
   svg {
   color: var(--color-accent);
   fill: none;
@@ -656,42 +656,42 @@
 }
 
 :is(html[data-theme="dark"])
-  .list-header .cv-inline-create__toggle {
+  .list-header .inline-create__toggle {
   background: var(--card-family-bg);
   border-top-color: var(--border-filter-bar);
   color: var(--theme-text-body);
 }
 
 :is(html[data-theme="dark"])
-  .list-header .cv-inline-create__toggle:hover,
+  .list-header .inline-create__toggle:hover,
 :is(html[data-theme="dark"])
-  .list-header .cv-inline-create__toggle.is-active,
+  .list-header .inline-create__toggle.is-active,
 :is(html[data-theme="dark"])
-  .list-header .cv-inline-create__toggle[aria-expanded="true"] {
+  .list-header .inline-create__toggle[aria-expanded="true"] {
   background: color-mix(in srgb, var(--color-card-muted) 72%, var(--color-white) 10%);
 }
 
 :is(html[data-theme="dark"])
-  .list-header .cv-inline-create__toggle-icon {
+  .list-header .inline-create__toggle-icon {
   background: color-mix(in srgb, var(--color-accent) 16%, transparent);
   color: var(--color-accent);
 }
 
 :is(html[data-theme="dark"])
-  .list-header .cv-inline-create__toggle.is-filled {
+  .list-header .inline-create__toggle.is-filled {
   background: var(--btn-primary-bg);
   border-color: var(--btn-primary-border);
   color: var(--color-white);
 }
 
 :is(html[data-theme="dark"])
-  .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon {
+  .list-header .inline-create__toggle.is-filled .inline-create__toggle-icon {
   background: color-mix(in srgb, var(--color-white) 16%, transparent);
   color: inherit;
 }
 
 :is(html[data-theme="dark"])
-  .list-header .cv-inline-create__panel.is-open {
+  .list-header .inline-create__panel.is-open {
   border-top-color: var(--border-filter-bar);
 }
 
@@ -709,7 +709,7 @@
     flex-basis: 18rem;
   }
 
-  .list-header__filters--advanced .cv-date-picker,
+  .list-header__filters--advanced .date-picker,
   .list-header__filters--advanced .travel-period-filter,
   .list-header__filters--advanced .cv-btn--control {
     flex: 1 1 calc(50% - var(--space-2));
@@ -729,7 +729,7 @@
  */
 @media (min-width: 1181px) and (max-width: 1400px) {
   .list-header__filters--advanced:has(.list-header__select + .list-header__select)
-    :is(.cv-date-picker, .travel-period-filter, .cv-btn--control) {
+    :is(.date-picker, .travel-period-filter, .cv-btn--control) {
     flex: 1 1 calc(50% - var(--space-2));
   }
 
@@ -747,7 +747,7 @@
   }
 
   .list-header__select,
-  .list-header__filters .cv-date-picker,
+  .list-header__filters .date-picker,
   .list-header__filters .travel-period-filter,
   .list-header__filters .cv-btn--control,
   .list-header__actions {

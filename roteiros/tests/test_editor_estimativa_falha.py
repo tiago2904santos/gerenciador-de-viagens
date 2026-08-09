@@ -116,7 +116,7 @@ class EstimativaDeTrechoAvisaQuandoFalhaTests(SimpleTestCase):
         self.assertIn("hidden", markup)
         self.assertIn('role="alert"', markup)
         # Design system, não o Bootstrap legado que o HT-03 vai varrer.
-        self.assertIn("cv-notice", markup)
+        self.assertIn("notice", markup)
         self.assertNotIn("alert alert-", markup)
 
         fonte = _fonte_do_editor()

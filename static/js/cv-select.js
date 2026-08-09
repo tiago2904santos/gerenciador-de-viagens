@@ -55,8 +55,8 @@
 
     if (!trigger || !menu) return;
 
-    wrapper.classList.toggle('cv-action-dropdown--open', open);
-    wrapper.classList.toggle('cv-filter-dropdown--open', open);
+    wrapper.classList.toggle('action-dropdown--open', open);
+    wrapper.classList.toggle('filter-dropdown--open', open);
     trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
     menu.hidden = !open;
 
@@ -72,8 +72,8 @@
   }
 
   function isDropdownOpen(wrapper) {
-    return wrapper.classList.contains('cv-action-dropdown--open') ||
-           wrapper.classList.contains('cv-filter-dropdown--open');
+    return wrapper.classList.contains('action-dropdown--open') ||
+           wrapper.classList.contains('filter-dropdown--open');
   }
 
   /* ─────────────────────────────────────────────────────────────────────────
@@ -81,16 +81,16 @@
      ───────────────────────────────────────────────────────────────────────── */
 
   function _repositionMenu(wrapper, menu) {
-    menu.classList.remove('cv-action-dropdown__menu--up', 'cv-action-dropdown__menu--left');
+    menu.classList.remove('action-dropdown__menu--up', 'action-dropdown__menu--left');
     var rect    = menu.getBoundingClientRect();
     var vpH     = window.innerHeight || document.documentElement.clientHeight;
     var vpW     = window.innerWidth  || document.documentElement.clientWidth;
 
     if (rect.bottom > vpH && rect.top > vpH / 2) {
-      menu.classList.add('cv-action-dropdown__menu--up');
+      menu.classList.add('action-dropdown__menu--up');
     }
     if (rect.right > vpW) {
-      menu.classList.add('cv-action-dropdown__menu--left');
+      menu.classList.add('action-dropdown__menu--left');
     }
   }
 
@@ -152,7 +152,7 @@
       if (!trigger || !menu) return;
 
       // ARIA inicial
-      var menuId = menu.id || ('cv-dd-menu-' + (++_uid));
+      var menuId = menu.id || ('dd-menu-' + (++_uid));
       menu.id = menuId;
       trigger.setAttribute('aria-haspopup', 'true');
       trigger.setAttribute('aria-expanded', 'false');
@@ -201,12 +201,12 @@
 
       var trigger = qs('[data-cv-filter-dropdown-trigger]', wrapper);
       var menu    = qs('[data-cv-filter-dropdown-menu]', wrapper);
-      var badge   = qs('.cv-filter-dropdown__trigger-badge', wrapper);
+      var badge   = qs('.filter-dropdown__trigger-badge', wrapper);
 
       if (!trigger || !menu) return;
 
       // ARIA inicial
-      var menuId = menu.id || ('cv-fd-menu-' + (++_uid));
+      var menuId = menu.id || ('fd-menu-' + (++_uid));
       menu.id = menuId;
       trigger.setAttribute('aria-haspopup', 'listbox');
       trigger.setAttribute('aria-expanded', 'false');
@@ -242,13 +242,13 @@
         var selected = option.dataset.selected === 'true';
         option.setAttribute('role', 'option');
         option.setAttribute('aria-selected', selected ? 'true' : 'false');
-        option.classList.toggle('cv-filter-dropdown__option--selected', selected);
+        option.classList.toggle('filter-dropdown__option--selected', selected);
 
         option.addEventListener('click', function () {
           var isSelected = option.dataset.selected === 'true';
           option.dataset.selected = isSelected ? 'false' : 'true';
           option.setAttribute('aria-selected', isSelected ? 'false' : 'true');
-          option.classList.toggle('cv-filter-dropdown__option--selected', !isSelected);
+          option.classList.toggle('filter-dropdown__option--selected', !isSelected);
           updateBadge();
           dispatchChange();
         });

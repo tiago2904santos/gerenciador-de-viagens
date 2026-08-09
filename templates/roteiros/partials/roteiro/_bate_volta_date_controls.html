@@ -1,20 +1,20 @@
 {# Controles visíveis do range bate-volta (ofício). panel_id vem do date_picker. #}
 <div class="oficio-roteiro-bate-volta__rows" role="group" aria-label="Datas e horários do bate-volta diário">
 
-  <section class="oficio-roteiro-bate-volta__leg cv-form-block cv-form-block--split route-bate-volta-leg" aria-labelledby="bate-volta-ida-title">
-    <header class="cv-form-block__header">
-      <div class="cv-form-block__copy">
-        <h4 class="cv-form-block__title" id="bate-volta-ida-title">Informações de ida</h4>
-        <p class="cv-form-block__description">Data e horário de partida.</p>
+  <section class="oficio-roteiro-bate-volta__leg form-block form-block--split route-bate-volta-leg" aria-labelledby="bate-volta-ida-title">
+    <header class="form-block__header">
+      <div class="form-block__copy">
+        <h4 class="form-block__title" id="bate-volta-ida-title">Informações de ida</h4>
+        <p class="form-block__description">Data e horário de partida.</p>
       </div>
     </header>
-    <div class="cv-form-block__body">
+    <div class="form-block__body">
       <div class="field-grid oficio-roteiro-bate-volta__fields">
         <div class="field cv-field">
           <label class="cv-field__label" for="id_bate_volta_data_inicio_display">Data de ida</label>
-          <div class="cv-date-picker__control">
+          <div class="date-picker__control">
             <input type="text" class="cv-field__control" id="id_bate_volta_data_inicio_display" placeholder="dd/mm/aaaa" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-start-display readonly>
-            <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendário da data de ida">
+            <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendário da data de ida">
               {% include "components/ui/forms/_date_picker_icon.html" %}
             </button>
           </div>
@@ -32,20 +32,20 @@
     </div>
   </section>
 
-  <section class="oficio-roteiro-bate-volta__leg cv-form-block cv-form-block--split route-bate-volta-leg" aria-labelledby="bate-volta-volta-title">
-    <header class="cv-form-block__header">
-      <div class="cv-form-block__copy">
-        <h4 class="cv-form-block__title" id="bate-volta-volta-title">Informações de volta</h4>
-        <p class="cv-form-block__description">Data e horário de retorno.</p>
+  <section class="oficio-roteiro-bate-volta__leg form-block form-block--split route-bate-volta-leg" aria-labelledby="bate-volta-volta-title">
+    <header class="form-block__header">
+      <div class="form-block__copy">
+        <h4 class="form-block__title" id="bate-volta-volta-title">Informações de volta</h4>
+        <p class="form-block__description">Data e horário de retorno.</p>
       </div>
     </header>
-    <div class="cv-form-block__body">
+    <div class="form-block__body">
       <div class="field-grid oficio-roteiro-bate-volta__fields">
         <div class="field cv-field">
           <label class="cv-field__label" for="id_bate_volta_data_fim_display">Data de volta</label>
-          <div class="cv-date-picker__control">
+          <div class="date-picker__control">
             <input type="text" class="cv-field__control" id="id_bate_volta_data_fim_display" placeholder="dd/mm/aaaa" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-end-display readonly>
-            <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendário da data de volta">
+            <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendário da data de volta">
               {% include "components/ui/forms/_date_picker_icon.html" %}
             </button>
           </div>

@@ -115,7 +115,7 @@ class RemoverAssinadoNaoMenteTests(SimpleTestCase):
         self.assertIn("data-attach-signed-error", markup)
         self.assertIn('role="alert"', markup)
         # Design system, não o `alert alert-*` do Bootstrap que o HT-03 vai varrer.
-        self.assertIn("cv-notice", markup)
+        self.assertIn("notice", markup)
 
         fonte = COMPONENTE.read_text(encoding="utf-8")
         for contrato in ("function mostrarErro(", "function limparErro("):

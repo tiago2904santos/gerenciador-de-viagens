@@ -31,21 +31,21 @@
         {% include "components/ui/feedback/form_errors.html" with form=vincular_form only %}
 
         <div
-          class="vincular-usuario-modal__fields cv-form-stack document-form-page"
+          class="vincular-usuario-modal__fields form-stack document-form-page"
           data-travel-document-wizard-step1
         >
           {% include "components/ui/forms/field.html" with field=vincular_form.area size_class="field-size-1" only %}
           {% include "components/ui/forms/field.html" with field=vincular_form.papel size_class="field-size-1" only %}
         </div>
       </div>
-      <div class="cv-dialog__footer vincular-usuario-modal__footer cv-form-card__footer">
-        <section class="cv-card-footer-section">
-          <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
-          <footer class="cv-card-footer">
-            <div class="cv-card-footer__secondary">
+      <div class="cv-dialog__footer vincular-usuario-modal__footer form-card__footer">
+        <section class="card-footer-section">
+          <div class="card-footer-section__divider" aria-hidden="true"></div>
+          <footer class="card-footer">
+            <div class="card-footer__secondary">
               {% include "components/ui/buttons/button.html" with label="Cancelar" variant="secondary" type="button" icon="arrow-left" data_cancel_modal_cancel=True only %}
             </div>
-            <div class="cv-card-footer__primary">
+            <div class="card-footer__primary">
               {% include "components/ui/buttons/button.html" with label="Salvar vínculo" variant="primary" type="submit" icon="arrow-right" icon_after=True only %}
             </div>
           </footer>

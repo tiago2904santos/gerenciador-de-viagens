@@ -9,12 +9,12 @@ para o `<body>` ao abrir —, então materializar sob demanda não muda nada par
 Isso está conferido no navegador, não deduzido.
 {% endcomment %}
 {% for servidor in card.servidores %}
-<div class="cv-action-menu cv-action-menu--documents"
+<div class="action-menu action-menu--documents"
            id="prestacao-docs-menu-{{ servidor.ps_pk }}"
            role="menu"
            hidden>
-        <div class="cv-action-menu__heading">
-          <span class="cv-action-menu__heading-icon">
+        <div class="action-menu__heading">
+          <span class="action-menu__heading-icon">
             {% include "components/ui/icons/icon.html" with icon="download" only %}
           </span>
           <span>
@@ -22,30 +22,30 @@ Isso está conferido no navegador, não deduzido.
             <small>{{ servidor.name }}</small>
           </span>
         </div>
-        <a class="cv-action-menu__item cv-action-menu__item"
+        <a class="action-menu__item action-menu__item"
            href="{{ servidor.rt_download_url }}"
            download
            role="menuitem">
-          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--pdf">
+          <span class="action-menu__item-icon action-menu__item-icon--pdf">
             {% include "components/ui/icons/icon.html" with icon="pdf" only %}
           </span>
           <span><strong>Relatório técnico</strong><small>Salvar PDF individual</small></span>
         </a>
         {% if servidor.diario_pdf_url %}
-        <a class="cv-action-menu__item cv-action-menu__item"
+        <a class="action-menu__item action-menu__item"
            href="{{ servidor.diario_pdf_url }}"
            download
            role="menuitem">
-          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--route">
+          <span class="action-menu__item-icon action-menu__item-icon--route">
             {% include "components/ui/icons/icon.html" with icon="route" only %}
           </span>
           <span><strong>Diário de bordo</strong><small>Salvar PDF do diário</small></span>
         </a>
         {% else %}
-        <span class="cv-action-menu__item cv-action-menu__item is-disabled"
+        <span class="action-menu__item action-menu__item is-disabled"
               role="menuitem"
               aria-disabled="true">
-          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--route">
+          <span class="action-menu__item-icon action-menu__item-icon--route">
             {% include "components/ui/icons/icon.html" with icon="route" only %}
           </span>
           <span><strong>Diário de bordo</strong><small>Ainda não foi criado</small></span>
@@ -59,7 +59,7 @@ Isso está conferido no navegador, não deduzido.
         {% endcomment %}
         <button
           type="button"
-          class="cv-action-menu__item cv-action-menu__item{% if servidor.rt_assinado.assinado or servidor.diario_assinado.assinado or servidor.comprovante_anexo.assinado %} is-assinado{% endif %}"
+          class="action-menu__item action-menu__item{% if servidor.rt_assinado.assinado or servidor.diario_assinado.assinado or servidor.comprovante_anexo.assinado %} is-assinado{% endif %}"
           role="menuitem"
           data-attach-signed-trigger
           data-attach-signed-reopen-key="prestacao-servidor-{{ servidor.ps_pk }}"
@@ -70,7 +70,7 @@ Isso está conferido no navegador, não deduzido.
           data-attach-signed-upload-label="Anexar arquivo"
           data-attach-signed-kinds="{{ card.attach_kinds_json }}"
         >
-          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
+          <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
             {% include "components/ui/icons/icon.html" with icon="sign" only %}
           </span>
           <span>
@@ -78,19 +78,19 @@ Isso está conferido no navegador, não deduzido.
             <small>RT, diário ou comprovante</small>
           </span>
         </button>
-        <a class="cv-action-menu__item cv-action-menu__item"
+        <a class="action-menu__item action-menu__item"
            href="{{ servidor.pacote_url }}"
            download
            role="menuitem">
-          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--package">
+          <span class="action-menu__item-icon action-menu__item-icon--package">
             {% include "components/ui/icons/icon.html" with icon="folder" only %}
           </span>
           <span><strong>Anexo completo</strong><small>Salvar PDF consolidado</small></span>
         </a>
       </div>
-<div class="cv-action-menu cv-action-menu--whatsapp" id="diaria-wa-menu-{{ servidor.ps_pk }}" role="menu" hidden>
-        <div class="cv-action-menu__heading">
-          <span class="cv-action-menu__heading-icon cv-action-menu__heading-icon--wa">
+<div class="action-menu action-menu--whatsapp" id="diaria-wa-menu-{{ servidor.ps_pk }}" role="menu" hidden>
+        <div class="action-menu__heading">
+          <span class="action-menu__heading-icon action-menu__heading-icon--wa">
             {% include "components/ui/icons/icon.html" with icon="whatsapp-modern" only %}
           </span>
           <span>
@@ -98,20 +98,20 @@ Isso está conferido no navegador, não deduzido.
             <small>Escolha como enviar</small>
           </span>
         </div>
-        <button type="button" class="cv-action-menu__item cv-action-menu__item cv-action-menu__item--wa" role="menuitem" data-diaria-wa-send data-wa-app="normal">
-          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--wa">
+        <button type="button" class="action-menu__item action-menu__item action-menu__item--wa" role="menuitem" data-diaria-wa-send data-wa-app="normal">
+          <span class="action-menu__item-icon action-menu__item-icon--wa">
             {% include "components/ui/icons/icon.html" with icon="whatsapp-modern" only %}
           </span>
           <span><strong>WhatsApp</strong><small>Abrir no aplicativo pessoal</small></span>
         </button>
-        <button type="button" class="cv-action-menu__item cv-action-menu__item cv-action-menu__item--wa" role="menuitem" data-diaria-wa-send data-wa-app="business">
-          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--business">
+        <button type="button" class="action-menu__item action-menu__item action-menu__item--wa" role="menuitem" data-diaria-wa-send data-wa-app="business">
+          <span class="action-menu__item-icon action-menu__item-icon--business">
             {% include "components/ui/icons/icon.html" with icon="whatsapp-business" only %}
           </span>
           <span><strong>WhatsApp Business</strong><small>Abrir no aplicativo profissional</small></span>
         </button>
-        <button type="button" class="cv-action-menu__item cv-action-menu__item" role="menuitem" data-diaria-wa-copy>
-          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--copy">
+        <button type="button" class="action-menu__item action-menu__item" role="menuitem" data-diaria-wa-copy>
+          <span class="action-menu__item-icon action-menu__item-icon--copy">
             {% include "components/ui/icons/icon.html" with icon="copy-modern" only %}
           </span>
           <span><strong>Copiar mensagem</strong><small>Copiar o texto para a área de transferência</small></span>

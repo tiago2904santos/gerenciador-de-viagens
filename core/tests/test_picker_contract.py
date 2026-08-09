@@ -50,8 +50,8 @@ class PickerContractTests(SimpleTestCase):
 
     def test_legacy_picker_engines_and_hooks_are_absent(self):
         components = self.root / "static" / "js" / "components"
-        self.assertFalse((components / "cv-search-picker.js").exists())
-        self.assertFalse((components / "cv-custom-select.js").exists())
+        self.assertFalse((components / "search-picker.js").exists())
+        self.assertFalse((components / "custom-select.js").exists())
 
         paths = list((self.root / "static" / "js").rglob("*.js"))
         paths += list((self.root / "templates").rglob("*.html"))
@@ -65,7 +65,7 @@ class PickerContractTests(SimpleTestCase):
         """JS-06 — o nome da classe CSS não é mais condição de lógica.
 
         Antes deste contrato, 10 arquivos achavam o picker renderizado com
-        `classList.contains("cv-search-picker")` e suas partes por seletor de
+        `classList.contains("search-picker")` e suas partes por seletor de
         classe BEM. Renomear a classe na reconstrução do CSS quebraria o
         roteamento de foco em 6 telas em silêncio: não há runtime de teste de
         JS que execute esse caminho.
@@ -83,7 +83,7 @@ class PickerContractTests(SimpleTestCase):
                 continue
             codigo = sem_comentarios(path.read_text(encoding="utf-8"))
             for numero, linha in enumerate(codigo.splitlines(), start=1):
-                if 'classList.contains("cv-search-picker' in linha or ".cv-search-picker" in linha:
+                if 'classList.contains("search-picker' in linha or ".search-picker" in linha:
                     infratores.append(f"{path.relative_to(self.root)}:{numero}")
         self.assertEqual(
             infratores,
@@ -110,5 +110,5 @@ class PickerContractTests(SimpleTestCase):
         self.assertIn("js/shell.bundle.js", base)
         self.assertIn(">>> js/components/picker.js >>>", bundle)
         self.assertIn(">>> js/components/picker-select.js >>>", bundle)
-        self.assertNotIn("cv-search-picker.js", base)
-        self.assertNotIn("cv-custom-select.js", base)
+        self.assertNotIn("search-picker.js", base)
+        self.assertNotIn("custom-select.js", base)

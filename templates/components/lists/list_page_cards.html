@@ -21,7 +21,7 @@
   <div class="list-panel">
     {# Controles ficam no toolbar; aqui só o alerta N-07 se faltar page_obj. #}
     {% include "components/ui/lists/pagination.html" with page_obj=page_obj paginacao_obrigatoria=True pagination_part="erro" only %}
-    <div class="cv-card-grid" data-collection-container>
+    <div class="card-grid" data-collection-container>
       {% for card in cards %}
         {% include card_template with card=card csrf_token=csrf_token current_url=request.get_full_path only %}
       {% empty %}

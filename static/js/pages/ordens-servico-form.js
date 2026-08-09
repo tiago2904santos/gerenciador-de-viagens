@@ -30,7 +30,7 @@
   };
 
   var ROUTE_AVATAR_ICON =
-    '<svg class="cv-icon related-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
+    '<svg class="icon related-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
       '<circle cx="6" cy="19" r="2.5" fill="currentColor"></circle>' +
       '<circle cx="18" cy="5" r="2.5" fill="currentColor"></circle>' +
       '<path d="M8.2 18.2h6.1a3.3 3.3 0 0 0 0-6.6H9.7a3.3 3.3 0 0 1 0-6.6h6.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>' +
@@ -95,12 +95,12 @@
     return [p[2], p[1], p[0]].join("/");
   }
 
-  /* ── cv-search-picker: reset + reinit ──────────────────────── */
+  /* ── search-picker: reset + reinit ──────────────────────── */
 
   function salvageServidorRolePanel(form) {
     var panel = form.querySelector("[data-os-servidor-role-panel]");
     if (!panel || !panel.closest("[data-entity-picker-root]")) return;
-    var host = form.querySelector("#os-card-servidores .cv-form-block__body") || form;
+    var host = form.querySelector("#os-card-servidores .form-block__body") || form;
     host.appendChild(panel);
   }
 
@@ -320,7 +320,7 @@
       modes.forEach(function (mode, index) {
         var button = document.createElement("button");
         button.type = "button";
-        button.className = "cv-segment-toggle__btn";
+        button.className = "segment-toggle__btn";
         button.dataset.osRoleMode = mode;
         button.setAttribute("aria-pressed", mode === activeRole ? "true" : "false");
         button.textContent = OS_ROLE_LABELS[mode] || mode;
@@ -335,9 +335,9 @@
 
       /* Dispara a animação de entrada apenas na troca (não no carregamento) */
       if (active && !wasActive) {
-        button.classList.remove("cv-segment-toggle__btn--pop");
+        button.classList.remove("segment-toggle__btn--pop");
         void button.offsetWidth;
-        button.classList.add("cv-segment-toggle__btn--pop");
+        button.classList.add("segment-toggle__btn--pop");
       }
     });
   }
@@ -373,7 +373,7 @@
     card.classList.toggle("os-servidor-role-card", active);
     card.classList.toggle("os-servidor-role-card--assigned", !!role && active);
     card.classList.toggle(
-      "cv-search-picker__selected-card--driver",
+      "search-picker__selected-card--driver",
       highlighted,
     );
     card.dataset.osServidorRole = role || "";
@@ -395,7 +395,7 @@
       }
     }
     var label = role ? OS_ROLE_LABELS[role] : "Sem função - texto padrão";
-    badge.classList.toggle("cv-search-picker__driver-chip", highlighted);
+    badge.classList.toggle("search-picker__driver-chip", highlighted);
     badge.textContent = label;
   }
 
@@ -450,7 +450,7 @@
         picker.insertBefore(field, selected);
       }
       if (panel.parentElement === picker) {
-        var panelHost = form.querySelector("#os-card-servidores .cv-form-block__body") || form;
+        var panelHost = form.querySelector("#os-card-servidores .form-block__body") || form;
         panelHost.appendChild(panel);
       }
       panel.hidden = true;
@@ -519,9 +519,9 @@
         candidate.setAttribute("aria-pressed", candidate === button ? "true" : "false");
       });
       if (!wasActive) {
-        button.classList.remove("cv-segment-toggle__btn--pop");
+        button.classList.remove("segment-toggle__btn--pop");
         void button.offsetWidth;
-        button.classList.add("cv-segment-toggle__btn--pop");
+        button.classList.add("segment-toggle__btn--pop");
       }
       syncServidorRoleUi(form);
     });
@@ -629,24 +629,24 @@
         var active = selected.has(String(summary.id));
         var button = document.createElement("button");
         button.type = "button";
-        button.className = "cv-search-picker__selected-card related-route-item" + (active ? " is-active" : "");
+        button.className = "search-picker__selected-card related-route-item" + (active ? " is-active" : "");
         button.dataset.routeId = String(summary.id);
         button.setAttribute("aria-pressed", active ? "true" : "false");
 
         var avatar = document.createElement("span");
-        avatar.className = "cv-search-picker__selected-avatar";
+        avatar.className = "search-picker__selected-avatar";
         avatar.setAttribute("aria-hidden", "true");
         avatar.innerHTML = ROUTE_AVATAR_ICON;
 
         var main = document.createElement("div");
-        main.className = "cv-search-picker__selected-main";
+        main.className = "search-picker__selected-main";
 
         var name = document.createElement("span");
-        name.className = "cv-search-picker__selected-name";
+        name.className = "search-picker__selected-name";
         name.textContent = routeCardTitle(summary);
 
         var meta = document.createElement("span");
-        meta.className = "cv-search-picker__selected-meta related-route-period";
+        meta.className = "search-picker__selected-meta related-route-period";
         meta.textContent = routeCardMeta(summary);
 
         main.appendChild(name);

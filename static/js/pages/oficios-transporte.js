@@ -66,7 +66,7 @@
   }
 
   OficioTransporte.prototype.handleDocClick = function (event) {
-    // Considera tanto o picker novo (cv-search-picker) quanto o wrap legado.
+    // Considera tanto o picker novo (search-picker) quanto o wrap legado.
     const wrap = this.pickerRoot || this.root.querySelector(".oficio-viatura-busca__wrap");
     if (!wrap || !this.dropdown) return;
     if (!wrap.contains(event.target)) {
@@ -221,12 +221,12 @@
   };
 
   OficioTransporte.prototype.buildResultButton = function (item) {
-    // Estrutura idêntica ao cv-search-picker.renderOptionItem
+    // Estrutura idêntica ao search-picker.renderOptionItem
     // (marker + content; content tem __option-main e __option-meta).
     const self = this;
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "cv-search-picker__option";
+    btn.className = "search-picker__option";
     btn.dataset.value = String(item.id);
     btn.setAttribute("role", "option");
     btn.setAttribute("aria-selected", "false");
@@ -235,13 +235,13 @@
     }
 
     const marker = document.createElement("span");
-    marker.className = "cv-search-picker__option-marker";
+    marker.className = "search-picker__option-marker";
 
     const body = document.createElement("div");
-    body.className = "cv-search-picker__option-content";
+    body.className = "search-picker__option-content";
 
     const main = document.createElement("span");
-    main.className = "cv-search-picker__option-main";
+    main.className = "search-picker__option-main";
     const placaLabel = item.placa_formatada || "Viatura";
     const modeloLabel = item.modelo || "";
     main.textContent = modeloLabel ? placaLabel + "  •  " + modeloLabel : placaLabel;
@@ -251,14 +251,14 @@
     if (item.suggestion_reason === "motorista" || item.suggestion_reason === "unidade") {
       const chip = document.createElement("span");
       chip.className =
-        "cv-search-picker__driver-chip oficio-viatura-reason oficio-viatura-reason--" +
+        "search-picker__driver-chip oficio-viatura-reason oficio-viatura-reason--" +
         item.suggestion_reason;
       chip.textContent = item.suggestion_reason === "motorista" ? "Motorista" : "Unidade";
       main.appendChild(chip);
     }
 
     const meta = document.createElement("span");
-    meta.className = "cv-search-picker__option-meta";
+    meta.className = "search-picker__option-meta";
     const metaParts = [
       item.unidade_resumo,
       item.combustivel,
@@ -317,7 +317,7 @@
 
   OficioTransporte.prototype.renderSelectedCard = function (item) {
     // Constrói um card com a MESMA estrutura visual do
-    // cv-search-picker.buildCard (variant=detailed):
+    // search-picker.buildCard (variant=detailed):
     //  ┌─────────────────────────────────────────────┐
     //  │ ABC-1234 • FORD KA                  [Editar]│
     //  │ DU01 • Gasolina • Caracterizada     [   x  ]│
@@ -326,17 +326,17 @@
     this.selectedList.innerHTML = "";
 
     const card = document.createElement("div");
-    card.className = "cv-search-picker__selected-card oficio-viatura-selected-card";
+    card.className = "search-picker__selected-card oficio-viatura-selected-card";
     card.dataset.value = String(item.id || "");
 
     const body = document.createElement("div");
-    body.className = "cv-search-picker__selected-main";
+    body.className = "search-picker__selected-main";
 
     const titleRow = document.createElement("div");
-    titleRow.className = "cv-search-picker__selected-title-row";
+    titleRow.className = "search-picker__selected-title-row";
 
     const name = document.createElement("span");
-    name.className = "cv-search-picker__selected-name";
+    name.className = "search-picker__selected-name";
     const placaLabel = item.placa_formatada || "—";
     const modeloLabel = item.modelo || "";
     name.textContent = modeloLabel ? placaLabel + "  •  " + modeloLabel : placaLabel;
@@ -345,7 +345,7 @@
     if (item.suggestion_reason === "motorista" || item.suggestion_reason === "unidade") {
       const chip = document.createElement("span");
       chip.className =
-        "cv-search-picker__driver-chip oficio-viatura-reason oficio-viatura-reason--" +
+        "search-picker__driver-chip oficio-viatura-reason oficio-viatura-reason--" +
         item.suggestion_reason;
       chip.textContent = item.suggestion_reason === "motorista" ? "Motorista" : "Unidade";
       titleRow.appendChild(chip);
@@ -358,7 +358,7 @@
       item.tipo,
     ].filter(function (p) { return p && p !== "—"; });
     const metaEl = document.createElement("span");
-    metaEl.className = "cv-search-picker__selected-meta";
+    metaEl.className = "search-picker__selected-meta";
     metaEl.textContent = metaParts.length
       ? metaParts.join("  •  ")
       : "Dados complementares não informados";
@@ -368,17 +368,17 @@
     // Botão Editar — visual semelhante ao driver-toggle do multiselect
     if (item.edit_url) {
       const editRow = document.createElement("div");
-      editRow.className = "cv-search-picker__driver-control oficio-viatura-edit-row";
+      editRow.className = "search-picker__driver-control oficio-viatura-edit-row";
 
       const editLink = document.createElement("a");
       editLink.className =
-        "cv-search-picker__driver-toggle oficio-viatura-edit-link";
+        "search-picker__driver-toggle oficio-viatura-edit-link";
       editLink.href = item.edit_url;
       editLink.setAttribute("aria-label", "Editar viatura selecionada");
       const marker = document.createElement("span");
-      marker.className = "cv-search-picker__driver-marker";
+      marker.className = "search-picker__driver-marker";
       const text = document.createElement("span");
-      text.className = "cv-search-picker__driver-text";
+      text.className = "search-picker__driver-text";
       text.textContent = "Editar viatura";
       editLink.appendChild(marker);
       editLink.appendChild(text);
@@ -389,7 +389,7 @@
     // Botão remover/limpar — usa o mesmo padrão visual do __remove (x)
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
-    removeBtn.className = "cv-search-picker__remove";
+    removeBtn.className = "search-picker__remove";
     removeBtn.setAttribute("aria-label", "Remover viatura selecionada");
     removeBtn.textContent = "x";
     const self = this;

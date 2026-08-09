@@ -129,7 +129,7 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         component_files = (
             "picker.js",
-            "cv-date-picker.js",
+            "date-picker.js",
             "collection.js",
             "overlay.js",
         )
@@ -211,8 +211,8 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         self.assertIn("alert-{{ alert_variant }}", alert)
         self.assertIn("alert--{{ alert_variant }}", alert)
-        self.assertIn("cv-notice", alert)
-        self.assertIn("cv-notice--", alert)
+        self.assertIn("notice", alert)
+        self.assertIn("notice--", alert)
         self.assertIn("action_label and action_url", empty_state)
         self.assertIn('components/ui/buttons/button.html', empty_state)
         # `HT-03`: a guarda era `form.errors or errors`, num `{% if %}` só. Virou dois
@@ -242,12 +242,12 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "file-picker.css"
         ).read_text(encoding="utf-8")
 
-        self.assertIn("cv-file-picker", component)
-        self.assertIn("cv-file-selection", component)
+        self.assertIn("file-picker", component)
+        self.assertIn("file-selection", component)
         self.assertIn('{{ field_id }}-status', component)
         self.assertIn('role="status"', component)
         self.assertIn('data-file-picker-status', component)
-        self.assertIn(".cv-file-picker", component_css)
+        self.assertIn(".file-picker", component_css)
         self.assertIn(".is-dragover", component_css)
         self.assertIn("@media (max-width: 640px)", component_css)
 
@@ -358,16 +358,16 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "_detalhe_documentos_body.html"
         ).read_text(encoding="utf-8")
         # Toggle segmentado (mesmo componente do Condução/Técnico/Apoio da OS)
-        self.assertIn("cv-segment-toggle evento-doc-toggle", documentos_body)
+        self.assertIn("segment-toggle evento-doc-toggle", documentos_body)
         self.assertIn("data-evento-doc-toggle", documentos_body)
         self.assertIn('data-doc-tab-target="oficios"', documentos_body)
-        self.assertIn("cv-form-section-card--compact", page_shell)
-        self.assertIn("cv-form-section-card--described", page_shell)
+        self.assertIn("form-section-card--compact", page_shell)
+        self.assertIn("form-section-card--described", page_shell)
         self.assertIn("event.key === 'ArrowRight'", script)
         self.assertIn("event.key === 'Home'", script)
         self.assertIn("registerEnhancer('eventoGuided', initD)", script)
-        self.assertEqual(template.count('class="cv-fab-container"'), 4)
-        self.assertIn('extra_class="cv-fab"', template)
+        self.assertEqual(template.count('class="fab-container"'), 4)
+        self.assertIn('extra_class="fab"', template)
 
         # `collection_header.html` era conferido aqui; saiu na cascata do
         # `NOVO-44` — o componente só vivia no UI Lab, que o `BE-25` apagou.
@@ -425,7 +425,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "confirm_delete.html"
         ).read_text(encoding="utf-8")
 
-        self.assertIn("cv-confirm-page", component)
+        self.assertIn("confirm-page", component)
         self.assertIn("href=back_url", component)
         self.assertIn('variant="danger"', component)
         self.assertIn('type="submit"', component)
@@ -436,7 +436,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         # pelo `BE-25`. `summary_card.html` saiu pela MESMA razão, um ID depois:
         # o único citador era o painel de `/`, esvaziado a pedido do dono, e a
         # trava de órfãos reprovou antes do merge — o que o `NOVO-44` só
-        # descobriu depois. O vocabulário `cv-metric` não morreu com ele; segue
+        # descobriu depois. O vocabulário `metric` não morreu com ele; segue
         # vivo em `planos_trabalho`, que é o que este teste continua medindo.
         plan_summary = (
             Path(settings.BASE_DIR)
@@ -460,9 +460,9 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "content-cards.css"
         ).read_text(encoding="utf-8")
 
-        self.assertIn("cv-summary-card", plan_summary)
+        self.assertIn("summary-card", plan_summary)
         # `H-05`: o grid saiu do casco e vive no partial do corpo.
-        self.assertIn("cv-summary-grid--4", plan_summary_body)
+        self.assertIn("summary-grid--4", plan_summary_body)
         self.assertIn("@media (max-width: 640px)", component_css)
 
         # As classes do card mestre das 4 telas de prestação são medidas no HTML
@@ -486,7 +486,7 @@ class DarkRedesignContractTests(SimpleTestCase):
                 )
                 self.assertIn("travel-document-card", html)
                 self.assertIn("travel-document-body", html)
-                self.assertIn("cv-form-card__footer", html)
+                self.assertIn("form-card__footer", html)
                 self.assertIn(card, html)
 
     def test_rich_list_cards_share_the_entity_card_contract(self):
@@ -495,8 +495,8 @@ class DarkRedesignContractTests(SimpleTestCase):
             templates / "components" / "ui" / "lists" / "entity_card.html"
         ).read_text(encoding="utf-8")
         for contract in (
-            "cv-entity-card",
-            "cv-entity-card__body",
+            "entity-card",
+            "entity-card__body",
             "components/ui/lists/entity_card_header.html",
             "components/ui/lists/entity_card_footer.html",
         ):
@@ -518,7 +518,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         # mesmo contrato de `entity_card.html` e **nada o renderizava** — o único
         # citador do repositório era este arquivo de teste, e ainda por cima numa
         # asserção de que ele *não* aparece no lab (linha ~681). O contrato de
-        # `cv-entity-card` continua afirmado logo acima, sobre o componente canônico.
+        # `entity-card` continua afirmado logo acima, sobre o componente canônico.
 
     def test_document_viewer_and_signature_use_canonical_components(self):
         templates = Path(settings.BASE_DIR) / "templates"
@@ -532,10 +532,10 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR) / "static" / "js" / "components" / "signature-actions.js"
         ).read_text(encoding="utf-8")
 
-        self.assertIn("cv-document-viewer", viewer)
+        self.assertIn("document-viewer", viewer)
         self.assertIn("doc-pdf-canvas-wrap", viewer)
         self.assertIn('components/documents/pdf_viewer.html', viewer_page)
-        self.assertIn("cv-signature-card", signature)
+        self.assertIn("signature-card", signature)
         # `H-05`: o hook de cópia mora no partial do corpo, não no casco.
         self.assertIn("data-cv-signature-copy", signature_body)
         self.assertIn('components/documents/signature_card.html', (
@@ -564,9 +564,9 @@ class DarkRedesignContractTests(SimpleTestCase):
         # `H-05`: o casco do card veio de `components/form/card.html`; a página
         # só aponta o include. O contrato visual continua no componente canônico.
         self.assertIn('components/form/card.html', source)
-        self.assertIn("cv-form-section-card", card)
+        self.assertIn("form-section-card", card)
         self.assertIn("cv-form-section-header", card)
-        self.assertIn("cv-form-section-body", card)
+        self.assertIn("form-section-body", card)
         self.assertIn("cv-btn cv-btn--secondary", header_actions)
         self.assertNotIn("form-section app-form-section", source)
         self.assertNotIn("btn btn-secondary", source)
@@ -590,9 +590,9 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn('components/ui/buttons/button.html', module_card)
 
         cadastros = (templates / "cadastros" / "index.html").read_text(encoding="utf-8")
-        # `cadastros-hub` virou `cv-catalog-hub` na reescrita visual da
+        # `cadastros-hub` virou `catalog-hub` na reescrita visual da
         # Administracao; o contrato e o shell padrao mais o hub, nao o nome antigo.
-        self.assertIn("page-shell page-shell--standard cv-catalog-hub", cadastros)
+        self.assertIn("page-shell page-shell--standard catalog-hub", cadastros)
         self.assertIn('components/ui/headers/page_header.html', cadastros)
         self.assertIn('components/cards/module_card.html', cadastros)
         self.assertNotIn("app-page-hero", cadastros)
@@ -683,7 +683,7 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         wizard_header = self.css.rsplit(".cv-form-section-header {", 1)[1]
         wizard_header = wizard_header.split("}", 1)[0]
-        list_header = self.css.split(".cv-record-card__id-row {", 1)[1]
+        list_header = self.css.split(".record-card__id-row {", 1)[1]
         list_header = list_header.split("}", 1)[0]
 
         for shared_token in (
@@ -695,7 +695,7 @@ class DarkRedesignContractTests(SimpleTestCase):
                 self.assertIn(shared_token, wizard_header)
                 self.assertIn(shared_token, list_header)
 
-        self.assertEqual(self.css.count(".cv-record-card__id-row::before"), 1)
+        self.assertEqual(self.css.count(".record-card__id-row::before"), 1)
 
         simple_form_header = self.css.split(
             ".main-form-panel > .form-section > .section-header {", 1

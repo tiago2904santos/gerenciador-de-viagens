@@ -371,16 +371,16 @@ document.documentElement.dataset.appReady = "true";
     var panel = element("section", "cv-dialog__panel cv-dialog__panel--sm delete-confirm-modal__dialog", {
       role: "dialog",
       "aria-modal": "true",
-      "aria-labelledby": "cv-feedback-title",
-      "aria-describedby": "cv-feedback-message",
+      "aria-labelledby": "feedback-title",
+      "aria-describedby": "feedback-message",
       tabindex: "-1",
     });
     var header = element("header", "cv-dialog__header cv-dialog__header--warning");
     var heading = element("div", "cv-dialog__heading delete-confirm-modal__copy");
     var eyebrow = element("span", "cv-dialog__eyebrow delete-confirm-modal__eyebrow");
     eyebrow.textContent = "Central de Viagens";
-    var title = element("h2", "cv-dialog__title delete-confirm-modal__title", { id: "cv-feedback-title" });
-    var closeButton = element("button", "cv-dialog__close cv-icon-btn cv-icon-btn--sm", {
+    var title = element("h2", "cv-dialog__title delete-confirm-modal__title", { id: "feedback-title" });
+    var closeButton = element("button", "cv-dialog__close icon-btn icon-btn--sm", {
       type: "button",
       "aria-label": "Fechar",
       "data-cv-feedback-cancel": "",
@@ -388,7 +388,7 @@ document.documentElement.dataset.appReady = "true";
     closeButton.textContent = "×";
     var body = element("div", "cv-dialog__body delete-confirm-modal__body");
     var message = element("p", "cv-dialog__message delete-confirm-modal__message", {
-      id: "cv-feedback-message",
+      id: "feedback-message",
     });
     var footer = element("div", "cv-dialog__footer delete-confirm-modal__actions");
     var cancelButton = element("button", "cv-btn cv-btn--secondary", {
@@ -435,8 +435,8 @@ document.documentElement.dataset.appReady = "true";
     active = queue.shift();
     var container = ensureModal();
     var isConfirm = active.kind === "confirm";
-    var title = container.querySelector("#cv-feedback-title");
-    var message = container.querySelector("#cv-feedback-message");
+    var title = container.querySelector("#feedback-title");
+    var message = container.querySelector("#feedback-message");
     var cancelButton = container.querySelector("[data-cv-feedback-cancel].cv-btn");
     var acceptButton = container.querySelector("[data-cv-feedback-accept]");
     var panel = container.querySelector('[role="dialog"]');
@@ -604,7 +604,7 @@ document.documentElement.dataset.appReady = "true";
       });
 
       if (toggle.hasAttribute("data-inline-create-submit-when-open")) {
-        var labelEl = toggle.querySelector(".cv-inline-create__toggle-label");
+        var labelEl = toggle.querySelector(".inline-create__toggle-label");
         var originalLabel = labelEl ? labelEl.textContent : null;
         var saveLabel = toggle.getAttribute("data-inline-create-save-label") || "Salvar";
 
@@ -1714,8 +1714,8 @@ document.documentElement.dataset.appReady = "true";
 
     trigger.classList.toggle('is-active', active);
     trigger.classList.toggle('is-inactive', !active);
-    trigger.classList.toggle('cv-field-side-action--success', active);
-    trigger.classList.toggle('cv-field-side-action--danger', !active);
+    trigger.classList.toggle('field-side-action--success', active);
+    trigger.classList.toggle('field-side-action--danger', !active);
     trigger.setAttribute('aria-pressed', active ? 'true' : 'false');
 
     var labelEl = trigger.querySelector('span:last-child');
@@ -2203,9 +2203,9 @@ document.documentElement.dataset.appReady = "true";
 (function () {
   "use strict";
 
-  var NAV = ".cv-segment-toggle--nav";
-  var BTN = "a.cv-segment-toggle__btn";
-  var POP = "cv-segment-toggle__btn--pop";
+  var NAV = ".segment-toggle--nav";
+  var BTN = "a.segment-toggle__btn";
+  var POP = "segment-toggle__btn--pop";
   var BOUND = "data-cv-segment-nav-bound";
   var DURATION_MS = 280;
 
@@ -2274,7 +2274,7 @@ document.documentElement.dataset.appReady = "true";
   function ensureTooltip() {
     if (tooltip) return tooltip;
     tooltip = document.createElement("div");
-    tooltip.className = "cv-global-tooltip";
+    tooltip.className = "global-tooltip";
     tooltip.setAttribute("role", "tooltip");
     tooltip.hidden = true;
     document.body.appendChild(tooltip);
@@ -2314,8 +2314,8 @@ document.documentElement.dataset.appReady = "true";
     ensureTooltip();
     tooltip.textContent = text;
     tooltip.classList.toggle(
-      "cv-global-tooltip--accent",
-      target.classList.contains("cv-icon-btn--field-manage")
+      "global-tooltip--accent",
+      target.classList.contains("icon-btn--field-manage")
     );
     tooltip.hidden = false;
     tooltip.classList.add("is-visible");
@@ -2327,7 +2327,7 @@ document.documentElement.dataset.appReady = "true";
     if (!tooltip) return;
 
     tooltip.classList.remove("is-visible");
-    tooltip.classList.remove("cv-global-tooltip--accent");
+    tooltip.classList.remove("global-tooltip--accent");
     tooltip.hidden = true;
     currentTarget = null;
   }
@@ -2552,7 +2552,7 @@ document.documentElement.dataset.appReady = "true";
 
   function closeMenu(menu) {
     if (!menu) return;
-    menu.classList.remove("cv-action-menu--open");
+    menu.classList.remove("action-menu--open");
     menu.hidden = true;
     menu.style.removeProperty("position");
     menu.style.removeProperty("top");
@@ -2563,7 +2563,7 @@ document.documentElement.dataset.appReady = "true";
 
   function closeMenus() {
     document
-      .querySelectorAll(".cv-action-menu--open")
+      .querySelectorAll(".action-menu--open")
       .forEach(closeMenu);
   }
 
@@ -2598,7 +2598,7 @@ document.documentElement.dataset.appReady = "true";
         var doc = new DOMParser().parseFromString(resultado.data, "text/html");
         var inseridos = 0;
         Array.prototype.slice
-          .call(doc.querySelectorAll(".cv-action-menu"))
+          .call(doc.querySelectorAll(".action-menu"))
           .forEach(function (bloco) {
             if (bloco.id && document.getElementById(bloco.id)) return;
             document.body.appendChild(document.importNode(bloco, true));
@@ -2622,12 +2622,12 @@ document.documentElement.dataset.appReady = "true";
   /** Menu de erro, para o clique nunca terminar em silêncio. */
   function menuDeFalha(id) {
     var bloco = document.createElement("div");
-    bloco.className = "cv-action-menu cv-action-menu--rich";
+    bloco.className = "action-menu action-menu--rich";
     bloco.id = id;
     bloco.setAttribute("role", "menu");
     bloco.hidden = true;
     var aviso = document.createElement("p");
-    aviso.className = "cv-action-menu__erro";
+    aviso.className = "action-menu__erro";
     aviso.setAttribute("role", "alert");
     aviso.textContent =
       "Não foi possível carregar as ações. Verifique a conexão e tente de novo.";
@@ -2660,13 +2660,13 @@ document.documentElement.dataset.appReady = "true";
   }
 
   function abrirMenuResolvido(trigger, menu) {
-    var wasOpen = menu.classList.contains("cv-action-menu--open");
+    var wasOpen = menu.classList.contains("action-menu--open");
     closeMenus();
     if (wasOpen) return;
     rememberOwner(menu);
     if (menu.parentNode !== document.body) document.body.appendChild(menu);
     menu.hidden = false;
-    menu.classList.add("cv-action-menu--open");
+    menu.classList.add("action-menu--open");
     trigger.setAttribute("aria-expanded", "true");
     positionMenu(trigger, menu);
   }
@@ -2708,7 +2708,7 @@ document.documentElement.dataset.appReady = "true";
       menu.style.width = Math.max(rect.width, 0) + "px";
       menu.style.right = "auto";
       menu.style.minWidth = Math.max(rect.width, 0) + "px";
-      menu.classList.add("cv-floating-dropdown--active");
+      menu.classList.add("floating-dropdown--active");
     }
 
     function open() {
@@ -2729,7 +2729,7 @@ document.documentElement.dataset.appReady = "true";
       if (menu.dataset.cvFloatingActive !== "true") return;
       window.removeEventListener("resize", position);
       window.removeEventListener("scroll", position, true);
-      menu.classList.remove("cv-floating-dropdown--active");
+      menu.classList.remove("floating-dropdown--active");
       ["position", "left", "top", "width", "right", "min-width"].forEach(
         function (property) {
           menu.style.removeProperty(property);
@@ -2805,7 +2805,7 @@ document.documentElement.dataset.appReady = "true";
       openMenu(menuTrigger);
       return;
     }
-    if (event.target.closest(".cv-action-menu")) {
+    if (event.target.closest(".action-menu")) {
       closeMenus();
     } else {
       closeMenus();
@@ -3682,7 +3682,7 @@ document.documentElement.dataset.appReady = "true";
 
   /* ── Contrato de identificação (JS-06) ───────────────────────────
      A `<div>` renderizada abaixo era encontrada de fora por
-     `classList.contains("cv-search-picker")`, e suas partes por seletor de
+     `classList.contains("search-picker")`, e suas partes por seletor de
      classe BEM. Isso amarra 10 arquivos ao nome da classe: renomeá-la na
      reconstrução do CSS quebraria o roteamento de foco em silêncio, sem erro
      no console e sem teste que pegue.
@@ -3852,26 +3852,26 @@ document.documentElement.dataset.appReady = "true";
 
     /* ── Construção do DOM ──────────────────────────────────────── */
 
-    const root = markRoot(el("div", `cv-search-picker cv-search-picker--${mode} cv-search-picker--${variant}`));
-    if (presentation !== "default") root.classList.add(`cv-search-picker--${presentation}`);
-    if (presentation === "people") root.classList.add("cv-search-picker--roster");
-    if (select.disabled)   root.classList.add("cv-search-picker--disabled");
-    if (isError)           root.classList.add("cv-search-picker--error");
+    const root = markRoot(el("div", `search-picker search-picker--${mode} search-picker--${variant}`));
+    if (presentation !== "default") root.classList.add(`search-picker--${presentation}`);
+    if (presentation === "people") root.classList.add("search-picker--roster");
+    if (select.disabled)   root.classList.add("search-picker--disabled");
+    if (isError)           root.classList.add("search-picker--error");
 
     const fieldLabel = select.dataset.pickerLabel || "";
     const fieldHint  = select.dataset.pickerHint  || "";
 
     /* Área de busca */
-    const field      = markPart(el("div",    "cv-search-picker__field"),     "field");
-    const labelEl    = fieldLabel ? el("div", "cv-search-picker__label", fieldLabel) : null;
-    const hintEl     = fieldHint ? el("div", "cv-search-picker__hint", fieldHint) : null;
-    const control    = markPart(el("div",    "cv-search-picker__control"),   "control");
-    const icon       = el("span",   "cv-search-picker__icon", "");
-    const input      = markPart(el("input",  "cv-search-picker__input"),     "input");
-    const clearBtn   = markPart(el("button", "cv-search-picker__clear", "x"), "clear");
-    const dropdown   = markPart(el("div",    "cv-search-picker__dropdown"),  "dropdown");
-    const list       = markPart(el("div",    "cv-search-picker__list"),      "list");
-    const emptyEl    = markPart(el("div",    "cv-search-picker__empty", emptyMsg), "empty");
+    const field      = markPart(el("div",    "search-picker__field"),     "field");
+    const labelEl    = fieldLabel ? el("div", "search-picker__label", fieldLabel) : null;
+    const hintEl     = fieldHint ? el("div", "search-picker__hint", fieldHint) : null;
+    const control    = markPart(el("div",    "search-picker__control"),   "control");
+    const icon       = el("span",   "search-picker__icon", "");
+    const input      = markPart(el("input",  "search-picker__input"),     "input");
+    const clearBtn   = markPart(el("button", "search-picker__clear", "x"), "clear");
+    const dropdown   = markPart(el("div",    "search-picker__dropdown"),  "dropdown");
+    const list       = markPart(el("div",    "search-picker__list"),      "list");
+    const emptyEl    = markPart(el("div",    "search-picker__empty", emptyMsg), "empty");
 
     input.type         = "search";
     input.placeholder  = placeholder;
@@ -3884,7 +3884,7 @@ document.documentElement.dataset.appReady = "true";
 
     /* HT-11 — o input criado aqui nao tinha nome acessivel.
 
-       O `<div class="cv-search-picker__label">` logo abaixo *parece* rotulo,
+       O `<div class="search-picker__label">` logo abaixo *parece* rotulo,
        mas `<div>` nao rotula nada: sem `aria-labelledby` ele e so texto ao
        lado. E o `<label for>` que o Django emite aponta para o `<select>`
        original, que esta em `display:none` — fora da arvore de acessibilidade.
@@ -3944,16 +3944,16 @@ document.documentElement.dataset.appReady = "true";
     const showPanel = mode === "multi" || variant === "detailed";
     let panel = null, grid = null, counter = null, panelEmpty = null, panelTitleEl = null;
     if (showPanel) {
-      panel      = markPart(el("section", "cv-search-picker__selected-panel"), "selected-panel");
-      grid       = el("div",  "cv-search-picker__selected-list");
-      panelEmpty = el("p",    "cv-search-picker__selected-empty", emptyPanelMsg);
+      panel      = markPart(el("section", "search-picker__selected-panel"), "selected-panel");
+      grid       = el("div",  "search-picker__selected-list");
+      panelEmpty = el("p",    "search-picker__selected-empty", emptyPanelMsg);
 
       if (presentation !== "people" && presentation !== "vehicle" && !hideSelectedHeader) {
-        const panelHeader = el("div", "cv-search-picker__selected-header");
-        panelTitleEl = el("h4", "cv-search-picker__selected-title", panelTitle);
+        const panelHeader = el("div", "search-picker__selected-header");
+        panelTitleEl = el("h4", "search-picker__selected-title", panelTitle);
         panelHeader.appendChild(panelTitleEl);
         if (mode === "multi") {
-          counter = el("span", "cv-search-picker__selected-count", "0");
+          counter = el("span", "search-picker__selected-count", "0");
           panelHeader.appendChild(counter);
         }
         panel.appendChild(panelHeader);
@@ -3965,13 +3965,13 @@ document.documentElement.dataset.appReady = "true";
     select.insertAdjacentElement("afterend", root);
 
     /* Campo com botão de gerenciar (field.html): o botão nasce como irmão
-       do <select> dentro do wrapper .cv-field-with-action--manage-reveal.
-       Move para o `.cv-search-picker__field` (irmão do controle, não dentro
+       do <select> dentro do wrapper .field-with-action--manage-reveal.
+       Move para o `.search-picker__field` (irmão do controle, não dentro
        dele) para o mesmo padrão do cargo: encolhe no hover e revela a
        engrenagem à direita, sem competir com "Limpar busca" nem ficar
        centrado sobre o rótulo/dica. */
     const manageBtn = select.parentElement
-      ? select.parentElement.querySelector(":scope > .cv-icon-btn--field-manage")
+      ? select.parentElement.querySelector(":scope > .icon-btn--field-manage")
       : null;
     if (manageBtn) field.appendChild(manageBtn);
 
@@ -3979,7 +3979,7 @@ document.documentElement.dataset.appReady = "true";
       window.CV.overlay && window.CV.overlay.attachDropdown
         ? window.CV.overlay.attachDropdown(dropdown, control)
         : null;
-    if (floatingMenu) root.classList.add("cv-search-picker--menu-portal");
+    if (floatingMenu) root.classList.add("search-picker--menu-portal");
 
     /* ── Helpers de estado ──────────────────────────────────────── */
 
@@ -4035,7 +4035,7 @@ document.documentElement.dataset.appReady = "true";
     }
 
     function setHasQuery(val) {
-      root.classList.toggle("cv-search-picker--has-query", val);
+      root.classList.toggle("search-picker--has-query", val);
     }
 
     function setOpen(next) {
@@ -4045,7 +4045,7 @@ document.documentElement.dataset.appReady = "true";
       isOpen = shouldOpen;
       dropdown.hidden = !isOpen;
       input.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      root.classList.toggle("cv-search-picker--open", isOpen);
+      root.classList.toggle("search-picker--open", isOpen);
       if (isOpen && floatingMenu) floatingMenu.reposition();
       renderResults();
     }
@@ -4070,7 +4070,7 @@ document.documentElement.dataset.appReady = "true";
       if (!value) return false;
       input.value = value;
       query = value;
-      select.dispatchEvent(new CustomEvent("cv-search-picker:free-text-commit", {
+      select.dispatchEvent(new CustomEvent("search-picker:free-text-commit", {
         bubbles: true,
         detail: { value },
       }));
@@ -4154,18 +4154,18 @@ document.documentElement.dataset.appReady = "true";
       const card = grid.querySelector('[data-value="' + CSS.escape(value) + '"]');
       if (!card) return;
 
-      card.classList.toggle("cv-search-picker__selected-card--has-term", enabled);
+      card.classList.toggle("search-picker__selected-card--has-term", enabled);
 
       const termControl = partOf(card, "term-control");
-      const toggle = termControl ? termControl.querySelector(".cv-field-side-action") : null;
+      const toggle = termControl ? termControl.querySelector(".field-side-action") : null;
       if (toggle) {
         toggle.setAttribute("aria-pressed", enabled ? "true" : "false");
         toggle.textContent = presentation === "people"
           ? (enabled ? "Com termo" : "Sem termo")
           : (enabled ? "Gerar termo" : "Não gerar");
         toggle.setAttribute("aria-label", enabled ? "Não gerar termo de autorização" : "Gerar termo de autorização");
-        toggle.classList.toggle("cv-field-side-action--success", enabled);
-        toggle.classList.toggle("cv-field-side-action--danger", !enabled);
+        toggle.classList.toggle("field-side-action--success", enabled);
+        toggle.classList.toggle("field-side-action--danger", !enabled);
         toggle.classList.toggle("is-active",   enabled);
         toggle.classList.toggle("is-inactive", !enabled);
       }
@@ -4178,9 +4178,9 @@ document.documentElement.dataset.appReady = "true";
         const card = closestPart(button, "selected-card");
         const text = partOf(button, "driver-text");
         button.setAttribute("aria-pressed", active ? "true" : "false");
-        button.classList.toggle("cv-search-picker__driver-toggle--active", active);
+        button.classList.toggle("search-picker__driver-toggle--active", active);
         if (card) {
-          card.classList.toggle("cv-search-picker__selected-card--driver", active);
+          card.classList.toggle("search-picker__selected-card--driver", active);
           const surface = partOf(card, "driver-surface");
           if (surface) {
             surface.setAttribute("aria-pressed", active ? "true" : "false");
@@ -4211,23 +4211,23 @@ document.documentElement.dataset.appReady = "true";
     /* ── Render: Resultados do dropdown ─────────────────────────── */
 
     function renderOptionItem(item, index) {
-      const btn    = markPart(el("button", "cv-search-picker__option"), "option");
-      const marker = el("span",   "cv-search-picker__option-marker", "");
-      const visual = el("span",   "cv-search-picker__option-visual", "");
-      const body   = el("div",    "cv-search-picker__option-content");
-      const status = el("span",   "cv-search-picker__option-status", "");
+      const btn    = markPart(el("button", "search-picker__option"), "option");
+      const marker = el("span",   "search-picker__option-marker", "");
+      const visual = el("span",   "search-picker__option-visual", "");
+      const body   = el("div",    "search-picker__option-content");
+      const status = el("span",   "search-picker__option-status", "");
       const isVehicle = presentation === "vehicle";
       const isPerson = !isVehicle && (presentation === "people" || !!item.cargo || !!item.cpf || !!item.rg);
       const primaryText = (isPerson || isVehicle) ? item.label : (item.main || item.label);
-      const main   = el("span",   "cv-search-picker__option-main", primaryText);
+      const main   = el("span",   "search-picker__option-main", primaryText);
       let metaText = item.meta;
 
       if (isPerson) {
-        btn.classList.add("cv-search-picker__option--person");
+        btn.classList.add("search-picker__option--person");
         visual.textContent = initialsFromLabel(item.label);
         metaText = uniqueTextParts([item.cargo, item.unidade]).join(" • ") || "Servidor cadastrado";
       } else if (isVehicle) {
-        btn.classList.add("cv-search-picker__option--vehicle");
+        btn.classList.add("search-picker__option--vehicle");
         visual.textContent = "V";
         metaText = item.cargo || item.meta;
       } else if (item.kind === "unidade") {
@@ -4240,10 +4240,10 @@ document.documentElement.dataset.appReady = "true";
       btn.dataset.value = item.value;
       btn.setAttribute("role", "option");
       btn.setAttribute("aria-selected", item.selected ? "true" : "false");
-      btn.classList.toggle("cv-search-picker__option--active", index === activeIndex);
-      btn.classList.toggle("cv-search-picker__option--selected", item.selected);
+      btn.classList.toggle("search-picker__option--active", index === activeIndex);
+      btn.classList.toggle("search-picker__option--selected", item.selected);
       if (item.kind === "unidade") {
-        btn.classList.add("cv-search-picker__option--unidade");
+        btn.classList.add("search-picker__option--unidade");
       }
 
       visual.setAttribute("aria-hidden", "true");
@@ -4254,10 +4254,10 @@ document.documentElement.dataset.appReady = "true";
 
       body.appendChild(main);
       if (item.rascunho) {
-        main.appendChild(el("span", "cv-chip cv-chip--warning cv-chip--compact", "Rascunho"));
+        main.appendChild(el("span", "chip chip--warning chip--compact", "Rascunho"));
       }
       if (metaText) {
-        body.appendChild(el("span", "cv-search-picker__option-meta", metaText));
+        body.appendChild(el("span", "search-picker__option-meta", metaText));
       }
 
       btn.appendChild(marker);
@@ -4283,17 +4283,17 @@ document.documentElement.dataset.appReady = "true";
 
     function buildTermControl(value) {
       const enabled = selectedForTerm.has(value);
-      const row    = markPart(el("div",  "cv-search-picker__term-control"), "term-control");
-      const label  = el("span", "cv-search-picker__term-label", "Termo de Autorizacao");
+      const row    = markPart(el("div",  "search-picker__term-control"), "term-control");
+      const label  = el("span", "search-picker__term-label", "Termo de Autorizacao");
 
-      /* Reutiliza o padrão cv-field-side-action--state (dot colorido + filled bg)
+      /* Reutiliza o padrão field-side-action--state (dot colorido + filled bg)
          usado nos demais toggles binários do sistema (ex: Possui RG). */
       const stateClass = enabled
-        ? "cv-field-side-action--success is-active"
-        : "cv-field-side-action--danger is-inactive";
+        ? "field-side-action--success is-active"
+        : "field-side-action--danger is-inactive";
       const toggle = el(
         "button",
-        "cv-field-side-action cv-field-side-action--toggle cv-field-side-action--state " + stateClass,
+        "field-side-action field-side-action--toggle field-side-action--state " + stateClass,
         presentation === "people"
           ? (enabled ? "Com termo" : "Sem termo")
           : (enabled ? "Gerar termo" : "Não gerar"),
@@ -4315,12 +4315,12 @@ document.documentElement.dataset.appReady = "true";
 
     function buildDriverControl(item) {
       const active = driverValue === item.value;
-      const row = el("div", "cv-search-picker__driver-control");
-      const button = markPart(el("button", "cv-search-picker__driver-toggle"), "driver-toggle");
-      const marker = el("span", "cv-search-picker__driver-marker", "");
+      const row = el("div", "search-picker__driver-control");
+      const button = markPart(el("button", "search-picker__driver-toggle"), "driver-toggle");
+      const marker = el("span", "search-picker__driver-marker", "");
       const text = markPart(el(
         "span",
-        "cv-search-picker__driver-text",
+        "search-picker__driver-text",
         presentation === "people" ? (active ? "Motorista" : "Definir motorista") : "Este servidor e o motorista",
       ), "driver-text");
 
@@ -4328,7 +4328,7 @@ document.documentElement.dataset.appReady = "true";
       button.dataset.value = item.value;
       button.setAttribute("aria-pressed", active ? "true" : "false");
       button.setAttribute("aria-label", (active ? "Desmarcar " : "Marcar ") + item.label + " como motorista");
-      button.classList.toggle("cv-search-picker__driver-toggle--active", active);
+      button.classList.toggle("search-picker__driver-toggle--active", active);
       button.addEventListener("click", () => setDriverValue(driverValue === item.value ? "" : item.value));
 
       button.appendChild(marker);
@@ -4339,7 +4339,7 @@ document.documentElement.dataset.appReady = "true";
 
     function buildDriverSurface(item) {
       const active = driverValue === item.value;
-      const button = markPart(el("button", "cv-search-picker__driver-surface"), "driver-surface");
+      const button = markPart(el("button", "search-picker__driver-surface"), "driver-surface");
       button.type = "button";
       button.dataset.value = item.value;
       button.dataset.label = item.label;
@@ -4355,30 +4355,30 @@ document.documentElement.dataset.appReady = "true";
     /* ── Render: Cards selecionados ─────────────────────────────── */
 
     function buildCard(item) {
-      const card = markPart(el("div", "cv-search-picker__selected-card"), "selected-card");
+      const card = markPart(el("div", "search-picker__selected-card"), "selected-card");
       card.dataset.value = item.value;
 
       if (presentation === "people" || item.cpf || item.rg) {
-        card.classList.add("cv-search-picker__selected-card--person");
+        card.classList.add("search-picker__selected-card--person");
       } else if (presentation === "vehicle") {
-        card.classList.add("cv-search-picker__selected-card--vehicle");
+        card.classList.add("search-picker__selected-card--vehicle");
       }
 
-      const body  = el("div", "cv-search-picker__selected-main");
-      const title = markPart(el("div", "cv-search-picker__selected-title-row"), "selected-title-row");
+      const body  = el("div", "search-picker__selected-main");
+      const title = markPart(el("div", "search-picker__selected-title-row"), "selected-title-row");
 
       if (presentation === "people") {
-        const name = el("span", "cv-search-picker__selected-name", item.label);
+        const name = el("span", "search-picker__selected-name", item.label);
         title.appendChild(name);
-        if (showDriverCtrl || allAsDrivers) title.appendChild(el("span", "cv-search-picker__driver-chip", "Motorista"));
-        if (item.rascunho) title.appendChild(el("span", "cv-chip cv-chip--warning cv-chip--compact", "Rascunho"));
+        if (showDriverCtrl || allAsDrivers) title.appendChild(el("span", "search-picker__driver-chip", "Motorista"));
+        if (item.rascunho) title.appendChild(el("span", "chip chip--warning chip--compact", "Rascunho"));
         body.appendChild(title);
 
         const infoParts = [];
         if (item.cargo) infoParts.push(item.cargo);
         if (item.unidade) infoParts.push(item.unidade);
         if (infoParts.length) {
-          body.appendChild(el("span", "cv-search-picker__selected-meta", infoParts.join("  •  ")));
+          body.appendChild(el("span", "search-picker__selected-meta", infoParts.join("  •  ")));
         }
       } else if (variant === "detailed") {
         /* ── Layout detalhado ──────────────────────────────────────
@@ -4386,15 +4386,15 @@ document.documentElement.dataset.appReady = "true";
            Linha 2: Cargo • CPF • RG (sem máscara)
         ─────────────────────────────────────────────────────────── */
         const nameParts = [item.label, item.unidade].filter(Boolean);
-        const name = el("span", "cv-search-picker__selected-name", nameParts.join("  •  "));
+        const name = el("span", "search-picker__selected-name", nameParts.join("  •  "));
         title.appendChild(name);
-        if (showDriverCtrl) title.appendChild(el("span", "cv-search-picker__driver-chip", "Motorista"));
-        if (item.rascunho) title.appendChild(el("span", "cv-chip cv-chip--warning cv-chip--compact", "Rascunho"));
+        if (showDriverCtrl) title.appendChild(el("span", "search-picker__driver-chip", "Motorista"));
+        if (item.rascunho) title.appendChild(el("span", "chip chip--warning chip--compact", "Rascunho"));
         body.appendChild(title);
 
         const metaParts = [item.cargo, item.cpf, item.rg].filter(Boolean);
         if (metaParts.length) {
-          body.appendChild(el("span", "cv-search-picker__selected-meta", metaParts.join("  •  ")));
+          body.appendChild(el("span", "search-picker__selected-meta", metaParts.join("  •  ")));
         }
       } else {
         /* ── Layout compacto ───────────────────────────────────────
@@ -4402,33 +4402,33 @@ document.documentElement.dataset.appReady = "true";
            Linha 2: Cargo • Unidade
            Linha 3 (detail): CPF mascarado • RG mascarado
         ─────────────────────────────────────────────────────────── */
-        const name = el("span", "cv-search-picker__selected-name", item.label);
+        const name = el("span", "search-picker__selected-name", item.label);
         title.appendChild(name);
-        if (showDriverCtrl) title.appendChild(el("span", "cv-search-picker__driver-chip", "Motorista"));
-        if (item.rascunho) title.appendChild(el("span", "cv-chip cv-chip--warning cv-chip--compact", "Rascunho"));
+        if (showDriverCtrl) title.appendChild(el("span", "search-picker__driver-chip", "Motorista"));
+        if (item.rascunho) title.appendChild(el("span", "chip chip--warning chip--compact", "Rascunho"));
         body.appendChild(title);
 
         const metaParts = [item.cargo, item.unidade].filter(Boolean);
         const metaText = metaParts.length
           ? metaParts.join(" • ")
           : (item.meta || "Dados complementares nao informados");
-        body.appendChild(el("span", "cv-search-picker__selected-meta", metaText));
+        body.appendChild(el("span", "search-picker__selected-meta", metaText));
 
         const detailParts = [];
         if (item.cpf) detailParts.push("CPF: " + maskDocument(item.cpf, "cpf"));
         if (item.rg)  detailParts.push("RG: "  + maskDocument(item.rg, "rg"));
         if (detailParts.length) {
-          body.appendChild(el("span", "cv-search-picker__selected-detail", detailParts.join("  •  ")));
+          body.appendChild(el("span", "search-picker__selected-detail", detailParts.join("  •  ")));
         }
       }
 
-      const removeBtn = markPart(el("button", "cv-search-picker__remove", presentation !== "default" ? "×" : "x"), "remove");
+      const removeBtn = markPart(el("button", "search-picker__remove", presentation !== "default" ? "×" : "x"), "remove");
       removeBtn.type = "button";
       removeBtn.setAttribute("aria-label", "Remover " + item.label);
       removeBtn.addEventListener("click", () => removeItem(item.value));
 
       card.classList.toggle(
-        "cv-search-picker__selected-card--driver",
+        "search-picker__selected-card--driver",
         allAsDrivers || driverValue === item.value,
       );
 
@@ -4440,8 +4440,8 @@ document.documentElement.dataset.appReady = "true";
           .join("")
           .slice(0, 2)
           .toUpperCase();
-        const avatar = el("span", "cv-search-picker__selected-avatar", initials || "•");
-        const actions = el("div", "cv-search-picker__selected-actions");
+        const avatar = el("span", "search-picker__selected-avatar", initials || "•");
+        const actions = el("div", "search-picker__selected-actions");
         avatar.setAttribute("aria-hidden", "true");
         actions.setAttribute("role", "group");
         actions.setAttribute("aria-label", "Ações de " + item.label);
@@ -4450,13 +4450,13 @@ document.documentElement.dataset.appReady = "true";
         card.appendChild(avatar);
         card.appendChild(body);
         if (showDriverCtrl) {
-          card.classList.add("cv-search-picker__selected-card--with-driver");
+          card.classList.add("search-picker__selected-card--with-driver");
           actions.appendChild(buildDriverControl(item));
         }
         if (showTermCtrl) {
-          card.classList.add("cv-search-picker__selected-card--with-term");
+          card.classList.add("search-picker__selected-card--with-term");
           actions.appendChild(buildTermControl(item.value));
-          card.classList.toggle("cv-search-picker__selected-card--has-term", selectedForTerm.has(item.value));
+          card.classList.toggle("search-picker__selected-card--has-term", selectedForTerm.has(item.value));
         }
         actions.appendChild(removeBtn);
         card.appendChild(actions);
@@ -4466,11 +4466,11 @@ document.documentElement.dataset.appReady = "true";
       if (presentation === "vehicle") {
         const plate = String(item.label || "").split(/\s*[-–]\s*/)[0].replace(/[^A-Za-z0-9]/g, "");
         const initials = (plate.slice(0, 2) || "V").toUpperCase();
-        const avatar = el("span", "cv-search-picker__selected-avatar", initials);
+        const avatar = el("span", "search-picker__selected-avatar", initials);
         avatar.setAttribute("aria-hidden", "true");
         const titleRow = partOf(body, "selected-title-row");
         if (titleRow) {
-          titleRow.appendChild(el("span", "cv-search-picker__vehicle-chip", "Viatura"));
+          titleRow.appendChild(el("span", "search-picker__vehicle-chip", "Viatura"));
         }
         card.appendChild(avatar);
         card.appendChild(body);
@@ -4483,14 +4483,14 @@ document.documentElement.dataset.appReady = "true";
 
       /* Controle de Termo */
       if (showTermCtrl) {
-        card.classList.add("cv-search-picker__selected-card--with-term");
+        card.classList.add("search-picker__selected-card--with-term");
         card.appendChild(buildTermControl(item.value));
-        card.classList.toggle("cv-search-picker__selected-card--has-term", selectedForTerm.has(item.value));
+        card.classList.toggle("search-picker__selected-card--has-term", selectedForTerm.has(item.value));
       }
 
       /* Botão de motorista — apenas quando explicitamente habilitado */
       if (showDriverCtrl) {
-        card.classList.add("cv-search-picker__selected-card--with-driver");
+        card.classList.add("search-picker__selected-card--with-driver");
         card.appendChild(buildDriverControl(item));
       }
 
@@ -4685,7 +4685,7 @@ document.documentElement.dataset.appReady = "true";
    O <select> nativo permanece oculto para submissão do formulário.
 
    Uso:
-     <div class="cv-custom-select" data-entity-picker data-entity-picker-renderer="select">
+     <div class="custom-select" data-entity-picker data-entity-picker-renderer="select">
        <select name="campo">
          <option value="">Selecione</option>
          <option value="1">Opção 1</option>
@@ -4693,7 +4693,7 @@ document.documentElement.dataset.appReady = "true";
      </div>
 
    Modificadores CSS:
-     .cv-custom-select--sm / --lg / --disabled / --error
+     .custom-select--sm / --lg / --disabled / --error
 
    Multi-select: adicione o atributo `multiple` no <select> nativo e, se quiser,
    `data-placeholder="Texto"` na div wrapper para o texto exibido quando nada
@@ -4706,7 +4706,7 @@ document.documentElement.dataset.appReady = "true";
   var uid = 0;
 
   function nextId() {
-    return 'cv-cs-' + (++uid);
+    return 'cs-' + (++uid);
   }
 
   function svgChevron() {
@@ -4741,10 +4741,10 @@ document.documentElement.dataset.appReady = "true";
     var self   = this;
     var native = this.native;
 
-    this.root.classList.add('cv-custom-select--v2');
+    this.root.classList.add('custom-select--v2');
 
     // 1. Ocultar native select (mantido no DOM para form submit)
-    native.classList.add('cv-custom-select__native');
+    native.classList.add('custom-select__native');
     native.setAttribute('aria-hidden', 'true');
     native.setAttribute('tabindex', '-1');
 
@@ -4763,7 +4763,7 @@ document.documentElement.dataset.appReady = "true";
     var trigger = document.createElement('button');
     trigger.type = 'button';
     trigger.id   = triggerId;
-    trigger.className = 'cv-custom-select__trigger cv-custom-select__trigger--v2';
+    trigger.className = 'custom-select__trigger custom-select__trigger--v2';
     trigger.setAttribute('role', 'combobox');
     trigger.setAttribute('aria-haspopup', 'listbox');
     trigger.setAttribute('aria-expanded', 'false');
@@ -4771,14 +4771,14 @@ document.documentElement.dataset.appReady = "true";
     if (labelEl) trigger.setAttribute('aria-labelledby', labelEl.id);
     if (native.disabled) {
       trigger.disabled = true;
-      this.root.classList.add('cv-custom-select--disabled');
+      this.root.classList.add('custom-select--disabled');
     }
 
     var valSpan  = document.createElement('span');
-    valSpan.className = 'cv-custom-select__value';
+    valSpan.className = 'custom-select__value';
 
     var chevSpan = document.createElement('span');
-    chevSpan.className = 'cv-custom-select__chevron';
+    chevSpan.className = 'custom-select__chevron';
     chevSpan.setAttribute('aria-hidden', 'true');
     chevSpan.innerHTML = svgChevron();
 
@@ -4789,7 +4789,7 @@ document.documentElement.dataset.appReady = "true";
     // 4. Construir menu
     var menu = document.createElement('ul');
     menu.id        = this._id + '-menu';
-    menu.className = 'cv-custom-select__menu cv-custom-select__menu--v2';
+    menu.className = 'custom-select__menu custom-select__menu--v2';
     menu.setAttribute('role', 'listbox');
     if (native.multiple) menu.setAttribute('aria-multiselectable', 'true');
     menu.hidden = true;
@@ -4799,23 +4799,23 @@ document.documentElement.dataset.appReady = "true";
       var li  = document.createElement('li');
       var itemId = self._id + '-opt-' + i;
       li.id        = itemId;
-      li.className = 'cv-custom-select__option';
+      li.className = 'custom-select__option';
       li.setAttribute('role', 'option');
       li.setAttribute('data-value', opt.value);
       li.setAttribute('aria-selected', 'false');
 
       if (opt.disabled) {
-        li.classList.add('cv-custom-select__option--disabled');
+        li.classList.add('custom-select__option--disabled');
         li.setAttribute('aria-disabled', 'true');
       }
 
       var check = document.createElement('span');
-      check.className = 'cv-custom-select__option-check';
+      check.className = 'custom-select__option-check';
       check.setAttribute('aria-hidden', 'true');
       check.innerHTML = svgCheck();
 
       var label = document.createElement('span');
-      label.className = 'cv-custom-select__option-label';
+      label.className = 'custom-select__option-label';
       label.textContent = opt.text;
 
       li.appendChild(check);
@@ -4840,7 +4840,7 @@ document.documentElement.dataset.appReady = "true";
       window.CV.overlay && window.CV.overlay.attachDropdown
         ? window.CV.overlay.attachDropdown(menu, trigger)
         : null;
-    if (this._floatingMenu) this.root.classList.add('cv-custom-select--menu-portal');
+    if (this._floatingMenu) this.root.classList.add('custom-select--menu-portal');
 
     // 6. Valor inicial
     this._syncFromNative();
@@ -4854,10 +4854,10 @@ document.documentElement.dataset.appReady = "true";
   // ─────────────────────────────────────────────────────────────────────────
   CustomSelect.prototype._syncFromNative = function () {
     var native   = this.native;
-    var valSpan  = this.trigger.querySelector('.cv-custom-select__value');
+    var valSpan  = this.trigger.querySelector('.custom-select__value');
 
     this._items.forEach(function (item) {
-      item.el.classList.remove('cv-custom-select__option--selected');
+      item.el.classList.remove('custom-select__option--selected');
       item.el.setAttribute('aria-selected', 'false');
     });
 
@@ -4865,15 +4865,15 @@ document.documentElement.dataset.appReady = "true";
       var selected = Array.prototype.filter.call(native.options, function (o) { return o.selected; });
       if (selected.length) {
         valSpan.textContent = selected.map(function (o) { return o.text; }).join(', ');
-        valSpan.classList.remove('cv-custom-select__value--placeholder');
+        valSpan.classList.remove('custom-select__value--placeholder');
       } else {
         valSpan.textContent = native.getAttribute('data-placeholder') || this.root.getAttribute('data-placeholder') || '';
-        valSpan.classList.add('cv-custom-select__value--placeholder');
+        valSpan.classList.add('custom-select__value--placeholder');
       }
       for (var s = 0; s < selected.length; s++) {
         for (var i = 0; i < this._items.length; i++) {
           if (this._items[i].value === selected[s].value) {
-            this._items[i].el.classList.add('cv-custom-select__option--selected');
+            this._items[i].el.classList.add('custom-select__option--selected');
             this._items[i].el.setAttribute('aria-selected', 'true');
           }
         }
@@ -4886,13 +4886,13 @@ document.documentElement.dataset.appReady = "true";
     if (sel) {
       valSpan.textContent = sel.text;
       if (!sel.value || sel.value === '') {
-        valSpan.classList.add('cv-custom-select__value--placeholder');
+        valSpan.classList.add('custom-select__value--placeholder');
       } else {
-        valSpan.classList.remove('cv-custom-select__value--placeholder');
+        valSpan.classList.remove('custom-select__value--placeholder');
         // Marcar opção selecionada no menu
         for (var i = 0; i < this._items.length; i++) {
           if (this._items[i].value === sel.value) {
-            this._items[i].el.classList.add('cv-custom-select__option--selected');
+            this._items[i].el.classList.add('custom-select__option--selected');
             this._items[i].el.setAttribute('aria-selected', 'true');
             break;
           }
@@ -4900,7 +4900,7 @@ document.documentElement.dataset.appReady = "true";
       }
     } else {
       valSpan.textContent = '';
-      valSpan.classList.add('cv-custom-select__value--placeholder');
+      valSpan.classList.add('custom-select__value--placeholder');
     }
   };
 
@@ -4918,13 +4918,13 @@ document.documentElement.dataset.appReady = "true";
     if (this._isOpen || this.trigger.disabled) return;
 
     // Fechar outros selects abertos na página
-    var openEls = document.querySelectorAll('.cv-custom-select--open');
+    var openEls = document.querySelectorAll('.custom-select--open');
     for (var i = 0; i < openEls.length; i++) {
       if (openEls[i]._cvSelect) openEls[i]._cvSelect._close();
     }
 
     this._isOpen = true;
-    this.root.classList.add('cv-custom-select--open');
+    this.root.classList.add('custom-select--open');
     this.menu.hidden = false;
     this.trigger.setAttribute('aria-expanded', 'true');
     if (this._floatingMenu) this._floatingMenu.open();
@@ -4932,7 +4932,7 @@ document.documentElement.dataset.appReady = "true";
     // Focar opção selecionada ou a primeira disponível
     var startIdx = -1;
     for (var j = 0; j < this._items.length; j++) {
-      if (this._items[j].el.classList.contains('cv-custom-select__option--selected')) {
+      if (this._items[j].el.classList.contains('custom-select__option--selected')) {
         startIdx = j;
         break;
       }
@@ -4943,7 +4943,7 @@ document.documentElement.dataset.appReady = "true";
   CustomSelect.prototype._close = function () {
     if (!this._isOpen) return;
     this._isOpen = false;
-    this.root.classList.remove('cv-custom-select--open');
+    this.root.classList.remove('custom-select--open');
     this.menu.hidden = true;
     this.trigger.setAttribute('aria-expanded', 'false');
     this.trigger.removeAttribute('aria-activedescendant');
@@ -4988,12 +4988,12 @@ document.documentElement.dataset.appReady = "true";
   // ─────────────────────────────────────────────────────────────────────────
   CustomSelect.prototype._setFocus = function (index) {
     if (this._focused >= 0 && this._items[this._focused]) {
-      this._items[this._focused].el.classList.remove('cv-custom-select__option--focused');
+      this._items[this._focused].el.classList.remove('custom-select__option--focused');
     }
     this._focused = index;
     if (index >= 0 && this._items[index]) {
       var item = this._items[index];
-      item.el.classList.add('cv-custom-select__option--focused');
+      item.el.classList.add('custom-select__option--focused');
       item.el.scrollIntoView({ block: 'nearest' });
       this.trigger.setAttribute('aria-activedescendant', item.el.id);
     }
@@ -5001,7 +5001,7 @@ document.documentElement.dataset.appReady = "true";
 
   CustomSelect.prototype._clearFocus = function () {
     if (this._focused >= 0 && this._items[this._focused]) {
-      this._items[this._focused].el.classList.remove('cv-custom-select__option--focused');
+      this._items[this._focused].el.classList.remove('custom-select__option--focused');
     }
     this._focused = -1;
     this.trigger.removeAttribute('aria-activedescendant');
@@ -6218,7 +6218,7 @@ document.documentElement.dataset.appReady = "true";
 })();
 /* <<< js/components/document-search.js <<< */
 
-/* >>> js/components/cv-date-picker.js >>> */
+/* >>> js/components/date-picker.js >>> */
 (function () {
   'use strict';
 
@@ -6558,19 +6558,19 @@ document.documentElement.dataset.appReady = "true";
     function setOpen(nextOpen) {
       isOpen = !!nextOpen;
       panel.hidden = !isOpen;
-      root.classList.toggle('cv-date-picker--open', isOpen);
+      root.classList.toggle('date-picker--open', isOpen);
       triggers.forEach(function (btn) {
         btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
       });
       if (isOpen) {
         positionPanel();
         // Garante animação mesmo com o panel fora do root (portal)
-        panel.classList.remove('cv-date-picker__panel--entering');
+        panel.classList.remove('date-picker__panel--entering');
         void panel.offsetWidth; // force reflow
-        panel.classList.add('cv-date-picker__panel--entering');
+        panel.classList.add('date-picker__panel--entering');
         render();
       } else {
-        panel.classList.remove('cv-date-picker__panel--entering');
+        panel.classList.remove('date-picker__panel--entering');
       }
     }
 
@@ -6809,7 +6809,7 @@ document.documentElement.dataset.appReady = "true";
       weekdays.innerHTML = '';
       WEEKDAYS.forEach(function (label) {
         var node = document.createElement('span');
-        node.className = 'cv-date-picker__weekday';
+        node.className = 'date-picker__weekday';
         node.textContent = label;
         weekdays.appendChild(node);
       });
@@ -6850,22 +6850,22 @@ document.documentElement.dataset.appReady = "true";
       }
 
       button.type = 'button';
-      button.className = 'cv-date-picker__day';
+      button.className = 'date-picker__day';
       button.textContent = String(date.getDate());
       button.setAttribute('aria-label', dayAriaLabel);
       button.setAttribute('aria-pressed', (isStart || isEnd || isSameDay(date, selectedSingle) || isMultiRange) ? 'true' : 'false');
       button.dataset.date = formatIsoDate(date);
-      button.classList.toggle('cv-date-picker__day--muted', !isCurrentMonth);
-      button.classList.toggle('cv-date-picker__day--today', isToday);
-      button.classList.toggle('cv-date-picker__day--selected', mode !== 'multi' && (isStart || isEnd || isSameDay(date, selectedSingle)));
-      button.classList.toggle('cv-date-picker__day--range', isInRange);
-      button.classList.toggle('cv-date-picker__day--range-start', isStart);
-      button.classList.toggle('cv-date-picker__day--range-end', isEnd);
-      button.classList.toggle('cv-date-picker__day--multi-selected', isMultiRange);
-      button.classList.toggle('cv-date-picker__day--multi-start', isMultiStart);
-      button.classList.toggle('cv-date-picker__day--multi-middle', isMultiMiddle);
-      button.classList.toggle('cv-date-picker__day--multi-end', isMultiEnd);
-      button.classList.toggle('cv-date-picker__day--multi-single', isMultiSingle);
+      button.classList.toggle('date-picker__day--muted', !isCurrentMonth);
+      button.classList.toggle('date-picker__day--today', isToday);
+      button.classList.toggle('date-picker__day--selected', mode !== 'multi' && (isStart || isEnd || isSameDay(date, selectedSingle)));
+      button.classList.toggle('date-picker__day--range', isInRange);
+      button.classList.toggle('date-picker__day--range-start', isStart);
+      button.classList.toggle('date-picker__day--range-end', isEnd);
+      button.classList.toggle('date-picker__day--multi-selected', isMultiRange);
+      button.classList.toggle('date-picker__day--multi-start', isMultiStart);
+      button.classList.toggle('date-picker__day--multi-middle', isMultiMiddle);
+      button.classList.toggle('date-picker__day--multi-end', isMultiEnd);
+      button.classList.toggle('date-picker__day--multi-single', isMultiSingle);
 
       if (mode === 'multi' && isMultiSel) {
         // Uma mesma data pode atender mais de um trecho (chegar e seguir viagem no mesmo dia).
@@ -6879,7 +6879,7 @@ document.documentElement.dataset.appReady = "true";
         var hasMiddleStep = multiStepIndex > 0 && multiStepIndex < selectedDates.length - 1;
         if (hasMiddleStep || multiStepIndexes.length > 1) {
           var badge = document.createElement('span');
-          badge.className = 'cv-date-picker__day-badge';
+          badge.className = 'date-picker__day-badge';
           badge.textContent = multiStepIndexes.map(function (index) {
             return String(index + 1);
           }).join('·');
@@ -7146,7 +7146,7 @@ document.documentElement.dataset.appReady = "true";
     boot();
   }
 })();
-/* <<< js/components/cv-date-picker.js <<< */
+/* <<< js/components/date-picker.js <<< */
 
 /* >>> js/cv-select.js >>> */
 /* ==========================================================================
@@ -7206,8 +7206,8 @@ document.documentElement.dataset.appReady = "true";
 
     if (!trigger || !menu) return;
 
-    wrapper.classList.toggle('cv-action-dropdown--open', open);
-    wrapper.classList.toggle('cv-filter-dropdown--open', open);
+    wrapper.classList.toggle('action-dropdown--open', open);
+    wrapper.classList.toggle('filter-dropdown--open', open);
     trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
     menu.hidden = !open;
 
@@ -7223,8 +7223,8 @@ document.documentElement.dataset.appReady = "true";
   }
 
   function isDropdownOpen(wrapper) {
-    return wrapper.classList.contains('cv-action-dropdown--open') ||
-           wrapper.classList.contains('cv-filter-dropdown--open');
+    return wrapper.classList.contains('action-dropdown--open') ||
+           wrapper.classList.contains('filter-dropdown--open');
   }
 
   /* ─────────────────────────────────────────────────────────────────────────
@@ -7232,16 +7232,16 @@ document.documentElement.dataset.appReady = "true";
      ───────────────────────────────────────────────────────────────────────── */
 
   function _repositionMenu(wrapper, menu) {
-    menu.classList.remove('cv-action-dropdown__menu--up', 'cv-action-dropdown__menu--left');
+    menu.classList.remove('action-dropdown__menu--up', 'action-dropdown__menu--left');
     var rect    = menu.getBoundingClientRect();
     var vpH     = window.innerHeight || document.documentElement.clientHeight;
     var vpW     = window.innerWidth  || document.documentElement.clientWidth;
 
     if (rect.bottom > vpH && rect.top > vpH / 2) {
-      menu.classList.add('cv-action-dropdown__menu--up');
+      menu.classList.add('action-dropdown__menu--up');
     }
     if (rect.right > vpW) {
-      menu.classList.add('cv-action-dropdown__menu--left');
+      menu.classList.add('action-dropdown__menu--left');
     }
   }
 
@@ -7303,7 +7303,7 @@ document.documentElement.dataset.appReady = "true";
       if (!trigger || !menu) return;
 
       // ARIA inicial
-      var menuId = menu.id || ('cv-dd-menu-' + (++_uid));
+      var menuId = menu.id || ('dd-menu-' + (++_uid));
       menu.id = menuId;
       trigger.setAttribute('aria-haspopup', 'true');
       trigger.setAttribute('aria-expanded', 'false');
@@ -7352,12 +7352,12 @@ document.documentElement.dataset.appReady = "true";
 
       var trigger = qs('[data-cv-filter-dropdown-trigger]', wrapper);
       var menu    = qs('[data-cv-filter-dropdown-menu]', wrapper);
-      var badge   = qs('.cv-filter-dropdown__trigger-badge', wrapper);
+      var badge   = qs('.filter-dropdown__trigger-badge', wrapper);
 
       if (!trigger || !menu) return;
 
       // ARIA inicial
-      var menuId = menu.id || ('cv-fd-menu-' + (++_uid));
+      var menuId = menu.id || ('fd-menu-' + (++_uid));
       menu.id = menuId;
       trigger.setAttribute('aria-haspopup', 'listbox');
       trigger.setAttribute('aria-expanded', 'false');
@@ -7393,13 +7393,13 @@ document.documentElement.dataset.appReady = "true";
         var selected = option.dataset.selected === 'true';
         option.setAttribute('role', 'option');
         option.setAttribute('aria-selected', selected ? 'true' : 'false');
-        option.classList.toggle('cv-filter-dropdown__option--selected', selected);
+        option.classList.toggle('filter-dropdown__option--selected', selected);
 
         option.addEventListener('click', function () {
           var isSelected = option.dataset.selected === 'true';
           option.dataset.selected = isSelected ? 'false' : 'true';
           option.setAttribute('aria-selected', isSelected ? 'false' : 'true');
-          option.classList.toggle('cv-filter-dropdown__option--selected', !isSelected);
+          option.classList.toggle('filter-dropdown__option--selected', !isSelected);
           updateBadge();
           dispatchChange();
         });

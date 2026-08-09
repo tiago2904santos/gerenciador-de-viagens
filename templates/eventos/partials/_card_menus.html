@@ -15,7 +15,7 @@ O presenter é o mesmo da lista, chamado com `menus_sob_demanda=False`.
 {% for menu in card.footer.danger_menus %}{% include "components/ui/lists/entity_card_menu_body.html" with menu=menu csrf_token=csrf_token only %}{% endfor %}
 {% for oficio in card.oficios %}
 <div
-              class="cv-action-menu cv-action-menu--rich cv-action-menu--documents"
+              class="action-menu action-menu--rich action-menu--documents"
               id="evento-oficio-menu-{{ card.pk }}-{{ oficio.oficio_pk }}"
               role="menu"
               hidden
@@ -37,7 +37,7 @@ O presenter é o mesmo da lista, chamado com `menus_sob_demanda=False`.
 {% endfor %}
 {% for doc in card.documentos %}
 <div
-              class="cv-action-menu cv-action-menu--rich cv-action-menu--documents"
+              class="action-menu action-menu--rich action-menu--documents"
               id="evento-documento-menu-{{ card.pk }}-{{ forloop.counter }}"
               role="menu"
               hidden
@@ -58,7 +58,7 @@ O presenter é o mesmo da lista, chamado com `menus_sob_demanda=False`.
             </div>
 {% endfor %}
 {% for oficio in card.oficios %}{% for s in oficio.servidores %}{% if s.has_termo %}
-<div class="cv-action-menu cv-action-menu--rich" id="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}" role="menu" hidden>
+<div class="action-menu action-menu--rich" id="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}" role="menu" hidden>
             {% if s.termo_assinado %}
               {% include "components/ui/menus/rich_menu_header.html" with title="Termo assinado" subtitle=s.name icon="sign" only %}
             {% else %}
@@ -76,7 +76,7 @@ O presenter é o mesmo da lista, chamado com `menus_sob_demanda=False`.
             {% if s.termo_anexar_assinado_url %}
             <button
               type="button"
-              class="cv-action-menu__item cv-action-menu__item--rich{% if s.termo_assinado %} is-assinado{% endif %}"
+              class="action-menu__item action-menu__item--rich{% if s.termo_assinado %} is-assinado{% endif %}"
               role="menuitem"
               data-attach-signed-trigger
               data-attach-signed-url="{{ s.termo_anexar_assinado_url }}"
@@ -85,10 +85,10 @@ O presenter é o mesmo da lista, chamado com `menus_sob_demanda=False`.
               data-attach-signed-current-view-url="{{ s.termo_assinado_view_url }}"
               data-attach-signed-current-remove-url="{{ s.termo_remover_assinado_url }}"
             >
-              <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
+              <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
                 {% include "components/ui/icons/icon.html" with icon="sign" only %}
               </span>
-              <span class="cv-action-menu__item-copy">
+              <span class="action-menu__item-copy">
                 <strong>{% if s.termo_assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
                 <small>{% if s.termo_assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
               </span>

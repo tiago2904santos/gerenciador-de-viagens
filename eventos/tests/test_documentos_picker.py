@@ -64,7 +64,7 @@ class DocumentosPickerContextTests(TestCase):
         url = reverse("eventos:guiado_etapa", kwargs={"pk": self.evento.pk, "etapa": 1})
         html = self.client.get(url).content.decode("utf-8")
 
-        self.assertIn("cv-segment-toggle evento-doc-toggle", html)
+        self.assertIn("segment-toggle evento-doc-toggle", html)
         self.assertIn("data-evento-doc-toggle", html)
         self.assertIn('id="evento-doc-summaries"', html)
         self.assertIn('data-evento-doc-field="oficios"', html)

@@ -178,7 +178,7 @@
 
   function closeMenu(menu) {
     if (!menu) return;
-    menu.classList.remove("cv-action-menu--open");
+    menu.classList.remove("action-menu--open");
     menu.hidden = true;
     menu.style.removeProperty("position");
     menu.style.removeProperty("top");
@@ -189,7 +189,7 @@
 
   function closeMenus() {
     document
-      .querySelectorAll(".cv-action-menu--open")
+      .querySelectorAll(".action-menu--open")
       .forEach(closeMenu);
   }
 
@@ -224,7 +224,7 @@
         var doc = new DOMParser().parseFromString(resultado.data, "text/html");
         var inseridos = 0;
         Array.prototype.slice
-          .call(doc.querySelectorAll(".cv-action-menu"))
+          .call(doc.querySelectorAll(".action-menu"))
           .forEach(function (bloco) {
             if (bloco.id && document.getElementById(bloco.id)) return;
             document.body.appendChild(document.importNode(bloco, true));
@@ -248,12 +248,12 @@
   /** Menu de erro, para o clique nunca terminar em silêncio. */
   function menuDeFalha(id) {
     var bloco = document.createElement("div");
-    bloco.className = "cv-action-menu cv-action-menu--rich";
+    bloco.className = "action-menu action-menu--rich";
     bloco.id = id;
     bloco.setAttribute("role", "menu");
     bloco.hidden = true;
     var aviso = document.createElement("p");
-    aviso.className = "cv-action-menu__erro";
+    aviso.className = "action-menu__erro";
     aviso.setAttribute("role", "alert");
     aviso.textContent =
       "Não foi possível carregar as ações. Verifique a conexão e tente de novo.";
@@ -286,13 +286,13 @@
   }
 
   function abrirMenuResolvido(trigger, menu) {
-    var wasOpen = menu.classList.contains("cv-action-menu--open");
+    var wasOpen = menu.classList.contains("action-menu--open");
     closeMenus();
     if (wasOpen) return;
     rememberOwner(menu);
     if (menu.parentNode !== document.body) document.body.appendChild(menu);
     menu.hidden = false;
-    menu.classList.add("cv-action-menu--open");
+    menu.classList.add("action-menu--open");
     trigger.setAttribute("aria-expanded", "true");
     positionMenu(trigger, menu);
   }
@@ -334,7 +334,7 @@
       menu.style.width = Math.max(rect.width, 0) + "px";
       menu.style.right = "auto";
       menu.style.minWidth = Math.max(rect.width, 0) + "px";
-      menu.classList.add("cv-floating-dropdown--active");
+      menu.classList.add("floating-dropdown--active");
     }
 
     function open() {
@@ -355,7 +355,7 @@
       if (menu.dataset.cvFloatingActive !== "true") return;
       window.removeEventListener("resize", position);
       window.removeEventListener("scroll", position, true);
-      menu.classList.remove("cv-floating-dropdown--active");
+      menu.classList.remove("floating-dropdown--active");
       ["position", "left", "top", "width", "right", "min-width"].forEach(
         function (property) {
           menu.style.removeProperty(property);
@@ -431,7 +431,7 @@
       openMenu(menuTrigger);
       return;
     }
-    if (event.target.closest(".cv-action-menu")) {
+    if (event.target.closest(".action-menu")) {
       closeMenus();
     } else {
       closeMenus();

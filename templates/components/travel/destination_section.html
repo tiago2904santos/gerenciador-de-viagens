@@ -1,5 +1,5 @@
 {% if layout == "split" %}
-<section class="cv-form-subsection travel-destinations cv-ordered-field-collection route-destinos-block route-destinos-block--split route-destinos-block--single{% if section_extra_class %} {{ section_extra_class }}{% endif %}"
+<section class="form-subsection travel-destinations ordered-field-collection route-destinos-block route-destinos-block--split route-destinos-block--single{% if section_extra_class %} {{ section_extra_class }}{% endif %}"
          aria-labelledby="{{ title_id|default:'destinos-title' }}"
          id="{{ section_id|default:'sec-destinos' }}"
          data-location-rows>
@@ -17,7 +17,7 @@
   </div>
   <div class="route-destinos-block__body">
     <div class="route-destinos-block__editor">
-      <div class="cv-ordered-field-collection__list route-destinations-list"
+      <div class="ordered-field-collection__list route-destinations-list"
            data-location-list
            aria-label="{{ panel_aria_label|default:'Destinos adicionados' }}"
            {% if list_id %}id="{{ list_id }}"{% endif %}>
@@ -33,16 +33,16 @@
   </div>
 </section>
 {% else %}
-<section class="cv-form-subsection travel-destinations cv-ordered-field-collection{% if section_extra_class %} {{ section_extra_class }}{% endif %}"
+<section class="form-subsection travel-destinations ordered-field-collection{% if section_extra_class %} {{ section_extra_class }}{% endif %}"
          aria-labelledby="{{ title_id|default:'destinos-title' }}"
          id="{{ section_id|default:'sec-destinos' }}"
          data-location-rows>
-  <header class="cv-form-subsection__header cv-ordered-field-collection__header">
-    <div class="cv-form-subsection__copy">
-      <h4 class="cv-form-subsection__title" id="{{ title_id|default:'destinos-title' }}">{{ title|default:'Destinos' }}</h4>
-      <p class="cv-form-subsection__description">{{ description|default:'Adicione os locais na ordem em que serão visitados.' }}</p>
+  <header class="form-subsection__header ordered-field-collection__header">
+    <div class="form-subsection__copy">
+      <h4 class="form-subsection__title" id="{{ title_id|default:'destinos-title' }}">{{ title|default:'Destinos' }}</h4>
+      <p class="form-subsection__description">{{ description|default:'Adicione os locais na ordem em que serão visitados.' }}</p>
     </div>
-    <div class="cv-ordered-field-collection__actions">
+    <div class="ordered-field-collection__actions">
       <button type="button"
               class="cv-btn cv-btn--secondary cv-btn--sm"
               data-location-add
@@ -52,7 +52,7 @@
     </div>
   </header>
 
-  <div class="cv-ordered-field-collection__list route-destinations-list"
+  <div class="ordered-field-collection__list route-destinations-list"
        data-location-list
        aria-label="{{ panel_aria_label|default:'Destinos adicionados' }}"
        {% if list_id %}id="{{ list_id }}"{% endif %}>

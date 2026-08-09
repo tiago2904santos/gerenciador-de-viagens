@@ -9,7 +9,7 @@
           <span class="prestacao-file-widget__subtitle">{{ subtitle|default:"Arquivo anexado" }}</span>
         </div>
         <div class="prestacao-file-widget__actions">
-          <a class="cv-icon-btn cv-icon-btn--preview prestacao-file-widget__action"
+          <a class="icon-btn icon-btn--preview prestacao-file-widget__action"
              href="{{ anexo.url }}"
              target="_blank"
              rel="noopener noreferrer"
@@ -18,9 +18,9 @@
             {% include "components/ui/icons/icon.html" with icon="eye" only %}
           </a>
           {% if delete_form %}
-            <form class="cv-inline-form" method="post" action="{{ anexo.delete_url }}">
+            <form class="inline-form" method="post" action="{{ anexo.delete_url }}">
               {% csrf_token %}
-              <button class="cv-icon-btn cv-icon-btn--delete prestacao-file-widget__action"
+              <button class="icon-btn icon-btn--delete prestacao-file-widget__action"
                       type="submit"
                       aria-label="Excluir documento"
                       data-tooltip="Excluir"
@@ -29,7 +29,7 @@
               </button>
             </form>
           {% else %}
-            <button class="cv-icon-btn cv-icon-btn--delete prestacao-file-widget__action"
+            <button class="icon-btn icon-btn--delete prestacao-file-widget__action"
                     type="button"
                     aria-label="Excluir arquivo"
                     data-tooltip="Excluir">
@@ -41,5 +41,5 @@
     {% endfor %}
   </ul>
 {% elif empty_message %}
-  <p class="document-inline-empty cv-content-spaced">{{ empty_message }}</p>
+  <p class="document-inline-empty content-spaced">{{ empty_message }}</p>
 {% endif %}

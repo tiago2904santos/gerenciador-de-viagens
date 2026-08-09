@@ -189,16 +189,16 @@ document.documentElement.dataset.appReady = "true";
     var panel = element("section", "cv-dialog__panel cv-dialog__panel--sm delete-confirm-modal__dialog", {
       role: "dialog",
       "aria-modal": "true",
-      "aria-labelledby": "cv-feedback-title",
-      "aria-describedby": "cv-feedback-message",
+      "aria-labelledby": "feedback-title",
+      "aria-describedby": "feedback-message",
       tabindex: "-1",
     });
     var header = element("header", "cv-dialog__header cv-dialog__header--warning");
     var heading = element("div", "cv-dialog__heading delete-confirm-modal__copy");
     var eyebrow = element("span", "cv-dialog__eyebrow delete-confirm-modal__eyebrow");
     eyebrow.textContent = "Central de Viagens";
-    var title = element("h2", "cv-dialog__title delete-confirm-modal__title", { id: "cv-feedback-title" });
-    var closeButton = element("button", "cv-dialog__close cv-icon-btn cv-icon-btn--sm", {
+    var title = element("h2", "cv-dialog__title delete-confirm-modal__title", { id: "feedback-title" });
+    var closeButton = element("button", "cv-dialog__close icon-btn icon-btn--sm", {
       type: "button",
       "aria-label": "Fechar",
       "data-cv-feedback-cancel": "",
@@ -206,7 +206,7 @@ document.documentElement.dataset.appReady = "true";
     closeButton.textContent = "×";
     var body = element("div", "cv-dialog__body delete-confirm-modal__body");
     var message = element("p", "cv-dialog__message delete-confirm-modal__message", {
-      id: "cv-feedback-message",
+      id: "feedback-message",
     });
     var footer = element("div", "cv-dialog__footer delete-confirm-modal__actions");
     var cancelButton = element("button", "cv-btn cv-btn--secondary", {
@@ -253,8 +253,8 @@ document.documentElement.dataset.appReady = "true";
     active = queue.shift();
     var container = ensureModal();
     var isConfirm = active.kind === "confirm";
-    var title = container.querySelector("#cv-feedback-title");
-    var message = container.querySelector("#cv-feedback-message");
+    var title = container.querySelector("#feedback-title");
+    var message = container.querySelector("#feedback-message");
     var cancelButton = container.querySelector("[data-cv-feedback-cancel].cv-btn");
     var acceptButton = container.querySelector("[data-cv-feedback-accept]");
     var panel = container.querySelector('[role="dialog"]');
@@ -422,7 +422,7 @@ document.documentElement.dataset.appReady = "true";
       });
 
       if (toggle.hasAttribute("data-inline-create-submit-when-open")) {
-        var labelEl = toggle.querySelector(".cv-inline-create__toggle-label");
+        var labelEl = toggle.querySelector(".inline-create__toggle-label");
         var originalLabel = labelEl ? labelEl.textContent : null;
         var saveLabel = toggle.getAttribute("data-inline-create-save-label") || "Salvar";
 

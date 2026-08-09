@@ -5,7 +5,7 @@
   só. Cada ramo aqui reproduz exatamente o que `field.html` já fazia:
 
   - multiselect  → `multiselect.html`
-  - `cv-search-picker__native` → o widget cru; o picker desenha o resto
+  - `search-picker__native` → o widget cru; o picker desenha o resto
   - select       → `select.html`
   - o resto      → o widget cru
 
@@ -16,7 +16,7 @@
 {% endcomment %}
 {% if field.field.widget.allow_multiple_selected and field.field.widget.input_type == 'select' %}
   {% include "components/ui/forms/multiselect.html" with field=field only %}
-{% elif "cv-search-picker__native" in classe_do_widget %}
+{% elif "search-picker__native" in classe_do_widget %}
   {{ field.as_widget }}
 {% elif field.field.widget.input_type == 'select' %}
   {% include "components/ui/forms/select.html" with field=field only %}

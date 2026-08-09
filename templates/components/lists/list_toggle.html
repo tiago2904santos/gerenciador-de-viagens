@@ -1,6 +1,6 @@
 {% comment %}
 Alternativa ao list_tabs para listagens de duas ou tres opcoes: mesmo dado
-(`abas`), desenhado como segmented control (cv-segment-toggle), o mesmo
+(`abas`), desenhado como segmented control (segment-toggle), o mesmo
 controle do "Roteiro salvo / Roteiro novo" do editor de roteiro.
 
 Os itens sao links de navegacao, nao botoes de estado, entao o ativo usa
@@ -11,14 +11,14 @@ Recebe:
   - `abas`: lista de dicts {key, label, count, url, is_active}
   - `tabs_aria_label` (opcional): rotulo acessivel do grupo.
 {% endcomment %}
-<nav class="cv-segment-toggle cv-segment-toggle--nav" aria-label="{{ tabs_aria_label|default:'Alternar lista' }}">
+<nav class="segment-toggle segment-toggle--nav" aria-label="{{ tabs_aria_label|default:'Alternar lista' }}">
   {% for tab in abas %}
-  <a class="cv-segment-toggle__btn"
+  <a class="segment-toggle__btn"
      href="{{ tab.url }}"
      title="{{ tab.label }}"
      {% if tab.is_active %}aria-current="page"{% endif %}>
     <span>{{ tab.label }}</span>
-    {% if tab.count is not None %}<span class="cv-segment-toggle__count">{{ tab.count }}</span>{% endif %}
+    {% if tab.count is not None %}<span class="segment-toggle__count">{{ tab.count }}</span>{% endif %}
   </a>
   {% endfor %}
 </nav>

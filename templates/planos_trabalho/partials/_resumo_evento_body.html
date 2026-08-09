@@ -1,7 +1,7 @@
-<div class="cv-summary-card__body pt-resumo-evento">
+<div class="summary-card__body pt-resumo-evento">
 
   {# ── Linha 1: identificação (4 colunas) ───────────────────── #}
-  <div class="cv-summary-grid cv-summary-grid--4 pt-resumo-grid pt-resumo-grid--4">
+  <div class="summary-grid summary-grid--4 pt-resumo-grid pt-resumo-grid--4">
     <div class="pt-resumo-box">
       <span class="pt-resumo-box__label">Número do plano</span>
       <span class="pt-resumo-box__value">{{ numero }}</span>
@@ -21,7 +21,7 @@
   </div>
 
   {# ── Linha 2: solicitante + coordenação ───────────────────── #}
-  <div class="cv-summary-grid {% if ev.coordenador_op_presente %}cv-summary-grid--3 pt-resumo-grid--3{% else %}cv-summary-grid--2 pt-resumo-grid--2{% endif %} pt-resumo-grid">
+  <div class="summary-grid {% if ev.coordenador_op_presente %}summary-grid--3 pt-resumo-grid--3{% else %}summary-grid--2 pt-resumo-grid--2{% endif %} pt-resumo-grid">
     <div class="pt-resumo-box">
       <span class="pt-resumo-box__label">Solicitante</span>
       <span class="pt-resumo-box__value">{{ ev.programa }}</span>
@@ -39,7 +39,7 @@
   </div>
 
   {# ── Linha 3: efetivo · valor/diárias · atividades (3 colunas) #}
-  <div class="cv-summary-grid cv-summary-grid--3 pt-resumo-grid3">
+  <div class="summary-grid summary-grid--3 pt-resumo-grid3">
     <div class="pt-resumo-box pt-resumo-efetivo">
       <span class="pt-resumo-box__label">Efetivo{% if ev.efetivo_total %} ({{ ev.efetivo_total }} servidor{{ ev.efetivo_total|pluralize:"es" }}){% endif %}</span>
       <div class="pt-resumo-list">

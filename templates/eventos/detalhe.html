@@ -24,7 +24,7 @@
 
 {% block flow_stepper %}
   {% if evento.status == "cancelado" %}
-    <div class="cv-notice cv-notice--danger cv-notice--action cv-alert cv-alert--danger cv-alert--action">
+    <div class="notice notice--danger notice--action cv-alert cv-alert--danger cv-alert--action">
       <span>
         <strong>Evento cancelado.</strong>
         {% if evento.motivo_cancelamento %} Motivo: {{ evento.motivo_cancelamento }}{% endif %}
@@ -54,19 +54,19 @@
   {% endif %}
 
   {% if etapa_atual == 2 %}
-    <section class="cv-wizard-collection" aria-label="Roteiros do evento">
-      <div class="cv-wizard-collection__body">
+    <section class="wizard-collection" aria-label="Roteiros do evento">
+      <div class="wizard-collection__body">
         {% include "components/lists/simple_list.html" with rows=roteiro_rows empty_message="Nenhum roteiro vinculado a este evento." hide_realtime_count=True only %}
       </div>
     </section>
-    <div class="cv-fab-container">
-      {% include "components/ui/buttons/button.html" with href=create_urls.roteiro label="Novo roteiro" variant="primary" icon="plus" extra_class="cv-fab" only %}
+    <div class="fab-container">
+      {% include "components/ui/buttons/button.html" with href=create_urls.roteiro label="Novo roteiro" variant="primary" icon="plus" extra_class="fab" only %}
     </div>
   {% endif %}
 
   {% if etapa_atual == 3 %}
-    <section class="cv-wizard-collection" aria-label="Ofícios e justificativas">
-      <div class="cv-wizard-collection__body list-content app-list-grid">
+    <section class="wizard-collection" aria-label="Ofícios e justificativas">
+      <div class="wizard-collection__body list-content app-list-grid">
         {% for card in oficio_cards %}
           {% include "oficios/partials/oficio_list_card.html" with card=card csrf_token=csrf_token only %}
         {% empty %}
@@ -74,22 +74,22 @@
         {% endfor %}
       </div>
     </section>
-    <div class="cv-fab-container">
-      {% include "components/ui/buttons/button.html" with href=create_urls.oficio label="Novo ofício" variant="primary" icon="plus" extra_class="cv-fab" only %}
+    <div class="fab-container">
+      {% include "components/ui/buttons/button.html" with href=create_urls.oficio label="Novo ofício" variant="primary" icon="plus" extra_class="fab" only %}
     </div>
   {% endif %}
 
   {% if etapa_atual == 4 %}
     {% if solicitacao_anexos %}
-      <section class="cv-wizard-collection" aria-label="Documentos de solicitação">
-        <div class="cv-wizard-collection__body">
+      <section class="wizard-collection" aria-label="Documentos de solicitação">
+        <div class="wizard-collection__body">
           {% include "eventos/partials/_detalhe_solicitacao_body.html" %}
         </div>
       </section>
     {% endif %}
 
-    <section class="cv-wizard-collection" aria-label="Planejamento e autorização">
-      <div class="cv-wizard-collection__body list-content app-list-grid">
+    <section class="wizard-collection" aria-label="Planejamento e autorização">
+      <div class="wizard-collection__body list-content app-list-grid">
         {% for card in plano_cards %}
           {% include "planos_trabalho/partials/plano_list_card.html" with card=card only %}
         {% endfor %}
@@ -101,7 +101,7 @@
         {% endif %}
       </div>
     </section>
-    <div class="cv-fab-container">
+    <div class="fab-container">
       <button
         type="button"
         class="cv-btn cv-btn--primary"
@@ -116,11 +116,11 @@
         <span class="cv-btn__icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon="more" only %}</span>
         <span>Mais ações</span>
       </button>
-      <div class="cv-action-menu cv-action-menu--rich" id="evento-etapa4-actions-menu" role="menu" hidden>
+      <div class="action-menu action-menu--rich" id="evento-etapa4-actions-menu" role="menu" hidden>
         {% include "components/ui/menus/rich_menu_header.html" with title="Mais ações" subtitle="Documentos e planejamento" icon="folder" only %}
         <button
           type="button"
-          class="cv-action-menu__item cv-action-menu__item--rich"
+          class="action-menu__item action-menu__item--rich"
           role="menuitem"
           data-attach-signed-trigger
           data-attach-signed-url="{% url 'eventos:solicitacao_anexar' evento.pk %}"
@@ -134,10 +134,10 @@
           data-attach-signed-choose-label="Escolher arquivo"
           data-attach-signed-upload-label="Anexar documento"
         >
-          <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
+          <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
             {% include "components/ui/icons/icon.html" with icon="document" only %}
           </span>
-          <span class="cv-action-menu__item-copy">
+          <span class="action-menu__item-copy">
             <strong>Anexar documento</strong>
             <small>Ofícios solicitantes, convites, despachos ou imagens</small>
           </span>
@@ -149,14 +149,14 @@
   {% endif %}
 
   {% if etapa_atual == 5 %}
-    <section class="cv-wizard-collection" aria-label="Termos do evento">
-      <div class="cv-wizard-collection__body">
+    <section class="wizard-collection" aria-label="Termos do evento">
+      <div class="wizard-collection__body">
         {% include "components/lists/simple_list.html" with rows=termo_rows empty_message="Nenhum termo vinculado a este evento." hide_realtime_count=True only %}
       </div>
     </section>
 
-    <div class="cv-fab-container">
-      {% include "components/ui/buttons/button.html" with href=create_urls.termo label="Novo termo" variant="primary" icon="plus" extra_class="cv-fab" only %}
+    <div class="fab-container">
+      {% include "components/ui/buttons/button.html" with href=create_urls.termo label="Novo termo" variant="primary" icon="plus" extra_class="fab" only %}
     </div>
   {% endif %}
 {% endblock %}

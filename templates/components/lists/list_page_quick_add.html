@@ -1,7 +1,7 @@
-{# Lista com criação inline (cv-inline-create). Cabeçalho via banda canônica (D-53). #}
+{# Lista com criação inline (inline-create). Cabeçalho via banda canônica (D-53). #}
 <div class="page-shell page-shell--list" data-collection data-collection-mode="server">
   <div
-    class="list-header list-header--inline-create cv-filter-header{% if quick_add_compact %} list-header--inline-create-compact{% endif %}"
+    class="list-header list-header--inline-create filter-header{% if quick_add_compact %} list-header--inline-create-compact{% endif %}"
     {% if can_edit_area %}data-travel-document-wizard-step1{% endif %}
   >
     {% include "components/ui/headers/_list_header_band.html" with title=title eyebrow=eyebrow band_tabs_template=band_tabs_template abas=abas tabs_aria_label=tabs_aria_label only %}
@@ -33,7 +33,7 @@
 
       {% if can_edit_area %}
       <form
-        class="cv-inline-create__panel"
+        class="inline-create__panel"
         id="{{ quick_add_panel_id }}"
         method="post"
         action="{{ request.path }}"
@@ -50,18 +50,18 @@
           recarregando com o painel aberto e nenhuma explicação.
 
           **Fora do `__body`, e isso o navegador ensinou.** A primeira versão punha
-          o resumo dentro dele; `.cv-inline-create__body` é `display: flex` com
+          o resumo dentro dele; `.inline-create__body` é `display: flex` com
           `align-items: flex-end` (`page-shell.css:2998`), então a faixa virou uma
           terceira coluna do lado dos campos e empurrou o formulário inteiro. Aqui,
           filha direta do `<form>`, ela empilha acima como se espera.
         {% endcomment %}
         {% include "components/ui/feedback/form_errors.html" with form=quick_add_form only %}
-        <div class="cv-inline-create__body">
-          <div class="cv-inline-create__fields">
+        <div class="inline-create__body">
+          <div class="inline-create__fields">
             {% include quick_add_body_template with form=quick_add_form only %}
           </div>
           {% if not quick_add_compact %}
-          <div class="cv-inline-create__actions">
+          <div class="inline-create__actions">
             {% include "components/ui/buttons/button.html" with label=quick_add_submit_label|default:"Salvar" variant="primary" type="submit" icon="check" only %}
           </div>
           {% endif %}
@@ -72,20 +72,20 @@
 
     {% if can_edit_area %}
     <button
-      class="cv-inline-create__toggle"
+      class="inline-create__toggle"
       type="button"
       data-inline-create-toggle
       {% if quick_add_compact %}data-inline-create-submit-when-open data-inline-create-save-label="{{ quick_add_submit_label|default:'Salvar' }}"{% endif %}
       aria-controls="{{ quick_add_panel_id }}"
       aria-expanded="{% if quick_add_form.errors %}true{% else %}false{% endif %}"
     >
-      <span class="cv-inline-create__toggle-icon" aria-hidden="true">+</span>
-      <span class="cv-inline-create__toggle-label">{{ quick_add_label|default:"Cadastrar item" }}</span>
+      <span class="inline-create__toggle-icon" aria-hidden="true">+</span>
+      <span class="inline-create__toggle-label">{{ quick_add_label|default:"Cadastrar item" }}</span>
     </button>
     {% endif %}
   </div>
 
-  <div class="cv-collection-panel">
+  <div class="collection-panel">
     {% if page_obj.paginator.num_pages > 1 %}
     <div class="list-toolbar">
       {% include "components/ui/lists/pagination.html" with page_obj=page_obj pagination_pages=pagination_pages page_querystring=page_querystring pagination_part="info" only %}
@@ -104,6 +104,6 @@
   {% endif %}
 
   {% if back_url %}
-    {% include "components/ui/buttons/floating_action.html" with href=back_url label=back_label|default:"Voltar" icon="arrow-left" variant="secondary" aria_label=back_label|default:"Voltar" extra_class="cv-floating-action--back" only %}
+    {% include "components/ui/buttons/floating_action.html" with href=back_url label=back_label|default:"Voltar" icon="arrow-left" variant="secondary" aria_label=back_label|default:"Voltar" extra_class="floating-action--back" only %}
   {% endif %}
 </div>

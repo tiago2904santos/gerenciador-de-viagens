@@ -232,7 +232,7 @@
 
 /* HT-09 — o skip link do login.
 
-   O `.cv-skip-link` canonico mora em `components/app-shell.css`, que so entra
+   O `.skip-link` canonico mora em `components/app-shell.css`, que so entra
    pelo bundle do casco. Esta tela nao estende `base.html` e carrega so quatro
    folhas, entao a classe chegaria **sem estilo**: o link ficaria visivel no
    canto, atravessado no layout. As propriedades sao as mesmas de
@@ -241,7 +241,7 @@
 
    A cor vem dos tokens de auth para o link nao sumir contra o fundo escuro
    desta tela, que e proprio dela. */
-.cv-skip-link {
+.skip-link {
   background: var(--auth-card, var(--color-card));
   border: 1px solid var(--auth-border, var(--color-border));
   border-radius: var(--radius-md, 8px);
@@ -256,7 +256,7 @@
   z-index: 1010;
 }
 
-.cv-skip-link:focus {
+.skip-link:focus {
   transform: translateY(0);
 }
 

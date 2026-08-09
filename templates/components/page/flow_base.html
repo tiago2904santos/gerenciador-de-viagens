@@ -3,7 +3,7 @@
   Shell único das páginas de fluxo documental (`H-02`).
 
   Nove páginas repetiam o mesmo casco — `page-shell`, cabeçalho, stepper,
-  `main-form-panel` e `cv-form-section-stack` — cada uma com a sua cópia. As duas
+  `main-form-panel` e `form-section-stack` — cada uma com a sua cópia. As duas
   linhas do meio eram **literalmente idênticas** nas nove; o resto variava em 12
   eixos, que é por isso que este componente tem parâmetro em vez de ser um
   include mudo.
@@ -37,7 +37,7 @@
       {% block flow_stepper %}{% endblock %}
 
       <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
-        <div class="cv-form-section-stack cv-form-section-stack--comfortable">
+        <div class="form-section-stack form-section-stack--comfortable">
           {% block flow_body %}{% endblock %}
         </div>
       </div>

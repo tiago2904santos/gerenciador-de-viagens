@@ -1,12 +1,12 @@
 {% comment %}
 date_picker.html — componente global de calendário.
-Unico ponto de verdade para a marcacao do componente; static/js/components/cv-date-picker.js e
-static/css/components/cv-date-picker.css ja sao compartilhados — este partial evita que cada
+Unico ponto de verdade para a marcacao do componente; static/js/components/date-picker.js e
+static/css/components/date-picker.css ja sao compartilhados — este partial evita que cada
 pagina copie/cole (e por engano divirja) a marcacao HTML.
 
 Parametros comuns:
   mode            "single" (padrao) | "range" | "multi"
-  picker_id       id do elemento raiz .cv-date-picker (opcional)
+  picker_id       id do elemento raiz .date-picker (opcional)
   extra_class     classes extras na raiz, ex.: "termo-date-picker" (opcional)
   initial_date    data-initial-date na raiz — data inicial exibida ao abrir (opcional)
 
@@ -49,10 +49,10 @@ Modo multi:
                         "filter-pill" reutiliza o controle compacto dos filtros de lista
   trigger_label / trigger_aria_label / trigger_class
 {% endcomment %}
-{% with root_id=picker_id|default:"cv-date-picker" %}
+{% with root_id=picker_id|default:"date-picker" %}
 {% with panel_id=root_id|add:"-panel" %}
 <div
-  class="cv-date-picker{% if extra_class %} {{ extra_class }}{% endif %}"
+  class="date-picker{% if extra_class %} {{ extra_class }}{% endif %}"
   data-cv-date-picker
   {% if mode %}data-mode="{{ mode }}"{% endif %}
   {% if picker_id %}id="{{ picker_id }}"{% endif %}
@@ -92,9 +92,9 @@ Modo multi:
       <div class="field-grid field-grid--cols-2">
         <div class="cv-field">
           <label class="cv-field__label{% if hide_labels %} sr-only{% endif %}" for="{{ start_id }}">{{ start_lbl }}</label>
-          <div class="cv-date-picker__control">
+          <div class="date-picker__control">
             <input type="text" class="cv-field__control" id="{{ start_id }}" placeholder="{{ start_ph }}" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-start-display readonly{% if hide_labels %} aria-label="{{ start_lbl }}"{% endif %}>
-            <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
+            <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
               {% include "components/ui/forms/_date_picker_icon.html" %}
             </button>
           </div>
@@ -103,9 +103,9 @@ Modo multi:
       <div class="field-grid field-grid--cols-2">
         <div class="cv-field">
           <label class="cv-field__label{% if hide_labels %} sr-only{% endif %}" for="{{ start_id }}">{{ start_lbl }}</label>
-          <div class="cv-date-picker__control">
+          <div class="date-picker__control">
             <input type="text" class="cv-field__control" id="{{ start_id }}" placeholder="{{ start_ph }}" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-start-display readonly{% if hide_labels %} aria-label="{{ start_lbl }}"{% endif %}>
-            <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
+            <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
               {% include "components/ui/forms/_date_picker_icon.html" %}
             </button>
           </div>
@@ -115,9 +115,9 @@ Modo multi:
     {% if end_field %}{% with end_default_id=end_field.id_for_label|add:"_display" %}{% with end_id=end_input_id|default:end_default_id end_lbl=end_label|default:end_field.label end_ph=end_placeholder|default:"dd/mm/aaaa" %}
         <div class="cv-field">
           <label class="cv-field__label{% if hide_labels %} sr-only{% endif %}" for="{{ end_id }}">{{ end_lbl }}</label>
-          <div class="cv-date-picker__control">
+          <div class="date-picker__control">
             <input type="text" class="cv-field__control" id="{{ end_id }}" placeholder="{{ end_ph }}" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-end-display readonly{% if hide_labels %} aria-label="{{ end_lbl }}"{% endif %}>
-            <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
+            <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
               {% include "components/ui/forms/_date_picker_icon.html" %}
             </button>
           </div>
@@ -126,9 +126,9 @@ Modo multi:
     {% endwith %}{% endwith %}{% else %}{% with end_id=end_input_id end_lbl=end_label|default:"Data final" end_ph=end_placeholder|default:"dd/mm/aaaa" %}
         <div class="cv-field">
           <label class="cv-field__label{% if hide_labels %} sr-only{% endif %}" for="{{ end_id }}">{{ end_lbl }}</label>
-          <div class="cv-date-picker__control">
+          <div class="date-picker__control">
             <input type="text" class="cv-field__control" id="{{ end_id }}" placeholder="{{ end_ph }}" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-end-display readonly{% if hide_labels %} aria-label="{{ end_lbl }}"{% endif %}>
-            <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
+            <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
               {% include "components/ui/forms/_date_picker_icon.html" %}
             </button>
           </div>
@@ -150,7 +150,7 @@ Modo multi:
       {% include "components/ui/feedback/field_error.html" with errors=end_field.errors field_id=end_field.auto_id only %}
     {% endif %}
     {% if show_summary|default_if_none:True %}
-      <p class="cv-date-picker__summary" data-cv-date-picker-summary></p>
+      <p class="date-picker__summary" data-cv-date-picker-summary></p>
     {% endif %}
   {% elif mode == "multi" %}
     {% if control_variant == "filter-pill" %}
@@ -170,7 +170,7 @@ Modo multi:
     {% elif control_variant == "action-button" %}
       <button
         type="button"
-        class="{{ trigger_class|default:'cv-btn cv-btn--secondary' }} cv-date-picker__trigger"
+        class="{{ trigger_class|default:'cv-btn cv-btn--secondary' }} date-picker__trigger"
         data-cv-date-picker-trigger
         aria-expanded="false"
         aria-controls="{{ panel_id }}"
@@ -182,7 +182,7 @@ Modo multi:
         <span>{{ trigger_label|default:"Preencher datas" }}</span>
       </button>
     {% else %}
-    <div class="cv-date-picker__control">
+    <div class="date-picker__control">
       <input
         type="text"
         class="cv-field__control"
@@ -192,13 +192,13 @@ Modo multi:
         readonly
         data-cv-date-picker-display
       >
-      <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
+      <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
         {% include "components/ui/forms/_date_picker_icon.html" %}
       </button>
     </div>
     {% endif %}
     {% if show_summary|default_if_none:True %}
-      <p class="cv-date-picker__summary" data-cv-date-picker-summary></p>
+      <p class="date-picker__summary" data-cv-date-picker-summary></p>
     {% endif %}
   {% else %}
     {% if control_variant == "input-only" %}
@@ -219,9 +219,9 @@ Modo multi:
     {% if single_field %}{% with single_default_id=single_field.id_for_label|add:"_display" %}{% with single_id=single_input_id|default:single_default_id single_lbl=single_label|default:single_field.label %}
       <div class="cv-field">
         {% if single_lbl %}<label class="cv-field__label" for="{{ single_id }}">{{ single_lbl }}</label>{% endif %}
-        <div class="cv-date-picker__control">
+        <div class="date-picker__control">
           <input type="text" class="cv-field__control{% if input_class %} {{ input_class }}{% endif %}" id="{{ single_id }}" placeholder="{{ single_placeholder|default:'dd/mm/aaaa' }}" autocomplete="off" inputmode="numeric" maxlength="10"{% if single_aria_label %} aria-label="{{ single_aria_label }}"{% endif %} data-cv-date-picker-display readonly>
-          <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
+          <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
             {% include "components/ui/forms/_date_picker_icon.html" %}
           </button>
         </div>
@@ -229,9 +229,9 @@ Modo multi:
     {% endwith %}{% endwith %}{% else %}{% with single_id=single_input_id single_lbl=single_label %}
       <div class="cv-field">
         {% if single_lbl %}<label class="cv-field__label" for="{{ single_id }}">{{ single_lbl }}</label>{% endif %}
-        <div class="cv-date-picker__control">
+        <div class="date-picker__control">
           <input type="text" class="cv-field__control{% if input_class %} {{ input_class }}{% endif %}" id="{{ single_id }}" placeholder="{{ single_placeholder|default:'dd/mm/aaaa' }}" autocomplete="off" inputmode="numeric" maxlength="10"{% if single_aria_label %} aria-label="{{ single_aria_label }}"{% endif %} data-cv-date-picker-display readonly>
-          <button type="button" class="cv-date-picker__trigger cv-date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
+          <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
             {% include "components/ui/forms/_date_picker_icon.html" %}
           </button>
         </div>
@@ -246,32 +246,32 @@ Modo multi:
     {% endif %}
   {% endif %}
 
-  <div class="cv-date-picker__panel" id="{{ panel_id }}" hidden data-cv-date-picker-panel>
+  <div class="date-picker__panel" id="{{ panel_id }}" hidden data-cv-date-picker-panel>
     {% if mode == "multi" and show_context|default_if_none:True %}
-      <div class="cv-date-picker__context" data-cv-date-picker-context hidden>
-        <span class="cv-date-picker__context-step" data-cv-date-picker-context-step></span>
-        <strong class="cv-date-picker__context-route" data-cv-date-picker-context-route></strong>
+      <div class="date-picker__context" data-cv-date-picker-context hidden>
+        <span class="date-picker__context-step" data-cv-date-picker-context-step></span>
+        <strong class="date-picker__context-route" data-cv-date-picker-context-route></strong>
       </div>
     {% endif %}
-    <div class="cv-date-picker__panel-header">
-      <button class="cv-date-picker__nav" type="button" data-cv-date-picker-prev aria-label="Mes anterior">Anterior</button>
-      <div class="cv-date-picker__month" data-cv-date-picker-month></div>
-      <button class="cv-date-picker__nav" type="button" data-cv-date-picker-next aria-label="Próximo mês">Próximo</button>
+    <div class="date-picker__panel-header">
+      <button class="date-picker__nav" type="button" data-cv-date-picker-prev aria-label="Mes anterior">Anterior</button>
+      <div class="date-picker__month" data-cv-date-picker-month></div>
+      <button class="date-picker__nav" type="button" data-cv-date-picker-next aria-label="Próximo mês">Próximo</button>
     </div>
-    <div class="cv-date-picker__weekdays" data-cv-date-picker-weekdays></div>
-    <div class="cv-date-picker__days" data-cv-date-picker-days></div>
-    <div class="cv-date-picker__footer">
+    <div class="date-picker__weekdays" data-cv-date-picker-weekdays></div>
+    <div class="date-picker__days" data-cv-date-picker-days></div>
+    <div class="date-picker__footer">
       {% if mode == "multi" %}
-        <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
+        <button type="button" class="date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
         {% if allow_repeat_dates %}
-          <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-undo>Desfazer</button>
+          <button type="button" class="date-picker__footer-action" data-cv-date-picker-undo>Desfazer</button>
         {% endif %}
         {% if show_confirm|default_if_none:True %}
           <button type="button" class="cv-btn cv-btn--primary cv-btn--sm" data-cv-date-picker-confirm><span>Aplicar datas</span></button>
         {% endif %}
       {% else %}
-        <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-today>Hoje</button>
-        <button type="button" class="cv-date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
+        <button type="button" class="date-picker__footer-action" data-cv-date-picker-today>Hoje</button>
+        <button type="button" class="date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
       {% endif %}
     </div>
   </div>

@@ -32,8 +32,8 @@ _CSS_VALUE = re.compile(r":\s*.+")
 
 # Arquivos novos da fase 13 — devem estar 100% livres de literais.
 STRICT_COLOR_LITERAL_FILES = {
-    "static/css/components/cv-notice.css",
-    "static/css/components/cv-metric.css",
+    "static/css/components/notice.css",
+    "static/css/components/metric.css",
 }
 
 # Baseline medido em 30/07/2026 antes da fase 14; o gate falha se a dívida subir.
@@ -48,18 +48,18 @@ ALLOWED_MEDIA_BREAKPOINTS = frozenset({
 _MEDIA_BLOCK = re.compile(r"@media\s+([^{]+)\{", re.IGNORECASE)
 _MEDIA_WIDTH = re.compile(r"(?:min|max)-width:\s*(\d+)px", re.IGNORECASE)
 
-# Templates de alto tráfego + componentes globais que já emitem cv-notice / cv-metric.
+# Templates de alto tráfego + componentes globais que já emitem notice / metric.
 CRITICAL_CANONICAL_CLASSES = {
-    "cv-notice",
-    "cv-notice--info",
-    "cv-notice--success",
-    "cv-notice--warning",
-    "cv-notice--danger",
-    "cv-notice-stack",
-    "cv-metric",
-    "cv-metric--tile",
-    "cv-metric-grid",
-    "cv-metric-grid--4",
+    "notice",
+    "notice--info",
+    "notice--success",
+    "notice--warning",
+    "notice--danger",
+    "notice-stack",
+    "metric",
+    "metric--tile",
+    "metric-grid",
+    "metric-grid--4",
 }
 
 
@@ -134,7 +134,7 @@ def _css_bundle_text() -> str:
 
 class CssTokenGateTests(SimpleTestCase):
     def test_canonical_component_stylesheets_have_no_color_literals(self):
-        """Novos componentes cv-notice/cv-metric devem usar apenas var() de token."""
+        """Novos componentes notice/metric devem usar apenas var() de token."""
         violations: list[str] = []
         for rel in sorted(STRICT_COLOR_LITERAL_FILES):
             path = ROOT / rel
@@ -164,7 +164,7 @@ class CssTokenGateTests(SimpleTestCase):
         )
 
     def test_critical_canonical_classes_have_css_definitions(self):
-        """Gate leve: classes cv-notice/cv-metric usadas em templates críticos existem no CSS."""
+        """Gate leve: classes notice/metric usadas em templates críticos existem no CSS."""
         bundle = _css_bundle_text()
         missing: list[str] = []
         for class_name in sorted(CRITICAL_CANONICAL_CLASSES):
@@ -178,14 +178,14 @@ class CssTokenGateTests(SimpleTestCase):
         )
 
     def test_critical_templates_emit_canonical_notice_and_metric_classes(self):
-        """Templates migrados na fase 13 emitem cv-notice / cv-metric como classe primária."""
+        """Templates migrados na fase 13 emitem notice / metric como classe primária."""
         expectations = {
-            "templates/components/ui/feedback/alert.html": ("cv-notice", "cv-notice--"),
-            "templates/components/feedback/alerts.html": ("cv-notice-stack", "cv-notice"),
-            # `summary_card.html` saiu com o painel de `/`; `cv-metric` continua
+            "templates/components/ui/feedback/alert.html": ("notice", "notice--"),
+            "templates/components/feedback/alerts.html": ("notice-stack", "notice"),
+            # `summary_card.html` saiu com o painel de `/`; `metric` continua
             # sendo o canônico e é medido em quem ainda o usa.
-            "templates/planos_trabalho/partials/_resumo_evento_body.html": ("cv-summary-grid",),
-            "templates/core/dashboard.html": ("cv-metric-grid",),
+            "templates/planos_trabalho/partials/_resumo_evento_body.html": ("summary-grid",),
+            "templates/core/dashboard.html": ("metric-grid",),
         }
         for rel_path, tokens in expectations.items():
             text = (ROOT / rel_path).read_text(encoding="utf-8")
@@ -197,10 +197,10 @@ class CssTokenGateTests(SimpleTestCase):
         """NOVO-12: o shell entrega um CSS; notice/metric entram via bundle gerado."""
         base = (ROOT / "templates" / "base.html").read_text(encoding="utf-8")
         self.assertIn("css/shell.bundle.css", base)
-        self.assertNotIn("css/components/cv-notice.css", base)
-        self.assertNotIn("css/components/cv-metric.css", base)
+        self.assertNotIn("css/components/notice.css", base)
+        self.assertNotIn("css/components/metric.css", base)
         bundle = (ROOT / "static" / "css" / "shell.bundle.css").read_text(
             encoding="utf-8"
         )
-        self.assertIn(">>> css/components/cv-notice.css >>>", bundle)
-        self.assertIn(">>> css/components/cv-metric.css >>>", bundle)
+        self.assertIn(">>> css/components/notice.css >>>", bundle)
+        self.assertIn(">>> css/components/metric.css >>>", bundle)

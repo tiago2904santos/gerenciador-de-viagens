@@ -248,10 +248,10 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
         texto = (j.texto or "").strip()
         if texto:
             status_label = "Preenchida"
-            status_css_class = "cv-record-card__badge--success"
+            status_css_class = "record-card__badge--success"
         elif getattr(j, "obrigatoria", False):
             status_label = "Pendente"
-            status_css_class = "cv-record-card__badge--warning"
+            status_css_class = "record-card__badge--warning"
         else:
             status_label = ""
             status_css_class = ""

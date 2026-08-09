@@ -14,7 +14,7 @@
 </head>
 <body>
   {% include "components/ui/icons/_sprite.html" %}
-  <a class="cv-skip-link" href="#main-content">Pular para o conteúdo principal</a>
+  <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
   <div class="app-shell {% block shell_class %}{% endblock %}" data-app-shell>
     <header class="app-mobile-bar">
       <a class="app-mobile-bar__brand" href="{% url 'core:dashboard' %}">
@@ -34,11 +34,11 @@
       </section>
     </main>
   </div>
-  <div class="cv-document-loading" data-document-loading role="status" aria-live="polite" aria-atomic="true" hidden>
-    <div class="cv-document-loading__panel">
-      <span class="cv-document-loading__spinner" aria-hidden="true"></span>
-      <p class="cv-document-loading__title" data-document-loading-title>Gerando documento…</p>
-      <p class="cv-document-loading__detail" data-document-loading-detail>Aguarde enquanto o arquivo é preparado.</p>
+  <div class="document-loading" data-document-loading role="status" aria-live="polite" aria-atomic="true" hidden>
+    <div class="document-loading__panel">
+      <span class="document-loading__spinner" aria-hidden="true"></span>
+      <p class="document-loading__title" data-document-loading-title>Gerando documento…</p>
+      <p class="document-loading__detail" data-document-loading-detail>Aguarde enquanto o arquivo é preparado.</p>
     </div>
   </div>
   {# NOVO-12: um JS de shell (defer) no lugar de 23 requests; theme-* ficam no head sem defer. #}

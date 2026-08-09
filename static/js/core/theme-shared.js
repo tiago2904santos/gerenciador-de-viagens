@@ -1,7 +1,7 @@
 (function (global) {
   "use strict";
 
-  var STORAGE_KEY = "cv-theme";
+  var STORAGE_KEY = "theme";
   var VALID_THEMES = ["dark", "light"];
   var LEGACY_THEMES = {
     "dark-dark": "dark",

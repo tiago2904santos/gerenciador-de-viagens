@@ -3,7 +3,7 @@
 
   /* Mesmo renderer de cards do termos-form.js (Ofício vinculado). */
   var ROUTE_AVATAR_ICON =
-    '<svg class="cv-icon related-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
+    '<svg class="icon related-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
       '<circle cx="6" cy="19" r="2.5" fill="currentColor"></circle>' +
       '<circle cx="18" cy="5" r="2.5" fill="currentColor"></circle>' +
       '<path d="M8.2 18.2h6.1a3.3 3.3 0 0 0 0-6.6H9.7a3.3 3.3 0 0 1 0-6.6h6.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>' +
@@ -106,24 +106,24 @@
         var button = document.createElement("button");
         button.type = "button";
         button.className =
-          "cv-search-picker__selected-card related-route-item" + (active ? " is-active" : "");
+          "search-picker__selected-card related-route-item" + (active ? " is-active" : "");
         button.dataset.routeId = String(summary.id);
         button.setAttribute("aria-pressed", active ? "true" : "false");
 
         var avatar = document.createElement("span");
-        avatar.className = "cv-search-picker__selected-avatar";
+        avatar.className = "search-picker__selected-avatar";
         avatar.setAttribute("aria-hidden", "true");
         avatar.innerHTML = ROUTE_AVATAR_ICON;
 
         var main = document.createElement("div");
-        main.className = "cv-search-picker__selected-main";
+        main.className = "search-picker__selected-main";
 
         var name = document.createElement("span");
-        name.className = "cv-search-picker__selected-name";
+        name.className = "search-picker__selected-name";
         name.textContent = routeCardTitle(summary);
 
         var meta = document.createElement("span");
-        meta.className = "cv-search-picker__selected-meta related-route-period";
+        meta.className = "search-picker__selected-meta related-route-period";
         meta.textContent = routeCardMeta(summary);
 
         main.appendChild(name);
@@ -195,15 +195,15 @@
      input (busca), e fecha o painel sem enviar o form. */
   function initQuickAddSaveToggle() {
     var form = document.querySelector("[data-justificativa-quick-add]");
-    var panel = form ? form.closest("form.cv-inline-create__panel") : null;
+    var panel = form ? form.closest("form.inline-create__panel") : null;
     var toggle = document.querySelector(
-      ".justificativas-page .cv-inline-create__toggle[data-inline-create-toggle]"
+      ".justificativas-page .inline-create__toggle[data-inline-create-toggle]"
     );
     if (!form || !panel || !toggle) return;
     if (toggle.dataset.justificativaSaveToggleReady === "true") return;
     toggle.dataset.justificativaSaveToggleReady = "true";
 
-    var labelEl = toggle.querySelector(".cv-inline-create__toggle-label");
+    var labelEl = toggle.querySelector(".inline-create__toggle-label");
     var idleLabel =
       toggle.getAttribute("data-inline-create-idle-label") ||
       (labelEl ? labelEl.textContent.trim() : "Cadastrar justificativa");

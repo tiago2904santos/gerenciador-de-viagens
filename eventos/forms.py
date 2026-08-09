@@ -149,7 +149,7 @@ class EventoNovoCadastroForm(forms.ModelForm):
     # Os documentos vinculáveis usam um picker de busca próprio (mesmo cartão dos
     # ofícios da OS), montado pelo JS a partir dos resumos servidos no template.
     # Aqui o campo é apenas o <select multiple> oculto que carrega a seleção no
-    # submit — sem o enhancer genérico de cv-search-picker.
+    # submit — sem o enhancer genérico de search-picker.
     oficios_vinculados = forms.ModelMultipleChoiceField(
         label="Ofícios já existentes",
         queryset=Oficio.objects.none(),

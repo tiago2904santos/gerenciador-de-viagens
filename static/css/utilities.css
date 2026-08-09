@@ -19,7 +19,7 @@
 
 /* Folha de símbolos do PF-01: só define `<symbol>`, nunca desenha. Fora do
    fluxo para não ocupar espaço nem virar alvo de rolagem. */
-.cv-icon-sprite {
+.icon-sprite {
   height: 0;
   overflow: hidden;
   position: absolute;
@@ -38,7 +38,7 @@
   gap: var(--space-3);
 }
 
-.cv-inline-form {
+.inline-form {
   display: inline;
   margin: 0;
 }
@@ -52,7 +52,7 @@
   margin: 0 0 var(--space-4);
 }
 
-.cv-content-spaced {
+.content-spaced {
   margin-top: var(--space-3);
 }
 
@@ -287,7 +287,7 @@ html[data-theme="light"] {
   --chip-filter-glow:  var(--chip-info-glow);
 }
 
-.cv-chip,
+.chip,
 .status-chip {
   --_cv-chip-bg:     var(--chip-bg);
   --_cv-chip-border: var(--chip-border);
@@ -316,54 +316,54 @@ html[data-theme="light"] {
   white-space: nowrap;
 }
 
-.cv-chip:hover,
+.chip:hover,
 .status-chip:hover {
   box-shadow: var(--_cv-chip-glow), var(--shadow-sm);
   transform: translateY(-1px);
 }
 
-.cv-chip:focus-visible,
+.chip:focus-visible,
 .status-chip:focus-visible {
   box-shadow: var(--_cv-chip-glow), var(--chip-focus-ring);
   outline: none;
 }
 
-.cv-chip--compact {
+.chip--compact {
   min-height: var(--chip-height-compact);
   padding-inline: var(--space-2);
 }
 
-.cv-chip--interactive,
-.cv-chip--filter,
-.cv-chip--removable {
+.chip--interactive,
+.chip--filter,
+.chip--removable {
   cursor: pointer;
 }
 
-.cv-chip.is-selected {
+.chip.is-selected {
   box-shadow: var(--_cv-chip-glow), var(--shadow-sm), 0 0 0 2px var(--_cv-chip-border);
 }
 
-.cv-chip.is-disabled {
+.chip.is-disabled {
   opacity: var(--chip-disabled-opacity);
   pointer-events: none;
 }
 
-.cv-chip__icon,
-.cv-chip__remove,
-.cv-chip__count {
+.chip__icon,
+.chip__remove,
+.chip__count {
   align-items: center;
   display: inline-flex;
   flex-shrink: 0;
   justify-content: center;
 }
 
-.cv-chip__icon,
-.cv-chip__remove {
+.chip__icon,
+.chip__remove {
   font-size: var(--chip-icon-size);
   line-height: 1;
 }
 
-.cv-chip__count {
+.chip__count {
   background: var(--_cv-chip-border);
   border-radius: var(--radius-pill);
   color: var(--_cv-chip-color);
@@ -371,7 +371,7 @@ html[data-theme="light"] {
   padding: 2px var(--space-2);
 }
 
-.cv-chip--success,
+.chip--success,
 .status-chip--completed,
 .status-chip--active,
 .status-chip--success,
@@ -382,7 +382,7 @@ html[data-theme="light"] {
   --_cv-chip-glow: var(--chip-success-glow);
 }
 
-.cv-chip--warning,
+.chip--warning,
 .status-chip--draft,
 .status-chip--warning {
   --_cv-chip-bg: var(--chip-warning-bg);
@@ -391,7 +391,7 @@ html[data-theme="light"] {
   --_cv-chip-glow: var(--chip-warning-glow);
 }
 
-.cv-chip--danger,
+.chip--danger,
 .status-chip--danger {
   --_cv-chip-bg: var(--chip-danger-bg);
   --_cv-chip-border: var(--chip-danger-border);
@@ -399,7 +399,7 @@ html[data-theme="light"] {
   --_cv-chip-glow: var(--chip-danger-glow);
 }
 
-.cv-chip--info,
+.chip--info,
 .status-chip--info {
   --_cv-chip-bg: var(--chip-info-bg);
   --_cv-chip-border: var(--chip-info-border);
@@ -407,7 +407,7 @@ html[data-theme="light"] {
   --_cv-chip-glow: var(--chip-info-glow);
 }
 
-.cv-chip--pending,
+.chip--pending,
 .status-chip--pending {
   --_cv-chip-bg: var(--chip-pending-bg);
   --_cv-chip-border: var(--chip-pending-border);
@@ -415,7 +415,7 @@ html[data-theme="light"] {
   --_cv-chip-glow: var(--chip-pending-glow);
 }
 
-.cv-chip--muted,
+.chip--muted,
 .status-chip--muted {
   --_cv-chip-bg: var(--chip-muted-bg);
   --_cv-chip-border: var(--chip-muted-border);
@@ -423,57 +423,57 @@ html[data-theme="light"] {
   --_cv-chip-glow: var(--chip-muted-glow);
 }
 
-.cv-chip--neutral {
+.chip--neutral {
   --_cv-chip-bg: var(--chip-neutral-bg);
   --_cv-chip-border: var(--chip-neutral-border);
   --_cv-chip-color: var(--chip-neutral-color);
   --_cv-chip-glow: var(--chip-neutral-glow);
 }
 
-.cv-chip--entity {
+.chip--entity {
   --_cv-chip-bg: var(--chip-entity-bg);
   --_cv-chip-border: var(--chip-entity-border);
   --_cv-chip-color: var(--chip-entity-color);
   --_cv-chip-glow: var(--chip-entity-glow);
 }
 
-.cv-chip--filter {
+.chip--filter {
   --_cv-chip-bg: var(--chip-filter-bg);
   --_cv-chip-border: var(--chip-filter-border);
   --_cv-chip-color: var(--chip-filter-color);
   --_cv-chip-glow: var(--chip-filter-glow);
 }
 
-.cv-data-table {
+.data-table {
   border-collapse: collapse;
   min-width: 680px;
   width: 100%;
 }
 
-.cv-data-table :is(th, td) {
+.data-table :is(th, td) {
   border-bottom: 1px solid var(--color-border);
   padding: var(--space-3) var(--space-4);
   text-align: left;
   vertical-align: middle;
 }
 
-.cv-data-table th {
+.data-table th {
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
-.cv-data-table tbody tr:last-child td {
+.data-table tbody tr:last-child td {
   border-bottom: 0;
 }
 
 @media (max-width: 600px) {
-  .cv-data-table {
+  .data-table {
     min-width: 0;
   }
 
-  .cv-data-table thead {
+  .data-table thead {
     clip: rect(0 0 0 0);
     clip-path: inset(50%);
     height: 1px;
@@ -483,21 +483,21 @@ html[data-theme="light"] {
     width: 1px;
   }
 
-  .cv-data-table :is(tbody, tr, td) {
+  .data-table :is(tbody, tr, td) {
     display: block;
     width: 100%;
   }
 
-  .cv-data-table tr {
+  .data-table tr {
     border-bottom: 1px solid var(--color-border);
     padding: var(--space-3);
   }
 
-  .cv-data-table tr:last-child {
+  .data-table tr:last-child {
     border-bottom: 0;
   }
 
-  .cv-data-table td {
+  .data-table td {
     align-items: center;
     border: 0;
     display: flex;
@@ -507,7 +507,7 @@ html[data-theme="light"] {
     text-align: right;
   }
 
-  .cv-data-table td::before {
+  .data-table td::before {
     color: var(--color-text-muted);
     content: attr(data-label);
     font-size: var(--font-size-xs);
@@ -515,22 +515,22 @@ html[data-theme="light"] {
     text-align: left;
   }
 
-  .cv-data-table td:first-child {
+  .data-table td:first-child {
     align-items: flex-start;
     display: grid;
     text-align: left;
   }
 
-  .cv-data-table td:first-child::before,
-  .cv-data-table__actions::before {
+  .data-table td:first-child::before,
+  .data-table__actions::before {
     display: none;
   }
 
-  .cv-data-table__actions {
+  .data-table__actions {
     width: 100%;
   }
 
-  .cv-data-table__actions .cv-btn {
+  .data-table__actions .cv-btn {
     width: 100%;
   }
 }

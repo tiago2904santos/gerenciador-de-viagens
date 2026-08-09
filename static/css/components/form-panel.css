@@ -32,11 +32,11 @@
   padding: clamp(20px, 3vw, 30px);
 }
 
-.main-form-panel > .cv-card-footer {
+.main-form-panel > .card-footer {
   margin: 0;
 }
 
-.cv-confirm-page {
+.confirm-page {
   background: var(--step1-surface, var(--color-surface-muted));
   border: 0;
   border-radius: 14px;
@@ -45,7 +45,7 @@
   overflow: hidden;
 }
 
-.cv-confirm-page__header {
+.confirm-page__header {
   align-items: start;
   background: transparent;
   border: 0;
@@ -55,11 +55,11 @@
   padding: 18px clamp(20px, 3vw, 30px);
 }
 
-:is(html[data-theme="dark"]) .cv-confirm-page {
+:is(html[data-theme="dark"]) .confirm-page {
   background: var(--step1-surface);
 }
 
-.cv-confirm-page__icon {
+.confirm-page__icon {
   align-items: center;
   background: var(--color-danger-soft);
   border: 1px solid var(--color-danger-border-soft);
@@ -71,7 +71,7 @@
   width: var(--control-height-md);
 }
 
-.cv-confirm-page__eyebrow {
+.confirm-page__eyebrow {
   color: var(--color-danger);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-extrabold);
@@ -80,14 +80,14 @@
   text-transform: uppercase;
 }
 
-.cv-confirm-page__message {
+.confirm-page__message {
   color: var(--color-text);
   font-size: var(--font-size-md);
   line-height: 1.65;
   margin: 0;
 }
 
-.cv-confirm-page__preview {
+.confirm-page__preview {
   background: var(--color-surface-muted);
   border: 1px solid var(--color-border-soft);
   border-radius: var(--radius-control);
@@ -96,12 +96,12 @@
   padding: var(--space-3) var(--space-4);
 }
 
-.cv-confirm-page__preview p {
+.confirm-page__preview p {
   color: var(--color-muted-strong);
   margin: 0;
 }
 
-.cv-confirm-page__notice {
+.confirm-page__notice {
   background: var(--color-danger-soft);
   border: 1px solid var(--color-danger-border-soft);
   border-radius: var(--radius-control);
@@ -110,19 +110,19 @@
   padding: var(--space-3);
 }
 
-.cv-confirm-page__body {
+.confirm-page__body {
   display: grid;
   gap: var(--space-4);
 }
 
-.cv-confirm-page__footer {
+.confirm-page__footer {
   justify-content: flex-end;
 }
 
 @media (max-width: 640px) {
   .main-form-panel > .form-section > .section-header,
   .main-form-panel > .form-section > :not(.section-header),
-  .main-form-panel > .cv-card-footer {
+  .main-form-panel > .card-footer {
     padding-left: 16px;
     padding-right: 16px;
   }

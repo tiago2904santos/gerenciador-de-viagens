@@ -4,7 +4,7 @@
   gap: var(--space-5);
 }
 
-.document-form .cv-form-section-card,
+.document-form .form-section-card,
 .document-form-block {
   scroll-margin-top: 24px;
 }
@@ -22,17 +22,17 @@
    busca e lista próximas (8px), sem gap do grid (select oculto no meio). */
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
-  .related-route-picker.termo-oficio-picker.cv-search-picker--people.cv-search-picker--roster,
-.document-form-page .related-route-picker.termo-oficio-picker.cv-search-picker--people.cv-search-picker--roster,
-.termo-oficio-picker.cv-search-picker--people.cv-search-picker--roster {
+  .related-route-picker.termo-oficio-picker.search-picker--people.search-picker--roster,
+.document-form-page .related-route-picker.termo-oficio-picker.search-picker--people.search-picker--roster,
+.termo-oficio-picker.search-picker--people.search-picker--roster {
   gap: 0 !important;
 }
 
-.termo-oficio-picker .cv-search-picker__field,
+.termo-oficio-picker .search-picker__field,
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker
-  .cv-search-picker__field {
+  .search-picker__field {
   gap: 7px !important;
 }
 
@@ -46,14 +46,14 @@
 }
 
 /* .roteiro-editor__route-list traz space-3; aqui 8px entre busca e cards. */
-.termo-oficio-picker .cv-search-picker__selected-list,
+.termo-oficio-picker .search-picker__selected-list,
 .termo-oficio-picker .roteiro-editor__route-list,
-.termo-oficio-summary-panel .cv-search-picker__selected-list,
+.termo-oficio-summary-panel .search-picker__selected-list,
 .termo-oficio-summary-panel .related-route-list,
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .related-route-picker.termo-oficio-picker
-  :is(.cv-search-picker__selected-list, #termo-oficio-lista, #os-oficio-lista) {
+  :is(.search-picker__selected-list, #termo-oficio-lista, #os-oficio-lista) {
   display: grid;
   gap: 8px !important;
   margin-top: 8px;
@@ -64,26 +64,26 @@
 /* Lista de ofícios do termo/OS: sempre uma coluna, um card por linha. */
 .document-form-page #termo-oficio-lista,
 .document-form-page #os-oficio-lista,
-.document-form-page .termo-oficio-picker .cv-search-picker__selected-list,
-.document-form-page .related-route-picker .cv-search-picker__selected-list {
+.document-form-page .termo-oficio-picker .search-picker__selected-list,
+.document-form-page .related-route-picker .search-picker__selected-list {
   grid-template-columns: 1fr;
 }
 
-.document-form-page #termo-oficio-lista .cv-search-picker__selected-card,
-.document-form-page #termo-oficio-lista .cv-search-picker__selected-card:only-child,
-.document-form-page #termo-oficio-lista .cv-search-picker__selected-card:last-child:nth-child(odd),
-.document-form-page #os-oficio-lista .cv-search-picker__selected-card,
-.document-form-page #os-oficio-lista .cv-search-picker__selected-card:only-child,
-.document-form-page #os-oficio-lista .cv-search-picker__selected-card:last-child:nth-child(odd) {
+.document-form-page #termo-oficio-lista .search-picker__selected-card,
+.document-form-page #termo-oficio-lista .search-picker__selected-card:only-child,
+.document-form-page #termo-oficio-lista .search-picker__selected-card:last-child:nth-child(odd),
+.document-form-page #os-oficio-lista .search-picker__selected-card,
+.document-form-page #os-oficio-lista .search-picker__selected-card:only-child,
+.document-form-page #os-oficio-lista .search-picker__selected-card:last-child:nth-child(odd) {
   grid-column: 1 / -1;
 }
 
 /* Dentro do stack: o gap já separa as seções — evita margem/padding extras. */
-.cv-form-stack > .termo-evento-periodo {
+.form-stack > .termo-evento-periodo {
   margin-bottom: 0;
 }
 
-.termo-evento-body > .cv-form-subsection + .cv-form-subsection {
+.termo-evento-body > .form-subsection + .form-subsection {
   border-top: 0;
   padding-top: 0;
 }
@@ -98,18 +98,18 @@
    isso e apertado demais: nome completo, cargo e unidade passam a quebrar em
    varias linhas. Os dois seletores abaixo tem 2 classes contra 1 das regras
    de origem, entao vencem por especificidade, sem depender da ordem. */
-.cv-record-card--termo .cv-person-list {
+.record-card--termo .person-list {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.cv-record-card--termo .cv-person-list--n0,
-.cv-record-card--termo .cv-person-list--n1 {
+.record-card--termo .person-list--n0,
+.record-card--termo .person-list--n1 {
   grid-template-columns: minmax(0, 1fr);
 }
 
 /* Contagem impar deixa o ultimo item sozinho na fileira, ocupando meia
    largura; ele passa a atravessar as duas colunas. :nth-child(odd) junto de
    :last-child identifica exatamente esse caso numa grade de 2 colunas. */
-.cv-record-card--termo .cv-person-list > .cv-person-row:last-child:nth-child(odd) {
+.record-card--termo .person-list > .person-row:last-child:nth-child(odd) {
   grid-column: 1 / -1;
 }

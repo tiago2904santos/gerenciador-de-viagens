@@ -811,9 +811,9 @@ html[data-theme="light"] {
 .main-form-panel .field-grid-rows,
 .main-form-panel .field,
 .main-form-panel .cv-field,
-.main-form-panel .cv-search-picker,
-.main-form-panel .cv-custom-select,
-.main-form-panel .cv-field-with-action {
+.main-form-panel .search-picker,
+.main-form-panel .custom-select,
+.main-form-panel .field-with-action {
   overflow: visible;
 }
 
@@ -830,12 +830,12 @@ html[data-theme="light"] {
 
 /* =========================================================
    Footer colado ao último card do stack.
-   Aplica-se em 100% das páginas que usam .cv-form-section-stack.
+   Aplica-se em 100% das páginas que usam .form-section-stack.
    margin-top negativo cancela exatamente o gap do stack pai
    (usa --_stack-gap herdada, que varia conforme a variante usada).
    ========================================================= */
-.cv-form-section-stack > .footer-actions,
-.cv-form-section-stack > form > .footer-actions {
+.form-section-stack > .footer-actions,
+.form-section-stack > form > .footer-actions {
   background:    var(--form-section-bg);
   border-radius: 0 0 var(--radius-card) var(--radius-card);
   border-top:    1px solid var(--form-section-border);
@@ -844,7 +844,7 @@ html[data-theme="light"] {
 }
 
 /* Ponte: seções legadas do wizard dentro do stack (ofícios/roteiros) */
-.main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section,
+.main-form-panel--stack .form-section-stack > .form-section.app-form-section,
 .main-form-panel--stack .roteiro-editor--avulso .roteiro-editor__section,
 .main-form-panel--stack .roteiro-editor--oficio .roteiro-editor__section {
   background:    var(--form-section-bg);
@@ -855,7 +855,7 @@ html[data-theme="light"] {
   width:         100%;
 }
 
-.main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section > :not(.form-section-header) {
+.main-form-panel--stack .form-section-stack > .form-section.app-form-section > :not(.form-section-header) {
   padding: var(--form-section-body-padding);
 }
 
@@ -934,7 +934,7 @@ html[data-theme="light"] {
    com header de tonalidade distinta e body para os campos.
    ========================================================= */
 
-.cv-form-section-stack {
+.form-section-stack {
   --_stack-gap:   var(--space-4);
   display:        flex;
   flex-direction: column;
@@ -942,21 +942,21 @@ html[data-theme="light"] {
   width:          100%;
 }
 
-.cv-form-section-stack--comfortable {
+.form-section-stack--comfortable {
   --_stack-gap: var(--space-8);
   gap:          var(--_stack-gap);
 }
 
 /* O form dentro do stack herda --_stack-gap e replica o mesmo layout flex,
    garantindo gap entre os cards mesmo quando estão dentro de um <form>. */
-.cv-form-section-stack > form {
+.form-section-stack > form {
   display:        flex;
   flex-direction: column;
   gap:            var(--_stack-gap, var(--space-4));
   width:          100%;
 }
 
-.cv-form-section-card {
+.form-section-card {
   background:    var(--form-section-bg);
   border:        1px solid var(--form-section-border);
   border-radius: var(--radius-card);
@@ -966,11 +966,11 @@ html[data-theme="light"] {
 }
 
 /* =========================================================
-   cv-card-footer — rodapé padronizado do último card.
-   Fica dentro do cv-form-section-card ou form-section,
+   card-footer — rodapé padronizado do último card.
+   Fica dentro do form-section-card ou form-section,
    após o corpo de conteúdo, separado por uma linha.
    ========================================================= */
-.cv-card-footer {
+.card-footer {
   align-items:     center;
   border-top:      1px solid var(--form-section-border, var(--border-form-section));
   display:         flex;
@@ -979,31 +979,31 @@ html[data-theme="light"] {
   padding:         var(--space-4) var(--space-6);
 }
 
-.cv-card-footer__secondary,
-.cv-card-footer__primary {
+.card-footer__secondary,
+.card-footer__primary {
   align-items: center;
   display:     flex;
   gap:         var(--space-3);
 }
 
-.cv-card-footer--end {
+.card-footer--end {
   justify-content: flex-end;
 }
 
-.cv-card-footer-section {
+.card-footer-section {
   display: grid;
 }
 
-.cv-card-footer-section__divider {
+.card-footer-section__divider {
   border-top: 1px solid var(--form-section-border, var(--border-form-section));
 }
 
-.cv-card-footer-section > .cv-card-footer {
+.card-footer-section > .card-footer {
   border-top: 0;
 }
 
 /* Dentro de form-section (páginas de formulário simples) */
-.form-section > .cv-card-footer {
+.form-section > .card-footer {
   margin-inline: calc(-1 * var(--form-section-padding-x, var(--space-6)));
   padding-inline: var(--form-section-padding-x, var(--space-6));
 }
@@ -1057,7 +1057,7 @@ html[data-theme="light"] {
   gap:         var(--space-2);
 }
 
-.cv-form-section-title {
+.form-section-title {
   color:          var(--theme-text-heading);
   font-size:      var(--font-size-lg);
   font-weight:    var(--font-weight-extrabold);
@@ -1079,19 +1079,19 @@ html[data-theme="light"] {
   padding:    0 var(--space-3);
 }
 
-.cv-form-section-subtitle {
+.form-section-subtitle {
   display:     none;
 }
 
 /* Modificadores canônicos para formulários que precisam explicar a tarefa
    sem transformar cada seção em um cabeçalho pesado. */
-.cv-form-section-card--described .cv-form-section-subtitle {
+.form-section-card--described .form-section-subtitle {
   display: block;
   line-height: 1.45;
   max-width: 72ch;
 }
 
-.cv-form-section-header--described .cv-form-section-subtitle {
+.cv-form-section-header--described .form-section-subtitle {
   display: block;
   line-height: 1.45;
   max-width: 72ch;
@@ -1099,44 +1099,44 @@ html[data-theme="light"] {
 
 /* Cabeçalho autônomo para coleções: compartilha a linguagem do card sem
    envolver cards de lista em outra superfície. */
-.cv-wizard-collection {
+.wizard-collection {
   display: grid;
   gap: var(--space-4);
   min-width: 0;
   width: 100%;
 }
 
-.cv-wizard-collection__body {
+.wizard-collection__body {
   min-width: 0;
 }
 
-.cv-form-section-card--compact .cv-form-section-header {
+.form-section-card--compact .cv-form-section-header {
   --_wizard-filete-width: 4px;
   min-height: 0;
   padding-block: var(--space-4);
 }
 
-.cv-form-section-card--compact .cv-form-section-header::before {
+.form-section-card--compact .cv-form-section-header::before {
   width: var(--_wizard-filete-width);
 }
 
-.cv-form-section-card--compact .cv-form-section-title {
+.form-section-card--compact .form-section-title {
   font-size: var(--font-size-md);
   letter-spacing: 0.045em;
 }
 
-.cv-form-section-body {
+.form-section-body {
   display:        flex;
   flex-direction: column;
   gap:            var(--form-section-inner-gap);
   padding:        var(--form-section-body-padding);
 }
 
-.cv-form-section-body--sections > .wizard-inner-section:not(:last-child) {
+.form-section-body--sections > .wizard-inner-section:not(:last-child) {
   padding-bottom: var(--space-5);
 }
 
-.cv-form-section-body--sections > .wizard-inner-section + .wizard-inner-section {
+.form-section-body--sections > .wizard-inner-section + .wizard-inner-section {
   padding-top: var(--space-5);
 }
 
@@ -1218,7 +1218,7 @@ html[data-theme="light"] {
   padding-inline: 0;
 }
 
-.cv-floating-action {
+.floating-action {
   align-items: flex-end;
   display: flex;
   justify-content: flex-end;
@@ -1229,16 +1229,16 @@ html[data-theme="light"] {
   z-index: calc(var(--z-footer-actions-fixed) + 20);
 }
 
-/* `.cv-floating-action--stacked` mora em `cv-buttons.css` (NOVO-23): aquele
-   arquivo redeclara `.cv-floating-action { bottom }
+/* `.floating-action--stacked` mora em `buttons.css` (NOVO-23): aquele
+   arquivo redeclara `.floating-action { bottom }
 
 @media (max-width: 640px) {
-  .cv-floating-action {
+  .floating-action {
     left: clamp(var(--space-3), 2vw, var(--space-4));
     right: clamp(var(--space-3), 2vw, var(--space-4));
   }
 
-  .cv-floating-action__button {
+  .floating-action__button {
     width: 100%;
   }
 }
@@ -1545,7 +1545,7 @@ body.has-delete-modal-open {
   width: 42px;
 }
 
-.delete-confirm-modal__icon .cv-icon {
+.delete-confirm-modal__icon .icon {
   height: 20px;
   width: 20px;
 }
@@ -1631,7 +1631,7 @@ body.has-delete-modal-open {
 }
 
 /* Menu de ações (⋮) — junta Cancelar/Excluir num único botão */
-.cv-action-menu {
+.action-menu {
   background: var(--surface-list-panel);
   border: 1px solid var(--border-list-panel);
   border-radius: var(--radius-md);
@@ -1644,11 +1644,11 @@ body.has-delete-modal-open {
   z-index: var(--z-modal, 1000);
 }
 
-.cv-action-menu--open {
+.action-menu--open {
   display: flex;
 }
 
-.cv-action-menu__item {
+.action-menu__item {
   align-items: center;
   background: transparent;
   border: none;
@@ -1663,27 +1663,27 @@ body.has-delete-modal-open {
   width: 100%;
 }
 
-.cv-action-menu__item:hover,
-.cv-action-menu__item:focus-visible {
+.action-menu__item:hover,
+.action-menu__item:focus-visible {
   background: var(--color-surface-muted);
 }
 
-.cv-action-menu__item .cv-icon {
+.action-menu__item .icon {
   flex: 0 0 auto;
   height: 16px;
   width: 16px;
 }
 
-.cv-action-menu__item--sign.is-assinado {
+.action-menu__item--sign.is-assinado {
   color: var(--color-success, #24a25b);
 }
 
-.cv-action-menu__item--sign.is-assinado:hover,
-.cv-action-menu__item--sign.is-assinado:focus-visible {
+.action-menu__item--sign.is-assinado:hover,
+.action-menu__item--sign.is-assinado:focus-visible {
   background: color-mix(in srgb, var(--color-success, #24a25b) 16%, transparent);
 }
 
-.cv-action-menu__form {
+.action-menu__form {
   display: block;
   width: 100%;
 }
@@ -1722,11 +1722,11 @@ body.has-delete-modal-open {
     padding: var(--space-3) var(--space-4) var(--space-3) var(--space-8);
   }
 
-  .cv-form-section-card--compact .cv-form-section-header {
+  .form-section-card--compact .cv-form-section-header {
     padding-block: var(--space-3);
   }
 
-  .cv-form-section-body {
+  .form-section-body {
     padding: var(--space-4);
   }
 
@@ -2086,7 +2086,7 @@ body.has-delete-modal-open {
 }
 
 /* Painel inline dentro do rail quick-add */
-.page-header-rail--filters-inline-create .cv-inline-create__panel {
+.page-header-rail--filters-inline-create .inline-create__panel {
   background:  transparent;
   border:      0;
   border-top:  1px solid var(--border-filter-bar);
@@ -2094,7 +2094,7 @@ body.has-delete-modal-open {
   width:       100%;
 }
 
-.page-header-rail--filters-inline-create .cv-inline-create__body {
+.page-header-rail--filters-inline-create .inline-create__body {
   align-items: flex-end;
   display:     flex;
   gap:         var(--layout-quick-create-gap);
@@ -2102,7 +2102,7 @@ body.has-delete-modal-open {
   width:       100%;
 }
 
-.page-header-rail--filters-inline-create .cv-inline-create__actions {
+.page-header-rail--filters-inline-create .inline-create__actions {
   margin-left: auto;
   width:       auto;
 }
@@ -2110,11 +2110,11 @@ body.has-delete-modal-open {
 /* Variante compacta (cargo/combustível): apenas o input.
    Sem label, sem botão e com o divisor indo de ponta a ponta do card. */
 
-.header-stack--inline-create-compact .cv-inline-create__body {
+.header-stack--inline-create-compact .inline-create__body {
   padding: var(--space-3) 0 0; /* só o gap entre o divisor e o input */
 }
 
-.header-stack--inline-create-compact .page-header-rail--filters-inline-create .cv-inline-create__panel {
+.header-stack--inline-create-compact .page-header-rail--filters-inline-create .inline-create__panel {
   border-radius: 0;
   box-shadow:    none;
   flex-shrink:   0;             /* não deixa o flex encolher de volta */
@@ -2130,7 +2130,7 @@ body.has-delete-modal-open {
    Controlado por JS: remove [hidden] → adiciona .is-open.
    ========================================================= */
 
-.cv-inline-create__panel {
+.inline-create__panel {
   box-sizing:  border-box;
   margin-top:  0;
   max-height:  0;
@@ -2147,7 +2147,7 @@ body.has-delete-modal-open {
    /usuarios/ ao pôr o resumo de erro: `scrollHeight` 696 contra `clientHeight`
    640, e os 56 px cortados eram o bloco "Primeiro acesso" inteiro. Com `auto`
    nada mais se perde em silêncio, e o teto continua governando a animação. */
-.cv-inline-create__panel.is-open {
+.inline-create__panel.is-open {
   max-height: 580px;
   opacity:    1;
   overflow-y: auto;
@@ -2160,7 +2160,7 @@ body.has-delete-modal-open {
    dispara o painel de cadastro rápido.
    ========================================================= */
 
-.cv-inline-create__toggle {
+.inline-create__toggle {
   align-items:     center;
   appearance:      none;
   background:      var(--surface-filter-bar);
@@ -2181,23 +2181,23 @@ body.has-delete-modal-open {
   width:           100%;
 }
 
-.cv-inline-create__toggle:hover {
+.inline-create__toggle:hover {
   background: var(--surface-list-row-hover);
 }
 
-.cv-inline-create__toggle:focus-visible {
+.inline-create__toggle:focus-visible {
   outline:        2px solid var(--border-focus);
   outline-offset: -2px;
 }
 
-.cv-inline-create__toggle.is-active,
-.cv-inline-create__toggle[aria-expanded="true"] {
+.inline-create__toggle.is-active,
+.inline-create__toggle[aria-expanded="true"] {
   background:   var(--surface-filter-bar);
   border-color: var(--border-filter-bar);
   box-shadow:   none;
 }
 
-.cv-inline-create__toggle.is-filled {
+.inline-create__toggle.is-filled {
   animation:    inline-create-btn-fill 0.4s cubic-bezier(0, 0, 0.2, 1) forwards;
   background:   var(--btn-primary-bg);
   border-color: var(--btn-primary-border);
@@ -2205,7 +2205,7 @@ body.has-delete-modal-open {
   color:        var(--color-white);
 }
 
-.cv-inline-create__toggle.is-filled:hover {
+.inline-create__toggle.is-filled:hover {
   background:   var(--btn-primary-hover-bg);
   border-color: var(--btn-primary-hover-border);
   box-shadow:   0 10px 18px rgba(11, 58, 102, 0.22);
@@ -2220,23 +2220,23 @@ body.has-delete-modal-open {
   }
 }
 
-html[data-theme="dark"] .cv-inline-create__toggle {
+html[data-theme="dark"] .inline-create__toggle {
   background: var(--color-card-muted); /* #223348 */
   color:      var(--theme-text-body);
 }
 
-html[data-theme="dark"] .cv-inline-create__toggle:hover {
+html[data-theme="dark"] .inline-create__toggle:hover {
   background: color-mix(in srgb, var(--color-card-muted) 80%, var(--color-white) 20%);
 }
 
-html[data-theme="dark"] .cv-inline-create__toggle.is-active,
-html[data-theme="dark"] .cv-inline-create__toggle[aria-expanded="true"] {
+html[data-theme="dark"] .inline-create__toggle.is-active,
+html[data-theme="dark"] .inline-create__toggle[aria-expanded="true"] {
   background:   var(--color-card-muted); /* #223348 — igual ao estado fechado */
   border-color: var(--border-filter-bar);
   color:        var(--theme-text-body);
 }
 
-html[data-theme="dark"] .cv-inline-create__toggle.is-filled {
+html[data-theme="dark"] .inline-create__toggle.is-filled {
   animation-name:     inline-create-btn-fill-dark;
   animation-duration: 0.4s;
   animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
@@ -2254,18 +2254,18 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled {
   }
 }
 
-html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
+html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
   background:   var(--btn-primary-hover-bg);
   border-color: var(--btn-primary-hover-border);
 }
 
-.cv-inline-create__toggle-icon {
+.inline-create__toggle-icon {
   align-items:     center;
   display:         inline-flex;
   justify-content: center;
 }
 
-.cv-inline-create__toggle-label {
+.inline-create__toggle-label {
   font-weight: var(--font-weight-bold);
 }
 
@@ -2323,7 +2323,7 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
    Extensão visual abaixo do filter bar / toolbar.
    ========================================================= */
 
-.cv-inline-create {
+.inline-create {
   box-sizing:     border-box;
   display:        flex;
   flex-direction: column;
@@ -2331,7 +2331,7 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 }
 
 /* Painel: visualmente unido à aba acima */
-.cv-inline-create__panel {
+.inline-create__panel {
   background:    var(--surface-quick-create);
   border:        1px solid var(--border-quick-create);
   border-radius: 0 var(--radius-sm) var(--radius-sm) var(--radius-sm);
@@ -2341,12 +2341,12 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 }
 
 /* Fallback: quando não usa __panel (forma antiga com .is-open) */
-.cv-inline-create.is-open > :not(.cv-inline-create__tab-row) {
+.inline-create.is-open > :not(.inline-create__tab-row) {
   display: flex;
   flex-direction: column;
 }
 
-.cv-inline-create__body {
+.inline-create__body {
   align-items: flex-end;
   box-sizing:  border-box;
   display:     flex;
@@ -2355,12 +2355,12 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   width:       100%;
 }
 
-.cv-inline-create__fields {
+.inline-create__fields {
   flex:      1;
   min-width: 0;
 }
 
-.cv-inline-create__actions {
+.inline-create__actions {
   align-items:    flex-end;
   display:        flex;
   flex-shrink:    0;
@@ -2369,11 +2369,11 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   width:          var(--layout-quick-create-actions-width);
 }
 
-.cv-inline-create__actions .btn {
+.inline-create__actions .btn {
   border-radius: var(--radius-md);
 }
 
-.cv-inline-create__actions .btn-primary {
+.inline-create__actions .btn-primary {
   border-color: var(--inline-create-primary-border);
 }
 
@@ -2434,12 +2434,12 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
 
-  .cv-inline-create__body {
+  .inline-create__body {
     align-items:    stretch;
     flex-direction: column;
   }
 
-  .cv-inline-create__actions {
+  .inline-create__actions {
     justify-content: flex-end;
     width:           100%;
   }
@@ -2543,14 +2543,14 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 }
 
 /* Layout do controle (roteiros.css não carregado nesta página) */
-.header-filter-datepicker .cv-date-picker__control {
+.header-filter-datepicker .date-picker__control {
   align-items: stretch;
   display:     flex;
   gap:         0;
   position:    relative;
 }
 
-.header-filter-datepicker .cv-date-picker__control .cv-field__control {
+.header-filter-datepicker .date-picker__control .cv-field__control {
   flex:       1 1 auto;
   cursor:     pointer;
   min-height: unset;
@@ -2559,7 +2559,7 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 }
 
 /* Botão do calendário — sempre visível, posicionado sobre o input */
-.header-filter-datepicker .cv-date-picker__trigger--icon {
+.header-filter-datepicker .date-picker__trigger--icon {
   align-items:      center;
   background:       transparent;
   border:           1px solid transparent;
@@ -2582,12 +2582,12 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   z-index:          2;
 }
 
-.header-filter-datepicker .cv-date-picker__trigger--icon:hover {
+.header-filter-datepicker .date-picker__trigger--icon:hover {
   background:   rgba(255, 255, 255, 0.1);
   border-color: var(--border-active);
 }
 
-.header-filter-datepicker .cv-date-picker__panel {
+.header-filter-datepicker .date-picker__panel {
   left:  auto;
   right: 0;
 }
@@ -2629,7 +2629,7 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
     min-width: 0;
   }
 
-  .header-filter-datepicker .cv-date-picker__panel {
+  .header-filter-datepicker .date-picker__panel {
     left: 0;
     max-width: min(100%, 320px);
     right: auto;
@@ -2735,7 +2735,7 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
     padding: var(--space-4) var(--space-4) var(--space-4) var(--space-8);
   }
 
-  .cv-form-section-card--compact .cv-form-section-header {
+  .form-section-card--compact .cv-form-section-header {
     padding-block: var(--space-4);
   }
 
@@ -2746,18 +2746,18 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
     width: 100%;
   }
 
-  .cv-form-section-body {
+  .form-section-body {
     padding: var(--space-4);
   }
 
-  .cv-card-footer {
+  .card-footer {
     align-items: stretch;
     flex-direction: column;
     padding: var(--space-4);
   }
 
-  .cv-card-footer__secondary,
-  .cv-card-footer__primary {
+  .card-footer__secondary,
+  .card-footer__primary {
     align-items: stretch;
     flex-direction: column;
     width: 100%;
@@ -2779,13 +2779,13 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   }
 }
 
-#quick-add-modelo-motivo .cv-inline-create__fields {
+#quick-add-modelo-motivo .inline-create__fields {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
-#quick-add-modelo-motivo .cv-inline-create__fields > .field-grid {
+#quick-add-modelo-motivo .inline-create__fields > .field-grid {
   margin: 0;
 }
 
@@ -2821,13 +2821,13 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
   outline: none;
 }
 
-#quick-add-atividade .cv-inline-create__fields {
+#quick-add-atividade .inline-create__fields {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
-#quick-add-atividade .cv-inline-create__fields > .field-grid {
+#quick-add-atividade .inline-create__fields > .field-grid {
   margin: 0;
 }
 

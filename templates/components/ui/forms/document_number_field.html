@@ -2,10 +2,10 @@
 Campo composto para referências documentais no formato NUMERO/ANO.
 O BoundField original continua sendo enviado ao backend; o input visível edita somente o número.
 {% endcomment %}
-<div class="field app-form-field cv-field cv-composite-field document-number-field">
+<div class="field app-form-field cv-field composite-field document-number-field">
   <label class="app-form-label cv-field__label" for="{{ field.id_for_label }}_numero">{{ label }}</label>
   <div
-    class="cv-composite-field__control"
+    class="composite-field__control"
     data-document-number-field
     data-document-year="{{ ano }}"
     data-mask-year="{{ ano }}"
@@ -23,7 +23,7 @@ O BoundField original continua sendo enviado ao backend; o input visível edita 
       data-document-number-input
       aria-label="{{ label }} — só o número"
     />
-    <span class="cv-composite-field__suffix">/ {{ ano }}</span>
+    <span class="composite-field__suffix">/ {{ ano }}</span>
   </div>
   {% if field.errors %}<p class="field-error">{{ field.errors|striptags }}</p>{% endif %}
 </div>

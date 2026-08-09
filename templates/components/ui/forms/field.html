@@ -13,7 +13,7 @@
   Duas exceções, ambas deliberadas:
   - `checkbox` sai por `card_toggle.html`. É cartão clicável, não campo em
     grade — contrato próprio, de propósito.
-  - quando o widget é um `cv-search-picker__native`, o rótulo deixa de ser
+  - quando o widget é um `search-picker__native`, o rótulo deixa de ser
     *visível* — o próprio picker desenha o dele — mas continua **existindo**
     para leitor de tela (`HT-11`). Antes ele era omitido de vez, e o input que
     o picker cria ficava sem nome acessível nenhum: `picker.js` procura
@@ -35,7 +35,7 @@
 {% else %}
 {% with classe_do_widget=field.field.widget.attrs.class|default:"" %}
 <div class="field app-form-field cv-field{% if size_class %} {{ size_class }}{% endif %}">
-  {% if "cv-search-picker__native" in classe_do_widget %}
+  {% if "search-picker__native" in classe_do_widget %}
     {% comment %}
       `HT-11`: fora da tela, dentro da árvore de acessibilidade. É daqui que
       `picker.js` tira o nome do campo de busca que ele cria.
@@ -46,7 +46,7 @@
   {% endif %}
 
   {% if action_url or action_label %}
-    <div class="cv-field-with-action cv-field-with-action--manage-reveal{% if "cv-search-picker__native" in classe_do_widget %} cv-field-with-action--search-picker{% endif %}">
+    <div class="field-with-action field-with-action--manage-reveal{% if "search-picker__native" in classe_do_widget %} field-with-action--search-picker{% endif %}">
       {% include "components/ui/forms/_field_control.html" with field=field classe_do_widget=classe_do_widget input_class=input_class only %}
       {% if action_url %}
         {% include "components/ui/buttons/field_manage_button.html" with href=action_url action_label=action_label data_autosave_link=True only %}

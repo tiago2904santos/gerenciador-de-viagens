@@ -4,7 +4,7 @@ Corpo do menu de uma linha do card de termo (servidor ou viatura).
 Separado do gatilho no `PF-04`, no mesmo desenho de `entity_card_menu.html`:
 sem `src` o corpo continua embutido, com `src` ele vem de `termos:card_menus`.
 {% endcomment %}
-<div class="cv-action-menu cv-action-menu--rich" id="{{ menu_id }}" role="menu" hidden>
+<div class="action-menu action-menu--rich" id="{{ menu_id }}" role="menu" hidden>
     {% include "components/ui/menus/rich_menu_header.html" with title=titulo subtitle=subtitulo icon="document" only %}
     {% if view_url %}
       {% include "components/ui/menus/rich_menu_link.html" with href=view_url title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}

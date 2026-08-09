@@ -75,7 +75,7 @@
     if (!select) return;
     select.value = value;
     /* select nativo fica escondido atras de um trigger customizado
-       (cv-custom-select) que só atualiza o rótulo visível ao ouvir
+       (custom-select) que só atualiza o rótulo visível ao ouvir
        'change' no <select> — setar .value sozinho não é suficiente. */
     select.dispatchEvent(new Event("change", { bubbles: true }));
   }

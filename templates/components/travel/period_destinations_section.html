@@ -11,10 +11,10 @@ Slots opcionais:
 - destination_row_template: <template> usado para adicionar novas linhas.
 - period_layout="split": rail de título + campos (mesmo padrão de destinos).
 {% endcomment %}
-<div class="cv-travel-schedule{% if extra_class %} {{ extra_class }}{% endif %}" data-travel-schedule>
+<div class="travel-schedule{% if extra_class %} {{ extra_class }}{% endif %}" data-travel-schedule>
   {% if period_layout == "split" %}
   <section
-    class="cv-form-subsection cv-travel-schedule__period travel-period-block travel-period-block--split{% if period_extra_class %} {{ period_extra_class }}{% endif %}"
+    class="form-subsection travel-schedule__period travel-period-block travel-period-block--split{% if period_extra_class %} {{ period_extra_class }}{% endif %}"
     aria-labelledby="{{ period_title_id|default:'travel-period-title' }}"
   >
     <div class="travel-period-block__rail">
@@ -28,7 +28,7 @@ Slots opcionais:
       </div>
     </div>
     <div class="travel-period-block__body">
-      <div class="cv-travel-schedule__period-fields{% if period_fields_extra_class %} {{ period_fields_extra_class }}{% endif %}">
+      <div class="travel-schedule__period-fields{% if period_fields_extra_class %} {{ period_fields_extra_class }}{% endif %}">
         {% include "components/ui/forms/date_picker.html" with mode="range" picker_id=picker_id extra_class=picker_extra_class start_field=start_field end_field=end_field start_label=start_label|default:"Data inicial" end_label=end_label|default:"Data final" start_placeholder=start_placeholder|default:"dd/mm/aaaa" end_placeholder=end_placeholder|default:"dd/mm/aaaa" start_input_id=start_input_id end_input_id=end_input_id start_hidden_id=start_hidden_id end_hidden_id=end_hidden_id start_hidden_name=start_hidden_name end_hidden_name=end_hidden_name start_hidden_value=start_hidden_value end_hidden_value=end_hidden_value initial_date=initial_date show_summary=False hide_labels=True only %}
         {% if period_extra_template %}
           {% include period_extra_template %}
@@ -38,21 +38,21 @@ Slots opcionais:
   </section>
   {% else %}
   <section
-    class="cv-form-subsection cv-travel-schedule__period{% if period_extra_class %} {{ period_extra_class }}{% endif %}"
+    class="form-subsection travel-schedule__period{% if period_extra_class %} {{ period_extra_class }}{% endif %}"
     aria-labelledby="{{ period_title_id|default:'travel-period-title' }}"
   >
-    <header class="cv-form-subsection__header">
-      <div class="cv-form-subsection__copy">
-        <h4 class="cv-form-subsection__title" id="{{ period_title_id|default:'travel-period-title' }}">
+    <header class="form-subsection__header">
+      <div class="form-subsection__copy">
+        <h4 class="form-subsection__title" id="{{ period_title_id|default:'travel-period-title' }}">
           {{ period_title|default:"Período" }}
         </h4>
         {% if period_description %}
-          <p class="cv-form-subsection__description">{{ period_description }}</p>
+          <p class="form-subsection__description">{{ period_description }}</p>
         {% endif %}
       </div>
     </header>
 
-    <div class="cv-travel-schedule__period-fields{% if period_fields_extra_class %} {{ period_fields_extra_class }}{% endif %}">
+    <div class="travel-schedule__period-fields{% if period_fields_extra_class %} {{ period_fields_extra_class }}{% endif %}">
       {% include "components/ui/forms/date_picker.html" with mode="range" picker_id=picker_id extra_class=picker_extra_class start_field=start_field end_field=end_field start_label=start_label|default:"Data inicial" end_label=end_label|default:"Data final" start_input_id=start_input_id end_input_id=end_input_id start_hidden_id=start_hidden_id end_hidden_id=end_hidden_id start_hidden_name=start_hidden_name end_hidden_name=end_hidden_name start_hidden_value=start_hidden_value end_hidden_value=end_hidden_value initial_date=initial_date show_summary=False only %}
       {% if period_extra_template %}
         {% include period_extra_template %}

@@ -1,10 +1,10 @@
-<section class="cv-card-footer-section">
-  <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
-  <footer class="cv-card-footer">
-    <div class="cv-card-footer__secondary">
+<section class="card-footer-section">
+  <div class="card-footer-section__divider" aria-hidden="true"></div>
+  <footer class="card-footer">
+    <div class="card-footer__secondary">
       {% include "components/ui/buttons/button.html" with href=back_url|default:"/prestacoes-contas/" label="Voltar à lista" variant="secondary" icon="arrow-left" only %}
     </div>
-    <div class="cv-card-footer__primary">
+    <div class="card-footer__primary">
       {% include "components/ui/buttons/button.html" with label="Salvar texto" variant="secondary" type="submit" name="action" value="save" only %}
       {% include "components/ui/buttons/button.html" with href=diario_url label="Ir para Diário de Bordo" variant="primary" icon="arrow-right" icon_after=True only %}
     </div>

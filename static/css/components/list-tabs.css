@@ -1,6 +1,6 @@
 /* Abas canônicas para listas temporais e de estado. */
 
-.cv-list-tabs {
+.list-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2, 8px);
@@ -26,7 +26,7 @@
 
 .page-shell--list > .list-toolbar,
 .cv-page--collection > .list-toolbar,
-.cv-collection-panel > .list-toolbar {
+.collection-panel > .list-toolbar {
   background: transparent;
   border: 0;
   box-shadow: none;
@@ -34,25 +34,25 @@
   padding: var(--space-3, 12px) 0 var(--space-1, 4px);
 }
 
-.cv-collection-panel > .list-toolbar {
+.collection-panel > .list-toolbar {
   margin-top: 0;
   padding: 0;
 }
 
-.list-toolbar .cv-list-tabs {
+.list-toolbar .list-tabs {
   flex: 1 1 auto;
   margin: 0;
   min-width: 0;
   padding: 0;
 }
 
-.list-toolbar .cv-list-tab {
+.list-toolbar .list-tab {
   flex: 0 1 auto;
   max-width: 100%;
   min-width: 0;
 }
 
-.list-toolbar .cv-list-tab__label {
+.list-toolbar .list-tab__label {
   max-width: 22ch;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -90,14 +90,14 @@
 }
 
 /* Conexão visual com o header flat: abas logo abaixo do divisor. */
-.page-shell--list > .cv-list-tabs,
-.cv-page--collection > .cv-list-tabs {
+.page-shell--list > .list-tabs,
+.cv-page--collection > .list-tabs {
   margin-top: calc(-1 * var(--space-1, 4px));
   padding-bottom: var(--space-1, 4px);
   padding-top: var(--space-3, 12px);
 }
 
-.cv-list-tab {
+.list-tab {
   --list-tab-bg: var(--color-surface-soft, rgba(255, 255, 255, 0.04));
   --list-tab-border: var(--color-border, rgba(255, 255, 255, 0.12));
   --list-tab-color: var(--color-text-secondary, rgba(255, 255, 255, 0.7));
@@ -127,21 +127,21 @@
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.cv-list-tab:hover,
-.cv-list-tab:focus-visible {
+.list-tab:hover,
+.list-tab:focus-visible {
   background: var(--list-tab-hover-bg);
   border-color: var(--list-tab-hover-border);
   color: var(--list-tab-hover-color);
   outline: none;
 }
 
-.cv-list-tab--active {
+.list-tab--active {
   background: var(--list-tab-active-bg);
   border-color: var(--list-tab-active-border);
   color: var(--list-tab-active-color);
 }
 
-.cv-list-tab__count {
+.list-tab__count {
   background: var(--list-tab-count-bg);
   border-radius: var(--radius-pill, 999px);
   color: inherit;
@@ -152,13 +152,13 @@
   text-align: center;
 }
 
-.cv-list-tab--active .cv-list-tab__count {
+.list-tab--active .list-tab__count {
   background: var(--list-tab-active-count-bg);
   color: var(--list-tab-active-count-color);
 }
 
 :is(html[data-theme="dark"])
-  .cv-list-tab {
+  .list-tab {
   --list-tab-bg: var(--color-card-soft);
   --list-tab-border: var(--color-border-soft);
   --list-tab-color: var(--theme-text-muted, #afc0d3);
@@ -175,7 +175,7 @@
 
 /* Aba ativa: hover sobe no dourado (não vai para branco) e sem barra esquerda. */
 :is(html[data-theme="dark"])
-  .cv-list-tab--active:is(:hover, :focus-visible) {
+  .list-tab--active:is(:hover, :focus-visible) {
   background: color-mix(in srgb, var(--color-accent-soft, #3b3320) 72%, var(--color-accent, #d8a21b) 28%);
   border-color: var(--color-accent-hover, #e0ab3c);
   box-shadow: none;
@@ -183,24 +183,24 @@
 }
 
 :is(html[data-theme="dark"])
-  .cv-list-tab:focus-visible {
+  .list-tab:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-focus, #74aae0) 28%, transparent);
 }
 
 :is(html[data-theme="dark"])
-  .cv-list-tab--active:focus-visible {
+  .list-tab--active:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent, #d8a21b) 32%, transparent);
 }
 
 @media (max-width: 600px) {
   :is(html[data-theme="dark"])
-    .cv-list-tabs {
+    .list-tabs {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   :is(html[data-theme="dark"])
-    .cv-list-tab {
+    .list-tab {
     justify-content: space-between;
     min-width: 0;
   }
@@ -222,7 +222,7 @@
 
 @media (max-width: 420px) {
   :is(html[data-theme="dark"])
-    .cv-list-tabs {
+    .list-tabs {
     grid-template-columns: minmax(0, 1fr);
   }
 }

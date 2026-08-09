@@ -1,4 +1,4 @@
-"""Linhas de listagem da administração, no contrato `cv-record-row`.
+"""Linhas de listagem da administração, no contrato `record-row`.
 
 Sem HTML e sem consulta: os vínculos chegam pré-carregados pelo
 `selectors.queryset_usuarios_base`.

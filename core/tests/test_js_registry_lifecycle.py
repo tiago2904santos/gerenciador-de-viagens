@@ -123,7 +123,7 @@ class JavascriptRegistryLifecycleTests(SimpleTestCase):
 
         `core/app.js:126` aceita o terceiro argumento e o MutationObserver
         chama `destroy` em `removedNodes`; o que faltava era adoção. Sem ele,
-        `picker.js` e `cv-date-picker.js` deixavam um listener em `document`
+        `picker.js` e `date-picker.js` deixavam um listener em `document`
         por instância — e `attach-signed-modal.js`, um por painel trazido via
         AJAX, porque o guard `BOUND` é por elemento e o listener é global.
         """
@@ -150,7 +150,7 @@ class JavascriptRegistryLifecycleTests(SimpleTestCase):
         static_js = Path(settings.BASE_DIR) / "static" / "js"
         for relativo in (
             "components/picker.js",
-            "components/cv-date-picker.js",
+            "components/date-picker.js",
             "components/attach-signed-modal.js",
             "components/location-rows.js",
         ):

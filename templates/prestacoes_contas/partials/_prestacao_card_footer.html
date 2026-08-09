@@ -1,11 +1,11 @@
 {# Rodapé específico da prestação — abrir/assinar despacho + finalizar/arquivar (POST com next=current_url). #}
-<div class="cv-entity-card__footer cv-record-card__footer">
-  <div class="cv-record-card__footer-actions">
-    <div class="cv-record-card__footer-actions-main cv-icon-btn-group">
+<div class="entity-card__footer record-card__footer">
+  <div class="record-card__footer-actions">
+    <div class="record-card__footer-actions-main icon-btn-group">
       {% include "components/ui/buttons/icon_button.html" with href=card.rt_url action="edit" aria_label="Abrir prestação na etapa 1" tooltip="Abrir prestação" only %}
       <button
         type="button"
-        class="cv-icon-btn cv-icon-btn--sign{% if card.despacho_assinado.assinado %} is-assinado{% endif %}"
+        class="icon-btn icon-btn--sign{% if card.despacho_assinado.assinado %} is-assinado{% endif %}"
         aria-label="{% if card.despacho_assinado.assinado %}Gerenciar despacho assinado{% else %}Anexar despacho assinado{% endif %}"
         data-tooltip="{% if card.despacho_assinado.assinado %}Despacho assinado — gerenciar{% else %}Anexar despacho assinado{% endif %}"
         data-attach-signed-trigger
@@ -23,24 +23,24 @@
       >{% include "components/ui/icons/icon.html" with icon="sign" only %}</button>
     </div>
 
-    <div class="cv-record-card__footer-actions--manage cv-icon-btn-group">
-      <form method="post" action="{{ card.finalizar_url }}" class="cv-record-card__inline-action">
+    <div class="record-card__footer-actions--manage icon-btn-group">
+      <form method="post" action="{{ card.finalizar_url }}" class="record-card__inline-action">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ current_url }}">
         {% if card.finalizada %}
-        <button type="submit" class="cv-icon-btn cv-icon-btn--edit" aria-label="Reabrir prestação" data-tooltip="Reabrir prestação">{% include "components/ui/icons/icon.html" with icon="arrow-left" only %}</button>
+        <button type="submit" class="icon-btn icon-btn--edit" aria-label="Reabrir prestação" data-tooltip="Reabrir prestação">{% include "components/ui/icons/icon.html" with icon="arrow-left" only %}</button>
         {% else %}
-        <button type="submit" class="cv-icon-btn cv-icon-btn--complete" aria-label="Finalizar prestação" data-tooltip="Finalizar prestação">{% include "components/ui/icons/icon.html" with icon="check" only %}</button>
+        <button type="submit" class="icon-btn icon-btn--complete" aria-label="Finalizar prestação" data-tooltip="Finalizar prestação">{% include "components/ui/icons/icon.html" with icon="check" only %}</button>
         {% endif %}
       </form>
 
-      <form method="post" action="{{ card.arquivar_url }}" class="cv-record-card__inline-action">
+      <form method="post" action="{{ card.arquivar_url }}" class="record-card__inline-action">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ current_url }}">
         {% if card.arquivada %}
-        <button type="submit" class="cv-icon-btn cv-icon-btn--edit" aria-label="Desarquivar prestação" data-tooltip="Desarquivar prestação">{% include "components/ui/icons/icon.html" with icon="unarchive" only %}</button>
+        <button type="submit" class="icon-btn icon-btn--edit" aria-label="Desarquivar prestação" data-tooltip="Desarquivar prestação">{% include "components/ui/icons/icon.html" with icon="unarchive" only %}</button>
         {% else %}
-        <button type="submit" class="cv-icon-btn cv-icon-btn--archive" aria-label="Arquivar prestação" data-tooltip="Arquivar prestação">{% include "components/ui/icons/icon.html" with icon="archive" only %}</button>
+        <button type="submit" class="icon-btn icon-btn--archive" aria-label="Arquivar prestação" data-tooltip="Arquivar prestação">{% include "components/ui/icons/icon.html" with icon="archive" only %}</button>
         {% endif %}
       </form>
     </div>

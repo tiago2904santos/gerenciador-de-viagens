@@ -29,7 +29,7 @@ a impressao de progresso.
 
 ## O risco deste script, e para que lado ele erra
 
-Classe montada em tempo de execucao (`` `cv-chip--${tom}` ``) nao aparece
+Classe montada em tempo de execucao (`` `chip--${tom}` ``) nao aparece
 inteira no corpus. Se o prefixo nao estiver em `PREFIXOS_DINAMICOS`, o script
 conta uma classe **viva** como morta.
 
@@ -78,23 +78,23 @@ PREFIXOS_DINAMICOS = (
     "app-wizard",
     "area-quick-add__toggle--",
     "asgn-fontchip--",
-    "cv-action-menu__item-icon--",
+    "action-menu__item-icon--",
     "cv-btn--",
-    "cv-chip--",
-    "cv-custom-select--disabled",
-    "cv-custom-select--error",
+    "chip--",
+    "custom-select--disabled",
+    "custom-select--error",
     "cv-dialog__header--",
     "cv-dialog__icon--",
-    "cv-field-side-action--",
-    "cv-footer-action--",
-    "cv-form-block--",
-    "cv-icon-btn--",
-    "cv-notice--",
-    "cv-pendencias--",
-    "cv-person-list--n",
-    "cv-record-card--",
-    "cv-record-card__info-value--wrap",
-    "cv-search-picker--",
+    "field-side-action--",
+    "footer-action--",
+    "form-block--",
+    "icon-btn--",
+    "notice--",
+    "pendencias--",
+    "person-list--n",
+    "record-card--",
+    "record-card__info-value--wrap",
+    "search-picker--",
     "destination-row--single",
     "empty-state--",
     "is-checked",

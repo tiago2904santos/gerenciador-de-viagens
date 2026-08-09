@@ -42,7 +42,7 @@ html[data-theme="dark"] .pt-activity__toolbar--panel {
   min-width: 140px;
 }
 
-.pt-activity__preset-select .cv-custom-select__trigger,
+.pt-activity__preset-select .custom-select__trigger,
 .pt-activity__search .pt-activity__search-input,
 .pt-activity__preset .cv-btn,
 .pt-activity__clear {
@@ -52,25 +52,25 @@ html[data-theme="dark"] .pt-activity__toolbar--panel {
 
 /*
   Soft --step1-panel sobre o poço da toolbar.
-  O seletor global do wizard usa :is(input:not(...), .cv-custom-select__trigger)
+  O seletor global do wizard usa :is(input:not(...), .custom-select__trigger)
   e herda especificidade (0,5,2) dos :not — precisa empatar/vencer isso.
 */
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .pt-activity__toolbar--panel
   .pt-activity__preset-select
-  button.cv-custom-select__trigger.cv-custom-select__trigger--v2,
+  button.custom-select__trigger.custom-select__trigger--v2,
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .pt-activity__toolbar--panel
-  .pt-activity__preset-select.cv-custom-select--open
-  button.cv-custom-select__trigger.cv-custom-select__trigger--v2,
+  .pt-activity__preset-select.custom-select--open
+  button.custom-select__trigger.custom-select__trigger--v2,
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-step1]
   .pt-activity__toolbar--panel
   .pt-activity__search
   input.cv-field__control.pt-activity__search-input,
-.pt-activity__preset-select .cv-custom-select__trigger,
+.pt-activity__preset-select .custom-select__trigger,
 .pt-activity__search .pt-activity__search-input {
   background: var(--step1-panel, var(--color-surface-soft)) !important;
   background-color: var(--step1-panel, var(--color-surface-soft)) !important;
@@ -80,7 +80,7 @@ html[data-theme="dark"] .pt-activity__toolbar--panel {
   box-shadow: none !important;
 }
 
-.pt-activity__preset-select .cv-custom-select__trigger {
+.pt-activity__preset-select .custom-select__trigger {
   width: 100%;
 }
 
@@ -289,11 +289,11 @@ html[data-theme="dark"] .pt-activity-card {
 }
 
 /* Subtítulo do form_block Atividades — mesmo 2xs do Efetivo. */
-[data-pt-atividades] .travel-document-block .cv-form-block__description,
+[data-pt-atividades] .travel-document-block .form-block__description,
 :is(html[data-theme="dark"])
   [data-pt-atividades]
   .travel-document-block
-  .cv-form-block__description {
+  .form-block__description {
   font-size: var(--font-size-2xs);
   line-height: 1.4;
 }

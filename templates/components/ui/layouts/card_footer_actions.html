@@ -1,6 +1,6 @@
-<footer class="cv-card-footer cv-form-card__footer{% if not secondary_label and not secondary_url %} cv-card-footer--end{% endif %}">
+<footer class="card-footer form-card__footer{% if not secondary_label and not secondary_url %} card-footer--end{% endif %}">
 
-  <div class="cv-card-footer__secondary">
+  <div class="card-footer__secondary">
     {% if secondary_label %}
       {% if secondary_url %}
         {% include "components/ui/buttons/button.html" with href=secondary_url label=secondary_label variant=secondary_variant|default:"secondary" icon=secondary_icon|default:"arrow-left" link_target=secondary_link_target link_rel=secondary_link_rel only %}
@@ -10,7 +10,7 @@
     {% endif %}
   </div>
 
-  <div class="cv-card-footer__primary">
+  <div class="card-footer__primary">
     {% if primary_label %}
       {% if primary_url %}
         {% include "components/ui/buttons/button.html" with href=primary_url label=primary_label variant=primary_variant|default:"primary" icon=primary_icon|default:"arrow-right" icon_after=True link_target=primary_link_target link_rel=primary_link_rel only %}

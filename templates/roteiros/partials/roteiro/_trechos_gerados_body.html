@@ -1,11 +1,11 @@
 {% comment %}
 JS-04: a estimativa automática de distância falhava em silêncio — não havia
 onde escrever o erro. O editor já tinha faixa para diárias e para o mapa, e
-nenhuma para trechos. Classes do design system (cv-notice), não as do
+nenhuma para trechos. Classes do design system (notice), não as do
 Bootstrap legado que o HT-03 vai varrer. Escondida por [hidden], que
 base.css força com !important mesmo sobre o display do componente.
 {% endcomment %}
-<div id="trechos-error" class="cv-notice cv-notice--warning" hidden role="alert"></div>
+<div id="trechos-error" class="notice notice--warning" hidden role="alert"></div>
 
 {# Container dos trechos gerados pelo JS (IDs/classes preservados). #}
 <div id="trechos-gerados-container" class="roteiro-trechos-stack">

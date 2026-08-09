@@ -36,7 +36,7 @@ Listagens com busca, filtros, ordenação e período usam `filter_page_header.ht
 
 `components/ui/forms/field.html` renderiza o `BoundField` Django e suas mensagens. Variações legítimas têm componentes próprios quando existe comportamento adicional:
 
-- `date_picker.html`: data única ou intervalo, com `cv-date-picker.js`;
+- `date_picker.html`: data única ou intervalo, com `date-picker.js`;
 - `document_number_field.html`: número e ano sincronizados com campo oculto;
 - `card_toggle.html`: booleano apresentado como card;
 - `file_picker.html` e `multiselect.html`: controles compostos.

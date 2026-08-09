@@ -5014,3 +5014,60 @@ e a explicação é que aquele elemento mudaria de qualquer jeito.
 
 Fica registrado como **ruído conhecido daquela rota**, para a próxima medição não gastar tempo com
 ele.
+
+### NOVO-65 ✅ RESOLVIDO · `NOVO` As 545 classes `cv-*` mecânicas perdem o prefixo de origem · MED · 1 d
+
+Continuação do `NOVO-64` (tokens) para as **classes**, fechando o pedido do dono. Também renomeia os
+**sete arquivos** que carregavam o prefixo no nome (`cv-buttons.css`, `cv-search-picker.css`,
+`cv-select.css`, `components/cv-date-picker.css`, `components/cv-metric.css`,
+`components/cv-notice.css`, `js/components/cv-date-picker.js`).
+
+| | |
+|---|---|
+| classes renomeadas | **545 de 632** |
+| ocorrências trocadas | 4.541 + 29 de prefixo + 42 em Python |
+| arquivos tocados | 212 |
+| elementos alterados | **1** de 41.950 — o ruído conhecido do `NOVO-64` |
+
+**Dez famílias ficam preservadas**, porque o nome sem prefixo já pertence a outra classe **viva**:
+`cv-alert`, `cv-btn`, `cv-dialog`, `cv-field`, `cv-field-row`, `cv-form-section-header`, `cv-input`,
+`cv-loading`, `cv-module-card`, `cv-page`. A exclusão é por **família inteira**, não por nome: manter
+`cv-btn` e renomear `cv-btn--primary` produziria `class="cv-btn btn--primary"`, que é pior que
+qualquer um dos dois.
+
+## Quatro defeitos meus, todos pegos pela medição, nenhum por teste
+
+Nenhum destes quebraria a suíte. Todos quebrariam a tela.
+
+**1. O `@import` reescrito.** A regex trocou `@import url("./cv-search-picker.css")` por
+`./search-picker.css`, apontando para arquivo inexistente — a família inteira do *picker* ficou sem
+estilo. É a mesma classe de defeito que reprovou o CI no `#266`, e foi o gate que eu escrevi lá
+(`audit_css_morto` checando `@import`) que acusou. Consertado renomeando os arquivos de verdade.
+
+**2. O token de template.** Em `class="cv-form-section-header{% if ... %}"`, o token capturado pela
+descoberta é `cv-form-section-header{%` — que não bate com nenhuma família, escapa da exclusão e é
+renomeado, enquanto o CSS (que via o nome limpo) preserva. O cabeçalho de formulário ficou sem
+`display`, `padding` e `position`. Corrigido filtrando a descoberta a **identificadores CSS
+válidos**.
+
+**3. O prefixo montado em tempo de execução.** `class="icon-btn cv-icon-btn--{{ action }}"` monta a
+classe no template. A primeira passada exigia fim de token, e `cv-icon-btn` seguido de `-` não
+casava — então o prefixo ficou para trás enquanto o CSS virou `.icon-btn--settings`. Corrigido com
+uma segunda passada que reconhece `--`/`__` como continuação.
+
+**4. Classe escrita em Python.** `roteiros/presenters.py:230` monta
+`value_class="cv-record-card__info-value--rota"`. Eu tinha varrido só `core/` e `scripts/`; classe de
+CSS também mora em presenter. Varredura estendida a todo `*.py`, **protegendo `data-cv-*`** — que é
+atributo, não classe, e não muda.
+
+A medição foi de 1.061 → 945 → 894 → 20 → **1** conforme cada um caiu. O número que fechou é o
+mesmo piso de ruído do `NOVO-64`: `.os-model-card` em `/ordens-servico/nova/`.
+
+## Dois testes atualizados, e um deles é instrutivo
+
+- `oficios/tests/test_menus_sob_demanda.py:33` tinha `re.compile(r'...\bcv-action-menu\b...')`. O
+  `\b` põe um `b` imediatamente antes do nome, então a guarda `(?<![\w-])` da minha regex recusou a
+  troca — o teste continuou procurando o nome antigo e não achou menu nenhum. **A guarda funcionou
+  como projetada; o custo é que nome dentro de regex escapa da renomeação automática.**
+- `docs/DATA_ATTRIBUTES_JS.md` citava `components/cv-date-picker.js`, e o `HT-13` exige que a doc só
+  descreva o que existe. Os `data-cv-date-picker-*` **continuam**: atributo não é classe.

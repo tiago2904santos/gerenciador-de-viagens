@@ -696,7 +696,7 @@ html[data-theme="dark"] input[type="checkbox"] {
 
 .main-form-panel .app-form-label,
 .main-form-panel .cv-field__label,
-.main-form-panel .cv-search-picker__label {
+.main-form-panel .search-picker__label {
   color: var(--color-label);
   font-size: var(--font-size-sm);
   font-weight: 700;
@@ -768,7 +768,7 @@ html[data-theme="dark"] input[type="checkbox"] {
   outline: none;
 }
 
-.main-form-panel .cv-custom-select__trigger {
+.main-form-panel .custom-select__trigger {
   background:
     linear-gradient(var(--field-bg), var(--field-bg)) padding-box,
     linear-gradient(var(--field-border), var(--field-border)) border-box;
@@ -777,46 +777,46 @@ html[data-theme="dark"] input[type="checkbox"] {
   color: var(--field-text);
 }
 
-.main-form-panel .cv-custom-select__trigger:focus,
-.main-form-panel .cv-custom-select__trigger:focus-visible {
+.main-form-panel .custom-select__trigger:focus,
+.main-form-panel .custom-select__trigger:focus-visible {
   outline: none;
 }
 
-.main-form-panel .cv-custom-select--open:not(.cv-custom-select--menu-portal) .cv-custom-select__trigger {
+.main-form-panel .custom-select--open:not(.custom-select--menu-portal) .custom-select__trigger {
   box-shadow: none;
 }
 
-.main-form-panel .cv-custom-select__trigger,
-.main-form-panel .cv-search-picker__control {
+.main-form-panel .custom-select__trigger,
+.main-form-panel .search-picker__control {
   box-sizing: border-box;
   height: var(--form-control-height);
   max-height: var(--form-control-height);
   min-height: var(--form-control-height);
 }
 
-.main-form-panel .cv-search-picker__input {
+.main-form-panel .search-picker__input {
   line-height: 1.25;
   min-height: 0;
   padding: 0 5px;
 }
 
-.main-form-panel .cv-field-with-action {
+.main-form-panel .field-with-action {
   align-items: center;
   min-height: var(--form-control-height);
 }
 
-.main-form-panel .cv-field-with-action .cv-custom-select,
-.main-form-panel .cv-field-with-action .cv-field__control {
+.main-form-panel .field-with-action .custom-select,
+.main-form-panel .field-with-action .cv-field__control {
   flex: 1 1 auto;
   min-width: 0;
 }
 
-.main-form-panel .cv-field-with-action .cv-custom-select__trigger {
+.main-form-panel .field-with-action .custom-select__trigger {
   width: 100%;
 }
 
 /* Gerenciar: input encolhe no hover; botão absoluto por cima, à direita */
-.main-form-panel .cv-field-with-action--manage-reveal {
+.main-form-panel .field-with-action--manage-reveal {
   --field-manage-btn-size: var(--form-control-height);
   --field-manage-btn-gap: var(--space-2);
   display: block;
@@ -826,11 +826,11 @@ html[data-theme="dark"] input[type="checkbox"] {
   position: relative;
 }
 
-.main-form-panel .cv-field-with-action--manage-reveal > .cv-custom-select,
-.main-form-panel .cv-field-with-action--manage-reveal > .cv-field__control,
-.main-form-panel .cv-field-with-action--manage-reveal > .form-control,
-.main-form-panel .cv-field-with-action--manage-reveal > .form-select,
-.main-form-panel .cv-field-with-action--manage-reveal > select {
+.main-form-panel .field-with-action--manage-reveal > .custom-select,
+.main-form-panel .field-with-action--manage-reveal > .cv-field__control,
+.main-form-panel .field-with-action--manage-reveal > .form-control,
+.main-form-panel .field-with-action--manage-reveal > .form-select,
+.main-form-panel .field-with-action--manage-reveal > select {
   box-sizing: border-box;
   display: block;
   max-width: 100%;
@@ -841,25 +841,25 @@ html[data-theme="dark"] input[type="checkbox"] {
   z-index: 2;
 }
 
-.main-form-panel .cv-field-with-action--manage-reveal:hover > .cv-custom-select,
-.main-form-panel .cv-field-with-action--manage-reveal:focus-within > .cv-custom-select,
-.main-form-panel .cv-field-with-action--manage-reveal:hover > .cv-field__control,
-.main-form-panel .cv-field-with-action--manage-reveal:focus-within > .cv-field__control,
-.main-form-panel .cv-field-with-action--manage-reveal:hover > .form-control,
-.main-form-panel .cv-field-with-action--manage-reveal:focus-within > .form-control,
-.main-form-panel .cv-field-with-action--manage-reveal:hover > .form-select,
-.main-form-panel .cv-field-with-action--manage-reveal:focus-within > .form-select,
-.main-form-panel .cv-field-with-action--manage-reveal:hover > select,
-.main-form-panel .cv-field-with-action--manage-reveal:focus-within > select {
+.main-form-panel .field-with-action--manage-reveal:hover > .custom-select,
+.main-form-panel .field-with-action--manage-reveal:focus-within > .custom-select,
+.main-form-panel .field-with-action--manage-reveal:hover > .cv-field__control,
+.main-form-panel .field-with-action--manage-reveal:focus-within > .cv-field__control,
+.main-form-panel .field-with-action--manage-reveal:hover > .form-control,
+.main-form-panel .field-with-action--manage-reveal:focus-within > .form-control,
+.main-form-panel .field-with-action--manage-reveal:hover > .form-select,
+.main-form-panel .field-with-action--manage-reveal:focus-within > .form-select,
+.main-form-panel .field-with-action--manage-reveal:hover > select,
+.main-form-panel .field-with-action--manage-reveal:focus-within > select {
   max-width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
   width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
 }
 
-.main-form-panel .cv-field-with-action--manage-reveal .cv-custom-select__trigger {
+.main-form-panel .field-with-action--manage-reveal .custom-select__trigger {
   width: 100%;
 }
 
-.main-form-panel .cv-field-with-action--manage-reveal > .cv-icon-btn--field-manage {
+.main-form-panel .field-with-action--manage-reveal > .icon-btn--field-manage {
   height: var(--field-manage-btn-size);
   max-height: var(--field-manage-btn-size);
   min-height: var(--field-manage-btn-size);
@@ -874,21 +874,21 @@ html[data-theme="dark"] input[type="checkbox"] {
   z-index: 1;
 }
 
-.main-form-panel .cv-field-with-action--manage-reveal:hover > .cv-icon-btn--field-manage,
-.main-form-panel .cv-field-with-action--manage-reveal:focus-within > .cv-icon-btn--field-manage {
+.main-form-panel .field-with-action--manage-reveal:hover > .icon-btn--field-manage,
+.main-form-panel .field-with-action--manage-reveal:focus-within > .icon-btn--field-manage {
   opacity: 1;
   pointer-events: auto;
   z-index: 5;
 }
 
 /* Search picker + gerenciar: mesmo padrão do cargo (reveal no hover).
-   O botão fica irmão do controle dentro de `.cv-search-picker__field`,
+   O botão fica irmão do controle dentro de `.search-picker__field`,
    alinhado à linha do input — não dentro do controle. */
-.main-form-panel .cv-field-with-action--search-picker .cv-search-picker__field {
+.main-form-panel .field-with-action--search-picker .search-picker__field {
   position: relative;
 }
 
-.main-form-panel .cv-field-with-action--search-picker .cv-search-picker__control {
+.main-form-panel .field-with-action--search-picker .search-picker__control {
   box-sizing: border-box;
   max-width: 100%;
   min-width: 0;
@@ -896,13 +896,13 @@ html[data-theme="dark"] input[type="checkbox"] {
   width: 100%;
 }
 
-.main-form-panel .cv-field-with-action--search-picker:hover .cv-search-picker__control,
-.main-form-panel .cv-field-with-action--search-picker:focus-within .cv-search-picker__control {
+.main-form-panel .field-with-action--search-picker:hover .search-picker__control,
+.main-form-panel .field-with-action--search-picker:focus-within .search-picker__control {
   max-width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
   width: calc(100% - var(--field-manage-btn-size) - var(--field-manage-btn-gap));
 }
 
-.main-form-panel .cv-field-with-action--search-picker .cv-search-picker__field > .cv-icon-btn--field-manage {
+.main-form-panel .field-with-action--search-picker .search-picker__field > .icon-btn--field-manage {
   height: var(--field-manage-btn-size);
   max-height: var(--field-manage-btn-size);
   min-height: var(--field-manage-btn-size);
@@ -917,24 +917,24 @@ html[data-theme="dark"] input[type="checkbox"] {
   z-index: 1;
 }
 
-.main-form-panel .cv-field-with-action--search-picker:hover .cv-search-picker__field > .cv-icon-btn--field-manage,
-.main-form-panel .cv-field-with-action--search-picker:focus-within .cv-search-picker__field > .cv-icon-btn--field-manage {
+.main-form-panel .field-with-action--search-picker:hover .search-picker__field > .icon-btn--field-manage,
+.main-form-panel .field-with-action--search-picker:focus-within .search-picker__field > .icon-btn--field-manage {
   opacity: 1;
   pointer-events: auto;
   z-index: 5;
 }
 
 /* Search picker single: só label interna + controle (sem painel de selecionados) */
-.main-form-panel .cv-search-picker:not(:has(.cv-search-picker__selected-panel)) {
+.main-form-panel .search-picker:not(:has(.search-picker__selected-panel)) {
   gap: var(--space-2);
 }
 
-.main-form-panel .cv-search-picker__field {
+.main-form-panel .search-picker__field {
   gap: var(--space-2);
 }
 
 /* Motoristas / multiselect: busca alinhada; painel de chips abaixo */
-.main-form-panel .cv-search-picker:has(.cv-search-picker__selected-panel) {
+.main-form-panel .search-picker:has(.search-picker__selected-panel) {
   gap: var(--space-3);
 }
 

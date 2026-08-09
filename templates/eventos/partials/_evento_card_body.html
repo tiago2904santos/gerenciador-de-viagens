@@ -1,27 +1,27 @@
 {# Miolo do card de evento — mesma linguagem do card de ofício: resumo em cartões (ofícios · documentos · efetivo) + servidores. #}
-<div class="cv-record-card__band">
-  <div class="cv-fact-grid">
+<div class="record-card__band">
+  <div class="fact-grid">
 
-    <div class="cv-fact-block cv-fact-block--trechos">
-      <span class="cv-fact-block__label">Ofícios{% if card.oficios_count %} ({{ card.oficios_count }}){% endif %}</span>
+    <div class="fact-block fact-block--trechos">
+      <span class="fact-block__label">Ofícios{% if card.oficios_count %} ({{ card.oficios_count }}){% endif %}</span>
       {% if card.oficios %}
-      <ul class="cv-itinerary cv-fact-grid--dense">
+      <ul class="itinerary fact-grid--dense">
         {% for oficio in card.oficios %}
-        <li class="cv-itinerary__leg cv-itinerary__leg--documento">
-          <div class="cv-itinerary__leg-body">
-            <div class="cv-itinerary__route">
+        <li class="itinerary__leg itinerary__leg--documento">
+          <div class="itinerary__leg-body">
+            <div class="itinerary__route">
               <span>{{ oficio.numero }}</span>
             </div>
             {% if oficio.protocolo or oficio.data_evento_display or oficio.destino_display %}
-            <div class="cv-itinerary__time">
+            <div class="itinerary__time">
               {% if oficio.protocolo %}{{ oficio.protocolo }}{% endif %}{% if oficio.protocolo and oficio.data_evento_display %} · {% endif %}{% if oficio.data_evento_display %}{{ oficio.data_evento_display }}{% endif %}{% if oficio.destino_display and oficio.protocolo or oficio.destino_display and oficio.data_evento_display %} · {% endif %}{% if oficio.destino_display %}{{ oficio.destino_display }}{% endif %}
             </div>
             {% endif %}
           </div>
-          <div class="cv-itinerary__leg-actions">
+          <div class="itinerary__leg-actions">
             <button
               type="button"
-              class="cv-icon-btn cv-icon-btn--settings cv-icon-btn--documents"
+              class="icon-btn icon-btn--settings icon-btn--documents"
               aria-label="Abrir ações do ofício {{ oficio.numero }}"
               aria-haspopup="true"
               aria-expanded="false"
@@ -37,31 +37,31 @@
         {% endfor %}
       </ul>
       {% else %}
-      <div class="cv-fact-block__value--secondary cv-empty-hint">Nenhum ofício vinculado</div>
+      <div class="fact-block__value--secondary empty-hint">Nenhum ofício vinculado</div>
       {% endif %}
     </div>
 
-    <div class="cv-fact-block cv-fact-block--trechos cv-fact-block--documents">
-      <span class="cv-fact-block__label">Documentos{% if card.documentos_count %} ({{ card.documentos_count }}){% endif %}</span>
+    <div class="fact-block fact-block--trechos fact-block--documents">
+      <span class="fact-block__label">Documentos{% if card.documentos_count %} ({{ card.documentos_count }}){% endif %}</span>
       {% if card.documentos %}
-      <ul class="cv-itinerary cv-fact-grid--dense">
+      <ul class="itinerary fact-grid--dense">
         {% for doc in card.documentos %}
-        <li class="cv-itinerary__leg cv-itinerary__leg--documento">
-          <div class="cv-itinerary__leg-body">
-            <div class="cv-itinerary__route">
+        <li class="itinerary__leg itinerary__leg--documento">
+          <div class="itinerary__leg-body">
+            <div class="itinerary__route">
               <span>{{ doc.title }}</span>
-              <span class="cv-person-row__badge">{{ doc.kind }}</span>
+              <span class="person-row__badge">{{ doc.kind }}</span>
             </div>
             {% if doc.meta or doc.detail %}
-            <div class="cv-itinerary__time">
+            <div class="itinerary__time">
               {% if doc.meta %}{{ doc.meta }}{% endif %}{% if doc.meta and doc.detail %} · {% endif %}{% if doc.detail %}{{ doc.detail }}{% endif %}
             </div>
             {% endif %}
           </div>
-          <div class="cv-itinerary__leg-actions">
+          <div class="itinerary__leg-actions">
             <button
               type="button"
-              class="cv-icon-btn cv-icon-btn--settings cv-icon-btn--documents"
+              class="icon-btn icon-btn--settings icon-btn--documents"
               aria-label="Abrir ações de {{ doc.title }}"
               aria-haspopup="true"
               aria-expanded="false"
@@ -77,7 +77,7 @@
         {% endfor %}
       </ul>
       {% else %}
-      <div class="cv-fact-block__value--secondary cv-empty-hint">Nenhum plano, convite ou OS vinculado</div>
+      <div class="fact-block__value--secondary empty-hint">Nenhum plano, convite ou OS vinculado</div>
       {% endif %}
     </div>
 
@@ -85,28 +85,28 @@
 </div>
 
 {% if card.servidores_flat %}
-<div class="cv-record-card__band">
-  <ul class="cv-person-list cv-person-list--n{% if card.servidores_flat_count == 1 %}1{% else %}2{% endif %}">
+<div class="record-card__band">
+  <ul class="person-list person-list--n{% if card.servidores_flat_count == 1 %}1{% else %}2{% endif %}">
     {% for oficio in card.oficios %}
       {% for s in oficio.servidores %}
-      <li class="cv-person-row{% if s.is_motorista %} cv-person-row--highlight{% endif %}">
-        <span class="cv-person-row__avatar" aria-hidden="true">{{ s.initials }}</span>
+      <li class="person-row{% if s.is_motorista %} person-row--highlight{% endif %}">
+        <span class="person-row__avatar" aria-hidden="true">{{ s.initials }}</span>
 
-        <div class="cv-person-row__body">
-          <div class="cv-person-row__name-row">
-            <span class="cv-person-row__name">{{ s.name }}</span>
-            <span class="cv-person-row__badge">{{ oficio.numero }}</span>
+        <div class="person-row__body">
+          <div class="person-row__name-row">
+            <span class="person-row__name">{{ s.name }}</span>
+            <span class="person-row__badge">{{ oficio.numero }}</span>
           </div>
           {% if s.cargo or s.unidade %}
-          <span class="cv-person-row__meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
+          <span class="person-row__meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
           {% endif %}
         </div>
 
         {% if s.has_termo %}
-        <div class="cv-person-row__actions">
+        <div class="person-row__actions">
           <button
             type="button"
-            class="cv-icon-btn cv-icon-btn--edit{% if s.termo_assinado %} is-assinado{% endif %}"
+            class="icon-btn icon-btn--edit{% if s.termo_assinado %} is-assinado{% endif %}"
             aria-label="Ações do termo de {{ s.name }}"
             aria-haspopup="true"
             aria-expanded="false"

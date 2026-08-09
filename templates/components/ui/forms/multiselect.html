@@ -5,10 +5,10 @@ Campos que já usam o renderer de busca (data-entity-picker no widget, ex.:
 equipe do ofício) não devem ganhar este wrapper — o próprio search-picker
 já cuida da UI e do <select> nativo.
 {% endcomment %}
-{% if "cv-search-picker__native" in field.field.widget.attrs.class|default:"" %}
+{% if "search-picker__native" in field.field.widget.attrs.class|default:"" %}
   {{ field.as_widget }}
 {% else %}
-<div class="cv-custom-select{% if field.errors %} cv-custom-select--error{% endif %}{% if field.field.disabled %} cv-custom-select--disabled{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="multi">
+<div class="custom-select{% if field.errors %} custom-select--error{% endif %}{% if field.field.disabled %} custom-select--disabled{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="multi">
   {{ field.as_widget }}
 </div>
 {% endif %}

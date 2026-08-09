@@ -531,7 +531,7 @@ html[data-theme="light"] {
 }
 
 /* =========================================================
-   7. Botões Circulares — .cv-icon-btn
+   7. Botões Circulares — .icon-btn
    Uso exclusivo: ações compactas em listas, cards e ações
    documentais. Apenas ícone, sem texto visível.
    Obrigatório: aria-label + data-tooltip.
@@ -544,7 +544,7 @@ html[data-theme="light"] {
   --icon-btn-icon-size: 18px;
 }
 
-.cv-icon-btn {
+.icon-btn {
   --icon-btn-icon-size: 18px;
   align-items: center;
   background: var(--color-panel);
@@ -570,31 +570,31 @@ html[data-theme="light"] {
   width: var(--icon-btn-size);
 }
 
-.cv-icon-btn svg {
+.icon-btn svg {
   flex-shrink: 0;
   height: var(--icon-btn-icon-size);
   pointer-events: none;
   width: var(--icon-btn-icon-size);
 }
 
-.cv-icon-btn:hover,
-.cv-icon-btn:focus {
+.icon-btn:hover,
+.icon-btn:focus {
   box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
 }
 
-.cv-icon-btn:active {
+.icon-btn:active {
   box-shadow: var(--shadow-xs);
   transform: translateY(1px) scale(0.97);
 }
 
-.cv-icon-btn:focus-visible {
+.icon-btn:focus-visible {
   box-shadow: var(--btn-focus-ring);
   outline: none;
 }
 
-.cv-icon-btn:disabled,
-.cv-icon-btn[aria-disabled="true"] {
+.icon-btn:disabled,
+.icon-btn[aria-disabled="true"] {
   cursor: not-allowed;
   opacity: 0.45;
   pointer-events: none;
@@ -602,13 +602,13 @@ html[data-theme="light"] {
 }
 
 /* Tamanhos */
-.cv-icon-btn--sm {
+.icon-btn--sm {
   --icon-btn-icon-size: 17px;
   height: var(--icon-btn-size-sm);
   width: var(--icon-btn-size-sm);
 }
 
-.cv-icon-btn--lg {
+.icon-btn--lg {
   --icon-btn-icon-size: 19px;
   height: var(--icon-btn-size-lg);
   width: var(--icon-btn-size-lg);
@@ -617,255 +617,255 @@ html[data-theme="light"] {
 /* --- Variantes semânticas --- */
 
 /* Edit — neutro com hover azul discreto */
-.cv-icon-btn--edit {
+.icon-btn--edit {
   background: var(--color-panel);
   border-color: var(--btn-neutral-border);
   color: var(--color-label);
 }
 
-.cv-icon-btn--edit:hover,
-.cv-icon-btn--edit:focus {
+.icon-btn--edit:hover,
+.icon-btn--edit:focus {
   background: var(--btn-secondary-hover-bg);
   border-color: var(--btn-secondary-hover-border);
   color: var(--btn-secondary-hover-color);
 }
 
 /* Link / vincular — mesmo neutro do editar */
-.cv-icon-btn--link {
+.icon-btn--link {
   background: var(--color-panel);
   border-color: var(--btn-neutral-border);
   color: var(--color-label);
 }
 
-.cv-icon-btn--link:hover,
-.cv-icon-btn--link:focus {
+.icon-btn--link:hover,
+.icon-btn--link:focus {
   background: var(--btn-secondary-hover-bg);
   border-color: var(--btn-secondary-hover-border);
   color: var(--btn-secondary-hover-color);
 }
 
 /* Delete — vermelho destrutivo */
-.cv-icon-btn--delete {
+.icon-btn--delete {
   background: linear-gradient(135deg, #c0392b 0%, var(--color-danger) 100%);
   border-color: #951f18;
   color: var(--color-white);
 }
 
-.cv-icon-btn--delete:hover,
-.cv-icon-btn--delete:focus {
+.icon-btn--delete:hover,
+.icon-btn--delete:focus {
   background: linear-gradient(135deg, #a93328 0%, #951f18 100%);
   border-color: #7a1a14;
 }
 
 /* Cancelar — amber de alerta (distinto do vermelho de exclusão) */
-.cv-icon-btn--cancel {
+.icon-btn--cancel {
   background: linear-gradient(135deg, #b8860b 0%, var(--color-warning) 100%);
   border-color: #876317;
   color: var(--color-white);
 }
 
-.cv-icon-btn--cancel:hover,
-.cv-icon-btn--cancel:focus {
+.icon-btn--cancel:hover,
+.icon-btn--cancel:focus {
   background: linear-gradient(135deg, #9c7209 0%, #b8860b 100%);
   border-color: #75570a;
 }
 
 /* Preview — teal informativo (olho) */
-.cv-icon-btn--preview {
+.icon-btn--preview {
   background: var(--btn-preview-bg);
   border-color: var(--btn-secondary-border);
   color: var(--btn-preview-color);
 }
 
-.cv-icon-btn--preview:hover,
-.cv-icon-btn--preview:focus {
+.icon-btn--preview:hover,
+.icon-btn--preview:focus {
   background: var(--btn-preview-hover-bg);
   border-color: var(--btn-secondary-hover-border);
   color: var(--btn-preview-color);
 }
 
 /* Settings — gerenciar cadastros auxiliares (engrenagem) */
-.cv-icon-btn--settings {
+.icon-btn--settings {
   background: var(--color-panel);
   border-color: var(--btn-neutral-border);
   color: var(--color-label);
 }
 
-.cv-icon-btn--settings:hover,
-.cv-icon-btn--settings:focus {
+.icon-btn--settings:hover,
+.icon-btn--settings:focus {
   background: var(--btn-secondary-hover-bg);
   border-color: var(--btn-secondary-hover-border);
   color: var(--btn-secondary-hover-color);
 }
 
 /* Gerenciar modelos (engrenagem ao lado do campo) — accent dourado. */
-.cv-icon-btn--field-manage.cv-icon-btn--settings {
+.icon-btn--field-manage.icon-btn--settings {
   background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface-soft, var(--color-panel)));
   border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border, transparent));
   color: var(--color-accent);
 }
 
-.cv-icon-btn--field-manage.cv-icon-btn--settings:hover,
-.cv-icon-btn--field-manage.cv-icon-btn--settings:focus,
-.cv-icon-btn--field-manage.cv-icon-btn--settings:focus-visible {
+.icon-btn--field-manage.icon-btn--settings:hover,
+.icon-btn--field-manage.icon-btn--settings:focus,
+.icon-btn--field-manage.icon-btn--settings:focus-visible {
   background: color-mix(in srgb, var(--color-accent) 26%, var(--color-surface-muted, var(--color-panel)));
   border-color: var(--color-accent);
   color: var(--color-accent-text, var(--color-accent));
 }
 
 /* Star — definir como padrão (accent) */
-.cv-icon-btn--star {
+.icon-btn--star {
   background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface-soft, var(--color-panel)));
   border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-border, transparent));
   color: var(--color-accent);
 }
 
-.cv-icon-btn--star:hover,
-.cv-icon-btn--star:focus {
+.icon-btn--star:hover,
+.icon-btn--star:focus {
   background: color-mix(in srgb, var(--color-accent) 26%, var(--color-surface-muted, var(--color-panel)));
   border-color: var(--color-accent);
   color: var(--color-accent-text, var(--color-accent));
 }
 
 /* Sign — assinar (primary blue, caneta) */
-.cv-icon-btn--sign {
+.icon-btn--sign {
   background: var(--btn-primary-bg);
   border-color: var(--btn-primary-border);
   color: var(--color-white);
 }
 
-.cv-icon-btn--sign:hover,
-.cv-icon-btn--sign:focus {
+.icon-btn--sign:hover,
+.icon-btn--sign:focus {
   background: var(--btn-primary-hover-bg);
   border-color: var(--btn-primary-hover-border);
   color: var(--color-white);
 }
 
 /* Sign — já assinado: mesmo verde de "Concluir", indicador compacto sem badge de texto */
-.cv-icon-btn--sign.is-assinado {
+.icon-btn--sign.is-assinado {
   background: linear-gradient(135deg, #1f8f4e 0%, var(--color-success, #24a25b) 100%);
   border-color: #167039;
   color: var(--color-white, #fff);
 }
 
-.cv-icon-btn--sign.is-assinado:hover,
-.cv-icon-btn--sign.is-assinado:focus {
+.icon-btn--sign.is-assinado:hover,
+.icon-btn--sign.is-assinado:focus {
   background: linear-gradient(135deg, #1a7a43 0%, #1f8f4e 100%);
   border-color: #125d30;
 }
 
 /* Edit (⋯ menu de ações) — já assinado: mesmo indicador verde compacto do --sign */
-.cv-icon-btn--edit.is-assinado {
+.icon-btn--edit.is-assinado {
   background: linear-gradient(135deg, #1f8f4e 0%, var(--color-success, #24a25b) 100%);
   border-color: #167039;
   color: var(--color-white, #fff);
 }
 
-.cv-icon-btn--edit.is-assinado:hover,
-.cv-icon-btn--edit.is-assinado:focus {
+.icon-btn--edit.is-assinado:hover,
+.icon-btn--edit.is-assinado:focus {
   background: linear-gradient(135deg, #1a7a43 0%, #1f8f4e 100%);
   border-color: #125d30;
 }
 
 /* Settings (pasta / ações) — já assinado: mesmo indicador verde compacto do --sign */
-.cv-icon-btn--settings.is-assinado {
+.icon-btn--settings.is-assinado {
   background: linear-gradient(135deg, #1f8f4e 0%, var(--color-success, #24a25b) 100%);
   border-color: #167039;
   color: var(--color-white, #fff);
 }
 
-.cv-icon-btn--settings.is-assinado:hover,
-.cv-icon-btn--settings.is-assinado:focus {
+.icon-btn--settings.is-assinado:hover,
+.icon-btn--settings.is-assinado:focus {
   background: linear-gradient(135deg, #1a7a43 0%, #1f8f4e 100%);
   border-color: #125d30;
 }
 
 /* Signature — gerar assinatura (primary soft preenchido) */
-.cv-icon-btn--signature {
+.icon-btn--signature {
   background: var(--btn-secondary-bg);
   border-color: var(--btn-secondary-border);
   color: var(--btn-secondary-color);
 }
 
-.cv-icon-btn--signature:hover,
-.cv-icon-btn--signature:focus {
+.icon-btn--signature:hover,
+.icon-btn--signature:focus {
   background: var(--btn-secondary-hover-bg);
   border-color: var(--btn-secondary-hover-border);
   color: var(--btn-secondary-hover-color);
 }
 
 /* Concluir — verde de sucesso, preenchido (finalizar prestação) */
-.cv-icon-btn--complete {
+.icon-btn--complete {
   background: linear-gradient(135deg, #1f8f4e 0%, var(--color-success, #24a25b) 100%);
   border-color: #167039;
   color: var(--color-white, #fff);
 }
 
-.cv-icon-btn--complete:hover,
-.cv-icon-btn--complete:focus {
+.icon-btn--complete:hover,
+.icon-btn--complete:focus {
   background: linear-gradient(135deg, #1a7a43 0%, #1f8f4e 100%);
   border-color: #125d30;
 }
 
 /* WhatsApp — verde característico, preenchido (aviso de liberação de diárias) */
-.cv-icon-btn--whatsapp {
+.icon-btn--whatsapp {
   background: linear-gradient(135deg, #1fa855 0%, #25d366 100%);
   border-color: #1f8f4e;
   color: #fff;
 }
 
-.cv-icon-btn--whatsapp:hover,
-.cv-icon-btn--whatsapp:focus {
+.icon-btn--whatsapp:hover,
+.icon-btn--whatsapp:focus {
   background: linear-gradient(135deg, #1f8f4e 0%, #1fa855 100%);
   border-color: #167039;
 }
 
 /* Arquivar — âmbar sóbrio; desarquivar/reabrir usam o neutro (--edit) */
-.cv-icon-btn--archive {
+.icon-btn--archive {
   background: var(--color-panel);
   border-color: var(--btn-neutral-border);
   color: var(--color-label);
 }
 
-.cv-icon-btn--archive:hover,
-.cv-icon-btn--archive:focus {
+.icon-btn--archive:hover,
+.icon-btn--archive:focus {
   background: var(--btn-secondary-hover-bg);
   border-color: var(--btn-secondary-hover-border);
   color: var(--btn-secondary-hover-color);
 }
 
 /* PDF — vermelho documental, preenchido */
-.cv-icon-btn--pdf {
+.icon-btn--pdf {
   background: var(--btn-pdf-bg);
   border-color: rgba(145, 41, 31, 0.92);
   box-shadow: 0 4px 10px rgba(190, 56, 43, 0.18);
   color: #fff;
 }
 
-.cv-icon-btn--pdf:hover,
-.cv-icon-btn--pdf:focus {
+.icon-btn--pdf:hover,
+.icon-btn--pdf:focus {
   background: var(--btn-pdf-hover-bg);
   border-color: rgba(125, 34, 26, 0.95);
   box-shadow: 0 6px 14px rgba(190, 56, 43, 0.24);
 }
 
 /* DOCX — azul arquivo, preenchido */
-.cv-icon-btn--docx {
+.icon-btn--docx {
   background: var(--btn-docx-bg);
   border-color: rgba(24, 69, 125, 0.92);
   box-shadow: 0 4px 10px rgba(26, 84, 152, 0.18);
   color: #fff;
 }
 
-.cv-icon-btn--docx:hover,
-.cv-icon-btn--docx:focus {
+.icon-btn--docx:hover,
+.icon-btn--docx:focus {
   background: var(--btn-docx-hover-bg);
   border-color: rgba(18, 55, 102, 0.96);
   box-shadow: 0 6px 14px rgba(26, 84, 152, 0.24);
 }
 
-/* --- Tooltip CSS (scoped em cv-icon-btn) --- */
-.cv-icon-btn[data-tooltip]::after {
+/* --- Tooltip CSS (scoped em icon-btn) --- */
+.icon-btn[data-tooltip]::after {
   background: var(--icon-btn-tooltip-bg);
   border: 1px solid var(--icon-btn-tooltip-border);
   border-radius: 7px;
@@ -888,48 +888,48 @@ html[data-theme="light"] {
   z-index: var(--z-dropdown);
 }
 
-.cv-icon-btn[data-tooltip]:hover::after,
-.cv-icon-btn[data-tooltip]:focus-visible::after {
+.icon-btn[data-tooltip]:hover::after,
+.icon-btn[data-tooltip]:focus-visible::after {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
 
-.cv-icon-btn[data-tooltip]:hover,
-.cv-icon-btn[data-tooltip]:focus-visible {
+.icon-btn[data-tooltip]:hover,
+.icon-btn[data-tooltip]:focus-visible {
   z-index: calc(var(--z-dropdown) + 1);
 }
 
-.cv-icon-btn[data-tooltip][aria-expanded="true"]::after {
+.icon-btn[data-tooltip][aria-expanded="true"]::after {
   content: none;
   display: none;
 }
 
 /* Grupo de icon buttons (para listas e cards) */
-.cv-icon-btn-group {
+.icon-btn-group {
   align-items: center;
   display: flex;
   gap: var(--space-2);
   overflow: visible;
 }
 
-.cv-icon-btn-group .cv-icon-btn[data-tooltip]::after {
+.icon-btn-group .icon-btn[data-tooltip]::after {
   left: auto;
   right: 0;
   transform: translateY(4px);
 }
 
-.cv-icon-btn-group .cv-icon-btn[data-tooltip]:hover::after,
-.cv-icon-btn-group .cv-icon-btn[data-tooltip]:focus-visible::after {
+.icon-btn-group .icon-btn[data-tooltip]:hover::after,
+.icon-btn-group .icon-btn[data-tooltip]:focus-visible::after {
   transform: translateY(0);
 }
 
-.has-cv-global-tooltips .cv-icon-btn[data-tooltip]::after,
+.has-cv-global-tooltips .icon-btn[data-tooltip]::after,
 .has-cv-global-tooltips [data-tooltip]::after {
   content: none;
   display: none;
 }
 
-.cv-global-tooltip {
+.global-tooltip {
   background: var(--icon-btn-tooltip-bg);
   border: 1px solid var(--icon-btn-tooltip-border);
   border-radius: 7px;
@@ -951,13 +951,13 @@ html[data-theme="light"] {
   z-index: calc(var(--z-modal, 1000) + 20);
 }
 
-.cv-global-tooltip.is-visible {
+.global-tooltip.is-visible {
   opacity: 1;
   transform: translateY(0);
 }
 
 /* Tooltip do botão Gerenciar modelos — amarelo dourado (accent). */
-.cv-global-tooltip.cv-global-tooltip--accent {
+.global-tooltip.global-tooltip--accent {
   background: var(--color-accent);
   border-color: var(--color-accent);
   box-shadow: 0 10px 24px color-mix(in srgb, var(--color-accent) 35%, transparent);
@@ -965,7 +965,7 @@ html[data-theme="light"] {
 }
 
 /* =========================================================
-   8. Botões Acoplados a Campo — .cv-field-action
+   8. Botões Acoplados a Campo — .field-action
    Uso OBRIGATÓRIO: quando o botão estiver ao lado de
    input, select ou campo de filtro.
    Formato: retangular com bordas arredondadas. NUNCA pill.
@@ -974,19 +974,19 @@ html[data-theme="light"] {
 :root {
 }
 
-.cv-field-action .cv-btn__icon {
+.field-action .cv-btn__icon {
   height: 17px;
   width: 17px;
 }
 
 /* =========================================================
-   9. Botão de Rodapé — .cv-footer-action
+   9. Botão de Rodapé — .footer-action
    Uso: adicionar itens dentro de cards/blocos.
    Integrado ao rodapé — largura total, hover sinaliza
    que o rodapé inteiro é clicável.
    ========================================================= */
 
-.cv-footer-action {
+.footer-action {
   align-items: center;
   background: var(--color-card);
   border: none;
@@ -1010,25 +1010,25 @@ html[data-theme="light"] {
   width: 100%;
 }
 
-.cv-footer-action:hover,
-.cv-footer-action:focus {
+.footer-action:hover,
+.footer-action:focus {
   background: var(--btn-footer-hover-bg);
   border-top-color: var(--btn-footer-hover-border);
   color: var(--btn-footer-hover-color);
   transform: translateY(-1px);
 }
 
-.cv-footer-action:active {
+.footer-action:active {
   filter: brightness(0.985);
   transform: translateY(1px);
 }
 
-.cv-footer-action:focus-visible {
+.footer-action:focus-visible {
   box-shadow: var(--btn-focus-ring);
   outline: none;
 }
 
-.cv-footer-action:disabled {
+.footer-action:disabled {
   cursor: not-allowed;
   opacity: var(--btn-disabled-opacity);
   pointer-events: none;
@@ -1039,7 +1039,7 @@ html[data-theme="light"] {
    Uso: acao principal persistente de formularios/cadastros.
    ========================================================= */
 
-.cv-floating-action {
+.floating-action {
   bottom: var(--space-6);
   position: fixed;
   right: var(--space-6);
@@ -1047,7 +1047,7 @@ html[data-theme="light"] {
 }
 
 @media (max-width: 640px) {
-  .cv-floating-action {
+  .floating-action {
     bottom: var(--space-4);
     left: var(--space-4);
     right: var(--space-4);
@@ -1059,55 +1059,55 @@ html[data-theme="light"] {
    "Novo usuário") — empilha em vez de sobrepor.
 
    Precisa ficar DEPOIS da base deste arquivo: `page-shell.css` também declara
-   `.cv-floating-action { bottom }` e, no bundle, este arquivo é o último a
+   `.floating-action { bottom }` e, no bundle, este arquivo é o último a
    falar sobre a propriedade. Enquanto o modificador morou lá, ele era vencido
    pela base daqui e as duas ações caíam uma em cima da outra (NOVO-23). */
-.cv-floating-action--stacked {
+.floating-action--stacked {
   bottom: calc(var(--space-6) + var(--control-height-md) + var(--space-3));
 }
 
 @media (max-width: 640px) {
-  .cv-floating-action--stacked {
+  .floating-action--stacked {
     bottom: calc(var(--space-4) + var(--control-height-md) + var(--space-3));
   }
 }
 
 /* Add — ação de adição com plus */
-.cv-footer-action--add {
+.footer-action--add {
   background: var(--color-card);
   color: var(--color-label);
 }
 
-.cv-footer-action--add:hover,
-.cv-footer-action--add:focus {
+.footer-action--add:hover,
+.footer-action--add:focus {
   background: var(--btn-footer-hover-bg);
   border-top-color: var(--btn-footer-hover-border);
   color: var(--btn-footer-hover-color);
 }
 
 /* Primary — criação mais destacada */
-.cv-footer-action--primary {
+.footer-action--primary {
   background: var(--btn-primary-bg);
   border-top-color: transparent;
   color: var(--color-white);
 }
 
-.cv-footer-action--primary:hover,
-.cv-footer-action--primary:focus {
+.footer-action--primary:hover,
+.footer-action--primary:focus {
   background: var(--btn-primary-hover-bg);
   border-top-color: transparent;
   color: var(--color-white);
 }
 
 /* Neutral — ação discreta, borda tracejada */
-.cv-footer-action--neutral {
+.footer-action--neutral {
   background: transparent;
   border-top: 1px solid var(--btn-footer-border);
   color: var(--color-label);
 }
 
-.cv-footer-action--neutral:hover,
-.cv-footer-action--neutral:focus {
+.footer-action--neutral:hover,
+.footer-action--neutral:focus {
   background: var(--btn-footer-hover-bg);
   border-top-color: var(--btn-footer-hover-border);
   color: var(--btn-footer-hover-color);
@@ -1119,9 +1119,9 @@ html[data-theme="light"] {
 
    O comentário original desta regra dizia "tamanho e alinhamento
    consistentes", mas o seletor era `:is(html[data-theme="dark"])
-   .cv-btn__icon .cv-icon` — a consistência valia num tema só.
+   .cv-btn__icon .icon` — a consistência valia num tema só.
 
-   `.cv-icon` é um `<svg>` sem `width`/`height` no atributo, e `.cv-btn__icon`
+   `.icon` é um `<svg>` sem `width`/`height` no atributo, e `.cv-btn__icon`
    nunca teve regra base. Sem alguém dizer o tamanho, o SVG colapsa: medido no
    tema claro, o ícone de "Limpar filtros" sai **0×0** enquanto no escuro sai
    17×17. Não é ícone diferente entre os temas — é ícone que **não aparece** no
@@ -1134,7 +1134,7 @@ html[data-theme="light"] {
    ícone por conta própria (`list-header.css:1029`, `action-system.css:340`).
    ========================================================================== */
 
-:where(.cv-btn__icon .cv-icon) {
+:where(.cv-btn__icon .icon) {
   display: block;
   height: var(--btn-icon-size);
   width: var(--btn-icon-size);

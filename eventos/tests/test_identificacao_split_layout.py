@@ -40,7 +40,7 @@ class IdentificacaoSplitLayoutTests(TestCase):
         ident_chunk = html[ident_start:motivo_start]
         motivo_chunk = html[motivo_start:dados_start]
 
-        self.assertIn("cv-form-block--split", ident_chunk)
+        self.assertIn("form-block--split", ident_chunk)
         self.assertIn("evento-identificacao-split", ident_chunk)
         self.assertIn('name="tipos"', ident_chunk)
         self.assertNotIn("modelo_motivo", ident_chunk)

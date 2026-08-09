@@ -1,6 +1,6 @@
 /* Accessible application shell and mobile navigation drawer. */
 
-.cv-skip-link {
+.skip-link {
   left: 16px;
   padding: 10px 14px;
   position: fixed;
@@ -10,7 +10,7 @@
   z-index: calc(var(--z-modal, 1000) + 10);
 }
 
-.cv-skip-link:focus {
+.skip-link:focus {
   transform: translateY(0);
 }
 
@@ -127,7 +127,7 @@
 @media (prefers-reduced-motion: reduce) {
   .sidebar,
   .sidebar-scrim,
-  .cv-skip-link {
+  .skip-link {
     transition: none;
   }
 }

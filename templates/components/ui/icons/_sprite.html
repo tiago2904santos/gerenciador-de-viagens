@@ -8,7 +8,7 @@ em média. Aqui cada desenho aparece UMA vez e o `icon.html` só aponta para ele
 Os atributos de traço ficam em cada `<symbol>`, não no invólucro: o `<use>` clona o
 símbolo com os atributos dele, então o invólucro fica com 3 atributos em vez de 8.
 CSS de fora não alcança o conteúdo clonado — só herança —, e nenhuma regra do projeto
-mira descendente de `.cv-icon`, então isso não muda pintura nenhuma.
+mira descendente de `.icon`, então isso não muda pintura nenhuma.
 
 Precisa entrar em toda raiz de documento que use ícone. Hoje são duas: `base.html`, que
 cobre tudo que a estende, e `documentos/geracao_aguarde_embedded.html`, que é raiz
@@ -17,7 +17,7 @@ não desenha —, então quem garante é `core/tests/test_folha_de_icones.py`.
 
 A geometria veio dos 36 ramos do `icon.html` sem alteração.
 {% endcomment %}
-<svg class="cv-icon-sprite" aria-hidden="true" focusable="false">
+<svg class="icon-sprite" aria-hidden="true" focusable="false">
   <symbol id="cv-icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
     <path d="M4.75 12.75l4.6 4.6L19.25 7.1"></path>
   </symbol>

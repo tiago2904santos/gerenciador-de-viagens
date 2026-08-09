@@ -1,31 +1,31 @@
-<div class="cv-record-list simple-list perfil-pendencias-list" role="list">
+<div class="record-list simple-list perfil-pendencias-list" role="list">
   {% for p in drive_pendencias %}
-    <article class="cv-record-row" role="listitem">
-      <div class="cv-record-row__content">
-        <div class="cv-record-row__heading">
-          <span class="cv-record-row__title">{{ p.titulo }}</span>
-          <span class="cv-record-row__badges">
+    <article class="record-row" role="listitem">
+      <div class="record-row__content">
+        <div class="record-row__heading">
+          <span class="record-row__title">{{ p.titulo }}</span>
+          <span class="record-row__badges">
             {% include "components/ui/badges/chip.html" with tone="muted" label=p.tipo_label size="compact" only %}
           </span>
         </div>
 
         {% if p.contexto %}
-          <p class="cv-record-row__subtitle">{{ p.contexto }}</p>
+          <p class="record-row__subtitle">{{ p.contexto }}</p>
         {% endif %}
 
-        <p class="cv-record-row__subtitle perfil-pendencia__motivo">
+        <p class="record-row__subtitle perfil-pendencia__motivo">
           {{ p.motivo }}{% if p.acao %} — {{ p.acao }}{% endif %}
         </p>
 
-        <div class="cv-record-row__facts">
-          <span class="cv-record-row__fact">
-            <span class="cv-record-row__fact-label">Tentativas</span>
-            <span class="cv-record-row__fact-value">{{ p.tentativas }}</span>
+        <div class="record-row__facts">
+          <span class="record-row__fact">
+            <span class="record-row__fact-label">Tentativas</span>
+            <span class="record-row__fact-value">{{ p.tentativas }}</span>
           </span>
-          <span class="cv-record-row__facts-sep" aria-hidden="true">·</span>
-          <span class="cv-record-row__fact">
-            <span class="cv-record-row__fact-label">Atualizado</span>
-            <span class="cv-record-row__fact-value">{{ p.atualizado_em|date:"d/m H:i" }}</span>
+          <span class="record-row__facts-sep" aria-hidden="true">·</span>
+          <span class="record-row__fact">
+            <span class="record-row__fact-label">Atualizado</span>
+            <span class="record-row__fact-value">{{ p.atualizado_em|date:"d/m H:i" }}</span>
           </span>
         </div>
 

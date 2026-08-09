@@ -1,27 +1,27 @@
 {# Miolo do card de ofício — viajantes (modelo roster), transporte/roteiro e justificativa. #}
-<div class="cv-record-card__band">
-  <ul class="cv-person-list cv-person-list--n{{ card.servidores_count|default:0 }}">
+<div class="record-card__band">
+  <ul class="person-list person-list--n{{ card.servidores_count|default:0 }}">
     {% for s in card.servidores %}
-    <li class="cv-person-row{% if s.is_motorista %} cv-person-row--highlight{% endif %}">
-      <span class="cv-person-row__avatar" aria-hidden="true">{{ s.initials }}</span>
+    <li class="person-row{% if s.is_motorista %} person-row--highlight{% endif %}">
+      <span class="person-row__avatar" aria-hidden="true">{{ s.initials }}</span>
 
-      <div class="cv-person-row__body">
-        <div class="cv-person-row__name-row">
-          <span class="cv-person-row__name">{{ s.name }}</span>
+      <div class="person-row__body">
+        <div class="person-row__name-row">
+          <span class="person-row__name">{{ s.name }}</span>
           {% if s.is_motorista %}
-          <span class="cv-person-row__badge">Motorista</span>
+          <span class="person-row__badge">Motorista</span>
           {% endif %}
         </div>
         {% if s.cargo or s.unidade %}
-        <span class="cv-person-row__meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
+        <span class="person-row__meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
         {% endif %}
       </div>
 
       {% if s.has_termo %}
-      <div class="cv-person-row__actions">
+      <div class="person-row__actions">
         <button
           type="button"
-          class="cv-icon-btn cv-icon-btn--edit{% if s.termo_assinado %} is-assinado{% endif %}"
+          class="icon-btn icon-btn--edit{% if s.termo_assinado %} is-assinado{% endif %}"
           aria-label="Ações do termo de {{ s.name }}"
           aria-haspopup="true"
           aria-expanded="false"
@@ -37,43 +37,43 @@
 
     </li>
     {% empty %}
-    <li class="cv-empty-hint">Nenhum servidor informado</li>
+    <li class="empty-hint">Nenhum servidor informado</li>
     {% endfor %}
   </ul>
 </div>
 
-<div class="cv-record-card__band">
-  <div class="cv-fact-grid">
+<div class="record-card__band">
+  <div class="fact-grid">
 
-    <div class="cv-fact-block{% if card.motorista_is_carona %} cv-fact-block--motorista-externo{% endif %}">
-      <span class="cv-fact-block__label">Placa</span>
+    <div class="fact-block{% if card.motorista_is_carona %} fact-block--motorista-externo{% endif %}">
+      <span class="fact-block__label">Placa</span>
       {% if card.veiculo_placa %}
-        <div class="cv-fact-block__value">{{ card.veiculo_placa }}</div>
+        <div class="fact-block__value">{{ card.veiculo_placa }}</div>
       {% else %}
-        <div class="cv-fact-block__value cv-empty-hint">Não informado</div>
+        <div class="fact-block__value empty-hint">Não informado</div>
       {% endif %}
       {% if card.veiculo_modelo %}
-        <span class="cv-fact-block__label">Modelo</span>
-        <div class="cv-fact-block__value--secondary">{{ card.veiculo_modelo }}</div>
+        <span class="fact-block__label">Modelo</span>
+        <div class="fact-block__value--secondary">{{ card.veiculo_modelo }}</div>
       {% endif %}
       {% if card.motorista_is_carona and card.motorista_display %}
-        <span class="cv-fact-block__label">Motorista</span>
-        <div class="cv-fact-block__value">{{ card.motorista_display }}</div>
+        <span class="fact-block__label">Motorista</span>
+        <div class="fact-block__value">{{ card.motorista_display }}</div>
         {% if card.motorista_referencia_display %}
-          <span class="cv-fact-block__hint">{{ card.motorista_referencia_display }}</span>
+          <span class="fact-block__hint">{{ card.motorista_referencia_display }}</span>
         {% endif %}
       {% endif %}
     </div>
 
     {% if card.trechos %}
-    <div class="cv-fact-block cv-fact-block--trechos">
-      <span class="cv-fact-block__label">Trechos encontrados</span>
-      <ul class="cv-itinerary">
+    <div class="fact-block fact-block--trechos">
+      <span class="fact-block__label">Trechos encontrados</span>
+      <ul class="itinerary">
         {% for trecho in card.trechos %}
-        <li class="cv-itinerary__leg">
-          <div class="cv-itinerary__route">{{ trecho.rota }}</div>
+        <li class="itinerary__leg">
+          <div class="itinerary__route">{{ trecho.rota }}</div>
           {% if trecho.saida or trecho.chegada %}
-          <div class="cv-itinerary__time">
+          <div class="itinerary__time">
             {% if trecho.saida %}{{ trecho.saida }}{% endif %}
             {% if trecho.saida and trecho.chegada %} → {% endif %}
             {% if trecho.chegada %}{{ trecho.chegada }}{% endif %}
@@ -86,12 +86,12 @@
     {% endif %}
 
     {% if card.valor_diarias_display %}
-    <div class="cv-fact-block cv-fact-block--valor">
-      <span class="cv-fact-block__label">Valor Total</span>
-      <div class="cv-fact-block__value--strong">{{ card.valor_diarias_display }}</div>
+    <div class="fact-block fact-block--valor">
+      <span class="fact-block__label">Valor Total</span>
+      <div class="fact-block__value--strong">{{ card.valor_diarias_display }}</div>
       {% if card.valor_diarias_extenso %}
-      <span class="cv-fact-block__label">Valor por Extenso</span>
-      <div class="cv-fact-block__value--long">{{ card.valor_diarias_extenso }}</div>
+      <span class="fact-block__label">Valor por Extenso</span>
+      <div class="fact-block__value--long">{{ card.valor_diarias_extenso }}</div>
       {% endif %}
     </div>
     {% endif %}
@@ -99,19 +99,19 @@
   </div>
 </div>
 
-<div class="cv-record-card__band cv-record-card__band--justificativas">
-  <ul class="cv-person-list cv-person-list--n1">
-    <li class="cv-person-row cv-fact-row">
-      <div class="cv-person-row__body">
-        <div class="cv-person-row__name-row">
-          <span class="cv-person-row__name">JUSTIFICATIVA</span>
+<div class="record-card__band record-card__band--justificativas">
+  <ul class="person-list person-list--n1">
+    <li class="person-row fact-row">
+      <div class="person-row__body">
+        <div class="person-row__name-row">
+          <span class="person-row__name">JUSTIFICATIVA</span>
           {% if card.justificativa %}
-            <span class="cv-person-row__badge">{{ card.justificativa.status_label }}</span>
+            <span class="person-row__badge">{{ card.justificativa.status_label }}</span>
           {% else %}
-            <span class="cv-person-row__badge">Pendente</span>
+            <span class="person-row__badge">Pendente</span>
           {% endif %}
         </div>
-        <span class="cv-person-row__meta">
+        <span class="person-row__meta">
           {% if card.justificativa %}
             {{ card.justificativa.texto_resumido }}
           {% else %}
@@ -119,10 +119,10 @@
           {% endif %}
         </span>
       </div>
-      <div class="cv-person-row__termo cv-icon-btn-group">
+      <div class="person-row__termo icon-btn-group">
         {% include "components/ui/buttons/icon_button.html" with href=card.justificativa_url action="edit" aria_label="Editar justificativa" tooltip="Editar justificativa" only %}
         <button
-          class="cv-icon-btn cv-icon-btn--documents"
+          class="icon-btn icon-btn--documents"
           type="button"
           aria-label="Abrir documentos da justificativa"
           aria-haspopup="true"

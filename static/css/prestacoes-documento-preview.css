@@ -96,7 +96,7 @@
     justify-content: stretch;
   }
 
-  .document-inline-actions--header .cv-icon-btn {
+  .document-inline-actions--header .icon-btn {
     flex: 1 1 auto;
     justify-content: center;
   }

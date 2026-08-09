@@ -1,4 +1,4 @@
-.cv-document-loading {
+.document-loading {
   position: fixed;
   right: 20px;
   bottom: 20px;
@@ -7,11 +7,11 @@
   pointer-events: none;
 }
 
-.cv-document-loading[hidden] {
+.document-loading[hidden] {
   display: none;
 }
 
-.cv-document-loading__panel {
+.document-loading__panel {
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
@@ -25,7 +25,7 @@
   text-align: left;
 }
 
-.cv-document-loading__spinner {
+.document-loading__spinner {
   grid-row: 1 / span 2;
   width: 30px;
   height: 30px;
@@ -35,26 +35,26 @@
   animation: cv-document-loading-spin 0.72s linear infinite;
 }
 
-.cv-document-loading__title {
+.document-loading__title {
   margin: 0;
   color: var(--color-heading);
   font-size: 0.92rem;
   font-weight: 800;
 }
 
-.cv-document-loading__detail {
+.document-loading__detail {
   margin: -8px 0 0;
   color: var(--color-text-muted);
   font-size: 0.875rem;
   line-height: 1.45;
 }
 
-.cv-document-loading.is-error .cv-document-loading__spinner {
+.document-loading.is-error .document-loading__spinner {
   border-color: var(--color-danger);
   animation: none;
 }
 
-.cv-document-loading.is-error .cv-document-loading__spinner::after {
+.document-loading.is-error .document-loading__spinner::after {
   content: "!";
   display: grid;
   height: 100%;
@@ -69,7 +69,7 @@
 }
 
 @media (max-width: 600px) {
-  .cv-document-loading {
+  .document-loading {
     right: 16px;
     bottom: 16px;
     left: 16px;
@@ -84,7 +84,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cv-document-loading__spinner {
+  .document-loading__spinner {
     animation-duration: 1.8s;
   }
 }

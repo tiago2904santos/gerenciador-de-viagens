@@ -13,4 +13,4 @@ justamente no arquivo que existe para encolher a página.
 
 O filtro `nome_de_icone` garante que o `id` sempre existe: nome desconhecido vira
 `unknown`, a mesma interrogação de antes, em vez de um `<use>` apontando para o nada.
-{% endcomment %}{% load icones %}<svg class="cv-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#cv-icon-{{ icon|nome_de_icone }}"></use></svg>
+{% endcomment %}{% load icones %}<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#cv-icon-{{ icon|nome_de_icone }}"></use></svg>

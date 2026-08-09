@@ -63,7 +63,7 @@ class FormularioDeProva(forms.Form):
         self.fields["busca"] = forms.ChoiceField(
             choices=[("a", "A")],
             help_text="Busque e selecione.",
-            widget=forms.Select(attrs={"class": "cv-search-picker__native"}),
+            widget=forms.Select(attrs={"class": "search-picker__native"}),
         )
 
 

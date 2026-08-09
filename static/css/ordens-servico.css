@@ -188,17 +188,17 @@
   --form-control-height: var(--control-height-md, 44px);
 }
 
-.os-servidor-role-panel__picker .cv-search-picker__field {
+.os-servidor-role-panel__picker .search-picker__field {
   gap: 7px;
 }
 
-.os-servidor-role-panel__picker .cv-search-picker__label,
-.os-servidor-role-panel__picker .cv-search-picker__hint {
+.os-servidor-role-panel__picker .search-picker__label,
+.os-servidor-role-panel__picker .search-picker__hint {
   display: none;
 }
 
 /* Toggle = evento-doc-toggle (poço --step1-field). */
-.os-servidor-role-panel__toggle.cv-segment-toggle {
+.os-servidor-role-panel__toggle.segment-toggle {
   background: var(--step1-field, var(--color-surface-muted));
   border-color: transparent;
   border-radius: 10px;
@@ -210,7 +210,7 @@
   width: 100%;
 }
 
-.os-servidor-role-panel__toggle .cv-segment-toggle__btn {
+.os-servidor-role-panel__toggle .segment-toggle__btn {
   border-radius: 7px;
   color: var(--color-muted-strong);
   justify-content: center;
@@ -222,7 +222,7 @@
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
-.os-servidor-role-panel__toggle .cv-segment-toggle__btn[aria-pressed="true"] {
+.os-servidor-role-panel__toggle .segment-toggle__btn[aria-pressed="true"] {
   background: var(--color-accent);
   border-color: var(--color-accent);
   box-shadow: none;
@@ -230,7 +230,7 @@
   transform: none;
 }
 
-.os-servidor-role-panel__toggle .cv-segment-toggle__btn:hover:not([aria-pressed="true"]) {
+.os-servidor-role-panel__toggle .segment-toggle__btn:hover:not([aria-pressed="true"]) {
   background: color-mix(in srgb, #fff 5%, transparent);
   color: var(--color-text);
 }
@@ -260,13 +260,13 @@
 /* ── Dark: só o que o step1 global não cobre ─────────────────────────────── */
 
 :is(html[data-theme="dark"])
-  .os-page .os-form-card .cv-form-card__footer .cv-card-footer-section__divider {
+  .os-page .os-form-card .form-card__footer .card-footer-section__divider {
   border-top: 1px solid var(--form-section-border, var(--color-border));
   display: block;
 }
 
 :is(html[data-theme="dark"])
-  .os-page .os-form-card .cv-form-card__footer .cv-card-footer {
+  .os-page .os-form-card .form-card__footer .card-footer {
   background: transparent;
   border: 0;
   box-shadow: none;
@@ -279,7 +279,7 @@
 }
 
 :is(html[data-theme="dark"])
-  .os-page .os-form-card .os-servidor-role-panel__toggle.cv-segment-toggle {
+  .os-page .os-form-card .os-servidor-role-panel__toggle.segment-toggle {
   background: var(--step1-field);
   border-color: transparent;
 }
@@ -287,17 +287,17 @@
 /* Busca: poço --step1-field, fixo (como Documentos vinculados). */
 :is(html[data-theme="dark"])
   .os-page .os-form-card #os-card-servidores :is(
-    .cv-search-picker__control,
-    .cv-search-picker__input
+    .search-picker__control,
+    .search-picker__input
   ),
 :is(html[data-theme="dark"])
   .os-page .os-form-card #os-card-servidores :is(
-    .cv-search-picker__control,
-    .cv-search-picker__input
+    .search-picker__control,
+    .search-picker__input
   ):is(:hover, :focus, :focus-within, :focus-visible),
 :is(html[data-theme="dark"])
-  .os-page .os-form-card #os-card-servidores .cv-search-picker__field:focus-within
-  .cv-search-picker__control {
+  .os-page .os-form-card #os-card-servidores .search-picker__field:focus-within
+  .search-picker__control {
   background: var(--step1-field, var(--color-input-bg)) !important;
   background-color: var(--step1-field, var(--color-input-bg)) !important;
   border-color: transparent !important;
@@ -342,34 +342,34 @@
 
 :is(html[data-theme="dark"])
   .os-page .os-form-card #os-oficio-lista
-  .cv-search-picker__selected-card:not(.is-active):not([aria-pressed="true"]) {
+  .search-picker__selected-card:not(.is-active):not([aria-pressed="true"]) {
   background: var(--step1-field) !important;
   border-color: transparent !important;
 }
 
 :is(html[data-theme="dark"])
   .os-page .os-form-card #os-oficio-lista
-  .cv-search-picker__selected-card:not(.is-active):not([aria-pressed="true"]):hover {
+  .search-picker__selected-card:not(.is-active):not([aria-pressed="true"]):hover {
   background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field)) !important;
 }
 
 /* Cards de servidores no poço dos campos; destaque dourado só na função ativa. */
 :is(html[data-theme="dark"])
   .os-page #os-card-servidores
-  .cv-search-picker__selected-card:not(.cv-search-picker__selected-card--driver) {
+  .search-picker__selected-card:not(.search-picker__selected-card--driver) {
   background: var(--step1-field) !important;
   border-color: transparent !important;
 }
 
 :is(html[data-theme="dark"])
   .os-page #os-card-servidores
-  .cv-search-picker__selected-card:not(.cv-search-picker__selected-card--driver):hover {
+  .search-picker__selected-card:not(.search-picker__selected-card--driver):hover {
   background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field)) !important;
 }
 
 /* Equipe da OS: flat como Documentos vinculados (busca + lista próximas). */
 .os-page #os-card-servidores
-  .cv-search-picker--people.cv-search-picker--roster {
+  .search-picker--people.search-picker--roster {
   background: transparent !important;
   border: 0 !important;
   border-radius: 0;
@@ -379,8 +379,8 @@
 }
 
 .os-page #os-card-servidores
-  .cv-search-picker--people.cv-search-picker--roster
-  .cv-search-picker__selected-panel {
+  .search-picker--people.search-picker--roster
+  .search-picker__selected-panel {
   background: transparent !important;
   border: 0 !important;
   border-radius: 0;
@@ -391,8 +391,8 @@
 }
 
 .os-page #os-card-servidores
-  .cv-search-picker--people.cv-search-picker--roster
-  .cv-search-picker__selected-list {
+  .search-picker--people.search-picker--roster
+  .search-picker__selected-list {
   display: grid;
   gap: 8px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -402,25 +402,25 @@
 }
 
 .os-page #os-card-servidores
-  .cv-search-picker--people.cv-search-picker--roster
-  .cv-search-picker__selected-card {
+  .search-picker--people.search-picker--roster
+  .search-picker__selected-card {
   min-width: 0;
 }
 
 .os-page #os-card-servidores
-  .cv-search-picker--people.cv-search-picker--roster
-  .cv-search-picker__selected-name {
+  .search-picker--people.search-picker--roster
+  .search-picker__selected-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .os-page #os-card-servidores
-  .cv-search-picker--people.cv-search-picker--roster
-  .cv-search-picker__selected-card:only-child,
+  .search-picker--people.search-picker--roster
+  .search-picker__selected-card:only-child,
 .os-page #os-card-servidores
-  .cv-search-picker--people.cv-search-picker--roster
-  .cv-search-picker__selected-card:last-child:nth-child(odd) {
+  .search-picker--people.search-picker--roster
+  .search-picker__selected-card:last-child:nth-child(odd) {
   grid-column: 1 / -1;
 }
 
@@ -430,17 +430,17 @@
   }
 
   .os-page #os-card-servidores
-    .cv-search-picker--people.cv-search-picker--roster
-    .cv-search-picker__selected-list {
+    .search-picker--people.search-picker--roster
+    .search-picker__selected-list {
     grid-template-columns: 1fr;
   }
 
   .os-page #os-card-servidores
-    .cv-search-picker--people.cv-search-picker--roster
-    .cv-search-picker__selected-card:only-child,
+    .search-picker--people.search-picker--roster
+    .search-picker__selected-card:only-child,
   .os-page #os-card-servidores
-    .cv-search-picker--people.cv-search-picker--roster
-    .cv-search-picker__selected-card:last-child:nth-child(odd) {
+    .search-picker--people.search-picker--roster
+    .search-picker__selected-card:last-child:nth-child(odd) {
     grid-column: auto;
   }
 }

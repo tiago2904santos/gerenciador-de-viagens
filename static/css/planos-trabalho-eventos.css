@@ -588,7 +588,7 @@ html[data-theme="dark"] .pt-add-evento__btn:focus-visible {
   gap: var(--space-2);
 }
 
-.pt-document-preview__actions .cv-icon-btn {
+.pt-document-preview__actions .icon-btn {
   border: 0 !important;
   background: var(--step1-surface) !important;
   box-shadow: none !important;
@@ -606,28 +606,28 @@ html[data-theme="dark"] .pt-add-evento__btn:focus-visible {
   background: var(--step1-surface) !important;
 }
 
-.pt-documentos-stage > .cv-form-section-card {
+.pt-documentos-stage > .form-section-card {
   border: 0 !important;
   background: var(--step1-surface) !important;
   box-shadow: none !important;
 }
 
-.pt-documentos-stage > .cv-form-section-card > .cv-form-section-header {
+.pt-documentos-stage > .form-section-card > .cv-form-section-header {
   background: var(--step1-surface) !important;
   border: 0 !important;
   border-bottom: 1px solid var(--form-section-border, var(--color-border)) !important;
   box-shadow: none !important;
 }
 
-.pt-documentos-stage > .cv-form-section-card > .cv-form-card__footer,
-.pt-documentos-stage > .cv-form-section-card .cv-card-footer,
-.pt-documentos-stage > .cv-form-section-card .cv-card-footer-section {
+.pt-documentos-stage > .form-section-card > .form-card__footer,
+.pt-documentos-stage > .form-section-card .card-footer,
+.pt-documentos-stage > .form-section-card .card-footer-section {
   border: 0 !important;
   background: var(--step1-surface) !important;
   box-shadow: none !important;
 }
 
-.pt-documentos-stage > .cv-form-section-card .cv-card-footer-section__divider {
+.pt-documentos-stage > .form-section-card .card-footer-section__divider {
   display: none;
 }
 
@@ -670,7 +670,7 @@ html[data-theme="dark"] .pt-add-evento__btn:focus-visible {
    roteiros.css força 1 coluna em .period-fields no step1; esta regra (depois)
    restaura o --with-extra. Não usamos display:contents no picker — os hiddens
    e o painel virariam itens da grade e quebrariam o alinhamento. */
-[data-pt-form] .travel-period-block--split .cv-travel-schedule__period-fields.cv-travel-schedule__period-fields--with-extra {
+[data-pt-form] .travel-period-block--split .travel-schedule__period-fields.travel-schedule__period-fields--with-extra {
   align-items: end;
   display: grid;
   gap: var(--space-3) var(--space-4);
@@ -678,23 +678,23 @@ html[data-theme="dark"] .pt-add-evento__btn:focus-visible {
   width: 100%;
 }
 
-[data-pt-form] .travel-period-block--split .cv-travel-schedule__period-fields--with-extra > .cv-date-picker {
+[data-pt-form] .travel-period-block--split .travel-schedule__period-fields--with-extra > .date-picker {
   min-width: 0;
   width: 100%;
 }
 
-[data-pt-form] .travel-period-block--split .cv-travel-schedule__period-fields--with-extra > .cv-date-picker > .field-grid.field-grid--cols-2 {
+[data-pt-form] .travel-period-block--split .travel-schedule__period-fields--with-extra > .date-picker > .field-grid.field-grid--cols-2 {
   display: grid;
   gap: var(--space-3) var(--space-4);
   grid-template-columns: repeat(2, minmax(0, 1fr));
   width: 100%;
 }
 
-[data-pt-form] .travel-period-block--split .cv-travel-schedule__period-fields--with-extra > .pt-periodo-horario {
+[data-pt-form] .travel-period-block--split .travel-schedule__period-fields--with-extra > .pt-periodo-horario {
   min-width: 0;
 }
 
-[data-pt-form] .travel-period-block--split .cv-travel-schedule__period-fields--with-extra .pt-periodo-horario > .cv-field__label {
+[data-pt-form] .travel-period-block--split .travel-schedule__period-fields--with-extra .pt-periodo-horario > .cv-field__label {
   border: 0;
   clip: rect(0, 0, 0, 0);
   height: 1px;
@@ -707,45 +707,45 @@ html[data-theme="dark"] .pt-add-evento__btn:focus-visible {
 }
 
 /* Horário: mesmo panel soft das datas do período (não o poço --step1-field). */
-[data-pt-form] .travel-period-block--split .cv-travel-schedule__period-fields--with-extra .pt-periodo-horario :is(
-  .cv-custom-select__trigger,
-  .cv-custom-select__trigger--v2,
-  .cv-custom-select--open .cv-custom-select__trigger
+[data-pt-form] .travel-period-block--split .travel-schedule__period-fields--with-extra .pt-periodo-horario :is(
+  .custom-select__trigger,
+  .custom-select__trigger--v2,
+  .custom-select--open .custom-select__trigger
 ) {
   background: var(--step1-panel, var(--color-surface-soft)) !important;
   background-color: var(--step1-panel, var(--color-surface-soft)) !important;
 }
 
 @media (max-width: 720px) {
-  [data-pt-form] .travel-period-block--split .cv-travel-schedule__period-fields.cv-travel-schedule__period-fields--with-extra {
+  [data-pt-form] .travel-period-block--split .travel-schedule__period-fields.travel-schedule__period-fields--with-extra {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
-.cv-form-subsection.pt-evento-periodo--inline {
+.form-subsection.pt-evento-periodo--inline {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-3) var(--space-4);
   align-items: start;
 }
 
-.pt-evento-periodo--inline > .cv-date-picker.pt-evento-periodo__dates,
-.pt-evento-periodo--inline > .cv-date-picker.pt-evento-periodo__dates > .field-grid--cols-2 {
+.pt-evento-periodo--inline > .date-picker.pt-evento-periodo__dates,
+.pt-evento-periodo--inline > .date-picker.pt-evento-periodo__dates > .field-grid--cols-2 {
   display: contents;
 }
 
 @media (max-width: 720px) {
-  .cv-form-subsection.pt-evento-periodo--inline {
+  .form-subsection.pt-evento-periodo--inline {
     grid-template-columns: 1fr;
   }
 
   /* Empilhado: o picker volta a ser um bloco normal com as duas datas lado a lado. */
-  .pt-evento-periodo--inline > .cv-date-picker.pt-evento-periodo__dates {
+  .pt-evento-periodo--inline > .date-picker.pt-evento-periodo__dates {
     display: grid;
     gap: var(--space-3);
   }
 
-  .pt-evento-periodo--inline > .cv-date-picker.pt-evento-periodo__dates > .field-grid--cols-2 {
+  .pt-evento-periodo--inline > .date-picker.pt-evento-periodo__dates > .field-grid--cols-2 {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-3) var(--space-4);
@@ -753,7 +753,7 @@ html[data-theme="dark"] .pt-add-evento__btn:focus-visible {
 }
 
 /* Três textos do documento: cada um é um form_block--split irmão (sem card-capa). */
-.pt-texto-block.cv-form-block--split {
+.pt-texto-block.form-block--split {
   align-items: start;
 }
 
@@ -805,31 +805,31 @@ html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
    data de chegada · hora de chegada. O date-picker (range) embrulha as duas
    datas num field-grid--cols-2 próprio; achatamos com display:contents (mesmo
    truque do período do evento na etapa 1) e reordenamos com `order`. */
-.cv-form-subsection.pt-diarias-linha {
+.form-subsection.pt-diarias-linha {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-3) var(--space-4);
   align-items: start;
 }
 
-.pt-diarias-linha > .cv-date-picker.pt-diarias-linha__dates,
-.pt-diarias-linha > .cv-date-picker.pt-diarias-linha__dates > .field-grid--cols-2 {
+.pt-diarias-linha > .date-picker.pt-diarias-linha__dates,
+.pt-diarias-linha > .date-picker.pt-diarias-linha__dates > .field-grid--cols-2 {
   display: contents;
 }
 
-.pt-diarias-linha > .cv-date-picker.pt-diarias-linha__dates > .field-grid--cols-2 > .cv-field:first-child { order: 1; }
+.pt-diarias-linha > .date-picker.pt-diarias-linha__dates > .field-grid--cols-2 > .cv-field:first-child { order: 1; }
 .pt-diarias-linha > .field.pt-diarias-hora-saida { order: 2; }
-.pt-diarias-linha > .cv-date-picker.pt-diarias-linha__dates > .field-grid--cols-2 > .cv-field:last-child { order: 3; }
+.pt-diarias-linha > .date-picker.pt-diarias-linha__dates > .field-grid--cols-2 > .cv-field:last-child { order: 3; }
 .pt-diarias-linha > .field.pt-diarias-hora-chegada { order: 4; }
 
 @media (max-width: 840px) {
-  .cv-form-subsection.pt-diarias-linha {
+  .form-subsection.pt-diarias-linha {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 520px) {
-  .cv-form-subsection.pt-diarias-linha {
+  .form-subsection.pt-diarias-linha {
     grid-template-columns: 1fr;
   }
 }
@@ -867,14 +867,14 @@ html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
   height: auto;
 }
 
-#pt-card-diarias .cv-summary-label {
+#pt-card-diarias .summary-label {
   color: var(--color-muted);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.11em;
 }
 
-#pt-card-diarias .cv-summary-value {
+#pt-card-diarias .summary-value {
   color: var(--color-heading);
   font-size: 1.3rem;
   font-weight: 900;
@@ -882,7 +882,7 @@ html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
 }
 
 #pt-card-diarias :is(
-  .cv-summary-value--principal,
+  .summary-value--principal,
   .pt-diarias-summary-card--unitario [data-pt-resultado-unitario]
 ) {
   font-size: clamp(2rem, 3.2vw, 2.75rem);
@@ -890,7 +890,7 @@ html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
   white-space: nowrap;
 }
 
-#pt-card-diarias .cv-summary-value--principal + .cv-summary-label {
+#pt-card-diarias .summary-value--principal + .summary-label {
   margin-top: var(--space-4);
 }
 
@@ -996,14 +996,14 @@ html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
   min-width: 0;
 }
 
-.pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .cv-ordered-field-row__badge.sr-only {
+.pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .ordered-field-row__badge.sr-only {
   display: none !important;
 }
 
 /* + e × sobem junto dos rótulos se alinhados ao topo; descem a altura do label+gap. */
 .pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .route-destinos-add,
 .pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .destination-remove-button,
-.pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .cv-ordered-field-row__remove {
+.pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .ordered-field-row__remove {
   align-self: start;
   margin-top: calc(0.78rem * 1.2 + var(--space-2, 0.5rem));
 }
@@ -1013,12 +1013,12 @@ html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
 }
 
 .pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .destination-remove-button,
-.pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .cv-ordered-field-row__remove {
+.pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .ordered-field-row__remove {
   grid-column: 3;
   justify-self: end;
 }
 
-.cv-ordered-field-row__fields.pt-efetivo-fields {
+.ordered-field-row__fields.pt-efetivo-fields {
   align-items: end;
   display: grid;
   gap: 10px 12px;
@@ -1027,7 +1027,7 @@ html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
 
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1])
-  .cv-ordered-field-row__fields.pt-efetivo-fields {
+  .ordered-field-row__fields.pt-efetivo-fields {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 8rem;
 }
 
@@ -1097,9 +1097,9 @@ html[data-theme="dark"] .pt-efetivo-fields .pt-quantidade-stepper {
   outline: 0;
 }
 
-.pt-efetivo-fields .cv-search-picker__field,
-.pt-efetivo-fields .cv-search-picker__control,
-.pt-efetivo-fields .cv-custom-select__trigger {
+.pt-efetivo-fields .search-picker__field,
+.pt-efetivo-fields .search-picker__control,
+.pt-efetivo-fields .custom-select__trigger {
   box-sizing: border-box;
   height: 44px;
   min-height: 44px;
@@ -1125,35 +1125,35 @@ html[data-theme="dark"] .pt-efetivo-fields .pt-quantidade-stepper {
     grid-template-columns: 44px minmax(0, 1fr);
   }
 
-  .cv-ordered-field-row__fields.pt-efetivo-fields,
+  .ordered-field-row__fields.pt-efetivo-fields,
   :is(html[data-theme="dark"])
     :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1])
-    .cv-ordered-field-row__fields.pt-efetivo-fields {
+    .ordered-field-row__fields.pt-efetivo-fields {
     grid-template-columns: 1fr;
   }
 }
 
 /* Identificação do evento: split título | tipo. */
-.evento-identificacao-block.evento-identificacao-split.cv-form-block--split,
-.evento-identificacao-split.cv-form-block--split {
+.evento-identificacao-block.evento-identificacao-split.form-block--split,
+.evento-identificacao-split.form-block--split {
   align-items: center;
   gap: 16px;
   grid-template-columns: minmax(148px, 0.62fr) minmax(0, 2.1fr);
 }
 
-.evento-identificacao-block.evento-identificacao-split > .cv-form-block__header,
-.evento-identificacao-split > .cv-form-block__header {
+.evento-identificacao-block.evento-identificacao-split > .form-block__header,
+.evento-identificacao-split > .form-block__header {
   align-self: center;
 }
 
-.evento-identificacao-block.evento-identificacao-split > .cv-form-block__body,
-.evento-identificacao-split > .cv-form-block__body {
+.evento-identificacao-block.evento-identificacao-split > .form-block__body,
+.evento-identificacao-split > .form-block__body {
   align-self: center;
 }
 
 @media (max-width: 720px) {
-  .evento-identificacao-block.evento-identificacao-split.cv-form-block--split,
-  .evento-identificacao-split.cv-form-block--split {
+  .evento-identificacao-block.evento-identificacao-split.form-block--split,
+  .evento-identificacao-split.form-block--split {
     align-items: stretch;
     grid-template-columns: minmax(0, 1fr);
   }

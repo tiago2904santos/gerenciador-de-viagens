@@ -1349,7 +1349,7 @@ export function initRoteirosEditor() {
     var chip = $('diarias-header-chip');
     if (chip) {
       if (state === 'updated') {
-        chip.querySelector('.cv-chip__label').textContent = text || 'Cálculo atualizado.';
+        chip.querySelector('.chip__label').textContent = text || 'Cálculo atualizado.';
         chip.classList.remove('d-none');
       } else {
         chip.classList.add('d-none');
@@ -1548,7 +1548,7 @@ export function initRoteirosEditor() {
     return 'Roteiro salvo';
   }
   var ROUTE_AVATAR_ICON =
-    '<svg class="cv-icon related-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
+    '<svg class="icon related-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
       '<circle cx="6" cy="19" r="2.5" fill="currentColor"></circle>' +
       '<circle cx="18" cy="5" r="2.5" fill="currentColor"></circle>' +
       '<path d="M8.2 18.2h6.1a3.3 3.3 0 0 0 0-6.6H9.7a3.3 3.3 0 0 1 0-6.6h6.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>' +
@@ -1569,11 +1569,11 @@ export function initRoteirosEditor() {
       var rid=String(r.id); var ac=rid===selId?' is-active':'';
       var title = routeDisplayTitle(r);
       if (isOficioPicker) {
-        return '<button type="button" class="cv-search-picker__selected-card related-route-item'+ac+'" data-route-id="'+window.CV.util.escapeHtml(rid)+'" aria-pressed="'+(rid===selId?'true':'false')+'">' +
-          '<span class="cv-search-picker__selected-avatar" aria-hidden="true">'+ROUTE_AVATAR_ICON+'</span>' +
-          '<div class="cv-search-picker__selected-main">' +
-            '<span class="cv-search-picker__selected-name">'+window.CV.util.escapeHtml(title)+'</span>' +
-            '<span class="cv-search-picker__selected-meta related-route-period">'+window.CV.util.escapeHtml(routePeriodSummary(r))+'</span>' +
+        return '<button type="button" class="search-picker__selected-card related-route-item'+ac+'" data-route-id="'+window.CV.util.escapeHtml(rid)+'" aria-pressed="'+(rid===selId?'true':'false')+'">' +
+          '<span class="search-picker__selected-avatar" aria-hidden="true">'+ROUTE_AVATAR_ICON+'</span>' +
+          '<div class="search-picker__selected-main">' +
+            '<span class="search-picker__selected-name">'+window.CV.util.escapeHtml(title)+'</span>' +
+            '<span class="search-picker__selected-meta related-route-period">'+window.CV.util.escapeHtml(routePeriodSummary(r))+'</span>' +
           '</div></button>';
       }
       return '<button type="button" class="related-route-item'+ac+'" data-route-id="'+window.CV.util.escapeHtml(rid)+'">' +

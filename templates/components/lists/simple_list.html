@@ -2,7 +2,7 @@
   {% if not hide_realtime_count %}
     <span class="pagination-shell__info" data-collection-count data-collection-count-template="{% verbatim %}{{visible}} de {{total}}{% endverbatim %} visíveis" hidden aria-live="polite"></span>
   {% endif %}
-  <div class="cv-record-list simple-list" role="list" data-collection-container>
+  <div class="record-list simple-list" role="list" data-collection-container>
     {% for row in rows %}
       {% include "components/lists/simple_list_row.html" with row=row row_index=forloop.counter %}
     {% endfor %}

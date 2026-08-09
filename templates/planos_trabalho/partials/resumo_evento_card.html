@@ -15,14 +15,14 @@ Espera:
   {% with ordem=ev.ordem|stringformat:"s" %}
     {% if total_eventos %}
       {% with total=total_eventos|stringformat:"s" card_subtitle="Evento "|add:ordem|add:" de "|add:total|add:" · "|add:ev.programa card_label="Resumo do evento "|add:ordem %}
-        {% include "components/form/card.html" with title=card_label description=card_subtitle extra_class="cv-summary-card" header_extra_class="pt-resumo-card-header" aria_label=card_label actions_template="planos_trabalho/partials/_resumo_evento_header_actions.html" actions_bare=True body_template="planos_trabalho/partials/_resumo_evento_body.html" %}
+        {% include "components/form/card.html" with title=card_label description=card_subtitle extra_class="summary-card" header_extra_class="pt-resumo-card-header" aria_label=card_label actions_template="planos_trabalho/partials/_resumo_evento_header_actions.html" actions_bare=True body_template="planos_trabalho/partials/_resumo_evento_body.html" %}
       {% endwith %}
     {% else %}
       {% with card_subtitle="Evento "|add:ordem|add:" · "|add:ev.programa card_label="Resumo do evento "|add:ordem %}
-        {% include "components/form/card.html" with title=card_label description=card_subtitle extra_class="cv-summary-card" header_extra_class="pt-resumo-card-header" aria_label=card_label actions_template="planos_trabalho/partials/_resumo_evento_header_actions.html" actions_bare=True body_template="planos_trabalho/partials/_resumo_evento_body.html" %}
+        {% include "components/form/card.html" with title=card_label description=card_subtitle extra_class="summary-card" header_extra_class="pt-resumo-card-header" aria_label=card_label actions_template="planos_trabalho/partials/_resumo_evento_header_actions.html" actions_bare=True body_template="planos_trabalho/partials/_resumo_evento_body.html" %}
       {% endwith %}
     {% endif %}
   {% endwith %}
 {% else %}
-  {% include "components/form/card.html" with title="Resumo do plano" description="Dados utilizados para montar o documento." extra_class="cv-summary-card" header_extra_class="pt-resumo-card-header" aria_label="Resumo do plano" actions_template="planos_trabalho/partials/_resumo_evento_header_actions.html" actions_bare=True body_template="planos_trabalho/partials/_resumo_evento_body.html" %}
+  {% include "components/form/card.html" with title="Resumo do plano" description="Dados utilizados para montar o documento." extra_class="summary-card" header_extra_class="pt-resumo-card-header" aria_label="Resumo do plano" actions_template="planos_trabalho/partials/_resumo_evento_header_actions.html" actions_bare=True body_template="planos_trabalho/partials/_resumo_evento_body.html" %}
 {% endif %}

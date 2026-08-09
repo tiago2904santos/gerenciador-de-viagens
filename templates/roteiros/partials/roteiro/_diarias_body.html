@@ -7,22 +7,22 @@
 {% endif %}
 
 <div class="field-grid field-grid--cols-4 roteiro-editor__diarias-finance-grid">
-  <div class="field field-size-2 cv-summary-item cv-summary-item--principal">
-    <span class="cv-summary-label">Valor total</span>
-    <span class="cv-summary-value cv-summary-value--principal" id="diarias-valor">
+  <div class="field field-size-2 summary-item summary-item--principal">
+    <span class="summary-label">Valor total</span>
+    <span class="summary-value summary-value--principal" id="diarias-valor">
       {{ roteiro_diarias_resultado.totais.total_valor|default:"—" }}
     </span>
-    <span class="cv-summary-label">Valor por extenso</span>
+    <span class="summary-label">Valor por extenso</span>
     <span id="diarias-extenso">{{ roteiro_diarias_resultado.totais.valor_extenso|default:"Não informado" }}</span>
   </div>
   <div class="field field-size-2 roteiro-editor__diarias-secondary-stack">
-    <div class="cv-summary-item cv-summary-item--secondary">
-      <span class="cv-summary-label">Tipo destino</span>
-      <span class="cv-summary-value" id="diarias-tipo">{{ roteiro_diarias_resultado.tipo_destino|default:"—" }}</span>
+    <div class="summary-item summary-item--secondary">
+      <span class="summary-label">Tipo destino</span>
+      <span class="summary-value" id="diarias-tipo">{{ roteiro_diarias_resultado.tipo_destino|default:"—" }}</span>
     </div>
-    <div class="cv-summary-item cv-summary-item--secondary">
-      <span class="cv-summary-label">Quantidade de diárias</span>
-      <span class="cv-summary-value" id="diarias-qtd">{{ roteiro_diarias_resultado.totais.total_diarias|default:"—" }}</span>
+    <div class="summary-item summary-item--secondary">
+      <span class="summary-label">Quantidade de diárias</span>
+      <span class="summary-value" id="diarias-qtd">{{ roteiro_diarias_resultado.totais.total_diarias|default:"—" }}</span>
     </div>
   </div>
 </div>

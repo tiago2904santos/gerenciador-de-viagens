@@ -168,7 +168,7 @@
   background: color-mix(in srgb, var(--color-primary, #2f8bd8) 16%, transparent);
 }
 
-.dmv-prefill__icon .cv-icon {
+.dmv-prefill__icon .icon {
   width: 18px;
   height: 18px;
 }

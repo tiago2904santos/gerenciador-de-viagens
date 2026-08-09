@@ -22,18 +22,18 @@ class GlobalActionSystemTests(SimpleTestCase):
         self.assertIn(".cv-btn,", self.css)
         self.assertIn(".btn,", self.css)
         self.assertIn(".app-btn {", self.css)
-        self.assertIn(".cv-icon-btn {", self.css)
+        self.assertIn(".icon-btn {", self.css)
 
     def test_icon_groups_do_not_receive_an_outer_box(self):
-        group_rule = self.css.split(".cv-icon-btn-group {", 1)[1].split("}", 1)[0]
+        group_rule = self.css.split(".icon-btn-group {", 1)[1].split("}", 1)[0]
         self.assertIn("background: transparent;", group_rule)
         self.assertIn("border: 0;", group_rule)
         self.assertIn("box-shadow: none;", group_rule)
 
     def test_rich_menu_and_shared_modal_primitives_exist(self):
-        self.assertIn(".cv-action-menu--rich {", self.css)
-        self.assertIn(".cv-action-menu__heading {", self.css)
-        self.assertIn(".cv-action-menu__item--rich {", self.css)
+        self.assertIn(".action-menu--rich {", self.css)
+        self.assertIn(".action-menu__heading {", self.css)
+        self.assertIn(".action-menu__item--rich {", self.css)
         self.assertIn(".delete-confirm-modal__dialog {", self.css)
         self.assertIn(".attach-signed-modal__dialog {", self.css)
 
@@ -52,15 +52,15 @@ class GlobalActionSystemTests(SimpleTestCase):
                 "download": True,
             },
         )
-        self.assertIn("cv-action-menu__heading", header)
+        self.assertIn("action-menu__heading", header)
         self.assertIn("Ofício 1/2026", header)
-        self.assertIn("cv-action-menu__item--rich", item)
+        self.assertIn("action-menu__item--rich", item)
         self.assertIn("download", item)
 
     def test_document_action_tones_are_distinct_and_motion_can_be_reduced(self):
         for tone in ("pdf", "docx", "preview", "edit"):
             self.assertIn(f"--action-{tone}-bg:", self.css)
-            self.assertIn(f".cv-action-menu__item-icon--{tone} {{", self.css)
+            self.assertIn(f".action-menu__item-icon--{tone} {{", self.css)
         self.assertIn("@media (prefers-reduced-motion: reduce)", self.css)
 
     def test_simple_list_document_menu_accepts_dictionary_without_pk(self):
@@ -94,6 +94,6 @@ class GlobalActionSystemTests(SimpleTestCase):
             base.index("{% block extra_css %}"),
         )
         self.assertLess(
-            bundle.index(">>> css/cv-buttons.css >>>"),
+            bundle.index(">>> css/buttons.css >>>"),
             bundle.index(">>> css/components/action-system.css >>>"),
         )
