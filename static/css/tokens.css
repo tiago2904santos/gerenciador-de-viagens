@@ -167,7 +167,13 @@
   /* --------------------------------------------------------------------------
      Pilha de camadas
      -------------------------------------------------------------------------- */
-  --font-sans: "Segoe UI", Arial, sans-serif;
+  /* A pilha vale nos DOIS temas (`NOVO-62`). Antes, o claro ficava com
+     `"Segoe UI", Arial` e o escuro sobrescrevia o `body` com `Inter, …` — 19.896
+     elementos com tipografia diferente conforme o tema. E a `Inter` sequer
+     estava no repositório: quem definia a letra era a máquina do usuário.
+     Agora ela é entregue por `fonts.css`; o resto da pilha é só rede de
+     segurança para o intervalo até o arquivo carregar. */
+  --font-sans: "Inter Variable", Inter, "Segoe UI", system-ui, sans-serif;
   --z-background: 0;
   --z-page-shell: 1;
   --z-stepper: 2;
