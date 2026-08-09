@@ -379,6 +379,7 @@ jobs:
         # so pode descer, conforme scripts/tetos_front.json.
         run: |
           python -m playwright install --with-deps chromium
+          python manage.py migrate --noinput --settings=config.settings.test
           python manage.py resetar_banco_demo --settings=config.settings.test
 
           export FRONT_METRICS_PASSWORD

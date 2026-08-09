@@ -93,6 +93,17 @@ class CssPorRotaMetricTests(SimpleTestCase):
             all(item["usage_percent_min"] > 0 for item in css_gate["routes"].values())
         )
 
+    def test_ci_migra_o_banco_descartavel_antes_de_semear(self):
+        workflow = (css_metric.ROOT / ".github" / "workflows" / "tests.yml").read_text(
+            encoding="utf-8"
+        )
+        frontend_step = workflow.split("Enforce frontend route baselines (NOVO-70)", 1)[1]
+
+        self.assertLess(
+            frontend_step.index("manage.py migrate --noinput"),
+            frontend_step.index("manage.py resetar_banco_demo"),
+        )
+
 
 class DivergenciaTemaMetricTests(SimpleTestCase):
     def test_propriedades_de_cor_e_tokens_nao_entram(self):
