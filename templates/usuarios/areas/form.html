@@ -19,7 +19,7 @@
 {% block flow_shell_extra %} document-form-page usuarios-area-form{% endblock %}
 
 {% block flow_body %}
-  <div class="cv-form-section-stack cv-form-section-stack--comfortable" data-travel-document-wizard-step1>
+  <div class="form-section-stack form-section-stack--comfortable" data-travel-document-wizard-step1>
     <form method="post" class="document-form travel-document-wizard__form" novalidate>
       {% csrf_token %}
       {% include "components/ui/feedback/form_errors.html" with form=form only %}

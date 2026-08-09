@@ -13,7 +13,7 @@
   <form method="post" class="document-form travel-document-wizard__form" novalidate>
     {% csrf_token %}
     {% include "components/ui/feedback/form_errors.html" with form=form only %}
-    <div class="cv-form-section-stack cv-form-section-stack--comfortable" data-travel-document-wizard-step1>
+    <div class="form-section-stack form-section-stack--comfortable" data-travel-document-wizard-step1>
       {% include "components/form/card.html" with title=card_title description=page_description title_id="usuarios-form-card-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template=body_template footer_template="usuarios/partials/_form_card_footer.html" %}
     </div>
   </form>

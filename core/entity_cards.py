@@ -79,7 +79,7 @@ def menu_attach_signed(url, doc_label, *, assinado=False, current_name="", curre
 def menu(menu_id, title, subtitle, items, *, icon="folder", trigger_icon="folder",
          trigger_variant="settings", trigger_aria="", trigger_tooltip="Visualizar e baixar",
          trigger_state_class="", src=""):
-    """Botão-gatilho + menu rico (cv-action-menu--rich).
+    """Botão-gatilho + menu rico (action-menu--rich).
 
     `src` é a URL que serve o corpo deste menu (PF-04). Com ela, a lista manda só
     o gatilho e o corpo vem no primeiro clique; sem ela, o corpo continua

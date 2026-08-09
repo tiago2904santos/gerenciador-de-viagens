@@ -137,8 +137,8 @@
 
     trigger.classList.toggle('is-active', active);
     trigger.classList.toggle('is-inactive', !active);
-    trigger.classList.toggle('cv-field-side-action--success', active);
-    trigger.classList.toggle('cv-field-side-action--danger', !active);
+    trigger.classList.toggle('field-side-action--success', active);
+    trigger.classList.toggle('field-side-action--danger', !active);
     trigger.setAttribute('aria-pressed', active ? 'true' : 'false');
 
     var labelEl = trigger.querySelector('span:last-child');

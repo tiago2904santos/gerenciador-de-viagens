@@ -1,14 +1,14 @@
 {% if has_event_routes %}
-  <div class="cv-segment-toggle" role="group" aria-label="Modo do roteiro" id="roteiro-modo-toggle">
+  <div class="segment-toggle" role="group" aria-label="Modo do roteiro" id="roteiro-modo-toggle">
     <button type="button"
-            class="cv-segment-toggle__btn"
+            class="segment-toggle__btn"
             id="toggle-btn-salvo"
             aria-pressed="{% if roteiro_modo == 'EVENTO_EXISTENTE' %}true{% else %}false{% endif %}"
             data-roteiro-toggle="EVENTO_EXISTENTE">
       <span>Roteiro salvo</span>
     </button>
     <button type="button"
-            class="cv-segment-toggle__btn"
+            class="segment-toggle__btn"
             id="toggle-btn-novo"
             aria-pressed="{% if roteiro_modo != 'EVENTO_EXISTENTE' %}true{% else %}false{% endif %}"
             data-roteiro-toggle="ROTEIRO_PROPRIO">

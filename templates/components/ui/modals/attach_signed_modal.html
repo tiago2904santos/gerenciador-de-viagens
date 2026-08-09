@@ -38,10 +38,10 @@
         </div>
         {% comment %}
         NOVO-23: remover o assinado é a única ação AJAX deste modal, e ela não
-        tinha onde avisar quando falhava. Classes do design system (cv-notice);
+        tinha onde avisar quando falhava. Classes do design system (notice);
         [hidden] é forçado por base.css mesmo sobre o display do componente.
         {% endcomment %}
-        <div class="cv-notice cv-notice--danger" data-attach-signed-error hidden role="alert"></div>
+        <div class="notice notice--danger" data-attach-signed-error hidden role="alert"></div>
 
         <ul class="prestacao-file-list" data-attach-signed-current hidden>
           <li class="prestacao-file-list__item">
@@ -51,7 +51,7 @@
             </div>
             <div class="prestacao-file-widget__actions">
               <a
-                class="cv-icon-btn cv-icon-btn--preview prestacao-file-widget__action"
+                class="icon-btn icon-btn--preview prestacao-file-widget__action"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Visualizar arquivo assinado"
@@ -60,7 +60,7 @@
               >{% include "components/ui/icons/icon.html" with icon="eye" only %}</a>
               <button
                 type="button"
-                class="cv-icon-btn cv-icon-btn--delete prestacao-file-widget__action"
+                class="icon-btn icon-btn--delete prestacao-file-widget__action"
                 aria-label="Remover arquivo assinado"
                 data-tooltip="Remover"
                 data-attach-signed-remove

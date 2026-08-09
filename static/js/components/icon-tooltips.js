@@ -9,7 +9,7 @@
   function ensureTooltip() {
     if (tooltip) return tooltip;
     tooltip = document.createElement("div");
-    tooltip.className = "cv-global-tooltip";
+    tooltip.className = "global-tooltip";
     tooltip.setAttribute("role", "tooltip");
     tooltip.hidden = true;
     document.body.appendChild(tooltip);
@@ -49,8 +49,8 @@
     ensureTooltip();
     tooltip.textContent = text;
     tooltip.classList.toggle(
-      "cv-global-tooltip--accent",
-      target.classList.contains("cv-icon-btn--field-manage")
+      "global-tooltip--accent",
+      target.classList.contains("icon-btn--field-manage")
     );
     tooltip.hidden = false;
     tooltip.classList.add("is-visible");
@@ -62,7 +62,7 @@
     if (!tooltip) return;
 
     tooltip.classList.remove("is-visible");
-    tooltip.classList.remove("cv-global-tooltip--accent");
+    tooltip.classList.remove("global-tooltip--accent");
     tooltip.hidden = true;
     currentTarget = null;
   }

@@ -100,7 +100,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, f'name="numero" value="{oficio.numero}"')
         self.assertContains(response, f"/ {oficio.ano}")
         self.assertNotContains(response, "Data criação:")
-        self.assertContains(response, "cv-form-section-card")
+        self.assertContains(response, "form-section-card")
         self.assertContains(response, "field-grid")
         self.assertNotContains(response, "DOCX")
         self.assertContains(response, "Avançar")
@@ -118,11 +118,11 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertNotContains(response, "Escolha quais viajantes devem ter termo gerado.")
         self.assertContains(response, 'name="servidores_termo_autorizacao_present"')
         self.assertContains(response, 'name="servidores_termo_autorizacao"')
-        self.assertContains(response, "cv-search-picker__termos-native")
+        self.assertContains(response, "search-picker__termos-native")
         self.assertContains(response, 'data-entity-picker="true"')
         self.assertContains(response, 'data-picker-variant="detailed"')
         self.assertContains(response, 'data-picker-term-control="true"')
-        self.assertContains(response, "cv-form-section-stack--comfortable")
+        self.assertContains(response, "form-section-stack--comfortable")
         self.assertContains(response, "Equipe")
         self.assertNotContains(response, "Selecione os viajantes; um deles pode ser o motorista")
         html = response.content.decode()
@@ -146,8 +146,8 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, "data-cargo=")
         self.assertContains(response, "data-unidade=")
         self.assertNotContains(response, "data-filterable-multiselect-input")
-        self.assertContains(response, "cv-field-with-action--manage-reveal")
-        self.assertContains(response, "cv-icon-btn--field-manage")
+        self.assertContains(response, "field-with-action--manage-reveal")
+        self.assertContains(response, "icon-btn--field-manage")
         self.assertContains(response, reverse("oficios:modelos_motivo_index"))
         self.assertContains(response, "Modelo de motivo")
         self.assertContains(response, 'name="modelo_motivo"')
@@ -155,7 +155,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, 'name="motivo"')
         self.assertContains(response, "cv-field__control cv-field__control--textarea")
         self.assertContains(response, 'rows="4"')
-        self.assertContains(response, "cv-form-block--resource")
+        self.assertContains(response, "form-block--resource")
         self.assertContains(response, 'id="travel-document-purpose-title"')
         self.assertNotContains(
             response,
@@ -626,7 +626,7 @@ class OficioWizardDadosViajantesTests(TestCase):
 
         response = self.client.get(reverse("oficios:index") + "?aba=atuais")
 
-        self.assertContains(response, "cv-fact-block--motorista-externo")
+        self.assertContains(response, "fact-block--motorista-externo")
         self.assertContains(response, "Ofício 79/2026 · Protocolo 15.000.003-9")
         self.assertNotContains(response, "Externo ao ofício")
 

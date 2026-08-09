@@ -310,7 +310,7 @@ class FocoNoResumoTests(SimpleTestCase):
         fonte = self.js()
 
         self.assertIn("[data-form-errors]", fonte)
-        self.assertNotIn(".cv-notice--danger", fonte)
+        self.assertNotIn(".notice--danger", fonte)
 
     def test_o_foco_acontece_uma_vez_por_pagina(self):
         """`init` roda de novo a cada re-render parcial.
@@ -346,7 +346,7 @@ class PainelAbertoNaoCortaTests(SimpleTestCase):
     fechado, ele apaga o excedente sem aviso. `overflow-y: auto` mantém a animação
     e devolve o que passa do teto.
 
-    **Duas folhas, e por quê:** `.list-header .cv-inline-create__panel` declara
+    **Duas folhas, e por quê:** `.list-header .inline-create__panel` declara
     `overflow: hidden` com a mesma especificidade da regra genérica e vem **depois**
     no bundle — a correção só em `page-shell.css` não chegava a valer (medido:
     `overflowY` continuava `hidden`). É o `UI-04`; enquanto ele não sai, as duas
@@ -354,8 +354,8 @@ class PainelAbertoNaoCortaTests(SimpleTestCase):
     """
 
     REGRAS = [
-        ("static/css/page-shell.css", ".cv-inline-create__panel.is-open {"),
-        ("static/css/components/list-header.css", ".list-header .cv-inline-create__panel.is-open {"),
+        ("static/css/page-shell.css", ".inline-create__panel.is-open {"),
+        ("static/css/components/list-header.css", ".list-header .inline-create__panel.is-open {"),
     ]
 
     def test_o_painel_aberto_rola_em_vez_de_cortar(self):

@@ -1,4 +1,4 @@
-.rt-summary-card .cv-form-section-body {
+.rt-summary-card .form-section-body {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -93,10 +93,10 @@
 
 /* oficios-documentos-inline.css reordena summary/viajantes/preview no fluxo
    do ofício (preview primeiro). Nas etapas da prestação a ordem do HTML prevalece. */
-[data-travel-document-wizard-rt] .rt-wizard-body > .cv-form-block,
-[data-travel-document-wizard-diario] .diario-wizard-body > .cv-form-block,
-[data-travel-document-wizard-documentos] .docs-wizard-body > .cv-form-block,
-[data-travel-document-wizard-consolidado] .consolidado-wizard-body > .cv-form-block {
+[data-travel-document-wizard-rt] .rt-wizard-body > .form-block,
+[data-travel-document-wizard-diario] .diario-wizard-body > .form-block,
+[data-travel-document-wizard-documentos] .docs-wizard-body > .form-block,
+[data-travel-document-wizard-consolidado] .consolidado-wizard-body > .form-block {
   order: unset;
 }
 
@@ -137,21 +137,21 @@
   grid-template-columns: 40px minmax(0, 1fr);
 }
 
-.rt-wizard-card .rt-topic-block .cv-form-block__body {
+.rt-wizard-card .rt-topic-block .form-block__body {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
 
-.rt-wizard-card .rt-topic-block .cv-form-block__body > .field,
-.rt-wizard-card .rt-topic-block .cv-form-block__body > .app-form-field,
-.rt-wizard-card .rt-topic-block .cv-form-block__body > .cv-field--full-width {
+.rt-wizard-card .rt-topic-block .form-block__body > .field,
+.rt-wizard-card .rt-topic-block .form-block__body > .app-form-field,
+.rt-wizard-card .rt-topic-block .form-block__body > .cv-field--full-width {
   align-self: stretch;
   width: 100%;
 }
 
-.rt-wizard-card .rt-topic-block .cv-custom-select,
-.rt-wizard-card .rt-topic-block .cv-custom-select__trigger {
+.rt-wizard-card .rt-topic-block .custom-select,
+.rt-wizard-card .rt-topic-block .custom-select__trigger {
   width: 100%;
 }
 
@@ -291,7 +291,7 @@
 
 .prestacao-file-selection__toggle:focus-visible {
   border-color: var(--cv-field-border-focus, var(--color-primary));
-  box-shadow: var(--cv-field-shadow-focus, var(--cv-field-focus-ring));
+  box-shadow: var(--field-shadow-focus, var(--cv-field-focus-ring));
   outline: 0;
 }
 
@@ -402,8 +402,8 @@
 }
 
 .prestacao-file-widget__action {
-  --cv-icon-btn-size: 44px;
-  --cv-icon-btn-icon-size: 18px;
+  --icon-btn-size: 44px;
+  --icon-btn-icon-size: 18px;
 }
 
 .prestacao-file-picker {
@@ -425,7 +425,7 @@
 
 .prestacao-file-picker:focus-within {
   border-color: var(--cv-field-border-focus, var(--color-primary));
-  box-shadow: var(--cv-field-shadow-focus, var(--cv-field-focus-ring));
+  box-shadow: var(--field-shadow-focus, var(--cv-field-focus-ring));
 }
 
 .prestacao-file-picker__value {
@@ -482,12 +482,12 @@
 }
 
 .prestacao-file-picker__upload {
-  background: var(--cv-btn-primary-bg, var(--color-primary));
+  background: var(--btn-primary-bg, var(--color-primary));
   color: var(--color-white, var(--color-white));
 }
 
 .prestacao-file-picker__upload:hover:not(:disabled) {
-  background: var(--cv-btn-primary-hover-bg, var(--color-primary-hover));
+  background: var(--btn-primary-hover-bg, var(--color-primary-hover));
 }
 
 .prestacao-file-picker__upload:disabled {
@@ -604,38 +604,38 @@
 .rt-diaria-override-field { max-width: 22rem; margin-bottom: var(--space-4, 1rem); }
 
 /* Cards individuais agrupados visualmente pelo mesmo ofício */
-.cv-card-grid > .prestacao-card-group--start,
-.cv-card-grid > .prestacao-card-group--middle,
-.cv-card-grid > .prestacao-card-group--end {
+.card-grid > .prestacao-card-group--start,
+.card-grid > .prestacao-card-group--middle,
+.card-grid > .prestacao-card-group--end {
   position: relative;
 }
 
-.cv-card-grid > .prestacao-card-group--start {
+.card-grid > .prestacao-card-group--start {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   margin-bottom: 0;
 }
 
-.cv-card-grid > .prestacao-card-group--middle {
+.card-grid > .prestacao-card-group--middle {
   border-radius: 0;
   margin-bottom: 0;
   margin-top: 0;
 }
 
-.cv-card-grid > .prestacao-card-group--end {
+.card-grid > .prestacao-card-group--end {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   margin-top: 0;
 }
 
-.cv-card-grid > .prestacao-card-group--middle,
-.cv-card-grid > .prestacao-card-group--end {
+.card-grid > .prestacao-card-group--middle,
+.card-grid > .prestacao-card-group--end {
   border-top: 1px dashed var(--color-border-soft, #e3eaf2);
 }
 
-.cv-card-grid > .prestacao-card-group--start::before,
-.cv-card-grid > .prestacao-card-group--middle::before,
-.cv-card-grid > .prestacao-card-group--end::before {
+.card-grid > .prestacao-card-group--start::before,
+.card-grid > .prestacao-card-group--middle::before,
+.card-grid > .prestacao-card-group--end::before {
   background: var(--color-primary, #1f6feb);
   border-radius: 999px;
   content: "";
@@ -832,13 +832,13 @@
 
 /* Modal anexar assinado: item selecionado sem hover (esta folha carrega depois do shell). */
 #attach-signed-modal .prestacao-file-selection__item,
-#attach-signed-modal .cv-file-selection__item,
+#attach-signed-modal .file-selection__item,
 #attach-signed-modal .prestacao-file-selection__item:hover,
-#attach-signed-modal .cv-file-selection__item:hover,
+#attach-signed-modal .file-selection__item:hover,
 #attach-signed-modal .prestacao-file-selection__item:focus,
-#attach-signed-modal .cv-file-selection__item:focus,
+#attach-signed-modal .file-selection__item:focus,
 #attach-signed-modal .prestacao-file-selection__item:focus-within,
-#attach-signed-modal .cv-file-selection__item:focus-within {
+#attach-signed-modal .file-selection__item:focus-within {
   background: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%)) !important;
   background-color: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%)) !important;
   transition: none !important;

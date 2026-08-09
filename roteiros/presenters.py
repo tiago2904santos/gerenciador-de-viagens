@@ -227,7 +227,7 @@ def apresentar_roteiro_card(roteiro, *, todos_trechos=False, capitais=None):
     fim_display = _format_roteiro_dt(fim_dt)
     header_items = [
         entity_cards.header_item(
-            "Roteiro", titulo_rota, wide=True, value_class="cv-record-card__info-value--rota"
+            "Roteiro", titulo_rota, wide=True, value_class="record-card__info-value--rota"
         )
     ]
     header_chips = [entity_cards.chip(temporal_tone, temporal_label)] if temporal_label else []

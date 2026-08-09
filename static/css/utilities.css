@@ -19,7 +19,7 @@
 
 /* Folha de símbolos do PF-01: só define `<symbol>`, nunca desenha. Fora do
    fluxo para não ocupar espaço nem virar alvo de rolagem. */
-.cv-icon-sprite {
+.icon-sprite {
   height: 0;
   overflow: hidden;
   position: absolute;
@@ -38,7 +38,7 @@
   gap: var(--space-3);
 }
 
-.cv-inline-form {
+.inline-form {
   display: inline;
   margin: 0;
 }
@@ -52,7 +52,7 @@
   margin: 0 0 var(--space-4);
 }
 
-.cv-content-spaced {
+.content-spaced {
   margin-top: var(--space-3);
 }
 
@@ -185,117 +185,117 @@
    -------------------------------------------------------------------------- */
 :root {
   /* Dimensões — chip é menor que o state button (control-height-md = 44px) */
-  --cv-chip-height:            26px;
-  --cv-chip-height-compact:    20px;
-  --cv-chip-gap:               6px;
-  --cv-chip-icon-size:         13px;
-  --cv-chip-letter-spacing:    0.055em;
-  --cv-chip-border-width:      1px;
-  --cv-chip-focus-ring:        0 0 0 3px rgba(21, 91, 154, 0.22);
-  --cv-chip-disabled-opacity:  0.48;
+  --chip-height:            26px;
+  --chip-height-compact:    20px;
+  --chip-gap:               6px;
+  --chip-icon-size:         13px;
+  --chip-letter-spacing:    0.055em;
+  --chip-border-width:      1px;
+  --chip-focus-ring:        0 0 0 3px rgba(21, 91, 154, 0.22);
+  --chip-disabled-opacity:  0.48;
 
   /* Base (neutro) — herda direto do state-neutral */
-  --cv-chip-bg:     var(--state-neutral-bg);
-  --cv-chip-border: var(--state-neutral-border);
-  --cv-chip-color:  var(--state-neutral-text);
-  --cv-chip-glow:   var(--state-neutral-glow);
+  --chip-bg:     var(--state-neutral-bg);
+  --chip-border: var(--state-neutral-border);
+  --chip-color:  var(--state-neutral-text);
+  --chip-glow:   var(--state-neutral-glow);
 
   /* Sucesso — herda direto do state-success */
-  --cv-chip-success-bg:     var(--state-success-bg);
-  --cv-chip-success-border: var(--state-success-border);
-  --cv-chip-success-color:  var(--state-success-text);
-  --cv-chip-success-glow:   var(--state-success-glow);
+  --chip-success-bg:     var(--state-success-bg);
+  --chip-success-border: var(--state-success-border);
+  --chip-success-color:  var(--state-success-text);
+  --chip-success-glow:   var(--state-success-glow);
 
   /* Aviso — herda direto do state-warning */
-  --cv-chip-warning-bg:     var(--state-warning-bg);
-  --cv-chip-warning-border: var(--state-warning-border);
-  --cv-chip-warning-color:  var(--state-warning-text);
-  --cv-chip-warning-glow:   var(--state-warning-glow);
+  --chip-warning-bg:     var(--state-warning-bg);
+  --chip-warning-border: var(--state-warning-border);
+  --chip-warning-color:  var(--state-warning-text);
+  --chip-warning-glow:   var(--state-warning-glow);
 
   /* Perigo — herda direto do state-danger */
-  --cv-chip-danger-bg:     var(--state-danger-bg);
-  --cv-chip-danger-border: var(--state-danger-border);
-  --cv-chip-danger-color:  var(--state-danger-text);
-  --cv-chip-danger-glow:   var(--state-danger-glow);
+  --chip-danger-bg:     var(--state-danger-bg);
+  --chip-danger-border: var(--state-danger-border);
+  --chip-danger-color:  var(--state-danger-text);
+  --chip-danger-glow:   var(--state-danger-glow);
 
   /* Muted / Neutro — herda do state-neutral */
-  --cv-chip-muted-bg:     var(--state-neutral-bg);
-  --cv-chip-muted-border: var(--state-neutral-border);
-  --cv-chip-muted-color:  var(--state-neutral-text);
-  --cv-chip-muted-glow:   var(--state-neutral-glow);
+  --chip-muted-bg:     var(--state-neutral-bg);
+  --chip-muted-border: var(--state-neutral-border);
+  --chip-muted-color:  var(--state-neutral-text);
+  --chip-muted-glow:   var(--state-neutral-glow);
 
-  --cv-chip-neutral-bg:     var(--state-neutral-bg);
-  --cv-chip-neutral-border: var(--state-neutral-border);
-  --cv-chip-neutral-color:  var(--state-neutral-text);
-  --cv-chip-neutral-glow:   var(--state-neutral-glow);
+  --chip-neutral-bg:     var(--state-neutral-bg);
+  --chip-neutral-border: var(--state-neutral-border);
+  --chip-neutral-color:  var(--state-neutral-text);
+  --chip-neutral-glow:   var(--state-neutral-glow);
 
   /* Filtro e Entidade — herdam do info (azul), mesma família do Retificado */
-  --cv-chip-filter-bg:     var(--cv-chip-info-bg);
-  --cv-chip-filter-border: var(--cv-chip-info-border);
-  --cv-chip-filter-color:  var(--cv-chip-info-color);
-  --cv-chip-filter-glow:   var(--cv-chip-info-glow);
+  --chip-filter-bg:     var(--chip-info-bg);
+  --chip-filter-border: var(--chip-info-border);
+  --chip-filter-color:  var(--chip-info-color);
+  --chip-filter-glow:   var(--chip-info-glow);
 
   /* Info — mesma fórmula do state-success com --color-info */
-  --cv-chip-info-bg:     color-mix(in srgb, var(--color-info) 16%, var(--theme-surface-card, var(--color-surface)) 84%);
-  --cv-chip-info-border: color-mix(in srgb, var(--color-info) 68%, var(--theme-border-card, var(--color-border)) 32%);
-  --cv-chip-info-color:  color-mix(in srgb, var(--color-info) 84%, var(--color-heading) 16%);
-  --cv-chip-info-glow:   0 0 0 1px color-mix(in srgb, var(--color-info) 20%, transparent), 0 0 14px color-mix(in srgb, var(--color-info) 26%, transparent);
+  --chip-info-bg:     color-mix(in srgb, var(--color-info) 16%, var(--theme-surface-card, var(--color-surface)) 84%);
+  --chip-info-border: color-mix(in srgb, var(--color-info) 68%, var(--theme-border-card, var(--color-border)) 32%);
+  --chip-info-color:  color-mix(in srgb, var(--color-info) 84%, var(--color-heading) 16%);
+  --chip-info-glow:   0 0 0 1px color-mix(in srgb, var(--color-info) 20%, transparent), 0 0 14px color-mix(in srgb, var(--color-info) 26%, transparent);
 
   /* Pendente — mesma fórmula com --color-primary */
-  --cv-chip-pending-bg:     color-mix(in srgb, var(--color-primary) 14%, var(--theme-surface-card, var(--color-surface)) 86%);
-  --cv-chip-pending-border: color-mix(in srgb, var(--color-primary) 62%, var(--theme-border-card, var(--color-border)) 38%);
-  --cv-chip-pending-color:  color-mix(in srgb, var(--color-primary) 82%, var(--color-heading) 18%);
-  --cv-chip-pending-glow:   0 0 0 1px color-mix(in srgb, var(--color-primary) 18%, transparent), 0 0 12px color-mix(in srgb, var(--color-primary) 22%, transparent);
+  --chip-pending-bg:     color-mix(in srgb, var(--color-primary) 14%, var(--theme-surface-card, var(--color-surface)) 86%);
+  --chip-pending-border: color-mix(in srgb, var(--color-primary) 62%, var(--theme-border-card, var(--color-border)) 38%);
+  --chip-pending-color:  color-mix(in srgb, var(--color-primary) 82%, var(--color-heading) 18%);
+  --chip-pending-glow:   0 0 0 1px color-mix(in srgb, var(--color-primary) 18%, transparent), 0 0 12px color-mix(in srgb, var(--color-primary) 22%, transparent);
 
   /* Entidade — primário mais rico */
-  --cv-chip-entity-bg:     color-mix(in srgb, var(--color-primary) 16%, var(--theme-surface-card, var(--color-surface)) 84%);
-  --cv-chip-entity-border: color-mix(in srgb, var(--color-primary) 70%, var(--theme-border-card, var(--color-border)) 30%);
-  --cv-chip-entity-color:  color-mix(in srgb, var(--color-primary) 86%, var(--color-heading) 14%);
-  --cv-chip-entity-glow:   0 0 0 1px color-mix(in srgb, var(--color-primary) 20%, transparent), 0 0 14px color-mix(in srgb, var(--color-primary) 24%, transparent);
+  --chip-entity-bg:     color-mix(in srgb, var(--color-primary) 16%, var(--theme-surface-card, var(--color-surface)) 84%);
+  --chip-entity-border: color-mix(in srgb, var(--color-primary) 70%, var(--theme-border-card, var(--color-border)) 30%);
+  --chip-entity-color:  color-mix(in srgb, var(--color-primary) 86%, var(--color-heading) 14%);
+  --chip-entity-glow:   0 0 0 1px color-mix(in srgb, var(--color-primary) 20%, transparent), 0 0 14px color-mix(in srgb, var(--color-primary) 24%, transparent);
 }
 
 /* Dark — espelha o padrão do state button (16% → 26% bg, text misturado com white) */
 html[data-theme="dark"] {
-  --cv-chip-focus-ring: 0 0 0 3px rgba(112, 184, 255, 0.32);
+  --chip-focus-ring: 0 0 0 3px rgba(112, 184, 255, 0.32);
 
   /* info/pending/entity — success/warning/danger/neutral já herdam via --state-* */
-  --cv-chip-info-bg:       color-mix(in srgb, var(--color-info) 26%, var(--theme-surface-card) 74%);
-  --cv-chip-info-color:    color-mix(in srgb, var(--color-info) 48%, var(--color-white) 52%);
+  --chip-info-bg:       color-mix(in srgb, var(--color-info) 26%, var(--theme-surface-card) 74%);
+  --chip-info-color:    color-mix(in srgb, var(--color-info) 48%, var(--color-white) 52%);
 
-  --cv-chip-pending-bg:    color-mix(in srgb, var(--color-primary) 22%, var(--theme-surface-card) 78%);
-  --cv-chip-pending-color: color-mix(in srgb, var(--color-primary) 52%, var(--color-white) 48%);
+  --chip-pending-bg:    color-mix(in srgb, var(--color-primary) 22%, var(--theme-surface-card) 78%);
+  --chip-pending-color: color-mix(in srgb, var(--color-primary) 52%, var(--color-white) 48%);
 
-  --cv-chip-entity-bg:     color-mix(in srgb, var(--color-primary) 22%, var(--theme-surface-card) 78%);
-  --cv-chip-entity-color:  color-mix(in srgb, var(--color-primary) 52%, var(--color-white) 48%);
+  --chip-entity-bg:     color-mix(in srgb, var(--color-primary) 22%, var(--theme-surface-card) 78%);
+  --chip-entity-color:  color-mix(in srgb, var(--color-primary) 52%, var(--color-white) 48%);
 }
 
 /* Light explícito — bg espelha 6% do state button + glow 30% mais suave */
 html[data-theme="light"] {
-  --cv-chip-info-bg:    color-mix(in srgb, var(--color-info) 6%, var(--theme-surface-card, var(--color-surface)) 94%);
-  --cv-chip-pending-bg: color-mix(in srgb, var(--color-primary) 5%, var(--theme-surface-card, var(--color-surface)) 95%);
-  --cv-chip-entity-bg:  color-mix(in srgb, var(--color-primary) 5%, var(--theme-surface-card, var(--color-surface)) 95%);
+  --chip-info-bg:    color-mix(in srgb, var(--color-info) 6%, var(--theme-surface-card, var(--color-surface)) 94%);
+  --chip-pending-bg: color-mix(in srgb, var(--color-primary) 5%, var(--theme-surface-card, var(--color-surface)) 95%);
+  --chip-entity-bg:  color-mix(in srgb, var(--color-primary) 5%, var(--theme-surface-card, var(--color-surface)) 95%);
 
   /* Glow reduzido: outer blur 18→10px, percentagens -30% */
-  --cv-chip-success-glow: 0 0 0 1px color-mix(in srgb, var(--color-success) 16%, transparent), 0 0 10px color-mix(in srgb, var(--color-success) 22%, transparent);
-  --cv-chip-warning-glow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 16%, transparent), 0 0 10px color-mix(in srgb, var(--color-accent) 20%, transparent);
-  --cv-chip-danger-glow:  0 0 0 1px color-mix(in srgb, var(--color-danger) 14%, transparent), 0 0 10px color-mix(in srgb, var(--color-danger) 20%, transparent);
-  --cv-chip-neutral-glow: 0 0 0 1px color-mix(in srgb, var(--theme-text-muted) 10%, transparent), 0 0 8px color-mix(in srgb, var(--theme-text-muted) 10%, transparent);
-  --cv-chip-muted-glow:   var(--cv-chip-neutral-glow);
-  --cv-chip-info-glow:    0 0 0 1px color-mix(in srgb, var(--color-info) 14%, transparent), 0 0 9px color-mix(in srgb, var(--color-info) 18%, transparent);
-  --cv-chip-pending-glow: 0 0 0 1px color-mix(in srgb, var(--color-primary) 12%, transparent), 0 0 8px color-mix(in srgb, var(--color-primary) 16%, transparent);
-  --cv-chip-entity-glow:  0 0 0 1px color-mix(in srgb, var(--color-primary) 14%, transparent), 0 0 9px color-mix(in srgb, var(--color-primary) 18%, transparent);
-  --cv-chip-filter-glow:  var(--cv-chip-info-glow);
+  --chip-success-glow: 0 0 0 1px color-mix(in srgb, var(--color-success) 16%, transparent), 0 0 10px color-mix(in srgb, var(--color-success) 22%, transparent);
+  --chip-warning-glow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 16%, transparent), 0 0 10px color-mix(in srgb, var(--color-accent) 20%, transparent);
+  --chip-danger-glow:  0 0 0 1px color-mix(in srgb, var(--color-danger) 14%, transparent), 0 0 10px color-mix(in srgb, var(--color-danger) 20%, transparent);
+  --chip-neutral-glow: 0 0 0 1px color-mix(in srgb, var(--theme-text-muted) 10%, transparent), 0 0 8px color-mix(in srgb, var(--theme-text-muted) 10%, transparent);
+  --chip-muted-glow:   var(--chip-neutral-glow);
+  --chip-info-glow:    0 0 0 1px color-mix(in srgb, var(--color-info) 14%, transparent), 0 0 9px color-mix(in srgb, var(--color-info) 18%, transparent);
+  --chip-pending-glow: 0 0 0 1px color-mix(in srgb, var(--color-primary) 12%, transparent), 0 0 8px color-mix(in srgb, var(--color-primary) 16%, transparent);
+  --chip-entity-glow:  0 0 0 1px color-mix(in srgb, var(--color-primary) 14%, transparent), 0 0 9px color-mix(in srgb, var(--color-primary) 18%, transparent);
+  --chip-filter-glow:  var(--chip-info-glow);
 }
 
-.cv-chip,
+.chip,
 .status-chip {
-  --_cv-chip-bg:     var(--cv-chip-bg);
-  --_cv-chip-border: var(--cv-chip-border);
-  --_cv-chip-color:  var(--cv-chip-color);
-  --_cv-chip-glow:   var(--cv-chip-glow);
+  --_cv-chip-bg:     var(--chip-bg);
+  --_cv-chip-border: var(--chip-border);
+  --_cv-chip-color:  var(--chip-color);
+  --_cv-chip-glow:   var(--chip-glow);
   align-items: center;
   background: var(--_cv-chip-bg);
-  border: var(--cv-chip-border-width) solid var(--_cv-chip-border);
+  border: var(--chip-border-width) solid var(--_cv-chip-border);
   border-radius: var(--radius-pill);
   /* Mesma lógica do cv-state-button: glow semântico + sombra genérica */
   box-shadow: var(--_cv-chip-glow), var(--shadow-xs);
@@ -304,9 +304,9 @@ html[data-theme="light"] {
   display: inline-flex;
   font-size: var(--font-size-2xs);
   font-weight: var(--font-weight-bold);
-  gap: var(--cv-chip-gap);
-  letter-spacing: var(--cv-chip-letter-spacing);
-  min-height: var(--cv-chip-height);
+  gap: var(--chip-gap);
+  letter-spacing: var(--chip-letter-spacing);
+  min-height: var(--chip-height);
   line-height: 1;
   margin: 0;
   padding: 0 var(--space-3);
@@ -316,54 +316,54 @@ html[data-theme="light"] {
   white-space: nowrap;
 }
 
-.cv-chip:hover,
+.chip:hover,
 .status-chip:hover {
   box-shadow: var(--_cv-chip-glow), var(--shadow-sm);
   transform: translateY(-1px);
 }
 
-.cv-chip:focus-visible,
+.chip:focus-visible,
 .status-chip:focus-visible {
-  box-shadow: var(--_cv-chip-glow), var(--cv-chip-focus-ring);
+  box-shadow: var(--_cv-chip-glow), var(--chip-focus-ring);
   outline: none;
 }
 
-.cv-chip--compact {
-  min-height: var(--cv-chip-height-compact);
+.chip--compact {
+  min-height: var(--chip-height-compact);
   padding-inline: var(--space-2);
 }
 
-.cv-chip--interactive,
-.cv-chip--filter,
-.cv-chip--removable {
+.chip--interactive,
+.chip--filter,
+.chip--removable {
   cursor: pointer;
 }
 
-.cv-chip.is-selected {
+.chip.is-selected {
   box-shadow: var(--_cv-chip-glow), var(--shadow-sm), 0 0 0 2px var(--_cv-chip-border);
 }
 
-.cv-chip.is-disabled {
-  opacity: var(--cv-chip-disabled-opacity);
+.chip.is-disabled {
+  opacity: var(--chip-disabled-opacity);
   pointer-events: none;
 }
 
-.cv-chip__icon,
-.cv-chip__remove,
-.cv-chip__count {
+.chip__icon,
+.chip__remove,
+.chip__count {
   align-items: center;
   display: inline-flex;
   flex-shrink: 0;
   justify-content: center;
 }
 
-.cv-chip__icon,
-.cv-chip__remove {
-  font-size: var(--cv-chip-icon-size);
+.chip__icon,
+.chip__remove {
+  font-size: var(--chip-icon-size);
   line-height: 1;
 }
 
-.cv-chip__count {
+.chip__count {
   background: var(--_cv-chip-border);
   border-radius: var(--radius-pill);
   color: var(--_cv-chip-color);
@@ -371,109 +371,109 @@ html[data-theme="light"] {
   padding: 2px var(--space-2);
 }
 
-.cv-chip--success,
+.chip--success,
 .status-chip--completed,
 .status-chip--active,
 .status-chip--success,
 .status-chip--default {
-  --_cv-chip-bg: var(--cv-chip-success-bg);
-  --_cv-chip-border: var(--cv-chip-success-border);
-  --_cv-chip-color: var(--cv-chip-success-color);
-  --_cv-chip-glow: var(--cv-chip-success-glow);
+  --_cv-chip-bg: var(--chip-success-bg);
+  --_cv-chip-border: var(--chip-success-border);
+  --_cv-chip-color: var(--chip-success-color);
+  --_cv-chip-glow: var(--chip-success-glow);
 }
 
-.cv-chip--warning,
+.chip--warning,
 .status-chip--draft,
 .status-chip--warning {
-  --_cv-chip-bg: var(--cv-chip-warning-bg);
-  --_cv-chip-border: var(--cv-chip-warning-border);
-  --_cv-chip-color: var(--cv-chip-warning-color);
-  --_cv-chip-glow: var(--cv-chip-warning-glow);
+  --_cv-chip-bg: var(--chip-warning-bg);
+  --_cv-chip-border: var(--chip-warning-border);
+  --_cv-chip-color: var(--chip-warning-color);
+  --_cv-chip-glow: var(--chip-warning-glow);
 }
 
-.cv-chip--danger,
+.chip--danger,
 .status-chip--danger {
-  --_cv-chip-bg: var(--cv-chip-danger-bg);
-  --_cv-chip-border: var(--cv-chip-danger-border);
-  --_cv-chip-color: var(--cv-chip-danger-color);
-  --_cv-chip-glow: var(--cv-chip-danger-glow);
+  --_cv-chip-bg: var(--chip-danger-bg);
+  --_cv-chip-border: var(--chip-danger-border);
+  --_cv-chip-color: var(--chip-danger-color);
+  --_cv-chip-glow: var(--chip-danger-glow);
 }
 
-.cv-chip--info,
+.chip--info,
 .status-chip--info {
-  --_cv-chip-bg: var(--cv-chip-info-bg);
-  --_cv-chip-border: var(--cv-chip-info-border);
-  --_cv-chip-color: var(--cv-chip-info-color);
-  --_cv-chip-glow: var(--cv-chip-info-glow);
+  --_cv-chip-bg: var(--chip-info-bg);
+  --_cv-chip-border: var(--chip-info-border);
+  --_cv-chip-color: var(--chip-info-color);
+  --_cv-chip-glow: var(--chip-info-glow);
 }
 
-.cv-chip--pending,
+.chip--pending,
 .status-chip--pending {
-  --_cv-chip-bg: var(--cv-chip-pending-bg);
-  --_cv-chip-border: var(--cv-chip-pending-border);
-  --_cv-chip-color: var(--cv-chip-pending-color);
-  --_cv-chip-glow: var(--cv-chip-pending-glow);
+  --_cv-chip-bg: var(--chip-pending-bg);
+  --_cv-chip-border: var(--chip-pending-border);
+  --_cv-chip-color: var(--chip-pending-color);
+  --_cv-chip-glow: var(--chip-pending-glow);
 }
 
-.cv-chip--muted,
+.chip--muted,
 .status-chip--muted {
-  --_cv-chip-bg: var(--cv-chip-muted-bg);
-  --_cv-chip-border: var(--cv-chip-muted-border);
-  --_cv-chip-color: var(--cv-chip-muted-color);
-  --_cv-chip-glow: var(--cv-chip-muted-glow);
+  --_cv-chip-bg: var(--chip-muted-bg);
+  --_cv-chip-border: var(--chip-muted-border);
+  --_cv-chip-color: var(--chip-muted-color);
+  --_cv-chip-glow: var(--chip-muted-glow);
 }
 
-.cv-chip--neutral {
-  --_cv-chip-bg: var(--cv-chip-neutral-bg);
-  --_cv-chip-border: var(--cv-chip-neutral-border);
-  --_cv-chip-color: var(--cv-chip-neutral-color);
-  --_cv-chip-glow: var(--cv-chip-neutral-glow);
+.chip--neutral {
+  --_cv-chip-bg: var(--chip-neutral-bg);
+  --_cv-chip-border: var(--chip-neutral-border);
+  --_cv-chip-color: var(--chip-neutral-color);
+  --_cv-chip-glow: var(--chip-neutral-glow);
 }
 
-.cv-chip--entity {
-  --_cv-chip-bg: var(--cv-chip-entity-bg);
-  --_cv-chip-border: var(--cv-chip-entity-border);
-  --_cv-chip-color: var(--cv-chip-entity-color);
-  --_cv-chip-glow: var(--cv-chip-entity-glow);
+.chip--entity {
+  --_cv-chip-bg: var(--chip-entity-bg);
+  --_cv-chip-border: var(--chip-entity-border);
+  --_cv-chip-color: var(--chip-entity-color);
+  --_cv-chip-glow: var(--chip-entity-glow);
 }
 
-.cv-chip--filter {
-  --_cv-chip-bg: var(--cv-chip-filter-bg);
-  --_cv-chip-border: var(--cv-chip-filter-border);
-  --_cv-chip-color: var(--cv-chip-filter-color);
-  --_cv-chip-glow: var(--cv-chip-filter-glow);
+.chip--filter {
+  --_cv-chip-bg: var(--chip-filter-bg);
+  --_cv-chip-border: var(--chip-filter-border);
+  --_cv-chip-color: var(--chip-filter-color);
+  --_cv-chip-glow: var(--chip-filter-glow);
 }
 
-.cv-data-table {
+.data-table {
   border-collapse: collapse;
   min-width: 680px;
   width: 100%;
 }
 
-.cv-data-table :is(th, td) {
+.data-table :is(th, td) {
   border-bottom: 1px solid var(--color-border);
   padding: var(--space-3) var(--space-4);
   text-align: left;
   vertical-align: middle;
 }
 
-.cv-data-table th {
+.data-table th {
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
-.cv-data-table tbody tr:last-child td {
+.data-table tbody tr:last-child td {
   border-bottom: 0;
 }
 
 @media (max-width: 600px) {
-  .cv-data-table {
+  .data-table {
     min-width: 0;
   }
 
-  .cv-data-table thead {
+  .data-table thead {
     clip: rect(0 0 0 0);
     clip-path: inset(50%);
     height: 1px;
@@ -483,21 +483,21 @@ html[data-theme="light"] {
     width: 1px;
   }
 
-  .cv-data-table :is(tbody, tr, td) {
+  .data-table :is(tbody, tr, td) {
     display: block;
     width: 100%;
   }
 
-  .cv-data-table tr {
+  .data-table tr {
     border-bottom: 1px solid var(--color-border);
     padding: var(--space-3);
   }
 
-  .cv-data-table tr:last-child {
+  .data-table tr:last-child {
     border-bottom: 0;
   }
 
-  .cv-data-table td {
+  .data-table td {
     align-items: center;
     border: 0;
     display: flex;
@@ -507,7 +507,7 @@ html[data-theme="light"] {
     text-align: right;
   }
 
-  .cv-data-table td::before {
+  .data-table td::before {
     color: var(--color-text-muted);
     content: attr(data-label);
     font-size: var(--font-size-xs);
@@ -515,22 +515,22 @@ html[data-theme="light"] {
     text-align: left;
   }
 
-  .cv-data-table td:first-child {
+  .data-table td:first-child {
     align-items: flex-start;
     display: grid;
     text-align: left;
   }
 
-  .cv-data-table td:first-child::before,
-  .cv-data-table__actions::before {
+  .data-table td:first-child::before,
+  .data-table__actions::before {
     display: none;
   }
 
-  .cv-data-table__actions {
+  .data-table__actions {
     width: 100%;
   }
 
-  .cv-data-table__actions .cv-btn {
+  .data-table__actions .cv-btn {
     width: 100%;
   }
 }

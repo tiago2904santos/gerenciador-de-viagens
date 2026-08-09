@@ -16,10 +16,10 @@
 
 .usuarios-page .list-header,
 .usuarios-page .list-header__rail,
-.usuarios-page .list-header .cv-inline-create__toggle:not(.is-filled):not(.usuario-quick-add__toggle--ready):not(.area-quick-add__toggle--ready),
+.usuarios-page .list-header .inline-create__toggle:not(.is-filled):not(.usuario-quick-add__toggle--ready):not(.area-quick-add__toggle--ready),
 :is(html[data-theme="dark"]) .usuarios-page .list-header,
 :is(html[data-theme="dark"]) .usuarios-page .list-header__rail,
-:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle:not(.is-filled):not(.usuario-quick-add__toggle--ready):not(.area-quick-add__toggle--ready) {
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle:not(.is-filled):not(.usuario-quick-add__toggle--ready):not(.area-quick-add__toggle--ready) {
   background: var(--step1-surface);
 }
 
@@ -28,23 +28,23 @@
   background: var(--color-surface-muted);
 }
 
-.usuarios-page .cv-record-row,
-:is(html[data-theme="dark"]) .usuarios-page .cv-record-row {
+.usuarios-page .record-row,
+:is(html[data-theme="dark"]) .usuarios-page .record-row {
   background: var(--step1-field, var(--step1-surface));
   border: 0;
   box-shadow: none;
 }
 
-.usuarios-page .cv-record-row:hover,
-.usuarios-page .cv-record-row:focus-within,
-:is(html[data-theme="dark"]) .usuarios-page .cv-record-row:hover,
-:is(html[data-theme="dark"]) .usuarios-page .cv-record-row:focus-within {
+.usuarios-page .record-row:hover,
+.usuarios-page .record-row:focus-within,
+:is(html[data-theme="dark"]) .usuarios-page .record-row:hover,
+:is(html[data-theme="dark"]) .usuarios-page .record-row:focus-within {
   background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field, var(--step1-surface)));
   border: 0;
   box-shadow: none;
 }
 
-.usuarios-page .cv-record-row__vincular {
+.usuarios-page .record-row__vincular {
   flex-shrink: 0;
 }
 
@@ -53,7 +53,7 @@
  * justificativas). Só entra com `.is-filled` / `--ready` quando o JS valida
  * todos os campos obrigatórios.
  */
-.usuarios-page .list-header .cv-inline-create__toggle {
+.usuarios-page .list-header .inline-create__toggle {
   transition:
     background-color 220ms ease,
     border-color 220ms ease,
@@ -61,8 +61,8 @@
     box-shadow 220ms ease;
 }
 
-.usuarios-page .list-header .cv-inline-create__toggle .cv-inline-create__toggle-icon,
-.usuarios-page .list-header .cv-inline-create__toggle .cv-inline-create__toggle-label {
+.usuarios-page .list-header .inline-create__toggle .inline-create__toggle-icon,
+.usuarios-page .list-header .inline-create__toggle .inline-create__toggle-label {
   transition:
     opacity 140ms ease,
     transform 180ms ease,
@@ -70,18 +70,18 @@
     color 220ms ease;
 }
 
-.usuarios-page .list-header .cv-inline-create__toggle.is-filled,
-.usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready,
-.usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready,
-.usuarios-page .list-header .cv-inline-create__toggle.is-filled[aria-expanded="true"],
-.usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready[aria-expanded="true"],
-.usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready[aria-expanded="true"],
-:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.is-filled,
-:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready,
-:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready,
-:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.is-filled[aria-expanded="true"],
-:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready[aria-expanded="true"],
-:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready[aria-expanded="true"] {
+.usuarios-page .list-header .inline-create__toggle.is-filled,
+.usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready,
+.usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready,
+.usuarios-page .list-header .inline-create__toggle.is-filled[aria-expanded="true"],
+.usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready[aria-expanded="true"],
+.usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready[aria-expanded="true"],
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.is-filled,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.is-filled[aria-expanded="true"],
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready[aria-expanded="true"],
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready[aria-expanded="true"] {
   animation: none;
   background: var(--color-accent);
   background-image: none;
@@ -91,18 +91,18 @@
   font-weight: var(--font-weight-bold);
 }
 
-.usuarios-page .list-header .cv-inline-create__toggle.is-filled:hover,
-.usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready:hover,
-.usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready:hover,
-.usuarios-page .list-header .cv-inline-create__toggle.is-filled:focus-visible,
-.usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready:focus-visible,
-.usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready:focus-visible,
-:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.is-filled:hover,
-:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready:hover,
-:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready:hover,
-:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.is-filled:focus-visible,
-:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready:focus-visible,
-:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready:focus-visible {
+.usuarios-page .list-header .inline-create__toggle.is-filled:hover,
+.usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready:hover,
+.usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready:hover,
+.usuarios-page .list-header .inline-create__toggle.is-filled:focus-visible,
+.usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready:focus-visible,
+.usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready:focus-visible,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.is-filled:hover,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready:hover,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready:hover,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.is-filled:focus-visible,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready:focus-visible,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready:focus-visible {
   background: var(--color-accent-hover, var(--color-accent));
   background-image: none;
   border: 0;
@@ -110,20 +110,20 @@
   color: var(--color-on-accent, #19232d);
 }
 
-.usuarios-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
-.usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready .cv-inline-create__toggle-icon,
-.usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready .cv-inline-create__toggle-icon,
-:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.is-filled .cv-inline-create__toggle-icon,
-:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--ready .cv-inline-create__toggle-icon,
-:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--ready .cv-inline-create__toggle-icon {
+.usuarios-page .list-header .inline-create__toggle.is-filled .inline-create__toggle-icon,
+.usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready .inline-create__toggle-icon,
+.usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready .inline-create__toggle-icon,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.is-filled .inline-create__toggle-icon,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready .inline-create__toggle-icon,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready .inline-create__toggle-icon {
   background: color-mix(in srgb, var(--color-on-accent, #19232d) 14%, transparent);
   color: inherit;
 }
 
-.usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--changing .cv-inline-create__toggle-icon,
-.usuarios-page .list-header .cv-inline-create__toggle.usuario-quick-add__toggle--changing .cv-inline-create__toggle-label,
-.usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--changing .cv-inline-create__toggle-icon,
-.usuarios-page .list-header .cv-inline-create__toggle.area-quick-add__toggle--changing .cv-inline-create__toggle-label {
+.usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--changing .inline-create__toggle-icon,
+.usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--changing .inline-create__toggle-label,
+.usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--changing .inline-create__toggle-icon,
+.usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--changing .inline-create__toggle-label {
   opacity: 0;
   transform: translateY(4px);
 }
@@ -133,8 +133,8 @@
   padding: var(--space-3) clamp(var(--space-4), 2vw, var(--space-5));
 }
 
-.usuarios-page .list-header .cv-inline-create__panel.is-open,
-:is(html[data-theme="dark"]) .usuarios-page .list-header .cv-inline-create__panel.is-open {
+.usuarios-page .list-header .inline-create__panel.is-open,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__panel.is-open {
   border-top: 0;
   padding-top: 0;
 }
@@ -176,13 +176,13 @@
   padding: 14px;
 }
 
-[data-usuario-quick-add] .cv-form-block--split,
-[data-area-quick-add] .cv-form-block--split {
+[data-usuario-quick-add] .form-block--split,
+[data-area-quick-add] .form-block--split {
   align-items: start;
 }
 
-[data-usuario-quick-add] .cv-form-block__body,
-[data-area-quick-add] .cv-form-block__body {
+[data-usuario-quick-add] .form-block__body,
+[data-area-quick-add] .form-block__body {
   min-width: 0;
 }
 
@@ -241,7 +241,7 @@
   padding: 10px 12px;
 }
 
-.vincular-usuario-modal__intro .cv-icon {
+.vincular-usuario-modal__intro .icon {
   color: var(--action-info-text, var(--color-info));
   flex: 0 0 18px;
   height: 18px;
@@ -253,8 +253,8 @@
   color: var(--action-text-strong, var(--theme-text-heading));
 }
 
-:is(html[data-theme="dark"]) .vincular-usuario-modal__fields.cv-form-stack,
-.vincular-usuario-modal__fields.cv-form-stack,
+:is(html[data-theme="dark"]) .vincular-usuario-modal__fields.form-stack,
+.vincular-usuario-modal__fields.form-stack,
 .vincular-usuario-modal__fields {
   --step1-field: var(--step1-surface);
   --color-input-bg: var(--step1-field);
@@ -280,18 +280,18 @@
 
 /* Controles no poço do formulário: sem borda e sem colar nas laterais do painel. */
 .vincular-usuario-modal__fields :is(
-  .cv-search-picker,
-  .cv-custom-select,
+  .search-picker,
+  .custom-select,
   .cv-field__control
 ) {
   width: 100%;
 }
 
 .vincular-usuario-modal__fields :is(
-  .cv-search-picker__control,
-  .cv-search-picker__input,
-  .cv-custom-select__trigger,
-  .cv-custom-select__trigger--v2
+  .search-picker__control,
+  .search-picker__input,
+  .custom-select__trigger,
+  .custom-select__trigger--v2
 ) {
   background: var(--step1-field, var(--color-input-bg)) !important;
   border: 0 !important;
@@ -299,11 +299,11 @@
   box-shadow: none !important;
 }
 
-.vincular-usuario-modal__fields .cv-custom-select__trigger--v2 .cv-custom-select__value {
+.vincular-usuario-modal__fields .custom-select__trigger--v2 .custom-select__value {
   padding: 0 14px;
 }
 
-.vincular-usuario-modal__fields .cv-search-picker__control {
+.vincular-usuario-modal__fields .search-picker__control {
   min-height: var(--control-height-md, 44px);
   padding-inline: 12px;
 }
@@ -319,16 +319,16 @@
   padding: 0;
 }
 
-.vincular-usuario-modal__footer.cv-form-card__footer {
+.vincular-usuario-modal__footer.form-card__footer {
   display: block;
   width: 100%;
 }
 
-.vincular-usuario-modal__footer .cv-card-footer-section {
+.vincular-usuario-modal__footer .card-footer-section {
   margin: 0;
 }
 
-.vincular-usuario-modal__footer .cv-card-footer {
+.vincular-usuario-modal__footer .card-footer {
   align-items: center;
   background: transparent;
   border: 0;
@@ -340,15 +340,15 @@
 }
 
 /* Evita o secondary esticar e parecer um bloco maior que o primary. */
-#vincular-usuario-modal .cv-card-footer__secondary .cv-btn,
-#vincular-usuario-modal .cv-card-footer__primary .cv-btn {
+#vincular-usuario-modal .card-footer__secondary .cv-btn,
+#vincular-usuario-modal .card-footer__primary .cv-btn {
   align-self: center;
   box-sizing: border-box;
   height: var(--control-height-md, 44px);
   min-height: var(--control-height-md, 44px);
 }
 
-.vincular-usuario-modal__footer .cv-card-footer-section__divider {
+.vincular-usuario-modal__footer .card-footer-section__divider {
   border-top: 1px solid var(--color-border-soft, var(--action-group-border, var(--color-border)));
   display: block;
 }
@@ -363,7 +363,7 @@
  * aqui só resta a lista de vínculos, que não deve ganhar cartão dentro do
  * bloco.
  */
-.usuarios-area-form .cv-record-list {
+.usuarios-area-form .record-list {
   gap: var(--space-2);
 }
 
@@ -381,13 +381,13 @@
 /*
  * Sem moldura na lista de vínculos.
  *
- * `simple_list.html` emite `cv-record-list simple-list`, e `.simple-list` ainda
+ * `simple_list.html` emite `record-list simple-list`, e `.simple-list` ainda
  * é o nome de uma lista LEGADA em `lists.css` — é dela que vinham a borda de
- * 1px, o raio e a sombra em volta das linhas. O `cv-record-list` canônico não
+ * 1px, o raio e a sombra em volta das linhas. O `record-list` canônico não
  * tem moldura nenhuma; aqui só desfazemos a herança acidental.
  */
-.usuarios-area-form .cv-record-list.simple-list,
-:is(html[data-theme="dark"]) .usuarios-area-form .cv-record-list.simple-list {
+.usuarios-area-form .record-list.simple-list,
+:is(html[data-theme="dark"]) .usuarios-area-form .record-list.simple-list {
   background: transparent;
   border: 0;
   border-radius: 0;

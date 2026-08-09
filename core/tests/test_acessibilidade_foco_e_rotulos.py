@@ -77,12 +77,12 @@ class SkipLinkDoLoginTests(SimpleTestCase):
     def test_o_login_tem_skip_link_apontando_para_alvo_que_existe(self):
         html = ler("templates/core/login.html")
 
-        self.assertIn('class="cv-skip-link" href="#auth-form"', html)
+        self.assertIn('class="skip-link" href="#auth-form"', html)
         self.assertIn('id="auth-form"', html)
 
     def test_o_estilo_do_skip_link_acompanha_a_tela_que_o_usa(self):
         """`app-shell.css` não entra nesta tela; sem isto o link ficaria visível."""
-        self.assertIn(".cv-skip-link", ler("static/css/auth.css"))
+        self.assertIn(".skip-link", ler("static/css/auth.css"))
 
 
 class ErroDeLoginAssociadoTests(TestCase):

@@ -5,12 +5,12 @@
   "use strict";
 
   // Os itens do menu (Enviar WhatsApp/Business/Copiar) ficam dentro de
-  // .cv-action-menu, que o CV.overlay move para <body> ao abrir — por
+  // .action-menu, que o CV.overlay move para <body> ao abrir — por
   // isso não dá pra usar closest() a partir do item para achar a linha do
   // servidor; volta-se ao botão-gatilho original (que continua no lugar)
   // pelo id do menu.
   function diariaWaTrigger(el) {
-    var menu = el.closest(".cv-action-menu");
+    var menu = el.closest(".action-menu");
     if (!menu) return null;
     return document.querySelector(
       '[data-overlay-kind="menu"][data-overlay-target="' + menu.id + '"]'
@@ -34,11 +34,11 @@
   function diariaWaContext(el) {
     var trigger = diariaWaTrigger(el);
     if (!trigger) return null;
-    var row = trigger.closest(".cv-person-row");
+    var row = trigger.closest(".person-row");
     var numInput = row ? row.querySelector('input[name$="-numero_solicitacao"]') : null;
     var liberacaoInput = row ? row.querySelector('input[name$="-data_liberacao_diarias"]') : null;
     var prazoInput = row ? row.querySelector('input[name$="-prazo_limite_saque"]') : null;
-    var rangeTrigger = row ? row.querySelector(".cv-record-card__inline-range [data-cv-date-picker-trigger]") : null;
+    var rangeTrigger = row ? row.querySelector(".record-card__inline-range [data-cv-date-picker-trigger]") : null;
 
     if (numInput && !numInput.value.trim()) {
       numInput.focus();

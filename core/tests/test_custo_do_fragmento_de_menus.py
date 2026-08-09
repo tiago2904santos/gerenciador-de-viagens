@@ -76,7 +76,7 @@ class CustoDoFragmentoDeMenusTests(TestCase):
             resposta = self.client.get(url)
         self.assertEqual(resposta.status_code, 200)
         # Sem isto o teste mediria um fragmento vazio e passaria sempre.
-        self.assertIn(b"cv-action-menu", resposta.content)
+        self.assertIn(b"action-menu", resposta.content)
         return len(capturadas.captured_queries)
 
     def test_dobrar_destinos_e_servidores_nao_dobra_as_consultas(self):

@@ -3,7 +3,7 @@
     <summary class="document-inline-card__header">
       <span class="document-inline-card__title">
         {{ s.nome }}
-        {% if s.is_motorista %} <span class="cv-person-row__badge">Motorista</span>{% endif %}
+        {% if s.is_motorista %} <span class="person-row__badge">Motorista</span>{% endif %}
         {% if s.diaria_ajustada %} {% include "components/ui/badges/chip.html" with label="Diária ajustada" tone="info" size="compact" only %}{% endif %}
       </span>
       <span class="document-inline-card__header-end">

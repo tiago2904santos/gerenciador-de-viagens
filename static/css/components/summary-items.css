@@ -6,7 +6,7 @@
    Variantes --principal/--secondary são moduladas pelos contextos.
    ======================================================================== */
 
-.cv-summary-item {
+.summary-item {
   background: var(--route-card-inner-bg);
   border: 1px solid var(--route-card-inner-border);
   border-radius: var(--radius-md);
@@ -17,7 +17,7 @@
   padding: var(--space-3);
 }
 
-.cv-summary-label {
+.summary-label {
   color: var(--theme-text-muted);
   font-size: 11px;
   font-weight: 700;
@@ -25,7 +25,7 @@
   text-transform: uppercase;
 }
 
-.cv-summary-value {
+.summary-value {
   color: var(--theme-stat-value);
   font-size: 1.05rem;
   font-weight: 800;

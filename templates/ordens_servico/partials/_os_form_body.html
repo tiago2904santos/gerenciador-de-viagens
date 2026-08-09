@@ -4,6 +4,6 @@
 
 {% include "components/ui/forms/form_block.html" with element_id="os-card-motivo-texto" section_id="os-motivo-texto-title" extra_class="travel-document-block document-form-block os-block" title="Motivo" description="Complemente com o motivo ou finalidade específica." body_extra_class="termo-block__body" body_template="ordens_servico/partials/_motivo_texto_body.html" %}
 
-{% include "components/ui/forms/form_block.html" with element_id="os-card-evento" section_id="os-evento-title" extra_class="travel-document-block document-form-block os-block" title="Evento" description="Período e destinos da atividade." body_extra_class="cv-form-stack termo-evento-body" body_template="ordens_servico/partials/_evento_body.html" %}
+{% include "components/ui/forms/form_block.html" with element_id="os-card-evento" section_id="os-evento-title" extra_class="travel-document-block document-form-block os-block" title="Evento" description="Período e destinos da atividade." body_extra_class="form-stack termo-evento-body" body_template="ordens_servico/partials/_evento_body.html" %}
 
 {% include "components/ui/forms/form_block.html" with element_id="os-card-servidores" section_id="os-servidores-title" variant="resource" extra_class="travel-document-block document-form-block os-block" title="Equipe" description="Viajantes da ordem de serviço." action_label="Novo viajante" action_url=servidor_create_url action_autosave=True body_template="ordens_servico/partials/_servidores_body.html" %}

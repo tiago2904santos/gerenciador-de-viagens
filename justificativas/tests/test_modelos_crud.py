@@ -32,7 +32,7 @@ class ModelosJustificativaCrudTests(TestCase):
         self.assertContains(r, "Novo modelo")
         self.assertContains(r, 'name="nome"')
         self.assertContains(r, 'name="texto"')
-        self.assertContains(r, "cv-floating-action")
+        self.assertContains(r, "floating-action")
         self.assertContains(r, "Voltar para as justificativas")
         self.assertContains(r, reverse("justificativas:index"))
 

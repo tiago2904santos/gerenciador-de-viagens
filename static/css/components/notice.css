@@ -1,5 +1,5 @@
 /* ========================================================================
-   cv-notice — aviso inline unificado (Etapa 7, fase 13)
+   notice — aviso inline unificado (Etapa 7, fase 13)
 
    Substitui progressivamente: .alert/.alert-*, .cv-alert/.cv-alert--*,
    .diario-diaria-alert, .pte-events__banner.
@@ -7,7 +7,7 @@
    ======================================================================== */
 
 /* Contêiner de pilha */
-.cv-notice-stack,
+.notice-stack,
 .alerts {
   display: grid;
   gap: var(--space-2);
@@ -15,7 +15,7 @@
 }
 
 /* Base */
-.cv-notice,
+.notice,
 .alert,
 .cv-alert {
   align-items: flex-start;
@@ -30,14 +30,14 @@
   position: relative;
 }
 
-.cv-notice > *,
+.notice > *,
 .alert > *,
 .cv-alert > * {
   grid-column: 2;
   min-width: 0;
 }
 
-.cv-notice::before,
+.notice::before,
 .alert::before {
   border-radius: var(--radius-pill);
   content: "";
@@ -49,7 +49,7 @@
   width: 8px;
 }
 
-.cv-notice__title,
+.notice__title,
 .alert__title {
   color: inherit;
   display: block;
@@ -58,7 +58,7 @@
   grid-column: 2;
 }
 
-.cv-notice__message,
+.notice__message,
 .alert__message {
   color: inherit;
   display: block;
@@ -68,7 +68,7 @@
 }
 
 /* Variante info */
-.cv-notice--info,
+.notice--info,
 .alert-info,
 .alert--info,
 .pte-events__banner {
@@ -77,7 +77,7 @@
   color: var(--color-info-text);
 }
 
-.cv-notice--info::before,
+.notice--info::before,
 .alert-info::before,
 .alert--info::before {
   background: var(--color-info);
@@ -85,7 +85,7 @@
 
 /* Banner PTE: layout flex com ícone (sem marcador circular) */
 .pte-events__banner,
-.cv-notice.pte-events__banner {
+.notice.pte-events__banner {
   align-items: center;
   display: flex;
   font-size: var(--font-size-sm, 0.875rem);
@@ -95,7 +95,7 @@
 }
 
 .pte-events__banner::before,
-.cv-notice.pte-events__banner::before {
+.notice.pte-events__banner::before {
   content: none;
   display: none;
 }
@@ -108,7 +108,7 @@
 }
 
 /* Variante success */
-.cv-notice--success,
+.notice--success,
 .alert-success,
 .alert--success {
   background: var(--color-success-soft);
@@ -116,14 +116,14 @@
   color: var(--color-success);
 }
 
-.cv-notice--success::before,
+.notice--success::before,
 .alert-success::before,
 .alert--success::before {
   background: var(--color-success);
 }
 
 /* Variante warning */
-.cv-notice--warning,
+.notice--warning,
 .alert-warning,
 .alert--warning,
 .diario-diaria-alert {
@@ -137,7 +137,7 @@
   line-height: 1.5;
 }
 
-.cv-notice--warning::before,
+.notice--warning::before,
 .alert-warning::before,
 .alert--warning::before,
 .diario-diaria-alert::before {
@@ -146,24 +146,24 @@
 }
 
 .diario-diaria-alert strong,
-.cv-notice--warning strong {
+.notice--warning strong {
   color: var(--color-text);
 }
 
 .diario-diaria-alert__values,
-.cv-notice__values {
+.notice__values {
   color: var(--color-text);
   font-weight: 700;
   white-space: nowrap;
 }
 
 .diario-diaria-alert a,
-.cv-notice--warning a {
+.notice--warning a {
   color: var(--color-primary);
   font-weight: 600;
 }
 
-.cv-notice--danger,
+.notice--danger,
 .alert-error,
 .alert-danger,
 .alert--error,
@@ -173,7 +173,7 @@
   color: var(--color-danger-text);
 }
 
-.cv-notice--danger::before,
+.notice--danger::before,
 .alert-error::before,
 .alert-danger::before,
 .alert--error::before {
@@ -194,7 +194,7 @@
 }
 
 /* Layout com ação lateral */
-.cv-notice--action,
+.notice--action,
 .cv-alert--action {
   align-items: center;
   display: flex;
@@ -205,7 +205,7 @@
   margin: 0 0 var(--space-4);
 }
 
-.cv-notice--action::before,
+.notice--action::before,
 .cv-alert--action::before {
   content: none;
   display: none;

@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  /* ── cv-search-picker: reset + reinit ──────────────────────── */
+  /* ── search-picker: reset + reinit ──────────────────────── */
 
   function resetPicker(select) {
     if (window.CV && window.CV.locationRows && typeof window.CV.locationRows.resetSearchPicker === "function") {
@@ -327,7 +327,7 @@
       setHiddenValue(modoInput, "SERVIDOR", options);
       setSelectValue(cargoSelect, option.dataset.cargo || "", options);
       // Em modo silencioso (carga/edição) o setSelectValue não dispara "change",
-      // então o cv-custom-select do cargo não atualiza o texto visível sozinho.
+      // então o custom-select do cargo não atualiza o texto visível sozinho.
       refreshCustomSelect(cargoSelect);
       syncing = false;
     }
@@ -371,7 +371,7 @@
       applyServidorSelection(initialOption, { silent: true });
     } else if (manualInput && manualInput.value) {
       pickerInput.value = manualInput.value;
-      if (pickerRoot) pickerRoot.classList.add("cv-search-picker--has-query");
+      if (pickerRoot) pickerRoot.classList.add("search-picker--has-query");
       setHiddenValue(modoInput, "MANUAL", { silent: true });
     }
   }
@@ -568,7 +568,7 @@
 
   function setChipLabel(wrapper, text) {
     if (!wrapper) return;
-    var label = wrapper.querySelector(".cv-chip__label");
+    var label = wrapper.querySelector(".chip__label");
     if (label) label.textContent = text;
   }
 

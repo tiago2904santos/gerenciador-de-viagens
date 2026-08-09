@@ -337,19 +337,19 @@
     function setOpen(nextOpen) {
       isOpen = !!nextOpen;
       panel.hidden = !isOpen;
-      root.classList.toggle('cv-date-picker--open', isOpen);
+      root.classList.toggle('date-picker--open', isOpen);
       triggers.forEach(function (btn) {
         btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
       });
       if (isOpen) {
         positionPanel();
         // Garante animação mesmo com o panel fora do root (portal)
-        panel.classList.remove('cv-date-picker__panel--entering');
+        panel.classList.remove('date-picker__panel--entering');
         void panel.offsetWidth; // force reflow
-        panel.classList.add('cv-date-picker__panel--entering');
+        panel.classList.add('date-picker__panel--entering');
         render();
       } else {
-        panel.classList.remove('cv-date-picker__panel--entering');
+        panel.classList.remove('date-picker__panel--entering');
       }
     }
 
@@ -588,7 +588,7 @@
       weekdays.innerHTML = '';
       WEEKDAYS.forEach(function (label) {
         var node = document.createElement('span');
-        node.className = 'cv-date-picker__weekday';
+        node.className = 'date-picker__weekday';
         node.textContent = label;
         weekdays.appendChild(node);
       });
@@ -629,22 +629,22 @@
       }
 
       button.type = 'button';
-      button.className = 'cv-date-picker__day';
+      button.className = 'date-picker__day';
       button.textContent = String(date.getDate());
       button.setAttribute('aria-label', dayAriaLabel);
       button.setAttribute('aria-pressed', (isStart || isEnd || isSameDay(date, selectedSingle) || isMultiRange) ? 'true' : 'false');
       button.dataset.date = formatIsoDate(date);
-      button.classList.toggle('cv-date-picker__day--muted', !isCurrentMonth);
-      button.classList.toggle('cv-date-picker__day--today', isToday);
-      button.classList.toggle('cv-date-picker__day--selected', mode !== 'multi' && (isStart || isEnd || isSameDay(date, selectedSingle)));
-      button.classList.toggle('cv-date-picker__day--range', isInRange);
-      button.classList.toggle('cv-date-picker__day--range-start', isStart);
-      button.classList.toggle('cv-date-picker__day--range-end', isEnd);
-      button.classList.toggle('cv-date-picker__day--multi-selected', isMultiRange);
-      button.classList.toggle('cv-date-picker__day--multi-start', isMultiStart);
-      button.classList.toggle('cv-date-picker__day--multi-middle', isMultiMiddle);
-      button.classList.toggle('cv-date-picker__day--multi-end', isMultiEnd);
-      button.classList.toggle('cv-date-picker__day--multi-single', isMultiSingle);
+      button.classList.toggle('date-picker__day--muted', !isCurrentMonth);
+      button.classList.toggle('date-picker__day--today', isToday);
+      button.classList.toggle('date-picker__day--selected', mode !== 'multi' && (isStart || isEnd || isSameDay(date, selectedSingle)));
+      button.classList.toggle('date-picker__day--range', isInRange);
+      button.classList.toggle('date-picker__day--range-start', isStart);
+      button.classList.toggle('date-picker__day--range-end', isEnd);
+      button.classList.toggle('date-picker__day--multi-selected', isMultiRange);
+      button.classList.toggle('date-picker__day--multi-start', isMultiStart);
+      button.classList.toggle('date-picker__day--multi-middle', isMultiMiddle);
+      button.classList.toggle('date-picker__day--multi-end', isMultiEnd);
+      button.classList.toggle('date-picker__day--multi-single', isMultiSingle);
 
       if (mode === 'multi' && isMultiSel) {
         // Uma mesma data pode atender mais de um trecho (chegar e seguir viagem no mesmo dia).
@@ -658,7 +658,7 @@
         var hasMiddleStep = multiStepIndex > 0 && multiStepIndex < selectedDates.length - 1;
         if (hasMiddleStep || multiStepIndexes.length > 1) {
           var badge = document.createElement('span');
-          badge.className = 'cv-date-picker__day-badge';
+          badge.className = 'date-picker__day-badge';
           badge.textContent = multiStepIndexes.map(function (index) {
             return String(index + 1);
           }).join('·');

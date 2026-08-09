@@ -5,7 +5,7 @@
    acrescentar um sexto documento exigia editar template, JS e modal. {% endcomment %}
 <button
   type="button"
-  class="cv-icon-btn cv-icon-btn--sign{% if doc.assinado %} is-assinado{% endif %}"
+  class="icon-btn icon-btn--sign{% if doc.assinado %} is-assinado{% endif %}"
   aria-label="{% if doc.assinado %}Gerenciar {{ title }}{% else %}Anexar {{ title }}{% endif %}"
   data-tooltip="{% if doc.assinado %}Gerenciar assinado{% else %}Anexar assinado{% endif %}"
   data-attach-signed-trigger

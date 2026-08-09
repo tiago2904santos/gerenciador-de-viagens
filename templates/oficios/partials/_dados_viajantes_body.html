@@ -1,6 +1,6 @@
 {% include "components/ui/forms/form_block.html" with title="Identificação" description="Número, protocolo e custeio" section_id="travel-document-identity-title" heading_level=3 variant="split" extra_class="travel-document-block" body_template="oficios/partials/step1/_identity_fields.html" %}
 
-{% include "components/ui/forms/form_block.html" with title="Finalidade" description="Motivo e descrição da viagem" section_id="travel-document-purpose-title" heading_level=3 extra_class="travel-document-block" body_extra_class="cv-form-stack" body_template="oficios/partials/step1/_purpose_fields.html" %}
+{% include "components/ui/forms/form_block.html" with title="Finalidade" description="Motivo e descrição da viagem" section_id="travel-document-purpose-title" heading_level=3 extra_class="travel-document-block" body_extra_class="form-stack" body_template="oficios/partials/step1/_purpose_fields.html" %}
 
 {% include "components/ui/forms/form_block.html" with title="Equipe" description="Viajantes e motorista" section_id="travel-document-wizard-equipe-title" heading_level=3 variant="resource" extra_class="travel-document-block" action_label="Novo viajante" action_url=servidor_create_url action_autosave=True body_template="oficios/partials/step1/_team_fields.html" %}
 

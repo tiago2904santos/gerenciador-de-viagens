@@ -101,9 +101,9 @@ class PlanoWizardViewsTests(TestCase):
         )
 
         self.assertContains(response, 'class="pt-diarias-summary-grid"')
-        self.assertContains(response, "cv-summary-item--principal")
+        self.assertContains(response, "summary-item--principal")
         self.assertContains(response, "pt-diarias-summary-secondary-stack")
-        self.assertContains(response, "cv-summary-item--secondary", count=3)
+        self.assertContains(response, "summary-item--secondary", count=3)
         self.assertContains(response, "pt-diarias-summary-card--unitario")
         self.assertContains(response, "data-pt-resultado-total")
         self.assertContains(response, "data-pt-resultado-unitario")

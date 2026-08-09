@@ -217,7 +217,7 @@ class ServidorCrudTests(TestCase):
         self.assertEqual([aba["label"] for aba in abas], ["Todos", "DELEGADO", "ESCRIVAO", "MOTORISTA"])
         self.assertEqual(abas[0]["count"], 11)
         self.assertNotIn("RARO", [aba["label"] for aba in abas])
-        self.assertContains(response, 'class="cv-list-tabs"')
+        self.assertContains(response, 'class="list-tabs"')
         self.assertContains(response, f"cargo={cargo_a.pk}")
 
         filtrado = self.client.get(reverse("cadastros:servidores_index"), {"cargo": cargo_a.pk})
@@ -487,7 +487,7 @@ class ViaturaCrudTests(TestCase):
         )
         self.assertEqual(abas[0]["count"], 11)
         self.assertNotIn("GNV", [aba["label"] for aba in abas])
-        self.assertContains(response, 'class="cv-list-tabs"')
+        self.assertContains(response, 'class="list-tabs"')
 
         por_unidade = self.client.get(reverse("cadastros:viaturas_index"), {"unidade": unidade.pk})
         self.assertEqual(len(por_unidade.context["rows"]), 8)

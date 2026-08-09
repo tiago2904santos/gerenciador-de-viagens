@@ -113,7 +113,7 @@ class DocumentoNaoCitaMortoTests(SimpleTestCase):
         texto = DOC.read_text(encoding="utf-8")
         bloco = texto[texto.index(HISTORICO[0]) : texto.index(HISTORICO[1])]
 
-        for morto in ("data-quick-add-toggle", "data-cv-select", "cv-search-picker.js"):
+        for morto in ("data-quick-add-toggle", "data-cv-select", "search-picker.js"):
             with self.subTest(morto=morto):
                 self.assertIn(morto, bloco)
                 self.assertNotIn(morto, corpo_vivo())

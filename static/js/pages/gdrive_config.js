@@ -2,12 +2,12 @@
   "use strict";
 
   const FOLDER_ICON_SVG =
-    '<svg class="cv-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+    '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
     '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" ' +
     'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>';
 
   const SHARED_DRIVE_ICON_SVG =
-    '<svg class="cv-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
+    '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
     '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" ' +
     'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>' +
     '<circle cx="12" cy="13" r="2.4" fill="none" stroke="currentColor" stroke-width="1.6"></circle></svg>';

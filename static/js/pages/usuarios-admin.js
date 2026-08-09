@@ -3,15 +3,15 @@
 
   function initUsuarioQuickAdd() {
     var root = document.querySelector("[data-usuario-quick-add]");
-    var panel = root ? root.closest("form.cv-inline-create__panel") : null;
+    var panel = root ? root.closest("form.inline-create__panel") : null;
     var toggle = document.querySelector(
-      ".usuarios-page .cv-inline-create__toggle[data-inline-create-toggle][aria-controls='quick-add-usuario']"
+      ".usuarios-page .inline-create__toggle[data-inline-create-toggle][aria-controls='quick-add-usuario']"
     );
     if (!root || !panel || !toggle) return;
     if (toggle.dataset.usuarioSaveToggleReady === "true") return;
     toggle.dataset.usuarioSaveToggleReady = "true";
 
-    var labelEl = toggle.querySelector(".cv-inline-create__toggle-label");
+    var labelEl = toggle.querySelector(".inline-create__toggle-label");
     var idleLabel =
       toggle.getAttribute("data-inline-create-idle-label") ||
       (labelEl ? labelEl.textContent.trim() : "Cadastrar usuário");
@@ -72,15 +72,15 @@
 
   function initAreaQuickAdd() {
     var root = document.querySelector("[data-area-quick-add]");
-    var panel = root ? root.closest("form.cv-inline-create__panel") : null;
+    var panel = root ? root.closest("form.inline-create__panel") : null;
     var toggle = document.querySelector(
-      ".usuarios-page .cv-inline-create__toggle[data-inline-create-toggle][aria-controls='quick-add-area']"
+      ".usuarios-page .inline-create__toggle[data-inline-create-toggle][aria-controls='quick-add-area']"
     );
     if (!root || !panel || !toggle) return;
     if (toggle.dataset.areaSaveToggleReady === "true") return;
     toggle.dataset.areaSaveToggleReady = "true";
 
-    var labelEl = toggle.querySelector(".cv-inline-create__toggle-label");
+    var labelEl = toggle.querySelector(".inline-create__toggle-label");
     var idleLabel =
       toggle.getAttribute("data-inline-create-idle-label") ||
       (labelEl ? labelEl.textContent.trim() : "Cadastrar área");

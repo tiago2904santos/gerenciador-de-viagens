@@ -1,6 +1,6 @@
 <div
   id="documentos-pdf-viewer"
-  class="cv-document-viewer doc-pdf-viewer{% if is_demo %} cv-document-viewer--demo{% endif %}"
+  class="document-viewer doc-pdf-viewer{% if is_demo %} document-viewer--demo{% endif %}"
   {% if not is_demo %}
     data-pdf-url="{{ pdf_url }}"
     data-worker-src="{{ worker_src }}"
@@ -8,7 +8,7 @@
     data-share-url="{{ share_url }}"
   {% endif %}
 >
-  <header class="cv-document-viewer__toolbar doc-pdf-toolbar" role="toolbar" aria-label="Ferramentas do visualizador">
+  <header class="document-viewer__toolbar doc-pdf-toolbar" role="toolbar" aria-label="Ferramentas do visualizador">
     <div class="doc-pdf-toolbar__left">
       <button type="button" class="cv-btn cv-btn--secondary doc-pdf-toolbar__btn" id="doc-pdf-back" aria-label="Voltar"{% if is_demo %} disabled{% endif %}>Voltar</button>
       <span class="doc-pdf-toolbar__title" title="{{ filename|default:'oficio-621-2026.pdf' }}">{{ filename|default:"oficio-621-2026.pdf" }}</span>
@@ -37,25 +37,25 @@
     </div>
   </header>
 
-  <div class="cv-document-viewer__body doc-pdf-body">
-    <aside class="cv-document-viewer__sidebar doc-pdf-sidebar" aria-label="Miniaturas">
+  <div class="document-viewer__body doc-pdf-body">
+    <aside class="document-viewer__sidebar doc-pdf-sidebar" aria-label="Miniaturas">
       {% if is_demo %}
-        <button class="doc-pdf-thumb doc-pdf-thumb--active" type="button" aria-label="Página 1"><span class="cv-document-viewer__thumb-paper">1</span></button>
-        <button class="doc-pdf-thumb" type="button" aria-label="Página 2"><span class="cv-document-viewer__thumb-paper">2</span></button>
-        <button class="doc-pdf-thumb" type="button" aria-label="Página 3"><span class="cv-document-viewer__thumb-paper">3</span></button>
+        <button class="doc-pdf-thumb doc-pdf-thumb--active" type="button" aria-label="Página 1"><span class="document-viewer__thumb-paper">1</span></button>
+        <button class="doc-pdf-thumb" type="button" aria-label="Página 2"><span class="document-viewer__thumb-paper">2</span></button>
+        <button class="doc-pdf-thumb" type="button" aria-label="Página 3"><span class="document-viewer__thumb-paper">3</span></button>
       {% else %}
         <div id="doc-pdf-thumbs" class="doc-pdf-thumbs"></div>
       {% endif %}
     </aside>
-    <div class="cv-document-viewer__stage doc-pdf-stage">
+    <div class="document-viewer__stage doc-pdf-stage">
       <div id="doc-pdf-canvas-wrap" class="doc-pdf-canvas-wrap" tabindex="0">
         {% if is_demo %}
-          <div class="cv-document-viewer__paper" role="img" aria-label="Prévia ilustrativa da primeira página do documento">
-            <span class="cv-document-viewer__paper-mark">CV</span>
-            <span class="cv-document-viewer__paper-line cv-document-viewer__paper-line--title"></span>
-            <span class="cv-document-viewer__paper-line"></span>
-            <span class="cv-document-viewer__paper-line"></span>
-            <span class="cv-document-viewer__paper-line cv-document-viewer__paper-line--short"></span>
+          <div class="document-viewer__paper" role="img" aria-label="Prévia ilustrativa da primeira página do documento">
+            <span class="document-viewer__paper-mark">CV</span>
+            <span class="document-viewer__paper-line document-viewer__paper-line--title"></span>
+            <span class="document-viewer__paper-line"></span>
+            <span class="document-viewer__paper-line"></span>
+            <span class="document-viewer__paper-line document-viewer__paper-line--short"></span>
           </div>
         {% endif %}
       </div>

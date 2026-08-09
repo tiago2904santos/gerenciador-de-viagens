@@ -3,7 +3,7 @@
 {% endcomment %}
 {% include "components/ui/forms/form_block.html" with element_id="termo-block-oficio" section_id="termo-oficio-title" extra_class="travel-document-block document-form-block" title="Ofício vinculado" description="Opcional. Reaproveite destino, período, servidores e viatura de um ofício." body_extra_class="termo-block__body" body_template="termos/partials/_oficio_body.html" %}
 
-{% include "components/ui/forms/form_block.html" with element_id="termo-block-evento" section_id="termo-evento-title" extra_class="travel-document-block document-form-block" title="Evento" description="Destino e período — obrigatórios quando não vierem do ofício." body_extra_class="cv-form-stack termo-evento-body" body_template="termos/partials/_evento_body.html" %}
+{% include "components/ui/forms/form_block.html" with element_id="termo-block-evento" section_id="termo-evento-title" extra_class="travel-document-block document-form-block" title="Evento" description="Destino e período — obrigatórios quando não vierem do ofício." body_extra_class="form-stack termo-evento-body" body_template="termos/partials/_evento_body.html" %}
 
 {% include "components/ui/forms/form_block.html" with element_id="termo-block-servidores" section_id="termo-servidores-title" variant="resource" extra_class="travel-document-block document-form-block" title="Equipe" description="Viajantes do termo. Com vários servidores, gera um termo para cada um." action_label="Novo viajante" action_url=servidor_create_url action_autosave=True body_template="termos/partials/_servidores_body.html" %}
 

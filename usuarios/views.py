@@ -52,7 +52,7 @@ def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
 
 
 def _abas_administracao(*, ativa, contadores):
-    """Alternador Usuários / Áreas — o mesmo `cv-segment-toggle` dos Termos.
+    """Alternador Usuários / Áreas — o mesmo `segment-toggle` dos Termos.
 
     É o que amarra as duas listagens: cada uma é uma página inteira, e o
     toggle no cabeçalho é a passagem entre elas.

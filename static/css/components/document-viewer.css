@@ -1,4 +1,4 @@
-.cv-document-viewer {
+.document-viewer {
   display: flex;
   flex-direction: column;
   gap: var(--space-4, 1rem);
@@ -6,7 +6,7 @@
   min-width: 0;
 }
 
-.cv-document-viewer--demo {
+.document-viewer--demo {
   min-height: 620px;
 }
 
@@ -112,7 +112,7 @@
   padding: var(--space-3, 0.75rem);
 }
 
-.cv-document-viewer__thumb-paper {
+.document-viewer__thumb-paper {
   align-items: center;
   aspect-ratio: 0.72;
   display: flex;
@@ -122,7 +122,7 @@
   width: 100%;
 }
 
-.cv-document-viewer__paper {
+.document-viewer__paper {
   aspect-ratio: 0.707;
   display: grid;
   gap: 20px;
@@ -131,7 +131,7 @@
   width: min(100%, 520px);
 }
 
-.cv-document-viewer__paper-mark {
+.document-viewer__paper-mark {
   align-items: center;
   border-radius: 50%;
   display: flex;
@@ -141,15 +141,15 @@
   width: 58px;
 }
 
-.cv-document-viewer__paper-line {
+.document-viewer__paper-line {
   border-radius: 999px;
   display: block;
   height: 8px;
   width: 100%;
 }
 
-.cv-document-viewer__paper-line--title { height: 14px; width: 68%; }
-.cv-document-viewer__paper-line--short { width: 52%; }
+.document-viewer__paper-line--title { height: 14px; width: 68%; }
+.document-viewer__paper-line--short { width: 52%; }
 
 @media (max-width: 900px) {
   .doc-pdf-body { grid-template-columns: 1fr; }
@@ -165,5 +165,5 @@
   .doc-pdf-toolbar__right { width: 100%; }
   .doc-pdf-toolbar__right .cv-btn { flex: 1 1 auto; }
   .doc-pdf-zoom { margin-left: auto; }
-  .cv-document-viewer__paper { gap: 14px; padding: 34px; }
+  .document-viewer__paper { gap: 14px; padding: 34px; }
 }

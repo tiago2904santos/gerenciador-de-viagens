@@ -1,76 +1,76 @@
 {# Linha canônica de catálogo — roster: identity + título/subtitle/facts + ações. #}
 {# row: title, avatar?, badges?, subtitle?, facts?, meta? (fallback), edit/delete/docs hooks. #}
 <div
-  class="cv-record-row"
+  class="record-row"
   role="listitem"
   data-collection-item
   data-search-text="{{ row.title }}{% if row.search_extra %} {{ row.search_extra }}{% endif %}{% if row.subtitle %} {{ row.subtitle }}{% endif %}{% if row.facts %}{% for item in row.facts %} {{ item.value }}{% endfor %}{% elif row.meta %}{% if row.meta.0.label %}{% for item in row.meta %} {{ item.value }}{% endfor %}{% else %} {{ row.meta }}{% endif %}{% endif %}"
   {% if row.status_value %}data-status-value="{{ row.status_value }}"{% endif %}
 >
   {% if row.avatar %}
-    <span class="cv-record-row__identity" aria-hidden="true"><span>{{ row.avatar }}</span></span>
+    <span class="record-row__identity" aria-hidden="true"><span>{{ row.avatar }}</span></span>
   {% endif %}
 
-  <div class="cv-record-row__content">
-    <div class="cv-record-row__heading">
-      <span class="cv-record-row__title">{{ row.title }}</span>
+  <div class="record-row__content">
+    <div class="record-row__heading">
+      <span class="record-row__title">{{ row.title }}</span>
       {% if row.badges %}
-        <span class="cv-record-row__badges">
+        <span class="record-row__badges">
           {% for badge in row.badges %}
-            <span class="cv-record-row__badge">{{ badge.text }}</span>
+            <span class="record-row__badge">{{ badge.text }}</span>
           {% endfor %}
         </span>
       {% endif %}
     </div>
 
     {% if row.subtitle %}
-      <p class="cv-record-row__subtitle">{{ row.subtitle }}</p>
+      <p class="record-row__subtitle">{{ row.subtitle }}</p>
     {% endif %}
 
     {% if row.facts %}
-      <div class="cv-record-row__facts">
+      <div class="record-row__facts">
         {% for item in row.facts %}
-          {% if not forloop.first %}<span class="cv-record-row__facts-sep" aria-hidden="true">·</span>{% endif %}
-          <span class="cv-record-row__fact">
-            {% if item.label %}<span class="cv-record-row__fact-label">{{ item.label }}</span>{% endif %}
-            <span class="cv-record-row__fact-value">{{ item.value }}</span>
+          {% if not forloop.first %}<span class="record-row__facts-sep" aria-hidden="true">·</span>{% endif %}
+          <span class="record-row__fact">
+            {% if item.label %}<span class="record-row__fact-label">{{ item.label }}</span>{% endif %}
+            <span class="record-row__fact-value">{{ item.value }}</span>
           </span>
         {% endfor %}
       </div>
     {% elif row.meta %}
-      <div class="cv-record-row__facts">
+      <div class="record-row__facts">
         {% if row.meta.0.label %}
           {% for item in row.meta %}
-            {% if not forloop.first %}<span class="cv-record-row__facts-sep" aria-hidden="true">·</span>{% endif %}
-            <span class="cv-record-row__fact">
-              <span class="cv-record-row__fact-label">{{ item.label }}</span>
-              <span class="cv-record-row__fact-value">{{ item.value }}</span>
+            {% if not forloop.first %}<span class="record-row__facts-sep" aria-hidden="true">·</span>{% endif %}
+            <span class="record-row__fact">
+              <span class="record-row__fact-label">{{ item.label }}</span>
+              <span class="record-row__fact-value">{{ item.value }}</span>
             </span>
           {% endfor %}
         {% else %}
-          <span class="cv-record-row__fact"><span class="cv-record-row__fact-value">{{ row.meta }}</span></span>
+          <span class="record-row__fact"><span class="record-row__fact-value">{{ row.meta }}</span></span>
         {% endif %}
       </div>
     {% endif %}
   </div>
 
-  <div class="cv-record-row__actions">
+  <div class="record-row__actions">
     {% if row.set_default_url %}
-      <form method="post" action="{{ row.set_default_url }}" class="cv-record-row__inline-form">
+      <form method="post" action="{{ row.set_default_url }}" class="record-row__inline-form">
         {% csrf_token %}
         <button
-          class="cv-icon-btn cv-icon-btn--star"
+          class="icon-btn icon-btn--star"
           type="submit"
           aria-label="Definir como padrão"
           data-tooltip="Definir como padrão"
         >{% include "components/ui/icons/icon.html" with icon="star" only %}</button>
       </form>
     {% endif %}
-    <div class="cv-icon-btn-group">
+    <div class="icon-btn-group">
       {% if row.vincular_url %}
         <button
           type="button"
-          class="cv-icon-btn cv-icon-btn--link cv-record-row__vincular"
+          class="icon-btn icon-btn--link record-row__vincular"
           data-overlay-trigger
           data-overlay-kind="dialog"
           data-overlay-target="vincular-usuario-modal"
@@ -85,7 +85,7 @@
         {% with menu_suffix=row_index|default:"item" %}
           <button
             type="button"
-            class="cv-icon-btn {% if row.remover_assinado_url %}cv-icon-btn--complete{% else %}cv-icon-btn--settings{% endif %}"
+            class="icon-btn {% if row.remover_assinado_url %}icon-btn--complete{% else %}icon-btn--settings{% endif %}"
             aria-label="Abrir documentos de {{ row.title }}"
             aria-haspopup="true"
             aria-expanded="false"
@@ -95,7 +95,7 @@
             data-overlay-target="simple-row-document-menu-{{ row.title|slugify }}-{{ menu_suffix }}"
           >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
           <div
-            class="cv-action-menu cv-action-menu--rich"
+            class="action-menu action-menu--rich"
             id="simple-row-document-menu-{{ row.title|slugify }}-{{ menu_suffix }}"
             role="menu"
             hidden
@@ -114,7 +114,7 @@
             {% if row.anexar_assinado_url %}
               <button
                 type="button"
-                class="cv-action-menu__item cv-action-menu__item--rich"
+                class="action-menu__item action-menu__item--rich"
                 role="menuitem"
                 data-attach-signed-trigger
                 data-attach-signed-url="{{ row.anexar_assinado_url }}"
@@ -123,10 +123,10 @@
                 data-attach-signed-current-view-url="{{ row.assinado_view_url }}"
                 data-attach-signed-current-remove-url="{{ row.remover_assinado_url }}"
               >
-                <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
+                <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
                   {% include "components/ui/icons/icon.html" with icon="sign" only %}
                 </span>
-                <span class="cv-action-menu__item-copy">
+                <span class="action-menu__item-copy">
                   <strong>{% if row.remover_assinado_url %}Gerenciar assinado{% else %}Anexar assinado{% endif %}</strong>
                   <small>{% if row.remover_assinado_url %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
                 </span>
@@ -140,7 +140,7 @@
           {# Edição em diálogo: quem abre o modal é o script da página, que sabe #}
           {# trocar a copy e sincronizar os pickers a partir de `edit_fields`.   #}
           <button
-            class="cv-icon-btn cv-icon-btn--edit"
+            class="icon-btn icon-btn--edit"
             type="button"
             data-row-edit-modal="{{ row.edit_modal }}"
             data-edit-url="{{ row.edit_url }}"
@@ -151,7 +151,7 @@
           >{% include "components/ui/icons/icon.html" with icon="edit" only %}</button>
         {% elif row.edit_fields_json %}
           <button
-            class="cv-icon-btn cv-icon-btn--edit"
+            class="icon-btn icon-btn--edit"
             type="button"
             data-quick-edit
             data-edit-url="{{ row.edit_url }}"
@@ -166,7 +166,7 @@
       {% if row.delete_url %}
         {% if row.delete_modal %}
           <button
-            class="cv-icon-btn cv-icon-btn--delete"
+            class="icon-btn icon-btn--delete"
             type="button"
             data-overlay-trigger data-overlay-kind="dialog" data-overlay-target="delete-confirm-modal"
             data-delete-url="{{ row.delete_url }}"

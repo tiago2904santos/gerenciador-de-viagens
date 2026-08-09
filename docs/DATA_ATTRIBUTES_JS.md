@@ -176,7 +176,7 @@ Checkbox renderizado como cartão clicável (`components/ui/forms/card_toggle.ht
 | `data-cancel-reason-modal`, `data-cancel-reason-form`, `data-cancel-reason-label` | modal de cancelamento com motivo |
 | `data-vincular-usuario-modal`, `data-vincular-usuario-form`, `data-vincular-usuario-label` | modal de vínculo de usuário |
 
-## Date picker — `components/cv-date-picker.js`
+## Date picker — `components/date-picker.js`
 
 Raiz: `data-cv-date-picker`. Idempotência e ciclo de vida por `registerEnhancer` (`JS-02`).
 

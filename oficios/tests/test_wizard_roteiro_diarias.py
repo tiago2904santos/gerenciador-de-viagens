@@ -92,7 +92,7 @@ class OficioWizardRoteiroDiariasTests(TestCase):
         self.assertContains(response, "Etapa 2")
         self.assertContains(response, reverse("oficios:index"))
         self.assertContains(response, "Voltar à lista")
-        self.assertContains(response, "cv-card-footer-section")
+        self.assertContains(response, "card-footer-section")
         self.assertContains(response, "Avançar")
 
         oficio.refresh_from_db()

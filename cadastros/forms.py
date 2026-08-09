@@ -695,7 +695,7 @@ _TIPO_FIELD_MAP = [
 
 
 class _AssinanteServidorSelect(forms.Select):
-    """Select com metadados nas options para o cv-search-picker."""
+    """Select com metadados nas options para o search-picker."""
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
@@ -841,7 +841,7 @@ class TabelaDiariaForm(forms.ModelForm):
         fields = ["faixa", "vigencia_inicio", "valor_24h"]
         widgets = {
             "faixa": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL)}),
-            # O calendário do sistema é o componente global `cv-date-picker`;
+            # O calendário do sistema é o componente global `date-picker`;
             # o campo em si é só o hidden que ele preenche.
             "vigencia_inicio": forms.HiddenInput(attrs={"data-cv-date-picker-value": ""}),
             "valor_24h": forms.NumberInput(

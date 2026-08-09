@@ -23,8 +23,8 @@
 }
 
 /* Primary dourado no header do bloco (mesmo accent do footer de formulário). */
-.perfil-form-page .cv-form-block__actions .cv-btn--primary,
-:is(html[data-theme="dark"]) .perfil-form-page .cv-form-block__actions .cv-btn--primary {
+.perfil-form-page .form-block__actions .cv-btn--primary,
+:is(html[data-theme="dark"]) .perfil-form-page .form-block__actions .cv-btn--primary {
   background: var(--color-accent);
   background-image: none;
   border: 0;
@@ -35,31 +35,31 @@
   text-shadow: none;
 }
 
-.perfil-form-page .cv-form-block__actions .cv-btn--primary:hover,
-:is(html[data-theme="dark"]) .perfil-form-page .cv-form-block__actions .cv-btn--primary:hover {
+.perfil-form-page .form-block__actions .cv-btn--primary:hover,
+:is(html[data-theme="dark"]) .perfil-form-page .form-block__actions .cv-btn--primary:hover {
   background: var(--color-accent-hover, var(--color-accent));
   background-image: none;
   box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
   color: var(--color-on-accent, #19232d);
 }
 
-.perfil-form-page .cv-form-block__actions .cv-btn--primary .cv-btn__icon {
+.perfil-form-page .form-block__actions .cv-btn--primary .cv-btn__icon {
   color: inherit;
 }
 
-.perfil-form-page .cv-form-block .cv-card-footer-section,
-.perfil-form-page .cv-form-block .cv-form-card__footer {
+.perfil-form-page .form-block .card-footer-section,
+.perfil-form-page .form-block .form-card__footer {
   margin: 0;
   padding: 0;
   width: auto;
 }
 
-.perfil-form-page .cv-form-block .cv-card-footer-section__divider {
+.perfil-form-page .form-block .card-footer-section__divider {
   margin: 0;
 }
 
-.perfil-form-page .cv-form-block .cv-card-footer,
-:is(html[data-theme="dark"]) .perfil-form-page .cv-form-block .cv-card-footer {
+.perfil-form-page .form-block .card-footer,
+:is(html[data-theme="dark"]) .perfil-form-page .form-block .card-footer {
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -68,8 +68,8 @@
   padding: var(--space-2, 0.5rem) 0 0;
 }
 
-.perfil-form-page .cv-record-list.simple-list,
-:is(html[data-theme="dark"]) .perfil-form-page .cv-record-list.simple-list {
+.perfil-form-page .record-list.simple-list,
+:is(html[data-theme="dark"]) .perfil-form-page .record-list.simple-list {
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -90,7 +90,7 @@
   box-shadow: none;
 }
 
-/* Pendências — lista canônica cv-record-row, sem ilha gdrive-pend. */
+/* Pendências — lista canônica record-row, sem ilha gdrive-pend. */
 .perfil-form-page .perfil-pendencias-list {
   max-height: min(28rem, 50vh);
   overflow: auto;

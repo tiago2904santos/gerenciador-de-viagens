@@ -106,7 +106,7 @@
     return value;
   }
 
-  /* ── Sincroniza visual do cv-segment-toggle ─────────────────── */
+  /* ── Sincroniza visual do segment-toggle ─────────────────── */
 
   function syncModoButtons(root) {
     var modoInput = root.querySelector(MODO_SEL);
@@ -119,9 +119,9 @@
 
       /* Dispara animação de entrada apenas na troca (não no carregamento) */
       if (active && !wasActive) {
-        btn.classList.remove('cv-segment-toggle__btn--pop');
+        btn.classList.remove('segment-toggle__btn--pop');
         void btn.offsetWidth;   /* reinicia o keyframe */
-        btn.classList.add('cv-segment-toggle__btn--pop');
+        btn.classList.add('segment-toggle__btn--pop');
       }
     });
   }

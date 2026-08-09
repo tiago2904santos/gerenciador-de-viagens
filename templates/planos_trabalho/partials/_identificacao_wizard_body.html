@@ -2,7 +2,7 @@
 
 {% include "components/ui/forms/form_block.html" with element_id="pt-card-coordenadores" section_id="pt-coordenadores-title" variant="split" extra_class="travel-document-block document-form-block" title="Coordenação" description="Coordenadores administrativo e operacional do plano." body_extra_class="termo-block__body" body_template="planos_trabalho/partials/_identificacao_coordenadores_body.html" %}
 
-{% include "components/ui/forms/form_block.html" with element_id="pt-card-evento" section_id="pt-evento-title" extra_class="travel-document-block document-form-block" title="Evento" description="Destino e período — obrigatórios quando não vierem do ofício." body_extra_class="cv-form-stack termo-evento-body" body_template="planos_trabalho/partials/_identificacao_evento_body.html" %}
+{% include "components/ui/forms/form_block.html" with element_id="pt-card-evento" section_id="pt-evento-title" extra_class="travel-document-block document-form-block" title="Evento" description="Destino e período — obrigatórios quando não vierem do ofício." body_extra_class="form-stack termo-evento-body" body_template="planos_trabalho/partials/_identificacao_evento_body.html" %}
 
 <input type="hidden" name="contextualizacao_auto" value="{% if contextualizacao_auto %}1{% else %}0{% endif %}" data-pt-texto-auto-flag="contextualizacao">
 <input type="hidden" name="coordenacao_auto" value="{% if coordenacao_auto %}1{% else %}0{% endif %}" data-pt-texto-auto-flag="coordenacao">

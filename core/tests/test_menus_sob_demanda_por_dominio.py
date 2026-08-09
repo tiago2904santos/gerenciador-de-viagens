@@ -33,7 +33,7 @@ from usuarios.models import AreaTrabalho
 
 
 CORPO_DE_MENU = re.compile(r'<div[^>]*class="[^"]*\bcv-action-menu\b[^"]*"')
-ID_DE_MENU = re.compile(r'<div[^>]*class="[^"]*cv-action-menu[^"]*"[^>]*id="([^"]+)"')
+ID_DE_MENU = re.compile(r'<div[^>]*class="[^"]*action-menu[^"]*"[^>]*id="([^"]+)"')
 GATILHO = re.compile(r'data-overlay-kind="menu"[^>]*data-overlay-target="([^"]+)"')
 GATILHO_INVERTIDO = re.compile(r'data-overlay-target="([^"]+)"[^>]*data-overlay-kind="menu"')
 

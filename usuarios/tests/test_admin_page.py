@@ -91,7 +91,7 @@ class UsuariosAdminPageTests(TestCase):
         self.assertContains(response, reverse("usuarios:area_update", args=[area.pk]))
         self.assertContains(response, reverse("usuarios:area_delete", args=[area.pk]))
         self.assertContains(response, 'data-overlay-target="delete-confirm-modal"')
-        self.assertContains(response, "cv-icon-btn--delete")
+        self.assertContains(response, "icon-btn--delete")
         self.assertContains(response, "Excluir área?")
 
     def test_exclui_area_pela_lista(self):
@@ -320,8 +320,8 @@ class UsuariosAdminPageTests(TestCase):
         response = self.client.get(reverse("usuarios:index"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "cv-record-row__vincular")
-        self.assertContains(response, "cv-icon-btn--link")
+        self.assertContains(response, "record-row__vincular")
+        self.assertContains(response, "icon-btn--link")
         self.assertContains(response, 'data-overlay-target="vincular-usuario-modal"')
         self.assertContains(response, f'data-vincular-usuario-id="{user.pk}"')
         self.assertContains(response, f'data-vincular-url="{reverse("usuarios:vinculo_create")}"')
@@ -331,7 +331,7 @@ class UsuariosAdminPageTests(TestCase):
         self.assertContains(response, reverse("usuarios:usuario_update", args=[user.pk]))
         self.assertContains(response, reverse("usuarios:usuario_delete", args=[user.pk]))
         self.assertContains(response, 'data-overlay-target="delete-confirm-modal"')
-        self.assertContains(response, "cv-icon-btn--delete")
+        self.assertContains(response, "icon-btn--delete")
         self.assertContains(response, "Excluir usuário?")
         # A própria conta logada não oferece exclusão.
         self.assertNotContains(
@@ -341,7 +341,7 @@ class UsuariosAdminPageTests(TestCase):
         self.assertNotContains(response, "usuario-qa-permissoes")
         self.assertNotContains(response, "usuario-is_active")
         self.assertNotContains(response, "usuario-is_staff")
-        self.assertNotContains(response, "cv-floating-action--stacked")
+        self.assertNotContains(response, "floating-action--stacked")
 
     def test_exclui_usuario_pela_lista(self):
         self.client.force_login(self.admin)

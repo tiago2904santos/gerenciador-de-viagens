@@ -18,10 +18,10 @@
   margin: 0 0 var(--space-1);
 }
 
-/* ── Reuso do card de ofício (cv-record-card) na lista de roteiros ── */
+/* ── Reuso do card de ofício (record-card) na lista de roteiros ── */
 
 /* Rota pode ocupar várias linhas em vez de truncar com reticências */
-.cv-record-card--roteiro .cv-record-card__info-value--rota {
+.record-card--roteiro .record-card__info-value--rota {
   white-space: normal;
 }
 
@@ -32,13 +32,13 @@
    ao lado (16cqi/3rem), invertendo a hierarquia do bloco. 15cqi é o maior
    coeficiente que ainda acomoda "R$ 12.500,00" sem corte — o --fit usa
    text-overflow: clip, e valor cortado em campo de dinheiro é inaceitável. */
-.cv-record-card--roteiro .cv-fact-block__value--strong--fit {
+.record-card--roteiro .fact-block__value--strong--fit {
   font-size: clamp(1.05rem, 15cqi, 3.25rem);
 }
 
 /* "Tipo de destino" é uma categoria curta e herda o tamanho que no card de
    ofício pertence à placa. Reduzido para o valor das diárias liderar o bloco. */
-.cv-record-card--roteiro .cv-fact-block__value {
+.record-card--roteiro .fact-block__value {
   font-size: clamp(0.95rem, 12cqi, 2.25rem);
 }
 

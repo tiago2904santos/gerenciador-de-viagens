@@ -1,6 +1,6 @@
 /* Canonical file picker and attached-file list. Page CSS may position it, not skin it. */
 
-.cv-file-input,
+.file-input,
 .prestacao-file-input,
 .prestacao-file-widget__clear-input {
   clip: rect(0 0 0 0);
@@ -12,20 +12,20 @@
   width: 1px;
 }
 
-.cv-file-widget,
+.file-widget,
 .prestacao-file-widget {
   display: grid;
   gap: var(--space-3);
   min-width: 0;
 }
 
-.cv-file-widget.is-busy,
+.file-widget.is-busy,
 .prestacao-file-widget.is-busy {
   cursor: progress;
   opacity: 0.78;
 }
 
-.cv-file-picker,
+.file-picker,
 .prestacao-file-picker {
   align-items: stretch;
   background: var(--cv-field-bg, var(--color-surface));
@@ -40,35 +40,35 @@
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
 }
 
-.cv-file-widget.is-selected .cv-file-picker,
+.file-widget.is-selected .file-picker,
 .prestacao-file-widget.is-selected .prestacao-file-picker {
   border-color: color-mix(in srgb, var(--color-primary) 64%, var(--color-border-strong));
 }
 
-.cv-file-widget.is-dragover .cv-file-picker,
+.file-widget.is-dragover .file-picker,
 .prestacao-file-widget.is-dragover .prestacao-file-picker {
   background: color-mix(in srgb, var(--color-primary) 16%, var(--cv-field-bg, var(--color-surface)));
   border-color: var(--color-primary);
   box-shadow: var(--cv-field-focus-ring, var(--focus-ring));
 }
 
-.cv-file-widget.is-error .cv-file-picker,
+.file-widget.is-error .file-picker,
 .prestacao-file-widget.is-error .prestacao-file-picker {
   border-color: var(--color-danger);
 }
 
-.cv-file-picker:hover,
+.file-picker:hover,
 .prestacao-file-picker:hover {
   border-color: var(--color-border-strong, var(--color-border-strong));
 }
 
-.cv-file-picker:focus-within,
+.file-picker:focus-within,
 .prestacao-file-picker:focus-within {
   border-color: var(--cv-field-border-focus, var(--color-focus));
-  box-shadow: var(--cv-field-shadow-focus, var(--cv-field-focus-ring, var(--focus-ring)));
+  box-shadow: var(--field-shadow-focus, var(--cv-field-focus-ring, var(--focus-ring)));
 }
 
-.cv-file-picker__action,
+.file-picker__action,
 .prestacao-file-picker__action {
   align-items: center;
   background: color-mix(in srgb, var(--color-primary) 20%, var(--cv-field-bg, var(--color-surface)));
@@ -84,25 +84,25 @@
   transition: background var(--transition-fast), color var(--transition-fast);
 }
 
-.cv-file-picker__action-icon {
+.file-picker__action-icon {
   align-items: center;
   color: var(--color-primary-bright, var(--color-primary));
   display: inline-flex;
   flex: 0 0 auto;
 }
 
-.cv-file-picker__action-icon .cv-icon {
+.file-picker__action-icon .icon {
   height: 18px;
   width: 18px;
 }
 
-.cv-file-picker__action:hover,
+.file-picker__action:hover,
 .prestacao-file-picker__action:hover {
   background: color-mix(in srgb, var(--color-primary) 32%, var(--cv-field-bg, var(--color-surface)));
   color: var(--color-heading);
 }
 
-.cv-file-picker__value,
+.file-picker__value,
 .prestacao-file-picker__value {
   align-items: center;
   color: var(--color-muted);
@@ -114,13 +114,13 @@
   white-space: nowrap;
 }
 
-.cv-file-picker__value.prestacao-file-picker__value--selected,
+.file-picker__value.prestacao-file-picker__value--selected,
 .prestacao-file-picker__value--selected {
   color: var(--color-text);
   font-weight: var(--font-weight-semibold, 650);
 }
 
-.cv-file-picker__upload,
+.file-picker__upload,
 .prestacao-file-picker__upload,
 .prestacao-file-picker__clear {
   align-items: center;
@@ -136,23 +136,23 @@
   transition: background var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast);
 }
 
-.cv-file-picker__upload,
+.file-picker__upload,
 .prestacao-file-picker__upload {
-  background: var(--cv-btn-primary-bg, var(--color-primary));
+  background: var(--btn-primary-bg, var(--color-primary));
   color: var(--color-white, var(--color-white));
 }
 
-.cv-file-picker__upload:hover:not(:disabled),
+.file-picker__upload:hover:not(:disabled),
 .prestacao-file-picker__upload:hover:not(:disabled) {
-  background: var(--cv-btn-primary-hover-bg, var(--color-primary-hover));
+  background: var(--btn-primary-hover-bg, var(--color-primary-hover));
 }
 
-.cv-file-picker__upload:disabled,
+.file-picker__upload:disabled,
 .prestacao-file-picker__upload:disabled {
   display: none;
 }
 
-.cv-file-picker__inline-actions,
+.file-picker__inline-actions,
 .prestacao-file-picker__inline-actions {
   align-items: center;
   border-left: 1px solid var(--color-border);
@@ -161,18 +161,18 @@
   padding: 0 var(--space-3);
 }
 
-.cv-file-picker__inline-actions[hidden],
+.file-picker__inline-actions[hidden],
 .prestacao-file-picker__inline-actions[hidden] {
   display: none;
 }
 
-.cv-file-selection,
+.file-selection,
 .prestacao-file-selection {
   display: grid;
   min-width: 0;
 }
 
-.cv-file-selection__toggle,
+.file-selection__toggle,
 .prestacao-file-selection__toggle {
   align-items: center;
   background: var(--color-surface-soft);
@@ -191,13 +191,13 @@
   width: 100%;
 }
 
-.cv-file-selection__toggle:focus-visible,
+.file-selection__toggle:focus-visible,
 .prestacao-file-selection__toggle:focus-visible {
   box-shadow: var(--cv-field-focus-ring, var(--focus-ring));
   outline: 0;
 }
 
-.cv-file-selection__chevron,
+.file-selection__chevron,
 .prestacao-file-selection__chevron {
   border-bottom: 1.5px solid currentColor;
   border-right: 1.5px solid currentColor;
@@ -207,7 +207,7 @@
   width: 7px;
 }
 
-.cv-file-selection__menu,
+.file-selection__menu,
 .prestacao-file-selection__menu,
 .prestacao-file-list {
   background: var(--color-surface-soft);
@@ -218,12 +218,12 @@
   overflow: hidden;
 }
 
-.cv-file-selection__menu[hidden],
+.file-selection__menu[hidden],
 .prestacao-file-selection__menu[hidden] {
   display: none;
 }
 
-.cv-file-selection__list,
+.file-selection__list,
 .prestacao-file-selection__list,
 .prestacao-file-list {
   list-style: none;
@@ -231,7 +231,7 @@
   padding: 0;
 }
 
-.cv-file-selection__item,
+.file-selection__item,
 .prestacao-file-selection__item,
 .prestacao-file-list__item {
   align-items: center;
@@ -244,26 +244,26 @@
   transition: background var(--transition-fast);
 }
 
-.cv-file-selection__item:hover,
+.file-selection__item:hover,
 .prestacao-file-selection__item:hover,
 .prestacao-file-list__item:hover {
   background: color-mix(in srgb, var(--color-primary) 9%, transparent);
 }
 
-.cv-file-selection__item + .cv-file-selection__item,
+.file-selection__item + .file-selection__item,
 .prestacao-file-selection__item + .prestacao-file-selection__item,
 .prestacao-file-list__item + .prestacao-file-list__item {
   border-top: 1px solid var(--color-border);
 }
 
-.cv-file-widget__meta,
+.file-widget__meta,
 .prestacao-file-widget__meta {
   display: grid;
   gap: 3px;
   min-width: 0;
 }
 
-.cv-file-widget__name,
+.file-widget__name,
 .prestacao-file-widget__name {
   color: var(--color-text);
   display: block;
@@ -273,7 +273,7 @@
   white-space: nowrap;
 }
 
-.cv-file-widget__subtitle,
+.file-widget__subtitle,
 .prestacao-file-widget__subtitle {
   color: var(--color-muted);
   display: block;
@@ -283,7 +283,7 @@
   white-space: nowrap;
 }
 
-.cv-file-widget__actions,
+.file-widget__actions,
 .prestacao-file-widget__actions {
   align-items: center;
   display: flex;
@@ -291,31 +291,31 @@
   gap: var(--space-2);
 }
 
-.cv-file-widget__action,
+.file-widget__action,
 .prestacao-file-widget__action {
-  --cv-icon-btn-size: 42px;
-  --cv-icon-btn-icon-size: 18px;
+  --icon-btn-size: 42px;
+  --icon-btn-icon-size: 18px;
 }
 
 @media (max-width: 640px) {
-  .cv-file-picker,
+  .file-picker,
   .prestacao-file-picker {
     grid-template-columns: 1fr;
   }
 
-  .cv-file-picker__action,
+  .file-picker__action,
   .prestacao-file-picker__action {
     border-bottom: 1px solid var(--color-border);
     border-right: 0;
     min-height: 46px;
   }
 
-  .cv-file-picker__value,
+  .file-picker__value,
   .prestacao-file-picker__value {
     min-height: 48px;
   }
 
-  .cv-file-picker__upload,
+  .file-picker__upload,
   .prestacao-file-picker__upload,
   .prestacao-file-picker__clear {
     border-left: 0;
@@ -323,14 +323,14 @@
     min-height: 44px;
   }
 
-  .cv-file-selection__item,
+  .file-selection__item,
   .prestacao-file-selection__item,
   .prestacao-file-list__item {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .cv-file-widget__actions,
+  .file-widget__actions,
   .prestacao-file-widget__actions {
     justify-content: flex-end;
   }

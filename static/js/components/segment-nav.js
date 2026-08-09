@@ -5,9 +5,9 @@
 (function () {
   "use strict";
 
-  var NAV = ".cv-segment-toggle--nav";
-  var BTN = "a.cv-segment-toggle__btn";
-  var POP = "cv-segment-toggle__btn--pop";
+  var NAV = ".segment-toggle--nav";
+  var BTN = "a.segment-toggle__btn";
+  var POP = "segment-toggle__btn--pop";
   var BOUND = "data-cv-segment-nav-bound";
   var DURATION_MS = 280;
 

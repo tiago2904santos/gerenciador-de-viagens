@@ -2,8 +2,8 @@
   Canonical internal form block (`H-04`).
 
   Shells:
-  - block (default): cv-form-block, para seções dentro de um card maior
-  - card: cv-form-section-card, para seções que são o próprio card
+  - block (default): form-block, para seções dentro de um card maior
+  - card: form-section-card, para seções que são o próprio card
     (ex.: wizard de roteiro avulso)
 
   Variants (somente shell block):
@@ -26,15 +26,15 @@
 {% with corpo=body_template acoes=actions_template rodape=footer_template %}
 {% if shell == "card" %}
 <section
-  class="cv-form-section-card{% if extra_class %} {{ extra_class }}{% endif %}"
+  class="form-section-card{% if extra_class %} {{ extra_class }}{% endif %}"
   {% if element_id %}id="{{ element_id }}"{% endif %}
   {% if section_id %}aria-labelledby="{{ section_id }}"{% endif %}
   {% if data_hook %}data-{{ data_hook }}{% endif %}
 >
   <header class="cv-form-section-header">
     <div class="cv-form-section-header__copy">
-      <h3 class="cv-form-section-title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h3>
-      {% if description %}<p class="cv-form-section-subtitle">{{ description }}</p>{% endif %}
+      <h3 class="form-section-title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h3>
+      {% if description %}<p class="form-section-subtitle">{{ description }}</p>{% endif %}
     </div>
 
     {% if action_label or acoes %}
@@ -50,7 +50,7 @@
     {% endif %}
   </header>
 
-  <div class="cv-form-section-body{% if body_extra_class %} {{ body_extra_class }}{% endif %}"{% if body_id %} id="{{ body_id }}"{% endif %}>
+  <div class="form-section-body{% if body_extra_class %} {{ body_extra_class }}{% endif %}"{% if body_id %} id="{{ body_id }}"{% endif %}>
     {% with title="" description="" title_id="" section_id="" element_id="" extra_class="" body_extra_class="" body_template="" footer_template="" actions_template="" variant="" shell="" action_label="" action_url="" action_autosave="" action_variant="" data_hook="" heading_level="" body_id="" aria_label="" %}
       {% if corpo %}{% include corpo %}{% endif %}
     {% endwith %}
@@ -64,14 +64,14 @@
 </section>
 {% else %}
 <section
-  class="cv-form-block{% if variant %} cv-form-block--{{ variant }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+  class="form-block{% if variant %} form-block--{{ variant }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
   {% if element_id %}id="{{ element_id }}"{% endif %}
   {% if section_id %}aria-labelledby="{{ section_id }}"{% elif aria_label %}aria-label="{{ aria_label }}"{% endif %}
   {% if data_hook %}data-{{ data_hook }}{% endif %}
 >
   {% if title or description or action_label or acoes %}
-  <header class="cv-form-block__header">
-    <div class="cv-form-block__copy">
+  <header class="form-block__header">
+    <div class="form-block__copy">
       {% if title %}
         {% comment %}
           `HT-05`: o ramo `h2` é novo e **aditivo** — só recebe quem pedir
@@ -83,18 +83,18 @@
           meio. Com o máximo sendo 3, aquela tela não tinha como não pular nível.
         {% endcomment %}
         {% if heading_level == 2 %}
-          <h2 class="cv-form-block__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h2>
+          <h2 class="form-block__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h2>
         {% elif heading_level == 3 %}
-          <h3 class="cv-form-block__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h3>
+          <h3 class="form-block__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h3>
         {% else %}
-          <h4 class="cv-form-block__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h4>
+          <h4 class="form-block__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h4>
         {% endif %}
       {% endif %}
-      {% if description %}<p class="cv-form-block__description">{{ description }}</p>{% endif %}
+      {% if description %}<p class="form-block__description">{{ description }}</p>{% endif %}
     </div>
 
     {% if action_label or acoes %}
-      <div class="cv-form-block__actions">
+      <div class="form-block__actions">
         {% if acoes %}
           {% with title="" description="" title_id="" section_id="" element_id="" extra_class="" body_extra_class="" body_template="" footer_template="" actions_template="" variant="" shell="" action_label="" action_url="" action_autosave="" action_variant="" data_hook="" heading_level="" body_id="" aria_label="" %}
             {% include acoes %}
@@ -107,7 +107,7 @@
   </header>
   {% endif %}
 
-  <div class="cv-form-block__body{% if body_extra_class %} {{ body_extra_class }}{% endif %}"{% if body_id %} id="{{ body_id }}"{% endif %}>
+  <div class="form-block__body{% if body_extra_class %} {{ body_extra_class }}{% endif %}"{% if body_id %} id="{{ body_id }}"{% endif %}>
     {% with title="" description="" title_id="" section_id="" element_id="" extra_class="" body_extra_class="" body_template="" footer_template="" actions_template="" variant="" shell="" action_label="" action_url="" action_autosave="" action_variant="" data_hook="" heading_level="" body_id="" aria_label="" %}
       {% if corpo %}{% include corpo %}{% endif %}
     {% endwith %}

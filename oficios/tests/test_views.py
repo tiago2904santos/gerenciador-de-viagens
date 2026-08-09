@@ -72,7 +72,7 @@ class OficioViewsTests(TestCase):
         self.assertEqual(oficio.data_criacao, timezone.localdate())
 
         response = self.client.get(response.url)
-        self.assertContains(response, "cv-form-section-card")
+        self.assertContains(response, "form-section-card")
         self.assertContains(response, "field-grid")
         self.assertContains(response, f'name="numero" value="{oficio.numero}"')
         self.assertContains(response, f"/ {oficio.ano}")
@@ -83,10 +83,10 @@ class OficioViewsTests(TestCase):
         self.assertContains(response, "page-stepper")
         self.assertContains(response, "page-shell--wizard")
         self.assertContains(response, "page-header-status-chip")
-        self.assertContains(response, "cv-field-with-action--manage-reveal")
+        self.assertContains(response, "field-with-action--manage-reveal")
         self.assertContains(response, "Modelo de motivo")
         self.assertContains(response, reverse("oficios:modelos_motivo_index"))
-        self.assertContains(response, "cv-card-footer-section")
+        self.assertContains(response, "card-footer-section")
         self.assertContains(response, "Avan\u00e7ar")
         self.assertNotContains(
             response,
@@ -269,7 +269,7 @@ class OficioViewsTests(TestCase):
         self.assertIn("oficio-documentos-summary-section", html[preview_start:])
         self.assertIn("oficio-documentos-viajantes-section", html[preview_start:])
         self.assertIn("oficio-documentos-viatura-section", html[preview_start:])
-        footer_start = html.index('<section class="cv-card-footer-section">', preview_start)
+        footer_start = html.index('<section class="card-footer-section">', preview_start)
         footer_end = html.index('</section>', footer_start) + len('</section>')
         footer = html[footer_start:footer_end]
 
@@ -297,7 +297,7 @@ class OficioViewsTests(TestCase):
         html = response.content.decode("utf-8")
         preview_start = html.index('oficio-documentos-preview-section document-inline-stack')
         self.assertIn("oficio-documentos-summary-section", html[preview_start:])
-        footer_start = html.index('<section class="cv-card-footer-section">', preview_start)
+        footer_start = html.index('<section class="card-footer-section">', preview_start)
         footer_end = html.index('</section>', footer_start) + len('</section>')
         footer = html[footer_start:footer_end]
 

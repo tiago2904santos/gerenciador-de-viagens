@@ -2,7 +2,7 @@
 <div class="page-shell cv-page page-shell--list cv-page--collection" data-collection data-collection-mode="server">
   {% include "components/ui/headers/filter_page_header.html" with eyebrow=eyebrow title=title icon_label=brand_mark form_action=request.path search_name="q" search_value=q search_placeholder=search_placeholder search_clear_url=search_clear_url|default:request.path status_options=status_options status_value=status_value current_aba=current_aba cargo_filter=cargo_filter combustivel_filter=combustivel_filter unidade_filter=unidade_filter next_url=next_url %}
 
-  <div class="cv-collection-panel">
+  <div class="collection-panel">
     {% if abas and not band_tabs_template or page_obj.paginator.num_pages > 1 %}
     <div class="list-toolbar">
       {% if abas and not band_tabs_template %}
@@ -31,6 +31,6 @@
   {% endif %}
 
   {% if back_url %}
-    {% include "components/ui/buttons/floating_action.html" with href=back_url label=back_label|default:"Voltar" icon="arrow-left" variant="secondary" aria_label=back_label|default:"Voltar" extra_class="cv-floating-action--stacked" only %}
+    {% include "components/ui/buttons/floating_action.html" with href=back_url label=back_label|default:"Voltar" icon="arrow-left" variant="secondary" aria_label=back_label|default:"Voltar" extra_class="floating-action--stacked" only %}
   {% endif %}
 </div>

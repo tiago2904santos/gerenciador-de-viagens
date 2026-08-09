@@ -30,7 +30,7 @@ from core.testing import area_de_teste
 from core.testing import vincular_area
 
 
-CORPO_DE_MENU = re.compile(r'<div[^>]*class="[^"]*\bcv-action-menu\b[^"]*"')
+CORPO_DE_MENU = re.compile(r'<div[^>]*class="[^"]*\baction-menu\b[^"]*"')
 
 
 class MenusSobDemandaTests(TestCase):
@@ -80,7 +80,7 @@ class MenusSobDemandaTests(TestCase):
 
         alvos = set(re.findall(r'data-overlay-kind="menu"[^>]*data-overlay-target="([^"]+)"', html))
         alvos |= set(re.findall(r'data-overlay-target="([^"]+)"[^>]*data-overlay-kind="menu"', html))
-        servidos = set(re.findall(r'<div[^>]*class="[^"]*cv-action-menu[^"]*"[^>]*id="([^"]+)"', fragmento))
+        servidos = set(re.findall(r'<div[^>]*class="[^"]*action-menu[^"]*"[^>]*id="([^"]+)"', fragmento))
 
         self.assertTrue(alvos, "a lista não tem gatilho de menu nenhum")
         self.assertEqual(alvos - servidos, set(), "gatilho sem menu correspondente")

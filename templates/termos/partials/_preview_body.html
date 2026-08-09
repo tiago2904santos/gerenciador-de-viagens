@@ -7,7 +7,7 @@
       <span class="document-inline-card__header-end">
         <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do termo genérico">
           <button
-            class="cv-icon-btn cv-icon-btn--settings"
+            class="icon-btn icon-btn--settings"
             type="button"
             aria-label="Abrir ações do termo genérico"
             aria-haspopup="true"
@@ -17,7 +17,7 @@
             data-overlay-trigger data-overlay-kind="menu"
             data-overlay-target="termo-cadastro-generico-menu"
           >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
-          <div class="cv-action-menu cv-action-menu--rich" id="termo-cadastro-generico-menu" role="menu" hidden>
+          <div class="action-menu action-menu--rich" id="termo-cadastro-generico-menu" role="menu" hidden>
             {% if docs.generico.assinado %}
               {% include "components/ui/menus/rich_menu_header.html" with title="Termo genérico assinado" subtitle=termo.destino_display icon="sign" only %}
             {% else %}
@@ -33,7 +33,7 @@
             {% if docs.generico.anexar_assinado_url %}
             <button
               type="button"
-              class="cv-action-menu__item cv-action-menu__item--rich{% if docs.generico.assinado %} is-assinado{% endif %}"
+              class="action-menu__item action-menu__item--rich{% if docs.generico.assinado %} is-assinado{% endif %}"
               role="menuitem"
               data-attach-signed-trigger
               data-attach-signed-url="{{ docs.generico.anexar_assinado_url }}"
@@ -42,10 +42,10 @@
               data-attach-signed-current-view-url="{{ docs.generico.assinado_view_url }}"
               data-attach-signed-current-remove-url="{{ docs.generico.remover_assinado_url }}"
             >
-              <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
+              <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
                 {% include "components/ui/icons/icon.html" with icon="sign" only %}
               </span>
-              <span class="cv-action-menu__item-copy">
+              <span class="action-menu__item-copy">
                 <strong>{% if docs.generico.assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
                 <small>{% if docs.generico.assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
               </span>
@@ -75,7 +75,7 @@
           <span class="document-inline-card__header-end">
             <span class="document-inline-actions document-inline-actions--header" aria-label="Ações de todos os termos">
               <button
-                class="cv-icon-btn cv-icon-btn--settings"
+                class="icon-btn icon-btn--settings"
                 type="button"
                 aria-label="Abrir ações dos termos"
                 aria-haspopup="true"
@@ -85,7 +85,7 @@
                 data-overlay-trigger data-overlay-kind="menu"
                 data-overlay-target="termo-cadastro-todos-menu"
               >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
-              <div class="cv-action-menu cv-action-menu--rich" id="termo-cadastro-todos-menu" role="menu" hidden>
+              <div class="action-menu action-menu--rich" id="termo-cadastro-todos-menu" role="menu" hidden>
                 {% include "components/ui/menus/rich_menu_header.html" with title="Termos de autorização" subtitle="Todos os servidores" icon="folder" only %}
                 {% include "components/ui/menus/rich_menu_link.html" with href=docs.download_todos_pdf_url title="Baixar PDF" description="Pacote com todos os termos" icon="pdf" tone="pdf" download=True only %}
                 {% if docs.download_todos_docx_url %}
@@ -106,7 +106,7 @@
               <span class="document-inline-card__header-end">
                 <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do termo de {{ doc.servidor_nome }}">
                   <button
-                    class="cv-icon-btn cv-icon-btn--settings"
+                    class="icon-btn icon-btn--settings"
                     type="button"
                     aria-label="Abrir ações do termo de {{ doc.servidor_nome }}"
                     aria-haspopup="true"
@@ -116,7 +116,7 @@
                     data-overlay-trigger data-overlay-kind="menu"
                     data-overlay-target="termo-cadastro-servidor-menu-{{ doc.id }}"
                   >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
-                  <div class="cv-action-menu cv-action-menu--rich" id="termo-cadastro-servidor-menu-{{ doc.id }}" role="menu" hidden>
+                  <div class="action-menu action-menu--rich" id="termo-cadastro-servidor-menu-{{ doc.id }}" role="menu" hidden>
                     {% if doc.assinado %}
                       {% include "components/ui/menus/rich_menu_header.html" with title="Termo assinado" subtitle=doc.servidor_nome icon="sign" only %}
                     {% else %}
@@ -126,7 +126,7 @@
                     {% if doc.anexar_assinado_url %}
                     <button
                       type="button"
-                      class="cv-action-menu__item cv-action-menu__item--rich{% if doc.assinado %} is-assinado{% endif %}"
+                      class="action-menu__item action-menu__item--rich{% if doc.assinado %} is-assinado{% endif %}"
                       role="menuitem"
                       data-attach-signed-trigger
                       data-attach-signed-url="{{ doc.anexar_assinado_url }}"
@@ -135,10 +135,10 @@
                       data-attach-signed-current-view-url="{{ doc.assinado_view_url }}"
                       data-attach-signed-current-remove-url="{{ doc.remover_assinado_url }}"
                     >
-                      <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
+                      <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
                         {% include "components/ui/icons/icon.html" with icon="sign" only %}
                       </span>
-                      <span class="cv-action-menu__item-copy">
+                      <span class="action-menu__item-copy">
                         <strong>{% if doc.assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
                         <small>{% if doc.assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
                       </span>

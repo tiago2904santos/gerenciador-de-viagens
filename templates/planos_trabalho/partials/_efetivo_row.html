@@ -3,7 +3,7 @@
   Hooks JS: data-pt-efetivo-*. Campos: Unidade · Cargo · Quantidade.
   Hiddens ficam num wrapper [hidden] para não virarem colunas da grade.
 {% endcomment %}
-<div class="destination-row destination-row--with-add travel-destination-row cv-ordered-field-row pt-efetivo-card{% if row_ordinal == 1 and total_forms == 1 %} destination-row--single{% endif %}"
+<div class="destination-row destination-row--with-add travel-destination-row ordered-field-row pt-efetivo-card{% if row_ordinal == 1 and total_forms == 1 %} destination-row--single{% endif %}"
      data-pt-efetivo-row>
   <div hidden>
     {% for hidden in efetivo_form.hidden_fields %}{{ hidden }}{% endfor %}
@@ -11,17 +11,17 @@
   </div>
 
   <button type="button"
-          class="route-destinos-add cv-ordered-field-row__add"
+          class="route-destinos-add ordered-field-row__add"
           data-pt-efetivo-add
           title="Adicionar efetivo abaixo"
           aria-label="Adicionar efetivo abaixo">
     <span class="route-destinos-add__glyph" aria-hidden="true">+</span>
   </button>
 
-  <span class="cv-ordered-field-row__badge sr-only" data-pt-efetivo-ord aria-hidden="true">{{ row_ordinal|default:1 }}</span>
+  <span class="ordered-field-row__badge sr-only" data-pt-efetivo-ord aria-hidden="true">{{ row_ordinal|default:1 }}</span>
 
-  <div class="cv-ordered-field-row__body pt-efetivo-card__body">
-    <div class="field-grid cv-ordered-field-row__fields pt-efetivo-fields">
+  <div class="ordered-field-row__body pt-efetivo-card__body">
+    <div class="field-grid ordered-field-row__fields pt-efetivo-fields">
       <div class="field app-form-field">
         <label class="cv-field__label app-form-label" for="{{ efetivo_form.unidade.id_for_label }}">Unidade (opcional)</label>
         {{ efetivo_form.unidade }}
@@ -41,11 +41,11 @@
   </div>
 
   <button type="button"
-          class="destination-remove-button cv-ordered-field-row__remove"
+          class="destination-remove-button ordered-field-row__remove"
           title="Remover efetivo"
           aria-label="Remover efetivo"
           {% if row_ordinal == 1 and total_forms == 1 %}hidden{% endif %}
           data-pt-efetivo-remove>
-    <span class="cv-ordered-field-row__remove-glyph" aria-hidden="true">&#215;</span>
+    <span class="ordered-field-row__remove-glyph" aria-hidden="true">&#215;</span>
   </button>
 </div>

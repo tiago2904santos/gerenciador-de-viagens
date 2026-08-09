@@ -95,7 +95,7 @@ class GlobalDatePickerTests(SimpleTestCase):
         html = render_to_string("roteiros/partials/roteiro/_trechos_actions.html")
         self.assertIn('data-allow-repeat-dates="true"', html)
         self.assertIn(
-            'class="cv-date-picker travel-period-filter travel-period-filter--filled"',
+            'class="date-picker travel-period-filter travel-period-filter--filled"',
             html,
         )
         self.assertIn('class="travel-period-filter__btn"', html)
@@ -107,13 +107,13 @@ class GlobalDatePickerTests(SimpleTestCase):
             / "static"
             / "css"
             / "components"
-            / "cv-date-picker.css"
+            / "date-picker.css"
         )
         css = css_path.read_text(encoding="utf-8")
-        self.assertIn("--cv-date-picker-day-gap: 2px;", css)
+        self.assertIn("--date-picker-day-gap: 2px;", css)
         self.assertNotIn("scale(1.03)", css)
-        self.assertIn("column-gap: var(--cv-date-picker-day-gap);", css)
-        self.assertIn("row-gap: var(--cv-date-picker-day-gap);", css)
+        self.assertIn("column-gap: var(--date-picker-day-gap);", css)
+        self.assertIn("row-gap: var(--date-picker-day-gap);", css)
 
     def test_calendar_markup_exists_only_in_the_global_partial(self):
         templates_root = Path(settings.BASE_DIR) / "templates"
@@ -124,7 +124,7 @@ class GlobalDatePickerTests(SimpleTestCase):
             if template == global_partial:
                 continue
             source = template.read_text(encoding="utf-8")
-            if "cv-date-picker__panel" in source or re.search(r"<div[^>]*\bdata-cv-date-picker\b", source):
+            if "date-picker__panel" in source or re.search(r"<div[^>]*\bdata-cv-date-picker\b", source):
                 offenders.append(str(template.relative_to(settings.BASE_DIR)))
 
         scripts_root = Path(settings.BASE_DIR) / "static" / "js"
@@ -151,14 +151,14 @@ class GlobalDatePickerTests(SimpleTestCase):
             if source_path.name.endswith((".bundle.css", ".bundle.js")):
                 continue
             source = source_path.read_text(encoding="utf-8")
-            is_global_css = source_path == base_dir / "static" / "css" / "components" / "cv-date-picker.css"
-            is_global_js = source_path == base_dir / "static" / "js" / "components" / "cv-date-picker.js"
+            is_global_css = source_path == base_dir / "static" / "css" / "components" / "date-picker.css"
+            is_global_js = source_path == base_dir / "static" / "js" / "components" / "date-picker.js"
             is_template_or_form = source_path.suffix == ".html" or source_path.name == "forms.py"
             has_alternative = (
                 (is_template_or_form and 'type="date"' in source)
                 or (is_template_or_form and "type='date'" in source)
                 or (source_path.name == "forms.py" and "forms.DateInput" in source)
-                or ("cv-date-picker__day--" in source and not is_global_css and not is_global_js)
+                or ("date-picker__day--" in source and not is_global_css and not is_global_js)
             )
             if has_alternative:
                 offenders.append(str(source_path.relative_to(base_dir)))

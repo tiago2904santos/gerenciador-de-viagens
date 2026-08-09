@@ -3,14 +3,14 @@
   data-doc-tab-panel="{{ panel_key }}"
   {% if hidden %}hidden{% endif %}
 >
-  <div class="cv-search-picker cv-search-picker--single cv-search-picker--detailed cv-search-picker--people cv-search-picker--roster evento-doc-source-picker">
-    <div class="cv-search-picker__field">
-      <div class="cv-search-picker__control">
-        <span class="cv-search-picker__icon" aria-hidden="true"></span>
+  <div class="search-picker search-picker--single search-picker--detailed search-picker--people search-picker--roster evento-doc-source-picker">
+    <div class="search-picker__field">
+      <div class="search-picker__control">
+        <span class="search-picker__icon" aria-hidden="true"></span>
         <input
           type="search"
           id="id_evento_doc_busca_{{ panel_key }}"
-          class="cv-search-picker__input"
+          class="search-picker__input"
           placeholder="{{ placeholder }}"
           autocomplete="off"
           role="searchbox"
@@ -23,9 +23,9 @@
     {% if field.errors %}
       {% include "components/ui/feedback/field_error.html" with errors=field.errors field_id=field.auto_id only %}
     {% endif %}
-    <section class="cv-search-picker__selected-panel evento-doc-summary-panel" aria-label="Documentos encontrados">
-      <div class="cv-search-picker__selected-list roteiro-editor__route-list related-route-list related-route-list" data-evento-doc-list="{{ panel_key }}"></div>
-      <p class="cv-search-picker__selected-empty" data-evento-doc-empty="{{ panel_key }}" hidden>{{ empty }}</p>
+    <section class="search-picker__selected-panel evento-doc-summary-panel" aria-label="Documentos encontrados">
+      <div class="search-picker__selected-list roteiro-editor__route-list related-route-list related-route-list" data-evento-doc-list="{{ panel_key }}"></div>
+      <p class="search-picker__selected-empty" data-evento-doc-empty="{{ panel_key }}" hidden>{{ empty }}</p>
     </section>
   </div>
 </section>
