@@ -17,11 +17,11 @@ CSS_DIR = ROOT / "static" / "css"
 
 # Mesma política de exceção do audit_frontend_standards.py (Etapa 7 gate).
 COLOR_LITERAL_ALLOWED = {
-    "static/css/tokens.css",
-    "static/css/theme.css",
-    "static/css/03-theme-dark.css",
+    "static/css/base/tokens.css",
+    "static/css/base/theme.css",
+    "static/css/base/03-theme-dark.css",
     "static/css/components/theme-dark-components.css",  # transitório — dissolver nas fases seguintes
-    "static/css/auth.css",  # transitório — login fora do bundle global
+    "static/css/pages/auth.css",  # transitório — login fora do bundle global
     "static/css/shell.bundle.css",  # gerado (NOVO-12); literais vêm das fontes acima
 }
 
@@ -32,14 +32,14 @@ _CSS_VALUE = re.compile(r":\s*.+")
 
 # Arquivos novos da fase 13 — devem estar 100% livres de literais.
 STRICT_COLOR_LITERAL_FILES = {
-    "static/css/components/notice.css",
-    "static/css/components/metric.css",
+    "static/css/feedback/notice.css",
+    "static/css/feedback/metric.css",
 }
 
 # Baseline medido em 30/07/2026 antes da fase 14; o gate falha se a dívida subir.
 COLOR_LITERAL_BASELINE = 660
 
-# Escala fechada R-01 — espelha o comentário em static/css/tokens.css (Breakpoints).
+# Escala fechada R-01 — espelha o comentário em static/css/base/tokens.css (Breakpoints).
 ALLOWED_MEDIA_BREAKPOINTS = frozenset({
     420, 520, 600, 640, 720, 721, 768, 800, 820, 840, 841, 900,
     1080, 1180, 1181, 1400, 1480,
@@ -197,10 +197,10 @@ class CssTokenGateTests(SimpleTestCase):
         """NOVO-12: o shell entrega um CSS; notice/metric entram via bundle gerado."""
         base = (ROOT / "templates" / "base.html").read_text(encoding="utf-8")
         self.assertIn("css/shell.bundle.css", base)
-        self.assertNotIn("css/components/notice.css", base)
-        self.assertNotIn("css/components/metric.css", base)
+        self.assertNotIn("css/feedback/notice.css", base)
+        self.assertNotIn("css/feedback/metric.css", base)
         bundle = (ROOT / "static" / "css" / "shell.bundle.css").read_text(
             encoding="utf-8"
         )
-        self.assertIn(">>> css/components/notice.css >>>", bundle)
-        self.assertIn(">>> css/components/metric.css >>>", bundle)
+        self.assertIn(">>> css/feedback/notice.css >>>", bundle)
+        self.assertIn(">>> css/feedback/metric.css >>>", bundle)

@@ -2,22 +2,22 @@
 /* shell css sources (25): */
 
 /* >>> css/style.css >>> */
-@import url("./fonts.css");
-@import url("./tokens.css");
-@import url("./theme.css");
-@import url("./base.css");
-@import url("./layout.css");
-@import url("./sidebar.css");
-@import url("./forms.css");
-@import url("./lists.css");
-@import url("./cards.css");
-@import url("./search-picker.css");
-@import url("./select.css");
-@import url("./stages.css");
-@import url("./documents.css");
+@import url("./base/fonts.css");
+@import url("./base/tokens.css");
+@import url("./base/theme.css");
+@import url("./base/base.css");
+@import url("./layout/layout.css");
+@import url("./layout/sidebar.css");
+@import url("./fields/forms.css");
+@import url("./lists/lists.css");
+@import url("./lists/cards.css");
+@import url("./fields/search-picker.css");
+@import url("./fields/select.css");
+@import url("./layout/stages.css");
+@import url("./pages/documents.css");
 /* <<< css/style.css <<< */
 
-/* >>> css/03-theme-dark.css >>> */
+/* >>> css/base/03-theme-dark.css >>> */
 /*
  * 03-theme-dark.css — semantic dark theme tokens only.
  * Component appearance overrides live in components/theme-dark-components.css.
@@ -337,9 +337,9 @@ html[data-theme="dark"] {
 :is(html[data-theme="dark"]) {
   --btn-focus-ring: none;
 }
-/* <<< css/03-theme-dark.css <<< */
+/* <<< css/base/03-theme-dark.css <<< */
 
-/* >>> css/utilities.css >>> */
+/* >>> css/base/utilities.css >>> */
 /* ==========================================================================
    UTILITIES
    ========================================================================== */
@@ -876,9 +876,9 @@ html[data-theme="light"] {
     width: 100%;
   }
 }
-/* <<< css/utilities.css <<< */
+/* <<< css/base/utilities.css <<< */
 
-/* >>> css/page-shell.css >>> */
+/* >>> css/layout/page-shell.css >>> */
 /* ==========================================================================
    Page Shell — Sistema Oficial de Camadas
    Central de Viagens 3.0
@@ -3744,9 +3744,9 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
   outline: none;
 }
 
-/* <<< css/page-shell.css <<< */
+/* <<< css/layout/page-shell.css <<< */
 
-/* >>> css/buttons.css >>> */
+/* >>> css/actions/buttons.css >>> */
 /* =========================================================
    CV-BTN — Sistema de botoes do design system
    Central de Viagens 3.0
@@ -4888,9 +4888,9 @@ html[data-theme="light"] {
   height: var(--btn-icon-size);
   width: var(--btn-icon-size);
 }
-/* <<< css/buttons.css <<< */
+/* <<< css/actions/buttons.css <<< */
 
-/* >>> css/components/field.css >>> */
+/* >>> css/fields/field.css >>> */
 /* ==========================================================================
    Campo de texto — a regra base que nunca existiu
    ==========================================================================
@@ -4960,9 +4960,9 @@ html[data-theme="light"] {
   padding-top: var(--space-3);
   resize: vertical;
 }
-/* <<< css/components/field.css <<< */
+/* <<< css/fields/field.css <<< */
 
-/* >>> css/components/date-picker.css >>> */
+/* >>> css/fields/date-picker.css >>> */
 /* --------------------------------------------------------------------------
    date-picker — componente compartilhado
    -------------------------------------------------------------------------- */
@@ -5531,9 +5531,9 @@ html[data-theme="light"] .date-picker .date-picker__day--multi-single:hover {
   gap: var(--space-2);
   justify-content: flex-end;
 }
-/* <<< css/components/date-picker.css <<< */
+/* <<< css/fields/date-picker.css <<< */
 
-/* >>> css/components/file-picker.css >>> */
+/* >>> css/fields/file-picker.css >>> */
 /* Canonical file picker and attached-file list. Page CSS may position it, not skin it. */
 
 .file-input,
@@ -5871,9 +5871,9 @@ html[data-theme="light"] .date-picker .date-picker__day--multi-single:hover {
     justify-content: flex-end;
   }
 }
-/* <<< css/components/file-picker.css <<< */
+/* <<< css/fields/file-picker.css <<< */
 
-/* >>> css/components/action-system.css >>> */
+/* >>> css/actions/action-system.css >>> */
 /* ==========================================================================
    ACTION SYSTEM 2.0
    Camada visual unificada para .cv-btn, botoes legados, icones, grupos,
@@ -7224,9 +7224,9 @@ html[data-theme="dark"] #attach-signed-modal .icon-btn.icon-btn--delete,
     transform: none;
   }
 }
-/* <<< css/components/action-system.css <<< */
+/* <<< css/actions/action-system.css <<< */
 
-/* >>> css/components/record-list.css >>> */
+/* >>> css/lists/record-list.css >>> */
 /* Canonical record list — roster no ritmo das listas internas de formulário
    (poço de campo, sem borda, sem hover de cor). */
 
@@ -7490,9 +7490,9 @@ html[data-theme="dark"] #attach-signed-modal .icon-btn.icon-btn--delete,
   grid-template-columns: minmax(0, 1fr);
   width: 100%;
 }
-/* <<< css/components/record-list.css <<< */
+/* <<< css/lists/record-list.css <<< */
 
-/* >>> css/components/list-tabs.css >>> */
+/* >>> css/lists/list-tabs.css >>> */
 /* Abas canônicas para listas temporais e de estado. */
 
 .list-tabs {
@@ -7721,9 +7721,9 @@ html[data-theme="dark"] #attach-signed-modal .icon-btn.icon-btn--delete,
     grid-template-columns: minmax(0, 1fr);
   }
 }
-/* <<< css/components/list-tabs.css <<< */
+/* <<< css/lists/list-tabs.css <<< */
 
-/* >>> css/components/filter-header.css >>> */
+/* >>> css/lists/filter-header.css >>> */
 /* Compat residual — layout de filtros agora vive em list-header.css. */
 
 .filter-header {
@@ -7733,9 +7733,9 @@ html[data-theme="dark"] #attach-signed-modal .icon-btn.icon-btn--delete,
 .filter-bar__select {
   min-width: 9.5rem;
 }
-/* <<< css/components/filter-header.css <<< */
+/* <<< css/lists/filter-header.css <<< */
 
-/* >>> css/components/form-panel.css >>> */
+/* >>> css/fields/form-panel.css >>> */
 /* Canonical structure for compact CRUD forms. Theme appearance is defined globally. */
 
 .main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) {
@@ -7865,9 +7865,9 @@ html[data-theme="dark"] #attach-signed-modal .icon-btn.icon-btn--delete,
     padding-right: 16px;
   }
 }
-/* <<< css/components/form-panel.css <<< */
+/* <<< css/fields/form-panel.css <<< */
 
-/* >>> css/components/form-sections.css >>> */
+/* >>> css/fields/form-sections.css >>> */
 /* ========================================================================
    Canonical form composition
 
@@ -8269,9 +8269,9 @@ html[data-theme="light"] .segment-toggle {
 .segment-toggle__btn--pop {
   animation: cv-segment-pop 280ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
-/* <<< css/components/form-sections.css <<< */
+/* <<< css/fields/form-sections.css <<< */
 
-/* >>> css/components/pendencias.css >>> */
+/* >>> css/feedback/pendencias.css >>> */
 /* ========================================================================
    pendencias — card global de pendências/avisos de etapa
 
@@ -8371,9 +8371,9 @@ html[data-theme="light"] .segment-toggle {
   background: color-mix(in srgb, var(--color-warning) 14%, var(--color-card, #132238));
   border-color: color-mix(in srgb, var(--color-warning) 55%, transparent);
 }
-/* <<< css/components/pendencias.css <<< */
+/* <<< css/feedback/pendencias.css <<< */
 
-/* >>> css/components/summary-items.css >>> */
+/* >>> css/feedback/summary-items.css >>> */
 /* ========================================================================
    cv-summary — item de resumo global (label + valor em mini-card)
 
@@ -8464,9 +8464,9 @@ html[data-theme="light"] .segment-toggle {
   font-weight: var(--font-weight-semibold);
   white-space: nowrap;
 }
-/* <<< css/components/summary-items.css <<< */
+/* <<< css/feedback/summary-items.css <<< */
 
-/* >>> css/components/notice.css >>> */
+/* >>> css/feedback/notice.css >>> */
 /* ========================================================================
    notice — aviso inline unificado (Etapa 7, fase 13)
 
@@ -8679,9 +8679,9 @@ html[data-theme="light"] .segment-toggle {
   content: none;
   display: none;
 }
-/* <<< css/components/notice.css <<< */
+/* <<< css/feedback/notice.css <<< */
 
-/* >>> css/components/metric.css >>> */
+/* >>> css/feedback/metric.css >>> */
 /* ========================================================================
    metric — métrica/resumo unificado (Etapa 7, fase 13)
 
@@ -8830,9 +8830,9 @@ html[data-theme="light"] .segment-toggle {
     grid-template-columns: 1fr;
   }
 }
-/* <<< css/components/metric.css <<< */
+/* <<< css/feedback/metric.css <<< */
 
-/* >>> css/components/app-shell.css >>> */
+/* >>> css/layout/app-shell.css >>> */
 /* Accessible application shell and mobile navigation drawer. */
 
 .skip-link {
@@ -8966,9 +8966,9 @@ html[data-theme="light"] .segment-toggle {
     transition: none;
   }
 }
-/* <<< css/components/app-shell.css <<< */
+/* <<< css/layout/app-shell.css <<< */
 
-/* >>> css/components/content-cards.css >>> */
+/* >>> css/lists/content-cards.css >>> */
 /* Canonical summary and document cards. Theme-specific appearance is separate. */
 
 .summary-tile {
@@ -9185,9 +9185,9 @@ html[data-theme="light"] .segment-toggle {
     width: 100%;
   }
 }
-/* <<< css/components/content-cards.css <<< */
+/* <<< css/lists/content-cards.css <<< */
 
-/* >>> css/components/document-viewer.css >>> */
+/* >>> css/pages/document-viewer.css >>> */
 .document-viewer {
   display: flex;
   flex-direction: column;
@@ -9357,9 +9357,9 @@ html[data-theme="light"] .segment-toggle {
   .doc-pdf-zoom { margin-left: auto; }
   .document-viewer__paper { gap: 14px; padding: 34px; }
 }
-/* <<< css/components/document-viewer.css <<< */
+/* <<< css/pages/document-viewer.css <<< */
 
-/* >>> css/components/dialog.css >>> */
+/* >>> css/feedback/dialog.css >>> */
 /* Structural contract for global dialogs. Dark-theme appearance lives in theme-dark-components.css. */
 
 .cv-dialog[hidden] {
@@ -9517,9 +9517,9 @@ html[data-theme="dark"] .cv-dialog--document :is(.cv-dialog__icon, .cv-dialog__e
     justify-content: center;
   }
 }
-/* <<< css/components/dialog.css <<< */
+/* <<< css/feedback/dialog.css <<< */
 
-/* >>> css/components/document-download-loading.css >>> */
+/* >>> css/feedback/document-download-loading.css >>> */
 .document-loading {
   position: fixed;
   right: 20px;
@@ -9610,7 +9610,7 @@ html[data-theme="dark"] .cv-dialog--document :is(.cv-dialog__icon, .cv-dialog__e
     animation-duration: 1.8s;
   }
 }
-/* <<< css/components/document-download-loading.css <<< */
+/* <<< css/feedback/document-download-loading.css <<< */
 
 /* >>> css/components/theme-dark-components.css >>> */
 /*
@@ -15243,7 +15243,7 @@ html[data-theme="dark"] *::after {
 }
 /* <<< css/components/theme-dark-components.css <<< */
 
-/* >>> css/components/list-header.css >>> */
+/* >>> css/lists/list-header.css >>> */
 /* =========================================================
    List Header — bloco compacto de listas
    Card com faixa de título + rail de filtros.
@@ -16331,4 +16331,4 @@ html[data-theme="dark"] *::after {
     width: 100%;
   }
 }
-/* <<< css/components/list-header.css <<< */
+/* <<< css/lists/list-header.css <<< */

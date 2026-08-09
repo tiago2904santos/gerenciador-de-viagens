@@ -5071,3 +5071,62 @@ mesmo piso de ruído do `NOVO-64`: `.os-model-card` em `/ordens-servico/nova/`.
   como projetada; o custo é que nome dentro de regex escapa da renomeação automática.**
 - `docs/DATA_ATTRIBUTES_JS.md` citava `components/cv-date-picker.js`, e o `HT-13` exige que a doc só
   descreva o que existe. Os `data-cv-date-picker-*` **continuam**: atributo não é classe.
+
+### NOVO-66 ✅ RESOLVIDO · `NOVO` Os 60 arquivos de CSS passam a ser agrupados por função · MED · 0,5 d
+
+O dono pediu pastas "agrupadas por função". O critério anterior era só profundidade: **40 arquivos
+soltos na raiz** e 21 em `components/`, sem dizer nada sobre o que cada um faz — `buttons.css` e
+`oficios.css` moravam lado a lado, e um é componente do sistema enquanto o outro é a tela de um
+domínio.
+
+| pasta | arquivos | o que é |
+|---|---|---|
+| `base/` | 7 | token, tema, reset, utilitário |
+| `layout/` | 5 | a moldura da página |
+| `fields/` | 8 | entrada de dados |
+| `actions/` | 2 | botão e menu de ação |
+| `lists/` | 7 | listagem, card, cabeçalho de filtro |
+| `feedback/` | 6 | aviso, diálogo, métrica, carregamento |
+| `pages/` | 23 | tela de domínio, não componente |
+
+**Três ficam na raiz:** `style.css` (ponto de entrada dos `@import`), `shell.bundle.css` (gerado) e
+`components/theme-dark-components.css` — este último porque não pertence a família nenhuma: é o
+resíduo do redesenho que o `NOVO-58` está desmontando.
+
+**A ordem da cascata não muda.** `SHELL_CSS` e os `@import` de `style.css` mantêm a mesma sequência;
+só o caminho de cada entrada muda. Mover arquivo e reordenar cascata no mesmo PR tornaria qualquer
+diferença medida impossível de atribuir.
+
+**Medição: 0 elementos alterados em 41.950.** É o resultado exigido de um move.
+
+**A armadilha do caminho relativo.** `fonts.css` e `prestacoes-assinatura.css` referenciam
+`url("../vendor/fonts/…")`. Descer um nível quebra isso **em silêncio** — o navegador não reclama, a
+fonte simplesmente não carrega. Os dois ganharam um `../` a mais, e conferi no navegador que a
+`Inter` continua sendo baixada e usada (medição de largura, não `fonts.check()`).
+
+**Caminho montado por segmento escapa de substituição textual.** Os testes constroem
+`css_root / "components" / "action-system.css"`, com cada pedaço numa string. Trocar `css/components/…`
+por `css/actions/…` no texto não alcança isso: **43 testes quebraram** com `FileNotFoundError`.
+Corrigido com uma varredura que entende a forma `X / "pasta" / "arquivo.css"`.
+
+### NOVO-67 🟡 `NOVO` O auditor de padrões de front nunca varreu `static/css/components/` · CI · 0,5 d
+
+Descoberto pelo `NOVO-66`. `scripts/audit_frontend_standards.py:444` usava `CSS_DIR.glob("*.css")` —
+**varredura rasa**. Enquanto os componentes moravam um nível abaixo, eles simplesmente não entravam
+na conta: o auditor via 40 arquivos de 61.
+
+O move tornou isso visível de duas formas, nesta ordem:
+
+1. Com `glob` raso e os arquivos já em subpastas, os avisos caíram de **240 para 18** — o auditor
+   passou a enxergar 2 arquivos. **Catraca que desce por cegueira é pior que catraca nenhuma**, e
+   esse número teria passado no CI como se fosse melhora.
+2. Trocando para `rglob`, o número sobe para **354**: são **114 avisos de dívida preexistente** que
+   nunca foram contados.
+
+Neste PR a varredura passou a ser `rglob` (a correção de fato) e os 20 arquivos que vieram de
+`components/` entram numa lista `COBERTURA_ADIADA` explícita, com o motivo escrito no código. Assim
+o corpo medido continua idêntico ao de antes — 240 avisos —, e um PR que só move arquivo não carrega
+114 avisos alheios.
+
+**Abrir a cobertura é trabalho próprio**, com o número já medido: `240 → 354`. Os avisos se
+concentram em `actions/` (152) e `pages/` (128).

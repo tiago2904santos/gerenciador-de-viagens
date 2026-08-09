@@ -354,8 +354,8 @@ class PainelAbertoNaoCortaTests(SimpleTestCase):
     """
 
     REGRAS = [
-        ("static/css/page-shell.css", ".inline-create__panel.is-open {"),
-        ("static/css/components/list-header.css", ".list-header .inline-create__panel.is-open {"),
+        ("static/css/layout/page-shell.css", ".inline-create__panel.is-open {"),
+        ("static/css/lists/list-header.css", ".list-header .inline-create__panel.is-open {"),
     ]
 
     def test_o_painel_aberto_rola_em_vez_de_cortar(self):

@@ -9,7 +9,7 @@ class DarkRedesignContractTests(SimpleTestCase):
     def setUp(self):
         self.base_path = Path(settings.BASE_DIR) / "templates" / "base.html"
         css_root = Path(settings.BASE_DIR) / "static" / "css"
-        self.tokens_path = css_root / "03-theme-dark.css"
+        self.tokens_path = css_root / "base" / "03-theme-dark.css"
         self.components_path = css_root / "components" / "theme-dark-components.css"
         self.base = self.base_path.read_text(encoding="utf-8")
         self.tokens_css = self.tokens_path.read_text(encoding="utf-8")
@@ -22,18 +22,18 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR) / "static" / "css" / "shell.bundle.css"
         ).read_text(encoding="utf-8")
         style_index = bundle.index(">>> css/style.css >>>")
-        theme_dark_tokens_index = bundle.index(">>> css/03-theme-dark.css >>>")
-        file_picker_index = bundle.index(">>> css/components/file-picker.css >>>")
-        action_system_index = bundle.index(">>> css/components/action-system.css >>>")
-        record_list_index = bundle.index(">>> css/components/record-list.css >>>")
-        filter_header_index = bundle.index(">>> css/components/filter-header.css >>>")
-        form_panel_index = bundle.index(">>> css/components/form-panel.css >>>")
-        app_shell_index = bundle.index(">>> css/components/app-shell.css >>>")
-        content_cards_index = bundle.index(">>> css/components/content-cards.css >>>")
+        theme_dark_tokens_index = bundle.index(">>> css/base/03-theme-dark.css >>>")
+        file_picker_index = bundle.index(">>> css/fields/file-picker.css >>>")
+        action_system_index = bundle.index(">>> css/actions/action-system.css >>>")
+        record_list_index = bundle.index(">>> css/lists/record-list.css >>>")
+        filter_header_index = bundle.index(">>> css/lists/filter-header.css >>>")
+        form_panel_index = bundle.index(">>> css/fields/form-panel.css >>>")
+        app_shell_index = bundle.index(">>> css/layout/app-shell.css >>>")
+        content_cards_index = bundle.index(">>> css/lists/content-cards.css >>>")
         document_viewer_index = bundle.index(
-            ">>> css/components/document-viewer.css >>>"
+            ">>> css/pages/document-viewer.css >>>"
         )
-        dialog_index = bundle.index(">>> css/components/dialog.css >>>")
+        dialog_index = bundle.index(">>> css/feedback/dialog.css >>>")
         theme_dark_components_index = bundle.index(
             ">>> css/components/theme-dark-components.css >>>"
         )
@@ -238,7 +238,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR)
             / "static"
             / "css"
-            / "components"
+            / "fields"
             / "file-picker.css"
         ).read_text(encoding="utf-8")
 
@@ -312,7 +312,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR) / "static" / "js" / "pages" / "eventos-detalhe.js"
         ).read_text(encoding="utf-8")
         page_shell = (
-            Path(settings.BASE_DIR) / "static" / "css" / "page-shell.css"
+            Path(settings.BASE_DIR) / "static" / "css" / "layout" / "page-shell.css"
         ).read_text(encoding="utf-8")
 
         # `H-02`: a página passou a estender `components/page/flow_base.html`,
@@ -401,7 +401,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR) / "static" / "js" / "components" / "sidebar.js"
         ).read_text(encoding="utf-8")
         shell_css = (
-            Path(settings.BASE_DIR) / "static" / "css" / "components" / "app-shell.css"
+            Path(settings.BASE_DIR) / "static" / "css" / "layout" / "app-shell.css"
         ).read_text(encoding="utf-8")
 
         self.assertIn('href="#main-content"', self.base)
@@ -456,7 +456,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR)
             / "static"
             / "css"
-            / "components"
+            / "lists"
             / "content-cards.css"
         ).read_text(encoding="utf-8")
 
@@ -602,7 +602,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR) / "templates" / "core" / "login.html"
         ).read_text(encoding="utf-8")
         auth_css = (
-            Path(settings.BASE_DIR) / "static" / "css" / "auth.css"
+            Path(settings.BASE_DIR) / "static" / "css" / "pages" / "auth.css"
         ).read_text(encoding="utf-8")
 
         self.assertIn('method="post"', login)
@@ -632,7 +632,7 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_dark_wizard_filete_stays_gold_and_tracks_header_content(self):
         page_shell = (
-            Path(settings.BASE_DIR) / "static" / "css" / "page-shell.css"
+            Path(settings.BASE_DIR) / "static" / "css" / "layout" / "page-shell.css"
         ).read_text(encoding="utf-8")
 
         self.assertIn("--_wizard-filete-inset-block", page_shell)
@@ -651,7 +651,7 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_standard_simple_centers_a_tokenized_compact_panel(self):
         page_shell = (
-            Path(settings.BASE_DIR) / "static" / "css" / "page-shell.css"
+            Path(settings.BASE_DIR) / "static" / "css" / "layout" / "page-shell.css"
         ).read_text(encoding="utf-8")
         # `H-05`/Fase 9: o seletor ganhou o alias `cv-page--narrow` na mesma regra.
         marker = ".page-shell--standard-simple > .main-form-panel"
@@ -666,7 +666,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         bundle = (
             Path(settings.BASE_DIR) / "static" / "css" / "shell.bundle.css"
         ).read_text(encoding="utf-8")
-        self.assertIn(">>> css/page-shell.css >>>", bundle)
+        self.assertIn(">>> css/layout/page-shell.css >>>", bundle)
 
     def test_list_and_form_cards_share_the_dark_card_family(self):
         for token in (

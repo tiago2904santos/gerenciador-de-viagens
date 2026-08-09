@@ -191,7 +191,7 @@ def apresentar_termo_card(
     header_chips = [entity_cards.chip("muted", oficio_label)] if oficio_label else []
 
     # Sem servidores e sem viatura o miolo nao renderiza faixa alguma; nesse caso
-    # cabecalho e acoes dividem a mesma linha (ver static/css/termos.css).
+    # cabecalho e acoes dividem a mesma linha (ver static/css/pages/termos.css).
     return {
         "termo_pk": termo.pk,
         "search_text": " ".join(filter(None, [
