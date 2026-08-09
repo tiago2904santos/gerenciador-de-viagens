@@ -401,7 +401,7 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [x] `NOVO-77` corpus antigo mantinha duas telas mortas além do UI Lab · **E0**
 - [x] `NOVO-78` fixture demo não acompanhou área obrigatória e seis modelos novos · **E0**
 - [x] `NOVO-79` duas rotas canônicas resolviam, mas respondiam 500 · **E0**
-- [ ] `JS-03` runner de teste de JavaScript — deixou de ser aditivo, virou pré-requisito · **E1**
+- [x] `JS-03` runner de teste de JavaScript — deixou de ser aditivo, virou pré-requisito · **E1**
 - [ ] `NOVO-69` `cv-select.js` (343 linhas) morto desde o PR #247, ainda no bundle · **E2**
 - [ ] `NOVO-72` `ui_lab2/` sobreviveu ao PR #247 · **E2**
 - [ ] `NOVO-73` nome e lugar de arquivo JS sem padrão · **E2**

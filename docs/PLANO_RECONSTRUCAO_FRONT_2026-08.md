@@ -166,9 +166,15 @@ dono entre um usuário de teste dedicado e medir só o que é público. Não me�
 
 ---
 
-### E1 — Rede de teste de JavaScript · `JS-03` · risco baixo · 5+ d
+### E1 ✅ — Rede de teste de JavaScript · `JS-03` · risco baixo · concluída em 09/08/2026
 
 **Objetivo.** Dar às 18.382 linhas de JS o primeiro teste automatizado do projeto.
+
+**Resultado.** Vitest + jsdom executam **34 testes** sobre os quatro primeiros módulos. A
+cobertura medida e fixada como piso por arquivo é: `http.js` 100% de linhas, `app.js` 27,74%,
+`masks.js` 96,20% e `collection.js` 91,36%. O CI usa Node 22, `npm ci` e `npm test`; a prova
+negativa elevou temporariamente o piso de linhas de `app.js` para 100% e o verificador saiu 1,
+informando 27,74% abaixo do piso. Nenhum teto existente foi desligado ou afrouxado.
 
 **Arquivos.** `package.json` (novo) · `vitest.config.js` (novo) · `static/js/**/*.test.js` (novos)
 · `.github/workflows/tests.yml` · `.gitignore`

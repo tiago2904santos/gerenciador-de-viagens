@@ -1468,7 +1468,7 @@ adicionados por instância e nunca removidos. Quando a linha do formulário é r
 (`location-rows.js:585-586`), o listener global continua vivo referenciando nós desconectados.
 Sinal agregado: 365 `addEventListener` contra **13** `removeEventListener` nas fontes.
 
-### JS-03 🟠 Zero teste automatizado para 17.859 linhas de JS · AUD+VER · 5+ d · risco baixo
+### JS-03 ✅ RESOLVIDO (d5b1d629, 09/08/2026) · Zero teste automatizado para 17.859 linhas de JS · AUD+VER · 5+ d · risco baixo
 
 Não há `package.json`, runner, nem `*.test.js` no repositório. Os únicos scripts com Playwright
 são utilitários de captura de tela, fora de qualquer workflow do `.github`. Toda a lógica
@@ -1478,6 +1478,12 @@ acima — só é validada à mão.
 > **Número corrigido pela verificação (05/08): 17.859, não 25.492.** A contagem original somava
 > `shell.bundle.js` (7.633 linhas) às fontes que o compõem — dupla contagem do mesmo código. Vale
 > o mesmo para o CSS: **43.038** linhas de fonte, não 60.707.
+
+**Resolvido na E1.** O repositório ganhou Vitest + jsdom, 34 testes dos contratos públicos de
+`CV.http`, registry (`registerEnhancer`/`destroy`), máscaras e coleções, e cobertura V8 por
+arquivo. `.github/js-coverage-floors.json` nasce no medido (linhas: 100%, 27,74%, 96,20% e
+91,36%, respectivamente), `scripts/check_js_coverage.mjs` bloqueia regressões e o workflow roda
+`npm ci` + `npm test` em Node 22. A prova negativa deliberada reprovou com exit 1.
 
 ### JS-04 ✅ RESOLVIDO (1a51341) · 🟠 Cadeia de promise sem `.catch` no editor de roteiros · AUD · 0,5 d
 
