@@ -185,15 +185,10 @@
    -------------------------------------------------------------------------- */
 :root {
   /* Dimensões — chip é menor que o state button (control-height-md = 44px) */
-  --cv-chip-radius:            var(--radius-pill);
   --cv-chip-height:            26px;
   --cv-chip-height-compact:    20px;
-  --cv-chip-padding-x:         var(--space-3);
-  --cv-chip-padding-x-compact: var(--space-2);
   --cv-chip-gap:               6px;
   --cv-chip-icon-size:         13px;
-  --cv-chip-font-size:         var(--font-size-2xs);
-  --cv-chip-font-weight:       var(--font-weight-bold);
   --cv-chip-letter-spacing:    0.055em;
   --cv-chip-border-width:      1px;
   --cv-chip-focus-ring:        0 0 0 3px rgba(21, 91, 154, 0.22);
@@ -301,20 +296,20 @@ html[data-theme="light"] {
   align-items: center;
   background: var(--_cv-chip-bg);
   border: var(--cv-chip-border-width) solid var(--_cv-chip-border);
-  border-radius: var(--cv-chip-radius);
+  border-radius: var(--radius-pill);
   /* Mesma lógica do cv-state-button: glow semântico + sombra genérica */
   box-shadow: var(--_cv-chip-glow), var(--shadow-xs);
   box-sizing: border-box;
   color: var(--_cv-chip-color);
   display: inline-flex;
-  font-size: var(--cv-chip-font-size);
-  font-weight: var(--cv-chip-font-weight);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
   gap: var(--cv-chip-gap);
   letter-spacing: var(--cv-chip-letter-spacing);
   min-height: var(--cv-chip-height);
   line-height: 1;
   margin: 0;
-  padding: 0 var(--cv-chip-padding-x);
+  padding: 0 var(--space-3);
   text-transform: uppercase;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
   vertical-align: middle;
@@ -335,7 +330,7 @@ html[data-theme="light"] {
 
 .cv-chip--compact {
   min-height: var(--cv-chip-height-compact);
-  padding-inline: var(--cv-chip-padding-x-compact);
+  padding-inline: var(--space-2);
 }
 
 .cv-chip--interactive,

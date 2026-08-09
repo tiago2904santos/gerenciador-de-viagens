@@ -62,13 +62,13 @@
 .travel-document-wizard .cv-field__select {
   background: var(--cv-field-bg);
   border: 1px solid var(--cv-field-border);
-  border-radius: var(--cv-field-radius);
-  box-shadow: var(--cv-field-shadow);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-xs);
   box-sizing: border-box;
   color: var(--color-input-text);
-  font-size: var(--cv-field-font-size);
-  min-height: var(--cv-field-height);
-  padding: var(--cv-field-padding-y) var(--cv-field-padding-x);
+  font-size: var(--font-size-sm);
+  min-height: var(--control-height-md);
+  padding: var(--cv-field-padding-y) var(--space-3);
   transition:
     background-color var(--transition-fast),
     border-color var(--transition-fast),
@@ -97,7 +97,7 @@
 
 .travel-document-wizard .cv-field--readonly .cv-field__control,
 .travel-document-wizard .cv-field__control[readonly] {
-  background: var(--cv-field-readonly-bg);
+  background: var(--route-field-disabled-bg);
   border-color: var(--color-border-strong);
   box-shadow: none;
   color: var(--color-input-text);
@@ -229,9 +229,9 @@
 /* Botões do footer: altura padrão do sistema de botões */
 .travel-document-wizard__actions .cv-btn {
   font-size:  var(--font-size-sm);
-  height:     var(--cv-btn-height);
-  min-height: var(--cv-btn-height);
-  max-height: var(--cv-btn-height);
+  height:     var(--control-height-md);
+  min-height: var(--control-height-md);
+  max-height: var(--control-height-md);
   padding:    0 var(--space-4);
 }
 
@@ -1402,7 +1402,7 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
 .cv-record-card {
   background: var(--cv-form-section-bg, var(--color-card));
   border: 1px solid var(--cv-form-section-border, var(--color-border-soft));
-  border-radius: var(--cv-form-section-radius, var(--radius-card));
+  border-radius: var(--radius-card, var(--radius-card));
   box-shadow: var(--cv-form-section-shadow, var(--shadow-card));
   overflow: hidden;
   transition:

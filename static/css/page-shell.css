@@ -84,11 +84,8 @@
   --cv-form-section-header-bg:      var(--surface-form-panel);
   --cv-form-section-border:         var(--border-form-section);
   --cv-form-section-shadow:         var(--shadow-sm);
-  --cv-form-section-radius:         var(--radius-card);
   --cv-form-section-header-padding: var(--space-4) var(--space-6) var(--space-4) var(--space-10);
   --cv-form-section-body-padding:   var(--space-5) var(--space-6);
-  --cv-form-section-stack-gap:             var(--space-4);
-  --cv-form-section-stack-gap-comfortable: var(--space-8);
 
   /* --- Stepper --- */
   --stepper-padding-x:   var(--space-6);
@@ -826,7 +823,7 @@ html[data-theme="light"] {
   border:        none;
   border-radius: 0;
   box-shadow:    none;
-  gap:           var(--cv-form-section-stack-gap);
+  gap:           var(--space-4);
   overflow:      visible;
   padding:       0;
 }
@@ -840,10 +837,10 @@ html[data-theme="light"] {
 .cv-form-section-stack > .footer-actions,
 .cv-form-section-stack > form > .footer-actions {
   background:    var(--cv-form-section-bg);
-  border-radius: 0 0 var(--cv-form-section-radius) var(--cv-form-section-radius);
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
   border-top:    1px solid var(--cv-form-section-border);
   box-shadow:    var(--cv-form-section-shadow);
-  margin-top:    calc(-1 * var(--_stack-gap, var(--cv-form-section-stack-gap)));
+  margin-top:    calc(-1 * var(--_stack-gap, var(--space-4)));
 }
 
 /* Ponte: seções legadas do wizard dentro do stack (ofícios/roteiros) */
@@ -852,7 +849,7 @@ html[data-theme="light"] {
 .main-form-panel--stack .roteiro-editor--oficio .roteiro-editor__section {
   background:    var(--cv-form-section-bg);
   border:        1px solid var(--cv-form-section-border);
-  border-radius: var(--cv-form-section-radius);
+  border-radius: var(--radius-card);
   box-shadow:    var(--cv-form-section-shadow);
   overflow:      hidden;
   width:         100%;
@@ -954,7 +951,7 @@ html[data-theme="light"] {
    ========================================================= */
 
 .cv-form-section-stack {
-  --_stack-gap:   var(--cv-form-section-stack-gap);
+  --_stack-gap:   var(--space-4);
   display:        flex;
   flex-direction: column;
   gap:            var(--_stack-gap);
@@ -962,7 +959,7 @@ html[data-theme="light"] {
 }
 
 .cv-form-section-stack--comfortable {
-  --_stack-gap: var(--cv-form-section-stack-gap-comfortable);
+  --_stack-gap: var(--space-8);
   gap:          var(--_stack-gap);
 }
 
@@ -971,14 +968,14 @@ html[data-theme="light"] {
 .cv-form-section-stack > form {
   display:        flex;
   flex-direction: column;
-  gap:            var(--_stack-gap, var(--cv-form-section-stack-gap));
+  gap:            var(--_stack-gap, var(--space-4));
   width:          100%;
 }
 
 .cv-form-section-card {
   background:    var(--cv-form-section-bg);
   border:        1px solid var(--cv-form-section-border);
-  border-radius: var(--cv-form-section-radius);
+  border-radius: var(--radius-card);
   box-shadow:    var(--cv-form-section-shadow);
   overflow:      hidden;
   width:         100%;
@@ -2817,15 +2814,15 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 #quick-add-modelo-motivo .cv-field__control--textarea {
   background: var(--cv-field-bg);
   border: 1px solid var(--cv-field-border);
-  border-radius: var(--cv-field-radius);
-  box-shadow: var(--cv-field-shadow);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-xs);
   box-sizing: border-box;
   color: var(--color-input-text);
-  font-size: var(--cv-field-font-size);
+  font-size: var(--font-size-sm);
   height: var(--text-area-height-md);
   line-height: 1.5;
   min-height: var(--text-area-height-md);
-  padding: var(--space-3) var(--cv-field-padding-x);
+  padding: var(--space-3) var(--space-3);
   resize: vertical;
   transition:
     background-color var(--transition-fast),
@@ -2859,15 +2856,15 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 #quick-add-atividade .cv-field__control--textarea {
   background: var(--color-input-bg);
   border: 1px solid var(--cv-field-border);
-  border-radius: var(--cv-field-radius);
-  box-shadow: var(--cv-field-shadow);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-xs);
   box-sizing: border-box;
   color: var(--color-input-text);
-  font-size: var(--cv-field-font-size);
+  font-size: var(--font-size-sm);
   height: var(--text-area-height-md);
   line-height: 1.5;
   min-height: var(--text-area-height-md);
-  padding: var(--space-3) var(--cv-field-padding-x);
+  padding: var(--space-3) var(--space-3);
   resize: vertical;
   transition:
     background-color var(--transition-fast),

@@ -112,9 +112,6 @@
   --radius-map: var(--radius-panel);
   --radius-pill: 999px;
   --radius-full: var(--radius-pill);
-  --cv-btn-radius: var(--radius-pill);
-  --cv-field-radius: var(--radius-control);
-  --cv-card-radius: var(--radius-card);
 
   /* --------------------------------------------------------------------------
      Tipografia
@@ -145,12 +142,9 @@
   --text-area-height-md: 88px;
   --text-area-height-lg: 176px;
   --text-area-height-justificativa: 220px;
-  --cv-btn-height: var(--control-height-md);
   --cv-btn-padding-x: 13px;
   --cv-btn-gap: 5px;
   --cv-btn-icon-size: 17px;
-  --cv-field-height: var(--control-height-md);
-  --cv-field-padding-x: var(--space-3);
   --cv-field-border: 1px solid var(--color-border-strong);
   --cv-field-bg: var(--color-surface);
   --cv-field-focus-ring: 0 0 0 3px rgba(21, 91, 154, 0.28);

@@ -13,15 +13,11 @@
   --cv-sp-field-text: var(--theme-input-text, var(--color-input-text));
   --cv-sp-field-focus-ring: var(--route-focus-ring, var(--color-info-border));
   --cv-sp-dropdown-bg: var(--theme-surface-card, var(--color-card));
-  --cv-sp-dropdown-border: var(--cv-sp-field-border-focus);
-  --cv-sp-dropdown-shadow: var(--shadow-panel);
   --cv-sp-dropdown-option-hover: var(--theme-list-row-hover, var(--color-primary-soft));
   --cv-sp-selected-panel-bg: var(--theme-surface-card-soft, var(--color-card-soft));
   --cv-sp-selected-panel-border: var(--theme-border-card, var(--color-border));
   --cv-sp-selected-card-bg: var(--theme-surface-card, var(--color-card));
   --cv-sp-selected-card-border: var(--theme-border-card, var(--color-border-soft));
-  --cv-sp-radius: var(--radius-control);
-  --cv-sp-card-radius: var(--radius-card);
 }
 
 .cv-search-picker {
@@ -34,8 +30,8 @@
   --field-placeholder: var(--color-input-placeholder);
   --field-focus-ring: var(--cv-sp-field-focus-ring);
   --dropdown-bg: var(--cv-sp-dropdown-bg);
-  --dropdown-border: var(--cv-sp-dropdown-border);
-  --dropdown-shadow: var(--cv-sp-dropdown-shadow);
+  --dropdown-border: var(--cv-sp-field-border-focus);
+  --dropdown-shadow: var(--shadow-panel);
   --dropdown-option-hover: var(--cv-sp-dropdown-option-hover);
   --dropdown-option-selected: var(--color-info-bg);
   --selected-panel-bg: var(--cv-sp-selected-panel-bg);
@@ -57,8 +53,8 @@
   --driver-border: var(--cv-btn-secondary-active-border, var(--color-primary));
   --driver-text: var(--cv-btn-secondary-active-color, var(--color-primary-strong));
   --cv-search-picker-height: var(--control-height-md);
-  --cv-search-picker-radius: var(--cv-sp-radius);
-  --cv-search-picker-card-radius: var(--cv-sp-card-radius);
+  --cv-search-picker-radius: var(--radius-control);
+  --cv-search-picker-card-radius: var(--radius-card);
   --cv-search-picker-focus-shadow: 0 0 0 var(--space-1) var(--field-focus-ring), var(--shadow-xs);
   display: grid;
   gap: var(--space-4);
@@ -106,11 +102,11 @@
   --field-placeholder: var(--color-input-placeholder);
   --field-focus-ring: var(--cv-sp-field-focus-ring);
   --dropdown-bg: var(--cv-sp-dropdown-bg);
-  --dropdown-border: var(--cv-sp-dropdown-border);
-  --dropdown-shadow: var(--cv-sp-dropdown-shadow);
+  --dropdown-border: var(--cv-sp-field-border-focus);
+  --dropdown-shadow: var(--shadow-panel);
   --dropdown-option-hover: var(--cv-sp-dropdown-option-hover);
   --dropdown-option-selected: var(--color-info-bg);
-  --cv-search-picker-radius: var(--cv-sp-radius);
+  --cv-search-picker-radius: var(--radius-control);
 }
 
 .cv-search-picker__control {
