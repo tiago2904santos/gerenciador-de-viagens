@@ -5130,3 +5130,48 @@ o corpo medido continua idêntico ao de antes — 240 avisos —, e um PR que s�
 
 **Abrir a cobertura é trabalho próprio**, com o número já medido: `240 → 354`. Os avisos se
 concentram em `actions/` (152) e `pages/` (128).
+
+### NOVO-68 🟠 PARCIAL · `NOVO` 155 regras de geometria deixam de depender do tema · UI · 1 d
+
+Terceiro recorte do `NOVO-58`, e o primeiro **mecânico** — os anteriores (barra lateral) foram
+regra a regra.
+
+**A transformação, e por que ela é segura:**
+
+```css
+:is(html[data-theme="dark"]) .x { padding: 8px; }
+              ↓
+:is(html[data-theme])        .x { padding: 8px; }
+```
+
+`[data-theme]` e `[data-theme="dark"]` têm **a mesma especificidade** — os dois são um seletor de
+atributo (0,1,0) — e a regra fica **no mesmo lugar** do arquivo, dentro do mesmo `@media` se houver.
+Nada muda de peso nem de posição na cascata: o escuro recebe exatamente o que já recebia, e o claro
+passa a receber a geometria.
+
+Isso só vale porque `data-theme` está **sempre presente**. Conferido no navegador nos três casos de
+`prefers-color-scheme` (claro, escuro e sem preferência): `theme-init.js` escreve o atributo em
+todos. Se faltasse, a regra não casaria e o elemento cairia na base clara — que é o comportamento de
+hoje, então nem assim haveria regressão.
+
+| | |
+|---|---|
+| regras desescopadas | **155** |
+| elementos melhorados no claro | **3.432** |
+| elementos alterados no escuro | **1** — o ruído conhecido |
+| divergência não-cor entre temas | 13.936 → **11.667** |
+
+**Por que só 155 e não 368.** A versão completa também **partia** os blocos mistos, separando
+geometria de cor em dois blocos irmãos — e chegava a derrubar a divergência de 13.936 para **1.826**,
+87%. Mas ela mexia em **88 elementos do tema escuro**, que deveria ficar intacto.
+
+Excluir os blocos que declaram *custom property* (o valor de um token pode alimentar outro bloco por
+herança, e partir muda de qual escopo ele é lido) levou de 88 para **9**. Os 9 restantes — todos
+`record-row`, trocando o fundo — **eu não consegui explicar**: as regras de `record-row` saíram
+byte-idêntica do transformador, só com o número de linha deslocado.
+
+Mudança sem explicação no tema que deveria ficar intacto é exatamente o que a medição existe para
+barrar. Então a partição fica **fora desta leva**, com o ganho já medido (11.667 → 1.826) para quando
+for investigada com calma.
+
+**O que resta no arquivo:** 590 seletores ainda escopados ao escuro contra 175 já globais.
