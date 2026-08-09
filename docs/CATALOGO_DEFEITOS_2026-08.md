@@ -4762,3 +4762,62 @@ cita como par ("mesmo token da área interna dos cards"), também não é pintad
 combinam. É declaração que não faz nada, não fundo faltando. Fica registrado como higiene junto do
 resto do `NOVO-58`, não como correção urgente — e o `var(--x, fallback)` que já existe em dois usos
 do mesmo token (linhas 988 e 993) mostra que alguém já tropeçou nisto antes.
+
+### NOVO-60 🟠 `NOVO` A renomeação por função é 98% mecânica — e os 2% restantes são arqueologia, não digitação · UI · a decidir
+
+Levantamento para a renomeação que o dono aprovou (inglês, sem `cv-`, nome pela função, prefixo só
+quando o nome sozinho for ambíguo). O número que decide o formato do trabalho:
+
+| | |
+|---|---|
+| classes no CSS | 1.864 |
+| das quais `cv-*` | 598, em 95 blocos |
+| **colidiriam com classe existente se o `cv-` fosse só removido** | **13** |
+
+Ou seja: **585 das 598 podem ser renomeadas mecanicamente.** As 13 exceções são o trabalho de
+verdade, e cada uma é um caso.
+
+**Dez das treze estão mortas** — 0 usos como token de classe em `templates/`, `static/js/` e nos
+apps: `alert--danger`, `btn`, `btn--ghost`, `btn--lg`, `btn--sm`, `btn-group`, `chip`,
+`form-section-header`, `summary-card`, `summary-label`. O único hit de `btn` é
+`assertNotIn("btn btn-secondary", source)` em `core/tests/test_dark_redesign.py:562` — um teste que
+já guarda a ausência do nome antigo. O único de `chip` é o nome da função
+`_evento_temporal_chip`, não uma classe.
+
+**Três estão vivas, e cada uma é um problema diferente:**
+
+| classe | usos | o que realmente é |
+|---|---|---|
+| `.field` | 89 | 51 no **mesmo elemento** que `cv-field`, 25 sozinha |
+| `.alert` | 11 | não faz par com `cv-alert` — faz com **`cv-notice`** |
+| `.module-card` | 1 | no mesmo elemento que `cv-module-card` |
+
+O caso do campo mostra o problema inteiro numa linha
+(`components/ui/modals/cancel_reason_modal.html:20`):
+
+```html
+<div class="field app-form-field cv-field cancel-reason-modal__field">
+```
+
+**Quatro nomes para um campo, no mesmo elemento.** E o alerta tem cinco
+(`components/ui/feedback/alert.html:21`): `cv-notice cv-notice--{{v}} alert alert-{{v}} alert--{{v}}`.
+Não são componentes concorrentes disputando o nome — é o mesmo elemento carregando as duas gerações
+ao mesmo tempo. Onde é assim, tirar o nome antigo é **remoção**, não fusão. Onde não é (`.field`
+sozinha em 25 lugares, `.alert` que aponta para `cv-notice`), é decisão.
+
+**Correção de rumo, e ela importa para o método.** A primeira medição destes 13 foi por contagem de
+elementos no navegador, nas 44 rotas: deu `.alert` = 0 e eu quase registrei "11 de 13 mortas". Está
+errado — `.alert` tem 11 usos em template, e só não apareceu porque alerta é renderizado em condição
+de erro que a varredura não provoca. **Rota visitada não é cobertura.** Quem decide morte aqui é o
+grep por token de classe; o navegador só confirma vida, nunca ausência.
+
+**O `chip` era o candidato natural para o primeiro PR, e é justamente o que não serve.** Renomear
+`cv-chip` → `chip` faria os chips passarem a casar com
+`html[data-theme="dark"] :is(.badge, .chip, .status-badge, .cv-status-pill)`
+(`theme-dark-components.css:3801`), herdando `border-color: var(--color-border-strong)` no escuro.
+A regra está morta hoje, mas o nome não estaria depois da troca. `chip` é ambíguo neste código —
+`cv-chip`, `.chip`, `.status-chip`, `.badge` —, e é exatamente o caso que a regra do dono cobre.
+
+**Ordem sugerida:** (1) apagar os 10 nomes mortos, com prova de grep; (2) resolver os 3 vivos, um
+por vez, porque cada um é uma decisão; (3) só então a renomeação mecânica dos 585, família por
+família.
