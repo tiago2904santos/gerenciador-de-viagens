@@ -220,7 +220,6 @@ html[data-theme="dark"] {
   --route-button-primary-hover-bg: linear-gradient(180deg, var(--color-primary-bright) 0%, var(--color-primary) 100%);
 
   /* Shell */
-  --sidebar-width: clamp(238px, 17.5vw, 276px);
   --sidebar-surface: #111e2f;
   --sidebar-fg: #d2d9de;
   --sidebar-fg-soft: #b5c0c8;
@@ -314,11 +313,6 @@ html[data-theme="dark"] {
   --cv-chip-filter-border: #55a1d6;
   --cv-chip-filter-color: #deebfb;
   --cv-chip-filter-glow: var(--cv-chip-info-glow);
-}
-@media (max-width: 1080px) {
-  html[data-theme="dark"] {
-    --sidebar-width: 224px;
-  }
 }
 :is(html[data-theme="dark"]) {
   --cv-btn-focus-ring: none;

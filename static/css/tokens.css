@@ -216,8 +216,12 @@
   --breakpoint-6xl: 1400px;
   --breakpoint-7xl: 1480px;
 
-  /* Shell: sidebar fixa em % da viewport; conteudo usa o restante (grid em layout.css). */
-  --sidebar-width: 15%;
+  /* Shell: largura da barra lateral; conteudo usa o restante (grid em layout.css).
+     `NOVO-63`: era `15%` aqui e `clamp(238px, 17.5vw, 276px)` só no tema escuro —
+     216px contra 252px na mesma janela, e tudo que mora dentro herdava a
+     diferenca. O `clamp` e o valor melhor: prende um minimo legivel e um maximo,
+     em vez de encolher junto com a janela. */
+  --sidebar-width: clamp(238px, 17.5vw, 276px);
   --page-max-width: 100%;
 
   /* --------------------------------------------------------------------------
@@ -266,4 +270,13 @@
   --app-z-dropdown: var(--z-dropdown);
   --app-z-modal: var(--z-modal);
   --app-z-toast: var(--z-toast);
+}
+
+/* `NOVO-63`: em telas medias a barra aperta um pouco. A regra existia só no
+   tema escuro (`03-theme-dark.css`), então o claro ficava com a barra mais
+   larga exatamente onde o espaco e mais escasso. */
+@media (max-width: 1080px) {
+  :root {
+    --sidebar-width: 224px;
+  }
 }

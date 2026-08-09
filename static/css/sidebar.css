@@ -13,8 +13,13 @@
   color: var(--sidebar-fg-soft);
   display: flex;
   flex-direction: column;
+  /* `NOVO-63`: altura presa na viewport e transbordo cortado — era regra só do
+     tema escuro. A barra rola por dentro (`.sidebar-nav`), sem empurrar a pagina. */
+  height: 100vh;
+  max-height: 100vh;
   min-height: 100vh;
   min-width: 0;
+  overflow: hidden;
   padding: 0;
   position: sticky;
   top: 0;
@@ -24,15 +29,16 @@
 
 .sidebar-header {
   border-bottom: 1px solid var(--sidebar-border);
-  padding: var(--space-5) var(--space-5) var(--space-4);
+  padding: 22px 18px 18px;
 }
 
 .sidebar-brand {
   align-items: center;
   color: var(--sidebar-brand-fg);
   display: inline-flex;
-  gap: calc(var(--space-2) + 2px);
+  gap: 12px;
   font-size: 1.05rem;
+  line-height: 1.2;
   font-weight: 700;
   letter-spacing: -0.01em;
   transition: color var(--transition-slow);
@@ -47,9 +53,9 @@
   display: inline-flex;
   font-size: 11px;
   font-weight: 800;
-  height: 28px;
+  height: 34px;
   justify-content: center;
-  width: 28px;
+  width: 34px;
 }
 
 .sidebar-brand:hover {
@@ -60,9 +66,9 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  gap: var(--space-2);
+  gap: 3px;
   overflow-y: auto;
-  padding: calc(var(--space-3) + 2px) var(--space-3) var(--space-section-y);
+  padding: 12px 10px 18px;
 }
 
 .sidebar-item {
@@ -92,22 +98,32 @@
   align-items: center;
   background: var(--sidebar-link-surface);
   border: 1px solid var(--sidebar-link-border);
-  border-radius: var(--radius-control-lg);
+  border-radius: 10px;
   box-sizing: border-box;
   color: var(--sidebar-link-fg);
   display: flex;
   flex: 1;
-  font-size: 0.93rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  min-height: calc(var(--control-height-md) - 2px);
+  min-height: 40px;
   min-width: 0;
-  padding: 10px 13px;
+  padding: 8px 10px;
 }
 
 .sidebar-module-expand {
   cursor: pointer;
   flex: 1;
-  font: inherit;
+  /* `font-family`/`font-weight` e não `font: inherit` (`NOVO-63`).
+     `font: inherit` é o reset habitual de `<button>`, mas ele zera TAMBÉM o
+     tamanho — e este botão É um `.sidebar-link--module`, que declara
+     `font-size: 0.875rem` logo acima. Vindo depois e com a mesma
+     especificidade, `font: inherit` vencia e o item virava 16px, enquanto o
+     item irmão (que não é botão) ficava em 14px.
+     Isso não aparecia porque a regra do tema escuro, mais específica, corrigia
+     o tamanho de volta — só no escuro. Globalizada a geometria, o conserto
+     escondido caiu e a divergência ficou visível nos dois temas. */
+  font-family: inherit;
+  font-weight: inherit;
   justify-content: space-between;
   text-align: left;
   width: 100%;
@@ -143,16 +159,17 @@
 .sidebar-item-icon {
   align-items: center;
   background: var(--sidebar-icon-bg);
-  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  border-radius: 7px;
   color: var(--sidebar-icon-fg);
   display: inline-flex;
   flex-shrink: 0;
   font-size: 10px;
   font-weight: 800;
-  height: 22px;
+  height: 24px;
   justify-content: center;
   letter-spacing: 0.03em;
-  width: 22px;
+  width: 24px;
 }
 
 .sidebar-accordion {
@@ -232,15 +249,15 @@
   color: var(--sidebar-footer-fg);
   display: flex;
   flex-direction: column;
-  gap: calc(var(--space-2) + 2px);
+  gap: 12px;
   font-size: 12px;
-  padding: 14px 20px 16px;
+  padding: 12px 14px 16px;
 }
 
 .sidebar-account {
   display: grid;
   gap: 10px;
-  padding: 10px;
+  padding: 10px 12px;
   border: 1px solid var(--sidebar-link-border);
   border-radius: var(--radius-control);
   background: rgba(255, 255, 255, 0.045);
@@ -343,7 +360,7 @@
 
 @media (max-width: 600px) {
   .sidebar-header {
-    padding: 12px 14px 10px;
+    padding: 14px;
   }
 
   .sidebar-brand {
@@ -354,7 +371,7 @@
     display: grid;
     gap: 8px;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    max-height: 260px;
+    max-height: none;
     overflow-y: auto;
     padding: 10px;
   }
@@ -382,6 +399,17 @@
   }
 
   .sidebar-footer {
+    display: flex;
+    gap: 10px;
     padding: 10px;
+  }
+
+  .sidebar-account {
+    gap: 7px;
+    padding: 8px 10px;
+  }
+
+  .sidebar-account__actions {
+    gap: 6px;
   }
 }

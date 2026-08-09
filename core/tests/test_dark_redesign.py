@@ -77,8 +77,18 @@ class DarkRedesignContractTests(SimpleTestCase):
             "--color-warning:",
             "--color-danger:",
             "--color-input-bg:",
-            "--sidebar-width:",
         )
+        # `--sidebar-width` saiu desta lista no `NOVO-63`, e a saída é o ponto.
+        #
+        # Todo o resto aqui é `--color-*`: são as cores que um tema precisa
+        # declarar para os componentes funcionarem. Largura de barra lateral
+        # nunca foi cor — estava aqui porque o tema escuro a redefinia
+        # (`clamp(238px, 17.5vw, 276px)` contra os `15%` do sistema), e a lista
+        # apenas registrava esse fato.
+        #
+        # Agora a largura é decidida uma vez, em `tokens.css`, e vale nos dois
+        # temas. Exigi-la de volta neste arquivo seria exigir que a divergência
+        # voltasse.
 
         for token in required_tokens:
             with self.subTest(token=token):
