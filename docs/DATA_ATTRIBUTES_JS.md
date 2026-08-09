@@ -7,7 +7,7 @@ que ele publica em `window.CV`. Não altera regra de negócio.
 
 Este documento cobre `static/js/core/`, `static/js/components/` e os motores de raiz — o código que
 qualquer tela pode acionar. **Não** indexa os atributos de uma página só (`static/js/pages/`): são
-**135** deles, cada um com um único consumidor, e a documentação certa para esses é o próprio
+**141** deles, cada um com um único consumidor, e a documentação certa para esses é o próprio
 módulo da página.
 
 A regra que decide: se o atributo aparece num motor compartilhado, ele está aqui. Isso é verificado
@@ -110,20 +110,6 @@ Duas armadilhas medidas no navegador: o **dropdown é portado para `document.bod
 quando aberto, então `part(root, "dropdown")` devolve `null` nesse estado — use `closestPart` a
 partir do alvo do evento; e existe markup que **imita** o picker sem ser um (três templates o
 escrevem à mão, `NOVO-16`): tem as classes, não tem os atributos.
-
-## Dropdowns — `cv-select.js` / `CV.dropdowns`
-
-| Atributo | Elemento |
-|---|---|
-| `data-cv-dropdown` | raiz do dropdown simples |
-| `data-cv-dropdown-trigger` | botão que abre |
-| `data-cv-dropdown-menu` | menu |
-| `data-cv-filter-dropdown` | raiz do dropdown de filtro |
-| `data-cv-filter-dropdown-trigger` | botão que abre |
-| `data-cv-filter-dropdown-menu` | menu |
-| `data-cv-filter-dropdown-option` | opção |
-
-API: `CV.dropdowns.init(root?)`. Marcador de idempotência: `_cvDropdownReady`.
 
 ## Máscaras — `components/masks.js` / `CV.masks`
 
@@ -263,7 +249,6 @@ Orquestrador carregado depois dos motores em `base.html`.
 | `CV.fields.initSelects(root?)` | Só os selects customizados |
 | `CV.fields.initSearchPickers(root?)` | Só o picker de busca |
 | `CV.fields.initDatePickers(root?)` | Só os date pickers |
-| `CV.fields.initDropdowns(root?)` | Só os dropdowns |
 | `CV.fields.initMultiselects(root?)` | Só os multiselects |
 
 | Atributo | Uso |
@@ -271,10 +256,10 @@ Orquestrador carregado depois dos motores em `base.html`.
 | `data-form-errors` | Resumo de erro de formulário (`HT-03`) — recebe o foco uma vez por carga de página |
 
 Evento: `cv:fields:init` — `detail.initialized`:
-`{ masks, stateToggles, segmentNav, selects, searchPickers, datePickers, dropdowns, multiselects, filterableMultiselects, resumoDeErros }`.
+`{ masks, stateToggles, segmentNav, selects, searchPickers, datePickers, multiselects, filterableMultiselects, resumoDeErros }`.
 
 Ordem interna: masks → stateToggle → segmentNav → selects → searchPickers → datePickers →
-dropdowns → multiselects → filterableMultiselects → resumo de erros.
+multiselects → filterableMultiselects → resumo de erros.
 
 Depois de inserir DOM dinamicamente:
 
@@ -289,8 +274,8 @@ window.CV.fields.init(panelElement);
 | `data-diaria-base`, `data-diaria-derivado` | `components/diaria-derivados.js` | Espelha na tela a derivação de 15% e 30% que o modelo faz no `save()` — é pré-visualização, o servidor continua dono do valor |
 | `data-cv-signature-card`, `data-cv-signature-link`, `data-cv-signature-copy`, `data-cv-signature-wa` | `components/signature-actions.js` | Cartão de assinatura: copiar link e enviar por WhatsApp |
 | `data-cv-segment-nav-bound` | `components/segment-nav.js` | Navegação por segmentos — marcador de idempotência (o motor liga por classe, não por atributo) |
-| `data-map-focus-lat`, `data-map-focus-lng` | `roteiros-map.js` | Centro inicial do mapa |
-| `data-oficio-glance-panel`, `data-oficio-glance-toggle`, `data-oficio-glance-toggle-label`, `data-oficio-sticky-header` | `roteiros_wizard.js` | Painel de resumo do ofício no wizard de roteiro |
+| `data-map-focus-lat`, `data-map-focus-lng` | `pages/roteiros-map.js` | Centro inicial do mapa |
+| `data-oficio-glance-panel`, `data-oficio-glance-toggle`, `data-oficio-glance-toggle-label`, `data-oficio-sticky-header` | `pages/roteiros-wizard.js` | Painel de resumo do ofício no wizard de roteiro |
 
 ## Domínio de roteiro (no `#roteiro-editor-form`)
 

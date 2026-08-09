@@ -58,8 +58,7 @@
 }
 
 /* Textarea de Motivo no wizard: visual idêntico ao input, só com altura maior */
-.travel-document-wizard .cv-field__control,
-.travel-document-wizard .cv-field__select {
+.travel-document-wizard .cv-field__control {
   background: var(--cv-field-bg);
   border: 1px solid var(--cv-field-border);
   border-radius: var(--radius-control);
@@ -144,8 +143,7 @@
 }
 
 /* Wizard Ofício: wrappers empilham linhas internas, não field-span no container */
-.oficio-data-block.app-form-grid-panel,
-.motivo-card__body.app-form-grid-panel {
+.oficio-data-block.app-form-grid-panel {
   grid-template-columns: minmax(0, 1fr);
 }
 
@@ -655,10 +653,6 @@
   overflow: visible;
 }
 
-.oficio-documentos-admin-facts > .oficio-documentos-card__header {
-  display: none;
-}
-
 .oficio-documentos-admin-facts > .oficio-documentos-card__body {
   padding: 0;
 }
@@ -898,7 +892,6 @@
   width: 100%;
 }
 
-.oficio-documentos-route-card__diarias-main,
 .oficio-documentos-route-card__diarias-metric {
   background: var(--color-card-muted);
   border: 1px solid var(--color-border-soft);

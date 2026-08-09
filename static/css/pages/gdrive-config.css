@@ -651,27 +651,24 @@
 }
 
 /* ── Barras de rolagem temáticas (o scrollbar claro nativo fica feio no escuro) */
-.gdrive-pend-lista,
+
 .gdrive-previa-lista,
 .gdrive-folder-list {
   scrollbar-width: thin;
   scrollbar-color: var(--color-border-strong) transparent;
 }
 
-.gdrive-pend-lista::-webkit-scrollbar,
 .gdrive-previa-lista::-webkit-scrollbar,
 .gdrive-folder-list::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
-.gdrive-pend-lista::-webkit-scrollbar-track,
 .gdrive-previa-lista::-webkit-scrollbar-track,
 .gdrive-folder-list::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.gdrive-pend-lista::-webkit-scrollbar-thumb,
 .gdrive-previa-lista::-webkit-scrollbar-thumb,
 .gdrive-folder-list::-webkit-scrollbar-thumb {
   border: 2px solid transparent;
@@ -680,7 +677,6 @@
   background-clip: padding-box;
 }
 
-.gdrive-pend-lista::-webkit-scrollbar-thumb:hover,
 .gdrive-previa-lista::-webkit-scrollbar-thumb:hover,
 .gdrive-folder-list::-webkit-scrollbar-thumb:hover {
   background-color: var(--color-text-soft);

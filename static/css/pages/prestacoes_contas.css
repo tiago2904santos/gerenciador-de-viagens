@@ -61,7 +61,6 @@
 /* Servidores do RT: colunas dinâmicas por quantidade (até 3 por linha), como
    nos Viajantes do ofício — o modificador --nX no container define o flex-basis. */
 
-.rt-summary-card__cost-grid,
 .rt-custeios-grid {
   display: grid;
   gap: var(--space-3);
@@ -465,7 +464,6 @@
   color: var(--color-white, #fff);
 }
 
-.prestacao-file-picker__clear,
 .prestacao-file-picker__upload {
   align-items: center;
   border: 0;
@@ -509,7 +507,6 @@
 
 @media (max-width: 900px) {
   .rt-summary-card .oficio-documentos-facts,
-  .rt-summary-card__cost-grid,
   .rt-custeios-grid,
   .diario-wizard-card .oficio-documentos-facts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -519,7 +516,6 @@
 
 @media (max-width: 600px) {
   .rt-summary-card .oficio-documentos-facts,
-  .rt-summary-card__cost-grid,
   .rt-custeios-grid,
   .diario-wizard-card .oficio-documentos-facts {
     grid-template-columns: 1fr;
@@ -545,7 +541,6 @@
   }
 
   .prestacao-file-picker__action,
-  .prestacao-file-picker__clear,
   .prestacao-file-picker__upload {
     width: 100%;
   }
@@ -564,7 +559,6 @@
     min-height: 44px;
   }
 
-  .prestacao-file-picker__clear,
   .prestacao-file-picker__upload {
     border-left: 0;
     border-top: 1px solid var(--cv-field-border, var(--color-border-soft));

@@ -204,10 +204,17 @@ afrouxa para o PR passar.
 
 ---
 
-### E2 — Higiene: o morto e os nomes · `NOVO-69`, `NOVO-72`, `NOVO-73`, `NOVO-48` · risco baixo · 2 d
+### E2 ✅ — Higiene: o morto e os nomes · `NOVO-69`, `NOVO-72`, `NOVO-73`, `NOVO-48` · concluída em 09/08/2026
 
 **Objetivo.** Tirar do caminho o que está morto e padronizar nome e lugar, antes que a
 componentização os carregue para dentro do desenho novo.
+
+**Resultado.** `cv-select.js` e seu contrato/no-op/CSS órfão saíram; `SHELL_JS` ficou com 25
+fontes e o bundle versionado caiu **289.831 → 274.420 bytes**. Os quatro módulos de página agora
+estão em `static/js/pages/` com kebab-case. `ui_lab2/` não existe numa worktree limpa (era apenas
+cache ignorado). A poda CSS, re-medida depois da sobreposição com `NOVO-69`, removeu **66 nomes**,
+168 alternativas e 57 regras completas; o bundle CSS caiu **485.262 → 479.996 bytes** e a catraca
+de padrões de UI desceu **2.622 → 2.583**.
 
 **Arquivos.** `static/js/cv-select.js` · `scripts/build_shell_bundles.py` · `ui_lab2/` ·
 `static/js/roteiros*.js` · `static/js/pages/gdrive_config.js` · `static/css/**` (seletores

@@ -205,8 +205,7 @@ html[data-theme="dark"] {
 .cv-btn--primary,
 .cv-btn--primary-action,
 .cv-btn--next,
-.btn-primary,
-.app-btn--primary {
+.btn-primary {
   background: var(--action-primary-bg);
   border-color: var(--action-primary-border);
   box-shadow: var(--action-primary-shadow);
@@ -220,9 +219,7 @@ html[data-theme="dark"] {
 .cv-btn--next:hover,
 .cv-btn--next:focus,
 .btn-primary:hover,
-.btn-primary:focus,
-.app-btn--primary:hover,
-.app-btn--primary:focus {
+.btn-primary:focus {
   background: var(--action-primary-hover-bg);
   border-color: var(--action-primary-border);
   color: var(--action-primary-text);
@@ -237,10 +234,7 @@ html[data-theme="dark"] {
 .cv-btn--signature,
 .cv-btn--document,
 .cv-btn--copy-link,
-.btn-secondary,
-.btn-muted,
-.app-btn--secondary,
-.app-btn--muted {
+.btn-secondary {
   background: var(--action-bg);
   border-color: var(--action-border);
   box-shadow: var(--action-shadow);
@@ -256,23 +250,20 @@ html[data-theme="dark"] {
 .cv-btn--signature:hover,
 .cv-btn--document:hover,
 .cv-btn--copy-link:hover,
-.btn-secondary:hover,
-.btn-muted:hover,
-.app-btn--secondary:hover,
-.app-btn--muted:hover {
+.btn-secondary:hover {
   background: var(--action-bg-hover);
   border-color: var(--action-border-strong);
   color: var(--action-text-strong);
 }
 
-.cv-btn--ghost{
+.cv-btn--ghost {
   background: transparent;
   border-color: transparent;
   box-shadow: none;
   color: var(--action-text);
 }
 
-.cv-btn--ghost:hover{
+.cv-btn--ghost:hover {
   background: var(--action-bg-soft);
   border-color: transparent;
   box-shadow: none;
@@ -281,9 +272,7 @@ html[data-theme="dark"] {
 }
 
 .cv-btn--danger,
-.cv-btn--soft-danger,
-.btn-danger,
-.app-btn--danger {
+.cv-btn--soft-danger {
   background: var(--action-danger-bg);
   border-color: var(--action-danger-border);
   box-shadow: none;
@@ -291,9 +280,7 @@ html[data-theme="dark"] {
 }
 
 .cv-btn--danger:hover,
-.cv-btn--soft-danger:hover,
-.btn-danger:hover,
-.app-btn--danger:hover {
+.cv-btn--soft-danger:hover {
   background: var(--action-danger-hover-bg);
   border-color: var(--action-danger-border);
   color: var(--action-danger-text);
@@ -343,22 +330,19 @@ html[data-theme="dark"] {
   color: var(--action-info-text);
 }
 
-.cv-btn--xs,
-.btn--compact {
+.cv-btn--xs {
   border-radius: 9px;
   min-height: 30px;
   padding-inline: 9px;
 }
 
-.cv-btn--sm,
-.btn-sm,
-.app-btn--sm {
+.cv-btn--sm {
   border-radius: var(--action-radius-sm);
   min-height: 34px;
   padding-inline: 11px;
 }
 
-.cv-btn--lg{
+.cv-btn--lg {
   min-height: 48px;
   padding-inline: 20px;
 }

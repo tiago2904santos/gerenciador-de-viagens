@@ -30,10 +30,6 @@
   order: 20;
 }
 
-.oficio-documentos-unified-card .oficio-documentos-justification-section {
-  order: 30;
-}
-
 .oficio-documentos-unified-card .oficio-documentos-preview-section {
   order: 40;
 }
@@ -51,8 +47,7 @@
   padding-top: 0;
 }
 
-.oficio-documentos-route-section .form-section-body,
-.oficio-documentos-justification-section .form-section-body {
+.oficio-documentos-route-section .form-section-body {
   padding-top: var(--space-5, 1.25rem);
 }
 
@@ -80,8 +75,7 @@
 .oficio-documentos-info-section .oficio-documentos-card,
 .oficio-documentos-info-section .oficio-documentos-card--travellers,
 .oficio-documentos-info-section .oficio-documentos-card--vehicle,
-.oficio-documentos-route-section .oficio-documentos-route-card,
-.oficio-documentos-justification-section .oficio-documentos-card--justification {
+.oficio-documentos-route-section .oficio-documentos-route-card {
   background: transparent !important;
   border: 0 !important;
   border-radius: 0;
@@ -107,9 +101,7 @@
   padding: 0;
 }
 
-.oficio-documentos-info-section .oficio-documentos-card__header,
-.oficio-documentos-route-section .oficio-documentos-route-card__head,
-.oficio-documentos-justification-section .oficio-documentos-card__header {
+.oficio-documentos-route-section .oficio-documentos-route-card__head {
   border-bottom: 0;
   padding: 12px 0 8px;
 }
@@ -128,8 +120,7 @@
 }
 
 .oficio-documentos-info-section .oficio-documentos-card__body,
-.oficio-documentos-route-section .oficio-documentos-route-card__body,
-.oficio-documentos-justification-section .oficio-documentos-card__body {
+.oficio-documentos-route-section .oficio-documentos-route-card__body {
   padding: 0;
 }
 
@@ -355,22 +346,9 @@
   }
 }
 
-.oficio-documentos-info-section .oficio-documentos-card__eyebrow,
-.oficio-documentos-info-section .oficio-documentos-card__subtitle,
-.oficio-documentos-info-section .oficio-documentos-vehicle-executive__label,
 .oficio-documentos-route-section .oficio-documentos-route-card__eyebrow,
-.oficio-documentos-route-section .oficio-documentos-route-card__subtitle,
-.oficio-documentos-route-section .oficio-documentos-route-card__tagline,
-.oficio-documentos-justification-section .oficio-documentos-card__eyebrow,
-.oficio-documentos-justification-section .oficio-documentos-card__subtitle,
-.oficio-documentos-justification-section .oficio-documentos-model-card__label,
-.oficio-documentos-justification-section .oficio-documentos-antecedence-card__label,
-.oficio-documentos-justification-section .oficio-documentos-justification-text-card__label {
+.oficio-documentos-route-section .oficio-documentos-route-card__subtitle {
   display: none;
-}
-
-.oficio-documentos-justification-section .oficio-documentos-card__title {
-  font-size: var(--font-size-md, 1rem);
 }
 
 .oficio-documentos-info-section .oficio-documentos-facts {

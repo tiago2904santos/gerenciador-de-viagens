@@ -179,10 +179,6 @@ JS_EXCEPTIONS: dict[str, dict] = {
         "reason": "NOVO-14: classes de campo de tempo como condição, sai com o editor (BE-11, fase 6). NOVO-15: interpola markup de rota já escapado com CV.util.escapeHtml nas linhas vizinhas.",
         "rules": {"css_class_as_logic": 6, "innerhtml_dynamic_without_escape": 2},
     },
-    "static/js/cv-select.js": {
-        "reason": "NOVO-14: estado aberto do dropdown lido pela classe, sai na fase 7. JS-02: delegação de página registrada uma vez no módulo.",
-        "rules": {"css_class_as_logic": 2, "enhancer_without_destroy": 1},
-    },
     "static/js/components/overlay.js": {
         "reason": "NOVO-14: estado aberto do menu lido pela classe; sai na reconstrução do CSS (fase 7).",
         "rules": {"css_class_as_logic": 1},
@@ -202,7 +198,7 @@ JS_EXCEPTIONS: dict[str, dict] = {
         "reason": "NOVO-15: markup de linha e opções montado a partir de template do próprio DOM.",
         "rules": {"innerhtml_dynamic_without_escape": 4},
     },
-    "static/js/pages/gdrive_config.js": {
+    "static/js/pages/gdrive-config.js": {
         "reason": "NOVO-15: já usa escapeHtml nos dados; a linha marcada monta o invólucro.",
         "rules": {"innerhtml_dynamic_without_escape": 1},
     },

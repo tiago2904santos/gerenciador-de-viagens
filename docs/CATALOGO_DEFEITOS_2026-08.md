@@ -4167,7 +4167,7 @@ Os três consumidores (`termos/services.py`, `prestacoes_contas/services.py` e
 `assinatura_services.py`) usam `PdfReader`/`PdfWriter` na superfície estável; suíte verde, 1.744
 testes, e `pip_audit` sem achado além do `PYSEC-2026-3412` já ignorado com justificativa.
 
-### NOVO-48 🟡 `NOVO` Setenta nomes de classe morta sobrevivem dentro de seletor agrupado vivo · MOR · 0,5 d
+### NOVO-48 ✅ RESOLVIDO (27e9642e, 09/08/2026) · `NOVO` Setenta nomes de classe morta sobrevivem dentro de seletor agrupado vivo · MOR · 0,5 d
 
 Medido depois de o `UI-01` fechar: **140 partes de seletor** citando **70 classes** que não existem
 em lugar nenhum do código, dentro de blocos que a poda não podia tocar. O caso típico:
@@ -4194,6 +4194,14 @@ acreditar que a classe existe, e é assim que ela reaparece num template.
 Os campeões, para dar tamanho: `roteiro-editor__*` (6 nomes), `oficio-documentos-*` (7),
 `cv-resource-picker__*` (4), `app-btn--*` e `btn-*` (9 entre os dois vocabulários de botão que o
 `cv-btn--` substituiu).
+
+**Resolvido na E2.** A varredura refeita depois do `NOVO-69` encontrou **66 nomes** ainda
+presentes: a diferença para 70 é sobreposição dentro da própria etapa, não mudança de critério. O
+pruner percorreu também regras aninhadas em `@media`/`@supports`, removeu **168 alternativas de
+seletor** e **57 regras completas** em 18 fontes, preservando alternativas vivas de `:is()` e
+simplificando `:not()` quando o argumento morto era o único. Depois: zero emissores em templates,
+JS e Python de produção, zero seletores fonte com os 66 nomes, parse CSS sem erro,
+`audit_css_morto --max 0` verde e `audit_ui_patterns` **2.622 → 2.583**.
 
 ---
 
@@ -5244,7 +5252,7 @@ são instrumentos que não funcionam, e um é ambiente.
 > `components/`, `pages/`). Todos os caminhos citados abaixo e no plano de reconstrução já são os
 > novos. Os defeitos foram reconferidos depois do merge: **os oito continuam de pé**.
 
-### NOVO-69 🟡 `NOVO` `cv-select.js` está morto desde o PR #247 e continua no bundle de toda página · MOR · 0,25 d
+### NOVO-69 ✅ RESOLVIDO (8133d8af, 09/08/2026) · `NOVO` `cv-select.js` está morto desde o PR #247 e continua no bundle de toda página · MOR · 0,25 d
 
 `static/js/cv-select.js` tem **343 linhas** e responde a `[data-cv-dropdown]` e
 `[data-cv-filter-dropdown]`. **Nada no sistema emite esses atributos.** A varredura em `templates/`,
@@ -5262,7 +5270,10 @@ O PR #247 apagou os dois UI Labs, e aquele único uso virou **zero**. O arquivo 
 `components/picker-select.js`, via `data-entity-picker` — são 7 templates de produção. Apagar a
 família de CSS junto com o JS quebraria os seletores customizados do sistema inteiro.
 
-**Fila:** etapa E2 do plano de reconstrução.
+**Resolvido na E2.** `cv-select.js`, o no-op `CV.fields.initDropdowns`, sua documentação e a
+família CSS `action-dropdown`/`filter-dropdown` sem emissor foram removidos; `custom-select` e
+`data-entity-picker` permaneceram intactos. `SHELL_JS` passou de 26 para 25 fontes e o bundle JS
+versionado caiu de **289.831 para 274.420 bytes** (−15.411 bytes, −5,32%).
 
 ### NOVO-70 ✅ RESOLVIDO (7a1e2e03, af97ac56) · `NOVO` A métrica de aceite do `PF-02` não tem instrumento no repositório · QA · 1,5 d
 
@@ -5304,15 +5315,17 @@ Trocar o carregador muda a resolução de **407 templates** de uma vez, e o modo
 
 **Fila:** etapas E3 (instalar), E4 (converter os 82 componentes) e E5 (migrar os call sites).
 
-### NOVO-72 ⚪ `NOVO` `ui_lab2/` sobreviveu à remoção do PR #247 · MOR · 0,1 d
+### NOVO-72 ✅ RESOLVIDO (E2, 09/08/2026) · `NOVO` `ui_lab2/` sobreviveu à remoção do PR #247 · MOR · 0,1 d
 
 O `BE-25` decidiu que nenhum dos dois UI Labs é o vigente e o PR #247 os apagou. `ui_lab2/` ficou
 para trás como diretório contendo só `__pycache__/*.pyc`. Não está em `INSTALLED_APPS`, não tem
 rota, não tem fonte — é o rastro de um app que não existe mais.
 
-**Fila:** etapa E2.
+**Resolvido na E2.** O diretório só existia no checkout antigo por conter `__pycache__` ignorado.
+Uma worktree limpa de `origin/main` já não o materializa: `git ls-files ui_lab2` e `Test-Path
+ui_lab2` retornam, respectivamente, zero arquivos e falso. Não havia fonte versionada a apagar.
 
-### NOVO-73 ⚪ `NOVO` Nome e lugar de arquivo JS sem padrão · MOR · 0,5 d
+### NOVO-73 ✅ RESOLVIDO (8133d8af, 09/08/2026) · `NOVO` Nome e lugar de arquivo JS sem padrão · MOR · 0,5 d
 
 Duas divergências, nenhuma delas cosmética a longo prazo, porque é assim que o próximo
 desenvolvedor aprende o padrão errado:
@@ -5327,7 +5340,9 @@ desenvolvedor aprende o padrão errado:
 Mover exige atualizar `SHELL_JS` em `scripts/build_shell_bundles.py`, os `{% block extra_js %}` que
 os citam e `docs/DATA_ATTRIBUTES_JS.md`.
 
-**Fila:** etapa E2.
+**Resolvido na E2.** Os quatro módulos agora moram em `static/js/pages/` e usam kebab-case:
+`roteiros.js`, `roteiros-map.js`, `roteiros-wizard.js` e `gdrive-config.js`. Templates, testes,
+exceções do auditor e documentação foram atualizados no mesmo commit, sem alias de compatibilidade.
 
 ### NOVO-74 🟡 `NOVO` Dois namespaces de componente concorrentes, com quatro pastas fantasma · HT · junto da E5
 

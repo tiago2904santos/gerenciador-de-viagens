@@ -282,8 +282,6 @@
   overflow: hidden;
 }
 
-.list-header .filter-header__heading,
-.list-header .filter-header__controls,
 .list-header .page-header-band,
 .list-header .page-header-rail {
   background: transparent;

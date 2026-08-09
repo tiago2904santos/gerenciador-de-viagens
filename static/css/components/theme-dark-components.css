@@ -7,7 +7,7 @@
 /* O passo atual é identificado pela combinação sólida de fundo e borda, sem
    anéis concêntricos que possam ser confundidos com um foco exagerado. */
 :is(html[data-theme="dark"])
-  :is(.page-stepper__item.is-current .page-stepper__marker, .page-stepper__item.is-active .page-stepper__number) {
+  :is(.page-stepper__item.is-current .page-stepper__marker) {
   box-shadow: none;
 }
 
@@ -23,7 +23,6 @@ html[data-theme="dark"] ::selection {
   color: var(--color-heading);
 }
 
-                          
 html[data-theme] .app-main {
   padding: clamp(20px, 2.6vw, 40px);
 }
@@ -190,7 +189,6 @@ html[data-theme="dark"] .page-header-rail__subtitle {
   padding: 14px clamp(20px, 2.4vw, 30px) 18px;
 }
 
-                                                                                      
 :is(html[data-theme])
   :is(.page-shell--list, .cv-page--collection) .header-filter-input {
   min-height: 44px;
@@ -358,7 +356,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   min-height: 58px;
 }
 
-                                                                                                                                                         
 :is(html[data-theme])
   .form-card > .quick-create-panel__header.cv-form-section-header {
   padding-left: 34px;
@@ -804,7 +801,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   width: 100%;
 }
 
-                                                                                  
 :is(html[data-theme])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1])
   .travel-period-block--split
@@ -1211,7 +1207,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
     .oficio-documentos-summary-section .oficio-documentos-card,
     .oficio-documentos-summary-section .oficio-documentos-admin-facts,
     .oficio-documentos-route-section .oficio-documentos-route-card,
-    .oficio-documentos-justification-section .oficio-documentos-card,
     .oficio-documentos-route-card__diarias-box,
     .oficio-documentos-route-card__body,
     .oficio-documentos-route-col4,
@@ -1293,7 +1288,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   box-shadow: none !important;
 }
 
-                                                                                            
 :is(html[data-theme])
   .document-form-page
   .termo-documentos-preview
@@ -1395,7 +1389,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   color: var(--color-heading);
 }
 
-                                                                       
 :is(html[data-theme])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__selected-list {
   display: grid;
@@ -1771,7 +1764,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   }
 }
 
-                                                                                   
 :is(html[data-theme])
   [data-travel-document-wizard-roteiro]
   #sec-mapa-rota > .form-block__header {
@@ -1858,7 +1850,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   box-shadow: none;
 }
 
-                                                                                         
 :is(html[data-theme])
   [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta {
   display: block;
@@ -1980,7 +1971,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   }
 }
 
-                                                                                                                                                                                                                                                                                                                                                  
 :is(html[data-theme])
   [data-travel-document-wizard-roteiro] .roteiro-trechos-host,
 :is(html[data-theme])
@@ -1988,7 +1978,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   display: contents;
 }
 
-                                                                             
 :is(html[data-theme])
   [data-travel-document-wizard-roteiro]
   .roteiro-editor__section--trecho
@@ -2284,7 +2273,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   background: var(--color-muted) !important;
 }
 
-                                                                                                                                                                                                                           
 :is(html[data-theme])
   [data-travel-document-wizard-roteiro]
   .roteiro-editor__section--bate-volta.route-section-block:has(#bate-volta-body[hidden]) {
@@ -2390,7 +2378,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   text-align: right;
 }
 
-                                                                                                                                                            
 :is(html[data-theme])
   .form-block--split {
   align-items: end;
@@ -2455,7 +2442,7 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
 }
 
 :is(html[data-theme="dark"])
-  :is(.form-subsection__title, .resource-picker__title) {
+  :is(.form-subsection__title) {
   color: var(--color-heading);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-black);
@@ -2463,7 +2450,7 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
 }
 
 :is(html[data-theme="dark"])
-  :is(.form-subsection__description, .resource-picker__description) {
+  :is(.form-subsection__description) {
   color: var(--color-muted);
   font-size: var(--font-size-xs);
   line-height: 1.45;
@@ -2561,7 +2548,6 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   outline: none;
 }
 
-                                                                                                                                                                            
 :is(html[data-theme])
   .search-picker--people {
   gap: 12px;
@@ -4312,7 +4298,6 @@ html[data-theme="dark"] .empty-state__title {
   color: var(--color-accent-text);
 }
 
-                                                                                   
 :is(html[data-theme])
   .search-picker__selected-list {
   gap: 8px;
@@ -4500,33 +4485,6 @@ html[data-theme="dark"] *::after {
   .entity-card__footer {
   background: var(--color-surface);
   border-top-color: var(--color-border);
-}
-
-:is(html[data-theme="dark"])
-  .summary-tile {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 13px;
-  box-shadow: var(--shadow-xs);
-}
-
-:is(html[data-theme="dark"])
-  .summary-tile:hover {
-  background: var(--color-surface-soft);
-}
-
-:is(html[data-theme="dark"])
-  .summary-tile__label {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 750;
-  letter-spacing: 0.065em;
-  text-transform: uppercase;
-}
-
-:is(html[data-theme="dark"])
-  .summary-tile__value {
-  color: var(--color-heading);
 }
 
 :is(html[data-theme="dark"])
@@ -4868,7 +4826,7 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  :is(.card, .app-card, .module-card, .document-card, .page-card) {
+  :is(.card, .app-card, .module-card, .document-card) {
   background: var(--color-surface);
   border-color: var(--color-border);
   box-shadow: var(--shadow-xs);
@@ -5026,19 +4984,6 @@ html[data-theme="dark"] *::after {
   background: var(--color-surface-strong);
   border-color: var(--color-border-strong);
   box-shadow: var(--shadow-sm);
-}
-
-:is(html[data-theme="dark"])
-  .filter-header:not(.list-header) .filter-header__heading {
-  background: var(--color-surface-strong);
-  padding-bottom: 16px;
-}
-
-:is(html[data-theme="dark"])
-  .filter-header:not(.list-header) .filter-header__controls {
-  background: var(--color-surface);
-  border-top-color: var(--color-border-strong);
-  padding-top: 18px;
 }
 
 :is(html[data-theme="dark"])
@@ -5250,7 +5195,6 @@ html[data-theme="dark"] *::after {
   outline: none;
 }
 
-                                                  
 :is(html[data-theme])
   :is(.page-shell--cards, .cv-page--collection-cards) .card-grid {
   gap: var(--space-6);
@@ -5387,7 +5331,6 @@ html[data-theme="dark"] *::after {
   translate: 0 6px;
 }
 
-                                                                          
 :is(html[data-theme])
   .custom-select__menu--v2::-webkit-scrollbar {
   width: 14px;
