@@ -371,3 +371,59 @@ jobs:
             cat "$RUNNER_TEMP/desempenho.txt" 2>/dev/null || echo '(a régua não chegou a produzir relatório)'
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Enforce frontend route baselines (NOVO-70)
+        # E0: mede as 43 rotas reais depois dos gates funcionais e de desempenho.
+        # O banco e o usuario existem apenas neste job descartavel; a senha aleatoria
+        # fica somente no ambiente do passo. CSS so pode subir e divergencia de tema
+        # so pode descer, conforme scripts/tetos_front.json.
+        run: |
+          python -m playwright install --with-deps chromium
+          python manage.py resetar_banco_demo --settings=config.settings.test
+
+          export FRONT_METRICS_PASSWORD
+          FRONT_METRICS_PASSWORD="$(python -c 'import secrets; print(secrets.token_urlsafe(36))')"
+          python manage.py shell --settings=config.settings.test <<'PY'
+          import os
+          from django.contrib.auth import get_user_model
+          from usuarios.models import AreaTrabalho, VinculoUsuarioArea
+
+          User = get_user_model()
+          user = User.objects.create_superuser(
+              "front_metrics",
+              "front_metrics@example.invalid",
+              os.environ["FRONT_METRICS_PASSWORD"],
+          )
+          area = AreaTrabalho.objects.order_by("pk").first()
+          VinculoUsuarioArea.objects.create(
+              usuario=user,
+              area=area,
+              papel=VinculoUsuarioArea.PAPEL_ADMIN,
+              area_padrao=True,
+          )
+          PY
+
+          python manage.py runserver 127.0.0.1:8000 \
+            --noreload --insecure --settings=config.settings.test \
+            > "$RUNNER_TEMP/frontend-server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for _ in $(seq 1 40); do
+            if curl --fail --silent --output /dev/null http://127.0.0.1:8000/login/; then
+              break
+            fi
+            sleep 0.5
+          done
+          curl --fail --silent --output /dev/null http://127.0.0.1:8000/login/ || {
+            cat "$RUNNER_TEMP/frontend-server.log"
+            exit 1
+          }
+
+          python scripts/medir_css_por_rota.py \
+            --username front_metrics \
+            --password-env FRONT_METRICS_PASSWORD \
+            --json "$RUNNER_TEMP/css-por-rota.json"
+          python scripts/medir_divergencia_tema.py \
+            --username front_metrics \
+            --password-env FRONT_METRICS_PASSWORD \
+            --json "$RUNNER_TEMP/divergencia-tema.json"

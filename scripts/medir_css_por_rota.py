@@ -105,8 +105,15 @@ def _write_thresholds(path: Path, payload: dict) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def _same_path(actual_url: str, expected_path: str) -> bool:
-    return urlparse(actual_url).path.rstrip("/") == expected_path.rstrip("/")
+def is_valid_final_url(actual_url: str, expected_path: str, base_url: str, *, requires_auth: bool) -> bool:
+    actual = urlparse(actual_url)
+    base = urlparse(base_url)
+    if (actual.scheme, actual.netloc) != (base.scheme, base.netloc):
+        return False
+    actual_path = actual.path.rstrip("/")
+    if requires_auth:
+        return actual_path != "/login"
+    return actual_path == expected_path.rstrip("/")
 
 
 def _measure_page(page, route, base_url: str, timeout_ms: int) -> dict:
@@ -123,8 +130,13 @@ def _measure_page(page, route, base_url: str, timeout_ms: int) -> dict:
         raise RuntimeError(f"{route.slug}: navegação não produziu resposta HTTP")
     if response.status >= 400:
         raise RuntimeError(f"{route.slug}: HTTP {response.status} em {route.path}")
-    if not _same_path(page.url, route.path):
-        raise RuntimeError(f"{route.slug}: {route.path} redirecionou para {page.url}")
+    if not is_valid_final_url(
+        page.url,
+        route.path,
+        base_url,
+        requires_auth=route.requires_auth,
+    ):
+        raise RuntimeError(f"{route.slug}: {route.path} terminou em URL inválida: {page.url}")
 
     stylesheets: dict[str, str] = {}
     for sheet_id in sorted({item["styleSheetId"] for item in coverage}):
@@ -137,7 +149,14 @@ def _measure_page(page, route, base_url: str, timeout_ms: int) -> dict:
             # Folhas internas do navegador não são bytes entregues pela aplicação.
             continue
     result = summarize_rule_usage(stylesheets, coverage)
-    result.update({"path": route.path, "final_url": page.url, "stylesheets": len(stylesheets)})
+    result.update(
+        {
+            "path": route.path,
+            "final_url": page.url,
+            "redirected": urlparse(page.url).path.rstrip("/") != route.path.rstrip("/"),
+            "stylesheets": len(stylesheets),
+        }
+    )
     session.detach()
     return result
 

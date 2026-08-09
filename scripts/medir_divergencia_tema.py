@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from scripts.medir_css_por_rota import is_valid_final_url  # noqa: E402
 from scripts.rotas_do_sistema import ROTAS  # noqa: E402
 
 
@@ -186,12 +187,25 @@ def _measure_route(page, route, base_url: str, timeout_ms: int) -> dict:
     if response is None or response.status >= 400:
         status = response.status if response else "sem resposta"
         raise RuntimeError(f"{route.slug}: HTTP {status} em {route.path}")
-    if urlparse(page.url).path.rstrip("/") != route.path.rstrip("/"):
-        raise RuntimeError(f"{route.slug}: {route.path} redirecionou para {page.url}")
+    if not is_valid_final_url(
+        page.url,
+        route.path,
+        base_url,
+        requires_auth=route.requires_auth,
+    ):
+        raise RuntimeError(f"{route.slug}: {route.path} terminou em URL inválida: {page.url}")
     _disable_motion(page)
     first = _capture_order(page, "light", "dark")
     reverse = _capture_order(page, "dark", "light")
-    return _summarize_pair(first, reverse)
+    result = _summarize_pair(first, reverse)
+    result.update(
+        {
+            "path": route.path,
+            "final_url": page.url,
+            "redirected": urlparse(page.url).path.rstrip("/") != route.path.rstrip("/"),
+        }
+    )
+    return result
 
 
 def _parse_viewports(value: str) -> tuple[int, ...]:

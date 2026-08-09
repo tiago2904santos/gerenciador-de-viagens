@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import json
+
 from django.test import SimpleTestCase
 
 from scripts import medir_css_por_rota as css_metric
 from scripts import medir_divergencia_tema as theme_metric
+from scripts.rotas_do_sistema import ROTAS
 
 
 class CssPorRotaMetricTests(SimpleTestCase):
@@ -55,6 +58,41 @@ class CssPorRotaMetricTests(SimpleTestCase):
             11.5,
         )
 
+    def test_redirecionamento_interno_autenticado_e_aceito(self):
+        self.assertTrue(
+            css_metric.is_valid_final_url(
+                "http://127.0.0.1:8000/oficios/1/dados-viajantes/",
+                "/oficios/1/",
+                "http://127.0.0.1:8000/",
+                requires_auth=True,
+            )
+        )
+
+    def test_redirecionamento_para_login_ou_outro_host_e_rejeitado(self):
+        for final_url in (
+            "http://127.0.0.1:8000/login/",
+            "https://example.invalid/oficios/1/",
+        ):
+            with self.subTest(final_url=final_url):
+                self.assertFalse(
+                    css_metric.is_valid_final_url(
+                        final_url,
+                        "/oficios/1/",
+                        "http://127.0.0.1:8000/",
+                        requires_auth=True,
+                    )
+                )
+
+    def test_pisos_versionados_cobrem_as_43_rotas(self):
+        thresholds = json.loads(css_metric.DEFAULT_THRESHOLDS.read_text(encoding="utf-8"))
+        css_gate = thresholds["css_by_route"]
+
+        self.assertEqual(css_gate["direction"], "up")
+        self.assertEqual(set(css_gate["routes"]), {route.slug for route in ROTAS})
+        self.assertTrue(
+            all(item["usage_percent_min"] > 0 for item in css_gate["routes"].values())
+        )
+
 
 class DivergenciaTemaMetricTests(SimpleTestCase):
     def test_propriedades_de_cor_e_tokens_nao_entram(self):
@@ -85,3 +123,15 @@ class DivergenciaTemaMetricTests(SimpleTestCase):
         first = {("0", "font-family", "Arial", "Inter")}
         reverse = {("0", "font-family", "Arial", "Inter")}
         self.assertEqual(theme_metric.order_exclusives(first, reverse), (set(), set()))
+
+    def test_tetos_versionados_cobrem_tres_larguras_e_43_rotas(self):
+        thresholds = json.loads(theme_metric.DEFAULT_THRESHOLDS.read_text(encoding="utf-8"))
+        theme_gate = thresholds["theme_divergence"]
+        expected = {
+            f"{route.slug}@{width}"
+            for route in ROTAS
+            for width in theme_metric.DEFAULT_VIEWPORTS
+        }
+
+        self.assertEqual(theme_gate["direction"], "down")
+        self.assertEqual(set(theme_gate["routes"]), expected)
