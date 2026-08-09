@@ -4821,3 +4821,51 @@ A regra está morta hoje, mas o nome não estaria depois da troca. `chip` é amb
 **Ordem sugerida:** (1) apagar os 10 nomes mortos, com prova de grep; (2) resolver os 3 vivos, um
 por vez, porque cada um é uma decisão; (3) só então a renomeação mecânica dos 585, família por
 família.
+
+### NOVO-61 ✅ RESOLVIDO · 🟡 `NOVO` Dez nomes de classe mortos sobrevivem dentro de seletor agrupado vivo · MOR · 0,25 d
+
+Primeiro passo da ordem proposta no `NOVO-60`: apagar os nomes provadamente mortos, antes de
+qualquer renomeação. Mesma família do `NOVO-48`.
+
+Nove dos dez do `NOVO-60` (`alert--danger`, `btn--ghost`, `btn--lg`, `btn--sm`, `btn-group`,
+`chip`, `form-section-header`, `summary-card`, `summary-label`) **mais `cv-btn-group`**, que só
+apareceu depois: enquanto `.cv-btn-group, .btn-group` dividiam o seletor, o auditor via um nome
+"vivo" e não contava o bloco. Removido o morto, o outro ficou exposto — e também tem **0 usos**.
+Nome morto escondendo nome morto é o padrão do `NOVO-48`.
+
+**`.btn` ficou de fora, e a suíte é que decidiu.** Ele tem 0 usos como classe, então entrou na
+primeira leva — e `core/tests/test_action_system.py:23` reprovou, porque afirma `.btn,` dentro de
+`action-system.css`: o sistema de ação se declara, explicitamente, cobertura dos botões **legados**.
+Tirar o nome exigiria mudar esse teste, e mexer num teste para o próprio PR passar é decisão, não
+limpeza. Fica para o dono: a rede diz que a cobertura é intencional, o grep diz que não há mais
+consumidor.
+
+**Resultado:** 9 blocos apagados, 8 seletores podados, 148 linhas a menos, 9 arquivos.
+
+**O defeito que a medição pegou, e ele teria ido para produção.** A primeira versão dividia o grupo
+de seletores com `split(",")`. Isso destrói `:is()`:
+
+```css
+:is(html[data-theme="dark"]) :is(.card, .app-card, .module-card, .document-card, .summary-card)
+```
+
+Descartar `.summary-card` devolvia `:is(.card, .app-card, .module-card, .document-card` — **com o
+parêntese aberto**. Seletor malformado invalida a regra inteira, e o navegador não reclama.
+
+**Medido: 8.196 elementos alterados**, com `.list-header` perdendo `display: flex`, cor, fonte e
+altura de uma vez, e a página de eventos indo de 1.100 px para 1.810 px de altura. Chaves e
+parênteses do arquivo continuavam balanceados — só o seletor não estava. Nenhum teste pegaria isso;
+nenhum gate de CSS pegaria isso. Pegou a comparação de estilo computado.
+
+A divisão agora respeita profundidade de parênteses, e duas travas novas cuidam de **especificidade**:
+
+- **`:not()` fica intocado.** Tirar argumento de lá alarga o que a regra pega e muda a
+  especificidade emprestada — em silêncio.
+- **`:is()`/`:where()` só são podados quando todos os argumentos são classe simples**, para a
+  especificidade do grupo ser a mesma antes e depois. Lista que mistura `.a` e `#b` fica de fora.
+
+E `parte_morta` passou a apagar o conteúdo de `:not()` antes de decidir: em `.a:not(.btn)` a classe
+morta é **excluída**, não exigida — tratar a parte como morta apagaria uma regra viva.
+
+**Verificação: 0 elementos alterados** em 41.950, nas 88 telas. `audit_css_morto` volta a 0 depois
+de incluir o `cv-btn-group` — a catraca acusou o nome recém-exposto, que é exatamente o serviço dela.

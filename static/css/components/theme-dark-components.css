@@ -3798,7 +3798,7 @@ html[data-theme="dark"] :is(.modal, .cv-modal__dialog, .drawer, [role="dialog"])
   color: var(--color-text);
 }
 
-html[data-theme="dark"] :is(.badge, .chip, .status-badge, .cv-status-pill) {
+html[data-theme="dark"] :is(.badge, .status-badge, .cv-status-pill) {
   border-color: var(--color-border-strong);
 }
 
@@ -3855,7 +3855,7 @@ html[data-theme="dark"] :is(.alert-warning, .alert--warning) {
   font-weight: var(--font-weight-semibold);
 }
 
-html[data-theme="dark"] :is(.alert-danger, .alert-error, .alert--danger, .alert--error) {
+html[data-theme="dark"] :is(.alert-danger, .alert-error, .alert--error) {
   background: #5d252c;
   border-color: #bd5059;
   color: #ffdcde;
@@ -4932,14 +4932,14 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  :is(.card, .app-card, .module-card, .document-card, .summary-card, .page-card) {
+  :is(.card, .app-card, .module-card, .document-card, .page-card) {
   background: var(--color-surface);
   border-color: var(--color-border);
   box-shadow: var(--shadow-xs);
 }
 
 :is(html[data-theme="dark"])
-  :is(.card, .app-card, .module-card, .document-card, .summary-card):hover {
+  :is(.card, .app-card, .module-card, .document-card):hover {
   box-shadow: var(--shadow-sm);
 }
 
