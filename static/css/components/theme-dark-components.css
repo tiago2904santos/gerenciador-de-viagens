@@ -5236,13 +5236,6 @@ html[data-theme="dark"] *::after {
   opacity: 0.45;
 }
 
-/* Ícones dentro de botões: tamanho e alinhamento consistentes. */
-:is(html[data-theme="dark"]) .cv-btn__icon .cv-icon {
-  width: var(--cv-btn-icon-size);
-  height: var(--cv-btn-icon-size);
-  display: block;
-}
-
 /* =========================================================
    Refino visual v2 (2026-07-18) — hierarquia e menos peso
    Cards de lista (entity card), chips e cabeçalho de filtros.

@@ -4606,3 +4606,108 @@ Os quatro campos com divergência em dev: `eventos.TipoEvento.nome` (5), `Ativid
 
 **Fecha quando** a contagem rodar contra produção, os campos bloqueados (se houver) forem resolvidos
 no sistema, e o `--commit` for aplicado com backup.
+
+### NOVO-58 🔴 `NOVO` Claro e escuro não são dois temas do mesmo sistema: são dois desenhos diferentes · UI · a decidir
+
+Medido com `getComputedStyle` nas 44 rotas, comparando o **mesmo elemento** nas duas versões do
+**mesmo documento** e olhando **só propriedades que não são cor** — cor é o que um tema tem direito
+de mudar; o resto deveria ser igual.
+
+| | |
+|---|---|
+| elementos comparados | 20.975 (44 telas) |
+| elementos com ao menos uma diferença não-cor | **20.203 — 96%** |
+| diferenças no total | 45.726 |
+| pares de valor distintos (as *decisões* que divergiram) | **851** |
+| elementos que ainda divergem ignorando a fonte | 6.882 (33%) |
+
+**A maior diferença isolada é a fonte do sistema inteiro.** `tokens.css:176` define
+`--font-sans: "Segoe UI", Arial, sans-serif`, e `theme-dark-components.css:16` sobrescreve o `body`
+com `Inter, "Segoe UI Variable", …`. São **19.896 elementos** com pilha de fonte diferente conforme o
+tema.
+
+> **Cuidado com o que este número é.** Ele mede a pilha **declarada**, não a face que o usuário vê.
+> `Inter` **não está no repositório** — não há `@font-face` nem arquivo (os únicos em
+> `static/vendor/fonts/` são as fontes de assinatura). Então o escuro pede uma fonte que o sistema
+> não entrega, e o que aparece depende do que estiver instalado em cada máquina. **Não dá para
+> determinar daqui** qual face renderiza para o usuário: neste contêiner Linux, `Inter`,
+> `Segoe UI Variable` e `Segoe UI` devolvem largura idêntica (811,06 px para a mesma frase), o que é
+> substituição do fontconfig, não instalação. Medir isso exige uma máquina igual à do usuário.
+
+As demais divergências sistemáticas, com a contagem de elementos:
+
+| propriedade | claro | escuro | elementos |
+|---|---|---|---|
+| `font-size` | 16px | 14px | 533 |
+| `line-height` | 24px | 21px | 533 |
+| `border-*-width` | 0px | 1px | 1.416 |
+| `border-radius` | 14px | 10px | 940 |
+| largura da barra lateral | 191/216px | 231/252px | 976 |
+| `height` de controle | 46px | 42px | 378 |
+| `justify-content` | normal | center | 230 |
+
+Concentradas em `sidebar-*` (2.956 + 2.200 + 880 + 748 + 572 + 440), `cv-custom-select__option`
+(1.604), `cv-dialog__*` (1.151) e `cv-date-picker__footer-action` (640).
+
+**Não é deriva acidental: está escrito no cabeçalho do arquivo.**
+
+> `theme-dark-components.css` — *transitional dark-theme component overrides. Long-term: dissolve
+> into owning component files. **Extracted from dark-redesign.css** (Etapa 7, Fase 6).*
+
+Houve um redesenho, ele foi aplicado **só no escuro**, e o arquivo que deveria ser transitório virou
+5.690 linhas permanentes. O tema claro é o desenho **anterior** ao redesenho — e é o que o sistema
+mostra por padrão para quem não escolheu tema.
+
+**O instrumento.** Diferença de ordem de captura foi descartada como artefato: medindo claro→escuro
+e escuro→claro nas mesmas 3 rotas, 2.820 diferenças nas duas, **0** exclusivas de uma ordem. E a
+transição de tema é desligada antes de medir, senão a captura pega o valor no meio da interpolação
+(erro que já custou 418 elementos de ruído numa medição anterior).
+
+**Por que isto muda o plano.** A etapa estava descrita como "inverter o tema: escuro vira base, claro
+vira espelho", como se fosse reorganização de token. Não é. Espelhar significa **aplicar o redesenho
+ao tema claro**, o que muda a aparência de todas as 44 telas no modo claro — fonte, tamanho de texto,
+raio, borda e largura da barra lateral. É trabalho de desenho, não de arrumação, e precisa da decisão
+do dono antes da primeira linha de CSS.
+
+### NOVO-59 ✅ RESOLVIDO · 🔴 `NOVO` Todo ícone de botão é invisível no tema claro, no sistema inteiro · UI · 0,25 d
+
+Primeiro recorte do `NOVO-58`, e o único que **não é redesenho: é defeito**. Por isso vem antes de
+qualquer decisão de desenho — não depende de escolher nada.
+
+`.cv-icon` é um `<svg>` sem `width`/`height` no atributo, e `.cv-btn__icon` nunca teve regra base.
+Quem dava tamanho ao ícone dentro de botão era esta regra, em `theme-dark-components.css:5240`:
+
+```css
+/* Ícones dentro de botões: tamanho e alinhamento consistentes. */
+:is(html[data-theme="dark"]) .cv-btn__icon .cv-icon { … }
+```
+
+O comentário promete consistência; o seletor entrega num tema só. **Sem ninguém dizer o tamanho, o
+SVG colapsa.** No claro, o ícone de "Limpar filtros" mede `0×0`; no escuro, `17×17`. Não é ícone
+diferente entre os temas — é ícone que **não aparece** no claro, em botão nenhum do sistema.
+
+**Correção:** a regra sai do arquivo de tema e vai para `cv-buttons.css`, sem escopo de tema, com
+`:where()` para especificidade zero — mesma razão do `field.css` (`NOVO-54`): base vale onde ninguém
+disse nada e perde para contexto que diga, e existem contextos que dimensionam este ícone por conta
+própria (`list-header.css:1029`, `action-system.css:340`). O token `--cv-btn-icon-size: 17px` já
+morava no `:root` do `tokens.css`, então não foi preciso mover nada de valor.
+
+**Medido nas 88 telas (44 rotas × 2 temas), `getComputedStyle`:**
+
+| | claro antes | claro depois | escuro antes | escuro depois |
+|---|---|---|---|---|
+| `.cv-icon` com caixa | 103 | **176** | 176 | 176 |
+| `.cv-icon` em `0×0` | 323 | **250** | 250 | 250 |
+
+**O claro passou a ser idêntico ao escuro.** Dos 41.950 elementos, 847 mudaram — **todos no tema
+claro, zero no escuro**, que é o resultado que a mudança tinha que ter: mover a regra não podia
+alterar o tema que já a tinha.
+
+Os 250 que continuam em `0×0` **não são defeito e existem igualmente nos dois temas**: conferido com
+`checkVisibility()` em 5 rotas, são **39 ícones dentro de ancestral oculto** (diálogo fechado, menu
+não aberto) e **0 ícones visíveis sem caixa**. Elemento escondido não tem caixa; isso é o navegador
+funcionando.
+
+**O que não entra aqui:** as outras 850 decisões divergentes do `NOVO-58` (fonte do sistema,
+`font-size`, raio, borda, largura da barra lateral). Aquilo é aplicar um redesenho ao tema claro e
+muda a aparência de todas as telas — precisa da decisão do dono, e este PR não a antecipa.

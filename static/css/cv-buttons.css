@@ -1117,3 +1117,30 @@ html[data-theme="light"] {
   border-top-color: var(--cv-btn-footer-hover-border);
   color: var(--cv-btn-footer-hover-color);
 }
+
+/* ==========================================================================
+   Ícone dentro de botão — a regra que existia só no tema escuro
+   ==========================================================================
+
+   O comentário original desta regra dizia "tamanho e alinhamento
+   consistentes", mas o seletor era `:is(html[data-theme="dark"])
+   .cv-btn__icon .cv-icon` — a consistência valia num tema só.
+
+   `.cv-icon` é um `<svg>` sem `width`/`height` no atributo, e `.cv-btn__icon`
+   nunca teve regra base. Sem alguém dizer o tamanho, o SVG colapsa: medido no
+   tema claro, o ícone de "Limpar filtros" sai **0×0** enquanto no escuro sai
+   17×17. Não é ícone diferente entre os temas — é ícone que **não aparece** no
+   claro, em botão nenhum do sistema.
+
+   Aqui ela sai do arquivo de tema e passa a valer nos dois, que é o que o
+   comentário já prometia. `:where()` zera a especificidade pelo mesmo motivo do
+   `field.css` (`NOVO-54`): base é o que vale quando ninguém disse nada e perde
+   para qualquer contexto que diga — e existem contextos que dimensionam este
+   ícone por conta própria (`list-header.css:1029`, `action-system.css:340`).
+   ========================================================================== */
+
+:where(.cv-btn__icon .cv-icon) {
+  display: block;
+  height: var(--cv-btn-icon-size);
+  width: var(--cv-btn-icon-size);
+}
