@@ -56,7 +56,7 @@ Padrao interno do app (**modulo referencia** para os demais):
 
 A interface publica em `/roteiros/` inclui listagem (busca `q`), criacao, edicao, detalhe, exclusao com confirmacao, wizard de trechos/destinos e endpoints de apoio (cidades, diarias, estimativa de trecho, **calculo de rota no mapa** via `POST /roteiros/api/calcular-rota/` que chama OpenRouteService no servidor — chave `OPENROUTESERVICE_API_KEY` apenas no `.env`), sem alterar regras do legado ja portadas.
 
-**Mapa:** Leaflet + tiles OpenStreetMap no formulario (`static/js/roteiros-map.js`, estilos em `static/css/roteiros.css`). Variaveis: `ROUTE_PROVIDER`, `ROUTE_CACHE_ENABLED`, `ROUTE_REQUEST_TIMEOUT_SECONDS` (ver `.env.example`). Testes: `python manage.py test roteiros`.
+**Mapa:** Leaflet + tiles OpenStreetMap no formulario (`static/js/pages/roteiros-map.js`, estilos em `static/css/pages/roteiros.css`). Variaveis: `ROUTE_PROVIDER`, `ROUTE_CACHE_ENABLED`, `ROUTE_REQUEST_TIMEOUT_SECONDS` (ver `.env.example`). Testes: `python manage.py test roteiros`.
 
 Regras transversais: sem `href="#"`, sem CSS/JS inline nos blocos de dominio, sem exibir "Atualizado em" como metadado de lista; JS de pagina em `static/js/` (ex.: `roteiros.js`) e tokens de dominio em `static/css/domain.css`.
 

@@ -1,6 +1,6 @@
 """Criar pasta no Drive: `.then` solto escapava do `try/catch` (NOVO-24).
 
-`static/js/pages/gdrive_config.js`, no clique de "Criar pasta": depois de criar a
+`static/js/pages/gdrive-config.js`, no clique de "Criar pasta": depois de criar a
 pasta o código encadeava `loadPastas(currentPaiId()).then(...)` **sem `await`**.
 Duas consequências, as duas medidas no navegador antes de mexer:
 
@@ -27,7 +27,7 @@ from pathlib import Path
 from django.conf import settings
 from django.test import SimpleTestCase
 
-PAGINA = Path(settings.BASE_DIR) / "static" / "js" / "pages" / "gdrive_config.js"
+PAGINA = Path(settings.BASE_DIR) / "static" / "js" / "pages" / "gdrive-config.js"
 
 
 def _bloco_a_partir_de(marcador: str) -> str:

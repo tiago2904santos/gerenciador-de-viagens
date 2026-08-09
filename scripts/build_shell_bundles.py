@@ -71,7 +71,6 @@ SHELL_JS: tuple[str, ...] = (
     "js/components/document-source.js",
     "js/components/document-search.js",
     "js/components/date-picker.js",
-    "js/cv-select.js",
     "js/components/fields-init.js",
     "js/components/document-download.js",
     "js/components/extra-download.js",

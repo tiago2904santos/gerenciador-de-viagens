@@ -96,7 +96,7 @@ Outras observacoes de validacao:
 
 ## JavaScript do editor (modular)
 
-- Entrypoint: `static/js/roteiros.js` (arquivo enxuto de bootstrap).
+- Entrypoint: `static/js/pages/roteiros.js` (arquivo enxuto de bootstrap).
 - Núcleo do editor: `static/js/pages/roteiros/editor/index.js`.
 - Módulos por responsabilidade:
   - `state.js`
