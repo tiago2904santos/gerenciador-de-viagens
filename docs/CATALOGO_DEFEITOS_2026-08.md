@@ -4980,3 +4980,37 @@ que "rodei a suíte" e "li o resultado da suíte" são coisas diferentes.
 de `@media` do claro por especificidade, então o escuro ignorava o próprio ajuste de celular.
 Removida a sobrescrita, os dois temas passam a obedecer a mesma media. O valor que prevalece é o
 deliberado para telas pequenas.
+
+### NOVO-64 ✅ RESOLVIDO · `NOVO` Os 176 tokens `--cv-*` perdem o prefixo de origem e passam a ser nomeados pela função · MED · 0,5 d
+
+O dono foi explícito: *"não quero mais nada com `cv`, quero que as nomenclaturas sejam focadas na
+função do componente e não de onde ele é"*. `--cv-field-radius` não diz o que é o token; diz de que
+biblioteca ele veio.
+
+**172 dos 176 renomeados**, em 24 arquivos, 1.366 linhas. `--cv-x` vira `--x`, o que já deixa o nome
+sendo a função (`--field-radius`, `--btn-height`, `--dialog-bg`).
+
+**Quatro ficam para depois, e a razão é colisão real**, medida contra o estado anterior — não contra
+o posterior, que já contém o resultado da própria troca:
+
+| token | colide com |
+|---|---|
+| `--cv-field-bg` | `--field-bg` |
+| `--cv-field-border` | `--field-border` |
+| `--cv-field-border-focus` | `--field-border-focus` |
+| `--cv-field-focus-ring` | `--field-focus-ring` |
+
+São dois campos convivendo com nomes paralelos — o mesmo padrão das três classes vivas do
+`NOVO-60`. Fundir exige decidir qual valor sobrevive, e isso é do dono.
+
+A substituição é feita **do nome mais longo para o mais curto**, senão `--cv-field-bg` comeria o
+prefixo de `--cv-field-bg-hover` e produziria `--field-bg-hover` a partir do lugar errado.
+
+**Medição: 1 elemento alterado em 41.950 — e o piso de ruído também é 1.** Capturando duas vezes com
+o **mesmo código**, `.os-model-card` em `/ordens-servico/nova/` no tema escuro difere sozinho: o
+fundo dele varia entre execuções (estado de seleção que não é determinístico naquela tela). Rodei o
+controle justamente porque "1 elemento mudou" numa renomeação pura não podia ficar sem explicação —
+e a explicação é que aquele elemento mudaria de qualquer jeito.
+
+Fica registrado como **ruído conhecido daquela rota**, para a próxima medição não gastar tempo com
+ele.

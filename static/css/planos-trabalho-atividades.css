@@ -545,7 +545,7 @@ html[data-theme="dark"] .pt-live-col {
   padding: 8px 10px;
   border: 1px solid var(--color-border-soft);
   border-radius: 9px;
-  background: var(--cv-card-family-bg, var(--color-surface));
+  background: var(--card-family-bg, var(--color-surface));
   color: var(--color-heading);
   cursor: pointer;
   font-size: var(--font-size-xs, .8rem);
@@ -588,7 +588,7 @@ html[data-theme="dark"] .pt-live-col {
   background: color-mix(
     in srgb,
     var(--color-accent) 12%,
-    var(--cv-card-family-bg, var(--color-surface))
+    var(--card-family-bg, var(--color-surface))
   );
   border-color: var(--color-accent-border-soft);
   box-shadow: inset 4px 0 0 var(--color-accent);

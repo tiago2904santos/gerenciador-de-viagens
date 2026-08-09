@@ -296,7 +296,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 
 :is(html[data-theme="dark"])
   .cv-search-picker {
-  --cv-search-picker-focus-shadow: none;
+  --search-picker-focus-shadow: none;
   --field-border-focus: var(--color-accent-border-strong);
 }
 
@@ -322,8 +322,8 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
    ========================================================= */
 :is(html[data-theme="dark"])
   :is(.page-shell--wizard, .cv-page--flow) {
-  --cv-form-section-header-padding: 12px 18px 12px 30px;
-  --cv-form-section-body-padding: 16px 18px;
+  --form-section-header-padding: 12px 18px 12px 30px;
+  --form-section-body-padding: 16px 18px;
 }
 
 /* Título livre do evento: quebra em até duas linhas no list-header. */
@@ -662,7 +662,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 /* Menu do select reanexado ao <body> por CV.overlay. */
 :is(html[data-theme="dark"])
   .cv-custom-select__menu--v2.cv-floating-dropdown--active:is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) {
-  --cv-cs-menu-bg: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
+  --cs-menu-bg: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
   background: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
   border-color: color-mix(in srgb, var(--color-border) 55%, transparent);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
@@ -1409,7 +1409,7 @@ html[data-theme="dark"] :is(.cv-custom-select__trigger, .cv-search-picker__input
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker {
   --form-control-height: var(--control-height-md, 44px);
-  --cv-search-picker-height: var(--control-height-md, 44px);
+  --search-picker-height: var(--control-height-md, 44px);
 }
 
 :is(html[data-theme="dark"])
@@ -3554,7 +3554,7 @@ html[data-theme="dark"] :is(.cv-search-picker__selected-panel, .cv-search-picker
 
 /* Buttons and icon actions */
 html[data-theme="dark"] :is(.cv-btn--primary, .btn-primary, .app-primary-action) {
-  background: var(--cv-btn-primary-bg);
+  background: var(--btn-primary-bg);
   border-color: var(--color-primary-hover);
   box-shadow: none;
   color: #ffffff;
@@ -3562,7 +3562,7 @@ html[data-theme="dark"] :is(.cv-btn--primary, .btn-primary, .app-primary-action)
 }
 
 html[data-theme="dark"] :is(.cv-btn--primary-action, .cv-btn--next, .cv-btn--sign) {
-  background: var(--cv-btn-primary-bg);
+  background: var(--btn-primary-bg);
   border-color: var(--color-primary-hover);
   box-shadow: none;
   color: var(--color-white);
@@ -3597,13 +3597,13 @@ html[data-theme="dark"] .cv-btn--soft-danger {
 }
 
 html[data-theme="dark"] :is(.cv-footer-action--primary, .cv-field-side-action--primary) {
-  background: var(--cv-btn-primary-bg);
+  background: var(--btn-primary-bg);
   border-color: var(--color-primary-hover);
   color: var(--color-white);
 }
 
 html[data-theme="dark"] :is(.cv-btn--primary, .btn-primary, .app-primary-action):hover {
-  background: var(--cv-btn-primary-hover-bg);
+  background: var(--btn-primary-hover-bg);
   border-color: var(--color-primary-bright);
   transform: translateY(-1px);
 }
@@ -4019,24 +4019,24 @@ html[data-theme="dark"] .empty-state__title {
 
 :is(html[data-theme="dark"])
   .cv-form-section-card {
-  background: var(--cv-card-family-bg);
-  border-color: var(--cv-card-family-border);
-  box-shadow: var(--cv-card-family-shadow);
+  background: var(--card-family-bg);
+  border-color: var(--card-family-border);
+  box-shadow: var(--card-family-shadow);
   overflow: hidden;
 }
 
 :is(html[data-theme="dark"])
   .cv-form-section-header {
-  --_wizard-filete-width: var(--cv-card-family-accent-width);
-  background: var(--cv-card-family-header-bg);
-  background-image: var(--cv-card-family-header-image);
-  border-color: var(--cv-card-family-border-strong);
+  --_wizard-filete-width: var(--card-family-accent-width);
+  background: var(--card-family-header-bg);
+  background-image: var(--card-family-header-image);
+  border-color: var(--card-family-border-strong);
 }
 
 :is(html[data-theme="dark"])
   .cv-form-section-header::before {
-  background: var(--cv-card-family-accent-bg);
-  box-shadow: var(--cv-card-family-accent-shadow);
+  background: var(--card-family-accent-bg);
+  box-shadow: var(--card-family-accent-shadow);
 }
 
 :is(html[data-theme="dark"])
@@ -4779,36 +4779,36 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) {
-  background: var(--cv-card-family-bg);
-  border: 1px solid var(--cv-card-family-border);
+  background: var(--card-family-bg);
+  border: 1px solid var(--card-family-border);
   border-radius: 16px;
-  box-shadow: var(--cv-card-family-shadow);
+  box-shadow: var(--card-family-shadow);
 }
 
 :is(html[data-theme="dark"])
   .main-form-panel > .form-section {
-  background: var(--cv-card-family-bg);
+  background: var(--card-family-bg);
   box-shadow: none;
 }
 
 :is(html[data-theme="dark"])
   .main-form-panel > .form-section > .section-header {
-  background: var(--cv-card-family-header-bg);
-  background-image: var(--cv-card-family-header-image);
-  border-bottom: 1px solid var(--cv-card-family-border-strong);
+  background: var(--card-family-header-bg);
+  background-image: var(--card-family-header-image);
+  border-bottom: 1px solid var(--card-family-border-strong);
   padding: var(--space-4) var(--space-6) var(--space-4) var(--space-10);
 }
 
 :is(html[data-theme="dark"])
   .main-form-panel > .form-section > .section-header::before {
-  background: var(--cv-card-family-accent-bg);
+  background: var(--card-family-accent-bg);
   bottom: var(--space-4);
-  box-shadow: var(--cv-card-family-accent-shadow);
+  box-shadow: var(--card-family-accent-shadow);
   height: auto;
   left: var(--space-6);
   top: var(--space-4);
   transform: none;
-  width: var(--cv-card-family-accent-width);
+  width: var(--card-family-accent-width);
 }
 
 :is(html[data-theme="dark"])
@@ -4827,8 +4827,8 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .main-form-panel > .cv-card-footer {
-  background: var(--cv-card-family-bg);
-  border-top-color: var(--cv-card-family-border);
+  background: var(--card-family-bg);
+  border-top-color: var(--card-family-border);
 }
 
 @media (max-width: 640px) {
@@ -4890,31 +4890,31 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .cv-record-card {
-  background: var(--cv-card-family-bg);
-  border: 1px solid var(--cv-card-family-border);
+  background: var(--card-family-bg);
+  border: 1px solid var(--card-family-border);
   border-radius: 16px;
-  box-shadow: var(--cv-card-family-shadow);
+  box-shadow: var(--card-family-shadow);
   transform: none;
 }
 
 :is(html[data-theme="dark"])
   .cv-record-card:hover {
-  box-shadow: var(--cv-card-family-shadow);
+  box-shadow: var(--card-family-shadow);
   transform: none;
 }
 
 :is(html[data-theme="dark"])
   .cv-record-card__id-row {
-  background: var(--cv-card-family-header-bg);
-  background-image: var(--cv-card-family-header-image);
-  border-bottom-color: var(--cv-card-family-border-strong);
+  background: var(--card-family-header-bg);
+  background-image: var(--card-family-header-image);
+  border-bottom-color: var(--card-family-border-strong);
 }
 
 :is(html[data-theme="dark"])
   .cv-record-card__id-row::before {
-  background: var(--cv-card-family-accent-bg);
-  box-shadow: var(--cv-card-family-accent-shadow);
-  width: var(--cv-card-family-accent-width);
+  background: var(--card-family-accent-bg);
+  box-shadow: var(--card-family-accent-shadow);
+  width: var(--card-family-accent-width);
 }
 
 :is(html[data-theme="dark"])
@@ -4952,7 +4952,7 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .cv-record-card__band {
-  background: var(--cv-card-family-bg);
+  background: var(--card-family-bg);
 }
 
 :is(html[data-theme="dark"])
@@ -5006,13 +5006,13 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .cv-itinerary__leg {
-  background: var(--cv-card-family-bg) !important;
+  background: var(--card-family-bg) !important;
   border-color: transparent !important;
 }
 
 :is(html[data-theme="dark"])
   .cv-itinerary__leg:hover {
-  background: var(--cv-card-family-bg) !important;
+  background: var(--card-family-bg) !important;
   border-color: transparent !important;
 }
 
@@ -5026,8 +5026,8 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .cv-record-card__footer {
-  background: var(--cv-card-family-bg);
-  border-top-color: var(--cv-card-family-border);
+  background: var(--card-family-bg);
+  border-top-color: var(--card-family-border);
 }
 
 :is(html[data-theme="dark"])
@@ -5075,9 +5075,9 @@ html[data-theme="dark"] *::after {
 :is(html[data-theme="dark"])
   .cv-collection-panel
   .cv-list-tab {
-  --cv-list-tab-bg: var(--step1-surface);
-  --cv-list-tab-hover-bg: color-mix(in srgb, var(--step1-surface) 82%, #fff 18%);
-  --cv-list-tab-count-bg: color-mix(in srgb, #fff 12%, transparent);
+  --list-tab-bg: var(--step1-surface);
+  --list-tab-hover-bg: color-mix(in srgb, var(--step1-surface) 82%, #fff 18%);
+  --list-tab-count-bg: color-mix(in srgb, #fff 12%, transparent);
 }
 
 :is(html[data-theme="dark"])
@@ -5169,7 +5169,7 @@ html[data-theme="dark"] *::after {
 :is(html[data-theme="dark"])
   :is(.cv-btn, .cv-icon-btn, .cv-footer-action, .cv-field-side-action):focus-visible {
   outline: none;
-  box-shadow: var(--cv-btn-focus-ring);
+  box-shadow: var(--btn-focus-ring);
   border-color: var(--color-focus);
 }
 
@@ -5236,13 +5236,13 @@ html[data-theme="dark"] *::after {
 /* Linhas de trecho: mesmo fundo da seção do card. */
 :is(html[data-theme="dark"])
   .cv-itinerary__leg {
-  background: var(--cv-card-family-bg) !important;
+  background: var(--card-family-bg) !important;
   border-color: transparent !important;
 }
 
 :is(html[data-theme="dark"])
   .cv-itinerary__leg:hover {
-  background: var(--cv-card-family-bg) !important;
+  background: var(--card-family-bg) !important;
   border-color: transparent !important;
 }
 
@@ -5311,7 +5311,7 @@ html[data-theme="dark"] *::after {
 /* Chevron v2: accent dourado em TODOS os estados (fechado/hover/focus/open). */
 :is(html[data-theme="dark"])
   .cv-custom-select--v2 {
-  --cv-cs-chevron-color: var(--color-accent);
+  --cs-chevron-color: var(--color-accent);
 }
 
 :is(html[data-theme="dark"])
@@ -5371,7 +5371,7 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme="dark"])
   .cv-custom-select__menu--v2 {
-  --cv-cs-menu-bg: var(--color-input-bg);
+  --cs-menu-bg: var(--color-input-bg);
   animation: none;
   background: var(--color-input-bg);
   border: 1px solid var(--color-border-strong);

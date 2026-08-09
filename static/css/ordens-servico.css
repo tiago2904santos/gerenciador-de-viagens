@@ -261,7 +261,7 @@
 
 :is(html[data-theme="dark"])
   .os-page .os-form-card .cv-form-card__footer .cv-card-footer-section__divider {
-  border-top: 1px solid var(--cv-form-section-border, var(--color-border));
+  border-top: 1px solid var(--form-section-border, var(--color-border));
   display: block;
 }
 

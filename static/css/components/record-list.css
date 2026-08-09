@@ -29,9 +29,9 @@
 
 /* Controles elevados sobre o poço --step1-panel (abas + cápsula de páginas). */
 .cv-collection-panel .cv-list-tab {
-  --cv-list-tab-bg: var(--step1-surface);
-  --cv-list-tab-hover-bg: color-mix(in srgb, var(--step1-surface) 86%, #fff 14%);
-  --cv-list-tab-count-bg: color-mix(in srgb, var(--step1-panel) 55%, transparent);
+  --list-tab-bg: var(--step1-surface);
+  --list-tab-hover-bg: color-mix(in srgb, var(--step1-surface) 86%, #fff 14%);
+  --list-tab-count-bg: color-mix(in srgb, var(--step1-panel) 55%, transparent);
 }
 
 .cv-collection-panel .pagination-shell__controls {

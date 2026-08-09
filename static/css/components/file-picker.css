@@ -65,7 +65,7 @@
 .cv-file-picker:focus-within,
 .prestacao-file-picker:focus-within {
   border-color: var(--cv-field-border-focus, var(--color-focus));
-  box-shadow: var(--cv-field-shadow-focus, var(--cv-field-focus-ring, var(--focus-ring)));
+  box-shadow: var(--field-shadow-focus, var(--cv-field-focus-ring, var(--focus-ring)));
 }
 
 .cv-file-picker__action,
@@ -138,13 +138,13 @@
 
 .cv-file-picker__upload,
 .prestacao-file-picker__upload {
-  background: var(--cv-btn-primary-bg, var(--color-primary));
+  background: var(--btn-primary-bg, var(--color-primary));
   color: var(--color-white, var(--color-white));
 }
 
 .cv-file-picker__upload:hover:not(:disabled),
 .prestacao-file-picker__upload:hover:not(:disabled) {
-  background: var(--cv-btn-primary-hover-bg, var(--color-primary-hover));
+  background: var(--btn-primary-hover-bg, var(--color-primary-hover));
 }
 
 .cv-file-picker__upload:disabled,
@@ -293,8 +293,8 @@
 
 .cv-file-widget__action,
 .prestacao-file-widget__action {
-  --cv-icon-btn-size: 42px;
-  --cv-icon-btn-icon-size: 18px;
+  --icon-btn-size: 42px;
+  --icon-btn-icon-size: 18px;
 }
 
 @media (max-width: 640px) {

@@ -618,7 +618,7 @@ class DarkRedesignContractTests(SimpleTestCase):
     def test_dark_primary_actions_stay_in_the_primary_blue_family(self):
         for token in (
             "--action-primary-bg:",
-            "--cv-btn-primary-bg:",
+            "--btn-primary-bg:",
             "--route-button-primary-bg:",
         ):
             with self.subTest(token=token):
@@ -646,7 +646,7 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         dark_filete_rule = self.css.split(".cv-form-section-header::before", 1)[1]
         dark_filete_rule = dark_filete_rule.split("}", 1)[0]
-        self.assertIn("var(--cv-card-family-accent-bg)", dark_filete_rule)
+        self.assertIn("var(--card-family-accent-bg)", dark_filete_rule)
         self.assertNotIn("var(--color-primary-bright)", dark_filete_rule)
 
     def test_standard_simple_centers_a_tokenized_compact_panel(self):
@@ -670,13 +670,13 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_list_and_form_cards_share_the_dark_card_family(self):
         for token in (
-            "--cv-card-family-bg:",
-            "--cv-card-family-header-bg:",
-            "--cv-card-family-header-image:",
-            "--cv-card-family-border:",
-            "--cv-card-family-shadow:",
-            "--cv-card-family-accent-bg:",
-            "--cv-card-family-accent-width:",
+            "--card-family-bg:",
+            "--card-family-header-bg:",
+            "--card-family-header-image:",
+            "--card-family-border:",
+            "--card-family-shadow:",
+            "--card-family-accent-bg:",
+            "--card-family-accent-width:",
         ):
             with self.subTest(token=token):
                 self.assertIn(token, self.tokens_css)
@@ -687,9 +687,9 @@ class DarkRedesignContractTests(SimpleTestCase):
         list_header = list_header.split("}", 1)[0]
 
         for shared_token in (
-            "var(--cv-card-family-header-bg)",
-            "var(--cv-card-family-header-image)",
-            "var(--cv-card-family-border-strong)",
+            "var(--card-family-header-bg)",
+            "var(--card-family-header-image)",
+            "var(--card-family-border-strong)",
         ):
             with self.subTest(shared_token=shared_token):
                 self.assertIn(shared_token, wizard_header)
@@ -704,7 +704,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             ".main-form-panel > .form-section > .section-header::before {", 1
         )[1].split("}", 1)[0]
 
-        self.assertIn("var(--cv-card-family-header-bg)", simple_form_header)
-        self.assertIn("var(--cv-card-family-header-image)", simple_form_header)
-        self.assertIn("var(--cv-card-family-accent-bg)", simple_form_filete)
-        self.assertIn("var(--cv-card-family-accent-width)", simple_form_filete)
+        self.assertIn("var(--card-family-header-bg)", simple_form_header)
+        self.assertIn("var(--card-family-header-image)", simple_form_header)
+        self.assertIn("var(--card-family-accent-bg)", simple_form_filete)
+        self.assertIn("var(--card-family-accent-width)", simple_form_filete)

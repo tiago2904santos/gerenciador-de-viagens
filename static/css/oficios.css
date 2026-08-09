@@ -68,7 +68,7 @@
   color: var(--color-input-text);
   font-size: var(--font-size-sm);
   min-height: var(--control-height-md);
-  padding: var(--cv-field-padding-y) var(--space-3);
+  padding: var(--field-padding-y) var(--space-3);
   transition:
     background-color var(--transition-fast),
     border-color var(--transition-fast),
@@ -88,9 +88,9 @@
 .travel-document-wizard .cv-field__control:-webkit-autofill,
 .travel-document-wizard .cv-field__control:-webkit-autofill:hover,
 .travel-document-wizard .cv-field__control:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px var(--field-bg-soft, var(--color-input-bg)) inset, var(--cv-field-shadow-focus);
+  -webkit-box-shadow: 0 0 0 1000px var(--field-bg-soft, var(--color-input-bg)) inset, var(--field-shadow-focus);
   -webkit-text-fill-color: var(--field-text, var(--color-input-text));
-  border-color: var(--field-border-focus, var(--cv-field-focus-border));
+  border-color: var(--field-border-focus, var(--field-focus-border));
   caret-color: var(--field-text, var(--color-input-text));
   color: var(--field-text, var(--color-input-text));
 }
@@ -1400,10 +1400,10 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
 
 /* ── Ofício List Card (cv-record-card) ───────────────────────────────── */
 .cv-record-card {
-  background: var(--cv-form-section-bg, var(--color-card));
-  border: 1px solid var(--cv-form-section-border, var(--color-border-soft));
+  background: var(--form-section-bg, var(--color-card));
+  border: 1px solid var(--form-section-border, var(--color-border-soft));
   border-radius: var(--radius-card, var(--radius-card));
-  box-shadow: var(--cv-form-section-shadow, var(--shadow-card));
+  box-shadow: var(--form-section-shadow, var(--shadow-card));
   overflow: hidden;
   transition:
     box-shadow var(--transition-base),
@@ -1411,7 +1411,7 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
 }
 
 .cv-record-card:hover {
-  box-shadow: var(--cv-form-section-shadow, var(--shadow-card));
+  box-shadow: var(--form-section-shadow, var(--shadow-card));
   transform: none;
 }
 
@@ -1422,9 +1422,9 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .cv-search-picker {
 /* ── IDENTIFICAÇÃO: Número · Protocolo · Data de Criação (topo do card) ── */
 .cv-record-card__id-row {
   align-items: center;
-  background: var(--cv-form-section-header-bg);
+  background: var(--form-section-header-bg);
   background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 7%, transparent) 0px, transparent 76px);
-  border-bottom: 1px solid var(--cv-form-section-border);
+  border-bottom: 1px solid var(--form-section-border);
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-4);
@@ -1976,8 +1976,8 @@ html[data-theme="light"] .cv-person-row--highlight .cv-person-row__name {
 
 /* ── FOOTER ── */
 .cv-record-card__footer {
-  background: var(--cv-form-section-bg, var(--color-surface));
-  border-top: 1px solid var(--cv-form-section-border, var(--color-border-soft));
+  background: var(--form-section-bg, var(--color-surface));
+  border-top: 1px solid var(--form-section-border, var(--color-border-soft));
   padding: var(--space-3) var(--space-6);
 }
 

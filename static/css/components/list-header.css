@@ -83,7 +83,7 @@
 /* Rail de filtros — faixa clara abaixo do título */
 .list-header__rail {
   /* Mesmo token da área interna dos cards (.cv-record-card__band). */
-  background: var(--cv-card-family-bg);
+  background: var(--card-family-bg);
   border-top: 1px solid var(--border-filter-bar);
   box-sizing: border-box;
   display: flex;
@@ -454,7 +454,7 @@
 .list-header .cv-inline-create__toggle {
   align-items: center;
   appearance: none;
-  background: var(--cv-card-family-bg);
+  background: var(--card-family-bg);
   border: 0;
   border-radius: 0;
   border-top: 1px solid var(--border-filter-bar);
@@ -494,15 +494,15 @@
 
 .list-header .cv-inline-create__toggle.is-filled {
   animation: list-header-inline-create-fill 0.35s ease forwards;
-  background: var(--cv-btn-primary-bg);
-  border-color: var(--cv-btn-primary-border);
+  background: var(--btn-primary-bg);
+  border-color: var(--btn-primary-border);
   box-shadow: var(--shadow-sm);
   color: var(--color-white);
 }
 
 .list-header .cv-inline-create__toggle.is-filled:hover {
-  background: var(--cv-btn-primary-hover-bg);
-  border-color: var(--cv-btn-primary-hover-border);
+  background: var(--btn-primary-hover-bg);
+  border-color: var(--btn-primary-hover-border);
 }
 
 @keyframes list-header-inline-create-fill {
@@ -574,7 +574,7 @@
 /* Mesma cor das seções internas do card (.cv-record-card__band). */
 :is(html[data-theme="dark"])
   .list-header__rail {
-  background: var(--cv-card-family-bg);
+  background: var(--card-family-bg);
   border-top-color: var(--color-border);
   --list-header-control-bg: var(--step1-panel, var(--color-surface-soft, var(--color-card-soft)));
 }
@@ -627,7 +627,7 @@
 /* Select do rail: chevron sempre accent (fechado = aberto). */
 :is(html[data-theme="dark"])
   .list-header__rail .cv-custom-select--v2 {
-  --cv-cs-chevron-color: var(--color-accent);
+  --cs-chevron-color: var(--color-accent);
 }
 
 :is(html[data-theme="dark"])
@@ -657,7 +657,7 @@
 
 :is(html[data-theme="dark"])
   .list-header .cv-inline-create__toggle {
-  background: var(--cv-card-family-bg);
+  background: var(--card-family-bg);
   border-top-color: var(--border-filter-bar);
   color: var(--theme-text-body);
 }
@@ -679,8 +679,8 @@
 
 :is(html[data-theme="dark"])
   .list-header .cv-inline-create__toggle.is-filled {
-  background: var(--cv-btn-primary-bg);
-  border-color: var(--cv-btn-primary-border);
+  background: var(--btn-primary-bg);
+  border-color: var(--btn-primary-border);
   color: var(--color-white);
 }
 
@@ -785,10 +785,10 @@
   align-items: center;
   background:
     linear-gradient(var(--color-card), var(--color-card)) padding-box,
-    linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
+    linear-gradient(var(--select-border), var(--select-border)) border-box;
   border: 1px solid transparent;
   border-radius: var(--radius-control);
-  box-shadow: var(--cv-cs-trigger-shadow);
+  box-shadow: var(--cs-trigger-shadow);
   color: var(--color-input-text);
   cursor: pointer;
   display: inline-flex;
@@ -805,15 +805,15 @@
 
 .travel-period-filter__btn:hover:not(:disabled) {
   background:
-    linear-gradient(var(--cv-field-bg-hover), var(--cv-field-bg-hover)) padding-box,
+    linear-gradient(var(--field-bg-hover), var(--field-bg-hover)) padding-box,
     linear-gradient(var(--color-secondary), var(--color-secondary)) border-box;
 }
 
 .travel-period-filter__btn:focus-visible {
   background:
-    linear-gradient(var(--cv-field-bg-hover), var(--cv-field-bg-hover)) padding-box,
-    linear-gradient(var(--cv-select-border-focus), var(--cv-select-border-focus)) border-box;
-  box-shadow: var(--cv-select-focus-shadow);
+    linear-gradient(var(--field-bg-hover), var(--field-bg-hover)) padding-box,
+    linear-gradient(var(--select-border-focus), var(--select-border-focus)) border-box;
+  box-shadow: var(--select-focus-shadow);
   outline: none;
 }
 
@@ -984,12 +984,12 @@
 }
 
 :is(html[data-theme="dark"]) .list-header--wizard-stepper {
-  background: var(--cv-card-family-bg, var(--color-card));
+  background: var(--card-family-bg, var(--color-card));
   border-color: var(--color-border);
 }
 
 :is(html[data-theme="dark"]) .list-header--wizard-stepper .list-header__rail--wizard {
-  background: var(--cv-card-family-bg, var(--color-card));
+  background: var(--card-family-bg, var(--color-card));
   border-top: 0;
 }
 

@@ -1510,7 +1510,7 @@
   background: var(--danger-bg);
   border: 0;
   border-left: 1px solid var(--danger-border);
-  border-radius: 0 calc(var(--cv-search-picker-radius) - 1px) calc(var(--cv-search-picker-radius) - 1px) 0;
+  border-radius: 0 calc(var(--search-picker-radius) - 1px) calc(var(--search-picker-radius) - 1px) 0;
   box-shadow: none;
   grid-column: 2;
   grid-row: 1;
@@ -1749,9 +1749,9 @@
    (cv-btn--secondary:focus). Teclado continua via :focus-visible. */
 :is(.roteiro-time-calc-stepper, .roteiro-trecho-card__time-stepper)
   .cv-btn--control:focus:not(:focus-visible):not(:hover):not(:active) {
-  background: var(--cv-btn-secondary-bg);
-  border-color: var(--cv-btn-secondary-border);
-  color: var(--cv-btn-secondary-color);
+  background: var(--btn-secondary-bg);
+  border-color: var(--btn-secondary-border);
+  color: var(--btn-secondary-color);
   box-shadow: var(--shadow-xs);
   transform: none;
 }
@@ -2063,7 +2063,7 @@
 
 /* Footer integrado ao card de diárias */
 .roteiro-editor__section--diarias > .footer-actions {
-  border-top:     1px solid var(--cv-form-section-border);
+  border-top:     1px solid var(--form-section-border);
   padding:        var(--footer-actions-padding-y) var(--footer-actions-padding-x);
 }
 
@@ -2421,9 +2421,9 @@
 }
 
 .roteiro-mapa__canvas-shell {
-  --roteiro-mapa-toolbar-bg: var(--cv-form-section-header-bg, var(--route-card-bg));
+  --roteiro-mapa-toolbar-bg: var(--form-section-header-bg, var(--route-card-bg));
   --roteiro-mapa-toolbar-border: transparent;
-  background: var(--cv-form-section-bg, var(--route-card-bg));
+  background: var(--form-section-bg, var(--route-card-bg));
   border: 0;
   border-radius: var(--radius-card, 13px);
   box-shadow: none;
@@ -2485,7 +2485,7 @@
   color: var(--color-input-text, var(--theme-input-text));
   font-size: var(--font-size-sm, var(--font-size-sm));
   min-height: var(--control-height-md, var(--control-height-md));
-  padding: var(--cv-field-padding-y, 0) var(--space-3, var(--space-3));
+  padding: var(--field-padding-y, 0) var(--space-3, var(--space-3));
   width: 100%;
 }
 
@@ -2633,13 +2633,13 @@ html[data-theme="light"] .roteiro-editor--avulso .roteiro-editor__reference-bloc
 [data-travel-document-wizard-roteiro] .oficio-roteiro-body,
 .roteiro-editor--oficio .oficio-roteiro-body {
   /* Anéis / shadows de foco */
-  --cv-btn-focus-ring: none;
+  --btn-focus-ring: none;
   --cv-field-focus-ring: none;
-  --cv-field-shadow-focus: none;
-  --cv-search-picker-focus-shadow: none;
-  --cv-select-focus-ring: none;
-  --cv-select-focus-shadow: none;
-  --cv-sp-field-focus-ring: none;
+  --field-shadow-focus: none;
+  --search-picker-focus-shadow: none;
+  --select-focus-ring: none;
+  --select-focus-shadow: none;
+  --sp-field-focus-ring: none;
   --field-focus-ring: none;
   --focus-ring: none;
   --route-focus-ring: none;
@@ -2648,8 +2648,8 @@ html[data-theme="light"] .roteiro-editor--avulso .roteiro-editor__reference-bloc
   --border-focus: var(--color-border, transparent);
   --color-focus: var(--color-border, transparent);
   --cv-field-border-focus: var(--cv-field-border, var(--color-border, transparent));
-  --cv-select-border-focus: var(--cv-select-border, var(--color-border, transparent));
-  --cv-sp-field-border-focus: var(--cv-sp-field-border, var(--color-border, transparent));
+  --select-border-focus: var(--select-border, var(--color-border, transparent));
+  --sp-field-border-focus: var(--sp-field-border, var(--color-border, transparent));
   --field-border-focus: var(--field-border, var(--color-border, transparent));
 }
 

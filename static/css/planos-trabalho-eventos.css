@@ -615,7 +615,7 @@ html[data-theme="dark"] .pt-add-evento__btn:focus-visible {
 .pt-documentos-stage > .cv-form-section-card > .cv-form-section-header {
   background: var(--step1-surface) !important;
   border: 0 !important;
-  border-bottom: 1px solid var(--cv-form-section-border, var(--color-border)) !important;
+  border-bottom: 1px solid var(--form-section-border, var(--color-border)) !important;
   box-shadow: none !important;
 }
 

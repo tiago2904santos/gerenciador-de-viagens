@@ -80,12 +80,12 @@
   --field-group-gap:     var(--space-3);
 
   /* --- Wizard Section Cards --- */
-  --cv-form-section-bg:             var(--surface-form-section);
-  --cv-form-section-header-bg:      var(--surface-form-panel);
-  --cv-form-section-border:         var(--border-form-section);
-  --cv-form-section-shadow:         var(--shadow-sm);
-  --cv-form-section-header-padding: var(--space-4) var(--space-6) var(--space-4) var(--space-10);
-  --cv-form-section-body-padding:   var(--space-5) var(--space-6);
+  --form-section-bg:             var(--surface-form-section);
+  --form-section-header-bg:      var(--surface-form-panel);
+  --form-section-border:         var(--border-form-section);
+  --form-section-shadow:         var(--shadow-sm);
+  --form-section-header-padding: var(--space-4) var(--space-6) var(--space-4) var(--space-10);
+  --form-section-body-padding:   var(--space-5) var(--space-6);
 
   /* --- Stepper --- */
   --stepper-padding-x:   var(--space-6);
@@ -179,10 +179,10 @@ html[data-theme="dark"] {
   --surface-field-group:    rgba(255, 255, 255, 0.04);
   --border-field-group:     rgba(255, 255, 255, 0.09);
 
-  --cv-form-section-bg:        var(--surface-form-section);
-  --cv-form-section-header-bg: var(--surface-form-panel);
-  --cv-form-section-border:    var(--theme-border-card);
-  --cv-form-section-shadow:    var(--theme-shadow-hero);
+  --form-section-bg:        var(--surface-form-section);
+  --form-section-header-bg: var(--surface-form-panel);
+  --form-section-border:    var(--theme-border-card);
+  --form-section-shadow:    var(--theme-shadow-hero);
 
   --surface-list-panel:     var(--theme-surface-card);
   --border-list-panel:      var(--theme-border-card);
@@ -286,10 +286,10 @@ html[data-theme="light"] {
   --surface-field-group:    #e3eaf2;
   --border-field-group:     #d4dde9;
 
-  --cv-form-section-bg:        var(--surface-form-panel);
-  --cv-form-section-header-bg: var(--surface-form-section);
-  --cv-form-section-border:    var(--border-form-section);
-  --cv-form-section-shadow:    var(--shadow-sm);
+  --form-section-bg:        var(--surface-form-panel);
+  --form-section-header-bg: var(--surface-form-section);
+  --form-section-border:    var(--border-form-section);
+  --form-section-shadow:    var(--shadow-sm);
 
   --surface-list-panel:     var(--color-surface);
   --border-list-panel:      #d4dde9;
@@ -836,10 +836,10 @@ html[data-theme="light"] {
    ========================================================= */
 .cv-form-section-stack > .footer-actions,
 .cv-form-section-stack > form > .footer-actions {
-  background:    var(--cv-form-section-bg);
+  background:    var(--form-section-bg);
   border-radius: 0 0 var(--radius-card) var(--radius-card);
-  border-top:    1px solid var(--cv-form-section-border);
-  box-shadow:    var(--cv-form-section-shadow);
+  border-top:    1px solid var(--form-section-border);
+  box-shadow:    var(--form-section-shadow);
   margin-top:    calc(-1 * var(--_stack-gap, var(--space-4)));
 }
 
@@ -847,16 +847,16 @@ html[data-theme="light"] {
 .main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section,
 .main-form-panel--stack .roteiro-editor--avulso .roteiro-editor__section,
 .main-form-panel--stack .roteiro-editor--oficio .roteiro-editor__section {
-  background:    var(--cv-form-section-bg);
-  border:        1px solid var(--cv-form-section-border);
+  background:    var(--form-section-bg);
+  border:        1px solid var(--form-section-border);
   border-radius: var(--radius-card);
-  box-shadow:    var(--cv-form-section-shadow);
+  box-shadow:    var(--form-section-shadow);
   overflow:      hidden;
   width:         100%;
 }
 
 .main-form-panel--stack .cv-form-section-stack > .form-section.app-form-section > :not(.form-section-header) {
-  padding: var(--cv-form-section-body-padding);
+  padding: var(--form-section-body-padding);
 }
 
 /* =========================================================
@@ -957,10 +957,10 @@ html[data-theme="light"] {
 }
 
 .cv-form-section-card {
-  background:    var(--cv-form-section-bg);
-  border:        1px solid var(--cv-form-section-border);
+  background:    var(--form-section-bg);
+  border:        1px solid var(--form-section-border);
   border-radius: var(--radius-card);
-  box-shadow:    var(--cv-form-section-shadow);
+  box-shadow:    var(--form-section-shadow);
   overflow:      hidden;
   width:         100%;
 }
@@ -972,7 +972,7 @@ html[data-theme="light"] {
    ========================================================= */
 .cv-card-footer {
   align-items:     center;
-  border-top:      1px solid var(--cv-form-section-border, var(--border-form-section));
+  border-top:      1px solid var(--form-section-border, var(--border-form-section));
   display:         flex;
   gap:             var(--space-3);
   justify-content: space-between;
@@ -995,7 +995,7 @@ html[data-theme="light"] {
 }
 
 .cv-card-footer-section__divider {
-  border-top: 1px solid var(--cv-form-section-border, var(--border-form-section));
+  border-top: 1px solid var(--form-section-border, var(--border-form-section));
 }
 
 .cv-card-footer-section > .cv-card-footer {
@@ -1013,15 +1013,15 @@ html[data-theme="light"] {
   --_wizard-filete-left:        var(--space-6);
   --_wizard-filete-width:       6px;
   align-items:      center;
-  background:       var(--cv-form-section-header-bg);
+  background:       var(--form-section-header-bg);
   background-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 7%, transparent) 0px, transparent 76px);
-  border-bottom:    1px solid var(--cv-form-section-border);
+  border-bottom:    1px solid var(--form-section-border);
   display:          flex;
   gap:              var(--space-4);
   justify-content:  space-between;
   /* altura fixa: garante consistência com ou sem botões/toggles no header */
   min-height:       calc(2 * var(--space-4) + var(--control-height-sm));
-  padding:          var(--cv-form-section-header-padding);
+  padding:          var(--form-section-header-padding);
   position:         relative;
 }
 
@@ -1129,7 +1129,7 @@ html[data-theme="light"] {
   display:        flex;
   flex-direction: column;
   gap:            var(--form-section-inner-gap);
-  padding:        var(--cv-form-section-body-padding);
+  padding:        var(--form-section-body-padding);
 }
 
 .cv-form-section-body--sections > .wizard-inner-section:not(:last-child) {
@@ -2199,15 +2199,15 @@ body.has-delete-modal-open {
 
 .cv-inline-create__toggle.is-filled {
   animation:    inline-create-btn-fill 0.4s cubic-bezier(0, 0, 0.2, 1) forwards;
-  background:   var(--cv-btn-primary-bg);
-  border-color: var(--cv-btn-primary-border);
+  background:   var(--btn-primary-bg);
+  border-color: var(--btn-primary-border);
   box-shadow:   0 6px 14px rgba(11, 58, 102, 0.16);
   color:        var(--color-white);
 }
 
 .cv-inline-create__toggle.is-filled:hover {
-  background:   var(--cv-btn-primary-hover-bg);
-  border-color: var(--cv-btn-primary-hover-border);
+  background:   var(--btn-primary-hover-bg);
+  border-color: var(--btn-primary-hover-border);
   box-shadow:   0 10px 18px rgba(11, 58, 102, 0.22);
 }
 
@@ -2240,8 +2240,8 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled {
   animation-name:     inline-create-btn-fill-dark;
   animation-duration: 0.4s;
   animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-  background:     var(--cv-btn-primary-bg);
-  border-color:   var(--cv-btn-primary-border);
+  background:     var(--btn-primary-bg);
+  border-color:   var(--btn-primary-border);
   color:          var(--color-white);
 }
 
@@ -2255,8 +2255,8 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled {
 }
 
 html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
-  background:   var(--cv-btn-primary-hover-bg);
-  border-color: var(--cv-btn-primary-hover-border);
+  background:   var(--btn-primary-hover-bg);
+  border-color: var(--btn-primary-hover-border);
 }
 
 .cv-inline-create__toggle-icon {

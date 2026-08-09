@@ -291,7 +291,7 @@
 
 .prestacao-file-selection__toggle:focus-visible {
   border-color: var(--cv-field-border-focus, var(--color-primary));
-  box-shadow: var(--cv-field-shadow-focus, var(--cv-field-focus-ring));
+  box-shadow: var(--field-shadow-focus, var(--cv-field-focus-ring));
   outline: 0;
 }
 
@@ -402,8 +402,8 @@
 }
 
 .prestacao-file-widget__action {
-  --cv-icon-btn-size: 44px;
-  --cv-icon-btn-icon-size: 18px;
+  --icon-btn-size: 44px;
+  --icon-btn-icon-size: 18px;
 }
 
 .prestacao-file-picker {
@@ -425,7 +425,7 @@
 
 .prestacao-file-picker:focus-within {
   border-color: var(--cv-field-border-focus, var(--color-primary));
-  box-shadow: var(--cv-field-shadow-focus, var(--cv-field-focus-ring));
+  box-shadow: var(--field-shadow-focus, var(--cv-field-focus-ring));
 }
 
 .prestacao-file-picker__value {
@@ -482,12 +482,12 @@
 }
 
 .prestacao-file-picker__upload {
-  background: var(--cv-btn-primary-bg, var(--color-primary));
+  background: var(--btn-primary-bg, var(--color-primary));
   color: var(--color-white, var(--color-white));
 }
 
 .prestacao-file-picker__upload:hover:not(:disabled) {
-  background: var(--cv-btn-primary-hover-bg, var(--color-primary-hover));
+  background: var(--btn-primary-hover-bg, var(--color-primary-hover));
 }
 
 .prestacao-file-picker__upload:disabled {

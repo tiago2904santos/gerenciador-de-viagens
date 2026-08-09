@@ -2,9 +2,9 @@
 
 .cv-summary-tile {
   background: var(--color-card);
-  border: var(--cv-card-border);
+  border: var(--card-border);
   border-radius: var(--radius-card);
-  box-shadow: var(--cv-card-shadow);
+  box-shadow: var(--card-shadow);
   display: grid;
   gap: var(--space-2);
   min-width: 0;

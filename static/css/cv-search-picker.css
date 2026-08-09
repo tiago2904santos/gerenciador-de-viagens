@@ -6,38 +6,38 @@
 
 /* Tokens globais — o dropdown flutuante (body) precisa destes valores */
 :root {
-  --cv-sp-field-bg: var(--theme-input-bg, var(--color-input-bg));
-  --cv-sp-field-bg-soft: var(--theme-surface-card-soft, var(--color-card-soft));
-  --cv-sp-field-border: var(--theme-input-border, var(--color-input-border));
-  --cv-sp-field-border-focus: var(--route-button-primary-border, var(--color-secondary));
-  --cv-sp-field-text: var(--theme-input-text, var(--color-input-text));
-  --cv-sp-field-focus-ring: var(--route-focus-ring, var(--color-info-border));
-  --cv-sp-dropdown-bg: var(--theme-surface-card, var(--color-card));
-  --cv-sp-dropdown-option-hover: var(--theme-list-row-hover, var(--color-primary-soft));
-  --cv-sp-selected-panel-bg: var(--theme-surface-card-soft, var(--color-card-soft));
-  --cv-sp-selected-panel-border: var(--theme-border-card, var(--color-border));
-  --cv-sp-selected-card-bg: var(--theme-surface-card, var(--color-card));
-  --cv-sp-selected-card-border: var(--theme-border-card, var(--color-border-soft));
+  --sp-field-bg: var(--theme-input-bg, var(--color-input-bg));
+  --sp-field-bg-soft: var(--theme-surface-card-soft, var(--color-card-soft));
+  --sp-field-border: var(--theme-input-border, var(--color-input-border));
+  --sp-field-border-focus: var(--route-button-primary-border, var(--color-secondary));
+  --sp-field-text: var(--theme-input-text, var(--color-input-text));
+  --sp-field-focus-ring: var(--route-focus-ring, var(--color-info-border));
+  --sp-dropdown-bg: var(--theme-surface-card, var(--color-card));
+  --sp-dropdown-option-hover: var(--theme-list-row-hover, var(--color-primary-soft));
+  --sp-selected-panel-bg: var(--theme-surface-card-soft, var(--color-card-soft));
+  --sp-selected-panel-border: var(--theme-border-card, var(--color-border));
+  --sp-selected-card-bg: var(--theme-surface-card, var(--color-card));
+  --sp-selected-card-border: var(--theme-border-card, var(--color-border-soft));
 }
 
 .cv-search-picker {
-  --field-bg: var(--cv-sp-field-bg);
-  --field-bg-soft: var(--cv-sp-field-bg-soft);
-  --field-border: var(--cv-sp-field-border);
+  --field-bg: var(--sp-field-bg);
+  --field-bg-soft: var(--sp-field-bg-soft);
+  --field-border: var(--sp-field-border);
   --field-border-hover: var(--color-border-strong);
-  --field-border-focus: var(--cv-sp-field-border-focus);
-  --field-text: var(--cv-sp-field-text);
+  --field-border-focus: var(--sp-field-border-focus);
+  --field-text: var(--sp-field-text);
   --field-placeholder: var(--color-input-placeholder);
-  --field-focus-ring: var(--cv-sp-field-focus-ring);
-  --dropdown-bg: var(--cv-sp-dropdown-bg);
-  --dropdown-border: var(--cv-sp-field-border-focus);
+  --field-focus-ring: var(--sp-field-focus-ring);
+  --dropdown-bg: var(--sp-dropdown-bg);
+  --dropdown-border: var(--sp-field-border-focus);
   --dropdown-shadow: var(--shadow-panel);
-  --dropdown-option-hover: var(--cv-sp-dropdown-option-hover);
+  --dropdown-option-hover: var(--sp-dropdown-option-hover);
   --dropdown-option-selected: var(--color-info-bg);
-  --selected-panel-bg: var(--cv-sp-selected-panel-bg);
-  --selected-panel-border: var(--cv-sp-selected-panel-border);
-  --selected-card-bg: var(--cv-sp-selected-card-bg);
-  --selected-card-border: var(--cv-sp-selected-card-border);
+  --selected-panel-bg: var(--sp-selected-panel-bg);
+  --selected-panel-border: var(--sp-selected-panel-border);
+  --selected-card-bg: var(--sp-selected-card-bg);
+  --selected-card-border: var(--sp-selected-card-border);
   --control-active-bg: var(--state-success-bg-active);
   --control-active-border: var(--state-success-border-hover);
   --control-active-text: var(--state-success-text-active);
@@ -50,12 +50,12 @@
   --remove-rail-width: calc(var(--space-10) + var(--space-2));
   --selected-card-open-gap: var(--space-2);
   --driver-bg: var(--color-bg-subtle, var(--color-primary-soft));
-  --driver-border: var(--cv-btn-secondary-active-border, var(--color-primary));
-  --driver-text: var(--cv-btn-secondary-active-color, var(--color-primary-strong));
-  --cv-search-picker-height: var(--control-height-md);
-  --cv-search-picker-radius: var(--radius-control);
-  --cv-search-picker-card-radius: var(--radius-card);
-  --cv-search-picker-focus-shadow: 0 0 0 var(--space-1) var(--field-focus-ring), var(--shadow-xs);
+  --driver-border: var(--btn-secondary-active-border, var(--color-primary));
+  --driver-text: var(--btn-secondary-active-color, var(--color-primary-strong));
+  --search-picker-height: var(--control-height-md);
+  --search-picker-radius: var(--radius-control);
+  --search-picker-card-radius: var(--radius-card);
+  --search-picker-focus-shadow: 0 0 0 var(--space-1) var(--field-focus-ring), var(--shadow-xs);
   display: grid;
   gap: var(--space-4);
   min-width: 0;
@@ -93,20 +93,20 @@
 /* Controle e dropdown repetem tokens — dropdown no body não herda do .cv-search-picker */
 .cv-search-picker__control,
 .cv-search-picker__dropdown {
-  --field-bg: var(--cv-sp-field-bg);
-  --field-bg-soft: var(--cv-sp-field-bg-soft);
-  --field-border: var(--cv-sp-field-border);
+  --field-bg: var(--sp-field-bg);
+  --field-bg-soft: var(--sp-field-bg-soft);
+  --field-border: var(--sp-field-border);
   --field-border-hover: var(--color-border-strong);
-  --field-border-focus: var(--cv-sp-field-border-focus);
-  --field-text: var(--cv-sp-field-text);
+  --field-border-focus: var(--sp-field-border-focus);
+  --field-text: var(--sp-field-text);
   --field-placeholder: var(--color-input-placeholder);
-  --field-focus-ring: var(--cv-sp-field-focus-ring);
-  --dropdown-bg: var(--cv-sp-dropdown-bg);
-  --dropdown-border: var(--cv-sp-field-border-focus);
+  --field-focus-ring: var(--sp-field-focus-ring);
+  --dropdown-bg: var(--sp-dropdown-bg);
+  --dropdown-border: var(--sp-field-border-focus);
   --dropdown-shadow: var(--shadow-panel);
-  --dropdown-option-hover: var(--cv-sp-dropdown-option-hover);
+  --dropdown-option-hover: var(--sp-dropdown-option-hover);
   --dropdown-option-selected: var(--color-info-bg);
-  --cv-search-picker-radius: var(--radius-control);
+  --search-picker-radius: var(--radius-control);
 }
 
 .cv-search-picker__control {
@@ -115,12 +115,12 @@
     linear-gradient(var(--field-bg), var(--field-bg)) padding-box,
     linear-gradient(var(--field-border), var(--field-border)) border-box;
   border: 1px solid transparent;
-  border-radius: var(--cv-search-picker-radius);
+  border-radius: var(--search-picker-radius);
   box-shadow: var(--shadow-xs);
   box-sizing: border-box;
   display: flex;
   gap: var(--space-2);
-  min-height: var(--cv-search-picker-height);
+  min-height: var(--search-picker-height);
   min-width: 0;
   padding: 0 var(--space-3);
   transition:
@@ -181,7 +181,7 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   line-height: 1.4;
-  min-height: calc(var(--cv-search-picker-height) - var(--space-3));
+  min-height: calc(var(--search-picker-height) - var(--space-3));
   min-width: 0;
   outline: 0;
   padding: 0;
@@ -250,7 +250,7 @@
   background: var(--danger-bg);
   align-self: stretch;
   border: 0;
-  border-radius: calc(var(--cv-search-picker-radius) - 1px) 0 0 calc(var(--cv-search-picker-radius) - 1px);
+  border-radius: calc(var(--search-picker-radius) - 1px) 0 0 calc(var(--search-picker-radius) - 1px);
   border-right: 1px solid var(--danger-border);
   box-shadow: none;
   color: var(--danger-text);
@@ -328,7 +328,7 @@
   animation: cv-search-picker-menu-in var(--transition-base) both;
   background: var(--dropdown-bg);
   border: 1px solid var(--dropdown-border);
-  border-radius: 0 0 var(--cv-search-picker-radius) var(--cv-search-picker-radius);
+  border-radius: 0 0 var(--search-picker-radius) var(--search-picker-radius);
   border-top: 0;
   box-shadow: var(--dropdown-shadow);
   box-sizing: border-box;
@@ -343,7 +343,7 @@
 
 .cv-search-picker__dropdown.cv-floating-dropdown--active {
   background: var(--dropdown-bg);
-  border-radius: var(--cv-search-picker-radius);
+  border-radius: var(--search-picker-radius);
   border-top: 1px solid var(--dropdown-border);
   overflow: hidden;
   /* Portal no body: precisa ficar acima do modal (--z-modal), senão o menu
@@ -352,7 +352,7 @@
 }
 
 .cv-search-picker--open .cv-search-picker__dropdown {
-  box-shadow: var(--cv-search-picker-focus-shadow), var(--dropdown-shadow);
+  box-shadow: var(--search-picker-focus-shadow), var(--dropdown-shadow);
   clip-path: inset(0 calc(var(--space-1) * -1) calc(var(--space-1) * -1) calc(var(--space-1) * -1));
 }
 
@@ -414,13 +414,13 @@
 }
 
 .cv-search-picker__option:first-child {
-  border-top-left-radius: calc(var(--cv-search-picker-radius) - var(--space-1));
-  border-top-right-radius: calc(var(--cv-search-picker-radius) - var(--space-1));
+  border-top-left-radius: calc(var(--search-picker-radius) - var(--space-1));
+  border-top-right-radius: calc(var(--search-picker-radius) - var(--space-1));
 }
 
 .cv-search-picker__option:last-child {
-  border-bottom-left-radius: calc(var(--cv-search-picker-radius) - var(--space-1));
-  border-bottom-right-radius: calc(var(--cv-search-picker-radius) - var(--space-1));
+  border-bottom-left-radius: calc(var(--search-picker-radius) - var(--space-1));
+  border-bottom-right-radius: calc(var(--search-picker-radius) - var(--space-1));
 }
 
 .cv-search-picker__option:hover,
@@ -530,7 +530,7 @@
 .cv-search-picker__selected-panel {
   background: var(--selected-panel-bg);
   border: 1px solid var(--selected-panel-border);
-  border-radius: var(--cv-search-picker-card-radius);
+  border-radius: var(--search-picker-card-radius);
   display: grid;
   gap: var(--space-3);
   min-width: 0;
@@ -591,7 +591,7 @@
   align-items: start;
   background: var(--selected-card-bg);
   border: 1px solid var(--selected-card-border);
-  border-radius: var(--cv-search-picker-radius);
+  border-radius: var(--search-picker-radius);
   box-shadow: var(--shadow-xs);
   display: grid;
   column-gap: 0;
@@ -775,7 +775,7 @@
   appearance: none;
   background: var(--field-bg-soft);
   border: 1px solid var(--selected-card-border);
-  border-radius: var(--cv-search-picker-radius);
+  border-radius: var(--search-picker-radius);
   color: var(--theme-text-body, var(--color-text));
   cursor: pointer;
   display: flex;
