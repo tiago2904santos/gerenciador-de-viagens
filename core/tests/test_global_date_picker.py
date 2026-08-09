@@ -106,7 +106,7 @@ class GlobalDatePickerTests(SimpleTestCase):
             Path(settings.BASE_DIR)
             / "static"
             / "css"
-            / "components"
+            / "fields"
             / "date-picker.css"
         )
         css = css_path.read_text(encoding="utf-8")
@@ -151,7 +151,7 @@ class GlobalDatePickerTests(SimpleTestCase):
             if source_path.name.endswith((".bundle.css", ".bundle.js")):
                 continue
             source = source_path.read_text(encoding="utf-8")
-            is_global_css = source_path == base_dir / "static" / "css" / "components" / "date-picker.css"
+            is_global_css = source_path == base_dir / "static" / "css" / "fields" / "date-picker.css"
             is_global_js = source_path == base_dir / "static" / "js" / "components" / "date-picker.js"
             is_template_or_form = source_path.suffix == ".html" or source_path.name == "forms.py"
             has_alternative = (

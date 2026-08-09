@@ -395,17 +395,17 @@ dono: **componentização por `django-cotton`**, **desenho único entre os temas
 
 O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta lista.
 
-- [ ] `NOVO-72` 🔴 `dev.txt` não puxa `test.txt` — o `--parallel 4` aborta em toda sessão remota · **E0**
-- [ ] `NOVO-67` a métrica de aceite do `PF-02` não tem instrumento; corpus de rotas com 14 telas mortas · **E0**
-- [ ] `NOVO-73` `audit_ui_patterns.py` está no ciclo obrigatório do `AGENTS.md` §4 e sai 1 sempre · **E0**
+- [ ] `NOVO-75` 🔴 `dev.txt` não puxa `test.txt` — o `--parallel 4` aborta em toda sessão remota · **E0**
+- [ ] `NOVO-70` a métrica de aceite do `PF-02` não tem instrumento; corpus de rotas com 14 telas mortas · **E0**
+- [ ] `NOVO-76` `audit_ui_patterns.py` está no ciclo obrigatório do `AGENTS.md` §4 e sai 1 sempre · **E0**
 - [ ] `JS-03` runner de teste de JavaScript — deixou de ser aditivo, virou pré-requisito · **E1**
-- [ ] `NOVO-66` `cv-select.js` (343 linhas) morto desde o PR #247, ainda no bundle · **E2**
-- [ ] `NOVO-69` `ui_lab2/` sobreviveu ao PR #247 · **E2**
-- [ ] `NOVO-70` nome e lugar de arquivo JS sem padrão · **E2**
+- [ ] `NOVO-69` `cv-select.js` (343 linhas) morto desde o PR #247, ainda no bundle · **E2**
+- [ ] `NOVO-72` `ui_lab2/` sobreviveu ao PR #247 · **E2**
+- [ ] `NOVO-73` nome e lugar de arquivo JS sem padrão · **E2**
 - [ ] `NOVO-48` 70 nomes de classe morta dentro de seletor agrupado vivo · **E2**
-- [ ] `NOVO-68` componente global sem contrato de parâmetro → `django-cotton` · **E3, E4, E5**
+- [ ] `NOVO-71` componente global sem contrato de parâmetro → `django-cotton` · **E3, E4, E5**
 - [ ] `HT-14` 275 de 946 includes não usam `only` — fecha por construção no cotton · **E5**
-- [ ] `NOVO-71` dois namespaces de componente, quatro pastas fantasma de `.gitkeep` · **E5**
+- [ ] `NOVO-74` dois namespaces de componente, quatro pastas fantasma de `.gitkeep` · **E5**
 - [ ] `HT-08` 82 `<button>` fora do sistema de componentes · **E6**
 - [ ] `HT-15` bloco `cv-itinerary` duplicado em 5 apps · **E6**
 - [ ] `NOVO-16` markup do picker copiado à mão em 3 templates e 5 arquivos JS · **E6**
@@ -415,7 +415,7 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [ ] `NOVO-51` as `--cv-*` que ainda são apelido, não token (PARCIAL) · **E7**
 - [ ] `NOVO-54` as 64 sobrescritas de `.cv-field__control` (PARCIAL) · **E7**
 - [ ] `NOVO-58` 🔴 claro e escuro são dois desenhos — o redesenho passa a valer no claro · **E8**
-- [ ] `UI-02` tema escuro deixa de ser camada de exceção (5.628 linhas, 190 `!important`) · **E9**
+- [ ] `UI-02` tema escuro deixa de ser camada de exceção (5.619 linhas, 190 `!important`) · **E9**
 - [ ] `UI-04` **97** imports de CSS de outro domínio, em **36** templates · **E10**
 - [ ] `HT-04` `base.html` carrega ~153 KB de JS de domínio em toda página · **E11**
 - [ ] `JS-07` "fechar ao clicar fora / Esc" em 4 cópias · **E11**

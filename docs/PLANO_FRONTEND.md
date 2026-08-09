@@ -197,7 +197,7 @@ arquivos; contraste medido (não estimado) nos pares alterados.
 > **Esta etapa virou [`PLANO_RECONSTRUCAO_FRONT_2026-08.md`](PLANO_RECONSTRUCAO_FRONT_2026-08.md).**
 > Os quatro IDs abaixo continuam válidos e estão distribuídos assim: `UI-04` na etapa E10,
 > `JS-07`/`JS-08`/`JS-09`/`JS-10` na E11. O documento novo acrescenta o que esta tabela não
-> previa — a componentização por `django-cotton` (`NOVO-68`) e o desenho único entre os temas
+> previa — a componentização por `django-cotton` (`NOVO-71`) e o desenho único entre os temas
 > (`NOVO-58`), que são a maior parte do trabalho.
 >
 > A tabela original fica abaixo como registro do dimensionamento de 05/08.

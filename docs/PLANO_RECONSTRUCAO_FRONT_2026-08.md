@@ -18,7 +18,7 @@ Antes de começar **qualquer** etapa:
 
 ```bash
 source .venv/bin/activate
-pip install -r requirements/test.txt     # enquanto o NOVO-72 estiver aberto
+pip install -r requirements/test.txt     # enquanto o NOVO-75 estiver aberto
 python manage.py test --settings=config.settings.test --parallel 4
 ```
 
@@ -51,8 +51,8 @@ etapa**; o que estiver diferente é trabalho que aconteceu no meio.
 
 | medida | 05/08 | **09/08** | comando |
 |---|---:|---:|---|
-| CSS de fonte | 43.038 | **32.940** em 60 arquivos | `find static/css -name '*.css' ! -name 'shell.bundle.css' -exec cat {} + \| wc -l` |
-| `theme-dark-components.css` | 5.843 | **5.628** | `wc -l static/css/components/theme-dark-components.css` |
+| CSS de fonte | 43.038 | **32.931** em 60 arquivos, em 8 pastas | `find static/css -name '*.css' ! -name 'shell.bundle.css' -exec cat {} + \| wc -l` |
+| `theme-dark-components.css` | 5.843 | **5.619** | `wc -l static/css/components/theme-dark-components.css` |
 | `!important` fora do bundle | 497 | **496** (190 no tema escuro) | `grep -ro '!important' static/css --include='*.css' \| grep -v shell.bundle \| wc -l` |
 | arquivos definindo `--color-*` | 9 | **9** | `grep -rl '^\s*--color-' static/css --include='*.css' \| grep -v shell.bundle` |
 | imports de CSS em template | 54 em 26 | **97 em 36** | `grep -rn "{% static 'css/" templates --include='*.html' \| wc -l` |
@@ -103,7 +103,7 @@ que se descobre que alguém dependia do que sumiu.
 
 ## 4. As etapas
 
-### E0 — A régua · `NOVO-72`, `NOVO-67`, `NOVO-73` · risco baixo · 3–4 d
+### E0 — A régua · `NOVO-75`, `NOVO-70`, `NOVO-76` · risco baixo · 3–4 d
 
 **Objetivo.** Tornar mensurável o que este plano promete: uso de CSS por rota e divergência entre
 os dois temas.
@@ -114,7 +114,7 @@ os dois temas.
 
 **Passo a passo.**
 
-1. **Primeiro o `NOVO-72`, sozinho no primeiro commit.** `requirements/dev.txt` ganha
+1. **Primeiro o `NOVO-75`, sozinho no primeiro commit.** `requirements/dev.txt` ganha
    `-r test.txt`. Sem isso o hook `.claude/hooks/session-start.sh:20` continua montando um
    ambiente onde o comando do `AGENTS.md` §7 aborta com `TypeError: cannot pickle 'traceback'
    object`, e nada abaixo é verificável. Prove rodando `--parallel 4` num venv limpo.
@@ -133,7 +133,7 @@ os dois temas.
    ruído numa medição anterior), e confirme que a ordem de captura não muda o resultado
    (claro→escuro e escuro→claro deram 0 diferenças exclusivas de uma ordem).
 5. **Passo no `tests.yml`**, depois do passo de desempenho, com teto que só desce.
-6. **`NOVO-73` — decidir o que é o `audit_ui_patterns.py`.** Ele está no ciclo obrigatório do
+6. **`NOVO-76` — decidir o que é o `audit_ui_patterns.py`.** Ele está no ciclo obrigatório do
    `AGENTS.md` §4, sai **1 sempre** (5.173 ocorrências hoje, na `main`) e **não está no
    `tests.yml`**. Ou vira catraca com teto, ou vira relatório e sai do §4 — mas não pode continuar
    sendo um verificador que ninguém pode passar, porque isso treina quem o roda a ignorar a saída.
@@ -152,7 +152,7 @@ python manage.py test --settings=config.settings.test --parallel 4
 não-cor (hoje ~45.726 diferenças em 20.203 elementos). Os dois só descem — o primeiro sobe, o
 segundo desce; declare o sentido no JSON para não inverter por engano.
 
-**Corpo do PR.** Etapa E0 · resolve `NOVO-72` e `NOVO-67` · a saída dos dois scripts colada,
+**Corpo do PR.** Etapa E0 · resolve `NOVO-75` e `NOVO-70` · a saída dos dois scripts colada,
 porque é a linha de base que todas as etapas seguintes citam.
 
 **Pare e pergunte.** Se o CDP não conseguir autenticar nas rotas que exigem login — decida com o
@@ -192,7 +192,7 @@ afrouxa para o PR passar.
 
 ---
 
-### E2 — Higiene: o morto e os nomes · `NOVO-66`, `NOVO-69`, `NOVO-70`, `NOVO-48` · risco baixo · 2 d
+### E2 — Higiene: o morto e os nomes · `NOVO-69`, `NOVO-72`, `NOVO-73`, `NOVO-48` · risco baixo · 2 d
 
 **Objetivo.** Tirar do caminho o que está morto e padronizar nome e lugar, antes que a
 componentização os carregue para dentro do desenho novo.
@@ -203,17 +203,17 @@ agrupados) · `docs/DATA_ATTRIBUTES_JS.md`
 
 **Passo a passo.**
 
-1. **`NOVO-66` — apagar `static/js/cv-select.js` (343 linhas).** Ele responde a
+1. **`NOVO-69` — apagar `static/js/cv-select.js` (343 linhas).** Ele responde a
    `data-cv-dropdown` e `data-cv-filter-dropdown`, e **nada no sistema emite esses atributos**: o
-   que sobrou são um comentário em `static/css/select.css:99,147-148`, a tabela de
+   que sobrou são um comentário em `static/css/fields/select.css:99,147-148`, a tabela de
    `docs/DATA_ATTRIBUTES_JS.md:118-124` e o histórico. O `JS-08` dizia "1 uso, sob `DEBUG` via
    `ui_lab2`" — o PR #247 apagou os labs e o uso virou zero. Tire-o também de `SHELL_JS`
    (`scripts/build_shell_bundles.py:74`) e regenere os bundles. Atualize a doc: o `HT-13` exige que
    ela descreva só o que existe. **Cuidado:** `custom-select` **não** é dele — quem atende esse
    markup é `components/picker-select.js`, via `data-entity-picker`. Não apague a família de CSS.
-2. **`NOVO-69` — apagar `ui_lab2/`.** Sobrou como diretório de `__pycache__`; não está em
+2. **`NOVO-72` — apagar `ui_lab2/`.** Sobrou como diretório de `__pycache__`; não está em
    `INSTALLED_APPS` nem no `urls.py`.
-3. **`NOVO-70` — nome e lugar.** `roteiros_wizard.js` → kebab-case; `pages/gdrive_config.js` →
+3. **`NOVO-73` — nome e lugar.** `roteiros_wizard.js` → kebab-case; `pages/gdrive_config.js` →
    `pages/gdrive-config.js`; e o domínio sai da raiz de `static/js/` para `pages/`
    (`roteiros.js`, `roteiros-map.js`, `roteiros_wizard.js`). Atualize `SHELL_JS`, os
    `{% block extra_js %}` que os citam e a doc.
@@ -233,7 +233,7 @@ python manage.py test --settings=config.settings.test --parallel 4
 
 **Catraca.** `audit_frontend_standards --max-warnings 246` (hoje 240) e `audit_css_morto --max 0`.
 
-**Corpo do PR.** Etapa E2 · resolve `NOVO-66`, `NOVO-69`, `NOVO-70`, `NOVO-48` · KB a menos no
+**Corpo do PR.** Etapa E2 · resolve `NOVO-69`, `NOVO-72`, `NOVO-73`, `NOVO-48` · KB a menos no
 bundle JS.
 
 **Pare e pergunte.** Nada aqui exige decisão. Se um `grep` voltar com hit que você não sabe
@@ -241,7 +241,7 @@ classificar, **não apague** — registre no catálogo e siga.
 
 ---
 
-### E3 — Cotton instalado, nada migrado · `NOVO-68` (parte) · risco **médio-alto** · 1 d
+### E3 — Cotton instalado, nada migrado · `NOVO-71` (parte) · risco **médio-alto** · 1 d
 
 **Objetivo.** Trocar o carregador de template sem tocar em um único template, para que a suíte
 prove que só o carregador mudou.
@@ -264,7 +264,7 @@ prova que existe aqui, e é suficiente **só** porque nada mais mudou.
 
 **Catraca.** Nenhuma nova. As existentes não podem mexer.
 
-**Corpo do PR.** Etapa E3 · `NOVO-68` (parte) · o diff de `settings` lado a lado, com a lista de
+**Corpo do PR.** Etapa E3 · `NOVO-71` (parte) · o diff de `settings` lado a lado, com a lista de
 loaders explicada linha a linha.
 
 **Pare e pergunte — este é o passo mecânico mais arriscado do plano.** Errar a lista de loaders não
@@ -274,7 +274,7 @@ pergunte antes de mesclar. E confira, com o servidor de pé, pelo menos uma tela
 
 ---
 
-### E4 — Os componentes globais viram cotton · `NOVO-68` · risco médio · 4–6 d
+### E4 — Os componentes globais viram cotton · `NOVO-71` · risco médio · 4–6 d
 
 **Objetivo.** Dar a cada componente global um contrato de parâmetro declarado, em vez de contexto
 herdado por acaso.
@@ -314,7 +314,7 @@ contrato, não a aparência. Diferença medida é defeito seu, não do desenho.
 **Catraca.** `audit_frontend_standards --max-warnings 246`, `audit_ui_patterns` sem crescer, e a
 régua de divergência da E0 estável.
 
-**Corpo do PR.** Etapa E4 · `NOVO-68` · quais famílias saíram, com usos antes e depois.
+**Corpo do PR.** Etapa E4 · `NOVO-71` · quais famílias saíram, com usos antes e depois.
 
 **Pare e pergunte.** Componente cujo contrato de parâmetro for ambíguo — o mesmo nome de variável
 significando coisas diferentes em chamadores diferentes. Não invente o contrato: registre e
@@ -322,7 +322,7 @@ pergunte.
 
 ---
 
-### E5 — Call sites migrados, cascas apagadas · `HT-14`, `NOVO-71` · risco médio · 4–6 d
+### E5 — Call sites migrados, cascas apagadas · `HT-14`, `NOVO-74` · risco médio · 4–6 d
 
 **Objetivo.** Fechar o "mudar o modelo muda todas as páginas" no motor, não na disciplina.
 
@@ -332,7 +332,7 @@ pergunte.
 
 1. App por app, um commit por app: `{% include "components/…" %}` vira `<c-…>`.
 2. Ao fim de cada família, apague a casca da E4.
-3. **`NOVO-71` — um namespace só.** Hoje existem dois (`components/*` e `components/ui/*`), mais
+3. **`NOVO-74` — um namespace só.** Hoje existem dois (`components/*` e `components/ui/*`), mais
    quatro pastas fantasma só com `.gitkeep` (`components/buttons`, `forms`, `modals`, `steppers`)
    enquanto os componentes reais moram em `components/ui/buttons/` etc., mais
    `components/form/` (singular, 37 usos) convivendo com `components/forms/` (plural, vazia).
@@ -352,7 +352,7 @@ python scripts/medir_divergencia_tema.py                           # sem mudanç
 **Catraca.** Regra nova no `audit_frontend_standards`: `{% include %}` de componente reprova. E o
 número de includes sem `only` vai a zero.
 
-**Corpo do PR.** Etapa E5 · resolve `HT-14` e `NOVO-71` · quantos call sites por app.
+**Corpo do PR.** Etapa E5 · resolve `HT-14` e `NOVO-74` · quantos call sites por app.
 
 **Pare e pergunte.** Template renderizado do Python por caminho (o caso do `create_draft.html`) —
 esses não aparecem em `grep` de template, e mudar o caminho quebra a view em silêncio.
@@ -399,7 +399,7 @@ comportamento. Registre e pergunte antes de trocar.
 
 **Objetivo.** Um vocabulário de token único, antes de reescrever qualquer aparência.
 
-**Arquivos.** `static/css/tokens.css` · `static/css/03-theme-dark.css` · e os sete que precisam
+**Arquivos.** `static/css/base/tokens.css` · `static/css/base/03-theme-dark.css` · e os sete que precisam
 parar de definir cor: `theme.css`, `components/theme-dark-components.css`, `page-shell.css`,
 `roteiros.css`, `usuarios.css`, `justificativas.css`, `gdrive-config.css`
 
@@ -449,7 +449,7 @@ desenho anterior — e é o que o sistema mostra para quem nunca escolheu tema.*
 
 | # | família | contagem de 07/08 | estado em 09/08 |
 |---|---|---:|---|
-| 8a | tipografia | 19.896 | ✅ **fechada pelo `NOVO-62`** — `Inter` empacotada em `static/vendor/fonts/inter/`, `--font-sans` em `tokens.css:176` valendo nos dois temas, `font-family` removido de `theme-dark-components.css:14` |
+| 8a | tipografia | 19.896 | ✅ **fechada pelo `NOVO-62`** — `Inter` empacotada em `static/vendor/fonts/inter/`, `--font-sans` em `base/tokens.css:176` valendo nos dois temas, `font-family` removido de `theme-dark-components.css:14` |
 | 8d | barra lateral | 976 | ✅ **fechada pelo `NOVO-63`** — `.sidebar*` divergente de 1.096 para **96**; a largura virou um token só |
 | 8e | `font-size`/`line-height` | 533 | ✅ **em quase tudo**: o `NOVO-63` mediu que **528 dos 533** eram a barra lateral |
 | 8f | altura de controle | 378 | ✅ **toda**: o `NOVO-63` mediu que os 378 eram a barra lateral |
@@ -489,11 +489,11 @@ print antes/depois nos dois temas, nas três larguras.
 **Objetivo.** `theme-dark-components.css` deixa de ser camada de exceção e vira consequência do
 token.
 
-**Contexto.** 5.628 linhas e 190 `!important` — o maior arquivo CSS do projeto depois do bundle.
+**Contexto.** 5.619 linhas e 190 `!important` — o maior arquivo CSS do projeto depois do bundle.
 Ele só é grande porque carrega **geometria**; com a E8 feita, o que sobra é diferença de cor, que
 o token resolve.
 
-**Prova.** `!important` fora do bundle caindo de 496; linhas do arquivo caindo de 5.628; a régua de
+**Prova.** `!important` fora do bundle caindo de 496; linhas do arquivo caindo de 5.619; a régua de
 divergência estável (a E9 não pode mudar aparência — a E8 já mudou).
 
 **Catraca.** Contagem de `!important` fora do bundle, nova, só desce.
@@ -513,7 +513,7 @@ quer o componente pare de levar o domínio junto.
 9. Em `templates/prestacoes_contas/index.html`, `oficios.css` (106 KB) chega com **0,0% de uso**.
 
 **Passo a passo.** Extraia os componentes compartilhados dos arquivos de domínio para
-`static/css/components/`, domínio por domínio, e derrube o import correspondente. Dimensione com a
+`fields/`, `actions/`, `lists/` e `feedback/`, domínio por domínio, e derrube o import correspondente. Dimensione com a
 régua da E0: o que não é usado na rota não devia estar sendo entregue nela.
 
 **Prova.** `scripts/medir_css_por_rota.py` — **é aqui que a métrica de aceite da frente inteira
@@ -575,7 +575,7 @@ A reconstrução termina quando, medido por comando e não por opinião:
   paralelo, em branch própria. A exceção é o `JS-10`, que depende do `BE-13`.
 - **Não renumera os IDs colididos do catálogo.** `NOVO-45`, `NOVO-49`, `NOVO-50` e `NOVO-51`
   aparecem duas vezes cada, por acidente de sessões paralelas. Renumerar quebra o rastro dos PRs
-  que já os citam; a colisão fica registrada e os IDs novos começam em `NOVO-66`.
+  que já os citam; a colisão fica registrada e os IDs novos começam em `NOVO-69`.
 - **Não persegue número de Lighthouse.** A régua é a deste documento e a do
   [`PLANO_DESEMPENHO.md`](PLANO_DESEMPENHO.md): KB, consultas, uso de CSS por rota e divergência
   entre temas — tudo reproduzível por comando.

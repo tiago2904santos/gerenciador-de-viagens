@@ -24,11 +24,21 @@ Origem: `AUD` = auditoria desta sessão · `MED` = medição direta no fio princ
 enunciado corrigido pela passada de verificação · `NOVO` = acrescentado depois da abertura do
 catálogo · `MOR` = código morto achado por varredura · `COR` = correção de rumo.
 
-> **Quatro números de `NOVO` estão duplicados, e ficam assim de propósito.** `NOVO-45`, `NOVO-49`,
-> `NOVO-50` e `NOVO-51` titulam duas entradas diferentes cada, por acidente de sessões paralelas.
-> Renumerar quebraria o rastro dos PRs que já os citam, então a colisão fica registrada aqui e
-> quem for citar um deles **diz também o domínio** (`NOVO-50/MED` é a paleta; `NOVO-50/PF`, o
-> `Nested Loop`). IDs novos começam em `NOVO-66`.
+> **Cinco números de `NOVO` estão duplicados, e ficam assim de propósito.** `NOVO-27`, `NOVO-45`,
+> `NOVO-49`, `NOVO-50` e `NOVO-51` titulam duas entradas diferentes cada, por acidente de sessões
+> paralelas. Renumerar quebraria o rastro dos PRs que já os citam, então a colisão fica registrada
+> aqui e quem for citar um deles **diz também o domínio** (`NOVO-50/MED` é a paleta; `NOVO-50/PF`,
+> o `Nested Loop`).
+>
+> **A regra que decide entre renumerar e conviver:** o número já foi citado em PR mesclado? Se sim,
+> conviva e desambigue pelo domínio. Se não, renumere — foi o que se fez com o levantamento de
+> 09/08, que nasceu em `NOVO-66`…`73` e virou `NOVO-69`…`76` quando os PRs #283 e #284 chegaram
+> primeiro à `main`.
+>
+> **E a causa, que continua aberta:** a numeração é descoberta lendo o maior `NOVO` do arquivo.
+> Duas sessões que começam juntas leem o mesmo número e reservam o mesmo ID. Cinco colisões em um
+> ciclo não é azar, é o método. Quem for fechar isso, feche com um comando que reserva
+> (`scripts/`), não com disciplina.
 
 ## A passada de verificação de 05/08
 
@@ -5097,22 +5107,144 @@ mesmo piso de ruído do `NOVO-64`: `.os-model-card` em `/ordens-servico/nova/`.
 - `docs/DATA_ATTRIBUTES_JS.md` citava `components/cv-date-picker.js`, e o `HT-13` exige que a doc só
   descreva o que existe. Os `data-cv-date-picker-*` **continuam**: atributo não é classe.
 
+### NOVO-66 ✅ RESOLVIDO · `NOVO` Os 60 arquivos de CSS passam a ser agrupados por função · MED · 0,5 d
+
+O dono pediu pastas "agrupadas por função". O critério anterior era só profundidade: **40 arquivos
+soltos na raiz** e 21 em `components/`, sem dizer nada sobre o que cada um faz — `buttons.css` e
+`oficios.css` moravam lado a lado, e um é componente do sistema enquanto o outro é a tela de um
+domínio.
+
+| pasta | arquivos | o que é |
+|---|---|---|
+| `base/` | 7 | token, tema, reset, utilitário |
+| `layout/` | 5 | a moldura da página |
+| `fields/` | 8 | entrada de dados |
+| `actions/` | 2 | botão e menu de ação |
+| `lists/` | 7 | listagem, card, cabeçalho de filtro |
+| `feedback/` | 6 | aviso, diálogo, métrica, carregamento |
+| `pages/` | 23 | tela de domínio, não componente |
+
+**Três ficam na raiz:** `style.css` (ponto de entrada dos `@import`), `shell.bundle.css` (gerado) e
+`components/theme-dark-components.css` — este último porque não pertence a família nenhuma: é o
+resíduo do redesenho que o `NOVO-58` está desmontando.
+
+**A ordem da cascata não muda.** `SHELL_CSS` e os `@import` de `style.css` mantêm a mesma sequência;
+só o caminho de cada entrada muda. Mover arquivo e reordenar cascata no mesmo PR tornaria qualquer
+diferença medida impossível de atribuir.
+
+**Medição: 0 elementos alterados em 41.950.** É o resultado exigido de um move.
+
+**A armadilha do caminho relativo.** `fonts.css` e `prestacoes-assinatura.css` referenciam
+`url("../vendor/fonts/…")`. Descer um nível quebra isso **em silêncio** — o navegador não reclama, a
+fonte simplesmente não carrega. Os dois ganharam um `../` a mais, e conferi no navegador que a
+`Inter` continua sendo baixada e usada (medição de largura, não `fonts.check()`).
+
+**Caminho montado por segmento escapa de substituição textual.** Os testes constroem
+`css_root / "components" / "action-system.css"`, com cada pedaço numa string. Trocar `css/components/…`
+por `css/actions/…` no texto não alcança isso: **43 testes quebraram** com `FileNotFoundError`.
+Corrigido com uma varredura que entende a forma `X / "pasta" / "arquivo.css"`.
+
+### NOVO-67 🟡 `NOVO` O auditor de padrões de front nunca varreu `static/css/components/` · CI · 0,5 d
+
+Descoberto pelo `NOVO-66`. `scripts/audit_frontend_standards.py:444` usava `CSS_DIR.glob("*.css")` —
+**varredura rasa**. Enquanto os componentes moravam um nível abaixo, eles simplesmente não entravam
+na conta: o auditor via 40 arquivos de 61.
+
+O move tornou isso visível de duas formas, nesta ordem:
+
+1. Com `glob` raso e os arquivos já em subpastas, os avisos caíram de **240 para 18** — o auditor
+   passou a enxergar 2 arquivos. **Catraca que desce por cegueira é pior que catraca nenhuma**, e
+   esse número teria passado no CI como se fosse melhora.
+2. Trocando para `rglob`, o número sobe para **354**: são **114 avisos de dívida preexistente** que
+   nunca foram contados.
+
+Neste PR a varredura passou a ser `rglob` (a correção de fato) e os 20 arquivos que vieram de
+`components/` entram numa lista `COBERTURA_ADIADA` explícita, com o motivo escrito no código. Assim
+o corpo medido continua idêntico ao de antes — 240 avisos —, e um PR que só move arquivo não carrega
+114 avisos alheios.
+
+**Abrir a cobertura é trabalho próprio**, com o número já medido: `240 → 354`. Os avisos se
+concentram em `actions/` (152) e `pages/` (128).
+
+### NOVO-68 🟠 PARCIAL · `NOVO` 155 regras de geometria deixam de depender do tema · UI · 1 d
+
+Terceiro recorte do `NOVO-58`, e o primeiro **mecânico** — os anteriores (barra lateral) foram
+regra a regra.
+
+**A transformação, e por que ela é segura:**
+
+```css
+:is(html[data-theme="dark"]) .x { padding: 8px; }
+              ↓
+:is(html[data-theme])        .x { padding: 8px; }
+```
+
+`[data-theme]` e `[data-theme="dark"]` têm **a mesma especificidade** — os dois são um seletor de
+atributo (0,1,0) — e a regra fica **no mesmo lugar** do arquivo, dentro do mesmo `@media` se houver.
+Nada muda de peso nem de posição na cascata: o escuro recebe exatamente o que já recebia, e o claro
+passa a receber a geometria.
+
+Isso só vale porque `data-theme` está **sempre presente**. Conferido no navegador nos três casos de
+`prefers-color-scheme` (claro, escuro e sem preferência): `theme-init.js` escreve o atributo em
+todos. Se faltasse, a regra não casaria e o elemento cairia na base clara — que é o comportamento de
+hoje, então nem assim haveria regressão.
+
+| | |
+|---|---|
+| regras desescopadas | **155** |
+| elementos melhorados no claro | **3.432** |
+| elementos alterados no escuro | **1** — o ruído conhecido |
+| divergência não-cor entre temas | 13.936 → **11.667** |
+
+**Por que só 155 e não 368.** A versão completa também **partia** os blocos mistos, separando
+geometria de cor em dois blocos irmãos — e chegava a derrubar a divergência de 13.936 para **1.826**,
+87%. Mas ela mexia em **88 elementos do tema escuro**, que deveria ficar intacto.
+
+Excluir os blocos que declaram *custom property* (o valor de um token pode alimentar outro bloco por
+herança, e partir muda de qual escopo ele é lido) levou de 88 para **9**. Os 9 restantes — todos
+`record-row`, trocando o fundo — **eu não consegui explicar**: as regras de `record-row` saíram
+byte-idêntica do transformador, só com o número de linha deslocado.
+
+Mudança sem explicação no tema que deveria ficar intacto é exatamente o que a medição existe para
+barrar. Então a partição fica **fora desta leva**, com o ganho já medido (11.667 → 1.826) para quando
+for investigada com calma.
+
+**O que resta no arquivo:** 590 seletores ainda escopados ao escuro contra 175 já globais.
+
+---
 ---
 
 ## Levantamento de 09/08/2026 — a reconstrução do front
 
-Sete defeitos achados ao medir o sistema para escrever o
+Oito defeitos achados ao medir o sistema para escrever o
 [`PLANO_RECONSTRUCAO_FRONT_2026-08.md`](PLANO_RECONSTRUCAO_FRONT_2026-08.md), que é a Fase 7 do
-plano mestre. Nenhum deles aparece nas medições de 05/08 — quatro são resíduo de PRs recentes, um é
-um instrumento que nunca existiu, e um é ambiente.
+plano mestre. Nenhum deles aparece nas medições de 05/08 — quatro são resíduo de PRs recentes, dois
+são instrumentos que não funcionam, e um é ambiente.
 
-### NOVO-66 🟡 `NOVO` `cv-select.js` está morto desde o PR #247 e continua no bundle de toda página · MOR · 0,25 d
+> **Estes IDs nasceram como `NOVO-66`…`NOVO-73` e foram renumerados para `NOVO-69`…`NOVO-76`.** Os
+> PRs #283 e #284 entraram na `main` enquanto este levantamento era escrito, e reservaram
+> `NOVO-66`, `NOVO-67` e `NOVO-68` para outros defeitos. Como estes aqui ainda não tinham sido
+> citados por nenhum PR mesclado, renumerá-los foi mais barato que criar a quinta colisão do
+> catálogo — que é o inverso da decisão tomada para as quatro colisões antigas, e pelo mesmo
+> critério: **o que manda é se o número já está em uso em PR mesclado.**
+>
+> **A colisão não foi acidente de sorte, foi de método.** Dois trabalhos de front correram em
+> paralelo na mesma semana, cada um lendo o "maior `NOVO` do catálogo" no seu próprio ponto de
+> partida. Enquanto a numeração for descoberta por leitura do arquivo, duas sessões simultâneas vão
+> reservar o mesmo número sempre que se cruzarem — e este catálogo já tem cinco provas disso.
+>
+> **O que o PR #283 mudou embaixo deste levantamento:** os 60 arquivos de CSS saíram da raiz para
+> oito pastas por função (`base/`, `layout/`, `fields/`, `actions/`, `lists/`, `feedback/`,
+> `components/`, `pages/`). Todos os caminhos citados abaixo e no plano de reconstrução já são os
+> novos. Os defeitos foram reconferidos depois do merge: **os oito continuam de pé**.
+
+### NOVO-69 🟡 `NOVO` `cv-select.js` está morto desde o PR #247 e continua no bundle de toda página · MOR · 0,25 d
 
 `static/js/cv-select.js` tem **343 linhas** e responde a `[data-cv-dropdown]` e
 `[data-cv-filter-dropdown]`. **Nada no sistema emite esses atributos.** A varredura em `templates/`,
 `static/js/` e nos treze apps devolve só três tipos de sobrevivente, nenhum deles um uso:
 
-- comentário e seletor em `static/css/select.css:99,147-148`;
+- comentário e seletor em `static/css/fields/select.css:99,147-148`;
 - a tabela de contrato em `docs/DATA_ATTRIBUTES_JS.md:118-124`;
 - relatórios em `docs/historico/`.
 
@@ -5126,7 +5258,7 @@ família de CSS junto com o JS quebraria os seletores customizados do sistema in
 
 **Fila:** etapa E2 do plano de reconstrução.
 
-### NOVO-67 🟠 `NOVO` A métrica de aceite do `PF-02` não tem instrumento no repositório · QA · 1,5 d
+### NOVO-70 🟠 `NOVO` A métrica de aceite do `PF-02` não tem instrumento no repositório · QA · 1,5 d
 
 O `PF-02` fixa o aceite da frente de front inteira em **uso de CSS acima de 35% por rota**, contra
 os 10,1%–11,8% medidos. **Nenhum script do repositório mede isso.** `scripts/medir_desempenho.py`
@@ -5145,7 +5277,7 @@ quais **14 são rotas de UI Lab que o PR #247 apagou** (`/dev/ui-lab/*` não res
 
 **Fila:** etapa E0 do plano de reconstrução, antes de tudo.
 
-### NOVO-68 🟠 `NOVO` Componente global não tem contrato de parâmetro · HT · 6+ d
+### NOVO-71 🟠 `NOVO` Componente global não tem contrato de parâmetro · HT · 6+ d
 
 **275 dos 946 `{% include %}`** do sistema não usam `only`. O componente lê o contexto que o
 chamador tem por acaso, e quebra quando outro chamador não tem — que é o `HT-14` pelo lado do
@@ -5162,7 +5294,7 @@ Trocar o carregador muda a resolução de **407 templates** de uma vez, e o modo
 
 **Fila:** etapas E3 (instalar), E4 (converter os 82 componentes) e E5 (migrar os call sites).
 
-### NOVO-69 ⚪ `NOVO` `ui_lab2/` sobreviveu à remoção do PR #247 · MOR · 0,1 d
+### NOVO-72 ⚪ `NOVO` `ui_lab2/` sobreviveu à remoção do PR #247 · MOR · 0,1 d
 
 O `BE-25` decidiu que nenhum dos dois UI Labs é o vigente e o PR #247 os apagou. `ui_lab2/` ficou
 para trás como diretório contendo só `__pycache__/*.pyc`. Não está em `INSTALLED_APPS`, não tem
@@ -5170,7 +5302,7 @@ rota, não tem fonte — é o rastro de um app que não existe mais.
 
 **Fila:** etapa E2.
 
-### NOVO-70 ⚪ `NOVO` Nome e lugar de arquivo JS sem padrão · MOR · 0,5 d
+### NOVO-73 ⚪ `NOVO` Nome e lugar de arquivo JS sem padrão · MOR · 0,5 d
 
 Duas divergências, nenhuma delas cosmética a longo prazo, porque é assim que o próximo
 desenvolvedor aprende o padrão errado:
@@ -5187,7 +5319,7 @@ os citam e `docs/DATA_ATTRIBUTES_JS.md`.
 
 **Fila:** etapa E2.
 
-### NOVO-71 🟡 `NOVO` Dois namespaces de componente concorrentes, com quatro pastas fantasma · HT · junto da E5
+### NOVO-74 🟡 `NOVO` Dois namespaces de componente concorrentes, com quatro pastas fantasma · HT · junto da E5
 
 `templates/components/` tem **duas gerações vivas ao mesmo tempo**:
 
@@ -5204,7 +5336,7 @@ não seguiu. Quem for criar um botão novo tem dois lugares plausíveis e nenhum
 **Fila:** etapa E5, junto da migração dos call sites — mover para `templates/cotton/` resolve os
 dois namespaces de uma vez, em vez de renomear duas vezes.
 
-### NOVO-72 🔴 `NOVO` O comando de suíte do `AGENTS.md` não funciona no ambiente que o projeto monta para os agentes · COR · 0,1 d
+### NOVO-75 🔴 `NOVO` O comando de suíte do `AGENTS.md` não funciona no ambiente que o projeto monta para os agentes · COR · 0,1 d
 
 `requirements/dev.txt` puxa `base.txt` e `lint.txt`, e **não puxa `test.txt`**. O hook
 `.claude/hooks/session-start.sh:20` instala só o `dev.txt`. Resultado: `tblib` e `coverage` nunca
@@ -5225,12 +5357,12 @@ um jeito que parece falha do trabalho do agente, não do ambiente.
 
 **Fila:** primeiro commit da etapa E0, antes de qualquer outra coisa.
 
-### NOVO-73 🟡 `NOVO` O `audit_ui_patterns.py` está no ciclo obrigatório e nunca pode passar · COR · 0,5 d
+### NOVO-76 🟡 `NOVO` O `audit_ui_patterns.py` está no ciclo obrigatório e nunca pode passar · COR · 0,5 d
 
 O `AGENTS.md` §4 manda rodar três auditores no passo 5 de toda tarefa, e um deles é
 `scripts/audit_ui_patterns.py`. **Ele sai 1 sempre** — hoje, na `main`, com 5.173 ocorrências
 informativas, das quais a esmagadora maioria é a regra `hex_or_rgba` disparando dentro dos próprios
-arquivos de token (`03-theme-dark.css:22-28` etc.), onde a cor literal é a definição e não um
+arquivos de token (`base/03-theme-dark.css:22-28` etc.), onde a cor literal é a definição e não um
 desvio.
 
 Ele também **não está no `tests.yml`** — os seis auditores do CI são `audit_frontend_standards`,

@@ -26,23 +26,23 @@ TEMPLATE_EXCEPTIONS: dict[str, dict] = {
 }
 
 CSS_EXCEPTIONS: dict[str, dict] = {
-    "static/css/forms.css": {
+    "static/css/fields/forms.css": {
         "reason": ".roteiro-editor__* permanece como dominio em CSS global; --route-* sao variaveis globais de tema.",
         "rules": {"domain_selector_in_global", "route_token_in_global", "hex_color_outside_tokens"},
     },
-    "static/css/cards.css": {
+    "static/css/lists/cards.css": {
         "reason": ".oficio-card em cards.css: domínio a mover para oficios.css (Prompt 5).",
         "rules": {"domain_selector_in_global"},
     },
-    "static/css/tokens.css": {
+    "static/css/base/tokens.css": {
         "reason": "Arquivo de tokens — cores hex são a definição original, permitidas aqui.",
         "rules": {"hex_color_outside_tokens"},
     },
-    "static/css/theme.css": {
+    "static/css/base/theme.css": {
         "reason": "Arquivo de tema — cores hex são a definição original, permitidas aqui.",
         "rules": {"hex_color_outside_tokens"},
     },
-    "static/css/03-theme-dark.css": {
+    "static/css/base/03-theme-dark.css": {
         "reason": "Official dark-theme token layer; literal values define semantic tokens.",
         "rules": {"hex_color_outside_tokens"},
     },
@@ -50,7 +50,7 @@ CSS_EXCEPTIONS: dict[str, dict] = {
         "reason": "Transitional dark-theme component overrides; literals allowed until dissolved into components.",
         "rules": {"hex_color_outside_tokens"},
     },
-    "static/css/auth.css": {
+    "static/css/pages/auth.css": {
         "reason": "CSS de autenticação — isolado, pode ter cores específicas.",
         "rules": {"hex_color_outside_tokens"},
     },
@@ -93,16 +93,47 @@ TEMPLATE_RULES_AVISO = [
 # ---------------------------------------------------------------------------
 # Regras de CSS
 # ---------------------------------------------------------------------------
+# Arquivos que viviam em `static/css/components/` e nunca foram auditados: a
+# varredura era rasa (`glob`), e o diretorio estava um nivel abaixo. O `NOVO-66`
+# os moveu para pastas por funcao e, de quebra, os traria para dentro da conta —
+# somando 114 avisos de divida PREEXISTENTE a uma catraca que so desce, num PR
+# que apenas move arquivo.
+#
+# A cobertura fica adiada para nao misturar as duas coisas. A lacuna esta
+# registrada como `NOVO-67`, com o numero ja medido: 240 -> 354.
+COBERTURA_ADIADA = {
+    "static/css/actions/action-system.css",
+    "static/css/feedback/dialog.css",
+    "static/css/feedback/document-download-loading.css",
+    "static/css/feedback/metric.css",
+    "static/css/feedback/notice.css",
+    "static/css/feedback/pendencias.css",
+    "static/css/feedback/summary-items.css",
+    "static/css/fields/date-picker.css",
+    "static/css/fields/field.css",
+    "static/css/fields/file-picker.css",
+    "static/css/fields/form-panel.css",
+    "static/css/fields/form-sections.css",
+    "static/css/layout/app-shell.css",
+    "static/css/lists/content-cards.css",
+    "static/css/lists/filter-header.css",
+    "static/css/lists/list-header.css",
+    "static/css/lists/list-tabs.css",
+    "static/css/lists/record-list.css",
+    "static/css/pages/document-generation-embedded.css",
+    "static/css/pages/document-viewer.css",
+}
+
 # Arquivos CSS globais onde seletores de domínio não devem aparecer
 GLOBAL_CSS = {
-    "static/css/forms.css",
-    "static/css/lists.css",
-    "static/css/cards.css",
-    "static/css/layout.css",
-    "static/css/base.css",
-    "static/css/utilities.css",
-    "static/css/stages.css",
-    "static/css/documents.css",
+    "static/css/fields/forms.css",
+    "static/css/lists/lists.css",
+    "static/css/lists/cards.css",
+    "static/css/layout/layout.css",
+    "static/css/base/base.css",
+    "static/css/base/utilities.css",
+    "static/css/layout/stages.css",
+    "static/css/pages/documents.css",
 }
 
 # Seletores de domínio que não devem estar em CSS global
@@ -441,8 +472,14 @@ def audit_templates() -> list[tuple]:
 
 def audit_css() -> list[tuple]:
     findings = []
-    for path in sorted(CSS_DIR.glob("*.css")):
+    # `rglob`, nao `glob`: o `NOVO-66` moveu 58 arquivos para subpastas, e com a
+    # varredura rasa o auditor passou a enxergar 2 arquivos em vez de 60 — os
+    # avisos cairiam de 240 para 18 sem nenhuma melhora no codigo. Catraca que
+    # desce por cegueira e pior que catraca nenhuma.
+    for path in sorted(CSS_DIR.rglob("*.css")):
         rp = rel(path)
+        if rp in COBERTURA_ADIADA:
+            continue
         # Bundle gerado (NOVO-12): auditar as fontes, não a concatenação.
         if path.name.endswith(".bundle.css"):
             continue
