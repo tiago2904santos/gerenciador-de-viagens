@@ -106,6 +106,23 @@ class TermoServidorPdfInlineTests(TestCase):
         self.oficio.servidores.add(self.servidor_ok)
         self.oficio.servidores_termo_autorizacao.add(self.servidor_ok)
 
+    def test_preview_html_renderiza_contexto_com_referencias_de_modelo(self):
+        response = self.client.get(reverse("termos:preview_termo_oficio", args=[self.oficio.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.servidor_ok.nome)
+
+    def test_preview_json_serializa_referencias_de_modelo(self):
+        response = self.client.get(
+            reverse("termos:preview_termo_oficio", args=[self.oficio.pk]),
+            {"format": "json"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["servidor"]["id"], self.servidor_ok.pk)
+        self.assertEqual(payload["servidores"][0]["texto"], str(self.servidor_ok))
+
     @mock.patch("termos.services._facade_termo_com_template")
     @mock.patch("termos.services.documento_gerado_from_artifact")
     @mock.patch("termos.services.get_cached_document_artifact")

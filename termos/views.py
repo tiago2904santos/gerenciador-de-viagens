@@ -7,6 +7,8 @@ from urllib.parse import urlencode
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Count
+from django.db.models import Model
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import JsonResponse
@@ -18,8 +20,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
 
 from core.retorno import voltar_para
-
-
+from cadastros.selectors import rotulo_da_sede_configurada
 from documentos.selectors import mapa_artefatos_pdf_termo_cadastro
 from documentos.selectors import mapa_artefatos_pdf_termo_cadastro_em_lote
 from documentos.services.async_generation import enfileirar_documento
@@ -42,8 +43,6 @@ from .card_builder import montar_card_de_termo
 from .selectors import get_servidor_do_termo_do_oficio
 from .selectors import get_servidor_para_termo
 from .selectors import get_termo_by_id
-from django.db.models import Count
-
 from .selectors import Q_SIMPLES
 from .selectors import anotar_composicao
 from .selectors import listar_termos
@@ -53,7 +52,15 @@ from .services import resolver_artefato_termo_cadastro
 from .services import resolver_artefato_termo_oficio
 from .services import termo_cadastro_assinado_info
 from .services import termo_oficio_tem_assinado
-from cadastros.selectors import rotulo_da_sede_configurada
+
+
+class DocumentoPreviewJSONEncoder(DjangoJSONEncoder):
+    """Representa referências de modelos sem tentar serializar o ORM inteiro."""
+
+    def default(self, obj):
+        if isinstance(obj, Model):
+            return {"id": obj.pk, "texto": str(obj)}
+        return super().default(obj)
 
 
 TERMOS_PER_PAGE = 15
@@ -717,7 +724,7 @@ def preview_termo_oficio(request, pk):
     ctx = preview_termo_context(oficio, servidor, modo_semipreenchido=modo)
     if request.GET.get("format") == "json":
         return HttpResponse(
-            json.dumps(ctx, cls=DjangoJSONEncoder, ensure_ascii=False, indent=2),
+            json.dumps(ctx, cls=DocumentoPreviewJSONEncoder, ensure_ascii=False, indent=2),
             content_type="application/json; charset=utf-8",
         )
     return render(
@@ -727,7 +734,6 @@ def preview_termo_oficio(request, pk):
             "page_title": f"Preview termo - Oficio {oficio.numero_formatado}",
             "oficio": oficio,
             "preview": ctx,
-            "preview_json": json.dumps(ctx, cls=DjangoJSONEncoder, ensure_ascii=False, indent=2),
             "validacao": aval,
         },
     )

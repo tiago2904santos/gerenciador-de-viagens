@@ -103,10 +103,16 @@ que se descobre que alguém dependia do que sumiu.
 
 ## 4. As etapas
 
-### E0 — A régua · `NOVO-75`, `NOVO-70`, `NOVO-76` · risco baixo · 3–4 d
+### E0 ✅ — A régua · `NOVO-75`, `NOVO-70`, `NOVO-76`, `NOVO-77`–`79` · risco baixo · concluída em 09/08/2026
 
 **Objetivo.** Tornar mensurável o que este plano promete: uso de CSS por rota e divergência entre
 os dois temas.
+
+**Resultado.** As 43 rotas foram medidas com usuário dedicado efêmero e base isolada. O CSS ficou
+entre **11,3369% e 70,5559%** de uso (11,3369%–19,2908% nas rotas autenticadas). A matriz de tema
+fez **129 medições** em 1440, 800 e 500 px: 61.700 elementos comparados, 248.651 diferenças
+não-cor e zero diferenças exclusivas entre as ordens claro→escuro e escuro→claro. Uma segunda
+execução, sem `--atualizar-tetos`, passou contra `scripts/tetos_front.json`.
 
 **Arquivos.** `requirements/dev.txt` · `scripts/rotas_do_sistema.py` (novo) ·
 `scripts/medir_css_por_rota.py` (novo) · `scripts/medir_divergencia_tema.py` (novo) ·

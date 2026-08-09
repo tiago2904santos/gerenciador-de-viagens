@@ -167,5 +167,5 @@ def justificativa_excluir(request, pk):
     return redirect("justificativas:index")
 
 
-def legacy_modelos_redirect(request):
+def legacy_modelos_redirect(request, pk=None):
     return redirect("justificativas:modelos_index")
