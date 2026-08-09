@@ -395,9 +395,12 @@ dono: **componentização por `django-cotton`**, **desenho único entre os temas
 
 O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta lista.
 
-- [ ] `NOVO-75` 🔴 `dev.txt` não puxa `test.txt` — o `--parallel 4` aborta em toda sessão remota · **E0**
-- [ ] `NOVO-70` a métrica de aceite do `PF-02` não tem instrumento; corpus de rotas com 14 telas mortas · **E0**
-- [ ] `NOVO-76` `audit_ui_patterns.py` está no ciclo obrigatório do `AGENTS.md` §4 e sai 1 sempre · **E0**
+- [x] `NOVO-75` 🔴 `dev.txt` não puxa `test.txt` — o `--parallel 4` aborta em toda sessão remota · **E0**
+- [x] `NOVO-70` a métrica de aceite do `PF-02` não tem instrumento; corpus de rotas com 14 telas mortas · **E0**
+- [x] `NOVO-76` `audit_ui_patterns.py` está no ciclo obrigatório do `AGENTS.md` §4 e sai 1 sempre · **E0**
+- [x] `NOVO-77` corpus antigo mantinha duas telas mortas além do UI Lab · **E0**
+- [x] `NOVO-78` fixture demo não acompanhou área obrigatória e seis modelos novos · **E0**
+- [x] `NOVO-79` duas rotas canônicas resolviam, mas respondiam 500 · **E0**
 - [ ] `JS-03` runner de teste de JavaScript — deixou de ser aditivo, virou pré-requisito · **E1**
 - [ ] `NOVO-69` `cv-select.js` (343 linhas) morto desde o PR #247, ainda no bundle · **E2**
 - [ ] `NOVO-72` `ui_lab2/` sobreviveu ao PR #247 · **E2**

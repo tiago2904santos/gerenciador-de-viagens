@@ -5258,7 +5258,7 @@ família de CSS junto com o JS quebraria os seletores customizados do sistema in
 
 **Fila:** etapa E2 do plano de reconstrução.
 
-### NOVO-70 🟠 `NOVO` A métrica de aceite do `PF-02` não tem instrumento no repositório · QA · 1,5 d
+### NOVO-70 ✅ RESOLVIDO (7a1e2e03, af97ac56) · `NOVO` A métrica de aceite do `PF-02` não tem instrumento no repositório · QA · 1,5 d
 
 O `PF-02` fixa o aceite da frente de front inteira em **uso de CSS acima de 35% por rota**, contra
 os 10,1%–11,8% medidos. **Nenhum script do repositório mede isso.** `scripts/medir_desempenho.py`
@@ -5275,7 +5275,11 @@ quais **14 são rotas de UI Lab que o PR #247 apagou** (`/dev/ui-lab/*` não res
 `ui_lab2` não está em `INSTALLED_APPS`). Sobram **43** reais. O corpus precisa sair de
 `screenshots/` — 39 MB que o `BE-24` quer tirar do repositório — e virar módulo em `scripts/`.
 
-**Fila:** etapa E0 do plano de reconstrução, antes de tudo.
+**Resolvido na E0.** `scripts/rotas_do_sistema.py` fixa as 43 rotas; os dois medidores usam
+Playwright/CDP com autenticação efêmera e gravam catracas por rota em `scripts/tetos_front.json`.
+A linha de base reproduzida em 09/08/2026 foi **11,3369%–70,5559%** de uso de CSS (o máximo é o
+login; nas rotas autenticadas, 11,3369%–19,2908%) e **248.651 diferenças não-cor** em 61.700
+elementos, 129 combinações de rota/largura. A captura inversa deu zero diferenças exclusivas.
 
 ### NOVO-71 🟠 `NOVO` Componente global não tem contrato de parâmetro · HT · 6+ d
 
@@ -5336,7 +5340,7 @@ não seguiu. Quem for criar um botão novo tem dois lugares plausíveis e nenhum
 **Fila:** etapa E5, junto da migração dos call sites — mover para `templates/cotton/` resolve os
 dois namespaces de uma vez, em vez de renomear duas vezes.
 
-### NOVO-75 🔴 `NOVO` O comando de suíte do `AGENTS.md` não funciona no ambiente que o projeto monta para os agentes · COR · 0,1 d
+### NOVO-75 ✅ RESOLVIDO (e6e9c3d2) · `NOVO` O comando de suíte do `AGENTS.md` não funciona no ambiente que o projeto monta para os agentes · COR · 0,1 d
 
 `requirements/dev.txt` puxa `base.txt` e `lint.txt`, e **não puxa `test.txt`**. O hook
 `.claude/hooks/session-start.sh:20` instala só o `dev.txt`. Resultado: `tblib` e `coverage` nunca
@@ -5355,9 +5359,10 @@ descrevem o sintoma com precisão na própria mensagem de falha.
 rodar. O defeito não quebra produção — quebra a capacidade de provar qualquer coisa, e o faz de
 um jeito que parece falha do trabalho do agente, não do ambiente.
 
-**Fila:** primeiro commit da etapa E0, antes de qualquer outra coisa.
+**Resolvido na E0.** `requirements/dev.txt` passou a incluir `test.txt`; ambientes de agente agora
+recebem `tblib`, `coverage` e Playwright pelo contrato de dependências do projeto.
 
-### NOVO-76 🟡 `NOVO` O `audit_ui_patterns.py` está no ciclo obrigatório e nunca pode passar · COR · 0,5 d
+### NOVO-76 ✅ RESOLVIDO (a70fe64b) · `NOVO` O `audit_ui_patterns.py` está no ciclo obrigatório e nunca pode passar · COR · 0,5 d
 
 O `AGENTS.md` §4 manda rodar três auditores no passo 5 de toda tarefa, e um deles é
 `scripts/audit_ui_patterns.py`. **Ele sai 1 sempre** — hoje, na `main`, com 5.173 ocorrências
@@ -5379,3 +5384,29 @@ catraca (com teto, no CI) ou relatório (e aí sai do §4 do `AGENTS.md`).
 **Cuidado ao consertar:** a etapa E4 do plano de reconstrução move componentes para
 `templates/cotton/`, e `IGNORED_PARTS` precisa acompanhar no mesmo PR — senão o número se move por
 mudança de escopo, não de qualidade.
+
+**Resolvido na E0.** Sem argumentos, o auditor virou relatório e sai zero; no CI, `--max 2622`
+torna os 2.622 achados reais uma catraca que só desce. O bundle gerado e as definições de tokens
+deixaram de ser contados como dívida duplicada.
+
+### NOVO-77 ✅ RESOLVIDO (7a1e2e03) · `NOVO` O corpus antigo tinha rotas mortas além do UI Lab · QA · 0,25 d
+
+Subtrair apenas as 14 rotas de UI Lab preservava `/oficios/<pk>/assinaturas/` e
+`/roteiros/<pk>/`, que já não têm tela própria. O corpus continuaria com 43 entradas, mas duas
+delas não mediriam uma interface viva. A E0 substituiu essas entradas pelas listas de Eventos e
+Prestações de Contas, que estavam vivas e ausentes, e adicionou testes de resolução, unicidade e
+contagem das 43 rotas.
+
+### NOVO-78 ✅ RESOLVIDO (f5f0b9cf) · `NOVO` O gerador demo não acompanhou os modelos por área · COR · 0,5 d
+
+`resetar_banco_demo` abortava em `Roteiro.area_id NOT NULL` e, depois desse primeiro bloqueio,
+deixava seis modelos novos com zero registros. Isso impedia criar a base efêmera exigida pelas
+réguas da E0. O comando voltou a criar cinco registros de todos os modelos de domínio, respeitando
+as áreas nas FKs e M2M, com teste de regressão para os modelos operacionais obrigatórios.
+
+### NOVO-79 ✅ RESOLVIDO (95f9f26d) · `NOVO` Duas rotas do corpus resolviam, mas respondiam 500 · COR · 0,25 d
+
+A navegação real da E0 encontrou dois defeitos que o teste de `resolve()` não alcançava:
+`/termos/oficio/<pk>/preview/` tentava serializar instâncias ORM com `DjangoJSONEncoder`, e
+`/justificativas/<pk>/editar/` encaminhava `pk` para uma view que não o aceitava. As duas rotas
+agora respondem, e cada falha ganhou teste de regressão.
