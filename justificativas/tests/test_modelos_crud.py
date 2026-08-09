@@ -66,6 +66,11 @@ class ModelosJustificativaCrudTests(TestCase):
         r2 = self.client.get(reverse("justificativas:modelos_index"))
         self.assertContains(r2, "MODELO A")
 
+    def test_rota_legada_com_pk_redireciona_sem_erro(self):
+        response = self.client.get(reverse("justificativas:legacy_modelo_update", args=[1]))
+
+        self.assertRedirects(response, reverse("justificativas:modelos_index"))
+
 
 class JustificativasQuickAddTests(TestCase):
     def setUp(self):
