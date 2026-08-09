@@ -54,8 +54,8 @@ class JavascriptNamespaceContractTests(SimpleTestCase):
 
     def test_roteiro_modules_share_one_cv_subtree(self):
         editor = self.sources["pages/roteiros/editor/index.js"]
-        map_engine = self.sources["roteiros-map.js"]
-        wizard = self.sources["roteiros_wizard.js"]
+        map_engine = self.sources["pages/roteiros-map.js"]
+        wizard = self.sources["pages/roteiros-wizard.js"]
         self.assertIn("window.CV.roteiros.editor", editor)
         self.assertIn("window.CV.roteiros.modules", editor)
         self.assertIn("window.CV.roteiros.map", map_engine)
