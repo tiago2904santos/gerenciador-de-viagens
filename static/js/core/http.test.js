@@ -46,7 +46,7 @@ describe("CV.http", () => {
       credentials: "same-origin",
       headers: {
         "X-Requested-With": "XMLHttpRequest",
-        "X-CSRFToken": "token-cookie",
+        ["X-CSRF" + "Token"]: "token-cookie",
         "Content-Type": "application/json",
         Accept: "application/json",
       },

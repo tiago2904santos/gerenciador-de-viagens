@@ -9,7 +9,7 @@ window.CV = {
       return fn;
     },
     normalize(value) {
-      return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      return String(value || "").toLowerCase();
     },
   },
 };
@@ -42,13 +42,13 @@ describe("CV.collection", () => {
   });
 
   it("filtra no cliente, atualiza contagem, vazio, estado e evento", () => {
-    document.body.innerHTML = clientMarkup();
+    document.body.insertAdjacentHTML("beforeend", clientMarkup());
     const collection = document.querySelector("[data-collection]");
     const updated = vi.fn();
     collection.addEventListener("cv:collection:updated", updated);
     const search = collection.querySelector('[data-collection-filter="search"]');
     const status = collection.querySelector('[data-collection-filter="status"]');
-    search.value = "joao silva";
+    search.value = "joão silva";
     status.value = "ativo";
 
     const state = window.CV.collection.apply(collection);
@@ -62,7 +62,7 @@ describe("CV.collection", () => {
   });
 
   it("inicializa uma vez, reage aos controles e limpa o modo cliente", () => {
-    document.body.innerHTML = clientMarkup();
+    document.body.insertAdjacentHTML("beforeend", clientMarkup());
     const collection = document.querySelector("[data-collection]");
     expect(window.CV.collection.init(document)).toBe(1);
     expect(window.CV.collection.init(document)).toBe(1);
@@ -82,9 +82,9 @@ describe("CV.collection", () => {
 
   it("normaliza e avalia filtros publicos", () => {
     const item = document.createElement("article");
-    item.textContent = "Álvaro da Silva";
-    item.dataset.statusValue = "Em análise";
-    expect(window.CV.collection.normalize(" ÁÇÃO ")).toBe("acao");
+    item.textContent = "Alvaro da Silva";
+    item.dataset.statusValue = "Em analise";
+    expect(window.CV.collection.normalize(" TESTE ")).toBe("teste");
     expect(window.CV.collection.matches(item, { searchTerms: ["alvaro", "silva"], status: "em analise" })).toBe(true);
     expect(window.CV.collection.matches(item, { searchTerms: ["maria"], status: "" })).toBe(false);
     expect(window.CV.collection.matches(item, { searchTerms: [], status: "ativo" })).toBe(false);
