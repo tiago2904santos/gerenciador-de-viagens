@@ -36,7 +36,7 @@ class FocoVisivelTests(SimpleTestCase):
     """`HT-01` — o anel de foco de teclado."""
 
     def test_o_token_do_anel_existe_nos_dois_temas(self):
-        for arquivo in ("static/css/tokens.css", "static/css/03-theme-dark.css"):
+        for arquivo in ("static/css/base/tokens.css", "static/css/base/03-theme-dark.css"):
             with self.subTest(arquivo=arquivo):
                 self.assertIn("--color-focus-visible-ring:", ler(arquivo))
 
@@ -47,7 +47,7 @@ class FocoVisivelTests(SimpleTestCase):
         folhas e `base.css` não é uma delas. Um piso só em `base.css` deixa de
         fora justamente a tela que o defeito citava.
         """
-        for arquivo in ("static/css/base.css", "static/css/auth.css"):
+        for arquivo in ("static/css/base/base.css", "static/css/pages/auth.css"):
             with self.subTest(arquivo=arquivo):
                 css = ler(arquivo)
                 self.assertIn(":focus-visible", css)
@@ -58,7 +58,7 @@ class FocoVisivelTests(SimpleTestCase):
         html = ler("templates/core/login.html")
 
         self.assertNotIn("base.css", html)
-        self.assertIn("css/auth.css", html)
+        self.assertIn("css/pages/auth.css", html)
 
     def test_o_anel_leva_offset(self):
         """No tema escuro o âmbar dá 2,07:1 contra a borda do campo.
@@ -66,7 +66,7 @@ class FocoVisivelTests(SimpleTestCase):
         Colado nela reprovaria; o afastamento põe o fundo ao lado do anel, onde
         a medida é 7,76:1. O offset é requisito de contraste, não enfeite.
         """
-        for arquivo in ("static/css/base.css", "static/css/auth.css"):
+        for arquivo in ("static/css/base/base.css", "static/css/pages/auth.css"):
             with self.subTest(arquivo=arquivo):
                 self.assertIn("outline-offset", ler(arquivo))
 
@@ -82,7 +82,7 @@ class SkipLinkDoLoginTests(SimpleTestCase):
 
     def test_o_estilo_do_skip_link_acompanha_a_tela_que_o_usa(self):
         """`app-shell.css` não entra nesta tela; sem isto o link ficaria visível."""
-        self.assertIn(".skip-link", ler("static/css/auth.css"))
+        self.assertIn(".skip-link", ler("static/css/pages/auth.css"))
 
 
 class ErroDeLoginAssociadoTests(TestCase):

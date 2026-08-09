@@ -12,7 +12,7 @@ class DocumentDownloadLoadingContractTests(SimpleTestCase):
             root / "static" / "js" / "components" / "document-download.js"
         ).read_text(encoding="utf-8")
         self.styles = (
-            root / "static" / "css" / "components" / "document-download-loading.css"
+            root / "static" / "css" / "feedback" / "document-download-loading.css"
         ).read_text(encoding="utf-8")
 
     def test_shell_expoe_status_acessivel_e_assets_globais(self):
@@ -27,7 +27,7 @@ class DocumentDownloadLoadingContractTests(SimpleTestCase):
         self.assertIn('role="status"', self.base)
         self.assertIn("css/shell.bundle.css", self.base)
         self.assertIn("js/shell.bundle.js", self.base)
-        self.assertIn(">>> css/components/document-download-loading.css >>>", css_bundle)
+        self.assertIn(">>> css/feedback/document-download-loading.css >>>", css_bundle)
         self.assertIn(">>> js/components/document-download.js >>>", js_bundle)
 
     def test_download_usa_resposta_real_e_preserva_nome_do_servidor(self):

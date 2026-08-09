@@ -11,7 +11,7 @@ class GlobalActionSystemTests(SimpleTestCase):
             Path(settings.BASE_DIR)
             / "static"
             / "css"
-            / "components"
+            / "actions"
             / "action-system.css"
         )
         self.css = self.css_path.read_text(encoding="utf-8")
@@ -94,6 +94,6 @@ class GlobalActionSystemTests(SimpleTestCase):
             base.index("{% block extra_css %}"),
         )
         self.assertLess(
-            bundle.index(">>> css/buttons.css >>>"),
-            bundle.index(">>> css/components/action-system.css >>>"),
+            bundle.index(">>> css/actions/buttons.css >>>"),
+            bundle.index(">>> css/actions/action-system.css >>>"),
         )
