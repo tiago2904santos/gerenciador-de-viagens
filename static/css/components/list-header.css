@@ -788,31 +788,31 @@
     linear-gradient(var(--color-card), var(--color-card)) padding-box,
     linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
   border: 1px solid transparent;
-  border-radius: var(--cv-field-radius);
+  border-radius: var(--radius-control);
   box-shadow: var(--cv-cs-trigger-shadow);
   color: var(--color-input-text);
   cursor: pointer;
   display: inline-flex;
   font-family: inherit;
-  font-size: var(--cv-field-font-size);
-  font-weight: var(--cv-cs-value-weight);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   gap: var(--space-2);
-  height: var(--cv-field-height);
-  min-height: var(--cv-field-height);
-  padding: 0 var(--cv-field-padding-x);
+  height: var(--control-height-md);
+  min-height: var(--control-height-md);
+  padding: 0 var(--space-3);
   transition: background var(--transition-fast), box-shadow var(--transition-fast);
   white-space: nowrap;
 }
 
 .travel-period-filter__btn:hover:not(:disabled) {
   background:
-    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
+    linear-gradient(var(--cv-field-bg-hover), var(--cv-field-bg-hover)) padding-box,
     linear-gradient(var(--color-secondary), var(--color-secondary)) border-box;
 }
 
 .travel-period-filter__btn:focus-visible {
   background:
-    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
+    linear-gradient(var(--cv-field-bg-hover), var(--cv-field-bg-hover)) padding-box,
     linear-gradient(var(--cv-select-border-focus), var(--cv-select-border-focus)) border-box;
   box-shadow: var(--cv-select-focus-shadow);
   outline: none;

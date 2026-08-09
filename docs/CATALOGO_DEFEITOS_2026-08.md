@@ -4711,3 +4711,54 @@ funcionando.
 **O que não entra aqui:** as outras 850 decisões divergentes do `NOVO-58` (fonte do sistema,
 `font-size`, raio, borda, largura da barra lateral). Aquilo é aplicar um redesenho ao tema claro e
 muda a aparência de todas as telas — precisa da decisão do dono, e este PR não a antecipa.
+
+### NOVO-51 (continuação) ✅ Poda dos 55 apelidos puros: `--cv-x: var(--y)` deixa de existir · MED · 0,5 d
+
+Terceira e maior leva do `NOVO-51`, e ataca exatamente o que o dono nomeou: *"tudo usando tokens
+dentro de tokens ao invés de só usar o token comum"*. `--cv-field-radius: var(--radius-control)` não
+é um token — é um segundo nome para um token, e quem lê a regra precisa de dois saltos para saber o
+valor.
+
+**`--cv-*` definidos: 230 → 176.** 58 definições apagadas, 149 usos reescritos, 17 arquivos.
+
+**Três travas, e cada uma existe porque já falhou antes:**
+
+1. **Apagar a definição, nunca renomeá-la.** Renomear para o alvo produz `--y: var(--y)` —
+   auto-referência, que o CSS invalida. Já custou 60 elementos sem cor numa página.
+2. **Só apelido definido no escopo raiz.** O filtro recusou `--cv-btn-docx-bg`,
+   `--cv-card-family-bg` e outros 20 por estarem dentro de `html[data-theme="dark"]` ou de um
+   componente: ali a troca deixa de ser mecânica, porque o alvo pode estar redefinido em outro
+   escopo.
+3. **Só `var(--y)` exato, sem fallback.** `var(--y, #e3eaf2)` carrega a decisão de o que fazer
+   quando `--y` não existe. Sete apelidos assim já moveram 9 bordas quando tratados como
+   equivalentes.
+
+Dos 230, **175 foram recusados** por uma dessas travas — a poda mecânica só alcança o que é
+provadamente mecânico. O alvo é resolvido **transitivamente**: `--cv-btn-height-md` →
+`--cv-btn-height` → `--control-height-md`, senão a troca só empurraria o salto adiante.
+
+**Um defeito meu, achado pela contagem depois de aplicar.** O apagador exigia `;` no fim da linha, e
+`--cv-btn-height-control: var(--control-height-md); /* 44px — emparelha com inputs */` tem comentário
+depois do ponto e vírgula. A definição sobreviveu à poda dos usos e virou órfã. Só apareceu porque
+conferi "definidos e não usados" em vez de confiar no relatório do próprio script. Removida, com a
+prova de ausência que o `AGENTS.md` §3.6 pede: `grep -rn -- "cv-btn-height-control"` em `static`,
+`templates` e nos 12 apps → **0**.
+
+**Medição: 0 elementos alterados** em 41.950, nas 88 telas (44 rotas × 2 temas), `getComputedStyle`.
+É o resultado exigido — apelido é por definição um nome a mais para o mesmo valor, então trocar o
+nome pelo valor não pode mudar pixel nenhum. Qualquer diferença aqui seria prova de que o apelido
+**não** era puro.
+
+### Anotação no `NOVO-58`: dois tokens só existem no tema escuro
+
+Levantado ao filtrar os apelidos por escopo. `--cv-card-family-bg` é definido só dentro de
+`html[data-theme="dark"]` (`03-theme-dark.css:126`) e lido em duas regras **sem escopo** de
+`list-header.css` (linhas 80 e 437); `--color-accent-text` tem um caso igual em
+`planos-trabalho-atividades.css:104`. Variável ausente invalida a declaração inteira, sem aviso.
+
+**Conferido no navegador, e NÃO é defeito visível:** no claro o token sai `""` e
+`.list-header__rail` fica `rgba(0,0,0,0)` — mas `.cv-record-card__band`, que o comentário da regra
+cita como par ("mesmo token da área interna dos cards"), também não é pintado no claro. Os dois
+combinam. É declaração que não faz nada, não fundo faltando. Fica registrado como higiene junto do
+resto do `NOVO-58`, não como correção urgente — e o `var(--x, fallback)` que já existe em dois usos
+do mesmo token (linhas 988 e 993) mostra que alguém já tropeçou nisto antes.

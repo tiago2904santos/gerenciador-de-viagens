@@ -12,17 +12,12 @@
    ========================================================= */
 :root {
   /* Régua única — tokens canônicos definidos em tokens.css */
-  --cv-btn-size: var(--cv-btn-height);
   --cv-btn-font-size: 0.86rem;
   --cv-btn-font-weight: 700;
-  --cv-btn-control-radius: var(--radius-control);
 
   /* Alturas derivadas */
   --cv-btn-height-xs:      28px;
   --cv-btn-height-sm:      32px;
-  --cv-btn-height-md:      var(--cv-btn-height);
-  --cv-btn-height-lg:      var(--control-height-lg);
-  --cv-btn-height-control: var(--control-height-md); /* 44px — emparelha com inputs */
 
   /* Padding por tamanho, mantido para compatibilidade */
   --cv-btn-padding-x-xs:      9px;
@@ -194,9 +189,9 @@ html[data-theme="light"] {
   align-items: center;
   justify-content: center;
   gap: var(--cv-btn-gap);
-  min-height: var(--cv-btn-height);
+  min-height: var(--control-height-md);
   padding: 0 var(--cv-btn-padding-x);
-  border-radius: var(--cv-btn-radius);
+  border-radius: var(--radius-pill);
   border: 1px solid transparent;
   font-family: var(--font-sans);
   font-size: var(--cv-btn-font-size);
@@ -436,9 +431,9 @@ html[data-theme="light"] {
 /* --- Icon (padding quadrado, compacto) --- */
 .cv-btn--icon {
   aspect-ratio: 1;
-  min-height: var(--cv-btn-height-md);
+  min-height: var(--control-height-md);
   padding: 0;
-  width: var(--cv-btn-height-md);
+  width: var(--control-height-md);
 }
 
 /* --- Pill (border-radius 999px explicito) --- */
@@ -465,7 +460,7 @@ html[data-theme="light"] {
 /* md e o default — sem classe adicional necessaria */
 
 .cv-btn--lg {
-  min-height: var(--cv-btn-height-lg);
+  min-height: var(--control-height-lg);
   padding: 0 var(--cv-btn-padding-x-lg);
   font-size: 1rem;
 }
@@ -473,9 +468,9 @@ html[data-theme="light"] {
 /* Altura de controle — emparelha com inputs (--control-height-md: 44px).
    Regra absoluta: todo botão ao lado de um input deve usar esta variante. */
 .cv-btn--control {
-  min-height: var(--cv-btn-height-control);
+  min-height: var(--control-height-md);
   padding: 0 var(--cv-btn-padding-x-control);
-  border-radius: var(--cv-btn-control-radius);
+  border-radius: var(--radius-control);
 }
 
 /* Icon sizes */
@@ -543,7 +538,7 @@ html[data-theme="light"] {
    ========================================================= */
 
 :root {
-  --cv-icon-btn-size: var(--cv-btn-size);
+  --cv-icon-btn-size: var(--control-height-md);
   --cv-icon-btn-size-sm: 32px;
   --cv-icon-btn-size-lg: 40px;
   --cv-icon-btn-icon-size: 18px;
@@ -1005,7 +1000,7 @@ html[data-theme="light"] {
   font-weight: var(--font-weight-semibold);
   gap: var(--space-2);
   justify-content: center;
-  min-height: var(--cv-btn-height);
+  min-height: var(--control-height-md);
   text-decoration: none;
   transition:
     background-color var(--transition-fast),

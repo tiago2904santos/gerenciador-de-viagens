@@ -532,15 +532,10 @@ html[data-theme="dark"] {
    -------------------------------------------------------------------------- */
 :root {
   /* Dimensões — chip é menor que o state button (control-height-md = 44px) */
-  --cv-chip-radius:            var(--radius-pill);
   --cv-chip-height:            26px;
   --cv-chip-height-compact:    20px;
-  --cv-chip-padding-x:         var(--space-3);
-  --cv-chip-padding-x-compact: var(--space-2);
   --cv-chip-gap:               6px;
   --cv-chip-icon-size:         13px;
-  --cv-chip-font-size:         var(--font-size-2xs);
-  --cv-chip-font-weight:       var(--font-weight-bold);
   --cv-chip-letter-spacing:    0.055em;
   --cv-chip-border-width:      1px;
   --cv-chip-focus-ring:        0 0 0 3px rgba(21, 91, 154, 0.22);
@@ -648,20 +643,20 @@ html[data-theme="light"] {
   align-items: center;
   background: var(--_cv-chip-bg);
   border: var(--cv-chip-border-width) solid var(--_cv-chip-border);
-  border-radius: var(--cv-chip-radius);
+  border-radius: var(--radius-pill);
   /* Mesma lógica do cv-state-button: glow semântico + sombra genérica */
   box-shadow: var(--_cv-chip-glow), var(--shadow-xs);
   box-sizing: border-box;
   color: var(--_cv-chip-color);
   display: inline-flex;
-  font-size: var(--cv-chip-font-size);
-  font-weight: var(--cv-chip-font-weight);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
   gap: var(--cv-chip-gap);
   letter-spacing: var(--cv-chip-letter-spacing);
   min-height: var(--cv-chip-height);
   line-height: 1;
   margin: 0;
-  padding: 0 var(--cv-chip-padding-x);
+  padding: 0 var(--space-3);
   text-transform: uppercase;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
   vertical-align: middle;
@@ -682,7 +677,7 @@ html[data-theme="light"] {
 
 .cv-chip--compact {
   min-height: var(--cv-chip-height-compact);
-  padding-inline: var(--cv-chip-padding-x-compact);
+  padding-inline: var(--space-2);
 }
 
 .cv-chip--interactive,
@@ -975,11 +970,8 @@ html[data-theme="light"] {
   --cv-form-section-header-bg:      var(--surface-form-panel);
   --cv-form-section-border:         var(--border-form-section);
   --cv-form-section-shadow:         var(--shadow-sm);
-  --cv-form-section-radius:         var(--radius-card);
   --cv-form-section-header-padding: var(--space-4) var(--space-6) var(--space-4) var(--space-10);
   --cv-form-section-body-padding:   var(--space-5) var(--space-6);
-  --cv-form-section-stack-gap:             var(--space-4);
-  --cv-form-section-stack-gap-comfortable: var(--space-8);
 
   /* --- Stepper --- */
   --stepper-padding-x:   var(--space-6);
@@ -1717,7 +1709,7 @@ html[data-theme="light"] {
   border:        none;
   border-radius: 0;
   box-shadow:    none;
-  gap:           var(--cv-form-section-stack-gap);
+  gap:           var(--space-4);
   overflow:      visible;
   padding:       0;
 }
@@ -1731,10 +1723,10 @@ html[data-theme="light"] {
 .cv-form-section-stack > .footer-actions,
 .cv-form-section-stack > form > .footer-actions {
   background:    var(--cv-form-section-bg);
-  border-radius: 0 0 var(--cv-form-section-radius) var(--cv-form-section-radius);
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
   border-top:    1px solid var(--cv-form-section-border);
   box-shadow:    var(--cv-form-section-shadow);
-  margin-top:    calc(-1 * var(--_stack-gap, var(--cv-form-section-stack-gap)));
+  margin-top:    calc(-1 * var(--_stack-gap, var(--space-4)));
 }
 
 /* Ponte: seções legadas do wizard dentro do stack (ofícios/roteiros) */
@@ -1743,7 +1735,7 @@ html[data-theme="light"] {
 .main-form-panel--stack .roteiro-editor--oficio .roteiro-editor__section {
   background:    var(--cv-form-section-bg);
   border:        1px solid var(--cv-form-section-border);
-  border-radius: var(--cv-form-section-radius);
+  border-radius: var(--radius-card);
   box-shadow:    var(--cv-form-section-shadow);
   overflow:      hidden;
   width:         100%;
@@ -1845,7 +1837,7 @@ html[data-theme="light"] {
    ========================================================= */
 
 .cv-form-section-stack {
-  --_stack-gap:   var(--cv-form-section-stack-gap);
+  --_stack-gap:   var(--space-4);
   display:        flex;
   flex-direction: column;
   gap:            var(--_stack-gap);
@@ -1853,7 +1845,7 @@ html[data-theme="light"] {
 }
 
 .cv-form-section-stack--comfortable {
-  --_stack-gap: var(--cv-form-section-stack-gap-comfortable);
+  --_stack-gap: var(--space-8);
   gap:          var(--_stack-gap);
 }
 
@@ -1862,14 +1854,14 @@ html[data-theme="light"] {
 .cv-form-section-stack > form {
   display:        flex;
   flex-direction: column;
-  gap:            var(--_stack-gap, var(--cv-form-section-stack-gap));
+  gap:            var(--_stack-gap, var(--space-4));
   width:          100%;
 }
 
 .cv-form-section-card {
   background:    var(--cv-form-section-bg);
   border:        1px solid var(--cv-form-section-border);
-  border-radius: var(--cv-form-section-radius);
+  border-radius: var(--radius-card);
   box-shadow:    var(--cv-form-section-shadow);
   overflow:      hidden;
   width:         100%;
@@ -3708,15 +3700,15 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 #quick-add-modelo-motivo .cv-field__control--textarea {
   background: var(--cv-field-bg);
   border: 1px solid var(--cv-field-border);
-  border-radius: var(--cv-field-radius);
-  box-shadow: var(--cv-field-shadow);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-xs);
   box-sizing: border-box;
   color: var(--color-input-text);
-  font-size: var(--cv-field-font-size);
+  font-size: var(--font-size-sm);
   height: var(--text-area-height-md);
   line-height: 1.5;
   min-height: var(--text-area-height-md);
-  padding: var(--space-3) var(--cv-field-padding-x);
+  padding: var(--space-3) var(--space-3);
   resize: vertical;
   transition:
     background-color var(--transition-fast),
@@ -3750,15 +3742,15 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
 #quick-add-atividade .cv-field__control--textarea {
   background: var(--color-input-bg);
   border: 1px solid var(--cv-field-border);
-  border-radius: var(--cv-field-radius);
-  box-shadow: var(--cv-field-shadow);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-xs);
   box-sizing: border-box;
   color: var(--color-input-text);
-  font-size: var(--cv-field-font-size);
+  font-size: var(--font-size-sm);
   height: var(--text-area-height-md);
   line-height: 1.5;
   min-height: var(--text-area-height-md);
-  padding: var(--space-3) var(--cv-field-padding-x);
+  padding: var(--space-3) var(--space-3);
   resize: vertical;
   transition:
     background-color var(--transition-fast),
@@ -3790,17 +3782,12 @@ html[data-theme="dark"] .cv-inline-create__toggle.is-filled:hover {
    ========================================================= */
 :root {
   /* Régua única — tokens canônicos definidos em tokens.css */
-  --cv-btn-size: var(--cv-btn-height);
   --cv-btn-font-size: 0.86rem;
   --cv-btn-font-weight: 700;
-  --cv-btn-control-radius: var(--radius-control);
 
   /* Alturas derivadas */
   --cv-btn-height-xs:      28px;
   --cv-btn-height-sm:      32px;
-  --cv-btn-height-md:      var(--cv-btn-height);
-  --cv-btn-height-lg:      var(--control-height-lg);
-  --cv-btn-height-control: var(--control-height-md); /* 44px — emparelha com inputs */
 
   /* Padding por tamanho, mantido para compatibilidade */
   --cv-btn-padding-x-xs:      9px;
@@ -3972,9 +3959,9 @@ html[data-theme="light"] {
   align-items: center;
   justify-content: center;
   gap: var(--cv-btn-gap);
-  min-height: var(--cv-btn-height);
+  min-height: var(--control-height-md);
   padding: 0 var(--cv-btn-padding-x);
-  border-radius: var(--cv-btn-radius);
+  border-radius: var(--radius-pill);
   border: 1px solid transparent;
   font-family: var(--font-sans);
   font-size: var(--cv-btn-font-size);
@@ -4214,9 +4201,9 @@ html[data-theme="light"] {
 /* --- Icon (padding quadrado, compacto) --- */
 .cv-btn--icon {
   aspect-ratio: 1;
-  min-height: var(--cv-btn-height-md);
+  min-height: var(--control-height-md);
   padding: 0;
-  width: var(--cv-btn-height-md);
+  width: var(--control-height-md);
 }
 
 /* --- Pill (border-radius 999px explicito) --- */
@@ -4243,7 +4230,7 @@ html[data-theme="light"] {
 /* md e o default — sem classe adicional necessaria */
 
 .cv-btn--lg {
-  min-height: var(--cv-btn-height-lg);
+  min-height: var(--control-height-lg);
   padding: 0 var(--cv-btn-padding-x-lg);
   font-size: 1rem;
 }
@@ -4251,9 +4238,9 @@ html[data-theme="light"] {
 /* Altura de controle — emparelha com inputs (--control-height-md: 44px).
    Regra absoluta: todo botão ao lado de um input deve usar esta variante. */
 .cv-btn--control {
-  min-height: var(--cv-btn-height-control);
+  min-height: var(--control-height-md);
   padding: 0 var(--cv-btn-padding-x-control);
-  border-radius: var(--cv-btn-control-radius);
+  border-radius: var(--radius-control);
 }
 
 /* Icon sizes */
@@ -4321,7 +4308,7 @@ html[data-theme="light"] {
    ========================================================= */
 
 :root {
-  --cv-icon-btn-size: var(--cv-btn-size);
+  --cv-icon-btn-size: var(--control-height-md);
   --cv-icon-btn-size-sm: 32px;
   --cv-icon-btn-size-lg: 40px;
   --cv-icon-btn-icon-size: 18px;
@@ -4783,7 +4770,7 @@ html[data-theme="light"] {
   font-weight: var(--font-weight-semibold);
   gap: var(--space-2);
   justify-content: center;
-  min-height: var(--cv-btn-height);
+  min-height: var(--control-height-md);
   text-decoration: none;
   transition:
     background-color var(--transition-fast),
@@ -5042,17 +5029,17 @@ html[data-theme="light"] {
     linear-gradient(var(--theme-surface-card), var(--theme-surface-card)) padding-box,
     linear-gradient(var(--cv-field-border, var(--color-border-strong)), var(--cv-field-border, var(--color-border-strong))) border-box;
   border: 1px solid transparent;
-  border-radius: var(--cv-field-radius);
+  border-radius: var(--radius-control);
   box-shadow: var(--shadow-xs);
   color: var(--theme-text-body);
   cursor: pointer;
   display: inline-flex;
   flex: 0 0 auto;
   font: inherit;
-  font-size: var(--cv-field-font-size);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   justify-content: center;
-  min-height: var(--cv-field-height);
+  min-height: var(--control-height-md);
   padding: 0 var(--space-4);
   transition:
     background-color var(--transition-fast),
@@ -5233,7 +5220,7 @@ html[data-theme="light"] {
 .cv-date-picker__footer-action:hover {
   background:
     linear-gradient(var(--cv-field-bg-hover), var(--cv-field-bg-hover)) padding-box,
-    linear-gradient(var(--cv-field-border-hover, var(--color-border-strong)), var(--cv-field-border-hover, var(--color-border-strong))) border-box;
+    linear-gradient(var(--color-border-strong, var(--color-border-strong)), var(--color-border-strong, var(--color-border-strong))) border-box;
 }
 
 .cv-date-picker__weekdays,
@@ -5601,7 +5588,7 @@ html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single:hove
   background: var(--cv-field-bg, var(--color-surface));
   border: var(--cv-field-border, 1px solid var(--color-border));
   border-radius: var(--radius-control, 10px);
-  box-shadow: var(--cv-field-shadow, none);
+  box-shadow: var(--shadow-xs, none);
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
   min-height: 56px;
@@ -5629,7 +5616,7 @@ html[data-theme="light"] .cv-date-picker .cv-date-picker__day--multi-single:hove
 
 .cv-file-picker:hover,
 .prestacao-file-picker:hover {
-  border-color: var(--cv-field-border-hover, var(--color-border-strong));
+  border-color: var(--color-border-strong, var(--color-border-strong));
 }
 
 .cv-file-picker:focus-within,
@@ -8801,7 +8788,7 @@ html[data-theme="light"] .cv-segment-toggle {
 .cv-summary-tile {
   background: var(--color-card);
   border: var(--cv-card-border);
-  border-radius: var(--cv-card-radius);
+  border-radius: var(--radius-card);
   box-shadow: var(--cv-card-shadow);
   display: grid;
   gap: var(--space-2);
@@ -9037,7 +9024,7 @@ html[data-theme="light"] .cv-segment-toggle {
 .cv-summary-tile {
   background: var(--color-card);
   border: var(--cv-card-border);
-  border-radius: var(--cv-card-radius);
+  border-radius: var(--radius-card);
   box-shadow: var(--cv-card-shadow);
   display: grid;
   gap: var(--space-2);
@@ -16152,31 +16139,31 @@ html[data-theme="dark"] *::after {
     linear-gradient(var(--color-card), var(--color-card)) padding-box,
     linear-gradient(var(--cv-select-border), var(--cv-select-border)) border-box;
   border: 1px solid transparent;
-  border-radius: var(--cv-field-radius);
+  border-radius: var(--radius-control);
   box-shadow: var(--cv-cs-trigger-shadow);
   color: var(--color-input-text);
   cursor: pointer;
   display: inline-flex;
   font-family: inherit;
-  font-size: var(--cv-field-font-size);
-  font-weight: var(--cv-cs-value-weight);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   gap: var(--space-2);
-  height: var(--cv-field-height);
-  min-height: var(--cv-field-height);
-  padding: 0 var(--cv-field-padding-x);
+  height: var(--control-height-md);
+  min-height: var(--control-height-md);
+  padding: 0 var(--space-3);
   transition: background var(--transition-fast), box-shadow var(--transition-fast);
   white-space: nowrap;
 }
 
 .travel-period-filter__btn:hover:not(:disabled) {
   background:
-    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
+    linear-gradient(var(--cv-field-bg-hover), var(--cv-field-bg-hover)) padding-box,
     linear-gradient(var(--color-secondary), var(--color-secondary)) border-box;
 }
 
 .travel-period-filter__btn:focus-visible {
   background:
-    linear-gradient(var(--cv-select-bg-hover), var(--cv-select-bg-hover)) padding-box,
+    linear-gradient(var(--cv-field-bg-hover), var(--cv-field-bg-hover)) padding-box,
     linear-gradient(var(--cv-select-border-focus), var(--cv-select-border-focus)) border-box;
   box-shadow: var(--cv-select-focus-shadow);
   outline: none;

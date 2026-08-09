@@ -681,7 +681,7 @@ html[data-theme="dark"] input[type="checkbox"] {
   --field-bg: var(--cv-field-bg);
   --field-bg-soft: var(--cv-field-bg-hover);
   --field-border: var(--cv-field-border);
-  --field-border-hover: var(--cv-field-border-hover);
+  --field-border-hover: var(--color-border-strong);
   --field-border-focus: var(--cv-field-border-focus);
   --field-text: var(--color-input-text);
 }
@@ -698,7 +698,7 @@ html[data-theme="dark"] input[type="checkbox"] {
   --field-bg: var(--cv-field-bg);
   --field-bg-soft: var(--cv-field-bg-hover);
   --field-border: var(--cv-field-border);
-  --field-border-hover: var(--cv-field-border-hover);
+  --field-border-hover: var(--color-border-strong);
   --field-border-focus: var(--cv-field-border-focus);
   --field-text: var(--color-input-text);
   --field-focus-ring: var(--cv-field-focus-ring);
@@ -724,15 +724,15 @@ html[data-theme="dark"] input[type="checkbox"] {
     linear-gradient(var(--field-bg), var(--field-bg)) padding-box,
     linear-gradient(var(--field-border), var(--field-border)) border-box;
   border: 1px solid transparent;
-  border-radius: var(--cv-field-radius);
-  box-shadow: var(--cv-field-shadow);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-xs);
   box-sizing: border-box;
   color: var(--field-text);
   height: var(--form-control-height);
   line-height: 1.25;
   max-height: var(--form-control-height);
   min-height: var(--form-control-height);
-  padding: 0 var(--cv-field-padding-x);
+  padding: 0 var(--space-3);
   transition:
     background var(--transition-fast),
     box-shadow var(--transition-fast);
@@ -746,7 +746,7 @@ html[data-theme="dark"] input[type="checkbox"] {
 }
 
 .main-form-panel .form-control::placeholder {
-  color: var(--cv-field-placeholder);
+  color: var(--color-input-placeholder);
   opacity: 1;
 }
 
@@ -759,14 +759,14 @@ html[data-theme="dark"] input[type="checkbox"] {
     linear-gradient(var(--field-bg), var(--field-bg)) padding-box,
     linear-gradient(var(--field-border), var(--field-border)) border-box;
   border: 1px solid transparent;
-  border-radius: var(--cv-field-radius);
-  box-shadow: var(--cv-field-shadow);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-xs);
   box-sizing: border-box;
   color: var(--field-text);
   height: var(--form-control-height);
   max-height: var(--form-control-height);
   min-height: var(--form-control-height);
-  padding: 0 calc(var(--space-6) + var(--space-2)) 0 var(--cv-field-padding-x);
+  padding: 0 calc(var(--space-6) + var(--space-2)) 0 var(--space-3);
   transition:
     background var(--transition-fast),
     box-shadow var(--transition-fast);
@@ -786,7 +786,7 @@ html[data-theme="dark"] input[type="checkbox"] {
     linear-gradient(var(--field-bg), var(--field-bg)) padding-box,
     linear-gradient(var(--field-border), var(--field-border)) border-box;
   border: 1px solid transparent;
-  box-shadow: var(--cv-field-shadow);
+  box-shadow: var(--shadow-xs);
   color: var(--field-text);
 }
 

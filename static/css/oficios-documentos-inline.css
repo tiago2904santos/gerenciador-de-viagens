@@ -5,7 +5,7 @@
 .travel-document-wizard__form:has(.oficio-documentos-preview-section) {
   display: flex;
   flex-direction: column;
-  gap: var(--_stack-gap, var(--cv-form-section-stack-gap));
+  gap: var(--_stack-gap, var(--space-4));
 }
 
 .travel-document-wizard__form:has(.oficio-documentos-preview-section) .cv-pendencias {

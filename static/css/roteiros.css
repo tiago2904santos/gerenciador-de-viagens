@@ -25,7 +25,7 @@
 #roteiro-editor-form {
   display: flex;
   flex-direction: column;
-  gap: var(--cv-form-section-stack-gap-comfortable);
+  gap: var(--space-8);
   font-size: 0;
   line-height: 0;
 }
@@ -36,7 +36,7 @@
 }
 
 .roteiro-editor__section--fonte {
-  margin-top: calc(-1 * var(--cv-form-section-stack-gap-comfortable));
+  margin-top: calc(-1 * var(--space-8));
 }
 
 .roteiro-editor .app-page-shell__inner.travel-document-wizard-shell {
@@ -1597,7 +1597,7 @@
 .roteiro-trechos-stack {
   display: flex;
   flex-direction: column;
-  gap: var(--cv-form-section-stack-gap, var(--space-4));
+  gap: var(--space-4, var(--space-4));
 }
 
 /* ── Deslocamentos (trechos + retorno): blocos planos, sem card interno ── */
@@ -2425,7 +2425,7 @@
   --roteiro-mapa-toolbar-border: transparent;
   background: var(--cv-form-section-bg, var(--route-card-bg));
   border: 0;
-  border-radius: var(--cv-form-section-radius, 13px);
+  border-radius: var(--radius-card, 13px);
   box-shadow: none;
   isolation: isolate;
   overflow: hidden;
@@ -2454,9 +2454,9 @@
 
 .roteiro-mapa__canvas-head .cv-btn {
   font-size: var(--font-size-xs);
-  height: var(--cv-btn-height);
-  max-height: var(--cv-btn-height);
-  min-height: var(--cv-btn-height);
+  height: var(--control-height-md);
+  max-height: var(--control-height-md);
+  min-height: var(--control-height-md);
   padding: 0 var(--space-3);
 }
 
@@ -2479,18 +2479,18 @@
   appearance: none;
   background: var(--cv-field-bg, var(--theme-input-bg));
   border: 1px solid var(--cv-field-border, var(--theme-input-border));
-  border-radius: var(--cv-field-radius, var(--radius-control));
-  box-shadow: var(--cv-field-shadow, var(--shadow-xs));
+  border-radius: var(--radius-control, var(--radius-control));
+  box-shadow: var(--shadow-xs, var(--shadow-xs));
   box-sizing: border-box;
   color: var(--color-input-text, var(--theme-input-text));
-  font-size: var(--cv-field-font-size, var(--font-size-sm));
-  min-height: var(--cv-field-height, var(--control-height-md));
-  padding: var(--cv-field-padding-y, 0) var(--cv-field-padding-x, var(--space-3));
+  font-size: var(--font-size-sm, var(--font-size-sm));
+  min-height: var(--control-height-md, var(--control-height-md));
+  padding: var(--cv-field-padding-y, 0) var(--space-3, var(--space-3));
   width: 100%;
 }
 
 .roteiro-editor__section--mapa .cv-field--readonly .cv-field__control {
-  background: var(--cv-field-readonly-bg, var(--route-field-disabled-bg));
+  background: var(--route-field-disabled-bg, var(--route-field-disabled-bg));
   border-color: var(--color-border-strong);
   box-shadow: none;
   color: var(--color-input-text, var(--theme-input-text));

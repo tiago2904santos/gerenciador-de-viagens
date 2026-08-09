@@ -235,7 +235,7 @@
   background: color-mix(in srgb, var(--color-primary, #0b3a66) 8%, var(--cv-field-bg, var(--color-surface)));
   border: 1px solid var(--cv-field-border, var(--color-border-soft));
   border-radius: var(--radius-control, 8px);
-  box-shadow: var(--cv-field-shadow, none);
+  box-shadow: var(--shadow-xs, none);
   list-style: none;
   margin-top: var(--space-2);
   min-width: 0;
@@ -268,7 +268,7 @@
   background: color-mix(in srgb, var(--color-primary, #0b3a66) 10%, var(--cv-field-bg, var(--color-surface)));
   border: 1px solid var(--cv-field-border-focus, var(--color-primary));
   border-radius: var(--radius-control, 8px);
-  box-shadow: var(--cv-field-shadow, none);
+  box-shadow: var(--shadow-xs, none);
   color: var(--color-info-text, var(--color-text));
   cursor: pointer;
   display: flex;
@@ -329,7 +329,7 @@
   border: 1px solid var(--cv-field-border-focus, var(--color-primary));
   border-radius: 0 0 var(--radius-control, 8px) var(--radius-control, 8px);
   border-top: 0;
-  box-shadow: var(--cv-field-shadow, none);
+  box-shadow: var(--shadow-xs, none);
   min-width: 0;
   overflow: hidden;
 }
@@ -411,7 +411,7 @@
   background: var(--cv-field-bg, var(--color-surface));
   border: 1px solid var(--cv-field-border, var(--color-border-soft));
   border-radius: var(--radius-control, 8px);
-  box-shadow: var(--cv-field-shadow, none);
+  box-shadow: var(--shadow-xs, none);
   display: flex;
   min-height: 54px;
   min-width: 0;
@@ -420,7 +420,7 @@
 }
 
 .prestacao-file-picker:hover {
-  border-color: var(--cv-field-border-hover, var(--color-border-strong));
+  border-color: var(--color-border-strong, var(--color-border-strong));
 }
 
 .prestacao-file-picker:focus-within {
