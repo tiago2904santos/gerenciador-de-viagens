@@ -12,6 +12,33 @@ ROOT = Path(settings.BASE_DIR)
 COTTON = ROOT / "templates" / "cotton"
 SEARCH_SUFFIXES = {".html", ".py", ".js"}
 
+# As duas listas abaixo são travas de regressão, não inventário: nomeiam componentes que
+# o projeto apagou pagando a prova de grep do `AGENTS.md` §3.6. O guarda de órfão pega um
+# deles se voltar sem consumidor; estas listas pegam o caso que ele não vê — voltar
+# **e ser usado**, que é como componente morto reaparece na prática.
+APAGADOS_PELO_HT06 = (
+    "perfil/gdrive_card.html",
+    "perfil/partials/_gdrive_card_header_meta.html",
+    "ui/filters/advanced_filters.html",
+    "ui/filters/search_input.html",
+    "ui/lists/list_card_actions.html",
+    "lists/main_list_card.html",
+    "lists/list_filters.html",  # órfão em cascata do anterior
+)
+
+APAGADOS_COM_O_LAB = (
+    "ui/buttons/field_action_button.html",
+    "ui/buttons/floating_primary_action.html",
+    "ui/buttons/footer_action.html",
+    "ui/forms/dropdown.html",
+    "ui/layouts/collection_header.html",
+    "lists/list_grid.html",
+    "ui/tables/data_table.html",
+    # Segunda ordem: os citadores dele eram `list_grid.html` (acima) e `ui_lab2/views.py`
+    # (PR #247). O `HT-06` o mediu vivo porque ambos ainda existiam.
+    "cards/document_card.html",
+)
+
 
 def _sources() -> list[Path]:
     ignored = {".git", ".venv", "__pycache__"}
@@ -69,3 +96,39 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
     def test_namespace_unico_tem_o_inventario_atual(self):
         self.assertEqual(list((ROOT / "templates" / "components").rglob("*.*")), [])
         self.assertEqual(len(self.components()), 85)
+
+    def test_os_apagados_do_HT06_nao_voltaram(self):
+        """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.
+
+        A E5 apagou esta trava junto com o diretório `templates/components/`: quando o
+        diretório inteiro sumiu, `(COMPONENTES / rel).exists()` virou vacuamente
+        verdadeira e o teste foi removido em vez de reapontado (`NOVO-80`). O caminho
+        mudou; a lista, não — a E4 preservou a forma da árvore ao mover para
+        `templates/cotton/`.
+        """
+        voltaram = [rel for rel in APAGADOS_PELO_HT06 if (COTTON / rel).exists()]
+        self.assertEqual(voltaram, [], "componente apagado pelo HT-06 voltou")
+
+    def test_os_apagados_da_cascata_do_be25_nao_voltaram(self):
+        """Idem para a cascata do `NOVO-44` e para o que caiu com o UI Lab (PR #247)."""
+        voltaram = [rel for rel in APAGADOS_COM_O_LAB if (COTTON / rel).exists()]
+        self.assertEqual(voltaram, [], "componente apagado com o lab voltou")
+
+    def test_as_travas_nomeadas_pegam_o_que_o_guarda_de_orfao_nao_ve(self):
+        """O buraco do `NOVO-80` foi medido, não suposto.
+
+        Ressuscitando `ui/forms/dropdown.html`:
+
+          volta sem consumidor -> guarda de órfão pega, trava nomeada pega
+          volta COM consumidor -> guarda de órfão passa, trava nomeada pega
+
+        A segunda linha é o defeito, e é como componente morto reaparece na prática:
+        alguém copia de branch antiga e já sai usando. Este teste prende a razão de as
+        duas listas existirem, para que a próxima etapa não as apague de novo achando
+        que o guarda de órfão já cobre o caso.
+        """
+        nomeados = set(APAGADOS_PELO_HT06) | set(APAGADOS_COM_O_LAB)
+        vivos = {str(path.relative_to(COTTON)) for path in self.components()}
+        self.assertEqual(nomeados & vivos, set())
+        # com consumidor, o guarda de órfão não teria o que reclamar — só a lista pega
+        self.assertIn("ui/forms/dropdown.html", nomeados)

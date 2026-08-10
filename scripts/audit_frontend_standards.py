@@ -515,6 +515,14 @@ def audit_js() -> list[tuple]:
         # Bundle gerado (NOVO-12): auditar as fontes, não a concatenação.
         if path.name.endswith(".bundle.js"):
             continue
+        # Teste de JS (JS-03): não é código entregue ao navegador, e o que ele monta
+        # para exercitar uma regra — `innerHTML` de fixture, classe usada como asserção —
+        # é exatamente o que estas regras proíbem no código de produção. Sem esta linha,
+        # escrever teste consome a folga do teto e reprova o CI por escrever teste
+        # (`NOVO-81`). Hoje o único teste existente não dispara nada; a trava é para o
+        # próximo, não para este.
+        if path.name.endswith(".test.js"):
+            continue
         try:
             lines = path.read_text(encoding="utf-8").splitlines()
         except UnicodeDecodeError:
