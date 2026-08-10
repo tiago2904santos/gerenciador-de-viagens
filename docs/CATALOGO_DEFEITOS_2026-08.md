@@ -5625,3 +5625,90 @@ folga e reprova o CI por escrever teste.
 
 Hoje o defeito é latente: o único `*.test.js` do repositório (`state-toggle.test.js`, da E6) não
 dispara nenhuma regra. A trava é para o próximo, e o custo dela é uma linha.
+
+### NOVO-83 🔴 · `NOVO` As duas réguas da E0 não sobem o navegador na sessão remota · COR · 0,25 d
+
+Irmão do `NOVO-72`, e o mesmo formato: **o comando que o projeto manda rodar não roda no ambiente
+que o próprio projeto monta para os agentes.**
+
+`medir_divergencia_tema.py:266` e `medir_css_por_rota.py:199` chamavam `playwright.chromium.launch()`
+sem `executable_path`. Isso procura um build de Chromium casado com a versão do pacote pip — hoje
+`playwright==1.62.0`, que espera o build **1234**.
+
+No CI funciona, porque `tests.yml:391` roda `python -m playwright install --with-deps chromium` e
+baixa o build certo. Na sessão remota, não: a imagem já traz o Chromium em
+`PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`, no build **1194**, e o ambiente pede explicitamente
+para **não** rodar `playwright install`. O launch morre com
+
+    Executable doesn't exist at .../chromium_headless_shell-1234/chrome-headless-shell
+
+Por que isso importa mais do que parece: a **E8 inteira** depende dessas duas réguas. O plano diz,
+com todas as letras, que a primeira coisa da E8 é remedir — "número velho é o quarto erro que mata
+um ciclo" — e a catraca da etapa é a divergência não-cor caindo. Sem o navegador subir, a E8 fica
+sem prova e sem catraca, e a alternativa seria mexer em 43 telas no olho.
+
+Descobri tentando fazer exatamente isso: rodar a régua para reescrever a tabela do enunciado.
+
+**Resolvido** por `scripts/navegador_medicao.py`: tenta o caminho normal primeiro e só cai para o
+build instalado quando o esperado não existe, e só quando o erro é esse — outro erro sobe sem
+disfarce. No CI o primeiro caminho sempre funciona, então lá nada muda.
+`core/tests/test_navegador_medicao.py` prende as duas metades, mais uma trava de regressão que
+reprova se alguma régua voltar ao `launch()` cru.
+
+**Segundo tropeço, no mesmo caminho.** Com o navegador de pé, a régua ainda parava em
+`oficios-detalhe: HTTP 404 em /oficios/1/`. O registro existe; o que faltava era o usuário de
+medição ter **vínculo de área** — o sistema é escopado por `AreaTrabalho`, e sem
+`VinculoUsuarioArea` as rotas de detalhe respondem 404. O `.github/workflows/tests.yml` faz esse
+vínculo; o `AGENTS.md` §7 não menciona, e quem rodar a régua à mão sem ler o workflow cai nele.
+
+### NOVO-84 🔴 · `NOVO` A régua de tema reprovava `roteiros-editar@500` — e tinha razão · COR · 0,5 d
+
+Com o `NOVO-83` resolvido, a régua da E0 finalmente subiu o navegador e parou noutro ponto:
+
+    RuntimeError: a ordem de captura alterou o resultado:
+    168 exclusivos claro→escuro; 164 exclusivos escuro→claro
+
+A mensagem não dizia **qual rota**. Deduzi contando linhas do log: `roteiros-editar@500` — e só a
+500 px; a 1440 e a 800 a mesma rota passava.
+
+**A trava estava certa, e não foi afrouxada.** Capturando as chaves exclusivas dentro da corrida, as
+332 são **todas** de propriedade derivada de layout (`height`, `width`, `transform-origin`,
+`perspective-origin`, `grid-template-*`) em 38 containers. Nenhuma é de estilo. E o valor do tema
+claro é idêntico nas duas ordens; só o do escuro muda:
+
+| ordem da captura | claro | escuro |
+|---|---|---|
+| claro→escuro | 4374.84px | **4367.39px** |
+| escuro→claro | 4374.84px | **4423.39px** |
+
+As duas leituras do escuro acontecem em sequência **sem troca de tema entre elas** — a captura 1
+termina em escuro e a captura 2 começa reaplicando escuro. A página cresceu **56px sozinha**. O
+número não era reprodutível porque a página não tinha parado de mudar: `networkidle` diz que a rede
+calou, não que o layout assentou.
+
+**Duas hipóteses caíram no caminho, e vale registrar para ninguém repetir:**
+
+- *"O DOM muda entre as capturas e desloca os índices"* — as chaves são `(índice, propriedade, …)`,
+  então parecia óbvio. Medido: **1142 elementos, constante**, inclusive através de quatro trocas de
+  tema. Falsa.
+- *"É corrida de temporização"* — duas corridas completas deram **168/164 idênticos**. Falsa.
+
+**A primeira correção também errou o lugar.** Pus a espera de estabilidade **antes** da primeira
+captura, com a página em tema claro. Não adiantou, e quem desmentiu foi a mensagem de erro que eu
+tinha acabado de melhorar: `layout estável: True` com a falha intacta. O crescimento vem **depois**
+da troca de tema, não antes dela — a espera passou para dentro do `apply()`, valendo em toda
+aplicação de tema.
+
+**Resolvido.** `settle()` deixa de ser dois `requestAnimationFrame` e passa a acompanhar
+`scrollHeight`/`scrollWidth` até três leituras iguais, com teto de orçamento. Verificado no repro
+real (a corrida completa de 500 px pelo script, que é onde a falha aparecia): **as 42 rotas mediram,
+`roteiros-editar@500` inclusive**. O teste isolado não serve de prova aqui — a rota sozinha já
+passava 10 de 10 **antes** da correção.
+
+Fica também o diagnóstico melhor: quando a trava disparar, o erro passa a dizer qual rota é e se a
+página chegou a assentar, que é o que separa "o instrumento falhou" de "a página não para de mudar".
+
+**E fica um achado sobre o sistema, não sobre o instrumento:** trocar para o tema escuro dispara
+relayout assíncrono no editor de roteiro a 500 px, com 56px de crescimento. Isso é **comportamento**,
+não pintura, e mora perto da família 8h da E8 (a gaveta da barra lateral, que também é comportamento
+e também só existe abaixo de 840 px). Vale investigar junto quando a 8h for executada.
