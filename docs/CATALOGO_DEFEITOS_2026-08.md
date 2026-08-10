@@ -6206,3 +6206,44 @@ tabela do plano**.
 inteiro só existe no tema escuro — `.empty-state__mark` (24 elementos, sem nenhuma regra fora do
 arquivo escuro), os avatares do picker e o badge do wizard. Isso é maior que uma família e precisa de
 decisão própria.
+### NOVO-54 (continuação) 🟠 Trinta dos setenta `!important` de `.cv-field__control` não sustentavam nada · UI · 0,5 d
+
+Segunda leva do `NOVO-54`. A primeira deu à classe uma regra base; esta começa a cobrar a dívida que
+a base tornou visível.
+
+**O método foi medir, não julgar.** Em vez de ler cada regra e decidir se o `!important` "parece
+necessário", removi **todos os 70** de uma vez e medi. Depois fui restaurando até achar quem
+realmente sustentava algo.
+
+| passo | `!important` removidos | elementos alterados |
+|---|---:|---:|
+| todos | 70 | 10 |
+| tudo menos `theme-dark-components.css` | 32 | 1 |
+| tudo menos o tema e `base.css` | 30 | **0** |
+
+**Os 2 de `base.css` são piso de acessibilidade, e o próprio código já dizia.** São o `outline` de
+`:focus-visible` do `HT-01`, cujo comentário explica que **52 blocos** apagam o foco de campo sem pôr
+nada no lugar — o `!important` é o que impede qualquer componente de remover o indicador. Removê-los
+apagou o anel de foco em `/perfil/` no tema escuro, exatamente como o comentário previa.
+
+**Os 38 do arquivo de tema ficam, e um deles está provado necessário.** Perguntei ao navegador quais
+das 11 regras com `!important` daquele arquivo casam com os elementos afetados: **uma só**. As outras
+10 miram passos de wizard (`[data-travel-document-wizard-*]`).
+
+**E aí veio a parte que quase passou.** As 44 rotas da medição **não entram nos wizards**, então
+aquelas 10 regras nunca eram exercidas — "não mudou nada" ali significaria apenas "não foi testado".
+É a mesma armadilha do `.alert` no `NOVO-60`: *rota visitada não é cobertura*.
+
+Estendi o conjunto para **51 rotas**, incluindo `/oficios/<pk>/roteiro/`, `/justificativa/`,
+`/documentos/`, `/resumo/` e o editor de roteiro — de 41.946 para **53.636 elementos**, 102 telas.
+
+**Com a cobertura ampliada, os 30 continuam medindo 0.** E aqui o piso de ruído importa: as telas de
+wizard têm conteúdo variável, e duas capturas do **mesmo código** já diferem em **14 elementos**
+(todos em `/justificativas/`). Os 30 removidos ficam em **zero — abaixo do próprio ruído**.
+
+A comparação passou a ser **por caminho no DOM**, não por índice: com 53.534 elementos numa captura e
+53.636 na outra, alinhar por posição compararia elementos diferentes e produziria diferença onde não
+há.
+
+**Resta:** 40 `!important` (38 no arquivo de tema, 2 de acessibilidade) e as 68 regras em si, que a
+análise por família ainda vai separar entre contexto, estado, tema e divergência real.
