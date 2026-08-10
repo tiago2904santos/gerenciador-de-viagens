@@ -186,8 +186,8 @@ JS_MASKS_OWNER = "static/js/components/masks.js"
 # Baixar um teto quando o número cair é parte do trabalho, não faxina opcional.
 JS_EXCEPTIONS: dict[str, dict] = {
     "static/js/pages/roteiros/editor/index.js": {
-        "reason": "NOVO-14: classes de campo de tempo como condição, sai com o editor (BE-11, fase 6). NOVO-15: interpola markup de rota já escapado com CV.util.escapeHtml nas linhas vizinhas.",
-        "rules": {"css_class_as_logic": 6, "innerhtml_dynamic_without_escape": 2},
+        "reason": "NOVO-14: classes de campo de tempo como condição, sai com o editor (BE-11, fase 6). NOVO-15: HTML de trechos já renderizado pelo servidor.",
+        "rules": {"css_class_as_logic": 6, "innerhtml_dynamic_without_escape": 1},
     },
     "static/js/components/overlay.js": {
         "reason": "NOVO-14: estado aberto do menu lido pela classe; sai na reconstrução do CSS (fase 7).",
@@ -213,20 +213,8 @@ JS_EXCEPTIONS: dict[str, dict] = {
         "rules": {"innerhtml_dynamic_without_escape": 1},
     },
     "static/js/pages/eventos-detalhe.js": {
-        "reason": "NOVO-15: interpola constante de ícone do próprio arquivo. JS-02: sem listener global.",
-        "rules": {"innerhtml_dynamic_without_escape": 1, "enhancer_without_destroy": 1},
-    },
-    "static/js/pages/justificativas-index.js": {
-        "reason": "NOVO-15: interpola constante de ícone declarada no próprio arquivo.",
-        "rules": {"innerhtml_dynamic_without_escape": 1},
-    },
-    "static/js/pages/termos-form.js": {
-        "reason": "NOVO-15: interpola constante de ícone declarada no próprio arquivo.",
-        "rules": {"innerhtml_dynamic_without_escape": 1},
-    },
-    "static/js/pages/ordens-servico-form.js": {
-        "reason": "NOVO-15: interpola constante de ícone declarada no próprio arquivo.",
-        "rules": {"innerhtml_dynamic_without_escape": 1},
+        "reason": "JS-02: enhancer sem listener global e sem estado para desmontar.",
+        "rules": {"enhancer_without_destroy": 1},
     },
     "static/js/pages/planos-trabalho-wizard.js": {
         "reason": "NOVO-15: html vindo do servidor, já sanitizado na renderização do template.",

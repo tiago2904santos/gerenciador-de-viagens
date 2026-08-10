@@ -29,52 +29,10 @@
     }
   };
 
-  var ROUTE_AVATAR_ICON =
-    '<svg class="icon related-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
-      '<circle cx="6" cy="19" r="2.5" fill="currentColor"></circle>' +
-      '<circle cx="18" cy="5" r="2.5" fill="currentColor"></circle>' +
-      '<path d="M8.2 18.2h6.1a3.3 3.3 0 0 0 0-6.6H9.7a3.3 3.3 0 0 1 0-6.6h6.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>' +
-    '</svg>';
-
   /* ── Utilitários ────────────────────────────────────────────── */
 
   function readSummaries() {
     return window.CV.documentSource.read("os-oficios-summary");
-  }
-
-  function routeCardTitle(summary) {
-    var label = String(summary.label || "").trim();
-    var destino = String(summary.roteiro || summary.destino || "")
-      .trim()
-      .replace(/\s*->\s*/g, " \u2192 ");
-    return [label, destino].filter(Boolean).join(" ");
-  }
-
-  function firstNames(summary) {
-    var nomes = summary.servidores_nomes;
-    if (!nomes || !nomes.length) {
-      nomes = String(summary.servidores_label || "")
-        .split(",")
-        .map(function (nome) { return nome.trim(); })
-        .filter(Boolean);
-    }
-    return nomes
-      .map(function (nome) { return String(nome || "").trim().split(/\s+/)[0] || ""; })
-      .filter(Boolean);
-  }
-
-  function viaturaLabel(summary) {
-    var placa = String(summary.viatura || "").trim();
-    var modelo = String(summary.viatura_modelo || "").trim();
-    return [placa, modelo].filter(Boolean).join(" ");
-  }
-
-  function routeCardMeta(summary) {
-    var periodo = String(summary.periodo || "").trim();
-    var servidores = firstNames(summary).join(", ");
-    var viatura = viaturaLabel(summary);
-    var parts = [periodo, servidores, viatura].filter(Boolean);
-    return parts.length ? parts.join(" \u00b7 ") : "Sem informa\u00e7\u00f5es dispon\u00edveis";
   }
 
   function readRoleAssignments() {
@@ -627,32 +585,7 @@
 
       filtered.forEach(function (summary) {
         var active = selected.has(String(summary.id));
-        var button = document.createElement("button");
-        button.type = "button";
-        button.className = "search-picker__selected-card related-route-item" + (active ? " is-active" : "");
-        button.dataset.routeId = String(summary.id);
-        button.setAttribute("aria-pressed", active ? "true" : "false");
-
-        var avatar = document.createElement("span");
-        avatar.className = "search-picker__selected-avatar";
-        avatar.setAttribute("aria-hidden", "true");
-        avatar.innerHTML = ROUTE_AVATAR_ICON;
-
-        var main = document.createElement("div");
-        main.className = "search-picker__selected-main";
-
-        var name = document.createElement("span");
-        name.className = "search-picker__selected-name";
-        name.textContent = routeCardTitle(summary);
-
-        var meta = document.createElement("span");
-        meta.className = "search-picker__selected-meta related-route-period";
-        meta.textContent = routeCardMeta(summary);
-
-        main.appendChild(name);
-        main.appendChild(meta);
-        button.appendChild(avatar);
-        button.appendChild(main);
+        var button = window.CV.pickerParts.createRouteCard(summary, { active: active });
         button.addEventListener("click", function () {
           setOficioSelected(select, summary.id, !active);
           select.dispatchEvent(new Event("change", { bubbles: true }));

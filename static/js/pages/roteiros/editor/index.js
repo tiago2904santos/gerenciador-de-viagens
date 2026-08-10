@@ -1547,39 +1547,41 @@ export function initRoteirosEditor() {
     if (resumo) return resumo;
     return 'Roteiro salvo';
   }
-  var ROUTE_AVATAR_ICON =
-    '<svg class="icon related-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
-      '<circle cx="6" cy="19" r="2.5" fill="currentColor"></circle>' +
-      '<circle cx="18" cy="5" r="2.5" fill="currentColor"></circle>' +
-      '<path d="M8.2 18.2h6.1a3.3 3.3 0 0 0 0-6.6H9.7a3.3 3.3 0 0 1 0-6.6h6.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>' +
-    '</svg>';
   function renderRouteList(filterText) {
     var target = $('roteiro-lista'); if (!target) return;
     var emptyEl = $('roteiro-lista-empty');
     var selId = getSelectedRouteId(); var term = window.CV.util.normalize(filterText).replace(/\s+/g, ' ').trim();
     var filtered = routes.filter(function(r) { if (!term) return true; return window.CV.util.normalize(routeSearchText(r)).replace(/\s+/g, ' ').trim().indexOf(term)!==-1; });
-    var isOficioPicker = !!target.closest('.related-route-picker');
+    var pickerRoot = target.closest('[data-related-picker-root]');
+    var isCardPicker = !pickerRoot || pickerRoot.dataset.relatedPickerPresentation !== 'compact';
+    target.replaceChildren();
     if (!filtered.length) {
-      target.innerHTML = isOficioPicker ? '' : '<div class="related-route-empty">Nenhum roteiro encontrado para a busca.</div>';
-      if (emptyEl) emptyEl.hidden = !isOficioPicker;
+      if (!isCardPicker) {
+        var empty = document.createElement('div');
+        empty.className = 'related-route-empty';
+        empty.textContent = 'Nenhum roteiro encontrado para a busca.';
+        target.appendChild(empty);
+      }
+      if (emptyEl) emptyEl.hidden = !isCardPicker;
       return;
     }
     if (emptyEl) emptyEl.hidden = true;
-    target.innerHTML = filtered.map(function(r) {
-      var rid=String(r.id); var ac=rid===selId?' is-active':'';
+    filtered.forEach(function(r) {
+      var rid = String(r.id);
+      var active = rid === selId;
       var title = routeDisplayTitle(r);
-      if (isOficioPicker) {
-        return '<button type="button" class="search-picker__selected-card related-route-item'+ac+'" data-route-id="'+window.CV.util.escapeHtml(rid)+'" aria-pressed="'+(rid===selId?'true':'false')+'">' +
-          '<span class="search-picker__selected-avatar" aria-hidden="true">'+ROUTE_AVATAR_ICON+'</span>' +
-          '<div class="search-picker__selected-main">' +
-            '<span class="search-picker__selected-name">'+window.CV.util.escapeHtml(title)+'</span>' +
-            '<span class="search-picker__selected-meta related-route-period">'+window.CV.util.escapeHtml(routePeriodSummary(r))+'</span>' +
-          '</div></button>';
-      }
-      return '<button type="button" class="related-route-item'+ac+'" data-route-id="'+window.CV.util.escapeHtml(rid)+'">' +
-        '<span class="related-route-title">'+window.CV.util.escapeHtml(title)+'</span>' +
-        '<span class="related-route-period">'+window.CV.util.escapeHtml(routePeriodSummary(r))+'</span></button>';
-    }).join('');
+      var config = {
+        active: active,
+        meta: routePeriodSummary(r),
+        title: title,
+        value: rid,
+      };
+      target.appendChild(
+        isCardPicker
+          ? window.CV.pickerParts.createRelatedCard(config)
+          : window.CV.pickerParts.createCompactRouteCard(config),
+      );
+    });
   }
   function routeResumo() {
     var resumoEl = $('roteiro-selector-resumo');

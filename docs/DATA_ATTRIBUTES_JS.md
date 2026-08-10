@@ -7,7 +7,7 @@ que ele publica em `window.CV`. Não altera regra de negócio.
 
 Este documento cobre `static/js/core/`, `static/js/components/` e os motores de raiz — o código que
 qualquer tela pode acionar. **Não** indexa os atributos de uma página só (`static/js/pages/`): são
-**141** deles, cada um com um único consumidor, e a documentação certa para esses é o próprio
+**142** deles, cada um com um único consumidor, e a documentação certa para esses é o próprio
 módulo da página.
 
 A regra que decide: se o atributo aparece num motor compartilhado, ele está aqui. Isso é verificado
@@ -85,7 +85,7 @@ Evento no modo cliente: `cv:collection:updated` — `{ collection, filters, tota
 A busca cliente ignora caixa e acentos e combina palavras com AND. No modo servidor o backend
 continua dono da semântica de busca e paginação.
 
-## Picker de entidade — `components/picker.js`, `components/picker-select.js`
+## Pickers — `components/picker.js`, `components/picker-select.js`, `components/picker-parts.js`
 
 O `<select>` fonte declara o componente; a `<div>` que o motor renderiza declara **o que ela é**.
 Quem consome o picker de fora nunca deve procurá-lo pela classe CSS.
@@ -108,8 +108,10 @@ CV.picker.closestPart(no, nome)  // subindo a partir de um nó
 
 Duas armadilhas medidas no navegador: o **dropdown é portado para `document.body`** pelo overlay
 quando aberto, então `part(root, "dropdown")` devolve `null` nesse estado — use `closestPart` a
-partir do alvo do evento; e existe markup que **imita** o picker sem ser um (três templates o
-escrevem à mão, `NOVO-16`): tem as classes, não tem os atributos.
+partir do alvo do evento. Os pickers de relacionamento escritos pelo servidor usam
+`ui/forms/related_picker.html`; sua raiz semântica é `data-related-picker-root` e a apresentação
+(`card` ou `compact`) fica em `data-related-picker-presentation`. A estrutura criada por JS vem de
+`CV.pickerParts`, sem reconstruir classes BEM nos módulos de página (`NOVO-16`).
 
 ## Máscaras — `components/masks.js` / `CV.masks`
 

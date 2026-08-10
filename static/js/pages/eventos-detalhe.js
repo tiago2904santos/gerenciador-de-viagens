@@ -115,13 +115,6 @@
 
   /* ── Documentos vinculados: toggle segmentado + lista com pré-filtro de datas ── */
 
-  var DOC_AVATAR_ICON =
-    '<svg class="icon related-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
-      '<circle cx="6" cy="19" r="2.5" fill="currentColor"></circle>' +
-      '<circle cx="18" cy="5" r="2.5" fill="currentColor"></circle>' +
-      '<path d="M8.2 18.2h6.1a3.3 3.3 0 0 0 0-6.6H9.7a3.3 3.3 0 0 1 0-6.6h6.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>' +
-    '</svg>';
-
   var MS_PER_DAY = 24 * 60 * 60 * 1000;
 
   function readDocSummaries() {
@@ -188,36 +181,6 @@
     select.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
-  function buildDocCard(summary, active) {
-    var button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'search-picker__selected-card related-route-item' + (active ? ' is-active' : '');
-    button.dataset.value = String(summary.id);
-    button.setAttribute('aria-pressed', active ? 'true' : 'false');
-
-    var avatar = document.createElement('span');
-    avatar.className = 'search-picker__selected-avatar';
-    avatar.setAttribute('aria-hidden', 'true');
-    avatar.innerHTML = DOC_AVATAR_ICON;
-
-    var main = document.createElement('div');
-    main.className = 'search-picker__selected-main';
-
-    var name = document.createElement('span');
-    name.className = 'search-picker__selected-name';
-    name.textContent = summary.title || '';
-
-    var meta = document.createElement('span');
-    meta.className = 'search-picker__selected-meta related-route-period';
-    meta.textContent = summary.meta || '';
-
-    main.appendChild(name);
-    main.appendChild(meta);
-    button.appendChild(avatar);
-    button.appendChild(main);
-    return button;
-  }
-
   function initDocPanel(root, key, items, eventStart, eventEnd, tolerance) {
     var select = sourceSelectFor(root, key);
     var list = root.querySelector('[data-evento-doc-list="' + key + '"]');
@@ -248,7 +211,13 @@
 
       visible.forEach(function (summary) {
         var active = selected.has(String(summary.id));
-        var card = buildDocCard(summary, active);
+        var card = window.CV.pickerParts.createRelatedCard({
+          active: active,
+          dataKey: 'value',
+          meta: summary.meta || '',
+          title: summary.title || '',
+          value: summary.id,
+        });
         card.addEventListener('click', function () {
           toggleSelectValue(select, summary.id, !selected.has(String(summary.id)));
           render();

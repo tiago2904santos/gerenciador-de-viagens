@@ -12,27 +12,14 @@
      class="roteiro-editor__routes-panel">
 
   {% if roteiro_editor_oficio %}
-  <div class="search-picker search-picker--single search-picker--detailed search-picker--people search-picker--roster related-route-picker">
-    <div class="search-picker__field">
-      <div class="search-picker__control">
-        <span class="search-picker__icon" aria-hidden="true"></span>
-        <input type="search" id="id_roteiro_busca" class="search-picker__input"
-               placeholder="Buscar por destino, tipo ou trecho..."
-               {% if not has_event_routes %}disabled{% endif %}
-               autocomplete="off"
-               role="searchbox"
-               aria-label="Buscar roteiro salvo">
-      </div>
-    </div>
+  {% with cotton_attr_disabled=has_event_routes|yesno:"False,True" %}<c-ui.forms.related_picker root_extra_class="related-route-picker" input_id="id_roteiro_busca" input_placeholder="Buscar por destino, tipo ou trecho..." input_aria_label="Buscar roteiro salvo" :disabled="cotton_attr_disabled" panel_aria_label="Roteiros disponíveis" list_id="roteiro-lista" empty_id="roteiro-lista-empty" empty_text="Nenhum roteiro encontrado para a busca." only>
+    <c-slot name="native">
     <input type="hidden" name="roteiro_id" id="id_roteiro_id"
            value="{{ roteiro_id|default:'' }}"
            data-route-selected-input
            {% if not has_event_routes %}disabled{% endif %}>
-    <section class="search-picker__selected-panel" aria-label="Roteiros disponíveis">
-      <div id="roteiro-lista" class="search-picker__selected-list roteiro-editor__route-list related-route-list related-route-list"></div>
-      <p class="search-picker__selected-empty" id="roteiro-lista-empty" hidden>Nenhum roteiro encontrado para a busca.</p>
-    </section>
-  </div>
+    </c-slot>
+  </c-ui.forms.related_picker>{% endwith %}
   {% else %}
   <section class="wizard-inner-section" aria-labelledby="sec-roteiro-salvo-title">
     <header class="wizard-inner-section__header">
@@ -54,14 +41,13 @@
            value="{{ roteiro_id|default:'' }}"
            data-route-selected-input
            {% if not has_event_routes %}disabled{% endif %}>
-    <div class="search-picker">
-      <section class="search-picker__selected-panel roteiro-routes-panel">
+    <c-ui.forms.related_picker :hide_search="True" :plain_list="True" presentation="compact" panel_extra_class="roteiro-routes-panel" list_id="roteiro-lista" only>
+      <c-slot name="panel_header">
         <div class="search-picker__selected-header roteiro-routes-panel__header">
           <h4 class="search-picker__selected-title">Roteiros encontrados</h4>
         </div>
-        <div id="roteiro-lista" class="roteiro-editor__route-list related-route-list related-route-list"></div>
-      </section>
-    </div>
+      </c-slot>
+    </c-ui.forms.related_picker>
   </section>
   {% endif %}
 </div>

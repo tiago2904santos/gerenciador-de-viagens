@@ -357,15 +357,16 @@ class ContratoDosChamadoresTests(SimpleTestCase):
     def test_a_varredura_esta_achando_os_chamadores(self):
         """Sem isto, as regras acima passariam com a varredura vazia.
 
-        Eram 59 chamadores; o `HT-03` levou 18 para o `form_errors.html` e sobraram
-        **41 erros de campo**, todos com `field_id`. O número desce quando um
-        chamador legítimo sai, e é para isso que ele está escrito aqui em vez de
-        num comentário.
+        Eram 59 chamadores; o `HT-03` levou 18 para o `form_errors.html`. O
+        `NOVO-16` substituiu outros 3 chamadores duplicados por um único chamador
+        dentro de `related_picker.html`, restando **38 erros de campo** nos
+        templates de aplicação. O número desce quando um chamador legítimo sai, e
+        é para isso que ele está escrito aqui em vez de num comentário.
         """
         achados = list(chamadores_de_field_error())
 
-        self.assertGreaterEqual(len(achados), 41)
-        self.assertGreaterEqual(sum(1 for _, _, v, a in achados if "field_id=" in a), 39)
+        self.assertGreaterEqual(len(achados), 38)
+        self.assertGreaterEqual(sum(1 for _, _, v, a in achados if "field_id=" in a), 38)
 
 
 class DicaEscritaAMaoTests(SimpleTestCase):
