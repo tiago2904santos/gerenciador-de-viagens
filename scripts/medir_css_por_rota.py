@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from scripts.navegador_medicao import abrir_chromium  # noqa: E402
 from scripts.rotas_do_sistema import ROTAS  # noqa: E402
 
 
@@ -196,7 +197,7 @@ def run_measurement(args) -> dict:
             context = browser.contexts[0] if browser.contexts else browser.new_context()
             owns_browser = False
         else:
-            browser = playwright.chromium.launch(headless=not args.headful)
+            browser = abrir_chromium(playwright, headless=not args.headful)
             context = browser.new_context(
                 viewport={"width": args.viewport_width, "height": args.viewport_height},
                 storage_state=args.storage_state,

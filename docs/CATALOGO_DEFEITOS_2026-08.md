@@ -5625,3 +5625,38 @@ folga e reprova o CI por escrever teste.
 
 Hoje o defeito é latente: o único `*.test.js` do repositório (`state-toggle.test.js`, da E6) não
 dispara nenhuma regra. A trava é para o próximo, e o custo dela é uma linha.
+
+### NOVO-83 🔴 · `NOVO` As duas réguas da E0 não sobem o navegador na sessão remota · COR · 0,25 d
+
+Irmão do `NOVO-72`, e o mesmo formato: **o comando que o projeto manda rodar não roda no ambiente
+que o próprio projeto monta para os agentes.**
+
+`medir_divergencia_tema.py:266` e `medir_css_por_rota.py:199` chamavam `playwright.chromium.launch()`
+sem `executable_path`. Isso procura um build de Chromium casado com a versão do pacote pip — hoje
+`playwright==1.62.0`, que espera o build **1234**.
+
+No CI funciona, porque `tests.yml:391` roda `python -m playwright install --with-deps chromium` e
+baixa o build certo. Na sessão remota, não: a imagem já traz o Chromium em
+`PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`, no build **1194**, e o ambiente pede explicitamente
+para **não** rodar `playwright install`. O launch morre com
+
+    Executable doesn't exist at .../chromium_headless_shell-1234/chrome-headless-shell
+
+Por que isso importa mais do que parece: a **E8 inteira** depende dessas duas réguas. O plano diz,
+com todas as letras, que a primeira coisa da E8 é remedir — "número velho é o quarto erro que mata
+um ciclo" — e a catraca da etapa é a divergência não-cor caindo. Sem o navegador subir, a E8 fica
+sem prova e sem catraca, e a alternativa seria mexer em 43 telas no olho.
+
+Descobri tentando fazer exatamente isso: rodar a régua para reescrever a tabela do enunciado.
+
+**Resolvido** por `scripts/navegador_medicao.py`: tenta o caminho normal primeiro e só cai para o
+build instalado quando o esperado não existe, e só quando o erro é esse — outro erro sobe sem
+disfarce. No CI o primeiro caminho sempre funciona, então lá nada muda.
+`core/tests/test_navegador_medicao.py` prende as duas metades, mais uma trava de regressão que
+reprova se alguma régua voltar ao `launch()` cru.
+
+**Segundo tropeço, no mesmo caminho.** Com o navegador de pé, a régua ainda parava em
+`oficios-detalhe: HTTP 404 em /oficios/1/`. O registro existe; o que faltava era o usuário de
+medição ter **vínculo de área** — o sistema é escopado por `AreaTrabalho`, e sem
+`VinculoUsuarioArea` as rotas de detalhe respondem 404. O `.github/workflows/tests.yml` faz esse
+vínculo; o `AGENTS.md` §7 não menciona, e quem rodar a régua à mão sem ler o workflow cai nele.

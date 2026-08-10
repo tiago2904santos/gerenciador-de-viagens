@@ -18,6 +18,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.medir_css_por_rota import is_valid_final_url  # noqa: E402
+from scripts.navegador_medicao import abrir_chromium  # noqa: E402
 from scripts.rotas_do_sistema import ROTAS  # noqa: E402
 
 
@@ -263,7 +264,7 @@ def run_measurement(args) -> dict:
 
     results: dict[str, dict] = {}
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=not args.headful)
+        browser = abrir_chromium(playwright, headless=not args.headful)
         for width in args.viewports:
             context = browser.new_context(
                 viewport={"width": width, "height": args.viewport_height},
