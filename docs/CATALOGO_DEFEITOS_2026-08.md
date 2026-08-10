@@ -6017,3 +6017,75 @@ mão, e o log só mostra as rotas que **reprovaram**.
 **Efeito medido apesar de tudo:** o próprio log de reprovação mostra a queda real no ambiente certo.
 `configuracao` caiu de 1652 para 1425 a 1440px (−227), e o mesmo nas outras duas larguras (−204 cada).
 `eventos-lista@1440` caiu 14. É menos do que os −9.376 medidos localmente, e é o número que vale.
+
+### NOVO-92 🔴 · `NOVO` A família 8b não é portável sozinha: no tema claro a borda é a única separação · UI · a decidir
+
+Achado ao executar a **E8**, com o dono já tendo decidido a direção ("o claro perde as bordas"). A
+medição contradiz a decisão, e por um motivo que não estava na mesa quando ela foi tomada.
+
+**O que a família 8b parecia ser.** 186 regras predicadas em `html[data-theme="dark"]` declaram
+borda. Medindo elemento a elemento nas 43 rotas, **54 têm efeito** — 754 elementos a 1440 e 800, 760
+a 500. As outras 132 não mudam nada.
+
+**Por que ela não pode ser aplicada inteira.** No tema escuro `border: 0` funciona porque as
+superfícies se separam por **luminância**; no claro elas são todas brancas, e a borda é a única
+separação que existe. Levar `border: 0` para o claro apaga a fronteira sem pôr nada no lugar. Cinco
+casos verificados, com arquivo e linha:
+
+1. **`.cv-module-card`** — o claro tem `border: 1px solid var(--color-border)` (`lists/cards.css:19`)
+   **e** `border-top: 3px solid var(--color-accent-border-strong)` (`cards.css:61`). O shorthand da
+   regra escura, neutralizado, **apaga o filete dourado do topo** de todo card do painel.
+2. **Os `--step1-*`** (`--step1-surface`, `--step1-panel`, `--step1-field`) são ligados **dentro de
+   regra escura** (`theme-dark-components.css:397-400` e `:5015-5017`). Fora dela existem só em
+   `.attach-signed-modal__dialog` (`actions/action-system.css:717`) e `.collection-panel`
+   (`lists/record-list.css:12`) — escopos que não alcançam o wizard. Um `border: 0` que vem casado
+   com `background: var(--step1-surface)` chega ao claro com **variável indefinida**.
+3. **`.cv-dialog__notice`** não tem regra clara nenhuma — só as duas escuras
+   (`theme-dark-components.css:3937` e `:3948`). Neutralizar a borda desenha **um retângulo em volta
+   de um `<p>` sem padding**. Não é mover declaração: é regra base que nunca foi escrita.
+4. **Seis componentes ficam branco-no-branco**: `.list-header__wizard-back`, os `−`/`+` do
+   `.pt-quantidade-stepper`, os botões de `.form-block__actions` do wizard,
+   `.card-footer__secondary .cv-btn`, `.roteiro-mapa__canvas-head .cv-btn--secondary` e — o pior —
+   `.roteiro-trecho-card__leg`, onde a borda é a única coisa que separa Saída de Chegada dentro de um
+   card branco.
+5. **`.search-picker__selected-card:last-child { border-bottom: 0 }`** é declaração morta no escuro
+   (outras regras já zeram os quatro lados) e **viva no claro**, onde o card tem borda inteira
+   (`fields/search-picker.css:590`). Neutralizada sozinha, o último card fica com contorno em U.
+
+**Consequência para o plano.** A 8b **não é "mover borda"**: é adotar o sistema de superfícies do
+escuro, e isso depende de os `--step1-*` existirem no tema claro. **A família está bloqueada na
+camada de token, que é a E9.** Enquanto isso não existir, cada regra de borda só pode ser decidida
+uma a uma, com print, e a maioria vai na direção contrária à que o enunciado supunha.
+
+**O que entrou apesar disso:** `.sidebar-brand-badge` (86 elementos), onde a borda é decoração — um
+anel creme sobre um badge dourado — e não separação.
+
+### NOVO-93 · `NOVO` A família 8g move a régua e não move um pixel · QA · fechada na medição
+
+Terceira ocorrência da mesma armadilha do `NOVO-90`, e a primeira detectada **antes** de virar
+commit.
+
+`justify-content` só desloca alguma coisa quando **sobra espaço** no container. Medindo o
+deslocamento real do primeiro e do último filho dentro do pai, nos dois temas, nas 43 rotas:
+
+| componente | elementos | `justify-content` difere | filho se move |
+|---|---:|---:|---:|
+| `.custom-select__option-check` | 72 | 72 | 1px, e só com o menu aberto |
+| `.custom-select__chevron` (v2) | 21 | 21 | **0** — caixa de 16px com filho de 16px |
+| `.segment-toggle__btn` (ofício/roteiro) | 8 | 8 | 2 |
+| `.ordered-field-row__badge` | 3 | 3 | **0** — `display: none` nos dois temas |
+| avatares do `search-picker` | 9 | 9 | **0** — `block` no claro contra `inline-flex` no escuro |
+| `.empty-state__mark` | 24 | 24 | **0** — `inline` no claro contra `inline-flex` no escuro |
+| `.list-tab` (≤600px) | 29 | 29 | **0** — os dois filhos já encostam nas duas bordas |
+
+Das 137 divergências que a família contribui a 1440 e das 170 a 500, o que pinta é **o deslocamento
+de 1px de um ícone de confirmação em lista suspensa aberta**. O que difere de verdade nesses
+elementos é `display`, largura e padding — geometria real, e que **não pertence a família nenhuma da
+tabela do plano**.
+
+**Decisão do dono:** pular a 8g. Fazê-la derrubaria ~150 pontos da catraca sem entregar tela.
+
+**O defeito verdadeiro que a medição encontrou** e que continua aberto: há componentes cujo desenho
+inteiro só existe no tema escuro — `.empty-state__mark` (24 elementos, sem nenhuma regra fora do
+arquivo escuro), os avatares do picker e o badge do wizard. Isso é maior que uma família e precisa de
+decisão própria.
