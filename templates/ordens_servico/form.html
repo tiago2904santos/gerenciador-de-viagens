@@ -1,4 +1,4 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 {% load static %}
 
 {% block extra_css %}
@@ -19,10 +19,10 @@
   <form method="post" class="document-form travel-document-wizard__form os-form" data-os-form data-api-cidades-url="{{ api_cidades_por_estado_url }}" data-sede-label="{{ sede_config_label|default:'' }}">
     {% csrf_token %}
 
-    {% include "components/ui/feedback/form_errors.html" with form=form only %}
+    <c-ui.feedback.form_errors :form="form" only />
 
     <div class="form-section-stack form-section-stack--comfortable" data-os-wizard-form data-travel-document-wizard-step1>
-      {% include "components/form/card.html" with title="Dados da ordem de serviço" description="Ofícios, evento, equipe e necessidade da OS" title_id="os-form-main-title" extra_class="os-form-card" body_extra_class="os-form-body" body_template="ordens_servico/partials/_os_form_body.html" footer_template="ordens_servico/partials/_motivo_footer.html" footer_id="os-form-footer" %}
+      <c-form.card title="Dados da ordem de serviço" description="Ofícios, evento, equipe e necessidade da OS" title_id="os-form-main-title" extra_class="os-form-card" body_extra_class="os-form-body" body_template="ordens_servico/partials/_os_form_body.html" footer_template="ordens_servico/partials/_motivo_footer.html" footer_id="os-form-footer" />
     </div>
   </form>
 {% endblock %}
