@@ -5454,3 +5454,41 @@ A navegação real da E0 encontrou dois defeitos que o teste de `resolve()` não
 `/termos/oficio/<pk>/preview/` tentava serializar instâncias ORM com `DjangoJSONEncoder`, e
 `/justificativas/<pk>/editar/` encaminhava `pk` para uma view que não o aceitava. As duas rotas
 agora respondem, e cada falha ganhou teste de regressão.
+
+### NOVO-80 · `NOVO` A E5 apagou duas travas de regressão em vez de reapontá-las · QA · 0,25 d
+
+`test_componentes_sem_orfao.py` guardava duas listas nomeadas — os 7 componentes que o `HT-06`
+apagou e os 8 que caíram com o UI Lab (PR #247 e a cascata do `NOVO-44`) — afirmando por arquivo
+que nenhum deles voltou, que é a prova de grep exigida pelo `AGENTS.md` §3.6.
+
+A E5 extinguiu `templates/components/` e moveu tudo para `templates/cotton/`. Com o diretório
+antigo vazio, `(COMPONENTES / rel).exists()` virou vacuamente verdadeira: as asserções passaram a
+passar sem testar nada. O teste **tinha** mesmo que mudar; o que faltou foi trocar a raiz por
+`COTTON`, e não remover as duas travas. A E4 preservou a forma da árvore ao mover, então as duas
+listas seguem válidas letra por letra.
+
+O buraco foi medido, não suposto. Ressuscitando `ui/forms/dropdown.html`:
+
+    volta sem consumidor -> guarda de órfão pega, trava nomeada pega
+    volta COM consumidor -> guarda de órfão passa, trava nomeada pega
+
+A segunda linha é o defeito, e é como componente morto reaparece na prática: alguém copia de uma
+branch antiga e já sai usando. O `test_todo_componente_tem_quem_o_renderize` não cobre esse caso —
+por construção, ele só reclama de quem **não** tem consumidor.
+
+A E6 (todos os cinco IDs, `70f369c6`..`5b58fac7`) passou por esse arquivo três vezes e não repôs
+as travas: ajustou apenas a contagem do inventário, de 82 para 85.
+
+### NOVO-81 · `NOVO` O auditor de front audita os testes de JS que a E1 criou · QA · 0,1 d
+
+`audit_frontend_standards.py` varre `static/js/**.js` e pula só `*.bundle.js`. Com o runner de JS
+da E1 (`JS-03`), os arquivos `*.test.js` passaram a morar ao lado do código que testam e entraram
+na varredura.
+
+O que um teste monta para exercitar uma regra é exatamente o que a regra proíbe em produção:
+`innerHTML` de fixture dispara `innerhtml_dynamic_without_escape`, e afirmar sobre classe dispara
+`css_class_as_logic`. Como o teto é global (246, com 240 em uso), escrever teste de JS consome a
+folga e reprova o CI por escrever teste.
+
+Hoje o defeito é latente: o único `*.test.js` do repositório (`state-toggle.test.js`, da E6) não
+dispara nenhuma regra. A trava é para o próximo, e o custo dela é uma linha.
