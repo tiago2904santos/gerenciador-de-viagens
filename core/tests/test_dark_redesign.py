@@ -549,7 +549,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR) / "templates" / "oficios" / "wizard_transporte.html"
         ).read_text(encoding="utf-8")
         card = (
-            Path(settings.BASE_DIR) / "templates" / "components" / "form" / "card.html"
+            Path(settings.BASE_DIR) / "templates" / "cotton" / "form" / "card.html"
         ).read_text(encoding="utf-8")
         header_actions = (
             Path(settings.BASE_DIR)
