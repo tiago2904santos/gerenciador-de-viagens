@@ -234,7 +234,7 @@ aparecem no seletor; justificativas de outra área aparecem na lista e podem ser
 **Correção:** migração acrescentando `area` (FK PROTECT) aos dois modelos, com backfill a partir
 de `oficio.area`; `UniqueConstraint(area, nome)`; filtro nos 4 selectors e nos 2 pickers.
 
-### BE-11 🟠 Editor de roteiro em 3 cópias · AUD · 3 d · risco alto
+### BE-11 ✅ RESOLVIDO Editor de roteiro em 3 cópias · AUD · 3 d · risco alto
 
 `roteiros/views.py:203` (`novo`, 89 linhas úteis) e `:311` (`editar`, 86 linhas) têm similaridade
 0,629 e 41 linhas idênticas; `oficios/route_views.py:100` (`wizard_roteiro`, 175 linhas) partilha
@@ -243,6 +243,28 @@ de `oficio.area`; `UniqueConstraint(area, nome)`; filtro nos 4 selectors e nos 2
 (`encontrar_roteiro_duplicado`/`sobrescrever_roteiro_duplicado`); o fluxo do ofício não.
 **Correção:** `roteiros/services/editor_flow.py::processar_submissao_editor(...)` devolvendo
 resultado tipado, e um presenter único. As três views ficam com ~25 linhas.
+
+**Duas medições corrigem o enunciado.** Contando interseção de multiconjunto de linhas
+normalizadas (sem comentário nem branco), `novo` × `editar` dá **55**, não 41 — as duas são mais
+parecidas do que o catálogo dizia. E `wizard_roteiro` partilha 20 de **165** linhas úteis: não é a
+terceira cópia do editor, é outro fluxo (reuso-sem-cópia, soft-advance, vínculo `Oficio.roteiro`,
+ações de wizard, outro template). Passá-lo pela mesma função exigiria bandeiras que desligam metade
+dela, ou mudaria o comportamento do fluxo do ofício. Por decisão do usuário o `BE-11` unificou
+**`novo` + `editar`**; a orquestração do wizard é o `BE-12`, que já era o PR seguinte.
+
+**Entregue:** `roteiros/services/editor_flow.py` com `ResultadoSubmissaoEditor` (frozen dataclass,
+sem `request`/`messages`/`redirect`) e `processar_submissao_editor`;
+`roteiros/presenters.py::apresentar_pagina_editor_roteiro` no lugar dos dois dicts de contexto
+literais; `roteiros/views.py::_responder_submissao_editor` traduzindo o resultado em redirect ou
+erro no form. `novo` 89 → **54** linhas úteis, `editar` 86 → **58**, interseção 55 → **31** — das
+quais 7 são só parênteses e vírgula. Comportamento inalterado: as duas mensagens de duplicado
+seguem com textos diferentes, `delete_url` segue existindo só em `editar`, e as três telas rendem
+prints byte a byte idênticos antes e depois.
+
+**O terceiro pedaço partilhado, esse sim resolvido nos dois lados:** o parse de `autosave_obj_id`
+estava copiado em `roteiros/views.py` e `oficios/route_views.py`. Virou
+`roteiros/services/autosave.py::pk_de_autosave`. Só o parse — os querysets divergem de propósito
+(área ativa contra área do ofício) e continuam em cada view, com o comentário de escopo.
 
 ### BE-12 🟠 `wizard_roteiro` concentra a regra de vínculo/cópia na view · AUD · 2 d · risco alto
 
@@ -5843,3 +5865,42 @@ Resolvido com o mesmo descarte, na origem da lista de fontes. A lição que fica
 `NOVO-81`, não sobre este teste: quando um problema é de categoria — "arquivo de teste sendo lido
 como produção" —, consertar a ocorrência que apareceu não fecha a categoria. Valia ter varrido quem
 mais lê `static/js/**`.
+
+### NOVO-87 · `NOVO` O fluxo do ofício não detecta roteiro duplicado · AUD · 0,5 d
+
+O catálogo já registrava isto como "divergência real já existente" dentro do `BE-11`. Ao unificar
+`novo` e `editar` a divergência ficou isolada e nomeável, então vira linha própria: `novo` e
+`editar` chamam `encontrar_roteiro_duplicado`, que procura **qualquer** roteiro idêntico já salvo e
+funde os dados nele. `oficios/route_views.py::wizard_roteiro` não chama.
+
+O que o wizard tem é outra coisa: `roteiro_state_equivalente_ao_roteiro` (`:133`) compara o estado
+submetido **só** com o roteiro que o usuário escolheu explicitamente no seletor. Se bater, vincula
+sem copiar; se não bater, grava rascunho novo. Ou seja, salvar a etapa de roteiro de um ofício pode
+criar um roteiro idêntico a um terceiro que o usuário nunca viu, sem aviso.
+
+**Não foi mexido de propósito.** Dar detecção de duplicado ao wizard não é refatoração: muda o que
+o usuário vê ao salvar a etapa, e `sobrescrever_roteiro_duplicado` migra ofícios e prestações e
+apaga o registro obsoleto — exatamente a classe de operação que o comentário de
+`oficios/route_views.py:139` manda nunca fazer com roteiro de outro ofício.
+
+**Antes de decidir, medir:** quantos roteiros idênticos o fluxo do ofício cria de fato em produção.
+Se forem poucos, a assimetria é aceitável e vira decisão documentada; se forem muitos, o desenho
+tem de mudar — e aí é `BE-12`, não este.
+
+### NOVO-88 · `NOVO` `wizard_roteiro` repete dois blocos dentro de si mesma · AUD · 0,25 d
+
+Achado ao medir o `BE-11`, e insumo direto do `BE-12`. A view de 165 linhas úteis tem duas
+duplicações internas:
+
+1. **Materializa rascunho + revincula ao ofício**, em `:140-146` e `:168-185`. Mesmo
+   `if roteiro_vinculado is None or roteiro_vinculado.status != Roteiro.STATUS_RASCUNHO:` seguido de
+   `Roteiro(tipo=…, status=…)`, `form.instance = …`, e depois
+   `if oficio.roteiro_id != roteiro_salvo.pk: oficio.roteiro = …; oficio.save(...)`. **Só a segunda
+   cópia injeta `area=`** — a primeira deixa o `Roteiro` nascer sem área e depende de quem salva
+   para preenchê-la.
+2. **O fallback de área** (`from cadastros.models import ConfiguracaoSistema` /
+   `area = ConfiguracaoSistema.get_singleton().area`) está escrito duas vezes, em `:79-84` e
+   `:170-173`.
+
+A assimetria do item 1 é a parte que importa: duas escritas do mesmo registro com regras de área
+diferentes na mesma view, e nada na suíte distingue os dois caminhos.
