@@ -9,6 +9,22 @@ from roteiros.services.editor_state import dedupe_roteiro_loop_retorno_final
 from roteiros.services.roteiro_editor import _apply_saved_map_route_from_post
 
 
+def pk_de_autosave(post):
+    """`autosave_obj_id` do POST como int, ou `None`.
+
+    `BE-11`: o parse estava copiado em `roteiros/views.py` e `oficios/route_views.py`.
+    Só o parse é comum — o queryset é de quem chama, porque os escopos divergem de
+    propósito: o fluxo avulso recorta pela área ativa, o do ofício pela área do ofício.
+    """
+    raw = (post.get("autosave_obj_id") or "").strip()
+    if not raw:
+        return None
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        return None
+
+
 ROTEIRO_AUTOSAVE_FIELDS = {
     "origem_estado",
     "origem_cidade",

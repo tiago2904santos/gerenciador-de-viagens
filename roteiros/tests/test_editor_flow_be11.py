@@ -163,6 +163,36 @@ class EditorRoteiroCaracterizacaoTests(TestCase):
             reverse("eventos:guiado_etapa", args=[evento.pk, 2]),
         )
 
+    def test_1b_editar_preserva_o_tipo_gravado_em_vez_de_deduzi_lo_do_evento(self):
+        """`editar` chama `atualizar_roteiro`, nunca `criar_roteiro` — e isso é visível.
+
+        As duas divergem em duas linhas: só `criar_roteiro` sobrescreve `evento` e deriva
+        `tipo` dele; `atualizar_roteiro` preserva `instance.tipo`. Um roteiro **avulso
+        vinculado a um evento** (é o que o wizard do ofício grava) separa as duas: sob
+        `criar_roteiro` o `tipo` viraria `TIPO_EVENTO` em silêncio.
+
+        Antes deste teste nada na suíte distinguia os dois caminhos.
+        """
+        roteiro = self._criar_roteiro_pelo_editor()
+        evento = Evento.objects.create(area=area_de_teste(), titulo="EVENTO AVULSO BE-11")
+        roteiro.evento = evento
+        roteiro.tipo = Roteiro.TIPO_AVULSO
+        roteiro.save(update_fields=["evento", "tipo"])
+
+        resposta = self.client.post(
+            reverse("roteiros:editar", args=[roteiro.pk]),
+            data=self._post_valido(observacoes="continua avulso"),
+        )
+
+        self.assertEqual(resposta.status_code, 302)
+        roteiro.refresh_from_db()
+        self.assertEqual(
+            roteiro.tipo,
+            Roteiro.TIPO_AVULSO,
+            "`editar` não pode redefinir o tipo a partir do evento vinculado",
+        )
+        self.assertEqual(roteiro.observacoes, "CONTINUA AVULSO")
+
     # -- 5 e 7: as duas mensagens de duplicado, que são diferentes ----------
 
     def test_5_editar_que_colide_grava_no_duplicado_e_descarta_este(self):
@@ -230,16 +260,16 @@ class EditorRoteiroCaracterizacaoTests(TestCase):
     def test_8_sobrescrita_que_falha_vira_erro_no_form_e_nao_redirect(self):
         existente = self._criar_roteiro_pelo_editor(observacoes="primeira")
 
-        from roteiros import views as roteiros_views
+        from roteiros.services import editor_flow
 
-        original = roteiros_views.sobrescrever_roteiro_duplicado
-        roteiros_views.sobrescrever_roteiro_duplicado = lambda *a, **k: None
+        original = editor_flow.sobrescrever_roteiro_duplicado
+        editor_flow.sobrescrever_roteiro_duplicado = lambda *a, **k: None
         try:
             resposta = self.client.post(
                 reverse("roteiros:novo"), data=self._post_valido(observacoes="segunda")
             )
         finally:
-            roteiros_views.sobrescrever_roteiro_duplicado = original
+            editor_flow.sobrescrever_roteiro_duplicado = original
 
         self.assertEqual(resposta.status_code, 200, "colisão sem saída não redireciona")
         erros = resposta.context["form"].errors.get("__all__") or []
