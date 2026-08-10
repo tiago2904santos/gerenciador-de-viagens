@@ -375,8 +375,12 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       mecanismo já identificado no catálogo
 
 ### Fase 6 — Camadas e duplicação
-- [ ] `BE-11` editor de roteiro em 3 cópias
-- [ ] `BE-12` `wizard_roteiro` com a regra dentro da view
+- [x] `BE-11` editor de roteiro em 3 cópias — **eram 2**: medida a interseção, `novo` × `editar` dá
+      55 linhas idênticas (o enunciado dizia 41) e `wizard_roteiro` só 20 de 165. As duas primeiras
+      foram unificadas atrás de `roteiros/services/editor_flow.py`; a terceira é outro fluxo e cai
+      no `BE-12`. Sobrou `NOVO-87` (o ofício não detecta duplicado — decisão adiada, não esquecida)
+- [ ] `BE-12` `wizard_roteiro` com a regra dentro da view — ler `NOVO-88` antes: a view repete dois
+      blocos dentro de si mesma, e só uma das duas cópias injeta `area=`
 - [ ] `BE-13` `roteiro_logic.py` fora do contrato de camadas
 - [ ] `BE-14` 48 sites de persistência em view, sem transação
 - [ ] `BE-15` numeração reimplementada 3 vezes

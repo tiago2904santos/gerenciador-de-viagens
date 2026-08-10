@@ -14,6 +14,7 @@ from roteiros.services.autosave import ROTEIRO_AUTOSAVE_FIELDS
 from roteiros.services.autosave import apply_roteiro_autosave
 from roteiros.services.autosave import build_roteiro_draft
 from roteiros.services.autosave import has_minimum_roteiro_content
+from roteiros.services.autosave import pk_de_autosave
 from roteiros.services import atualizar_roteiro, carregar_opcoes_rotas_avulsas_salvas, montar_contexto_editor_roteiro, montar_estado_editor_roteiro_evento_selecionado, montar_initial_roteiro_evento_sem_datas, normalizar_destinos_e_trechos_apos_erro_post, persistir_roteiro_rascunho_parcial, preparar_estado_editor_roteiro_para_get, preparar_querysets_formulario_roteiro, roteiro_state_equivalente_ao_roteiro, validar_submissao_editor_roteiro
 from .presenters import apresentar_oficio_wizard_summary
 from .selectors import get_oficio_by_id
@@ -32,12 +33,8 @@ from .view_helpers import _redirect_lista_oficio, _wizard_footer_ctx, _wizard_sh
 def _resolver_roteiro_rascunho_autosave(post, *, oficio):
     """Resolve um rascunho de Roteiro ja criado por autosave nesta mesma edicao
     (o JS guarda o pk em `autosave_obj_id` assim que o primeiro autosave cria a linha)."""
-    raw = (post.get("autosave_obj_id") or "").strip()
-    if not raw:
-        return None
-    try:
-        pk = int(raw)
-    except (TypeError, ValueError):
+    pk = pk_de_autosave(post)
+    if pk is None:
         return None
     return (
         # `BE-09`: `all_objects` — o escopo é a área do **ofício**, na linha de baixo.

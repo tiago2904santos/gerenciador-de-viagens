@@ -29,7 +29,7 @@
      `14px` literal, e não `var(--space-4)`: a escala vai de 12 (`--space-3`)
      para 16, e não há token de 14. Usar 16 mexeria 2px no ESCURO, e a E8 é o
      claro alcançando o escuro — não os dois indo para um terceiro lugar. O
-     valor fora de escala está registrado para a E9 (`NOVO-88`). */
+     valor fora de escala está registrado para a E9 (`NOVO-89`). */
   padding: 14px;
 }
 

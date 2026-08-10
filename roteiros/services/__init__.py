@@ -1,5 +1,9 @@
 # Servicos de calculo (legacy) e orquestracao do editor de roteiros.
 
+from .editor_flow import (
+    ResultadoSubmissaoEditor,
+    processar_submissao_editor,
+)
 from .roteiro_editor import (
     atualizar_roteiro,
     calcular_diarias_roteiro_request,
@@ -21,6 +25,7 @@ from .roteiro_editor import (
 )
 
 __all__ = [
+    "ResultadoSubmissaoEditor",
     "atualizar_roteiro",
     "calcular_diarias_roteiro_request",
     "carregar_opcoes_rotas_avulsas_salvas",
@@ -35,6 +40,7 @@ __all__ = [
     "persistir_roteiro_rascunho_parcial",
     "preparar_estado_editor_roteiro_para_get",
     "preparar_querysets_formulario_roteiro",
+    "processar_submissao_editor",
     "roteiro_state_equivalente_ao_roteiro",
     "sobrescrever_roteiro_duplicado",
     "validar_submissao_editor_roteiro",
