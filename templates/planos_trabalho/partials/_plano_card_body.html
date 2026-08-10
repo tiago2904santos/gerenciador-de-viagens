@@ -23,17 +23,7 @@
   <div class="fact-grid">
     <div class="fact-block fact-block--trechos">
       <span class="fact-block__label">Atividades selecionadas{% if card.atividades_count %} ({{ card.atividades_count }}){% endif %}</span>
-      {% if card.atividades %}
-      <ul class="itinerary">
-        {% for atividade in card.atividades %}
-        <li class="itinerary__leg">
-          <div class="itinerary__route">{{ atividade }}</div>
-        </li>
-        {% endfor %}
-      </ul>
-      {% else %}
-      <div class="fact-block__value--secondary empty-hint">Nenhuma atividade selecionada</div>
-      {% endif %}
+      <c-ui.lists.itinerary :items="card.atividades" :text_items="True" empty_label="Nenhuma atividade selecionada" empty_class="fact-block__value--secondary empty-hint" only />
     </div>
 
     <div class="fact-block fact-block--valor">

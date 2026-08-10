@@ -67,20 +67,7 @@
     {% if card.trechos %}
     <div class="fact-block fact-block--trechos">
       <span class="fact-block__label">Trechos encontrados</span>
-      <ul class="itinerary">
-        {% for trecho in card.trechos %}
-        <li class="itinerary__leg">
-          <div class="itinerary__route">{{ trecho.rota }}</div>
-          {% if trecho.saida or trecho.chegada %}
-          <div class="itinerary__time">
-            {% if trecho.saida %}{{ trecho.saida }}{% endif %}
-            {% if trecho.saida and trecho.chegada %} → {% endif %}
-            {% if trecho.chegada %}{{ trecho.chegada }}{% endif %}
-          </div>
-          {% endif %}
-        </li>
-        {% endfor %}
-      </ul>
+      <c-ui.lists.itinerary :items="card.trechos" only />
     </div>
     {% endif %}
 

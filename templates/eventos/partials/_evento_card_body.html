@@ -5,36 +5,7 @@
     <div class="fact-block fact-block--trechos">
       <span class="fact-block__label">Ofícios{% if card.oficios_count %} ({{ card.oficios_count }}){% endif %}</span>
       {% if card.oficios %}
-      <ul class="itinerary fact-grid--dense">
-        {% for oficio in card.oficios %}
-        <li class="itinerary__leg itinerary__leg--documento">
-          <div class="itinerary__leg-body">
-            <div class="itinerary__route">
-              <span>{{ oficio.numero }}</span>
-            </div>
-            {% if oficio.protocolo or oficio.data_evento_display or oficio.destino_display %}
-            <div class="itinerary__time">
-              {% if oficio.protocolo %}{{ oficio.protocolo }}{% endif %}{% if oficio.protocolo and oficio.data_evento_display %} · {% endif %}{% if oficio.data_evento_display %}{{ oficio.data_evento_display }}{% endif %}{% if oficio.destino_display and oficio.protocolo or oficio.destino_display and oficio.data_evento_display %} · {% endif %}{% if oficio.destino_display %}{{ oficio.destino_display }}{% endif %}
-            </div>
-            {% endif %}
-          </div>
-          <div class="itinerary__leg-actions">
-            <c-ui.buttons.button
-              type="button"
-              class_name="icon-btn icon-btn--settings icon-btn--documents"
-              aria_label="Abrir ações do ofício {{ oficio.numero }}"
-              aria-haspopup="true"
-              aria-expanded="false"
-              aria-controls="evento-oficio-menu-{{ card.pk }}-{{ oficio.oficio_pk }}"
-              data-tooltip="Ações e documentos"
-              data-overlay-trigger data-overlay-kind="menu"
-              data-overlay-target="evento-oficio-menu-{{ card.pk }}-{{ oficio.oficio_pk }}"
-              data_overlay_src="{{ card.menus_url }}" only><c-ui.icons.icon icon="folder" only /></c-ui.buttons.button>
-            
-          </div>
-        </li>
-        {% endfor %}
-      </ul>
+      <c-ui.lists.itinerary :items="card.oficios" extra_class="fact-grid--dense" item_extra_class="itinerary__leg--documento" item_template="eventos/partials/_itinerary_item.html" item_kind="oficio" :item_context="card" only />
       {% else %}
       <div class="fact-block__value--secondary empty-hint">Nenhum ofício vinculado</div>
       {% endif %}
@@ -43,37 +14,7 @@
     <div class="fact-block fact-block--trechos fact-block--documents">
       <span class="fact-block__label">Documentos{% if card.documentos_count %} ({{ card.documentos_count }}){% endif %}</span>
       {% if card.documentos %}
-      <ul class="itinerary fact-grid--dense">
-        {% for doc in card.documentos %}
-        <li class="itinerary__leg itinerary__leg--documento">
-          <div class="itinerary__leg-body">
-            <div class="itinerary__route">
-              <span>{{ doc.title }}</span>
-              <span class="person-row__badge">{{ doc.kind }}</span>
-            </div>
-            {% if doc.meta or doc.detail %}
-            <div class="itinerary__time">
-              {% if doc.meta %}{{ doc.meta }}{% endif %}{% if doc.meta and doc.detail %} · {% endif %}{% if doc.detail %}{{ doc.detail }}{% endif %}
-            </div>
-            {% endif %}
-          </div>
-          <div class="itinerary__leg-actions">
-            <c-ui.buttons.button
-              type="button"
-              class_name="icon-btn icon-btn--settings icon-btn--documents"
-              aria_label="Abrir ações de {{ doc.title }}"
-              aria-haspopup="true"
-              aria-expanded="false"
-              aria-controls="evento-documento-menu-{{ card.pk }}-{{ forloop.counter }}"
-              data-tooltip="Ações e documentos"
-              data-overlay-trigger data-overlay-kind="menu"
-              data-overlay-target="evento-documento-menu-{{ card.pk }}-{{ forloop.counter }}"
-              data_overlay_src="{{ card.menus_url }}" only><c-ui.icons.icon icon="folder" only /></c-ui.buttons.button>
-            
-          </div>
-        </li>
-        {% endfor %}
-      </ul>
+      <c-ui.lists.itinerary :items="card.documentos" extra_class="fact-grid--dense" item_extra_class="itinerary__leg--documento" item_template="eventos/partials/_itinerary_item.html" item_kind="documento" :item_context="card" only />
       {% else %}
       <div class="fact-block__value--secondary empty-hint">Nenhum plano, convite ou OS vinculado</div>
       {% endif %}

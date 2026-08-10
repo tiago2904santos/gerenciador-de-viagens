@@ -68,4 +68,4 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
 
     def test_namespace_unico_tem_o_inventario_atual(self):
         self.assertEqual(list((ROOT / "templates" / "components").rglob("*.*")), [])
-        self.assertEqual(len(self.components()), 83)
+        self.assertEqual(len(self.components()), 84)
