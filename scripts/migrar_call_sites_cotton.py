@@ -24,6 +24,7 @@ from django.utils.text import smart_split
 
 COMPONENT_PREFIX = "components/"
 INCLUDE_RE = re.compile(r"{%\s*include\s+.*?%}", re.DOTALL)
+EXTENDS_RE = re.compile(r"{%\s*extends\s+.*?%}", re.DOTALL)
 QUOTED_RE = re.compile(r"^(?P<quote>['\"])(?P<value>.*)(?P=quote)$", re.DOTALL)
 
 
@@ -98,6 +99,19 @@ def converter_include(tag: str) -> str:
     return componente
 
 
+def converter_extends(tag: str) -> str:
+    conteudo = tag[2:-2].strip()
+    tokens = list(smart_split(conteudo))
+    if len(tokens) != 2 or tokens[0] != "extends":
+        return tag
+    alvo = _literal(tokens[1])
+    if not alvo or not alvo.startswith(COMPONENT_PREFIX):
+        return tag
+    canonico = "cotton/" + alvo.removeprefix(COMPONENT_PREFIX)
+    quote = tokens[1][0]
+    return f"{{% extends {quote}{canonico}{quote} %}}"
+
+
 def converter_texto(texto: str) -> tuple[str, int]:
     alterados = 0
 
@@ -109,7 +123,17 @@ def converter_texto(texto: str) -> tuple[str, int]:
             alterados += 1
         return convertido
 
-    return INCLUDE_RE.sub(substituir, texto), alterados
+    convertido = INCLUDE_RE.sub(substituir, texto)
+
+    def substituir_extends(match: re.Match[str]) -> str:
+        nonlocal alterados
+        original = match.group(0)
+        novo = converter_extends(original)
+        if novo != original:
+            alterados += 1
+        return novo
+
+    return EXTENDS_RE.sub(substituir_extends, convertido), alterados
 
 
 def iterar_templates(escopos: Iterable[Path]) -> Iterable[Path]:
@@ -139,8 +163,8 @@ def executar(escopos: list[Path], *, escrever: bool) -> int:
         if escrever:
             caminho.write_text(convertido, encoding="utf-8", newline="")
 
-    acao = "migrados" if escrever else "pendentes"
-    print(f"{total} include(s) {acao} em {len(alteracoes)} arquivo(s)")
+    acao = "migradas" if escrever else "pendentes"
+    print(f"{total} referência(s) {acao} em {len(alteracoes)} arquivo(s)")
     return 0 if escrever or total == 0 else 1
 
 

@@ -1,4 +1,4 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 {% load static %}
 
 {% comment %}
@@ -17,13 +17,13 @@
 
 {% block flow_header %}
   <header class="list-header list-header--wizard-band" data-wizard-sticky-band>
-    {% include "components/ui/headers/_list_header_band.html" with title=page_title eyebrow=flow_eyebrow status_label=flow_status_label status_variant=flow_status_variant only %}
+    <c-ui.headers._list_header_band :title="page_title" :eyebrow="flow_eyebrow" :status_label="flow_status_label" :status_variant="flow_status_variant" only />
   </header>
 {% endblock %}
 
 {% block flow_body %}
   <div class="form-section-stack form-section-stack--comfortable" data-travel-document-wizard-step1>
-    {% include "components/form/card.html" with title="Conta e segurança" description=page_description title_id="perfil-conta-title" heading_level=2 extra_class="travel-document-card" body_extra_class="travel-document-body" meta_template="core/partials/_perfil_areas_header_meta.html" body_template="core/partials/_perfil_card_body.html" footer_template="core/partials/_perfil_logout_footer.html" %}
+    <c-form.card title="Conta e segurança" :description="page_description" title_id="perfil-conta-title" :heading_level="2" extra_class="travel-document-card" body_extra_class="travel-document-body" meta_template="core/partials/_perfil_areas_header_meta.html" body_template="core/partials/_perfil_card_body.html" footer_template="core/partials/_perfil_logout_footer.html" />
   </div>
 {% endblock %}
 

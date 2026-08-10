@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 
-from scripts.migrar_call_sites_cotton import converter_include
+from scripts.migrar_call_sites_cotton import converter_extends, converter_include
 
 
 class MigracaoCallSitesCottonTests(SimpleTestCase):
@@ -28,6 +28,12 @@ class MigracaoCallSitesCottonTests(SimpleTestCase):
     def test_ignora_include_de_partial_de_aplicacao(self):
         origem = '{% include "oficios/partials/_card.html" with card=card only %}'
         self.assertEqual(converter_include(origem), origem)
+
+    def test_converte_heranca_de_componente_para_template_canonico(self):
+        self.assertEqual(
+            converter_extends('{% extends "components/page/flow_base.html" %}'),
+            '{% extends "cotton/page/flow_base.html" %}',
+        )
 
     def test_rejeita_sintaxe_inesperada_em_componente(self):
         with self.assertRaisesRegex(ValueError, "include de componente não suportado"):

@@ -5,14 +5,14 @@
 {% endcomment %}
 <form method="post" class="document-form travel-document-wizard__form perfil-form-section" novalidate>
   {% csrf_token %}
-  {% include "components/ui/forms/form_block.html" with element_id="perfil-identificacao" section_id="perfil-identificacao-title" variant="split" extra_class="travel-document-block document-form-block" title="Dados pessoais" description="Nome, usuário e e-mail institucional" body_template="core/partials/_perfil_dados_identificacao_fields.html" actions_template="core/partials/_perfil_dados_action.html" heading_level=3 %}
+  <c-ui.forms.form_block element_id="perfil-identificacao" section_id="perfil-identificacao-title" variant="split" extra_class="travel-document-block document-form-block" title="Dados pessoais" description="Nome, usuário e e-mail institucional" body_template="core/partials/_perfil_dados_identificacao_fields.html" actions_template="core/partials/_perfil_dados_action.html" :heading_level="3" />
 </form>
 
 <form method="post" class="document-form travel-document-wizard__form perfil-form-section" novalidate>
   {% csrf_token %}
-  {% include "components/ui/forms/form_block.html" with element_id="perfil-senha-bloco" section_id="perfil-senha-bloco-title" variant="split" extra_class="travel-document-block document-form-block" title="Senha de acesso" description="A troca encerra as demais sessões abertas" body_template="core/partials/_perfil_senha_fields.html" actions_template="core/partials/_perfil_senha_action.html" heading_level=3 %}
+  <c-ui.forms.form_block element_id="perfil-senha-bloco" section_id="perfil-senha-bloco-title" variant="split" extra_class="travel-document-block document-form-block" title="Senha de acesso" description="A troca encerra as demais sessões abertas" body_template="core/partials/_perfil_senha_fields.html" actions_template="core/partials/_perfil_senha_action.html" :heading_level="3" />
 </form>
 
-{% include "components/ui/forms/form_block.html" with element_id="perfil-areas-bloco" section_id="perfil-areas-bloco-title" extra_class="travel-document-block document-form-block" title="Áreas de trabalho" description="Espaços aos quais sua conta possui acesso" body_template="core/partials/_perfil_areas_list.html" heading_level=3 %}
+<c-ui.forms.form_block element_id="perfil-areas-bloco" section_id="perfil-areas-bloco-title" extra_class="travel-document-block document-form-block" title="Áreas de trabalho" description="Espaços aos quais sua conta possui acesso" body_template="core/partials/_perfil_areas_list.html" :heading_level="3" />
 
-{% include "components/perfil/partials/_gdrive_card_body.html" %}
+<c-perfil.partials._gdrive_card_body />

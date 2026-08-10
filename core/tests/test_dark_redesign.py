@@ -582,8 +582,8 @@ class DarkRedesignContractTests(SimpleTestCase):
         # classe `dashboard-*` pode voltar — era ela que justificava um CSS so
         # dela (`dashboard.css`, apagado) e 4 blocos no tema escuro.
         self.assertIn("page-shell", dashboard)
-        self.assertIn('components/ui/headers/page_header.html', dashboard)
-        self.assertIn('components/cards/module_card.html', dashboard)
+        self.assertIn('<c-ui.headers.page_header', dashboard)
+        self.assertIn('<c-cards.module_card', dashboard)
         self.assertNotIn("dashboard-page", dashboard)
         self.assertNotIn("summary_card.html", dashboard)
         self.assertIn("cv-module-card", module_card)

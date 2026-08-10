@@ -262,7 +262,7 @@ class UmPadraoSoTests(SimpleTestCase):
         producao = [
             caminho.relative_to(RAIZ).as_posix()
             for caminho, texto in self.templates()
-            if "feedback/form_errors.html" in texto
+            if "feedback/form_errors.html" in texto or "ui.feedback.form_errors" in texto
            
         ]
 
