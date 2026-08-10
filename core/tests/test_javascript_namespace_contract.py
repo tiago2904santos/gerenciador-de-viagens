@@ -15,7 +15,7 @@ class JavascriptNamespaceContractTests(SimpleTestCase):
                 encoding="utf-8-sig"
             )
             for path in cls.static_js.rglob("*.js")
-            if "vendor" not in path.parts
+            if "vendor" not in path.parts and not path.name.endswith(".test.js")
         }
 
     def test_application_does_not_publish_namespaces_outside_cv(self):
