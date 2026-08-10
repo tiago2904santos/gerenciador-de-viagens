@@ -4,6 +4,7 @@ from django.urls import reverse
 
 from cadastros.selectors import get_configuracao_sistema
 from core import entity_cards
+from core.presenters.text import join_non_empty
 from core.utils.masks import format_protocolo
 
 # Reaproveita a formatação já consolidada na lista de ofícios para manter
@@ -109,6 +110,7 @@ def _servidor_row(ps, solicitacao_form=None, prestacao_anexos=None, diario_pdf_u
         "name": servidor.nome,
         "cargo": cargo_nome,
         "unidade": unidade_nome,
+        "meta": join_non_empty([cargo_nome, unidade_nome]),
         "is_motorista": ps.is_motorista,
         "numero_solicitacao": ps.numero_solicitacao,
         "data_liberacao_diarias": (

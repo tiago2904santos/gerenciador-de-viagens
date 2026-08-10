@@ -39,9 +39,7 @@
           <span class="person-row__badge person-row__badge--ok" title="Comprovante de saque anexado">✓ Comprovante</span>
           {% endif %}
         </div>
-        {% if servidor.cargo or servidor.unidade %}
-        <span class="person-row__meta">{% if servidor.cargo %}{{ servidor.cargo }}{% endif %}{% if servidor.cargo and servidor.unidade %} · {% endif %}{% if servidor.unidade %}{{ servidor.unidade }}{% endif %}</span>
-        {% endif %}
+      {% if servidor.meta %}<span class="person-row__meta">{{ servidor.meta }}</span>{% endif %}
       </div>
 
       <c-ui.buttons.button type="button"

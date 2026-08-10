@@ -73,6 +73,7 @@ class ItineraryComponentTests(SimpleTestCase):
                         "protocolo": "123",
                         "data_evento_display": "10/08/2026",
                         "destino_display": "Curitiba",
+                        "meta_display": "123 · 10/08/2026 · Curitiba",
                     }
                 ],
             },
@@ -86,8 +87,20 @@ class ItineraryComponentTests(SimpleTestCase):
             {
                 "card": {"pk": 17, "menus_url": "/eventos/17/menus/"},
                 "items": [
-                    {"title": "Plano", "kind": "PT", "meta": "A", "detail": "B"},
-                    {"title": "Convite", "kind": "Anexo", "meta": "", "detail": ""},
+                    {
+                        "title": "Plano",
+                        "kind": "PT",
+                        "meta": "A",
+                        "detail": "B",
+                        "meta_display": "A · B",
+                    },
+                    {
+                        "title": "Convite",
+                        "kind": "Anexo",
+                        "meta": "",
+                        "detail": "",
+                        "meta_display": "",
+                    },
                 ],
             },
         )

@@ -15,11 +15,7 @@
                 <span class="oficio-documentos-traveller-tile__badge">Motorista</span>
               {% endif %}
             </div>
-            {% if viajante.cargo or viajante.funcao or viajante.unidade %}
-              <span class="oficio-documentos-traveller-tile__meta">
-                {% if viajante.cargo %}{{ viajante.cargo }}{% elif viajante.funcao %}{{ viajante.funcao }}{% endif %}{% if viajante.unidade and viajante.cargo %} · {{ viajante.unidade }}{% elif viajante.unidade and viajante.funcao %} · {{ viajante.unidade }}{% elif viajante.unidade %}{{ viajante.unidade }}{% endif %}
-              </span>
-            {% endif %}
+            {% if viajante.meta %}<span class="oficio-documentos-traveller-tile__meta">{{ viajante.meta }}</span>{% endif %}
           </div>
           <span
             class="oficio-documentos-traveller-tile__termo{% if viajante.has_termo %} oficio-documentos-traveller-tile__termo--sim{% else %} oficio-documentos-traveller-tile__termo--nao{% endif %}"

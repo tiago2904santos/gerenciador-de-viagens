@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from core import entity_cards
 from core.presenters.badges import build_badge
+from core.presenters.text import join_non_empty
 from oficios.presenters import apresentar_oficio_card
 
 from .models import EventoAnexo
@@ -30,6 +31,9 @@ def _oficio_item(oficio):
     viatura_placa = card.get("veiculo_placa") or ""
     viatura_modelo = card.get("veiculo_modelo") or ""
     viatura_display = " · ".join(filter(None, [viatura_placa, viatura_modelo])) or "Não informado"
+    protocolo = card.get("protocolo_display") or ""
+    data_evento = card.get("data_evento_display") or ""
+    destino = card.get("destino_display") or ""
 
     viatura_tipo = ""
     viatura_combustivel = ""
@@ -43,9 +47,10 @@ def _oficio_item(oficio):
     return {
         "oficio_pk": card["oficio_pk"],
         "numero": card["numero_display"],
-        "protocolo": card.get("protocolo_display") or "",
-        "data_evento_display": card.get("data_evento_display") or "",
-        "destino_display": card.get("destino_display") or "",
+        "protocolo": protocolo,
+        "data_evento_display": data_evento,
+        "destino_display": destino,
+        "meta_display": join_non_empty([protocolo, data_evento, destino]),
         "status_label": card["status_chip_label"].replace(" (legado)", ""),
         "status_state": card["status_chip_tone"],
         "data": card["data_criacao_display"],
@@ -68,11 +73,14 @@ def _oficio_item(oficio):
 
 
 def _plano_item(plano):
+    meta = plano.periodo_display
+    detail = plano.destino_display
     return {
         "kind": "Plano de trabalho",
         "title": plano.numero_formatado,
-        "meta": plano.periodo_display,
-        "detail": plano.destino_display,
+        "meta": meta,
+        "detail": detail,
+        "meta_display": join_non_empty([meta, detail]),
         "editar_url": reverse("planos_trabalho:wizard_identificacao", args=[plano.pk]),
         "visualizar_url": reverse("planos_trabalho:pdf_inline", args=[plano.pk]),
         "pdf_url": reverse("planos_trabalho:baixar_documento", args=[plano.pk, "pdf"]),
@@ -81,11 +89,14 @@ def _plano_item(plano):
 
 
 def _ordem_item(ordem):
+    meta = ordem.periodo_display
+    detail = ordem.destinos_display
     return {
         "kind": "Ordem de serviço",
         "title": ordem.numero_formatado,
-        "meta": ordem.periodo_display,
-        "detail": ordem.destinos_display,
+        "meta": meta,
+        "detail": detail,
+        "meta_display": join_non_empty([meta, detail]),
         "editar_url": reverse("ordens_servico:editar", args=[ordem.pk]),
         "visualizar_url": reverse("ordens_servico:pdf_inline", args=[ordem.pk]),
         "pdf_url": reverse("ordens_servico:baixar_pdf", args=[ordem.pk]),
@@ -99,11 +110,14 @@ def _convite_item(anexo):
         if anexo.arquivo
         else ""
     )
+    meta = anexo.criado_em.strftime("%d/%m/%Y") if anexo.criado_em else ""
+    detail = anexo.observacoes or "Arquivo anexado ao evento."
     return {
         "kind": "Convite",
         "title": anexo.titulo or anexo.get_tipo_display(),
-        "meta": anexo.criado_em.strftime("%d/%m/%Y") if anexo.criado_em else "",
-        "detail": anexo.observacoes or "Arquivo anexado ao evento.",
+        "meta": meta,
+        "detail": detail,
+        "meta_display": join_non_empty([meta, detail]),
         "visualizar_url": arquivo_url,
         "pdf_url": arquivo_url,
         "docx_url": "",
@@ -118,11 +132,13 @@ def _solicitacao_item(doc):
         else ""
     )
     nome = doc.nome_original or doc.arquivo.name.split("/")[-1]
+    meta = doc.criado_em.strftime("%d/%m/%Y") if doc.criado_em else ""
     return {
         "kind": "Solicitação",
         "title": nome,
-        "meta": doc.criado_em.strftime("%d/%m/%Y") if doc.criado_em else "",
+        "meta": meta,
         "detail": "",
+        "meta_display": join_non_empty([meta]),
         "visualizar_url": arquivo_url,
         "pdf_url": arquivo_url,
         "docx_url": "",

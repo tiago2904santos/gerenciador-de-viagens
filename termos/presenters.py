@@ -2,6 +2,7 @@ from django.urls import reverse
 
 from core import entity_cards
 from core.presenters.meta import build_meta
+from core.presenters.text import join_non_empty
 from core.utils.masks import format_placa
 
 
@@ -101,6 +102,7 @@ def apresentar_termo_card(
             "name": servidor.nome,
             "cargo": cargo_nome,
             "unidade": unidade_nome,
+            "meta": join_non_empty([cargo_nome, unidade_nome]),
             "pdf_url": servidor_url_builder(servidor.pk, "pdf") if servidor_url_builder else "",
             "docx_url": servidor_url_builder(servidor.pk, "docx") if servidor_url_builder else "",
             "view_url": servidor_view_url_builder(servidor.pk) if servidor_view_url_builder else "",

@@ -12,9 +12,7 @@
           <span class="person-row__badge">Motorista</span>
           {% endif %}
         </div>
-        {% if s.cargo or s.unidade %}
-        <span class="person-row__meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
-        {% endif %}
+      {% if s.meta %}<span class="person-row__meta">{{ s.meta }}</span>{% endif %}
       </div>
 
       {% if s.has_termo %}

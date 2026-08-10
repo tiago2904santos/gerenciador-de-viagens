@@ -7,17 +7,7 @@
       <span class="person-row__badge">{{ item.kind }}</span>
     {% endif %}
   </div>
-  {% if item_kind == "oficio" %}
-    {% if item.protocolo or item.data_evento_display or item.destino_display %}
-      <div class="itinerary__time">
-        {% if item.protocolo %}{{ item.protocolo }}{% endif %}{% if item.protocolo and item.data_evento_display %} · {% endif %}{% if item.data_evento_display %}{{ item.data_evento_display }}{% endif %}{% if item.destino_display and item.protocolo or item.destino_display and item.data_evento_display %} · {% endif %}{% if item.destino_display %}{{ item.destino_display }}{% endif %}
-      </div>
-    {% endif %}
-  {% elif item.meta or item.detail %}
-    <div class="itinerary__time">
-      {% if item.meta %}{{ item.meta }}{% endif %}{% if item.meta and item.detail %} · {% endif %}{% if item.detail %}{{ item.detail }}{% endif %}
-    </div>
-  {% endif %}
+  {% if item.meta_display %}<div class="itinerary__time">{{ item.meta_display }}</div>{% endif %}
 </div>
 <div class="itinerary__leg-actions">
   <c-ui.buttons.button

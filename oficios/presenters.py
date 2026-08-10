@@ -3,6 +3,7 @@ import json
 from core import entity_cards
 from core.presenters.badges import build_badge
 from core.presenters.meta import build_meta
+from core.presenters.text import join_non_empty
 from core.utils.masks import format_placa
 from core.utils.masks import format_protocolo
 from decimal import Decimal
@@ -177,6 +178,7 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
             "name": s.nome,
             "cargo": cargo_nome,
             "unidade": unidade_nome,
+            "meta": join_non_empty([cargo_nome, unidade_nome]),
             "is_motorista": bool(motorista_pk and s.pk == motorista_pk),
             "telefone": s.telefone_formatado if s.telefone else "",
             "has_termo": has_termo,
@@ -492,6 +494,7 @@ def _montar_viajantes_cards_documentos(oficio):
                 "iniciais": _iniciais_nome_servidor(servidor.nome),
                 "cargo": cargo_nome,
                 "funcao": "",
+                "meta": join_non_empty([cargo_nome, unidade_label]),
                 "matricula": "",
                 "rg": rg_m,
                 "cpf": cpf_m,

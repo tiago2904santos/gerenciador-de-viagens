@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.utils.html import escape
 
 from core.tenancy import filter_queryset_by_area, get_current_area
+from core.presenters.text import join_non_empty
 from core.utils.masks import format_protocolo
 
 from .forms import CAMPOS_COM_MODELO, CAMPOS_CUSTEIO_COM_OUTRO
@@ -116,12 +117,17 @@ def _servidor_identificacao(ps) -> dict:
     from oficios.presenters import _iniciais_nome_servidor
 
     servidor = ps.servidor
+    cargo = str(servidor.cargo) if servidor.cargo_id else "—"
+    unidade = str(servidor.unidade) if servidor.unidade_id else ""
+    cpf = servidor.cpf_formatado
+    cpf_display = f"CPF {cpf}" if cpf and cpf != "—" else ""
     return {
         "ps_pk": ps.pk,
         "nome_servidor": servidor.nome,
-        "cpf_servidor": servidor.cpf_formatado,
-        "cargo": str(servidor.cargo) if servidor.cargo_id else "—",
-        "unidade": str(servidor.unidade) if servidor.unidade_id else "",
+        "cpf_servidor": cpf,
+        "cargo": cargo,
+        "unidade": unidade,
+        "meta": join_non_empty([cargo, unidade, cpf_display]),
         "is_motorista": ps.is_motorista,
         "numero_solicitacao": ps.numero_solicitacao,
         "iniciais": _iniciais_nome_servidor(servidor.nome),
