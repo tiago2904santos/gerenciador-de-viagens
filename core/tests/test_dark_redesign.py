@@ -522,10 +522,10 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_document_viewer_and_signature_use_canonical_components(self):
         templates = Path(settings.BASE_DIR) / "templates"
-        viewer = (templates / "components" / "documents" / "pdf_viewer.html").read_text(encoding="utf-8")
-        signature = (templates / "components" / "documents" / "signature_card.html").read_text(encoding="utf-8")
+        viewer = (templates / "cotton" / "documents" / "pdf_viewer.html").read_text(encoding="utf-8")
+        signature = (templates / "cotton" / "documents" / "signature_card.html").read_text(encoding="utf-8")
         signature_body = (
-            templates / "components" / "documents" / "partials" / "_signature_card_body.html"
+            templates / "cotton" / "documents" / "partials" / "_signature_card_body.html"
         ).read_text(encoding="utf-8")
         viewer_page = (templates / "documentos" / "pdf_viewer.html").read_text(encoding="utf-8")
         signature_js = (

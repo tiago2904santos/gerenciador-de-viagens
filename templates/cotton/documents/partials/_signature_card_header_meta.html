@@ -1,0 +1,8 @@
+{% cotton:vars signature %}
+{% if signature.assinada %}
+  {% include "components/ui/badges/status_badge.html" with label="Assinado" variant="success" only %}
+{% elif signature.link_ativo %}
+  {% include "components/ui/badges/status_badge.html" with label="Aguardando assinatura" variant="info" only %}
+{% else %}
+  {% include "components/ui/badges/status_badge.html" with label="Pendente" variant="warning" only %}
+{% endif %}
