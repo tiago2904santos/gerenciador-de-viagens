@@ -8,11 +8,11 @@
   data-evento-doc-tolerancia="{{ evento_doc_tolerancia_dias }}"
 >
   <div class="segment-toggle evento-doc-toggle" role="group" aria-label="Tipo de documento" data-evento-doc-toggle>
-    <button type="button" class="segment-toggle__btn" data-doc-tab-target="oficios" aria-pressed="true">Ofícios</button>
-    <button type="button" class="segment-toggle__btn" data-doc-tab-target="roteiros" aria-pressed="false">Roteiros</button>
-    <button type="button" class="segment-toggle__btn" data-doc-tab-target="pt" aria-pressed="false">Plano de Trabalho</button>
-    <button type="button" class="segment-toggle__btn" data-doc-tab-target="os" aria-pressed="false">Ordem de Serviço</button>
-    <button type="button" class="segment-toggle__btn" data-doc-tab-target="termos" aria-pressed="false">Termos</button>
+    <c-ui.buttons.button type="button" class_name="segment-toggle__btn" data-doc-tab-target="oficios" aria-pressed="true" only>Ofícios</c-ui.buttons.button>
+    <c-ui.buttons.button type="button" class_name="segment-toggle__btn" data-doc-tab-target="roteiros" aria-pressed="false" only>Roteiros</c-ui.buttons.button>
+    <c-ui.buttons.button type="button" class_name="segment-toggle__btn" data-doc-tab-target="pt" aria-pressed="false" only>Plano de Trabalho</c-ui.buttons.button>
+    <c-ui.buttons.button type="button" class_name="segment-toggle__btn" data-doc-tab-target="os" aria-pressed="false" only>Ordem de Serviço</c-ui.buttons.button>
+    <c-ui.buttons.button type="button" class_name="segment-toggle__btn" data-doc-tab-target="termos" aria-pressed="false" only>Termos</c-ui.buttons.button>
   </div>
 
   {% include "eventos/partials/_documento_panel.html" with panel_key="oficios" field=form.oficios_vinculados label="Adicionar ofício" placeholder="Buscar por número, protocolo, destino ou servidor" empty="Nenhum ofício disponível para o período." hidden=False only %}

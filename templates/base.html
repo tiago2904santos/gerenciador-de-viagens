@@ -21,12 +21,12 @@
         <span class="sidebar-brand-badge" aria-hidden="true">CV</span>
         <span>Central de Viagens</span>
       </a>
-      <button class="app-mobile-bar__toggle" type="button" aria-controls="app-sidebar" aria-expanded="false" aria-label="Abrir menu principal" data-sidebar-drawer-toggle>
+      <c-ui.buttons.button class_name="app-mobile-bar__toggle" type="button" aria-controls="app-sidebar" aria-expanded="false" aria_label="Abrir menu principal" data-sidebar-drawer-toggle only>
         <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
-      </button>
+      </c-ui.buttons.button>
     </header>
     <c-layout.sidebar  :navigation_items="navigation_items" :request="request" />
-    <button class="sidebar-scrim" type="button" aria-label="Fechar menu principal" tabindex="-1" data-sidebar-drawer-close></button>
+    <c-ui.buttons.button class_name="sidebar-scrim" type="button" aria_label="Fechar menu principal" tabindex="-1" data-sidebar-drawer-close only></c-ui.buttons.button>
     <main class="app-main" id="main-content" tabindex="-1">
       <section class="content-wrap">
         <c-feedback.alerts  :messages="messages" />

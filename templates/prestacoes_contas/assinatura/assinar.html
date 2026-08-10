@@ -22,11 +22,11 @@
   </ol>
 
   <div class="asgn-toolbar">
-    <button type="button" class="asgn-btn asgn-btn--ghost" id="asgn-open-builder">✍ Criar assinatura</button>
+    <c-ui.buttons.plain_button type="button" class_name="asgn-btn asgn-btn--ghost" id="asgn-open-builder" only>✍ Criar assinatura</c-ui.buttons.plain_button>
     <div class="asgn-pager">
-      <button type="button" id="asgn-prev" class="asgn-iconbtn" aria-label="Página anterior">‹</button>
+      <c-ui.buttons.plain_button type="button" id="asgn-prev" class_name="asgn-iconbtn" aria-label="Página anterior" only>‹</c-ui.buttons.plain_button>
       <span id="asgn-page-label" class="asgn-pager__label">1 / 1</span>
-      <button type="button" id="asgn-next" class="asgn-iconbtn" aria-label="Próxima página">›</button>
+      <c-ui.buttons.plain_button type="button" id="asgn-next" class_name="asgn-iconbtn" aria-label="Próxima página" only>›</c-ui.buttons.plain_button>
     </div>
   </div>
 
@@ -51,9 +51,9 @@
     <input type="hidden" name="pos_y" id="f-y">
     <input type="hidden" name="largura" id="f-w">
     <input type="hidden" name="altura" id="f-h">
-    <button type="submit" class="asgn-btn asgn-btn--primary asgn-btn--block" id="asgn-submit" disabled>
+    <c-ui.buttons.plain_button type="submit" class_name="asgn-btn asgn-btn--primary asgn-btn--block" id="asgn-submit" disabled only>
       Enviar assinatura
-    </button>
+    </c-ui.buttons.plain_button>
   </form>
 </section>
 
@@ -61,8 +61,8 @@
   <div class="asgn-sheet__backdrop" id="asgn-sheet-backdrop"></div>
   <div class="asgn-sheet__panel" role="dialog" aria-label="Criar assinatura">
     <div class="asgn-tabs">
-      <button type="button" class="asgn-tab is-active" data-tab="fonte">Escolher fonte</button>
-      <button type="button" class="asgn-tab" data-tab="desenho">Desenhar à mão</button>
+      <c-ui.buttons.plain_button type="button" class_name="asgn-tab is-active" data-tab="fonte" only>Escolher fonte</c-ui.buttons.plain_button>
+      <c-ui.buttons.plain_button type="button" class_name="asgn-tab" data-tab="desenho" only>Desenhar à mão</c-ui.buttons.plain_button>
     </div>
 
     <div class="asgn-tabpane" data-pane="fonte">
@@ -70,8 +70,8 @@
       <input class="asgn-input" id="asgn-name-input" maxlength="60" value="{{ nome }}">
       <div class="asgn-fontlist" id="asgn-fontlist">
         {% for f in fontes %}
-        <button type="button" class="asgn-fontchip asgn-fontchip--{{ f.key }}" data-key="{{ f.key }}"
-                data-family="{{ f.family }}">{{ nome }}</button>
+        <c-ui.buttons.plain_button type="button" class_name="asgn-fontchip asgn-fontchip--{{ f.key }}" data-key="{{ f.key }}"
+                data-family="{{ f.family }}" only>{{ nome }}</c-ui.buttons.plain_button>
         {% endfor %}
       </div>
     </div>
@@ -80,12 +80,12 @@
       <div class="asgn-drawwrap">
         <canvas id="asgn-draw" class="asgn-draw"></canvas>
       </div>
-      <button type="button" class="asgn-btn asgn-btn--ghost asgn-btn--sm" id="asgn-draw-clear">Limpar</button>
+      <c-ui.buttons.plain_button type="button" class_name="asgn-btn asgn-btn--ghost asgn-btn--sm" id="asgn-draw-clear" only>Limpar</c-ui.buttons.plain_button>
     </div>
 
     <div class="asgn-sheet__actions">
-      <button type="button" class="asgn-btn asgn-btn--ghost" id="asgn-sheet-cancel">Cancelar</button>
-      <button type="button" class="asgn-btn asgn-btn--primary" id="asgn-sheet-apply" disabled>Usar assinatura</button>
+      <c-ui.buttons.plain_button type="button" class_name="asgn-btn asgn-btn--ghost" id="asgn-sheet-cancel" only>Cancelar</c-ui.buttons.plain_button>
+      <c-ui.buttons.plain_button type="button" class_name="asgn-btn asgn-btn--primary" id="asgn-sheet-apply" disabled only>Usar assinatura</c-ui.buttons.plain_button>
     </div>
   </div>
 </div>

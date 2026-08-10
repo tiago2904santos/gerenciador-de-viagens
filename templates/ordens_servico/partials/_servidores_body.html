@@ -7,9 +7,9 @@
 >
   {# Mesmo ritmo de Documentos vinculados (eventos): toggle → busca → lista. #}
   <div class="segment-toggle os-servidor-role-panel__toggle" role="group" aria-label="Função dos servidores no caminhão">
-    <button type="button" class="segment-toggle__btn" data-os-role-mode="CONDUCAO" aria-pressed="true">Condução</button>
-    <button type="button" class="segment-toggle__btn" data-os-role-mode="TECNICO" aria-pressed="false">Técnico</button>
-    <button type="button" class="segment-toggle__btn" data-os-role-mode="APOIO" aria-pressed="false">Apoio</button>
+    <c-ui.buttons.button type="button" class_name="segment-toggle__btn" data-os-role-mode="CONDUCAO" aria-pressed="true" only>Condução</c-ui.buttons.button>
+    <c-ui.buttons.button type="button" class_name="segment-toggle__btn" data-os-role-mode="TECNICO" aria-pressed="false" only>Técnico</c-ui.buttons.button>
+    <c-ui.buttons.button type="button" class_name="segment-toggle__btn" data-os-role-mode="APOIO" aria-pressed="false" only>Apoio</c-ui.buttons.button>
   </div>
   <div class="os-servidor-role-panel__picker" data-os-servidor-picker-field-host></div>
 </section>

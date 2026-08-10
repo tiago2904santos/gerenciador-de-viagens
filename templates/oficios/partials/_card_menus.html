@@ -33,17 +33,16 @@ são, por construção, os mesmos que estavam embutidos antes.
     <c-ui.menus.rich_menu_link :href="s.termo_docx_url" title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" :download="True" only />
   {% endif %}
   {% if s.termo_anexar_assinado_url %}
-  <button
+  <c-ui.buttons.button
     type="button"
-    class="action-menu__item action-menu__item--rich{% if s.termo_assinado %} is-assinado{% endif %}"
+    class_name="action-menu__item action-menu__item--rich{% if s.termo_assinado %} is-assinado{% endif %}"
     role="menuitem"
     data-attach-signed-trigger
     data-attach-signed-url="{{ s.termo_anexar_assinado_url }}"
     data-attach-signed-doc-label="o termo de {{ s.name }}"
     data-attach-signed-current-name="{{ s.termo_assinado_nome_original }}"
     data-attach-signed-current-view-url="{{ s.termo_assinado_view_url }}"
-    data-attach-signed-current-remove-url="{{ s.termo_remover_assinado_url }}"
-  >
+    data-attach-signed-current-remove-url="{{ s.termo_remover_assinado_url }}" only>
     <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
       <c-ui.icons.icon icon="sign" only />
     </span>
@@ -51,7 +50,7 @@ são, por construção, os mesmos que estavam embutidos antes.
       <strong>{% if s.termo_assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
       <small>{% if s.termo_assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
     </span>
-  </button>
+  </c-ui.buttons.button>
   {% endif %}
 </div>
 {% endif %}{% endfor %}

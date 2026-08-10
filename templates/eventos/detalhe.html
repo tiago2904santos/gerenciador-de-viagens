@@ -102,25 +102,24 @@
       </div>
     </section>
     <div class="fab-container">
-      <button
+      <c-ui.buttons.button
         type="button"
-        class="cv-btn cv-btn--primary"
-        aria-label="Mais ações"
+        class_name="cv-btn cv-btn--primary"
+        aria_label="Mais ações"
         aria-haspopup="true"
         aria-expanded="false"
         aria-controls="evento-etapa4-actions-menu"
         data-overlay-trigger
         data-overlay-kind="menu"
-        data-overlay-target="evento-etapa4-actions-menu"
-      >
+        data-overlay-target="evento-etapa4-actions-menu" only>
         <span class="cv-btn__icon" aria-hidden="true"><c-ui.icons.icon icon="more" only /></span>
         <span>Mais ações</span>
-      </button>
+      </c-ui.buttons.button>
       <div class="action-menu action-menu--rich" id="evento-etapa4-actions-menu" role="menu" hidden>
         <c-ui.menus.rich_menu_header title="Mais ações" subtitle="Documentos e planejamento" icon="folder" only />
-        <button
+        <c-ui.buttons.button
           type="button"
-          class="action-menu__item action-menu__item--rich"
+          class_name="action-menu__item action-menu__item--rich"
           role="menuitem"
           data-attach-signed-trigger
           data-attach-signed-url="{% url 'eventos:solicitacao_anexar' evento.pk %}"
@@ -132,8 +131,7 @@
           data-attach-signed-file-help="Selecione um arquivo em PDF, PNG, JPG ou JPEG."
           data-attach-signed-hint="Ele fica disponível na lista de documentos de solicitação."
           data-attach-signed-choose-label="Escolher arquivo"
-          data-attach-signed-upload-label="Anexar documento"
-        >
+          data-attach-signed-upload-label="Anexar documento" only>
           <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
             <c-ui.icons.icon icon="document" only />
           </span>
@@ -141,7 +139,7 @@
             <strong>Anexar documento</strong>
             <small>Ofícios solicitantes, convites, despachos ou imagens</small>
           </span>
-        </button>
+        </c-ui.buttons.button>
         <c-ui.menus.rich_menu_link :href="create_urls.plano" title="Plano de trabalho" description="Criar um novo plano vinculado a este evento" icon="document" tone="preview" only />
         <c-ui.menus.rich_menu_link :href="create_urls.ordem" title="Ordem de serviço" description="Criar uma nova OS vinculada a este evento" icon="clipboard-copy" tone="pdf" only />
       </div>

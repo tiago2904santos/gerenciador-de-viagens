@@ -4,13 +4,12 @@
   diálogo é `usuarios-area-form.js`, que também precisa saber que este é o modo
   de criação (o botão de editar da linha abre o MESMO modal em modo edição).
 {% endcomment %}
-<button
+<c-ui.buttons.button
   type="button"
-  class="cv-btn cv-btn--secondary"
+  class_name="cv-btn cv-btn--secondary"
   data-vinculo-create
   data-vincular-url="{{ vinculo_action_url }}"
-  aria-label="Vincular um usuário à área {{ area.sigla }}"
->
+  aria_label="Vincular um usuário à área {{ area.sigla }}" only>
   <span class="cv-btn__icon" aria-hidden="true"><c-ui.icons.icon icon="link" only /></span>
   <span>Vincular usuário</span>
-</button>
+</c-ui.buttons.button>

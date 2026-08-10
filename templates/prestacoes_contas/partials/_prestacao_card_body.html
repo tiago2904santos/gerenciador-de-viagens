@@ -44,35 +44,33 @@
         {% endif %}
       </div>
 
-      <button type="button"
-              class="icon-btn icon-btn--documents"
-              aria-label="Abrir opções de documentos de {{ servidor.name }}"
+      <c-ui.buttons.button type="button"
+              class_name="icon-btn icon-btn--documents"
+              aria_label="Abrir opções de documentos de {{ servidor.name }}"
               data-tooltip="Baixar documentos"
               aria-haspopup="true"
               aria-expanded="false"
               aria-controls="prestacao-docs-menu-{{ servidor.ps_pk }}"
               data-overlay-trigger data-overlay-kind="menu"
               data-overlay-target="prestacao-docs-menu-{{ servidor.ps_pk }}"
-              data-overlay-src="{{ card.menus_url }}"
-      ><c-ui.icons.icon icon="folder" only /></button>
+              data_overlay_src="{{ card.menus_url }}" only><c-ui.icons.icon icon="folder" only /></c-ui.buttons.button>
       
-      <button type="button"
-              class="icon-btn icon-btn--whatsapp"
-              aria-label="Enviar aviso de liberação de diárias por WhatsApp"
+      <c-ui.buttons.button type="button"
+              class_name="icon-btn icon-btn--whatsapp"
+              aria_label="Enviar aviso de liberação de diárias por WhatsApp"
               data-tooltip="Enviar aviso de liberação (WhatsApp)"
               aria-haspopup="true"
               aria-expanded="false"
               aria-controls="diaria-wa-menu-{{ servidor.ps_pk }}"
               data-overlay-trigger data-overlay-kind="menu"
               data-overlay-target="diaria-wa-menu-{{ servidor.ps_pk }}"
-              data-overlay-src="{{ card.menus_url }}"
+              data_overlay_src="{{ card.menus_url }}"
               data-wa-phone="{{ servidor.whatsapp_phone }}"
               data-wa-oficio="{{ servidor.whatsapp_oficio }}"
               data-wa-unidade="{{ servidor.whatsapp_unidade }}"
               data-wa-evento="{{ servidor.whatsapp_evento }}"
               data-wa-servidor="{{ servidor.name }}"
-              data-wa-diaria="{{ servidor.whatsapp_diaria }}"
-      ><c-ui.icons.icon icon="whatsapp-modern" only /></button>
+              data-wa-diaria="{{ servidor.whatsapp_diaria }}" only><c-ui.icons.icon icon="whatsapp-modern" only /></c-ui.buttons.button>
       
     </li>
     {% endfor %}

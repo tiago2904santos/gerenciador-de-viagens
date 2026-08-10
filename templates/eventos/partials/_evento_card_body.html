@@ -19,18 +19,17 @@
             {% endif %}
           </div>
           <div class="itinerary__leg-actions">
-            <button
+            <c-ui.buttons.button
               type="button"
-              class="icon-btn icon-btn--settings icon-btn--documents"
-              aria-label="Abrir ações do ofício {{ oficio.numero }}"
+              class_name="icon-btn icon-btn--settings icon-btn--documents"
+              aria_label="Abrir ações do ofício {{ oficio.numero }}"
               aria-haspopup="true"
               aria-expanded="false"
               aria-controls="evento-oficio-menu-{{ card.pk }}-{{ oficio.oficio_pk }}"
               data-tooltip="Ações e documentos"
               data-overlay-trigger data-overlay-kind="menu"
               data-overlay-target="evento-oficio-menu-{{ card.pk }}-{{ oficio.oficio_pk }}"
-              data-overlay-src="{{ card.menus_url }}"
-            ><c-ui.icons.icon icon="folder" only /></button>
+              data_overlay_src="{{ card.menus_url }}" only><c-ui.icons.icon icon="folder" only /></c-ui.buttons.button>
             
           </div>
         </li>
@@ -59,18 +58,17 @@
             {% endif %}
           </div>
           <div class="itinerary__leg-actions">
-            <button
+            <c-ui.buttons.button
               type="button"
-              class="icon-btn icon-btn--settings icon-btn--documents"
-              aria-label="Abrir ações de {{ doc.title }}"
+              class_name="icon-btn icon-btn--settings icon-btn--documents"
+              aria_label="Abrir ações de {{ doc.title }}"
               aria-haspopup="true"
               aria-expanded="false"
               aria-controls="evento-documento-menu-{{ card.pk }}-{{ forloop.counter }}"
               data-tooltip="Ações e documentos"
               data-overlay-trigger data-overlay-kind="menu"
               data-overlay-target="evento-documento-menu-{{ card.pk }}-{{ forloop.counter }}"
-              data-overlay-src="{{ card.menus_url }}"
-            ><c-ui.icons.icon icon="folder" only /></button>
+              data_overlay_src="{{ card.menus_url }}" only><c-ui.icons.icon icon="folder" only /></c-ui.buttons.button>
             
           </div>
         </li>
@@ -104,18 +102,17 @@
 
         {% if s.has_termo %}
         <div class="person-row__actions">
-          <button
+          <c-ui.buttons.button
             type="button"
-            class="icon-btn icon-btn--edit{% if s.termo_assinado %} is-assinado{% endif %}"
-            aria-label="Ações do termo de {{ s.name }}"
+            class_name="icon-btn icon-btn--edit{% if s.termo_assinado %} is-assinado{% endif %}"
+            aria_label="Ações do termo de {{ s.name }}"
             aria-haspopup="true"
             aria-expanded="false"
             aria-controls="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}"
             data-tooltip="{% if s.termo_assinado %}Termo assinado — ações{% else %}Ações do termo{% endif %}"
             data-overlay-trigger data-overlay-kind="menu"
             data-overlay-target="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}"
-              data-overlay-src="{{ card.menus_url }}"
-          ><c-ui.icons.icon icon="more" only /></button>
+              data_overlay_src="{{ card.menus_url }}" only><c-ui.icons.icon icon="more" only /></c-ui.buttons.button>
           
         </div>
         {% endif %}

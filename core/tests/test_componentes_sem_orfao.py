@@ -66,6 +66,6 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
                 test_only.append(str(component.relative_to(COTTON)))
         self.assertEqual(test_only, [], "componente citado somente por teste")
 
-    def test_namespace_unico_tem_o_inventario_da_e4(self):
+    def test_namespace_unico_tem_o_inventario_atual(self):
         self.assertEqual(list((ROOT / "templates" / "components").rglob("*.*")), [])
-        self.assertEqual(len(self.components()), 82)
+        self.assertEqual(len(self.components()), 83)

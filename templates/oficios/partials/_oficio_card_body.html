@@ -19,18 +19,17 @@
 
       {% if s.has_termo %}
       <div class="person-row__actions">
-        <button
+        <c-ui.buttons.button
           type="button"
-          class="icon-btn icon-btn--edit{% if s.termo_assinado %} is-assinado{% endif %}"
-          aria-label="Ações do termo de {{ s.name }}"
+          class_name="icon-btn icon-btn--edit{% if s.termo_assinado %} is-assinado{% endif %}"
+          aria_label="Ações do termo de {{ s.name }}"
           aria-haspopup="true"
           aria-expanded="false"
           aria-controls="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}"
           data-tooltip="{% if s.termo_assinado %}Termo assinado — ações{% else %}Ações do termo{% endif %}"
           data-overlay-trigger data-overlay-kind="menu"
           data-overlay-target="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}"
-          data-overlay-src="{{ card.menus_url }}"
-        ><c-ui.icons.icon icon="more" only /></button>
+          data_overlay_src="{{ card.menus_url }}" only><c-ui.icons.icon icon="more" only /></c-ui.buttons.button>
         
       </div>
       {% endif %}
@@ -121,18 +120,17 @@
       </div>
       <div class="person-row__termo icon-btn-group">
         <c-ui.buttons.icon_button :href="card.justificativa_url" action="edit" aria_label="Editar justificativa" tooltip="Editar justificativa" only />
-        <button
-          class="icon-btn icon-btn--documents"
+        <c-ui.buttons.button
+          class_name="icon-btn icon-btn--documents"
           type="button"
-          aria-label="Abrir documentos da justificativa"
+          aria_label="Abrir documentos da justificativa"
           aria-haspopup="true"
           aria-expanded="false"
           aria-controls="justificativa-document-menu-{{ card.oficio_pk }}"
           data-tooltip="Visualizar e baixar"
           data-overlay-trigger data-overlay-kind="menu"
           data-overlay-target="justificativa-document-menu-{{ card.oficio_pk }}"
-          data-overlay-src="{{ card.menus_url }}"
-        ><c-ui.icons.icon icon="folder" only /></button>
+          data_overlay_src="{{ card.menus_url }}" only><c-ui.icons.icon icon="folder" only /></c-ui.buttons.button>
         
       </div>
     </li>
