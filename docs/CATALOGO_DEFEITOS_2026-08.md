@@ -4605,6 +4605,42 @@ monte de correção por cima. Daí saem, medidos:
 | `background` | **27 cadeias distintas** |
 | `border-radius` | 13 valores — `12px` escrito com 4 nomes de token, mais 4 literais de `10px` |
 | altura | 7, com **5 nomes de token diferentes valendo o mesmo 44px** |
+
+**Remedido na E7c (10/08/2026).** A regra base já existe — `:where(.cv-field__control)` em
+`fields/field.css:53`, com especificidade **zero** de propósito. O que falta é remover o que ela
+tornou redundante. Contando com parser de blocos (o grep de uma linha subconta: cheguei a reportar
+37 no PR #295, e estava errado):
+
+| | |
+|---|---:|
+| regras que tocam a classe | **63** em 19 arquivos |
+| base (`:where`) | 2 |
+| estado (`:hover`, `:focus`, `:disabled`…) | 15 |
+| tema escuro | 15 |
+| contexto (dentro de um container) | 24 |
+| outras | 7 |
+| `!important` | **67**, em 19 regras |
+
+Os 67 `!important` são o alvo mais óbvio: a base tem especificidade zero, então **nenhuma regra de
+classe precisa de `!important` para vencê-la**. Só que "não precisa contra a base" não é o mesmo
+que "não precisa contra as outras 62", e a diferença tem que ser medida, não deduzida.
+
+**O que trava a etapa: o instrumento não alcança.** `scripts/medir_campos_computados.py` (novo)
+fotografa o estilo computado de todo `.cv-field__control` nas 43 rotas, nos dois temas, em quatro
+estados forçados por `CSS.forcePseudoState`. Rodando, ele encontra campo em **8 rotas** — 64
+combinações, 224 leituras. As outras 35 devolvem zero, e não por defeito do script: dos 11
+templates que emitem a classe, a maioria é partial que só entra no DOM depois de interação
+(`cancel_reason_modal.html` atrás de um modal, `_atividades_body.html` dentro de um passo de
+wizard, `_diarias_fields.html` num corpo colapsável).
+
+Então um diff vazio hoje prova neutralidade para o que essas 8 rotas exercitam, e **nada além**.
+Remover regra de contexto que só vale dentro de modal seria remover sem prova — exatamente o que o
+plano proíbe ao exigir "uma medição por vez", e como a primeira tentativa mexeu em 55 elementos
+sem querer.
+
+**Nenhuma regra foi removida.** O que ficou pronto foi o instrumento e a medição do próprio
+instrumento. Ampliar o alcance — abrir os modais, navegar os passos do wizard, expandir os corpos
+colapsáveis — é a primeira metade da E7c, e é o que destrava a segunda.
 | borda | 6 formas de declarar a mesma linha de 1px |
 
 **`static/css/components/field.css`** dá o lar que faltava. Os valores são **exatamente** os que

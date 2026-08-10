@@ -420,7 +420,7 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [ ] `NOVO-82` 87 declarações escuras inertes, visíveis desde a fusão do `theme.css` · **E9**
 - [x] `NOVO-51` os 2 apelidos puros da família `cv-field` (e 15 bordas invisíveis) · **E7b**
 - [ ] `NOVO-51` os 2 restantes têm valor próprio; o do foco é decisão de a11y · **E8**
-- [ ] `NOVO-54` as sobrescritas de `.cv-field__control` (**remedidas: 63 regras, 19 arquivos**) · **E7c**
+- [ ] `NOVO-54` 63 regras, 67 `!important`; travado no alcance do instrumento (8 de 43 rotas) · **E7c**
 - [ ] `NOVO-58` 🔴 claro e escuro são dois desenhos — o redesenho passa a valer no claro · **E8**
 - [ ] `UI-02` tema escuro deixa de ser camada de exceção (5.619 linhas, 190 `!important`) · **E9**
 - [ ] `UI-04` **97** imports de CSS de outro domínio, em **36** templates · **E10**
