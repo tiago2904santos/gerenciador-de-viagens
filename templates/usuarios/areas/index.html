@@ -9,7 +9,7 @@
 
 {% block content %}
   <div class="usuarios-page">
-    {% include "components/lists/list_page_quick_add.html" with title=page_title eyebrow="Administração" search_placeholder="Buscar por sigla ou nome da área" empty_message="Nenhuma área cadastrada ainda." rows=rows q=q page_obj=page_obj pagination_pages=pagination_pages page_querystring=page_querystring quick_add_form=quick_add_form quick_add_panel_id="quick-add-area" quick_add_label="Cadastrar área" quick_add_submit_label="Criar área" quick_add_body_template="usuarios/partials/_quick_add_area_fields.html" quick_add_compact=True hide_realtime_count=True band_tabs_template="components/lists/list_toggle.html" abas=abas tabs_aria_label=tabs_aria_label can_edit_area=can_edit_area delete_modal_enabled=True delete_modal_title="Excluir área?" delete_modal_entity="esta área" %}
+    <c-lists.list_page_quick_add :title="page_title" eyebrow="Administração" search_placeholder="Buscar por sigla ou nome da área" empty_message="Nenhuma área cadastrada ainda." :rows="rows" :q="q" :page_obj="page_obj" :pagination_pages="pagination_pages" :page_querystring="page_querystring" :quick_add_form="quick_add_form" quick_add_panel_id="quick-add-area" quick_add_label="Cadastrar área" quick_add_submit_label="Criar área" quick_add_body_template="usuarios/partials/_quick_add_area_fields.html" :quick_add_compact="True" :hide_realtime_count="True" band_tabs_template="components/lists/list_toggle.html" :abas="abas" :tabs_aria_label="tabs_aria_label" :can_edit_area="can_edit_area" :delete_modal_enabled="True" delete_modal_title="Excluir área?" delete_modal_entity="esta área" />
   </div>
 {% endblock %}
 

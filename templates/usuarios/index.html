@@ -9,7 +9,7 @@
 
 {% block content %}
   <div class="usuarios-page">
-    {% include "components/lists/list_page_quick_add.html" with title=page_title eyebrow="Administração" search_placeholder="Buscar por nome, usuário, e-mail ou área" empty_message="Nenhum usuário encontrado." rows=rows q=q page_obj=page_obj pagination_pages=pagination_pages page_querystring=page_querystring quick_add_form=quick_add_form quick_add_panel_id="quick-add-usuario" quick_add_label="Cadastrar usuário" quick_add_submit_label="Criar usuário" quick_add_body_template="usuarios/partials/_quick_add_usuario_fields.html" quick_add_compact=True hide_realtime_count=True band_tabs_template="components/lists/list_toggle.html" abas=abas tabs_aria_label=tabs_aria_label can_edit_area=can_edit_area delete_modal_enabled=True delete_modal_title="Excluir usuário?" delete_modal_entity="este usuário" %}
+    <c-lists.list_page_quick_add :title="page_title" eyebrow="Administração" search_placeholder="Buscar por nome, usuário, e-mail ou área" empty_message="Nenhum usuário encontrado." :rows="rows" :q="q" :page_obj="page_obj" :pagination_pages="pagination_pages" :page_querystring="page_querystring" :quick_add_form="quick_add_form" quick_add_panel_id="quick-add-usuario" quick_add_label="Cadastrar usuário" quick_add_submit_label="Criar usuário" quick_add_body_template="usuarios/partials/_quick_add_usuario_fields.html" :quick_add_compact="True" :hide_realtime_count="True" band_tabs_template="components/lists/list_toggle.html" :abas="abas" :tabs_aria_label="tabs_aria_label" :can_edit_area="can_edit_area" :delete_modal_enabled="True" delete_modal_title="Excluir usuário?" delete_modal_entity="este usuário" />
 
     {% include "usuarios/partials/_vincular_usuario_modal.html" %}
   </div>

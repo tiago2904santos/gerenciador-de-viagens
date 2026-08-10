@@ -4,6 +4,6 @@
   Os campos precisam do painel `travel-document-block`: sem ele o `form-control`
   fica com o mesmo fundo do card e o input some.
 {% endcomment %}
-{% include "components/ui/forms/form_block.html" with element_id="area-identificacao" section_id="area-identificacao-title" variant="split" extra_class="travel-document-block document-form-block" title="Identificação" description="Nome e sigla usados em todo o sistema" body_template="usuarios/partials/_editar_area_identificacao_fields.html" %}
+<c-ui.forms.form_block element_id="area-identificacao" section_id="area-identificacao-title" variant="split" extra_class="travel-document-block document-form-block" title="Identificação" description="Nome e sigla usados em todo o sistema" body_template="usuarios/partials/_editar_area_identificacao_fields.html" />
 
-{% include "components/ui/forms/form_block.html" with element_id="area-usuarios" section_id="area-usuarios-title" extra_class="travel-document-block document-form-block" title="Usuários da área" description="Contas com acesso a esta unidade de trabalho" heading_level=3 actions_template="usuarios/partials/_area_vincular_action.html" body_template="usuarios/partials/_area_vinculos_body.html" %}
+<c-ui.forms.form_block element_id="area-usuarios" section_id="area-usuarios-title" extra_class="travel-document-block document-form-block" title="Usuários da área" description="Contas com acesso a esta unidade de trabalho" :heading_level="3" actions_template="usuarios/partials/_area_vincular_action.html" body_template="usuarios/partials/_area_vinculos_body.html" />

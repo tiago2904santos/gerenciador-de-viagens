@@ -1,4 +1,4 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 {% load static %}
 
 {% comment %}
@@ -22,8 +22,8 @@
   <div class="form-section-stack form-section-stack--comfortable" data-travel-document-wizard-step1>
     <form method="post" class="document-form travel-document-wizard__form" novalidate>
       {% csrf_token %}
-      {% include "components/ui/feedback/form_errors.html" with form=form only %}
-      {% include "components/form/card.html" with title="Dados da área" description="Identificação da unidade de trabalho e contas com acesso a ela." title_id="area-dados-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="usuarios/partials/_editar_area_fields.html" footer_template="usuarios/partials/_form_card_footer.html" %}
+      <c-ui.feedback.form_errors :form="form" only />
+      <c-form.card title="Dados da área" description="Identificação da unidade de trabalho e contas com acesso a ela." title_id="area-dados-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="usuarios/partials/_editar_area_fields.html" footer_template="usuarios/partials/_form_card_footer.html" />
     </form>
   </div>
 {% endblock %}
@@ -34,5 +34,5 @@
 
 {% block flow_modals %}
   {% include "usuarios/partials/_vincular_na_area_modal.html" %}
-  {% include "components/ui/modals/delete_confirm_modal.html" with delete_modal_title="Remover acesso?" delete_modal_entity="o acesso deste usuário à área" %}
+  <c-ui.modals.delete_confirm_modal delete_modal_title="Remover acesso?" delete_modal_entity="o acesso deste usuário à área" />
 {% endblock %}

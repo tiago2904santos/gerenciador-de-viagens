@@ -1,6 +1,6 @@
 <div class="area-quick-add" data-area-quick-add>
   {# step1 só para herdar tokens/estilos; sem travel-document-card (caixa externa). #}
   <div data-travel-document-wizard-step1 class="document-form-page area-quick-add__scope">
-    {% include "components/ui/forms/form_block.html" with element_id="area-qa-dados" section_id="area-qa-dados-title" variant="split" extra_class="travel-document-block document-form-block" title="Dados da área" description="Nome e sigla da unidade" body_template="usuarios/partials/_criar_area_fields.html" heading_level=3 %}
+    <c-ui.forms.form_block element_id="area-qa-dados" section_id="area-qa-dados-title" variant="split" extra_class="travel-document-block document-form-block" title="Dados da área" description="Nome e sigla da unidade" body_template="usuarios/partials/_criar_area_fields.html" :heading_level="3" />
   </div>
 </div>
