@@ -400,7 +400,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
      conhecer este container. Converter para estilo direto custaria duplicar as
      45 sob este seletor, subindo especificidade — o oposto da Fase 7. */
   --color-input-bg: var(--step1-field);
-  --cv-field-bg: var(--step1-field);
   background: var(--step1-surface);
   border-color: color-mix(in srgb, var(--color-border) 40%, transparent);
   box-shadow:

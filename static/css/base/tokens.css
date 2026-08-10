@@ -145,8 +145,6 @@
   --btn-padding-x: 13px;
   --btn-gap: 5px;
   --btn-icon-size: 17px;
-  --cv-field-border: 1px solid var(--color-border-strong);
-  --cv-field-bg: var(--color-surface);
   --cv-field-focus-ring: 0 0 0 3px rgba(21, 91, 154, 0.28);
   --card-border: 1px solid var(--color-border);
   --card-shadow: var(--shadow-card);

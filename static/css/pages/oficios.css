@@ -59,8 +59,8 @@
 
 /* Textarea de Motivo no wizard: visual idêntico ao input, só com altura maior */
 .travel-document-wizard .cv-field__control {
-  background: var(--cv-field-bg);
-  border: 1px solid var(--cv-field-border);
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
   border-radius: var(--radius-control);
   box-shadow: var(--shadow-xs);
   box-sizing: border-box;

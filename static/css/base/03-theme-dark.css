@@ -289,8 +289,6 @@ html[data-theme="dark"] {
   --color-input-placeholder: #9ba9b4;
   --color-input-disabled-text: #909da7;
   --color-input-border: #607d93;
-  --cv-field-bg: var(--color-input-bg);
-  --cv-field-border: 1px solid var(--color-input-border);
   --cv-field-focus-ring: var(--focus-ring);
   --field-shadow-focus: none;
   --select-focus-ring: none;

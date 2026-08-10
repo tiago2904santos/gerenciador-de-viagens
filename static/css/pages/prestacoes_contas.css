@@ -231,8 +231,8 @@
 }
 
 .prestacao-file-list {
-  background: color-mix(in srgb, var(--color-primary, #0b3a66) 8%, var(--cv-field-bg, var(--color-surface)));
-  border: 1px solid var(--cv-field-border, var(--color-border-soft));
+  background: color-mix(in srgb, var(--color-primary, #0b3a66) 8%, var(--color-input-bg, var(--color-surface)));
+  border: 1px solid var(--color-input-border, var(--color-border-soft));
   border-radius: var(--radius-control, 8px);
   box-shadow: var(--shadow-xs, none);
   list-style: none;
@@ -253,7 +253,7 @@
 }
 
 .prestacao-file-list__item + .prestacao-file-list__item {
-  border-top: 1px solid var(--cv-field-border, var(--color-border-soft));
+  border-top: 1px solid var(--color-input-border, var(--color-border-soft));
 }
 
 .prestacao-file-selection {
@@ -264,7 +264,7 @@
 
 .prestacao-file-selection__toggle {
   align-items: center;
-  background: color-mix(in srgb, var(--color-primary, #0b3a66) 10%, var(--cv-field-bg, var(--color-surface)));
+  background: color-mix(in srgb, var(--color-primary, #0b3a66) 10%, var(--color-input-bg, var(--color-surface)));
   border: 1px solid var(--cv-field-border-focus, var(--color-primary));
   border-radius: var(--radius-control, 8px);
   box-shadow: var(--shadow-xs, none);
@@ -284,7 +284,7 @@
 }
 
 .prestacao-file-selection__toggle:hover {
-  background: color-mix(in srgb, var(--color-primary, #0b3a66) 16%, var(--cv-field-bg, var(--color-surface)));
+  background: color-mix(in srgb, var(--color-primary, #0b3a66) 16%, var(--color-input-bg, var(--color-surface)));
   border-color: var(--cv-field-border-focus, var(--color-primary));
 }
 
@@ -407,8 +407,8 @@
 
 .prestacao-file-picker {
   align-items: stretch;
-  background: var(--cv-field-bg, var(--color-surface));
-  border: 1px solid var(--cv-field-border, var(--color-border-soft));
+  background: var(--color-input-bg, var(--color-surface));
+  border: 1px solid var(--color-input-border, var(--color-border-soft));
   border-radius: var(--radius-control, 8px);
   box-shadow: var(--shadow-xs, none);
   display: flex;
@@ -447,7 +447,7 @@
 .prestacao-file-picker__action {
   align-items: center;
   background: color-mix(in srgb, var(--color-primary, #0b3a66) 16%, transparent);
-  border-right: 1px solid var(--cv-field-border, var(--color-border-soft));
+  border-right: 1px solid var(--color-input-border, var(--color-border-soft));
   color: var(--color-text);
   cursor: pointer;
   display: inline-flex;
@@ -467,7 +467,7 @@
 .prestacao-file-picker__upload {
   align-items: center;
   border: 0;
-  border-left: 1px solid var(--cv-field-border, var(--color-border-soft));
+  border-left: 1px solid var(--color-input-border, var(--color-border-soft));
   cursor: pointer;
   display: inline-flex;
   flex: 0 0 auto;
@@ -494,7 +494,7 @@
 
 .prestacao-file-picker__inline-actions {
   align-items: center;
-  border-left: 1px solid var(--cv-field-border, var(--color-border-soft));
+  border-left: 1px solid var(--color-input-border, var(--color-border-soft));
   display: flex;
   flex: 0 0 auto;
   gap: var(--space-1);
@@ -554,14 +554,14 @@
   }
 
   .prestacao-file-picker__action {
-    border-bottom: 1px solid var(--cv-field-border, var(--color-border-soft));
+    border-bottom: 1px solid var(--color-input-border, var(--color-border-soft));
     border-right: 0;
     min-height: 44px;
   }
 
   .prestacao-file-picker__upload {
     border-left: 0;
-    border-top: 1px solid var(--cv-field-border, var(--color-border-soft));
+    border-top: 1px solid var(--color-input-border, var(--color-border-soft));
     min-height: 44px;
   }
 }
