@@ -1,4 +1,4 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 {% load static %}
 
 {% block extra_css %}
@@ -11,7 +11,7 @@
 
 {% block flow_header %}
   <header class="list-header list-header--wizard-band" data-wizard-sticky-band>
-    {% include "components/ui/headers/_list_header_band.html" with title=page_title eyebrow=flow_eyebrow band_tabs_template="components/lists/list_toggle.html" abas=abas tabs_aria_label=tabs_aria_label only %}
+    <c-ui.headers._list_header_band :title="page_title" :eyebrow="flow_eyebrow" band_tabs_template="components/lists/list_toggle.html" :abas="abas" :tabs_aria_label="tabs_aria_label" only />
   </header>
 {% endblock %}
 
@@ -29,7 +29,7 @@
       >
         {% csrf_token %}
         <input type="hidden" name="form_id" value="instituicao">
-        {% include "components/form/card.html" with title="Dados da unidade e endereço" description="Unidade operacional e endereço usado nos documentos." title_id="config-card-unidade-endereco-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_unidade_endereco_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
+        <c-form.card title="Dados da unidade e endereço" description="Unidade operacional e endereço usado nos documentos." title_id="config-card-unidade-endereco-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_unidade_endereco_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" />
       </form>
 
     {% elif aba == "oficio" %}
@@ -37,7 +37,7 @@
         {% csrf_token %}
         <input type="hidden" name="form_id" value="oficio">
         {{ destinatario_form.destinatario_oficio_nome }}
-        {% include "components/form/card.html" with title="Assinantes e destinatário" description="Padrões usados na emissão do ofício e documentos relacionados." title_id="config-card-oficio-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_oficio_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
+        <c-form.card title="Assinantes e destinatário" description="Padrões usados na emissão do ofício e documentos relacionados." title_id="config-card-oficio-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_oficio_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" />
       </form>
 
     {% elif aba == "roteiros" %}
@@ -52,10 +52,10 @@
         <form method="post" action="{{ config_action_url }}" class="document-form travel-document-wizard__form" novalidate>
           {% csrf_token %}
           <input type="hidden" name="form_id" value="diarias">
-          {% include "components/form/card.html" with title="Valores de diária" description="Informe apenas o valor de 24 horas; 15% e 30% são calculados. Cada tabela vale a partir da data de vigência, e roteiros com saída anterior mantêm o valor que valia na época." title_id="config-card-diarias-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_diarias_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
+          <c-form.card title="Valores de diária" description="Informe apenas o valor de 24 horas; 15% e 30% são calculados. Cada tabela vale a partir da data de vigência, e roteiros com saída anterior mantêm o valor que valia na época." title_id="config-card-diarias-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_diarias_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" />
         </form>
       {% else %}
-        {% include "components/form/card.html" with title="Valores de diária" description="Cada tabela vale a partir da data de vigência, e roteiros com saída anterior mantêm o valor que valia na época." title_id="config-card-diarias-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_diarias_somente_leitura.html" %}
+        <c-form.card title="Valores de diária" description="Cada tabela vale a partir da data de vigência, e roteiros com saída anterior mantêm o valor que valia na época." title_id="config-card-diarias-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_diarias_somente_leitura.html" />
       {% endif %}
     {% endif %}
   </div>

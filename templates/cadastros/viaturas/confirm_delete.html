@@ -1,4 +1,4 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 
 {% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
 {% block flow_shell_extra %} document-form-page cadastros-form-page{% endblock %}
@@ -6,6 +6,6 @@
 {% block flow_body %}
   <form method="post" class="document-form travel-document-wizard__form" data-travel-document-wizard-step1>
     {% csrf_token %}
-    {% include "components/feedback/confirm_delete_block.html" with object_label=object.placa primary_label="Excluir viatura" back_url=back_url only %}
+    <c-feedback.confirm_delete_block :object_label="object.placa" primary_label="Excluir viatura" :back_url="back_url" only />
   </form>
 {% endblock %}

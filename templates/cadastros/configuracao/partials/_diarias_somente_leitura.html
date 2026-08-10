@@ -3,6 +3,6 @@
   histórico de vigências da versão editável (`_diarias_body.html`), sem o bloco
   "Nova vigência" e sem `<form>`.
 {% endcomment %}
-{% include "components/ui/feedback/alert.html" with variant="info" title="Somente leitura" message="Os valores de diária vêm de norma externa e valem para todas as unidades. Só um administrador do sistema pode alterá-los." only %}
+<c-ui.feedback.alert variant="info" title="Somente leitura" message="Os valores de diária vêm de norma externa e valem para todas as unidades. Só um administrador do sistema pode alterá-los." only />
 
-{% include "components/ui/forms/form_block.html" with element_id="config-diarias-historico" section_id="config-diarias-historico-title" extra_class="travel-document-block document-form-block" title="Vigências cadastradas" description="Da mais recente para a mais antiga" body_template="cadastros/configuracao/partials/_diarias_historico.html" heading_level=3 %}
+<c-ui.forms.form_block element_id="config-diarias-historico" section_id="config-diarias-historico-title" extra_class="travel-document-block document-form-block" title="Vigências cadastradas" description="Da mais recente para a mais antiga" body_template="cadastros/configuracao/partials/_diarias_historico.html" :heading_level="3" />

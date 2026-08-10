@@ -593,8 +593,8 @@ class DarkRedesignContractTests(SimpleTestCase):
         # `cadastros-hub` virou `catalog-hub` na reescrita visual da
         # Administracao; o contrato e o shell padrao mais o hub, nao o nome antigo.
         self.assertIn("page-shell page-shell--standard catalog-hub", cadastros)
-        self.assertIn('components/ui/headers/page_header.html', cadastros)
-        self.assertIn('components/cards/module_card.html', cadastros)
+        self.assertIn('<c-ui.headers.page_header', cadastros)
+        self.assertIn('<c-cards.module_card', cadastros)
         self.assertNotIn("app-page-hero", cadastros)
 
     def test_login_is_a_solid_responsive_dark_surface_without_flow_changes(self):

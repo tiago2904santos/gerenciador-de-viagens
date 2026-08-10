@@ -1,4 +1,4 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 {% load static %}
 
 {% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
@@ -9,9 +9,9 @@
   <form method="post" class="document-form travel-document-wizard__form" novalidate data-servidor-form>
     {% csrf_token %}
     {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
-    {% include "components/ui/feedback/form_errors.html" with form=form only %}
+    <c-ui.feedback.form_errors :form="form" only />
     <div class="form-section-stack form-section-stack--comfortable" data-travel-document-wizard-step1>
-      {% include "components/form/card.html" with title="Dados do servidor" description=page_description title_id="servidores-form-card-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/servidores/partials/_form_card_body.html" footer_template="cadastros/servidores/partials/_form_card_footer.html" %}
+      <c-form.card title="Dados do servidor" :description="page_description" title_id="servidores-form-card-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/servidores/partials/_form_card_body.html" footer_template="cadastros/servidores/partials/_form_card_footer.html" />
     </div>
   </form>
 {% endblock %}

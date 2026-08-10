@@ -1,5 +1,5 @@
 {% extends "base.html" %}
 {% block title %}Cidades{% endblock %}
 {% block content %}
-  {% include "components/lists/list_page_quick_add.html" with title=page_title description=page_description eyebrow="Cadastros" search_placeholder="Buscar cidades" empty_message="Nenhuma cidade cadastrada." rows=rows q=q quick_add_form=quick_add_form quick_add_panel_id="quick-add-cidade" quick_add_label="Cadastrar cidade" quick_add_submit_label="Salvar cidade" quick_add_body_template="cadastros/cidades/partials/_quick_add_fields.html" disable_realtime_filter=True hide_realtime_count=True %}
+  <c-lists.list_page_quick_add :title="page_title" :description="page_description" eyebrow="Cadastros" search_placeholder="Buscar cidades" empty_message="Nenhuma cidade cadastrada." :rows="rows" :q="q" :quick_add_form="quick_add_form" quick_add_panel_id="quick-add-cidade" quick_add_label="Cadastrar cidade" quick_add_submit_label="Salvar cidade" quick_add_body_template="cadastros/cidades/partials/_quick_add_fields.html" :disable_realtime_filter="True" :hide_realtime_count="True" />
 {% endblock %}
