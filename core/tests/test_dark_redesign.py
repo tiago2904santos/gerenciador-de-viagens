@@ -260,7 +260,7 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_confirmation_flows_share_the_canonical_dialog_structure(self):
         modals = (
-            Path(settings.BASE_DIR) / "templates" / "components" / "ui" / "modals"
+            Path(settings.BASE_DIR) / "templates" / "cotton" / "ui" / "modals"
         )
         header = (modals / "dialog_header.html").read_text(encoding="utf-8")
 
@@ -419,7 +419,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         component = (
             Path(settings.BASE_DIR)
             / "templates"
-            / "components"
+            / "cotton"
             / "ui"
             / "modals"
             / "confirm_delete.html"
