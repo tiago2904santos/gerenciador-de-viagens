@@ -574,7 +574,7 @@ class DarkRedesignContractTests(SimpleTestCase):
     def test_dashboard_uses_global_header_summary_and_module_cards(self):
         templates = Path(settings.BASE_DIR) / "templates"
         dashboard = (templates / "core" / "dashboard.html").read_text(encoding="utf-8")
-        module_card = (templates / "components" / "cards" / "module_card.html").read_text(encoding="utf-8")
+        module_card = (templates / "cotton" / "cards" / "module_card.html").read_text(encoding="utf-8")
 
         # O painel foi esvaziado a pedido do dono. O contrato mudou de "usa os
         # tres componentes globais" para "**nao tem vocabulario proprio**": o que
