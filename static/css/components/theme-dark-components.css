@@ -15,7 +15,11 @@
    dois temas (`NOVO-62`). Tipografia não é decisão de tema. */
 html[data-theme="dark"] body {
   background-attachment: fixed;
-  -webkit-font-smoothing: antialiased;
+  /* NOVO-58 (E8): `-webkit-font-smoothing` saiu daqui e virou regra base em
+     `base/base.css`, junto de `font-family` e `line-height`. Era 48,2% da
+     divergência não-cor do sistema — a maior fatia isolada, e maior que as
+     quatro famílias catalogadas da E8 somadas. Se voltar a ser declarado aqui,
+     a divergência volta com ele. */
 }
 
 html[data-theme="dark"] ::selection {

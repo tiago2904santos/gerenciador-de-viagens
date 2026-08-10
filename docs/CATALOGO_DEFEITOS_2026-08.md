@@ -5868,3 +5868,46 @@ presente em 23 templates, e portanto vale a pena resolver de uma vez.
 pode ser decidida sem se confundir com a igualação dos temas. Duas saídas possíveis, e a escolha é
 do dono: arredondar para `--space-4` (16px, mexe 2px nos dois temas de uma vez) ou criar um token de
 14px, se o valor se provar recorrente.
+
+### NOVO-89 · `NOVO` A régua de tema não separa "diverge e pinta" de "diverge e não pinta" · QA · 0,5 d
+
+Achado ao executar a segunda sub-etapa da **E8**, e ele muda como o número da etapa deve ser lido.
+
+`medir_divergencia_tema.py` compara `getComputedStyle` entre os temas e conta toda diferença que não
+seja cor. Isso trata como equivalentes duas coisas muito diferentes: propriedade que **muda o que o
+usuário vê** e propriedade que o navegador **computa mas não pinta**.
+
+O caso que expôs isso: `-webkit-font-smoothing: antialiased`, declarado só em
+`html[data-theme="dark"] body`, valia **60.270 elementos — 48,2% de toda a divergência não-cor do
+sistema**, mais que as quatro famílias catalogadas da E8 somadas (~16%).
+
+Medido neste contêiner Linux, com Chromium:
+
+| | |
+|---|---|
+| estilo computado | `auto` (claro) vs `antialiased` (escuro) — **difere** |
+| largura renderizada do mesmo texto | 1264px vs 1264px — **idêntica** |
+| print da lista de ofícios, antes e depois de globalizar | **idêntico byte a byte** (mesmo md5, nos dois temas) |
+
+A propriedade tem efeito real no **macOS**. Então a divergência é verdadeira para quem usa Mac — o
+tema claro e o escuro renderizam texto diferente lá — e é **invisível** aqui. As duas afirmações
+convivem, e a régua não distingue uma da outra.
+
+**Consequência prática, que precisa estar escrita:** a meta do plano para o `NOVO-58` ("divergência
+próxima de zero") vai ser cumprida em boa parte por itens sem efeito visual nesta plataforma. Quem
+ler só o número vai superestimar o ganho de tela. Uma queda de 48% na métrica pode significar zero
+pixel movido — foi exatamente o que aconteceu.
+
+Isto **não** torna a correção errada: globalizar segue o princípio que o próprio projeto escreveu no
+`NOVO-62` ("tipografia não é decisão de tema") e conserta a divergência real no macOS. O que o ID
+registra é que o instrumento precisa de uma segunda coluna.
+
+O plano já avisava do parente deste defeito, na seção "a armadilha da tipografia": *"o número
+19.896 elementos media a pilha declarada, não a face que o usuário vê […] não dá para determinar
+daqui o que renderiza na máquina do usuário"*. O aviso valia para `font-family`; vale igual para
+tudo que é renderização de texto.
+
+**Saída sugerida para quem pegar este ID:** uma lista de propriedades sabidamente sem efeito de
+layout no motor usado pela régua (`-webkit-font-smoothing`, `-moz-osx-font-smoothing`,
+`text-rendering`, e as de `transition-*`, que só mudam a curva no tempo), contadas à parte no
+relatório. Duas somas, não uma: a que move pixel e a que não move.
