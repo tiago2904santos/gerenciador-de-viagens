@@ -266,7 +266,7 @@ estava copiado em `roteiros/views.py` e `oficios/route_views.py`. Virou
 `roteiros/services/autosave.py::pk_de_autosave`. Só o parse — os querysets divergem de propósito
 (área ativa contra área do ofício) e continuam em cada view, com o comentário de escopo.
 
-### BE-12 🟠 `wizard_roteiro` concentra a regra de vínculo/cópia na view · AUD · 2 d · risco alto
+### BE-12 ✅ RESOLVIDO `wizard_roteiro` concentra a regra de vínculo/cópia na view · AUD · 2 d · risco alto
 
 `oficios/route_views.py:100` — 181 linhas e 24 ramos, a maior view do sistema (a segunda tem 125).
 Decide vínculo sem cópia ou rascunho novo (`:127-143`), instancia `Roteiro(...)` direto
@@ -274,6 +274,36 @@ Decide vínculo sem cópia ou rascunho novo (`:127-143`), instancia `Roteiro(...
 **Efeito:** a regra que mais gera bug de dados neste sistema — roteiro é compartilhado entre
 ofícios — não é testável sem subir request HTTP nem reusável pelo fluxo avulso.
 **Plan mode obrigatório.**
+
+**A cobertura media o defeito melhor que o tamanho.** Antes de mexer, `coverage` sobre
+`oficios/route_views.py` com a suíte da etapa: **69%**, e o que faltava era `:125-160` — o bloco
+inteiro de `if form.is_valid() and validated["ok"]`. Nenhum teste do repositório exercitava o
+reuso-sem-cópia, a materialização de rascunho novo, nem qualquer das quatro saídas de navegação do
+caminho válido. A regra "que mais gera bug de dados neste sistema" tinha cobertura **zero**.
+
+**Entregue:** `oficios/services.py` ganhou `ResultadoRoteiroDoOficio`, `salvar_roteiro_do_oficio`,
+`salvar_rascunho_parcial_do_oficio` e `montar_roteiro_inicial_do_oficio`, mais os privados
+`_materializar_rascunho_do_oficio` e `_revincular_roteiro_ao_oficio`. A view ficou com navegação,
+mensagens e render, e ganhou `_redirect_after_roteiro_save` — nome que segue o par já existente em
+`traveler_views.py`.
+
+| | antes | depois |
+|---|---:|---:|
+| `wizard_roteiro`, linhas úteis | 165 | **124** |
+| `wizard_roteiro`, ramos | **33** | **13** |
+| cobertura de `route_views.py` | 69% | 88% |
+
+Os 33 ramos eram o triplo da segunda maior view de wizard (12). Com 13, deixa de ser exceção.
+
+**As duas funções de gravação são `@transaction.atomic`** — decisão do usuário. A requisição grava
+`Oficio`, `Roteiro`, `RoteiroDestino` e `RoteiroTrecho` (mais um delete de rascunho), e os services
+chamados eram atômicos cada um mas o conjunto não. Isto fecha o **item 1** da lista de perigo do
+`BE-14`; os outros 46 sites seguem lá.
+
+**O que a extração destravou**, e é o que o enunciado pedia: três cenários que eram intestáveis
+antes. Falha no meio da gravação (não deixa roteiro órfão), gravação fora de request (`NOVO-88`), e
+a guarda de área cruzada de `vincular_roteiro_ao_oficio_sem_copia` — inalcançável pela view, porque
+`obter_roteiro_escolhido_do_post` já filtra pela área do ofício.
 
 ### BE-13 🟠 `roteiros/roteiro_logic.py` fora do contrato de camadas · AUD · 4 d · risco alto
 
@@ -5887,7 +5917,7 @@ apaga o registro obsoleto — exatamente a classe de operação que o comentári
 Se forem poucos, a assimetria é aceitável e vira decisão documentada; se forem muitos, o desenho
 tem de mudar — e aí é `BE-12`, não este.
 
-### NOVO-88 · `NOVO` `wizard_roteiro` repete dois blocos dentro de si mesma · AUD · 0,25 d
+### NOVO-88 ✅ RESOLVIDO `wizard_roteiro` repete dois blocos dentro de si mesma · AUD · 0,25 d
 
 Achado ao medir o `BE-11`, e insumo direto do `BE-12`. A view de 165 linhas úteis tem duas
 duplicações internas:
@@ -5904,6 +5934,18 @@ duplicações internas:
 
 A assimetria do item 1 é a parte que importa: duas escritas do mesmo registro com regras de área
 diferentes na mesma view, e nada na suíte distingue os dois caminhos.
+
+**Fechado no `BE-12`, e a causa era mais funda do que a redação acima.** As duas cópias viraram
+`oficios/services.py::_materializar_rascunho_do_oficio`, com a regra do segundo bloco: `area` do
+**ofício**, com queda para `ConfiguracaoSistema`.
+
+Eu tinha escrito que o primeiro bloco estouraria o `NOT NULL` do `DB-02` numa requisição sem área
+ativa. **Não estoura** — `get_oficio_by_id` filtra por `filter_queryset_by_area`, que lê o mesmo
+thread-local que `Roteiro.save()` vai ler; sem área ativa o ofício já não é encontrado e a view
+devolve 404 antes. O que existia era pior de achar: **o roteiro nascia na área certa por
+coincidência de duas leituras do mesmo thread-local**, nunca por garantia. Fora de request o
+`INSERT` vira `IntegrityError: NOT NULL constraint failed: roteiros_roteiro.area_id` — e foi assim
+que o teste provou a correção, porque desfazer o `area=` reproduz exatamente esse erro.
 <!-- Renumeração: o `#304` (BE-11) mesclou antes deste ramo e criou `NOVO-87` e `NOVO-88`.
      Estes três nasceram como 88/89/90 no ramo da E8 e viraram 89/90/91 para não colidir.
      Os commits `5d0c151f`, `7a4704f2` e `77dbaac9` citam os números antigos. -->
@@ -6017,3 +6059,26 @@ mão, e o log só mostra as rotas que **reprovaram**.
 **Efeito medido apesar de tudo:** o próprio log de reprovação mostra a queda real no ambiente certo.
 `configuracao` caiu de 1652 para 1425 a 1440px (−227), e o mesmo nas outras duas larguras (−204 cada).
 `eventos-lista@1440` caiu 14. É menos do que os −9.376 medidos localmente, e é o número que vale.
+
+### NOVO-92 · `NOVO` A tradução de ação do rodapé em redirect está copiada em cada passo do wizard · AUD · 0,75 d
+
+Achado ao fechar o `BE-12`. Todo passo de wizard lê a ação do rodapé com
+`core/wizard.py::normalizar_acao_do_wizard` — dono único desde o `BE-01` — e depois **cada um
+escreve a sua própria cadeia** de `if nav_action == …` para traduzir a ação em mensagem e redirect:
+
+| passo | onde | forma |
+|---|---|---|
+| `dados_viajantes` | `oficios/traveler_views.py:138` | helper privado `_redirect_after_dados_viajantes_save` |
+| `transporte` | `oficios/traveler_views.py:210` | helper privado `_redirect_after_transporte_save` |
+| `wizard_roteiro` | `oficios/route_views.py` | helper privado `_redirect_after_roteiro_save` (criado no `BE-12`; antes eram duas cadeias inline dentro da mesma view) |
+| `wizard_justificativa` | `oficios/wizard_document_views.py:48` | inline |
+| `wizard_documentos` | `oficios/wizard_document_views.py:144` | inline |
+
+São três helpers com o mesmo nome-padrão e nenhum reuso entre arquivos, mais dois inline. É a mesma
+família do `BE-01`, que centralizou a *leitura* do botão depois de duas cópias divergentes terem
+quebrado a navegação de quatro telas do plano de trabalho — a *escrita* do destino continua
+espalhada.
+
+**Não é cópia literal**, e é por isso que não entrou no `BE-12`: cada passo tem destinos próprios, e
+`wizard_documentos` ainda tem a ação `finalizar`, que os outros não têm. Unificar exige um mapa de
+etapa → próximo/anterior, que é desenho, não extração mecânica. Fica para depois do `BE-13`.

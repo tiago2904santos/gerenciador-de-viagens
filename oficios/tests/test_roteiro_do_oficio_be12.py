@@ -357,3 +357,148 @@ class RoteiroDoOficioCaracterizacaoTests(TestCase):
             Oficio.objects.get(pk=oficio.pk).roteiro_id, "pré-selecionar não pode gravar nada"
         )
         self.assertContains(resposta, f'value="{self.sede.pk}"')
+
+
+class RoteiroDoOficioSemRequestTests(TestCase):
+    """`BE-12`: o que só passou a ser testável depois de a regra sair da view.
+
+    Os três cenários abaixo eram inalcançáveis pelo cliente HTTP. O primeiro porque a
+    view nunca teve transação; os outros dois porque dependem de condições que o
+    caminho HTTP não produz — e essa impossibilidade *era* o defeito catalogado:
+    "não é testável sem subir request HTTP nem reusável pelo fluxo avulso".
+    """
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username="be12_service", password="123456")
+        self.client.force_login(self.user)
+        vincular_area(self.user)
+        self.area = area_de_teste()
+        self.estado = Estado.objects.create(nome="Parana SR", sigla="SR")
+        self.sede = Cidade.objects.create(nome="Curitiba SR", estado=self.estado)
+        self.destino = Cidade.objects.create(nome="Londrina SR", estado=self.estado)
+        self.oficio = Oficio.objects.create(area=self.area)
+        self.saida = timezone.localdate() + timedelta(days=30)
+
+    def _submissao(self):
+        """Form e estado válidos montados sem passar por view nenhuma."""
+        from urllib.parse import urlencode
+
+        from django.http import QueryDict
+
+        from roteiros.forms import RoteiroForm
+        from roteiros.services import validar_submissao_editor_roteiro
+
+        volta = self.saida + timedelta(days=2)
+        post = QueryDict(
+            urlencode(
+                {
+                    "roteiro_modo": roteiro_logic.ROTEIRO_MODO_PROPRIO,
+                    "origem_estado": str(self.estado.pk),
+                    "origem_cidade": str(self.sede.pk),
+                    "observacoes": "sem request",
+                    "quantidade_servidores": "1",
+                    "retorno_saida_data": volta.isoformat(),
+                    "retorno_saida_hora": "14:00",
+                    "retorno_chegada_data": volta.isoformat(),
+                    "retorno_chegada_hora": "18:00",
+                    "retorno_tempo_cru_estimado_min": "240",
+                    "retorno_tempo_adicional_min": "0",
+                    "retorno_duracao_estimada_min": "240",
+                    "trecho_0_origem_estado_id": str(self.estado.pk),
+                    "trecho_0_origem_cidade_id": str(self.sede.pk),
+                    "trecho_0_destino_estado_id": str(self.estado.pk),
+                    "trecho_0_destino_cidade_id": str(self.destino.pk),
+                    "trecho_0_saida_data": self.saida.isoformat(),
+                    "trecho_0_saida_hora": "08:00",
+                    "trecho_0_chegada_data": self.saida.isoformat(),
+                    "trecho_0_chegada_hora": "12:00",
+                    "trecho_0_tempo_cru_estimado_min": "240",
+                    "trecho_0_tempo_adicional_min": "0",
+                    "trecho_0_duracao_estimada_min": "240",
+                }
+            )
+        )
+        form = RoteiroForm(post)
+        roteiro_state, validated, diarias = validar_submissao_editor_roteiro(post, {})
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertTrue(validated["ok"], validated.get("errors"))
+        return post, form, roteiro_state, validated, diarias
+
+    def test_9_fora_de_request_o_roteiro_nasce_na_area_do_oficio(self):
+        """`NOVO-88`: antes disto o ramo válido criava `Roteiro(...)` sem `area=`.
+
+        A área saía de `Roteiro.save()` → `get_current_area()`, que fora de request é
+        `None` — e o `INSERT` batia no `NOT NULL` do `DB-02`. Pelo HTTP as duas leituras
+        coincidiam por acidente (`get_oficio_by_id` lê o mesmo thread-local), então o
+        acoplamento era invisível. Aqui ele aparece.
+        """
+        from core.testing import sem_request
+        from oficios.services import salvar_roteiro_do_oficio
+
+        post, form, roteiro_state, validated, diarias = self._submissao()
+
+        with sem_request():
+            resultado = salvar_roteiro_do_oficio(
+                self.oficio,
+                post,
+                form,
+                roteiro_state=roteiro_state,
+                validated=validated,
+                diarias_resultado=diarias,
+            )
+
+        self.assertTrue(resultado.criou_rascunho)
+        self.assertFalse(resultado.reusou_sem_copia)
+        self.assertEqual(
+            resultado.roteiro.area_id,
+            self.oficio.area_id,
+            "a área é a do ofício, passada explicitamente — não a ativa da requisição",
+        )
+        self.oficio.refresh_from_db()
+        self.assertEqual(self.oficio.roteiro_id, resultado.roteiro.pk)
+
+    def test_8_falha_no_meio_da_gravacao_nao_deixa_roteiro_orfao(self):
+        """`atomic`: a requisição grava 4 tabelas, e antes do `BE-12` nenhuma transação
+        as unia. Uma falha entre gravar o roteiro e apontar o ofício deixava roteiro
+        órfão no banco — o item 1 da lista de perigo do `BE-14`."""
+        from unittest.mock import patch
+
+        from oficios import services as oficios_services
+
+        post, form, roteiro_state, validated, diarias = self._submissao()
+        antes = Roteiro.all_objects.count()
+
+        with patch.object(
+            oficios_services, "_revincular_roteiro_ao_oficio", side_effect=RuntimeError("boom")
+        ):
+            with self.assertRaises(RuntimeError):
+                oficios_services.salvar_roteiro_do_oficio(
+                    self.oficio,
+                    post,
+                    form,
+                    roteiro_state=roteiro_state,
+                    validated=validated,
+                    diarias_resultado=diarias,
+                )
+
+        self.assertEqual(
+            Roteiro.all_objects.count(), antes, "o roteiro gravado antes da falha tem de sumir"
+        )
+        self.oficio.refresh_from_db()
+        self.assertIsNone(self.oficio.roteiro_id)
+
+    def test_10_vincular_roteiro_de_outra_area_e_recusado(self):
+        """Inalcançável pela view — `obter_roteiro_escolhido_do_post` já filtra pela área
+        do ofício —, então esta guarda nunca tinha sido exercitada."""
+        from usuarios.models import AreaTrabalho
+
+        from oficios.services import vincular_roteiro_ao_oficio_sem_copia
+
+        outra = AreaTrabalho.objects.create(sigla="BE12X", nome="Outra area BE12")
+        alheio = Roteiro.all_objects.create(area=outra, tipo=Roteiro.TIPO_AVULSO)
+
+        with self.assertRaises(ValueError):
+            vincular_roteiro_ao_oficio_sem_copia(self.oficio, alheio)
+
+        self.oficio.refresh_from_db()
+        self.assertIsNone(self.oficio.roteiro_id)
