@@ -72,7 +72,7 @@
 
   {# Sede #}
   {% if roteiro_editor_oficio %}
-  <c-ui.forms.form_block title="Sede" description="Unidade de origem da viagem." section_id="sec-sede-title" element_id="sec-sede" :heading_level="4" variant="split" extra_class="route-sede-block" body_template="roteiros/partials/roteiro/_sede_fields.html" />
+  <c-ui.forms.form_block title="Sede" description="Unidade de origem da viagem." section_id="sec-sede-title" element_id="sec-sede" :heading_level="4" variant="split" extra_class="route-sede-block" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :shell="shell"><c-slot name="body">{% include "roteiros/partials/roteiro/_sede_fields.html" with estados=estados form=form sede_cidade_id=sede_cidade_id sede_cidades_qs=sede_cidades_qs sede_estado_id=sede_estado_id only %}</c-slot></c-ui.forms.form_block>
   {% else %}
   <section class="wizard-inner-section" aria-labelledby="sec-sede-title" id="sec-sede">
     <header class="wizard-inner-section__header">
@@ -123,12 +123,12 @@
   </section>
   {% endif %}
 
-  <c-travel.destination_section section_id="sec-destinos" title_id="sec-destinos-title" add_button_id="btn-adicionar-destino" list_id="destinos-container" title="Destinos" description="Locais na ordem da visita. " layout="split" panel_aria_label="Destinos adicionados." />
+  <c-travel.destination_section section_id="sec-destinos" title_id="sec-destinos-title" add_button_id="btn-adicionar-destino" list_id="destinos-container" title="Destinos" description="Locais na ordem da visita. " layout="split" panel_aria_label="Destinos adicionados."  :errors_template="errors_template" :rows_template="rows_template" :section_extra_class="section_extra_class" :city_field="city_field" :data_index="data_index" :destino_index="destino_index" :evento="evento" :form="form" :has_data_index="has_data_index" :has_destino_index="has_destino_index" :hide_order_badge="hide_order_badge" :picker_open_all="picker_open_all" :prefix="prefix" :remove_hidden="remove_hidden" :row_extra_class="row_extra_class" :row_index="row_index" :row_single="row_single" :show_drag_handle="show_drag_handle" :show_row_add="show_row_add" :state_field="state_field" :estados="estados" :location_city_value="location_city_value" :location_legacy_event="location_legacy_event" :location_state_code="location_state_code" :location_state_id="location_state_id" :row="row" />
   <template id="tmpl-destino-roteiro" data-location-template>
     {% if roteiro_editor_oficio %}
-      <c-travel.destination_row data_index="__index__" :has_data_index="True" :row_ordinal="1" :hide_order_badge="True" :show_row_add="True" state_select_template="roteiros/partials/roteiro/_destino_template_state.html" city_select_template="roteiros/partials/roteiro/_destino_template_city.html" />
+      <c-travel.destination_row data_index="__index__" :has_data_index="True" :row_ordinal="1" :hide_order_badge="True" :show_row_add="True" state_select_template="roteiros/partials/roteiro/_destino_template_state.html" city_select_template="roteiros/partials/roteiro/_destino_template_city.html"  :city_field="city_field" :destino_index="destino_index" :has_destino_index="has_destino_index" :prefix="prefix" :remove_hidden="remove_hidden" :row_extra_class="row_extra_class" :row_index="row_index" :row_single="row_single" :show_drag_handle="show_drag_handle" :state_field="state_field" :estados="estados" :form="form" :location_city_value="location_city_value" :location_legacy_event="location_legacy_event" :location_state_code="location_state_code" :location_state_id="location_state_id" :picker_open_all="picker_open_all" :row="row" />
     {% else %}
-      <c-travel.destination_row :hide_order_badge="True" :show_row_add="True" state_select_template="roteiros/partials/roteiro/_destino_template_state.html" city_select_template="roteiros/partials/roteiro/_destino_template_city.html" />
+      <c-travel.destination_row :hide_order_badge="True" :show_row_add="True" state_select_template="roteiros/partials/roteiro/_destino_template_state.html" city_select_template="roteiros/partials/roteiro/_destino_template_city.html"  :city_field="city_field" :data_index="data_index" :destino_index="destino_index" :has_data_index="has_data_index" :has_destino_index="has_destino_index" :prefix="prefix" :remove_hidden="remove_hidden" :row_extra_class="row_extra_class" :row_index="row_index" :row_ordinal="row_ordinal" :row_single="row_single" :show_drag_handle="show_drag_handle" :state_field="state_field" :estados="estados" :form="form" :location_city_value="location_city_value" :location_legacy_event="location_legacy_event" :location_state_code="location_state_code" :location_state_id="location_state_id" :picker_open_all="picker_open_all" :row="row" />
     {% endif %}
   </template>
 

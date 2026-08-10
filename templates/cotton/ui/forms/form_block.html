@@ -1,30 +1,8 @@
-{% cotton:vars action_autosave action_label action_url action_variant actions_template aria_label body_extra_class body_id body_template data_hook description element_id extra_class footer_template heading_level section_id shell title variant %}
+{% cotton:vars action_autosave action_label action_url action_variant actions aria_label body body_extra_class body_id data_hook description element_id extra_class footer heading_level section_id shell title variant %}
 {% comment %}
-  Canonical internal form block (`H-04`).
-
-  Shells:
-  - block (default): form-block, para seções dentro de um card maior
-  - card: form-section-card, para seções que são o próprio card
-    (ex.: wizard de roteiro avulso)
-
-  Variants (somente shell block):
-  - default: stacked header and body
-  - split: contextual copy beside the fields
-  - resource: entity/resource picker with an optional header action
-
-  Params extras:
-  - element_id: id do <section>
-  - data_hook: data-attr de comportamento (ex. "route-segments")
-  - actions_template: template incluído no slot de ações do header
-  - body_template / body_extra_class
-
-  Business behaviour belongs to data-* hooks supplied through extra_class or
-  to the included body template; this component owns only shared structure.
-
-  Os parâmetros DESTE componente são zerados antes de incluir body, actions e
-  footer — os `form_block` aninhados usam os mesmos nomes (`H-04`).
+  Bloco de formulário canônico. Body, actions e footer são slots explícitos.
+  shell="card" mantém a variante de card de página; o padrão é form-block.
 {% endcomment %}
-{% with corpo=body_template acoes=actions_template rodape=footer_template %}
 {% if shell == "card" %}
 <section
   class="form-section-card{% if extra_class %} {{ extra_class }}{% endif %}"
@@ -38,12 +16,10 @@
       {% if description %}<p class="form-section-subtitle">{{ description }}</p>{% endif %}
     </div>
 
-    {% if action_label or acoes %}
+    {% if action_label or actions %}
       <div class="cv-form-section-header__actions">
-        {% if acoes %}
-          {% with title="" description="" title_id="" section_id="" element_id="" extra_class="" body_extra_class="" body_template="" footer_template="" actions_template="" variant="" shell="" action_label="" action_url="" action_autosave="" action_variant="" data_hook="" heading_level="" body_id="" aria_label="" %}
-            {% include acoes %}
-          {% endwith %}
+        {% if actions %}
+          {{ actions }}
         {% else %}
           {% with cotton_attr_variant=action_variant|default:"secondary" %}<c-ui.buttons.button :href="action_url" :label="action_label" :variant="cotton_attr_variant" :data_autosave_link="action_autosave" only />{% endwith %}
         {% endif %}
@@ -52,16 +28,10 @@
   </header>
 
   <div class="form-section-body{% if body_extra_class %} {{ body_extra_class }}{% endif %}"{% if body_id %} id="{{ body_id }}"{% endif %}>
-    {% with title="" description="" title_id="" section_id="" element_id="" extra_class="" body_extra_class="" body_template="" footer_template="" actions_template="" variant="" shell="" action_label="" action_url="" action_autosave="" action_variant="" data_hook="" heading_level="" body_id="" aria_label="" %}
-      {% if corpo %}{% include corpo %}{% endif %}
-    {% endwith %}
+    {{ body }}
   </div>
 
-  {% if rodape %}
-    {% with title="" description="" title_id="" section_id="" element_id="" extra_class="" body_extra_class="" body_template="" footer_template="" actions_template="" variant="" shell="" action_label="" action_url="" action_autosave="" action_variant="" data_hook="" heading_level="" body_id="" aria_label="" %}
-      {% include rodape %}
-    {% endwith %}
-  {% endif %}
+  {{ footer }}
 </section>
 {% else %}
 <section
@@ -70,19 +40,10 @@
   {% if section_id %}aria-labelledby="{{ section_id }}"{% elif aria_label %}aria-label="{{ aria_label }}"{% endif %}
   {% if data_hook %}data-{{ data_hook }}{% endif %}
 >
-  {% if title or description or action_label or acoes %}
+  {% if title or description or action_label or actions %}
   <header class="form-block__header">
     <div class="form-block__copy">
       {% if title %}
-        {% comment %}
-          `HT-05`: o ramo `h2` é novo e **aditivo** — só recebe quem pedir
-          `heading_level=2`. O componente sabia render­izar 3 e 4, e o default
-          continua 4; nenhum dos ~40 chamadores existentes muda de nível.
-
-          Ele existe porque a lista de justificativas tem o painel de cadastro
-          rápido como filho direto do `<h1>` da página, sem heading próprio no
-          meio. Com o máximo sendo 3, aquela tela não tinha como não pular nível.
-        {% endcomment %}
         {% if heading_level == 2 %}
           <h2 class="form-block__title"{% if section_id %} id="{{ section_id }}"{% endif %}>{{ title }}</h2>
         {% elif heading_level == 3 %}
@@ -94,12 +55,10 @@
       {% if description %}<p class="form-block__description">{{ description }}</p>{% endif %}
     </div>
 
-    {% if action_label or acoes %}
+    {% if action_label or actions %}
       <div class="form-block__actions">
-        {% if acoes %}
-          {% with title="" description="" title_id="" section_id="" element_id="" extra_class="" body_extra_class="" body_template="" footer_template="" actions_template="" variant="" shell="" action_label="" action_url="" action_autosave="" action_variant="" data_hook="" heading_level="" body_id="" aria_label="" %}
-            {% include acoes %}
-          {% endwith %}
+        {% if actions %}
+          {{ actions }}
         {% else %}
           {% with cotton_attr_variant=action_variant|default:"secondary" %}<c-ui.buttons.button :href="action_url" :label="action_label" :variant="cotton_attr_variant" :data_autosave_link="action_autosave" only />{% endwith %}
         {% endif %}
@@ -109,16 +68,9 @@
   {% endif %}
 
   <div class="form-block__body{% if body_extra_class %} {{ body_extra_class }}{% endif %}"{% if body_id %} id="{{ body_id }}"{% endif %}>
-    {% with title="" description="" title_id="" section_id="" element_id="" extra_class="" body_extra_class="" body_template="" footer_template="" actions_template="" variant="" shell="" action_label="" action_url="" action_autosave="" action_variant="" data_hook="" heading_level="" body_id="" aria_label="" %}
-      {% if corpo %}{% include corpo %}{% endif %}
-    {% endwith %}
+    {{ body }}
   </div>
 
-  {% if rodape %}
-    {% with title="" description="" title_id="" section_id="" element_id="" extra_class="" body_extra_class="" body_template="" footer_template="" actions_template="" variant="" shell="" action_label="" action_url="" action_autosave="" action_variant="" data_hook="" heading_level="" body_id="" aria_label="" %}
-      {% include rodape %}
-    {% endwith %}
-  {% endif %}
+  {{ footer }}
 </section>
 {% endif %}
-{% endwith %}

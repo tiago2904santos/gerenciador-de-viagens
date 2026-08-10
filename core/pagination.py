@@ -1,6 +1,6 @@
 """Paginação compartilhada das listas em cards.
 
-Toda lista que usa ``components/lists/list_page_cards.html`` é paginada: o
+Toda lista que usa ``cotton/lists/list_page_cards.html`` é paginada: o
 componente de paginação declara ``paginacao_obrigatoria`` e denuncia na tela a
 ausência de ``page_obj`` em vez de sumir em silêncio (defeito N-07).
 

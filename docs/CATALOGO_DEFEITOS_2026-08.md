@@ -1770,7 +1770,7 @@ não está documentado. É um `PADRAO_*` que aponta para o passado — quem segu
 > esperteza do teste e pôr o nome cheio no documento — referência que não dá para grepar não é
 > referência.
 
-### HT-14 🟡 28% dos includes não usam `only` · AUD · 2 d
+### HT-14 ✅ RESOLVIDO (E5, 10/08/2026) · 28% dos includes não usavam `only` · AUD · 2 d
 
 Componentes leem contexto ambiente do chamador em vez de receber só o que declaram. É como um
 componente passa a depender de uma variável que o chamador tem por acaso — e quebra quando outro
@@ -1785,6 +1785,11 @@ chamador não tem.
 > declarado: o `only` deixa de ser disciplina de quem escreve o `{% include %}` e vira o
 > comportamento do motor. **Fila:** etapa E5 do
 > [`PLANO_RECONSTRUCAO_FRONT_2026-08.md`](PLANO_RECONSTRUCAO_FRONT_2026-08.md).
+
+**Resolvido na E5.** Os 868 call sites de componentes agora usam tags Cotton com contratos
+explícitos e isolamento habilitado. Os 190 includes Django que restaram são parciais de aplicação
+ou conteúdo de slot; todos declaram o contexto e usam `only`. A regra `include_without_only` do
+auditor transforma o zero atual em catraca de CI.
 
 ### HT-15 🟡 Bloco `cv-itinerary` duplicado em 5 apps · AUD · 1,5 d
 
@@ -5298,7 +5303,7 @@ A linha de base reproduzida em 09/08/2026 foi **11,3369%–70,5559%** de uso de 
 login; nas rotas autenticadas, 11,3369%–19,2908%) e **248.651 diferenças não-cor** em 61.700
 elementos, 129 combinações de rota/largura. A captura inversa deu zero diferenças exclusivas.
 
-### NOVO-71 🟠 `NOVO` Componente global não tem contrato de parâmetro · HT · 6+ d
+### NOVO-71 ✅ RESOLVIDO (E3–E5, 10/08/2026) · `NOVO` Componente global não tinha contrato de parâmetro · HT · 6+ d
 
 **275 dos 946 `{% include %}`** do sistema não usam `only`. O componente lê o contexto que o
 chamador tem por acaso, e quebra quando outro chamador não tem — que é o `HT-14` pelo lado do
@@ -5313,8 +5318,8 @@ passa só o atributo declarado — o `only` deixa de ser disciplina e vira o com
 Trocar o carregador muda a resolução de **407 templates** de uma vez, e o modo de falhar é
 `TemplateDoesNotExist` em rota que ninguém abriu no PR.
 
-**Fila:** E3 (instalar) e E4 (converter os 82 componentes) concluídas; E5 (migrar os call sites)
-pendente.
+**Resolvido.** A E3 instalou e configurou o motor, a E4 converteu os 82 componentes e a E5 migrou
+os 868 call sites, habilitou isolamento de contexto e apagou todas as cascas de compatibilidade.
 
 **E3 concluída em 09/08/2026 (`e6a722ae`).** `django-cotton==2.7.2` entrou no lock com hashes e
 o projeto passou a usar configuração manual: `SimpleAppConfig`, loader em cache com Cotton antes
@@ -5327,8 +5332,8 @@ servidor sem `TemplateDoesNotExist` e sem erro de console.
 em `templates/cotton/**`, mantendo 82 cascas compatíveis nos caminhos antigos. Os contratos cobrem
 todo o inventário, e a régua visual da E0 ficou estável nas 129 combinações de rota e largura. As
 catracas fecharam em 0 erros/240 avisos no auditor frontend, 2.535 suspeitas no auditor de padrões e
-78 no auditor de arquitetura. A E5 ainda precisa migrar os call sites, habilitar o isolamento de
-contexto onde hoje há includes dinâmicos e apagar as cascas; só então o `NOVO-71` estará fechado.
+78 no auditor de arquitetura. A E5 migrou os call sites, explicitou contratos inclusive em slots
+e templates dinâmicos, habilitou o isolamento e removeu as cascas; o defeito está fechado.
 
 ### NOVO-72 ✅ RESOLVIDO (E2, 09/08/2026) · `NOVO` `ui_lab2/` sobreviveu à remoção do PR #247 · MOR · 0,1 d
 
@@ -5359,7 +5364,7 @@ os citam e `docs/DATA_ATTRIBUTES_JS.md`.
 `roteiros.js`, `roteiros-map.js`, `roteiros-wizard.js` e `gdrive-config.js`. Templates, testes,
 exceções do auditor e documentação foram atualizados no mesmo commit, sem alias de compatibilidade.
 
-### NOVO-74 🟡 `NOVO` Dois namespaces de componente concorrentes, com quatro pastas fantasma · HT · junto da E5
+### NOVO-74 ✅ RESOLVIDO (E5, 10/08/2026) · `NOVO` Dois namespaces de componente concorrentes, com quatro pastas fantasma · HT
 
 `templates/components/` tem **duas gerações vivas ao mesmo tempo**:
 
@@ -5375,6 +5380,9 @@ não seguiu. Quem for criar um botão novo tem dois lugares plausíveis e nenhum
 
 **Fila:** etapa E5, junto da migração dos call sites — mover para `templates/cotton/` resolve os
 dois namespaces de uma vez, em vez de renomear duas vezes.
+
+**Resolvido na E5.** `templates/cotton/**` é o único namespace: as 82 cascas e os cinco arquivos
+`.gitkeep` de `templates/components/**` foram removidos, sem alias de compatibilidade.
 
 ### NOVO-75 ✅ RESOLVIDO (e6e9c3d2) · `NOVO` O comando de suíte do `AGENTS.md` não funciona no ambiente que o projeto monta para os agentes · COR · 0,1 d
 

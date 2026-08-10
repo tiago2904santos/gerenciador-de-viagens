@@ -5,7 +5,7 @@
     {% url "oficios:dados_viajantes" oficio.pk as oficio_url %}
     <c-ui.headers.page_header eyebrow="OFÍCIOS" :title="page_title" icon_label="TM" module_label="Termos" back_label="Voltar ao ofício" :back_url="oficio_url" only />
     <div class="main-form-panel">
-      <c-ui.forms.form_block title="Pré-visualização" section_id="termos-preview-section" body_template="termos/partials/_oficio_preview_body.html" />
+      <c-ui.forms.form_block title="Pré-visualização" section_id="termos-preview-section" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :description="description" :element_id="element_id" :extra_class="extra_class" :heading_level="heading_level" :shell="shell" :variant="variant"><c-slot name="body">{% include "termos/partials/_oficio_preview_body.html" with preview=preview only %}</c-slot></c-ui.forms.form_block>
     </div>
   </div>
 {% endblock %}

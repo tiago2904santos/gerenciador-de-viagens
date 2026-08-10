@@ -20,7 +20,6 @@ from typing import Sequence
 ROOT = Path(__file__).resolve().parents[1]
 TARGETS = [ROOT / "templates", ROOT / "static" / "css"]
 IGNORED_PARTS = {
-    "templates/components/ui",
     "templates/cotton",
     "templates/documentos/pdf",
 }

@@ -14,7 +14,7 @@
     {% csrf_token %}
     <c-ui.feedback.form_errors :form="form" only />
     <div class="form-section-stack form-section-stack--comfortable" data-travel-document-wizard-step1>
-      <c-form.card :title="card_title" :description="page_description" title_id="usuarios-form-card-title" extra_class="travel-document-card" body_extra_class="travel-document-body" :body_template="body_template" footer_template="usuarios/partials/_form_card_footer.html" />
+      <c-form.card :title="card_title" :description="page_description" title_id="usuarios-form-card-title" extra_class="travel-document-card" body_extra_class="travel-document-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include body_template with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id data_hook=data_hook form=form heading_level=heading_level shell=shell variant=variant only %}</c-slot><c-slot name="footer">{% include "usuarios/partials/_form_card_footer.html" with flow_back_url=flow_back_url submit_label=submit_label only %}</c-slot></c-form.card>
     </div>
   </form>
 {% endblock %}

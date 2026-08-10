@@ -12,7 +12,7 @@
       {% if doc.view_url %}
         <c-ui.buttons.icon_button :href="doc.view_url" action="preview" aria_label="Visualizar" tooltip="Visualizar" only />
       {% endif %}
-      {% include "prestacoes_contas/partials/_docs_attach_trigger.html" %}
+      {% include "prestacoes_contas/partials/_docs_attach_trigger.html" with attach_kinds_json=attach_kinds_json doc=doc initial_kind=initial_kind reopen_key=reopen_key title=title only %}
     </div>
   </article>
 {% else %}
@@ -24,7 +24,7 @@
       </span>
       <span class="document-inline-card__header-end">
         <span class="document-inline-actions document-inline-actions--header" aria-label="Ações de {{ title }}">
-          {% include "prestacoes_contas/partials/_docs_attach_trigger.html" %}
+          {% include "prestacoes_contas/partials/_docs_attach_trigger.html" with attach_kinds_json=attach_kinds_json doc=doc initial_kind=initial_kind reopen_key=reopen_key title=title only %}
         </span>
       </span>
     </div>

@@ -1,4 +1,4 @@
-"""Builders do entity card global (components/ui/lists/entity_card*.html).
+"""Builders do entity card global (cotton/ui/lists/entity_card*.html).
 
 As views/presenters montam as partes comuns do card (cabeçalho, chips e rodapé
 de ações) com estes helpers; o miolo específico de cada domínio continua num

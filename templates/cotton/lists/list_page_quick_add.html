@@ -1,4 +1,4 @@
-{% cotton:vars abas back_label back_url band_tabs_template can_edit_area delete_modal_enabled delete_modal_entity delete_modal_title empty_message extra_hidden_field_name extra_hidden_field_value eyebrow hide_realtime_count page_obj page_querystring pagination_pages q quick_add_body_template quick_add_compact quick_add_form quick_add_label quick_add_next_url quick_add_panel_id quick_add_submit_label request rows search_placeholder tabs_aria_label title %}
+{% cotton:vars abas action_autosave action_label action_url action_variant aria_label back_label back_url band_tabs_template body_extra_class body_id can_edit_area cotton_attr_aria_label cotton_attr_href cotton_attr_label data_hook delete_modal_enabled delete_modal_entity delete_modal_title empty_action_label empty_action_url empty_message empty_variant extra_hidden_field_name extra_hidden_field_value eyebrow hide_realtime_count page_obj page_querystring pagination_pages q quick_add_body_template quick_add_compact quick_add_form quick_add_label quick_add_next_url quick_add_panel_id quick_add_submit_label request rows search_placeholder shell tabs_aria_label title variant %}
 {# Lista com criação inline (inline-create). Cabeçalho via banda canônica (D-53). #}
 <div class="page-shell page-shell--list" data-collection data-collection-mode="server">
   <div
@@ -59,7 +59,7 @@
         <c-ui.feedback.form_errors :form="quick_add_form" only />
         <div class="inline-create__body">
           <div class="inline-create__fields">
-            {% include quick_add_body_template with form=quick_add_form only %}
+            {% include quick_add_body_template with form=quick_add_form abas=abas back_label=back_label back_url=back_url band_tabs_template=band_tabs_template can_edit_area=can_edit_area delete_modal_enabled=delete_modal_enabled delete_modal_entity=delete_modal_entity delete_modal_title=delete_modal_title empty_action_label=empty_action_label empty_action_url=empty_action_url empty_message=empty_message empty_variant=empty_variant extra_hidden_field_name=extra_hidden_field_name extra_hidden_field_value=extra_hidden_field_value eyebrow=eyebrow hide_realtime_count=hide_realtime_count page_obj=page_obj page_querystring=page_querystring pagination_pages=pagination_pages q=q quick_add_body_template=quick_add_body_template quick_add_compact=quick_add_compact quick_add_form=quick_add_form quick_add_label=quick_add_label quick_add_next_url=quick_add_next_url quick_add_panel_id=quick_add_panel_id quick_add_submit_label=quick_add_submit_label request=request rows=rows search_placeholder=search_placeholder tabs_aria_label=tabs_aria_label title=title cotton_attr_href=cotton_attr_href cotton_attr_label=cotton_attr_label cotton_attr_aria_label=cotton_attr_aria_label action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id data_hook=data_hook shell=shell variant=variant only %}
           </div>
           {% if not quick_add_compact %}
           <div class="inline-create__actions">
@@ -96,7 +96,7 @@
 
     <div class="list-panel{% if not rows %} list-panel--empty{% endif %}">
       <c-ui.lists.pagination :page_obj="page_obj" :paginacao_obrigatoria="True" pagination_part="erro" only />
-      <c-lists.simple_list :rows="rows" :empty_message="empty_message" :hide_realtime_count="hide_realtime_count" />
+      <c-lists.simple_list :rows="rows" :empty_message="empty_message" :hide_realtime_count="hide_realtime_count"  :empty_action_label="empty_action_label" :empty_action_url="empty_action_url" :empty_variant="empty_variant" />
     </div>
   </div>
 

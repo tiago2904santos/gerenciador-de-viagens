@@ -1,7 +1,7 @@
 """A folha de símbolos de ícone tem que estar onde os ícones estão (`PF-01`).
 
 `icon.html` deixou de desenhar o ícone: ele aponta para um `<symbol>` de
-`components/ui/icons/_sprite.html`. O ganho é grande — na lista de Ofícios, 380
+`cotton/ui/icons/_sprite.html`. O ganho é grande — na lista de Ofícios, 380
 ícones caíram de 192,6 KB para 59,0 KB, e a página de 450,4 KB para 315,3 KB —
 mas o modo de falha mudou de lugar, e piorou:
 
@@ -30,7 +30,7 @@ from core.templatetags.icones import nome_de_icone
 
 RAIZ = Path(settings.BASE_DIR) / "templates"
 FOLHA = RAIZ / "cotton/ui/icons/_sprite.html"
-ICONE = "components/ui/icons/icon.html"
+ICONE = "cotton/ui/icons/icon.html"
 FOLHA_REL = "cotton/ui/icons/_sprite.html"
 
 SIMBOLO = re.compile(r'<symbol id="cv-icon-([^"]+)"')

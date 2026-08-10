@@ -1,40 +1,8 @@
-{% cotton:vars actions_bare actions_extra_class actions_template aria_label body_extra_class body_template copy_extra_class data_hook description extra_class eyebrow footer_data_hook footer_extra_class footer_id footer_template header_extra_class heading_level meta_extra_class meta_template title title_id %}
+{% cotton:vars actions actions_bare actions_extra_class aria_label body body_extra_class copy_extra_class data_hook description extra_class eyebrow footer footer_data_hook footer_extra_class footer_id header_extra_class heading_level meta meta_extra_class title title_id %}
 {% comment %}
-  Card mestre de uma página de fluxo (`H-05`).
-
-  O `<header>` deste card era escrito à mão em 28 arquivos, apesar de
-  `form_block.html shell="card"` já produzir esse markup — só que `form_block` é
-  bloco *dentro* de um card, e faltava a versão que é o card da página inteira.
-
-  Parâmetros:
-    title / description   copy do cabeçalho
-    title_id              id do `<h*>`, referenciado por `aria-labelledby`
-    heading_level         1, 2 ou 3 (padrão); o PDF Final usa 2 desde antes desta
-                          migração, e mudar seria alteração de conteúdo
-                          disfarçada de refactor
-    eyebrow               linha acima do título (ex.: signature card)
-    extra_class           modificador do card (ex.: "rt-wizard-card")
-    body_extra_class      modificador do corpo (ex.: "rt-wizard-body")
-    body_template         template do conteúdo
-    footer_template       template do rodapé (dentro de `form-card__footer`)
-    footer_id             id do rodapé, quando o JS precisa achá-lo
-    footer_extra_class    modificador do wrapper do rodapé (ex.: "hidden")
-    footer_data_hook      data-attr de comportamento no rodapé (ex.: "oficio-viatura-footer")
-    header_extra_class    modificador do `<header>`
-    copy_extra_class      modificador de `cv-form-section-header__copy`
-    actions_template      template incluído em `cv-form-section-header__actions`
-    meta_template         template incluído no slot de meta/status do header
-    meta_extra_class      modificador do slot de meta (padrão: `cv-form-section-header__meta`)
-    actions_extra_class   modificador de `cv-form-section-header__actions`
-    actions_bare          quando true, inclui `actions_template` sem wrapper
-    aria_label            alternativa a `aria-labelledby` quando não há `title_id`
-    data_hook             data-attr de comportamento no `<section>` (ex.: "oficio-viatura-card")
-
-  O rodapé sai num `<div>`, e não num `<footer>`: o rodapé semântico já existe
-  dentro de `card_footer_actions.html`, e aninhar `<footer>` em `<footer>` é
-  inválido — medido e escrito no `H-08`.
+  Card mestre de página de fluxo. Conteúdo, ações, meta e rodapé são slots
+  renderizados no contexto do chamador; o componente recebe apenas o resultado.
 {% endcomment %}
-{% with corpo=body_template rodape=footer_template acoes=actions_template meta=meta_template %}
 <section
   class="form-section-card form-card form-section-card--described travel-document-card{% if extra_class %} {{ extra_class }}{% endif %}"
   {% if aria_label %}aria-label="{{ aria_label }}"{% elif title_id %}aria-labelledby="{{ title_id }}"{% endif %}
@@ -52,52 +20,29 @@
       {% endif %}
       {% if description %}<p class="form-section-subtitle">{{ description }}</p>{% endif %}
     </div>
-    {% if acoes %}
+    {% if actions %}
       {% if actions_bare %}
-        {% with title="" description="" title_id="" extra_class="" body_extra_class="" body_template="" footer_template="" footer_id="" footer_extra_class="" footer_data_hook="" heading_level="" section_id="" variant="" actions_template="" meta_template="" shell="" header_extra_class="" copy_extra_class="" aria_label="" data_hook="" eyebrow="" actions_extra_class="" actions_bare="" meta_extra_class="" %}
-          {% include acoes %}
-        {% endwith %}
+        {{ actions }}
       {% else %}
         <div class="cv-form-section-header__actions{% if actions_extra_class %} {{ actions_extra_class }}{% endif %}">
-          {% with title="" description="" title_id="" extra_class="" body_extra_class="" body_template="" footer_template="" footer_id="" footer_extra_class="" footer_data_hook="" heading_level="" section_id="" variant="" actions_template="" meta_template="" shell="" header_extra_class="" copy_extra_class="" aria_label="" data_hook="" eyebrow="" actions_extra_class="" actions_bare="" meta_extra_class="" %}
-            {% include acoes %}
-          {% endwith %}
+          {{ actions }}
         </div>
       {% endif %}
     {% endif %}
     {% if meta %}
       <div class="{% if meta_extra_class %}{{ meta_extra_class }}{% else %}cv-form-section-header__meta{% endif %}">
-        {% with title="" description="" title_id="" extra_class="" body_extra_class="" body_template="" footer_template="" footer_id="" footer_extra_class="" footer_data_hook="" heading_level="" section_id="" variant="" actions_template="" meta_template="" shell="" header_extra_class="" copy_extra_class="" aria_label="" data_hook="" eyebrow="" actions_extra_class="" actions_bare="" meta_extra_class="" %}
-          {% include meta %}
-        {% endwith %}
+        {{ meta }}
       </div>
     {% endif %}
   </header>
 
   <div class="form-section-body travel-document-body{% if body_extra_class %} {{ body_extra_class }}{% endif %}">
-    {% comment %}
-      O include do corpo NÃO leva `only`: como `form_block.html`, este componente
-      é portador de contexto — o template do corpo lê `form`, `campos_modelo`,
-      `trechos` e outras variáveis da view (é o `H-04`, que tem PR próprio).
-
-      Mas os parâmetros DESTE componente precisam ser zerados antes de descer,
-      porque os `form_block` de dentro usam os mesmos nomes. Sem isso o
-      `body_extra_class="rt-wizard-body"` do card mestre reaparecia em TODOS os
-      blocos internos e o `footer_template` do card virava rodapé de cada bloco.
-      Achado comparando o HTML renderizado antes e depois; nenhum teste pegaria,
-      porque o defeito é uma classe a mais, não uma exceção.
-    {% endcomment %}
-    {% with title="" description="" title_id="" extra_class="" body_extra_class="" body_template="" footer_template="" footer_id="" footer_extra_class="" footer_data_hook="" heading_level="" section_id="" variant="" actions_template="" meta_template="" shell="" header_extra_class="" copy_extra_class="" aria_label="" data_hook="" eyebrow="" actions_extra_class="" actions_bare="" meta_extra_class="" %}
-      {% if corpo %}{% include corpo %}{% endif %}
-    {% endwith %}
+    {{ body }}
   </div>
 
-  {% if rodape %}
+  {% if footer %}
     <div class="form-card__footer{% if footer_extra_class %} {{ footer_extra_class }}{% endif %}"{% if footer_id %} id="{{ footer_id }}"{% endif %}{% if footer_data_hook %} data-{{ footer_data_hook }}{% endif %}>
-      {% with title="" description="" title_id="" extra_class="" body_extra_class="" body_template="" footer_template="" footer_id="" footer_extra_class="" footer_data_hook="" heading_level="" section_id="" variant="" actions_template="" meta_template="" shell="" header_extra_class="" copy_extra_class="" aria_label="" data_hook="" eyebrow="" actions_extra_class="" actions_bare="" meta_extra_class="" %}
-        {% include rodape %}
-      {% endwith %}
+      {{ footer }}
     </div>
   {% endif %}
 </section>
-{% endwith %}

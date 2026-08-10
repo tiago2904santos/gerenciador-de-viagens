@@ -200,7 +200,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         )
 
         self.assertFalse(wrapper.exists())
-        canonical = wrapper.parents[1] / "ui" / "forms" / "field.html"
+        canonical = Path(settings.BASE_DIR) / "templates" / "cotton" / "ui" / "forms" / "field.html"
         self.assertTrue(canonical.exists())
 
     def test_canonical_feedback_supports_existing_contracts(self):
@@ -293,13 +293,13 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_incomplete_form_section_component_was_removed(self):
         templates = Path(settings.BASE_DIR) / "templates"
-        legacy_component = templates / "components" / "ui" / "layouts" / "form_section.html"
-        self.assertFalse(legacy_component.exists())
+        incomplete_component = templates / "cotton" / "ui" / "layouts" / "form_section.html"
+        self.assertFalse(incomplete_component.exists())
 
         offenders = []
         for template in templates.rglob("*.html"):
             source = template.read_text(encoding="utf-8")
-            if "components/ui/layouts/form_section.html" in source:
+            if "cotton/ui/layouts/form_section.html" in source:
                 offenders.append(str(template.relative_to(templates)))
 
         self.assertEqual(offenders, [])
@@ -315,20 +315,20 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR) / "static" / "css" / "layout" / "page-shell.css"
         ).read_text(encoding="utf-8")
 
-        # `H-02`: a página passou a estender `components/page/flow_base.html`,
+        # `H-02`: a página passou a estender `cotton/page/flow_base.html`,
         # que já é coberto por teste próprio. O eyebrow não é mais escrito à mão
         # no template — vem do contexto da view (`flow_eyebrow`), então o
         # contrato certo a medir é "a view manda EVENTOS", não "o template tem a
         # string" (mesma lição do card mestre de Prestações, ver
         # `test_summary_and_document_cards_share_global_contracts`).
-        self.assertIn('extends "components/page/flow_base.html"', template)
+        self.assertIn('extends "cotton/page/flow_base.html"', template)
         eventos_views = (
             Path(settings.BASE_DIR) / "eventos" / "views.py"
         ).read_text(encoding="utf-8")
         self.assertIn('"flow_eyebrow": "EVENTOS"', eventos_views)
         self.assertNotIn("CADASTRO DE OFICIO", template)
         # `H-05`: o card da etapa 1 saiu do `detalhe.html` e virou
-        # `components/form/card.html` com `body_template`; os títulos dos
+        # `cotton/form/card.html` com slot de corpo; os títulos dos
         # blocos internos moraram para o partial extraído.
         etapa1_body = (
             Path(settings.BASE_DIR)
@@ -471,7 +471,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         # A versão anterior lia o `.html` da página com `read_text` e procurava a
         # string. Isso confundia "onde a string está escrita" com "o que a página
         # entrega": no `H-02` o card mestre passou a vir de
-        # `components/form/card.html`, o HTML final ficou idêntico e o teste
+        # `cotton/form/card.html`, o HTML final ficou idêntico e o teste
         # falhou mesmo assim — ele guardava o arquivo, não o contrato.
         for relative, card in (
             ("relatorio_tecnico_form.html", "rt-wizard-card"),
@@ -512,9 +512,9 @@ class DarkRedesignContractTests(SimpleTestCase):
         ):
             with self.subTest(template=relative):
                 source = (templates / relative).read_text(encoding="utf-8")
-                self.assertIn('components/ui/lists/entity_card.html', source)
+                self.assertIn('<c-ui.lists.entity_card', source)
 
-        # `HT-06`: `components/lists/main_list_card.html` foi apagado. Ele afirmava o
+        # `HT-06`: o antigo `main_list_card.html` foi apagado. Ele afirmava o
         # mesmo contrato de `entity_card.html` e **nada o renderizava** — o único
         # citador do repositório era este arquivo de teste, e ainda por cima numa
         # asserção de que ele *não* aparece no lab (linha ~681). O contrato de
@@ -561,7 +561,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "_transporte_header_actions.html"
         ).read_text(encoding="utf-8")
 
-        # `H-05`: o casco do card veio de `components/form/card.html`; a página
+        # `H-05`: o casco do card veio de `cotton/form/card.html`; a página
         # só aponta o include. O contrato visual continua no componente canônico.
         self.assertIn('<c-form.card', source)
         self.assertIn("form-section-card", card)

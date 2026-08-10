@@ -11,7 +11,7 @@
 {% block wizard_content %}
   <div data-pt-efetivo-diarias data-api-calcular-url="{{ api_calcular_diarias_url }}" data-travel-document-wizard-step1>
 
-    <c-form.card title="Efetivo e diárias" description="Composição da equipe e cálculo automático das diárias" title_id="pt-efetivo-diarias-title" extra_class="pt-form-card" body_extra_class="travel-document-body" body_template="planos_trabalho/partials/_efetivo_diarias_wizard_body.html" footer_template="planos_trabalho/partials/_efetivo_diarias_wizard_footer.html" />
+    <c-form.card title="Efetivo e diárias" description="Composição da equipe e cálculo automático das diárias" title_id="pt-efetivo-diarias-title" extra_class="pt-form-card" body_extra_class="travel-document-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "planos_trabalho/partials/_efetivo_diarias_wizard_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_id=body_id data_hook=data_hook heading_level=heading_level shell=shell variant=variant cargos_url=cargos_url formset=formset diarias_form=diarias_form diarias_resultado=diarias_resultado total_forms=total_forms only %}</c-slot><c-slot name="footer">{% include "planos_trabalho/partials/_efetivo_diarias_wizard_footer.html" only %}</c-slot></c-form.card>
   </div>
 {% endblock %}
 

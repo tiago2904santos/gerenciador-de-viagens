@@ -25,11 +25,11 @@
         <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
       </button>
     </header>
-    <c-layout.sidebar />
+    <c-layout.sidebar  :navigation_items="navigation_items" :request="request" />
     <button class="sidebar-scrim" type="button" aria-label="Fechar menu principal" tabindex="-1" data-sidebar-drawer-close></button>
     <main class="app-main" id="main-content" tabindex="-1">
       <section class="content-wrap">
-        <c-feedback.alerts />
+        <c-feedback.alerts  :messages="messages" />
         {% block content %}{% endblock %}
       </section>
     </main>

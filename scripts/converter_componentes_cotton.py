@@ -120,6 +120,7 @@ def _contrato(template_name: str, memo: dict[str, set[str]], stack: set[str]) ->
     from django.template.loader import get_template
     from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
     from django_cotton.templatetags._component import CottonComponentNode
+    from django_cotton.templatetags._slot import CottonSlotNode
 
     if template_name.startswith("components/"):
         cotton_name = "cotton/" + template_name.removeprefix("components/")
@@ -193,10 +194,8 @@ def _contrato(template_name: str, memo: dict[str, set[str]], stack: set[str]) ->
                     found.update(_externas(expression, bound))
 
                 if template_literal and not node.isolated_context:
-                    target = template_literal
-                    if target.startswith("components/"):
-                        nested = _contrato(target, memo, stack)
-                        found.update(nested - set(node.extra_context) - bound)
+                    nested = _contrato(template_literal, memo, stack)
+                    found.update(nested - set(node.extra_context) - bound)
                 continue
 
             if isinstance(node, CottonComponentNode):
@@ -206,6 +205,10 @@ def _contrato(template_name: str, memo: dict[str, set[str]], stack: set[str]) ->
                     expression = cotton_expression(raw)
                     if expression is not None:
                         found.update(_externas(expression, bound))
+                found.update(nodelist_contract(node.nodelist, bound))
+                continue
+
+            if isinstance(node, CottonSlotNode):
                 found.update(nodelist_contract(node.nodelist, bound))
                 continue
 
@@ -258,6 +261,12 @@ def _contrato(template_name: str, memo: dict[str, set[str]], stack: set[str]) ->
 
 def contrato(path: Path, memo: dict[str, set[str]]) -> list[str]:
     template_name = path.relative_to(ROOT / "templates").as_posix()
+    return sorted(_contrato(template_name, memo, set()))
+
+
+def contrato_template(template_name: str, memo: dict[str, set[str]]) -> list[str]:
+    """Retorna as variáveis livres de qualquer template carregável."""
+
     return sorted(_contrato(template_name, memo, set()))
 
 

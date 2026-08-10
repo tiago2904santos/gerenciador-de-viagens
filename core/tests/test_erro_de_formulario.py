@@ -30,7 +30,7 @@ from django.test import SimpleTestCase
 from django.test import TestCase
 from django.urls import reverse
 
-RESUMO = "components/ui/feedback/form_errors.html"
+RESUMO = "cotton/ui/feedback/form_errors.html"
 RAIZ = Path(settings.BASE_DIR)
 
 GENERICA = "Revise os campos destacados antes de continuar."
@@ -145,7 +145,7 @@ class AlertNaoInterpretaMarcacaoTests(SimpleTestCase):
 
     def test_message_crua_com_marcacao_sai_escapada(self):
         html = render_to_string(
-            "components/ui/feedback/alert.html",
+            "cotton/ui/feedback/alert.html",
             {"variant": "danger", "message": "<img src=x onerror=alert(1)>"},
         )
 
@@ -154,7 +154,7 @@ class AlertNaoInterpretaMarcacaoTests(SimpleTestCase):
 
     def test_title_cru_com_marcacao_sai_escapado(self):
         html = render_to_string(
-            "components/ui/feedback/alert.html",
+            "cotton/ui/feedback/alert.html",
             {"variant": "danger", "title": "<b>x</b>", "message": "ok"},
         )
 
@@ -244,7 +244,7 @@ class UmPadraoSoTests(SimpleTestCase):
             for achado in re.finditer(r'class="[^"]*\balert-danger\b', sem_comentario):
                 mao.append(f"{rel}:{sem_comentario.count(chr(10), 0, achado.start()) + 1}")
 
-        self.assertEqual(mao, [], "use components/ui/feedback/alert.html")
+        self.assertEqual(mao, [], "use <c-ui.feedback.alert>")
 
     def test_a_excecao_do_diarias_body_ainda_e_de_JS(self):
         """Exceção que ninguém confere vira permissão. Esta é conferida.

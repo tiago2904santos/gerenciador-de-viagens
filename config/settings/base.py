@@ -186,6 +186,10 @@ TEMPLATES = [
     },
 ]
 
+# E5 / HT-14: componentes Cotton recebem somente atributos e slots declarados.
+# Context processors continuam disponíveis pelo RequestContext do próprio Cotton.
+COTTON_ENABLE_CONTEXT_ISOLATION = True
+
 WSGI_APPLICATION = "config.wsgi.application"
 
 LANGUAGE_CODE = os.getenv("LANGUAGE_CODE", "pt-br")

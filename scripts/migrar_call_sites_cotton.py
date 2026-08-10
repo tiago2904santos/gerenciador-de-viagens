@@ -26,6 +26,9 @@ COMPONENT_PREFIX = "components/"
 INCLUDE_RE = re.compile(r"{%\s*include\s+.*?%}", re.DOTALL)
 EXTENDS_RE = re.compile(r"{%\s*extends\s+.*?%}", re.DOTALL)
 QUOTED_RE = re.compile(r"^(?P<quote>['\"])(?P<value>.*)(?P=quote)$", re.DOTALL)
+LEGACY_PATH_RE = re.compile(
+    r"(?P<quote>['\"])components/(?P<path>[A-Za-z0-9_./-]+\.html)(?P=quote)"
+)
 
 
 def _literal(token: str) -> str | None:
@@ -133,7 +136,15 @@ def converter_texto(texto: str) -> tuple[str, int]:
             alterados += 1
         return novo
 
-    return EXTENDS_RE.sub(substituir_extends, convertido), alterados
+    convertido = EXTENDS_RE.sub(substituir_extends, convertido)
+
+    def substituir_caminho(match: re.Match[str]) -> str:
+        nonlocal alterados
+        alterados += 1
+        quote = match.group("quote")
+        return f"{quote}cotton/{match.group('path')}{quote}"
+
+    return LEGACY_PATH_RE.sub(substituir_caminho, convertido), alterados
 
 
 def iterar_templates(escopos: Iterable[Path]) -> Iterable[Path]:

@@ -3,7 +3,7 @@
 
 {% block wizard_content %}
   <div data-travel-document-wizard-justificativa>
-    <c-form.card title="Justificativa" description="Texto que fundamenta a necessidade da viagem" title_id="justificativa-panel-title" extra_class="oficio-justificativa-card" body_extra_class="oficio-justificativa-body" body_template="oficios/partials/_justificativa_wizard_body.html" footer_template="oficios/partials/_justificativa_wizard_footer.html" />
+    <c-form.card title="Justificativa" description="Texto que fundamenta a necessidade da viagem" title_id="justificativa-panel-title" extra_class="oficio-justificativa-card" body_extra_class="oficio-justificativa-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "oficios/partials/_justificativa_wizard_body.html" with action_variant=action_variant aria_label=aria_label body_id=body_id data_hook=data_hook element_id=element_id heading_level=heading_level modelos_justificativa_url=modelos_justificativa_url shell=shell form=form only %}</c-slot><c-slot name="footer">{% include "oficios/partials/_justificativa_wizard_footer.html" only %}</c-slot></c-form.card>
   </div>
 {% endblock %}
 

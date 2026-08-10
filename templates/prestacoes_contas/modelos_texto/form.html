@@ -8,7 +8,7 @@
 
     <form class="main-form-panel form-card" method="post" novalidate>
       {% csrf_token %}
-      <c-ui.forms.form_block title="Dados do modelo" description="Escolha o campo, o nome e o texto do modelo." section_id="modelos-texto-form-section" body_template="prestacoes_contas/modelos_texto/_form_body.html" />
+      <c-ui.forms.form_block title="Dados do modelo" description="Escolha o campo, o nome e o texto do modelo." section_id="modelos-texto-form-section" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :element_id="element_id" :extra_class="extra_class" :heading_level="heading_level" :shell="shell" :variant="variant"><c-slot name="body">{% include "prestacoes_contas/modelos_texto/_form_body.html" with form=form only %}</c-slot></c-ui.forms.form_block>
       {% with cotton_attr_primary_label=submit_label|default:"Salvar" %}<c-ui.layouts.card_footer_actions secondary_label="Voltar" :secondary_url="back_url" :primary_label="cotton_attr_primary_label" only />{% endwith %}
     </form>
   </div>

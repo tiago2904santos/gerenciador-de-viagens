@@ -359,9 +359,19 @@ pergunte.
 
 ---
 
-### E5 — Call sites migrados, cascas apagadas · `HT-14`, `NOVO-74` · risco médio · 4–6 d
+### E5 ✅ — Call sites migrados, cascas apagadas · `HT-14`, `NOVO-74` · concluída em 10/08/2026
 
 **Objetivo.** Fechar o "mudar o modelo muda todas as páginas" no motor, não na disciplina.
+
+**Concluída.** Os **868 call sites de componentes** foram migrados, app por app, para tags
+`<c-…>`. Os 82 componentes canônicos permanecem exclusivamente em `templates/cotton/**`; as 82
+cascas, os cinco `.gitkeep` e todo o diretório rastreado `templates/components/**` foram removidos.
+O isolamento de contexto do Cotton está habilitado e os **190 includes Django remanescentes** —
+parciais de aplicação e slots, não componentes — declaram parâmetros e terminam em `only`.
+`audit_frontend_standards` agora reprova tanto include de componente quanto include sem `only`.
+Os contratos estáticos percorrem composição, slots e templates dinâmicos; a suíte coletou 1.866
+testes e, no host Windows, restaram apenas as duas limitações já conhecidas (WeasyPrint/GTK e o
+subprocesso do auditor por socket). A régua visual da E0 permaneceu estável nas 129 combinações.
 
 **Arquivos.** todos os `templates/<app>/**` · `templates/components/**` (removidos ao fim)
 

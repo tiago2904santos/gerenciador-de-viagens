@@ -32,7 +32,7 @@ from django.test import SimpleTestCase
 from django.test import TestCase
 from django.urls import reverse
 
-CAMPO = "components/ui/forms/field.html"
+CAMPO = "cotton/ui/forms/field.html"
 RAIZ = Path(settings.BASE_DIR)
 
 _ID = re.compile(r'\bid="([^"]+)"')
@@ -313,7 +313,7 @@ class ContratoDosChamadoresTests(SimpleTestCase):
             if valor and valor.endswith(("non_field_errors", "non_form_errors"))
         ]
 
-        self.assertEqual(indevidos, [], "use components/ui/feedback/form_errors.html")
+        self.assertEqual(indevidos, [], "use <c-ui.feedback.form_errors>")
 
     def test_ninguem_passa_string_literal_em_errors(self):
         """`join` sobre string separa **caractere por caractere**.

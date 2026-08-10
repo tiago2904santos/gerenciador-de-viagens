@@ -20,12 +20,12 @@
     </div>
     {% endif %}
 
-    {% include body_template with card=card csrf_token=csrf_token current_url=current_url only %}
+    {% include body_template with card=card csrf_token=csrf_token current_url=current_url body_template=body_template extra_class=extra_class footer_template=footer_template modifier=modifier only %}
 
     {% if card.footer %}
       <c-ui.lists.entity_card_footer :footer="card.footer" :csrf_token="csrf_token" only />
     {% elif footer_template %}
-      {% include footer_template with card=card csrf_token=csrf_token current_url=current_url only %}
+      {% include footer_template with card=card csrf_token=csrf_token current_url=current_url body_template=body_template extra_class=extra_class footer_template=footer_template modifier=modifier only %}
     {% endif %}
 
   </div>
