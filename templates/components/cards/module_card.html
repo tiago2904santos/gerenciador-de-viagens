@@ -1,15 +1,1 @@
-<article class="cv-module-card module-card app-card">
-  <header class="cv-module-card__header">
-    <span class="cv-module-card__mark" aria-hidden="true">{{ mark|default:title|slice:":2"|upper }}</span>
-    <span class="cv-module-card__eyebrow eyebrow">{{ eyebrow|default:"Módulo" }}</span>
-  </header>
-  <div class="cv-module-card__body">
-    <h3 class="cv-module-card__title">{{ title }}</h3>
-    {% if description %}<p class="cv-module-card__description">{{ description }}</p>{% endif %}
-  </div>
-  {% if href %}
-    <footer class="cv-module-card__footer">
-      {% include "components/ui/buttons/button.html" with href=href label=action_label|default:"Abrir" variant="secondary" size="sm" icon="arrow-right" icon_after=True only %}
-    </footer>
-  {% endif %}
-</article>
+<c-cards.module_card :action_label="action_label" :description="description" :eyebrow="eyebrow" :href="href" :mark="mark" :title="title" />

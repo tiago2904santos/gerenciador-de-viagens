@@ -40,7 +40,7 @@ COMPONENTE = (
 MODAL = (
     Path(settings.BASE_DIR)
     / "templates"
-    / "components"
+    / "cotton"
     / "ui"
     / "modals"
     / "attach_signed_modal.html"

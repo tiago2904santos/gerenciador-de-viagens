@@ -1,0 +1,281 @@
+{% cotton:vars allow_repeat_dates compact_range_display control_variant end_field end_hidden_id end_hidden_name end_hidden_value end_input_id end_label end_placeholder extra_class filter_date hide_labels initial_date input_class max_dates mode multi_input_id multi_placeholder picker_id range_controls_template selected_dates_json show_confirm show_context show_summary single_aria_label single_field single_hidden_id single_hidden_name single_hidden_value single_input_id single_label single_placeholder start_field start_hidden_id start_hidden_name start_hidden_value start_input_id start_label start_placeholder trecho_date trigger_aria_label trigger_class trigger_label %}
+{% comment %}
+date_picker.html — componente global de calendário.
+Unico ponto de verdade para a marcacao do componente; static/js/components/date-picker.js e
+static/css/fields/date-picker.css ja sao compartilhados — este partial evita que cada
+pagina copie/cole (e por engano divirja) a marcacao HTML.
+
+Parametros comuns:
+  mode            "single" (padrao) | "range" | "multi"
+  picker_id       id do elemento raiz .date-picker (opcional)
+  extra_class     classes extras na raiz, ex.: "termo-date-picker" (opcional)
+  initial_date    data-initial-date na raiz — data inicial exibida ao abrir (opcional)
+
+Modo single:
+  single_field         BoundField do form (opcional) — usado para rotulo/id/name/value/erros do hidden
+  single_label          rotulo (se omitido, usa single_field.label; se nenhum, nao exibe rotulo)
+  single_input_id       id do input de exibicao (se omitido, usa single_field.id_for_label + "_display")
+  single_hidden_id      id do hidden quando NAO houver single_field
+  single_hidden_name    name do hidden quando NAO houver single_field
+  single_hidden_value   value do hidden quando NAO houver single_field
+  trecho_date           data-trecho-date na raiz (uso: roteiro retorno)
+  control_variant       "input-only" preserva um unico input sem botao lateral
+  input_class / single_aria_label
+
+  Modo range:
+  start_field / end_field                 BoundField do form (opcional)
+  start_label / end_label                 default "Data inicial" / "Data final"
+  start_placeholder / end_placeholder     placeholder dos inputs de exibição (default: "dd/mm/aaaa")
+  start_input_id / end_input_id           ids dos inputs de exibicao; default *_field.id_for_label + "_display"
+  start_hidden_id / end_hidden_id         ids dos hiddens quando NAO houver *_field
+  start_hidden_name / end_hidden_name     usados quando NAO houver *_field
+  start_hidden_value / end_hidden_value
+  show_summary   exibe o resumo textual abaixo dos campos (default: true)
+  hide_labels    esconde os rótulos visuais do range (mantém sr-only para a11y)
+  control_variant  "filter-pill" preserva o botao compacto dos filtros de lista
+  range_controls_template  partial opcional para posicionar os dois controles sem duplicar raiz/painel
+  compact_range_display  exibe dia/mes no inicio e mantem o ano na data final
+
+Modo multi:
+  max_dates             numero maximo de datas (ex.: 1 por trecho do roteiro)
+  allow_repeat_dates    selecao sequencial: cada clique preenche o proximo trecho, a mesma data
+                        pode se repetir (mesmo dia em trechos seguidos / ida e volta) e o rodape
+                        ganha "Desfazer" no lugar do clique-para-remover
+  selected_dates_json   JSON com as datas ja selecionadas (opcional)
+  multi_input_id        id do input de exibicao (unico campo, somente leitura)
+  multi_placeholder     placeholder do input (default: "Selecione as datas")
+  show_context          exibe o rotulo de trecho atual (default: true)
+  show_confirm          exibe o botao "Aplicar datas" no rodape (default: true)
+  control_variant       "action-button" preserva um gatilho de acao sem input;
+                        "filter-pill" reutiliza o controle compacto dos filtros de lista
+  trigger_label / trigger_aria_label / trigger_class
+{% endcomment %}
+{% with root_id=picker_id|default:"date-picker" %}
+{% with panel_id=root_id|add:"-panel" %}
+<div
+  class="date-picker{% if extra_class %} {{ extra_class }}{% endif %}"
+  data-cv-date-picker
+  {% if mode %}data-mode="{{ mode }}"{% endif %}
+  {% if picker_id %}id="{{ picker_id }}"{% endif %}
+  {% if initial_date %}data-initial-date="{{ initial_date }}"{% endif %}
+  {% if compact_range_display %}data-compact-range-display="true"{% endif %}
+  {% if trecho_date %}data-trecho-date="{{ trecho_date }}"{% endif %}
+  {% if mode == "multi" %}
+    {% if max_dates %}data-max-dates="{{ max_dates }}"{% endif %}
+    {% if allow_repeat_dates %}data-allow-repeat-dates="true"{% endif %}
+    data-selected-dates='{{ selected_dates_json|default:"[]" }}'
+  {% endif %}
+>
+  {% if mode == "range" %}
+    {% if control_variant == "filter-pill" %}
+      <button
+        type="button"
+        class="travel-period-filter__btn"
+        data-cv-date-picker-trigger
+        aria-expanded="false"
+        aria-controls="{{ panel_id }}"
+        aria-label="{{ trigger_aria_label|default:'Filtrar por período da viagem' }}"
+      >
+        <span class="cv-btn__icon" aria-hidden="true">
+          {% include "components/ui/forms/_date_picker_icon.html" %}
+        </span>
+        <span
+          class="travel-period-filter__label"
+          data-cv-date-picker-display-text
+          data-placeholder="{{ trigger_label|default:'Período da viagem' }}"
+        >{{ trigger_label|default:"Período da viagem" }}</span>
+      </button>
+    {% elif range_controls_template %}
+      {# Herda o contexto do chamador (ex.: estado do roteiro) e o panel_id do with acima. #}
+      {% include range_controls_template %}
+    {% else %}
+    {% if start_field %}{% with start_default_id=start_field.id_for_label|add:"_display" %}{% with start_id=start_input_id|default:start_default_id start_lbl=start_label|default:start_field.label start_ph=start_placeholder|default:"dd/mm/aaaa" %}
+      <div class="field-grid field-grid--cols-2">
+        <div class="cv-field">
+          <label class="cv-field__label{% if hide_labels %} sr-only{% endif %}" for="{{ start_id }}">{{ start_lbl }}</label>
+          <div class="date-picker__control">
+            <input type="text" class="cv-field__control" id="{{ start_id }}" placeholder="{{ start_ph }}" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-start-display readonly{% if hide_labels %} aria-label="{{ start_lbl }}"{% endif %}>
+            <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
+              {% include "components/ui/forms/_date_picker_icon.html" %}
+            </button>
+          </div>
+        </div>
+    {% endwith %}{% endwith %}{% else %}{% with start_id=start_input_id start_lbl=start_label|default:"Data inicial" start_ph=start_placeholder|default:"dd/mm/aaaa" %}
+      <div class="field-grid field-grid--cols-2">
+        <div class="cv-field">
+          <label class="cv-field__label{% if hide_labels %} sr-only{% endif %}" for="{{ start_id }}">{{ start_lbl }}</label>
+          <div class="date-picker__control">
+            <input type="text" class="cv-field__control" id="{{ start_id }}" placeholder="{{ start_ph }}" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-start-display readonly{% if hide_labels %} aria-label="{{ start_lbl }}"{% endif %}>
+            <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
+              {% include "components/ui/forms/_date_picker_icon.html" %}
+            </button>
+          </div>
+        </div>
+    {% endwith %}{% endif %}
+
+    {% if end_field %}{% with end_default_id=end_field.id_for_label|add:"_display" %}{% with end_id=end_input_id|default:end_default_id end_lbl=end_label|default:end_field.label end_ph=end_placeholder|default:"dd/mm/aaaa" %}
+        <div class="cv-field">
+          <label class="cv-field__label{% if hide_labels %} sr-only{% endif %}" for="{{ end_id }}">{{ end_lbl }}</label>
+          <div class="date-picker__control">
+            <input type="text" class="cv-field__control" id="{{ end_id }}" placeholder="{{ end_ph }}" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-end-display readonly{% if hide_labels %} aria-label="{{ end_lbl }}"{% endif %}>
+            <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
+              {% include "components/ui/forms/_date_picker_icon.html" %}
+            </button>
+          </div>
+        </div>
+      </div>
+    {% endwith %}{% endwith %}{% else %}{% with end_id=end_input_id end_lbl=end_label|default:"Data final" end_ph=end_placeholder|default:"dd/mm/aaaa" %}
+        <div class="cv-field">
+          <label class="cv-field__label{% if hide_labels %} sr-only{% endif %}" for="{{ end_id }}">{{ end_lbl }}</label>
+          <div class="date-picker__control">
+            <input type="text" class="cv-field__control" id="{{ end_id }}" placeholder="{{ end_ph }}" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-end-display readonly{% if hide_labels %} aria-label="{{ end_lbl }}"{% endif %}>
+            <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
+              {% include "components/ui/forms/_date_picker_icon.html" %}
+            </button>
+          </div>
+        </div>
+      </div>
+    {% endwith %}{% endif %}
+    {% endif %}
+
+    {% if start_field %}{{ start_field }}{% else %}
+      <input type="hidden" name="{{ start_hidden_name }}"{% if start_hidden_id %} id="{{ start_hidden_id }}"{% endif %} value="{{ start_hidden_value|default:'' }}" data-cv-date-picker-start-value{% if filter_date %} data-collection-filter="date"{% endif %}>
+    {% endif %}
+    {% if end_field %}{{ end_field }}{% else %}
+      <input type="hidden" name="{{ end_hidden_name }}"{% if end_hidden_id %} id="{{ end_hidden_id }}"{% endif %} value="{{ end_hidden_value|default:'' }}" data-cv-date-picker-end-value{% if filter_date %} data-collection-filter="date"{% endif %}>
+    {% endif %}
+    {% if start_field.errors %}
+      {% include "components/ui/feedback/field_error.html" with errors=start_field.errors field_id=start_field.auto_id only %}
+    {% endif %}
+    {% if end_field.errors %}
+      {% include "components/ui/feedback/field_error.html" with errors=end_field.errors field_id=end_field.auto_id only %}
+    {% endif %}
+    {% if show_summary|default_if_none:True %}
+      <p class="date-picker__summary" data-cv-date-picker-summary></p>
+    {% endif %}
+  {% elif mode == "multi" %}
+    {% if control_variant == "filter-pill" %}
+      <button
+        type="button"
+        class="travel-period-filter__btn"
+        data-cv-date-picker-trigger
+        aria-expanded="false"
+        aria-controls="{{ panel_id }}"
+        aria-label="{{ trigger_aria_label|default:trigger_label|default:'Abrir calendario' }}"
+      >
+        <span class="cv-btn__icon" aria-hidden="true">
+          {% include "components/ui/forms/_date_picker_icon.html" %}
+        </span>
+        <span class="travel-period-filter__label">{{ trigger_label|default:"Preencher datas" }}</span>
+      </button>
+    {% elif control_variant == "action-button" %}
+      <button
+        type="button"
+        class="{{ trigger_class|default:'cv-btn cv-btn--secondary' }} date-picker__trigger"
+        data-cv-date-picker-trigger
+        aria-expanded="false"
+        aria-controls="{{ panel_id }}"
+        aria-label="{{ trigger_aria_label|default:trigger_label|default:'Abrir calendario' }}"
+      >
+        <span class="cv-btn__icon" aria-hidden="true">
+          {% include "components/ui/forms/_date_picker_icon.html" %}
+        </span>
+        <span>{{ trigger_label|default:"Preencher datas" }}</span>
+      </button>
+    {% else %}
+    <div class="date-picker__control">
+      <input
+        type="text"
+        class="cv-field__control"
+        {% if multi_input_id %}id="{{ multi_input_id }}"{% endif %}
+        placeholder="{{ multi_placeholder|default:'Selecione as datas' }}"
+        autocomplete="off"
+        readonly
+        data-cv-date-picker-display
+      >
+      <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
+        {% include "components/ui/forms/_date_picker_icon.html" %}
+      </button>
+    </div>
+    {% endif %}
+    {% if show_summary|default_if_none:True %}
+      <p class="date-picker__summary" data-cv-date-picker-summary></p>
+    {% endif %}
+  {% else %}
+    {% if control_variant == "input-only" %}
+      <input
+        type="text"
+        class="{{ input_class|default:'cv-field__control' }}"
+        {% if single_input_id %}id="{{ single_input_id }}"{% endif %}
+        placeholder="{{ single_placeholder|default:'dd/mm/aaaa' }}"
+        autocomplete="off"
+        inputmode="numeric"
+        maxlength="10"
+        {% if single_aria_label %}aria-label="{{ single_aria_label }}"{% endif %}
+        data-cv-date-picker-display
+        data-cv-date-picker-input-only
+        readonly
+      >
+    {% else %}
+    {% if single_field %}{% with single_default_id=single_field.id_for_label|add:"_display" %}{% with single_id=single_input_id|default:single_default_id single_lbl=single_label|default:single_field.label %}
+      <div class="cv-field">
+        {% if single_lbl %}<label class="cv-field__label" for="{{ single_id }}">{{ single_lbl }}</label>{% endif %}
+        <div class="date-picker__control">
+          <input type="text" class="cv-field__control{% if input_class %} {{ input_class }}{% endif %}" id="{{ single_id }}" placeholder="{{ single_placeholder|default:'dd/mm/aaaa' }}" autocomplete="off" inputmode="numeric" maxlength="10"{% if single_aria_label %} aria-label="{{ single_aria_label }}"{% endif %} data-cv-date-picker-display readonly>
+          <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
+            {% include "components/ui/forms/_date_picker_icon.html" %}
+          </button>
+        </div>
+      </div>
+    {% endwith %}{% endwith %}{% else %}{% with single_id=single_input_id single_lbl=single_label %}
+      <div class="cv-field">
+        {% if single_lbl %}<label class="cv-field__label" for="{{ single_id }}">{{ single_lbl }}</label>{% endif %}
+        <div class="date-picker__control">
+          <input type="text" class="cv-field__control{% if input_class %} {{ input_class }}{% endif %}" id="{{ single_id }}" placeholder="{{ single_placeholder|default:'dd/mm/aaaa' }}" autocomplete="off" inputmode="numeric" maxlength="10"{% if single_aria_label %} aria-label="{{ single_aria_label }}"{% endif %} data-cv-date-picker-display readonly>
+          <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
+            {% include "components/ui/forms/_date_picker_icon.html" %}
+          </button>
+        </div>
+      </div>
+    {% endwith %}{% endif %}
+    {% endif %}
+    {% if single_field %}{{ single_field }}{% else %}
+      <input type="hidden" name="{{ single_hidden_name }}"{% if single_hidden_id %} id="{{ single_hidden_id }}"{% endif %} value="{{ single_hidden_value|default:'' }}" data-cv-date-picker-value>
+    {% endif %}
+    {% if single_field.errors %}
+      {% include "components/ui/feedback/field_error.html" with errors=single_field.errors field_id=single_field.auto_id only %}
+    {% endif %}
+  {% endif %}
+
+  <div class="date-picker__panel" id="{{ panel_id }}" hidden data-cv-date-picker-panel>
+    {% if mode == "multi" and show_context|default_if_none:True %}
+      <div class="date-picker__context" data-cv-date-picker-context hidden>
+        <span class="date-picker__context-step" data-cv-date-picker-context-step></span>
+        <strong class="date-picker__context-route" data-cv-date-picker-context-route></strong>
+      </div>
+    {% endif %}
+    <div class="date-picker__panel-header">
+      <button class="date-picker__nav" type="button" data-cv-date-picker-prev aria-label="Mes anterior">Anterior</button>
+      <div class="date-picker__month" data-cv-date-picker-month></div>
+      <button class="date-picker__nav" type="button" data-cv-date-picker-next aria-label="Próximo mês">Próximo</button>
+    </div>
+    <div class="date-picker__weekdays" data-cv-date-picker-weekdays></div>
+    <div class="date-picker__days" data-cv-date-picker-days></div>
+    <div class="date-picker__footer">
+      {% if mode == "multi" %}
+        <button type="button" class="date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
+        {% if allow_repeat_dates %}
+          <button type="button" class="date-picker__footer-action" data-cv-date-picker-undo>Desfazer</button>
+        {% endif %}
+        {% if show_confirm|default_if_none:True %}
+          <button type="button" class="cv-btn cv-btn--primary cv-btn--sm" data-cv-date-picker-confirm><span>Aplicar datas</span></button>
+        {% endif %}
+      {% else %}
+        <button type="button" class="date-picker__footer-action" data-cv-date-picker-today>Hoje</button>
+        <button type="button" class="date-picker__footer-action" data-cv-date-picker-clear>Limpar</button>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endwith %}
+{% endwith %}

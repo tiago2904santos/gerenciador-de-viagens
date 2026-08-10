@@ -180,8 +180,8 @@ class CssTokenGateTests(SimpleTestCase):
     def test_critical_templates_emit_canonical_notice_and_metric_classes(self):
         """Templates migrados na fase 13 emitem notice / metric como classe primária."""
         expectations = {
-            "templates/components/ui/feedback/alert.html": ("notice", "notice--"),
-            "templates/components/feedback/alerts.html": ("notice-stack", "notice"),
+            "templates/cotton/ui/feedback/alert.html": ("notice", "notice--"),
+            "templates/cotton/feedback/alerts.html": ("notice-stack", "notice"),
             # `summary_card.html` saiu com o painel de `/`; `metric` continua
             # sendo o canônico e é medido em quem ainda o usa.
             "templates/planos_trabalho/partials/_resumo_evento_body.html": ("summary-grid",),

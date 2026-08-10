@@ -1,16 +1,1 @@
-{% comment %}
-Abas de listagem (temporais / de estado). Recebe:
-  - ``abas``: lista de dicts {key, label, count, url, is_active}
-  - ``tabs_aria_label`` (opcional): rótulo acessível do <nav>.
-{% endcomment %}
-<nav class="list-tabs" aria-label="{{ tabs_aria_label|default:'Abas' }}">
-  {% for tab in abas %}
-  <a class="list-tab{% if tab.is_active %} list-tab--active{% endif %}"
-     href="{{ tab.url }}"
-     title="{{ tab.label }}"
-     {% if tab.is_active %}aria-current="page"{% endif %}>
-    <span class="list-tab__label">{{ tab.label }}</span>
-    <span class="list-tab__count">{{ tab.count }}</span>
-  </a>
-  {% endfor %}
-</nav>
+<c-lists.list_tabs :abas="abas" :tabs_aria_label="tabs_aria_label" />

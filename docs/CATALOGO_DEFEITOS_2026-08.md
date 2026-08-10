@@ -5313,14 +5313,22 @@ passa só o atributo declarado — o `only` deixa de ser disciplina e vira o com
 Trocar o carregador muda a resolução de **407 templates** de uma vez, e o modo de falhar é
 `TemplateDoesNotExist` em rota que ninguém abriu no PR.
 
-**Fila:** etapas E3 (instalar), E4 (converter os 82 componentes) e E5 (migrar os call sites).
+**Fila:** E3 (instalar) e E4 (converter os 82 componentes) concluídas; E5 (migrar os call sites)
+pendente.
 
 **E3 concluída em 09/08/2026 (`e6a722ae`).** `django-cotton==2.7.2` entrou no lock com hashes e
 o projeto passou a usar configuração manual: `SimpleAppConfig`, loader em cache com Cotton antes
 de `filesystem.Loader` e `app_directories.Loader`, e a biblioteca de tags em `builtins`. Os cinco
 context processors declarados foram preservados e nenhum template mudou. Os **408 templates** do
 corpus compilam; 12 telas de domínio e o perfil que hospeda a integração Google renderizam no
-servidor sem `TemplateDoesNotExist` e sem erro de console. E4 e E5 ainda fecham o defeito.
+servidor sem `TemplateDoesNotExist` e sem erro de console.
+
+**E4 concluída em 10/08/2026.** Os 82 componentes foram convertidos para implementações canônicas
+em `templates/cotton/**`, mantendo 82 cascas compatíveis nos caminhos antigos. Os contratos cobrem
+todo o inventário, e a régua visual da E0 ficou estável nas 129 combinações de rota e largura. As
+catracas fecharam em 0 erros/240 avisos no auditor frontend, 2.535 suspeitas no auditor de padrões e
+78 no auditor de arquitetura. A E5 ainda precisa migrar os call sites, habilitar o isolamento de
+contexto onde hoje há includes dinâmicos e apagar as cascas; só então o `NOVO-71` estará fechado.
 
 ### NOVO-72 ✅ RESOLVIDO (E2, 09/08/2026) · `NOVO` `ui_lab2/` sobreviveu à remoção do PR #247 · MOR · 0,1 d
 

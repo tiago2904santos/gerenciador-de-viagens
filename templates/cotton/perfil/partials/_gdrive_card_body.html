@@ -1,0 +1,8 @@
+{% cotton:vars drive_total_pendencias %}
+{% include "components/ui/forms/form_block.html" with element_id="gdrive-conta" section_id="gdrive-conta-section" variant="resource" extra_class="travel-document-block document-form-block gdrive-block" title="Conta Google" description="Tokens armazenados e renovados automaticamente, ou conecte uma conta para começar." actions_template="components/perfil/partials/_gdrive_conta_actions.html" body_template="components/perfil/partials/_gdrive_conta_body.html" heading_level=3 %}
+
+{% include "components/ui/forms/form_block.html" with element_id="gdrive-diretorio" section_id="gdrive-diretorio-section" extra_class="travel-document-block document-form-block gdrive-block" title="Diretório de destino" description="Pasta raiz onde os documentos desta área são organizados" body_template="components/perfil/partials/_gdrive_diretorio_body.html" heading_level=3 %}
+
+{% if drive_total_pendencias %}
+  {% include "components/ui/forms/form_block.html" with element_id="gdrive-pendencias" section_id="gdrive-pendencias-section" variant="resource" extra_class="travel-document-block document-form-block" title="Pendências" description="Documentos que não chegaram ao Drive; o sistema tenta reenviar em segundo plano" actions_template="components/perfil/partials/_gdrive_pendencias_meta.html" body_template="components/perfil/partials/_gdrive_pendencias_body.html" heading_level=3 %}
+{% endif %}

@@ -1,0 +1,15 @@
+{% cotton:vars extra_class field %}
+{% comment %}
+CV.picker em modo multiplo — mesmo motor do select simples e do picker de busca.
+O <select multiple> nativo preserva name/id/value/selected para submit Django.
+Campos que já usam o renderer de busca (data-entity-picker no widget, ex.:
+equipe do ofício) não devem ganhar este wrapper — o próprio search-picker
+já cuida da UI e do <select> nativo.
+{% endcomment %}
+{% if "search-picker__native" in field.field.widget.attrs.class|default:"" %}
+  {{ field.as_widget }}
+{% else %}
+<div class="custom-select{% if field.errors %} custom-select--error{% endif %}{% if field.field.disabled %} custom-select--disabled{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="multi">
+  {{ field.as_widget }}
+</div>
+{% endif %}

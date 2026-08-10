@@ -29,14 +29,15 @@ from core.templatetags.icones import ICONES
 from core.templatetags.icones import nome_de_icone
 
 RAIZ = Path(settings.BASE_DIR) / "templates"
-FOLHA = RAIZ / "components/ui/icons/_sprite.html"
+FOLHA = RAIZ / "cotton/ui/icons/_sprite.html"
 ICONE = "components/ui/icons/icon.html"
-FOLHA_REL = "components/ui/icons/_sprite.html"
+FOLHA_REL = "cotton/ui/icons/_sprite.html"
 
 SIMBOLO = re.compile(r'<symbol id="cv-icon-([^"]+)"')
 REFERENCIA = re.compile(r'{%\s*(?:include|extends)\s+"([^"]+)"')
+COTTON_REFERENCIA = re.compile(r"<c-([\w.-]+)")
 # `include ... with icon="edit"`, e também o `icon="edit"` de um `with` de bloco.
-ICONE_LITERAL = re.compile(r'\bicon=(?:"([a-z0-9-]+)"|\'([a-z0-9-]+)\')')
+ICONE_LITERAL = re.compile(r'(?<!:)\bicon=(?:"([a-z0-9-]+)"|\'([a-z0-9-]+)\')')
 
 
 def _templates() -> dict[str, str]:
@@ -63,7 +64,13 @@ def _alcance(raiz: str, textos: dict[str, str]) -> set[str]:
     fila = [raiz]
     while fila:
         atual = fila.pop()
-        vizinhos = REFERENCIA.findall(textos.get(atual, "")) + estende.get(atual, [])
+        texto = textos.get(atual, "")
+        cotton = [
+            "cotton/" + nome.replace(".", "/").replace("-", "_") + ".html"
+            for nome in COTTON_REFERENCIA.findall(texto)
+            if nome not in {"vars", "slot"}
+        ]
+        vizinhos = REFERENCIA.findall(texto) + cotton + estende.get(atual, [])
         for vizinho in vizinhos:
             if vizinho in textos and vizinho not in visto:
                 visto.add(vizinho)
@@ -135,7 +142,7 @@ class FolhaDeIconesTests(SimpleTestCase):
             if ICONE not in alcance:
                 continue
             com_icone.append(raiz)
-            if not any(FOLHA_REL in textos[t] for t in alcance):
+            if FOLHA_REL not in alcance:
                 sem_folha.append(raiz)
 
         self.assertEqual(sem_folha, [], "raiz de documento com ícone e sem a folha")

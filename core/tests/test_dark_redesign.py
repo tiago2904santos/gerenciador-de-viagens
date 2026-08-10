@@ -144,7 +144,9 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_page_header_has_one_canonical_markup_without_legacy_wrappers(self):
         headers = Path(settings.BASE_DIR) / "templates" / "components" / "ui" / "headers"
-        canonical = (headers / "page_header.html").read_text(encoding="utf-8")
+        canonical = (
+            Path(settings.BASE_DIR) / "templates" / "cotton" / "ui" / "headers" / "page_header.html"
+        ).read_text(encoding="utf-8")
 
         self.assertIn('<header class="page-header-stack', canonical)
         self.assertIn("components/ui/buttons/button.html", canonical)
@@ -164,7 +166,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         canonical = (
             Path(settings.BASE_DIR)
             / "templates"
-            / "components"
+            / "cotton"
             / "ui"
             / "headers"
             / "page_header.html"
@@ -178,7 +180,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         button = (
             Path(settings.BASE_DIR)
             / "templates"
-            / "components"
+            / "cotton"
             / "ui"
             / "buttons"
             / "button.html"
@@ -202,9 +204,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertTrue(canonical.exists())
 
     def test_canonical_feedback_supports_existing_contracts(self):
-        feedback = (
-            Path(settings.BASE_DIR) / "templates" / "components" / "ui" / "feedback"
-        )
+        feedback = Path(settings.BASE_DIR) / "templates" / "cotton" / "ui" / "feedback"
         alert = (feedback / "alert.html").read_text(encoding="utf-8")
         empty_state = (feedback / "empty_state.html").read_text(encoding="utf-8")
         form_errors = (feedback / "form_errors.html").read_text(encoding="utf-8")
@@ -229,7 +229,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         component = (
             Path(settings.BASE_DIR)
             / "templates"
-            / "components"
+            / "cotton"
             / "ui"
             / "forms"
             / "file_picker.html"
@@ -260,7 +260,7 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_confirmation_flows_share_the_canonical_dialog_structure(self):
         modals = (
-            Path(settings.BASE_DIR) / "templates" / "components" / "ui" / "modals"
+            Path(settings.BASE_DIR) / "templates" / "cotton" / "ui" / "modals"
         )
         header = (modals / "dialog_header.html").read_text(encoding="utf-8")
 
@@ -395,7 +395,7 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_global_shell_has_accessible_mobile_navigation_contract(self):
         sidebar_template = (
-            Path(settings.BASE_DIR) / "templates" / "components" / "layout" / "sidebar.html"
+            Path(settings.BASE_DIR) / "templates" / "cotton" / "layout" / "sidebar.html"
         ).read_text(encoding="utf-8")
         sidebar_js = (
             Path(settings.BASE_DIR) / "static" / "js" / "components" / "sidebar.js"
@@ -419,7 +419,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         component = (
             Path(settings.BASE_DIR)
             / "templates"
-            / "components"
+            / "cotton"
             / "ui"
             / "modals"
             / "confirm_delete.html"
@@ -492,7 +492,7 @@ class DarkRedesignContractTests(SimpleTestCase):
     def test_rich_list_cards_share_the_entity_card_contract(self):
         templates = Path(settings.BASE_DIR) / "templates"
         canonical = (
-            templates / "components" / "ui" / "lists" / "entity_card.html"
+            templates / "cotton" / "ui" / "lists" / "entity_card.html"
         ).read_text(encoding="utf-8")
         for contract in (
             "entity-card",
@@ -522,10 +522,10 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_document_viewer_and_signature_use_canonical_components(self):
         templates = Path(settings.BASE_DIR) / "templates"
-        viewer = (templates / "components" / "documents" / "pdf_viewer.html").read_text(encoding="utf-8")
-        signature = (templates / "components" / "documents" / "signature_card.html").read_text(encoding="utf-8")
+        viewer = (templates / "cotton" / "documents" / "pdf_viewer.html").read_text(encoding="utf-8")
+        signature = (templates / "cotton" / "documents" / "signature_card.html").read_text(encoding="utf-8")
         signature_body = (
-            templates / "components" / "documents" / "partials" / "_signature_card_body.html"
+            templates / "cotton" / "documents" / "partials" / "_signature_card_body.html"
         ).read_text(encoding="utf-8")
         viewer_page = (templates / "documentos" / "pdf_viewer.html").read_text(encoding="utf-8")
         signature_js = (
@@ -551,7 +551,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR) / "templates" / "oficios" / "wizard_transporte.html"
         ).read_text(encoding="utf-8")
         card = (
-            Path(settings.BASE_DIR) / "templates" / "components" / "form" / "card.html"
+            Path(settings.BASE_DIR) / "templates" / "cotton" / "form" / "card.html"
         ).read_text(encoding="utf-8")
         header_actions = (
             Path(settings.BASE_DIR)
@@ -574,7 +574,7 @@ class DarkRedesignContractTests(SimpleTestCase):
     def test_dashboard_uses_global_header_summary_and_module_cards(self):
         templates = Path(settings.BASE_DIR) / "templates"
         dashboard = (templates / "core" / "dashboard.html").read_text(encoding="utf-8")
-        module_card = (templates / "components" / "cards" / "module_card.html").read_text(encoding="utf-8")
+        module_card = (templates / "cotton" / "cards" / "module_card.html").read_text(encoding="utf-8")
 
         # O painel foi esvaziado a pedido do dono. O contrato mudou de "usa os
         # tres componentes globais" para "**nao tem vocabulario proprio**": o que

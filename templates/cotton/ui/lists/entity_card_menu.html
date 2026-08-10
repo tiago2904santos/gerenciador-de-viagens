@@ -1,0 +1,26 @@
+{% cotton:vars csrf_token menu %}
+{% comment %}
+Botão-gatilho do menu rico do entity card. menu = core.entity_cards.menu(...).
+
+PF-04: o corpo do menu mora em `entity_card_menu_body.html`. Quando o menu tem
+`src`, o corpo NÃO vem no HTML da lista — o `overlay.js` busca nessa URL no
+primeiro clique. Sem `src`, o corpo continua embutido aqui, e é essa regra que
+mantém funcionando os domínios que ainda não migraram.
+
+Na lista de Ofícios eram 60 menus escondidos para 20 cards: 151,2 KB de 315,3
+(48% da página), 1.960 dos 3.636 nós de elemento (54%) e 51,7 ms dos 133,8 ms
+de servidor (39%).
+{% endcomment %}
+<button
+  class="icon-btn icon-btn--{{ menu.trigger_variant|default:'settings' }}{% if menu.trigger_state_class %} {{ menu.trigger_state_class }}{% endif %}"
+  type="button"
+  aria-label="{{ menu.trigger_aria }}"
+  aria-haspopup="true"
+  aria-expanded="false"
+  aria-controls="{{ menu.id }}"
+  data-tooltip="{{ menu.trigger_tooltip|default:'Visualizar e baixar' }}"
+  data-overlay-trigger data-overlay-kind="menu"
+  data-overlay-target="{{ menu.id }}"
+  {% if menu.src %}data-overlay-src="{{ menu.src }}"{% endif %}
+>{% include "components/ui/icons/icon.html" with icon=menu.trigger_icon|default:"folder" only %}</button>
+{% if not menu.src %}{% include "components/ui/lists/entity_card_menu_body.html" with menu=menu csrf_token=csrf_token only %}{% endif %}

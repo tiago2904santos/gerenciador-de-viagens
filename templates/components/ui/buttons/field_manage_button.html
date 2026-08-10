@@ -1,2 +1,1 @@
-{# Botão circular de gerenciar (engrenagem) — mesmo padrão das listas; tooltip no hover. #}
-{% include "components/ui/buttons/icon_button.html" with href=href action="settings" type=type aria_label=aria_label|default:action_label tooltip=action_label size=size extra_class="icon-btn--field-manage" data_autosave_link=data_autosave_link only %}
+<c-ui.buttons.field_manage_button :action_label="action_label" :aria_label="aria_label" :data_autosave_link="data_autosave_link" :href="href" :size="size" :type="type" />

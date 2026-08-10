@@ -66,7 +66,7 @@ class LocationRowsContractTests(SimpleTestCase):
         source = (
             self.root
             / "templates"
-            / "components"
+            / "cotton"
             / "travel"
             / "destinations"
             / "state_select.html"

@@ -1,0 +1,46 @@
+{% cotton:vars next_url signature %}
+{% if not signature.pode_assinar and not signature.assinada %}
+  <p class="signature-card__notice" role="status">{{ signature.motivo }}</p>
+{% elif signature.assinada %}
+  <p class="signature-card__result">
+    Assinado por <strong>{{ signature.signatario }}</strong>
+    {% if signature.assinado_em %}em {{ signature.assinado_em|date:"d/m/Y H:i" }}{% endif %}
+    {% if signature.codigo %}<span class="signature-card__code">cód. {{ signature.codigo }}</span>{% endif %}.
+    O arquivo assinado passou a ser usado nos downloads e no PDF final.
+  </p>
+  <form method="post" action="{{ signature.gerar_url }}" class="signature-card__form">
+    {% csrf_token %}
+    <input type="hidden" name="tipo" value="{{ signature.tipo }}">
+    <input type="hidden" name="forcar" value="1">
+    <input type="hidden" name="next" value="{{ next_url }}">
+    {% include "components/ui/buttons/button.html" with type="submit" label="Refazer assinatura" variant="secondary" only %}
+  </form>
+{% elif signature.link_ativo %}
+  <div class="signature-card__link-group">
+    <label class="signature-card__link-label" for="signature-link-{{ signature.tipo }}">Link seguro de assinatura</label>
+    <div class="signature-card__link-row">
+      <input id="signature-link-{{ signature.tipo }}" class="signature-card__link" type="text" readonly value="{{ signature.link_absoluto }}" data-cv-signature-link>
+      <button type="button" class="cv-btn cv-btn--secondary" data-cv-signature-copy>Copiar link</button>
+    </div>
+  </div>
+  <div class="signature-card__actions">
+    <button type="button" class="cv-btn cv-btn--primary" data-cv-signature-wa data-wa-app="normal" data-wa-phone="{{ signature.whatsapp_phone }}" data-wa-text="{{ signature.whatsapp_msg }}">Enviar pelo WhatsApp</button>
+    <button type="button" class="cv-btn cv-btn--secondary" data-cv-signature-wa data-wa-app="business" data-wa-phone="{{ signature.whatsapp_phone }}" data-wa-text="{{ signature.whatsapp_msg }}">WhatsApp Business</button>
+    <form method="post" action="{{ signature.gerar_url }}" class="signature-card__form">
+      {% csrf_token %}
+      <input type="hidden" name="tipo" value="{{ signature.tipo }}">
+      <input type="hidden" name="next" value="{{ next_url }}">
+      {% include "components/ui/buttons/button.html" with type="submit" label="Gerar novo link" variant="secondary" only %}
+    </form>
+  </div>
+  {% if signature.expira_em %}
+    <p class="signature-card__expiry">O link expira em {{ signature.expira_em|date:"d/m/Y H:i" }}.</p>
+  {% endif %}
+{% else %}
+  <form method="post" action="{{ signature.gerar_url }}" class="signature-card__form">
+    {% csrf_token %}
+    <input type="hidden" name="tipo" value="{{ signature.tipo }}">
+    <input type="hidden" name="next" value="{{ next_url }}">
+    {% include "components/ui/buttons/button.html" with type="submit" label="Gerar link de assinatura" variant="primary" only %}
+  </form>
+{% endif %}
