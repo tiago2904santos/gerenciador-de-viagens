@@ -17,8 +17,7 @@ CSS_DIR = ROOT / "static" / "css"
 
 # Mesma política de exceção do audit_frontend_standards.py (Etapa 7 gate).
 COLOR_LITERAL_ALLOWED = {
-    "static/css/base/tokens.css",
-    "static/css/base/theme.css",
+    "static/css/base/tokens.css",  # UI-03: absorveu base/theme.css na E7
     "static/css/base/03-theme-dark.css",
     "static/css/components/theme-dark-components.css",  # transitório — dissolver nas fases seguintes
     "static/css/pages/auth.css",  # transitório — login fora do bundle global

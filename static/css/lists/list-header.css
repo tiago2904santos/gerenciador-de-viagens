@@ -120,7 +120,7 @@
 
 .list-header__search-icon {
   align-items: center;
-  color: var(--color-filter-placeholder);
+  color: var(--text-filter-placeholder);
   display: inline-flex;
   left: 12px;
   pointer-events: none;
@@ -142,7 +142,7 @@
   border: 1px solid var(--border-filter-input);
   border-radius: var(--radius-control);
   box-sizing: border-box;
-  color: var(--color-filter-text);
+  color: var(--text-filter);
   font-size: var(--font-size-sm);
   height: var(--list-header-control-height);
   outline: none;
@@ -161,7 +161,7 @@
 }
 
 .list-header__search-input::placeholder {
-  color: var(--color-filter-placeholder);
+  color: var(--text-filter-placeholder);
 }
 
 .list-header__search-input:focus,
@@ -212,7 +212,7 @@
   border: 1px solid var(--border-filter-input);
   border-radius: var(--radius-control);
   box-sizing: border-box;
-  color: var(--color-filter-text);
+  color: var(--text-filter);
   font-size: var(--font-size-sm);
   height: var(--list-header-control-height);
   outline: none;
@@ -361,7 +361,7 @@
   border-radius: var(--radius-control);
   box-shadow: none;
   box-sizing: border-box;
-  color: var(--color-filter-text);
+  color: var(--text-filter);
   font-size: var(--font-size-sm);
   transition: none;
 }
@@ -382,7 +382,7 @@
 
 .list-header--inline-create .inline-create__panel
   :is(.form-control, .form-select, .cv-field__control, .search-picker__input)::placeholder {
-  color: var(--color-filter-placeholder);
+  color: var(--text-filter-placeholder);
   opacity: 1;
 }
 
@@ -619,7 +619,7 @@
 
 :is(html[data-theme="dark"])
   .list-header__search-icon {
-  color: var(--color-filter-placeholder);
+  color: var(--text-filter-placeholder);
 }
 
 /* Select do rail: chevron sempre accent (fechado = aberto). */
@@ -817,7 +817,7 @@
 
 .travel-period-filter__btn .cv-btn__icon {
   align-items: center;
-  color: var(--color-filter-placeholder);
+  color: var(--text-filter-placeholder);
   display: inline-flex;
   flex: 0 0 auto;
 }

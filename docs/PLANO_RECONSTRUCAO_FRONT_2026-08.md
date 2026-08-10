@@ -460,7 +460,33 @@ comportamento. Registre e pergunte antes de trocar.
 
 ---
 
-### E7 — Token em duas camadas · `UI-03`, `NOVO-51`, `NOVO-54` · risco médio · 3–4 d
+### E7a ✅ — Token em duas camadas: onde o token mora · `UI-03` · concluída em 10/08/2026
+
+> **O que o enunciado errou.** Eram **oito** arquivos definindo `--color-*`, não nove. E ele não
+> mencionava a família `--theme-*` (40 nomes, 152 definições), que é camada intermediária real —
+> consolidar só `--color-*` deixaria uma terceira camada global não declarada.
+>
+> `base/theme.css` foi dissolvido. Em `page-shell.css`, 4 dos 7 `--color-*` eram mortos e os 3
+> vivos foram renomeados para a família do componente, em vez de migrarem para o arquivo de token.
+>
+> A catraca vale para **escopo raiz**; re-ligação dentro de componente continua permitida, porque
+> 45 regras globais leem `var(--color-input-bg)` e 10 leem `var(--color-focus)` — proibir custaria
+> duplicar 55 regras sob seletor de container e **subir** especificidade.
+>
+> A prova é `scripts/resolver_tokens_css.py`: 2131 valores computados, 0 diferenças. Ela existe
+> porque nenhum gate do repositório protegia valor de token.
+
+### E7b — Token em duas camadas: a família `cv-field` · `NOVO-51`, `NOVO-54` · risco médio
+
+Medido: `NOVO-51` são **4 nomes** (`--cv-field-bg`, `--cv-field-border`, `--cv-field-focus-ring`,
+`--cv-field-border-focus`), e `--cv-field-border` carrega **dois contratos incompatíveis** — 4
+consumidores leem como shorthand (`border: var(--cv-field-border)`), 3 leem como cor
+(`1px solid var(--cv-field-border)`). `--cv-field-border-focus` não nasce em nenhuma das duas
+camadas, só em `fields/select.css:95`.
+
+`NOVO-54` são **37 regras** em 11 arquivos, não 64. Só 2 usam `:where()`.
+
+**Enunciado original da E7, para registro:**
 
 **Objetivo.** Um vocabulário de token único, antes de reescrever qualquer aparência.
 

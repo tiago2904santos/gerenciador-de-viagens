@@ -2296,13 +2296,65 @@ protegidas por prefixo, presas ao `NOVO-45`.
 projeto depois do bundle — e **190 `!important`**. O tema escuro não é resolvido por token: é
 resolvido sobrescrevendo componente por componente. Total de `!important` fora do bundle: **497**.
 
-### UI-03 🟠 Nove arquivos definem token de cor · MED
+### UI-03 ✅ RESOLVIDO (E7a) · Nove arquivos definem token de cor · MED
 
-`--color-*` é **definido** em `tokens.css`, `theme.css`, `03-theme-dark.css`,
+`--color-*` era **definido** em `tokens.css`, `theme.css`, `03-theme-dark.css`,
 `components/theme-dark-components.css`, `page-shell.css`, `roteiros.css`, `usuarios.css`,
 `justificativas.css` e `gdrive-config.css`. Redefinições campeãs: `--step1-surface` (15×),
 `--step1-panel` (15×), `--step1-field` (13×), `--field-border-focus` (7×), `--cv-field-bg` (7×),
 `--color-input-bg` (7×).
+
+**Remedido na E7:** eram **oito** arquivos, não nove — `gdrive-config.css` já tinha parado de
+definir. E o enunciado não mencionava a família `--theme-*` (40 nomes, 152 definições), que é uma
+camada intermediária real entre `--color-*` e os tokens de componente. Consolidar só `--color-*`
+teria deixado `--theme-*` como terceira camada global não declarada, que é o oposto do objetivo.
+
+**Como fechou.** `base/theme.css` foi dissolvido: os blocos `:root` e `html[data-theme="light"]`
+foram para o fim de `tokens.css`, e o bloco `html[data-theme="dark"]` para o **começo** de
+`03-theme-dark.css` — começo, e não fim, porque o `theme.css` carregava antes; apender embaixo
+inverteria a disputa e mudaria cor sem mudar valor nenhum. As regras do seletor de tema, que não
+eram token, foram para `layout/sidebar.css`.
+
+Em `page-shell.css`, dos 7 `--color-*` (× 2 temas), **4 eram mortos** — só definição, nenhuma
+leitura em CSS, JS, Python ou template. Foram apagados (8 declarações). Os 3 vivos foram
+**renomeados** para a família do próprio componente (`--text-filter`, `--text-filter-button`,
+`--text-filter-placeholder`), ficando junto dos irmãos `--surface-filter-*`/`--border-filter-*` em
+vez de migrarem para o arquivo de token e se separarem deles.
+
+**O que a regra alcança.** A catraca (`core/tests/test_tokens_em_duas_camadas.py`) vale para
+definição em escopo raiz — `:root` e `html[data-theme=…]`. Re-ligar um token dentro de um seletor
+de componente continua permitido, medido: **45 regras globais** leem `var(--color-input-bg)` e
+**10** leem `var(--color-focus)`. Um container que re-liga o nome dirige todas elas sem que
+nenhuma precise conhecê-lo; proibir obrigaria a duplicar as 55 sob seletor de container, subindo
+especificidade — a dívida que a Fase 7 veio pagar. Os 4 sites que exercem a permissão estão
+anotados no CSS, cada um dizendo qual regra global dirige.
+
+**A prova.** Nenhum gate do repositório protege valor de token: `medir_divergencia_tema.py` filtra
+fora custom property e cor, `audit_paleta.py` compara hex soltos, `test_css_tokens.py` restringe
+literal e não local. Dava para trocar uma cor e o CI inteiro passar. Por isso a etapa escreveu
+`scripts/resolver_tokens_css.py`, que resolve a cascata nos três escopos raiz e expande `var()` até
+o literal: **2131 valores computados, 0 diferenças** antes/depois.
+
+### NOVO-82 · `NOVO` 87 das 143 declarações escuras do `theme.css` já eram mortas · MOR · 1 d
+
+Ao dissolver o `theme.css` (`UI-03`), o bloco `html[data-theme="dark"]` dele passou a conviver com
+o bloco próprio do `03-theme-dark.css`, no mesmo arquivo. Aí ficou visível o que a separação
+escondia: das 143 declarações que vinham do `theme.css`, **87 já eram sobrescritas** pelo bloco de
+baixo — e **57 delas com valor diferente**.
+
+Não é regressão: era assim antes, porque o `theme.css` sempre carregou primeiro. O que muda é que
+agora dá para ver. Exemplos: `--app-hero-body-bg` declarava um `linear-gradient` e o que vale é
+`var(--color-surface)`; `--app-text-muted` declarava `var(--color-text-muted)` e o que vale é
+`var(--color-muted)`.
+
+O custo real é de leitura: quem abrir o arquivo para entender o tema escuro lê 87 declarações
+inertes, 57 delas apontando para o lugar errado. Já mordeu uma vez —
+`test_dark_redesign.py:618` lia a **primeira** declaração de cada token e passou a ler a perdedora;
+o teste foi corrigido para ler a última, que é a que vence a cascata.
+
+Fica para a **E9** (`UI-02`, "o tema escuro dissolvido em token"), que é onde o arquivo é reescrito
+de qualquer forma. Apagar as 87 é provável por `scripts/resolver_tokens_css.py` — se a tabela de
+valores computados não mudar, nenhuma era viva.
 
 ### UI-04 🟠 CSS de outro domínio importado em 26 templates · MED
 

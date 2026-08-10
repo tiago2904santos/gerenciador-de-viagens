@@ -38,10 +38,6 @@ CSS_EXCEPTIONS: dict[str, dict] = {
         "reason": "Arquivo de tokens — cores hex são a definição original, permitidas aqui.",
         "rules": {"hex_color_outside_tokens"},
     },
-    "static/css/base/theme.css": {
-        "reason": "Arquivo de tema — cores hex são a definição original, permitidas aqui.",
-        "rules": {"hex_color_outside_tokens"},
-    },
     "static/css/base/03-theme-dark.css": {
         "reason": "Official dark-theme token layer; literal values define semantic tokens.",
         "rules": {"hex_color_outside_tokens"},
