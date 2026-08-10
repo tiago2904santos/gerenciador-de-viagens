@@ -395,7 +395,7 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_global_shell_has_accessible_mobile_navigation_contract(self):
         sidebar_template = (
-            Path(settings.BASE_DIR) / "templates" / "components" / "layout" / "sidebar.html"
+            Path(settings.BASE_DIR) / "templates" / "cotton" / "layout" / "sidebar.html"
         ).read_text(encoding="utf-8")
         sidebar_js = (
             Path(settings.BASE_DIR) / "static" / "js" / "components" / "sidebar.js"
