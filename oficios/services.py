@@ -1,4 +1,5 @@
 import re
+from dataclasses import dataclass
 
 from django.db import connection
 from django.db import IntegrityError
@@ -182,6 +183,182 @@ def vincular_roteiro_ao_oficio_sem_copia(oficio: Oficio, roteiro_escolhido: Rote
             rascunho_antigo.delete()
         except ProtectedError:
             pass
+
+
+@dataclass(frozen=True)
+class ResultadoRoteiroDoOficio:
+    """O que a Etapa 2 gravou. A view traduz isto em mensagem e redirect."""
+
+    #: O roteiro que ficou vinculado ao ofício.
+    roteiro: Roteiro
+    #: Vinculou ao roteiro escolhido no picker, sem gravar cópia.
+    reusou_sem_copia: bool
+    #: Materializou um `Roteiro` novo (o ofício não tinha rascunho próprio reaproveitável).
+    criou_rascunho: bool
+    #: Gravado sem validação completa (soft-advance do rodapé).
+    parcial: bool
+
+
+def _materializar_rascunho_do_oficio(oficio: Oficio) -> Roteiro:
+    """Rascunho de roteiro próprio do ofício, ainda não persistido.
+
+    `NOVO-88`: a área é a do **ofício**, sempre explícita. Antes disto havia duas cópias
+    deste bloco na view e só uma passava `area=`; a outra deixava `Roteiro.save()`
+    (`roteiros/models.py`) resolver por `get_current_area()`. As duas coincidiam por
+    acidente — `get_oficio_by_id` lê o mesmo thread-local —, e fora de request a segunda
+    gravava `area=NULL` contra o `NOT NULL` do `DB-02`.
+    """
+    area = oficio.area
+    if area is None:
+        # Compatibilidade transitória para ofícios legados ainda sem área: a
+        # configuração resolve uma área explícita (única ou técnica), nunca NULL.
+        from cadastros.models import ConfiguracaoSistema
+
+        area = ConfiguracaoSistema.get_singleton().area
+    return Roteiro(tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO, area=area)
+
+
+def _revincular_roteiro_ao_oficio(oficio: Oficio, roteiro: Roteiro) -> None:
+    """Aponta o ofício para o roteiro gravado, só quando muda."""
+    if oficio.roteiro_id != roteiro.pk:
+        oficio.roteiro = roteiro
+        oficio.save(update_fields=["roteiro", "updated_at"])
+
+
+@transaction.atomic
+def salvar_roteiro_do_oficio(
+    oficio: Oficio,
+    post,
+    form,
+    *,
+    roteiro_state,
+    validated,
+    diarias_resultado,
+    roteiro_vinculado=None,
+) -> ResultadoRoteiroDoOficio:
+    """Decide entre reaproveitar o roteiro escolhido e gravar um próprio, e persiste.
+
+    `BE-12`: esta é a regra que mais gera bug de dados no sistema, porque **roteiro é
+    compartilhado entre ofícios**. Ela morava dentro de `wizard_roteiro`, o que a tornava
+    intestável sem subir request e inalcançável pelo fluxo avulso.
+
+    Duas travas que a decisão carrega, e que os testes congelam:
+
+    - se o estado submetido equivale ao roteiro escolhido, **vincula sem copiar** — dois
+      ofícios passam a apontar para a mesma linha, que é o desenho;
+    - se não equivale, grava num rascunho **próprio**. Um roteiro que não é rascunho
+      pertence a outros documentos e nunca é reescrito no lugar.
+
+    `atomic` porque a requisição grava `Oficio`, `Roteiro`, `RoteiroDestino` e
+    `RoteiroTrecho` — os services chamados são atômicos cada um, o conjunto não era
+    (`BE-14`, item 1 da lista).
+    """
+    from roteiros.services import atualizar_roteiro
+    from roteiros.services import roteiro_state_equivalente_ao_roteiro
+
+    roteiro_escolhido = obter_roteiro_escolhido_do_post(
+        post, evento=oficio.evento, area=oficio.area
+    )
+    if roteiro_escolhido and roteiro_state_equivalente_ao_roteiro(
+        roteiro_escolhido, roteiro_state, validated
+    ):
+        rascunho_antigo = (
+            roteiro_vinculado
+            if (roteiro_vinculado and roteiro_vinculado.status == Roteiro.STATUS_RASCUNHO)
+            else None
+        )
+        vincular_roteiro_ao_oficio_sem_copia(
+            oficio, roteiro_escolhido, rascunho_antigo=rascunho_antigo
+        )
+        tocar_data_criacao_oficio(oficio)
+        return ResultadoRoteiroDoOficio(
+            roteiro=roteiro_escolhido,
+            reusou_sem_copia=True,
+            criou_rascunho=False,
+            parcial=False,
+        )
+
+    criou = roteiro_vinculado is None or roteiro_vinculado.status != Roteiro.STATUS_RASCUNHO
+    if criou:
+        roteiro_vinculado = _materializar_rascunho_do_oficio(oficio)
+        form.instance = roteiro_vinculado
+    roteiro_salvo = atualizar_roteiro(
+        roteiro_vinculado, form, roteiro_state, validated, diarias_resultado
+    )
+    _revincular_roteiro_ao_oficio(oficio, roteiro_salvo)
+    tocar_data_criacao_oficio(oficio)
+    return ResultadoRoteiroDoOficio(
+        roteiro=roteiro_salvo,
+        reusou_sem_copia=False,
+        criou_rascunho=criou,
+        parcial=False,
+    )
+
+
+@transaction.atomic
+def salvar_rascunho_parcial_do_oficio(
+    oficio: Oficio,
+    form,
+    *,
+    roteiro_state,
+    validated,
+    roteiro_vinculado=None,
+) -> ResultadoRoteiroDoOficio:
+    """Soft-advance: grava o que houver e deixa navegar sem validação completa."""
+    from roteiros.services import persistir_roteiro_rascunho_parcial
+
+    criou = roteiro_vinculado is None or roteiro_vinculado.status != Roteiro.STATUS_RASCUNHO
+    if criou:
+        roteiro_vinculado = _materializar_rascunho_do_oficio(oficio)
+        form.instance = roteiro_vinculado
+    roteiro_salvo = persistir_roteiro_rascunho_parcial(
+        roteiro_vinculado, form, roteiro_state, validated
+    )
+    _revincular_roteiro_ao_oficio(oficio, roteiro_salvo)
+    tocar_data_criacao_oficio(oficio)
+    return ResultadoRoteiroDoOficio(
+        roteiro=roteiro_salvo,
+        reusou_sem_copia=False,
+        criou_rascunho=criou,
+        parcial=True,
+    )
+
+
+def montar_roteiro_inicial_do_oficio(oficio: Oficio):
+    """Estado do editor para o GET de um ofício **sem** roteiro próprio, sem gravar nada.
+
+    Devolve `(form_instance, destinos_atuais, trechos_list, roteiro_state)`. Pré-seleciona
+    o roteiro do evento quando há um completo pronto para reuso; senão parte de sede e
+    destino do evento, sem datas — cada ofício tem horários próprios.
+    """
+    from roteiros.services import montar_estado_editor_roteiro_evento_selecionado
+    from roteiros.services import montar_initial_roteiro_evento_sem_datas
+    from roteiros.services import preparar_estado_editor_roteiro_para_get
+
+    roteiro_padrao = resolver_roteiro_padrao_evento(oficio.evento)
+    if roteiro_padrao is not None:
+        destinos_atuais, trechos_list, roteiro_state = (
+            montar_estado_editor_roteiro_evento_selecionado(roteiro_padrao)
+        )
+        form_instance = Roteiro(
+            tipo=Roteiro.TIPO_AVULSO,
+            status=Roteiro.STATUS_RASCUNHO,
+            origem_cidade=roteiro_padrao.origem_cidade,
+            origem_estado=roteiro_padrao.origem_estado,
+            observacoes=roteiro_padrao.observacoes,
+        )
+        return form_instance, destinos_atuais, trechos_list, roteiro_state
+
+    initial = montar_initial_roteiro_evento_sem_datas(oficio.evento)
+    destinos_atuais, trechos_list, roteiro_state = preparar_estado_editor_roteiro_para_get(
+        initial=initial
+    )
+    form_instance = Roteiro(tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
+    if initial.get("origem_cidade"):
+        form_instance.origem_cidade_id = initial["origem_cidade"]
+    if initial.get("origem_estado"):
+        form_instance.origem_estado_id = initial["origem_estado"]
+    return form_instance, destinos_atuais, trechos_list, roteiro_state
 
 
 def _preencher_roteiro_oficio_com_evento(roteiro: Roteiro, evento) -> None:

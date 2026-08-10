@@ -8032,6 +8032,20 @@ html[data-theme="dark"] #attach-signed-modal .icon-btn.icon-btn--delete,
   gap: var(--space-4);
   grid-template-columns: minmax(0, 1fr);
   min-width: 0;
+  /* NOVO-58 (E8): existia só no tema escuro, em
+     `theme-dark-components.css`. O claro é o desenho ANTERIOR ao redesenho, e é
+     o que o sistema mostra para quem nunca escolheu tema.
+
+     Não é ajuste cosmético: medido no navegador, o padding só-escuro encolhia a
+     caixa de conteúdo em 28px, os filhos iam de 434px para 406px, o texto
+     quebrava diferente e a página ganhava 48,55px — propagando por 14 níveis. É
+     essa cadeia que desestabilizava a régua de tema (`NOVO-84`).
+
+     `14px` literal, e não `var(--space-4)`: a escala vai de 12 (`--space-3`)
+     para 16, e não há token de 14. Usar 16 mexeria 2px no ESCURO, e a E8 é o
+     claro alcançando o escuro — não os dois indo para um terceiro lugar. O
+     valor fora de escala está registrado para a E9 (`NOVO-89`). */
+  padding: 14px;
 }
 
 .form-block__header {
@@ -9702,7 +9716,11 @@ html[data-theme="dark"] .cv-dialog--document :is(.cv-dialog__icon, .cv-dialog__e
    dois temas (`NOVO-62`). Tipografia não é decisão de tema. */
 html[data-theme="dark"] body {
   background-attachment: fixed;
-  -webkit-font-smoothing: antialiased;
+  /* NOVO-58 (E8): `-webkit-font-smoothing` saiu daqui e virou regra base em
+     `base/base.css`, junto de `font-family` e `line-height`. Era 48,2% da
+     divergência não-cor do sistema — a maior fatia isolada, e maior que as
+     quatro famílias catalogadas da E8 somadas. Se voltar a ser declarado aqui,
+     a divergência volta com ele. */
 }
 
 html[data-theme="dark"] ::selection {
@@ -9714,8 +9732,9 @@ html[data-theme] .app-main {
   padding: clamp(20px, 2.6vw, 40px);
 }
 
+/* NOVO-58 (E8, família 8b): `border: 0` saiu daqui e virou o valor da regra
+   base em `layout/sidebar.css`, que agora vale nos dois temas. */
 html[data-theme="dark"] .sidebar-brand-badge {
-  border: 0;
   box-shadow: none;
 }
 
@@ -9754,11 +9773,15 @@ html[data-theme="dark"] .sidebar-account {
   border-color: var(--color-border-strong);
 }
 
+:is(html[data-theme])
+  .skip-link {
+  border-radius: var(--radius-control);
+}
+
 :is(html[data-theme="dark"])
   .skip-link {
   background: var(--color-surface-strong);
   border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-control);
   box-shadow: var(--shadow-md);
   color: var(--color-heading);
 }
@@ -9775,11 +9798,15 @@ html[data-theme="dark"] .sidebar-account {
   color: var(--sidebar-brand-fg);
 }
 
+:is(html[data-theme])
+  :is(.app-mobile-bar__toggle, .sidebar-drawer-close) {
+  border-radius: 10px;
+}
+
 :is(html[data-theme="dark"])
   :is(.app-mobile-bar__toggle, .sidebar-drawer-close) {
   background: var(--color-primary-soft);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
   color: var(--color-heading);
 }
 
@@ -9840,10 +9867,13 @@ html[data-theme="dark"] .page-header-rail {
   padding: 16px clamp(22px, 3vw, 38px) clamp(22px, 2.6vw, 32px);
 }
 
+html[data-theme] .page-header-rail__marker {
+  border-radius: var(--radius-control);
+}
+
 html[data-theme="dark"] .page-header-rail__marker {
   background: var(--color-primary-strong);
   border: 1px solid var(--color-primary-hover);
-  border-radius: var(--radius-control);
   color: var(--color-white);
 }
 
@@ -9987,6 +10017,15 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
 
 /* O picker é um único controle visual. O input de busca interno não desenha
    uma segunda caixa nem recebe o outline global de campos. */
+:is(html[data-theme])
+  .search-picker__input,
+:is(html[data-theme])
+  .search-picker__input:focus,
+:is(html[data-theme])
+  .search-picker__input:focus-visible {
+  border-radius: 0;
+}
+
 :is(html[data-theme="dark"])
   .search-picker__input,
 :is(html[data-theme="dark"])
@@ -9995,7 +10034,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   .search-picker__input:focus-visible {
   background: transparent;
   border: 0;
-  border-radius: 0;
   box-shadow: none;
   outline: none;
 }
@@ -10124,11 +10162,15 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
 }
 
 /* Camada intermediária: cada seção é um painel suave. */
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block) {
+  border-radius: 14px;
+}
+
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block) {
   background: var(--step1-panel);
   border: 0;
-  border-radius: 14px;
   gap: 12px;
   margin: 0;
   padding: 14px;
@@ -10169,6 +10211,22 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
 /* Campos no tom do card: poço inset dentro do painel intermediário.
    Exclui o filtro do list-header (soft panel / --color-surface-soft): o attr
    data-travel-document-wizard-step1 no quick-add não deve pintar a busca. */
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) :is(
+    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not(.list-header__search-input):not(.header-filter-input),
+    textarea,
+    select,
+    .form-control,
+    .form-select,
+    .composite-field__control,
+    .custom-select__trigger,
+    .cv-field__control,
+    .search-picker__input,
+    .search-picker__control
+  ) {
+  border-radius: 10px;
+}
+
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) :is(
     input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not(.list-header__search-input):not(.header-filter-input),
@@ -10184,7 +10242,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   ) {
   background: var(--step1-field) !important;
   border-color: transparent !important;
-  border-radius: 10px;
   box-shadow: none !important;
 }
 
@@ -10229,11 +10286,15 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   padding: 0 !important;
 }
 
+:is(html[data-theme])
+  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .search-picker__selected-empty {
+  border-radius: 10px;
+}
+
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .search-picker__selected-empty {
   background: var(--step1-empty) !important;
   border: 0 !important;
-  border-radius: 10px;
   color: var(--color-muted);
   padding: 12px 14px !important;
   text-align: left;
@@ -10920,6 +10981,22 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   box-shadow: none !important;
 }
 
+:is(html[data-theme])
+  [data-travel-document-wizard-documentos]
+  :is(
+    .summary-item:not(.oficio-documentos-route-trecho-scroll-item),
+    .oficio-documentos-fact,
+    .oficio-documentos-traveller-tile:not(.oficio-documentos-traveller-tile--motorista),
+    .oficio-documentos-traveller-line:not(.oficio-documentos-traveller-line--motorista),
+    .oficio-documentos-vehicle-executive__driver,
+    .document-inline-card,
+    .oficio-documentos-route-card__diarias-subblock,
+    .oficio-documentos-route-card__fallback-fact,
+    .oficio-documentos-route-card__trecho
+  ) {
+  border-radius: 10px;
+}
+
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-documentos]
   :is(
@@ -10935,7 +11012,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   ) {
   background: var(--step1-field, var(--color-input-bg)) !important;
   border-color: transparent !important;
-  border-radius: 10px;
 }
 
 /* Depois do poço geral: itens do scroll usam o mesmo fundo do form-block da seção */
@@ -11108,12 +11184,16 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   text-transform: none;
 }
 
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__control {
+  border-radius: 10px;
+}
+
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__control {
   align-items: center;
   background: var(--step1-field, var(--color-input-bg)) !important;
   border-color: transparent !important;
-  border-radius: 10px;
   box-shadow: none !important;
   box-sizing: border-box;
   display: flex;
@@ -11211,12 +11291,16 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   grid-template-columns: 42px minmax(0, 1fr);
 }
 
+:is(html[data-theme])
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row__badge {
+  border-radius: 12px;
+}
+
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-row__badge {
   align-items: center;
   background: var(--color-accent-soft);
   border: 1px solid var(--color-accent-border-soft);
-  border-radius: 12px;
   color: var(--color-accent-text);
   display: inline-flex;
   font-size: var(--font-size-xs);
@@ -11622,6 +11706,21 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   margin: 0;
 }
 
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg :is(
+    .cv-field__control,
+    .date-picker__control,
+    .date-picker__control .cv-field__control,
+    .cv-field__control:hover,
+    .cv-field__control:focus,
+    .date-picker__control:hover,
+    .date-picker__control:focus-within,
+    .date-picker__control .cv-field__control:hover,
+    .date-picker__control .cv-field__control:focus
+  ) {
+  border-radius: 10px;
+}
+
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg :is(
     .cv-field__control,
@@ -11637,7 +11736,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   background: var(--step1-panel) !important;
   background-color: var(--step1-panel) !important;
   border-color: transparent !important;
-  border-radius: 10px;
   box-shadow: none !important;
   transition: none !important;
 }
@@ -11688,6 +11786,15 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
 }
 
 /* Dentro de cada bloco de trecho: conteúdo plano (sem mini-card aninhado). */
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .roteiro-editor__section--trecho .roteiro-deslocamento,
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .roteiro-editor__section--trecho .roteiro-trecho-card,
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .roteiro-editor__section--trechos-empty .roteiro-editor__empty {
+  border-radius: 0;
+}
+
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .roteiro-editor__section--trecho .roteiro-deslocamento,
 :is(html[data-theme="dark"])
@@ -11696,7 +11803,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   [data-travel-document-wizard-roteiro] .roteiro-editor__section--trechos-empty .roteiro-editor__empty {
   background: transparent;
   border: 0;
-  border-radius: 0;
   box-shadow: none;
   padding: 0;
 }
@@ -11707,11 +11813,15 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
 }
 
 /* Saída/Chegada: poço escuro (= inputs do wizard); sem borda. */
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro] .roteiro-trecho-card__leg {
+  border-radius: 12px;
+}
+
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro] .roteiro-trecho-card__leg {
   background: var(--step1-field, var(--color-input-bg));
   border: 0;
-  border-radius: 12px;
   box-shadow: none;
 }
 
@@ -12016,14 +12126,22 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   flex: 0 0 auto;
 }
 
+:is(html[data-theme])
+  .form-block {
+  border-radius: 14px;
+}
+
 :is(html[data-theme="dark"])
   .form-block {
   background: var(--color-surface-soft);
   border: 0;
-  border-radius: 14px;
   grid-template-columns: minmax(0, 1fr);
   margin: 0;
-  padding: 14px;
+  /* NOVO-58 (E8): o `padding: 14px` saiu daqui e virou regra base em
+     `fields/form-sections.css`, para valer nos dois temas. O escuro continua
+     com o mesmo valor, agora herdado — se este bloco voltar a declará-lo, a
+     divergência volta junto. `border` e `border-radius` ficam: são as famílias
+     8b e 8c, cada uma com aprovação própria. */
 }
 
 :is(html[data-theme])
@@ -12149,11 +12267,15 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
 
 /* Controles da ficha: superfícies sólidas, raios menores e nenhuma luz de
    foco. O número e o ano formam um único controle composto. */
+:is(html[data-theme])
+  .form-card :is(.form-control, .custom-select__trigger, textarea) {
+  border-radius: 10px;
+}
+
 :is(html[data-theme="dark"])
   .form-card :is(.form-control, .custom-select__trigger, textarea) {
   background: var(--color-input-bg);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
   box-shadow: none;
   color: var(--color-text);
   min-height: var(--control-height-md);
@@ -12177,12 +12299,16 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   padding: 12px 14px;
 }
 
+:is(html[data-theme])
+  .composite-field__control {
+  border-radius: 10px;
+}
+
 :is(html[data-theme="dark"])
   .composite-field__control {
   align-items: stretch;
   background: var(--color-input-bg);
   border: 1px solid var(--color-border);
-  border-radius: 10px;
   display: grid;
   gap: 0;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -12190,11 +12316,15 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   overflow: hidden;
 }
 
+:is(html[data-theme])
+  .composite-field__control .form-control {
+  border-radius: 0;
+}
+
 :is(html[data-theme="dark"])
   .composite-field__control .form-control {
   background: transparent;
   border: 0;
-  border-radius: 0;
   box-shadow: none;
   min-width: 0;
 }
@@ -12244,11 +12374,15 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   gap: 12px;
 }
 
+:is(html[data-theme])
+  .search-picker--people .search-picker__selected-panel {
+  border-radius: 0;
+}
+
 :is(html[data-theme="dark"])
   .search-picker--people .search-picker__selected-panel {
   background: transparent;
   border: 0;
-  border-radius: 0;
   gap: 10px;
   padding: 0;
 }
@@ -12311,11 +12445,15 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   transform: none;
 }
 
+:is(html[data-theme])
+  .search-picker--people .search-picker__driver-toggle {
+  border-radius: var(--radius-pill);
+}
+
 :is(html[data-theme="dark"])
   .search-picker--people .search-picker__driver-toggle {
   background: var(--color-surface-muted);
   border-color: var(--color-border-strong);
-  border-radius: var(--radius-pill);
   box-shadow: none;
   min-height: 34px;
   padding: 0 11px;
@@ -12396,11 +12534,15 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   border-color: var(--color-input-border);
 }
 
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-panel {
+  border-radius: 0;
+}
+
 :is(html[data-theme="dark"])
   .search-picker--vehicle .search-picker__selected-panel {
   background: transparent;
   border: 0;
-  border-radius: 0;
   gap: 8px;
   padding: 0;
 }
@@ -12440,12 +12582,16 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   row-gap: 0;
 }
 
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-avatar {
+  border-radius: 12px;
+}
+
 :is(html[data-theme="dark"])
   .search-picker--vehicle .search-picker__selected-avatar {
   align-items: center;
   background: var(--color-accent);
   border: 1px solid var(--color-accent);
-  border-radius: 12px;
   color: var(--color-on-accent);
   display: inline-flex;
   font-size: var(--font-size-xs);
@@ -12478,11 +12624,15 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   font-weight: var(--font-weight-bold);
 }
 
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__vehicle-chip {
+  border-radius: 999px;
+}
+
 :is(html[data-theme="dark"])
   .search-picker--vehicle .search-picker__vehicle-chip {
   align-items: center;
   background: var(--color-accent);
-  border-radius: 999px;
   color: var(--color-on-accent);
   display: inline-flex;
   font-size: 10px;
@@ -12499,6 +12649,13 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   font-size: var(--font-size-xs);
 }
 
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-card > .search-picker__remove,
+:is(html[data-theme])
+  .search-picker--vehicle .search-picker__selected-card:hover > .search-picker__remove {
+  border-radius: 0;
+}
+
 :is(html[data-theme="dark"])
   .search-picker--vehicle .search-picker__selected-card > .search-picker__remove,
 :is(html[data-theme="dark"])
@@ -12507,7 +12664,6 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   background: transparent;
   border: 0;
   border-left: 1px solid var(--color-border-soft);
-  border-radius: 0;
   color: var(--color-muted);
   grid-column: 3;
   grid-row: 1;
@@ -12561,11 +12717,15 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   border-color: var(--color-input-border);
 }
 
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__selected-panel {
+  border-radius: 0;
+}
+
 :is(html[data-theme="dark"])
   .search-picker--people.search-picker--roster .search-picker__selected-panel {
   background: transparent;
   border: 0;
-  border-radius: 0;
   gap: 8px;
   padding: 0;
 }
@@ -12585,6 +12745,13 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   overflow: visible;
 }
 
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__selected-card,
+:is(html[data-theme])
+  .search-picker--people.search-picker--roster .search-picker__selected-card:hover {
+  border-radius: 12px;
+}
+
 :is(html[data-theme="dark"])
   .search-picker--people.search-picker--roster .search-picker__selected-card,
 :is(html[data-theme="dark"])
@@ -12592,7 +12759,6 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   align-items: center;
   background: var(--color-input-bg);
   border: 0;
-  border-radius: 12px;
   box-shadow: none;
   column-gap: 12px;
   display: grid;
@@ -12623,12 +12789,16 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   border-bottom: 0;
 }
 
+:is(html[data-theme])
+  .search-picker--roster .search-picker__selected-avatar {
+  border-radius: 12px;
+}
+
 :is(html[data-theme="dark"])
   .search-picker--roster .search-picker__selected-avatar {
   align-items: center;
   background: var(--color-accent-soft);
   border: 1px solid var(--color-accent-border-soft);
-  border-radius: 12px;
   color: var(--color-accent-text);
   display: inline-flex;
   font-size: var(--font-size-xs);
@@ -12727,11 +12897,15 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   display: none;
 }
 
+:is(html[data-theme])
+  .search-picker--roster .search-picker__selected-actions :is(.search-picker__driver-toggle, .field-side-action) {
+  border-radius: 0;
+}
+
 :is(html[data-theme="dark"])
   .search-picker--roster .search-picker__selected-actions :is(.search-picker__driver-toggle, .field-side-action) {
   background: transparent;
   border: 0;
-  border-radius: 0;
   box-shadow: none;
   color: var(--color-muted-strong);
   min-height: 30px;
@@ -12802,13 +12976,17 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   width: 6px;
 }
 
+:is(html[data-theme])
+  .search-picker--roster .search-picker__selected-actions .search-picker__remove {
+  border-radius: 0;
+}
+
 :is(html[data-theme="dark"])
   .search-picker--roster .search-picker__selected-actions .search-picker__remove {
   align-self: center;
   background: transparent;
   border: 0;
   border-left: 1px solid var(--color-border-soft);
-  border-radius: 0;
   color: var(--color-muted);
   height: 32px;
   margin: 0;
@@ -13143,11 +13321,14 @@ html[data-theme="dark"] :is(.date-picker__panel, .popover) {
 
 /* Date-picker footer: Limpar/Desfazer/Hoje = secondary soft (--step1-panel);
    Aplicar = accent primary — mesma linguagem do Voltar/Avançar do wizard. */
+html[data-theme] .date-picker__footer .date-picker__footer-action {
+  border-radius: 10px;
+}
+
 html[data-theme="dark"] .date-picker__footer .date-picker__footer-action {
   background: var(--step1-panel, var(--color-surface-soft));
   background-image: none;
   border: 0;
-  border-radius: 10px;
   box-shadow: none;
   color: var(--color-heading, var(--theme-text-heading));
   font-weight: var(--font-weight-bold);
@@ -13504,10 +13685,13 @@ html[data-theme="dark"] :is(.empty-state, .app-empty-state) {
   color: var(--color-text);
 }
 
+html[data-theme] .empty-state__mark {
+  border-radius: var(--radius-md);
+}
+
 html[data-theme="dark"] .empty-state__mark {
   align-items: center;
   background: var(--color-primary-strong);
-  border-radius: var(--radius-md);
   color: #fff;
   display: inline-flex;
   font-size: var(--font-size-xs);
@@ -13529,11 +13713,15 @@ html[data-theme="dark"] .empty-state__title {
   backdrop-filter: blur(6px) saturate(0.8);
 }
 
+:is(html[data-theme])
+  .cv-dialog__panel {
+  border-radius: 18px;
+}
+
 :is(html[data-theme="dark"])
   .cv-dialog__panel {
   background: var(--color-surface);
   border: 1px solid var(--color-border-strong);
-  border-radius: 18px;
   box-shadow: var(--shadow-elevated);
   gap: 0;
   padding: 0;
@@ -13546,11 +13734,15 @@ html[data-theme="dark"] .empty-state__title {
   padding: 18px 20px;
 }
 
+:is(html[data-theme])
+  .cv-dialog__icon {
+  border-radius: 12px;
+}
+
 :is(html[data-theme="dark"])
   .cv-dialog__icon {
   background: var(--color-accent-soft);
   border: 1px solid var(--color-accent-border-soft);
-  border-radius: 12px;
   color: var(--color-accent-text);
   flex-basis: 44px;
   height: 44px;
@@ -13612,11 +13804,15 @@ html[data-theme="dark"] .empty-state__title {
   color: var(--color-heading);
 }
 
+:is(html[data-theme])
+  .cv-dialog__notice {
+  border-radius: var(--radius-control);
+}
+
 :is(html[data-theme="dark"])
   .cv-dialog__notice {
   background: var(--color-surface-muted);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-control);
   color: var(--color-muted);
   font-size: var(--font-size-xs);
   margin: var(--space-4) 0 0;
@@ -14063,20 +14259,28 @@ html[data-theme="dark"] .empty-state__title {
   color: var(--color-heading);
 }
 
+:is(html[data-theme])
+  :is(.oficio-external-driver, [data-travel-document-wizard-roteiro]) .segment-toggle {
+  border-radius: 10px;
+}
+
 :is(html[data-theme="dark"])
   :is(.oficio-external-driver, [data-travel-document-wizard-roteiro]) .segment-toggle {
   background: var(--step1-field, var(--color-input-bg));
   border-color: transparent;
-  border-radius: 10px;
   box-shadow: none;
   display: inline-grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   padding: 3px;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   :is(.oficio-external-driver, [data-travel-document-wizard-roteiro]) .segment-toggle__btn {
   border-radius: 7px;
+}
+
+:is(html[data-theme="dark"])
+  :is(.oficio-external-driver, [data-travel-document-wizard-roteiro]) .segment-toggle__btn {
   color: var(--color-muted-strong);
   justify-content: center;
   min-height: 32px;
@@ -14111,11 +14315,15 @@ html[data-theme="dark"] .empty-state__title {
   padding: 0;
 }
 
+:is(html[data-theme])
+  .oficio-external-driver .search-picker__control {
+  border-radius: 10px;
+}
+
 :is(html[data-theme="dark"])
   .oficio-external-driver .search-picker__control {
   background: var(--color-input-bg) !important;
   border: 1px solid var(--color-border) !important;
-  border-radius: 10px;
   box-shadow: none !important;
   min-height: var(--control-height-md);
   padding: 0 12px;
@@ -14147,11 +14355,15 @@ html[data-theme="dark"] *::after {
 }
 
 /* Solid record rows and document dialogs. Gold appears only as a small hover accent. */
+:is(html[data-theme])
+  .entity-card {
+  border-radius: 14px;
+}
+
 :is(html[data-theme="dark"])
   .entity-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 14px;
   box-shadow: var(--shadow-card);
   transition:
     background-color var(--duration-fast) var(--ease-standard),
@@ -14363,11 +14575,15 @@ html[data-theme="dark"] *::after {
 }
 
 /* Module navigation cards and the redesigned dashboard. */
+:is(html[data-theme])
+  .cv-module-card {
+  border-radius: 14px;
+}
+
 :is(html[data-theme="dark"])
   .cv-module-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 14px;
   box-shadow: var(--shadow-card);
   transition:
     background-color var(--duration-fast) var(--ease-standard),
@@ -14417,11 +14633,15 @@ html[data-theme="dark"] *::after {
   border-top: 1px solid var(--color-border);
 }
 
+:is(html[data-theme])
+  .main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) {
+  border-radius: 16px;
+}
+
 :is(html[data-theme="dark"])
   .main-form-panel:not(.main-form-panel--stack):not(.main-form-panel--inline-create) {
   background: var(--card-family-bg);
   border: 1px solid var(--card-family-border);
-  border-radius: 16px;
   box-shadow: var(--card-family-shadow);
 }
 
@@ -14528,11 +14748,15 @@ html[data-theme="dark"] *::after {
   box-shadow: var(--shadow-sm);
 }
 
+:is(html[data-theme])
+  .record-card {
+  border-radius: 16px;
+}
+
 :is(html[data-theme="dark"])
   .record-card {
   background: var(--card-family-bg);
   border: 1px solid var(--card-family-border);
-  border-radius: 16px;
   box-shadow: var(--card-family-shadow);
   transform: none;
 }
@@ -14904,12 +15128,16 @@ html[data-theme="dark"] *::after {
 
 /* Custom Select v2 — controle dividido e menu de opções destacado. A classe
    do menu viaja com o dropdown quando ele é portado para o body. */
+:is(html[data-theme])
+  .custom-select__trigger--v2 {
+  border-radius: 10px;
+}
+
 :is(html[data-theme="dark"])
   .custom-select__trigger--v2 {
   align-items: stretch;
   background: var(--color-input-bg);
   border: 1px solid var(--color-input-border);
-  border-radius: 10px;
   box-shadow: none;
   color: var(--color-text);
   gap: 0;
@@ -15074,9 +15302,13 @@ html[data-theme="dark"] *::after {
   background: transparent;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2 .custom-select__option {
   border-radius: 8px;
+}
+
+:is(html[data-theme="dark"])
+  .custom-select__menu--v2 .custom-select__option {
   color: var(--color-muted-strong);
   gap: 10px;
   margin: 2px 0;
@@ -15111,11 +15343,15 @@ html[data-theme="dark"] *::after {
   filter: none;
 }
 
+:is(html[data-theme])
+  .custom-select__menu--v2 .custom-select__option-check {
+  border-radius: 7px;
+}
+
 :is(html[data-theme="dark"])
   .custom-select__menu--v2 .custom-select__option-check {
   align-items: center;
   background: var(--color-accent);
-  border-radius: 7px;
   color: var(--color-on-accent);
   height: 26px;
   justify-content: center;

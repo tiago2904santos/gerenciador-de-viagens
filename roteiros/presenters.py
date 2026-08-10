@@ -320,3 +320,50 @@ def apresentar_contexto_formulario_roteiro_avulso(
         roteiro_state=roteiro_state,
         route_options=route_options,
     )
+
+
+def apresentar_pagina_editor_roteiro(
+    *,
+    contexto_editor,
+    titulo,
+    descricao,
+    back_url,
+    back_label,
+    form_action,
+    roteiro=None,
+):
+    """`BE-11`: o invólucro de página do editor, que `novo` e `editar` escreviam igual.
+
+    `back_url` alimenta as duas chaves de voltar — nas duas views a expressão já era a
+    mesma, escrita duas vezes. `delete_url` só aparece quando há `roteiro`: numa página
+    de criação não há o que excluir, e a chave não pode surgir vazia (o template testa
+    presença, não valor).
+    """
+    contexto = {
+        "page_title": titulo,
+        "page_description": descricao,
+        "back_url": back_url,
+        "wizard_header": {
+            "title": titulo,
+            "description": "Roteiro e diárias",
+            "status_label": (
+                roteiro.get_status_display() if hasattr(roteiro, "get_status_display") else ""
+            ),
+            "status_variant": _variante_de_status_do_roteiro(roteiro),
+        },
+        "wizard_back_label": back_label,
+        "wizard_back_url": back_url,
+        "wizard_page_steps": [],
+        "roteiro_editor_oficio": True,
+        "roteiro_form_action": form_action,
+    }
+    if roteiro is not None:
+        contexto["delete_url"] = reverse("roteiros:excluir", args=[roteiro.pk])
+    contexto.update(contexto_editor)
+    return contexto
+
+
+def _variante_de_status_do_roteiro(roteiro):
+    if roteiro is None:
+        return ""
+    return "draft" if roteiro.status == Roteiro.STATUS_RASCUNHO else "active"

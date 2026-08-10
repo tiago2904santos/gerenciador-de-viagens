@@ -544,14 +544,48 @@ desenho anterior — e é o que o sistema mostra para quem nunca escolheu tema.*
 | 8d | barra lateral | 976 | ✅ **fechada pelo `NOVO-63`** — `.sidebar*` divergente de 1.096 para **96**; a largura virou um token só |
 | 8e | `font-size`/`line-height` | 533 | ✅ **em quase tudo**: o `NOVO-63` mediu que **528 dos 533** eram a barra lateral |
 | 8f | altura de controle | 378 | ✅ **toda**: o `NOVO-63` mediu que os 378 eram a barra lateral |
-| 8b | borda `0px` → `1px` | 1.416 | 🟠 **aberta** |
-| 8c | raio `14px` → `10px` | 940 | 🟠 **aberta** |
-| 8g | `justify-content` `normal` → `center` | 230 | 🟠 **aberta** |
+| 8b | borda `0px` → `1px` | 1.416 | 🔴 **bloqueada na camada de token — `NOVO-93`** (remedida em 10/08; ver abaixo) |
+| 8c | raio `14px` → `10px` | 940 | ✅ **fechada em 10/08** — 43 das 116 regras, 1.116 elementos |
+| 8g | `justify-content` `normal` → `center` | 230 | ⛔ **pulada por decisão do dono — `NOVO-94`**: move a régua e não move um pixel |
 | 8h | **gaveta da barra lateral** | — | 🟠 **aberta, deixada de fora de propósito pelo `NOVO-63`**: sob `@media (max-width: 840px)` o escuro usa `position: fixed` + `height: 100dvh` e o claro `position: relative`. Isso não é geometria, é **comportamento** — vira gaveta sobreposta em vez de coluna no fluxo, e depende de `.app-mobile-bar__toggle` e `.sidebar-drawer-close` se comportarem igual nos dois temas |
 
 **Portanto a 8-zero é remedir.** Rode `scripts/medir_divergencia_tema.py` da E0 e reescreva a
 tabela acima antes de tocar em CSS. O `PLANO_MESTRE` §7.4 é explícito: número velho é o quarto erro
 que mata um ciclo.
+
+#### A remedição de 10/08, e o instrumento que ela exigiu
+
+A tabela de 07/08 conta **elementos que divergem**. Isso confunde três coisas diferentes, e as três
+apareceram na E8:
+
+1. a regra existe e muda o que se vê;
+2. a regra existe, diverge, e **não pinta nada** (o `NOVO-90`: `-webkit-font-smoothing` divergia em
+   20.100 elementos e os prints saíam idênticos byte a byte);
+3. o elemento está fora da tela naquela largura ou naquele estado — menu fechado, diálogo fechado,
+   barra de celular escondida no desktop. Pinta, mas só depois de o usuário abrir alguma coisa.
+
+Medido **regra a regra**, com o predicado de tema retirado do seletor e os elementos procurados nas
+43 rotas, nas três larguras, depois do `#304`:
+
+| família | regras só-escuras | com efeito | elementos @1440 | @800 | @500 | dos quais visíveis @1440 |
+|---|---:|---:|---:|---:|---:|---:|
+| 8b borda | 186 | **54** | 754 | 754 | 760 | 285 |
+| 8c raio | 116 | **43** | 1.116 | 1.116 | 1.128 | 451 |
+| 8g `justify-content` | 16 | **7** | 137 | 137 | 170 | — |
+
+Duas conclusões que a contagem antiga escondia:
+
+- **214 das 318 regras catalogadas não mudam nada** — ou o elemento não existe naquelas rotas, ou o
+  claro já computa o mesmo valor. Contá-las como trabalho pendente superestimava a etapa.
+- **"Invisível" quer dizer coisas diferentes na 8g e na 8b/8c.** Na 8g a propriedade *não consegue*
+  pintar (não há folga no container, ou o elemento nem é caixa flex no claro) — é inútil por
+  construção, e virou o `NOVO-94`. Na 8b/8c o elemento só não está na tela **no estado de repouso**;
+  ele pinta quando o menu ou o diálogo abre. Por isso a 8c foi feita inteira e a 8g não foi feita.
+
+**Instrumento novo desta etapa:** o print antes/depois deixou de ser conferência visual e virou
+número. `prova_pixel.py` fotografa 10 componentes × 3 larguras × 2 temas e conta pixels diferentes.
+A 8c fechou com **0 pixels diferentes no tema escuro nas 30 comparações** e mudança em 8 dos 10
+componentes no claro. Sem isso não há como distinguir o caso 1 do caso 2.
 
 **Duas lições de método que o `NOVO-63` pagou e você não deve pagar de novo:**
 

@@ -234,7 +234,7 @@ aparecem no seletor; justificativas de outra área aparecem na lista e podem ser
 **Correção:** migração acrescentando `area` (FK PROTECT) aos dois modelos, com backfill a partir
 de `oficio.area`; `UniqueConstraint(area, nome)`; filtro nos 4 selectors e nos 2 pickers.
 
-### BE-11 🟠 Editor de roteiro em 3 cópias · AUD · 3 d · risco alto
+### BE-11 ✅ RESOLVIDO Editor de roteiro em 3 cópias · AUD · 3 d · risco alto
 
 `roteiros/views.py:203` (`novo`, 89 linhas úteis) e `:311` (`editar`, 86 linhas) têm similaridade
 0,629 e 41 linhas idênticas; `oficios/route_views.py:100` (`wizard_roteiro`, 175 linhas) partilha
@@ -244,7 +244,29 @@ de `oficio.area`; `UniqueConstraint(area, nome)`; filtro nos 4 selectors e nos 2
 **Correção:** `roteiros/services/editor_flow.py::processar_submissao_editor(...)` devolvendo
 resultado tipado, e um presenter único. As três views ficam com ~25 linhas.
 
-### BE-12 🟠 `wizard_roteiro` concentra a regra de vínculo/cópia na view · AUD · 2 d · risco alto
+**Duas medições corrigem o enunciado.** Contando interseção de multiconjunto de linhas
+normalizadas (sem comentário nem branco), `novo` × `editar` dá **55**, não 41 — as duas são mais
+parecidas do que o catálogo dizia. E `wizard_roteiro` partilha 20 de **165** linhas úteis: não é a
+terceira cópia do editor, é outro fluxo (reuso-sem-cópia, soft-advance, vínculo `Oficio.roteiro`,
+ações de wizard, outro template). Passá-lo pela mesma função exigiria bandeiras que desligam metade
+dela, ou mudaria o comportamento do fluxo do ofício. Por decisão do usuário o `BE-11` unificou
+**`novo` + `editar`**; a orquestração do wizard é o `BE-12`, que já era o PR seguinte.
+
+**Entregue:** `roteiros/services/editor_flow.py` com `ResultadoSubmissaoEditor` (frozen dataclass,
+sem `request`/`messages`/`redirect`) e `processar_submissao_editor`;
+`roteiros/presenters.py::apresentar_pagina_editor_roteiro` no lugar dos dois dicts de contexto
+literais; `roteiros/views.py::_responder_submissao_editor` traduzindo o resultado em redirect ou
+erro no form. `novo` 89 → **54** linhas úteis, `editar` 86 → **58**, interseção 55 → **31** — das
+quais 7 são só parênteses e vírgula. Comportamento inalterado: as duas mensagens de duplicado
+seguem com textos diferentes, `delete_url` segue existindo só em `editar`, e as três telas rendem
+prints byte a byte idênticos antes e depois.
+
+**O terceiro pedaço partilhado, esse sim resolvido nos dois lados:** o parse de `autosave_obj_id`
+estava copiado em `roteiros/views.py` e `oficios/route_views.py`. Virou
+`roteiros/services/autosave.py::pk_de_autosave`. Só o parse — os querysets divergem de propósito
+(área ativa contra área do ofício) e continuam em cada view, com o comentário de escopo.
+
+### BE-12 ✅ RESOLVIDO `wizard_roteiro` concentra a regra de vínculo/cópia na view · AUD · 2 d · risco alto
 
 `oficios/route_views.py:100` — 181 linhas e 24 ramos, a maior view do sistema (a segunda tem 125).
 Decide vínculo sem cópia ou rascunho novo (`:127-143`), instancia `Roteiro(...)` direto
@@ -252,6 +274,36 @@ Decide vínculo sem cópia ou rascunho novo (`:127-143`), instancia `Roteiro(...
 **Efeito:** a regra que mais gera bug de dados neste sistema — roteiro é compartilhado entre
 ofícios — não é testável sem subir request HTTP nem reusável pelo fluxo avulso.
 **Plan mode obrigatório.**
+
+**A cobertura media o defeito melhor que o tamanho.** Antes de mexer, `coverage` sobre
+`oficios/route_views.py` com a suíte da etapa: **69%**, e o que faltava era `:125-160` — o bloco
+inteiro de `if form.is_valid() and validated["ok"]`. Nenhum teste do repositório exercitava o
+reuso-sem-cópia, a materialização de rascunho novo, nem qualquer das quatro saídas de navegação do
+caminho válido. A regra "que mais gera bug de dados neste sistema" tinha cobertura **zero**.
+
+**Entregue:** `oficios/services.py` ganhou `ResultadoRoteiroDoOficio`, `salvar_roteiro_do_oficio`,
+`salvar_rascunho_parcial_do_oficio` e `montar_roteiro_inicial_do_oficio`, mais os privados
+`_materializar_rascunho_do_oficio` e `_revincular_roteiro_ao_oficio`. A view ficou com navegação,
+mensagens e render, e ganhou `_redirect_after_roteiro_save` — nome que segue o par já existente em
+`traveler_views.py`.
+
+| | antes | depois |
+|---|---:|---:|
+| `wizard_roteiro`, linhas úteis | 165 | **124** |
+| `wizard_roteiro`, ramos | **33** | **13** |
+| cobertura de `route_views.py` | 69% | 88% |
+
+Os 33 ramos eram o triplo da segunda maior view de wizard (12). Com 13, deixa de ser exceção.
+
+**As duas funções de gravação são `@transaction.atomic`** — decisão do usuário. A requisição grava
+`Oficio`, `Roteiro`, `RoteiroDestino` e `RoteiroTrecho` (mais um delete de rascunho), e os services
+chamados eram atômicos cada um mas o conjunto não. Isto fecha o **item 1** da lista de perigo do
+`BE-14`; os outros 46 sites seguem lá.
+
+**O que a extração destravou**, e é o que o enunciado pedia: três cenários que eram intestáveis
+antes. Falha no meio da gravação (não deixa roteiro órfão), gravação fora de request (`NOVO-88`), e
+a guarda de área cruzada de `vincular_roteiro_ao_oficio_sem_copia` — inalcançável pela view, porque
+`obter_roteiro_escolhido_do_post` já filtra pela área do ofício.
 
 ### BE-13 🟠 `roteiros/roteiro_logic.py` fora do contrato de camadas · AUD · 4 d · risco alto
 
@@ -5844,6 +5896,268 @@ Resolvido com o mesmo descarte, na origem da lista de fontes. A lição que fica
 como produção" —, consertar a ocorrência que apareceu não fecha a categoria. Valia ter varrido quem
 mais lê `static/js/**`.
 
+### NOVO-87 · `NOVO` O fluxo do ofício não detecta roteiro duplicado · AUD · 0,5 d
+
+O catálogo já registrava isto como "divergência real já existente" dentro do `BE-11`. Ao unificar
+`novo` e `editar` a divergência ficou isolada e nomeável, então vira linha própria: `novo` e
+`editar` chamam `encontrar_roteiro_duplicado`, que procura **qualquer** roteiro idêntico já salvo e
+funde os dados nele. `oficios/route_views.py::wizard_roteiro` não chama.
+
+O que o wizard tem é outra coisa: `roteiro_state_equivalente_ao_roteiro` (`:133`) compara o estado
+submetido **só** com o roteiro que o usuário escolheu explicitamente no seletor. Se bater, vincula
+sem copiar; se não bater, grava rascunho novo. Ou seja, salvar a etapa de roteiro de um ofício pode
+criar um roteiro idêntico a um terceiro que o usuário nunca viu, sem aviso.
+
+**Não foi mexido de propósito.** Dar detecção de duplicado ao wizard não é refatoração: muda o que
+o usuário vê ao salvar a etapa, e `sobrescrever_roteiro_duplicado` migra ofícios e prestações e
+apaga o registro obsoleto — exatamente a classe de operação que o comentário de
+`oficios/route_views.py:139` manda nunca fazer com roteiro de outro ofício.
+
+**Antes de decidir, medir:** quantos roteiros idênticos o fluxo do ofício cria de fato em produção.
+Se forem poucos, a assimetria é aceitável e vira decisão documentada; se forem muitos, o desenho
+tem de mudar — e aí é `BE-12`, não este.
+
+### NOVO-88 ✅ RESOLVIDO `wizard_roteiro` repete dois blocos dentro de si mesma · AUD · 0,25 d
+
+Achado ao medir o `BE-11`, e insumo direto do `BE-12`. A view de 165 linhas úteis tem duas
+duplicações internas:
+
+1. **Materializa rascunho + revincula ao ofício**, em `:140-146` e `:168-185`. Mesmo
+   `if roteiro_vinculado is None or roteiro_vinculado.status != Roteiro.STATUS_RASCUNHO:` seguido de
+   `Roteiro(tipo=…, status=…)`, `form.instance = …`, e depois
+   `if oficio.roteiro_id != roteiro_salvo.pk: oficio.roteiro = …; oficio.save(...)`. **Só a segunda
+   cópia injeta `area=`** — a primeira deixa o `Roteiro` nascer sem área e depende de quem salva
+   para preenchê-la.
+2. **O fallback de área** (`from cadastros.models import ConfiguracaoSistema` /
+   `area = ConfiguracaoSistema.get_singleton().area`) está escrito duas vezes, em `:79-84` e
+   `:170-173`.
+
+A assimetria do item 1 é a parte que importa: duas escritas do mesmo registro com regras de área
+diferentes na mesma view, e nada na suíte distingue os dois caminhos.
+
+**Fechado no `BE-12`, e a causa era mais funda do que a redação acima.** As duas cópias viraram
+`oficios/services.py::_materializar_rascunho_do_oficio`, com a regra do segundo bloco: `area` do
+**ofício**, com queda para `ConfiguracaoSistema`.
+
+Eu tinha escrito que o primeiro bloco estouraria o `NOT NULL` do `DB-02` numa requisição sem área
+ativa. **Não estoura** — `get_oficio_by_id` filtra por `filter_queryset_by_area`, que lê o mesmo
+thread-local que `Roteiro.save()` vai ler; sem área ativa o ofício já não é encontrado e a view
+devolve 404 antes. O que existia era pior de achar: **o roteiro nascia na área certa por
+coincidência de duas leituras do mesmo thread-local**, nunca por garantia. Fora de request o
+`INSERT` vira `IntegrityError: NOT NULL constraint failed: roteiros_roteiro.area_id` — e foi assim
+que o teste provou a correção, porque desfazer o `area=` reproduz exatamente esse erro.
+<!-- Renumeração: o `#304` (BE-11) mesclou antes deste ramo e criou `NOVO-87` e `NOVO-88`.
+     Estes três nasceram como 88/89/90 no ramo da E8 e viraram 89/90/91 para não colidir.
+     Os commits `5d0c151f`, `7a4704f2` e `77dbaac9` citam os números antigos. -->
+
+### NOVO-89 · `NOVO` O padding do `.form-block` entrou fora da escala de espaçamento · UI · 0,1 d
+
+Dívida assumida de propósito na primeira sub-etapa da **E8**, e registrada no mesmo commit que a
+criou.
+
+Ao levar `padding: 14px` do tema escuro para a regra base de `.form-block`
+(`fields/form-sections.css`), o valor entrou **literal**. A escala de espaçamento não tem 14px: vai
+de `--space-3` (12px) para `--space-4` (16px).
+
+**Por que não arredondei.** Usar `--space-4` mexeria **2px no tema escuro**, e a E8 é o claro
+alcançando o escuro — não os dois indo para um terceiro lugar. Misturar "igualar os temas" com
+"arrumar a escala" na mesma edição é o que torna regressão visual impossível de atribuir, que é o
+risco que a etapa mais teme. O escuro tinha que sair byte a byte igual, e saiu: os prints das três
+larguras dão dimensão idêntica antes e depois.
+
+O 14px já não era estranho ao claro — `pages/roteiros.css` tem `padding: 14px` sem predicado de tema
+no `.route-sede-block`, e `theme-dark-components.css` usa `padding: 12px 14px` em outros pontos. O
+valor já circulava; o que este ID registra é que ele agora está na regra **base** de uma classe
+presente em 23 templates, e portanto vale a pena resolver de uma vez.
+
+**Fica para a E9** (`UI-02`), que reescreve `theme-dark-components.css` inteiro e é onde a escala
+pode ser decidida sem se confundir com a igualação dos temas. Duas saídas possíveis, e a escolha é
+do dono: arredondar para `--space-4` (16px, mexe 2px nos dois temas de uma vez) ou criar um token de
+14px, se o valor se provar recorrente.
+
+### NOVO-90 · `NOVO` A régua de tema não separa "diverge e pinta" de "diverge e não pinta" · QA · 0,5 d
+
+Achado ao executar a segunda sub-etapa da **E8**, e ele muda como o número da etapa deve ser lido.
+
+`medir_divergencia_tema.py` compara `getComputedStyle` entre os temas e conta toda diferença que não
+seja cor. Isso trata como equivalentes duas coisas muito diferentes: propriedade que **muda o que o
+usuário vê** e propriedade que o navegador **computa mas não pinta**.
+
+O caso que expôs isso: `-webkit-font-smoothing: antialiased`, declarado só em
+`html[data-theme="dark"] body`, valia **60.270 elementos — 48,2% de toda a divergência não-cor do
+sistema**, mais que as quatro famílias catalogadas da E8 somadas (~16%).
+
+Medido neste contêiner Linux, com Chromium:
+
+| | |
+|---|---|
+| estilo computado | `auto` (claro) vs `antialiased` (escuro) — **difere** |
+| largura renderizada do mesmo texto | 1264px vs 1264px — **idêntica** |
+| print da lista de ofícios, antes e depois de globalizar | **idêntico byte a byte** (mesmo md5, nos dois temas) |
+
+A propriedade tem efeito real no **macOS**. Então a divergência é verdadeira para quem usa Mac — o
+tema claro e o escuro renderizam texto diferente lá — e é **invisível** aqui. As duas afirmações
+convivem, e a régua não distingue uma da outra.
+
+**Consequência prática, que precisa estar escrita:** a meta do plano para o `NOVO-58` ("divergência
+próxima de zero") vai ser cumprida em boa parte por itens sem efeito visual nesta plataforma. Quem
+ler só o número vai superestimar o ganho de tela. Uma queda de 48% na métrica pode significar zero
+pixel movido — foi exatamente o que aconteceu.
+
+Isto **não** torna a correção errada: globalizar segue o princípio que o próprio projeto escreveu no
+`NOVO-62` ("tipografia não é decisão de tema") e conserta a divergência real no macOS. O que o ID
+registra é que o instrumento precisa de uma segunda coluna.
+
+O plano já avisava do parente deste defeito, na seção "a armadilha da tipografia": *"o número
+19.896 elementos media a pilha declarada, não a face que o usuário vê […] não dá para determinar
+daqui o que renderiza na máquina do usuário"*. O aviso valia para `font-family`; vale igual para
+tudo que é renderização de texto.
+
+**Saída sugerida para quem pegar este ID:** uma lista de propriedades sabidamente sem efeito de
+layout no motor usado pela régua (`-webkit-font-smoothing`, `-moz-osx-font-smoothing`,
+`text-rendering`, e as de `transition-*`, que só mudam a curva no tempo), contadas à parte no
+relatório. Duas somas, não uma: a que move pixel e a que não move.
+
+### NOVO-91 🔴 · `NOVO` A sessão remota mede ~35% menos divergência que o CI · QA · 0,5 d
+
+Descoberto errando: apertei os tetos de `scripts/tetos_front.json` com números medidos **aqui**, e o
+CI reprovou em 25+ rotas. O arquivo estava calibrado para o CI, e eu escrevi por cima dele medições
+de outro ambiente.
+
+A prova de que os tetos originais vieram do CI, e não daqui:
+
+| rota | teto gravado | CI mede | local mede |
+|---|---:|---:|---:|
+| `dashboard@1440` | 1125 | **1125** | 780 |
+| `cargo-editar@1440` | 1029 | **1029** | 672 |
+| `combustiveis-lista@1440` | 1036 | **1036** | 676 |
+
+Idêntico ao teto no CI, ~35% menor aqui. Não é ruído: são três casas decimais de coincidência em
+rotas independentes.
+
+**A causa provável é fonte.** O CI roda `python -m playwright install --with-deps chromium`, que traz
+o conjunto de fontes dele; a sessão remota usa o Chromium pré-instalado da imagem, com outro
+conjunto. Métrica de texto diferente muda quebra de linha, que muda altura, que muda quantos
+elementos divergem. É o mesmo mecanismo que o plano descreve na "armadilha da tipografia" — e a
+mesma advertência: *"não dá para determinar daqui o que renderiza na máquina do usuário"*.
+
+**Consequência operacional, que é o que importa:** medição local serve para **comparar antes/depois
+no mesmo ambiente** — foi assim que a cadeia do `.form-block` foi diagnosticada, e o diagnóstico
+está certo. Não serve para **gravar teto**. Regravar `tetos_front.json` só pode ser feito com números
+produzidos pelo CI.
+
+Isso deixa um buraco de processo: hoje o CI **não** commita o JSON de volta (`--json` vai para
+`$RUNNER_TEMP` e morre com o job), e regravar teto é passo manual. Ou seja, não existe caminho
+suportado para baixar a catraca a partir de uma corrida do CI — que é justamente o que uma etapa como
+a E8 precisa fazer a cada sub-etapa.
+
+**Saída sugerida:** um passo opcional no `tests.yml`, disparado por rótulo ou `workflow_dispatch`, que
+roda as duas réguas com `--atualizar-tetos` e publica o JSON como artefato — ou abre commit na
+branch. Enquanto isso não existe, a catraca só desce quando alguém copiar os números do log do CI à
+mão, e o log só mostra as rotas que **reprovaram**.
+
+**Efeito medido apesar de tudo:** o próprio log de reprovação mostra a queda real no ambiente certo.
+`configuracao` caiu de 1652 para 1425 a 1440px (−227), e o mesmo nas outras duas larguras (−204 cada).
+`eventos-lista@1440` caiu 14. É menos do que os −9.376 medidos localmente, e é o número que vale.
+
+### NOVO-92 · `NOVO` A tradução de ação do rodapé em redirect está copiada em cada passo do wizard · AUD · 0,75 d
+
+Achado ao fechar o `BE-12`. Todo passo de wizard lê a ação do rodapé com
+`core/wizard.py::normalizar_acao_do_wizard` — dono único desde o `BE-01` — e depois **cada um
+escreve a sua própria cadeia** de `if nav_action == …` para traduzir a ação em mensagem e redirect:
+
+| passo | onde | forma |
+|---|---|---|
+| `dados_viajantes` | `oficios/traveler_views.py:138` | helper privado `_redirect_after_dados_viajantes_save` |
+| `transporte` | `oficios/traveler_views.py:210` | helper privado `_redirect_after_transporte_save` |
+| `wizard_roteiro` | `oficios/route_views.py` | helper privado `_redirect_after_roteiro_save` (criado no `BE-12`; antes eram duas cadeias inline dentro da mesma view) |
+| `wizard_justificativa` | `oficios/wizard_document_views.py:48` | inline |
+| `wizard_documentos` | `oficios/wizard_document_views.py:144` | inline |
+
+São três helpers com o mesmo nome-padrão e nenhum reuso entre arquivos, mais dois inline. É a mesma
+família do `BE-01`, que centralizou a *leitura* do botão depois de duas cópias divergentes terem
+quebrado a navegação de quatro telas do plano de trabalho — a *escrita* do destino continua
+espalhada.
+
+**Não é cópia literal**, e é por isso que não entrou no `BE-12`: cada passo tem destinos próprios, e
+`wizard_documentos` ainda tem a ação `finalizar`, que os outros não têm. Unificar exige um mapa de
+etapa → próximo/anterior, que é desenho, não extração mecânica. Fica para depois do `BE-13`.
+<!-- Renumeração (2a vez nesta etapa): o `#305` (BE-12) mesclou antes deste ramo e criou
+     `NOVO-92`. Estes dois nasceram como 92/93 no ramo da E8 e viraram 93/94. Ramos paralelos
+     tiram número do mesmo contador sem reserva, e a colisão só aparece no merge — foi a
+     segunda vez na mesma sessão (a primeira foi o `#304`, com o `NOVO-88`). -->
+
+### NOVO-93 🔴 · `NOVO` A família 8b não é portável sozinha: no tema claro a borda é a única separação · UI · a decidir
+
+Achado ao executar a **E8**, com o dono já tendo decidido a direção ("o claro perde as bordas"). A
+medição contradiz a decisão, e por um motivo que não estava na mesa quando ela foi tomada.
+
+**O que a família 8b parecia ser.** 186 regras predicadas em `html[data-theme="dark"]` declaram
+borda. Medindo elemento a elemento nas 43 rotas, **54 têm efeito** — 754 elementos a 1440 e 800, 760
+a 500. As outras 132 não mudam nada.
+
+**Por que ela não pode ser aplicada inteira.** No tema escuro `border: 0` funciona porque as
+superfícies se separam por **luminância**; no claro elas são todas brancas, e a borda é a única
+separação que existe. Levar `border: 0` para o claro apaga a fronteira sem pôr nada no lugar. Cinco
+casos verificados, com arquivo e linha:
+
+1. **`.cv-module-card`** — o claro tem `border: 1px solid var(--color-border)` (`lists/cards.css:19`)
+   **e** `border-top: 3px solid var(--color-accent-border-strong)` (`cards.css:61`). O shorthand da
+   regra escura, neutralizado, **apaga o filete dourado do topo** de todo card do painel.
+2. **Os `--step1-*`** (`--step1-surface`, `--step1-panel`, `--step1-field`) são ligados **dentro de
+   regra escura** (`theme-dark-components.css:397-400` e `:5015-5017`). Fora dela existem só em
+   `.attach-signed-modal__dialog` (`actions/action-system.css:717`) e `.collection-panel`
+   (`lists/record-list.css:12`) — escopos que não alcançam o wizard. Um `border: 0` que vem casado
+   com `background: var(--step1-surface)` chega ao claro com **variável indefinida**.
+3. **`.cv-dialog__notice`** não tem regra clara nenhuma — só as duas escuras
+   (`theme-dark-components.css:3937` e `:3948`). Neutralizar a borda desenha **um retângulo em volta
+   de um `<p>` sem padding**. Não é mover declaração: é regra base que nunca foi escrita.
+4. **Seis componentes ficam branco-no-branco**: `.list-header__wizard-back`, os `−`/`+` do
+   `.pt-quantidade-stepper`, os botões de `.form-block__actions` do wizard,
+   `.card-footer__secondary .cv-btn`, `.roteiro-mapa__canvas-head .cv-btn--secondary` e — o pior —
+   `.roteiro-trecho-card__leg`, onde a borda é a única coisa que separa Saída de Chegada dentro de um
+   card branco.
+5. **`.search-picker__selected-card:last-child { border-bottom: 0 }`** é declaração morta no escuro
+   (outras regras já zeram os quatro lados) e **viva no claro**, onde o card tem borda inteira
+   (`fields/search-picker.css:590`). Neutralizada sozinha, o último card fica com contorno em U.
+
+**Consequência para o plano.** A 8b **não é "mover borda"**: é adotar o sistema de superfícies do
+escuro, e isso depende de os `--step1-*` existirem no tema claro. **A família está bloqueada na
+camada de token, que é a E9.** Enquanto isso não existir, cada regra de borda só pode ser decidida
+uma a uma, com print, e a maioria vai na direção contrária à que o enunciado supunha.
+
+**O que entrou apesar disso:** `.sidebar-brand-badge` (86 elementos), onde a borda é decoração — um
+anel creme sobre um badge dourado — e não separação.
+
+### NOVO-94 · `NOVO` A família 8g move a régua e não move um pixel · QA · fechada na medição
+
+Terceira ocorrência da mesma armadilha do `NOVO-90`, e a primeira detectada **antes** de virar
+commit.
+
+`justify-content` só desloca alguma coisa quando **sobra espaço** no container. Medindo o
+deslocamento real do primeiro e do último filho dentro do pai, nos dois temas, nas 43 rotas:
+
+| componente | elementos | `justify-content` difere | filho se move |
+|---|---:|---:|---:|
+| `.custom-select__option-check` | 72 | 72 | 1px, e só com o menu aberto |
+| `.custom-select__chevron` (v2) | 21 | 21 | **0** — caixa de 16px com filho de 16px |
+| `.segment-toggle__btn` (ofício/roteiro) | 8 | 8 | 2 |
+| `.ordered-field-row__badge` | 3 | 3 | **0** — `display: none` nos dois temas |
+| avatares do `search-picker` | 9 | 9 | **0** — `block` no claro contra `inline-flex` no escuro |
+| `.empty-state__mark` | 24 | 24 | **0** — `inline` no claro contra `inline-flex` no escuro |
+| `.list-tab` (≤600px) | 29 | 29 | **0** — os dois filhos já encostam nas duas bordas |
+
+Das 137 divergências que a família contribui a 1440 e das 170 a 500, o que pinta é **o deslocamento
+de 1px de um ícone de confirmação em lista suspensa aberta**. O que difere de verdade nesses
+elementos é `display`, largura e padding — geometria real, e que **não pertence a família nenhuma da
+tabela do plano**.
+
+**Decisão do dono:** pular a 8g. Fazê-la derrubaria ~150 pontos da catraca sem entregar tela.
+
+**O defeito verdadeiro que a medição encontrou** e que continua aberto: há componentes cujo desenho
+inteiro só existe no tema escuro — `.empty-state__mark` (24 elementos, sem nenhuma regra fora do
+arquivo escuro), os avatares do picker e o badge do wizard. Isso é maior que uma família e precisa de
+decisão própria.
 ### NOVO-54 (continuação) 🟠 Trinta dos setenta `!important` de `.cv-field__control` não sustentavam nada · UI · 0,5 d
 
 Segunda leva do `NOVO-54`. A primeira deu à classe uma regra base; esta começa a cobrar a dívida que
