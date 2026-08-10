@@ -5843,3 +5843,28 @@ Resolvido com o mesmo descarte, na origem da lista de fontes. A lição que fica
 `NOVO-81`, não sobre este teste: quando um problema é de categoria — "arquivo de teste sendo lido
 como produção" —, consertar a ocorrência que apareceu não fecha a categoria. Valia ter varrido quem
 mais lê `static/js/**`.
+
+### NOVO-88 · `NOVO` O padding do `.form-block` entrou fora da escala de espaçamento · UI · 0,1 d
+
+Dívida assumida de propósito na primeira sub-etapa da **E8**, e registrada no mesmo commit que a
+criou.
+
+Ao levar `padding: 14px` do tema escuro para a regra base de `.form-block`
+(`fields/form-sections.css`), o valor entrou **literal**. A escala de espaçamento não tem 14px: vai
+de `--space-3` (12px) para `--space-4` (16px).
+
+**Por que não arredondei.** Usar `--space-4` mexeria **2px no tema escuro**, e a E8 é o claro
+alcançando o escuro — não os dois indo para um terceiro lugar. Misturar "igualar os temas" com
+"arrumar a escala" na mesma edição é o que torna regressão visual impossível de atribuir, que é o
+risco que a etapa mais teme. O escuro tinha que sair byte a byte igual, e saiu: os prints das três
+larguras dão dimensão idêntica antes e depois.
+
+O 14px já não era estranho ao claro — `pages/roteiros.css` tem `padding: 14px` sem predicado de tema
+no `.route-sede-block`, e `theme-dark-components.css` usa `padding: 12px 14px` em outros pontos. O
+valor já circulava; o que este ID registra é que ele agora está na regra **base** de uma classe
+presente em 23 templates, e portanto vale a pena resolver de uma vez.
+
+**Fica para a E9** (`UI-02`), que reescreve `theme-dark-components.css` inteiro e é onde a escala
+pode ser decidida sem se confundir com a igualação dos temas. Duas saídas possíveis, e a escolha é
+do dono: arredondar para `--space-4` (16px, mexe 2px nos dois temas de uma vez) ou criar um token de
+14px, se o valor se provar recorrente.

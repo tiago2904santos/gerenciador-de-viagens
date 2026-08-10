@@ -2336,7 +2336,11 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   border-radius: 14px;
   grid-template-columns: minmax(0, 1fr);
   margin: 0;
-  padding: 14px;
+  /* NOVO-58 (E8): o `padding: 14px` saiu daqui e virou regra base em
+     `fields/form-sections.css`, para valer nos dois temas. O escuro continua
+     com o mesmo valor, agora herdado — se este bloco voltar a declará-lo, a
+     divergência volta junto. `border` e `border-radius` ficam: são as famílias
+     8b e 8c, cada uma com aprovação própria. */
 }
 
 :is(html[data-theme])
