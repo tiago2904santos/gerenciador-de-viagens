@@ -3,8 +3,8 @@
 Ela é a única das sete funções de parsing do `roteiro_logic.py` que lê `request.method`
 além de `request.POST` — o único `request.method` do módulo inteiro, aliás. Tirar o
 `request` de lá significa passar `method` como parâmetro, e é exatamente o `if/elif/else`
-que ramifica nele que estava descoberto: `coverage` apontava `roteiro_logic.py:1382-1383`
-e `:1390`, os ramos "instância existente" e "cadastro novo com initial".
+que ramifica nele que estava descoberto: `coverage` apontava os ramos "instância
+existente" e "cadastro novo com initial" de `_setup_roteiro_querysets`.
 
 Os três ramos escolhem de qual estado virá o queryset de cidades da sede. Errar isso não
 dá erro: dá um `<select>` de cidades do estado errado, ou vazio.
@@ -67,7 +67,7 @@ class QuerysetsDoEditorTests(TestCase):
         self.assertEqual(self._cidades_oferecidas(form), set())
 
     def test_get_de_instancia_usa_o_estado_gravado(self):
-        """`roteiro_logic.py:1382-1383`, descoberto: edição carrega o estado do registro."""
+        """Ramo `elif instance`, descoberto: edição carrega o estado do registro."""
         roteiro = Roteiro.objects.create(
             area=area_de_teste(),
             tipo=Roteiro.TIPO_AVULSO,
@@ -110,7 +110,7 @@ class QuerysetsDoEditorTests(TestCase):
         self.assertNotIn(self.cidade_a.pk, oferecidas)
 
     def test_get_de_cadastro_novo_usa_o_initial_da_configuracao(self):
-        """`roteiro_logic.py:1390`, descoberto: sem instância, o estado vem do `initial`.
+        """Ramo `else`, descoberto: sem instância, o estado vem do `initial`.
 
         É o caminho que herda a sede padrão do singleton de configuração.
         """
@@ -142,3 +142,59 @@ class QuerysetsDoEditorTests(TestCase):
                 preparar_querysets_formulario_roteiro(form, **kwargs)
                 oferecidos = set(form.fields["origem_estado"].queryset.values_list("pk", flat=True))
                 self.assertTrue(esperado.issubset(oferecidos))
+
+
+class ParserNaoMutaOPostDoChamadorTests(TestCase):
+    """`BE-13` fatia 1: o parser recebe o POST direto, então não pode escrever nele.
+
+    `_build_avulso_roteiro_state_from_post` copia o POST e **grava** no resultado
+    (`sede_estado` a partir de `origem_estado`). Enquanto ele recebia um request, o
+    `QueryDict` vinha imutável e o `.copy()` era obrigatório por construção. Recebendo o
+    `post` do chamador, esquecer o `.copy()` passa despercebido — e o chamador que
+    reutilizasse o mesmo POST veria campos que nunca submeteu.
+
+    `roteiros/services/roteiro_editor.py::validar_submissao_editor_roteiro` passa o mesmo
+    `post` para três funções em sequência, então é exatamente esse o cenário.
+    """
+
+    def setUp(self):
+        self.estado = Estado.objects.create(nome="Estado M BE13", sigla="M1")
+        self.cidade = Cidade.objects.create(nome="Cidade M BE13", estado=self.estado)
+
+    def _post(self):
+        return QueryDict(
+            urlencode(
+                {
+                    "roteiro_modo": "ROTEIRO_PROPRIO",
+                    "origem_estado": str(self.estado.pk),
+                    "origem_cidade": str(self.cidade.pk),
+                }
+            ),
+            mutable=True,
+        )
+
+    def test_o_post_do_chamador_sai_intacto(self):
+        from roteiros import roteiro_logic
+
+        post = self._post()
+        antes = dict(post.lists())
+
+        roteiro_logic._build_avulso_roteiro_state_from_post(post)
+
+        self.assertEqual(
+            dict(post.lists()),
+            antes,
+            "o parser tem de copiar antes de injetar os aliases `sede_*`",
+        )
+        self.assertNotIn("sede_estado", post)
+
+    def test_duas_chamadas_com_o_mesmo_post_dao_o_mesmo_estado(self):
+        from roteiros import roteiro_logic
+
+        post = self._post()
+
+        primeiro = roteiro_logic._build_avulso_roteiro_state_from_post(post)
+        segundo = roteiro_logic._build_avulso_roteiro_state_from_post(post)
+
+        self.assertEqual(primeiro["sede_estado_id"], segundo["sede_estado_id"])
+        self.assertEqual(primeiro["sede_cidade_id"], segundo["sede_cidade_id"])

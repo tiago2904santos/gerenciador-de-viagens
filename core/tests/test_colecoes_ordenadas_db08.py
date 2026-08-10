@@ -9,7 +9,7 @@ medição antes de escrever uma linha de constraint:
    `services.py:968` copia `d.ordem` tal e qual ao comitar. `(plano, ordem)`
    reprovaria produção no primeiro commit de evento.
 3. **Dois dos cinco não aceitam constraint simples.** `RoteiroTrecho`
-   (`roteiro_logic.py:1629`) e `DiarioBordoTrecho` (`diario_services.py:282`)
+   (`roteiro_logic._salvar_roteiro_avulso_from_roteiro_state`) e `DiarioBordoTrecho` (`diario_services.py:282`)
    reaproveitam as linhas existentes por id e gravam `ordem` uma a uma — trocar
    duas posições colide no meio do laço. Ficam para a fatia 2, junto com a
    correção dos escritores para dois passos.
@@ -85,7 +85,7 @@ class DestinoDeRoteiroTests(BaseColecoes):
 
         Se algum dia o escritor passar a reaproveitar linha e trocar posições, este
         teste continua verde e o de cima também: quem reprova é este, que reproduz
-        o `delete()` + `create()` de `roteiro_logic.py:1581`.
+        o `delete()` + `create()` de `roteiro_logic._salvar_roteiro_avulso_from_roteiro_state`.
         """
         self.destino(0)
         self.destino(1, cidade=self.cidade2)

@@ -119,7 +119,7 @@ class VazamentosQueOManagerFechaTests(TestCase):
         self.assertNotIn(alheio.pk, encontrados, msg="o picker ofereceu roteiro de outra área")
 
     def test_o_roteiro_submetido_de_outra_area_nao_e_aceito(self):
-        """`roteiros/roteiro_logic.py:1088` validava o id sem recorte: bastava
+        """`roteiro_logic._build_roteiro_state_from_post` validava o id sem recorte: bastava
         submeter o pk de um roteiro alheio para ele ser aceito."""
         from roteiros.roteiro_logic import Roteiro as RoteiroNoLogic
 

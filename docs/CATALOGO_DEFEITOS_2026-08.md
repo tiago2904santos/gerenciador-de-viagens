@@ -312,6 +312,54 @@ misturando parsing de request, montagem de contexto e persistência. Importado p
 **Correção:** fatiar por responsabilidade em PRs sucessivos — parsing sai para forms, contexto
 para presenters, persistência para services. Depois de `BE-11`.
 
+#### Fatia 1 ✅ — o parsing de request (o resto segue aberto)
+
+**Três correções ao enunciado, medidas antes de mexer.**
+
+**As migrações não importam o módulo.** `roteiros/migrations/0010` e `0012` (e `roteiros/models.py`)
+apenas **citam** `roteiro_logic` em comentário, não importam. A amarra que travaria mover código não
+existe. Importam de verdade só três módulos, todos em `roteiros/services/`.
+
+**O acoplamento a `request` era raso.** Em 1.845 linhas, `request` aparecia **22 vezes como
+`request.POST` e uma como `request.method`** — nada de `user`, `GET`, `area` ou sessão. Sete funções
+o recebiam.
+
+**Mover as funções não cabia nesta fatia, e o grafo diz por quê.**
+`_build_roteiro_state_from_post` chama 12 funções do próprio módulo e
+`_build_roteiro_diarias_from_request` chama 6, incluindo o motor de diárias. Levá-las para um módulo
+novo arrastaria meia dúzia junto ou criaria import cruzado de volta.
+
+**O sintoma, com nome:** `docs/PADRAO_SERVICES.md:20` proíbe service manipular `request`, e o código
+contornava fabricando **seis objetos falsos** — dois deles dentro do próprio `roteiro_logic`, que
+montava um request para chamar a si mesmo. E `_validate_roteiro_state(state, oficio=None)` tinha
+**173 linhas e nunca lia `oficio`**: dois chamadores construíam `SimpleNamespace` para alimentar um
+parâmetro morto.
+
+**Entregue:** cinco assinaturas passaram a receber `post`; `_setup_roteiro_querysets` ganhou `method`
+explícito (o chamador já o tinha e o embrulhava só para desembrulhar do outro lado); **duas funções
+foram apagadas** — `_parse_destinos_post` e `_extract_roteiro_posted_trechos` eram invólucros de uma
+linha que só desembrulhavam o request para chamar `services/editor_parser.py`; os seis objetos falsos
+e o parâmetro morto sumiram; e quatro testes deixaram de montar `RequestFactory` para alcançar o
+parser.
+
+| | antes | depois |
+|---|---:|---:|
+| ocorrências de `request` no módulo | 23 | **1** (o nome de uma função) |
+| `SimpleNamespace` em `roteiros/services/` | 3 | **0** |
+| defs de topo | 57 | 55 |
+| linhas | 1.845 | 1.829 |
+
+**O módulo continua com 1.829 linhas, e isso é o esperado:** esta fatia tira o acoplamento, não o
+volume. Ela é pré-requisito das outras duas — função que recebe `request` não pode ser movida para
+parser, presenter nem service antes de deixar de recebê-lo.
+
+**Falta para fechar o `BE-13`:** contexto (3 funções, entre elas `_build_roteiro_form_context`, 113
+linhas → `presenters.py`) e persistência (3 funções, entre elas o gravador atômico de 3 tabelas).
+Levantamento sobre a próxima: das 57 funções, **17 são invólucros de uma linha** para módulos já
+extraídos (`services/editor_parser.py`, `editor_context.py`, `editor_state.py`, `map_defaults.py`) —
+86 linhas deletáveis a custo zero de teste, e nenhuma chamada de fora do módulo. É a fatia mais
+barata que sobrou.
+
 ### BE-14 🟠 48 sites de persistência em view, sem service e sem transação · AUD · 3 d
 
 Varredura AST dos `views.py`/`*_views.py`: 48 chamadas `.save`/`.delete`/`.create` fora de

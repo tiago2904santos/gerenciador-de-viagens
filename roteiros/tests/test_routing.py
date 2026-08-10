@@ -511,7 +511,7 @@ class RoteirosRoutingTests(TestCase):
         # outro destino ainda a ocupa.
         #
         # A troca no lugar **não existe em produção**: o único escritor de
-        # destinos é `roteiro_logic.py:1581`, que faz `destinos.all().delete()` e
+        # destinos é `roteiro_logic._salvar_roteiro_avulso_from_roteiro_state`, que faz `destinos.all().delete()` e
         # recria com `enumerate`. O atalho era do teste, não do sistema.
         #
         # A asserção não muda de sentido: `mark_stale_when_signature_changed`
