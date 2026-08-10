@@ -8032,6 +8032,20 @@ html[data-theme="dark"] #attach-signed-modal .icon-btn.icon-btn--delete,
   gap: var(--space-4);
   grid-template-columns: minmax(0, 1fr);
   min-width: 0;
+  /* NOVO-58 (E8): existia só no tema escuro, em
+     `theme-dark-components.css`. O claro é o desenho ANTERIOR ao redesenho, e é
+     o que o sistema mostra para quem nunca escolheu tema.
+
+     Não é ajuste cosmético: medido no navegador, o padding só-escuro encolhia a
+     caixa de conteúdo em 28px, os filhos iam de 434px para 406px, o texto
+     quebrava diferente e a página ganhava 48,55px — propagando por 14 níveis. É
+     essa cadeia que desestabilizava a régua de tema (`NOVO-84`).
+
+     `14px` literal, e não `var(--space-4)`: a escala vai de 12 (`--space-3`)
+     para 16, e não há token de 14. Usar 16 mexeria 2px no ESCURO, e a E8 é o
+     claro alcançando o escuro — não os dois indo para um terceiro lugar. O
+     valor fora de escala está registrado para a E9 (`NOVO-89`). */
+  padding: 14px;
 }
 
 .form-block__header {
@@ -9702,7 +9716,11 @@ html[data-theme="dark"] .cv-dialog--document :is(.cv-dialog__icon, .cv-dialog__e
    dois temas (`NOVO-62`). Tipografia não é decisão de tema. */
 html[data-theme="dark"] body {
   background-attachment: fixed;
-  -webkit-font-smoothing: antialiased;
+  /* NOVO-58 (E8): `-webkit-font-smoothing` saiu daqui e virou regra base em
+     `base/base.css`, junto de `font-family` e `line-height`. Era 48,2% da
+     divergência não-cor do sistema — a maior fatia isolada, e maior que as
+     quatro famílias catalogadas da E8 somadas. Se voltar a ser declarado aqui,
+     a divergência volta com ele. */
 }
 
 html[data-theme="dark"] ::selection {
@@ -12023,7 +12041,11 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   border-radius: 14px;
   grid-template-columns: minmax(0, 1fr);
   margin: 0;
-  padding: 14px;
+  /* NOVO-58 (E8): o `padding: 14px` saiu daqui e virou regra base em
+     `fields/form-sections.css`, para valer nos dois temas. O escuro continua
+     com o mesmo valor, agora herdado — se este bloco voltar a declará-lo, a
+     divergência volta junto. `border` e `border-radius` ficam: são as famílias
+     8b e 8c, cada uma com aprovação própria. */
 }
 
 :is(html[data-theme])
