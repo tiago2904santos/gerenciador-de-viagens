@@ -534,7 +534,7 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         self.assertIn("document-viewer", viewer)
         self.assertIn("doc-pdf-canvas-wrap", viewer)
-        self.assertIn('components/documents/pdf_viewer.html', viewer_page)
+        self.assertIn('<c-documents.pdf_viewer', viewer_page)
         self.assertIn("signature-card", signature)
         # `H-05`: o hook de cópia mora no partial do corpo, não no casco.
         self.assertIn("data-cv-signature-copy", signature_body)
