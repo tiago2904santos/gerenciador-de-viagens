@@ -10,16 +10,16 @@
 
 {% block wizard_content %}
   {% if mostrar_pendencias %}
-    {% include "components/ui/feedback/pendencias_card.html" with items=pendencias_documentos lead="Corrija os itens abaixo antes de finalizar o ofício ou gerar DOCX/PDF." only %}
+    <c-ui.feedback.pendencias_card :items="pendencias_documentos" lead="Corrija os itens abaixo antes de finalizar o ofício ou gerar DOCX/PDF." only />
   {% endif %}
 
   <div data-travel-document-wizard-documentos>
-    {% include "components/form/card.html" with title="Documentos e conferência" description="Arquivos gerados, resumo e roteiro para revisão final" title_id="oficio-documentos-unified-title" heading_level=2 extra_class="oficio-documentos-unified-card oficio-documentos-card" body_extra_class="oficio-documentos-body" body_template="oficios/partials/_documentos_wizard_body.html" footer_template="oficios/partials/_documentos_wizard_footer.html" %}
+    <c-form.card title="Documentos e conferência" description="Arquivos gerados, resumo e roteiro para revisão final" title_id="oficio-documentos-unified-title" :heading_level="2" extra_class="oficio-documentos-unified-card oficio-documentos-card" body_extra_class="oficio-documentos-body" body_template="oficios/partials/_documentos_wizard_body.html" footer_template="oficios/partials/_documentos_wizard_footer.html" />
   </div>
 {% endblock %}
 
 {% block wizard_modals %}
-  {% include "components/ui/modals/attach_signed_modal.html" %}
+  <c-ui.modals.attach_signed_modal />
 {% endblock %}
 
 {% block extra_js %}

@@ -563,7 +563,7 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         # `H-05`: o casco do card veio de `components/form/card.html`; a página
         # só aponta o include. O contrato visual continua no componente canônico.
-        self.assertIn('components/form/card.html', source)
+        self.assertIn('<c-form.card', source)
         self.assertIn("form-section-card", card)
         self.assertIn("cv-form-section-header", card)
         self.assertIn("form-section-body", card)

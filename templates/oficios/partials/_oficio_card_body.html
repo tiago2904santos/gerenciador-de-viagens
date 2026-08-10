@@ -30,7 +30,7 @@
           data-overlay-trigger data-overlay-kind="menu"
           data-overlay-target="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}"
           data-overlay-src="{{ card.menus_url }}"
-        >{% include "components/ui/icons/icon.html" with icon="more" only %}</button>
+        ><c-ui.icons.icon icon="more" only /></button>
         
       </div>
       {% endif %}
@@ -120,7 +120,7 @@
         </span>
       </div>
       <div class="person-row__termo icon-btn-group">
-        {% include "components/ui/buttons/icon_button.html" with href=card.justificativa_url action="edit" aria_label="Editar justificativa" tooltip="Editar justificativa" only %}
+        <c-ui.buttons.icon_button :href="card.justificativa_url" action="edit" aria_label="Editar justificativa" tooltip="Editar justificativa" only />
         <button
           class="icon-btn icon-btn--documents"
           type="button"
@@ -132,7 +132,7 @@
           data-overlay-trigger data-overlay-kind="menu"
           data-overlay-target="justificativa-document-menu-{{ card.oficio_pk }}"
           data-overlay-src="{{ card.menus_url }}"
-        >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
+        ><c-ui.icons.icon icon="folder" only /></button>
         
       </div>
     </li>

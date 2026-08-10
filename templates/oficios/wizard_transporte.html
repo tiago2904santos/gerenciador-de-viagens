@@ -8,7 +8,7 @@
     data-oficio-motorista-mod-inicial="{{ form.motorista_modo.value|default:'SERVIDOR' }}"
     data-equipe-servidor-ids="{{ equipe_servidor_ids_csv }}"
   >
-    {% include "components/form/card.html" with title="Motorista" description="Escolha um servidor cadastrado ou use o modo manual quando o motorista for externo à equipe." title_id="oficio-motorista-title" extra_class="oficio-transporte-card oficio-motorista-card" header_extra_class="oficio-equipe-section__header" copy_extra_class="oficio-equipe-section__copy" actions_template="oficios/partials/_transporte_header_actions.html" actions_extra_class="oficio-transporte-card__header-actions oficio-transporte-card__header-actions--split" body_template="oficios/partials/_transporte_body.html" footer_template="oficios/partials/_transporte_footer.html" %}
+    <c-form.card title="Motorista" description="Escolha um servidor cadastrado ou use o modo manual quando o motorista for externo à equipe." title_id="oficio-motorista-title" extra_class="oficio-transporte-card oficio-motorista-card" header_extra_class="oficio-equipe-section__header" copy_extra_class="oficio-equipe-section__copy" actions_template="oficios/partials/_transporte_header_actions.html" actions_extra_class="oficio-transporte-card__header-actions oficio-transporte-card__header-actions--split" body_template="oficios/partials/_transporte_body.html" footer_template="oficios/partials/_transporte_footer.html" />
   </div>
 {% endblock %}
 

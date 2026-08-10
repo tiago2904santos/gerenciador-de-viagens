@@ -1,9 +1,9 @@
-{% include "components/ui/forms/form_block.html" with title="Identificação" description="Número, protocolo e custeio" section_id="travel-document-identity-title" heading_level=3 variant="split" extra_class="travel-document-block" body_template="oficios/partials/step1/_identity_fields.html" %}
+<c-ui.forms.form_block title="Identificação" description="Número, protocolo e custeio" section_id="travel-document-identity-title" :heading_level="3" variant="split" extra_class="travel-document-block" body_template="oficios/partials/step1/_identity_fields.html" />
 
-{% include "components/ui/forms/form_block.html" with title="Finalidade" description="Motivo e descrição da viagem" section_id="travel-document-purpose-title" heading_level=3 extra_class="travel-document-block" body_extra_class="form-stack" body_template="oficios/partials/step1/_purpose_fields.html" %}
+<c-ui.forms.form_block title="Finalidade" description="Motivo e descrição da viagem" section_id="travel-document-purpose-title" :heading_level="3" extra_class="travel-document-block" body_extra_class="form-stack" body_template="oficios/partials/step1/_purpose_fields.html" />
 
-{% include "components/ui/forms/form_block.html" with title="Equipe" description="Viajantes e motorista" section_id="travel-document-wizard-equipe-title" heading_level=3 variant="resource" extra_class="travel-document-block" action_label="Novo viajante" action_url=servidor_create_url action_autosave=True body_template="oficios/partials/step1/_team_fields.html" %}
+<c-ui.forms.form_block title="Equipe" description="Viajantes e motorista" section_id="travel-document-wizard-equipe-title" :heading_level="3" variant="resource" extra_class="travel-document-block" action_label="Novo viajante" :action_url="servidor_create_url" :action_autosave="True" body_template="oficios/partials/step1/_team_fields.html" />
 
-{% include "components/ui/forms/form_block.html" with title="Transporte" description="Viatura utilizada" section_id="travel-document-wizard-viatura-title" heading_level=3 variant="resource" extra_class="travel-document-block" action_label="Nova viatura" action_url=viatura_create_url action_autosave=True data_hook="oficio-viatura-card" body_template="oficios/partials/step1/_transport_fields.html" %}
+<c-ui.forms.form_block title="Transporte" description="Viatura utilizada" section_id="travel-document-wizard-viatura-title" :heading_level="3" variant="resource" extra_class="travel-document-block" action_label="Nova viatura" :action_url="viatura_create_url" :action_autosave="True" data_hook="oficio-viatura-card" body_template="oficios/partials/step1/_transport_fields.html" />
 
 {% include "oficios/partials/wizard_dados_card_motorista_externo.html" %}
