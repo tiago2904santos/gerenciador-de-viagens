@@ -653,12 +653,12 @@
   .date-picker__control .cv-field__control:hover,
   .date-picker__control .cv-field__control:focus
 ) {
-  background: var(--step1-panel, var(--color-surface-soft, var(--color-card))) !important;
-  background-color: var(--step1-panel, var(--color-surface-soft, var(--color-card))) !important;
-  border-color: transparent !important;
-  border-radius: 10px !important;
-  box-shadow: none !important;
-  transition: none !important;
+  background: var(--step1-panel, var(--color-surface-soft, var(--color-card)));
+  background-color: var(--step1-panel, var(--color-surface-soft, var(--color-card)));
+  border-color: transparent;
+  border-radius: 10px;
+  box-shadow: none;
+  transition: none;
 }
 
 /* Calendário do período: mesmo filled soft de "Novo viajante". */
@@ -2434,9 +2434,9 @@ html[data-theme="light"] .roteiro-editor--avulso .roteiro-editor__reference-bloc
     .cv-field__control[readonly],
     input[readonly]
   ) {
-  background: var(--color-surface-soft) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
+  background: var(--color-surface-soft);
+  border-color: transparent;
+  box-shadow: none;
   color: var(--color-text);
   opacity: 1;
 }

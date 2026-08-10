@@ -783,8 +783,8 @@ html[data-theme="dark"] .pt-add-evento__btn:focus-visible {
 }
 
 html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
-  background: var(--step1-panel) !important;
-  background-color: var(--step1-panel) !important;
+  background: var(--step1-panel);
+  background-color: var(--step1-panel);
 }
 
 .pt-texto-block .cv-field__control--textarea::-webkit-scrollbar {
@@ -1053,14 +1053,14 @@ html[data-theme="dark"] .pt-efetivo-fields .pt-quantidade-stepper {
 .pt-efetivo-fields .pt-quantidade-stepper > input {
   appearance: textfield;
   -moz-appearance: textfield;
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  height: 44px !important;
-  min-height: 44px !important;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  height: 44px;
+  min-height: 44px;
   min-width: 0;
-  padding: 0 0.25rem !important;
+  padding: 0 0.25rem;
   text-align: center;
   width: 100%;
 }

@@ -25,8 +25,8 @@
     .search-picker__input,
     .date-picker__control
   ) {
-  border: 0 !important;
-  box-shadow: none !important;
+  border: 0;
+  box-shadow: none;
 }
 
 :is(html[data-theme="dark"])
@@ -39,7 +39,7 @@
     .search-picker__control,
     .date-picker__control
   ) {
-  background: var(--step1-field, var(--color-input-bg)) !important;
+  background: var(--step1-field, var(--color-input-bg));
 }
 
 :is(html[data-theme="dark"])
@@ -53,8 +53,8 @@
   .cadastros-form-page[data-configuracoes-shell]
   .date-picker__control
   :is(.cv-field__control, input) {
-  background: transparent !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
