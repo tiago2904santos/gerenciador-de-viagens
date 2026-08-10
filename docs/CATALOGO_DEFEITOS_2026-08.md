@@ -5315,6 +5315,13 @@ Trocar o carregador muda a resolução de **407 templates** de uma vez, e o modo
 
 **Fila:** etapas E3 (instalar), E4 (converter os 82 componentes) e E5 (migrar os call sites).
 
+**E3 concluída em 09/08/2026 (`e6a722ae`).** `django-cotton==2.7.2` entrou no lock com hashes e
+o projeto passou a usar configuração manual: `SimpleAppConfig`, loader em cache com Cotton antes
+de `filesystem.Loader` e `app_directories.Loader`, e a biblioteca de tags em `builtins`. Os cinco
+context processors declarados foram preservados e nenhum template mudou. Os **408 templates** do
+corpus compilam; 12 telas de domínio e o perfil que hospeda a integração Google renderizam no
+servidor sem `TemplateDoesNotExist` e sem erro de console. E4 e E5 ainda fecham o defeito.
+
 ### NOVO-72 ✅ RESOLVIDO (E2, 09/08/2026) · `NOVO` `ui_lab2/` sobreviveu à remoção do PR #247 · MOR · 0,1 d
 
 O `BE-25` decidiu que nenhum dos dois UI Labs é o vigente e o PR #247 os apagou. `ui_lab2/` ficou

@@ -260,10 +260,17 @@ classificar, **não apague** — registre no catálogo e siga.
 
 ---
 
-### E3 — Cotton instalado, nada migrado · `NOVO-71` (parte) · risco **médio-alto** · 1 d
+### E3 ✅ — Cotton instalado, nada migrado · `NOVO-71` (parte) · concluída em 09/08/2026
 
 **Objetivo.** Trocar o carregador de template sem tocar em um único template, para que a suíte
 prove que só o carregador mudou.
+
+**Resultado.** `django-cotton==2.7.2` foi pinado e travado com hashes. O loader efetivo é
+`cached.Loader` → `django_cotton.cotton_loader.Loader` → `filesystem.Loader` →
+`app_directories.Loader`; `cotton`, `cotton:vars` e `cotton:slot` estão em `builtins`. Os cinco
+context processors do projeto permaneceram idênticos, nenhum arquivo em `templates/` mudou e os
+408 templates compilam. A navegação real cobriu uma tela de cada domínio, mais o perfil da
+integração Google, sem erro do Django ou do console.
 
 **Arquivos.** `requirements/base.txt` · `requirements/lock.txt` · `config/settings/base.py:161-176`
 
