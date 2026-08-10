@@ -1388,9 +1388,26 @@ document.documentElement.dataset.appReady = "true";
       }
 
       if (event.key !== "Tab") return;
+      // `tabIndex >= 0` e nao o seletor: `button:not([disabled])` casava com
+      // botao `tabindex="-1"`, que o navegador nunca foca por Tab. O seletor
+      // so descartava `tabindex="-1"` no ramo generico `[tabindex]`.
+      //
+      // Isso quebrava a armadilha no TEMA ESCURO (`NOVO-85`). O seletor de tema
+      // e o ultimo bloco da barra e e um radiogroup rotativo: `theme-toggle.js`
+      // deixa `tabindex="0"` so no tema ativo. No claro, o botao "Claro" e o
+      // ultimo do DOM E o ultimo tabulavel, entao `last` acertava por acidente.
+      // No escuro "Claro" vira `-1` mas continua sendo o `last` calculado, o
+      // ultimo tabulavel de verdade passa a ser "Escuro", a comparacao com
+      // `activeElement` da falso, o `preventDefault()` nao roda — e o foco sai
+      // da gaveta para o conteudo atras do scrim, com o `body` travado.
+      //
+      // Vale tambem antes de o `theme-toggle.js` rodar: o template nasce com os
+      // DOIS botoes em `tabindex="-1"`, e ele desiste cedo se `CV.theme` faltar.
       const focusable = Array.from(sidebar.querySelectorAll(
-        'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        'a[href], button, input, select, textarea, [tabindex]'
       )).filter(function (element) {
+        if (element.disabled) return false;
+        if (element.tabIndex < 0) return false;
         return !element.hidden && element.getAttribute("aria-hidden") !== "true";
       });
       if (!focusable.length) return;

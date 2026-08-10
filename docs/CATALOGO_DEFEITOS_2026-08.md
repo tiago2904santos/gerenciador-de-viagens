@@ -5739,3 +5739,61 @@ página chegou a assentar, que é o que separa "o instrumento falhou" de "a pág
 relayout assíncrono no editor de roteiro a 500 px, com 56px de crescimento. Isso é **comportamento**,
 não pintura, e mora perto da família 8h da E8 (a gaveta da barra lateral, que também é comportamento
 e também só existe abaixo de 840 px). Vale investigar junto quando a 8h for executada.
+
+### NOVO-85 🔴 · `NOVO` A armadilha de foco da gaveta vazava — e só no tema escuro · A11Y · 0,25 d
+
+Apareceu na investigação da família **8h** da E8, e no lugar do defeito que se esperava: a premissa
+catalogada ("a gaveta é `fixed` no escuro e `relative` no claro") **já estava morta** — o `NOVO-68`
+globalizou a geometria em 09/08, e `sidebar.css:353` é código que não vence mais nada. No lugar dela
+apareceu isto, que é comportamento de verdade.
+
+`sidebar.js` montava a lista de focáveis com
+
+    'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+e `button:not([disabled])` **casa com botão `tabindex="-1"`** — que o navegador nunca alcança por
+Tab. O descarte de `tabindex="-1"` só existia no ramo genérico `[tabindex]`.
+
+Por que isso vira defeito **de um tema só**: o seletor de tema é o último bloco da barra e é um
+radiogroup rotativo — `theme-toggle.js:19` deixa `tabindex="0"` apenas no tema ativo. No DOM,
+"Escuro" vem antes de "Claro" (`templates/cotton/layout/sidebar.html:102,106`).
+
+| tema | último do DOM | último **tabulável** | batem? |
+|---|---|---|---|
+| claro | "Claro" (`tabindex="0"`) | "Claro" | ✅ por acidente |
+| escuro | "Claro" (`tabindex="-1"`) | "Escuro" | ❌ |
+
+No escuro, `document.activeElement === last` dá falso quando o foco está no último tabulável real, o
+`event.preventDefault()` não roda, e **o foco sai da gaveta para o conteúdo atrás do scrim** — com a
+gaveta aberta e o `body` travado em `overflow: hidden`. O usuário perde o foco numa região que não
+consegue ver nem rolar.
+
+Vale também **antes de o `theme-toggle.js` rodar**: o template nasce com os dois botões em
+`tabindex="-1"`, e o script desiste cedo (`if (!shared) return;`) se `CV.theme` faltar.
+
+**Resolvido** trocando a filtragem por `element.tabIndex >= 0` mais o descarte explícito de
+`disabled` — o critério do navegador, e não uma aproximação por seletor.
+
+`static/js/components/sidebar.test.js` (novo, 5 casos) prende os dois temas, o estado inicial do
+template, o `Shift+Tab` e o botão desabilitado. A prova de que prendem: com o seletor antigo
+reposto, **4 dos 5 reprovam — e o que passa é justamente o do tema claro**, que é onde o defeito não
+existia.
+
+### NOVO-86 · `NOVO` O `NOVO-81` consertou um varredor de JS; existem dois · QA · 0,1 d
+
+O `NOVO-81` tirou os `*.test.js` da varredura do `audit_frontend_standards.py`, com o argumento de
+que o que um teste monta para exercitar uma regra é exatamente o que a regra proíbe em produção. O
+argumento estava certo e a correção estava incompleta: **`core/tests/test_javascript_namespace_contract.py`
+varre o mesmo `static/js/**` e tinha o mesmo problema.**
+
+Apareceu ao escrever o teste do `NOVO-85`. Para simular a media query da gaveta, ele faz
+`window.matchMedia = vi.fn()` — e o contrato reprova qualquer `window.X =` fora de `CV`. O teste
+mede código entregue ao navegador; um duplo de teste não é isso.
+
+Diferente do `NOVO-81`, que era latente, este **reprovou de imediato**: a suíte saiu de 1911 verdes
+para uma falha, com `static/js/components/sidebar.test.js: window.matchMedia`.
+
+Resolvido com o mesmo descarte, na origem da lista de fontes. A lição que fica é sobre a correção do
+`NOVO-81`, não sobre este teste: quando um problema é de categoria — "arquivo de teste sendo lido
+como produção" —, consertar a ocorrência que apareceu não fecha a categoria. Valia ter varrido quem
+mais lê `static/js/**`.
