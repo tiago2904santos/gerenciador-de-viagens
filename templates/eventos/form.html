@@ -1,10 +1,10 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 
 {% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
 
 {% block flow_body %}
   <form method="post">
     {% csrf_token %}
-    {% include "components/form/card.html" with title="Informações do evento" title_id="evento-form-title" heading_level=2 body_template="eventos/partials/_form_body.html" footer_template="eventos/partials/_form_footer.html" %}
+    <c-form.card title="Informações do evento" title_id="evento-form-title" :heading_level="2" body_template="eventos/partials/_form_body.html" footer_template="eventos/partials/_form_footer.html" />
   </form>
 {% endblock %}

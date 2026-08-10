@@ -1,4 +1,4 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 {% load static %}
 
 {% block extra_css %}
@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block flow_header %}
-  {% include "components/ui/headers/wizard_page_header.html" with eyebrow="EVENTOS" title=page_title status_label=flow_status_label status_variant=flow_status_variant steps=evento_page_steps stepper_aria_label="Etapas do evento" back_label=flow_back_label back_url=flow_back_url only %}
+  <c-ui.headers.wizard_page_header eyebrow="EVENTOS" :title="page_title" :status_label="flow_status_label" :status_variant="flow_status_variant" :steps="evento_page_steps" stepper_aria_label="Etapas do evento" :back_label="flow_back_label" :back_url="flow_back_url" only />
 {% endblock %}
 
 {% block flow_stepper %}
@@ -31,7 +31,7 @@
       </span>
       <form method="post" action="{{ reativar_evento_url }}" data-confirm-submit data-confirm-message="Reativar este evento? Os documentos cancelados junto com ele também serão reativados.">
         {% csrf_token %}
-        {% include "components/ui/buttons/button.html" with label="Reativar evento" variant="secondary" type="submit" icon="unarchive" only %}
+        <c-ui.buttons.button label="Reativar evento" variant="secondary" type="submit" icon="unarchive" only />
       </form>
     </div>
   {% endif %}
@@ -44,9 +44,9 @@
       {% with form=evento_form %}
       <div data-travel-document-wizard-step1>
 
-        {% include "components/ui/feedback/form_errors.html" with form=form only %}
+        <c-ui.feedback.form_errors :form="form" only />
 
-        {% include "components/form/card.html" with title="Dados do evento" description="Identificação, período, destinos e documentos vinculados" title_id="evento-step1-title" extra_class="evento-step1-card" body_template="eventos/partials/_detalhe_etapa1_body.html" footer_template="eventos/partials/_detalhe_etapa1_footer.html" %}
+        <c-form.card title="Dados do evento" description="Identificação, período, destinos e documentos vinculados" title_id="evento-step1-title" extra_class="evento-step1-card" body_template="eventos/partials/_detalhe_etapa1_body.html" footer_template="eventos/partials/_detalhe_etapa1_footer.html" />
       </div>
       {% endwith %}
 
@@ -56,11 +56,11 @@
   {% if etapa_atual == 2 %}
     <section class="wizard-collection" aria-label="Roteiros do evento">
       <div class="wizard-collection__body">
-        {% include "components/lists/simple_list.html" with rows=roteiro_rows empty_message="Nenhum roteiro vinculado a este evento." hide_realtime_count=True only %}
+        <c-lists.simple_list :rows="roteiro_rows" empty_message="Nenhum roteiro vinculado a este evento." :hide_realtime_count="True" only />
       </div>
     </section>
     <div class="fab-container">
-      {% include "components/ui/buttons/button.html" with href=create_urls.roteiro label="Novo roteiro" variant="primary" icon="plus" extra_class="fab" only %}
+      <c-ui.buttons.button :href="create_urls.roteiro" label="Novo roteiro" variant="primary" icon="plus" extra_class="fab" only />
     </div>
   {% endif %}
 
@@ -70,12 +70,12 @@
         {% for card in oficio_cards %}
           {% include "oficios/partials/oficio_list_card.html" with card=card csrf_token=csrf_token only %}
         {% empty %}
-          {% include "components/lists/list_empty.html" with message="Nenhum ofício vinculado a este evento." only %}
+          <c-lists.list_empty message="Nenhum ofício vinculado a este evento." only />
         {% endfor %}
       </div>
     </section>
     <div class="fab-container">
-      {% include "components/ui/buttons/button.html" with href=create_urls.oficio label="Novo ofício" variant="primary" icon="plus" extra_class="fab" only %}
+      <c-ui.buttons.button :href="create_urls.oficio" label="Novo ofício" variant="primary" icon="plus" extra_class="fab" only />
     </div>
   {% endif %}
 
@@ -97,7 +97,7 @@
           {% include "ordens_servico/partials/os_list_card.html" with card=card only %}
         {% endfor %}
         {% if not plano_cards and not ordem_cards %}
-          {% include "components/lists/list_empty.html" with message="Nenhum plano ou OS vinculado a este evento." only %}
+          <c-lists.list_empty message="Nenhum plano ou OS vinculado a este evento." only />
         {% endif %}
       </div>
     </section>
@@ -113,11 +113,11 @@
         data-overlay-kind="menu"
         data-overlay-target="evento-etapa4-actions-menu"
       >
-        <span class="cv-btn__icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon="more" only %}</span>
+        <span class="cv-btn__icon" aria-hidden="true"><c-ui.icons.icon icon="more" only /></span>
         <span>Mais ações</span>
       </button>
       <div class="action-menu action-menu--rich" id="evento-etapa4-actions-menu" role="menu" hidden>
-        {% include "components/ui/menus/rich_menu_header.html" with title="Mais ações" subtitle="Documentos e planejamento" icon="folder" only %}
+        <c-ui.menus.rich_menu_header title="Mais ações" subtitle="Documentos e planejamento" icon="folder" only />
         <button
           type="button"
           class="action-menu__item action-menu__item--rich"
@@ -135,15 +135,15 @@
           data-attach-signed-upload-label="Anexar documento"
         >
           <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
-            {% include "components/ui/icons/icon.html" with icon="document" only %}
+            <c-ui.icons.icon icon="document" only />
           </span>
           <span class="action-menu__item-copy">
             <strong>Anexar documento</strong>
             <small>Ofícios solicitantes, convites, despachos ou imagens</small>
           </span>
         </button>
-        {% include "components/ui/menus/rich_menu_link.html" with href=create_urls.plano title="Plano de trabalho" description="Criar um novo plano vinculado a este evento" icon="document" tone="preview" only %}
-        {% include "components/ui/menus/rich_menu_link.html" with href=create_urls.ordem title="Ordem de serviço" description="Criar uma nova OS vinculada a este evento" icon="clipboard-copy" tone="pdf" only %}
+        <c-ui.menus.rich_menu_link :href="create_urls.plano" title="Plano de trabalho" description="Criar um novo plano vinculado a este evento" icon="document" tone="preview" only />
+        <c-ui.menus.rich_menu_link :href="create_urls.ordem" title="Ordem de serviço" description="Criar uma nova OS vinculada a este evento" icon="clipboard-copy" tone="pdf" only />
       </div>
     </div>
   {% endif %}
@@ -151,18 +151,18 @@
   {% if etapa_atual == 5 %}
     <section class="wizard-collection" aria-label="Termos do evento">
       <div class="wizard-collection__body">
-        {% include "components/lists/simple_list.html" with rows=termo_rows empty_message="Nenhum termo vinculado a este evento." hide_realtime_count=True only %}
+        <c-lists.simple_list :rows="termo_rows" empty_message="Nenhum termo vinculado a este evento." :hide_realtime_count="True" only />
       </div>
     </section>
 
     <div class="fab-container">
-      {% include "components/ui/buttons/button.html" with href=create_urls.termo label="Novo termo" variant="primary" icon="plus" extra_class="fab" only %}
+      <c-ui.buttons.button :href="create_urls.termo" label="Novo termo" variant="primary" icon="plus" extra_class="fab" only />
     </div>
   {% endif %}
 {% endblock %}
 
 {% block flow_modals %}
-  {% include "components/ui/modals/delete_confirm_modal.html" %}
-  {% include "components/ui/modals/cancel_reason_modal.html" with cancel_modal_hint="Um ofício cancelado deixa de gerar prestação de contas e não pode mais ser usado em novas Ordens de Serviço. Ao cancelar o evento, todos os documentos vinculados a ele também serão cancelados." %}
-  {% include "components/ui/modals/attach_signed_modal.html" %}
+  <c-ui.modals.delete_confirm_modal />
+  <c-ui.modals.cancel_reason_modal cancel_modal_hint="Um ofício cancelado deixa de gerar prestação de contas e não pode mais ser usado em novas Ordens de Serviço. Ao cancelar o evento, todos os documentos vinculados a ele também serão cancelados." />
+  <c-ui.modals.attach_signed_modal />
 {% endblock %}
