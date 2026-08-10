@@ -72,12 +72,12 @@ html[data-theme="dark"] .pt-activity__toolbar--panel {
   input.cv-field__control.pt-activity__search-input,
 .pt-activity__preset-select .custom-select__trigger,
 .pt-activity__search .pt-activity__search-input {
-  background: var(--step1-panel, var(--color-surface-soft)) !important;
-  background-color: var(--step1-panel, var(--color-surface-soft)) !important;
-  background-image: none !important;
-  border-color: transparent !important;
+  background: var(--step1-panel, var(--color-surface-soft));
+  background-color: var(--step1-panel, var(--color-surface-soft));
+  background-image: none;
+  border-color: transparent;
   border-radius: 12px;
-  box-shadow: none !important;
+  box-shadow: none;
 }
 
 .pt-activity__preset-select .custom-select__trigger {
