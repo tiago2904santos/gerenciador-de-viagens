@@ -119,3 +119,76 @@ class AsReguasUsamOAtalhoTests(SimpleTestCase):
                 cruas.append(caminho)
             self.assertIn("abrir_chromium", texto, f"{caminho} não usa o atalho")
         self.assertEqual(cruas, [], "voltou ao launch cru — ver NOVO-83")
+
+
+class EsperarLayoutEstavelTests(SimpleTestCase):
+    """NOVO-84: medir só depois que a página para de crescer."""
+
+    def test_o_orcamento_e_repassado_ao_navegador(self):
+        from scripts import medir_divergencia_tema as medidor
+
+        pagina = mock.Mock()
+        pagina.evaluate.return_value = {"estavel": True, "voltas": 3, "medida": "100x50x100"}
+        resultado = medidor._esperar_layout_estavel(pagina, tentativas=7, intervalo_ms=11)
+
+        self.assertTrue(resultado["estavel"])
+        _script, argumentos = pagina.evaluate.call_args.args
+        self.assertEqual(argumentos, {"tentativas": 7, "intervaloMs": 11})
+
+    def test_o_erro_de_ordem_passa_a_dizer_a_rota_e_se_assentou(self):
+        """Antes a mensagem não dizia nem qual rota era — eu tive que deduzir
+        contando linhas de log. Agora ela carrega as duas informações que
+        separam 'o instrumento falhou' de 'a página não para de mudar'."""
+        from scripts import medir_divergencia_tema as medidor
+
+        rota = mock.Mock(slug="roteiros-editar", path="/roteiros/1/editar/", requires_auth=True)
+        pagina = mock.Mock()
+        pagina.goto.return_value = mock.Mock(status=200)
+        pagina.url = "http://127.0.0.1:8000/roteiros/1/editar/"
+
+        with mock.patch.object(medidor, "_disable_motion"), mock.patch.object(
+            medidor, "is_valid_final_url", return_value=True
+        ), mock.patch.object(
+            medidor,
+            "_esperar_layout_estavel",
+            return_value={"estavel": False, "voltas": 40, "medida": "4423x500x4423"},
+        ), mock.patch.object(
+            medidor, "_capture_order", return_value={"difference_keys": set()}
+        ), mock.patch.object(
+            medidor, "_summarize_pair", side_effect=RuntimeError("a ordem de captura alterou")
+        ):
+            with self.assertRaises(RuntimeError) as caixa:
+                medidor._measure_route(pagina, rota, "http://127.0.0.1:8000", 30000)
+
+        mensagem = str(caixa.exception)
+        self.assertIn("roteiros-editar", mensagem)
+        self.assertIn("layout estável: False", mensagem)
+        self.assertIn("4423x500x4423", mensagem)
+
+    def test_a_espera_acontece_antes_da_captura(self):
+        """Esperar depois de capturar não serviria de nada."""
+        from scripts import medir_divergencia_tema as medidor
+
+        ordem = []
+        rota = mock.Mock(slug="x", path="/x/", requires_auth=True)
+        pagina = mock.Mock()
+        pagina.goto.return_value = mock.Mock(status=200)
+        pagina.url = "http://127.0.0.1:8000/x/"
+
+        with mock.patch.object(medidor, "_disable_motion"), mock.patch.object(
+            medidor, "is_valid_final_url", return_value=True
+        ), mock.patch.object(
+            medidor,
+            "_esperar_layout_estavel",
+            side_effect=lambda *a, **k: (ordem.append("espera"), {"estavel": True, "medida": "1x1x1"})[1],
+        ), mock.patch.object(
+            medidor,
+            "_capture_order",
+            side_effect=lambda *a, **k: (ordem.append("captura"), {"difference_keys": set()})[1],
+        ), mock.patch.object(
+            medidor, "_summarize_pair", return_value={}
+        ):
+            medidor._measure_route(pagina, rota, "http://127.0.0.1:8000", 30000)
+
+        self.assertEqual(ordem[0], "espera")
+        self.assertEqual(ordem.count("captura"), 2)
