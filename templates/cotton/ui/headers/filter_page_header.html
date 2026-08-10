@@ -1,0 +1,120 @@
+{% cotton:vars abas advanced band_tabs_template cargo_filter combustivel_filter current_aba date_end_id date_picker_id date_start_id extra_class eyebrow form_action hide_date_filter next_url primary_action_label primary_action_url q search_aria_label search_clear_url search_name search_placeholder search_value sort sort_options status status_label status_name status_options status_value status_variant tabs_aria_label temporal temporal_options title unidade_filter viagem_ate viagem_de %}
+{# filter_page_header.html — cabeçalho canônico de listas com filtros. #}
+{% if form_action %}
+  <form class="list-header filter-header{% if extra_class %} {{ extra_class }}{% endif %}" method="get" action="{{ form_action }}" data-collection-form>
+{% else %}
+  <div class="list-header filter-header{% if extra_class %} {{ extra_class }}{% endif %}">
+{% endif %}
+
+  {% include "components/ui/headers/_list_header_band.html" with title=title eyebrow=eyebrow status_label=status_label status_variant=status_variant band_tabs_template=band_tabs_template abas=abas tabs_aria_label=tabs_aria_label only %}
+
+  {% if advanced %}
+  <div class="list-header__rail list-header__rail--advanced">
+    <div class="list-header__filters list-header__filters--advanced">
+      <div class="list-header__search list-header__search--with-icon">
+        <span class="list-header__search-icon" aria-hidden="true">
+          {% include "components/ui/icons/icon.html" with icon="search" only %}
+        </span>
+        <input
+          class="list-header__search-input header-filter-input"
+          type="search"
+          name="{{ search_name|default:'q' }}"
+          placeholder="{{ search_placeholder|default:'Buscar...' }}"
+          aria-label="{{ search_aria_label|default:search_placeholder|default:'Buscar' }}"
+          data-collection-filter="search"
+          {% if q %}value="{{ q }}"{% endif %}
+        >
+      </div>
+
+      {% if current_aba %}<input type="hidden" name="aba" value="{{ current_aba }}">{% endif %}
+
+      {% if status_options %}
+      <div class="list-header__select filter-bar__select custom-select" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
+        <select name="{{ status_name|default:'status' }}" aria-label="Status" data-collection-filter="select">
+          {% for opt in status_options %}
+            <option value="{{ opt.value }}"{% if opt.value == status %} selected{% endif %}>{{ opt.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      {% if temporal_options %}
+      <div class="list-header__select filter-bar__select custom-select" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
+        <select name="temporal" aria-label="Período da viagem" data-collection-filter="select">
+          {% for opt in temporal_options %}
+            <option value="{{ opt.value }}"{% if opt.value == temporal %} selected{% endif %}>{{ opt.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      {% if sort_options %}
+      <div class="list-header__select filter-bar__select custom-select" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
+        <select name="sort" aria-label="Ordenar por" data-collection-filter="select">
+          {% for opt in sort_options %}
+            <option value="{{ opt.value }}"{% if opt.value == sort or not sort and forloop.first %} selected{% endif %}>{{ opt.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      {% if not hide_date_filter %}
+      {% include "components/ui/forms/date_picker.html" with mode="range" control_variant="filter-pill" picker_id=date_picker_id|default:"list-filter-date-picker" extra_class="travel-period-filter" trigger_label="Período da viagem" trigger_aria_label="Filtrar por período da viagem" start_hidden_id=date_start_id|default:"id_list_viagem_de" end_hidden_id=date_end_id|default:"id_list_viagem_ate" start_hidden_name="viagem_de" end_hidden_name="viagem_ate" start_hidden_value=viagem_de end_hidden_value=viagem_ate initial_date=viagem_de filter_date=True show_summary=False only %}
+      {% endif %}
+
+      {% if search_clear_url %}
+        {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" only %}
+      {% endif %}
+    </div>
+  </div>
+  {% else %}
+  <div class="list-header__rail">
+    <div class="list-header__filters">
+      <div class="list-header__search">
+        <input
+          class="list-header__search-input header-filter-input"
+          type="search"
+          name="{{ search_name|default:'q' }}"
+          placeholder="{{ search_placeholder|default:'Buscar...' }}"
+          aria-label="{{ search_placeholder|default:'Buscar' }}"
+          data-collection-filter="search"
+          {% if search_value %}value="{{ search_value }}"{% endif %}
+        >
+      </div>
+      {% if current_aba %}<input type="hidden" name="aba" value="{{ current_aba }}">{% endif %}
+      {% if cargo_filter %}<input type="hidden" name="cargo" value="{{ cargo_filter }}">{% endif %}
+      {% if combustivel_filter %}<input type="hidden" name="combustivel" value="{{ combustivel_filter }}">{% endif %}
+      {% if unidade_filter %}<input type="hidden" name="unidade" value="{{ unidade_filter }}">{% endif %}
+      {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+      {% if status_options %}
+        <div class="list-header__select">
+          <select class="header-filter-select" name="{{ status_name|default:'status' }}" aria-label="{{ status_label|default:'Status' }}" data-collection-filter="status">
+            {% for option in status_options %}
+              <option value="{{ option.value }}"{% if option.value == status_value %} selected{% endif %}>{{ option.label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      {% endif %}
+      {% if search_value or status_value or primary_action_label and primary_action_url %}
+        <div class="list-header__actions">
+          {% if search_value or status_value %}
+            {% if search_clear_url and next_url %}
+              {% include "components/ui/buttons/button.html" with href=search_clear_url|add:"?next="|add:next_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
+            {% elif search_clear_url %}
+              {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
+            {% endif %}
+          {% endif %}
+          {% if primary_action_label and primary_action_url %}
+            {% include "components/ui/buttons/button.html" with href=primary_action_url label=primary_action_label variant="primary" icon="plus" extra_class="cv-btn--control" only %}
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+{% if form_action %}
+  </form>
+{% else %}
+  </div>
+{% endif %}

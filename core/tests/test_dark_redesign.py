@@ -144,7 +144,9 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_page_header_has_one_canonical_markup_without_legacy_wrappers(self):
         headers = Path(settings.BASE_DIR) / "templates" / "components" / "ui" / "headers"
-        canonical = (headers / "page_header.html").read_text(encoding="utf-8")
+        canonical = (
+            Path(settings.BASE_DIR) / "templates" / "cotton" / "ui" / "headers" / "page_header.html"
+        ).read_text(encoding="utf-8")
 
         self.assertIn('<header class="page-header-stack', canonical)
         self.assertIn("components/ui/buttons/button.html", canonical)
@@ -164,7 +166,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         canonical = (
             Path(settings.BASE_DIR)
             / "templates"
-            / "components"
+            / "cotton"
             / "ui"
             / "headers"
             / "page_header.html"
