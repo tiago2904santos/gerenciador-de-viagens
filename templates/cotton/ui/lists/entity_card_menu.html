@@ -22,5 +22,5 @@ de servidor (39%).
   data-overlay-trigger data-overlay-kind="menu"
   data-overlay-target="{{ menu.id }}"
   {% if menu.src %}data-overlay-src="{{ menu.src }}"{% endif %}
->{% include "components/ui/icons/icon.html" with icon=menu.trigger_icon|default:"folder" only %}</button>
-{% if not menu.src %}{% include "components/ui/lists/entity_card_menu_body.html" with menu=menu csrf_token=csrf_token only %}{% endif %}
+>{% with cotton_attr_icon=menu.trigger_icon|default:"folder" %}<c-ui.icons.icon :icon="cotton_attr_icon" only />{% endwith %}</button>
+{% if not menu.src %}<c-ui.lists.entity_card_menu_body :menu="menu" :csrf_token="csrf_token" only />{% endif %}

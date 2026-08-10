@@ -13,8 +13,10 @@ class MigracaoCallSitesCottonTests(SimpleTestCase):
 
         self.assertEqual(
             converter_include(origem),
+            '{% with cotton_attr_icon=icone|default:"document" %}'
             '<c-ui.buttons.button label="Abrir documento" '
-            ':href="arquivo.url" :icon=\'icone|default:"document"\' only />',
+            ':href="arquivo.url" :icon="cotton_attr_icon" only />'
+            '{% endwith %}',
         )
 
     def test_converte_include_sem_parametros(self):

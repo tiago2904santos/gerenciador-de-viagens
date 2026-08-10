@@ -5,6 +5,6 @@
 
 {% block content %}
 <div class="page-shell cv-page page-shell--standard-simple cv-page--narrow">
-  {% include "components/form/card.html" with title=page_title description=page_description title_id="create-draft-title" heading_level=1 body_template="components/partials/_create_draft_body.html" %}
+  <c-form.card :title="page_title" :description="page_description" title_id="create-draft-title" :heading_level="1" body_template="components/partials/_create_draft_body.html" />
 </div>
 {% endblock %}

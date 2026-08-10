@@ -149,8 +149,8 @@ class DarkRedesignContractTests(SimpleTestCase):
         ).read_text(encoding="utf-8")
 
         self.assertIn('<header class="page-header-stack', canonical)
-        self.assertIn("components/ui/buttons/button.html", canonical)
-        self.assertIn("components/ui/badges/status_badge.html", canonical)
+        self.assertIn("<c-ui.buttons.button", canonical)
+        self.assertIn("<c-ui.badges.status_badge", canonical)
 
         for wrapper_name in (
             "header_stack_simple.html",
@@ -214,7 +214,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("notice", alert)
         self.assertIn("notice--", alert)
         self.assertIn("action_label and action_url", empty_state)
-        self.assertIn('components/ui/buttons/button.html', empty_state)
+        self.assertIn('<c-ui.buttons.button', empty_state)
         # `HT-03`: a guarda era `form.errors or errors`, num `{% if %}` só. Virou dois
         # ramos porque a forma antiga **estourava** quando o chamador passava `errors`
         # sem `form`: variável em argumento de filtro levanta `VariableDoesNotExist`
@@ -275,7 +275,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             with self.subTest(modal=filename):
                 source = (modals / filename).read_text(encoding="utf-8")
                 self.assertIn("cv-dialog__panel", source)
-                self.assertIn("components/ui/modals/dialog_header.html", source)
+                self.assertIn("<c-ui.modals.dialog_header", source)
                 self.assertIn("cv-dialog__body", source)
                 self.assertIn("cv-dialog__footer", source)
                 self.assertIn(hook, source)
@@ -426,7 +426,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         ).read_text(encoding="utf-8")
 
         self.assertIn("confirm-page", component)
-        self.assertIn("href=back_url", component)
+        self.assertIn(':href="back_url"', component)
         self.assertIn('variant="danger"', component)
         self.assertIn('type="submit"', component)
 
@@ -497,8 +497,8 @@ class DarkRedesignContractTests(SimpleTestCase):
         for contract in (
             "entity-card",
             "entity-card__body",
-            "components/ui/lists/entity_card_header.html",
-            "components/ui/lists/entity_card_footer.html",
+            "<c-ui.lists.entity_card_header",
+            "<c-ui.lists.entity_card_footer",
         ):
             self.assertIn(contract, canonical)
 
@@ -587,7 +587,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertNotIn("dashboard-page", dashboard)
         self.assertNotIn("summary_card.html", dashboard)
         self.assertIn("cv-module-card", module_card)
-        self.assertIn('components/ui/buttons/button.html', module_card)
+        self.assertIn('<c-ui.buttons.button', module_card)
 
         cadastros = (templates / "cadastros" / "index.html").read_text(encoding="utf-8")
         # `cadastros-hub` virou `catalog-hub` na reescrita visual da

@@ -1,2 +1,2 @@
 {% cotton:vars back_url message object_label preview_label preview_text primary_label %}
-{% include "components/ui/modals/confirm_delete.html" with object_label=object_label message=message preview_label=preview_label preview_text=preview_text primary_label=primary_label back_url=back_url only %}
+<c-ui.modals.confirm_delete :object_label="object_label" :message="message" :preview_label="preview_label" :preview_text="preview_text" :primary_label="primary_label" :back_url="back_url" only />

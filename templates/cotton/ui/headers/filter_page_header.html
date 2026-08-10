@@ -6,14 +6,14 @@
   <div class="list-header filter-header{% if extra_class %} {{ extra_class }}{% endif %}">
 {% endif %}
 
-  {% include "components/ui/headers/_list_header_band.html" with title=title eyebrow=eyebrow status_label=status_label status_variant=status_variant band_tabs_template=band_tabs_template abas=abas tabs_aria_label=tabs_aria_label only %}
+  <c-ui.headers._list_header_band :title="title" :eyebrow="eyebrow" :status_label="status_label" :status_variant="status_variant" :band_tabs_template="band_tabs_template" :abas="abas" :tabs_aria_label="tabs_aria_label" only />
 
   {% if advanced %}
   <div class="list-header__rail list-header__rail--advanced">
     <div class="list-header__filters list-header__filters--advanced">
       <div class="list-header__search list-header__search--with-icon">
         <span class="list-header__search-icon" aria-hidden="true">
-          {% include "components/ui/icons/icon.html" with icon="search" only %}
+          <c-ui.icons.icon icon="search" only />
         </span>
         <input
           class="list-header__search-input header-filter-input"
@@ -59,11 +59,11 @@
       {% endif %}
 
       {% if not hide_date_filter %}
-      {% include "components/ui/forms/date_picker.html" with mode="range" control_variant="filter-pill" picker_id=date_picker_id|default:"list-filter-date-picker" extra_class="travel-period-filter" trigger_label="Período da viagem" trigger_aria_label="Filtrar por período da viagem" start_hidden_id=date_start_id|default:"id_list_viagem_de" end_hidden_id=date_end_id|default:"id_list_viagem_ate" start_hidden_name="viagem_de" end_hidden_name="viagem_ate" start_hidden_value=viagem_de end_hidden_value=viagem_ate initial_date=viagem_de filter_date=True show_summary=False only %}
+      {% with cotton_attr_picker_id=date_picker_id|default:"list-filter-date-picker" cotton_attr_start_hidden_id=date_start_id|default:"id_list_viagem_de" cotton_attr_end_hidden_id=date_end_id|default:"id_list_viagem_ate" %}<c-ui.forms.date_picker mode="range" control_variant="filter-pill" :picker_id="cotton_attr_picker_id" extra_class="travel-period-filter" trigger_label="Período da viagem" trigger_aria_label="Filtrar por período da viagem" :start_hidden_id="cotton_attr_start_hidden_id" :end_hidden_id="cotton_attr_end_hidden_id" start_hidden_name="viagem_de" end_hidden_name="viagem_ate" :start_hidden_value="viagem_de" :end_hidden_value="viagem_ate" :initial_date="viagem_de" :filter_date="True" :show_summary="False" only />{% endwith %}
       {% endif %}
 
       {% if search_clear_url %}
-        {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" only %}
+        <c-ui.buttons.button :href="search_clear_url" label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" only />
       {% endif %}
     </div>
   </div>
@@ -99,13 +99,13 @@
         <div class="list-header__actions">
           {% if search_value or status_value %}
             {% if search_clear_url and next_url %}
-              {% include "components/ui/buttons/button.html" with href=search_clear_url|add:"?next="|add:next_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
+              {% with cotton_attr_href=search_clear_url|add:"?next="|add:next_url %}<c-ui.buttons.button :href="cotton_attr_href" label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" :data_cv_filter_clear="True" only />{% endwith %}
             {% elif search_clear_url %}
-              {% include "components/ui/buttons/button.html" with href=search_clear_url label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" data_cv_filter_clear=True only %}
+              <c-ui.buttons.button :href="search_clear_url" label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" :data_cv_filter_clear="True" only />
             {% endif %}
           {% endif %}
           {% if primary_action_label and primary_action_url %}
-            {% include "components/ui/buttons/button.html" with href=primary_action_url label=primary_action_label variant="primary" icon="plus" extra_class="cv-btn--control" only %}
+            <c-ui.buttons.button :href="primary_action_url" :label="primary_action_label" variant="primary" icon="plus" extra_class="cv-btn--control" only />
           {% endif %}
         </div>
       {% endif %}

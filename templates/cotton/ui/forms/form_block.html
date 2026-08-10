@@ -45,7 +45,7 @@
             {% include acoes %}
           {% endwith %}
         {% else %}
-          {% include "components/ui/buttons/button.html" with href=action_url label=action_label variant=action_variant|default:"secondary" data_autosave_link=action_autosave only %}
+          {% with cotton_attr_variant=action_variant|default:"secondary" %}<c-ui.buttons.button :href="action_url" :label="action_label" :variant="cotton_attr_variant" :data_autosave_link="action_autosave" only />{% endwith %}
         {% endif %}
       </div>
     {% endif %}
@@ -101,7 +101,7 @@
             {% include acoes %}
           {% endwith %}
         {% else %}
-          {% include "components/ui/buttons/button.html" with href=action_url label=action_label variant=action_variant|default:"secondary" data_autosave_link=action_autosave only %}
+          {% with cotton_attr_variant=action_variant|default:"secondary" %}<c-ui.buttons.button :href="action_url" :label="action_label" :variant="cotton_attr_variant" :data_autosave_link="action_autosave" only />{% endwith %}
         {% endif %}
       </div>
     {% endif %}

@@ -4,9 +4,9 @@
   <div class="card-footer__secondary">
     {% if secondary_label %}
       {% if secondary_url %}
-        {% include "components/ui/buttons/button.html" with href=secondary_url label=secondary_label variant=secondary_variant|default:"secondary" icon=secondary_icon|default:"arrow-left" link_target=secondary_link_target link_rel=secondary_link_rel only %}
+        {% with cotton_attr_variant=secondary_variant|default:"secondary" cotton_attr_icon=secondary_icon|default:"arrow-left" %}<c-ui.buttons.button :href="secondary_url" :label="secondary_label" :variant="cotton_attr_variant" :icon="cotton_attr_icon" :link_target="secondary_link_target" :link_rel="secondary_link_rel" only />{% endwith %}
       {% else %}
-        {% include "components/ui/buttons/button.html" with label=secondary_label variant=secondary_variant|default:"secondary" icon=secondary_icon|default:"arrow-left" type="submit" extra_class=secondary_extra_class name="wizard_action" value=secondary_action|default:"wizard_back" only %}
+        {% with cotton_attr_variant=secondary_variant|default:"secondary" cotton_attr_icon=secondary_icon|default:"arrow-left" cotton_attr_value=secondary_action|default:"wizard_back" %}<c-ui.buttons.button :label="secondary_label" :variant="cotton_attr_variant" :icon="cotton_attr_icon" type="submit" :extra_class="secondary_extra_class" name="wizard_action" :value="cotton_attr_value" only />{% endwith %}
       {% endif %}
     {% endif %}
   </div>
@@ -14,9 +14,9 @@
   <div class="card-footer__primary">
     {% if primary_label %}
       {% if primary_url %}
-        {% include "components/ui/buttons/button.html" with href=primary_url label=primary_label variant=primary_variant|default:"primary" icon=primary_icon|default:"arrow-right" icon_after=True link_target=primary_link_target link_rel=primary_link_rel only %}
+        {% with cotton_attr_variant=primary_variant|default:"primary" cotton_attr_icon=primary_icon|default:"arrow-right" %}<c-ui.buttons.button :href="primary_url" :label="primary_label" :variant="cotton_attr_variant" :icon="cotton_attr_icon" :icon_after="True" :link_target="primary_link_target" :link_rel="primary_link_rel" only />{% endwith %}
       {% else %}
-        {% include "components/ui/buttons/button.html" with label=primary_label variant=primary_variant|default:"primary" icon=primary_icon|default:"arrow-right" icon_after=True type="submit" extra_class=primary_extra_class name="wizard_action" value=primary_action only %}
+        {% with cotton_attr_variant=primary_variant|default:"primary" cotton_attr_icon=primary_icon|default:"arrow-right" %}<c-ui.buttons.button :label="primary_label" :variant="cotton_attr_variant" :icon="cotton_attr_icon" :icon_after="True" type="submit" :extra_class="primary_extra_class" name="wizard_action" :value="primary_action" only />{% endwith %}
       {% endif %}
     {% endif %}
   </div>

@@ -16,7 +16,7 @@
              rel="noopener noreferrer"
              aria-label="Visualizar arquivo"
              data-tooltip="Visualizar">
-            {% include "components/ui/icons/icon.html" with icon="eye" only %}
+            <c-ui.icons.icon icon="eye" only />
           </a>
           {% if delete_form %}
             <form class="inline-form" method="post" action="{{ anexo.delete_url }}">
@@ -26,7 +26,7 @@
                       aria-label="Excluir documento"
                       data-tooltip="Excluir"
                       data-confirm-submit data-confirm-message="{{ delete_confirm_message|default:'Remover este documento?' }}">
-                {% include "components/ui/icons/icon.html" with icon="delete" only %}
+                <c-ui.icons.icon icon="delete" only />
               </button>
             </form>
           {% else %}
@@ -34,7 +34,7 @@
                     type="button"
                     aria-label="Excluir arquivo"
                     data-tooltip="Excluir">
-              {% include "components/ui/icons/icon.html" with icon="delete" only %}
+              <c-ui.icons.icon icon="delete" only />
             </button>
           {% endif %}
         </div>

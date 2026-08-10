@@ -2,7 +2,7 @@
 <section class="confirm-page form-section" aria-labelledby="confirm-delete-page-title">
   <header class="confirm-page__header section-header">
     <span class="confirm-page__icon" aria-hidden="true">
-      {% include "components/ui/icons/icon.html" with icon="delete" only %}
+      <c-ui.icons.icon icon="delete" only />
     </span>
     <div class="section-header__copy">
       <span class="confirm-page__eyebrow">Confirmação permanente</span>
@@ -21,7 +21,7 @@
     <p class="confirm-page__notice">A exclusão não poderá ser desfeita.</p>
   </div>
   <footer class="card-footer confirm-page__footer">
-    {% include "components/ui/buttons/button.html" with href=back_url label="Cancelar" variant="secondary" icon="arrow-left" only %}
-    {% include "components/ui/buttons/button.html" with label=primary_label|default:"Excluir" variant="danger" icon="delete" type="submit" only %}
+    <c-ui.buttons.button :href="back_url" label="Cancelar" variant="secondary" icon="arrow-left" only />
+    {% with cotton_attr_label=primary_label|default:"Excluir" %}<c-ui.buttons.button :label="cotton_attr_label" variant="danger" icon="delete" type="submit" only />{% endwith %}
   </footer>
 </section>

@@ -247,25 +247,35 @@ class ErroDoCampoTests(SimpleTestCase):
 _INCLUDE_DE_ERRO = re.compile(
     r'\{%\s*include\s+"components/ui/feedback/field_error\.html"\s+with\s+(?P<args>[^%]*?)%\}',
 )
+_COTTON_DE_ERRO = re.compile(
+    r'<c-ui\.feedback\.field_error\s+(?P<args>[^>]*?)/>',
+)
 _ERRORS_ARG = re.compile(r'errors=(?P<valor>"[^"]*"|[^\s]+)')
+
+
+def _normaliza_args_cotton(args):
+    return re.sub(r':([A-Za-z_]\w*)=(["\'])(.*?)\2', r'\1=\3', args)
 
 
 def chamadores_de_field_error():
     """`(arquivo, linha, expressão de errors, args)` de cada include do componente."""
     for caminho in sorted((RAIZ / "templates").rglob("*.html")):
         texto = caminho.read_text(encoding="utf-8")
-        if "feedback/field_error.html" not in texto:
+        if "feedback/field_error.html" not in texto and "ui.feedback.field_error" not in texto:
             continue
-        for achado in _INCLUDE_DE_ERRO.finditer(texto):
-            args = achado.group("args")
-            valor = _ERRORS_ARG.search(args)
-            linha = texto.count("\n", 0, achado.start()) + 1
-            yield (
-                caminho.relative_to(RAIZ).as_posix(),
-                linha,
-                valor.group("valor") if valor else None,
-                args,
-            )
+        for padrao, cotton in ((_INCLUDE_DE_ERRO, False), (_COTTON_DE_ERRO, True)):
+            for achado in padrao.finditer(texto):
+                args = achado.group("args")
+                if cotton:
+                    args = _normaliza_args_cotton(args)
+                valor = _ERRORS_ARG.search(args)
+                linha = texto.count("\n", 0, achado.start()) + 1
+                yield (
+                    caminho.relative_to(RAIZ).as_posix(),
+                    linha,
+                    valor.group("valor") if valor else None,
+                    args,
+                )
 
 
 class ContratoDosChamadoresTests(SimpleTestCase):
@@ -333,9 +343,12 @@ class ContratoDosChamadoresTests(SimpleTestCase):
         for caminho in sorted((RAIZ / "templates").rglob("*.html")):
             texto = caminho.read_text(encoding="utf-8")
             for achado in re.finditer(
-                r'\{%\s*include\s+"components/ui/forms/card_toggle\.html"\s+with\s+([^%]*?)%\}', texto,
+                r'(?:\{%\s*include\s+"components/ui/forms/card_toggle\.html"\s+with\s+([^%]*?)%\}'
+                r'|<c-ui\.forms\.card_toggle\s+([^>]*?)/>)',
+                texto,
             ):
-                if "description=" not in achado.group(1):
+                args = achado.group(1) or achado.group(2)
+                if "description=" not in args:
                     linha = texto.count("\n", 0, achado.start()) + 1
                     diretos.append(f"{caminho.relative_to(RAIZ).as_posix()}:{linha}")
 

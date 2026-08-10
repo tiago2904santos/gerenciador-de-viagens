@@ -9,7 +9,7 @@
     aria-describedby="cancel-reason-description"
     tabindex="-1"
   >
-    {% include "components/ui/modals/dialog_header.html" with icon="ban" tone="warning" eyebrow="Confirmar cancelamento" title=cancel_modal_title|default:"Cancelar registro?" title_id="cancel-reason-title" data_cancel_modal_cancel=True only %}
+    {% with cotton_attr_title=cancel_modal_title|default:"Cancelar registro?" %}<c-ui.modals.dialog_header icon="ban" tone="warning" eyebrow="Confirmar cancelamento" :title="cotton_attr_title" title_id="cancel-reason-title" :data_cancel_modal_cancel="True" only />{% endwith %}
 
     <form method="post" class="cv-dialog__form cancel-reason-modal__form" data-cancel-reason-form>
       <div class="cv-dialog__body">
@@ -31,8 +31,8 @@
         </div>
       </div>
       <div class="cv-dialog__footer delete-confirm-modal__actions">
-        {% include "components/ui/buttons/button.html" with label="Voltar" variant="secondary" type="button" data_cancel_modal_cancel=True only %}
-        {% include "components/ui/buttons/button.html" with label="Cancelar registro" variant="danger" type="submit" icon="ban" only %}
+        <c-ui.buttons.button label="Voltar" variant="secondary" type="button" :data_cancel_modal_cancel="True" only />
+        <c-ui.buttons.button label="Cancelar registro" variant="danger" type="submit" icon="ban" only />
       </div>
     </form>
   </section>

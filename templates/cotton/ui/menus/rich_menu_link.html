@@ -9,7 +9,7 @@
   {% if data_download_all_termos %}data-download-all-termos{% endif %}
 >
   <span class="action-menu__item-icon{% if tone %} action-menu__item-icon--{{ tone }}{% endif %}" aria-hidden="true">
-    {% include "components/ui/icons/icon.html" with icon=icon only %}
+    <c-ui.icons.icon :icon="icon" only />
   </span>
   <span class="action-menu__item-copy">
     <strong>{{ title }}</strong>

@@ -11,7 +11,7 @@
   <div class="entity-card__body record-card__layout">
 
     {% if card.header %}
-      {% include "components/ui/lists/entity_card_header.html" with header=card.header only %}
+      <c-ui.lists.entity_card_header :header="card.header" only />
     {% endif %}
 
     {% if card.cancel_note %}
@@ -23,7 +23,7 @@
     {% include body_template with card=card csrf_token=csrf_token current_url=current_url only %}
 
     {% if card.footer %}
-      {% include "components/ui/lists/entity_card_footer.html" with footer=card.footer csrf_token=csrf_token only %}
+      <c-ui.lists.entity_card_footer :footer="card.footer" :csrf_token="csrf_token" only />
     {% elif footer_template %}
       {% include footer_template with card=card csrf_token=csrf_token current_url=current_url only %}
     {% endif %}

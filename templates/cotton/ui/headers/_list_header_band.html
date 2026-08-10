@@ -10,7 +10,7 @@ quando a lista alterna por toggle em vez das abas da barra de ferramentas.
     <div class="list-header__title-row">
       <h1 class="list-header__title">{{ title }}</h1>
       {% if status_label %}
-        {% include "components/ui/badges/status_badge.html" with label=status_label variant=status_variant|default:"draft" extra_class="page-header-status-chip" only %}
+        {% with cotton_attr_variant=status_variant|default:"draft" %}<c-ui.badges.status_badge :label="status_label" :variant="cotton_attr_variant" extra_class="page-header-status-chip" only />{% endwith %}
       {% endif %}
     </div>
   </div>

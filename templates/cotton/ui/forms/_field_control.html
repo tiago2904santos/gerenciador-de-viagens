@@ -16,11 +16,11 @@
   um `<select>` sem classe perdia o rótulo inteiro em silêncio.
 {% endcomment %}
 {% if field.field.widget.allow_multiple_selected and field.field.widget.input_type == 'select' %}
-  {% include "components/ui/forms/multiselect.html" with field=field only %}
+  <c-ui.forms.multiselect :field="field" only />
 {% elif "search-picker__native" in classe_do_widget %}
   {{ field.as_widget }}
 {% elif field.field.widget.input_type == 'select' %}
-  {% include "components/ui/forms/select.html" with field=field only %}
+  <c-ui.forms.select :field="field" only />
 {% else %}
   {{ field.as_widget }}
 {% endif %}

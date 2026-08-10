@@ -9,7 +9,7 @@
     aria-describedby="delete-confirm-description"
     tabindex="-1"
   >
-    {% include "components/ui/modals/dialog_header.html" with icon="delete" tone="danger" eyebrow="Confirmar exclusão" title=delete_modal_title|default:"Excluir registro?" title_id="delete-confirm-title" data_delete_modal_cancel=True only %}
+    {% with cotton_attr_title=delete_modal_title|default:"Excluir registro?" %}<c-ui.modals.dialog_header icon="delete" tone="danger" eyebrow="Confirmar exclusão" :title="cotton_attr_title" title_id="delete-confirm-title" :data_delete_modal_cancel="True" only />{% endwith %}
 
     <div class="cv-dialog__body delete-confirm-modal__body">
       <p class="cv-dialog__message delete-confirm-modal__message" id="delete-confirm-description">
@@ -21,8 +21,8 @@
 
     <form method="post" class="cv-dialog__footer delete-confirm-modal__actions" data-delete-confirm-form>
       {% csrf_token %}
-      {% include "components/ui/buttons/button.html" with label="Cancelar" variant="secondary" type="button" data_delete_modal_cancel=True only %}
-      {% include "components/ui/buttons/button.html" with label="Excluir" variant="danger" type="submit" icon="delete" only %}
+      <c-ui.buttons.button label="Cancelar" variant="secondary" type="button" :data_delete_modal_cancel="True" only />
+      <c-ui.buttons.button label="Excluir" variant="danger" type="submit" icon="delete" only />
     </form>
   </section>
 </div>

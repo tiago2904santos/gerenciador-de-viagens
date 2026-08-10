@@ -9,7 +9,7 @@
           data-location-drag-handle
           title="Arrastar para reordenar"
           aria-label="Arrastar para reordenar">
-      {% include "components/ui/icons/icon.html" with icon="grip" only %}
+      <c-ui.icons.icon icon="grip" only />
     </span>
     <button type="button"
             class="route-destinos-add ordered-field-row__add"
@@ -50,7 +50,7 @@
         data-location-drag-handle
         title="Arrastar para reordenar"
         aria-label="Arrastar para reordenar">
-    {% include "components/ui/icons/icon.html" with icon="grip" only %}
+    <c-ui.icons.icon icon="grip" only />
   </span>
   {% endif %}
   <span class="ordered-field-row__badge{% if hide_order_badge %} sr-only{% endif %}" data-location-order aria-hidden="true">{{ row_ordinal|default:1 }}</span>

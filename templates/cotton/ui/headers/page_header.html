@@ -13,7 +13,7 @@
         <h1 class="page-header-band__title">{{ title }}</h1>
       </div>
       {% if status_label %}
-        {% include "components/ui/badges/status_badge.html" with label=status_label variant=status_variant|default:"draft" extra_class="page-header-status-chip" only %}
+        {% with cotton_attr_variant=status_variant|default:"draft" %}<c-ui.badges.status_badge :label="status_label" :variant="cotton_attr_variant" extra_class="page-header-status-chip" only />{% endwith %}
       {% endif %}
     </div>
   </div>
@@ -35,9 +35,9 @@
     {% if back_label or primary_action_label %}
       <div class="page-header-rail__actions">
         {% if primary_action_label %}
-          {% include "components/ui/buttons/button.html" with href=primary_action_url label=primary_action_label variant="primary" icon="check" type="submit" data_autosave_link=True only %}
+          <c-ui.buttons.button :href="primary_action_url" :label="primary_action_label" variant="primary" icon="check" type="submit" :data_autosave_link="True" only />
         {% elif back_label %}
-          {% include "components/ui/buttons/button.html" with href=back_url label=back_label variant="back-list" icon="list" type="button" data_autosave_link=True only %}
+          <c-ui.buttons.button :href="back_url" :label="back_label" variant="back-list" icon="list" type="button" :data_autosave_link="True" only />
         {% endif %}
       </div>
     {% endif %}

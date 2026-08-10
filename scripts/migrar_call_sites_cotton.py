@@ -63,6 +63,7 @@ def converter_include(tag: str) -> str:
     restante = tokens[2:]
     somente = False
     atributos: list[str] = []
+    aliases: list[str] = []
     if restante:
         if restante[0] == "with":
             restante = restante[1:]
@@ -79,6 +80,10 @@ def converter_include(tag: str) -> str:
         valor_literal = _literal(expressao)
         if valor_literal is not None:
             atributos.append(f"{nome}={expressao}")
+        elif "|" in expressao:
+            alias = f"cotton_attr_{nome}"
+            aliases.append(f"{alias}={expressao}")
+            atributos.append(f':{nome}="{alias}"')
         else:
             atributos.append(_atributo_dinamico(nome, expressao))
 
@@ -87,7 +92,10 @@ def converter_include(tag: str) -> str:
     partes = [f"<c-{nome_componente}", *atributos]
     if somente:
         partes.append("only")
-    return " ".join(partes) + " />"
+    componente = " ".join(partes) + " />"
+    if aliases:
+        return f"{{% with {' '.join(aliases)} %}}{componente}{{% endwith %}}"
+    return componente
 
 
 def converter_texto(texto: str) -> tuple[str, int]:
