@@ -300,10 +300,21 @@ pergunte antes de mesclar. E confira, com o servidor de pé, pelo menos uma tela
 
 ---
 
-### E4 — Os componentes globais viram cotton · `NOVO-71` · risco médio · 4–6 d
+### E4 ✅ — Os componentes globais viram cotton · `NOVO-71` · concluída em 10/08/2026
 
 **Objetivo.** Dar a cada componente global um contrato de parâmetro declarado, em vez de contexto
 herdado por acaso.
+
+**Concluída.** Os **82 componentes globais** agora têm implementação canônica em
+`templates/cotton/**`; os 82 caminhos antigos em `templates/components/**` ficaram como cascas de
+compatibilidade para a migração dos 946 call sites na E5. A conversão foi entregue em 21 commits
+por família, com contrato automatizado cobrindo o inventário completo. A régua da E0 permaneceu
+idêntica nas **129 combinações** (43 rotas × 3 larguras). Localmente, os 1.852 testes foram
+coletados e só restaram as limitações já conhecidas do host Windows; as catracas fecharam em
+`audit_frontend_standards`: **0 erros/240 avisos**, `audit_ui_patterns`: **2.535 suspeitas**,
+`audit_django_architecture`: **78 suspeitas**, e os bundles do shell estão atualizados. O isolamento
+de contexto e a remoção das cascas pertencem deliberadamente à E5, quando os call sites passarem a
+usar slots e atributos Cotton diretamente.
 
 **Arquivos.** `templates/cotton/**` (novos) · `templates/components/**` (viram cascas) ·
 `scripts/audit_ui_patterns.py:10`
