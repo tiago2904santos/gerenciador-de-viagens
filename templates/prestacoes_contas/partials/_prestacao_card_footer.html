@@ -2,7 +2,7 @@
 <div class="entity-card__footer record-card__footer">
   <div class="record-card__footer-actions">
     <div class="record-card__footer-actions-main icon-btn-group">
-      {% include "components/ui/buttons/icon_button.html" with href=card.rt_url action="edit" aria_label="Abrir prestação na etapa 1" tooltip="Abrir prestação" only %}
+      <c-ui.buttons.icon_button :href="card.rt_url" action="edit" aria_label="Abrir prestação na etapa 1" tooltip="Abrir prestação" only />
       <button
         type="button"
         class="icon-btn icon-btn--sign{% if card.despacho_assinado.assinado %} is-assinado{% endif %}"
@@ -20,7 +20,7 @@
         data-attach-signed-current-name="{{ card.despacho_assinado.nome_original }}"
         data-attach-signed-current-view-url="{{ card.despacho_assinado.view_url }}"
         data-attach-signed-current-remove-url="{{ card.despacho_assinado.remover_url }}"
-      >{% include "components/ui/icons/icon.html" with icon="sign" only %}</button>
+      ><c-ui.icons.icon icon="sign" only /></button>
     </div>
 
     <div class="record-card__footer-actions--manage icon-btn-group">
@@ -28,9 +28,9 @@
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ current_url }}">
         {% if card.finalizada %}
-        <button type="submit" class="icon-btn icon-btn--edit" aria-label="Reabrir prestação" data-tooltip="Reabrir prestação">{% include "components/ui/icons/icon.html" with icon="arrow-left" only %}</button>
+        <button type="submit" class="icon-btn icon-btn--edit" aria-label="Reabrir prestação" data-tooltip="Reabrir prestação"><c-ui.icons.icon icon="arrow-left" only /></button>
         {% else %}
-        <button type="submit" class="icon-btn icon-btn--complete" aria-label="Finalizar prestação" data-tooltip="Finalizar prestação">{% include "components/ui/icons/icon.html" with icon="check" only %}</button>
+        <button type="submit" class="icon-btn icon-btn--complete" aria-label="Finalizar prestação" data-tooltip="Finalizar prestação"><c-ui.icons.icon icon="check" only /></button>
         {% endif %}
       </form>
 
@@ -38,9 +38,9 @@
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ current_url }}">
         {% if card.arquivada %}
-        <button type="submit" class="icon-btn icon-btn--edit" aria-label="Desarquivar prestação" data-tooltip="Desarquivar prestação">{% include "components/ui/icons/icon.html" with icon="unarchive" only %}</button>
+        <button type="submit" class="icon-btn icon-btn--edit" aria-label="Desarquivar prestação" data-tooltip="Desarquivar prestação"><c-ui.icons.icon icon="unarchive" only /></button>
         {% else %}
-        <button type="submit" class="icon-btn icon-btn--archive" aria-label="Arquivar prestação" data-tooltip="Arquivar prestação">{% include "components/ui/icons/icon.html" with icon="archive" only %}</button>
+        <button type="submit" class="icon-btn icon-btn--archive" aria-label="Arquivar prestação" data-tooltip="Arquivar prestação"><c-ui.icons.icon icon="archive" only /></button>
         {% endif %}
       </form>
     </div>

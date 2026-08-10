@@ -3,18 +3,18 @@
 {% endcomment %}
 {% include "prestacoes_contas/partials/_prestacao_identificacao_equipe.html" with omit_equipe=True %}
 
-{% include "components/ui/forms/form_block.html" with title="Motorista" description="Motorista efetivo deste diário" section_id="diario-motorista-title" variant="resource" extra_class="travel-document-block oficio-documentos-block" actions_template="prestacoes_contas/partials/_diario_motorista_actions.html" body_template="prestacoes_contas/partials/_diario_motorista_body.html" %}
+<c-ui.forms.form_block title="Motorista" description="Motorista efetivo deste diário" section_id="diario-motorista-title" variant="resource" extra_class="travel-document-block oficio-documentos-block" actions_template="prestacoes_contas/partials/_diario_motorista_actions.html" body_template="prestacoes_contas/partials/_diario_motorista_body.html" />
 
 {% for item in trechos %}
   {% with form=item.form d=item.display %}
     {% with ordem_str=d.ordem|stringformat:"s" %}
-      {% include "components/ui/forms/form_block.html" with title="Trecho "|add:ordem_str|add:" — "|add:d.rota description="Dados do roteiro. Informe KM e abastecimento." variant="resource" extra_class="travel-document-block roteiro-editor__section--retorno route-section-block diario-trecho-block" body_extra_class="roteiro-editor__retorno-body" body_template="prestacoes_contas/partials/_diario_trecho_body.html" %}
+      {% with cotton_attr_title="Trecho "|add:ordem_str|add:" — "|add:d.rota %}<c-ui.forms.form_block :title="cotton_attr_title" description="Dados do roteiro. Informe KM e abastecimento." variant="resource" extra_class="travel-document-block roteiro-editor__section--retorno route-section-block diario-trecho-block" body_extra_class="roteiro-editor__retorno-body" body_template="prestacoes_contas/partials/_diario_trecho_body.html" />{% endwith %}
     {% endwith %}
   {% endwith %}
 {% empty %}
-  {% include "components/ui/forms/form_block.html" with title="Trechos do roteiro" description="Defina o roteiro do ofício para gerar o diário de bordo" section_id="diario-trechos-empty-title" variant="resource" extra_class="travel-document-block roteiro-editor__section--retorno route-section-block diario-trecho-block" body_template="prestacoes_contas/partials/_diario_trechos_empty.html" %}
+  <c-ui.forms.form_block title="Trechos do roteiro" description="Defina o roteiro do ofício para gerar o diário de bordo" section_id="diario-trechos-empty-title" variant="resource" extra_class="travel-document-block roteiro-editor__section--retorno route-section-block diario-trecho-block" body_template="prestacoes_contas/partials/_diario_trechos_empty.html" />
 {% endfor %}
 
 {% if trechos %}
-  {% include "components/ui/forms/form_block.html" with title="Pré-visualização do diário" description="O PDF é gerado com os dados salvos. Reabra o card após editar para atualizar." section_id="diario-preview-title" extra_class="travel-document-block oficio-documentos-block oficio-documentos-preview-section document-inline-stack" body_extra_class="oficio-documentos-preview-section__body document-inline-stack" body_template="prestacoes_contas/partials/_diario_preview_body.html" %}
+  <c-ui.forms.form_block title="Pré-visualização do diário" description="O PDF é gerado com os dados salvos. Reabra o card após editar para atualizar." section_id="diario-preview-title" extra_class="travel-document-block oficio-documentos-block oficio-documentos-preview-section document-inline-stack" body_extra_class="oficio-documentos-preview-section__body document-inline-stack" body_template="prestacoes_contas/partials/_diario_preview_body.html" />
 {% endif %}

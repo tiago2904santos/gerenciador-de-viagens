@@ -1,4 +1,4 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 {% load static %}
 
 {% block extra_css %}
@@ -24,7 +24,7 @@
         data-autosave-object-id="{{ relatorio.pk }}">
     {% csrf_token %}
 
-    {% include "components/ui/feedback/form_errors.html" with form=form only %}
+    <c-ui.feedback.form_errors :form="form" only />
 
     {% if diaria_info.alterada %}
       <div class="notice notice--warning diario-diaria-alert" role="alert">
@@ -34,7 +34,7 @@
     {% endif %}
 
     <div data-travel-document-wizard-rt data-travel-document-wizard-documentos>
-      {% include "components/form/card.html" with title="Relatório técnico" description="Resumo do ofício, custeios e texto compartilhado do relatório" title_id="rt-wizard-title" extra_class="rt-wizard-card" body_extra_class="rt-wizard-body" body_template="prestacoes_contas/partials/_rt_wizard_body.html" footer_template="prestacoes_contas/partials/_rt_downloads_footer.html" %}
+      <c-form.card title="Relatório técnico" description="Resumo do ofício, custeios e texto compartilhado do relatório" title_id="rt-wizard-title" extra_class="rt-wizard-card" body_extra_class="rt-wizard-body" body_template="prestacoes_contas/partials/_rt_wizard_body.html" footer_template="prestacoes_contas/partials/_rt_downloads_footer.html" />
     </div>
   </form>
 {% endblock %}

@@ -1,1 +1,1 @@
-{% include "components/lists/simple_list.html" with rows=grupo.rows empty_message="Nenhum modelo cadastrado para este campo." empty_action_label="Novo modelo" empty_action_url=grupo.new_url only %}
+<c-lists.simple_list :rows="grupo.rows" empty_message="Nenhum modelo cadastrado para este campo." empty_action_label="Novo modelo" :empty_action_url="grupo.new_url" only />

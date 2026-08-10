@@ -538,7 +538,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("signature-card", signature)
         # `H-05`: o hook de cópia mora no partial do corpo, não no casco.
         self.assertIn("data-cv-signature-copy", signature_body)
-        self.assertIn('components/documents/signature_card.html', (
+        self.assertIn('<c-documents.signature_card', (
             templates / "prestacoes_contas" / "diario_bordo_form.html"
         ).read_text(encoding="utf-8"))
         self.assertIn("[data-cv-signature-copy]", signature_js)

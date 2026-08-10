@@ -1,12 +1,12 @@
-{% include "components/ui/forms/form_block.html" with title="Identificação" description="Número, protocolo, destino e período" section_id="prestacao-identificacao-title" heading_level=form_block_heading_level variant="split" extra_class="travel-document-block oficio-documentos-block oficio-documentos-summary-section" body_template="prestacoes_contas/partials/_rt_identificacao_body.html" %}
+<c-ui.forms.form_block title="Identificação" description="Número, protocolo, destino e período" section_id="prestacao-identificacao-title" :heading_level="form_block_heading_level" variant="split" extra_class="travel-document-block oficio-documentos-block oficio-documentos-summary-section" body_template="prestacoes_contas/partials/_rt_identificacao_body.html" />
 
 {% if not omit_equipe %}
-{% include "components/ui/forms/form_block.html" with title="Equipe" description="Servidores desta prestação" section_id="prestacao-equipe-title" heading_level=form_block_heading_level variant="split" extra_class="travel-document-block oficio-documentos-block oficio-documentos-viajantes-section" body_template=equipe_body_template|default:"prestacoes_contas/partials/_rt_equipe_body.html" %}
+{% with cotton_attr_body_template=equipe_body_template|default:"prestacoes_contas/partials/_rt_equipe_body.html" %}<c-ui.forms.form_block title="Equipe" description="Servidores desta prestação" section_id="prestacao-equipe-title" :heading_level="form_block_heading_level" variant="split" extra_class="travel-document-block oficio-documentos-block oficio-documentos-viajantes-section" :body_template="cotton_attr_body_template" />{% endwith %}
 {% endif %}
 
 {# `DB-06`: só existe quando alguém saiu da equipe levando dados junto — linha sem #}
 {# nada coletado é apagada no sinal e nunca chega aqui. Fica fora do `omit_equipe` #}
 {# porque o diário de bordo esconde a equipe corrente, não o histórico de saída.   #}
 {% if identificacao.servidores_removidos %}
-{% include "components/ui/forms/form_block.html" with title="Saíram da equipe" description="Dados preservados de quem foi retirado do ofício" section_id="prestacao-removidos-title" heading_level=form_block_heading_level variant="split" extra_class="travel-document-block oficio-documentos-block prestacao-removidos-section" body_template="prestacoes_contas/partials/_prestacao_removidos_body.html" %}
+<c-ui.forms.form_block title="Saíram da equipe" description="Dados preservados de quem foi retirado do ofício" section_id="prestacao-removidos-title" :heading_level="form_block_heading_level" variant="split" extra_class="travel-document-block oficio-documentos-block prestacao-removidos-section" body_template="prestacoes_contas/partials/_prestacao_removidos_body.html" />
 {% endif %}

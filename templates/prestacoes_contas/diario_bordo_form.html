@@ -1,4 +1,4 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 {% load static %}
 
 {% block extra_css %}
@@ -25,7 +25,7 @@
     {% csrf_token %}
     {{ formset.management_form }}
 
-    {% include "components/ui/feedback/form_errors.html" with errors=formset.non_form_errors only %}
+    <c-ui.feedback.form_errors :errors="formset.non_form_errors" only />
 
     {% if diaria_info.alterada %}
       <div class="notice notice--warning diario-diaria-alert" role="alert">
@@ -36,12 +36,12 @@
     {% endif %}
 
     <div data-travel-document-wizard-diario data-travel-document-wizard-documentos>
-      {% include "components/form/card.html" with title="Diário de bordo" description="Resumo do ofício, trechos do roteiro e pré-visualização" title_id="diario-wizard-title" extra_class="diario-wizard-card" body_extra_class="diario-wizard-body" body_template="prestacoes_contas/partials/_diario_wizard_body.html" footer_template="prestacoes_contas/partials/_diario_footer.html" %}
+      <c-form.card title="Diário de bordo" description="Resumo do ofício, trechos do roteiro e pré-visualização" title_id="diario-wizard-title" extra_class="diario-wizard-card" body_extra_class="diario-wizard-body" body_template="prestacoes_contas/partials/_diario_wizard_body.html" footer_template="prestacoes_contas/partials/_diario_footer.html" />
     </div>
 
     {# Assinatura eletrônica temporariamente oculta (fluxo indisponível). #}
     {% comment %}
-    {% include "components/documents/signature_card.html" with signature=assinatura next_url=assinatura_next_url only %}
+    <c-documents.signature_card :signature="assinatura" :next_url="assinatura_next_url" only />
     {% endcomment %}
   </form>
 {% endblock %}

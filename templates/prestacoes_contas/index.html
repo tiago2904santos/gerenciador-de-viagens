@@ -15,5 +15,5 @@
 {% endblock %}
 
 {% block content %}
-  {% include "components/lists/list_page_cards.html" with title=page_title eyebrow="PRESTAÇÕES" search_placeholder="Buscar por servidor, ofício, protocolo ou solicitação…" search_aria_label="Buscar prestações" date_picker_id="pc-filter-date-picker" date_start_id="id_pc_viagem_de" date_end_id="id_pc_viagem_ate" tabs_aria_label="Abas de prestações" card_template="prestacoes_contas/partials/prestacao_list_card.html" empty_message=empty_message attach_signed_modal=True %}
+  <c-lists.list_page_cards :title="page_title" eyebrow="PRESTAÇÕES" search_placeholder="Buscar por servidor, ofício, protocolo ou solicitação…" search_aria_label="Buscar prestações" date_picker_id="pc-filter-date-picker" date_start_id="id_pc_viagem_de" date_end_id="id_pc_viagem_ate" tabs_aria_label="Abas de prestações" card_template="prestacoes_contas/partials/prestacao_list_card.html" :empty_message="empty_message" :attach_signed_modal="True" />
 {% endblock %}

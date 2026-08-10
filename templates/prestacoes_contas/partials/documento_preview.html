@@ -1,4 +1,4 @@
 {# Visualizador inline de PDF — espelha o padrão da etapa de Documentos do ofício. #}
 {# Parâmetros: preview_anchor, preview_title, preview_subtitle, preview_doc_title, #}
 {#             preview_inline_url e, opcionalmente, preview_pdf_url / preview_docx_url / preview_xlsx_url. #}
-{% include "components/form/card.html" with title=preview_title|default:"Pré-visualização do documento" description=preview_subtitle|default:"Confira o documento gerado antes de baixar." title_id=preview_anchor|add:"-title" heading_level=2 extra_class="document-inline-stack" body_template="prestacoes_contas/partials/_documento_preview_body.html" %}
+{% with cotton_attr_title=preview_title|default:"Pré-visualização do documento" cotton_attr_description=preview_subtitle|default:"Confira o documento gerado antes de baixar." cotton_attr_title_id=preview_anchor|add:"-title" %}<c-form.card :title="cotton_attr_title" :description="cotton_attr_description" :title_id="cotton_attr_title_id" :heading_level="2" extra_class="document-inline-stack" body_template="prestacoes_contas/partials/_documento_preview_body.html" />{% endwith %}

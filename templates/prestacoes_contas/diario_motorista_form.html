@@ -1,4 +1,4 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 {% load static %}
 
 {% block extra_css %}
@@ -19,7 +19,7 @@
         data-diario-motorista-form>
     {% csrf_token %}
 
-    {% include "components/ui/feedback/form_errors.html" with form=form only %}
+    <c-ui.feedback.form_errors :form="form" only />
 
     <p class="dmv-lede">
       Ajuste o <strong>motorista</strong> e a <strong>viatura</strong> apenas deste diário — o
@@ -28,9 +28,9 @@
     </p>
 
     {# ═══════════════ MOTORISTA ═══════════════ #}
-    {% include "components/ui/forms/form_block.html" with shell="card" section_id="dmv-motorista-title" title="Motorista" description="Quem dirigiu o veículo nesta viagem?" body_template="prestacoes_contas/partials/_dmv_motorista_body.html" %}
+    <c-ui.forms.form_block shell="card" section_id="dmv-motorista-title" title="Motorista" description="Quem dirigiu o veículo nesta viagem?" body_template="prestacoes_contas/partials/_dmv_motorista_body.html" />
 
     {# ═══════════════ VIATURA ═══════════════ #}
-    {% include "components/ui/forms/form_block.html" with shell="card" section_id="dmv-viatura-title" title="Viatura" description="Qual veículo foi usado nesta viagem?" body_template="prestacoes_contas/partials/_dmv_viatura_body.html" footer_template="prestacoes_contas/partials/_dmv_viatura_footer.html" %}
+    <c-ui.forms.form_block shell="card" section_id="dmv-viatura-title" title="Viatura" description="Qual veículo foi usado nesta viagem?" body_template="prestacoes_contas/partials/_dmv_viatura_body.html" footer_template="prestacoes_contas/partials/_dmv_viatura_footer.html" />
   </form>
 {% endblock %}

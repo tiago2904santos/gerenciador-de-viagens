@@ -1,4 +1,4 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 {% load static %}
 
 {% block extra_css %}
@@ -14,6 +14,6 @@
 
 {% block flow_body %}
   <div data-travel-document-wizard-consolidado data-travel-document-wizard-documentos>
-    {% include "components/form/card.html" with title="PDF Final" description="Resumo, conferência e pacote consolidado deste servidor" title_id="consolidado-wizard-title" heading_level=2 extra_class="consolidado-wizard-card" body_extra_class="consolidado-wizard-body" body_template="prestacoes_contas/partials/_consolidado_wizard_body.html" footer_template="prestacoes_contas/partials/_consolidado_footer.html" %}
+    <c-form.card title="PDF Final" description="Resumo, conferência e pacote consolidado deste servidor" title_id="consolidado-wizard-title" :heading_level="2" extra_class="consolidado-wizard-card" body_extra_class="consolidado-wizard-body" body_template="prestacoes_contas/partials/_consolidado_wizard_body.html" footer_template="prestacoes_contas/partials/_consolidado_footer.html" />
   </div>
 {% endblock %}

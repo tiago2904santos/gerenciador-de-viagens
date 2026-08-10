@@ -1,4 +1,4 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 {% load static %}
 
 {% block extra_css %}
@@ -19,11 +19,11 @@
     {% csrf_token %}
 
     <div data-travel-document-wizard-documentos>
-      {% include "components/form/card.html" with title="Documentos da prestação" description="Resumo do ofício, solicitação e anexos assinados" title_id="docs-wizard-title" extra_class="docs-wizard-card" body_extra_class="docs-wizard-body" body_template="prestacoes_contas/partials/_docs_wizard_body.html" footer_template="prestacoes_contas/partials/_docs_footer.html" %}
+      <c-form.card title="Documentos da prestação" description="Resumo do ofício, solicitação e anexos assinados" title_id="docs-wizard-title" extra_class="docs-wizard-card" body_extra_class="docs-wizard-body" body_template="prestacoes_contas/partials/_docs_wizard_body.html" footer_template="prestacoes_contas/partials/_docs_footer.html" />
     </div>
   </form>
 {% endblock %}
 
 {% block flow_modals %}
-  {% include "components/ui/modals/attach_signed_modal.html" %}
+  <c-ui.modals.attach_signed_modal />
 {% endblock %}
