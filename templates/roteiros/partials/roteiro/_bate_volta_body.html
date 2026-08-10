@@ -2,13 +2,13 @@
   {% if roteiro_editor_oficio %}
   <div id="bate-volta-panel" class="oficio-roteiro-bate-volta">
     {# Sem `only`: o partial de controles precisa de roteiro_editor_state_json + panel_id. #}
-    {% include "components/ui/forms/date_picker.html" with mode="range" picker_id="bate-volta-date-picker" extra_class="oficio-roteiro-bate-volta__picker" range_controls_template="roteiros/partials/roteiro/_bate_volta_date_controls.html" start_hidden_id="id_bate_volta_data_inicio_native" end_hidden_id="id_bate_volta_data_fim_native" start_hidden_name="bate_volta_data_inicio" end_hidden_name="bate_volta_data_fim" start_hidden_value=roteiro_editor_state_json.bate_volta_diario.data_inicio end_hidden_value=roteiro_editor_state_json.bate_volta_diario.data_fim initial_date=roteiro_editor_state_json.bate_volta_diario.data_inicio show_summary=False %}
+    <c-ui.forms.date_picker mode="range" picker_id="bate-volta-date-picker" extra_class="oficio-roteiro-bate-volta__picker" range_controls_template="roteiros/partials/roteiro/_bate_volta_date_controls.html" start_hidden_id="id_bate_volta_data_inicio_native" end_hidden_id="id_bate_volta_data_fim_native" start_hidden_name="bate_volta_data_inicio" end_hidden_name="bate_volta_data_fim" :start_hidden_value="roteiro_editor_state_json.bate_volta_diario.data_inicio" :end_hidden_value="roteiro_editor_state_json.bate_volta_diario.data_fim" :initial_date="roteiro_editor_state_json.bate_volta_diario.data_inicio" :show_summary="False" />
   </div>
   {% else %}
   <div id="bate-volta-panel" class="roteiro-editor__bate-volta-grid-v2">
 
     {# O intervalo usa o modelo global; os horarios permanecem campos independentes. #}
-    {% include "components/ui/forms/date_picker.html" with mode="range" picker_id="bate-volta-date-picker" start_label="Data inicial" end_label="Data final" start_input_id="id_bate_volta_data_inicio_display" end_input_id="id_bate_volta_data_fim_display" start_hidden_id="id_bate_volta_data_inicio_native" end_hidden_id="id_bate_volta_data_fim_native" start_hidden_name="bate_volta_data_inicio" end_hidden_name="bate_volta_data_fim" start_hidden_value=roteiro_editor_state_json.bate_volta_diario.data_inicio end_hidden_value=roteiro_editor_state_json.bate_volta_diario.data_fim initial_date=roteiro_editor_state_json.bate_volta_diario.data_inicio only %}
+    <c-ui.forms.date_picker mode="range" picker_id="bate-volta-date-picker" start_label="Data inicial" end_label="Data final" start_input_id="id_bate_volta_data_inicio_display" end_input_id="id_bate_volta_data_fim_display" start_hidden_id="id_bate_volta_data_inicio_native" end_hidden_id="id_bate_volta_data_fim_native" start_hidden_name="bate_volta_data_inicio" end_hidden_name="bate_volta_data_fim" :start_hidden_value="roteiro_editor_state_json.bate_volta_diario.data_inicio" :end_hidden_value="roteiro_editor_state_json.bate_volta_diario.data_fim" :initial_date="roteiro_editor_state_json.bate_volta_diario.data_inicio" only />
 
     <div class="field-grid field-grid--cols-2">
         <div class="field cv-field field-size-1">

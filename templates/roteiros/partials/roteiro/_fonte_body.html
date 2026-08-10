@@ -72,7 +72,7 @@
 
   {# Sede #}
   {% if roteiro_editor_oficio %}
-  {% include "components/ui/forms/form_block.html" with title="Sede" description="Unidade de origem da viagem." section_id="sec-sede-title" element_id="sec-sede" heading_level=4 variant="split" extra_class="route-sede-block" body_template="roteiros/partials/roteiro/_sede_fields.html" %}
+  <c-ui.forms.form_block title="Sede" description="Unidade de origem da viagem." section_id="sec-sede-title" element_id="sec-sede" :heading_level="4" variant="split" extra_class="route-sede-block" body_template="roteiros/partials/roteiro/_sede_fields.html" />
   {% else %}
   <section class="wizard-inner-section" aria-labelledby="sec-sede-title" id="sec-sede">
     <header class="wizard-inner-section__header">
@@ -97,7 +97,7 @@
           {% endfor %}
         </select>
         {% if form.origem_estado.errors %}
-          {% include "components/ui/feedback/field_error.html" with errors=form.origem_estado.errors field_id=form.origem_estado.auto_id only %}
+          <c-ui.feedback.field_error :errors="form.origem_estado.errors" :field_id="form.origem_estado.auto_id" only />
         {% endif %}
       </div>
       <div class="field app-form-field">
@@ -116,19 +116,19 @@
           {% endfor %}
         </select>
         {% if form.origem_cidade.errors %}
-          {% include "components/ui/feedback/field_error.html" with errors=form.origem_cidade.errors field_id=form.origem_cidade.auto_id only %}
+          <c-ui.feedback.field_error :errors="form.origem_cidade.errors" :field_id="form.origem_cidade.auto_id" only />
         {% endif %}
       </div>
     </div>
   </section>
   {% endif %}
 
-  {% include "components/travel/destination_section.html" with section_id="sec-destinos" title_id="sec-destinos-title" add_button_id="btn-adicionar-destino" list_id="destinos-container" title="Destinos" description="Locais na ordem da visita. " layout="split" panel_aria_label="Destinos adicionados." %}
+  <c-travel.destination_section section_id="sec-destinos" title_id="sec-destinos-title" add_button_id="btn-adicionar-destino" list_id="destinos-container" title="Destinos" description="Locais na ordem da visita. " layout="split" panel_aria_label="Destinos adicionados." />
   <template id="tmpl-destino-roteiro" data-location-template>
     {% if roteiro_editor_oficio %}
-      {% include "components/travel/destination_row.html" with data_index="__index__" has_data_index=True row_ordinal=1 hide_order_badge=True show_row_add=True state_select_template="roteiros/partials/roteiro/_destino_template_state.html" city_select_template="roteiros/partials/roteiro/_destino_template_city.html" %}
+      <c-travel.destination_row data_index="__index__" :has_data_index="True" :row_ordinal="1" :hide_order_badge="True" :show_row_add="True" state_select_template="roteiros/partials/roteiro/_destino_template_state.html" city_select_template="roteiros/partials/roteiro/_destino_template_city.html" />
     {% else %}
-      {% include "components/travel/destination_row.html" with hide_order_badge=True show_row_add=True state_select_template="roteiros/partials/roteiro/_destino_template_state.html" city_select_template="roteiros/partials/roteiro/_destino_template_city.html" %}
+      <c-travel.destination_row :hide_order_badge="True" :show_row_add="True" state_select_template="roteiros/partials/roteiro/_destino_template_state.html" city_select_template="roteiros/partials/roteiro/_destino_template_city.html" />
     {% endif %}
   </template>
 

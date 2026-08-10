@@ -41,12 +41,12 @@
         mão com `alert alert-danger py-2` — classes do Bootstrap legado, fora do
         design system, e o `py-2` sem nenhuma regra que o defina.
       {% endcomment %}
-      {% include "components/ui/feedback/form_errors.html" with form=form only %}
+      <c-ui.feedback.form_errors :form="form" only />
 
       {% if roteiro_editor_oficio %}
-        {% include "components/form/card.html" with title="Roteiro e diárias" description="Origem, percurso, deslocamentos e cálculo financeiro" title_id="roteiro-oficio-card-title" heading_level=2 extra_class="roteiro-editor__oficio-card oficio-roteiro-card" body_extra_class="oficio-roteiro-body" body_template="roteiros/partials/roteiro/_editor_oficio_body.html" footer_template="roteiros/partials/roteiro/actions.html" %}
+        <c-form.card title="Roteiro e diárias" description="Origem, percurso, deslocamentos e cálculo financeiro" title_id="roteiro-oficio-card-title" :heading_level="2" extra_class="roteiro-editor__oficio-card oficio-roteiro-card" body_extra_class="oficio-roteiro-body" body_template="roteiros/partials/roteiro/_editor_oficio_body.html" footer_template="roteiros/partials/roteiro/actions.html" />
       {% else %}
-        {% include "components/form/card.html" with title="Roteiro e diárias" description="Origem, percurso, deslocamentos e cálculo financeiro" title_id="roteiro-avulso-card-title" heading_level=2 extra_class="roteiro-editor__avulso-card" body_extra_class="roteiro-editor__avulso-body" body_template="roteiros/partials/roteiro/_editor_oficio_body.html" footer_template="roteiros/partials/roteiro/actions.html" %}
+        <c-form.card title="Roteiro e diárias" description="Origem, percurso, deslocamentos e cálculo financeiro" title_id="roteiro-avulso-card-title" :heading_level="2" extra_class="roteiro-editor__avulso-card" body_extra_class="roteiro-editor__avulso-body" body_template="roteiros/partials/roteiro/_editor_oficio_body.html" footer_template="roteiros/partials/roteiro/actions.html" />
       {% endif %}
     </form>
 </div>

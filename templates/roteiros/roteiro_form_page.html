@@ -1,4 +1,4 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 {% load static %}
 
 {% block title %}{% if object %}Editar roteiro{% else %}Novo roteiro{% endif %}{% endblock %}
@@ -17,7 +17,7 @@
 {% endblock %}
 
 {% block flow_header %}
-  {% include "components/ui/headers/wizard_page_header.html" with eyebrow="ROTEIROS" title=wizard_header.title status_label=wizard_header.status_label status_variant=wizard_header.status_variant steps=wizard_page_steps back_label=wizard_back_label back_url=wizard_back_url only %}
+  <c-ui.headers.wizard_page_header eyebrow="ROTEIROS" :title="wizard_header.title" :status_label="wizard_header.status_label" :status_variant="wizard_header.status_variant" :steps="wizard_page_steps" :back_label="wizard_back_label" :back_url="wizard_back_url" only />
 {% endblock %}
 
 {% block flow_body %}

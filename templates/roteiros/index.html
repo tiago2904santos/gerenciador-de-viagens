@@ -9,5 +9,5 @@
 {% endblock %}
 
 {% block content %}
-  {% include "components/lists/list_page_cards.html" with title=page_title description=page_description eyebrow="Roteiros" search_placeholder="Buscar por sede, destino ou observações" search_aria_label="Buscar roteiros" card_template="roteiros/partials/roteiro_list_card.html" empty_message=empty_message empty_action_label="Novo roteiro" empty_action_url=create_url action_label="Novo roteiro" action_url=create_url tabs_aria_label="Abas de roteiros" delete_modal_title="Excluir roteiro?" delete_modal_entity="este roteiro" %}
+  <c-lists.list_page_cards :title="page_title" :description="page_description" eyebrow="Roteiros" search_placeholder="Buscar por sede, destino ou observações" search_aria_label="Buscar roteiros" card_template="roteiros/partials/roteiro_list_card.html" :empty_message="empty_message" empty_action_label="Novo roteiro" :empty_action_url="create_url" action_label="Novo roteiro" :action_url="create_url" tabs_aria_label="Abas de roteiros" delete_modal_title="Excluir roteiro?" delete_modal_entity="este roteiro" />
 {% endblock %}
