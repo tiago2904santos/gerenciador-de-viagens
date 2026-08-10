@@ -178,7 +178,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         button = (
             Path(settings.BASE_DIR)
             / "templates"
-            / "components"
+            / "cotton"
             / "ui"
             / "buttons"
             / "button.html"
