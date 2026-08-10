@@ -190,7 +190,7 @@ def _contrato(template_name: str, memo: dict[str, set[str]], stack: set[str]) ->
                 continue
 
             if isinstance(node, FirstOfNode):
-                for expression in node.values:
+                for expression in node.vars:
                     found.update(_externas(expression, bound))
                 if node.asvar:
                     bound.add(node.asvar)

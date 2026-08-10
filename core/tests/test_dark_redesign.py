@@ -202,9 +202,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertTrue(canonical.exists())
 
     def test_canonical_feedback_supports_existing_contracts(self):
-        feedback = (
-            Path(settings.BASE_DIR) / "templates" / "components" / "ui" / "feedback"
-        )
+        feedback = Path(settings.BASE_DIR) / "templates" / "cotton" / "ui" / "feedback"
         alert = (feedback / "alert.html").read_text(encoding="utf-8")
         empty_state = (feedback / "empty_state.html").read_text(encoding="utf-8")
         form_errors = (feedback / "form_errors.html").read_text(encoding="utf-8")
