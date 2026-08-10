@@ -5911,3 +5911,45 @@ tudo que é renderização de texto.
 layout no motor usado pela régua (`-webkit-font-smoothing`, `-moz-osx-font-smoothing`,
 `text-rendering`, e as de `transition-*`, que só mudam a curva no tempo), contadas à parte no
 relatório. Duas somas, não uma: a que move pixel e a que não move.
+
+### NOVO-90 🔴 · `NOVO` A sessão remota mede ~35% menos divergência que o CI · QA · 0,5 d
+
+Descoberto errando: apertei os tetos de `scripts/tetos_front.json` com números medidos **aqui**, e o
+CI reprovou em 25+ rotas. O arquivo estava calibrado para o CI, e eu escrevi por cima dele medições
+de outro ambiente.
+
+A prova de que os tetos originais vieram do CI, e não daqui:
+
+| rota | teto gravado | CI mede | local mede |
+|---|---:|---:|---:|
+| `dashboard@1440` | 1125 | **1125** | 780 |
+| `cargo-editar@1440` | 1029 | **1029** | 672 |
+| `combustiveis-lista@1440` | 1036 | **1036** | 676 |
+
+Idêntico ao teto no CI, ~35% menor aqui. Não é ruído: são três casas decimais de coincidência em
+rotas independentes.
+
+**A causa provável é fonte.** O CI roda `python -m playwright install --with-deps chromium`, que traz
+o conjunto de fontes dele; a sessão remota usa o Chromium pré-instalado da imagem, com outro
+conjunto. Métrica de texto diferente muda quebra de linha, que muda altura, que muda quantos
+elementos divergem. É o mesmo mecanismo que o plano descreve na "armadilha da tipografia" — e a
+mesma advertência: *"não dá para determinar daqui o que renderiza na máquina do usuário"*.
+
+**Consequência operacional, que é o que importa:** medição local serve para **comparar antes/depois
+no mesmo ambiente** — foi assim que a cadeia do `.form-block` foi diagnosticada, e o diagnóstico
+está certo. Não serve para **gravar teto**. Regravar `tetos_front.json` só pode ser feito com números
+produzidos pelo CI.
+
+Isso deixa um buraco de processo: hoje o CI **não** commita o JSON de volta (`--json` vai para
+`$RUNNER_TEMP` e morre com o job), e regravar teto é passo manual. Ou seja, não existe caminho
+suportado para baixar a catraca a partir de uma corrida do CI — que é justamente o que uma etapa como
+a E8 precisa fazer a cada sub-etapa.
+
+**Saída sugerida:** um passo opcional no `tests.yml`, disparado por rótulo ou `workflow_dispatch`, que
+roda as duas réguas com `--atualizar-tetos` e publica o JSON como artefato — ou abre commit na
+branch. Enquanto isso não existe, a catraca só desce quando alguém copiar os números do log do CI à
+mão, e o log só mostra as rotas que **reprovaram**.
+
+**Efeito medido apesar de tudo:** o próprio log de reprovação mostra a queda real no ambiente certo.
+`configuracao` caiu de 1652 para 1425 a 1440px (−227), e o mesmo nas outras duas larguras (−204 cada).
+`eventos-lista@1440` caiu 14. É menos do que os −9.376 medidos localmente, e é o número que vale.
