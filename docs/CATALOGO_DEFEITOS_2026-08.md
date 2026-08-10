@@ -5699,11 +5699,38 @@ tinha acabado de melhorar: `layout estável: True` com a falha intacta. O cresci
 da troca de tema, não antes dela — a espera passou para dentro do `apply()`, valendo em toda
 aplicação de tema.
 
-**Resolvido.** `settle()` deixa de ser dois `requestAnimationFrame` e passa a acompanhar
-`scrollHeight`/`scrollWidth` até três leituras iguais, com teto de orçamento. Verificado no repro
-real (a corrida completa de 500 px pelo script, que é onde a falha aparecia): **as 42 rotas mediram,
-`roteiros-editar@500` inclusive**. O teste isolado não serve de prova aqui — a rota sozinha já
-passava 10 de 10 **antes** da correção.
+**PARCIAL — e eu cheguei a dar por resolvido, errado.** `settle()` deixou de ser dois
+`requestAnimationFrame` e passou a acompanhar `scrollHeight`/`scrollWidth` até três leituras iguais.
+Com isso a corrida de 500 px passou uma vez, com as 42 rotas. **Mas a corrida completa (três
+larguras) voltou a reprovar na mesma rota**, agora com `164/168` — os mesmos números, invertidos.
+
+Então a falha é **intermitente**, e a leitura anterior de "determinística" também estava errada: as
+duas primeiras corridas darem `168/164` idênticos foi coincidência, não determinismo. A passagem do
+run de 500 px foi sorte, e eu a tratei como prova. O erro de método aqui foi meu: **uma passagem não
+prova ausência de falha intermitente.**
+
+**O que está firme, medido:** aplicado o tema escuro e deixado assentar, a altura fica em **4423px,
+estável por 12 segundos** (24 leituras de 0,5 s). O valor que aparece na captura que reprova é
+**4367.39px** — 56px a menos. Ou seja, 4423 é o layout escuro de verdade, e 4367 é um estado
+intermediário que a janela de estabilidade de 150 ms às vezes toma por assentado.
+
+**O que cresce, medido.** Comparando altura de cada elemento entre os temas a 500 px:
+`.form-section-body` **cresce 66,34px** no escuro, enquanto os textos ao redor **encolhem** —
+`cv-form-section-header` −17,79px, `form-block__header` e `form-block__copy` −7,61px cada,
+`form-section-subtitle` −5,8px. Saldo: **+48,55px**. São métricas de texto divergindo entre os
+temas, que é exatamente o assunto da E8 — não é defeito da página, é o defeito que a etapa existe
+para fechar.
+
+**Por que a régua tropeça mesmo assim.** Indo de claro para escuro numa página ociosa, o escuro
+nasce **já em 4423,39px** — o valor certo — e fica lá por 12 s. O `4367.39px` que aparece na captura
+reprovada **não é um estado que assenta em 4423**: é outro layout, que só aparece dentro da captura.
+A diferença é a carga: logo antes de aplicar o escuro, a captura faz ~388 mil leituras de
+`getComputedStyle` (1.142 elementos × ~340 propriedades). Essa carga atrasa o relayout assíncrono e
+o faz cair no meio do laço de diff. Daí a intermitência: é corrida entre o relayout e o laço, e não
+falta de espera depois do carregamento.
+
+**Ainda em aberto:** qual trabalho assíncrono dispara o relayout. Enquanto isso não fecha, a régua
+não completa uma corrida de três larguras, e a E8 segue sem a tabela remedida.
 
 Fica também o diagnóstico melhor: quando a trava disparar, o erro passa a dizer qual rota é e se a
 página chegou a assentar, que é o que separa "o instrumento falhou" de "a página não para de mudar".
