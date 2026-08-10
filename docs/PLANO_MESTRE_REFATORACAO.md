@@ -406,7 +406,7 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [x] `NOVO-72` `ui_lab2/` sobreviveu ao PR #247 · **E2**
 - [x] `NOVO-73` nome e lugar de arquivo JS sem padrão · **E2**
 - [x] `NOVO-48` 70 nomes de classe morta dentro de seletor agrupado vivo · **E2**
-- [ ] `NOVO-71` componente global sem contrato de parâmetro → `django-cotton` · **E3, E4, E5**
+- [~] `NOVO-71` componente global sem contrato de parâmetro → `django-cotton` · **E3 concluída; E4, E5 pendentes**
 - [ ] `HT-14` 275 de 946 includes não usam `only` — fecha por construção no cotton · **E5**
 - [ ] `NOVO-74` dois namespaces de componente, quatro pastas fantasma de `.gitkeep` · **E5**
 - [ ] `HT-08` 82 `<button>` fora do sistema de componentes · **E6**
