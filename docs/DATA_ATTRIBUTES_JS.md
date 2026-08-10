@@ -133,8 +133,6 @@ API: `CV.masks.scan(root?)`, `CV.masks.apply(input)`, `CV.masks.format(value, ma
 | `data-cv-state-input` | input / seletor | Campo sincronizado (padrão: primeiro checkbox) |
 | `data-cv-state-trigger` | botão | Gatilho binário |
 | `data-active-label`, `data-inactive-label` | botão/container | Rótulo por estado |
-| `data-rg-toggle` | botão | Legado — RG do servidor (binário), `HT-10` |
-| `data-motorista-fixo-toggle` | botão | Legado — motorista da viatura (binário), `HT-10` |
 | `data-cv-state-bound` | container (interno) | Idempotência |
 
 API: `CV.stateToggle.init(root?)`, `CV.stateToggle.update(group, value)`.

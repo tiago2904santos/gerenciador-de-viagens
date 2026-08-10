@@ -1699,12 +1699,7 @@ document.documentElement.dataset.appReady = "true";
   }
 
   function findBinaryTrigger(container) {
-    return (
-      container.querySelector('[data-cv-state-trigger]') ||
-      container.querySelector('[data-cv-state-option]') ||
-      container.querySelector('[data-rg-toggle]') ||
-      container.querySelector('[data-motorista-fixo-toggle]')
-    );
+    return container.querySelector('[data-cv-state-trigger]');
   }
 
   function syncBinaryButton(container, input, trigger) {
@@ -1721,14 +1716,10 @@ document.documentElement.dataset.appReady = "true";
     var labelEl = trigger.querySelector('span:last-child');
     var activeLabel =
       trigger.getAttribute('data-active-label') ||
-      trigger.dataset.rgLabelActive ||
-      trigger.dataset.mfLabelActive ||
       container.getAttribute('data-active-label') ||
       '';
     var inactiveLabel =
       trigger.getAttribute('data-inactive-label') ||
-      trigger.dataset.rgLabelInactive ||
-      trigger.dataset.mfLabelInactive ||
       container.getAttribute('data-inactive-label') ||
       '';
 
@@ -1770,12 +1761,9 @@ document.documentElement.dataset.appReady = "true";
     if (!container || container.getAttribute(BOUND) === 'true') return;
     container.setAttribute(BOUND, 'true');
 
-    var isBinary =
-      container.hasAttribute('data-cv-state-binary') ||
-      container.querySelector('[data-rg-toggle]') ||
-      container.querySelector('[data-motorista-fixo-toggle]');
+    var isBinary = container.hasAttribute('data-cv-state-binary');
 
-    if (isBinary && !qsa('[data-cv-state-option]', container).length) {
+    if (isBinary) {
       bindBinary(container);
       return;
     }
@@ -1783,10 +1771,6 @@ document.documentElement.dataset.appReady = "true";
     if (qsa('[data-cv-state-option]', container).length) {
       bindOptionGroup(container);
       return;
-    }
-
-    if (isBinary) {
-      bindBinary(container);
     }
   }
 
@@ -1806,7 +1790,7 @@ document.documentElement.dataset.appReady = "true";
     var input = resolveInput(group);
     if (!input) return;
     writeValue(input, value);
-    if (group.hasAttribute('data-cv-state-binary') || findBinaryTrigger(group)) {
+    if (group.hasAttribute('data-cv-state-binary')) {
       syncBinaryButton(group, input, findBinaryTrigger(group));
     } else {
       syncOptionGroup(group);
