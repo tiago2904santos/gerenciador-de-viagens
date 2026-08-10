@@ -2,7 +2,6 @@ import json
 from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal, InvalidOperation
-from types import SimpleNamespace
 
 from django.db import transaction
 from django.db.models.deletion import ProtectedError
@@ -87,8 +86,7 @@ def obter_initial_roteiro():
 
 def preparar_querysets_formulario_roteiro(form, *, method, post, instance=None):
     """Limita-se a preencher querysets do form (sede); não monta contexto de template."""
-    fake_request = SimpleNamespace(method=method.upper(), POST=post)
-    roteiro_logic._setup_roteiro_querysets(form, fake_request, instance)
+    roteiro_logic._setup_roteiro_querysets(form, post, instance, method=method.upper())
 
 
 def carregar_opcoes_rotas_avulsas_salvas(evento=None, excluir_pk=None):
@@ -217,15 +215,13 @@ def normalizar_destinos_e_trechos_apos_erro_post(roteiro_state):
 
 def validar_submissao_editor_roteiro(post, route_state_map, roteiro=None):
     """Validação e cálculo de diárias a partir do POST; sem render nem redirect."""
-    fake_request = SimpleNamespace(method="POST", POST=post)
     roteiro_state = roteiro_logic._build_avulso_roteiro_state_from_post(
-        fake_request, route_state_map=route_state_map
+        post, route_state_map=route_state_map
     )
-    fake_oficio = SimpleNamespace(evento_id=None, roteiro_evento_id=None, evento=None)
-    validated = roteiro_logic._validate_roteiro_state(roteiro_state, oficio=fake_oficio)
+    validated = roteiro_logic._validate_roteiro_state(roteiro_state)
     try:
         _, _, _, diarias_resultado = roteiro_logic._build_roteiro_diarias_from_request(
-            fake_request, roteiro=roteiro
+            post, roteiro=roteiro
         )
     except ValueError as exc:
         mensagem = str(exc) or "Revise os dados de datas e horas para calcular as diárias."
@@ -238,9 +234,9 @@ def validar_submissao_editor_roteiro(post, route_state_map, roteiro=None):
     return roteiro_state, validated, diarias_resultado
 
 
-def calcular_diarias_roteiro_request(request, *, roteiro=None, evento=None):
+def calcular_diarias_roteiro_request(post, *, roteiro=None, evento=None):
     return roteiro_logic._build_roteiro_diarias_from_request(
-        request,
+        post,
         roteiro=roteiro,
         evento=evento,
     )

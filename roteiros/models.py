@@ -255,7 +255,7 @@ class RoteiroDestino(models.Model):
         # `DB-08`: dois destinos na mesma posição eram aceitos, e o destino
         # duplicado é contado **duas vezes pelo motor de diárias** — sai no ofício
         # e no termo. Constraint simples (não adiada) porque o único escritor
-        # apaga tudo antes de recriar: `roteiro_logic.py:1581`
+        # apaga tudo antes de recriar: `roteiro_logic._salvar_roteiro_avulso_from_roteiro_state`
         # (`roteiro.destinos.all().delete()`), depois `create` com `enumerate`.
         # Reordenação por troca de posição não existe neste caminho.
         constraints = [

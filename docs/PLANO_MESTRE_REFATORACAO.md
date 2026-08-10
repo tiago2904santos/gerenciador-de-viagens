@@ -383,7 +383,9 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       `oficios/services.py::salvar_roteiro_do_oficio`, com `atomic`. 33 → 13 ramos, 165 → 124
       linhas úteis, cobertura de `route_views.py` de 69% para 88%. Fecha o `NOVO-88` e o item 1 da
       lista do `BE-14`. Sobrou `NOVO-92` (a tradução de ação do rodapé, copiada em cada passo)
-- [ ] `BE-13` `roteiro_logic.py` fora do contrato de camadas
+- [ ] `BE-13` `roteiro_logic.py` fora do contrato de camadas — **fatia 1 (parsing de request) feita**:
+      `request` no módulo caiu de 23 ocorrências para 1, os 6 objetos falsos e o parâmetro morto de
+      `_validate_roteiro_state` sumiram, 2 invólucros apagados. Faltam contexto e persistência
 - [ ] `BE-14` 48 sites de persistência em view, sem transação
 - [ ] `BE-15` numeração reimplementada 3 vezes
 - [ ] `BE-16` abstrações de `core` adotadas pela metade

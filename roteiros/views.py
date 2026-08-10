@@ -405,7 +405,7 @@ def api_cidades_por_estado(request, estado_id):
 @require_http_methods(["POST"])
 def calcular_diarias(request):
     try:
-        _, _, validated, resultado = calcular_diarias_roteiro_request(request)
+        _, _, validated, resultado = calcular_diarias_roteiro_request(request.POST)
     except ValueError as exc:
         return JsonResponse(
             {

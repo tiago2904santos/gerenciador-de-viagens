@@ -3,8 +3,8 @@ from datetime import date
 from datetime import time
 
 from django.contrib.auth import get_user_model
+from django.http import QueryDict
 from django.test import Client
-from django.test import RequestFactory
 from django.test import TestCase
 from django.test import override_settings
 from django.urls import reverse
@@ -17,6 +17,14 @@ from roteiros.models import RoteiroTrecho
 from roteiros import roteiro_logic
 from core.testing import area_de_teste
 from core.testing import vincular_area
+
+
+def _querydict(dados):
+    """POST como o parser passou a recebê-lo no `BE-13`: sem request em volta."""
+    qd = QueryDict(mutable=True)
+    for chave, valor in dados.items():
+        qd[chave] = valor
+    return qd
 
 
 @override_settings(ALLOWED_HOSTS=["testserver", "localhost"])
@@ -147,20 +155,19 @@ class RoteirosBaseTests(TestCase):
             cidade=self.cidade_dest,
             ordem=0,
         )
-        request = RequestFactory().post(
-            reverse("roteiros:novo"),
-            data={
+        post = _querydict(
+            {
                 "roteiro_modo": roteiro_logic.ROTEIRO_MODO_EVENTO,
                 "roteiro_id": str(r.pk),
                 "origem_estado": str(self.estado.pk),
                 "origem_cidade": str(self.cidade_sede.pk),
                 "destino_estado_0": str(self.estado_destino.pk),
                 "destino_cidade_0": str(self.cidade_dest.pk),
-            },
+            }
         )
 
         route_options, _, _, _ = roteiro_logic._build_roteiro_diarias_from_request(
-            request,
+            post,
             roteiro=r,
         )
 
@@ -431,12 +438,9 @@ class RoteirosBaseTests(TestCase):
         )
 
     def test_bate_volta_diario_remove_retorno_final_duplicado_do_post(self):
-        request = RequestFactory().post(
-            reverse("roteiros:novo"),
-            data=self._loop_diario_post_data(),
-        )
+        post = _querydict(self._loop_diario_post_data())
 
-        state = roteiro_logic._build_avulso_roteiro_state_from_post(request)
+        state = roteiro_logic._build_avulso_roteiro_state_from_post(post)
         validated = roteiro_logic._validate_roteiro_state(state)
 
         self.assertTrue(validated["ok"], validated["errors"])
@@ -460,11 +464,8 @@ class RoteirosBaseTests(TestCase):
             cidade=self.cidade_dest,
             ordem=0,
         )
-        request = RequestFactory().post(
-            reverse("roteiros:novo"),
-            data=self._loop_diario_post_data(),
-        )
-        state = roteiro_logic._build_avulso_roteiro_state_from_post(request)
+        post = _querydict(self._loop_diario_post_data())
+        state = roteiro_logic._build_avulso_roteiro_state_from_post(post)
         validated = roteiro_logic._validate_roteiro_state(state)
 
         roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(roteiro, state, validated)
@@ -496,11 +497,8 @@ class RoteirosBaseTests(TestCase):
             cidade=self.cidade_dest,
             ordem=0,
         )
-        request = RequestFactory().post(
-            reverse("roteiros:novo"),
-            data=self._loop_diario_post_data(),
-        )
-        state = roteiro_logic._build_avulso_roteiro_state_from_post(request)
+        post = _querydict(self._loop_diario_post_data())
+        state = roteiro_logic._build_avulso_roteiro_state_from_post(post)
         validated = roteiro_logic._validate_roteiro_state(state)
         roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(roteiro, state, validated)
 

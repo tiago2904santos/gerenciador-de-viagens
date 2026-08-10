@@ -59,14 +59,6 @@ def _build_roteiro_map_defaults():
     return build_roteiro_map_defaults()
 
 
-def _parse_destinos_post(request):
-    """
-    Extrai da request.POST lista de (estado_id, cidade_id).
-    Retorna (lista de tuplas (estado_id, cidade_id), erro ou None).
-    """
-    return parse_destinos_post(request.POST)
-
-
 def _get_parana_estado():
     return Estado.objects.filter(sigla__iexact='PR').order_by('id').first()
 
@@ -341,10 +333,6 @@ def _roteiro_trecho_duplica_retorno(trecho, retorno, sede_estado_id=None, sede_c
 
 def _dedupe_roteiro_loop_retorno_final(state):
     return dedupe_roteiro_loop_retorno_final(state)
-
-
-def _extract_roteiro_posted_trechos(request):
-    return extract_roteiro_posted_trechos(request.POST)
 
 
 def _infer_roteiro_destinos_from_trechos(raw_trechos, sede_estado=None, sede_cidade=None):
@@ -987,18 +975,18 @@ def _build_roteiro_route_options(oficio):
     return options, state_map
 
 
-def _build_roteiro_state_from_post(request, oficio=None, route_state_map=None):
+def _build_roteiro_state_from_post(post, oficio=None, route_state_map=None):
     route_state_map = route_state_map or {}
-    roteiro_modo = (request.POST.get('roteiro_modo') or '').strip()
+    roteiro_modo = (post.get('roteiro_modo') or '').strip()
     if roteiro_modo not in {ROTEIRO_MODO_EVENTO, ROTEIRO_MODO_PROPRIO}:
         roteiro_modo = ROTEIRO_MODO_EVENTO if route_state_map else ROTEIRO_MODO_PROPRIO
-    roteiro_evento_id = _parse_int(request.POST.get('roteiro_id') or request.POST.get('roteiro_evento_id'))
-    sede_estado_id = _parse_int(request.POST.get('sede_estado'))
-    sede_cidade_id = _parse_int(request.POST.get('sede_cidade'))
+    roteiro_evento_id = _parse_int(post.get('roteiro_id') or post.get('roteiro_evento_id'))
+    sede_estado_id = _parse_int(post.get('sede_estado'))
+    sede_cidade_id = _parse_int(post.get('sede_cidade'))
     sede_cidade = Cidade.objects.select_related('estado').filter(pk=sede_cidade_id).first() if sede_cidade_id else None
     sede_estado = Estado.objects.filter(pk=sede_estado_id or getattr(sede_cidade, 'estado_id', None)).first() if (sede_estado_id or sede_cidade) else None
-    destinos_list = _parse_destinos_post(request)
-    posted_trechos = _extract_roteiro_posted_trechos(request)
+    destinos_list = parse_destinos_post(post)
+    posted_trechos = extract_roteiro_posted_trechos(post)
     has_structure = bool(
         sede_estado_id
         or sede_cidade_id
@@ -1061,8 +1049,8 @@ def _build_roteiro_state_from_post(request, oficio=None, route_state_map=None):
         )
 
     def _posted_or_default(name, default=''):
-        if name in request.POST:
-            return (request.POST.get(name) or '').strip()
+        if name in post:
+            return (post.get(name) or '').strip()
         return default
 
     for idx, trecho in enumerate(state.get('trechos', [])):
@@ -1100,13 +1088,13 @@ def _build_roteiro_state_from_post(request, oficio=None, route_state_map=None):
     state['retorno']['duracao_estimada_min'] = duracao_retorno if duracao_retorno is not None else ''
     state['bate_volta_diario'] = _build_roteiro_bate_volta_diario_state(
         {
-            'ativo': request.POST.get('bate_volta_diario_ativo') in {'1', 'true', 'True', 'on'},
-            'data_inicio': (request.POST.get('bate_volta_data_inicio') or '').strip(),
-            'data_fim': (request.POST.get('bate_volta_data_fim') or '').strip(),
-            'ida_saida_hora': (request.POST.get('bate_volta_ida_saida_hora') or '').strip(),
-            'ida_tempo_min': (request.POST.get('bate_volta_ida_tempo_min') or '').strip(),
-            'volta_saida_hora': (request.POST.get('bate_volta_volta_saida_hora') or '').strip(),
-            'volta_tempo_min': (request.POST.get('bate_volta_volta_tempo_min') or '').strip(),
+            'ativo': post.get('bate_volta_diario_ativo') in {'1', 'true', 'True', 'on'},
+            'data_inicio': (post.get('bate_volta_data_inicio') or '').strip(),
+            'data_fim': (post.get('bate_volta_data_fim') or '').strip(),
+            'ida_saida_hora': (post.get('bate_volta_ida_saida_hora') or '').strip(),
+            'ida_tempo_min': (post.get('bate_volta_ida_tempo_min') or '').strip(),
+            'volta_saida_hora': (post.get('bate_volta_volta_saida_hora') or '').strip(),
+            'volta_tempo_min': (post.get('bate_volta_volta_tempo_min') or '').strip(),
         }
     )
     _dedupe_roteiro_loop_retorno_final(state)
@@ -1121,7 +1109,7 @@ def _build_roteiro_state_from_post(request, oficio=None, route_state_map=None):
     return state
 
 
-def _validate_roteiro_state(state, oficio=None):
+def _validate_roteiro_state(state):
     errors = []
     roteiro_modo = state.get('roteiro_modo') or ROTEIRO_MODO_PROPRIO
     roteiro_evento_id = state.get('roteiro_evento_id')
@@ -1368,14 +1356,14 @@ def _roteiro_combine_date_time(data_value, hora_value):
         return None
     return datetime.combine(data_value, hora_value)
 
-def _setup_roteiro_querysets(form, request, instance=None):
+def _setup_roteiro_querysets(form, post, instance=None, *, method="GET"):
     """Preenche querysets de estado/cidade para sede (origem). No cadastro novo usa initial da config."""
     from roteiros import selectors
 
     form.fields["origem_estado"].queryset = selectors.listar_estados_para_select()
     estado_id = None
-    if request.method == "POST":
-        estado_id = request.POST.get("origem_estado")
+    if method == "POST":
+        estado_id = post.get("origem_estado")
         if estado_id:
             try:
                 estado_id = int(estado_id)
@@ -1447,26 +1435,23 @@ def _build_roteiro_avulso_route_options(evento=None, excluir_pk=None):
     return options, state_map
 
 
-def _build_avulso_roteiro_state_from_post(request, route_state_map=None):
+def _build_avulso_roteiro_state_from_post(post, route_state_map=None):
     """Reutiliza o parser do editor com aliases avulsos (origem_* -> sede_*)."""
 
-    post_data = request.POST.copy()
+    post_data = post.copy()
     if 'sede_estado' not in post_data and 'origem_estado' in post_data:
         post_data['sede_estado'] = post_data.get('origem_estado')
     if 'sede_cidade' not in post_data and 'origem_cidade' in post_data:
         post_data['sede_cidade'] = post_data.get('origem_cidade')
 
-    fake_request = SimpleNamespace(POST=post_data)
-    fake_oficio = SimpleNamespace(evento_id=None, roteiro_evento_id=None, evento=None)
     return _build_roteiro_state_from_post(
-        fake_request,
-        oficio=fake_oficio,
+        post_data,
         route_state_map=route_state_map or {},
     )
 
 
-def _parse_quantidade_servidores_diarias_post(request) -> int:
-    raw = (getattr(request, "POST", None) or {}).get("quantidade_servidores")
+def _parse_quantidade_servidores_diarias_post(post) -> int:
+    raw = (post or {}).get("quantidade_servidores")
     if raw is None:
         raw = ""
     raw = str(raw).strip()
@@ -1493,12 +1478,12 @@ def _calculate_avulso_diarias_from_state(state, *, quantidade_servidores: int = 
     return resultado
 
 
-def _build_roteiro_diarias_from_request(request, *, roteiro=None, evento=None):
+def _build_roteiro_diarias_from_request(post, *, roteiro=None, evento=None):
 
-    post_data = request.POST.copy()
+    post_data = post.copy()
     if 'roteiro_modo' not in post_data:
         post_data['roteiro_modo'] = ROTEIRO_MODO_PROPRIO
-    roteiro_evento_id = _parse_int(request.POST.get('roteiro_id') or request.POST.get('roteiro_evento_id'))
+    roteiro_evento_id = _parse_int(post.get('roteiro_id') or post.get('roteiro_evento_id'))
     if not roteiro_evento_id and roteiro is not None:
         roteiro_evento_id = roteiro.pk
     evento_id = None
@@ -1511,12 +1496,11 @@ def _build_roteiro_diarias_from_request(request, *, roteiro=None, evento=None):
         evento_id=evento_id,
     )
     route_options, route_state_map = _build_roteiro_route_options(route_context)
-    fake_request = SimpleNamespace(POST=post_data)
-    roteiro_state = _build_avulso_roteiro_state_from_post(fake_request, route_state_map=route_state_map)
-    validated = _validate_roteiro_state(roteiro_state, oficio=route_context)
+    roteiro_state = _build_avulso_roteiro_state_from_post(post_data, route_state_map=route_state_map)
+    validated = _validate_roteiro_state(roteiro_state)
     if not validated['ok']:
         return route_options, roteiro_state, validated, None
-    qs_diarias = _parse_quantidade_servidores_diarias_post(fake_request)
+    qs_diarias = _parse_quantidade_servidores_diarias_post(post_data)
     return (
         route_options,
         roteiro_state,
