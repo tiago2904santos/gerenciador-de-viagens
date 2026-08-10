@@ -5729,8 +5729,54 @@ A diferença é a carga: logo antes de aplicar o escuro, a captura faz ~388 mil 
 o faz cair no meio do laço de diff. Daí a intermitência: é corrida entre o relayout e o laço, e não
 falta de espera depois do carregamento.
 
-**Ainda em aberto:** qual trabalho assíncrono dispara o relayout. Enquanto isso não fecha, a régua
-não completa uma corrida de três larguras, e a E8 segue sem a tabela remedida.
+**Fechado: não havia trabalho assíncrono.** A pergunta estava mal posta, e eu a persegui por três
+hipóteses erradas — deslocamento de índice (falsa: 1.142 elementos constantes), carregamento de
+fonte (falsa: 4 faces, todas `loaded`, `fonts.ready` não muda altura) e corrida de temporização
+simples (falsa: não reproduz em 12 voltas replicando a captura exata).
+
+A causa é **uma regra de CSS**, e ela é síncrona. Instrumentando a corrida para nomear os elementos
+em vez de numerá-los, a coluna de largura entregou o caso: `.route-destinos-block__rail` e toda a
+subárvore vão de **406px no claro para 378px no escuro**. Subindo a árvore, os 28px nascem em
+`section.form-block--resource`:
+
+| propriedade | claro | escuro |
+|---|---|---|
+| `padding` | **0px** | **14px** |
+| `gap` | 16px | 12px |
+
+Perguntando ao navegador quem declara (`CSS.getMatchedStylesForNode`, que é autoridade e não
+palpite), a regra é `static/css/components/theme-dark-components.css:2332`:
+
+```css
+:is(html[data-theme="dark"]) .form-block {
+  background: var(--color-surface-soft);
+  border: 0;
+  border-radius: 14px;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+  padding: 14px;
+}
+```
+
+O `padding: 14px` só existe no escuro. Ele encolhe a caixa de conteúdo em 28px, os filhos vão de 434
+para 406, o texto quebra diferente, as alturas crescem, e a página inteira ganha 48,55px —
+propagando por **14 níveis** de árvore.
+
+**Por que isso desestabiliza a régua.** A cadeia é longa e cada `getComputedStyle` do laço de diff
+força layout. Em algumas corridas a captura lê a árvore com a cadeia ainda propagando, e aí registra
+o estado intermediário (4367,39px) em vez do final (4423,39px). Não é falta de espera depois do
+carregamento — é reflow profundo acontecendo durante a leitura, e por isso a espera que eu tinha
+posto no `settle()` reduziu a frequência sem eliminar.
+
+**O que fazer com isso é decisão da E8, não deste ID.** `.form-block` é classe de layout base, usada
+em 23 templates. Igualar o padding entre os temas é sub-etapa da E8 com `PARE E PERGUNTE`, e não
+cabe aqui.
+
+**Nota para a E8:** esta regra sozinha concentra quatro das famílias abertas — `padding`
+(espaçamento), `border: 0` (a **8b**, e na direção **oposta** à do enunciado, que fala em
+0px→1px), `border-radius: 14px` (a **8c** — e o 14px está no **escuro**, não no claro, ao contrário
+do que o enunciado diz) e `grid-template-columns`. Vale reabrir a tabela das famílias com isso em
+mãos: elas podem não ser quatro frentes espalhadas, e sim poucas regras densas.
 
 Fica também o diagnóstico melhor: quando a trava disparar, o erro passa a dizer qual rota é e se a
 página chegou a assentar, que é o que separa "o instrumento falhou" de "a página não para de mudar".
