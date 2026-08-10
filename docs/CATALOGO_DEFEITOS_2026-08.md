@@ -5904,3 +5904,116 @@ duplicações internas:
 
 A assimetria do item 1 é a parte que importa: duas escritas do mesmo registro com regras de área
 diferentes na mesma view, e nada na suíte distingue os dois caminhos.
+<!-- Renumeração: o `#304` (BE-11) mesclou antes deste ramo e criou `NOVO-87` e `NOVO-88`.
+     Estes três nasceram como 88/89/90 no ramo da E8 e viraram 89/90/91 para não colidir.
+     Os commits `5d0c151f`, `7a4704f2` e `77dbaac9` citam os números antigos. -->
+
+### NOVO-89 · `NOVO` O padding do `.form-block` entrou fora da escala de espaçamento · UI · 0,1 d
+
+Dívida assumida de propósito na primeira sub-etapa da **E8**, e registrada no mesmo commit que a
+criou.
+
+Ao levar `padding: 14px` do tema escuro para a regra base de `.form-block`
+(`fields/form-sections.css`), o valor entrou **literal**. A escala de espaçamento não tem 14px: vai
+de `--space-3` (12px) para `--space-4` (16px).
+
+**Por que não arredondei.** Usar `--space-4` mexeria **2px no tema escuro**, e a E8 é o claro
+alcançando o escuro — não os dois indo para um terceiro lugar. Misturar "igualar os temas" com
+"arrumar a escala" na mesma edição é o que torna regressão visual impossível de atribuir, que é o
+risco que a etapa mais teme. O escuro tinha que sair byte a byte igual, e saiu: os prints das três
+larguras dão dimensão idêntica antes e depois.
+
+O 14px já não era estranho ao claro — `pages/roteiros.css` tem `padding: 14px` sem predicado de tema
+no `.route-sede-block`, e `theme-dark-components.css` usa `padding: 12px 14px` em outros pontos. O
+valor já circulava; o que este ID registra é que ele agora está na regra **base** de uma classe
+presente em 23 templates, e portanto vale a pena resolver de uma vez.
+
+**Fica para a E9** (`UI-02`), que reescreve `theme-dark-components.css` inteiro e é onde a escala
+pode ser decidida sem se confundir com a igualação dos temas. Duas saídas possíveis, e a escolha é
+do dono: arredondar para `--space-4` (16px, mexe 2px nos dois temas de uma vez) ou criar um token de
+14px, se o valor se provar recorrente.
+
+### NOVO-90 · `NOVO` A régua de tema não separa "diverge e pinta" de "diverge e não pinta" · QA · 0,5 d
+
+Achado ao executar a segunda sub-etapa da **E8**, e ele muda como o número da etapa deve ser lido.
+
+`medir_divergencia_tema.py` compara `getComputedStyle` entre os temas e conta toda diferença que não
+seja cor. Isso trata como equivalentes duas coisas muito diferentes: propriedade que **muda o que o
+usuário vê** e propriedade que o navegador **computa mas não pinta**.
+
+O caso que expôs isso: `-webkit-font-smoothing: antialiased`, declarado só em
+`html[data-theme="dark"] body`, valia **60.270 elementos — 48,2% de toda a divergência não-cor do
+sistema**, mais que as quatro famílias catalogadas da E8 somadas (~16%).
+
+Medido neste contêiner Linux, com Chromium:
+
+| | |
+|---|---|
+| estilo computado | `auto` (claro) vs `antialiased` (escuro) — **difere** |
+| largura renderizada do mesmo texto | 1264px vs 1264px — **idêntica** |
+| print da lista de ofícios, antes e depois de globalizar | **idêntico byte a byte** (mesmo md5, nos dois temas) |
+
+A propriedade tem efeito real no **macOS**. Então a divergência é verdadeira para quem usa Mac — o
+tema claro e o escuro renderizam texto diferente lá — e é **invisível** aqui. As duas afirmações
+convivem, e a régua não distingue uma da outra.
+
+**Consequência prática, que precisa estar escrita:** a meta do plano para o `NOVO-58` ("divergência
+próxima de zero") vai ser cumprida em boa parte por itens sem efeito visual nesta plataforma. Quem
+ler só o número vai superestimar o ganho de tela. Uma queda de 48% na métrica pode significar zero
+pixel movido — foi exatamente o que aconteceu.
+
+Isto **não** torna a correção errada: globalizar segue o princípio que o próprio projeto escreveu no
+`NOVO-62` ("tipografia não é decisão de tema") e conserta a divergência real no macOS. O que o ID
+registra é que o instrumento precisa de uma segunda coluna.
+
+O plano já avisava do parente deste defeito, na seção "a armadilha da tipografia": *"o número
+19.896 elementos media a pilha declarada, não a face que o usuário vê […] não dá para determinar
+daqui o que renderiza na máquina do usuário"*. O aviso valia para `font-family`; vale igual para
+tudo que é renderização de texto.
+
+**Saída sugerida para quem pegar este ID:** uma lista de propriedades sabidamente sem efeito de
+layout no motor usado pela régua (`-webkit-font-smoothing`, `-moz-osx-font-smoothing`,
+`text-rendering`, e as de `transition-*`, que só mudam a curva no tempo), contadas à parte no
+relatório. Duas somas, não uma: a que move pixel e a que não move.
+
+### NOVO-91 🔴 · `NOVO` A sessão remota mede ~35% menos divergência que o CI · QA · 0,5 d
+
+Descoberto errando: apertei os tetos de `scripts/tetos_front.json` com números medidos **aqui**, e o
+CI reprovou em 25+ rotas. O arquivo estava calibrado para o CI, e eu escrevi por cima dele medições
+de outro ambiente.
+
+A prova de que os tetos originais vieram do CI, e não daqui:
+
+| rota | teto gravado | CI mede | local mede |
+|---|---:|---:|---:|
+| `dashboard@1440` | 1125 | **1125** | 780 |
+| `cargo-editar@1440` | 1029 | **1029** | 672 |
+| `combustiveis-lista@1440` | 1036 | **1036** | 676 |
+
+Idêntico ao teto no CI, ~35% menor aqui. Não é ruído: são três casas decimais de coincidência em
+rotas independentes.
+
+**A causa provável é fonte.** O CI roda `python -m playwright install --with-deps chromium`, que traz
+o conjunto de fontes dele; a sessão remota usa o Chromium pré-instalado da imagem, com outro
+conjunto. Métrica de texto diferente muda quebra de linha, que muda altura, que muda quantos
+elementos divergem. É o mesmo mecanismo que o plano descreve na "armadilha da tipografia" — e a
+mesma advertência: *"não dá para determinar daqui o que renderiza na máquina do usuário"*.
+
+**Consequência operacional, que é o que importa:** medição local serve para **comparar antes/depois
+no mesmo ambiente** — foi assim que a cadeia do `.form-block` foi diagnosticada, e o diagnóstico
+está certo. Não serve para **gravar teto**. Regravar `tetos_front.json` só pode ser feito com números
+produzidos pelo CI.
+
+Isso deixa um buraco de processo: hoje o CI **não** commita o JSON de volta (`--json` vai para
+`$RUNNER_TEMP` e morre com o job), e regravar teto é passo manual. Ou seja, não existe caminho
+suportado para baixar a catraca a partir de uma corrida do CI — que é justamente o que uma etapa como
+a E8 precisa fazer a cada sub-etapa.
+
+**Saída sugerida:** um passo opcional no `tests.yml`, disparado por rótulo ou `workflow_dispatch`, que
+roda as duas réguas com `--atualizar-tetos` e publica o JSON como artefato — ou abre commit na
+branch. Enquanto isso não existe, a catraca só desce quando alguém copiar os números do log do CI à
+mão, e o log só mostra as rotas que **reprovaram**.
+
+**Efeito medido apesar de tudo:** o próprio log de reprovação mostra a queda real no ambiente certo.
+`configuracao` caiu de 1652 para 1425 a 1440px (−227), e o mesmo nas outras duas larguras (−204 cada).
+`eventos-lista@1440` caiu 14. É menos do que os −9.376 medidos localmente, e é o número que vale.
