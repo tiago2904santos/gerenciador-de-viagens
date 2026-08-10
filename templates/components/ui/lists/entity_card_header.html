@@ -1,12 +1,1 @@
-{# Cabeçalho data-driven do entity card. header = core.entity_cards.header(items, chips). #}
-<div class="entity-card__header record-card__id-row">
-  {% for item in header.items %}
-  <div class="record-card__info-item{% if item.wide %} record-card__info-item--wide{% endif %}">
-    <span class="record-card__info-label">{{ item.label }}</span>
-    <span class="record-card__info-value{% if item.wrap %} record-card__info-value--wrap{% endif %}{% if item.value_class %} {{ item.value_class }}{% endif %}">{{ item.value }}</span>
-  </div>
-  {% endfor %}
-  {% for chip in header.chips %}
-    {% include "components/ui/badges/chip.html" with tone=chip.tone label=chip.label extra_class="record-card__temporal-chip" only %}
-  {% endfor %}
-</div>
+<c-ui.lists.entity_card_header :header="header" />

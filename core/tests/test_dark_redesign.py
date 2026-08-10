@@ -492,7 +492,7 @@ class DarkRedesignContractTests(SimpleTestCase):
     def test_rich_list_cards_share_the_entity_card_contract(self):
         templates = Path(settings.BASE_DIR) / "templates"
         canonical = (
-            templates / "components" / "ui" / "lists" / "entity_card.html"
+            templates / "cotton" / "ui" / "lists" / "entity_card.html"
         ).read_text(encoding="utf-8")
         for contract in (
             "entity-card",
