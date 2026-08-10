@@ -5,18 +5,18 @@ Parâmetros: label, variant, extra_class.
 {% endcomment %}
 {% with status_variant=variant|default:'muted' %}
 {% if status_variant == 'draft' %}
-  {% include "components/ui/badges/chip.html" with tone="warning" label=label extra_class=extra_class only %}
+  <c-ui.badges.chip tone="warning" :label="label" :extra_class="extra_class" only />
 {% elif status_variant == 'active' or status_variant == 'completed' or status_variant == 'default' or status_variant == 'success' %}
-  {% include "components/ui/badges/chip.html" with tone="success" label=label extra_class=extra_class only %}
+  <c-ui.badges.chip tone="success" :label="label" :extra_class="extra_class" only />
 {% elif status_variant == 'danger' or status_variant == 'error' %}
-  {% include "components/ui/badges/chip.html" with tone="danger" label=label extra_class=extra_class only %}
+  <c-ui.badges.chip tone="danger" :label="label" :extra_class="extra_class" only />
 {% elif status_variant == 'warning' %}
-  {% include "components/ui/badges/chip.html" with tone="warning" label=label extra_class=extra_class only %}
+  <c-ui.badges.chip tone="warning" :label="label" :extra_class="extra_class" only />
 {% elif status_variant == 'pending' %}
-  {% include "components/ui/badges/chip.html" with tone="pending" label=label extra_class=extra_class only %}
+  <c-ui.badges.chip tone="pending" :label="label" :extra_class="extra_class" only />
 {% elif status_variant == 'info' or status_variant == 'accent' %}
-  {% include "components/ui/badges/chip.html" with tone="info" label=label extra_class=extra_class only %}
+  <c-ui.badges.chip tone="info" :label="label" :extra_class="extra_class" only />
 {% else %}
-  {% include "components/ui/badges/chip.html" with tone="muted" label=label extra_class=extra_class only %}
+  <c-ui.badges.chip tone="muted" :label="label" :extra_class="extra_class" only />
 {% endif %}
 {% endwith %}

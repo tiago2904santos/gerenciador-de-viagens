@@ -6,7 +6,7 @@ mesma sequência com variações pequenas. Este módulo é o motor; cada app dec
 um `CatalogConfig` por catálogo e liga as views geradas no `urls.py`.
 
 **Nenhum template muda.** Os índices de catálogo já são invólucros de 5 a 10
-linhas sobre `components/lists/list_page_quick_add.html`; a duplicação estava
+linhas sobre `cotton/lists/list_page_quick_add.html`; a duplicação estava
 inteiramente nas views. Por isso `rows_context_key` existe: `planos_trabalho`
 passa as linhas como `linhas` e os outros como `rows`, e preservar essa diferença
 é mais barato (e mais seguro) do que mexer em quatro templates.

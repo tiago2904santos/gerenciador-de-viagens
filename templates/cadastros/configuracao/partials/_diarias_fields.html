@@ -1,10 +1,10 @@
-{% include "components/ui/feedback/form_errors.html" with form=diaria_form only %}
+<c-ui.feedback.form_errors :form="diaria_form" only />
 
 <div class="field-layout">
   <div class="field-row field-row--3">
-    {% include "components/ui/forms/field.html" with field=diaria_form.faixa only %}
-    {% include "components/ui/forms/date_picker.html" with mode="single" picker_id="diaria-vigencia-picker" single_field=diaria_form.vigencia_inicio only %}
-    {% include "components/ui/forms/field.html" with field=diaria_form.valor_24h only %}
+    <c-ui.forms.field :field="diaria_form.faixa" only />
+    <c-ui.forms.date_picker mode="single" picker_id="diaria-vigencia-picker" :single_field="diaria_form.vigencia_inicio" only />
+    <c-ui.forms.field :field="diaria_form.valor_24h" only />
   </div>
 
   <div class="field-row field-row--2">

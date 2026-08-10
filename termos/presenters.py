@@ -23,7 +23,7 @@ def apresentar_linha_simples_termo(
     """Linha da lista de termos simples — os que nao tem servidor nem viatura.
 
     Sem equipe e sem veiculo o card em camadas nao tem o que mostrar, entao
-    esses termos usam a linha de catalogo (components/lists/simple_list_row).
+    esses termos usam a linha de catálogo (cotton/lists/simple_list_row).
     O download e o do termo generico: e a variante SEMIPREENCHIDO, a unica
     que faz sentido sem servidor — ver termos.services.
     """

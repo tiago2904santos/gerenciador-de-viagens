@@ -1,1 +1,1 @@
-{% include "components/ui/lists/entity_card.html" with card=card body_template="prestacoes_contas/partials/_prestacao_card_body.html" footer_template="prestacoes_contas/partials/_prestacao_card_footer.html" csrf_token=csrf_token current_url=current_url extra_class=card.group_class only %}
+<c-ui.lists.entity_card :card="card" body_template="prestacoes_contas/partials/_prestacao_card_body.html" footer_template="prestacoes_contas/partials/_prestacao_card_footer.html" :csrf_token="csrf_token" :current_url="current_url" :extra_class="card.group_class" only />

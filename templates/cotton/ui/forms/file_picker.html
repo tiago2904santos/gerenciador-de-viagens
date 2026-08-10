@@ -15,7 +15,7 @@
              {% if required %}required{% endif %}
              data-file-native="true">
       <label class="file-picker__action prestacao-file-picker__action" for="{{ field_id }}">
-        <span class="file-picker__action-icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon="document" only %}</span>
+        <span class="file-picker__action-icon" aria-hidden="true"><c-ui.icons.icon icon="document" only /></span>
         <span data-file-picker-action-label>{{ action_label|default:"Selecionar arquivos" }}</span>
       </label>
       <span class="file-picker__value prestacao-file-picker__value" data-file-picker-name data-default-label="{{ empty_label|default:'Nenhum arquivo selecionado' }}">{{ empty_label|default:"Nenhum arquivo selecionado" }}</span>
@@ -47,7 +47,7 @@
              data-tooltip="Abrir"
              title="Abrir"
              data-file-preview-selection>
-            {% include "components/ui/icons/icon.html" with icon="eye" only %}
+            <c-ui.icons.icon icon="eye" only />
           </a>
           <button class="icon-btn icon-btn--delete file-widget__action prestacao-file-widget__action"
                   type="button"
@@ -55,7 +55,7 @@
                   data-tooltip="Remover"
                   title="Remover"
                   data-file-remove-selection>
-            {% include "components/ui/icons/icon.html" with icon="delete" only %}
+            <c-ui.icons.icon icon="delete" only />
           </button>
         </div>
       </li>

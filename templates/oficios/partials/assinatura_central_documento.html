@@ -6,9 +6,9 @@
     </div>
     {% if painel.disponivel %}
       {% if painel.ja_assinado %}
-        {% include "components/ui/badges/chip.html" with label="Assinado" tone="success" only %}
+        <c-ui.badges.chip label="Assinado" tone="success" only />
       {% else %}
-        {% include "components/ui/badges/chip.html" with label="Não assinado" tone="warning" only %}
+        <c-ui.badges.chip label="Não assinado" tone="warning" only />
       {% endif %}
     {% endif %}
   </header>

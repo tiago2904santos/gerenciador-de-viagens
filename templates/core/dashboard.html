@@ -19,7 +19,7 @@
 
 {% block content %}
   <div class="page-shell">
-    {% include "components/ui/headers/page_header.html" with eyebrow="CENTRAL DE VIAGENS 3" title="Início" description="Escolha um módulo para começar." icon_label="CV" only %}
+    <c-ui.headers.page_header eyebrow="CENTRAL DE VIAGENS 3" title="Início" description="Escolha um módulo para começar." icon_label="CV" only />
 
     <section aria-labelledby="inicio-modulos-title">
       <h2 id="inicio-modulos-title" class="sr-only">Módulos</h2>
@@ -28,10 +28,10 @@
         {% url 'termos:index' as url_termos %}
         {% url 'justificativas:index' as url_justificativas %}
         {% url 'roteiros:index' as url_roteiros %}
-        {% include "components/cards/module_card.html" with mark="OF" eyebrow="Documentos" title="Ofícios" description="Emissão e acompanhamento dos documentos oficiais de viagem." href=url_oficios action_label="Abrir Ofícios" only %}
-        {% include "components/cards/module_card.html" with mark="TA" eyebrow="Documentos" title="Termos" description="Geração e acompanhamento de termos vinculados aos ofícios." href=url_termos action_label="Abrir Termos" only %}
-        {% include "components/cards/module_card.html" with mark="JT" eyebrow="Textos formais" title="Justificativas" description="Modelos e textos formais vinculados aos documentos." href=url_justificativas action_label="Abrir Justificativas" only %}
-        {% include "components/cards/module_card.html" with mark="RT" eyebrow="Planejamento" title="Roteiros" description="Cadastro e reaproveitamento de trajetos oficiais." href=url_roteiros action_label="Abrir Roteiros" only %}
+        <c-cards.module_card mark="OF" eyebrow="Documentos" title="Ofícios" description="Emissão e acompanhamento dos documentos oficiais de viagem." :href="url_oficios" action_label="Abrir Ofícios" only />
+        <c-cards.module_card mark="TA" eyebrow="Documentos" title="Termos" description="Geração e acompanhamento de termos vinculados aos ofícios." :href="url_termos" action_label="Abrir Termos" only />
+        <c-cards.module_card mark="JT" eyebrow="Textos formais" title="Justificativas" description="Modelos e textos formais vinculados aos documentos." :href="url_justificativas" action_label="Abrir Justificativas" only />
+        <c-cards.module_card mark="RT" eyebrow="Planejamento" title="Roteiros" description="Cadastro e reaproveitamento de trajetos oficiais." :href="url_roteiros" action_label="Abrir Roteiros" only />
       </div>
     </section>
   </div>

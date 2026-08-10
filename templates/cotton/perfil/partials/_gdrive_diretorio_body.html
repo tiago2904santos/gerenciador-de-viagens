@@ -6,13 +6,13 @@
 {% else %}
   <div class="gdrive-stats-row">
     <div class="gdrive-stat">
-      <span class="gdrive-stat__icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon="cloud" only %}</span>
+      <span class="gdrive-stat__icon" aria-hidden="true"><c-ui.icons.icon icon="cloud" only /></span>
       <span class="gdrive-stat__text">Arquivos enviados ao Drive</span>
       <span class="gdrive-stat__value">{{ drive_total_arquivos }}</span>
     </div>
     {% if drive_pode_reorganizar %}
       <div class="gdrive-stat">
-        <span class="gdrive-stat__icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon="calendar" only %}</span>
+        <span class="gdrive-stat__icon" aria-hidden="true"><c-ui.icons.icon icon="calendar" only /></span>
         <span class="gdrive-stat__text">Eventos cadastrados</span>
         <span class="gdrive-stat__value">{{ drive_total_eventos }}</span>
       </div>
@@ -32,7 +32,7 @@
       <div class="gdrive-pasta-atual">
         <span class="gdrive-pasta-atual__label">Pasta atual</span>
         <div class="gdrive-pasta-selecionada">
-          <span class="gdrive-pasta-selecionada__icon" aria-hidden="true">{% include "components/ui/icons/icon.html" with icon="folder" only %}</span>
+          <span class="gdrive-pasta-selecionada__icon" aria-hidden="true"><c-ui.icons.icon icon="folder" only /></span>
           <span class="gdrive-pasta-selecionada__nome">{{ drive_pasta_raiz_nome|default:drive_pasta_raiz_id }}</span>
           <a href="https://drive.google.com/drive/folders/{{ drive_pasta_raiz_id }}"
              target="_blank" rel="noopener"

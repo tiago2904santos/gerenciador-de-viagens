@@ -64,7 +64,7 @@
           type="submit"
           aria-label="Definir como padrão"
           data-tooltip="Definir como padrão"
-        >{% include "components/ui/icons/icon.html" with icon="star" only %}</button>
+        ><c-ui.icons.icon icon="star" only /></button>
       </form>
     {% endif %}
     <div class="icon-btn-group">
@@ -80,7 +80,7 @@
           data-vincular-usuario-label="{{ row.vincular_usuario_label }}"
           aria-label="Vincular {{ row.title }} a uma área"
           data-tooltip="Vincular a uma área"
-        >{% include "components/ui/icons/icon.html" with icon="link" only %}</button>
+        ><c-ui.icons.icon icon="link" only /></button>
       {% endif %}
       {% if row.pdf_url or row.docx_url or row.anexar_assinado_url %}
         {% with menu_suffix=row_index|default:"item" %}
@@ -94,7 +94,7 @@
             data-tooltip="{% if row.remover_assinado_url %}Documentos e assinado{% else %}Documentos{% endif %}"
             data-overlay-trigger data-overlay-kind="menu"
             data-overlay-target="simple-row-document-menu-{{ row.title|slugify }}-{{ menu_suffix }}"
-          >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
+          ><c-ui.icons.icon icon="folder" only /></button>
           <div
             class="action-menu action-menu--rich"
             id="simple-row-document-menu-{{ row.title|slugify }}-{{ menu_suffix }}"
@@ -102,15 +102,15 @@
             hidden
           >
             {% if row.remover_assinado_url %}
-              {% include "components/ui/menus/rich_menu_header.html" with title="Documento assinado" subtitle=row.title icon="sign" only %}
+              <c-ui.menus.rich_menu_header title="Documento assinado" :subtitle="row.title" icon="sign" only />
             {% else %}
-              {% include "components/ui/menus/rich_menu_header.html" with title="Documentos" subtitle=row.title icon="folder" only %}
+              <c-ui.menus.rich_menu_header title="Documentos" :subtitle="row.title" icon="folder" only />
             {% endif %}
             {% if row.pdf_url %}
-              {% include "components/ui/menus/rich_menu_link.html" with href=row.pdf_url title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" download=True only %}
+              <c-ui.menus.rich_menu_link :href="row.pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" :download="True" only />
             {% endif %}
             {% if row.docx_url %}
-              {% include "components/ui/menus/rich_menu_link.html" with href=row.docx_url title="Baixar DOCX" description="Arquivo editável" icon="docx" tone="docx" download=True only %}
+              <c-ui.menus.rich_menu_link :href="row.docx_url" title="Baixar DOCX" description="Arquivo editável" icon="docx" tone="docx" :download="True" only />
             {% endif %}
             {% if row.anexar_assinado_url %}
               <button
@@ -125,7 +125,7 @@
                 data-attach-signed-current-remove-url="{{ row.remover_assinado_url }}"
               >
                 <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
-                  {% include "components/ui/icons/icon.html" with icon="sign" only %}
+                  <c-ui.icons.icon icon="sign" only />
                 </span>
                 <span class="action-menu__item-copy">
                   <strong>{% if row.remover_assinado_url %}Gerenciar assinado{% else %}Anexar assinado{% endif %}</strong>
@@ -149,7 +149,7 @@
             data-edit-label="{{ row.title }}"
             aria-label="Editar {{ row.title }}"
             data-tooltip="Editar"
-          >{% include "components/ui/icons/icon.html" with icon="edit" only %}</button>
+          ><c-ui.icons.icon icon="edit" only /></button>
         {% elif row.edit_fields_json %}
           <button
             class="icon-btn icon-btn--edit"
@@ -159,9 +159,9 @@
             data-edit-fields="{{ row.edit_fields_json }}"
             aria-label="Editar"
             data-tooltip="Editar"
-          >{% include "components/ui/icons/icon.html" with icon="edit" only %}</button>
+          ><c-ui.icons.icon icon="edit" only /></button>
         {% else %}
-          {% include "components/ui/buttons/icon_button.html" with href=row.edit_url action="edit" aria_label="Editar" tooltip="Editar" only %}
+          <c-ui.buttons.icon_button :href="row.edit_url" action="edit" aria_label="Editar" tooltip="Editar" only />
         {% endif %}
       {% endif %}
       {% if row.delete_url %}
@@ -174,9 +174,9 @@
             data-delete-label="{{ row.title }}"
             aria-label="Excluir"
             data-tooltip="Excluir"
-          >{% include "components/ui/icons/icon.html" with icon="delete" only %}</button>
+          ><c-ui.icons.icon icon="delete" only /></button>
         {% else %}
-          {% include "components/ui/buttons/icon_button.html" with href=row.delete_url action="delete" aria_label="Excluir" tooltip="Excluir" only %}
+          <c-ui.buttons.icon_button :href="row.delete_url" action="delete" aria_label="Excluir" tooltip="Excluir" only />
         {% endif %}
       {% endif %}
     </div>

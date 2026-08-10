@@ -1,6 +1,6 @@
 <div class="field-grid field-grid--cols-4">
-  {% include "components/ui/forms/field.html" with field=form.placa size_class="field-size-1" only %}
-  {% include "components/ui/forms/field.html" with field=form.modelo size_class="field-size-1" only %}
-  {% include "components/ui/forms/field.html" with field=form.tipo size_class="field-size-1" only %}
-  {% include "components/ui/forms/field.html" with field=form.combustivel action_url=combustiveis_manage_url action_label="Gerenciar combustíveis" size_class="field-size-1" only %}
+  <c-ui.forms.field :field="form.placa" size_class="field-size-1" only />
+  <c-ui.forms.field :field="form.modelo" size_class="field-size-1" only />
+  <c-ui.forms.field :field="form.tipo" size_class="field-size-1" only />
+  <c-ui.forms.field :field="form.combustivel" :action_url="combustiveis_manage_url" action_label="Gerenciar combustíveis" size_class="field-size-1" only />
 </div>

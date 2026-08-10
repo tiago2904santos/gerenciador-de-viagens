@@ -1,5 +1,5 @@
 {# Calendário para preencher as datas dos trechos em sequência #}
-{% include "components/ui/forms/date_picker.html" with mode="multi" control_variant="filter-pill" picker_id="trechos-date-picker" extra_class="travel-period-filter travel-period-filter--filled" trigger_label="Preencher datas" trigger_aria_label="Preencher datas dos trechos" show_summary=False show_context=True show_confirm=True allow_repeat_dates=True only %}
+<c-ui.forms.date_picker mode="multi" control_variant="filter-pill" picker_id="trechos-date-picker" extra_class="travel-period-filter travel-period-filter--filled" trigger_label="Preencher datas" trigger_aria_label="Preencher datas dos trechos" :show_summary="False" :show_context="True" :show_confirm="True" :allow_repeat_dates="True" only />
 <template id="trecho-single-date-picker-template">
-  {% include "components/ui/forms/date_picker.html" with mode="single" single_label="__LABEL__" single_input_id="__DISPLAY_ID__" single_hidden_id="__HIDDEN_ID__" single_hidden_name="__HIDDEN_NAME__" single_hidden_value="__ISO_VALUE__" initial_date="__INITIAL_DATE__" trecho_date="__ROLE__" only %}
+  <c-ui.forms.date_picker mode="single" single_label="__LABEL__" single_input_id="__DISPLAY_ID__" single_hidden_id="__HIDDEN_ID__" single_hidden_name="__HIDDEN_NAME__" single_hidden_value="__ISO_VALUE__" initial_date="__INITIAL_DATE__" trecho_date="__ROLE__" only />
 </template>

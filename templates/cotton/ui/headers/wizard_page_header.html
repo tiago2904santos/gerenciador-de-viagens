@@ -11,13 +11,13 @@
       <div class="list-header__title-row">
         <h1 class="list-header__title">{{ title }}</h1>
         {% if status_label %}
-          {% include "components/ui/badges/status_badge.html" with label=status_label variant=status_variant|default:"draft" extra_class="page-header-status-chip" only %}
+          {% with cotton_attr_variant=status_variant|default:"draft" %}<c-ui.badges.status_badge :label="status_label" :variant="cotton_attr_variant" extra_class="page-header-status-chip" only />{% endwith %}
         {% endif %}
       </div>
     </div>
     {% if back_label %}
       <div class="list-header__band-actions">
-        {% include "components/ui/buttons/button.html" with href=back_url label=back_label variant="secondary" icon="arrow-left" type="button" data_autosave_link=True extra_class="list-header__wizard-back" only %}
+        <c-ui.buttons.button :href="back_url" :label="back_label" variant="secondary" icon="arrow-left" type="button" :data_autosave_link="True" extra_class="list-header__wizard-back" only />
       </div>
     {% endif %}
   </div>
@@ -30,7 +30,7 @@
 <div class="list-header list-header--wizard-stepper" data-wizard-sticky-stepper>
   <div class="list-header__rail list-header__rail--wizard">
     <div class="list-header__wizard-stepper">
-      {% include "components/ui/navigation/page_stepper.html" with steps=steps aria_label=stepper_aria_label|default:"Etapas do formulário" only %}
+      {% with cotton_attr_aria_label=stepper_aria_label|default:"Etapas do formulário" %}<c-ui.navigation.page_stepper :steps="steps" :aria_label="cotton_attr_aria_label" only />{% endwith %}
     </div>
   </div>
 </div>

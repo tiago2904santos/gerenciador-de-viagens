@@ -11,16 +11,16 @@ Separado do gatilho no PF-04. Renderizado em dois caminhos:
 A marcação é a mesma nos dois; o que muda é quando ela chega ao navegador.
 {% endcomment %}
 <div class="action-menu action-menu--rich" id="{{ menu.id }}" role="menu" hidden>
-  {% include "components/ui/menus/rich_menu_header.html" with title=menu.title subtitle=menu.subtitle icon=menu.icon|default:"folder" only %}
+  {% with cotton_attr_icon=menu.icon|default:"folder" %}<c-ui.menus.rich_menu_header :title="menu.title" :subtitle="menu.subtitle" :icon="cotton_attr_icon" only />{% endwith %}
   {% for item in menu.items %}
     {% if item.type == "link" %}
-      {% include "components/ui/menus/rich_menu_link.html" with href=item.href title=item.title description=item.description icon=item.icon tone=item.tone target_blank=item.target_blank download=item.download only %}
+      <c-ui.menus.rich_menu_link :href="item.href" :title="item.title" :description="item.description" :icon="item.icon" :tone="item.tone" :target_blank="item.target_blank" :download="item.download" only />
     {% elif item.type == "post" %}
       <form method="post" action="{{ item.action_url }}" class="action-menu__form">
         {% csrf_token %}
         <button type="submit" class="action-menu__item action-menu__item--rich" role="menuitem">
           <span class="action-menu__item-icon action-menu__item-icon--{{ item.icon_tone }}" aria-hidden="true">
-            {% include "components/ui/icons/icon.html" with icon=item.icon only %}
+            <c-ui.icons.icon :icon="item.icon" only />
           </span>
           <span class="action-menu__item-copy"><strong>{{ item.title }}</strong><small>{{ item.description }}</small></span>
         </button>
@@ -35,7 +35,7 @@ A marcação é a mesma nos dois; o que muda é quando ela chega ao navegador.
         data-confirm-action-label-text="{{ item.label }}"
       >
         <span class="action-menu__item-icon action-menu__item-icon--{{ item.icon_tone|default:'success' }}" aria-hidden="true">
-          {% include "components/ui/icons/icon.html" with icon=item.icon|default:"check" only %}
+          {% with cotton_attr_icon=item.icon|default:"check" %}<c-ui.icons.icon :icon="cotton_attr_icon" only />{% endwith %}
         </span>
         <span class="action-menu__item-copy"><strong>{{ item.title }}</strong><small>{{ item.description }}</small></span>
       </button>
@@ -49,7 +49,7 @@ A marcação é a mesma nos dois; o que muda é quando ela chega ao navegador.
         data-cancel-label="{{ item.label }}"
       >
         <span class="action-menu__item-icon action-menu__item-icon--warning" aria-hidden="true">
-          {% include "components/ui/icons/icon.html" with icon="ban" only %}
+          <c-ui.icons.icon icon="ban" only />
         </span>
         <span class="action-menu__item-copy"><strong>{{ item.title }}</strong><small>{{ item.description }}</small></span>
       </button>
@@ -63,7 +63,7 @@ A marcação é a mesma nos dois; o que muda é quando ela chega ao navegador.
         data-delete-label="{{ item.label }}"
       >
         <span class="action-menu__item-icon action-menu__item-icon--danger" aria-hidden="true">
-          {% include "components/ui/icons/icon.html" with icon="delete" only %}
+          <c-ui.icons.icon icon="delete" only />
         </span>
         <span class="action-menu__item-copy"><strong>{{ item.title }}</strong><small>{{ item.description }}</small></span>
       </button>
@@ -80,7 +80,7 @@ A marcação é a mesma nos dois; o que muda é quando ela chega ao navegador.
         data-attach-signed-current-remove-url="{{ item.current_remove_url }}"
       >
         <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
-          {% include "components/ui/icons/icon.html" with icon="sign" only %}
+          <c-ui.icons.icon icon="sign" only />
         </span>
         <span class="action-menu__item-copy">
           <strong>{% if item.assinado %}Gerenciar assinado{% else %}Anexar assinado{% endif %}</strong>

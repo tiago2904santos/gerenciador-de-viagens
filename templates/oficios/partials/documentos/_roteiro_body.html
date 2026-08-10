@@ -1,5 +1,5 @@
 {% if documentos_ctx.roteiro_card %}
-  {% include "oficios/partials/documentos/_route_summary_grid.html" with card=documentos_ctx.roteiro_card only %}
+  {% include "oficios/partials/documentos/_route_summary_grid.html" with card=documentos_ctx.roteiro_card col4_viatura=col4_viatura viatura_modelo=viatura_modelo viatura_placa=viatura_placa only %}
 {% else %}
   <article class="oficio-documentos-route-card oficio-documentos-route-card--fallback">
     <header class="oficio-documentos-route-card__head">

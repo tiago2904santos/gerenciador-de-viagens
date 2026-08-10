@@ -1,1 +1,1 @@
-{% include "components/ui/lists/file_list.html" with anexos=solicitacao_anexos subtitle="Documento de solicitação" extra_class="content-spaced evento-solicitacao-list" delete_form=True empty_message="Nenhum documento de solicitação anexado ainda." csrf_token=csrf_token only %}
+<c-ui.lists.file_list :anexos="solicitacao_anexos" subtitle="Documento de solicitação" extra_class="content-spaced evento-solicitacao-list" :delete_form="True" empty_message="Nenhum documento de solicitação anexado ainda." :csrf_token="csrf_token" only />

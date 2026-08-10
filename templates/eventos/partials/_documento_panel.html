@@ -21,7 +21,7 @@
     </div>
     {{ field }}
     {% if field.errors %}
-      {% include "components/ui/feedback/field_error.html" with errors=field.errors field_id=field.auto_id only %}
+      <c-ui.feedback.field_error :errors="field.errors" :field_id="field.auto_id" only />
     {% endif %}
     <section class="search-picker__selected-panel evento-doc-summary-panel" aria-label="Documentos encontrados">
       <div class="search-picker__selected-list roteiro-editor__route-list related-route-list related-route-list" data-evento-doc-list="{{ panel_key }}"></div>

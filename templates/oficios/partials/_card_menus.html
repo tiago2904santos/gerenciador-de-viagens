@@ -8,29 +8,29 @@ depois o de "Mais ações" paga uma requisição, não duas.
 `apresentar_oficio_card(oficio, menus_sob_demanda=False)`, então os corpos aqui
 são, por construção, os mesmos que estavam embutidos antes.
 {% endcomment %}
-{% for menu in card.footer.menus %}{% include "components/ui/lists/entity_card_menu_body.html" with menu=menu csrf_token=csrf_token only %}{% endfor %}
-{% for menu in card.footer.danger_menus %}{% include "components/ui/lists/entity_card_menu_body.html" with menu=menu csrf_token=csrf_token only %}{% endfor %}
+{% for menu in card.footer.menus %}<c-ui.lists.entity_card_menu_body :menu="menu" :csrf_token="csrf_token" only />{% endfor %}
+{% for menu in card.footer.danger_menus %}<c-ui.lists.entity_card_menu_body :menu="menu" :csrf_token="csrf_token" only />{% endfor %}
 <div class="action-menu action-menu--rich" id="justificativa-document-menu-{{ card.oficio_pk }}" role="menu" hidden>
-  {% include "components/ui/menus/rich_menu_header.html" with title="Justificativa" subtitle=card.numero_display icon="folder" only %}
-  {% include "components/ui/menus/rich_menu_link.html" with href=card.justificativa_visualizar_url title="Visualizar justificativa" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
-  {% include "components/ui/menus/rich_menu_link.html" with href=card.justificativa_pdf_url title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" download=True only %}
-  {% include "components/ui/menus/rich_menu_link.html" with href=card.justificativa_docx_url title="Baixar DOCX" description="Arquivo editável da justificativa" icon="docx" tone="docx" download=True only %}
+  <c-ui.menus.rich_menu_header title="Justificativa" :subtitle="card.numero_display" icon="folder" only />
+  <c-ui.menus.rich_menu_link :href="card.justificativa_visualizar_url" title="Visualizar justificativa" description="Abrir o documento no navegador" icon="eye" tone="preview" :target_blank="True" only />
+  <c-ui.menus.rich_menu_link :href="card.justificativa_pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" :download="True" only />
+  <c-ui.menus.rich_menu_link :href="card.justificativa_docx_url" title="Baixar DOCX" description="Arquivo editável da justificativa" icon="docx" tone="docx" :download="True" only />
 </div>
 {% for s in card.servidores %}{% if s.has_termo %}
 <div class="action-menu action-menu--rich" id="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}" role="menu" hidden>
   {% if s.termo_assinado %}
-    {% include "components/ui/menus/rich_menu_header.html" with title="Termo assinado" subtitle=s.name icon="sign" only %}
+    <c-ui.menus.rich_menu_header title="Termo assinado" :subtitle="s.name" icon="sign" only />
   {% else %}
-    {% include "components/ui/menus/rich_menu_header.html" with title="Termo do servidor" subtitle=s.name icon="document" only %}
+    <c-ui.menus.rich_menu_header title="Termo do servidor" :subtitle="s.name" icon="document" only />
   {% endif %}
   {% if s.termo_open_url %}
-    {% include "components/ui/menus/rich_menu_link.html" with href=s.termo_open_url title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
+    <c-ui.menus.rich_menu_link :href="s.termo_open_url" title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" :target_blank="True" only />
   {% endif %}
   {% if s.termo_pdf_url %}
-    {% include "components/ui/menus/rich_menu_link.html" with href=s.termo_pdf_url title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" download=True only %}
+    <c-ui.menus.rich_menu_link :href="s.termo_pdf_url" title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" :download="True" only />
   {% endif %}
   {% if s.termo_docx_url %}
-    {% include "components/ui/menus/rich_menu_link.html" with href=s.termo_docx_url title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" download=True only %}
+    <c-ui.menus.rich_menu_link :href="s.termo_docx_url" title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" :download="True" only />
   {% endif %}
   {% if s.termo_anexar_assinado_url %}
   <button
@@ -45,7 +45,7 @@ são, por construção, os mesmos que estavam embutidos antes.
     data-attach-signed-current-remove-url="{{ s.termo_remover_assinado_url }}"
   >
     <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
-      {% include "components/ui/icons/icon.html" with icon="sign" only %}
+      <c-ui.icons.icon icon="sign" only />
     </span>
     <span class="action-menu__item-copy">
       <strong>{% if s.termo_assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>

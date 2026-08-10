@@ -137,7 +137,7 @@ def _form_context(form, evento=None):
         "panel_url": reverse("eventos:detalhe", kwargs={"pk": evento.pk}) if is_edit else "",
         "status_label": status_label,
         "status_variant": status_variant,
-        # `H-02`: contexto do casco único (`components/page/flow_base.html`).
+        # `H-02`: contexto do casco único (`cotton/page/flow_base.html`).
         "flow_eyebrow": "EVENTOS",
         "flow_description": page_description,
         "flow_icon_label": "EV",
@@ -239,7 +239,7 @@ def novo(request):
     if request.method == "GET":
         return render(
             request,
-            "components/create_draft.html",
+            "cotton/create_draft.html",
             {
                 "page_title": "Novo evento",
                 "page_description": "Confirme para iniciar o cadastro guiado do evento.",
@@ -359,7 +359,7 @@ def detalhe(request, pk, etapa=1):
             "evento": evento,
             "evento_header_title": evento_header_title,
             "evento_header_description": evento_header_description,
-            # `H-02`: contexto do casco único (`components/page/flow_base.html`).
+            # `H-02`: contexto do casco único (`cotton/page/flow_base.html`).
             "flow_eyebrow": "EVENTOS",
             "flow_description": evento_header_description,
             "flow_icon_label": "EV",

@@ -69,6 +69,16 @@ CSS_EXCEPTIONS: dict[str, dict] = {
 # Regras de templates
 # ---------------------------------------------------------------------------
 TEMPLATE_RULES_ERRO = [
+    (
+        "component_include",
+        re.compile(r"{%\s*include\s+['\"](?:components|cotton)/"),
+        "Componente incluído como template — usar a tag <c-…>",
+    ),
+    (
+        "include_without_only",
+        re.compile(r"{%\s*include\b(?:(?!\bonly\b|%}).)*%}"),
+        "Include herda contexto ambiente — declarar parâmetros e usar only",
+    ),
     ("onsubmit_inline", re.compile(r'\bonsubmit='),           'Inline onsubmit event - use addEventListener'),
     ("css_inline",      re.compile(r'\bstyle="'),             'Atributo style="" inline — usar classe CSS'),
     ("onclick_inline",  re.compile(r'\bonclick='),            'Evento onclick inline — usar addEventListener'),

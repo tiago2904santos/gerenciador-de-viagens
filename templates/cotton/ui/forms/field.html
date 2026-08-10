@@ -32,7 +32,7 @@
   action_url / action_label / action_type (botão acoplado ao campo).
 {% endcomment %}
 {% if field.field.widget.input_type == 'checkbox' %}
-  {% include "components/ui/forms/card_toggle.html" with field=field title=label|default:field.label description=help_text|default:field.help_text size_class=size_class only %}
+  {% with cotton_attr_title=label|default:field.label cotton_attr_description=help_text|default:field.help_text %}<c-ui.forms.card_toggle :field="field" :title="cotton_attr_title" :description="cotton_attr_description" :size_class="size_class" only />{% endwith %}
 {% else %}
 {% with classe_do_widget=field.field.widget.attrs.class|default:"" %}
 <div class="field app-form-field cv-field{% if size_class %} {{ size_class }}{% endif %}">
@@ -48,15 +48,15 @@
 
   {% if action_url or action_label %}
     <div class="field-with-action field-with-action--manage-reveal{% if "search-picker__native" in classe_do_widget %} field-with-action--search-picker{% endif %}">
-      {% include "components/ui/forms/_field_control.html" with field=field classe_do_widget=classe_do_widget input_class=input_class only %}
+      <c-ui.forms._field_control :field="field" :classe_do_widget="classe_do_widget" :input_class="input_class" only />
       {% if action_url %}
-        {% include "components/ui/buttons/field_manage_button.html" with href=action_url action_label=action_label data_autosave_link=True only %}
+        <c-ui.buttons.field_manage_button :href="action_url" :action_label="action_label" :data_autosave_link="True" only />
       {% elif action_label %}
-        {% include "components/ui/buttons/field_manage_button.html" with action_label=action_label type=action_type|default:"button" only %}
+        {% with cotton_attr_type=action_type|default:"button" %}<c-ui.buttons.field_manage_button :action_label="action_label" :type="cotton_attr_type" only />{% endwith %}
       {% endif %}
     </div>
   {% else %}
-    {% include "components/ui/forms/_field_control.html" with field=field classe_do_widget=classe_do_widget input_class=input_class only %}
+    <c-ui.forms._field_control :field="field" :classe_do_widget="classe_do_widget" :input_class="input_class" only />
   {% endif %}
 
   {% comment %}
@@ -73,7 +73,7 @@
   {% with ajuda=help_text|default:field.help_text %}
     {% if ajuda %}<div class="field-help app-form-help" id="{{ field.auto_id }}_helptext">{{ ajuda|safe }}</div>{% endif %}
   {% endwith %}
-  {% if field.errors %}{% include "components/ui/feedback/field_error.html" with errors=field.errors field_id=field.auto_id only %}{% endif %}
+  {% if field.errors %}<c-ui.feedback.field_error :errors="field.errors" :field_id="field.auto_id" only />{% endif %}
 </div>
 {% endwith %}
 {% endif %}

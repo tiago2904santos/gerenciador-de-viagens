@@ -1,6 +1,6 @@
-{% include "components/ui/feedback/form_errors.html" with form=senha_form only %}
+<c-ui.feedback.form_errors :form="senha_form" only />
 <div class="field-grid field-grid--cols-2">
-  {% include "components/ui/forms/field.html" with field=senha_form.old_password size_class="field-size-2" only %}
-  {% include "components/ui/forms/field.html" with field=senha_form.new_password1 size_class="field-size-1" only %}
-  {% include "components/ui/forms/field.html" with field=senha_form.new_password2 size_class="field-size-1" only %}
+  <c-ui.forms.field :field="senha_form.old_password" size_class="field-size-2" only />
+  <c-ui.forms.field :field="senha_form.new_password1" size_class="field-size-1" only />
+  <c-ui.forms.field :field="senha_form.new_password2" size_class="field-size-1" only />
 </div>

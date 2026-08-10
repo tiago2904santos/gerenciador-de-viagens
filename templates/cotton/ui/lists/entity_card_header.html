@@ -8,6 +8,6 @@
   </div>
   {% endfor %}
   {% for chip in header.chips %}
-    {% include "components/ui/badges/chip.html" with tone=chip.tone label=chip.label extra_class="record-card__temporal-chip" only %}
+    <c-ui.badges.chip :tone="chip.tone" :label="chip.label" extra_class="record-card__temporal-chip" only />
   {% endfor %}
 </div>

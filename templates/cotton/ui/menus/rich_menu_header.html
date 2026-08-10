@@ -1,7 +1,7 @@
 {% cotton:vars icon subtitle title %}
 <div class="action-menu__heading">
   <span class="action-menu__heading-icon" aria-hidden="true">
-    {% include "components/ui/icons/icon.html" with icon=icon|default:"folder" only %}
+    {% with cotton_attr_icon=icon|default:"folder" %}<c-ui.icons.icon :icon="cotton_attr_icon" only />{% endwith %}
   </span>
   <span class="action-menu__heading-copy">
     <strong>{{ title }}</strong>

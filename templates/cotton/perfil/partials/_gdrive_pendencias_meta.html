@@ -1,2 +1,2 @@
 {% cotton:vars drive_total_pendencias %}
-{% include "components/ui/badges/chip.html" with tone="danger" label="Pendente" count=drive_total_pendencias only %}
+<c-ui.badges.chip tone="danger" label="Pendente" :count="drive_total_pendencias" only />

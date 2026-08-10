@@ -3,12 +3,12 @@
     <span class="document-inline-card__title">Diário de Bordo</span>
     <span class="document-inline-card__header-end">
       <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
-        {% include "components/ui/buttons/icon_button.html" with href=preview_inline_url action="preview" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" only %}
+        <c-ui.buttons.icon_button :href="preview_inline_url" action="preview" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" only />
         {% if preview_pdf_url %}
-          {% include "components/ui/buttons/icon_button.html" with href=preview_pdf_url action="pdf" aria_label="Baixar PDF" tooltip="Baixar PDF" only %}
+          <c-ui.buttons.icon_button :href="preview_pdf_url" action="pdf" aria_label="Baixar PDF" tooltip="Baixar PDF" only />
         {% endif %}
         {% if preview_xlsx_url %}
-          {% include "components/ui/buttons/icon_button.html" with href=preview_xlsx_url action="download" aria_label="Baixar XLSX" tooltip="Baixar XLSX" only %}
+          <c-ui.buttons.icon_button :href="preview_xlsx_url" action="download" aria_label="Baixar XLSX" tooltip="Baixar XLSX" only />
         {% endif %}
       </span>
     </span>

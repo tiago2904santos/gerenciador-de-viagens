@@ -4,10 +4,10 @@
   <div class="record-card__footer-actions">
     <div class="record-card__footer-actions-main icon-btn-group">
       {% if footer.edit_url %}
-        {% include "components/ui/buttons/icon_button.html" with href=footer.edit_url action="edit" aria_label=footer.edit_aria tooltip=footer.edit_tooltip|default:"Editar" only %}
+        {% with cotton_attr_tooltip=footer.edit_tooltip|default:"Editar" %}<c-ui.buttons.icon_button :href="footer.edit_url" action="edit" :aria_label="footer.edit_aria" :tooltip="cotton_attr_tooltip" only />{% endwith %}
       {% endif %}
       {% for menu in footer.menus %}
-        {% include "components/ui/lists/entity_card_menu.html" with menu=menu csrf_token=csrf_token only %}
+        <c-ui.lists.entity_card_menu :menu="menu" :csrf_token="csrf_token" only />
       {% endfor %}
     </div>
     <div class="record-card__footer-actions--danger icon-btn-group">
@@ -22,13 +22,13 @@
           data-delete-label="{{ footer.delete_modal_label }}"
           {% if footer.delete_modal_title %}data-delete-title="{{ footer.delete_modal_title }}"{% endif %}
         >
-          {% include "components/ui/icons/icon.html" with icon="delete" only %}
+          <c-ui.icons.icon icon="delete" only />
         </button>
       {% elif footer.delete_url %}
-        {% include "components/ui/buttons/icon_button.html" with href=footer.delete_url action="delete" aria_label=footer.delete_aria|default:"Excluir" tooltip="Excluir" only %}
+        {% with cotton_attr_aria_label=footer.delete_aria|default:"Excluir" %}<c-ui.buttons.icon_button :href="footer.delete_url" action="delete" :aria_label="cotton_attr_aria_label" tooltip="Excluir" only />{% endwith %}
       {% endif %}
       {% for menu in footer.danger_menus %}
-        {% include "components/ui/lists/entity_card_menu.html" with menu=menu csrf_token=csrf_token only %}
+        <c-ui.lists.entity_card_menu :menu="menu" :csrf_token="csrf_token" only />
       {% endfor %}
     </div>
   </div>

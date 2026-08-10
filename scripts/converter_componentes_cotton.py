@@ -109,7 +109,7 @@ def _template_literal(expression: Any) -> str | None:
 
 
 def _contrato(template_name: str, memo: dict[str, set[str]], stack: set[str]) -> set[str]:
-    from django.template.base import NodeList, VariableNode
+    from django.template.base import NodeList, Parser, VariableNode
     from django.template.defaulttags import (
         FirstOfNode,
         ForNode,
@@ -119,6 +119,8 @@ def _contrato(template_name: str, memo: dict[str, set[str]], stack: set[str]) ->
     )
     from django.template.loader import get_template
     from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
+    from django_cotton.templatetags._component import CottonComponentNode
+    from django_cotton.templatetags._slot import CottonSlotNode
 
     if template_name.startswith("components/"):
         cotton_name = "cotton/" + template_name.removeprefix("components/")
@@ -131,6 +133,25 @@ def _contrato(template_name: str, memo: dict[str, set[str]], stack: set[str]) ->
         return set()
     stack = {*stack, template_name}
     template = get_template(template_name).template
+    expression_parser = Parser(
+        [],
+        template.engine.template_libraries,
+        template.engine.template_builtins,
+        template.origin,
+    )
+
+    def cotton_expression(raw: Any) -> Any | None:
+        if not isinstance(raw, str):
+            return None
+        value = raw
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+            value = value[1:-1]
+        if value.startswith("{{") and value.endswith("}}"):
+            value = value[2:-2].strip()
+        try:
+            return expression_parser.compile_filter(value)
+        except Exception:
+            return None
 
     def nodelist_contract(nodelist: NodeList, initial_bound: set[str]) -> set[str]:
         found: set[str] = set()
@@ -173,10 +194,22 @@ def _contrato(template_name: str, memo: dict[str, set[str]], stack: set[str]) ->
                     found.update(_externas(expression, bound))
 
                 if template_literal and not node.isolated_context:
-                    target = template_literal
-                    if target.startswith("components/"):
-                        nested = _contrato(target, memo, stack)
-                        found.update(nested - set(node.extra_context) - bound)
+                    nested = _contrato(template_literal, memo, stack)
+                    found.update(nested - set(node.extra_context) - bound)
+                continue
+
+            if isinstance(node, CottonComponentNode):
+                for key, raw in node.attrs.items():
+                    if not key.startswith(":"):
+                        continue
+                    expression = cotton_expression(raw)
+                    if expression is not None:
+                        found.update(_externas(expression, bound))
+                found.update(nodelist_contract(node.nodelist, bound))
+                continue
+
+            if isinstance(node, CottonSlotNode):
+                found.update(nodelist_contract(node.nodelist, bound))
                 continue
 
             if isinstance(node, URLNode):
@@ -231,9 +264,14 @@ def contrato(path: Path, memo: dict[str, set[str]]) -> list[str]:
     return sorted(_contrato(template_name, memo, set()))
 
 
+def contrato_template(template_name: str, memo: dict[str, set[str]]) -> list[str]:
+    """Retorna as variáveis livres de qualquer template carregável."""
+
+    return sorted(_contrato(template_name, memo, set()))
+
+
 def _newline(raw: bytes) -> str:
-    del raw
-    return "\n"
+    return "\r\n" if b"\r\n" in raw else "\n"
 
 
 def _declaracao(params: list[str]) -> str:

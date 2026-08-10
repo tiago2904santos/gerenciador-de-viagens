@@ -16,6 +16,6 @@ no primeiro clique. Sem `src`, continua embutido aqui.
     data-overlay-trigger data-overlay-kind="menu"
     data-overlay-target="{{ menu_id }}"
     {% if src %}data-overlay-src="{{ src }}"{% endif %}
-  >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
+  ><c-ui.icons.icon icon="folder" only /></button>
   {% if not src %}{% include "termos/partials/_termo_linha_menu_body.html" with menu_id=menu_id titulo=titulo subtitulo=subtitulo view_url=view_url pdf_url=pdf_url docx_url=docx_url only %}{% endif %}
 </div>

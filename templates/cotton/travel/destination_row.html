@@ -1,4 +1,4 @@
-{% cotton:vars city_field city_select_template data_index destino_index has_data_index has_destino_index hide_order_badge prefix remove_hidden row_extra_class row_index row_ordinal row_single show_drag_handle show_row_add state_field state_select_template %}
+{% cotton:vars city_field city_select_template data_index destino_index estados form has_data_index has_destino_index hide_order_badge location_city_value location_legacy_event location_state_code location_state_id picker_open_all prefix remove_hidden row row_extra_class row_index row_ordinal row_single show_drag_handle show_row_add state_field state_select_template %}
 <div class="destination-row travel-destination-row ordered-field-row{% if row_single %} destination-row--single{% endif %}{% if row_extra_class %} {{ row_extra_class }}{% endif %}{% if show_row_add %} destination-row--with-add{% endif %}"
      data-location-row
      data-location-index="{% if prefix %}{{ row_index }}{% elif has_destino_index %}{{ destino_index }}{% elif has_data_index %}{{ data_index }}{% else %}0{% endif %}">
@@ -9,7 +9,7 @@
           data-location-drag-handle
           title="Arrastar para reordenar"
           aria-label="Arrastar para reordenar">
-      {% include "components/ui/icons/icon.html" with icon="grip" only %}
+      <c-ui.icons.icon icon="grip" only />
     </span>
     <button type="button"
             class="route-destinos-add ordered-field-row__add"
@@ -21,7 +21,7 @@
     <span class="ordered-field-row__badge{% if hide_order_badge %} sr-only{% endif %}" data-location-order aria-hidden="true">{{ row_ordinal|default:1 }}</span>
     <div class="field app-form-field destination-row__field destination-row__field--uf">
       {% if state_select_template %}
-        {% include state_select_template %}
+        {% include state_select_template with city_field=city_field city_select_template=city_select_template data_index=data_index destino_index=destino_index has_data_index=has_data_index has_destino_index=has_destino_index hide_order_badge=hide_order_badge prefix=prefix remove_hidden=remove_hidden row_extra_class=row_extra_class row_index=row_index row_ordinal=row_ordinal row_single=row_single show_drag_handle=show_drag_handle show_row_add=show_row_add state_field=state_field state_select_template=state_select_template estados=estados form=form location_legacy_event=location_legacy_event location_state_code=location_state_code location_state_id=location_state_id picker_open_all=picker_open_all row=row location_city_value=location_city_value only %}
       {% else %}
         {{ state_field }}
       {% endif %}
@@ -30,7 +30,7 @@
   <div class="destination-row__half destination-row__half--end">
     <div class="field app-form-field destination-row__field destination-row__field--city">
       {% if city_select_template %}
-        {% include city_select_template %}
+        {% include city_select_template with city_field=city_field city_select_template=city_select_template data_index=data_index destino_index=destino_index has_data_index=has_data_index has_destino_index=has_destino_index hide_order_badge=hide_order_badge prefix=prefix remove_hidden=remove_hidden row_extra_class=row_extra_class row_index=row_index row_ordinal=row_ordinal row_single=row_single show_drag_handle=show_drag_handle show_row_add=show_row_add state_field=state_field state_select_template=state_select_template location_city_value=location_city_value location_legacy_event=location_legacy_event picker_open_all=picker_open_all row=row estados=estados form=form location_state_code=location_state_code location_state_id=location_state_id only %}
       {% else %}
         {{ city_field }}
       {% endif %}
@@ -50,7 +50,7 @@
         data-location-drag-handle
         title="Arrastar para reordenar"
         aria-label="Arrastar para reordenar">
-    {% include "components/ui/icons/icon.html" with icon="grip" only %}
+    <c-ui.icons.icon icon="grip" only />
   </span>
   {% endif %}
   <span class="ordered-field-row__badge{% if hide_order_badge %} sr-only{% endif %}" data-location-order aria-hidden="true">{{ row_ordinal|default:1 }}</span>
@@ -58,14 +58,14 @@
     <div class="field-grid roteiro-sede-grid roteiro-destino-grid ordered-field-row__fields">
       <div class="field app-form-field">
         {% if state_select_template %}
-          {% include state_select_template %}
+          {% include state_select_template with city_field=city_field city_select_template=city_select_template data_index=data_index destino_index=destino_index has_data_index=has_data_index has_destino_index=has_destino_index hide_order_badge=hide_order_badge prefix=prefix remove_hidden=remove_hidden row_extra_class=row_extra_class row_index=row_index row_ordinal=row_ordinal row_single=row_single show_drag_handle=show_drag_handle show_row_add=show_row_add state_field=state_field state_select_template=state_select_template estados=estados form=form location_legacy_event=location_legacy_event location_state_code=location_state_code location_state_id=location_state_id picker_open_all=picker_open_all row=row location_city_value=location_city_value only %}
         {% else %}
           {{ state_field }}
         {% endif %}
       </div>
       <div class="field app-form-field">
         {% if city_select_template %}
-          {% include city_select_template %}
+          {% include city_select_template with city_field=city_field city_select_template=city_select_template data_index=data_index destino_index=destino_index has_data_index=has_data_index has_destino_index=has_destino_index hide_order_badge=hide_order_badge prefix=prefix remove_hidden=remove_hidden row_extra_class=row_extra_class row_index=row_index row_ordinal=row_ordinal row_single=row_single show_drag_handle=show_drag_handle show_row_add=show_row_add state_field=state_field state_select_template=state_select_template location_city_value=location_city_value location_legacy_event=location_legacy_event picker_open_all=picker_open_all row=row estados=estados form=form location_state_code=location_state_code location_state_id=location_state_id only %}
         {% else %}
           {{ city_field }}
         {% endif %}

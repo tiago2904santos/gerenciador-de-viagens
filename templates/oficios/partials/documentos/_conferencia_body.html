@@ -13,13 +13,13 @@
                     data-tooltip="Visualizar e baixar"
                     data-overlay-trigger data-overlay-kind="menu"
                     data-overlay-target="wizard-oficio-document-menu">
-              {% include "components/ui/icons/icon.html" with icon="folder" only %}
+              <c-ui.icons.icon icon="folder" only />
             </button>
             <div class="action-menu action-menu--rich" id="wizard-oficio-document-menu" role="menu" hidden>
-              {% include "components/ui/menus/rich_menu_header.html" with title=di.oficio.titulo subtitle="Documento do ofício" icon="folder" only %}
-              {% include "components/ui/menus/rich_menu_link.html" with href=di.oficio.url title="Visualizar documento" description="Abrir o PDF no navegador" icon="eye" tone="preview" target_blank=True only %}
-              {% include "components/ui/menus/rich_menu_link.html" with href=di.oficio.download_pdf_url title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" download=True only %}
-              {% include "components/ui/menus/rich_menu_link.html" with href=di.oficio.download_docx_url title="Baixar DOCX" description="Arquivo editável do ofício" icon="docx" tone="docx" download=True only %}
+              <c-ui.menus.rich_menu_header :title="di.oficio.titulo" subtitle="Documento do ofício" icon="folder" only />
+              <c-ui.menus.rich_menu_link :href="di.oficio.url" title="Visualizar documento" description="Abrir o PDF no navegador" icon="eye" tone="preview" :target_blank="True" only />
+              <c-ui.menus.rich_menu_link :href="di.oficio.download_pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" :download="True" only />
+              <c-ui.menus.rich_menu_link :href="di.oficio.download_docx_url" title="Baixar DOCX" description="Arquivo editável do ofício" icon="docx" tone="docx" :download="True" only />
             </div>
           </span>
         </span>
@@ -55,13 +55,13 @@
                     data-tooltip="Visualizar e baixar"
                     data-overlay-trigger data-overlay-kind="menu"
                     data-overlay-target="wizard-justificativa-document-menu">
-              {% include "components/ui/icons/icon.html" with icon="folder" only %}
+              <c-ui.icons.icon icon="folder" only />
             </button>
             <div class="action-menu action-menu--rich" id="wizard-justificativa-document-menu" role="menu" hidden>
-              {% include "components/ui/menus/rich_menu_header.html" with title=di.justificativa.titulo subtitle="Documento de justificativa" icon="folder" only %}
-              {% include "components/ui/menus/rich_menu_link.html" with href=di.justificativa.url title="Visualizar documento" description="Abrir o PDF no navegador" icon="eye" tone="preview" target_blank=True only %}
-              {% include "components/ui/menus/rich_menu_link.html" with href=di.justificativa.download_pdf_url title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" download=True only %}
-              {% include "components/ui/menus/rich_menu_link.html" with href=di.justificativa.download_docx_url title="Baixar DOCX" description="Arquivo editável da justificativa" icon="docx" tone="docx" download=True only %}
+              <c-ui.menus.rich_menu_header :title="di.justificativa.titulo" subtitle="Documento de justificativa" icon="folder" only />
+              <c-ui.menus.rich_menu_link :href="di.justificativa.url" title="Visualizar documento" description="Abrir o PDF no navegador" icon="eye" tone="preview" :target_blank="True" only />
+              <c-ui.menus.rich_menu_link :href="di.justificativa.download_pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" :download="True" only />
+              <c-ui.menus.rich_menu_link :href="di.justificativa.download_docx_url" title="Baixar DOCX" description="Arquivo editável da justificativa" icon="docx" tone="docx" :download="True" only />
             </div>
           </span>
         </span>
@@ -97,18 +97,18 @@
                     data-tooltip="Visualizar e baixar"
                     data-overlay-trigger data-overlay-kind="menu"
                     data-overlay-target="wizard-termos-document-menu">
-              {% include "components/ui/icons/icon.html" with icon="folder" only %}
+              <c-ui.icons.icon icon="folder" only />
             </button>
             <div class="action-menu action-menu--rich" id="wizard-termos-document-menu" role="menu" hidden>
-              {% include "components/ui/menus/rich_menu_header.html" with title="Termos de autorização" subtitle="Todos os servidores" icon="folder" only %}
+              <c-ui.menus.rich_menu_header title="Termos de autorização" subtitle="Todos os servidores" icon="folder" only />
               <button class="action-menu__item action-menu__item--rich" type="button" data-open-all-termos role="menuitem">
                 <span class="action-menu__item-icon action-menu__item-icon--preview" aria-hidden="true">
-                  {% include "components/ui/icons/icon.html" with icon="eye" only %}
+                  <c-ui.icons.icon icon="eye" only />
                 </span>
                 <span class="action-menu__item-copy"><strong>Visualizar termos</strong><small>Abrir todos os documentos disponíveis</small></span>
               </button>
-              {% include "components/ui/menus/rich_menu_link.html" with href=di.termos_download_todos_pdf_url title="Baixar PDFs" description="Salvar todos os termos em PDF" icon="pdf" tone="pdf" download=True data_download_all_termos=True only %}
-              {% include "components/ui/menus/rich_menu_link.html" with href=di.termos_download_todos_docx_url title="Baixar DOCXs" description="Salvar todos os arquivos editáveis" icon="docx" tone="docx" download=True only %}
+              <c-ui.menus.rich_menu_link :href="di.termos_download_todos_pdf_url" title="Baixar PDFs" description="Salvar todos os termos em PDF" icon="pdf" tone="pdf" :download="True" :data_download_all_termos="True" only />
+              <c-ui.menus.rich_menu_link :href="di.termos_download_todos_docx_url" title="Baixar DOCXs" description="Salvar todos os arquivos editáveis" icon="docx" tone="docx" :download="True" only />
             </div>
           </span>
         </span>
@@ -136,17 +136,17 @@
                     data-tooltip="{% if t.assinado %}Termo assinado — ações{% else %}Visualizar, baixar e anexar{% endif %}"
                     data-overlay-trigger data-overlay-kind="menu"
                     data-overlay-target="wizard-termo-document-menu-{{ forloop.counter }}"
-                  >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
+                  ><c-ui.icons.icon icon="folder" only /></button>
                   <div class="action-menu action-menu--rich" id="wizard-termo-document-menu-{{ forloop.counter }}" role="menu" hidden>
                     {% if t.assinado %}
-                      {% include "components/ui/menus/rich_menu_header.html" with title="Termo assinado" subtitle=t.titulo icon="sign" only %}
+                      <c-ui.menus.rich_menu_header title="Termo assinado" :subtitle="t.titulo" icon="sign" only />
                     {% else %}
-                      {% include "components/ui/menus/rich_menu_header.html" with title="Termo de autorização" subtitle=t.titulo icon="folder" only %}
+                      <c-ui.menus.rich_menu_header title="Termo de autorização" :subtitle="t.titulo" icon="folder" only />
                     {% endif %}
                     {% if t.disponivel %}
-                      {% include "components/ui/menus/rich_menu_link.html" with href=t.inline_url title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
-                      {% include "components/ui/menus/rich_menu_link.html" with href=t.download_pdf_url title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" download=True only %}
-                      {% include "components/ui/menus/rich_menu_link.html" with href=t.download_docx_url title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" download=True only %}
+                      <c-ui.menus.rich_menu_link :href="t.inline_url" title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" :target_blank="True" only />
+                      <c-ui.menus.rich_menu_link :href="t.download_pdf_url" title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" :download="True" only />
+                      <c-ui.menus.rich_menu_link :href="t.download_docx_url" title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" :download="True" only />
                     {% endif %}
                     {% if t.anexar_assinado_url %}
                       <button
@@ -161,7 +161,7 @@
                         data-attach-signed-current-remove-url="{{ t.remover_assinado_url }}"
                       >
                         <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
-                          {% include "components/ui/icons/icon.html" with icon="sign" only %}
+                          <c-ui.icons.icon icon="sign" only />
                         </span>
                         <span class="action-menu__item-copy">
                           <strong>{% if t.assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>

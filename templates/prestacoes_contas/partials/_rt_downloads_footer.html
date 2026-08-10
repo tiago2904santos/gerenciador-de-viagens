@@ -2,11 +2,11 @@
   <div class="card-footer-section__divider" aria-hidden="true"></div>
   <footer class="card-footer">
     <div class="card-footer__secondary">
-      {% include "components/ui/buttons/button.html" with href=back_url|default:"/prestacoes-contas/" label="Voltar à lista" variant="secondary" icon="arrow-left" only %}
+      {% with cotton_attr_href=back_url|default:"/prestacoes-contas/" %}<c-ui.buttons.button :href="cotton_attr_href" label="Voltar à lista" variant="secondary" icon="arrow-left" only />{% endwith %}
     </div>
     <div class="card-footer__primary">
-      {% include "components/ui/buttons/button.html" with label="Salvar texto" variant="secondary" type="submit" name="action" value="save" only %}
-      {% include "components/ui/buttons/button.html" with href=diario_url label="Ir para Diário de Bordo" variant="primary" icon="arrow-right" icon_after=True only %}
+      <c-ui.buttons.button label="Salvar texto" variant="secondary" type="submit" name="action" value="save" only />
+      <c-ui.buttons.button :href="diario_url" label="Ir para Diário de Bordo" variant="primary" icon="arrow-right" :icon_after="True" only />
     </div>
   </footer>
 </section>

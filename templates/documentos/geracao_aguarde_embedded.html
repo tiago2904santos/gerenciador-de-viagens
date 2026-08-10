@@ -11,14 +11,14 @@
   <link rel="stylesheet" href="{% static 'css/pages/document-generation-embedded.css' %}">
 </head>
 <body class="document-generation-embedded">
-  {% include "components/ui/icons/_sprite.html" %}
+  <c-ui.icons._sprite />
   <main
     class="document-generation-embedded__panel"
     data-document-generation-wait
     data-status-url="{{ geracao.status_url }}"
   >
     <span class="document-generation-embedded__icon" aria-hidden="true">
-      {% include "components/ui/icons/icon.html" with icon="document" only %}
+      <c-ui.icons.icon icon="document" only />
     </span>
     <span class="document-generation-embedded__spinner" aria-hidden="true"></span>
     <p class="document-generation-embedded__eyebrow">Documento em preparação</p>

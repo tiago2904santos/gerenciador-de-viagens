@@ -1,4 +1,4 @@
-{% cotton:vars add_button_id description errors_template layout list_id panel_aria_label rows_template section_extra_class section_id title title_id %}
+{% cotton:vars add_button_id city_field data_index description destino_index errors_template estados evento form has_data_index has_destino_index hide_order_badge layout list_id location_city_value location_legacy_event location_state_code location_state_id panel_aria_label picker_open_all prefix remove_hidden row row_extra_class row_index row_single rows_template section_extra_class section_id show_drag_handle show_row_add state_field title title_id %}
 {% if layout == "split" %}
 <section class="form-subsection travel-destinations ordered-field-collection route-destinos-block route-destinos-block--split route-destinos-block--single{% if section_extra_class %} {{ section_extra_class }}{% endif %}"
          aria-labelledby="{{ title_id|default:'destinos-title' }}"
@@ -23,13 +23,13 @@
            aria-label="{{ panel_aria_label|default:'Destinos adicionados' }}"
            {% if list_id %}id="{{ list_id }}"{% endif %}>
         {% if rows_template %}
-          {% include rows_template %}
+          {% include rows_template with add_button_id=add_button_id description=description errors_template=errors_template layout=layout list_id=list_id panel_aria_label=panel_aria_label rows_template=rows_template section_extra_class=section_extra_class section_id=section_id title=title title_id=title_id city_field=city_field data_index=data_index destino_index=destino_index evento=evento form=form has_data_index=has_data_index has_destino_index=has_destino_index hide_order_badge=hide_order_badge picker_open_all=picker_open_all prefix=prefix remove_hidden=remove_hidden row_extra_class=row_extra_class row_index=row_index row_single=row_single show_drag_handle=show_drag_handle show_row_add=show_row_add state_field=state_field estados=estados location_city_value=location_city_value location_legacy_event=location_legacy_event location_state_code=location_state_code location_state_id=location_state_id row=row only %}
         {% endif %}
       </div>
     </div>
 
     {% if errors_template %}
-      {% include errors_template %}
+      {% include errors_template with add_button_id=add_button_id description=description errors_template=errors_template layout=layout list_id=list_id panel_aria_label=panel_aria_label rows_template=rows_template section_extra_class=section_extra_class section_id=section_id title=title title_id=title_id form=form city_field=city_field data_index=data_index destino_index=destino_index evento=evento has_data_index=has_data_index has_destino_index=has_destino_index hide_order_badge=hide_order_badge picker_open_all=picker_open_all prefix=prefix remove_hidden=remove_hidden row_extra_class=row_extra_class row_index=row_index row_single=row_single show_drag_handle=show_drag_handle show_row_add=show_row_add state_field=state_field estados=estados location_city_value=location_city_value location_legacy_event=location_legacy_event location_state_code=location_state_code location_state_id=location_state_id row=row only %}
     {% endif %}
   </div>
 </section>
@@ -58,12 +58,12 @@
        aria-label="{{ panel_aria_label|default:'Destinos adicionados' }}"
        {% if list_id %}id="{{ list_id }}"{% endif %}>
     {% if rows_template %}
-      {% include rows_template %}
+      {% include rows_template with add_button_id=add_button_id description=description errors_template=errors_template layout=layout list_id=list_id panel_aria_label=panel_aria_label rows_template=rows_template section_extra_class=section_extra_class section_id=section_id title=title title_id=title_id city_field=city_field data_index=data_index destino_index=destino_index evento=evento form=form has_data_index=has_data_index has_destino_index=has_destino_index hide_order_badge=hide_order_badge picker_open_all=picker_open_all prefix=prefix remove_hidden=remove_hidden row_extra_class=row_extra_class row_index=row_index row_single=row_single show_drag_handle=show_drag_handle show_row_add=show_row_add state_field=state_field estados=estados location_city_value=location_city_value location_legacy_event=location_legacy_event location_state_code=location_state_code location_state_id=location_state_id row=row only %}
     {% endif %}
   </div>
 
   {% if errors_template %}
-    {% include errors_template %}
+    {% include errors_template with add_button_id=add_button_id description=description errors_template=errors_template layout=layout list_id=list_id panel_aria_label=panel_aria_label rows_template=rows_template section_extra_class=section_extra_class section_id=section_id title=title title_id=title_id form=form city_field=city_field data_index=data_index destino_index=destino_index evento=evento has_data_index=has_data_index has_destino_index=has_destino_index hide_order_badge=hide_order_badge picker_open_all=picker_open_all prefix=prefix remove_hidden=remove_hidden row_extra_class=row_extra_class row_index=row_index row_single=row_single show_drag_handle=show_drag_handle show_row_add=show_row_add state_field=state_field estados=estados location_city_value=location_city_value location_legacy_event=location_legacy_event location_state_code=location_state_code location_state_id=location_state_id row=row only %}
   {% endif %}
 </section>
 {% endif %}

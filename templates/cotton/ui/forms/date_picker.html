@@ -1,4 +1,4 @@
-{% cotton:vars allow_repeat_dates compact_range_display control_variant end_field end_hidden_id end_hidden_name end_hidden_value end_input_id end_label end_placeholder extra_class filter_date hide_labels initial_date input_class max_dates mode multi_input_id multi_placeholder picker_id range_controls_template selected_dates_json show_confirm show_context show_summary single_aria_label single_field single_hidden_id single_hidden_name single_hidden_value single_input_id single_label single_placeholder start_field start_hidden_id start_hidden_name start_hidden_value start_input_id start_label start_placeholder trecho_date trigger_aria_label trigger_class trigger_label %}
+{% cotton:vars allow_repeat_dates compact_range_display control_variant end_default_id end_field end_hidden_id end_hidden_name end_hidden_value end_id end_input_id end_label end_lbl end_ph end_placeholder extra_class filter_date hide_labels initial_date input_class max_dates mode multi_input_id multi_placeholder picker_id range_controls_template roteiro_editor_state_json selected_dates_json show_confirm show_context show_summary single_aria_label single_default_id single_field single_hidden_id single_hidden_name single_hidden_value single_id single_input_id single_label single_lbl single_placeholder start_default_id start_field start_hidden_id start_hidden_name start_hidden_value start_id start_input_id start_label start_lbl start_ph start_placeholder trecho_date trigger_aria_label trigger_class trigger_label %}
 {% comment %}
 date_picker.html — componente global de calendário.
 Unico ponto de verdade para a marcacao do componente; static/js/components/date-picker.js e
@@ -77,7 +77,7 @@ Modo multi:
         aria-label="{{ trigger_aria_label|default:'Filtrar por período da viagem' }}"
       >
         <span class="cv-btn__icon" aria-hidden="true">
-          {% include "components/ui/forms/_date_picker_icon.html" %}
+          <c-ui.forms._date_picker_icon />
         </span>
         <span
           class="travel-period-filter__label"
@@ -87,7 +87,7 @@ Modo multi:
       </button>
     {% elif range_controls_template %}
       {# Herda o contexto do chamador (ex.: estado do roteiro) e o panel_id do with acima. #}
-      {% include range_controls_template %}
+      {% include range_controls_template with allow_repeat_dates=allow_repeat_dates compact_range_display=compact_range_display control_variant=control_variant end_field=end_field end_hidden_id=end_hidden_id end_hidden_name=end_hidden_name end_hidden_value=end_hidden_value end_input_id=end_input_id end_label=end_label end_placeholder=end_placeholder extra_class=extra_class filter_date=filter_date hide_labels=hide_labels initial_date=initial_date input_class=input_class max_dates=max_dates mode=mode multi_input_id=multi_input_id multi_placeholder=multi_placeholder picker_id=picker_id range_controls_template=range_controls_template selected_dates_json=selected_dates_json show_confirm=show_confirm show_context=show_context show_summary=show_summary single_aria_label=single_aria_label single_field=single_field single_hidden_id=single_hidden_id single_hidden_name=single_hidden_name single_hidden_value=single_hidden_value single_input_id=single_input_id single_label=single_label single_placeholder=single_placeholder start_field=start_field start_hidden_id=start_hidden_id start_hidden_name=start_hidden_name start_hidden_value=start_hidden_value start_input_id=start_input_id start_label=start_label start_placeholder=start_placeholder trecho_date=trecho_date trigger_aria_label=trigger_aria_label trigger_class=trigger_class trigger_label=trigger_label root_id=root_id panel_id=panel_id start_default_id=start_default_id start_id=start_id start_lbl=start_lbl start_ph=start_ph end_default_id=end_default_id end_id=end_id end_lbl=end_lbl end_ph=end_ph single_default_id=single_default_id single_id=single_id single_lbl=single_lbl roteiro_editor_state_json=roteiro_editor_state_json only %}
     {% else %}
     {% if start_field %}{% with start_default_id=start_field.id_for_label|add:"_display" %}{% with start_id=start_input_id|default:start_default_id start_lbl=start_label|default:start_field.label start_ph=start_placeholder|default:"dd/mm/aaaa" %}
       <div class="field-grid field-grid--cols-2">
@@ -96,7 +96,7 @@ Modo multi:
           <div class="date-picker__control">
             <input type="text" class="cv-field__control" id="{{ start_id }}" placeholder="{{ start_ph }}" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-start-display readonly{% if hide_labels %} aria-label="{{ start_lbl }}"{% endif %}>
             <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
-              {% include "components/ui/forms/_date_picker_icon.html" %}
+              <c-ui.forms._date_picker_icon />
             </button>
           </div>
         </div>
@@ -107,7 +107,7 @@ Modo multi:
           <div class="date-picker__control">
             <input type="text" class="cv-field__control" id="{{ start_id }}" placeholder="{{ start_ph }}" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-start-display readonly{% if hide_labels %} aria-label="{{ start_lbl }}"{% endif %}>
             <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
-              {% include "components/ui/forms/_date_picker_icon.html" %}
+              <c-ui.forms._date_picker_icon />
             </button>
           </div>
         </div>
@@ -119,7 +119,7 @@ Modo multi:
           <div class="date-picker__control">
             <input type="text" class="cv-field__control" id="{{ end_id }}" placeholder="{{ end_ph }}" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-end-display readonly{% if hide_labels %} aria-label="{{ end_lbl }}"{% endif %}>
             <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
-              {% include "components/ui/forms/_date_picker_icon.html" %}
+              <c-ui.forms._date_picker_icon />
             </button>
           </div>
         </div>
@@ -130,7 +130,7 @@ Modo multi:
           <div class="date-picker__control">
             <input type="text" class="cv-field__control" id="{{ end_id }}" placeholder="{{ end_ph }}" autocomplete="off" inputmode="numeric" maxlength="10" data-cv-date-picker-end-display readonly{% if hide_labels %} aria-label="{{ end_lbl }}"{% endif %}>
             <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
-              {% include "components/ui/forms/_date_picker_icon.html" %}
+              <c-ui.forms._date_picker_icon />
             </button>
           </div>
         </div>
@@ -145,10 +145,10 @@ Modo multi:
       <input type="hidden" name="{{ end_hidden_name }}"{% if end_hidden_id %} id="{{ end_hidden_id }}"{% endif %} value="{{ end_hidden_value|default:'' }}" data-cv-date-picker-end-value{% if filter_date %} data-collection-filter="date"{% endif %}>
     {% endif %}
     {% if start_field.errors %}
-      {% include "components/ui/feedback/field_error.html" with errors=start_field.errors field_id=start_field.auto_id only %}
+      <c-ui.feedback.field_error :errors="start_field.errors" :field_id="start_field.auto_id" only />
     {% endif %}
     {% if end_field.errors %}
-      {% include "components/ui/feedback/field_error.html" with errors=end_field.errors field_id=end_field.auto_id only %}
+      <c-ui.feedback.field_error :errors="end_field.errors" :field_id="end_field.auto_id" only />
     {% endif %}
     {% if show_summary|default_if_none:True %}
       <p class="date-picker__summary" data-cv-date-picker-summary></p>
@@ -164,7 +164,7 @@ Modo multi:
         aria-label="{{ trigger_aria_label|default:trigger_label|default:'Abrir calendario' }}"
       >
         <span class="cv-btn__icon" aria-hidden="true">
-          {% include "components/ui/forms/_date_picker_icon.html" %}
+          <c-ui.forms._date_picker_icon />
         </span>
         <span class="travel-period-filter__label">{{ trigger_label|default:"Preencher datas" }}</span>
       </button>
@@ -178,7 +178,7 @@ Modo multi:
         aria-label="{{ trigger_aria_label|default:trigger_label|default:'Abrir calendario' }}"
       >
         <span class="cv-btn__icon" aria-hidden="true">
-          {% include "components/ui/forms/_date_picker_icon.html" %}
+          <c-ui.forms._date_picker_icon />
         </span>
         <span>{{ trigger_label|default:"Preencher datas" }}</span>
       </button>
@@ -194,7 +194,7 @@ Modo multi:
         data-cv-date-picker-display
       >
       <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
-        {% include "components/ui/forms/_date_picker_icon.html" %}
+        <c-ui.forms._date_picker_icon />
       </button>
     </div>
     {% endif %}
@@ -223,7 +223,7 @@ Modo multi:
         <div class="date-picker__control">
           <input type="text" class="cv-field__control{% if input_class %} {{ input_class }}{% endif %}" id="{{ single_id }}" placeholder="{{ single_placeholder|default:'dd/mm/aaaa' }}" autocomplete="off" inputmode="numeric" maxlength="10"{% if single_aria_label %} aria-label="{{ single_aria_label }}"{% endif %} data-cv-date-picker-display readonly>
           <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
-            {% include "components/ui/forms/_date_picker_icon.html" %}
+            <c-ui.forms._date_picker_icon />
           </button>
         </div>
       </div>
@@ -233,7 +233,7 @@ Modo multi:
         <div class="date-picker__control">
           <input type="text" class="cv-field__control{% if input_class %} {{ input_class }}{% endif %}" id="{{ single_id }}" placeholder="{{ single_placeholder|default:'dd/mm/aaaa' }}" autocomplete="off" inputmode="numeric" maxlength="10"{% if single_aria_label %} aria-label="{{ single_aria_label }}"{% endif %} data-cv-date-picker-display readonly>
           <button type="button" class="date-picker__trigger date-picker__trigger--icon" data-cv-date-picker-trigger aria-expanded="false" aria-controls="{{ panel_id }}" aria-label="Abrir calendario">
-            {% include "components/ui/forms/_date_picker_icon.html" %}
+            <c-ui.forms._date_picker_icon />
           </button>
         </div>
       </div>
@@ -243,7 +243,7 @@ Modo multi:
       <input type="hidden" name="{{ single_hidden_name }}"{% if single_hidden_id %} id="{{ single_hidden_id }}"{% endif %} value="{{ single_hidden_value|default:'' }}" data-cv-date-picker-value>
     {% endif %}
     {% if single_field.errors %}
-      {% include "components/ui/feedback/field_error.html" with errors=single_field.errors field_id=single_field.auto_id only %}
+      <c-ui.feedback.field_error :errors="single_field.errors" :field_id="single_field.auto_id" only />
     {% endif %}
   {% endif %}
 

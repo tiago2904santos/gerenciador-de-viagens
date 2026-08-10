@@ -2,14 +2,14 @@
 <div class="oficio-motorista-servidor" data-oficio-motorista-servidor>
   <div class="form-grid app-form-grid">
     <div class="field-span-12">
-      {% include "components/ui/forms/field.html" with field=form.motorista label="MOTORISTA SERVIDOR" help_text="Busque e selecione um servidor; você pode trocar a qualquer momento." only %}
+      <c-ui.forms.field :field="form.motorista" label="MOTORISTA SERVIDOR" help_text="Busque e selecione um servidor; você pode trocar a qualquer momento." only />
     </div>
   </div>
 </div>
 <div class="oficio-motorista-manual app-form-grid-panel oficio-data-block form-field--hidden" data-oficio-motorista-manual>
   <div class="oficio-data-grid oficio-data-grid--full">
     <div class="oficio-data-grid__field">
-      {% include "components/ui/forms/field.html" with field=form.motorista_manual_nome label="NOME DO MOTORISTA" only %}
+      <c-ui.forms.field :field="form.motorista_manual_nome" label="NOME DO MOTORISTA" only />
     </div>
   </div>
 </div>
@@ -31,10 +31,10 @@
 >
   <div class="oficio-data-grid oficio-data-grid--two">
     <div class="oficio-data-grid__field">
-      {% include "components/ui/forms/document_number_field.html" with field=form.motorista_oficio_referencia label="Nº OFÍCIO MOTORISTA" ano=motorista_oficio_ano numero_inicial=motorista_oficio_numero_inicial only %}
+      <c-ui.forms.document_number_field :field="form.motorista_oficio_referencia" label="Nº OFÍCIO MOTORISTA" :ano="motorista_oficio_ano" :numero_inicial="motorista_oficio_numero_inicial" only />
     </div>
     <div class="oficio-data-grid__field">
-      {% include "components/ui/forms/field.html" with field=form.motorista_protocolo_ref label="PROTOCOLO DO MOTORISTA" only %}
+      <c-ui.forms.field :field="form.motorista_protocolo_ref" label="PROTOCOLO DO MOTORISTA" only />
     </div>
   </div>
 </div>

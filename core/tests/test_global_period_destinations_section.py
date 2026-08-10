@@ -8,7 +8,7 @@ from django.test import SimpleTestCase
 class GlobalPeriodDestinationsSectionTests(SimpleTestCase):
     def test_composite_owns_period_and_destination_structure(self):
         html = render_to_string(
-            "components/travel/period_destinations_section.html",
+            "cotton/travel/period_destinations_section.html",
             {
                 "period_title_id": "audit-period-title",
                 "picker_id": "audit-date-picker",
@@ -42,14 +42,14 @@ class GlobalPeriodDestinationsSectionTests(SimpleTestCase):
             with self.subTest(template=relative_path):
                 source = (templates_root / relative_path).read_text(encoding="utf-8")
                 self.assertIn(
-                    "components/travel/period_destinations_section.html",
+                    "<c-travel.period_destinations_section",
                     source,
                 )
                 self.assertNotIn(
-                    "components/ui/forms/date_picker.html",
+                    "<c-ui.forms.date_picker",
                     source,
                 )
                 self.assertNotIn(
-                    "components/travel/destination_section.html",
+                    "<c-travel.destination_section",
                     source,
                 )

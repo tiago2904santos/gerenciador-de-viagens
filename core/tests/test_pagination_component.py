@@ -1,6 +1,6 @@
 """Contrato do componente de paginação (defeito N-07).
 
-`components/lists/list_page_cards.html` incluía a paginação em todas as listas em
+`cotton/lists/list_page_cards.html` inclui a paginação em todas as listas em
 cards, mas o `{% if page_obj %}` do componente falhava em silêncio nas listas que
 nunca puseram `page_obj` no contexto: a interface parecia paginada e não era.
 
@@ -16,7 +16,7 @@ from django.urls import reverse
 
 
 ALERTA = "Paginação indisponível"
-COMPONENTE = "components/ui/lists/pagination.html"
+COMPONENTE = "cotton/ui/lists/pagination.html"
 
 # Toda lista que usa o shell de cards — nenhuma pode renderizar o alerta.
 LISTAS_EM_CARDS = [

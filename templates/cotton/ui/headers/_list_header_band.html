@@ -1,4 +1,4 @@
-{% cotton:vars abas band_tabs_template eyebrow status_label status_variant tabs_aria_label title %}
+{% cotton:vars abas band_tabs_template cotton_attr_variant eyebrow status_label status_variant tabs_aria_label title %}
 {# Banda de título compartilhada por filter_page_header e list_page_quick_add (D-53). #}
 {% comment %}
 `band_tabs_template` (opcional) desenha as `abas` a direita do titulo — usado
@@ -10,13 +10,13 @@ quando a lista alterna por toggle em vez das abas da barra de ferramentas.
     <div class="list-header__title-row">
       <h1 class="list-header__title">{{ title }}</h1>
       {% if status_label %}
-        {% include "components/ui/badges/status_badge.html" with label=status_label variant=status_variant|default:"draft" extra_class="page-header-status-chip" only %}
+        {% with cotton_attr_variant=status_variant|default:"draft" %}<c-ui.badges.status_badge :label="status_label" :variant="cotton_attr_variant" extra_class="page-header-status-chip" only />{% endwith %}
       {% endif %}
     </div>
   </div>
   {% if band_tabs_template and abas %}
     <div class="list-header__band-aside">
-      {% include band_tabs_template with abas=abas tabs_aria_label=tabs_aria_label only %}
+      {% include band_tabs_template with abas=abas tabs_aria_label=tabs_aria_label band_tabs_template=band_tabs_template eyebrow=eyebrow status_label=status_label status_variant=status_variant title=title cotton_attr_variant=cotton_attr_variant only %}
     </div>
   {% endif %}
 </div>

@@ -32,7 +32,7 @@
   <div class="page-shell cv-page {% block flow_shell_modifier %}page-shell--wizard cv-page--flow{% endblock %} travel-document-wizard app-wizard{% block flow_shell_extra %}{% endblock %}"{% block flow_shell_attrs %}{% endblock %}>
     <div class="wizard-sticky-scope" data-wizard-sticky-header>
       {% block flow_header %}
-        {% include "components/ui/headers/wizard_page_header.html" with eyebrow=flow_eyebrow title=page_title steps=wizard_page_steps stepper_aria_label=flow_stepper_aria_label back_label=flow_back_label back_url=flow_back_url only %}
+        <c-ui.headers.wizard_page_header :eyebrow="flow_eyebrow" :title="page_title" :steps="wizard_page_steps" :stepper_aria_label="flow_stepper_aria_label" :back_label="flow_back_label" :back_url="flow_back_url" only />
       {% endblock %}
 
       {% block flow_stepper %}{% endblock %}

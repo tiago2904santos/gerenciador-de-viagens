@@ -3,7 +3,7 @@
     <header class="pt-live-col__head">
       <span class="pt-live-col__title">Metas</span>
       <span data-pt-live-metas-count>
-        {% include "components/ui/badges/chip.html" with tone="warning" size="compact" label=metas_preview|length only %}
+        {% with cotton_attr_label=metas_preview|length %}<c-ui.badges.chip tone="warning" size="compact" :label="cotton_attr_label" only />{% endwith %}
       </span>
     </header>
     <ul class="pt-live-list" data-pt-live-metas-list>
@@ -21,7 +21,7 @@
     <header class="pt-live-col__head">
       <span class="pt-live-col__title">Recursos</span>
       <span data-pt-live-recursos-count>
-        {% include "components/ui/badges/chip.html" with tone="info" size="compact" label=recursos_preview|length only %}
+        {% with cotton_attr_label=recursos_preview|length %}<c-ui.badges.chip tone="info" size="compact" :label="cotton_attr_label" only />{% endwith %}
       </span>
     </header>
     <ul class="pt-live-list" data-pt-live-recursos-list>

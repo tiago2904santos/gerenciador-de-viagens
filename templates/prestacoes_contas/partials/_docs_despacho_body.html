@@ -1,10 +1,10 @@
 <div class="document-inline-stack docs-attach-stack">
   {% with pk=prestacao.pk|stringformat:"s" %}
     {% with reopen_key="prestacao-despacho-"|add:pk %}
-      {% include "prestacoes_contas/partials/_docs_attach_card.html" with title="Despacho assinado" abbr="DP" doc=despacho_assinado reopen_key=reopen_key initial_kind="despacho" %}
+      {% include "prestacoes_contas/partials/_docs_attach_card.html" with title="Despacho assinado" abbr="DP" doc=despacho_assinado reopen_key=reopen_key initial_kind="despacho" empty_label=empty_label attach_kinds_json=attach_kinds_json only %}
     {% endwith %}
     {% with reopen_key="prestacao-oficio-"|add:pk %}
-      {% include "prestacoes_contas/partials/_docs_attach_card.html" with title="Ofício assinado" abbr="OF" doc=oficio_assinado reopen_key=reopen_key initial_kind="oficio" %}
+      {% include "prestacoes_contas/partials/_docs_attach_card.html" with title="Ofício assinado" abbr="OF" doc=oficio_assinado reopen_key=reopen_key initial_kind="oficio" empty_label=empty_label attach_kinds_json=attach_kinds_json only %}
     {% endwith %}
   {% endwith %}
 </div>

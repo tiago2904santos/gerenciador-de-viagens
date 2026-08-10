@@ -23,7 +23,7 @@
   **Dois ramos, e não um `default` entre os dois.** A primeira versão era
   `errors|default:form.non_field_errors`, e isso **estourava**: variável que aparece
   como *argumento de filtro* não cai no `string_if_invalid` como a variável
-  principal — ela levanta `VariableDoesNotExist`, e o `{% include %}` propaga. Como
+  principal — ela levanta `VariableDoesNotExist`, e a inclusão propaga. Como
   os dois chamadores de formset passam `errors` **sem** `form`, as telas de diário
   de bordo e de efetivo teriam dado 500. Pego pelo teste, não pela leitura.
 
@@ -33,7 +33,7 @@
   exatamente o efeito descrito no enunciado do `HT-03`.
 {% endcomment %}
 {% if errors %}
-  {% include "components/ui/feedback/alert.html" with variant="danger" data_hook="form-errors" focalizavel=True title="Não foi possível continuar" message=errors|join:" " only %}
+  {% with cotton_attr_message=errors|join:" " %}<c-ui.feedback.alert variant="danger" data_hook="form-errors" :focalizavel="True" title="Não foi possível continuar" :message="cotton_attr_message" only />{% endwith %}
 {% elif form.non_field_errors or form.errors %}
-  {% include "components/ui/feedback/alert.html" with variant="danger" data_hook="form-errors" focalizavel=True title="Não foi possível continuar" message=form.non_field_errors|join:" "|default:"Revise os campos destacados antes de continuar." only %}
+  {% with cotton_attr_message=form.non_field_errors|join:" "|default:"Revise os campos destacados antes de continuar." %}<c-ui.feedback.alert variant="danger" data_hook="form-errors" :focalizavel="True" title="Não foi possível continuar" :message="cotton_attr_message" only />{% endwith %}
 {% endif %}

@@ -4,11 +4,11 @@ O botão "Gerenciar modelos" fica no header do form_block (variant=resource).
 Espera a variável `c` (dict com select, textarea, label, manage_url, tem_modelos).
 {% endcomment %}
 <div class="cv-field--full-width">
-  {% include "components/ui/forms/field.html" with field=c.select label="Modelo" only %}
+  <c-ui.forms.field :field="c.select" label="Modelo" only />
   {% if not c.tem_modelos %}
     <p class="field-help app-form-help">Nenhum modelo cadastrado para este campo. <a href="{{ c.manage_url }}">Cadastrar modelo</a></p>
   {% endif %}
 </div>
 <div class="oficio-justificativa-card__wide-field cv-field--full-width">
-  {% include "components/ui/forms/field.html" with field=c.textarea label=c.label only %}
+  <c-ui.forms.field :field="c.textarea" :label="c.label" only />
 </div>

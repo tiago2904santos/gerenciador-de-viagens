@@ -13,7 +13,7 @@
     <input type="hidden" name="tipo" value="{{ signature.tipo }}">
     <input type="hidden" name="forcar" value="1">
     <input type="hidden" name="next" value="{{ next_url }}">
-    {% include "components/ui/buttons/button.html" with type="submit" label="Refazer assinatura" variant="secondary" only %}
+    <c-ui.buttons.button type="submit" label="Refazer assinatura" variant="secondary" only />
   </form>
 {% elif signature.link_ativo %}
   <div class="signature-card__link-group">
@@ -30,7 +30,7 @@
       {% csrf_token %}
       <input type="hidden" name="tipo" value="{{ signature.tipo }}">
       <input type="hidden" name="next" value="{{ next_url }}">
-      {% include "components/ui/buttons/button.html" with type="submit" label="Gerar novo link" variant="secondary" only %}
+      <c-ui.buttons.button type="submit" label="Gerar novo link" variant="secondary" only />
     </form>
   </div>
   {% if signature.expira_em %}
@@ -41,6 +41,6 @@
     {% csrf_token %}
     <input type="hidden" name="tipo" value="{{ signature.tipo }}">
     <input type="hidden" name="next" value="{{ next_url }}">
-    {% include "components/ui/buttons/button.html" with type="submit" label="Gerar link de assinatura" variant="primary" only %}
+    <c-ui.buttons.button type="submit" label="Gerar link de assinatura" variant="primary" only />
   </form>
 {% endif %}

@@ -5,12 +5,12 @@
   {% endif %}
   <div class="record-list simple-list" role="list" data-collection-container>
     {% for row in rows %}
-      {% include "components/lists/simple_list_row.html" with row=row row_index=forloop.counter %}
+      <c-lists.simple_list_row :row="row" :row_index="forloop.counter" />
     {% endfor %}
   </div>
   <div data-collection-empty hidden>
-    {% include "components/lists/list_empty.html" with message=empty_message action_label=empty_action_label action_url=empty_action_url variant=empty_variant only %}
+    <c-lists.list_empty :message="empty_message" :action_label="empty_action_label" :action_url="empty_action_url" :variant="empty_variant" only />
   </div>
 {% else %}
-  {% include "components/lists/list_empty.html" with message=empty_message action_label=empty_action_label action_url=empty_action_url variant=empty_variant only %}
+  <c-lists.list_empty :message="empty_message" :action_label="empty_action_label" :action_url="empty_action_url" :variant="empty_variant" only />
 {% endif %}

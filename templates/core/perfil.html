@@ -1,4 +1,4 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 {% load static %}
 
 {% comment %}
@@ -17,13 +17,13 @@
 
 {% block flow_header %}
   <header class="list-header list-header--wizard-band" data-wizard-sticky-band>
-    {% include "components/ui/headers/_list_header_band.html" with title=page_title eyebrow=flow_eyebrow status_label=flow_status_label status_variant=flow_status_variant only %}
+    <c-ui.headers._list_header_band :title="page_title" :eyebrow="flow_eyebrow" :status_label="flow_status_label" :status_variant="flow_status_variant" only />
   </header>
 {% endblock %}
 
 {% block flow_body %}
   <div class="form-section-stack form-section-stack--comfortable" data-travel-document-wizard-step1>
-    {% include "components/form/card.html" with title="Conta e segurança" description=page_description title_id="perfil-conta-title" heading_level=2 extra_class="travel-document-card" body_extra_class="travel-document-body" meta_template="core/partials/_perfil_areas_header_meta.html" body_template="core/partials/_perfil_card_body.html" footer_template="core/partials/_perfil_logout_footer.html" %}
+    <c-form.card title="Conta e segurança" :description="page_description" title_id="perfil-conta-title" :heading_level="2" extra_class="travel-document-card" body_extra_class="travel-document-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :meta_extra_class="meta_extra_class"><c-slot name="meta">{% include "core/partials/_perfil_areas_header_meta.html" with vinculos_area=vinculos_area only %}</c-slot><c-slot name="body">{% include "core/partials/_perfil_card_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id csrf_token=csrf_token data_hook=data_hook drive_autorizado=drive_autorizado drive_creds=drive_creds drive_escopo_faltante=drive_escopo_faltante drive_job_reorg=drive_job_reorg drive_modo_ativo=drive_modo_ativo drive_pasta_raiz_id=drive_pasta_raiz_id drive_pasta_raiz_nome=drive_pasta_raiz_nome drive_pendencias=drive_pendencias drive_pode_reorganizar=drive_pode_reorganizar drive_total_arquivos=drive_total_arquivos drive_total_eventos=drive_total_eventos drive_total_pendencias=drive_total_pendencias shell=shell variant=variant perfil_form=perfil_form senha_form=senha_form vinculos_area=vinculos_area only %}</c-slot><c-slot name="footer">{% include "core/partials/_perfil_logout_footer.html" only %}</c-slot></c-form.card>
   </div>
 {% endblock %}
 

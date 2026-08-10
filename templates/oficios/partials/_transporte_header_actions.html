@@ -1,4 +1,4 @@
-{% include "components/ui/buttons/button.html" with href=servidor_create_url label="Adicionar servidor" variant="secondary" data_autosave_link=True only %}
+<c-ui.buttons.button :href="servidor_create_url" label="Adicionar servidor" variant="secondary" :data_autosave_link="True" only />
 <button type="button" class="cv-btn cv-btn--secondary" data-oficio-motorista-toggle>
   {% if form.motorista_modo.value == "MANUAL" %}Usar motorista cadastrado{% else %}Usar motorista manual{% endif %}
 </button>

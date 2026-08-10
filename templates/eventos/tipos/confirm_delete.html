@@ -4,10 +4,10 @@
 
 {% block content %}
   <div class="page-shell page-shell--standard-simple">
-    {% include "components/ui/headers/page_header.html" with eyebrow="EVENTOS" title=page_title description=page_description icon_label="EV" module_label="Tipos de Evento" only %}
+    <c-ui.headers.page_header eyebrow="EVENTOS" :title="page_title" :description="page_description" icon_label="EV" module_label="Tipos de Evento" only />
     <form class="main-form-panel" method="post">
       {% csrf_token %}
-      {% include "components/feedback/confirm_delete_block.html" with object_label=object.nome message="Esta ação remove o tipo da lista de seleção, mas não altera eventos já criados." primary_label="Excluir tipo" back_url=back_url only %}
+      <c-feedback.confirm_delete_block :object_label="object.nome" message="Esta ação remove o tipo da lista de seleção, mas não altera eventos já criados." primary_label="Excluir tipo" :back_url="back_url" only />
     </form>
   </div>
 {% endblock %}

@@ -18,7 +18,7 @@
       </label>
     {% endfor %}
   </div>
-  {% if form.viatura_modo.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.viatura_modo.errors field_id=form.viatura_modo.auto_id only %}{% endif %}
+  {% if form.viatura_modo.errors %}<c-ui.feedback.field_error :errors="form.viatura_modo.errors" :field_id="form.viatura_modo.auto_id" only />{% endif %}
 </fieldset>
 
 {# Viatura do cadastro #}
@@ -26,7 +26,7 @@
   <div class="field cv-field">
     <label class="cv-field__label" for="{{ form.viatura.id_for_label }}">Viatura do cadastro</label>
     {{ form.viatura }}
-    {% if form.viatura.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.viatura.errors field_id=form.viatura.auto_id only %}{% endif %}
+    {% if form.viatura.errors %}<c-ui.feedback.field_error :errors="form.viatura.errors" :field_id="form.viatura.auto_id" only />{% endif %}
   </div>
 </div>
 
@@ -36,22 +36,22 @@
     <div class="field cv-field dmv-fields__wide">
       <label class="cv-field__label" for="{{ form.viatura_manual_modelo.id_for_label }}">Modelo</label>
       {{ form.viatura_manual_modelo }}
-      {% if form.viatura_manual_modelo.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.viatura_manual_modelo.errors field_id=form.viatura_manual_modelo.auto_id only %}{% endif %}
+      {% if form.viatura_manual_modelo.errors %}<c-ui.feedback.field_error :errors="form.viatura_manual_modelo.errors" :field_id="form.viatura_manual_modelo.auto_id" only />{% endif %}
     </div>
     <div class="field cv-field">
       <label class="cv-field__label" for="{{ form.viatura_manual_placa.id_for_label }}">Placa</label>
       {{ form.viatura_manual_placa }}
-      {% if form.viatura_manual_placa.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.viatura_manual_placa.errors field_id=form.viatura_manual_placa.auto_id only %}{% endif %}
+      {% if form.viatura_manual_placa.errors %}<c-ui.feedback.field_error :errors="form.viatura_manual_placa.errors" :field_id="form.viatura_manual_placa.auto_id" only />{% endif %}
     </div>
     <div class="field cv-field">
       <label class="cv-field__label" for="{{ form.viatura_manual_tipo.id_for_label }}">Tipo</label>
       {{ form.viatura_manual_tipo }}
-      {% if form.viatura_manual_tipo.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.viatura_manual_tipo.errors field_id=form.viatura_manual_tipo.auto_id only %}{% endif %}
+      {% if form.viatura_manual_tipo.errors %}<c-ui.feedback.field_error :errors="form.viatura_manual_tipo.errors" :field_id="form.viatura_manual_tipo.auto_id" only />{% endif %}
     </div>
     <div class="field cv-field">
       <label class="cv-field__label" for="{{ form.viatura_manual_combustivel.id_for_label }}">Combustível</label>
       {{ form.viatura_manual_combustivel }}
-      {% if form.viatura_manual_combustivel.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.viatura_manual_combustivel.errors field_id=form.viatura_manual_combustivel.auto_id only %}{% endif %}
+      {% if form.viatura_manual_combustivel.errors %}<c-ui.feedback.field_error :errors="form.viatura_manual_combustivel.errors" :field_id="form.viatura_manual_combustivel.auto_id" only />{% endif %}
     </div>
   </div>
 </div>

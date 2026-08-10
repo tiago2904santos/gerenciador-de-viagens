@@ -423,7 +423,7 @@ def _form_context(*, request, form, ordem=None, evento=None):
         "ordem": ordem,
         "index_url": index_url,
         "back_label": back_label,
-        # `H-02`: contexto do casco único (`components/page/flow_base.html`).
+        # `H-02`: contexto do casco único (`cotton/page/flow_base.html`).
         "flow_eyebrow": "DOCUMENTOS",
         "flow_description": "Cadastro de ordem de serviço",
         "flow_icon_label": "OS",

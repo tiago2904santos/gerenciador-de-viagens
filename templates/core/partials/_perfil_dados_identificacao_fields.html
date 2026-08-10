@@ -1,6 +1,6 @@
-{% include "components/ui/feedback/form_errors.html" with form=perfil_form only %}
+<c-ui.feedback.form_errors :form="perfil_form" only />
 <div class="field-grid field-grid--cols-2">
-  {% include "components/ui/forms/field.html" with field=perfil_form.nome_completo size_class="field-size-2" only %}
-  {% include "components/ui/forms/field.html" with field=perfil_form.username size_class="field-size-1" only %}
-  {% include "components/ui/forms/field.html" with field=perfil_form.email size_class="field-size-1" only %}
+  <c-ui.forms.field :field="perfil_form.nome_completo" size_class="field-size-2" only />
+  <c-ui.forms.field :field="perfil_form.username" size_class="field-size-1" only />
+  <c-ui.forms.field :field="perfil_form.email" size_class="field-size-1" only />
 </div>

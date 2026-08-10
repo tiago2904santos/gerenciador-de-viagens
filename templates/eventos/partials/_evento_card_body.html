@@ -30,7 +30,7 @@
               data-overlay-trigger data-overlay-kind="menu"
               data-overlay-target="evento-oficio-menu-{{ card.pk }}-{{ oficio.oficio_pk }}"
               data-overlay-src="{{ card.menus_url }}"
-            >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
+            ><c-ui.icons.icon icon="folder" only /></button>
             
           </div>
         </li>
@@ -70,7 +70,7 @@
               data-overlay-trigger data-overlay-kind="menu"
               data-overlay-target="evento-documento-menu-{{ card.pk }}-{{ forloop.counter }}"
               data-overlay-src="{{ card.menus_url }}"
-            >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
+            ><c-ui.icons.icon icon="folder" only /></button>
             
           </div>
         </li>
@@ -115,7 +115,7 @@
             data-overlay-trigger data-overlay-kind="menu"
             data-overlay-target="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}"
               data-overlay-src="{{ card.menus_url }}"
-          >{% include "components/ui/icons/icon.html" with icon="more" only %}</button>
+          ><c-ui.icons.icon icon="more" only /></button>
           
         </div>
         {% endif %}
