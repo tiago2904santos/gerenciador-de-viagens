@@ -47,7 +47,14 @@
 .sidebar-brand-badge {
   align-items: center;
   background: var(--sidebar-badge-bg);
-  border: 1px solid rgba(255, 243, 207, 0.5);
+  /* NOVO-58 (E8, família 8b): o anel creme existia só aqui — o escuro o
+     apagava com `border: 0` (`theme-dark-components.css`). Como
+     `--sidebar-badge-bg` é definido uma vez só (`base/tokens.css`), o badge já
+     era idêntico nos dois temas menos por este anel; agora é idêntico.
+
+     Editado onde o valor mora, e não movido, que é o que a etapa exige: a
+     regra continua na mesma posição da cascata e com a mesma especificidade. */
+  border: 0;
   border-radius: var(--radius-pill);
   color: var(--color-white);
   display: inline-flex;
