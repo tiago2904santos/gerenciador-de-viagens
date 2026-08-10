@@ -36,7 +36,7 @@ FOLHA_REL = "components/ui/icons/_sprite.html"
 SIMBOLO = re.compile(r'<symbol id="cv-icon-([^"]+)"')
 REFERENCIA = re.compile(r'{%\s*(?:include|extends)\s+"([^"]+)"')
 # `include ... with icon="edit"`, e também o `icon="edit"` de um `with` de bloco.
-ICONE_LITERAL = re.compile(r'\bicon=(?:"([a-z0-9-]+)"|\'([a-z0-9-]+)\')')
+ICONE_LITERAL = re.compile(r'(?<!:)\bicon=(?:"([a-z0-9-]+)"|\'([a-z0-9-]+)\')')
 
 
 def _templates() -> dict[str, str]:

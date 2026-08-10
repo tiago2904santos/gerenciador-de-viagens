@@ -229,7 +229,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         component = (
             Path(settings.BASE_DIR)
             / "templates"
-            / "components"
+            / "cotton"
             / "ui"
             / "forms"
             / "file_picker.html"

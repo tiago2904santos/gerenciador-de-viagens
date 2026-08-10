@@ -51,6 +51,17 @@ class AuditUiPatternsTests(SimpleTestCase):
 
         self.assertEqual(findings, [])
 
+    def test_componentes_cotton_preservam_a_excecao_dos_componentes_ui(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            component = root / "templates" / "cotton" / "ui" / "buttons" / "button.html"
+            component.parent.mkdir(parents=True)
+            component.write_text('<button style="color: #fff">Ação</button>\n', encoding="utf-8")
+
+            findings = auditor.scan_file(component, root=root)
+
+        self.assertEqual(findings, [])
+
     def test_teto_reprova_so_quando_a_contagem_cresce(self):
         self.assertFalse(auditor.exceeds_limit(total=12, maximum=12))
         self.assertFalse(auditor.exceeds_limit(total=11, maximum=12))

@@ -117,7 +117,7 @@ class GlobalDatePickerTests(SimpleTestCase):
 
     def test_calendar_markup_exists_only_in_the_global_partial(self):
         templates_root = Path(settings.BASE_DIR) / "templates"
-        global_partial = templates_root / "components" / "ui" / "forms" / "date_picker.html"
+        global_partial = templates_root / "cotton" / "ui" / "forms" / "date_picker.html"
 
         offenders = []
         for template in templates_root.rglob("*.html"):
