@@ -15,7 +15,7 @@
   </div>
   {{ form.oficio }}
   {% if form.oficio.errors %}
-    {% include "components/ui/feedback/field_error.html" with errors=form.oficio.errors field_id=form.oficio.auto_id only %}
+    <c-ui.feedback.field_error :errors="form.oficio.errors" :field_id="form.oficio.auto_id" only />
   {% endif %}
   <section class="search-picker__selected-panel termo-oficio-summary-panel" aria-label="Ofícios encontrados">
     <div id="termo-oficio-lista" class="search-picker__selected-list roteiro-editor__route-list related-route-list related-route-list"></div>

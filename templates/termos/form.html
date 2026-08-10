@@ -1,4 +1,4 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 {% load static %}
 
 {% block extra_css %}
@@ -31,16 +31,16 @@
   >
     {% csrf_token %}
 
-    {% include "components/ui/feedback/form_errors.html" with form=form only %}
+    <c-ui.feedback.form_errors :form="form" only />
 
     <div data-termo-wizard-form data-travel-document-wizard-step1>
-      {% include "components/form/card.html" with title="Dados do termo" description="Ofício, evento, equipe, transporte e documentos" title_id="termo-form-main-title" body_template="termos/partials/_termo_form_body.html" footer_template="termos/partials/_viatura_footer.html" footer_id="termo-form-footer" %}
+      <c-form.card title="Dados do termo" description="Ofício, evento, equipe, transporte e documentos" title_id="termo-form-main-title" body_template="termos/partials/_termo_form_body.html" footer_template="termos/partials/_viatura_footer.html" footer_id="termo-form-footer" />
     </div>
   </form>
 {% endblock %}
 
 {% block flow_modals %}
   {% if termo and termo.pk %}
-    {% include "components/ui/modals/attach_signed_modal.html" %}
+    <c-ui.modals.attach_signed_modal />
   {% endif %}
 {% endblock %}
