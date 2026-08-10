@@ -15,6 +15,7 @@ from roteiros.models import Roteiro
 from roteiros.models import RoteiroDestino
 from roteiros.models import RoteiroTrecho
 from roteiros import roteiro_logic
+from roteiros.services.editor_state import dedupe_roteiro_loop_retorno_final
 from core.testing import area_de_teste
 from core.testing import vincular_area
 
@@ -513,7 +514,7 @@ class RoteirosBaseTests(TestCase):
 
     def test_calculo_diarias_ignora_retorno_final_duplicado_no_loop_diario(self):
         base_state = self._loop_diario_state_com_retorno_duplicado()
-        deduped_state = roteiro_logic._dedupe_roteiro_loop_retorno_final(dict(base_state))
+        deduped_state = dedupe_roteiro_loop_retorno_final(dict(base_state))
 
         markers_com_duplicado, _, chegada_com_duplicado, _, _ = roteiro_logic._collect_roteiro_markers_payload(base_state)
         markers_sem_duplicado, _, chegada_sem_duplicado, _, _ = roteiro_logic._collect_roteiro_markers_payload(deduped_state)
