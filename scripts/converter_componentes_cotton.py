@@ -247,15 +247,24 @@ def _conteudo_cotton(source: Path, params: list[str]) -> bytes:
     text = raw.decode("utf-8").replace("\r\n", "\n")
     declaration = _declaracao(params)
 
-    # ``ExtendsNode`` precisa continuar sendo o primeiro nó. Esses dois casos
-    # recebem adaptadores próprios e ficam fora da conversão mecânica.
+    # ``ExtendsNode`` precisa continuar sendo o primeiro nó. A declaração entra
+    # logo depois dele e a casca legada vira um adaptador de herança.
     if re.match(r"^\s*{%\s*extends\b", text):
-        raise ValueError(f"componente com extends exige adaptador manual: {source}")
+        first_line, separator, rest = text.partition("\n")
+        if not separator:
+            return (first_line + newline + declaration + newline).encode("utf-8")
+        return (first_line + newline + declaration + newline + rest).encode("utf-8")
 
     return (declaration + newline + text).encode("utf-8")
 
 
-def _casca(component_name: str, params: list[str], newline: str) -> bytes:
+def _casca(source: Path, component_name: str, params: list[str], newline: str) -> bytes:
+    canonical = _target(source) if _target(source).exists() else source
+    first_line = canonical.read_text(encoding="utf-8").splitlines()[0]
+    if re.match(r"^\s*{%\s*extends\b", first_line):
+        target_name = _target(source).relative_to(ROOT / "templates").as_posix()
+        return f'{{% extends "{target_name}" %}}{newline}'.encode("utf-8")
+
     attrs = " ".join(f':{name}="{name}"' for name in params)
     spacing = " " if attrs else ""
     return f"<c-{component_name}{spacing}{attrs} />{newline}".encode("utf-8")
@@ -321,12 +330,24 @@ def main() -> int:
                 errors.append(f"alvo ausente: {target.relative_to(ROOT)}")
                 continue
             target_text = target.read_text(encoding="utf-8")
-            first = target_text.splitlines()[0] if target_text.splitlines() else ""
-            if first != _declaracao(params):
+            target_lines = target_text.splitlines()
+            declaration_index = (
+                1
+                if target_lines and re.match(r"^\s*{%\s*extends\b", target_lines[0])
+                else 0
+            )
+            actual_declaration = (
+                target_lines[declaration_index]
+                if len(target_lines) > declaration_index
+                else ""
+            )
+            if actual_declaration != _declaracao(params):
                 errors.append(
-                    f"contrato divergente em {target.relative_to(ROOT)}: {first!r}"
+                    f"contrato divergente em {target.relative_to(ROOT)}: "
+                    f"{actual_declaration!r}"
                 )
             expected_wrapper = _casca(
+                source,
                 _component_name(source),
                 params,
                 _newline(source.read_bytes()),
@@ -341,7 +362,7 @@ def main() -> int:
                 encoding="utf-8",
                 newline="\n",
             )
-            source.write_bytes(_casca(_component_name(source), params, "\n"))
+            source.write_bytes(_casca(source, _component_name(source), params, "\n"))
             continue
         if target.exists():
             errors.append(f"alvo já existe: {target.relative_to(ROOT)}")
@@ -354,7 +375,7 @@ def main() -> int:
             continue
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(cotton_content)
-        source.write_bytes(_casca(_component_name(source), params, _newline(raw)))
+        source.write_bytes(_casca(source, _component_name(source), params, _newline(raw)))
 
     if errors:
         print("\nERRO:")
