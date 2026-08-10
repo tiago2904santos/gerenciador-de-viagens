@@ -12,7 +12,9 @@ subgrafo, e duas delas não são detalhe:
   servidor, exibido na tela, e não havia teste.
 
 Tudo pela fachada pública `montar_contexto_editor_roteiro`, que é o que os chamadores
-usam — assim a rede sobrevive à mudança de arquivo.
+usam — assim a rede sobrevive à mudança de arquivo. Ela mesma migrou de
+`services/roteiro_editor.py` para `presenters.py` nesta fatia: deixá-la no service faria
+um service importar um presenter.
 """
 
 from decimal import Decimal
@@ -24,7 +26,7 @@ from cadastros.models import Estado
 from core.testing import area_de_teste
 from roteiros.forms import RoteiroForm
 from roteiros.models import Roteiro
-from roteiros.services import montar_contexto_editor_roteiro
+from roteiros.presenters import montar_contexto_editor_roteiro
 
 
 class ContextoDoEditorTests(TestCase):

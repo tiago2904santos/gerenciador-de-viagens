@@ -2,17 +2,13 @@
 """Regras de negocio e montagem de contexto do formulario de roteiros."""
 from __future__ import annotations
 
-import json
 from copy import deepcopy
 from datetime import datetime
-from decimal import ROUND_HALF_UP
-from decimal import Decimal
 from types import SimpleNamespace
 
 from django.db import transaction
 from django.db.models import F
 from django.db.models import Q
-from django.urls import reverse
 from django.utils import timezone
 
 from cadastros.models import Cidade, Estado, ConfiguracaoSistema
@@ -20,7 +16,6 @@ from cadastros.models import Cidade, Estado, ConfiguracaoSistema
 from roteiros.services.diarias import (
     PeriodMarker,
     calculate_periodized_diarias,
-    formatar_valor_diarias,
     infer_tipo_destino_from_paradas,
 )
 from roteiros.models import Roteiro, RoteiroDestino, RoteiroTrecho
@@ -180,22 +175,6 @@ def _estrutura_trechos(roteiro, destinos_list=None):
         'rota_fonte': (getattr(t_db, 'rota_fonte', '') or '') if t_db else '',
     })
     return out
-def _trechos_list_json_compat(trechos_list):
-    """Serializa trechos para trechos_json (string) e para json_script no template."""
-    rows = []
-    for row in trechos_list or []:
-        item = {}
-        for k, v in row.items():
-            if v is None:
-                item[k] = None
-            elif hasattr(v, 'isoformat'):
-                item[k] = v.isoformat()
-            elif isinstance(v, Decimal):
-                item[k] = float(v)
-            else:
-                item[k] = v
-        rows.append(item)
-    return rows, json.dumps(rows)
 def _atualizar_datas_roteiro_apos_salvar_trechos(roteiro):
     """Deriva o cabeçalho de datas do roteiro a partir dos trechos (`NOVO-36`).
 
@@ -1516,45 +1495,6 @@ def _persistir_diarias_roteiro(roteiro, diarias_resultado):
     roteiro.save(update_fields=['quantidade_diarias', 'valor_diarias', 'valor_diarias_extenso'])
 
 
-def _build_roteiro_diarias_fallback(roteiro, *, quantidade_servidores: int = 1):
-    if not roteiro:
-        return None
-    if roteiro.valor_diarias is None and not roteiro.quantidade_diarias and not roteiro.valor_diarias_extenso:
-        return None
-    total_valor_decimal = roteiro.valor_diarias
-    if total_valor_decimal is None:
-        return None
-    total_valor = formatar_valor_diarias(total_valor_decimal)
-    qs = max(0, int(quantidade_servidores or 0))
-    if qs == 0:
-        valor_por_servidor_decimal = Decimal('0.00')
-        valor_por_servidor_txt = formatar_valor_diarias(valor_por_servidor_decimal)
-    elif qs == 1:
-        valor_por_servidor_decimal = total_valor_decimal
-        valor_por_servidor_txt = total_valor
-    else:
-        valor_por_servidor_decimal = (
-            total_valor_decimal / Decimal(qs)
-        ).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-        valor_por_servidor_txt = formatar_valor_diarias(valor_por_servidor_decimal)
-    return {
-        'periodos': [],
-        'totais': {
-            'total_diarias': roteiro.quantidade_diarias or '',
-            'total_horas': '',
-            'total_valor': total_valor,
-            'total_valor_decimal': total_valor_decimal,
-            'valor_extenso': roteiro.valor_diarias_extenso or '',
-            'quantidade_servidores': qs,
-            'diarias_por_servidor': roteiro.quantidade_diarias or '',
-            'valor_por_servidor': valor_por_servidor_txt,
-            'valor_por_servidor_decimal': valor_por_servidor_decimal,
-            'valor_unitario_referencia': '',
-        },
-        'tipo_destino': '',
-    }
-
-
 #: `DB-08` fatia 2: bloco livre para onde as posições vão no primeiro passo.
 #: Precisa ficar acima de qualquer posição final — e as finais são
 #: `0..len(trechos_validated)`, uma por trecho do payload do editor. Um milhão dá
@@ -1714,116 +1654,3 @@ def _salvar_roteiro_avulso_from_roteiro_state(roteiro, roteiro_state, validated,
     mark_stale_when_signature_changed(roteiro)
 
 
-def _build_roteiro_form_context(
-    *,
-    evento,
-    form,
-    obj,
-    destinos_atuais,
-    trechos_list,
-    is_avulso=False,
-    roteiro_state=None,
-    route_options=None,
-    seed_source_label='',
-    diarias_quantidade_servidores=1,
-):
-    """
-    Monta contexto completo para o formulário de roteiro (guiado e avulso).
-    Quando roteiro_state é fornecido, usa diretamente; caso contrário, constrói
-    a partir de trechos_list + destinos_atuais (compatibilidade com forms guiados).
-    """
-    if roteiro_state is None:
-        instance = obj or form.instance
-        sede_estado_id = getattr(instance, 'origem_estado_id', None)
-        sede_cidade_id = getattr(instance, 'origem_cidade_id', None)
-        roteiro_state = _build_roteiro_state_from_estrutura(
-            trechos_list,
-            [{'estado_id': d.get('estado_id'), 'cidade_id': d.get('cidade_id')} for d in (destinos_atuais or [])],
-            sede_estado_id,
-            sede_cidade_id,
-            seed_source_label,
-        )
-        roteiro_state['roteiro_modo'] = 'ROTEIRO_PROPRIO'
-
-    from roteiros import selectors
-
-    sede_estado_id = roteiro_state.get("sede_estado_id")
-    sede_cidade_id = roteiro_state.get("sede_cidade_id")
-    estados_qs = selectors.listar_estados_para_select()
-    sede_cidades_qs = selectors.listar_cidades_para_select(estado_id=sede_estado_id)
-    qs_ctx = max(0, int(diarias_quantidade_servidores or 0))
-    diarias_resultado = None
-    try:
-        diarias_resultado = _calculate_avulso_diarias_from_state(
-            roteiro_state,
-            quantidade_servidores=qs_ctx,
-        )
-    except ValueError:
-        diarias_resultado = _build_roteiro_diarias_fallback(
-            obj or form.instance,
-            quantidade_servidores=qs_ctx,
-        )
-    if diarias_resultado is None:
-        diarias_resultado = _build_roteiro_diarias_fallback(
-            obj or form.instance,
-            quantidade_servidores=qs_ctx,
-        )
-    destino_estado_fixo = _get_parana_estado()
-    rows_src = list(trechos_list or [])
-    if not rows_src:
-        ts = (roteiro_state or {}).get('trechos') or []
-        if ts:
-            rows_src = list(ts)
-    initial_trechos_data, trechos_json = _trechos_list_json_compat(rows_src)
-    serialized_roteiro_state = _serialize_roteiro_state(roteiro_state)
-    route_options_json = route_options or []
-    if is_avulso:
-        serialized_roteiro_state.pop('roteiro_evento_id', None)
-        route_options_json = deepcopy(route_options_json)
-        for route_option in route_options_json:
-            state = route_option.get('state') or {}
-            state.pop('roteiro_evento_id', None)
-    from roteiros.services.routing.route_service import serialize_existing_route
-
-    roteiro_mapa_inicial = (
-        serialize_existing_route(obj)
-        if obj and getattr(obj, "pk", None)
-        else {"roteiro_id": None, "status": "pendente", "route": None}
-    )
-    roteiro_mapa_inicial.update(_build_roteiro_map_defaults())
-    return {
-        'evento': evento,
-        'object': obj,
-        'form': form,
-        'destinos_atuais': destinos_atuais,
-        'estados': estados_qs,
-        'api_cidades_por_estado_url': reverse('roteiros:api_cidades_por_estado', kwargs={'estado_id': 0}),
-        'trechos': trechos_list,
-        'trechos_json': trechos_json,
-        'initial_trechos_data': initial_trechos_data,
-        'roteiro_editor_state_json': serialized_roteiro_state,
-        'roteiro_diarias_resultado': diarias_resultado,
-        'roteiro_seed_source_label': roteiro_state.get('seed_source_label', ''),
-        'api_calcular_diarias_url': reverse('roteiros:calcular_diarias'),
-        'api_calcular_rota_url': reverse('roteiros:calcular_rota'),
-        'api_calcular_rota_preview_url': reverse('roteiros:calcular_rota_preview'),
-        'roteiro_mapa_inicial': roteiro_mapa_inicial,
-        'roteiro_modo': roteiro_state.get('roteiro_modo', 'ROTEIRO_PROPRIO'),
-        'roteiro_id': roteiro_state.get('roteiro_evento_id'),
-        'roteiro_evento_id': roteiro_state.get('roteiro_evento_id'),
-        'roteiros_evento': route_options or [],
-        'roteiro_routes_json': route_options_json,
-        'has_event_routes': bool(route_options),
-        'is_avulso': is_avulso,
-        'retorno_state': roteiro_state.get('retorno', {}),
-        'sede_estado_id': sede_estado_id,
-        'sede_cidade_id': sede_cidade_id,
-        'sede_cidades_qs': sede_cidades_qs,
-        'destino_estado_fixo_id': getattr(destino_estado_fixo, 'pk', None),
-        'destino_estado_fixo_nome': (
-            f'{destino_estado_fixo.nome} ({destino_estado_fixo.sigla})'
-            if destino_estado_fixo
-            else 'Paraná (PR)'
-        ),
-        'diarias_quantidade_servidores': qs_ctx,
-    }
