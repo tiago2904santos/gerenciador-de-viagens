@@ -544,9 +544,9 @@ desenho anterior — e é o que o sistema mostra para quem nunca escolheu tema.*
 | 8d | barra lateral | 976 | ✅ **fechada pelo `NOVO-63`** — `.sidebar*` divergente de 1.096 para **96**; a largura virou um token só |
 | 8e | `font-size`/`line-height` | 533 | ✅ **em quase tudo**: o `NOVO-63` mediu que **528 dos 533** eram a barra lateral |
 | 8f | altura de controle | 378 | ✅ **toda**: o `NOVO-63` mediu que os 378 eram a barra lateral |
-| 8b | borda `0px` → `1px` | 1.416 | 🔴 **bloqueada na camada de token — `NOVO-92`** (remedida em 10/08; ver abaixo) |
+| 8b | borda `0px` → `1px` | 1.416 | 🔴 **bloqueada na camada de token — `NOVO-93`** (remedida em 10/08; ver abaixo) |
 | 8c | raio `14px` → `10px` | 940 | ✅ **fechada em 10/08** — 43 das 116 regras, 1.116 elementos |
-| 8g | `justify-content` `normal` → `center` | 230 | ⛔ **pulada por decisão do dono — `NOVO-93`**: move a régua e não move um pixel |
+| 8g | `justify-content` `normal` → `center` | 230 | ⛔ **pulada por decisão do dono — `NOVO-94`**: move a régua e não move um pixel |
 | 8h | **gaveta da barra lateral** | — | 🟠 **aberta, deixada de fora de propósito pelo `NOVO-63`**: sob `@media (max-width: 840px)` o escuro usa `position: fixed` + `height: 100dvh` e o claro `position: relative`. Isso não é geometria, é **comportamento** — vira gaveta sobreposta em vez de coluna no fluxo, e depende de `.app-mobile-bar__toggle` e `.sidebar-drawer-close` se comportarem igual nos dois temas |
 
 **Portanto a 8-zero é remedir.** Rode `scripts/medir_divergencia_tema.py` da E0 e reescreva a
@@ -579,7 +579,7 @@ Duas conclusões que a contagem antiga escondia:
   claro já computa o mesmo valor. Contá-las como trabalho pendente superestimava a etapa.
 - **"Invisível" quer dizer coisas diferentes na 8g e na 8b/8c.** Na 8g a propriedade *não consegue*
   pintar (não há folga no container, ou o elemento nem é caixa flex no claro) — é inútil por
-  construção, e virou o `NOVO-93`. Na 8b/8c o elemento só não está na tela **no estado de repouso**;
+  construção, e virou o `NOVO-94`. Na 8b/8c o elemento só não está na tela **no estado de repouso**;
   ele pinta quando o menu ou o diálogo abre. Por isso a 8c foi feita inteira e a 8g não foi feita.
 
 **Instrumento novo desta etapa:** o print antes/depois deixou de ser conferência visual e virou
