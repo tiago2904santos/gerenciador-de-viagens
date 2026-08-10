@@ -9,5 +9,5 @@
 {% endblock %}
 
 {% block content %}
-  {% include "components/lists/list_page_cards.html" with title=page_title eyebrow="PLANOS DE TRABALHO" search_placeholder="Buscar por número, destino ou programa..." search_aria_label="Buscar planos de trabalho" date_picker_id="pt-filter-date-picker" date_start_id="id_pt_viagem_de" date_end_id="id_pt_viagem_ate" tabs_aria_label="Abas de planos de trabalho" card_template="planos_trabalho/partials/plano_list_card.html" empty_message=empty_message empty_action_label="Novo plano" empty_action_url=create_url action_label="Novo plano" action_url=create_url delete_modal_title="Excluir Plano de Trabalho?" delete_modal_entity="este plano de trabalho" %}
+  <c-lists.list_page_cards :title="page_title" eyebrow="PLANOS DE TRABALHO" search_placeholder="Buscar por número, destino ou programa..." search_aria_label="Buscar planos de trabalho" date_picker_id="pt-filter-date-picker" date_start_id="id_pt_viagem_de" date_end_id="id_pt_viagem_ate" tabs_aria_label="Abas de planos de trabalho" card_template="planos_trabalho/partials/plano_list_card.html" :empty_message="empty_message" empty_action_label="Novo plano" :empty_action_url="create_url" action_label="Novo plano" :action_url="create_url" delete_modal_title="Excluir Plano de Trabalho?" delete_modal_entity="este plano de trabalho" />
 {% endblock %}

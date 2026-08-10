@@ -1,2 +1,2 @@
-{% include "components/travel/destination_section.html" with prefix="pt" section_id="pt-evento-destinos" title_id="pt-evento-destinos-title" add_button_id="pt-btn-adicionar-destino" add_button_pt=True list_id="pt-destinos-list" rows_template="components/travel/destinations/rows.html" errors_template="components/travel/destinations/errors.html" %}
-{% include "components/travel/destinations/row_template.html" with prefix="pt" %}
+<c-travel.destination_section prefix="pt" section_id="pt-evento-destinos" title_id="pt-evento-destinos-title" add_button_id="pt-btn-adicionar-destino" :add_button_pt="True" list_id="pt-destinos-list" rows_template="components/travel/destinations/rows.html" errors_template="components/travel/destinations/errors.html" />
+<c-travel.destinations.row_template prefix="pt" />

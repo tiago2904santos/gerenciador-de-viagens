@@ -90,7 +90,7 @@ def novo(request):
     if request.method == "GET":
         return render(
             request,
-            "components/create_draft.html",
+            "cotton/create_draft.html",
             {
                 "page_title": "Novo plano de trabalho",
                 "page_description": "Confirme para reservar a numeração e iniciar o cadastro.",

@@ -1,6 +1,6 @@
 <div class="field-grid pt-programa-fields">
-  {% include "components/ui/forms/field.html" with field=form.programa label="Programa" action_url=programas_url action_label="Gerenciar programas" only %}
+  <c-ui.forms.field :field="form.programa" label="Programa" :action_url="programas_url" action_label="Gerenciar programas" only />
   <div class="pt-programa-outros" data-pt-programa-outros-field {% if not form.programa_outros_selected %}hidden{% endif %}>
-    {% include "components/ui/forms/field.html" with field=form.programa_outros label="Outro programa" only %}
+    <c-ui.forms.field :field="form.programa_outros" label="Outro programa" only />
   </div>
 </div>

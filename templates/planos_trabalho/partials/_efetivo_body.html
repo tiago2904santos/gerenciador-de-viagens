@@ -1,5 +1,5 @@
 {{ formset.management_form }}
-{% include "components/ui/feedback/form_errors.html" with errors=formset.non_form_errors only %}
+<c-ui.feedback.form_errors :errors="formset.non_form_errors" only />
 
 <section
   class="form-subsection travel-destinations ordered-field-collection route-destinos-block route-destinos-block--split route-destinos-block--single travel-document-block pt-efetivo-section"

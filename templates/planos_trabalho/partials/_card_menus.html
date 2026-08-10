@@ -5,5 +5,5 @@ O presenter é o mesmo da lista, chamado com `menus_sob_demanda=False`: assim o
 corpo aqui é, por construção, o que estava embutido antes — e não uma segunda
 versão que pode divergir sem ninguém notar.
 {% endcomment %}
-{% for menu in card.footer.menus %}{% include "components/ui/lists/entity_card_menu_body.html" with menu=menu csrf_token=csrf_token only %}{% endfor %}
-{% for menu in card.footer.danger_menus %}{% include "components/ui/lists/entity_card_menu_body.html" with menu=menu csrf_token=csrf_token only %}{% endfor %}
+{% for menu in card.footer.menus %}<c-ui.lists.entity_card_menu_body :menu="menu" :csrf_token="csrf_token" only />{% endfor %}
+{% for menu in card.footer.danger_menus %}<c-ui.lists.entity_card_menu_body :menu="menu" :csrf_token="csrf_token" only />{% endfor %}

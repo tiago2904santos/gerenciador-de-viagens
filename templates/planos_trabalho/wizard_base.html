@@ -10,7 +10,7 @@
 {% block content %}
   <div class="page-shell page-shell--wizard travel-document-wizard app-wizard" data-pt-wizard-shell>
     <div class="wizard-sticky-scope" data-wizard-sticky-header>
-      {% include "components/ui/headers/wizard_page_header.html" with eyebrow="PLANOS DE TRABALHO" title=wizard_header.title steps=wizard_page_steps back_label=wizard_back_label back_url=wizard_back_url only %}
+      <c-ui.headers.wizard_page_header eyebrow="PLANOS DE TRABALHO" :title="wizard_header.title" :steps="wizard_page_steps" :back_label="wizard_back_label" :back_url="wizard_back_url" only />
 
       <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
         <div class="form-section-stack form-section-stack--comfortable">

@@ -1,7 +1,7 @@
 """BE-01 — os botões do wizard de plano de trabalho precisam fazer o que dizem.
 
 `planos_trabalho/view_helpers.py` lia apenas `post.get("action")` e caía no
-default. Os rodapés do wizard vêm de `components/ui/layouts/card_footer_actions.html`,
+default. Os rodapés do wizard vêm de `cotton/ui/layouts/card_footer_actions.html`,
 que emite `name="wizard_action"` — e não existe **nenhum** `name="action"` nos
 templates do app. Resultado: o valor do botão nunca chegava.
 

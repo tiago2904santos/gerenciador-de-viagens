@@ -11,7 +11,7 @@
 {% block wizard_content %}
   <div data-pt-efetivo-diarias data-api-calcular-url="{{ api_calcular_diarias_url }}" data-travel-document-wizard-step1>
 
-    {% include "components/form/card.html" with title="Efetivo e diárias" description="Composição da equipe e cálculo automático das diárias" title_id="pt-efetivo-diarias-title" extra_class="pt-form-card" body_extra_class="travel-document-body" body_template="planos_trabalho/partials/_efetivo_diarias_wizard_body.html" footer_template="planos_trabalho/partials/_efetivo_diarias_wizard_footer.html" %}
+    <c-form.card title="Efetivo e diárias" description="Composição da equipe e cálculo automático das diárias" title_id="pt-efetivo-diarias-title" extra_class="pt-form-card" body_extra_class="travel-document-body" body_template="planos_trabalho/partials/_efetivo_diarias_wizard_body.html" footer_template="planos_trabalho/partials/_efetivo_diarias_wizard_footer.html" />
   </div>
 {% endblock %}
 

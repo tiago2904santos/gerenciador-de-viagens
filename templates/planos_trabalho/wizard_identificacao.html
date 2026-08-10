@@ -10,13 +10,13 @@
 
 {% block wizard_content %}
   <div data-pt-form data-api-cidades-url="{{ api_cidades_por_estado_url }}" data-travel-document-wizard-step1>
-    {% include "components/ui/feedback/form_errors.html" with form=form only %}
+    <c-ui.feedback.form_errors :form="form" only />
 
     {# ── 0. Eventos já adicionados (modo multi-evento) — cards contextuais acima do card-mestre ── #}
     {% if is_multi_evento %}
       {% if em_edicao_evento %}
         <div class="notice notice--info pte-events__banner" role="status">
-          {% include "components/ui/icons/icon.html" with icon="edit" extra_class="pte-events__banner-icon" only %}
+          <c-ui.icons.icon icon="edit" extra_class="pte-events__banner-icon" only />
           <span>Editando um evento existente — preencha as etapas e salve. Para criar um novo evento, finalize este e use “Adicionar evento ao plano” na última etapa.</span>
         </div>
       {% endif %}
@@ -31,7 +31,7 @@
 
     {{ pt_textos_padrao_templates|json_script:"pt-textos-padrao-data" }}
 
-    {% include "components/form/card.html" with title="Identificação e atuação" description="Programa solicitante, evento e textos do documento" title_id="pt-identificacao-title" extra_class="pt-form-card" body_extra_class="travel-document-body" body_template="planos_trabalho/partials/_identificacao_wizard_body.html" footer_template="planos_trabalho/partials/_identificacao_wizard_footer.html" %}
+    <c-form.card title="Identificação e atuação" description="Programa solicitante, evento e textos do documento" title_id="pt-identificacao-title" extra_class="pt-form-card" body_extra_class="travel-document-body" body_template="planos_trabalho/partials/_identificacao_wizard_body.html" footer_template="planos_trabalho/partials/_identificacao_wizard_footer.html" />
   </div>
 {% endblock %}
 

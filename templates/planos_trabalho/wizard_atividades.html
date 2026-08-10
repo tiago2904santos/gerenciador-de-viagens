@@ -13,7 +13,7 @@
     {{ atividades_catalogo_data|json_script:"pt-atividades-data" }}
     {{ atividades_presets_data|json_script:"pt-atividades-presets-data" }}
 
-    {% include "components/form/card.html" with title="Atividades, metas e recursos" description="Selecione as atividades — a meta e o recurso de cada uma entram automaticamente" title_id="pt-atividades-title-card" extra_class="pt-form-card" body_extra_class="travel-document-body" body_template="planos_trabalho/partials/_atividades_wizard_body.html" footer_template="planos_trabalho/partials/_atividades_wizard_footer.html" %}
+    <c-form.card title="Atividades, metas e recursos" description="Selecione as atividades — a meta e o recurso de cada uma entram automaticamente" title_id="pt-atividades-title-card" extra_class="pt-form-card" body_extra_class="travel-document-body" body_template="planos_trabalho/partials/_atividades_wizard_body.html" footer_template="planos_trabalho/partials/_atividades_wizard_footer.html" />
   </div>
 {% endblock %}
 
