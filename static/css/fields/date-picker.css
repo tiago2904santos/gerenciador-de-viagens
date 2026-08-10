@@ -41,7 +41,7 @@ html[data-theme="light"] {
   appearance: none;
   background:
     linear-gradient(var(--theme-surface-card), var(--theme-surface-card)) padding-box,
-    linear-gradient(var(--cv-field-border, var(--color-border-strong)), var(--cv-field-border, var(--color-border-strong))) border-box;
+    linear-gradient(var(--color-input-border, var(--color-border-strong)), var(--color-input-border, var(--color-border-strong))) border-box;
   border: 1px solid transparent;
   border-radius: var(--radius-control);
   box-shadow: var(--shadow-xs);
@@ -213,7 +213,7 @@ html[data-theme="light"] {
   appearance: none;
   background:
     linear-gradient(var(--theme-surface-card), var(--theme-surface-card)) padding-box,
-    linear-gradient(var(--cv-field-border, var(--color-border-strong)), var(--cv-field-border, var(--color-border-strong))) border-box;
+    linear-gradient(var(--color-input-border, var(--color-border-strong)), var(--color-input-border, var(--color-border-strong))) border-box;
   border: 1px solid transparent;
   border-radius: var(--radius-pill);
   color: var(--theme-text-body);

@@ -855,7 +855,7 @@ html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
 }
 
 #pt-card-diarias .pt-diarias-summary-card {
-  background: var(--cv-field-bg);
+  background: var(--color-input-bg);
   border: 0;
   border-radius: var(--radius-control-lg);
   box-shadow: none;

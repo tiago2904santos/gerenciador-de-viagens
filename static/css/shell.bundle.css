@@ -308,8 +308,6 @@ html[data-theme="dark"] {
   --color-input-placeholder: #9ba9b4;
   --color-input-disabled-text: #909da7;
   --color-input-border: #607d93;
-  --cv-field-bg: var(--color-input-bg);
-  --cv-field-border: 1px solid var(--color-input-border);
   --cv-field-focus-ring: var(--focus-ring);
   --field-shadow-focus: none;
   --select-focus-ring: none;
@@ -3840,8 +3838,8 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
 }
 
 #quick-add-modelo-motivo .cv-field__control--textarea {
-  background: var(--cv-field-bg);
-  border: 1px solid var(--cv-field-border);
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
   border-radius: var(--radius-control);
   box-shadow: var(--shadow-xs);
   box-sizing: border-box;
@@ -3883,7 +3881,7 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
 
 #quick-add-atividade .cv-field__control--textarea {
   background: var(--color-input-bg);
-  border: 1px solid var(--cv-field-border);
+  border: 1px solid var(--color-input-border);
   border-radius: var(--radius-control);
   box-shadow: var(--shadow-xs);
   box-sizing: border-box;
@@ -5169,7 +5167,7 @@ html[data-theme="light"] {
   appearance: none;
   background:
     linear-gradient(var(--theme-surface-card), var(--theme-surface-card)) padding-box,
-    linear-gradient(var(--cv-field-border, var(--color-border-strong)), var(--cv-field-border, var(--color-border-strong))) border-box;
+    linear-gradient(var(--color-input-border, var(--color-border-strong)), var(--color-input-border, var(--color-border-strong))) border-box;
   border: 1px solid transparent;
   border-radius: var(--radius-control);
   box-shadow: var(--shadow-xs);
@@ -5341,7 +5339,7 @@ html[data-theme="light"] {
   appearance: none;
   background:
     linear-gradient(var(--theme-surface-card), var(--theme-surface-card)) padding-box,
-    linear-gradient(var(--cv-field-border, var(--color-border-strong)), var(--cv-field-border, var(--color-border-strong))) border-box;
+    linear-gradient(var(--color-input-border, var(--color-border-strong)), var(--color-input-border, var(--color-border-strong))) border-box;
   border: 1px solid transparent;
   border-radius: var(--radius-pill);
   color: var(--theme-text-body);
@@ -5726,8 +5724,11 @@ html[data-theme="light"] .date-picker .date-picker__day--multi-single:hover {
 .file-picker,
 .prestacao-file-picker {
   align-items: stretch;
-  background: var(--cv-field-bg, var(--color-surface));
-  border: var(--cv-field-border, 1px solid var(--color-border));
+  background: var(--color-input-bg, var(--color-surface));
+  /* NOVO-51: era `border: var(--cv-field-border, 1px solid …)`, a unica leitura
+     como shorthand contra 14 como cor. No claro o token resolvia para cor pura e
+     esta borda saia com `style=none width=0px` — invisivel. */
+  border: 1px solid var(--color-input-border, var(--color-border));
   border-radius: var(--radius-control, 10px);
   box-shadow: var(--shadow-xs, none);
   display: grid;
@@ -5745,7 +5746,7 @@ html[data-theme="light"] .date-picker .date-picker__day--multi-single:hover {
 
 .file-widget.is-dragover .file-picker,
 .prestacao-file-widget.is-dragover .prestacao-file-picker {
-  background: color-mix(in srgb, var(--color-primary) 16%, var(--cv-field-bg, var(--color-surface)));
+  background: color-mix(in srgb, var(--color-primary) 16%, var(--color-input-bg, var(--color-surface)));
   border-color: var(--color-primary);
   box-shadow: var(--cv-field-focus-ring, var(--focus-ring));
 }
@@ -5769,7 +5770,7 @@ html[data-theme="light"] .date-picker .date-picker__day--multi-single:hover {
 .file-picker__action,
 .prestacao-file-picker__action {
   align-items: center;
-  background: color-mix(in srgb, var(--color-primary) 20%, var(--cv-field-bg, var(--color-surface)));
+  background: color-mix(in srgb, var(--color-primary) 20%, var(--color-input-bg, var(--color-surface)));
   border-right: 1px solid var(--color-border);
   color: var(--color-heading);
   cursor: pointer;
@@ -5796,7 +5797,7 @@ html[data-theme="light"] .date-picker .date-picker__day--multi-single:hover {
 
 .file-picker__action:hover,
 .prestacao-file-picker__action:hover {
-  background: color-mix(in srgb, var(--color-primary) 32%, var(--cv-field-bg, var(--color-surface)));
+  background: color-mix(in srgb, var(--color-primary) 32%, var(--color-input-bg, var(--color-surface)));
   color: var(--color-heading);
 }
 
@@ -10086,7 +10087,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
      conhecer este container. Converter para estilo direto custaria duplicar as
      45 sob este seletor, subindo especificidade — o oposto da Fase 7. */
   --color-input-bg: var(--step1-field);
-  --cv-field-bg: var(--step1-field);
   background: var(--step1-surface);
   border-color: color-mix(in srgb, var(--color-border) 40%, transparent);
   box-shadow:

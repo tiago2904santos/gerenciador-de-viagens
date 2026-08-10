@@ -86,7 +86,6 @@
      conhecer este container. Converter para estilo direto custaria duplicar as
      45 sob este seletor, subindo especificidade — o oposto da Fase 7. */
   --color-input-bg: var(--step1-field);
-  --cv-field-bg: var(--step1-field);
 }
 
 /* Lista do Ofício vinculado: mesma do termo, só um pouco mais baixa. */

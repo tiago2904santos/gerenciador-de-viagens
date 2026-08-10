@@ -4424,7 +4424,7 @@ diferentes no arquivo.
 `--cv-*` para `--color-*` (309 variáveis), decidida pelo dono, é o próximo passo — cor e nome de
 token são coisas separadas e não viajam no mesmo PR.
 
-### NOVO-51 🟠 PARCIAL · `NOVO` As 309 variáveis `--cv-*` são apelido de token, não token · MED · 2 d
+### NOVO-51 🟠 PARCIAL (2 de 4 restantes fechados na E7b) · `NOVO` As 309 variáveis `--cv-*` são apelido de token, não token · MED · 2 d
 
 Segunda etapa da padronização. O dono decidiu que **`--color-*` é a base semântica única** e que as
 `--cv-*` somem. Não é um `sed`: `--cv-card-bg` não tem equivalente pelo nome, tem pelo **valor**. A
@@ -4439,6 +4439,51 @@ Resolvendo as 309 **por tema** (o mesmo nome vale coisas diferentes no claro e n
 | valor próprio, precisam de token novo | 214 |
 
 **Entrou nesta leva:** as 58 órfãs e 21 dos 37 apelidos. Restam **231** `--cv-*` distintas.
+
+**Na E7b (10/08/2026).** O `NOVO-65` levou as 231 e preservou de propósito a família `cv-field`,
+porque o nome sem prefixo já pertencia a outra classe viva. Sobraram **4 nomes** — e um deles não
+era apelido, era defeito.
+
+`--cv-field-border` tinha **dois contratos incompatíveis**:
+
+```
+tokens.css:148          --cv-field-border: 1px solid var(--color-border-strong)   ← shorthand
+03-theme-dark.css:293   --cv-field-border: 1px solid var(--color-input-border)    ← shorthand
+select.css:94           --cv-field-border: var(--theme-input-border)              ← cor pura
+```
+
+`select.css` está em `:root` e carrega depois de `tokens.css` e antes de `03-theme-dark.css`, então
+o token resolvia **cor pura no claro e shorthand no escuro**. Contra isso, 14 consumidores escreviam
+`border: 1px solid var(--cv-field-border)` e 1 escrevia `border: var(--cv-field-border, …)`.
+
+Conferido em Chromium com `getComputedStyle`, não deduzido da especificação:
+
+| tema | forma | resultado |
+|---|---|---|
+| claro | `1px solid var()` — 14 sites | `solid 1px` ✅ |
+| claro | `var()` — `file-picker.css:31` | **`style=none width=0px`** ❌ |
+| escuro | `1px solid var()` — 14 sites | **`style=none width=0px`** ❌ |
+| escuro | `var()` — file-picker | `solid 1px` ✅ |
+
+No escuro os 14 viravam `border: 1px solid 1px solid #607d93`, declaração inválida que o parser
+descarta. **Eram 15 bordas invisíveis em produção**, em `page-shell.css:2789,2831`,
+`prestacoes_contas.css` (6×), `oficios.css:63`, `roteiros.css:2231` e `file-picker.css:31`.
+
+Resolvido o contrato para cor pura (14 contra 1), o token virou **apelido puro de
+`--color-input-border`** nos dois temas — e aí o `NOVO-51` se aplica como escrito. O mesmo valia
+para `--cv-field-bg`, apelido puro de `--color-input-bg`. Os dois foram eliminados: 9 definições
+apagadas, 36 consumidores apontados para a base semântica única.
+
+**Ficam 2**, e nenhum é apelido: `--cv-field-border-focus` (claro `#0b3a66`, escuro `#286fa4`) e
+`--cv-field-focus-ring` (claro `rgba(21, 91, 154, 0.18)`, escuro `none`). Nenhum `--color-*`
+resolve o mesmo par. O segundo diverge de **fonte** entre os temas — no escuro vem de
+`--focus-ring`, que vale `none` —, e isso toca visibilidade de foco, cujo auditor está com folga
+zero (30 de teto 30). Promover os dois a token próprio exige decidir se o anel de foco do campo
+deve mesmo sumir no escuro, que é pergunta de acessibilidade e não de vocabulário. Fica para a E8.
+
+**Nota de método.** O auditor `audit_ui_patterns` conta `border: 1px solid var(…)` como
+`hardcoded_visual` (o valor não começa com `var`) e **isenta** `border: var(…)`. Ou seja, a forma
+quebrada era premiada e a correta é contada: 2453 → 2454. É falha da heurística, não da correção.
 
 **Três correções de método, cada uma achada por medição e não por leitura.**
 

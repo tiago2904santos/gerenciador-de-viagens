@@ -418,8 +418,9 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [x] `NOVO-81` o auditor de front audita os `*.test.js` que a E1 criou · **E6**
 - [x] `UI-03` nove (medidos: oito) arquivos definem token de cor → duas camadas · **E7a**
 - [ ] `NOVO-82` 87 declarações escuras inertes, visíveis desde a fusão do `theme.css` · **E9**
-- [ ] `NOVO-51` as `--cv-*` que ainda são apelido, não token (medidos: 4 nomes) · **E7b**
-- [ ] `NOVO-54` as sobrescritas de `.cv-field__control` (medidas: 37 regras, 11 arquivos) · **E7b**
+- [x] `NOVO-51` os 2 apelidos puros da família `cv-field` (e 15 bordas invisíveis) · **E7b**
+- [ ] `NOVO-51` os 2 restantes têm valor próprio; o do foco é decisão de a11y · **E8**
+- [ ] `NOVO-54` as sobrescritas de `.cv-field__control` (**remedidas: 63 regras, 19 arquivos**) · **E7c**
 - [ ] `NOVO-58` 🔴 claro e escuro são dois desenhos — o redesenho passa a valer no claro · **E8**
 - [ ] `UI-02` tema escuro deixa de ser camada de exceção (5.619 linhas, 190 `!important`) · **E9**
 - [ ] `UI-04` **97** imports de CSS de outro domínio, em **36** templates · **E10**

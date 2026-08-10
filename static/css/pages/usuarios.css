@@ -263,7 +263,6 @@
      conhecer este container. Converter para estilo direto custaria duplicar as
      45 sob este seletor, subindo especificidade — o oposto da Fase 7. */
   --color-input-bg: var(--step1-field);
-  --cv-field-bg: var(--step1-field);
   background: var(--step1-panel, var(--color-surface-soft));
   border-radius: 15px;
   display: grid;

@@ -89,15 +89,17 @@ html[data-theme="light"] {
 
 :root {
   --field-padding-y: 0;
-  --cv-field-bg: var(--theme-input-bg, var(--color-input-bg));
   --field-bg-hover: var(--theme-surface-card);
-  --cv-field-border: var(--theme-input-border);
   --cv-field-border-focus: var(--route-button-primary-border);
   --field-shadow-focus: 0 0 0 var(--space-1) var(--cv-field-focus-ring), var(--shadow-xs);
   --cv-field-focus-ring: var(--route-focus-ring);
   --field-error-bg: var(--color-danger-soft);
   --field-error-shadow: 0 0 0 var(--space-1) var(--color-danger-border-soft), var(--shadow-xs);
-  --select-border: var(--cv-field-border);
+  /* NOVO-51: lia `var(--cv-field-border)`, que este mesmo bloco definia como
+     `var(--theme-input-border)`. Aponta direto para a fonte, e nao para
+     `--color-input-border`: no fallback sem JS os dois divergem, e a E7 nao
+     mexe nessa camada (fica para a E8). */
+  --select-border: var(--theme-input-border);
   --select-border-focus: var(--cv-field-border-focus);
   --select-focus-shadow: var(--field-shadow-focus);
   --chip-bg: var(--color-primary-soft);
@@ -115,7 +117,7 @@ html[data-theme="light"] {
 
 html[data-theme="dark"] {
   --field-bg-hover: var(--theme-surface-card-soft);
-  --field-error-bg: var(--cv-field-bg);
+  --field-error-bg: var(--color-input-bg);
   --chip-bg: var(--color-info-bg);
   --chip-border: var(--color-info-border);
   --chip-color: var(--color-info-text);

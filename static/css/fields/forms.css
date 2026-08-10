@@ -655,9 +655,9 @@ html[data-theme="dark"] input[type="checkbox"] {
    ========================================================================== */
 
 .main-form-panel {
-  --field-bg: var(--cv-field-bg);
+  --field-bg: var(--color-input-bg);
   --field-bg-soft: var(--field-bg-hover);
-  --field-border: var(--cv-field-border);
+  --field-border: var(--color-input-border);
   --field-border-hover: var(--color-border-strong);
   --field-border-focus: var(--cv-field-border-focus);
   --field-text: var(--color-input-text);
@@ -666,9 +666,9 @@ html[data-theme="dark"] input[type="checkbox"] {
 .main-form-panel .field,
 .main-form-panel .app-form-field,
 .main-form-panel .cv-field {
-  --field-bg: var(--cv-field-bg);
+  --field-bg: var(--color-input-bg);
   --field-bg-soft: var(--field-bg-hover);
-  --field-border: var(--cv-field-border);
+  --field-border: var(--color-input-border);
   --field-border-hover: var(--color-border-strong);
   --field-border-focus: var(--cv-field-border-focus);
   --field-text: var(--color-input-text);

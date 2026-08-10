@@ -2227,8 +2227,8 @@
 
 .roteiro-editor__section--mapa .cv-field__control {
   appearance: none;
-  background: var(--cv-field-bg, var(--theme-input-bg));
-  border: 1px solid var(--cv-field-border, var(--theme-input-border));
+  background: var(--color-input-bg, var(--theme-input-bg));
+  border: 1px solid var(--color-input-border, var(--theme-input-border));
   border-radius: var(--radius-control, var(--radius-control));
   box-shadow: var(--shadow-xs, var(--shadow-xs));
   box-sizing: border-box;
@@ -2393,7 +2393,7 @@ html[data-theme="light"] .roteiro-editor--avulso .roteiro-editor__reference-bloc
      10 regras globais leem var(--color-focus); dirigi-las por token e o que
      evita reescrever as dez sob este seletor. */
   --color-focus: var(--color-border, transparent);
-  --cv-field-border-focus: var(--cv-field-border, var(--color-border, transparent));
+  --cv-field-border-focus: var(--color-input-border, var(--color-border, transparent));
   --select-border-focus: var(--select-border, var(--color-border, transparent));
   --sp-field-border-focus: var(--sp-field-border, var(--color-border, transparent));
   --field-border-focus: var(--field-border, var(--color-border, transparent));
