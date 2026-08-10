@@ -360,6 +360,45 @@ extraídos (`services/editor_parser.py`, `editor_context.py`, `editor_state.py`,
 86 linhas deletáveis a custo zero de teste, e nenhuma chamada de fora do módulo. É a fatia mais
 barata que sobrou.
 
+#### Fatia 2 ✅ — contexto para presenters, e os invólucros
+
+**Correção aos meus próprios números.** Eu havia registrado "17 invólucros, 86 linhas, custo zero".
+Medido por AST: **14** invólucros (dois já tinham morrido na fatia 1) mais um morto, **40 linhas**, e
+o custo não é zero — **107 call sites** a reescrever, `_parse_int` sozinho com 56.
+
+**O contexto era um subgrafo fechado.** `_build_roteiro_form_context` (113 linhas) não tinha
+chamador nenhum dentro do módulo e arrastava duas funções que só ela usa
+(`_trechos_list_json_compat`, `_build_roteiro_diarias_fallback`). As três foram para
+`roteiros/presenters.py`, que é o dono de montar dict para template (`docs/PADRAO_APP.md:10`).
+
+**A fachada foi junto, e esse é o ponto de camada.** `montar_contexto_editor_roteiro` estava em
+`services/roteiro_editor.py`; deixá-la lá faria um **service importar um presenter** — a violação que
+o `BE-13` existe para corrigir. Com ela no presenter, `oficios/route_views.py` passa a importar de
+`roteiros.presenters` (view → presenter, `docs/PADRAO_APP.md:11`) e `services/__init__.py` deixa de
+re-exportar.
+
+**Os invólucros.** 14 delegavam em uma linha para funções públicas que o próprio módulo já importava
+no topo; o 15º, `_resolve_uf_from_cep`, não tinha chamador em lugar nenhum. Três dos 14 tinham
+**zero chamadas** — eram função morta com import órfão junto, e o `ruff` apontou os três imports
+depois da remoção.
+
+| | antes da fatia 2 | depois |
+|---|---:|---:|
+| `roteiro_logic.py` | 1.829 linhas, 55 defs | **1.579 linhas, 37 defs** |
+| `presenters.py` | 421 linhas | 589 |
+
+**Rede antes de mover:** havia 20 linhas descobertas no subgrafo, e duas não eram detalhe — o ramo
+`roteiro_state is None` (reconstrução do estado) e os ramos que **dividem o valor das diárias pelo
+número de viajantes** com `ROUND_HALF_UP`. Sete cenários pela fachada pública, verdes antes da
+mudança de arquivo. O caso que trava o arredondamento é 1,00 ÷ 8 = 0,13 (truncando daria 0,12).
+
+**Primeira travessia de fronteira de fim de linha desta etapa:** `roteiro_logic.py` é CRLF puro e
+`presenters.py` é LF puro. Os dois seguem homogêneos depois da mudança.
+
+**Falta para fechar o `BE-13`:** a persistência — 3 funções, entre elas
+`_salvar_roteiro_avulso_from_roteiro_state`, o gravador atômico de 3 tabelas. É a mais arriscada, e
+a única citada por nome em migração, modelo e testes.
+
 ### BE-14 🟠 48 sites de persistência em view, sem service e sem transação · AUD · 3 d
 
 Varredura AST dos `views.py`/`*_views.py`: 48 chamadas `.save`/`.delete`/`.create` fora de
