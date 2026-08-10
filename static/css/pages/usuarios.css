@@ -257,6 +257,11 @@
 .vincular-usuario-modal__fields.form-stack,
 .vincular-usuario-modal__fields {
   --step1-field: var(--step1-surface);
+  /* UI-03: re-ligacao COM ESCOPO, nao definicao global — permitida de proposito.
+     45 regras globais leem var(--color-input-bg); re-ligar aqui faz todas elas
+     pintarem o campo com a superficie do passo 1 sem que nenhuma delas precise
+     conhecer este container. Converter para estilo direto custaria duplicar as
+     45 sob este seletor, subindo especificidade — o oposto da Fase 7. */
   --color-input-bg: var(--step1-field);
   --cv-field-bg: var(--step1-field);
   background: var(--step1-panel, var(--color-surface-soft));

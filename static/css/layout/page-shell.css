@@ -230,25 +230,21 @@ html[data-theme="dark"] {
   /* Quick Add Folder Tab */
   --surface-inline-create-tab:        rgba(11, 58, 102, 0.50);   /* azul primário com opacidade */
   --border-inline-create-tab:         rgba(255, 255, 255, 0.22);
-  --color-inline-create-tab:          #cddcf0;                   /* texto claro sobre fundo escuro */
-  --color-inline-create-tab-icon-bg:  var(--color-accent);       /* círculo dourado */
-  --color-inline-create-tab-icon-fg:  var(--color-primary-dark); /* texto escuro sobre dourado */
 
   /* Header Filter Bar */
   --surface-filter-input:         rgba(255, 255, 255, 0.05);
   --border-filter-input:          rgba(255, 255, 255, 0.12);
   --surface-filter-chip:          var(--surface-filter-input);
   --border-filter-chip:           var(--border-filter-input);
-  --color-filter-placeholder:     rgba(255, 255, 255, 0.35);
-  --color-filter-text:            var(--theme-text-body);
+  --text-filter-placeholder:     rgba(255, 255, 255, 0.35);
+  --text-filter:            var(--theme-text-body);
   --surface-filter-button:        rgba(255, 255, 255, 0.06);
   --border-filter-button:         rgba(255, 255, 255, 0.14);
-  --color-filter-button:          var(--theme-text-muted);
+  --text-filter-button:          var(--theme-text-muted);
 
   /* Filtros aplicados — chips */
   --surface-applied-chip:         rgba(255, 255, 255, 0.07);
   --border-applied-chip:          rgba(255, 255, 255, 0.16);
-  --color-applied-chip:           var(--theme-text-muted);
 
   /* Stepper — estados adicionais */
   --stepper-missing-bg:           rgba(180, 35, 24, 0.16);
@@ -337,25 +333,21 @@ html[data-theme="light"] {
   /* Quick Add Folder Tab */
   --surface-inline-create-tab:        #deebfb;
   --border-inline-create-tab:         #a8c4db;
-  --color-inline-create-tab:          var(--color-primary-strong);
-  --color-inline-create-tab-icon-bg:  var(--color-primary);
-  --color-inline-create-tab-icon-fg:  var(--color-white);
 
   /* Header Filter Bar */
   --surface-filter-input:         var(--color-surface);
   --border-filter-input:          var(--color-border);
   --surface-filter-chip:          var(--surface-filter-input);
   --border-filter-chip:           var(--border-filter-input);
-  --color-filter-placeholder:     var(--theme-text-muted);
-  --color-filter-text:            var(--theme-text-body);
+  --text-filter-placeholder:     var(--theme-text-muted);
+  --text-filter:            var(--theme-text-body);
   --surface-filter-button:        var(--color-surface);
   --border-filter-button:         var(--color-border);
-  --color-filter-button:          var(--theme-text-muted);
+  --text-filter-button:          var(--theme-text-muted);
 
   /* Filtros aplicados — chips */
   --surface-applied-chip:         var(--color-primary-soft);
   --border-applied-chip:          rgba(11, 58, 102, 0.18);
-  --color-applied-chip:           var(--color-primary-strong);
 
   /* Stepper — estados adicionais */
   --stepper-missing-bg:           var(--color-danger-soft);
@@ -1412,7 +1404,7 @@ html[data-theme="light"] {
 .pagination-shell__page {
   background: transparent;
   border: 1px solid transparent;
-  color: var(--theme-text-muted, var(--color-filter-button));
+  color: var(--theme-text-muted, var(--text-filter-button));
 }
 
 .pagination-shell__page {
@@ -1451,7 +1443,7 @@ html[data-theme="light"] {
 .pagination-shell__nav--primary {
   background: transparent;
   border-color: transparent;
-  color: var(--theme-text-muted, var(--color-filter-button));
+  color: var(--theme-text-muted, var(--text-filter-button));
 }
 
 .pagination-shell__nav--prev,
@@ -2501,7 +2493,7 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
   border:        1px solid var(--border-filter-input);
   border-radius: var(--radius-control);
   box-sizing:    border-box;
-  color:         var(--color-filter-text);
+  color:         var(--text-filter);
   font-size:     var(--font-size-sm);
   height:        var(--filter-input-height);
   outline:       none;
@@ -2510,7 +2502,7 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
   width:         100%;
 }
 
-.header-filter-input::placeholder { color: var(--color-filter-placeholder); }
+.header-filter-input::placeholder { color: var(--text-filter-placeholder); }
 
 .header-filter-input:focus,
 .header-filter-input:focus-visible {
@@ -2524,7 +2516,7 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
   border:        1px solid var(--border-filter-input);
   border-radius: var(--radius-control);
   box-sizing:    border-box;
-  color:         var(--color-filter-text);
+  color:         var(--text-filter);
   cursor:        pointer;
   font-size:     var(--font-size-sm);
   height:        var(--filter-input-height);
@@ -2561,7 +2553,7 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
   background:       transparent;
   border:           1px solid transparent;
   border-radius:    var(--radius-sm);
-  color:            var(--color-input-text, var(--color-filter-text));
+  color:            var(--color-input-text, var(--text-filter));
   cursor:           pointer;
   display:          flex;
   flex-shrink:      0;

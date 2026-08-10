@@ -2388,6 +2388,10 @@ html[data-theme="light"] .roteiro-editor--avulso .roteiro-editor__reference-bloc
   --sidebar-focus-ring: transparent;
   /* Bordas de foco = borda em repouso (sem destaque colorido) */
   --border-focus: var(--color-border, transparent);
+  /* UI-03: re-ligacao COM ESCOPO, nao definicao global — permitida de proposito.
+     Este bloco zera seis tokens de foco de uma vez para o editor de roteiro.
+     10 regras globais leem var(--color-focus); dirigi-las por token e o que
+     evita reescrever as dez sob este seletor. */
   --color-focus: var(--color-border, transparent);
   --cv-field-border-focus: var(--cv-field-border, var(--color-border, transparent));
   --select-border-focus: var(--select-border, var(--color-border, transparent));

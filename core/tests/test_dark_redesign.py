@@ -622,11 +622,17 @@ class DarkRedesignContractTests(SimpleTestCase):
             "--route-button-primary-bg:",
         ):
             with self.subTest(token=token):
-                declaration = next(
+                # A ÚLTIMA declaração, não a primeira: é a que vence a cascata.
+                # Até a E7 dava no mesmo, porque cada token aparecia uma vez só
+                # neste arquivo. Ao dissolver `base/theme.css` (UI-03) o bloco
+                # escuro dele passou a conviver aqui, e com ele 87 declarações
+                # que o bloco de baixo já sobrescrevia desde sempre (`NOVO-82`).
+                # Ler a primeira passou a significar ler justamente a perdedora.
+                declaration = [
                     line.strip()
                     for line in self.tokens_css.splitlines()
                     if line.strip().startswith(token)
-                )
+                ][-1]
                 self.assertIn("var(--color-primary", declaration)
                 self.assertNotIn("var(--color-accent", declaration)
 
