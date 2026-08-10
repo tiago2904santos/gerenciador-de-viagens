@@ -13,7 +13,7 @@
 {% block content %}
   <div class="justificativas-page">
     {{ oficios_summary|json_script:"justificativas-oficios-summary" }}
-    {% include "components/lists/list_page_quick_add.html" with title=page_title description=page_description eyebrow="Justificativas" search_placeholder="Buscar justificativas" empty_message="Nenhuma justificativa cadastrada ainda." rows=rows q=q quick_add_form=quick_add_form quick_add_panel_id="quick-add-justificativa" quick_add_label="Cadastrar justificativa" quick_add_submit_label="Salvar justificativa" quick_add_body_template="justificativas/partials/_quick_add_fields.html" quick_add_compact=True disable_realtime_filter=True hide_realtime_count=True delete_modal_enabled=True delete_modal_title="Excluir justificativa?" delete_modal_entity="esta justificativa" %}
+    <c-lists.list_page_quick_add :title="page_title" :description="page_description" eyebrow="Justificativas" search_placeholder="Buscar justificativas" empty_message="Nenhuma justificativa cadastrada ainda." :rows="rows" :q="q" :quick_add_form="quick_add_form" quick_add_panel_id="quick-add-justificativa" quick_add_label="Cadastrar justificativa" quick_add_submit_label="Salvar justificativa" quick_add_body_template="justificativas/partials/_quick_add_fields.html" :quick_add_compact="True" :disable_realtime_filter="True" :hide_realtime_count="True" :delete_modal_enabled="True" delete_modal_title="Excluir justificativa?" delete_modal_entity="esta justificativa" />
   </div>
 {% endblock %}
 
