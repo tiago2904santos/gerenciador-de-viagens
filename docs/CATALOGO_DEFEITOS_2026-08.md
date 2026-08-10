@@ -1791,7 +1791,7 @@ explícitos e isolamento habilitado. Os 190 includes Django que restaram são pa
 ou conteúdo de slot; todos declaram o contexto e usam `only`. A regra `include_without_only` do
 auditor transforma o zero atual em catraca de CI.
 
-### HT-15 🟡 Bloco `cv-itinerary` duplicado em 5 apps · AUD · 1,5 d
+### HT-15 ✅ RESOLVIDO (58776bcc) · Bloco `cv-itinerary` duplicado em 5 apps · AUD · 1,5 d
 
 Idêntico byte a byte entre dois deles. Mesma família do `HT-08`: markup de `cv-icon-btn` e
 `cv-action-menu__item` também reescrito à mão em templates de app.
@@ -2029,7 +2029,7 @@ que ele **não** aparece no lab — foi descontinuado e não apagado),
 > citadores de produção que esta nota lhe media eram `list_grid` e `ui_lab2/views.py`). O
 > fechamento, com prova por arquivo, é o `NOVO-44`.
 
-### HT-07 🟡 Concatenação condicional com "·" no template · AUD · 1–2 d
+### HT-07 ✅ RESOLVIDO (5b58fac7) · Concatenação condicional com "·" no template · AUD · 1–2 d
 
 `templates/eventos/partials/_evento_card_body.html:17` (repetido nas linhas 75 e 137) monta o
 subtítulo com uma cadeia de `{% if %}` cujo separador depende de
@@ -2040,7 +2040,7 @@ O mesmo arquivo tem a maior profundidade de aninhamento do repositório: **6 ní
 123-198).
 **Correção:** `join_non_empty(parts, sep=" · ")` no presenter, testável.
 
-### HT-08 🟡 Oitenta `<button>` fora do sistema de componentes · AUD · 3–4 d · risco médio
+### HT-08 ✅ RESOLVIDO (70f369c6) · Oitenta `<button>` fora do sistema de componentes · AUD · 3–4 d · risco médio
 
 Por app, excluindo componentes e labs: `prestacoes_contas` 23, `oficios` 15, `eventos` 11,
 `planos_trabalho` 10, `roteiros` 10, `termos` 6, `ordens_servico` 3, `core` 1, `usuarios` 1.
@@ -2076,7 +2076,7 @@ de campo (`:56`, `:64`) têm `id`, mas `core/forms/__init__.py:14-27` nunca os r
 > título, subtítulo e a lista de três recursos antes do primeiro campo.
 
 
-### HT-10 ⚪ Migração de `data-*` de toggle parada no meio · AUD · 0,5–1 d · risco médio
+### HT-10 ✅ RESOLVIDO (e12672ff) · Migração de `data-*` de toggle parada no meio · AUD · 0,5–1 d · risco médio
 
 `docs/DATA_ATTRIBUTES_JS.md:96-97` já marca `data-rg-toggle` e `data-motorista-fixo-toggle` como
 legado, com `data-cv-state-trigger` como sucessor. `components/ui/buttons/field_action_button.html:6,16,17`
@@ -3123,7 +3123,7 @@ entre sem revisão, que é como o `JS-01` nasceu.
 
 ---
 
-### NOVO-16 🟠 `NOVO` O markup do picker está copiado à mão em 3 templates e 5 arquivos JS · QA · 2–3 d
+### NOVO-16 ✅ RESOLVIDO (c6dd81d1) · `NOVO` O markup do picker está copiado à mão em 3 templates e 5 arquivos JS · QA · 2–3 d
 
 O `JS-06` cortou a dependência do **JavaScript** com a classe do picker. Sobrou o outro lado: há
 markup que **imita** o picker, escrito à mão, e que a renomeação da fase 7 quebraria visualmente.
@@ -5455,7 +5455,7 @@ A navegação real da E0 encontrou dois defeitos que o teste de `resolve()` não
 `/justificativas/<pk>/editar/` encaminhava `pk` para uma view que não o aceitava. As duas rotas
 agora respondem, e cada falha ganhou teste de regressão.
 
-### NOVO-80 · `NOVO` A E5 apagou duas travas de regressão em vez de reapontá-las · QA · 0,25 d
+### NOVO-80 ✅ RESOLVIDO (3996f903) · `NOVO` A E5 apagou duas travas de regressão em vez de reapontá-las · QA · 0,25 d
 
 `test_componentes_sem_orfao.py` guardava duas listas nomeadas — os 7 componentes que o `HT-06`
 apagou e os 8 que caíram com o UI Lab (PR #247 e a cascata do `NOVO-44`) — afirmando por arquivo
@@ -5479,7 +5479,7 @@ por construção, ele só reclama de quem **não** tem consumidor.
 A E6 (todos os cinco IDs, `70f369c6`..`5b58fac7`) passou por esse arquivo três vezes e não repôs
 as travas: ajustou apenas a contagem do inventário, de 82 para 85.
 
-### NOVO-81 · `NOVO` O auditor de front audita os testes de JS que a E1 criou · QA · 0,1 d
+### NOVO-81 ✅ RESOLVIDO (3996f903) · `NOVO` O auditor de front audita os testes de JS que a E1 criou · QA · 0,1 d
 
 `audit_frontend_standards.py` varre `static/js/**.js` e pula só `*.bundle.js`. Com o runner de JS
 da E1 (`JS-03`), os arquivos `*.test.js` passaram a morar ao lado do código que testam e entraram

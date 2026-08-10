@@ -406,7 +406,25 @@ esses não aparecem em `grep` de template, e mudar o caminho quebra a view em si
 
 ---
 
-### E6 — Os componentes que faltam · `HT-08`, `HT-15`, `NOVO-16`, `HT-10`, `HT-07` · risco médio · 6–8 d
+### E6 ✅ — Os componentes que faltam · `HT-08`, `HT-15`, `NOVO-16`, `HT-10`, `HT-07`, `NOVO-80`, `NOVO-81` · concluída em 10/08/2026
+
+> **Como fechou, e o que o enunciado errou.** Os cinco IDs saíram em `70f369c6`..`5b58fac7`; as
+> duas travas de regressão saíram no PR #293 (`3996f903`).
+>
+> O enunciado do `HT-08` dizia que "a maioria é reimplementação de markup, não falta de suporte".
+> Era o contrário. O componente tinha lista fechada de 29 variáveis, e os `<button>` do sistema
+> dependiam de `id`, `formaction`, `data-*` fora do catálogo, `hidden` e `tabindex` — nada disso
+> saía. A correção começou pelo componente (`attrs`, `slot` e `class_name`, que troca a base em
+> vez de apendar), e só depois pelos call sites. Duas telas autônomas (`core/login.html` e
+> `prestacoes_contas/assinatura/`) são `<html>` sem a folha de ícones, e migrar direto quebrava
+> `test_folha_de_icones`; elas usam `plain_button.html`, sem dependência de ícone.
+>
+> O `NOVO-80` não estava no enunciado: a E5 apagou duas travas de regressão em vez de reapontá-las
+> quando `templates/components/` virou `templates/cotton/`. Sem elas, componente morto que volta
+> **e já vem sendo usado** não é pego por nada — o guarda de órfão, por construção, só reclama de
+> quem não tem consumidor.
+
+**Enunciado original, para registro:**
 
 **Objetivo.** Acabar com o markup reescrito à mão que a componentização deixou para trás.
 
