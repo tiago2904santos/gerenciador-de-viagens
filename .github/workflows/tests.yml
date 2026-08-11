@@ -144,11 +144,12 @@ jobs:
         # nunca foram medidos. A catraca não regrediu: ela passou a medir o
         # que já estava no chão. A própria fatia devolveu 2 dos 11
         # (rt_views.py foi a zero), e o saldo entra como 9. Daqui em diante
-        # volta a só descer.
+        # volta a só descer. E desceu: 33 → 31 na fatia 3, quando a
+        # persistência dos anexos saiu de document_views.py.
         # P-05: todo `except Exception` do Drive começa com captura estruturada.
         run: >-
           python scripts/audit_django_architecture.py
-          --max-orm-em-view 33
+          --max-orm-em-view 31
           --max-drive-except-without-capture 0
           --max-sync-document-generations 0
 
