@@ -9,7 +9,8 @@ from django.utils import timezone
 
 from cadastros.models import ConfiguracaoSistema
 
-from roteiros import roteiro_logic
+from roteiros.services import editor_state_builder
+from roteiros.services import editor_persistence
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroTrecho
 
@@ -86,7 +87,7 @@ def obter_initial_roteiro():
 
 def preparar_querysets_formulario_roteiro(form, *, method, post, instance=None):
     """Limita-se a preencher querysets do form (sede); não monta contexto de template."""
-    roteiro_logic._setup_roteiro_querysets(form, post, instance, method=method.upper())
+    editor_state_builder._setup_roteiro_querysets(form, post, instance, method=method.upper())
 
 
 def carregar_opcoes_rotas_avulsas_salvas(evento=None, excluir_pk=None):
@@ -96,7 +97,7 @@ def carregar_opcoes_rotas_avulsas_salvas(evento=None, excluir_pk=None):
     por algum ofício do evento) entram na lista e ficam priorizados no topo. `excluir_pk`
     tira da lista o roteiro que já está vinculado ao documento em edição.
     """
-    return roteiro_logic._build_roteiro_avulso_route_options(evento=evento, excluir_pk=excluir_pk)
+    return editor_state_builder._build_roteiro_avulso_route_options(evento=evento, excluir_pk=excluir_pk)
 
 
 def montar_initial_roteiro_evento_sem_datas(evento):
@@ -139,7 +140,7 @@ def montar_estado_editor_roteiro_evento_selecionado(roteiro):
     de forcar ROTEIRO_PROPRIO. Usado quando o oficio ainda nao tem roteiro proprio
     mas o evento ja tem um roteiro completo para reaproveitar por padrao.
     """
-    destinos_atuais = roteiro_logic._destinos_roteiro_para_template(roteiro) or [
+    destinos_atuais = editor_state_builder._destinos_roteiro_para_template(roteiro) or [
         {"estado_id": None, "cidade_id": None, "cidade": None, "estado": None}
     ]
     destinos_list = [
@@ -147,14 +148,14 @@ def montar_estado_editor_roteiro_evento_selecionado(roteiro):
         for d in destinos_atuais
         if d.get("estado_id") and d.get("cidade_id")
     ]
-    trechos_list = roteiro_logic._estrutura_trechos(roteiro, destinos_list) if destinos_list else []
-    roteiro_state = roteiro_logic._build_roteiro_state_from_roteiro_evento(roteiro)
+    trechos_list = editor_state_builder._estrutura_trechos(roteiro, destinos_list) if destinos_list else []
+    roteiro_state = editor_state_builder._build_roteiro_state_from_roteiro_evento(roteiro)
     return destinos_atuais, trechos_list, roteiro_state
 
 
 def preparar_estado_editor_roteiro_para_get(initial=None, roteiro=None):
     if roteiro:
-        destinos_atuais = roteiro_logic._destinos_roteiro_para_template(roteiro) or [
+        destinos_atuais = editor_state_builder._destinos_roteiro_para_template(roteiro) or [
             {"estado_id": None, "cidade_id": None, "cidade": None, "estado": None}
         ]
         destinos_list = [
@@ -162,8 +163,8 @@ def preparar_estado_editor_roteiro_para_get(initial=None, roteiro=None):
             for d in destinos_atuais
             if d.get("estado_id") and d.get("cidade_id")
         ]
-        trechos_list = roteiro_logic._estrutura_trechos(roteiro, destinos_list) if destinos_list else []
-        roteiro_state = roteiro_logic._build_roteiro_state_from_roteiro_evento(roteiro)
+        trechos_list = editor_state_builder._estrutura_trechos(roteiro, destinos_list) if destinos_list else []
+        roteiro_state = editor_state_builder._build_roteiro_state_from_roteiro_evento(roteiro)
         roteiro_state["roteiro_modo"] = "ROTEIRO_PROPRIO"
         return destinos_atuais, trechos_list, roteiro_state
 
@@ -179,7 +180,7 @@ def preparar_estado_editor_roteiro_para_get(initial=None, roteiro=None):
         }
     ]
     trechos_list = []
-    roteiro_state = roteiro_logic._build_roteiro_state_from_estrutura(
+    roteiro_state = editor_state_builder._build_roteiro_state_from_estrutura(
         trechos_list,
         [{"estado_id": destino_estado, "cidade_id": destino_cidade}],
         initial.get("origem_estado"),
@@ -215,12 +216,12 @@ def normalizar_destinos_e_trechos_apos_erro_post(roteiro_state):
 
 def validar_submissao_editor_roteiro(post, route_state_map, roteiro=None):
     """Validação e cálculo de diárias a partir do POST; sem render nem redirect."""
-    roteiro_state = roteiro_logic._build_avulso_roteiro_state_from_post(
+    roteiro_state = editor_state_builder._build_avulso_roteiro_state_from_post(
         post, route_state_map=route_state_map
     )
-    validated = roteiro_logic._validate_roteiro_state(roteiro_state)
+    validated = editor_state_builder._validate_roteiro_state(roteiro_state)
     try:
-        _, _, _, diarias_resultado = roteiro_logic._build_roteiro_diarias_from_request(
+        _, _, _, diarias_resultado = editor_state_builder._build_roteiro_diarias_from_request(
             post, roteiro=roteiro
         )
     except ValueError as exc:
@@ -235,7 +236,7 @@ def validar_submissao_editor_roteiro(post, route_state_map, roteiro=None):
 
 
 def calcular_diarias_roteiro_request(post, *, roteiro=None, evento=None):
-    return roteiro_logic._build_roteiro_diarias_from_request(
+    return editor_state_builder._build_roteiro_diarias_from_request(
         post,
         roteiro=roteiro,
         evento=evento,
@@ -258,7 +259,7 @@ def encontrar_roteiro_duplicado(validated, roteiro_state, *, evento=None, exclui
 
     # `NOVO-36`: a saída **mais antiga**, não a do primeiro trecho da lista. Esta
     # função casa contra `Roteiro.saida_dt` no banco, e o produtor daquele campo
-    # (`roteiro_logic._atualizar_datas_roteiro_apos_salvar_trechos`) passou a
+    # (`editor_persistence.atualizar_datas_roteiro_apos_salvar_trechos`) passou a
     # derivá-lo cronologicamente. Deixar a regra posicional aqui faria o leitor
     # discordar do escritor exatamente nos roteiros com destinos reordenados — a
     # detecção de duplicata pararia de achá-los, em silêncio.
@@ -350,10 +351,10 @@ def criar_roteiro(form, roteiro_state, validated, diarias_resultado, *, evento=N
     roteiro.origem_estado = validated.get("sede_estado")
     roteiro.origem_cidade = validated.get("sede_cidade")
     roteiro.save()
-    diarias_para_roteiro = roteiro_logic._calculate_avulso_diarias_from_state(
+    diarias_para_roteiro = editor_state_builder._calculate_avulso_diarias_from_state(
         roteiro_state, quantidade_servidores=1
     ) if roteiro_state else diarias_resultado
-    roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
+    editor_persistence.salvar_roteiro_avulso_from_roteiro_state(
         roteiro, roteiro_state, validated, diarias_resultado=diarias_para_roteiro
     )
     _apply_saved_map_route_from_post(roteiro, form.data)
@@ -482,10 +483,10 @@ def atualizar_roteiro(instance, form, roteiro_state, validated, diarias_resultad
     roteiro.save()
     # O roteiro persiste diárias sempre para 1 servidor; o ofício aplica a multiplicação
     # somente na geração do documento.
-    diarias_para_roteiro = roteiro_logic._calculate_avulso_diarias_from_state(
+    diarias_para_roteiro = editor_state_builder._calculate_avulso_diarias_from_state(
         roteiro_state, quantidade_servidores=1
     ) if roteiro_state else diarias_resultado
-    roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
+    editor_persistence.salvar_roteiro_avulso_from_roteiro_state(
         roteiro, roteiro_state, validated, diarias_resultado=diarias_para_roteiro
     )
     _apply_saved_map_route_from_post(roteiro, form.data)
@@ -543,7 +544,7 @@ def persistir_roteiro_rascunho_parcial(instance, form, roteiro_state, validated)
         roteiro.area_id = instance.area_id
     roteiro.save()
 
-    roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
+    editor_persistence.salvar_roteiro_avulso_from_roteiro_state(
         roteiro,
         roteiro_state or {},
         validated,

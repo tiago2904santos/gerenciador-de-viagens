@@ -27,7 +27,7 @@ from cadastros.models import Estado
 from core.testing import area_de_teste
 from core.testing import vincular_area
 from eventos.models import Evento
-from roteiros import roteiro_logic
+from roteiros.services import editor_state_builder
 from roteiros.models import Roteiro
 
 
@@ -68,7 +68,7 @@ class EditorRoteiroCaracterizacaoTests(TestCase):
         """
         destino = destino or self.destino
         dados = {
-            "roteiro_modo": roteiro_logic.ROTEIRO_MODO_PROPRIO,
+            "roteiro_modo": editor_state_builder.ROTEIRO_MODO_PROPRIO,
             "origem_estado": str(self.estado.pk),
             "origem_cidade": str(self.sede.pk),
             "observacoes": observacoes,

@@ -1,6 +1,6 @@
 """`NOVO-36` — o cabeçalho de datas do roteiro deriva dos trechos por cronologia.
 
-`_atualizar_datas_roteiro_apos_salvar_trechos` derivava POSICIONALMENTE:
+`atualizar_datas_roteiro_apos_salvar_trechos` derivava POSICIONALMENTE:
 `trechos[0].saida_dt` e `trechos[-2].chegada_dt`. Posição e cronologia coincidem
 até a REORDENAÇÃO de destinos, que preserva o horário de cada trecho e troca a
 ordem — e aí o cabeçalho saía com chegada antes da saída. Quem achou foi a
@@ -35,7 +35,7 @@ from cadastros.models import Cidade
 from cadastros.models import Estado
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroTrecho
-from roteiros.roteiro_logic import _atualizar_datas_roteiro_apos_salvar_trechos
+from roteiros.services.editor_persistence import atualizar_datas_roteiro_apos_salvar_trechos
 from core.testing import area_de_teste
 
 DIA_1 = timezone.make_aware(datetime(2026, 5, 1, 8, 0))
@@ -67,7 +67,7 @@ class CabecalhoDeDatasBase(TestCase):
         )
 
     def _derivar(self):
-        _atualizar_datas_roteiro_apos_salvar_trechos(self.roteiro)
+        atualizar_datas_roteiro_apos_salvar_trechos(self.roteiro)
         self.roteiro.refresh_from_db()
         return self.roteiro
 
@@ -148,7 +148,7 @@ class EstadosDegeneradosContinuamSalvandoTests(CabecalhoDeDatasBase):
     def test_roteiro_so_com_trecho_de_retorno(self):
         """O contraexemplo que derrubou a primeira versão da regra.
 
-        `_salvar_roteiro_avulso_from_roteiro_state` cria o trecho de retorno
+        `salvar_roteiro_avulso_from_roteiro_state` cria o trecho de retorno
         **incondicionalmente** e apaga os demais; o editor esvazia a lista de
         trechos quando o usuário remove a última linha de destino. Uma regra que
         caísse para "máximo sobre todos os trechos" gravaria `retorno.chegada_dt`

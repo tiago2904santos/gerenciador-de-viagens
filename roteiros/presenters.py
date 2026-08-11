@@ -11,10 +11,10 @@ from core.presenters.actions import build_edit_action
 from core.presenters.actions import build_open_action
 from core.presenters.meta import build_meta
 from .models import Roteiro
-from .roteiro_logic import _build_roteiro_state_from_estrutura
-from .roteiro_logic import _calculate_avulso_diarias_from_state
-from .roteiro_logic import _get_parana_estado
-from .roteiro_logic import _serialize_roteiro_state
+from .services.editor_state_builder import _build_roteiro_state_from_estrutura
+from .services.editor_state_builder import _calculate_avulso_diarias_from_state
+from .services.editor_state_builder import _get_parana_estado
+from .services.editor_state_builder import _serialize_roteiro_state
 from .services.diarias import formatar_valor_diarias
 from .services.diarias import infer_tipo_destino_from_paradas
 from .services.map_defaults import build_roteiro_map_defaults
@@ -379,7 +379,7 @@ def _variante_de_status_do_roteiro(roteiro):
 # ---------------------------------------------------------------------------
 # `BE-13` fatia 2 — o contexto do editor de roteiro.
 #
-# Estas três funções vieram de `roteiros/roteiro_logic.py`, onde eram privadas e
+# Estas três funções vieram de `roteiros/services/editor_state_builder.py`, onde eram privadas e
 # conviviam com parsing e persistência. Montar o dict que o template consome é
 # trabalho de presenter (`docs/PADRAO_APP.md:10`), e é só isso que elas fazem.
 #
@@ -387,7 +387,7 @@ def _variante_de_status_do_roteiro(roteiro):
 # deixá-la lá faria um service importar um presenter, que é a violação de camada
 # que o `BE-13` existe para corrigir.
 #
-# As quatro funções `_`-privadas que continuam em `roteiro_logic` são importadas
+# As quatro funções `_`-privadas que continuam em `editor_state_builder` são importadas
 # pelo nome privado — feio, e é o que `roteiro_editor.py` e `route_point_builder.py`
 # já faziam antes desta fatia. O contrato público de cada grupo é a fatia 3.
 # ---------------------------------------------------------------------------

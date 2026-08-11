@@ -9,7 +9,7 @@ medição antes de escrever uma linha de constraint:
    `services.py:968` copia `d.ordem` tal e qual ao comitar. `(plano, ordem)`
    reprovaria produção no primeiro commit de evento.
 3. **Dois dos cinco não aceitam constraint simples.** `RoteiroTrecho`
-   (`roteiro_logic._salvar_roteiro_avulso_from_roteiro_state`) e `DiarioBordoTrecho` (`diario_services.py:282`)
+   (`editor_persistence.salvar_roteiro_avulso_from_roteiro_state`) e `DiarioBordoTrecho` (`diario_services.py:282`)
    reaproveitam as linhas existentes por id e gravam `ordem` uma a uma — trocar
    duas posições colide no meio do laço. Ficam para a fatia 2, junto com a
    correção dos escritores para dois passos.
@@ -36,7 +36,7 @@ from planos_trabalho.models import EventoPlano, PlanoDestino, PlanoTrabalho
 from prestacoes_contas import diario_services
 from prestacoes_contas.diario_services import sincronizar_trechos
 from prestacoes_contas.models import DiarioBordo, DiarioBordoTrecho, PrestacaoContas
-from roteiros import roteiro_logic
+from roteiros.services import editor_persistence
 from roteiros.models import RoteiroDestino, Roteiro, RoteiroTrecho
 from usuarios.models import AreaTrabalho
 
@@ -85,7 +85,7 @@ class DestinoDeRoteiroTests(BaseColecoes):
 
         Se algum dia o escritor passar a reaproveitar linha e trocar posições, este
         teste continua verde e o de cima também: quem reprova é este, que reproduz
-        o `delete()` + `create()` de `roteiro_logic._salvar_roteiro_avulso_from_roteiro_state`.
+        o `delete()` + `create()` de `editor_persistence.salvar_roteiro_avulso_from_roteiro_state`.
         """
         self.destino(0)
         self.destino(1, cidade=self.cidade2)
@@ -270,7 +270,7 @@ class TrechoDeRoteiroTests(BaseColecoes):
 
 
 class EscritorDeTrechoEmDoisPassosTests(TestCase):
-    """O laço real de `_salvar_roteiro_avulso_from_roteiro_state`, não uma imitação.
+    """O laço real de `salvar_roteiro_avulso_from_roteiro_state`, não uma imitação.
 
     Cada teste aqui reprova se o primeiro passo (o `UPDATE` que empurra as
     posições para o bloco livre) for removido — é o que a inversão tem de mostrar.
@@ -341,7 +341,7 @@ class EscritorDeTrechoEmDoisPassosTests(TestCase):
 
     def salvar(self, trechos):
         state, validated = self.payload(trechos)
-        roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
+        editor_persistence.salvar_roteiro_avulso_from_roteiro_state(
             self.roteiro, state, validated,
         )
 
@@ -418,7 +418,7 @@ class EscritorDeTrechoEmDoisPassosTests(TestCase):
 
         self.assertFalse(
             self.roteiro.trechos.filter(
-                ordem__gte=roteiro_logic.DESLOCAMENTO_ORDEM_TRECHO,
+                ordem__gte=editor_persistence.DESLOCAMENTO_ORDEM_TRECHO,
             ).exists(),
         )
 
@@ -453,7 +453,7 @@ class EscritorDeTrechoEmDoisPassosTests(TestCase):
 
         self.assertFalse(
             self.roteiro.trechos.filter(
-                ordem__gte=roteiro_logic.DESLOCAMENTO_ORDEM_TRECHO,
+                ordem__gte=editor_persistence.DESLOCAMENTO_ORDEM_TRECHO,
             ).exists(),
             "sobrou trecho estacionado no bloco de deslocamento",
         )

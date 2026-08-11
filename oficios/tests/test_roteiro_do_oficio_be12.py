@@ -40,7 +40,7 @@ from cadastros.models import Viatura
 from core.testing import area_de_teste
 from core.testing import vincular_area
 from oficios.models import Oficio
-from roteiros import roteiro_logic
+from roteiros.services import editor_state_builder
 from roteiros.models import Roteiro
 
 
@@ -132,7 +132,7 @@ class RoteiroDoOficioCaracterizacaoTests(TestCase):
         saida = saida or self.saida_folgada
         volta = saida + timedelta(days=2)
         dados = {
-            "roteiro_modo": roteiro_logic.ROTEIRO_MODO_PROPRIO,
+            "roteiro_modo": editor_state_builder.ROTEIRO_MODO_PROPRIO,
             "origem_estado": str(self.estado.pk),
             "origem_cidade": str(self.sede.pk),
             "observacoes": observacoes,
@@ -392,7 +392,7 @@ class RoteiroDoOficioSemRequestTests(TestCase):
         post = QueryDict(
             urlencode(
                 {
-                    "roteiro_modo": roteiro_logic.ROTEIRO_MODO_PROPRIO,
+                    "roteiro_modo": editor_state_builder.ROTEIRO_MODO_PROPRIO,
                     "origem_estado": str(self.estado.pk),
                     "origem_cidade": str(self.sede.pk),
                     "observacoes": "sem request",
