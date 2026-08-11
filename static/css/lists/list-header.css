@@ -907,27 +907,27 @@
   width: 100%;
 }
 
-:is(html[data-theme="dark"]) .list-header--wizard-band {
+:is(html[data-theme]) .list-header--wizard-band {
   background: var(--color-surface-muted);
   border-color: var(--color-border);
 }
 
-:is(html[data-theme="dark"]) .list-header--wizard-band .list-header__band {
+:is(html[data-theme]) .list-header--wizard-band .list-header__band {
   background: var(--color-surface-muted);
 }
 
-:is(html[data-theme="dark"]) .list-header--wizard-stepper {
+:is(html[data-theme]) .list-header--wizard-stepper {
   background: var(--card-family-bg, var(--color-card));
   border-color: var(--color-border);
 }
 
-:is(html[data-theme="dark"]) .list-header--wizard-stepper .list-header__rail--wizard {
+:is(html[data-theme]) .list-header--wizard-stepper .list-header__rail--wizard {
   background: var(--card-family-bg, var(--color-card));
   border-top: 0;
 }
 
 /* Voltar no band = mesma linguagem do Voltar do footer. */
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .list-header--wizard-band
   .list-header__wizard-back.cv-btn--secondary {
   background: var(--step1-panel, var(--color-surface-soft));
@@ -940,10 +940,10 @@
   transform: none;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .list-header--wizard-band
   .list-header__wizard-back.cv-btn--secondary:hover,
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .list-header--wizard-band
   .list-header__wizard-back.cv-btn--secondary:focus-visible {
   background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted));
