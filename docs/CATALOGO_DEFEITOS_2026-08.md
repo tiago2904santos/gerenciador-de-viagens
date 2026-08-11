@@ -622,6 +622,75 @@ requisição, e também salva `DiarioBordoTrecho` — a falha caía **antes** do
 passou a olhar `update_fields`, que é o que distingue a gravação do autosave da gravação da
 sincronização. É a terceira vez nesta corrente que a inversão corrige o teste em vez do código.
 
+#### Fatia 5 ✅ — planos de trabalho e o rascunho de roteiro do ofício
+
+`planos_trabalho/services.py` tinha **1.314 linhas e zero `transaction.atomic`** — o módulo que o
+enunciado cita pelo nome e o único app grande que ainda não tinha camada de escrita nenhuma. Agora
+tem duas, pareadas com as telas do wizard: `efetivo_services.py` e `identificacao_services.py`. Em
+ofícios, `criar_rascunho_de_roteiro_do_oficio` entra em `services.py` ao lado do irmão que o `BE-12`
+extraiu.
+
+**O que tornava a falta de transação cara era a ordem, não a contagem.** O efetivo é reconciliado
+primeiro e a diária recalculada depois, porque o valor da diária é função do total do efetivo: uma
+falha entre as duas deixava o plano com o efetivo novo e o **valor do efetivo antigo**. Em
+`wizard_identificacao` são três `save()` no mesmo plano, e uma falha no terceiro deixava o texto que
+descreve o destino novo junto do valor da diária do destino antigo — os dois no mesmo documento.
+
+**Em ofícios o dano era de outra natureza:** não meia gravação, mas **um objeto inteiro sem dono**. O
+`Roteiro` nascia e o vínculo com o `Oficio` era a gravação seguinte; falhando ali, sobrava um roteiro
+inalcançável por qualquer tela enquanto o ofício voltava a sugerir o roteiro do evento — isto é, a
+falha reintroduzia exatamente o defeito que aquela rota foi escrita para corrigir.
+
+| | antes da fatia 5 | depois |
+|---|---:|---:|
+| gravações fora de transação em módulo de view | 24 | **17** |
+| funções com gravação fora de transação | 19 | **15** |
+| funções com 2+ gravações sem transação | 4 | **2** |
+| `transaction.atomic` em `planos_trabalho` | 0 | **5** |
+
+As duas funções com 2+ que sobram são `prestacoes_contas/diario_views.py::_salvar_diario_autosave`
+(resolvida pela fatia 4, que ainda não estava na base desta) e
+`oficios/wizard_document_views.py::wizard_documentos` — que **não é defeito**, ver abaixo.
+
+##### A contagem por AST chegou ao fim da sua utilidade, e erra nos dois sentidos
+
+Esta fatia mediu o resíduo item a item, e o número deixou de descrever o defeito.
+
+**Ela superconta.** Cinco dos 17 sites restantes são `delete()` solto
+(`core/views.py`, `ordens_servico`, `planos_trabalho/list_views.py`, `termos`,
+`prestacoes_contas/model_views.py`). `Collector.delete()` do Django **já abre
+`transaction.atomic(using=..., savepoint=False)`** — verificado no fonte instalado. Um `delete()` em
+view é dívida de **camada**, não risco de gravação parcial, e envolvê-lo em `atomic` não mudaria
+nada. Os dois sites de `wizard_documentos` são o mesmo caso por outro motivo: estão em ramos
+`if nav_action == …` mutuamente exclusivos, cada um com `return`. A função nunca grava duas vezes.
+
+**E ela subconta, que é o problema sério.** `eventos/views.py::detalhe` aparece com **1** gravação.
+O caminho real da etapa 1 é `evento.save()` → `form.save_m2m()` →
+`sincronizar_documentos_vinculados(evento)` → `garantir_termo_automatico(evento)`. O terceiro
+percorre cinco tipos de documento e dispara **até dois `UPDATE` em massa por tipo**, religando
+ofícios, ordens de serviço, planos, termos e roteiros ao evento; o quarto **cria** um
+`TermoAutorizacao`. É da ordem de doze gravações em seis tabelas, nenhuma em transação, e uma falha
+no meio deixa os documentos **meio religados** — um ofício apontando para o evento e um termo não.
+A contagem vê 1 porque as gravações moram atrás de chamadas de função, e o `ast` não atravessa isso.
+
+**Consequência para a fatia 6:** ela tem de ser dirigida por **leitura de caminho**, não pelo
+contador. O alvo é `eventos/views.py::detalhe`, que é o maior defeito restante do `BE-14` e o que a
+métrica menos enxerga. Registrado como `NOVO-108`.
+
+##### A inversão precisou de uma rede a mais, e de uma área
+
+Seis `atomic` entraram, e os seis foram provados um a um. Dois exigiram trabalho extra:
+
+- **`reconciliar_efetivo` ganhou teste de chamada direta.** Chamada de dentro de
+  `salvar_efetivo_e_diarias`, que também é atômica, `atomic` aninhado vira SAVEPOINT e tirar o
+  decorador de dentro **não reprova pela rota HTTP** — a função pública ficaria com garantia vazia,
+  exatamente o que a fatia 1 mediu em `salvar_diarias_recebidas` e o `BE-12` pagou antes disso.
+- **O teste de chamada direta precisou de `com_request(area_de_teste())`.** `reconciliar_efetivo`
+  valida cargo e unidade contra a área corrente, e fora de um request não há área no thread-local:
+  **toda linha seria descartada em silêncio** e o cenário de falha viraria um laço sobre lista vazia,
+  verde por omissão. É o `NOVO-107` noutro app, e a segunda vez na mesma etapa que um cenário quase
+  passou sem medir nada.
+
 ### BE-15 🟡 Numeração de documento reimplementada 3 vezes · AUD · 2 d · risco alto
 
 (a) `oficios/services.py:425-440` — advisory lock, fallback `select_for_update`, reuso de lacunas,
@@ -7313,3 +7382,44 @@ novo, com a migração feita por módulo.
 **A família é maior que o diário.** Qualquer teste cuja asserção dependa de uma coleção derivada do
 roteiro (trechos, diárias por trecho, o próprio diário) tem o mesmo risco de medir vazio. Vale uma
 varredura por `criar_prestacao` antes de escrever a próxima rede sobre prestações.
+
+### NOVO-108 · `NOVO` A contagem por AST de gravação-em-view erra nos dois sentidos e não serve mais de alvo · QA · 0,5 d
+
+Achado na fatia 5 do `BE-14`, medindo o resíduo item a item em vez de confiar no total.
+
+O número que guiou as cinco fatias — "gravações fora de transação em módulo de view", por `ast` — foi
+útil enquanto o defeito era denso. Chegando a 17, ele deixou de descrever qualquer coisa.
+
+**Superconta cinco sites.** `Collector.delete()` do Django já abre
+`transaction.atomic(using=..., savepoint=False)` — conferido no fonte instalado, não de memória.
+Então `plano.delete()`, `ordem.delete()`, `termo.delete()`, `modelo.delete()` e `session.delete()`
+**não são risco de gravação parcial**. São dívida de camada (`P-06`), e envolvê-los em `atomic` não
+mudaria uma linha de comportamento.
+
+**Superconta mais dois.** Os dois `oficio.save()` de `oficios/wizard_document_views.py::wizard_documentos`
+estão em ramos `if nav_action == …` mutuamente exclusivos, cada um com `return` próprio. A função é
+contada como "2+ gravações sem transação" e nunca grava duas vezes.
+
+**E subconta o pior caso que sobrou.** `eventos/views.py::detalhe` conta **1**. O caminho real é:
+
+```
+evento.save()
+form.save_m2m()
+sincronizar_documentos_vinculados(evento)   # 5 tipos x até 2 UPDATE em massa
+garantir_termo_automatico(evento)           # cria TermoAutorizacao
+```
+
+Ordem de doze gravações em seis tabelas, nenhuma em transação. Uma falha no meio deixa os documentos
+**meio religados**: um ofício apontando para o evento e um termo não, sem nada na tela dizendo isso.
+A contagem vê 1 porque as gravações moram atrás de chamadas de função, e a varredura sintática não
+atravessa chamada.
+
+**Por que isto vira linha de catálogo em vez de virar catraca.** A correção óbvia — fazer o script
+seguir chamadas — é análise interprocedural, cara de escrever e fácil de errar em silêncio, que é o
+pior defeito possível num medidor. E há uma correção mais barata que resolve o que importa: **parar
+de usar este número como alvo**. Ele já fez o trabalho dele.
+
+**Correção:** a fatia 6 do `BE-14` é dirigida por leitura de caminho, começando por
+`eventos/views.py::detalhe`. O contador continua no repositório como relatório, e o catálogo passa a
+registrar, ao lado de cada número, quantos dos itens são `delete()` e quantos são ramo exclusivo —
+para que o próximo leitor não tome 17 por 17 defeitos.
