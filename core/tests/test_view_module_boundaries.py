@@ -95,8 +95,16 @@ class ViewModuleBoundaryTests(SimpleTestCase):
         # 33 -> 31 (`BE-14` fatia 3): a persistencia dos anexos assinados saiu de
         # `document_views.py` para `anexo_services.py`, e com ela os dois acessos de
         # manager que restavam ali. Agora a catraca desce, que e o sentido normal.
-        self.assertEqual(counts["prestacoes_contas"], 7)
-        self.assertEqual(sum(counts.values()), 31)
+        #
+        # 31 -> 27 (`BE-14` fatia 4): `diario_views.py` foi a zero. Um acesso saiu
+        # junto com a sincronizacao da previa do RT, dois `get_or_create` viraram
+        # `diario_services.obter_ou_criar_diario` (get_or_create **grava**, entao vai
+        # para service e nao para selector) e a consulta de oficios do
+        # auto-preenchimento virou `selectors.oficios_para_prefill_de_motorista`.
+        # Os 3 que sobram em prestacoes sao leituras de `model_views.py`, o CRUD dos
+        # modelos de texto do RT — divida de `P-01`, nao do `BE-14`.
+        self.assertEqual(counts["prestacoes_contas"], 3)
+        self.assertEqual(sum(counts.values()), 27)
 
     def test_orm_em_prosa_nao_conta_e_orm_em_codigo_conta(self):
         """`NOVO-11` — a catraca mede código, não texto.

@@ -405,7 +405,16 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       sozinho inverteria o órfão do `BE-07`. O defeito maior não era gravação parcial: era
       destruição — um `create` que falhasse levava o documento assinado anterior do disco e do
       banco. Gravações fora de transação: 29 → 24; catraca `P-01` desce de 33 para 31. Sobrou
-      `NOVO-104` (arquivo órfão no storage não tem quem varra). **Falta só o diário**
+      `NOVO-104` (arquivo órfão no storage não tem quem varra). **Fatia 4 (diário) feita**: os três
+      caminhos de escrita de `diario_views.py` foram para `diario_services.py`, o módulo caiu de 388
+      para 345 linhas com zero acessos de manager, gravações fora de transação 24 → 19 e catraca
+      `P-01` 31 → 27. Sobrou `NOVO-107` (a fixture monta ofício sem roteiro e o teste de diário fica
+      verde por omissão). **Prestações fecha aqui; o `BE-14` não.** A fatia 1 disse que 2, 3 e 4
+      fechariam o defeito, e a frase valia para prestações — 21 dos 36 sites. **Restam 19**, em
+      `planos_trabalho` (6), `oficios` (4), `eventos` (2), `prestacoes_contas/model_views.py` (3) e
+      uma cada em `core`, `ordens_servico`, `roteiros` e `termos`. **Fatia 5: `planos_trabalho` +
+      `oficios`**, que somam 10 dos 19 e incluem a pior função restante
+      (`_apply_efetivo_snapshot`: `save` + `create` + `delete` em laço)
 - [ ] `BE-15` numeração reimplementada 3 vezes
 - [ ] `BE-16` abstrações de `core` adotadas pela metade
 - [x] `BE-17` `core/views.py` é 75% fixture de UI Lab — **fechado pelo PR #247**, que apagou os
