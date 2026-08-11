@@ -2513,7 +2513,7 @@ literal e não local. Dava para trocar uma cor e o CI inteiro passar. Por isso a
 `scripts/resolver_tokens_css.py`, que resolve a cascata nos três escopos raiz e expande `var()` até
 o literal: **2131 valores computados, 0 diferenças** antes/depois.
 
-### NOVO-82 · `NOVO` 87 das 143 declarações escuras do `theme.css` já eram mortas · MOR · 1 d
+### NOVO-82 ✅ RESOLVIDO (E9-d) · `NOVO` 87 das 143 declarações escuras do `theme.css` já eram mortas · MOR · 1 d
 
 Ao dissolver o `theme.css` (`UI-03`), o bloco `html[data-theme="dark"]` dele passou a conviver com
 o bloco próprio do `03-theme-dark.css`, no mesmo arquivo. Aí ficou visível o que a separação
@@ -2533,6 +2533,12 @@ o teste foi corrigido para ler a última, que é a que vence a cascata.
 Fica para a **E9** (`UI-02`, "o tema escuro dissolvido em token"), que é onde o arquivo é reescrito
 de qualquer forma. Apagar as 87 é provável por `scripts/resolver_tokens_css.py` — se a tabela de
 valores computados não mudar, nenhuma era viva.
+
+**Fechado na E9-d.** As 87 declarações vencidas foram removidas, incluindo as 57 cujo valor
+enganoso diferia do vencedor. O bloco legado caiu de 143 para **56 declarações vivas** e ficou com
+**zero nomes** redefinidos pelos blocos canônicos seguintes. O resolvedor manteve os **2.135 valores
+computados** e o mesmo SHA-256 antes/depois
+(`55c095380e25f0735ad7bb8a40dd23a916df57cb9f47a98e91bd7ed54f064abc`).
 
 ### UI-04 🟠 CSS de outro domínio importado em 26 templates · MED
 

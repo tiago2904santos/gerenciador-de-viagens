@@ -431,7 +431,7 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [x] `NOVO-80` a E5 apagou duas travas de regressão em vez de reapontá-las · **E6**
 - [x] `NOVO-81` o auditor de front audita os `*.test.js` que a E1 criou · **E6**
 - [x] `UI-03` nove (medidos: oito) arquivos definem token de cor → duas camadas · **E7a**
-- [ ] `NOVO-82` 87 declarações escuras inertes, visíveis desde a fusão do `theme.css` · **E9**
+- [x] `NOVO-82` 87 declarações escuras inertes, visíveis desde a fusão do `theme.css` · **E9**
 - [x] `NOVO-51` os 2 apelidos puros da família `cv-field` (e 15 bordas invisíveis) · **E7b**
 - [ ] `NOVO-51` os 2 restantes têm valor próprio; o do foco é decisão de a11y · **E8**
 - [x] `NOVO-54` 72 regras (30 `!important` e 7 regras já fora); as 7 candidatas de estado não-base
