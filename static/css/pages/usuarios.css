@@ -282,14 +282,6 @@
   margin-top: 0;
 }
 
-/* Controles no poço do formulário: sem borda e sem colar nas laterais do painel. */
-.vincular-usuario-modal__fields :is(
-  .search-picker,
-  .custom-select,
-  .cv-field__control
-) {
-  width: 100%;
-}
 
 .vincular-usuario-modal__fields :is(
   .search-picker__control,

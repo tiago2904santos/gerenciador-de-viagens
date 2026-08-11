@@ -17,27 +17,38 @@ ficariam invisiveis para a medicao.
 
 ## ALCANCE MEDIDO — leia antes de confiar num diff vazio
 
-Rodado contra as 43 rotas de `rotas_do_sistema.py`, nos dois temas e em quatro
-estados, ele encontra campo em **8 rotas**: eventos-lista, justificativas-lista,
-oficios-lista, oficios-modelos-motivo-lista, oficios-modelos-motivo-novo,
-prestacoes-contas-lista, roteiros-novo, termos-lista. Sao 64 combinacoes e 224
-leituras.
+`ROTAS` (de `rotas_do_sistema.py`) so tem rota sem argumento, e por isso a
+primeira versao deste script encontrava campo em **8 rotas**: as paginas onde o
+campo aparece de verdade sao as de wizard e edicao, que exigem PK. Daí `--rotas`:
+um JSON com a lista de caminhos ja resolvidos (`/oficios/1/roteiro/`,
+`/roteiros/9/editar/`, ...). Medido: com 56 caminhos sao 208 combinacoes
+rota|tema|estado e 1144 leituras de campo, contra 64 e 224 antes.
 
-As outras 35 rotas devolvem zero elementos, e nao e defeito do script: dos 11
-templates que emitem a classe, a maioria e partial que so entra no DOM depois de
-interacao — `cotton/ui/modals/cancel_reason_modal.html` atras de um modal,
-`_atividades_body.html` dentro de um passo de wizard,
-`cadastros/configuracao/partials/_diarias_fields.html` dentro de um corpo
-colapsavel.
+**Rota quebrada aborta.** `page.goto()` NAO levanta em 404, 500 nem em
+redirecionamento para o login — devolve a resposta e segue. Sem conferir status
+e URL final, a rota caia no ramo "nenhum campo" e sumia em silencio: foi assim
+que `/prestacoes-contas/1/`, que nao existe, passou tres medicoes inteiras
+contando como cobertura.
 
-**Consequencia pratica:** um diff vazio prova neutralidade para o que estas 8
-rotas exercitam, e nada alem. Para as regras de contexto que so valem dentro de
-modal ou passo de wizard, este instrumento ainda nao serve de prova — ampliar o
-alcance (abrir os modais e navegar os passos) e trabalho a fazer antes de
-remover essas regras.
+Ampliar o alcance era, literalmente, o que a versao anterior deste arquivo
+listava como "trabalho a fazer antes de remover essas regras".
+
+**O que um diff vazio prova, e o que nao prova.** Prova neutralidade para o que
+as rotas passadas exercitam, nos estados forcados. Nao prova nada sobre contexto
+que so existe depois de interacao — modal fechado, passo de wizard nao aberto,
+painel colapsado. Antes de remover uma regra, confira que o alvo dela aparece em
+alguma rota da lista: `document.querySelectorAll(seletor).length > 0`. Rota
+visitada nao e cobertura.
+
+**Piso de ruido.** Rode duas vezes com o MESMO codigo antes de comparar. A
+medicao nao volta zero: ha texto que muda de largura por 1px entre cargas.
+Comparar contra zero em vez de contra o piso faz perseguir fantasma.
 
 Uso (com o servidor de pe):
     python scripts/medir_campos_computados.py --senha SENHA --saida antes.json
+    python scripts/medir_campos_computados.py --senha SENHA --saida ctrl.json
+    # ... mexe no CSS ...
+    python scripts/medir_campos_computados.py --senha SENHA --saida depois.json
 """
 
 from __future__ import annotations
@@ -86,7 +97,37 @@ JS_COLETA = """
 """
 
 
-def medir(base_url, usuario, senha, temas):
+def carregar_rotas(caminho):
+    """Caminhos a visitar: os do `--rotas`, ou as rotas sem argumento de `ROTAS`."""
+    if not caminho:
+        return [(r.slug, r.path) for r in ROTAS]
+    lista = json.loads(Path(caminho).read_text(encoding="utf-8"))
+    return [(p, p) for p in lista]
+
+
+def esperar_arvore_estavel(pagina, quieto_ms=400, teto_ms=8000):
+    """Espera a arvore parar de crescer, em vez de contar um tempo fixo.
+
+    O editor de roteiro so materializa os campos depois de `loadCities(...)`
+    resolver e `renderTrechos` rodar. Com espera fixa, uma rede mais lenta numa
+    das capturas mede a pagina antes dos campos existirem — e ai a regra que
+    pinta esses campos parece inocua porque ninguem olhou para eles. Contar
+    elementos ate o numero repetir amarra a medicao ao DOM, nao ao relogio.
+    """
+    anterior = -1
+    parado = 0
+    passo = 100
+    for _ in range(teto_ms // passo):
+        atual = pagina.evaluate("() => document.getElementsByTagName('*').length")
+        parado = parado + passo if atual == anterior else 0
+        anterior = atual
+        if parado >= quieto_ms:
+            return atual
+        pagina.wait_for_timeout(passo)
+    return anterior
+
+
+def medir(base_url, usuario, senha, temas, rotas):
     from playwright.sync_api import sync_playwright
 
     resultado: dict[str, list] = {}
@@ -107,13 +148,31 @@ def medir(base_url, usuario, senha, temas):
         cdp.send("DOM.enable")
         cdp.send("CSS.enable")
 
-        for rota in ROTAS:
+        for slug, caminho in rotas:
             for tema in temas:
+                # `networkidle` nao serve: as paginas de roteiro tem pedido que o
+                # proxy segura e nunca ficam ociosas, estouram o timeout e a rota
+                # sumia da captura — e rota que sai do "antes" mas entra no
+                # "depois" vira diferenca que nao existe. Espera ate a arvore
+                # parar de crescer, e a falha ABORTA: comparar dois conjuntos de
+                # rotas diferentes e pior que nao medir.
                 try:
-                    pagina.goto(f"{base_url}{rota.path}", wait_until="networkidle", timeout=30000)
+                    resposta = pagina.goto(
+                        f"{base_url}{caminho}", wait_until="domcontentloaded", timeout=45000
+                    )
                 except Exception as erro:
-                    resultado[f"{rota.slug}|{tema}|ERRO"] = [{"erro": str(erro)[:120]}]
-                    continue
+                    sys.exit(f"rota {caminho} nao carregou: {str(erro).splitlines()[0]}")
+
+                # `goto` NAO levanta em 404, 500 nem em redirecionamento para o
+                # login: devolve a resposta e segue. Sem conferir aqui, a rota
+                # cairia no ramo "nenhum campo" e sumiria em silencio — e uma
+                # captura com uma rota boa e vinte quebradas aprovaria remocao
+                # alegando cobertura que nao houve.
+                if resposta is not None and resposta.status >= 400:
+                    sys.exit(f"rota {caminho} respondeu {resposta.status}")
+                if "/login" in pagina.url and "/login" not in caminho:
+                    sys.exit(f"rota {caminho} caiu no login: sessao perdida")
+                esperar_arvore_estavel(pagina)
                 pagina.evaluate(
                     "t => document.documentElement.setAttribute('data-theme', t)", tema
                 )
@@ -130,7 +189,7 @@ def medir(base_url, usuario, senha, temas):
                             {"nodeId": no, "forcedPseudoClasses": list(estados)},
                         )
                     rotulo = "+".join(estados) or "repouso"
-                    resultado[f"{rota.slug}|{tema}|{rotulo}"] = pagina.evaluate(
+                    resultado[f"{slug}|{tema}|{rotulo}"] = pagina.evaluate(
                         JS_COLETA, PROPRIEDADES
                     )
                 for no in nos:  # devolve ao normal antes da proxima rota
@@ -147,15 +206,21 @@ def main() -> None:
     p.add_argument("--senha", required=True)
     p.add_argument("--saida", required=True)
     p.add_argument("--temas", default="light,dark")
+    p.add_argument(
+        "--rotas",
+        help="JSON com lista de caminhos ja resolvidos; sem isso usa as rotas "
+             "sem argumento de rotas_do_sistema.py, que nao alcancam os wizards",
+    )
     a = p.parse_args()
 
-    dados = medir(a.base_url, a.usuario, a.senha, tuple(a.temas.split(",")))
+    rotas = carregar_rotas(a.rotas)
+    dados = medir(a.base_url, a.usuario, a.senha, tuple(a.temas.split(",")), rotas)
     Path(a.saida).write_text(json.dumps(dados, indent=1, sort_keys=True), encoding="utf-8")
-    erros = [k for k in dados if k.endswith("|ERRO")]
-    leituras = sum(len(v) for k, v in dados.items() if not k.endswith("|ERRO"))
-    print(f"{len(dados)} combinacoes rota|tema|estado, {leituras} leituras de campo")
-    if erros:
-        print(f"ATENCAO: {len(erros)} rotas falharam: {erros[:5]}")
+    leituras = sum(len(v) for v in dados.values())
+    print(f"{len(rotas)} rotas, {len(dados)} combinacoes rota|tema|estado, "
+          f"{leituras} leituras de campo")
+    if not leituras:
+        sys.exit("nenhum campo encontrado — a lista de rotas nao cobre nada")
 
 
 if __name__ == "__main__":

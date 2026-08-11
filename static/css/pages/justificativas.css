@@ -245,9 +245,6 @@
   width: 100%;
 }
 
-.justificativa-quick-add .cv-field__control--textarea {
-  min-height: var(--text-area-height-justificativa);
-}
 
 /*
  * Pronto para salvar: mesmo primary dourado do "Salvar rascunho" do cadastro

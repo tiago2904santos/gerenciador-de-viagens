@@ -2526,63 +2526,6 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
   outline: none;
 }
 
-/* Layout do controle (roteiros.css não carregado nesta página) */
-.header-filter-datepicker .date-picker__control {
-  align-items: stretch;
-  display:     flex;
-  gap:         0;
-  position:    relative;
-}
-
-.header-filter-datepicker .date-picker__control .cv-field__control {
-  flex:       1 1 auto;
-  cursor:     pointer;
-  min-height: unset;
-  height:     var(--filter-input-height, 38px);
-  padding-right: calc(var(--space-2) * 2 + 30px);
-}
-
-/* Botão do calendário — sempre visível, posicionado sobre o input */
-.header-filter-datepicker .date-picker__trigger--icon {
-  align-items:      center;
-  background:       transparent;
-  border:           1px solid transparent;
-  border-radius:    var(--radius-sm);
-  color:            var(--color-input-text, var(--text-filter));
-  cursor:           pointer;
-  display:          flex;
-  flex-shrink:      0;
-  height:           28px;
-  justify-content:  center;
-  opacity:          1;
-  padding:          0;
-  pointer-events:   auto;
-  position:         absolute;
-  right:            var(--space-2);
-  top:              50%;
-  transform:        translateY(-50%);
-  transition:       background var(--transition-fast), border-color var(--transition-fast);
-  width:            28px;
-  z-index:          2;
-}
-
-.header-filter-datepicker .date-picker__trigger--icon:hover {
-  background:   rgba(255, 255, 255, 0.1);
-  border-color: var(--border-active);
-}
-
-.header-filter-datepicker .date-picker__panel {
-  left:  auto;
-  right: 0;
-}
-
-@media (max-width: 840px) {
-  .header-filter-datepicker {
-    flex:      0 0 100%;
-    min-width: 0;
-  }
-}
-
 @media (max-width: 840px) {
   .page-header-rail--filters {
     align-items: stretch;
@@ -2611,12 +2554,6 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
   .page-header-rail__actions .cv-btn {
     flex: 1 1 12rem;
     min-width: 0;
-  }
-
-  .header-filter-datepicker .date-picker__panel {
-    left: 0;
-    max-width: min(100%, 320px);
-    right: auto;
   }
 
   .cv-form-section-header {
@@ -2670,8 +2607,7 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
     flex: 0 0 auto;
   }
 
-  .header-filter-field,
-  .header-filter-datepicker {
+  .header-filter-field {
     flex: 0 0 100%;
   }
 
