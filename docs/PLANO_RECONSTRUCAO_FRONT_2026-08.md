@@ -531,7 +531,14 @@ definem `--color-*` indo de 9 para 2.
 
 ---
 
-### E8 — O desenho único · `NOVO-58` · risco **alto** · a dimensionar
+### E8 ✅ — O desenho único · `NOVO-58` · concluída em 11/08/2026
+
+> **E8-zero final.** A remedição obrigatória no `main` depois das E7b/E7c encontrou **54.225
+> elementos** em 43 rotas × 3 larguras (1440, 800 e 500 px), **129 medições**, **0 elementos com
+> divergência não-cor, 0 diferenças e 0 pares distintos**. A captura reversa confirmou a mesma
+> ordem em cada rota e o relatório respeitou todos os tetos. As famílias abaixo foram fechadas pelos
+> recortes já integrados; não existe sub-etapa visual restante para aplicar. O `NOVO-51` de foco é
+> uma decisão separada de cor/a11y e não reabre o desenho único do `NOVO-58`.
 
 > **PARE E PERGUNTE EM TODAS AS SUB-ETAPAS.** Esta etapa não é trabalho de Codex no sentido do
 > `AGENTS.md` §6: aplicar um redesenho a 43 telas não tem critério objetivo de pronto. O que o

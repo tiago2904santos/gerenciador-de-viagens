@@ -438,7 +438,7 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
       também fecharam por medição (2 blocos removidos e 5 grupos de seletor simplificados). A regra
       base agora vence o seletor de elemento cru com neutralidade medida; as 8 pseudo-regras e 1
       contexto órfão caíram; diário, quick-add e `field-with-action` fecharam no corpus ampliado · **E7c**
-- [ ] `NOVO-58` 🔴 claro e escuro são dois desenhos — o redesenho passa a valer no claro · **E8**
+- [x] `NOVO-58` claro e escuro têm desenho único: 54.225 elementos, 129 medições, 0 divergências não-cor · **E8**
 - [ ] `UI-02` tema escuro deixa de ser camada de exceção (5.619 linhas, 190 `!important`) · **E9**
 - [ ] `UI-04` **97** imports de CSS de outro domínio, em **36** templates · **E10**
 - [ ] `HT-04` `base.html` carrega ~153 KB de JS de domínio em toda página · **E11**
