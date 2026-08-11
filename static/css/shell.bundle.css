@@ -187,8 +187,8 @@ html[data-theme="dark"] {
   --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.3);
   --shadow-panel: 0 18px 44px rgba(0, 0, 0, 0.42);
   --shadow-elevated: 0 26px 70px rgba(0, 0, 0, 0.55);
-  /* O foco escuro orienta pela borda, sem halo luminoso ao redor do controle. */
-  --focus-ring: none;
+  /* NOVO-51: o foco escuro combina borda e halo visível. */
+  --focus-ring: 0 0 0 var(--space-1) var(--input-focus-ring);
   --transition-fast: 120ms cubic-bezier(.2, .8, .2, 1);
   --transition-base: 170ms cubic-bezier(.2, .8, .2, 1);
   --transition-slow: 240ms cubic-bezier(.2, .8, .2, 1);
@@ -201,10 +201,11 @@ html[data-theme="dark"] {
   --color-input-placeholder: #9ba9b4;
   --color-input-disabled-text: #909da7;
   --color-input-border: #607d93;
-  --cv-field-focus-ring: var(--focus-ring);
-  --field-shadow-focus: none;
-  --select-focus-ring: none;
-  --select-focus-shadow: none;
+  --input-border-focus: #286fa4;
+  --input-focus-ring: rgba(116, 170, 224, 0.24);
+  --field-shadow-focus: 0 0 0 var(--space-1) var(--input-focus-ring), var(--shadow-xs);
+  --select-focus-ring: 0 0 0 var(--space-1) var(--input-focus-ring);
+  --select-focus-shadow: var(--field-shadow-focus);
   --card-border: 1px solid var(--color-border);
   --card-shadow: var(--shadow-card);
   /* Uma única família visual sustenta cards de lista e de formulário. */
@@ -5572,7 +5573,7 @@ html[data-theme="light"] .date-picker .date-picker__day--multi-single:hover {
 .prestacao-file-widget.is-dragover .prestacao-file-picker {
   background: color-mix(in srgb, var(--color-primary) 16%, var(--color-input-bg, var(--color-surface)));
   border-color: var(--color-primary);
-  box-shadow: var(--cv-field-focus-ring, var(--focus-ring));
+  box-shadow: 0 0 0 var(--space-1) var(--input-focus-ring);
 }
 
 .file-widget.is-error .file-picker,
@@ -5587,8 +5588,8 @@ html[data-theme="light"] .date-picker .date-picker__day--multi-single:hover {
 
 .file-picker:focus-within,
 .prestacao-file-picker:focus-within {
-  border-color: var(--cv-field-border-focus, var(--color-focus));
-  box-shadow: var(--field-shadow-focus, var(--cv-field-focus-ring, var(--focus-ring)));
+  border-color: var(--input-border-focus);
+  box-shadow: var(--field-shadow-focus, 0 0 0 var(--space-1) var(--input-focus-ring));
 }
 
 .file-picker__action,
@@ -5715,7 +5716,7 @@ html[data-theme="light"] .date-picker .date-picker__day--multi-single:hover {
 
 .file-selection__toggle:focus-visible,
 .prestacao-file-selection__toggle:focus-visible {
-  box-shadow: var(--cv-field-focus-ring, var(--focus-ring));
+  box-shadow: 0 0 0 var(--space-1) var(--input-focus-ring);
   outline: 0;
 }
 
@@ -8425,10 +8426,8 @@ html[data-theme="light"] .segment-toggle {
   color: var(--color-primary-bright);
 }
 
-/* Foco por outline, nao por box-shadow: no tema escuro o
-   --cv-field-focus-ring resolve para --focus-ring, que vale `none` por decisao
-   de design (la o foco e sinalizado pela borda do controle). Um link nao tem
-   borda para mudar, entao herdar esse contrato deixaria o foco invisivel. */
+/* Link usa outline próprio: o anel de campo é box-shadow e não se aplica a
+   elementos sem a geometria de controle. */
 .summary-items > li > a:focus-visible {
   border-radius: var(--radius-sm);
   outline: 2px solid var(--color-accent-border-strong);

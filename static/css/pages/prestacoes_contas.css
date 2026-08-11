@@ -265,7 +265,7 @@
 .prestacao-file-selection__toggle {
   align-items: center;
   background: color-mix(in srgb, var(--color-primary, #0b3a66) 10%, var(--color-input-bg, var(--color-surface)));
-  border: 1px solid var(--cv-field-border-focus, var(--color-primary));
+  border: 1px solid var(--input-border-focus);
   border-radius: var(--radius-control, 8px);
   box-shadow: var(--shadow-xs, none);
   color: var(--color-info-text, var(--color-text));
@@ -285,12 +285,12 @@
 
 .prestacao-file-selection__toggle:hover {
   background: color-mix(in srgb, var(--color-primary, #0b3a66) 16%, var(--color-input-bg, var(--color-surface)));
-  border-color: var(--cv-field-border-focus, var(--color-primary));
+  border-color: var(--input-border-focus);
 }
 
 .prestacao-file-selection__toggle:focus-visible {
-  border-color: var(--cv-field-border-focus, var(--color-primary));
-  box-shadow: var(--field-shadow-focus, var(--cv-field-focus-ring));
+  border-color: var(--input-border-focus);
+  box-shadow: var(--field-shadow-focus, 0 0 0 var(--space-1) var(--input-focus-ring));
   outline: 0;
 }
 
@@ -325,7 +325,7 @@
 
 .prestacao-file-selection__menu {
   background: var(--color-surface, #111e2f);
-  border: 1px solid var(--cv-field-border-focus, var(--color-primary));
+  border: 1px solid var(--input-border-focus);
   border-radius: 0 0 var(--radius-control, 8px) var(--radius-control, 8px);
   border-top: 0;
   box-shadow: var(--shadow-xs, none);
@@ -334,7 +334,7 @@
 }
 
 .prestacao-file-selection__toggle[hidden] + .prestacao-file-selection__menu {
-  border-top: 1px solid var(--cv-field-border-focus, var(--color-primary));
+  border-top: 1px solid var(--input-border-focus);
   border-top-left-radius: var(--radius-control, 8px);
   border-top-right-radius: var(--radius-control, 8px);
 }
@@ -423,8 +423,8 @@
 }
 
 .prestacao-file-picker:focus-within {
-  border-color: var(--cv-field-border-focus, var(--color-primary));
-  box-shadow: var(--field-shadow-focus, var(--cv-field-focus-ring));
+  border-color: var(--input-border-focus);
+  box-shadow: var(--field-shadow-focus, 0 0 0 var(--space-1) var(--input-focus-ring));
 }
 
 .prestacao-file-picker__value {

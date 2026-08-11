@@ -659,7 +659,7 @@ html[data-theme="dark"] input[type="checkbox"] {
   --field-bg-soft: var(--field-bg-hover);
   --field-border: var(--color-input-border);
   --field-border-hover: var(--color-border-strong);
-  --field-border-focus: var(--cv-field-border-focus);
+  --field-border-focus: var(--input-border-focus);
   --field-text: var(--color-input-text);
 }
 
@@ -670,9 +670,9 @@ html[data-theme="dark"] input[type="checkbox"] {
   --field-bg-soft: var(--field-bg-hover);
   --field-border: var(--color-input-border);
   --field-border-hover: var(--color-border-strong);
-  --field-border-focus: var(--cv-field-border-focus);
+  --field-border-focus: var(--input-border-focus);
   --field-text: var(--color-input-text);
-  --field-focus-ring: var(--cv-field-focus-ring);
+  --field-focus-ring: var(--input-focus-ring);
   --form-control-height: var(--control-height-md);
   align-content: start;
   gap: var(--space-2);

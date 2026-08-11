@@ -4648,7 +4648,7 @@ diferentes no arquivo.
 `--cv-*` para `--color-*` (309 variáveis), decidida pelo dono, é o próximo passo — cor e nome de
 token são coisas separadas e não viajam no mesmo PR.
 
-### NOVO-51 🟠 PARCIAL (2 de 4 restantes fechados na E7b) · `NOVO` As 309 variáveis `--cv-*` são apelido de token, não token · MED · 2 d
+### NOVO-51 ✅ RESOLVIDO · `NOVO` As 309 variáveis `--cv-*` são apelido de token, não token · MED · 2 d
 
 Segunda etapa da padronização. O dono decidiu que **`--color-*` é a base semântica única** e que as
 `--cv-*` somem. Não é um `sed`: `--cv-card-bg` não tem equivalente pelo nome, tem pelo **valor**. A
@@ -4704,6 +4704,22 @@ resolve o mesmo par. O segundo diverge de **fonte** entre os temas — no escuro
 `--focus-ring`, que vale `none` —, e isso toca visibilidade de foco, cujo auditor está com folga
 zero (30 de teto 30). Promover os dois a token próprio exige decidir se o anel de foco do campo
 deve mesmo sumir no escuro, que é pergunta de acessibilidade e não de vocabulário. Fica para a E8.
+
+**Fechamento em 11/08/2026, depois da decisão do dono: o escuro terá anel visível.** Os dois
+nomes restantes foram substituídos por contratos de tipo estável: `--input-border-focus` é sempre
+cor de borda e `--input-focus-ring` é sempre cor do halo. Antes, `--cv-field-focus-ring` alternava
+entre sombra completa, cor pura e `none` conforme a camada; consumidores de `box-shadow` ora
+compunham a cor, ora tentavam usar o valor diretamente. Os consumidores agora constroem a sombra
+explicitamente, e `--field-shadow-focus`/`--select-focus-shadow` deixam de ser `none` no escuro.
+
+Prova computada em `/oficios/`, com 42 dias do calendário e pseudoestado forçado pelo CDP:
+`dark|focus-visible` passou de `box-shadow: none` para um halo de 4 px
+`rgba(116, 170, 224, 0.24)` mais `--shadow-xs`; o mesmo ocorreu em
+`dark|focus+focus-visible` (**84 leituras alteradas**). Claro, repouso, hover, focus sem
+`focus-visible` e active ficaram com **0 diferenças**. A decisão nova também retirou do wizard de
+roteiro as supressões locais dos anéis de campo; apenas a borda de foco neutra e os contratos de
+botão/sidebar permanecem específicos daquele editor. A busca de definições `--cv-*` em CSS de
+fonte terminou em **0**.
 
 **Nota de método.** O auditor `audit_ui_patterns` conta `border: 1px solid var(…)` como
 `hardcoded_visual` (o valor não começa com `var`) e **isenta** `border: var(…)`. Ou seja, a forma

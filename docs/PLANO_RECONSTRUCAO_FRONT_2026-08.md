@@ -498,7 +498,9 @@ camadas, só em `fields/select.css:95`.
 > leva acrescentou as rotas reais de diário e atividades: 56 rotas, 672 combinações e 7.536
 > leituras. Os ramos duplicados de diário, quick-add e `field-with-action` caíram com 0 diferenças
 > de estilo, pseudo-estilo e estrutura; o inventário terminou em 36 regras vivas de base, a11y ou contexto, em 11
-> arquivos. **A E7c está concluída.** O `NOVO-51` de valor próprio continua deliberadamente na E8.
+> arquivos. **A E7c está concluída.** O `NOVO-51` de valor próprio foi fechado em 11/08 depois da
+> decisão do dono por anel visível no escuro: 0 definições `--cv-*` restantes no CSS de fonte e
+> 84 leituras de calendário alteradas apenas nos estados escuros com `focus-visible`.
 
 **Enunciado original da E7, para registro:**
 
@@ -538,8 +540,9 @@ definem `--color-*` indo de 9 para 2.
 > elementos** em 43 rotas × 3 larguras (1440, 800 e 500 px), **129 medições**, **0 elementos com
 > divergência não-cor, 0 diferenças e 0 pares distintos**. A captura reversa confirmou a mesma
 > ordem em cada rota e o relatório respeitou todos os tetos. As famílias abaixo foram fechadas pelos
-> recortes já integrados; não existe sub-etapa visual restante para aplicar. O `NOVO-51` de foco é
-> uma decisão separada de cor/a11y e não reabre o desenho único do `NOVO-58`.
+> recortes já integrados; não existe sub-etapa visual restante para aplicar. O `NOVO-51` de foco,
+> decisão separada de cor/a11y, foi fechado com anel visível no escuro e não reabriu o desenho
+> único do `NOVO-58`.
 
 > **PARE E PERGUNTE EM TODAS AS SUB-ETAPAS.** Esta etapa não é trabalho de Codex no sentido do
 > `AGENTS.md` §6: aplicar um redesenho a 43 telas não tem critério objetivo de pronto. O que o

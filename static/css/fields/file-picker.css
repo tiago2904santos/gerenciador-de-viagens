@@ -51,7 +51,7 @@
 .prestacao-file-widget.is-dragover .prestacao-file-picker {
   background: color-mix(in srgb, var(--color-primary) 16%, var(--color-input-bg, var(--color-surface)));
   border-color: var(--color-primary);
-  box-shadow: var(--cv-field-focus-ring, var(--focus-ring));
+  box-shadow: 0 0 0 var(--space-1) var(--input-focus-ring);
 }
 
 .file-widget.is-error .file-picker,
@@ -66,8 +66,8 @@
 
 .file-picker:focus-within,
 .prestacao-file-picker:focus-within {
-  border-color: var(--cv-field-border-focus, var(--color-focus));
-  box-shadow: var(--field-shadow-focus, var(--cv-field-focus-ring, var(--focus-ring)));
+  border-color: var(--input-border-focus);
+  box-shadow: var(--field-shadow-focus, 0 0 0 var(--space-1) var(--input-focus-ring));
 }
 
 .file-picker__action,
@@ -194,7 +194,7 @@
 
 .file-selection__toggle:focus-visible,
 .prestacao-file-selection__toggle:focus-visible {
-  box-shadow: var(--cv-field-focus-ring, var(--focus-ring));
+  box-shadow: 0 0 0 var(--space-1) var(--input-focus-ring);
   outline: 0;
 }
 

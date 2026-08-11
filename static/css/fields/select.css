@@ -90,9 +90,7 @@ html[data-theme="light"] {
 :root {
   --field-padding-y: 0;
   --field-bg-hover: var(--theme-surface-card);
-  --cv-field-border-focus: var(--route-button-primary-border);
-  --field-shadow-focus: 0 0 0 var(--space-1) var(--cv-field-focus-ring), var(--shadow-xs);
-  --cv-field-focus-ring: var(--route-focus-ring);
+  --field-shadow-focus: 0 0 0 var(--space-1) var(--input-focus-ring), var(--shadow-xs);
   --field-error-bg: var(--color-danger-soft);
   --field-error-shadow: 0 0 0 var(--space-1) var(--color-danger-border-soft), var(--shadow-xs);
   /* NOVO-51: lia `var(--cv-field-border)`, que este mesmo bloco definia como
@@ -100,7 +98,7 @@ html[data-theme="light"] {
      `--color-input-border`: no fallback sem JS os dois divergem, e a E7 nao
      mexe nessa camada (fica para a E8). */
   --select-border: var(--theme-input-border);
-  --select-border-focus: var(--cv-field-border-focus);
+  --select-border-focus: var(--input-border-focus);
   --select-focus-shadow: var(--field-shadow-focus);
   --chip-bg: var(--color-primary-soft);
   --chip-border: var(--color-info-border-strong);
