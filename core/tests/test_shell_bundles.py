@@ -27,6 +27,16 @@ FORM_COMPONENT_TEMPLATES = (
     "templates/termos/form.html",
 )
 
+FORM_COMPONENT_STYLE_TEMPLATES = FORM_COMPONENT_TEMPLATES + (
+    "templates/eventos/index.html",
+    "templates/oficios/index.html",
+    "templates/ordens_servico/index.html",
+    "templates/planos_trabalho/index.html",
+    "templates/prestacoes_contas/index.html",
+    "templates/roteiros/index.html",
+    "templates/termos/index.html",
+)
+
 DIRECT_FORM_API_CONSUMERS = (
     "static/js/pages/configuracoes.js",
     "static/js/pages/diario-motorista.js",
@@ -84,6 +94,40 @@ class ShellBundleGateTests(SimpleTestCase):
         self.assertLessEqual(len(css_links), MAX_SHELL_CSS_LINKS)
         self.assertEqual(len(scripts[:2]), MAX_SHELL_HEAD_SCRIPTS)
         self.assertEqual(len(scripts[2:]), MAX_SHELL_BODY_SCRIPTS)
+
+    def test_ht04_form_css_leaves_the_default_shell_without_changing_order(self):
+        base = BASE_HTML.read_text(encoding="utf-8")
+        shell = (ROOT / "static/css/shell.bundle.css").read_text(encoding="utf-8")
+        form_shell = (
+            ROOT / "static/css/shell.form-components.bundle.css"
+        ).read_text(encoding="utf-8")
+        sources = (
+            "css/fields/date-picker.css",
+            "css/fields/file-picker.css",
+        )
+
+        self.assertIn("{% block shell_css %}", base)
+        for source in sources:
+            with self.subTest(source=source):
+                self.assertNotIn(f">>> {source} >>>", shell)
+                self.assertIn(f">>> {source} >>>", form_shell)
+
+        self.assertLess(
+            form_shell.index(">>> css/fields/field.css >>>"),
+            form_shell.index(">>> css/fields/date-picker.css >>>"),
+        )
+        self.assertLess(
+            form_shell.index(">>> css/fields/file-picker.css >>>"),
+            form_shell.index(">>> css/actions/action-system.css >>>"),
+        )
+
+    def test_ht04_form_css_consumers_choose_the_form_shell(self):
+        marker = "{% include 'includes/form_components_css.html' only %}"
+        for relative in FORM_COMPONENT_STYLE_TEMPLATES:
+            with self.subTest(template=relative):
+                text = (ROOT / relative).read_text(encoding="utf-8")
+                self.assertIn("{% block shell_css %}", text)
+                self.assertIn(marker, text)
 
     def test_base_html_keeps_extra_blocks(self):
         text = BASE_HTML.read_text(encoding="utf-8")

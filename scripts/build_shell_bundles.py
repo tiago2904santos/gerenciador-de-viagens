@@ -28,8 +28,6 @@ SHELL_CSS: tuple[str, ...] = (
     "css/layout/page-shell.css",
     "css/actions/buttons.css",
     "css/fields/field.css",
-    "css/fields/date-picker.css",
-    "css/fields/file-picker.css",
     "css/actions/action-system.css",
     "css/lists/record-list.css",
     "css/lists/list-tabs.css",
@@ -47,6 +45,18 @@ SHELL_CSS: tuple[str, ...] = (
     "css/feedback/document-download-loading.css",
     "css/components/theme-dark-components.css",
     "css/lists/list-header.css",
+)
+
+FORM_COMPONENTS_CSS: tuple[str, ...] = (
+    "css/fields/date-picker.css",
+    "css/fields/file-picker.css",
+)
+
+_FORM_CSS_INSERT_AT = SHELL_CSS.index("css/fields/field.css") + 1
+SHELL_CSS_WITH_FORM_COMPONENTS: tuple[str, ...] = (
+    SHELL_CSS[:_FORM_CSS_INSERT_AT]
+    + FORM_COMPONENTS_CSS
+    + SHELL_CSS[_FORM_CSS_INSERT_AT:]
 )
 
 SHELL_JS: tuple[str, ...] = (
@@ -80,6 +90,7 @@ FORM_COMPONENTS_JS: tuple[str, ...] = (
 )
 
 CSS_BUNDLE = STATIC / "css" / "shell.bundle.css"
+FORM_CSS_BUNDLE = STATIC / "css" / "shell.form-components.bundle.css"
 JS_BUNDLE = STATIC / "js" / "shell.bundle.js"
 FORM_COMPONENTS_BUNDLE = STATIC / "js" / "form-components.bundle.js"
 
@@ -110,22 +121,28 @@ def _concat(sources: tuple[str, ...], kind: str) -> str:
     return "".join(parts)
 
 
-def build() -> tuple[str, str, str]:
+def build() -> tuple[str, str, str, str]:
     css = _concat(SHELL_CSS, "css")
+    form_css = _concat(SHELL_CSS_WITH_FORM_COMPONENTS, "css with form components")
     js = _concat(SHELL_JS, "js")
     form_components = _concat(FORM_COMPONENTS_JS, "form components js")
     CSS_BUNDLE.parent.mkdir(parents=True, exist_ok=True)
     JS_BUNDLE.parent.mkdir(parents=True, exist_ok=True)
     CSS_BUNDLE.write_text(css, encoding="utf-8", newline="\n")
+    FORM_CSS_BUNDLE.write_text(form_css, encoding="utf-8", newline="\n")
     JS_BUNDLE.write_text(js, encoding="utf-8", newline="\n")
     FORM_COMPONENTS_BUNDLE.write_text(
         form_components, encoding="utf-8", newline="\n"
     )
-    return css, js, form_components
+    return css, form_css, js, form_components
 
 
 def check() -> int:
     expected_css = _concat(SHELL_CSS, "css")
+    expected_form_css = _concat(
+        SHELL_CSS_WITH_FORM_COMPONENTS,
+        "css with form components",
+    )
     expected_js = _concat(SHELL_JS, "js")
     errors: list[str] = []
     if not CSS_BUNDLE.is_file():
@@ -133,6 +150,13 @@ def check() -> int:
     elif CSS_BUNDLE.read_text(encoding="utf-8") != expected_css:
         errors.append(
             f"desatualizado: {CSS_BUNDLE.relative_to(ROOT).as_posix()} "
+            "(rode python scripts/build_shell_bundles.py)"
+        )
+    if not FORM_CSS_BUNDLE.is_file():
+        errors.append(f"ausente: {FORM_CSS_BUNDLE.relative_to(ROOT).as_posix()}")
+    elif FORM_CSS_BUNDLE.read_text(encoding="utf-8") != expected_form_css:
+        errors.append(
+            f"desatualizado: {FORM_CSS_BUNDLE.relative_to(ROOT).as_posix()} "
             "(rode python scripts/build_shell_bundles.py)"
         )
     if not JS_BUNDLE.is_file():
@@ -175,10 +199,11 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.check:
         return check()
-    css, js, form_components = build()
+    css, form_css, js, form_components = build()
     print(
         f"gerado {CSS_BUNDLE.relative_to(ROOT).as_posix()} "
-        f"({len(css)} bytes), {JS_BUNDLE.relative_to(ROOT).as_posix()} "
+        f"({len(css)} bytes), {FORM_CSS_BUNDLE.relative_to(ROOT).as_posix()} "
+        f"({len(form_css)} bytes), {JS_BUNDLE.relative_to(ROOT).as_posix()} "
         f"({len(js)} bytes) e "
         f"{FORM_COMPONENTS_BUNDLE.relative_to(ROOT).as_posix()} "
         f"({len(form_components)} bytes)"

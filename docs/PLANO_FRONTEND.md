@@ -205,7 +205,7 @@ arquivos; contraste medido (não estimado) nos pares alterados.
 
 | ID | Defeito | Dias |
 |---|---|---:|
-| `UI-04` 🟠 PARCIAL | E10: `oficios.css` 19 → 13 imports (−44.376 B em seis listas); `roteiros-list.css` e seus 7 imports removidos (−6.919 B/rota). Sem diferença computada em claro/escuro. As demais famílias seguem abertas | a definir |
+| `UI-04` 🟠 PARCIAL | E10: `oficios.css` 19 → 13 imports (−44.376 B em seis listas); `roteiros-list.css` removido (−6.919 B/rota); date/file picker fora do shell padrão (−25.615 B nas rotas sem eles). Sem diferença computada em claro/escuro. As demais famílias seguem abertas | a definir |
 | `JS-08` ✅ | Cinco componentes sob demanda por marcador DOM; shell global −6,0% | 2 |
 | `JS-09` 🟡 | Tela de espera de documento carrega 264 KB para usar 3,3 KB | 0,5 |
 | `JS-07` ✅ | "Fechar ao clicar fora / Esc": 3 implementações vivas consolidadas em `CV.overlay.attachDismiss` | 2 |

@@ -23,7 +23,10 @@ IGNORED_PARTS = {
     "templates/cotton",
     "templates/documentos/pdf",
 }
-GENERATED_FILES = {"static/css/shell.bundle.css"}
+GENERATED_FILES = {
+    "static/css/shell.bundle.css",
+    "static/css/shell.form-components.bundle.css",
+}
 
 PATTERNS: dict[str, str] = {
     "inline_css": r"style\s*=",

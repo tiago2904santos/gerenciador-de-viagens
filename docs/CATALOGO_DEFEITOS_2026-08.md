@@ -2260,7 +2260,9 @@ carregar sob demanda. O shell global caiu de **266.254 para 108.937 bytes** (**�
 Nas rotas que precisam do bundle de formulário, os dois arquivos somam **248.402 bytes**, ainda
 **17.852 bytes abaixo** do shell anterior. O gate mantém o inventário completo dos 12 scripts de
 página que chamam essas APIs e falha se um consumidor novo não for classificado. Os ~37 KB de CSS
-continuam abertos na fronteira `UI-04`/E10; por isso o ID permanece parcial.
+de `search-picker`/`select` continuam abertos na fronteira `UI-04`/E10; por isso o ID permanece
+parcial. Em 11/08, a fatia adjacente de `date-picker`/`file-picker` saiu do shell padrão: rotas sem
+esses componentes deixaram de receber 25.615 bytes, sem diferença visual computada.
 
 ### HT-05 ✅ RESOLVIDO · 🟡 `empty_state.html` quebra a ordem de headings · AUD+MED · 0,5 d
 
@@ -2725,6 +2727,13 @@ viewport**. O ID permanece aberto para as demais famílias e para a meta final d
 São **−6.919 bytes** em cada rota afetada. O corte também resolveu o `NOVO-45/MOR`, removendo o
 cálculo de `faixa_lateral_class` que nenhum template consumia.
 O modificador vivo foi comparado em card real: claro/escuro e 1440/800/500 px idênticos.
+
+**Terceira família fechada em 11/08 (`HT-04`, parcial).** `date-picker.css` e `file-picker.css`
+saíram do shell padrão. O gerador agora produz uma variante de um único request com os componentes
+na posição original da cascata; 18 templates consumidores a escolhem explicitamente. Rotas sem
+esses componentes recebem **25.615 bytes a menos**. Servidores, Eventos e Termos foram comparados
+por página inteira em claro/escuro e 1440/800/500 px: **2.632 leituras por viewport**, com os mesmos
+estilos computados. `search-picker.css` e `select.css` ainda mantêm o `HT-04` aberto na E10.
 
 ---
 

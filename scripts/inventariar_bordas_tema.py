@@ -224,7 +224,7 @@ def source_index() -> dict[str, list[dict]]:
 
     css_root = ROOT / "static" / "css"
     for path in sorted(css_root.rglob("*.css")):
-        if path.name == "shell.bundle.css":
+        if path.name in {"shell.bundle.css", "shell.form-components.bundle.css"}:
             continue
         visit(
             tinycss2.parse_stylesheet(path.read_text(encoding="utf-8")),
