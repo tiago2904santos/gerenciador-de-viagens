@@ -2700,7 +2700,7 @@ enganoso diferia do vencedor. O bloco legado caiu de 143 para **56 declarações
 computados** e o mesmo SHA-256 antes/depois
 (`55c095380e25f0735ad7bb8a40dd23a916df57cb9f47a98e91bd7ed54f064abc`).
 
-### UI-04 🟠 CSS de outro domínio importado em 26 templates · MED
+### UI-04 🟠 PARCIAL (E10) · CSS de outro domínio importado em 26 templates · MED
 
 **54 imports** de CSS de domínio alheio. Prestações importa CSS de Ofícios 11 vezes; Termos, 4;
 Planos de Trabalho importa de três domínios diferentes. Exemplo com uso medido:
@@ -2710,6 +2710,15 @@ página**) e `roteiros-list.css` (15 KB, **0,0%**).
 A causa não é descuido: o estilo dos componentes compartilhados mora **dentro** dos arquivos de
 domínio, então quem quer o componente leva o domínio inteiro junto. É a fronteira que o plano de
 front precisa desfazer.
+
+**Primeira família extraída em 11/08.** `record-card`, `person-row`, `fact-block`, `itinerary` e
+seus modificadores saíram de `pages/oficios.css` para `lists/entity-cards.css`. As sete listagens
+canônicas carregam o componente explicitamente e as seis que não são de Ofícios deixaram de
+importar o CSS do wizard: `oficios.css` caiu de **19 para 13 imports**. Nessas seis rotas, a entrega
+de CSS caiu **44.376 bytes por página**; na lista de Ofícios caiu 176 bytes. A porcentagem de uso só
+subiu nas sete rotas medidas (por exemplo, Prestações **13,9147% → 14,8009%**). Claro/escuro em
+1440, 800 e 500 px produziram JSONs de estilos computados idênticos, **1.616 leituras por
+viewport**. O ID permanece aberto para as demais famílias e para a meta final de 35% por rota.
 
 ---
 

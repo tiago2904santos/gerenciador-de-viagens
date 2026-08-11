@@ -169,6 +169,16 @@ class MedidorDeCamposEstavelTests(SimpleTestCase):
         self.assertEqual(medidor.SELETOR_PADRAO, ".cv-field__control")
         self.assertIn("querySelectorAll(selector)", medidor.JS_COLETA)
 
+    def test_viewport_e_estados_podem_ser_restringidos_sem_mudar_o_padrao(self):
+        import inspect
+
+        from scripts import medir_campos_computados as medidor
+
+        parametros = inspect.signature(medidor.medir).parameters
+        self.assertEqual(parametros["viewport_width"].default, 1440)
+        self.assertEqual(parametros["viewport_height"].default, 900)
+        self.assertEqual(parametros["estados"].default, medidor.ESTADOS)
+
 
 class EsperarLayoutEstavelTests(SimpleTestCase):
     """NOVO-84: medir só depois que a página para de crescer."""

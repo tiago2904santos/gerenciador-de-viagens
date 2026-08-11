@@ -711,6 +711,15 @@ compartilhada `record-card`/`person-row`/`fact-block` ainda mora ali. `roteiros-
 **7.180 bytes e casa zero** nessa rota. O `NOVO-106` fez o medidor enxergar também essa segunda
 folha; a extração deve mover a família compartilhada antes de retirar o primeiro import.
 
+> **Primeira fatia fechada em 11/08.** A família
+> `record-card`/`person-row`/`fact-block`/`itinerary` agora mora em
+> `lists/entity-cards.css`. As sete listas a declaram diretamente; seis deixaram de importar
+> `oficios.css`, que caiu de **19 para 13 imports**. A entrega caiu **44.376 bytes** em cada uma
+> dessas seis rotas e 176 bytes em Ofícios. A catraca subiu em todas (Prestações:
+> **13,9147% → 14,8009%**). A comparação claro/escuro em 1440/800/500 px foi idêntica nas
+> **1.616 leituras por viewport**. E10/UI-04 continua aberta para as famílias restantes e para a
+> meta de 35%.
+
 **Passo a passo.** Extraia os componentes compartilhados dos arquivos de domínio para
 `fields/`, `actions/`, `lists/` e `feedback/`, domínio por domínio, e derrube o import correspondente. Dimensione com a
 régua da E0: o que não é usado na rota não devia estar sendo entregue nela.
