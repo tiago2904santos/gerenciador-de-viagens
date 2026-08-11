@@ -346,16 +346,7 @@
     .custom-select__trigger,
     .search-picker__control,
     .search-picker__input
-  ),
-.list-header--inline-create .inline-create__panel
-  :is(
-    .form-control,
-    .form-select,
-    .cv-field__control,
-    .custom-select__trigger,
-    .search-picker__control,
-    .search-picker__input
-  ):is(:hover, :focus, :focus-within, :focus-visible) {
+  ) {
   background: var(--step1-field, var(--list-header-control-bg, var(--color-input-bg)));
   border: 0;
   border-radius: var(--radius-control);
@@ -384,27 +375,6 @@
   :is(.form-control, .form-select, .cv-field__control, .search-picker__input)::placeholder {
   color: var(--text-filter-placeholder);
   opacity: 1;
-}
-
-.list-header--inline-create .inline-create__panel
-  :is(
-    .form-control,
-    .form-select,
-    .cv-field__control,
-    .custom-select__trigger
-  ):focus,
-.list-header--inline-create .inline-create__panel
-  :is(
-    .form-control,
-    .form-select,
-    .cv-field__control,
-    .custom-select__trigger
-  ):focus-visible,
-.list-header--inline-create .inline-create__panel
-  .search-picker__control:focus-within {
-  border: 0;
-  box-shadow: none;
-  outline: none;
 }
 
 .list-header--inline-create .inline-create__panel

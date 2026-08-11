@@ -486,6 +486,12 @@ camadas, só em `fields/select.css:95`.
 
 `NOVO-54` são **37 regras** em 11 arquivos, não 64. Só 2 usam `:where()`.
 
+> **Progresso de 11/08.** Depois da recontagem para 72 regras, as 7 candidatas de repouso e as 7
+> candidatas de estado não-base foram removidas/simplificadas com estilo computado estável. O
+> medidor agora separa `focus` de `focus-visible`, desliga movimento e passa no piso de repetição
+> com 0 diferenças. A E7c continua aberta para 16 contextos interativos, 8 pseudo-elementos e a
+> substituição futura do seletor de elemento nu que ainda vence as duas regras base com `:where()`.
+
 **Enunciado original da E7, para registro:**
 
 **Objetivo.** Um vocabulário de token único, antes de reescrever qualquer aparência.

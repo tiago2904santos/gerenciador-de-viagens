@@ -6688,3 +6688,40 @@ combinações** rota|tema|estado e de 224 para **1048 leituras**.
 **Resta:** 65 regras. Das 25 candidatas, 8 de estado esperam um instrumento que meça `:hover`/`:focus`
 e 2 são a base intocável; 16 sem cobertura precisam de rota que abra modal, passo de wizard ou painel
 colapsado; 8 de pseudo-elemento precisam de outro caminho que não o `getMatchedStylesForNode`.
+
+### NOVO-54 (continuação 3) 🟠 As candidatas de estado foram medidas no estado certo · UI · 0,5 d
+
+A classificação anterior deixou oito candidatas de estado para trás porque o instrumento media
+repouso. A primeira tentativa de fechar essa lacuna achou quatro defeitos na própria régua antes de
+tocar no CSS:
+
+1. `medir_campos_computados.py` fixava um executável Linux em `/opt/pw-browsers`, embora o projeto
+   já tivesse `navegador_medicao.abrir_chromium()` para escolher o build correto no CI, na sessão
+   remota e no Windows;
+2. `focus` e `focus-visible` eram forçados sempre juntos, escondendo a diferença entre foco por
+   ponteiro e foco de teclado;
+3. transições e animações continuavam ativas. Duas capturas do mesmo código produziram **45
+   diferenças falsas**, com cores e sombras fracionárias fotografadas em frames distintos;
+4. a documentação dizia que conteúdo e estilo eram separados, mas `JS_COLETA` não registrava o
+   conteúdo do controle.
+
+A régua agora usa o lançador canônico, mede `focus`, `focus-visible` e a combinação separadamente,
+desliga movimento antes da captura, espera dois frames depois de cada pseudoestado e registra texto
+fora do dicionário de estilo. Duas execuções do mesmo código deram **0 diferenças de estrutura, 0 de
+estilo e 0 de conteúdo**, em **204 combinações rota|tema|estado e 1.116 leituras**.
+
+Com o piso limpo, as sete candidatas não-base caíram em três cortes, cada um medido em zero:
+
+- alternativas `:hover`/`:focus` repetidas dentro dos mesmos blocos que já continham
+  `.cv-field__control`/`.date-picker__control`, em `roteiros.css` e em três regras de
+  `theme-dark-components.css`;
+- o seletor de estado duplicado e o bloco de foco redundante do Quick Add em `list-header.css`;
+- o `outline: none` do campo do wizard de ofícios, inclusive no novo estado isolado `focus`.
+
+O oitavo bloco é o piso global de `:focus-visible` do `HT-01` e **fica**: não é dívida de contexto,
+é a trava de acessibilidade que impede as outras regras de apagarem o indicador de teclado.
+
+O corpus adicional também foi refeito sobre o banco descartável: **54 rotas, 312 combinações e
+1.488 leituras**. A conferência de status abortou corretamente ao encontrar `/eventos/1/` sem seed;
+a rota não foi contada como cobertura. Continuam para a próxima leva os 16 contextos interativos e
+os 8 pseudo-elementos (`::placeholder`/`::-webkit-scrollbar-*`).
