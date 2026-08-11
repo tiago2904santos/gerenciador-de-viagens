@@ -441,9 +441,9 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [x] `NOVO-58` claro e escuro têm desenho único: 54.225 elementos, 129 medições, 0 divergências não-cor · **E8**
 - [ ] `UI-02` tema escuro deixa de ser camada de exceção (5.619 linhas, 190 `!important`) · **E9**
 - [ ] `UI-04` **97** imports de CSS de outro domínio, em **36** templates · **E10**
-- [ ] `HT-04` `base.html` carrega ~153 KB de JS de domínio em toda página · **E11**
+- [ ] `HT-04` entrega JS fechada: shell 266.254 → 108.937 bytes; a fatia CSS continua em `UI-04`/E10 · **E11/E10**
 - [x] `JS-07` 3 implementações vivas de "fechar ao clicar fora / Esc" → `CV.overlay.attachDismiss` · **E11**
-- [ ] `JS-08` 11% do bundle atende menos de 1% das páginas · **E11**
+- [x] `JS-08` cinco componentes sob demanda por marcador DOM; shell 283.128 → 266.254 bytes · **E11**
 - [x] `JS-09` tela embutida entrega só `http.js` + polling: 283.282 → 4.255 bytes de JS · **E11**
 - [x] `JS-10` três stubs sem consumidor removidos; módulos reais e bootstrap preservados · **E11**
 

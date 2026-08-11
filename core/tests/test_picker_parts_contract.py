@@ -67,12 +67,14 @@ class PickerPartsContractTests(SimpleTestCase):
             self.assertNotIn(".termo-oficio-picker", source, relative)
             self.assertNotIn("closest('.related-route-picker')", source, relative)
 
-    def test_fabrica_esta_no_bundle_antes_dos_scripts_de_pagina(self):
-        bundle = (ROOT / "static/js/shell.bundle.js").read_text(encoding="utf-8")
+    def test_fabrica_esta_no_bundle_de_formulario_antes_dos_renderers(self):
+        bundle = (ROOT / "static/js/form-components.bundle.js").read_text(
+            encoding="utf-8"
+        )
         self.assertIn(">>> js/components/picker-parts.js >>>", bundle)
         self.assertLess(
-            bundle.index(">>> js/components/picker.js >>>"),
             bundle.index(">>> js/components/picker-parts.js >>>"),
+            bundle.index(">>> js/components/picker.js >>>"),
         )
         self.assertLess(
             bundle.index(">>> js/components/picker-parts.js >>>"),

@@ -1712,7 +1712,7 @@ interna que aceita painéis portalizados, predicado de abertura, escopo opcional
 continua apenas reposicionando em `scroll`/`resize`. Testes de runtime cobrem clique externo,
 painel portalizado, Escape condicional e desmontagem; o gate JavaScript fechou com **43 testes**.
 
-### JS-08 🟡 11% do bundle global atende menos de 1% das páginas · AUD · 2 d · risco médio
+### JS-08 ✅ RESOLVIDO (E11) · 11% do bundle global atende menos de 1% das páginas · AUD · 2 d · risco médio
 
 | componente | linhas | templates que usam |
 |---|---:|---:|
@@ -1734,6 +1734,14 @@ painel portalizado, Escape condicional e desmontagem; o gate JavaScript fechou c
 > `termos/form.html`, `prestacoes_contas/documentos_form.html`). Os outros quatro conferem.
 > **Consequência:** o ganho de separar o bundle é menor do que o catálogo prometia, e o corte tem
 > que ser decidido por componente, não pelo bloco inteiro.
+
+**Fechamento (11/08/2026).** `cv-select.js` já havia sido apagado na E2. Os cinco componentes
+restantes saíram do bundle global e agora são solicitados por `core/component-loader.js` somente
+quando seu marcador real aparece no DOM, inclusive em conteúdo inserido por AJAX. As URLs vêm de
+`{% static %}` em `base.html`, preservando storage com hash; não há lista manual de páginas sujeita
+às indireções de Cotton/includes que invalidaram a contagem original. O shell caiu de **283.128
+para 266.254 bytes** (**−16.874; −6,0%**). Testes de runtime travam seleção, unicidade e conteúdo
+dinâmico; a suíte JavaScript passou de 43 para **45 testes**.
 
 ### JS-09 ✅ RESOLVIDO (E11) · Tela de espera de documento carregava o bundle inteiro para usar 3,3 KB · AUD · 0,5 d
 
@@ -2108,7 +2116,7 @@ assim, não é preciso tocar em `_field_control.html`.
 > editor escreve `errEl.textContent` direto no elemento, o que apagaria a estrutura interna do
 > `alert.html`. Converter exige mexer no JS do editor: é o `BE-13`.
 
-### HT-04 🟠 `base.html` carrega ~153 KB de JS de domínio em toda página · AUD · 2–3 d · risco médio
+### HT-04 🟡 PARCIAL · entrega JS concluída na E11; CSS segue em `UI-04`/E10 · AUD · 2–3 d · risco médio
 
 `templates/base.html:11,44` inclui `shell.bundle.css` (524.763 B) e `shell.bundle.js` (269.990 B)
 incondicionalmente. A lista `SHELL_JS` (`scripts/build_shell_bundles.py:24-73`) traz
@@ -2121,6 +2129,18 @@ wizards de ofício/roteiro/termo/prestação. `SHELL_CSS` soma ≈37 KB na mesma
 **Correção:** separar bundle "núcleo" de bundle "documentos", usando os `{% block extra_js %}`/
 `{% block extra_css %}` que `base.html:12-13,45` já tem. Mitigar a regressão silenciosa (template
 que esquece de declarar) com regra no auditor ou teste de fumaça por tela.
+
+**Entrega JS (11/08/2026).** A classificação “exclusivos dos wizards” estava desatualizada:
+pickers, calendário e linhas de destino também aparecem em cadastros, filtros e conteúdo AJAX.
+Sete módulos relacionados agora formam `form-components.bundle.js` em ordem determinística;
+11 templates com dependência direta o declaram depois do shell e antes dos scripts de página, e
+os demais usam fallback pelos marcadores reais do DOM. `attach-signed-modal.js` e
+`wizard-sticky-header.js` também passaram a
+carregar sob demanda. O shell global caiu de **266.254 para 108.937 bytes** (**−157.317; −59,1%**).
+Nas rotas que precisam do bundle de formulário, os dois arquivos somam **248.402 bytes**, ainda
+**17.852 bytes abaixo** do shell anterior. O gate mantém o inventário completo dos 12 scripts de
+página que chamam essas APIs e falha se um consumidor novo não for classificado. Os ~37 KB de CSS
+continuam abertos na fronteira `UI-04`/E10; por isso o ID permanece parcial.
 
 ### HT-05 ✅ RESOLVIDO · 🟡 `empty_state.html` quebra a ordem de headings · AUD+MED · 0,5 d
 

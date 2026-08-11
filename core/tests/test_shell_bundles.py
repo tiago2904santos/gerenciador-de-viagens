@@ -13,6 +13,35 @@ from django.test import SimpleTestCase
 ROOT = Path(settings.BASE_DIR)
 BASE_HTML = ROOT / "templates" / "base.html"
 
+FORM_COMPONENT_TEMPLATES = (
+    "templates/cadastros/configuracao/form.html",
+    "templates/cadastros/servidores/form.html",
+    "templates/cadastros/viaturas/form.html",
+    "templates/eventos/detalhe.html",
+    "templates/justificativas/index.html",
+    "templates/oficios/wizard_base.html",
+    "templates/ordens_servico/form.html",
+    "templates/planos_trabalho/wizard_base.html",
+    "templates/prestacoes_contas/diario_motorista_form.html",
+    "templates/roteiros/roteiro_form_page.html",
+    "templates/termos/form.html",
+)
+
+DIRECT_FORM_API_CONSUMERS = (
+    "static/js/pages/configuracoes.js",
+    "static/js/pages/diario-motorista.js",
+    "static/js/pages/eventos-detalhe.js",
+    "static/js/pages/justificativas-index.js",
+    "static/js/pages/oficios-transporte.js",
+    "static/js/pages/ordens-servico-form.js",
+    "static/js/pages/planos-trabalho-wizard.js",
+    "static/js/pages/roteiros/editor/index.js",
+    "static/js/pages/roteiros-wizard.js",
+    "static/js/pages/servidores-form.js",
+    "static/js/pages/termos-form.js",
+    "static/js/pages/viaturas-form.js",
+)
+
 # Limites do shell após o bundle (extra_css/extra_js por página ficam de fora).
 MAX_SHELL_CSS_LINKS = 1
 MAX_SHELL_HEAD_SCRIPTS = 2  # theme-shared + theme-init
@@ -37,7 +66,11 @@ class ShellBundleGateTests(SimpleTestCase):
     def test_base_html_shell_asset_budget(self):
         text = BASE_HTML.read_text(encoding="utf-8")
         css_links = re.findall(r"static '([^']+\.css)'", text)
-        scripts = re.findall(r"static '([^']+\.js)'", text)
+        scripts = re.findall(
+            r'<script\b[^>]*?\ssrc="{% static \'([^\']+\.js)\' %}"',
+            text,
+            flags=re.S,
+        )
 
         self.assertEqual(css_links, ["css/shell.bundle.css"])
         self.assertEqual(
@@ -56,7 +89,16 @@ class ShellBundleGateTests(SimpleTestCase):
         text = BASE_HTML.read_text(encoding="utf-8")
         self.assertIn("{% block extra_css %}", text)
         self.assertIn("{% block extra_css_after_theme %}", text)
+        self.assertIn("{% block component_js %}", text)
         self.assertIn("{% block extra_js %}", text)
+        self.assertLess(
+            text.index("src=\"{% static 'js/shell.bundle.js' %}\""),
+            text.index("{% block component_js %}"),
+        )
+        self.assertLess(
+            text.index("{% block component_js %}"),
+            text.index("{% block extra_js %}"),
+        )
 
     def test_bundle_markers_cover_canonical_sources(self):
         css = (ROOT / "static" / "css" / "shell.bundle.css").read_text(encoding="utf-8")
@@ -66,3 +108,82 @@ class ShellBundleGateTests(SimpleTestCase):
         self.assertIn(">>> css/layout/page-shell.css >>>", css)
         self.assertIn(">>> js/core/http.js >>>", js)
         self.assertNotIn(">>> js/core/theme-init.js >>>", js)
+
+    def test_js08_components_are_lazy_and_have_static_urls(self):
+        base = BASE_HTML.read_text(encoding="utf-8")
+        bundle = (ROOT / "static" / "js" / "shell.bundle.js").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(">>> js/core/component-loader.js >>>", bundle)
+        for name in (
+            "card-toggle",
+            "segment-nav",
+            "file-picker",
+            "signature-actions",
+            "extra-download",
+        ):
+            with self.subTest(component=name):
+                source = f"js/components/{name}.js"
+                self.assertNotIn(f">>> {source} >>>", bundle)
+                self.assertIn(f"{{% static '{source}' %}}", base)
+
+    def test_ht04_form_components_leave_the_global_shell(self):
+        base = BASE_HTML.read_text(encoding="utf-8")
+        shell = (ROOT / "static" / "js" / "shell.bundle.js").read_text(
+            encoding="utf-8"
+        )
+        forms = (ROOT / "static" / "js" / "form-components.bundle.js").read_text(
+            encoding="utf-8"
+        )
+        sources = (
+            "js/components/picker-parts.js",
+            "js/components/picker.js",
+            "js/components/picker-select.js",
+            "js/components/location-rows.js",
+            "js/components/document-source.js",
+            "js/components/document-search.js",
+            "js/components/date-picker.js",
+        )
+
+        self.assertIn("{% block component_js %}", base)
+        self.assertIn("{% static 'js/form-components.bundle.js' %}", base)
+        for source in sources:
+            with self.subTest(source=source):
+                self.assertNotIn(f">>> {source} >>>", shell)
+                self.assertIn(f">>> {source} >>>", forms)
+
+        self.assertLess(
+            forms.index(">>> js/components/picker-parts.js >>>"),
+            forms.index(">>> js/components/picker.js >>>"),
+        )
+
+    def test_ht04_direct_api_consumers_declare_the_form_bundle(self):
+        marker = "{% include 'includes/form_components_js.html' only %}"
+        for relative in FORM_COMPONENT_TEMPLATES:
+            with self.subTest(template=relative):
+                text = (ROOT / relative).read_text(encoding="utf-8")
+                self.assertIn("{% block component_js %}", text)
+                self.assertIn(marker, text)
+
+    def test_ht04_direct_api_consumer_inventory_is_complete(self):
+        api = re.compile(
+            r"(?:window\.)?CV\.(?:pickerParts|picker|locationRows|"
+            r"documentSource|documentSearch|datePicker)"
+        )
+        discovered = {
+            path.relative_to(ROOT).as_posix()
+            for path in (ROOT / "static" / "js" / "pages").rglob("*.js")
+            if api.search(path.read_text(encoding="utf-8"))
+        }
+        self.assertEqual(discovered, set(DIRECT_FORM_API_CONSUMERS))
+
+    def test_ht04_remaining_large_components_are_lazy(self):
+        base = BASE_HTML.read_text(encoding="utf-8")
+        shell = (ROOT / "static" / "js" / "shell.bundle.js").read_text(
+            encoding="utf-8"
+        )
+        for name in ("attach-signed-modal", "wizard-sticky-header"):
+            with self.subTest(component=name):
+                source = f"js/components/{name}.js"
+                self.assertNotIn(f">>> {source} >>>", shell)
+                self.assertIn(f"{{% static '{source}' %}}", base)

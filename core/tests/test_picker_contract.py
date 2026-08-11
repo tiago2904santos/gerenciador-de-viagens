@@ -104,11 +104,12 @@ class PickerContractTests(SimpleTestCase):
         self.assertIn('data-entity-picker-mode="multi"', sources)
 
         base = (templates / "base.html").read_text(encoding="utf-8")
-        bundle = (
-            self.root / "static" / "js" / "shell.bundle.js"
+        form_bundle = (
+            self.root / "static" / "js" / "form-components.bundle.js"
         ).read_text(encoding="utf-8")
         self.assertIn("js/shell.bundle.js", base)
-        self.assertIn(">>> js/components/picker.js >>>", bundle)
-        self.assertIn(">>> js/components/picker-select.js >>>", bundle)
+        self.assertIn("js/form-components.bundle.js", base)
+        self.assertIn(">>> js/components/picker.js >>>", form_bundle)
+        self.assertIn(">>> js/components/picker-select.js >>>", form_bundle)
         self.assertNotIn("search-picker.js", base)
         self.assertNotIn("custom-select.js", base)
