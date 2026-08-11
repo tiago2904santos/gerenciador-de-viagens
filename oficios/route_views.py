@@ -11,8 +11,6 @@ from justificativas.services import oficio_exige_justificativa
 from roteiros.forms import RoteiroForm
 from roteiros.models import Roteiro
 from roteiros.services.autosave import ROTEIRO_AUTOSAVE_FIELDS
-from roteiros.services.autosave import apply_roteiro_autosave
-from roteiros.services.autosave import build_roteiro_draft
 from roteiros.services.autosave import has_minimum_roteiro_content
 from roteiros.services.autosave import pk_de_autosave
 from roteiros.presenters import montar_contexto_editor_roteiro
@@ -20,6 +18,7 @@ from roteiros.services import carregar_opcoes_rotas_avulsas_salvas, normalizar_d
 from .presenters import apresentar_oficio_wizard_summary
 from .selectors import get_oficio_by_id
 from .services import avaliar_oficio_dados_viajantes
+from .services import criar_rascunho_de_roteiro_do_oficio
 from .services import montar_roteiro_inicial_do_oficio
 from .services import salvar_rascunho_parcial_do_oficio
 from .services import salvar_roteiro_do_oficio
@@ -79,20 +78,9 @@ def wizard_roteiro_autosave_criar(request, pk):
         from cadastros.models import ConfiguracaoSistema
 
         area = ConfiguracaoSistema.get_singleton().area
-    roteiro = build_roteiro_draft(area=area)
-    version = apply_roteiro_autosave(roteiro, clean_fields, payload.snapshots)
-    if not roteiro.origem_cidade_id and not roteiro.origem_estado_id:
-        # A sede exibida na tela (herdada do evento/config) nao chega "suja" no payload de
-        # autosave se o usuario nunca clicou nela — sem isso o rascunho nasceria sem sede.
-        from cadastros.services import resolver_sede_ids_desde_configuracao
-
-        estado_id, cidade_id, _aviso = resolver_sede_ids_desde_configuracao()
-        if estado_id and cidade_id:
-            roteiro.origem_estado_id = estado_id
-            roteiro.origem_cidade_id = cidade_id
-            roteiro.save(update_fields=["origem_estado", "origem_cidade", "updated_at"])
-    oficio.roteiro = roteiro
-    oficio.save(update_fields=["roteiro", "updated_at"])
+    roteiro, version = criar_rascunho_de_roteiro_do_oficio(
+        oficio, area=area, campos=clean_fields, snapshots=payload.snapshots
+    )
     return autosave_json_response(ok=True, object_id=roteiro.pk, created=True, version=version)
 
 

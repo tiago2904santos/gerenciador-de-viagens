@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import json
 
-from unittest import expectedFailure
 from unittest import mock
 
 from django.contrib.auth import get_user_model
@@ -70,9 +69,8 @@ class RascunhoDeRoteiroDoOficioTests(TestCase):
         self.oficio.refresh_from_db()
         self.assertEqual(self.oficio.roteiro_id, corpo["object_id"])
 
-    @expectedFailure
     def test_falha_ao_vincular_nao_deixa_roteiro_orfao(self):
-        """O defeito. **Reprova antes da correção.**
+        """O defeito, e a garantia que esta fatia entrega.
 
         O roteiro é criado e gravado; o vínculo com o ofício é a gravação seguinte. Sem
         transação, uma falha no vínculo deixa um `Roteiro` no banco sem ofício e sem
@@ -82,6 +80,9 @@ class RascunhoDeRoteiroDoOficioTests(TestCase):
         A falha entra em `Oficio.save`, que é a última gravação do caminho antes e
         depois da extração — o mesmo critério das fatias 3 e 4: injetar no
         comportamento, não no nome do módulo.
+
+        Reprovava no commit da rede; passou a valer quando as duas gravações foram para
+        `oficios.services.criar_rascunho_de_roteiro_do_oficio`, que é `@transaction.atomic`.
         """
         antes = Roteiro.all_objects.count()
 

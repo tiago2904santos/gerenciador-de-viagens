@@ -1105,3 +1105,44 @@ def atualizar_modelo_motivo(instance, form):
 @transaction.atomic
 def excluir_modelo_motivo(instance):
     instance.delete()
+
+
+@transaction.atomic
+def criar_rascunho_de_roteiro_do_oficio(oficio: Oficio, *, area, campos, snapshots):
+    """Cria o rascunho próprio de roteiro do ofício e já vincula, numa operação só.
+
+    `BE-14` fatia 5. São duas gravações em objetos diferentes: o `Roteiro` nasce e o
+    `Oficio` recebe o vínculo. Sem transação, uma falha na segunda deixava um **roteiro
+    órfão** — sem ofício, sem evento e sem tela que o alcance — enquanto o ofício voltava
+    a se comportar como se o usuário nunca tivesse desmarcado o roteiro do evento. Ou
+    seja: a falha reintroduzia justamente o defeito que esta rota foi escrita para
+    corrigir, e ainda deixava lixo no banco.
+
+    Devolve `(roteiro, version)`.
+    """
+    from roteiros.services.autosave import apply_roteiro_autosave
+    from roteiros.services.autosave import build_roteiro_draft
+
+    roteiro = build_roteiro_draft(area=area)
+    version = apply_roteiro_autosave(roteiro, campos, snapshots)
+    _garantir_sede_do_rascunho(roteiro)
+    _revincular_roteiro_ao_oficio(oficio, roteiro)
+    return roteiro, version
+
+
+def _garantir_sede_do_rascunho(roteiro: Roteiro) -> None:
+    """Dá ao rascunho a sede da configuração quando ela não veio suja no payload.
+
+    A sede exibida na tela é herdada do evento/configuração e não chega no autosave se o
+    usuário nunca clicou nela — sem isto o rascunho nasceria sem sede. Regra anterior ao
+    `BE-14`.
+    """
+    if roteiro.origem_cidade_id or roteiro.origem_estado_id:
+        return
+    from cadastros.services import resolver_sede_ids_desde_configuracao
+
+    estado_id, cidade_id, _aviso = resolver_sede_ids_desde_configuracao()
+    if estado_id and cidade_id:
+        roteiro.origem_estado_id = estado_id
+        roteiro.origem_cidade_id = cidade_id
+        roteiro.save(update_fields=["origem_estado", "origem_cidade", "updated_at"])
