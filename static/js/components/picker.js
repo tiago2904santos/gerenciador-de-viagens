@@ -993,6 +993,12 @@
     registerRenderer(renderer) {
       if (typeof renderer === "function" && !renderers.includes(renderer)) {
         renderers.push(renderer);
+        /* O bundle de formulario e carregado depois do shell. Nesse caminho o
+           primeiro passe do enhancer ja aconteceu quando o renderer de select
+           se registra; esperar outra mutacao deixa o <select multiple> nativo
+           visivel indefinidamente. Inicialize o DOM existente no registro e
+           mantenha o fluxo normal para nos inseridos depois. */
+        if (document.readyState !== "loading") renderer(document);
       }
     },
   };

@@ -805,6 +805,11 @@ tem que bater: uso acima de 35% por rota**, contra os 10,1%–11,8% de hoje.
    `diarias.js`) depois do fechamento do `BE-13`: **3 arquivos e 3 objetos sem consumidor → 0**.
    `trechos.js`, `mapa.js` e o bootstrap do mapa permanecem intactos.
 
+> **Regressão fechada em 11/08 (`NOVO-110`).** O renderer de select chegava depois do primeiro
+> passe do enhancer e não processava o DOM já existente; selects e multiselects ficavam nativos,
+> sem erro no console. O registro tardio agora inicializa o documento imediatamente e possui teste
+> de runtime com a ordem real dos bundles.
+
 **Prova.** KB por rota antes/depois, `npm test` da E1 verde, suíte verde.
 
 **Catraca.** Os tetos de `scripts/tetos_desempenho.json`, que já existem por rota e volume.

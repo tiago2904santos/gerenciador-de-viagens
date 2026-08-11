@@ -7517,3 +7517,16 @@ estreita** que o casamento por texto, porque não engole violação alheia. Os d
 **Vale procurar a mesma forma noutros lugares:** qualquer `except IntegrityError` que decida por
 substring da mensagem tem este problema. Uma varredura por `not in str(exc)` é barata e ainda não
 foi feita.
+
+### NOVO-110 ✅ RESOLVIDO · `NOVO` Renderer tardio deixa selects e multiselects nativos visíveis · JS · 0,25 d
+
+O shell executa `fields-init.js` antes do bundle de formulários. Quando esse bundle chega depois de
+`DOMContentLoaded`, `picker.js` se registra e faz o primeiro passe imediatamente, ainda sem o
+renderer de `picker-select.js`. O renderer entra na lista logo depois, mas nenhum segundo passe é
+disparado. O resultado é um `<select multiple>` nativo visível, sem trigger customizado e sem erro
+no console — reproduzido no tipo do evento em `eventos:guiado_etapa`.
+
+**Correção.** `registerRenderer()` inicializa o renderer recém-registrado sobre o documento quando
+o DOM já está pronto; o registro continua idempotente e o enhancer permanece responsável por nós
+inseridos depois. Um teste Vitest reproduz a ordem real `shell → picker → renderer` e exige que o
+controle nativo fique oculto, com combobox e listbox customizados presentes.
