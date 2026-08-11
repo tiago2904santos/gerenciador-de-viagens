@@ -754,6 +754,13 @@ folha; a extração deve mover a família compartilhada antes de retirar o prime
 > Roteiros, Termos e Ordem de Serviço também mantiveram assinaturas de estilo idênticas nas seis
 > combinações.
 
+> **Sétima fatia fechada em 11/08 (`UI-04`, parcial).** A lista de Termos parou de carregar
+> `prestacoes_contas.css`. A folha alheia não alterava lista, filtros, cards, calendário ou menus;
+> apenas alterava 13 elementos (14 a 500 px) do `file-picker` dentro do modal global de anexo
+> assinado. O modal passou intencionalmente à superfície canônica de `fields/file-picker.css`, sem
+> overflow em claro/escuro a 1440/800/500 px. A rota caiu de **673.378 para 650.375 bytes**
+> (**-23.003 bytes**) e subiu de **13,6518% para 14,0594% de uso**.
+
 **Passo a passo.** Extraia os componentes compartilhados dos arquivos de domínio para
 `fields/`, `actions/`, `lists/` e `feedback/`, domínio por domínio, e derrube o import correspondente. Dimensione com a
 régua da E0: o que não é usado na rota não devia estar sendo entregue nela.

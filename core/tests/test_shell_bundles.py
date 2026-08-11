@@ -204,6 +204,14 @@ class ShellBundleGateTests(SimpleTestCase):
                 source = (ROOT / relative).read_text(encoding="utf-8")
                 self.assertNotIn(selector, source)
 
+    def test_ui04_terms_list_does_not_import_prestacoes_css(self):
+        template = (ROOT / "templates/termos/index.html").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("css/lists/entity-cards.css", template)
+        self.assertIn("css/pages/termos.css", template)
+        self.assertNotIn("css/pages/prestacoes_contas.css", template)
+
     def test_base_html_keeps_extra_blocks(self):
         text = BASE_HTML.read_text(encoding="utf-8")
         self.assertIn("{% block extra_css %}", text)
