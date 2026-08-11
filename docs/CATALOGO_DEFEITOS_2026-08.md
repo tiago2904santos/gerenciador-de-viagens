@@ -528,6 +528,47 @@ teste, em vez de ser efeito colateral de onde o `return` estava escrito.
 `marcar_servidor_em_preenchimento` e a função `_parse_iso_date` — que sobrou com a própria definição
 e a entrada no `__all__`, e nada mais. Converter data passou a ser trabalho do service.
 
+#### Fatia 3 ✅ — os anexos assinados, onde `atomic` sozinho pioraria
+
+A persistência dos anexos foi para `prestacoes_contas/anexo_services.py`. É a única das quatro fatias
+em que **a transação sozinha piora o sistema**, e o motivo é que aqui o estado mora em dois lugares e
+só um desfaz: o banco tem `ROLLBACK`, o storage não.
+
+`atomic` puro faria `FieldFile.delete()` rodar dentro da transação, e um rollback depois dele
+devolveria a **linha viva apontando para um arquivo destruído** — o inverso exato do órfão que o
+`BE-07` corrigiu, e igualmente irrecuperável. O par correto é **linha na transação, arquivo no
+`transaction.on_commit`**.
+
+**O defeito maior aqui não era gravação parcial: era destruição.** `_prestacao_assinado_upload`
+apagava os arquivos anteriores do disco e as linhas **antes** de criar a linha nova. Um `create` que
+falhasse — erro de storage, disco cheio, erro de banco — levava o documento assinado anterior embora,
+do disco e do banco, sem volta. Agora as linhas antigas saem dentro da transação e os arquivos só
+depois do commit, então a falha devolve tudo.
+
+**A ordem do `BE-07` ficou mais firme por dentro.** Antes ela dependia de duas chamadas escritas na
+sequência certa; agora o arquivo sai no callback, então sair depois da linha deixou de ser convenção
+e virou consequência de onde a chamada está.
+
+| | antes da fatia 3 | depois |
+|---|---:|---:|
+| gravações em módulo de view | 29 | **24** |
+| funções com gravação fora de transação | 21 | **19** |
+| funções com 2+ gravações sem transação | 6 | **4** |
+| `document_views.py` | 376 linhas, 2 acessos de manager | **359 linhas, 0** |
+| catraca `P-01` | 33 | **31** |
+
+É a primeira vez que a catraca **desce** desde que passou a medir prestações (`NOVO-101`).
+
+**O que `on_commit` não promete, e está escrito no módulo:** se o callback falhar *depois* do commit,
+a linha já foi e sobra arquivo órfão no storage — igual a hoje. Ele não conserta isso, e prometer o
+contrário seria mentira. A garantia é a outra, e é a que importa: linha viva apontando para arquivo
+destruído nunca acontece. O resíduo está registrado como `NOVO-104`.
+
+**Consequência para quem escreve teste:** `on_commit` não dispara dentro de `TestCase`, que envolve
+cada teste numa transação desfeita no fim. `test_anexos.py::test_exclusao_remove_registro_e_o_arquivo_do_disco`
+passou a usar `captureOnCommitCallbacks(execute=True)` — mesma intenção, forma nova, com o motivo no
+comentário.
+
 ### BE-15 🟡 Numeração de documento reimplementada 3 vezes · AUD · 2 d · risco alto
 
 (a) `oficios/services.py:425-440` — advisory lock, fallback `select_for_update`, reuso de lacunas,
@@ -7083,3 +7124,26 @@ teste específico, e é isso que se quer.
 **Custo do que já foi feito:** os dois caminhos hoje moram no mesmo módulo
 (`prestacoes_contas/solicitacao_services.py`), lado a lado, com a tabela acima no docstring. Unificar
 virou uma edição local, não uma caçada.
+
+### NOVO-104 · `NOVO` Arquivo órfão no storage não tem quem varra · BE · 0,5 d
+
+Resíduo conhecido da fatia 3 do `BE-14`, registrado para não virar surpresa.
+
+Com `atomic` na linha e `transaction.on_commit` no arquivo, a combinação perigosa — linha viva
+apontando para arquivo destruído — deixou de existir. A outra combinação continua possível: **o
+callback falhar depois do commit**. Aí a linha já foi e o arquivo fica no disco, alcançável por
+ninguém. `on_commit` não conserta isso, e nenhuma ordenação conserta: são dois sistemas, e o commit
+de um não é transacional com o outro.
+
+O dano é pequeno por evento — disco ocupado, não dado errado — e por isso o resíduo é aceitável. O
+que falta é **poder saber**: hoje não existe nada que compare o storage com a tabela. Os comandos de
+diagnóstico do repositório (`roteiros/management/commands/limpar_roteiros_orfaos.py`,
+`diagnosticar_roteiros.py`, `prestacoes_contas/.../sincronizar_prestacao_servidores.py`) olham só
+banco.
+
+**Correção:** um comando que liste arquivos sob o diretório privado de prestações sem linha
+correspondente em `PrestacaoDocumentoAnexo`, com `--apagar` opcional e saída legível. Mesma forma dos
+irmãos: diagnostica por padrão, só apaga quando mandado.
+
+**Vale para além dos anexos:** todo `FileField` do sistema tem o mesmo buraco. Começar pelos anexos
+de prestação, que são os únicos com exclusão pela tela, e ver se o resto compensa.
