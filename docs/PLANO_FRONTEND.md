@@ -206,7 +206,7 @@ arquivos; contraste medido (não estimado) nos pares alterados.
 | ID | Defeito | Dias |
 |---|---|---:|
 | `UI-04` 🟠 | 54 imports de CSS de outro domínio em 26 templates: extrair os componentes compartilhados dos arquivos de domínio | a definir |
-| `JS-08` 🟡 | 11% do bundle atende menos de 1% das páginas: segundo bundle sob demanda | 2 |
+| `JS-08` ✅ | Cinco componentes sob demanda por marcador DOM; shell global −6,0% | 2 |
 | `JS-09` 🟡 | Tela de espera de documento carrega 264 KB para usar 3,3 KB | 0,5 |
 | `JS-07` ✅ | "Fechar ao clicar fora / Esc": 3 implementações vivas consolidadas em `CV.overlay.attachDismiss` | 2 |
 | `JS-10` ✅ | Três stubs sem consumidor do editor de roteiros removidos | 0,25 |

@@ -1712,7 +1712,7 @@ interna que aceita painéis portalizados, predicado de abertura, escopo opcional
 continua apenas reposicionando em `scroll`/`resize`. Testes de runtime cobrem clique externo,
 painel portalizado, Escape condicional e desmontagem; o gate JavaScript fechou com **43 testes**.
 
-### JS-08 🟡 11% do bundle global atende menos de 1% das páginas · AUD · 2 d · risco médio
+### JS-08 ✅ RESOLVIDO (E11) · 11% do bundle global atende menos de 1% das páginas · AUD · 2 d · risco médio
 
 | componente | linhas | templates que usam |
 |---|---:|---:|
@@ -1734,6 +1734,14 @@ painel portalizado, Escape condicional e desmontagem; o gate JavaScript fechou c
 > `termos/form.html`, `prestacoes_contas/documentos_form.html`). Os outros quatro conferem.
 > **Consequência:** o ganho de separar o bundle é menor do que o catálogo prometia, e o corte tem
 > que ser decidido por componente, não pelo bloco inteiro.
+
+**Fechamento (11/08/2026).** `cv-select.js` já havia sido apagado na E2. Os cinco componentes
+restantes saíram do bundle global e agora são solicitados por `core/component-loader.js` somente
+quando seu marcador real aparece no DOM, inclusive em conteúdo inserido por AJAX. As URLs vêm de
+`{% static %}` em `base.html`, preservando storage com hash; não há lista manual de páginas sujeita
+às indireções de Cotton/includes que invalidaram a contagem original. O shell caiu de **283.128
+para 266.254 bytes** (**−16.874; −6,0%**). Testes de runtime travam seleção, unicidade e conteúdo
+dinâmico; a suíte JavaScript passou de 43 para **45 testes**.
 
 ### JS-09 ✅ RESOLVIDO (E11) · Tela de espera de documento carregava o bundle inteiro para usar 3,3 KB · AUD · 0,5 d
 

@@ -56,6 +56,23 @@ registry chama `destroy(root)` quando o nó sai do DOM (`JS-02`).
 
 O painel é o elemento apontado por `aria-controls`, com a transição `.is-open`.
 
+## Carregamento progressivo — `core/component-loader.js`
+
+O script do shell em `base.html` fornece URLs resolvidas pelo storage de estáticos. O loader pede
+cada componente somente quando encontra seu marcador no DOM inicial ou em conteúdo inserido por
+AJAX.
+
+| Atributo | Elemento | Uso |
+|---|---|---|
+| `data-cv-lazy-components` | script do shell | Declara a configuração única do loader |
+| `data-cv-lazy-card-toggle-src` | script do shell | URL de `card-toggle.js` |
+| `data-cv-lazy-segment-nav-src` | script do shell | URL de `segment-nav.js` |
+| `data-cv-lazy-file-picker-src` | script do shell | URL de `file-picker.js` |
+| `data-cv-lazy-signature-actions-src` | script do shell | URL de `signature-actions.js` |
+| `data-cv-lazy-extra-download-src` | script do shell | URL de `extra-download.js` |
+
+API: `CV.lazyComponents.scan(root?)`, para uma varredura explícita, e `destroy()`, usado em testes.
+
 ## Coleções — `components/collection.js` / `CV.collection`
 
 Cada lista declara exatamente um modo. `client` filtra o que já está renderizado; `server` manda os

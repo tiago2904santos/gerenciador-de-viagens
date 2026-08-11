@@ -718,9 +718,10 @@ tem que bater: uso acima de 35% por rota**, contra os 10,1%–11,8% de hoje.
    `scroll`/`resize`; só `date-picker.js` **reposiciona**. Não implemente um fechamento que
    não existia. Fechado com `CV.overlay.attachDismiss`: **3 implementações vivas → 1 contrato**,
    mantendo o painel portalizado dentro da zona interativa e o reposicionamento do calendário.
-3. **`JS-08`** — corte por componente, não pelo bloco. A coluna "templates que usam" do enunciado
+3. **`JS-08` ✅** — corte por componente, não pelo bloco. A coluna "templates que usam" do enunciado
    original estava errada: `segment-nav.js` chega a ≥4 templates e `file-picker.js` a ≥6, por
-   `{% include %}` com variável. O ganho é menor do que o catálogo prometia.
+   `{% include %}` com variável. Os cinco componentes vivos agora carregam por marcador real de
+   DOM, inclusive AJAX: **283.128 → 266.254 bytes** no shell global (−16.874; −6,0%).
 4. **`JS-09` ✅** — o documento autônomo entrega `core/http.js` antes do polling e não carrega mais
    `shell.bundle.js`: **283.282 → 4.255 bytes** de JavaScript específico da rota (−98,5%).
 5. **`JS-10` ✅** — removidos os stubs de 3 linhas do editor de roteiros (`state.js`, `retorno.js`,
