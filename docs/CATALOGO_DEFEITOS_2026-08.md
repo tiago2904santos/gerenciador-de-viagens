@@ -6374,3 +6374,57 @@ correção, porque a sua única declaração de fundo mora dentro de regra predi
 É a classe "componente cujo desenho só existe no escuro" — a mesma que barrou a família **8b**
 (`NOVO-93`) e que apareceu na medição da **8g** (`NOVO-94`, com `.empty-state__mark`). Token não
 resolve; precisa de regra base, e isso é decisão de desenho.
+
+### NOVO-97 · `NOVO` A E9-a entrega 32 regras, e o caminho até elas custou três tentativas · UI · em curso
+
+Primeira colheita medida da **E9-a**: 32 regras só-escuras de cor saem do repositório sem mudar um
+pixel em tema nenhum.
+
+**O caminho, porque ele é o resultado mais reaproveitável desta sub-etapa.**
+
+| tentativa | o que foi feito | resultado |
+|---|---|---|
+| 1 | apagar as 307 candidatas e ler o efeito | 6 mudanças **no claro** — impossível para regra predicada em `dark`. Causa: **17 regras de lista mista** (parte do seletor neutra, parte escura) apagadas inteiras |
+| 2 | recortar só as partes escuras da lista | **pior**: 274 mudanças no claro, nenhuma das 86 capturas intacta. Separar lista por vírgula com regex quebra `:is()` multi-linha — `lists/list-header.css:578` virou `:hover:not(:disabled))`, com parêntese desbalanceado |
+| 3 | regra de lista mista **não entra** | claro **zero** (as 2 leituras eram o piso de ruído). 2.598 mudanças no escuro, que é o sinal real |
+
+Da tentativa 3 saiu a lista de candidatas, e daí veio o `NOVO-95`: a prova por não-interseção não
+vale, porque a cascata não é monotônica. As 36 regras "provadas" por aquele atalho reprovaram com
+**75 elementos alterados**.
+
+**O que funcionou no lugar da bisecção.** Atribuir o resultado do diff **que foi de fato rodado** —
+não de um diff maior do qual se deduz. Perguntando quais das 36 casam com os 75 elementos
+alterados, saíram **4 culpadas**:
+
+```
+theme-dark-components.css:3782   .icon-btn--whatsapp
+theme-dark-components.css:3806   .icon-btn--delete
+theme-dark-components.css:5137   .person-row--highlight
+theme-dark-components.css:5161   .person-row--highlight .person-row__avatar
+```
+
+As duas primeiras pintam ícone de ação lendo `--action-success-*`/`--action-danger-*`; as duas
+últimas, a linha destacada do roster. São o caso que quebra a monotonicidade: competem com outra
+regra pelo mesmo elemento, então remover uma **promove** a outra.
+
+Removendo as 32 restantes, medido contra o estado imediatamente anterior: **4 elementos alterados,
+que são exatamente o piso de ruído** — o mesmo par de caminhos em `justificativas-lista`, nos dois
+temas.
+
+**Custo real do método:** duas capturas (~8 min cada) e uma atribuição (~4 min) por lote, e o lote
+termina com as culpadas **nomeadas** — não só com "a metade de cima reprovou", que é tudo o que a
+bisecção daria pelo mesmo preço.
+
+**Catracas, todas por mérito:**
+
+| | antes | depois |
+|---|---:|---:|
+| `theme-dark-components.css` | 5.788 linhas | **5.610** |
+| `!important` fora do bundle | 466 | **463** |
+| `audit_frontend_standards` | 239 | **237** |
+| `audit_ui_patterns` | 2.456 | **2.447** |
+
+**O que continua aberto:** 173 candidatas **nunca exercitadas** pelas 43 rotas em repouso — o
+elemento só existe com diálogo, menu ou dropdown aberto. Sobre elas a medição não diz nada, e
+tratá-las como inócuas seria repetir o `NOVO-90`. Medi-las exige estender o corpus aos estados de
+sobreposição, como o `NOVO-54` fez ao ir de 44 para 51 rotas.
