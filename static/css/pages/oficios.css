@@ -44,19 +44,6 @@
   scrollbar-width: thin;
 }
 
-.oficio-justificativa-card .cv-field__control--textarea::-webkit-scrollbar {
-  width: 4px;
-}
-
-.oficio-justificativa-card .cv-field__control--textarea::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.oficio-justificativa-card .cv-field__control--textarea::-webkit-scrollbar-thumb {
-  background: var(--color-border-strong);
-  border-radius: 2px;
-}
-
 /* Textarea de Motivo no wizard: visual idêntico ao input, só com altura maior */
 .travel-document-wizard .cv-field__control {
   background: var(--color-input-bg);
@@ -107,12 +94,6 @@
   padding-top: var(--space-3);
   resize: vertical;
   line-height: 1.5;
-}
-
-.justificativa-panel .cv-field__control--textarea {
-  height: var(--text-area-height-justificativa);
-  min-height: var(--text-area-height-lg);
-  margin-bottom: var(--app-space-5);
 }
 
 .oficio-reveal-panel {

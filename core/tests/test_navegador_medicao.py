@@ -148,6 +148,27 @@ class MedidorDeCamposEstavelTests(SimpleTestCase):
         self.assertIn("texto:", medidor.JS_COLETA)
         self.assertIn("estilo,", medidor.JS_COLETA)
 
+    def test_pseudo_elementos_do_inventario_sao_capturados(self):
+        from scripts import medir_campos_computados as medidor
+
+        self.assertIn("::placeholder", medidor.PSEUDO_ELEMENTOS)
+        self.assertIn("::-webkit-scrollbar-thumb", medidor.PSEUDO_ELEMENTOS)
+        self.assertIn("getComputedStyle(el, nome)", medidor.JS_COLETA)
+        self.assertIn("pseudo,", medidor.JS_COLETA)
+
+    def test_captura_ancestrais_para_provar_contexto(self):
+        from scripts import medir_campos_computados as medidor
+
+        self.assertIn("atual = atual.parentElement", medidor.JS_COLETA)
+        self.assertIn("classes: Array.from(atual.classList)", medidor.JS_COLETA)
+        self.assertIn("contexto,", medidor.JS_COLETA)
+
+    def test_seletor_pode_incluir_controles_sem_a_classe_canonica(self):
+        from scripts import medir_campos_computados as medidor
+
+        self.assertEqual(medidor.SELETOR_PADRAO, ".cv-field__control")
+        self.assertIn("querySelectorAll(selector)", medidor.JS_COLETA)
+
 
 class EsperarLayoutEstavelTests(SimpleTestCase):
     """NOVO-84: medir só depois que a página para de crescer."""

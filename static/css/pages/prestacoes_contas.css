@@ -739,12 +739,6 @@
   width: 100%;
 }
 
-.docs-equipe-solicitacao__field .form-control::placeholder,
-.docs-equipe-solicitacao__field .cv-field__control::placeholder {
-  color: var(--color-muted);
-  font-weight: 500;
-}
-
 .docs-equipe-solicitacao__field .form-control:focus,
 .docs-equipe-solicitacao__field .cv-field__control:focus {
   outline: none;
