@@ -11,11 +11,12 @@ from core.autosave import filter_allowed_fields
 from core.autosave import parse_autosave_payload
 from .forms import PlanoIdentificacaoForm
 from .models import PlanoTrabalho
+from .identificacao_services import flags_automaticas
+from .identificacao_services import salvar_identificacao_do_autosave
+from .identificacao_services import salvar_identificacao_do_wizard
 from .presenters import apresentar_resumo_evento_card
 from .presenters import apresentar_resumo_header
-from .services import atualizar_snapshot_diarias
 from .services import eventos_para_cards
-from .services import sincronizar_textos_padrao
 from .services import texto_padrao_consideracao_final
 from .services import texto_padrao_coordenacao
 from .services import texto_padrao_contextualizacao
@@ -149,19 +150,9 @@ def wizard_identificacao(request, pk):
     if request.method == "POST":
         nav_action = normalizar_acao_do_wizard(request.POST)
         if form.is_valid():
-            plano = form.save()
-            plano.contextualizacao_auto = (request.POST.get("contextualizacao_auto", "1") or "0").strip() != "0"
-            plano.coordenacao_auto = (request.POST.get("coordenacao_auto", "1") or "0").strip() != "0"
-            plano.consideracao_auto = (request.POST.get("consideracao_auto", "1") or "0").strip() != "0"
-            campos_texto = sincronizar_textos_padrao(plano)
-            plano.save(
-                update_fields=[
-                    *{*campos_texto, "contextualizacao_auto", "coordenacao_auto", "consideracao_auto"},
-                    "updated_at",
-                ],
+            plano = salvar_identificacao_do_wizard(
+                form, flags=flags_automaticas(request.POST)
             )
-            if plano.saida_sede_data and plano.chegada_sede_data:
-                atualizar_snapshot_diarias(plano)
             if nav_action == "wizard_next":
                 messages.success(request, "Identificação salva. Continue com o efetivo e as diárias.")
                 return redirect("planos_trabalho:wizard_efetivo_diarias", pk=plano.pk)
@@ -207,20 +198,5 @@ def identificacao_autosave(request, pk):
             message="Alguns campos ainda precisam de ajuste antes do autosave.",
             errors=_autosave_form_errors(form),
         )
-    plano = form.save()
-    # Edição direta do texto desliga o modo automático; mudança de destino/programa
-    # mantém o texto padrão sincronizado quando ainda estiver no modo automático.
-    flag_updates: list[str] = []
-    if "contextualizacao" in clean_fields:
-        plano.contextualizacao_auto = False
-        flag_updates.append("contextualizacao_auto")
-    if "coordenacao" in clean_fields:
-        plano.coordenacao_auto = False
-        flag_updates.append("coordenacao_auto")
-    if "consideracao_final" in clean_fields:
-        plano.consideracao_auto = False
-        flag_updates.append("consideracao_auto")
-    campos_texto = sincronizar_textos_padrao(plano)
-    if campos_texto or flag_updates:
-        plano.save(update_fields=[*{*campos_texto, *flag_updates}, "updated_at"])
+    plano = salvar_identificacao_do_autosave(form, campos_editados=clean_fields)
     return autosave_json_response(ok=True, object_id=plano.pk, version=_plano_autosave_version(plano))

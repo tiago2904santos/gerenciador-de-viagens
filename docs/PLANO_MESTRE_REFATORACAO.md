@@ -415,6 +415,17 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       uma cada em `core`, `ordens_servico`, `roteiros` e `termos`. **Fatia 5: `planos_trabalho` +
       `oficios`**, que somam 10 dos 19 e incluem a pior função restante
       (`_apply_efetivo_snapshot`: `save` + `create` + `delete` em laço)
+
+      `NOVO-104` (arquivo órfão no storage não tem quem varra). **Fatia 5 (planos + ofícios)
+      feita**: `planos_trabalho` ganhou a primeira camada de escrita da sua história —
+      `efetivo_services.py` e `identificacao_services.py`, 5 `atomic` onde antes havia **zero
+      em 1.314 linhas** — e `criar_rascunho_de_roteiro_do_oficio` entrou em `oficios/services.py`
+      ao lado do irmão do `BE-12`. Gravações fora de transação: 24 → 19 na fatia 4 e → 17 nesta.
+      Sobrou `NOVO-108`: **a contagem por AST erra nos dois sentidos e não serve mais de alvo** —
+      superconta 7 (cinco `delete()`, que o `Collector` do Django já faz em transação, e dois ramos
+      mutuamente exclusivos) e subconta o pior caso restante, `eventos/views.py::detalhe`, que
+      aparece com 1 e faz ~12 gravações em 6 tabelas. **Fatia 6: `eventos`**, dirigida por leitura
+      de caminho e não pelo contador
 - [ ] `BE-15` numeração reimplementada 3 vezes
 - [ ] `BE-16` abstrações de `core` adotadas pela metade
 - [x] `BE-17` `core/views.py` é 75% fixture de UI Lab — **fechado pelo PR #247**, que apagou os

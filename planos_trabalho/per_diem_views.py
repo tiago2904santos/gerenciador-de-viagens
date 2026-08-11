@@ -11,14 +11,12 @@ from core.autosave import AutosavePayloadError
 from core.autosave import autosave_json_response
 from core.autosave import filter_allowed_fields
 from core.autosave import parse_autosave_payload
+from .efetivo_services import salvar_efetivo_do_autosave
+from .efetivo_services import salvar_efetivo_e_diarias
 from .forms import EfetivoPlanoFormSet
 from .forms import PlanoDiariasForm
 from .models import PlanoTrabalho
-from .selectors import cargo_pertence_a_area
 from .selectors import get_evento_do_plano_by_id
-from .selectors import unidade_pertence_a_area
-from .services import atualizar_snapshot_diarias
-from .services import atualizar_snapshot_diarias_combinadas
 from .services import calcular_diarias_combinadas
 from .services import calcular_diarias_plano
 from .services import adicionar_evento_ao_plano
@@ -80,7 +78,7 @@ def _plano_diarias_autosave_data(plano: PlanoTrabalho):
 
 
 def _efetivo_rows_from_formset(formset):
-    """Converte o formset inline de efetivo em linhas para `_apply_efetivo_snapshot`.
+    """Converte o formset inline de efetivo em linhas para `reconciliar_efetivo`.
 
     Usa o `id` enviado (preenchido pelo autosave) em vez de depender do
     management form (INITIAL_FORMS), que pode estar defasado quando o autosave
@@ -104,56 +102,6 @@ def _efetivo_rows_from_formset(formset):
             }
         )
     return rows
-
-
-def _apply_efetivo_snapshot(plano: PlanoTrabalho, rows):
-    """Reconcilia o efetivo do plano com o snapshot recebido do autosave.
-
-    Linhas com `cargo` e `quantidade` válidos são criadas/atualizadas; linhas
-    incompletas são ignoradas (placeholders no formulário). IDs ausentes no
-    snapshot são removidos do banco para refletir o estado atual da tela.
-    """
-    existentes = {efetivo.pk: efetivo for efetivo in plano.efetivos.all()}
-    mantidos: set[int] = set()
-    saida: list[dict] = []
-    vistos: set[tuple] = set()
-
-    for index, row in enumerate(rows or []):
-        if not isinstance(row, dict):
-            continue
-        cargo_id = _to_int_or_none(row.get("cargo"))
-        quantidade = _to_int_or_none(row.get("quantidade"))
-        unidade_id = _to_int_or_none(row.get("unidade"))
-        client_idx = _to_int_or_none(row.get("idx"))
-        if client_idx is None:
-            client_idx = index
-        if not cargo_id or not quantidade or quantidade <= 0:
-            continue
-        if not cargo_pertence_a_area(cargo_id):
-            continue
-        if unidade_id and not unidade_pertence_a_area(unidade_id):
-            unidade_id = None
-        chave = (unidade_id, cargo_id)
-        if chave in vistos:
-            continue
-        vistos.add(chave)
-        row_id = _to_int_or_none(row.get("id"))
-        if row_id and row_id in existentes:
-            efetivo = existentes[row_id]
-            efetivo.unidade_id = unidade_id
-            efetivo.cargo_id = cargo_id
-            efetivo.quantidade = quantidade
-            efetivo.save(update_fields=["unidade", "cargo", "quantidade", "updated_at"])
-            mantidos.add(row_id)
-        else:
-            efetivo = plano.efetivos.create(unidade_id=unidade_id, cargo_id=cargo_id, quantidade=quantidade)
-            mantidos.add(efetivo.pk)
-        saida.append({"idx": client_idx, "id": efetivo.pk})
-
-    remover = [pk for pk in existentes if pk not in mantidos]
-    if remover:
-        plano.efetivos.filter(pk__in=remover).delete()
-    return saida
 
 
 def _to_int_or_none(value):
@@ -195,14 +143,9 @@ def wizard_efetivo_diarias(request, pk):
     if request.method == "POST":
         nav_action = normalizar_acao_do_wizard(request.POST)
         if formset.is_valid() and diarias_form.is_valid():
-            # Reconcilia por id (e não via management form), pois o autosave pode
-            # ter criado efetivos após o carregamento da página — o que deixaria
-            # INITIAL_FORMS defasado e faria o formset.save() inserir duplicatas.
-            _apply_efetivo_snapshot(plano, _efetivo_rows_from_formset(formset))
-            plano = diarias_form.save()
-            resultado = atualizar_snapshot_diarias(plano)
-            if plano.is_multi_evento:
-                atualizar_snapshot_diarias_combinadas(plano)
+            resultado = salvar_efetivo_e_diarias(
+                plano, rows=_efetivo_rows_from_formset(formset), diarias_form=diarias_form
+            ).diarias
             if nav_action == "wizard_back":
                 messages.success(request, "Efetivo e diárias salvos.")
                 return redirect("planos_trabalho:wizard_identificacao", pk=plano.pk)
@@ -362,6 +305,7 @@ def efetivo_diarias_autosave(request, pk):
     # Campos planos da etapa 2 (saída/chegada na sede)
     allowed_fields = set(PlanoDiariasForm.Meta.fields)
     clean_fields = filter_allowed_fields(payload.fields, payload.dirty_fields, allowed_fields)
+    diarias_form = None
     if clean_fields:
         data = _merge_payload_fields(_plano_diarias_autosave_data(plano), clean_fields)
         diarias_form = PlanoDiariasForm(data, instance=plano)
@@ -371,23 +315,18 @@ def efetivo_diarias_autosave(request, pk):
                 message="Alguns campos ainda precisam de ajuste antes do autosave.",
                 errors=_autosave_form_errors(diarias_form),
             )
-        plano = diarias_form.save()
 
     # Snapshot do efetivo (formset inline)
-    efetivo_result = None
     efetivo_snapshot = payload.snapshots.get("efetivo")
-    if isinstance(efetivo_snapshot, list):
-        efetivo_result = _apply_efetivo_snapshot(plano, efetivo_snapshot)
-
-    if plano.saida_sede_data and plano.chegada_sede_data:
-        # Sempre atualiza a diária do rascunho (evento atual); em multi, também a combinada.
-        atualizar_snapshot_diarias(plano)
-        if plano.is_multi_evento:
-            atualizar_snapshot_diarias_combinadas(plano)
+    resultado = salvar_efetivo_do_autosave(
+        plano,
+        rows=efetivo_snapshot if isinstance(efetivo_snapshot, list) else None,
+        diarias_form=diarias_form,
+    )
 
     snapshots_payload = {}
-    if efetivo_result is not None:
-        snapshots_payload["efetivo"] = efetivo_result
+    if resultado.efetivo is not None:
+        snapshots_payload["efetivo"] = resultado.efetivo
 
     now = timezone.localtime()
     return JsonResponse(
