@@ -2209,11 +2209,6 @@ body.has-delete-modal-open {
   }
 }
 
-html[data-theme="dark"] .inline-create__toggle {
-  background: var(--color-card-muted); /* #223348 */
-  color:      var(--theme-text-body);
-}
-
 html[data-theme="dark"] .inline-create__toggle:hover {
   background: color-mix(in srgb, var(--color-card-muted) 80%, var(--color-white) 20%);
 }
