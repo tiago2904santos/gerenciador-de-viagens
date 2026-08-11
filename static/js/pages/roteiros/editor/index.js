@@ -1,4 +1,3 @@
-import { createEditorState } from './state.js';
 import {
   createTrechosModule,
   getTrechosEmptyHtml,
@@ -8,16 +7,11 @@ import {
   setTrechoDateValue,
   queryTrechoCards,
 } from './trechos.js';
-import { createRetornoModule } from './retorno.js';
-import { createDiariasModule } from './diarias.js';
 import { createMapaModule } from './mapa.js';
 
 export function initRoteirosEditor() {
   const modules = {
-    state: createEditorState(),
     trechos: createTrechosModule(),
-    retorno: createRetornoModule(),
-    diarias: createDiariasModule(),
     mapa: createMapaModule(),
   };
   window.CV = window.CV || {};

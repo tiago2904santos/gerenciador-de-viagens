@@ -445,7 +445,7 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [x] `JS-07` 3 implementações vivas de "fechar ao clicar fora / Esc" → `CV.overlay.attachDismiss` · **E11**
 - [ ] `JS-08` 11% do bundle atende menos de 1% das páginas · **E11**
 - [x] `JS-09` tela embutida entrega só `http.js` + polling: 283.282 → 4.255 bytes de JS · **E11**
-- [ ] `JS-10` decidir os stubs do editor de roteiros — **destravado**: o `BE-13` fechou · **E11**
+- [x] `JS-10` três stubs sem consumidor removidos; módulos reais e bootstrap preservados · **E11**
 
 **Fechados nesta fase antes do dimensionamento** (a reconstrução parcial de 07–08/08, que o quadro
 não registrava): `NOVO-50/MED` paleta de 255 cores duplicadas · `NOVO-51` poda dos 55 apelidos

@@ -1748,7 +1748,7 @@ medição atual, o JavaScript específico da rota caiu de **283.282 para 4.255 b
 **−98,5%**), preservando o contrato `CV.http.fetchJson`. O teste da resposta 202 trava presença,
 ausência e ordem dos dois scripts para impedir a regressão silenciosa.
 
-### JS-10 🟡 Modularização do editor de roteiros é fachada · AUD · 0,25 d ou 3+ d
+### JS-10 ✅ RESOLVIDO (E11) · Modularização do editor de roteiros é fachada · AUD · 0,25 d ou 3+ d
 
 `static/js/pages/roteiros/editor/state.js`, `retorno.js` e `diarias.js` têm **3 linhas cada** e
 devolvem só `{ name: 'state' }` etc. São importados e instanciados em `index.js:11-20`, e os
@@ -1757,6 +1757,13 @@ objetos não são usados em mais lugar nenhum. A lógica real continua nas 1.848
 **Efeito:** a estrutura de arquivos mente. Quem procurar a regra de diárias em `diarias.js` não
 acha.
 **Decisão:** completar a extração (3+ dias, depois de `BE-13`) ou remover os stubs (0,25 d).
+
+**Fechamento (11/08/2026).** Escolhida a poda de comportamento nulo: o grep de repositório inteiro
+confirmou que os três objetos só eram publicados em `window.CV.roteiros.modules` e não tinham
+consumidor. Os imports, as três propriedades e os arquivos `state.js`, `retorno.js` e `diarias.js`
+foram removidos. Os módulos reais `trechos.js` e `mapa.js`, inclusive o bootstrap do mapa, foram
+preservados. O contrato de namespace trava a ausência dos stubs; **33 testes focados** ficaram
+verdes.
 
 ### JS-11 ✅ RESOLVIDO (f9e3f72) · ⚪ Máscara de CEP duplicada e `onlyDigits` em 4 cópias · AUD · 0,25 d
 

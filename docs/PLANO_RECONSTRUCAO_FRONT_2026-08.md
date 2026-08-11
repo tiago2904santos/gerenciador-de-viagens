@@ -723,8 +723,9 @@ tem que bater: uso acima de 35% por rota**, contra os 10,1%–11,8% de hoje.
    `{% include %}` com variável. O ganho é menor do que o catálogo prometia.
 4. **`JS-09` ✅** — o documento autônomo entrega `core/http.js` antes do polling e não carrega mais
    `shell.bundle.js`: **283.282 → 4.255 bytes** de JavaScript específico da rota (−98,5%).
-5. **`JS-10`** — decidir os stubs de 3 linhas do editor de roteiros (`state.js`, `retorno.js`,
-   `diarias.js`): completar a extração ou removê-los. **Depende do `BE-13`** — pergunte.
+5. **`JS-10` ✅** — removidos os stubs de 3 linhas do editor de roteiros (`state.js`, `retorno.js`,
+   `diarias.js`) depois do fechamento do `BE-13`: **3 arquivos e 3 objetos sem consumidor → 0**.
+   `trechos.js`, `mapa.js` e o bootstrap do mapa permanecem intactos.
 
 **Prova.** KB por rota antes/depois, `npm test` da E1 verde, suíte verde.
 
@@ -750,7 +751,7 @@ A reconstrução termina quando, medido por comando e não por opinião:
 ## 6. O que este plano não faz
 
 - **Não mexe no backend.** A Fase 6 (`BE-11`…`BE-16`) é superfície disjunta e pode correr em
-  paralelo, em branch própria. A exceção é o `JS-10`, que depende do `BE-13`.
+  paralelo, em branch própria. A dependência `JS-10` → `BE-13` já foi satisfeita.
 - **Não renumera os IDs colididos do catálogo.** `NOVO-45`, `NOVO-49`, `NOVO-50` e `NOVO-51`
   aparecem duas vezes cada, por acidente de sessões paralelas. Renumerar quebra o rastro dos PRs
   que já os citam; a colisão fica registrada e os IDs novos começam em `NOVO-69`.
