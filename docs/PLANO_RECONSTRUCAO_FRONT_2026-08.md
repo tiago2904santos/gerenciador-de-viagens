@@ -489,8 +489,15 @@ camadas, só em `fields/select.css:95`.
 > **Progresso de 11/08.** Depois da recontagem para 72 regras, as 7 candidatas de repouso e as 7
 > candidatas de estado não-base foram removidas/simplificadas com estilo computado estável. O
 > medidor agora separa `focus` de `focus-visible`, desliga movimento e passa no piso de repetição
-> com 0 diferenças. A E7c continua aberta para 16 contextos interativos, 8 pseudo-elementos e a
-> substituição futura do seletor de elemento nu que ainda vence as duas regras base com `:where()`.
+> com 0 diferenças. A leva seguinte passou a capturar ancestrais e os 4 pseudo-elementos do
+> inventário, e aceitou um seletor amplo para conferir também controles sem a classe. Em 54 rotas,
+> 648 combinações e 7.260 leituras, zerar a especificidade do seletor de elemento nu, retirar as 8
+> pseudo-regras redundantes e apagar o contexto órfão `.justificativa-panel` preservou 0 diferenças
+> de estilo, pseudo-estilo e estrutura. O inventário caiu para 47 regras em 13 arquivos. A última
+> leva acrescentou as rotas reais de diário e atividades: 56 rotas, 672 combinações e 7.536
+> leituras. Os ramos duplicados de diário, quick-add e `field-with-action` caíram com 0 diferenças
+> de estilo, pseudo-estilo e estrutura; o inventário terminou em 36 regras vivas de base, a11y ou contexto, em 11
+> arquivos. **A E7c está concluída.** O `NOVO-51` de valor próprio continua deliberadamente na E8.
 
 **Enunciado original da E7, para registro:**
 
