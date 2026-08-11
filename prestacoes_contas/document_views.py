@@ -17,13 +17,13 @@ from .forms import PrestacaoDespachoForm, PrestacaoServidorDocumentosForm, Prest
 from .models import PrestacaoDocumentoAnexo
 from .presenters import _anexo_assinado_info
 from .presenters import kinds_de_anexo_assinado
+from .services import marcar_servidor_em_preenchimento
+from .services import marcar_servidores_pendentes
 from .view_common import (
     _autosave_form_errors,
     _autosave_version,
     _build_identificacao,
     contexto_do_fluxo,
-    _marcar_servidor_em_preenchimento,
-    _marcar_servidores_pendentes,
     _prestacao_queryset,
     _prestacao_servidor_full,
     _prestacao_servidor_queryset,
@@ -215,7 +215,7 @@ def prestacao_arquivo_autosave(request, pc_pk):
             errors=_autosave_form_errors(form),
         )
     form.save()
-    _marcar_servidores_pendentes(prestacao)
+    marcar_servidores_pendentes(prestacao)
     return autosave_json_response(
         ok=True,
         object_id=prestacao.pk,
@@ -238,7 +238,7 @@ def prestacao_servidor_arquivo_autosave(request, ps_pk):
             errors=_autosave_form_errors(form),
         )
     form.save_anexos(ps)
-    _marcar_servidor_em_preenchimento(ps)
+    marcar_servidor_em_preenchimento(ps)
     return autosave_json_response(
         ok=True,
         object_id=ps.pk,
@@ -302,9 +302,9 @@ def _prestacao_assinado_upload(
         nome_original=nome_original,
     )
     if servidor_prestacao is not None:
-        _marcar_servidor_em_preenchimento(servidor_prestacao)
+        marcar_servidor_em_preenchimento(servidor_prestacao)
     else:
-        _marcar_servidores_pendentes(prestacao)
+        marcar_servidores_pendentes(prestacao)
     messages.success(request, "Documento assinado anexado.")
     return redirect(destino)
 
@@ -366,9 +366,9 @@ def prestacao_documento_excluir(request, pc_pk, anexo_pk):
     if arquivo:
         arquivo.delete(save=False)
     if ps_marcar is not None:
-        _marcar_servidor_em_preenchimento(ps_marcar)
+        marcar_servidor_em_preenchimento(ps_marcar)
     else:
-        _marcar_servidores_pendentes(prestacao)
+        marcar_servidores_pendentes(prestacao)
     return autosave_json_response(
         ok=True,
         object_id=prestacao.pk,

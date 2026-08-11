@@ -137,10 +137,18 @@ jobs:
         # do P-01: integracoes/google_drive (10), core (9), documentos (4),
         # oficios (4), roteiros (2) e justificativas (1). Alvo final segue
         # sendo zero; ver docs/PADRAO_SELECTORS.md.
+        #
+        # 24 → 33 (BE-14 fatia 1, NOVO-100): **o número subiu de propósito.**
+        # Prestações foi fatiada em módulos por tela, mas os cinco módulos
+        # nunca entraram em P06_SPLIT_VIEW_MODULES — 11 acessos de manager
+        # nunca foram medidos. A catraca não regrediu: ela passou a medir o
+        # que já estava no chão. A própria fatia devolveu 2 dos 11
+        # (rt_views.py foi a zero), e o saldo entra como 9. Daqui em diante
+        # volta a só descer.
         # P-05: todo `except Exception` do Drive começa com captura estruturada.
         run: >-
           python scripts/audit_django_architecture.py
-          --max-orm-em-view 24
+          --max-orm-em-view 33
           --max-drive-except-without-capture 0
           --max-sync-document-generations 0
 

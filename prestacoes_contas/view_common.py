@@ -175,19 +175,6 @@ def _build_identificacao(prestacao) -> dict:
     }
 
 
-def _marcar_servidor_em_preenchimento(ps):
-    if ps is not None:
-        ps.marcar_em_preenchimento()
-
-
-def _marcar_servidores_pendentes(prestacao):
-    """Marca em preenchimento todos os servidores ainda pendentes do ofício."""
-    if prestacao is None:
-        return
-    for ps in prestacao.servidores_prestacao.filter(status=PrestacaoServidor.STATUS_PENDENTE):
-        ps.marcar_em_preenchimento()
-
-
 def _primeiro_servidor(prestacao):
     return prestacao.servidores_prestacao.order_by("pk").first()
 

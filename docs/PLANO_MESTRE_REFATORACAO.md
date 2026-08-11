@@ -392,7 +392,13 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       **1.845 → 1.337 linhas (−27%), 57 → 33 defs.** Continua grande, mas com uma responsabilidade
       só. Sobrou `NOVO-98` (guardas defensivas do gravador, inalcançáveis pelo caminho público).
       **Fecha a corrente `BE-11`/`BE-12`/`BE-13`**
-- [ ] `BE-14` 48 sites de persistência em view, sem transação
+- [ ] `BE-14` 48 sites de persistência em view, sem transação — **eram 36**, mais 4 por método de
+      modelo que grava por dentro. **Fatia 1 (o dinheiro do RT) feita**: a persistência de
+      `rt_views.py` virou `prestacoes_contas/rt_services.py`, o módulo caiu de 305 para 203 linhas
+      com zero acessos de manager, e as gravações fora de transação foram de 36 para 33. Fecha
+      `NOVO-101` (a catraca `P-01` media 24 com 35 no chão) e `NOVO-102` (gravação em laço escondida
+      em `view_common.py`). Faltam a solicitação, os anexos e o diário — e a dos anexos **não é pôr
+      `atomic`**: precisa de `transaction.on_commit`, senão inverte o órfão do `BE-07`
 - [ ] `BE-15` numeração reimplementada 3 vezes
 - [ ] `BE-16` abstrações de `core` adotadas pela metade
 - [x] `BE-17` `core/views.py` é 75% fixture de UI Lab — **fechado pelo PR #247**, que apagou os

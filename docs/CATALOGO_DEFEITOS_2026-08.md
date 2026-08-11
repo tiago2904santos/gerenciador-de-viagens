@@ -449,6 +449,58 @@ parsing de `request.POST` por regex e grava N linhas em laço.
 **Efeito:** salvar o lote de solicitações é operação parcial — se a quinta linha falhar, as quatro
 primeiras já foram gravadas.
 
+#### Fatia 1 ✅ — o dinheiro do RT (o resto segue aberto)
+
+**Os números do enunciado estavam altos, e um ponto cego os deixava baixos.** Medido por AST antes de
+mexer: **36 gravações em banco** em módulo de view (não 48), mais **4** por método de modelo que grava
+por dentro (`ps.definir_arquivada()`) — 40 caminhos, nenhum em transação. Confirmado que
+`ATOMIC_REQUESTS` é `False` e não há middleware de transação, então a premissa se sustenta. Prestações
+concentrava 21 dos 36.
+
+**A leitura ingênua do `BE-14` está errada em `rt_views.py`, e o próprio código dizia isso.** O
+comentário em `rt_views.py:271-274` defende que o texto do RT **fique salvo** quando o valor da diária
+é recusado — *"salvar automaticamente um valor que a regra proíbe seria pior que devolver erro"*.
+Envolver o par numa transação que desfaz tudo apagaria essa decisão. Não é o que acontece: `erros` é
+valor de retorno, não exceção, então o `atomic` commita normalmente. Mas isso virou teste em vez de
+confiança.
+
+**O defeito real era mais estreito:** o laço de diárias gravava um `UPDATE` por servidor, e uma falha
+no terceiro deixava os dois primeiros gravados — dinheiro por servidor, sem nada na tela dizendo que
+faltou o outro. Medido antes da correção: `Decimal('100.00') is not None`.
+
+**Entregue:** `prestacoes_contas/rt_services.py` (240 linhas, 4 funções públicas, todas
+`@transaction.atomic` onde grava), e `rt_views.py` de 305 para **203 linhas com zero acessos de
+manager**. Os 12 nomes de campo do autosave, escritos duas vezes palavra por palavra nas duas rotas,
+viraram `CAMPOS_AUTOSAVE_RT`; a única diferença real entre elas — qual status marcar — virou o
+parâmetro `escopo`, explícito. `aplicar_diaria_recebida` ficou onde estava: a regra já estava no lugar
+certo, o que mudou é quem fecha o laço e grava.
+
+| | antes | depois |
+|---|---:|---:|
+| gravações em módulo de view | 36 | **33** |
+| funções com gravação fora de transação | 26 | **23** |
+| `rt_views.py` | 305 linhas, 2 acessos de manager | **203 linhas, 0** |
+| catraca `P-01` | 24 (medindo 24 de 35) | **33 (medindo tudo)** |
+
+Dois achados de método saíram desta fatia e estão registrados à parte: o **`NOVO-101`** (a catraca
+tinha um buraco de 11 acessos porque prestações nunca entrou na lista fixa do auditor) e o
+**`NOVO-102`** (uma gravação em laço morava em `view_common.py`, fora de qualquer varredura por nome
+de arquivo). Os dois foram fechados aqui, e os dois valem para as fatias 2 a 4.
+
+**A inversão corrigiu o teste, não o código** — e vale como método. Tirar o `@transaction.atomic` de
+`salvar_diarias_recebidas` **não reprovava nada**, porque `salvar_rt_do_autosave` também é atômica e
+`atomic` aninhado vira SAVEPOINT: o decorador de fora segurava a garantia. A função pública ficaria sem
+rede própria, e um chamador futuro que entrasse direto herdaria a meia gravação de volta — foi
+exatamente o que o `BE-12` fez com `salvar_roteiro_do_oficio`. Cada decorador ganhou o teste que só ele
+faz passar.
+
+**Falta para fechar o `BE-14`:** fatia 2 (solicitação, `views.py` — o caso exemplar de 47 linhas e 17
+ramos, mais o autosave com três `save()` no mesmo objeto), fatia 3 (anexos e arquivo,
+`document_views.py`) e fatia 4 (diário, `diario_views.py`). **A fatia 3 não é "pôr `atomic`":** ali
+`atomic` sozinho **piora**, porque inverteria o órfão que o `BE-07` corrigiu — a linha ficaria viva no
+banco com o arquivo já destruído no storage, que não faz rollback. Precisa de `atomic` +
+`transaction.on_commit`, padrão que já existe em `core/audit.py:170`.
+
 ### BE-15 🟡 Numeração de documento reimplementada 3 vezes · AUD · 2 d · risco alto
 
 (a) `oficios/services.py:425-440` — advisory lock, fallback `select_for_update`, reuso de lacunas,
@@ -6893,3 +6945,47 @@ elementos alterados nas três rotas de roteiro, e os 10 elementos-alvo mantendo 
 próprio contra o painel. As outras 40 regras da família continuam bloqueadas pelo `NOVO-93`: elas
 não precisam de mais medição, precisam de **decisão de desenho** sobre qual superfície o claro
 recebe no lugar da borda.
+### NOVO-101 ✅ RESOLVIDO · `NOVO` A catraca `P-01` media 24 com 35 no chão: prestações nunca entrou na lista · QA · 0,25 d
+
+`scripts/audit_django_architecture.py` conta acessos de manager em módulo de view, e só olha dois
+lugares: arquivos chamados `views.py` e a lista `P06_SPLIT_VIEW_MODULES`. Quando prestações foi
+fatiada em módulos por tela — como ofícios e planos de trabalho, que **estão** na lista —, os cinco
+módulos novos não foram acrescentados.
+
+Resultado medido: **11 acessos de manager fora da medição** (`diario_views` 4, `model_views` 3,
+`document_views` 2, `rt_views` 2). A catraca dizia **24**; o chão era **35**. Enquanto o buraco
+existisse, mexer em prestações não movia nenhum gate — e foi por isso que apareceu: a fatia 1 do
+`BE-14` tirou ORM de `rt_views.py` e o número não se mexeu.
+
+**Correção (`BE-14` fatia 1):** os cinco módulos entram na lista, a catraca vai a **33** — 35 menos
+os 2 que a própria fatia devolveu —, e `core/tests/test_view_module_boundaries.py` ganha a asserção
+de contagem de prestações, que é o teste que impede esvaziar a métrica por forma.
+
+**O número subiu, e a regra 5 do `AGENTS.md` continua valendo.** Ela proíbe a catraca subir por
+regressão; esta subiu por passar a medir o que já estava lá. É a diferença entre piorar e parar de
+mentir. Daqui em diante volta a só descer.
+
+**`prestacoes_contas` não entrou em `APP_MODULES`** do mesmo teste, de propósito:
+`test_facades_views_ficam_enxutas` exige `views.py` com no máximo 160 linhas, e o de prestações tem
+**743**. As duas listas medem coisas diferentes; fazer daquele arquivo uma fachada é `P-06`.
+
+**Vale conferir as outras catracas com lista fixa.** O defeito não é do número, é do **cadastro**: uma
+métrica que depende de lista escrita à mão envelhece toda vez que um app é fatiado, e falha em
+silêncio — para baixo, que é o pior sentido.
+
+### NOVO-102 ✅ RESOLVIDO · `NOVO` Gravação em laço escondida em `view_common.py`, fora de qualquer varredura · QA · fechada na medição
+
+`_marcar_servidores_pendentes` percorria os servidores pendentes de um ofício e gravava um por um, sem
+transação. Ela é chamada pelas views de RT, diário e documentos — em 11 sites — e **nenhuma varredura
+de `*views*.py` a encontrava**, porque o arquivo se chama `view_common.py`: tem "view", não tem
+"views".
+
+A metade que sobrava era pior que a média do `BE-14` porque **não se conserta sozinha**: quem já saiu
+de "pendente" deixa de entrar no filtro, então a gravação seguinte nem tenta de novo.
+
+**Correção (`BE-14` fatia 1):** as duas funções foram para `services.py` como públicas, e a que
+percorre o laço ganhou `@transaction.atomic`, com teste provado por inversão.
+
+**O registro é sobre o método, e vale para as fatias 2 a 4:** varrer por nome de arquivo perde código.
+O critério certo é "módulo alcançado a partir de `urls.py`", não "arquivo cujo nome casa com um
+padrão" — e é o mesmo mecanismo do `NOVO-101`, um andar acima.

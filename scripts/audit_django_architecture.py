@@ -32,6 +32,16 @@ P06_SPLIT_VIEW_MODULES = {
     "planos_trabalho/list_views.py",
     "planos_trabalho/per_diem_views.py",
     "planos_trabalho/view_helpers.py",
+    # `BE-14` fatia 1: prestações foi fatiada em módulos por tela como os dois
+    # apps acima, mas ninguém os acrescentou aqui — e como a contagem só olha
+    # `views.py` e esta lista, **nove acessos de manager ficaram fora da
+    # medição** desde então. A catraca dizia 24 com 33 no chão. Entram agora;
+    # o número sobe uma vez, por honestidade, e volta a só descer.
+    "prestacoes_contas/assinatura_views.py",
+    "prestacoes_contas/diario_views.py",
+    "prestacoes_contas/document_views.py",
+    "prestacoes_contas/model_views.py",
+    "prestacoes_contas/rt_views.py",
 }
 SYNC_DOCUMENT_GENERATORS = {
     "gerar_resposta_documento_oficio",
