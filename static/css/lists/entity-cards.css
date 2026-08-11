@@ -104,6 +104,18 @@
   white-space: normal;
 }
 
+.record-card--roteiro .record-card__info-value--rota {
+  white-space: normal;
+}
+
+.record-card--roteiro .fact-block__value--strong--fit {
+  font-size: clamp(1.05rem, 15cqi, 3.25rem);
+}
+
+.record-card--roteiro .fact-block__value {
+  font-size: clamp(0.95rem, 12cqi, 2.25rem);
+}
+
 /* ── SEÇÕES INTERNAS ── */
 .record-card__band {
   padding: var(--space-3) var(--space-6);

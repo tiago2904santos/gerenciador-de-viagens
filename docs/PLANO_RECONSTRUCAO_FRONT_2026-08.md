@@ -720,6 +720,12 @@ folha; a extração deve mover a família compartilhada antes de retirar o prime
 > **1.616 leituras por viewport**. E10/UI-04 continua aberta para as famílias restantes e para a
 > meta de 35%.
 
+> **Segunda fatia fechada em 11/08 (`NOVO-45/MOR`).** `roteiros-list.css` foi removido: as três
+> regras vivas de `record-card--roteiro` foram para `lists/entity-cards.css` (+261 B), 265 linhas
+> legadas e os sete imports saíram. Cada rota afetada entrega **6.919 bytes a menos**. Os
+> presenters também deixaram de calcular `faixa_lateral_class`, chave que nenhum template lia.
+> Um card real confirmou os mesmos estilos computados em claro/escuro e 1440/800/500 px.
+
 **Passo a passo.** Extraia os componentes compartilhados dos arquivos de domínio para
 `fields/`, `actions/`, `lists/` e `feedback/`, domínio por domínio, e derrube o import correspondente. Dimensione com a
 régua da E0: o que não é usado na rota não devia estar sendo entregue nela.

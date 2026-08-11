@@ -153,24 +153,6 @@ def _temporal_badge_roteiro(roteiro):
     return f"há {dias} dias", "success"
 
 
-def _roteiro_faixa_lateral_class(roteiro):
-    now = timezone.now()
-    inicio, fim = _roteiro_inicio_fim(roteiro)
-
-    status_code = getattr(roteiro, "status", "") or ""
-    if status_code == Roteiro.STATUS_RASCUNHO:
-        if inicio and now >= inicio:
-            return "roteiro-list-card--faixa-rascunho-atrasado"
-        return "roteiro-list-card--faixa-rascunho-futuro"
-
-    if status_code == Roteiro.STATUS_FINALIZADO:
-        if fim and now >= fim:
-            return "roteiro-list-card--faixa-finalizado-concluido"
-        return "roteiro-list-card--faixa-finalizado-antecipado"
-
-    return "roteiro-list-card--faixa-neutro"
-
-
 def apresentar_roteiro_card(roteiro, *, todos_trechos=False, capitais=None):
     origem_txt = _label_cidade_uf(roteiro.origem_cidade, roteiro.origem_estado)
     destinos_todos = list(roteiro.destinos.all()) if roteiro.pk else []
@@ -265,7 +247,6 @@ def apresentar_roteiro_card(roteiro, *, todos_trechos=False, capitais=None):
         "status_chip_label": status,
         "status_chip_class": status_chip_class,
         "status_variant": status_variant,
-        "faixa_lateral_class": _roteiro_faixa_lateral_class(roteiro),
         "diaria_moeda": diaria_moeda,
         "diaria_resumo": diaria_resumo,
         "diaria_extenso": diaria_extenso,
