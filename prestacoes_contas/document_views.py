@@ -16,6 +16,8 @@ from core.uploads import validate_private_document_upload
 from .forms import PrestacaoDespachoForm, PrestacaoServidorDocumentosForm, PrestacaoSolicitacaoForm
 from .models import PrestacaoDocumentoAnexo
 from .presenters import _anexo_assinado_info
+from .anexo_services import excluir_anexo
+from .anexo_services import substituir_anexo_assinado
 from .presenters import kinds_de_anexo_assinado
 from .services import marcar_servidor_em_preenchimento
 from .services import marcar_servidores_pendentes
@@ -286,25 +288,14 @@ def _prestacao_assinado_upload(
 
     # A validação vem antes da exclusão dos anteriores de propósito: recusar um
     # arquivo novo não pode custar o que já estava anexado.
-    anteriores = PrestacaoDocumentoAnexo.objects.filter(prestacao=prestacao, tipo=tipo)
-    if not substituir_todos_do_tipo:
-        anteriores = anteriores.filter(servidor_prestacao=servidor_prestacao)
-    for anexo in anteriores:
-        if anexo.arquivo:
-            anexo.arquivo.delete(save=False)
-    anteriores.delete()
-
-    PrestacaoDocumentoAnexo.objects.create(
-        prestacao=prestacao,
-        servidor_prestacao=servidor_prestacao,
+    substituir_anexo_assinado(
+        prestacao,
         tipo=tipo,
         arquivo=arquivo,
         nome_original=nome_original,
+        servidor_prestacao=servidor_prestacao,
+        substituir_todos_do_tipo=substituir_todos_do_tipo,
     )
-    if servidor_prestacao is not None:
-        marcar_servidor_em_preenchimento(servidor_prestacao)
-    else:
-        marcar_servidores_pendentes(prestacao)
     messages.success(request, "Documento assinado anexado.")
     return redirect(destino)
 
@@ -357,18 +348,10 @@ def prestacao_documento_excluir(request, pc_pk, anexo_pk):
         pk=anexo_pk,
         prestacao=prestacao,
     )
-    ps_marcar = anexo.servidor_prestacao
     # BE-07: apagar o arquivo primeiro zera `FieldFile.name`, e com `nome_original`
     # vazio o `__str__` do anexo passava a devolver None — o que derrubava o sinal
-    # de auditoria no pre_delete. A linha sai primeiro; o arquivo, depois.
-    arquivo = anexo.arquivo if anexo.arquivo else None
-    anexo.delete()
-    if arquivo:
-        arquivo.delete(save=False)
-    if ps_marcar is not None:
-        marcar_servidor_em_preenchimento(ps_marcar)
-    else:
-        marcar_servidores_pendentes(prestacao)
+    # de auditoria no pre_delete. A linha sai primeiro; o arquivo, no `on_commit`.
+    excluir_anexo(anexo, prestacao)
     return autosave_json_response(
         ok=True,
         object_id=prestacao.pk,

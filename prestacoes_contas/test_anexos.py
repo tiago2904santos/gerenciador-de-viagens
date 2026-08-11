@@ -186,7 +186,13 @@ class AnexoExclusaoTests(PrestacaoFixturesMixin, TestCase):
         caminho = Path(self.anexo.arquivo.path)
         self.assertTrue(caminho.exists())
 
-        response = self.client.post(self.url())
+        # `BE-14` fatia 3: a remoção do arquivo passou a ser agendada com
+        # `transaction.on_commit`, para que um rollback nunca devolva a linha ao banco
+        # apontando para um arquivo já destruído. `TestCase` envolve cada teste numa
+        # transação desfeita no fim, então o callback só roda dentro deste bloco. A
+        # intenção do teste não mudou — o arquivo tem de sair do disco.
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.post(self.url())
 
         self.assertTrue(response.json()["ok"])
         self.assertFalse(

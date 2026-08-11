@@ -33,7 +33,6 @@ fatia sem mudar de intenção.
 from __future__ import annotations
 
 from pathlib import Path
-from unittest import expectedFailure
 from unittest import mock
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -41,6 +40,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from prestacoes_contas.models import PrestacaoDocumentoAnexo
+from prestacoes_contas.models import PrestacaoServidor
 from prestacoes_contas.test_helpers import PrestacaoFixturesMixin
 
 PDF = b"%PDF-1.4\n%%EOF\n"
@@ -86,7 +86,6 @@ class UploadDeAssinadoNaoPodeDestruirOAnteriorTests(PrestacaoFixturesMixin, Test
         self.assertEqual(restantes.count(), 1)
         self.assertEqual(restantes.first().nome_original, "despacho-novo.pdf")
 
-    @expectedFailure
     def test_falha_ao_criar_o_novo_nao_pode_destruir_o_anterior(self):
         """**Perda de dado, e reprova hoje.**
 
@@ -95,7 +94,8 @@ class UploadDeAssinadoNaoPodeDestruirOAnteriorTests(PrestacaoFixturesMixin, Test
         banco —, o documento assinado anterior não existe mais em lugar nenhum. Não é
         gravação parcial: é destruição.
 
-        `expectedFailure` só no commit da rede; o commit do service tira o decorador.
+        Reprovava no commit da rede; passou a valer quando a exclusão das linhas foi
+        para dentro da transação e a dos arquivos para o `on_commit`.
         """
         caminho_antigo = Path(self.anterior.arquivo.path)
         original = PrestacaoDocumentoAnexo.save
@@ -158,7 +158,6 @@ class ExclusaoDeAnexoTests(PrestacaoFixturesMixin, TestCase):
         self.assertFalse(PrestacaoDocumentoAnexo.objects.filter(pk=self.anexo.pk).exists())
         self.assertFalse(caminho.exists(), "arquivo órfão no storage")
 
-    @expectedFailure
     def test_falha_depois_de_apagar_devolve_a_linha_e_preserva_o_arquivo(self):
         """A garantia que esta fatia entrega. **Reprova hoje.**
 
@@ -176,12 +175,15 @@ class ExclusaoDeAnexoTests(PrestacaoFixturesMixin, TestCase):
         """
         caminho = Path(self.anexo.arquivo.path)
 
-        def falhar(_servidor_prestacao):
+        def falhar(*args, **kwargs):
             raise RuntimeError("falha ao marcar o status depois de excluir")
 
-        with mock.patch(
-            "prestacoes_contas.document_views.marcar_servidor_em_preenchimento", falhar
-        ):
+        # A falha é injetada em `PrestacaoServidor.save`, e não num nome de módulo, de
+        # propósito: a marcação de status mudou de arquivo nesta fatia, e um teste que
+        # aponta para o caminho do import passaria a medir a estrutura em vez do
+        # comportamento. Aqui o ponto de injeção é o mesmo antes e depois — a primeira
+        # escrita que acontece **depois** da exclusão da linha.
+        with mock.patch.object(PrestacaoServidor, "save", falhar):
             with self.assertRaises(RuntimeError):
                 self.client.post(self.url())
 
