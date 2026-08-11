@@ -385,7 +385,9 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       lista do `BE-14`. Sobrou `NOVO-92` (a tradução de ação do rodapé, copiada em cada passo)
 - [ ] `BE-13` `roteiro_logic.py` fora do contrato de camadas — **fatia 1 (parsing de request) feita**:
       `request` no módulo caiu de 23 ocorrências para 1, os 6 objetos falsos e o parâmetro morto de
-      `_validate_roteiro_state` sumiram, 2 invólucros apagados. Faltam contexto e persistência
+      `_validate_roteiro_state` sumiram, 2 invólucros apagados. **Fatia 2 (contexto + invólucros)
+      feita**: o módulo saiu de 1.829 para 1.579 linhas e de 55 para 37 defs; a fachada do contexto
+      migrou de service para presenter. Falta a persistência
 - [ ] `BE-14` 48 sites de persistência em view, sem transação
 - [ ] `BE-15` numeração reimplementada 3 vezes
 - [ ] `BE-16` abstrações de `core` adotadas pela metade
