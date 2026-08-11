@@ -1,6 +1,6 @@
 """`BE-13` fatia 3 — a persistência do editor de roteiro.
 
-Estas funções vieram de `roteiros/roteiro_logic.py`, onde eram privadas e conviviam com
+Estas funções vieram de `roteiros/services/editor_state_builder.py`, onde eram privadas e conviviam com
 parsing de request e montagem de contexto. Gravar é trabalho de service
 (`docs/PADRAO_APP.md:8`), e é só isso que elas fazem.
 

@@ -4,7 +4,7 @@ from decimal import Decimal, InvalidOperation
 from django.utils import timezone
 
 from roteiros.services import editor_persistence
-from roteiros import roteiro_logic
+from roteiros.services import editor_state_builder
 from roteiros.models import Roteiro
 from roteiros.services.editor_state import dedupe_roteiro_loop_retorno_final
 from roteiros.services.roteiro_editor import _apply_saved_map_route_from_post
@@ -107,7 +107,7 @@ def _apply_roteiro_snapshot(roteiro, snapshots):
     if not isinstance(state, dict):
         return
     state = dedupe_roteiro_loop_retorno_final(state)
-    validated = roteiro_logic._validate_roteiro_state(state)
+    validated = editor_state_builder._validate_roteiro_state(state)
     # Mesmo incompleto: persiste trechos/destinos parseados (datas podem ser null).
     editor_persistence.salvar_roteiro_avulso_from_roteiro_state(
         roteiro, state, validated, diarias_resultado=None
