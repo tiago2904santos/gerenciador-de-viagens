@@ -6286,3 +6286,91 @@ há.
 
 **Resta:** 40 `!important` (38 no arquivo de tema, 2 de acessibilidade) e as 68 regras em si, que a
 análise por família ainda vai separar entre contexto, estado, tema e divergência real.
+
+### NOVO-95 · `NOVO` A prova por não-interseção não vale: a cascata não é monotônica · QA · fechada na medição
+
+Erro de método cometido na **E9-a**, detectado pela própria régua antes de virar commit. Fica
+registrado porque a ideia é tentadora e vai ocorrer a quem retomar a etapa.
+
+**O raciocínio que parecia sólido.** Para descobrir quais das 307 regras só-escuras de cor podem
+sumir, a bisecção custaria ~9 rodadas de captura completa. O atalho proposto foi:
+
+> Apague **todas** as candidatas de uma vez e meça o conjunto `S` de elementos que mudaram. Para
+> uma regra `R`, se `R` não casa com nenhum elemento de `S`, apagar `R` não muda nada — os
+> elementos fora de `S` não mudaram nem com tudo removido, e os de `S` não são tocados por `R`.
+
+Com isso, 307 candidatas viraram **36 provadas** (inócua ∧ exercitada pelo corpus ∧ não de lista
+mista).
+
+**A medição derrubou.** Removendo exatamente essas 36: **75 elementos mudaram**, contra um piso de
+ruído de 4. E o diagnóstico está no detalhe: **71 dos 75 não estavam em `S`**.
+
+Removendo um **subconjunto**, mudaram elementos que removendo **tudo** não mudavam.
+
+**Por que.** O argumento supõe monotonicidade — que remover menos regras produz um subconjunto das
+mudanças. A cascata não funciona assim. Se `A` e `B` competem pelo mesmo elemento e `A` vence:
+remover só `A` **promove `B`**, e o valor final pode diferir tanto do estado original quanto do
+estado sem as duas. Com `A` e `B` fora, o elemento cai na regra base — que pode calhar de ser o
+valor original, e aí ele nem aparece em `S`.
+
+**O que sobra de válido.** O instrumento (`sonda_mesmo_tema.py`: mesmo tema, dois estados de
+código, 41.754 elementos chaveados por caminho no DOM, piso de ruído de 4 elementos em
+`justificativas-lista`) está certo e é rápido — uma captura completa. O que não vale é **inferir**
+o efeito de um diff a partir do efeito de outro. **Meça o diff que você pretende entregar**, não um
+diff maior do qual você deduz.
+
+**Consequência para a E9-a:** volta para bisecção de verdade, ou para lotes pequenos medidos um a
+um. O custo que o atalho tentava evitar é real e tem de ser pago.
+
+### NOVO-96 ✅ RESOLVIDO · 🔴 `NOVO` A faixa de filtros não tinha fundo no tema claro · UI · 0,25 d
+
+Primeira entrega da **E9**, e um defeito visual real que estava escondido atrás de uma variável.
+
+`lists/list-header.css:85` declara, em regra **sem predicado de tema**:
+
+```css
+.list-header__rail {
+  /* Mesmo token da área interna dos cards (.record-card__band). */
+  background: var(--card-family-bg);
+```
+
+`--card-family-bg` existia **só** em `base/03-theme-dark.css:299`. No tema claro a leitura era
+inválida (*invalid at computed-value time*) e a propriedade caía para o valor inicial. Medido no
+navegador, antes:
+
+| elemento | claro | escuro |
+|---|---|---|
+| `.list-header__rail` | **transparente** | superfície escura |
+
+O comentário logo acima da declaração chama o elemento de "faixa clara abaixo do título". Ele não
+era faixa nenhuma: a barra de filtros de **toda lista do sistema** aparecia sem fundo no tema que o
+sistema mostra para quem nunca escolheu tema.
+
+**Correção.** As nove definições `--card-family-*` passam a existir também no `:root` de
+`base/tokens.css`. Os valores são **os mesmos** do arquivo escuro, sem uma vírgula de diferença,
+porque todos são `var(--color-*)` — a mesma expressão resolve claro no `:root` e escuro no bloco de
+tema. Como `tokens.css` carrega antes de `03-theme-dark.css`, o escuro continua ganhando com os
+próprios valores, e as definições de lá viraram redundantes (a E9-a decide se saem).
+
+**Prova, com o instrumento novo da etapa** (`sonda_mesmo_tema.py`: mesmo tema, dois estados de
+código, 41.754 elementos chaveados por caminho no DOM, `transition` e `animation` desligadas):
+
+| | |
+|---|---:|
+| elementos alterados no **claro** | **47**, em 33 das 86 capturas |
+| elementos alterados no **escuro** | **2** |
+
+Os 2 do escuro são `justificativas-lista`, e são **exatamente o piso de ruído** medido capturando a
+mesma base duas vezes — o mesmo par de caminhos, causado por conteúdo que varia entre capturas.
+**O tema escuro não se moveu.**
+
+### Anotação: o `.record-card__band` é outro defeito, e continua aberto
+
+Ao medir esta correção ficou claro que `.record-card__band` **não** é o mesmo caso, embora o
+comentário do `list-header.css` o cite como fonte. Ele segue transparente no claro depois da
+correção, porque a sua única declaração de fundo mora dentro de regra predicada em `dark`
+(`theme-dark-components.css:4942`): no claro não existe regra nenhuma para ele.
+
+É a classe "componente cujo desenho só existe no escuro" — a mesma que barrou a família **8b**
+(`NOVO-93`) e que apareceu na medição da **8g** (`NOVO-94`, com `.empty-state__mark`). Token não
+resolve; precisa de regra base, e isso é decisão de desenho.
