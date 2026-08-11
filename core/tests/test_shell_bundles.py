@@ -121,6 +121,29 @@ class ShellBundleGateTests(SimpleTestCase):
             form_shell.index(">>> css/actions/action-system.css >>>"),
         )
 
+        style = (ROOT / "static/css/style.css").read_text(encoding="utf-8")
+        picker_import = '@import url("./fields/search-picker.css");'
+        select_import = '@import url("./fields/select.css");'
+        self.assertNotIn(picker_import, style)
+        self.assertNotIn(picker_import, shell)
+        self.assertIn(picker_import, form_shell)
+        self.assertIn(select_import, style)
+        self.assertIn(select_import, shell)
+        self.assertIn(select_import, form_shell)
+
+        self.assertLess(
+            form_shell.index('@import url("./lists/cards.css");'),
+            form_shell.index(picker_import),
+        )
+        self.assertLess(
+            form_shell.index(picker_import),
+            form_shell.index(select_import),
+        )
+        self.assertLess(
+            form_shell.index(select_import),
+            form_shell.index('@import url("./layout/stages.css");'),
+        )
+
     def test_ht04_form_css_consumers_choose_the_form_shell(self):
         marker = "{% include 'includes/form_components_css.html' only %}"
         for relative in FORM_COMPONENT_STYLE_TEMPLATES:

@@ -2260,9 +2260,10 @@ carregar sob demanda. O shell global caiu de **266.254 para 108.937 bytes** (**�
 Nas rotas que precisam do bundle de formulário, os dois arquivos somam **248.402 bytes**, ainda
 **17.852 bytes abaixo** do shell anterior. O gate mantém o inventário completo dos 12 scripts de
 página que chamam essas APIs e falha se um consumidor novo não for classificado. Os ~37 KB de CSS
-de `search-picker`/`select` continuam abertos na fronteira `UI-04`/E10; por isso o ID permanece
-parcial. Em 11/08, a fatia adjacente de `date-picker`/`file-picker` saiu do shell padrão: rotas sem
-esses componentes deixaram de receber 25.615 bytes, sem diferença visual computada.
+de `search-picker`/`select` continuam na fronteira `UI-04`/E10. Em 11/08,
+`date-picker`/`file-picker` saíram do shell padrão (−25.615 bytes nas rotas sem eles) e
+`search-picker.css` também passou à variante consumidora (−27.227 bytes). `select.css` ainda mistura
+o custom select com selects nativos globais; por isso o ID permanece parcial.
 
 ### HT-05 ✅ RESOLVIDO · 🟡 `empty_state.html` quebra a ordem de headings · AUD+MED · 0,5 d
 
@@ -2734,6 +2735,13 @@ na posição original da cascata; 18 templates consumidores a escolhem explicita
 esses componentes recebem **25.615 bytes a menos**. Servidores, Eventos e Termos foram comparados
 por página inteira em claro/escuro e 1440/800/500 px: **2.632 leituras por viewport**, com os mesmos
 estilos computados. `search-picker.css` e `select.css` ainda mantêm o `HT-04` aberto na E10.
+
+**Quarta família fechada em 11/08 (`HT-04`, parcial).** O import de `search-picker.css` agora é
+injetado pelo gerador somente na variante consumidora, na mesma posição histórica. O shell padrão
+deixa de buscar **27.227 bytes**. Servidores e Eventos foram comparados por página inteira em
+claro/escuro e 1440/800/500 px: **1.704 leituras por viewport**, com estilos idênticos.
+`select.css` permanece global porque também estiliza selects nativos de `.list-panel`; separá-lo
+sem regressão exige antes dividir essa família.
 
 ---
 
