@@ -711,6 +711,51 @@ do que o catálogo sugeria.
 **Correção:** `core/numeracao.py::reservar_numero(...)`. Teste de concorrência com duas threads
 **antes** de qualquer mudança.
 
+> **Enunciado corrigido pela medição (11/08), em três pontos.**
+>
+> 1. **As linhas citadas acima envelheceram.** Os lugares reais são
+>    `oficios/services.py:607-677`, `ordens_servico/models.py:225-287` e
+>    `planos_trabalho/models.py:589-638`.
+> 2. **"OS não reaproveita número cancelado" está impreciso nos dois lados.** O ofício também
+>    não reaproveita cancelado — `cancelar_oficio` só marca a flag; quem cria a lacuna é
+>    `excluir_oficio`. E a OS **não tem caminho de cancelamento vivo**: herda `CancelavelModel`,
+>    mas nenhuma chamada a `.cancelar()` existe no app. O que ela tem é exclusão, que apaga sem
+>    registrar lacuna. A convergência que a fatia 2 entrega é, portanto, **reuso por exclusão** —
+>    a linha some do banco, então não há risco de dois documentos emitidos com o mesmo número.
+> 3. **`area` é `NOT NULL` nos três modelos desde o `DB-02`**, mas o ramo `area IS NULL` do lock
+>    **não é morto**: a reserva acontece antes do `save()`, e é o `save()` que preenche a área.
+>    No instante do lock o `area_id` ainda pode ser `None`. Isto foi medido, não presumido — o
+>    plano previa apagar o ramo e a medição o salvou.
+
+#### Fatia 1 ✅ — a mecânica sai das três cópias
+
+O que estava reimplementado três vezes **não era a política de escolha**. Reuso de lacuna, piso e
+contador são diferentes porque os documentos são diferentes, e unificá-los seria apagar desenho. O
+que era cópia literal é a **mecânica**: serializar o escopo e repetir quando outro processo vence a
+corrida — ~60 linhas idênticas entre ofício e OS, com a mesma fórmula
+`(((area_id or 0) * 4096) + (ano % 4096)) % 2_147_483_647` e só a constante do namespace mudando.
+
+`core/numeracao.py` fica com `bloquear_escopo_numeracao` e `reservar_numero`; a escolha entra como
+callback e continua em casa.
+
+**Apareceu um quarto site**, que o enunciado não citava: a edição de número **manual**
+(`atualizar_oficio_dados_viajantes`) também tomava o lock e também casava o nome da constraint.
+Ele passou a usar o mesmo lock **sem** o retry — e isso é o desenho certo, não uma omissão: número
+digitado pelo operador não pode ser trocado em silêncio, e ali a colisão vira
+`OficioNumeroConflitoError`, que a tela sabe apresentar.
+
+**A detecção de colisão deixou de ler a mensagem do banco** — ver `NOVO-109`, que é o achado maior
+desta fatia.
+
+**O teste de concorrência não prova o lock, e isso só apareceu na inversão.** Removendo o advisory
+lock, o teste de duas threads **continua passando**: as duas escolhem o mesmo número, uma colide, o
+retry escolhe outro, e o resultado final ainda é `[1, 2]`. Ele provava "lock **ou** retry". O que
+separa as duas garantias é **contar as escolhas**: com o escopo serializado cada thread escolhe uma
+vez só, e toda escolha além do número de threads é uma colisão que o retry teve de limpar — que é
+exatamente o que o lock existe para evitar. `test_o_lock_evita_a_colisao_em_vez_de_apenas_se_recuperar_dela`
+mede isso, e reprova 3 de 3 execuções com o lock desligado.
+
+
 ### BE-16 🟡 Abstrações de `core` adotadas pela metade · AUD · 2 d · risco baixo
 
 - `core/pagination.contexto_paginacao`: 2 de 14 listas; as outras 12 instanciam `Paginator` direto
@@ -7431,3 +7476,44 @@ de usar este número como alvo**. Ele já fez o trabalho dele.
 `eventos/views.py::detalhe`. O contador continua no repositório como relatório, e o catálogo passa a
 registrar, ao lado de cada número, quantos dos itens são `delete()` e quantos são ramo exclusivo —
 para que o próximo leitor não tome 17 por 17 defeitos.
+
+### NOVO-109 ✅ RESOLVIDO · `NOVO` O retry da numeração só funcionava no PostgreSQL, e o teste que o cobria fabricava a prova · QA · 0,25 d
+
+Achado na fatia 1 do `BE-15`, escrevendo um teste de colisão **real** em vez de sintética.
+
+As três implementações de numeração decidiam "isto foi corrida perdida?" lendo o texto do
+`IntegrityError`:
+
+```python
+if "oficios_oficio_area_ano_numero_unique" not in str(exc):
+    raise
+```
+
+**A mensagem não é portátil.** Medido nos dois bancos que a suíte roda:
+
+| banco | mensagem |
+|---|---|
+| PostgreSQL | `duplicate key value violates unique constraint "oficios_oficio_area_ano_numero_unique"` |
+| SQLite | `UNIQUE constraint failed: oficios_oficio.area_id, oficios_oficio.ano, oficios_oficio.numero` |
+
+O SQLite **não cita o nome da constraint**. O `not in` era sempre verdadeiro e o retry
+re-levantava na primeira colisão: em metade da suíte o laço de três tentativas era código morto.
+
+**Em produção não havia defeito** — produção é PostgreSQL, e lá o casamento funcionava. O defeito
+é de *garantia*: metade das execuções não exercia o mecanismo, e ninguém saberia se a parte
+PostgreSQL quebrasse.
+
+**E o teste que existia não teria avisado.** `test_reserva_repete_apos_colisao_de_worker_antigo`
+levantava um `IntegrityError` **fabricado**, já contendo o texto que o código procurava. Ele provava
+que o laço repete; nunca provou que a mensagem do banco casa com o nome procurado. Um teste que
+constrói a própria evidência não é rede — é espelho.
+
+**Correção (fatia 1 do `BE-15`):** a pergunta passou a ser feita ao banco, não à mensagem dele —
+*o número que eu escolhi está ocupado agora?* Se está, foi colisão e vale repetir; se não está, a
+violação foi de outra constraint e sobe. É portátil, sobrevive a renomear a constraint, e é **mais
+estreita** que o casamento por texto, porque não engole violação alheia. Os dois testes de colisão
+(ofício e OS) passaram a forçar uma colisão real e valem igual nos dois bancos.
+
+**Vale procurar a mesma forma noutros lugares:** qualquer `except IntegrityError` que decida por
+substring da mensagem tem este problema. Uma varredura por `not in str(exc)` é barata e ainda não
+foi feita.
