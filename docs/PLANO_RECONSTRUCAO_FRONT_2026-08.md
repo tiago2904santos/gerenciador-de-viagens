@@ -712,11 +712,12 @@ tem que bater: uso acima de 35% por rota**, contra os 10,1%–11,8% de hoje.
    `{% block extra_js %}`/`{% block extra_css %}` que `base.html:12-13,46` já tem. Mitigue a
    regressão silenciosa — template que esquece de declarar — com regra no auditor ou teste de
    fumaça por tela.
-2. **`JS-07`** — "fechar ao clicar fora / Esc" em 4 cópias (`picker.js`, `date-picker.js`,
-   `cv-select.js` — que a E2 já apagou —, `picker-select.js`). `components/overlay.js:471-503` já
-   tem a base. **Correção do catálogo que você precisa conhecer:** nenhuma das quatro fecha em
-   `scroll`/`resize`; só `date-picker.js:794-795` **reposiciona**. Não implemente um fechamento que
-   não existia.
+2. **`JS-07` ✅** — "fechar ao clicar fora / Esc" estava em 4 cópias (`picker.js`, `date-picker.js`,
+   `cv-select.js` — que a E2 já apagou —, `picker-select.js`). `components/overlay.js` já tinha
+   a base. **Correção do catálogo que você precisa conhecer:** nenhuma das quatro fecha em
+   `scroll`/`resize`; só `date-picker.js` **reposiciona**. Não implemente um fechamento que
+   não existia. Fechado com `CV.overlay.attachDismiss`: **3 implementações vivas → 1 contrato**,
+   mantendo o painel portalizado dentro da zona interativa e o reposicionamento do calendário.
 3. **`JS-08`** — corte por componente, não pelo bloco. A coluna "templates que usam" do enunciado
    original estava errada: `segment-nav.js` chega a ≥4 templates e `file-picker.js` a ≥6, por
    `{% include %}` com variável. O ganho é menor do que o catálogo prometia.

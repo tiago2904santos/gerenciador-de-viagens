@@ -1693,7 +1693,7 @@ quebra o roteamento de foco em 6 páginas, em silêncio.
 **Correção:** trocar por atributo dedicado (`data-entity-picker-root`) e deixar a classe só para
 estilo — **antes** de qualquer renomeação de CSS.
 
-### JS-07 🟡 "Fechar ao clicar fora / Esc" reimplementado 4 vezes · AUD · 2 d · risco médio
+### JS-07 ✅ RESOLVIDO (E11) · "Fechar ao clicar fora / Esc" reimplementado 4 vezes · AUD · 2 d · risco médio
 
 `components/picker.js:798,828`, `components/cv-date-picker.js:728-731,787-788`,
 `cv-select.js:131,179,302,313`, `components/picker-select.js:394,432` — quatro implementações sem
@@ -1704,6 +1704,13 @@ função compartilhada.
 > `cv-date-picker.js:794-795` — e mesmo ele apenas **reposiciona** o painel aberto
 > (`if (isOpen) positionPanel()`), não o fecha. **Nenhuma das quatro** fecha em scroll ou resize.
 > A duplicação continua real; a divergência citada, não.
+
+**Fechamento (11/08/2026).** Depois da remoção de `cv-select.js` na E2, restavam três
+implementações vivas. `components/overlay.js` agora expõe `CV.overlay.attachDismiss`, com uma zona
+interna que aceita painéis portalizados, predicado de abertura, escopo opcional de Escape e
+`destroy()`. `picker.js`, `date-picker.js` e `picker-select.js` usam esse contrato; o calendário
+continua apenas reposicionando em `scroll`/`resize`. Testes de runtime cobrem clique externo,
+painel portalizado, Escape condicional e desmontagem; o gate JavaScript fechou com **43 testes**.
 
 ### JS-08 🟡 11% do bundle global atende menos de 1% das páginas · AUD · 2 d · risco médio
 

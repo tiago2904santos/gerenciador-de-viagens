@@ -883,11 +883,6 @@
 
     input.addEventListener("keydown", (e) => {
       const visible = filteredItems();
-      if (e.key === "Escape") {
-        e.preventDefault();
-        setOpen(false);
-        return;
-      }
       if (e.key === "Enter") {
         e.preventDefault();
         const item = visible[Math.max(activeIndex, 0)];
@@ -910,20 +905,19 @@
       }
     });
 
-    /* Fecha dropdown ao clicar fora.
-
-       JS-02 — este listener é por instância. Sem `destroy` ele sobrevivia à
-       remoção da linha do formulário (`location-rows`) e ao ciclo de
-       reset+reinit dos wizards, acumulando um handler por picker já morto,
-       cada um segurando a closure inteira do componente. */
-    const onDocumentClick = (e) => {
-      if (!root.contains(e.target) && e.target !== select) setOpen(false);
-    };
-    document.addEventListener("click", onDocumentClick);
+    /* JS-07 — clique externo e Escape compartilham o contrato de overlay.
+       O dropdown não entra em `inside`: preserva o comportamento anterior do
+       picker, cujo listener considerava apenas a raiz e o select nativo. */
+    const dismissBinding = window.CV.overlay.attachDismiss({
+      inside: [root, select],
+      isOpen: () => isOpen,
+      escapeWhen: (e) => e.target === input,
+      onDismiss: () => setOpen(false),
+    });
     instancias.push({
       root,
       desmontar() {
-        document.removeEventListener("click", onDocumentClick);
+        dismissBinding.destroy();
       },
     });
 

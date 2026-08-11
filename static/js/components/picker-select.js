@@ -391,10 +391,6 @@
             }
           }
           break;
-        case 'Escape':
-          e.preventDefault();
-          self._close();
-          break;
         case 'Tab':
           self._close();
           break;
@@ -427,12 +423,13 @@
       self._clearFocus();
     });
 
-    // Clique fora → fechar (o menu pode estar "flutuando" no body via
-    // CV.overlay, entao um clique nele nao conta como "fora").
-    document.addEventListener('click', function (e) {
-      if (self._isOpen && !self.root.contains(e.target) && !self.menu.contains(e.target)) {
-        self._close();
-      }
+    // JS-07 — o menu pode estar flutuando em body, mas continua dentro da
+    // zona interativa. Escape mantém o escopo anterior: somente o trigger.
+    this._dismiss = window.CV.overlay.attachDismiss({
+      inside: [self.root, self.menu],
+      isOpen: function () { return self._isOpen; },
+      escapeWhen: function (e) { return e.target === self.trigger; },
+      onDismiss: function () { self._close(); },
     });
   };
 
