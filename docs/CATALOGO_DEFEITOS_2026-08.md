@@ -6725,3 +6725,28 @@ O corpus adicional também foi refeito sobre o banco descartável: **54 rotas, 3
 1.488 leituras**. A conferência de status abortou corretamente ao encontrar `/eventos/1/` sem seed;
 a rota não foi contada como cobertura. Continuam para a próxima leva os 16 contextos interativos e
 os 8 pseudo-elementos (`::placeholder`/`::-webkit-scrollbar-*`).
+
+### NOVO-54 (continuação 4) 🟠 Pseudo-elementos medidos e a classe passa a possuir a base · UI · 0,5 d
+
+A régua passou a fotografar `::placeholder`, `::-webkit-scrollbar`, `-track` e `-thumb`, além de
+registrar a cadeia de ancestrais de cada controle. Também ganhou `--seletor`, porque mudar o seletor
+nu de `input/select/textarea` alcança controles que ainda não carregam `.cv-field__control` e medir
+só a classe não provaria neutralidade do corte.
+
+Duas capturas idênticas do novo formato deram o mesmo SHA-256: **54 rotas, 312 combinações e 1.272
+leituras** da classe. A captura ampla de `input, select, textarea` mediu **648 combinações e 7.260
+leituras**. Nela, trocar os seletores base de elemento por `:where(input, select, textarea)` e
+`:where(textarea)` produziu **0 diferenças de estilo, pseudo-estilo e estrutura**; 1.596 diferenças
+eram apenas valores dinâmicos de controles ocultos e ficaram corretamente fora do estilo. Como
+`field.css` é carregado depois de `base.css`, a regra canônica da classe passa finalmente a possuir
+a aparência sem quebrar controles legados que ainda dependem do seletor de elemento.
+
+As oito regras de pseudo-elemento foram retiradas juntas e repetidas contra o mesmo corpus amplo:
+**0 diferenças de pseudo-estilo**. Todas eram redundantes. O bloco
+`.justificativa-panel .cv-field__control--textarea` também caiu: o grep do repositório inteiro só
+encontrava a própria regra e `test_wizard_justificativa.py` exige explicitamente que essa classe não
+seja renderizada.
+
+O inventário atual fica em **47 regras, 13 arquivos, 0 pseudo-regra**. A E7c permanece parcial: os
+contextos de diário e `field-with-action` ainda não renderizam um `.cv-field__control` no corpus, e
+serão classificados sem inferir ausência a partir de rota visitada.

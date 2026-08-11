@@ -489,8 +489,12 @@ camadas, só em `fields/select.css:95`.
 > **Progresso de 11/08.** Depois da recontagem para 72 regras, as 7 candidatas de repouso e as 7
 > candidatas de estado não-base foram removidas/simplificadas com estilo computado estável. O
 > medidor agora separa `focus` de `focus-visible`, desliga movimento e passa no piso de repetição
-> com 0 diferenças. A E7c continua aberta para 16 contextos interativos, 8 pseudo-elementos e a
-> substituição futura do seletor de elemento nu que ainda vence as duas regras base com `:where()`.
+> com 0 diferenças. A leva seguinte passou a capturar ancestrais e os 4 pseudo-elementos do
+> inventário, e aceitou um seletor amplo para conferir também controles sem a classe. Em 54 rotas,
+> 648 combinações e 7.260 leituras, zerar a especificidade do seletor de elemento nu, retirar as 8
+> pseudo-regras redundantes e apagar o contexto órfão `.justificativa-panel` preservou 0 diferenças
+> de estilo, pseudo-estilo e estrutura. O inventário caiu para 47 regras em 13 arquivos. A E7c
+> continua aberta somente para os contextos interativos que ainda não renderizam alvo no corpus.
 
 **Enunciado original da E7, para registro:**
 

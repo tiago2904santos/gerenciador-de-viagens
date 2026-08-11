@@ -787,19 +787,6 @@ html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
   background-color: var(--step1-panel);
 }
 
-.pt-texto-block .cv-field__control--textarea::-webkit-scrollbar {
-  width: 4px;
-}
-
-.pt-texto-block .cv-field__control--textarea::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.pt-texto-block .cv-field__control--textarea::-webkit-scrollbar-thumb {
-  background: var(--color-border-strong);
-  border-radius: 2px;
-}
-
 /* ── Etapa 2 · Deslocamento e diárias ────────────────────────────────────────
    Linha única com 4 colunas na ordem: data de saída · hora de saída ·
    data de chegada · hora de chegada. O date-picker (range) embrulha as duas

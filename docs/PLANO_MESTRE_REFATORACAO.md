@@ -435,8 +435,9 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [x] `NOVO-51` os 2 apelidos puros da família `cv-field` (e 15 bordas invisíveis) · **E7b**
 - [ ] `NOVO-51` os 2 restantes têm valor próprio; o do foco é decisão de a11y · **E8**
 - [ ] `NOVO-54` 72 regras (30 `!important` e 7 regras já fora); as 7 candidatas de estado não-base
-      também fecharam por medição (2 blocos removidos e 5 grupos de seletor simplificados). Restam
-      os contextos interativos, os pseudo-elementos e a retirada futura do seletor de elemento nu · **E7c**
+      também fecharam por medição (2 blocos removidos e 5 grupos de seletor simplificados). A regra
+      base agora vence o seletor de elemento cru com neutralidade medida; as 8 pseudo-regras e 1
+      contexto órfão caíram. Restam os contextos interativos sem alvo no corpus · **E7c**
 - [ ] `NOVO-58` 🔴 claro e escuro são dois desenhos — o redesenho passa a valer no claro · **E8**
 - [ ] `UI-02` tema escuro deixa de ser camada de exceção (5.619 linhas, 190 `!important`) · **E9**
 - [ ] `UI-04` **97** imports de CSS de outro domínio, em **36** templates · **E10**

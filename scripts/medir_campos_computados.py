@@ -81,6 +81,23 @@ PROPRIEDADES = [
     "font-size", "font-weight", "opacity",
 ]
 
+# Pseudo-elementos que aparecem no inventario de `.cv-field__control`. Eles
+# precisam ser pedidos explicitamente: `getComputedStyle(el)` fotografa apenas
+# o elemento principal e, portanto, um diff vazio antigo nao dizia nada sobre
+# placeholder ou scrollbar.
+PSEUDO_ELEMENTOS = (
+    "::placeholder",
+    "::-webkit-scrollbar",
+    "::-webkit-scrollbar-track",
+    "::-webkit-scrollbar-thumb",
+)
+
+PROPRIEDADES_PSEUDO = [
+    "background-color", "border-radius", "color", "font-weight", "opacity", "width",
+]
+
+SELETOR_PADRAO = ".cv-field__control"
+
 ESTADOS = (
     (),
     ("hover",),
@@ -95,14 +112,36 @@ ESTADOS = (
 )
 
 JS_COLETA = """
-(props) => Array.from(document.querySelectorAll('.cv-field__control')).map((el, i) => {
+({selector, props, pseudos, propsPseudo}) => Array.from(document.querySelectorAll(selector)).map((el, i) => {
   const c = getComputedStyle(el);
   const estilo = {};
   props.forEach(p => { estilo[p] = c.getPropertyValue(p); });
+  const pseudo = {};
+  pseudos.forEach(nome => {
+    const computado = getComputedStyle(el, nome);
+    pseudo[nome] = {};
+    propsPseudo.forEach(p => { pseudo[nome][p] = computado.getPropertyValue(p); });
+  });
+  const contexto = [];
+  let atual = el;
+  while (atual && atual.nodeType === Node.ELEMENT_NODE) {
+    contexto.push({
+      tag: atual.tagName.toLowerCase(),
+      id: atual.id || '',
+      classes: Array.from(atual.classList),
+      data: Array.from(atual.attributes)
+        .filter(a => a.name.startsWith('data-'))
+        .map(a => a.name)
+        .sort(),
+    });
+    atual = atual.parentElement;
+  }
   return {
     chave: `${i}:${el.tagName.toLowerCase()}.${el.getAttribute('class') || ''}`,
     texto: 'value' in el ? el.value : (el.textContent || ''),
     estilo,
+    pseudo,
+    contexto,
   };
 })
 """
@@ -149,7 +188,7 @@ def esperar_arvore_estavel(pagina, quieto_ms=400, teto_ms=8000):
     return anterior
 
 
-def medir(base_url, usuario, senha, temas, rotas):
+def medir(base_url, usuario, senha, temas, rotas, seletor=SELETOR_PADRAO):
     from playwright.sync_api import sync_playwright
 
     resultado: dict[str, list] = {}
@@ -204,7 +243,7 @@ def medir(base_url, usuario, senha, temas, rotas):
                 pagina.evaluate(JS_ESPERAR_ESTILO)
                 raiz = cdp.send("DOM.getDocument")["root"]["nodeId"]
                 nos = cdp.send(
-                    "DOM.querySelectorAll", {"nodeId": raiz, "selector": ".cv-field__control"}
+                    "DOM.querySelectorAll", {"nodeId": raiz, "selector": seletor}
                 )["nodeIds"]
                 if not nos:
                     continue
@@ -217,7 +256,13 @@ def medir(base_url, usuario, senha, temas, rotas):
                     pagina.evaluate(JS_ESPERAR_ESTILO)
                     rotulo = "+".join(estados) or "repouso"
                     resultado[f"{slug}|{tema}|{rotulo}"] = pagina.evaluate(
-                        JS_COLETA, PROPRIEDADES
+                        JS_COLETA,
+                        {
+                            "selector": seletor,
+                            "props": PROPRIEDADES,
+                            "pseudos": PSEUDO_ELEMENTOS,
+                            "propsPseudo": PROPRIEDADES_PSEUDO,
+                        },
                     )
                 for no in nos:  # devolve ao normal antes da proxima rota
                     cdp.send("CSS.forcePseudoState", {"nodeId": no, "forcedPseudoClasses": []})
@@ -234,6 +279,11 @@ def main() -> None:
     p.add_argument("--saida", required=True)
     p.add_argument("--temas", default="light,dark")
     p.add_argument(
+        "--seletor",
+        default=SELETOR_PADRAO,
+        help="seletor CSS dos controles a fotografar (padrao: .cv-field__control)",
+    )
+    p.add_argument(
         "--rotas",
         help="JSON com lista de caminhos ja resolvidos; sem isso usa as rotas "
              "sem argumento de rotas_do_sistema.py, que nao alcancam os wizards",
@@ -241,7 +291,14 @@ def main() -> None:
     a = p.parse_args()
 
     rotas = carregar_rotas(a.rotas)
-    dados = medir(a.base_url, a.usuario, a.senha, tuple(a.temas.split(",")), rotas)
+    dados = medir(
+        a.base_url,
+        a.usuario,
+        a.senha,
+        tuple(a.temas.split(",")),
+        rotas,
+        seletor=a.seletor,
+    )
     Path(a.saida).write_text(json.dumps(dados, indent=1, sort_keys=True), encoding="utf-8")
     leituras = sum(len(v) for v in dados.values())
     print(f"{len(rotas)} rotas, {len(dados)} combinacoes rota|tema|estado, "
