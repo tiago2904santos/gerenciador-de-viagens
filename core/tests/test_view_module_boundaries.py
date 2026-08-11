@@ -83,7 +83,16 @@ class ViewModuleBoundaryTests(SimpleTestCase):
         # pendentes e as viagens dos proximos 30 dias. Era a rota que TODO login
         # abre (`LOGIN_REDIRECT_URL`), entao a divida mais cara do arquivo caiu
         # junto com a tela.
-        self.assertEqual(sum(counts.values()), 24)
+        #
+        # 24 -> 33 (`BE-14` fatia 1, `NOVO-100`): **o numero subiu, e subiu de
+        # proposito.** Prestacoes foi fatiada em modulos por tela como oficios e
+        # planos, mas os cinco modulos nunca entraram em `P06_SPLIT_VIEW_MODULES`
+        # — entao 11 acessos de manager nunca foram medidos. A regra 5 do
+        # `AGENTS.md` proibe a catraca subir por regressao; esta subiu por
+        # honestidade, ao passar a medir o que ja estava la. A propria fatia ja
+        # devolveu 2 dos 11 (`rt_views.py` foi a zero), e o saldo entra como 9.
+        self.assertEqual(counts["prestacoes_contas"], 9)
+        self.assertEqual(sum(counts.values()), 33)
 
     def test_orm_em_prosa_nao_conta_e_orm_em_codigo_conta(self):
         """`NOVO-11` — a catraca mede código, não texto.
