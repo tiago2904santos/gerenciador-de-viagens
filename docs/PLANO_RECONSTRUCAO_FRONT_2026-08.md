@@ -739,6 +739,12 @@ folha; a extração deve mover a família compartilhada antes de retirar o prime
 > claro/escuro e 1440/800/500 px (**1.704 leituras por viewport**). `select.css` segue global porque
 > ainda contém regras de select nativo; sua divisão é a próxima fronteira.
 
+> **Quinta fatia fechada em 11/08 (`HT-04`, parcial).** `select.css` foi dividido sem retirar do
+> shell as regras de select nativo, `.cv-field` e `.field-with-action`. A família
+> `.custom-select*` agora vive em `fields/custom-select.css`, imediatamente depois do núcleo global
+> e somente na variante consumidora. São mais **6.496 bytes** fora das rotas sem o enhancer e
+> **59.338 bytes** acumulados entre date/file/search/custom-select.
+
 **Passo a passo.** Extraia os componentes compartilhados dos arquivos de domínio para
 `fields/`, `actions/`, `lists/` e `feedback/`, domínio por domínio, e derrube o import correspondente. Dimensione com a
 régua da E0: o que não é usado na rota não devia estar sendo entregue nela.

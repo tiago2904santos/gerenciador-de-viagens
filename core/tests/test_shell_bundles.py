@@ -124,12 +124,25 @@ class ShellBundleGateTests(SimpleTestCase):
         style = (ROOT / "static/css/style.css").read_text(encoding="utf-8")
         picker_import = '@import url("./fields/search-picker.css");'
         select_import = '@import url("./fields/select.css");'
+        custom_select_import = '@import url("./fields/custom-select.css");'
         self.assertNotIn(picker_import, style)
         self.assertNotIn(picker_import, shell)
         self.assertIn(picker_import, form_shell)
         self.assertIn(select_import, style)
         self.assertIn(select_import, shell)
         self.assertIn(select_import, form_shell)
+        self.assertNotIn(custom_select_import, style)
+        self.assertNotIn(custom_select_import, shell)
+        self.assertIn(custom_select_import, form_shell)
+
+        native_select = (ROOT / "static/css/fields/select.css").read_text(
+            encoding="utf-8"
+        )
+        custom_select = (ROOT / "static/css/fields/custom-select.css").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotIn(".custom-select {", native_select)
+        self.assertIn(".custom-select {", custom_select)
 
         self.assertLess(
             form_shell.index('@import url("./lists/cards.css");'),
@@ -141,6 +154,10 @@ class ShellBundleGateTests(SimpleTestCase):
         )
         self.assertLess(
             form_shell.index(select_import),
+            form_shell.index(custom_select_import),
+        )
+        self.assertLess(
+            form_shell.index(custom_select_import),
             form_shell.index('@import url("./layout/stages.css");'),
         )
 

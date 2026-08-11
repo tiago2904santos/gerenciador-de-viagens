@@ -52,10 +52,16 @@ FORM_COMPONENTS_CSS: tuple[str, ...] = (
     "css/fields/file-picker.css",
 )
 
-FORM_COMPONENT_IMPORTS: tuple[str, ...] = (
-    '@import url("./fields/search-picker.css");',
+FORM_COMPONENT_IMPORTS: tuple[tuple[str, str], ...] = (
+    (
+        '@import url("./lists/cards.css");',
+        '@import url("./fields/search-picker.css");',
+    ),
+    (
+        '@import url("./fields/select.css");',
+        '@import url("./fields/custom-select.css");',
+    ),
 )
-FORM_COMPONENT_IMPORT_AFTER = '@import url("./lists/cards.css");'
 
 _FORM_CSS_INSERT_AT = SHELL_CSS.index("css/fields/field.css") + 1
 SHELL_CSS_WITH_FORM_COMPONENTS: tuple[str, ...] = (
@@ -117,15 +123,15 @@ def _read(rel: str) -> str:
 
 def _style_with_form_components() -> str:
     style = _read("css/style.css")
-    if any(import_line in style for import_line in FORM_COMPONENT_IMPORTS):
-        raise ValueError("style.css voltou a importar componentes de formulario")
-    if style.count(FORM_COMPONENT_IMPORT_AFTER) != 1:
-        raise ValueError("ponto de insercao dos imports de formulario ausente ou ambiguo")
-    imports = "\n".join(FORM_COMPONENT_IMPORTS)
-    return style.replace(
-        FORM_COMPONENT_IMPORT_AFTER,
-        f"{FORM_COMPONENT_IMPORT_AFTER}\n{imports}",
-    )
+    for import_after, import_line in FORM_COMPONENT_IMPORTS:
+        if import_line in style:
+            raise ValueError("style.css voltou a importar componentes de formulario")
+        if style.count(import_after) != 1:
+            raise ValueError(
+                "ponto de insercao dos imports de formulario ausente ou ambiguo"
+            )
+        style = style.replace(import_after, f"{import_after}\n{import_line}")
+    return style
 
 
 def _concat(

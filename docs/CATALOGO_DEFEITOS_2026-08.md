@@ -2262,8 +2262,10 @@ Nas rotas que precisam do bundle de formulário, os dois arquivos somam **248.40
 página que chamam essas APIs e falha se um consumidor novo não for classificado. Os ~37 KB de CSS
 de `search-picker`/`select` continuam na fronteira `UI-04`/E10. Em 11/08,
 `date-picker`/`file-picker` saíram do shell padrão (−25.615 bytes nas rotas sem eles) e
-`search-picker.css` também passou à variante consumidora (−27.227 bytes). `select.css` ainda mistura
-o custom select com selects nativos globais; por isso o ID permanece parcial.
+`search-picker.css` também passou à variante consumidora (−27.227 bytes). Na fatia seguinte,
+`select.css` foi dividido: os selects nativos e estruturas globais permanecem no shell, enquanto
+os **6.496 bytes** de `.custom-select*` passaram à variante consumidora. O ID permanece parcial
+pelas demais famílias de CSS de domínio.
 
 ### HT-05 ✅ RESOLVIDO · 🟡 `empty_state.html` quebra a ordem de headings · AUD+MED · 0,5 d
 
@@ -2742,6 +2744,12 @@ deixa de buscar **27.227 bytes**. Servidores e Eventos foram comparados por pág
 claro/escuro e 1440/800/500 px: **1.704 leituras por viewport**, com estilos idênticos.
 `select.css` permanece global porque também estiliza selects nativos de `.list-panel`; separá-lo
 sem regressão exige antes dividir essa família.
+
+**Quinta família fechada em 11/08 (`HT-04`, parcial).** A família `.custom-select*` foi extraída
+para `fields/custom-select.css`, carregado somente pela variante consumidora e imediatamente após
+o núcleo global de `select.css`. Rotas sem o enhancer deixam de buscar mais **6.496 bytes**; os
+selects nativos, `.cv-field` e `.field-with-action` continuam globais. A redução acumulada dos
+pickers chega a **59.338 bytes** por rota não consumidora.
 
 ---
 
