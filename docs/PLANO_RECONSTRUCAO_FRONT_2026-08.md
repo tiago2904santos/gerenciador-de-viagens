@@ -115,6 +115,13 @@ fez **129 medições** em 1440, 800 e 500 px: 61.700 elementos comparados, 248.6
 não-cor e zero diferenças exclusivas entre as ordens claro→escuro e escuro→claro. Uma segunda
 execução, sem `--atualizar-tetos`, passou contra `scripts/tetos_front.json`.
 
+> **Correção de 11/08 (`NOVO-106`).** O medidor somava apenas folhas que apareciam em
+> `CSS.stopRuleUsageTracking`; uma folha externa com **zero regras casadas** não aparecia nem no
+> numerador nem no denominador. A linha de base escondia justamente o desperdício que E10 precisa
+> retirar. Com todas as folhas externas contabilizadas, o intervalo real é **11,1003%–55,8925%**
+> (11,1003%–22,1029% nas rotas autenticadas). Os pisos foram corrigidos apenas onde o denominador
+> antes estava incompleto; daqui em diante voltam a só subir.
+
 **Arquivos.** `requirements/dev.txt` · `scripts/rotas_do_sistema.py` (novo) ·
 `scripts/medir_css_por_rota.py` (novo) · `scripts/medir_divergencia_tema.py` (novo) ·
 `scripts/tetos_front.json` (novo) · `.github/workflows/tests.yml`
@@ -698,7 +705,11 @@ quer o componente pare de levar o domínio junto.
 
 **Contexto medido hoje.** **97 imports de CSS em 36 templates** (eram 54 em 26 em 05/08 — piorou).
 `oficios.css` é importado 19 vezes, `roteiros.css` e `prestacoes_contas.css` 10 cada, `termos.css`
-9. Em `templates/prestacoes_contas/index.html`, `oficios.css` (106 KB) chega com **0,0% de uso**.
+9. A afirmação anterior de que `oficios.css` chegava à lista de Prestações com 0,0% de uso estava
+errada: no código de 11/08 são **64.095 bytes entregues e 9.383 casados**, porque a família
+compartilhada `record-card`/`person-row`/`fact-block` ainda mora ali. `roteiros-list.css` entrega
+**7.180 bytes e casa zero** nessa rota. O `NOVO-106` fez o medidor enxergar também essa segunda
+folha; a extração deve mover a família compartilhada antes de retirar o primeiro import.
 
 **Passo a passo.** Extraia os componentes compartilhados dos arquivos de domínio para
 `fields/`, `actions/`, `lists/` e `feedback/`, domínio por domínio, e derrube o import correspondente. Dimensione com a
