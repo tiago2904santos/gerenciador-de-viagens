@@ -54,7 +54,11 @@ RAIZ = Path(__file__).resolve().parents[1]
 CSS = RAIZ / "static" / "css"
 
 #: Bundles sao concatenacao do que ja esta sob analise; conta-los dobraria tudo.
-IGNORA_ARQUIVO = {"shell.bundle.css", "shell.bundle.js"}
+IGNORA_ARQUIVO = {
+    "shell.bundle.css",
+    "shell.form-components.bundle.css",
+    "shell.bundle.js",
+}
 IGNORA_DIR = {".venv", "node_modules", ".git", "staticfiles", "htmlcov", "__pycache__"}
 SUFIXOS_CORPUS = {".html", ".js", ".py", ".txt", ".md", ".json", ".mjs"}
 

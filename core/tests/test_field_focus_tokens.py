@@ -15,7 +15,10 @@ class FieldFocusTokenTests(SimpleTestCase):
     def test_os_dois_ultimos_tokens_cv_de_campo_nao_existem(self):
         infratores = []
         for arquivo in CSS.rglob("*.css"):
-            if arquivo.name == "shell.bundle.css":
+            if arquivo.name in {
+                "shell.bundle.css",
+                "shell.form-components.bundle.css",
+            }:
                 continue
             texto = arquivo.read_text(encoding="utf-8")
             for token in ("--cv-field-border-focus", "--cv-field-focus-ring"):

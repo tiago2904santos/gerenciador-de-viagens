@@ -21,9 +21,18 @@ class DarkRedesignContractTests(SimpleTestCase):
         bundle = (
             Path(settings.BASE_DIR) / "static" / "css" / "shell.bundle.css"
         ).read_text(encoding="utf-8")
+        form_bundle = (
+            Path(settings.BASE_DIR)
+            / "static"
+            / "css"
+            / "shell.form-components.bundle.css"
+        ).read_text(encoding="utf-8")
         style_index = bundle.index(">>> css/style.css >>>")
         theme_dark_tokens_index = bundle.index(">>> css/base/03-theme-dark.css >>>")
-        file_picker_index = bundle.index(">>> css/fields/file-picker.css >>>")
+        file_picker_index = form_bundle.index(">>> css/fields/file-picker.css >>>")
+        form_action_system_index = form_bundle.index(
+            ">>> css/actions/action-system.css >>>"
+        )
         action_system_index = bundle.index(">>> css/actions/action-system.css >>>")
         record_list_index = bundle.index(">>> css/lists/record-list.css >>>")
         filter_header_index = bundle.index(">>> css/lists/filter-header.css >>>")
@@ -44,7 +53,8 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertNotIn("css/dark-redesign.css", self.base)
         self.assertNotIn("css/dark-redesign.css", bundle)
         self.assertLess(shell_bundle_index, extra_css_index)
-        self.assertLess(file_picker_index, action_system_index)
+        self.assertNotIn(">>> css/fields/file-picker.css >>>", bundle)
+        self.assertLess(file_picker_index, form_action_system_index)
         self.assertLess(action_system_index, dialog_index)
         self.assertLess(action_system_index, record_list_index)
         self.assertLess(record_list_index, filter_header_index)

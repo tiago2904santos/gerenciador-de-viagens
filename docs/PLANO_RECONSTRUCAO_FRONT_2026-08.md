@@ -726,6 +726,13 @@ folha; a extração deve mover a família compartilhada antes de retirar o prime
 > presenters também deixaram de calcular `faixa_lateral_class`, chave que nenhum template lia.
 > Um card real confirmou os mesmos estilos computados em claro/escuro e 1440/800/500 px.
 
+> **Terceira fatia fechada em 11/08 (`HT-04`, parcial).** `date-picker.css` e `file-picker.css`
+> saíram do shell padrão. O gerador mantém uma variante com a ordem original para os 18 templates
+> consumidores; as demais rotas recebem **25.615 bytes a menos** em um único request. Servidores,
+> Eventos e Termos produziram os mesmos estilos computados de página inteira em claro/escuro e
+> 1440/800/500 px (**2.632 leituras por viewport**). `search-picker`/`select` seguem na próxima
+> fronteira do `HT-04`.
+
 **Passo a passo.** Extraia os componentes compartilhados dos arquivos de domínio para
 `fields/`, `actions/`, `lists/` e `feedback/`, domínio por domínio, e derrube o import correspondente. Dimensione com a
 régua da E0: o que não é usado na rota não devia estar sendo entregue nela.

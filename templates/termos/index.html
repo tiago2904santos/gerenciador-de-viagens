@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% block shell_css %}{% include 'includes/form_components_css.html' only %}{% endblock %}
 {% block title %}{{ page_title }}{% endblock %}
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/lists/entity-cards.css' %}">

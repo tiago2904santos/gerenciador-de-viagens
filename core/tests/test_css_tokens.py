@@ -22,6 +22,7 @@ COLOR_LITERAL_ALLOWED = {
     "static/css/components/theme-dark-components.css",  # transitório — dissolver nas fases seguintes
     "static/css/pages/auth.css",  # transitório — login fora do bundle global
     "static/css/shell.bundle.css",  # gerado (NOVO-12); literais vêm das fontes acima
+    "static/css/shell.form-components.bundle.css",  # variante gerada (UI-04/HT-04)
 }
 
 _HEX_COLOR = re.compile(r"(?<![\w#])#([0-9a-fA-F]{3,8})\b")
