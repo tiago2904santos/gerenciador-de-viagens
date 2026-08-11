@@ -6428,3 +6428,50 @@ bisecção daria pelo mesmo preço.
 elemento só existe com diálogo, menu ou dropdown aberto. Sobre elas a medição não diz nada, e
 tratá-las como inócuas seria repetir o `NOVO-90`. Medi-las exige estender o corpus aos estados de
 sobreposição, como o `NOVO-54` fez ao ir de 44 para 51 rotas.
+
+### NOVO-98 · `NOVO` O sistema de superfície do wizard só existia no tema escuro · UI · 0,5 d
+
+Terceira entrega da **E9**, e a que **destrava a família 8b** (`NOVO-93`).
+
+`theme-dark-components.css` ligava as quatro variáveis do sistema de superfície do wizard —
+`--step1-surface`, `--step1-panel`, `--step1-field`, `--step1-empty` — **dentro de uma regra
+predicada em `dark`**. No tema claro elas não existiam nesse escopo.
+
+**O tamanho do buraco, contado:**
+
+| leituras de `--step1-*` | quantas |
+|---|---:|
+| dentro de regra escura | 112 |
+| em regra que o claro alcança, **com** `fallback` | 62 |
+| em regra que o claro alcança, **sem** `fallback` | **32** |
+
+Essas 32 não resolviam nada no claro.
+
+**É a causa raiz do `NOVO-93`.** No escuro `border: 0` funciona porque o fundo separa as
+superfícies; levar só a borda para o claro tirava a fronteira **sem pôr nada no lugar**, porque o
+fundo dependia de um token que o claro não tinha. Era por isso que seis componentes ficariam
+branco-no-branco, entre eles o `.roteiro-trecho-card__leg`, onde a borda é a única coisa que separa
+Saída de Chegada.
+
+**Correção.** As duas regras que ligam os tokens (o cartão do wizard e o `.collection-panel`) são
+partidas em duas: um gêmeo `:is(html[data-theme])` carregando **só a definição das variáveis**, e a
+regra escura ficando com a **pintura** (`background`, `border-color`, `box-shadow`) e com a
+re-ligação de `--color-input-bg`. Pintura é decisão de tema; mexer nela é a 8b, com aprovação
+própria. Mesma especificidade, gêmeo adjacente — o argumento da E8.
+
+**Prova** (`sonda_mesmo_tema.py`, 41.754 elementos por caminho no DOM, com `--revelar --pseudo
+hover`):
+
+| | |
+|---|---:|
+| elementos alterados no **claro** | **36**, em 21 capturas |
+| elementos alterados no **escuro** | **2** |
+
+Os 2 do escuro são o piso de ruído. As maiores mudanças caem em `oficios-wizard-roteiro`,
+`roteiros-editar` e `roteiros-novo` — o wizard, como esperado.
+
+**Correção a um registro anterior:** eu havia escrito no `NOVO-93` que os `--step1-*` chegavam ao
+claro "com variável indefinida". Não globalmente — eles têm ligação neutra em
+`actions/action-system.css` (`.attach-signed-modal__dialog`) e `lists/record-list.css`
+(`.collection-panel`), e lá resolvem bem. O buraco era **só no escopo do wizard**. Isso muda o
+conserto: não era criar token, era ampliar escopo.
