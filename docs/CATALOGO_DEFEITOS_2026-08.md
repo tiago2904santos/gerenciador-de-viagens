@@ -569,6 +569,59 @@ cada teste numa transação desfeita no fim. `test_anexos.py::test_exclusao_remo
 passou a usar `captureOnCommitCallbacks(execute=True)` — mesma intenção, forma nova, com o motivo no
 comentário.
 
+#### Fatia 4 ✅ — o diário de bordo; **prestações fecha, o `BE-14` não**
+
+Os três caminhos de escrita de `diario_views.py` foram para `diario_services.py`, cada um
+`@transaction.atomic`: o autosave (laço, um `UPDATE` por campo sujo), o `POST` do formset (N linhas
+mais a marcação) e a troca de motorista/viatura (três gravações).
+
+**O caso mais afiado é o da troca**, e não pela contagem: ela grava o diário, depois a prévia de
+"informações complementares" do RT — que é justamente **o texto que explica a troca** no documento —
+e depois o status. Uma falha entre a primeira e a segunda emitia o documento com o motorista trocado
+e sem a explicação, e a tela não dizia nada. Medido antes da correção: `'SERVIDOR' == 'SERVIDOR'`.
+
+**`sincronizar_trechos` já era atômica desde o `DB-08` fatia 2.** Isto é, a parte que **cria** as
+linhas do diário estava protegida desde então, e a que **preenche** não estava — a divisão não vinha
+de análise, vinha de qual defeito passou por ali antes.
+
+| | antes da fatia 4 | depois |
+|---|---:|---:|
+| gravações fora de transação em módulo de view | 24 | **19** |
+| funções com gravação fora de transação | 19 | **15** |
+| funções com 2+ gravações sem transação | 4 | **3** |
+| `diario_views.py` | 388 linhas, 4 acessos de manager | **345 linhas, 0** |
+| catraca `P-01` | 31 | **27** |
+
+**A fatia 1 disse que as fatias 2, 3 e 4 fechariam o `BE-14`, e isso estava errado** — a frase valia
+para *prestações*, que era 21 dos 36 sites, não para o defeito. Medido agora, com o mesmo script nas
+duas pontas: **sobram 19 gravações fora de transação**, em `planos_trabalho` (6), `oficios` (4),
+`eventos` (2), `prestacoes_contas/model_views.py` (3, o CRUD dos modelos de texto do RT) e uma cada
+em `core`, `ordens_servico`, `roteiros` e `termos`.
+
+Das três funções que ainda gravam duas ou mais vezes sem transação, a pior é
+`planos_trabalho/per_diem_views.py::_apply_efetivo_snapshot`: `save` + `create` + `delete` sobre a
+mesma coleção, em laço. É a herdeira direta do caso exemplar do enunciado, agora noutro app.
+
+**O que fecha aqui é prestações**, e vale dizer o que isso significa: nenhum dos quatro fluxos do
+wizard — RT, solicitação, anexos, diário — grava mais fora de transação, e nenhum dos quatro módulos
+de tela constrói queryset. **O `BE-14` continua aberto** para os apps restantes; a quinta fatia é
+`planos_trabalho` + `oficios`, que juntos concentram 10 dos 19.
+
+**A fixture mentia em silêncio, e isso vale para quem for escrever teste de diário.**
+`criar_prestacao` monta um ofício **sem roteiro**, e sem roteiro `sincronizar_trechos` não cria linha
+nenhuma: o autosave vira um laço sobre lista vazia e **todo cenário fica verde por omissão** — o de
+rollback inclusive, que é o que deveria reprovar. Foi encontrado porque um cenário passou antes da
+correção existir. `_com_roteiro` resolve, e `test_a_fixture_produz_linha_de_diario` existe só para
+reprovar se o cenário vazio voltar. Registrado como `NOVO-107` — nasceu `NOVO-106` e
+cedeu o número ao `NOVO-106` do PR #331, que chegou ao `main` primeiro. É a quinta colisão de
+numeração desta etapa.
+
+**A inversão precisou de mira, não só de existir.** Injetar falha na segunda gravação de
+`DiarioBordoTrecho` fazia o teste passar sem medir nada: `sincronizar_trechos` roda antes, na mesma
+requisição, e também salva `DiarioBordoTrecho` — a falha caía **antes** do laço começar. O contador
+passou a olhar `update_fields`, que é o que distingue a gravação do autosave da gravação da
+sincronização. É a terceira vez nesta corrente que a inversão corrige o teste em vez do código.
+
 ### BE-15 🟡 Numeração de documento reimplementada 3 vezes · AUD · 2 d · risco alto
 
 (a) `oficios/services.py:425-440` — advisory lock, fallback `select_for_update`, reuso de lacunas,
@@ -7176,3 +7229,30 @@ Folhas internas sem URL continuam fora.
 menor entre o piso anterior e a medição honesta — não se aproveitou a correção para subir os outros
 14 pisos. Esta é a mesma exceção documentada no `NOVO-101`: a catraca enfraquece uma vez porque
 parou de omitir dívida preexistente; depois volta a caminhar apenas no sentido exigido.
+### NOVO-107 · `NOVO` A fixture de prestação monta ofício sem roteiro, e o teste de diário fica verde por omissão · QA · 0,25 d
+
+Achado na fatia 4 do `BE-14`, e é do tipo que não aparece em revisão de código: **o teste passa**.
+
+`PrestacaoFixturesMixin.criar_prestacao` monta um ofício **sem roteiro**. As linhas do diário nascem
+de `sincronizar_trechos`, que percorre os trechos do roteiro — sem roteiro, nenhuma linha. O autosave
+do diário então percorre uma lista vazia, grava zero vezes, devolve `200 {"ok": true}`, e **todo
+cenário escrito sobre ele fica verde**, inclusive o de rollback, que é exatamente o que deveria
+reprovar antes da correção.
+
+Foi descoberto porque um cenário passou antes de a correção existir — a inversão obrigatória do
+`AGENTS.md` é o que o pegou. Sem ela, a fatia teria entregue quatro testes que não mediam nada,
+todos verdes, com a aparência de rede.
+
+**Contido na fatia 4:** `_com_roteiro(oficio, trechos=N)` dá o roteiro, e
+`test_a_fixture_produz_linha_de_diario` reprova se o cenário vazio voltar. Isso resolve o módulo de
+teste do diário, **não a fixture**.
+
+**O que falta:** decidir se `criar_prestacao` passa a montar roteiro por padrão. A favor: ofício de
+prestação sem roteiro não existe em produção — o fluxo inteiro nasce de um roteiro, e a fixture está
+fotografando um estado impossível. Contra: dezenove módulos de teste usam essa fixture, e mudar o
+padrão mexe em todos de uma vez. O caminho provável é um parâmetro `com_roteiro=True` como padrão
+novo, com a migração feita por módulo.
+
+**A família é maior que o diário.** Qualquer teste cuja asserção dependa de uma coleção derivada do
+roteiro (trechos, diárias por trecho, o próprio diário) tem o mesmo risco de medir vazio. Vale uma
+varredura por `criar_prestacao` antes de escrever a próxima rede sobre prestações.
