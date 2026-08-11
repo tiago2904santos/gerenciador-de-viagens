@@ -209,7 +209,7 @@ arquivos; contraste medido (não estimado) nos pares alterados.
 | `JS-08` 🟡 | 11% do bundle atende menos de 1% das páginas: segundo bundle sob demanda | 2 |
 | `JS-09` 🟡 | Tela de espera de documento carrega 264 KB para usar 3,3 KB | 0,5 |
 | `JS-07` ✅ | "Fechar ao clicar fora / Esc": 3 implementações vivas consolidadas em `CV.overlay.attachDismiss` | 2 |
-| `JS-10` 🟡 | Decidir os stubs do editor de roteiros: completar a extração ou removê-los | 0,25 ou 3+ |
+| `JS-10` ✅ | Três stubs sem consumidor do editor de roteiros removidos | 0,25 |
 
 O dimensionamento de `UI-04` depende de F2: quantos componentes precisam sair dos arquivos de
 domínio só se sabe depois de saber quais componentes existem.
