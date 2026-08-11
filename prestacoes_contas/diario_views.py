@@ -22,6 +22,8 @@ from .diario_services import (
 )
 from .forms import DiarioBordoTrechoFormSet, DiarioMotoristaForm
 from .models import DiarioBordo, RelatorioTecnico
+from .services import marcar_servidor_em_preenchimento
+from .services import marcar_servidores_pendentes
 from .signature_views import _assinatura_db_card
 from .view_common import (
     _autosave_version,
@@ -29,8 +31,6 @@ from .view_common import (
     contexto_do_fluxo,
     _diario_queryset,
     _is_inline_request,
-    _marcar_servidor_em_preenchimento,
-    _marcar_servidores_pendentes,
     _prestacao_queryset,
     _prestacao_servidor_full,
     _prestacao_servidor_queryset,
@@ -132,7 +132,7 @@ def diario_servidor(request, ps_pk):
         formset = DiarioBordoTrechoFormSet(request.POST, queryset=queryset)
         if formset.is_valid():
             formset.save()
-            _marcar_servidor_em_preenchimento(ps)
+            marcar_servidor_em_preenchimento(ps)
             formato = "pdf" if request.POST.get("action") == "download_pdf" else "xlsx"
             return redirect("prestacoes_contas:diario_download_formato", pk=diario.pk, formato=formato)
     else:
@@ -184,7 +184,7 @@ def diario_servidor_autosave(request, ps_pk):
 
     _salvar_diario_autosave(diario, payload)
     if payload.dirty_fields:
-        _marcar_servidor_em_preenchimento(ps)
+        marcar_servidor_em_preenchimento(ps)
     return autosave_json_response(
         ok=True,
         object_id=diario.pk,
@@ -202,7 +202,7 @@ def diario_autosave(request, pk):
 
     _salvar_diario_autosave(diario, payload)
     if payload.dirty_fields:
-        _marcar_servidores_pendentes(diario.prestacao)
+        marcar_servidores_pendentes(diario.prestacao)
     return autosave_json_response(
         ok=True,
         object_id=diario.pk,
@@ -326,7 +326,7 @@ def diario_servidor_motorista(request, ps_pk):
         if form.is_valid():
             form.save()
             _sincronizar_info_complementares_rt(prestacao)
-            _marcar_servidor_em_preenchimento(ps)
+            marcar_servidor_em_preenchimento(ps)
             messages.success(request, "Diário de bordo atualizado (motorista/viatura).")
             return redirect(diario_url)
     else:

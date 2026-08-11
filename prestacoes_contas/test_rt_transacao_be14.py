@@ -187,3 +187,53 @@ class RelatorioTecnicoTransacaoTests(PrestacaoFixturesMixin, TestCase):
             "sobrou meia gravação: o primeiro servidor ficou com valor e o segundo não",
         )
         self.assertIsNone(self.ps_b.diaria_valor_override)
+
+
+class MarcarServidoresPendentesTests(PrestacaoFixturesMixin, TestCase):
+    """Por que `services.marcar_servidores_pendentes` virou `@transaction.atomic`.
+
+    Ela grava em laço, um `UPDATE` por servidor pendente, e nenhum dos chamadores abre
+    transação — são as views de RT, diário e documentos. A metade que sobra **não se
+    conserta na gravação seguinte**: quem já saiu de "pendente" deixa de entrar no
+    filtro, então o laço nem tenta de novo.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.setUpPrestacaoFixtures()
+        self.fixture = self.criar_prestacao(
+            numero=42,
+            servidores=[
+                self.criar_servidor("Um"),
+                self.criar_servidor("Dois"),
+                self.criar_servidor("Tres"),
+            ],
+        )
+
+    def test_falha_no_meio_do_laco_nao_marca_ninguem(self):
+        from prestacoes_contas.services import marcar_servidores_pendentes
+
+        original = PrestacaoServidor.save
+        chamadas = []
+
+        def falhar_na_segunda(self_ps, *args, **kwargs):
+            chamadas.append(self_ps.pk)
+            if len(chamadas) == 2:
+                raise RuntimeError("falha no meio do laço de marcação")
+            return original(self_ps, *args, **kwargs)
+
+        with mock.patch.object(PrestacaoServidor, "save", falhar_na_segunda):
+            with self.assertRaises(RuntimeError):
+                marcar_servidores_pendentes(self.fixture.prestacao)
+
+        status = list(
+            self.fixture.prestacao.servidores_prestacao.order_by("pk").values_list(
+                "status", flat=True
+            )
+        )
+        self.assertEqual(
+            status,
+            [PrestacaoServidor.STATUS_PENDENTE] * 3,
+            "sobrou marcação pela metade, e o laço não a reencontra: quem saiu de "
+            "'pendente' não volta ao filtro",
+        )

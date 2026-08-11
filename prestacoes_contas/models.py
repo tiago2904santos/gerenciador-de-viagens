@@ -364,7 +364,7 @@ class PrestacaoServidor(models.Model):
         O que ficou de fora, e por quê: `status`, `arquivada`, `finalizada`,
         `data_liberacao_diarias`, `prazo_limite_saque` e os campos de override são
         estado de fluxo, refazíveis em segundos. Pior, `status` é **coletivo**:
-        `view_common._marcar_servidores_pendentes` marca toda a equipe pendente do
+        `services.marcar_servidores_pendentes` marca toda a equipe pendente do
         ofício ao salvar um documento COMPARTILHADO (despacho, RT, diário). Medido:
         basta alguém salvar o despacho para que um servidor semeado por engano
         passe a "ter dados coletados" sem nunca ter entregue nada — e ficaria

@@ -90,6 +90,7 @@ from .selectors import listar_prestacoes
 from .selectors import normalizar_aba
 from .services import diaria_inicial_da_prestacao
 from .services import garantir_campos_padrao_relatorio_tecnico
+from .services import marcar_servidor_em_preenchimento
 
 
 
@@ -145,9 +146,7 @@ from .view_common import (
     _build_identificacao,
     contexto_do_fluxo,
     _diario_queryset,
-    _marcar_servidor_em_preenchimento,
     _is_inline_request,
-    _marcar_servidores_pendentes,
     _prestacao_full,
     _prestacao_queryset,
     _prestacao_servidor_full,
@@ -200,8 +199,6 @@ __all__ = [
     "_date_autosave_value",
     "_diario_queryset",
     "_is_inline_request",
-    "_marcar_servidor_em_preenchimento",
-    "_marcar_servidores_pendentes",
     "_parse_iso_date",
     "_prestacao_full",
     "_prestacao_queryset",
@@ -554,7 +551,7 @@ def prestacao_servidor_solicitacao_autosave(request, ps_pk):
     if valor is not None and ps.numero_solicitacao != valor:
         ps.numero_solicitacao = valor
         ps.save(update_fields=["numero_solicitacao", "atualizado_em"])
-        _marcar_servidor_em_preenchimento(ps)
+        marcar_servidor_em_preenchimento(ps)
 
     liberacao_raw = _date_autosave_value(payload, "data_liberacao_diarias")
     prazo_raw = _date_autosave_value(payload, "prazo_limite_saque")
@@ -567,7 +564,7 @@ def prestacao_servidor_solicitacao_autosave(request, ps_pk):
         if ps.data_liberacao_diarias != nova_liberacao:
             ps.data_liberacao_diarias = nova_liberacao
             ps.save(update_fields=["data_liberacao_diarias", "atualizado_em"])
-            _marcar_servidor_em_preenchimento(ps)
+            marcar_servidor_em_preenchimento(ps)
 
     if prazo_raw is not None:
         try:
@@ -577,7 +574,7 @@ def prestacao_servidor_solicitacao_autosave(request, ps_pk):
         if ps.prazo_limite_saque != novo_prazo:
             ps.prazo_limite_saque = novo_prazo
             ps.save(update_fields=["prazo_limite_saque", "atualizado_em"])
-            _marcar_servidor_em_preenchimento(ps)
+            marcar_servidor_em_preenchimento(ps)
 
     return autosave_json_response(
         ok=True,

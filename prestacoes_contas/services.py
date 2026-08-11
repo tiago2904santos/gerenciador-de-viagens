@@ -7,6 +7,7 @@ from datetime import timedelta
 from pathlib import Path
 
 from django.conf import settings
+from django.db import transaction
 from django.utils import timezone
 
 from cadastros.selectors import build_configuracao_context
@@ -40,6 +41,7 @@ from .diario_services import sincronizar_trechos
 from .forms import DEFAULT_CUSTEIO_VALUES
 from .models import DiarioBordo
 from .models import PrestacaoDocumentoAnexo
+from .models import PrestacaoServidor
 from .models import RelatorioTecnico
 
 _MESES = [
@@ -256,6 +258,32 @@ def aplicar_diaria_recebida(servidor_prestacao, texto) -> list[str]:
     servidor_prestacao.diaria_valor_override = valor
     servidor_prestacao.diaria_valor_override_observacao = observacao
     return []
+
+
+def marcar_servidor_em_preenchimento(servidor_prestacao) -> None:
+    """Sai de "pendente" quando o operador digita a primeira coisa do servidor."""
+    if servidor_prestacao is not None:
+        servidor_prestacao.marcar_em_preenchimento()
+
+
+@transaction.atomic
+def marcar_servidores_pendentes(prestacao) -> None:
+    """O mesmo, para toda a equipe ainda pendente do ofício.
+
+    `BE-14`: grava **em laço**, um `UPDATE` por servidor. Sem a transação, uma falha no
+    quinto deixa os quatro primeiros com o status trocado e o resto não — e essa metade
+    não se conserta sozinha na gravação seguinte, porque quem já saiu de "pendente" deixa
+    de entrar no filtro.
+
+    Este par morava em `view_common.py`, onde nenhuma varredura de `*views*.py` o
+    encontrava: o arquivo não tem "views" no nome (`NOVO-101`).
+    """
+    if prestacao is None:
+        return
+    for servidor_prestacao in prestacao.servidores_prestacao.filter(
+        status=PrestacaoServidor.STATUS_PENDENTE
+    ):
+        servidor_prestacao.marcar_em_preenchimento()
 
 
 def relatorio_tecnico_default_values(prestacao) -> dict:

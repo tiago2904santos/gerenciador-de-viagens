@@ -26,6 +26,8 @@ from .services import (
     aplicar_diaria_recebida,
     diaria_inicial_da_prestacao,
     garantir_campos_padrao_relatorio_tecnico,
+    marcar_servidor_em_preenchimento,
+    marcar_servidores_pendentes,
 )
 from .view_common import (
     _autosave_version,
@@ -34,8 +36,6 @@ from .view_common import (
     _build_identificacao,
     contexto_do_fluxo,
     _is_inline_request,
-    _marcar_servidor_em_preenchimento,
-    _marcar_servidores_pendentes,
     _prestacao_queryset,
     _prestacao_servidor_full,
     _prestacao_servidor_queryset,
@@ -156,7 +156,7 @@ def rt_servidor(request, ps_pk):
         if form.is_valid():
             form.save()
             erros = _salvar_diaria_overrides(prestacao, request.POST)
-            _marcar_servidor_em_preenchimento(ps)
+            marcar_servidor_em_preenchimento(ps)
             if erros:
                 for mensagens in erros.values():
                     for mensagem in mensagens:
@@ -233,7 +233,7 @@ def rt_servidor_autosave(request, ps_pk):
             message="O valor da diária não foi salvo.",
         )
     if payload.dirty_fields:
-        _marcar_servidor_em_preenchimento(ps)
+        marcar_servidor_em_preenchimento(ps)
     return autosave_json_response(
         ok=True,
         object_id=relatorio.pk,
@@ -278,7 +278,7 @@ def rt_autosave(request, pk):
             message="O valor da diária não foi salvo.",
         )
     if payload.dirty_fields:
-        _marcar_servidores_pendentes(relatorio.prestacao)
+        marcar_servidores_pendentes(relatorio.prestacao)
     return autosave_json_response(
         ok=True,
         object_id=relatorio.pk,
