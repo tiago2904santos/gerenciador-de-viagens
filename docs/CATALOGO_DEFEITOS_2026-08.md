@@ -4972,7 +4972,7 @@ Os quatro campos com divergência em dev: `eventos.TipoEvento.nome` (5), `Ativid
 **Fecha quando** a contagem rodar contra produção, os campos bloqueados (se houver) forem resolvidos
 no sistema, e o `--commit` for aplicado com backup.
 
-### NOVO-58 🔴 `NOVO` Claro e escuro não são dois temas do mesmo sistema: são dois desenhos diferentes · UI · a decidir
+### NOVO-58 ✅ RESOLVIDO · `NOVO` Claro e escuro não são dois temas do mesmo sistema: são dois desenhos diferentes · UI · a decidir
 
 Medido com `getComputedStyle` nas 44 rotas, comparando o **mesmo elemento** nas duas versões do
 **mesmo documento** e olhando **só propriedades que não são cor** — cor é o que um tema tem direito
@@ -5033,6 +5033,13 @@ vira espelho", como se fosse reorganização de token. Não é. Espelhar signifi
 ao tema claro**, o que muda a aparência de todas as 44 telas no modo claro — fonte, tamanho de texto,
 raio, borda e largura da barra lateral. É trabalho de desenho, não de arrumação, e precisa da decisão
 do dono antes da primeira linha de CSS.
+
+**Fechamento da E8 (11/08/2026).** A E8-zero foi repetida depois de todos os recortes intermediários,
+sem tocar em CSS: **43 rotas × 3 larguras = 129 medições**, **54.225 elementos comparados**, **0
+elementos divergentes, 0 diferenças não-cor e 0 pares distintos**. O instrumento mediu nas duas
+ordens de tema e manteve a trava de layout estável; o relatório passou os tetos vigentes. A dívida
+descrita acima foi consumida pelas famílias já integradas e não resta redesenho a aplicar. O foco de
+campo do `NOVO-51`, por ser cor/a11y, continua uma decisão separada e não altera este fechamento.
 
 ### NOVO-59 ✅ RESOLVIDO · 🔴 `NOVO` Todo ícone de botão é invisível no tema claro, no sistema inteiro · UI · 0,25 d
 
