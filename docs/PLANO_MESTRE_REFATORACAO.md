@@ -444,7 +444,7 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [ ] `HT-04` `base.html` carrega ~153 KB de JS de domínio em toda página · **E11**
 - [ ] `JS-07` "fechar ao clicar fora / Esc" em 4 cópias · **E11**
 - [ ] `JS-08` 11% do bundle atende menos de 1% das páginas · **E11**
-- [ ] `JS-09` tela de espera carrega 264 KB para usar 3,3 KB · **E11**
+- [x] `JS-09` tela embutida entrega só `http.js` + polling: 283.282 → 4.255 bytes de JS · **E11**
 - [ ] `JS-10` decidir os stubs do editor de roteiros — **destravado**: o `BE-13` fechou · **E11**
 
 **Fechados nesta fase antes do dimensionamento** (a reconstrução parcial de 07–08/08, que o quadro
