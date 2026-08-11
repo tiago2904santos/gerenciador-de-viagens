@@ -10,6 +10,7 @@ from django.utils import timezone
 from cadastros.models import ConfiguracaoSistema
 
 from roteiros import roteiro_logic
+from roteiros.services import editor_persistence
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroTrecho
 
@@ -258,7 +259,7 @@ def encontrar_roteiro_duplicado(validated, roteiro_state, *, evento=None, exclui
 
     # `NOVO-36`: a saída **mais antiga**, não a do primeiro trecho da lista. Esta
     # função casa contra `Roteiro.saida_dt` no banco, e o produtor daquele campo
-    # (`roteiro_logic._atualizar_datas_roteiro_apos_salvar_trechos`) passou a
+    # (`editor_persistence.atualizar_datas_roteiro_apos_salvar_trechos`) passou a
     # derivá-lo cronologicamente. Deixar a regra posicional aqui faria o leitor
     # discordar do escritor exatamente nos roteiros com destinos reordenados — a
     # detecção de duplicata pararia de achá-los, em silêncio.
@@ -353,7 +354,7 @@ def criar_roteiro(form, roteiro_state, validated, diarias_resultado, *, evento=N
     diarias_para_roteiro = roteiro_logic._calculate_avulso_diarias_from_state(
         roteiro_state, quantidade_servidores=1
     ) if roteiro_state else diarias_resultado
-    roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
+    editor_persistence.salvar_roteiro_avulso_from_roteiro_state(
         roteiro, roteiro_state, validated, diarias_resultado=diarias_para_roteiro
     )
     _apply_saved_map_route_from_post(roteiro, form.data)
@@ -485,7 +486,7 @@ def atualizar_roteiro(instance, form, roteiro_state, validated, diarias_resultad
     diarias_para_roteiro = roteiro_logic._calculate_avulso_diarias_from_state(
         roteiro_state, quantidade_servidores=1
     ) if roteiro_state else diarias_resultado
-    roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
+    editor_persistence.salvar_roteiro_avulso_from_roteiro_state(
         roteiro, roteiro_state, validated, diarias_resultado=diarias_para_roteiro
     )
     _apply_saved_map_route_from_post(roteiro, form.data)
@@ -543,7 +544,7 @@ def persistir_roteiro_rascunho_parcial(instance, form, roteiro_state, validated)
         roteiro.area_id = instance.area_id
     roteiro.save()
 
-    roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
+    editor_persistence.salvar_roteiro_avulso_from_roteiro_state(
         roteiro,
         roteiro_state or {},
         validated,

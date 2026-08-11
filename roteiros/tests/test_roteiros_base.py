@@ -15,6 +15,7 @@ from roteiros.models import Roteiro
 from roteiros.models import RoteiroDestino
 from roteiros.models import RoteiroTrecho
 from roteiros import roteiro_logic
+from roteiros.services import editor_persistence
 from roteiros.services.editor_state import dedupe_roteiro_loop_retorno_final
 from core.testing import area_de_teste
 from core.testing import vincular_area
@@ -217,7 +218,7 @@ class RoteirosBaseTests(TestCase):
             duracao_estimada_min=135,
         )
 
-        roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
+        editor_persistence.salvar_roteiro_avulso_from_roteiro_state(
             roteiro,
             {
                 "destinos_atuais": [
@@ -311,7 +312,7 @@ class RoteirosBaseTests(TestCase):
             duracao_estimada_min=195,
         )
 
-        roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
+        editor_persistence.salvar_roteiro_avulso_from_roteiro_state(
             roteiro,
             {
                 "destinos_atuais": [
@@ -386,7 +387,7 @@ class RoteirosBaseTests(TestCase):
             duracao_estimada_min=135,
         )
 
-        roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
+        editor_persistence.salvar_roteiro_avulso_from_roteiro_state(
             roteiro,
             {
                 "destinos_atuais": [
@@ -469,7 +470,7 @@ class RoteirosBaseTests(TestCase):
         state = roteiro_logic._build_avulso_roteiro_state_from_post(post)
         validated = roteiro_logic._validate_roteiro_state(state)
 
-        roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(roteiro, state, validated)
+        editor_persistence.salvar_roteiro_avulso_from_roteiro_state(roteiro, state, validated)
 
         self.assertEqual(roteiro.trechos.filter(tipo=RoteiroTrecho.TIPO_IDA).count(), 5)
         self.assertEqual(roteiro.trechos.filter(tipo=RoteiroTrecho.TIPO_RETORNO).count(), 1)
@@ -501,7 +502,7 @@ class RoteirosBaseTests(TestCase):
         post = _querydict(self._loop_diario_post_data())
         state = roteiro_logic._build_avulso_roteiro_state_from_post(post)
         validated = roteiro_logic._validate_roteiro_state(state)
-        roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(roteiro, state, validated)
+        editor_persistence.salvar_roteiro_avulso_from_roteiro_state(roteiro, state, validated)
 
         reopened = roteiro_logic._build_roteiro_state_from_roteiro_evento(roteiro)
 

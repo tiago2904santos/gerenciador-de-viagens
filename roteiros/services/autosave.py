@@ -3,6 +3,7 @@ from decimal import Decimal, InvalidOperation
 
 from django.utils import timezone
 
+from roteiros.services import editor_persistence
 from roteiros import roteiro_logic
 from roteiros.models import Roteiro
 from roteiros.services.editor_state import dedupe_roteiro_loop_retorno_final
@@ -108,7 +109,7 @@ def _apply_roteiro_snapshot(roteiro, snapshots):
     state = dedupe_roteiro_loop_retorno_final(state)
     validated = roteiro_logic._validate_roteiro_state(state)
     # Mesmo incompleto: persiste trechos/destinos parseados (datas podem ser null).
-    roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
+    editor_persistence.salvar_roteiro_avulso_from_roteiro_state(
         roteiro, state, validated, diarias_resultado=None
     )
 
