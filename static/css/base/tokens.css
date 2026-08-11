@@ -25,7 +25,7 @@
   --color-primary-hover: #082f55;
   --color-primary-bright: #155b9a;
   --color-primary-soft: #e3eaf2;
-  --color-on-accent: var(--color-primary-dark);
+  --color-on-accent: var(--color-white);
   /* Halo de foco. Era usado sem estar definido, entao .cv-data-table-shell
      ficava sem anel de foco visivel (D-06). */
   --color-focus-ring: rgba(21, 91, 154, 0.22);
@@ -39,14 +39,15 @@
   --color-secondary: #155b9a;
   --color-secondary-hover: #17476f;
   --color-secondary-soft: #deebfb;
-  --color-accent: #d8a21b;
-  --color-accent-hover: #b8860b;
-  --color-accent-soft: #fff3cf;
+  --color-accent: #155b9a;
+  --color-accent-hover: #17476f;
+  --color-accent-soft: #deebfb;
+  --color-accent-text: #155b9a;
   --color-danger: #b42318;
   --color-danger-soft: #fff2f0;
   --color-warning: #d8a21b;
   --color-warning-soft: #fff3cf;
-  --color-warning-border: var(--color-accent-border-strong);
+  --color-warning-border: rgba(216, 162, 27, 0.45);
   --color-success: #16805a;
   --color-success-soft: #e5f6ef;
   --color-info: #155b9a;
@@ -56,8 +57,8 @@
   --color-danger-border-strong: rgba(180, 35, 24, 0.38);
   --color-info-border-strong: rgba(21, 91, 154, 0.48);
   --color-success-border-soft: rgba(22, 128, 90, 0.28);
-  --color-accent-border-soft: rgba(216, 162, 27, 0.35);
-  --color-accent-border-strong: rgba(216, 162, 27, 0.45);
+  --color-accent-border-soft: rgba(21, 91, 154, 0.35);
+  --color-accent-border-strong: rgba(21, 91, 154, 0.48);
 
   /* --------------------------------------------------------------------------
      Sombras (escala base + aliases semanticos)
@@ -75,7 +76,7 @@
   --shadow-strong: 0 20px 44px rgba(15, 34, 54, 0.1);
   --shadow-inner-light: var(--shadow-inner);
   --glow-primary: 0 0 0 1px rgba(21, 91, 154, 0.12), 0 14px 34px rgba(11, 58, 102, 0.28);
-  --glow-accent: 0 14px 34px rgba(216, 162, 27, 0.22);
+  --glow-accent: 0 14px 34px rgba(21, 91, 154, 0.22);
 
   /* --------------------------------------------------------------------------
      Espacamento (escala + aliases de contexto)
@@ -382,29 +383,29 @@
   --sidebar-border: rgba(175, 192, 211, 0.24);
   --sidebar-shadow: inset -1px 0 0 rgba(175, 192, 211, 0.2), 12px 0 28px rgba(2, 8, 23, 0.34);
   --sidebar-brand-fg: #f7fbff;
-  --sidebar-badge-bg: linear-gradient(140deg, rgba(216, 162, 27, 0.62), rgba(185, 135, 18, 0.72));
+  --sidebar-badge-bg: linear-gradient(140deg, var(--color-primary-bright), var(--color-accent-hover));
   --sidebar-link-surface: rgba(255, 255, 255, 0.06);
   --sidebar-link-border: rgba(175, 192, 211, 0.22);
   --sidebar-link-fg: #cddcf0;
   --sidebar-link-hover-bg: rgba(255, 255, 255, 0.08);
-  --sidebar-icon-bg: rgba(216, 162, 27, 0.18);
+  --sidebar-icon-bg: color-mix(in srgb, var(--color-accent) 18%, transparent);
   --sidebar-icon-fg: #deebfb;
   --sidebar-active-bg: rgba(255, 255, 255, 0.1);
   --sidebar-active-fg: var(--color-white);
-  --sidebar-active-border: rgba(216, 162, 27, 0.45);
-  --sidebar-panel-border: rgba(216, 162, 27, 0.35);
+  --sidebar-active-border: var(--color-accent-border-strong);
+  --sidebar-panel-border: var(--color-accent-border-soft);
   --sidebar-footer-fg: rgba(205, 226, 249, 0.84);
   --sidebar-logout-bg: rgba(4, 24, 46, 0.55);
   --sidebar-logout-border: rgba(175, 192, 211, 0.35);
   --sidebar-logout-fg: rgba(230, 241, 255, 0.95);
-  --sidebar-focus-ring: rgba(216, 162, 27, 0.35);
+  --sidebar-focus-ring: var(--color-accent-border-soft);
 
   /* Fallback antes do JS (equivalente a light) */
   --app-body-bg: linear-gradient(180deg, #ffffff 0%, #e3eaf2 48%, #e3eaf2 100%);
   --app-main-bg: transparent;
   --app-featured-bg-fallback: #b9cbe0;
   --app-featured-bg:
-    radial-gradient(ellipse 110% 78% at 0% 0%, rgba(216, 162, 27, 0.16), transparent 50%),
+    radial-gradient(ellipse 110% 78% at 0% 0%, color-mix(in srgb, var(--color-accent) 16%, transparent), transparent 50%),
     radial-gradient(ellipse 82% 62% at 100% 6%, rgba(21, 91, 154, 0.16), transparent 48%),
     radial-gradient(ellipse 70% 48% at 50% 108%, rgba(11, 58, 102, 0.12), transparent 56%),
     linear-gradient(168deg, #ffffff 0%, #e3eaf2 26%, #d4dde9 62%, #cddcf0 100%);
@@ -418,8 +419,8 @@
   --app-hero-body-bg: linear-gradient(180deg, var(--color-white) 0%, #ffffff 100%);
   --app-hero-ribbon: linear-gradient(
     90deg,
-    rgba(216, 162, 27, 0.88) 0%,
-    rgba(190, 145, 45, 0.5) 42%,
+    color-mix(in srgb, var(--color-accent) 88%, transparent) 0%,
+    color-mix(in srgb, var(--color-accent-hover) 50%, transparent) 42%,
     rgba(45, 95, 145, 0.85) 100%
   );
 
@@ -432,12 +433,12 @@
   --theme-text-muted: #52657a;
   --theme-text-subtle: #71839a;
   --theme-text-muted-strong: #334c63;
-  --theme-accent-eyebrow: #d8a21b;
+  --theme-accent-eyebrow: var(--color-accent);
   --theme-stat-value: #0b3a66;
   --theme-accent-line: linear-gradient(
     90deg,
-    rgba(216, 162, 27, 0.92) 0%,
-    rgba(200, 150, 40, 0.55) 42%,
+    color-mix(in srgb, var(--color-accent) 92%, transparent) 0%,
+    color-mix(in srgb, var(--color-accent-hover) 55%, transparent) 42%,
     rgba(11, 58, 102, 0.88) 100%
   );
   --theme-card-inset: 0 1px 0 rgba(255, 255, 255, 0.08);
@@ -463,14 +464,14 @@
   --theme-form-section-border: #d4dde9;
   --theme-empty-bg: #ffffff;
   --theme-empty-border: #8ca6bf;
-  --theme-quick-icon-bg: linear-gradient(165deg, #fff6dc, #fffaeb);
-  --theme-quick-icon-border: #d8a21b;
+  --theme-quick-icon-bg: linear-gradient(165deg, var(--color-accent-soft), var(--color-white));
+  --theme-quick-icon-border: var(--color-accent);
   --theme-quick-icon-fg: #0b3a66;
   --theme-badge-accent-bg: var(--color-accent-soft);
-  --theme-badge-accent-border: #d8a21b;
+  --theme-badge-accent-border: var(--color-accent);
   --theme-badge-accent-text: var(--color-accent-hover);
-  --color-accent-border-soft: rgba(216, 162, 27, 0.35);
-  --color-accent-border-strong: rgba(216, 162, 27, 0.45);
+  --color-accent-border-soft: rgba(21, 91, 154, 0.35);
+  --color-accent-border-strong: rgba(21, 91, 154, 0.48);
   --color-danger-border-soft: rgba(180, 35, 24, 0.24);
   --color-danger-border-strong: rgba(180, 35, 24, 0.38);
   --color-info-border-strong: rgba(21, 91, 154, 0.48);
@@ -564,7 +565,7 @@ html[data-theme="light"] {
   --app-body-bg: linear-gradient(180deg, #ffffff 0%, #e3eaf2 48%, #e3eaf2 100%);
   --app-featured-bg-fallback: #d4dde9;
   --app-featured-bg:
-    radial-gradient(ellipse 110% 75% at 0% 0%, rgba(216, 162, 27, 0.12), transparent 52%),
+    radial-gradient(ellipse 110% 75% at 0% 0%, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 52%),
     radial-gradient(ellipse 80% 60% at 100% 8%, rgba(21, 91, 154, 0.11), transparent 50%),
     radial-gradient(ellipse 70% 48% at 50% 105%, rgba(11, 58, 102, 0.08), transparent 58%),
     linear-gradient(168deg, #f7fbff 0%, #e3eaf2 34%, #e3eaf2 68%, #cddcf0 100%);
@@ -574,8 +575,8 @@ html[data-theme="light"] {
   --app-hero-body-bg: linear-gradient(180deg, var(--color-white) 0%, #ffffff 100%);
   --app-hero-ribbon: linear-gradient(
     90deg,
-    rgba(216, 162, 27, 0.88) 0%,
-    rgba(190, 145, 45, 0.5) 42%,
+    color-mix(in srgb, var(--color-accent) 88%, transparent) 0%,
+    color-mix(in srgb, var(--color-accent-hover) 50%, transparent) 42%,
     rgba(45, 95, 145, 0.85) 100%
   );
 
@@ -587,12 +588,12 @@ html[data-theme="light"] {
   --theme-text-muted: #52657a;
   --theme-text-subtle: #71839a;
   --theme-text-muted-strong: #334c63;
-  --theme-accent-eyebrow: #d8a21b;
+  --theme-accent-eyebrow: var(--color-accent);
   --theme-stat-value: #0b3a66;
   --theme-accent-line: linear-gradient(
     90deg,
-    rgba(216, 162, 27, 0.92) 0%,
-    rgba(200, 150, 40, 0.55) 42%,
+    color-mix(in srgb, var(--color-accent) 92%, transparent) 0%,
+    color-mix(in srgb, var(--color-accent-hover) 55%, transparent) 42%,
     rgba(45, 95, 145, 0.82) 100%
   );
   --theme-card-inset: 0 1px 0 rgba(255, 255, 255, 0.08);
@@ -618,11 +619,11 @@ html[data-theme="light"] {
   --theme-form-section-border: #d4dde9;
   --theme-empty-bg: #ffffff;
   --theme-empty-border: #8ca6bf;
-  --theme-quick-icon-bg: linear-gradient(165deg, #fff6dc, #fffaeb);
-  --theme-quick-icon-border: #d8a21b;
+  --theme-quick-icon-bg: linear-gradient(165deg, var(--color-accent-soft), var(--color-white));
+  --theme-quick-icon-border: var(--color-accent);
   --theme-quick-icon-fg: #0b3a66;
   --theme-badge-accent-bg: var(--color-accent-soft);
-  --theme-badge-accent-border: #d8a21b;
+  --theme-badge-accent-border: var(--color-accent);
   --theme-badge-accent-text: var(--color-accent-hover);
 
   --route-card-bg: #ffffff;

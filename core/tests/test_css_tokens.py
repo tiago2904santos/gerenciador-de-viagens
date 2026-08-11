@@ -133,6 +133,28 @@ def _css_bundle_text() -> str:
 
 
 class CssTokenGateTests(SimpleTestCase):
+    def test_theme_accents_are_blue_in_light_and_gold_in_dark(self):
+        """NOVO-111: accent é paleta de tema; warning continua semântico."""
+        light = (CSS_DIR / "base" / "tokens.css").read_text(encoding="utf-8")
+        dark = (CSS_DIR / "base" / "03-theme-dark.css").read_text(encoding="utf-8")
+
+        self.assertIn("--color-accent: #155b9a;", light)
+        self.assertIn("--color-accent-hover: #17476f;", light)
+        self.assertIn("--color-accent-soft: #deebfb;", light)
+        self.assertIn("--color-on-accent: var(--color-white);", light)
+        self.assertIn("--color-warning: #d8a21b;", light)
+        self.assertNotIn(
+            "--color-warning-border: var(--color-accent-border-strong);",
+            light,
+        )
+
+        self.assertIn("--color-accent: #d8a21b;", dark)
+        self.assertIn("--color-accent-hover: #e0ab3c;", dark)
+        self.assertIn("--color-accent-soft: #3b3320;", dark)
+        self.assertIn("--color-on-accent: var(--color-primary-dark);", dark)
+        self.assertIn("--sidebar-active-border: var(--color-accent-border-strong);", dark)
+        self.assertIn("--sidebar-panel-border: var(--color-accent-border-soft);", dark)
+
     def test_canonical_component_stylesheets_have_no_color_literals(self):
         """Novos componentes notice/metric devem usar apenas var() de token."""
         violations: list[str] = []

@@ -7547,3 +7547,23 @@ no console — reproduzido no tipo do evento em `eventos:guiado_etapa`.
 o DOM já está pronto; o registro continua idempotente e o enhancer permanece responsável por nós
 inseridos depois. Um teste Vitest reproduz a ordem real `shell → picker → renderer` e exige que o
 controle nativo fique oculto, com combobox e listbox customizados presentes.
+
+### NOVO-111 ✅ RESOLVIDO · `NOVO` Accent dourado vazava para o tema claro e accents azuis vazavam para o escuro · UI · 0,5 d
+
+O contrato visual confirmado pelo dono é binário: **tema claro usa azul e variações de azul para
+accent; tema escuro usa dourado e variações de dourado**. O sistema ainda tinha um único
+`--color-accent` dourado no `:root`, por isso filetes, stepper, tabs, chevrons, badges, brilhos e
+realces do claro herdavam a paleta escura. No sentido inverso, os realces da sidebar escura ainda
+usavam bordas e halos azulados.
+
+**Correção.** A escala clara agora define `accent` azul (`#155b9a`, hover `#17476f`, soft
+`#deebfb`) e a camada escura conserva a escala dourada (`#d8a21b`, hover `#e0ab3c`, soft
+`#3b3320`). Gradientes, badges, filetes, sidebar e brilho consomem os tokens do tema. `warning`
+continua dourado no claro como estado semântico e sua borda foi desacoplada de `accent`, para que
+trocar a identidade visual não transforme aviso em azul. O texto sobre accent é branco no azul
+claro e azul-marinho sobre o dourado escuro.
+
+**Prova.** Capturas autenticadas da família Eventos/Wizard em claro e escuro, nas larguras 1440 e
+500 px; teste de contrato cobre as duas escalas, o contraste de texto e o desacoplamento de
+`warning`. Contraste medido do texto sobre o accent: **7,01:1** no azul claro e **6,49:1** no
+dourado escuro.
