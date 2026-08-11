@@ -2598,10 +2598,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   padding: 12px 14px;
 }
 
-:is(html[data-theme])
-  .composite-field__control {
-  border-radius: 10px;
-}
 
 :is(html[data-theme="dark"])
   .composite-field__control {
@@ -2615,10 +2611,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   overflow: hidden;
 }
 
-:is(html[data-theme])
-  .composite-field__control .form-control {
-  border-radius: 0;
-}
 
 :is(html[data-theme="dark"])
   .composite-field__control .form-control {
@@ -5688,39 +5680,6 @@ html[data-theme="dark"] *::after {
   }
 }
 
-/* ========================================================================
-   Ofício wizard — legs: surface-soft nos inputs (kill-switch final)
-   --color-surface-soft = #223348; leg permanece em --step1-field ≈ #132538
-   ======================================================================== */
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro]
-  .roteiro-trecho-card__leg
-  :is(
-    input.cv-field__control,
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
-    .date-picker__control > input.cv-field__control,
-    .date-picker__control .cv-field__control,
-    .cv-field--readonly input.cv-field__control,
-    input.cv-field__control[readonly],
-    input[readonly]
-  ),
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro]
-  #retorno-card
-  .roteiro-trecho-card__leg
-  :is(
-    input.cv-field__control,
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
-    .date-picker__control > input.cv-field__control,
-    .date-picker__control .cv-field__control,
-    .cv-field--readonly input.cv-field__control,
-    input.cv-field__control[readonly],
-    input[readonly]
-  ) {
-  background: var(--color-surface-soft) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-}
 
 /* ========================================================================
    Diario de bordo ? Saída/Chegada no mesmo visual do Retorno do ofício

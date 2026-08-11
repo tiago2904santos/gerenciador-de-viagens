@@ -147,11 +147,6 @@ html[data-theme="dark"] {
   min-width: 0;
 }
 
-.field-with-action .cv-field__control,
-.field-with-action .custom-select {
-  flex: 1 1 auto;
-  min-width: 0;
-}
 
 .field-with-action .field-action {
   align-self: center;

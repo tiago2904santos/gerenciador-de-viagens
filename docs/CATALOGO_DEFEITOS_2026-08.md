@@ -6247,3 +6247,77 @@ há.
 
 **Resta:** 40 `!important` (38 no arquivo de tema, 2 de acessibilidade) e as 68 regras em si, que a
 análise por família ainda vai separar entre contexto, estado, tema e divergência real.
+
+### NOVO-54 (continuação 2) 🟠 As 72 regras de campo, classificadas por medição, e as 7 que caíram · UI · 1 d
+
+Terceira leva do `NOVO-54`. As duas primeiras deram à classe uma regra base e cobraram 30 dos 70
+`!important`. Esta ataca as **regras em si**, por remoção empírica: em vez de ler cada uma e julgar
+se "parece necessária", removi e medi.
+
+**Primeiro, o inventário estava vencido.** O `campo.json` da leva anterior tinha 68 regras; a
+globalização mecânica do `NOVO-68` reescreveu `[data-theme="dark"]` para `[data-theme]` em dezenas de
+seletores depois disso. Os instrumentos casavam regra por **texto do seletor**, então toda regra
+reescrita deixou de casar — e "não casou" foi lido como "não vence", isto é, como candidata a
+remoção. A poda falhou alto (`bloco em 2053 nao fecha`) em vez de apagar o bloco errado, mas por
+sorte, não por desenho. Re-extraído do CSS atual: **72 regras, 40 `!important`**.
+
+*Inventário de CSS tem prazo de validade de um merge.*
+
+**Dois instrumentos, porque um só não responde.** Um diz se a rota chega a **renderizar** o alvo da
+regra (`querySelectorAll` do seletor, sem as pseudo-classes de estado); o outro diz se a regra chega
+a **ganhar** alguma propriedade (`CSS.getMatchedStylesForNode`, percorrido em ordem de precedência,
+honrando `!important`). Sem o primeiro, "nunca venceu" confunde regra morta com regra que rota
+nenhuma abriu — a armadilha do `.alert` no `NOVO-60`.
+
+| destino | regras | o que significa |
+|---|---:|---|
+| vence | 23 | ganha alguma propriedade: fica |
+| candidata | 25 | alvo renderizado e mesmo assim não ganha nada |
+| sem cobertura | 16 | rota nenhuma renderizou o alvo: não dá para julgar |
+| pseudo-elemento | 8 | `::placeholder`, `::-webkit-scrollbar-*`: fora do alcance do CDP |
+
+**Candidata não é sinônimo de podável.** A captura mede o **repouso**: não sabe dizer o que acontece
+no `:hover` nem no `:focus`. Das 25 candidatas, 8 descrevem estado e ficaram de fora do lote — provar
+com medição de repouso seria trocar prova por suposição. Mais duas ficaram por intenção explícita:
+`:where(.cv-field__control)` e a variante `--textarea` "nunca vencem" **porque** `:where()` tem
+especificidade zero e perde para o seletor de elemento nu de `base.css` — que é exatamente o que o
+`NOVO-54` quer apagar *depois*. Removê-las seria andar para trás.
+
+**A bissecção, com o piso de ruído medido em 4 elementos** (duas capturas do mesmo código, 114 telas,
+57.896 elementos):
+
+| lote podado | elementos alterados |
+|---|---:|
+| as 15 do lote inicial | 490 |
+| sem as 2 regras amplas do tema | 127 |
+| `list-header.css` sozinha responde por | 43 |
+| as 7 finais | **4 — o próprio piso** |
+
+**Caíram 7 regras**, provadas neutras: duas de `theme-dark-components.css` em `.composite-field__control`,
+uma duplicata de subconjunto (mesmo seletor de `roteiros.css:2412`, declarações contidas nas dela),
+`select.css` em `.field-with-action`, `justificativas.css` no textarea do quick-add, `usuarios.css` no
+modal de vínculo e a variante escura de `cadastros-config.css`.
+
+**Mais uma família inteira morreu por grep:** `.header-filter-datepicker` — 8 blocos em
+`page-shell.css`, incluindo um `@media` que só continha ela. A classe não existe em template, view
+nem script, e nada a monta em tempo de execução (`header-filter-input` e `header-filter-select`
+existem; `-datepicker` não). Uma das 8 é o `page-shell.css:2542` que aparece como "sem cobertura" na
+tabela acima — aqui o grep decidiu, e o navegador só confirmou.
+
+**Uma armadilha que custou uma rodada:** restaurar um **subconjunto** dos blocos podados reinsere
+cada um no índice que ele tinha no arquivo original, e com outros blocos ainda ausentes acima ele
+aterrissa no lugar errado. As chaves continuam balanceadas e o CSS continua válido — só que a ordem
+da cascata mudou, e apareceram 71 diferenças em `/roteiros/` que **não vinham de nenhuma regra
+removida**. Bissecção agora sempre parte do estado limpo (`git checkout`) e poda o subconjunto numa
+passada só.
+
+**O instrumento do repositório subiu junto.** `scripts/medir_campos_computados.py` dizia, na própria
+docstring, que alcançava 8 rotas e que ampliar isso era "trabalho a fazer antes de remover essas
+regras". Ganhou `--rotas` (caminhos já resolvidos, com PK), troca de `networkidle` — que nunca fica
+ocioso nas páginas de roteiro — por carga determinística, e passa a **abortar** quando uma rota
+falha, em vez de seguir comparando conjuntos de rotas diferentes. Medido: de 64 para **192
+combinações** rota|tema|estado e de 224 para **1048 leituras**.
+
+**Resta:** 65 regras. Das 25 candidatas, 8 de estado esperam um instrumento que meça `:hover`/`:focus`
+e 2 são a base intocável; 16 sem cobertura precisam de rota que abra modal, passo de wizard ou painel
+colapsado; 8 de pseudo-elemento precisam de outro caminho que não o `getMatchedStylesForNode`.
