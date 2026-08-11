@@ -91,8 +91,12 @@ class ViewModuleBoundaryTests(SimpleTestCase):
         # `AGENTS.md` proibe a catraca subir por regressao; esta subiu por
         # honestidade, ao passar a medir o que ja estava la. A propria fatia ja
         # devolveu 2 dos 11 (`rt_views.py` foi a zero), e o saldo entra como 9.
-        self.assertEqual(counts["prestacoes_contas"], 9)
-        self.assertEqual(sum(counts.values()), 33)
+        #
+        # 33 -> 31 (`BE-14` fatia 3): a persistencia dos anexos assinados saiu de
+        # `document_views.py` para `anexo_services.py`, e com ela os dois acessos de
+        # manager que restavam ali. Agora a catraca desce, que e o sentido normal.
+        self.assertEqual(counts["prestacoes_contas"], 7)
+        self.assertEqual(sum(counts.values()), 31)
 
     def test_orm_em_prosa_nao_conta_e_orm_em_codigo_conta(self):
         """`NOVO-11` — a catraca mede código, não texto.

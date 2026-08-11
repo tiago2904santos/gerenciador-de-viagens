@@ -397,8 +397,15 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       `rt_views.py` virou `prestacoes_contas/rt_services.py`, o módulo caiu de 305 para 203 linhas
       com zero acessos de manager, e as gravações fora de transação foram de 36 para 33. Fecha
       `NOVO-101` (a catraca `P-01` media 24 com 35 no chão) e `NOVO-102` (gravação em laço escondida
-      em `view_common.py`). Faltam a solicitação, os anexos e o diário — e a dos anexos **não é pôr
-      `atomic`**: precisa de `transaction.on_commit`, senão inverte o órfão do `BE-07`
+      em `view_common.py`). **Fatia 2 (solicitação) feita**: as duas rotas foram para
+      `solicitacao_services.py` com transação, `views.py` caiu de 743 para 674 linhas e as gravações
+      fora de transação de 33 para 29. Sobrou `NOVO-103` (as duas rotas divergem em três pontos, e a
+      divergência estava registrada com o ID de outro defeito — é decisão de produto). **Fatia 3
+      (anexos) feita**: `atomic` na linha e `transaction.on_commit` no arquivo, porque ali `atomic`
+      sozinho inverteria o órfão do `BE-07`. O defeito maior não era gravação parcial: era
+      destruição — um `create` que falhasse levava o documento assinado anterior do disco e do
+      banco. Gravações fora de transação: 29 → 24; catraca `P-01` desce de 33 para 31. Sobrou
+      `NOVO-104` (arquivo órfão no storage não tem quem varra). **Falta só o diário**
 - [ ] `BE-15` numeração reimplementada 3 vezes
 - [ ] `BE-16` abstrações de `core` adotadas pela metade
 - [x] `BE-17` `core/views.py` é 75% fixture de UI Lab — **fechado pelo PR #247**, que apagou os

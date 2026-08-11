@@ -501,6 +501,74 @@ ramos, mais o autosave com três `save()` no mesmo objeto), fatia 3 (anexos e ar
 banco com o arquivo já destruído no storage, que não faz rollback. Precisa de `atomic` +
 `transaction.on_commit`, padrão que já existe em `core/audit.py:170`.
 
+#### Fatia 2 ✅ — a solicitação (faltam os anexos e o diário)
+
+As duas rotas que gravam número de solicitação, data de liberação e prazo limite foram para
+`prestacoes_contas/solicitacao_services.py`, ambas `@transaction.atomic`. O parsing do POST virou
+`valores_do_lote(post)`, que recebe o `QueryDict` e não o `request`.
+
+**A fatia não unifica as duas rotas, e isso é decisão consciente.** Elas divergem em três pontos, e
+os três estão fotografados — ver `NOVO-103`. Escolher qual comportamento vence muda o que o operador
+vê na tela; é decisão de produto, não de camada. O que mudou aqui é onde a gravação mora e o fato de
+ela ser atômica.
+
+**O que a transação não faz, e precisa ser dito:** ela **não** desfaz a gravação parcial do autosave.
+O erro de data sai por `return`, não por exceção, então o número continua salvo quando a data
+seguinte é recusada. Era assim antes e continua assim — a diferença é que agora está travado por
+teste, em vez de ser efeito colateral de onde o `return` estava escrito.
+
+| | antes da fatia 2 | depois |
+|---|---:|---:|
+| `views.py` | 743 linhas | **674** |
+| gravações em módulo de view | 33 | **29** |
+| funções com gravação fora de transação | 23 | **21** |
+| funções com 2+ gravações sem transação | 7 | **6** |
+
+**A extração deixou três órfãos, e os três saíram:** o import de `re`, o de
+`marcar_servidor_em_preenchimento` e a função `_parse_iso_date` — que sobrou com a própria definição
+e a entrada no `__all__`, e nada mais. Converter data passou a ser trabalho do service.
+
+#### Fatia 3 ✅ — os anexos assinados, onde `atomic` sozinho pioraria
+
+A persistência dos anexos foi para `prestacoes_contas/anexo_services.py`. É a única das quatro fatias
+em que **a transação sozinha piora o sistema**, e o motivo é que aqui o estado mora em dois lugares e
+só um desfaz: o banco tem `ROLLBACK`, o storage não.
+
+`atomic` puro faria `FieldFile.delete()` rodar dentro da transação, e um rollback depois dele
+devolveria a **linha viva apontando para um arquivo destruído** — o inverso exato do órfão que o
+`BE-07` corrigiu, e igualmente irrecuperável. O par correto é **linha na transação, arquivo no
+`transaction.on_commit`**.
+
+**O defeito maior aqui não era gravação parcial: era destruição.** `_prestacao_assinado_upload`
+apagava os arquivos anteriores do disco e as linhas **antes** de criar a linha nova. Um `create` que
+falhasse — erro de storage, disco cheio, erro de banco — levava o documento assinado anterior embora,
+do disco e do banco, sem volta. Agora as linhas antigas saem dentro da transação e os arquivos só
+depois do commit, então a falha devolve tudo.
+
+**A ordem do `BE-07` ficou mais firme por dentro.** Antes ela dependia de duas chamadas escritas na
+sequência certa; agora o arquivo sai no callback, então sair depois da linha deixou de ser convenção
+e virou consequência de onde a chamada está.
+
+| | antes da fatia 3 | depois |
+|---|---:|---:|
+| gravações em módulo de view | 29 | **24** |
+| funções com gravação fora de transação | 21 | **19** |
+| funções com 2+ gravações sem transação | 6 | **4** |
+| `document_views.py` | 376 linhas, 2 acessos de manager | **359 linhas, 0** |
+| catraca `P-01` | 33 | **31** |
+
+É a primeira vez que a catraca **desce** desde que passou a medir prestações (`NOVO-101`).
+
+**O que `on_commit` não promete, e está escrito no módulo:** se o callback falhar *depois* do commit,
+a linha já foi e sobra arquivo órfão no storage — igual a hoje. Ele não conserta isso, e prometer o
+contrário seria mentira. A garantia é a outra, e é a que importa: linha viva apontando para arquivo
+destruído nunca acontece. O resíduo está registrado como `NOVO-104`.
+
+**Consequência para quem escreve teste:** `on_commit` não dispara dentro de `TestCase`, que envolve
+cada teste numa transação desfeita no fim. `test_anexos.py::test_exclusao_remove_registro_e_o_arquivo_do_disco`
+passou a usar `captureOnCommitCallbacks(execute=True)` — mesma intenção, forma nova, com o motivo no
+comentário.
+
 ### BE-15 🟡 Numeração de documento reimplementada 3 vezes · AUD · 2 d · risco alto
 
 (a) `oficios/services.py:425-440` — advisory lock, fallback `select_for_update`, reuso de lacunas,
@@ -7017,3 +7085,65 @@ percorre o laço ganhou `@transaction.atomic`, com teste provado por inversão.
 **O registro é sobre o método, e vale para as fatias 2 a 4:** varrer por nome de arquivo perde código.
 O critério certo é "módulo alcançado a partir de `urls.py`", não "arquivo cujo nome casa com um
 padrão" — e é o mesmo mecanismo do `NOVO-101`, um andar acima.
+
+### NOVO-103 · `NOVO` As duas rotas da solicitação divergem em três pontos, e a divergência estava registrada com o ID errado · BE · 1 d · decisão de produto
+
+Número de solicitação, data de liberação e prazo limite são gravados por **dois caminhos** — o lote
+sem JS (`views.py::index`, ação `save_solicitacoes`) e o autosave com JS
+(`prestacao_servidor_solicitacao_autosave`). Eles nunca se comportaram igual:
+
+| | lote (sem JS) | autosave (com JS) |
+|---|---|---|
+| data inválida | **engole em silêncio** e mantém a anterior | devolve `ok=False` com mensagem |
+| status do servidor | **não marca** — fica em `PENDENTE` | marca "em preenchimento" |
+| erro no meio | segue para os outros servidores | para, **com o que já gravou no banco** |
+
+A primeira e a segunda estavam fotografadas em `test_solicitacao.py:178` e `:192`. A terceira não
+estava, e entrou na rede da fatia 2 do `BE-14`: digitar número e data juntos, com a data inválida,
+devolve erro **com o número já gravado** — e a tela não diz isso.
+
+**Efeito prático:** o status da prestação passa a depender de o navegador ter JavaScript, e quem
+salva sem JS não descobre que a data não entrou.
+
+**O ID estava errado.** Os dois testes citam `NOVO-09` no docstring, mas o `NOVO-09` do catálogo é
+*"modelo de justificativa é global e o padrão de uma área derruba o das outras"* — outro defeito, em
+outro app, já resolvido. A divergência das solicitações **nunca teve entrada própria**; foi
+registrada num número que pertencia a outra coisa, e por isso ninguém a encontrava procurando.
+
+**Correção:** decidir qual comportamento é o certo e aplicá-lo aos dois caminhos. Não é trabalho de
+camada — é de produto, e as três perguntas são independentes:
+
+1. data inválida deve avisar ou preservar em silêncio?
+2. salvar sem JS deve tirar o servidor de "pendente"?
+3. erro numa data deve desfazer o número já digitado, ou mantê-lo?
+
+A fatia 2 do `BE-14` **preservou os três comportamentos** de propósito e travou cada um com teste, o
+que torna a mudança futura barata e verificável: qualquer resposta às perguntas acima reprova um
+teste específico, e é isso que se quer.
+
+**Custo do que já foi feito:** os dois caminhos hoje moram no mesmo módulo
+(`prestacoes_contas/solicitacao_services.py`), lado a lado, com a tabela acima no docstring. Unificar
+virou uma edição local, não uma caçada.
+
+### NOVO-104 · `NOVO` Arquivo órfão no storage não tem quem varra · BE · 0,5 d
+
+Resíduo conhecido da fatia 3 do `BE-14`, registrado para não virar surpresa.
+
+Com `atomic` na linha e `transaction.on_commit` no arquivo, a combinação perigosa — linha viva
+apontando para arquivo destruído — deixou de existir. A outra combinação continua possível: **o
+callback falhar depois do commit**. Aí a linha já foi e o arquivo fica no disco, alcançável por
+ninguém. `on_commit` não conserta isso, e nenhuma ordenação conserta: são dois sistemas, e o commit
+de um não é transacional com o outro.
+
+O dano é pequeno por evento — disco ocupado, não dado errado — e por isso o resíduo é aceitável. O
+que falta é **poder saber**: hoje não existe nada que compare o storage com a tabela. Os comandos de
+diagnóstico do repositório (`roteiros/management/commands/limpar_roteiros_orfaos.py`,
+`diagnosticar_roteiros.py`, `prestacoes_contas/.../sincronizar_prestacao_servidores.py`) olham só
+banco.
+
+**Correção:** um comando que liste arquivos sob o diretório privado de prestações sem linha
+correspondente em `PrestacaoDocumentoAnexo`, com `--apagar` opcional e saída legível. Mesma forma dos
+irmãos: diagnostica por padrão, só apaga quando mandado.
+
+**Vale para além dos anexos:** todo `FileField` do sistema tem o mesmo buraco. Começar pelos anexos
+de prestação, que são os únicos com exclusão pela tela, e ver se o resto compensa.
