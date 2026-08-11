@@ -1,6 +1,8 @@
 {% extends "cotton/page/flow_base.html" %}
 {% load static %}
 
+{% block component_js %}{% include 'includes/form_components_js.html' only %}{% endblock %}
+
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/pages/oficios.css' %}">
   <link rel="stylesheet" href="{% static 'css/pages/roteiros.css' %}">

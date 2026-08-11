@@ -65,13 +65,25 @@ AJAX.
 | Atributo | Elemento | Uso |
 |---|---|---|
 | `data-cv-lazy-components` | script do shell | Declara a configuração única do loader |
+| `data-cv-lazy-form-components-src` | script do shell | URL de `form-components.bundle.js` |
 | `data-cv-lazy-card-toggle-src` | script do shell | URL de `card-toggle.js` |
 | `data-cv-lazy-segment-nav-src` | script do shell | URL de `segment-nav.js` |
 | `data-cv-lazy-file-picker-src` | script do shell | URL de `file-picker.js` |
+| `data-cv-lazy-attach-signed-modal-src` | script do shell | URL de `attach-signed-modal.js` |
 | `data-cv-lazy-signature-actions-src` | script do shell | URL de `signature-actions.js` |
 | `data-cv-lazy-extra-download-src` | script do shell | URL de `extra-download.js` |
+| `data-cv-lazy-wizard-sticky-header-src` | script do shell | URL de `wizard-sticky-header.js` |
+| `data-cv-component-bundle="forms"` | script opcional da página | Informa que o bundle de formulários já foi declarado antes do shell |
 
 API: `CV.lazyComponents.scan(root?)`, para uma varredura explícita, e `destroy()`, usado em testes.
+
+O bundle de formulários agrupa `picker-parts`, os dois renderers de picker, `location-rows`,
+`document-source`, `document-search` e `date-picker`. Páginas cujo JavaScript chama essas APIs
+diretamente incluem `includes/form_components_js.html` no bloco `component_js`, depois do shell e
+antes dos scripts de página;
+nas demais, o loader usa `[data-entity-picker]`, `[data-location-rows]` ou
+`[data-cv-date-picker]` como marcador. O inventário automatizado em
+`core/tests/test_shell_bundles.py` obriga todo consumidor direto novo a declarar a dependência.
 
 ## Coleções — `components/collection.js` / `CV.collection`
 

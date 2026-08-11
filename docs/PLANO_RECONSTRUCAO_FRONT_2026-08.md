@@ -68,7 +68,8 @@ etapa**; o que estiver diferente é trabalho que aconteceu no meio.
 
 **O que já está são, e que nenhuma etapa pode estragar:** zero `fetch()` cru, zero `alert()`/
 `confirm()` nativos (os 12 hits de `grep` são `CV.feedback.*`), zero `style=` inline, zero
-`<script>` inline em template, bundles em dia (`build_shell_bundles.py --check`: 25 CSS, 26 JS).
+`<script>` inline em template, bundles em dia (`build_shell_bundles.py --check`: 25 CSS,
+13 JS de shell e 7 JS de formulário).
 
 **A folga zero do foco importa.** `audit_foco_visivel --max 30` está em exatamente 30. Qualquer
 bloco novo que apague foco sem substituto reprova o CI. As etapas E6 a E9 mexem em `:focus`; conte
@@ -706,12 +707,17 @@ tem que bater: uso acima de 35% por rota**, contra os 10,1%–11,8% de hoje.
 
 **Passo a passo, um ID por commit.**
 
-1. **`HT-04`** — `base.html:11,45` carrega `shell.bundle.css` e `shell.bundle.js`
-   incondicionalmente, e ~153 KB do JS (57% do bundle) são exclusivos dos wizards de
-   ofício/roteiro/termo/prestação. Separe bundle "núcleo" de bundle "documentos", usando os
-   `{% block extra_js %}`/`{% block extra_css %}` que `base.html:12-13,46` já tem. Mitigue a
-   regressão silenciosa — template que esquece de declarar — com regra no auditor ou teste de
-   fumaça por tela.
+1. **`HT-04` — JS ✅; CSS → E10.** A premissa de uso exclusivo por wizard estava desatualizada:
+   pickers e calendários também chegam a cadastros, filtros e conteúdo AJAX. Os sete módulos com
+   dependência entre si foram para `form-components.bundle.js`, em ordem determinística; 11
+   templates que chamam suas APIs diretamente o declaram no novo bloco `component_js`, depois do
+   shell e antes dos scripts de página, e os demais carregam por marcador DOM.
+   `attach-signed-modal` e `wizard-sticky-header` também saíram
+   do shell e carregam sob demanda. Resultado: **266.254 → 108.937 bytes** no shell global
+   (**−157.317; −59,1%**); uma rota com o bundle de formulário recebe **248.402 bytes**, ainda
+   **17.852 bytes abaixo** do shell anterior. O teste mantém o inventário dos 12 scripts de página
+   que dependem diretamente dessas APIs e impede declaração esquecida. A fatia de ~37 KB de CSS
+   permanece deliberadamente em `UI-04`/E10, porque CSS e JS não podem avançar na mesma camada.
 2. **`JS-07` ✅** — "fechar ao clicar fora / Esc" estava em 4 cópias (`picker.js`, `date-picker.js`,
    `cv-select.js` — que a E2 já apagou —, `picker-select.js`). `components/overlay.js` já tinha
    a base. **Correção do catálogo que você precisa conhecer:** nenhuma das quatro fecha em

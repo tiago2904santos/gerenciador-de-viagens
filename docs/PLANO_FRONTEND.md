@@ -247,7 +247,7 @@ dentro de `{% for %}`). Os defeitos estão concentrados em acessibilidade de for
 | `HT-01` 🔴 | **Foco de teclado invisível em todo campo do sistema, inclusive no login** | 1–2 | F0 |
 | `HT-02` ✅ 🟠 | Erro de campo sem `aria-describedby`/`aria-invalid`/`role="alert"` — no componente com **154** usos; fechado junto do `HT-12`, que é o mesmo defeito pelo outro lado | 2–3 | F2 |
 | `HT-03` ✅ 🟠 | Sem padrão único para erro de formulário: o componente correto tinha **zero** usos em produção — e **jogava a mensagem fora**; agora são 20 chamadores, com o texto real e foco no resumo | 2 | F2 |
-| `HT-04` 🟠 | `base.html` carrega ~153 KB de JS e ~37 KB de CSS de domínio em toda página | 2–3 | F5 |
+| `HT-04` 🟡 | Entrega JS fechada: shell 266.254 → 108.937 B; os ~37 KB de CSS seguem na fronteira `UI-04`/E10 | 2–3 | F5 |
 | `HT-05` ✅ 🟡 | `empty_state.html` fixa `<h3>`, quebrando a ordem de headings em **10** das 10 listas | 0,5 | F2 |
 | `HT-06` 🟡 | 10 componentes mortos (6 órfãos diretos, 4 alcançáveis só sob `DEBUG`) | 0,5–1 | F3 |
 | `HT-07` 🟡 | Concatenação condicional com "·" no template, 10 pontos em 8 arquivos, sem parênteses | 1–2 | F5 |

@@ -6,6 +6,12 @@
   var config = document.querySelector("script[data-cv-lazy-components]");
   var entries = [
     {
+      name: "form-components",
+      selector: "[data-entity-picker], [data-location-rows], [data-cv-date-picker]",
+      sourceAttribute: "data-cv-lazy-form-components-src",
+      loadedSelector: 'script[data-cv-component-bundle="forms"]',
+    },
+    {
       name: "card-toggle",
       selector: "[data-card-toggle]",
       sourceAttribute: "data-cv-lazy-card-toggle-src",
@@ -21,6 +27,11 @@
       sourceAttribute: "data-cv-lazy-file-picker-src",
     },
     {
+      name: "attach-signed-modal",
+      selector: "[data-attach-signed-modal], [data-attach-signed-trigger]",
+      sourceAttribute: "data-cv-lazy-attach-signed-modal-src",
+    },
+    {
       name: "signature-actions",
       selector: "[data-cv-signature-copy], [data-cv-signature-wa]",
       sourceAttribute: "data-cv-lazy-signature-actions-src",
@@ -29,6 +40,11 @@
       name: "extra-download",
       selector: "[data-extra-download-url]",
       sourceAttribute: "data-cv-lazy-extra-download-src",
+    },
+    {
+      name: "wizard-sticky-header",
+      selector: "[data-wizard-sticky-header]",
+      sourceAttribute: "data-cv-lazy-wizard-sticky-header-src",
     },
   ];
   var requested = Object.create(null);
@@ -42,6 +58,10 @@
 
   function request(entry) {
     if (requested[entry.name] || !config) return;
+    if (entry.loadedSelector && document.querySelector(entry.loadedSelector)) {
+      requested[entry.name] = true;
+      return;
+    }
     var source = config.getAttribute(entry.sourceAttribute);
     if (!source) return;
     requested[entry.name] = true;
