@@ -2760,6 +2760,14 @@ mesma geometria e os mesmos estilos computados em claro/escuro a 1440, 800 e 500
 de estilo da família também ficaram idênticas nos consumidores originais: Ofícios, Roteiros,
 Termos e Ordem de Serviço, nas mesmas seis combinações.
 
+**Sétima família fechada em 11/08 (`UI-04`, parcial).** A lista de Termos deixou de importar
+`prestacoes_contas.css`: o único efeito da folha alheia eram 13 elementos do modal recebendo a
+superfície antiga em vez do `file-picker` canônico (14 elementos em 500 px). A lista, filtros,
+cards, calendário e menus mantiveram estilo e geometria; o modal passou deliberadamente ao desenho
+canônico de `fields/file-picker.css`, sem overflow em claro/escuro a 1440, 800 e 500 px. A entrega
+caiu de **673.378 para 650.375 bytes** (**-23.003 bytes**) e o uso medido subiu de **13,6518% para
+14,0594%**.
+
 ---
 
 ## QA — Testes, CI, segurança e infraestrutura
