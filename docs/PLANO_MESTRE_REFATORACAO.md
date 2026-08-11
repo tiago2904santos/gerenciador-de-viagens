@@ -426,7 +426,15 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       mutuamente exclusivos) e subconta o pior caso restante, `eventos/views.py::detalhe`, que
       aparece com 1 e faz ~12 gravações em 6 tabelas. **Fatia 6: `eventos`**, dirigida por leitura
       de caminho e não pelo contador
-- [ ] `BE-15` numeração reimplementada 3 vezes
+- [ ] `BE-15` numeração reimplementada 3 vezes — **fatia 1 (a mecânica) feita**: o lock e o laço
+      de retry, que eram ~60 linhas copiadas entre ofício e OS, viraram `core/numeracao.py`; a
+      política de escolha de cada documento fica onde estava, porque diferente ali é desenho, não
+      defeito. Apareceu um quarto site que o enunciado não citava (a edição de número manual), que
+      passou a usar o lock **sem** o retry. Fecha `NOVO-109`: a detecção de colisão lia a mensagem
+      do `IntegrityError` e **só funcionava no PostgreSQL** — em metade da suíte o retry era código
+      morto, e o teste que o cobria fabricava a própria evidência. **Fatia 2**: OS reaproveita
+      número liberado por exclusão (decisão do dono; único ponto que muda número emitido).
+      **Fatia 3**: o plano entra na abstração e ganha o retry que não tem
 - [ ] `BE-16` abstrações de `core` adotadas pela metade
 - [x] `BE-17` `core/views.py` é 75% fixture de UI Lab — **fechado pelo PR #247**, que apagou os
       dois labs e as 1.013 linhas de fixture; a cascata de componentes que ele deixou é o

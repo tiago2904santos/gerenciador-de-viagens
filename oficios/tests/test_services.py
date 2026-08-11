@@ -2,7 +2,6 @@ import datetime
 from types import SimpleNamespace
 from unittest import mock
 
-from django.db import IntegrityError
 from django.test import TestCase
 from django.core.files.base import ContentFile
 from django.test import override_settings
@@ -73,42 +72,41 @@ class OficioServicesTests(TestCase):
         self.assertEqual(oficio.status, Oficio.STATUS_RASCUNHO)
         self.assertEqual(list(oficio.servidores.all()), [self.servidor])
 
-    @mock.patch("oficios.services._bloquear_escopo_numeracao_oficio")
     @mock.patch(
         "oficios.services.get_next_available_numero_oficio",
         side_effect=[77, 78],
     )
-    def test_reserva_repete_apos_colisao_de_worker_antigo(
-        self,
-        _proximo_numero,
-        _bloqueio,
-    ):
+    def test_reserva_repete_apos_colisao_de_worker_antigo(self, _proximo_numero):
+        """O retry, contra uma colisão **real** do banco.
+
+        `BE-15`: até aqui este teste fabricava um `IntegrityError` já contendo o nome da
+        constraint que o código procurava. Isso provava o laço e nunca o **casamento** — e
+        o casamento estava quebrado no SQLite, cuja mensagem cita as colunas em vez do
+        nome da constraint. Medido nos dois bancos:
+
+        - PostgreSQL: `duplicate key value violates unique constraint "oficios_oficio_area_ano_numero_unique"`
+        - SQLite: `UNIQUE constraint failed: oficios_oficio.area_id, oficios_oficio.ano, oficios_oficio.numero`
+
+        Agora a primeira tentativa escolhe um número **de fato ocupado** e quem levanta é o
+        banco. A detecção passou a ser semântica (`core/numeracao.py`), então o cenário
+        vale igual nos dois.
+        """
         ano = timezone.localdate().year
-        Oficio.objects.create(area=area_de_teste(), 
+        Oficio.objects.create(
+            area=area_de_teste(),
             numero=77,
             ano=ano,
             custeio=Oficio.CUSTEIO_UNIDADE_DPC,
         )
-        rascunho = Oficio.objects.create(area=area_de_teste(), 
+        rascunho = Oficio.objects.create(
+            area=area_de_teste(),
             custeio=Oficio.CUSTEIO_UNIDADE_DPC,
         )
-        original_save = rascunho.save
-        chamadas = 0
 
-        def save_com_primeira_colisao(*args, **kwargs):
-            nonlocal chamadas
-            chamadas += 1
-            if chamadas == 1:
-                raise IntegrityError(
-                    'duplicate key violates "oficios_oficio_area_ano_numero_unique"',
-                )
-            return original_save(*args, **kwargs)
-
-        with mock.patch.object(rascunho, "save", side_effect=save_com_primeira_colisao):
-            reservado = reservar_numero_oficio(rascunho, ano=ano)
+        reservado = reservar_numero_oficio(rascunho, ano=ano)
 
         self.assertEqual(reservado.numero, 78)
-        self.assertEqual(chamadas, 2)
+        self.assertEqual(_proximo_numero.call_count, 2, "o laço não repetiu na colisão")
 
     def test_get_next_available_numero_reaproveita_lacuna_apos_exclusao(self):
         ano = timezone.localdate().year
