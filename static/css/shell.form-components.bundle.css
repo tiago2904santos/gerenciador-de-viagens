@@ -150,6 +150,7 @@ html[data-theme="dark"] {
   --color-accent-text: #e0ab3c;
   --color-accent-border-soft: #7a641f;
   --color-accent-border-strong: #a5851f;
+  --color-on-accent: var(--color-primary-dark);
   --glow-accent: 0 14px 34px rgba(216, 162, 27, 0.22);
   --color-focus: #e0ab3c;
   /* No escuro o halo acompanha o foco ambar, nao o azul do tema claro. */
@@ -314,23 +315,23 @@ html[data-theme="dark"] {
   --sidebar-border: rgba(255, 255, 255, 0.08);
   --sidebar-shadow: inset -1px 0 rgba(255, 255, 255, 0.04), 14px 0 42px rgba(0, 0, 0, 0.22);
   --sidebar-brand-fg: #ffffff;
-  --sidebar-badge-bg: linear-gradient(140deg, rgba(219, 166, 32, 0.72) 0%, rgba(179, 129, 27, 0.85) 100%);
+  --sidebar-badge-bg: linear-gradient(140deg, var(--color-accent-hover) 0%, var(--color-accent) 100%);
   --sidebar-link-surface: transparent;
   --sidebar-link-border: transparent;
   --sidebar-link-fg: #b5c0c8;
   --sidebar-link-hover-bg: #243541;
   --sidebar-icon-bg: #243541;
   --sidebar-icon-fg: #c3ccd3;
-  --sidebar-active-bg: #1e3a50;
+  --sidebar-active-bg: color-mix(in srgb, var(--color-accent) 12%, var(--sidebar-surface));
   --sidebar-active-fg: #ffffff;
-  --sidebar-active-border: #607d93;
-  --sidebar-panel-border: #3f657f;
+  --sidebar-active-border: var(--color-accent-border-strong);
+  --sidebar-panel-border: var(--color-accent-border-soft);
   --sidebar-footer-fg: #9ba9b4;
   --sidebar-logout-bg: transparent;
   --sidebar-logout-border: rgba(255, 255, 255, 0.11);
   --sidebar-logout-fg: #d2d9de;
-  --sidebar-focus-ring: rgba(131, 188, 232, 0.52);
-  --sidebar-theme-active-bg: rgba(75, 143, 197, 0.23);
+  --sidebar-focus-ring: color-mix(in srgb, var(--color-accent) 52%, transparent);
+  --sidebar-theme-active-bg: color-mix(in srgb, var(--color-accent) 18%, transparent);
 
   --app-body-bg:
     radial-gradient(ellipse 70% 50% at 50% 0%, rgba(21, 91, 154, 0.16), transparent 55%),

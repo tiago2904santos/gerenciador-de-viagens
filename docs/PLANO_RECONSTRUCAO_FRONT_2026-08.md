@@ -666,6 +666,7 @@ o token resolve.
 | **E9-a** | 32 regras só-escuras de cor removidas por medição | ✅ `#310` — 4 elementos alterados = piso de ruído. Arquivo 5.788 → **5.610** linhas; `!important` 466 → **463** |
 | **E9-c** | o sistema de superfície do wizard (`--step1-*`) passa a existir no claro — **destrava a 8b** | ✅ `#313` — 36 elementos no claro, **2 no escuro** ⚠️ o "destrava" valeu para **1 regra**, não para a família: ver `NOVO-105` |
 | **E9-d** | `NOVO-82`: remove as 87 declarações de tema escuro vencidas no próprio arquivo | ✅ tabela efetiva do resolvedor idêntica: **2.135 valores**, SHA-256 `55c095380e25f0735ad7bb8a40dd23a916df57cb9f47a98e91bd7ed54f064abc` |
+| **E9-e accents por tema** | azul no claro, dourado no escuro, com `warning` desacoplado (`NOVO-111`) | ✅ tokens, gradientes, badges, filetes e sidebar seguem a paleta do tema; contrato e prints 1440/500 |
 | **E8-8b** | a fatia da 8b que sobrevive aos três portões (alcance medido, âncora estrutural, fronteira no claro) | ✅ 1 de 41 regras — escuro **pixel-idêntico**, claro com 18 elementos nas 3 rotas de roteiro |
 | **E8-8b superfícies** | redesenha a hierarquia clara e neutraliza a família bloqueada (`NOVO-93`) | ✅ regras que removem borda do claro **34 → 0**; divergências não-cor **138.978 → 115.963**; escuro 60.497 elementos, **0 diferenças** |
 | **E8 Eventos/Wizard** | tipografia, stepper de um anel, campos, selects e hierarquia de superfícies (`NOVO-58`, `NOVO-100`) | ✅ conteúdo com **0 divergências não-cor** em 1440/800/500; chrome móvel permanece na 8h; prints claro/escuro conferidos |
