@@ -6463,8 +6463,8 @@ com medição de repouso seria trocar prova por suposição. Mais duas ficaram p
 especificidade zero e perde para o seletor de elemento nu de `base.css` — que é exatamente o que o
 `NOVO-54` quer apagar *depois*. Removê-las seria andar para trás.
 
-**A bissecção, com o piso de ruído medido em 4 elementos** (duas capturas do mesmo código, 114 telas,
-57.896 elementos):
+**A bissecção, com o piso de ruído medido** (duas capturas do mesmo código, 112 telas, 59.006
+elementos):
 
 | lote podado | elementos alterados |
 |---|---:|
@@ -6491,10 +6491,26 @@ da cascata mudou, e apareceram 71 diferenças em `/roteiros/` que **não vinham 
 removida**. Bissecção agora sempre parte do estado limpo (`git checkout`) e poda o subconjunto numa
 passada só.
 
+**O piso de ruído não era ruído de renderização — era o relógio.** `/justificativas/` mostra
+`ATUALIZADA 10/08/2026 23:32`, com precisão de minuto, e numa fonte proporcional os dígitos não têm
+todos a mesma largura. Duas capturas em minutos diferentes divergiam em 4 elementos; duas no mesmo
+minuto, em zero. O piso oscilava entre 0 e 4 conforme a hora da captura — e um piso que é loteria não
+serve de referência. A captura passou a guardar o **texto** de cada elemento e o comparador separa
+*"o texto mudou"* (reflow) de *"o estilo mudou"* (cascata). Com isso, piso e mudança medem a mesma
+coisa: **0 diferenças de estilo, 4 de conteúdo**, dos dois lados.
+
+**Uma rota do corpus era 404 e ninguém tinha notado.** `page.goto()` não levanta exceção em 404, 500
+nem em redirecionamento para o login: devolve a resposta e segue. `/prestacoes-contas/1/` não existe
+— o caminho real é `/prestacoes-contas/prestacao/<pk>/documentos/` — e a rota entrava na captura como
+uma tela de erro, sem campo nenhum, contando como cobertura. O instrumento agora confere o status e a
+URL final, e **aborta**. Foi assim que o defeito apareceu.
+
 **O instrumento do repositório subiu junto.** `scripts/medir_campos_computados.py` dizia, na própria
 docstring, que alcançava 8 rotas e que ampliar isso era "trabalho a fazer antes de remover essas
-regras". Ganhou `--rotas` (caminhos já resolvidos, com PK), troca de `networkidle` — que nunca fica
-ocioso nas páginas de roteiro — por carga determinística, e passa a **abortar** quando uma rota
+regras". Ganhou `--rotas` (caminhos já resolvidos, com PK); troca de `networkidle` — que nunca
+fica ocioso nas páginas de roteiro — por espera até a árvore parar de crescer, porque o editor de
+roteiro só materializa os campos depois de `loadCities()` resolver e tempo fixo mediria a página
+antes de eles existirem; conferência de status HTTP e de URL final; e **aborta** quando uma rota
 falha, em vez de seguir comparando conjuntos de rotas diferentes. Medido: de 64 para **192
 combinações** rota|tema|estado e de 224 para **1048 leituras**.
 

@@ -21,8 +21,14 @@ ficariam invisiveis para a medicao.
 primeira versao deste script encontrava campo em **8 rotas**: as paginas onde o
 campo aparece de verdade sao as de wizard e edicao, que exigem PK. Daí `--rotas`:
 um JSON com a lista de caminhos ja resolvidos (`/oficios/1/roteiro/`,
-`/roteiros/9/editar/`, ...). Medido: com 57 caminhos sao 192 combinacoes
-rota|tema|estado e 1048 leituras de campo, contra 64 e 224 antes.
+`/roteiros/9/editar/`, ...). Medido: com 56 caminhos sao 208 combinacoes
+rota|tema|estado e 1144 leituras de campo, contra 64 e 224 antes.
+
+**Rota quebrada aborta.** `page.goto()` NAO levanta em 404, 500 nem em
+redirecionamento para o login — devolve a resposta e segue. Sem conferir status
+e URL final, a rota caia no ramo "nenhum campo" e sumia em silencio: foi assim
+que `/prestacoes-contas/1/`, que nao existe, passou tres medicoes inteiras
+contando como cobertura.
 
 Ampliar o alcance era, literalmente, o que a versao anterior deste arquivo
 listava como "trabalho a fazer antes de remover essas regras".
@@ -99,6 +105,28 @@ def carregar_rotas(caminho):
     return [(p, p) for p in lista]
 
 
+def esperar_arvore_estavel(pagina, quieto_ms=400, teto_ms=8000):
+    """Espera a arvore parar de crescer, em vez de contar um tempo fixo.
+
+    O editor de roteiro so materializa os campos depois de `loadCities(...)`
+    resolver e `renderTrechos` rodar. Com espera fixa, uma rede mais lenta numa
+    das capturas mede a pagina antes dos campos existirem — e ai a regra que
+    pinta esses campos parece inocua porque ninguem olhou para eles. Contar
+    elementos ate o numero repetir amarra a medicao ao DOM, nao ao relogio.
+    """
+    anterior = -1
+    parado = 0
+    passo = 100
+    for _ in range(teto_ms // passo):
+        atual = pagina.evaluate("() => document.getElementsByTagName('*').length")
+        parado = parado + passo if atual == anterior else 0
+        anterior = atual
+        if parado >= quieto_ms:
+            return atual
+        pagina.wait_for_timeout(passo)
+    return anterior
+
+
 def medir(base_url, usuario, senha, temas, rotas):
     from playwright.sync_api import sync_playwright
 
@@ -125,16 +153,26 @@ def medir(base_url, usuario, senha, temas, rotas):
                 # `networkidle` nao serve: as paginas de roteiro tem pedido que o
                 # proxy segura e nunca ficam ociosas, estouram o timeout e a rota
                 # sumia da captura — e rota que sai do "antes" mas entra no
-                # "depois" vira diferenca que nao existe. Espera fixa e
-                # reprodutivel; e a falha ABORTA, porque comparar dois conjuntos
-                # de rotas diferentes e pior que nao medir.
+                # "depois" vira diferenca que nao existe. Espera ate a arvore
+                # parar de crescer, e a falha ABORTA: comparar dois conjuntos de
+                # rotas diferentes e pior que nao medir.
                 try:
-                    pagina.goto(
+                    resposta = pagina.goto(
                         f"{base_url}{caminho}", wait_until="domcontentloaded", timeout=45000
                     )
                 except Exception as erro:
                     sys.exit(f"rota {caminho} nao carregou: {str(erro).splitlines()[0]}")
-                pagina.wait_for_timeout(700)
+
+                # `goto` NAO levanta em 404, 500 nem em redirecionamento para o
+                # login: devolve a resposta e segue. Sem conferir aqui, a rota
+                # cairia no ramo "nenhum campo" e sumiria em silencio — e uma
+                # captura com uma rota boa e vinte quebradas aprovaria remocao
+                # alegando cobertura que nao houve.
+                if resposta is not None and resposta.status >= 400:
+                    sys.exit(f"rota {caminho} respondeu {resposta.status}")
+                if "/login" in pagina.url and "/login" not in caminho:
+                    sys.exit(f"rota {caminho} caiu no login: sessao perdida")
+                esperar_arvore_estavel(pagina)
                 pagina.evaluate(
                     "t => document.documentElement.setAttribute('data-theme', t)", tema
                 )
