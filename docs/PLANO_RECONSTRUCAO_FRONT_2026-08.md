@@ -655,6 +655,7 @@ o token resolve.
 | **E9-b** | a faixa de filtros não tinha fundo no claro: os nove `--card-family-*` passam a existir no `:root` do `tokens.css` | ✅ `#309` — 47 elementos no claro, **2 no escuro** (piso de ruído) |
 | **E9-a** | 32 regras só-escuras de cor removidas por medição | ✅ `#310` — 4 elementos alterados = piso de ruído. Arquivo 5.788 → **5.610** linhas; `!important` 466 → **463** |
 | **E9-c** | o sistema de superfície do wizard (`--step1-*`) passa a existir no claro — **destrava a 8b** | ✅ `#313` — 36 elementos no claro, **2 no escuro** |
+| **E9-d** | `NOVO-82`: remove as 87 declarações de tema escuro vencidas no próprio arquivo | ✅ tabela efetiva do resolvedor idêntica: **2.135 valores**, SHA-256 `55c095380e25f0735ad7bb8a40dd23a916df57cb9f47a98e91bd7ed54f064abc` |
 
 **O instrumento que a etapa exigiu, e que não existia.** A régua da E0
 (`medir_divergencia_tema.py`) compara **claro contra escuro no mesmo código**. A E9 precisa do
