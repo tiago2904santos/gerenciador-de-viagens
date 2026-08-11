@@ -28,7 +28,6 @@ from __future__ import annotations
 
 import json
 from datetime import date
-from unittest import expectedFailure
 from unittest import mock
 
 from django.test import TestCase
@@ -163,13 +162,11 @@ class SolicitacaoEmLoteTransacaoTests(PrestacaoFixturesMixin, TestCase):
         self.assertEqual(self.ps_a.numero_solicitacao, "LOTE-A")
         self.assertEqual(self.ps_b.numero_solicitacao, "LOTE-B")
 
-    @expectedFailure
     def test_falha_no_meio_do_laco_nao_deixa_meia_gravacao(self):
-        """O defeito do `BE-14` no lote. **Reprova antes da correção.**
+        """Era o defeito do `BE-14` no lote, e é a razão de o service ser atômico.
 
-        `expectedFailure` só neste commit, para a rede entrar verde antes de o código
-        mudar. O commit do service tira o decorador — e esquecer de tirar reprova
-        também, por "unexpected success".
+        Reprovava no commit da rede e passou a valer quando o laço saiu da view para
+        `solicitacao_services.salvar_solicitacoes_em_lote`.
         """
         original = PrestacaoServidor.save
         chamadas = []
