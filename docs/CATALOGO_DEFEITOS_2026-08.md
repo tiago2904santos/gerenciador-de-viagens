@@ -501,6 +501,33 @@ ramos, mais o autosave com três `save()` no mesmo objeto), fatia 3 (anexos e ar
 banco com o arquivo já destruído no storage, que não faz rollback. Precisa de `atomic` +
 `transaction.on_commit`, padrão que já existe em `core/audit.py:170`.
 
+#### Fatia 2 ✅ — a solicitação (faltam os anexos e o diário)
+
+As duas rotas que gravam número de solicitação, data de liberação e prazo limite foram para
+`prestacoes_contas/solicitacao_services.py`, ambas `@transaction.atomic`. O parsing do POST virou
+`valores_do_lote(post)`, que recebe o `QueryDict` e não o `request`.
+
+**A fatia não unifica as duas rotas, e isso é decisão consciente.** Elas divergem em três pontos, e
+os três estão fotografados — ver `NOVO-103`. Escolher qual comportamento vence muda o que o operador
+vê na tela; é decisão de produto, não de camada. O que mudou aqui é onde a gravação mora e o fato de
+ela ser atômica.
+
+**O que a transação não faz, e precisa ser dito:** ela **não** desfaz a gravação parcial do autosave.
+O erro de data sai por `return`, não por exceção, então o número continua salvo quando a data
+seguinte é recusada. Era assim antes e continua assim — a diferença é que agora está travado por
+teste, em vez de ser efeito colateral de onde o `return` estava escrito.
+
+| | antes da fatia 2 | depois |
+|---|---:|---:|
+| `views.py` | 743 linhas | **674** |
+| gravações em módulo de view | 33 | **29** |
+| funções com gravação fora de transação | 23 | **21** |
+| funções com 2+ gravações sem transação | 7 | **6** |
+
+**A extração deixou três órfãos, e os três saíram:** o import de `re`, o de
+`marcar_servidor_em_preenchimento` e a função `_parse_iso_date` — que sobrou com a própria definição
+e a entrada no `__all__`, e nada mais. Converter data passou a ser trabalho do service.
+
 ### BE-15 🟡 Numeração de documento reimplementada 3 vezes · AUD · 2 d · risco alto
 
 (a) `oficios/services.py:425-440` — advisory lock, fallback `select_for_update`, reuso de lacunas,
@@ -6973,3 +7000,42 @@ percorre o laço ganhou `@transaction.atomic`, com teste provado por inversão.
 **O registro é sobre o método, e vale para as fatias 2 a 4:** varrer por nome de arquivo perde código.
 O critério certo é "módulo alcançado a partir de `urls.py`", não "arquivo cujo nome casa com um
 padrão" — e é o mesmo mecanismo do `NOVO-101`, um andar acima.
+
+### NOVO-103 · `NOVO` As duas rotas da solicitação divergem em três pontos, e a divergência estava registrada com o ID errado · BE · 1 d · decisão de produto
+
+Número de solicitação, data de liberação e prazo limite são gravados por **dois caminhos** — o lote
+sem JS (`views.py::index`, ação `save_solicitacoes`) e o autosave com JS
+(`prestacao_servidor_solicitacao_autosave`). Eles nunca se comportaram igual:
+
+| | lote (sem JS) | autosave (com JS) |
+|---|---|---|
+| data inválida | **engole em silêncio** e mantém a anterior | devolve `ok=False` com mensagem |
+| status do servidor | **não marca** — fica em `PENDENTE` | marca "em preenchimento" |
+| erro no meio | segue para os outros servidores | para, **com o que já gravou no banco** |
+
+A primeira e a segunda estavam fotografadas em `test_solicitacao.py:178` e `:192`. A terceira não
+estava, e entrou na rede da fatia 2 do `BE-14`: digitar número e data juntos, com a data inválida,
+devolve erro **com o número já gravado** — e a tela não diz isso.
+
+**Efeito prático:** o status da prestação passa a depender de o navegador ter JavaScript, e quem
+salva sem JS não descobre que a data não entrou.
+
+**O ID estava errado.** Os dois testes citam `NOVO-09` no docstring, mas o `NOVO-09` do catálogo é
+*"modelo de justificativa é global e o padrão de uma área derruba o das outras"* — outro defeito, em
+outro app, já resolvido. A divergência das solicitações **nunca teve entrada própria**; foi
+registrada num número que pertencia a outra coisa, e por isso ninguém a encontrava procurando.
+
+**Correção:** decidir qual comportamento é o certo e aplicá-lo aos dois caminhos. Não é trabalho de
+camada — é de produto, e as três perguntas são independentes:
+
+1. data inválida deve avisar ou preservar em silêncio?
+2. salvar sem JS deve tirar o servidor de "pendente"?
+3. erro numa data deve desfazer o número já digitado, ou mantê-lo?
+
+A fatia 2 do `BE-14` **preservou os três comportamentos** de propósito e travou cada um com teste, o
+que torna a mudança futura barata e verificável: qualquer resposta às perguntas acima reprova um
+teste específico, e é isso que se quer.
+
+**Custo do que já foi feito:** os dois caminhos hoje moram no mesmo módulo
+(`prestacoes_contas/solicitacao_services.py`), lado a lado, com a tabela acima no docstring. Unificar
+virou uma edição local, não uma caçada.
