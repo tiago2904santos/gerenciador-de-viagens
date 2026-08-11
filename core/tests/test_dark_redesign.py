@@ -11,9 +11,13 @@ class DarkRedesignContractTests(SimpleTestCase):
         css_root = Path(settings.BASE_DIR) / "static" / "css"
         self.tokens_path = css_root / "base" / "03-theme-dark.css"
         self.components_path = css_root / "components" / "theme-dark-components.css"
+        self.page_shell_path = css_root / "layout" / "page-shell.css"
+        self.list_header_path = css_root / "lists" / "list-header.css"
         self.base = self.base_path.read_text(encoding="utf-8")
         self.tokens_css = self.tokens_path.read_text(encoding="utf-8")
         self.components_css = self.components_path.read_text(encoding="utf-8")
+        self.page_shell_css = self.page_shell_path.read_text(encoding="utf-8")
+        self.list_header_css = self.list_header_path.read_text(encoding="utf-8")
         self.css = f"{self.tokens_css}\n{self.components_css}"
 
     def test_dark_redesign_is_the_final_global_css_layer(self):
@@ -109,6 +113,40 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("@media (max-width: 600px)", self.components_css)
         self.assertIn("height: 100dvh;", self.components_css)
         self.assertIn("max-height: none;", self.components_css)
+
+    def test_event_wizard_geometry_is_shared_by_both_themes(self):
+        # NOVO-58/NOVO-100: o claro e o escuro mudam de paleta, não de desenho.
+        self.assertIn(
+            ':is(html[data-theme])\n  :is([data-travel-document-wizard-step1] .travel-document-block',
+            self.components_css,
+        )
+        self.assertIn(
+            ':is(html[data-theme])\n  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block.route-destinos-block--split',
+            self.components_css,
+        )
+        self.assertIn(
+            ':is(html[data-theme])\n  .custom-select__trigger--v2 .custom-select__chevron',
+            self.components_css,
+        )
+        self.assertNotIn(
+            ':is(html[data-theme="dark"])\n  .custom-select__trigger--v2 .custom-select__chevron',
+            self.components_css,
+        )
+
+    def test_event_stepper_uses_one_shared_ring_and_shared_typography(self):
+        # Decisão visual do dono em 11/08/2026: um anel no passo ativo.
+        self.assertIn(
+            "0 0 0 3px color-mix(",
+            self.page_shell_css,
+        )
+        self.assertIn(
+            ':is(html[data-theme])\n  .list-header--wizard-stepper\n  .page-stepper__eyebrow',
+            self.list_header_css,
+        )
+        self.assertNotIn(
+            ':is(html[data-theme="dark"])\n  .list-header--wizard-stepper\n  .page-stepper__eyebrow',
+            self.list_header_css,
+        )
 
     def test_templates_do_not_reintroduce_inline_visual_or_event_contracts(self):
         templates = Path(settings.BASE_DIR) / "templates"

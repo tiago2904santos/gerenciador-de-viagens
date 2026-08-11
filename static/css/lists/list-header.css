@@ -908,12 +908,12 @@
 }
 
 :is(html[data-theme]) .list-header--wizard-band {
-  background: var(--color-surface-muted);
-  border-color: var(--color-border);
+  background: var(--app-hero-stage-bg);
+  border-color: transparent;
 }
 
 :is(html[data-theme]) .list-header--wizard-band .list-header__band {
-  background: var(--color-surface-muted);
+  background: var(--app-hero-stage-bg);
 }
 
 :is(html[data-theme]) .list-header--wizard-stepper {
@@ -955,25 +955,31 @@
   transform: none;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .list-header--wizard-stepper
   .list-header__wizard-stepper
   .page-stepper {
   --stepper-marker-size: 32px;
-  --stepper-missing-bg: color-mix(in srgb, var(--color-danger) 12%, transparent);
-  --stepper-missing-border: color-mix(in srgb, var(--color-danger) 30%, transparent);
-  --stepper-missing-color: color-mix(in srgb, var(--color-danger) 72%, #e3eaf2);
-  --stepper-status-missing-color: color-mix(in srgb, var(--color-danger) 62%, #afc0d3);
   background: transparent;
 }
 
 :is(html[data-theme="dark"])
   .list-header--wizard-stepper
+  .list-header__wizard-stepper
+  .page-stepper {
+  --stepper-missing-bg: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  --stepper-missing-border: color-mix(in srgb, var(--color-danger) 30%, transparent);
+  --stepper-missing-color: color-mix(in srgb, var(--color-danger) 72%, #e3eaf2);
+  --stepper-status-missing-color: color-mix(in srgb, var(--color-danger) 62%, #afc0d3);
+}
+
+:is(html[data-theme])
+  .list-header--wizard-stepper
   .page-stepper__eyebrow {
   display: none;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .list-header--wizard-stepper
   .page-stepper__label {
   font-size: 0.8rem;
@@ -981,14 +987,14 @@
   letter-spacing: -0.01em;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .list-header--wizard-stepper
   .page-stepper__status {
   font-size: 0.68rem;
   font-weight: 600;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .list-header--wizard-stepper
   .page-stepper__item.is-missing
   .page-stepper__status {
