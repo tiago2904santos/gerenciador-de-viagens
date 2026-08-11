@@ -205,7 +205,7 @@ arquivos; contraste medido (não estimado) nos pares alterados.
 
 | ID | Defeito | Dias |
 |---|---|---:|
-| `UI-04` 🟠 | 54 imports de CSS de outro domínio em 26 templates: extrair os componentes compartilhados dos arquivos de domínio | a definir |
+| `UI-04` 🟠 PARCIAL | Primeira família compartilhada extraída na E10: `oficios.css` 19 → 13 imports; seis listas −44.376 B por rota, sem diferença computada em claro/escuro. As demais famílias seguem abertas | a definir |
 | `JS-08` ✅ | Cinco componentes sob demanda por marcador DOM; shell global −6,0% | 2 |
 | `JS-09` 🟡 | Tela de espera de documento carrega 264 KB para usar 3,3 KB | 0,5 |
 | `JS-07` ✅ | "Fechar ao clicar fora / Esc": 3 implementações vivas consolidadas em `CV.overlay.attachDismiss` | 2 |

@@ -188,13 +188,25 @@ def esperar_arvore_estavel(pagina, quieto_ms=400, teto_ms=8000):
     return anterior
 
 
-def medir(base_url, usuario, senha, temas, rotas, seletor=SELETOR_PADRAO):
+def medir(
+    base_url,
+    usuario,
+    senha,
+    temas,
+    rotas,
+    seletor=SELETOR_PADRAO,
+    viewport_width=1440,
+    viewport_height=900,
+    estados=ESTADOS,
+):
     from playwright.sync_api import sync_playwright
 
     resultado: dict[str, list] = {}
     with sync_playwright() as pw:
         navegador = abrir_chromium(pw)
-        contexto = navegador.new_context(viewport={"width": 1440, "height": 900})
+        contexto = navegador.new_context(
+            viewport={"width": viewport_width, "height": viewport_height}
+        )
         pagina = contexto.new_page()
 
         pagina.goto(f"{base_url}/login/", wait_until="domcontentloaded")
@@ -247,14 +259,14 @@ def medir(base_url, usuario, senha, temas, rotas, seletor=SELETOR_PADRAO):
                 )["nodeIds"]
                 if not nos:
                     continue
-                for estados in ESTADOS:
+                for pseudoestados in estados:
                     for no in nos:
                         cdp.send(
                             "CSS.forcePseudoState",
-                            {"nodeId": no, "forcedPseudoClasses": list(estados)},
+                            {"nodeId": no, "forcedPseudoClasses": list(pseudoestados)},
                         )
                     pagina.evaluate(JS_ESPERAR_ESTILO)
-                    rotulo = "+".join(estados) or "repouso"
+                    rotulo = "+".join(pseudoestados) or "repouso"
                     resultado[f"{slug}|{tema}|{rotulo}"] = pagina.evaluate(
                         JS_COLETA,
                         {
@@ -278,6 +290,13 @@ def main() -> None:
     p.add_argument("--senha", required=True)
     p.add_argument("--saida", required=True)
     p.add_argument("--temas", default="light,dark")
+    p.add_argument("--viewport-width", type=int, default=1440)
+    p.add_argument("--viewport-height", type=int, default=900)
+    p.add_argument(
+        "--repouso-only",
+        action="store_true",
+        help="captura somente o estado sem pseudoestado forçado",
+    )
     p.add_argument(
         "--seletor",
         default=SELETOR_PADRAO,
@@ -298,6 +317,9 @@ def main() -> None:
         tuple(a.temas.split(",")),
         rotas,
         seletor=a.seletor,
+        viewport_width=a.viewport_width,
+        viewport_height=a.viewport_height,
+        estados=((),) if a.repouso_only else ESTADOS,
     )
     Path(a.saida).write_text(json.dumps(dados, indent=1, sort_keys=True), encoding="utf-8")
     leituras = sum(len(v) for v in dados.values())
