@@ -97,7 +97,10 @@ class DocumentoNaoCitaMortoTests(SimpleTestCase):
 
     def test_todo_arquivo_js_citado_existe(self):
         """Era a outra metade: 4 arquivos JS citados que já tinham sido removidos."""
-        existentes = {p.name for p in fontes_js()}
+        # Bundles gerados ficam fora da varredura de atributos para não contar
+        # cada contrato duas vezes, mas continuam sendo arquivos válidos para
+        # a documentação de entrega.
+        existentes = {p.name for p in JS.rglob("*.js")}
         citados = set(re.findall(r"`([\w./-]+\.js)`", corpo_vivo()))
         fantasmas = sorted(c for c in citados if Path(c).name not in existentes)
 

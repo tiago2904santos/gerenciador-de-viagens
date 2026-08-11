@@ -1,6 +1,8 @@
 {% extends "cotton/page/flow_base.html" %}
 {% load static %}
 
+{% block component_js %}{% include 'includes/form_components_js.html' only %}{% endblock %}
+
 {% block title %}{% if object %}Editar roteiro{% else %}Novo roteiro{% endif %}{% endblock %}
 
 {% block extra_css %}
