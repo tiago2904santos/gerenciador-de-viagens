@@ -3,7 +3,9 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
 from core.normalizers import remove_accents
+from core.tenancy import filter_queryset_by_area
 from core.tenancy import get_current_area
+from oficios.models import Oficio
 from roteiros.models import RoteiroDestino
 from roteiros.models import RoteiroTrecho
 
@@ -239,3 +241,23 @@ def contar_por_aba(
         aba: base.filter(_q_da_aba(aba)).count()
         for aba in (ABA_NAO_LIBERADAS, ABA_LIBERADAS, ABA_ARQUIVADOS, ABA_FINALIZADOS)
     }
+
+
+#: Teto da lista de ofícios oferecida no auto-preenchimento da troca de motorista.
+#: O valor é o de sempre; o que muda no `BE-14` fatia 4 é o lugar onde ele mora.
+LIMITE_OFICIOS_PREFILL = 200
+
+
+def oficios_para_prefill_de_motorista(oficio_atual):
+    """Ofícios da área que podem emprestar motorista/viatura ao diário desta prestação.
+
+    Consulta pura — vem para cá porque era o último acesso de manager que sobrava em
+    `diario_views.py` depois da extração da gravação (`P-01`).
+    """
+    return (
+        filter_queryset_by_area(Oficio.objects)
+        .select_related("viatura", "viatura__combustivel", "motorista", "transporte_combustivel_manual")
+        .exclude(pk=oficio_atual.pk)
+        .filter(numero__isnull=False)
+        .order_by("-ano", "-numero")[:LIMITE_OFICIOS_PREFILL]
+    )

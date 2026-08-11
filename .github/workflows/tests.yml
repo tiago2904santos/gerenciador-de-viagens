@@ -145,11 +145,14 @@ jobs:
         # que já estava no chão. A própria fatia devolveu 2 dos 11
         # (rt_views.py foi a zero), e o saldo entra como 9. Daqui em diante
         # volta a só descer. E desceu: 33 → 31 na fatia 3, quando a
-        # persistência dos anexos saiu de document_views.py.
+        # persistência dos anexos saiu de document_views.py, e 31 → 27 na
+        # fatia 4, quando diario_views.py foi a zero (a gravação do diário
+        # para diario_services.py, a consulta do auto-preenchimento de
+        # motorista para selectors.py). Dos 11 nunca medidos, 8 já voltaram.
         # P-05: todo `except Exception` do Drive começa com captura estruturada.
         run: >-
           python scripts/audit_django_architecture.py
-          --max-orm-em-view 31
+          --max-orm-em-view 27
           --max-drive-except-without-capture 0
           --max-sync-document-generations 0
 
