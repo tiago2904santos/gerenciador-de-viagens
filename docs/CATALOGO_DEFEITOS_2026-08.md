@@ -305,7 +305,7 @@ antes. Falha no meio da gravação (não deixa roteiro órfão), gravação fora
 a guarda de área cruzada de `vincular_roteiro_ao_oficio_sem_copia` — inalcançável pela view, porque
 `obter_roteiro_escolhido_do_post` já filtra pela área do ofício.
 
-### BE-13 🟠 `roteiros/roteiro_logic.py` fora do contrato de camadas · AUD · 4 d · risco alto
+### BE-13 ✅ RESOLVIDO · 🟠 `roteiros/roteiro_logic.py` fora do contrato de camadas · AUD · 4 d · risco alto
 
 1.779 linhas, o maior módulo de produção do repositório, 57 definições de topo **todas privadas**,
 misturando parsing de request, montagem de contexto e persistência. Importado pelos services.
@@ -398,6 +398,45 @@ mudança de arquivo. O caso que trava o arredondamento é 1,00 ÷ 8 = 0,13 (trun
 **Falta para fechar o `BE-13`:** a persistência — 3 funções, entre elas
 `_salvar_roteiro_avulso_from_roteiro_state`, o gravador atômico de 3 tabelas. É a mais arriscada, e
 a única citada por nome em migração, modelo e testes.
+
+#### Fatia 3 ✅ — a persistência sai, e o módulo ganha o nome certo (`BE-13` **fecha**)
+
+**O gravador era um sumidouro fechado**, o melhor caso das três fatias: ninguém dentro do módulo
+chamava `_salvar_roteiro_avulso_from_roteiro_state`, e as outras duas
+(`_atualizar_datas_roteiro_apos_salvar_trechos`, `_persistir_diarias_roteiro`) só ela chamava. Foram para
+`roteiros/services/editor_persistence.py` com `_roteiro_combine_date_time` junto, **as quatro
+públicas** — como nos módulos irmãos (`editor_parser` tem 9 públicas e 0 privadas). O
+`@transaction.atomic` foi com o gravador, decorando a função, não o módulo.
+
+**O módulo virou `roteiros/services/editor_state_builder.py`.** O nome antigo descrevia um saco de
+coisas; o que sobrou tem uma responsabilidade só — montar e validar o estado do editor a partir do
+POST e dos trechos gravados. O lugar novo é o que `docs/PADRAO_APP.md:8` reserva para isso; até aqui
+era um arquivo solto no topo do app. O ciclo de import que a análise dizia não existir **de fato não
+existe**: verificado subindo `manage.py check` com o módulo já dentro do pacote, antes de mover
+qualquer linha. Renomeação por `git mv`: rename puro no `git diff --find-renames`, CRLF preservado
+(1.337/1.337), e as 73 linhas alteradas são só os imports dos 17 chamadores — **sem alias**, para não
+repetir a "abstração adotada pela metade" que este catálogo critica.
+
+| | antes da fatia 3 | depois | acumulado nas 3 fatias |
+|---|---:|---:|---:|
+| o módulo | 1.579 linhas, 37 defs | **1.337 linhas, 33 defs** | 1.845 → **1.337** (−27%), 57 → **33** defs |
+| `editor_persistence.py` | — | **276 linhas, 4 defs, todas públicas** | — |
+
+**O módulo continua grande, e o PR diz isso.** 1.337 linhas dominadas por `_validate_roteiro_state`
+(171) e `_build_roteiro_state_from_post` (132). Mas grande **com uma responsabilidade** é outro
+problema, que este catálogo não nomeia: o enunciado do `BE-13` é "fora do contrato de camadas", e
+parsing de request, contexto e persistência não estão mais lá dentro. As 33 defs seguem privadas de
+propósito — dar contrato público a elas é trabalho de quem for reduzir o volume.
+
+**Nota de nome:** as menções a `roteiro_logic` em `docs/` **continuam com o nome antigo de
+propósito**. Elas registram medições e decisões datadas ("1.779 linhas", "57 defs"), e reescrevê-las
+tornaria o registro falso sobre o próprio passado. Só os documentos de arquitetura viva
+(`ROTEIROS_ARQUITETURA.md`, `PADRAO_CRUD.md`) foram ajustados, porque descrevem o hoje.
+
+**A rede desta fatia é pequena, e o motivo está no `NOVO-98`:** três dos cinco cenários que escrevi
+passavam com o código quebrado. Sobraram dois que mordem, e a garantia mais importante — o gravador
+ser atômico — já tinha teste desde o `DB-08`; conferi por inversão que ele reprova sem o
+`@transaction.atomic` em vez de duplicá-lo.
 
 ### BE-14 🟠 48 sites de persistência em view, sem service e sem transação · AUD · 3 d
 
@@ -6428,3 +6467,84 @@ bisecção daria pelo mesmo preço.
 elemento só existe com diálogo, menu ou dropdown aberto. Sobre elas a medição não diz nada, e
 tratá-las como inócuas seria repetir o `NOVO-90`. Medi-las exige estender o corpus aos estados de
 sobreposição, como o `NOVO-54` fez ao ir de 44 para 51 rotas.
+
+### NOVO-98 · `NOVO` Guardas do gravador do editor são inalcançáveis: regra defensiva duplicada do parser · QA · 0,5 d
+
+**Como apareceu.** Escrevendo a rede do `BE-13` fatia 3 eu ia "cobrir as 6 linhas descobertas" de
+`_salvar_roteiro_avulso_from_roteiro_state`. Cinco cenários, todos verdes — e **três passavam com o
+código quebrado**. A prova por inversão os reprovou como vazios. Investigando o porquê, com sondas no
+POST real:
+
+```
+tempo_adicional_min = -30 no POST   ->  chega ao gravador como 0
+duracao_estimada_min = "" no POST   ->  chega ao gravador como 285 (já derivada)
+trecho que duplica o retorno        ->  chega ao gravador já removido
+```
+
+`_build_roteiro_state_from_post` e `dedupe_roteiro_loop_retorno_final` **já normalizam** tudo isso a
+montante. As guardas correspondentes dentro do gravador (`max(0, …)`, a derivação de
+`duracao_estimada_min`, o descarte do trecho que duplica o retorno) são **cópias defensivas de regra
+que roda antes**. É por isso que `coverage` nunca as alcançou: não é lacuna de teste, é ramo
+inalcançável pelo caminho público.
+
+**Por que registrar em vez de apagar.** O gravador é público desde o `BE-13` fatia 3
+(`roteiros/services/editor_persistence.py`), e um chamador futuro pode entrar sem passar pelo parser
+— foi justamente o que o `BE-12` fez com `salvar_roteiro_do_oficio`. Apagar as guardas junto com a
+mudança de arquivo seria mudar comportamento numa fatia que se comprometeu a não mudar nenhum.
+
+**Correção:** decidir de que lado mora cada regra. Ou o gravador passa a confiar no estado validado
+(guardas saem, e o contrato "recebe estado já normalizado" vira docstring e teste), ou a
+normalização é dele e o parser para de fazê-la. Hoje as duas fazem, e a segunda é código que nenhum
+teste pode exercitar honestamente.
+
+**Escopo medido:** 3 guardas, 6 linhas, em `editor_persistence.py`.
+
+**Lição de método, que vale além deste caso:** cobertura descoberta não é sinônimo de teste faltando.
+Antes de escrever teste para uma linha vermelha, vale perguntar se ela é alcançável — a inversão
+responde em minutos e evita encher a suíte de cenários que não protegem nada. Este é o terceiro caso
+da etapa (`BE-11` e `BE-13` fatia 1 tiveram um cada), e os três só apareceram porque a inversão é
+obrigatória.
+
+### NOVO-99 🔴 · `NOVO` O formulário do editor de roteiro não recebe o token CSRF: salvar pela tela devolve 403 · HT · 0,25 d
+
+**Achado ao verificar o `BE-13` fatia 3 na tela.** O plano da fatia exigia *salvar de verdade pelo
+navegador*, porque o gravador só roda no POST. O POST voltou **403 — "Verificação CSRF falhou"**, nas
+quatro páginas do editor.
+
+**A causa, com o próprio Django dizendo o nome:**
+
+```
+UserWarning: A {% csrf_token %} was used in a template, but the context did not
+provide the value. This is usually caused by not using RequestContext.
+```
+
+`templates/roteiros/includes/_roteiro_editor.html:24` tem `{% csrf_token %}` dentro do
+`<form id="roteiro-editor-form">`. Mas os três lugares que incluem esse arquivo fecham o contexto com
+`only`:
+
+- `templates/roteiros/roteiro_form_page.html:25`
+- `templates/roteiros/partials/roteiro_form.html:1`
+- `templates/oficios/wizard_roteiro.html:20`
+
+O `only` isola o contexto e a lista explícita de variáveis **não passa `csrf_token`**. A tag então
+renderiza string vazia, e o formulário vai para o navegador sem token. Medido: **1 ocorrência de
+`csrfmiddlewaretoken` na página inteira**, e ela é do formulário de logout no cabeçalho — **zero
+dentro do formulário do editor**, em `/roteiros/novo/`, `/roteiros/<pk>/editar/` e nas duas variantes
+da etapa 2 do ofício.
+
+**Por que a suíte não pega.** O `Client` do Django é isento de CSRF por padrão
+(`enforce_csrf_checks=False`), então os 1.954 testes exercitam o POST do editor sem nunca passar pela
+checagem. É o `NOVO-20`/`NOVO-28` outra vez: ambiente de teste mais permissivo que produção.
+
+**A correção, provada:** acrescentar `csrf_token=csrf_token` à lista de cada um dos três `include`.
+Verificado em processo — com os três ajustados, o token aparece dentro do formulário nas três páginas
+e o aviso do Django some; e pelo navegador o POST passa a responder "Roteiro atualizado com sucesso."
+com redirecionamento para a lista. **A correção não entra no PR do `BE-13` fatia 3**: é template, é
+outra responsabilidade, e a fase 7 está sendo mexida por sessão paralela — conflito garantido.
+
+**Não é regressão da fase 7.** O `only` está nos três `include` desde `a4739eff` (01/08), o commit de
+importação do projeto. O `index.html` já passa `:csrf_token="csrf_token"` explicitamente para o
+componente de lista — a mesma armadilha, ali resolvida.
+
+**Vale varrer o resto:** qualquer `include ... only` que contenha `{% csrf_token %}` tem o mesmo
+defeito, e o aviso do Django é o detector — sobe no log a cada render.

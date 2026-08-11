@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from django.test import TestCase
 
-from roteiros import roteiro_logic
+from roteiros.services import editor_state_builder
 from roteiros.services.diarias import (
     PeriodMarker,
     TABELA_DIARIAS_HISTORICA as TABELA_DIARIAS,
@@ -288,7 +288,7 @@ class DiariasServiceTests(TestCase):
 
     def test_calculo_avulso_considera_retorno_final_manual(self):
         state = {
-            "roteiro_modo": roteiro_logic.ROTEIRO_MODO_PROPRIO,
+            "roteiro_modo": editor_state_builder.ROTEIRO_MODO_PROPRIO,
             "sede_estado_id": None,
             "sede_cidade_id": None,
             "trechos": [
@@ -312,6 +312,6 @@ class DiariasServiceTests(TestCase):
                 "chegada_hora": "19:00",
             },
         }
-        resultado = roteiro_logic._calculate_avulso_diarias_from_state(state)
+        resultado = editor_state_builder._calculate_avulso_diarias_from_state(state)
         self.assertIn("1 x 30%", resultado["totais"]["total_diarias"])
         self.assertGreaterEqual(resultado["totais"]["total_valor_decimal"], Decimal("0.01"))

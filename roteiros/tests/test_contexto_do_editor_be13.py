@@ -1,4 +1,4 @@
-"""`BE-13` fatia 2 — rede para o subgrafo de contexto antes de ele sair do `roteiro_logic`.
+"""`BE-13` fatia 2 — rede para o subgrafo de contexto antes de ele sair do módulo.
 
 `_build_roteiro_form_context` (113 linhas) e as duas funções que só ela usa vão para
 `roteiros/presenters.py`. `coverage` apontava **20 linhas descobertas** dentro desse
