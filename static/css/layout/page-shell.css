@@ -650,8 +650,7 @@ html[data-theme="light"] {
 .page-stepper__item.is-current .page-stepper__marker {
   background:   var(--stepper-active-bg);
   border-color: var(--stepper-active-border);
-  box-shadow:   0 0 0 3px var(--stepper-idle-bg),
-                0 0 0 5px var(--stepper-active-bg);
+  box-shadow:   0 0 0 3px color-mix(in srgb, var(--stepper-active-bg) 28%, transparent);
   color:        var(--stepper-active-color);
 }
 

@@ -5386,7 +5386,7 @@ Os quatro campos com divergência em dev: `eventos.TipoEvento.nome` (5), `Ativid
 **Fecha quando** a contagem rodar contra produção, os campos bloqueados (se houver) forem resolvidos
 no sistema, e o `--commit` for aplicado com backup.
 
-### NOVO-58 ✅ RESOLVIDO · `NOVO` Claro e escuro não são dois temas do mesmo sistema: são dois desenhos diferentes · UI · a decidir
+### NOVO-58 🟠 EM ANDAMENTO · `NOVO` Claro e escuro não são dois temas do mesmo sistema: são dois desenhos diferentes · UI · a decidir
 
 Medido com `getComputedStyle` nas 44 rotas, comparando o **mesmo elemento** nas duas versões do
 **mesmo documento** e olhando **só propriedades que não são cor** — cor é o que um tema tem direito
@@ -5454,6 +5454,16 @@ elementos divergentes, 0 diferenças não-cor e 0 pares distintos**. O instrumen
 ordens de tema e manteve a trava de layout estável; o relatório passou os tetos vigentes. A dívida
 descrita acima foi consumida pelas famílias já integradas e não resta redesenho a aplicar. O foco de
 campo do `NOVO-51`, por ser cor/a11y, continua uma decisão separada e não altera este fechamento.
+
+**Correção e recorte Eventos/Wizard (11/08/2026).** A reauditoria posterior já registrada no plano
+refutou esse fechamento geral. Com a decisão explícita do dono — **um anel** no passo atual e
+**redesenhar superfícies** — a família Eventos/Wizard foi refeita sem predicado de tema: tipografia
+do stepper e dos blocos, alturas e espaçamentos, três níveis de superfície, campos e geometria dos
+selects/multiselects. Na rota autenticada `/eventos/10/guiado/etapa-1/`, a comparação do mesmo DOM
+em 1440, 800 e 500 px caiu para **0 divergências não-cor no conteúdo do wizard**. Restaram apenas
+as bordas do chrome móvel, já catalogadas na família 8h, e a diferença de `min-height` declarada no
+textarea; a altura renderizada continuou 88 px nos dois temas. Prints claro/escuro foram conferidos
+nas três larguras. A E8 geral permanece aberta para as demais famílias.
 
 ### NOVO-59 ✅ RESOLVIDO · 🔴 `NOVO` Todo ícone de botão é invisível no tema claro, no sistema inteiro · UI · 0,25 d
 
@@ -7031,6 +7041,13 @@ partidas em duas: um gêmeo `:is(html[data-theme])` carregando **só a definiç�
 regra escura ficando com a **pintura** (`background`, `border-color`, `box-shadow`) e com a
 re-ligação de `--color-input-bg`. Pintura é decisão de tema; mexer nela é a 8b, com aprovação
 própria. Mesma especificidade, gêmeo adjacente — o argumento da E8.
+
+**Conclusão visual do sistema de superfície (11/08/2026).** Depois da aprovação do redesenho pelo
+dono, os consumidores estruturais do wizard também passaram a usar os tokens nos dois temas:
+cartão externo, painel intermediário, poço dos campos, blocos de período/destinos/documentos e
+chrome do custom select. O tema continua responsável somente pelos valores de cor. A prova dirigida
+da família Eventos/Wizard ficou em **0 divergências não-cor de conteúdo** nas larguras 1440, 800 e
+500 px.
 
 **Prova** (`sonda_mesmo_tema.py`, 41.754 elementos por caminho no DOM, com `--revelar --pseudo
 hover`):
