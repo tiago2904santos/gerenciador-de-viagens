@@ -254,6 +254,7 @@ dentro de `{% for %}`). Os defeitos estão concentrados em acessibilidade de for
 | `HT-08` 🟡 | 80 `<button>` reimplementados fora do componente, em 10 apps | 3–4 | F5 |
 | `HT-09` ⚪ | Login é HTML autônomo, sem skip link e sem `aria-describedby` no erro | 0,5 | F0 |
 | `HT-10` ⚪ | `data-rg-toggle`/`data-motorista-fixo-toggle` legados ainda emitidos por componente compartilhado | 0,5–1 | F5 |
+| `NOVO-99` ✅ 🔴 | `include ... only` isolava o token CSRF do formulário do editor de roteiro; os três chamadores agora o passam explicitamente | 0,25 | correção imediata |
 
 **`HT-01` sobe para F0** junto com o XSS: é falha WCAG 2.4.7 na primeira tela que qualquer usuário
 encontra, e a correção é aditiva.

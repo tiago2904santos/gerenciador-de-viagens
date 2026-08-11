@@ -31,6 +31,14 @@ from roteiros.services import editor_state_builder
 from roteiros.models import Roteiro
 
 
+def _roteiro_editor_form_html(response):
+    html = response.content.decode()
+    id_form = html.index('id="roteiro-editor-form"')
+    inicio = html.rindex("<form", 0, id_form)
+    fim = html.index("</form>", inicio)
+    return html[inicio:fim]
+
+
 def _mensagens(response):
     return [str(m) for m in get_messages(response.wsgi_request)]
 
@@ -281,7 +289,10 @@ class EditorRoteiroCaracterizacaoTests(TestCase):
     # -- 9: as chaves de contexto de cada uma das duas páginas -------------
 
     def test_9_contexto_do_get_de_novo(self):
-        contexto = self.client.get(reverse("roteiros:novo")).context
+        resposta = self.client.get(reverse("roteiros:novo"))
+        contexto = resposta.context
+
+        self.assertIn('name="csrfmiddlewaretoken"', _roteiro_editor_form_html(resposta))
 
         self.assertEqual(contexto["page_title"], "Novo roteiro")
         self.assertEqual(
@@ -313,7 +324,10 @@ class EditorRoteiroCaracterizacaoTests(TestCase):
         roteiro = self._criar_roteiro_pelo_editor()
         url = reverse("roteiros:editar", args=[roteiro.pk])
 
-        contexto = self.client.get(url).context
+        resposta = self.client.get(url)
+        contexto = resposta.context
+
+        self.assertIn('name="csrfmiddlewaretoken"', _roteiro_editor_form_html(resposta))
 
         self.assertEqual(contexto["page_title"], "Editar roteiro")
         self.assertEqual(

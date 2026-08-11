@@ -436,6 +436,7 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [x] `HT-07` concatenação condicional com "·" no template · **E6**
 - [x] `NOVO-80` a E5 apagou duas travas de regressão em vez de reapontá-las · **E6**
 - [x] `NOVO-81` o auditor de front audita os `*.test.js` que a E1 criou · **E6**
+- [x] `NOVO-99` os três `include ... only` do editor passam o token CSRF explicitamente · **correção imediata**
 - [x] `UI-03` nove (medidos: oito) arquivos definem token de cor → duas camadas · **E7a**
 - [x] `NOVO-82` 87 declarações escuras inertes, visíveis desde a fusão do `theme.css` · **E9**
 - [x] `NOVO-51` os 2 apelidos puros da família `cv-field` (e 15 bordas invisíveis) · **E7b**

@@ -379,7 +379,7 @@ class RoteiroDoOficioSemRequestTests(TestCase):
         self.oficio = Oficio.objects.create(area=self.area)
         self.saida = timezone.localdate() + timedelta(days=30)
 
-    def _submissao(self):
+    def _submissao(self, *, quantidade_servidores=1):
         """Form e estado válidos montados sem passar por view nenhuma."""
         from urllib.parse import urlencode
 
@@ -396,7 +396,7 @@ class RoteiroDoOficioSemRequestTests(TestCase):
                     "origem_estado": str(self.estado.pk),
                     "origem_cidade": str(self.sede.pk),
                     "observacoes": "sem request",
-                    "quantidade_servidores": "1",
+                    "quantidade_servidores": str(quantidade_servidores),
                     "retorno_saida_data": volta.isoformat(),
                     "retorno_saida_hora": "14:00",
                     "retorno_chegada_data": volta.isoformat(),
@@ -456,6 +456,47 @@ class RoteiroDoOficioSemRequestTests(TestCase):
         )
         self.oficio.refresh_from_db()
         self.assertEqual(self.oficio.roteiro_id, resultado.roteiro.pk)
+
+    def test_10_duas_pessoas_nao_multiplicam_as_diarias_duas_vezes(self):
+        """O editor mostra o total da equipe, mas o roteiro persiste o valor unitário.
+
+        O resumo do ofício é o único ponto que aplica o efetivo. Persistir o total
+        mostrado pelo editor faria duas pessoas virarem multiplicador quatro.
+        """
+        from oficios.services import salvar_roteiro_do_oficio
+
+        cargo = Cargo.objects.create(area=self.area, nome="Cargo diárias unitárias")
+        servidores = [
+            Servidor.objects.create(
+                area=self.area,
+                nome=f"Servidor diárias {indice}",
+                cargo=cargo,
+                cpf=f"1234567890{indice}",
+            )
+            for indice in (1, 2)
+        ]
+        self.oficio.servidores.add(*servidores)
+        post, form, roteiro_state, validated, diarias_equipe = self._submissao(
+            quantidade_servidores=2
+        )
+
+        resultado = salvar_roteiro_do_oficio(
+            self.oficio,
+            post,
+            form,
+            roteiro_state=roteiro_state,
+            validated=validated,
+            diarias_resultado=diarias_equipe,
+        )
+
+        valor_exibido_equipe = diarias_equipe["totais"]["total_valor_decimal"]
+        self.assertGreater(valor_exibido_equipe, 0)
+        self.assertEqual(resultado.roteiro.valor_diarias * 2, valor_exibido_equipe)
+        self.oficio.refresh_from_db()
+        self.assertEqual(
+            self.oficio.diarias_para_servidores()["valor_decimal"],
+            valor_exibido_equipe,
+        )
 
     def test_8_falha_no_meio_da_gravacao_nao_deixa_roteiro_orfao(self):
         """`atomic`: a requisição grava 4 tabelas, e antes do `BE-12` nenhuma transação

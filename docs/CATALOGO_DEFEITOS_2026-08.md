@@ -6626,7 +6626,7 @@ responde em minutos e evita encher a suíte de cenários que não protegem nada.
 da etapa (`BE-11` e `BE-13` fatia 1 tiveram um cada), e os três só apareceram porque a inversão é
 obrigatória.
 
-### NOVO-99 🔴 · `NOVO` O formulário do editor de roteiro não recebe o token CSRF: salvar pela tela devolve 403 · HT · 0,25 d
+### NOVO-99 ✅ RESOLVIDO · 🔴 · `NOVO` O formulário do editor de roteiro não recebe o token CSRF: salvar pela tela devolve 403 · HT · 0,25 d
 
 **Achado ao verificar o `BE-13` fatia 3 na tela.** O plano da fatia exigia *salvar de verdade pelo
 navegador*, porque o gravador só roda no POST. O POST voltou **403 — "Verificação CSRF falhou"**, nas
@@ -6669,6 +6669,12 @@ componente de lista — a mesma armadilha, ali resolvida.
 
 **Vale varrer o resto:** qualquer `include ... only` que contenha `{% csrf_token %}` tem o mesmo
 defeito, e o aviso do Django é o detector — sobe no log a cada render.
+
+**Entregue:** os três `include ... only` agora passam `csrf_token` explicitamente. A rede verifica
+que o token está dentro de `#roteiro-editor-form` — não apenas no formulário de logout — em
+`roteiros:novo`, `roteiros:editar` e na etapa de roteiro do ofício. O teste financeiro adjacente
+também trava o caso de duas pessoas: a prévia mostra o total da equipe, o `Roteiro` persiste o valor
+unitário e o resumo aplica o efetivo uma única vez.
 <!-- Renumeração (3a vez nesta reconstrução): o `#312` (BE-13 fatia 3) mesclou antes deste ramo
      e criou `NOVO-98` e `NOVO-99`. Este nasceu como `NOVO-98` no ramo da E9 e virou `NOVO-100`.
      As anteriores foram com o `#304` (`NOVO-88`) e o `#305` (`NOVO-92`). Ramos paralelos tiram
