@@ -2513,7 +2513,7 @@ literal e não local. Dava para trocar uma cor e o CI inteiro passar. Por isso a
 `scripts/resolver_tokens_css.py`, que resolve a cascata nos três escopos raiz e expande `var()` até
 o literal: **2131 valores computados, 0 diferenças** antes/depois.
 
-### NOVO-82 · `NOVO` 87 das 143 declarações escuras do `theme.css` já eram mortas · MOR · 1 d
+### NOVO-82 ✅ RESOLVIDO (E9-d) · `NOVO` 87 das 143 declarações escuras do `theme.css` já eram mortas · MOR · 1 d
 
 Ao dissolver o `theme.css` (`UI-03`), o bloco `html[data-theme="dark"]` dele passou a conviver com
 o bloco próprio do `03-theme-dark.css`, no mesmo arquivo. Aí ficou visível o que a separação
@@ -2533,6 +2533,12 @@ o teste foi corrigido para ler a última, que é a que vence a cascata.
 Fica para a **E9** (`UI-02`, "o tema escuro dissolvido em token"), que é onde o arquivo é reescrito
 de qualquer forma. Apagar as 87 é provável por `scripts/resolver_tokens_css.py` — se a tabela de
 valores computados não mudar, nenhuma era viva.
+
+**Fechado na E9-d.** As 87 declarações vencidas foram removidas, incluindo as 57 cujo valor
+enganoso diferia do vencedor. O bloco legado caiu de 143 para **56 declarações vivas** e ficou com
+**zero nomes** redefinidos pelos blocos canônicos seguintes. O resolvedor manteve os **2.135 valores
+computados** e o mesmo SHA-256 antes/depois
+(`55c095380e25f0735ad7bb8a40dd23a916df57cb9f47a98e91bd7ed54f064abc`).
 
 ### UI-04 🟠 CSS de outro domínio importado em 26 templates · MED
 
@@ -4972,7 +4978,7 @@ Os quatro campos com divergência em dev: `eventos.TipoEvento.nome` (5), `Ativid
 **Fecha quando** a contagem rodar contra produção, os campos bloqueados (se houver) forem resolvidos
 no sistema, e o `--commit` for aplicado com backup.
 
-### NOVO-58 🔴 `NOVO` Claro e escuro não são dois temas do mesmo sistema: são dois desenhos diferentes · UI · a decidir
+### NOVO-58 ✅ RESOLVIDO · `NOVO` Claro e escuro não são dois temas do mesmo sistema: são dois desenhos diferentes · UI · a decidir
 
 Medido com `getComputedStyle` nas 44 rotas, comparando o **mesmo elemento** nas duas versões do
 **mesmo documento** e olhando **só propriedades que não são cor** — cor é o que um tema tem direito
@@ -5033,6 +5039,13 @@ vira espelho", como se fosse reorganização de token. Não é. Espelhar signifi
 ao tema claro**, o que muda a aparência de todas as 44 telas no modo claro — fonte, tamanho de texto,
 raio, borda e largura da barra lateral. É trabalho de desenho, não de arrumação, e precisa da decisão
 do dono antes da primeira linha de CSS.
+
+**Fechamento da E8 (11/08/2026).** A E8-zero foi repetida depois de todos os recortes intermediários,
+sem tocar em CSS: **43 rotas × 3 larguras = 129 medições**, **54.225 elementos comparados**, **0
+elementos divergentes, 0 diferenças não-cor e 0 pares distintos**. O instrumento mediu nas duas
+ordens de tema e manteve a trava de layout estável; o relatório passou os tetos vigentes. A dívida
+descrita acima foi consumida pelas famílias já integradas e não resta redesenho a aplicar. O foco de
+campo do `NOVO-51`, por ser cor/a11y, continua uma decisão separada e não altera este fechamento.
 
 ### NOVO-59 ✅ RESOLVIDO · 🔴 `NOVO` Todo ícone de botão é invisível no tema claro, no sistema inteiro · UI · 0,25 d
 

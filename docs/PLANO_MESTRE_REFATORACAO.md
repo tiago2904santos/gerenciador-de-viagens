@@ -431,14 +431,14 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [x] `NOVO-80` a E5 apagou duas travas de regressão em vez de reapontá-las · **E6**
 - [x] `NOVO-81` o auditor de front audita os `*.test.js` que a E1 criou · **E6**
 - [x] `UI-03` nove (medidos: oito) arquivos definem token de cor → duas camadas · **E7a**
-- [ ] `NOVO-82` 87 declarações escuras inertes, visíveis desde a fusão do `theme.css` · **E9**
+- [x] `NOVO-82` 87 declarações escuras inertes, visíveis desde a fusão do `theme.css` · **E9**
 - [x] `NOVO-51` os 2 apelidos puros da família `cv-field` (e 15 bordas invisíveis) · **E7b**
 - [ ] `NOVO-51` os 2 restantes têm valor próprio; o do foco é decisão de a11y · **E8**
 - [x] `NOVO-54` 72 regras (30 `!important` e 7 regras já fora); as 7 candidatas de estado não-base
       também fecharam por medição (2 blocos removidos e 5 grupos de seletor simplificados). A regra
       base agora vence o seletor de elemento cru com neutralidade medida; as 8 pseudo-regras e 1
       contexto órfão caíram; diário, quick-add e `field-with-action` fecharam no corpus ampliado · **E7c**
-- [ ] `NOVO-58` 🔴 claro e escuro são dois desenhos — o redesenho passa a valer no claro · **E8**
+- [x] `NOVO-58` claro e escuro têm desenho único: 54.225 elementos, 129 medições, 0 divergências não-cor · **E8**
 - [ ] `UI-02` tema escuro deixa de ser camada de exceção (5.619 linhas, 190 `!important`) · **E9**
 - [ ] `UI-04` **97** imports de CSS de outro domínio, em **36** templates · **E10**
 - [ ] `HT-04` `base.html` carrega ~153 KB de JS de domínio em toda página · **E11**

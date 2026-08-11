@@ -531,7 +531,14 @@ definem `--color-*` indo de 9 para 2.
 
 ---
 
-### E8 — O desenho único · `NOVO-58` · risco **alto** · a dimensionar
+### E8 ✅ — O desenho único · `NOVO-58` · concluída em 11/08/2026
+
+> **E8-zero final.** A remedição obrigatória no `main` depois das E7b/E7c encontrou **54.225
+> elementos** em 43 rotas × 3 larguras (1440, 800 e 500 px), **129 medições**, **0 elementos com
+> divergência não-cor, 0 diferenças e 0 pares distintos**. A captura reversa confirmou a mesma
+> ordem em cada rota e o relatório respeitou todos os tetos. As famílias abaixo foram fechadas pelos
+> recortes já integrados; não existe sub-etapa visual restante para aplicar. O `NOVO-51` de foco é
+> uma decisão separada de cor/a11y e não reabre o desenho único do `NOVO-58`.
 
 > **PARE E PERGUNTE EM TODAS AS SUB-ETAPAS.** Esta etapa não é trabalho de Codex no sentido do
 > `AGENTS.md` §6: aplicar um redesenho a 43 telas não tem critério objetivo de pronto. O que o
@@ -648,6 +655,7 @@ o token resolve.
 | **E9-b** | a faixa de filtros não tinha fundo no claro: os nove `--card-family-*` passam a existir no `:root` do `tokens.css` | ✅ `#309` — 47 elementos no claro, **2 no escuro** (piso de ruído) |
 | **E9-a** | 32 regras só-escuras de cor removidas por medição | ✅ `#310` — 4 elementos alterados = piso de ruído. Arquivo 5.788 → **5.610** linhas; `!important` 466 → **463** |
 | **E9-c** | o sistema de superfície do wizard (`--step1-*`) passa a existir no claro — **destrava a 8b** | ✅ `#313` — 36 elementos no claro, **2 no escuro** ⚠️ o "destrava" valeu para **1 regra**, não para a família: ver `NOVO-103` |
+| **E9-d** | `NOVO-82`: remove as 87 declarações de tema escuro vencidas no próprio arquivo | ✅ tabela efetiva do resolvedor idêntica: **2.135 valores**, SHA-256 `55c095380e25f0735ad7bb8a40dd23a916df57cb9f47a98e91bd7ed54f064abc` |
 | **E8-8b** | a fatia da 8b que sobrevive aos três portões (alcance medido, âncora estrutural, fronteira no claro) | ✅ 1 de 41 regras — escuro **pixel-idêntico**, claro com 18 elementos nas 3 rotas de roteiro |
 
 **O instrumento que a etapa exigiu, e que não existia.** A régua da E0
