@@ -6334,7 +6334,7 @@ etapa → próximo/anterior, que é desenho, não extração mecânica. Fica par
      tiram número do mesmo contador sem reserva, e a colisão só aparece no merge — foi a
      segunda vez na mesma sessão (a primeira foi o `#304`, com o `NOVO-88`). -->
 
-### NOVO-93 🔴 · `NOVO` A família 8b não é portável sozinha: no tema claro a borda é a única separação · UI · a decidir
+### NOVO-93 ✅ RESOLVIDO (11/08/2026) · `NOVO` A família 8b não é portável sozinha: no tema claro a borda é a única separação · UI · 1 d
 
 Achado ao executar a **E8**, com o dono já tendo decidido a direção ("o claro perde as bordas"). A
 medição contradiz a decisão, e por um motivo que não estava na mesa quando ela foi tomada.
@@ -6375,6 +6375,28 @@ uma a uma, com print, e a maioria vai na direção contrária à que o enunciado
 
 **O que entrou apesar disso:** `.sidebar-brand-badge` (86 elementos), onde a borda é decoração — um
 anel creme sobre um badge dourado — e não separação.
+
+**Decisão do dono em 11/08: redesenhar as superfícies claras.** `--color-surface` continua branco;
+`--color-surface-muted` passa a `#f7fbff` e `--color-surface-soft` a `#e3eaf2`. Com três níveis de
+luminância, os fundos que já separavam card, painel e campo no escuro passam a cumprir a mesma função
+no claro. As regras completas de wizard, roteiro, pickers, rodapés e date-picker foram tornadas
+neutras — incluindo hover/foco e estados selecionados — para não transportar apenas `border: 0` e
+deixar metade do componente no desenho antigo. O shorthand de `.cv-module-card` ficou escuro: o
+filete dourado de 3 px do claro não foi apagado.
+
+**O número histórico de 40 não é reproduzível no `main` atual.** O novo inventário por CSSOM
+(`scripts/inventariar_bordas_tema.py`) percorre 43 rotas × 3 larguras, atribui o efeito computado à
+regra-fonte e separa “muda uma borda” de “remove uma borda que existia no claro”. Antes da correção,
+em 1440 px, havia **55 regras escuras com algum efeito em borda, 34 delas removendo ao menos um
+lado**. Depois, nas três larguras, restam **19 regras**, todas bordas positivas/deliberadas, e
+**0 removendo borda do claro**.
+
+**Prova visual e de regressão.** A régua completa, no mesmo corpus de 60.386 elementos, caiu de
+**138.978 para 115.963 diferenças não-cor** (−23.015; −16,6%). A contagem não vai a zero porque a
+reauditoria também refutou o fechamento geral da E8; outras famílias ainda divergem. Para isolar o
+risco desta mudança, o bundle anterior e o novo foram trocados dentro do mesmo DOM em tema escuro:
+**126 medições autenticadas, 60.497 elementos, 0 diferenças computadas**. Claro/escuro foram
+conferidos em 1440 e 500 px nas telas de equipe/transporte, roteiro de ofício e editor de roteiro.
 
 ### NOVO-94 · `NOVO` A família 8g move a régua e não move um pixel · QA · fechada na medição
 
