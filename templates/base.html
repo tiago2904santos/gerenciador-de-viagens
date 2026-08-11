@@ -42,7 +42,16 @@
     </div>
   </div>
   {# NOVO-12: um JS de shell (defer) no lugar de 23 requests; theme-* ficam no head sem defer. #}
-  <script src="{% static 'js/shell.bundle.js' %}" defer></script>
+  <script
+    src="{% static 'js/shell.bundle.js' %}"
+    data-cv-lazy-components
+    data-cv-lazy-card-toggle-src="{% static 'js/components/card-toggle.js' %}"
+    data-cv-lazy-segment-nav-src="{% static 'js/components/segment-nav.js' %}"
+    data-cv-lazy-file-picker-src="{% static 'js/components/file-picker.js' %}"
+    data-cv-lazy-signature-actions-src="{% static 'js/components/signature-actions.js' %}"
+    data-cv-lazy-extra-download-src="{% static 'js/components/extra-download.js' %}"
+    defer
+  ></script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>
