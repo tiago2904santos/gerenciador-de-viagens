@@ -4,7 +4,7 @@
     "direction": "up",
     "routes": {
       "login": {
-        "usage_percent_min": 55.8925
+        "usage_percent_min": 55.8871
       },
       "dashboard": {
         "usage_percent_min": 11.6626

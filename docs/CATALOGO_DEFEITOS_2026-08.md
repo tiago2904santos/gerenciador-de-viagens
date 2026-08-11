@@ -7172,7 +7172,7 @@ bytes entregues/casados por URL; `--route` permite diagnóstico de uma rota e
 Folhas internas sem URL continuam fora.
 
 **Reauditoria.** O intervalo oficial mudou de **11,3369%–70,5559%** para
-**11,1003%–55,8925%**. Os 29 pisos afetados em `scripts/tetos_front.json` foram corrigidos para o
+**11,1003%–55,8871%**. Os 29 pisos afetados em `scripts/tetos_front.json` foram corrigidos para o
 menor entre o piso anterior e a medição honesta — não se aproveitou a correção para subir os outros
 14 pisos. Esta é a mesma exceção documentada no `NOVO-101`: a catraca enfraquece uma vez porque
 parou de omitir dívida preexistente; depois volta a caminhar apenas no sentido exigido.

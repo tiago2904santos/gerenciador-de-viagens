@@ -118,7 +118,7 @@ execução, sem `--atualizar-tetos`, passou contra `scripts/tetos_front.json`.
 > **Correção de 11/08 (`NOVO-106`).** O medidor somava apenas folhas que apareciam em
 > `CSS.stopRuleUsageTracking`; uma folha externa com **zero regras casadas** não aparecia nem no
 > numerador nem no denominador. A linha de base escondia justamente o desperdício que E10 precisa
-> retirar. Com todas as folhas externas contabilizadas, o intervalo real é **11,1003%–55,8925%**
+> retirar. Com todas as folhas externas contabilizadas, o intervalo real é **11,1003%–55,8871%**
 > (11,1003%–22,1029% nas rotas autenticadas). Os pisos foram corrigidos apenas onde o denominador
 > antes estava incompleto; daqui em diante voltam a só subir.
 
