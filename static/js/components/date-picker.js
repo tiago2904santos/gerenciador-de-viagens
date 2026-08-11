@@ -719,21 +719,6 @@
       renderDays();
     }
 
-    function onDocumentClick(event) {
-      var path = event.composedPath ? event.composedPath() : [event.target];
-      // O panel pode estar em document.body (portal), checar root E panel separadamente
-      if (path.indexOf(root) === -1 && path.indexOf(panel) === -1) {
-        setOpen(false);
-      }
-    }
-
-    function onKeydown(event) {
-      if (event.key === 'Escape' && isOpen) {
-        event.preventDefault();
-        closePicker();
-      }
-    }
-
     if (weekdays) buildWeekdays();
     syncStateFromInputs();
     syncOutputs();
@@ -786,12 +771,17 @@
       });
     }
 
-    /* JS-02 — os quatro listeners abaixo são por instância. Sem `destroy`
-       eles sobreviviam à remoção do campo (troca de aba, linha de formulário
-       removida, painel trocado por AJAX) e seguiam reposicionando um painel
-       que já não estava no documento. */
-    document.addEventListener('click', onDocumentClick);
-    document.addEventListener('keydown', onKeydown);
+    /* JS-07 — o painel portalizado pertence à zona interna; Escape conserva
+       a restauração de foco de `closePicker`, e clique externo conserva o
+       fechamento simples sem alterar o foco. */
+    var dismissBinding = window.CV.overlay.attachDismiss({
+      inside: [root, panel],
+      isOpen: function () { return isOpen; },
+      onDismiss: function (reason) {
+        if (reason === 'escape') closePicker();
+        else setOpen(false);
+      },
+    });
 
     // Reposicionar ao scrollar ou redimensionar para o panel acompanhar o anchor
     function onScrollOrResize() {
@@ -802,8 +792,7 @@
     instancias.push({
       root: root,
       desmontar: function () {
-        document.removeEventListener('click', onDocumentClick);
-        document.removeEventListener('keydown', onKeydown);
+        dismissBinding.destroy();
         window.removeEventListener('scroll', onScrollOrResize, { capture: true });
         window.removeEventListener('resize', onScrollOrResize);
       },
