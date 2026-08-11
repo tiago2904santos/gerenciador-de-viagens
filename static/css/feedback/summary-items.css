@@ -72,10 +72,8 @@
   color: var(--color-primary-bright);
 }
 
-/* Foco por outline, nao por box-shadow: no tema escuro o
-   --cv-field-focus-ring resolve para --focus-ring, que vale `none` por decisao
-   de design (la o foco e sinalizado pela borda do controle). Um link nao tem
-   borda para mudar, entao herdar esse contrato deixaria o foco invisivel. */
+/* Link usa outline próprio: o anel de campo é box-shadow e não se aplica a
+   elementos sem a geometria de controle. */
 .summary-items > li > a:focus-visible {
   border-radius: var(--radius-sm);
   outline: 2px solid var(--color-accent-border-strong);

@@ -145,7 +145,8 @@
   --btn-padding-x: 13px;
   --btn-gap: 5px;
   --btn-icon-size: 17px;
-  --cv-field-focus-ring: 0 0 0 3px rgba(21, 91, 154, 0.28);
+  --input-border-focus: #0b3a66;
+  --input-focus-ring: rgba(21, 91, 154, 0.18);
   --card-border: 1px solid var(--color-border);
   --card-shadow: var(--shadow-card);
 
