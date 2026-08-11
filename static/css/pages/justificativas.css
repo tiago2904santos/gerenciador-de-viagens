@@ -168,8 +168,7 @@
   min-height: var(--form-control-height, var(--control-height-md));
 }
 
-.justificativa-quick-add .field-with-action .custom-select,
-.justificativa-quick-add .field-with-action .cv-field__control {
+.justificativa-quick-add .field-with-action .custom-select {
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -189,7 +188,6 @@
 }
 
 .justificativa-quick-add .field-with-action--manage-reveal > .custom-select,
-.justificativa-quick-add .field-with-action--manage-reveal > .cv-field__control,
 .justificativa-quick-add .field-with-action--manage-reveal > .form-control,
 .justificativa-quick-add .field-with-action--manage-reveal > .form-select,
 .justificativa-quick-add .field-with-action--manage-reveal > select {
@@ -205,8 +203,6 @@
 
 .justificativa-quick-add .field-with-action--manage-reveal:hover > .custom-select,
 .justificativa-quick-add .field-with-action--manage-reveal:focus-within > .custom-select,
-.justificativa-quick-add .field-with-action--manage-reveal:hover > .cv-field__control,
-.justificativa-quick-add .field-with-action--manage-reveal:focus-within > .cv-field__control,
 .justificativa-quick-add .field-with-action--manage-reveal:hover > .form-control,
 .justificativa-quick-add .field-with-action--manage-reveal:focus-within > .form-control,
 .justificativa-quick-add .field-with-action--manage-reveal:hover > .form-select,

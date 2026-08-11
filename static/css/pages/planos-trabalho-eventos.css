@@ -1036,7 +1036,6 @@ html[data-theme="dark"] .pt-efetivo-fields .pt-quantidade-stepper {
   background: var(--step1-field) !important;
 }
 
-.pt-efetivo-fields .pt-quantidade-stepper > .cv-field__control,
 .pt-efetivo-fields .pt-quantidade-stepper > input {
   appearance: textfield;
   -moz-appearance: textfield;
