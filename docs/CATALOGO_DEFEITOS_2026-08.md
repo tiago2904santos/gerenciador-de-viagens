@@ -1693,7 +1693,7 @@ quebra o roteamento de foco em 6 páginas, em silêncio.
 **Correção:** trocar por atributo dedicado (`data-entity-picker-root`) e deixar a classe só para
 estilo — **antes** de qualquer renomeação de CSS.
 
-### JS-07 🟡 "Fechar ao clicar fora / Esc" reimplementado 4 vezes · AUD · 2 d · risco médio
+### JS-07 ✅ RESOLVIDO (E11) · "Fechar ao clicar fora / Esc" reimplementado 4 vezes · AUD · 2 d · risco médio
 
 `components/picker.js:798,828`, `components/cv-date-picker.js:728-731,787-788`,
 `cv-select.js:131,179,302,313`, `components/picker-select.js:394,432` — quatro implementações sem
@@ -1704,6 +1704,13 @@ função compartilhada.
 > `cv-date-picker.js:794-795` — e mesmo ele apenas **reposiciona** o painel aberto
 > (`if (isOpen) positionPanel()`), não o fecha. **Nenhuma das quatro** fecha em scroll ou resize.
 > A duplicação continua real; a divergência citada, não.
+
+**Fechamento (11/08/2026).** Depois da remoção de `cv-select.js` na E2, restavam três
+implementações vivas. `components/overlay.js` agora expõe `CV.overlay.attachDismiss`, com uma zona
+interna que aceita painéis portalizados, predicado de abertura, escopo opcional de Escape e
+`destroy()`. `picker.js`, `date-picker.js` e `picker-select.js` usam esse contrato; o calendário
+continua apenas reposicionando em `scroll`/`resize`. Testes de runtime cobrem clique externo,
+painel portalizado, Escape condicional e desmontagem; o gate JavaScript fechou com **43 testes**.
 
 ### JS-08 🟡 11% do bundle global atende menos de 1% das páginas · AUD · 2 d · risco médio
 
@@ -1728,14 +1735,20 @@ função compartilhada.
 > **Consequência:** o ganho de separar o bundle é menor do que o catálogo prometia, e o corte tem
 > que ser decidido por componente, não pelo bloco inteiro.
 
-### JS-09 🟡 Tela de espera de documento carrega 264 KB para usar 3,3 KB · AUD · 0,5 d
+### JS-09 ✅ RESOLVIDO (E11) · Tela de espera de documento carregava o bundle inteiro para usar 3,3 KB · AUD · 0,5 d
 
 `templates/documentos/geracao_aguarde_embedded.html:27` é um documento autônomo (não estende
 `base.html`) que carrega `shell.bundle.js` inteiro. O único uso de `CV.*` na tela é
 `CV.http.fetchJson` (`document-generation-wait.js:10`), definido em `core/http.js` (116 linhas).
 A tela só mostra um spinner e faz polling.
 
-### JS-10 🟡 Modularização do editor de roteiros é fachada · AUD · 0,25 d ou 3+ d
+**Fechado na E11.** A tela embutida agora entrega `core/http.js` diretamente antes de
+`document-generation-wait.js`; `shell.bundle.js` não participa mais desse documento autônomo. Na
+medição atual, o JavaScript específico da rota caiu de **283.282 para 4.255 bytes** (−279.027;
+**−98,5%**), preservando o contrato `CV.http.fetchJson`. O teste da resposta 202 trava presença,
+ausência e ordem dos dois scripts para impedir a regressão silenciosa.
+
+### JS-10 ✅ RESOLVIDO (E11) · Modularização do editor de roteiros é fachada · AUD · 0,25 d ou 3+ d
 
 `static/js/pages/roteiros/editor/state.js`, `retorno.js` e `diarias.js` têm **3 linhas cada** e
 devolvem só `{ name: 'state' }` etc. São importados e instanciados em `index.js:11-20`, e os
@@ -1744,6 +1757,13 @@ objetos não são usados em mais lugar nenhum. A lógica real continua nas 1.848
 **Efeito:** a estrutura de arquivos mente. Quem procurar a regra de diárias em `diarias.js` não
 acha.
 **Decisão:** completar a extração (3+ dias, depois de `BE-13`) ou remover os stubs (0,25 d).
+
+**Fechamento (11/08/2026).** Escolhida a poda de comportamento nulo: o grep de repositório inteiro
+confirmou que os três objetos só eram publicados em `window.CV.roteiros.modules` e não tinham
+consumidor. Os imports, as três propriedades e os arquivos `state.js`, `retorno.js` e `diarias.js`
+foram removidos. Os módulos reais `trechos.js` e `mapa.js`, inclusive o bootstrap do mapa, foram
+preservados. O contrato de namespace trava a ausência dos stubs; **33 testes focados** ficaram
+verdes.
 
 ### JS-11 ✅ RESOLVIDO (f9e3f72) · ⚪ Máscara de CEP duplicada e `onlyDigits` em 4 cópias · AUD · 0,25 d
 

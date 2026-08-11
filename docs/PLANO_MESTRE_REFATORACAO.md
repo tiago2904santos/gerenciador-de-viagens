@@ -442,10 +442,10 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [ ] `UI-02` tema escuro deixa de ser camada de exceção (5.619 linhas, 190 `!important`) · **E9**
 - [ ] `UI-04` **97** imports de CSS de outro domínio, em **36** templates · **E10**
 - [ ] `HT-04` `base.html` carrega ~153 KB de JS de domínio em toda página · **E11**
-- [ ] `JS-07` "fechar ao clicar fora / Esc" em 4 cópias · **E11**
+- [x] `JS-07` 3 implementações vivas de "fechar ao clicar fora / Esc" → `CV.overlay.attachDismiss` · **E11**
 - [ ] `JS-08` 11% do bundle atende menos de 1% das páginas · **E11**
-- [ ] `JS-09` tela de espera carrega 264 KB para usar 3,3 KB · **E11**
-- [ ] `JS-10` decidir os stubs do editor de roteiros — **destravado**: o `BE-13` fechou · **E11**
+- [x] `JS-09` tela embutida entrega só `http.js` + polling: 283.282 → 4.255 bytes de JS · **E11**
+- [x] `JS-10` três stubs sem consumidor removidos; módulos reais e bootstrap preservados · **E11**
 
 **Fechados nesta fase antes do dimensionamento** (a reconstrução parcial de 07–08/08, que o quadro
 não registrava): `NOVO-50/MED` paleta de 255 cores duplicadas · `NOVO-51` poda dos 55 apelidos

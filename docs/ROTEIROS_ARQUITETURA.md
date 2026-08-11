@@ -100,14 +100,12 @@ Outras observacoes de validacao:
 
 - Entrypoint: `static/js/pages/roteiros.js` (arquivo enxuto de bootstrap).
 - Núcleo do editor: `static/js/pages/roteiros/editor/index.js`.
-- Módulos por responsabilidade:
-  - `state.js`
-  - `destinos.js`
-  - `trechos.js`
-  - `retorno.js`
-  - `diarias.js`
-  - `mapa.js`
-  - `utils.js`
+- Módulos reais do editor:
+  - `trechos.js` — renderização e manipulação dos cartões de trecho.
+  - `mapa.js` — ponte de inicialização com o motor de mapa.
+  - `source-toggle.js` — controle isolado da origem do roteiro, carregado pelo include do editor.
+- A lógica ainda não extraída permanece explicitamente em `index.js`; não há arquivos-fachada
+  reservando nomes de responsabilidades que continuam no núcleo.
 - Carregamento em `templates/roteiros/roteiro_form_page.html` com `type="module"`, sem bundler e sem retorno de JS inline para template.
 
 ## View `calcular_diarias` e `request`

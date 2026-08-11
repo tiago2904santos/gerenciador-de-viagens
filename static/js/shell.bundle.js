@@ -2696,6 +2696,53 @@ document.documentElement.dataset.appReady = "true";
     });
   }
 
+  function attachDismiss(options) {
+    options = options || {};
+    var inside = options.inside || [];
+    var isOpen = typeof options.isOpen === "function"
+      ? options.isOpen
+      : function () { return true; };
+    var onDismiss = typeof options.onDismiss === "function"
+      ? options.onDismiss
+      : function () {};
+
+    function eventIsInside(event) {
+      var path = event.composedPath ? event.composedPath() : null;
+      return inside.some(function (node) {
+        if (!node) return false;
+        if (path && path.indexOf(node) !== -1) return true;
+        return node === event.target ||
+          (node.contains && node.contains(event.target));
+      });
+    }
+
+    function onDocumentClick(event) {
+      if (isOpen() && !eventIsInside(event)) {
+        onDismiss("outside", event);
+      }
+    }
+
+    function onDocumentKeydown(event) {
+      if (event.key !== "Escape" || !isOpen()) return;
+      if (
+        typeof options.escapeWhen === "function" &&
+        !options.escapeWhen(event)
+      ) return;
+      event.preventDefault();
+      onDismiss("escape", event);
+    }
+
+    document.addEventListener("click", onDocumentClick);
+    document.addEventListener("keydown", onDocumentKeydown);
+
+    return {
+      destroy: function () {
+        document.removeEventListener("click", onDocumentClick);
+        document.removeEventListener("keydown", onDocumentKeydown);
+      },
+    };
+  }
+
   function attachDropdown(menu, anchor) {
     if (!menu || !anchor) {
       return { open: function () {}, close: function () {}, reposition: function () {} };
@@ -2924,6 +2971,7 @@ document.documentElement.dataset.appReady = "true";
   }
 
   window.CV.overlay = {
+    attachDismiss: attachDismiss,
     attachDropdown: attachDropdown,
     closeDialog: closeDialog,
     closeMenus: closeMenus,
@@ -4549,11 +4597,6 @@ document.documentElement.dataset.appReady = "true";
 
     input.addEventListener("keydown", (e) => {
       const visible = filteredItems();
-      if (e.key === "Escape") {
-        e.preventDefault();
-        setOpen(false);
-        return;
-      }
       if (e.key === "Enter") {
         e.preventDefault();
         const item = visible[Math.max(activeIndex, 0)];
@@ -4576,20 +4619,19 @@ document.documentElement.dataset.appReady = "true";
       }
     });
 
-    /* Fecha dropdown ao clicar fora.
-
-       JS-02 — este listener é por instância. Sem `destroy` ele sobrevivia à
-       remoção da linha do formulário (`location-rows`) e ao ciclo de
-       reset+reinit dos wizards, acumulando um handler por picker já morto,
-       cada um segurando a closure inteira do componente. */
-    const onDocumentClick = (e) => {
-      if (!root.contains(e.target) && e.target !== select) setOpen(false);
-    };
-    document.addEventListener("click", onDocumentClick);
+    /* JS-07 — clique externo e Escape compartilham o contrato de overlay.
+       O dropdown não entra em `inside`: preserva o comportamento anterior do
+       picker, cujo listener considerava apenas a raiz e o select nativo. */
+    const dismissBinding = window.CV.overlay.attachDismiss({
+      inside: [root, select],
+      isOpen: () => isOpen,
+      escapeWhen: (e) => e.target === input,
+      onDismiss: () => setOpen(false),
+    });
     instancias.push({
       root,
       desmontar() {
-        document.removeEventListener("click", onDocumentClick);
+        dismissBinding.destroy();
       },
     });
 
@@ -5263,10 +5305,6 @@ document.documentElement.dataset.appReady = "true";
             }
           }
           break;
-        case 'Escape':
-          e.preventDefault();
-          self._close();
-          break;
         case 'Tab':
           self._close();
           break;
@@ -5299,12 +5337,13 @@ document.documentElement.dataset.appReady = "true";
       self._clearFocus();
     });
 
-    // Clique fora → fechar (o menu pode estar "flutuando" no body via
-    // CV.overlay, entao um clique nele nao conta como "fora").
-    document.addEventListener('click', function (e) {
-      if (self._isOpen && !self.root.contains(e.target) && !self.menu.contains(e.target)) {
-        self._close();
-      }
+    // JS-07 — o menu pode estar flutuando em body, mas continua dentro da
+    // zona interativa. Escape mantém o escopo anterior: somente o trigger.
+    this._dismiss = window.CV.overlay.attachDismiss({
+      inside: [self.root, self.menu],
+      isOpen: function () { return self._isOpen; },
+      escapeWhen: function (e) { return e.target === self.trigger; },
+      onDismiss: function () { self._close(); },
     });
   };
 
@@ -7131,21 +7170,6 @@ document.documentElement.dataset.appReady = "true";
       renderDays();
     }
 
-    function onDocumentClick(event) {
-      var path = event.composedPath ? event.composedPath() : [event.target];
-      // O panel pode estar em document.body (portal), checar root E panel separadamente
-      if (path.indexOf(root) === -1 && path.indexOf(panel) === -1) {
-        setOpen(false);
-      }
-    }
-
-    function onKeydown(event) {
-      if (event.key === 'Escape' && isOpen) {
-        event.preventDefault();
-        closePicker();
-      }
-    }
-
     if (weekdays) buildWeekdays();
     syncStateFromInputs();
     syncOutputs();
@@ -7198,12 +7222,17 @@ document.documentElement.dataset.appReady = "true";
       });
     }
 
-    /* JS-02 — os quatro listeners abaixo são por instância. Sem `destroy`
-       eles sobreviviam à remoção do campo (troca de aba, linha de formulário
-       removida, painel trocado por AJAX) e seguiam reposicionando um painel
-       que já não estava no documento. */
-    document.addEventListener('click', onDocumentClick);
-    document.addEventListener('keydown', onKeydown);
+    /* JS-07 — o painel portalizado pertence à zona interna; Escape conserva
+       a restauração de foco de `closePicker`, e clique externo conserva o
+       fechamento simples sem alterar o foco. */
+    var dismissBinding = window.CV.overlay.attachDismiss({
+      inside: [root, panel],
+      isOpen: function () { return isOpen; },
+      onDismiss: function (reason) {
+        if (reason === 'escape') closePicker();
+        else setOpen(false);
+      },
+    });
 
     // Reposicionar ao scrollar ou redimensionar para o panel acompanhar o anchor
     function onScrollOrResize() {
@@ -7214,8 +7243,7 @@ document.documentElement.dataset.appReady = "true";
     instancias.push({
       root: root,
       desmontar: function () {
-        document.removeEventListener('click', onDocumentClick);
-        document.removeEventListener('keydown', onKeydown);
+        dismissBinding.destroy();
         window.removeEventListener('scroll', onScrollOrResize, { capture: true });
         window.removeEventListener('resize', onScrollOrResize);
       },
