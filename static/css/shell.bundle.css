@@ -11716,12 +11716,18 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
 
 /* Stepper −/+: mesmo secondary filled soft do "Preencher datas"
    (.form-block__actions .cv-btn--secondary). */
+:is(html[data-theme])
+  [data-travel-document-wizard-roteiro]
+  :is(.roteiro-time-calc-stepper, .roteiro-trecho-card__time-stepper)
+  :is(.trecho-tempo-add-btn, .cv-btn--control.cv-btn--secondary) {
+  border: 0;
+}
+
 :is(html[data-theme="dark"])
   [data-travel-document-wizard-roteiro]
   :is(.roteiro-time-calc-stepper, .roteiro-trecho-card__time-stepper)
   :is(.trecho-tempo-add-btn, .cv-btn--control.cv-btn--secondary) {
   background: var(--step1-surface);
-  border: 0;
   border-radius: 12px;
   box-shadow: none;
   color: var(--color-heading);

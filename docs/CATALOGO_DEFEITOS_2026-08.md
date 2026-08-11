@@ -6822,3 +6822,58 @@ A medição antes/depois cobriu **56 rotas, 672 combinações rota|tema|estado e
 dinâmicos, deliberadamente separados do estilo. O inventário fecha em **36 regras vivas de base, a11y ou contexto,
 11 arquivos e 0 pseudo-regra**, contra 72 regras no início da classificação. A regra canônica possui
 a base, e os contextos restantes são variações medidas, não correções cegas. **E7c concluída.**
+
+### NOVO-105 · `NOVO` A 8b precisa de três portões, não de um; e o piso de ruído era o relógio · QA · fechada na medição
+
+Duas correções a coisas que **eu mesmo escrevi** nesta sessão, ambas achadas medindo.
+
+**1. O "destrava a 8b" do `NOVO-100` valeu para menos regras do que eu disse.** A E9-c levou os
+`--step1-*` para um escopo que alcança o wizard, e eu concluí daí que a família 8b estava liberada
+dentro das rotas de wizard. Não estava: o token existir no claro não é o mesmo que o componente
+*consumir* o token. Medido regra a regra na família (41 com efeito contra o `main` de 11/08):
+
+| portão | o que ele pergunta | sobrevivem |
+|---|---|---:|
+| — | regras da família com efeito | 41 |
+| **alcance medido** | os elementos que a regra casa estão **todos** em rota de wizard? (`querySelectorAll` rota a rota) | 6 |
+| **âncora estrutural** | o seletor começa em `[data-travel-document-wizard-*]`, e a declaração é mesmo `border: 0`? | 4 |
+| **fronteira** | no **claro**, depois da mudança, o elemento ainda se distingue do pai — fundo próprio, sombra ou borda que sobrou? | **1** |
+
+O terceiro portão é o `NOVO-93` transformado em medição, e ele reencontrou sozinho, a partir dos
+pixels, os mesmos componentes que o `NOVO-93` tinha listado à mão: `.roteiro-trecho-card__leg` e
+`.roteiro-mapa__canvas-head .cv-btn--secondary` ficam **branco no branco**. O `NOVO-93` estava
+certo; o otimismo do `NOVO-100` é que estava errado.
+
+**Por que os dois primeiros portões não bastam.** O lote anterior foi recortado procurando
+`travel-document-wizard` no texto do seletor, e reprovou movendo 15 elementos no escuro. O atributo
+tem a palavra "wizard"; o elemento não mora em rota de wizard —
+`:is([data-travel-document-wizard-step1], …) .search-picker__selected-panel` casa em
+`oficios-detalhe`, `justificativas-lista` e `viatura-editar`. **Grep não é medição**, terceira vez
+nesta sessão.
+
+**2. O piso de ruído de 4 elementos nunca foi ruído de renderização — era o relógio.** É o mesmo
+defeito que o `075d77df` achou no `medir_campos_computados.py`, e ele valia igual nas sondas da E9,
+porque o furo é do método e não do arquivo. `/justificativas/` mostra `ATUALIZADA <data> HH:MM` com
+precisão de minuto; numa fonte proporcional os dígitos não têm todos a mesma largura, e como
+`width`/`height` estão na rede de segurança geométrica da sonda, o minuto virando entre duas
+capturas movia 4 elementos. Guardando um hash do texto ao lado do hash de estilo, o comparador
+separa **reflow** de **cascata**:
+
+```
+duas capturas do MESMO código, 41.754 elementos pareados por caminho no DOM
+  antes : 4 elementos "mudaram"        <- o minuto virou
+  agora : 0 de estilo, 30 só de texto
+```
+
+Isso importa retroativamente: todo "zero" que eu afirmei descontando um piso de 4 era, na verdade,
+"zero ou quatro". Agora é zero. As três correções do `075d77df` — status HTTP e URL final, espera
+pela árvore em vez do relógio, e o texto fora do diff de estilo — estão nas sondas
+`sonda_mesmo_tema.py`, `atribuir_e9.py` e `recortar_8b.py`; nas duas últimas a rota quebrada
+**aborta**, porque ali "não casou com nada" é justamente o critério que aprovaria a remoção.
+
+**O que entrou.** Uma regra, `theme-dark-components.css:2190` — os `−`/`+` dos steppers de tempo do
+editor de roteiro. Escuro **pixel-idêntico** (mesmo md5 no recorte do componente), claro com 18
+elementos alterados nas três rotas de roteiro, e os 10 elementos-alvo mantendo fronteira por fundo
+próprio contra o painel. As outras 40 regras da família continuam bloqueadas pelo `NOVO-93`: elas
+não precisam de mais medição, precisam de **decisão de desenho** sobre qual superfície o claro
+recebe no lugar da borda.
