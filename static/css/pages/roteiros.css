@@ -307,29 +307,7 @@
   margin-top: 9px;
 }
 
-.roteiro-editor__route-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin-top: var(--space-3);
-  max-height: 220px;
-  overflow: auto;
-}
-
 /* Picker de roteiro salvo (ofício): mesmo ritmo do picker de Documentos vinculados. */
-.related-route-picker.search-picker--people.search-picker--roster {
-  gap: 0 !important;
-}
-
-.related-route-picker .search-picker__field {
-  gap: 7px;
-}
-
-.related-route-picker .search-picker__selected-list.roteiro-editor__route-list {
-  gap: 8px;
-  margin-top: 8px;
-}
-
 .roteiro-routes-panel__header {
   padding-right: var(--space-4);
 }
@@ -341,34 +319,6 @@
 
 /* â”€â”€ Painel de destinos (Roteiro novo) â”€â”€ */
 
-/* Scrollbar estilizado da lista de roteiros */
-.related-route-list {
-  scrollbar-color: rgba(191, 211, 234, 0.6) transparent;
-}
-
-.related-route-list::-webkit-scrollbar {
-  width: 28px;
-}
-
-.related-route-list::-webkit-scrollbar-track {
-  background: transparent;
-  margin: var(--space-1) 0;
-}
-
-.related-route-list::-webkit-scrollbar-thumb {
-  background: rgba(191, 211, 234, 0.45);
-  border-radius: var(--radius-pill);
-  transition: background 0.2s;
-}
-
-.related-route-list::-webkit-scrollbar-thumb:hover {
-  background: var(--color-accent, #d8a21b);
-}
-
-.related-route-list::-webkit-scrollbar-button {
-  display: none;
-}
-
 .roteiro-editor--avulso .roteiro-editor__routes-panel--source .roteiro-editor__route-list {
   background: var(--route-card-bg);
   border: 0;
@@ -376,22 +326,6 @@
   margin-top: 10px;
   max-height: 280px;
   padding: 0 2px 0 0;
-}
-
-.related-route-item {
-  background: var(--route-card-inner-bg);
-  border: 1px solid var(--route-section-border);
-  border-radius: var(--radius-md);
-  color: var(--theme-text-body);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: var(--space-2) var(--space-3);
-  text-align: left;
-  transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast);
 }
 
 .roteiro-editor--avulso .related-route-item {
@@ -406,20 +340,10 @@
     background-color var(--transition-base);
 }
 
-.related-route-item:hover {
-  background: var(--route-card-inner-bg);
-  border-color: var(--route-button-secondary-hover-border);
-}
-
 .roteiro-editor--avulso .related-route-item:hover {
   background: var(--route-card-inner-bg);
   border-color: var(--route-button-secondary-hover-border);
   box-shadow: 0 8px 14px rgba(23, 50, 77, 0.08);
-}
-
-.related-route-item.is-active {
-  border-color: var(--re-accent-border);
-  box-shadow: 0 0 0 2px var(--re-choice-ring);
 }
 
 .roteiro-editor--avulso .related-route-item.is-active {
@@ -430,34 +354,15 @@
     0 10px 16px rgba(23, 50, 77, 0.1);
 }
 
-.related-route-item .related-route-title {
-  color: var(--theme-text-heading);
-  font-weight: 700;
-}
-
 .roteiro-editor--avulso .related-route-item .related-route-title {
   color: var(--theme-text-heading);
   font-size: 13px;
   font-weight: 900;
 }
 
-.related-route-item .related-route-period {
-  color: var(--theme-text-muted);
-  font-size: 12px;
-}
-
 .roteiro-editor--avulso .related-route-item .related-route-period {
   color: var(--theme-text-muted);
   font-size: 11px;
-}
-
-.related-route-empty {
-  border: 1px dashed var(--theme-border-card);
-  border-radius: var(--radius-md);
-  color: var(--theme-text-muted);
-  font-size: 13px;
-  padding: var(--space-4);
-  text-align: center;
 }
 
 #roteiro-selector-resumo {

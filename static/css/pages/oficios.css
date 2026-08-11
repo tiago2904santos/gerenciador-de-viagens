@@ -96,28 +96,6 @@
   line-height: 1.5;
 }
 
-.oficio-reveal-panel {
-  overflow: hidden;
-  opacity: 0;
-  transform: translateY(-12px);
-  transition:
-    opacity 220ms ease,
-    transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, transform;
-}
-
-.oficio-reveal-panel.is-open {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .oficio-reveal-panel {
-    transition: none;
-    transform: none;
-  }
-}
-
 /* Wizard Ofício: wrappers empilham linhas internas, não field-span no container */
 .oficio-data-block.app-form-grid-panel {
   grid-template-columns: minmax(0, 1fr);
@@ -1339,24 +1317,6 @@ html[data-theme="dark"] [data-travel-document-wizard-step1] .search-picker {
   --stepper-missing-border: color-mix(in srgb, var(--color-danger) 28%, transparent);
   --stepper-missing-color: color-mix(in srgb, var(--color-danger) 78%, var(--color-heading));
   --stepper-status-missing-color: color-mix(in srgb, var(--color-danger) 68%, var(--color-muted));
-}
-
-:is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-consolidado]) :is(.travel-document-body, .oficio-roteiro-body, .oficio-justificativa-body, .oficio-documentos-body) {
-  display: grid;
-  gap: 10px;
-}
-
-:is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block) {
-  margin: 0;
-}
-
-:is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block) > .form-block__header .form-block__copy {
-  display: grid;
-  gap: 3px;
-}
-
-:is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block) .form-block__description {
-  text-align: left;
 }
 
 /* ── Sugestões de viatura: sem corte (JS já limita a 8 chips) ───── */

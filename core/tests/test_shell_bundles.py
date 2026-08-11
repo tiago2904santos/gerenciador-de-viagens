@@ -104,6 +104,7 @@ class ShellBundleGateTests(SimpleTestCase):
         sources = (
             "css/fields/date-picker.css",
             "css/fields/file-picker.css",
+            "css/fields/related-route-picker.css",
         )
 
         self.assertIn("{% block shell_css %}", base)
@@ -119,6 +120,10 @@ class ShellBundleGateTests(SimpleTestCase):
         self.assertLess(
             form_shell.index(">>> css/fields/file-picker.css >>>"),
             form_shell.index(">>> css/actions/action-system.css >>>"),
+        )
+        self.assertLess(
+            form_shell.index(">>> css/lists/list-header.css >>>"),
+            form_shell.index(">>> css/fields/related-route-picker.css >>>"),
         )
 
         style = (ROOT / "static/css/style.css").read_text(encoding="utf-8")
@@ -168,6 +173,36 @@ class ShellBundleGateTests(SimpleTestCase):
                 text = (ROOT / relative).read_text(encoding="utf-8")
                 self.assertIn("{% block shell_css %}", text)
                 self.assertIn(marker, text)
+
+    def test_ui04_justificativas_uses_shared_related_route_picker_css(self):
+        template = (ROOT / "templates/justificativas/index.html").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("css/pages/justificativas.css", template)
+        for obsolete in (
+            "css/pages/oficios.css",
+            "css/pages/roteiros.css",
+            "css/pages/termos.css",
+        ):
+            with self.subTest(obsolete=obsolete):
+                self.assertNotIn(obsolete, template)
+
+        shared = (
+            ROOT / "static/css/fields/related-route-picker.css"
+        ).read_text(encoding="utf-8")
+        self.assertIn(".oficio-reveal-panel {", shared)
+        self.assertIn(".related-route-item {", shared)
+        self.assertIn(".termo-oficio-picker {", shared)
+
+        moved_selectors = {
+            "static/css/pages/oficios.css": "\n.oficio-reveal-panel {",
+            "static/css/pages/roteiros.css": "\n.related-route-item {",
+            "static/css/pages/termos.css": "\n.termo-oficio-picker {",
+        }
+        for relative, selector in moved_selectors.items():
+            with self.subTest(source=relative):
+                source = (ROOT / relative).read_text(encoding="utf-8")
+                self.assertNotIn(selector, source)
 
     def test_base_html_keeps_extra_blocks(self):
         text = BASE_HTML.read_text(encoding="utf-8")

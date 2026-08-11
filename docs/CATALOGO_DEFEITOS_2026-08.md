@@ -2751,6 +2751,15 @@ o núcleo global de `select.css`. Rotas sem o enhancer deixam de buscar mais **6
 selects nativos, `.cv-field` e `.field-with-action` continuam globais. A redução acumulada dos
 pickers chega a **59.338 bytes** por rota não consumidora.
 
+**Sexta família fechada em 11/08 (`UI-04`/`HT-04`, parcial).** Justificativas deixou de
+importar `oficios.css`, `roteiros.css` e `termos.css`. As 32 regras que o cadastro rápido realmente
+usa foram consolidadas em `fields/related-route-picker.css`, depois do shell para preservar a
+ordem da cascata. Na rota, a entrega caiu de **753.913 para 625.201 bytes** (**-128.712 bytes**) e
+o uso medido subiu de **11,3912% para 13,5547%**. O painel aberto manteve os mesmos **233 nós**, a
+mesma geometria e os mesmos estilos computados em claro/escuro a 1440, 800 e 500 px. As assinaturas
+de estilo da família também ficaram idênticas nos consumidores originais: Ofícios, Roteiros,
+Termos e Ordem de Serviço, nas mesmas seis combinações.
+
 ---
 
 ## QA — Testes, CI, segurança e infraestrutura
