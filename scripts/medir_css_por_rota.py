@@ -35,11 +35,15 @@ def merge_ranges(ranges: Iterable[tuple[int, int]]) -> list[tuple[int, int]]:
     return [(start, end) for start, end in merged]
 
 
-def _utf8_bytes_for_offsets(text: str, start: int, end: int) -> int:
-    """Converte offsets UTF-16 do CDP em bytes UTF-8 sem errar astral chars."""
+def _text_for_utf16_offsets(text: str, start: int, end: int) -> str:
+    """Recorta offsets UTF-16 do CDP sem deslocar conteúdo após caractere astral."""
     raw = text.encode("utf-16-le")
     segment = raw[max(0, start) * 2 : max(0, end) * 2]
-    return len(segment.decode("utf-16-le", errors="ignore").encode("utf-8"))
+    return segment.decode("utf-16-le", errors="ignore")
+
+
+def _utf8_bytes_for_offsets(text: str, start: int, end: int) -> int:
+    return len(_text_for_utf16_offsets(text, start, end).encode("utf-8"))
 
 
 def summarize_rule_usage(stylesheets: dict[str, str], usage: list[dict]) -> dict[str, float | int]:
@@ -63,6 +67,49 @@ def summarize_rule_usage(stylesheets: dict[str, str], usage: list[dict]) -> dict
         "bytes_matched": matched,
         "usage_percent": round(percent, 4),
     }
+
+
+def summarize_stylesheet_usage(
+    stylesheets: dict[str, str],
+    usage: list[dict],
+    source_urls: dict[str, str],
+    *,
+    include_fragments: bool = False,
+) -> list[dict]:
+    """Atribui bytes casados a cada folha para orientar a extração de E10."""
+    used_by_sheet: dict[str, list[tuple[int, int]]] = {}
+    for item in usage:
+        if item.get("used"):
+            used_by_sheet.setdefault(item["styleSheetId"], []).append(
+                (item["startOffset"], item["endOffset"])
+            )
+
+    result = []
+    for sheet_id, text in stylesheets.items():
+        ranges = merge_ranges(used_by_sheet.get(sheet_id, []))
+        delivered = len(text.encode("utf-8"))
+        matched = sum(
+            _utf8_bytes_for_offsets(text, start, end) for start, end in ranges
+        )
+        item = {
+            "source_url": source_urls.get(sheet_id, ""),
+            "bytes_delivered": delivered,
+            "bytes_matched": matched,
+            "usage_percent": round(100.0 * matched / delivered, 4) if delivered else 0.0,
+        }
+        if include_fragments:
+            item["matched_fragments"] = [
+                _text_for_utf16_offsets(text, start, end) for start, end in ranges
+            ]
+        result.append(item)
+    return sorted(result, key=lambda item: item["source_url"])
+
+
+def stylesheet_ids(usage: list[dict], source_urls: dict[str, str]) -> set[str]:
+    """Inclui folhas externas mesmo quando nenhuma regra casa na página."""
+    covered = {item["styleSheetId"] for item in usage}
+    external = {sheet_id for sheet_id, source_url in source_urls.items() if source_url}
+    return covered | external
 
 
 def updated_floors(
@@ -117,10 +164,24 @@ def is_valid_final_url(actual_url: str, expected_path: str, base_url: str, *, re
     return actual_path == expected_path.rstrip("/")
 
 
-def _measure_page(page, route, base_url: str, timeout_ms: int) -> dict:
+def _measure_page(
+    page,
+    route,
+    base_url: str,
+    timeout_ms: int,
+    *,
+    include_stylesheet_fragments: bool = False,
+) -> dict:
     from playwright.sync_api import Error as PlaywrightError
 
     session = page.context.new_cdp_session(page)
+    source_urls: dict[str, str] = {}
+
+    def remember_stylesheet(params: dict) -> None:
+        header = params["header"]
+        source_urls[header["styleSheetId"]] = header.get("sourceURL", "")
+
+    session.on("CSS.styleSheetAdded", remember_stylesheet)
     session.send("DOM.enable")
     session.send("CSS.enable")
     session.send("CSS.startRuleUsageTracking")
@@ -140,7 +201,7 @@ def _measure_page(page, route, base_url: str, timeout_ms: int) -> dict:
         raise RuntimeError(f"{route.slug}: {route.path} terminou em URL inválida: {page.url}")
 
     stylesheets: dict[str, str] = {}
-    for sheet_id in sorted({item["styleSheetId"] for item in coverage}):
+    for sheet_id in sorted(stylesheet_ids(coverage, source_urls)):
         try:
             stylesheets[sheet_id] = session.send(
                 "CSS.getStyleSheetText",
@@ -150,6 +211,12 @@ def _measure_page(page, route, base_url: str, timeout_ms: int) -> dict:
             # Folhas internas do navegador não são bytes entregues pela aplicação.
             continue
     result = summarize_rule_usage(stylesheets, coverage)
+    result["stylesheet_usage"] = summarize_stylesheet_usage(
+        stylesheets,
+        coverage,
+        source_urls,
+        include_fragments=include_stylesheet_fragments,
+    )
     result.update(
         {
             "path": route.path,
@@ -205,15 +272,30 @@ def run_measurement(args) -> dict:
             owns_browser = True
         page = context.new_page()
 
-        public_routes = [route for route in ROTAS if not route.requires_auth]
-        protected_routes = [route for route in ROTAS if route.requires_auth]
+        selected_routes = [
+            route for route in ROTAS if not args.route or route.slug in args.route
+        ]
+        public_routes = [route for route in selected_routes if not route.requires_auth]
+        protected_routes = [route for route in selected_routes if route.requires_auth]
         for route in public_routes:
-            measurements[route.slug] = _measure_page(page, route, args.base_url, args.timeout_ms)
+            measurements[route.slug] = _measure_page(
+                page,
+                route,
+                args.base_url,
+                args.timeout_ms,
+                include_stylesheet_fragments=args.include_matched_css,
+            )
 
-        if not args.storage_state:
+        if protected_routes and not args.storage_state:
             _login(page, args.base_url, username, password, args.timeout_ms)
         for route in protected_routes:
-            measurements[route.slug] = _measure_page(page, route, args.base_url, args.timeout_ms)
+            measurements[route.slug] = _measure_page(
+                page,
+                route,
+                args.base_url,
+                args.timeout_ms,
+                include_stylesheet_fragments=args.include_matched_css,
+            )
             print(
                 f"{route.slug}: {measurements[route.slug]['usage_percent']:.2f}% "
                 f"({measurements[route.slug]['bytes_matched']}/"
@@ -245,20 +327,36 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--viewport-height", type=int, default=900)
     parser.add_argument("--timeout-ms", type=int, default=30_000)
     parser.add_argument("--json", type=Path)
+    parser.add_argument("--route", action="append", help="mede somente o slug informado (diagnóstico)")
+    parser.add_argument(
+        "--include-matched-css",
+        action="store_true",
+        help="inclui no JSON os fragmentos casados de cada folha (use com --route)",
+    )
     parser.add_argument("--thresholds", type=Path, default=DEFAULT_THRESHOLDS)
     parser.add_argument("--atualizar-tetos", action="store_true")
     parser.add_argument("--permitir-subir-teto", action="store_true", help="permite enfraquecer um piso existente")
     args = parser.parse_args(argv)
 
+    known_routes = {route.slug for route in ROTAS}
+    unknown_routes = sorted(set(args.route or ()) - known_routes)
+    if unknown_routes:
+        parser.error("slug de rota desconhecido: " + ", ".join(unknown_routes))
+    if args.include_matched_css and not args.route:
+        parser.error("--include-matched-css exige ao menos um --route")
+
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
     report = run_measurement(args)
-    if report["route_count"] != len(ROTAS):
+    if not args.route and report["route_count"] != len(ROTAS):
         print(f"ERRO: foram medidas {report['route_count']} de {len(ROTAS)} rotas.")
         return 1
     if args.json:
         args.json.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    if args.route:
+        return 0
 
     thresholds = _read_thresholds(args.thresholds)
     current = thresholds.get("css_by_route", {}).get("routes", {})

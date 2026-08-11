@@ -44,6 +44,63 @@ class CssPorRotaMetricTests(SimpleTestCase):
             places=4,
         )
 
+    def test_diagnostico_atribui_bytes_e_fragmentos_por_folha(self):
+        first = ".a { color: red; }"
+        second = ".b { color: blue; }"
+        result = css_metric.summarize_stylesheet_usage(
+            {"sheet-a": first, "sheet-b": second},
+            [
+                {
+                    "styleSheetId": "sheet-a",
+                    "startOffset": 0,
+                    "endOffset": len(first),
+                    "used": True,
+                },
+                {
+                    "styleSheetId": "sheet-b",
+                    "startOffset": 0,
+                    "endOffset": len(second),
+                    "used": False,
+                },
+            ],
+            {"sheet-a": "http://test/static/a.css", "sheet-b": "http://test/static/b.css"},
+            include_fragments=True,
+        )
+
+        self.assertEqual(result[0]["bytes_matched"], len(first.encode("utf-8")))
+        self.assertEqual(result[0]["matched_fragments"], [first])
+        self.assertEqual(result[1]["bytes_matched"], 0)
+        self.assertEqual(result[1]["matched_fragments"], [])
+
+    def test_folha_externa_sem_regra_casada_entra_no_denominador(self):
+        self.assertEqual(
+            css_metric.stylesheet_ids(
+                [
+                    {
+                        "styleSheetId": "sheet-used",
+                        "startOffset": 0,
+                        "endOffset": 10,
+                        "used": True,
+                    }
+                ],
+                {
+                    "sheet-used": "http://test/static/used.css",
+                    "sheet-zero": "http://test/static/zero.css",
+                    "browser-sheet": "",
+                },
+            ),
+            {"sheet-used", "sheet-zero"},
+        )
+
+    def test_fragmento_respeita_offsets_utf16_do_cdp(self):
+        text = "/* 🚀 */ .a { color: red; }"
+        utf16_length = len(text.encode("utf-16-le")) // 2
+
+        self.assertEqual(
+            css_metric._text_for_utf16_offsets(text, 0, utf16_length),
+            text,
+        )
+
     def test_piso_de_uso_so_pode_subir(self):
         old = {"oficios-lista": {"usage_percent_min": 11.5}}
         measured_better = {"oficios-lista": {"usage_percent": 14.0}}

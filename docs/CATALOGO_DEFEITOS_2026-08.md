@@ -7147,3 +7147,32 @@ irmãos: diagnostica por padrão, só apaga quando mandado.
 
 **Vale para além dos anexos:** todo `FileField` do sistema tem o mesmo buraco. Começar pelos anexos
 de prestação, que são os únicos com exclusão pela tela, e ver se o resto compensa.
+
+### NOVO-106 ✅ RESOLVIDO (11/08/2026) · `NOVO` A régua de CSS não contava folhas com uso zero · QA · 0,5 d
+
+`scripts/medir_css_por_rota.py` construía o conjunto de folhas a partir dos IDs devolvidos por
+`CSS.stopRuleUsageTracking`. O CDP não devolve intervalo para uma folha externa quando nenhuma
+regra casa; por isso a folha desaparecia inteira do denominador. A métrica dizia medir “CSS
+entregue”, mas ignorava exatamente o CSS entregue e totalmente inútil.
+
+O caso que revelou o buraco foi `templates/prestacoes_contas/index.html`. A retirada simultânea de
+`oficios.css` e `roteiros-list.css`, baseada no catálogo que atribuía 0,0% aos dois, derrubou os
+bytes casados em **10.167** e teria causado regressão visual. O diagnóstico por folha mostrou:
+
+- `oficios.css`: **64.095 bytes entregues, 9.383 casados**; contém a família compartilhada
+  `record-card`/`person-row`/`fact-block` usada pela listagem;
+- `roteiros-list.css`: **7.180 bytes entregues, zero casados**;
+- `prestacoes_contas.css`: **23.003 bytes entregues, zero casados no estado claro medido** — não é
+  prova de arquivo morto, porque a régua ainda não abre todos os estados nem alterna o tema.
+
+**Correção.** O cliente registra `CSS.styleSheetAdded` antes de habilitar o rastreamento e usa a
+união entre folhas externas anunciadas e folhas presentes na cobertura. O JSON passa a atribuir
+bytes entregues/casados por URL; `--route` permite diagnóstico de uma rota e
+`--include-matched-css` inclui os fragmentos exatos sem inflar a execução canônica das 43 rotas.
+Folhas internas sem URL continuam fora.
+
+**Reauditoria.** O intervalo oficial mudou de **11,3369%–70,5559%** para
+**11,1003%–55,8871%**. Os 29 pisos afetados em `scripts/tetos_front.json` foram corrigidos para o
+menor entre o piso anterior e a medição honesta — não se aproveitou a correção para subir os outros
+14 pisos. Esta é a mesma exceção documentada no `NOVO-101`: a catraca enfraquece uma vez porque
+parou de omitir dívida preexistente; depois volta a caminhar apenas no sentido exigido.
