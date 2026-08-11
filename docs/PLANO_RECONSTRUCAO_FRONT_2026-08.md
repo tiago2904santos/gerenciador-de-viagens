@@ -618,6 +618,37 @@ token.
 Ele só é grande porque carrega **geometria**; com a E8 feita, o que sobra é diferença de cor, que
 o token resolve.
 
+> **⚠️ A premissa acima é falsa, e a medição de 10/08 mostra.** Depois da E8, das 659 regras
+> predicadas em `dark` em todo o `static/css`, **329 ainda misturam cor e geometria** — lideradas
+> por `border` (162 ocorrências), a família **8b**, que a E8 deixou bloqueada. Depois vêm `padding`
+> (83), `border-radius` (73), `font-size` (58), `font-weight` (54), `display` (50) e `transform`
+> (47). A E9 tira a camada de cor e destrava a 8b; a geometria restante continua sendo desenho.
+>
+> Os números do enunciado também envelheceram: o arquivo tinha **5.788** linhas (a E8 criou 41
+> regras gêmeas de raio) e os `!important` fora do bundle eram **466**, não 496 — o `#303` tirou 30
+> depois que o plano foi escrito.
+
+#### Progresso
+
+| fatia | o que fez | estado |
+|---|---|---|
+| **E9-b** | a faixa de filtros não tinha fundo no claro: os nove `--card-family-*` passam a existir no `:root` do `tokens.css` | ✅ `#309` — 47 elementos no claro, **2 no escuro** (piso de ruído) |
+| **E9-a** | 32 regras só-escuras de cor removidas por medição | ✅ `#310` — 4 elementos alterados = piso de ruído. Arquivo 5.788 → **5.610** linhas; `!important` 466 → **463** |
+| **E9-c** | o sistema de superfície do wizard (`--step1-*`) passa a existir no claro — **destrava a 8b** | ✅ `#313` — 36 elementos no claro, **2 no escuro** |
+
+**O instrumento que a etapa exigiu, e que não existia.** A régua da E0
+(`medir_divergencia_tema.py`) compara **claro contra escuro no mesmo código**. A E9 precisa do
+contrário: **o mesmo tema em dois códigos**. Daí `sonda_mesmo_tema.py` — 41.754 elementos chaveados
+por caminho no DOM, `transition` e `animation` desligadas, com `--revelar` (tira `[hidden]`, liga as
+classes de aberto) e `--pseudo hover` (força o estado em todo elemento). **Piso de ruído medido em
+4 elementos**, nos dois regimes: qualquer "zero" abaixo disso é indistinguível de ruído.
+
+**O que continua aberto na E9-a:** ~147 candidatas que reprovam em lote e **110 fora do alcance da
+régua** — o componente não aparece em nenhuma das 43 rotas (84), o contexto de wizard não tem o dado
+(25) ou é estado vazio (1). E três lições de método, cada uma paga com uma reversão: `NOVO-95` (a
+cascata não é monotônica — não se infere o efeito de um diff a partir de outro), a ordem obrigatória
+entre atribuir e remover, e o piso de ruído como pré-requisito de qualquer afirmação de "zero".
+
 **Prova.** `!important` fora do bundle caindo de 496; linhas do arquivo caindo de 5.619; a régua de
 divergência estável (a E9 não pode mudar aparência — a E8 já mudou).
 

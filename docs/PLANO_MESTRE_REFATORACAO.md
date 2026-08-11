@@ -383,11 +383,15 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       `oficios/services.py::salvar_roteiro_do_oficio`, com `atomic`. 33 → 13 ramos, 165 → 124
       linhas úteis, cobertura de `route_views.py` de 69% para 88%. Fecha o `NOVO-88` e o item 1 da
       lista do `BE-14`. Sobrou `NOVO-92` (a tradução de ação do rodapé, copiada em cada passo)
-- [ ] `BE-13` `roteiro_logic.py` fora do contrato de camadas — **fatia 1 (parsing de request) feita**:
-      `request` no módulo caiu de 23 ocorrências para 1, os 6 objetos falsos e o parâmetro morto de
-      `_validate_roteiro_state` sumiram, 2 invólucros apagados. **Fatia 2 (contexto + invólucros)
-      feita**: o módulo saiu de 1.829 para 1.579 linhas e de 55 para 37 defs; a fachada do contexto
-      migrou de service para presenter. Falta a persistência
+- [x] `BE-13` `roteiro_logic.py` fora do contrato de camadas — **três fatias, três PRs**. F1
+      (parsing): `request` no módulo caiu de 23 ocorrências para 1, os 6 objetos falsos e o parâmetro
+      morto de `_validate_roteiro_state` sumiram. F2 (contexto + invólucros): a fachada do contexto
+      migrou de service para presenter, e 15 invólucros morreram. F3 (persistência): o gravador
+      atômico de 3 tabelas foi para `roteiros/services/editor_persistence.py` com nomes públicos, e o
+      módulo virou `roteiros/services/editor_state_builder.py` — nome e lugar do que sobrou.
+      **1.845 → 1.337 linhas (−27%), 57 → 33 defs.** Continua grande, mas com uma responsabilidade
+      só. Sobrou `NOVO-98` (guardas defensivas do gravador, inalcançáveis pelo caminho público).
+      **Fecha a corrente `BE-11`/`BE-12`/`BE-13`**
 - [ ] `BE-14` 48 sites de persistência em view, sem transação
 - [ ] `BE-15` numeração reimplementada 3 vezes
 - [ ] `BE-16` abstrações de `core` adotadas pela metade
@@ -438,7 +442,7 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [ ] `JS-07` "fechar ao clicar fora / Esc" em 4 cópias · **E11**
 - [ ] `JS-08` 11% do bundle atende menos de 1% das páginas · **E11**
 - [ ] `JS-09` tela de espera carrega 264 KB para usar 3,3 KB · **E11**
-- [ ] `JS-10` decidir os stubs do editor de roteiros — depende do `BE-13` · **E11**
+- [ ] `JS-10` decidir os stubs do editor de roteiros — **destravado**: o `BE-13` fechou · **E11**
 
 **Fechados nesta fase antes do dimensionamento** (a reconstrução parcial de 07–08/08, que o quadro
 não registrava): `NOVO-50/MED` paleta de 255 cores duplicadas · `NOVO-51` poda dos 55 apelidos

@@ -10104,7 +10104,7 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
    Card externo escuro; blocos em surface-soft; campos no tom do card
    (poço inset dentro de cada seção).
    ======================================================================== */
-/* NOVO-98 (E9-c): as quatro variaveis do sistema de superficie do wizard eram
+/* NOVO-100 (E9-c): as quatro variaveis do sistema de superficie do wizard eram
    ligadas SO no escuro. No claro elas nao existiam neste escopo, e as 32
    leituras sem `fallback` que moram dentro do wizard nao resolviam nada.
 
@@ -14794,7 +14794,7 @@ html[data-theme="dark"] *::after {
   color: var(--color-heading);
 }
 
-/* NOVO-98 (E9-c): idem — a definicao das variaveis vale nos dois temas, a
+/* NOVO-100 (E9-c): idem — a definicao das variaveis vale nos dois temas, a
    pintura continua sendo decisao de tema. `lists/record-list.css:12` ja liga as
    mesmas tres neutras para `.collection-panel`; aqui o gemeo garante que o
    valor seja o mesmo do escuro, e nao o daquele arquivo. */

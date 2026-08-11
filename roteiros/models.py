@@ -255,7 +255,7 @@ class RoteiroDestino(models.Model):
         # `DB-08`: dois destinos na mesma posição eram aceitos, e o destino
         # duplicado é contado **duas vezes pelo motor de diárias** — sai no ofício
         # e no termo. Constraint simples (não adiada) porque o único escritor
-        # apaga tudo antes de recriar: `roteiro_logic._salvar_roteiro_avulso_from_roteiro_state`
+        # apaga tudo antes de recriar: `editor_state_builder._salvar_roteiro_avulso_from_roteiro_state`
         # (`roteiro.destinos.all().delete()`), depois `create` com `enumerate`.
         # Reordenação por troca de posição não existe neste caminho.
         constraints = [
@@ -354,7 +354,7 @@ class RoteiroTrecho(models.Model):
             # `DB-08` fatia 2: a posição é a sequência do itinerário impresso, e
             # duas linhas na mesma posição tornam o documento não determinístico —
             # a mesma tela gera dois PDFs diferentes conforme o desempate de `pk`.
-            # O retorno não disputa posição com a ida: `roteiro_logic.py` dá a ele
+            # O retorno não disputa posição com a ida: `editor_state_builder.py` dá a ele
             # `len(trechos_validated)`, uma casa acima de todas as de ida.
             #
             # Ao contrário do `RoteiroDestino`, aqui o escritor **não** apaga antes

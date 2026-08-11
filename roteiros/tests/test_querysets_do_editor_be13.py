@@ -1,6 +1,6 @@
 """`BE-13` fatia 1 — rede para `_setup_roteiro_querysets` antes de mexer na assinatura.
 
-Ela é a única das sete funções de parsing do `roteiro_logic.py` que lê `request.method`
+Ela é a única das sete funções de parsing do `editor_state_builder.py` que lê `request.method`
 além de `request.POST` — o único `request.method` do módulo inteiro, aliás. Tirar o
 `request` de lá significa passar `method` como parâmetro, e é exatamente o `if/elif/else`
 que ramifica nele que estava descoberto: `coverage` apontava os ramos "instância
@@ -174,12 +174,12 @@ class ParserNaoMutaOPostDoChamadorTests(TestCase):
         )
 
     def test_o_post_do_chamador_sai_intacto(self):
-        from roteiros import roteiro_logic
+        from roteiros.services import editor_state_builder
 
         post = self._post()
         antes = dict(post.lists())
 
-        roteiro_logic._build_avulso_roteiro_state_from_post(post)
+        editor_state_builder._build_avulso_roteiro_state_from_post(post)
 
         self.assertEqual(
             dict(post.lists()),
@@ -189,12 +189,12 @@ class ParserNaoMutaOPostDoChamadorTests(TestCase):
         self.assertNotIn("sede_estado", post)
 
     def test_duas_chamadas_com_o_mesmo_post_dao_o_mesmo_estado(self):
-        from roteiros import roteiro_logic
+        from roteiros.services import editor_state_builder
 
         post = self._post()
 
-        primeiro = roteiro_logic._build_avulso_roteiro_state_from_post(post)
-        segundo = roteiro_logic._build_avulso_roteiro_state_from_post(post)
+        primeiro = editor_state_builder._build_avulso_roteiro_state_from_post(post)
+        segundo = editor_state_builder._build_avulso_roteiro_state_from_post(post)
 
         self.assertEqual(primeiro["sede_estado_id"], segundo["sede_estado_id"])
         self.assertEqual(primeiro["sede_cidade_id"], segundo["sede_cidade_id"])
