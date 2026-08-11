@@ -2,17 +2,13 @@
 """Regras de negocio e montagem de contexto do formulario de roteiros."""
 from __future__ import annotations
 
-import json
 from copy import deepcopy
 from datetime import datetime
-from decimal import ROUND_HALF_UP
-from decimal import Decimal
 from types import SimpleNamespace
 
 from django.db import transaction
 from django.db.models import F
 from django.db.models import Q
-from django.urls import reverse
 from django.utils import timezone
 
 from cadastros.models import Cidade, Estado, ConfiguracaoSistema
@@ -20,7 +16,6 @@ from cadastros.models import Cidade, Estado, ConfiguracaoSistema
 from roteiros.services.diarias import (
     PeriodMarker,
     calculate_periodized_diarias,
-    formatar_valor_diarias,
     infer_tipo_destino_from_paradas,
 )
 from roteiros.models import Roteiro, RoteiroDestino, RoteiroTrecho
@@ -36,29 +31,16 @@ from roteiros.services.editor_parser import (
     parse_roteiro_date,
     parse_roteiro_decimal,
     parse_roteiro_time,
-    roteiro_date_input,
     roteiro_decimal_input,
-    roteiro_time_input,
 )
 from roteiros.services.editor_state import (
     build_roteiro_bate_volta_diario_state,
     dedupe_roteiro_loop_retorno_final,
     roteiro_trecho_duplica_retorno,
 )
-from roteiros.services.map_defaults import build_roteiro_map_defaults
 
 ROTEIRO_MODO_EVENTO = "EVENTO_EXISTENTE"
 ROTEIRO_MODO_PROPRIO = "ROTEIRO_PROPRIO"
-def _resolve_uf_from_cep(cep: str) -> str:
-    from roteiros.services.map_defaults import resolve_uf_from_cep
-
-    return resolve_uf_from_cep(cep)
-
-
-def _build_roteiro_map_defaults():
-    return build_roteiro_map_defaults()
-
-
 def _get_parana_estado():
     return Estado.objects.filter(sigla__iexact='PR').order_by('id').first()
 
@@ -180,22 +162,6 @@ def _estrutura_trechos(roteiro, destinos_list=None):
         'rota_fonte': (getattr(t_db, 'rota_fonte', '') or '') if t_db else '',
     })
     return out
-def _trechos_list_json_compat(trechos_list):
-    """Serializa trechos para trechos_json (string) e para json_script no template."""
-    rows = []
-    for row in trechos_list or []:
-        item = {}
-        for k, v in row.items():
-            if v is None:
-                item[k] = None
-            elif hasattr(v, 'isoformat'):
-                item[k] = v.isoformat()
-            elif isinstance(v, Decimal):
-                item[k] = float(v)
-            else:
-                item[k] = v
-        rows.append(item)
-    return rows, json.dumps(rows)
 def _atualizar_datas_roteiro_apos_salvar_trechos(roteiro):
     """Deriva o cabeçalho de datas do roteiro a partir dos trechos (`NOVO-36`).
 
@@ -267,87 +233,31 @@ def _atualizar_datas_roteiro_apos_salvar_trechos(roteiro):
         update_fields.append('status')
         roteiro.save(update_fields=update_fields)
 
-def _parse_int(value):
-    return parse_int(value)
-
-
-def _parse_roteiro_date(value):
-    return parse_roteiro_date(value)
-
-
-def _parse_roteiro_time(value):
-    return parse_roteiro_time(value)
-
-
-def _roteiro_date_input(value):
-    return roteiro_date_input(value)
-
-
-def _roteiro_time_input(value):
-    return roteiro_time_input(value)
-
-
-def _roteiro_local_label(cidade=None, estado=None):
-    return roteiro_local_label(cidade=cidade, estado=estado)
-
-
-def _roteiro_get_local_parts(cidade=None, estado=None, nome=''):
-    return roteiro_get_local_parts(cidade=cidade, estado=estado, nome=nome)
-
-
-def _roteiro_locations_equivalent(*, cidade_a=None, estado_a=None, nome_a='', cidade_b=None, estado_b=None, nome_b=''):
-    return roteiro_locations_equivalent(
-        cidade_a=cidade_a,
-        estado_a=estado_a,
-        nome_a=nome_a,
-        cidade_b=cidade_b,
-        estado_b=estado_b,
-        nome_b=nome_b,
-    )
-
-
-def _build_roteiro_bate_volta_diario_state(data=None):
-    return build_roteiro_bate_volta_diario_state(data)
-
-
 def _roteiro_values_equal(a, b):
     return str(a or '').strip() == str(b or '').strip()
 
 
 def _roteiro_minutes_equal(a, b):
-    parsed_a = _parse_int(a)
-    parsed_b = _parse_int(b)
+    parsed_a = parse_int(a)
+    parsed_b = parse_int(b)
     if parsed_a is None or parsed_b is None:
         return True
     return parsed_a == parsed_b
-
-
-def _roteiro_trecho_duplica_retorno(trecho, retorno, sede_estado_id=None, sede_cidade_id=None):
-    return roteiro_trecho_duplica_retorno(
-        trecho=trecho,
-        retorno=retorno,
-        sede_estado_id=sede_estado_id,
-        sede_cidade_id=sede_cidade_id,
-    )
-
-
-def _dedupe_roteiro_loop_retorno_final(state):
-    return dedupe_roteiro_loop_retorno_final(state)
 
 
 def _infer_roteiro_destinos_from_trechos(raw_trechos, sede_estado=None, sede_cidade=None):
     destinos = []
     prev_kept_key = None
     for trecho in raw_trechos or []:
-        destino_estado_id = _parse_int(trecho.get('destino_estado_id'))
-        destino_cidade_id = _parse_int(trecho.get('destino_cidade_id'))
+        destino_estado_id = parse_int(trecho.get('destino_estado_id'))
+        destino_cidade_id = parse_int(trecho.get('destino_cidade_id'))
         destino_nome = trecho.get('destino_nome') or ''
         destino_cidade = Cidade.objects.select_related('estado').filter(pk=destino_cidade_id).first() if destino_cidade_id else None
         destino_estado = Estado.objects.filter(pk=destino_estado_id or getattr(destino_cidade, 'estado_id', None)).first() if (destino_estado_id or destino_cidade) else None
         # Voltas à sede (ex.: o retorno diário do bate-volta) não são destinos e
         # não interrompem a comparação de repetição — o próximo destino continua
         # sendo confrontado com o último destino REALMENTE mantido.
-        if _roteiro_locations_equivalent(
+        if roteiro_locations_equivalent(
             cidade_a=destino_cidade,
             estado_a=destino_estado,
             nome_a=destino_nome,
@@ -375,14 +285,14 @@ def _infer_roteiro_destinos_from_trechos(raw_trechos, sede_estado=None, sede_cid
 
 
 def _roteiro_has_intermediate_return_to_sede(state):
-    sede_cidade = Cidade.objects.select_related('estado').filter(pk=_parse_int(state.get('sede_cidade_id'))).first()
-    sede_estado = Estado.objects.filter(pk=_parse_int(state.get('sede_estado_id')) or getattr(sede_cidade, 'estado_id', None)).first()
+    sede_cidade = Cidade.objects.select_related('estado').filter(pk=parse_int(state.get('sede_cidade_id'))).first()
+    sede_estado = Estado.objects.filter(pk=parse_int(state.get('sede_estado_id')) or getattr(sede_cidade, 'estado_id', None)).first()
     if not sede_cidade and not sede_estado:
         return False
     return any(
-        _roteiro_locations_equivalent(
-            cidade_a=Cidade.objects.select_related('estado').filter(pk=_parse_int(trecho.get('destino_cidade_id'))).first(),
-            estado_a=Estado.objects.filter(pk=_parse_int(trecho.get('destino_estado_id'))).first(),
+        roteiro_locations_equivalent(
+            cidade_a=Cidade.objects.select_related('estado').filter(pk=parse_int(trecho.get('destino_cidade_id'))).first(),
+            estado_a=Estado.objects.filter(pk=parse_int(trecho.get('destino_estado_id'))).first(),
             nome_a=trecho.get('destino_nome') or '',
             cidade_b=sede_cidade,
             estado_b=sede_estado,
@@ -392,8 +302,8 @@ def _roteiro_has_intermediate_return_to_sede(state):
 
 
 def _roteiro_format_date_time_br(data_value, hora_value):
-    data_obj = data_value if hasattr(data_value, 'strftime') and not isinstance(data_value, str) else _parse_roteiro_date(data_value)
-    hora_obj = hora_value if hasattr(hora_value, 'strftime') and not isinstance(hora_value, str) else _parse_roteiro_time(hora_value)
+    data_obj = data_value if hasattr(data_value, 'strftime') and not isinstance(data_value, str) else parse_roteiro_date(data_value)
+    hora_obj = hora_value if hasattr(hora_value, 'strftime') and not isinstance(hora_value, str) else parse_roteiro_time(hora_value)
     partes = []
     if data_obj:
         partes.append(data_obj.strftime('%d/%m/%Y'))
@@ -466,7 +376,7 @@ def _build_roteiro_state_from_estrutura(estrutura, destinos_atuais, sede_estado_
             'saida_hora': saida_hora,
             'chegada_data': chegada_data,
             'chegada_hora': chegada_hora,
-            'distancia_km': _roteiro_decimal_input(item.get('distancia_km')),
+            'distancia_km': roteiro_decimal_input(item.get('distancia_km')),
             'duracao_estimada_min': item.get('duracao_estimada_min'),
             'tempo_cru_estimado_min': _roteiro_resolve_travel_minutes(
                 item.get('tempo_cru_estimado_min'),
@@ -505,34 +415,26 @@ def _build_roteiro_state_from_estrutura(estrutura, destinos_atuais, sede_estado_
         'destinos_atuais': destinos_atuais,
         'trechos': trechos,
         'retorno': retorno,
-        'bate_volta_diario': _build_roteiro_bate_volta_diario_state(),
+        'bate_volta_diario': build_roteiro_bate_volta_diario_state(),
         'seed_source_label': seed_source_label,
     }
 
 
-def _parse_roteiro_decimal(value):
-    return parse_roteiro_decimal(value)
-
-
-def _roteiro_decimal_input(value):
-    return roteiro_decimal_input(value)
-
-
 def _roteiro_resolve_travel_minutes(raw_minutes, total_minutes, additional_minutes=0):
-    value = _parse_int(raw_minutes)
+    value = parse_int(raw_minutes)
     if value is not None:
         return value
-    total = _parse_int(total_minutes)
-    additional = _parse_int(additional_minutes) or 0
+    total = parse_int(total_minutes)
+    additional = parse_int(additional_minutes) or 0
     if total is None:
         return ''
     return max(total - additional, 0)
 
 
 def _build_roteiro_roteiro_label(roteiro):
-    origem = _roteiro_local_label(roteiro.origem_cidade, roteiro.origem_estado) or 'Sede não informada'
+    origem = roteiro_local_label(roteiro.origem_cidade, roteiro.origem_estado) or 'Sede não informada'
     destinos = [
-        _roteiro_local_label(destino.cidade, destino.estado)
+        roteiro_local_label(destino.cidade, destino.estado)
         for destino in roteiro.destinos.select_related('cidade', 'estado').order_by('ordem', 'id')
     ]
     resumo = ' -> '.join(destinos[:3]) if destinos else 'Sem destinos'
@@ -574,7 +476,7 @@ def _serialize_roteiro_state(state):
                 'saida_hora': trecho.get('saida_hora') or '',
                 'chegada_data': trecho.get('chegada_data') or '',
                 'chegada_hora': trecho.get('chegada_hora') or '',
-                'distancia_km': _roteiro_decimal_input(trecho.get('distancia_km')),
+                'distancia_km': roteiro_decimal_input(trecho.get('distancia_km')),
                 'duracao_estimada_min': trecho.get('duracao_estimada_min'),
                 'tempo_cru_estimado_min': trecho.get('tempo_cru_estimado_min'),
                 'tempo_adicional_min': trecho.get('tempo_adicional_min') or 0,
@@ -591,13 +493,13 @@ def _serialize_roteiro_state(state):
             'saida_hora': retorno.get('saida_hora') or '',
             'chegada_data': retorno.get('chegada_data') or '',
             'chegada_hora': retorno.get('chegada_hora') or '',
-            'distancia_km': _roteiro_decimal_input(retorno.get('distancia_km')),
+            'distancia_km': roteiro_decimal_input(retorno.get('distancia_km')),
             'duracao_estimada_min': retorno.get('duracao_estimada_min') or '',
             'tempo_cru_estimado_min': retorno.get('tempo_cru_estimado_min') or '',
             'tempo_adicional_min': retorno.get('tempo_adicional_min') or 0,
             'rota_fonte': retorno.get('rota_fonte') or '',
         },
-        'bate_volta_diario': _build_roteiro_bate_volta_diario_state(state.get('bate_volta_diario')),
+        'bate_volta_diario': build_roteiro_bate_volta_diario_state(state.get('bate_volta_diario')),
         'seed_source_label': state.get('seed_source_label') or '',
         'mapa_rota': state.get('mapa_rota'),
     }
@@ -623,9 +525,9 @@ def _build_roteiro_empty_state(oficio=None, roteiro_modo=None, seed_source_label
         'trechos': [],
         'retorno': {
             'origem_nome': '',
-            'destino_nome': _roteiro_local_label(sede_cidade, sede_estado),
+            'destino_nome': roteiro_local_label(sede_cidade, sede_estado),
             'saida_cidade': '',
-            'chegada_cidade': _roteiro_local_label(sede_cidade, sede_estado),
+            'chegada_cidade': roteiro_local_label(sede_cidade, sede_estado),
             'saida_data': '',
             'saida_hora': '',
             'chegada_data': '',
@@ -636,7 +538,7 @@ def _build_roteiro_empty_state(oficio=None, roteiro_modo=None, seed_source_label
             'tempo_adicional_min': 0,
             'rota_fonte': '',
         },
-        'bate_volta_diario': _build_roteiro_bate_volta_diario_state(),
+        'bate_volta_diario': build_roteiro_bate_volta_diario_state(),
         'seed_source_label': seed_source_label or '',
     }
 
@@ -765,11 +667,11 @@ def _build_roteiro_state_from_saved_trechos(roteiro, seed_source_label=''):
 
     ordem = 0
     for trecho in trechos_salvos:
-        origem_nome, _ = _roteiro_get_local_parts(
+        origem_nome, _ = roteiro_get_local_parts(
             cidade=trecho.origem_cidade,
             estado=trecho.origem_estado,
         )
-        destino_nome, _ = _roteiro_get_local_parts(
+        destino_nome, _ = roteiro_get_local_parts(
             cidade=trecho.destino_cidade,
             estado=trecho.destino_estado,
         )
@@ -793,7 +695,7 @@ def _build_roteiro_state_from_saved_trechos(roteiro, seed_source_label=''):
             'saida_hora': saida_hora,
             'chegada_data': chegada_data,
             'chegada_hora': chegada_hora,
-            'distancia_km': _roteiro_decimal_input(trecho.distancia_km),
+            'distancia_km': roteiro_decimal_input(trecho.distancia_km),
             'duracao_estimada_min': trecho.duracao_estimada_min or '',
             'tempo_cru_estimado_min': tempo_cru if tempo_cru is not None else '',
             'tempo_adicional_min': tempo_adicional,
@@ -807,7 +709,7 @@ def _build_roteiro_state_from_saved_trechos(roteiro, seed_source_label=''):
                 'saida_hora': saida_hora,
                 'chegada_data': chegada_data,
                 'chegada_hora': chegada_hora,
-                'distancia_km': _roteiro_decimal_input(trecho.distancia_km),
+                'distancia_km': roteiro_decimal_input(trecho.distancia_km),
                 'duracao_estimada_min': trecho.duracao_estimada_min or '',
                 'tempo_cru_estimado_min': tempo_cru if tempo_cru is not None else '',
                 'tempo_adicional_min': tempo_adicional,
@@ -822,21 +724,21 @@ def _build_roteiro_state_from_saved_trechos(roteiro, seed_source_label=''):
 
 
 def _infer_roteiro_bate_volta_diario_from_state(state):
-    fallback = _build_roteiro_bate_volta_diario_state()
+    fallback = build_roteiro_bate_volta_diario_state()
     destinos = [
         item
         for item in (state.get('destinos_atuais') or [])
-        if _parse_int(item.get('estado_id')) and _parse_int(item.get('cidade_id'))
+        if parse_int(item.get('estado_id')) and parse_int(item.get('cidade_id'))
     ]
     trechos = list(state.get('trechos') or [])
     retorno = state.get('retorno') or {}
     if len(destinos) != 1:
         return fallback
 
-    sede_estado_id = _parse_int(state.get('sede_estado_id'))
-    sede_cidade_id = _parse_int(state.get('sede_cidade_id'))
-    destino_estado_id = _parse_int(destinos[0].get('estado_id'))
-    destino_cidade_id = _parse_int(destinos[0].get('cidade_id'))
+    sede_estado_id = parse_int(state.get('sede_estado_id'))
+    sede_cidade_id = parse_int(state.get('sede_cidade_id'))
+    destino_estado_id = parse_int(destinos[0].get('estado_id'))
+    destino_cidade_id = parse_int(destinos[0].get('cidade_id'))
     if not all([sede_estado_id, sede_cidade_id, destino_estado_id, destino_cidade_id]):
         return fallback
     if (len(trechos) % 2) == 1 and retorno.get('saida_data') and retorno.get('saida_hora'):
@@ -868,22 +770,22 @@ def _infer_roteiro_bate_volta_diario_from_state(state):
         ida = trechos[idx] or {}
         volta = trechos[idx + 1] or {}
 
-        if _parse_int(ida.get('origem_estado_id')) != sede_estado_id:
+        if parse_int(ida.get('origem_estado_id')) != sede_estado_id:
             return fallback
-        if _parse_int(ida.get('origem_cidade_id')) != sede_cidade_id:
+        if parse_int(ida.get('origem_cidade_id')) != sede_cidade_id:
             return fallback
-        if _parse_int(ida.get('destino_estado_id')) != destino_estado_id:
+        if parse_int(ida.get('destino_estado_id')) != destino_estado_id:
             return fallback
-        if _parse_int(ida.get('destino_cidade_id')) != destino_cidade_id:
+        if parse_int(ida.get('destino_cidade_id')) != destino_cidade_id:
             return fallback
 
-        if _parse_int(volta.get('origem_estado_id')) != destino_estado_id:
+        if parse_int(volta.get('origem_estado_id')) != destino_estado_id:
             return fallback
-        if _parse_int(volta.get('origem_cidade_id')) != destino_cidade_id:
+        if parse_int(volta.get('origem_cidade_id')) != destino_cidade_id:
             return fallback
-        if _parse_int(volta.get('destino_estado_id')) != sede_estado_id:
+        if parse_int(volta.get('destino_estado_id')) != sede_estado_id:
             return fallback
-        if _parse_int(volta.get('destino_cidade_id')) != sede_cidade_id:
+        if parse_int(volta.get('destino_cidade_id')) != sede_cidade_id:
             return fallback
 
         ida_data = ida.get('saida_data') or ''
@@ -895,14 +797,14 @@ def _infer_roteiro_bate_volta_diario_from_state(state):
         if not ida_hora or not volta_hora:
             return fallback
 
-        ida_min = _parse_int(
+        ida_min = parse_int(
             _roteiro_resolve_travel_minutes(
                 ida.get('tempo_cru_estimado_min'),
                 ida.get('duracao_estimada_min'),
                 ida.get('tempo_adicional_min') or 0,
             )
         )
-        volta_min = _parse_int(
+        volta_min = parse_int(
             _roteiro_resolve_travel_minutes(
                 volta.get('tempo_cru_estimado_min'),
                 volta.get('duracao_estimada_min'),
@@ -921,7 +823,7 @@ def _infer_roteiro_bate_volta_diario_from_state(state):
         if ida_min != ida_min_ref or volta_min != volta_min_ref:
             return fallback
 
-        dia = _parse_roteiro_date(ida_data)
+        dia = parse_roteiro_date(ida_data)
         if not dia:
             return fallback
         dias.append(dia)
@@ -931,7 +833,7 @@ def _infer_roteiro_bate_volta_diario_from_state(state):
         if (dias[current_idx] - dias[current_idx - 1]).days != 1:
             return fallback
 
-    return _build_roteiro_bate_volta_diario_state(
+    return build_roteiro_bate_volta_diario_state(
         {
             'ativo': True,
             'data_inicio': dias[0].strftime('%Y-%m-%d'),
@@ -950,7 +852,7 @@ def _build_roteiro_route_options(oficio):
     include_ids = [oficio.roteiro_evento_id] if oficio.roteiro_evento_id else []
     for roteiro in _get_roteiro_saved_routes(oficio, include_ids=include_ids):
         destinos = [
-            _roteiro_local_label(destino.cidade, destino.estado)
+            roteiro_local_label(destino.cidade, destino.estado)
             for destino in roteiro.destinos.select_related('cidade', 'estado').order_by('ordem', 'id')
         ]
         resumo = ' -> '.join(destinos[:3]) if destinos else 'Sem destinos'
@@ -980,9 +882,9 @@ def _build_roteiro_state_from_post(post, oficio=None, route_state_map=None):
     roteiro_modo = (post.get('roteiro_modo') or '').strip()
     if roteiro_modo not in {ROTEIRO_MODO_EVENTO, ROTEIRO_MODO_PROPRIO}:
         roteiro_modo = ROTEIRO_MODO_EVENTO if route_state_map else ROTEIRO_MODO_PROPRIO
-    roteiro_evento_id = _parse_int(post.get('roteiro_id') or post.get('roteiro_evento_id'))
-    sede_estado_id = _parse_int(post.get('sede_estado'))
-    sede_cidade_id = _parse_int(post.get('sede_cidade'))
+    roteiro_evento_id = parse_int(post.get('roteiro_id') or post.get('roteiro_evento_id'))
+    sede_estado_id = parse_int(post.get('sede_estado'))
+    sede_cidade_id = parse_int(post.get('sede_cidade'))
     sede_cidade = Cidade.objects.select_related('estado').filter(pk=sede_cidade_id).first() if sede_cidade_id else None
     sede_estado = Estado.objects.filter(pk=sede_estado_id or getattr(sede_cidade, 'estado_id', None)).first() if (sede_estado_id or sede_cidade) else None
     destinos_list = parse_destinos_post(post)
@@ -1009,15 +911,15 @@ def _build_roteiro_state_from_post(post, oficio=None, route_state_map=None):
         for idx, trecho in enumerate(posted_trechos):
             state['trechos'].append(
                 {
-                    'id': _parse_int(trecho.get('id')),
+                    'id': parse_int(trecho.get('id')),
                     'key': trecho.get('key') or trecho.get('destino_key') or trecho.get('id') or '',
                     'ordem': idx,
                     'origem_nome': (trecho.get('origem_nome') or '').strip(),
                     'destino_nome': (trecho.get('destino_nome') or '').strip(),
-                    'origem_estado_id': _parse_int(trecho.get('origem_estado_id')),
-                    'origem_cidade_id': _parse_int(trecho.get('origem_cidade_id')),
-                    'destino_estado_id': _parse_int(trecho.get('destino_estado_id')),
-                    'destino_cidade_id': _parse_int(trecho.get('destino_cidade_id')),
+                    'origem_estado_id': parse_int(trecho.get('origem_estado_id')),
+                    'origem_cidade_id': parse_int(trecho.get('origem_cidade_id')),
+                    'destino_estado_id': parse_int(trecho.get('destino_estado_id')),
+                    'destino_cidade_id': parse_int(trecho.get('destino_cidade_id')),
                     'saida_data': (trecho.get('saida_data') or '').strip(),
                     'saida_hora': (trecho.get('saida_hora') or '').strip(),
                     'chegada_data': (trecho.get('chegada_data') or '').strip(),
@@ -1058,7 +960,7 @@ def _build_roteiro_state_from_post(post, oficio=None, route_state_map=None):
         trecho['saida_hora'] = _posted_or_default(f'trecho_{idx}_saida_hora', trecho.get('saida_hora', ''))
         trecho['chegada_data'] = _posted_or_default(f'trecho_{idx}_chegada_data', trecho.get('chegada_data', ''))
         trecho['chegada_hora'] = _posted_or_default(f'trecho_{idx}_chegada_hora', trecho.get('chegada_hora', ''))
-        trecho['distancia_km'] = _posted_or_default(f'trecho_{idx}_distancia_km', _roteiro_decimal_input(trecho.get('distancia_km')))
+        trecho['distancia_km'] = _posted_or_default(f'trecho_{idx}_distancia_km', roteiro_decimal_input(trecho.get('distancia_km')))
         trecho['tempo_cru_estimado_min'] = _posted_or_default(f'trecho_{idx}_tempo_cru_estimado_min', trecho.get('tempo_cru_estimado_min') or '')
         trecho['tempo_adicional_min'] = _posted_or_default(f'trecho_{idx}_tempo_adicional_min', trecho.get('tempo_adicional_min') or 0)
         trecho['duracao_estimada_min'] = _posted_or_default(f'trecho_{idx}_duracao_estimada_min', trecho.get('duracao_estimada_min') or '')
@@ -1077,16 +979,16 @@ def _build_roteiro_state_from_post(post, oficio=None, route_state_map=None):
             'rota_fonte': _posted_or_default('retorno_rota_fonte', state['retorno'].get('rota_fonte', '')),
         }
     )
-    tempo_cru_retorno = _parse_int(state['retorno'].get('tempo_cru_estimado_min'))
-    tempo_adicional_retorno = _parse_int(state['retorno'].get('tempo_adicional_min')) or 0
+    tempo_cru_retorno = parse_int(state['retorno'].get('tempo_cru_estimado_min'))
+    tempo_adicional_retorno = parse_int(state['retorno'].get('tempo_adicional_min')) or 0
     if tempo_adicional_retorno < 0:
         tempo_adicional_retorno = 0
-    duracao_retorno = _parse_int(state['retorno'].get('duracao_estimada_min'))
+    duracao_retorno = parse_int(state['retorno'].get('duracao_estimada_min'))
     if duracao_retorno is None and ((tempo_cru_retorno or 0) + tempo_adicional_retorno) > 0:
         duracao_retorno = (tempo_cru_retorno or 0) + tempo_adicional_retorno
     state['retorno']['tempo_adicional_min'] = tempo_adicional_retorno
     state['retorno']['duracao_estimada_min'] = duracao_retorno if duracao_retorno is not None else ''
-    state['bate_volta_diario'] = _build_roteiro_bate_volta_diario_state(
+    state['bate_volta_diario'] = build_roteiro_bate_volta_diario_state(
         {
             'ativo': post.get('bate_volta_diario_ativo') in {'1', 'true', 'True', 'on'},
             'data_inicio': (post.get('bate_volta_data_inicio') or '').strip(),
@@ -1097,7 +999,7 @@ def _build_roteiro_state_from_post(post, oficio=None, route_state_map=None):
             'volta_tempo_min': (post.get('bate_volta_volta_tempo_min') or '').strip(),
         }
     )
-    _dedupe_roteiro_loop_retorno_final(state)
+    dedupe_roteiro_loop_retorno_final(state)
     state['seed_source_label'] = ''
     state['roteiro_modo'] = roteiro_modo
     if roteiro_modo == ROTEIRO_MODO_EVENTO and roteiro_evento_id and roteiro_evento_id in route_state_map:
@@ -1138,14 +1040,14 @@ def _validate_roteiro_state(state):
         errors.append('A cidade da sede deve pertencer ao estado selecionado.')
 
     destinos_list = [
-        (_parse_int(item.get('estado_id')), _parse_int(item.get('cidade_id')))
+        (parse_int(item.get('estado_id')), parse_int(item.get('cidade_id')))
         for item in state.get('destinos_atuais', [])
         if item.get('estado_id') and item.get('cidade_id')
     ]
     ok_destinos, msg_destinos = _validar_destinos(destinos_list)
     if not ok_destinos:
         errors.append(msg_destinos)
-    bate_volta_diario = _build_roteiro_bate_volta_diario_state(state.get('bate_volta_diario'))
+    bate_volta_diario = build_roteiro_bate_volta_diario_state(state.get('bate_volta_diario'))
     if bate_volta_diario['ativo'] and len(destinos_list) != 1:
         errors.append('No modo bate-volta diário, informe exatamente um destino operacional.')
 
@@ -1158,10 +1060,10 @@ def _validate_roteiro_state(state):
             errors.append(f'Trecho {idx}: informe uma origem válida.')
         if not trecho.get('destino_estado_id') or not trecho.get('destino_cidade_id'):
             errors.append(f'Trecho {idx}: informe um destino válido.')
-        saida_data = _parse_roteiro_date(trecho.get('saida_data'))
-        saida_hora = _parse_roteiro_time(trecho.get('saida_hora'))
-        chegada_data = _parse_roteiro_date(trecho.get('chegada_data'))
-        chegada_hora = _parse_roteiro_time(trecho.get('chegada_hora'))
+        saida_data = parse_roteiro_date(trecho.get('saida_data'))
+        saida_hora = parse_roteiro_time(trecho.get('saida_hora'))
+        chegada_data = parse_roteiro_date(trecho.get('chegada_data'))
+        chegada_hora = parse_roteiro_time(trecho.get('chegada_hora'))
         if not saida_data or not saida_hora:
             errors.append(f'Trecho {idx}: informe a saída (data e hora).')
         if not chegada_data or not chegada_hora:
@@ -1190,7 +1092,7 @@ def _validate_roteiro_state(state):
 
         cleaned_trechos.append(
             {
-                'id': _parse_int(trecho.get('id')),
+                'id': parse_int(trecho.get('id')),
                 'key': trecho.get('key') or trecho.get('destino_key') or trecho.get('id') or '',
                 'ordem': idx - 1,
                 'origem_estado_id': trecho.get('origem_estado_id'),
@@ -1201,7 +1103,7 @@ def _validate_roteiro_state(state):
                 'saida_hora': saida_hora,
                 'chegada_data': chegada_data,
                 'chegada_hora': chegada_hora,
-                'distancia_km': _parse_roteiro_decimal(trecho.get('distancia_km')),
+                'distancia_km': parse_roteiro_decimal(trecho.get('distancia_km')),
                 'tempo_cru_estimado_min': tempo_cru,
                 'tempo_adicional_min': tempo_adicional,
                 'duracao_estimada_min': duracao_estimada,
@@ -1210,10 +1112,10 @@ def _validate_roteiro_state(state):
         )
 
     retorno = state.get('retorno', {})
-    retorno_saida_data = _parse_roteiro_date(retorno.get('saida_data'))
-    retorno_saida_hora = _parse_roteiro_time(retorno.get('saida_hora'))
-    retorno_chegada_data = _parse_roteiro_date(retorno.get('chegada_data'))
-    retorno_chegada_hora = _parse_roteiro_time(retorno.get('chegada_hora'))
+    retorno_saida_data = parse_roteiro_date(retorno.get('saida_data'))
+    retorno_saida_hora = parse_roteiro_time(retorno.get('saida_hora'))
+    retorno_chegada_data = parse_roteiro_date(retorno.get('chegada_data'))
+    retorno_chegada_hora = parse_roteiro_time(retorno.get('chegada_hora'))
     if not retorno_saida_data or not retorno_saida_hora:
         errors.append('Informe a saída do retorno (data e hora).')
     if not retorno_chegada_data or not retorno_chegada_hora:
@@ -1228,14 +1130,14 @@ def _validate_roteiro_state(state):
         'saida_hora': retorno_saida_hora,
         'chegada_data': retorno_chegada_data,
         'chegada_hora': retorno_chegada_hora,
-        'tempo_cru_estimado_min': _parse_int(retorno.get('tempo_cru_estimado_min')),
-        'tempo_adicional_min': _parse_int(retorno.get('tempo_adicional_min')) or 0,
-        'duracao_estimada_min': _parse_int(retorno.get('duracao_estimada_min')),
+        'tempo_cru_estimado_min': parse_int(retorno.get('tempo_cru_estimado_min')),
+        'tempo_adicional_min': parse_int(retorno.get('tempo_adicional_min')) or 0,
+        'duracao_estimada_min': parse_int(retorno.get('duracao_estimada_min')),
     }
     if (
         bate_volta_diario['ativo']
         and cleaned_trechos
-        and _roteiro_trecho_duplica_retorno(
+        and roteiro_trecho_duplica_retorno(
             cleaned_trechos[-1],
             retorno_validado,
             sede_estado_id=sede_estado_id,
@@ -1248,7 +1150,7 @@ def _validate_roteiro_state(state):
     if ultimo_trecho and sede_cidade:
         ultimo_destino_cidade = Cidade.objects.select_related('estado').filter(pk=ultimo_trecho.get('destino_cidade_id')).first()
         ultimo_destino_estado = Estado.objects.filter(pk=ultimo_trecho.get('destino_estado_id')).first()
-        ultimo_trecho_retorna_sede = _roteiro_locations_equivalent(
+        ultimo_trecho_retorna_sede = roteiro_locations_equivalent(
             cidade_a=ultimo_destino_cidade,
             estado_a=ultimo_destino_estado,
             cidade_b=sede_cidade,
@@ -1283,7 +1185,7 @@ def _validate_roteiro_state(state):
 
 
 def _collect_roteiro_markers_payload(state, oficio=None):
-    state = _dedupe_roteiro_loop_retorno_final(deepcopy(state))
+    state = dedupe_roteiro_loop_retorno_final(deepcopy(state))
     roteiro_modo = state.get('roteiro_modo') or ROTEIRO_MODO_PROPRIO
     roteiro_evento_id = state.get('roteiro_evento_id')
     if roteiro_modo == ROTEIRO_MODO_EVENTO and not roteiro_evento_id:
@@ -1299,22 +1201,22 @@ def _collect_roteiro_markers_payload(state, oficio=None):
         for obj in Cidade.objects.select_related('estado').filter(pk__in=cidade_ids)
     }
     estados_map = {obj.pk: obj for obj in Estado.objects.filter(pk__in=estado_ids)}
-    sede_cidade = Cidade.objects.select_related('estado').filter(pk=_parse_int(state.get('sede_cidade_id'))).first()
-    sede_estado = Estado.objects.filter(pk=_parse_int(state.get('sede_estado_id')) or getattr(sede_cidade, 'estado_id', None)).first() if (state.get('sede_estado_id') or sede_cidade) else None
+    sede_cidade = Cidade.objects.select_related('estado').filter(pk=parse_int(state.get('sede_cidade_id'))).first()
+    sede_estado = Estado.objects.filter(pk=parse_int(state.get('sede_estado_id')) or getattr(sede_cidade, 'estado_id', None)).first() if (state.get('sede_estado_id') or sede_cidade) else None
 
     markers = []
     paradas = []
     for trecho in trechos:
-        saida_data = _parse_roteiro_date(trecho.get('saida_data'))
-        saida_hora = _parse_roteiro_time(trecho.get('saida_hora'))
+        saida_data = parse_roteiro_date(trecho.get('saida_data'))
+        saida_hora = parse_roteiro_time(trecho.get('saida_hora'))
         if not saida_data or not saida_hora:
             raise ValueError('Preencha datas e horas para calcular.')
         # A chegada de cada trecho decide onde o periodo termina (NOVO-11). A
         # tela ja coleta e o banco ja guarda (RoteiroTrecho.chegada_dt); so o
         # calculo a descartava, e por isso o tempo de estrada entre destinos
         # sumia da conta.
-        chegada_data = _parse_roteiro_date(trecho.get('chegada_data'))
-        chegada_hora = _parse_roteiro_time(trecho.get('chegada_hora'))
+        chegada_data = parse_roteiro_date(trecho.get('chegada_data'))
+        chegada_hora = parse_roteiro_time(trecho.get('chegada_hora'))
         chegada_trecho = (
             datetime.combine(chegada_data, chegada_hora)
             if chegada_data and chegada_hora
@@ -1324,7 +1226,7 @@ def _collect_roteiro_markers_payload(state, oficio=None):
         estado = getattr(cidade, 'estado', None) or estados_map.get(trecho.get('destino_estado_id'))
         cidade_nome = cidade.nome if cidade else (trecho.get('destino_nome') or '').split('/', 1)[0]
         uf_sigla = estado.sigla if estado else ''
-        if not _roteiro_locations_equivalent(
+        if not roteiro_locations_equivalent(
             cidade_a=cidade,
             estado_a=estado,
             nome_a=cidade_nome,
@@ -1342,12 +1244,12 @@ def _collect_roteiro_markers_payload(state, oficio=None):
         )
 
     retorno = state.get('retorno') or {}
-    retorno_chegada_data = _parse_roteiro_date(retorno.get('chegada_data'))
-    retorno_chegada_hora = _parse_roteiro_time(retorno.get('chegada_hora'))
+    retorno_chegada_data = parse_roteiro_date(retorno.get('chegada_data'))
+    retorno_chegada_hora = parse_roteiro_time(retorno.get('chegada_hora'))
     if not retorno_chegada_data or not retorno_chegada_hora:
         raise ValueError('Preencha datas e horas para calcular.')
     chegada_final = datetime.combine(retorno_chegada_data, retorno_chegada_hora)
-    sede_cidade_nome, sede_uf_sigla = _roteiro_get_local_parts(cidade=sede_cidade, estado=sede_estado)
+    sede_cidade_nome, sede_uf_sigla = roteiro_get_local_parts(cidade=sede_cidade, estado=sede_estado)
     return markers, paradas, chegada_final, sede_cidade_nome, sede_uf_sigla
 
 
@@ -1416,7 +1318,7 @@ def _build_roteiro_avulso_route_options(evento=None, excluir_pk=None):
     roteiros = selectors.queryset_roteiros_reutilizaveis_para_evento(evento=evento, excluir_pk=excluir_pk)
     for roteiro in roteiros:
         destinos = [
-            _roteiro_local_label(destino.cidade, destino.estado)
+            roteiro_local_label(destino.cidade, destino.estado)
             for destino in roteiro.destinos.select_related("cidade", "estado").order_by("ordem", "id")
         ]
         resumo = ' -> '.join(destinos[:3]) if destinos else 'Sem destinos'
@@ -1483,7 +1385,7 @@ def _build_roteiro_diarias_from_request(post, *, roteiro=None, evento=None):
     post_data = post.copy()
     if 'roteiro_modo' not in post_data:
         post_data['roteiro_modo'] = ROTEIRO_MODO_PROPRIO
-    roteiro_evento_id = _parse_int(post.get('roteiro_id') or post.get('roteiro_evento_id'))
+    roteiro_evento_id = parse_int(post.get('roteiro_id') or post.get('roteiro_evento_id'))
     if not roteiro_evento_id and roteiro is not None:
         roteiro_evento_id = roteiro.pk
     evento_id = None
@@ -1516,45 +1418,6 @@ def _persistir_diarias_roteiro(roteiro, diarias_resultado):
     roteiro.save(update_fields=['quantidade_diarias', 'valor_diarias', 'valor_diarias_extenso'])
 
 
-def _build_roteiro_diarias_fallback(roteiro, *, quantidade_servidores: int = 1):
-    if not roteiro:
-        return None
-    if roteiro.valor_diarias is None and not roteiro.quantidade_diarias and not roteiro.valor_diarias_extenso:
-        return None
-    total_valor_decimal = roteiro.valor_diarias
-    if total_valor_decimal is None:
-        return None
-    total_valor = formatar_valor_diarias(total_valor_decimal)
-    qs = max(0, int(quantidade_servidores or 0))
-    if qs == 0:
-        valor_por_servidor_decimal = Decimal('0.00')
-        valor_por_servidor_txt = formatar_valor_diarias(valor_por_servidor_decimal)
-    elif qs == 1:
-        valor_por_servidor_decimal = total_valor_decimal
-        valor_por_servidor_txt = total_valor
-    else:
-        valor_por_servidor_decimal = (
-            total_valor_decimal / Decimal(qs)
-        ).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-        valor_por_servidor_txt = formatar_valor_diarias(valor_por_servidor_decimal)
-    return {
-        'periodos': [],
-        'totais': {
-            'total_diarias': roteiro.quantidade_diarias or '',
-            'total_horas': '',
-            'total_valor': total_valor,
-            'total_valor_decimal': total_valor_decimal,
-            'valor_extenso': roteiro.valor_diarias_extenso or '',
-            'quantidade_servidores': qs,
-            'diarias_por_servidor': roteiro.quantidade_diarias or '',
-            'valor_por_servidor': valor_por_servidor_txt,
-            'valor_por_servidor_decimal': valor_por_servidor_decimal,
-            'valor_unitario_referencia': '',
-        },
-        'tipo_destino': '',
-    }
-
-
 #: `DB-08` fatia 2: bloco livre para onde as posições vão no primeiro passo.
 #: Precisa ficar acima de qualquer posição final — e as finais são
 #: `0..len(trechos_validated)`, uma por trecho do payload do editor. Um milhão dá
@@ -1577,8 +1440,8 @@ def _salvar_roteiro_avulso_from_roteiro_state(roteiro, roteiro_state, validated,
     """
     destinos_post = []
     for item in (roteiro_state.get('destinos_atuais') or []):
-        estado_id = _parse_int(item.get('estado_id'))
-        cidade_id = _parse_int(item.get('cidade_id'))
+        estado_id = parse_int(item.get('estado_id'))
+        cidade_id = parse_int(item.get('cidade_id'))
         if estado_id and cidade_id:
             destinos_post.append((estado_id, cidade_id))
 
@@ -1593,7 +1456,7 @@ def _salvar_roteiro_avulso_from_roteiro_state(roteiro, roteiro_state, validated,
 
     retorno_state = roteiro_state.get('retorno') or {}
     trechos_validated = list(validated.get('trechos') or [])
-    if _build_roteiro_bate_volta_diario_state(roteiro_state.get('bate_volta_diario'))['ativo'] and trechos_validated:
+    if build_roteiro_bate_volta_diario_state(roteiro_state.get('bate_volta_diario'))['ativo'] and trechos_validated:
         retorno_validado = {
             'saida_cidade': retorno_state.get('saida_cidade') or retorno_state.get('origem_nome') or '',
             'chegada_cidade': retorno_state.get('chegada_cidade') or retorno_state.get('destino_nome') or '',
@@ -1601,11 +1464,11 @@ def _salvar_roteiro_avulso_from_roteiro_state(roteiro, roteiro_state, validated,
             'saida_hora': validated.get('retorno_saida_hora'),
             'chegada_data': validated.get('retorno_chegada_data'),
             'chegada_hora': validated.get('retorno_chegada_hora'),
-            'tempo_cru_estimado_min': _parse_int(retorno_state.get('tempo_cru_estimado_min')),
-            'tempo_adicional_min': _parse_int(retorno_state.get('tempo_adicional_min')) or 0,
-            'duracao_estimada_min': _parse_int(retorno_state.get('duracao_estimada_min')),
+            'tempo_cru_estimado_min': parse_int(retorno_state.get('tempo_cru_estimado_min')),
+            'tempo_adicional_min': parse_int(retorno_state.get('tempo_adicional_min')) or 0,
+            'duracao_estimada_min': parse_int(retorno_state.get('duracao_estimada_min')),
         }
-        if _roteiro_trecho_duplica_retorno(
+        if roteiro_trecho_duplica_retorno(
             trechos_validated[-1],
             retorno_validado,
             sede_estado_id=roteiro.origem_estado_id,
@@ -1636,8 +1499,8 @@ def _salvar_roteiro_avulso_from_roteiro_state(roteiro, roteiro_state, validated,
         duracao_estimada = trecho.get('duracao_estimada_min')
         if duracao_estimada is None and ((tempo_cru or 0) + tempo_adicional) > 0:
             duracao_estimada = (tempo_cru or 0) + tempo_adicional
-        distancia = _parse_roteiro_decimal(trecho.get('distancia_km'))
-        trecho_id = _parse_int(trecho.get('id'))
+        distancia = parse_roteiro_decimal(trecho.get('distancia_km'))
+        trecho_id = parse_int(trecho.get('id'))
         trecho_obj = trechos_existentes.get(trecho_id) if trecho_id else None
         if trecho_obj is None:
             trecho_obj = RoteiroTrecho(roteiro=roteiro)
@@ -1664,18 +1527,18 @@ def _salvar_roteiro_avulso_from_roteiro_state(roteiro, roteiro_state, validated,
         trecho_obj.save()
         trechos_mantidos.add(trecho_obj.pk)
 
-    retorno_tempo_cru = _parse_int(retorno_state.get('tempo_cru_estimado_min'))
-    retorno_tempo_adicional = _parse_int(retorno_state.get('tempo_adicional_min')) or 0
+    retorno_tempo_cru = parse_int(retorno_state.get('tempo_cru_estimado_min'))
+    retorno_tempo_adicional = parse_int(retorno_state.get('tempo_adicional_min')) or 0
     if retorno_tempo_adicional < 0:
         retorno_tempo_adicional = 0
-    retorno_duracao = _parse_int(retorno_state.get('duracao_estimada_min'))
+    retorno_duracao = parse_int(retorno_state.get('duracao_estimada_min'))
     if retorno_duracao is None and ((retorno_tempo_cru or 0) + retorno_tempo_adicional) > 0:
         retorno_duracao = (retorno_tempo_cru or 0) + retorno_tempo_adicional
 
     ultimo_trecho = trechos_validated[-1] if trechos_validated else None
     origem_retorno_estado_id = (ultimo_trecho or {}).get('destino_estado_id') or roteiro.origem_estado_id
     origem_retorno_cidade_id = (ultimo_trecho or {}).get('destino_cidade_id') or roteiro.origem_cidade_id
-    distancia_retorno = _parse_roteiro_decimal(retorno_state.get('distancia_km'))
+    distancia_retorno = parse_roteiro_decimal(retorno_state.get('distancia_km'))
 
     retorno_obj = (
         roteiro.trechos.filter(tipo=RoteiroTrecho.TIPO_RETORNO).order_by('ordem', 'id').first()
@@ -1714,116 +1577,3 @@ def _salvar_roteiro_avulso_from_roteiro_state(roteiro, roteiro_state, validated,
     mark_stale_when_signature_changed(roteiro)
 
 
-def _build_roteiro_form_context(
-    *,
-    evento,
-    form,
-    obj,
-    destinos_atuais,
-    trechos_list,
-    is_avulso=False,
-    roteiro_state=None,
-    route_options=None,
-    seed_source_label='',
-    diarias_quantidade_servidores=1,
-):
-    """
-    Monta contexto completo para o formulário de roteiro (guiado e avulso).
-    Quando roteiro_state é fornecido, usa diretamente; caso contrário, constrói
-    a partir de trechos_list + destinos_atuais (compatibilidade com forms guiados).
-    """
-    if roteiro_state is None:
-        instance = obj or form.instance
-        sede_estado_id = getattr(instance, 'origem_estado_id', None)
-        sede_cidade_id = getattr(instance, 'origem_cidade_id', None)
-        roteiro_state = _build_roteiro_state_from_estrutura(
-            trechos_list,
-            [{'estado_id': d.get('estado_id'), 'cidade_id': d.get('cidade_id')} for d in (destinos_atuais or [])],
-            sede_estado_id,
-            sede_cidade_id,
-            seed_source_label,
-        )
-        roteiro_state['roteiro_modo'] = 'ROTEIRO_PROPRIO'
-
-    from roteiros import selectors
-
-    sede_estado_id = roteiro_state.get("sede_estado_id")
-    sede_cidade_id = roteiro_state.get("sede_cidade_id")
-    estados_qs = selectors.listar_estados_para_select()
-    sede_cidades_qs = selectors.listar_cidades_para_select(estado_id=sede_estado_id)
-    qs_ctx = max(0, int(diarias_quantidade_servidores or 0))
-    diarias_resultado = None
-    try:
-        diarias_resultado = _calculate_avulso_diarias_from_state(
-            roteiro_state,
-            quantidade_servidores=qs_ctx,
-        )
-    except ValueError:
-        diarias_resultado = _build_roteiro_diarias_fallback(
-            obj or form.instance,
-            quantidade_servidores=qs_ctx,
-        )
-    if diarias_resultado is None:
-        diarias_resultado = _build_roteiro_diarias_fallback(
-            obj or form.instance,
-            quantidade_servidores=qs_ctx,
-        )
-    destino_estado_fixo = _get_parana_estado()
-    rows_src = list(trechos_list or [])
-    if not rows_src:
-        ts = (roteiro_state or {}).get('trechos') or []
-        if ts:
-            rows_src = list(ts)
-    initial_trechos_data, trechos_json = _trechos_list_json_compat(rows_src)
-    serialized_roteiro_state = _serialize_roteiro_state(roteiro_state)
-    route_options_json = route_options or []
-    if is_avulso:
-        serialized_roteiro_state.pop('roteiro_evento_id', None)
-        route_options_json = deepcopy(route_options_json)
-        for route_option in route_options_json:
-            state = route_option.get('state') or {}
-            state.pop('roteiro_evento_id', None)
-    from roteiros.services.routing.route_service import serialize_existing_route
-
-    roteiro_mapa_inicial = (
-        serialize_existing_route(obj)
-        if obj and getattr(obj, "pk", None)
-        else {"roteiro_id": None, "status": "pendente", "route": None}
-    )
-    roteiro_mapa_inicial.update(_build_roteiro_map_defaults())
-    return {
-        'evento': evento,
-        'object': obj,
-        'form': form,
-        'destinos_atuais': destinos_atuais,
-        'estados': estados_qs,
-        'api_cidades_por_estado_url': reverse('roteiros:api_cidades_por_estado', kwargs={'estado_id': 0}),
-        'trechos': trechos_list,
-        'trechos_json': trechos_json,
-        'initial_trechos_data': initial_trechos_data,
-        'roteiro_editor_state_json': serialized_roteiro_state,
-        'roteiro_diarias_resultado': diarias_resultado,
-        'roteiro_seed_source_label': roteiro_state.get('seed_source_label', ''),
-        'api_calcular_diarias_url': reverse('roteiros:calcular_diarias'),
-        'api_calcular_rota_url': reverse('roteiros:calcular_rota'),
-        'api_calcular_rota_preview_url': reverse('roteiros:calcular_rota_preview'),
-        'roteiro_mapa_inicial': roteiro_mapa_inicial,
-        'roteiro_modo': roteiro_state.get('roteiro_modo', 'ROTEIRO_PROPRIO'),
-        'roteiro_id': roteiro_state.get('roteiro_evento_id'),
-        'roteiro_evento_id': roteiro_state.get('roteiro_evento_id'),
-        'roteiros_evento': route_options or [],
-        'roteiro_routes_json': route_options_json,
-        'has_event_routes': bool(route_options),
-        'is_avulso': is_avulso,
-        'retorno_state': roteiro_state.get('retorno', {}),
-        'sede_estado_id': sede_estado_id,
-        'sede_cidade_id': sede_cidade_id,
-        'sede_cidades_qs': sede_cidades_qs,
-        'destino_estado_fixo_id': getattr(destino_estado_fixo, 'pk', None),
-        'destino_estado_fixo_nome': (
-            f'{destino_estado_fixo.nome} ({destino_estado_fixo.sigla})'
-            if destino_estado_fixo
-            else 'Paraná (PR)'
-        ),
-        'diarias_quantidade_servidores': qs_ctx,
-    }

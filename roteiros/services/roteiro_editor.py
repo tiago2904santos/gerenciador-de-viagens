@@ -242,31 +242,6 @@ def calcular_diarias_roteiro_request(post, *, roteiro=None, evento=None):
     )
 
 
-def montar_contexto_editor_roteiro(
-    *,
-    evento,
-    form,
-    obj,
-    destinos_atuais,
-    trechos_list,
-    is_avulso,
-    roteiro_state,
-    route_options,
-    diarias_quantidade_servidores=1,
-):
-    return roteiro_logic._build_roteiro_form_context(
-        evento=evento,
-        form=form,
-        obj=obj,
-        destinos_atuais=destinos_atuais,
-        trechos_list=trechos_list,
-        is_avulso=is_avulso,
-        roteiro_state=roteiro_state,
-        route_options=route_options,
-        diarias_quantidade_servidores=diarias_quantidade_servidores,
-    )
-
-
 def encontrar_roteiro_duplicado(validated, roteiro_state, *, evento=None, excluir_pk=None):
     """Retorna Roteiro idêntico (mesma sede, mesma sequência de destinos e mesma saída) ou None."""
     sede_cidade = validated.get("sede_cidade")

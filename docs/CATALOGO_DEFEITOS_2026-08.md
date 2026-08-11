@@ -360,6 +360,45 @@ extraídos (`services/editor_parser.py`, `editor_context.py`, `editor_state.py`,
 86 linhas deletáveis a custo zero de teste, e nenhuma chamada de fora do módulo. É a fatia mais
 barata que sobrou.
 
+#### Fatia 2 ✅ — contexto para presenters, e os invólucros
+
+**Correção aos meus próprios números.** Eu havia registrado "17 invólucros, 86 linhas, custo zero".
+Medido por AST: **14** invólucros (dois já tinham morrido na fatia 1) mais um morto, **40 linhas**, e
+o custo não é zero — **107 call sites** a reescrever, `_parse_int` sozinho com 56.
+
+**O contexto era um subgrafo fechado.** `_build_roteiro_form_context` (113 linhas) não tinha
+chamador nenhum dentro do módulo e arrastava duas funções que só ela usa
+(`_trechos_list_json_compat`, `_build_roteiro_diarias_fallback`). As três foram para
+`roteiros/presenters.py`, que é o dono de montar dict para template (`docs/PADRAO_APP.md:10`).
+
+**A fachada foi junto, e esse é o ponto de camada.** `montar_contexto_editor_roteiro` estava em
+`services/roteiro_editor.py`; deixá-la lá faria um **service importar um presenter** — a violação que
+o `BE-13` existe para corrigir. Com ela no presenter, `oficios/route_views.py` passa a importar de
+`roteiros.presenters` (view → presenter, `docs/PADRAO_APP.md:11`) e `services/__init__.py` deixa de
+re-exportar.
+
+**Os invólucros.** 14 delegavam em uma linha para funções públicas que o próprio módulo já importava
+no topo; o 15º, `_resolve_uf_from_cep`, não tinha chamador em lugar nenhum. Três dos 14 tinham
+**zero chamadas** — eram função morta com import órfão junto, e o `ruff` apontou os três imports
+depois da remoção.
+
+| | antes da fatia 2 | depois |
+|---|---:|---:|
+| `roteiro_logic.py` | 1.829 linhas, 55 defs | **1.579 linhas, 37 defs** |
+| `presenters.py` | 421 linhas | 589 |
+
+**Rede antes de mover:** havia 20 linhas descobertas no subgrafo, e duas não eram detalhe — o ramo
+`roteiro_state is None` (reconstrução do estado) e os ramos que **dividem o valor das diárias pelo
+número de viajantes** com `ROUND_HALF_UP`. Sete cenários pela fachada pública, verdes antes da
+mudança de arquivo. O caso que trava o arredondamento é 1,00 ÷ 8 = 0,13 (truncando daria 0,12).
+
+**Primeira travessia de fronteira de fim de linha desta etapa:** `roteiro_logic.py` é CRLF puro e
+`presenters.py` é LF puro. Os dois seguem homogêneos depois da mudança.
+
+**Falta para fechar o `BE-13`:** a persistência — 3 funções, entre elas
+`_salvar_roteiro_avulso_from_roteiro_state`, o gravador atômico de 3 tabelas. É a mais arriscada, e
+a única citada por nome em migração, modelo e testes.
+
 ### BE-14 🟠 48 sites de persistência em view, sem service e sem transação · AUD · 3 d
 
 Varredura AST dos `views.py`/`*_views.py`: 48 chamadas `.save`/`.delete`/`.create` fora de
@@ -6248,6 +6287,147 @@ há.
 **Resta:** 40 `!important` (38 no arquivo de tema, 2 de acessibilidade) e as 68 regras em si, que a
 análise por família ainda vai separar entre contexto, estado, tema e divergência real.
 
+### NOVO-95 · `NOVO` A prova por não-interseção não vale: a cascata não é monotônica · QA · fechada na medição
+
+Erro de método cometido na **E9-a**, detectado pela própria régua antes de virar commit. Fica
+registrado porque a ideia é tentadora e vai ocorrer a quem retomar a etapa.
+
+**O raciocínio que parecia sólido.** Para descobrir quais das 307 regras só-escuras de cor podem
+sumir, a bisecção custaria ~9 rodadas de captura completa. O atalho proposto foi:
+
+> Apague **todas** as candidatas de uma vez e meça o conjunto `S` de elementos que mudaram. Para
+> uma regra `R`, se `R` não casa com nenhum elemento de `S`, apagar `R` não muda nada — os
+> elementos fora de `S` não mudaram nem com tudo removido, e os de `S` não são tocados por `R`.
+
+Com isso, 307 candidatas viraram **36 provadas** (inócua ∧ exercitada pelo corpus ∧ não de lista
+mista).
+
+**A medição derrubou.** Removendo exatamente essas 36: **75 elementos mudaram**, contra um piso de
+ruído de 4. E o diagnóstico está no detalhe: **71 dos 75 não estavam em `S`**.
+
+Removendo um **subconjunto**, mudaram elementos que removendo **tudo** não mudavam.
+
+**Por que.** O argumento supõe monotonicidade — que remover menos regras produz um subconjunto das
+mudanças. A cascata não funciona assim. Se `A` e `B` competem pelo mesmo elemento e `A` vence:
+remover só `A` **promove `B`**, e o valor final pode diferir tanto do estado original quanto do
+estado sem as duas. Com `A` e `B` fora, o elemento cai na regra base — que pode calhar de ser o
+valor original, e aí ele nem aparece em `S`.
+
+**O que sobra de válido.** O instrumento (`sonda_mesmo_tema.py`: mesmo tema, dois estados de
+código, 41.754 elementos chaveados por caminho no DOM, piso de ruído de 4 elementos em
+`justificativas-lista`) está certo e é rápido — uma captura completa. O que não vale é **inferir**
+o efeito de um diff a partir do efeito de outro. **Meça o diff que você pretende entregar**, não um
+diff maior do qual você deduz.
+
+**Consequência para a E9-a:** volta para bisecção de verdade, ou para lotes pequenos medidos um a
+um. O custo que o atalho tentava evitar é real e tem de ser pago.
+
+### NOVO-96 ✅ RESOLVIDO · 🔴 `NOVO` A faixa de filtros não tinha fundo no tema claro · UI · 0,25 d
+
+Primeira entrega da **E9**, e um defeito visual real que estava escondido atrás de uma variável.
+
+`lists/list-header.css:85` declara, em regra **sem predicado de tema**:
+
+```css
+.list-header__rail {
+  /* Mesmo token da área interna dos cards (.record-card__band). */
+  background: var(--card-family-bg);
+```
+
+`--card-family-bg` existia **só** em `base/03-theme-dark.css:299`. No tema claro a leitura era
+inválida (*invalid at computed-value time*) e a propriedade caía para o valor inicial. Medido no
+navegador, antes:
+
+| elemento | claro | escuro |
+|---|---|---|
+| `.list-header__rail` | **transparente** | superfície escura |
+
+O comentário logo acima da declaração chama o elemento de "faixa clara abaixo do título". Ele não
+era faixa nenhuma: a barra de filtros de **toda lista do sistema** aparecia sem fundo no tema que o
+sistema mostra para quem nunca escolheu tema.
+
+**Correção.** As nove definições `--card-family-*` passam a existir também no `:root` de
+`base/tokens.css`. Os valores são **os mesmos** do arquivo escuro, sem uma vírgula de diferença,
+porque todos são `var(--color-*)` — a mesma expressão resolve claro no `:root` e escuro no bloco de
+tema. Como `tokens.css` carrega antes de `03-theme-dark.css`, o escuro continua ganhando com os
+próprios valores, e as definições de lá viraram redundantes (a E9-a decide se saem).
+
+**Prova, com o instrumento novo da etapa** (`sonda_mesmo_tema.py`: mesmo tema, dois estados de
+código, 41.754 elementos chaveados por caminho no DOM, `transition` e `animation` desligadas):
+
+| | |
+|---|---:|
+| elementos alterados no **claro** | **47**, em 33 das 86 capturas |
+| elementos alterados no **escuro** | **2** |
+
+Os 2 do escuro são `justificativas-lista`, e são **exatamente o piso de ruído** medido capturando a
+mesma base duas vezes — o mesmo par de caminhos, causado por conteúdo que varia entre capturas.
+**O tema escuro não se moveu.**
+
+### Anotação: o `.record-card__band` é outro defeito, e continua aberto
+
+Ao medir esta correção ficou claro que `.record-card__band` **não** é o mesmo caso, embora o
+comentário do `list-header.css` o cite como fonte. Ele segue transparente no claro depois da
+correção, porque a sua única declaração de fundo mora dentro de regra predicada em `dark`
+(`theme-dark-components.css:4942`): no claro não existe regra nenhuma para ele.
+
+É a classe "componente cujo desenho só existe no escuro" — a mesma que barrou a família **8b**
+(`NOVO-93`) e que apareceu na medição da **8g** (`NOVO-94`, com `.empty-state__mark`). Token não
+resolve; precisa de regra base, e isso é decisão de desenho.
+
+### NOVO-97 · `NOVO` A E9-a entrega 32 regras, e o caminho até elas custou três tentativas · UI · em curso
+
+Primeira colheita medida da **E9-a**: 32 regras só-escuras de cor saem do repositório sem mudar um
+pixel em tema nenhum.
+
+**O caminho, porque ele é o resultado mais reaproveitável desta sub-etapa.**
+
+| tentativa | o que foi feito | resultado |
+|---|---|---|
+| 1 | apagar as 307 candidatas e ler o efeito | 6 mudanças **no claro** — impossível para regra predicada em `dark`. Causa: **17 regras de lista mista** (parte do seletor neutra, parte escura) apagadas inteiras |
+| 2 | recortar só as partes escuras da lista | **pior**: 274 mudanças no claro, nenhuma das 86 capturas intacta. Separar lista por vírgula com regex quebra `:is()` multi-linha — `lists/list-header.css:578` virou `:hover:not(:disabled))`, com parêntese desbalanceado |
+| 3 | regra de lista mista **não entra** | claro **zero** (as 2 leituras eram o piso de ruído). 2.598 mudanças no escuro, que é o sinal real |
+
+Da tentativa 3 saiu a lista de candidatas, e daí veio o `NOVO-95`: a prova por não-interseção não
+vale, porque a cascata não é monotônica. As 36 regras "provadas" por aquele atalho reprovaram com
+**75 elementos alterados**.
+
+**O que funcionou no lugar da bisecção.** Atribuir o resultado do diff **que foi de fato rodado** —
+não de um diff maior do qual se deduz. Perguntando quais das 36 casam com os 75 elementos
+alterados, saíram **4 culpadas**:
+
+```
+theme-dark-components.css:3782   .icon-btn--whatsapp
+theme-dark-components.css:3806   .icon-btn--delete
+theme-dark-components.css:5137   .person-row--highlight
+theme-dark-components.css:5161   .person-row--highlight .person-row__avatar
+```
+
+As duas primeiras pintam ícone de ação lendo `--action-success-*`/`--action-danger-*`; as duas
+últimas, a linha destacada do roster. São o caso que quebra a monotonicidade: competem com outra
+regra pelo mesmo elemento, então remover uma **promove** a outra.
+
+Removendo as 32 restantes, medido contra o estado imediatamente anterior: **4 elementos alterados,
+que são exatamente o piso de ruído** — o mesmo par de caminhos em `justificativas-lista`, nos dois
+temas.
+
+**Custo real do método:** duas capturas (~8 min cada) e uma atribuição (~4 min) por lote, e o lote
+termina com as culpadas **nomeadas** — não só com "a metade de cima reprovou", que é tudo o que a
+bisecção daria pelo mesmo preço.
+
+**Catracas, todas por mérito:**
+
+| | antes | depois |
+|---|---:|---:|
+| `theme-dark-components.css` | 5.788 linhas | **5.610** |
+| `!important` fora do bundle | 466 | **463** |
+| `audit_frontend_standards` | 239 | **237** |
+| `audit_ui_patterns` | 2.456 | **2.447** |
+
+**O que continua aberto:** 173 candidatas **nunca exercitadas** pelas 43 rotas em repouso — o
+elemento só existe com diálogo, menu ou dropdown aberto. Sobre elas a medição não diz nada, e
+tratá-las como inócuas seria repetir o `NOVO-90`. Medi-las exige estender o corpus aos estados de
+sobreposição, como o `NOVO-54` fez ao ir de 44 para 51 rotas.
 ### NOVO-54 (continuação 2) 🟠 As 72 regras de campo, classificadas por medição, e as 7 que caíram · UI · 1 d
 
 Terceira leva do `NOVO-54`. As duas primeiras deram à classe uma regra base e cobraram 30 dos 70

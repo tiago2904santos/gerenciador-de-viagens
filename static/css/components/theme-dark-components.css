@@ -37,10 +37,6 @@ html[data-theme="dark"] .sidebar-brand-badge {
   box-shadow: none;
 }
 
-html[data-theme="dark"] .sidebar-nav {
-  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
-}
-
 html[data-theme="dark"] .sidebar-item-icon {
   border-color: rgba(255, 255, 255, 0.055);
 }
@@ -630,11 +626,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   border: 0;
   box-shadow: inset 4px 0 0 var(--color-accent);
   outline: 0;
-}
-
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .viatura-sugestao-chip--active strong {
-  color: var(--color-heading);
 }
 
 /* Badge interno: neutro no chip comum; no ativo = chip dourado do MOTORISTA.
@@ -1434,27 +1425,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   box-shadow: inset 4px 0 0 var(--color-accent) !important;
 }
 
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-documentos] .oficio-documentos-traveller-tile__avatar {
-  background: color-mix(in srgb, var(--color-heading) 10%, transparent);
-  border-color: color-mix(in srgb, var(--color-border) 70%, transparent);
-  color: var(--color-heading);
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-documentos]
-  .oficio-documentos-traveller-tile--motorista
-  .oficio-documentos-traveller-tile__avatar {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--color-on-accent);
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-documentos] .oficio-documentos-traveller-tile__name {
-  color: var(--color-heading);
-}
-
 :is(html[data-theme])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__selected-list {
   display: grid;
@@ -2217,23 +2187,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   border-color: transparent !important;
   box-shadow: none !important;
   color: var(--color-text);
-}
-
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro]
-  :is(.roteiro-editor__section--trecho, .roteiro-editor__section--retorno)
-  .roteiro-trecho-card__leg
-  :is(.cv-field--readonly .cv-field__control, .cv-field__control[readonly], input[readonly]),
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro]
-  #retorno-card
-  .roteiro-trecho-card__leg
-  :is(.cv-field--readonly .cv-field__control, .cv-field__control[readonly], input[readonly]) {
-  background: var(--color-surface-soft) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  color: var(--color-text);
-  opacity: 1;
 }
 
 /* Stepper −/+: mesmo secondary filled soft do "Preencher datas"
@@ -3375,12 +3328,6 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
 }
 
 :is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__selected-avatar .related-route-icon circle {
-  fill: currentColor;
-  stroke: none;
-}
-
-:is(html[data-theme="dark"])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__selected-avatar .related-route-icon path {
   fill: none;
   stroke: currentColor;
@@ -3494,14 +3441,6 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   transform: none;
 }
 
-:is(html[data-theme="dark"])
-  .form-card__footer
-  .card-footer__secondary
-  .cv-btn
-  .cv-btn__icon {
-  color: inherit;
-}
-
 /* Avançar: primary dourado (accent) — hierarquia acima do Voltar soft. */
 :is(html[data-theme="dark"])
   .form-card__footer
@@ -3517,12 +3456,6 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   padding: 0 18px;
   text-shadow: none;
   transform: none;
-}
-
-:is(html[data-theme="dark"])
-  .form-card__footer
-  .card-footer__primary .cv-btn .cv-btn__icon {
-  color: inherit;
 }
 
 :is(html[data-theme="dark"])
@@ -3785,12 +3718,6 @@ html[data-theme="dark"] .icon-btn--whatsapp:is(:hover, :focus) {
   color: var(--action-success-text);
 }
 
-html[data-theme="dark"] .icon-btn--preview {
-  background: var(--action-preview-bg);
-  border-color: var(--action-preview-border);
-  color: var(--action-preview-text);
-}
-
 html[data-theme="dark"] .icon-btn--preview:is(:hover, :focus) {
   background: color-mix(in srgb, var(--action-preview-bg) 82%, var(--action-preview-text) 18%);
   border-color: var(--action-preview-text);
@@ -3855,14 +3782,6 @@ html[data-theme="dark"] :is(
   background: var(--action-success-hover-bg);
   border-color: var(--action-success-border);
   color: var(--action-success-text);
-}
-
-html[data-theme="dark"]
-  :is(.record-card__footer, .entity-card__footer, .record-card__footer-actions)
-  :is(.icon-btn--edit, .icon-btn--settings):not(.is-assinado) {
-  background: var(--action-info-bg);
-  border-color: var(--action-info-border);
-  color: var(--action-info-text);
 }
 
 html[data-theme="dark"]
@@ -4238,13 +4157,6 @@ html[data-theme="dark"] .empty-state__title {
 }
 
 :is(html[data-theme="dark"])
-  :is(.file-picker__action, .prestacao-file-picker__action) {
-  background: var(--color-primary-soft);
-  border-color: var(--color-input-border);
-  color: var(--color-text);
-}
-
-:is(html[data-theme="dark"])
   .global-tooltip {
   background: var(--color-bg-strong);
   border-color: var(--color-border-strong);
@@ -4505,13 +4417,6 @@ html[data-theme="dark"] .empty-state__title {
 }
 
 :is(html[data-theme="dark"])
-  .search-picker--people.search-picker--roster .search-picker__selected-card--driver,
-:is(html[data-theme="dark"])
-  .search-picker--people.search-picker--roster .search-picker__selected-card--driver:hover {
-  box-shadow: inset 4px 0 0 var(--color-accent);
-}
-
-:is(html[data-theme="dark"])
   .search-picker__selected-card > .search-picker__remove,
 :is(html[data-theme="dark"])
   .search-picker__selected-card > .search-picker__remove:hover,
@@ -4629,11 +4534,6 @@ html[data-theme="dark"] .empty-state__title {
   padding: 0;
 }
 
-:is(html[data-theme="dark"])
-  .oficio-external-driver__reference {
-  border-top-color: var(--color-border-soft);
-}
-
 @media (prefers-reduced-motion: reduce) {
   html[data-theme="dark"] *,
 html[data-theme="dark"] *::before,
@@ -4673,12 +4573,6 @@ html[data-theme="dark"] *::after {
   .entity-card__header {
   background: var(--color-surface-muted);
   border-bottom-color: var(--color-border);
-}
-
-:is(html[data-theme="dark"])
-  .entity-card__footer {
-  background: var(--color-surface);
-  border-top-color: var(--color-border);
 }
 
 :is(html[data-theme="dark"])
@@ -4909,11 +4803,6 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  .cv-module-card__title {
-  color: var(--color-heading);
-}
-
-:is(html[data-theme="dark"])
   .cv-module-card__description {
   color: var(--color-muted-strong);
 }
@@ -4969,11 +4858,6 @@ html[data-theme="dark"] *::after {
   font-weight: var(--font-weight-extrabold);
   letter-spacing: 0.045em;
   text-transform: uppercase;
-}
-
-:is(html[data-theme="dark"])
-  .main-form-panel .section-header__description {
-  color: var(--color-muted);
 }
 
 :is(html[data-theme="dark"])
@@ -5140,11 +5024,6 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  .person-row--highlight .person-row__name {
-  color: var(--color-heading);
-}
-
-:is(html[data-theme="dark"])
   .person-row__avatar {
   /* Mesmo tom do chip Pendente (.person-row__badge) */
   background: color-mix(in srgb, var(--color-accent) 18%, transparent);
@@ -5180,12 +5059,6 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  .record-card__footer {
-  background: var(--card-family-bg);
-  border-top-color: var(--card-family-border);
-}
-
-:is(html[data-theme="dark"])
   .filter-header:not(.list-header) {
   background: var(--color-surface-strong);
   border-color: var(--color-border-strong);
@@ -5197,11 +5070,6 @@ html[data-theme="dark"] *::after {
   background: var(--color-primary-soft);
   border-color: var(--color-border-strong);
   color: var(--color-heading);
-}
-
-:is(html[data-theme="dark"])
-  .record-list {
-  background: transparent;
 }
 
 :is(html[data-theme="dark"])
@@ -5246,25 +5114,8 @@ html[data-theme="dark"] *::after {
 }
 
 :is(html[data-theme="dark"])
-  .record-row__identity {
-  background: var(--color-accent-soft, color-mix(in srgb, var(--color-accent) 18%, transparent));
-  border-color: var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 55%, transparent));
-  color: var(--color-accent-text, var(--color-accent));
-}
-
-:is(html[data-theme="dark"])
   .record-row__title {
   color: var(--color-heading);
-}
-
-:is(html[data-theme="dark"])
-  .record-row__subtitle {
-  color: var(--color-muted);
-}
-
-:is(html[data-theme="dark"])
-  .record-row__fact-label {
-  color: var(--color-muted);
 }
 
 :is(html[data-theme="dark"])
@@ -5365,14 +5216,6 @@ html[data-theme="dark"] *::after {
   .record-card__temporal-chip {
   box-shadow: none;
   font-size: 0.68rem;
-}
-
-/* Badge interna (Motorista, nº do ofício... ) mais contida. */
-:is(html[data-theme="dark"])
-  .person-row__badge,
-:is(html[data-theme="dark"])
-  .record-row__badge {
-  box-shadow: none;
 }
 
 /* Linhas de trecho: mesmo fundo da seção do card. */
@@ -5484,27 +5327,6 @@ html[data-theme="dark"] *::after {
   transform: none;
   transition: none;
   width: 44px;
-}
-
-:is(html[data-theme="dark"])
-  .custom-select__trigger--v2 .custom-select__chevron svg,
-:is(html[data-theme="dark"])
-  .custom-select__trigger--v2:hover .custom-select__chevron svg,
-:is(html[data-theme="dark"])
-  .custom-select__trigger--v2:focus .custom-select__chevron svg,
-:is(html[data-theme="dark"])
-  .custom-select__trigger--v2:focus-visible .custom-select__chevron svg,
-:is(html[data-theme="dark"])
-  .custom-select__trigger--v2[aria-expanded="true"] .custom-select__chevron svg,
-:is(html[data-theme="dark"])
-  .custom-select--v2.custom-select--open .custom-select__chevron svg,
-:is(html[data-theme="dark"])
-  .custom-select--v2.custom-select--disabled .custom-select__chevron svg,
-:is(html[data-theme="dark"])
-  .list-header__rail .custom-select__trigger--v2 .custom-select__chevron svg {
-  color: var(--color-accent);
-  fill: none;
-  stroke: currentColor;
 }
 
 :is(html[data-theme])

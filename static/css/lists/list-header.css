@@ -610,18 +610,6 @@
   box-shadow: none;
 }
 
-:is(html[data-theme="dark"])
-  .list-header__search-input,
-:is(html[data-theme="dark"])
-  .list-header .header-filter-input {
-  color: var(--color-text);
-}
-
-:is(html[data-theme="dark"])
-  .list-header__search-icon {
-  color: var(--text-filter-placeholder);
-}
-
 /* Select do rail: chevron sempre accent (fechado = aberto). */
 :is(html[data-theme="dark"])
   .list-header__rail .custom-select--v2 {
@@ -641,23 +629,6 @@
   .custom-select--v2.custom-select--open
   .custom-select__chevron {
   color: var(--color-accent);
-}
-
-:is(html[data-theme="dark"])
-  .list-header__rail
-  .custom-select__trigger--v2
-  .custom-select__chevron
-  svg {
-  color: var(--color-accent);
-  fill: none;
-  stroke: currentColor;
-}
-
-:is(html[data-theme="dark"])
-  .list-header .inline-create__toggle {
-  background: var(--card-family-bg);
-  border-top-color: var(--border-filter-bar);
-  color: var(--theme-text-body);
 }
 
 :is(html[data-theme="dark"])
@@ -1018,13 +989,6 @@
   color: var(--color-accent-text);
   outline: 0;
   transform: none;
-}
-
-:is(html[data-theme="dark"])
-  .list-header--wizard-band
-  .list-header__wizard-back
-  .cv-btn__icon {
-  color: inherit;
 }
 
 :is(html[data-theme="dark"])
