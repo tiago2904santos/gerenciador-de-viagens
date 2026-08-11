@@ -1,7 +1,6 @@
 import re
 from dataclasses import dataclass
 
-from django.db import connection
 from django.db import IntegrityError
 from django.db import transaction
 from django.urls import reverse
@@ -10,6 +9,10 @@ from django.db.models import Q
 from django.utils import timezone
 
 from core.normalizers import normalize_upper
+from core.numeracao import NAMESPACE_OFICIO
+from core.numeracao import bloquear_escopo_numeracao
+from core.numeracao import colisao_de_numero
+from core.numeracao import reservar_numero
 from core.tenancy import get_current_area
 from core.utils.masks import format_placa
 from core.utils.masks import format_protocolo
@@ -35,6 +38,7 @@ from .docxtpl_context import build_justificativa_docxtpl_context
 from .docxtpl_context import build_oficio_docxtpl_context
 from .documents import build_canonical_document_payload
 from .documents import build_justificativa_payload
+from .models import CONSTRAINT_NUMERO_OFICIO
 from .models import ModeloMotivoOficio
 from .models import Oficio
 from .models import OficioNumeroLacuna
@@ -476,9 +480,14 @@ def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
     modelo_motivo = form.cleaned_data.get("modelo_motivo")
     aplicar_modelo_motivo_no_oficio(atualizado, modelo_motivo, form.cleaned_data.get("motivo"))
     atualizar_status_automatico_oficio(atualizado, action=action, form=form)
-    _bloquear_escopo_numeracao_oficio(
+    # `BE-15`: mesmo lock da reserva automática, **sem** o retry. Aqui o número foi
+    # digitado pelo operador; trocá-lo em silêncio seria pior que devolver o erro, então
+    # este caminho traduz a colisão em `OficioNumeroConflitoError` e devolve a tela.
+    bloquear_escopo_numeracao(
+        namespace=NAMESPACE_OFICIO,
         area_id=atualizado.area_id,
         ano=atualizado.ano,
+        modelo=Oficio,
     )
     # `BE-09`: `all_objects` porque a checagem é sobre a área **deste** ofício, já
     # explícita no filtro. Com `objects`, área do registro diferente da ativa daria
@@ -499,7 +508,17 @@ def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
         with transaction.atomic():
             atualizado.save()
     except IntegrityError as exc:
-        if "oficios_oficio_area_ano_numero_unique" not in str(exc):
+        # `BE-15`: identifica pelo metadado da exceção, com a ocupação como segundo
+        # recurso. O texto do `IntegrityError` cita o nome da constraint no PostgreSQL e
+        # as colunas no SQLite, então o casamento por substring só valia num dos dois.
+        if not colisao_de_numero(
+            exc,
+            constraint=CONSTRAINT_NUMERO_OFICIO,
+            ja_ocupado=lambda numero: _numero_de_oficio_ocupado(
+                atualizado, numero=numero, ano=atualizado.ano
+            ),
+            numero=atualizado.numero,
+        ):
             raise
         raise OficioNumeroConflitoError(
             f"O número {atualizado.numero}/{atualizado.ano} acabou de ser usado "
@@ -604,36 +623,22 @@ def get_next_available_numero_oficio(ano, area=None):
     return Oficio.get_next_available_numero(ano, area=area)
 
 
-def _bloquear_escopo_numeracao_oficio(*, area_id: int | None, ano: int | None) -> None:
-    """Serializa a escolha do próximo número para uma área/ano.
+def _numero_de_oficio_ocupado(oficio, *, numero: int, ano: int) -> bool:
+    """Alguém já gravou este (área, ano, número)?
 
-    Bloquear apenas linhas de ``Oficio`` não protege o próximo número, pois ele
-    ainda não existe. No PostgreSQL, o advisory lock transacional cobre
-    exatamente esse intervalo lógico sem exigir uma tabela de contadores.
+    `BE-15`: é o segundo recurso para distinguir "perdi a corrida" de "violei outra
+    constraint", quando o banco não oferece o metadado da exceção. Ver o cabeçalho de
+    `core/numeracao.py`.
     """
-    resolved_ano = int(ano) if ano is not None else timezone.localdate().year
-    if connection.vendor == "postgresql":
-        namespace = 0x4F464943  # "OFIC"
-        scope = (((area_id or 0) * 4096) + (resolved_ano % 4096)) % 2_147_483_647
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT pg_advisory_xact_lock(%s, %s)",
-                [namespace, scope],
-            )
-        return
-
-    # Fallback para bancos usados em desenvolvimento/testes.
-    if area_id:
-        area_model = Oficio._meta.get_field("area").remote_field.model
-        area_model.objects.select_for_update().filter(pk=area_id).exists()
-    else:
-        list(
-            # `BE-09`: o lock cobre a faixa `area IS NULL`; recortar pela área ativa
-            # o deixaria vazio e a serialização da numeração deixaria de existir.
-            Oficio.all_objects.select_for_update()
-            .filter(area__isnull=True, ano=resolved_ano)
-            .exclude(numero__isnull=True)
-        )
+    return (
+        # `BE-09`: `all_objects` — o escopo é a área **deste** ofício, e ela vem explícita
+        # no filtro da própria linha. Com `objects`, um ofício de área diferente da ativa
+        # daria consulta vazia: a colisão passaria por "não é minha" e o `IntegrityError`
+        # subiria cru em vez de virar nova tentativa.
+        Oficio.all_objects.filter(area_id=oficio.area_id, ano=ano, numero=numero)
+        .exclude(pk=oficio.pk)
+        .exists()
+    )
 
 
 @transaction.atomic
@@ -642,39 +647,38 @@ def reservar_numero_oficio(oficio, ano=None):
         return oficio
 
     resolved_year = ano or timezone.localdate().year
-    _bloquear_escopo_numeracao_oficio(
-        area_id=oficio.area_id,
-        ano=resolved_year,
-    )
-
     original_pk = oficio.pk
     original_adding = oficio._state.adding
-    last_error: IntegrityError | None = None
-    for _attempt in range(3):
-        oficio.ano = resolved_year
-        oficio.numero = get_next_available_numero_oficio(
-            resolved_year,
-            area=oficio.area,
-        )
-        try:
-            # Savepoint interno: uma colisão causada por um worker antigo não
-            # inutiliza a transação externa; a consulta seguinte já verá o
-            # número que venceu a corrida.
-            with transaction.atomic():
-                oficio.save()
-            return oficio
-        except IntegrityError as exc:
-            if "oficios_oficio_area_ano_numero_unique" not in str(exc):
-                raise
-            last_error = exc
-            oficio.numero = None
-            oficio.ano = None
-            if original_adding:
-                oficio.pk = original_pk
-                oficio._state.adding = True
 
-    assert last_error is not None
-    raise last_error
+    def escolher():
+        return get_next_available_numero_oficio(resolved_year, area=oficio.area)
+
+    def gravar(numero):
+        oficio.ano = resolved_year
+        oficio.numero = numero
+        oficio.save()
+
+    def limpar():
+        oficio.numero = None
+        oficio.ano = None
+        if original_adding:
+            oficio.pk = original_pk
+            oficio._state.adding = True
+
+    reservar_numero(
+        namespace=NAMESPACE_OFICIO,
+        area_id=oficio.area_id,
+        ano=resolved_year,
+        modelo=Oficio,
+        constraint=CONSTRAINT_NUMERO_OFICIO,
+        escolher=escolher,
+        gravar=gravar,
+        ja_ocupado=lambda numero: _numero_de_oficio_ocupado(
+            oficio, numero=numero, ano=resolved_year
+        ),
+        apos_colisao=limpar,
+    )
+    return oficio
 
 
 def avaliar_oficio_dados_viajantes(oficio=None, form=None):

@@ -1,19 +1,24 @@
 from __future__ import annotations
 
-from django.db import IntegrityError
-from django.db import connection
 from django.db import models
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
 from core.constraints import periodo_ordenado
+from core.numeracao import NAMESPACE_ORDEM_SERVICO
+from core.numeracao import reservar_numero
 from core.managers import AreaScopedManager
 from core.models import CancelavelModel
 from cadastros.models import Cidade
 from cadastros.models import Servidor
 from core.models import TimeStampedModel
 from oficios.models import Oficio
+
+
+#: Mesmo motivo do `CONSTRAINT_NUMERO_OFICIO`: `core.numeracao` compara o metadado da
+#: exceção contra este nome, então ele existe uma vez só.
+CONSTRAINT_NUMERO_ORDEM_SERVICO = "ordens_servico_area_ano_numero_unique"
 
 
 class OrdemServico(TimeStampedModel, CancelavelModel):
@@ -175,7 +180,7 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
             models.UniqueConstraint(
                 fields=["area", "ano", "numero"],
                 condition=Q(ano__isnull=False, numero__isnull=False),
-                name="ordens_servico_area_ano_numero_unique",
+                name=CONSTRAINT_NUMERO_ORDEM_SERVICO,
             ),
             # `DB-07`: o período da OS é copiado do evento e reimpresso no documento.
             periodo_ordenado(
@@ -234,20 +239,49 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
             return super().save(*args, **kwargs)
 
         ano = timezone.localdate().year
+
+        def escolher():
+            # `_assign_numero` grava `numero` e `ano` no próprio objeto; devolvê-lo aqui é
+            # o que `reservar_numero` usa para conferir a colisão depois.
+            self._assign_numero()
+            return self.numero
+
+        def gravar(_numero):
+            super(OrdemServico, self).save(*args, **kwargs)
+
+        def limpar():
+            self.numero = None
+            self.ano = None
+
+        # `BE-15`: o lock e o laço de três tentativas moravam aqui, copiados de
+        # `oficios/services.py`. A política de escolha (`max+1`) fica; a mecânica é comum.
         with transaction.atomic():
-            self._lock_numero_scope(ano)
-            for attempt in range(3):
-                self._assign_numero()
-                try:
-                    with transaction.atomic():
-                        return super().save(*args, **kwargs)
-                except IntegrityError as exc:
-                    if "ordens_servico_area_ano_numero_unique" not in str(exc):
-                        raise
-                    self.numero = None
-                    self.ano = None
-                    if attempt == 2:
-                        raise
+            reservar_numero(
+                namespace=NAMESPACE_ORDEM_SERVICO,
+                area_id=self.area_id,
+                ano=ano,
+                modelo=OrdemServico,
+                constraint=CONSTRAINT_NUMERO_ORDEM_SERVICO,
+                escolher=escolher,
+                gravar=gravar,
+                ja_ocupado=self._numero_ocupado,
+                apos_colisao=limpar,
+            )
+
+    def _numero_ocupado(self, numero: int) -> bool:
+        """Outra OS já ocupa este (área, ano, número)?
+
+        `BE-15`: substitui o casamento por texto da mensagem do `IntegrityError`, que só
+        funcionava no PostgreSQL — ver o cabeçalho de `core/numeracao.py`.
+        """
+        # `BE-09`: `all_objects` — o escopo é a área **desta** OS, já no filtro.
+        return (
+            OrdemServico.all_objects.filter(
+                area_id=self.area_id, ano=self.ano, numero=numero
+            )
+            .exclude(pk=self.pk)
+            .exists()
+        )
 
     def _assign_numero(self):
         ano = timezone.localdate().year
@@ -264,24 +298,3 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
         self.numero = (last or 0) + 1
         self.ano = ano
 
-    def _lock_numero_scope(self, ano):
-        if connection.vendor == "postgresql":
-            namespace = 0x4F534E55  # "OSNU"
-            scope = (((self.area_id or 0) * 4096) + (ano % 4096)) % 2_147_483_647
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    "SELECT pg_advisory_xact_lock(%s, %s)",
-                    [namespace, scope],
-                )
-            return
-        if self.area_id:
-            area_model = self._meta.get_field("area").remote_field.model
-            area_model.objects.select_for_update().filter(pk=self.area_id).exists()
-        else:
-            list(
-                # `BE-09`: mesmo motivo de `_assign_numero` — o lock cobre a faixa
-                # `area IS NULL`, e recortar pela área ativa o deixaria vazio.
-                OrdemServico.all_objects.select_for_update()
-                .filter(area__isnull=True, ano=ano)
-                .exclude(numero__isnull=True)
-            )
