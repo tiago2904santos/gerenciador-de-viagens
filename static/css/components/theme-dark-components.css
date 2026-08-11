@@ -889,13 +889,7 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
     .date-picker__control > input.cv-field__control,
     .cv-field__control,
     input.cv-field__control,
-    input.cv-field__control[readonly],
-    .date-picker__control:hover,
-    .date-picker__control:focus-within,
-    .cv-field__control:hover,
-    .cv-field__control:focus,
-    .date-picker__control .cv-field__control:hover,
-    .date-picker__control .cv-field__control:focus
+    input.cv-field__control[readonly]
   ) {
   background: var(--step1-panel, var(--color-surface-soft)) !important;
   background-color: var(--step1-panel, var(--color-surface-soft)) !important;
@@ -1997,13 +1991,7 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg :is(
     .cv-field__control,
     .date-picker__control,
-    .date-picker__control .cv-field__control,
-    .cv-field__control:hover,
-    .cv-field__control:focus,
-    .date-picker__control:hover,
-    .date-picker__control:focus-within,
-    .date-picker__control .cv-field__control:hover,
-    .date-picker__control .cv-field__control:focus
+    .date-picker__control .cv-field__control
   ) {
   border-radius: 10px;
 }
@@ -2012,13 +2000,7 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg :is(
     .cv-field__control,
     .date-picker__control,
-    .date-picker__control .cv-field__control,
-    .cv-field__control:hover,
-    .cv-field__control:focus,
-    .date-picker__control:hover,
-    .date-picker__control:focus-within,
-    .date-picker__control .cv-field__control:hover,
-    .date-picker__control .cv-field__control:focus
+    .date-picker__control .cv-field__control
   ) {
   background: var(--step1-panel) !important;
   background-color: var(--step1-panel) !important;

@@ -76,11 +76,6 @@
   width: 100%;
 }
 
-.travel-document-wizard .cv-field__control:focus,
-.travel-document-wizard .cv-field__control:focus-visible {
-  outline: none;
-}
-
 .travel-document-wizard .form-control:-webkit-autofill,
 .travel-document-wizard .form-control:-webkit-autofill:hover,
 .travel-document-wizard .form-control:-webkit-autofill:focus,

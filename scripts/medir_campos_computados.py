@@ -66,6 +66,7 @@ while not (RAIZ / "manage.py").exists():
 sys.path.insert(0, str(RAIZ))
 
 from scripts.rotas_do_sistema import ROTAS  # noqa: E402
+from scripts.navegador_medicao import abrir_chromium  # noqa: E402
 
 # So o que o campo de fato pinta. `getComputedStyle` devolve ~340 propriedades e
 # a maioria e ruido que muda com a largura da janela.
@@ -83,6 +84,12 @@ PROPRIEDADES = [
 ESTADOS = (
     (),
     ("hover",),
+    # Separados de propósito: forçar os dois de uma vez escondia regras que
+    # valem apenas para foco por ponteiro atrás do piso global de
+    # ``:focus-visible``. A combinação continua medida porque é o estado real
+    # de navegação por teclado nos controles nativos.
+    ("focus",),
+    ("focus-visible",),
     ("focus", "focus-visible"),
     ("active",),
 )
@@ -92,8 +99,23 @@ JS_COLETA = """
   const c = getComputedStyle(el);
   const estilo = {};
   props.forEach(p => { estilo[p] = c.getPropertyValue(p); });
-  return { chave: `${i}:${el.tagName.toLowerCase()}.${el.getAttribute('class') || ''}`, estilo };
+  return {
+    chave: `${i}:${el.tagName.toLowerCase()}.${el.getAttribute('class') || ''}`,
+    texto: 'value' in el ? el.value : (el.textContent || ''),
+    estilo,
+  };
 })
+"""
+
+JS_ESPERAR_ESTILO = """
+() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+"""
+
+CSS_SEM_MOVIMENTO = """
+*, *::before, *::after {
+  animation: none !important;
+  transition: none !important;
+}
 """
 
 
@@ -132,9 +154,7 @@ def medir(base_url, usuario, senha, temas, rotas):
 
     resultado: dict[str, list] = {}
     with sync_playwright() as pw:
-        navegador = pw.chromium.launch(
-            executable_path="/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
-        )
+        navegador = abrir_chromium(pw)
         contexto = navegador.new_context(viewport={"width": 1440, "height": 900})
         pagina = contexto.new_page()
 
@@ -173,9 +193,15 @@ def medir(base_url, usuario, senha, temas, rotas):
                 if "/login" in pagina.url and "/login" not in caminho:
                     sys.exit(f"rota {caminho} caiu no login: sessao perdida")
                 esperar_arvore_estavel(pagina)
+                # A regra da E0 também vale aqui: capturar no meio de uma
+                # transição produz cores e sombras fracionárias diferentes
+                # entre duas execuções do mesmo código. O medidor compara a
+                # cascata estabilizada, não um frame acidental da animação.
+                pagina.add_style_tag(content=CSS_SEM_MOVIMENTO)
                 pagina.evaluate(
                     "t => document.documentElement.setAttribute('data-theme', t)", tema
                 )
+                pagina.evaluate(JS_ESPERAR_ESTILO)
                 raiz = cdp.send("DOM.getDocument")["root"]["nodeId"]
                 nos = cdp.send(
                     "DOM.querySelectorAll", {"nodeId": raiz, "selector": ".cv-field__control"}
@@ -188,6 +214,7 @@ def medir(base_url, usuario, senha, temas, rotas):
                             "CSS.forcePseudoState",
                             {"nodeId": no, "forcedPseudoClasses": list(estados)},
                         )
+                    pagina.evaluate(JS_ESPERAR_ESTILO)
                     rotulo = "+".join(estados) or "repouso"
                     resultado[f"{slug}|{tema}|{rotulo}"] = pagina.evaluate(
                         JS_COLETA, PROPRIEDADES

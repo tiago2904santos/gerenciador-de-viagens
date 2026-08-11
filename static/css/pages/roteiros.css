@@ -645,13 +645,7 @@
   .date-picker__control > input.cv-field__control,
   .cv-field__control,
   input.cv-field__control,
-  input.cv-field__control[readonly],
-  .date-picker__control:hover,
-  .date-picker__control:focus-within,
-  .cv-field__control:hover,
-  .cv-field__control:focus,
-  .date-picker__control .cv-field__control:hover,
-  .date-picker__control .cv-field__control:focus
+  input.cv-field__control[readonly]
 ) {
   background: var(--step1-panel, var(--color-surface-soft, var(--color-card)));
   background-color: var(--step1-panel, var(--color-surface-soft, var(--color-card)));

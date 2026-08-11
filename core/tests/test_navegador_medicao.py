@@ -107,7 +107,11 @@ class AbrirChromiumTests(SimpleTestCase):
 class AsReguasUsamOAtalhoTests(SimpleTestCase):
     """Trava de regressão: se alguém voltar ao launch cru, a régua para de rodar aqui."""
 
-    ROTAS = ("scripts/medir_divergencia_tema.py", "scripts/medir_css_por_rota.py")
+    ROTAS = (
+        "scripts/medir_campos_computados.py",
+        "scripts/medir_divergencia_tema.py",
+        "scripts/medir_css_por_rota.py",
+    )
 
     def test_nenhuma_regua_chama_chromium_launch_direto(self):
         from django.conf import settings
@@ -119,6 +123,30 @@ class AsReguasUsamOAtalhoTests(SimpleTestCase):
                 cruas.append(caminho)
             self.assertIn("abrir_chromium", texto, f"{caminho} não usa o atalho")
         self.assertEqual(cruas, [], "voltou ao launch cru — ver NOVO-83")
+
+
+class MedidorDeCamposEstavelTests(SimpleTestCase):
+    """NOVO-54: a régua distingue estado real de frame intermediário."""
+
+    def test_foco_e_foco_visivel_sao_medidos_separadamente(self):
+        from scripts import medir_campos_computados as medidor
+
+        self.assertIn(("focus",), medidor.ESTADOS)
+        self.assertIn(("focus-visible",), medidor.ESTADOS)
+        self.assertIn(("focus", "focus-visible"), medidor.ESTADOS)
+
+    def test_movimento_e_desligado_antes_da_captura(self):
+        from scripts import medir_campos_computados as medidor
+
+        self.assertIn("animation: none !important", medidor.CSS_SEM_MOVIMENTO)
+        self.assertIn("transition: none !important", medidor.CSS_SEM_MOVIMENTO)
+        self.assertIn("requestAnimationFrame", medidor.JS_ESPERAR_ESTILO)
+
+    def test_conteudo_fica_fora_do_dicionario_de_estilo(self):
+        from scripts import medir_campos_computados as medidor
+
+        self.assertIn("texto:", medidor.JS_COLETA)
+        self.assertIn("estilo,", medidor.JS_COLETA)
 
 
 class EsperarLayoutEstavelTests(SimpleTestCase):
