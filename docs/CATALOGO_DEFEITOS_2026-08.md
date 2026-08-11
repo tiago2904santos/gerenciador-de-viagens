@@ -4768,7 +4768,7 @@ e nada falharia: o atributo ficaria no HTML, inerte.
 A máscara vale do próximo cadastro em diante. Uniformizar o histórico é migração de dados, com
 contagem por campo, e é decisão separada.
 
-### NOVO-54 🟠 PARCIAL · `NOVO` `.cv-field__control` não tem regra base — o campo é o elemento cru mais 64 correções · UI · 2 d
+### NOVO-54 ✅ RESOLVIDO · `NOVO` `.cv-field__control` não tem regra base — o campo é o elemento cru mais 64 correções · UI · 2 d
 
 A classe de campo com maior alcance do sistema — **11 templates, 30 rotas** — não tinha nenhuma
 regra base. Ela existia só em **64 regras de sobrescrita** espalhadas por **14 arquivos**, com **70
@@ -6750,3 +6750,22 @@ seja renderizada.
 O inventário atual fica em **47 regras, 13 arquivos, 0 pseudo-regra**. A E7c permanece parcial: os
 contextos de diário e `field-with-action` ainda não renderizam um `.cv-field__control` no corpus, e
 serão classificados sem inferir ausência a partir de rota visitada.
+
+### NOVO-54 (continuação 5) ✅ Os contextos interativos fecham a E7c · UI · 0,5 d
+
+O corpus ganhou as duas rotas que faltavam: `/prestacoes-contas/prestacao/1/diario/` e
+`/planos-trabalho/atividades/`. A primeira materializou **120 leituras** dentro de
+`.diario-trecho-block`; a segunda, **48** dentro de `#quick-add-atividade`. `field-with-action` já
+existia em **156 combinações**, mas seus controles atuais são `form-select` e `search-picker`, nunca
+um ramo exclusivo de `.cv-field__control`.
+
+Com essa cobertura, foram retirados somente ramos de seletor duplicados que casavam o mesmo elemento
+por `form-control`, `input`, `select` ou `textarea`: três regras de `field-with-action` em cada uma
+das duas folhas, duas do diário, uma do efetivo e duas da solicitação de equipe. O estilo permanece
+no contexto; saiu a segunda maneira de selecionar o mesmo nó.
+
+A medição antes/depois cobriu **56 rotas, 672 combinações rota|tema|estado e 7.536 leituras**:
+**0 diferenças de estilo, pseudo-estilo e estrutura**. As 1.656 diferenças eram somente valores
+dinâmicos, deliberadamente separados do estilo. O inventário fecha em **36 regras vivas de base, a11y ou contexto,
+11 arquivos e 0 pseudo-regra**, contra 72 regras no início da classificação. A regra canônica possui
+a base, e os contextos restantes são variações medidas, não correções cegas. **E7c concluída.**

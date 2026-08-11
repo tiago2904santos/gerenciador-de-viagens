@@ -15169,9 +15169,6 @@ html[data-theme="dark"] *::after {
   [data-travel-document-wizard-diario]
   .diario-trecho-block
   :is(
-    .cv-field__control,
-    .date-picker .cv-field__control,
-    .date-picker__control .cv-field__control,
     .date-picker__input,
     .custom-select__trigger,
     input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
@@ -15189,16 +15186,11 @@ html[data-theme="dark"] *::after {
   .diario-trecho-block
   .roteiro-trecho-card__leg
   :is(
-    .cv-field__control,
-    .date-picker .cv-field__control,
-    .date-picker__control .cv-field__control,
     .date-picker__input,
     .custom-select__trigger,
     input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
     select,
     textarea,
-    .cv-field--readonly .cv-field__control,
-    .cv-field__control[readonly],
     input[readonly]
   ) {
   background: var(--color-surface-soft) !important;

@@ -493,8 +493,11 @@ camadas, só em `fields/select.css:95`.
 > inventário, e aceitou um seletor amplo para conferir também controles sem a classe. Em 54 rotas,
 > 648 combinações e 7.260 leituras, zerar a especificidade do seletor de elemento nu, retirar as 8
 > pseudo-regras redundantes e apagar o contexto órfão `.justificativa-panel` preservou 0 diferenças
-> de estilo, pseudo-estilo e estrutura. O inventário caiu para 47 regras em 13 arquivos. A E7c
-> continua aberta somente para os contextos interativos que ainda não renderizam alvo no corpus.
+> de estilo, pseudo-estilo e estrutura. O inventário caiu para 47 regras em 13 arquivos. A última
+> leva acrescentou as rotas reais de diário e atividades: 56 rotas, 672 combinações e 7.536
+> leituras. Os ramos duplicados de diário, quick-add e `field-with-action` caíram com 0 diferenças
+> de estilo, pseudo-estilo e estrutura; o inventário terminou em 36 regras vivas de base, a11y ou contexto, em 11
+> arquivos. **A E7c está concluída.** O `NOVO-51` de valor próprio continua deliberadamente na E8.
 
 **Enunciado original da E7, para registro:**
 
