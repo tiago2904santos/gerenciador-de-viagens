@@ -733,6 +733,12 @@ folha; a extração deve mover a família compartilhada antes de retirar o prime
 > 1440/800/500 px (**2.632 leituras por viewport**). `search-picker`/`select` seguem na próxima
 > fronteira do `HT-04`.
 
+> **Quarta fatia fechada em 11/08 (`HT-04`, parcial).** `search-picker.css` também saiu do shell
+> padrão e permanece, na ordem original, apenas na variante consumidora. Rotas sem o componente
+> deixam de buscar **27.227 bytes**. Servidores e Eventos ficaram idênticos por página inteira em
+> claro/escuro e 1440/800/500 px (**1.704 leituras por viewport**). `select.css` segue global porque
+> ainda contém regras de select nativo; sua divisão é a próxima fronteira.
+
 **Passo a passo.** Extraia os componentes compartilhados dos arquivos de domínio para
 `fields/`, `actions/`, `lists/` e `feedback/`, domínio por domínio, e derrube o import correspondente. Dimensione com a
 régua da E0: o que não é usado na rota não devia estar sendo entregue nela.

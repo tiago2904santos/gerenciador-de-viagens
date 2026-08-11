@@ -52,6 +52,11 @@ FORM_COMPONENTS_CSS: tuple[str, ...] = (
     "css/fields/file-picker.css",
 )
 
+FORM_COMPONENT_IMPORTS: tuple[str, ...] = (
+    '@import url("./fields/search-picker.css");',
+)
+FORM_COMPONENT_IMPORT_AFTER = '@import url("./lists/cards.css");'
+
 _FORM_CSS_INSERT_AT = SHELL_CSS.index("css/fields/field.css") + 1
 SHELL_CSS_WITH_FORM_COMPONENTS: tuple[str, ...] = (
     SHELL_CSS[:_FORM_CSS_INSERT_AT]
@@ -110,11 +115,32 @@ def _read(rel: str) -> str:
         return path.read_text(encoding="latin-1")
 
 
-def _concat(sources: tuple[str, ...], kind: str) -> str:
+def _style_with_form_components() -> str:
+    style = _read("css/style.css")
+    if any(import_line in style for import_line in FORM_COMPONENT_IMPORTS):
+        raise ValueError("style.css voltou a importar componentes de formulario")
+    if style.count(FORM_COMPONENT_IMPORT_AFTER) != 1:
+        raise ValueError("ponto de insercao dos imports de formulario ausente ou ambiguo")
+    imports = "\n".join(FORM_COMPONENT_IMPORTS)
+    return style.replace(
+        FORM_COMPONENT_IMPORT_AFTER,
+        f"{FORM_COMPONENT_IMPORT_AFTER}\n{imports}",
+    )
+
+
+def _concat(
+    sources: tuple[str, ...],
+    kind: str,
+    *,
+    overrides: dict[str, str] | None = None,
+) -> str:
     parts: list[str] = [BANNER, f"/* shell {kind} sources ({len(sources)}): */\n"]
     for rel in sources:
         parts.append(f"\n/* >>> {rel} >>> */\n")
-        parts.append(_read(rel))
+        if overrides is not None and rel in overrides:
+            parts.append(overrides[rel])
+        else:
+            parts.append(_read(rel))
         if not parts[-1].endswith("\n"):
             parts.append("\n")
         parts.append(f"/* <<< {rel} <<< */\n")
@@ -123,7 +149,11 @@ def _concat(sources: tuple[str, ...], kind: str) -> str:
 
 def build() -> tuple[str, str, str, str]:
     css = _concat(SHELL_CSS, "css")
-    form_css = _concat(SHELL_CSS_WITH_FORM_COMPONENTS, "css with form components")
+    form_css = _concat(
+        SHELL_CSS_WITH_FORM_COMPONENTS,
+        "css with form components",
+        overrides={"css/style.css": _style_with_form_components()},
+    )
     js = _concat(SHELL_JS, "js")
     form_components = _concat(FORM_COMPONENTS_JS, "form components js")
     CSS_BUNDLE.parent.mkdir(parents=True, exist_ok=True)
@@ -142,6 +172,7 @@ def check() -> int:
     expected_form_css = _concat(
         SHELL_CSS_WITH_FORM_COMPONENTS,
         "css with form components",
+        overrides={"css/style.css": _style_with_form_components()},
     )
     expected_js = _concat(SHELL_JS, "js")
     errors: list[str] = []
