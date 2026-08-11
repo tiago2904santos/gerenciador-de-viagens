@@ -39,3 +39,31 @@ class EntityCardStylesTests(SimpleTestCase):
             with self.subTest(selector=selector):
                 self.assertIn(selector, shared)
                 self.assertNotIn(selector, wizard)
+
+    def test_modificador_de_roteiro_nao_exige_folha_legada(self):
+        shared = (ROOT / "static/css/lists/entity-cards.css").read_text(encoding="utf-8")
+
+        self.assertIn(
+            ".record-card--roteiro .record-card__info-value--rota",
+            shared,
+        )
+        self.assertIn(
+            ".record-card--roteiro .fact-block__value--strong--fit",
+            shared,
+        )
+        self.assertFalse((ROOT / "static/css/pages/roteiros-list.css").exists())
+
+        imports_legados = []
+        for template in (ROOT / "templates").rglob("*.html"):
+            if "css/pages/roteiros-list.css" in template.read_text(encoding="utf-8"):
+                imports_legados.append(str(template.relative_to(ROOT)))
+        self.assertEqual(imports_legados, [])
+
+    def test_presenters_nao_calculam_classe_sem_consumidor(self):
+        for relative_path in (
+            "oficios/presenters.py",
+            "roteiros/presenters.py",
+        ):
+            with self.subTest(module=relative_path):
+                source = (ROOT / relative_path).read_text(encoding="utf-8")
+                self.assertNotIn("faixa_lateral_class", source)

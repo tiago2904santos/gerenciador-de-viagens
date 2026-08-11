@@ -35,14 +35,6 @@ def _status_variant(status: str) -> str:
     return "status-chip--warning"
 
 
-def _oficio_faixa_lateral_class(status: str) -> str:
-    if status in {Oficio.STATUS_GERADO, Oficio.STATUS_FINALIZADO}:
-        return "roteiro-list-card--faixa-finalizado-concluido"
-    if status == Oficio.STATUS_RASCUNHO:
-        return "roteiro-list-card--faixa-rascunho-futuro"
-    return "roteiro-list-card--faixa-neutro"
-
-
 def _destino_display_oficio(oficio) -> str:
     if not oficio.roteiro_id:
         return ""

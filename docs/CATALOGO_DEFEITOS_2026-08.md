@@ -2625,8 +2625,8 @@ segura.
 
 **O que fica declarado como não resolvido**, para o ID não fechar prometendo mais do que entregou:
 seletor de atributo (`[data-state=…]`) nunca entrou em lente nenhuma; os 70 nomes mortos dentro de
-seletor agrupado vivo são o `NOVO-48`; e as classes `roteiro-list-card--faixa-*` continuam no CSS
-protegidas por prefixo, presas ao `NOVO-45`.
+seletor agrupado vivo são o `NOVO-48`. As classes `roteiro-list-card--faixa-*` que esta seção
+deixava presas ao prefixo foram removidas com a resolução do `NOVO-45/MOR` na E10.
 
 ### UI-02 🟠 Tema escuro é camada de exceção, não de token · MED
 
@@ -2719,6 +2719,12 @@ de CSS caiu **44.376 bytes por página**; na lista de Ofícios caiu 176 bytes. A
 subiu nas sete rotas medidas (por exemplo, Prestações **13,9147% → 14,8009%**). Claro/escuro em
 1440, 800 e 500 px produziram JSONs de estilos computados idênticos, **1.616 leituras por
 viewport**. O ID permanece aberto para as demais famílias e para a meta final de 35% por rota.
+
+**Segunda família fechada em 11/08.** `roteiros-list.css` foi apagado: as três regras vivas de
+`record-card--roteiro` foram incorporadas ao componente; 265 linhas legadas e sete imports saíram.
+São **−6.919 bytes** em cada rota afetada. O corte também resolveu o `NOVO-45/MOR`, removendo o
+cálculo de `faixa_lateral_class` que nenhum template consumia.
+O modificador vivo foi comparado em card real: claro/escuro e 1440/800/500 px idênticos.
 
 ---
 
@@ -4520,7 +4526,7 @@ a suíte inteira antes do merge — a trava do `HT-06` é local e barata, e teri
 `main` verde. O run 697 (`NOVO-43`) passou sobre a árvore do #246 por sorte de ordem: o
 vermelho só apareceu quando o #247 entrou.
 
-### NOVO-45 🟡 `NOVO` `faixa_lateral_class` é calculada por card em duas listas e nenhum template a lê · MOR · 0,25 d
+### NOVO-45 ✅ RESOLVIDO (E10/MOR) · `NOVO` `faixa_lateral_class` era calculada por card em duas listas e nenhum template a lia · MOR · 0,25 d
 
 `roteiros/presenters.py:261` põe `"faixa_lateral_class": _roteiro_faixa_lateral_class(roteiro)` no
 dicionário do card, e `oficios/presenters.py:37` tem a função gêmea. As duas resolvem status,
@@ -4540,6 +4546,14 @@ dinâmico, estilizando um elemento que ninguém emite.
 **Consequência para o `UI-01`:** a proteção por prefixo é generosa de propósito, e o preço é este —
 classe morta que sobrevive porque o nome dela está numa string. Corrigir o `NOVO-45` derruba junto
 os blocos `--faixa-*`.
+
+**Resolvido em 11/08.** As duas funções e a chave sem consumidor foram removidas. A folha
+`roteiros-list.css` tinha **265 linhas / 7.180 bytes**: só três regras do modificador vivo
+`record-card--roteiro` sobreviveram em `lists/entity-cards.css` (+261 bytes); os 41 blocos do card
+legado, os seletores de hero sem markup e os sete imports saíram. Resultado líquido nas rotas que
+carregavam a folha: **−6.919 bytes por página**, sem alteração de seletor vivo.
+O card de roteiro real produziu JSONs de estilo computado idênticos entre `main` e a fatia em
+claro/escuro, nos viewports 1440, 800 e 500 px (8 leituras por viewport).
 
 ### NOVO-46 🟡 `NOVO` Contrato de widget e template apontam para CSS que produção nunca carregou · MOR · 0,25 d
 
