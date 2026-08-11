@@ -557,7 +557,7 @@ desenho anterior — e é o que o sistema mostra para quem nunca escolheu tema.*
 | 8d | barra lateral | 976 | ✅ **fechada pelo `NOVO-63`** — `.sidebar*` divergente de 1.096 para **96**; a largura virou um token só |
 | 8e | `font-size`/`line-height` | 533 | ✅ **em quase tudo**: o `NOVO-63` mediu que **528 dos 533** eram a barra lateral |
 | 8f | altura de controle | 378 | ✅ **toda**: o `NOVO-63` mediu que os 378 eram a barra lateral |
-| 8b | borda `0px` → `1px` | 1.416 | 🟠 **1 de 41 regras entrou; 40 continuam bloqueadas — `NOVO-93`/`NOVO-101`**: o bloqueio não é de token, é de **desenho** (qual superfície o claro ganha no lugar da borda). Remedida em 10/08 e recortada em 11/08; ver abaixo |
+| 8b | borda `0px` → `1px` | 1.416 | 🟠 **1 de 41 regras entrou; 40 continuam bloqueadas — `NOVO-93`/`NOVO-103`**: o bloqueio não é de token, é de **desenho** (qual superfície o claro ganha no lugar da borda). Remedida em 10/08 e recortada em 11/08; ver abaixo |
 | 8c | raio `14px` → `10px` | 940 | ✅ **fechada em 10/08** — 43 das 116 regras, 1.116 elementos |
 | 8g | `justify-content` `normal` → `center` | 230 | ⛔ **pulada por decisão do dono — `NOVO-94`**: move a régua e não move um pixel |
 | 8h | **gaveta da barra lateral** | — | 🟠 **aberta, deixada de fora de propósito pelo `NOVO-63`**: sob `@media (max-width: 840px)` o escuro usa `position: fixed` + `height: 100dvh` e o claro `position: relative`. Isso não é geometria, é **comportamento** — vira gaveta sobreposta em vez de coluna no fluxo, e depende de `.app-mobile-bar__toggle` e `.sidebar-drawer-close` se comportarem igual nos dois temas |
@@ -647,7 +647,7 @@ o token resolve.
 |---|---|---|
 | **E9-b** | a faixa de filtros não tinha fundo no claro: os nove `--card-family-*` passam a existir no `:root` do `tokens.css` | ✅ `#309` — 47 elementos no claro, **2 no escuro** (piso de ruído) |
 | **E9-a** | 32 regras só-escuras de cor removidas por medição | ✅ `#310` — 4 elementos alterados = piso de ruído. Arquivo 5.788 → **5.610** linhas; `!important` 466 → **463** |
-| **E9-c** | o sistema de superfície do wizard (`--step1-*`) passa a existir no claro — **destrava a 8b** | ✅ `#313` — 36 elementos no claro, **2 no escuro** ⚠️ o "destrava" valeu para **1 regra**, não para a família: ver `NOVO-101` |
+| **E9-c** | o sistema de superfície do wizard (`--step1-*`) passa a existir no claro — **destrava a 8b** | ✅ `#313` — 36 elementos no claro, **2 no escuro** ⚠️ o "destrava" valeu para **1 regra**, não para a família: ver `NOVO-103` |
 | **E8-8b** | a fatia da 8b que sobrevive aos três portões (alcance medido, âncora estrutural, fronteira no claro) | ✅ 1 de 41 regras — escuro **pixel-idêntico**, claro com 18 elementos nas 3 rotas de roteiro |
 
 **O instrumento que a etapa exigiu, e que não existia.** A régua da E0
@@ -656,7 +656,7 @@ contrário: **o mesmo tema em dois códigos**. Daí `sonda_mesmo_tema.py` — 41
 por caminho no DOM, `transition` e `animation` desligadas, com `--revelar` (tira `[hidden]`, liga as
 classes de aberto) e `--pseudo hover` (força o estado em todo elemento).
 
-> **Correção de 11/08 (`NOVO-101`):** o "piso de ruído de 4 elementos" que aparecia aqui **não era
+> **Correção de 11/08 (`NOVO-103`):** o "piso de ruído de 4 elementos" que aparecia aqui **não era
 > ruído** — era o relógio de minuto de `/justificativas/` mudando a largura dos dígitos numa fonte
 > proporcional, o mesmo defeito que o `075d77df` achou no `medir_campos_computados.py`. Com o texto
 > guardado ao lado do estilo, o comparador separa reflow de cascata e **o piso é 0**: duas capturas

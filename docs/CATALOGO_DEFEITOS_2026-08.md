@@ -6770,7 +6770,7 @@ dinâmicos, deliberadamente separados do estilo. O inventário fecha em **36 reg
 11 arquivos e 0 pseudo-regra**, contra 72 regras no início da classificação. A regra canônica possui
 a base, e os contextos restantes são variações medidas, não correções cegas. **E7c concluída.**
 
-### NOVO-101 · `NOVO` A 8b precisa de três portões, não de um; e o piso de ruído era o relógio · QA · fechada na medição
+### NOVO-103 · `NOVO` A 8b precisa de três portões, não de um; e o piso de ruído era o relógio · QA · fechada na medição
 
 Duas correções a coisas que **eu mesmo escrevi** nesta sessão, ambas achadas medindo.
 
