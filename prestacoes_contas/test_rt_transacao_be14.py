@@ -26,7 +26,6 @@ from __future__ import annotations
 
 import json
 from decimal import Decimal
-from unittest import expectedFailure
 from unittest import mock
 
 from django.test import TestCase
@@ -150,13 +149,11 @@ class RelatorioTecnicoTransacaoTests(PrestacaoFixturesMixin, TestCase):
             "a rota por relatório marca todos os pendentes",
         )
 
-    @expectedFailure
     def test_falha_no_meio_do_laco_nao_deixa_meia_gravacao_de_diaria(self):
-        """Cenário 4: o defeito. **Reprova antes da correção.**
+        """Cenário 4: era o defeito, e é a razão de `salvar_diarias_recebidas` ser atômica.
 
-        Marcado `expectedFailure` só neste commit, para a rede entrar verde antes de o
-        código mudar. O commit que cria o service tira o decorador — e se esquecer de
-        tirar, o `unittest` acusa "unexpected success" e reprova assim mesmo.
+        Reprovava no commit da rede (`Decimal('100.00') is not None`) e passou a valer
+        quando o laço saiu da view para o service com `@transaction.atomic`.
 
         Dois servidores no mesmo POST, e o `save` do segundo falha. Sem transação, o
         primeiro já está gravado no banco e o operador vê um valor pela metade — em
@@ -187,6 +184,102 @@ class RelatorioTecnicoTransacaoTests(PrestacaoFixturesMixin, TestCase):
             "sobrou meia gravação: o primeiro servidor ficou com valor e o segundo não",
         )
         self.assertIsNone(self.ps_b.diaria_valor_override)
+
+
+class AutosaveDoRtEUmaOperacaoSoTests(PrestacaoFixturesMixin, TestCase):
+    """Por que `salvar_rt_do_autosave` também é `@transaction.atomic`.
+
+    O decorador de dentro (`salvar_diarias_recebidas`) já segura o laço; este segura o
+    **conjunto** — texto do RT, diárias e marcação de status são uma operação só. Sem
+    ele, uma falha na marcação deixaria o texto gravado e o servidor ainda "pendente",
+    e é a marcação que faz a prestação aparecer como iniciada na lista.
+
+    Sem este teste o decorador de fora seria enfeite: nenhuma inversão o alcançaria.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.setUpPrestacaoFixtures()
+        self.fixture = self.criar_prestacao(numero=44)
+        self.ps = self.fixture.prestacoes_servidor[0]
+        self.relatorio = RelatorioTecnico.objects.create(prestacao=self.fixture.prestacao)
+
+    def test_falha_ao_marcar_status_desfaz_o_texto_do_rt(self):
+        from prestacoes_contas import rt_services
+
+        def explodir(_servidor_prestacao):
+            raise RuntimeError("falha ao marcar o status")
+
+        with mock.patch.object(rt_services, "marcar_servidor_em_preenchimento", explodir):
+            with self.assertRaises(RuntimeError):
+                rt_services.salvar_rt_do_autosave(
+                    self.relatorio,
+                    self.fixture.prestacao,
+                    fields={"motivo": "Não pode sobrar"},
+                    dirty_fields=["motivo"],
+                    escopo=rt_services.ESCOPO_SERVIDOR,
+                    servidor_prestacao=self.ps,
+                )
+
+        self.relatorio.refresh_from_db()
+        self.assertEqual(
+            self.relatorio.motivo,
+            "",
+            "o texto ficou gravado com o status não marcado: não é uma operação só",
+        )
+
+
+class DiariasRecebidasAtomicaSozinhaTests(PrestacaoFixturesMixin, TestCase):
+    """`salvar_diarias_recebidas` protege o laço **sozinha**, sem depender do chamador.
+
+    Existe porque a primeira inversão não provou o que eu achava que provava: tirar o
+    `@transaction.atomic` de `salvar_diarias_recebidas` **não** reprovava o cenário 4,
+    porque `salvar_rt_do_autosave` também é atômica e o decorador de fora segurava a
+    garantia — `atomic` aninhado vira SAVEPOINT, e o rollback acontecia de qualquer
+    jeito.
+
+    Isso deixaria a função pública sem rede própria: um chamador futuro que entrasse
+    direto — como o `BE-12` fez com `salvar_roteiro_do_oficio` — herdaria a meia
+    gravação de volta. Aqui ela é chamada sem invólucro nenhum, que é o cenário desse
+    chamador.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.setUpPrestacaoFixtures()
+        self.fixture = self.criar_prestacao(
+            numero=43,
+            servidores=[self.criar_servidor("Alfa"), self.criar_servidor("Beta")],
+        )
+        self.ps_a, self.ps_b = self.fixture.prestacoes_servidor
+
+    def test_chamada_direta_nao_deixa_meia_gravacao(self):
+        from prestacoes_contas.rt_services import salvar_diarias_recebidas
+
+        original = PrestacaoServidor.save
+        chamadas = []
+
+        def falhar_na_segunda(self_ps, *args, **kwargs):
+            chamadas.append(self_ps.pk)
+            if len(chamadas) == 2:
+                raise RuntimeError("falha no meio do laço, sem invólucro")
+            return original(self_ps, *args, **kwargs)
+
+        with mock.patch.object(PrestacaoServidor, "save", falhar_na_segunda):
+            with self.assertRaises(RuntimeError):
+                salvar_diarias_recebidas(
+                    self.fixture.prestacao,
+                    {
+                        f"ps-{self.ps_a.pk}-diaria_valor_override": "R$ 100,00",
+                        f"ps-{self.ps_b.pk}-diaria_valor_override": "R$ 200,00",
+                    },
+                )
+
+        self.ps_a.refresh_from_db()
+        self.assertIsNone(
+            self.ps_a.diaria_valor_override,
+            "sem invólucro atômico por fora, a própria função tem de segurar o laço",
+        )
 
 
 class MarcarServidoresPendentesTests(PrestacaoFixturesMixin, TestCase):
