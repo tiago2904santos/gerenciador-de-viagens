@@ -149,6 +149,29 @@
   --card-border: 1px solid var(--color-border);
   --card-shadow: var(--shadow-card);
 
+  /* NOVO-96 (E9): a familia visual de card existia SO em `03-theme-dark.css`.
+     Como `lists/list-header.css:85` e o proprio `.record-card__band` leem
+     `var(--card-family-bg)` em regra sem predicado de tema, no CLARO a leitura
+     era invalida e o fundo sumia: medido transparente no claro, contra a
+     superficie escura no escuro. O comentario acima da declaracao chama o
+     elemento de "faixa clara abaixo do titulo" — ele nao era faixa nenhuma.
+
+     Os valores sao os mesmos do arquivo escuro porque todos sao `var(--color-*)`,
+     que ja trocam por tema: a mesma expressao resolve claro aqui e escuro la.
+     Por isso as definicoes de `03-theme-dark.css:299-310` passam a ser
+     redundantes — ficam onde estao, e a E9-a decide se saem. */
+  --card-family-bg: var(--color-surface);
+  --card-family-header-bg: var(--color-surface-muted);
+  --card-family-header-image: linear-gradient(to right, color-mix(in srgb, var(--color-accent) 12%, transparent) 0, transparent 88px);
+  --card-family-border: var(--color-border);
+  --card-family-border-strong: var(--color-border-strong);
+  --card-family-shadow: var(--shadow-card);
+  --card-family-accent-bg: linear-gradient(180deg, var(--color-accent-hover) 0%, var(--color-accent) 100%);
+  --card-family-accent-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 18%, transparent),
+    0 0 10px color-mix(in srgb, var(--color-accent) 16%, transparent);
+  --card-family-accent-width: 8px;
+
   /* --------------------------------------------------------------------------
      Motion (duracao + easing + aliases semanticos)
      -------------------------------------------------------------------------- */

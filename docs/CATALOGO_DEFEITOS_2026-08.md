@@ -6282,3 +6282,56 @@ diff maior do qual você deduz.
 
 **Consequência para a E9-a:** volta para bisecção de verdade, ou para lotes pequenos medidos um a
 um. O custo que o atalho tentava evitar é real e tem de ser pago.
+
+### NOVO-96 ✅ RESOLVIDO · 🔴 `NOVO` A faixa de filtros não tinha fundo no tema claro · UI · 0,25 d
+
+Primeira entrega da **E9**, e um defeito visual real que estava escondido atrás de uma variável.
+
+`lists/list-header.css:85` declara, em regra **sem predicado de tema**:
+
+```css
+.list-header__rail {
+  /* Mesmo token da área interna dos cards (.record-card__band). */
+  background: var(--card-family-bg);
+```
+
+`--card-family-bg` existia **só** em `base/03-theme-dark.css:299`. No tema claro a leitura era
+inválida (*invalid at computed-value time*) e a propriedade caía para o valor inicial. Medido no
+navegador, antes:
+
+| elemento | claro | escuro |
+|---|---|---|
+| `.list-header__rail` | **transparente** | superfície escura |
+
+O comentário logo acima da declaração chama o elemento de "faixa clara abaixo do título". Ele não
+era faixa nenhuma: a barra de filtros de **toda lista do sistema** aparecia sem fundo no tema que o
+sistema mostra para quem nunca escolheu tema.
+
+**Correção.** As nove definições `--card-family-*` passam a existir também no `:root` de
+`base/tokens.css`. Os valores são **os mesmos** do arquivo escuro, sem uma vírgula de diferença,
+porque todos são `var(--color-*)` — a mesma expressão resolve claro no `:root` e escuro no bloco de
+tema. Como `tokens.css` carrega antes de `03-theme-dark.css`, o escuro continua ganhando com os
+próprios valores, e as definições de lá viraram redundantes (a E9-a decide se saem).
+
+**Prova, com o instrumento novo da etapa** (`sonda_mesmo_tema.py`: mesmo tema, dois estados de
+código, 41.754 elementos chaveados por caminho no DOM, `transition` e `animation` desligadas):
+
+| | |
+|---|---:|
+| elementos alterados no **claro** | **47**, em 33 das 86 capturas |
+| elementos alterados no **escuro** | **2** |
+
+Os 2 do escuro são `justificativas-lista`, e são **exatamente o piso de ruído** medido capturando a
+mesma base duas vezes — o mesmo par de caminhos, causado por conteúdo que varia entre capturas.
+**O tema escuro não se moveu.**
+
+### Anotação: o `.record-card__band` é outro defeito, e continua aberto
+
+Ao medir esta correção ficou claro que `.record-card__band` **não** é o mesmo caso, embora o
+comentário do `list-header.css` o cite como fonte. Ele segue transparente no claro depois da
+correção, porque a sua única declaração de fundo mora dentro de regra predicada em `dark`
+(`theme-dark-components.css:4942`): no claro não existe regra nenhuma para ele.
+
+É a classe "componente cujo desenho só existe no escuro" — a mesma que barrou a família **8b**
+(`NOVO-93`) e que apareceu na medição da **8g** (`NOVO-94`, com `.empty-state__mark`). Token não
+resolve; precisa de regra base, e isso é decisão de desenho.
