@@ -52,6 +52,12 @@ FORM_COMPONENTS_CSS: tuple[str, ...] = (
     "css/fields/file-picker.css",
 )
 
+# Famílias antes espalhadas em CSS de domínio precisam continuar depois de
+# todo o shell global, como eram quando chegavam pelos blocos extra_css.
+FORM_COMPONENTS_CSS_AFTER_SHELL: tuple[str, ...] = (
+    "css/fields/related-route-picker.css",
+)
+
 FORM_COMPONENT_IMPORTS: tuple[tuple[str, str], ...] = (
     (
         '@import url("./lists/cards.css");',
@@ -68,6 +74,7 @@ SHELL_CSS_WITH_FORM_COMPONENTS: tuple[str, ...] = (
     SHELL_CSS[:_FORM_CSS_INSERT_AT]
     + FORM_COMPONENTS_CSS
     + SHELL_CSS[_FORM_CSS_INSERT_AT:]
+    + FORM_COMPONENTS_CSS_AFTER_SHELL
 )
 
 SHELL_JS: tuple[str, ...] = (

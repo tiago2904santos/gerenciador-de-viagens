@@ -745,6 +745,15 @@ folha; a extração deve mover a família compartilhada antes de retirar o prime
 > e somente na variante consumidora. São mais **6.496 bytes** fora das rotas sem o enhancer e
 > **59.338 bytes** acumulados entre date/file/search/custom-select.
 
+> **Sexta fatia fechada em 11/08 (`UI-04`/`HT-04`, parcial).** Justificativas deixou de carregar
+> `oficios.css`, `roteiros.css` e `termos.css`. As 32 regras compartilhadas efetivamente usadas
+> pelo cadastro rápido foram reunidas em `fields/related-route-picker.css`, após o shell para
+> manter a precedência anterior. A rota caiu de **753.913 para 625.201 bytes entregues**
+> (**-128.712 bytes**) e subiu de **11,3912% para 13,5547% de uso**. O painel aberto preservou
+> **233 nós**, geometria e estilos computados em claro/escuro a 1440/800/500 px. Ofícios,
+> Roteiros, Termos e Ordem de Serviço também mantiveram assinaturas de estilo idênticas nas seis
+> combinações.
+
 **Passo a passo.** Extraia os componentes compartilhados dos arquivos de domínio para
 `fields/`, `actions/`, `lists/` e `feedback/`, domínio por domínio, e derrube o import correspondente. Dimensione com a
 régua da E0: o que não é usado na rota não devia estar sendo entregue nela.
