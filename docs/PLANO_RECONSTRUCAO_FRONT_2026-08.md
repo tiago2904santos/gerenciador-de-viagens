@@ -720,8 +720,8 @@ tem que bater: uso acima de 35% por rota**, contra os 10,1%–11,8% de hoje.
 3. **`JS-08`** — corte por componente, não pelo bloco. A coluna "templates que usam" do enunciado
    original estava errada: `segment-nav.js` chega a ≥4 templates e `file-picker.js` a ≥6, por
    `{% include %}` com variável. O ganho é menor do que o catálogo prometia.
-4. **`JS-09`** — `templates/documentos/geracao_aguarde_embedded.html:27` é documento autônomo que
-   carrega 264 KB para usar `CV.http.fetchJson` (3,3 KB).
+4. **`JS-09` ✅** — o documento autônomo entrega `core/http.js` antes do polling e não carrega mais
+   `shell.bundle.js`: **283.282 → 4.255 bytes** de JavaScript específico da rota (−98,5%).
 5. **`JS-10`** — decidir os stubs de 3 linhas do editor de roteiros (`state.js`, `retorno.js`,
    `diarias.js`): completar a extração ou removê-los. **Depende do `BE-13`** — pergunte.
 

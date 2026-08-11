@@ -1728,12 +1728,18 @@ função compartilhada.
 > **Consequência:** o ganho de separar o bundle é menor do que o catálogo prometia, e o corte tem
 > que ser decidido por componente, não pelo bloco inteiro.
 
-### JS-09 🟡 Tela de espera de documento carrega 264 KB para usar 3,3 KB · AUD · 0,5 d
+### JS-09 ✅ RESOLVIDO (E11) · Tela de espera de documento carregava o bundle inteiro para usar 3,3 KB · AUD · 0,5 d
 
 `templates/documentos/geracao_aguarde_embedded.html:27` é um documento autônomo (não estende
 `base.html`) que carrega `shell.bundle.js` inteiro. O único uso de `CV.*` na tela é
 `CV.http.fetchJson` (`document-generation-wait.js:10`), definido em `core/http.js` (116 linhas).
 A tela só mostra um spinner e faz polling.
+
+**Fechado na E11.** A tela embutida agora entrega `core/http.js` diretamente antes de
+`document-generation-wait.js`; `shell.bundle.js` não participa mais desse documento autônomo. Na
+medição atual, o JavaScript específico da rota caiu de **283.282 para 4.255 bytes** (−279.027;
+**−98,5%**), preservando o contrato `CV.http.fetchJson`. O teste da resposta 202 trava presença,
+ausência e ordem dos dois scripts para impedir a regressão silenciosa.
 
 ### JS-10 🟡 Modularização do editor de roteiros é fachada · AUD · 0,25 d ou 3+ d
 
