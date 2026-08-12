@@ -544,7 +544,8 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       `cadastros/views.py` era o único que obrigava o gate do `S-06` a ler com `utf-8-sig`
 - [~] `BE-23` vocabulário de rotas divergente — **sufixo CRUD fechado** (28 rotas PT→EN,
       com catraca). Resta o vocabulário dos outros 75% dos nomes, que é decisão de sistema
-- [ ] `BE-24` 89 MB de screenshots e 175 arquivos indevidos no repositório
+- [x] `BE-24` artefatos locais removidos após extrair o corpus — **135 arquivos / 43,18 MiB**;
+      `.gitignore` impede a reentrada
 - [x] `BE-25` decidir qual UI Lab é o vigente — **decidido e executado no PR #247: nenhum dos
       dois.** A cascata (7 componentes órfãos + 1 de segunda ordem, `main` vermelho em 8 testes)
       ficou para trás e foi fechada como `NOVO-44`

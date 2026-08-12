@@ -1034,7 +1034,7 @@ parte das rotas de `core` só existe sob `settings.DEBUG` (`core/urls.py:18`), e
 passar. Segundo teste é o piso de 70 nomes com sufixo do padrão, para ninguém "padronizar" apagando
 o sufixo em vez de traduzi-lo.
 
-### BE-24 🟡 Repositório com 133 MB de pack e 175 arquivos indevidos · MED+VER · 1 d
+### BE-24 ✅ RESOLVIDO · Repositório com 133 MB de pack e arquivos indevidos · MED+VER · 1 d
 
 `git count-objects -vH` → **size-pack 132,98 MiB** (5 packs), medido na verificação. A primeira
 medição desta sessão deu 106,02 MiB; a diferença são commits entrados depois, na mesma sessão —
@@ -1056,6 +1056,16 @@ estar: `tmp/` (23), `media_teste/` (6), `migration_backups/` (2, um deles um `.d
 > `BE-24` leva a régua embora junto com as imagens.
 >
 > `ui_lab2/` também sobreviveu, como diretório de `__pycache__` — virou o `NOVO-69`.
+
+**Fechado após a E0.** O corpus canônico já estava em `scripts/rotas_do_sistema.py`, portanto a
+poda não levou a régua de 43 rotas. A remedição encontrou **135 arquivos / 43,18 MiB** ainda
+rastreados: 90 sob `screenshots/`, 23 em `tmp/`, 7 em `.tmp-*`, 6 em `media_teste/`, 2 backups de
+migração, 2 logs e 5 artefatos na raiz. A varredura de repositório mostrou zero consumidores fora
+dos próprios artefatos e dos textos que registravam o defeito.
+
+Todos saíram do índice Git e continuam recuperáveis pelo histórico. `.gitignore` agora bloqueia
+essas famílias, inclusive dumps, capturas, logs de runserver e `_tmp_check*.py`. `manage.py check`
+e os 37 testes dos instrumentos de front/shell passaram depois da remoção.
 
 ### BE-25 ✅ RESOLVIDO · 🟡 Dois UI Labs concorrentes, sem regra de qual é o vigente · AUD · 0,75 d
 
