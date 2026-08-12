@@ -1,90 +1,40 @@
-# Assinatura com etiqueta (compatibilidade conceitual com CV 2.0)
+# Assinatura de documentos — contrato vigente
 
-Este documento descreve a integração da **etiqueta visual de assinatura** no Central de Viagens 3.0, alinhada em comportamento ao 2.0, **sem** importar código, caminhos ou templates do repositório legacy em runtime.
+Este documento descreve os dois fluxos de arquivo assinado que existem no Central de Viagens.
+O antigo backend criptográfico baseado em pyHanko foi removido junto com os campos de assinatura
+de `DocumentoArtefato` na migration `documentos/0003_remove_assinatura_fields.py`.
 
-## Estado dos modelos
+## 1. Anexo manual de PDF assinado
 
-### `DocumentoArtefato`
+`DocumentoArtefato` guarda o PDF gerado e, opcionalmente, um PDF assinado fora do sistema. O
+serviço `documentos.services.persistence.anexar_arquivo_assinado`:
 
-- `arquivo` / `arquivo_assinado`: ficheiros PDF (original e com etiqueta aplicada).
-- `hash_sha256` / `hash_sha256_assinado`: digest SHA-256 do original e do assinado.
-- `assinatura_backend`: identifica o motor usado (ex.: fluxo pyHanko existente ou `etiqueta_pdf`).
-- `assinado_em`, `formato`, etc.: metadados usuais do documento.
+- aceita somente nome `.pdf` e conteúdo que começa com a assinatura binária de PDF;
+- calcula SHA-256 e cria uma `DocumentoAssinaturaVersao` imutável;
+- preserva versões anteriores quando o arquivo é substituído;
+- faz o download preferir o arquivo assinado enquanto ele estiver ativo.
 
-### `AssinaturaDigital`
+Remover o anexo revoga a versão corrente, mas não apaga o histórico. Esse fluxo registra e
+preserva um documento recebido; ele não valida certificado digital, PAdES ou cadeia ICP-Brasil.
 
-- FK ao artefato; `status`, `hash_documento`, `hash_documento_assinado`, `appearance`, `evidencias`.
-- Campos da etiqueta: `codigo_verificacao`, `nome_assinante`, `cpf_assinante`, `email_assinante`, `url_validacao`, `posicao_carimbo_json`, `pagina_carimbo`, `ip_assinatura`, `user_agent`, etc.
+## 2. Assinatura eletrônica da prestação de contas
 
-## Dois backends de assinatura
+Relatórios técnicos e diários de bordo usam `prestacoes_contas.AssinaturaDocumento`. Após confirmar
+a identidade esperada, o sistema recebe a imagem da assinatura, aplica um carimbo ao PDF com
+`pypdf` + `reportlab`, grava posição, instante, IP, hash do documento de origem e um código de
+verificação. A implementação vive em `prestacoes_contas/assinatura_services.py`.
 
-1. **pyHanko** (existente): assinatura criptográfica embutida no PDF; validação via `pyhanko` em `verificar_pdf_bytes`.
-2. **Etiqueta PDF** (`assinatura_backend="etiqueta_pdf"`): carimbo visual + QR + metadados; a validação **não** passa pela cadeia ICP-Brasil do ficheiro; confia-se no registo `AssinaturaDigital` e na **integridade do ficheiro** (hash do PDF servido vs. hash guardado).
+O hash e o código dão rastreabilidade ao registro da aplicação. Eles não transformam o carimbo em
+assinatura digital qualificada. Quando houver exigência jurídica de ICP-Brasil, a assinatura deve
+ser realizada por uma solução institucional externa e o PDF resultante pode entrar pelo fluxo de
+anexo manual.
 
-Em `assinaturas.services.verification.verificar_artefato_documento`, se o backend for `etiqueta_pdf`, usa-se `_verificar_artefato_etiqueta_pdf` (registo + `assinatura_arquivo_esta_integra`). Caso contrário mantém-se a validação embutida + confronto de hash.
+## Dependências e provas
 
-## Fluxos principais
+- `pypdf` e `reportlab`: composição do carimbo no PDF;
+- `hashlib` da biblioteca padrão: integridade e rastreabilidade;
+- `documentos/tests/test_assinatura_manual.py`: anexo, substituição, histórico, remoção e download;
+- `prestacoes_contas/tests_assinatura.py` e `prestacoes_contas/test_assinatura_publica.py`:
+  identidade, carimbo, código e acesso público.
 
-### Assinar com etiqueta (utilizador autenticado)
-
-- URL: `/assinaturas/artefatos/<uuid>/assinar/` (nome `assinaturas:assinatura-assinar-artefato`).
-- GET: página com PDF.js para posicionar a caixa da etiqueta.
-- POST: parâmetros `sig_x`, `sig_y`, `sig_w`, `sig_h`, `sig_page`, dados opcionais do assinante; chama `assinar_artefato_com_etiqueta` e redireciona para a página pública de verificação com o código gerado.
-
-### Verificação pública por código
-
-- URL: `/assinaturas/verificar/<codigo>/`.
-- A view usa `validar_assinatura_por_codigo` para obter existência, motivo e flag `integra`; o template distingue **documento íntegro** vs **alterado / inválida** com base em `status_integridade_registro`.
-
-### PDFs inline (verificação)
-
-- Originais e assinados servidos com `Content-Disposition: inline` onde aplicável, sujeitos às mesmas regras de acesso definidas nas views.
-
-## Comando de gestão
-
-```bash
-python manage.py diagnosticar_assinatura_pdf <codigo>
-```
-
-Imprime: existência, IDs, hashes esperado/atual, `integra`, disponibilidade do PDF assinado, motivo e dados de posição do carimbo. Útil para suporte e auditoria operacional.
-
-## Limitação legal / ICP-Brasil
-
-A etiqueta **não substitui** assinatura qualificada ICP-Brasil. Garante **rastreabilidade** e **integridade** relativamente ao registo na aplicação (hash + código). Para requisitos legais de assinatura avançada, use o fluxo pyHanko / política institucional adequada.
-
-## Dependências relevantes
-
-- `pypdf` e `reportlab` (intervalos em `requirements/base.txt`): composição do PDF e overlay da etiqueta.
-- `pyHanko`: validação do backend criptográfico.
-
-## Ficheiros-chave (referência)
-
-| Área | Ficheiros |
-|------|-----------|
-| Carimbo | `assinaturas/services/carimbo_pdf.py` |
-| Códigos | `assinaturas/services/codigos.py` |
-| Hash | `assinaturas/services/hash.py` |
-| Serviço etiqueta | `assinaturas/services/assinatura_artefato.py` |
-| Validação por código | `assinaturas/services/validacao_codigo.py` |
-| Verificação API | `assinaturas/services/verification.py` |
-| Vistas | `assinaturas/views.py`, `assinaturas/urls.py` |
-| Templates | `templates/assinaturas/verificar_codigo.html`, `templates/assinaturas/assinar_artefato.html` |
-| Estilos | `static/css/assinaturas.css` (import em `static/css/style.css`) |
-| Integração UI | `assinaturas/presenters.py`, templates em `oficios`, etc. |
-| Comando | `assinaturas/management/commands/diagnosticar_assinatura_pdf.py` |
-| Testes | `assinaturas/tests/test_*.py` |
-
-## Riscos e mitigação
-
-| Risco | Mitigação |
-|-------|-----------|
-| Conflito de versões `pypdf` / signing | Testes `documentos` + `assinaturas` após alterações de dependências. |
-| PDF público por código | Código opaco + verificação limitada a metadados e integridade; evitar expor listagens. |
-| Duplicar assinatura no mesmo artefato | UI e `presenters` devem refletir `assinatura_backend` e estado do ficheiro. |
-
-## Critérios de aceite (resumo)
-
-- `python manage.py check` sem erros.
-- Testes das apps `assinaturas`, `documentos` e integrações (`oficios` onde existir) a verde.
-- Etiqueta com medidas/cores conforme especificação de produto; QR apontando para `/assinaturas/verificar/<codigo>/`.
-- Nenhum import ou path do repositório 2.0 em código de produção.
+Não há import, configuração ou caminho de execução de pyHanko no código de produção.
