@@ -2,9 +2,12 @@
 
 Três caminhos de escrita em `diario_views.py`, nenhum em transação:
 
-1. **O autosave**, que grava `linha.save(update_fields=[campo])` **um por campo sujo**
-   dentro de um laço, e depois `diario.save()`. Digitar km inicial e km final da mesma
-   linha são duas gravações; uma falha entre elas deixa metade.
+1. **O autosave**, que grava `linha.save(...)` dentro de um laço e depois `diario.save()`.
+   Duas linhas sujas são duas gravações; uma falha entre elas deixa metade.
+   (Quando esta fatia foi escrita o laço era **por campo sujo**, e o teste da falha
+   injetava na segunda gravação da *mesma* linha. O `NOVO-116` juntou os campos de uma
+   linha numa gravação só — o estado intermediário violava o `diario_trecho_km_ordenado`
+   —, então o ponto de injeção passou a ser a **segunda linha**. A garantia é a mesma.)
 2. **A troca de motorista/viatura**, que grava três vezes: o form do diário, a prévia de
    "informações complementares" do RT, e a marcação de status. Uma falha no meio deixa o
    motorista trocado com o texto do RT desatualizado — e é justamente o texto que explica
@@ -64,7 +67,9 @@ class DiarioAutosaveTests(PrestacaoFixturesMixin, TestCase):
             numero=71,
             servidores=[self.criar_servidor("Um DB"), self.criar_servidor("Dois DB")],
         )
-        _com_roteiro(self.fixture.oficio)
+        # Duas linhas: é o que o teste da falha no meio do laço precisa medir desde que
+        # o `NOVO-116` passou a gravar uma vez por linha. Os demais só usam a `form-0`.
+        _com_roteiro(self.fixture.oficio, trechos=2)
         self.prestacao = self.fixture.prestacao
         self.ps_a, self.ps_b = self.fixture.prestacoes_servidor
         self.diario, _ = DiarioBordo.objects.get_or_create(prestacao=self.prestacao)
@@ -138,12 +143,16 @@ class DiarioAutosaveTests(PrestacaoFixturesMixin, TestCase):
     def test_falha_no_meio_do_laco_nao_deixa_meia_gravacao(self):
         """O defeito, e a garantia que esta fatia entrega.
 
-        Dois campos sujos da mesma linha, e a segunda gravação falha. Sem transação, o
-        primeiro campo já está no banco — o operador vê km inicial gravado e km final
-        não, sem nada dizendo que faltou.
+        Duas linhas sujas, e a gravação da segunda falha. Sem transação, a primeira já
+        está no banco — o operador vê uma linha salva e a outra não, sem nada dizendo
+        que faltou.
 
         Reprovava no commit da rede; passou a valer quando o laço foi para dentro de
         `salvar_autosave_do_diario`, que é `@transaction.atomic`.
+
+        O ponto de injeção era a segunda gravação da *mesma* linha, quando o laço ainda
+        era por campo sujo. O `NOVO-116` juntou os campos de uma linha numa gravação só,
+        então passou a ser a segunda **linha** — mesma garantia, mesma rede.
         """
         original = DiarioBordoTrecho.save
         chamadas = []
@@ -163,13 +172,14 @@ class DiarioAutosaveTests(PrestacaoFixturesMixin, TestCase):
         with mock.patch.object(DiarioBordoTrecho, "save", falhar_na_segunda):
             with self.assertRaises(RuntimeError):
                 self.autosave_por_diario(
-                    **{"form-0-km_inicial": "500", "form-0-km_final": "900"}
+                    **{"form-0-km_inicial": "500", "form-1-km_inicial": "700"}
                 )
 
+        self.assertEqual(len(chamadas), 2, "o laço não chegou à segunda linha")
         linha = self._linhas()[0]
         self.assertIsNone(
             linha.km_inicial,
-            "sobrou meia gravação: o primeiro campo entrou e o segundo não",
+            "sobrou meia gravação: a primeira linha entrou e a segunda não",
         )
 
 

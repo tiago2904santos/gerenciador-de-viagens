@@ -7762,3 +7762,44 @@ próximo; trocar os hiddens ainda não salvos para `29–31/08` troca a lista; l
 dois. O segundo cenário exige o botão, seu estado visual, foco e limpeza; o terceiro reinicializa o
 enhancer e exige um único listener delegado no formulário. O teste Django do template trava hook e
 nome acessível da ação `data-evento-doc-clear`.
+
+### NOVO-116 ✅ RESOLVIDO · 🔴 `NOVO` O `CHECK` de km do diário entrou sem o produtor: 500 na tela, e edição válida derrubada · BE · 0,5 d
+
+Achado ao aplicar as migrações pendentes num banco de desenvolvimento com dado real. A
+`prestacoes_contas/0033` pôs o `diario_trecho_km_ordenado` no banco sem tocar em quem escreve —
+exatamente o preço que o `NOVO-36` já tinha registrado: *"pôr o `CHECK` antes de consertar o produtor
+troca dado silenciosamente errado por erro 500 numa tela de uso diário. A constraint entra no mesmo
+PR da correção."* Ela entrou sozinha, e a tela do diário de bordo tem dois caminhos de gravação:
+
+1. **Autosave (o caminho normal, com JS).** `salvar_autosave_do_diario` grava sem `full_clean` e
+   nenhuma das duas views trata `IntegrityError`. Km final menor que o inicial virava **500 sem
+   mensagem**, num campo digitado à mão pelo operador.
+2. **Formset (sem JS).** Recusava, mas com o texto que o Django monta para log:
+   `Restrição "diario_trecho_km_ordenado" foi violada.`
+
+**E um terceiro efeito, pior, sem dado inválido nenhum.** O laço gravava um `UPDATE` **por campo
+sujo**, e o payload do autosave não promete ordem. Corrigir uma linha de `100→200` para `5000→6000`
+passava por um estado intermediário que mistura o km novo com o antigo do par — `km_inicial=5000`
+contra o `km_final=200` ainda não gravado — e violava a constraint no meio do caminho. Edição
+perfeitamente válida, 500 intermitente por ordem de dicionário.
+
+**Correção.** O laço passou a agrupar os campos sujos **por linha**: uma gravação por linha, com o
+estado intermediário deixando de existir. Antes de gravar, `validate_constraints()`; a violação vira
+`DiarioValidacaoError` (erro de domínio, no molde do `DelecaoProtegidaError` de `core/deletion.py`),
+e as duas views a traduzem em `autosave_json_response(ok=False, ...)` — 400 com texto, que o
+`autosave.js` já sabia exibir desde sempre. Nenhum JS mudou. A mensagem legível vem de
+`violation_error_message` na própria constraint, via um parâmetro novo em
+`core/constraints.py::periodo_ordenado`, então vale para todo caminho que chame
+`validate_constraints()`. A migração `0036` que isso gera é `(no-op)` em SQL — só o texto do erro
+faz parte do `deconstruct()`.
+
+**Prova por inversão.** Com o conserto retirado e os testes mantidos, 5 erros e 1 falha: os quatro
+cenários de km invertido estouram `IntegrityError` em vez de 400, o formset devolve o texto da
+constraint, e `test_trocar_os_dois_km_para_valores_maiores_grava` — que **não tem dado inválido** —
+cai junto, que é a medida do terceiro efeito. `km_final == km_inicial` passa nos dois lados: é a
+razão do `gte`, e serve de controle.
+
+**Efeito colateral no `BE-14`.** `test_falha_no_meio_do_laco_nao_deixa_meia_gravacao` injetava a
+falha na segunda gravação da *mesma* linha — o laço por campo que deixou de existir. A garantia é a
+mesma e continua medida; o ponto de injeção passou a ser a **segunda linha**. O comentário do teste
+já avisava que esse ponto tinha mudado uma vez antes.
