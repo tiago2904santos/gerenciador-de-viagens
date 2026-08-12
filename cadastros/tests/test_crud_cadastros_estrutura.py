@@ -76,6 +76,15 @@ class CombustivelCrudTests(TestCase):
         self.assertRedirects(response, reverse("cadastros:combustiveis_index"))
         self.assertFalse(Combustivel.objects.filter(pk=combustivel.pk).exists())
 
+    def test_lista_usa_ct_como_marcador_do_catalogo(self):
+        Combustivel.objects.create(area=area_de_teste(), nome="GASOLINA")
+
+        response = self.client.get(reverse("cadastros:combustiveis_index"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["rows"][0]["avatar"], "CT")
+        self.assertContains(response, "CT")
+
 
 @override_settings(ALLOWED_HOSTS=["testserver", "localhost"])
 class SimpleListCsrfTests(TestCase):

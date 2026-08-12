@@ -3794,14 +3794,22 @@ demorem mais de duas horas ainda colidem. A correção completa é `Roteiro` ter
 usuário criador —, o que é migração e entra em `DB-02`/Fase 2 quando o modelo for mexido de todo
 jeito. Registrado aqui para não se perder.
 
-### QA-17 ⚪ Treze PRs abertos sem triagem · MED · 1 d
+### QA-17 ✅ RESOLVIDO · Dezessete PRs abertos sem triagem · MED · 1 d
 
-PRs #4, #7, #10, #13, #14, #16, #27, #32, #44, #58, #137, #144 são de maio–julho/2026; #178 é de
-05/08. O plano antigo já registrava que #27, #32 e #44 foram resolvidos por outros caminhos, e os
-PRs seguem abertos.
-**Não foi possível medir daqui se ainda aplicam:** o clone desta sessão é *shallow* (128 commits),
-então `git diff main...branch` responde "no merge base" para todos. Precisa de histórico completo
-ou da API do GitHub. **Decisão humana.**
+A API e o histórico completo mostraram **17**, não 13, PRs abertos no início da triagem. Onze
+rascunhos obsoletos foram fechados com evidência da implementação vigente ou da remoção do código:
+#7, #10, #13, #14, #16, #27, #32, #44, #137, #144 e #178. O lote #287 misturava 19 upgrades,
+incluindo Django 5.2→6.1 e WeasyPrint 68→69, com CI vermelho; foi fechado para o `QA-08` seguir em
+fatias atribuíveis.
+
+Dois resíduos ainda válidos foram reaplicados sobre a arquitetura atual, com teste e catálogo:
+#58 virou o `NOVO-115` no PR #358; #4 virou o `NOVO-117` no PR #359. Os rascunhos antigos foram
+fechados sem merge. Por fim, #187, #188 e #189 foram atualizados contra a `main`, passaram a suíte
+completa e foram mesclados separadamente, elevando `actions/checkout` 4→7,
+`appleboy/ssh-action` 1.0.3→1.2.5 e `actions/setup-python` 5→7.
+
+**Resultado:** a fila antiga foi zerada; nenhum diff obsoleto, sem merge-base ou com gate vermelho
+foi incorporado por conveniência.
 
 ---
 
@@ -7762,3 +7770,15 @@ próximo; trocar os hiddens ainda não salvos para `29–31/08` troca a lista; l
 dois. O segundo cenário exige o botão, seu estado visual, foco e limpeza; o terceiro reinicializa o
 enhancer e exige um único listener delegado no formulário. O teste Django do template trava hook e
 nome acessível da ação `data-evento-doc-clear`.
+
+### NOVO-117 ✅ RESOLVIDO · `NOVO` Marcador de combustível ainda usava CB em vez de CT · UI · 0,1 d
+
+A triagem do PR #4 encontrou uma intenção válida sobre uma implementação já substituída. Os três
+templates antigos de combustível não existem mais; a tela atual usa o renderer unificado de listas.
+Nele, o avatar ainda derivava letras do nome do combustível e conservava `CB` como fallback, e o
+cabeçalho não declarava o marcador do catálogo.
+
+**Correção.** O presenter agora entrega `CT` como marcador estável de combustível e a página passa
+o mesmo `brand_mark` ao cabeçalho compartilhado. Um teste do CRUD cria `GASOLINA` para provar que
+o resultado é `CT`, não as iniciais `GA`, e verifica a renderização. O rascunho antigo não foi
+mesclado; a intenção foi reaplicada sobre a arquitetura vigente.
