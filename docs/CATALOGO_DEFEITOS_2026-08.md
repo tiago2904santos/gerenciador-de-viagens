@@ -3297,11 +3297,16 @@ a11y automatizado (axe-core via Playwright, já disponível no ambiente) é inve
 de contrato legítimas —, mas é o número a olhar quando um app "tem cobertura" e ainda assim
 regride.
 
-### QA-14 ⚪ CRUD de modelos de texto do Relatório Técnico sem teste · AUD · 0,5 d
+### QA-14 ✅ RESOLVIDO (993e14c5) · CRUD de modelos de texto do Relatório Técnico sem teste · AUD · 0,5 d
 
 `prestacoes_contas/model_views.py` — 66 statements, **25,76%**. As quatro views (`:19-137`) têm a
 lógica de criação, edição e exclusão inteiramente fora da cobertura, incluindo o filtro por área
 (`:25` e `:92`).
+
+**Reconciliação em 12/08.** O defeito já havia sido fechado por `993e14c5`, mas o status não foi
+atualizado. `prestacoes_contas/test_modelos_texto.py` tem sete testes: index, campo válido e
+inválido na criação, criar, editar, excluir e isolamento de outra área. Eles cobrem as quatro views
+e os redirects que antes levantavam `NameError`; a execução focada passou 7/7.
 
 ### QA-15 ⚪ Caminhos de erro da geração de PDF sem teste · AUD+VER · 1,5 d
 

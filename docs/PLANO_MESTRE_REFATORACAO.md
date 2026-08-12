@@ -531,7 +531,8 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
 - [ ] `QA-16` sem rastreamento de erro centralizado
 - [ ] `QA-10` `/metrics/` conta só o worker que atendeu
 - [ ] `QA-05` cliente real do Google Drive com 42,5% de cobertura
-- [ ] `QA-14` CRUD de modelos do Relatório Técnico sem teste
+- [x] `QA-14` CRUD de modelos do Relatório Técnico — já fechado por 7 testes em `993e14c5`;
+      status reconciliado
 - [ ] `QA-15` caminhos de erro da geração de PDF sem teste
 - [ ] `QA-13` 218 testes "magros" — número a olhar, não meta a perseguir
 
