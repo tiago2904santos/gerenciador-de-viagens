@@ -15,6 +15,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
@@ -66,6 +67,18 @@ class DocumentoPreviewJSONEncoder(DjangoJSONEncoder):
 TERMOS_PER_PAGE = 15
 
 
+class TermosPaginator(Paginator):
+    """Paginator cujo total ja veio da agregacao das abas (`DB-11`)."""
+
+    def __init__(self, object_list, per_page, *, known_count):
+        self.known_count = known_count
+        super().__init__(object_list, per_page)
+
+    @cached_property
+    def count(self):
+        return self.known_count
+
+
 
 
 # Duas listas: o termo sem servidor e sem viatura nao tem o que mostrar no card
@@ -100,7 +113,10 @@ def index(request):
         for chave, label in ABAS_TERMO
     ]
 
-    paginator = Paginator(termos, TERMOS_PER_PAGE)
+    # A agregacao acima ja calculou exatamente o total da aba ativa. Reusar esse
+    # numero evita executar a mesma busca pesada uma terceira vez no `.count()`
+    # interno do Paginator (`DB-11`).
+    paginator = TermosPaginator(termos, TERMOS_PER_PAGE, known_count=contagem[aba])
     page_obj = paginator.get_page(request.GET.get("page"))
     # `NOVO-08`: uma consulta para os artefatos da página inteira. Sem o mapa,
     # `termo_cadastro_assinado_info` consultava uma vez por linha.
