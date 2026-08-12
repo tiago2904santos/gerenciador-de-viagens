@@ -33,13 +33,14 @@ def is_excel_pdf_available() -> bool:
         excel.Visible = False
         return True
     except Exception:
+        logger.debug("Excel COM indisponível", exc_info=True)
         return False
     finally:
         if excel is not None:
             try:
                 excel.Quit()
             except Exception:
-                pass
+                logger.debug("Falha ao encerrar Excel após probe", exc_info=True)
 
 
 def convert_xlsx_to_pdf_excel_com(xlsx_bytes: bytes) -> bytes:
@@ -73,11 +74,11 @@ def convert_xlsx_to_pdf_excel_com(xlsx_bytes: bytes) -> bytes:
                 try:
                     excel.Quit()
                 except Exception:
-                    pass
+                    logger.debug("Falha ao encerrar Excel após conversão", exc_info=True)
             try:
                 pythoncom.CoUninitialize()
             except Exception:
-                pass
+                logger.debug("Falha em CoUninitialize do Excel", exc_info=True)
         if not out_path.is_file():
             raise RuntimeError(_EXCEL_ERR)
         return out_path.read_bytes()

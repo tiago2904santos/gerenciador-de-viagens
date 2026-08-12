@@ -34,13 +34,14 @@ def is_word_pdf_available() -> bool:
         word.Visible = False
         return True
     except Exception:
+        logger.debug("Word COM indisponível", exc_info=True)
         return False
     finally:
         if word is not None:
             try:
                 word.Quit(SaveChanges=0)
             except Exception:
-                pass
+                logger.debug("Falha ao encerrar Word após probe", exc_info=True)
 
 
 def convert_docx_to_pdf_word_com(docx_bytes: bytes) -> bytes:
@@ -102,11 +103,11 @@ def _convert_via_win32com(docx_bytes: bytes) -> bytes:
                 try:
                     word.Quit(SaveChanges=0)
                 except Exception:
-                    pass
+                    logger.debug("Falha ao encerrar Word após conversão", exc_info=True)
             try:
                 pythoncom.CoUninitialize()
             except Exception:
-                pass
+                logger.debug("Falha em CoUninitialize do Word", exc_info=True)
         if not out_path.is_file():
             raise RuntimeError(_WORD_ERR)
         return out_path.read_bytes()

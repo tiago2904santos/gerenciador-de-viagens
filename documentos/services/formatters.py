@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import re
 from decimal import ROUND_HALF_UP
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from typing import Final
 
 # Partículas comuns em títulos (minúsculas quando não são o primeiro token).
@@ -239,7 +239,7 @@ def format_currency_br(value: object) -> str:
         return ""
     try:
         d = Decimal(str(value))
-    except Exception:
+    except (InvalidOperation, TypeError, ValueError):
         return ""
     q = d.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
     neg = q < 0

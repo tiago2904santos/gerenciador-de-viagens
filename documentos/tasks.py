@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from core.errors import capture
+
 try:
     from celery import shared_task
 except ModuleNotFoundError:
@@ -58,6 +60,7 @@ def gerar_documento_assincrono(job_id: str) -> None:
         response = gerar_resposta_do_job(job)
         concluir_job(job, response)
     except Exception as exc:
+        capture(exc, "documentos.gerar_documento_assincrono", job_id=str(job.pk))
         falhar_job(job, exc)
 
 

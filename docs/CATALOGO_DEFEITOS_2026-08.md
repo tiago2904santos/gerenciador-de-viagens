@@ -892,6 +892,12 @@ Onze foram eliminados: conversões esperadas agora capturam exceções específi
 importação geográfica, configuração de justificativa, auditoria, tenancy e encerramento de sessão
 entram em `capture()` com contexto estável. O saldo caiu para 62, e 41 testes direcionados passaram.
 
+**Fatia 2.** O domínio documental passou a observar falhas de tarefa/fila, resolução do ator,
+storage e telemetria; probes e limpeza de COM registram diagnóstico em nível debug; conversão
+decimal captura apenas erros esperados. A régua também foi corrigida para não chamar de “mudo” um
+handler que relança a exceção. Saldo real: **39**. Dos 176 testes de `documentos`, 175 passaram e
+somente a importação conhecida do WeasyPrint ficou bloqueada pela `libgobject` ausente no Windows.
+
 ### BE-19 ✅ RESOLVIDO · `require_area_role` tem zero usos · AUD · 1,5 d
 
 `core/permissions.py:28` define `require_area_role(minimum_role)`; grep fora de testes: **zero
