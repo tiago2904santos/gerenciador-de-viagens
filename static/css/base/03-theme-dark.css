@@ -203,6 +203,10 @@ html[data-theme="dark"] {
     0 0 0 1px color-mix(in srgb, var(--color-accent) 18%, transparent),
     0 0 10px color-mix(in srgb, var(--color-accent) 16%, transparent);
   --card-family-accent-width: 8px;
+  --entity-card-inner-bg: var(--color-surface-soft);
+  --wizard-card-bg: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  --wizard-panel-bg: var(--color-surface-soft);
+  --wizard-field-bg: var(--wizard-card-bg);
   --theme-surface-card: var(--color-surface);
   --theme-surface-card-soft: var(--color-surface-soft);
   --theme-border-card: var(--color-border);

@@ -10,11 +10,13 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.base_path = Path(settings.BASE_DIR) / "templates" / "base.html"
         css_root = Path(settings.BASE_DIR) / "static" / "css"
         self.tokens_path = css_root / "base" / "03-theme-dark.css"
+        self.base_tokens_path = css_root / "base" / "tokens.css"
         self.components_path = css_root / "components" / "theme-dark-components.css"
         self.page_shell_path = css_root / "layout" / "page-shell.css"
         self.list_header_path = css_root / "lists" / "list-header.css"
         self.base = self.base_path.read_text(encoding="utf-8")
         self.tokens_css = self.tokens_path.read_text(encoding="utf-8")
+        self.base_tokens_css = self.base_tokens_path.read_text(encoding="utf-8")
         self.components_css = self.components_path.read_text(encoding="utf-8")
         self.page_shell_css = self.page_shell_path.read_text(encoding="utf-8")
         self.list_header_css = self.list_header_path.read_text(encoding="utf-8")
@@ -165,6 +167,54 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         self.assertIn("box-shadow: var(--shadow-custom-select-menu);", self.components_css)
         self.assertIn("--shadow-custom-select-menu:", self.tokens_css)
+
+    def test_entity_cards_use_one_structure_for_both_themes(self):
+        # NOVO-113: listas claras e escuras compartilham geometria e tipografia;
+        # apenas os tokens de paleta mudam o resultado visual.
+        selectors = (
+            ".record-card {",
+            ".record-card__id-row {",
+            ".record-card__id-row .record-card__info-value {",
+            ":is(.fact-block, .person-row, .record-card__subcard) {",
+            ".itinerary__leg {",
+        )
+        for selector in selectors:
+            with self.subTest(selector=selector):
+                shared = f':is(html[data-theme])\n  {selector}'
+                dark_only = f':is(html[data-theme="dark"])\n  {selector}'
+                self.assertIn(shared, self.components_css)
+                self.assertNotIn(dark_only, self.components_css)
+
+        self.assertIn(
+            "--entity-card-inner-bg: var(--color-bg-strong);",
+            self.base_tokens_css,
+        )
+        self.assertIn(
+            "--entity-card-inner-bg: var(--color-surface-soft);",
+            self.tokens_css,
+        )
+        self.assertIn("background: var(--entity-card-inner-bg);", self.components_css)
+
+    def test_light_wizard_uses_blue_gray_sections_with_white_fields(self):
+        # NOVO-113: a referencia aprovada inverte a hierarquia que havia
+        # regredido: painel interno azul-cinza, controle branco.
+        light_contracts = (
+            "--wizard-card-bg: var(--color-surface);",
+            "--wizard-panel-bg: var(--color-bg-strong);",
+            "--wizard-field-bg: var(--color-surface);",
+        )
+        dark_contracts = (
+            "--wizard-panel-bg: var(--color-surface-soft);",
+            "--wizard-field-bg: var(--wizard-card-bg);",
+        )
+        for contract in light_contracts:
+            self.assertIn(contract, self.base_tokens_css)
+        for contract in dark_contracts:
+            self.assertIn(contract, self.tokens_css)
+
+        self.assertIn("--step1-surface: var(--wizard-card-bg);", self.components_css)
+        self.assertIn("--step1-panel: var(--wizard-panel-bg);", self.components_css)
+        self.assertIn("--step1-field: var(--wizard-field-bg);", self.components_css)
 
     def test_templates_do_not_reintroduce_inline_visual_or_event_contracts(self):
         templates = Path(settings.BASE_DIR) / "templates"
