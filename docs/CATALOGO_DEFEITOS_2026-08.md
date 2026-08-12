@@ -7721,3 +7721,23 @@ sem alterar a composição escura.
 posição relativa ou propriedade não-cor. No wizard de dados, a sonda computada confirma card
 `#fff`, bloco `#eef4fc` e campo `#fff`; contrato automatizado impede a volta dos seletores de lista
 exclusivos do escuro e da hierarquia de superfícies invertida.
+
+### NOVO-114 ✅ RESOLVIDO · `NOVO` A sonda de mesmo tema era evidência citada, mas não versionada · QA · 0,5 d
+
+Quatro trechos deste catálogo e a própria E9 citavam `sonda_mesmo_tema.py` como prova de que uma
+alteração preservava o mesmo tema entre dois estados do código. O arquivo, porém, nunca entrou no
+histórico Git. A evidência existia só na sessão que a produziu: não era reproduzível por outra
+pessoa, não tinha contrato automatizado e não podia servir de gate para as próximas fatias.
+
+**Correção.** A sonda agora recebe dois URLs e compara o mesmo tema, rota e largura. Cada elemento é
+chaveado por caminho estrutural no DOM; diferenças de estrutura e de estilo computado são separadas,
+e as duas ordens de captura são obrigatórias. Se ordem, texto correlacionado ou estrutura mudar o
+resultado, a combinação aborta. Texto/valor variável é metadado diagnóstico — nunca salvo-conduto
+para uma mudança de CSS. O tema é gravado antes de a rota inicializar, e rotas públicas são medidas
+em contexto anônimo separado das protegidas, inclusive quando se fornece `--storage-state`.
+
+O padrão cobre **43 rotas × 3 larguras × 2 temas = 258 combinações**, com teto inicial de zero para
+estrutura e estilo. `--revelar` expõe `[hidden]`/`aria-hidden` e abre `details`; `--pseudo` força
+`hover`, `focus`, `focus-visible` ou `active`. O contrato puro tem dez cenários e um smoke real da
+tela pública provou duas sessões, duas ordens e zero diferença; o corpus completo continua sendo a
+prova exigida para cada diff visual da E9, não uma inferência reaproveitada de outro diff.
