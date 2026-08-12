@@ -202,7 +202,7 @@ Esta etapa é a que o [`PLANO_DESEMPENHO.md`](PLANO_DESEMPENHO.md) mede e não e
 | `BE-11` 🟠 | Editor de roteiro em 3 cópias (`roteiros/views.py:203,311` e `oficios/route_views.py:100`); só duas tratam roteiro duplicado | 3 |
 | `BE-12` 🟠 | `wizard_roteiro` concentra a regra de vínculo/cópia de roteiro na view: 181 linhas, 24 ramos, 4 gravações | 2 |
 | `BE-13` 🟠 | `roteiros/roteiro_logic.py`: 1.779 linhas, 57 funções privadas, fora do contrato de camadas, importado pelos services | 4 |
-| `BE-14` 🟠 | 48 sites de persistência em módulo de view sem service e sem transação (21 em prestações); zero `transaction.atomic` em `prestacoes_contas/services.py` (643 LOC), `termos/services.py` (709) e `planos_trabalho/services.py` (1.314) | 3 |
+| `BE-14` ✅ | 48 sites de persistência em módulo de view sem service e sem transação — fechado em 6 fatias; o último caminho multigravação, identificação de Evento (~12 writes/6 tabelas), virou um service atômico com rollback provado nos cinco documentos vinculáveis | 3 |
 | `BE-15` 🟡 | Numeração de documento reimplementada 3 vezes com garantias de concorrência diferentes | 2 |
 | `BE-16` 🟡 | Abstrações adotadas pela metade: paginação em 2 de 14 listas, exclusão protegida em 3 de 48 sites, 6 cópias de `_pagination_pages` | 2 |
 | `BE-17` 🟡 | `core/views.py` é 75% fixture de UI Lab (947 de 1.261 linhas), e existem **dois** UI Labs paralelos | 1,5 |
