@@ -6,12 +6,12 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from core.autosave import autosave_json_response
 from core.private_media import private_file_response
 from core.uploads import validate_private_document_upload
+from core.retorno import voltar_para
 
 from .forms import PrestacaoDespachoForm, PrestacaoServidorDocumentosForm, PrestacaoSolicitacaoForm
 from .models import PrestacaoDocumentoAnexo
@@ -248,17 +248,6 @@ def prestacao_servidor_arquivo_autosave(request, ps_pk):
     )
 
 
-def _prestacao_upload_next_url(request, fallback_url):
-    next_url = request.POST.get("next")
-    if next_url and url_has_allowed_host_and_scheme(
-        next_url,
-        allowed_hosts={request.get_host()},
-        require_https=request.is_secure(),
-    ):
-        return next_url
-    return fallback_url
-
-
 def _prestacao_assinado_upload(
     request,
     *,
@@ -268,7 +257,7 @@ def _prestacao_assinado_upload(
     substituir_todos_do_tipo=False,
 ):
     fallback_url = reverse("prestacoes_contas:index")
-    destino = _prestacao_upload_next_url(request, fallback_url)
+    destino = voltar_para(request, fallback_url)
     arquivo = request.FILES.get("arquivo")
     if not arquivo:
         messages.error(request, "Selecione um arquivo PDF para anexar.")

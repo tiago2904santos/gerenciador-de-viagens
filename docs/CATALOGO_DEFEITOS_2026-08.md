@@ -808,7 +808,7 @@ o desfaz e confirma que a nova tentativa grava **78**, não 79. A suíte de `pla
 SQLite). Com as três políticas preservadas sobre uma única mecânica, o `BE-15` está fechado.
 
 
-### BE-16 🟡 Abstrações de `core` adotadas pela metade · AUD · 2 d · risco baixo
+### BE-16 ✅ RESOLVIDO · Abstrações de `core` adotadas pela metade · AUD · 2 d · risco baixo
 
 - `core/pagination.contexto_paginacao`: 2 de 14 listas; as outras 12 instanciam `Paginator` direto
   e sobrevivem **6 cópias privadas** de `_pagination_pages` (`cadastros`, `roteiros`, `usuarios`,
@@ -854,6 +854,18 @@ persistência, arquivos, cache, sessão ou rascunhos internos; não são exclus�
 pelo usuário e convertê-los em mensagem de vínculo mudaria o contrato transacional. A regressão do
 catálogo prova o antigo 500 e o redirect com mensagem; a de OS prova que uma exclusão protegida não
 cria lacuna numérica. **299 testes consumidores** estão verdes. Falta somente a fatia de retorno.
+
+#### Fatia 3 ✅ — retorno tem um único validador
+
+A recontagem atual encontrou somente duas cópias sobreviventes, não os oito sites históricos de
+Prestações: `core.catalog._next_url` e `_prestacao_upload_next_url`. Os dois passaram a delegar a
+`core.retorno.voltar_para`; o catálogo também usa `com_next` para compor a querystring. A cópia de
+Prestações foi removida. Testes preservam o fallback do catálogo, o fragmento que reabre o modal de
+upload e a recusa de host externo nos dois caminhos.
+
+Prova mecânica: fora dos testes, `url_has_allowed_host_and_scheme` e a leitura direta de
+`request.POST/GET.get("next")` existem somente em `core/retorno.py`. **93 testes consumidores**
+estão verdes. Com paginação, exclusão protegida e retorno centralizados, o `BE-16` está fechado.
 
 ### BE-17 ✅ RESOLVIDO · 🟡 `core/views.py` é 75% fixture de UI Lab · AUD · 1,5 d
 

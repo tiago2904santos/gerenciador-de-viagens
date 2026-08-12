@@ -29,8 +29,6 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
 from typing import Callable
-from urllib.parse import urlencode
-
 from django.contrib import messages
 from django.http import HttpRequest
 from django.http import HttpResponse
@@ -38,12 +36,13 @@ from django.http import HttpResponseNotAllowed
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils.http import url_has_allowed_host_and_scheme
 
 from core.deletion import DelecaoProtegidaError
 from core.deletion import excluir_com_protecao
 from core.pagination import contexto_paginacao
+from core.retorno import com_next
 from core.retorno import next_valido
+from core.retorno import voltar_para
 
 
 @dataclass(frozen=True)
@@ -136,12 +135,7 @@ def _next_url(request: HttpRequest, config: CatalogConfig) -> str:
     """`?next=` validado contra o host, com o fallback do catálogo."""
     if not config.url_fallback_next:
         return next_valido(request) if config.aceitar_next else ""
-    candidato = request.POST.get("next") or request.GET.get("next") or ""
-    if candidato and url_has_allowed_host_and_scheme(
-        candidato, allowed_hosts={request.get_host()}
-    ):
-        return candidato
-    return reverse(config.url_fallback_next)
+    return voltar_para(request, reverse(config.url_fallback_next))
 
 
 def _com_next(base: str, next_url: str, config: CatalogConfig) -> str:
@@ -153,7 +147,7 @@ def _com_next(base: str, next_url: str, config: CatalogConfig) -> str:
         and next_url == reverse(config.url_fallback_next)
     ):
         return base
-    return f"{base}?{urlencode({'next': next_url})}"
+    return com_next(base, next_url)
 
 
 def _url_index(config: CatalogConfig, next_url: str = "", base: str | None = None) -> str:

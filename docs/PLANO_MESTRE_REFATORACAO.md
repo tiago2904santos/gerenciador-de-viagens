@@ -448,15 +448,18 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       e `INSERT` na mesma transação e usa o retry comum. Colisão real repete; falha após reserva
       desfaz o contador; escolha+gravação compartilham o savepoint; a concorrência PostgreSQL agora
       mede duas linhas gravadas. 116 testes verdes
-- [ ] `BE-16` abstrações de `core` adotadas pela metade — **fatia 1 (paginação) feita**: os 15
+- [x] `BE-16` abstrações de `core` adotadas pela metade — **fatia 1 (paginação) feita**: os 15
       pontos usam `contexto_paginacao`, as 6 cópias de `_pagination_pages` foram removidas e não há
       `Paginator(...)` em produção fora do módulo comum. Termos mantém o total pré-agregado via
       `paginator_class`; chaves e filtros do contexto foram preservados. 922 testes consumidores
       verdes. **Fatia 2 (exclusão protegida) feita**: catálogos e serviços de exclusão de entidades
       acionados pelo usuário adotam `core.deletion`; `PROTECT` vira erro de domínio/mensagem e não
       500. Remoções internas de filhos, arquivos, cache, sessão e rascunhos ficam fora por contrato.
-      A regressão de OS prova que bloqueio não cria lacuna; 299 testes consumidores verdes. Falta
-      retorno
+      A regressão de OS prova que bloqueio não cria lacuna; 299 testes consumidores verdes.
+      **Fatia 3 (retorno) feita**: as duas cópias sobreviventes — catálogo e upload assinado de
+      Prestações — delegam a `core.retorno`; leitura de `next` e validação de host têm um único dono.
+      Fallback, fragmento de modal e recusa de host externo estão cobertos por 93 testes. BE-16
+      fechado
 - [x] `BE-17` `core/views.py` é 75% fixture de UI Lab — **fechado pelo PR #247**, que apagou os
       dois labs e as 1.013 linhas de fixture; a cascata de componentes que ele deixou é o
       `NOVO-44`
