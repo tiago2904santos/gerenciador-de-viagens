@@ -3230,6 +3230,12 @@ defasagem, não de vulnerabilidade confirmada.
 `docxtpl` e `redis` seguem em uso e entram no `pip-compile --upgrade` trimestral, com a suíte
 completa a cada bump.
 
+> **Fatia 1 concluída.** A dependência morta saiu. A regeneração sem `--upgrade` removeu dos locks
+> `pyHanko`, `pyhanko-certvalidator`, `asn1crypto`, `oscrypto`, `uritools` e o `PyYAML` que só essa
+> cadeia puxava; nenhuma versão das bibliotecas usadas mudou. A prova cobre 32 testes dos fluxos
+> atuais e `pip-audit` sem vulnerabilidade conhecida nova. O ID permanece parcial até os upgrades
+> isolados de `docxtpl`, WeasyPrint, ReportLab e Redis.
+
 ### QA-09 ✅ RESOLVIDO (fe43b1d8) · 🟡 Dois templates de `.env` de produção divergentes · AUD · 0,25 d
 
 `diff .env.production.example .env.producao.example`: nomes de banco diferentes
@@ -3324,12 +3330,16 @@ silenciosa de sincronização com o Drive, por exemplo) se acumula sem que ningu
 Casa com o `BE-18`: adotar `capture()` nos outros apps só tem valor pleno se houver onde os
 eventos aterrissarem.
 
-### NOVO-01 ⚪ `ASSINATURA_ETIQUETA_2_COMPAT.md` descreve um fluxo que não existe mais · VER · 0,25 d
+### NOVO-01 ✅ RESOLVIDO · `ASSINATURA_ETIQUETA_2_COMPAT.md` descrevia um fluxo que não existe mais · VER · 0,25 d
 
 O documento apresenta o fluxo de assinatura com `pyHanko` como vigente. Ele foi removido
 (`documentos/migrations/0003_remove_assinatura_fields.py`), e a assinatura de hoje usa
 `pypdf` + `reportlab`. Mesma família do `HT-13`: documentação de contrato apontando para o
 passado.
+
+**Correção.** O documento agora descreve somente os dois contratos vigentes: anexo manual de PDF
+assinado com histórico imutável em `documentos`, e carimbo eletrônico de prestação de contas com
+`pypdf`, `reportlab`, hash e código. Também explicita que nenhum deles valida PAdES/ICP-Brasil.
 
 ### NOVO-02 ✅ NÃO REPRODUZIDO (06/08/2026) · ⚪ A suíte trava ao combinar certos grupos de apps · VER
 
