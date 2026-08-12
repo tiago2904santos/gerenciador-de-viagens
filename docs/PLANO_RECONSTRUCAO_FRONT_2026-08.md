@@ -132,10 +132,9 @@ execução, sem `--atualizar-tetos`, passou contra `scripts/tetos_front.json`.
    `-r test.txt`. Sem isso o hook `.claude/hooks/session-start.sh:20` continua montando um
    ambiente onde o comando do `AGENTS.md` §7 aborta com `TypeError: cannot pickle 'traceback'
    object`, e nada abaixo é verificável. Prove rodando `--parallel 4` num venv limpo.
-2. **`scripts/rotas_do_sistema.py`** — o corpus canônico de rotas, hoje espalhado e podre. Tire de
-   `screenshots/auditoria-telas/_capturar.py`, que lista 57 telas das quais **14 são rotas de UI
-   Lab que o PR #247 apagou**. Sobram **43**. O corpus mora em `scripts/` porque o `BE-24` vai
-   tirar os 39 MB de `screenshots/` do repositório, e a régua não pode ir junto.
+2. **`scripts/rotas_do_sistema.py`** — o corpus canônico foi extraído da captura descartável:
+   das 57 entradas antigas, **14 eram rotas do UI Lab removido** e sobraram **43**. O corpus mora
+   em `scripts/`; o `BE-24` pôde então retirar os 38,07 MiB de `screenshots/` sem levar a régua.
 3. **`scripts/medir_css_por_rota.py`** — Chromium via CDP (`CSS.startRuleUsageTracking`), medindo
    por rota: bytes de CSS entregues, bytes casados, percentual. Espelhe a interface de
    `scripts/medir_desempenho.py`: `--json`, `--atualizar-tetos`, teto por rota em JSON, saída 1 se
