@@ -396,7 +396,7 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       **1.845 → 1.337 linhas (−27%), 57 → 33 defs.** Continua grande, mas com uma responsabilidade
       só. Sobrou `NOVO-98` (guardas defensivas do gravador, inalcançáveis pelo caminho público).
       **Fecha a corrente `BE-11`/`BE-12`/`BE-13`**
-- [ ] `BE-14` 48 sites de persistência em view, sem transação — **eram 36**, mais 4 por método de
+- [x] `BE-14` 48 sites de persistência em view, sem transação — **eram 36**, mais 4 por método de
       modelo que grava por dentro. **Fatia 1 (o dinheiro do RT) feita**: a persistência de
       `rt_views.py` virou `prestacoes_contas/rt_services.py`, o módulo caiu de 305 para 203 linhas
       com zero acessos de manager, e as gravações fora de transação foram de 36 para 33. Fecha
@@ -429,7 +429,11 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       superconta 7 (cinco `delete()`, que o `Collector` do Django já faz em transação, e dois ramos
       mutuamente exclusivos) e subconta o pior caso restante, `eventos/views.py::detalhe`, que
       aparece com 1 e faz ~12 gravações em 6 tabelas. **Fatia 6: `eventos`**, dirigida por leitura
-      de caminho e não pelo contador
+      de caminho e não pelo contador. **Fatia 6 feita**: a etapa 1 de `eventos::detalhe` virou
+      `salvar_identificacao_evento`, um service atômico para Evento, M2M, destinos, cinco famílias de
+      documento e termo automático. Falha no último passo desfaz todas as seis tabelas; 43 testes de
+      Eventos verdes. O `P-01` permanece 27 porque o `NOVO-108` provou que esse caminho era invisível
+      ao contador. Fecha `BE-14` e `NOVO-108`; a dívida unitária de posição em camada segue no `BE-16`
 - [ ] `BE-15` numeração reimplementada 3 vezes — **fatia 1 (a mecânica) feita**: o lock e o laço
       de retry, que eram ~60 linhas copiadas entre ofício e OS, viraram `core/numeracao.py`; a
       política de escolha de cada documento fica onde estava, porque diferente ali é desenho, não

@@ -438,7 +438,7 @@ passavam com o código quebrado. Sobraram dois que mordem, e a garantia mais imp
 ser atômico — já tinha teste desde o `DB-08`; conferi por inversão que ele reprova sem o
 `@transaction.atomic` em vez de duplicá-lo.
 
-### BE-14 🟠 48 sites de persistência em view, sem service e sem transação · AUD · 3 d
+### BE-14 ✅ RESOLVIDO · 48 sites de persistência em view, sem service e sem transação · AUD · 3 d
 
 Varredura AST dos `views.py`/`*_views.py`: 48 chamadas `.save`/`.delete`/`.create` fora de
 `form.save()` — prestações 21, ofícios 6, planos 6, integrações 6. Caso exemplar:
@@ -676,6 +676,26 @@ A contagem vê 1 porque as gravações moram atrás de chamadas de função, e o
 **Consequência para a fatia 6:** ela tem de ser dirigida por **leitura de caminho**, não pelo
 contador. O alvo é `eventos/views.py::detalhe`, que é o maior defeito restante do `BE-14` e o que a
 métrica menos enxerga. Registrado como `NOVO-108`.
+
+#### Fatia 6 ✅ — identificação do evento; o risco transacional do `BE-14` fecha
+
+A etapa 1 de `eventos/views.py::detalhe` agora delega o caminho inteiro a
+`eventos/services.py::salvar_identificacao_evento`, sob um único `transaction.atomic`: Evento,
+tipos, destinos, os cinco tipos de documento vinculável e o termo automático são confirmados juntos
+ou todos voltam ao estado anterior. A sincronização também deixou o form e passou a usar
+`all_objects.filter(area=evento.area)`, sem depender do thread-local quando o serviço é chamado por
+worker, comando ou teste.
+
+O teste foi escrito antes da implementação e invertido no último passo: uma falha simulada na criação
+do termo, depois dos vínculos, desfaz título, motivo, M2M e os vínculos de Ofício, OS, Plano, Termo e
+Roteiro. O cenário feliz prova as mesmas seis tabelas e os destinos extras. A suíte de `eventos`
+fecha com **43 testes verdes**.
+
+O `P-01` permanece em **27**, como esperado: o próprio `NOVO-108` demonstrou que a contagem AST não
+atravessava as chamadas e enxergava só um `save()` neste caminho. Os sites restantes medidos são
+operações unitárias, `delete()` já transacional pelo `Collector` ou ramos exclusivos; a dívida de
+posição em camada continua no `BE-16`, mas não há outro caminho multigravação sem transação dentro do
+escopo apurado do `BE-14`.
 
 ##### A inversão precisou de uma rede a mais, e de uma área
 
@@ -7475,7 +7495,7 @@ novo, com a migração feita por módulo.
 roteiro (trechos, diárias por trecho, o próprio diário) tem o mesmo risco de medir vazio. Vale uma
 varredura por `criar_prestacao` antes de escrever a próxima rede sobre prestações.
 
-### NOVO-108 · `NOVO` A contagem por AST de gravação-em-view erra nos dois sentidos e não serve mais de alvo · QA · 0,5 d
+### NOVO-108 ✅ RESOLVIDO · `NOVO` A contagem por AST de gravação-em-view erra nos dois sentidos e não serve mais de alvo · QA · 0,5 d
 
 Achado na fatia 5 do `BE-14`, medindo o resíduo item a item em vez de confiar no total.
 
@@ -7515,6 +7535,11 @@ de usar este número como alvo**. Ele já fez o trabalho dele.
 `eventos/views.py::detalhe`. O contador continua no repositório como relatório, e o catálogo passa a
 registrar, ao lado de cada número, quantos dos itens são `delete()` e quantos são ramo exclusivo —
 para que o próximo leitor não tome 17 por 17 defeitos.
+
+**Executado na fatia 6:** o caminho foi encapsulado em `salvar_identificacao_evento`, com transação
+única e teste de inversão que alcança as gravações escondidas nos cinco vínculos e no termo
+automático. O relatório AST permaneceu em 27 no gate `P-01`; ele continua informativo, mas não foi
+usado como falsa prova de que a correção não moveu o risco real.
 
 ### NOVO-109 ✅ RESOLVIDO · `NOVO` O retry da numeração só funcionava no PostgreSQL, e o teste que o cobria fabricava a prova · QA · 0,25 d
 

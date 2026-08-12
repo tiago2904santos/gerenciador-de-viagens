@@ -1,4 +1,3 @@
-import json
 from urllib.parse import urlencode
 
 from django.contrib import messages
@@ -48,7 +47,7 @@ from .services import anexar_documentos_solicitacao
 from .services import build_evento_guided_context
 from .services import excluir_documento_solicitacao
 from .services import excluir_evento
-from .services import garantir_termo_automatico
+from .services import salvar_identificacao_evento
 
 
 
@@ -147,22 +146,6 @@ def _form_context(form, evento=None):
         "flow_status_label": status_label,
         "flow_status_variant": status_variant,
     }
-
-
-def _save_destinos_extras(evento, request):
-    """Lê destinos_json do POST e salva extras no evento (primeiro = destino_uf/cidade)."""
-    raw = request.POST.get("destinos_json", "")
-    try:
-        destinos = json.loads(raw) if raw else []
-    except (ValueError, TypeError):
-        destinos = []
-    if destinos and isinstance(destinos, list):
-        primeiro = destinos[0] if destinos else {}
-        evento.destino_uf = primeiro.get("uf", "")
-        evento.destino_cidade = primeiro.get("cidade", "")
-        evento.destinos_extras = destinos[1:] if len(destinos) > 1 else []
-    else:
-        evento.destinos_extras = []
 
 
 def _roteiro_rows_do_evento(evento):
@@ -279,16 +262,11 @@ def detalhe(request, pk, etapa=1):
     if etapa == 1 and request.method == "POST":
         form = EventoNovoCadastroForm(request.POST, instance=evento)
         if form.is_valid():
-            evento = form.save(commit=False)
-            if evento.area_id is None:
-                evento.area = getattr(request, "area", None)
-            nomes = [tipo.nome for tipo in form.cleaned_data.get("tipos") or []]
-            evento.titulo = " / ".join(nomes) if nomes else "Novo Evento"
-            _save_destinos_extras(evento, request)
-            evento.save()
-            form.save_m2m()
-            form.sincronizar_documentos_vinculados(evento)
-            garantir_termo_automatico(evento)
+            evento = salvar_identificacao_evento(
+                form,
+                area=getattr(request, "area", None),
+                destinos_json=request.POST.get("destinos_json", ""),
+            )
             messages.success(request, "Dados do evento atualizados.")
             return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=2)
     else:
