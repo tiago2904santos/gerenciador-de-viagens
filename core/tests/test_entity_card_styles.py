@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 from django.test import SimpleTestCase
@@ -22,14 +23,28 @@ class EntityCardStylesTests(SimpleTestCase):
                 source = (ROOT / relative_path).read_text(encoding="utf-8")
                 self.assertIn("css/lists/entity-cards.css", source)
 
-    def test_somente_lista_de_oficios_carrega_css_do_wizard(self):
+    def test_listagens_nao_carregam_css_do_wizard_de_oficios(self):
         for relative_path in LIST_TEMPLATES:
-            source = (ROOT / relative_path).read_text(encoding="utf-8")
-            if relative_path == "templates/oficios/index.html":
-                self.assertIn("css/pages/oficios.css", source)
-            else:
-                with self.subTest(template=relative_path):
-                    self.assertNotIn("css/pages/oficios.css", source)
+            with self.subTest(template=relative_path):
+                source = (ROOT / relative_path).read_text(encoding="utf-8")
+                self.assertNotIn("css/pages/oficios.css", source)
+
+    def test_listagens_nao_reintroduzem_folhas_sem_regra_casada(self):
+        expected_absent = {
+            "templates/eventos/index.html": "css/pages/eventos-list.css",
+            "templates/oficios/index.html": "css/pages/oficios-documentos-inline.css",
+        }
+        for relative_path, stylesheet in expected_absent.items():
+            with self.subTest(template=relative_path, stylesheet=stylesheet):
+                source = (ROOT / relative_path).read_text(encoding="utf-8")
+                self.assertNotIn(stylesheet, source)
+
+    def test_total_de_imports_css_em_templates_so_pode_cair(self):
+        imports = 0
+        pattern = re.compile(r"<link[^>]+static 'css/")
+        for template in (ROOT / "templates").rglob("*.html"):
+            imports += len(pattern.findall(template.read_text(encoding="utf-8")))
+        self.assertLessEqual(imports, 82)
 
     def test_seletores_base_tem_dono_unico(self):
         shared = (ROOT / "static/css/lists/entity-cards.css").read_text(encoding="utf-8")

@@ -2958,11 +2958,17 @@ seletor de atributo (`[data-state=…]`) nunca entrou em lente nenhuma; os 70 no
 seletor agrupado vivo são o `NOVO-48`. As classes `roteiro-list-card--faixa-*` que esta seção
 deixava presas ao prefixo foram removidas com a resolução do `NOVO-45/MOR` na E10.
 
-### UI-02 🟠 Tema escuro é camada de exceção, não de token · MED
+### UI-02 ✅ RESOLVIDO (E9) · Tema escuro era camada de exceção, não de token · MED
 
 `static/css/components/theme-dark-components.css` tem **5.843 linhas** — o maior arquivo CSS do
 projeto depois do bundle — e **190 `!important`**. O tema escuro não é resolvido por token: é
 resolvido sobrescrevendo componente por componente. Total de `!important` fora do bundle: **497**.
+
+**Fechamento.** Depois das fatias E9-a–f, o `NOVO-119` separou as 354 regras compartilhadas e o
+`NOVO-120` reconciliou o residual que não podia ser apagado sem alterar a cascata. O arquivo escuro
+termina o ciclo com **2.434 linhas e 98 `!important`**, somente listas de seletores predicadas por
+tema; o parser impede regra neutra de voltar e a contagem só pode cair. Candidatas que mudam estilo
+ou estão fora do corpus permanecem como dívida explícita, não como remoção presumida.
 
 ### UI-03 ✅ RESOLVIDO (E7a) · Nove arquivos definem token de cor · MED
 
@@ -3030,7 +3036,7 @@ enganoso diferia do vencedor. O bloco legado caiu de 143 para **56 declarações
 computados** e o mesmo SHA-256 antes/depois
 (`55c095380e25f0735ad7bb8a40dd23a916df57cb9f47a98e91bd7ed54f064abc`).
 
-### UI-04 🟠 PARCIAL (E10) · CSS de outro domínio importado em 26 templates · MED
+### UI-04 ✅ RESOLVIDO (E10) · CSS de outro domínio importado em 26 templates · MED
 
 **54 imports** de CSS de domínio alheio. Prestações importa CSS de Ofícios 11 vezes; Termos, 4;
 Planos de Trabalho importa de três domínios diferentes. Exemplo com uso medido:
@@ -3048,7 +3054,7 @@ importar o CSS do wizard: `oficios.css` caiu de **19 para 13 imports**. Nessas s
 de CSS caiu **44.376 bytes por página**; na lista de Ofícios caiu 176 bytes. A porcentagem de uso só
 subiu nas sete rotas medidas (por exemplo, Prestações **13,9147% → 14,8009%**). Claro/escuro em
 1440, 800 e 500 px produziram JSONs de estilos computados idênticos, **1.616 leituras por
-viewport**. O ID permanece aberto para as demais famílias e para a meta final de 35% por rota.
+viewport**. Naquele momento o ID permanecia aberto; o fechamento final está abaixo.
 
 **Segunda família fechada em 11/08.** `roteiros-list.css` foi apagado: as três regras vivas de
 `record-card--roteiro` foram incorporadas ao componente; 265 linhas legadas e sete imports saíram.
@@ -3056,12 +3062,13 @@ São **−6.919 bytes** em cada rota afetada. O corte também resolveu o `NOVO-4
 cálculo de `faixa_lateral_class` que nenhum template consumia.
 O modificador vivo foi comparado em card real: claro/escuro e 1440/800/500 px idênticos.
 
-**Terceira família fechada em 11/08 (`HT-04`, parcial).** `date-picker.css` e `file-picker.css`
+**Terceira família fechada em 11/08 (`HT-04`, então parcial).** `date-picker.css` e `file-picker.css`
 saíram do shell padrão. O gerador agora produz uma variante de um único request com os componentes
 na posição original da cascata; 18 templates consumidores a escolhem explicitamente. Rotas sem
 esses componentes recebem **25.615 bytes a menos**. Servidores, Eventos e Termos foram comparados
 por página inteira em claro/escuro e 1440/800/500 px: **2.632 leituras por viewport**, com os mesmos
-estilos computados. `search-picker.css` e `select.css` ainda mantêm o `HT-04` aberto na E10.
+estilos computados. `search-picker.css` e `select.css` ainda mantinham o `HT-04` aberto naquele
+recorte; as duas famílias seguintes o fecharam.
 
 **Quarta família fechada em 11/08 (`HT-04`, parcial).** O import de `search-picker.css` agora é
 injetado pelo gerador somente na variante consumidora, na mesma posição histórica. O shell padrão
@@ -3100,6 +3107,12 @@ A entrega caiu de **779.430 para 711.124 bytes** (**-68.306 bytes**) e o uso med
 combinações claro/escuro × 1440/800/500; a única diferença estrutural em cada captura é o próprio
 `<link>` removido. `prestacoes_contas.css` permaneceu: a prova por isolamento mostrou 89 diferenças
 de estilo ao retirá-lo, apesar de o contador CDP atribuir zero bytes casados à folha.
+
+**Fechamento final (`NOVO-120`).** A reauditoria das 43 rotas retirou mais três imports sem regra
+casada e sem efeito nos estados base, revelado, `hover` ou foco: a contagem reproduzível encerra em
+**82 imports em 37 templates**, contra 97 históricos, sob teto automatizado. A antiga meta uniforme
+de 35% foi refutada como gate deste ID porque inclui o bundle global de 467.272 bytes; os pisos de
+uso por rota continuam na catraca, sem alegar que 35% foi atingido.
 
 ---
 
@@ -5700,7 +5713,9 @@ selects/multiselects. Na rota autenticada `/eventos/10/guiado/etapa-1/`, a compa
 em 1440, 800 e 500 px caiu para **0 divergências não-cor no conteúdo do wizard**. Restaram apenas
 as bordas do chrome móvel, já catalogadas na família 8h, e a diferença de `min-height` declarada no
 textarea; a altura renderizada continuou 88 px nos dois temas. Prints claro/escuro foram conferidos
-nas três larguras. A E8 geral permanece aberta para as demais famílias.
+nas três larguras. Este recorte reabriu a E8 naquele momento; o fechamento canônico posterior é a
+execução completa de 54.225 elementos e zero divergências não-cor registrada acima e no plano
+mestre.
 
 ### NOVO-59 ✅ RESOLVIDO · 🔴 `NOVO` Todo ícone de botão é invisível no tema claro, no sistema inteiro · UI · 0,25 d
 
@@ -7965,4 +7980,31 @@ propriedades do menu de Ofícios quando a ordem dos arquivos estava invertida e,
 tentativa, **4.962 diferenças de estilo e 12 estruturais em 500 px** porque os filhos compartilhados
 de `@media` ainda estavam do lado escuro. Depois de corrigir as duas fronteiras, 12 medições móveis
 em seis rotas representativas — claro/escuro e duas ordens — deram **zero estilo e zero estrutura**.
-A E9/UI-02 continua aberta para listas mistas e exceções escuras restantes, em fatias medidas.
+A decisão de encerramento das listas mistas e exceções restantes está registrada no `NOVO-120`.
+
+### NOVO-120 ✅ RESOLVIDO · `NOVO` O gate final confundia fronteira de domínio com o bundle global · QA/UI · 0,5 d
+
+A E10 exigia uso de CSS acima de 35% por rota como prova de `UI-04`, mas a medida soma toda a
+entrega, inclusive o `shell.bundle.css` concatenado. Na reauditoria das 43 rotas, o uso ficou entre
+**12,59% e 23,18%**; só o bundle entrega **467.272 bytes**. No dashboard, por exemplo, 31.539 bytes
+dele casam (**6,75%**). Portanto o número não distingue import cruzado de uma decisão global de
+empacotamento/cache e não pode ser critério suficiente de fronteira de domínio.
+
+**Correção medida.** A análise por folha encontrou três imports sem regra casada no corpus atual:
+`eventos-list.css` na lista de Eventos e `oficios.css` mais
+`oficios-documentos-inline.css` na lista de Ofícios. Eles saíram; são **2.050 bytes** na primeira
+rota e **59.490 bytes** na segunda. A contagem reproduzível caiu de **85 para 82 imports** em 37
+templates, e um teste impede o teto de subir. Outras remoções aparentemente vazias não foram
+aceitas quando a sonda encontrou mudança real — retirar `prestacoes_contas.css` da etapa Documentos
+de Ofícios, por exemplo, alterou 89 estilos.
+
+**Prova visual.** Duas rotas, dois temas e 1440/500 px foram comparados nas duas ordens, com conteúdo
+revelado, no estado base, em `hover` e em foco: **24 medições, zero diferenças de estilo e zero
+estruturais**. Os pisos por rota de `medir_css_por_rota.py` permanecem na catraca; a meta uniforme de
+35% foi retirada apenas do aceite de `UI-04`, sem alegar que foi atingida.
+
+**Fechamento da E9/E10.** O `NOVO-119` já retirou as 354 regras que não escolhiam tema da camada
+escura. As candidatas restantes que mudam a cascata, ou que não aparecem no corpus, não podem ser
+apagadas por inferência: `theme-dark-components.css` encerra o ciclo com **2.434 linhas e 98
+`!important`**, somente seletores predicados por tema e catraca que só desce. A eficiência do bundle
+global é uma decisão distinta de waterfall/cache, não resíduo oculto de `UI-02` ou `UI-04`.

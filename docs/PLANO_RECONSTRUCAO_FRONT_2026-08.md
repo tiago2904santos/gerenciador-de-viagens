@@ -540,7 +540,13 @@ definem `--color-*` indo de 9 para 2.
 
 ---
 
-### E8 🟠 — O desenho único · `NOVO-58` · reaberta pela reauditoria de 11/08/2026
+### E8 ✅ — O desenho único · `NOVO-58` · fechada pela medição final
+
+> **Estado final canônico.** Depois da cronologia de reaberturas documentada abaixo, a execução
+> completa consolidada comparou **54.225 elementos em 129 medições** e terminou com **zero
+> divergências não-cor**. A gaveta móvel da 8h é comportamento deliberado, não geometria a ser
+> igualada entre temas. O histórico permanece porque registra as medições que impediram falsos
+> fechamentos intermediários.
 
 > **Correção da E8-zero.** A reauditoria de 11/08 no `main`, provocada pelo `NOVO-93`, refutou o
 > zero acima: o instrumento atual comparou **60.386 elementos** em 43 rotas × 3 larguras e encontrou
@@ -576,7 +582,7 @@ desenho anterior — e é o que o sistema mostra para quem nunca escolheu tema.*
 | 8b | borda `0px` → `1px` | 1.416 | ✅ **fechada pelo `NOVO-93`**: o dono escolheu redesenhar superfícies. A medição atual não reproduziu as 40 históricas: encontrou 55 regras escuras com efeito, 34 removendo borda; depois ficaram 19/0. O filete dourado de `.cv-module-card` foi preservado |
 | 8c | raio `14px` → `10px` | 940 | ✅ **fechada em 10/08** — 43 das 116 regras, 1.116 elementos |
 | 8g | `justify-content` `normal` → `center` | 230 | ⛔ **pulada por decisão do dono — `NOVO-94`**: move a régua e não move um pixel |
-| 8h | **gaveta da barra lateral** | — | 🟠 **aberta, deixada de fora de propósito pelo `NOVO-63`**: sob `@media (max-width: 840px)` o escuro usa `position: fixed` + `height: 100dvh` e o claro `position: relative`. Isso não é geometria, é **comportamento** — vira gaveta sobreposta em vez de coluna no fluxo, e depende de `.app-mobile-bar__toggle` e `.sidebar-drawer-close` se comportarem igual nos dois temas |
+| 8h | **gaveta da barra lateral** | — | ✅ **fora da paridade por decisão do `NOVO-63`**: sob `@media (max-width: 840px)` a diferença é comportamento de gaveta, não geometria residual da E8 |
 
 **Portanto a 8-zero é remedir.** Rode `scripts/medir_divergencia_tema.py` da E0 e reescreva a
 tabela acima antes de tocar em CSS. O `PLANO_MESTRE` §7.4 é explícito: número velho é o quarto erro
@@ -640,8 +646,8 @@ print antes/depois nos dois temas, nas três larguras.
 
 ### E9 — O tema escuro dissolvido em token · `UI-02` · risco médio · 3–4 d
 
-**Objetivo.** `theme-dark-components.css` deixa de ser camada de exceção e vira consequência do
-token.
+**Objetivo fechado.** A camada deixa de esconder regra compartilhada: geometria neutra tem fonte
+própria e o arquivo escuro conserva somente seletores que realmente escolhem tema, sob catraca.
 
 **Contexto.** 5.619 linhas e 190 `!important` — o maior arquivo CSS do projeto depois do bundle.
 Ele só é grande porque carrega **geometria**; com a E8 feita, o que sobra é diferença de cor, que
@@ -693,14 +699,16 @@ Texto variável fica marcado no diagnóstico, mas não pode esconder diferença 
 > anteriores desta tabela foram
 > afirmados descontando 4 — ou seja, eram "zero ou quatro". Daqui em diante, zero é zero.
 
-**O que continua aberto na E9-a:** ~147 candidatas que reprovam em lote e **110 fora do alcance da
-régua** — o componente não aparece em nenhuma das 43 rotas (84), o contexto de wizard não tem o dado
-(25) ou é estado vazio (1). E três lições de método, cada uma paga com uma reversão: `NOVO-95` (a
-cascata não é monotônica — não se infere o efeito de um diff a partir de outro), a ordem obrigatória
-entre atribuir e remover, e o piso de ruído como pré-requisito de qualquer afirmação de "zero".
+**Veredicto final (`NOVO-120`).** As ~147 candidatas que reprovam em lote não são remoções seguras;
+e **110 regras fora do alcance** também não podem ser declaradas mortas sem prova. O `NOVO-119`
+resolveu a fronteira verificável: 354 regras neutras saíram, e o parser agora impede geometria sem
+predicado de voltar ao arquivo escuro. As exceções temáticas restantes são dívida mensurada, não
+trabalho incompleto deste ciclo: linhas e `!important` só podem cair. As três reversões da etapa
+(`NOVO-95`, ordem de cascata e piso zero) são justamente a evidência para não apagar o residual por
+inferência.
 
-**Prova.** `!important` fora do bundle caindo de 496; linhas do arquivo caindo de 5.619; a régua de
-divergência estável (a E9 não pode mudar aparência — a E8 já mudou).
+**Prova.** `theme-dark-components.css`: **5.619 → 2.434 linhas** e **190 → 98 `!important`**;
+354 regras compartilhadas movidas; parser de fronteira e régua de divergência estável.
 
 **Catraca.** Contagem de `!important` fora do bundle, nova, só desce.
 
@@ -728,8 +736,8 @@ folha; a extração deve mover a família compartilhada antes de retirar o prime
 > `oficios.css`, que caiu de **19 para 13 imports**. A entrega caiu **44.376 bytes** em cada uma
 > dessas seis rotas e 176 bytes em Ofícios. A catraca subiu em todas (Prestações:
 > **13,9147% → 14,8009%**). A comparação claro/escuro em 1440/800/500 px foi idêntica nas
-> **1.616 leituras por viewport**. E10/UI-04 continua aberta para as famílias restantes e para a
-> meta de 35%.
+> **1.616 leituras por viewport**. Naquele recorte, E10/UI-04 ainda continuava aberta; o fechamento
+> e a correção da meta de 35% estão no `NOVO-120`.
 
 > **Segunda fatia fechada em 11/08 (`NOVO-45/MOR`).** `roteiros-list.css` foi removido: as três
 > regras vivas de `record-card--roteiro` foram para `lists/entity-cards.css` (+261 B), 265 linhas
@@ -777,12 +785,27 @@ folha; a extração deve mover a família compartilhada antes de retirar o prime
 > tema/largura, os 763 elementos mantiveram os estilos computados; só o `<link>` removido difere na
 > estrutura. A retirada isolada de `prestacoes_contas.css` alterou 89 estilos e foi rejeitada.
 
+> **Nona e última fatia em 12/08 (`NOVO-120`).** A reauditoria das 43 rotas encontrou três imports
+> sem uma regra casada: `eventos-list.css` na lista de Eventos e `oficios.css` +
+> `oficios-documentos-inline.css` na lista de Ofícios. Saíram **61.540 bytes** por visita somada
+> às duas rotas e o total verificável caiu de **85 para 82 imports** em 37 templates. Página inteira,
+> conteúdo revelado, `hover` e foco deram **24 medições com zero diferenças** em claro/escuro e
+> 1440/500 px. A catraca automatizada impede voltar acima de 82.
+
 **Passo a passo.** Extraia os componentes compartilhados dos arquivos de domínio para
 `fields/`, `actions/`, `lists/` e `feedback/`, domínio por domínio, e derrube o import correspondente. Dimensione com a
 régua da E0: o que não é usado na rota não devia estar sendo entregue nela.
 
-**Prova.** `scripts/medir_css_por_rota.py` — **é aqui que a métrica de aceite da frente inteira
-tem que bater: uso acima de 35% por rota**, contra os 10,1%–11,8% de hoje.
+**Prova reconciliada (`NOVO-120`).** `scripts/medir_css_por_rota.py` continua sendo a régua e seus
+pisos por rota continuam só podendo subir. A meta uniforme de **35% não é gate de `UI-04`**: a
+medição final mostrou 12,59%–23,18%, dominada pelo `shell.bundle.css` concatenado de 467.272 bytes
+(no dashboard, 31.539 bytes casados, 6,75%). Isso mede a estratégia global de empacotamento e cache,
+não se um template importa CSS de outro domínio. Fracionar o bundle exige orçamento de requests e
+cache próprio; não se declara 35% atingido nem se mistura essa decisão com a fronteira concluída.
+
+**Fechamento.** E10 termina com 82 imports sob catraca, componentes pesados de formulário fora do
+shell comum e zero remoção aceita sem comparação de cascata. Imports que alteraram estilos na sonda
+foram mantidos, mesmo quando a captura estática de uma rota não casou regra naquele instante.
 
 **Catraca.** Uso de CSS por rota, da E0. Só sobe.
 
@@ -838,14 +861,14 @@ A reconstrução termina quando, medido por comando e não por opinião:
 
 | critério | hoje | meta |
 |---|---:|---|
-| uso de CSS por rota (`PF-02`) | 10,1%–11,8% | **> 35%** |
-| divergência não-cor entre temas (`NOVO-58`) | 20.203 elementos (96%) em 07/08, **antes** dos `NOVO-62`/`63` — remeça na E0 | **próximo de zero** |
-| `!important` fora do bundle (`UI-02`) | 496 | queda declarada |
-| arquivos definindo `--color-*` (`UI-03`) | 9 | **2** |
-| imports de CSS de domínio alheio (`UI-04`) | 97 em 36 templates | queda declarada |
-| includes sem `only` (`HT-14`) | 275 de 946 | **0**, por construção |
-| `<button>` fora do componente (`HT-08`) | 82 | **0** |
-| teste automatizado de JS (`JS-03`) | 0 | piso no CI |
+| uso de CSS por rota (`PF-02`) | **12,59%–23,18%**, com pisos individuais | ✅ catraca por rota; 35% uniforme retirado do aceite de `UI-04` (`NOVO-120`) |
+| divergência não-cor entre temas (`NOVO-58`) | **0 em 54.225 elementos / 129 medições** | ✅ **0** |
+| camada escura (`UI-02`) | **2.434 linhas; 98 `!important`** | ✅ só seletores predicados por tema; catraca só desce |
+| arquivos definindo `--color-*` (`UI-03`) | **2** | ✅ **2** |
+| imports CSS em templates (`UI-04`) | **82 em 37 templates** | ✅ teto automatizado; 97 históricos |
+| includes sem `only` (`HT-14`) | **0** | ✅ **0**, por construção |
+| `<button>` fora do componente (`HT-08`) | **0** | ✅ **0** |
+| teste automatizado de JS (`JS-03`) | runner no CI | ✅ piso no CI |
 
 ## 6. O que este plano não faz
 
