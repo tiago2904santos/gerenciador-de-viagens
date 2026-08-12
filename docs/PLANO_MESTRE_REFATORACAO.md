@@ -554,8 +554,9 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       ficou para trás e foi fechada como `NOVO-44`
 - [x] `NOVO-44` o `BE-25` apagou os labs e deixou a cascata do `HT-06` para trás — 8 componentes
       apagados com prova de grep, `SO_NO_LABORATORIO` vazia com a trava intacta, piso 85 → 83
-- [~] `QA-08` dependências atrasadas — `pyhanko` morto removido com seis pacotes da cadeia; restam
-      upgrades isolados das bibliotecas usadas
+- [~] `QA-08` dependências atrasadas — `pyhanko` morto removido; `docxtpl` 0.20.2, WeasyPrint 69 e
+      ReportLab 5 atualizados em fatia própria; resta o salto isolado de Redis
+- [x] `NOVO-118` `docxcompose` declarado diretamente após o upgrade expor a transitividade oculta
 - [x] `NOVO-01` contrato de assinatura reescrito para os fluxos reais, sem backend pyHanko fictício
 - [x] `NOVO-02` suíte trava ao combinar certos grupos de apps — **não reproduziu** em 06/08 (a
       combinação do catálogo passa, inclusive em `--reverse`). A sondagem achou o `NOVO-26`
