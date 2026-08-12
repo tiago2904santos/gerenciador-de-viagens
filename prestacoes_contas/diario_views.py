@@ -11,6 +11,7 @@ from documentos.services.async_generation import enfileirar_documento
 from .diario_services import (
     ESCOPO_EQUIPE,
     ESCOPO_SERVIDOR,
+    DiarioValidacaoError,
     diaria_info,
     garantir_roteiro_ajustado,
     motorista_diario,
@@ -152,13 +153,18 @@ def diario_servidor_autosave(request, ps_pk):
     except AutosavePayloadError as exc:
         return autosave_json_response(ok=False, message=str(exc))
 
-    salvar_autosave_do_diario(
-        diario,
-        fields=payload.fields,
-        dirty_fields=payload.dirty_fields,
-        escopo=ESCOPO_SERVIDOR,
-        servidor_prestacao=ps,
-    )
+    try:
+        salvar_autosave_do_diario(
+            diario,
+            fields=payload.fields,
+            dirty_fields=payload.dirty_fields,
+            escopo=ESCOPO_SERVIDOR,
+            servidor_prestacao=ps,
+        )
+    except DiarioValidacaoError as exc:
+        # `NOVO-116`: km invertido é erro do operador, não falha do servidor. Sem isto
+        # a violação da constraint subia como `IntegrityError` e virava 500.
+        return autosave_json_response(ok=False, message=str(exc))
     return autosave_json_response(
         ok=True,
         object_id=diario.pk,
@@ -174,12 +180,16 @@ def diario_autosave(request, pk):
     except AutosavePayloadError as exc:
         return autosave_json_response(ok=False, message=str(exc))
 
-    salvar_autosave_do_diario(
-        diario,
-        fields=payload.fields,
-        dirty_fields=payload.dirty_fields,
-        escopo=ESCOPO_EQUIPE,
-    )
+    try:
+        salvar_autosave_do_diario(
+            diario,
+            fields=payload.fields,
+            dirty_fields=payload.dirty_fields,
+            escopo=ESCOPO_EQUIPE,
+        )
+    except DiarioValidacaoError as exc:
+        # Ver `diario_servidor_autosave`: mesma tradução, mesma razão (`NOVO-116`).
+        return autosave_json_response(ok=False, message=str(exc))
     return autosave_json_response(
         ok=True,
         object_id=diario.pk,

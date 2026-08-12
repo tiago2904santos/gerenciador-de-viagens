@@ -12,6 +12,7 @@ import re
 from pathlib import Path
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import F
 from django.utils import timezone
@@ -627,15 +628,32 @@ def _parse_km(value):
     return int(digitos) if digitos else None
 
 
+class DiarioValidacaoError(Exception):
+    """Erro de domínio do autosave do diário: o que o operador digitou não vale.
+
+    Mesmo papel do `DelecaoProtegidaError` em `core/deletion.py` — o service não sabe
+    o que é uma resposta HTTP (`docs/PADRAO_SERVICES.md:18`), então levanta, e a view
+    traduz em `autosave_json_response(ok=False, ...)`.
+    """
+
+
 @transaction.atomic
 def salvar_autosave_do_diario(
     diario: DiarioBordo, *, fields, dirty_fields, escopo, servidor_prestacao=None
 ) -> int:
-    """Grava km e abastecimento das linhas sujas, e marca o status. Devolve quantas mudou.
+    """Grava km e abastecimento das linhas sujas, e marca o status. Devolve quantas linhas mudou.
 
-    Atômica porque grava **em laço**, um `UPDATE` por campo sujo: digitar km inicial e km
-    final da mesma linha são duas gravações, e sem transação uma falha entre elas deixa
-    metade — o operador vê um campo salvo e o outro não, sem nada dizendo isso.
+    Atômica porque grava **em laço**, uma linha por vez: duas linhas sujas são duas
+    gravações, e sem transação uma falha entre elas deixa metade — o operador vê uma
+    linha salva e a outra não, sem nada dizendo isso (`BE-14`).
+
+    **Uma gravação por linha, não por campo** (`NOVO-116`). O `diario_trecho_km_ordenado`
+    compara os dois km entre si, e o payload não promete ordem: gravar campo a campo passa
+    por um estado intermediário que mistura o km novo com o antigo do par. Corrigir uma
+    linha de `100→200` para `5000→6000` violaria a constraint no meio do caminho — em
+    `km_inicial=5000` contra o `km_final=200` que ainda não foi gravado — e derrubaria uma
+    edição perfeitamente válida, de forma intermitente. Juntar os campos da linha numa
+    gravação só faz o estado intermediário deixar de existir.
 
     Recebe o payload já interpretado, nunca o `request` (`docs/PADRAO_SERVICES.md:20`).
     """
@@ -643,7 +661,9 @@ def salvar_autosave_do_diario(
     from .services import marcar_servidores_pendentes
 
     linhas = list(diario.trechos.select_related("trecho").order_by("ordem", "pk"))
-    gravadas = 0
+
+    # Agrupa por linha preservando a ordem de chegada, para a gravação sair determinística.
+    por_linha: dict[int, dict[str, object]] = {}
     for nome in dirty_fields:
         match = _CAMPO_LINHA.match(str(nome or ""))
         if not match:
@@ -651,13 +671,23 @@ def salvar_autosave_do_diario(
         indice, campo = int(match.group(1)), match.group(2)
         if indice >= len(linhas):
             continue
+        por_linha.setdefault(indice, {})[campo] = fields.get(nome)
+
+    gravadas = 0
+    for indice, campos in por_linha.items():
         linha = linhas[indice]
-        valor = fields.get(nome)
-        if campo in {"km_inicial", "km_final"}:
-            setattr(linha, campo, _parse_km(valor))
-        else:
-            linha.abastecimento = str(valor or "") != "nao"
-        linha.save(update_fields=[campo])
+        for campo, valor in campos.items():
+            if campo in {"km_inicial", "km_final"}:
+                setattr(linha, campo, _parse_km(valor))
+            else:
+                linha.abastecimento = str(valor or "") != "nao"
+        # Antes de gravar, e não depois: sem isto a violação chega como `IntegrityError`
+        # na view, que não a trata — o operador levava 500 em vez da mensagem.
+        try:
+            linha.validate_constraints()
+        except ValidationError as exc:
+            raise DiarioValidacaoError(" ".join(exc.messages)) from exc
+        linha.save(update_fields=sorted(campos))
         gravadas += 1
 
     if gravadas:
