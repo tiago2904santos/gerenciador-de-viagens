@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import tinycss2
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.test import SimpleTestCase
@@ -11,16 +12,30 @@ class DarkRedesignContractTests(SimpleTestCase):
         css_root = Path(settings.BASE_DIR) / "static" / "css"
         self.tokens_path = css_root / "base" / "03-theme-dark.css"
         self.base_tokens_path = css_root / "base" / "tokens.css"
+        self.shared_components_path = (
+            css_root / "components" / "theme-shared-components.css"
+        )
         self.components_path = css_root / "components" / "theme-dark-components.css"
         self.page_shell_path = css_root / "layout" / "page-shell.css"
         self.list_header_path = css_root / "lists" / "list-header.css"
         self.base = self.base_path.read_text(encoding="utf-8")
         self.tokens_css = self.tokens_path.read_text(encoding="utf-8")
         self.base_tokens_css = self.base_tokens_path.read_text(encoding="utf-8")
-        self.components_css = self.components_path.read_text(encoding="utf-8")
+        self.shared_components_css = self.shared_components_path.read_text(encoding="utf-8")
+        self.dark_components_css = self.components_path.read_text(encoding="utf-8")
+        self.components_css = (
+            f"{self.dark_components_css}\n{self.shared_components_css}"
+        )
         self.page_shell_css = self.page_shell_path.read_text(encoding="utf-8")
         self.list_header_css = self.list_header_path.read_text(encoding="utf-8")
-        self.css = f"{self.tokens_css}\n{self.components_css}"
+        # Os asserts abaixo localizam o primeiro bloco textual de alguns
+        # seletores. Preserve a ordem histórica do arquivo monolítico para que
+        # o teste continue descrevendo o contrato, não a ordem dos novos
+        # arquivos no bundle.
+        self.css = (
+            f"{self.tokens_css}\n{self.shared_components_css}\n"
+            f"{self.dark_components_css}"
+        )
 
     def test_dark_redesign_is_the_final_global_css_layer(self):
         # NOVO-12: ordem canônica está no shell.bundle.css; base só linka o bundle.
@@ -49,6 +64,9 @@ class DarkRedesignContractTests(SimpleTestCase):
             ">>> css/pages/document-viewer.css >>>"
         )
         dialog_index = bundle.index(">>> css/feedback/dialog.css >>>")
+        theme_shared_components_index = bundle.index(
+            ">>> css/components/theme-shared-components.css >>>"
+        )
         theme_dark_components_index = bundle.index(
             ">>> css/components/theme-dark-components.css >>>"
         )
@@ -71,6 +89,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertLess(document_viewer_index, dialog_index)
         self.assertLess(content_cards_index, dialog_index)
         self.assertLess(dialog_index, theme_dark_components_index)
+        self.assertLess(theme_dark_components_index, theme_shared_components_index)
         self.assertLess(action_system_index, theme_dark_components_index)
 
     def test_theme_layer_does_not_target_official_light_theme(self):
@@ -78,6 +97,39 @@ class DarkRedesignContractTests(SimpleTestCase):
             self.assertNotIn('html[data-theme="light"]', layer_css)
             self.assertNotIn('html[data-theme="light-light"]', layer_css)
             self.assertNotIn('html[data-theme="dark-light"]', layer_css)
+
+    def test_geometry_no_longer_lives_in_dark_theme_file(self):
+        def selectors_from(css):
+            rules = tinycss2.parse_stylesheet(
+                css,
+                skip_comments=True,
+                skip_whitespace=True,
+            )
+            selectors = []
+            for rule in rules:
+                if rule.type == "qualified-rule":
+                    selectors.append(tinycss2.serialize(rule.prelude))
+                elif rule.type == "at-rule" and rule.at_keyword == "media":
+                    selectors.extend(
+                        tinycss2.serialize(child.prelude)
+                        for child in tinycss2.parse_rule_list(
+                            rule.content,
+                            skip_comments=True,
+                            skip_whitespace=True,
+                        )
+                        if child.type == "qualified-rule"
+                    )
+            return selectors
+
+        selectors = selectors_from(self.dark_components_css)
+        self.assertGreater(len(selectors), 0)
+        self.assertTrue(all("dark" in selector for selector in selectors))
+        self.assertTrue(
+            all(
+                "dark" not in selector
+                for selector in selectors_from(self.shared_components_css)
+            )
+        )
 
     def test_semantic_dark_contract_covers_core_component_needs(self):
         required_tokens = (
@@ -819,10 +871,10 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         self.assertEqual(self.css.count(".record-card__id-row::before"), 1)
 
-        simple_form_header = self.css.split(
+        simple_form_header = self.css.rsplit(
             ".main-form-panel > .form-section > .section-header {", 1
         )[1].split("}", 1)[0]
-        simple_form_filete = self.css.split(
+        simple_form_filete = self.css.rsplit(
             ".main-form-panel > .form-section > .section-header::before {", 1
         )[1].split("}", 1)[0]
 
