@@ -7593,10 +7593,10 @@ azul-cinza, quando o contrato pedido é bloco azul-cinza com controle branco.
 **Correção.** A estrutura completa de `.record-card` passou ao seletor compartilhado
 `html[data-theme]`. A paleta continua temática: superfícies internas azul-cinza e accents azuis no
 claro; grafite-azulado e accents dourados no escuro. O wizard usa três tokens semânticos separados
-para card, bloco e campo; no claro eles resolvem respectivamente para branco, azul-cinza e branco,
+para card, bloco e campo; no claro eles resolvem respectivamente para branco, `#eef4fc` e branco,
 sem alterar a composição escura.
 
 **Prova.** No Ofício 91, 112 nós foram comparados entre claro e escuro: zero diferenças de dimensão,
 posição relativa ou propriedade não-cor. No wizard de dados, a sonda computada confirma card
-`#fff`, bloco `#e3eaf2` e campo `#fff`; contrato automatizado impede a volta dos seletores de lista
+`#fff`, bloco `#eef4fc` e campo `#fff`; contrato automatizado impede a volta dos seletores de lista
 exclusivos do escuro e da hierarquia de superfícies invertida.

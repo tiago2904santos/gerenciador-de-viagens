@@ -176,11 +176,11 @@
   --card-family-accent-width: 8px;
   /* NOVO-113: a hierarquia interna das listas e a mesma nos dois temas.
      O token resolve para azul-cinza no claro e grafite-azulado no escuro. */
-  --entity-card-inner-bg: var(--color-bg-strong);
+  --entity-card-inner-bg: #eef4fc;
   /* NOVO-113: no claro, cards de formulario sao brancos, blocos internos
      azul-cinza e controles brancos, como na referencia aprovada. */
   --wizard-card-bg: var(--color-surface);
-  --wizard-panel-bg: var(--color-bg-strong);
+  --wizard-panel-bg: #eef4fc;
   --wizard-field-bg: var(--color-surface);
 
   /* --------------------------------------------------------------------------
