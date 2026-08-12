@@ -510,7 +510,8 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
       contexto órfão caíram; diário, quick-add e `field-with-action` fecharam no corpus ampliado · **E7c**
 - [x] `NOVO-58` claro e escuro têm desenho único: 54.225 elementos, 129 medições, 0 divergências não-cor · **E8**
 - [ ] `UI-02` tema escuro deixa de ser camada de exceção (5.619 linhas, 190 `!important`) · **E9**
-- [ ] `UI-04` **97** imports de CSS de outro domínio, em **36** templates · **E10**
+- [ ] `UI-04` fronteiras CSS em redução: 97 imports históricos → **84 imports atuais** em 37
+      templates; última fatia removeu 68.306 B da etapa Documentos de Ofícios · **E10**
 - [ ] `HT-04` entrega JS fechada: shell 266.254 → 108.937 bytes; a fatia CSS continua em `UI-04`/E10 · **E11/E10**
 - [x] `JS-07` 3 implementações vivas de "fechar ao clicar fora / Esc" → `CV.overlay.attachDismiss` · **E11**
 - [x] `JS-08` cinco componentes sob demanda por marcador DOM; shell 283.128 → 266.254 bytes · **E11**

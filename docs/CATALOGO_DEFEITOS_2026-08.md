@@ -3093,6 +3093,14 @@ canônico de `fields/file-picker.css`, sem overflow em claro/escuro a 1440, 800 
 caiu de **673.378 para 650.375 bytes** (**-23.003 bytes**) e o uso medido subiu de **13,6518% para
 14,0594%**.
 
+**Oitava fronteira fechada em 12/08 (`UI-04`, parcial).** A etapa Documentos de Ofícios deixou de
+importar `roteiros.css`: nenhuma regra da folha casava ou alterava os **763 elementos** da página.
+A entrega caiu de **779.430 para 711.124 bytes** (**-68.306 bytes**) e o uso medido subiu de
+**15,08% para 16,57%**. A sonda de mesmo tema confirmou **zero diferenças de estilo** nas seis
+combinações claro/escuro × 1440/800/500; a única diferença estrutural em cada captura é o próprio
+`<link>` removido. `prestacoes_contas.css` permaneceu: a prova por isolamento mostrou 89 diferenças
+de estilo ao retirá-lo, apesar de o contador CDP atribuir zero bytes casados à folha.
+
 ---
 
 ## QA — Testes, CI, segurança e infraestrutura
