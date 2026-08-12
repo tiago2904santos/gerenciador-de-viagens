@@ -527,7 +527,8 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
 
 ### Fase 8 — Observabilidade e autorização
 - [ ] `BE-18` `capture()` só existe em um app; 72 `except` mudos
-- [ ] `BE-19` `require_area_role` com zero usos
+- [x] `BE-19` decisão de autorização registrada; helper e contexto sem consumidor removidos sem
+      inventar operação exclusiva de ADMIN
 - [ ] `QA-16` sem rastreamento de erro centralizado
 - [x] `QA-10` causa fechada por `QA-02`: Redis obrigatório em produção compartilha os contadores
       entre workers; margem concreta do Drive segue em `QA-05`

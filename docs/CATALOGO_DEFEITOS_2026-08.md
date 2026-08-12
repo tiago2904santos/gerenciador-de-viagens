@@ -887,7 +887,7 @@ diario_bordo, eventos, justificativas, prestacoes_contas, usuarios) não têm lo
 **Correção:** `capture()` como contrato único, registrado no `AGENTS.md`; regra nova no
 `audit_django_architecture.py` com catraca que só desce.
 
-### BE-19 🟠 `require_area_role` tem zero usos · AUD · 1,5 d
+### BE-19 ✅ RESOLVIDO · `require_area_role` tem zero usos · AUD · 1,5 d
 
 `core/permissions.py:28` define `require_area_role(minimum_role)`; grep fora de testes: **zero
 chamadas**. `core/context_processors.py:31` calcula `can_admin_area`, usado em **0** templates
@@ -895,6 +895,13 @@ chamadas**. `core/context_processors.py:31` calcula `can_admin_area`, usado em *
 distingue LEITOR de não-LEITOR.
 **Efeito:** `PAPEL_ADMIN` é decorativo — um EDITOR tem os mesmos poderes dentro da área.
 **Decisão humana necessária:** quais operações exigem ADMIN.
+
+**Decisão em 12/08.** Nenhuma operação existente foi elevada arbitrariamente a ADMIN. Contas,
+áreas e vínculos são administração global e já exigem `is_staff`/superusuário; as operações de
+negócio da área pertencem a EDITOR. O papel ADMIN continua como nível superior compatível com
+EDITOR, mas sem privilégio exclusivo inventado. O decorator sem consumidor e a variável de
+template `can_admin_area`, também sem consumidor, foram removidos; `has_area_role` permanece como
+contrato único efetivamente usado.
 
 ### BE-20 ✅ RESOLVIDO · 🟡 `diario_bordo` é app-casca morto · MED · 0,5 d
 
