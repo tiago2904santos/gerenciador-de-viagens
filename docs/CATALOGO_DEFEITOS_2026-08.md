@@ -3168,7 +3168,7 @@ depois é sincronizado para o Google Drive
 **Correção:** chamar `full_clean()` nos caminhos de escrita, ou mover a validação para o form/
 service — e decidir se `despacho_assinado` sai do modelo.
 
-### QA-05 🟡 Cliente real do Google Drive com 42,5% de cobertura · AUD · 3 d
+### QA-05 ✅ RESOLVIDO · Cliente real do Google Drive com 42,5% de cobertura · AUD · 3 d
 
 `integracoes/google_drive/services.py` — 301 statements, **42,52%**. A classe `_RealClient`
 (a partir de `:218`), com refresh de token OAuth (`:243-250`) e todos os métodos que chamam
@@ -3176,6 +3176,13 @@ service — e decidir se `despacho_assinado` sai do modelo.
 `tests/test_organizer_contract.py:16` define `DriveClientDouble(services._MockClient)` — os testes
 exercitam o dublê, não o código que fala com a API. Não há `responses`/`vcr` no projeto.
 **Agrava o `QA-10`:** é justamente o app com a menor folga real sobre o piso de cobertura.
+
+**Fechamento em 12/08.** Doze testes exercitam `_RealClient` diretamente com a biblioteca oficial
+simulada na fronteira: ausência e renovação de credencial OAuth, timeout e construção do serviço,
+upload, busca/criação/cache/listagem de pastas, Drives compartilhados, criação e identificação de
+pasta, movimento com remoção dos pais antigos, atalhos, atualização de conteúdo, busca com escape
+de nome, listagem, exclusão e lixeira. Assim os parâmetros enviados à API e os efeitos locais são
+provados sem rede, credencial real ou gravação externa.
 
 ### QA-06 🟡 Teste da CVE do WeasyPrint verifica texto-fonte, não comportamento · AUD · 0,5 d
 

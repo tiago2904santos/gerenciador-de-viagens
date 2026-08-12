@@ -531,7 +531,7 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
 - [ ] `QA-16` sem rastreamento de erro centralizado
 - [x] `QA-10` causa fechada por `QA-02`: Redis obrigatório em produção compartilha os contadores
       entre workers; margem concreta do Drive segue em `QA-05`
-- [ ] `QA-05` cliente real do Google Drive com 42,5% de cobertura
+- [x] `QA-05` cliente real do Google Drive coberto por 12 testes de contrato na fronteira da API
 - [x] `QA-14` CRUD de modelos do Relatório Técnico — já fechado por 7 testes em `993e14c5`;
       status reconciliado
 - [x] `QA-15` oito provas dos erros de download, WeasyPrint, storage e fila; 22 testes do conjunto
