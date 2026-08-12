@@ -20,6 +20,17 @@ coverage-js/
 .vscode/
 legacy/
 
+# BE-24 — evidências e artefatos locais nunca entram no repositório.
+/screenshots/
+/.tmp-*/
+/tmp/
+/media_teste/
+/migration_backups/
+/logs/
+/.codex-runserver-*.log
+/_tmp_check*.py
+/tatus
+
 # Agentes/Claude/Cursor - evitar projetos duplicados dentro do repo
 /Central de Viagens 3.0/
 *_DUPLICADO_NAO_USAR/
