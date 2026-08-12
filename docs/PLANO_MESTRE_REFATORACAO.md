@@ -530,7 +530,7 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       observadas e catraca AST permanente no CI
 - [x] `BE-19` decisão de autorização registrada; helper e contexto sem consumidor removidos sem
       inventar operação exclusiva de ADMIN
-- [ ] `QA-16` sem rastreamento de erro centralizado
+- [x] `QA-16` Sentry opcional integrado ao Django e a `capture()`, sem PII/tracing e com falha segura
 - [x] `QA-10` causa fechada por `QA-02`: Redis obrigatório em produção compartilha os contadores
       entre workers; margem concreta do Drive segue em `QA-05`
 - [x] `QA-05` cliente real do Google Drive coberto por 12 testes de contrato na fronteira da API

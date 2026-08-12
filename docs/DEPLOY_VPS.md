@@ -149,6 +149,12 @@ Preencha:
 - `DJANGO_SETTINGS_MODULE` — `config.settings.prod`
 - `FIELD_ENCRYPTION_KEYS` — cifragem dos tokens do Drive; `prod.py` recusa subir sem ela
 - `REDIS_URL` — `redis://127.0.0.1:6379/1` (o Redis do passo 2.3)
+- `SENTRY_DSN` — opcional; DSN público do projeto de monitoramento de erros
+- `SENTRY_ENVIRONMENT` — nome do ambiente, por exemplo `production`
+- `SENTRY_RELEASE` — SHA/tag implantado para correlacionar regressões com deploys
+
+Com `SENTRY_DSN` vazio, nenhum evento sai do servidor. Quando habilitado, o backend recebe
+exceções sem PII padrão e sem tracing; configure alertas e retenção no próprio projeto Sentry.
 
 > **`REDIS_URL` passou a ser obrigatória (`QA-02`).** O Redis já era exigido aqui como
 > broker do Celery, mas o Django não o usava como cache: sem a variável ele caía para

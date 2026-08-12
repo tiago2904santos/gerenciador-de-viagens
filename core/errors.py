@@ -17,6 +17,24 @@ def _json_safe(value: Any) -> Any:
     return str(value)
 
 
+def _capture_remote(exc: BaseException, contexto: str, dados: Mapping[str, Any]) -> None:
+    from django.conf import settings
+
+    if not getattr(settings, "SENTRY_DSN", ""):
+        return
+    try:
+        import sentry_sdk
+
+        if not sentry_sdk.is_initialized():
+            return
+        with sentry_sdk.new_scope() as scope:
+            scope.set_tag("error.context", contexto)
+            scope.set_context("error_data", _json_safe(dados))
+            sentry_sdk.capture_exception(exc)
+    except Exception:
+        _LOGGER.warning("Falha ao encaminhar exceção para o backend externo", exc_info=True)
+
+
 def capture(
     exc: BaseException,
     contexto: str,
@@ -45,4 +63,5 @@ def capture(
             "error_data": _json_safe(dados),
         },
     )
+    _capture_remote(exc, contexto, dados)
     return exc

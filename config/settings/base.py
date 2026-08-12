@@ -156,6 +156,9 @@ TRUSTED_PROXY_IPS = tuple(
     if value.strip()
 )
 METRICS_TOKEN = os.getenv("METRICS_TOKEN", "")
+SENTRY_DSN = os.getenv("SENTRY_DSN", "").strip()
+SENTRY_ENVIRONMENT = os.getenv("SENTRY_ENVIRONMENT", "production").strip() or "production"
+SENTRY_RELEASE = os.getenv("SENTRY_RELEASE", "").strip()
 
 ROOT_URLCONF = "config.urls"
 
