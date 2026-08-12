@@ -887,7 +887,7 @@ diario_bordo, eventos, justificativas, prestacoes_contas, usuarios) não têm lo
 **Correção:** `capture()` como contrato único, registrado no `AGENTS.md`; regra nova no
 `audit_django_architecture.py` com catraca que só desce.
 
-### BE-19 🟠 `require_area_role` tem zero usos · AUD · 1,5 d
+### BE-19 ✅ RESOLVIDO · `require_area_role` tem zero usos · AUD · 1,5 d
 
 `core/permissions.py:28` define `require_area_role(minimum_role)`; grep fora de testes: **zero
 chamadas**. `core/context_processors.py:31` calcula `can_admin_area`, usado em **0** templates
@@ -895,6 +895,13 @@ chamadas**. `core/context_processors.py:31` calcula `can_admin_area`, usado em *
 distingue LEITOR de não-LEITOR.
 **Efeito:** `PAPEL_ADMIN` é decorativo — um EDITOR tem os mesmos poderes dentro da área.
 **Decisão humana necessária:** quais operações exigem ADMIN.
+
+**Decisão em 12/08.** Nenhuma operação existente foi elevada arbitrariamente a ADMIN. Contas,
+áreas e vínculos são administração global e já exigem `is_staff`/superusuário; as operações de
+negócio da área pertencem a EDITOR. O papel ADMIN continua como nível superior compatível com
+EDITOR, mas sem privilégio exclusivo inventado. O decorator sem consumidor e a variável de
+template `can_admin_area`, também sem consumidor, foram removidos; `has_area_role` permanece como
+contrato único efetivamente usado.
 
 ### BE-20 ✅ RESOLVIDO · 🟡 `diario_bordo` é app-casca morto · MED · 0,5 d
 
@@ -3175,7 +3182,7 @@ depois é sincronizado para o Google Drive
 **Correção:** chamar `full_clean()` nos caminhos de escrita, ou mover a validação para o form/
 service — e decidir se `despacho_assinado` sai do modelo.
 
-### QA-05 🟡 Cliente real do Google Drive com 42,5% de cobertura · AUD · 3 d
+### QA-05 ✅ RESOLVIDO · Cliente real do Google Drive com 42,5% de cobertura · AUD · 3 d
 
 `integracoes/google_drive/services.py` — 301 statements, **42,52%**. A classe `_RealClient`
 (a partir de `:218`), com refresh de token OAuth (`:243-250`) e todos os métodos que chamam
@@ -3183,6 +3190,13 @@ service — e decidir se `despacho_assinado` sai do modelo.
 `tests/test_organizer_contract.py:16` define `DriveClientDouble(services._MockClient)` — os testes
 exercitam o dublê, não o código que fala com a API. Não há `responses`/`vcr` no projeto.
 **Agrava o `QA-10`:** é justamente o app com a menor folga real sobre o piso de cobertura.
+
+**Fechamento em 12/08.** Doze testes exercitam `_RealClient` diretamente com a biblioteca oficial
+simulada na fronteira: ausência e renovação de credencial OAuth, timeout e construção do serviço,
+upload, busca/criação/cache/listagem de pastas, Drives compartilhados, criação e identificação de
+pasta, movimento com remoção dos pais antigos, atalhos, atualização de conteúdo, busca com escape
+de nome, listagem, exclusão e lixeira. Assim os parâmetros enviados à API e os efeitos locais são
+provados sem rede, credencial real ou gravação externa.
 
 ### QA-06 🟡 Teste da CVE do WeasyPrint verifica texto-fonte, não comportamento · AUD · 0,5 d
 

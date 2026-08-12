@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-from functools import wraps
-
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
 
 from usuarios.models import VinculoUsuarioArea
 
@@ -23,16 +20,3 @@ def has_area_role(request, minimum_role: str) -> bool:
     if not vinculo.ativo:
         return False
     return ROLE_ORDER.get(vinculo.papel, 0) >= ROLE_ORDER[minimum_role]
-
-
-def require_area_role(minimum_role: str):
-    def decorator(view):
-        @wraps(view)
-        def wrapped(request, *args, **kwargs):
-            if not has_area_role(request, minimum_role):
-                raise PermissionDenied
-            return view(request, *args, **kwargs)
-
-        return wrapped
-
-    return decorator
