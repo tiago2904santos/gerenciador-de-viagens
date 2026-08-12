@@ -2,13 +2,14 @@ import csv
 import unicodedata
 from dataclasses import dataclass
 from dataclasses import field
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 from django.db import transaction
 
 from cadastros.models import Cidade
 from cadastros.models import Estado
+from core.errors import capture
 
 # Capitais por UF — comparação por nome normalizado (maiúsculas + acentos → NFKD).
 CAPITAIS_POR_UF = {
@@ -115,7 +116,7 @@ def _parse_decimal(raw: str) -> Decimal | None:
         return None
     try:
         return Decimal(raw)
-    except Exception:
+    except InvalidOperation:
         return None
 
 
@@ -256,6 +257,7 @@ def importar_estados_csv(
                     Estado.objects.create(nome=nome, sigla=sigla, codigo_ibge=cod_ibge)
                     resultado.criados += 1
         except Exception as exc:
+            capture(exc, "cadastros.importar_estados_csv", linha=line_no, sigla=sigla)
             resultado.erros.append((line_no, str(exc)))
 
     return resultado

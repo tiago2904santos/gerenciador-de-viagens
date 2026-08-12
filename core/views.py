@@ -13,6 +13,7 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 
 from core import login_throttle
+from core.errors import capture
 from eventos.models import Evento
 
 from .forms import AlterarSenhaForm
@@ -59,7 +60,8 @@ def _encerrar_outras_sessoes(request) -> None:
         try:
             if str(session.get_decoded().get("_auth_user_id")) == str(request.user.pk):
                 session.delete()
-        except Exception:
+        except Exception as exc:
+            capture(exc, "core.login.encerrar_outras_sessoes", session_key=session.session_key)
             continue
 
 

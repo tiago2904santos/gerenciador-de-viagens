@@ -25,7 +25,7 @@ def _exigir_chave_de_cifragem(chaves):
     else:
         try:
             Fernet(chaves[0].encode() if isinstance(chaves[0], str) else chaves[0])
-        except Exception:
+        except (TypeError, ValueError):
             motivo = "não é uma chave Fernet válida (o valor do .env.example é só um lembrete)"
         else:
             return

@@ -887,6 +887,11 @@ diario_bordo, eventos, justificativas, prestacoes_contas, usuarios) não têm lo
 **Correção:** `capture()` como contrato único, registrado no `AGENTS.md`; regra nova no
 `audit_django_architecture.py` com catraca que só desce.
 
+**Fatia 1 em 12/08.** A medição atualizada encontrou 73 handlers genéricos sem `capture` nem log.
+Onze foram eliminados: conversões esperadas agora capturam exceções específicas; falhas reais de
+importação geográfica, configuração de justificativa, auditoria, tenancy e encerramento de sessão
+entram em `capture()` com contexto estável. O saldo caiu para 62, e 41 testes direcionados passaram.
+
 ### BE-19 ✅ RESOLVIDO · `require_area_role` tem zero usos · AUD · 1,5 d
 
 `core/permissions.py:28` define `require_area_role(minimum_role)`; grep fora de testes: **zero

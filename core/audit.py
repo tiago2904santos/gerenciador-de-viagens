@@ -6,6 +6,7 @@ from uuid import UUID
 
 from django.db import transaction
 
+from core.errors import capture
 from core.middleware import get_current_request
 
 AUDITED_APP_LABELS = {
@@ -78,7 +79,13 @@ def _repr_seguro(instance) -> str:
     """
     try:
         rotulo = str(instance)
-    except Exception:
+    except Exception as exc:
+        capture(
+            exc,
+            "core.audit.instance_label",
+            model=instance._meta.label,
+            object_id=instance.pk,
+        )
         rotulo = None
     if isinstance(rotulo, str) and rotulo:
         return rotulo[:255]
@@ -92,7 +99,13 @@ def _snapshot(instance):
             continue
         try:
             values[field.name] = _json_value(field.value_from_object(instance))
-        except Exception:
+        except Exception as exc:
+            capture(
+                exc,
+                "core.audit.snapshot_instance",
+                model=instance._meta.label,
+                field=field.name,
+            )
             continue
     return values
 
