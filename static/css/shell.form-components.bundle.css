@@ -188,6 +188,7 @@ html[data-theme="dark"] {
   --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 14px 34px rgba(0, 0, 0, 0.42);
   --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.3);
   --shadow-panel: 0 18px 44px rgba(0, 0, 0, 0.42);
+  --shadow-custom-select-menu: 0 12px 28px rgba(2, 10, 18, 0.28);
   --shadow-elevated: 0 26px 70px rgba(0, 0, 0, 0.55);
   /* NOVO-51: o foco escuro combina borda e halo visível. */
   --focus-ring: 0 0 0 var(--space-1) var(--input-focus-ring);
@@ -14800,9 +14801,9 @@ html[data-theme="dark"] *::after {
   transition: border-color 120ms ease;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__trigger--v2:focus,
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__trigger--v2:focus-visible {
   outline: none;
 }
@@ -14815,8 +14816,8 @@ html[data-theme="dark"] *::after {
   padding: 0 14px;
 }
 
-/* Chevron v2: accent dourado em TODOS os estados (fechado/hover/focus/open). */
-:is(html[data-theme="dark"])
+/* Chevron v2: usa o accent da paleta em TODOS os estados. */
+:is(html[data-theme])
   .custom-select--v2 {
   --cs-chevron-color: var(--color-accent);
 }
@@ -14855,14 +14856,14 @@ html[data-theme="dark"] *::after {
   transform: rotate(180deg);
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2 {
   --cs-menu-bg: var(--color-input-bg);
   animation: none;
   background: var(--color-input-bg);
   border: 1px solid var(--color-border-strong);
   border-radius: 12px;
-  box-shadow: 0 12px 28px rgb(2 10 18 / 0.28);
+  box-shadow: var(--shadow-custom-select-menu);
   max-height: 260px;
   padding: 6px;
   scrollbar-color: var(--color-border-strong) transparent;
@@ -14870,7 +14871,7 @@ html[data-theme="dark"] *::after {
   top: calc(100% + 6px);
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2.floating-dropdown--active {
   background: var(--color-input-bg);
   border: 1px solid var(--color-border-strong);
@@ -14887,9 +14888,9 @@ html[data-theme="dark"] *::after {
   width: 14px;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2::-webkit-scrollbar-track,
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2::-webkit-scrollbar-track-piece {
   background: transparent;
   border: none;
@@ -14897,7 +14898,7 @@ html[data-theme="dark"] *::after {
   margin-block: 8px;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2::-webkit-scrollbar-thumb {
   background-clip: padding-box;
   background-color: var(--color-border-strong);
@@ -14905,22 +14906,22 @@ html[data-theme="dark"] *::after {
   border-radius: var(--radius-pill);
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2::-webkit-scrollbar-thumb:hover {
   background-color: color-mix(in srgb, var(--color-muted) 55%, transparent);
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2::-webkit-scrollbar-button,
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2::-webkit-scrollbar-button:single-button,
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2::-webkit-scrollbar-button:start:decrement,
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2::-webkit-scrollbar-button:end:increment,
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2::-webkit-scrollbar-button:vertical:start:decrement,
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2::-webkit-scrollbar-button:vertical:end:increment {
   background: transparent;
   border: none;
@@ -14929,7 +14930,7 @@ html[data-theme="dark"] *::after {
   width: 0;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2::-webkit-scrollbar-corner {
   background: transparent;
 }
@@ -14939,7 +14940,7 @@ html[data-theme="dark"] *::after {
   border-radius: 8px;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2 .custom-select__option {
   color: var(--color-muted-strong);
   gap: 10px;
@@ -14949,15 +14950,15 @@ html[data-theme="dark"] *::after {
   transition: background-color 100ms ease, color 100ms ease;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2 .custom-select__option:hover:not(.custom-select__option--disabled),
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2 .custom-select__option--focused {
   background: var(--color-surface-soft);
   color: var(--color-heading);
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2 .custom-select__option--selected {
   background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface-soft));
   box-shadow: inset 3px 0 0 var(--color-accent);
@@ -14965,9 +14966,9 @@ html[data-theme="dark"] *::after {
   font-weight: var(--font-weight-bold);
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2 .custom-select__option--selected:hover:not(.custom-select__option--disabled),
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2 .custom-select__option--selected.custom-select__option--focused {
   background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface-soft));
   box-shadow: inset 3px 0 0 var(--color-accent);
@@ -14980,7 +14981,7 @@ html[data-theme="dark"] *::after {
   border-radius: 7px;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__menu--v2 .custom-select__option-check {
   align-items: center;
   background: var(--color-accent);
@@ -14997,9 +14998,9 @@ html[data-theme="dark"] *::after {
   order: 1;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select--v2.custom-select--disabled .custom-select__trigger--v2,
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select__trigger--v2:disabled {
   background: var(--color-surface-muted);
   border-color: var(--color-border-soft);
@@ -15007,7 +15008,7 @@ html[data-theme="dark"] *::after {
   opacity: 0.64;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .custom-select--v2.custom-select--error .custom-select__trigger--v2 {
   background: var(--color-input-bg);
   border-color: var(--color-danger);

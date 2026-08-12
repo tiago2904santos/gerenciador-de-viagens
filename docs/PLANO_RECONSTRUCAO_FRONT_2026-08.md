@@ -670,6 +670,7 @@ o token resolve.
 | **E8-8b** | a fatia da 8b que sobrevive aos três portões (alcance medido, âncora estrutural, fronteira no claro) | ✅ 1 de 41 regras — escuro **pixel-idêntico**, claro com 18 elementos nas 3 rotas de roteiro |
 | **E8-8b superfícies** | redesenha a hierarquia clara e neutraliza a família bloqueada (`NOVO-93`) | ✅ regras que removem borda do claro **34 → 0**; divergências não-cor **138.978 → 115.963**; escuro 60.497 elementos, **0 diferenças** |
 | **E8 Eventos/Wizard** | tipografia, stepper de um anel, campos, selects e hierarquia de superfícies (`NOVO-58`, `NOVO-100`) | ✅ conteúdo com **0 divergências não-cor** em 1440/800/500; chrome móvel permanece na 8h; prints claro/escuro conferidos |
+| **E8 Custom Select v2** | menu aberto, opções e check usam uma geometria nos dois temas (`NOVO-112`) | ✅ trilho, recuo, altura, raio, check e scrollbar compartilhados; azul no claro e dourado no escuro |
 
 **O instrumento que a etapa exigiu, e que não existia.** A régua da E0
 (`medir_divergencia_tema.py`) compara **claro contra escuro no mesmo código**. A E9 precisa do

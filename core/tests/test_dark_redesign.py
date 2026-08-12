@@ -148,6 +148,24 @@ class DarkRedesignContractTests(SimpleTestCase):
             self.list_header_css,
         )
 
+    def test_custom_select_v2_uses_one_geometry_for_both_themes(self):
+        # NOVO-112: o claro espelha o escuro; somente os tokens de paleta mudam.
+        selectors = (
+            ".custom-select__menu--v2 {",
+            ".custom-select__menu--v2 .custom-select__option {",
+            ".custom-select__menu--v2 .custom-select__option--selected {",
+            ".custom-select__menu--v2 .custom-select__option-check {",
+        )
+        for selector in selectors:
+            with self.subTest(selector=selector):
+                shared = f':is(html[data-theme])\n  {selector}'
+                dark_only = f':is(html[data-theme="dark"])\n  {selector}'
+                self.assertIn(shared, self.components_css)
+                self.assertNotIn(dark_only, self.components_css)
+
+        self.assertIn("box-shadow: var(--shadow-custom-select-menu);", self.components_css)
+        self.assertIn("--shadow-custom-select-menu:", self.tokens_css)
+
     def test_templates_do_not_reintroduce_inline_visual_or_event_contracts(self):
         templates = Path(settings.BASE_DIR) / "templates"
         forbidden = (" style=", " onclick=", " onchange=", " oninput=", " onsubmit=")
