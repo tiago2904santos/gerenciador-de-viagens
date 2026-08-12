@@ -3256,7 +3256,7 @@ morto, nome não definido em ramo raro ou incompatibilidade de tipo.
 **Nota de folga:** `audit_django_architecture.py --max-orm-em-view 30` está com **folga zero** —
 30 medido contra teto 30. Qualquer ORM novo em view reprova o CI.
 
-### QA-08 🟡 Dependências de assinatura e criptografia atrasadas · AUD · 2 d · risco médio
+### QA-08 ✅ RESOLVIDO · Dependências de assinatura e criptografia atrasadas · AUD · 2 d · risco médio
 
 `pip list --outdated`: `pyHanko 0.25.3 → 0.36.2` (11 minors), `pyhanko-certvalidator 0.26.8 →
 0.31.4`, `redis 5.3.1 → 8.1.0` (3 majors), `reportlab 4.5.1 → 5.0.0`, `weasyprint 68.1 → 69.0`,
@@ -3269,7 +3269,10 @@ defasagem, não de vulnerabilidade confirmada.
 em ambiente isolado. O conjunto combinado de documentos, ofícios, ordens de serviço, planos de
 trabalho e prestações executou 784 testes: 783 verdes e uma importação do WeasyPrint bloqueada no
 Windows pela ausência conhecida de `libgobject-2.0-0`; o gate canônico Ubuntu fica a cargo do CI.
-Resta isolar o salto de Redis.
+O salto de Redis foi isolado em seguida: cliente 5.3.1 → 8.1.0, removendo `PyJWT`, dependência
+transitiva que deixou de ser necessária. O lock integral com hashes instala sem conflito; Redis,
+o transporte Redis do Kombu e o backend `RedisCache` do Django importam juntos, e 29 testes de
+rate limit, métricas, cache documental e enfileiramento passam no ambiente com a versão nova.
 
 ### NOVO-118 ✅ RESOLVIDO · `docxcompose` era dependência transitiva usada diretamente · QA · 0,25 d
 

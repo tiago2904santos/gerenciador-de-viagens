@@ -21,7 +21,7 @@ google-api-python-client>=2.100,<3.0
 google-auth>=2.20,<3.0
 google-auth-oauthlib>=1.0,<2.0
 celery>=5.4,<6.0
-redis>=5.0,<6.0
+redis>=8.1,<9.0
 unoserver>=3.4,<4.0
 # Base, não prod-only: `config/staticfiles.py` importa `whitenoise.storage` e é
 # importado pelo teste de contrato de versionamento, que roda em toda suíte.
