@@ -529,7 +529,8 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
 - [ ] `BE-18` `capture()` só existe em um app; 72 `except` mudos
 - [ ] `BE-19` `require_area_role` com zero usos
 - [ ] `QA-16` sem rastreamento de erro centralizado
-- [ ] `QA-10` `/metrics/` conta só o worker que atendeu
+- [x] `QA-10` causa fechada por `QA-02`: Redis obrigatório em produção compartilha os contadores
+      entre workers; margem concreta do Drive segue em `QA-05`
 - [ ] `QA-05` cliente real do Google Drive com 42,5% de cobertura
 - [x] `QA-14` CRUD de modelos do Relatório Técnico — já fechado por 7 testes em `993e14c5`;
       status reconciliado

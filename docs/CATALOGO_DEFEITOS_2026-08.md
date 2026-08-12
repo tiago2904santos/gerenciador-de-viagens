@@ -3240,7 +3240,7 @@ de mídia diferentes, e o de 32 linhas não tem `DOCUMENTOS_PDF_AUTO_FALLBACK`,
 **Efeito:** os dois nomes são igualmente plausíveis; seguir o errado configura caminhos que não
 batem com o que os scripts de deploy assumem.
 
-### QA-10 🟡 `/metrics/` e margem de cobertura fina · AUD · segue de QA-02 e QA-05
+### QA-10 ✅ RESOLVIDO POR QA-02 · `/metrics/` e margem de cobertura fina · AUD · segue de QA-02 e QA-05
 
 `core/metrics.py:20-38` usa `cache.incr`/`cache.add` do mesmo `CACHES` do `QA-02`: com
 `LocMemCache` e 3 workers, `/metrics/` reporta só os contadores do processo que atendeu à
@@ -3251,6 +3251,11 @@ Margem sobre o piso de cobertura abaixo de 1 ponto: `integracoes.google_drive` 5
 `roteiros` 74,83% contra 74,10% (0,73 pp sobre 4.069 statements);
 `diario_bordo` 91,67% contra 91,17% — artefato de arquivo minúsculo (12 statements, 1 linha =
 8,3 pp), que se resolve pelo `BE-20`, não perseguindo a métrica.
+
+**Reconciliação em 12/08.** A causa funcional foi eliminada por `QA-02`: produção agora exige
+`REDIS_URL`, e `base.py` seleciona `RedisCache`, compartilhando os mesmos contadores entre os
+workers. As margens de cobertura continuam protegidas pelos pisos do CI; a lacuna concreta do
+Drive permanece isolada em `QA-05`, e o artefato de `diario_bordo` foi removido em `BE-20`.
 
 ### QA-11 ✅ RESOLVIDO (993e14c, 05/08/2026) · 🟡 `reparar-producao.yml` em UTF-16LE · AUD · 0,25 d
 
