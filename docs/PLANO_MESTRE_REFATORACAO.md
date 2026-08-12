@@ -351,7 +351,7 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       atributos mortos, não 3, e a cobertura era de 19% (57 de 298). Rescrito a partir da
       medição e **travado nos dois sentidos** por teste, que é o que impede de apodrecer de novo
 
-### Fase 5 — Consulta e índice
+### Fase 5 — Consulta e índice ✅ **COMPLETA** (12/08/2026)
 - [x] `DB-09` lista de roteiros agrega antes do `LIMIT` — `~Exists()` no lugar de
       `Count` + `.exclude(...=0)`, **junto** com o índice `(area, -updated_at)`: separados dão
       2,9× e 1,0×, juntos 8,9× na consulta e **1,54× na rota** (975,8 → 633,2 ms). O `LIMIT`
@@ -360,7 +360,11 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       Das cinco listas que ordenavam em memória, só `OrdemServico` ganha (64× na consulta,
       1,08× na rota); nas outras quatro o índice análogo não move o tempo e em `roteiros`
       piora. "Ofícios têm situação análoga" era falso, e o que sobra ali é o `NOVO-50`
-- [ ] `DB-11` 80 buscas livres sem índice
+- [x] `DB-11` busca livre de Termos multiplicava 20.000 linhas por três M2M e rodava três vezes —
+      `Exists()` por origem + contagem das abas reutilizada pelo paginador. O `PF-07` agora mede
+      `termos:index:busca` permanentemente: **1.807,9 → 391,4 ms (4,62×)** em 20.000 registros,
+      com 6 queries. `pg_trgm` não entrou: a medição anterior deu 1,00× e provou que o gargalo era
+      a forma da consulta, não a ausência de cinco índices
 - [x] `DB-12` trilha de auditoria sem índice, sem expurgo — **só o índice**. O expurgo saiu
       por decisão do usuário (retenção de trilha de órgão público é pergunta de produto).
       O índice entrou como folga: medido, o planner só o escolhe por volta de 100 áreas,

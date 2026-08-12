@@ -161,6 +161,14 @@ ROTAS = [
     ("prestacoes_contas:index", "prestacoes_contas"),
 ]
 
+# Cenários da mesma rota cuja consulta muda de forma material com parâmetros.
+# A busca de Termos merece uma linha própria: foi justamente a rota sem `q` da
+# régua que deixou o `DB-11` parecer coberto enquanto a busca levava ~1,8 s.
+# A chave é deliberadamente diferente do nome reversível para ter teto próprio.
+CENARIOS_COM_QUERY = [
+    ("termos:index:busca", "termos:index", "termos_busca", {"q": "137"}),
+]
+
 
 # ── Semeadura ────────────────────────────────────────────────────────────────
 
@@ -588,14 +596,15 @@ def _linhas_na_pagina(resposta):
     return len(page_obj.object_list)
 
 
-def medir_rota(client, nome_rota, repeticoes):
+def medir_rota(client, nome_rota, repeticoes, *, params=None):
     url = reverse(nome_rota)
+    params = params or {}
 
     # Uma requisição descartada antes de medir: a primeira paga compilação de
     # template e preenchimento de cache de app. Em produção esse custo é pago uma
     # vez por processo, não por requisição — medir o regime estável é o que
     # descreve o que o usuário sente na segunda tela em diante.
-    resposta = client.get(url)
+    resposta = client.get(url, params)
     if resposta.status_code != 200:
         raise SystemExit(f"{nome_rota} respondeu {resposta.status_code}, esperava 200")
 
@@ -604,7 +613,7 @@ def medir_rota(client, nome_rota, repeticoes):
     for _ in range(repeticoes):
         with CaptureQueriesContext(connection) as capturadas:
             comeco = time.perf_counter()
-            resposta = client.get(url)
+            resposta = client.get(url, params)
             tempos.append((time.perf_counter() - comeco) * 1000)
         consultas = len(capturadas)
 
@@ -631,6 +640,9 @@ def medir_volume(volume, repeticoes):
     for nome_rota, rotulo in ROTAS:
         medidas[nome_rota] = medir_rota(client, nome_rota, repeticoes)
         medidas[nome_rota]["dominio"] = rotulo
+    for chave, nome_rota, rotulo, params in CENARIOS_COM_QUERY:
+        medidas[chave] = medir_rota(client, nome_rota, repeticoes, params=params)
+        medidas[chave]["dominio"] = rotulo
     return medidas
 
 

@@ -1498,7 +1498,7 @@ Ofícios têm situação análoga.
 > Migração `ordens_servico/0013`, com o procedimento de `CREATE INDEX CONCURRENTLY` no docstring
 > para o caso de a tabela em produção ser grande (limite 4 do `AGENTS.md`).
 
-### DB-11 🟡 As 80 buscas livres são varredura sequencial · AUD · 3 d
+### DB-11 ✅ RESOLVIDO (PR #349) · A busca livre mais cara multiplicava linhas antes de filtrar · AUD · 3 d
 
 80 ocorrências de `__unaccent__icontains`; extensão `unaccent` instalada, `pg_trgm` ausente;
 **0 índices GIN ou trigram** em 390 índices. Prova direta: busca de ofícios com `q="ambi"` sobre
@@ -1565,6 +1565,28 @@ expressão nas 4 ou 5 colunas realmente buscadas.
 > **A pergunta do privilégio era desnecessária:** `CREATE EXTENSION pg_trgm` funciona **sem
 > superusuário** desde o PostgreSQL 13, em que ela é *trusted* — e o `unaccent` deste projeto já
 > tinha sido criado assim.
+>
+> **Fechado em 12/08/2026 pela correção que a medição pediu, sem índice ornamental.** Os três
+> relacionamentos M2M de servidor saíram do `OR` externo e viraram `Exists()` independentes. A
+> linha de Termo deixa de ser multiplicada antes do filtro, o `DISTINCT` deixa de ser necessário e
+> testes de caracterização preservam as três origens: servidor próprio, servidor do Ofício e
+> servidor marcado para Termo no Ofício. A contagem das abas, que já conhece o total da aba ativa,
+> passou a alimentar o `Paginator`; a terceira execução da mesma busca saiu.
+>
+> O `PF-07` ganhou um cenário permanente `termos:index:busca` com `q=137`, teto próprio e teste que
+> impede removê-lo da régua. No PostgreSQL 16 do CI, com 20.000 registros por domínio e três áreas:
+>
+> | forma | consultas | mediana da rota |
+> |---|---:|---:|
+> | antes, `OR` pós-join executado três vezes | — | 1.807,9 ms |
+> | depois, `Exists()` + contagem reutilizada | 6 | **391,4 ms** |
+> | | | **4,62×** |
+>
+> No volume 200, a mesma régua mediu 3 consultas e 37,7 ms. A listagem sem busca também caiu de 7
+> para 6 consultas. Não entrou `pg_trgm`: a medição anterior já provou 1,00× enquanto a forma da
+> consulta era o gargalo, e este fechamento remove o defeito provado sem criar cinco índices sem
+> ganho demonstrado. As demais buscas livres permanecem sob a régua por rota; otimização futura
+> exige evidência própria, não herda a severidade nem a solução do pior caso.
 
 ### DB-12 ✅ RESOLVIDO (parte do índice) · 🟡 Trilha de auditoria cresce sem limite e encarece toda escrita · AUD · 3 d
 
