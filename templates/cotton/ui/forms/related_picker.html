@@ -1,4 +1,4 @@
-{% cotton:vars attrs disabled empty_data_hook empty_data_value empty_id empty_text field hide_search input_aria_label input_data_hook input_data_value input_id input_placeholder list_data_hook list_data_value list_extra_class list_id native panel_aria_label panel_extra_class panel_header plain_list presentation root_extra_class %}
+{% cotton:vars attrs clear_aria_label clear_data_hook clear_data_value disabled empty_data_hook empty_data_value empty_id empty_text field hide_search input_aria_label input_data_hook input_data_value input_id input_placeholder list_data_hook list_data_value list_extra_class list_id native panel_aria_label panel_extra_class panel_header plain_list presentation root_extra_class %}
 <div class="search-picker{% if not hide_search %} search-picker--single search-picker--detailed search-picker--people search-picker--roster{% endif %}{% if root_extra_class %} {{ root_extra_class }}{% endif %}"
      data-related-picker-root
      data-related-picker-presentation="{{ presentation|default:'card' }}"
@@ -19,6 +19,14 @@
           autocomplete="off"
           role="searchbox"
         >
+        {% if clear_data_hook %}
+          <button
+            type="button"
+            class="search-picker__clear"
+            data-{{ clear_data_hook }}="{{ clear_data_value }}"
+            aria-label="{{ clear_aria_label|default:'Limpar busca' }}"
+          >×</button>
+        {% endif %}
       </div>
     </div>
   {% endif %}

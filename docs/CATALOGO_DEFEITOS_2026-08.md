@@ -7741,3 +7741,24 @@ estrutura e estilo. `--revelar` expõe `[hidden]`/`aria-hidden` e abre `details`
 `hover`, `focus`, `focus-visible` ou `active`. O contrato puro tem dez cenários e um smoke real da
 tela pública provou duas sessões, duas ordens e zero diferença; o corpus completo continua sendo a
 prova exigida para cada diff visual da E9, não uma inferência reaproveitada de outro diff.
+
+### NOVO-115 ✅ RESOLVIDO · `NOVO` Picker de documentos filtrava pela data salva, não pela data visível · JS · 0,25 d
+
+A triagem do rascunho #58 encontrou um defeito ainda vivo sob uma implementação antiga: o picker de
+documentos vinculados do Evento calculava o período uma vez, a partir do valor salvo no servidor.
+Ao editar início ou fim no calendário, a tela mostrava a data nova, mas os Ofícios, Roteiros, Planos,
+OS e Termos continuavam filtrados pelo período anterior até salvar e recarregar a página. Em evento
+novo, a lista permanecia sem filtro. O campo também era o único picker detalhado sem ação de limpar.
+
+**Correção.** Cada render lê os `hidden` canônicos do `date-picker`; o `change` emitido pelo componente
+refiltra os cinco painéis imediatamente. Limpar as duas datas remove o filtro, em vez de ressuscitar
+o período salvo como fallback. O `related_picker` ganhou um slot declarativo opcional para a ação de
+limpar, e o painel de documentos consome o mesmo estado `search-picker--has-query` dos demais
+pickers. O rascunho conflitante não foi mesclado: a intenção foi reaplicada sobre os componentes
+atuais.
+
+**Prova.** Três testes Vitest exercitam o DOM real da integração: `10–12/08` mostra o documento
+próximo; trocar os hiddens ainda não salvos para `29–31/08` troca a lista; limpar as datas mostra os
+dois. O segundo cenário exige o botão, seu estado visual, foco e limpeza; o terceiro reinicializa o
+enhancer e exige um único listener delegado no formulário. O teste Django do template trava hook e
+nome acessível da ação `data-evento-doc-clear`.

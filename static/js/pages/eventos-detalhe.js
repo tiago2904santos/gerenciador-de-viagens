@@ -132,8 +132,33 @@
     if (!iso) return null;
     var parts = String(iso).split('-');
     if (parts.length !== 3) return null;
-    var t = Date.UTC(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-    return isNaN(t) ? null : Math.round(t / MS_PER_DAY);
+    var year = Number(parts[0]);
+    var month = Number(parts[1]);
+    var day = Number(parts[2]);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(iso))) return null;
+    var t = Date.UTC(year, month - 1, day);
+    var parsed = new Date(t);
+    if (
+      isNaN(t) ||
+      parsed.getUTCFullYear() !== year ||
+      parsed.getUTCMonth() !== month - 1 ||
+      parsed.getUTCDate() !== day
+    ) return null;
+    return Math.round(t / MS_PER_DAY);
+  }
+
+  function readEventPeriod(picker) {
+    var form = picker.closest('form') || document;
+    var start = form.querySelector('input[name="data_inicio"]') ||
+      form.querySelector('[data-cv-date-picker-start-value]');
+    var end = form.querySelector('input[name="data_fim"]') ||
+      form.querySelector('[data-cv-date-picker-end-value]');
+    var startValue = start && isoToDayNumber(start.value);
+    var endValue = end && isoToDayNumber(end.value);
+    return {
+      start: start ? startValue : isoToDayNumber(picker.dataset.eventoPeriodoInicio || ''),
+      end: end ? endValue : isoToDayNumber(picker.dataset.eventoPeriodoFim || ''),
+    };
   }
 
   /* Distância (em dias) entre dois intervalos [a1,a2] e [b1,b2]; 0 se sobrepõem. */
@@ -181,22 +206,26 @@
     select.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
-  function initDocPanel(root, key, items, eventStart, eventEnd, tolerance) {
+  function initDocPanel(root, key, items, getPeriod, tolerance) {
     var select = sourceSelectFor(root, key);
     var list = root.querySelector('[data-evento-doc-list="' + key + '"]');
     var search = root.querySelector('[data-evento-doc-search="' + key + '"]');
+    var clear = root.querySelector('[data-evento-doc-clear="' + key + '"]');
     var empty = root.querySelector('[data-evento-doc-empty="' + key + '"]');
     if (!select || !list) return;
 
     function render() {
+      var period = getPeriod();
       var selected = selectedIdsFromSelect(select);
       var term = window.CV.util.normalize(search ? search.value : '');
       var tokens = term.split(/\s+/).filter(Boolean);
+      var pickerRoot = search ? search.closest('[data-related-picker-root]') : null;
+      if (pickerRoot) pickerRoot.classList.toggle('search-picker--has-query', !!term);
 
       var visible = items.filter(function (summary) {
         var isSelected = selected.has(String(summary.id));
         // Documentos já vinculados aparecem sempre; os demais respeitam o filtro de datas.
-        if (!isSelected && !passesDateFilter(summary, eventStart, eventEnd, tolerance)) return false;
+        if (!isSelected && !passesDateFilter(summary, period.start, period.end, tolerance)) return false;
         if (!tokens.length) return true;
         var haystack = window.CV.util.normalize(summary.search_text || (summary.title + ' ' + summary.meta));
         return tokens.every(function (token) { return haystack.indexOf(token) !== -1; });
@@ -230,8 +259,18 @@
       search.dataset.eventoDocBound = 'true';
       search.addEventListener('input', render);
     }
+    if (clear && clear.dataset.eventoDocBound !== 'true') {
+      clear.dataset.eventoDocBound = 'true';
+      clear.addEventListener('click', function () {
+        if (!search) return;
+        search.value = '';
+        search.focus();
+        render();
+      });
+    }
     select.addEventListener('change', render);
     render();
+    return render;
   }
 
   function initDocPickersD(root) {
@@ -244,14 +283,36 @@
       picker.dataset.eventoDocPickerBound = 'true';
 
       var summaries = readDocSummaries();
-      var eventStart = isoToDayNumber(picker.dataset.eventoPeriodoInicio || '');
-      var eventEnd = isoToDayNumber(picker.dataset.eventoPeriodoFim || '');
       var tolerance = parseInt(picker.dataset.eventoDocTolerancia || '5', 10);
       if (isNaN(tolerance)) tolerance = 5;
+      var renders = [];
 
       Object.keys(summaries).forEach(function (key) {
-        initDocPanel(picker, key, summaries[key] || [], eventStart, eventEnd, tolerance);
+        var render = initDocPanel(
+          picker,
+          key,
+          summaries[key] || [],
+          function () { return readEventPeriod(picker); },
+          tolerance
+        );
+        if (render) renders.push(render);
       });
+      picker._eventoDocRenderAll = function () {
+        renders.forEach(function (render) { render(); });
+      };
+
+      var form = picker.closest('form');
+      if (form && form.dataset.eventoDocPeriodBound !== 'true') {
+        form.dataset.eventoDocPeriodBound = 'true';
+        form.addEventListener('change', function (event) {
+          if (!event.target.matches('[data-cv-date-picker-start-value], [data-cv-date-picker-end-value]')) return;
+          form.querySelectorAll('[data-evento-doc-picker]').forEach(function (currentPicker) {
+            if (typeof currentPicker._eventoDocRenderAll === 'function') {
+              currentPicker._eventoDocRenderAll();
+            }
+          });
+        });
+      }
 
       initDocToggle(picker);
     });

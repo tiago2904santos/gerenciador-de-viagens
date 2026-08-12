@@ -70,6 +70,9 @@ class DocumentosPickerContextTests(TestCase):
         self.assertIn('data-evento-doc-field="oficios"', html)
         # O <select> de origem fica oculto (a lista é montada pelo JS).
         self.assertIn("evento-doc-source-select", html)
+        self.assertIn('data-evento-doc-clear="oficios"', html)
+        self.assertIn("search-picker__clear", html)
+        self.assertIn('aria-label="Limpar busca de documentos"', html)
 
     def test_periodo_referencia_usa_dados_do_form_bound(self):
         form = EventoNovoCadastroForm(
