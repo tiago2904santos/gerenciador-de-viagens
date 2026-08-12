@@ -2,7 +2,7 @@
 
 Destino duplicado é contado **duas vezes pelo motor de diárias** e sai duas vezes
 no ofício e no termo. Constraint simples, não adiada: o único escritor
-(`roteiros/roteiro_logic.py:1581`) apaga todos os destinos antes de recriar com
+(`editor_state_builder._salvar_roteiro_avulso_from_roteiro_state`) apaga todos os destinos antes de recriar com
 `enumerate`, então não existe reordenação por troca de posição neste caminho.
 
 **Limite 4 do `AGENTS.md` — rode antes do deploy:**

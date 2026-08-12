@@ -149,7 +149,7 @@ class ComponenteDeMenuTests(TestCase):
         )
 
         html = render_to_string(
-            "components/ui/lists/entity_card_menu.html", {"menu": menu}
+            "cotton/ui/lists/entity_card_menu.html", {"menu": menu}
         )
 
         self.assertIn('id="menu-teste"', html)
@@ -167,7 +167,7 @@ class ComponenteDeMenuTests(TestCase):
         )
 
         html = render_to_string(
-            "components/ui/lists/entity_card_menu.html", {"menu": menu}
+            "cotton/ui/lists/entity_card_menu.html", {"menu": menu}
         )
 
         self.assertIn('data-overlay-src="/menus/"', html)

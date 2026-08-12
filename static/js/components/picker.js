@@ -883,11 +883,6 @@
 
     input.addEventListener("keydown", (e) => {
       const visible = filteredItems();
-      if (e.key === "Escape") {
-        e.preventDefault();
-        setOpen(false);
-        return;
-      }
       if (e.key === "Enter") {
         e.preventDefault();
         const item = visible[Math.max(activeIndex, 0)];
@@ -910,20 +905,19 @@
       }
     });
 
-    /* Fecha dropdown ao clicar fora.
-
-       JS-02 — este listener é por instância. Sem `destroy` ele sobrevivia à
-       remoção da linha do formulário (`location-rows`) e ao ciclo de
-       reset+reinit dos wizards, acumulando um handler por picker já morto,
-       cada um segurando a closure inteira do componente. */
-    const onDocumentClick = (e) => {
-      if (!root.contains(e.target) && e.target !== select) setOpen(false);
-    };
-    document.addEventListener("click", onDocumentClick);
+    /* JS-07 — clique externo e Escape compartilham o contrato de overlay.
+       O dropdown não entra em `inside`: preserva o comportamento anterior do
+       picker, cujo listener considerava apenas a raiz e o select nativo. */
+    const dismissBinding = window.CV.overlay.attachDismiss({
+      inside: [root, select],
+      isOpen: () => isOpen,
+      escapeWhen: (e) => e.target === input,
+      onDismiss: () => setOpen(false),
+    });
     instancias.push({
       root,
       desmontar() {
-        document.removeEventListener("click", onDocumentClick);
+        dismissBinding.destroy();
       },
     });
 
@@ -999,6 +993,12 @@
     registerRenderer(renderer) {
       if (typeof renderer === "function" && !renderers.includes(renderer)) {
         renderers.push(renderer);
+        /* O bundle de formulario e carregado depois do shell. Nesse caminho o
+           primeiro passe do enhancer ja aconteceu quando o renderer de select
+           se registra; esperar outra mutacao deixa o <select multiple> nativo
+           visivel indefinidamente. Inicialize o DOM existente no registro e
+           mantenha o fluxo normal para nos inseridos depois. */
+        if (document.readyState !== "loading") renderer(document);
       }
     },
   };

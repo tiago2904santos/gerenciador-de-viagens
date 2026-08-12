@@ -1,4 +1,4 @@
 <div class="field-grid field-grid--cols-2">
-  {% include "components/ui/forms/field.html" with field=form.area size_class="field-size-1" only %}
-  {% include "components/ui/forms/field.html" with field=form.papel size_class="field-size-1" only %}
+  <c-ui.forms.field :field="form.area" size_class="field-size-1" only />
+  <c-ui.forms.field :field="form.papel" size_class="field-size-1" only />
 </div>

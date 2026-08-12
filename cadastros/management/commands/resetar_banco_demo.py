@@ -32,6 +32,7 @@ from oficios.models import ConfiguracaoNumeracaoOficio
 from oficios.models import Oficio
 from oficios.models import OficioNumeroLacuna
 from ordens_servico.models import OrdemServico
+from ordens_servico.models import OrdemServicoNumeroLacuna
 from planos_trabalho.models import AtividadePlanoTrabalho
 from planos_trabalho.models import EfetivoEvento
 from planos_trabalho.models import EfetivoPlano
@@ -683,6 +684,14 @@ class Command(BaseCommand):
             ordem.oficios.add(oficios[i])
             ordem.destinos.add(destinos[i % len(destinos)])
             ordem.servidores.add(servidores[i])
+            # Assim como `OficioNumeroLacuna`, a tabela operacional de numeração
+            # participa do contrato de cinco linhas do banco demo. A linha nasce
+            # depois da OS para não ser consumida pela própria reserva automática.
+            OrdemServicoNumeroLacuna.objects.create(
+                area=oficios[i].area,
+                ano=timezone.localdate().year,
+                numero=100 + i,
+            )
 
     def _seed_documentos(
         self,

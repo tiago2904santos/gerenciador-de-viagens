@@ -22,6 +22,6 @@
         </label>
       {% endfor %}
     </div>
-    {% if form.tipo_necessidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.tipo_necessidade.errors field_id=form.tipo_necessidade.auto_id only %}{% endif %}
+    {% if form.tipo_necessidade.errors %}<c-ui.feedback.field_error :errors="form.tipo_necessidade.errors" :field_id="form.tipo_necessidade.auto_id" only />{% endif %}
   </fieldset>
 </div>

@@ -32,7 +32,6 @@ SEM_DESTROY_JUSTIFICADO = {
     "pages/eventos-detalhe.js": "sem listener global",
     "components/file-picker.js": "delegação de página: click/pagehide registrados uma vez no módulo",
     "core/app.js": "delegação de página: quickEdit tem guard de módulo, confirmSubmit roda uma vez",
-    "cv-select.js": "delegação de página: click/keydown registrados uma vez no módulo",
 }
 
 
@@ -100,7 +99,6 @@ class JavascriptRegistryLifecycleTests(SimpleTestCase):
         static_js = Path(settings.BASE_DIR) / "static" / "js"
         contracts = {
             "autosave.js": "registerEnhancer('autosave'",
-            "cv-select.js": "registerEnhancer('dropdowns'",
             "components/card-toggle.js": 'registerEnhancer("cardToggle"',
             "components/location-rows.js": 'registerEnhancer("locationRows"',
             "components/document-number-field.js": 'registerEnhancer("documentNumberField"',

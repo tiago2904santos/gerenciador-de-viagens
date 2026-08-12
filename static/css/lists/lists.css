@@ -56,11 +56,6 @@
   margin-top: var(--space-4);
 }
 
-html[data-theme="dark"] .empty-state {
-  background: color-mix(in srgb, var(--color-surface) 38%, #0d1725);
-  border-color: color-mix(in srgb, var(--color-border-soft) 55%, transparent);
-}
-
 html[data-theme="dark"] .empty-state__message,
 html[data-theme="dark"] .empty-state p {
   color: color-mix(in srgb, var(--theme-text-body) 82%, white);
@@ -125,7 +120,6 @@ html[data-theme="dark"] .empty-state p {
    .app-list-* como joint selectors das classes legadas.
    ========================================================================== */
 
-.app-list-toolbar,
 .list-toolbar {
   align-items: center;
   display: flex;

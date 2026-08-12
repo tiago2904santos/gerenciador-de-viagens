@@ -1,5 +1,5 @@
 {{ formset.management_form }}
-{% include "components/ui/feedback/form_errors.html" with errors=formset.non_form_errors only %}
+<c-ui.feedback.form_errors :errors="formset.non_form_errors" only />
 
 <section
   class="form-subsection travel-destinations ordered-field-collection route-destinos-block route-destinos-block--split route-destinos-block--single travel-document-block pt-efetivo-section"
@@ -30,5 +30,5 @@
 </section>
 
 <template data-pt-efetivo-template>
-  {% include "planos_trabalho/partials/_efetivo_row.html" with efetivo_form=formset.empty_form row_ordinal=1 cargos_url=cargos_url only %}
+  {% include "planos_trabalho/partials/_efetivo_row.html" with efetivo_form=formset.empty_form row_ordinal=1 cargos_url=cargos_url total_forms=total_forms only %}
 </template>

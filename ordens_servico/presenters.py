@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from core import entity_cards
+from core.presenters.text import join_non_empty
 from oficios.presenters import _iniciais_nome_servidor
 
 
@@ -73,6 +74,7 @@ def _servidores_display_os(ordem):
                 "name": servidor.nome,
                 "cargo": cargo_nome,
                 "unidade": unidade_nome,
+                "meta": join_non_empty([cargo_nome, unidade_nome]),
                 "is_motorista": servidor.pk in motorista_pks,
             },
         )

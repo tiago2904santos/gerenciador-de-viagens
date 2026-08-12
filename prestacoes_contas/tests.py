@@ -540,6 +540,21 @@ class PrestacaoAssinadoUploadTests(TestCase):
             ).exists()
         )
 
+    def test_upload_assinado_nao_segue_next_externo(self):
+        response = self.client.post(
+            reverse(
+                "prestacoes_contas:prestacao_despacho_assinado_anexar",
+                args=[self.prestacao.pk],
+            ),
+            {"next": "https://externo.invalido/coleta"},
+        )
+
+        self.assertRedirects(
+            response,
+            reverse("prestacoes_contas:index"),
+            fetch_redirect_response=False,
+        )
+
     def test_lista_exibe_uploads_assinados_conforme_o_papel(self):
         """O item de anexar assinados migrou para o menu sob demanda (`PF-04`).
 

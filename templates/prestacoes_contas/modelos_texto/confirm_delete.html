@@ -4,10 +4,10 @@
 
 {% block content %}
   <div class="page-shell page-shell--standard-simple">
-    {% include "components/ui/headers/page_header.html" with eyebrow="PRESTAÇÕES" title=page_title description=page_description icon_label="PC" module_label="Modelos de Texto" only %}
+    <c-ui.headers.page_header eyebrow="PRESTAÇÕES" :title="page_title" :description="page_description" icon_label="PC" module_label="Modelos de Texto" only />
     <form class="main-form-panel" method="post">
       {% csrf_token %}
-      {% include "components/feedback/confirm_delete_block.html" with object_label=object.nome message="Esta ação remove o modelo da lista de sugestões, mas não altera relatórios já gerados." preview_label="Prévia do texto" preview_text=object.texto primary_label="Excluir modelo" back_url=back_url only %}
+      <c-feedback.confirm_delete_block :object_label="object.nome" message="Esta ação remove o modelo da lista de sugestões, mas não altera relatórios já gerados." preview_label="Prévia do texto" :preview_text="object.texto" primary_label="Excluir modelo" :back_url="back_url" only />
     </form>
   </div>
 {% endblock %}

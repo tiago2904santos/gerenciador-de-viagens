@@ -11,17 +11,17 @@ from justificativas.services import oficio_exige_justificativa
 from roteiros.forms import RoteiroForm
 from roteiros.models import Roteiro
 from roteiros.services.autosave import ROTEIRO_AUTOSAVE_FIELDS
-from roteiros.services.autosave import apply_roteiro_autosave
-from roteiros.services.autosave import build_roteiro_draft
 from roteiros.services.autosave import has_minimum_roteiro_content
-from roteiros.services import atualizar_roteiro, carregar_opcoes_rotas_avulsas_salvas, montar_contexto_editor_roteiro, montar_estado_editor_roteiro_evento_selecionado, montar_initial_roteiro_evento_sem_datas, normalizar_destinos_e_trechos_apos_erro_post, persistir_roteiro_rascunho_parcial, preparar_estado_editor_roteiro_para_get, preparar_querysets_formulario_roteiro, roteiro_state_equivalente_ao_roteiro, validar_submissao_editor_roteiro
+from roteiros.services.autosave import pk_de_autosave
+from roteiros.presenters import montar_contexto_editor_roteiro
+from roteiros.services import carregar_opcoes_rotas_avulsas_salvas, normalizar_destinos_e_trechos_apos_erro_post, preparar_estado_editor_roteiro_para_get, preparar_querysets_formulario_roteiro, validar_submissao_editor_roteiro
 from .presenters import apresentar_oficio_wizard_summary
 from .selectors import get_oficio_by_id
 from .services import avaliar_oficio_dados_viajantes
-from .services import resolver_roteiro_padrao_evento
-from .services import obter_roteiro_escolhido_do_post
-from .services import vincular_roteiro_ao_oficio_sem_copia
-from .services import tocar_data_criacao_oficio
+from .services import criar_rascunho_de_roteiro_do_oficio
+from .services import montar_roteiro_inicial_do_oficio
+from .services import salvar_rascunho_parcial_do_oficio
+from .services import salvar_roteiro_do_oficio
 from .view_navigation import oficio_back_label as _oficio_back_label
 from .view_navigation import oficio_back_url as _oficio_back_url
 from core.wizard import normalizar_acao_do_wizard
@@ -32,12 +32,8 @@ from .view_helpers import _redirect_lista_oficio, _wizard_footer_ctx, _wizard_sh
 def _resolver_roteiro_rascunho_autosave(post, *, oficio):
     """Resolve um rascunho de Roteiro ja criado por autosave nesta mesma edicao
     (o JS guarda o pk em `autosave_obj_id` assim que o primeiro autosave cria a linha)."""
-    raw = (post.get("autosave_obj_id") or "").strip()
-    if not raw:
-        return None
-    try:
-        pk = int(raw)
-    except (TypeError, ValueError):
+    pk = pk_de_autosave(post)
+    if pk is None:
         return None
     return (
         # `BE-09`: `all_objects` — o escopo é a área do **ofício**, na linha de baixo.
@@ -82,21 +78,45 @@ def wizard_roteiro_autosave_criar(request, pk):
         from cadastros.models import ConfiguracaoSistema
 
         area = ConfiguracaoSistema.get_singleton().area
-    roteiro = build_roteiro_draft(area=area)
-    version = apply_roteiro_autosave(roteiro, clean_fields, payload.snapshots)
-    if not roteiro.origem_cidade_id and not roteiro.origem_estado_id:
-        # A sede exibida na tela (herdada do evento/config) nao chega "suja" no payload de
-        # autosave se o usuario nunca clicou nela — sem isso o rascunho nasceria sem sede.
-        from cadastros.services import resolver_sede_ids_desde_configuracao
-
-        estado_id, cidade_id, _aviso = resolver_sede_ids_desde_configuracao()
-        if estado_id and cidade_id:
-            roteiro.origem_estado_id = estado_id
-            roteiro.origem_cidade_id = cidade_id
-            roteiro.save(update_fields=["origem_estado", "origem_cidade", "updated_at"])
-    oficio.roteiro = roteiro
-    oficio.save(update_fields=["roteiro", "updated_at"])
+    roteiro, version = criar_rascunho_de_roteiro_do_oficio(
+        oficio, area=area, campos=clean_fields, snapshots=payload.snapshots
+    )
     return autosave_json_response(ok=True, object_id=roteiro.pk, created=True, version=version)
+
+
+def _redirect_after_roteiro_save(
+    request,
+    oficio,
+    nav_action,
+    *,
+    nivel,
+    msg_next,
+    msg_back,
+    msg_lista=None,
+    msg_default=None,
+):
+    """Traduz a ação do rodapé em redirect, depois de a Etapa 2 ter gravado.
+
+    `BE-12`: as duas cadeias `if nav_action == …` da view eram a mesma coisa com textos
+    diferentes. `wizard_next` desvia para a justificativa quando a antecedência da saída a
+    torna obrigatória — e por isso a checagem tem de vir **depois** da gravação, que é
+    quem grava a data de saída. Segue o par já existente em `traveler_views.py`
+    (`_redirect_after_dados_viajantes_save`, `_redirect_after_transporte_save`).
+
+    `nav_action` chega já normalizado por `normalizar_acao_do_wizard`, nunca cru.
+    """
+    if nav_action == "wizard_next":
+        nivel(request, msg_next)
+        if oficio_exige_justificativa(oficio):
+            return redirect("oficios:wizard_justificativa", pk=oficio.pk)
+        return redirect("oficios:wizard_documentos", pk=oficio.pk)
+    if nav_action == "wizard_back":
+        nivel(request, msg_back)
+        return redirect("oficios:dados_viajantes", pk=oficio.pk)
+    if nav_action == "save_draft_list" and msg_lista is not None:
+        return _redirect_lista_oficio(request, oficio, msg_lista)
+    nivel(request, msg_default or msg_back)
+    return redirect("oficios:wizard_roteiro", pk=oficio.pk)
 
 
 def wizard_roteiro(request, pk):
@@ -124,76 +144,47 @@ def wizard_roteiro(request, pk):
         roteiro_state, validated, diarias_resultado = validar_submissao_editor_roteiro(
             request.POST, route_state_map, roteiro=roteiro_vinculado
         )
-        if form.is_valid() and validated["ok"]:
-            roteiro_escolhido = obter_roteiro_escolhido_do_post(
-                request.POST,
-                evento=oficio.evento,
-                area=oficio.area,
-            )
-            if roteiro_escolhido and roteiro_state_equivalente_ao_roteiro(roteiro_escolhido, roteiro_state, validated):
-                # Sem alterações: vincular diretamente ao roteiro selecionado
-                rascunho_antigo = roteiro_vinculado if (roteiro_vinculado and roteiro_vinculado.status == Roteiro.STATUS_RASCUNHO) else None
-                vincular_roteiro_ao_oficio_sem_copia(oficio, roteiro_escolhido, rascunho_antigo=rascunho_antigo)
-            else:
-                # Com alterações (ou roteiro próprio): salvar sempre num rascunho
-                # Nunca modificar um roteiro não-rascunho que pertence a outros ofícios
-                if roteiro_vinculado is None or roteiro_vinculado.status != Roteiro.STATUS_RASCUNHO:
-                    roteiro_vinculado = Roteiro(tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
-                    form.instance = roteiro_vinculado
-                roteiro_salvo = atualizar_roteiro(roteiro_vinculado, form, roteiro_state, validated, diarias_resultado)
-                if oficio.roteiro_id != roteiro_salvo.pk:
-                    oficio.roteiro = roteiro_salvo
-                    oficio.save(update_fields=["roteiro", "updated_at"])
-            oficio = tocar_data_criacao_oficio(oficio)
-            nav_action = normalizar_acao_do_wizard(request.POST)
-            if nav_action == "wizard_next":
-                messages.success(
-                    request,
-                    "Roteiro e diárias salvos. Continue para a próxima etapa quando estiver pronto.",
-                )
-                if oficio_exige_justificativa(oficio):
-                    return redirect("oficios:wizard_justificativa", pk=oficio.pk)
-                return redirect("oficios:wizard_documentos", pk=oficio.pk)
-            if nav_action == "wizard_back":
-                messages.success(request, "Roteiro e diárias salvos.")
-                return redirect("oficios:dados_viajantes", pk=oficio.pk)
-            if nav_action == "save_draft_list":
-                return _redirect_lista_oficio(request, oficio, "Roteiro e diárias salvos.")
-            messages.success(request, "Rascunho do roteiro salvo.")
-            return redirect("oficios:wizard_roteiro", pk=oficio.pk)
-
         nav_action = normalizar_acao_do_wizard(request.POST)
+        if form.is_valid() and validated["ok"]:
+            resultado = salvar_roteiro_do_oficio(
+                oficio,
+                request.POST,
+                form,
+                roteiro_state=roteiro_state,
+                validated=validated,
+                diarias_resultado=diarias_resultado,
+                roteiro_vinculado=roteiro_vinculado,
+            )
+            roteiro_vinculado = resultado.roteiro
+            return _redirect_after_roteiro_save(
+                request,
+                oficio,
+                nav_action,
+                nivel=messages.success,
+                msg_next="Roteiro e diárias salvos. Continue para a próxima etapa quando estiver pronto.",
+                msg_back="Roteiro e diárias salvos.",
+                msg_lista="Roteiro e diárias salvos.",
+                msg_default="Rascunho do roteiro salvo.",
+            )
+
         if nav_action in ("wizard_next", "wizard_back"):
             # Soft-advance: grava rascunho parcial e deixa navegar sem validação completa.
-            if roteiro_vinculado is None or roteiro_vinculado.status != Roteiro.STATUS_RASCUNHO:
-                area = oficio.area
-                if area is None:
-                    from cadastros.models import ConfiguracaoSistema
-
-                    area = ConfiguracaoSistema.get_singleton().area
-                roteiro_vinculado = Roteiro(
-                    tipo=Roteiro.TIPO_AVULSO,
-                    status=Roteiro.STATUS_RASCUNHO,
-                    area=area,
-                )
-                form.instance = roteiro_vinculado
-            roteiro_salvo = persistir_roteiro_rascunho_parcial(
-                roteiro_vinculado, form, roteiro_state, validated
+            resultado = salvar_rascunho_parcial_do_oficio(
+                oficio,
+                form,
+                roteiro_state=roteiro_state,
+                validated=validated,
+                roteiro_vinculado=roteiro_vinculado,
             )
-            if oficio.roteiro_id != roteiro_salvo.pk:
-                oficio.roteiro = roteiro_salvo
-                oficio.save(update_fields=["roteiro", "updated_at"])
-            oficio = tocar_data_criacao_oficio(oficio)
-            if nav_action == "wizard_next":
-                messages.info(
-                    request,
-                    "Roteiro incompleto salvo como rascunho. Você pode completar depois.",
-                )
-                if oficio_exige_justificativa(oficio):
-                    return redirect("oficios:wizard_justificativa", pk=oficio.pk)
-                return redirect("oficios:wizard_documentos", pk=oficio.pk)
-            messages.info(request, "Roteiro incompleto salvo como rascunho.")
-            return redirect("oficios:dados_viajantes", pk=oficio.pk)
+            roteiro_vinculado = resultado.roteiro
+            return _redirect_after_roteiro_save(
+                request,
+                oficio,
+                nav_action,
+                nivel=messages.info,
+                msg_next="Roteiro incompleto salvo como rascunho. Você pode completar depois.",
+                msg_back="Roteiro incompleto salvo como rascunho.",
+            )
 
         for error in validated.get("errors", []):
             form.add_error(None, error)
@@ -221,28 +212,12 @@ def wizard_roteiro(request, pk):
         # Oficio ainda sem roteiro proprio: pre-seleciona o roteiro do evento (se houver
         # um completo pronto pra reuso) ou parte de sede+destino do evento, sem datas e
         # sem persistir nada ainda.
-        roteiro_padrao_evento = resolver_roteiro_padrao_evento(oficio.evento)
-        if roteiro_padrao_evento is not None:
-            destinos_atuais, trechos_list, roteiro_state = montar_estado_editor_roteiro_evento_selecionado(
-                roteiro_padrao_evento
-            )
-            form_instance = Roteiro(
-                tipo=Roteiro.TIPO_AVULSO,
-                status=Roteiro.STATUS_RASCUNHO,
-                origem_cidade=roteiro_padrao_evento.origem_cidade,
-                origem_estado=roteiro_padrao_evento.origem_estado,
-                observacoes=roteiro_padrao_evento.observacoes,
-            )
-        else:
-            initial = montar_initial_roteiro_evento_sem_datas(oficio.evento)
-            destinos_atuais, trechos_list, roteiro_state = preparar_estado_editor_roteiro_para_get(
-                initial=initial
-            )
-            form_instance = Roteiro(tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
-            if initial.get("origem_cidade"):
-                form_instance.origem_cidade_id = initial["origem_cidade"]
-            if initial.get("origem_estado"):
-                form_instance.origem_estado_id = initial["origem_estado"]
+        (
+            form_instance,
+            destinos_atuais,
+            trechos_list,
+            roteiro_state,
+        ) = montar_roteiro_inicial_do_oficio(oficio)
         form = RoteiroForm(instance=form_instance)
         preparar_querysets_formulario_roteiro(
             form, method=request.method, post=request.POST, instance=form_instance

@@ -107,6 +107,30 @@ def listar_termos(q=None, q_digits=None, simples=None):
         return termos
 
     q_unaccent = remove_accents(q)
+    # `DB-11`: as tres M2M abaixo estavam no mesmo `OR` das colunas escalares.
+    # O PostgreSQL precisava expandir cada termo pelos tres relacionamentos antes
+    # de filtrar e aplicar `DISTINCT` (20 mil termos viravam ~60 mil linhas na
+    # medicao do catálogo). `Exists` preserva a semantica sem multiplicar a linha
+    # externa; cada origem pode ser planejada de forma independente.
+    from oficios.models import Oficio
+
+    servidores_do_termo = TermoAutorizacao.servidores.through.objects.filter(
+        termoautorizacao_id=OuterRef("pk"),
+        servidor__nome__unaccent__icontains=q_unaccent,
+    )
+    servidores_do_oficio = Oficio.servidores.through.objects.filter(
+        oficio_id=OuterRef("oficio_id"),
+        servidor__nome__unaccent__icontains=q_unaccent,
+    )
+    servidores_do_termo_do_oficio = Oficio.servidores_termo_autorizacao.through.objects.filter(
+        oficio_id=OuterRef("oficio_id"),
+        servidor__nome__unaccent__icontains=q_unaccent,
+    )
+    termos = termos.annotate(
+        _busca_servidor_do_termo=Exists(servidores_do_termo),
+        _busca_servidor_do_oficio=Exists(servidores_do_oficio),
+        _busca_servidor_do_termo_do_oficio=Exists(servidores_do_termo_do_oficio),
+    )
     query = (
         Q(destino_cidade__nome__unaccent__icontains=q_unaccent)
         | Q(destino_cidade__uf__unaccent__icontains=q_unaccent)
@@ -114,9 +138,9 @@ def listar_termos(q=None, q_digits=None, simples=None):
         | Q(destino_estado__sigla__unaccent__icontains=q_unaccent)
         | Q(oficio__numero__icontains=q)
         | Q(oficio__protocolo__icontains=q)
-        | Q(oficio__servidores__nome__unaccent__icontains=q_unaccent)
-        | Q(oficio__servidores_termo_autorizacao__nome__unaccent__icontains=q_unaccent)
-        | Q(servidores__nome__unaccent__icontains=q_unaccent)
+        | Q(_busca_servidor_do_termo=True)
+        | Q(_busca_servidor_do_oficio=True)
+        | Q(_busca_servidor_do_termo_do_oficio=True)
         | Q(viatura__placa__icontains=q)
         | Q(viatura__modelo__unaccent__icontains=q_unaccent)
         | Q(oficio__viatura__placa__icontains=q)
@@ -124,7 +148,7 @@ def listar_termos(q=None, q_digits=None, simples=None):
     )
     if q_digits:
         query |= Q(oficio__protocolo__icontains=q_digits) | Q(oficio__numero__icontains=q_digits)
-    return termos.filter(query).distinct()
+    return termos.filter(query)
 
 
 def queryset_termo_detalhe():

@@ -7,7 +7,9 @@ view chama, mantendo `form.save()` fora dela.
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.db.models.deletion import ProtectedError
+
+from core.deletion import DelecaoProtegidaError
+from core.deletion import excluir_com_protecao
 
 
 class UsuarioNaoPodeSerExcluido(ValidationError):
@@ -35,8 +37,8 @@ def excluir_area(area):
         )
 
     try:
-        area.delete()
-    except ProtectedError as exc:
+        excluir_com_protecao(area)
+    except DelecaoProtegidaError as exc:
         raise AreaNaoPodeSerExcluida(
             "Não foi possível excluir a área porque há registros vinculados a ela."
         ) from exc
@@ -79,8 +81,8 @@ def excluir_usuario(usuario, *, solicitante):
             )
 
     try:
-        usuario.delete()
-    except ProtectedError as exc:
+        excluir_com_protecao(usuario)
+    except DelecaoProtegidaError as exc:
         raise UsuarioNaoPodeSerExcluido(
             "Não foi possível excluir a conta porque há registros vinculados a ela."
         ) from exc

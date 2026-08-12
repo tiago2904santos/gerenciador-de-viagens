@@ -1,0 +1,28 @@
+{% cotton:vars delete_modal_entity delete_modal_title %}
+<div id="delete-confirm-modal" class="cv-dialog cv-dialog--danger delete-confirm-modal" data-delete-confirm-modal data-overlay-panel hidden>
+  <div class="cv-dialog__backdrop delete-confirm-modal__backdrop" data-overlay-close></div>
+  <section
+    class="cv-dialog__panel cv-dialog__panel--sm delete-confirm-modal__dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="delete-confirm-title"
+    aria-describedby="delete-confirm-description"
+    tabindex="-1"
+  >
+    {% with cotton_attr_title=delete_modal_title|default:"Excluir registro?" %}<c-ui.modals.dialog_header icon="delete" tone="danger" eyebrow="Confirmar exclusão" :title="cotton_attr_title" title_id="delete-confirm-title" :data_delete_modal_cancel="True" only />{% endwith %}
+
+    <div class="cv-dialog__body delete-confirm-modal__body">
+      <p class="cv-dialog__message delete-confirm-modal__message" id="delete-confirm-description">
+        Você está prestes a excluir <strong data-delete-confirm-label>{{ delete_modal_entity|default:"este registro" }}</strong>.
+        Se houver vínculos com outros registros, a exclusão será bloqueada.
+      </p>
+      <p class="cv-dialog__notice cv-dialog__notice--danger">Esta ação é permanente e não poderá ser desfeita.</p>
+    </div>
+
+    <form method="post" class="cv-dialog__footer delete-confirm-modal__actions" data-delete-confirm-form>
+      {% csrf_token %}
+      <c-ui.buttons.button label="Cancelar" variant="secondary" type="button" :data_delete_modal_cancel="True" only />
+      <c-ui.buttons.button label="Excluir" variant="danger" type="submit" icon="delete" only />
+    </form>
+  </section>
+</div>

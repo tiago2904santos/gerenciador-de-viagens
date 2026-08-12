@@ -1,0 +1,110 @@
+{% cotton:vars abas action_autosave action_label action_url action_variant aria_label back_label back_url band_tabs_template body_extra_class body_id can_edit_area cotton_attr_aria_label cotton_attr_href cotton_attr_label data_hook delete_modal_enabled delete_modal_entity delete_modal_title empty_action_label empty_action_url empty_message empty_variant extra_hidden_field_name extra_hidden_field_value eyebrow hide_realtime_count page_obj page_querystring pagination_pages q quick_add_body_template quick_add_compact quick_add_form quick_add_label quick_add_next_url quick_add_panel_id quick_add_submit_label request rows search_placeholder shell tabs_aria_label title variant %}
+{# Lista com criação inline (inline-create). Cabeçalho via banda canônica (D-53). #}
+<div class="page-shell page-shell--list" data-collection data-collection-mode="server">
+  <div
+    class="list-header list-header--inline-create filter-header{% if quick_add_compact %} list-header--inline-create-compact{% endif %}"
+    {% if can_edit_area %}data-travel-document-wizard-step1{% endif %}
+  >
+    <c-ui.headers._list_header_band :title="title" :eyebrow="eyebrow" :band_tabs_template="band_tabs_template" :abas="abas" :tabs_aria_label="tabs_aria_label" only />
+
+    <div class="list-header__rail list-header__rail--inline-create">
+      <form class="list-header__filters" method="get" action="{{ request.path }}" data-collection-form>
+        <div class="list-header__search">
+          <input
+            class="list-header__search-input header-filter-input"
+            type="search"
+            name="q"
+            placeholder="{{ search_placeholder|default:'Buscar itens' }}"
+            aria-label="{{ search_placeholder|default:'Buscar itens' }}"
+            data-collection-filter="search"
+            {% if q %}value="{{ q }}"{% endif %}
+          >
+        </div>
+        {% if extra_hidden_field_name and extra_hidden_field_value %}
+          <input type="hidden" name="{{ extra_hidden_field_name }}" value="{{ extra_hidden_field_value }}">
+        {% endif %}
+        <div class="list-header__actions">
+          {% if extra_hidden_field_name and extra_hidden_field_value %}
+            {% with cotton_attr_href=request.path|add:"?"|add:extra_hidden_field_name|add:"="|add:extra_hidden_field_value %}<c-ui.buttons.button :href="cotton_attr_href" label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" :data_cv_filter_clear="True" only />{% endwith %}
+          {% else %}
+            <c-ui.buttons.button :href="request.path" label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" :data_cv_filter_clear="True" only />
+          {% endif %}
+        </div>
+      </form>
+
+      {% if can_edit_area %}
+      <form
+        class="inline-create__panel"
+        id="{{ quick_add_panel_id }}"
+        method="post"
+        action="{{ request.path }}"
+        data-create-action="{{ request.path }}"
+        hidden
+        novalidate
+      >
+        {% csrf_token %}
+        {% if quick_add_next_url %}<input type="hidden" name="next" value="{{ quick_add_next_url }}">{% endif %}
+        {% comment %}
+          `HT-03`: o painel de cadastro rápido não tinha padrão nenhum para erro de
+          formulário inteiro — nem o certo, nem um dos quatro errados. Erro de
+          `clean()` num quick-add simplesmente **não aparecia**; sobrava a página
+          recarregando com o painel aberto e nenhuma explicação.
+
+          **Fora do `__body`, e isso o navegador ensinou.** A primeira versão punha
+          o resumo dentro dele; `.inline-create__body` é `display: flex` com
+          `align-items: flex-end` (`page-shell.css:2998`), então a faixa virou uma
+          terceira coluna do lado dos campos e empurrou o formulário inteiro. Aqui,
+          filha direta do `<form>`, ela empilha acima como se espera.
+        {% endcomment %}
+        <c-ui.feedback.form_errors :form="quick_add_form" only />
+        <div class="inline-create__body">
+          <div class="inline-create__fields">
+            {% include quick_add_body_template with form=quick_add_form abas=abas back_label=back_label back_url=back_url band_tabs_template=band_tabs_template can_edit_area=can_edit_area delete_modal_enabled=delete_modal_enabled delete_modal_entity=delete_modal_entity delete_modal_title=delete_modal_title empty_action_label=empty_action_label empty_action_url=empty_action_url empty_message=empty_message empty_variant=empty_variant extra_hidden_field_name=extra_hidden_field_name extra_hidden_field_value=extra_hidden_field_value eyebrow=eyebrow hide_realtime_count=hide_realtime_count page_obj=page_obj page_querystring=page_querystring pagination_pages=pagination_pages q=q quick_add_body_template=quick_add_body_template quick_add_compact=quick_add_compact quick_add_form=quick_add_form quick_add_label=quick_add_label quick_add_next_url=quick_add_next_url quick_add_panel_id=quick_add_panel_id quick_add_submit_label=quick_add_submit_label request=request rows=rows search_placeholder=search_placeholder tabs_aria_label=tabs_aria_label title=title cotton_attr_href=cotton_attr_href cotton_attr_label=cotton_attr_label cotton_attr_aria_label=cotton_attr_aria_label action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id data_hook=data_hook shell=shell variant=variant only %}
+          </div>
+          {% if not quick_add_compact %}
+          <div class="inline-create__actions">
+            {% with cotton_attr_label=quick_add_submit_label|default:"Salvar" %}<c-ui.buttons.button :label="cotton_attr_label" variant="primary" type="submit" icon="check" only />{% endwith %}
+          </div>
+          {% endif %}
+        </div>
+      </form>
+      {% endif %}
+    </div>
+
+    {% if can_edit_area %}
+    <button
+      class="inline-create__toggle"
+      type="button"
+      data-inline-create-toggle
+      {% if quick_add_compact %}data-inline-create-submit-when-open data-inline-create-save-label="{{ quick_add_submit_label|default:'Salvar' }}"{% endif %}
+      aria-controls="{{ quick_add_panel_id }}"
+      aria-expanded="{% if quick_add_form.errors %}true{% else %}false{% endif %}"
+    >
+      <span class="inline-create__toggle-icon" aria-hidden="true">+</span>
+      <span class="inline-create__toggle-label">{{ quick_add_label|default:"Cadastrar item" }}</span>
+    </button>
+    {% endif %}
+  </div>
+
+  <div class="collection-panel">
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="list-toolbar">
+      <c-ui.lists.pagination :page_obj="page_obj" :pagination_pages="pagination_pages" :page_querystring="page_querystring" pagination_part="info" only />
+      <c-ui.lists.pagination :page_obj="page_obj" :pagination_pages="pagination_pages" :page_querystring="page_querystring" pagination_part="controls" only />
+    </div>
+    {% endif %}
+
+    <div class="list-panel{% if not rows %} list-panel--empty{% endif %}">
+      <c-ui.lists.pagination :page_obj="page_obj" :paginacao_obrigatoria="True" pagination_part="erro" only />
+      <c-lists.simple_list :rows="rows" :empty_message="empty_message" :hide_realtime_count="hide_realtime_count"  :empty_action_label="empty_action_label" :empty_action_url="empty_action_url" :empty_variant="empty_variant" />
+    </div>
+  </div>
+
+  {% if delete_modal_enabled %}
+    <c-ui.modals.delete_confirm_modal :delete_modal_title="delete_modal_title" :delete_modal_entity="delete_modal_entity" />
+  {% endif %}
+
+  {% if back_url %}
+    {% with cotton_attr_label=back_label|default:"Voltar" cotton_attr_aria_label=back_label|default:"Voltar" %}<c-ui.buttons.floating_action :href="back_url" :label="cotton_attr_label" icon="arrow-left" variant="secondary" :aria_label="cotton_attr_aria_label" extra_class="floating-action--back" only />{% endwith %}
+  {% endif %}
+</div>

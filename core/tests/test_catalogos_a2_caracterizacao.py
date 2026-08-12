@@ -21,8 +21,11 @@ asserções comparam com o valor **gravado**, não com o digitado.
 
 from __future__ import annotations
 
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
 from django.contrib.messages import get_messages
+from django.db.models.deletion import ProtectedError
 from django.test import TestCase
 from django.urls import reverse
 
@@ -168,6 +171,25 @@ class TiposEventoTests(_CatalogoMixin, TestCase):
         self.assertFalse(TipoEvento.objects.filter(pk=tipo.pk).exists())
         self.assertIn("Tipo de evento excluído com sucesso.", self._mensagens(response))
 
+    def test_exclusao_protegida_avisa_sem_virar_erro_500(self):
+        tipo = TipoEvento.objects.create(area=area_de_teste(), nome="Em uso")
+
+        with patch.object(
+            TipoEvento,
+            "delete",
+            side_effect=ProtectedError("vinculado", {tipo}),
+        ):
+            response = self.client.post(
+                reverse("eventos:tipo_delete", args=[tipo.pk])
+            )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(TipoEvento.objects.filter(pk=tipo.pk).exists())
+        self.assertIn(
+            "Não foi possível excluir este cadastro porque ele está vinculado a outros registros.",
+            self._mensagens(response),
+        )
+
     def test_a_busca_filtra(self):
         TipoEvento.objects.create(area=area_de_teste(), nome="Zebra")
         TipoEvento.objects.create(area=area_de_teste(), nome="Girafa")
@@ -191,6 +213,14 @@ class TiposEventoTests(_CatalogoMixin, TestCase):
 
         self.assertEqual(response.context["back_url"], destino)
         self.assertEqual(response.context["quick_add_next_url"], destino)
+
+    def test_next_externo_cai_no_fallback_do_catalogo(self):
+        response = self.client.get(
+            self._index(next="https://externo.invalido/coleta")
+        )
+
+        self.assertEqual(response.context["back_url"], reverse("eventos:index"))
+        self.assertEqual(response.context["quick_add_next_url"], "")
 
     def test_edicao_invalida_avisa_com_a_frase_unica(self):
         tipo = TipoEvento.objects.create(area=area_de_teste(), nome="Seminario")

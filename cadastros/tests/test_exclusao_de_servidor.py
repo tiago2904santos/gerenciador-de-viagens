@@ -155,14 +155,14 @@ class SemProvaContinuaExcluindoTests(ExclusaoDeServidorBase):
     def test_status_coletivo_nao_prende_o_servidor(self):
         """`status` é contaminado por ação de terceiro — por isso ficou fora.
 
-        `_marcar_servidores_pendentes` marca TODA a equipe pendente do ofício ao
+        `marcar_servidores_pendentes` marca TODA a equipe pendente do ofício ao
         salvar um documento compartilhado (despacho, RT, diário). Se o predicado
         olhasse `status`, bastaria um colega salvar o despacho para tornar
         indelével um servidor semeado por engano.
         """
-        from prestacoes_contas.view_common import _marcar_servidores_pendentes
+        from prestacoes_contas.services import marcar_servidores_pendentes
 
-        _marcar_servidores_pendentes(self.prestacao)
+        marcar_servidores_pendentes(self.prestacao)
         ps = self._ps(self.alvo)
         self.assertNotEqual(ps.status, PrestacaoServidor.STATUS_PENDENTE)
         self.assertTrue(ps.tem_dados_coletados(), "o predicado largo já considera coletado")

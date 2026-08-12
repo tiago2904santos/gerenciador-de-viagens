@@ -321,6 +321,53 @@
     });
   }
 
+  function attachDismiss(options) {
+    options = options || {};
+    var inside = options.inside || [];
+    var isOpen = typeof options.isOpen === "function"
+      ? options.isOpen
+      : function () { return true; };
+    var onDismiss = typeof options.onDismiss === "function"
+      ? options.onDismiss
+      : function () {};
+
+    function eventIsInside(event) {
+      var path = event.composedPath ? event.composedPath() : null;
+      return inside.some(function (node) {
+        if (!node) return false;
+        if (path && path.indexOf(node) !== -1) return true;
+        return node === event.target ||
+          (node.contains && node.contains(event.target));
+      });
+    }
+
+    function onDocumentClick(event) {
+      if (isOpen() && !eventIsInside(event)) {
+        onDismiss("outside", event);
+      }
+    }
+
+    function onDocumentKeydown(event) {
+      if (event.key !== "Escape" || !isOpen()) return;
+      if (
+        typeof options.escapeWhen === "function" &&
+        !options.escapeWhen(event)
+      ) return;
+      event.preventDefault();
+      onDismiss("escape", event);
+    }
+
+    document.addEventListener("click", onDocumentClick);
+    document.addEventListener("keydown", onDocumentKeydown);
+
+    return {
+      destroy: function () {
+        document.removeEventListener("click", onDocumentClick);
+        document.removeEventListener("keydown", onDocumentKeydown);
+      },
+    };
+  }
+
   function attachDropdown(menu, anchor) {
     if (!menu || !anchor) {
       return { open: function () {}, close: function () {}, reposition: function () {} };
@@ -549,6 +596,7 @@
   }
 
   window.CV.overlay = {
+    attachDismiss: attachDismiss,
     attachDropdown: attachDropdown,
     closeDialog: closeDialog,
     closeMenus: closeMenus,

@@ -43,11 +43,28 @@ class AuditUiPatternsTests(SimpleTestCase):
     def test_bundle_gerado_nao_duplica_a_divida_das_fontes(self):
         with TemporaryDirectory() as tmp:
             root = Path(tmp)
-            bundle = root / "static" / "css" / "shell.bundle.css"
-            bundle.parent.mkdir(parents=True)
-            bundle.write_text(".card { background: #ffffff; }\n", encoding="utf-8")
+            css = root / "static" / "css"
+            css.mkdir(parents=True)
+            for name in (
+                "shell.bundle.css",
+                "shell.form-components.bundle.css",
+            ):
+                with self.subTest(bundle=name):
+                    bundle = css / name
+                    bundle.write_text(
+                        ".card { background: #ffffff; }\n",
+                        encoding="utf-8",
+                    )
+                    self.assertEqual(auditor.scan_file(bundle, root=root), [])
 
-            findings = auditor.scan_file(bundle, root=root)
+    def test_componentes_cotton_preservam_a_excecao_dos_componentes_ui(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            component = root / "templates" / "cotton" / "ui" / "buttons" / "button.html"
+            component.parent.mkdir(parents=True)
+            component.write_text('<button style="color: #fff">Ação</button>\n', encoding="utf-8")
+
+            findings = auditor.scan_file(component, root=root)
 
         self.assertEqual(findings, [])
 

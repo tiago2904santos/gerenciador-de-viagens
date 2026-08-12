@@ -1,0 +1,2 @@
+{% cotton:vars action_label action_url message title variant %}
+{% with cotton_attr_title=title|default:"Nenhum registro cadastrado" cotton_attr_message=message|default:"Este módulo ainda não possui registros cadastrados." %}<c-ui.feedback.empty_state :title="cotton_attr_title" :message="cotton_attr_message" :action_label="action_label" :action_url="action_url" :variant="variant" only />{% endwith %}

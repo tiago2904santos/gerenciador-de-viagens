@@ -28,7 +28,7 @@
         <label class="sr-only" for="{{ transporte_form.motorista_manual_nome.id_for_label }}">Nome completo</label>
         {{ transporte_form.motorista_manual_nome }}
         {% if transporte_form.motorista_manual_nome.errors %}
-          {% include "components/ui/feedback/field_error.html" with errors=transporte_form.motorista_manual_nome.errors field_id=transporte_form.motorista_manual_nome.auto_id only %}
+          <c-ui.feedback.field_error :errors="transporte_form.motorista_manual_nome.errors" :field_id="transporte_form.motorista_manual_nome.auto_id" only />
         {% endif %}
       </div>
     </div>
@@ -39,8 +39,8 @@
         <span>Identifique o documento que autorizou este motorista.</span>
       </div>
       <div class="oficio-external-driver__reference-fields">
-        {% include "components/ui/forms/document_number_field.html" with field=transporte_form.motorista_oficio_referencia label="N° do Ofício" ano=motorista_oficio_ano numero_inicial=motorista_oficio_numero_inicial only %}
-        {% include "components/ui/forms/field.html" with field=transporte_form.motorista_protocolo_ref label="Protocolo" only %}
+        <c-ui.forms.document_number_field :field="transporte_form.motorista_oficio_referencia" label="N° do Ofício" :ano="motorista_oficio_ano" :numero_inicial="motorista_oficio_numero_inicial" only />
+        <c-ui.forms.field :field="transporte_form.motorista_protocolo_ref" label="Protocolo" only />
       </div>
     </div>
   </div>

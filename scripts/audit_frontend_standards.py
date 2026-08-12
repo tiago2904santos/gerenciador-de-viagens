@@ -38,10 +38,6 @@ CSS_EXCEPTIONS: dict[str, dict] = {
         "reason": "Arquivo de tokens — cores hex são a definição original, permitidas aqui.",
         "rules": {"hex_color_outside_tokens"},
     },
-    "static/css/base/theme.css": {
-        "reason": "Arquivo de tema — cores hex são a definição original, permitidas aqui.",
-        "rules": {"hex_color_outside_tokens"},
-    },
     "static/css/base/03-theme-dark.css": {
         "reason": "Official dark-theme token layer; literal values define semantic tokens.",
         "rules": {"hex_color_outside_tokens"},
@@ -69,6 +65,16 @@ CSS_EXCEPTIONS: dict[str, dict] = {
 # Regras de templates
 # ---------------------------------------------------------------------------
 TEMPLATE_RULES_ERRO = [
+    (
+        "component_include",
+        re.compile(r"{%\s*include\s+['\"](?:components|cotton)/"),
+        "Componente incluído como template — usar a tag <c-…>",
+    ),
+    (
+        "include_without_only",
+        re.compile(r"{%\s*include\b(?:(?!\bonly\b|%}).)*%}"),
+        "Include herda contexto ambiente — declarar parâmetros e usar only",
+    ),
     ("onsubmit_inline", re.compile(r'\bonsubmit='),           'Inline onsubmit event - use addEventListener'),
     ("css_inline",      re.compile(r'\bstyle="'),             'Atributo style="" inline — usar classe CSS'),
     ("onclick_inline",  re.compile(r'\bonclick='),            'Evento onclick inline — usar addEventListener'),
@@ -176,12 +182,8 @@ JS_MASKS_OWNER = "static/js/components/masks.js"
 # Baixar um teto quando o número cair é parte do trabalho, não faxina opcional.
 JS_EXCEPTIONS: dict[str, dict] = {
     "static/js/pages/roteiros/editor/index.js": {
-        "reason": "NOVO-14: classes de campo de tempo como condição, sai com o editor (BE-11, fase 6). NOVO-15: interpola markup de rota já escapado com CV.util.escapeHtml nas linhas vizinhas.",
-        "rules": {"css_class_as_logic": 6, "innerhtml_dynamic_without_escape": 2},
-    },
-    "static/js/cv-select.js": {
-        "reason": "NOVO-14: estado aberto do dropdown lido pela classe, sai na fase 7. JS-02: delegação de página registrada uma vez no módulo.",
-        "rules": {"css_class_as_logic": 2, "enhancer_without_destroy": 1},
+        "reason": "NOVO-14: classes de campo de tempo como condição, sai com o editor (BE-11, fase 6). NOVO-15: HTML de trechos já renderizado pelo servidor.",
+        "rules": {"css_class_as_logic": 6, "innerhtml_dynamic_without_escape": 1},
     },
     "static/js/components/overlay.js": {
         "reason": "NOVO-14: estado aberto do menu lido pela classe; sai na reconstrução do CSS (fase 7).",
@@ -202,25 +204,13 @@ JS_EXCEPTIONS: dict[str, dict] = {
         "reason": "NOVO-15: markup de linha e opções montado a partir de template do próprio DOM.",
         "rules": {"innerhtml_dynamic_without_escape": 4},
     },
-    "static/js/pages/gdrive_config.js": {
+    "static/js/pages/gdrive-config.js": {
         "reason": "NOVO-15: já usa escapeHtml nos dados; a linha marcada monta o invólucro.",
         "rules": {"innerhtml_dynamic_without_escape": 1},
     },
     "static/js/pages/eventos-detalhe.js": {
-        "reason": "NOVO-15: interpola constante de ícone do próprio arquivo. JS-02: sem listener global.",
-        "rules": {"innerhtml_dynamic_without_escape": 1, "enhancer_without_destroy": 1},
-    },
-    "static/js/pages/justificativas-index.js": {
-        "reason": "NOVO-15: interpola constante de ícone declarada no próprio arquivo.",
-        "rules": {"innerhtml_dynamic_without_escape": 1},
-    },
-    "static/js/pages/termos-form.js": {
-        "reason": "NOVO-15: interpola constante de ícone declarada no próprio arquivo.",
-        "rules": {"innerhtml_dynamic_without_escape": 1},
-    },
-    "static/js/pages/ordens-servico-form.js": {
-        "reason": "NOVO-15: interpola constante de ícone declarada no próprio arquivo.",
-        "rules": {"innerhtml_dynamic_without_escape": 1},
+        "reason": "JS-02: enhancer sem listener global e sem estado para desmontar.",
+        "rules": {"enhancer_without_destroy": 1},
     },
     "static/js/pages/planos-trabalho-wizard.js": {
         "reason": "NOVO-15: html vindo do servidor, já sanitizado na renderização do template.",
@@ -520,6 +510,14 @@ def audit_js() -> list[tuple]:
         rp = rel(path)
         # Bundle gerado (NOVO-12): auditar as fontes, não a concatenação.
         if path.name.endswith(".bundle.js"):
+            continue
+        # Teste de JS (JS-03): não é código entregue ao navegador, e o que ele monta
+        # para exercitar uma regra — `innerHTML` de fixture, classe usada como asserção —
+        # é exatamente o que estas regras proíbem no código de produção. Sem esta linha,
+        # escrever teste consome a folga do teto e reprova o CI por escrever teste
+        # (`NOVO-81`). Hoje o único teste existente não dispara nada; a trava é para o
+        # próximo, não para este.
+        if path.name.endswith(".test.js"):
             continue
         try:
             lines = path.read_text(encoding="utf-8").splitlines()

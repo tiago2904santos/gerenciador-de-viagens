@@ -4,6 +4,74 @@
  * Extracted from dark-redesign.css (Etapa 7, Fase 6).
  */
 
+/* UI-03: o bloco abaixo vinha de base/theme.css, que carregava ANTES deste
+   arquivo. Por isso ele entra no comeco e nao no fim — apender embaixo faria
+   estas declaracoes vencerem as de baixo, que e o contrario do que valia. */
+/* ========== 2 tema escuro oficial (inclui aliases legados escuros) ========== */
+html[data-theme="dark"] {
+  --color-danger-bg: rgba(180, 35, 24, 0.22);
+  --color-danger-text: #ffc8c2;
+  --color-info-bg: rgba(40, 96, 148, 0.24);
+  --color-info-text: #deebfb;
+
+  --app-featured-bg-fallback: #132238;
+
+  --app-hero-eyebrow: rgba(255, 236, 180, 0.95);
+  --app-hero-title: var(--color-white);
+
+  --theme-card-inset: 0 1px 0 rgba(255, 255, 255, 0.06);
+  --theme-shadow-hero: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 12px 36px rgba(0, 0, 0, 0.45), 0 4px 14px rgba(0, 0, 0, 0.28);
+  --theme-shadow-block: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 14px 34px rgba(0, 0, 0, 0.38);
+  --theme-shadow-stat: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 8px 22px rgba(0, 0, 0, 0.32);
+  --theme-quick-icon-bg: linear-gradient(165deg, #4a3a1e, #5a4622);
+  --theme-quick-icon-border: #d8a21b;
+  --theme-quick-icon-fg: #f0f6ff;
+  --theme-badge-accent-bg: #4a3a1e;
+  --theme-badge-accent-border: #d8a21b;
+  --theme-badge-accent-text: #ffe7ac;
+
+  --route-card-bg: #111e2f;
+  --route-card-border: #2b3f52;
+  --route-card-inner-bg: #132238;
+  --route-card-inner-border: #334c63;
+  --route-form-shell-bg: var(--route-card-bg);
+  --route-section-bg: var(--route-card-bg);
+  --route-section-soft-bg: var(--route-card-bg);
+  --route-section-border: #2b3f52;
+  --route-reference-top-bg: linear-gradient(180deg, #17476f 0%, #0b3a66 100%);
+  --route-field-bg: var(--color-card);
+  --route-field-border: #425a72;
+  --route-field-text: #f7fbff;
+  --route-field-placeholder: #9eb7d2;
+  --route-card-text: #e3eaf2;
+  --route-field-disabled-bg: var(--route-card-bg);
+  --route-field-disabled-text: #9fb1c8;
+  --route-button-primary-border: #286fa4;
+  --route-button-primary-text: #ffffff;
+  --route-button-primary-hover-border: #2f88c7;
+  --route-button-secondary-bg: #111e2f;
+  --route-button-secondary-border: #53708c;
+  --route-button-secondary-text: #f0f6ff;
+  --route-button-secondary-hover-bg: #2b3f52;
+  --route-button-secondary-hover-border: #7690af;
+  --route-button-danger-bg: linear-gradient(180deg, #c93636 0%, #962222 100%);
+  --route-button-danger-border: #d75a52;
+  --route-button-danger-text: #ffffff;
+  --route-button-danger-hover-bg: linear-gradient(180deg, #d94848 0%, #a92222 100%);
+  --route-button-danger-hover-border: #ef7d77;
+  --route-status-draft-bg: #3b3320;
+  --route-status-draft-border: #d8a21b;
+  --route-status-draft-text: #ffe7ac;
+  --route-status-final-bg: #14382e;
+  --route-status-final-border: #39a87e;
+  --route-status-final-text: #bcf4dc;
+  --route-status-muted-bg: #223348;
+  --route-status-muted-border: #53708c;
+  --route-status-muted-text: #d4dde9;
+  --route-focus-ring: rgba(116, 170, 224, 0.24);
+}
+
+
 html[data-theme="dark"] {
   color-scheme: dark;
 
@@ -62,6 +130,7 @@ html[data-theme="dark"] {
   --color-accent-text: #e0ab3c;
   --color-accent-border-soft: #7a641f;
   --color-accent-border-strong: #a5851f;
+  --color-on-accent: var(--color-primary-dark);
   --glow-accent: 0 14px 34px rgba(216, 162, 27, 0.22);
   --color-focus: #e0ab3c;
   /* No escuro o halo acompanha o foco ambar, nao o azul do tema claro. */
@@ -99,9 +168,10 @@ html[data-theme="dark"] {
   --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 14px 34px rgba(0, 0, 0, 0.42);
   --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.3);
   --shadow-panel: 0 18px 44px rgba(0, 0, 0, 0.42);
+  --shadow-custom-select-menu: 0 12px 28px rgba(2, 10, 18, 0.28);
   --shadow-elevated: 0 26px 70px rgba(0, 0, 0, 0.55);
-  /* O foco escuro orienta pela borda, sem halo luminoso ao redor do controle. */
-  --focus-ring: none;
+  /* NOVO-51: o foco escuro combina borda e halo visível. */
+  --focus-ring: 0 0 0 var(--space-1) var(--input-focus-ring);
   --transition-fast: 120ms cubic-bezier(.2, .8, .2, 1);
   --transition-base: 170ms cubic-bezier(.2, .8, .2, 1);
   --transition-slow: 240ms cubic-bezier(.2, .8, .2, 1);
@@ -114,12 +184,11 @@ html[data-theme="dark"] {
   --color-input-placeholder: #9ba9b4;
   --color-input-disabled-text: #909da7;
   --color-input-border: #607d93;
-  --cv-field-bg: var(--color-input-bg);
-  --cv-field-border: 1px solid var(--color-input-border);
-  --cv-field-focus-ring: var(--focus-ring);
-  --field-shadow-focus: none;
-  --select-focus-ring: none;
-  --select-focus-shadow: none;
+  --input-border-focus: #286fa4;
+  --input-focus-ring: rgba(116, 170, 224, 0.24);
+  --field-shadow-focus: 0 0 0 var(--space-1) var(--input-focus-ring), var(--shadow-xs);
+  --select-focus-ring: 0 0 0 var(--space-1) var(--input-focus-ring);
+  --select-focus-shadow: var(--field-shadow-focus);
   --card-border: 1px solid var(--color-border);
   --card-shadow: var(--shadow-card);
   /* Uma única família visual sustenta cards de lista e de formulário. */
@@ -134,6 +203,10 @@ html[data-theme="dark"] {
     0 0 0 1px color-mix(in srgb, var(--color-accent) 18%, transparent),
     0 0 10px color-mix(in srgb, var(--color-accent) 16%, transparent);
   --card-family-accent-width: 8px;
+  --entity-card-inner-bg: var(--color-surface-soft);
+  --wizard-card-bg: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  --wizard-panel-bg: var(--color-surface-soft);
+  --wizard-field-bg: var(--wizard-card-bg);
   --theme-surface-card: var(--color-surface);
   --theme-surface-card-soft: var(--color-surface-soft);
   --theme-border-card: var(--color-border);
@@ -179,7 +252,7 @@ html[data-theme="dark"] {
   --surface-pagination: transparent;
   --surface-filter-button: var(--color-surface-soft);
   --border-filter-button: var(--color-border);
-  --color-filter-button: var(--color-muted-strong);
+  --text-filter-button: var(--color-muted-strong);
   --surface-stepper: var(--color-surface);
   --border-stepper: var(--color-border);
   --shadow-stepper: var(--shadow-sm);
@@ -227,23 +300,23 @@ html[data-theme="dark"] {
   --sidebar-border: rgba(255, 255, 255, 0.08);
   --sidebar-shadow: inset -1px 0 rgba(255, 255, 255, 0.04), 14px 0 42px rgba(0, 0, 0, 0.22);
   --sidebar-brand-fg: #ffffff;
-  --sidebar-badge-bg: linear-gradient(140deg, rgba(219, 166, 32, 0.72) 0%, rgba(179, 129, 27, 0.85) 100%);
+  --sidebar-badge-bg: linear-gradient(140deg, var(--color-accent-hover) 0%, var(--color-accent) 100%);
   --sidebar-link-surface: transparent;
   --sidebar-link-border: transparent;
   --sidebar-link-fg: #b5c0c8;
   --sidebar-link-hover-bg: #243541;
   --sidebar-icon-bg: #243541;
   --sidebar-icon-fg: #c3ccd3;
-  --sidebar-active-bg: #1e3a50;
+  --sidebar-active-bg: color-mix(in srgb, var(--color-accent) 12%, var(--sidebar-surface));
   --sidebar-active-fg: #ffffff;
-  --sidebar-active-border: #607d93;
-  --sidebar-panel-border: #3f657f;
+  --sidebar-active-border: var(--color-accent-border-strong);
+  --sidebar-panel-border: var(--color-accent-border-soft);
   --sidebar-footer-fg: #9ba9b4;
   --sidebar-logout-bg: transparent;
   --sidebar-logout-border: rgba(255, 255, 255, 0.11);
   --sidebar-logout-fg: #d2d9de;
-  --sidebar-focus-ring: rgba(131, 188, 232, 0.52);
-  --sidebar-theme-active-bg: rgba(75, 143, 197, 0.23);
+  --sidebar-focus-ring: color-mix(in srgb, var(--color-accent) 52%, transparent);
+  --sidebar-theme-active-bg: color-mix(in srgb, var(--color-accent) 18%, transparent);
 
   --app-body-bg:
     radial-gradient(ellipse 70% 50% at 50% 0%, rgba(21, 91, 154, 0.16), transparent 55%),

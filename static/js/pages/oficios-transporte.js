@@ -221,61 +221,29 @@
   };
 
   OficioTransporte.prototype.buildResultButton = function (item) {
-    // Estrutura idêntica ao search-picker.renderOptionItem
-    // (marker + content; content tem __option-main e __option-meta).
     const self = this;
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "search-picker__option";
-    btn.dataset.value = String(item.id);
-    btn.setAttribute("role", "option");
-    btn.setAttribute("aria-selected", "false");
-    if (item.suggestion_reason) {
-      btn.dataset.suggestionReason = item.suggestion_reason;
-    }
-
-    const marker = document.createElement("span");
-    marker.className = "search-picker__option-marker";
-
-    const body = document.createElement("div");
-    body.className = "search-picker__option-content";
-
-    const main = document.createElement("span");
-    main.className = "search-picker__option-main";
     const placaLabel = item.placa_formatada || "Viatura";
     const modeloLabel = item.modelo || "";
-    main.textContent = modeloLabel ? placaLabel + "  •  " + modeloLabel : placaLabel;
-
-    // Chip de motivo (Motorista / Unidade) inline com o nome,
-    // mesmo padrão visual do driver-chip do multiselect.
-    if (item.suggestion_reason === "motorista" || item.suggestion_reason === "unidade") {
-      const chip = document.createElement("span");
-      chip.className =
-        "search-picker__driver-chip oficio-viatura-reason oficio-viatura-reason--" +
-        item.suggestion_reason;
-      chip.textContent = item.suggestion_reason === "motorista" ? "Motorista" : "Unidade";
-      main.appendChild(chip);
-    }
-
-    const meta = document.createElement("span");
-    meta.className = "search-picker__option-meta";
     const metaParts = [
       item.unidade_resumo,
       item.combustivel,
       item.tipo,
     ].filter(function (p) { return p && p !== "—"; });
-    meta.textContent = metaParts.length
-      ? metaParts.join("  •  ")
-      : "Dados complementares não informados";
-
-    body.appendChild(main);
-    body.appendChild(meta);
-    btn.appendChild(marker);
-    btn.appendChild(body);
-
-    btn.addEventListener("mousedown", function (event) { event.preventDefault(); });
-    btn.addEventListener("click", function () { self.applyViaturaFromResult(item); });
-    return btn;
+    const hasReason = item.suggestion_reason === "motorista"
+      || item.suggestion_reason === "unidade";
+    const button = window.CV.pickerParts.createOption({
+      chip: hasReason ? {
+        className: "search-picker__driver-chip oficio-viatura-reason oficio-viatura-reason--" + item.suggestion_reason,
+        label: item.suggestion_reason === "motorista" ? "Motorista" : "Unidade",
+      } : null,
+      meta: metaParts.length ? metaParts.join("  •  ") : "Dados complementares não informados",
+      selected: false,
+      suggestionReason: item.suggestion_reason,
+      title: modeloLabel ? placaLabel + "  •  " + modeloLabel : placaLabel,
+      value: item.id,
+    });
+    button.addEventListener("click", function () { self.applyViaturaFromResult(item); });
+    return button;
   };
 
   OficioTransporte.prototype.applyViaturaFromResult = function (item) {
@@ -316,88 +284,33 @@
   };
 
   OficioTransporte.prototype.renderSelectedCard = function (item) {
-    // Constrói um card com a MESMA estrutura visual do
-    // search-picker.buildCard (variant=detailed):
-    //  ┌─────────────────────────────────────────────┐
-    //  │ ABC-1234 • FORD KA                  [Editar]│
-    //  │ DU01 • Gasolina • Caracterizada     [   x  ]│
-    //  └─────────────────────────────────────────────┘
     if (!this.selectedList) return;
     this.selectedList.innerHTML = "";
-
-    const card = document.createElement("div");
-    card.className = "search-picker__selected-card oficio-viatura-selected-card";
-    card.dataset.value = String(item.id || "");
-
-    const body = document.createElement("div");
-    body.className = "search-picker__selected-main";
-
-    const titleRow = document.createElement("div");
-    titleRow.className = "search-picker__selected-title-row";
-
-    const name = document.createElement("span");
-    name.className = "search-picker__selected-name";
     const placaLabel = item.placa_formatada || "—";
     const modeloLabel = item.modelo || "";
-    name.textContent = modeloLabel ? placaLabel + "  •  " + modeloLabel : placaLabel;
-    titleRow.appendChild(name);
-
-    if (item.suggestion_reason === "motorista" || item.suggestion_reason === "unidade") {
-      const chip = document.createElement("span");
-      chip.className =
-        "search-picker__driver-chip oficio-viatura-reason oficio-viatura-reason--" +
-        item.suggestion_reason;
-      chip.textContent = item.suggestion_reason === "motorista" ? "Motorista" : "Unidade";
-      titleRow.appendChild(chip);
-    }
-    body.appendChild(titleRow);
-
     const metaParts = [
       item.unidade_resumo,
       item.combustivel,
       item.tipo,
     ].filter(function (p) { return p && p !== "—"; });
-    const metaEl = document.createElement("span");
-    metaEl.className = "search-picker__selected-meta";
-    metaEl.textContent = metaParts.length
-      ? metaParts.join("  •  ")
-      : "Dados complementares não informados";
-    body.appendChild(metaEl);
-    card.appendChild(body);
-
-    // Botão Editar — visual semelhante ao driver-toggle do multiselect
-    if (item.edit_url) {
-      const editRow = document.createElement("div");
-      editRow.className = "search-picker__driver-control oficio-viatura-edit-row";
-
-      const editLink = document.createElement("a");
-      editLink.className =
-        "search-picker__driver-toggle oficio-viatura-edit-link";
-      editLink.href = item.edit_url;
-      editLink.setAttribute("aria-label", "Editar viatura selecionada");
-      const marker = document.createElement("span");
-      marker.className = "search-picker__driver-marker";
-      const text = document.createElement("span");
-      text.className = "search-picker__driver-text";
-      text.textContent = "Editar viatura";
-      editLink.appendChild(marker);
-      editLink.appendChild(text);
-      editRow.appendChild(editLink);
-      card.appendChild(editRow);
-    }
-
-    // Botão remover/limpar — usa o mesmo padrão visual do __remove (x)
-    const removeBtn = document.createElement("button");
-    removeBtn.type = "button";
-    removeBtn.className = "search-picker__remove";
-    removeBtn.setAttribute("aria-label", "Remover viatura selecionada");
-    removeBtn.textContent = "x";
     const self = this;
-    removeBtn.addEventListener("click", function () {
-      self.clearViaturaSelection();
+    const hasReason = item.suggestion_reason === "motorista"
+      || item.suggestion_reason === "unidade";
+    const card = window.CV.pickerParts.createSelectedCard({
+      chip: hasReason ? {
+        className: "search-picker__driver-chip oficio-viatura-reason oficio-viatura-reason--" + item.suggestion_reason,
+        label: item.suggestion_reason === "motorista" ? "Motorista" : "Unidade",
+      } : null,
+      editAriaLabel: "Editar viatura selecionada",
+      editLabel: "Editar viatura",
+      editUrl: item.edit_url,
+      extraClass: "oficio-viatura-selected-card",
+      meta: metaParts.length ? metaParts.join("  •  ") : "Dados complementares não informados",
+      onRemove: function () { self.clearViaturaSelection(); },
+      removeAriaLabel: "Remover viatura selecionada",
+      title: modeloLabel ? placaLabel + "  •  " + modeloLabel : placaLabel,
+      value: item.id,
     });
-    card.appendChild(removeBtn);
-
     this.selectedList.appendChild(card);
     if (this.selectedEmpty) {
       this.selectedEmpty.hidden = true;

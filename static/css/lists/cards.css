@@ -16,8 +16,7 @@
 .card,
 .app-card,
 .module-card,
-.document-card,
-.page-card {
+.document-card {
   background: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
@@ -28,7 +27,7 @@
 .card,
 .app-card,
 .module-card,
-.document-card{
+.document-card {
   padding: var(--space-4);
   transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
 }
@@ -36,7 +35,7 @@
 .card:hover,
 .app-card:hover,
 .module-card:hover,
-.document-card:hover{
+.document-card:hover {
   border-color: var(--color-accent-border-strong);
   box-shadow: var(--shadow-panel);
   transform: translateY(-2px);

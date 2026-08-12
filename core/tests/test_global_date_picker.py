@@ -34,7 +34,7 @@ class GlobalDatePickerTests(SimpleTestCase):
         for mode, context in scenarios:
             with self.subTest(mode=mode):
                 html = render_to_string(
-                    "components/ui/forms/date_picker.html",
+                    "cotton/ui/forms/date_picker.html",
                     {"mode": mode, **context},
                 )
                 self.assertEqual(html.count("data-cv-date-picker\n"), 1)
@@ -43,7 +43,7 @@ class GlobalDatePickerTests(SimpleTestCase):
 
     def test_compact_variants_preserve_existing_triggers(self):
         filter_html = render_to_string(
-            "components/ui/forms/date_picker.html",
+            "cotton/ui/forms/date_picker.html",
             {
                 "mode": "range",
                 "control_variant": "filter-pill",
@@ -59,7 +59,7 @@ class GlobalDatePickerTests(SimpleTestCase):
         self.assertNotIn("data-cv-date-picker-end-display", filter_html)
 
         action_html = render_to_string(
-            "components/ui/forms/date_picker.html",
+            "cotton/ui/forms/date_picker.html",
             {
                 "mode": "multi",
                 "control_variant": "action-button",
@@ -73,14 +73,14 @@ class GlobalDatePickerTests(SimpleTestCase):
 
     def test_multi_mode_opts_into_repeated_dates_only_when_requested(self):
         sem_repeticao = render_to_string(
-            "components/ui/forms/date_picker.html",
+            "cotton/ui/forms/date_picker.html",
             {"mode": "multi", "multi_input_id": "multi-display", "max_dates": 3},
         )
         self.assertNotIn("data-allow-repeat-dates", sem_repeticao)
         self.assertNotIn("data-cv-date-picker-undo", sem_repeticao)
 
         com_repeticao = render_to_string(
-            "components/ui/forms/date_picker.html",
+            "cotton/ui/forms/date_picker.html",
             {
                 "mode": "multi",
                 "multi_input_id": "multi-display",
@@ -117,7 +117,7 @@ class GlobalDatePickerTests(SimpleTestCase):
 
     def test_calendar_markup_exists_only_in_the_global_partial(self):
         templates_root = Path(settings.BASE_DIR) / "templates"
-        global_partial = templates_root / "components" / "ui" / "forms" / "date_picker.html"
+        global_partial = templates_root / "cotton" / "ui" / "forms" / "date_picker.html"
 
         offenders = []
         for template in templates_root.rglob("*.html"):

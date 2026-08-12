@@ -5,10 +5,10 @@
       {{ form.numero }}
       {% if oficio_numero_ano_hint %}<span class="composite-field__suffix">{{ oficio_numero_ano_hint }}</span>{% endif %}
     </div>
-    {% if form.numero.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.numero.errors field_id=form.numero.auto_id only %}{% endif %}
+    {% if form.numero.errors %}<c-ui.feedback.field_error :errors="form.numero.errors" :field_id="form.numero.auto_id" only />{% endif %}
   </div>
-  {% include "components/ui/forms/field.html" with field=form.protocolo label="Protocolo" only %}
-  {% include "components/ui/forms/field.html" with field=form.custeio label="Custeio" only %}
+  <c-ui.forms.field :field="form.protocolo" label="Protocolo" only />
+  <c-ui.forms.field :field="form.custeio" label="Custeio" only />
   <div
     class="field field-size-4{% if not mostrar_custeio_observacao %} form-field--hidden{% else %} is-open{% endif %}"
     data-custeio-observacao-wrapper
@@ -16,6 +16,6 @@
     data-oficio-custeio-outra-value="{{ outra_instituicao_custeio_value|default:'OUTRA_INSTITUICAO' }}"
     {% if not mostrar_custeio_observacao %}hidden{% endif %}
   >
-    {% include "components/ui/forms/field.html" with field=form.custeio_observacao label="Nome da Instituição" only %}
+    <c-ui.forms.field :field="form.custeio_observacao" label="Nome da Instituição" only />
   </div>
 </div>

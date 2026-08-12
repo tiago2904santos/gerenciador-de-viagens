@@ -5,11 +5,12 @@ from datetime import time
 from urllib.parse import urlencode
 
 from django.contrib import messages
-from django.core.paginator import Paginator
 from django.http import Http404, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
+
+from core.pagination import contexto_paginacao
 
 from core.autosave import (
     AutosavePayloadError,
@@ -40,6 +41,7 @@ from .services.routing.route_preview_service import calculate_route_preview
 from .models import Roteiro
 from .presenters import (
     apresentar_contexto_formulario_roteiro_avulso,
+    apresentar_pagina_editor_roteiro,
     apresentar_roteiro_card,
 )
 from .selectors import (
@@ -48,24 +50,20 @@ from .selectors import (
     listar_roteiros,
 )
 from .services import (
-    atualizar_roteiro,
     calcular_diarias_roteiro_request,
     carregar_opcoes_rotas_avulsas_salvas,
-    criar_roteiro,
-    encontrar_roteiro_duplicado,
     excluir_roteiro,
-    normalizar_destinos_e_trechos_apos_erro_post,
     obter_initial_roteiro,
     preparar_estado_editor_roteiro_para_get,
     preparar_querysets_formulario_roteiro,
-    sobrescrever_roteiro_duplicado,
-    validar_submissao_editor_roteiro,
+    processar_submissao_editor,
 )
 from .services.autosave import (
     ROTEIRO_AUTOSAVE_FIELDS,
     apply_roteiro_autosave,
     build_roteiro_draft,
     has_minimum_roteiro_content,
+    pk_de_autosave,
 )
 from .services.estimativa_local import ROTA_FONTE_ESTIMATIVA_LOCAL
 from .services.routing.trecho_route_service import calcular_rota_trecho
@@ -147,8 +145,13 @@ def index(request):
         preserved={"q": q},
     )
 
-    paginator = Paginator(lista, ROTEIROS_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
+    paginacao = contexto_paginacao(
+        lista,
+        request,
+        ROTEIROS_PER_PAGE,
+        query_params={"q": q, "aba": aba},
+    )
+    page_obj = paginacao["page_obj"]
     next_url = request.get_full_path()
     cards = []
     # Uma resolução para a página inteira (NOVO-27). Sem isto cada card paga a
@@ -176,33 +179,52 @@ def index(request):
             "q": q,
             "aba": aba,
             "abas": abas,
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({k: v for k, v in {"q": q, "aba": aba}.items() if v}),
+            **paginacao,
         },
     )
 
 
-def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
-    return [
-        page_number if isinstance(page_number, int) else "..."
-        for page_number in page_obj.paginator.get_elided_page_range(
-            page_obj.number,
-            on_each_side=on_each_side,
-            on_ends=on_ends,
-        )
-    ]
-
-
 def _resolver_rascunho_autosave(request):
-    raw = (request.POST.get("autosave_obj_id") or "").strip()
-    if not raw:
+    pk = pk_de_autosave(request.POST)
+    if pk is None:
         return None
-    try:
-        pk = int(raw)
-    except (TypeError, ValueError):
-        return None
+    # O escopo do fluxo avulso é a área ativa; o do ofício é a área do ofício
+    # (`oficios/route_views.py`). Por isso o `BE-11` compartilhou só o parse.
     return filter_queryset_by_area(Roteiro.objects).filter(pk=pk).first()
+
+
+def _responder_submissao_editor(
+    request, resultado, form, *, evento, msg_sucesso, msg_duplicado, next_url=""
+):
+    """Traduz o resultado da submissão em redirect, ou em erro no form.
+
+    `BE-11`: o que `novo` e `editar` faziam igual aqui era tudo menos três coisas — o
+    texto do sucesso simples, o texto do sucesso por fusão no duplicado (só `editar` fala
+    em descarte, porque só lá havia registro a descartar) e o `?next=`, que só `editar`
+    aceita. Viraram parâmetros. Devolve `None` quando é para re-renderizar a página.
+    """
+    if resultado.salvo:
+        messages.success(
+            request,
+            msg_duplicado.format(pk=resultado.duplicado.pk)
+            if resultado.fundiu_no_duplicado
+            else msg_sucesso,
+        )
+        if next_url:
+            return redirect(next_url)
+        if evento is not None:
+            return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=2)
+        return redirect("roteiros:index")
+
+    if resultado.colisao_sem_saida:
+        form.add_error(
+            None,
+            f"Já existe um roteiro idêntico salvo (#{resultado.duplicado.pk}). "
+            "Edite o existente ou ajuste os dados.",
+        )
+    for error in resultado.erros_de_validacao():
+        form.add_error(None, error)
+    return None
 
 
 def novo(request):
@@ -224,80 +246,44 @@ def novo(request):
     route_options, route_state_map = carregar_opcoes_rotas_avulsas_salvas(evento=evento)
 
     if request.method == "POST":
-        roteiro_state, validated, diarias_resultado = validar_submissao_editor_roteiro(
-            request.POST, route_state_map, roteiro=rascunho
+        resultado = processar_submissao_editor(
+            request.POST, form, route_state_map, roteiro=rascunho, evento=evento
         )
-        if form.is_valid() and validated["ok"]:
-            duplicado = encontrar_roteiro_duplicado(
-                validated, roteiro_state, evento=evento, excluir_pk=getattr(rascunho, "pk", None)
-            )
-            if duplicado is not None:
-                roteiro = sobrescrever_roteiro_duplicado(
-                    duplicado,
-                    request.POST,
-                    method=request.method,
-                    roteiro_state=roteiro_state,
-                    validated=validated,
-                    diarias_resultado=diarias_resultado,
-                    instance_obsoleta=rascunho,
-                )
-            elif rascunho is not None:
-                roteiro = atualizar_roteiro(rascunho, form, roteiro_state, validated, diarias_resultado)
-            else:
-                roteiro = criar_roteiro(form, roteiro_state, validated, diarias_resultado, evento=evento)
-
-            if roteiro is not None:
-                if duplicado is not None:
-                    messages.success(
-                        request,
-                        f"Já existia um roteiro idêntico (#{duplicado.pk}); os dados foram atualizados nele.",
-                    )
-                else:
-                    messages.success(request, "Roteiro cadastrado com sucesso.")
-                if evento is not None:
-                    return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=2)
-                return redirect("roteiros:index")
-            form.add_error(
-                None,
-                f"Já existe um roteiro idêntico salvo (#{duplicado.pk}). Edite o existente ou ajuste os dados.",
-            )
-        for error in validated.get("errors", []):
-            form.add_error(None, error)
-        destinos_atuais, trechos_list = normalizar_destinos_e_trechos_apos_erro_post(roteiro_state)
+        resposta = _responder_submissao_editor(
+            request,
+            resultado,
+            form,
+            evento=evento,
+            msg_sucesso="Roteiro cadastrado com sucesso.",
+            msg_duplicado="Já existia um roteiro idêntico (#{pk}); os dados foram atualizados nele.",
+        )
+        if resposta is not None:
+            return resposta
+        destinos_atuais, trechos_list, roteiro_state = resultado.estado_para_rerender()
     else:
         destinos_atuais, trechos_list, roteiro_state = preparar_estado_editor_roteiro_para_get(
             initial=initial
         )
 
-    context = apresentar_contexto_formulario_roteiro_avulso(
-        evento=evento,
-        form=form,
-        obj=None,
-        destinos_atuais=destinos_atuais,
-        trechos_list=trechos_list,
-        roteiro_state=roteiro_state,
-        route_options=route_options,
-    )
     return render(
         request,
         "roteiros/roteiro_form_page.html",
-        {
-            "page_title": "Novo roteiro",
-            "page_description": "Sede, destinos, trechos, retorno e diárias no mesmo fluxo do legacy.",
-            "back_url": _roteiro_return_url(evento=evento),
-            "wizard_header": {
-                "title": "Novo roteiro",
-                "description": "Roteiro e diárias",
-                "status_label": "",
-                "status_variant": "",
-            },
-            "wizard_back_label": "Dados do evento" if evento is not None else "Voltar para lista",
-            "wizard_back_url": _roteiro_return_url(evento=evento),
-            "wizard_page_steps": [],
-            "roteiro_editor_oficio": True,
-            "roteiro_form_action": _roteiro_form_action(request, evento),
-            **context,
-        },
+        apresentar_pagina_editor_roteiro(
+            contexto_editor=apresentar_contexto_formulario_roteiro_avulso(
+                evento=evento,
+                form=form,
+                obj=None,
+                destinos_atuais=destinos_atuais,
+                trechos_list=trechos_list,
+                roteiro_state=roteiro_state,
+                route_options=route_options,
+            ),
+            titulo="Novo roteiro",
+            descricao="Sede, destinos, trechos, retorno e diárias no mesmo fluxo do legacy.",
+            back_url=_roteiro_return_url(evento=evento),
+            back_label="Dados do evento" if evento is not None else "Voltar para lista",
+            form_action=_roteiro_form_action(request, evento),
+        ),
     )
 
 
@@ -325,83 +311,54 @@ def editar(request, pk):
     route_options, route_state_map = carregar_opcoes_rotas_avulsas_salvas(evento=evento, excluir_pk=roteiro.pk)
 
     if request.method == "POST":
-        roteiro_state, validated, diarias_resultado = validar_submissao_editor_roteiro(
-            request.POST, route_state_map, roteiro=roteiro
+        resultado = processar_submissao_editor(
+            request.POST, form, route_state_map, roteiro=roteiro, evento=evento
         )
-        if form.is_valid() and validated["ok"]:
-            duplicado = encontrar_roteiro_duplicado(
-                validated, roteiro_state, evento=evento, excluir_pk=roteiro.pk
-            )
-            if duplicado is not None:
-                atualizado = sobrescrever_roteiro_duplicado(
-                    duplicado,
-                    request.POST,
-                    method=request.method,
-                    roteiro_state=roteiro_state,
-                    validated=validated,
-                    diarias_resultado=diarias_resultado,
-                    instance_obsoleta=roteiro,
-                )
-            else:
-                atualizado = atualizar_roteiro(roteiro, form, roteiro_state, validated, diarias_resultado)
-
-            if atualizado is not None:
-                if duplicado is not None:
-                    messages.success(
-                        request,
-                        f"Já existia um roteiro idêntico (#{duplicado.pk}); os dados foram atualizados nele e este registro foi descartado.",
-                    )
-                else:
-                    messages.success(request, "Roteiro atualizado com sucesso.")
-                if next_url:
-                    return redirect(next_url)
-                if evento is not None:
-                    return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=2)
-                return redirect("roteiros:index")
-            form.add_error(
-                None,
-                f"Já existe um roteiro idêntico salvo (#{duplicado.pk}). Edite o existente ou ajuste os dados.",
-            )
-        for error in validated.get("errors", []):
-            form.add_error(None, error)
-        destinos_atuais, trechos_list = normalizar_destinos_e_trechos_apos_erro_post(roteiro_state)
+        resposta = _responder_submissao_editor(
+            request,
+            resultado,
+            form,
+            evento=evento,
+            next_url=next_url,
+            msg_sucesso="Roteiro atualizado com sucesso.",
+            msg_duplicado=(
+                "Já existia um roteiro idêntico (#{pk}); os dados foram atualizados "
+                "nele e este registro foi descartado."
+            ),
+        )
+        if resposta is not None:
+            return resposta
+        destinos_atuais, trechos_list, roteiro_state = resultado.estado_para_rerender()
     else:
         destinos_atuais, trechos_list, roteiro_state = preparar_estado_editor_roteiro_para_get(
             roteiro=roteiro
         )
 
-    context = apresentar_contexto_formulario_roteiro_avulso(
-        evento=evento,
-        form=form,
-        obj=roteiro,
-        destinos_atuais=destinos_atuais,
-        trechos_list=trechos_list,
-        roteiro_state=roteiro_state,
-        route_options=route_options,
+    back_url = next_url or (
+        _roteiro_return_url(roteiro=roteiro) if roteiro.evento_id else reverse("roteiros:index")
     )
-    roteiro_status_label = roteiro.get_status_display() if hasattr(roteiro, "get_status_display") else ""
-    roteiro_status_variant = "draft" if roteiro.status == Roteiro.STATUS_RASCUNHO else "active"
     return render(
         request,
         "roteiros/roteiro_form_page.html",
-        {
-            "page_title": "Editar roteiro",
-            "page_description": "Ajuste sede, destinos, trechos e retorno.",
-            "back_url": next_url or (_roteiro_return_url(roteiro=roteiro) if roteiro.evento_id else reverse("roteiros:index")),
-            "delete_url": reverse("roteiros:excluir", args=[roteiro.pk]),
-            "wizard_header": {
-                "title": "Editar roteiro",
-                "description": "Roteiro e diárias",
-                "status_label": roteiro_status_label,
-                "status_variant": roteiro_status_variant,
-            },
-            "wizard_back_label": "Voltar" if next_url else ("Dados do evento" if roteiro.evento_id else "Voltar para lista"),
-            "wizard_back_url": next_url or (_roteiro_return_url(roteiro=roteiro) if roteiro.evento_id else reverse("roteiros:index")),
-            "wizard_page_steps": [],
-            "roteiro_editor_oficio": True,
-            "roteiro_form_action": request.get_full_path(),
-            **context,
-        },
+        apresentar_pagina_editor_roteiro(
+            contexto_editor=apresentar_contexto_formulario_roteiro_avulso(
+                evento=evento,
+                form=form,
+                obj=roteiro,
+                destinos_atuais=destinos_atuais,
+                trechos_list=trechos_list,
+                roteiro_state=roteiro_state,
+                route_options=route_options,
+            ),
+            titulo="Editar roteiro",
+            descricao="Ajuste sede, destinos, trechos e retorno.",
+            back_url=back_url,
+            back_label="Voltar"
+            if next_url
+            else ("Dados do evento" if roteiro.evento_id else "Voltar para lista"),
+            form_action=request.get_full_path(),
+            roteiro=roteiro,
+        ),
     )
 
 
@@ -441,7 +398,7 @@ def api_cidades_por_estado(request, estado_id):
 @require_http_methods(["POST"])
 def calcular_diarias(request):
     try:
-        _, _, validated, resultado = calcular_diarias_roteiro_request(request)
+        _, _, validated, resultado = calcular_diarias_roteiro_request(request.POST)
     except ValueError as exc:
         return JsonResponse(
             {

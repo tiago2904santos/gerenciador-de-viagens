@@ -68,7 +68,8 @@ etapa**; o que estiver diferente é trabalho que aconteceu no meio.
 
 **O que já está são, e que nenhuma etapa pode estragar:** zero `fetch()` cru, zero `alert()`/
 `confirm()` nativos (os 12 hits de `grep` são `CV.feedback.*`), zero `style=` inline, zero
-`<script>` inline em template, bundles em dia (`build_shell_bundles.py --check`: 25 CSS, 26 JS).
+`<script>` inline em template, bundles em dia (`build_shell_bundles.py --check`: 25 CSS,
+13 JS de shell e 7 JS de formulário).
 
 **A folga zero do foco importa.** `audit_foco_visivel --max 30` está em exatamente 30. Qualquer
 bloco novo que apague foco sem substituto reprova o CI. As etapas E6 a E9 mexem em `:focus`; conte
@@ -113,6 +114,13 @@ entre **11,3369% e 70,5559%** de uso (11,3369%–19,2908% nas rotas autenticadas
 fez **129 medições** em 1440, 800 e 500 px: 61.700 elementos comparados, 248.651 diferenças
 não-cor e zero diferenças exclusivas entre as ordens claro→escuro e escuro→claro. Uma segunda
 execução, sem `--atualizar-tetos`, passou contra `scripts/tetos_front.json`.
+
+> **Correção de 11/08 (`NOVO-106`).** O medidor somava apenas folhas que apareciam em
+> `CSS.stopRuleUsageTracking`; uma folha externa com **zero regras casadas** não aparecia nem no
+> numerador nem no denominador. A linha de base escondia justamente o desperdício que E10 precisa
+> retirar. Com todas as folhas externas contabilizadas, o intervalo real é **11,1003%–55,8871%**
+> (11,1003%–22,1029% nas rotas autenticadas). Os pisos foram corrigidos apenas onde o denominador
+> antes estava incompleto; daqui em diante voltam a só subir.
 
 **Arquivos.** `requirements/dev.txt` · `scripts/rotas_do_sistema.py` (novo) ·
 `scripts/medir_css_por_rota.py` (novo) · `scripts/medir_divergencia_tema.py` (novo) ·
@@ -204,10 +212,17 @@ afrouxa para o PR passar.
 
 ---
 
-### E2 — Higiene: o morto e os nomes · `NOVO-69`, `NOVO-72`, `NOVO-73`, `NOVO-48` · risco baixo · 2 d
+### E2 ✅ — Higiene: o morto e os nomes · `NOVO-69`, `NOVO-72`, `NOVO-73`, `NOVO-48` · concluída em 09/08/2026
 
 **Objetivo.** Tirar do caminho o que está morto e padronizar nome e lugar, antes que a
 componentização os carregue para dentro do desenho novo.
+
+**Resultado.** `cv-select.js` e seu contrato/no-op/CSS órfão saíram; `SHELL_JS` ficou com 25
+fontes e o bundle versionado caiu **289.831 → 274.420 bytes**. Os quatro módulos de página agora
+estão em `static/js/pages/` com kebab-case. `ui_lab2/` não existe numa worktree limpa (era apenas
+cache ignorado). A poda CSS, re-medida depois da sobreposição com `NOVO-69`, removeu **66 nomes**,
+168 alternativas e 57 regras completas; o bundle CSS caiu **485.262 → 479.996 bytes** e a catraca
+de padrões de UI desceu **2.622 → 2.583**.
 
 **Arquivos.** `static/js/cv-select.js` · `scripts/build_shell_bundles.py` · `ui_lab2/` ·
 `static/js/roteiros*.js` · `static/js/pages/gdrive_config.js` · `static/css/**` (seletores
@@ -253,10 +268,17 @@ classificar, **não apague** — registre no catálogo e siga.
 
 ---
 
-### E3 — Cotton instalado, nada migrado · `NOVO-71` (parte) · risco **médio-alto** · 1 d
+### E3 ✅ — Cotton instalado, nada migrado · `NOVO-71` (parte) · concluída em 09/08/2026
 
 **Objetivo.** Trocar o carregador de template sem tocar em um único template, para que a suíte
 prove que só o carregador mudou.
+
+**Resultado.** `django-cotton==2.7.2` foi pinado e travado com hashes. O loader efetivo é
+`cached.Loader` → `django_cotton.cotton_loader.Loader` → `filesystem.Loader` →
+`app_directories.Loader`; `cotton`, `cotton:vars` e `cotton:slot` estão em `builtins`. Os cinco
+context processors do projeto permaneceram idênticos, nenhum arquivo em `templates/` mudou e os
+408 templates compilam. A navegação real cobriu uma tela de cada domínio, mais o perfil da
+integração Google, sem erro do Django ou do console.
 
 **Arquivos.** `requirements/base.txt` · `requirements/lock.txt` · `config/settings/base.py:161-176`
 
@@ -286,10 +308,21 @@ pergunte antes de mesclar. E confira, com o servidor de pé, pelo menos uma tela
 
 ---
 
-### E4 — Os componentes globais viram cotton · `NOVO-71` · risco médio · 4–6 d
+### E4 ✅ — Os componentes globais viram cotton · `NOVO-71` · concluída em 10/08/2026
 
 **Objetivo.** Dar a cada componente global um contrato de parâmetro declarado, em vez de contexto
 herdado por acaso.
+
+**Concluída.** Os **82 componentes globais** agora têm implementação canônica em
+`templates/cotton/**`; os 82 caminhos antigos em `templates/components/**` ficaram como cascas de
+compatibilidade para a migração dos 946 call sites na E5. A conversão foi entregue em 21 commits
+por família, com contrato automatizado cobrindo o inventário completo. A régua da E0 permaneceu
+idêntica nas **129 combinações** (43 rotas × 3 larguras). Localmente, os 1.852 testes foram
+coletados e só restaram as limitações já conhecidas do host Windows; as catracas fecharam em
+`audit_frontend_standards`: **0 erros/240 avisos**, `audit_ui_patterns`: **2.535 suspeitas**,
+`audit_django_architecture`: **78 suspeitas**, e os bundles do shell estão atualizados. O isolamento
+de contexto e a remoção das cascas pertencem deliberadamente à E5, quando os call sites passarem a
+usar slots e atributos Cotton diretamente.
 
 **Arquivos.** `templates/cotton/**` (novos) · `templates/components/**` (viram cascas) ·
 `scripts/audit_ui_patterns.py:10`
@@ -334,9 +367,19 @@ pergunte.
 
 ---
 
-### E5 — Call sites migrados, cascas apagadas · `HT-14`, `NOVO-74` · risco médio · 4–6 d
+### E5 ✅ — Call sites migrados, cascas apagadas · `HT-14`, `NOVO-74` · concluída em 10/08/2026
 
 **Objetivo.** Fechar o "mudar o modelo muda todas as páginas" no motor, não na disciplina.
+
+**Concluída.** Os **868 call sites de componentes** foram migrados, app por app, para tags
+`<c-…>`. Os 82 componentes canônicos permanecem exclusivamente em `templates/cotton/**`; as 82
+cascas, os cinco `.gitkeep` e todo o diretório rastreado `templates/components/**` foram removidos.
+O isolamento de contexto do Cotton está habilitado e os **190 includes Django remanescentes** —
+parciais de aplicação e slots, não componentes — declaram parâmetros e terminam em `only`.
+`audit_frontend_standards` agora reprova tanto include de componente quanto include sem `only`.
+Os contratos estáticos percorrem composição, slots e templates dinâmicos; a suíte coletou 1.866
+testes e, no host Windows, restaram apenas as duas limitações já conhecidas (WeasyPrint/GTK e o
+subprocesso do auditor por socket). A régua visual da E0 permaneceu estável nas 129 combinações.
 
 **Arquivos.** todos os `templates/<app>/**` · `templates/components/**` (removidos ao fim)
 
@@ -371,7 +414,25 @@ esses não aparecem em `grep` de template, e mudar o caminho quebra a view em si
 
 ---
 
-### E6 — Os componentes que faltam · `HT-08`, `HT-15`, `NOVO-16`, `HT-10`, `HT-07` · risco médio · 6–8 d
+### E6 ✅ — Os componentes que faltam · `HT-08`, `HT-15`, `NOVO-16`, `HT-10`, `HT-07`, `NOVO-80`, `NOVO-81` · concluída em 10/08/2026
+
+> **Como fechou, e o que o enunciado errou.** Os cinco IDs saíram em `70f369c6`..`5b58fac7`; as
+> duas travas de regressão saíram no PR #293 (`3996f903`).
+>
+> O enunciado do `HT-08` dizia que "a maioria é reimplementação de markup, não falta de suporte".
+> Era o contrário. O componente tinha lista fechada de 29 variáveis, e os `<button>` do sistema
+> dependiam de `id`, `formaction`, `data-*` fora do catálogo, `hidden` e `tabindex` — nada disso
+> saía. A correção começou pelo componente (`attrs`, `slot` e `class_name`, que troca a base em
+> vez de apendar), e só depois pelos call sites. Duas telas autônomas (`core/login.html` e
+> `prestacoes_contas/assinatura/`) são `<html>` sem a folha de ícones, e migrar direto quebrava
+> `test_folha_de_icones`; elas usam `plain_button.html`, sem dependência de ícone.
+>
+> O `NOVO-80` não estava no enunciado: a E5 apagou duas travas de regressão em vez de reapontá-las
+> quando `templates/components/` virou `templates/cotton/`. Sem elas, componente morto que volta
+> **e já vem sendo usado** não é pego por nada — o guarda de órfão, por construção, só reclama de
+> quem não tem consumidor.
+
+**Enunciado original, para registro:**
 
 **Objetivo.** Acabar com o markup reescrito à mão que a componentização deixou para trás.
 
@@ -407,7 +468,48 @@ comportamento. Registre e pergunte antes de trocar.
 
 ---
 
-### E7 — Token em duas camadas · `UI-03`, `NOVO-51`, `NOVO-54` · risco médio · 3–4 d
+### E7a ✅ — Token em duas camadas: onde o token mora · `UI-03` · concluída em 10/08/2026
+
+> **O que o enunciado errou.** Eram **oito** arquivos definindo `--color-*`, não nove. E ele não
+> mencionava a família `--theme-*` (40 nomes, 152 definições), que é camada intermediária real —
+> consolidar só `--color-*` deixaria uma terceira camada global não declarada.
+>
+> `base/theme.css` foi dissolvido. Em `page-shell.css`, 4 dos 7 `--color-*` eram mortos e os 3
+> vivos foram renomeados para a família do componente, em vez de migrarem para o arquivo de token.
+>
+> A catraca vale para **escopo raiz**; re-ligação dentro de componente continua permitida, porque
+> 45 regras globais leem `var(--color-input-bg)` e 10 leem `var(--color-focus)` — proibir custaria
+> duplicar 55 regras sob seletor de container e **subir** especificidade.
+>
+> A prova é `scripts/resolver_tokens_css.py`: 2131 valores computados, 0 diferenças. Ela existe
+> porque nenhum gate do repositório protegia valor de token.
+
+### E7b — Token em duas camadas: a família `cv-field` · `NOVO-51`, `NOVO-54` · risco médio
+
+Medido: `NOVO-51` são **4 nomes** (`--cv-field-bg`, `--cv-field-border`, `--cv-field-focus-ring`,
+`--cv-field-border-focus`), e `--cv-field-border` carrega **dois contratos incompatíveis** — 4
+consumidores leem como shorthand (`border: var(--cv-field-border)`), 3 leem como cor
+(`1px solid var(--cv-field-border)`). `--cv-field-border-focus` não nasce em nenhuma das duas
+camadas, só em `fields/select.css:95`.
+
+`NOVO-54` são **37 regras** em 11 arquivos, não 64. Só 2 usam `:where()`.
+
+> **Progresso de 11/08.** Depois da recontagem para 72 regras, as 7 candidatas de repouso e as 7
+> candidatas de estado não-base foram removidas/simplificadas com estilo computado estável. O
+> medidor agora separa `focus` de `focus-visible`, desliga movimento e passa no piso de repetição
+> com 0 diferenças. A leva seguinte passou a capturar ancestrais e os 4 pseudo-elementos do
+> inventário, e aceitou um seletor amplo para conferir também controles sem a classe. Em 54 rotas,
+> 648 combinações e 7.260 leituras, zerar a especificidade do seletor de elemento nu, retirar as 8
+> pseudo-regras redundantes e apagar o contexto órfão `.justificativa-panel` preservou 0 diferenças
+> de estilo, pseudo-estilo e estrutura. O inventário caiu para 47 regras em 13 arquivos. A última
+> leva acrescentou as rotas reais de diário e atividades: 56 rotas, 672 combinações e 7.536
+> leituras. Os ramos duplicados de diário, quick-add e `field-with-action` caíram com 0 diferenças
+> de estilo, pseudo-estilo e estrutura; o inventário terminou em 36 regras vivas de base, a11y ou contexto, em 11
+> arquivos. **A E7c está concluída.** O `NOVO-51` de valor próprio foi fechado em 11/08 depois da
+> decisão do dono por anel visível no escuro: 0 definições `--cv-*` restantes no CSS de fonte e
+> 84 leituras de calendário alteradas apenas nos estados escuros com `focus-visible`.
+
+**Enunciado original da E7, para registro:**
 
 **Objetivo.** Um vocabulário de token único, antes de reescrever qualquer aparência.
 
@@ -439,7 +541,14 @@ definem `--color-*` indo de 9 para 2.
 
 ---
 
-### E8 — O desenho único · `NOVO-58` · risco **alto** · a dimensionar
+### E8 🟠 — O desenho único · `NOVO-58` · reaberta pela reauditoria de 11/08/2026
+
+> **Correção da E8-zero.** A reauditoria de 11/08 no `main`, provocada pelo `NOVO-93`, refutou o
+> zero acima: o instrumento atual comparou **60.386 elementos** em 43 rotas × 3 larguras e encontrou
+> **138.978 diferenças não-cor**. O redesenho das superfícies claras do `NOVO-93` reduziu o total
+> para **115.963** (−23.015; −16,6%), mas não o zerou. Portanto a E8 volta a aberta; cada família
+> restante precisa ser reatribuída por regra antes de qualquer novo recorte. O `NOVO-51` de foco
+> continua fechado, pois é decisão separada de cor/a11y.
 
 > **PARE E PERGUNTE EM TODAS AS SUB-ETAPAS.** Esta etapa não é trabalho de Codex no sentido do
 > `AGENTS.md` §6: aplicar um redesenho a 43 telas não tem critério objetivo de pronto. O que o
@@ -465,14 +574,48 @@ desenho anterior — e é o que o sistema mostra para quem nunca escolheu tema.*
 | 8d | barra lateral | 976 | ✅ **fechada pelo `NOVO-63`** — `.sidebar*` divergente de 1.096 para **96**; a largura virou um token só |
 | 8e | `font-size`/`line-height` | 533 | ✅ **em quase tudo**: o `NOVO-63` mediu que **528 dos 533** eram a barra lateral |
 | 8f | altura de controle | 378 | ✅ **toda**: o `NOVO-63` mediu que os 378 eram a barra lateral |
-| 8b | borda `0px` → `1px` | 1.416 | 🟠 **aberta** |
-| 8c | raio `14px` → `10px` | 940 | 🟠 **aberta** |
-| 8g | `justify-content` `normal` → `center` | 230 | 🟠 **aberta** |
+| 8b | borda `0px` → `1px` | 1.416 | ✅ **fechada pelo `NOVO-93`**: o dono escolheu redesenhar superfícies. A medição atual não reproduziu as 40 históricas: encontrou 55 regras escuras com efeito, 34 removendo borda; depois ficaram 19/0. O filete dourado de `.cv-module-card` foi preservado |
+| 8c | raio `14px` → `10px` | 940 | ✅ **fechada em 10/08** — 43 das 116 regras, 1.116 elementos |
+| 8g | `justify-content` `normal` → `center` | 230 | ⛔ **pulada por decisão do dono — `NOVO-94`**: move a régua e não move um pixel |
 | 8h | **gaveta da barra lateral** | — | 🟠 **aberta, deixada de fora de propósito pelo `NOVO-63`**: sob `@media (max-width: 840px)` o escuro usa `position: fixed` + `height: 100dvh` e o claro `position: relative`. Isso não é geometria, é **comportamento** — vira gaveta sobreposta em vez de coluna no fluxo, e depende de `.app-mobile-bar__toggle` e `.sidebar-drawer-close` se comportarem igual nos dois temas |
 
 **Portanto a 8-zero é remedir.** Rode `scripts/medir_divergencia_tema.py` da E0 e reescreva a
 tabela acima antes de tocar em CSS. O `PLANO_MESTRE` §7.4 é explícito: número velho é o quarto erro
 que mata um ciclo.
+
+#### A remedição de 10/08, e o instrumento que ela exigiu
+
+A tabela de 07/08 conta **elementos que divergem**. Isso confunde três coisas diferentes, e as três
+apareceram na E8:
+
+1. a regra existe e muda o que se vê;
+2. a regra existe, diverge, e **não pinta nada** (o `NOVO-90`: `-webkit-font-smoothing` divergia em
+   20.100 elementos e os prints saíam idênticos byte a byte);
+3. o elemento está fora da tela naquela largura ou naquele estado — menu fechado, diálogo fechado,
+   barra de celular escondida no desktop. Pinta, mas só depois de o usuário abrir alguma coisa.
+
+Medido **regra a regra**, com o predicado de tema retirado do seletor e os elementos procurados nas
+43 rotas, nas três larguras, depois do `#304`:
+
+| família | regras só-escuras | com efeito | elementos @1440 | @800 | @500 | dos quais visíveis @1440 |
+|---|---:|---:|---:|---:|---:|---:|
+| 8b borda | 186 | **54** | 754 | 754 | 760 | 285 |
+| 8c raio | 116 | **43** | 1.116 | 1.116 | 1.128 | 451 |
+| 8g `justify-content` | 16 | **7** | 137 | 137 | 170 | — |
+
+Duas conclusões que a contagem antiga escondia:
+
+- **214 das 318 regras catalogadas não mudam nada** — ou o elemento não existe naquelas rotas, ou o
+  claro já computa o mesmo valor. Contá-las como trabalho pendente superestimava a etapa.
+- **"Invisível" quer dizer coisas diferentes na 8g e na 8b/8c.** Na 8g a propriedade *não consegue*
+  pintar (não há folga no container, ou o elemento nem é caixa flex no claro) — é inútil por
+  construção, e virou o `NOVO-94`. Na 8b/8c o elemento só não está na tela **no estado de repouso**;
+  ele pinta quando o menu ou o diálogo abre. Por isso a 8c foi feita inteira e a 8g não foi feita.
+
+**Instrumento novo desta etapa:** o print antes/depois deixou de ser conferência visual e virou
+número. `prova_pixel.py` fotografa 10 componentes × 3 larguras × 2 temas e conta pixels diferentes.
+A 8c fechou com **0 pixels diferentes no tema escuro nas 30 comparações** e mudança em 8 dos 10
+componentes no claro. Sem isso não há como distinguir o caso 1 do caso 2.
 
 **Duas lições de método que o `NOVO-63` pagou e você não deve pagar de novo:**
 
@@ -505,6 +648,57 @@ token.
 Ele só é grande porque carrega **geometria**; com a E8 feita, o que sobra é diferença de cor, que
 o token resolve.
 
+> **⚠️ A premissa acima é falsa, e a medição de 10/08 mostra.** Depois da E8, das 659 regras
+> predicadas em `dark` em todo o `static/css`, **329 ainda misturam cor e geometria** — lideradas
+> por `border` (162 ocorrências), a família **8b**, que a E8 deixou bloqueada. Depois vêm `padding`
+> (83), `border-radius` (73), `font-size` (58), `font-weight` (54), `display` (50) e `transform`
+> (47). A E9 tira a camada de cor e destrava a 8b; a geometria restante continua sendo desenho.
+>
+> Os números do enunciado também envelheceram: o arquivo tinha **5.788** linhas (a E8 criou 41
+> regras gêmeas de raio) e os `!important` fora do bundle eram **466**, não 496 — o `#303` tirou 30
+> depois que o plano foi escrito.
+
+#### Progresso
+
+| fatia | o que fez | estado |
+|---|---|---|
+| **E9-b** | a faixa de filtros não tinha fundo no claro: os nove `--card-family-*` passam a existir no `:root` do `tokens.css` | ✅ `#309` — 47 elementos no claro, **2 no escuro** (piso de ruído) |
+| **E9-a** | 32 regras só-escuras de cor removidas por medição | ✅ `#310` — 4 elementos alterados = piso de ruído. Arquivo 5.788 → **5.610** linhas; `!important` 466 → **463** |
+| **E9-c** | o sistema de superfície do wizard (`--step1-*`) passa a existir no claro — **destrava a 8b** | ✅ `#313` — 36 elementos no claro, **2 no escuro** ⚠️ o "destrava" valeu para **1 regra**, não para a família: ver `NOVO-105` |
+| **E9-d** | `NOVO-82`: remove as 87 declarações de tema escuro vencidas no próprio arquivo | ✅ tabela efetiva do resolvedor idêntica: **2.135 valores**, SHA-256 `55c095380e25f0735ad7bb8a40dd23a916df57cb9f47a98e91bd7ed54f064abc` |
+| **E9-e accents por tema** | azul no claro, dourado no escuro, com `warning` desacoplado (`NOVO-111`) | ✅ tokens, gradientes, badges, filetes e sidebar seguem a paleta do tema; contrato e prints 1440/500 |
+| **E8-8b** | a fatia da 8b que sobrevive aos três portões (alcance medido, âncora estrutural, fronteira no claro) | ✅ 1 de 41 regras — escuro **pixel-idêntico**, claro com 18 elementos nas 3 rotas de roteiro |
+| **E8-8b superfícies** | redesenha a hierarquia clara e neutraliza a família bloqueada (`NOVO-93`) | ✅ regras que removem borda do claro **34 → 0**; divergências não-cor **138.978 → 115.963**; escuro 60.497 elementos, **0 diferenças** |
+| **E8 Eventos/Wizard** | tipografia, stepper de um anel, campos, selects e hierarquia de superfícies (`NOVO-58`, `NOVO-100`) | ✅ conteúdo com **0 divergências não-cor** em 1440/800/500; chrome móvel permanece na 8h; prints claro/escuro conferidos |
+| **E8 Custom Select v2** | menu aberto, opções e check usam uma geometria nos dois temas (`NOVO-112`) | ✅ trilho, recuo, altura, raio, check e scrollbar compartilhados; azul no claro e dourado no escuro |
+| **E8 listas e superfícies claras** | espelha a estrutura dos cards e restaura bloco azul-cinza com campo branco (`NOVO-113`) | ✅ Ofício 91 com 112 nós e **0** diferenças de dimensão, posição relativa ou estilo não-cor; página `var(--app-body-bg)`, wizard claro `#fff` / `#eef4fc` / `#fff` |
+| **E9 — régua de mesmo tema** | versiona a prova usada pelas fatias da E8/E9 (`NOVO-114`) | ✅ dois URLs, contexto público separado do autenticado, duas ordens, estrutura e cascata sob teto 0; contrato automatizado e smoke real |
+
+**O instrumento que a etapa exigiu, e que não existia.** A régua da E0
+(`medir_divergencia_tema.py`) compara **claro contra escuro no mesmo código**. A E9 precisa do
+contrário: **o mesmo tema em dois códigos**. Daí `sonda_mesmo_tema.py` — citada nas medições
+históricas, mas só versionada no `NOVO-114` — chaveia elementos por caminho no DOM, desliga
+`transition` e `animation`, aceita `--revelar` (tira `[hidden]`/`aria-hidden` e abre `details`) e
+`--pseudo hover` (força o estado em todo elemento). A execução padrão cobre 43 rotas × 3 larguras ×
+2 temas = **258 combinações**; mudança estrutural, cascata ou resultado dependente da ordem reprova.
+Texto variável fica marcado no diagnóstico, mas não pode esconder diferença de estilo.
+
+> **Correção de 11/08 (`NOVO-105`):** o "piso de ruído de 4 elementos" que aparecia aqui **não era
+> ruído** — era o relógio de minuto de `/justificativas/` mudando a largura dos dígitos numa fonte
+> proporcional, o mesmo defeito que o `075d77df` achou no `medir_campos_computados.py`. Com o texto
+> guardado ao lado do estilo, mudança só de texto não vira diferença de CSS e **o piso é 0**: duas
+> capturas do mesmo código dão 0 de estilo e 30 só de texto. O `NOVO-114` fecha o outro lado do
+> contrato: se texto e estilo computado mudarem juntos, a correlação é informativa e o estilo
+> continua na catraca — ela não prova que a mudança visual veio apenas do texto. Os "zeros"
+> anteriores desta tabela foram
+> afirmados descontando 4 — ou seja, eram "zero ou quatro". Daqui em diante, zero é zero.
+
+**O que continua aberto na E9-a:** ~147 candidatas que reprovam em lote e **110 fora do alcance da
+régua** — o componente não aparece em nenhuma das 43 rotas (84), o contexto de wizard não tem o dado
+(25) ou é estado vazio (1). E três lições de método, cada uma paga com uma reversão: `NOVO-95` (a
+cascata não é monotônica — não se infere o efeito de um diff a partir de outro), a ordem obrigatória
+entre atribuir e remover, e o piso de ruído como pré-requisito de qualquer afirmação de "zero".
+
 **Prova.** `!important` fora do bundle caindo de 496; linhas do arquivo caindo de 5.619; a régua de
 divergência estável (a E9 não pode mudar aparência — a E8 já mudou).
 
@@ -522,7 +716,61 @@ quer o componente pare de levar o domínio junto.
 
 **Contexto medido hoje.** **97 imports de CSS em 36 templates** (eram 54 em 26 em 05/08 — piorou).
 `oficios.css` é importado 19 vezes, `roteiros.css` e `prestacoes_contas.css` 10 cada, `termos.css`
-9. Em `templates/prestacoes_contas/index.html`, `oficios.css` (106 KB) chega com **0,0% de uso**.
+9. A afirmação anterior de que `oficios.css` chegava à lista de Prestações com 0,0% de uso estava
+errada: no código de 11/08 são **64.095 bytes entregues e 9.383 casados**, porque a família
+compartilhada `record-card`/`person-row`/`fact-block` ainda mora ali. `roteiros-list.css` entrega
+**7.180 bytes e casa zero** nessa rota. O `NOVO-106` fez o medidor enxergar também essa segunda
+folha; a extração deve mover a família compartilhada antes de retirar o primeiro import.
+
+> **Primeira fatia fechada em 11/08.** A família
+> `record-card`/`person-row`/`fact-block`/`itinerary` agora mora em
+> `lists/entity-cards.css`. As sete listas a declaram diretamente; seis deixaram de importar
+> `oficios.css`, que caiu de **19 para 13 imports**. A entrega caiu **44.376 bytes** em cada uma
+> dessas seis rotas e 176 bytes em Ofícios. A catraca subiu em todas (Prestações:
+> **13,9147% → 14,8009%**). A comparação claro/escuro em 1440/800/500 px foi idêntica nas
+> **1.616 leituras por viewport**. E10/UI-04 continua aberta para as famílias restantes e para a
+> meta de 35%.
+
+> **Segunda fatia fechada em 11/08 (`NOVO-45/MOR`).** `roteiros-list.css` foi removido: as três
+> regras vivas de `record-card--roteiro` foram para `lists/entity-cards.css` (+261 B), 265 linhas
+> legadas e os sete imports saíram. Cada rota afetada entrega **6.919 bytes a menos**. Os
+> presenters também deixaram de calcular `faixa_lateral_class`, chave que nenhum template lia.
+> Um card real confirmou os mesmos estilos computados em claro/escuro e 1440/800/500 px.
+
+> **Terceira fatia fechada em 11/08 (`HT-04`, parcial).** `date-picker.css` e `file-picker.css`
+> saíram do shell padrão. O gerador mantém uma variante com a ordem original para os 18 templates
+> consumidores; as demais rotas recebem **25.615 bytes a menos** em um único request. Servidores,
+> Eventos e Termos produziram os mesmos estilos computados de página inteira em claro/escuro e
+> 1440/800/500 px (**2.632 leituras por viewport**). `search-picker`/`select` seguem na próxima
+> fronteira do `HT-04`.
+
+> **Quarta fatia fechada em 11/08 (`HT-04`, parcial).** `search-picker.css` também saiu do shell
+> padrão e permanece, na ordem original, apenas na variante consumidora. Rotas sem o componente
+> deixam de buscar **27.227 bytes**. Servidores e Eventos ficaram idênticos por página inteira em
+> claro/escuro e 1440/800/500 px (**1.704 leituras por viewport**). `select.css` segue global porque
+> ainda contém regras de select nativo; sua divisão é a próxima fronteira.
+
+> **Quinta fatia fechada em 11/08 (`HT-04`, parcial).** `select.css` foi dividido sem retirar do
+> shell as regras de select nativo, `.cv-field` e `.field-with-action`. A família
+> `.custom-select*` agora vive em `fields/custom-select.css`, imediatamente depois do núcleo global
+> e somente na variante consumidora. São mais **6.496 bytes** fora das rotas sem o enhancer e
+> **59.338 bytes** acumulados entre date/file/search/custom-select.
+
+> **Sexta fatia fechada em 11/08 (`UI-04`/`HT-04`, parcial).** Justificativas deixou de carregar
+> `oficios.css`, `roteiros.css` e `termos.css`. As 32 regras compartilhadas efetivamente usadas
+> pelo cadastro rápido foram reunidas em `fields/related-route-picker.css`, após o shell para
+> manter a precedência anterior. A rota caiu de **753.913 para 625.201 bytes entregues**
+> (**-128.712 bytes**) e subiu de **11,3912% para 13,5547% de uso**. O painel aberto preservou
+> **233 nós**, geometria e estilos computados em claro/escuro a 1440/800/500 px. Ofícios,
+> Roteiros, Termos e Ordem de Serviço também mantiveram assinaturas de estilo idênticas nas seis
+> combinações.
+
+> **Sétima fatia fechada em 11/08 (`UI-04`, parcial).** A lista de Termos parou de carregar
+> `prestacoes_contas.css`. A folha alheia não alterava lista, filtros, cards, calendário ou menus;
+> apenas alterava 13 elementos (14 a 500 px) do `file-picker` dentro do modal global de anexo
+> assinado. O modal passou intencionalmente à superfície canônica de `fields/file-picker.css`, sem
+> overflow em claro/escuro a 1440/800/500 px. A rota caiu de **673.378 para 650.375 bytes**
+> (**-23.003 bytes**) e subiu de **13,6518% para 14,0594% de uso**.
 
 **Passo a passo.** Extraia os componentes compartilhados dos arquivos de domínio para
 `fields/`, `actions/`, `lists/` e `feedback/`, domínio por domínio, e derrube o import correspondente. Dimensione com a
@@ -541,24 +789,37 @@ tem que bater: uso acima de 35% por rota**, contra os 10,1%–11,8% de hoje.
 
 **Passo a passo, um ID por commit.**
 
-1. **`HT-04`** — `base.html:11,45` carrega `shell.bundle.css` e `shell.bundle.js`
-   incondicionalmente, e ~153 KB do JS (57% do bundle) são exclusivos dos wizards de
-   ofício/roteiro/termo/prestação. Separe bundle "núcleo" de bundle "documentos", usando os
-   `{% block extra_js %}`/`{% block extra_css %}` que `base.html:12-13,46` já tem. Mitigue a
-   regressão silenciosa — template que esquece de declarar — com regra no auditor ou teste de
-   fumaça por tela.
-2. **`JS-07`** — "fechar ao clicar fora / Esc" em 4 cópias (`picker.js`, `date-picker.js`,
-   `cv-select.js` — que a E2 já apagou —, `picker-select.js`). `components/overlay.js:471-503` já
-   tem a base. **Correção do catálogo que você precisa conhecer:** nenhuma das quatro fecha em
-   `scroll`/`resize`; só `date-picker.js:794-795` **reposiciona**. Não implemente um fechamento que
-   não existia.
-3. **`JS-08`** — corte por componente, não pelo bloco. A coluna "templates que usam" do enunciado
+1. **`HT-04` — JS ✅; CSS → E10.** A premissa de uso exclusivo por wizard estava desatualizada:
+   pickers e calendários também chegam a cadastros, filtros e conteúdo AJAX. Os sete módulos com
+   dependência entre si foram para `form-components.bundle.js`, em ordem determinística; 11
+   templates que chamam suas APIs diretamente o declaram no novo bloco `component_js`, depois do
+   shell e antes dos scripts de página, e os demais carregam por marcador DOM.
+   `attach-signed-modal` e `wizard-sticky-header` também saíram
+   do shell e carregam sob demanda. Resultado: **266.254 → 108.937 bytes** no shell global
+   (**−157.317; −59,1%**); uma rota com o bundle de formulário recebe **248.402 bytes**, ainda
+   **17.852 bytes abaixo** do shell anterior. O teste mantém o inventário dos 12 scripts de página
+   que dependem diretamente dessas APIs e impede declaração esquecida. A fatia de ~37 KB de CSS
+   permanece deliberadamente em `UI-04`/E10, porque CSS e JS não podem avançar na mesma camada.
+2. **`JS-07` ✅** — "fechar ao clicar fora / Esc" estava em 4 cópias (`picker.js`, `date-picker.js`,
+   `cv-select.js` — que a E2 já apagou —, `picker-select.js`). `components/overlay.js` já tinha
+   a base. **Correção do catálogo que você precisa conhecer:** nenhuma das quatro fecha em
+   `scroll`/`resize`; só `date-picker.js` **reposiciona**. Não implemente um fechamento que
+   não existia. Fechado com `CV.overlay.attachDismiss`: **3 implementações vivas → 1 contrato**,
+   mantendo o painel portalizado dentro da zona interativa e o reposicionamento do calendário.
+3. **`JS-08` ✅** — corte por componente, não pelo bloco. A coluna "templates que usam" do enunciado
    original estava errada: `segment-nav.js` chega a ≥4 templates e `file-picker.js` a ≥6, por
-   `{% include %}` com variável. O ganho é menor do que o catálogo prometia.
-4. **`JS-09`** — `templates/documentos/geracao_aguarde_embedded.html:27` é documento autônomo que
-   carrega 264 KB para usar `CV.http.fetchJson` (3,3 KB).
-5. **`JS-10`** — decidir os stubs de 3 linhas do editor de roteiros (`state.js`, `retorno.js`,
-   `diarias.js`): completar a extração ou removê-los. **Depende do `BE-13`** — pergunte.
+   `{% include %}` com variável. Os cinco componentes vivos agora carregam por marcador real de
+   DOM, inclusive AJAX: **283.128 → 266.254 bytes** no shell global (−16.874; −6,0%).
+4. **`JS-09` ✅** — o documento autônomo entrega `core/http.js` antes do polling e não carrega mais
+   `shell.bundle.js`: **283.282 → 4.255 bytes** de JavaScript específico da rota (−98,5%).
+5. **`JS-10` ✅** — removidos os stubs de 3 linhas do editor de roteiros (`state.js`, `retorno.js`,
+   `diarias.js`) depois do fechamento do `BE-13`: **3 arquivos e 3 objetos sem consumidor → 0**.
+   `trechos.js`, `mapa.js` e o bootstrap do mapa permanecem intactos.
+
+> **Regressão fechada em 11/08 (`NOVO-110`).** O renderer de select chegava depois do primeiro
+> passe do enhancer e não processava o DOM já existente; selects e multiselects ficavam nativos,
+> sem erro no console. O registro tardio agora inicializa o documento imediatamente e possui teste
+> de runtime com a ordem real dos bundles.
 
 **Prova.** KB por rota antes/depois, `npm test` da E1 verde, suíte verde.
 
@@ -584,7 +845,7 @@ A reconstrução termina quando, medido por comando e não por opinião:
 ## 6. O que este plano não faz
 
 - **Não mexe no backend.** A Fase 6 (`BE-11`…`BE-16`) é superfície disjunta e pode correr em
-  paralelo, em branch própria. A exceção é o `JS-10`, que depende do `BE-13`.
+  paralelo, em branch própria. A dependência `JS-10` → `BE-13` já foi satisfeita.
 - **Não renumera os IDs colididos do catálogo.** `NOVO-45`, `NOVO-49`, `NOVO-50` e `NOVO-51`
   aparecem duas vezes cada, por acidente de sessões paralelas. Renumerar quebra o rastro dos PRs
   que já os citam; a colisão fica registrada e os IDs novos começam em `NOVO-69`.

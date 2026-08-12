@@ -3,7 +3,6 @@ from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from django.core.paginator import Paginator
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import JsonResponse
@@ -11,6 +10,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 
+from core.pagination import contexto_paginacao
 from core.retorno import com_next
 from core.retorno import next_valido
 from core.retorno import voltar_para
@@ -126,8 +126,10 @@ def cidades_index(request):
         messages.success(request, "Cidade criada com sucesso.")
         return redirect("cadastros:cidades_index")
     cidades = listar_cidades(q=q)
-    paginator = Paginator(cidades, CADASTROS_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
+    paginacao = contexto_paginacao(
+        cidades, request, CADASTROS_PER_PAGE, query_params={"q": q}
+    )
+    page_obj = paginacao["page_obj"]
     rows = [
         apresentar_linha_lista_simples_cidade(cidade)
         for cidade in page_obj.object_list
@@ -141,9 +143,7 @@ def cidades_index(request):
             "rows": rows,
             "q": q,
             "quick_add_form": form,
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({"q": q}) if q else "",
+            **paginacao,
         },
     )
 
@@ -162,17 +162,6 @@ SERVIDORES_PER_PAGE = 25
 
 def _render_listagem(request, template_name, context):
     return render(request, template_name, context)
-
-
-def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
-    return [
-        page_number if isinstance(page_number, int) else "..."
-        for page_number in page_obj.paginator.get_elided_page_range(
-            page_obj.number,
-            on_each_side=on_each_side,
-            on_ends=on_ends,
-        )
-    ]
 
 
 def _vinculo_error(request, mensagem=None):
@@ -314,8 +303,20 @@ def servidores_index(request):
     cargo_id = _servidor_cargo_id(request)
     top_cargos = cargos_mais_frequentes_servidores(limit=3)
     servidores = listar_servidores(q=q, cargo_id=cargo_id)
-    paginator = Paginator(servidores, SERVIDORES_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
+    page_params = {}
+    if q:
+        page_params["q"] = q
+    if cargo_id:
+        page_params["cargo"] = cargo_id
+    if next_url:
+        page_params["next"] = next_url
+    paginacao = contexto_paginacao(
+        servidores,
+        request,
+        SERVIDORES_PER_PAGE,
+        query_params=page_params,
+    )
+    page_obj = paginacao["page_obj"]
     rows = [
         apresentar_linha_lista_simples_servidor(
             servidor,
@@ -325,13 +326,6 @@ def servidores_index(request):
         )
         for servidor in page_obj.object_list
     ]
-    page_params = {}
-    if q:
-        page_params["q"] = q
-    if cargo_id:
-        page_params["cargo"] = cargo_id
-    if next_url:
-        page_params["next"] = next_url
     abas = _build_servidor_cargo_abas(
         cargo_atual=cargo_id,
         top_cargos=top_cargos,
@@ -346,9 +340,7 @@ def servidores_index(request):
             "page_description": "Servidores vinculados aos fluxos documentais.",
             "rows": rows,
             "q": q,
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode(page_params) if page_params else "",
+            **paginacao,
             "back_url": next_url or None,
             "back_label": "Voltar à viatura",
             "next_url": next_url,
@@ -444,8 +436,20 @@ def viaturas_index(request):
     unidade_cfg = _unidade_da_configuracao()
     top_combustiveis = combustiveis_mais_frequentes_viaturas(limit=3)
     viaturas = listar_viaturas(q=q, combustivel_id=combustivel_id, unidade_id=unidade_id)
-    paginator = Paginator(viaturas, CADASTROS_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
+    page_params = {}
+    if q:
+        page_params["q"] = q
+    if combustivel_id:
+        page_params["combustivel"] = combustivel_id
+    elif unidade_id:
+        page_params["unidade"] = unidade_id
+    paginacao = contexto_paginacao(
+        viaturas,
+        request,
+        CADASTROS_PER_PAGE,
+        query_params=page_params,
+    )
+    page_obj = paginacao["page_obj"]
     rows = [
         apresentar_linha_lista_simples_viatura(
             viatura,
@@ -455,13 +459,6 @@ def viaturas_index(request):
         )
         for viatura in page_obj.object_list
     ]
-    page_params = {}
-    if q:
-        page_params["q"] = q
-    if combustivel_id:
-        page_params["combustivel"] = combustivel_id
-    elif unidade_id:
-        page_params["unidade"] = unidade_id
     abas = _build_viatura_filtro_abas(
         combustivel_atual=combustivel_id,
         unidade_atual=unidade_id,
@@ -477,9 +474,7 @@ def viaturas_index(request):
             "page_description": "Viaturas cadastradas para uso operacional.",
             "rows": rows,
             "q": q,
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode(page_params) if page_params else "",
+            **paginacao,
             "abas": abas,
             "tabs_aria_label": "Filtrar viaturas por unidade ou combustível",
             "combustivel_filter": combustivel_id or "",

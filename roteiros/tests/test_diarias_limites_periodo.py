@@ -284,7 +284,7 @@ class RoteiroCompletoTests(TestCase):
         }
 
     def test_o_estado_da_tela_produz_o_valor_do_sistema_oficial(self):
-        from roteiros import roteiro_logic
+        from roteiros.services import editor_state_builder
 
         state = {
             "sede_estado_id": self.pr.pk,
@@ -306,7 +306,7 @@ class RoteiroCompletoTests(TestCase):
             "retorno": {"chegada_data": "2026-08-14", "chegada_hora": "18:00"},
         }
 
-        resultado = roteiro_logic._calculate_avulso_diarias_from_state(
+        resultado = editor_state_builder._calculate_avulso_diarias_from_state(
             state, quantidade_servidores=1
         )
 

@@ -1,16 +1,16 @@
 <div class="field-grid">
-  {% include "components/ui/forms/field.html" with field=form.cep size_class="field-size-1" only %}
-  {% include "components/ui/forms/field.html" with field=form.numero size_class="field-size-1" only %}
-  {% include "components/ui/forms/field.html" with field=form.logradouro size_class="field-size-2" only %}
+  <c-ui.forms.field :field="form.cep" size_class="field-size-1" only />
+  <c-ui.forms.field :field="form.numero" size_class="field-size-1" only />
+  <c-ui.forms.field :field="form.logradouro" size_class="field-size-2" only />
 </div>
 <div class="field-grid">
-  {% include "components/ui/forms/field.html" with field=form.bairro size_class="field-size-2" only %}
-  {% include "components/ui/forms/field.html" with field=form.cidade_endereco size_class="field-size-1" only %}
-  {% include "components/ui/forms/field.html" with field=form.uf_nome size_class="field-size-1" only %}
+  <c-ui.forms.field :field="form.bairro" size_class="field-size-2" only />
+  <c-ui.forms.field :field="form.cidade_endereco" size_class="field-size-1" only />
+  <c-ui.forms.field :field="form.uf_nome" size_class="field-size-1" only />
   {{ form.uf }}
 </div>
 <div class="field-grid">
-  {% include "components/ui/forms/field.html" with field=form.email size_class="field-size-2" only %}
-  {% include "components/ui/forms/field.html" with field=form.telefone size_class="field-size-1" only %}
-  {% include "components/ui/forms/field.html" with field=form.ramal size_class="field-size-1" only %}
+  <c-ui.forms.field :field="form.email" size_class="field-size-2" only />
+  <c-ui.forms.field :field="form.telefone" size_class="field-size-1" only />
+  <c-ui.forms.field :field="form.ramal" size_class="field-size-1" only />
 </div>

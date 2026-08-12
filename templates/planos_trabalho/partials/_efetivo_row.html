@@ -10,13 +10,13 @@
     {{ efetivo_form.DELETE }}
   </div>
 
-  <button type="button"
-          class="route-destinos-add ordered-field-row__add"
+  <c-ui.buttons.button type="button"
+          class_name="route-destinos-add ordered-field-row__add"
           data-pt-efetivo-add
           title="Adicionar efetivo abaixo"
-          aria-label="Adicionar efetivo abaixo">
+          aria_label="Adicionar efetivo abaixo" only>
     <span class="route-destinos-add__glyph" aria-hidden="true">+</span>
-  </button>
+  </c-ui.buttons.button>
 
   <span class="ordered-field-row__badge sr-only" data-pt-efetivo-ord aria-hidden="true">{{ row_ordinal|default:1 }}</span>
 
@@ -25,27 +25,27 @@
       <div class="field app-form-field">
         <label class="cv-field__label app-form-label" for="{{ efetivo_form.unidade.id_for_label }}">Unidade (opcional)</label>
         {{ efetivo_form.unidade }}
-        {% if efetivo_form.unidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.unidade.errors field_id=efetivo_form.unidade.auto_id only %}{% endif %}
+        {% if efetivo_form.unidade.errors %}<c-ui.feedback.field_error :errors="efetivo_form.unidade.errors" :field_id="efetivo_form.unidade.auto_id" only />{% endif %}
       </div>
-      {% include "components/ui/forms/field.html" with field=efetivo_form.cargo action_url=cargos_url action_label="Gerenciar cargos" only %}
+      <c-ui.forms.field :field="efetivo_form.cargo" :action_url="cargos_url" action_label="Gerenciar cargos" only />
       <div class="field app-form-field">
         <label class="cv-field__label app-form-label" for="{{ efetivo_form.quantidade.id_for_label }}">Quantidade</label>
         <div class="pt-quantidade-stepper" role="group" aria-label="Quantidade">
-          <button type="button" class="pt-quantidade-stepper__btn" data-pt-quantidade-delta="-1" aria-label="Diminuir quantidade">−</button>
+          <c-ui.buttons.button type="button" class_name="pt-quantidade-stepper__btn" data-pt-quantidade-delta="-1" aria_label="Diminuir quantidade" only>−</c-ui.buttons.button>
           {{ efetivo_form.quantidade }}
-          <button type="button" class="pt-quantidade-stepper__btn" data-pt-quantidade-delta="1" aria-label="Aumentar quantidade">+</button>
+          <c-ui.buttons.button type="button" class_name="pt-quantidade-stepper__btn" data-pt-quantidade-delta="1" aria_label="Aumentar quantidade" only>+</c-ui.buttons.button>
         </div>
-        {% if efetivo_form.quantidade.errors %}{% include "components/ui/feedback/field_error.html" with errors=efetivo_form.quantidade.errors field_id=efetivo_form.quantidade.auto_id only %}{% endif %}
+        {% if efetivo_form.quantidade.errors %}<c-ui.feedback.field_error :errors="efetivo_form.quantidade.errors" :field_id="efetivo_form.quantidade.auto_id" only />{% endif %}
       </div>
     </div>
   </div>
 
-  <button type="button"
-          class="destination-remove-button ordered-field-row__remove"
+  <c-ui.buttons.button type="button"
+          class_name="destination-remove-button ordered-field-row__remove"
           title="Remover efetivo"
-          aria-label="Remover efetivo"
-          {% if row_ordinal == 1 and total_forms == 1 %}hidden{% endif %}
-          data-pt-efetivo-remove>
+          aria_label="Remover efetivo"
+          :hidden="{% if row_ordinal == 1 and total_forms == 1 %}True{% else %}False{% endif %}"
+          data-pt-efetivo-remove only>
     <span class="ordered-field-row__remove-glyph" aria-hidden="true">&#215;</span>
-  </button>
+  </c-ui.buttons.button>
 </div>

@@ -17,12 +17,12 @@ CSS_DIR = ROOT / "static" / "css"
 
 # Mesma política de exceção do audit_frontend_standards.py (Etapa 7 gate).
 COLOR_LITERAL_ALLOWED = {
-    "static/css/base/tokens.css",
-    "static/css/base/theme.css",
+    "static/css/base/tokens.css",  # UI-03: absorveu base/theme.css na E7
     "static/css/base/03-theme-dark.css",
     "static/css/components/theme-dark-components.css",  # transitório — dissolver nas fases seguintes
     "static/css/pages/auth.css",  # transitório — login fora do bundle global
     "static/css/shell.bundle.css",  # gerado (NOVO-12); literais vêm das fontes acima
+    "static/css/shell.form-components.bundle.css",  # variante gerada (UI-04/HT-04)
 }
 
 _HEX_COLOR = re.compile(r"(?<![\w#])#([0-9a-fA-F]{3,8})\b")
@@ -133,6 +133,28 @@ def _css_bundle_text() -> str:
 
 
 class CssTokenGateTests(SimpleTestCase):
+    def test_theme_accents_are_blue_in_light_and_gold_in_dark(self):
+        """NOVO-111: accent é paleta de tema; warning continua semântico."""
+        light = (CSS_DIR / "base" / "tokens.css").read_text(encoding="utf-8")
+        dark = (CSS_DIR / "base" / "03-theme-dark.css").read_text(encoding="utf-8")
+
+        self.assertIn("--color-accent: #155b9a;", light)
+        self.assertIn("--color-accent-hover: #17476f;", light)
+        self.assertIn("--color-accent-soft: #deebfb;", light)
+        self.assertIn("--color-on-accent: var(--color-white);", light)
+        self.assertIn("--color-warning: #d8a21b;", light)
+        self.assertNotIn(
+            "--color-warning-border: var(--color-accent-border-strong);",
+            light,
+        )
+
+        self.assertIn("--color-accent: #d8a21b;", dark)
+        self.assertIn("--color-accent-hover: #e0ab3c;", dark)
+        self.assertIn("--color-accent-soft: #3b3320;", dark)
+        self.assertIn("--color-on-accent: var(--color-primary-dark);", dark)
+        self.assertIn("--sidebar-active-border: var(--color-accent-border-strong);", dark)
+        self.assertIn("--sidebar-panel-border: var(--color-accent-border-soft);", dark)
+
     def test_canonical_component_stylesheets_have_no_color_literals(self):
         """Novos componentes notice/metric devem usar apenas var() de token."""
         violations: list[str] = []
@@ -180,8 +202,8 @@ class CssTokenGateTests(SimpleTestCase):
     def test_critical_templates_emit_canonical_notice_and_metric_classes(self):
         """Templates migrados na fase 13 emitem notice / metric como classe primária."""
         expectations = {
-            "templates/components/ui/feedback/alert.html": ("notice", "notice--"),
-            "templates/components/feedback/alerts.html": ("notice-stack", "notice"),
+            "templates/cotton/ui/feedback/alert.html": ("notice", "notice--"),
+            "templates/cotton/feedback/alerts.html": ("notice-stack", "notice"),
             # `summary_card.html` saiu com o painel de `/`; `metric` continua
             # sendo o canônico e é medido em quem ainda o usa.
             "templates/planos_trabalho/partials/_resumo_evento_body.html": ("summary-grid",),

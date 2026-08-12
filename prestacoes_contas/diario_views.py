@@ -1,4 +1,3 @@
-import re
 from urllib.parse import urlencode
 
 from django.contrib import messages
@@ -6,22 +5,26 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from core.autosave import AutosavePayloadError, autosave_json_response, parse_autosave_payload
-from core.normalizers import normalize_spaces
-from core.tenancy import filter_queryset_by_area
 from core.utils.masks import format_cpf, format_protocolo
 from documentos.services.async_generation import enfileirar_documento
-from oficios.models import Oficio
 
 from .diario_services import (
+    ESCOPO_EQUIPE,
+    ESCOPO_SERVIDOR,
     diaria_info,
     garantir_roteiro_ajustado,
     motorista_diario,
     motorista_do_oficio,
+    obter_ou_criar_diario,
+    salvar_autosave_do_diario,
+    salvar_linhas_do_diario,
     sincronizar_trechos,
+    trocar_motorista_do_diario,
     viatura_resumo_oficio,
 )
 from .forms import DiarioBordoTrechoFormSet, DiarioMotoristaForm
-from .models import DiarioBordo, RelatorioTecnico
+from .models import DiarioBordo
+from .selectors import oficios_para_prefill_de_motorista
 from .signature_views import _assinatura_db_card
 from .view_common import (
     _autosave_version,
@@ -29,8 +32,6 @@ from .view_common import (
     contexto_do_fluxo,
     _diario_queryset,
     _is_inline_request,
-    _marcar_servidor_em_preenchimento,
-    _marcar_servidores_pendentes,
     _prestacao_queryset,
     _prestacao_servidor_full,
     _prestacao_servidor_queryset,
@@ -43,36 +44,6 @@ _MOTORISTA_ORIGEM_LABEL = {
     DiarioBordo.MOTORISTA_MODO_SERVIDOR: "Outro servidor deste ofício",
     DiarioBordo.MOTORISTA_MODO_OUTRO: "Motorista de outro ofício",
 }
-
-
-def _parse_km_autosave(value):
-    digitos = re.sub(r"\D", "", str(value or ""))
-    return int(digitos) if digitos else None
-
-
-def _salvar_diario_autosave(diario, payload):
-    linhas = list(
-        diario.trechos.select_related("trecho").order_by("ordem", "pk")
-    )
-    changed = False
-    for dirty_name in payload.dirty_fields:
-        match = re.match(r"^form-(\d+)-(km_inicial|km_final|abastecimento)$", str(dirty_name or ""))
-        if not match:
-            continue
-        index = int(match.group(1))
-        field = match.group(2)
-        if index >= len(linhas):
-            continue
-        linha = linhas[index]
-        value = payload.fields.get(dirty_name)
-        if field in {"km_inicial", "km_final"}:
-            setattr(linha, field, _parse_km_autosave(value))
-        elif field == "abastecimento":
-            linha.abastecimento = str(value or "") != "nao"
-        linha.save(update_fields=[field])
-        changed = True
-    if changed:
-        diario.save(update_fields=["atualizado_em"])
 
 
 def _trecho_display(linha) -> dict:
@@ -119,7 +90,7 @@ def diario_servidor(request, ps_pk):
     ps = _prestacao_servidor_full(ps_pk)
     prestacao = ps.prestacao
 
-    diario, _ = DiarioBordo.objects.get_or_create(prestacao=prestacao)
+    diario = obter_ou_criar_diario(prestacao)
     sincronizar_trechos(diario)
     queryset = diario.trechos.select_related(
         "trecho__origem_cidade",
@@ -131,8 +102,7 @@ def diario_servidor(request, ps_pk):
     if request.method == "POST":
         formset = DiarioBordoTrechoFormSet(request.POST, queryset=queryset)
         if formset.is_valid():
-            formset.save()
-            _marcar_servidor_em_preenchimento(ps)
+            salvar_linhas_do_diario(formset, ps)
             formato = "pdf" if request.POST.get("action") == "download_pdf" else "xlsx"
             return redirect("prestacoes_contas:diario_download_formato", pk=diario.pk, formato=formato)
     else:
@@ -182,9 +152,13 @@ def diario_servidor_autosave(request, ps_pk):
     except AutosavePayloadError as exc:
         return autosave_json_response(ok=False, message=str(exc))
 
-    _salvar_diario_autosave(diario, payload)
-    if payload.dirty_fields:
-        _marcar_servidor_em_preenchimento(ps)
+    salvar_autosave_do_diario(
+        diario,
+        fields=payload.fields,
+        dirty_fields=payload.dirty_fields,
+        escopo=ESCOPO_SERVIDOR,
+        servidor_prestacao=ps,
+    )
     return autosave_json_response(
         ok=True,
         object_id=diario.pk,
@@ -200,9 +174,12 @@ def diario_autosave(request, pk):
     except AutosavePayloadError as exc:
         return autosave_json_response(ok=False, message=str(exc))
 
-    _salvar_diario_autosave(diario, payload)
-    if payload.dirty_fields:
-        _marcar_servidores_pendentes(diario.prestacao)
+    salvar_autosave_do_diario(
+        diario,
+        fields=payload.fields,
+        dirty_fields=payload.dirty_fields,
+        escopo=ESCOPO_EQUIPE,
+    )
     return autosave_json_response(
         ok=True,
         object_id=diario.pk,
@@ -241,20 +218,6 @@ def _motorista_resumo(diario) -> dict:
         "origem": _MOTORISTA_ORIGEM_LABEL.get(diario.motorista_modo, "Motorista do ofício"),
         "alterado": diario.motorista_alterado,
     }
-
-
-def _sincronizar_info_complementares_rt(prestacao):
-    """Após trocar motorista/viatura, gera a prévia em Informações complementares do
-    RT — apenas quando o campo ainda está vazio (não sobrescreve texto do usuário)."""
-    from .services import descricao_ajustes_prestacao
-
-    relatorio = RelatorioTecnico.objects.filter(prestacao=prestacao).first()
-    if relatorio is None or normalize_spaces(relatorio.info_complementares or ""):
-        return
-    texto = descricao_ajustes_prestacao(prestacao)
-    if texto:
-        relatorio.info_complementares = texto
-        relatorio.save(update_fields=["info_complementares", "atualizado_em"])
 
 
 def _oficio_prefill_dados(oficio) -> dict:
@@ -318,15 +281,13 @@ def diario_servidor_motorista(request, ps_pk):
         pk=ps_pk,
     )
     prestacao = ps.prestacao
-    diario, _ = DiarioBordo.objects.get_or_create(prestacao=prestacao)
+    diario = obter_ou_criar_diario(prestacao)
     diario_url = reverse("prestacoes_contas:diario_servidor", args=[ps.pk])
 
     if request.method == "POST":
         form = DiarioMotoristaForm(request.POST, instance=diario, oficio=prestacao.oficio)
         if form.is_valid():
-            form.save()
-            _sincronizar_info_complementares_rt(prestacao)
-            _marcar_servidor_em_preenchimento(ps)
+            trocar_motorista_do_diario(form, prestacao, ps)
             messages.success(request, "Diário de bordo atualizado (motorista/viatura).")
             return redirect(diario_url)
     else:
@@ -334,14 +295,10 @@ def diario_servidor_motorista(request, ps_pk):
 
     oficio_nome, oficio_cpf = motorista_do_oficio(prestacao.oficio)
 
-    oficios = (
-        filter_queryset_by_area(Oficio.objects)
-        .select_related("viatura", "viatura__combustivel", "motorista", "transporte_combustivel_manual")
-        .exclude(pk=prestacao.oficio_id)
-        .filter(numero__isnull=False)
-        .order_by("-ano", "-numero")[:200]
-    )
-    oficios_prefill = [_oficio_prefill_dados(o) for o in oficios]
+    oficios_prefill = [
+        _oficio_prefill_dados(o)
+        for o in oficios_para_prefill_de_motorista(prestacao.oficio)
+    ]
 
     return render(
         request,

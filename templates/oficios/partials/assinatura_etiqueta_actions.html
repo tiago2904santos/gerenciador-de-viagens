@@ -7,7 +7,7 @@
       <a class="cv-btn cv-btn--secondary" href="{{ painel.etiqueta_urls.pdf_assinado }}" target="_blank" rel="noopener noreferrer">PDF assinado</a>
     {% endif %}
     {% if painel.etiqueta_status == "invalido" %}
-      {% include "components/ui/badges/chip.html" with label="Assinatura inválida/desatualizada" tone="danger" only %}
+      <c-ui.badges.chip label="Assinatura inválida/desatualizada" tone="danger" only />
     {% endif %}
   </div>
 {% endif %}

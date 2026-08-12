@@ -97,6 +97,12 @@ class DocumentoGeracaoHttpTests(TestCase):
         self.assertTemplateUsed(response, "documentos/geracao_aguarde_embedded.html")
         self.assertContains(response, "data-document-generation-wait", status_code=202)
         self.assertNotContains(response, 'class="app-shell', status_code=202)
+        self.assertContains(response, "js/core/http.js", status_code=202)
+        self.assertNotContains(response, "js/shell.bundle.js", status_code=202)
+        self.assertLess(
+            response.content.index(b"js/core/http.js"),
+            response.content.index(b"js/components/document-generation-wait.js"),
+        )
 
     def test_status_e_resultado_respeitam_area_do_request(self):
         job = DocumentoGeracao.objects.create(

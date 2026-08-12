@@ -1,4 +1,4 @@
 {# Tipo do evento — corpo do bloco Identificação (split). #}
 <div class="field-grid">
-  {% include "components/ui/forms/field.html" with field=form.tipos action_url=tipos_evento_url action_label="Gerenciar tipos" size_class="field-size-4" only %}
+  <c-ui.forms.field :field="form.tipos" :action_url="tipos_evento_url" action_label="Gerenciar tipos" size_class="field-size-4" only />
 </div>

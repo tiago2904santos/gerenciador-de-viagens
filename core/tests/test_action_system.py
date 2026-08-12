@@ -38,11 +38,11 @@ class GlobalActionSystemTests(SimpleTestCase):
         self.assertIn(".attach-signed-modal__dialog {", self.css)
 
         header = render_to_string(
-            "components/ui/menus/rich_menu_header.html",
+            "cotton/ui/menus/rich_menu_header.html",
             {"title": "Documentos", "subtitle": "Ofício 1/2026", "icon": "folder"},
         )
         item = render_to_string(
-            "components/ui/menus/rich_menu_link.html",
+            "cotton/ui/menus/rich_menu_link.html",
             {
                 "href": "/documento.pdf",
                 "title": "Baixar PDF",
@@ -65,7 +65,7 @@ class GlobalActionSystemTests(SimpleTestCase):
 
     def test_simple_list_document_menu_accepts_dictionary_without_pk(self):
         html = render_to_string(
-            "components/lists/simple_list_row.html",
+            "cotton/lists/simple_list_row.html",
             {
                 "row_index": 7,
                 "row": {

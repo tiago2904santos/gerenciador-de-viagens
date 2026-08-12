@@ -1,45 +1,5 @@
 /* Canonical summary and document cards. Theme-specific appearance is separate. */
 
-.summary-tile {
-  background: var(--color-card);
-  border: var(--card-border);
-  border-radius: var(--radius-card);
-  box-shadow: var(--card-shadow);
-  display: grid;
-  gap: var(--space-2);
-  min-width: 0;
-  padding: var(--space-4);
-  transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast);
-}
-
-.summary-tile:hover {
-  box-shadow: var(--shadow-panel);
-}
-
-.summary-tile__label,
-.summary-tile__value,
-.summary-tile__description {
-  margin: 0;
-}
-
-.summary-tile__label {
-  color: var(--color-muted);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-label);
-  text-transform: uppercase;
-}
-
-.summary-tile__value {
-  color: var(--color-heading);
-  font-size: clamp(var(--font-size-lg), 2vw, 1.55rem);
-  line-height: 1.2;
-  overflow-wrap: anywhere;
-}
-
 .summary-grid {
   display: grid;
   gap: 12px;

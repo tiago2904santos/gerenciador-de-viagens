@@ -6,24 +6,26 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from core.autosave import autosave_json_response
 from core.private_media import private_file_response
 from core.uploads import validate_private_document_upload
+from core.retorno import voltar_para
 
 from .forms import PrestacaoDespachoForm, PrestacaoServidorDocumentosForm, PrestacaoSolicitacaoForm
 from .models import PrestacaoDocumentoAnexo
 from .presenters import _anexo_assinado_info
+from .anexo_services import excluir_anexo
+from .anexo_services import substituir_anexo_assinado
 from .presenters import kinds_de_anexo_assinado
+from .services import marcar_servidor_em_preenchimento
+from .services import marcar_servidores_pendentes
 from .view_common import (
     _autosave_form_errors,
     _autosave_version,
     _build_identificacao,
     contexto_do_fluxo,
-    _marcar_servidor_em_preenchimento,
-    _marcar_servidores_pendentes,
     _prestacao_queryset,
     _prestacao_servidor_full,
     _prestacao_servidor_queryset,
@@ -215,7 +217,7 @@ def prestacao_arquivo_autosave(request, pc_pk):
             errors=_autosave_form_errors(form),
         )
     form.save()
-    _marcar_servidores_pendentes(prestacao)
+    marcar_servidores_pendentes(prestacao)
     return autosave_json_response(
         ok=True,
         object_id=prestacao.pk,
@@ -238,23 +240,12 @@ def prestacao_servidor_arquivo_autosave(request, ps_pk):
             errors=_autosave_form_errors(form),
         )
     form.save_anexos(ps)
-    _marcar_servidor_em_preenchimento(ps)
+    marcar_servidor_em_preenchimento(ps)
     return autosave_json_response(
         ok=True,
         object_id=ps.pk,
         version=_autosave_version(ps),
     )
-
-
-def _prestacao_upload_next_url(request, fallback_url):
-    next_url = request.POST.get("next")
-    if next_url and url_has_allowed_host_and_scheme(
-        next_url,
-        allowed_hosts={request.get_host()},
-        require_https=request.is_secure(),
-    ):
-        return next_url
-    return fallback_url
 
 
 def _prestacao_assinado_upload(
@@ -266,7 +257,7 @@ def _prestacao_assinado_upload(
     substituir_todos_do_tipo=False,
 ):
     fallback_url = reverse("prestacoes_contas:index")
-    destino = _prestacao_upload_next_url(request, fallback_url)
+    destino = voltar_para(request, fallback_url)
     arquivo = request.FILES.get("arquivo")
     if not arquivo:
         messages.error(request, "Selecione um arquivo PDF para anexar.")
@@ -286,25 +277,14 @@ def _prestacao_assinado_upload(
 
     # A validação vem antes da exclusão dos anteriores de propósito: recusar um
     # arquivo novo não pode custar o que já estava anexado.
-    anteriores = PrestacaoDocumentoAnexo.objects.filter(prestacao=prestacao, tipo=tipo)
-    if not substituir_todos_do_tipo:
-        anteriores = anteriores.filter(servidor_prestacao=servidor_prestacao)
-    for anexo in anteriores:
-        if anexo.arquivo:
-            anexo.arquivo.delete(save=False)
-    anteriores.delete()
-
-    PrestacaoDocumentoAnexo.objects.create(
-        prestacao=prestacao,
-        servidor_prestacao=servidor_prestacao,
+    substituir_anexo_assinado(
+        prestacao,
         tipo=tipo,
         arquivo=arquivo,
         nome_original=nome_original,
+        servidor_prestacao=servidor_prestacao,
+        substituir_todos_do_tipo=substituir_todos_do_tipo,
     )
-    if servidor_prestacao is not None:
-        _marcar_servidor_em_preenchimento(servidor_prestacao)
-    else:
-        _marcar_servidores_pendentes(prestacao)
     messages.success(request, "Documento assinado anexado.")
     return redirect(destino)
 
@@ -357,18 +337,10 @@ def prestacao_documento_excluir(request, pc_pk, anexo_pk):
         pk=anexo_pk,
         prestacao=prestacao,
     )
-    ps_marcar = anexo.servidor_prestacao
     # BE-07: apagar o arquivo primeiro zera `FieldFile.name`, e com `nome_original`
     # vazio o `__str__` do anexo passava a devolver None — o que derrubava o sinal
-    # de auditoria no pre_delete. A linha sai primeiro; o arquivo, depois.
-    arquivo = anexo.arquivo if anexo.arquivo else None
-    anexo.delete()
-    if arquivo:
-        arquivo.delete(save=False)
-    if ps_marcar is not None:
-        _marcar_servidor_em_preenchimento(ps_marcar)
-    else:
-        _marcar_servidores_pendentes(prestacao)
+    # de auditoria no pre_delete. A linha sai primeiro; o arquivo, no `on_commit`.
+    excluir_anexo(anexo, prestacao)
     return autosave_json_response(
         ok=True,
         object_id=prestacao.pk,

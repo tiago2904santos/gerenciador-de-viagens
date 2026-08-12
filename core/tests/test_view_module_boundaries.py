@@ -83,7 +83,28 @@ class ViewModuleBoundaryTests(SimpleTestCase):
         # pendentes e as viagens dos proximos 30 dias. Era a rota que TODO login
         # abre (`LOGIN_REDIRECT_URL`), entao a divida mais cara do arquivo caiu
         # junto com a tela.
-        self.assertEqual(sum(counts.values()), 24)
+        #
+        # 24 -> 33 (`BE-14` fatia 1, `NOVO-100`): **o numero subiu, e subiu de
+        # proposito.** Prestacoes foi fatiada em modulos por tela como oficios e
+        # planos, mas os cinco modulos nunca entraram em `P06_SPLIT_VIEW_MODULES`
+        # — entao 11 acessos de manager nunca foram medidos. A regra 5 do
+        # `AGENTS.md` proibe a catraca subir por regressao; esta subiu por
+        # honestidade, ao passar a medir o que ja estava la. A propria fatia ja
+        # devolveu 2 dos 11 (`rt_views.py` foi a zero), e o saldo entra como 9.
+        #
+        # 33 -> 31 (`BE-14` fatia 3): a persistencia dos anexos assinados saiu de
+        # `document_views.py` para `anexo_services.py`, e com ela os dois acessos de
+        # manager que restavam ali. Agora a catraca desce, que e o sentido normal.
+        #
+        # 31 -> 27 (`BE-14` fatia 4): `diario_views.py` foi a zero. Um acesso saiu
+        # junto com a sincronizacao da previa do RT, dois `get_or_create` viraram
+        # `diario_services.obter_ou_criar_diario` (get_or_create **grava**, entao vai
+        # para service e nao para selector) e a consulta de oficios do
+        # auto-preenchimento virou `selectors.oficios_para_prefill_de_motorista`.
+        # Os 3 que sobram em prestacoes sao leituras de `model_views.py`, o CRUD dos
+        # modelos de texto do RT — divida de `P-01`, nao do `BE-14`.
+        self.assertEqual(counts["prestacoes_contas"], 3)
+        self.assertEqual(sum(counts.values()), 27)
 
     def test_orm_em_prosa_nao_conta_e_orm_em_codigo_conta(self):
         """`NOVO-11` — a catraca mede código, não texto.

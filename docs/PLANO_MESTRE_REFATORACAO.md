@@ -351,7 +351,7 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       atributos mortos, não 3, e a cobertura era de 19% (57 de 298). Rescrito a partir da
       medição e **travado nos dois sentidos** por teste, que é o que impede de apodrecer de novo
 
-### Fase 5 — Consulta e índice
+### Fase 5 — Consulta e índice ✅ **COMPLETA** (12/08/2026)
 - [x] `DB-09` lista de roteiros agrega antes do `LIMIT` — `~Exists()` no lugar de
       `Count` + `.exclude(...=0)`, **junto** com o índice `(area, -updated_at)`: separados dão
       2,9× e 1,0×, juntos 8,9× na consulta e **1,54× na rota** (975,8 → 633,2 ms). O `LIMIT`
@@ -360,7 +360,11 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       Das cinco listas que ordenavam em memória, só `OrdemServico` ganha (64× na consulta,
       1,08× na rota); nas outras quatro o índice análogo não move o tempo e em `roteiros`
       piora. "Ofícios têm situação análoga" era falso, e o que sobra ali é o `NOVO-50`
-- [ ] `DB-11` 80 buscas livres sem índice
+- [x] `DB-11` busca livre de Termos multiplicava 20.000 linhas por três M2M e rodava três vezes —
+      `Exists()` por origem + contagem das abas reutilizada pelo paginador. O `PF-07` agora mede
+      `termos:index:busca` permanentemente: **1.807,9 → 391,4 ms (4,62×)** em 20.000 registros,
+      com 6 queries. `pg_trgm` não entrou: a medição anterior deu 1,00× e provou que o gargalo era
+      a forma da consulta, não a ausência de cinco índices
 - [x] `DB-12` trilha de auditoria sem índice, sem expurgo — **só o índice**. O expurgo saiu
       por decisão do usuário (retenção de trilha de órgão público é pergunta de produto).
       O índice entrou como folga: medido, o planner só o escolhe por volta de 100 áreas,
@@ -375,12 +379,87 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       mecanismo já identificado no catálogo
 
 ### Fase 6 — Camadas e duplicação
-- [ ] `BE-11` editor de roteiro em 3 cópias
-- [ ] `BE-12` `wizard_roteiro` com a regra dentro da view
-- [ ] `BE-13` `roteiro_logic.py` fora do contrato de camadas
-- [ ] `BE-14` 48 sites de persistência em view, sem transação
-- [ ] `BE-15` numeração reimplementada 3 vezes
-- [ ] `BE-16` abstrações de `core` adotadas pela metade
+- [x] `BE-11` editor de roteiro em 3 cópias — **eram 2**: medida a interseção, `novo` × `editar` dá
+      55 linhas idênticas (o enunciado dizia 41) e `wizard_roteiro` só 20 de 165. As duas primeiras
+      foram unificadas atrás de `roteiros/services/editor_flow.py`; a terceira é outro fluxo e cai
+      no `BE-12`. Sobrou `NOVO-87` (o ofício não detecta duplicado — decisão adiada, não esquecida)
+- [x] `BE-12` `wizard_roteiro` com a regra dentro da view — a regra de vínculo/cópia virou
+      `oficios/services.py::salvar_roteiro_do_oficio`, com `atomic`. 33 → 13 ramos, 165 → 124
+      linhas úteis, cobertura de `route_views.py` de 69% para 88%. Fecha o `NOVO-88` e o item 1 da
+      lista do `BE-14`. Sobrou `NOVO-92` (a tradução de ação do rodapé, copiada em cada passo)
+- [x] `BE-13` `roteiro_logic.py` fora do contrato de camadas — **três fatias, três PRs**. F1
+      (parsing): `request` no módulo caiu de 23 ocorrências para 1, os 6 objetos falsos e o parâmetro
+      morto de `_validate_roteiro_state` sumiram. F2 (contexto + invólucros): a fachada do contexto
+      migrou de service para presenter, e 15 invólucros morreram. F3 (persistência): o gravador
+      atômico de 3 tabelas foi para `roteiros/services/editor_persistence.py` com nomes públicos, e o
+      módulo virou `roteiros/services/editor_state_builder.py` — nome e lugar do que sobrou.
+      **1.845 → 1.337 linhas (−27%), 57 → 33 defs.** Continua grande, mas com uma responsabilidade
+      só. Sobrou `NOVO-98` (guardas defensivas do gravador, inalcançáveis pelo caminho público).
+      **Fecha a corrente `BE-11`/`BE-12`/`BE-13`**
+- [x] `BE-14` 48 sites de persistência em view, sem transação — **eram 36**, mais 4 por método de
+      modelo que grava por dentro. **Fatia 1 (o dinheiro do RT) feita**: a persistência de
+      `rt_views.py` virou `prestacoes_contas/rt_services.py`, o módulo caiu de 305 para 203 linhas
+      com zero acessos de manager, e as gravações fora de transação foram de 36 para 33. Fecha
+      `NOVO-101` (a catraca `P-01` media 24 com 35 no chão) e `NOVO-102` (gravação em laço escondida
+      em `view_common.py`). **Fatia 2 (solicitação) feita**: as duas rotas foram para
+      `solicitacao_services.py` com transação, `views.py` caiu de 743 para 674 linhas e as gravações
+      fora de transação de 33 para 29. Sobrou `NOVO-103` (as duas rotas divergem em três pontos, e a
+      divergência estava registrada com o ID de outro defeito — é decisão de produto). **Fatia 3
+      (anexos) feita**: `atomic` na linha e `transaction.on_commit` no arquivo, porque ali `atomic`
+      sozinho inverteria o órfão do `BE-07`. O defeito maior não era gravação parcial: era
+      destruição — um `create` que falhasse levava o documento assinado anterior do disco e do
+      banco. Gravações fora de transação: 29 → 24; catraca `P-01` desce de 33 para 31. Sobrou
+      `NOVO-104` (arquivo órfão no storage não tem quem varra). **Fatia 4 (diário) feita**: os três
+      caminhos de escrita de `diario_views.py` foram para `diario_services.py`, o módulo caiu de 388
+      para 345 linhas com zero acessos de manager, gravações fora de transação 24 → 19 e catraca
+      `P-01` 31 → 27. Sobrou `NOVO-107` (a fixture monta ofício sem roteiro e o teste de diário fica
+      verde por omissão). **Prestações fecha aqui; o `BE-14` não.** A fatia 1 disse que 2, 3 e 4
+      fechariam o defeito, e a frase valia para prestações — 21 dos 36 sites. **Restam 19**, em
+      `planos_trabalho` (6), `oficios` (4), `eventos` (2), `prestacoes_contas/model_views.py` (3) e
+      uma cada em `core`, `ordens_servico`, `roteiros` e `termos`. **Fatia 5: `planos_trabalho` +
+      `oficios`**, que somam 10 dos 19 e incluem a pior função restante
+      (`_apply_efetivo_snapshot`: `save` + `create` + `delete` em laço)
+
+      `NOVO-104` (arquivo órfão no storage não tem quem varra). **Fatia 5 (planos + ofícios)
+      feita**: `planos_trabalho` ganhou a primeira camada de escrita da sua história —
+      `efetivo_services.py` e `identificacao_services.py`, 5 `atomic` onde antes havia **zero
+      em 1.314 linhas** — e `criar_rascunho_de_roteiro_do_oficio` entrou em `oficios/services.py`
+      ao lado do irmão do `BE-12`. Gravações fora de transação: 24 → 19 na fatia 4 e → 17 nesta.
+      Sobrou `NOVO-108`: **a contagem por AST erra nos dois sentidos e não serve mais de alvo** —
+      superconta 7 (cinco `delete()`, que o `Collector` do Django já faz em transação, e dois ramos
+      mutuamente exclusivos) e subconta o pior caso restante, `eventos/views.py::detalhe`, que
+      aparece com 1 e faz ~12 gravações em 6 tabelas. **Fatia 6: `eventos`**, dirigida por leitura
+      de caminho e não pelo contador. **Fatia 6 feita**: a etapa 1 de `eventos::detalhe` virou
+      `salvar_identificacao_evento`, um service atômico para Evento, M2M, destinos, cinco famílias de
+      documento e termo automático. Falha no último passo desfaz todas as seis tabelas; 43 testes de
+      Eventos verdes. O `P-01` permanece 27 porque o `NOVO-108` provou que esse caminho era invisível
+      ao contador. Fecha `BE-14` e `NOVO-108`; a dívida unitária de posição em camada segue no `BE-16`
+- [x] `BE-15` numeração reimplementada 3 vezes — **fatia 1 (a mecânica) feita**: o lock e o laço
+      de retry, que eram ~60 linhas copiadas entre ofício e OS, viraram `core/numeracao.py`; a
+      política de escolha de cada documento fica onde estava, porque diferente ali é desenho, não
+      defeito. Apareceu um quarto site que o enunciado não citava (a edição de número manual), que
+      passou a usar o lock **sem** o retry. Fecha `NOVO-109`: a detecção de colisão lia a mensagem
+      do `IntegrityError` e **só funcionava no PostgreSQL** — em metade da suíte o retry era código
+      morto, e o teste que o cobria fabricava a própria evidência. **Fatia 2**: OS reaproveita
+      número liberado por exclusão (decisão do dono; único ponto que muda número emitido) — **feita**
+      com `OrdemServicoNumeroLacuna`, exclusão atômica e consumo por área/ano; salto manual não vira
+      lacuna e falha no registro desfaz a exclusão. 53 testes de OS verdes.
+      **Fatia 3 feita**: `salvar_plano_numerado` preserva contador e sufixo do Plano, mas une avanço
+      e `INSERT` na mesma transação e usa o retry comum. Colisão real repete; falha após reserva
+      desfaz o contador; escolha+gravação compartilham o savepoint; a concorrência PostgreSQL agora
+      mede duas linhas gravadas. 116 testes verdes
+- [x] `BE-16` abstrações de `core` adotadas pela metade — **fatia 1 (paginação) feita**: os 15
+      pontos usam `contexto_paginacao`, as 6 cópias de `_pagination_pages` foram removidas e não há
+      `Paginator(...)` em produção fora do módulo comum. Termos mantém o total pré-agregado via
+      `paginator_class`; chaves e filtros do contexto foram preservados. 922 testes consumidores
+      verdes. **Fatia 2 (exclusão protegida) feita**: catálogos e serviços de exclusão de entidades
+      acionados pelo usuário adotam `core.deletion`; `PROTECT` vira erro de domínio/mensagem e não
+      500. Remoções internas de filhos, arquivos, cache, sessão e rascunhos ficam fora por contrato.
+      A regressão de OS prova que bloqueio não cria lacuna; 299 testes consumidores verdes.
+      **Fatia 3 (retorno) feita**: as duas cópias sobreviventes — catálogo e upload assinado de
+      Prestações — delegam a `core.retorno`; leitura de `next` e validação de host têm um único dono.
+      Fallback, fragmento de modal e recusa de host externo estão cobertos por 93 testes. BE-16
+      fechado
 - [x] `BE-17` `core/views.py` é 75% fixture de UI Lab — **fechado pelo PR #247**, que apagou os
       dois labs e as 1.013 linhas de fixture; a cascata de componentes que ele deixou é o
       `NOVO-44`
@@ -402,29 +481,41 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [x] `NOVO-78` fixture demo não acompanhou área obrigatória e seis modelos novos · **E0**
 - [x] `NOVO-79` duas rotas canônicas resolviam, mas respondiam 500 · **E0**
 - [x] `JS-03` runner de teste de JavaScript — deixou de ser aditivo, virou pré-requisito · **E1**
-- [ ] `NOVO-69` `cv-select.js` (343 linhas) morto desde o PR #247, ainda no bundle · **E2**
-- [ ] `NOVO-72` `ui_lab2/` sobreviveu ao PR #247 · **E2**
-- [ ] `NOVO-73` nome e lugar de arquivo JS sem padrão · **E2**
-- [ ] `NOVO-48` 70 nomes de classe morta dentro de seletor agrupado vivo · **E2**
-- [ ] `NOVO-71` componente global sem contrato de parâmetro → `django-cotton` · **E3, E4, E5**
-- [ ] `HT-14` 275 de 946 includes não usam `only` — fecha por construção no cotton · **E5**
-- [ ] `NOVO-74` dois namespaces de componente, quatro pastas fantasma de `.gitkeep` · **E5**
-- [ ] `HT-08` 82 `<button>` fora do sistema de componentes · **E6**
-- [ ] `HT-15` bloco `cv-itinerary` duplicado em 5 apps · **E6**
-- [ ] `NOVO-16` markup do picker copiado à mão em 3 templates e 5 arquivos JS · **E6**
-- [ ] `HT-10` `data-*` de toggle legado em componente compartilhado · **E6**
-- [ ] `HT-07` concatenação condicional com "·" no template · **E6**
-- [ ] `UI-03` nove arquivos definem token de cor → duas camadas · **E7**
-- [ ] `NOVO-51` as `--cv-*` que ainda são apelido, não token (PARCIAL) · **E7**
-- [ ] `NOVO-54` as 64 sobrescritas de `.cv-field__control` (PARCIAL) · **E7**
-- [ ] `NOVO-58` 🔴 claro e escuro são dois desenhos — o redesenho passa a valer no claro · **E8**
+- [x] `NOVO-69` `cv-select.js` (343 linhas) morto desde o PR #247, ainda no bundle · **E2**
+- [x] `NOVO-72` `ui_lab2/` sobreviveu ao PR #247 · **E2**
+- [x] `NOVO-73` nome e lugar de arquivo JS sem padrão · **E2**
+- [x] `NOVO-48` 70 nomes de classe morta dentro de seletor agrupado vivo · **E2**
+- [x] `NOVO-71` componente global sem contrato de parâmetro → `django-cotton` · **E3–E5**
+- [x] `HT-14` 275 de 946 includes não usam `only` — contratos e `only` obrigatórios · **E5**
+- [x] `NOVO-74` dois namespaces de componente, quatro pastas fantasma de `.gitkeep` · **E5**
+- [x] `HT-08` 82 `<button>` fora do sistema de componentes · **E6**
+- [x] `HT-15` bloco `cv-itinerary` duplicado em 5 apps · **E6**
+- [x] `NOVO-16` markup do picker copiado à mão em 3 templates e 5 arquivos JS · **E6**
+- [x] `HT-10` `data-*` de toggle legado em componente compartilhado · **E6**
+- [x] `HT-07` concatenação condicional com "·" no template · **E6**
+- [x] `NOVO-80` a E5 apagou duas travas de regressão em vez de reapontá-las · **E6**
+- [x] `NOVO-81` o auditor de front audita os `*.test.js` que a E1 criou · **E6**
+- [x] `NOVO-99` os três `include ... only` do editor passam o token CSRF explicitamente · **correção imediata**
+- [x] `UI-03` nove (medidos: oito) arquivos definem token de cor → duas camadas · **E7a**
+- [x] `NOVO-82` 87 declarações escuras inertes, visíveis desde a fusão do `theme.css` · **E9**
+- [x] `NOVO-114` a régua de mesmo tema citada pela E9 não estava versionada; sonda reproduzível,
+      contexto público/autenticado correto e contrato automatizado · **E9**
+- [x] `NOVO-51` os 2 apelidos puros da família `cv-field` (e 15 bordas invisíveis) · **E7b**
+- [x] `NOVO-51` os 2 de valor próprio foram fechados em 11/08 após a decisão por anel visível no
+      escuro: zero definições `--cv-field-*` vivas no CSS de fonte; a reauditoria de 12/08 encontra
+      somente comentários históricos nos bundles/folhas · **E7b**
+- [x] `NOVO-54` 72 regras (30 `!important` e 7 regras já fora); as 7 candidatas de estado não-base
+      também fecharam por medição (2 blocos removidos e 5 grupos de seletor simplificados). A regra
+      base agora vence o seletor de elemento cru com neutralidade medida; as 8 pseudo-regras e 1
+      contexto órfão caíram; diário, quick-add e `field-with-action` fecharam no corpus ampliado · **E7c**
+- [x] `NOVO-58` claro e escuro têm desenho único: 54.225 elementos, 129 medições, 0 divergências não-cor · **E8**
 - [ ] `UI-02` tema escuro deixa de ser camada de exceção (5.619 linhas, 190 `!important`) · **E9**
 - [ ] `UI-04` **97** imports de CSS de outro domínio, em **36** templates · **E10**
-- [ ] `HT-04` `base.html` carrega ~153 KB de JS de domínio em toda página · **E11**
-- [ ] `JS-07` "fechar ao clicar fora / Esc" em 4 cópias · **E11**
-- [ ] `JS-08` 11% do bundle atende menos de 1% das páginas · **E11**
-- [ ] `JS-09` tela de espera carrega 264 KB para usar 3,3 KB · **E11**
-- [ ] `JS-10` decidir os stubs do editor de roteiros — depende do `BE-13` · **E11**
+- [ ] `HT-04` entrega JS fechada: shell 266.254 → 108.937 bytes; a fatia CSS continua em `UI-04`/E10 · **E11/E10**
+- [x] `JS-07` 3 implementações vivas de "fechar ao clicar fora / Esc" → `CV.overlay.attachDismiss` · **E11**
+- [x] `JS-08` cinco componentes sob demanda por marcador DOM; shell 283.128 → 266.254 bytes · **E11**
+- [x] `JS-09` tela embutida entrega só `http.js` + polling: 283.282 → 4.255 bytes de JS · **E11**
+- [x] `JS-10` três stubs sem consumidor removidos; módulos reais e bootstrap preservados · **E11**
 
 **Fechados nesta fase antes do dimensionamento** (a reconstrução parcial de 07–08/08, que o quadro
 não registrava): `NOVO-50/MED` paleta de 255 cores duplicadas · `NOVO-51` poda dos 55 apelidos

@@ -6,8 +6,7 @@
    structure with module-prefixed selectors.
    ======================================================================== */
 
-.form-card > .form-section-body,
-.form-card__body {
+.form-card > .form-section-body {
   display: grid;
   gap: 10px;
 }
@@ -18,6 +17,20 @@
   gap: var(--space-4);
   grid-template-columns: minmax(0, 1fr);
   min-width: 0;
+  /* NOVO-58 (E8): existia só no tema escuro, em
+     `theme-dark-components.css`. O claro é o desenho ANTERIOR ao redesenho, e é
+     o que o sistema mostra para quem nunca escolheu tema.
+
+     Não é ajuste cosmético: medido no navegador, o padding só-escuro encolhia a
+     caixa de conteúdo em 28px, os filhos iam de 434px para 406px, o texto
+     quebrava diferente e a página ganhava 48,55px — propagando por 14 níveis. É
+     essa cadeia que desestabilizava a régua de tema (`NOVO-84`).
+
+     `14px` literal, e não `var(--space-4)`: a escala vai de 12 (`--space-3`)
+     para 16, e não há token de 14. Usar 16 mexeria 2px no ESCURO, e a E8 é o
+     claro alcançando o escuro — não os dois indo para um terceiro lugar. O
+     valor fora de escala está registrado para a E9 (`NOVO-89`). */
+  padding: 14px;
 }
 
 .form-block__header {
@@ -139,8 +152,7 @@
   min-width: 0;
 }
 
-.form-subsection__header,
-.resource-picker__header {
+.form-subsection__header {
   align-items: baseline;
   display: flex;
   gap: var(--space-3);
@@ -148,17 +160,14 @@
   min-width: 0;
 }
 
-.form-subsection__copy,
-.resource-picker__copy {
+.form-subsection__copy {
   display: grid;
   gap: 3px;
   min-width: 0;
 }
 
 .form-subsection__title,
-.form-subsection__description,
-.resource-picker__title,
-.resource-picker__description {
+.form-subsection__description {
   margin: 0;
 }
 
@@ -225,8 +234,7 @@
     width: 100%;
   }
 
-  .form-subsection__header,
-  .resource-picker__header {
+  .form-subsection__header {
     align-items: flex-start;
     flex-direction: column;
   }

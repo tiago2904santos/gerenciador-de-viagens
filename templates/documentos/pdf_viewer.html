@@ -4,7 +4,7 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-  {% include "components/documents/pdf_viewer.html" with pdf_url=pdf_conteudo_url worker_src=pdf_js_worker_src filename=pdf_filename share_url=share_temporario_url only %}
+  <c-documents.pdf_viewer :pdf_url="pdf_conteudo_url" :worker_src="pdf_js_worker_src" :filename="pdf_filename" :share_url="share_temporario_url" only />
 {% endblock %}
 
 {% block extra_js %}

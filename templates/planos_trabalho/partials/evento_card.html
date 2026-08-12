@@ -8,15 +8,15 @@
     </div>
     {# Botões usam formaction porque o card vive dentro do <form> do wizard (sem forms aninhados). #}
     <div class="pte-card__actions">
-      <button type="submit" formmethod="post" formaction="{{ card.editar_url }}" formnovalidate
-              class="icon-btn icon-btn--edit" aria-label="Editar evento" data-tooltip="Editar evento">
-        {% include "components/ui/icons/icon.html" with icon="edit" only %}
-      </button>
-      <button type="submit" formmethod="post" formaction="{{ card.excluir_url }}" formnovalidate
+      <c-ui.buttons.button type="submit" formmethod="post" formaction="{{ card.editar_url }}" formnovalidate
+              class_name="icon-btn icon-btn--edit" aria_label="Editar evento" data-tooltip="Editar evento" only>
+        <c-ui.icons.icon icon="edit" only />
+      </c-ui.buttons.button>
+      <c-ui.buttons.button type="submit" formmethod="post" formaction="{{ card.excluir_url }}" formnovalidate
               data-confirm-submit data-confirm-message="Remover este evento do plano?"
-              class="icon-btn icon-btn--delete" aria-label="Remover evento" data-tooltip="Remover evento">
-        {% include "components/ui/icons/icon.html" with icon="delete" only %}
-      </button>
+              class_name="icon-btn icon-btn--delete" aria_label="Remover evento" data-tooltip="Remover evento" only>
+        <c-ui.icons.icon icon="delete" only />
+      </c-ui.buttons.button>
     </div>
   </header>
 

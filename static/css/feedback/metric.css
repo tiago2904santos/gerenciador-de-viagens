@@ -15,12 +15,10 @@
   min-width: 0;
 }
 
-.metric-grid--2,
 .summary-grid--2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.metric-grid--3,
 .summary-grid--3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -50,8 +48,7 @@
 }
 
 /* Tile de métrica — card de dashboard/resumo */
-.metric--tile,
-.summary-tile {
+.metric--tile {
   background: var(--color-card);
   border: var(--card-border);
   border-radius: var(--radius-card);
@@ -66,15 +63,13 @@
     box-shadow var(--transition-fast);
 }
 
-.metric--tile:hover,
-.summary-tile:hover {
+.metric--tile:hover {
   box-shadow: var(--shadow-panel);
 }
 
 /* Rótulo */
-.metric__label,
+
 .summary-label,
-.summary-tile__label,
 .pt-resumo-box__label {
   color: var(--theme-text-muted, var(--color-muted));
   font-size: var(--font-size-xs, 11px);
@@ -84,19 +79,13 @@
   text-transform: uppercase;
 }
 
-.summary-tile__label {
-  letter-spacing: var(--letter-spacing-label);
-}
-
-.pt-resumo-box__label--accent,
-.metric__label--accent {
+.pt-resumo-box__label--accent {
   color: var(--color-accent);
 }
 
 /* Valor */
-.metric__value,
+
 .summary-value,
-.summary-tile__value,
 .pt-resumo-box__value {
   color: var(--theme-stat-value, var(--color-heading));
   font-size: 1.05rem;
@@ -107,27 +96,12 @@
   word-break: break-word;
 }
 
-.summary-tile__value {
-  font-size: clamp(var(--font-size-lg), 2vw, 1.55rem);
-  font-weight: var(--font-weight-bold, 800);
-  line-height: 1.2;
-}
-
-.pt-resumo-box__value--lg,
-.metric__value--lg {
+.pt-resumo-box__value--lg {
   font-size: clamp(1rem, 1.5vw, 1.2rem);
   font-weight: 800;
 }
 
 /* Descrição / subtexto */
-.metric__description,
-.summary-tile__description,
-.pt-resumo-box__sub {
-  color: var(--color-muted);
-  font-size: var(--font-size-sm, 0.85rem);
-  line-height: 1.35;
-  margin: 0;
-}
 
 @media (max-width: 900px) {
   .metric-grid--4,
@@ -137,8 +111,7 @@
 }
 
 @media (max-width: 640px) {
-  .metric-grid--2,
-  .metric-grid--3,
+
   .metric-grid--4,
   .summary-grid--2,
   .summary-grid--3,

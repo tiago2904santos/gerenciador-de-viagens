@@ -2,10 +2,10 @@
   <div class="card-footer-section__divider" aria-hidden="true"></div>
   <footer class="card-footer">
     <div class="card-footer__secondary">
-      {% include "components/ui/buttons/button.html" with href=diario_url label="Cancelar" variant="secondary" icon="arrow-left" only %}
+      <c-ui.buttons.button :href="diario_url" label="Cancelar" variant="secondary" icon="arrow-left" only />
     </div>
     <div class="card-footer__primary">
-      {% include "components/ui/buttons/button.html" with label="Salvar alterações" variant="primary" icon="check" icon_after=True type="submit" only %}
+      <c-ui.buttons.button label="Salvar alterações" variant="primary" icon="check" :icon_after="True" type="submit" only />
     </div>
   </footer>
 </section>
