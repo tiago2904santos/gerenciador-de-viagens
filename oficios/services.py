@@ -1,6 +1,6 @@
 import re
+from dataclasses import dataclass
 
-from django.db import connection
 from django.db import IntegrityError
 from django.db import transaction
 from django.urls import reverse
@@ -9,6 +9,12 @@ from django.db.models import Q
 from django.utils import timezone
 
 from core.normalizers import normalize_upper
+from core.deletion import DelecaoProtegidaError
+from core.deletion import excluir_com_protecao
+from core.numeracao import NAMESPACE_OFICIO
+from core.numeracao import bloquear_escopo_numeracao
+from core.numeracao import colisao_de_numero
+from core.numeracao import reservar_numero
 from core.tenancy import get_current_area
 from core.utils.masks import format_placa
 from core.utils.masks import format_protocolo
@@ -34,6 +40,7 @@ from .docxtpl_context import build_justificativa_docxtpl_context
 from .docxtpl_context import build_oficio_docxtpl_context
 from .documents import build_canonical_document_payload
 from .documents import build_justificativa_payload
+from .models import CONSTRAINT_NUMERO_OFICIO
 from .models import ModeloMotivoOficio
 from .models import Oficio
 from .models import OficioNumeroLacuna
@@ -151,7 +158,10 @@ def obter_roteiro_escolhido_do_post(post, evento=None, area=None):
     condicao = Q(tipo=Roteiro.TIPO_AVULSO)
     if evento is not None:
         condicao |= Q(evento=evento) | Q(oficios__evento=evento)
-    queryset = Roteiro.objects.filter(condicao, pk=roteiro_id)
+    # `BE-09`: `all_objects` — as quatro linhas abaixo aplicam o `area` recebido no
+    # argumento (ou o do evento). Recortar de novo pela área ativa esvaziaria a
+    # consulta sempre que as duas divergissem.
+    queryset = Roteiro.all_objects.filter(condicao, pk=roteiro_id)
     if area is not None:
         queryset = queryset.filter(area=area)
     else:
@@ -179,6 +189,182 @@ def vincular_roteiro_ao_oficio_sem_copia(oficio: Oficio, roteiro_escolhido: Rote
             rascunho_antigo.delete()
         except ProtectedError:
             pass
+
+
+@dataclass(frozen=True)
+class ResultadoRoteiroDoOficio:
+    """O que a Etapa 2 gravou. A view traduz isto em mensagem e redirect."""
+
+    #: O roteiro que ficou vinculado ao ofício.
+    roteiro: Roteiro
+    #: Vinculou ao roteiro escolhido no picker, sem gravar cópia.
+    reusou_sem_copia: bool
+    #: Materializou um `Roteiro` novo (o ofício não tinha rascunho próprio reaproveitável).
+    criou_rascunho: bool
+    #: Gravado sem validação completa (soft-advance do rodapé).
+    parcial: bool
+
+
+def _materializar_rascunho_do_oficio(oficio: Oficio) -> Roteiro:
+    """Rascunho de roteiro próprio do ofício, ainda não persistido.
+
+    `NOVO-88`: a área é a do **ofício**, sempre explícita. Antes disto havia duas cópias
+    deste bloco na view e só uma passava `area=`; a outra deixava `Roteiro.save()`
+    (`roteiros/models.py`) resolver por `get_current_area()`. As duas coincidiam por
+    acidente — `get_oficio_by_id` lê o mesmo thread-local —, e fora de request a segunda
+    gravava `area=NULL` contra o `NOT NULL` do `DB-02`.
+    """
+    area = oficio.area
+    if area is None:
+        # Compatibilidade transitória para ofícios legados ainda sem área: a
+        # configuração resolve uma área explícita (única ou técnica), nunca NULL.
+        from cadastros.models import ConfiguracaoSistema
+
+        area = ConfiguracaoSistema.get_singleton().area
+    return Roteiro(tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO, area=area)
+
+
+def _revincular_roteiro_ao_oficio(oficio: Oficio, roteiro: Roteiro) -> None:
+    """Aponta o ofício para o roteiro gravado, só quando muda."""
+    if oficio.roteiro_id != roteiro.pk:
+        oficio.roteiro = roteiro
+        oficio.save(update_fields=["roteiro", "updated_at"])
+
+
+@transaction.atomic
+def salvar_roteiro_do_oficio(
+    oficio: Oficio,
+    post,
+    form,
+    *,
+    roteiro_state,
+    validated,
+    diarias_resultado,
+    roteiro_vinculado=None,
+) -> ResultadoRoteiroDoOficio:
+    """Decide entre reaproveitar o roteiro escolhido e gravar um próprio, e persiste.
+
+    `BE-12`: esta é a regra que mais gera bug de dados no sistema, porque **roteiro é
+    compartilhado entre ofícios**. Ela morava dentro de `wizard_roteiro`, o que a tornava
+    intestável sem subir request e inalcançável pelo fluxo avulso.
+
+    Duas travas que a decisão carrega, e que os testes congelam:
+
+    - se o estado submetido equivale ao roteiro escolhido, **vincula sem copiar** — dois
+      ofícios passam a apontar para a mesma linha, que é o desenho;
+    - se não equivale, grava num rascunho **próprio**. Um roteiro que não é rascunho
+      pertence a outros documentos e nunca é reescrito no lugar.
+
+    `atomic` porque a requisição grava `Oficio`, `Roteiro`, `RoteiroDestino` e
+    `RoteiroTrecho` — os services chamados são atômicos cada um, o conjunto não era
+    (`BE-14`, item 1 da lista).
+    """
+    from roteiros.services import atualizar_roteiro
+    from roteiros.services import roteiro_state_equivalente_ao_roteiro
+
+    roteiro_escolhido = obter_roteiro_escolhido_do_post(
+        post, evento=oficio.evento, area=oficio.area
+    )
+    if roteiro_escolhido and roteiro_state_equivalente_ao_roteiro(
+        roteiro_escolhido, roteiro_state, validated
+    ):
+        rascunho_antigo = (
+            roteiro_vinculado
+            if (roteiro_vinculado and roteiro_vinculado.status == Roteiro.STATUS_RASCUNHO)
+            else None
+        )
+        vincular_roteiro_ao_oficio_sem_copia(
+            oficio, roteiro_escolhido, rascunho_antigo=rascunho_antigo
+        )
+        tocar_data_criacao_oficio(oficio)
+        return ResultadoRoteiroDoOficio(
+            roteiro=roteiro_escolhido,
+            reusou_sem_copia=True,
+            criou_rascunho=False,
+            parcial=False,
+        )
+
+    criou = roteiro_vinculado is None or roteiro_vinculado.status != Roteiro.STATUS_RASCUNHO
+    if criou:
+        roteiro_vinculado = _materializar_rascunho_do_oficio(oficio)
+        form.instance = roteiro_vinculado
+    roteiro_salvo = atualizar_roteiro(
+        roteiro_vinculado, form, roteiro_state, validated, diarias_resultado
+    )
+    _revincular_roteiro_ao_oficio(oficio, roteiro_salvo)
+    tocar_data_criacao_oficio(oficio)
+    return ResultadoRoteiroDoOficio(
+        roteiro=roteiro_salvo,
+        reusou_sem_copia=False,
+        criou_rascunho=criou,
+        parcial=False,
+    )
+
+
+@transaction.atomic
+def salvar_rascunho_parcial_do_oficio(
+    oficio: Oficio,
+    form,
+    *,
+    roteiro_state,
+    validated,
+    roteiro_vinculado=None,
+) -> ResultadoRoteiroDoOficio:
+    """Soft-advance: grava o que houver e deixa navegar sem validação completa."""
+    from roteiros.services import persistir_roteiro_rascunho_parcial
+
+    criou = roteiro_vinculado is None or roteiro_vinculado.status != Roteiro.STATUS_RASCUNHO
+    if criou:
+        roteiro_vinculado = _materializar_rascunho_do_oficio(oficio)
+        form.instance = roteiro_vinculado
+    roteiro_salvo = persistir_roteiro_rascunho_parcial(
+        roteiro_vinculado, form, roteiro_state, validated
+    )
+    _revincular_roteiro_ao_oficio(oficio, roteiro_salvo)
+    tocar_data_criacao_oficio(oficio)
+    return ResultadoRoteiroDoOficio(
+        roteiro=roteiro_salvo,
+        reusou_sem_copia=False,
+        criou_rascunho=criou,
+        parcial=True,
+    )
+
+
+def montar_roteiro_inicial_do_oficio(oficio: Oficio):
+    """Estado do editor para o GET de um ofício **sem** roteiro próprio, sem gravar nada.
+
+    Devolve `(form_instance, destinos_atuais, trechos_list, roteiro_state)`. Pré-seleciona
+    o roteiro do evento quando há um completo pronto para reuso; senão parte de sede e
+    destino do evento, sem datas — cada ofício tem horários próprios.
+    """
+    from roteiros.services import montar_estado_editor_roteiro_evento_selecionado
+    from roteiros.services import montar_initial_roteiro_evento_sem_datas
+    from roteiros.services import preparar_estado_editor_roteiro_para_get
+
+    roteiro_padrao = resolver_roteiro_padrao_evento(oficio.evento)
+    if roteiro_padrao is not None:
+        destinos_atuais, trechos_list, roteiro_state = (
+            montar_estado_editor_roteiro_evento_selecionado(roteiro_padrao)
+        )
+        form_instance = Roteiro(
+            tipo=Roteiro.TIPO_AVULSO,
+            status=Roteiro.STATUS_RASCUNHO,
+            origem_cidade=roteiro_padrao.origem_cidade,
+            origem_estado=roteiro_padrao.origem_estado,
+            observacoes=roteiro_padrao.observacoes,
+        )
+        return form_instance, destinos_atuais, trechos_list, roteiro_state
+
+    initial = montar_initial_roteiro_evento_sem_datas(oficio.evento)
+    destinos_atuais, trechos_list, roteiro_state = preparar_estado_editor_roteiro_para_get(
+        initial=initial
+    )
+    form_instance = Roteiro(tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
+    if initial.get("origem_cidade"):
+        form_instance.origem_cidade_id = initial["origem_cidade"]
+    if initial.get("origem_estado"):
+        form_instance.origem_estado_id = initial["origem_estado"]
+    return form_instance, destinos_atuais, trechos_list, roteiro_state
 
 
 def _preencher_roteiro_oficio_com_evento(roteiro: Roteiro, evento) -> None:
@@ -296,11 +482,21 @@ def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
     modelo_motivo = form.cleaned_data.get("modelo_motivo")
     aplicar_modelo_motivo_no_oficio(atualizado, modelo_motivo, form.cleaned_data.get("motivo"))
     atualizar_status_automatico_oficio(atualizado, action=action, form=form)
-    _bloquear_escopo_numeracao_oficio(
+    # `BE-15`: mesmo lock da reserva automática, **sem** o retry. Aqui o número foi
+    # digitado pelo operador; trocá-lo em silêncio seria pior que devolver o erro, então
+    # este caminho traduz a colisão em `OficioNumeroConflitoError` e devolve a tela.
+    bloquear_escopo_numeracao(
+        namespace=NAMESPACE_OFICIO,
         area_id=atualizado.area_id,
         ano=atualizado.ano,
+        modelo=Oficio,
     )
-    conflito = Oficio.objects.filter(
+    # `BE-09`: `all_objects` porque a checagem é sobre a área **deste** ofício, já
+    # explícita no filtro. Com `objects`, área do registro diferente da ativa daria
+    # consulta vazia: o conflito passaria batido aqui e voltaria como
+    # `IntegrityError` cru no INSERT, em vez do `OficioNumeroConflitoError` que a
+    # tela sabe apresentar.
+    conflito = Oficio.all_objects.filter(
         area_id=atualizado.area_id,
         ano=atualizado.ano,
         numero=atualizado.numero,
@@ -314,7 +510,17 @@ def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
         with transaction.atomic():
             atualizado.save()
     except IntegrityError as exc:
-        if "oficios_oficio_area_ano_numero_unique" not in str(exc):
+        # `BE-15`: identifica pelo metadado da exceção, com a ocupação como segundo
+        # recurso. O texto do `IntegrityError` cita o nome da constraint no PostgreSQL e
+        # as colunas no SQLite, então o casamento por substring só valia num dos dois.
+        if not colisao_de_numero(
+            exc,
+            constraint=CONSTRAINT_NUMERO_OFICIO,
+            ja_ocupado=lambda numero: _numero_de_oficio_ocupado(
+                atualizado, numero=numero, ano=atualizado.ano
+            ),
+            numero=atualizado.numero,
+        ):
             raise
         raise OficioNumeroConflitoError(
             f"O número {atualizado.numero}/{atualizado.ano} acabou de ser usado "
@@ -419,34 +625,22 @@ def get_next_available_numero_oficio(ano, area=None):
     return Oficio.get_next_available_numero(ano, area=area)
 
 
-def _bloquear_escopo_numeracao_oficio(*, area_id: int | None, ano: int | None) -> None:
-    """Serializa a escolha do próximo número para uma área/ano.
+def _numero_de_oficio_ocupado(oficio, *, numero: int, ano: int) -> bool:
+    """Alguém já gravou este (área, ano, número)?
 
-    Bloquear apenas linhas de ``Oficio`` não protege o próximo número, pois ele
-    ainda não existe. No PostgreSQL, o advisory lock transacional cobre
-    exatamente esse intervalo lógico sem exigir uma tabela de contadores.
+    `BE-15`: é o segundo recurso para distinguir "perdi a corrida" de "violei outra
+    constraint", quando o banco não oferece o metadado da exceção. Ver o cabeçalho de
+    `core/numeracao.py`.
     """
-    resolved_ano = int(ano) if ano is not None else timezone.localdate().year
-    if connection.vendor == "postgresql":
-        namespace = 0x4F464943  # "OFIC"
-        scope = (((area_id or 0) * 4096) + (resolved_ano % 4096)) % 2_147_483_647
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT pg_advisory_xact_lock(%s, %s)",
-                [namespace, scope],
-            )
-        return
-
-    # Fallback para bancos usados em desenvolvimento/testes.
-    if area_id:
-        area_model = Oficio._meta.get_field("area").remote_field.model
-        area_model.objects.select_for_update().filter(pk=area_id).exists()
-    else:
-        list(
-            Oficio.objects.select_for_update()
-            .filter(area__isnull=True, ano=resolved_ano)
-            .exclude(numero__isnull=True)
-        )
+    return (
+        # `BE-09`: `all_objects` — o escopo é a área **deste** ofício, e ela vem explícita
+        # no filtro da própria linha. Com `objects`, um ofício de área diferente da ativa
+        # daria consulta vazia: a colisão passaria por "não é minha" e o `IntegrityError`
+        # subiria cru em vez de virar nova tentativa.
+        Oficio.all_objects.filter(area_id=oficio.area_id, ano=ano, numero=numero)
+        .exclude(pk=oficio.pk)
+        .exists()
+    )
 
 
 @transaction.atomic
@@ -455,39 +649,38 @@ def reservar_numero_oficio(oficio, ano=None):
         return oficio
 
     resolved_year = ano or timezone.localdate().year
-    _bloquear_escopo_numeracao_oficio(
-        area_id=oficio.area_id,
-        ano=resolved_year,
-    )
-
     original_pk = oficio.pk
     original_adding = oficio._state.adding
-    last_error: IntegrityError | None = None
-    for _attempt in range(3):
-        oficio.ano = resolved_year
-        oficio.numero = get_next_available_numero_oficio(
-            resolved_year,
-            area=oficio.area,
-        )
-        try:
-            # Savepoint interno: uma colisão causada por um worker antigo não
-            # inutiliza a transação externa; a consulta seguinte já verá o
-            # número que venceu a corrida.
-            with transaction.atomic():
-                oficio.save()
-            return oficio
-        except IntegrityError as exc:
-            if "oficios_oficio_area_ano_numero_unique" not in str(exc):
-                raise
-            last_error = exc
-            oficio.numero = None
-            oficio.ano = None
-            if original_adding:
-                oficio.pk = original_pk
-                oficio._state.adding = True
 
-    assert last_error is not None
-    raise last_error
+    def escolher():
+        return get_next_available_numero_oficio(resolved_year, area=oficio.area)
+
+    def gravar(numero):
+        oficio.ano = resolved_year
+        oficio.numero = numero
+        oficio.save()
+
+    def limpar():
+        oficio.numero = None
+        oficio.ano = None
+        if original_adding:
+            oficio.pk = original_pk
+            oficio._state.adding = True
+
+    reservar_numero(
+        namespace=NAMESPACE_OFICIO,
+        area_id=oficio.area_id,
+        ano=resolved_year,
+        modelo=Oficio,
+        constraint=CONSTRAINT_NUMERO_OFICIO,
+        escolher=escolher,
+        gravar=gravar,
+        ja_ocupado=lambda numero: _numero_de_oficio_ocupado(
+            oficio, numero=numero, ano=resolved_year
+        ),
+        apos_colisao=limpar,
+    )
+    return oficio
 
 
 def avaliar_oficio_dados_viajantes(oficio=None, form=None):
@@ -796,11 +989,15 @@ def _dados_viajantes_from_oficio(oficio):
 def excluir_oficio(instance):
     numero, ano, area = instance.numero, instance.ano, instance.area
     try:
-        instance.delete()
-    except ProtectedError as exc:
+        excluir_com_protecao(instance)
+    except DelecaoProtegidaError as exc:
         raise OficioVinculadoError from exc
     if numero and ano:
-        OficioNumeroLacuna.objects.get_or_create(area=area, ano=ano, numero=numero)
+        # `BE-09`: `all_objects` — a lacuna pertence à área do ofício excluído, que
+        # já vem explícita. Com `objects` e área diferente da ativa, o `get` não
+        # acharia a lacuna existente e o `create` estouraria em
+        # `oficios_lacuna_area_ano_numero_unique`.
+        OficioNumeroLacuna.all_objects.get_or_create(area=area, ano=ano, numero=numero)
 
 
 def cancelar_oficio(instance: Oficio, motivo: str) -> Oficio:
@@ -880,7 +1077,13 @@ def criar_modelo_motivo(form):
 
         modelo.area = get_current_area()
     if modelo.is_padrao:
-        ModeloMotivoOficio.objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(is_padrao=False)
+        # `BE-09`: `all_objects` — desmarcar o padrão anterior é sobre a área do
+        # modelo, já no filtro. Recortado pela área ativa, o padrão antigo
+        # sobreviveria e a gravação estouraria em
+        # `oficios_motivo_area_padrao_unique`.
+        ModeloMotivoOficio.all_objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(
+            is_padrao=False,
+        )
     modelo.save()
     return modelo
 
@@ -894,11 +1097,58 @@ def atualizar_modelo_motivo(instance, form):
 
         modelo.area = get_current_area()
     if modelo.is_padrao:
-        ModeloMotivoOficio.objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(is_padrao=False)
+        # `BE-09`: `all_objects` — desmarcar o padrão anterior é sobre a área do
+        # modelo, já no filtro. Recortado pela área ativa, o padrão antigo
+        # sobreviveria e a gravação estouraria em
+        # `oficios_motivo_area_padrao_unique`.
+        ModeloMotivoOficio.all_objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(
+            is_padrao=False,
+        )
     modelo.save()
     return modelo
 
 
 @transaction.atomic
 def excluir_modelo_motivo(instance):
-    instance.delete()
+    excluir_com_protecao(instance)
+
+
+@transaction.atomic
+def criar_rascunho_de_roteiro_do_oficio(oficio: Oficio, *, area, campos, snapshots):
+    """Cria o rascunho próprio de roteiro do ofício e já vincula, numa operação só.
+
+    `BE-14` fatia 5. São duas gravações em objetos diferentes: o `Roteiro` nasce e o
+    `Oficio` recebe o vínculo. Sem transação, uma falha na segunda deixava um **roteiro
+    órfão** — sem ofício, sem evento e sem tela que o alcance — enquanto o ofício voltava
+    a se comportar como se o usuário nunca tivesse desmarcado o roteiro do evento. Ou
+    seja: a falha reintroduzia justamente o defeito que esta rota foi escrita para
+    corrigir, e ainda deixava lixo no banco.
+
+    Devolve `(roteiro, version)`.
+    """
+    from roteiros.services.autosave import apply_roteiro_autosave
+    from roteiros.services.autosave import build_roteiro_draft
+
+    roteiro = build_roteiro_draft(area=area)
+    version = apply_roteiro_autosave(roteiro, campos, snapshots)
+    _garantir_sede_do_rascunho(roteiro)
+    _revincular_roteiro_ao_oficio(oficio, roteiro)
+    return roteiro, version
+
+
+def _garantir_sede_do_rascunho(roteiro: Roteiro) -> None:
+    """Dá ao rascunho a sede da configuração quando ela não veio suja no payload.
+
+    A sede exibida na tela é herdada do evento/configuração e não chega no autosave se o
+    usuário nunca clicou nela — sem isto o rascunho nasceria sem sede. Regra anterior ao
+    `BE-14`.
+    """
+    if roteiro.origem_cidade_id or roteiro.origem_estado_id:
+        return
+    from cadastros.services import resolver_sede_ids_desde_configuracao
+
+    estado_id, cidade_id, _aviso = resolver_sede_ids_desde_configuracao()
+    if estado_id and cidade_id:
+        roteiro.origem_estado_id = estado_id
+        roteiro.origem_cidade_id = cidade_id
+        roteiro.save(update_fields=["origem_estado", "origem_cidade", "updated_at"])

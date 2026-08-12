@@ -34,6 +34,8 @@ from roteiros.services.routing.route_time_rules import (
 )
 from roteiros.services.routing.route_stale import mark_stale_when_signature_changed
 from roteiros.services.roteiro_editor import _apply_saved_map_route_from_post
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 @override_settings(
@@ -49,6 +51,7 @@ class RoteirosRoutingTests(TestCase):
         self.user = User.objects.create_user(username="routing_tester", password="teste")
         self.client = Client()
         self.client.force_login(self.user)
+        vincular_area(self.user)
         self.estado, _ = Estado.objects.get_or_create(sigla="PR", defaults={"nome": "PARANA"})
         self.estado2, _ = Estado.objects.get_or_create(sigla="SC", defaults={"nome": "SANTA CATARINA"})
         self.cidade_sede, _ = Cidade.objects.get_or_create(
@@ -272,7 +275,7 @@ class RoteirosRoutingTests(TestCase):
                 )
 
     def test_calcular_rota_endpoint_401_retorna_mensagem_amigavel_sem_chave(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,
@@ -320,7 +323,7 @@ class RoteirosRoutingTests(TestCase):
     def test_calcular_rota_endpoint_sem_chave_retorna_mensagem_amigavel(self):
         with override_settings(OPENROUTESERVICE_API_KEY=""):
             url = reverse("roteiros:calcular_rota")
-            roteiro = Roteiro.objects.create(
+            roteiro = Roteiro.objects.create(area=area_de_teste(), 
                 tipo=Roteiro.TIPO_AVULSO,
                 origem_estado=self.estado,
                 origem_cidade=self.cidade_sede,
@@ -340,7 +343,7 @@ class RoteirosRoutingTests(TestCase):
         self.assertEqual(resp.status_code, 400)
 
     def test_pontos_rota_simples_com_retorno(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,
@@ -380,7 +383,7 @@ class RoteirosRoutingTests(TestCase):
             latitude=None,
             longitude=None,
         )
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=cidade_sem,
@@ -403,7 +406,7 @@ class RoteirosRoutingTests(TestCase):
         self.assertIn("PR", ctx.exception.user_message)
 
     def test_cache_por_assinatura_sem_chamar_api(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,
@@ -450,7 +453,7 @@ class RoteirosRoutingTests(TestCase):
         self.assertTrue(out["route"]["from_cache"])
 
     def test_reordenar_destinos_marca_rota_desatualizada(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,
@@ -500,16 +503,34 @@ class RoteirosRoutingTests(TestCase):
         roteiro.rota_assinatura = sig
         roteiro.save(update_fields=["rota_assinatura"])
 
-        d0.ordem, d1.ordem = 1, 0
-        d0.save(update_fields=["ordem"])
-        d1.save(update_fields=["ordem"])
+        # `DB-08`: reordenar do jeito que a produção reordena.
+        #
+        # Este teste trocava as posições no lugar (`d0.ordem, d1.ordem = 1, 0`
+        # seguido de dois `save`), e a constraint `roteiro_destino_ordem_unique`
+        # passou a reprovar isso — o primeiro `save` grava `ordem=1` enquanto o
+        # outro destino ainda a ocupa.
+        #
+        # A troca no lugar **não existe em produção**: o único escritor de
+        # destinos é `editor_state_builder._salvar_roteiro_avulso_from_roteiro_state`, que faz `destinos.all().delete()` e
+        # recria com `enumerate`. O atalho era do teste, não do sistema.
+        #
+        # A asserção não muda de sentido: `mark_stale_when_signature_changed`
+        # recalcula a assinatura a partir dos destinos atuais, não de sinal de
+        # `save()` — a ordem final é a mesma pelos dois caminhos.
+        cidades_invertidas = [d.cidade for d in (d1, d0)]
+        estados_invertidos = [d.estado for d in (d1, d0)]
+        roteiro.destinos.all().delete()
+        for ordem, (estado, cidade) in enumerate(zip(estados_invertidos, cidades_invertidas, strict=True)):
+            RoteiroDestino.objects.create(
+                roteiro=roteiro, estado=estado, cidade=cidade, ordem=ordem
+            )
 
         mark_stale_when_signature_changed(roteiro)
         roteiro.refresh_from_db()
         self.assertEqual(roteiro.rota_status, Roteiro.ROTA_STATUS_DESATUALIZADA)
 
     def test_municipio_sem_coordenada_erro_amigavel(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,
@@ -547,7 +568,7 @@ class RoteirosRoutingTests(TestCase):
         self.assertIn("PR", msg)
 
     def test_falha_provedor_nao_apaga_rota_calculada_anterior(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,
@@ -604,7 +625,7 @@ class RoteirosRoutingTests(TestCase):
         self.assertIn("Salve o roteiro", resp.json()["message"])
 
     def test_calcular_rota_endpoint_sem_destinos_retorna_motivo_especifico(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,
@@ -615,7 +636,7 @@ class RoteirosRoutingTests(TestCase):
         self.assertIn("pelo menos dois pontos", resp.json()["message"])
 
     def test_calcular_rota_endpoint_bloqueia_modo_bate_volta(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,
@@ -655,7 +676,7 @@ class RoteirosRoutingTests(TestCase):
         self.assertEqual(payload["reason"], "daily_round_trip_mode")
 
     def test_calcular_rota_endpoint_retorna_linestring_quando_api_ok(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,
@@ -714,7 +735,7 @@ class RoteirosRoutingTests(TestCase):
         self.assertEqual(roteiro.rota_geojson.get("type"), "LineString")
 
     def test_serialize_existing_route_inclui_points_para_renderizar_mapa_salvo(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,
@@ -744,7 +765,7 @@ class RoteirosRoutingTests(TestCase):
         self.assertTrue(any(p.get("kind") == "destino" for p in serialized["points"]))
 
     def test_apply_saved_map_route_from_post_persiste_geometry_preview(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,
@@ -770,7 +791,7 @@ class RoteirosRoutingTests(TestCase):
         self.assertEqual(roteiro.rota_fonte, "openrouteservice")
 
     def test_calcular_rota_geometria_invalida_nao_quebra_json(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.cidade_sede,

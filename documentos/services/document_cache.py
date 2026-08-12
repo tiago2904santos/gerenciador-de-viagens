@@ -113,6 +113,32 @@ def get_cached_document_artifact(
     formato: DocumentoFormato,
     cache_key: str,
 ) -> DocumentoArtefato | None:
+    # `DB-04`: pelo menos uma referencia e **obrigatoria**.
+    #
+    # A `cache_key` e um SHA-256 de conteudo (`build_cache_key`, acima) e nao
+    # inclui area: dois oficios de areas diferentes com o mesmo conteudo
+    # produzem a mesma chave. Quem separa as areas aqui e a **referencia** — um
+    # oficio pertence a uma area so, entao filtrar por `oficio_id` implica
+    # filtrar por area, transitivamente.
+    #
+    # Os cinco chamadores de hoje passam referencia, e por isso o catalogo
+    # classificou este defeito como latente. O problema e que nada os obrigava:
+    # sem referencia, `filters` ficava so com tipo, formato e chave, e a busca
+    # varria o sistema inteiro por hash de conteudo — o primeiro artefato que
+    # casasse voltava, de qualquer area.
+    #
+    # Recusar a chamada e melhor que recortar por `get_current_area()`: a
+    # geracao documental roda **assincrona** em worker do Celery
+    # (`documentos/services/async_generation.py`), onde nao existe area
+    # ambiente. Um recorte por estado ambiente ficaria correto no request e
+    # devolveria `None` sempre na worker, transformando cache em nada — de
+    # forma silenciosa.
+    if oficio_id is None and evento_id is None and termo_id is None and servidor_id is None:
+        raise ValueError(
+            "get_cached_document_artifact exige ao menos uma referência "
+            "(oficio_id, evento_id, termo_id ou servidor_id): sem ela a busca "
+            "casaria artefato de qualquer área pelo hash de conteúdo (`DB-04`).",
+        )
     if not cache_key or not getattr(settings, "DOCUMENTOS_ARTIFACT_CACHE", True):
         return None
     try:
@@ -129,7 +155,11 @@ def get_cached_document_artifact(
             filters["termo_id"] = termo_id
         if servidor_id is not None:
             filters["servidor_id"] = servidor_id
-        art = DocumentoArtefato.objects.filter(**filters).order_by("-criado_em").first()
+        # `BE-09`: `all_objects`, pelo mesmo motivo do bloco acima — quem separa as
+        # áreas aqui é a **referência** (obrigatória desde o `DB-04`), não a área
+        # ambiente. Um artefato pertence a uma área só, então filtrar por `oficio_id`
+        # já implica filtrar por área, e a busca continua idêntica no request e na worker.
+        art = DocumentoArtefato.all_objects.filter(**filters).order_by("-criado_em").first()
     except Exception:
         logger.exception("Falha ao consultar cache documental.")
         return None

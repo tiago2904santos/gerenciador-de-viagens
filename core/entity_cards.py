@@ -1,4 +1,4 @@
-"""Builders do entity card global (components/ui/lists/entity_card*.html).
+"""Builders do entity card global (cotton/ui/lists/entity_card*.html).
 
 As views/presenters montam as partes comuns do card (cabeçalho, chips e rodapé
 de ações) com estes helpers; o miolo específico de cada domínio continua num
@@ -78,8 +78,13 @@ def menu_attach_signed(url, doc_label, *, assinado=False, current_name="", curre
 
 def menu(menu_id, title, subtitle, items, *, icon="folder", trigger_icon="folder",
          trigger_variant="settings", trigger_aria="", trigger_tooltip="Visualizar e baixar",
-         trigger_state_class=""):
-    """Botão-gatilho + menu rico (cv-action-menu--rich)."""
+         trigger_state_class="", src=""):
+    """Botão-gatilho + menu rico (action-menu--rich).
+
+    `src` é a URL que serve o corpo deste menu (PF-04). Com ela, a lista manda só
+    o gatilho e o corpo vem no primeiro clique; sem ela, o corpo continua
+    embutido, que é o caminho dos domínios ainda não migrados.
+    """
     return {
         "id": menu_id,
         "title": title,
@@ -91,6 +96,7 @@ def menu(menu_id, title, subtitle, items, *, icon="folder", trigger_icon="folder
         "trigger_aria": trigger_aria or title,
         "trigger_tooltip": trigger_tooltip,
         "trigger_state_class": trigger_state_class,
+        "src": src,
     }
 
 
@@ -98,7 +104,7 @@ def documents_menu(menu_id, subtitle, *, title, view_url=None, pdf_url=None, doc
                    view_title="Visualizar documento", view_description="Abrir o documento no navegador",
                    pdf_description="Documento pronto para impressão",
                    docx_description="Arquivo editável do documento",
-                   trigger_aria="", extra_items=None):
+                   trigger_aria="", extra_items=None, src=""):
     """Menu padrão Visualizar/PDF/DOCX usado no rodapé dos cards."""
     items = []
     if view_url:
@@ -115,6 +121,7 @@ def documents_menu(menu_id, subtitle, *, title, view_url=None, pdf_url=None, doc
         items,
         trigger_aria=trigger_aria,
         trigger_variant="documents",
+        src=src,
     )
 
 

@@ -1,13 +1,6 @@
 (function () {
-  function onlyDigits(value) {
-    return (value || "").replace(/\D/g, "");
-  }
-
-  function maskCep(value) {
-    const digits = onlyDigits(value).slice(0, 8);
-    if (digits.length <= 5) return digits;
-    return `${digits.slice(0, 5)}-${digits.slice(5)}`;
-  }
+  const onlyDigits = window.CV.masks.onlyDigits;
+  const maskCep = (valor) => window.CV.masks.format(valor, "cep");
 
   function setFieldError(input, message) {
     if (!input) return;
@@ -121,11 +114,7 @@
     const unidadeInput = form.querySelector("#id_destinatario_oficio_unidade");
     if (!select || !nomeHidden) return;
 
-    const picker = select.nextElementSibling;
-    const textInput =
-      picker && picker.classList.contains("cv-search-picker")
-        ? picker.querySelector(".cv-search-picker__input")
-        : null;
+    const textInput = window.CV.picker.part(window.CV.picker.rootFor(select), "input");
 
     if (textInput) {
       textInput.addEventListener("input", () => {

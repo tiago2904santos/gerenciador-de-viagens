@@ -41,7 +41,8 @@ def _credenciais_queryset(usuario):
 
 
 def _jobs_queryset(usuario, area):
-    return DriveReorganizacaoJob.objects.filter(usuario=usuario, area=area)
+    # `BE-09`: `all_objects` — a `area` vem no argumento e já está no filtro.
+    return DriveReorganizacaoJob.all_objects.filter(usuario=usuario, area=area)
 
 
 # ---------------------------------------------------------------------------
@@ -251,13 +252,18 @@ def _executar_reorganizacao(job_id: int, usuario, area, *, encerrar_conexao: boo
     from integracoes.google_drive import organizer
 
     def progress(processados, total):
-        DriveReorganizacaoJob.objects.filter(pk=job_id).update(
+        # `BE-09`: `all_objects` nas três atualizações deste bloco — são `update()`
+        # por `pk` de um job já em mãos, e a reorganização roda em thread de fundo,
+        # onde não há área ambiente. Recortadas, o progresso e o desfecho do job
+        # nunca seriam gravados e a tela ficaria presa em "em andamento".
+        DriveReorganizacaoJob.all_objects.filter(pk=job_id).update(
             eventos_processados=processados, total_eventos=total
         )
 
     try:
         resumo = organizer.reorganizar_tudo(progress=progress, usuario=usuario, area=area)
-        DriveReorganizacaoJob.objects.filter(pk=job_id).update(
+        # `BE-09`: `all_objects` — `update()` por `pk` do job em mãos; ver acima.
+        DriveReorganizacaoJob.all_objects.filter(pk=job_id).update(
             status=DriveReorganizacaoJob.STATUS_CONCLUIDA,
             total_eventos=resumo["eventos"],
             eventos_processados=resumo["eventos"],
@@ -268,7 +274,9 @@ def _executar_reorganizacao(job_id: int, usuario, area, *, encerrar_conexao: boo
     except Exception as exc:  # noqa: BLE001
         capture(exc, "drive.views._executar_reorganizacao")  # pragma: no cover
         logger.error("[Drive] reorganização (job %s) falhou: %s", job_id, exc, exc_info=True)
-        DriveReorganizacaoJob.objects.filter(pk=job_id).update(
+        # `BE-09`: `all_objects` — idem; sem isto o job ficaria eternamente
+        # "em andamento" mesmo depois de falhar.
+        DriveReorganizacaoJob.all_objects.filter(pk=job_id).update(
             status=DriveReorganizacaoJob.STATUS_ERRO,
             mensagem=str(exc),
             finalizado_em=timezone.now(),

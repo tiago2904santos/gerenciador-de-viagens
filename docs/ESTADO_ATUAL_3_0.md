@@ -34,7 +34,6 @@ O risco principal de continuar refatorando sem ordem e **quebrar convergencia ar
 | `planos_trabalho` | planejamento operacional e derivacoes documentais | preparacao com estrutura inicial | Sim | Sim | Nao | Sim | Nao | Sim | Sim | Sim | Nao | Placeholder |
 | `ordens_servico` | ordens vinculadas a oficios/eventos | preparacao com estrutura inicial | Sim | Sim | Nao | Sim | Nao | Sim | Sim | Sim | Nao | Placeholder |
 | `prestacoes_contas` | prestacao, RT, comprovacoes e dossie | preparacao com estrutura inicial | Sim | Sim | Nao | Sim | Nao | Sim | Sim | Sim | Nao | Placeholder |
-| `diario_bordo` | diario operacional e exportacoes | preparacao com estrutura inicial | Sim | Sim | Nao | Sim | Nao | Sim | Sim | Sim | Nao | Placeholder |
 | `assinaturas` | trilha de assinatura e validacao | preparacao com base tecnica, sem consolidacao funcional | Sim | Nao | Nao | Sim | Nao | Sim | Sim | Sim | Nao | Placeholder |
 | `integracoes` | conectores externos (ex.: Drive) | namespace/subapp ainda inicial | Parcial | Nao | Nao | Parcial | Nao | Parcial | Parcial | Sim | Nao | Placeholder |
 
@@ -117,7 +116,7 @@ Consolidacao confirmada:
 - theme integrado;
 - mapa e rota via backend;
 - bloco de trechos/retorno/calculadora;
-- documentacao explicita de divida controlada (`roteiro_logic`, extracao futura).
+- documentacao explicita de divida controlada (`services/editor_state_builder.py`, reducao de volume futura).
 
 ### Documentos
 
@@ -203,7 +202,7 @@ Mapeamento:
 - **ALTA:** nucleo documental (render/placeholder/validacao/download/conversao) ainda nao consolidado no novo projeto.
 - **ALTA:** dependencia de referencia funcional do legacy para varios modulos documentais.
 - **ALTA:** cobertura de testes desigual fora de `cadastros` e `roteiros`.
-- **MEDIA:** `roteiro_logic` ainda concentra contexto pesado (divida controlada).
+- **MEDIA:** `services/editor_state_builder.py` (antigo `roteiro_logic`) ainda tem 1.337 linhas. O `BE-13` tirou de la parsing de request, contexto e persistencia — sobrou uma responsabilidade so, mas o volume continua (divida controlada).
 - **MEDIA:** components de dominio ainda muito ancorados nos partials de Roteiros (divida controlada).
 - **MEDIA:** nomenclatura de URLs com convencoes mistas entre apps.
 - **MEDIA:** auditorias automaticas existem, mas ainda sem integracao de enforcement no fluxo completo.

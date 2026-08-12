@@ -29,21 +29,24 @@ from roteiros.models import RoteiroTrecho
 from termos.services import gerar_termo_um
 from termos.services import gerar_termo_lote
 from termos.services import sha256_bytes
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class TermoServidorPdfInlineTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="tester_termo_inline", password="123456")
         self.client.force_login(self.user)
-        self.cargo = Cargo.objects.create(nome="Cargo T")
-        self.unidade = Unidade.objects.create(nome="Unidade T", sigla="UT")
-        self.servidor_no = Servidor.objects.create(
+        vincular_area(self.user)
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Cargo T")
+        self.unidade = Unidade.objects.create(area=area_de_teste(), nome="Unidade T", sigla="UT")
+        self.servidor_no = Servidor.objects.create(area=area_de_teste(), 
             nome="Fora do oficio",
             cargo=self.cargo,
             cpf="11111111111",
             unidade=self.unidade,
         )
-        self.servidor_ok = Servidor.objects.create(
+        self.servidor_ok = Servidor.objects.create(area=area_de_teste(), 
             nome="No oficio",
             cargo=self.cargo,
             cpf="22222222222",
@@ -54,7 +57,7 @@ class TermoServidorPdfInlineTests(TestCase):
         self.estado = Estado.objects.create(nome="Parana", sigla="PR")
         self.cidade_origem = Cidade.objects.create(nome="Curitiba", estado=self.estado, uf="PR")
         self.cidade_destino = Cidade.objects.create(nome="Londrina", estado=self.estado, uf="PR")
-        self.roteiro = Roteiro.objects.create(
+        self.roteiro = Roteiro.objects.create(area=area_de_teste(), 
             origem_estado=self.estado,
             origem_cidade=self.cidade_origem,
             saida_dt=timezone.make_aware(timezone.datetime(2026, 5, 13, 8, 0)),
@@ -81,14 +84,14 @@ class TermoServidorPdfInlineTests(TestCase):
             saida_dt=timezone.make_aware(timezone.datetime(2026, 5, 13, 8, 0)),
             chegada_dt=timezone.make_aware(timezone.datetime(2026, 5, 13, 14, 0)),
         )
-        combustivel = Combustivel.objects.create(nome="Gasolina")
-        self.viatura = Viatura.objects.create(
+        combustivel = Combustivel.objects.create(area=area_de_teste(), nome="Gasolina")
+        self.viatura = Viatura.objects.create(area=area_de_teste(), 
             placa="ABC1234",
             modelo="Duster",
             combustivel=combustivel,
             tipo=Viatura.TIPO_CARACTERIZADA,
         )
-        self.oficio = Oficio.objects.create(
+        self.oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             protocolo="123456781",
@@ -102,6 +105,23 @@ class TermoServidorPdfInlineTests(TestCase):
         )
         self.oficio.servidores.add(self.servidor_ok)
         self.oficio.servidores_termo_autorizacao.add(self.servidor_ok)
+
+    def test_preview_html_renderiza_contexto_com_referencias_de_modelo(self):
+        response = self.client.get(reverse("termos:preview_termo_oficio", args=[self.oficio.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.servidor_ok.nome)
+
+    def test_preview_json_serializa_referencias_de_modelo(self):
+        response = self.client.get(
+            reverse("termos:preview_termo_oficio", args=[self.oficio.pk]),
+            {"format": "json"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["servidor"]["id"], self.servidor_ok.pk)
+        self.assertEqual(payload["servidores"][0]["texto"], str(self.servidor_ok))
 
     @mock.patch("termos.services._facade_termo_com_template")
     @mock.patch("termos.services.documento_gerado_from_artifact")

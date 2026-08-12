@@ -3,6 +3,8 @@
 
   const SELECTOR = "select[data-entity-picker]";
   const renderers = [];
+  /* JS-02 — uma entrada por picker vivo: { root, desmontar }. */
+  const instancias = [];
 
   /* ── Utilitários ─────────────────────────────────────────────── */
 
@@ -11,6 +13,50 @@
     if (className) node.className = className;
     if (text !== undefined) node.textContent = text;
     return node;
+  }
+
+  /* ── Contrato de identificação (JS-06) ───────────────────────────
+     A `<div>` renderizada abaixo era encontrada de fora por
+     `classList.contains("search-picker")`, e suas partes por seletor de
+     classe BEM. Isso amarra 10 arquivos ao nome da classe: renomeá-la na
+     reconstrução do CSS quebraria o roteamento de foco em silêncio, sem erro
+     no console e sem teste que pegue.
+
+     A classe continua — ela é o estilo. O que muda é quem responde "sou o
+     picker": `data-entity-picker-root` na raiz e `data-entity-picker-part`
+     em cada parte consultada. Use `CV.picker.rootFor` / `CV.picker.part`. */
+
+  function markRoot(node) {
+    node.dataset.entityPickerRoot = "true";
+    return node;
+  }
+
+  function markPart(node, name) {
+    node.dataset.entityPickerPart = name;
+    return node;
+  }
+
+  function rootFor(select) {
+    if (!select || !select.matches) return null;
+    /* No renderer "select" a raiz é o próprio elemento; no picker de busca ela
+       é o irmão que `initPicker` insere logo depois do <select> fonte. */
+    if (select.matches("[data-entity-picker-root]")) return select;
+    const next = select.nextElementSibling;
+    return next && next.matches && next.matches("[data-entity-picker-root]") ? next : null;
+  }
+
+  function partOf(scope, name) {
+    return scope ? scope.querySelector(`[data-entity-picker-part="${name}"]`) : null;
+  }
+
+  function partsOf(scope, name) {
+    return scope
+      ? Array.prototype.slice.call(scope.querySelectorAll(`[data-entity-picker-part="${name}"]`))
+      : [];
+  }
+
+  function closestPart(node, name) {
+    return node ? node.closest(`[data-entity-picker-part="${name}"]`) : null;
   }
 
   function dispatchChange(select) {
@@ -110,7 +156,8 @@
     const freeTextMsg    = select.dataset.pickerFreeTextMessage || "Pressione Enter para confirmar este nome.";
     const forceUppercase = select.dataset.pickerUppercase === "true";
     const isError        = select.dataset.pickerError         === "true";
-    const listboxId    = `${select.id || select.name || "cv-picker"}-results`;
+    const baseId       = select.id || select.name || `cv-picker-${renderers.length}-${document.querySelectorAll("[data-entity-picker-root]").length}`;
+    const listboxId    = `${baseId}-results`;
     const initialValue = (select.dataset.pickerInitialValue || "").trim();
 
     if (initialValue && !select.value) {
@@ -140,26 +187,26 @@
 
     /* ── Construção do DOM ──────────────────────────────────────── */
 
-    const root = el("div", `cv-search-picker cv-search-picker--${mode} cv-search-picker--${variant}`);
-    if (presentation !== "default") root.classList.add(`cv-search-picker--${presentation}`);
-    if (presentation === "people") root.classList.add("cv-search-picker--roster");
-    if (select.disabled)   root.classList.add("cv-search-picker--disabled");
-    if (isError)           root.classList.add("cv-search-picker--error");
+    const root = markRoot(el("div", `search-picker search-picker--${mode} search-picker--${variant}`));
+    if (presentation !== "default") root.classList.add(`search-picker--${presentation}`);
+    if (presentation === "people") root.classList.add("search-picker--roster");
+    if (select.disabled)   root.classList.add("search-picker--disabled");
+    if (isError)           root.classList.add("search-picker--error");
 
     const fieldLabel = select.dataset.pickerLabel || "";
     const fieldHint  = select.dataset.pickerHint  || "";
 
     /* Área de busca */
-    const field      = el("div",    "cv-search-picker__field");
-    const labelEl    = fieldLabel ? el("div", "cv-search-picker__label", fieldLabel) : null;
-    const hintEl     = fieldHint ? el("div", "cv-search-picker__hint", fieldHint) : null;
-    const control    = el("div",    "cv-search-picker__control");
-    const icon       = el("span",   "cv-search-picker__icon", "");
-    const input      = el("input",  "cv-search-picker__input");
-    const clearBtn   = el("button", "cv-search-picker__clear", "x");
-    const dropdown   = el("div",    "cv-search-picker__dropdown");
-    const list       = el("div",    "cv-search-picker__list");
-    const emptyEl    = el("div",    "cv-search-picker__empty", emptyMsg);
+    const field      = markPart(el("div",    "search-picker__field"),     "field");
+    const labelEl    = fieldLabel ? el("div", "search-picker__label", fieldLabel) : null;
+    const hintEl     = fieldHint ? el("div", "search-picker__hint", fieldHint) : null;
+    const control    = markPart(el("div",    "search-picker__control"),   "control");
+    const icon       = el("span",   "search-picker__icon", "");
+    const input      = markPart(el("input",  "search-picker__input"),     "input");
+    const clearBtn   = markPart(el("button", "search-picker__clear", "x"), "clear");
+    const dropdown   = markPart(el("div",    "search-picker__dropdown"),  "dropdown");
+    const list       = markPart(el("div",    "search-picker__list"),      "list");
+    const emptyEl    = markPart(el("div",    "search-picker__empty", emptyMsg), "empty");
 
     input.type         = "search";
     input.placeholder  = placeholder;
@@ -169,6 +216,44 @@
     input.setAttribute("aria-expanded", "false");
     input.setAttribute("aria-controls", listboxId);
     input.setAttribute("aria-autocomplete", "list");
+
+    /* HT-11 — o input criado aqui nao tinha nome acessivel.
+
+       O `<div class="search-picker__label">` logo abaixo *parece* rotulo,
+       mas `<div>` nao rotula nada: sem `aria-labelledby` ele e so texto ao
+       lado. E o `<label for>` que o Django emite aponta para o `<select>`
+       original, que esta em `display:none` — fora da arvore de acessibilidade.
+       Resultado medido no navegador: 1 campo sem nome em
+       `/cadastros/servidores/novo/` e 4 em `/termos/novo/`.
+
+       Tres fontes, nesta ordem, e a primeira que existir vence:
+         1. o rotulo que o proprio picker desenha (`data-picker-label`);
+         2. o `<label for>` da tela — `field.html` agora o mantem como
+            `.sr-only` justamente para este caso;
+         3. o `placeholder`, que e melhor que nada e nunca falta. */
+    const rotulos = [];
+    if (labelEl) {
+      labelEl.id = labelEl.id || `${baseId}-label`;
+      rotulos.push(labelEl.id);
+    } else if (select.id) {
+      const externo = document.querySelector(`label[for="${CSS.escape(select.id)}"]`);
+      if (externo) {
+        externo.id = externo.id || `${baseId}-label`;
+        rotulos.push(externo.id);
+      }
+    }
+    if (rotulos.length) {
+      input.setAttribute("aria-labelledby", rotulos.join(" "));
+    } else if (placeholder) {
+      input.setAttribute("aria-label", placeholder);
+    }
+
+    /* A dica tambem era so texto ao lado. Descricao, nao nome: entra por
+       `aria-describedby`, para ser lida depois do rotulo e nao no lugar dele. */
+    if (hintEl) {
+      hintEl.id = hintEl.id || `${baseId}-hint`;
+      input.setAttribute("aria-describedby", hintEl.id);
+    }
 
     clearBtn.type = "button";
     clearBtn.setAttribute("aria-label", "Limpar busca");
@@ -194,16 +279,16 @@
     const showPanel = mode === "multi" || variant === "detailed";
     let panel = null, grid = null, counter = null, panelEmpty = null, panelTitleEl = null;
     if (showPanel) {
-      panel      = el("section", "cv-search-picker__selected-panel");
-      grid       = el("div",  "cv-search-picker__selected-list");
-      panelEmpty = el("p",    "cv-search-picker__selected-empty", emptyPanelMsg);
+      panel      = markPart(el("section", "search-picker__selected-panel"), "selected-panel");
+      grid       = el("div",  "search-picker__selected-list");
+      panelEmpty = el("p",    "search-picker__selected-empty", emptyPanelMsg);
 
       if (presentation !== "people" && presentation !== "vehicle" && !hideSelectedHeader) {
-        const panelHeader = el("div", "cv-search-picker__selected-header");
-        panelTitleEl = el("h4", "cv-search-picker__selected-title", panelTitle);
+        const panelHeader = el("div", "search-picker__selected-header");
+        panelTitleEl = el("h4", "search-picker__selected-title", panelTitle);
         panelHeader.appendChild(panelTitleEl);
         if (mode === "multi") {
-          counter = el("span", "cv-search-picker__selected-count", "0");
+          counter = el("span", "search-picker__selected-count", "0");
           panelHeader.appendChild(counter);
         }
         panel.appendChild(panelHeader);
@@ -215,13 +300,13 @@
     select.insertAdjacentElement("afterend", root);
 
     /* Campo com botão de gerenciar (field.html): o botão nasce como irmão
-       do <select> dentro do wrapper .cv-field-with-action--manage-reveal.
-       Move para o `.cv-search-picker__field` (irmão do controle, não dentro
+       do <select> dentro do wrapper .field-with-action--manage-reveal.
+       Move para o `.search-picker__field` (irmão do controle, não dentro
        dele) para o mesmo padrão do cargo: encolhe no hover e revela a
        engrenagem à direita, sem competir com "Limpar busca" nem ficar
        centrado sobre o rótulo/dica. */
     const manageBtn = select.parentElement
-      ? select.parentElement.querySelector(":scope > .cv-icon-btn--field-manage")
+      ? select.parentElement.querySelector(":scope > .icon-btn--field-manage")
       : null;
     if (manageBtn) field.appendChild(manageBtn);
 
@@ -229,7 +314,7 @@
       window.CV.overlay && window.CV.overlay.attachDropdown
         ? window.CV.overlay.attachDropdown(dropdown, control)
         : null;
-    if (floatingMenu) root.classList.add("cv-search-picker--menu-portal");
+    if (floatingMenu) root.classList.add("search-picker--menu-portal");
 
     /* ── Helpers de estado ──────────────────────────────────────── */
 
@@ -285,7 +370,7 @@
     }
 
     function setHasQuery(val) {
-      root.classList.toggle("cv-search-picker--has-query", val);
+      root.classList.toggle("search-picker--has-query", val);
     }
 
     function setOpen(next) {
@@ -295,7 +380,7 @@
       isOpen = shouldOpen;
       dropdown.hidden = !isOpen;
       input.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      root.classList.toggle("cv-search-picker--open", isOpen);
+      root.classList.toggle("search-picker--open", isOpen);
       if (isOpen && floatingMenu) floatingMenu.reposition();
       renderResults();
     }
@@ -320,7 +405,7 @@
       if (!value) return false;
       input.value = value;
       query = value;
-      select.dispatchEvent(new CustomEvent("cv-search-picker:free-text-commit", {
+      select.dispatchEvent(new CustomEvent("search-picker:free-text-commit", {
         bubbles: true,
         detail: { value },
       }));
@@ -404,17 +489,18 @@
       const card = grid.querySelector('[data-value="' + CSS.escape(value) + '"]');
       if (!card) return;
 
-      card.classList.toggle("cv-search-picker__selected-card--has-term", enabled);
+      card.classList.toggle("search-picker__selected-card--has-term", enabled);
 
-      const toggle = card.querySelector(".cv-search-picker__term-control .cv-field-side-action");
+      const termControl = partOf(card, "term-control");
+      const toggle = termControl ? termControl.querySelector(".field-side-action") : null;
       if (toggle) {
         toggle.setAttribute("aria-pressed", enabled ? "true" : "false");
         toggle.textContent = presentation === "people"
           ? (enabled ? "Com termo" : "Sem termo")
           : (enabled ? "Gerar termo" : "Não gerar");
         toggle.setAttribute("aria-label", enabled ? "Não gerar termo de autorização" : "Gerar termo de autorização");
-        toggle.classList.toggle("cv-field-side-action--success", enabled);
-        toggle.classList.toggle("cv-field-side-action--danger", !enabled);
+        toggle.classList.toggle("field-side-action--success", enabled);
+        toggle.classList.toggle("field-side-action--danger", !enabled);
         toggle.classList.toggle("is-active",   enabled);
         toggle.classList.toggle("is-inactive", !enabled);
       }
@@ -422,15 +508,15 @@
 
     function updateDriverControls() {
       if (!grid) return;
-      grid.querySelectorAll(".cv-search-picker__driver-toggle").forEach((button) => {
+      partsOf(grid, "driver-toggle").forEach((button) => {
         const active = button.dataset.value === driverValue;
-        const card = button.closest(".cv-search-picker__selected-card");
-        const text = button.querySelector(".cv-search-picker__driver-text");
+        const card = closestPart(button, "selected-card");
+        const text = partOf(button, "driver-text");
         button.setAttribute("aria-pressed", active ? "true" : "false");
-        button.classList.toggle("cv-search-picker__driver-toggle--active", active);
+        button.classList.toggle("search-picker__driver-toggle--active", active);
         if (card) {
-          card.classList.toggle("cv-search-picker__selected-card--driver", active);
-          const surface = card.querySelector(".cv-search-picker__driver-surface");
+          card.classList.toggle("search-picker__selected-card--driver", active);
+          const surface = partOf(card, "driver-surface");
           if (surface) {
             surface.setAttribute("aria-pressed", active ? "true" : "false");
             surface.setAttribute(
@@ -460,23 +546,23 @@
     /* ── Render: Resultados do dropdown ─────────────────────────── */
 
     function renderOptionItem(item, index) {
-      const btn    = el("button", "cv-search-picker__option");
-      const marker = el("span",   "cv-search-picker__option-marker", "");
-      const visual = el("span",   "cv-search-picker__option-visual", "");
-      const body   = el("div",    "cv-search-picker__option-content");
-      const status = el("span",   "cv-search-picker__option-status", "");
+      const btn    = markPart(el("button", "search-picker__option"), "option");
+      const marker = el("span",   "search-picker__option-marker", "");
+      const visual = el("span",   "search-picker__option-visual", "");
+      const body   = el("div",    "search-picker__option-content");
+      const status = el("span",   "search-picker__option-status", "");
       const isVehicle = presentation === "vehicle";
       const isPerson = !isVehicle && (presentation === "people" || !!item.cargo || !!item.cpf || !!item.rg);
       const primaryText = (isPerson || isVehicle) ? item.label : (item.main || item.label);
-      const main   = el("span",   "cv-search-picker__option-main", primaryText);
+      const main   = el("span",   "search-picker__option-main", primaryText);
       let metaText = item.meta;
 
       if (isPerson) {
-        btn.classList.add("cv-search-picker__option--person");
+        btn.classList.add("search-picker__option--person");
         visual.textContent = initialsFromLabel(item.label);
         metaText = uniqueTextParts([item.cargo, item.unidade]).join(" • ") || "Servidor cadastrado";
       } else if (isVehicle) {
-        btn.classList.add("cv-search-picker__option--vehicle");
+        btn.classList.add("search-picker__option--vehicle");
         visual.textContent = "V";
         metaText = item.cargo || item.meta;
       } else if (item.kind === "unidade") {
@@ -489,10 +575,10 @@
       btn.dataset.value = item.value;
       btn.setAttribute("role", "option");
       btn.setAttribute("aria-selected", item.selected ? "true" : "false");
-      btn.classList.toggle("cv-search-picker__option--active", index === activeIndex);
-      btn.classList.toggle("cv-search-picker__option--selected", item.selected);
+      btn.classList.toggle("search-picker__option--active", index === activeIndex);
+      btn.classList.toggle("search-picker__option--selected", item.selected);
       if (item.kind === "unidade") {
-        btn.classList.add("cv-search-picker__option--unidade");
+        btn.classList.add("search-picker__option--unidade");
       }
 
       visual.setAttribute("aria-hidden", "true");
@@ -503,10 +589,10 @@
 
       body.appendChild(main);
       if (item.rascunho) {
-        main.appendChild(el("span", "cv-chip cv-chip--warning cv-chip--compact", "Rascunho"));
+        main.appendChild(el("span", "chip chip--warning chip--compact", "Rascunho"));
       }
       if (metaText) {
-        body.appendChild(el("span", "cv-search-picker__option-meta", metaText));
+        body.appendChild(el("span", "search-picker__option-meta", metaText));
       }
 
       btn.appendChild(marker);
@@ -532,17 +618,17 @@
 
     function buildTermControl(value) {
       const enabled = selectedForTerm.has(value);
-      const row    = el("div",  "cv-search-picker__term-control");
-      const label  = el("span", "cv-search-picker__term-label", "Termo de Autorizacao");
+      const row    = markPart(el("div",  "search-picker__term-control"), "term-control");
+      const label  = el("span", "search-picker__term-label", "Termo de Autorizacao");
 
-      /* Reutiliza o padrão cv-field-side-action--state (dot colorido + filled bg)
+      /* Reutiliza o padrão field-side-action--state (dot colorido + filled bg)
          usado nos demais toggles binários do sistema (ex: Possui RG). */
       const stateClass = enabled
-        ? "cv-field-side-action--success is-active"
-        : "cv-field-side-action--danger is-inactive";
+        ? "field-side-action--success is-active"
+        : "field-side-action--danger is-inactive";
       const toggle = el(
         "button",
-        "cv-field-side-action cv-field-side-action--toggle cv-field-side-action--state " + stateClass,
+        "field-side-action field-side-action--toggle field-side-action--state " + stateClass,
         presentation === "people"
           ? (enabled ? "Com termo" : "Sem termo")
           : (enabled ? "Gerar termo" : "Não gerar"),
@@ -564,20 +650,20 @@
 
     function buildDriverControl(item) {
       const active = driverValue === item.value;
-      const row = el("div", "cv-search-picker__driver-control");
-      const button = el("button", "cv-search-picker__driver-toggle");
-      const marker = el("span", "cv-search-picker__driver-marker", "");
-      const text = el(
+      const row = el("div", "search-picker__driver-control");
+      const button = markPart(el("button", "search-picker__driver-toggle"), "driver-toggle");
+      const marker = el("span", "search-picker__driver-marker", "");
+      const text = markPart(el(
         "span",
-        "cv-search-picker__driver-text",
+        "search-picker__driver-text",
         presentation === "people" ? (active ? "Motorista" : "Definir motorista") : "Este servidor e o motorista",
-      );
+      ), "driver-text");
 
       button.type = "button";
       button.dataset.value = item.value;
       button.setAttribute("aria-pressed", active ? "true" : "false");
       button.setAttribute("aria-label", (active ? "Desmarcar " : "Marcar ") + item.label + " como motorista");
-      button.classList.toggle("cv-search-picker__driver-toggle--active", active);
+      button.classList.toggle("search-picker__driver-toggle--active", active);
       button.addEventListener("click", () => setDriverValue(driverValue === item.value ? "" : item.value));
 
       button.appendChild(marker);
@@ -588,7 +674,7 @@
 
     function buildDriverSurface(item) {
       const active = driverValue === item.value;
-      const button = el("button", "cv-search-picker__driver-surface");
+      const button = markPart(el("button", "search-picker__driver-surface"), "driver-surface");
       button.type = "button";
       button.dataset.value = item.value;
       button.dataset.label = item.label;
@@ -604,30 +690,30 @@
     /* ── Render: Cards selecionados ─────────────────────────────── */
 
     function buildCard(item) {
-      const card = el("div", "cv-search-picker__selected-card");
+      const card = markPart(el("div", "search-picker__selected-card"), "selected-card");
       card.dataset.value = item.value;
 
       if (presentation === "people" || item.cpf || item.rg) {
-        card.classList.add("cv-search-picker__selected-card--person");
+        card.classList.add("search-picker__selected-card--person");
       } else if (presentation === "vehicle") {
-        card.classList.add("cv-search-picker__selected-card--vehicle");
+        card.classList.add("search-picker__selected-card--vehicle");
       }
 
-      const body  = el("div", "cv-search-picker__selected-main");
-      const title = el("div", "cv-search-picker__selected-title-row");
+      const body  = el("div", "search-picker__selected-main");
+      const title = markPart(el("div", "search-picker__selected-title-row"), "selected-title-row");
 
       if (presentation === "people") {
-        const name = el("span", "cv-search-picker__selected-name", item.label);
+        const name = el("span", "search-picker__selected-name", item.label);
         title.appendChild(name);
-        if (showDriverCtrl || allAsDrivers) title.appendChild(el("span", "cv-search-picker__driver-chip", "Motorista"));
-        if (item.rascunho) title.appendChild(el("span", "cv-chip cv-chip--warning cv-chip--compact", "Rascunho"));
+        if (showDriverCtrl || allAsDrivers) title.appendChild(el("span", "search-picker__driver-chip", "Motorista"));
+        if (item.rascunho) title.appendChild(el("span", "chip chip--warning chip--compact", "Rascunho"));
         body.appendChild(title);
 
         const infoParts = [];
         if (item.cargo) infoParts.push(item.cargo);
         if (item.unidade) infoParts.push(item.unidade);
         if (infoParts.length) {
-          body.appendChild(el("span", "cv-search-picker__selected-meta", infoParts.join("  •  ")));
+          body.appendChild(el("span", "search-picker__selected-meta", infoParts.join("  •  ")));
         }
       } else if (variant === "detailed") {
         /* ── Layout detalhado ──────────────────────────────────────
@@ -635,15 +721,15 @@
            Linha 2: Cargo • CPF • RG (sem máscara)
         ─────────────────────────────────────────────────────────── */
         const nameParts = [item.label, item.unidade].filter(Boolean);
-        const name = el("span", "cv-search-picker__selected-name", nameParts.join("  •  "));
+        const name = el("span", "search-picker__selected-name", nameParts.join("  •  "));
         title.appendChild(name);
-        if (showDriverCtrl) title.appendChild(el("span", "cv-search-picker__driver-chip", "Motorista"));
-        if (item.rascunho) title.appendChild(el("span", "cv-chip cv-chip--warning cv-chip--compact", "Rascunho"));
+        if (showDriverCtrl) title.appendChild(el("span", "search-picker__driver-chip", "Motorista"));
+        if (item.rascunho) title.appendChild(el("span", "chip chip--warning chip--compact", "Rascunho"));
         body.appendChild(title);
 
         const metaParts = [item.cargo, item.cpf, item.rg].filter(Boolean);
         if (metaParts.length) {
-          body.appendChild(el("span", "cv-search-picker__selected-meta", metaParts.join("  •  ")));
+          body.appendChild(el("span", "search-picker__selected-meta", metaParts.join("  •  ")));
         }
       } else {
         /* ── Layout compacto ───────────────────────────────────────
@@ -651,33 +737,33 @@
            Linha 2: Cargo • Unidade
            Linha 3 (detail): CPF mascarado • RG mascarado
         ─────────────────────────────────────────────────────────── */
-        const name = el("span", "cv-search-picker__selected-name", item.label);
+        const name = el("span", "search-picker__selected-name", item.label);
         title.appendChild(name);
-        if (showDriverCtrl) title.appendChild(el("span", "cv-search-picker__driver-chip", "Motorista"));
-        if (item.rascunho) title.appendChild(el("span", "cv-chip cv-chip--warning cv-chip--compact", "Rascunho"));
+        if (showDriverCtrl) title.appendChild(el("span", "search-picker__driver-chip", "Motorista"));
+        if (item.rascunho) title.appendChild(el("span", "chip chip--warning chip--compact", "Rascunho"));
         body.appendChild(title);
 
         const metaParts = [item.cargo, item.unidade].filter(Boolean);
         const metaText = metaParts.length
           ? metaParts.join(" • ")
           : (item.meta || "Dados complementares nao informados");
-        body.appendChild(el("span", "cv-search-picker__selected-meta", metaText));
+        body.appendChild(el("span", "search-picker__selected-meta", metaText));
 
         const detailParts = [];
         if (item.cpf) detailParts.push("CPF: " + maskDocument(item.cpf, "cpf"));
         if (item.rg)  detailParts.push("RG: "  + maskDocument(item.rg, "rg"));
         if (detailParts.length) {
-          body.appendChild(el("span", "cv-search-picker__selected-detail", detailParts.join("  •  ")));
+          body.appendChild(el("span", "search-picker__selected-detail", detailParts.join("  •  ")));
         }
       }
 
-      const removeBtn = el("button", "cv-search-picker__remove", presentation !== "default" ? "×" : "x");
+      const removeBtn = markPart(el("button", "search-picker__remove", presentation !== "default" ? "×" : "x"), "remove");
       removeBtn.type = "button";
       removeBtn.setAttribute("aria-label", "Remover " + item.label);
       removeBtn.addEventListener("click", () => removeItem(item.value));
 
       card.classList.toggle(
-        "cv-search-picker__selected-card--driver",
+        "search-picker__selected-card--driver",
         allAsDrivers || driverValue === item.value,
       );
 
@@ -689,8 +775,8 @@
           .join("")
           .slice(0, 2)
           .toUpperCase();
-        const avatar = el("span", "cv-search-picker__selected-avatar", initials || "•");
-        const actions = el("div", "cv-search-picker__selected-actions");
+        const avatar = el("span", "search-picker__selected-avatar", initials || "•");
+        const actions = el("div", "search-picker__selected-actions");
         avatar.setAttribute("aria-hidden", "true");
         actions.setAttribute("role", "group");
         actions.setAttribute("aria-label", "Ações de " + item.label);
@@ -699,13 +785,13 @@
         card.appendChild(avatar);
         card.appendChild(body);
         if (showDriverCtrl) {
-          card.classList.add("cv-search-picker__selected-card--with-driver");
+          card.classList.add("search-picker__selected-card--with-driver");
           actions.appendChild(buildDriverControl(item));
         }
         if (showTermCtrl) {
-          card.classList.add("cv-search-picker__selected-card--with-term");
+          card.classList.add("search-picker__selected-card--with-term");
           actions.appendChild(buildTermControl(item.value));
-          card.classList.toggle("cv-search-picker__selected-card--has-term", selectedForTerm.has(item.value));
+          card.classList.toggle("search-picker__selected-card--has-term", selectedForTerm.has(item.value));
         }
         actions.appendChild(removeBtn);
         card.appendChild(actions);
@@ -715,11 +801,11 @@
       if (presentation === "vehicle") {
         const plate = String(item.label || "").split(/\s*[-–]\s*/)[0].replace(/[^A-Za-z0-9]/g, "");
         const initials = (plate.slice(0, 2) || "V").toUpperCase();
-        const avatar = el("span", "cv-search-picker__selected-avatar", initials);
+        const avatar = el("span", "search-picker__selected-avatar", initials);
         avatar.setAttribute("aria-hidden", "true");
-        const titleRow = body.querySelector(".cv-search-picker__selected-title-row");
+        const titleRow = partOf(body, "selected-title-row");
         if (titleRow) {
-          titleRow.appendChild(el("span", "cv-search-picker__vehicle-chip", "Viatura"));
+          titleRow.appendChild(el("span", "search-picker__vehicle-chip", "Viatura"));
         }
         card.appendChild(avatar);
         card.appendChild(body);
@@ -732,14 +818,14 @@
 
       /* Controle de Termo */
       if (showTermCtrl) {
-        card.classList.add("cv-search-picker__selected-card--with-term");
+        card.classList.add("search-picker__selected-card--with-term");
         card.appendChild(buildTermControl(item.value));
-        card.classList.toggle("cv-search-picker__selected-card--has-term", selectedForTerm.has(item.value));
+        card.classList.toggle("search-picker__selected-card--has-term", selectedForTerm.has(item.value));
       }
 
       /* Botão de motorista — apenas quando explicitamente habilitado */
       if (showDriverCtrl) {
-        card.classList.add("cv-search-picker__selected-card--with-driver");
+        card.classList.add("search-picker__selected-card--with-driver");
         card.appendChild(buildDriverControl(item));
       }
 
@@ -797,11 +883,6 @@
 
     input.addEventListener("keydown", (e) => {
       const visible = filteredItems();
-      if (e.key === "Escape") {
-        e.preventDefault();
-        setOpen(false);
-        return;
-      }
       if (e.key === "Enter") {
         e.preventDefault();
         const item = visible[Math.max(activeIndex, 0)];
@@ -824,9 +905,20 @@
       }
     });
 
-    /* Fecha dropdown ao clicar fora */
-    document.addEventListener("click", (e) => {
-      if (!root.contains(e.target) && e.target !== select) setOpen(false);
+    /* JS-07 — clique externo e Escape compartilham o contrato de overlay.
+       O dropdown não entra em `inside`: preserva o comportamento anterior do
+       picker, cujo listener considerava apenas a raiz e o select nativo. */
+    const dismissBinding = window.CV.overlay.attachDismiss({
+      inside: [root, select],
+      isOpen: () => isOpen,
+      escapeWhen: (e) => e.target === input,
+      onDismiss: () => setOpen(false),
+    });
+    instancias.push({
+      root,
+      desmontar() {
+        dismissBinding.destroy();
+      },
     });
 
     /* Sincroniza quando o select nativo muda externamente */
@@ -874,20 +966,45 @@
     init(document);
   }
 
+  /* JS-02 — o registry chama isto quando um nó sai do DOM. Desmonta só os
+     pickers que viviam dentro do nó removido; os demais seguem intactos. */
+  function destroy(scope) {
+    if (!scope || (scope.nodeType !== 1 && scope.nodeType !== 9)) return;
+    for (let i = instancias.length - 1; i >= 0; i -= 1) {
+      const { root, desmontar } = instancias[i];
+      if (scope === root || (scope.contains && scope.contains(root))) {
+        desmontar();
+        instancias.splice(i, 1);
+      }
+    }
+  }
+
   window.CV = window.CV || {};
   window.CV.picker = {
     boot,
     init,
     initSearch: init,
+    /* JS-06 — o contrato para quem consome o picker de fora. Nenhum
+       consumidor deve conhecer a classe CSS do componente. */
+    rootFor,
+    part: partOf,
+    parts: partsOf,
+    closestPart,
     registerRenderer(renderer) {
       if (typeof renderer === "function" && !renderers.includes(renderer)) {
         renderers.push(renderer);
+        /* O bundle de formulario e carregado depois do shell. Nesse caminho o
+           primeiro passe do enhancer ja aconteceu quando o renderer de select
+           se registra; esperar outra mutacao deixa o <select multiple> nativo
+           visivel indefinidamente. Inicialize o DOM existente no registro e
+           mantenha o fluxo normal para nos inseridos depois. */
+        if (document.readyState !== "loading") renderer(document);
       }
     },
   };
 
   if (typeof window.CV.registerEnhancer === "function") {
-    window.CV.registerEnhancer("picker", init);
+    window.CV.registerEnhancer("picker", init, destroy);
   } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", boot);
   } else {

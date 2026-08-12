@@ -1,4 +1,4 @@
-﻿from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.test import override_settings
 from django.urls import reverse
@@ -9,14 +9,17 @@ from cadastros.models import Estado
 from cadastros.models import Servidor
 from cadastros.models import Unidade
 from cadastros.models import Viatura
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 @override_settings(ALLOWED_HOSTS=["testserver", "localhost"])
 class UnidadeCrudTests(TestCase):
     def setUp(self):
         user_model = get_user_model()
-        self.user = user_model.objects.create_user(username="teste-unidade", password="senha-teste")
+        self.user = user_model.objects.create_user(username="teste-unidade")
         self.client.force_login(self.user)
+        vincular_area(self.user)
 
     def test_get_listagem_unidades_retorna_200(self):
         response = self.client.get(reverse("cadastros:unidades_index"))
@@ -36,16 +39,16 @@ class UnidadeCrudTests(TestCase):
         self.assertEqual(unidade.sigla, "SEC")
 
     def test_post_exclusao_unidade_com_vinculo_bloqueia_exclusao(self):
-        unidade = Unidade.objects.create(nome="Unidade A", sigla="UA")
-        Servidor.objects.create(nome="SERVIDOR A", unidade=unidade)
+        unidade = Unidade.objects.create(area=area_de_teste(), nome="Unidade A", sigla="UA")
+        Servidor.objects.create(area=area_de_teste(), nome="SERVIDOR A", unidade=unidade)
         response = self.client.post(reverse("cadastros:unidade_delete", args=[unidade.pk]))
         self.assertRedirects(response, reverse("cadastros:unidades_index"))
         self.assertTrue(Unidade.objects.filter(pk=unidade.pk).exists())
 
     def test_post_exclusao_unidade_com_viatura_bloqueia_exclusao(self):
-        unidade = Unidade.objects.create(nome="Unidade B", sigla="UB")
-        combustivel = Combustivel.objects.create(nome="GASOLINA")
-        Viatura.objects.create(
+        unidade = Unidade.objects.create(area=area_de_teste(), nome="Unidade B", sigla="UB")
+        combustivel = Combustivel.objects.create(area=area_de_teste(), nome="GASOLINA")
+        Viatura.objects.create(area=area_de_teste(), 
             placa="ZZZ0001",
             combustivel=combustivel,
             tipo=Viatura.TIPO_CARACTERIZADA,
@@ -60,8 +63,9 @@ class UnidadeCrudTests(TestCase):
 class CidadeCrudTests(TestCase):
     def setUp(self):
         user_model = get_user_model()
-        self.user = user_model.objects.create_user(username="teste-cidade", password="senha-teste")
+        self.user = user_model.objects.create_user(username="teste-cidade")
         self.client.force_login(self.user)
+        vincular_area(self.user)
         self.estado_pr, _ = Estado.objects.get_or_create(sigla="PR", defaults={"nome": "PARANA"})
 
     def test_get_listagem_cidades_retorna_200(self):

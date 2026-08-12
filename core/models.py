@@ -2,6 +2,8 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
+from core.managers import AreaScopedManager
+
 
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(default=timezone.now, editable=False)
@@ -60,12 +62,39 @@ class AuditEvent(models.Model):
     request_id = models.CharField(max_length=64, blank=True, default="", db_index=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita
+    # para código que precisa enxergar todas. `default_manager_name` mantém o admin,
+    # as relações reversas e `validate_unique` irrestritos — ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["-created_at", "-pk"]
         indexes = [
             models.Index(
                 fields=["model_label", "object_id", "-created_at"],
                 name="core_audit_object_idx",
+            ),
+            # `DB-12`: o eixo que faltava — área cruzada com período. O único
+            # leitor da trilha é o admin do Django (`core/admin.py`), que filtra
+            # por `area` e herda o `ordering` acima.
+            #
+            # **A medição não justifica este índice na escala de hoje, e isso
+            # está dito de propósito.** Com 60.000 eventos, o planner só passa a
+            # escolhê-lo quando a área fica seletiva o bastante:
+            #
+            #       3 áreas   0,30 → 0,26 ms   1,1x   não usa o índice
+            #      20 áreas   0,49 → 0,47 ms   1,0x   não usa o índice
+            #     100 áreas   1,51 → 0,08 ms  18,4x   usa (buffers 1720 → 103)
+            #
+            # Entrou por decisão do usuário em 08/08/2026, como folga de
+            # crescimento: o número de áreas em produção não é observável daqui.
+            # Se a trilha ficar cara de escrever antes de as áreas crescerem, a
+            # remoção é uma migração de uma linha.
+            models.Index(
+                fields=["area", "-created_at", "-id"],
+                name="core_audit_area_periodo_idx",
             ),
         ]
 

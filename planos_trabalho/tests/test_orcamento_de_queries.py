@@ -25,6 +25,8 @@ from planos_trabalho.models import EventoPlano
 from planos_trabalho.models import PlanoDestino
 from planos_trabalho.models import PlanoTrabalho
 from planos_trabalho.models import ProgramaSolicitante
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class OrcamentoDeQueriesPlanoTrabalhoTests(TestCase):
@@ -32,13 +34,13 @@ class OrcamentoDeQueriesPlanoTrabalhoTests(TestCase):
     def setUpTestData(cls):
         estado = Estado.objects.create(nome="Parana", sigla="PR")
         cidade = Cidade.objects.create(nome="Curitiba", estado=estado, uf="PR")
-        cargo = Cargo.objects.create(nome="Investigador")
-        unidade = Unidade.objects.create(nome="Unidade", sigla="UN")
-        programa = ProgramaSolicitante.objects.create(nome="Programa", ordem=1)
+        cargo = Cargo.objects.create(area=area_de_teste(), nome="Investigador")
+        unidade = Unidade.objects.create(area=area_de_teste(), nome="Unidade", sigla="UN")
+        programa = ProgramaSolicitante.objects.create(area=area_de_teste(), nome="Programa", ordem=1)
 
         inicio = timezone.localdate() - timedelta(days=3)
         for numero in range(1, 26):
-            plano = PlanoTrabalho.objects.create(
+            plano = PlanoTrabalho.objects.create(area=area_de_teste(), 
                 numero=numero,
                 ano=2026,
                 programa=programa,
@@ -70,6 +72,7 @@ class OrcamentoDeQueriesPlanoTrabalhoTests(TestCase):
     def setUp(self):
         user = get_user_model().objects.create_user(username="pt_orcamento")
         self.client.force_login(user)
+        vincular_area(user)
         # Aquecimento: singleton de configuracao e sessao nao sao da tela medida.
         self.client.get(reverse("planos_trabalho:index") + "?aba=atuais")
 
@@ -115,6 +118,13 @@ class OrcamentoDeQueriesPlanoTrabalhoTests(TestCase):
     # efetivo proprio). O fixture magro que eu tinha antes dava 16/16/21 e nao
     # exercitava os `prefetch_related` — foi exatamente essa cegueira que
     # escondeu o `NOVO-13`.
-    QUERIES_LISTA = 20
-    QUERIES_LISTA_BUSCA = 20
-    QUERIES_WIZARD = 23
+
+    # `PF-03` (07/08/2026): a sessão saiu do caminho de escrita de toda requisição
+    # (`cached_db` + `SESSION_SAVE_EVERY_REQUEST = False` + renovação periódica).
+    # Em regime, some 1 leitura + 1 escrita + 2 comandos de transação = **-4**.
+    # Onde o corte é **-1**, o teste mede a **primeira** requisição depois do
+    # login: ali `core/tenancy.py:52` grava a área na sessão, que por isso é
+    # salva de qualquer jeito, e só a leitura é economizada.
+    QUERIES_LISTA = 16
+    QUERIES_LISTA_BUSCA = 16
+    QUERIES_WIZARD = 19

@@ -1,3 +1,5 @@
+import json
+
 from urllib.parse import urlencode
 
 from django.contrib.auth import get_user_model
@@ -7,12 +9,15 @@ from django.urls import reverse
 from justificativas.models import Justificativa
 from justificativas.models import ModeloJustificativa
 from oficios.models import Oficio
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class ModelosJustificativaCrudTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="j_test", password="x")
         self.client.force_login(self.user)
+        vincular_area(self.user)
 
     def test_listagem_200(self):
         r = self.client.get(reverse("justificativas:modelos_index"))
@@ -27,7 +32,7 @@ class ModelosJustificativaCrudTests(TestCase):
         self.assertContains(r, "Novo modelo")
         self.assertContains(r, 'name="nome"')
         self.assertContains(r, 'name="texto"')
-        self.assertContains(r, "cv-floating-action")
+        self.assertContains(r, "floating-action")
         self.assertContains(r, "Voltar para as justificativas")
         self.assertContains(r, reverse("justificativas:index"))
 
@@ -53,7 +58,7 @@ class ModelosJustificativaCrudTests(TestCase):
 
     def test_criar_e_lista(self):
         r = self.client.post(
-            reverse("justificativas:modelo_novo"),
+            reverse("justificativas:modelo_create"),
             data={"nome": "MODELO A", "texto": "Texto base", "is_padrao": "on"},
         )
         self.assertEqual(r.status_code, 302)
@@ -61,11 +66,17 @@ class ModelosJustificativaCrudTests(TestCase):
         r2 = self.client.get(reverse("justificativas:modelos_index"))
         self.assertContains(r2, "MODELO A")
 
+    def test_rota_legada_com_pk_redireciona_sem_erro(self):
+        response = self.client.get(reverse("justificativas:legacy_modelo_update", args=[1]))
+
+        self.assertRedirects(response, reverse("justificativas:modelos_index"))
+
 
 class JustificativasQuickAddTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="j_quick", password="x")
         self.client.force_login(self.user)
+        vincular_area(self.user)
 
     def test_index_renderiza_quick_add(self):
         response = self.client.get(reverse("justificativas:index"))
@@ -77,21 +88,27 @@ class JustificativasQuickAddTests(TestCase):
         self.assertContains(response, "Buscar ofício vinculado")
         self.assertContains(response, reverse("justificativas:modelos_index"))
 
-    def test_oficios_summary_ordena_pelo_ultimo_criado(self):
-        antigo = Oficio.objects.create(numero=150, ano=2026, data_criacao="2026-08-01")
-        recente = Oficio.objects.create(numero=5, ano=2026, data_criacao="2026-05-01")
+    def test_a_busca_de_oficios_ordena_pelo_ultimo_criado(self):
+        """A ordem é por `created_at`, não por `data_criacao` — o fixture inverte
+        os dois de propósito para que trocar um pelo outro reprove aqui.
+
+        `NOVO-07`: a lista deixou de vir no `json_script` da página e passou a vir
+        do endpoint de busca. A ordem é a mesma, e é isto que prova.
+        """
+        antigo = Oficio.objects.create(area=area_de_teste(), numero=150, ano=2026, data_criacao="2026-08-01")
+        recente = Oficio.objects.create(area=area_de_teste(), numero=5, ano=2026, data_criacao="2026-05-01")
         Oficio.objects.filter(pk=antigo.pk).update(created_at="2026-07-01 12:00:00+00:00")
         Oficio.objects.filter(pk=recente.pk).update(created_at="2026-08-01 18:00:00+00:00")
 
-        response = self.client.get(reverse("justificativas:index"))
-        summaries = response.context["oficios_summary"]
-        ordered = sorted(summaries.values(), key=lambda item: item["order"])
-        self.assertEqual([item["id"] for item in ordered[:2]], [recente.pk, antigo.pk])
+        response = self.client.get(reverse("justificativas:api_buscar_oficios"))
+        resultados = json.loads(response.content)["resultados"]
+
+        self.assertEqual([item["id"] for item in resultados[:2]], [recente.pk, antigo.pk])
 
     def test_quick_add_cria_justificativa_para_varios_oficios(self):
-        oficio_a = Oficio.objects.create(numero=1, ano=2026, data_criacao="2026-05-10")
-        oficio_b = Oficio.objects.create(numero=2, ano=2026, data_criacao="2026-05-10")
-        modelo = ModeloJustificativa.objects.create(nome="PADRAO", texto="Texto modelo")
+        oficio_a = Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, data_criacao="2026-05-10")
+        oficio_b = Oficio.objects.create(area=area_de_teste(), numero=2, ano=2026, data_criacao="2026-05-10")
+        modelo = ModeloJustificativa.objects.create(area=area_de_teste(), nome="PADRAO", texto="Texto modelo")
 
         response = self.client.post(
             reverse("justificativas:index"),

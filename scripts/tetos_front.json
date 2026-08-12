@@ -1,0 +1,529 @@
+{
+  "schema_version": 1,
+  "css_by_route": {
+    "direction": "up",
+    "routes": {
+      "login": {
+        "usage_percent_min": 55.8871
+      },
+      "dashboard": {
+        "usage_percent_min": 11.6626
+      },
+      "oficios-lista": {
+        "usage_percent_min": 13.5703
+      },
+      "oficios-novo": {
+        "usage_percent_min": 11.3879
+      },
+      "oficios-detalhe": {
+        "usage_percent_min": 17.7477
+      },
+      "oficios-editar": {
+        "usage_percent_min": 17.7477
+      },
+      "oficios-wizard-dados-viajantes": {
+        "usage_percent_min": 17.7477
+      },
+      "oficios-wizard-transporte": {
+        "usage_percent_min": 14.6734
+      },
+      "oficios-wizard-roteiro": {
+        "usage_percent_min": 18.8783
+      },
+      "oficios-wizard-justificativa": {
+        "usage_percent_min": 13.9022
+      },
+      "oficios-wizard-resumo": {
+        "usage_percent_min": 14.1335
+      },
+      "oficios-wizard-documentos": {
+        "usage_percent_min": 14.1335
+      },
+      "eventos-lista": {
+        "usage_percent_min": 11.947
+      },
+      "oficios-modelos-motivo-lista": {
+        "usage_percent_min": 13.6099
+      },
+      "oficios-modelos-motivo-novo": {
+        "usage_percent_min": 13.6099
+      },
+      "oficios-modelos-motivo-editar": {
+        "usage_percent_min": 13.6099
+      },
+      "roteiros-lista": {
+        "usage_percent_min": 13.2356
+      },
+      "roteiros-novo": {
+        "usage_percent_min": 18.7357
+      },
+      "prestacoes-contas-lista": {
+        "usage_percent_min": 13.5706
+      },
+      "roteiros-editar": {
+        "usage_percent_min": 19.2897
+      },
+      "termos-lista": {
+        "usage_percent_min": 12.7695
+      },
+      "termos-preview-oficio": {
+        "usage_percent_min": 11.3369
+      },
+      "justificativas-lista": {
+        "usage_percent_min": 11.1003
+      },
+      "justificativas-novo": {
+        "usage_percent_min": 13.6099
+      },
+      "justificativas-editar": {
+        "usage_percent_min": 13.6099
+      },
+      "planos-trabalho-lista": {
+        "usage_percent_min": 13.3951
+      },
+      "ordens-servico-lista": {
+        "usage_percent_min": 13.388
+      },
+      "configuracao": {
+        "usage_percent_min": 15.1686
+      },
+      "servidores-lista": {
+        "usage_percent_min": 13.6454
+      },
+      "servidor-novo": {
+        "usage_percent_min": 16.0602
+      },
+      "servidor-editar": {
+        "usage_percent_min": 16.0725
+      },
+      "viaturas-lista": {
+        "usage_percent_min": 13.6454
+      },
+      "viatura-nova": {
+        "usage_percent_min": 16.3042
+      },
+      "viatura-editar": {
+        "usage_percent_min": 16.8073
+      },
+      "unidades-lista": {
+        "usage_percent_min": 13.5567
+      },
+      "unidade-nova": {
+        "usage_percent_min": 13.5567
+      },
+      "unidade-editar": {
+        "usage_percent_min": 13.5567
+      },
+      "cargos-lista": {
+        "usage_percent_min": 13.5224
+      },
+      "cargo-novo": {
+        "usage_percent_min": 13.5224
+      },
+      "cargo-editar": {
+        "usage_percent_min": 13.5224
+      },
+      "combustiveis-lista": {
+        "usage_percent_min": 13.4793
+      },
+      "combustivel-novo": {
+        "usage_percent_min": 13.4793
+      },
+      "combustivel-editar": {
+        "usage_percent_min": 13.4793
+      }
+    }
+  },
+  "theme_divergence": {
+    "direction": "down",
+    "routes": {
+      "login@1440": {
+        "differences_max": 48
+      },
+      "dashboard@1440": {
+        "differences_max": 1125
+      },
+      "oficios-lista@1440": {
+        "differences_max": 2290
+      },
+      "oficios-novo@1440": {
+        "differences_max": 748
+      },
+      "oficios-detalhe@1440": {
+        "differences_max": 3897
+      },
+      "oficios-editar@1440": {
+        "differences_max": 3897
+      },
+      "oficios-wizard-dados-viajantes@1440": {
+        "differences_max": 3897
+      },
+      "oficios-wizard-transporte@1440": {
+        "differences_max": 1654
+      },
+      "oficios-wizard-roteiro@1440": {
+        "differences_max": 6486
+      },
+      "oficios-wizard-justificativa@1440": {
+        "differences_max": 1786
+      },
+      "oficios-wizard-resumo@1440": {
+        "differences_max": 2744
+      },
+      "oficios-wizard-documentos@1440": {
+        "differences_max": 2744
+      },
+      "eventos-lista@1440": {
+        "differences_max": 2140
+      },
+      "oficios-modelos-motivo-lista@1440": {
+        "differences_max": 1097
+      },
+      "oficios-modelos-motivo-novo@1440": {
+        "differences_max": 1097
+      },
+      "oficios-modelos-motivo-editar@1440": {
+        "differences_max": 1097
+      },
+      "roteiros-lista@1440": {
+        "differences_max": 1481
+      },
+      "roteiros-novo@1440": {
+        "differences_max": 4821
+      },
+      "prestacoes-contas-lista@1440": {
+        "differences_max": 2651
+      },
+      "roteiros-editar@1440": {
+        "differences_max": 5647
+      },
+      "termos-lista@1440": {
+        "differences_max": 1652
+      },
+      "termos-preview-oficio@1440": {
+        "differences_max": 953
+      },
+      "justificativas-lista@1440": {
+        "differences_max": 1560
+      },
+      "justificativas-novo@1440": {
+        "differences_max": 1087
+      },
+      "justificativas-editar@1440": {
+        "differences_max": 1087
+      },
+      "planos-trabalho-lista@1440": {
+        "differences_max": 2108
+      },
+      "ordens-servico-lista@1440": {
+        "differences_max": 1823
+      },
+      "configuracao@1440": {
+        "differences_max": 1652
+      },
+      "servidores-lista@1440": {
+        "differences_max": 1063
+      },
+      "servidor-novo@1440": {
+        "differences_max": 1722
+      },
+      "servidor-editar@1440": {
+        "differences_max": 1720
+      },
+      "viaturas-lista@1440": {
+        "differences_max": 1069
+      },
+      "viatura-nova@1440": {
+        "differences_max": 2240
+      },
+      "viatura-editar@1440": {
+        "differences_max": 2416
+      },
+      "unidades-lista@1440": {
+        "differences_max": 1055
+      },
+      "unidade-nova@1440": {
+        "differences_max": 1055
+      },
+      "unidade-editar@1440": {
+        "differences_max": 1055
+      },
+      "cargos-lista@1440": {
+        "differences_max": 1029
+      },
+      "cargo-novo@1440": {
+        "differences_max": 1029
+      },
+      "cargo-editar@1440": {
+        "differences_max": 1029
+      },
+      "combustiveis-lista@1440": {
+        "differences_max": 1036
+      },
+      "combustivel-novo@1440": {
+        "differences_max": 1036
+      },
+      "combustivel-editar@1440": {
+        "differences_max": 1036
+      },
+      "login@800": {
+        "differences_max": 48
+      },
+      "dashboard@800": {
+        "differences_max": 1126
+      },
+      "oficios-lista@800": {
+        "differences_max": 2305
+      },
+      "oficios-novo@800": {
+        "differences_max": 747
+      },
+      "oficios-detalhe@800": {
+        "differences_max": 3877
+      },
+      "oficios-editar@800": {
+        "differences_max": 3877
+      },
+      "oficios-wizard-dados-viajantes@800": {
+        "differences_max": 3877
+      },
+      "oficios-wizard-transporte@800": {
+        "differences_max": 1631
+      },
+      "oficios-wizard-roteiro@800": {
+        "differences_max": 6458
+      },
+      "oficios-wizard-justificativa@800": {
+        "differences_max": 1773
+      },
+      "oficios-wizard-resumo@800": {
+        "differences_max": 2750
+      },
+      "oficios-wizard-documentos@800": {
+        "differences_max": 2750
+      },
+      "eventos-lista@800": {
+        "differences_max": 2143
+      },
+      "oficios-modelos-motivo-lista@800": {
+        "differences_max": 1096
+      },
+      "oficios-modelos-motivo-novo@800": {
+        "differences_max": 1096
+      },
+      "oficios-modelos-motivo-editar@800": {
+        "differences_max": 1096
+      },
+      "roteiros-lista@800": {
+        "differences_max": 1496
+      },
+      "roteiros-novo@800": {
+        "differences_max": 4793
+      },
+      "prestacoes-contas-lista@800": {
+        "differences_max": 2666
+      },
+      "roteiros-editar@800": {
+        "differences_max": 5619
+      },
+      "termos-lista@800": {
+        "differences_max": 1655
+      },
+      "termos-preview-oficio@800": {
+        "differences_max": 962
+      },
+      "justificativas-lista@800": {
+        "differences_max": 1559
+      },
+      "justificativas-novo@800": {
+        "differences_max": 1086
+      },
+      "justificativas-editar@800": {
+        "differences_max": 1086
+      },
+      "planos-trabalho-lista@800": {
+        "differences_max": 2123
+      },
+      "ordens-servico-lista@800": {
+        "differences_max": 1826
+      },
+      "configuracao@800": {
+        "differences_max": 1648
+      },
+      "servidores-lista@800": {
+        "differences_max": 1066
+      },
+      "servidor-novo@800": {
+        "differences_max": 1727
+      },
+      "servidor-editar@800": {
+        "differences_max": 1725
+      },
+      "viaturas-lista@800": {
+        "differences_max": 1072
+      },
+      "viatura-nova@800": {
+        "differences_max": 2243
+      },
+      "viatura-editar@800": {
+        "differences_max": 2419
+      },
+      "unidades-lista@800": {
+        "differences_max": 1054
+      },
+      "unidade-nova@800": {
+        "differences_max": 1054
+      },
+      "unidade-editar@800": {
+        "differences_max": 1054
+      },
+      "cargos-lista@800": {
+        "differences_max": 1028
+      },
+      "cargo-novo@800": {
+        "differences_max": 1028
+      },
+      "cargo-editar@800": {
+        "differences_max": 1028
+      },
+      "combustiveis-lista@800": {
+        "differences_max": 1035
+      },
+      "combustivel-novo@800": {
+        "differences_max": 1035
+      },
+      "combustivel-editar@800": {
+        "differences_max": 1035
+      },
+      "login@500": {
+        "differences_max": 48
+      },
+      "dashboard@500": {
+        "differences_max": 1142
+      },
+      "oficios-lista@500": {
+        "differences_max": 2346
+      },
+      "oficios-novo@500": {
+        "differences_max": 747
+      },
+      "oficios-detalhe@500": {
+        "differences_max": 3862
+      },
+      "oficios-editar@500": {
+        "differences_max": 3862
+      },
+      "oficios-wizard-dados-viajantes@500": {
+        "differences_max": 3862
+      },
+      "oficios-wizard-transporte@500": {
+        "differences_max": 1611
+      },
+      "oficios-wizard-roteiro@500": {
+        "differences_max": 6458
+      },
+      "oficios-wizard-justificativa@500": {
+        "differences_max": 1763
+      },
+      "oficios-wizard-resumo@500": {
+        "differences_max": 2737
+      },
+      "oficios-wizard-documentos@500": {
+        "differences_max": 2737
+      },
+      "eventos-lista@500": {
+        "differences_max": 2172
+      },
+      "oficios-modelos-motivo-lista@500": {
+        "differences_max": 1096
+      },
+      "oficios-modelos-motivo-novo@500": {
+        "differences_max": 1096
+      },
+      "oficios-modelos-motivo-editar@500": {
+        "differences_max": 1096
+      },
+      "roteiros-lista@500": {
+        "differences_max": 1543
+      },
+      "roteiros-novo@500": {
+        "differences_max": 4807
+      },
+      "prestacoes-contas-lista@500": {
+        "differences_max": 2697
+      },
+      "roteiros-editar@500": {
+        "differences_max": 5641
+      },
+      "termos-lista@500": {
+        "differences_max": 1654
+      },
+      "termos-preview-oficio@500": {
+        "differences_max": 966
+      },
+      "justificativas-lista@500": {
+        "differences_max": 1555
+      },
+      "justificativas-novo@500": {
+        "differences_max": 1086
+      },
+      "justificativas-editar@500": {
+        "differences_max": 1086
+      },
+      "planos-trabalho-lista@500": {
+        "differences_max": 2166
+      },
+      "ordens-servico-lista@500": {
+        "differences_max": 1866
+      },
+      "configuracao@500": {
+        "differences_max": 1656
+      },
+      "servidores-lista@500": {
+        "differences_max": 1079
+      },
+      "servidor-novo@500": {
+        "differences_max": 1733
+      },
+      "servidor-editar@500": {
+        "differences_max": 1723
+      },
+      "viaturas-lista@500": {
+        "differences_max": 1115
+      },
+      "viatura-nova@500": {
+        "differences_max": 2247
+      },
+      "viatura-editar@500": {
+        "differences_max": 2414
+      },
+      "unidades-lista@500": {
+        "differences_max": 1054
+      },
+      "unidade-nova@500": {
+        "differences_max": 1054
+      },
+      "unidade-editar@500": {
+        "differences_max": 1054
+      },
+      "cargos-lista@500": {
+        "differences_max": 1028
+      },
+      "cargo-novo@500": {
+        "differences_max": 1028
+      },
+      "cargo-editar@500": {
+        "differences_max": 1028
+      },
+      "combustiveis-lista@500": {
+        "differences_max": 1035
+      },
+      "combustivel-novo@500": {
+        "differences_max": 1035
+      },
+      "combustivel-editar@500": {
+        "differences_max": 1035
+      }
+    }
+  }
+}

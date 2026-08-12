@@ -25,42 +25,49 @@ from termos.models import TermoAutorizacao
 from termos.services import VarianteTermo
 from termos.services import build_termo_cadastro_payload
 from termos.services import gerar_termo_cadastro_lote
+from core.testing import area_de_teste
+from core.testing import com_request
+from core.testing import vincular_area
 
 
 class TermoAutorizacaoCadastroTests(TestCase):
     def setUp(self):
+        # DB-02: forms diretos derivam a area do request no save().
+        self.enterContext(com_request(area_de_teste()))
         self.user = get_user_model().objects.create_user(username="tester_termo_cadastro", password="123456")
+        vincular_area(self.user)
         self.client.force_login(self.user)
-        self.cargo = Cargo.objects.create(nome="Investigador")
-        self.unidade = Unidade.objects.create(nome="Unidade", sigla="UN")
+        vincular_area(self.user)
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Investigador")
+        self.unidade = Unidade.objects.create(area=area_de_teste(), nome="Unidade", sigla="UN")
         self.estado = Estado.objects.create(nome="Parana", sigla="PR")
         self.cidade = Cidade.objects.create(nome="Curitiba", estado=self.estado, uf="PR")
         self.cidade_destino = Cidade.objects.create(nome="Londrina", estado=self.estado, uf="PR")
         self.cidade_destino_2 = Cidade.objects.create(nome="Maringa", estado=self.estado, uf="PR")
         self.estado_sc = Estado.objects.create(nome="Santa Catarina", sigla="SC")
         self.cidade_sc = Cidade.objects.create(nome="Joinville", estado=self.estado_sc, uf="SC")
-        self.servidor_1 = Servidor.objects.create(
+        self.servidor_1 = Servidor.objects.create(area=area_de_teste(), 
             nome="Servidor Um",
             cargo=self.cargo,
             cpf="11111111111",
             rg="1234567",
             unidade=self.unidade,
         )
-        self.servidor_2 = Servidor.objects.create(
+        self.servidor_2 = Servidor.objects.create(area=area_de_teste(), 
             nome="Servidor Dois",
             cargo=self.cargo,
             cpf="22222222222",
             rg="7654321",
             unidade=self.unidade,
         )
-        combustivel = Combustivel.objects.create(nome="Gasolina")
-        self.viatura = Viatura.objects.create(
+        combustivel = Combustivel.objects.create(area=area_de_teste(), nome="Gasolina")
+        self.viatura = Viatura.objects.create(area=area_de_teste(), 
             placa="ABC1234",
             modelo="Duster",
             combustivel=combustivel,
             tipo=Viatura.TIPO_CARACTERIZADA,
         )
-        self.roteiro = Roteiro.objects.create(
+        self.roteiro = Roteiro.objects.create(area=area_de_teste(), 
             origem_estado=self.estado,
             origem_cidade=self.cidade,
             saida_dt=timezone.make_aware(timezone.datetime(2026, 6, 10, 8, 0)),
@@ -72,7 +79,7 @@ class TermoAutorizacaoCadastroTests(TestCase):
             cidade=self.cidade_destino,
             ordem=1,
         )
-        self.oficio = Oficio.objects.create(
+        self.oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=20,
             ano=2026,
             protocolo="123456781",
@@ -155,7 +162,7 @@ class TermoAutorizacaoCadastroTests(TestCase):
         self.assertIn("data_evento_fim", form.errors)
 
     def test_vinculo_com_oficio_permanece_vivo_para_destino(self):
-        termo = TermoAutorizacao.objects.create(oficio=self.oficio)
+        termo = TermoAutorizacao.objects.create(area=area_de_teste(), oficio=self.oficio)
         self.assertIn("LONDRINA", termo.destino_display)
 
         self.destino_roteiro.cidade = self.cidade_destino_2
@@ -165,7 +172,7 @@ class TermoAutorizacaoCadastroTests(TestCase):
         self.assertIn("MARINGA", termo.destino_display)
 
     def test_campos_do_termo_tem_precedencia_sobre_oficio(self):
-        termo = TermoAutorizacao.objects.create(
+        termo = TermoAutorizacao.objects.create(area=area_de_teste(), 
             oficio=self.oficio,
             destino_estado=self.estado,
             destino_cidade=self.cidade_destino_2,
@@ -177,7 +184,7 @@ class TermoAutorizacaoCadastroTests(TestCase):
         self.assertEqual(termo.periodo_display, "01/07/2026")
 
     def test_servidores_do_termo_substituem_fallback_do_oficio(self):
-        termo = TermoAutorizacao.objects.create(oficio=self.oficio)
+        termo = TermoAutorizacao.objects.create(area=area_de_teste(), oficio=self.oficio)
         self.assertEqual(list(termo.servidores_efetivos()), [self.servidor_1])
 
         termo.servidores.add(self.servidor_2)
@@ -187,12 +194,12 @@ class TermoAutorizacaoCadastroTests(TestCase):
     def test_termo_generico_do_evento_usa_servidores_dos_oficios(self):
         from eventos.models import Evento
 
-        evento = Evento.objects.create(titulo="Acao", data_inicio=date(2026, 6, 10))
+        evento = Evento.objects.create(area=area_de_teste(), titulo="Acao", data_inicio=date(2026, 6, 10))
         self.oficio.evento = evento
         self.oficio.save(update_fields=["evento"])
         self.oficio.servidores_termo_autorizacao.add(self.servidor_2)
 
-        termo_generico = TermoAutorizacao.objects.create(
+        termo_generico = TermoAutorizacao.objects.create(area=area_de_teste(), 
             evento=evento,
             destino_estado=self.estado,
             destino_cidade=self.cidade_destino,
@@ -206,7 +213,7 @@ class TermoAutorizacaoCadastroTests(TestCase):
         )
 
     def test_payload_sem_servidor_e_semipreenchido(self):
-        termo = TermoAutorizacao.objects.create(
+        termo = TermoAutorizacao.objects.create(area=area_de_teste(), 
             destino_estado=self.estado,
             destino_cidade=self.cidade_destino,
             data_evento_inicio=date(2026, 6, 10),
@@ -221,7 +228,7 @@ class TermoAutorizacaoCadastroTests(TestCase):
 
     @mock.patch("termos.services.gerar_termo_cadastro_um")
     def test_lote_gera_um_documento_por_servidor(self, m_gerar):
-        termo = TermoAutorizacao.objects.create(
+        termo = TermoAutorizacao.objects.create(area=area_de_teste(), 
             destino_estado=self.estado,
             destino_cidade=self.cidade_destino,
             data_evento_inicio=date(2026, 6, 10),
@@ -269,7 +276,7 @@ class TermoAutorizacaoCadastroTests(TestCase):
         # nao tem id proprio; o contrato vivo e o hook do motor de destinos.
         self.assertContains(response_novo, "data-location-add")
 
-        termo = TermoAutorizacao.objects.create(
+        termo = TermoAutorizacao.objects.create(area=area_de_teste(), 
             destino_estado=self.estado,
             destino_cidade=self.cidade_destino,
             data_evento_inicio=date(2026, 6, 10),
@@ -315,7 +322,7 @@ class TermoAutorizacaoCadastroTests(TestCase):
 
     @mock.patch("termos.async_documents.gerar_termo_cadastro_um")
     def test_download_docx_multiplo_retorna_arquivo_unico(self, m_um):
-        termo = TermoAutorizacao.objects.create(
+        termo = TermoAutorizacao.objects.create(area=area_de_teste(), 
             destino_estado=self.estado,
             destino_cidade=self.cidade_destino,
             data_evento_inicio=date(2026, 6, 10),
@@ -340,7 +347,7 @@ class TermoAutorizacaoCadastroTests(TestCase):
     @mock.patch("termos.async_documents.gerar_termo_cadastro_um")
     def test_download_sem_servidor_nao_duplica_termo_generico(self, m_um):
         """Termo sem servidores efetivos gera UM genérico apenas (sem página repetida)."""
-        termo = TermoAutorizacao.objects.create(
+        termo = TermoAutorizacao.objects.create(area=area_de_teste(), 
             destino_estado=self.estado,
             destino_cidade=self.cidade_destino,
             data_evento_inicio=date(2026, 6, 10),

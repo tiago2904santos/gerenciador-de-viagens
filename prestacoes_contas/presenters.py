@@ -4,6 +4,7 @@ from django.urls import reverse
 
 from cadastros.selectors import get_configuracao_sistema
 from core import entity_cards
+from core.presenters.text import join_non_empty
 from core.utils.masks import format_protocolo
 
 # Reaproveita a formatação já consolidada na lista de ofícios para manter
@@ -50,7 +51,7 @@ def _anexo_assinado_info(anexos, *, tipo, anexar_url, prestacao_pk):
             args=[prestacao_pk, atual.pk],
         ),
         "remover_url": reverse(
-            "prestacoes_contas:prestacao_documento_excluir",
+            "prestacoes_contas:prestacao_documento_delete",
             args=[prestacao_pk, atual.pk],
         ),
     }
@@ -109,6 +110,7 @@ def _servidor_row(ps, solicitacao_form=None, prestacao_anexos=None, diario_pdf_u
         "name": servidor.nome,
         "cargo": cargo_nome,
         "unidade": unidade_nome,
+        "meta": join_non_empty([cargo_nome, unidade_nome]),
         "is_motorista": ps.is_motorista,
         "numero_solicitacao": ps.numero_solicitacao,
         "data_liberacao_diarias": (
@@ -158,12 +160,19 @@ def _servidor_row(ps, solicitacao_form=None, prestacao_anexos=None, diario_pdf_u
     return row
 
 
-def apresentar_prestacao_servidor_card(ps, *, group_position="alone", solicitacao_form=None):
+def apresentar_prestacao_servidor_card(
+    ps, *, group_position="alone", solicitacao_form=None, configuracao=None,
+    menus_sob_demanda=True,
+):
     """Monta o card de um único servidor, com cabeçalho do ofício compartilhado.
 
     ``group_position``: ``alone`` | ``start`` | ``middle`` | ``end`` — usado para
     agrupar visualmente cards consecutivos do mesmo ofício.
     """
+    menus_src = (
+        reverse("prestacoes_contas:card_menus", args=[ps.pk]) if menus_sob_demanda else ""
+    )
+
     prestacao = ps.prestacao
     oficio = prestacao.oficio
     prestacao_anexos = list(prestacao.documentos_anexos.all())
@@ -226,7 +235,11 @@ def apresentar_prestacao_servidor_card(ps, *, group_position="alone", solicitaca
             valor_diarias_display = _format_brl_diarias(roteiro.valor_diarias)
             valor_diarias_extenso = (roteiro.valor_diarias_extenso or "").strip()
 
-    configuracao = get_configuracao_sistema()
+    # `NOVO-08`: era uma consulta por card. A configuração é por área e a área
+    # é fixa no request, então os 20 cards da página resolviam sempre o mesmo
+    # objeto. O `None` mantém os demais chamadores (e `tests.py:290`) de pé.
+    if configuracao is None:
+        configuracao = get_configuracao_sistema()
     unidade_sede_display = configuracao.unidade.nome if configuracao.unidade_id else ""
     if destino_display and data_evento_display:
         evento_wa_display = f"{destino_display}, de {data_evento_display}"
@@ -321,6 +334,8 @@ def apresentar_prestacao_servidor_card(ps, *, group_position="alone", solicitaca
         "finalizada": ps.finalizada,
         "arquivar_url": reverse("prestacoes_contas:prestacao_servidor_arquivar", args=[ps.pk]),
         "finalizar_url": reverse("prestacoes_contas:prestacao_servidor_finalizar", args=[ps.pk]),
+        # Os gatilhos de menu do `_prestacao_card_body.html` apontam para cá (PF-04).
+        "menus_url": menus_src,
         "servidores": [servidor],
         "servidores_count": 1,
         "equipe_count": equipe_count,

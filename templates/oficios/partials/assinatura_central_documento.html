@@ -6,9 +6,9 @@
     </div>
     {% if painel.disponivel %}
       {% if painel.ja_assinado %}
-        {% include "components/ui/badges/chip.html" with label="Assinado" tone="success" only %}
+        <c-ui.badges.chip label="Assinado" tone="success" only />
       {% else %}
-        {% include "components/ui/badges/chip.html" with label="Não assinado" tone="warning" only %}
+        <c-ui.badges.chip label="Não assinado" tone="warning" only />
       {% endif %}
     {% endif %}
   </header>
@@ -33,11 +33,11 @@
         <a class="cv-btn cv-btn--secondary" href="{{ painel.etiqueta_urls.pdf_assinado }}" target="_blank" rel="noopener noreferrer">Ver PDF assinado</a>
       {% endif %}
       {% if painel.pedido_pendente %}
-        <button class="cv-btn cv-btn--secondary" type="button">Copiar link</button>
+        <c-ui.buttons.button class_name="cv-btn cv-btn--secondary" type="button" only>Copiar link</c-ui.buttons.button>
         <form method="post" action="{{ painel.etiqueta_urls.revogar }}" class="assinaturas-central-inline-form">
           {% csrf_token %}
           <input type="hidden" name="next" value="{{ request.get_full_path }}">
-          <button class="cv-btn cv-btn--secondary" type="submit">Revogar link</button>
+          <c-ui.buttons.button class_name="cv-btn cv-btn--secondary" type="submit" only>Revogar link</c-ui.buttons.button>
         </form>
       {% else %}
         <a class="cv-btn cv-btn--primary" href="{{ painel.etiqueta_urls.gerar_link }}?next={{ request.get_full_path|urlencode }}">Gerar solicitação</a>
@@ -67,7 +67,7 @@
               {% elif pedido.status == "expirado" or pedido.status == "revogada" or pedido.status == "recusada" %}
                 <a class="cv-btn cv-btn--secondary" href="{{ painel.etiqueta_urls.gerar_link }}?next={{ request.get_full_path|urlencode }}&forcar_novo=1">Gerar novo link</a>
               {% else %}
-                <button class="cv-btn cv-btn--secondary" type="button">Copiar link</button>
+                <c-ui.buttons.button class_name="cv-btn cv-btn--secondary" type="button" only>Copiar link</c-ui.buttons.button>
               {% endif %}
             </div>
           </article>

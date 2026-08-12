@@ -13,6 +13,7 @@ from cadastros.models import Unidade
 from cadastros.services import resolver_sede_ids_desde_configuracao
 from core.forms.widgets import WidgetStyle
 from core.forms.widgets import widget_attrs
+from core.forms.widgets import text_attrs
 from core.normalizers import normalize_upper
 from core.tenancy import filter_queryset_by_area
 
@@ -97,7 +98,7 @@ class PlanoIdentificacaoForm(forms.ModelForm):
         widgets = {
             "programa_outros": forms.TextInput(
                 attrs={
-                    **widget_attrs(WidgetStyle.FIELD_CONTROL),
+                    **text_attrs(WidgetStyle.FIELD_CONTROL),
                     "placeholder": "Informe o programa quando não estiver na lista",
                     "autocomplete": "off",
                 },
@@ -604,12 +605,12 @@ class EventoPlanoForm(forms.ModelForm):
             "ordem": forms.HiddenInput(),
             "programa": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_SELECT), "data-pt-evento-programa": "true"}),
             "programa_outros": forms.TextInput(
-                attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "data-pt-evento-programa-outros": "true"},
+                attrs={**text_attrs(WidgetStyle.FIELD_CONTROL), "data-pt-evento-programa-outros": "true"},
             ),
             "data_evento_inicio": forms.HiddenInput(attrs={"data-pt-evento-inicio": "true"}),
             "data_evento_fim": forms.HiddenInput(attrs={"data-pt-evento-fim": "true"}),
             "horario_atendimento": forms.TextInput(
-                attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "data-pt-evento-horario": "true"},
+                attrs={**text_attrs(WidgetStyle.FIELD_CONTROL), "data-pt-evento-horario": "true"},
             ),
         }
 
@@ -701,7 +702,7 @@ class ProgramaSolicitanteForm(forms.ModelForm):
         model = ProgramaSolicitante
         fields = ["nome", "ativo", "ordem"]
         widgets = {
-            "nome": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "data-mask": "upper"}),
+            "nome": forms.TextInput(attrs={**text_attrs(WidgetStyle.FIELD_CONTROL)}),
             "ordem": forms.NumberInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "min": "0", "step": "1"}),
         }
 
@@ -714,10 +715,10 @@ class AtividadePlanoTrabalhoForm(forms.ModelForm):
         fields = ["codigo", "nome", "meta", "recurso_necessario", "ordem", "ativo"]
         widgets = {
             "codigo": forms.TextInput(
-                attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "placeholder": "Ex.: CIN", "autocomplete": "off"},
+                attrs={**text_attrs(WidgetStyle.FIELD_CONTROL), "placeholder": "Ex.: CIN", "autocomplete": "off"},
             ),
             "nome": forms.TextInput(
-                attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "autocomplete": "off"},
+                attrs={**text_attrs(WidgetStyle.FIELD_CONTROL), "autocomplete": "off"},
             ),
             "meta": forms.Textarea(
                 attrs={"rows": 4, **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA)},
@@ -765,7 +766,7 @@ class AtividadePlanoTrabalhoQuickAddForm(forms.ModelForm):
         }
         widgets = {
             "nome": forms.TextInput(
-                attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "autocomplete": "off", "placeholder": "Nome da atividade"},
+                attrs={**text_attrs(WidgetStyle.FORM_CONTROL), "autocomplete": "off", "placeholder": "Nome da atividade"},
             ),
             "recurso_necessario": forms.Textarea(
                 attrs={
@@ -820,7 +821,7 @@ class PresetAtividadesQuickAddForm(forms.ModelForm):
         }
         widgets = {
             "nome": forms.TextInput(
-                attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "autocomplete": "off", "placeholder": "Ex.: PCPR na Comunidade"},
+                attrs={**text_attrs(WidgetStyle.FORM_CONTROL), "autocomplete": "off", "placeholder": "Ex.: PCPR na Comunidade"},
             ),
             "atividades": forms.CheckboxSelectMultiple(
                 attrs={
@@ -865,6 +866,6 @@ class HorarioAtendimentoForm(forms.ModelForm):
         model = HorarioAtendimento
         fields = ["faixa", "ativo", "ordem"]
         widgets = {
-            "faixa": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "placeholder": "Ex.: 09:00 até 17:00"}),
+            "faixa": forms.TextInput(attrs={**text_attrs(WidgetStyle.FIELD_CONTROL), "placeholder": "Ex.: 09:00 até 17:00"}),
             "ordem": forms.NumberInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "min": "0", "step": "1"}),
         }

@@ -25,6 +25,8 @@ from ordens_servico.models import OrdemServico
 from ordens_servico.views import ORDENS_POR_PAGINA
 from usuarios.models import AreaTrabalho
 from usuarios.models import VinculoUsuarioArea
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 # Teto atual de queries por página, medido. Não é um alvo: é uma catraca.
@@ -34,6 +36,7 @@ TETO_QUERIES_POR_PAGINA = 30
 
 def _criar_ordens(quantidade, *, area=None, primeiro_numero=1):
     """OS já realizadas (aba `atuais`)."""
+    area = area or area_de_teste()
     inicio = timezone.localdate() - timedelta(days=3)
     OrdemServico.objects.bulk_create(
         [
@@ -53,6 +56,7 @@ def _criar_ordens(quantidade, *, area=None, primeiro_numero=1):
 class OrdemServicoListPaginacaoTests(TestCase):
     def setUp(self):
         user = get_user_model().objects.create_user(username="os_perf", password="x")
+        vincular_area(user)
         self.client.force_login(user)
         self.url = reverse("ordens_servico:index")
 

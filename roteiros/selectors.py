@@ -1,6 +1,8 @@
 from django.db.models import Case
 from django.db.models import Count
+from django.db.models import Exists
 from django.db.models import IntegerField
+from django.db.models import OuterRef
 from django.db.models import Prefetch
 from django.db.models import Q
 from django.db.models import Value
@@ -12,6 +14,7 @@ from core.normalizers import remove_accents
 from core.tenancy import filter_queryset_by_area
 
 from .models import Roteiro
+from .models import RoteiroDestino
 from .models import RoteiroTrecho
 
 
@@ -31,19 +34,38 @@ def listar_roteiros(q=None, status=None):
         filter_queryset_by_area(Roteiro.objects)
         .select_related("origem_estado", "origem_cidade", "origem_cidade__estado")
         .prefetch_related(
-            "destinos__cidade",
+            # `PF-06`: `destinos__cidade__estado`, nao `destinos__cidade`. O
+            # presenter monta "Cidade/UF" com `cidade.estado.sigla`
+            # (`presenters.py:19`), e sem o nivel do estado no prefetch cada
+            # acesso volta ao banco. Medido na lista: **11 consultas a mais**
+            # por pagina, cinco estados repetidos de 3 a 4 vezes cada.
+            "destinos__cidade__estado",
             "destinos__estado",
             Prefetch("trechos", queryset=trechos_qs),
         )
-        .annotate(
-            trechos_count=Count("trechos", distinct=True),
-            destinos_count=Count("destinos", distinct=True),
-        )
+        # `DB-09`: descarta o rascunho **completamente** vazio — sem destino, sem
+        # trecho, sem saida e sem origem. A regra e' a mesma de antes; o que mudou
+        # e' como o banco a responde.
+        #
+        # Antes: `Count('trechos')` + `Count('destinos')` e `.exclude(...=0)`. Para
+        # contar, o Postgres precisa agrupar tudo primeiro, e o `GroupAggregate`
+        # varria as duas tabelas filhas inteiras antes de a pagina existir. Medido
+        # com 20.000 roteiros em tres areas: 79,0 ms e 7.817 buffers para entregar
+        # 15 cards.
+        #
+        # `Exists` correlacionado nao conta: pergunta se ha **alguma** linha e para
+        # na primeira. 27,0 ms e 659 buffers — e com o indice de ordenacao abaixo,
+        # 8,9 ms.
+        #
+        # **Cuidado com a semantica**: `.exclude()` com quatro argumentos e
+        # `NOT (a E b E c E d)`, nao quatro exclusoes. Um roteiro que tenha
+        # qualquer um dos quatro fica na lista. O `test_lista_de_roteiros_db09`
+        # trava essa tabela-verdade caso a caso.
         .exclude(
-            destinos_count=0,
-            trechos_count=0,
-            saida_dt__isnull=True,
-            origem_cidade__isnull=True,
+            ~Exists(RoteiroDestino.objects.filter(roteiro=OuterRef("pk")))
+            & ~Exists(RoteiroTrecho.objects.filter(roteiro=OuterRef("pk")))
+            & Q(saida_dt__isnull=True)
+            & Q(origem_cidade__isnull=True)
         )
         .order_by("-updated_at")
     )

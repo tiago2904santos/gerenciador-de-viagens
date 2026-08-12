@@ -6,6 +6,10 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.text import slugify
 
+from core.constraints import nao_negativo
+from core.constraints import periodo_ordenado
+from core.managers import AreaScopedManager
+
 from cadastros.models import Cargo
 from core.models import CancelavelModel
 from cadastros.models import Cidade
@@ -34,7 +38,14 @@ class ProgramaSolicitante(TimeStampedModel):
     ativo = models.BooleanField(default=True)
     ordem = models.PositiveIntegerField(default=100)
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita
+    # para código que precisa enxergar todas. `default_manager_name` mantém o admin,
+    # as relações reversas e `validate_unique` irrestritos — ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["ordem", "nome"]
         verbose_name = "Programa solicitante"
         verbose_name_plural = "Programas solicitantes"
@@ -69,7 +80,12 @@ class HorarioAtendimento(TimeStampedModel):
     ativo = models.BooleanField(default=True)
     ordem = models.PositiveIntegerField(default=100)
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["ordem", "faixa"]
         indexes = [
             models.Index(fields=["area", "ordem", "faixa"], name="planos_horario_area_ordem_idx"),
@@ -112,7 +128,12 @@ class AtividadePlanoTrabalho(TimeStampedModel):
     ordem = models.PositiveIntegerField("Ordem", default=100)
     ativo = models.BooleanField("Ativo", default=True)
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["ordem", "nome"]
         indexes = [
             models.Index(fields=["area", "ordem", "nome"], name="planos_ativ_area_ordem_idx"),
@@ -164,7 +185,12 @@ class PresetAtividadesPlanoTrabalho(TimeStampedModel):
         verbose_name="Atividades",
     )
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["ordem", "nome"]
         verbose_name = "Preset de atividades"
         verbose_name_plural = "Presets de atividades"
@@ -202,7 +228,13 @@ class PresetAtividadesPlanoTrabalho(TimeStampedModel):
         self.nome = normalize_upper(self.nome)
         self.descricao = normalize_spaces(self.descricao)
         if self.is_padrao:
-            PresetAtividadesPlanoTrabalho.objects.select_for_update().exclude(pk=self.pk).filter(
+            # `BE-09`: `all_objects` — o escopo é o `self.area` deste registro, na
+            # linha de baixo, e não o do request. Recortado, o padrão anterior não
+            # seria rebaixado e a gravação estouraria na `UniqueConstraint` de padrão
+            # único por área.
+            PresetAtividadesPlanoTrabalho.all_objects.select_for_update().exclude(
+                pk=self.pk,
+            ).filter(
                 area=self.area,
                 is_padrao=True,
             ).update(is_padrao=False)
@@ -233,7 +265,7 @@ class PlanoTrabalho(TimeStampedModel, CancelavelModel):
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
         on_delete=models.PROTECT,
-        null=True,
+        null=False,
         blank=True,
         related_name="planos_trabalho",
         verbose_name="Area de trabalho",
@@ -405,7 +437,12 @@ class PlanoTrabalho(TimeStampedModel, CancelavelModel):
     recursos_necessarios = models.TextField(blank=True, default="")
     unidade_movel_texto = models.TextField(blank=True, default="")
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["-ano", "-numero", "-created_at"]
         verbose_name = "Plano de Trabalho"
         verbose_name_plural = "Planos de Trabalho"
@@ -422,7 +459,23 @@ class PlanoTrabalho(TimeStampedModel, CancelavelModel):
                 fields=["area", "ano", "numero"],
                 condition=Q(area__isnull=False, ano__isnull=False, numero__isnull=False),
                 name="planos_trabalho_area_ano_numero_unique",
-            )
+            ),
+            # `DB-07`. Os quatro valores abaixo são **calculados** e gravados —
+            # unitário × quantidade, e a variante combinada. Zero é legítimo
+            # (plano sem diária); negativo só sai de conta errada, e daqui viaja
+            # direto para o documento do plano.
+            periodo_ordenado(
+                "data_evento_inicio", "data_evento_fim", name="plano_periodo_ordenado",
+            ),
+            nao_negativo("diarias_valor_unitario", name="plano_diaria_unitaria_nao_negativa"),
+            nao_negativo("diarias_valor_total", name="plano_diaria_total_nao_negativa"),
+            nao_negativo(
+                "diarias_combinada_valor_unitario",
+                name="plano_diaria_comb_unitaria_nao_negativa",
+            ),
+            nao_negativo(
+                "diarias_combinada_valor_total", name="plano_diaria_comb_total_nao_negativa",
+            ),
         ]
 
     def __str__(self):
@@ -544,16 +597,28 @@ class PlanoTrabalho(TimeStampedModel, CancelavelModel):
         area = get_current_area() if area is None else area
         with transaction.atomic():
             config = (
-                ConfiguracaoSistema.objects.select_for_update().filter(area=area).order_by("pk").first()
+                # `BE-09`: `all_objects` nos dois ramos. O escopo é a `area` recebida no
+                # argumento — `proximo_numero(self.area)`, a área do **plano**, não a
+                # ativa. Recortado, o `SELECT ... FOR UPDATE` não acha a linha, cai no
+                # `get_for_area` abaixo e emite número a partir de outro contador:
+                # plano de trabalho duplicado, sem erro nenhum.
+                ConfiguracaoSistema.all_objects.select_for_update().filter(area=area).order_by("pk").first()
                 if area is not None
-                else ConfiguracaoSistema.objects.select_for_update().filter(area__isnull=True).order_by("pk").first()
+                else ConfiguracaoSistema.all_objects.select_for_update()
+                .filter(area__isnull=True)
+                .order_by("pk")
+                .first()
             )
             if config is None:
                 config = ConfiguracaoSistema.get_for_area(area)
             if config.pt_ano != ano_atual:
                 config.pt_ano = ano_atual
                 config.pt_ultimo_numero = 0
-            planos = cls.objects.filter(ano=ano_atual)
+            # `BE-09`: `all_objects` — o escopo é a `area` do argumento, aplicado nas
+            # quatro linhas abaixo. Recortar de novo pela área ativa esvaziaria a
+            # agregação e o `max(contador, banco)` perderia o piso real, podendo
+            # reemitir número já usado.
+            planos = cls.all_objects.filter(ano=ano_atual)
             if area is None:
                 planos = planos.filter(area__isnull=True)
             else:
@@ -620,6 +685,34 @@ class PlanoDestino(TimeStampedModel):
     ordem = models.PositiveIntegerField(default=1)
 
     class Meta:
+        # `DB-08`: **duas** constraints, e não uma sobre `(plano, evento, ordem)`.
+        #
+        # `evento` é anulável, e em SQL NULL é distinto de NULL num índice único —
+        # uma constraint só sobre os três campos deixaria justamente o caso mais
+        # comum sem proteção: os destinos de rascunho, que têm `evento IS NULL`
+        # (`forms.py:_save_destinos`). É o mesmo par parcial que o repositório já
+        # usa para separar o balde global do por-área.
+        #
+        # O invariante NÃO é `(plano, ordem)`: um plano guarda ao mesmo tempo o
+        # rascunho e as cópias por evento, e `services.py:968` copia `d.ordem` tal e
+        # qual ao comitar o evento. `(plano, ordem)` reprovaria produção no primeiro
+        # commit.
+        #
+        # Simples, não adiadas: todos os escritores apagam antes de recriar, com o
+        # `delete()` escopado pelo mesmo par (`forms.py:459`, `services.py:964`,
+        # `services.py:1030`).
+        constraints = [
+            models.UniqueConstraint(
+                fields=["plano", "ordem"],
+                condition=models.Q(evento__isnull=True),
+                name="plano_destino_rascunho_ordem_unique",
+            ),
+            models.UniqueConstraint(
+                fields=["evento", "ordem"],
+                condition=models.Q(evento__isnull=False),
+                name="plano_destino_evento_ordem_unique",
+            ),
+        ]
         ordering = ["ordem", "pk"]
         verbose_name = "Destino do plano de trabalho"
         verbose_name_plural = "Destinos do plano de trabalho"
@@ -755,6 +848,25 @@ class EventoPlano(TimeStampedModel):
         ordering = ["ordem", "data_evento_inicio", "pk"]
         verbose_name = "Evento do plano de trabalho"
         verbose_name_plural = "Eventos do plano de trabalho"
+        constraints = [
+            # `DB-07`: no modo multi-evento é **aqui** que mora o período de cada
+            # evento, e a `Meta.ordering` ordena por `data_evento_inicio` — data
+            # invertida embaralha a sequência impressa no plano.
+            periodo_ordenado(
+                "data_evento_inicio", "data_evento_fim", name="evento_plano_periodo_ordenado",
+            ),
+            nao_negativo(
+                "diarias_valor_unitario", name="evento_plano_diaria_unitaria_nao_negativa",
+            ),
+            nao_negativo("diarias_valor_total", name="evento_plano_diaria_total_nao_negativa"),
+            # `DB-08`: dois eventos na mesma posição embaralham a sequência impressa
+            # no plano. Simples, não adiada: o único escritor acrescenta ao fim
+            # (`services.py:943`, `ordem = max("ordem") + 1`) — não há troca de
+            # posição neste caminho.
+            models.UniqueConstraint(
+                fields=["plano", "ordem"], name="evento_plano_ordem_unique",
+            ),
+        ]
 
     def __str__(self):
         if self.data_evento_inicio:

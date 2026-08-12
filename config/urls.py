@@ -25,13 +25,9 @@ urlpatterns = [
     path("justificativas/", include("justificativas.urls")),
     path("planos-trabalho/", include("planos_trabalho.urls")),
     path("ordens-servico/", include("ordens_servico.urls")),
-    path("diario-bordo/", include("diario_bordo.urls")),
     path("prestacoes-contas/", include("prestacoes_contas.urls")),
     path("integracoes/google-drive/", include("integracoes.google_drive.urls")),
 ]
 
 if settings.DEBUG:
-    urlpatterns += [
-        path("dev/ui-lab-2/", include("ui_lab2.urls")),
-    ]
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

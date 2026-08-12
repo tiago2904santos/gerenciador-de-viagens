@@ -4,7 +4,7 @@
    O <select> nativo permanece oculto para submissão do formulário.
 
    Uso:
-     <div class="cv-custom-select" data-entity-picker data-entity-picker-renderer="select">
+     <div class="custom-select" data-entity-picker data-entity-picker-renderer="select">
        <select name="campo">
          <option value="">Selecione</option>
          <option value="1">Opção 1</option>
@@ -12,7 +12,7 @@
      </div>
 
    Modificadores CSS:
-     .cv-custom-select--sm / --lg / --disabled / --error
+     .custom-select--sm / --lg / --disabled / --error
 
    Multi-select: adicione o atributo `multiple` no <select> nativo e, se quiser,
    `data-placeholder="Texto"` na div wrapper para o texto exibido quando nada
@@ -25,7 +25,7 @@
   var uid = 0;
 
   function nextId() {
-    return 'cv-cs-' + (++uid);
+    return 'cs-' + (++uid);
   }
 
   function svgChevron() {
@@ -60,10 +60,10 @@
     var self   = this;
     var native = this.native;
 
-    this.root.classList.add('cv-custom-select--v2');
+    this.root.classList.add('custom-select--v2');
 
     // 1. Ocultar native select (mantido no DOM para form submit)
-    native.classList.add('cv-custom-select__native');
+    native.classList.add('custom-select__native');
     native.setAttribute('aria-hidden', 'true');
     native.setAttribute('tabindex', '-1');
 
@@ -82,7 +82,7 @@
     var trigger = document.createElement('button');
     trigger.type = 'button';
     trigger.id   = triggerId;
-    trigger.className = 'cv-custom-select__trigger cv-custom-select__trigger--v2';
+    trigger.className = 'custom-select__trigger custom-select__trigger--v2';
     trigger.setAttribute('role', 'combobox');
     trigger.setAttribute('aria-haspopup', 'listbox');
     trigger.setAttribute('aria-expanded', 'false');
@@ -90,14 +90,14 @@
     if (labelEl) trigger.setAttribute('aria-labelledby', labelEl.id);
     if (native.disabled) {
       trigger.disabled = true;
-      this.root.classList.add('cv-custom-select--disabled');
+      this.root.classList.add('custom-select--disabled');
     }
 
     var valSpan  = document.createElement('span');
-    valSpan.className = 'cv-custom-select__value';
+    valSpan.className = 'custom-select__value';
 
     var chevSpan = document.createElement('span');
-    chevSpan.className = 'cv-custom-select__chevron';
+    chevSpan.className = 'custom-select__chevron';
     chevSpan.setAttribute('aria-hidden', 'true');
     chevSpan.innerHTML = svgChevron();
 
@@ -108,7 +108,7 @@
     // 4. Construir menu
     var menu = document.createElement('ul');
     menu.id        = this._id + '-menu';
-    menu.className = 'cv-custom-select__menu cv-custom-select__menu--v2';
+    menu.className = 'custom-select__menu custom-select__menu--v2';
     menu.setAttribute('role', 'listbox');
     if (native.multiple) menu.setAttribute('aria-multiselectable', 'true');
     menu.hidden = true;
@@ -118,23 +118,23 @@
       var li  = document.createElement('li');
       var itemId = self._id + '-opt-' + i;
       li.id        = itemId;
-      li.className = 'cv-custom-select__option';
+      li.className = 'custom-select__option';
       li.setAttribute('role', 'option');
       li.setAttribute('data-value', opt.value);
       li.setAttribute('aria-selected', 'false');
 
       if (opt.disabled) {
-        li.classList.add('cv-custom-select__option--disabled');
+        li.classList.add('custom-select__option--disabled');
         li.setAttribute('aria-disabled', 'true');
       }
 
       var check = document.createElement('span');
-      check.className = 'cv-custom-select__option-check';
+      check.className = 'custom-select__option-check';
       check.setAttribute('aria-hidden', 'true');
       check.innerHTML = svgCheck();
 
       var label = document.createElement('span');
-      label.className = 'cv-custom-select__option-label';
+      label.className = 'custom-select__option-label';
       label.textContent = opt.text;
 
       li.appendChild(check);
@@ -159,7 +159,7 @@
       window.CV.overlay && window.CV.overlay.attachDropdown
         ? window.CV.overlay.attachDropdown(menu, trigger)
         : null;
-    if (this._floatingMenu) this.root.classList.add('cv-custom-select--menu-portal');
+    if (this._floatingMenu) this.root.classList.add('custom-select--menu-portal');
 
     // 6. Valor inicial
     this._syncFromNative();
@@ -173,10 +173,10 @@
   // ─────────────────────────────────────────────────────────────────────────
   CustomSelect.prototype._syncFromNative = function () {
     var native   = this.native;
-    var valSpan  = this.trigger.querySelector('.cv-custom-select__value');
+    var valSpan  = this.trigger.querySelector('.custom-select__value');
 
     this._items.forEach(function (item) {
-      item.el.classList.remove('cv-custom-select__option--selected');
+      item.el.classList.remove('custom-select__option--selected');
       item.el.setAttribute('aria-selected', 'false');
     });
 
@@ -184,15 +184,15 @@
       var selected = Array.prototype.filter.call(native.options, function (o) { return o.selected; });
       if (selected.length) {
         valSpan.textContent = selected.map(function (o) { return o.text; }).join(', ');
-        valSpan.classList.remove('cv-custom-select__value--placeholder');
+        valSpan.classList.remove('custom-select__value--placeholder');
       } else {
         valSpan.textContent = native.getAttribute('data-placeholder') || this.root.getAttribute('data-placeholder') || '';
-        valSpan.classList.add('cv-custom-select__value--placeholder');
+        valSpan.classList.add('custom-select__value--placeholder');
       }
       for (var s = 0; s < selected.length; s++) {
         for (var i = 0; i < this._items.length; i++) {
           if (this._items[i].value === selected[s].value) {
-            this._items[i].el.classList.add('cv-custom-select__option--selected');
+            this._items[i].el.classList.add('custom-select__option--selected');
             this._items[i].el.setAttribute('aria-selected', 'true');
           }
         }
@@ -205,13 +205,13 @@
     if (sel) {
       valSpan.textContent = sel.text;
       if (!sel.value || sel.value === '') {
-        valSpan.classList.add('cv-custom-select__value--placeholder');
+        valSpan.classList.add('custom-select__value--placeholder');
       } else {
-        valSpan.classList.remove('cv-custom-select__value--placeholder');
+        valSpan.classList.remove('custom-select__value--placeholder');
         // Marcar opção selecionada no menu
         for (var i = 0; i < this._items.length; i++) {
           if (this._items[i].value === sel.value) {
-            this._items[i].el.classList.add('cv-custom-select__option--selected');
+            this._items[i].el.classList.add('custom-select__option--selected');
             this._items[i].el.setAttribute('aria-selected', 'true');
             break;
           }
@@ -219,7 +219,7 @@
       }
     } else {
       valSpan.textContent = '';
-      valSpan.classList.add('cv-custom-select__value--placeholder');
+      valSpan.classList.add('custom-select__value--placeholder');
     }
   };
 
@@ -237,13 +237,13 @@
     if (this._isOpen || this.trigger.disabled) return;
 
     // Fechar outros selects abertos na página
-    var openEls = document.querySelectorAll('.cv-custom-select--open');
+    var openEls = document.querySelectorAll('.custom-select--open');
     for (var i = 0; i < openEls.length; i++) {
       if (openEls[i]._cvSelect) openEls[i]._cvSelect._close();
     }
 
     this._isOpen = true;
-    this.root.classList.add('cv-custom-select--open');
+    this.root.classList.add('custom-select--open');
     this.menu.hidden = false;
     this.trigger.setAttribute('aria-expanded', 'true');
     if (this._floatingMenu) this._floatingMenu.open();
@@ -251,7 +251,7 @@
     // Focar opção selecionada ou a primeira disponível
     var startIdx = -1;
     for (var j = 0; j < this._items.length; j++) {
-      if (this._items[j].el.classList.contains('cv-custom-select__option--selected')) {
+      if (this._items[j].el.classList.contains('custom-select__option--selected')) {
         startIdx = j;
         break;
       }
@@ -262,7 +262,7 @@
   CustomSelect.prototype._close = function () {
     if (!this._isOpen) return;
     this._isOpen = false;
-    this.root.classList.remove('cv-custom-select--open');
+    this.root.classList.remove('custom-select--open');
     this.menu.hidden = true;
     this.trigger.setAttribute('aria-expanded', 'false');
     this.trigger.removeAttribute('aria-activedescendant');
@@ -307,12 +307,12 @@
   // ─────────────────────────────────────────────────────────────────────────
   CustomSelect.prototype._setFocus = function (index) {
     if (this._focused >= 0 && this._items[this._focused]) {
-      this._items[this._focused].el.classList.remove('cv-custom-select__option--focused');
+      this._items[this._focused].el.classList.remove('custom-select__option--focused');
     }
     this._focused = index;
     if (index >= 0 && this._items[index]) {
       var item = this._items[index];
-      item.el.classList.add('cv-custom-select__option--focused');
+      item.el.classList.add('custom-select__option--focused');
       item.el.scrollIntoView({ block: 'nearest' });
       this.trigger.setAttribute('aria-activedescendant', item.el.id);
     }
@@ -320,7 +320,7 @@
 
   CustomSelect.prototype._clearFocus = function () {
     if (this._focused >= 0 && this._items[this._focused]) {
-      this._items[this._focused].el.classList.remove('cv-custom-select__option--focused');
+      this._items[this._focused].el.classList.remove('custom-select__option--focused');
     }
     this._focused = -1;
     this.trigger.removeAttribute('aria-activedescendant');
@@ -391,10 +391,6 @@
             }
           }
           break;
-        case 'Escape':
-          e.preventDefault();
-          self._close();
-          break;
         case 'Tab':
           self._close();
           break;
@@ -427,12 +423,13 @@
       self._clearFocus();
     });
 
-    // Clique fora → fechar (o menu pode estar "flutuando" no body via
-    // CV.overlay, entao um clique nele nao conta como "fora").
-    document.addEventListener('click', function (e) {
-      if (self._isOpen && !self.root.contains(e.target) && !self.menu.contains(e.target)) {
-        self._close();
-      }
+    // JS-07 — o menu pode estar flutuando em body, mas continua dentro da
+    // zona interativa. Escape mantém o escopo anterior: somente o trigger.
+    this._dismiss = window.CV.overlay.attachDismiss({
+      inside: [self.root, self.menu],
+      isOpen: function () { return self._isOpen; },
+      escapeWhen: function (e) { return e.target === self.trigger; },
+      onDismiss: function () { self._close(); },
     });
   };
 
@@ -447,6 +444,9 @@
     for (var i = 0; i < els.length; i++) {
       if (!els[i]._cvSelect) {
         els[i].setAttribute('data-entity-picker-ready', 'true');
+        /* JS-06 — este renderer é a própria raiz. Marcada para que
+           CV.picker.rootFor responda igual nos dois renderers. */
+        els[i].setAttribute('data-entity-picker-root', 'true');
         var inst = new CustomSelect(els[i]);
         els[i]._cvSelect = inst;
       }

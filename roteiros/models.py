@@ -2,6 +2,10 @@ from decimal import Decimal, InvalidOperation
 
 from django.db import models
 
+from core.constraints import nao_negativo
+from core.constraints import periodo_ordenado
+from core.managers import AreaScopedManager
+
 from core.models import CancelavelModel
 from cadastros.models import Cidade
 from cadastros.models import Estado
@@ -45,7 +49,7 @@ class Roteiro(CancelavelModel):
 
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
-        null=True,
+        null=False,
         blank=True,
         on_delete=models.PROTECT,
         related_name="roteiros",
@@ -140,10 +144,55 @@ class Roteiro(CancelavelModel):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita
+    # para código que precisa enxergar todas. `default_manager_name` mantém o admin,
+    # as relações reversas e `validate_unique` irrestritos — ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["-created_at"]
+        # `DB-09`: a lista ordena por `-updated_at`, nao pelo `ordering` acima.
+        # Este indice **so paga depois** que a agregacao saiu do caminho: medido
+        # com ela no lugar, o ganho era 1,0x (o `GroupAggregate` dominava e o
+        # `Sort` era troco); sem ela, 27,0 ms -> 8,9 ms. Foi por isso que o
+        # `DB-10` mediu "roteiros nao ganha" e nao criou o indice la.
+        indexes = [
+            models.Index(fields=["area", "-updated_at"], name="roteiro_area_updated_idx"),
+        ]
         verbose_name = "Roteiro"
         verbose_name_plural = "Roteiros"
+        constraints = [
+            # `DB-07`. A cadeia real e' saida -> chegada -> retorno_saida ->
+            # retorno_chegada. Os tres elos consecutivos, mais o limite externo:
+            # com nulo no meio a transitividade se perde, e o par externo e'
+            # justamente o que o motor de diarias usa para contar dia.
+            #
+            # `NOVO-36`: este elo ficou de fora do `DB-07` porque reprovava codigo
+            # de producao — a derivacao posicional do cabecalho gravava chegada
+            # antes da saida ao reordenar destinos. O produtor foi corrigido para
+            # derivar cronologicamente, e a constraint entra junto com ele.
+            periodo_ordenado("saida_dt", "chegada_dt", name="roteiro_ida_ordenada"),
+            periodo_ordenado(
+                "chegada_dt", "retorno_saida_dt", name="roteiro_permanencia_ordenada",
+            ),
+            periodo_ordenado(
+                "retorno_saida_dt", "retorno_chegada_dt", name="roteiro_volta_ordenada",
+            ),
+            periodo_ordenado(
+                "saida_dt", "retorno_chegada_dt", name="roteiro_periodo_ordenado",
+            ),
+            # Zero e' legitimo (viagem sem diaria); negativo so sai de conta
+            # errada, e daqui vai para o oficio e para a prestacao assinada.
+            nao_negativo("valor_diarias", name="roteiro_valor_diarias_nao_negativo"),
+            nao_negativo(
+                "rota_distancia_calculada_km", name="roteiro_distancia_calc_nao_negativa",
+            ),
+            nao_negativo(
+                "rota_distancia_manual_km", name="roteiro_distancia_manual_nao_negativa",
+            ),
+        ]
 
     def __str__(self):
         orig = self.origem_cidade or self.origem_estado
@@ -202,6 +251,17 @@ class RoteiroDestino(models.Model):
         # Mesmo caso dos trechos: sempre lidos por roteiro e em ordem (P-03).
         indexes = [
             models.Index(fields=["roteiro", "ordem"], name="roteiro_destino_ordem_idx"),
+        ]
+        # `DB-08`: dois destinos na mesma posição eram aceitos, e o destino
+        # duplicado é contado **duas vezes pelo motor de diárias** — sai no ofício
+        # e no termo. Constraint simples (não adiada) porque o único escritor
+        # apaga tudo antes de recriar: `editor_state_builder._salvar_roteiro_avulso_from_roteiro_state`
+        # (`roteiro.destinos.all().delete()`), depois `create` com `enumerate`.
+        # Reordenação por troca de posição não existe neste caminho.
+        constraints = [
+            models.UniqueConstraint(
+                fields=["roteiro", "ordem"], name="roteiro_destino_ordem_unique",
+            ),
         ]
         ordering = ["roteiro", "ordem"]
         verbose_name = "Destino do roteiro"
@@ -290,6 +350,26 @@ class RoteiroTrecho(models.Model):
             models.Index(fields=["roteiro", "ordem"], name="roteiro_trecho_ordem_idx"),
         ]
         ordering = ["roteiro", "ordem"]
+        constraints = [
+            # `DB-08` fatia 2: a posição é a sequência do itinerário impresso, e
+            # duas linhas na mesma posição tornam o documento não determinístico —
+            # a mesma tela gera dois PDFs diferentes conforme o desempate de `pk`.
+            # O retorno não disputa posição com a ida: `editor_state_builder.py` dá a ele
+            # `len(trechos_validated)`, uma casa acima de todas as de ida.
+            #
+            # Ao contrário do `RoteiroDestino`, aqui o escritor **não** apaga antes
+            # de recriar: ele reaproveita a linha por `id` para preservar campo
+            # manual (KM, tempo adicional). Por isso a constraint só é segura junto
+            # com o escritor em dois passos — ver
+            # `_salvar_roteiro_avulso_from_roteiro_state`.
+            models.UniqueConstraint(
+                fields=["roteiro", "ordem"], name="roteiro_trecho_ordem_unique",
+            ),
+            # `DB-07`: cada trecho tem o proprio par, e a soma deles e' o
+            # itinerario impresso. Um trecho invertido nao aparece na tela.
+            periodo_ordenado("saida_dt", "chegada_dt", name="roteiro_trecho_ordenado"),
+            nao_negativo("distancia_km", name="roteiro_trecho_distancia_nao_negativa"),
+        ]
         verbose_name = "Trecho do roteiro"
         verbose_name_plural = "Trechos do roteiro"
 

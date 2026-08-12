@@ -5,9 +5,9 @@
 (function () {
   "use strict";
 
-  var NAV = ".cv-segment-toggle--nav";
-  var BTN = "a.cv-segment-toggle__btn";
-  var POP = "cv-segment-toggle__btn--pop";
+  var NAV = ".segment-toggle--nav";
+  var BTN = "a.segment-toggle__btn";
+  var POP = "segment-toggle__btn--pop";
   var BOUND = "data-cv-segment-nav-bound";
   var DURATION_MS = 280;
 
@@ -44,17 +44,31 @@
 
   function bind(root) {
     var scope = root && root.querySelectorAll ? root : document;
-    Array.prototype.forEach.call(scope.querySelectorAll(NAV), function (nav) {
+    var navs = Array.prototype.slice.call(scope.querySelectorAll(NAV));
+    if (scope.matches && scope.matches(NAV)) navs.unshift(scope);
+    navs.forEach(function (nav) {
       if (nav.getAttribute(BOUND) === "true") return;
       nav.setAttribute(BOUND, "true");
       nav.addEventListener("click", onClick);
     });
   }
 
+  function destroy(root) {
+    var scope = root && root.querySelectorAll ? root : document;
+    var navs = Array.prototype.slice.call(scope.querySelectorAll(NAV));
+    if (scope.matches && scope.matches(NAV)) navs.unshift(scope);
+    navs.forEach(function (nav) {
+      nav.removeEventListener("click", onClick);
+      nav.removeAttribute(BOUND);
+    });
+  }
+
   window.CV = window.CV || {};
   window.CV.segmentNav = { init: bind };
 
-  if (document.readyState === "loading") {
+  if (typeof window.CV.registerEnhancer === "function") {
+    window.CV.registerEnhancer("segmentNav", bind, destroy);
+  } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () {
       bind(document);
     });

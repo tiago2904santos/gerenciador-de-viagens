@@ -21,7 +21,7 @@
     aria-describedby="vincular-na-area-description"
     tabindex="-1"
   >
-    {% include "components/ui/modals/dialog_header.html" with icon="link" tone="document" eyebrow="Administração" title="Vincular usuário" title_id="vincular-na-area-title" data_cancel_modal_cancel=True only %}
+    <c-ui.modals.dialog_header icon="link" tone="document" eyebrow="Administração" title="Vincular usuário" title_id="vincular-na-area-title" :data_cancel_modal_cancel="True" only />
 
     <form
       method="post"
@@ -34,7 +34,7 @@
       {{ vinculo_form.area }}
       <div class="cv-dialog__body vincular-usuario-modal__body">
         <p class="cv-dialog__message vincular-usuario-modal__intro" id="vincular-na-area-description">
-          {% include "components/ui/icons/icon.html" with icon="link" only %}
+          <c-ui.icons.icon icon="link" only />
           <span>
             <span data-vinculo-intro="create">
               Escolha a conta e o perfil de acesso à área <strong>{{ area.sigla }}</strong>.
@@ -46,27 +46,25 @@
           </span>
         </p>
 
-        {% if vinculo_form.non_field_errors %}
-          {% include "components/ui/feedback/field_error.html" with errors=vinculo_form.non_field_errors only %}
-        {% endif %}
+        <c-ui.feedback.form_errors :form="vinculo_form" only />
 
         <div
-          class="vincular-usuario-modal__fields cv-form-stack document-form-page"
+          class="vincular-usuario-modal__fields form-stack document-form-page"
           data-travel-document-wizard-step1
         >
-          {% include "components/ui/forms/field.html" with field=vinculo_form.usuario size_class="field-size-1" only %}
-          {% include "components/ui/forms/field.html" with field=vinculo_form.papel size_class="field-size-1" only %}
+          <c-ui.forms.field :field="vinculo_form.usuario" size_class="field-size-1" only />
+          <c-ui.forms.field :field="vinculo_form.papel" size_class="field-size-1" only />
         </div>
       </div>
-      <div class="cv-dialog__footer vincular-usuario-modal__footer cv-form-card__footer">
-        <section class="cv-card-footer-section">
-          <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
-          <footer class="cv-card-footer">
-            <div class="cv-card-footer__secondary">
-              {% include "components/ui/buttons/button.html" with label="Cancelar" variant="secondary" type="button" icon="arrow-left" data_cancel_modal_cancel=True only %}
+      <div class="cv-dialog__footer vincular-usuario-modal__footer form-card__footer">
+        <section class="card-footer-section">
+          <div class="card-footer-section__divider" aria-hidden="true"></div>
+          <footer class="card-footer">
+            <div class="card-footer__secondary">
+              <c-ui.buttons.button label="Cancelar" variant="secondary" type="button" icon="arrow-left" :data_cancel_modal_cancel="True" only />
             </div>
-            <div class="cv-card-footer__primary">
-              {% include "components/ui/buttons/button.html" with label="Salvar vínculo" variant="primary" type="submit" icon="arrow-right" icon_after=True only %}
+            <div class="card-footer__primary">
+              <c-ui.buttons.button label="Salvar vínculo" variant="primary" type="submit" icon="arrow-right" :icon_after="True" only />
             </div>
           </footer>
         </section>

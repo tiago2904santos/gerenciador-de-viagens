@@ -12,6 +12,13 @@ def _sincronizar_prestacao_servidores(oficio):
     apenas "semeados" no wizard de um novo ofício (que herda a equipe do ofício
     anterior do mesmo evento) e depois retirados continuariam aparecendo na
     prestação, misturando equipes entre ofícios.
+
+    ``DB-06``: "remover" aqui deixou de significar ``DELETE``. Quem sai levando
+    trabalho junto — comprovante de saque, assinatura do RT, número da
+    solicitação — é apenas marcado (``PrestacaoServidor.sair_da_equipe``), some
+    das telas e volta inteiro se o servidor voltar para a equipe. Quem não tem
+    nada coletado continua sendo apagado, senão a prestação voltaria a exibir a
+    equipe de outro ofício, que é o defeito que este sinal resolve.
     """
     from .models import PrestacaoContas
     from .models import PrestacaoServidor
@@ -19,9 +26,17 @@ def _sincronizar_prestacao_servidores(oficio):
     if oficio.cancelado:
         return
 
-    prestacao, _ = PrestacaoContas.objects.get_or_create(
+    # `BE-09`: `all_objects` — a prestação pertence à área do **ofício**, na linha
+    # de baixo e no `defaults`. Com `objects` e área do ofício diferente da ativa,
+    # o `get` não acharia a prestação existente e o `create` duplicaria — este
+    # signal roda a cada mudança de equipe do ofício.
+    # `area_id`, não `area`: com o NOT NULL do `DB-02`, ler `oficio.area` num
+    # ofício órfão levanta `RelatedObjectDoesNotExist` — e este signal roda no
+    # `backfill_legacy_areas`, que é executado justamente sobre o banco
+    # pré-migração, onde o órfão ainda existe.
+    prestacao, _ = PrestacaoContas.all_objects.get_or_create(
         oficio=oficio,
-        defaults={"area": oficio.area},
+        defaults={"area_id": oficio.area_id},
     )
     if prestacao.area_id is None and oficio.area_id:
         prestacao.area = oficio.area
@@ -29,16 +44,27 @@ def _sincronizar_prestacao_servidores(oficio):
 
     ids_atuais = set(oficio.servidores.values_list("pk", flat=True))
 
-    # Remove quem não faz mais parte do ofício (cascata apaga os dados individuais
-    # daquele servidor: solicitação, comprovante e assinatura do RT).
-    prestacao.servidores_prestacao.exclude(servidor_id__in=ids_atuais).delete()
+    # Tira da equipe corrente quem não faz mais parte do ofício. `DB-06`: o
+    # `.delete()` que estava aqui levava junto, por cascata, o comprovante de
+    # saque e a assinatura eletrônica do RT — e deixava o arquivo órfão no disco.
+    # `todos` porque as já marcadas precisam ser vistas para não serem remarcadas.
+    saindo = PrestacaoServidor.todos.filter(
+        prestacao=prestacao, removida_em__isnull=True,
+    ).exclude(servidor_id__in=ids_atuais)
+    for servidor_prestacao in saindo:
+        servidor_prestacao.sair_da_equipe()
 
     # Garante uma linha para cada servidor atual (mantém as existentes e seus dados).
     for servidor_id in ids_atuais:
-        PrestacaoServidor.objects.get_or_create(
+        # `DB-06`: `todos` é obrigatório aqui. Com `objects`, o `get` não enxerga a
+        # linha de um servidor que já saiu da equipe uma vez, o `create` roda e
+        # `unique_servidor_por_prestacao` derruba a edição de equipe com 500.
+        servidor_prestacao, criada = PrestacaoServidor.todos.get_or_create(
             prestacao=prestacao,
             servidor_id=servidor_id,
         )
+        if not criada:
+            servidor_prestacao.voltar_para_equipe()
 
 
 def connect_signals():

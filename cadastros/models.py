@@ -1,9 +1,11 @@
-﻿import re
+import re
 from decimal import ROUND_HALF_UP, Decimal
 
 from django.db import models, transaction
 from django.db.models import Q, UniqueConstraint
 
+from core.constraints import positivo
+from core.managers import AreaScopedManager
 from core.normalizers import normalize_digits
 from core.normalizers import normalize_plate
 from core.normalizers import normalize_upper
@@ -23,7 +25,14 @@ class Unidade(TimeStampedModel):
     nome = models.CharField(max_length=255)
     sigla = models.CharField(max_length=50, blank=True)
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita
+    # para código que precisa enxergar todas. `default_manager_name` mantém o admin,
+    # as relações reversas e `validate_unique` irrestritos — ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["nome"]
         verbose_name = "Unidade"
         verbose_name_plural = "Unidades"
@@ -120,7 +129,12 @@ class Cargo(TimeStampedModel):
     nome = models.CharField(max_length=120)
     is_padrao = models.BooleanField(default=False)
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["nome"]
         verbose_name = "Cargo"
         verbose_name_plural = "Cargos"
@@ -155,7 +169,12 @@ class Cargo(TimeStampedModel):
         if self.nome:
             self.nome = normalize_upper(self.nome)
         if self.is_padrao:
-            Cargo.objects.select_for_update().exclude(pk=self.pk).filter(
+            # `BE-09`: `all_objects` porque o escopo é o `self.area` deste registro,
+            # na linha de baixo, e não o do request. `save()` roda também fora de
+            # request e com área diferente da ativa; recortado, o padrão anterior
+            # não seria rebaixado e a gravação estouraria em
+            # `cadastros_cargo_area_padrao_unique`.
+            Cargo.all_objects.select_for_update().exclude(pk=self.pk).filter(
                 area=self.area,
                 is_padrao=True,
             ).update(is_padrao=False)
@@ -177,7 +196,12 @@ class Combustivel(TimeStampedModel):
     nome = models.CharField(max_length=120)
     is_padrao = models.BooleanField(default=False)
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["nome"]
         verbose_name = "Combustível"
         verbose_name_plural = "Combustíveis"
@@ -212,7 +236,12 @@ class Combustivel(TimeStampedModel):
         if self.nome:
             self.nome = normalize_upper(self.nome)
         if self.is_padrao:
-            Combustivel.objects.select_for_update().exclude(pk=self.pk).filter(
+            # `BE-09`: `all_objects` porque o escopo é o `self.area` deste registro,
+            # na linha de baixo, e não o do request. `save()` roda também fora de
+            # request e com área diferente da ativa; recortado, o padrão anterior
+            # não seria rebaixado e a gravação estouraria em
+            # `cadastros_combustivel_area_padrao_unique`.
+            Combustivel.all_objects.select_for_update().exclude(pk=self.pk).filter(
                 area=self.area,
                 is_padrao=True,
             ).update(is_padrao=False)
@@ -259,7 +288,12 @@ class Servidor(TimeStampedModel):
         related_name="servidores",
     )
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["nome"]
         verbose_name = "Servidor"
         verbose_name_plural = "Servidores"
@@ -376,7 +410,11 @@ class Viatura(TimeStampedModel):
         related_name="viaturas",
         verbose_name="Area de trabalho",
     )
-    placa = models.CharField(max_length=7, unique=True)
+    # `DB-05`: era `unique=True` — placa unica no sistema inteiro. A area B nao
+    # conseguia cadastrar viatura cuja placa a area A ja tivesse, sem enxergar
+    # nem poder usar a viatura dela. A unicidade agora e por area, nas
+    # constraints do `Meta`.
+    placa = models.CharField(max_length=7)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_RASCUNHO)
     modelo = models.CharField(max_length=120, blank=True)
     combustivel = models.ForeignKey(
@@ -402,12 +440,35 @@ class Viatura(TimeStampedModel):
         verbose_name="Motoristas",
     )
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["placa"]
         verbose_name = "Viatura"
         verbose_name_plural = "Viaturas"
         indexes = [
             models.Index(fields=["area", "placa"], name="cadastros_viat_area_placa_idx"),
+        ]
+        # `DB-05`, espelhando `justificativas/models.py:47-57` (`NOVO-09`).
+        #
+        # Sao **duas** constraints e nao um `unique_together`, porque `area` e
+        # anulavel e em SQL `NULL != NULL`: um `unique(area, placa)` puro
+        # deixaria passar duas linhas globais com a mesma placa, sem erro
+        # nenhum. A condicional cobre os dois casos separadamente.
+        constraints = [
+            models.UniqueConstraint(
+                fields=["placa"],
+                condition=Q(area__isnull=True),
+                name="viatura_placa_global_unique",
+            ),
+            models.UniqueConstraint(
+                fields=["area", "placa"],
+                condition=Q(area__isnull=False),
+                name="viatura_area_placa_unique",
+            ),
         ]
 
     def __str__(self):
@@ -514,7 +575,15 @@ class ConfiguracaoSistema(TimeStampedModel):
         help_text="Sufixo aplicado à numeração do plano (ex.: 20/2026/ASCOM).",
     )
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita.
+    # Este modelo é singleton **por área** num `OneToOneField`, então um recorte
+    # errado não devolve lista vazia — duplica linha e estoura o `unique`. Ver os
+    # comentários de `get_singleton` e `get_for_area` logo abaixo.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         verbose_name = "Configuração do sistema"
         verbose_name_plural = "Configurações do sistema"
 
@@ -545,6 +614,11 @@ class ConfiguracaoSistema(TimeStampedModel):
         current_area = get_current_area()
         if current_area is not None:
             return cls.get_for_area(current_area)
+        # `BE-09`: `objects` mesmo, e não `all_objects`, ainda que a linha case com o
+        # padrão de consulta global. Ela **só é alcançada quando `current_area` já
+        # é `None`**, pelo retorno antecipado quatro linhas acima. Aí o manager ou
+        # não recorta (sem request) ou recorta exatamente para `area IS NULL`
+        # (request sem área) — redundante nos dois casos, nunca divergente.
         obj = cls.objects.filter(area__isnull=True).order_by("pk").first()
         if obj is not None:
             return obj
@@ -568,7 +642,14 @@ class ConfiguracaoSistema(TimeStampedModel):
     def get_for_area(cls, area):
         if area is None:
             return cls.get_singleton()
-        obj, _ = cls.objects.get_or_create(area=area, defaults={"prazo_justificativa_dias": 10})
+        # `BE-09`: `all_objects` — aqui a área vem no argumento, e ela **diverge** da
+        # ativa em produção: `cadastros/selectors.py:208`, `planos_trabalho/services.py`
+        # e `prestacoes_contas/services.py:133` (a correção do `BE-06`) chamam com a
+        # área de outro registro. Recortado, o `get` vem vazio, o `create` roda e o
+        # `OneToOneField` estoura com uma segunda configuração para a mesma área.
+        obj, _ = cls.all_objects.get_or_create(
+            area=area, defaults={"prazo_justificativa_dias": 10},
+        )
         return obj
 
     def save(self, *args, **kwargs):
@@ -710,6 +791,11 @@ class TabelaDiaria(TimeStampedModel):
                 condition=Q(valor_24h__gt=0),
                 name="tabela_diaria_valor_24h_positivo",
             ),
+            # `DB-07`: os dois derivados tinham a positividade só por consequência
+            # de `valor_24h` — e derivado é exatamente o que um `update()` cru ou
+            # uma migração de dados grava sem passar pelo `save()` que os calcula.
+            positivo("valor_15", name="tabela_diaria_valor_15_positivo"),
+            positivo("valor_30", name="tabela_diaria_valor_30_positivo"),
         ]
         indexes = [
             models.Index(

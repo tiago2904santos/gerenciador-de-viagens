@@ -41,16 +41,16 @@
   <div class="field cv-field field-size-1">
     <label class="cv-field__label" for="{{ form.km_inicial.id_for_label }}">KM inicial</label>
     {{ form.km_inicial }}
-    {% if form.km_inicial.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.km_inicial.errors only %}{% endif %}
+    {% if form.km_inicial.errors %}<c-ui.feedback.field_error :errors="form.km_inicial.errors" :field_id="form.km_inicial.auto_id" only />{% endif %}
   </div>
   <div class="field cv-field field-size-1">
     <label class="cv-field__label" for="{{ form.km_final.id_for_label }}">KM final</label>
     {{ form.km_final }}
-    {% if form.km_final.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.km_final.errors only %}{% endif %}
+    {% if form.km_final.errors %}<c-ui.feedback.field_error :errors="form.km_final.errors" :field_id="form.km_final.auto_id" only />{% endif %}
   </div>
   <div class="field cv-field field-size-1">
     <label class="cv-field__label" for="{{ form.abastecimento.id_for_label }}">Abastecimento</label>
-    {% include "components/ui/forms/select.html" with field=form.abastecimento only %}
-    {% if form.abastecimento.errors %}{% include "components/ui/feedback/field_error.html" with errors=form.abastecimento.errors only %}{% endif %}
+    <c-ui.forms.select :field="form.abastecimento" only />
+    {% if form.abastecimento.errors %}<c-ui.feedback.field_error :errors="form.abastecimento.errors" :field_id="form.abastecimento.auto_id" only />{% endif %}
   </div>
 </div>

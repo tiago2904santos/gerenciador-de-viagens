@@ -1,6 +1,7 @@
 """Fachada pública das views de Planos de Trabalho (P-06)."""
 
 from .activity_views import atividades_autosave, wizard_atividades
+from .card_menu_views import card_menus
 from .catalogs import (
     atividade_editar,
     atividade_excluir,
@@ -64,6 +65,7 @@ __all__ = [
     "atividade_excluir",
     "atividades_autosave",
     "atividades_index",
+    "card_menus",
     "baixar_documento",
     "editar",
     "efetivo_diarias_autosave",

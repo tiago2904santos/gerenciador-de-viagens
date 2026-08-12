@@ -1,0 +1,5 @@
+{% cotton:vars extra_class primary_action primary_extra_class primary_label primary_url primary_variant secondary_action secondary_extra_class secondary_label secondary_url %}
+<section class="card-footer-section{% if extra_class %} {{ extra_class }}{% endif %}">
+  <div class="card-footer-section__divider" aria-hidden="true"></div>
+  <c-ui.layouts.card_footer_actions :secondary_label="secondary_label" :secondary_url="secondary_url" :secondary_action="secondary_action" :secondary_extra_class="secondary_extra_class" :primary_label="primary_label" :primary_url="primary_url" :primary_action="primary_action" :primary_variant="primary_variant" :primary_extra_class="primary_extra_class" only />
+</section>

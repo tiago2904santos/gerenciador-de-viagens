@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from .card_menu_views import card_menus
 from . import assinatura_views
 
 
@@ -55,7 +56,7 @@ urlpatterns = [
         views.prestacao_servidor_assinado_anexar,
         name="prestacao_servidor_assinado_anexar",
     ),
-    path("prestacao/<int:pc_pk>/anexo/<int:anexo_pk>/excluir/", views.prestacao_documento_excluir, name="prestacao_documento_excluir"),
+    path("prestacao/<int:pc_pk>/anexo/<int:anexo_pk>/excluir/", views.prestacao_documento_excluir, name="prestacao_documento_delete"),
     path(
         "prestacao/<int:pc_pk>/anexo/<int:anexo_pk>/conteudo/",
         views.prestacao_documento_conteudo,
@@ -65,6 +66,7 @@ urlpatterns = [
     path("servidor-prestacao/<int:ps_pk>/comprovante/autosave/", views.prestacao_servidor_arquivo_autosave, name="prestacao_servidor_arquivo_autosave"),
     path("prestacao/<int:pc_pk>/rt/", views.rt_criar, name="rt_criar"),
     path("rt/<int:pk>/autosave/", views.rt_autosave, name="rt_autosave"),
+    path("<int:pk>/menus/", card_menus, name="card_menus"),
     path(
         "servidor-prestacao/<int:ps_pk>/rt/autosave/",
         views.rt_servidor_autosave,
@@ -108,7 +110,7 @@ urlpatterns = [
     path("assinar/<str:token>/<str:tipo>/pdf/", assinatura_views.publico_pdf_origem, name="assinatura_pdf_origem"),
     # Modelos de texto reutilizáveis
     path("modelos-texto/", views.modelos_index, name="modelos_index"),
-    path("modelos-texto/novo/", views.modelo_novo, name="modelo_novo"),
-    path("modelos-texto/<int:pk>/editar/", views.modelo_editar, name="modelo_editar"),
-    path("modelos-texto/<int:pk>/excluir/", views.modelo_excluir, name="modelo_excluir"),
+    path("modelos-texto/novo/", views.modelo_novo, name="modelo_create"),
+    path("modelos-texto/<int:pk>/editar/", views.modelo_editar, name="modelo_update"),
+    path("modelos-texto/<int:pk>/excluir/", views.modelo_excluir, name="modelo_delete"),
 ]

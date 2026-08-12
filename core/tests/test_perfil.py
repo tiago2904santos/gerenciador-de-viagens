@@ -7,6 +7,8 @@ from django.urls import reverse
 
 from eventos.models import Evento
 from integracoes.google_drive.models import DriveSyncStatus
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class PerfilUsuarioTests(TestCase):
@@ -41,9 +43,10 @@ class PerfilUsuarioTests(TestCase):
 
     def test_perfil_nao_faz_n_mais_um_nas_pendencias_do_drive(self):
         self.client.force_login(self.user)
+        vincular_area(self.user)
         content_type = ContentType.objects.get_for_model(Evento)
         eventos = Evento.objects.bulk_create(
-            [Evento(titulo=f"Evento {index}") for index in range(20)],
+            [Evento(area=area_de_teste(), titulo=f"Evento {index}") for index in range(20)],
         )
         DriveSyncStatus.objects.bulk_create(
             [

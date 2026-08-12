@@ -68,11 +68,26 @@ def listar_usuarios(q=""):
     return queryset.order_by("first_name", "username")
 
 
-def contadores_administracao():
-    """Os dois números que alimentam o alternador Usuários / Áreas."""
+def contadores_administracao(*, total_usuarios=None, total_areas=None):
+    """Os dois números que alimentam o alternador Usuários / Áreas.
+
+    `PF-06`: sem busca, o `Paginator` da própria página já contou exatamente o
+    mesmo conjunto — e `Paginator.count` é `cached_property`, então reaproveitar
+    não custa consulta nenhuma. Era o caso do enunciado, "consulta refeita em
+    camada diferente": o badge da aba recontava `auth_user` depois de a paginação
+    ter contado.
+
+    Com busca ativa os dois números divergem de propósito (o paginador conta o
+    filtrado, o badge conta o total), e aí o argumento vem `None` e a contagem
+    acontece.
+    """
     return {
-        "total_areas": AreaTrabalho.objects.count(),
-        "total_usuarios": get_user_model().objects.count(),
+        "total_areas": (
+            AreaTrabalho.objects.count() if total_areas is None else total_areas
+        ),
+        "total_usuarios": (
+            get_user_model().objects.count() if total_usuarios is None else total_usuarios
+        ),
         "total_vinculos": VinculoUsuarioArea.objects.count(),
     }
 

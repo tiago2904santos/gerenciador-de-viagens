@@ -1,0 +1,403 @@
+/* Usuários — lista + quick-add no padrão das justificativas. */
+
+.usuarios-page {
+  --step1-surface: var(--color-surface-muted, var(--color-card));
+  --step1-panel: var(--color-surface-soft, var(--color-card));
+  --step1-field: var(--step1-surface);
+  display: grid;
+  gap: var(--space-5);
+}
+
+:is(html[data-theme="dark"]) .usuarios-page {
+  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  --step1-panel: var(--color-surface-soft);
+  --step1-field: var(--step1-surface);
+}
+
+.usuarios-page .list-header,
+.usuarios-page .list-header__rail,
+.usuarios-page .list-header .inline-create__toggle:not(.is-filled):not(.usuario-quick-add__toggle--ready):not(.area-quick-add__toggle--ready),
+:is(html[data-theme="dark"]) .usuarios-page .list-header,
+:is(html[data-theme="dark"]) .usuarios-page .list-header__rail,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle:not(.is-filled):not(.usuario-quick-add__toggle--ready):not(.area-quick-add__toggle--ready) {
+  background: var(--step1-surface);
+}
+
+.usuarios-page .list-header__band,
+:is(html[data-theme="dark"]) .usuarios-page .list-header__band {
+  background: var(--color-surface-muted);
+}
+
+.usuarios-page .record-row,
+:is(html[data-theme="dark"]) .usuarios-page .record-row {
+  background: var(--step1-field, var(--step1-surface));
+  border: 0;
+  box-shadow: none;
+}
+
+.usuarios-page .record-row:hover,
+.usuarios-page .record-row:focus-within,
+:is(html[data-theme="dark"]) .usuarios-page .record-row:hover,
+:is(html[data-theme="dark"]) .usuarios-page .record-row:focus-within {
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field, var(--step1-surface)));
+  border: 0;
+  box-shadow: none;
+}
+
+.usuarios-page .record-row__vincular {
+  flex-shrink: 0;
+}
+
+/*
+ * Pronto para salvar: primary dourado + animação de rótulo (mesmo contrato das
+ * justificativas). Só entra com `.is-filled` / `--ready` quando o JS valida
+ * todos os campos obrigatórios.
+ */
+.usuarios-page .list-header .inline-create__toggle {
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.usuarios-page .list-header .inline-create__toggle .inline-create__toggle-icon,
+.usuarios-page .list-header .inline-create__toggle .inline-create__toggle-label {
+  transition:
+    opacity 140ms ease,
+    transform 180ms ease,
+    background-color 220ms ease,
+    color 220ms ease;
+}
+
+.usuarios-page .list-header .inline-create__toggle.is-filled,
+.usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready,
+.usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready,
+.usuarios-page .list-header .inline-create__toggle.is-filled[aria-expanded="true"],
+.usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready[aria-expanded="true"],
+.usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready[aria-expanded="true"],
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.is-filled,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.is-filled[aria-expanded="true"],
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready[aria-expanded="true"],
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready[aria-expanded="true"] {
+  animation: none;
+  background: var(--color-accent);
+  background-image: none;
+  border: 0;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  color: var(--color-on-accent, #19232d);
+  font-weight: var(--font-weight-bold);
+}
+
+.usuarios-page .list-header .inline-create__toggle.is-filled:hover,
+.usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready:hover,
+.usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready:hover,
+.usuarios-page .list-header .inline-create__toggle.is-filled:focus-visible,
+.usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready:focus-visible,
+.usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready:focus-visible,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.is-filled:hover,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready:hover,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready:hover,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.is-filled:focus-visible,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready:focus-visible,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready:focus-visible {
+  background: var(--color-accent-hover, var(--color-accent));
+  background-image: none;
+  border: 0;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
+  color: var(--color-on-accent, #19232d);
+}
+
+.usuarios-page .list-header .inline-create__toggle.is-filled .inline-create__toggle-icon,
+.usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready .inline-create__toggle-icon,
+.usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready .inline-create__toggle-icon,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.is-filled .inline-create__toggle-icon,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--ready .inline-create__toggle-icon,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--ready .inline-create__toggle-icon {
+  background: color-mix(in srgb, var(--color-on-accent, #19232d) 14%, transparent);
+  color: inherit;
+}
+
+.usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--changing .inline-create__toggle-icon,
+.usuarios-page .list-header .inline-create__toggle.usuario-quick-add__toggle--changing .inline-create__toggle-label,
+.usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--changing .inline-create__toggle-icon,
+.usuarios-page .list-header .inline-create__toggle.area-quick-add__toggle--changing .inline-create__toggle-label {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.usuarios-page .list-header__rail--inline-create {
+  gap: var(--space-3);
+  padding: var(--space-3) clamp(var(--space-4), 2vw, var(--space-5));
+}
+
+.usuarios-page .list-header .inline-create__panel.is-open,
+:is(html[data-theme="dark"]) .usuarios-page .list-header .inline-create__panel.is-open {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.usuario-quick-add,
+.area-quick-add {
+  display: grid;
+  gap: var(--space-3);
+}
+
+[data-usuario-quick-add] .usuario-quick-add__scope,
+[data-area-quick-add] .area-quick-add__scope {
+  --step1-surface: var(--color-surface-muted, var(--color-card));
+  --step1-panel: var(--color-surface-soft, var(--color-card));
+  --step1-field: var(--step1-surface);
+  --step1-empty: var(--step1-field);
+  display: grid;
+  gap: 10px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+:is(html[data-theme="dark"]) [data-usuario-quick-add] .usuario-quick-add__scope,
+:is(html[data-theme="dark"]) [data-area-quick-add] .area-quick-add__scope {
+  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  --step1-panel: var(--color-surface-soft);
+  --step1-field: var(--step1-surface);
+  --step1-empty: var(--step1-field);
+}
+
+[data-usuario-quick-add] .travel-document-block,
+[data-area-quick-add] .travel-document-block {
+  background: var(--step1-panel);
+  border: 0;
+  border-radius: 14px;
+  margin: 0;
+  padding: 14px;
+}
+
+[data-usuario-quick-add] .form-block--split,
+[data-area-quick-add] .form-block--split {
+  align-items: start;
+}
+
+[data-usuario-quick-add] .form-block__body,
+[data-area-quick-add] .form-block__body {
+  min-width: 0;
+}
+
+/* Modal Vincular usuário — mesmo contrato visual do anexar assinado. */
+.vincular-usuario-modal__dialog.delete-confirm-modal__dialog,
+.vincular-usuario-modal__dialog {
+  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  --step1-panel: var(--color-surface-soft);
+  --step1-field: var(--step1-surface);
+  background: var(--step1-surface);
+  gap: 0;
+  max-width: min(100%, 520px);
+  overflow: hidden;
+  padding: 0;
+}
+
+:is(html[data-theme="dark"]) #vincular-usuario-modal .vincular-usuario-modal__dialog {
+  background: var(--step1-surface) !important;
+}
+
+.vincular-usuario-modal__dialog > .cv-dialog__header {
+  margin: 0;
+  padding: 18px 22px 16px;
+}
+
+.vincular-usuario-modal__form.cv-dialog__form {
+  display: grid;
+  grid-template-rows: auto auto;
+  min-height: 0;
+}
+
+.vincular-usuario-modal__dialog.cv-dialog__panel {
+  align-content: start;
+  grid-template-rows: auto auto;
+  height: auto;
+  max-height: min(88vh, 760px);
+}
+
+.vincular-usuario-modal__body {
+  display: grid;
+  gap: 12px;
+  padding: 18px 22px 16px !important;
+}
+
+.vincular-usuario-modal__intro {
+  align-items: flex-start;
+  background: var(--step1-panel, var(--color-surface-soft));
+  border: 0;
+  border-radius: 15px;
+  color: var(--action-muted, var(--theme-text-muted));
+  display: flex;
+  font-size: 0.84rem;
+  gap: 10px;
+  line-height: 1.55;
+  margin: 0;
+  padding: 10px 12px;
+}
+
+.vincular-usuario-modal__intro .icon {
+  color: var(--action-info-text, var(--color-info));
+  flex: 0 0 18px;
+  height: 18px;
+  margin-top: 2px;
+  width: 18px;
+}
+
+.vincular-usuario-modal__intro strong {
+  color: var(--action-text-strong, var(--theme-text-heading));
+}
+
+:is(html[data-theme="dark"]) .vincular-usuario-modal__fields.form-stack,
+.vincular-usuario-modal__fields.form-stack,
+.vincular-usuario-modal__fields {
+  --step1-field: var(--step1-surface);
+  /* UI-03: re-ligacao COM ESCOPO, nao definicao global — permitida de proposito.
+     45 regras globais leem var(--color-input-bg); re-ligar aqui faz todas elas
+     pintarem o campo com a superficie do passo 1 sem que nenhuma delas precise
+     conhecer este container. Converter para estilo direto custaria duplicar as
+     45 sob este seletor, subindo especificidade — o oposto da Fase 7. */
+  --color-input-bg: var(--step1-field);
+  background: var(--step1-panel, var(--color-surface-soft));
+  border-radius: 15px;
+  display: grid;
+  gap: 18px;
+  margin: 0;
+  padding: 14px;
+}
+
+.vincular-usuario-modal__fields > .field,
+.vincular-usuario-modal__fields > .cv-field {
+  margin: 0;
+  min-width: 0;
+}
+
+.vincular-usuario-modal__fields > .field + .field,
+.vincular-usuario-modal__fields > .cv-field + .cv-field {
+  margin-top: 0;
+}
+
+
+.vincular-usuario-modal__fields :is(
+  .search-picker__control,
+  .search-picker__input,
+  .custom-select__trigger,
+  .custom-select__trigger--v2
+) {
+  background: var(--step1-field, var(--color-input-bg)) !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+
+.vincular-usuario-modal__fields .custom-select__trigger--v2 .custom-select__value {
+  padding: 0 14px;
+}
+
+.vincular-usuario-modal__fields .search-picker__control {
+  min-height: var(--control-height-md, 44px);
+  padding-inline: 12px;
+}
+
+.vincular-usuario-modal__dialog .cv-dialog__footer,
+:is(html[data-theme="dark"]) #vincular-usuario-modal .cv-dialog__footer {
+  align-items: stretch;
+  background: transparent;
+  border-top: 0;
+  display: block;
+  justify-content: stretch;
+  margin: 0;
+  padding: 0;
+}
+
+.vincular-usuario-modal__footer.form-card__footer {
+  display: block;
+  width: 100%;
+}
+
+.vincular-usuario-modal__footer .card-footer-section {
+  margin: 0;
+}
+
+.vincular-usuario-modal__footer .card-footer {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  gap: var(--space-3);
+  justify-content: space-between;
+  min-height: 0;
+  padding: 12px 22px 16px;
+}
+
+/* Evita o secondary esticar e parecer um bloco maior que o primary. */
+#vincular-usuario-modal .card-footer__secondary .cv-btn,
+#vincular-usuario-modal .card-footer__primary .cv-btn {
+  align-self: center;
+  box-sizing: border-box;
+  height: var(--control-height-md, 44px);
+  min-height: var(--control-height-md, 44px);
+}
+
+.vincular-usuario-modal__footer .card-footer-section__divider {
+  border-top: 1px solid var(--color-border-soft, var(--action-group-border, var(--color-border)));
+  display: block;
+}
+
+/*
+ * Gerenciador da área — sem regra de superfície própria, de propósito.
+ *
+ * A versão anterior redefinia `--step1-surface` / `--step1-field` no shell da
+ * página e os dois acabavam com o MESMO valor: o `form-control` ficava da cor
+ * do card e o campo sumia. O `document-form-page` já entrega as superfícies
+ * certas (é o que `cadastros/configuracao` e `cadastros/servidores` usam);
+ * aqui só resta a lista de vínculos, que não deve ganhar cartão dentro do
+ * bloco.
+ */
+.usuarios-area-form .record-list {
+  gap: var(--space-2);
+}
+
+/*
+ * A paginação aqui é rodapé de um BLOCO, não de uma página: o recuo lateral de
+ * 24px do `pagination-shell` desalinhava a contagem e as setas das bordas das
+ * linhas logo acima.
+ */
+.usuarios-area-form .pagination-shell {
+  padding-bottom: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/*
+ * Sem moldura na lista de vínculos.
+ *
+ * `simple_list.html` emite `record-list simple-list`, e `.simple-list` ainda
+ * é o nome de uma lista LEGADA em `lists.css` — é dela que vinham a borda de
+ * 1px, o raio e a sombra em volta das linhas. O `record-list` canônico não
+ * tem moldura nenhuma; aqui só desfazemos a herança acidental.
+ */
+.usuarios-area-form .record-list.simple-list,
+:is(html[data-theme="dark"]) .usuarios-area-form .record-list.simple-list {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+
+/*
+ * Empty state do bloco "Usuários da área": sem moldura de cartão, mesma
+ * superfície dos `form-control` do formulário.
+ */
+.usuarios-area-form .empty-state,
+:is(html[data-theme="dark"]) .usuarios-area-form .empty-state {
+  background: var(--step1-field, var(--color-input-bg));
+  border: 0;
+  box-shadow: none;
+}

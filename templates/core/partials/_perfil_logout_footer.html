@@ -1,12 +1,12 @@
 {# Logout no rodapé do card mestre — fora dos forms de conta/senha. #}
-<section class="cv-card-footer-section">
-  <div class="cv-card-footer-section__divider" aria-hidden="true"></div>
-  <footer class="cv-card-footer cv-form-card__footer cv-card-footer--end">
-    <div class="cv-card-footer__secondary"></div>
-    <div class="cv-card-footer__primary">
+<section class="card-footer-section">
+  <div class="card-footer-section__divider" aria-hidden="true"></div>
+  <footer class="card-footer form-card__footer card-footer--end">
+    <div class="card-footer__secondary"></div>
+    <div class="card-footer__primary">
       <form method="post" action="{% url 'core:logout' %}">
         {% csrf_token %}
-        {% include "components/ui/buttons/button.html" with label="Sair do sistema" variant="secondary" type="submit" only %}
+        <c-ui.buttons.button label="Sair do sistema" variant="secondary" type="submit" only />
       </form>
     </div>
   </footer>

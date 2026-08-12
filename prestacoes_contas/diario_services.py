@@ -7,12 +7,17 @@ complementados pelo usuário e persistidos em ``DiarioBordoTrecho``.
 
 from __future__ import annotations
 
+import re
+
 from pathlib import Path
 
 from django.conf import settings
+from django.db import transaction
+from django.db.models import F
 from django.utils import timezone
 
 from cadastros.selectors import build_configuracao_context
+from core.normalizers import normalize_spaces
 from core.utils.masks import format_cpf
 from core.utils.masks import format_placa
 from core.utils.masks import format_protocolo
@@ -259,15 +264,45 @@ def alteracoes_datas_horarios_roteiro(prestacao) -> list[str]:
     return itens
 
 
+#: `DB-08` fatia 2: bloco livre para onde as posições vão no primeiro passo.
+#: Fica acima de qualquer posição final — e as finais são `0..len(trechos)`, uma
+#: por trecho do roteiro. Cabe com folga no `PositiveIntegerField`.
+DESLOCAMENTO_ORDEM_TRECHO = 1_000_000
+
+
+@transaction.atomic
 def sincronizar_trechos(diario: DiarioBordo) -> list[DiarioBordoTrecho]:
-    """Garante uma linha de diário por trecho do roteiro, preservando o que já foi digitado."""
+    """Garante uma linha de diário por trecho do roteiro, preservando o que já foi digitado.
+
+    `DB-08` fatia 2: atômica. Nenhum dos chamadores abre transação — nem as três
+    views de `diario_views.py`, nem `services.py:574` — e sem ela uma falha no meio
+    deixa as posições estacionadas no bloco de deslocamento, à vista do usuário.
+    """
     roteiro = roteiro_efetivo(diario.prestacao)
     trechos = trechos_ordenados(roteiro)
+
+    # `DB-08` fatia 2, **primeiro passo**. As posições finais entram uma a uma no
+    # laço abaixo, e a linha é reaproveitada por `id`: quando o roteiro muda de
+    # ordem, a posição que estou gravando ainda pertence a outra linha. Este
+    # `UPDATE` único tira todas do caminho; o laço as traz de volta já no lugar, e
+    # o `delete()` do fim leva as que sobraram. `deferrable=DEFERRED` não serve —
+    # o SQLite não o suporta e a suíte roda nos dois bancos.
+    #
+    # **Antes da leitura, não depois.** Lendo primeiro, os objetos em memória
+    # ficariam com a posição antiga enquanto o banco já teria a deslocada, e o
+    # `save()` do laço — que grava todos os campos — devolveria o valor velho por
+    # acidente. Funciona enquanto o laço atribuir `ordem` explicitamente, e é
+    # exatamente o tipo de acerto silencioso que some quando alguém mexe no laço.
+    # Medido: com a leitura antes, o teste do bloco passa mesmo com o laço não
+    # devolvendo linha nenhuma.
+    diario.trechos.update(ordem=F("ordem") + DESLOCAMENTO_ORDEM_TRECHO)
+
     existentes = list(diario.trechos.all().order_by("ordem", "pk"))
     por_trecho = {dt.trecho_id: dt for dt in existentes}
     ids_atuais = {t.id for t in trechos}
     # Linhas cujo trecho deixou de existir (ex.: roteiro foi clonado/recriado):
     # ficam disponíveis para reaproveitar, preservando KM/abastecimento por ordem.
+    # A ordem relativa sobrevive ao deslocamento: ele soma o mesmo em todas.
     sobrando = [dt for dt in existentes if dt.trecho_id not in ids_atuais]
 
     usados = []
@@ -555,3 +590,133 @@ def nome_arquivo_diario(diario: DiarioBordo, formato: str = "xlsx") -> str:
     oficio = pc.oficio.numero_formatado.replace("/", "-")
     ext = "pdf" if formato == "pdf" else "xlsx"
     return f"DIARIO_DE_BORDO_OFICIO_{oficio}.{ext}"
+
+
+# ---------------------------------------------------------------------------
+# `BE-14` fatia 4 — a gravação do diário sai das views.
+#
+# `sincronizar_trechos` (acima) já era atômica desde o `DB-08`: a parte que **cria** as
+# linhas do diário estava protegida, a que **preenche** não estava. Estas três funções
+# fecham isso.
+# ---------------------------------------------------------------------------
+
+#: Campos que o autosave do diário aceita, por linha.
+CAMPOS_AUTOSAVE_DIARIO = frozenset({"km_inicial", "km_final", "abastecimento"})
+
+#: Qual status marcar depois de gravar — a única diferença entre as duas rotas de
+#: autosave do diário, como no RT (`rt_services.ESCOPO_*`).
+ESCOPO_SERVIDOR = "servidor"
+ESCOPO_EQUIPE = "equipe"
+
+_CAMPO_LINHA = re.compile(r"^form-(\d+)-(km_inicial|km_final|abastecimento)$")
+
+
+def obter_ou_criar_diario(prestacao) -> DiarioBordo:
+    """O diário da prestação, criado na primeira visita à tela.
+
+    Fica no service e não em `selectors.py` porque `get_or_create` **grava**
+    (`docs/PADRAO_SELECTORS.md`: selector é consulta) — mesma razão de
+    `rt_services.obter_ou_criar_relatorio_tecnico`, na fatia 1.
+    """
+    diario, _ = DiarioBordo.objects.get_or_create(prestacao=prestacao)
+    return diario
+
+
+def _parse_km(value):
+    digitos = re.sub(r"\D", "", str(value or ""))
+    return int(digitos) if digitos else None
+
+
+@transaction.atomic
+def salvar_autosave_do_diario(
+    diario: DiarioBordo, *, fields, dirty_fields, escopo, servidor_prestacao=None
+) -> int:
+    """Grava km e abastecimento das linhas sujas, e marca o status. Devolve quantas mudou.
+
+    Atômica porque grava **em laço**, um `UPDATE` por campo sujo: digitar km inicial e km
+    final da mesma linha são duas gravações, e sem transação uma falha entre elas deixa
+    metade — o operador vê um campo salvo e o outro não, sem nada dizendo isso.
+
+    Recebe o payload já interpretado, nunca o `request` (`docs/PADRAO_SERVICES.md:20`).
+    """
+    from .services import marcar_servidor_em_preenchimento
+    from .services import marcar_servidores_pendentes
+
+    linhas = list(diario.trechos.select_related("trecho").order_by("ordem", "pk"))
+    gravadas = 0
+    for nome in dirty_fields:
+        match = _CAMPO_LINHA.match(str(nome or ""))
+        if not match:
+            continue
+        indice, campo = int(match.group(1)), match.group(2)
+        if indice >= len(linhas):
+            continue
+        linha = linhas[indice]
+        valor = fields.get(nome)
+        if campo in {"km_inicial", "km_final"}:
+            setattr(linha, campo, _parse_km(valor))
+        else:
+            linha.abastecimento = str(valor or "") != "nao"
+        linha.save(update_fields=[campo])
+        gravadas += 1
+
+    if gravadas:
+        diario.save(update_fields=["atualizado_em"])
+    if dirty_fields:
+        if escopo == ESCOPO_SERVIDOR:
+            marcar_servidor_em_preenchimento(servidor_prestacao)
+        else:
+            marcar_servidores_pendentes(diario.prestacao)
+    return gravadas
+
+
+@transaction.atomic
+def salvar_linhas_do_diario(formset, servidor_prestacao) -> int:
+    """Caminho sem JS: o formset das linhas e a marcação de status na mesma transação.
+
+    O form já validou; aqui só se grava. `formset.save()` escreve N linhas de uma vez, e
+    a marcação é a N+1.
+    """
+    from .services import marcar_servidor_em_preenchimento
+
+    salvas = formset.save()
+    marcar_servidor_em_preenchimento(servidor_prestacao)
+    return len(salvas)
+
+
+@transaction.atomic
+def trocar_motorista_do_diario(form, prestacao, servidor_prestacao) -> None:
+    """Troca motorista/viatura só deste diário, com a prévia do RT e o status juntos.
+
+    São **três gravações**: o diário, a prévia de "informações complementares" do RT e a
+    marcação. O texto do RT é o que **explica a troca** no documento — deixá-lo para trás
+    numa falha significa emitir o documento sem a explicação, e a tela não diz nada.
+
+    `sincronizar_info_complementares_rt` só preenche quando o campo está vazio: não
+    sobrescreve texto do usuário. Essa regra é de antes desta fatia e não mudou.
+    """
+    from .services import marcar_servidor_em_preenchimento
+
+    form.save()
+    sincronizar_info_complementares_rt(prestacao)
+    marcar_servidor_em_preenchimento(servidor_prestacao)
+
+
+def sincronizar_info_complementares_rt(prestacao) -> bool:
+    """Gera a prévia de "informações complementares" do RT, se ainda estiver vazia.
+
+    Devolve se gravou. Não sobrescreve texto do usuário — a checagem de vazio é a regra,
+    não um detalhe de implementação.
+    """
+    from .models import RelatorioTecnico
+    from .services import descricao_ajustes_prestacao
+
+    relatorio = RelatorioTecnico.objects.filter(prestacao=prestacao).first()
+    if relatorio is None or normalize_spaces(relatorio.info_complementares or ""):
+        return False
+    texto = descricao_ajustes_prestacao(prestacao)
+    if not texto:
+        return False
+    relatorio.info_complementares = texto
+    relatorio.save(update_fields=["info_complementares", "atualizado_em"])
+    return True

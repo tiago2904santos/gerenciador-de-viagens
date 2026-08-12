@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from django.db.models import Exists
 from django.db.models import OuterRef
+from django.db.models import Prefetch
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
@@ -18,6 +19,28 @@ from core.normalizers import remove_accents
 from core.tenancy import filter_queryset_by_area
 
 from .models import TermoAutorizacao
+
+
+def prefetch_servidores_efetivos():
+    """Prefetch de `servidores` na forma exata que `servidores_efetivos()` usa.
+
+    O cache do prefetch só dispensa a consulta por linha se trouxer o mesmo
+    `select_related` e a mesma ordenação da primeira cascata de
+    `TermoAutorizacao.servidores_efetivos()`; com um `prefetch_related("servidores")`
+    genérico o model recebe os servidores mas perde cargo e unidade, e cada
+    acesso volta a consultar (`NOVO-08`).
+
+    É função e não constante de módulo de propósito: reaproveitar a mesma
+    instância de `Prefetch` entre querysets diferentes é fonte conhecida de erro.
+    """
+    return Prefetch(
+        "servidores",
+        # `BE-09`: `all_objects` — quem delimita aqui é a própria M2M `servidores` do
+        # termo, não a área ativa. Recortado, o termo renderizado fora da sua área
+        # perderia os servidores em silêncio, e o `NOVO-08` (que este prefetch existe
+        # para resolver) voltaria como lista vazia em vez de N+1.
+        queryset=Servidor.all_objects.select_related("cargo", "unidade").order_by("nome"),
+    )
 
 
 def anotar_composicao(termos):
@@ -74,7 +97,7 @@ def listar_termos(q=None, q_digits=None, simples=None):
             "destino_cidade",
             "viatura",
         )
-        .prefetch_related("servidores")
+        .prefetch_related(prefetch_servidores_efetivos())
         .order_by("-created_at")
     )
     if simples is not None:
@@ -84,6 +107,30 @@ def listar_termos(q=None, q_digits=None, simples=None):
         return termos
 
     q_unaccent = remove_accents(q)
+    # `DB-11`: as tres M2M abaixo estavam no mesmo `OR` das colunas escalares.
+    # O PostgreSQL precisava expandir cada termo pelos tres relacionamentos antes
+    # de filtrar e aplicar `DISTINCT` (20 mil termos viravam ~60 mil linhas na
+    # medicao do catálogo). `Exists` preserva a semantica sem multiplicar a linha
+    # externa; cada origem pode ser planejada de forma independente.
+    from oficios.models import Oficio
+
+    servidores_do_termo = TermoAutorizacao.servidores.through.objects.filter(
+        termoautorizacao_id=OuterRef("pk"),
+        servidor__nome__unaccent__icontains=q_unaccent,
+    )
+    servidores_do_oficio = Oficio.servidores.through.objects.filter(
+        oficio_id=OuterRef("oficio_id"),
+        servidor__nome__unaccent__icontains=q_unaccent,
+    )
+    servidores_do_termo_do_oficio = Oficio.servidores_termo_autorizacao.through.objects.filter(
+        oficio_id=OuterRef("oficio_id"),
+        servidor__nome__unaccent__icontains=q_unaccent,
+    )
+    termos = termos.annotate(
+        _busca_servidor_do_termo=Exists(servidores_do_termo),
+        _busca_servidor_do_oficio=Exists(servidores_do_oficio),
+        _busca_servidor_do_termo_do_oficio=Exists(servidores_do_termo_do_oficio),
+    )
     query = (
         Q(destino_cidade__nome__unaccent__icontains=q_unaccent)
         | Q(destino_cidade__uf__unaccent__icontains=q_unaccent)
@@ -91,9 +138,9 @@ def listar_termos(q=None, q_digits=None, simples=None):
         | Q(destino_estado__sigla__unaccent__icontains=q_unaccent)
         | Q(oficio__numero__icontains=q)
         | Q(oficio__protocolo__icontains=q)
-        | Q(oficio__servidores__nome__unaccent__icontains=q_unaccent)
-        | Q(oficio__servidores_termo_autorizacao__nome__unaccent__icontains=q_unaccent)
-        | Q(servidores__nome__unaccent__icontains=q_unaccent)
+        | Q(_busca_servidor_do_termo=True)
+        | Q(_busca_servidor_do_oficio=True)
+        | Q(_busca_servidor_do_termo_do_oficio=True)
         | Q(viatura__placa__icontains=q)
         | Q(viatura__modelo__unaccent__icontains=q_unaccent)
         | Q(oficio__viatura__placa__icontains=q)
@@ -101,7 +148,7 @@ def listar_termos(q=None, q_digits=None, simples=None):
     )
     if q_digits:
         query |= Q(oficio__protocolo__icontains=q_digits) | Q(oficio__numero__icontains=q_digits)
-    return termos.filter(query).distinct()
+    return termos.filter(query)
 
 
 def queryset_termo_detalhe():
@@ -111,7 +158,7 @@ def queryset_termo_detalhe():
         "destino_estado",
         "destino_cidade",
         "viatura",
-    ).prefetch_related("servidores")
+    ).prefetch_related(prefetch_servidores_efetivos())
 
 
 def get_termo_by_id(pk):

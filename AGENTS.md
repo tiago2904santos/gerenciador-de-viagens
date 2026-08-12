@@ -55,6 +55,13 @@ segue o `PADRAO_*` correspondente; divergência é defeito, não estilo pessoal.
    é uma catraca: o número **só desce**. Se seu PR aumenta o número, o PR está errado.
 6. **Não apague arquivo "morto" sem prova.** Prova = `grep` no repositório inteiro (templates,
    JS, CSS, Python) colado no PR mostrando zero referências.
+   **Poda de CSS é por família de classe, não por arquivo.** A regra antiga ("um arquivo por PR")
+   quebrava no caso comum: classe estilizada em dois CSS e usada em nenhum template é morta nos
+   dois, e podar só um lado deixa regra órfã do outro. Medido em `cv-buttons.css`, 16 das 25
+   classes mortas estavam nessa situação. A unidade de PR é a **classe**, com a prova de grep
+   cobrindo todos os arquivos que a estilizam. O que continua valendo, e é o que a regra
+   protegia: nada sai sem grep de repositório inteiro, e o grep tem de cobrir **concatenação com
+   `+` e interpolação no meio da string**, não só `` `${…}` `` no começo.
 7. **Nada de `fetch()` cru, `alert()`, `confirm()`, `style=` inline, `<script>` inline, cor
    literal fora dos arquivos de token, ORM dentro de view.** Estes são os invariantes que as
    auditorias mediram; regredir qualquer um deles reprova o PR.

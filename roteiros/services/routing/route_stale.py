@@ -13,7 +13,10 @@ def mark_stale_when_signature_changed(roteiro: Roteiro, *, profile: str = "drivi
     """
     if not roteiro.pk:
         return
-    fresh = Roteiro.objects.get(pk=roteiro.pk)
+    # `BE-09`: `all_objects` — releímos **este** roteiro pelo pk, logo depois de
+    # salvá-lo. Um `.get()` recortado levantaria `DoesNotExist` (erro 500, não
+    # resultado vazio) sempre que a área do registro divergisse da ativa.
+    fresh = Roteiro.all_objects.get(pk=roteiro.pk)
     try:
         new_sig = build_route_signature_for_roteiro(fresh, profile=profile)
     except Exception:

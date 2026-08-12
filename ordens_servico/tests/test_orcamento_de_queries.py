@@ -27,6 +27,8 @@ from cadastros.models import Servidor
 from cadastros.models import Unidade
 from oficios.models import Oficio
 from ordens_servico.models import OrdemServico
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class OrcamentoDeQueriesOrdemServicoTests(TestCase):
@@ -37,10 +39,10 @@ class OrcamentoDeQueriesOrdemServicoTests(TestCase):
             Cidade.objects.create(nome=nome, estado=estado, uf="PR")
             for nome in ("Curitiba", "Londrina")
         ]
-        cargo = Cargo.objects.create(nome="Investigador")
-        unidade = Unidade.objects.create(nome="Unidade", sigla="UN")
+        cargo = Cargo.objects.create(area=area_de_teste(), nome="Investigador")
+        unidade = Unidade.objects.create(area=area_de_teste(), nome="Unidade", sigla="UN")
         servidores = [
-            Servidor.objects.create(
+            Servidor.objects.create(area=area_de_teste(), 
                 nome=f"Servidor {numero}",
                 cargo=cargo,
                 unidade=unidade,
@@ -52,7 +54,7 @@ class OrcamentoDeQueriesOrdemServicoTests(TestCase):
 
         inicio = timezone.localdate() - timedelta(days=3)
         for numero in range(1, 26):
-            ordem = OrdemServico.objects.create(
+            ordem = OrdemServico.objects.create(area=area_de_teste(), 
                 numero=numero,
                 ano=2026,
                 motivo="Apoio logistico ao evento institucional.",
@@ -64,7 +66,7 @@ class OrcamentoDeQueriesOrdemServicoTests(TestCase):
             # cegueira que escondeu o `NOVO-13` na lista de Plano de Trabalho.
             ordem.servidores.set(servidores)
             ordem.destinos.set(cidades)
-            oficio = Oficio.objects.create(motorista=servidores[0])
+            oficio = Oficio.objects.create(area=area_de_teste(), motorista=servidores[0])
             ordem.oficios.set([oficio])
             if numero == 1:
                 cls.ordem = ordem
@@ -72,6 +74,7 @@ class OrcamentoDeQueriesOrdemServicoTests(TestCase):
     def setUp(self):
         user = get_user_model().objects.create_user(username="os_orcamento")
         self.client.force_login(user)
+        vincular_area(user)
         # Aquecimento: a primeira leitura do singleton de configuracao e da
         # sessao custa queries que nao sao da tela medida.
         self.client.get(reverse("ordens_servico:index") + "?aba=atuais")
@@ -117,10 +120,17 @@ class OrcamentoDeQueriesOrdemServicoTests(TestCase):
     # fixture; o `NOVO-07` derrubou a lista para 22 ao parar de consultar por
     # card. O numero so desce daqui: se subir, alguem devolveu uma consulta
     # para dentro do laco dos cards.
-    QUERIES_LISTA = 22
-    QUERIES_LISTA_BUSCA = 22
+
+    # `PF-03` (07/08/2026): a sessão saiu do caminho de escrita de toda requisição
+    # (`cached_db` + `SESSION_SAVE_EVERY_REQUEST = False` + renovação periódica).
+    # Em regime, some 1 leitura + 1 escrita + 2 comandos de transação = **-4**.
+    # Onde o corte é **-1**, o teste mede a **primeira** requisição depois do
+    # login: ali `core/tenancy.py:52` grava a área na sessão, que por isso é
+    # salva de qualquer jeito, e só a leitura é economizada.
+    QUERIES_LISTA = 15  # remedido no DB-02: usuário de teste passou a ter vínculo de área
+    QUERIES_LISTA_BUSCA = 15
     # 26 -> 30 na edicao, sem N+1: a lista segue em 22, entao nada voltou para
     # dentro do laco dos cards. Os quatro sao custo constante da previa de
     # destinos, que resolve a sede das Configuracoes e rele o singleton por
     # request (4x ConfiguracaoSistema + 4x AreaTrabalho). Registrado NOVO-27.
-    QUERIES_EDITAR = 30
+    QUERIES_EDITAR = 20

@@ -24,6 +24,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from oficios.models import Oficio
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class RodapeDasEtapasNavegaveisTests(TestCase):
@@ -36,10 +38,10 @@ class RodapeDasEtapasNavegaveisTests(TestCase):
     )
 
     def setUp(self):
-        self.client.force_login(
-            get_user_model().objects.create_user(username="wizard_rodape")
-        )
-        self.oficio = Oficio.objects.create(data_criacao=date(2026, 8, 1))
+        usuario = get_user_model().objects.create_user(username="wizard_rodape")
+        vincular_area(usuario)
+        self.client.force_login(usuario)
+        self.oficio = Oficio.objects.create(area=area_de_teste(), data_criacao=date(2026, 8, 1))
 
     def _corpo(self, url_name):
         response = self.client.get(reverse(url_name, args=[self.oficio.pk]))

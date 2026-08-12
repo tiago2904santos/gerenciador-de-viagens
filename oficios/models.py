@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 
+from core.managers import AreaScopedManager
 from core.tenancy import get_current_area
 from core.models import CancelavelModel
 from cadastros.models import Combustivel
@@ -13,6 +14,12 @@ from core.normalizers import normalize_spaces
 from core.normalizers import normalize_upper
 from core.utils.masks import normalize_protocolo
 from roteiros.models import Roteiro
+
+
+#: Nome da `UniqueConstraint` que guarda (área, ano, número). Vive aqui, e não solto no
+#: `Meta`, porque `core.numeracao` compara o metadado da exceção contra ele: nome duplicado
+#: em dois lugares é nome que diverge no dia do rename, e a divergência seria silenciosa.
+CONSTRAINT_NUMERO_OFICIO = "oficios_oficio_area_ano_numero_unique"
 
 
 class Oficio(TimeStampedModel, CancelavelModel):
@@ -39,7 +46,7 @@ class Oficio(TimeStampedModel, CancelavelModel):
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
         on_delete=models.PROTECT,
-        null=True,
+        null=False,
         blank=True,
         related_name="oficios",
         verbose_name="Area de trabalho",
@@ -161,7 +168,14 @@ class Oficio(TimeStampedModel, CancelavelModel):
         help_text="Quando verdadeiro, o documento usa o rótulo Complementar ao lado do número do ofício.",
     )
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita
+    # para código que precisa enxergar todas. `default_manager_name` mantém o admin,
+    # as relações reversas e `validate_unique` irrestritos — ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["-data_criacao", "-created_at"]
         verbose_name = "Ofício"
         verbose_name_plural = "Ofícios"
@@ -169,7 +183,7 @@ class Oficio(TimeStampedModel, CancelavelModel):
             models.UniqueConstraint(
                 fields=["area", "ano", "numero"],
                 condition=Q(ano__isnull=False, numero__isnull=False),
-                name="oficios_oficio_area_ano_numero_unique",
+                name=CONSTRAINT_NUMERO_OFICIO,
             )
         ]
 
@@ -196,13 +210,22 @@ class Oficio(TimeStampedModel, CancelavelModel):
         area = get_current_area() if area is None else area
         configuracao = None
         if getattr(settings, "OFICIO_NUMERACAO_USAR_CONFIGURACAO", True):
-            configuracao = ConfiguracaoNumeracaoOficio.objects.filter(
+            # `BE-09`: `all_objects` é obrigatório aqui, e este é o site mais
+            # perigoso do ID. A união com `area IS NULL` busca o **padrão global**
+            # de propósito, para servir de piso a quem não tem configuração
+            # própria. Com `objects`, dentro de um request na área A a consulta
+            # vira `area=A AND (area=A OR area IS NULL)` = `area=A`: a linha
+            # global some, `piso` cai para 1 e a numeração de ofício reinicia.
+            configuracao = ConfiguracaoNumeracaoOficio.all_objects.filter(
                 Q(area=area) | Q(area__isnull=True),
                 ano=resolved_year,
             ).order_by(models.F("area_id").desc(nulls_last=True)).first()
         piso = max(configuracao.numero_inicial if configuracao else 1, 1)
-        qs = cls.objects.filter(ano=resolved_year)
-        lacunas_qs = OficioNumeroLacuna.objects.filter(ano=resolved_year, numero__gte=piso)
+        # `BE-09`: idem — o escopo destas duas é o `area` recebido no argumento, e
+        # as quatro linhas abaixo o aplicam. Recortar de novo pela área ativa
+        # esvaziaria a consulta sempre que as duas divergissem.
+        qs = cls.all_objects.filter(ano=resolved_year)
+        lacunas_qs = OficioNumeroLacuna.all_objects.filter(ano=resolved_year, numero__gte=piso)
         if area is not None:
             qs = qs.filter(area=area)
             lacunas_qs = lacunas_qs.filter(area=area)
@@ -236,7 +259,12 @@ class Oficio(TimeStampedModel, CancelavelModel):
         self.custeio_observacao = normalize_spaces(self.custeio_observacao)
         super().save(*args, **kwargs)
         if self.numero and self.ano:
-            OficioNumeroLacuna.objects.filter(area=self.area, ano=self.ano, numero=self.numero).delete()
+            # `BE-09`: `all_objects` — a lacuna consumida é a da área deste ofício,
+            # já no filtro. Recortada pela área ativa, ela sobreviveria e o número
+            # voltaria a ser oferecido como disponível estando em uso.
+            OficioNumeroLacuna.all_objects.filter(
+                area=self.area, ano=self.ano, numero=self.numero,
+            ).delete()
 
     def diarias_para_servidores(self):
         """Diárias deste ofício = valor por servidor (persistido no roteiro) × nº de servidores.
@@ -290,7 +318,14 @@ class ConfiguracaoNumeracaoOficio(models.Model):
     numero_inicial = models.PositiveIntegerField(default=1)
     atualizado_em = models.DateTimeField(auto_now=True)
 
+    # `BE-09`: ver `core/managers.py`. Atenção especial neste modelo — a linha com
+    # `area IS NULL` é o **padrão global**, e `get_next_available_numero` a busca de
+    # propósito junto com a da área. Toda consulta a ele aqui usa `all_objects`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["-ano", "area_id"]
         constraints = [
             models.UniqueConstraint(
@@ -329,7 +364,12 @@ class OficioNumeroLacuna(models.Model):
     numero = models.PositiveIntegerField()
     liberado_em = models.DateTimeField(auto_now_add=True)
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["ano", "numero"]
         verbose_name = "Número de ofício liberado"
         verbose_name_plural = "Números de ofício liberados"
@@ -356,7 +396,12 @@ class ModeloMotivoOficio(TimeStampedModel):
     ordem = models.PositiveIntegerField(default=100)
     is_padrao = models.BooleanField(default=False)
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["ordem", "nome"]
         verbose_name = "Modelo de motivo de ofício"
         verbose_name_plural = "Modelos de motivo de ofício"
@@ -377,5 +422,11 @@ class ModeloMotivoOficio(TimeStampedModel):
         self.nome = normalize_upper(self.nome)
         self.texto = normalize_spaces(self.texto)
         if self.is_padrao:
-            ModeloMotivoOficio.objects.exclude(pk=self.pk).filter(area=self.area).update(is_padrao=False)
+            # `BE-09`: `all_objects` porque o escopo é o `self.area` deste modelo,
+            # não o do request. Com `objects` e área explícita diferente da ativa,
+            # o padrão anterior não seria desmarcado e a gravação estouraria em
+            # `oficios_motivo_area_padrao_unique`.
+            ModeloMotivoOficio.all_objects.exclude(pk=self.pk).filter(area=self.area).update(
+                is_padrao=False,
+            )
         super().save(*args, **kwargs)

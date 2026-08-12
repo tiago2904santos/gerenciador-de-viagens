@@ -4,6 +4,8 @@ from core.uploads import validate_private_document_upload
 from django.db.models import Q
 from django.utils import timezone
 
+from core.constraints import periodo_ordenado
+from core.managers import AreaScopedManager
 from core.normalizers import normalize_spaces
 from core.normalizers import normalize_upper
 from core.models import TimeStampedModel
@@ -37,7 +39,7 @@ class Evento(models.Model):
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
         on_delete=models.PROTECT,
-        null=True,
+        null=False,
         blank=True,
         related_name="eventos",
         verbose_name="Area de trabalho",
@@ -82,16 +84,41 @@ class Evento(models.Model):
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita
+    # para código que precisa enxergar todas. `default_manager_name` mantém o admin,
+    # as relações reversas e `validate_unique` irrestritos — ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["-data_inicio", "-criado_em"]
         verbose_name = "Evento"
         verbose_name_plural = "Eventos"
         indexes = [
             models.Index(fields=["area", "-criado_em"], name="eventos_evento_area_criado_idx"),
         ]
+        constraints = [
+            # `DB-07`: o período do evento se propaga para ofício, termo, plano e
+            # ordem de serviço — invertido aqui, sai invertido nos cinco.
+            periodo_ordenado("data_inicio", "data_fim", name="evento_periodo_ordenado"),
+        ]
 
     def __str__(self) -> str:
         return self.titulo or f"Evento #{self.pk or 'novo'}"
+
+    def save(self, *args, **kwargs):
+        # `DB-02`, grupo operacional: era o único dos oito modelos do `core.E001`
+        # sem derivação de área no `save()` — todo evento criado por código que
+        # esquecesse `area` nascia no balde `area IS NULL`, invisível para a
+        # própria área e visível para usuário sem vínculo. Fora de request,
+        # `get_current_area()` devolve `None` e nada muda: worker e comando
+        # continuam gravando o que recebem explicitamente.
+        if self.area_id is None:
+            from core.tenancy import get_current_area
+
+            self.area = get_current_area()
+        super().save(*args, **kwargs)
 
     @property
     def periodo_display(self) -> str:
@@ -166,7 +193,12 @@ class TipoEvento(TimeStampedModel):
     ativo = models.BooleanField(default=True)
     ordem = models.PositiveIntegerField(default=100)
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["ordem", "nome"]
         verbose_name = "Tipo de evento"
         verbose_name_plural = "Tipos de evento"
@@ -238,7 +270,12 @@ class ModeloMotivoEvento(TimeStampedModel):
     ordem = models.PositiveIntegerField(default=100)
     is_padrao = models.BooleanField(default=False)
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["ordem", "nome"]
         verbose_name = "Modelo de motivo de evento"
         verbose_name_plural = "Modelos de motivo de evento"
@@ -275,7 +312,13 @@ class ModeloMotivoEvento(TimeStampedModel):
         self.nome = normalize_upper(self.nome)
         self.texto = normalize_spaces(self.texto)
         if self.is_padrao:
-            ModeloMotivoEvento.objects.exclude(pk=self.pk).filter(area=self.area).update(is_padrao=False)
+            # `BE-09`: `all_objects` porque o escopo é o `self.area` deste modelo, não
+            # o do request. Com `objects` e área explícita diferente da ativa, o padrão
+            # anterior não seria desmarcado e a gravação estouraria em
+            # `eventos_motivo_area_padrao_unique`.
+            ModeloMotivoEvento.all_objects.exclude(pk=self.pk).filter(area=self.area).update(
+                is_padrao=False,
+            )
         super().save(*args, **kwargs)
 
 

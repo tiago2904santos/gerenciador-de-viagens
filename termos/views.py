@@ -7,50 +7,80 @@ from urllib.parse import urlencode
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Count
+from django.db.models import Model
 from django.http import Http404
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
 
+from core.pagination import contexto_paginacao
+from core.deletion import DelecaoProtegidaError
+
 from core.retorno import voltar_para
-
-
+from cadastros.selectors import rotulo_da_sede_configurada
 from documentos.selectors import mapa_artefatos_pdf_termo_cadastro
+from documentos.selectors import mapa_artefatos_pdf_termo_cadastro_em_lote
 from documentos.services.async_generation import enfileirar_documento
 from documentos.services.types import DocumentoFormato
 from eventos.services import build_evento_document_seed
 from eventos.services import resolve_evento_from_request
 
+from oficios.picker import LIMITE_BUSCA
+from oficios.picker import dados_do_option
+from oficios.picker import oficios_ja_escolhidos
 from oficios.selectors import get_oficio_by_id
+from oficios.selectors import listar_oficios
 from oficios.services import redirect_para_corrigir_documento_oficio
 from oficios.services import validar_oficio_para_documento
 
 from .forms import TermoAutorizacaoForm
 from .models import TermoAutorizacao
 from .presenters import apresentar_linha_simples_termo
-from .presenters import apresentar_termo_card
+from .card_builder import montar_card_de_termo
 from .selectors import get_servidor_do_termo_do_oficio
 from .selectors import get_servidor_para_termo
 from .selectors import get_termo_by_id
-from django.db.models import Count
-
 from .selectors import Q_SIMPLES
 from .selectors import anotar_composicao
 from .selectors import listar_termos
 from .services import listar_servidores_com_termo
+from .services import excluir_termo
 from .services import preview_termo_context
 from .services import resolver_artefato_termo_cadastro
 from .services import resolver_artefato_termo_oficio
 from .services import termo_cadastro_assinado_info
 from .services import termo_oficio_tem_assinado
-from cadastros.selectors import rotulo_da_sede_configurada
+
+
+class DocumentoPreviewJSONEncoder(DjangoJSONEncoder):
+    """Representa referências de modelos sem tentar serializar o ORM inteiro."""
+
+    def default(self, obj):
+        if isinstance(obj, Model):
+            return {"id": obj.pk, "texto": str(obj)}
+        return super().default(obj)
 
 
 TERMOS_PER_PAGE = 15
+
+
+class TermosPaginator(Paginator):
+    """Paginator cujo total ja veio da agregacao das abas (`DB-11`)."""
+
+    def __init__(self, object_list, per_page, *, known_count):
+        self.known_count = known_count
+        super().__init__(object_list, per_page)
+
+    @cached_property
+    def count(self):
+        return self.known_count
 
 
 
@@ -87,8 +117,23 @@ def index(request):
         for chave, label in ABAS_TERMO
     ]
 
-    paginator = Paginator(termos, TERMOS_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
+    # A agregacao acima ja calculou exatamente o total da aba ativa. Reusar esse
+    # numero evita executar a mesma busca pesada uma terceira vez no `.count()`
+    # interno do Paginator (`DB-11`).
+    paginacao = contexto_paginacao(
+        termos,
+        request,
+        TERMOS_PER_PAGE,
+        paginator_class=TermosPaginator,
+        paginator_kwargs={"known_count": contagem[aba]},
+        query_params={"q": q, "aba": aba},
+    )
+    page_obj = paginacao["page_obj"]
+    # `NOVO-08`: uma consulta para os artefatos da página inteira. Sem o mapa,
+    # `termo_cadastro_assinado_info` consultava uma vez por linha.
+    artefatos_por_termo = mapa_artefatos_pdf_termo_cadastro_em_lote(
+        [termo.pk for termo in page_obj.object_list]
+    )
     def _servidor_url(termo_pk):
         def build(servidor_pk, formato):
             return reverse(
@@ -112,28 +157,16 @@ def index(request):
             delete_url=reverse("termos:excluir", args=[termo.pk]),
             pdf_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "pdf"]),
             docx_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "docx"]),
-            **termo_cadastro_assinado_info(termo, None),
+            **termo_cadastro_assinado_info(termo, None, artefatos_por_termo.get(termo.pk, {})),
         )
         for termo in page_obj.object_list
     ] if simples else []
 
+    # `PF-04`: a montagem mora em `card_builder` porque o endpoint de menus monta o
+    # mesmo card. Repetir a dúzia de argumentos nos dois faria o menu divergir da
+    # lista em silêncio.
     cards = [] if simples else [
-        apresentar_termo_card(
-            termo,
-            edit_url=reverse("termos:editar", args=[termo.pk]),
-            delete_url=reverse("termos:excluir", args=[termo.pk]),
-            delete_modal=True,
-            pdf_url=reverse("termos:baixar_termo_cadastro_pdf", args=[termo.pk]),
-            docx_url=reverse("termos:baixar_termo_cadastro_docx", args=[termo.pk]),
-            generico_pdf_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "pdf"]),
-            generico_docx_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "docx"]),
-            servidor_url_builder=_servidor_url(termo.pk),
-            servidor_view_url_builder=_servidor_view_url(termo.pk),
-            viatura_view_url=reverse("termos:termo_cadastro_viatura_pdf_inline", args=[termo.pk]),
-            viatura_pdf_url=reverse("termos:baixar_termo_cadastro_viatura", args=[termo.pk, "pdf"]),
-            viatura_docx_url=reverse("termos:baixar_termo_cadastro_viatura", args=[termo.pk, "docx"]),
-            **termo_cadastro_assinado_info(termo, None),
-        )
+        montar_card_de_termo(termo, artefatos=artefatos_por_termo.get(termo.pk, {}))
         for termo in page_obj.object_list
     ]
     return render(
@@ -148,24 +181,11 @@ def index(request):
             "abas": abas,
             "simples": simples,
             "q": q,
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({k: v for k, v in {"q": q, "aba": aba}.items() if v}),
+            **paginacao,
             "novo_url": reverse("termos:novo"),
             "oficios_url": reverse("oficios:index"),
         },
     )
-
-
-def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
-    return [
-        page_number if isinstance(page_number, int) else "..."
-        for page_number in page_obj.paginator.get_elided_page_range(
-            page_obj.number,
-            on_each_side=on_each_side,
-            on_ends=on_ends,
-        )
-    ]
 
 
 def _evento_etapa_url(evento_id):
@@ -397,11 +417,10 @@ def _termo_preview_documents(termo):
     }
 
 
-def _form_context(*, request, form, termo=None, evento=None):
-    next_url = request.get_full_path()
-    oficios = (
-        form.fields["oficio"]
-        .queryset.select_related(
+def _com_o_que_o_resumo_le(oficios):
+    """As relações que `_oficio_summary` toca, para o resumo não gerar N+1."""
+    return (
+        oficios.select_related(
             "roteiro__origem_cidade",
             "roteiro__origem_estado",
             "viatura",
@@ -420,11 +439,54 @@ def _form_context(*, request, form, termo=None, evento=None):
             "servidores_termo_autorizacao__unidade",
         )
     )
+
+
+def _rotulo_do_option(oficio):
+    """O texto que `OficioSelectSingle.create_option` põe no `<option>`.
+
+    Sem acento, e é assim desde antes deste ID — o que a busca cria tem de sair
+    igual ao que o Django renderiza, então o rótulo vem daqui e não do JS.
+    """
+    return f"Oficio {oficio.numero_formatado}"
+
+
+def _resumos_de(oficios):
+    """`{str(pk): resumo}` na forma que `CV.documentSource` consome.
+
+    Recebe um iterável já preparado: `select_related` tem de vir **antes** de
+    qualquer fatiamento, e o Django recusa reescrever um queryset já fatiado.
+    """
     summaries = {}
     for index, oficio in enumerate(oficios):
         summary = _oficio_summary(oficio)
         summary["order"] = index
+        summary["option"] = dados_do_option(
+            oficio, resumo=summary, rotulo=_rotulo_do_option, decorar=True
+        )
         summaries[str(summary["id"])] = summary
+    return summaries
+
+
+@require_GET
+def api_buscar_oficios(request):
+    """Busca de ofícios para o seletor do termo, sob demanda (`NOVO-07`).
+
+    O recorte por área vem de `listar_oficios`, mesmo caminho da lista de
+    ofícios. A ordenação é a do campo (`-data_criacao, -created_at`) e não o
+    default do selector (`-numero, -ano`): trocar a ordem aqui mudaria a tela
+    sem que nada avisasse.
+    """
+    q = (request.GET.get("q") or "").strip()
+    oficios = listar_oficios(q=q or None).order_by("-data_criacao", "-created_at")[:LIMITE_BUSCA]
+    return JsonResponse({"resultados": list(_resumos_de(oficios).values())})
+
+
+def _form_context(*, request, form, termo=None, evento=None):
+    next_url = request.get_full_path()
+    # `NOVO-07`: só os ofícios **já selecionados** vão no `json_script`. Antes
+    # ia a área inteira, ~680 bytes por ofício, e a página crescia com a tabela.
+    # O resto chega por `api_buscar_oficios`.
+    summaries = _resumos_de(_com_o_que_o_resumo_le(oficios_ja_escolhidos(form, "oficio")))
     index_url = _termo_lista_url(termo=termo, evento=evento)
     back_label = _termo_back_label(termo=termo, evento=evento)
     return {
@@ -503,7 +565,11 @@ def editar(request, pk):
 @require_http_methods(["POST"])
 def excluir(request, pk):
     termo = get_termo_by_id(pk)
-    termo.delete()
+    try:
+        excluir_termo(termo)
+    except DelecaoProtegidaError as exc:
+        messages.error(request, str(exc))
+        return redirect("termos:index")
     messages.success(request, "Termo excluido.")
     return redirect("termos:index")
 
@@ -676,7 +742,7 @@ def preview_termo_oficio(request, pk):
     ctx = preview_termo_context(oficio, servidor, modo_semipreenchido=modo)
     if request.GET.get("format") == "json":
         return HttpResponse(
-            json.dumps(ctx, cls=DjangoJSONEncoder, ensure_ascii=False, indent=2),
+            json.dumps(ctx, cls=DocumentoPreviewJSONEncoder, ensure_ascii=False, indent=2),
             content_type="application/json; charset=utf-8",
         )
     return render(
@@ -686,7 +752,6 @@ def preview_termo_oficio(request, pk):
             "page_title": f"Preview termo - Oficio {oficio.numero_formatado}",
             "oficio": oficio,
             "preview": ctx,
-            "preview_json": json.dumps(ctx, cls=DjangoJSONEncoder, ensure_ascii=False, indent=2),
             "validacao": aval,
         },
     )

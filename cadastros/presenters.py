@@ -1,4 +1,4 @@
-﻿import json
+import json
 
 from core.utils.masks import format_cpf as _format_cpf_masked
 from core.utils.masks import format_placa as _format_placa_masked

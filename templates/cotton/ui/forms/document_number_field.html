@@ -1,0 +1,30 @@
+{% cotton:vars ano field label numero_inicial %}
+{% comment %}
+Campo composto para referências documentais no formato NUMERO/ANO.
+O BoundField original continua sendo enviado ao backend; o input visível edita somente o número.
+{% endcomment %}
+<div class="field app-form-field cv-field composite-field document-number-field">
+  <label class="app-form-label cv-field__label" for="{{ field.id_for_label }}_numero">{{ label }}</label>
+  <div
+    class="composite-field__control"
+    data-document-number-field
+    data-document-year="{{ ano }}"
+    data-mask-year="{{ ano }}"
+  >
+    {{ field.as_widget }}
+    <input
+      type="number"
+      id="{{ field.id_for_label }}_numero"
+      class="form-control"
+      min="1"
+      max="999"
+      inputmode="numeric"
+      autocomplete="off"
+      value="{{ numero_inicial }}"
+      data-document-number-input
+      aria-label="{{ label }} — só o número"
+    />
+    <span class="composite-field__suffix">/ {{ ano }}</span>
+  </div>
+  {% if field.errors %}<p class="field-error">{{ field.errors|striptags }}</p>{% endif %}
+</div>

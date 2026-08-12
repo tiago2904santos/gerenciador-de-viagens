@@ -1,5 +1,3 @@
-import re
-
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -7,23 +5,21 @@ from django.urls import reverse
 from core.autosave import (
     AutosavePayloadError,
     autosave_json_response,
-    filter_allowed_fields,
     parse_autosave_payload,
 )
-from core.normalizers import normalize_spaces
 from documentos.services.async_generation import enfileirar_documento
 
 from .diario_services import diaria_info
 from .forms import (
-    CAMPOS_CUSTEIO_COM_OUTRO,
-    OUTRO_VALUE,
     PrestacaoServidorDiariaForm,
     RelatorioTecnicoForm,
-    get_custeio_valores_fixos,
 )
-from .models import PrestacaoServidor, RelatorioTecnico
+from .rt_services import ESCOPO_EQUIPE
+from .rt_services import ESCOPO_SERVIDOR
+from .rt_services import obter_ou_criar_relatorio_tecnico
+from .rt_services import salvar_rt_do_autosave
+from .rt_services import salvar_rt_do_formulario
 from .services import (
-    aplicar_diaria_recebida,
     diaria_inicial_da_prestacao,
     garantir_campos_padrao_relatorio_tecnico,
 )
@@ -34,81 +30,12 @@ from .view_common import (
     _build_identificacao,
     contexto_do_fluxo,
     _is_inline_request,
-    _marcar_servidor_em_preenchimento,
-    _marcar_servidores_pendentes,
     _prestacao_queryset,
     _prestacao_servidor_full,
     _prestacao_servidor_queryset,
     _redirect_primeiro_servidor,
     _relatorio_queryset,
 )
-
-
-def _salvar_diaria_overrides(prestacao, fields):
-    """Salva os campos ``ps-<pk>-diaria_valor_override`` presentes em ``fields``.
-
-    Usado tanto pelo autosave do RT (um campo por servidor no mesmo formulário)
-    quanto pelo fallback sem JS do POST de ``rt_criar``.
-
-    Devolve ``{nome_do_campo: [mensagens]}`` para o que foi recusado — vazio
-    quando tudo entrou.
-    """
-    atualizacoes = {}
-    for name, value in fields.items():
-        match = re.match(r"^ps-(\d+)-diaria_valor_override$", str(name or ""))
-        if match:
-            atualizacoes[int(match.group(1))] = normalize_spaces(value or "")
-    if not atualizacoes:
-        return {}
-
-    erros = {}
-    servidores = PrestacaoServidor.objects.filter(pk__in=atualizacoes.keys(), prestacao=prestacao)
-    for ps in servidores:
-        texto = atualizacoes.get(ps.pk, "")
-        anterior = (ps.diaria_valor_override, ps.diaria_valor_override_observacao)
-        problemas = aplicar_diaria_recebida(ps, texto)
-        if problemas:
-            # Não grava nada deste servidor: um valor recusado não pode virar
-            # meia gravação. O autosave devolve o erro no nome do campo, e a
-            # tela mostra ao lado do input que o operador acabou de digitar.
-            erros[f"ps-{ps.pk}-diaria_valor_override"] = problemas
-            continue
-        if (ps.diaria_valor_override, ps.diaria_valor_override_observacao) != anterior:
-            ps.save(
-                update_fields=[
-                    "diaria_valor_override",
-                    "diaria_valor_override_observacao",
-                    "atualizado_em",
-                ]
-            )
-    return erros
-
-
-def _salvar_rt_autosave(relatorio, clean_fields):
-    if not clean_fields:
-        return
-    update_fields = set()
-    for campo, value in clean_fields.items():
-        if campo.endswith("_outro"):
-            base = campo.removesuffix("_outro")
-            if base in {item[0] for item in CAMPOS_CUSTEIO_COM_OUTRO}:
-                text = normalize_spaces(value or "")
-                if text:
-                    setattr(relatorio, base, text)
-                    update_fields.add(base)
-            continue
-        if campo in {item[0] for item in CAMPOS_CUSTEIO_COM_OUTRO}:
-            text = normalize_spaces(value or "")
-            if text == OUTRO_VALUE:
-                continue
-            if text in get_custeio_valores_fixos(campo):
-                setattr(relatorio, campo, text)
-                update_fields.add(campo)
-            continue
-        setattr(relatorio, campo, normalize_spaces(value or ""))
-        update_fields.add(campo)
-    if update_fields:
-        relatorio.save(update_fields=[*update_fields, "atualizado_em"])
 
 
 def _servidor_rt_ctx(ps):
@@ -147,18 +74,18 @@ def rt_servidor(request, ps_pk):
     ps = _prestacao_servidor_full(ps_pk)
     prestacao = ps.prestacao
 
-    relatorio, _ = RelatorioTecnico.objects.get_or_create(prestacao=prestacao)
+    relatorio = obter_ou_criar_relatorio_tecnico(prestacao)
     garantir_campos_padrao_relatorio_tecnico(relatorio)
     identificacao = _build_identificacao(prestacao)
 
     if request.method == "POST":
         form = RelatorioTecnicoForm(request.POST, instance=relatorio, relatorio=relatorio)
         if form.is_valid():
-            form.save()
-            erros = _salvar_diaria_overrides(prestacao, request.POST)
-            _marcar_servidor_em_preenchimento(ps)
-            if erros:
-                for mensagens in erros.values():
+            resultado = salvar_rt_do_formulario(
+                form, prestacao, campos_diaria=request.POST, servidor_prestacao=ps
+            )
+            if resultado.erros:
+                for mensagens in resultado.erros.values():
                     for mensagem in mensagens:
                         messages.error(request, mensagem)
             else:
@@ -206,34 +133,20 @@ def rt_servidor_autosave(request, ps_pk):
     except AutosavePayloadError as exc:
         return autosave_json_response(ok=False, message=str(exc))
 
-    allowed_fields = {
-        "diaria",
-        "translado",
-        "combustivel",
-        "passagem",
-        "translado_outro",
-        "combustivel_outro",
-        "passagem_outro",
-        "motivo",
-        "atividade",
-        "conclusao",
-        "medidas",
-        "info_complementares",
-    }
-    clean_fields = filter_allowed_fields(payload.fields, payload.dirty_fields, allowed_fields)
-    _salvar_rt_autosave(relatorio, clean_fields)
-    erros = _salvar_diaria_overrides(
+    resultado = salvar_rt_do_autosave(
+        relatorio,
         ps.prestacao,
-        {name: payload.fields.get(name) for name in payload.dirty_fields},
+        fields=payload.fields,
+        dirty_fields=payload.dirty_fields,
+        escopo=ESCOPO_SERVIDOR,
+        servidor_prestacao=ps,
     )
-    if erros:
+    if resultado.erros:
         return autosave_json_response(
             ok=False,
-            errors=erros,
+            errors=resultado.erros,
             message="O valor da diária não foi salvo.",
         )
-    if payload.dirty_fields:
-        _marcar_servidor_em_preenchimento(ps)
     return autosave_json_response(
         ok=True,
         object_id=relatorio.pk,
@@ -248,37 +161,22 @@ def rt_autosave(request, pk):
     except AutosavePayloadError as exc:
         return autosave_json_response(ok=False, message=str(exc))
 
-    allowed_fields = {
-        "diaria",
-        "translado",
-        "combustivel",
-        "passagem",
-        "translado_outro",
-        "combustivel_outro",
-        "passagem_outro",
-        "motivo",
-        "atividade",
-        "conclusao",
-        "medidas",
-        "info_complementares",
-    }
-    clean_fields = filter_allowed_fields(payload.fields, payload.dirty_fields, allowed_fields)
-    _salvar_rt_autosave(relatorio, clean_fields)
-    erros = _salvar_diaria_overrides(
+    resultado = salvar_rt_do_autosave(
+        relatorio,
         relatorio.prestacao,
-        {name: payload.fields.get(name) for name in payload.dirty_fields},
+        fields=payload.fields,
+        dirty_fields=payload.dirty_fields,
+        escopo=ESCOPO_EQUIPE,
     )
-    if erros:
+    if resultado.erros:
         # O texto do RT já foi salvo acima; o que não entrou foi só o valor
         # recusado. Salvar automaticamente um valor que a regra proíbe seria
         # pior que devolver erro: ninguém revisa o que salvou sozinho.
         return autosave_json_response(
             ok=False,
-            errors=erros,
+            errors=resultado.erros,
             message="O valor da diária não foi salvo.",
         )
-    if payload.dirty_fields:
-        _marcar_servidores_pendentes(relatorio.prestacao)
     return autosave_json_response(
         ok=True,
         object_id=relatorio.pk,

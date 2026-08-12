@@ -1,4 +1,3 @@
-import { createEditorState } from './state.js';
 import {
   createTrechosModule,
   getTrechosEmptyHtml,
@@ -8,16 +7,11 @@ import {
   setTrechoDateValue,
   queryTrechoCards,
 } from './trechos.js';
-import { createRetornoModule } from './retorno.js';
-import { createDiariasModule } from './diarias.js';
 import { createMapaModule } from './mapa.js';
 
 export function initRoteirosEditor() {
   const modules = {
-    state: createEditorState(),
     trechos: createTrechosModule(),
-    retorno: createRetornoModule(),
-    diarias: createDiariasModule(),
     mapa: createMapaModule(),
   };
   window.CV = window.CV || {};
@@ -787,12 +781,26 @@ export function initRoteirosEditor() {
     }
     recalcCard(card, true);
   }
+  /* JS-04 — a faixa de erro dos trechos. Mesmo par de `roteiros-map.js`, que é
+     o idioma da casa para erro assíncrono: texto inline, não modal. */
+  function clearTrechosError() {
+    var box = $('trechos-error');
+    if (!box) return;
+    box.textContent = '';
+    box.hidden = true;
+  }
+  function showTrechosError(msg) {
+    var box = $('trechos-error');
+    if (!box) return;
+    box.textContent = msg;
+    box.hidden = false;
+  }
   function scheduleAutoEstimarTrechos() {
     clearTimeout(autoEstimarTimer);
     autoEstimarTimer = setTimeout(runAutoEstimarTrechos, 450);
   }
   function runAutoEstimarTrechos() {
-    if (!urlTrechosEstimar || applyingState || isLoopModeActive()) return;
+    if (!urlTrechosEstimar || applyingState || isLoopModeActive()) return Promise.resolve();
     var cards = getTrechoCards();
     var pending = cards.filter(function(card) {
       var distInp = card.querySelector('[name^="trecho_"][name$="_distancia_km"]');
@@ -803,7 +811,10 @@ export function initRoteirosEditor() {
       var dcid = card.dataset.destinoCidadeId;
       return !!(ocid && dcid);
     });
-    pending.reduce(function(seq, card) {
+    if (!pending.length) return Promise.resolve();
+    clearTrechosError();
+    var falhas = 0;
+    return pending.reduce(function(seq, card) {
       return seq.then(function() {
         var ocid = card.dataset.origemCidadeId;
         var dcid = card.dataset.destinoCidadeId;
@@ -812,15 +823,37 @@ export function initRoteirosEditor() {
           form: form,
           body: { origem_cidade_id: parseInt(ocid, 10), destino_cidade_id: parseInt(dcid, 10) }
         }).then(function(result) {
+          /* Normaliza por `throw`, como `calculateDiarias`: status HTTP e o
+             `ok` do payload viram o mesmo erro, com a mensagem do servidor.
+             Antes só `data.ok` era lido, e `data.error` ia para o lixo — 500,
+             401 de sessão expirada e resposta não-JSON saíam todos calados. */
           var data = result && result.data;
-          if (!data || !data.ok) return;
+          if (!result.ok || !data || !data.ok) {
+            throw new Error((data && data.error) || 'Não foi possível estimar este trecho.');
+          }
           applyEstimarPayloadToTrechoCard(card, data);
           updateResumo();
           scheduleRealtimeDiarias();
           scheduleAutosave();
+        }).catch(function(err) {
+          /* O `.catch` fica DENTRO do elo de propósito. Antes não havia nenhum:
+             a rejeição de um card propagava pelo `reduce` e cancelava todos os
+             trechos seguintes da fila, não só o que falhou. */
+          falhas += 1;
+          window.CV.log.error('roteiro-trechos', 'falha ao estimar trecho', err);
         });
       });
-    }, Promise.resolve());
+    }, Promise.resolve()).then(function() {
+      if (!falhas) return;
+      showTrechosError(
+        (falhas === 1
+          ? 'Não foi possível estimar a distância de um trecho.'
+          : 'Não foi possível estimar a distância de ' + falhas + ' trechos.')
+        + ' Preencha a distância e o tempo à mão, ou tente de novo alterando o destino.'
+      );
+    }).catch(function(err) {
+      window.CV.log.error('roteiro-trechos', 'falha na fila de estimativa', err);
+    });
   }
   function getDestinoRows() {
     var container = $('destinos-container');
@@ -1310,7 +1343,7 @@ export function initRoteirosEditor() {
     var chip = $('diarias-header-chip');
     if (chip) {
       if (state === 'updated') {
-        chip.querySelector('.cv-chip__label').textContent = text || 'Cálculo atualizado.';
+        chip.querySelector('.chip__label').textContent = text || 'Cálculo atualizado.';
         chip.classList.remove('d-none');
       } else {
         chip.classList.add('d-none');
@@ -1466,6 +1499,15 @@ export function initRoteirosEditor() {
         if ($('id_retorno_saida_cidade') && !$('id_retorno_saida_cidade').value && ret.saida_cidade) $('id_retorno_saida_cidade').value = ret.saida_cidade;
         if ($('id_retorno_chegada_cidade') && !$('id_retorno_chegada_cidade').value && ret.chegada_cidade) $('id_retorno_chegada_cidade').value = ret.chegada_cidade;
         recalcRetorno(false); updateResumo(); applyingState = false; scheduleRealtimeDiarias();
+      })
+      .finally(function() {
+        /* JS-04 — o flag só voltava a false no caminho de sucesso, dentro do
+           `.then` acima. Uma exceção em qualquer callback desta cadeia — ou na
+           carga inicial do editor — deixava `applyingState` travado em true, e
+           a partir daí `runAutoEstimarTrechos` e todos os listeners que checam
+           o flag abortavam para sempre, sem nenhum sinal na tela. No caminho
+           feliz isto é no-op; no triste, é o que devolve o editor. */
+        applyingState = false;
       });
   }
   function dtBr(d,h) { if (!d&&!h) return ''; var p=d?d.split('-'):null; return (p?p[2]+'/'+p[1]+'/'+p[0]:'')+(h?' '+h:''); }
@@ -1499,39 +1541,41 @@ export function initRoteirosEditor() {
     if (resumo) return resumo;
     return 'Roteiro salvo';
   }
-  var ROUTE_AVATAR_ICON =
-    '<svg class="cv-icon related-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
-      '<circle cx="6" cy="19" r="2.5" fill="currentColor"></circle>' +
-      '<circle cx="18" cy="5" r="2.5" fill="currentColor"></circle>' +
-      '<path d="M8.2 18.2h6.1a3.3 3.3 0 0 0 0-6.6H9.7a3.3 3.3 0 0 1 0-6.6h6.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>' +
-    '</svg>';
   function renderRouteList(filterText) {
     var target = $('roteiro-lista'); if (!target) return;
     var emptyEl = $('roteiro-lista-empty');
     var selId = getSelectedRouteId(); var term = window.CV.util.normalize(filterText).replace(/\s+/g, ' ').trim();
     var filtered = routes.filter(function(r) { if (!term) return true; return window.CV.util.normalize(routeSearchText(r)).replace(/\s+/g, ' ').trim().indexOf(term)!==-1; });
-    var isOficioPicker = !!target.closest('.related-route-picker');
+    var pickerRoot = target.closest('[data-related-picker-root]');
+    var isCardPicker = !pickerRoot || pickerRoot.dataset.relatedPickerPresentation !== 'compact';
+    target.replaceChildren();
     if (!filtered.length) {
-      target.innerHTML = isOficioPicker ? '' : '<div class="related-route-empty">Nenhum roteiro encontrado para a busca.</div>';
-      if (emptyEl) emptyEl.hidden = !isOficioPicker;
+      if (!isCardPicker) {
+        var empty = document.createElement('div');
+        empty.className = 'related-route-empty';
+        empty.textContent = 'Nenhum roteiro encontrado para a busca.';
+        target.appendChild(empty);
+      }
+      if (emptyEl) emptyEl.hidden = !isCardPicker;
       return;
     }
     if (emptyEl) emptyEl.hidden = true;
-    target.innerHTML = filtered.map(function(r) {
-      var rid=String(r.id); var ac=rid===selId?' is-active':'';
+    filtered.forEach(function(r) {
+      var rid = String(r.id);
+      var active = rid === selId;
       var title = routeDisplayTitle(r);
-      if (isOficioPicker) {
-        return '<button type="button" class="cv-search-picker__selected-card related-route-item'+ac+'" data-route-id="'+window.CV.util.escapeHtml(rid)+'" aria-pressed="'+(rid===selId?'true':'false')+'">' +
-          '<span class="cv-search-picker__selected-avatar" aria-hidden="true">'+ROUTE_AVATAR_ICON+'</span>' +
-          '<div class="cv-search-picker__selected-main">' +
-            '<span class="cv-search-picker__selected-name">'+window.CV.util.escapeHtml(title)+'</span>' +
-            '<span class="cv-search-picker__selected-meta related-route-period">'+window.CV.util.escapeHtml(routePeriodSummary(r))+'</span>' +
-          '</div></button>';
-      }
-      return '<button type="button" class="related-route-item'+ac+'" data-route-id="'+window.CV.util.escapeHtml(rid)+'">' +
-        '<span class="related-route-title">'+window.CV.util.escapeHtml(title)+'</span>' +
-        '<span class="related-route-period">'+window.CV.util.escapeHtml(routePeriodSummary(r))+'</span></button>';
-    }).join('');
+      var config = {
+        active: active,
+        meta: routePeriodSummary(r),
+        title: title,
+        value: rid,
+      };
+      target.appendChild(
+        isCardPicker
+          ? window.CV.pickerParts.createRelatedCard(config)
+          : window.CV.pickerParts.createCompactRouteCard(config),
+      );
+    });
   }
   function routeResumo() {
     var resumoEl = $('roteiro-selector-resumo');

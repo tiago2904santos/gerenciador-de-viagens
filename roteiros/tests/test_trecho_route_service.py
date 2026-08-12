@@ -11,6 +11,8 @@ from cadastros.models import Cidade, Estado
 from roteiros.models import Roteiro, RoteiroDestino, RoteiroTrecho
 from roteiros.services.routing.trecho_route_service import ROTA_FONTE_TRECHO_ORS, calcular_rota_trecho
 from roteiros.services.routing.route_service import calcular_rota_para_roteiro
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 @override_settings(
@@ -26,6 +28,7 @@ class TrechoRouteServiceTests(TestCase):
         self.user = User.objects.create_user(username="trecho_route", password="x")
         self.client = Client()
         self.client.force_login(self.user)
+        vincular_area(self.user)
         self.estado, _ = Estado.objects.get_or_create(sigla="PR", defaults={"nome": "PR"})
         self.c_sede, _ = Cidade.objects.get_or_create(
             nome="TRECHO_SEDE",
@@ -94,7 +97,7 @@ class TrechoRouteServiceTests(TestCase):
         self.assertEqual(out.get("duracao_estimada_min"), 135)
 
     def test_calcular_rota_consolidada_nao_atualiza_distancia_trecho_ida(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_AVULSO,
             origem_estado=self.estado,
             origem_cidade=self.c_sede,

@@ -55,6 +55,61 @@ class CurrentRequestMiddleware:
             _local.request = None
 
 
+#: `PF-03`: chave privada que guarda quando a sessão foi renovada pela última vez.
+#: **Não é `_session_expiry`**, e isso é deliberado: escrever ali faria
+#: `get_expire_at_browser_close()` devolver `False` (`sessions/backends/base.py:403`)
+#: e o cookie ganharia `expires`, sobrevivendo ao fechamento do navegador — o
+#: oposto de `SESSION_EXPIRE_AT_BROWSER_CLOSE = True`, que este projeto liga de
+#: propósito. Uma chave própria marca a sessão como modificada sem tocar nisso.
+CHAVE_RENOVACAO_DE_SESSAO = "_renovada_em"
+
+
+class RenovacaoDeSessaoMiddleware:
+    """`PF-03`: renova a sessão de tempos em tempos, não a cada requisição.
+
+    `SESSION_SAVE_EVERY_REQUEST = True` fazia **toda** requisição autenticada
+    abrir transação de escrita no PostgreSQL. Medido no painel: 11 consultas, das
+    quais 2 em `django_session` e 2 de `BEGIN`/`COMMIT`. Toda página, todo XHR de
+    autosave, todo polling de documento.
+
+    Desligar aquilo sozinho faria a sessão expirar 8 h **depois do login**, não da
+    última ação — quem estivesse trabalhando às 8h01 seria deslogado no meio. Este
+    middleware devolve o deslizamento com uma escrita a cada
+    `SESSION_RENOVACAO_INTERVALO` segundos em vez de uma por requisição.
+
+    Marcar a sessão como modificada basta: o `SessionStore.save()` regrava
+    `expire_date` como "agora + `SESSION_COOKIE_AGE`". O usuário perde, no pior
+    caso, o intervalo de renovação do fim da janela — com o padrão de 1 h numa
+    sessão de 8 h, a janela efetiva desliza entre 7 h e 8 h.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        self._renovar_se_preciso(getattr(request, "session", None))
+        return self.get_response(request)
+
+    def _renovar_se_preciso(self, sessao):
+        # Sessão anônima não tem chave e não vale escrita: renovar aqui criaria
+        # linha em `django_session` para todo visitante não autenticado.
+        if sessao is None or not sessao.session_key or sessao.is_empty():
+            return
+
+        intervalo = getattr(settings, "SESSION_RENOVACAO_INTERVALO", 0)
+        if intervalo <= 0:
+            return
+
+        agora = time.time()
+        ultima = sessao.get(CHAVE_RENOVACAO_DE_SESSAO)
+        if isinstance(ultima, (int, float)) and (agora - ultima) < intervalo:
+            return
+
+        # A atribuição marca `modified`; quem grava é o `SessionMiddleware` na
+        # resposta, com o `expire_date` recalculado a partir de agora.
+        sessao[CHAVE_RENOVACAO_DE_SESSAO] = agora
+
+
 class SecurityHeadersMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response

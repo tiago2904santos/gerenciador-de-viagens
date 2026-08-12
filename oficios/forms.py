@@ -6,6 +6,7 @@ from django.utils import timezone
 from core.forms.widgets import set_widget_style
 from core.forms.widgets import WidgetStyle
 from core.forms.widgets import widget_attrs
+from core.forms.widgets import text_attrs
 from core.normalizers import normalize_plate
 from core.normalizers import normalize_spaces
 from core.tenancy import filter_queryset_by_area
@@ -180,9 +181,12 @@ class OficioForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
             if isinstance(field.widget, (forms.TextInput, forms.NumberInput)):
-                set_widget_style(field.widget, WidgetStyle.FORM_CONTROL, overwrite=False)
-            if field_name in {"protocolo", "assunto"}:
-                field.widget.attrs.setdefault("data-mask", "upper")
+                set_widget_style(
+                    field.widget,
+                    WidgetStyle.FORM_CONTROL,
+                    overwrite=False,
+                    nome=field_name,
+                )
         for optional_field in (
             "roteiro",
             "solicitante",
@@ -322,7 +326,10 @@ class OficioDadosViajantesForm(OficioForm):
             raise forms.ValidationError("Informe um número de ofício válido (maior que zero).")
         ano = self.instance.ano or timezone.localdate().year
         area = self.instance.area if self.instance and self.instance.area_id else get_current_area()
-        conflito = Oficio.objects.filter(ano=ano, numero=numero)
+        # `BE-09`: `all_objects` — as quatro linhas abaixo aplicam o escopo do
+        # próprio ofício (instância ou área ativa). Recortar de novo esvaziaria a
+        # checagem e o formulário aceitaria um número já usado.
+        conflito = Oficio.all_objects.filter(ano=ano, numero=numero)
         if area is not None:
             conflito = conflito.filter(area=area)
         else:
@@ -550,7 +557,7 @@ class ModeloMotivoOficioForm(forms.ModelForm):
     nome = forms.CharField(
         label="Nome",
         help_text="Use um nome curto para identificar o modelo.",
-        widget=forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL)}),
+        widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     texto = forms.CharField(
         label="Texto do modelo",

@@ -29,52 +29,10 @@
     }
   };
 
-  var ROUTE_AVATAR_ICON =
-    '<svg class="cv-icon related-route-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false" fill="none">' +
-      '<circle cx="6" cy="19" r="2.5" fill="currentColor"></circle>' +
-      '<circle cx="18" cy="5" r="2.5" fill="currentColor"></circle>' +
-      '<path d="M8.2 18.2h6.1a3.3 3.3 0 0 0 0-6.6H9.7a3.3 3.3 0 0 1 0-6.6h6.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>' +
-    '</svg>';
-
   /* ── Utilitários ────────────────────────────────────────────── */
 
   function readSummaries() {
     return window.CV.documentSource.read("os-oficios-summary");
-  }
-
-  function routeCardTitle(summary) {
-    var label = String(summary.label || "").trim();
-    var destino = String(summary.roteiro || summary.destino || "")
-      .trim()
-      .replace(/\s*->\s*/g, " \u2192 ");
-    return [label, destino].filter(Boolean).join(" ");
-  }
-
-  function firstNames(summary) {
-    var nomes = summary.servidores_nomes;
-    if (!nomes || !nomes.length) {
-      nomes = String(summary.servidores_label || "")
-        .split(",")
-        .map(function (nome) { return nome.trim(); })
-        .filter(Boolean);
-    }
-    return nomes
-      .map(function (nome) { return String(nome || "").trim().split(/\s+/)[0] || ""; })
-      .filter(Boolean);
-  }
-
-  function viaturaLabel(summary) {
-    var placa = String(summary.viatura || "").trim();
-    var modelo = String(summary.viatura_modelo || "").trim();
-    return [placa, modelo].filter(Boolean).join(" ");
-  }
-
-  function routeCardMeta(summary) {
-    var periodo = String(summary.periodo || "").trim();
-    var servidores = firstNames(summary).join(", ");
-    var viatura = viaturaLabel(summary);
-    var parts = [periodo, servidores, viatura].filter(Boolean);
-    return parts.length ? parts.join(" \u00b7 ") : "Sem informa\u00e7\u00f5es dispon\u00edveis";
   }
 
   function readRoleAssignments() {
@@ -95,12 +53,12 @@
     return [p[2], p[1], p[0]].join("/");
   }
 
-  /* ── cv-search-picker: reset + reinit ──────────────────────── */
+  /* ── search-picker: reset + reinit ──────────────────────── */
 
   function salvageServidorRolePanel(form) {
     var panel = form.querySelector("[data-os-servidor-role-panel]");
-    if (!panel || !panel.closest(".cv-search-picker")) return;
-    var host = form.querySelector("#os-card-servidores .cv-form-block__body") || form;
+    if (!panel || !panel.closest("[data-entity-picker-root]")) return;
+    var host = form.querySelector("#os-card-servidores .form-block__body") || form;
     host.appendChild(panel);
   }
 
@@ -115,9 +73,9 @@
     }
     if (!select || select.dataset.entityPickerReady !== "true") return;
     delete select.dataset.entityPickerReady;
-    var next = select.nextElementSibling;
-    if (next && next.classList && next.classList.contains("cv-search-picker")) {
-      next.parentNode.removeChild(next);
+    var rendered = window.CV.picker.rootFor(select);
+    if (rendered && rendered !== select) {
+      rendered.parentNode.removeChild(rendered);
     }
   }
 
@@ -320,7 +278,7 @@
       modes.forEach(function (mode, index) {
         var button = document.createElement("button");
         button.type = "button";
-        button.className = "cv-segment-toggle__btn";
+        button.className = "segment-toggle__btn";
         button.dataset.osRoleMode = mode;
         button.setAttribute("aria-pressed", mode === activeRole ? "true" : "false");
         button.textContent = OS_ROLE_LABELS[mode] || mode;
@@ -335,9 +293,9 @@
 
       /* Dispara a animação de entrada apenas na troca (não no carregamento) */
       if (active && !wasActive) {
-        button.classList.remove("cv-segment-toggle__btn--pop");
+        button.classList.remove("segment-toggle__btn--pop");
         void button.offsetWidth;
-        button.classList.add("cv-segment-toggle__btn--pop");
+        button.classList.add("segment-toggle__btn--pop");
       }
     });
   }
@@ -373,7 +331,7 @@
     card.classList.toggle("os-servidor-role-card", active);
     card.classList.toggle("os-servidor-role-card--assigned", !!role && active);
     card.classList.toggle(
-      "cv-search-picker__selected-card--driver",
+      "search-picker__selected-card--driver",
       highlighted,
     );
     card.dataset.osServidorRole = role || "";
@@ -387,7 +345,7 @@
       badge = document.createElement("span");
       badge.className = "os-servidor-role-badge";
       badge.dataset.osRoleBadge = "true";
-      var titleRow = card.querySelector(".cv-search-picker__selected-title-row");
+      var titleRow = window.CV.picker.part(card, "selected-title-row");
       if (titleRow) {
         titleRow.appendChild(badge);
       } else {
@@ -395,15 +353,14 @@
       }
     }
     var label = role ? OS_ROLE_LABELS[role] : "Sem função - texto padrão";
-    badge.classList.toggle("cv-search-picker__driver-chip", highlighted);
+    badge.classList.toggle("search-picker__driver-chip", highlighted);
     badge.textContent = label;
   }
 
   function servidoresPicker(form) {
     var select = form.querySelector("select[name='servidores']");
     if (!select) return null;
-    var next = select.nextElementSibling;
-    return next && next.classList && next.classList.contains("cv-search-picker") ? next : null;
+    return window.CV.picker.rootFor(select);
   }
 
   function mountServidorRolePanel(form, rolesEnabled) {
@@ -420,16 +377,16 @@
     if (toggle) {
       toggle.setAttribute("aria-label", copy.aria);
     }
-    var field = picker.querySelector(".cv-search-picker__field")
-      || panel.querySelector(".cv-search-picker__field");
-    var selected = picker.querySelector(".cv-search-picker__selected-panel");
+    var field = window.CV.picker.part(picker, "field")
+      || window.CV.picker.part(panel, "field");
+    var selected = window.CV.picker.part(picker, "selected-panel");
     var fieldHost = panel.querySelector("[data-os-servidor-picker-field-host]");
     if (!field || !selected || !fieldHost) return;
 
     var activeEl = document.activeElement;
     var keepPickerFocus = !!(activeEl && (
-      activeEl.classList.contains("cv-search-picker__input")
-      || activeEl.closest(".cv-search-picker__control")
+      activeEl.matches("[data-entity-picker-part='input']")
+      || activeEl.closest("[data-entity-picker-part='control']")
     ));
 
     if (rolesEnabled) {
@@ -451,15 +408,15 @@
         picker.insertBefore(field, selected);
       }
       if (panel.parentElement === picker) {
-        var panelHost = form.querySelector("#os-card-servidores .cv-form-block__body") || form;
+        var panelHost = form.querySelector("#os-card-servidores .form-block__body") || form;
         panelHost.appendChild(panel);
       }
       panel.hidden = true;
     }
 
     if (keepPickerFocus) {
-      var input = picker.querySelector(".cv-search-picker__input")
-        || panel.querySelector(".cv-search-picker__input");
+      var input = window.CV.picker.part(picker, "input")
+        || window.CV.picker.part(panel, "input");
       if (input) {
         window.setTimeout(function () {
           input.focus({ preventScroll: true });
@@ -479,7 +436,8 @@
 
     if (!picker) return;
     var activeRole = activeServidorRole(form);
-    picker.querySelectorAll(".cv-search-picker__selected-card[data-value]").forEach(function (card) {
+    window.CV.picker.parts(picker, "selected-card").forEach(function (card) {
+      if (!card.dataset.value) return;
       var servidorId = String(card.dataset.value || "");
       var role = OS_ROLE_ASSIGNMENTS[servidorId];
       renderServidorRoleCard(card, role, rolesEnabled, rolesEnabled && role === activeRole);
@@ -492,9 +450,9 @@
     form.addEventListener("click", function (event) {
       if (!supportsServidorRoles(form)) return;
       if (event.target.closest("[data-os-role-mode]")) return;
-      if (event.target.closest(".cv-search-picker__remove")) return;
+      if (event.target.closest("[data-entity-picker-part='remove']")) return;
 
-      var card = event.target.closest(".cv-search-picker__selected-card[data-value]");
+      var card = event.target.closest("[data-entity-picker-part='selected-card'][data-value]");
       if (!card || !form.contains(card)) return;
       var picker = servidoresPicker(form);
       if (!picker || !picker.contains(card)) return;
@@ -519,9 +477,9 @@
         candidate.setAttribute("aria-pressed", candidate === button ? "true" : "false");
       });
       if (!wasActive) {
-        button.classList.remove("cv-segment-toggle__btn--pop");
+        button.classList.remove("segment-toggle__btn--pop");
         void button.offsetWidth;
-        button.classList.add("cv-segment-toggle__btn--pop");
+        button.classList.add("segment-toggle__btn--pop");
       }
       syncServidorRoleUi(form);
     });
@@ -627,32 +585,7 @@
 
       filtered.forEach(function (summary) {
         var active = selected.has(String(summary.id));
-        var button = document.createElement("button");
-        button.type = "button";
-        button.className = "cv-search-picker__selected-card related-route-item" + (active ? " is-active" : "");
-        button.dataset.routeId = String(summary.id);
-        button.setAttribute("aria-pressed", active ? "true" : "false");
-
-        var avatar = document.createElement("span");
-        avatar.className = "cv-search-picker__selected-avatar";
-        avatar.setAttribute("aria-hidden", "true");
-        avatar.innerHTML = ROUTE_AVATAR_ICON;
-
-        var main = document.createElement("div");
-        main.className = "cv-search-picker__selected-main";
-
-        var name = document.createElement("span");
-        name.className = "cv-search-picker__selected-name";
-        name.textContent = routeCardTitle(summary);
-
-        var meta = document.createElement("span");
-        meta.className = "cv-search-picker__selected-meta related-route-period";
-        meta.textContent = routeCardMeta(summary);
-
-        main.appendChild(name);
-        main.appendChild(meta);
-        button.appendChild(avatar);
-        button.appendChild(main);
+        var button = window.CV.pickerParts.createRouteCard(summary, { active: active });
         button.addEventListener("click", function () {
           setOficioSelected(select, summary.id, !active);
           select.dispatchEvent(new Event("change", { bubbles: true }));
@@ -675,6 +608,23 @@
     });
     search.addEventListener("input", function () {
       renderList(search.value);
+    });
+
+    /* NOVO-07: os candidatos deixaram de vir todos no HTML. `summaries` recebe
+       os novos porque e o que `onOficiosChange` consulta para preencher datas,
+       destino e equipe. */
+    window.CV.documentSearch.attach({
+      select: select,
+      input: search,
+      onResults: function (novos) {
+        novos.forEach(function (resumo) {
+          var chave = String(resumo.id);
+          if (summaries[chave]) return;
+          summaries[chave] = resumo;
+          items.push(resumo);
+        });
+        renderList(search.value);
+      },
     });
 
     renderList(search.value);

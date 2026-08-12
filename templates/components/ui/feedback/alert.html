@@ -1,6 +1,0 @@
-{% with alert_variant=variant|default:'info' %}
-<div class="cv-notice cv-notice--{{ alert_variant }} alert alert-{{ alert_variant }} alert--{{ alert_variant }}{% if extra_class %} {{ extra_class }}{% endif %}" role="alert">
-  {% if title %}<strong class="cv-notice__title alert__title">{{ title }}</strong>{% endif %}
-  <span class="cv-notice__message alert__message">{{ message }}</span>
-</div>
-{% endwith %}

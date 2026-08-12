@@ -1,0 +1,1471 @@
+/* ==========================================================================
+   OFICIOS — CSS de dominio do modulo de Oficios
+   Extraido de forms.css e cards.css em 2026-05-10.
+   Nao importar diretamente — carregado via style.css apos cards.css.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   4. Oficios
+   -------------------------------------------------------------------------- */
+.oficio-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-left: 5px solid var(--color-accent);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.oficio-card:hover {
+  border-color: var(--color-accent-border-strong);
+  box-shadow: var(--shadow-panel);
+  transform: translateY(-2px);
+}
+
+/* Wizard Ofício: campos diretos no section-body devem ocupar largura total */
+.form-section-body > .cv-field,
+.form-section-body > .field {
+  align-self: stretch;
+  width: 100%;
+}
+
+/* Na etapa de justificativa, o campo "Modelo" precisa esticar a linha inteira. */
+.oficio-justificativa-card .wizard-inner-section > .field,
+.oficio-justificativa-card .wizard-inner-section > .app-form-field {
+  align-self: stretch;
+  width: 100%;
+}
+
+.oficio-justificativa-card .cv-field__control--textarea {
+  scrollbar-color: var(--color-border-strong) transparent;
+  scrollbar-width: thin;
+}
+
+/* Textarea de Motivo no wizard: visual idêntico ao input, só com altura maior */
+.travel-document-wizard .cv-field__control {
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-xs);
+  box-sizing: border-box;
+  color: var(--color-input-text);
+  font-size: var(--font-size-sm);
+  min-height: var(--control-height-md);
+  padding: var(--field-padding-y) var(--space-3);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    color var(--transition-fast);
+  width: 100%;
+}
+
+.travel-document-wizard .form-control:-webkit-autofill,
+.travel-document-wizard .form-control:-webkit-autofill:hover,
+.travel-document-wizard .form-control:-webkit-autofill:focus,
+.travel-document-wizard .cv-field__control:-webkit-autofill,
+.travel-document-wizard .cv-field__control:-webkit-autofill:hover,
+.travel-document-wizard .cv-field__control:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--field-bg-soft, var(--color-input-bg)) inset, var(--field-shadow-focus);
+  -webkit-text-fill-color: var(--field-text, var(--color-input-text));
+  border-color: var(--field-border-focus, var(--field-focus-border));
+  caret-color: var(--field-text, var(--color-input-text));
+  color: var(--field-text, var(--color-input-text));
+}
+
+.travel-document-wizard .cv-field--readonly .cv-field__control,
+.travel-document-wizard .cv-field__control[readonly] {
+  background: var(--route-field-disabled-bg);
+  border-color: var(--color-border-strong);
+  box-shadow: none;
+  color: var(--color-input-text);
+  cursor: default;
+  opacity: 1;
+}
+
+.travel-document-wizard .cv-field__control--textarea {
+  height: var(--text-area-height-md);
+  min-height: var(--text-area-height-md);
+  max-height: none;
+  padding-bottom: var(--space-3);
+  padding-top: var(--space-3);
+  resize: vertical;
+  line-height: 1.5;
+}
+
+/* Wizard Ofício: wrappers empilham linhas internas, não field-span no container */
+.oficio-data-block.app-form-grid-panel {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.oficio-equipe-picker__selected-panel.app-form-grid-panel {
+  gap: var(--space-3);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.app-multiselect {
+  position: relative;
+  width: 100%;
+}
+
+.oficio-equipe-section {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.oficio-equipe-section__header {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--color-border-soft);
+  display: flex;
+  gap: var(--space-4);
+  justify-content: space-between;
+  padding-bottom: var(--space-4);
+}
+
+.oficio-equipe-section__copy {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.oficio-equipe-section__copy h3,
+.oficio-equipe-section__copy p {
+  margin: 0;
+}
+
+.oficio-equipe-section__copy h3 {
+  color: var(--color-heading);
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+}
+
+.oficio-equipe-section__copy p {
+  color: var(--color-description);
+  font-size: var(--font-size-md);
+  line-height: 1.45;
+}
+
+@media (max-width: 720px) {
+  .oficio-equipe-section__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .oficio-equipe-section__header .btn {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .oficio-equipe-picker__selected-list {
+    grid-template-columns: 1fr;
+  }
+
+  .oficio-equipe-picker__selected-card:only-child,
+  .oficio-equipe-picker__selected-card:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+
+  .oficio-viajante-card__termo {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+}
+
+.travel-document-wizard__main {
+  min-width: 0;
+}
+
+/* Botões do footer: altura padrão do sistema de botões */
+.travel-document-wizard__actions .cv-btn {
+  font-size:  var(--font-size-sm);
+  height:     var(--control-height-md);
+  min-height: var(--control-height-md);
+  max-height: var(--control-height-md);
+  padding:    0 var(--space-4);
+}
+
+.travel-document-wizard__main .form-section-stack--comfortable {
+  --_stack-gap: var(--space-6);
+  gap:          var(--_stack-gap);
+}
+
+.travel-document-wizard__main .form-section-stack > form > .footer-actions,
+.travel-document-wizard__main .form-section-stack > .footer-actions {
+  margin-top: calc(-1 * var(--space-6));
+}
+
+@media (max-width: 900px) {
+  .travel-document-wizard__layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .travel-document-wizard__header {
+    align-items: flex-start;
+  }
+
+  .travel-document-wizard__title {
+    font-size: var(--font-size-xl);
+  }
+
+  .travel-document-wizard__subtitle {
+    font-size: var(--font-size-md);
+  }
+
+  .travel-document-wizard__actions > * {
+    width: 100%;
+  }
+}
+
+.travel-document-wizard__main {
+  min-width: 0;
+}
+
+.oficio-data-grid--two {
+  align-items: stretch;
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.oficio-data-grid--full {
+  align-items: stretch;
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.oficio-data-grid__field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.oficio-data-grid__field > .field {
+  flex: 1 1 auto;
+}
+
+.oficio-data-observacao .field {
+  max-width: none;
+}
+
+@media (max-width: 1080px) {
+  .oficio-data-grid--four,
+  .oficio-data-grid--three,
+  .oficio-data-grid--two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .oficio-data-grid--four,
+  .oficio-data-grid--three,
+  .oficio-data-grid--two {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.oficio-transporte-card__header-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.oficio-transporte-card__header-actions--split {
+  flex-wrap: wrap;
+}
+
+.oficio-viatura-busca__wrap {
+  position: relative;
+  width: 100%;
+}
+
+.oficio-viatura-busca__dropdown.floating-dropdown--active {
+  border-radius: var(--radius-md);
+  z-index: calc(var(--z-dropdown) + 10);
+}
+
+/* Painel manual de viatura — escondido quando há viatura cadastrada vinculada.
+   Usa !important porque .form-field--hidden compete com .field-grid em
+   especificidade em alguns contextos do wizard. */
+.oficio-viatura-manual.form-field--hidden {
+  display: none !important;
+}
+
+/* Picker de viatura: variação tonal do chip de motivo (Motorista / Unidade)
+   sobre a base visual do .search-picker__driver-chip. */
+.oficio-viatura-reason--motorista {
+  background: color-mix(in srgb, var(--color-accent, #d8a21b) 18%, transparent);
+  border-color: var(--stepper-done-border, var(--border-subtle));
+  color: var(--color-accent, var(--stepper-done-color));
+}
+
+.oficio-viatura-reason--unidade {
+  background: color-mix(in srgb, var(--color-primary, #0b3a66) 14%, transparent);
+  border-color: var(--border-stepper, var(--border-subtle));
+  color: var(--color-primary-bright, var(--text-primary));
+}
+
+/* Card da viatura selecionada — usa o slot do __driver-control para o
+   botão Editar (visual = botão "marcar motorista" do multiselect).
+   Diferença: aqui o botão fica SEMPRE visível, não apenas no :hover. */
+.oficio-viatura-selected-card .oficio-viatura-edit-row {
+  max-height: none;
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+.oficio-viatura-edit-link {
+  text-decoration: none;
+}
+
+.oficio-viatura-edit-link:hover,
+.oficio-viatura-edit-link:focus-visible {
+  text-decoration: none;
+}
+
+.motivo-card__footer .field-help {
+  margin-bottom: 0;
+}
+
+.motivo-card__model .form-select {
+  width: 100%;
+}
+
+.motivo-card__textarea .field {
+  max-width: none;
+}
+
+.motivo-card__textarea textarea.form-control {
+  min-height: 112px;
+  resize: vertical;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .motivo-card__actions {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .motivo-card__actions .btn {
+    width: 100%;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Wizard — Etapa 5 Documentos / resumo executivo
+   -------------------------------------------------------------------------- */
+
+.oficio-documentos-summary {
+  align-items: flex-start;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-panel);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+  padding: var(--space-4);
+}
+
+/* ── Viajantes (Documentos) — tiles iguais aos facts do Resumo ──────── */
+.oficio-documentos-travellers-grid {
+  display: grid;
+  gap: var(--space-2);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+}
+
+.oficio-documentos-travellers-grid--single {
+  grid-template-columns: 1fr;
+}
+
+.oficio-documentos-travellers-grid:not(.oficio-documentos-travellers-grid--single)
+  > .oficio-documentos-traveller-tile:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.oficio-documentos-traveller-tile {
+  align-items: center;
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 10px;
+  column-gap: 12px;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  min-width: 0;
+  padding: 10px 12px;
+}
+
+/* Motorista: mesmos tokens do roster Equipe (tint + borda + filete) */
+.oficio-documentos-traveller-tile--motorista {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-muted, var(--color-card-muted)));
+  border-color: var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 40%, var(--color-border-soft)));
+  box-shadow: inset 4px 0 0 var(--color-accent);
+}
+
+.oficio-documentos-traveller-tile__avatar {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-heading) 8%, transparent);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 10px;
+  color: var(--color-heading);
+  display: inline-flex;
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  height: 40px;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  width: 40px;
+}
+
+.oficio-documentos-traveller-tile--motorista .oficio-documentos-traveller-tile__avatar {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.oficio-documentos-traveller-tile__main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.oficio-documentos-traveller-tile__title-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+.oficio-documentos-traveller-tile__name {
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oficio-documentos-traveller-tile__badge {
+  align-items: center;
+  background: var(--color-accent);
+  border-radius: 999px;
+  color: var(--color-on-accent);
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  min-height: 21px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+}
+
+.oficio-documentos-traveller-tile__meta {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  line-height: 1.3;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oficio-documentos-traveller-tile__termo {
+  align-items: center;
+  align-self: center;
+  border-left: 1px solid var(--color-border-soft);
+  color: var(--color-muted-strong, var(--color-muted));
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  gap: 6px;
+  grid-column: 3;
+  line-height: 1.3;
+  margin-left: auto;
+  min-height: 32px;
+  padding-left: 10px;
+  white-space: nowrap;
+}
+
+.oficio-documentos-traveller-tile__termo-dot {
+  background: currentColor;
+  border-radius: 50%;
+  flex-shrink: 0;
+  height: 7px;
+  width: 7px;
+}
+
+.oficio-documentos-traveller-tile__termo--sim {
+  color: var(--color-success);
+}
+
+.oficio-documentos-traveller-tile__termo--nao {
+  color: var(--color-danger);
+}
+
+.oficio-documentos-travellers-empty {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  font-style: italic;
+  font-weight: 500;
+  grid-column: 1 / -1;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.oficio-documentos-vehicle-executive {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: 1fr;
+}
+
+.oficio-documentos-vehicle-executive__hero,
+.oficio-documentos-vehicle-executive__facts,
+.oficio-documentos-vehicle-executive__driver {
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-control);
+  padding: var(--space-4);
+}
+
+.oficio-documentos-vehicle-executive__driver {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  justify-content: center;
+  min-width: 0;
+}
+
+/* ── Responsividade — viajantes ────────────────────────────────────── */
+@media (max-width: 720px) {
+  .oficio-documentos-travellers-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .oficio-documentos-traveller-line {
+    flex-basis: 100%;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 800px) {
+  .oficio-documentos-traveller-line {
+    flex-basis: 45%;
+  }
+}
+
+/* ── Responsividade — transporte ───────────────────────────────────── */
+@media (min-width: 820px) {
+  .oficio-documentos-vehicle-executive {
+    align-items: stretch;
+    grid-template-columns: minmax(160px, 220px) 1fr minmax(160px, 220px);
+  }
+}
+
+@media (max-width: 520px) {
+  .oficio-documentos-vehicle-executive__facts {
+    grid-template-columns: 1fr;
+  }
+}
+
+.oficio-documentos-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.oficio-documentos-card__body {
+  padding: var(--space-4);
+}
+
+.oficio-documentos-admin-facts {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.oficio-documentos-admin-facts > .oficio-documentos-card__body {
+  padding: 0;
+}
+
+.oficio-documentos-facts {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  margin: 0;
+}
+
+.oficio-documentos-fact {
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.oficio-documentos-fact dt {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
+  text-transform: uppercase;
+}
+
+.oficio-documentos-fact dd {
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  margin: 0;
+  word-break: break-word;
+}
+
+/* Resumo de roteiro (etapa documentos) — shell transparente; poço só nos tiles internos */
+.oficio-documentos-route-card {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  overflow: visible;
+  padding: 0;
+}
+
+.oficio-documentos-route-card__head {
+  border-bottom: 1px solid var(--color-border-soft);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-3);
+}
+
+.oficio-documentos-route-card__eyebrow {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin: 0 0 var(--space-2);
+  text-transform: uppercase;
+}
+
+.oficio-documentos-route-card__title-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  justify-content: space-between;
+}
+
+.oficio-documentos-route-card__title {
+  color: var(--color-heading);
+  flex: 1 1 12rem;
+  font-size: var(--font-size-md);
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.25;
+  margin: 0;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.oficio-documentos-route-card__status-chip.status-chip--draft,
+.oficio-documentos-route-card__status-chip.chip--warning {
+  background: var(--route-status-draft-bg);
+  border-color: var(--route-status-draft-border);
+  color: var(--route-status-draft-text);
+}
+
+.oficio-documentos-route-card__status-chip.status-chip--completed,
+.oficio-documentos-route-card__status-chip.chip--success {
+  background: var(--route-status-final-bg);
+  border-color: var(--route-status-final-border);
+  color: var(--route-status-final-text);
+}
+
+.oficio-documentos-route-card__status-chip.status-chip--muted,
+.oficio-documentos-route-card__status-chip.chip--muted {
+  background: var(--route-status-muted-bg);
+  border-color: var(--route-status-muted-border);
+  color: var(--route-status-muted-text);
+}
+
+.oficio-documentos-route-card__subtitle {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.35;
+  margin: var(--space-2) 0 0;
+  max-width: 56ch;
+}
+
+.oficio-documentos-route-card__body {
+  align-items: stretch;
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: var(--space-1);
+}
+
+.oficio-documentos-route-card__trechos-col {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.oficio-documentos-route-card__diarias-col {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  grid-column: 2;
+  grid-row: 1;
+  height: auto;
+  min-height: 0;
+  min-width: 0;
+}
+
+.oficio-documentos-route-card__diarias-box {
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-2);
+  height: auto;
+  min-height: 0;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+}
+
+.oficio-documentos-route-card__diarias-box-title {
+  color: var(--color-heading);
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.2;
+  margin-bottom: var(--space-1);
+  padding: var(--space-1) var(--space-1) 0;
+  text-transform: uppercase;
+}
+
+.oficio-documentos-route-card__diarias-box-panels {
+  align-items: stretch;
+  display: grid;
+  flex: 1 1 auto;
+  gap: var(--space-2);
+  grid-template-columns: 1fr 1fr;
+  min-height: 0;
+  min-width: 0;
+}
+
+.oficio-documentos-route-card__diarias-subblock {
+  align-items: flex-start;
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  justify-content: flex-start;
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+}
+
+.oficio-documentos-route-card__diarias-panel-heading {
+  color: var(--color-muted);
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0;
+  margin-bottom: var(--space-1);
+  text-transform: uppercase;
+}
+
+.oficio-documentos-route-card__diarias-panel-line {
+  color: var(--color-heading);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0;
+  word-break: break-word;
+}
+
+.oficio-documentos-route-card__diarias-panel-line--moeda {
+  font-size: clamp(1.12rem, 1.5vw, 1.35rem);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+
+.oficio-documentos-route-card__diarias-panel-line--muted {
+  color: var(--color-muted);
+  font-weight: var(--font-weight-medium);
+}
+
+.oficio-documentos-route-card__diarias-panel-line--strong {
+  font-size: clamp(1.15rem, 1.6vw, 1.35rem);
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.oficio-documentos-route-card__diarias-metric-value {
+  align-items: center;
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: flex-start;
+  min-height: 0;
+  width: 100%;
+}
+
+.oficio-documentos-route-card__diarias-metric {
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  min-width: 0;
+  padding: var(--space-4);
+}
+
+.oficio-documentos-route-card__diarias-metric {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 0;
+}
+
+.oficio-documentos-route-card__diarias-extenso-label {
+  margin-top: 12px;
+}
+
+.oficio-documentos-route-card__diarias-extenso {
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.oficio-documentos-route-card__trecho {
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-3);
+  width: 100%;
+}
+
+.oficio-documentos-route-card__fallback-facts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.oficio-documentos-route-card__fallback-fact {
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+}
+
+.oficio-documentos-route-card__fallback-label {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.oficio-documentos-route-card__fallback-value {
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.oficio-documentos-route-card--layout-diarias-dashboard .oficio-documentos-route-card__diarias-panel-heading {
+  font-size: var(--font-size-xs);
+}
+
+@media (max-width: 1080px) {
+  .oficio-documentos-route-card__body {
+    grid-template-columns: minmax(0, 1.5fr) minmax(240px, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .oficio-documentos-route-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .oficio-documentos-route-card__trechos-col {
+    grid-column: unset;
+    grid-row: unset;
+  }
+
+  .oficio-documentos-route-card__diarias-col {
+    flex: 0 1 auto;
+    grid-column: unset;
+    grid-row: unset;
+    width: 100%;
+  }
+
+  .oficio-documentos-route-card__diarias-box {
+    flex: 0 1 auto;
+  }
+
+  .oficio-documentos-route-card__diarias-box-panels {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .oficio-documentos-route-card__diarias-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(180px, 0.8fr);
+  }
+
+  .oficio-documentos-route-card__metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .oficio-documentos-route-card__diarias-box-panels,
+  .oficio-documentos-route-card__diarias-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 640px) {
+  .oficio-documentos-justification-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .oficio-documentos-summary {
+    flex-direction: column;
+  }
+}
+
+/* ── Sugestões de viatura (step 1 do wizard) ──────────────────────────── */
+.viatura-sugestoes {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.viatura-sugestoes__label {
+  color: var(--color-label);
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  letter-spacing: var(--letter-spacing-label);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.viatura-sugestoes__chips {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.viatura-sugestao-chip {
+  align-items: center;
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-control);
+  color: var(--color-text);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--font-size-sm);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.viatura-sugestao-chip:hover,
+.viatura-sugestao-chip:focus-visible,
+.viatura-sugestao-chip--active {
+  background: var(--color-card);
+  border-color: var(--color-accent);
+  outline: 0;
+}
+
+.viatura-sugestao-chip strong {
+  color: var(--color-heading);
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.viatura-sugestao-badge {
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-soft);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 1px var(--space-2);
+  text-transform: uppercase;
+}
+
+.viatura-sugestao-badge--motorista {
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.viatura-sugestao-badge--unidade {
+  background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  border-color: var(--color-primary-bright);
+  color: var(--color-primary-bright);
+}
+
+.viatura-sugestao-badge--ativa {
+  background: color-mix(in srgb, var(--color-success) 16%, transparent);
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+/* Quando há sugestões visíveis, esconde a mensagem de "nenhuma viatura" */
+.search-picker__selected-panel:has(.viatura-sugestoes:not([hidden])) .search-picker__selected-empty {
+  display: none;
+}
+
+/* Fade-out suave no botão que acabou de ser desativado */
+@keyframes cv-segment-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 1; } /* só usa transition; este keyframe reservado */
+}
+
+/* ── Documentos vinculados (evento) ──────────────────────────────────────
+ * Toggle quadrado de 5 tipos, com o mesmo visual do segmented control de
+ * função dos servidores (Condução / Técnico / Apoio) da Ordem de Serviço.
+ */
+.evento-doc-toggle.segment-toggle {
+  background: var(--step1-field);
+  border-color: transparent;
+  border-radius: 10px;
+  box-shadow: none;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2px;
+  padding: 3px;
+  width: 100%;
+}
+
+.evento-doc-toggle .segment-toggle__btn {
+  border-radius: 7px;
+  color: var(--color-muted-strong);
+  justify-content: center;
+  min-height: 34px;
+  padding: 7px 10px;
+  text-align: center;
+  transform: none;
+  width: 100%;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.evento-doc-toggle .segment-toggle__btn[aria-pressed="true"] {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: none;
+  color: var(--color-on-accent);
+  transform: none;
+}
+
+.evento-doc-toggle .segment-toggle__btn:hover:not([aria-pressed="true"]) {
+  background: color-mix(in srgb, #fff 5%, transparent);
+  color: var(--color-text);
+}
+
+/* Telas estreitas: quebra o toggle em duas colunas para não espremer os rótulos. */
+@media (max-width: 720px) {
+  .evento-doc-toggle.segment-toggle {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.evento-doc-panel {
+  margin-top: 8px;
+}
+
+/* forms.css declara --form-control-height só em `.main-form-panel .field`, e o
+   picker de documentos não usa esse wrapper. Sem a variável, a regra
+   `.main-form-panel .search-picker__control` (height/min-height/max-height)
+   fica inválida e o campo colapsa para a altura do texto (~19px) em vez de 44px.
+   Mesmo remédio já usado em .related-route-picker (dark-redesign.css). */
+.evento-doc-source-picker {
+  --form-control-height: var(--control-height-md, 44px);
+  /* gap:0 — o select oculto no meio do grid dobraria qualquer gap. */
+  gap: 0 !important;
+}
+
+.evento-doc-source-picker .search-picker__field {
+  gap: 7px;
+}
+
+.evento-doc-summary-panel {
+  margin-top: 0;
+}
+
+.evento-doc-source-picker .search-picker__selected-panel {
+  gap: 8px;
+}
+
+/* .roteiro-editor__route-list traz space-3 (12px); aqui 8px entre busca e lista. */
+.evento-doc-source-picker .search-picker__selected-list,
+.evento-doc-source-picker .roteiro-editor__route-list {
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* O roster genérico (dark-redesign.css) força overflow:visible na lista de
+   selecionados; aqui a lista reaproveita o scroll de 220px do roteiro-editor,
+   então sem overflow:auto os cards vazam para fora do card do documento. */
+.evento-doc-summary-panel .search-picker__selected-list {
+  overflow-y: auto !important;
+}
+
+/* Destaque do card marcado (Documentos vinculados). .related-route-item.is-active
+   (roteiros.css) depende de --re-accent-border/--re-choice-ring, que só existem
+   dentro de .roteiro-editor; e o destaque do tema escuro (dark-redesign.css) só
+   existe dentro de .related-route-picker. Nenhum dos dois envolve este card, então
+   o clique marcava o item (select/aria-pressed) sem qualquer sinal visual. */
+#evento-card-documentos-d .related-route-item.is-active {
+  background: color-mix(in srgb, var(--color-primary-bright) 12%, var(--color-surface-muted, var(--color-card)));
+  border-color: color-mix(in srgb, var(--color-primary-bright) 45%, var(--color-border-soft));
+  box-shadow: inset 4px 0 0 var(--color-primary-bright);
+}
+
+#evento-card-documentos-d .related-route-item.is-active .search-picker__selected-avatar {
+  background: var(--color-primary-bright);
+  border-color: var(--color-primary-bright);
+  color: var(--color-white);
+}
+
+html[data-theme="dark"] #evento-card-documentos-d .related-route-item.is-active {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-muted));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border-soft));
+  box-shadow: inset 4px 0 0 var(--color-accent);
+}
+
+html[data-theme="dark"] #evento-card-documentos-d .related-route-item.is-active .search-picker__selected-avatar {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+[data-oficio-motorista-servidor],
+[data-oficio-motorista-manual] {
+  display: grid;
+  gap: var(--space-3);
+}
+
+[data-oficio-motorista-extras] {
+  margin-top: var(--space-2);
+}
+
+/*
+ * Driver toggle — prefixo [data-travel-document-wizard-step1] garante especificidade
+ * (0,3,0) que bate qualquer regra de search-picker.css (0,2,0).
+ *
+ * Lógica de cores:
+ *   Tema claro  → azul   (--color-primary-bright)
+ *   Tema escuro → dourado (--color-accent)
+ *
+ * Estados:
+ *   Inativo  → fundo selected-card-bg, borda/texto cor suave
+ *   Hover    → mesma borda forte + glow ring + difusão
+ *   Ativo    → igual ao hover (mesmo visual)
+ */
+
+/* ── Tema claro — inativo ──────────────────────────────────────── */
+[data-travel-document-wizard-step1] .search-picker__driver-toggle {
+  background:   var(--selected-card-bg);
+  border-color: color-mix(in srgb, var(--color-primary-bright) 50%, var(--color-border-soft));
+  color:        color-mix(in srgb, var(--color-primary-bright) 75%, var(--color-text));
+}
+
+/* ── Tema claro — hover / focus / ativo ────────────────────────── */
+[data-travel-document-wizard-step1] .search-picker__driver-toggle:hover,
+[data-travel-document-wizard-step1] .search-picker__driver-toggle:focus-visible,
+[data-travel-document-wizard-step1] .search-picker__driver-toggle--active,
+[data-travel-document-wizard-step1] .search-picker__driver-toggle[aria-pressed="true"] {
+  background:   color-mix(in srgb, var(--color-primary-bright) 14%, var(--selected-card-bg));
+  border-color: var(--color-primary-bright);
+  box-shadow:   0 0 0 1px color-mix(in srgb, var(--color-primary-bright) 30%, transparent),
+                0 2px 8px  color-mix(in srgb, var(--color-primary-bright) 18%, transparent);
+  color:        var(--color-primary-bright);
+}
+
+/* ── Tema escuro — inativo ─────────────────────────────────────── */
+html[data-theme="dark"] [data-travel-document-wizard-step1] .search-picker__driver-toggle {
+  background:   var(--selected-card-bg);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border-soft));
+  color:        color-mix(in srgb, var(--color-accent) 75%, var(--color-text));
+}
+
+/* ── Tema escuro — hover / focus / ativo ───────────────────────── */
+html[data-theme="dark"] [data-travel-document-wizard-step1] .search-picker__driver-toggle:hover,
+html[data-theme="dark"] [data-travel-document-wizard-step1] .search-picker__driver-toggle:focus-visible,
+html[data-theme="dark"] [data-travel-document-wizard-step1] .search-picker__driver-toggle--active,
+html[data-theme="dark"] [data-travel-document-wizard-step1] .search-picker__driver-toggle[aria-pressed="true"] {
+  background:   color-mix(in srgb, var(--color-accent) 22%, var(--selected-card-bg));
+  border-color: var(--color-accent);
+  box-shadow:   0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent),
+                0 2px 10px color-mix(in srgb, var(--color-accent) 22%, transparent);
+  color:        var(--color-accent);
+}
+
+/* ── Driver chip nos selecionados: dourado no tema escuro ────────── */
+/*
+ * Os tokens --driver-* são declarados em .search-picker (não em :root),
+ * então o override precisa ser no mesmo nível ou mais específico.
+ */
+html[data-theme="dark"] [data-travel-document-wizard-step1] .search-picker {
+  --driver-bg:     color-mix(in srgb, var(--color-accent) 18%, transparent);
+  --driver-border: color-mix(in srgb, var(--color-accent) 65%, transparent);
+  --driver-text:   var(--color-accent);
+}
+
+/* Equipe (step1): cards selecionados em até 2 colunas quando houver espaço.
+   Escopo restrito ao roster do step1 — outros pickers (ex.: roteiro) seguem 1 coluna. */
+[data-travel-document-wizard-step1] .travel-document-body
+  .search-picker--people.search-picker--roster
+  .search-picker__selected-list {
+  display: grid;
+  gap: var(--space-2, 8px);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+}
+
+[data-travel-document-wizard-step1] .travel-document-body
+  .search-picker--people.search-picker--roster
+  .search-picker__selected-card {
+  min-width: 0;
+}
+
+[data-travel-document-wizard-step1] .travel-document-body
+  .search-picker--people.search-picker--roster
+  .search-picker__selected-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-travel-document-wizard-step1] .travel-document-body
+  .search-picker--people.search-picker--roster
+  .search-picker__selected-card:only-child,
+[data-travel-document-wizard-step1] .travel-document-body
+  .search-picker--people.search-picker--roster
+  .search-picker__selected-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 720px) {
+  [data-travel-document-wizard-step1] .travel-document-body
+    .search-picker--people.search-picker--roster
+    .search-picker__selected-list {
+    grid-template-columns: 1fr;
+  }
+
+  [data-travel-document-wizard-step1] .travel-document-body
+    .search-picker--people.search-picker--roster
+    .search-picker__selected-card:only-child,
+  [data-travel-document-wizard-step1] .travel-document-body
+    .search-picker--people.search-picker--roster
+    .search-picker__selected-card:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+}
+
+/* ── Etapa 1 / Roteiro: painéis por seção (layout estrutural) ─ */
+.page-shell--wizard.travel-document-wizard,
+.cv-page--flow.travel-document-wizard {
+  --stepper-missing-bg: color-mix(in srgb, var(--color-danger) 10%, transparent);
+  --stepper-missing-border: color-mix(in srgb, var(--color-danger) 28%, transparent);
+  --stepper-missing-color: color-mix(in srgb, var(--color-danger) 78%, var(--color-heading));
+  --stepper-status-missing-color: color-mix(in srgb, var(--color-danger) 68%, var(--color-muted));
+}
+
+/* ── Sugestões de viatura: sem corte (JS já limita a 8 chips) ───── */
+/* max-height removido — overflow: hidden cortava chips na segunda linha */
+
+
+/* Regras responsivas exclusivas do wizard, separadas dos cards de listagem. */
+@media (max-width: 720px) {
+  .travel-document-wizard__main .form-section-stack--comfortable {
+    --_stack-gap: var(--space-5);
+  }
+
+  .travel-document-wizard .form-section-title {
+    font-size: clamp(1.08rem, 5vw, 1.45rem);
+    letter-spacing: 0.04em;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 600px) {
+  .oficio-equipe-picker__selected-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 420px) {
+  .oficio-viajante-card__termo-choice {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   FAB — Floating Action Button container (eventos wizard etapas 2-5)
+   Primário no mesmo tom do Avançar do cadastro de ofícios (accent dourado).
+   -------------------------------------------------------------------------- */
+.fab-container {
+  position: fixed;
+  bottom: var(--space-6, 1.5rem);
+  right: var(--space-6, 1.5rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-3, 0.75rem);
+  z-index: 100;
+}
+
+html[data-theme="dark"] .fab-container > .cv-btn--primary {
+  background: var(--color-accent);
+  background-image: none;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  color: var(--color-on-accent, #19232d);
+  font-weight: var(--font-weight-bold);
+  min-height: var(--control-height-md, 44px);
+  padding: 0 18px;
+  text-shadow: none;
+}
+
+html[data-theme="dark"] .fab-container > .cv-btn--primary:hover,
+html[data-theme="dark"] .fab-container > .cv-btn--primary:focus-visible {
+  background: var(--color-accent-hover);
+  background-image: none;
+  border: 0;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
+  color: var(--color-on-accent, #19232d);
+}
+
+html[data-theme="dark"] .fab-container > .cv-btn--primary .cv-btn__icon {
+  color: inherit;
+}
+
+.fab-container .fab {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+/* Motorista externo — painel contextual dentro da seção de transporte. */
+.oficio-external-driver {
+  min-width: 0;
+}
+
+.oficio-external-driver__body {
+  display: grid;
+  gap: var(--space-4);
+  padding: 0;
+}
+
+.oficio-external-driver__identity {
+  min-width: 0;
+}
+
+.oficio-external-driver__reference {
+  align-items: end;
+  border-top: 1px solid var(--color-border-soft);
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: minmax(160px, 0.7fr) minmax(0, 2fr);
+  padding-top: var(--space-4);
+}
+
+.oficio-external-driver__identity > .search-picker {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
+  padding: 0;
+}
+
+.oficio-external-driver__identity .search-picker__field {
+  gap: 0;
+}
+
+.oficio-external-driver__reference-copy {
+  align-self: center;
+  display: grid;
+  gap: 3px;
+}
+
+.oficio-external-driver__reference-copy strong {
+  font-size: var(--font-size-sm);
+}
+
+.oficio-external-driver__reference-copy span {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
+}
+
+.oficio-external-driver__reference-fields {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: minmax(190px, 0.8fr) minmax(240px, 1.2fr);
+}
+
+@media (max-width: 720px) {
+  .oficio-external-driver__reference {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .oficio-external-driver .segment-toggle {
+    align-self: stretch;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .oficio-external-driver__reference-fields {
+    grid-template-columns: 1fr;
+  }
+}

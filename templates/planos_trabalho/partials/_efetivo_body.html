@@ -1,10 +1,8 @@
 {{ formset.management_form }}
-{% if formset.non_form_errors %}
-  {% include "components/ui/feedback/field_error.html" with errors=formset.non_form_errors only %}
-{% endif %}
+<c-ui.feedback.form_errors :errors="formset.non_form_errors" only />
 
 <section
-  class="cv-form-subsection travel-destinations cv-ordered-field-collection route-destinos-block route-destinos-block--split route-destinos-block--single travel-document-block pt-efetivo-section"
+  class="form-subsection travel-destinations ordered-field-collection route-destinos-block route-destinos-block--split route-destinos-block--single travel-document-block pt-efetivo-section"
   aria-labelledby="pt-efetivo-title"
   id="pt-efetivo-section"
 >
@@ -19,7 +17,7 @@
   <div class="route-destinos-block__body">
     <div class="route-destinos-block__editor">
       <div
-        class="cv-ordered-field-collection__list route-destinations-list pt-efetivo-rows"
+        class="ordered-field-collection__list route-destinations-list pt-efetivo-rows"
         aria-label="Efetivos adicionados"
         data-pt-efetivo-rows
       >
@@ -32,5 +30,5 @@
 </section>
 
 <template data-pt-efetivo-template>
-  {% include "planos_trabalho/partials/_efetivo_row.html" with efetivo_form=formset.empty_form row_ordinal=1 cargos_url=cargos_url only %}
+  {% include "planos_trabalho/partials/_efetivo_row.html" with efetivo_form=formset.empty_form row_ordinal=1 cargos_url=cargos_url total_forms=total_forms only %}
 </template>

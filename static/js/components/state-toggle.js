@@ -122,12 +122,7 @@
   }
 
   function findBinaryTrigger(container) {
-    return (
-      container.querySelector('[data-cv-state-trigger]') ||
-      container.querySelector('[data-cv-state-option]') ||
-      container.querySelector('[data-rg-toggle]') ||
-      container.querySelector('[data-motorista-fixo-toggle]')
-    );
+    return container.querySelector('[data-cv-state-trigger]');
   }
 
   function syncBinaryButton(container, input, trigger) {
@@ -137,21 +132,17 @@
 
     trigger.classList.toggle('is-active', active);
     trigger.classList.toggle('is-inactive', !active);
-    trigger.classList.toggle('cv-field-side-action--success', active);
-    trigger.classList.toggle('cv-field-side-action--danger', !active);
+    trigger.classList.toggle('field-side-action--success', active);
+    trigger.classList.toggle('field-side-action--danger', !active);
     trigger.setAttribute('aria-pressed', active ? 'true' : 'false');
 
     var labelEl = trigger.querySelector('span:last-child');
     var activeLabel =
       trigger.getAttribute('data-active-label') ||
-      trigger.dataset.rgLabelActive ||
-      trigger.dataset.mfLabelActive ||
       container.getAttribute('data-active-label') ||
       '';
     var inactiveLabel =
       trigger.getAttribute('data-inactive-label') ||
-      trigger.dataset.rgLabelInactive ||
-      trigger.dataset.mfLabelInactive ||
       container.getAttribute('data-inactive-label') ||
       '';
 
@@ -193,12 +184,9 @@
     if (!container || container.getAttribute(BOUND) === 'true') return;
     container.setAttribute(BOUND, 'true');
 
-    var isBinary =
-      container.hasAttribute('data-cv-state-binary') ||
-      container.querySelector('[data-rg-toggle]') ||
-      container.querySelector('[data-motorista-fixo-toggle]');
+    var isBinary = container.hasAttribute('data-cv-state-binary');
 
-    if (isBinary && !qsa('[data-cv-state-option]', container).length) {
+    if (isBinary) {
       bindBinary(container);
       return;
     }
@@ -206,10 +194,6 @@
     if (qsa('[data-cv-state-option]', container).length) {
       bindOptionGroup(container);
       return;
-    }
-
-    if (isBinary) {
-      bindBinary(container);
     }
   }
 
@@ -229,7 +213,7 @@
     var input = resolveInput(group);
     if (!input) return;
     writeValue(input, value);
-    if (group.hasAttribute('data-cv-state-binary') || findBinaryTrigger(group)) {
+    if (group.hasAttribute('data-cv-state-binary')) {
       syncBinaryButton(group, input, findBinaryTrigger(group));
     } else {
       syncOptionGroup(group);

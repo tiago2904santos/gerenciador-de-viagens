@@ -1,55 +1,38 @@
 {# Miolo do card de roteiro — Trechos · Valor Total · Diárias, um terço cada. #}
-<div class="cv-record-card__band">
-  <div class="cv-fact-grid cv-fact-grid--roteiro">
+<div class="record-card__band">
+  <div class="fact-grid fact-grid--roteiro">
 
-    <div class="cv-fact-block cv-fact-block--trechos">
-      <span class="cv-fact-block__label">Trechos encontrados</span>
-      {% if card.trechos %}
-      <ul class="cv-itinerary">
-        {% for trecho in card.trechos %}
-        <li class="cv-itinerary__leg">
-          <div class="cv-itinerary__route">{{ trecho.rota }}</div>
-          {% if trecho.saida or trecho.chegada %}
-          <div class="cv-itinerary__time">
-            {% if trecho.saida %}{{ trecho.saida }}{% endif %}
-            {% if trecho.saida and trecho.chegada %} → {% endif %}
-            {% if trecho.chegada %}{{ trecho.chegada }}{% endif %}
-          </div>
-          {% endif %}
-        </li>
-        {% endfor %}
-      </ul>
-      {% else %}
-      <div class="cv-itinerary__route cv-empty-hint">Nenhum trecho cadastrado</div>
-      {% endif %}
+    <div class="fact-block fact-block--trechos">
+      <span class="fact-block__label">Trechos encontrados</span>
+      <c-ui.lists.itinerary :items="card.trechos" empty_label="Nenhum trecho cadastrado" only />
     </div>
 
-    <div class="cv-fact-block cv-fact-block--valor">
-      <span class="cv-fact-block__label">Valor Total</span>
+    <div class="fact-block fact-block--valor">
+      <span class="fact-block__label">Valor Total</span>
       {% if card.valor_diarias_display %}
-      <div class="cv-fact-block__value--strong cv-fact-block__value--strong--fit">{{ card.valor_diarias_display }}</div>
+      <div class="fact-block__value--strong fact-block__value--strong--fit">{{ card.valor_diarias_display }}</div>
       {% if card.valor_diarias_extenso %}
-      <span class="cv-fact-block__label">Valor por Extenso</span>
-      <div class="cv-fact-block__value--long">{{ card.valor_diarias_extenso }}</div>
+      <span class="fact-block__label">Valor por Extenso</span>
+      <div class="fact-block__value--long">{{ card.valor_diarias_extenso }}</div>
       {% endif %}
       {% else %}
-      <div class="cv-fact-block__value--strong cv-fact-block__value--strong--fit cv-empty-hint">—</div>
+      <div class="fact-block__value--strong fact-block__value--strong--fit empty-hint">—</div>
       {% endif %}
     </div>
 
-    <div class="cv-fact-block">
-      <span class="cv-fact-block__label">Tipo de destino</span>
+    <div class="fact-block">
+      <span class="fact-block__label">Tipo de destino</span>
       {% if card.diaria_tipo_destino %}
-      <div class="cv-fact-block__value">{{ card.diaria_tipo_destino }}</div>
+      <div class="fact-block__value">{{ card.diaria_tipo_destino }}</div>
       {% else %}
-      <div class="cv-fact-block__value cv-empty-hint">Não informado</div>
+      <div class="fact-block__value empty-hint">Não informado</div>
       {% endif %}
 
-      <span class="cv-fact-block__label">Quantidade de diárias</span>
+      <span class="fact-block__label">Quantidade de diárias</span>
       {% if card.diaria_resumo %}
-      <div class="cv-fact-block__value--average cv-fact-block__value--average--fit">{{ card.diaria_resumo }}</div>
+      <div class="fact-block__value--average fact-block__value--average--fit">{{ card.diaria_resumo }}</div>
       {% else %}
-      <div class="cv-fact-block__value--average cv-fact-block__value--average--fit cv-empty-hint">Não calculada</div>
+      <div class="fact-block__value--average fact-block__value--average--fit empty-hint">Não calculada</div>
       {% endif %}
     </div>
 

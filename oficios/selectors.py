@@ -146,15 +146,47 @@ def listar_oficios(
 
 
 def get_oficio_by_id(pk: int):
+    """Um ofício da área ativa, com a carga que o card do presenter toca.
+
+    `NOVO-38`: o `prefetch_related("servidores")` sozinho bastava enquanto isto
+    servia só a página de detalhe. O endpoint de menus do `PF-04` chama o MESMO
+    presenter que a lista, e ele percorre destinos e trechos do roteiro tocando
+    `cidade` e `estado` de cada um — 30 consultas para um card.
+
+    A forma abaixo é a de `listar_oficios`, que o `NOVO-08` já tinha afinado para
+    a lista. Aqui ela vale para um registro; a página de detalhe ganha junto.
+    """
     queryset = filter_queryset_by_area(Oficio.objects).select_related(
         "roteiro",
+        "roteiro__origem_cidade",
+        "roteiro__origem_estado",
         "viatura",
         "viatura__combustivel",
         "transporte_combustivel_manual",
         "motorista",
         "solicitante",
     ).prefetch_related(
-        "servidores",
+        Prefetch(
+            "servidores",
+            queryset=filter_queryset_by_area(Servidor.objects)
+            .select_related("cargo", "unidade")
+            .order_by("nome"),
+        ),
+        Prefetch(
+            "servidores_termo_autorizacao",
+            queryset=filter_queryset_by_area(Servidor.objects).order_by("nome"),
+        ),
+        Prefetch(
+            "roteiro__destinos",
+            queryset=RoteiroDestino.objects.select_related("cidade", "estado").order_by("ordem"),
+        ),
+        Prefetch(
+            "roteiro__trechos",
+            queryset=RoteiroTrecho.objects.select_related(
+                "origem_cidade", "origem_estado", "destino_cidade", "destino_estado"
+            ).order_by("ordem"),
+        ),
+        "justificativa",
     )
     return get_object_or_404(queryset, pk=pk)
 

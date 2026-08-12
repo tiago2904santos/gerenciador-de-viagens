@@ -12,6 +12,8 @@ media/
 .pytest_cache/
 .coverage
 htmlcov/
+node_modules/
+coverage-js/
 .local-backups/
 .runtime/
 .idea/

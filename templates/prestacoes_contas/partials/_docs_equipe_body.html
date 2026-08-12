@@ -9,9 +9,7 @@
           <span class="oficio-documentos-traveller-tile__badge">Motorista</span>
         {% endif %}
       </div>
-      <span class="oficio-documentos-traveller-tile__meta">
-        {{ s.cargo }}{% if s.unidade %} · {{ s.unidade }}{% endif %}{% if s.cpf_servidor and s.cpf_servidor != "—" %} · CPF {{ s.cpf_servidor }}{% endif %}
-      </span>
+      <span class="oficio-documentos-traveller-tile__meta">{{ s.meta }}</span>
     </div>
   </article>
   {% endwith %}

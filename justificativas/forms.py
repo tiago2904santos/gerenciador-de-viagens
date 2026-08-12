@@ -1,8 +1,12 @@
 from django import forms
+from django.urls import reverse_lazy
 
 from core.forms.widgets import WidgetStyle
 from core.forms.widgets import widget_attrs
+from core.forms.widgets import text_attrs
+from core.tenancy import filter_queryset_by_area
 from oficios.models import Oficio
+from oficios.picker import renderizar_so_os_escolhidos
 
 from .models import Justificativa
 from .models import ModeloJustificativa
@@ -72,6 +76,9 @@ class JustificativaQuickAddForm(forms.Form):
                 **widget_attrs(WidgetStyle.TERM_OFICIO_SOURCE),
                 "hidden": True,
                 "data-source-document": "justificativas-oficios-summary",
+                # `NOVO-07`: liga o modo remoto do picker. Sem este atributo ele
+                # segue filtrando só o que está no DOM, como antes.
+                "data-picker-source-url": reverse_lazy("justificativas:api_buscar_oficios"),
             },
         ),
     )
@@ -102,8 +109,20 @@ class JustificativaQuickAddForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["oficios"].queryset = Oficio.objects.order_by("-created_at", "-pk")
+        # Sem o recorte, o campo aceitava ofício de outra área e dava para
+        # **criar** justificativa cruzando a fronteira — não é só exibição
+        # (`NOVO-06`). `ordens_servico/forms.py:201` e `termos/forms.py:124`
+        # já faziam assim; justificativas era a exceção.
+        campo = self.fields["oficios"]
+        campo.queryset = filter_queryset_by_area(Oficio.objects).order_by("-created_at", "-pk")
         self.fields["modelo"].queryset = listar_modelos_justificativa()
+
+        # `NOVO-07`: o campo **aceita** qualquer ofício da área (o `queryset`
+        # acima, que é o que valida o pk vindo do picker) mas **renderiza** só o
+        # que já está selecionado. Antes um `<option>` por ofício da área ia para
+        # o HTML, e a página crescia com a tabela. A ordem importa, e o porquê
+        # está em `oficios/picker.py`.
+        renderizar_so_os_escolhidos(self, "oficios")
 
     def clean_texto(self):
         texto = (self.cleaned_data.get("texto") or "").strip()
@@ -118,7 +137,7 @@ class ModeloJustificativaForm(forms.ModelForm):
     nome = forms.CharField(
         label="Nome",
         help_text="Use um nome curto para identificar o modelo.",
-        widget=forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL)}),
+        widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     texto = forms.CharField(
         label="Texto do modelo",

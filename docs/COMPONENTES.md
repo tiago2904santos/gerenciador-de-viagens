@@ -6,15 +6,15 @@ Este catálogo descreve a árvore ativa em `templates/components/`. Um component
 
 | Área | Responsabilidade | Componentes principais |
 | --- | --- | --- |
-| `ui/buttons` | ações e controles | `button`, `icon_button`, `field_manage_button`, `floating_action`, `footer_action` |
+| `ui/buttons` | ações e controles | `button`, `icon_button`, `field_manage_button`, `floating_action` |
 | `ui/forms` | campos e grupos de formulário | `field`, `form_block`, `date_picker`, `document_number_field`, `card_toggle`, `file_picker`, `select`, `multiselect` |
 | `ui/headers` | cabeçalhos globais | `page_header`, `filter_page_header` |
 | `ui/feedback` | estados e validação | `alert`, `empty_state`, `field_error`, `form_errors`, `pendencias_card` |
 | `ui/badges` | chips e estados | `chip`, `status_badge` |
-| `ui/layouts` | seções e rodapés de cards | `collection_header`, `card_footer_section`, `card_footer_actions` |
-| `ui/lists` | primitivas de listas e cards | `entity_card*`, `file_list`, `pagination`, `list_card_actions` |
+| `ui/layouts` | seções e rodapés de cards | `card_footer_section`, `card_footer_actions` |
+| `ui/lists` | primitivas de listas e cards | `entity_card*`, `file_list`, `pagination` |
 | `ui/modals` | diálogos com comportamento real | `confirm_action_modal`, `confirm_delete`, `delete_confirm_modal`, `attach_signed_modal`, `cancel_reason_modal` |
-| `lists` | composições completas de listagem | `list_page_standard`, `list_page_cards`, `list_page_quick_add`, `main_list_card`, `simple_list*` |
+| `lists` | composições completas de listagem | `list_page_standard`, `list_page_cards`, `list_page_quick_add`, `simple_list*` |
 | `travel` | conceitos compartilhados de viagem | destinos, trechos e cálculo de diárias |
 | `cards`, `documents`, `feedback`, `layout`, `perfil` | composições globais já consumidas por páginas | cards documentais, assinatura/PDF, mensagens Django, sidebar e integração Drive |
 
@@ -36,7 +36,7 @@ Listagens com busca, filtros, ordenação e período usam `filter_page_header.ht
 
 `components/ui/forms/field.html` renderiza o `BoundField` Django e suas mensagens. Variações legítimas têm componentes próprios quando existe comportamento adicional:
 
-- `date_picker.html`: data única ou intervalo, com `cv-date-picker.js`;
+- `date_picker.html`: data única ou intervalo, com `date-picker.js`;
 - `document_number_field.html`: número e ano sincronizados com campo oculto;
 - `card_toggle.html`: booleano apresentado como card;
 - `file_picker.html` e `multiselect.html`: controles compostos.

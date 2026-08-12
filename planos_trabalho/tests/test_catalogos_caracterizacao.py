@@ -32,13 +32,15 @@ from planos_trabalho.models import AtividadePlanoTrabalho
 from planos_trabalho.models import HorarioAtendimento
 from planos_trabalho.models import PresetAtividadesPlanoTrabalho
 from planos_trabalho.models import ProgramaSolicitante
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class CatalogoCaracterizacaoMixin:
     def setUp(self):
-        self.client.force_login(
-            get_user_model().objects.create_user(username=f"cat_{self.url_index}")
-        )
+        usuario = get_user_model().objects.create_user(username=f"cat_{self.url_index}")
+        vincular_area(usuario)
+        self.client.force_login(usuario)
 
     def _mensagens(self, response):
         return [str(m) for m in get_messages(response.wsgi_request)]
@@ -56,7 +58,7 @@ class AtividadesTests(CatalogoCaracterizacaoMixin, TestCase):
     def _criar(self, nome="Palestra", meta="Meta X", recurso="Sala", codigo=None):
         # `codigo` e unico e o default e vazio: duas atividades sem codigo
         # colidem. A view gera o codigo a partir do nome; aqui e explicito.
-        return AtividadePlanoTrabalho.objects.create(
+        return AtividadePlanoTrabalho.objects.create(area=area_de_teste(), 
             nome=nome,
             meta=meta,
             recurso_necessario=recurso,
@@ -98,7 +100,7 @@ class AtividadesTests(CatalogoCaracterizacaoMixin, TestCase):
         atividade = self._criar(nome="Zebra caracterizacao")
 
         response = self.client.post(
-            reverse("planos_trabalho:atividade_editar", args=[atividade.pk]),
+            reverse("planos_trabalho:atividade_update", args=[atividade.pk]),
             {"nome": "Zebra editada", "meta": "Meta", "recurso_necessario": "Sala"},
         )
 
@@ -110,7 +112,7 @@ class AtividadesTests(CatalogoCaracterizacaoMixin, TestCase):
         atividade = self._criar(nome="Zebra caracterizacao")
 
         response = self.client.post(
-            reverse("planos_trabalho:atividade_excluir", args=[atividade.pk])
+            reverse("planos_trabalho:atividade_delete", args=[atividade.pk])
         )
 
         self.assertFalse(AtividadePlanoTrabalho.objects.filter(pk=atividade.pk).exists())
@@ -122,7 +124,7 @@ class AtividadesTests(CatalogoCaracterizacaoMixin, TestCase):
         atividade = self._criar(nome="Zebra caracterizacao")
 
         response = self.client.get(
-            reverse("planos_trabalho:atividade_excluir", args=[atividade.pk])
+            reverse("planos_trabalho:atividade_delete", args=[atividade.pk])
         )
 
         self.assertEqual(response.status_code, 200)
@@ -154,13 +156,13 @@ class PresetsTests(CatalogoCaracterizacaoMixin, TestCase):
     url_index = "planos_trabalho:presets_index"
 
     def _criar(self, nome="Preset A", **kwargs):
-        return PresetAtividadesPlanoTrabalho.objects.create(nome=nome, **kwargs)
+        return PresetAtividadesPlanoTrabalho.objects.create(area=area_de_teste(), nome=nome, **kwargs)
 
     def test_lista_abre_com_resumo_das_atividades(self):
         preset = self._criar()
         preset.atividades.set(
             [
-                AtividadePlanoTrabalho.objects.create(
+                AtividadePlanoTrabalho.objects.create(area=area_de_teste(), 
                     nome="Palestra caracterizacao", meta="M", codigo="PALESTRACAR"
                 )
             ]
@@ -174,7 +176,7 @@ class PresetsTests(CatalogoCaracterizacaoMixin, TestCase):
         self.assertIn("Palestra caracterizacao", str(linha["meta"]))
 
     def test_criacao_avisa_com_a_frase_do_preset(self):
-        atividade = AtividadePlanoTrabalho.objects.create(
+        atividade = AtividadePlanoTrabalho.objects.create(area=area_de_teste(), 
             nome="Atividade do preset", meta="M", codigo="ATIVPRESET"
         )
 
@@ -210,7 +212,7 @@ class PresetsTests(CatalogoCaracterizacaoMixin, TestCase):
         preset = self._criar()
 
         response = self.client.post(
-            reverse("planos_trabalho:preset_excluir", args=[preset.pk])
+            reverse("planos_trabalho:preset_delete", args=[preset.pk])
         )
 
         self.assertFalse(PresetAtividadesPlanoTrabalho.objects.filter(pk=preset.pk).exists())
@@ -221,7 +223,7 @@ class ProgramasTests(CatalogoCaracterizacaoMixin, TestCase):
     url_index = "planos_trabalho:programas_index"
 
     def test_lista_abre_sem_busca(self):
-        ProgramaSolicitante.objects.create(nome="PROGRAMA A", ordem=9)
+        ProgramaSolicitante.objects.create(area=area_de_teste(), nome="PROGRAMA A", ordem=9)
 
         response = self.client.get(self._index())
 
@@ -238,13 +240,13 @@ class ProgramasTests(CatalogoCaracterizacaoMixin, TestCase):
 
         programa = ProgramaSolicitante.objects.get(nome="NOVO PROGRAMA")
         response = self.client.post(
-            reverse("planos_trabalho:programa_editar", args=[programa.pk]),
+            reverse("planos_trabalho:programa_update", args=[programa.pk]),
             {"nome": "Programa editado", "ativo": "on", "ordem": "2"},
         )
         self.assertIn("Programa atualizado.", self._mensagens(response))
 
     def test_inativo_ganha_selo(self):
-        ProgramaSolicitante.objects.create(nome="INATIVO", ordem=1, ativo=False)
+        ProgramaSolicitante.objects.create(area=area_de_teste(), nome="INATIVO", ordem=1, ativo=False)
 
         linhas = self.client.get(self._index()).context["linhas"]
         linha = next(item for item in linhas if item["title"] == "INATIVO")
@@ -252,10 +254,10 @@ class ProgramasTests(CatalogoCaracterizacaoMixin, TestCase):
         self.assertEqual(len(linha["badges"]), 1)
 
     def test_exclusao_remove_e_avisa(self):
-        programa = ProgramaSolicitante.objects.create(nome="PROGRAMA A", ordem=9)
+        programa = ProgramaSolicitante.objects.create(area=area_de_teste(), nome="PROGRAMA A", ordem=9)
 
         response = self.client.post(
-            reverse("planos_trabalho:programa_excluir", args=[programa.pk])
+            reverse("planos_trabalho:programa_delete", args=[programa.pk])
         )
 
         self.assertFalse(ProgramaSolicitante.objects.filter(pk=programa.pk).exists())
@@ -266,7 +268,7 @@ class HorariosTests(CatalogoCaracterizacaoMixin, TestCase):
     url_index = "planos_trabalho:horarios_index"
 
     def test_lista_abre_com_a_faixa_como_titulo(self):
-        HorarioAtendimento.objects.create(faixa="07:15 até 11:45", ordem=9)
+        HorarioAtendimento.objects.create(area=area_de_teste(), faixa="07:15 até 11:45", ordem=9)
 
         response = self.client.get(self._index())
 
@@ -281,16 +283,16 @@ class HorariosTests(CatalogoCaracterizacaoMixin, TestCase):
 
         horario = HorarioAtendimento.objects.get(faixa="07:20 até 12:40")
         response = self.client.post(
-            reverse("planos_trabalho:horario_editar", args=[horario.pk]),
+            reverse("planos_trabalho:horario_update", args=[horario.pk]),
             {"faixa": "07:20 até 13:50", "ativo": "on", "ordem": "9"},
         )
         self.assertIn("Horário atualizado.", self._mensagens(response))
 
     def test_exclusao_remove_e_avisa(self):
-        horario = HorarioAtendimento.objects.create(faixa="07:15 até 11:45", ordem=9)
+        horario = HorarioAtendimento.objects.create(area=area_de_teste(), faixa="07:15 até 11:45", ordem=9)
 
         response = self.client.post(
-            reverse("planos_trabalho:horario_excluir", args=[horario.pk])
+            reverse("planos_trabalho:horario_delete", args=[horario.pk])
         )
 
         self.assertFalse(HorarioAtendimento.objects.filter(pk=horario.pk).exists())
@@ -310,7 +312,7 @@ class PresetDefinirPadraoNaoAceitaGetTests(TestCase):
         )
 
     def test_get_nao_define_o_padrao(self):
-        preset = PresetAtividadesPlanoTrabalho.objects.create(nome="Preset G")
+        preset = PresetAtividadesPlanoTrabalho.objects.create(area=area_de_teste(), nome="Preset G")
 
         response = self.client.get(
             reverse("planos_trabalho:preset_definir_padrao", args=[preset.pk])

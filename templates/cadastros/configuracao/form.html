@@ -1,8 +1,11 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 {% load static %}
+{% block shell_css %}{% include 'includes/form_components_css.html' only %}{% endblock %}
+
+{% block component_js %}{% include 'includes/form_components_js.html' only %}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/cadastros-config.css' %}">
+  <link rel="stylesheet" href="{% static 'css/pages/cadastros-config.css' %}">
 {% endblock %}
 
 {% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
@@ -11,13 +14,13 @@
 
 {% block flow_header %}
   <header class="list-header list-header--wizard-band" data-wizard-sticky-band>
-    {% include "components/ui/headers/_list_header_band.html" with title=page_title eyebrow=flow_eyebrow band_tabs_template="components/lists/list_toggle.html" abas=abas tabs_aria_label=tabs_aria_label only %}
+    <c-ui.headers._list_header_band :title="page_title" :eyebrow="flow_eyebrow" band_tabs_template="cotton/lists/list_toggle.html" :abas="abas" :tabs_aria_label="tabs_aria_label" only />
   </header>
 {% endblock %}
 
 {% block flow_body %}
   {# data-travel-document-wizard-step1: poço dos inputs (step1-field) sem borda. #}
-  <div class="cv-form-section-stack cv-form-section-stack--comfortable" data-travel-document-wizard-step1>
+  <div class="form-section-stack form-section-stack--comfortable" data-travel-document-wizard-step1>
     {% if aba == "instituicao" %}
       <form
         method="post"
@@ -29,7 +32,7 @@
       >
         {% csrf_token %}
         <input type="hidden" name="form_id" value="instituicao">
-        {% include "components/form/card.html" with title="Dados da unidade e endereço" description="Unidade operacional e endereço usado nos documentos." title_id="config-card-unidade-endereco-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_unidade_endereco_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
+        <c-form.card title="Dados da unidade e endereço" description="Unidade operacional e endereço usado nos documentos." title_id="config-card-unidade-endereco-title" extra_class="travel-document-card" body_extra_class="travel-document-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "cadastros/configuracao/partials/_unidade_endereco_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id data_hook=data_hook shell=shell form=form only %}</c-slot><c-slot name="footer">{% include "cadastros/configuracao/partials/_form_footer.html" with back_url=back_url only %}</c-slot></c-form.card>
       </form>
 
     {% elif aba == "oficio" %}
@@ -37,15 +40,26 @@
         {% csrf_token %}
         <input type="hidden" name="form_id" value="oficio">
         {{ destinatario_form.destinatario_oficio_nome }}
-        {% include "components/form/card.html" with title="Assinantes e destinatário" description="Padrões usados na emissão do ofício e documentos relacionados." title_id="config-card-oficio-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_oficio_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
+        <c-form.card title="Assinantes e destinatário" description="Padrões usados na emissão do ofício e documentos relacionados." title_id="config-card-oficio-title" extra_class="travel-document-card" body_extra_class="travel-document-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "cadastros/configuracao/partials/_oficio_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id data_hook=data_hook shell=shell variant=variant assinaturas_form=assinaturas_form destinatario_form=destinatario_form only %}</c-slot><c-slot name="footer">{% include "cadastros/configuracao/partials/_form_footer.html" with back_url=back_url only %}</c-slot></c-form.card>
       </form>
 
     {% elif aba == "roteiros" %}
-      <form method="post" action="{{ config_action_url }}" class="document-form travel-document-wizard__form" novalidate>
-        {% csrf_token %}
-        <input type="hidden" name="form_id" value="diarias">
-        {% include "components/form/card.html" with title="Valores de diária" description="Informe apenas o valor de 24 horas; 15% e 30% são calculados. Cada tabela vale a partir da data de vigência, e roteiros com saída anterior mantêm o valor que valia na época." title_id="config-card-diarias-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/configuracao/partials/_diarias_body.html" footer_template="cadastros/configuracao/partials/_form_footer.html" %}
-      </form>
+      {% comment %}
+        `DB-01`: os valores de diária são nacionais e só um administrador do
+        sistema os altera. Para os demais a aba continua aberta — ler o valor
+        vigente é legítimo, ele entra em todo roteiro calculado —, mas sem
+        formulário. Mostrar o formulário e recusar no submit faria a pessoa
+        preencher e perder o que digitou.
+      {% endcomment %}
+      {% if pode_editar_diarias %}
+        <form method="post" action="{{ config_action_url }}" class="document-form travel-document-wizard__form" novalidate>
+          {% csrf_token %}
+          <input type="hidden" name="form_id" value="diarias">
+          <c-form.card title="Valores de diária" description="Informe apenas o valor de 24 horas; 15% e 30% são calculados. Cada tabela vale a partir da data de vigência, e roteiros com saída anterior mantêm o valor que valia na época." title_id="config-card-diarias-title" extra_class="travel-document-card" body_extra_class="travel-document-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "cadastros/configuracao/partials/_diarias_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id data_hook=data_hook shell=shell variant=variant diaria_form=diaria_form diarias_vigentes=diarias_vigentes only %}</c-slot><c-slot name="footer">{% include "cadastros/configuracao/partials/_form_footer.html" with back_url=back_url only %}</c-slot></c-form.card>
+        </form>
+      {% else %}
+        <c-form.card title="Valores de diária" description="Cada tabela vale a partir da data de vigência, e roteiros com saída anterior mantêm o valor que valia na época." title_id="config-card-diarias-title" extra_class="travel-document-card" body_extra_class="travel-document-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "cadastros/configuracao/partials/_diarias_somente_leitura.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id data_hook=data_hook shell=shell variant=variant diarias_vigentes=diarias_vigentes only %}</c-slot></c-form.card>
+      {% endif %}
     {% endif %}
   </div>
 {% endblock %}

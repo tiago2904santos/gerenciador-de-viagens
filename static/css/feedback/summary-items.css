@@ -1,0 +1,88 @@
+/* ========================================================================
+   cv-summary — item de resumo global (label + valor em mini-card)
+
+   Substitui roteiro-editor__summary-item/-label/-value. Usado no editor de
+   roteiro (diárias), na etapa Documentos do ofício e em novos resumos.
+   Variantes --principal/--secondary são moduladas pelos contextos.
+   ======================================================================== */
+
+.summary-item {
+  background: var(--route-card-inner-bg);
+  border: 1px solid var(--route-card-inner-border);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 76px;
+  padding: var(--space-3);
+}
+
+.summary-label {
+  color: var(--theme-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.summary-value {
+  color: var(--theme-stat-value);
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+/* Dashboard: lista editorial de viagens proximas. Mantem a classe existente
+   ate a etapa dedicada de renomeacao. */
+.summary-items {
+  display: grid;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.summary-items > li {
+  align-items: center;
+  background: var(--route-card-inner-bg);
+  border: 1px solid var(--route-card-inner-border);
+  border-radius: var(--radius-md);
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: var(--space-3) var(--space-4);
+  transition: var(--transition-fast);
+}
+
+.summary-items > li:hover {
+  background: var(--color-surface-soft);
+  border-color: var(--color-border-strong);
+}
+
+.summary-items > li > a {
+  color: var(--color-heading);
+  font-weight: var(--font-weight-bold);
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.summary-items > li > a:hover {
+  color: var(--color-primary-bright);
+}
+
+/* Link usa outline próprio: o anel de campo é box-shadow e não se aplica a
+   elementos sem a geometria de controle. */
+.summary-items > li > a:focus-visible {
+  border-radius: var(--radius-sm);
+  outline: 2px solid var(--color-accent-border-strong);
+  outline-offset: 2px;
+}
+
+.summary-items > li > span {
+  color: var(--theme-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}

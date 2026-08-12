@@ -1,11 +1,11 @@
-<div class="cv-form-stack">
+<div class="form-stack">
   <div class="field app-form-field" data-pt-coordenador-panel="adm">
     {{ form.coordenador_adm_modo }}
     {{ form.coordenador_adm_nome_manual }}
     <div class="field-grid field-grid--cols-3">
-      {% include "components/ui/forms/field.html" with field=form.coordenador_adm label="Nome" only %}
-      {% include "components/ui/forms/field.html" with field=form.coordenador_adm_cargo_manual label="Cargo" action_url=cargos_url action_label="Gerenciar cargos" only %}
-      {% include "components/ui/forms/field.html" with field=form.coordenador_adm_genero label="Gênero" only %}
+      <c-ui.forms.field :field="form.coordenador_adm" label="Nome" only />
+      <c-ui.forms.field :field="form.coordenador_adm_cargo_manual" label="Cargo" :action_url="cargos_url" action_label="Gerenciar cargos" only />
+      <c-ui.forms.field :field="form.coordenador_adm_genero" label="Gênero" only />
     </div>
   </div>
 
@@ -13,9 +13,9 @@
     {{ form.coordenador_op_modo }}
     {{ form.coordenador_op_nome_manual }}
     <div class="field-grid field-grid--cols-3">
-      {% include "components/ui/forms/field.html" with field=form.coordenador_op label="Nome" only %}
-      {% include "components/ui/forms/field.html" with field=form.coordenador_op_cargo_manual label="Cargo" action_url=cargos_url action_label="Gerenciar cargos" only %}
-      {% include "components/ui/forms/field.html" with field=form.coordenador_op_genero label="Gênero" only %}
+      <c-ui.forms.field :field="form.coordenador_op" label="Nome" only />
+      <c-ui.forms.field :field="form.coordenador_op_cargo_manual" label="Cargo" :action_url="cargos_url" action_label="Gerenciar cargos" only />
+      <c-ui.forms.field :field="form.coordenador_op_genero" label="Gênero" only />
     </div>
   </div>
 </div>

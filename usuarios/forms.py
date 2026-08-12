@@ -29,14 +29,28 @@ class EstiloCamposMixin:
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
+        # O nome do campo precisa chegar em `set_widget_style`: é por ele que a
+        # regra da máscara reconhece `username`. Iterando `.values()` este
+        # formulário maiusculizava o campo de login — exatamente o caso que a
+        # lista de exceções existe para impedir (`NOVO-56`).
+        for nome, field in self.fields.items():
             if getattr(field.widget, "attrs", None) is None:
                 continue
             if isinstance(field.widget, forms.CheckboxInput):
-                set_widget_style(field.widget, WidgetStyle.CARD_TOGGLE_SR_ONLY, overwrite=False)
+                set_widget_style(
+                    field.widget,
+                    WidgetStyle.CARD_TOGGLE_SR_ONLY,
+                    overwrite=False,
+                    nome=nome,
+                )
                 field.widget.attrs.setdefault("role", "switch")
             else:
-                set_widget_style(field.widget, WidgetStyle.FORM_CONTROL, overwrite=False)
+                set_widget_style(
+                    field.widget,
+                    WidgetStyle.FORM_CONTROL,
+                    overwrite=False,
+                    nome=nome,
+                )
 
 
 class AreaTrabalhoForm(EstiloCamposMixin, forms.ModelForm):

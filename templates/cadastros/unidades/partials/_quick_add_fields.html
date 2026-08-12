@@ -1,11 +1,11 @@
 <div class="field-grid">
   <div class="field-size-3">
-    {% include "components/ui/forms/field.html" with field=form.nome only %}
+    <c-ui.forms.field :field="form.nome" only />
   </div>
   <div class="field-size-1">
-    {% include "components/ui/forms/field.html" with field=form.sigla only %}
+    <c-ui.forms.field :field="form.sigla" only />
   </div>
   <div class="field-size-4">
-    {% include "components/ui/forms/field.html" with field=form.servidores label="Filtrar servidores" help_text="Digite para buscar servidores cadastrados e vincular a esta unidade." only %}
+    <c-ui.forms.field :field="form.servidores" label="Filtrar servidores" help_text="Digite para buscar servidores cadastrados e vincular a esta unidade." only />
   </div>
 </div>

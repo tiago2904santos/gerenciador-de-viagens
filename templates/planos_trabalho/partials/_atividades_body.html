@@ -9,7 +9,7 @@
     <div class="pt-activity__toolbar pt-activity__toolbar--panel">
       <div class="pt-activity__preset">
         <label class="sr-only" for="pt-atividade-preset">Preset de atividades</label>
-        <div class="cv-custom-select pt-activity__preset-select" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
+        <div class="custom-select pt-activity__preset-select" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
           <select id="pt-atividade-preset" data-pt-activity-preset>
             <option value="">Aplicar preset…</option>
             {% for preset in atividades_presets %}
@@ -37,11 +37,11 @@
           data-pt-activity-search
         >
       </div>
-      <button type="button"
-              class="cv-btn cv-btn--secondary cv-btn--sm pt-activity__clear"
-              data-pt-activity-clear>
+      <c-ui.buttons.button type="button"
+              class_name="cv-btn cv-btn--secondary cv-btn--sm pt-activity__clear"
+              data-pt-activity-clear only>
         Limpar seleção
-      </button>
+      </c-ui.buttons.button>
     </div>
 
     <div class="pt-activity__grid" data-pt-activity-grid role="group" aria-label="Atividades disponíveis">

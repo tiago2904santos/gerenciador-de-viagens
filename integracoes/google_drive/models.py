@@ -3,6 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from django.db import models
 from core.db_fields import EncryptedTextField
+from core.managers import AreaScopedManager
 
 
 class DriveCredenciais(models.Model):
@@ -74,7 +75,14 @@ class DriveReorganizacaoJob(models.Model):
     iniciado_em = models.DateTimeField(auto_now_add=True)
     finalizado_em = models.DateTimeField(null=True, blank=True)
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita
+    # para código que precisa enxergar todas. `default_manager_name` mantém o admin,
+    # as relações reversas e `validate_unique` irrestritos — ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         verbose_name = "Job de reorganização do Drive"
         verbose_name_plural = "Jobs de reorganização do Drive"
         ordering = ["-iniciado_em"]

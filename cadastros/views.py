@@ -1,8 +1,8 @@
-﻿import csv
+import csv
 from urllib.parse import urlencode
 
 from django.contrib import messages
-from django.core.paginator import Paginator
+from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import JsonResponse
@@ -10,6 +10,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 
+from core.pagination import contexto_paginacao
 from core.retorno import com_next
 from core.retorno import next_valido
 from core.retorno import voltar_para
@@ -125,8 +126,10 @@ def cidades_index(request):
         messages.success(request, "Cidade criada com sucesso.")
         return redirect("cadastros:cidades_index")
     cidades = listar_cidades(q=q)
-    paginator = Paginator(cidades, CADASTROS_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
+    paginacao = contexto_paginacao(
+        cidades, request, CADASTROS_PER_PAGE, query_params={"q": q}
+    )
+    page_obj = paginacao["page_obj"]
     rows = [
         apresentar_linha_lista_simples_cidade(cidade)
         for cidade in page_obj.object_list
@@ -140,9 +143,7 @@ def cidades_index(request):
             "rows": rows,
             "q": q,
             "quick_add_form": form,
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({"q": q}) if q else "",
+            **paginacao,
         },
     )
 
@@ -163,21 +164,18 @@ def _render_listagem(request, template_name, context):
     return render(request, template_name, context)
 
 
-def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
-    return [
-        page_number if isinstance(page_number, int) else "..."
-        for page_number in page_obj.paginator.get_elided_page_range(
-            page_obj.number,
-            on_each_side=on_each_side,
-            on_ends=on_ends,
-        )
-    ]
+def _vinculo_error(request, mensagem=None):
+    """`NOVO-35`: a mensagem específica quando existe; a genérica quando não.
 
-
-def _vinculo_error(request):
+    O parâmetro tem default de propósito. Esta função é compartilhada por
+    `viatura_delete` e pelos catálogos, e `cadastros/tests/test_catalogos_caracterizacao.py`
+    trava o literal atual — mudar a assinatura sem default reescreveria testes de
+    caracterização que não têm nada a ver com este defeito.
+    """
     messages.error(
         request,
-        "Não foi possível excluir este cadastro porque ele está vinculado a outros registros.",
+        mensagem
+        or "Não foi possível excluir este cadastro porque ele está vinculado a outros registros.",
     )
 
 
@@ -305,8 +303,20 @@ def servidores_index(request):
     cargo_id = _servidor_cargo_id(request)
     top_cargos = cargos_mais_frequentes_servidores(limit=3)
     servidores = listar_servidores(q=q, cargo_id=cargo_id)
-    paginator = Paginator(servidores, SERVIDORES_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
+    page_params = {}
+    if q:
+        page_params["q"] = q
+    if cargo_id:
+        page_params["cargo"] = cargo_id
+    if next_url:
+        page_params["next"] = next_url
+    paginacao = contexto_paginacao(
+        servidores,
+        request,
+        SERVIDORES_PER_PAGE,
+        query_params=page_params,
+    )
+    page_obj = paginacao["page_obj"]
     rows = [
         apresentar_linha_lista_simples_servidor(
             servidor,
@@ -316,13 +326,6 @@ def servidores_index(request):
         )
         for servidor in page_obj.object_list
     ]
-    page_params = {}
-    if q:
-        page_params["q"] = q
-    if cargo_id:
-        page_params["cargo"] = cargo_id
-    if next_url:
-        page_params["next"] = next_url
     abas = _build_servidor_cargo_abas(
         cargo_atual=cargo_id,
         top_cargos=top_cargos,
@@ -337,9 +340,7 @@ def servidores_index(request):
             "page_description": "Servidores vinculados aos fluxos documentais.",
             "rows": rows,
             "q": q,
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode(page_params) if page_params else "",
+            **paginacao,
             "back_url": next_url or None,
             "back_label": "Voltar à viatura",
             "next_url": next_url,
@@ -420,8 +421,9 @@ def servidor_delete(request, pk):
     if request.method == "POST":
         try:
             excluir_servidor(servidor)
-        except CadastroVinculadoError:
-            _vinculo_error(request)
+        except CadastroVinculadoError as exc:
+            # `NOVO-35`: a razão específica chega à tela quando o serviço a dá.
+            _vinculo_error(request, str(exc) or None)
             return redirect(redirect_url)
         messages.success(request, "Servidor excluído com sucesso.")
         return redirect(redirect_url)
@@ -434,8 +436,20 @@ def viaturas_index(request):
     unidade_cfg = _unidade_da_configuracao()
     top_combustiveis = combustiveis_mais_frequentes_viaturas(limit=3)
     viaturas = listar_viaturas(q=q, combustivel_id=combustivel_id, unidade_id=unidade_id)
-    paginator = Paginator(viaturas, CADASTROS_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
+    page_params = {}
+    if q:
+        page_params["q"] = q
+    if combustivel_id:
+        page_params["combustivel"] = combustivel_id
+    elif unidade_id:
+        page_params["unidade"] = unidade_id
+    paginacao = contexto_paginacao(
+        viaturas,
+        request,
+        CADASTROS_PER_PAGE,
+        query_params=page_params,
+    )
+    page_obj = paginacao["page_obj"]
     rows = [
         apresentar_linha_lista_simples_viatura(
             viatura,
@@ -445,13 +459,6 @@ def viaturas_index(request):
         )
         for viatura in page_obj.object_list
     ]
-    page_params = {}
-    if q:
-        page_params["q"] = q
-    if combustivel_id:
-        page_params["combustivel"] = combustivel_id
-    elif unidade_id:
-        page_params["unidade"] = unidade_id
     abas = _build_viatura_filtro_abas(
         combustivel_atual=combustivel_id,
         unidade_atual=unidade_id,
@@ -467,9 +474,7 @@ def viaturas_index(request):
             "page_description": "Viaturas cadastradas para uso operacional.",
             "rows": rows,
             "q": q,
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode(page_params) if page_params else "",
+            **paginacao,
             "abas": abas,
             "tabs_aria_label": "Filtrar viaturas por unidade ou combustível",
             "combustivel_filter": combustivel_id or "",
@@ -629,6 +634,29 @@ def configuracao_sistema(request, aba=None):
     is_post_oficio = request.method == "POST" and form_id == "oficio"
     is_post_diarias = request.method == "POST" and form_id == "diarias"
 
+    # `DB-01`: a tabela de diarias e **nacional de proposito** — os valores vem
+    # de norma externa e valem para todas as unidades, para impedir que duas
+    # areas cobrem valores diferentes pela mesma viagem
+    # (`cadastros/selectors.py:20-27`). O defeito nao era ela ser nacional; era
+    # qualquer um poder mexer nela: `VinculoUsuarioArea.papel` nasce `EDITOR`,
+    # entao todo usuario novo do sistema alterava o valor de diaria de todo
+    # mundo.
+    #
+    # Superusuario, e nao `require_area_role(PAPEL_ADMIN)`: valor nacional nao e
+    # assunto de area nenhuma. Decisao do usuario, registrada no catalogo.
+    #
+    # O portao fica **aqui**, no POST de diarias, e nao como decorador da view:
+    # `configuracao_sistema` serve tres abas (`instituicao`, `oficio`,
+    # `roteiros`), e travar a view inteira tiraria as outras duas de quem nao e
+    # superusuario. Ler o valor vigente continua livre — ele entra em todo
+    # roteiro calculado.
+    pode_editar_diarias = bool(getattr(request.user, "is_superuser", False))
+    if is_post_diarias and not pode_editar_diarias:
+        raise PermissionDenied(
+            "Os valores de diária valem para todas as unidades e só podem ser "
+            "alterados por um administrador do sistema."
+        )
+
     form = ConfiguracaoSistemaForm(
         request.POST if is_post_instituicao else None,
         instance=obj,
@@ -696,6 +724,10 @@ def configuracao_sistema(request, aba=None):
     else:
         context["diaria_form"] = diaria_form
         context["diarias_vigentes"] = listar_tabelas_diaria()
+        # A tela nao pode oferecer o que ela vai recusar: sem isto, quem nao e
+        # superusuario preenche o formulario, envia e perde o que digitou para
+        # um 403. O 403 continua sendo o portao de verdade.
+        context["pode_editar_diarias"] = pode_editar_diarias
 
     return render(request, "cadastros/configuracao/form.html", context)
 

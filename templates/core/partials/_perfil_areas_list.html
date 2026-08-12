@@ -1,27 +1,27 @@
 {% if vinculos_area %}
-  <div class="cv-record-list simple-list" role="list">
+  <div class="record-list simple-list" role="list">
     {% for vinculo in vinculos_area %}
-      <div class="cv-record-row" role="listitem">
-        <span class="cv-record-row__identity" aria-hidden="true"><span>{{ vinculo.area.sigla|slice:":2" }}</span></span>
-        <div class="cv-record-row__content">
-          <div class="cv-record-row__heading">
-            <span class="cv-record-row__title">{{ vinculo.area.sigla }} · {{ vinculo.area.nome }}</span>
+      <div class="record-row" role="listitem">
+        <span class="record-row__identity" aria-hidden="true"><span>{{ vinculo.area.sigla|slice:":2" }}</span></span>
+        <div class="record-row__content">
+          <div class="record-row__heading">
+            <span class="record-row__title">{{ vinculo.area.sigla }} · {{ vinculo.area.nome }}</span>
           </div>
-          <div class="cv-record-row__facts">
-            <span class="cv-record-row__fact">
-              <span class="cv-record-row__fact-label">Perfil</span>
-              <span class="cv-record-row__fact-value">{{ vinculo.get_papel_display }}</span>
+          <div class="record-row__facts">
+            <span class="record-row__fact">
+              <span class="record-row__fact-label">Perfil</span>
+              <span class="record-row__fact-value">{{ vinculo.get_papel_display }}</span>
             </span>
           </div>
         </div>
         {% if vinculo.area_padrao %}
-          <div class="cv-record-row__actions">
-            {% include "components/ui/badges/chip.html" with tone="info" label="Padrão" size="compact" only %}
+          <div class="record-row__actions">
+            <c-ui.badges.chip tone="info" label="Padrão" size="compact" only />
           </div>
         {% endif %}
       </div>
     {% endfor %}
   </div>
 {% else %}
-  {% include "components/ui/feedback/empty_state.html" with title="Nenhuma área vinculada" message="Solicite a um administrador o acesso a uma área de trabalho." variant="compact" only %}
+  <c-ui.feedback.empty_state title="Nenhuma área vinculada" message="Solicite a um administrador o acesso a uma área de trabalho." variant="compact" only />
 {% endif %}

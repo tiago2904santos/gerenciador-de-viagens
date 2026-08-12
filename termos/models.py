@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from django.db import models
 
+from core.constraints import periodo_ordenado
+from core.managers import AreaScopedManager
 from core.models import CancelavelModel
 from cadastros.models import Cidade
 from cadastros.models import Estado
@@ -14,7 +16,7 @@ from oficios.models import Oficio
 class TermoAutorizacao(TimeStampedModel, CancelavelModel):
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
-        null=True,
+        null=False,
         blank=True,
         on_delete=models.PROTECT,
         related_name="termos_autorizacao",
@@ -69,10 +71,24 @@ class TermoAutorizacao(TimeStampedModel, CancelavelModel):
         verbose_name="Viatura",
     )
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita
+    # para código que precisa enxergar todas. `default_manager_name` mantém o admin,
+    # as relações reversas e `validate_unique` irrestritos — ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         # A listagem filtra por area e ordena por data (P-03).
         indexes = [
             models.Index(fields=["area", "-created_at"], name="termo_area_created_idx"),
+        ]
+        constraints = [
+            # `DB-07`: estas duas datas viram o período impresso no termo assinado
+            # (`periodo_display`), que é o documento que autoriza o afastamento.
+            periodo_ordenado(
+                "data_evento_inicio", "data_evento_fim", name="termo_periodo_ordenado",
+            ),
         ]
         ordering = ["-created_at"]
         verbose_name = "Termo de autorizacao"
@@ -144,7 +160,16 @@ class TermoAutorizacao(TimeStampedModel, CancelavelModel):
     def servidores_efetivos(self):
         if not self.pk:
             return Servidor.objects.none()
-        selecionados = self.servidores.select_related("cargo", "unidade").order_by("nome")
+        # `NOVO-08`: montar um queryset novo aqui **descarta** o cache de
+        # `prefetch_related("servidores")` — o related manager é clonado. O
+        # resultado era a consulta do prefetch 100% desperdiçada e duas consultas
+        # por linha da lista: o `.exists()` abaixo e a avaliação no presenter.
+        # O prefetch da lista vem por `termos.selectors.prefetch_servidores_efetivos()`,
+        # com o mesmo `select_related` e a mesma ordem desta cascata.
+        if "servidores" in getattr(self, "_prefetched_objects_cache", {}):
+            selecionados = self.servidores.all()
+        else:
+            selecionados = self.servidores.select_related("cargo", "unidade").order_by("nome")
         if selecionados.exists():
             return selecionados
         if self.oficio_id:
@@ -176,7 +201,11 @@ class TermoAutorizacao(TimeStampedModel, CancelavelModel):
         if not ids:
             return None
         return (
-            Servidor.objects.filter(pk__in=ids)
+            # `BE-09`: `all_objects` — os `ids` vieram dos ofícios do evento, então a
+            # fronteira já é a do evento, não a área ativa. Recortado, o termo genérico
+            # sairia **sem servidores** — vazio, sem erro — e a geração documental roda
+            # em worker, onde não há área ambiente.
+            Servidor.all_objects.filter(pk__in=ids)
             .select_related("cargo", "unidade")
             .order_by("nome")
         )

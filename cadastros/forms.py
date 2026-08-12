@@ -1,13 +1,15 @@
-﻿import re
+import re
 
 from django import forms
 
 from core.forms.widgets import set_widget_style
 from core.forms.widgets import WidgetStyle
 from core.forms.widgets import widget_attrs
+from core.forms.widgets import text_attrs
 from core.normalizers import normalize_plate
 from core.normalizers import normalize_upper
 from core.tenancy import filter_queryset_by_area
+from core.tenancy import get_current_area
 from core.utils.masks import (
     RG_NAO_POSSUI_CANONICAL,
     format_cpf,
@@ -53,16 +55,28 @@ def _normalize_nome_obrigatorio(value):
 class BaseCadastroForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for _name, field in self.fields.items():
+        for nome, field in self.fields.items():
             if getattr(field.widget, "attrs", None) is None:
                 continue
             if isinstance(field.widget, forms.CheckboxInput):
-                set_widget_style(field.widget, WidgetStyle.CARD_TOGGLE_SR_ONLY, overwrite=False)
+                set_widget_style(
+                    field.widget,
+                    WidgetStyle.CARD_TOGGLE_SR_ONLY,
+                    overwrite=False,
+                    nome=nome,
+                )
                 field.widget.attrs.setdefault("role", "switch")
                 continue
-            set_widget_style(field.widget, WidgetStyle.FORM_CONTROL, overwrite=False)
-            if isinstance(field, forms.CharField):
-                field.widget.attrs.setdefault("data-mask", "upper")
+            # A máscara sai de `set_widget_style` e não daqui. A regra local era
+            # "todo `CharField`", e `EmailField`/`URLField` são `CharField` — o
+            # dia em que um cadastro ganhasse e-mail, ele seria maiusculizado em
+            # silêncio. A regra central pergunta pelo widget e pelo nome.
+            set_widget_style(
+                field.widget,
+                WidgetStyle.FORM_CONTROL,
+                overwrite=False,
+                nome=nome,
+            )
 
 
 def _servidor_option_attrs(servidor):
@@ -489,11 +503,28 @@ class ViaturaForm(BaseCadastroForm):
         raw = normalize_plate(self.cleaned_data.get("placa", ""))
         if not PLACA_RE.match(raw):
             raise forms.ValidationError("Placa deve estar no formato AAA1234 ou AAA1A23.")
-        qs = Viatura.objects.filter(placa=raw)
+        # `DB-05`: esta consulta nao tinha recorte de area, e a mensagem de erro
+        # confirmava a existencia da placa em outra unidade — informacao de
+        # outra area entregue por um formulario. O recorte sai da area da
+        # propria instancia quando ela ja existe (edicao) e da area ativa quando
+        # e cadastro novo, que e a area em que a viatura vai nascer.
+        # `area_id` e nao `pk`: cobre os dois caminhos. Na edicao a viatura ja
+        # tem area; no cadastro novo ela ainda nao tem, porque
+        # `cadastros/services.py:259` so atribui **depois** da validacao — e ai
+        # a area ativa e a area em que a viatura vai nascer. Testar por `pk`
+        # faria a forma ignorar uma area ja atribuida na instancia, que e
+        # exatamente o caso de quem chama o form fora de um request.
+        area = self.instance.area if self.instance.area_id else get_current_area()
+        # `BE-09`: `all_objects` — a `area` da linha de cima é a da instância quando
+        # ela existe, e o parágrafo acima explica por quê. Recortar de novo pela área
+        # ativa esvaziaria o queryset quando as duas divergissem, a checagem de placa
+        # passaria em branco e o erro viraria `IntegrityError` em
+        # `viatura_area_placa_unique` — desfazendo justamente o `DB-05`.
+        qs = filter_queryset_by_area(Viatura.all_objects, area).filter(placa=raw)
         if self.instance.pk:
             qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():
-            raise forms.ValidationError("Já existe uma viatura com esta placa.")
+            raise forms.ValidationError("Já existe uma viatura com esta placa nesta área.")
         return raw
 
     def clean_modelo(self):
@@ -528,7 +559,7 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
                 }
             ),
             "logradouro": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "data-mask": "upper"}),
-            "numero": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "autocomplete": "off"}),
+            "numero": forms.TextInput(attrs={**text_attrs(WidgetStyle.FORM_CONTROL), "autocomplete": "off"}),
             "bairro": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "data-mask": "upper"}),
             "cidade_endereco": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL), "data-mask": "upper"}),
             "telefone": forms.TextInput(
@@ -542,7 +573,7 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
             ),
             "ramal": forms.TextInput(
                 attrs={
-                    **widget_attrs(WidgetStyle.FORM_CONTROL),
+                    **text_attrs(WidgetStyle.FORM_CONTROL),
                     "autocomplete": "off",
                     "maxlength": "20",
                     "placeholder": "Ex.: 1234",
@@ -592,7 +623,7 @@ class ConfiguracaoSistemaForm(forms.ModelForm):
             required=False,
             widget=forms.TextInput(
                 attrs={
-                    **widget_attrs(WidgetStyle.FORM_CONTROL),
+                    **text_attrs(WidgetStyle.FORM_CONTROL),
                     "readonly": "readonly",
                     "tabindex": "-1",
                     "data-uf-nome": "true",
@@ -664,7 +695,7 @@ _TIPO_FIELD_MAP = [
 
 
 class _AssinanteServidorSelect(forms.Select):
-    """Select com metadados nas options para o cv-search-picker."""
+    """Select com metadados nas options para o search-picker."""
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
@@ -810,7 +841,7 @@ class TabelaDiariaForm(forms.ModelForm):
         fields = ["faixa", "vigencia_inicio", "valor_24h"]
         widgets = {
             "faixa": forms.Select(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL_FIELD_CONTROL)}),
-            # O calendário do sistema é o componente global `cv-date-picker`;
+            # O calendário do sistema é o componente global `date-picker`;
             # o campo em si é só o hidden que ele preenche.
             "vigencia_inicio": forms.HiddenInput(attrs={"data-cv-date-picker-value": ""}),
             "valor_24h": forms.NumberInput(

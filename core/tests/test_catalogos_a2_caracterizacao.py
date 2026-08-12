@@ -21,21 +21,26 @@ asserções comparam com o valor **gravado**, não com o digitado.
 
 from __future__ import annotations
 
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
 from django.contrib.messages import get_messages
+from django.db.models.deletion import ProtectedError
 from django.test import TestCase
 from django.urls import reverse
 
 from eventos.models import TipoEvento
 from justificativas.models import ModeloJustificativa
 from oficios.models import ModeloMotivoOficio
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class _CatalogoMixin:
     def setUp(self):
-        self.client.force_login(
-            get_user_model().objects.create_user(username=f"a2_{self.url_index}")
-        )
+        usuario = get_user_model().objects.create_user(username=f"a2_{self.url_index}")
+        vincular_area(usuario)
+        self.client.force_login(usuario)
 
     def _mensagens(self, response):
         return [str(m) for m in get_messages(response.wsgi_request)]
@@ -51,7 +56,7 @@ class ModelosMotivoTests(_CatalogoMixin, TestCase):
     url_index = "oficios:modelos_motivo_index"
 
     def _criar(self, titulo="Modelo A", **kwargs):
-        return ModeloMotivoOficio.objects.create(
+        return ModeloMotivoOficio.objects.create(area=area_de_teste(), 
             nome=titulo, texto="Texto do motivo.", **kwargs
         )
 
@@ -85,7 +90,7 @@ class ModelosMotivoTests(_CatalogoMixin, TestCase):
         modelo = self._criar()
 
         response = self.client.post(
-            reverse("oficios:modelo_motivo_editar", args=[modelo.pk]),
+            reverse("oficios:modelo_motivo_update", args=[modelo.pk]),
             {"nome": "Modelo editado", "texto": "Outro texto."},
         )
 
@@ -99,7 +104,7 @@ class ModelosMotivoTests(_CatalogoMixin, TestCase):
         modelo = self._criar()
 
         response = self.client.post(
-            reverse("oficios:modelo_motivo_editar", args=[modelo.pk]),
+            reverse("oficios:modelo_motivo_update", args=[modelo.pk]),
             {"nome": "", "texto": ""},
         )
 
@@ -123,13 +128,13 @@ class ModelosMotivoTests(_CatalogoMixin, TestCase):
         modelo = self._criar()
 
         resposta_get = self.client.get(
-            reverse("oficios:modelo_motivo_excluir", args=[modelo.pk])
+            reverse("oficios:modelo_motivo_delete", args=[modelo.pk])
         )
         self.assertEqual(resposta_get.status_code, 200)
         self.assertTrue(ModeloMotivoOficio.objects.filter(pk=modelo.pk).exists())
 
         resposta_post = self.client.post(
-            reverse("oficios:modelo_motivo_excluir", args=[modelo.pk])
+            reverse("oficios:modelo_motivo_delete", args=[modelo.pk])
         )
         self.assertFalse(ModeloMotivoOficio.objects.filter(pk=modelo.pk).exists())
         self.assertIn(
@@ -158,17 +163,36 @@ class TiposEventoTests(_CatalogoMixin, TestCase):
         self.assertIn(tipo.nome, [r["title"] for r in response.context["rows"]])
 
         response = self.client.post(
-            reverse("eventos:tipo_editar", args=[tipo.pk]), {"nome": "Congresso"}
+            reverse("eventos:tipo_update", args=[tipo.pk]), {"nome": "Congresso"}
         )
         self.assertIn("Tipo de evento atualizado com sucesso.", self._mensagens(response))
 
-        response = self.client.post(reverse("eventos:tipo_excluir", args=[tipo.pk]))
+        response = self.client.post(reverse("eventos:tipo_delete", args=[tipo.pk]))
         self.assertFalse(TipoEvento.objects.filter(pk=tipo.pk).exists())
         self.assertIn("Tipo de evento excluído com sucesso.", self._mensagens(response))
 
+    def test_exclusao_protegida_avisa_sem_virar_erro_500(self):
+        tipo = TipoEvento.objects.create(area=area_de_teste(), nome="Em uso")
+
+        with patch.object(
+            TipoEvento,
+            "delete",
+            side_effect=ProtectedError("vinculado", {tipo}),
+        ):
+            response = self.client.post(
+                reverse("eventos:tipo_delete", args=[tipo.pk])
+            )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(TipoEvento.objects.filter(pk=tipo.pk).exists())
+        self.assertIn(
+            "Não foi possível excluir este cadastro porque ele está vinculado a outros registros.",
+            self._mensagens(response),
+        )
+
     def test_a_busca_filtra(self):
-        TipoEvento.objects.create(nome="Zebra")
-        TipoEvento.objects.create(nome="Girafa")
+        TipoEvento.objects.create(area=area_de_teste(), nome="Zebra")
+        TipoEvento.objects.create(area=area_de_teste(), nome="Girafa")
 
         response = self.client.get(self._index(q="zebra"))
 
@@ -190,11 +214,19 @@ class TiposEventoTests(_CatalogoMixin, TestCase):
         self.assertEqual(response.context["back_url"], destino)
         self.assertEqual(response.context["quick_add_next_url"], destino)
 
+    def test_next_externo_cai_no_fallback_do_catalogo(self):
+        response = self.client.get(
+            self._index(next="https://externo.invalido/coleta")
+        )
+
+        self.assertEqual(response.context["back_url"], reverse("eventos:index"))
+        self.assertEqual(response.context["quick_add_next_url"], "")
+
     def test_edicao_invalida_avisa_com_a_frase_unica(self):
-        tipo = TipoEvento.objects.create(nome="Seminario")
+        tipo = TipoEvento.objects.create(area=area_de_teste(), nome="Seminario")
 
         response = self.client.post(
-            reverse("eventos:tipo_editar", args=[tipo.pk]), {"nome": ""}
+            reverse("eventos:tipo_update", args=[tipo.pk]), {"nome": ""}
         )
 
         self.assertIn(
@@ -207,7 +239,7 @@ class ModelosJustificativaTests(_CatalogoMixin, TestCase):
     url_index = "justificativas:modelos_index"
 
     def _criar(self, titulo="Modelo J", **kwargs):
-        return ModeloJustificativa.objects.create(
+        return ModeloJustificativa.objects.create(area=area_de_teste(), 
             nome=titulo, texto="Texto da justificativa.", **kwargs
         )
 
@@ -230,7 +262,7 @@ class ModelosJustificativaTests(_CatalogoMixin, TestCase):
         modelo = ModeloJustificativa.objects.get(nome="NOVO J")
 
         response = self.client.post(
-            reverse("justificativas:modelo_editar", args=[modelo.pk]),
+            reverse("justificativas:modelo_update", args=[modelo.pk]),
             {"nome": "J editado", "texto": "Outro."},
         )
         self.assertIn(
@@ -238,7 +270,7 @@ class ModelosJustificativaTests(_CatalogoMixin, TestCase):
         )
 
         response = self.client.post(
-            reverse("justificativas:modelo_excluir", args=[modelo.pk])
+            reverse("justificativas:modelo_delete", args=[modelo.pk])
         )
         self.assertFalse(ModeloJustificativa.objects.filter(pk=modelo.pk).exists())
         self.assertIn(
@@ -279,7 +311,7 @@ class DefinirPadraoNaoAceitaGetTests(TestCase):
         )
 
     def test_modelo_de_motivo_recusa_get(self):
-        modelo = ModeloMotivoOficio.objects.create(nome="M", texto="T")
+        modelo = ModeloMotivoOficio.objects.create(area=area_de_teste(), nome="M", texto="T")
 
         response = self.client.get(
             reverse("oficios:modelo_motivo_definir_padrao", args=[modelo.pk])
@@ -290,7 +322,7 @@ class DefinirPadraoNaoAceitaGetTests(TestCase):
         self.assertFalse(modelo.is_padrao)
 
     def test_modelo_de_justificativa_recusa_get(self):
-        modelo = ModeloJustificativa.objects.create(nome="J", texto="T")
+        modelo = ModeloJustificativa.objects.create(area=area_de_teste(), nome="J", texto="T")
 
         response = self.client.get(
             reverse("justificativas:modelo_definir_padrao", args=[modelo.pk])

@@ -23,6 +23,20 @@
     }, {});
   }
 
+  /* NOVO-07: registro em memoria dos resumos que a busca sob demanda trouxe.
+     O `json_script` da pagina passou a carregar so o que ja esta selecionado —
+     antes ele trazia todo oficio da area, ~680 bytes cada, e a pagina crescia
+     com a tabela. O que o picker busca no servidor entra aqui, e `selected()`
+     continua sincrono: torna-lo Promise vazaria `async` para as tres paginas
+     que o consomem, sem ganho nenhum. */
+  var lembrados = {};
+
+  function remember(items) {
+    (items || []).forEach(function (item) {
+      if (item && item.id != null) lembrados[String(item.id)] = item;
+    });
+  }
+
   function selected(select, source) {
     if (!select) return [];
     if (source == null && select.dataset.sourceDocument) {
@@ -31,7 +45,10 @@
     var documents = index(source);
     return Array.from(select.options)
       .filter(function (option) { return option.selected && option.value; })
-      .map(function (option) { return documents[String(option.value)] || null; })
+      .map(function (option) {
+        var chave = String(option.value);
+        return documents[chave] || lembrados[chave] || null;
+      })
       .filter(Boolean);
   }
 
@@ -199,6 +216,7 @@
     apply: apply,
     index: index,
     read: read,
+    remember: remember,
     selected: selected,
     setDateRange: setDateRange,
     setMulti: setMulti,

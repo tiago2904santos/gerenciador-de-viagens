@@ -56,7 +56,7 @@ class ContratoDeClasseDoFieldTests(SimpleTestCase):
 
     def _render(self, nome):
         return render_to_string(
-            "components/ui/forms/field.html",
+            "cotton/ui/forms/field.html",
             {"field": self.form[nome], "label": self.form[nome].label},
         )
 
@@ -96,7 +96,7 @@ class ContratoDeClasseDoFieldTests(SimpleTestCase):
         for nome in CAMPOS_EM_GRADE:
             with self.subTest(campo=nome):
                 html = render_to_string(
-                    "components/ui/forms/field.html",
+                    "cotton/ui/forms/field.html",
                     {"field": self.form[nome], "size_class": "field-size-4"},
                 )
                 self.assertIn("field-size-4", html)

@@ -1,12 +1,18 @@
-from django.test import TestCase
+from unittest import mock
 
+from django.test import TestCase
+from django.utils import timezone
+
+from cadastros.models import ConfiguracaoSistema
 from planos_trabalho.models import PlanoTrabalho
 from planos_trabalho.models import ProgramaSolicitante
 from planos_trabalho.services import aplicar_textos_padrao
+from planos_trabalho.services import criar_plano_rascunho
 from planos_trabalho.services import format_periodo_evento_extenso
 from planos_trabalho.services import montar_efetivo_texto
 from planos_trabalho.services import montar_texto_coordenacao
 from planos_trabalho.services import texto_padrao_contextualizacao
+from planos_trabalho.services import salvar_plano_numerado
 
 from .helpers import configurar_sistema
 from .helpers import criar_base_geografica
@@ -14,6 +20,67 @@ from .helpers import criar_plano_maringa
 from .helpers import criar_servidor
 
 from datetime import date
+from core.testing import area_de_teste
+from core.testing import com_request
+
+
+class ReservaNumeroPlanoTests(TestCase):
+    def test_criacao_repete_apos_colisao_real(self):
+        area = area_de_teste()
+        ano = timezone.localdate().year
+        PlanoTrabalho.all_objects.create(area=area, numero=77, ano=ano)
+        original = PlanoTrabalho.proximo_numero.__func__
+        chamadas = []
+
+        def escolher_colidindo(cls, area_recebida=None):
+            chamadas.append(1)
+            if len(chamadas) == 1:
+                config = ConfiguracaoSistema.get_for_area(area_recebida)
+                config.pt_ano = ano
+                config.pt_ultimo_numero = 78
+                config.save(update_fields=["pt_ano", "pt_ultimo_numero", "updated_at"])
+                return 77, ano, "ASCOM"
+            return original(cls, area_recebida)
+
+        with com_request(area):
+            with mock.patch.object(
+                PlanoTrabalho,
+                "proximo_numero",
+                classmethod(escolher_colidindo),
+            ):
+                plano = criar_plano_rascunho()
+
+        self.assertEqual(len(chamadas), 2, "o plano não repetiu após a colisão")
+        self.assertNotEqual(plano.numero, 77)
+        self.assertEqual(plano.numero, 78)
+        config = ConfiguracaoSistema.get_for_area(area)
+        self.assertEqual(
+            config.pt_ultimo_numero,
+            78,
+            "a tentativa perdida avançou o contador fora do savepoint",
+        )
+        self.assertEqual(
+            PlanoTrabalho.all_objects.filter(area=area, ano=ano).count(),
+            2,
+        )
+
+    def test_falha_ao_gravar_desfaz_o_avanco_do_contador(self):
+        area = area_de_teste()
+        config = ConfiguracaoSistema.get_for_area(area)
+        contador_anterior = config.pt_ultimo_numero
+        plano = PlanoTrabalho(area=area)
+
+        with mock.patch.object(
+            PlanoTrabalho,
+            "save",
+            side_effect=RuntimeError("falha depois da reserva"),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "falha depois da reserva"):
+                salvar_plano_numerado(plano)
+
+        config.refresh_from_db()
+        self.assertEqual(config.pt_ultimo_numero, contador_anterior)
+        self.assertFalse(PlanoTrabalho.all_objects.filter(area=area).exists())
 
 
 class TextosPadraoTests(TestCase):
@@ -150,7 +217,7 @@ class EfetivoTextoTests(TestCase):
         from planos_trabalho.models import EfetivoPlano
 
         plano = criar_plano_maringa(self.maringa, efetivo=6)
-        papiloscopista = Cargo.objects.create(nome="Papiloscopista")
+        papiloscopista = Cargo.objects.create(area=area_de_teste(), nome="Papiloscopista")
         EfetivoPlano.objects.create(plano=plano, cargo=papiloscopista, quantidade=1)
 
         texto = montar_efetivo_texto(plano)
@@ -163,8 +230,8 @@ class EfetivoTextoTests(TestCase):
         from planos_trabalho.models import EfetivoPlano
 
         plano = criar_plano_maringa(self.maringa, efetivo=2)  # 2 Policiais Civis (ASCOM)
-        iipr = Unidade.objects.create(nome="Instituto de Identificação do Paraná", sigla="IIPR")
-        papiloscopista = Cargo.objects.create(nome="Papiloscopista")
+        iipr = Unidade.objects.create(area=area_de_teste(), nome="Instituto de Identificação do Paraná", sigla="IIPR")
+        papiloscopista = Cargo.objects.create(area=area_de_teste(), nome="Papiloscopista")
         EfetivoPlano.objects.create(plano=plano, unidade=iipr, cargo=papiloscopista, quantidade=8)
 
         self.assertEqual(

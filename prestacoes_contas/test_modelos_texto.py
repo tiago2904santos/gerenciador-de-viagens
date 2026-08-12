@@ -43,13 +43,13 @@ class ModelosDeTextoRTTests(TestCase):
 
     def test_novo_com_campo_na_querystring_abre(self):
         """A leitura de `_CAMPO_LABELS` acontece antes de qualquer coisa nesta view."""
-        response = self.client.get(reverse("prestacoes_contas:modelo_novo"), {"campo": CAMPO})
+        response = self.client.get(reverse("prestacoes_contas:modelo_create"), {"campo": CAMPO})
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["form"].initial.get("campo"), CAMPO)
 
     def test_novo_com_campo_desconhecido_nao_pre_seleciona(self):
-        response = self.client.get(reverse("prestacoes_contas:modelo_novo"), {"campo": "inexistente"})
+        response = self.client.get(reverse("prestacoes_contas:modelo_create"), {"campo": "inexistente"})
 
         self.assertEqual(response.status_code, 200)
         self.assertIsNone(response.context["form"].initial.get("campo"))
@@ -57,7 +57,7 @@ class ModelosDeTextoRTTests(TestCase):
     def test_criar_redireciona_para_a_aba_do_campo(self):
         """O redirect de sucesso passa por `_voltar_modelos_url` — o segundo `F821`."""
         response = self.client.post(
-            reverse("prestacoes_contas:modelo_novo"),
+            reverse("prestacoes_contas:modelo_create"),
             {"nome": "Modelo novo", "texto": "Texto novo", "campo": CAMPO},
         )
 
@@ -68,7 +68,7 @@ class ModelosDeTextoRTTests(TestCase):
         modelo = self._criar()
 
         response = self.client.post(
-            reverse("prestacoes_contas:modelo_editar", args=[modelo.pk]),
+            reverse("prestacoes_contas:modelo_update", args=[modelo.pk]),
             {"nome": "Modelo A editado", "texto": "Texto editado", "campo": CAMPO},
         )
 
@@ -79,7 +79,7 @@ class ModelosDeTextoRTTests(TestCase):
     def test_excluir_redireciona_para_a_aba_do_campo(self):
         modelo = self._criar()
 
-        response = self.client.post(reverse("prestacoes_contas:modelo_excluir", args=[modelo.pk]))
+        response = self.client.post(reverse("prestacoes_contas:modelo_delete", args=[modelo.pk]))
 
         self.assertRedirects(response, f"{reverse('prestacoes_contas:modelos_index')}?campo={CAMPO}")
         self.assertFalse(ModeloTextoRelatorioTecnico.objects.filter(pk=modelo.pk).exists())

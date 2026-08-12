@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.utils.html import escape
 
 from core.tenancy import filter_queryset_by_area, get_current_area
+from core.presenters.text import join_non_empty
 from core.utils.masks import format_protocolo
 
 from .forms import CAMPOS_COM_MODELO, CAMPOS_CUSTEIO_COM_OUTRO
@@ -116,22 +117,51 @@ def _servidor_identificacao(ps) -> dict:
     from oficios.presenters import _iniciais_nome_servidor
 
     servidor = ps.servidor
+    cargo = str(servidor.cargo) if servidor.cargo_id else "—"
+    unidade = str(servidor.unidade) if servidor.unidade_id else ""
+    cpf = servidor.cpf_formatado
+    cpf_display = f"CPF {cpf}" if cpf and cpf != "—" else ""
     return {
         "ps_pk": ps.pk,
         "nome_servidor": servidor.nome,
-        "cpf_servidor": servidor.cpf_formatado,
-        "cargo": str(servidor.cargo) if servidor.cargo_id else "—",
-        "unidade": str(servidor.unidade) if servidor.unidade_id else "",
+        "cpf_servidor": cpf,
+        "cargo": cargo,
+        "unidade": unidade,
+        "meta": join_non_empty([cargo, unidade, cpf_display]),
         "is_motorista": ps.is_motorista,
         "numero_solicitacao": ps.numero_solicitacao,
         "iniciais": _iniciais_nome_servidor(servidor.nome),
     }
 
 
+def _servidor_removido_identificacao(ps) -> dict:
+    """`DB-06`: quem saiu da equipe, com a data e o que ficou guardado dele."""
+    identificacao = _servidor_identificacao(ps)
+    guardados = []
+    if ps.numero_solicitacao.strip():
+        guardados.append("número da solicitação")
+    if ps.documentos_anexos.exists():
+        guardados.append("comprovante")
+    if ps.assinaturas.exists():
+        guardados.append("assinatura")
+    identificacao["removida_em"] = ps.removida_em
+    identificacao["guardados"] = ", ".join(guardados)
+    return identificacao
+
+
 def _build_identificacao(prestacao) -> dict:
     """Identificação de nível ofício + lista de servidores da prestação."""
+    from .selectors import servidores_removidos_da_equipe
+
     oficio = prestacao.oficio
     servidores = [_servidor_identificacao(ps) for ps in prestacao.servidores_prestacao.all()]
+    # `DB-06`: os que saíram da equipe levando dados junto. `objects` os esconde
+    # em todo o resto do sistema — este é o único lugar onde reaparecem, para que
+    # "preservado" não vire "sumido sem deixar endereço".
+    removidos = [
+        _servidor_removido_identificacao(ps)
+        for ps in servidores_removidos_da_equipe(prestacao)
+    ]
     return {
         "numero": oficio.numero_formatado,
         "protocolo": format_protocolo(oficio.protocolo) or "—",
@@ -141,20 +171,8 @@ def _build_identificacao(prestacao) -> dict:
         "periodo": _periodo_display(oficio) or "—",
         "servidores": servidores,
         "servidores_count": len(servidores),
+        "servidores_removidos": removidos,
     }
-
-
-def _marcar_servidor_em_preenchimento(ps):
-    if ps is not None:
-        ps.marcar_em_preenchimento()
-
-
-def _marcar_servidores_pendentes(prestacao):
-    """Marca em preenchimento todos os servidores ainda pendentes do ofício."""
-    if prestacao is None:
-        return
-    for ps in prestacao.servidores_prestacao.filter(status=PrestacaoServidor.STATUS_PENDENTE):
-        ps.marcar_em_preenchimento()
 
 
 def _primeiro_servidor(prestacao):

@@ -15,6 +15,8 @@ from cadastros.models import Viatura
 from cadastros.models import Combustivel
 from oficios.models import Oficio
 from roteiros.models import Roteiro
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class OficioWizardRoteiroDiariasTests(TestCase):
@@ -26,18 +28,19 @@ class OficioWizardRoteiroDiariasTests(TestCase):
             password="123456",
         )
         self.client.force_login(self.user)
-        self.cargo = Cargo.objects.create(nome="Cargo WR")
-        self.comb = Combustivel.objects.create(nome="Flex WR")
-        self.servidor_a = Servidor.objects.create(nome="Viajante A", cargo=self.cargo, cpf="11122233344")
-        self.servidor_b = Servidor.objects.create(nome="Viajante B", cargo=self.cargo, cpf="55566677788")
-        self.unidade_m = Unidade.objects.create(nome="Unidade WR", sigla="UWR")
-        self.motorista_v = Servidor.objects.create(
+        vincular_area(self.user)
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Cargo WR")
+        self.comb = Combustivel.objects.create(area=area_de_teste(), nome="Flex WR")
+        self.servidor_a = Servidor.objects.create(area=area_de_teste(), nome="Viajante A", cargo=self.cargo, cpf="11122233344")
+        self.servidor_b = Servidor.objects.create(area=area_de_teste(), nome="Viajante B", cargo=self.cargo, cpf="55566677788")
+        self.unidade_m = Unidade.objects.create(area=area_de_teste(), nome="Unidade WR", sigla="UWR")
+        self.motorista_v = Servidor.objects.create(area=area_de_teste(), 
             nome="Motorista WR",
             cargo=self.cargo,
             cpf="99988877766",
             unidade=self.unidade_m,
         )
-        self.viatura = Viatura.objects.create(
+        self.viatura = Viatura.objects.create(area=area_de_teste(), 
             placa="WRZ9999",
             modelo="Modelo WR",
             combustivel=self.comb,
@@ -86,10 +89,15 @@ class OficioWizardRoteiroDiariasTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "oficios/wizard_roteiro.html")
         self.assertContains(response, 'id="roteiro-editor-form"')
+        html = response.content.decode()
+        id_form = html.index('id="roteiro-editor-form"')
+        inicio_form = html.rindex("<form", 0, id_form)
+        fim_form = html.index("</form>", inicio_form)
+        self.assertIn('name="csrfmiddlewaretoken"', html[inicio_form:fim_form])
         self.assertContains(response, "Etapa 2")
         self.assertContains(response, reverse("oficios:index"))
         self.assertContains(response, "Voltar à lista")
-        self.assertContains(response, "cv-card-footer-section")
+        self.assertContains(response, "card-footer-section")
         self.assertContains(response, "Avançar")
 
         oficio.refresh_from_db()

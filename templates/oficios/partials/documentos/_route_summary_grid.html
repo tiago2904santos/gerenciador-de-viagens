@@ -5,26 +5,26 @@
     {# Trechos: cards individuais (<=3) ou lista com scroll (>3) #}
     {% if card.trechos_count <= 3 %}
       {% for t in card.trechos %}
-        <div class="cv-summary-item oficio-documentos-route-trecho-item">
-          <span class="cv-summary-label">{{ t.rota }}</span>
+        <div class="summary-item oficio-documentos-route-trecho-item">
+          <span class="summary-label">{{ t.rota }}</span>
           <div class="oficio-documentos-route-trecho-times">
-            <span class="cv-summary-value">{{ t.saida }}</span>
+            <span class="summary-value">{{ t.saida }}</span>
             <span class="oficio-documentos-route-trecho-arrow">→</span>
-            <span class="cv-summary-value">{{ t.chegada }}</span>
+            <span class="summary-value">{{ t.chegada }}</span>
           </div>
         </div>
       {% endfor %}
     {% else %}
       <div class="oficio-documentos-route-trechos-scroll-card">
-        <span class="cv-summary-label">Trechos encontrados</span>
+        <span class="summary-label">Trechos encontrados</span>
         <div class="oficio-documentos-route-trechos-scroll-list">
           {% for t in card.trechos %}
-            <div class="cv-summary-item oficio-documentos-route-trecho-scroll-item">
-              <span class="cv-summary-label">{{ t.rota }}</span>
+            <div class="summary-item oficio-documentos-route-trecho-scroll-item">
+              <span class="summary-label">{{ t.rota }}</span>
               <div class="oficio-documentos-route-trecho-times">
-                <span class="cv-summary-value">{{ t.saida }}</span>
+                <span class="summary-value">{{ t.saida }}</span>
                 <span class="oficio-documentos-route-trecho-arrow">→</span>
-                <span class="cv-summary-value">{{ t.chegada }}</span>
+                <span class="summary-value">{{ t.chegada }}</span>
               </div>
             </div>
           {% endfor %}
@@ -33,11 +33,11 @@
     {% endif %}
 
     {# Col 3: Valor total (2 trechos = grande; 3+ = com extenso) #}
-    <div class="cv-summary-item oficio-documentos-route-valor-card">
-      <span class="cv-summary-label">Valor total</span>
-      <span class="cv-summary-value oficio-documentos-route-diarias-valor">{% if card.diaria_vazio %}Não calculado{% elif card.diaria_moeda %}{{ card.diaria_moeda }}{% else %}—{% endif %}</span>
-      <span class="cv-summary-label">Valor por extenso</span>
-      <span class="cv-summary-value oficio-documentos-route-diarias-extenso">
+    <div class="summary-item oficio-documentos-route-valor-card">
+      <span class="summary-label">Valor total</span>
+      <span class="summary-value oficio-documentos-route-diarias-valor">{% if card.diaria_vazio %}Não calculado{% elif card.diaria_moeda %}{{ card.diaria_moeda }}{% else %}—{% endif %}</span>
+      <span class="summary-label">Valor por extenso</span>
+      <span class="summary-value oficio-documentos-route-diarias-extenso">
         {{ card.diaria_extenso|default:"Não informado" }}
       </span>
     </div>
@@ -45,27 +45,27 @@
     {# Col 4: Placa + Modelo (card da lista) ou Tipo destino + Quantidade de diárias (wizard) #}
     <div class="oficio-documentos-route-col4">
       {% if col4_viatura %}
-        <div class="cv-summary-item">
-          <span class="cv-summary-label">Placa</span>
-          <span class="cv-summary-value">{{ viatura_placa|default:"—" }}</span>
+        <div class="summary-item">
+          <span class="summary-label">Placa</span>
+          <span class="summary-value">{{ viatura_placa|default:"—" }}</span>
         </div>
-        <div class="cv-summary-item">
-          <span class="cv-summary-label">Modelo</span>
-          <span class="cv-summary-value">{{ viatura_modelo|default:"—" }}</span>
+        <div class="summary-item">
+          <span class="summary-label">Modelo</span>
+          <span class="summary-value">{{ viatura_modelo|default:"—" }}</span>
         </div>
       {% else %}
-        <div class="cv-summary-item">
-          <span class="cv-summary-label">Tipo destino</span>
-          <span class="cv-summary-value">{{ card.diaria_tipo_destino|default:"—" }}</span>
+        <div class="summary-item">
+          <span class="summary-label">Tipo destino</span>
+          <span class="summary-value">{{ card.diaria_tipo_destino|default:"—" }}</span>
         </div>
-        <div class="cv-summary-item">
-          <span class="cv-summary-label">Quantidade de diárias</span>
+        <div class="summary-item">
+          <span class="summary-label">Quantidade de diárias</span>
           {% if card.diaria_composicao_linhas %}
             <ul class="oficio-documentos-route-composicao-list">
-              {% for linha in card.diaria_composicao_linhas %}<li class="cv-summary-value">{{ linha }}</li>{% endfor %}
+              {% for linha in card.diaria_composicao_linhas %}<li class="summary-value">{{ linha }}</li>{% endfor %}
             </ul>
           {% else %}
-            <span class="cv-summary-value">—</span>
+            <span class="summary-value">—</span>
           {% endif %}
         </div>
       {% endif %}

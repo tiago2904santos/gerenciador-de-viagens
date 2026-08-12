@@ -3,6 +3,20 @@
 
   var locationCache = {};
 
+  /* JS-02 — uma entrada por container de linhas vivo: { root, desmontar }. */
+  var instancias = [];
+
+  function destroy(scope) {
+    if (!scope || (scope.nodeType !== 1 && scope.nodeType !== 9)) return;
+    for (var i = instancias.length - 1; i >= 0; i -= 1) {
+      var entrada = instancias[i];
+      if (scope === entrada.root || (scope.contains && scope.contains(entrada.root))) {
+        entrada.desmontar();
+        instancias.splice(i, 1);
+      }
+    }
+  }
+
   function asRoot(root) {
     return root || document;
   }
@@ -12,9 +26,9 @@
     if (select.dataset) {
       delete select.dataset.entityPickerReady;
     }
-    var nextEl = select.nextElementSibling;
-    if (nextEl && nextEl.classList && nextEl.classList.contains("cv-search-picker")) {
-      nextEl.parentNode.removeChild(nextEl);
+    var rendered = window.CV.picker.rootFor(select);
+    if (rendered && rendered !== select) {
+      rendered.parentNode.removeChild(rendered);
     }
   }
 
@@ -258,6 +272,12 @@
     root.dataset.locationDragDropReady = "true";
 
     var dragState = null;
+    /* JS-02 — o `cleanup` abaixo já removia os três listeners de ponteiro,
+       mas só era chamado no `pointerup`/`pointercancel`. Se a linha sair do
+       DOM no meio do arraste — troca de aba, painel trocado por AJAX — o
+       arraste nunca termina e os três ficam em `document`. Registrar a
+       instância dá ao `destroy` do registry como acionar a limpeza. */
+    instancias.push({ root: root, desmontar: function () { cleanup(); } });
 
     function cleanup() {
       if (dragState && dragState.row) {
@@ -326,11 +346,11 @@
         "textarea",
         "a",
         "[role='button']",
-        ".cv-search-picker__control",
-        ".cv-search-picker__dropdown",
-        ".cv-search-picker__option",
-        ".cv-search-picker__clear",
-        ".cv-search-picker__remove"
+        "[data-entity-picker-part='control']",
+        "[data-entity-picker-part='dropdown']",
+        "[data-entity-picker-part='option']",
+        "[data-entity-picker-part='clear']",
+        "[data-entity-picker-part='remove']"
       ].join(", "));
       var handleSelector = options.dragHandleSelector;
       if (handleSelector && !event.target.closest(handleSelector)) return;
@@ -661,7 +681,7 @@
 
   function focusFirstEmptyPicker(root, options) {
     options = options || {};
-    var inputs = Array.prototype.slice.call(asRoot(root).querySelectorAll(options.inputSelector || ".cv-search-picker__input"))
+    var inputs = Array.prototype.slice.call(asRoot(root).querySelectorAll(options.inputSelector || "[data-entity-picker-part='input']"))
       .filter(function (input) {
         return !input.disabled;
       });
@@ -708,7 +728,7 @@
   };
 
   if (typeof window.CV.registerEnhancer === "function") {
-    window.CV.registerEnhancer("locationRows", init);
+    window.CV.registerEnhancer("locationRows", init, destroy);
   } else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () { init(document); });
   } else {

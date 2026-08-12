@@ -52,7 +52,7 @@ class ExclusaoDeAnexoSemNomeOriginalTests(PrestacaoFixturesMixin, TestCase):
     def test_exclusao_conclui_e_nao_deixa_registro_orfao(self):
         response = self.client.post(
             reverse(
-                "prestacoes_contas:prestacao_documento_excluir",
+                "prestacoes_contas:prestacao_documento_delete",
                 args=[self.fixture.prestacao.pk, self.anexo.pk],
             )
         )

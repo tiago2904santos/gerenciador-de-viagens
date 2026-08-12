@@ -1,0 +1,105 @@
+{
+  "_leia": "PF-07 — teto por rota e por volume. Catraca: estes números só descem. `consultas` é o valor medido, sem folga. `kb_html` tem 5% de margem (piso de 2 KB) para não reprovar por edição de texto — ver `_teto_de_kb`. Gerado por `python scripts/medir_desempenho.py --atualizar-tetos`; quem subir um teto explica por quê no corpo do PR. Tempo não entra aqui de propósito — ver o docstring do script.",
+  "rotas": {
+    "core:dashboard": {
+      "200": {
+        "consultas": 2,
+        "kb_html": 36.4
+      },
+      "20000": {
+        "consultas": 2,
+        "kb_html": 36.4
+      }
+    },
+    "eventos:index": {
+      "200": {
+        "consultas": 30,
+        "kb_html": 222.5
+      },
+      "20000": {
+        "consultas": 30,
+        "kb_html": 266.9
+      }
+    },
+    "justificativas:index": {
+      "200": {
+        "consultas": 6,
+        "kb_html": 119.4
+      },
+      "20000": {
+        "consultas": 6,
+        "kb_html": 119.8
+      }
+    },
+    "oficios:index": {
+      "200": {
+        "consultas": 13,
+        "kb_html": 174.8
+      },
+      "20000": {
+        "consultas": 13,
+        "kb_html": 175.5
+      }
+    },
+    "ordens_servico:index": {
+      "200": {
+        "consultas": 15,
+        "kb_html": 133.0
+      },
+      "20000": {
+        "consultas": 15,
+        "kb_html": 133.3
+      }
+    },
+    "planos_trabalho:index": {
+      "200": {
+        "consultas": 14,
+        "kb_html": 135.5
+      },
+      "20000": {
+        "consultas": 14,
+        "kb_html": 179.1
+      }
+    },
+    "prestacoes_contas:index": {
+      "200": {
+        "consultas": 16,
+        "kb_html": 271.9
+      },
+      "20000": {
+        "consultas": 16,
+        "kb_html": 360.0
+      }
+    },
+    "roteiros:index": {
+      "200": {
+        "consultas": 14,
+        "kb_html": 98.4
+      },
+      "20000": {
+        "consultas": 14,
+        "kb_html": 98.5
+      }
+    },
+    "termos:index": {
+      "200": {
+        "consultas": 7,
+        "kb_html": 155.3
+      },
+      "20000": {
+        "consultas": 7,
+        "kb_html": 155.8
+      }
+    },
+    "termos:index:busca": {
+      "200": {
+        "consultas": 3,
+        "kb_html": 49.8
+      },
+      "20000": {
+        "consultas": 6,
+        "kb_html": 155.8
+      }
+    }
+  }
+}

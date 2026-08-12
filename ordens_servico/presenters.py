@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from core import entity_cards
+from core.presenters.text import join_non_empty
 from oficios.presenters import _iniciais_nome_servidor
 
 
@@ -73,6 +74,7 @@ def _servidores_display_os(ordem):
                 "name": servidor.nome,
                 "cargo": cargo_nome,
                 "unidade": unidade_nome,
+                "meta": join_non_empty([cargo_nome, unidade_nome]),
                 "is_motorista": servidor.pk in motorista_pks,
             },
         )
@@ -128,7 +130,16 @@ def _periodo_display_curto(ordem) -> str:
     return f"{inicio.strftime('%d/%m/%Y')} a {fim.strftime('%d/%m/%Y')}"
 
 
-def apresentar_ordem_servico_card(ordem, *, assinante=_ASSINANTE_NAO_RESOLVIDO):
+def apresentar_ordem_servico_card(ordem, *, assinante=_ASSINANTE_NAO_RESOLVIDO,
+                                  menus_sob_demanda=True):
+    """Card da Ordem de Serviço.
+
+    `menus_sob_demanda` liga o `PF-04`: o menu sai com `src` e o corpo dele não vai
+    no HTML da lista — quem serve é `ordens_servico:card_menus`, no primeiro
+    clique. O endpoint chama este mesmo presenter com `False`.
+    """
+    menus_src = reverse("ordens_servico:card_menus", args=[ordem.pk]) if menus_sob_demanda else ""
+
     """Monta o card de uma OS.
 
     `assinante` e o mesmo para todas as OS da pagina — quem monta uma lista
@@ -201,6 +212,7 @@ def apresentar_ordem_servico_card(ordem, *, assinante=_ASSINANTE_NAO_RESOLVIDO):
                     view_description="Abrir a Ordem de Serviço",
                     docx_description="Arquivo editável da Ordem de Serviço",
                     trigger_aria=f"Abrir documentos da Ordem de Serviço {numero_display}",
+                    src=menus_src,
                 )
             ],
             delete_modal_url=excluir_url,

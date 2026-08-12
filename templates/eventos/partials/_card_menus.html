@@ -1,0 +1,97 @@
+{% comment %}
+Corpos dos menus de um card de Evento, servidos por `eventos:card_menus` (PF-04).
+
+São quatro famílias, todas dirigidas pelo mesmo `card` que a lista usa: o menu do
+rodapé, um por ofício vinculado, um por documento e um por servidor com termo.
+
+Os laços têm que percorrer as MESMAS coleções na MESMA ordem que
+`_evento_card_body.html`: o `id` do menu de documento usa `forloop.counter`, então
+mudar a ordem aqui desliga o menu lá sem levantar erro. `test_todo_gatilho_da_lista_
+encontra_o_menu_dele_no_fragmento` é quem guarda isso.
+
+O presenter é o mesmo da lista, chamado com `menus_sob_demanda=False`.
+{% endcomment %}
+{% for menu in card.footer.menus %}<c-ui.lists.entity_card_menu_body :menu="menu" :csrf_token="csrf_token" only />{% endfor %}
+{% for menu in card.footer.danger_menus %}<c-ui.lists.entity_card_menu_body :menu="menu" :csrf_token="csrf_token" only />{% endfor %}
+{% for oficio in card.oficios %}
+<div
+              class="action-menu action-menu--rich action-menu--documents"
+              id="evento-oficio-menu-{{ card.pk }}-{{ oficio.oficio_pk }}"
+              role="menu"
+              hidden
+            >
+              {% if oficio.protocolo %}
+                <c-ui.menus.rich_menu_header :title="oficio.numero" :subtitle="oficio.protocolo" icon="document" only />
+              {% else %}
+                <c-ui.menus.rich_menu_header :title="oficio.numero" subtitle="Ações e documentos" icon="document" only />
+              {% endif %}
+              <c-ui.menus.rich_menu_link :href="oficio.visualizar_url" title="Visualizar ofício" description="Abrir o documento no navegador" icon="eye" tone="preview" :target_blank="True" only />
+              {% if oficio.justificativa_pdf_url %}
+                <c-ui.menus.rich_menu_link :href="oficio.pdf_url" title="Baixar PDF" description="Inclui também a justificativa" icon="pdf" tone="pdf" :download="True" :extra_download_url="oficio.justificativa_pdf_url" only />
+              {% else %}
+                <c-ui.menus.rich_menu_link :href="oficio.pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" :download="True" only />
+              {% endif %}
+              <c-ui.menus.rich_menu_link :href="oficio.docx_url" title="Baixar DOCX" description="Arquivo editável do ofício" icon="docx" tone="docx" :download="True" only />
+              <c-ui.menus.rich_menu_link :href="oficio.editar_url" title="Editar ofício" description="Abrir o cadastro para alterações" icon="edit" tone="edit" only />
+            </div>
+{% endfor %}
+{% for doc in card.documentos %}
+<div
+              class="action-menu action-menu--rich action-menu--documents"
+              id="evento-documento-menu-{{ card.pk }}-{{ forloop.counter }}"
+              role="menu"
+              hidden
+            >
+              <c-ui.menus.rich_menu_header :title="doc.title" :subtitle="doc.kind" icon="document" only />
+              {% if doc.visualizar_url %}
+                <c-ui.menus.rich_menu_link :href="doc.visualizar_url" title="Visualizar documento" description="Abrir o arquivo no navegador" icon="eye" tone="preview" :target_blank="True" only />
+              {% endif %}
+              {% if doc.pdf_url %}
+                <c-ui.menus.rich_menu_link :href="doc.pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" :download="True" only />
+              {% endif %}
+              {% if doc.docx_url %}
+                <c-ui.menus.rich_menu_link :href="doc.docx_url" title="Baixar DOCX" description="Arquivo editável do documento" icon="docx" tone="docx" :download="True" only />
+              {% endif %}
+              {% if doc.editar_url %}
+                <c-ui.menus.rich_menu_link :href="doc.editar_url" title="Editar documento" description="Abrir o cadastro para alterações" icon="edit" tone="edit" only />
+              {% endif %}
+            </div>
+{% endfor %}
+{% for oficio in card.oficios %}{% for s in oficio.servidores %}{% if s.has_termo %}
+<div class="action-menu action-menu--rich" id="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}" role="menu" hidden>
+            {% if s.termo_assinado %}
+              <c-ui.menus.rich_menu_header title="Termo assinado" :subtitle="s.name" icon="sign" only />
+            {% else %}
+              <c-ui.menus.rich_menu_header title="Termo do servidor" :subtitle="s.name" icon="document" only />
+            {% endif %}
+            {% if s.termo_open_url %}
+              <c-ui.menus.rich_menu_link :href="s.termo_open_url" title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" :target_blank="True" only />
+            {% endif %}
+            {% if s.termo_pdf_url %}
+              <c-ui.menus.rich_menu_link :href="s.termo_pdf_url" title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" :download="True" only />
+            {% endif %}
+            {% if s.termo_docx_url %}
+              <c-ui.menus.rich_menu_link :href="s.termo_docx_url" title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" :download="True" only />
+            {% endif %}
+            {% if s.termo_anexar_assinado_url %}
+            <c-ui.buttons.button
+              type="button"
+              class_name="action-menu__item action-menu__item--rich{% if s.termo_assinado %} is-assinado{% endif %}"
+              role="menuitem"
+              data-attach-signed-trigger
+              data-attach-signed-url="{{ s.termo_anexar_assinado_url }}"
+              data-attach-signed-doc-label="o termo de {{ s.name }}"
+              data-attach-signed-current-name="{{ s.termo_assinado_nome_original }}"
+              data-attach-signed-current-view-url="{{ s.termo_assinado_view_url }}"
+              data-attach-signed-current-remove-url="{{ s.termo_remover_assinado_url }}" only>
+              <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
+                <c-ui.icons.icon icon="sign" only />
+              </span>
+              <span class="action-menu__item-copy">
+                <strong>{% if s.termo_assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
+                <small>{% if s.termo_assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
+              </span>
+            </c-ui.buttons.button>
+            {% endif %}
+          </div>
+{% endif %}{% endfor %}{% endfor %}

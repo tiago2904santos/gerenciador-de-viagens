@@ -3,12 +3,12 @@
 
 {% block wizard_content %}
   {% if mostrar_pendencias_documento and pendencias %}
-    {% include "components/ui/feedback/pendencias_card.html" with items=pendencias title="Pendências para concluir esta etapa" tone="warning" only %}
+    <c-ui.feedback.pendencias_card :items="pendencias" title="Pendências para concluir esta etapa" tone="warning" only />
   {% endif %}
 
   <input type="hidden" name="transporte_embed" value="1">
-  <div class="cv-form-section-stack cv-form-section-stack--comfortable" data-travel-document-wizard-step1 data-oficio-driver-source>
-    {% include "components/form/card.html" with title="Informações da viagem" description="Identificação, finalidade, equipe e transporte" title_id="travel-document-wizard-dados-principais" heading_level=2 body_extra_class="travel-document-body" body_template="oficios/partials/_dados_viajantes_body.html" footer_template="oficios/partials/_dados_viajantes_footer.html" footer_data_hook="oficio-viatura-footer" %}
+  <div class="form-section-stack form-section-stack--comfortable" data-travel-document-wizard-step1 data-oficio-driver-source>
+    <c-form.card title="Informações da viagem" description="Identificação, finalidade, equipe e transporte" title_id="travel-document-wizard-dados-principais" :heading_level="2" body_extra_class="travel-document-body" footer_data_hook="oficio-viatura-footer" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :extra_class="extra_class" :eyebrow="eyebrow" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "oficios/partials/_dados_viajantes_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id data_hook=data_hook element_id=element_id servidor_create_url=servidor_create_url shell=shell variant=variant viatura_create_url=viatura_create_url motorista_compact_widget=motorista_compact_widget motorista_oficio_ano=motorista_oficio_ano motorista_oficio_numero_inicial=motorista_oficio_numero_inicial show_motorista_card=show_motorista_card transporte_form=transporte_form form=form modelos_motivo_url=modelos_motivo_url mostrar_custeio_observacao=mostrar_custeio_observacao oficio_numero_ano_hint=oficio_numero_ano_hint outra_instituicao_custeio_value=outra_instituicao_custeio_value tem_modelos_motivo=tem_modelos_motivo only %}</c-slot><c-slot name="footer">{% include "oficios/partials/_dados_viajantes_footer.html" only %}</c-slot></c-form.card>
   </div>
 {% endblock %}
 

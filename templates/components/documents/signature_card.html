@@ -1,3 +1,0 @@
-{% with signature_card_description="Gere um link e envie para "|add:signature.signatario|add:" assinar pelo celular." %}
-  {% include "components/form/card.html" with title="Assinatura eletrônica" description=signature_card_description title_id="signature-"|add:signature.tipo|add:"-title" heading_level=2 extra_class="cv-signature-card" data_hook="cv-signature-card" header_extra_class="cv-signature-card__header" eyebrow="Fluxo documental" meta_template="components/documents/partials/_signature_card_header_meta.html" meta_extra_class="cv-signature-card__status" body_extra_class="cv-signature-card__body" body_template="components/documents/partials/_signature_card_body.html" %}
-{% endwith %}

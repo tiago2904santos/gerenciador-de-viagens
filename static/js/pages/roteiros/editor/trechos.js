@@ -18,13 +18,13 @@ function isRoteiroOficio() {
 export function getTrechosEmptyHtml() {
   if (!isRoteiroOficio()) return TRECHOS_EMPTY_HTML;
   return (
-    '<section class="cv-form-block cv-form-block--resource roteiro-editor__section--trechos-empty route-section-block" aria-labelledby="sec-trechos-empty">' +
-    '<header class="cv-form-block__header">' +
-    '<div class="cv-form-block__copy">' +
-    '<h4 class="cv-form-block__title" id="sec-trechos-empty">Trechos</h4>' +
-    '<p class="cv-form-block__description">Saídas e chegadas entre sede e destinos.</p>' +
+    '<section class="form-block form-block--resource roteiro-editor__section--trechos-empty route-section-block" aria-labelledby="sec-trechos-empty">' +
+    '<header class="form-block__header">' +
+    '<div class="form-block__copy">' +
+    '<h4 class="form-block__title" id="sec-trechos-empty">Trechos</h4>' +
+    '<p class="form-block__description">Saídas e chegadas entre sede e destinos.</p>' +
     '</div></header>' +
-    '<div class="cv-form-block__body">' +
+    '<div class="form-block__body">' +
     TRECHOS_EMPTY_HTML +
     '</div></section>'
   );
@@ -246,25 +246,25 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
   if (!oficio) return article;
 
   return (
-    '<section class="cv-form-block cv-form-block--resource roteiro-editor__section--trecho route-section-block" aria-labelledby="' +
+    '<section class="form-block form-block--resource roteiro-editor__section--trecho route-section-block" aria-labelledby="' +
     titleId +
     '">' +
-    '<header class="cv-form-block__header">' +
-    '<div class="cv-form-block__copy">' +
-    '<h4 class="cv-form-block__title" id="' +
+    '<header class="form-block__header">' +
+    '<div class="form-block__copy">' +
+    '<h4 class="form-block__title" id="' +
     titleId +
     '">Trecho ' +
     num +
     '</h4>' +
-    '<p class="cv-form-block__description">' +
+    '<p class="form-block__description">' +
     routeText +
     '</p>' +
     '</div>' +
     (num === 1
-      ? '<div class="cv-form-block__actions" data-trechos-date-picker-slot></div>'
+      ? '<div class="form-block__actions" data-trechos-date-picker-slot></div>'
       : '') +
     '</header>' +
-    '<div class="cv-form-block__body">' +
+    '<div class="form-block__body">' +
     article +
     '</div></section>'
   );

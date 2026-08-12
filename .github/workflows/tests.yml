@@ -30,10 +30,21 @@ jobs:
       DB_PASSWORD: postgres
       DB_HOST: 127.0.0.1
       DB_PORT: "5432"
-      COVERAGE_APPS: "core,usuarios,cadastros,roteiros,eventos,documentos,oficios,termos,justificativas,planos_trabalho,ordens_servico,diario_bordo,integracoes.google_drive,prestacoes_contas,ui_lab2"
+      COVERAGE_APPS: "core,usuarios,cadastros,roteiros,eventos,documentos,oficios,termos,justificativas,planos_trabalho,ordens_servico,integracoes.google_drive,prestacoes_contas"
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install and test JavaScript (JS-03)
+        run: |
+          npm ci
+          npm test
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -74,7 +85,48 @@ jobs:
       - name: Block new frontend standards debt
         # Catraca: este número só desce. A Etapa 1 levou 465 → 449; a Etapa 7
         # levou 449 → 438 na fase 2 e 438 → 417 na fase 1.
-        run: python scripts/audit_frontend_standards.py --max-warnings 401
+        run: python scripts/audit_frontend_standards.py --max-warnings 245
+
+      - name: Block new UI pattern debt (NOVO-76)
+        # Catraca inaugurada em 09/08/2026 com 2.622 achados de dívida real;
+        # a poda de seletores agrupados da E2 levou 2.622 → 2.583.
+        # O auditor anterior sempre saía 1 e contava duas vezes o bundle gerado,
+        # além de tratar a própria definição de token como cor indevida. Sem
+        # --max ele continua útil como relatório local; no CI o teto só desce.
+        run: python scripts/audit_ui_patterns.py --max 2583 --quiet
+
+      - name: Block new dead CSS (UI-01)
+        # Catraca nova, e o teto nasce em ZERO. O `UI-01` mediu 981 blocos de
+        # CSS cujo seletor só cita classe que ninguém usa — 168 KB. Eles não
+        # foram escritos assim: cada refactor de template apagou markup e deixou
+        # o CSS para trás, ninguém viu, e um ano depois era isso.
+        #
+        # A poda foi feita à mão, com prova de grep por arquivo. Sem catraca o
+        # acúmulo recomeça no próximo PR que apagar um template. Se este passo
+        # reprovar, o seu PR apagou markup sem apagar o CSS junto — ou usou uma
+        # classe montada em tempo de execução cujo prefixo falta em
+        # PREFIXOS_DINAMICOS, e aí o prefixo entra lá com a linha que o monta.
+        run: python scripts/audit_css_morto.py --max 0
+
+      - name: Block duplicate colours (UI-03)
+        # Catraca nova, teto ZERO. O sistema tinha 464 valores hex distintos e
+        # 255 deles eram duplicata PERCEPTUAL de outro (ΔE2000 <= 2,5): 26
+        # brancos, 25 azuis pálidos, 16 azuis-marinho. Não é peso: é que ninguém
+        # mantém um sistema com 464 cores — trocar "o azul do cabeçalho" vira
+        # caçada.
+        #
+        # O script não junta cor que distingue ESTADO: se duas cores convivem na
+        # mesma propriedade do mesmo seletor-base (`:hover`, `.is-*`, `--mod`),
+        # elas estão trabalhando e ficam. São 207 pares protegidos assim.
+        run: python scripts/audit_paleta.py --max 0
+
+      - name: Block new keyboard-focus suppression (HT-01)
+        # Catraca: este numero so desce. 47 -> 44 no `HT-01`.
+        # O piso de `:focus-visible` em base.css/auth.css neutraliza os que
+        # sobraram, mas cada bloco novo e um lugar a mais onde alguem vai ter
+        # de lembrar do piso — e o script nao conta o idioma correto
+        # (`:focus:not(:focus-visible)`), so quem apaga o foco sem substituto.
+        run: python scripts/audit_foco_visivel.py --max 30
 
       - name: Block backend architecture regressions (P-01, P-05)
         # Catraca: este número só desce. O P-01 fechou os quatro apps do
@@ -85,12 +137,34 @@ jobs:
         # do P-01: integracoes/google_drive (10), core (9), documentos (4),
         # oficios (4), roteiros (2) e justificativas (1). Alvo final segue
         # sendo zero; ver docs/PADRAO_SELECTORS.md.
+        #
+        # 24 → 33 (BE-14 fatia 1, NOVO-100): **o número subiu de propósito.**
+        # Prestações foi fatiada em módulos por tela, mas os cinco módulos
+        # nunca entraram em P06_SPLIT_VIEW_MODULES — 11 acessos de manager
+        # nunca foram medidos. A catraca não regrediu: ela passou a medir o
+        # que já estava no chão. A própria fatia devolveu 2 dos 11
+        # (rt_views.py foi a zero), e o saldo entra como 9. Daqui em diante
+        # volta a só descer. E desceu: 33 → 31 na fatia 3, quando a
+        # persistência dos anexos saiu de document_views.py, e 31 → 27 na
+        # fatia 4, quando diario_views.py foi a zero (a gravação do diário
+        # para diario_services.py, a consulta do auto-preenchimento de
+        # motorista para selectors.py). Dos 11 nunca medidos, 8 já voltaram.
         # P-05: todo `except Exception` do Drive começa com captura estruturada.
         run: >-
           python scripts/audit_django_architecture.py
-          --max-orm-em-view 30
+          --max-orm-em-view 27
           --max-drive-except-without-capture 0
           --max-sync-document-generations 0
+
+      - name: Block area-scoping regressions (BE-09)
+        # `BE-09` FECHADO: os 28 modelos com campo `area` recortam sozinhos, em
+        # seis fatias. O teto agora é **zero** e nunca mais sobe — modelo novo com
+        # campo `area` reprova aqui até declarar o par de managers.
+        # Com isto o `DB-02` (`area` NOT NULL) fica desbloqueado; o `NOVO-31` vem
+        # antes, porque `core.E001` ainda não olha os modelos de `cadastros`.
+        # O script também reprova `all_objects` sem comentário em código de
+        # caminho de request — o gate literal de docs/PLANO_BACKEND.md:88.
+        run: python scripts/audit_area_scoped_managers.py --max 0
 
       - name: Validate production security settings
         env:
@@ -141,11 +215,24 @@ jobs:
           # dizia nada sobre o regime estável. Descartar a primeira medição
           # esconderia um custo que o usuário sente na primeira geração depois
           # de ocioso; por isso ela continua vigiada, com limite próprio.
+          #
+          # `--max-cold-ms` foi de 1500 para 3000 em 06/08 (NOVO-28). O teto de
+          # 1500 nasceu em 03/08 sobre 1119 ms medidos; em 06/08 a partida a
+          # frio reprovou três vezes seguidas, com 2553,8 ms (run 654, main),
+          # 1868,4 ms (run 657) e a mesma falha no run 653 — sempre SÓ a frio,
+          # com o regime estável entre 96 e 101 ms, dentro do `--max-ms` de
+          # 1000. Não foi código: nada mudou em `documentos/` nem no lock desde
+          # 03/08, e o passo "Install LibreOffice" saiu de 28 s no último run
+          # verde para 58, 60 e 77 s nos três reprovados — a mesma máquina 2 a
+          # 3× mais lenta. Como o passo fica ANTES da suíte e da régua do
+          # PF-07, um teto calibrado numa geração de runner que não existe mais
+          # bloqueava toda prova de CI do projeto. `--max-ms` fica em 1000: é
+          # ele que mede o custo que o usuário sente em uso normal.
           DOCUMENTOS_UNOSERVER_URL=http://127.0.0.1:2003 \
           DOCUMENTOS_DEFAULT_PDF_ENGINE=unoserver \
           python manage.py documentos_unoserver_check \
             --benchmark --representative-resources --iterations 3 \
-            --max-ms 1000 --max-cold-ms 1500
+            --max-ms 1000 --max-cold-ms 3000
 
       - name: Exercise encrypted database and media restore
         env:
@@ -169,6 +256,55 @@ jobs:
           MEDIA_ROOT="$RUNNER_TEMP/media" \
             bash scripts/restore_backup.sh "$BACKUP_FILE"
           test "$(cat "$RUNNER_TEMP/media/probe.txt")" = "restore-drill"
+
+      - name: Exercise deploy rollback (QA-03)
+        env:
+          # Banco próprio: o drill migra e desmigra, e não pode interferir no
+          # `gerenciador_test` que os passos vizinhos usam.
+          DB_NAME: drill_rollback
+        run: |
+          set -o pipefail
+          export PGHOST="$DB_HOST" PGPORT="$DB_PORT" PGUSER="$DB_USER" PGPASSWORD="$DB_PASSWORD"
+          export DJANGO_SETTINGS_MODULE=config.settings.test
+          psql -q -c "DROP DATABASE IF EXISTS drill_rollback" postgres
+          psql -q -c "CREATE DATABASE drill_rollback" postgres
+
+          estado() {
+            python manage.py showmigrations --plan | { grep '^\[X\]' || true; } | awk '{print $2}'
+          }
+
+          # Estado "antes do deploy": uma migração atrás em **dois** apps. Dois de
+          # propósito — é onde a ordem inversa entre apps importa, e uma ordem
+          # errada só aparece com mais de um.
+          python manage.py migrate --noinput > /dev/null
+          python manage.py migrate justificativas 0002 --noinput > /dev/null
+          python manage.py migrate termos 0006 --noinput > /dev/null
+          estado > "$RUNNER_TEMP/antes.txt"
+
+          # O "deploy" aplica as duas.
+          python manage.py migrate --noinput > /dev/null
+          estado > "$RUNNER_TEMP/durante.txt"
+          apps_no_delta="$(comm -13 <(sort "$RUNNER_TEMP/antes.txt") <(sort "$RUNNER_TEMP/durante.txt") \
+            | cut -d. -f1 | sort -u | tr '\n' ' ')"
+          # Guarda contra o drill virar vácuo: se o delta parar de cruzar os dois
+          # apps, ele deixou de exercitar a ordenação e isto reprova.
+          test "$apps_no_delta" = "justificativas termos " \
+            || { echo "::error::o drill perdeu o delta de dois apps: [$apps_no_delta]"; exit 1; }
+
+          # O rollback tem de devolver exatamente o estado de antes.
+          ESTADO_MIGRACOES_ANTES="$RUNNER_TEMP/antes.txt" bash scripts/deploy_rollback.sh
+          estado > "$RUNNER_TEMP/depois.txt"
+          diff "$RUNNER_TEMP/antes.txt" "$RUNNER_TEMP/depois.txt" \
+            || { echo "::error::o rollback não devolveu o estado de antes"; exit 1; }
+
+          # Caso mais comum de todos: deploy sem migração nenhuma. Tem de sair 0
+          # e não encostar no banco.
+          ESTADO_MIGRACOES_ANTES="$RUNNER_TEMP/depois.txt" bash scripts/deploy_rollback.sh
+          estado > "$RUNNER_TEMP/depois2.txt"
+          diff "$RUNNER_TEMP/depois.txt" "$RUNNER_TEMP/depois2.txt" \
+            || { echo "::error::o rollback mexeu no banco sem ter o que desfazer"; exit 1; }
+
+          psql -q -c "DROP DATABASE drill_rollback" postgres
 
       - name: Run complete Django test suite with coverage on PostgreSQL
         run: |
@@ -227,3 +363,92 @@ jobs:
                   print(f"::error title=Coverage floor regression::{failure}")
               sys.exit(1)
           PY
+
+      - name: Enforce list performance ceilings (PF-07)
+        # Último passo do job de propósito: é o mais caro (~2min30 medidos, dos
+        # quais ~1min é semeadura de 20.000 registros por domínio em 9 domínios).
+        # Os gates baratos já falharam antes de chegar aqui.
+        #
+        # `--repeticoes 1` porque tempo **não** é catraca aqui (ver o docstring do
+        # script): repetição só melhoraria a mediana de um número que é
+        # diagnóstico, não gate. Consulta e byte são determinísticos — medidos
+        # iguais em duas execuções seguidas — e uma passada basta.
+        #
+        # A régua exige PostgreSQL e recusa rodar em SQLite; as DB_* e o
+        # TEST_USE_POSTGRES do env do job já apontam para o serviço acima.
+        #
+        # `pipefail` não é decoração: o shell default da action é `bash -e`, sem
+        # ele o código de saída do `tee` é que valeria e o gate passaria verde
+        # justamente quando a régua reprovasse.
+        run: |
+          set -o pipefail
+          python scripts/medir_desempenho.py --repeticoes 1 | tee "$RUNNER_TEMP/desempenho.txt"
+
+      - name: Publish the performance report
+        # Roda mesmo com a régua vermelha: o relatório é justamente o que se lê
+        # para entender por que ela reprovou.
+        if: always()
+        run: |
+          {
+            echo '### Régua de desempenho (PF-07)'
+            echo '```'
+            cat "$RUNNER_TEMP/desempenho.txt" 2>/dev/null || echo '(a régua não chegou a produzir relatório)'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Enforce frontend route baselines (NOVO-70)
+        # E0: mede as 43 rotas reais depois dos gates funcionais e de desempenho.
+        # O banco e o usuario existem apenas neste job descartavel; a senha aleatoria
+        # fica somente no ambiente do passo. CSS so pode subir e divergencia de tema
+        # so pode descer, conforme scripts/tetos_front.json.
+        run: |
+          python -m playwright install --with-deps chromium
+          python manage.py migrate --noinput --settings=config.settings.test
+          python manage.py resetar_banco_demo --settings=config.settings.test
+
+          export FRONT_METRICS_PASSWORD
+          FRONT_METRICS_PASSWORD="$(python -c 'import secrets; print(secrets.token_urlsafe(36))')"
+          python manage.py shell --settings=config.settings.test <<'PY'
+          import os
+          from django.contrib.auth import get_user_model
+          from usuarios.models import AreaTrabalho, VinculoUsuarioArea
+
+          User = get_user_model()
+          user = User.objects.create_superuser(
+              "front_metrics",
+              "front_metrics@example.invalid",
+              os.environ["FRONT_METRICS_PASSWORD"],
+          )
+          area = AreaTrabalho.objects.order_by("pk").first()
+          VinculoUsuarioArea.objects.create(
+              usuario=user,
+              area=area,
+              papel=VinculoUsuarioArea.PAPEL_ADMIN,
+              area_padrao=True,
+          )
+          PY
+
+          python manage.py runserver 127.0.0.1:8000 \
+            --noreload --insecure --settings=config.settings.test \
+            > "$RUNNER_TEMP/frontend-server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for _ in $(seq 1 40); do
+            if curl --fail --silent --output /dev/null http://127.0.0.1:8000/login/; then
+              break
+            fi
+            sleep 0.5
+          done
+          curl --fail --silent --output /dev/null http://127.0.0.1:8000/login/ || {
+            cat "$RUNNER_TEMP/frontend-server.log"
+            exit 1
+          }
+
+          python scripts/medir_css_por_rota.py \
+            --username front_metrics \
+            --password-env FRONT_METRICS_PASSWORD \
+            --json "$RUNNER_TEMP/css-por-rota.json"
+          python scripts/medir_divergencia_tema.py \
+            --username front_metrics \
+            --password-env FRONT_METRICS_PASSWORD \
+            --json "$RUNNER_TEMP/divergencia-tema.json"

@@ -58,9 +58,9 @@
     if (!select) return;
     if (select.dataset.entityPickerReady === "true") {
       delete select.dataset.entityPickerReady;
-      var nextEl = select.nextElementSibling;
-      if (nextEl && nextEl.classList && nextEl.classList.contains("cv-search-picker")) {
-        nextEl.parentNode.removeChild(nextEl);
+      var rendered = window.CV.picker.rootFor(select);
+      if (rendered && rendered !== select) {
+        rendered.parentNode.removeChild(rendered);
       }
     }
   }
@@ -75,7 +75,7 @@
     if (!select) return;
     select.value = value;
     /* select nativo fica escondido atras de um trigger customizado
-       (cv-custom-select) que só atualiza o rótulo visível ao ouvir
+       (custom-select) que só atualiza o rótulo visível ao ouvir
        'change' no <select> — setar .value sozinho não é suficiente. */
     select.dispatchEvent(new Event("change", { bubbles: true }));
   }

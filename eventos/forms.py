@@ -5,6 +5,7 @@ from django.utils import timezone
 from cadastros.models import ConfiguracaoSistema
 from core.forms.widgets import WidgetStyle
 from core.forms.widgets import widget_attrs
+from core.forms.widgets import text_attrs
 from core.tenancy import filter_queryset_by_area
 from core.tenancy import get_current_area
 from oficios.forms import ModeloMotivoSelect
@@ -18,15 +19,6 @@ from termos.models import TermoAutorizacao
 
 from .models import Evento
 from .models import TipoEvento
-
-_DOCUMENTOS_VINCULAVEIS = [
-    ("oficios_vinculados", "oficios"),
-    ("ordens_servico_vinculadas", "ordens_servico"),
-    ("planos_trabalho_vinculados", "planos_trabalho"),
-    ("termos_vinculados", "termos_autorizacao"),
-    ("roteiros_vinculados", "roteiros"),
-]
-
 
 def _periodo_roteiro(roteiro) -> str:
     inicio = roteiro.saida_dt
@@ -148,7 +140,7 @@ class EventoNovoCadastroForm(forms.ModelForm):
     # Os documentos vinculáveis usam um picker de busca próprio (mesmo cartão dos
     # ofícios da OS), montado pelo JS a partir dos resumos servidos no template.
     # Aqui o campo é apenas o <select multiple> oculto que carrega a seleção no
-    # submit — sem o enhancer genérico de cv-search-picker.
+    # submit — sem o enhancer genérico de search-picker.
     oficios_vinculados = forms.ModelMultipleChoiceField(
         label="Ofícios já existentes",
         queryset=Oficio.objects.none(),
@@ -308,22 +300,6 @@ class EventoNovoCadastroForm(forms.ModelForm):
             self.add_error("data_fim", "A data final não pode ser anterior à data inicial.")
         return cleaned
 
-    def sincronizar_documentos_vinculados(self, evento):
-        """Vincula/desvincula ofícios, OS, planos, termos e roteiros conforme a seleção do form."""
-        for field_name, related_name in _DOCUMENTOS_VINCULAVEIS:
-            if field_name not in self.cleaned_data:
-                continue
-            manager = getattr(evento, related_name)
-            selecionados_ids = {obj.pk for obj in self.cleaned_data[field_name]}
-            atuais_ids = set(manager.values_list("pk", flat=True))
-            para_adicionar = selecionados_ids - atuais_ids
-            para_remover = atuais_ids - selecionados_ids
-            if para_adicionar:
-                manager.model.objects.filter(pk__in=para_adicionar).update(evento=evento)
-            if para_remover:
-                manager.model.objects.filter(pk__in=para_remover).update(evento=None)
-
-
 class EventoForm(forms.ModelForm):
     class Meta:
         model = Evento
@@ -342,10 +318,10 @@ class EventoForm(forms.ModelForm):
             "drive_folder_url",
         ]
         widgets = {
-            "titulo": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL)}),
+            "titulo": forms.TextInput(attrs={**text_attrs(WidgetStyle.FIELD_CONTROL)}),
             "descricao": forms.Textarea(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA), "rows": 4}),
-            "destino_uf": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "maxlength": 2}),
-            "destino_cidade": forms.TextInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL)}),
+            "destino_uf": forms.TextInput(attrs={**text_attrs(WidgetStyle.FIELD_CONTROL), "maxlength": 2}),
+            "destino_cidade": forms.TextInput(attrs={**text_attrs(WidgetStyle.FIELD_CONTROL)}),
             "data_inicio": forms.HiddenInput(attrs={"data-cv-date-picker-start-value": ""}),
             "data_fim": forms.HiddenInput(attrs={"data-cv-date-picker-end-value": ""}),
             "horario_inicio": forms.TimeInput(attrs={**widget_attrs(WidgetStyle.FIELD_CONTROL), "type": "time"}),
@@ -384,7 +360,7 @@ class TipoEventoForm(forms.ModelForm):
     nome = forms.CharField(
         label="Nome",
         help_text="Ex.: PCPR na Comunidade, Justiça no Bairro.",
-        widget=forms.TextInput(attrs={**widget_attrs(WidgetStyle.FORM_CONTROL)}),
+        widget=forms.TextInput(attrs={**text_attrs(WidgetStyle.FORM_CONTROL)}),
     )
     ativo = forms.BooleanField(
         label="Ativo",

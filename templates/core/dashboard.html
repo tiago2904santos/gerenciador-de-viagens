@@ -1,80 +1,37 @@
 {% extends "base.html" %}
+{% comment %}
+  Tela inicial (`/`). Enxuta de propósito.
+
+  O painel anterior tinha boas-vindas, quatro indicadores, viagens próximas e
+  quatro cartões de atalho — 81 linhas de markup e um CSS só dela
+  (`dashboard.css`, 138 linhas, mais 19 blocos no tema escuro). O dono decidiu
+  apagar o conteúdo e manter a rota: `/` é `LOGIN_REDIRECT_URL`, é o link da
+  marca na barra lateral e na barra móvel, e é a rota `painel` da régua do
+  `PF-07`. Trocar a rota mexeria nos cinco; trocar o conteúdo não mexe em nenhum.
+
+  Fica só o cabeçalho de página e os atalhos, **sem vocabulário próprio**: o que
+  sobrou usa `page_header.html` e `module_card.html`, que já são globais. Nenhuma
+  classe `dashboard-*` sobreviveu — é o começo da padronização, não uma exceção
+  a ela.
+{% endcomment %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-  <div class="page-shell dashboard-page">
-    {% include "components/ui/headers/page_header.html" with eyebrow="CENTRAL DE VIAGENS 3" title="Painel institucional" description="Documentos, viagens oficiais e cadastros operacionais em um único ambiente." icon_label="CV" module_label="Base institucional" status_label="Sistema ativo" status_variant="active" only %}
+  <div class="page-shell">
+    <c-ui.headers.page_header eyebrow="CENTRAL DE VIAGENS 3" title="Início" description="Escolha um módulo para começar." icon_label="CV" only />
 
-    <section class="dashboard-page__welcome cv-entity-card" aria-labelledby="dashboard-welcome-title">
-      <div class="cv-entity-card__header dashboard-page__welcome-header">
-        <div>
-          <span class="dashboard-page__eyebrow">Visão geral</span>
-          <h2 id="dashboard-welcome-title">Bem-vindo ao sistema</h2>
-        </div>
-        <span class="dashboard-page__brand-mark" aria-hidden="true">CV</span>
-      </div>
-      <div class="cv-entity-card__body dashboard-page__welcome-body">
-        <p>Gerencie documentos oficiais de viagem com organização, padronização e rastreabilidade.</p>
-        <p class="dashboard-page__welcome-note">Use os indicadores abaixo para priorizar pendências e viagens próximas.</p>
-      </div>
-    </section>
-
-    <section aria-labelledby="dashboard-indicators-title">
-      <div class="dashboard-page__section-heading">
-        <div>
-          <span class="dashboard-page__eyebrow">Acompanhamento</span>
-          <h2 id="dashboard-indicators-title">Indicadores</h2>
-        </div>
-      </div>
-      <div class="cv-metric-grid cv-metric-grid--4 cv-summary-grid cv-summary-grid--4" role="list">
-        {% include "components/cards/summary_card.html" with label="Total de ofícios" value=total_oficios description="Na área ativa" only %}
-        {% include "components/cards/summary_card.html" with label="Ofícios em rascunho" value=oficios_rascunho description="Aguardando conclusão" only %}
-        {% include "components/cards/summary_card.html" with label="Assinaturas pendentes" value=assinaturas_pendentes description="Links ainda não concluídos" only %}
-        {% include "components/cards/summary_card.html" with label="Prestações pendentes" value=prestacoes_pendentes description="Por servidor" only %}
-      </div>
-    </section>
-
-    <section aria-labelledby="dashboard-upcoming-title">
-      <div class="dashboard-page__section-heading">
-        <div>
-          <span class="dashboard-page__eyebrow">Próximos 30 dias</span>
-          <h2 id="dashboard-upcoming-title">Viagens próximas</h2>
-        </div>
-      </div>
-      <div class="cv-entity-card">
-        <div class="cv-entity-card__body">
-          <ul class="summary-items">
-            {% for evento in proximas_viagens %}
-              <li>
-                <a href="{% url 'eventos:detalhe' evento.id %}">{{ evento.titulo|default:"Evento sem título" }}</a>
-                <span>{{ evento.data_inicio|date:"d/m/Y" }}</span>
-              </li>
-            {% empty %}
-              <li>Nenhuma viagem programada para os próximos 30 dias.</li>
-            {% endfor %}
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section aria-labelledby="dashboard-shortcuts-title">
-      <div class="dashboard-page__section-heading">
-        <div>
-          <span class="dashboard-page__eyebrow">Navegação</span>
-          <h2 id="dashboard-shortcuts-title">Acessos rápidos</h2>
-        </div>
-        <p>Entre diretamente nos fluxos usados com maior frequência.</p>
-      </div>
-      <div class="dashboard-page__module-grid">
-        {% url 'oficios:index' as dashboard_oficios_url %}
-        {% url 'termos:index' as dashboard_termos_url %}
-        {% url 'justificativas:index' as dashboard_justificativas_url %}
-        {% url 'roteiros:index' as dashboard_roteiros_url %}
-        {% include "components/cards/module_card.html" with mark="OF" eyebrow="Documentos" title="Ofícios" description="Emissão e acompanhamento dos documentos oficiais de viagem." href=dashboard_oficios_url action_label="Abrir Ofícios" only %}
-        {% include "components/cards/module_card.html" with mark="TA" eyebrow="Documentos" title="Termos" description="Geração e acompanhamento de termos vinculados aos ofícios." href=dashboard_termos_url action_label="Abrir Termos" only %}
-        {% include "components/cards/module_card.html" with mark="JT" eyebrow="Textos formais" title="Justificativas" description="Modelos e textos formais vinculados aos documentos." href=dashboard_justificativas_url action_label="Abrir Justificativas" only %}
-        {% include "components/cards/module_card.html" with mark="RT" eyebrow="Planejamento" title="Roteiros" description="Cadastro e reaproveitamento de trajetos oficiais." href=dashboard_roteiros_url action_label="Abrir Roteiros" only %}
+    <section aria-labelledby="inicio-modulos-title">
+      <h2 id="inicio-modulos-title" class="sr-only">Módulos</h2>
+      <div class="metric-grid metric-grid--4">
+        {% url 'oficios:index' as url_oficios %}
+        {% url 'termos:index' as url_termos %}
+        {% url 'justificativas:index' as url_justificativas %}
+        {% url 'roteiros:index' as url_roteiros %}
+        <c-cards.module_card mark="OF" eyebrow="Documentos" title="Ofícios" description="Emissão e acompanhamento dos documentos oficiais de viagem." :href="url_oficios" action_label="Abrir Ofícios" only />
+        <c-cards.module_card mark="TA" eyebrow="Documentos" title="Termos" description="Geração e acompanhamento de termos vinculados aos ofícios." :href="url_termos" action_label="Abrir Termos" only />
+        <c-cards.module_card mark="JT" eyebrow="Textos formais" title="Justificativas" description="Modelos e textos formais vinculados aos documentos." :href="url_justificativas" action_label="Abrir Justificativas" only />
+        <c-cards.module_card mark="RT" eyebrow="Planejamento" title="Roteiros" description="Cadastro e reaproveitamento de trajetos oficiais." :href="url_roteiros" action_label="Abrir Roteiros" only />
       </div>
     </section>
   </div>

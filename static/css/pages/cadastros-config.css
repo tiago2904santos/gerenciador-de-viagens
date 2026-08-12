@@ -1,0 +1,48 @@
+/*
+ * Central de Configurações — reforço do poço sem borda nos controles.
+ * O casco `data-travel-document-wizard-step1` já cobre o tema escuro; isto
+ * garante border: 0 mesmo quando `.form-card .form-control` compete.
+ */
+
+.cadastros-form-page[data-configuracoes-shell]
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .custom-select__trigger,
+    .search-picker__control,
+    .search-picker__input,
+    .date-picker__control
+  ),
+:is(html[data-theme="dark"])
+  .cadastros-form-page[data-configuracoes-shell]
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .custom-select__trigger,
+    .search-picker__control,
+    .search-picker__input,
+    .date-picker__control
+  ) {
+  border: 0;
+  box-shadow: none;
+}
+
+
+:is(html[data-theme="dark"])
+  .cadastros-form-page[data-configuracoes-shell]
+  .date-picker__control {
+  border-radius: var(--radius-control, 10px) !important;
+  overflow: hidden;
+}
+
+:is(html[data-theme="dark"])
+  .cadastros-form-page[data-configuracoes-shell]
+  .date-picker__control
+  :is(.cv-field__control, input) {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}

@@ -1,41 +1,101 @@
 # Contrato de data attributes — JavaScript
 
-Referência mínima para motores globais da Central de Viagens. Não altera regra de negócio.
+Referência dos **motores compartilhados** da Central de Viagens: o que cada um procura no DOM e o
+que ele publica em `window.CV`. Não altera regra de negócio.
 
-## HTTP (`window.CV.http`)
+## O que está aqui, e o que não está
 
-Carregado em `base.html` via `static/js/core/http.js`.
+Este documento cobre `static/js/core/`, `static/js/components/` e os motores de raiz — o código que
+qualquer tela pode acionar. **Não** indexa os atributos de uma página só (`static/js/pages/`): são
+**142** deles, cada um com um único consumidor, e a documentação certa para esses é o próprio
+módulo da página.
+
+A regra que decide: se o atributo aparece num motor compartilhado, ele está aqui. Isso é verificado
+por `core/tests/test_contrato_data_attributes.py` nos dois sentidos — atributo citado aqui tem de
+existir no código, e atributo de motor compartilhado tem de estar citado aqui. Não existe mais a
+possibilidade de este arquivo apontar para o passado sem a suíte reclamar.
+
+> **`HT-13`, corrigido em 07/08/2026.** A versão anterior citava **4 arquivos JS que não existem**
+> (`cv-custom-select.js`, `cv-search-picker.js`, `app-multiselect.js`, `filterable-multiselect.js`)
+> e **7 atributos com zero ocorrência no repositório** (`data-quick-add-toggle`,
+> `data-quick-add-close`, `quick-add-panel`, `data-cv-select`, `data-cv-search-picker`,
+> `data-app-multiselect`, `data-filterable-multiselect-input`). O enunciado do defeito dizia 3; a
+> medição achou 7. E a cobertura era de **19%** — 57 atributos citados para 298 em uso.
+
+Nomes de classe CSS **não** são contrato de JS. Desde o `JS-06`, comportamento se pendura em
+`data-*`; classe é estilo e vai ser renomeada na reconstrução do CSS.
+
+---
+
+## `window.CV.http` — `core/http.js`
+
+Carregado em `base.html`. Sem atributos: é API.
 
 | API | Uso |
 |-----|-----|
-| `getCsrfToken(form?)` | Token do input CSRF no form ou cookie `csrftoken` |
-| `readJsonResponse(response)` | `{ ok, status, data }` com fallback para JSON inválido |
-| `fetchJson(url, options)` | `fetch` com `credentials: same-origin`, headers padrão |
+| `getCsrfToken(form?)` | Token do input CSRF no form ou do cookie `csrftoken` |
+| `readJsonResponse(response)` | `{ ok, status, data }`, com fallback para JSON inválido |
+| `fetchJson(url, options)` | `fetch` com `credentials: same-origin` e headers padrão |
 
-`options`: `method`, `body` (objeto → JSON, FormData, string), `form`, `headers`, `signal`, `rawResponse`.
+`options`: `method`, `body` (objeto → JSON, `FormData`, string), `form`, `headers`, `signal`,
+`rawResponse`.
 
-## Quick Add (`core/app.js`)
+## Registro de componentes — `core/app.js`
+
+Coordenador dos inicializadores idempotentes. `CV.registerEnhancer(nome, init, destroy?)`; o
+registry chama `destroy(root)` quando o nó sai do DOM (`JS-02`).
 
 | Atributo | Elemento | Comportamento |
-|----------|----------|---------------|
-| `data-quick-add-toggle` | botão | ID do painel (ou use `aria-controls`) |
-| `aria-controls` | botão | ID alternativo do painel |
-| `data-quick-add-close` | botão no painel | Fecha o painel |
-| `data-quick-edit` | botão lista | Abre painel em modo edição (`data-edit-url`, `data-edit-fields`) |
+|---|---|---|
+| `data-inline-create-toggle` | botão | Abre/fecha o painel de cadastro rápido (alvo por `aria-controls`) |
+| `data-inline-create-close` | botão no painel | Fecha o painel |
+| `data-quick-edit` | botão da lista | Abre o painel em modo edição (`data-edit-url`, `data-edit-fields`) |
+| `data-confirm-submit` | form | Pede confirmação antes de submeter |
+| `data-cv-feedback-accept` | botão | Confirma o diálogo de feedback |
+| `data-cv-feedback-cancel` | botão | Cancela o diálogo de feedback |
 
-Painel: `#id` com classe `quick-add-panel` (ou equivalente com transição `is-open`).
+O painel é o elemento apontado por `aria-controls`, com a transição `.is-open`.
 
-## Coleções (`collection.js` / `CV.collection`)
+## Carregamento progressivo — `core/component-loader.js`
 
-Cada lista declara exatamente um modo. `client` filtra os itens já renderizados;
-`server` envia os filtros por GET, troca apenas `.list-panel` e atualiza a URL.
+O script do shell em `base.html` fornece URLs resolvidas pelo storage de estáticos. O loader pede
+cada componente somente quando encontra seu marcador no DOM inicial ou em conteúdo inserido por
+AJAX.
+
+| Atributo | Elemento | Uso |
+|---|---|---|
+| `data-cv-lazy-components` | script do shell | Declara a configuração única do loader |
+| `data-cv-lazy-form-components-src` | script do shell | URL de `form-components.bundle.js` |
+| `data-cv-lazy-card-toggle-src` | script do shell | URL de `card-toggle.js` |
+| `data-cv-lazy-segment-nav-src` | script do shell | URL de `segment-nav.js` |
+| `data-cv-lazy-file-picker-src` | script do shell | URL de `file-picker.js` |
+| `data-cv-lazy-attach-signed-modal-src` | script do shell | URL de `attach-signed-modal.js` |
+| `data-cv-lazy-signature-actions-src` | script do shell | URL de `signature-actions.js` |
+| `data-cv-lazy-extra-download-src` | script do shell | URL de `extra-download.js` |
+| `data-cv-lazy-wizard-sticky-header-src` | script do shell | URL de `wizard-sticky-header.js` |
+| `data-cv-component-bundle="forms"` | script opcional da página | Informa que o bundle de formulários já foi declarado antes do shell |
+
+API: `CV.lazyComponents.scan(root?)`, para uma varredura explícita, e `destroy()`, usado em testes.
+
+O bundle de formulários agrupa `picker-parts`, os dois renderers de picker, `location-rows`,
+`document-source`, `document-search` e `date-picker`. Páginas cujo JavaScript chama essas APIs
+diretamente incluem `includes/form_components_js.html` no bloco `component_js`, depois do shell e
+antes dos scripts de página;
+nas demais, o loader usa `[data-entity-picker]`, `[data-location-rows]` ou
+`[data-cv-date-picker]` como marcador. O inventário automatizado em
+`core/tests/test_shell_bundles.py` obriga todo consumidor direto novo a declarar a dependência.
+
+## Coleções — `components/collection.js` / `CV.collection`
+
+Cada lista declara exatamente um modo. `client` filtra o que já está renderizado; `server` manda os
+filtros por GET, troca só `.list-panel` e atualiza a URL.
 
 | Atributo | Elemento | Obrigatório |
-|----------|----------|-------------|
+|---|---|---|
 | `data-collection` | container da lista/cards | sim |
-| `data-collection-mode="client|server"` | container | sim |
+| `data-collection-mode="client\|server"` | container | sim |
 | `data-collection-form` | `form` GET | no modo `server` |
-| `data-collection-filter="search|status|select|date"` | controle | sim por filtro |
+| `data-collection-filter="search\|status\|select\|date"` | controle | sim, por filtro |
 | `data-collection-item` | linha, card, item | no modo `client` |
 | `data-search-text` | item | recomendado no modo `client` |
 | `data-status-value` | item | se filtrar status no cliente |
@@ -46,120 +106,214 @@ Cada lista declara exatamente um modo. `client` filtra os itens já renderizados
 | `data-collection-clear` | botão de limpar | opcional |
 | `data-collection-bound` | container (interno) | idempotência |
 
-API oficial: `CV.collection.init(root?)`, `apply(collection)`,
-`clear(collection)`, `getState(collection)`, `matches(item, filters)` e
-`normalize(value)`.
+API: `CV.collection.init(root?)`, `apply(collection)`, `clear(collection)`, `getState(collection)`,
+`matches(item, filters)`, `normalize(value)`.
 
-Evento no modo cliente: `cv:collection:updated`, com
-`{ collection, filters, total, visible, hidden }`.
+Evento no modo cliente: `cv:collection:updated` — `{ collection, filters, total, visible, hidden }`.
 
-A busca cliente ignora caixa e acentos e combina palavras com AND. No modo
-servidor, o backend continua sendo o dono da semântica de busca e paginação.
+A busca cliente ignora caixa e acentos e combina palavras com AND. No modo servidor o backend
+continua dono da semântica de busca e paginação.
 
-## Máscaras (`masks.js` / `CV.masks`)
+## Pickers — `components/picker.js`, `components/picker-select.js`, `components/picker-parts.js`
 
-| Atributo | Elemento | Valores |
-|----------|----------|---------|
-| `data-mask` | `input`, `textarea` | `upper`, `cpf`, `rg`, `placa`, `cep`, `telefone`, `protocolo` |
-| `data-mask-bound` | campo (interno) | `true` após bind — evita listeners duplicados |
+O `<select>` fonte declara o componente; a `<div>` que o motor renderiza declara **o que ela é**.
+Quem consome o picker de fora nunca deve procurá-lo pela classe CSS.
 
-API:
+| Atributo | Onde | Para quê |
+|---|---|---|
+| `data-entity-picker` | `<select>` fonte | Declara o campo como picker |
+| `data-entity-picker-mode` | `<select>` | `single` \| `multi` |
+| `data-entity-picker-renderer="select"` | `<select>` | Escolhe o renderer alternativo (`picker-select.js`) |
+| `data-entity-picker-ready` | `<select>` | Marcador de idempotência |
+| **`data-entity-picker-root`** | raiz **renderizada** | É por aqui que se acha o picker no DOM |
+| **`data-entity-picker-part="…"`** | partes renderizadas | `field`, `control`, `input`, `clear`, `dropdown`, `list`, `empty`, `option`, `remove`, `selected-panel`, `selected-card`, `selected-title-row`, `term-control`, `driver-toggle`, `driver-surface`, `driver-text` |
 
-| Método | Uso |
-|--------|-----|
-| `CV.masks.scan(root?)` | Inicializa campos em `document` ou subárvore |
-| `CV.masks.apply(input)` | Aplica máscara ao valor atual |
-| `CV.masks.format(value, mask)` | Formata string sem DOM |
-
-API pública: `window.CV.masks`.
-
-Exemplo após DOM dinâmico (Quick Add):
-
-```javascript
-window.CV.masks.scan(panelElement);
+```js
+CV.picker.rootFor(select)        // raiz renderizada (serve para os dois renderers)
+CV.picker.part(escopo, nome)     // uma parte
+CV.picker.parts(escopo, nome)    // todas as partes
+CV.picker.closestPart(no, nome)  // subindo a partir de um nó
 ```
 
-Chamado automaticamente em `core/app.js` ao abrir painel Quick Add / quick edit.
+Duas armadilhas medidas no navegador: o **dropdown é portado para `document.body`** pelo overlay
+quando aberto, então `part(root, "dropdown")` devolve `null` nesse estado — use `closestPart` a
+partir do alvo do evento. Os pickers de relacionamento escritos pelo servidor usam
+`ui/forms/related_picker.html`; sua raiz semântica é `data-related-picker-root` e a apresentação
+(`card` ou `compact`) fica em `data-related-picker-presentation`. A estrutura criada por JS vem de
+`CV.pickerParts`, sem reconstruir classes BEM nos módulos de página (`NOVO-16`).
 
-## State Toggle (`state-toggle.js`)
+## Máscaras — `components/masks.js` / `CV.masks`
+
+| Atributo | Elemento | Valores |
+|---|---|---|
+| `data-mask` | `input`, `textarea` | `upper`, `cpf`, `rg`, `placa`, `cep`, `telefone`, `protocolo` |
+| `data-mask-bound` | campo (interno) | `true` após bind — evita listener duplicado |
+
+API: `CV.masks.scan(root?)`, `CV.masks.apply(input)`, `CV.masks.format(value, mask)`.
+
+## State toggle — `components/state-toggle.js` / `CV.stateToggle`
 
 | Atributo | Elemento | Uso |
-|----------|----------|-----|
+|---|---|---|
 | `data-cv-state-toggle` | container (ex.: `form`) | Escopo do toggle |
 | `data-cv-state-binary` | container | Modo botão único + checkbox |
 | `data-cv-state-option` | botão | Opção em grupo (com `data-value`) |
 | `data-value` | opção | Valor aplicado ao input |
-| `data-cv-state-input` | input / seletor | Campo sincronizado (opcional; padrão: primeiro checkbox) |
-| `data-cv-state-trigger` | botão | Gatilho binário (alternativa a `data-rg-toggle`) |
-| `data-active-label` | botão/container | Label quando ativo |
-| `data-inactive-label` | botão/container | Label quando inativo |
-| `data-rg-toggle` | botão | Legado — RG servidor (binário) |
-| `data-motorista-fixo-toggle` | botão | Legado — motorista viatura (binário) |
+| `data-cv-state-input` | input / seletor | Campo sincronizado (padrão: primeiro checkbox) |
+| `data-cv-state-trigger` | botão | Gatilho binário |
+| `data-active-label`, `data-inactive-label` | botão/container | Rótulo por estado |
 | `data-cv-state-bound` | container (interno) | Idempotência |
 
-Classes visuais: `is-active`, `is-inactive`, `cv-field-side-action--success`, `cv-field-side-action--danger`.
+API: `CV.stateToggle.init(root?)`, `CV.stateToggle.update(group, value)`.
+Evento: `cv:state-toggle:change` — `{ value, input, toggle, fromUser? }`.
 
-API: `window.CV.stateToggle.init(root?)`, `window.CV.stateToggle.update(group, value)`.
+## Card toggle — `components/card-toggle.js`
 
-Evento: `cv:state-toggle:change` — `detail`: `{ value, input, toggle, fromUser? }`.
+Checkbox renderizado como cartão clicável (`components/ui/forms/card_toggle.html`).
 
-## Autosave (`autosave.js`)
+| Atributo | Elemento |
+|---|---|
+| `data-card-toggle` | `<label>` do cartão |
+| `data-card-toggle-state` | span que mostra LIGADA/DESLIGADA |
+| `data-servidor-sem-rg-form` | form que esconde o RG quando o toggle liga |
+| `data-rg-field-wrap` | bloco do campo de RG |
 
-| Atributo | Form |
-|----------|------|
-| `data-autosave="true"` | ativa motor |
-| `data-autosave-model` | chave snapshots/validators |
-| `data-autosave-url` / `data-autosave-create-url` | endpoints |
+## Overlay e modais — `components/overlay.js`
+
+| Atributo | Elemento |
+|---|---|
+| `data-overlay-trigger` | botão que abre |
+| `data-overlay-target` | id do overlay alvo |
+| `data-overlay-kind` | tipo do overlay |
+| `data-overlay-close` | botão que fecha |
+| `data-delete-confirm-modal`, `data-delete-confirm-form`, `data-delete-confirm-label` | modal de exclusão |
+| `data-confirm-action-modal`, `data-confirm-action-form`, `data-confirm-action-label` | modal de confirmação genérica |
+| `data-cancel-reason-modal`, `data-cancel-reason-form`, `data-cancel-reason-label` | modal de cancelamento com motivo |
+| `data-vincular-usuario-modal`, `data-vincular-usuario-form`, `data-vincular-usuario-label` | modal de vínculo de usuário |
+
+## Date picker — `components/date-picker.js`
+
+Raiz: `data-cv-date-picker`. Idempotência e ciclo de vida por `registerEnhancer` (`JS-02`).
+
+| Grupo | Atributos |
+|---|---|
+| Estrutura | `data-cv-date-picker-panel`, `data-cv-date-picker-trigger`, `data-cv-date-picker-days`, `data-cv-date-picker-month`, `data-cv-date-picker-weekdays`, `data-cv-date-picker-summary` |
+| Navegação | `data-cv-date-picker-prev`, `data-cv-date-picker-next`, `data-cv-date-picker-today`, `data-cv-date-picker-clear`, `data-cv-date-picker-confirm`, `data-cv-date-picker-undo` |
+| Valor único | `data-cv-date-picker-value`, `data-cv-date-picker-display`, `data-cv-date-picker-display-text` |
+| Intervalo | `data-cv-date-picker-start-value`, `data-cv-date-picker-start-display`, `data-cv-date-picker-start-label`, `data-cv-date-picker-end-value`, `data-cv-date-picker-end-display`, `data-cv-date-picker-end-label` |
+| Contexto | `data-cv-date-picker-context`, `data-cv-date-picker-context-route`, `data-cv-date-picker-context-step` |
+
+## File picker — `components/file-picker.js`
+
+Raiz: `data-file-picker`, com o `<input type=file>` nativo em `data-file-native`.
+
+| Grupo | Atributos |
+|---|---|
+| Estado | `data-file-picker-name`, `data-file-picker-status`, `data-file-inline-actions` |
+| Seleção | `data-file-selection-list`, `data-file-selection-index`, `data-file-selection-name`, `data-file-selection-size`, `data-file-selection-summary`, `data-file-selection-template` |
+| Menu | `data-file-selection-menu`, `data-file-selection-toggle`, `data-file-selection-dropdown` |
+| Ações | `data-file-preview-selection`, `data-file-remove-selection`, `data-file-clear-selection` |
+
+## Anexar documento assinado — `components/attach-signed-modal.js`
+
+Raiz: `data-attach-signed-modal`, aberto por `data-attach-signed-trigger`.
+
+| Grupo | Atributos |
+|---|---|
+| Fluxo | `data-attach-signed-form`, `data-attach-signed-next`, `data-attach-signed-cancel`, `data-attach-signed-error`, `data-attach-signed-reopen-key` |
+| Tipo | `data-attach-signed-kind`, `data-attach-signed-kind-selector`, `data-attach-signed-kind-options`, `data-attach-signed-label` |
+| Arquivo atual | `data-attach-signed-current`, `data-attach-signed-current-name`, `data-attach-signed-current-open`, `data-attach-signed-remove` |
+| Upload | `data-attach-signed-file-description`, `data-attach-signed-file-help`, `data-file-upload-button`, `data-file-picker-action-label` |
+
+## Linhas de localidade — `components/location-rows.js`
+
+Raiz: `data-location-rows`; a lista é `data-location-list` e o molde `data-location-template`.
+
+| Atributo | Uso |
+|---|---|
+| `data-location-row` | Uma linha |
+| `data-location-state` / `data-location-city` | Selects de UF e cidade |
+| `data-location-add` / `data-location-remove` | Botões |
+| `data-location-order` | Campo de ordem |
+| `data-route-destinos-trechos` / `data-route-destinos-subtitle` | Resumo do roteiro |
+
+## Documentos — `components/document-*.js`, `components/extra-download.js`
+
+| Atributo | Motor | Uso |
+|---|---|---|
+| `data-document-loading`, `data-document-loading-title`, `data-document-loading-detail` | `document-download.js` | Estado de carregamento do download |
+| `data-document-download-bypass` | `document-download.js` | Link que ignora o estado de carregamento |
+| `data-document-generation-wait`, `data-document-generation-message` | `document-generation-wait.js` | Espera da geração assíncrona |
+| `data-document-number-field`, `data-document-number-input`, `data-document-number-value` | `document-number-field.js` | Campo composto número/ano |
+| `data-extra-download-url` | `extra-download.js` | Enfileira um segundo download junto do principal |
+
+## Autosave — `autosave.js`
+
+| Atributo | Elemento |
+|---|---|
+| `data-autosave="true"` | form — ativa o motor |
+| `data-autosave-model` | form — chave de snapshots/validators |
+| `data-autosave-url`, `data-autosave-create-url` | form — endpoints |
+| `data-autosave-link` | link que salva antes de navegar |
 
 Hooks: `window.CV.autosaveSnapshots[model]`, `window.CV.autosaveValidators[model]`.
 
-## Fields Init (`fields-init.js`)
+## Casca da página — `components/sidebar.js`, `theme-toggle.js`, `components/wizard-sticky-header.js`, `components/icon-tooltips.js`
 
-Orquestrador carregado após os motores em `base.html`.
+| Atributo | Motor |
+|---|---|
+| `data-sidebar`, `data-sidebar-toggle`, `data-sidebar-drawer-toggle`, `data-sidebar-drawer-close`, `data-sidebar-root-link`, `data-sidebar-panel-link` | `sidebar.js` |
+| `data-theme-mode` | `theme-toggle.js` |
+| `data-wizard-sticky-header`, `data-wizard-sticky-band`, `data-wizard-sticky-stepper`, `data-wizard-sticky-sentinel` | `wizard-sticky-header.js` |
+| `data-tooltip` | `icon-tooltips.js` |
+
+## Formulários — `components/fields-init.js`
+
+Orquestrador carregado depois dos motores em `base.html`.
 
 | API | Uso |
-|-----|-----|
-| `window.CV.fields.init(root?)` | Inicializa máscaras, toggles, selects, pickers e dropdowns na subárvore |
-| `window.CV.initFields` | Alias de `CV.fields.init` |
-| `window.CV.fields.initSelects(root?)` | Apenas `cv-custom-select` |
-| `window.CV.fields.initSearchPickers(root?)` | Apenas search picker |
-| `window.CV.fields.initDropdowns(root?)` | Apenas `cv-select` |
-| `window.CV.fields.initMultiselects(root?)` | Apenas `app-multiselect` (se script carregado) |
+|---|---|
+| `CV.fields.init(root?)` | Inicializa tudo na subárvore |
+| `CV.initFields` | Alias de `CV.fields.init` |
+| `CV.fields.initSelects(root?)` | Só os selects customizados |
+| `CV.fields.initSearchPickers(root?)` | Só o picker de busca |
+| `CV.fields.initDatePickers(root?)` | Só os date pickers |
+| `CV.fields.initMultiselects(root?)` | Só os multiselects |
 
-Evento: `cv:fields:init` — `detail.initialized`: `{ masks, stateToggles, selects, searchPickers, dropdowns, multiselects, filterableMultiselects }`.
+| Atributo | Uso |
+|---|---|
+| `data-form-errors` | Resumo de erro de formulário (`HT-03`) — recebe o foco uma vez por carga de página |
 
-Ordem interna: masks → stateToggle → customSelect → searchPicker → dropdowns → multiselect → filterableMultiselect.
+Evento: `cv:fields:init` — `detail.initialized`:
+`{ masks, stateToggles, segmentNav, selects, searchPickers, datePickers, multiselects, filterableMultiselects, resumoDeErros }`.
 
-Exemplo após DOM dinâmico:
+Ordem interna: masks → stateToggle → segmentNav → selects → searchPickers → datePickers →
+multiselects → filterableMultiselects → resumo de erros.
+
+Depois de inserir DOM dinamicamente:
 
 ```javascript
 window.CV.fields.init(panelElement);
 ```
 
-Quick Add e o wizard de ofícios chamam `CV.fields.init(root)` para inicializar
-campos inseridos dinamicamente.
+## Outros motores compartilhados
 
-## Selects / dropdowns (motores individuais)
+| Atributo | Motor | Uso |
+|---|---|---|
+| `data-diaria-base`, `data-diaria-derivado` | `components/diaria-derivados.js` | Espelha na tela a derivação de 15% e 30% que o modelo faz no `save()` — é pré-visualização, o servidor continua dono do valor |
+| `data-cv-signature-card`, `data-cv-signature-link`, `data-cv-signature-copy`, `data-cv-signature-wa` | `components/signature-actions.js` | Cartão de assinatura: copiar link e enviar por WhatsApp |
+| `data-cv-segment-nav-bound` | `components/segment-nav.js` | Navegação por segmentos — marcador de idempotência (o motor liga por classe, não por atributo) |
+| `data-map-focus-lat`, `data-map-focus-lng` | `pages/roteiros-map.js` | Centro inicial do mapa |
+| `data-oficio-glance-panel`, `data-oficio-glance-toggle`, `data-oficio-glance-toggle-label`, `data-oficio-sticky-header` | `pages/roteiros-wizard.js` | Painel de resumo do ofício no wizard de roteiro |
 
-| Motor | Seletor | API |
-|-------|---------|-----|
-| `cv-custom-select.js` | `[data-cv-select]` (wrapper) | `CV.customSelect.init(root)` |
-| `cv-search-picker.js` | `select[data-cv-search-picker]` | `CV.searchPicker.init(root)` |
-| `cv-select.js` | `[data-cv-dropdown]`, `[data-cv-filter-dropdown]` | `CV.dropdowns.init(root)` |
-| `app-multiselect.js` | `select[data-app-multiselect]` | `CV.multiselect.init(root)` |
-| `filterable-multiselect.js` | `input[data-filterable-multiselect-input]` | `CV.filterableMultiselect.init(root)` (se carregado) |
+## Domínio de roteiro (no `#roteiro-editor-form`)
 
-Marcadores de idempotência: `_cvSelect`, `data-cv-search-picker-ready`, `_cvDropdownReady`, `data-app-multiselect-ready`, `data-cv-select-bound`.
-
-## Configurações CEP
-
-| Atributo | Uso |
-|----------|-----|
-| `data-configuracoes-form` | form root |
-| `data-cep-lookup-url-template` | URL com `00000000` |
-
-## Roteiro / mapa (domínio — não unificar nesta fase)
-
-Atributos no `#roteiro-editor-form`: `data-api-calcular-rota-url`, `data-api-calcular-rota-preview-url`, `data-url-trechos-estimar`, `data-api-cidades-url`, `data-api-diarias-url`.
+`data-api-calcular-rota-url`, `data-api-calcular-rota-preview-url`, `data-url-trechos-estimar`,
+`data-api-cidades-url`, `data-api-diarias-url`.
 
 APIs públicas: `window.CV.roteiros.editor` e `window.CV.roteiros.map`.
+
+## Configurações — CEP
+
+`data-configuracoes-form` no form raiz; `data-cep-lookup-url-template` com `00000000` no lugar do
+CEP.

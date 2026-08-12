@@ -13,25 +13,28 @@ from prestacoes_contas.forms import DiarioMotoristaForm
 from prestacoes_contas.models import DiarioBordo
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroTrecho
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class DiarioMotoristaBaseTest(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="op", password="x")
         self.client.force_login(self.user)
+        vincular_area(self.user)
 
-        self.cargo = Cargo.objects.create(nome="Agente")
-        self.motorista_oficio = Servidor.objects.create(
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Agente")
+        self.motorista_oficio = Servidor.objects.create(area=area_de_teste(), 
             nome="Motorista Oficio", cargo=self.cargo, cpf="11122233344",
         )
-        self.servidor_equipe = Servidor.objects.create(
+        self.servidor_equipe = Servidor.objects.create(area=area_de_teste(), 
             nome="Servidor Equipe", cargo=self.cargo, cpf="55566677788",
         )
 
-        roteiro = Roteiro.objects.create()
+        roteiro = Roteiro.objects.create(area=area_de_teste())
         RoteiroTrecho.objects.create(roteiro=roteiro, tipo=RoteiroTrecho.TIPO_IDA, ordem=0)
 
-        self.oficio = Oficio.objects.create(
+        self.oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=7,
             ano=2026,
             protocolo="123456789",

@@ -1,6 +1,5 @@
 import argparse
 import ast
-import re
 import sys
 from pathlib import Path
 
@@ -10,7 +9,15 @@ ROOT = Path(__file__).resolve().parents[1]
 # selectors e nunca sobe — mesma convenção do `--max-warnings` do auditor de
 # frontend e do piso de cobertura. O alvo final é zero, mas ele não é atingível
 # num PR só: `core`, `documentos` e `usuarios` estão fora do escopo do `P-01`.
-ORM_EM_VIEW = re.compile(r"\.objects\b")
+# `BE-09`: `all_objects` conta igual. O manager que recorta por área trocou o nome
+# do manager irrestrito, e contar só `objects` deixaria de casar com
+# `Roteiro.all_objects` — renomear desinflaria esta catraca **sem tirar uma linha
+# de ORM da view**. Pego por `core/tests/test_view_module_boundaries.py`, que
+# existe justamente para impedir que a métrica seja esvaziada por forma.
+# `NOVO-11`: a contagem é sobre a árvore sintática, não sobre o texto. A regex
+# antiga casava `.objects` dentro de docstring e comentário — prosa segurava a
+# catraca no alto e explicar um ORM recém-removido fazia o CI reprovar um PR certo.
+ORM_MANAGER_ATTRS = {"objects", "all_objects"}
 DRIVE_ROOT = ROOT / "integracoes" / "google_drive"
 P06_SPLIT_VIEW_MODULES = {
     "oficios/api_views.py",
@@ -25,6 +32,16 @@ P06_SPLIT_VIEW_MODULES = {
     "planos_trabalho/list_views.py",
     "planos_trabalho/per_diem_views.py",
     "planos_trabalho/view_helpers.py",
+    # `BE-14` fatia 1: prestações foi fatiada em módulos por tela como os dois
+    # apps acima, mas ninguém os acrescentou aqui — e como a contagem só olha
+    # `views.py` e esta lista, **nove acessos de manager ficaram fora da
+    # medição** desde então. A catraca dizia 24 com 33 no chão. Entram agora;
+    # o número sobe uma vez, por honestidade, e volta a só descer.
+    "prestacoes_contas/assinatura_views.py",
+    "prestacoes_contas/diario_views.py",
+    "prestacoes_contas/document_views.py",
+    "prestacoes_contas/model_views.py",
+    "prestacoes_contas/rt_views.py",
 }
 SYNC_DOCUMENT_GENERATORS = {
     "gerar_resposta_documento_oficio",
@@ -127,8 +144,22 @@ def audit_templates():
     return findings
 
 
+def contar_orm_no_codigo(code: str) -> int:
+    """Acessos a `.objects`/`.all_objects` no **código**, via `ast.Attribute`.
+
+    `NOVO-11`: docstring e comentário não existem para este contador. Expressão
+    dentro de f-string continua contando — para o `ast` ela é código.
+    """
+    tree = ast.parse(code)
+    return sum(
+        1
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Attribute) and node.attr in ORM_MANAGER_ATTRS
+    )
+
+
 def contar_orm_em_views():
-    """Conta ocorrências de `.objects` em cada `views.py`, por app."""
+    """Conta acessos de manager em cada módulo de view, por app."""
     por_app = {}
     for path in iter_files(".py"):
         path_rel = rel(path)
@@ -139,7 +170,9 @@ def contar_orm_em_views():
             if path_rel in P06_SPLIT_VIEW_MODULES
             else path_rel.rsplit("/", 1)[0] or "."
         )
-        total = len(ORM_EM_VIEW.findall(path.read_text(encoding="utf-8")))
+        # `utf-8-sig` pela mesma razão dos gates vizinhos (BE-22): um BOM novo
+        # mataria o `ast.parse` e o gate morreria em vez de medir.
+        total = contar_orm_no_codigo(path.read_text(encoding="utf-8-sig"))
         if total:
             por_app[app] = por_app.get(app, 0) + total
     return por_app
@@ -183,7 +216,11 @@ def drive_excepts_without_capture():
     for path in DRIVE_ROOT.rglob("*.py"):
         if not path.is_file():
             continue
-        text = path.read_text(encoding="utf-8")
+        # `utf-8-sig` igual ao gate irmão abaixo (BE-22): `ast.parse` estoura com
+        # `invalid non-printable character U+FEFF` se o arquivo vier com BOM, e o
+        # gate morre em vez de medir. Hoje nenhum arquivo do Drive tem BOM — isto é
+        # para que o dia em que tiver não vire vermelho de bootstrap.
+        text = path.read_text(encoding="utf-8-sig")
         for line_no in except_exception_without_capture(text):
             findings.append((rel(path), line_no))
     return findings

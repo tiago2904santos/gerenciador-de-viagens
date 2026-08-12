@@ -8,6 +8,7 @@ from eventos.models import Evento
 from oficios.models import Oficio
 from prestacoes_contas.models import PrestacaoContas
 from roteiros.models import Roteiro
+from core.testing import area_de_teste
 
 
 class LimparRoteirosOrfaosTests(TestCase):
@@ -21,25 +22,25 @@ class LimparRoteirosOrfaosTests(TestCase):
         return out.getvalue()
 
     def test_dry_run_nao_apaga_nada(self):
-        orfao = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, origem_cidade=self.cidade_sede)
+        orfao = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, origem_cidade=self.cidade_sede)
         saida = self._run()
         self.assertIn(f"#{orfao.pk}", saida)
         self.assertIn("seriam apagados", saida)
         self.assertTrue(Roteiro.objects.filter(pk=orfao.pk).exists())
 
     def test_confirmar_apaga_apenas_orfaos(self):
-        orfao = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, origem_cidade=self.cidade_sede)
-        referenciado_por_oficio = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, origem_cidade=self.cidade_sede)
-        Oficio.objects.create(numero=1, ano=2026, roteiro=referenciado_por_oficio)
-        referenciado_por_prestacao = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, origem_cidade=self.cidade_sede)
-        oficio_da_prestacao = Oficio.objects.create(numero=99, ano=2026)
+        orfao = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, origem_cidade=self.cidade_sede)
+        referenciado_por_oficio = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, origem_cidade=self.cidade_sede)
+        Oficio.objects.create(area=area_de_teste(), numero=1, ano=2026, roteiro=referenciado_por_oficio)
+        referenciado_por_prestacao = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, origem_cidade=self.cidade_sede)
+        oficio_da_prestacao = Oficio.objects.create(area=area_de_teste(), numero=99, ano=2026)
         prestacao = PrestacaoContas.objects.get(oficio=oficio_da_prestacao)
         prestacao.roteiro_ajustado = referenciado_por_prestacao
         prestacao.save(update_fields=["roteiro_ajustado", "atualizado_em"])
-        referenciado_por_evento = Roteiro.objects.create(
+        referenciado_por_evento = Roteiro.objects.create(area=area_de_teste(), 
             tipo=Roteiro.TIPO_EVENTO,
             origem_cidade=self.cidade_sede,
-            evento=Evento.objects.create(titulo="Evento teste"),
+            evento=Evento.objects.create(area=area_de_teste(), titulo="Evento teste"),
         )
 
         saida = self._run("--confirmar")
@@ -51,8 +52,8 @@ class LimparRoteirosOrfaosTests(TestCase):
         self.assertTrue(Roteiro.objects.filter(pk=referenciado_por_evento.pk).exists())
 
     def test_sem_orfaos_nao_apaga_nada(self):
-        referenciado = Roteiro.objects.create(tipo=Roteiro.TIPO_AVULSO, origem_cidade=self.cidade_sede)
-        Oficio.objects.create(numero=2, ano=2026, roteiro=referenciado)
+        referenciado = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, origem_cidade=self.cidade_sede)
+        Oficio.objects.create(area=area_de_teste(), numero=2, ano=2026, roteiro=referenciado)
         saida = self._run("--confirmar")
         self.assertIn("Nenhum roteiro orfao", saida)
         self.assertTrue(Roteiro.objects.filter(pk=referenciado.pk).exists())

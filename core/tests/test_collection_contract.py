@@ -29,6 +29,7 @@ class CollectionContractTests(SimpleTestCase):
             "data-cv-filter-item",
         )
         paths = list((base / "templates" / "components").rglob("*.html"))
+        paths += list((base / "templates" / "cotton").rglob("*.html"))
         paths += list((base / "static" / "js").rglob("*.js"))
         for path in paths:
             source = path.read_text(encoding="utf-8-sig")
@@ -37,7 +38,7 @@ class CollectionContractTests(SimpleTestCase):
                     self.assertNotIn(hook, source)
 
     def test_list_components_declare_exactly_one_mode(self):
-        components = Path(settings.BASE_DIR) / "templates" / "components" / "lists"
+        components = Path(settings.BASE_DIR) / "templates" / "cotton" / "lists"
         for filename in (
             "list_page_cards.html",
             "list_page_quick_add.html",

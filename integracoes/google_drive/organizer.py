@@ -1036,7 +1036,8 @@ def sincronizar_pasta_evento(evento) -> None:
         pasta_id = _pasta_evento_folder(client, evento)
 
     if pasta_id and pasta_id != evento.drive_folder_id:
-        Evento.objects.filter(pk=evento.pk).update(drive_folder_id=pasta_id)
+        # `BE-09`: `all_objects` — atualização por pk de um evento já em mãos.
+        Evento.all_objects.filter(pk=evento.pk).update(drive_folder_id=pasta_id)
         evento.drive_folder_id = pasta_id
 
 
@@ -1159,7 +1160,10 @@ def reorganizar_tudo(evento_id: int | None = None, progress=None, usuario=None, 
 
     resumo = {"eventos": 0, "avulsos": 0, "erros": 0}
 
-    eventos = Evento.objects.all()
+    # `BE-09`: `all_objects` — o escopo é o `area` recebido no argumento, aplicado
+    # nas quatro linhas abaixo. A reorganização do Drive roda em worker, onde não
+    # há área ambiente, mas também pode ser disparada de dentro de um request.
+    eventos = Evento.all_objects.all()
     if area is None:
         eventos = eventos.filter(area__isnull=True)
     else:

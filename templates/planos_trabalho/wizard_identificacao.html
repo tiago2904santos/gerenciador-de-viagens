@@ -3,37 +3,35 @@
 
 {% block extra_css %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% static 'css/roteiros.css' %}">
-  <link rel="stylesheet" href="{% static 'css/termos.css' %}">
-  <link rel="stylesheet" href="{% static 'css/planos-trabalho-eventos.css' %}">
+  <link rel="stylesheet" href="{% static 'css/pages/roteiros.css' %}">
+  <link rel="stylesheet" href="{% static 'css/pages/termos.css' %}">
+  <link rel="stylesheet" href="{% static 'css/pages/planos-trabalho-eventos.css' %}">
 {% endblock %}
 
 {% block wizard_content %}
   <div data-pt-form data-api-cidades-url="{{ api_cidades_por_estado_url }}" data-travel-document-wizard-step1>
-    {% if form.non_field_errors %}
-      {% include "components/ui/feedback/field_error.html" with errors=form.non_field_errors only %}
-    {% endif %}
+    <c-ui.feedback.form_errors :form="form" only />
 
     {# ── 0. Eventos já adicionados (modo multi-evento) — cards contextuais acima do card-mestre ── #}
     {% if is_multi_evento %}
       {% if em_edicao_evento %}
-        <div class="cv-notice cv-notice--info pte-events__banner" role="status">
-          {% include "components/ui/icons/icon.html" with icon="edit" extra_class="pte-events__banner-icon" only %}
+        <div class="notice notice--info pte-events__banner" role="status">
+          <c-ui.icons.icon icon="edit" extra_class="pte-events__banner-icon" only />
           <span>Editando um evento existente — preencha as etapas e salve. Para criar um novo evento, finalize este e use “Adicionar evento ao plano” na última etapa.</span>
         </div>
       {% endif %}
       {% for ev in eventos_resumo %}
-        {% include "planos_trabalho/partials/resumo_evento_card.html" with ev=ev numero=resumo_header.numero coordenador_adm_nome=resumo_header.coordenador_adm_nome coordenador_adm_cargo=resumo_header.coordenador_adm_cargo is_multi=True total_eventos=total_eventos_commitados mostrar_acoes=True only %}
+        {% include "planos_trabalho/partials/resumo_evento_card.html" with ev=ev numero=resumo_header.numero coordenador_adm_nome=resumo_header.coordenador_adm_nome coordenador_adm_cargo=resumo_header.coordenador_adm_cargo is_multi=True total_eventos=total_eventos_commitados mostrar_acoes=True actions_extra_class=actions_extra_class body_extra_class=body_extra_class copy_extra_class=copy_extra_class data_hook=data_hook eyebrow=eyebrow footer_data_hook=footer_data_hook footer_extra_class=footer_extra_class footer_id=footer_id heading_level=heading_level meta_extra_class=meta_extra_class title_id=title_id total=total only %}
       {% empty %}
         {% if not em_edicao_evento %}
-          <p class="cv-card__hint"><em>Nenhum outro evento ainda. Preencha os campos e use “Adicionar evento ao plano” na etapa final para salvar e começar o próximo.</em></p>
+          <p class="card__hint"><em>Nenhum outro evento ainda. Preencha os campos e use “Adicionar evento ao plano” na etapa final para salvar e começar o próximo.</em></p>
         {% endif %}
       {% endfor %}
     {% endif %}
 
     {{ pt_textos_padrao_templates|json_script:"pt-textos-padrao-data" }}
 
-    {% include "components/form/card.html" with title="Identificação e atuação" description="Programa solicitante, evento e textos do documento" title_id="pt-identificacao-title" extra_class="pt-form-card" body_extra_class="travel-document-body" body_template="planos_trabalho/partials/_identificacao_wizard_body.html" footer_template="planos_trabalho/partials/_identificacao_wizard_footer.html" %}
+    <c-form.card title="Identificação e atuação" description="Programa solicitante, evento e textos do documento" title_id="pt-identificacao-title" extra_class="pt-form-card" body_extra_class="travel-document-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "planos_trabalho/partials/_identificacao_wizard_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_id=body_id consideracao_auto=consideracao_auto contextualizacao_auto=contextualizacao_auto coordenacao_auto=coordenacao_auto data_hook=data_hook heading_level=heading_level shell=shell variant=variant add_button_evento=add_button_evento add_button_evento_d=add_button_evento_d add_button_os=add_button_os add_button_termo=add_button_termo cargos_url=cargos_url cotton_attr_description=cotton_attr_description cotton_attr_end_label=cotton_attr_end_label cotton_attr_end_placeholder=cotton_attr_end_placeholder cotton_attr_start_label=cotton_attr_start_label cotton_attr_start_placeholder=cotton_attr_start_placeholder cotton_attr_title=cotton_attr_title destination_extra_class=destination_extra_class destination_title=destination_title end_hidden_id=end_hidden_id end_hidden_name=end_hidden_name end_hidden_value=end_hidden_value end_label=end_label form=form initial_date=initial_date period_extra_class=period_extra_class picker_open_all=picker_open_all programas_url=programas_url start_hidden_id=start_hidden_id start_hidden_name=start_hidden_name start_hidden_value=start_hidden_value start_label=start_label city_field=city_field data_index=data_index destino_index=destino_index has_data_index=has_data_index has_destino_index=has_destino_index horarios_url=horarios_url remove_hidden=remove_hidden row_extra_class=row_extra_class row_single=row_single show_drag_handle=show_drag_handle state_field=state_field estados=estados evento=evento location_city_value=location_city_value location_legacy_event=location_legacy_event location_state_code=location_state_code location_state_id=location_state_id row=row row_index=row_index only %}</c-slot><c-slot name="footer">{% include "planos_trabalho/partials/_identificacao_wizard_footer.html" only %}</c-slot></c-form.card>
   </div>
 {% endblock %}
 

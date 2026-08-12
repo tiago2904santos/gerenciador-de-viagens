@@ -1,6 +1,6 @@
 {% url 'justificativas:modelos_index' as modelos_url %}
 {% url 'justificativas:index' as justificativas_index_url %}
-{% include "components/ui/forms/field.html" with field=form.modelo label="Modelo de justificativa" action_url=modelos_url|add:"?next="|add:justificativas_index_url action_label="Gerenciar modelos" only %}
+{% with cotton_attr_action_url=modelos_url|add:"?next="|add:justificativas_index_url %}<c-ui.forms.field :field="form.modelo" label="Modelo de justificativa" :action_url="cotton_attr_action_url" action_label="Gerenciar modelos" only />{% endwith %}
 {% if not form.modelo.field.queryset.exists %}
   <div class="field">
     <p class="field-help">Nenhum modelo cadastrado. <a href="{{ modelos_url }}">Abrir gerenciamento de modelos</a></p>
@@ -10,6 +10,6 @@
   <label class="sr-only" for="{{ form.texto.id_for_label }}">Descrição</label>
   {{ form.texto }}
   {% if form.texto.errors %}
-    {% include "components/ui/feedback/field_error.html" with errors=form.texto.errors only %}
+    <c-ui.feedback.field_error :errors="form.texto.errors" :field_id="form.texto.auto_id" only />
   {% endif %}
 </div>

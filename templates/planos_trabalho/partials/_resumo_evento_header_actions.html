@@ -1,14 +1,14 @@
 {% if mostrar_acoes and ev.editar_url %}
   <div class="pt-resumo-card-actions">
     {# formaction: os botões vivem dentro do <form> do wizard (sem forms aninhados). #}
-    <button type="submit" formmethod="post" formaction="{{ ev.editar_url }}" formnovalidate
-            class="cv-icon-btn cv-icon-btn--edit" aria-label="Editar evento" data-tooltip="Editar evento">
-      {% include "components/ui/icons/icon.html" with icon="edit" only %}
-    </button>
-    <button type="submit" formmethod="post" formaction="{{ ev.excluir_url }}" formnovalidate
+    <c-ui.buttons.button type="submit" formmethod="post" formaction="{{ ev.editar_url }}" formnovalidate
+            class_name="icon-btn icon-btn--edit" aria_label="Editar evento" data-tooltip="Editar evento" only>
+      <c-ui.icons.icon icon="edit" only />
+    </c-ui.buttons.button>
+    <c-ui.buttons.button type="submit" formmethod="post" formaction="{{ ev.excluir_url }}" formnovalidate
             data-confirm-submit data-confirm-message="Remover este evento do plano?"
-            class="cv-icon-btn cv-icon-btn--delete" aria-label="Remover evento" data-tooltip="Remover evento">
-      {% include "components/ui/icons/icon.html" with icon="delete" only %}
-    </button>
+            class_name="icon-btn icon-btn--delete" aria_label="Remover evento" data-tooltip="Remover evento" only>
+      <c-ui.icons.icon icon="delete" only />
+    </c-ui.buttons.button>
   </div>
 {% endif %}

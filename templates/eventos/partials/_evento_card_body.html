@@ -1,119 +1,22 @@
 {# Miolo do card de evento — mesma linguagem do card de ofício: resumo em cartões (ofícios · documentos · efetivo) + servidores. #}
-<div class="cv-record-card__band">
-  <div class="cv-fact-grid">
+<div class="record-card__band">
+  <div class="fact-grid">
 
-    <div class="cv-fact-block cv-fact-block--trechos">
-      <span class="cv-fact-block__label">Ofícios{% if card.oficios_count %} ({{ card.oficios_count }}){% endif %}</span>
+    <div class="fact-block fact-block--trechos">
+      <span class="fact-block__label">Ofícios{% if card.oficios_count %} ({{ card.oficios_count }}){% endif %}</span>
       {% if card.oficios %}
-      <ul class="cv-itinerary cv-fact-grid--dense">
-        {% for oficio in card.oficios %}
-        <li class="cv-itinerary__leg cv-itinerary__leg--documento">
-          <div class="cv-itinerary__leg-body">
-            <div class="cv-itinerary__route">
-              <span>{{ oficio.numero }}</span>
-            </div>
-            {% if oficio.protocolo or oficio.data_evento_display or oficio.destino_display %}
-            <div class="cv-itinerary__time">
-              {% if oficio.protocolo %}{{ oficio.protocolo }}{% endif %}{% if oficio.protocolo and oficio.data_evento_display %} · {% endif %}{% if oficio.data_evento_display %}{{ oficio.data_evento_display }}{% endif %}{% if oficio.destino_display and oficio.protocolo or oficio.destino_display and oficio.data_evento_display %} · {% endif %}{% if oficio.destino_display %}{{ oficio.destino_display }}{% endif %}
-            </div>
-            {% endif %}
-          </div>
-          <div class="cv-itinerary__leg-actions">
-            <button
-              type="button"
-              class="cv-icon-btn cv-icon-btn--settings cv-icon-btn--documents"
-              aria-label="Abrir ações do ofício {{ oficio.numero }}"
-              aria-haspopup="true"
-              aria-expanded="false"
-              aria-controls="evento-oficio-menu-{{ card.pk }}-{{ oficio.oficio_pk }}"
-              data-tooltip="Ações e documentos"
-              data-overlay-trigger data-overlay-kind="menu"
-              data-overlay-target="evento-oficio-menu-{{ card.pk }}-{{ oficio.oficio_pk }}"
-            >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
-            <div
-              class="cv-action-menu cv-action-menu--rich cv-action-menu--documents"
-              id="evento-oficio-menu-{{ card.pk }}-{{ oficio.oficio_pk }}"
-              role="menu"
-              hidden
-            >
-              {% if oficio.protocolo %}
-                {% include "components/ui/menus/rich_menu_header.html" with title=oficio.numero subtitle=oficio.protocolo icon="document" only %}
-              {% else %}
-                {% include "components/ui/menus/rich_menu_header.html" with title=oficio.numero subtitle="Ações e documentos" icon="document" only %}
-              {% endif %}
-              {% include "components/ui/menus/rich_menu_link.html" with href=oficio.visualizar_url title="Visualizar ofício" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
-              {% if oficio.justificativa_pdf_url %}
-                {% include "components/ui/menus/rich_menu_link.html" with href=oficio.pdf_url title="Baixar PDF" description="Inclui também a justificativa" icon="pdf" tone="pdf" download=True extra_download_url=oficio.justificativa_pdf_url only %}
-              {% else %}
-                {% include "components/ui/menus/rich_menu_link.html" with href=oficio.pdf_url title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" download=True only %}
-              {% endif %}
-              {% include "components/ui/menus/rich_menu_link.html" with href=oficio.docx_url title="Baixar DOCX" description="Arquivo editável do ofício" icon="docx" tone="docx" download=True only %}
-              {% include "components/ui/menus/rich_menu_link.html" with href=oficio.editar_url title="Editar ofício" description="Abrir o cadastro para alterações" icon="edit" tone="edit" only %}
-            </div>
-          </div>
-        </li>
-        {% endfor %}
-      </ul>
+      <c-ui.lists.itinerary :items="card.oficios" extra_class="fact-grid--dense" item_extra_class="itinerary__leg--documento" item_template="eventos/partials/_itinerary_item.html" item_kind="oficio" :item_context="card" only />
       {% else %}
-      <div class="cv-fact-block__value--secondary cv-empty-hint">Nenhum ofício vinculado</div>
+      <div class="fact-block__value--secondary empty-hint">Nenhum ofício vinculado</div>
       {% endif %}
     </div>
 
-    <div class="cv-fact-block cv-fact-block--trechos cv-fact-block--documents">
-      <span class="cv-fact-block__label">Documentos{% if card.documentos_count %} ({{ card.documentos_count }}){% endif %}</span>
+    <div class="fact-block fact-block--trechos fact-block--documents">
+      <span class="fact-block__label">Documentos{% if card.documentos_count %} ({{ card.documentos_count }}){% endif %}</span>
       {% if card.documentos %}
-      <ul class="cv-itinerary cv-fact-grid--dense">
-        {% for doc in card.documentos %}
-        <li class="cv-itinerary__leg cv-itinerary__leg--documento">
-          <div class="cv-itinerary__leg-body">
-            <div class="cv-itinerary__route">
-              <span>{{ doc.title }}</span>
-              <span class="cv-person-row__badge">{{ doc.kind }}</span>
-            </div>
-            {% if doc.meta or doc.detail %}
-            <div class="cv-itinerary__time">
-              {% if doc.meta %}{{ doc.meta }}{% endif %}{% if doc.meta and doc.detail %} · {% endif %}{% if doc.detail %}{{ doc.detail }}{% endif %}
-            </div>
-            {% endif %}
-          </div>
-          <div class="cv-itinerary__leg-actions">
-            <button
-              type="button"
-              class="cv-icon-btn cv-icon-btn--settings cv-icon-btn--documents"
-              aria-label="Abrir ações de {{ doc.title }}"
-              aria-haspopup="true"
-              aria-expanded="false"
-              aria-controls="evento-documento-menu-{{ card.pk }}-{{ forloop.counter }}"
-              data-tooltip="Ações e documentos"
-              data-overlay-trigger data-overlay-kind="menu"
-              data-overlay-target="evento-documento-menu-{{ card.pk }}-{{ forloop.counter }}"
-            >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
-            <div
-              class="cv-action-menu cv-action-menu--rich cv-action-menu--documents"
-              id="evento-documento-menu-{{ card.pk }}-{{ forloop.counter }}"
-              role="menu"
-              hidden
-            >
-              {% include "components/ui/menus/rich_menu_header.html" with title=doc.title subtitle=doc.kind icon="document" only %}
-              {% if doc.visualizar_url %}
-                {% include "components/ui/menus/rich_menu_link.html" with href=doc.visualizar_url title="Visualizar documento" description="Abrir o arquivo no navegador" icon="eye" tone="preview" target_blank=True only %}
-              {% endif %}
-              {% if doc.pdf_url %}
-                {% include "components/ui/menus/rich_menu_link.html" with href=doc.pdf_url title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" download=True only %}
-              {% endif %}
-              {% if doc.docx_url %}
-                {% include "components/ui/menus/rich_menu_link.html" with href=doc.docx_url title="Baixar DOCX" description="Arquivo editável do documento" icon="docx" tone="docx" download=True only %}
-              {% endif %}
-              {% if doc.editar_url %}
-                {% include "components/ui/menus/rich_menu_link.html" with href=doc.editar_url title="Editar documento" description="Abrir o cadastro para alterações" icon="edit" tone="edit" only %}
-              {% endif %}
-            </div>
-          </div>
-        </li>
-        {% endfor %}
-      </ul>
+      <c-ui.lists.itinerary :items="card.documentos" extra_class="fact-grid--dense" item_extra_class="itinerary__leg--documento" item_template="eventos/partials/_itinerary_item.html" item_kind="documento" :item_context="card" only />
       {% else %}
-      <div class="cv-fact-block__value--secondary cv-empty-hint">Nenhum plano, convite ou OS vinculado</div>
+      <div class="fact-block__value--secondary empty-hint">Nenhum plano, convite ou OS vinculado</div>
       {% endif %}
     </div>
 
@@ -121,73 +24,35 @@
 </div>
 
 {% if card.servidores_flat %}
-<div class="cv-record-card__band">
-  <ul class="cv-person-list cv-person-list--n{% if card.servidores_flat_count == 1 %}1{% else %}2{% endif %}">
+<div class="record-card__band">
+  <ul class="person-list person-list--n{% if card.servidores_flat_count == 1 %}1{% else %}2{% endif %}">
     {% for oficio in card.oficios %}
       {% for s in oficio.servidores %}
-      <li class="cv-person-row{% if s.is_motorista %} cv-person-row--highlight{% endif %}">
-        <span class="cv-person-row__avatar" aria-hidden="true">{{ s.initials }}</span>
+      <li class="person-row{% if s.is_motorista %} person-row--highlight{% endif %}">
+        <span class="person-row__avatar" aria-hidden="true">{{ s.initials }}</span>
 
-        <div class="cv-person-row__body">
-          <div class="cv-person-row__name-row">
-            <span class="cv-person-row__name">{{ s.name }}</span>
-            <span class="cv-person-row__badge">{{ oficio.numero }}</span>
+        <div class="person-row__body">
+          <div class="person-row__name-row">
+            <span class="person-row__name">{{ s.name }}</span>
+            <span class="person-row__badge">{{ oficio.numero }}</span>
           </div>
-          {% if s.cargo or s.unidade %}
-          <span class="cv-person-row__meta">{% if s.cargo %}{{ s.cargo }}{% endif %}{% if s.cargo and s.unidade %} · {% endif %}{% if s.unidade %}{{ s.unidade }}{% endif %}</span>
-          {% endif %}
+        {% if s.meta %}<span class="person-row__meta">{{ s.meta }}</span>{% endif %}
         </div>
 
         {% if s.has_termo %}
-        <div class="cv-person-row__actions">
-          <button
+        <div class="person-row__actions">
+          <c-ui.buttons.button
             type="button"
-            class="cv-icon-btn cv-icon-btn--edit{% if s.termo_assinado %} is-assinado{% endif %}"
-            aria-label="Ações do termo de {{ s.name }}"
+            class_name="icon-btn icon-btn--edit{% if s.termo_assinado %} is-assinado{% endif %}"
+            aria_label="Ações do termo de {{ s.name }}"
             aria-haspopup="true"
             aria-expanded="false"
             aria-controls="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}"
             data-tooltip="{% if s.termo_assinado %}Termo assinado — ações{% else %}Ações do termo{% endif %}"
             data-overlay-trigger data-overlay-kind="menu"
             data-overlay-target="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}"
-          >{% include "components/ui/icons/icon.html" with icon="more" only %}</button>
-          <div class="cv-action-menu cv-action-menu--rich" id="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}" role="menu" hidden>
-            {% if s.termo_assinado %}
-              {% include "components/ui/menus/rich_menu_header.html" with title="Termo assinado" subtitle=s.name icon="sign" only %}
-            {% else %}
-              {% include "components/ui/menus/rich_menu_header.html" with title="Termo do servidor" subtitle=s.name icon="document" only %}
-            {% endif %}
-            {% if s.termo_open_url %}
-              {% include "components/ui/menus/rich_menu_link.html" with href=s.termo_open_url title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" target_blank=True only %}
-            {% endif %}
-            {% if s.termo_pdf_url %}
-              {% include "components/ui/menus/rich_menu_link.html" with href=s.termo_pdf_url title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" download=True only %}
-            {% endif %}
-            {% if s.termo_docx_url %}
-              {% include "components/ui/menus/rich_menu_link.html" with href=s.termo_docx_url title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" download=True only %}
-            {% endif %}
-            {% if s.termo_anexar_assinado_url %}
-            <button
-              type="button"
-              class="cv-action-menu__item cv-action-menu__item--rich{% if s.termo_assinado %} is-assinado{% endif %}"
-              role="menuitem"
-              data-attach-signed-trigger
-              data-attach-signed-url="{{ s.termo_anexar_assinado_url }}"
-              data-attach-signed-doc-label="o termo de {{ s.name }}"
-              data-attach-signed-current-name="{{ s.termo_assinado_nome_original }}"
-              data-attach-signed-current-view-url="{{ s.termo_assinado_view_url }}"
-              data-attach-signed-current-remove-url="{{ s.termo_remover_assinado_url }}"
-            >
-              <span class="cv-action-menu__item-icon cv-action-menu__item-icon--success" aria-hidden="true">
-                {% include "components/ui/icons/icon.html" with icon="sign" only %}
-              </span>
-              <span class="cv-action-menu__item-copy">
-                <strong>{% if s.termo_assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
-                <small>{% if s.termo_assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
-              </span>
-            </button>
-            {% endif %}
-          </div>
+              data_overlay_src="{{ card.menus_url }}" only><c-ui.icons.icon icon="more" only /></c-ui.buttons.button>
+          
         </div>
         {% endif %}
       </li>

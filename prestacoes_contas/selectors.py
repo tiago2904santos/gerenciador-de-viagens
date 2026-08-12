@@ -1,8 +1,12 @@
 from django.db.models import Prefetch
+from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
 from core.normalizers import remove_accents
+from core.tenancy import filter_queryset_by_area
 from core.tenancy import get_current_area
+from oficios.models import Oficio
+from roteiros.models import RoteiroDestino
 from roteiros.models import RoteiroTrecho
 
 from .models import PrestacaoServidor
@@ -47,11 +51,75 @@ def _q_da_aba(aba: str) -> Q:
     return ativa & Q(data_liberacao_diarias__isnull=True)
 
 
+def servidores_removidos_da_equipe(prestacao):
+    """Servidores que saíram da equipe do ofício mas cujos dados foram preservados (`DB-06`).
+
+    Único ponto de leitura que usa `todos` de propósito: em todo o resto do
+    sistema `objects` esconde estas linhas, e é isso que se quer. Aqui elas
+    precisam aparecer — preservar comprovante e assinatura sem lugar nenhum de
+    encontrá-los seria trocar "apagou em silêncio" por "sumiu em silêncio".
+
+    A lista só não é vazia quando havia dado coletado: linha sem nada some de vez
+    no próprio sinal, então o bloco da tela é autolimitado — aparece exatamente
+    quando importa.
+    """
+    return (
+        PrestacaoServidor.todos.filter(prestacao=prestacao, removida_em__isnull=False)
+        .select_related("servidor", "servidor__cargo", "servidor__unidade")
+        .order_by("removida_em", "pk")
+    )
+
+
 def _filter_servidores_by_area(queryset):
     area = get_current_area()
     if area is None:
         return queryset.filter(prestacao__area__isnull=True)
     return queryset.filter(prestacao__area=area)
+
+
+def get_servidor_prestacao_by_id(pk):
+    """Um `PrestacaoServidor` da área ativa, ou 404 (`PF-04`).
+
+    Este domínio não tinha um selector de registro único — a lista sempre pediu
+    página inteira. O endpoint de menus precisa de um, e escrever o filtro de área
+    à mão aqui seria repetir a regra que o `BE-09` centralizou. Por isso reusa
+    `_filter_servidores_by_area`, o mesmo que `_base_servidores` usa: `objects`
+    aqui é `PrestacaoServidorAtivosManager`, que filtra removidos mas **não**
+    recorta por área.
+
+    O `select_related` acompanha o que o presenter do card toca, para o fragmento
+    não virar um festival de consultas — ver `NOVO-38`.
+    """
+    queryset = (
+        _filter_servidores_by_area(PrestacaoServidor.objects)
+        .select_related(
+            "servidor",
+            "servidor__cargo",
+            "servidor__unidade",
+            "prestacao",
+            "prestacao__oficio",
+            "prestacao__oficio__roteiro",
+            "prestacao__oficio__roteiro__origem_cidade",
+            "prestacao__oficio__roteiro__origem_estado",
+            "prestacao__oficio__viatura",
+            "prestacao__oficio__motorista",
+        )
+        .prefetch_related(
+            # `NOVO-38`: a mesma forma de `_base_servidores`. O presenter é o
+            # mesmo, e ele toca `cidade` e `estado` de cada destino e trecho.
+            Prefetch(
+                "prestacao__oficio__roteiro__trechos",
+                queryset=RoteiroTrecho.objects.select_related(
+                    "origem_cidade", "origem_estado", "destino_cidade", "destino_estado"
+                ).order_by("ordem"),
+            ),
+            Prefetch(
+                "prestacao__oficio__roteiro__destinos",
+                queryset=RoteiroDestino.objects.select_related("cidade", "estado").order_by("ordem"),
+            ),
+        )
+    )
+    return get_object_or_404(queryset, pk=pk)
 
 
 def _base_servidores(
@@ -83,6 +151,17 @@ def _base_servidores(
                 queryset=RoteiroTrecho.objects.select_related(
                     "origem_cidade", "origem_estado", "destino_cidade", "destino_estado"
                 ).order_by("ordem"),
+            ),
+            # `NOVO-08`: `_destino_display_oficio` (`oficios/presenters.py:51-54`)
+            # faz `.destinos.all()` por card e toca `d.cidade` e `d.estado` de
+            # cada um — 100 consultas por página. Forma idêntica à do selector
+            # irmão (`oficios/selectors.py:72-75`), que alimenta o MESMO
+            # presenter. O `order_by("ordem")` é carga útil: o presenter mostra
+            # `destinos[:2]` e escreve "+N", então a ordem decide qual cidade
+            # aparece no cabeçalho.
+            Prefetch(
+                "prestacao__oficio__roteiro__destinos",
+                queryset=RoteiroDestino.objects.select_related("cidade", "estado").order_by("ordem"),
             ),
             Prefetch(
                 "prestacao__servidores_prestacao",
@@ -162,3 +241,23 @@ def contar_por_aba(
         aba: base.filter(_q_da_aba(aba)).count()
         for aba in (ABA_NAO_LIBERADAS, ABA_LIBERADAS, ABA_ARQUIVADOS, ABA_FINALIZADOS)
     }
+
+
+#: Teto da lista de ofícios oferecida no auto-preenchimento da troca de motorista.
+#: O valor é o de sempre; o que muda no `BE-14` fatia 4 é o lugar onde ele mora.
+LIMITE_OFICIOS_PREFILL = 200
+
+
+def oficios_para_prefill_de_motorista(oficio_atual):
+    """Ofícios da área que podem emprestar motorista/viatura ao diário desta prestação.
+
+    Consulta pura — vem para cá porque era o último acesso de manager que sobrava em
+    `diario_views.py` depois da extração da gravação (`P-01`).
+    """
+    return (
+        filter_queryset_by_area(Oficio.objects)
+        .select_related("viatura", "viatura__combustivel", "motorista", "transporte_combustivel_manual")
+        .exclude(pk=oficio_atual.pk)
+        .filter(numero__isnull=False)
+        .order_by("-ano", "-numero")[:LIMITE_OFICIOS_PREFILL]
+    )

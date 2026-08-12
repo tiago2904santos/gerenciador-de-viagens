@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  /* ── cv-search-picker: reset + reinit ──────────────────────── */
+  /* ── search-picker: reset + reinit ──────────────────────── */
 
   function resetPicker(select) {
     if (window.CV && window.CV.locationRows && typeof window.CV.locationRows.resetSearchPicker === "function") {
@@ -10,9 +10,9 @@
     }
     if (!select || select.dataset.entityPickerReady !== "true") return;
     delete select.dataset.entityPickerReady;
-    var next = select.nextElementSibling;
-    if (next && next.classList && next.classList.contains("cv-search-picker")) {
-      next.parentNode.removeChild(next);
+    var rendered = window.CV.picker.rootFor(select);
+    if (rendered && rendered !== select) {
+      rendered.parentNode.removeChild(rendered);
     }
   }
 
@@ -147,10 +147,8 @@
     }
     var manualInput = panel.querySelector("[data-pt-coordenador-nome-manual]");
     var cargoSelect = panel.querySelector("[name='coordenador_" + papel + "_cargo_manual']");
-    var pickerRoot = servidorSelect ? servidorSelect.nextElementSibling : null;
-    var pickerInput = pickerRoot && pickerRoot.classList.contains("cv-search-picker")
-      ? pickerRoot.querySelector(".cv-search-picker__input")
-      : null;
+    var pickerRoot = servidorSelect ? window.CV.picker.rootFor(servidorSelect) : null;
+    var pickerInput = window.CV.picker.part(pickerRoot, "input");
     return {
       nome: ((manualInput && manualInput.value) || (pickerInput && pickerInput.value) || "").trim(),
       cargo: ((cargoSelect && cargoSelect.value) || "").trim(),
@@ -314,11 +312,9 @@
     var manualInput = manualName ? panel.querySelector("[name='" + manualName + "']") : null;
     var cargoSelect = cargoName ? panel.querySelector("[name='" + cargoName + "']") : null;
     var modoInput = modoName ? panel.querySelector("[name='" + modoName + "']") : null;
-    var pickerRoot = servidorSelect.nextElementSibling;
-    var pickerInput = pickerRoot && pickerRoot.classList.contains("cv-search-picker")
-      ? pickerRoot.querySelector(".cv-search-picker__input")
-      : null;
-    var clearButton = pickerRoot ? pickerRoot.querySelector(".cv-search-picker__clear") : null;
+    var pickerRoot = window.CV.picker.rootFor(servidorSelect);
+    var pickerInput = window.CV.picker.part(pickerRoot, "input");
+    var clearButton = window.CV.picker.part(pickerRoot, "clear");
     if (!pickerInput) return;
 
     var syncing = false;
@@ -331,7 +327,7 @@
       setHiddenValue(modoInput, "SERVIDOR", options);
       setSelectValue(cargoSelect, option.dataset.cargo || "", options);
       // Em modo silencioso (carga/edição) o setSelectValue não dispara "change",
-      // então o cv-custom-select do cargo não atualiza o texto visível sozinho.
+      // então o custom-select do cargo não atualiza o texto visível sozinho.
       refreshCustomSelect(cargoSelect);
       syncing = false;
     }
@@ -375,7 +371,7 @@
       applyServidorSelection(initialOption, { silent: true });
     } else if (manualInput && manualInput.value) {
       pickerInput.value = manualInput.value;
-      if (pickerRoot) pickerRoot.classList.add("cv-search-picker--has-query");
+      if (pickerRoot) pickerRoot.classList.add("search-picker--has-query");
       setHiddenValue(modoInput, "MANUAL", { silent: true });
     }
   }
@@ -572,7 +568,7 @@
 
   function setChipLabel(wrapper, text) {
     if (!wrapper) return;
-    var label = wrapper.querySelector(".cv-chip__label");
+    var label = wrapper.querySelector(".chip__label");
     if (label) label.textContent = text;
   }
 

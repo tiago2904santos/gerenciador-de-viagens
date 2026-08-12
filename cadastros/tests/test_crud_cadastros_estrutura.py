@@ -1,4 +1,4 @@
-﻿import re
+import re
 
 from django.contrib.auth import get_user_model
 from django.test import Client
@@ -12,14 +12,17 @@ from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Servidor
 from cadastros.models import Unidade
 from cadastros.models import Viatura
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 @override_settings(ALLOWED_HOSTS=["testserver", "localhost"])
 class CargoCrudTests(TestCase):
     def setUp(self):
         user_model = get_user_model()
-        self.user = user_model.objects.create_user(username="teste-cargo", password="senha-teste")
+        self.user = user_model.objects.create_user(username="teste-cargo")
         self.client.force_login(self.user)
+        vincular_area(self.user)
 
     def test_crud_cargo_e_normalizacao(self):
         self.assertEqual(self.client.get(reverse("cadastros:cargos_index")).status_code, 200)
@@ -46,8 +49,9 @@ class CargoCrudTests(TestCase):
 class CombustivelCrudTests(TestCase):
     def setUp(self):
         user_model = get_user_model()
-        self.user = user_model.objects.create_user(username="teste-combustivel", password="senha-teste")
+        self.user = user_model.objects.create_user(username="teste-combustivel")
         self.client.force_login(self.user)
+        vincular_area(self.user)
 
     def test_crud_combustivel_e_normalizacao(self):
         self.assertEqual(self.client.get(reverse("cadastros:combustiveis_index")).status_code, 200)
@@ -76,12 +80,13 @@ class CombustivelCrudTests(TestCase):
 @override_settings(ALLOWED_HOSTS=["testserver", "localhost"])
 class SimpleListCsrfTests(TestCase):
     def test_acao_inline_de_cargo_renderiza_csrf_e_aceita_post(self):
-        Cargo.objects.create(nome="ANALISTA", is_padrao=True)
-        cargo = Cargo.objects.create(nome="GERENTE")
+        Cargo.objects.create(area=area_de_teste(), nome="ANALISTA", is_padrao=True)
+        cargo = Cargo.objects.create(area=area_de_teste(), nome="GERENTE")
         user_model = get_user_model()
-        user = user_model.objects.create_user(username="teste-csrf", password="senha-teste")
+        user = user_model.objects.create_user(username="teste-csrf")
         client = Client(enforce_csrf_checks=True)
         client.force_login(user)
+        vincular_area(user)
 
         response = client.get(reverse("cadastros:cargos_index"))
         self.assertEqual(response.status_code, 200)
@@ -102,10 +107,11 @@ class SimpleListCsrfTests(TestCase):
 class ServidorCrudTests(TestCase):
     def setUp(self):
         user_model = get_user_model()
-        self.user = user_model.objects.create_user(username="teste-servidor", password="senha-teste")
+        self.user = user_model.objects.create_user(username="teste-servidor")
         self.client.force_login(self.user)
-        self.unidade = Unidade.objects.create(nome="Secretaria", sigla="SEC")
-        self.cargo = Cargo.objects.create(nome="ANALISTA")
+        vincular_area(self.user)
+        self.unidade = Unidade.objects.create(area=area_de_teste(), nome="Secretaria", sigla="SEC")
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="ANALISTA")
 
     def test_servidor_fluxo_busca_e_regras(self):
         create_page = self.client.get(reverse("cadastros:servidor_create"))
@@ -161,7 +167,7 @@ class ServidorCrudTests(TestCase):
 
     def test_servidores_index_limita_25_por_pagina(self):
         for index in range(30):
-            Servidor.objects.create(nome=f"SERVIDOR PAGINADO {index:02d}", cargo=self.cargo)
+            Servidor.objects.create(area=area_de_teste(), nome=f"SERVIDOR PAGINADO {index:02d}", cargo=self.cargo)
 
         response = self.client.get(reverse("cadastros:servidores_index"), {"q": "PAGINADO"})
         self.assertEqual(response.status_code, 200)
@@ -193,17 +199,17 @@ class ServidorCrudTests(TestCase):
         self.assertContains(response, "?q=PAGINADO&page=1")
 
     def test_servidores_index_filtra_pelos_tres_cargos_mais_usados(self):
-        cargo_a = Cargo.objects.create(nome="DELEGADO")
-        cargo_b = Cargo.objects.create(nome="ESCRIVAO")
-        cargo_c = Cargo.objects.create(nome="MOTORISTA")
-        cargo_d = Cargo.objects.create(nome="RARO")
+        cargo_a = Cargo.objects.create(area=area_de_teste(), nome="DELEGADO")
+        cargo_b = Cargo.objects.create(area=area_de_teste(), nome="ESCRIVAO")
+        cargo_c = Cargo.objects.create(area=area_de_teste(), nome="MOTORISTA")
+        cargo_d = Cargo.objects.create(area=area_de_teste(), nome="RARO")
         for i in range(5):
-            Servidor.objects.create(nome=f"SRV A {i}", cargo=cargo_a)
+            Servidor.objects.create(area=area_de_teste(), nome=f"SRV A {i}", cargo=cargo_a)
         for i in range(3):
-            Servidor.objects.create(nome=f"SRV B {i}", cargo=cargo_b)
+            Servidor.objects.create(area=area_de_teste(), nome=f"SRV B {i}", cargo=cargo_b)
         for i in range(2):
-            Servidor.objects.create(nome=f"SRV C {i}", cargo=cargo_c)
-        Servidor.objects.create(nome="SRV D", cargo=cargo_d)
+            Servidor.objects.create(area=area_de_teste(), nome=f"SRV C {i}", cargo=cargo_c)
+        Servidor.objects.create(area=area_de_teste(), nome="SRV D", cargo=cargo_d)
 
         response = self.client.get(reverse("cadastros:servidores_index"))
         self.assertEqual(response.status_code, 200)
@@ -211,7 +217,7 @@ class ServidorCrudTests(TestCase):
         self.assertEqual([aba["label"] for aba in abas], ["Todos", "DELEGADO", "ESCRIVAO", "MOTORISTA"])
         self.assertEqual(abas[0]["count"], 11)
         self.assertNotIn("RARO", [aba["label"] for aba in abas])
-        self.assertContains(response, 'class="cv-list-tabs"')
+        self.assertContains(response, 'class="list-tabs"')
         self.assertContains(response, f"cargo={cargo_a.pk}")
 
         filtrado = self.client.get(reverse("cadastros:servidores_index"), {"cargo": cargo_a.pk})
@@ -223,7 +229,7 @@ class ServidorCrudTests(TestCase):
         self.assertContains(filtrado, f'name="cargo" value="{cargo_a.pk}"')
 
     def test_servidor_delete_get_redireciona_para_lista(self):
-        servidor = Servidor.objects.create(nome="SERVIDOR SEM PAGINA DE DELETE", cargo=self.cargo)
+        servidor = Servidor.objects.create(area=area_de_teste(), nome="SERVIDOR SEM PAGINA DE DELETE", cargo=self.cargo)
 
         response = self.client.get(reverse("cadastros:servidor_delete", args=[servidor.pk]))
 
@@ -303,9 +309,10 @@ class ServidorCrudTests(TestCase):
 class ViaturaCrudTests(TestCase):
     def setUp(self):
         user_model = get_user_model()
-        self.user = user_model.objects.create_user(username="teste-viatura", password="senha-teste")
+        self.user = user_model.objects.create_user(username="teste-viatura")
         self.client.force_login(self.user)
-        self.combustivel = Combustivel.objects.create(nome="GASOLINA")
+        vincular_area(self.user)
+        self.combustivel = Combustivel.objects.create(area=area_de_teste(), nome="GASOLINA")
 
     def test_viatura_fluxo_busca_e_validacoes(self):
         self.assertEqual(self.client.get(reverse("cadastros:viaturas_index")).status_code, 200)
@@ -428,19 +435,19 @@ class ViaturaCrudTests(TestCase):
         self.assertEqual(viatura.status, Viatura.STATUS_COMPLETO)
 
     def test_viaturas_index_filtra_unidade_config_e_top_combustiveis(self):
-        unidade = Unidade.objects.create(nome="Assessoria", sigla="ASCOM")
-        outra = Unidade.objects.create(nome="Outra", sigla="OUT")
+        unidade = Unidade.objects.create(area=area_de_teste(), nome="Assessoria", sigla="ASCOM")
+        outra = Unidade.objects.create(area=area_de_teste(), nome="Outra", sigla="OUT")
         cfg = ConfiguracaoSistema.get_singleton()
         cfg.unidade = unidade
         cfg.save(update_fields=["unidade"])
 
-        flex = Combustivel.objects.create(nome="FLEX")
-        diesel = Combustivel.objects.create(nome="DIESEL")
-        etanol = Combustivel.objects.create(nome="ETANOL")
-        Combustivel.objects.create(nome="GNV")
+        flex = Combustivel.objects.create(area=area_de_teste(), nome="FLEX")
+        diesel = Combustivel.objects.create(area=area_de_teste(), nome="DIESEL")
+        etanol = Combustivel.objects.create(area=area_de_teste(), nome="ETANOL")
+        Combustivel.objects.create(area=area_de_teste(), nome="GNV")
 
         for i in range(5):
-            Viatura.objects.create(
+            Viatura.objects.create(area=area_de_teste(), 
                 placa=f"FLX{i:04d}",
                 modelo="Duster",
                 combustivel=flex,
@@ -448,7 +455,7 @@ class ViaturaCrudTests(TestCase):
                 unidade=unidade,
             )
         for i in range(3):
-            Viatura.objects.create(
+            Viatura.objects.create(area=area_de_teste(), 
                 placa=f"DSL{i:04d}",
                 modelo="S10",
                 combustivel=diesel,
@@ -456,14 +463,14 @@ class ViaturaCrudTests(TestCase):
                 unidade=unidade,
             )
         for i in range(2):
-            Viatura.objects.create(
+            Viatura.objects.create(area=area_de_teste(), 
                 placa=f"ETA{i:04d}",
                 modelo="Onix",
                 combustivel=etanol,
                 tipo=Viatura.TIPO_CARACTERIZADA,
                 unidade=outra,
             )
-        Viatura.objects.create(
+        Viatura.objects.create(area=area_de_teste(), 
             placa="GNV0000",
             modelo="Uno",
             combustivel=Combustivel.objects.get(nome="GNV"),
@@ -480,7 +487,7 @@ class ViaturaCrudTests(TestCase):
         )
         self.assertEqual(abas[0]["count"], 11)
         self.assertNotIn("GNV", [aba["label"] for aba in abas])
-        self.assertContains(response, 'class="cv-list-tabs"')
+        self.assertContains(response, 'class="list-tabs"')
 
         por_unidade = self.client.get(reverse("cadastros:viaturas_index"), {"unidade": unidade.pk})
         self.assertEqual(len(por_unidade.context["rows"]), 8)

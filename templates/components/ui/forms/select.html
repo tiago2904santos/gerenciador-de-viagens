@@ -1,7 +1,0 @@
-{% comment %}
-cv-custom-select global — clonagem 1:1 do modelo aprovado no UI Lab.
-O <select> nativo permanece no DOM para submit Django; o JS monta trigger/menu.
-{% endcomment %}
-<div class="cv-custom-select{% if field.errors %} cv-custom-select--error{% endif %}{% if field.field.disabled %} cv-custom-select--disabled{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
-  {{ field.as_widget }}
-</div>

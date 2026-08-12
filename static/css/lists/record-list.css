@@ -1,0 +1,263 @@
+/* Canonical record list — roster no ritmo das listas internas de formulário
+   (poço de campo, sem borda, sem hover de cor). */
+
+.record-list {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Painel intermediário — mesmo tom --step1-panel dos formulários. */
+.collection-panel {
+  --step1-panel: var(--color-surface-soft, var(--color-card-soft));
+  --step1-surface: var(--color-surface-muted, var(--color-card-muted, var(--color-input-bg)));
+  --step1-field: var(--step1-surface);
+  background: var(--step1-panel);
+  border: 0;
+  border-radius: 14px;
+  box-shadow: none;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+}
+
+.collection-panel > .list-toolbar {
+  margin: 0;
+  padding: 0;
+}
+
+/* Controles elevados sobre o poço --step1-panel (abas + cápsula de páginas). */
+.collection-panel .list-tab {
+  --list-tab-bg: var(--step1-surface);
+  --list-tab-hover-bg: color-mix(in srgb, var(--step1-surface) 86%, #fff 14%);
+  --list-tab-count-bg: color-mix(in srgb, var(--step1-panel) 55%, transparent);
+}
+
+.collection-panel .pagination-shell__controls {
+  background: var(--step1-surface);
+}
+
+.record-row {
+  align-items: center;
+  background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted, var(--color-card-muted))));
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
+  column-gap: 12px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-height: 64px;
+  min-width: 0;
+  padding: 11px 12px;
+  position: relative;
+  transition: background-color var(--transition-fast, 140ms ease);
+}
+
+.record-row:hover,
+.record-row:focus-within {
+  background: color-mix(
+    in srgb,
+    var(--color-accent) 5%,
+    var(--step1-field, var(--color-input-bg, var(--color-surface-muted)))
+  );
+  border: 0;
+  box-shadow: none;
+}
+
+.record-row:not(:has(.record-row__identity)) {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.record-row__identity {
+  align-items: center;
+  background: var(--color-accent-soft, color-mix(in srgb, var(--color-accent) 18%, transparent));
+  border: 1px solid var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 55%, transparent));
+  border-radius: 12px;
+  color: var(--color-accent-text, var(--color-accent));
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: 800;
+  height: 42px;
+  justify-content: center;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  width: 42px;
+}
+
+.record-row__identity > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.record-row__content {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.record-row__heading {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2, 8px);
+  min-width: 0;
+}
+
+.record-row__title {
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.record-row__badges {
+  align-items: center;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-2, 8px);
+}
+
+/* Mesmo chip do Motorista (person-row__badge). */
+.record-row__badge {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  border-radius: 999px;
+  color: var(--color-accent);
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  min-height: 21px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.record-row__subtitle {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: 500;
+  line-height: 1.35;
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.record-row__facts {
+  align-items: baseline;
+  color: var(--color-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--font-size-xs, 0.75rem);
+  gap: 2px 0;
+  line-height: 1.4;
+  margin-top: 2px;
+  min-width: 0;
+}
+
+.record-row__fact {
+  align-items: baseline;
+  display: inline-flex;
+  gap: 0.35em;
+  min-width: 0;
+}
+
+.record-row__fact-label {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.record-row__fact-value {
+  color: var(--color-text);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.record-row__facts-sep {
+  color: var(--color-muted);
+  margin: 0 0.45em;
+  opacity: 0.7;
+}
+
+.record-row__actions {
+  align-items: center;
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: var(--space-2, 8px);
+  justify-content: flex-end;
+}
+
+.record-row__inline-form {
+  display: inline;
+  margin: 0;
+}
+
+/* When this canonical list sits inside a list/collection panel, drop the
+   panel slab so field wells sit on --step1-panel. */
+.list-panel:has(> .record-list),
+.collection-panel > .list-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+@media (max-width: 720px) {
+  .record-row {
+    align-items: start;
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 12px 14px;
+    row-gap: 10px;
+  }
+
+  .record-row:not(:has(.record-row__identity)) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .record-row__actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+    padding-top: 2px;
+    width: 100%;
+  }
+
+  .record-row__subtitle,
+  .record-row__title {
+    white-space: normal;
+  }
+}
+
+/* =========================================================
+   Página de lista em cards — casca canônica (list_page_cards)
+   Substitui a pilha app-page--main-card-list / oficios-list-page /
+   list-content list-grid list-grid--roteiros app-list-grid.
+   ========================================================= */
+.page-shell--cards > .list-panel,
+.cv-page--collection-cards > .list-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.page-shell--cards .card-grid,
+.cv-page--collection-cards .card-grid {
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+}

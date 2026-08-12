@@ -1,0 +1,26 @@
+{
+  "static/js/components/collection.js": {
+    "branches": 73.94,
+    "functions": 87.87,
+    "lines": 91.36,
+    "statements": 88.05
+  },
+  "static/js/components/masks.js": {
+    "branches": 82.65,
+    "functions": 95,
+    "lines": 96.2,
+    "statements": 91.89
+  },
+  "static/js/core/app.js": {
+    "branches": 16.96,
+    "functions": 45.58,
+    "lines": 27.74,
+    "statements": 26.51
+  },
+  "static/js/core/http.js": {
+    "branches": 97.82,
+    "functions": 100,
+    "lines": 100,
+    "statements": 100
+  }
+}

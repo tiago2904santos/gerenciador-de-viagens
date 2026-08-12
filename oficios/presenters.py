@@ -1,11 +1,9 @@
 import json
 
 from core import entity_cards
-from core.presenters.actions import build_action
-from core.presenters.actions import build_delete_action
-from core.presenters.actions import build_edit_action
 from core.presenters.badges import build_badge
 from core.presenters.meta import build_meta
+from core.presenters.text import join_non_empty
 from core.utils.masks import format_placa
 from core.utils.masks import format_protocolo
 from decimal import Decimal
@@ -35,14 +33,6 @@ def _status_variant(status: str) -> str:
     if status == Oficio.STATUS_ARQUIVADO:
         return "status-chip--muted"
     return "status-chip--warning"
-
-
-def _oficio_faixa_lateral_class(status: str) -> str:
-    if status in {Oficio.STATUS_GERADO, Oficio.STATUS_FINALIZADO}:
-        return "roteiro-list-card--faixa-finalizado-concluido"
-    if status == Oficio.STATUS_RASCUNHO:
-        return "roteiro-list-card--faixa-rascunho-futuro"
-    return "roteiro-list-card--faixa-neutro"
 
 
 def _destino_display_oficio(oficio) -> str:
@@ -128,8 +118,16 @@ def _temporal_badge_oficio(oficio):
     return f"há {dias} dias", "success"
 
 
-def apresentar_oficio_card(oficio, *, excluir_next_url=None):
+def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=True):
+    """Card da lista de Ofícios.
+
+    `menus_sob_demanda` liga o PF-04: os menus saem com `src` e o corpo deles não
+    vai no HTML da lista — quem serve é `oficios:card_menus`, no primeiro clique.
+    O endpoint chama este mesmo presenter com `False`, para renderizar os corpos.
+    """
     from termos.services import termo_oficio_assinado_info
+
+    menus_src = reverse("oficios:card_menus", args=[oficio.pk]) if menus_sob_demanda else ""
 
     servidores = list(oficio.servidores.all())
     termos_pks = {s.pk for s in oficio.servidores_termo_autorizacao.all()}
@@ -172,6 +170,7 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
             "name": s.nome,
             "cargo": cargo_nome,
             "unidade": unidade_nome,
+            "meta": join_non_empty([cargo_nome, unidade_nome]),
             "is_motorista": bool(motorista_pk and s.pk == motorista_pk),
             "telefone": s.telefone_formatado if s.telefone else "",
             "has_termo": has_termo,
@@ -243,10 +242,10 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
         texto = (j.texto or "").strip()
         if texto:
             status_label = "Preenchida"
-            status_css_class = "cv-record-card__badge--success"
+            status_css_class = "record-card__badge--success"
         elif getattr(j, "obrigatoria", False):
             status_label = "Pendente"
-            status_css_class = "cv-record-card__badge--warning"
+            status_css_class = "record-card__badge--warning"
         else:
             status_label = ""
             status_css_class = ""
@@ -365,6 +364,7 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
                     view_title="Visualizar ofício",
                     docx_description="Arquivo editável do ofício",
                     trigger_aria=f"Abrir documentos do ofício {numero_display}",
+                    src=menus_src,
                 )
             ],
             danger_menus=[
@@ -378,9 +378,13 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None):
                     trigger_variant="edit",
                     trigger_aria="Mais ações do ofício",
                     trigger_tooltip="Mais ações",
+                    src=menus_src,
                 )
             ],
         ),
+        # Os gatilhos escritos à mão no `_oficio_card_body.html` (termo por
+        # servidor e documentos da justificativa) apontam para cá (PF-04).
+        "menus_url": menus_src,
         "oficio_pk": oficio.pk,
         "numero_display": numero_display,
         "protocolo_display": protocolo_display,
@@ -482,6 +486,7 @@ def _montar_viajantes_cards_documentos(oficio):
                 "iniciais": _iniciais_nome_servidor(servidor.nome),
                 "cargo": cargo_nome,
                 "funcao": "",
+                "meta": join_non_empty([cargo_nome, unidade_label]),
                 "matricula": "",
                 "rg": rg_m,
                 "cpf": cpf_m,
@@ -616,42 +621,6 @@ def apresentar_pagina_detalhe_oficio(oficio):
         "custeio": oficio.get_custeio_display(),
         "custeio_observacao": oficio.custeio_observacao or "—",
     }
-
-
-def apresentar_opcoes_documentais_oficio(oficio):
-    _ = oficio
-    return [
-        {"label": "DOCX (em breve)", "enabled": False},
-        {"label": "PDF (em breve)", "enabled": False},
-    ]
-
-
-def apresentar_acoes_oficio(
-    *,
-    editar_url: str,
-    excluir_url: str,
-    visualizar_documento_url: str | None = None,
-    visualizar_documento_nova_aba: bool = False,
-    detalhe_url: str | None = None,
-):
-    """`detalhe_url` é aceito mas ignorado (compatibilidade com chamadas antigas)."""
-    actions = []
-    if visualizar_documento_url:
-        actions.append(
-            build_action(
-                "Visualizar documento",
-                visualizar_documento_url,
-                link_target="_blank" if visualizar_documento_nova_aba else None,
-                link_rel="noopener noreferrer" if visualizar_documento_nova_aba else None,
-            )
-        )
-    actions.extend(
-        [
-            build_edit_action(editar_url),
-            build_delete_action(excluir_url),
-        ],
-    )
-    return [a for a in actions if a]
 
 
 def apresentar_oficio_wizard_header(etapa_atual, oficio=None):
@@ -822,20 +791,6 @@ def apresentar_oficio_wizard_summary(oficio):
         "data_criacao_label": oficio.data_criacao.strftime("%d/%m/%Y"),
         "status_label": oficio.get_status_display(),
         "status_state": str(oficio.status or "").lower(),
-    }
-
-
-def apresentar_modelo_motivo_card(modelo):
-    texto = (modelo.texto or "").strip()
-    if len(texto) > 140:
-        texto = f"{texto[:140]}..."
-    return {
-        "id": modelo.pk,
-        "nome": modelo.nome,
-        "is_padrao": modelo.is_padrao,
-        "texto_preview": texto or "—",
-        "editar_url": reverse("oficios:modelo_motivo_editar", args=[modelo.pk]),
-        "excluir_url": reverse("oficios:modelo_motivo_excluir", args=[modelo.pk]),
     }
 
 

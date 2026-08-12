@@ -1,0 +1,1221 @@
+/* Programa + “Outro programa”: lado a lado quando “Outro” está selecionado. */
+#pt-card-programa .pt-programa-fields {
+  align-items: start;
+  display: grid;
+  gap: var(--space-3) var(--space-4);
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+}
+
+#pt-card-programa .pt-programa-fields:has([data-pt-programa-outros-field]:not([hidden])) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#pt-card-programa .pt-programa-fields > * {
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  #pt-card-programa .pt-programa-fields:has([data-pt-programa-outros-field]:not([hidden])) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Cards de eventos do Plano de Trabalho (multi-evento) — etapa 1 e etapa 4. */
+
+.pte-events {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.pte-events__banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md, 10px);
+  background: var(--color-info-soft);
+  border: 1px solid var(--color-info-border);
+  color: var(--color-info-text);
+  font-size: var(--font-size-sm, 0.875rem);
+  line-height: 1.4;
+}
+
+.pte-events__banner-icon,
+.pte-events__banner svg {
+  flex: 0 0 auto;
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.pte-card__actions svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ── Card ───────────────────────────────────────────────────────────────── */
+.pte-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg, 14px);
+  background: var(--color-card);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.pte-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-strong);
+}
+
+.pte-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-muted);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pte-card__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.pte-card__ordem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.pte-card__title {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-heading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pte-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex: 0 0 auto;
+}
+
+.pte-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.pte-card__info {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-4);
+}
+
+.pte-card__field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pte-card__field--full {
+  grid-column: 1 / -1;
+}
+
+.pte-card__label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.pte-card__value {
+  font-size: var(--font-size-sm, 0.875rem);
+  color: var(--color-heading);
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.pte-card__value--muted {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+.pte-card__value--valor {
+  font-size: 1.05rem;
+  font-weight: 700;
+  /* primary-strong é azul-marinho no dark (≈1,3:1); info acompanha o tema. */
+  color: var(--color-info);
+}
+
+.pte-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.pte-card__chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  font-size: 0.72rem;
+  color: var(--color-text);
+}
+
+/* Card destacado quando o evento está sendo editado no rascunho. */
+.pte-card--editing {
+  border-color: var(--color-warning-border);
+  box-shadow: 0 0 0 2px var(--color-warning-soft);
+}
+
+.pte-card__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  background: var(--color-warning-soft);
+  color: var(--color-warning-strong, #b45309);
+}
+
+@media (max-width: 520px) {
+  .pte-card__info { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Resumo do plano (etapa 4) — mistura de "Resumo do ofício" (linhas de cima)
+   com "Roteiro e diárias" (linha de baixo: valor grande + por extenso +
+   atividades). Construído com as variáveis reais do tema (escuro).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.pt-resumo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.pt-resumo-soft {
+  color: var(--color-muted);
+  font-weight: 500;
+}
+
+.pt-resumo-evento {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* Linhas divisórias entre as 3 seções (linha 1 | linha 2 | linha 3),
+   com respiro acima da linha além do gap padrão. */
+.pt-resumo-evento > .pt-resumo-grid--3,
+.pt-resumo-evento > .pt-resumo-grid--2,
+.pt-resumo-evento > .pt-resumo-grid3 {
+  border-top: 1px solid var(--color-border-soft);
+  padding-top: var(--space-5);
+}
+
+/* ── Grades de linhas ──────────────────────────────────────────────────── */
+.pt-resumo-grid {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.pt-resumo-grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.pt-resumo-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.pt-resumo-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* ── Caixa de campo ────────────────────────────────────────────────────── */
+.pt-resumo-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-control, 12px);
+  background: var(--color-card-muted);
+  border: 1px solid var(--color-border-soft);
+  min-width: 0;
+}
+
+.pt-resumo-box__label {
+  color: var(--color-muted);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+
+.pt-resumo-box__label--accent {
+  color: var(--color-accent, #d8a21b);
+}
+
+.pt-resumo-box__value {
+  color: var(--color-heading);
+  font-size: var(--font-size-sm, 0.9rem);
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.pt-resumo-box__value--lg {
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+  font-weight: 800;
+}
+
+/* ── Linha 3: efetivo · valor/diárias · atividades ─────────────────────── */
+.pt-resumo-grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  align-items: stretch;
+}
+
+/* A última linha tem altura máxima fixa; as listas internas rolam. */
+.pt-resumo-grid3 > .pt-resumo-box {
+  max-height: 9rem;
+  overflow: hidden;
+}
+
+/* Valor — herói grande (estilo "Roteiro e diárias") */
+.pt-resumo-valor {
+  gap: var(--space-1);
+  justify-content: center;
+}
+
+.pt-resumo-valor__amount {
+  color: var(--color-heading);
+  font-size: clamp(1.6rem, 2.9vw, 3.1rem);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.04;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: keep-all;
+  margin-bottom: var(--space-2);
+}
+
+/* ── Listas roláveis (Efetivo e Atividades) ────────────────────────────── */
+.pt-resumo-efetivo,
+.pt-resumo-atividades {
+  gap: var(--space-2);
+}
+
+.pt-resumo-list,
+.pt-resumo-atividades__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: var(--space-1);
+}
+
+/* Itens de atividades — destaque dourado */
+.pt-resumo-atividades__item {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-control, 10px);
+  background: color-mix(in srgb, var(--color-accent, #d8a21b) 8%, var(--color-card));
+  border: 1px solid color-mix(in srgb, var(--color-accent, #d8a21b) 45%, transparent);
+  color: var(--color-accent, #d8a21b);
+  font-size: var(--font-size-sm, 0.85rem);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* Itens de efetivo — neutro, com a quantidade em destaque */
+.pt-resumo-list__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-control, 10px);
+  background: var(--color-card);
+  border: 1px solid var(--color-border-soft);
+}
+
+.pt-resumo-list__qty {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-control, 8px);
+  background: color-mix(in srgb, var(--color-accent, #d8a21b) 16%, transparent);
+  color: var(--color-accent, #d8a21b);
+  font-size: var(--font-size-sm, 0.85rem);
+  font-weight: 900;
+}
+
+.pt-resumo-list__text {
+  color: var(--color-heading);
+  font-size: var(--font-size-sm, 0.85rem);
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.pt-resumo-atividades__empty {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm, 0.85rem);
+  font-style: italic;
+}
+
+/* Scrollbar discreta nas listas */
+.pt-resumo-list::-webkit-scrollbar,
+.pt-resumo-atividades__list::-webkit-scrollbar { width: 6px; }
+.pt-resumo-list::-webkit-scrollbar-thumb,
+.pt-resumo-atividades__list::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-accent, #d8a21b) 40%, transparent);
+  border-radius: 999px;
+}
+
+/* ── Responsivo ────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .pt-resumo-grid--4,
+  .pt-resumo-grid--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pt-resumo-grid3 { grid-template-columns: 1fr; }
+  .pt-resumo-valor__amount { white-space: normal; }
+}
+
+@media (max-width: 600px) {
+  .pt-resumo-grid--4,
+  .pt-resumo-grid--3,
+  .pt-resumo-grid--2 { grid-template-columns: 1fr; }
+}
+
+/* Cabeçalho do card de resumo com botões de ação (editar/remover) na etapa 1. */
+.pt-resumo-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.pt-resumo-card-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 0 0 auto;
+}
+
+.pt-resumo-card-actions svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ── Barra "Adicionar evento ao plano" (substitui a seção de eventos) ───── */
+.pt-add-evento__inner {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.pt-add-evento__copy {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.pt-add-evento__copy svg {
+  flex: 0 0 auto;
+  width: 1.4rem;
+  height: 1.4rem;
+  color: var(--color-accent, #d8a21b);
+}
+
+.pt-add-evento__text {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm, 0.875rem);
+  line-height: 1.45;
+}
+
+.pt-add-evento__btn {
+  flex: 0 0 auto;
+}
+
+html[data-theme="dark"] .pt-add-evento__btn {
+  min-height: var(--control-height-md, 44px);
+  padding: 0 18px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--color-accent);
+  background-image: none;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent);
+  color: var(--color-on-accent, #19232d);
+  font-weight: var(--font-weight-bold);
+  text-shadow: none;
+  transform: none;
+}
+
+html[data-theme="dark"] .pt-add-evento__btn:hover {
+  border: 0;
+  background: var(--color-accent-hover);
+  background-image: none;
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--color-accent) 36%, transparent);
+  color: var(--color-on-accent, #19232d);
+  transform: none;
+}
+
+html[data-theme="dark"] .pt-add-evento__btn:focus-visible {
+  border: 0;
+  box-shadow:
+    0 4px 14px color-mix(in srgb, var(--color-accent) 28%, transparent),
+    0 0 0 3px color-mix(in srgb, var(--color-accent) 32%, transparent);
+  outline: none;
+}
+
+@media (max-width: 600px) {
+  .pt-add-evento__inner { grid-template-columns: 1fr; }
+  .pt-add-evento__btn { width: 100%; }
+}
+
+/* Etapa 4 · conferência e documentos */
+.travel-document-wizard__form:has([data-travel-document-wizard-documentos]) {
+  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  --step1-panel: var(--color-surface-soft);
+}
+
+.pt-documentos-stage .oficio-documentos-body {
+  padding: var(--space-4);
+  background: var(--step1-surface);
+}
+
+.pt-document-preview {
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--step1-surface);
+}
+
+.pt-document-preview__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 0;
+  background: var(--step1-panel);
+}
+
+.pt-document-preview__identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.pt-document-preview__icon {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--step1-surface);
+  color: var(--color-accent);
+}
+
+.pt-document-preview__icon svg {
+  width: 1.45rem;
+  height: 1.45rem;
+}
+
+.pt-document-preview__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.pt-document-preview__eyebrow {
+  color: var(--color-accent);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pt-document-preview__title {
+  overflow: hidden;
+  color: var(--color-heading);
+  font-size: 1rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pt-document-preview__hint {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.pt-document-preview__actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--space-2);
+}
+
+.pt-document-preview__actions .icon-btn {
+  border: 0 !important;
+  background: var(--step1-surface) !important;
+  box-shadow: none !important;
+}
+
+.pt-document-preview__body {
+  padding: var(--space-3);
+  border: 0;
+  background: var(--step1-panel);
+}
+
+.pt-documentos-stage .document-inline-viewer {
+  border: 0 !important;
+  border-radius: calc(var(--radius-card) - var(--space-2));
+  background: var(--step1-surface) !important;
+}
+
+.pt-documentos-stage > .form-section-card {
+  border: 0 !important;
+  background: var(--step1-surface) !important;
+  box-shadow: none !important;
+}
+
+.pt-documentos-stage > .form-section-card > .cv-form-section-header {
+  background: var(--step1-surface) !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--form-section-border, var(--color-border)) !important;
+  box-shadow: none !important;
+}
+
+.pt-documentos-stage > .form-section-card > .form-card__footer,
+.pt-documentos-stage > .form-section-card .card-footer,
+.pt-documentos-stage > .form-section-card .card-footer-section {
+  border: 0 !important;
+  background: var(--step1-surface) !important;
+  box-shadow: none !important;
+}
+
+.pt-documentos-stage > .form-section-card .card-footer-section__divider {
+  display: none;
+}
+
+.pt-documentos-stage .document-inline-viewer__frame {
+  height: min(64vh, 650px);
+}
+
+.pt-add-evento {
+  margin: 0;
+  border: 0 !important;
+  background: var(--step1-surface) !important;
+  box-shadow: none !important;
+}
+
+.pt-add-evento > .pt-add-evento__inner {
+  border: 0 !important;
+  background: var(--step1-surface) !important;
+}
+
+@media (max-width: 720px) {
+  .pt-document-preview__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .pt-document-preview__actions {
+    width: 100%;
+  }
+
+  .pt-document-preview__title {
+    white-space: normal;
+  }
+
+  .pt-documentos-stage .document-inline-viewer__frame {
+    height: min(62vh, 500px);
+  }
+}
+
+/* ── Etapa 1 · Período: [datas] | [horário] na mesma linha ──
+   roteiros.css força 1 coluna em .period-fields no step1; esta regra (depois)
+   restaura o --with-extra. Não usamos display:contents no picker — os hiddens
+   e o painel virariam itens da grade e quebrariam o alinhamento. */
+[data-pt-form] .travel-period-block--split .travel-schedule__period-fields.travel-schedule__period-fields--with-extra {
+  align-items: end;
+  display: grid;
+  gap: var(--space-3) var(--space-4);
+  grid-template-columns: minmax(0, 2fr) minmax(11rem, 1fr);
+  width: 100%;
+}
+
+[data-pt-form] .travel-period-block--split .travel-schedule__period-fields--with-extra > .date-picker {
+  min-width: 0;
+  width: 100%;
+}
+
+[data-pt-form] .travel-period-block--split .travel-schedule__period-fields--with-extra > .date-picker > .field-grid.field-grid--cols-2 {
+  display: grid;
+  gap: var(--space-3) var(--space-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+}
+
+[data-pt-form] .travel-period-block--split .travel-schedule__period-fields--with-extra > .pt-periodo-horario {
+  min-width: 0;
+}
+
+[data-pt-form] .travel-period-block--split .travel-schedule__period-fields--with-extra .pt-periodo-horario > .cv-field__label {
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+/* Horário: mesmo panel soft das datas do período (não o poço --step1-field). */
+[data-pt-form] .travel-period-block--split .travel-schedule__period-fields--with-extra .pt-periodo-horario :is(
+  .custom-select__trigger,
+  .custom-select__trigger--v2,
+  .custom-select--open .custom-select__trigger
+) {
+  background: var(--step1-panel, var(--color-surface-soft)) !important;
+  background-color: var(--step1-panel, var(--color-surface-soft)) !important;
+}
+
+@media (max-width: 720px) {
+  [data-pt-form] .travel-period-block--split .travel-schedule__period-fields.travel-schedule__period-fields--with-extra {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.form-subsection.pt-evento-periodo--inline {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-4);
+  align-items: start;
+}
+
+.pt-evento-periodo--inline > .date-picker.pt-evento-periodo__dates,
+.pt-evento-periodo--inline > .date-picker.pt-evento-periodo__dates > .field-grid--cols-2 {
+  display: contents;
+}
+
+@media (max-width: 720px) {
+  .form-subsection.pt-evento-periodo--inline {
+    grid-template-columns: 1fr;
+  }
+
+  /* Empilhado: o picker volta a ser um bloco normal com as duas datas lado a lado. */
+  .pt-evento-periodo--inline > .date-picker.pt-evento-periodo__dates {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .pt-evento-periodo--inline > .date-picker.pt-evento-periodo__dates > .field-grid--cols-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3) var(--space-4);
+  }
+}
+
+/* Três textos do documento: cada um é um form_block--split irmão (sem card-capa). */
+.pt-texto-block.form-block--split {
+  align-items: start;
+}
+
+.pt-texto-block .cv-field__label {
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.pt-texto-block .cv-field__control--textarea {
+  background: var(--step1-panel, var(--color-surface-soft));
+  border-color: transparent;
+  height: 105px;
+  line-height: 1.55;
+  max-height: 280px;
+  min-height: 90px;
+  padding: var(--space-3) var(--space-3);
+  resize: vertical;
+  scrollbar-color: var(--color-border-strong) transparent;
+  scrollbar-width: thin;
+}
+
+html[data-theme="dark"] .pt-texto-block .cv-field__control--textarea {
+  background: var(--step1-panel);
+  background-color: var(--step1-panel);
+}
+
+/* ── Etapa 2 · Deslocamento e diárias ────────────────────────────────────────
+   Linha única com 4 colunas na ordem: data de saída · hora de saída ·
+   data de chegada · hora de chegada. O date-picker (range) embrulha as duas
+   datas num field-grid--cols-2 próprio; achatamos com display:contents (mesmo
+   truque do período do evento na etapa 1) e reordenamos com `order`. */
+.form-subsection.pt-diarias-linha {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-4);
+  align-items: start;
+}
+
+.pt-diarias-linha > .date-picker.pt-diarias-linha__dates,
+.pt-diarias-linha > .date-picker.pt-diarias-linha__dates > .field-grid--cols-2 {
+  display: contents;
+}
+
+.pt-diarias-linha > .date-picker.pt-diarias-linha__dates > .field-grid--cols-2 > .cv-field:first-child { order: 1; }
+.pt-diarias-linha > .field.pt-diarias-hora-saida { order: 2; }
+.pt-diarias-linha > .date-picker.pt-diarias-linha__dates > .field-grid--cols-2 > .cv-field:last-child { order: 3; }
+.pt-diarias-linha > .field.pt-diarias-hora-chegada { order: 4; }
+
+@media (max-width: 840px) {
+  .form-subsection.pt-diarias-linha {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .form-subsection.pt-diarias-linha {
+    grid-template-columns: 1fr;
+  }
+}
+
+#pt-card-diarias .pt-diarias-resultado {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+/* Grade financeira no padrão de Roteiros: cada grupo ocupa um card próprio. */
+#pt-card-diarias .pt-diarias-summary-grid {
+  align-items: stretch;
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+#pt-card-diarias .pt-diarias-summary-secondary-stack {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+#pt-card-diarias .pt-diarias-summary-card {
+  background: var(--color-input-bg);
+  border: 0;
+  border-radius: var(--radius-control-lg);
+  box-shadow: none;
+  gap: var(--space-2);
+  padding: 14px 16px;
+}
+
+#pt-card-diarias .pt-diarias-summary-card--principal {
+  height: auto;
+}
+
+#pt-card-diarias .summary-label {
+  color: var(--color-muted);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+}
+
+#pt-card-diarias .summary-value {
+  color: var(--color-heading);
+  font-size: 1.3rem;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+#pt-card-diarias :is(
+  .summary-value--principal,
+  .pt-diarias-summary-card--unitario [data-pt-resultado-unitario]
+) {
+  font-size: clamp(2rem, 3.2vw, 2.75rem);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+#pt-card-diarias .summary-value--principal + .summary-label {
+  margin-top: var(--space-4);
+}
+
+#pt-card-diarias .pt-diarias-summary-extenso {
+  color: var(--color-heading);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+  #pt-card-diarias .pt-diarias-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #pt-card-diarias .pt-diarias-summary-secondary-stack {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: none;
+  }
+}
+
+@media (max-width: 640px) {
+  #pt-card-diarias .pt-diarias-summary-secondary-stack {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Etapa 2 · Efetivo no padrão Destinos (rail split + linhas com +/−) ─────
+   A linha de destino tem 2 colunas; o efetivo precisa de 3: Unidade · Cargo ·
+   Quantidade. Layout da linha: [+] | campos | [×].
+   Soft panel: Destinos usa --step1-surface (fundido no card); Efetivo irmão de
+   Diárias precisa do mesmo --step1-panel dos travel-document-block. */
+.pt-efetivo-section.route-destinos-block.route-destinos-block--split {
+  background: var(--step1-panel, var(--color-surface-soft));
+  border-radius: 14px;
+  margin: 0;
+  padding: 14px;
+}
+
+.pt-efetivo-section .route-destinos-block__subtitle,
+.pt-efetivo-section .route-destinos-block__description,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-step1]
+  .pt-efetivo-section.route-destinos-block--split
+  .route-destinos-block__subtitle,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-step1]
+  .pt-efetivo-section.route-destinos-block--split
+  .route-destinos-block__description {
+  font-size: var(--font-size-2xs);
+  line-height: 1.4;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-step1]
+  .pt-efetivo-section.route-destinos-block.route-destinos-block--split,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-step1]
+  .pt-efetivo-section.route-destinos-block.route-destinos-block--split:hover {
+  background: var(--step1-panel) !important;
+  background-color: var(--step1-panel) !important;
+  margin: 0 !important;
+}
+
+.pt-efetivo-section.route-destinos-block--split .pt-efetivo-card.destination-row {
+  align-items: start;
+  display: grid;
+  gap: 10px 12px;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+}
+
+/* Sem ×: a 3ª coluna some — [hidden] não gera item, mas o track de 44px ficava vazio. */
+.pt-efetivo-section.route-destinos-block--split .pt-efetivo-card.destination-row--single {
+  grid-template-columns: 44px minmax(0, 1fr);
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-step1]
+  .pt-efetivo-section.route-destinos-block
+  .pt-efetivo-card.destination-row,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-step1]
+  .pt-efetivo-section.route-destinos-block
+  .pt-efetivo-card.destination-row:hover {
+  align-items: start !important;
+  grid-template-columns: 44px minmax(0, 1fr) 44px !important;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-step1]
+  .pt-efetivo-section.route-destinos-block
+  .pt-efetivo-card.destination-row--single,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-step1]
+  .pt-efetivo-section.route-destinos-block
+  .pt-efetivo-card.destination-row--single:hover {
+  align-items: start !important;
+  grid-template-columns: 44px minmax(0, 1fr) !important;
+}
+
+.pt-efetivo-section.route-destinos-block--split .pt-efetivo-card .pt-efetivo-card__body {
+  grid-column: 2;
+  min-width: 0;
+}
+
+.pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .ordered-field-row__badge.sr-only {
+  display: none !important;
+}
+
+/* + e × sobem junto dos rótulos se alinhados ao topo; descem a altura do label+gap. */
+.pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .route-destinos-add,
+.pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .destination-remove-button,
+.pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .ordered-field-row__remove {
+  align-self: start;
+  margin-top: calc(0.78rem * 1.2 + var(--space-2, 0.5rem));
+}
+
+.pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .route-destinos-add {
+  grid-column: 1;
+}
+
+.pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .destination-remove-button,
+.pt-efetivo-section.route-destinos-block--split .pt-efetivo-card > .ordered-field-row__remove {
+  grid-column: 3;
+  justify-self: end;
+}
+
+.ordered-field-row__fields.pt-efetivo-fields {
+  align-items: end;
+  display: grid;
+  gap: 10px 12px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 8rem;
+}
+
+:is(html[data-theme="dark"])
+  :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1])
+  .ordered-field-row__fields.pt-efetivo-fields {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 8rem;
+}
+
+/* Stepper − | valor | + num único “input” visual. */
+.pt-efetivo-fields .pt-quantidade-stepper {
+  align-items: stretch;
+  background: var(--step1-field, var(--color-input-bg, var(--color-surface-muted)));
+  border-radius: 10px;
+  display: grid;
+  gap: 0;
+  grid-template-columns: 2.25rem minmax(2rem, 1fr) 2.25rem;
+  height: 44px;
+  min-width: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+html[data-theme="dark"] .pt-efetivo-fields .pt-quantidade-stepper {
+  background: var(--step1-field) !important;
+}
+
+.pt-efetivo-fields .pt-quantidade-stepper > input {
+  appearance: textfield;
+  -moz-appearance: textfield;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  height: 44px;
+  min-height: 44px;
+  min-width: 0;
+  padding: 0 0.25rem;
+  text-align: center;
+  width: 100%;
+}
+
+.pt-efetivo-fields .pt-quantidade-stepper > input::-webkit-outer-spin-button,
+.pt-efetivo-fields .pt-quantidade-stepper > input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.pt-efetivo-fields .pt-quantidade-stepper__btn {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--color-heading, inherit);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 1rem;
+  font-weight: 700;
+  height: 44px;
+  justify-content: center;
+  line-height: 1;
+  margin: 0;
+  min-width: 2.25rem;
+  padding: 0;
+  width: 100%;
+}
+
+.pt-efetivo-fields .pt-quantidade-stepper__btn:hover,
+.pt-efetivo-fields .pt-quantidade-stepper__btn:focus-visible {
+  background: color-mix(in srgb, var(--color-accent, #d8a21b) 14%, transparent);
+  color: var(--color-accent-text, var(--color-heading));
+  outline: 0;
+}
+
+.pt-efetivo-fields .search-picker__field,
+.pt-efetivo-fields .search-picker__control,
+.pt-efetivo-fields .custom-select__trigger {
+  box-sizing: border-box;
+  height: 44px;
+  min-height: 44px;
+}
+
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-step1]
+  .pt-efetivo-section.route-destinos-block--split
+  .pt-efetivo-card.destination-row,
+:is(html[data-theme="dark"])
+  [data-travel-document-wizard-step1]
+  .pt-efetivo-section.route-destinos-block--split
+  .pt-efetivo-card.destination-row:hover {
+  align-items: start !important;
+}
+
+@media (max-width: 720px) {
+  .pt-efetivo-section.route-destinos-block--split .pt-efetivo-card.destination-row {
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+  }
+
+  .pt-efetivo-section.route-destinos-block--split .pt-efetivo-card.destination-row--single {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+
+  .ordered-field-row__fields.pt-efetivo-fields,
+  :is(html[data-theme="dark"])
+    :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1])
+    .ordered-field-row__fields.pt-efetivo-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Identificação do evento: split título | tipo. */
+.evento-identificacao-block.evento-identificacao-split.form-block--split,
+.evento-identificacao-split.form-block--split {
+  align-items: center;
+  gap: 16px;
+  grid-template-columns: minmax(148px, 0.62fr) minmax(0, 2.1fr);
+}
+
+.evento-identificacao-block.evento-identificacao-split > .form-block__header,
+.evento-identificacao-split > .form-block__header {
+  align-self: center;
+}
+
+.evento-identificacao-block.evento-identificacao-split > .form-block__body,
+.evento-identificacao-split > .form-block__body {
+  align-self: center;
+}
+
+@media (max-width: 720px) {
+  .evento-identificacao-block.evento-identificacao-split.form-block--split,
+  .evento-identificacao-split.form-block--split {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Etapa 4 do evento: documentos de solicitação seguem a lista canônica de
+   registros, com cartões independentes em vez de uma única caixa de upload. */
+:is(html[data-theme="dark"]) .evento-solicitacao-list {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  display: grid;
+  gap: 10px;
+  overflow: visible;
+}
+
+:is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-list__item {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg, 14px);
+  box-shadow: var(--shadow-xs);
+  min-height: 76px;
+  padding: 16px 18px 16px 30px;
+  position: relative;
+}
+
+:is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-list__item::before {
+  background: var(--color-accent);
+  border-radius: 999px;
+  content: "";
+  inset: 14px auto 14px 16px;
+  position: absolute;
+  width: 6px;
+}
+
+:is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-list__item:hover {
+  background: var(--color-surface-soft);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+:is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-list__item:hover::before {
+  background: var(--color-accent-hover);
+}
+
+:is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-list__item + .prestacao-file-list__item {
+  border-top: 1px solid var(--color-border);
+}
+
+:is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-widget__name {
+  color: var(--color-heading);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold, 650);
+  letter-spacing: 0.01em;
+}
+
+:is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-widget__subtitle {
+  color: var(--color-muted);
+  font-size: var(--font-size-xs);
+}
+
+:is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-widget__actions {
+  border-left: 1px solid var(--color-border-soft);
+  padding-left: 14px;
+}
+
+@media (max-width: 640px) {
+  :is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-list__item {
+    padding: 14px 14px 14px 26px;
+  }
+
+  :is(html[data-theme="dark"]) .evento-solicitacao-list .prestacao-file-widget__actions {
+    border-left: 0;
+    border-top: 1px solid var(--color-border-soft);
+    padding-left: 0;
+    padding-top: 12px;
+  }
+}

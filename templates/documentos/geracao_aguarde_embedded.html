@@ -8,16 +8,17 @@
   <script src="{% static 'js/core/theme-init.js' %}"></script>
   <title>Preparando documento</title>
   <link rel="stylesheet" href="{% static 'css/shell.bundle.css' %}">
-  <link rel="stylesheet" href="{% static 'css/components/document-generation-embedded.css' %}">
+  <link rel="stylesheet" href="{% static 'css/pages/document-generation-embedded.css' %}">
 </head>
 <body class="document-generation-embedded">
+  <c-ui.icons._sprite />
   <main
     class="document-generation-embedded__panel"
     data-document-generation-wait
     data-status-url="{{ geracao.status_url }}"
   >
     <span class="document-generation-embedded__icon" aria-hidden="true">
-      {% include "components/ui/icons/icon.html" with icon="document" only %}
+      <c-ui.icons.icon icon="document" only />
     </span>
     <span class="document-generation-embedded__spinner" aria-hidden="true"></span>
     <p class="document-generation-embedded__eyebrow">Documento em preparação</p>
@@ -26,7 +27,7 @@
       Aguarde um instante. O documento será exibido aqui automaticamente.
     </p>
   </main>
-  <script src="{% static 'js/shell.bundle.js' %}" defer></script>
+  <script src="{% static 'js/core/http.js' %}" defer></script>
   <script src="{% static 'js/components/document-generation-wait.js' %}" defer></script>
 </body>
 </html>

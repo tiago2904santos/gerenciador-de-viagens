@@ -7,6 +7,26 @@ JavaScript medido por varredura e leitura dirigida. Nada aqui foi herdado das au
 [`PLANO_MESTRE_REFATORACAO.md`](PLANO_MESTRE_REFATORACAO.md) · **Defeitos:**
 [`CATALOGO_DEFEITOS_2026-08.md`](CATALOGO_DEFEITOS_2026-08.md) (prefixos `UI`, `HT`, `JS`)
 
+> ## ⚠️ Este documento cobre até a F4. A F5 mudou de casa.
+>
+> **As etapas F0 a F4 abaixo estão fechadas** e o texto delas fica como registro do que foi feito
+> e por quê. A **F5 ("reconstrução por domínio"), que aqui está descrita como "a dimensionar",
+> foi dimensionada em 09/08/2026** e virou documento próprio:
+>
+> ### → [`PLANO_RECONSTRUCAO_FRONT_2026-08.md`](PLANO_RECONSTRUCAO_FRONT_2026-08.md)
+>
+> Lá estão as doze etapas da Fase 7 do plano mestre — componentização por `django-cotton`, desenho
+> único entre os temas, duas camadas de token, fronteira de domínio no CSS e entrega do JS —, cada
+> uma com arquivos, comando de verificação e catraca. **A F6 (`JS-03`, runner de teste) também foi
+> para lá**, como etapa E1, porque deixou de ser aditiva: ela é a rede que segura as etapas de
+> componentização.
+>
+> **Os números deste documento são de 05/08 e envelheceram.** A linha de base vigente, remedida em
+> 09/08 com o comando de cada número ao lado, está no §2 do documento novo. Para dar a ordem de
+> grandeza da diferença: a suíte foi de 1.306 para **1.824 testes**, o auditor de front de 392
+> para **240 avisos**, o CSS de 43.038 para **32.940 linhas** — e os imports de CSS de domínio
+> alheio, que este plano registra em 54, **subiram para 97**.
+
 ---
 
 ## 1. O estado real
@@ -29,7 +49,7 @@ junto. São 54 imports cruzados em 26 templates.
 `!important` — o tema não é resolvido por token, é resolvido sobrescrevendo componente por
 componente. Nove arquivos definem `--color-*`.
 
-**O que o CI não vê.** O auditor cobre 5 dos ~9 invariantes do projeto. Fora do alcance dele
+**O que o CI não vê.** O auditor cobre 6 dos ~9 invariantes do projeto. Fora do alcance dele
 ficaram um **XSS real** (`JS-01`), 15 de 18 componentes sem `destroy` no ciclo de vida (`JS-02`) e
 o acoplamento de lógica a nome de classe (`JS-06`) — que é justamente o que decide a ordem deste
 plano.
@@ -56,6 +76,11 @@ roteamento de foco em 6 telas — em silêncio, sem erro no console e sem teste 
 existe teste de JS (`JS-03`). Esta é a dependência que define tudo: **o JS larga o nome de classe,
 depois o CSS pode mexer nos nomes.**
 
+> **F1 concluída em 06/08/2026.** O lado do JavaScript está cortado. Falta o lado do **markup**:
+> três templates escrevem o picker à mão e cinco arquivos JS copiam suas classes para montar o
+> "cartão de rota relacionada" (`NOVO-16`) — a renomeação da F5 ainda quebra esses. Não bloqueia
+> F2 nem F3.
+
 **A poda (F3) vem antes dos tokens (F4).** Não faz sentido reconciliar nove camadas de token sobre
 168 KB de regra morta.
 
@@ -72,12 +97,12 @@ Independentes de tudo; podem entrar junto da fase 0 do plano mestre.
 
 | ID | Defeito | Dias |
 |---|---|---:|
-| `JS-01` 🔴 | XSS: `pasta.name` cru em `aria-label` (`gdrive_config.js:112,117`), enquanto a linha 114 escapa a mesma variável | 0,25 |
+| `JS-01` 🔴 | XSS: `pasta.name` cru em `aria-label` (`gdrive-config.js:112,117`), enquanto a linha 114 escapa a mesma variável | 0,25 |
 | `HT-01` 🔴 | Foco de teclado invisível em `input`/`select`/`textarea` no sistema inteiro, inclusive no login | 1–2 |
-| `JS-04` 🟠 | `.then()` sem `.catch` no editor de roteiros: falha de rede na estimativa de distância não avisa nada (`editor/index.js:790-822`) | 0,5 |
+| `JS-04` ✅ | `.then()` sem `.catch` no editor de roteiros. Medido: a falha de rede **cancelava a fila inteira**, não só o trecho que falhou — 1 requisição em vez de 2, 0 de 2 trechos estimados | 0,5 |
 | `HT-09` ⚪ | Login sem skip link e sem `aria-describedby` no erro de campo | 0,5 |
-| `JS-11` ⚪ | `maskCep` duplicada e `onlyDigits` em 4 cópias | 0,25 |
-| `JS-12` ⚪ | `CV.registry` e `CV.componentRegistry` são o mesmo objeto | 0,25 |
+| `JS-11` ✅ | `maskCep` duplicada e `onlyDigits` em 4 cópias — `masks.js` não tinha saída pública para `onlyDigits`; agora tem, com gate no auditor | 0,25 |
+| `JS-12` ✅ | `CV.componentRegistry` era alias sem nenhum consumidor (enunciado "mesmo objeto" refutado em runtime) | 0,25 |
 
 **Gate:** teste que prova o escape (entrada com `"` e `<script>`); o `JS-04` verificado com a rede
 derrubada; o `HT-01` conferido com navegação por Tab em tema claro e escuro, com print no PR.
@@ -86,9 +111,9 @@ derrubada; o `HT-01` conferido com navegação por Tab em tema claro e escuro, c
 
 | ID | Defeito | Dias |
 |---|---|---:|
-| `JS-06` 🟡 | Trocar `classList.contains("cv-search-picker")` por `data-entity-picker-root` nos 9 arquivos, no mesmo PR | 1 |
-| `JS-05` 🟠 | Estender o auditor de CI: regra para `innerHTML` com interpolação sem `escapeHtml`, e para `registerEnhancer` sem `destroy` | 1,5 |
-| `JS-02` 🟠 | `destroy` nos componentes que registram listener em `document`/`window` — `picker.js`, `cv-date-picker.js` e os demais 13 | 2,5 |
+| `JS-06` ✅ | Trocar `classList.contains("cv-search-picker")` por `data-entity-picker-root` — **7 arquivos, 10 ocorrências** (o "9 arquivos" era do enunciado antigo), mais as **34 consultas de parte** do `NOVO-19` | 1 |
+| `JS-05` ✅ | Estender o auditor de CI: **4 regras** — `innerHTML` sem `escapeHtml`, `registerEnhancer` sem `destroy`, classe CSS como condição de lógica e `catch` vazio. Cobertura 6 → 10 invariantes | 1,5 |
+| `JS-02` ✅ | `destroy` nos componentes que registram listener em `document`/`window` — **14 de 17** sem `destroy`, dos quais **4 vazavam de fato**: `picker.js`, `cv-date-picker.js`, `location-rows.js` e `attach-signed-modal.js` | 2,5 |
 
 `JS-02` entra aqui e não depois porque a poda de CSS vai remover elementos do DOM em massa durante
 a verificação, e é exatamente aí que listener órfão aparece.
@@ -100,8 +125,8 @@ sem `destroy` fora da lista de exceções documentada.
 
 | ID | Defeito | Dias |
 |---|---|---:|
-| `PF-01` 🟠 | Folha de símbolos de ícone: 378 `<svg>` inline = 192 KB por página de lista, vindos de uma cadeia de 222 linhas de `if/elif` | 2–3 |
-| `PF-04` 🟡 | Menu de ação sob demanda: 60 menus renderizados para 20 cards | 2–3 |
+| `PF-01` ✅ | Folha de símbolos de ícone: 378 `<svg>` inline = 192 KB por página de lista, vindos de uma cadeia de 222 linhas de `if/elif` — fechado em 06/08: 450,4 → 315,3 KB, 1.244 → 109 nós de forma; comprimido o ganho é nulo, ver catálogo | 2–3 |
+| `PF-04` ✅ | Menu de ação sob demanda — **fechado em 07/08 nos seis domínios**: Ofícios 315,3 → 166,5 KB, Eventos 416,3 → 211,9, Termos 317,6 → 147,9, Prestações 383,1 → 259,0, Planos 169,5 → 129,0, OS 166,8 → 126,7; `roteiros` não tem menu | 2–3 |
 | `HT-*` | Componentes que faltam e duplicação estrutural — ver §4 | a definir |
 
 Esta etapa **fixa quais classes existem**. É a fronteira: depois dela, o CSS estiliza um conjunto
@@ -114,9 +139,24 @@ conhecido.
 | `UI-01` 🟠 | ~929 classes candidatas em 981 blocos, 168 KB | 4–6 |
 
 **Como fazer, e o que não fazer.** A contagem desta auditoria é o **mapa**, não a licença. O
-`AGENTS.md` §3.6 exige prova de grep por arquivo apagado, colada no PR. Um arquivo por PR, na
-ordem do peso: `oficios.css` (283 blocos, 47 KB), `dev/ui-lab-fields.css`, `dev/ui-lab-pages.css`,
-`page-shell.css`, `roteiros.css`, `cv-buttons.css`.
+`AGENTS.md` §3.6 exige prova de grep por classe apagada, colada no PR.
+
+> **Fechado em 07/08.** A ordem original era um arquivo por PR, na ordem do peso: `oficios.css`
+> (283 blocos, 47 KB), `dev/ui-lab-fields.css`, `dev/ui-lab-pages.css`, `page-shell.css`,
+> `roteiros.css`, `cv-buttons.css`. Os seis saíram, e **a lista estava curta**: ela nomeava os seis
+> maiores, não os seis únicos. Remedindo o `static/css` inteiro sobravam 412 blocos e 71,6 KB em 31
+> arquivos, que saíram em duas levas — por regra, não por arquivo.
+>
+> **A regra de um arquivo por PR morreu no caminho, e a substituta é por família de classe.** Ela
+> quebrava no caso comum: classe estilizada em dois CSS e usada em nenhum template é morta nos dois,
+> e podar só um lado deixa regra órfã do outro. Em `cv-buttons.css`, 16 das 25 classes mortas.
+>
+> **O instrumento de verificação também mudou.** Diff de pixel não servia: rodando o mesmo CSS duas
+> vezes, 25 das 88 telas divergiam. O piso de ruído era maior que o efeito medido. Trocado por
+> `getComputedStyle` — caixa mais 44 propriedades por elemento, determinístico depois de desligar
+> `transition` e `animation`: **0 de 41.938** elementos entre duas capturas do mesmo CSS.
+>
+> A catraca que impede a volta é `scripts/audit_css_morto.py --max 0`, no CI.
 
 **A regra de segurança da poda, corrigida pela verificação de 05/08.** A primeira varredura
 concluiu que existia um único padrão de classe montada em tempo de execução. **Estava errada, e o
@@ -152,27 +192,43 @@ claro e escuro, componente a componente, com print antes/depois no PR.
 **Gate:** `!important` fora do bundle caindo de 497; nenhum token definido em mais de dois
 arquivos; contraste medido (não estimado) nos pares alterados.
 
-### F5 — Reconstrução por domínio · a dimensionar · risco médio
+### F5 — Reconstrução por domínio · **dimensionada em 09/08 → documento próprio**
+
+> **Esta etapa virou [`PLANO_RECONSTRUCAO_FRONT_2026-08.md`](PLANO_RECONSTRUCAO_FRONT_2026-08.md).**
+> Os quatro IDs abaixo continuam válidos e estão distribuídos assim: `UI-04` na etapa E10,
+> `JS-07`/`JS-08`/`JS-09`/`JS-10` na E11. O documento novo acrescenta o que esta tabela não
+> previa — a componentização por `django-cotton` (`NOVO-71`) e o desenho único entre os temas
+> (`NOVO-58`), que são a maior parte do trabalho.
+>
+> A tabela original fica abaixo como registro do dimensionamento de 05/08.
+
 
 | ID | Defeito | Dias |
 |---|---|---:|
-| `UI-04` 🟠 | 54 imports de CSS de outro domínio em 26 templates: extrair os componentes compartilhados dos arquivos de domínio | a definir |
-| `JS-08` 🟡 | 11% do bundle atende menos de 1% das páginas: segundo bundle sob demanda | 2 |
+| `UI-04` 🟠 PARCIAL | E10: `oficios.css` 19 → 13 imports (−44.376 B em seis listas); `roteiros-list.css` removido (−6.919 B/rota); date/file/search/custom-select fora do shell padrão (−59.338 B nas rotas sem eles); Justificativas sem três CSS de domínio (−128.712 B); Termos sem o CSS de Prestações (−23.003 B) e com o `file-picker` canônico. As demais famílias seguem abertas | a definir |
+| `JS-08` ✅ | Cinco componentes sob demanda por marcador DOM; shell global −6,0% | 2 |
 | `JS-09` 🟡 | Tela de espera de documento carrega 264 KB para usar 3,3 KB | 0,5 |
-| `JS-07` 🟡 | "Fechar ao clicar fora / Esc" reimplementado 4 vezes | 2 |
-| `JS-10` 🟡 | Decidir os stubs do editor de roteiros: completar a extração ou removê-los | 0,25 ou 3+ |
+| `JS-07` ✅ | "Fechar ao clicar fora / Esc": 3 implementações vivas consolidadas em `CV.overlay.attachDismiss` | 2 |
+| `JS-10` ✅ | Três stubs sem consumidor do editor de roteiros removidos | 0,25 |
 
 O dimensionamento de `UI-04` depende de F2: quantos componentes precisam sair dos arquivos de
 domínio só se sabe depois de saber quais componentes existem.
 
-**Métrica de aceite da frente inteira:** uso de CSS por rota acima de **35%** (hoje: 10,1% a
-11,8%), medido pelo mesmo script de `PF-02`.
+**Métrica de aceite da frente inteira:** uso de CSS por rota acima de **35%**. A E0 fixou a linha
+de base reproduzível em **11,3369%–19,2908% nas rotas autenticadas** (70,5559% no login), medida
+por `scripts/medir_css_por_rota.py` e guardada em `scripts/tetos_front.json`.
 
-### F6 — Teste de JavaScript · 5+ dias · risco baixo · etapa própria
+### F6 — Teste de JavaScript · **virou a etapa E1 do documento novo**
 
-`JS-03` — não há runner, não há `package.json`, não há um único teste para 17.859 linhas. Entra
-como etapa própria, aditiva, começando pelos módulos mais críticos e mais testáveis:
-`core/http.js`, o registry de `core/app.js`, `masks.js`, `components/collection.js`.
+`JS-03` — não há runner, não há `package.json`, não há um único teste para 17.859 linhas (hoje
+**18.382**). Começa pelos módulos mais críticos e mais testáveis: `core/http.js`, o registry de
+`core/app.js`, `masks.js`, `components/collection.js`.
+
+> **Deixou de ser "etapa própria, aditiva".** O dono aprovou o runner, e a reconstrução o
+> transformou em **pré-requisito**: as etapas de componentização (E4–E6) trocam o motor de
+> renderização de 82 componentes e reescrevem 946 pontos de chamada. Sem teste, a única rede é
+> conferência visual em 43 telas, a cada PR. Por isso ele virou a **E1** — logo depois da régua e
+> antes de qualquer mudança estrutural.
 
 Enquanto isso não existir, **toda etapa deste plano depende de conferência visual** — o que é
 justamente o motivo de F1 vir antes de qualquer renomeação.
@@ -189,15 +245,16 @@ dentro de `{% for %}`). Os defeitos estão concentrados em acessibilidade de for
 | ID | Defeito | Dias | Etapa |
 |---|---|---:|---|
 | `HT-01` 🔴 | **Foco de teclado invisível em todo campo do sistema, inclusive no login** | 1–2 | F0 |
-| `HT-02` 🟠 | Erro de campo sem `aria-describedby`/`aria-invalid`/`role="alert"` — no componente com 152 usos | 2–3 | F2 |
-| `HT-03` 🟠 | Sem padrão único para erro de formulário: o componente correto tem **zero** usos em produção | 2 | F2 |
-| `HT-04` 🟠 | `base.html` carrega ~153 KB de JS e ~37 KB de CSS de domínio em toda página | 2–3 | F5 |
-| `HT-05` 🟡 | `empty_state.html` fixa `<h3>`, quebrando a ordem de headings em 9 das 10 listas | 0,5 | F2 |
+| `HT-02` ✅ 🟠 | Erro de campo sem `aria-describedby`/`aria-invalid`/`role="alert"` — no componente com **154** usos; fechado junto do `HT-12`, que é o mesmo defeito pelo outro lado | 2–3 | F2 |
+| `HT-03` ✅ 🟠 | Sem padrão único para erro de formulário: o componente correto tinha **zero** usos em produção — e **jogava a mensagem fora**; agora são 20 chamadores, com o texto real e foco no resumo | 2 | F2 |
+| `HT-04` 🟡 | Entrega JS fechada: shell 266.254 → 108.937 B; os ~37 KB de CSS seguem na fronteira `UI-04`/E10 | 2–3 | F5 |
+| `HT-05` ✅ 🟡 | `empty_state.html` fixa `<h3>`, quebrando a ordem de headings em **10** das 10 listas | 0,5 | F2 |
 | `HT-06` 🟡 | 10 componentes mortos (6 órfãos diretos, 4 alcançáveis só sob `DEBUG`) | 0,5–1 | F3 |
 | `HT-07` 🟡 | Concatenação condicional com "·" no template, 10 pontos em 8 arquivos, sem parênteses | 1–2 | F5 |
 | `HT-08` 🟡 | 80 `<button>` reimplementados fora do componente, em 10 apps | 3–4 | F5 |
 | `HT-09` ⚪ | Login é HTML autônomo, sem skip link e sem `aria-describedby` no erro | 0,5 | F0 |
 | `HT-10` ⚪ | `data-rg-toggle`/`data-motorista-fixo-toggle` legados ainda emitidos por componente compartilhado | 0,5–1 | F5 |
+| `NOVO-99` ✅ 🔴 | `include ... only` isolava o token CSRF do formulário do editor de roteiro; os três chamadores agora o passam explicitamente | 0,25 | correção imediata |
 
 **`HT-01` sobe para F0** junto com o XSS: é falha WCAG 2.4.7 na primeira tela que qualquer usuário
 encontra, e a correção é aditiva.

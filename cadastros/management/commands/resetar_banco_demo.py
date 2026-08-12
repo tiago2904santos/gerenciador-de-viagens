@@ -19,14 +19,20 @@ from cadastros.models import Combustivel
 from cadastros.models import ConfiguracaoSistema
 from cadastros.models import Estado
 from cadastros.models import Servidor
+from cadastros.models import TabelaDiaria
 from cadastros.models import Unidade
 from cadastros.models import Viatura
 from documentos.models import DocumentoArtefato
+from documentos.models import DocumentoAssinaturaVersao
+from documentos.models import DocumentoGeracao
 from justificativas.models import Justificativa
 from justificativas.models import ModeloJustificativa
 from oficios.models import ModeloMotivoOficio
+from oficios.models import ConfiguracaoNumeracaoOficio
 from oficios.models import Oficio
+from oficios.models import OficioNumeroLacuna
 from ordens_servico.models import OrdemServico
+from ordens_servico.models import OrdemServicoNumeroLacuna
 from planos_trabalho.models import AtividadePlanoTrabalho
 from planos_trabalho.models import EfetivoEvento
 from planos_trabalho.models import EfetivoPlano
@@ -34,6 +40,7 @@ from planos_trabalho.models import EventoPlano
 from planos_trabalho.models import HorarioAtendimento
 from planos_trabalho.models import PlanoDestino
 from planos_trabalho.models import PlanoTrabalho
+from planos_trabalho.models import PresetAtividadesPlanoTrabalho
 from planos_trabalho.models import ProgramaSolicitante
 from planos_trabalho.services import sincronizar_atividades
 from planos_trabalho.services import sincronizar_textos_padrao
@@ -41,6 +48,7 @@ from roteiros.models import Roteiro
 from roteiros.models import RoteiroDestino
 from roteiros.models import RoteiroTrecho
 from termos.models import TermoAutorizacao
+from usuarios.models import AreaTrabalho
 
 
 N = 5
@@ -73,12 +81,13 @@ class Command(BaseCommand):
 
         with transaction.atomic():
             dados = self._seed_cadastros()
-            programas = self._seed_planos_catalogos()
-            modelos_motivo, modelos_justificativa = self._seed_modelos_documentais()
+            programas = self._seed_planos_catalogos(dados["areas"], dados["atividades"])
+            modelos_motivo, modelos_justificativa = self._seed_modelos_documentais(dados["areas"])
             roteiros = self._seed_roteiros(
                 dados["estado_pr"],
                 dados["curitiba"],
                 dados["cidades_destino"],
+                dados["areas"],
             )
             oficios = self._seed_oficios(
                 dados["unidades"],
@@ -96,6 +105,7 @@ class Command(BaseCommand):
                 dados["servidores"],
                 programas,
                 dados["atividades"],
+                dados["areas"],
             )
             self._seed_termos(oficios, dados["estado_pr"], dados["cidades_destino"], dados["servidores"], dados["viaturas"])
             self._seed_ordens_servico(oficios, dados["cidades_destino"], dados["servidores"])
@@ -107,6 +117,13 @@ class Command(BaseCommand):
             self.stdout.write(f"{nome}: {total}")
 
     def _seed_cadastros(self) -> dict:
+        areas = [
+            AreaTrabalho.objects.create(
+                nome=f"Area demonstrativa {i}",
+                sigla=f"DEMO-{i}",
+            )
+            for i in range(1, N + 1)
+        ]
         estados_data = [
             ("PARANA", "PR", 41),
             ("SANTA CATARINA", "SC", 42),
@@ -167,7 +184,10 @@ class Command(BaseCommand):
             ("DIVISAO DE APOIO ADMINISTRATIVO", "DAA"),
             ("COORDENACAO DE PROGRAMAS ITINERANTES", "CPI"),
         ]
-        unidades = [Unidade.objects.create(nome=nome, sigla=sigla) for nome, sigla in unidades_data]
+        unidades = [
+            Unidade.objects.create(area=areas[i], nome=nome, sigla=sigla)
+            for i, (nome, sigla) in enumerate(unidades_data)
+        ]
 
         cargos_data = [
             "DELEGADO DE POLICIA",
@@ -176,11 +196,14 @@ class Command(BaseCommand):
             "PAPILOSCOPISTA POLICIAL",
             "AGENTE ADMINISTRATIVO",
         ]
-        cargos = [Cargo.objects.create(nome=nome, is_padrao=(i == 0)) for i, nome in enumerate(cargos_data)]
+        cargos = [
+            Cargo.objects.create(area=areas[i], nome=nome, is_padrao=(i == 0))
+            for i, nome in enumerate(cargos_data)
+        ]
 
         combustiveis_data = ["GASOLINA", "ETANOL", "FLEX", "DIESEL S10", "HIBRIDO"]
         combustiveis = [
-            Combustivel.objects.create(nome=nome, is_padrao=(i == 2))
+            Combustivel.objects.create(area=areas[i], nome=nome, is_padrao=(i == 2))
             for i, nome in enumerate(combustiveis_data)
         ]
 
@@ -195,6 +218,7 @@ class Command(BaseCommand):
         for i, (nome, cpf, rg, telefone) in enumerate(servidores_data):
             servidores.append(
                 Servidor.objects.create(
+                    area=areas[i],
                     nome=nome,
                     cargo=cargos[i],
                     cpf=cpf,
@@ -205,18 +229,19 @@ class Command(BaseCommand):
             )
 
         viaturas_data = [
-            ("BCD1E23", "TOYOTA COROLLA XEI", combustiveis[2], Viatura.TIPO_DESCARACTERIZADA),
-            ("FGH2J45", "CHEVROLET TRAILBLAZER LTZ", combustiveis[3], Viatura.TIPO_CARACTERIZADA),
-            ("JKL3M67", "RENAULT DUSTER INTENSE", combustiveis[2], Viatura.TIPO_CARACTERIZADA),
-            ("NPQ4R89", "FIAT TORO FREEDOM", combustiveis[3], Viatura.TIPO_DESCARACTERIZADA),
-            ("STU5V01", "VOLKSWAGEN AMAROK HIGHLINE", combustiveis[3], Viatura.TIPO_CARACTERIZADA),
+            ("BCD1E23", "TOYOTA COROLLA XEI", Viatura.TIPO_DESCARACTERIZADA),
+            ("FGH2J45", "CHEVROLET TRAILBLAZER LTZ", Viatura.TIPO_CARACTERIZADA),
+            ("JKL3M67", "RENAULT DUSTER INTENSE", Viatura.TIPO_CARACTERIZADA),
+            ("NPQ4R89", "FIAT TORO FREEDOM", Viatura.TIPO_DESCARACTERIZADA),
+            ("STU5V01", "VOLKSWAGEN AMAROK HIGHLINE", Viatura.TIPO_CARACTERIZADA),
         ]
         viaturas = []
-        for i, (placa, modelo, combustivel, tipo) in enumerate(viaturas_data):
+        for i, (placa, modelo, tipo) in enumerate(viaturas_data):
             viatura = Viatura.objects.create(
+                area=areas[i],
                 placa=placa,
                 modelo=modelo,
-                combustivel=combustivel,
+                combustivel=combustiveis[i],
                 tipo=tipo,
                 unidade=unidades[i],
             )
@@ -225,10 +250,7 @@ class Command(BaseCommand):
 
         configs = []
         for i in range(N):
-            if i == 0:
-                cfg = ConfiguracaoSistema.get_singleton()
-            else:
-                cfg = ConfiguracaoSistema()
+            cfg = ConfiguracaoSistema(area=areas[i])
             cfg.cidade_sede_padrao = cidades[0]
             cfg.nome_orgao = "POLICIA CIVIL DO PARANA"
             cfg.sigla_orgao = "PCPR"
@@ -266,9 +288,23 @@ class Command(BaseCommand):
                 ativo=True,
             )
 
-        atividades = self._seed_atividades()
+        atividades = self._seed_atividades(areas)
+        faixas_diaria = [
+            TabelaDiaria.FAIXA_INTERIOR,
+            TabelaDiaria.FAIXA_CAPITAL,
+            TabelaDiaria.FAIXA_BRASILIA,
+            TabelaDiaria.FAIXA_INTERIOR,
+            TabelaDiaria.FAIXA_CAPITAL,
+        ]
+        for i, faixa in enumerate(faixas_diaria):
+            TabelaDiaria.objects.create(
+                faixa=faixa,
+                vigencia_inicio=timezone.localdate() - timedelta(days=365 * (i + 1)),
+                valor_24h=Decimal(str(320 + i * 35)),
+            )
 
         return {
+            "areas": areas,
             "estado_pr": estado_pr,
             "estados": estados,
             "curitiba": cidades[0],
@@ -280,7 +316,7 @@ class Command(BaseCommand):
             "atividades": atividades,
         }
 
-    def _seed_atividades(self) -> list[AtividadePlanoTrabalho]:
+    def _seed_atividades(self, areas: list[AreaTrabalho]) -> list[AtividadePlanoTrabalho]:
         atividades_data = [
             (
                 "CIN",
@@ -317,6 +353,7 @@ class Command(BaseCommand):
         for i, (codigo, nome, meta, recurso) in enumerate(atividades_data, start=1):
             atividades.append(
                 AtividadePlanoTrabalho.objects.create(
+                    area=areas[i - 1],
                     codigo=codigo,
                     nome=nome,
                     meta=meta,
@@ -327,7 +364,11 @@ class Command(BaseCommand):
             )
         return atividades
 
-    def _seed_planos_catalogos(self) -> list[ProgramaSolicitante]:
+    def _seed_planos_catalogos(
+        self,
+        areas: list[AreaTrabalho],
+        atividades: list[AtividadePlanoTrabalho],
+    ) -> list[ProgramaSolicitante]:
         programas_data = [
             "PCPR NA COMUNIDADE",
             "PROGRAMA PARANA EM ACAO",
@@ -336,7 +377,7 @@ class Command(BaseCommand):
             "ESCOLA SEGURA",
         ]
         programas = [
-            ProgramaSolicitante.objects.create(nome=nome, ordem=i * 10, ativo=True)
+            ProgramaSolicitante.objects.create(area=areas[i - 1], nome=nome, ordem=i * 10, ativo=True)
             for i, nome in enumerate(programas_data, start=1)
         ]
 
@@ -348,11 +389,25 @@ class Command(BaseCommand):
             "08:30 ate 16:30",
         ]
         for i, faixa in enumerate(horarios_data, start=1):
-            HorarioAtendimento.objects.create(faixa=faixa, ordem=i * 10, ativo=True)
+            HorarioAtendimento.objects.create(area=areas[i - 1], faixa=faixa, ordem=i * 10, ativo=True)
+
+        for i in range(N):
+            preset = PresetAtividadesPlanoTrabalho.objects.create(
+                area=areas[i],
+                nome=f"Atividades demonstrativas {i + 1}",
+                descricao="Selecao demonstrativa para validacao das telas do plano de trabalho.",
+                ordem=(i + 1) * 10,
+                ativo=True,
+                is_padrao=True,
+            )
+            preset.atividades.add(atividades[i])
 
         return programas
 
-    def _seed_modelos_documentais(self) -> tuple[list[ModeloMotivoOficio], list[ModeloJustificativa]]:
+    def _seed_modelos_documentais(
+        self,
+        areas: list[AreaTrabalho],
+    ) -> tuple[list[ModeloMotivoOficio], list[ModeloJustificativa]]:
         motivos_data = [
             ("AUTORIZACAO PARA DESLOCAMENTO", "Solicita-se autorizacao para deslocamento de equipe em acao institucional."),
             ("APOIO OPERACIONAL EM EVENTO", "Solicita-se apoio operacional para atendimento descentralizado ao cidadao."),
@@ -362,6 +417,7 @@ class Command(BaseCommand):
         ]
         motivos = [
             ModeloMotivoOficio.objects.create(
+                area=areas[i - 1],
                 nome=nome,
                 texto=texto,
                 ativo=True,
@@ -380,6 +436,7 @@ class Command(BaseCommand):
         ]
         justificativas = [
             ModeloJustificativa.objects.create(
+                area=areas[i - 1],
                 nome=nome,
                 texto=texto,
                 ativo=True,
@@ -395,6 +452,7 @@ class Command(BaseCommand):
         estado_pr: Estado,
         curitiba: Cidade,
         destinos: list[Cidade],
+        areas: list[AreaTrabalho],
     ) -> list[Roteiro]:
         base_saida = timezone.now().replace(hour=7, minute=30, second=0, microsecond=0) + timedelta(days=14)
         distancias = [Decimal("381.20"), Decimal("425.80"), Decimal("491.40"), Decimal("256.70"), Decimal("162.30")]
@@ -407,6 +465,7 @@ class Command(BaseCommand):
             retorno_saida = chegada + timedelta(days=1, hours=6)
             retorno_chegada = retorno_saida + timedelta(minutes=duracoes[i])
             roteiro = Roteiro.objects.create(
+                area=areas[i],
                 tipo=Roteiro.TIPO_AVULSO,
                 status=Roteiro.STATUS_FINALIZADO,
                 origem_estado=estado_pr,
@@ -463,7 +522,18 @@ class Command(BaseCommand):
         ]
         oficios = []
         for i in range(N):
+            ConfiguracaoNumeracaoOficio.objects.create(
+                area=roteiros[i].area,
+                ano=ano,
+                numero_inicial=1,
+            )
+            OficioNumeroLacuna.objects.create(
+                area=roteiros[i].area,
+                ano=ano,
+                numero=100 + i,
+            )
             oficio = Oficio.objects.create(
+                area=roteiros[i].area,
                 numero=i + 1,
                 ano=ano,
                 data_criacao=timezone.localdate() - timedelta(days=5 - i),
@@ -479,7 +549,7 @@ class Command(BaseCommand):
                 motorista_modo=Oficio.MOTORISTA_MODO_SERVIDOR,
                 porte_transporte_armas=(i % 2 == 0),
             )
-            oficio.servidores.add(servidores[i], servidores[(i + 1) % 5])
+            oficio.servidores.add(servidores[i])
             oficio.servidores_termo_autorizacao.add(servidores[i])
             Justificativa.objects.create(
                 oficio=oficio,
@@ -503,6 +573,7 @@ class Command(BaseCommand):
         servidores: list[Servidor],
         programas: list[ProgramaSolicitante],
         atividades: list[AtividadePlanoTrabalho],
+        areas: list[AreaTrabalho],
     ) -> list[PlanoTrabalho]:
         ano = timezone.localdate().year
         planos = []
@@ -510,6 +581,7 @@ class Command(BaseCommand):
             destino = destinos[i % len(destinos)]
             data_evento = timezone.localdate() + timedelta(days=21 + i * 4)
             plano = PlanoTrabalho.objects.create(
+                area=areas[i],
                 numero=i + 1,
                 ano=ano,
                 sufixo_numero="ASCOM",
@@ -521,8 +593,8 @@ class Command(BaseCommand):
                 data_evento_inicio=data_evento,
                 data_evento_fim=data_evento + timedelta(days=1),
                 horario_atendimento="09:00 ate 17:00",
-                coordenador_adm=servidores[0],
-                coordenador_op=servidores[(i + 1) % 5],
+                coordenador_adm=servidores[i],
+                coordenador_op=servidores[i],
                 saida_sede_data=data_evento - timedelta(days=1),
                 saida_sede_hora=time(8, 0),
                 chegada_sede_data=data_evento + timedelta(days=1),
@@ -535,10 +607,10 @@ class Command(BaseCommand):
             EfetivoPlano.objects.create(
                 plano=plano,
                 unidade=unidades[i],
-                cargo=cargos[1],
+                cargo=cargos[i],
                 quantidade=2 + (i % 2),
             )
-            selecionadas = [atividades[i], atividades[(i + 1) % 5], atividades[-1]]
+            selecionadas = [atividades[i]]
             plano.atividades_selecionadas.set(selecionadas)
 
             evento = EventoPlano.objects.create(
@@ -548,7 +620,7 @@ class Command(BaseCommand):
                 data_evento_inicio=data_evento,
                 data_evento_fim=data_evento + timedelta(days=1),
                 horario_atendimento="09:00 ate 17:00",
-                coordenador_op=servidores[(i + 1) % 5],
+                coordenador_op=servidores[i],
                 metas="Metas do evento demonstrativo.",
                 atividades_texto="Atividades previstas no atendimento itinerante.",
                 recursos_necessarios="Equipe, unidade movel e equipamentos de atendimento.",
@@ -561,7 +633,7 @@ class Command(BaseCommand):
             EfetivoEvento.objects.create(
                 evento=evento,
                 unidade=unidades[i],
-                cargo=cargos[3],
+                cargo=cargos[i],
                 quantidade=1,
             )
             sincronizar_atividades(plano)
@@ -594,7 +666,7 @@ class Command(BaseCommand):
                 data_evento_fim=timezone.localdate() + timedelta(days=15 + i),
                 viatura=viaturas[i],
             )
-            termo.servidores.add(servidores[i], servidores[(i + 1) % N])
+            termo.servidores.add(servidores[i])
 
     def _seed_ordens_servico(
         self,
@@ -604,13 +676,22 @@ class Command(BaseCommand):
     ) -> None:
         for i in range(N):
             ordem = OrdemServico.objects.create(
+                area=oficios[i].area,
                 data_evento_inicio=timezone.localdate() + timedelta(days=16 + i),
                 data_evento_fim=timezone.localdate() + timedelta(days=17 + i),
                 motivo=f"Designacao de equipe para atendimento institucional demo {i + 1}.",
             )
             ordem.oficios.add(oficios[i])
             ordem.destinos.add(destinos[i % len(destinos)])
-            ordem.servidores.add(servidores[i], servidores[(i + 2) % N])
+            ordem.servidores.add(servidores[i])
+            # Assim como `OficioNumeroLacuna`, a tabela operacional de numeração
+            # participa do contrato de cinco linhas do banco demo. A linha nasce
+            # depois da OS para não ser consumida pela própria reserva automática.
+            OrdemServicoNumeroLacuna.objects.create(
+                area=oficios[i].area,
+                ano=timezone.localdate().year,
+                numero=100 + i,
+            )
 
     def _seed_documentos(
         self,
@@ -644,6 +725,27 @@ class Command(BaseCommand):
             )
             artefato.arquivo.save(f"demo_documento_{i + 1:02d}.{formatos[i]}", ContentFile(conteudo), save=False)
             artefato.save()
+            DocumentoGeracao.objects.create(
+                area=oficios[i].area,
+                tipo=tipos[i],
+                parametros={"demo": True, "referencia": i + 1},
+                status=DocumentoGeracao.STATUS_CONCLUIDO,
+                nome_arquivo=f"demo_documento_{i + 1:02d}.{formatos[i]}",
+                content_type="application/octet-stream",
+                hash_sha256=digest,
+                concluido_em=timezone.now(),
+            )
+            versao = DocumentoAssinaturaVersao(
+                artefato=artefato,
+                hash_sha256=digest,
+                nome_original=f"demo_documento_assinado_{i + 1:02d}.{formatos[i]}",
+            )
+            versao.arquivo.save(
+                f"demo_documento_assinado_{i + 1:02d}.{formatos[i]}",
+                ContentFile(conteudo),
+                save=False,
+            )
+            versao.save()
 
     def _assert_domain_counts(self) -> list[tuple[str, int]]:
         resumo = []

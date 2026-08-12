@@ -13,7 +13,7 @@
         <dd>
           <span>{{ motorista_resumo.origem }}</span>
           {% if motorista_resumo.alterado %}
-            {% include "components/ui/badges/chip.html" with label="Alterado" tone="warning" size="compact" only %}
+            <c-ui.badges.chip label="Alterado" tone="warning" size="compact" only />
           {% endif %}
         </dd>
       </div>

@@ -3,6 +3,8 @@ import uuid
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from core.managers import AreaScopedManager
+
 
 class DocumentoArtefato(models.Model):
     """
@@ -13,7 +15,7 @@ class DocumentoArtefato(models.Model):
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
         on_delete=models.PROTECT,
-        null=True,
+        null=False,
         blank=True,
         related_name="documentos_artefatos",
         verbose_name="Area de trabalho",
@@ -76,7 +78,14 @@ class DocumentoArtefato(models.Model):
     )
     criado_em = models.DateTimeField(auto_now_add=True)
 
+    # `BE-09`: `objects` recorta pela área ativa; `all_objects` é a saída explícita
+    # para código que precisa enxergar todas. `default_manager_name` mantém o admin,
+    # as relações reversas e `validate_unique` irrestritos — ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["-criado_em"]
         verbose_name = "Artefato documental"
         verbose_name_plural = "Artefatos documentais"
@@ -166,7 +175,12 @@ class DocumentoGeracao(models.Model):
     iniciado_em = models.DateTimeField(null=True, blank=True)
     concluido_em = models.DateTimeField(null=True, blank=True, db_index=True)
 
+    # `BE-09`: ver `core/managers.py`.
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
     class Meta:
+        default_manager_name = "all_objects"
         ordering = ["-criado_em"]
         verbose_name = "Geração documental"
         verbose_name_plural = "Gerações documentais"

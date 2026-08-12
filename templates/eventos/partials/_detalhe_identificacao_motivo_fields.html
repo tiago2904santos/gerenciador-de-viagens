@@ -1,2 +1,2 @@
-{% include "components/ui/forms/field.html" with field=form.modelo_motivo action_url=modelos_motivo_url action_label="Gerenciar modelos" size_class="field-size-4" only %}
-{% include "components/ui/forms/field.html" with field=form.motivo size_class="field-size-4" only %}
+<c-ui.forms.field :field="form.modelo_motivo" :action_url="modelos_motivo_url" action_label="Gerenciar modelos" size_class="field-size-4" only />
+<c-ui.forms.field :field="form.motivo" size_class="field-size-4" only />

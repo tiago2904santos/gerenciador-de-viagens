@@ -1,4 +1,6 @@
-from decimal import Decimal, InvalidOperation
+import json
+from copy import deepcopy
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
 from django.urls import reverse
 from django.utils import timezone
@@ -9,8 +11,13 @@ from core.presenters.actions import build_edit_action
 from core.presenters.actions import build_open_action
 from core.presenters.meta import build_meta
 from .models import Roteiro
-from .services import montar_contexto_editor_roteiro
+from .services.editor_state_builder import _build_roteiro_state_from_estrutura
+from .services.editor_state_builder import _calculate_avulso_diarias_from_state
+from .services.editor_state_builder import _get_parana_estado
+from .services.editor_state_builder import _serialize_roteiro_state
+from .services.diarias import formatar_valor_diarias
 from .services.diarias import infer_tipo_destino_from_paradas
+from .services.map_defaults import build_roteiro_map_defaults
 from .services.valor_extenso import valor_por_extenso_ptbr
 
 
@@ -78,7 +85,7 @@ def _trechos_visiveis(trechos_payload):
     }
 
 
-def _inferir_tipo_destino(destinos):
+def _inferir_tipo_destino(destinos, capitais=None):
     paradas = []
     for destino in destinos:
         cidade = getattr(destino, "cidade", None)
@@ -87,7 +94,7 @@ def _inferir_tipo_destino(destinos):
         uf = getattr(estado, "sigla", None) or getattr(cidade, "uf", None)
         if cidade_nome or uf:
             paradas.append((cidade_nome, uf))
-    return infer_tipo_destino_from_paradas(paradas) if paradas else ""
+    return infer_tipo_destino_from_paradas(paradas, capitais) if paradas else ""
 
 
 def _roteiro_inicio_fim(roteiro):
@@ -146,25 +153,7 @@ def _temporal_badge_roteiro(roteiro):
     return f"há {dias} dias", "success"
 
 
-def _roteiro_faixa_lateral_class(roteiro):
-    now = timezone.now()
-    inicio, fim = _roteiro_inicio_fim(roteiro)
-
-    status_code = getattr(roteiro, "status", "") or ""
-    if status_code == Roteiro.STATUS_RASCUNHO:
-        if inicio and now >= inicio:
-            return "roteiro-list-card--faixa-rascunho-atrasado"
-        return "roteiro-list-card--faixa-rascunho-futuro"
-
-    if status_code == Roteiro.STATUS_FINALIZADO:
-        if fim and now >= fim:
-            return "roteiro-list-card--faixa-finalizado-concluido"
-        return "roteiro-list-card--faixa-finalizado-antecipado"
-
-    return "roteiro-list-card--faixa-neutro"
-
-
-def apresentar_roteiro_card(roteiro, *, todos_trechos=False):
+def apresentar_roteiro_card(roteiro, *, todos_trechos=False, capitais=None):
     origem_txt = _label_cidade_uf(roteiro.origem_cidade, roteiro.origem_estado)
     destinos_todos = list(roteiro.destinos.all()) if roteiro.pk else []
     destinos_txt_list = [
@@ -227,7 +216,7 @@ def apresentar_roteiro_card(roteiro, *, todos_trechos=False):
     fim_display = _format_roteiro_dt(fim_dt)
     header_items = [
         entity_cards.header_item(
-            "Roteiro", titulo_rota, wide=True, value_class="cv-record-card__info-value--rota"
+            "Roteiro", titulo_rota, wide=True, value_class="record-card__info-value--rota"
         )
     ]
     header_chips = [entity_cards.chip(temporal_tone, temporal_label)] if temporal_label else []
@@ -258,12 +247,11 @@ def apresentar_roteiro_card(roteiro, *, todos_trechos=False):
         "status_chip_label": status,
         "status_chip_class": status_chip_class,
         "status_variant": status_variant,
-        "faixa_lateral_class": _roteiro_faixa_lateral_class(roteiro),
         "diaria_moeda": diaria_moeda,
         "diaria_resumo": diaria_resumo,
         "diaria_extenso": diaria_extenso,
         "diaria_composicao_linhas": diaria_composicao_linhas,
-        "diaria_tipo_destino": _inferir_tipo_destino(destinos_todos),
+        "diaria_tipo_destino": _inferir_tipo_destino(destinos_todos, capitais),
         "diaria_vazio": diaria_vazio,
         "trechos": trechos_visiveis,
         "trechos_count": trechos_count,
@@ -320,3 +308,263 @@ def apresentar_contexto_formulario_roteiro_avulso(
         roteiro_state=roteiro_state,
         route_options=route_options,
     )
+
+
+def apresentar_pagina_editor_roteiro(
+    *,
+    contexto_editor,
+    titulo,
+    descricao,
+    back_url,
+    back_label,
+    form_action,
+    roteiro=None,
+):
+    """`BE-11`: o invólucro de página do editor, que `novo` e `editar` escreviam igual.
+
+    `back_url` alimenta as duas chaves de voltar — nas duas views a expressão já era a
+    mesma, escrita duas vezes. `delete_url` só aparece quando há `roteiro`: numa página
+    de criação não há o que excluir, e a chave não pode surgir vazia (o template testa
+    presença, não valor).
+    """
+    contexto = {
+        "page_title": titulo,
+        "page_description": descricao,
+        "back_url": back_url,
+        "wizard_header": {
+            "title": titulo,
+            "description": "Roteiro e diárias",
+            "status_label": (
+                roteiro.get_status_display() if hasattr(roteiro, "get_status_display") else ""
+            ),
+            "status_variant": _variante_de_status_do_roteiro(roteiro),
+        },
+        "wizard_back_label": back_label,
+        "wizard_back_url": back_url,
+        "wizard_page_steps": [],
+        "roteiro_editor_oficio": True,
+        "roteiro_form_action": form_action,
+    }
+    if roteiro is not None:
+        contexto["delete_url"] = reverse("roteiros:excluir", args=[roteiro.pk])
+    contexto.update(contexto_editor)
+    return contexto
+
+
+def _variante_de_status_do_roteiro(roteiro):
+    if roteiro is None:
+        return ""
+    return "draft" if roteiro.status == Roteiro.STATUS_RASCUNHO else "active"
+
+
+# ---------------------------------------------------------------------------
+# `BE-13` fatia 2 — o contexto do editor de roteiro.
+#
+# Estas três funções vieram de `roteiros/services/editor_state_builder.py`, onde eram privadas e
+# conviviam com parsing e persistência. Montar o dict que o template consome é
+# trabalho de presenter (`docs/PADRAO_APP.md:10`), e é só isso que elas fazem.
+#
+# `montar_contexto_editor_roteiro` veio junto, de `services/roteiro_editor.py`:
+# deixá-la lá faria um service importar um presenter, que é a violação de camada
+# que o `BE-13` existe para corrigir.
+#
+# As quatro funções `_`-privadas que continuam em `editor_state_builder` são importadas
+# pelo nome privado — feio, e é o que `roteiro_editor.py` e `route_point_builder.py`
+# já faziam antes desta fatia. O contrato público de cada grupo é a fatia 3.
+# ---------------------------------------------------------------------------
+
+
+def montar_contexto_editor_roteiro(
+    *,
+    evento,
+    form,
+    obj,
+    destinos_atuais,
+    trechos_list,
+    is_avulso,
+    roteiro_state,
+    route_options,
+    diarias_quantidade_servidores=1,
+):
+    """Contexto do editor de roteiro para o template (dict; sem HTML)."""
+    return _build_roteiro_form_context(
+        evento=evento,
+        form=form,
+        obj=obj,
+        destinos_atuais=destinos_atuais,
+        trechos_list=trechos_list,
+        is_avulso=is_avulso,
+        roteiro_state=roteiro_state,
+        route_options=route_options,
+        diarias_quantidade_servidores=diarias_quantidade_servidores,
+    )
+
+
+def _trechos_list_json_compat(trechos_list):
+    """Serializa trechos para trechos_json (string) e para json_script no template."""
+    rows = []
+    for row in trechos_list or []:
+        item = {}
+        for k, v in row.items():
+            if v is None:
+                item[k] = None
+            elif hasattr(v, 'isoformat'):
+                item[k] = v.isoformat()
+            elif isinstance(v, Decimal):
+                item[k] = float(v)
+            else:
+                item[k] = v
+        rows.append(item)
+    return rows, json.dumps(rows)
+
+def _build_roteiro_diarias_fallback(roteiro, *, quantidade_servidores: int = 1):
+    if not roteiro:
+        return None
+    if roteiro.valor_diarias is None and not roteiro.quantidade_diarias and not roteiro.valor_diarias_extenso:
+        return None
+    total_valor_decimal = roteiro.valor_diarias
+    if total_valor_decimal is None:
+        return None
+    total_valor = formatar_valor_diarias(total_valor_decimal)
+    qs = max(0, int(quantidade_servidores or 0))
+    if qs == 0:
+        valor_por_servidor_decimal = Decimal('0.00')
+        valor_por_servidor_txt = formatar_valor_diarias(valor_por_servidor_decimal)
+    elif qs == 1:
+        valor_por_servidor_decimal = total_valor_decimal
+        valor_por_servidor_txt = total_valor
+    else:
+        valor_por_servidor_decimal = (
+            total_valor_decimal / Decimal(qs)
+        ).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        valor_por_servidor_txt = formatar_valor_diarias(valor_por_servidor_decimal)
+    return {
+        'periodos': [],
+        'totais': {
+            'total_diarias': roteiro.quantidade_diarias or '',
+            'total_horas': '',
+            'total_valor': total_valor,
+            'total_valor_decimal': total_valor_decimal,
+            'valor_extenso': roteiro.valor_diarias_extenso or '',
+            'quantidade_servidores': qs,
+            'diarias_por_servidor': roteiro.quantidade_diarias or '',
+            'valor_por_servidor': valor_por_servidor_txt,
+            'valor_por_servidor_decimal': valor_por_servidor_decimal,
+            'valor_unitario_referencia': '',
+        },
+        'tipo_destino': '',
+    }
+
+def _build_roteiro_form_context(
+    *,
+    evento,
+    form,
+    obj,
+    destinos_atuais,
+    trechos_list,
+    is_avulso=False,
+    roteiro_state=None,
+    route_options=None,
+    seed_source_label='',
+    diarias_quantidade_servidores=1,
+):
+    """
+    Monta contexto completo para o formulário de roteiro (guiado e avulso).
+    Quando roteiro_state é fornecido, usa diretamente; caso contrário, constrói
+    a partir de trechos_list + destinos_atuais (compatibilidade com forms guiados).
+    """
+    if roteiro_state is None:
+        instance = obj or form.instance
+        sede_estado_id = getattr(instance, 'origem_estado_id', None)
+        sede_cidade_id = getattr(instance, 'origem_cidade_id', None)
+        roteiro_state = _build_roteiro_state_from_estrutura(
+            trechos_list,
+            [{'estado_id': d.get('estado_id'), 'cidade_id': d.get('cidade_id')} for d in (destinos_atuais or [])],
+            sede_estado_id,
+            sede_cidade_id,
+            seed_source_label,
+        )
+        roteiro_state['roteiro_modo'] = 'ROTEIRO_PROPRIO'
+
+    from roteiros import selectors
+
+    sede_estado_id = roteiro_state.get("sede_estado_id")
+    sede_cidade_id = roteiro_state.get("sede_cidade_id")
+    estados_qs = selectors.listar_estados_para_select()
+    sede_cidades_qs = selectors.listar_cidades_para_select(estado_id=sede_estado_id)
+    qs_ctx = max(0, int(diarias_quantidade_servidores or 0))
+    diarias_resultado = None
+    try:
+        diarias_resultado = _calculate_avulso_diarias_from_state(
+            roteiro_state,
+            quantidade_servidores=qs_ctx,
+        )
+    except ValueError:
+        diarias_resultado = _build_roteiro_diarias_fallback(
+            obj or form.instance,
+            quantidade_servidores=qs_ctx,
+        )
+    if diarias_resultado is None:
+        diarias_resultado = _build_roteiro_diarias_fallback(
+            obj or form.instance,
+            quantidade_servidores=qs_ctx,
+        )
+    destino_estado_fixo = _get_parana_estado()
+    rows_src = list(trechos_list or [])
+    if not rows_src:
+        ts = (roteiro_state or {}).get('trechos') or []
+        if ts:
+            rows_src = list(ts)
+    initial_trechos_data, trechos_json = _trechos_list_json_compat(rows_src)
+    serialized_roteiro_state = _serialize_roteiro_state(roteiro_state)
+    route_options_json = route_options or []
+    if is_avulso:
+        serialized_roteiro_state.pop('roteiro_evento_id', None)
+        route_options_json = deepcopy(route_options_json)
+        for route_option in route_options_json:
+            state = route_option.get('state') or {}
+            state.pop('roteiro_evento_id', None)
+    from roteiros.services.routing.route_service import serialize_existing_route
+
+    roteiro_mapa_inicial = (
+        serialize_existing_route(obj)
+        if obj and getattr(obj, "pk", None)
+        else {"roteiro_id": None, "status": "pendente", "route": None}
+    )
+    roteiro_mapa_inicial.update(build_roteiro_map_defaults())
+    return {
+        'evento': evento,
+        'object': obj,
+        'form': form,
+        'destinos_atuais': destinos_atuais,
+        'estados': estados_qs,
+        'api_cidades_por_estado_url': reverse('roteiros:api_cidades_por_estado', kwargs={'estado_id': 0}),
+        'trechos': trechos_list,
+        'trechos_json': trechos_json,
+        'initial_trechos_data': initial_trechos_data,
+        'roteiro_editor_state_json': serialized_roteiro_state,
+        'roteiro_diarias_resultado': diarias_resultado,
+        'roteiro_seed_source_label': roteiro_state.get('seed_source_label', ''),
+        'api_calcular_diarias_url': reverse('roteiros:calcular_diarias'),
+        'api_calcular_rota_url': reverse('roteiros:calcular_rota'),
+        'api_calcular_rota_preview_url': reverse('roteiros:calcular_rota_preview'),
+        'roteiro_mapa_inicial': roteiro_mapa_inicial,
+        'roteiro_modo': roteiro_state.get('roteiro_modo', 'ROTEIRO_PROPRIO'),
+        'roteiro_id': roteiro_state.get('roteiro_evento_id'),
+        'roteiro_evento_id': roteiro_state.get('roteiro_evento_id'),
+        'roteiros_evento': route_options or [],
+        'roteiro_routes_json': route_options_json,
+        'has_event_routes': bool(route_options),
+        'is_avulso': is_avulso,
+        'retorno_state': roteiro_state.get('retorno', {}),
+        'sede_estado_id': sede_estado_id,
+        'sede_cidade_id': sede_cidade_id,
+        'sede_cidades_qs': sede_cidades_qs,
+        'destino_estado_fixo_id': getattr(destino_estado_fixo, 'pk', None),
+        'destino_estado_fixo_nome': (
+            f'{destino_estado_fixo.nome} ({destino_estado_fixo.sigla})'
+            if destino_estado_fixo
+            else 'Paraná (PR)'
+        ),
+        'diarias_quantidade_servidores': qs_ctx,
+    }

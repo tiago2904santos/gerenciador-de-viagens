@@ -14,6 +14,9 @@ from eventos.presenters import DOCUMENTO_FILTRO_DIAS_TOLERANCIA
 from eventos.presenters import build_evento_documentos_context
 from oficios.models import Oficio
 from roteiros.models import Roteiro
+from core.testing import area_de_teste
+from core.testing import com_request
+from core.testing import vincular_area
 
 
 def _dt(y, m, d):
@@ -24,7 +27,8 @@ class DocumentosPickerContextTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="picker", password="123456")
         self.client.force_login(self.user)
-        self.evento = Evento.objects.create(
+        vincular_area(self.user)
+        self.evento = Evento.objects.create(area=area_de_teste(), 
             titulo="Evento base",
             data_inicio=date(2026, 8, 10),
             data_fim=date(2026, 8, 12),
@@ -34,11 +38,14 @@ class DocumentosPickerContextTests(TestCase):
         return next((s for s in resumos[key] if s["id"] == pk), None)
 
     def test_build_context_gera_resumos_e_datas(self):
-        roteiro = Roteiro.objects.create(saida_dt=_dt(2026, 8, 10), retorno_chegada_dt=_dt(2026, 8, 12))
-        oficio = Oficio.objects.create(roteiro=roteiro)
+        roteiro = Roteiro.objects.create(area=area_de_teste(), saida_dt=_dt(2026, 8, 10), retorno_chegada_dt=_dt(2026, 8, 12))
+        oficio = Oficio.objects.create(area=area_de_teste(), roteiro=roteiro)
 
-        form = EventoNovoCadastroForm(instance=self.evento)
-        context = build_evento_documentos_context(form)
+        # DB-02: o form recorta os pickers pela area do request no __init__
+        # (BE-04); a chamada direta reproduz o contexto que a view teria.
+        with com_request(area_de_teste()):
+            form = EventoNovoCadastroForm(instance=self.evento)
+            context = build_evento_documentos_context(form)
 
         self.assertIn("evento_doc_summaries", context)
         self.assertEqual(context["evento_doc_tolerancia_dias"], DOCUMENTO_FILTRO_DIAS_TOLERANCIA)
@@ -51,13 +58,13 @@ class DocumentosPickerContextTests(TestCase):
         self.assertIn("Ofício", resumo["title"])
 
     def test_pagina_renderiza_toggle_segmentado_e_json(self):
-        Oficio.objects.create(
-            roteiro=Roteiro.objects.create(saida_dt=_dt(2026, 8, 10), retorno_chegada_dt=_dt(2026, 8, 11)),
+        Oficio.objects.create(area=area_de_teste(), 
+            roteiro=Roteiro.objects.create(area=area_de_teste(), saida_dt=_dt(2026, 8, 10), retorno_chegada_dt=_dt(2026, 8, 11)),
         )
         url = reverse("eventos:guiado_etapa", kwargs={"pk": self.evento.pk, "etapa": 1})
         html = self.client.get(url).content.decode("utf-8")
 
-        self.assertIn("cv-segment-toggle evento-doc-toggle", html)
+        self.assertIn("segment-toggle evento-doc-toggle", html)
         self.assertIn("data-evento-doc-toggle", html)
         self.assertIn('id="evento-doc-summaries"', html)
         self.assertIn('data-evento-doc-field="oficios"', html)

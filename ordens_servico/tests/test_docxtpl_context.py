@@ -7,6 +7,8 @@ from django.test import TestCase
 from cadastros.models import Cidade
 from cadastros.models import Estado
 from cadastros.models import Servidor
+from core.testing import area_de_teste
+from core.testing import com_request
 
 from ..docxtpl_context import build_os_docxtpl_context
 from ..forms import OrdemServicoForm
@@ -15,19 +17,22 @@ from ..models import OrdemServico
 
 class OrdemServicoDocxtplContextTests(TestCase):
     def setUp(self):
+        # DB-02: forms/services recortam pela area do request; a chamada
+        # direta reproduz o contexto que a view teria.
+        self.enterContext(com_request(area_de_teste()))
         self.estado = Estado.objects.create(nome="PARANA", sigla="PR")
         self.cidade = Cidade.objects.create(nome="CURITIBA", estado=self.estado, uf="PR")
-        self.motorista = Servidor.objects.create(nome="MOTORISTA TESTE")
-        self.tecnico = Servidor.objects.create(nome="TECNICO TESTE")
-        self.montagem = Servidor.objects.create(nome="APOIO MONTAGEM")
-        self.escolta = Servidor.objects.create(nome="APOIO ESCOLTA")
-        self.apoio_extra = Servidor.objects.create(nome="APOIO EXTRA")
-        self.coordenador = Servidor.objects.create(nome="COORDENADOR CERIMONIAL")
-        self.apoio = Servidor.objects.create(nome="APOIO CERIMONIAL")
-        self.preparacao = Servidor.objects.create(nome="APOIO PREPARACAO")
+        self.motorista = Servidor.objects.create(area=area_de_teste(), nome="MOTORISTA TESTE")
+        self.tecnico = Servidor.objects.create(area=area_de_teste(), nome="TECNICO TESTE")
+        self.montagem = Servidor.objects.create(area=area_de_teste(), nome="APOIO MONTAGEM")
+        self.escolta = Servidor.objects.create(area=area_de_teste(), nome="APOIO ESCOLTA")
+        self.apoio_extra = Servidor.objects.create(area=area_de_teste(), nome="APOIO EXTRA")
+        self.coordenador = Servidor.objects.create(area=area_de_teste(), nome="COORDENADOR CERIMONIAL")
+        self.apoio = Servidor.objects.create(area=area_de_teste(), nome="APOIO CERIMONIAL")
+        self.preparacao = Servidor.objects.create(area=area_de_teste(), nome="APOIO PREPARACAO")
 
     def _ordem(self, tipo):
-        ordem = OrdemServico.objects.create(
+        ordem = OrdemServico.objects.create(area=area_de_teste(), 
             tipo_necessidade=tipo,
             data_evento_inicio=date(2026, 8, 10),
             data_evento_fim=date(2026, 8, 12),

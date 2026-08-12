@@ -1,7 +1,7 @@
 <div class="field-grid roteiro-sede-grid">
   <div class="field app-form-field">
     <select name="origem_estado" id="id_origem_estado"
-            class="cv-search-picker__native"
+            class="search-picker__native"
             data-entity-picker="true"
             data-entity-picker-mode="single"
             data-picker-variant="compact"
@@ -14,12 +14,12 @@
       {% endfor %}
     </select>
     {% if form.origem_estado.errors %}
-      {% include "components/ui/feedback/field_error.html" with errors=form.origem_estado.errors only %}
+      <c-ui.feedback.field_error :errors="form.origem_estado.errors" :field_id="form.origem_estado.auto_id" only />
     {% endif %}
   </div>
   <div class="field app-form-field">
     <select name="origem_cidade" id="id_origem_cidade"
-            class="cv-search-picker__native"
+            class="search-picker__native"
             data-entity-picker="true"
             data-entity-picker-mode="single"
             data-picker-variant="compact"
@@ -33,7 +33,7 @@
       {% endfor %}
     </select>
     {% if form.origem_cidade.errors %}
-      {% include "components/ui/feedback/field_error.html" with errors=form.origem_cidade.errors only %}
+      <c-ui.feedback.field_error :errors="form.origem_cidade.errors" :field_id="form.origem_cidade.auto_id" only />
     {% endif %}
   </div>
 </div>

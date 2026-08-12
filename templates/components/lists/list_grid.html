@@ -1,9 +1,0 @@
-<div class="list-grid app-list-grid">
-  {% if cards %}
-    {% for card in cards %}
-      {% include "components/cards/document_card.html" with card=card only %}
-    {% endfor %}
-  {% else %}
-    {% include "components/lists/list_empty.html" with message=empty_message action_label=empty_action_label action_url=empty_action_url only %}
-  {% endif %}
-</div>

@@ -1,0 +1,1019 @@
+/* =========================================================
+   List Header — bloco compacto de listas
+   Card com faixa de título + rail de filtros.
+   Mais leve que o page-header-stack antigo, mas ainda
+   lê como um cabeçalho (não some no fundo da página).
+   ========================================================= */
+
+.list-header {
+  --list-header-control-height: var(--filter-input-height);
+  background: var(--app-hero-body-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
+  width: 100%;
+}
+
+/* Faixa de título — compacta */
+.list-header__band {
+  background: var(--app-hero-stage-bg);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: var(--space-4) clamp(var(--space-4), 2vw, var(--space-5)) var(--space-3);
+  width: 100%;
+}
+
+/* Banda com aside (toggle de lista a direita do titulo): vira linha. Sem o
+   aside continua em coluna, como as demais listas. */
+.list-header__band--with-aside {
+  align-items: center;
+  column-gap: var(--space-4);
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  row-gap: var(--space-2);
+}
+
+.list-header__band-aside {
+  flex: 0 0 auto;
+}
+
+.list-header__title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.list-header__eyebrow {
+  color: var(--app-hero-eyebrow);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  line-height: 1.2;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.list-header__title-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.list-header__title {
+  color: var(--app-hero-title);
+  font-size: clamp(1.2rem, 1.8vw, 1.55rem);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+/* Rail de filtros — faixa clara abaixo do título */
+.list-header__rail {
+  /* Mesmo token da área interna dos cards (.record-card__band). */
+  background: var(--card-family-bg);
+  border-top: 1px solid var(--border-filter-bar);
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-3) clamp(var(--space-4), 2vw, var(--space-5));
+  width: 100%;
+}
+
+.list-header__rail--advanced,
+.list-header__rail--inline-create {
+  gap: var(--space-3);
+}
+
+.list-header__filters {
+  align-items: center;
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  min-width: 0;
+  width: 100%;
+}
+
+.list-header__filters--advanced {
+  gap: 10px;
+}
+
+.list-header__search {
+  flex: 1 1 16rem;
+  min-width: 12rem;
+  position: relative;
+}
+
+.list-header__search-icon {
+  align-items: center;
+  color: var(--text-filter-placeholder);
+  display: inline-flex;
+  left: 12px;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.list-header__search-icon .icon {
+  display: block;
+  flex: 0 0 auto;
+  height: 16px;
+  width: 16px;
+}
+
+.list-header__search-input {
+  background: var(--surface-filter-input);
+  border: 1px solid var(--border-filter-input);
+  border-radius: var(--radius-control);
+  box-sizing: border-box;
+  color: var(--text-filter);
+  font-size: var(--font-size-sm);
+  height: var(--list-header-control-height);
+  outline: none;
+  padding: 0 var(--space-3);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  width: 100%;
+}
+
+.list-header__search--with-icon .list-header__search-input {
+  padding-left: 38px;
+}
+
+/* Compat header-filter-input redefine padding shorthand — preservar folga do ícone. */
+.list-header__search--with-icon .list-header__search-input.header-filter-input {
+  padding-left: 38px;
+}
+
+.list-header__search-input::placeholder {
+  color: var(--text-filter-placeholder);
+}
+
+.list-header__search-input:focus,
+.list-header__search-input:focus-visible {
+  outline: none;
+}
+
+.list-header__select {
+  flex: 0 1 auto;
+  max-width: 14rem;
+  min-width: 9.5rem;
+}
+
+.list-header__select select,
+.list-header__select .header-filter-select {
+  height: var(--list-header-control-height);
+  min-width: 0;
+  width: 100%;
+}
+
+.list-header__actions {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.list-header__filters .cv-btn--control {
+  height: var(--list-header-control-height);
+  white-space: nowrap;
+}
+
+.list-header__filters .date-picker,
+.list-header__filters .travel-period-filter {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.list-header__filters .travel-period-filter__btn {
+  height: var(--list-header-control-height);
+  min-height: var(--list-header-control-height);
+}
+
+/* Compat: inputs que ainda usam classes antigas */
+.list-header .header-filter-input {
+  background: var(--surface-filter-input);
+  border: 1px solid var(--border-filter-input);
+  border-radius: var(--radius-control);
+  box-sizing: border-box;
+  color: var(--text-filter);
+  font-size: var(--font-size-sm);
+  height: var(--list-header-control-height);
+  outline: none;
+  padding: 0 var(--space-3);
+  width: 100%;
+}
+
+.list-header .header-filter-input:focus,
+.list-header .header-filter-input:focus-visible {
+  outline: none;
+}
+
+/*
+ * Controles do rail: superfície única (card-soft) e foco discreto.
+ * A ordem global de carregamento permite neutralizar as camadas visuais de
+ * cv-select sem elevar artificialmente a especificidade.
+ */
+.list-header__rail {
+  --list-header-control-bg: var(--step1-panel, var(--color-surface-soft, var(--color-card-soft)));
+}
+
+.list-header__rail .list-header__search-input.header-filter-input,
+.list-header__rail .custom-select__trigger.custom-select__trigger--v2,
+.list-header__rail .travel-period-filter__btn,
+.travel-period-filter--filled .travel-period-filter__btn,
+.list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control,
+.list-header__rail .list-header__search-input.header-filter-input:hover,
+.list-header__rail .custom-select__trigger.custom-select__trigger--v2:hover,
+.list-header__rail .travel-period-filter__btn:hover:not(:disabled),
+.travel-period-filter--filled .travel-period-filter__btn:hover:not(:disabled),
+.list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:hover {
+  background: var(--list-header-control-bg);
+  border: 0;
+  box-shadow: none;
+}
+
+.list-header__rail .custom-select__trigger.custom-select__trigger--v2 {
+  border-radius: var(--radius-control);
+  height: var(--list-header-control-height);
+  min-height: var(--list-header-control-height);
+}
+
+/* Campos do rail: sem chrome de focus. Botões mantêm foco discreto. */
+.list-header__rail .list-header__search-input.header-filter-input:focus,
+.list-header__rail .list-header__search-input.header-filter-input:focus-visible,
+.list-header__rail .custom-select__trigger.custom-select__trigger--v2:focus,
+.list-header__rail .custom-select__trigger.custom-select__trigger--v2:focus-visible {
+  border: 0;
+  box-shadow: none;
+  outline: none;
+}
+
+.list-header__rail .travel-period-filter__btn:focus,
+.list-header__rail .travel-period-filter__btn:focus-visible,
+.travel-period-filter--filled .travel-period-filter__btn:focus,
+.travel-period-filter--filled .travel-period-filter__btn:focus-visible,
+.list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:focus,
+.list-header__rail .cv-btn.cv-btn--secondary.cv-btn--control:focus-visible {
+  border: 1px solid color-mix(in srgb, var(--border-focus) 42%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--border-focus) 12%, transparent);
+  outline: none;
+}
+
+/* Não herdar estilos de card do dark-redesign / filter-header antigos */
+.list-header.filter-header,
+.list-header.page-header-stack {
+  overflow: hidden;
+}
+
+.list-header .page-header-band,
+.list-header .page-header-rail {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* =========================================================
+   Quick Add — barra de largura total modernizada
+   ========================================================= */
+
+.list-header--inline-create .list-header__rail--inline-create {
+  border-bottom: 0;
+  flex-direction: column;
+}
+
+.list-header .inline-create__panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  box-sizing: border-box;
+  margin: 0;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(-6px);
+  transition:
+    max-height 220ms ease,
+    opacity 180ms ease,
+    transform 220ms ease,
+    padding 180ms ease;
+  width: 100%;
+}
+
+/* `HT-03`: aberto, o painel rola em vez de cortar — ver `page-shell.css:2612`.
+   A regra precisa existir **aqui também**: `.list-header .inline-create__panel`
+   (linha 313) declara `overflow: hidden` com a mesma especificidade da regra de
+   page-shell e vem depois no bundle, então ela vencia e o `overflow-y: auto` de lá
+   não chegava a valer. Duas folhas governando o mesmo painel é o `UI-04`; enquanto
+   ele não sai, as duas precisam concordar. */
+.list-header .inline-create__panel.is-open {
+  border-top: 1px solid var(--border-filter-bar);
+  max-height: 640px;
+  opacity: 1;
+  overflow-y: auto;
+  padding: var(--space-3) 0 0;
+  transform: translateY(0);
+}
+
+/*
+ * Campos do Quick Add: mesma superfície e geometria da busca do rail.
+ * Textareas mantêm sua altura própria; selects e controles customizados
+ * preservam o comportamento nativo, alterando apenas a camada visual.
+ */
+.list-header--inline-create .inline-create__panel
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .custom-select__trigger,
+    .search-picker__control,
+    .search-picker__input
+  ) {
+  background: var(--step1-field, var(--list-header-control-bg, var(--color-input-bg)));
+  border: 0;
+  border-radius: var(--radius-control);
+  box-shadow: none;
+  box-sizing: border-box;
+  color: var(--text-filter);
+  font-size: var(--font-size-sm);
+  transition: none;
+}
+
+.list-header--inline-create .inline-create__panel
+  :is(
+    input.form-control,
+    select.form-control,
+    .form-select,
+    input.cv-field__control,
+    select.cv-field__control,
+    .custom-select__trigger,
+    .search-picker__control
+  ) {
+  height: var(--list-header-control-height);
+  min-height: var(--list-header-control-height);
+}
+
+.list-header--inline-create .inline-create__panel
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .custom-select__trigger,
+    .search-picker__control
+  ):is(.is-invalid, [aria-invalid="true"]),
+.list-header--inline-create .inline-create__panel
+  :is(.app-form-field, .cv-field):has(.field-error)
+  :is(
+    .form-control,
+    .form-select,
+    .cv-field__control,
+    .custom-select__trigger,
+    .search-picker__control
+  ) {
+  border: 1px solid var(--color-danger);
+}
+
+.list-header .inline-create__body {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.list-header .inline-create__fields {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.list-header .inline-create__actions {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.list-header--inline-create-compact .inline-create__body {
+  padding: 0;
+}
+
+.list-header .inline-create__toggle {
+  align-items: center;
+  appearance: none;
+  background: var(--card-family-bg);
+  border: 0;
+  border-radius: 0;
+  border-top: 1px solid var(--border-filter-bar);
+  box-shadow: none;
+  color: var(--theme-text-body);
+  cursor: pointer;
+  display: flex;
+  font-size: var(--font-size-sm);
+  gap: var(--space-2);
+  height: auto;
+  justify-content: center;
+  margin: 0;
+  min-height: var(--control-height-md);
+  padding: var(--space-2) var(--space-4);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+  width: 100%;
+}
+
+.list-header .inline-create__toggle:hover {
+  background: color-mix(in srgb, var(--color-primary-soft) 70%, var(--color-white));
+}
+
+.list-header .inline-create__toggle:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: -2px;
+}
+
+.list-header .inline-create__toggle.is-active,
+.list-header .inline-create__toggle[aria-expanded="true"] {
+  background: color-mix(in srgb, var(--color-primary-soft) 55%, var(--color-white));
+  box-shadow: none;
+}
+
+.list-header .inline-create__toggle.is-filled {
+  animation: list-header-inline-create-fill 0.35s ease forwards;
+  background: var(--btn-primary-bg);
+  border-color: var(--btn-primary-border);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-white);
+}
+
+.list-header .inline-create__toggle.is-filled:hover {
+  background: var(--btn-primary-hover-bg);
+  border-color: var(--btn-primary-hover-border);
+}
+
+@keyframes list-header-inline-create-fill {
+  from {
+    background: color-mix(in srgb, var(--color-primary-soft) 55%, var(--color-white));
+    box-shadow: none;
+    color: var(--theme-text-body);
+  }
+}
+
+.list-header .inline-create__toggle-icon {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  border-radius: 999px;
+  color: var(--color-primary);
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  height: 26px;
+  justify-content: center;
+  line-height: 1;
+  width: 26px;
+}
+
+.list-header .inline-create__toggle.is-filled .inline-create__toggle-icon {
+  background: color-mix(in srgb, var(--color-white) 18%, transparent);
+  color: inherit;
+}
+
+.list-header .inline-create__toggle-label {
+  font-weight: var(--font-weight-bold);
+}
+
+/* Abas logo abaixo do header */
+.page-shell--list > .list-header + .list-tabs,
+.cv-page--collection > .list-header + .list-tabs {
+  margin-top: 0;
+  padding-top: var(--space-3);
+}
+
+/* =========================================================
+   Tema escuro
+   ========================================================= */
+
+:is(html[data-theme="dark"])
+  .list-header {
+  background: var(--color-surface-muted);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+
+/* Mesma cor do cabeçalho dos cards (.entity-card__header) */
+:is(html[data-theme="dark"])
+  .list-header__band {
+  background: var(--color-surface-muted);
+}
+
+:is(html[data-theme="dark"])
+  .list-header__eyebrow {
+  color: var(--color-accent);
+}
+
+:is(html[data-theme="dark"])
+  .list-header__title {
+  color: var(--color-heading);
+}
+
+/* Mesma cor das seções internas do card (.record-card__band). */
+:is(html[data-theme="dark"])
+  .list-header__rail {
+  background: var(--card-family-bg);
+  border-top-color: var(--color-border);
+  --list-header-control-bg: var(--step1-panel, var(--color-surface-soft, var(--color-card-soft)));
+}
+
+/* Controles do filtro: soft panel (#223348 / --color-surface-soft). */
+:is(html[data-theme="dark"])
+  .list-header__rail
+  :is(
+    .list-header__search-input.header-filter-input,
+    .custom-select__trigger.custom-select__trigger--v2,
+    .travel-period-filter__btn,
+    .cv-btn.cv-btn--secondary.cv-btn--control
+  ),
+:is(html[data-theme="dark"])
+  .list-header__rail
+  :is(
+    .list-header__search-input.header-filter-input,
+    .custom-select__trigger.custom-select__trigger--v2,
+    .travel-period-filter__btn,
+    .cv-btn.cv-btn--secondary.cv-btn--control
+  ):is(:hover, :hover:not(:disabled)) {
+  background: var(--step1-panel, var(--color-surface-soft, var(--color-card-soft)));
+  border-color: transparent;
+  box-shadow: none;
+}
+
+:is(html[data-theme="dark"])
+  .travel-period-filter--filled
+  .travel-period-filter__btn,
+:is(html[data-theme="dark"])
+  .travel-period-filter--filled
+  .travel-period-filter__btn:hover:not(:disabled) {
+  background: var(--color-card-soft);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* Select do rail: chevron sempre accent (fechado = aberto). */
+:is(html[data-theme="dark"])
+  .list-header__rail .custom-select--v2 {
+  --cs-chevron-color: var(--color-accent);
+}
+
+:is(html[data-theme="dark"])
+  .list-header__rail
+  .custom-select__trigger--v2
+  .custom-select__chevron,
+:is(html[data-theme="dark"])
+  .list-header__rail
+  .custom-select__trigger--v2:is(:hover, :focus, :focus-visible, [aria-expanded="true"])
+  .custom-select__chevron,
+:is(html[data-theme="dark"])
+  .list-header__rail
+  .custom-select--v2.custom-select--open
+  .custom-select__chevron {
+  color: var(--color-accent);
+}
+
+:is(html[data-theme="dark"])
+  .list-header .inline-create__toggle:hover,
+:is(html[data-theme="dark"])
+  .list-header .inline-create__toggle.is-active,
+:is(html[data-theme="dark"])
+  .list-header .inline-create__toggle[aria-expanded="true"] {
+  background: color-mix(in srgb, var(--color-card-muted) 72%, var(--color-white) 10%);
+}
+
+:is(html[data-theme="dark"])
+  .list-header .inline-create__toggle-icon {
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+}
+
+:is(html[data-theme="dark"])
+  .list-header .inline-create__toggle.is-filled {
+  background: var(--btn-primary-bg);
+  border-color: var(--btn-primary-border);
+  color: var(--color-white);
+}
+
+:is(html[data-theme="dark"])
+  .list-header .inline-create__toggle.is-filled .inline-create__toggle-icon {
+  background: color-mix(in srgb, var(--color-white) 16%, transparent);
+  color: inherit;
+}
+
+:is(html[data-theme="dark"])
+  .list-header .inline-create__panel.is-open {
+  border-top-color: var(--border-filter-bar);
+}
+
+/* =========================================================
+   Responsivo
+   ========================================================= */
+
+/*
+ * A sidebar reduz o espaço útil muito antes do breakpoint móvel. Neste
+ * intervalo, busca e selects continuam compactos, enquanto ações de data e
+ * limpeza ocupam uma segunda linha previsível em vez de serem comprimidas.
+ */
+@media (min-width: 721px) and (max-width: 1180px) {
+  .list-header__filters--advanced .list-header__search {
+    flex-basis: 18rem;
+  }
+
+  .list-header__filters--advanced .date-picker,
+  .list-header__filters--advanced .travel-period-filter,
+  .list-header__filters--advanced .cv-btn--control {
+    flex: 1 1 calc(50% - var(--space-2));
+  }
+
+  .list-header__filters--advanced .travel-period-filter__btn,
+  .list-header__filters--advanced .cv-btn--control {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+/*
+ * Listas com dois ou mais selects (status + ordenação, por exemplo) precisam
+ * antecipar somente o par de ações finais. Assim a segunda linha nunca fica
+ * com um botão isolado em desktops médios.
+ */
+@media (min-width: 1181px) and (max-width: 1400px) {
+  .list-header__filters--advanced:has(.list-header__select + .list-header__select)
+    :is(.date-picker, .travel-period-filter, .cv-btn--control) {
+    flex: 1 1 calc(50% - var(--space-2));
+  }
+
+  .list-header__filters--advanced:has(.list-header__select + .list-header__select)
+    :is(.travel-period-filter__btn, .cv-btn--control) {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 720px) {
+  .list-header__band,
+  .list-header__rail {
+    padding-inline: var(--space-4);
+  }
+
+  .list-header__select,
+  .list-header__filters .date-picker,
+  .list-header__filters .travel-period-filter,
+  .list-header__filters .cv-btn--control,
+  .list-header__actions {
+    flex: 1 1 100%;
+    max-width: none;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .list-header__actions {
+    margin-left: 0;
+  }
+
+  .list-header__filters .travel-period-filter__btn,
+  .list-header__filters .cv-btn--control {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   Filter-pill do date picker (control_variant="filter-pill")
+   Classes históricas travel-period-filter* usadas pelo
+   cv_date_picker.html e pelo JS — mantidas globalmente.
+   ========================================================= */
+
+.travel-period-filter {
+  display: inline-flex;
+  flex: 0 1 auto;
+  min-width: 0;
+  position: relative;
+}
+
+.travel-period-filter__btn {
+  align-items: center;
+  background:
+    linear-gradient(var(--color-card), var(--color-card)) padding-box,
+    linear-gradient(var(--select-border), var(--select-border)) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  box-shadow: var(--cs-trigger-shadow);
+  color: var(--color-input-text);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  gap: var(--space-2);
+  height: var(--control-height-md);
+  min-height: var(--control-height-md);
+  padding: 0 var(--space-3);
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+  white-space: nowrap;
+}
+
+.travel-period-filter__btn:hover:not(:disabled) {
+  background:
+    linear-gradient(var(--field-bg-hover), var(--field-bg-hover)) padding-box,
+    linear-gradient(var(--color-secondary), var(--color-secondary)) border-box;
+}
+
+.travel-period-filter__btn:focus-visible {
+  background:
+    linear-gradient(var(--field-bg-hover), var(--field-bg-hover)) padding-box,
+    linear-gradient(var(--select-border-focus), var(--select-border-focus)) border-box;
+  box-shadow: var(--select-focus-shadow);
+  outline: none;
+}
+
+.travel-period-filter__btn .cv-btn__icon {
+  align-items: center;
+  color: var(--text-filter-placeholder);
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.travel-period-filter__label {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+.travel-period-filter--active .travel-period-filter__btn {
+  background: color-mix(in srgb, var(--color-primary-bright) 12%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary-bright) 55%, transparent);
+  color: var(--color-heading);
+}
+
+.travel-period-filter--active .travel-period-filter__btn .cv-btn__icon {
+  color: var(--color-accent);
+}
+
+.travel-period-filter--active .travel-period-filter__btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-primary-bright) 20%, transparent);
+  border-color: var(--color-primary-bright);
+}
+
+/* =========================================================
+   Wizard sticky header (NOVO-20)
+   .wizard-sticky-scope envolve header + formulário (pai alto do sticky).
+   Band sobe com a página; stepper cola e descola com radius na junção.
+   ========================================================= */
+
+.wizard-sticky-scope {
+  display: flex;
+  flex-direction: column;
+  gap: var(--page-shell-gap, var(--space-6));
+  position: relative;
+  width: 100%;
+}
+
+.wizard-sticky-header__sentinel {
+  height: 1px;
+  margin: 0;
+  pointer-events: none;
+  width: 100%;
+}
+
+/* Anula o gap do scope entre band e stepper (colados). */
+.wizard-sticky-scope > .list-header--wizard-stepper {
+  margin-top: calc(-1 * var(--page-shell-gap, var(--space-6)));
+}
+
+/* Sem borda dupla na junção enquanto colados. */
+.list-header--wizard-band:not(.is-detached) {
+  border-bottom-color: transparent;
+  border-bottom-width: 0;
+}
+
+.list-header--wizard-stepper:not(.is-detached) {
+  border-top-color: transparent;
+  border-top-width: 0;
+}
+
+.list-header--wizard-band,
+.list-header--wizard-stepper {
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-radius 240ms ease,
+    box-shadow 240ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .list-header--wizard-band,
+  .list-header--wizard-stepper {
+    transition: none;
+  }
+}
+
+/* Band: sobe com a página. Colado → base reta; descola → base com radius. */
+.list-header--wizard-band {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.list-header--wizard-band.is-detached {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.list-header--wizard-band .list-header__band {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-3);
+  justify-content: space-between;
+  width: 100%;
+}
+
+.list-header__band-actions {
+  flex: 0 0 auto;
+}
+
+.list-header__wizard-back {
+  min-height: var(--control-height-md, 44px);
+  padding: 0 18px;
+}
+
+/* Stepper: sticky no scope alto. Colado → topo reto; descola → topo com radius.
+   Base sempre arredondada. */
+.list-header--wizard-stepper {
+  border-bottom-left-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  overflow: hidden;
+  position: sticky;
+  top: 12px;
+  z-index: var(--z-sticky-stepper, 1100);
+}
+
+.list-header--wizard-stepper.is-detached {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.list-header__rail--wizard {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: stretch;
+  padding: 10px clamp(var(--space-4), 2vw, var(--space-5));
+}
+
+.list-header__wizard-stepper {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+}
+
+.list-header__wizard-stepper .page-stepper {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  isolation: auto;
+  padding: 0;
+  position: static;
+  top: auto;
+  width: 100%;
+}
+
+:is(html[data-theme]) .list-header--wizard-band {
+  background: var(--app-hero-stage-bg);
+  border-color: transparent;
+}
+
+:is(html[data-theme]) .list-header--wizard-band .list-header__band {
+  background: var(--app-hero-stage-bg);
+}
+
+:is(html[data-theme]) .list-header--wizard-stepper {
+  background: var(--card-family-bg, var(--color-card));
+  border-color: var(--color-border);
+}
+
+:is(html[data-theme]) .list-header--wizard-stepper .list-header__rail--wizard {
+  background: var(--card-family-bg, var(--color-card));
+  border-top: 0;
+}
+
+/* Voltar no band = mesma linguagem do Voltar do footer. */
+:is(html[data-theme])
+  .list-header--wizard-band
+  .list-header__wizard-back.cv-btn--secondary {
+  background: var(--step1-panel, var(--color-surface-soft));
+  background-image: none;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
+  color: var(--color-heading);
+  font-weight: var(--font-weight-bold);
+  transform: none;
+}
+
+:is(html[data-theme])
+  .list-header--wizard-band
+  .list-header__wizard-back.cv-btn--secondary:hover,
+:is(html[data-theme])
+  .list-header--wizard-band
+  .list-header__wizard-back.cv-btn--secondary:focus-visible {
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted));
+  background-image: none;
+  border: 0;
+  box-shadow: none;
+  color: var(--color-accent-text);
+  outline: 0;
+  transform: none;
+}
+
+:is(html[data-theme])
+  .list-header--wizard-stepper
+  .list-header__wizard-stepper
+  .page-stepper {
+  --stepper-marker-size: 32px;
+  background: transparent;
+}
+
+:is(html[data-theme="dark"])
+  .list-header--wizard-stepper
+  .list-header__wizard-stepper
+  .page-stepper {
+  --stepper-missing-bg: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  --stepper-missing-border: color-mix(in srgb, var(--color-danger) 30%, transparent);
+  --stepper-missing-color: color-mix(in srgb, var(--color-danger) 72%, #e3eaf2);
+  --stepper-status-missing-color: color-mix(in srgb, var(--color-danger) 62%, #afc0d3);
+}
+
+:is(html[data-theme])
+  .list-header--wizard-stepper
+  .page-stepper__eyebrow {
+  display: none;
+}
+
+:is(html[data-theme])
+  .list-header--wizard-stepper
+  .page-stepper__label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+:is(html[data-theme])
+  .list-header--wizard-stepper
+  .page-stepper__status {
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+:is(html[data-theme])
+  .list-header--wizard-stepper
+  .page-stepper__item.is-missing
+  .page-stepper__status {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  opacity: 0.92;
+}
+
+@media (max-width: 900px) {
+  .list-header--wizard-stepper {
+    top: 8px;
+  }
+
+  .list-header--wizard-band .list-header__band {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .list-header__band-actions .cv-btn {
+    width: 100%;
+  }
+}

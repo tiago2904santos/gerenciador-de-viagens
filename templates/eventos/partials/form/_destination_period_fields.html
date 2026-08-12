@@ -1,11 +1,11 @@
 <div class="field-grid">
-  {% include "components/ui/forms/field.html" with field=form.destino_uf size_class="field-size-1" only %}
-  {% include "components/ui/forms/field.html" with field=form.destino_cidade size_class="field-size-3" only %}
+  <c-ui.forms.field :field="form.destino_uf" size_class="field-size-1" only />
+  <c-ui.forms.field :field="form.destino_cidade" size_class="field-size-3" only />
   <div class="field app-form-field field-size-4">
     {% with picker_prefix=section_prefix|default:"evento" %}
-      {% include "components/ui/forms/date_picker.html" with mode="range" picker_id=picker_prefix|add:"-date-picker" extra_class="termo-date-picker" start_field=form.data_inicio end_field=form.data_fim start_input_id=picker_prefix|add:"-data-inicio-display" end_input_id=picker_prefix|add:"-data-fim-display" only %}
+      {% with cotton_attr_picker_id=picker_prefix|add:"-date-picker" cotton_attr_start_input_id=picker_prefix|add:"-data-inicio-display" cotton_attr_end_input_id=picker_prefix|add:"-data-fim-display" %}<c-ui.forms.date_picker mode="range" :picker_id="cotton_attr_picker_id" extra_class="termo-date-picker" :start_field="form.data_inicio" :end_field="form.data_fim" :start_input_id="cotton_attr_start_input_id" :end_input_id="cotton_attr_end_input_id" only />{% endwith %}
     {% endwith %}
   </div>
-  {% include "components/ui/forms/field.html" with field=form.horario_inicio size_class="field-size-2" only %}
-  {% include "components/ui/forms/field.html" with field=form.horario_fim size_class="field-size-2" only %}
+  <c-ui.forms.field :field="form.horario_inicio" size_class="field-size-2" only />
+  <c-ui.forms.field :field="form.horario_fim" size_class="field-size-2" only />
 </div>

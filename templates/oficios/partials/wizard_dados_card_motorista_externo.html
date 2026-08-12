@@ -1,21 +1,21 @@
 {# Seção de motorista externo: irmã de Equipe e Transporte. #}
 <section
-  class="cv-form-block cv-form-block--resource travel-document-block oficio-external-driver{% if show_motorista_card %} is-open{% else %} form-field--hidden{% endif %}"
+  class="form-block form-block--resource travel-document-block oficio-external-driver{% if show_motorista_card %} is-open{% else %} form-field--hidden{% endif %}"
   aria-labelledby="travel-document-wizard-motorista-title"
   data-oficio-driver-external-card
   {% if not show_motorista_card %}hidden{% endif %}
 >
-  <header class="cv-form-block__header">
-    <div class="cv-form-block__copy">
-      <h3 class="cv-form-block__title" id="travel-document-wizard-motorista-title">Motorista</h3>
-      <p class="cv-form-block__description">Condutor da viatura</p>
+  <header class="form-block__header">
+    <div class="form-block__copy">
+      <h3 class="form-block__title" id="travel-document-wizard-motorista-title">Motorista</h3>
+      <p class="form-block__description">Condutor da viatura</p>
     </div>
-    <div class="cv-form-block__actions">
+    <div class="form-block__actions">
       {% include "oficios/partials/_motorista_modo_toggle.html" with modo_atual=transporte_form.motorista_modo.value only %}
     </div>
   </header>
 
-  <div class="cv-form-block__body oficio-external-driver__body">
+  <div class="form-block__body oficio-external-driver__body">
     {{ transporte_form.motorista_modo }}
 
     <div class="oficio-external-driver__identity" data-oficio-motorista-servidor>
@@ -28,7 +28,7 @@
         <label class="sr-only" for="{{ transporte_form.motorista_manual_nome.id_for_label }}">Nome completo</label>
         {{ transporte_form.motorista_manual_nome }}
         {% if transporte_form.motorista_manual_nome.errors %}
-          {% include "components/ui/feedback/field_error.html" with errors=transporte_form.motorista_manual_nome.errors only %}
+          <c-ui.feedback.field_error :errors="transporte_form.motorista_manual_nome.errors" :field_id="transporte_form.motorista_manual_nome.auto_id" only />
         {% endif %}
       </div>
     </div>
@@ -39,8 +39,8 @@
         <span>Identifique o documento que autorizou este motorista.</span>
       </div>
       <div class="oficio-external-driver__reference-fields">
-        {% include "components/ui/forms/document_number_field.html" with field=transporte_form.motorista_oficio_referencia label="N° do Ofício" ano=motorista_oficio_ano numero_inicial=motorista_oficio_numero_inicial only %}
-        {% include "components/ui/forms/field.html" with field=transporte_form.motorista_protocolo_ref label="Protocolo" only %}
+        <c-ui.forms.document_number_field :field="transporte_form.motorista_oficio_referencia" label="N° do Ofício" :ano="motorista_oficio_ano" :numero_inicial="motorista_oficio_numero_inicial" only />
+        <c-ui.forms.field :field="transporte_form.motorista_protocolo_ref" label="Protocolo" only />
       </div>
     </div>
   </div>

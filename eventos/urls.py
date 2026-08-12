@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import views
+from .card_menu_views import card_menus
 
 
 app_name = "eventos"
@@ -10,9 +11,10 @@ urlpatterns = [
     path("novo/", views.novo, name="novo"),
     path("api/cidades/<str:uf>/", views.api_cidades_por_uf, name="api_cidades_por_uf"),
     path("tipos/", views.tipos_index, name="tipos_index"),
-    path("tipos/<int:pk>/editar/", views.tipo_editar, name="tipo_editar"),
-    path("tipos/<int:pk>/excluir/", views.tipo_excluir, name="tipo_excluir"),
+    path("tipos/<int:pk>/editar/", views.tipo_editar, name="tipo_update"),
+    path("tipos/<int:pk>/excluir/", views.tipo_excluir, name="tipo_delete"),
     path("<int:pk>/", views.detalhe, name="detalhe"),
+    path("<int:pk>/menus/", card_menus, name="card_menus"),
     path("<int:pk>/guiado/", views.detalhe, name="guiado"),
     path("<int:pk>/guiado/etapa-<int:etapa>/", views.detalhe, name="guiado_etapa"),
     path("<int:pk>/guiado_etapa-<int:etapa>/", views.detalhe, name="guiado_etapa_legacy"),

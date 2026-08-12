@@ -1,49 +1,49 @@
-<div class="cv-form-subsection pt-diarias-linha" aria-label="Datas e horários do deslocamento">
-  {% include "components/ui/forms/date_picker.html" with mode="range" picker_id="pt-diarias-date-picker" extra_class="termo-date-picker pt-diarias-linha__dates" start_field=diarias_form.saida_sede_data end_field=diarias_form.chegada_sede_data start_label="Data de saída da sede" end_label="Data de chegada na sede" start_input_id="id_pt_saida_sede_data_display" end_input_id="id_pt_chegada_sede_data_display" show_summary=False only %}
-  {% include "components/ui/forms/field.html" with field=diarias_form.saida_sede_hora label="Hora de saída" size_class="pt-diarias-hora-saida" only %}
-  {% include "components/ui/forms/field.html" with field=diarias_form.chegada_sede_hora label="Hora de chegada" size_class="pt-diarias-hora-chegada" only %}
+<div class="form-subsection pt-diarias-linha" aria-label="Datas e horários do deslocamento">
+  <c-ui.forms.date_picker mode="range" picker_id="pt-diarias-date-picker" extra_class="termo-date-picker pt-diarias-linha__dates" :start_field="diarias_form.saida_sede_data" :end_field="diarias_form.chegada_sede_data" start_label="Data de saída da sede" end_label="Data de chegada na sede" start_input_id="id_pt_saida_sede_data_display" end_input_id="id_pt_chegada_sede_data_display" :show_summary="False" only />
+  <c-ui.forms.field :field="diarias_form.saida_sede_hora" label="Hora de saída" size_class="pt-diarias-hora-saida" only />
+  <c-ui.forms.field :field="diarias_form.chegada_sede_hora" label="Hora de chegada" size_class="pt-diarias-hora-chegada" only />
 </div>
 
-<section class="cv-form-subsection pt-diarias-resultado" aria-labelledby="pt-diarias-resultado-title">
-  <header class="cv-form-subsection__header">
-    <div class="cv-form-subsection__copy">
-      <h4 class="cv-form-subsection__title" id="pt-diarias-resultado-title">Resultado do cálculo</h4>
+<section class="form-subsection pt-diarias-resultado" aria-labelledby="pt-diarias-resultado-title">
+  <header class="form-subsection__header">
+    <div class="form-subsection__copy">
+      <h4 class="form-subsection__title" id="pt-diarias-resultado-title">Resultado do cálculo</h4>
     </div>
   </header>
   <div class="pt-diarias-summary-grid" data-pt-diarias-resultado>
-    <div class="cv-summary-item cv-summary-item--principal pt-diarias-summary-card pt-diarias-summary-card--principal">
-      <span class="cv-summary-label">Valor total do plano</span>
-      <div class="cv-summary-value cv-summary-value--principal" data-pt-resultado-total>
+    <div class="summary-item summary-item--principal pt-diarias-summary-card pt-diarias-summary-card--principal">
+      <span class="summary-label">Valor total do plano</span>
+      <div class="summary-value summary-value--principal" data-pt-resultado-total>
         {% if diarias_resultado.ok %}R${{ diarias_resultado.valor_total_display }}{% else %}—{% endif %}
       </div>
-      <span class="cv-summary-label">Valor por extenso</span>
+      <span class="summary-label">Valor por extenso</span>
       <div class="pt-diarias-summary-extenso" data-pt-resultado-total-extenso>
         {% if diarias_resultado.ok %}{{ diarias_resultado.valor_total_extenso }}{% else %}—{% endif %}
       </div>
     </div>
 
-    <div class="cv-summary-item cv-summary-item--secondary pt-diarias-summary-card pt-diarias-summary-card--unitario">
-      <span class="cv-summary-label">Valor por servidor</span>
-      <div class="cv-summary-value" data-pt-resultado-unitario>
+    <div class="summary-item summary-item--secondary pt-diarias-summary-card pt-diarias-summary-card--unitario">
+      <span class="summary-label">Valor por servidor</span>
+      <div class="summary-value" data-pt-resultado-unitario>
         {% if diarias_resultado.ok %}R${{ diarias_resultado.valor_unitario_display }}{% else %}—{% endif %}
       </div>
-      <span class="cv-summary-label">Valor por extenso</span>
+      <span class="summary-label">Valor por extenso</span>
       <div class="pt-diarias-summary-extenso" data-pt-resultado-unitario-extenso>
         {% if diarias_resultado.ok %}{{ diarias_resultado.valor_unitario_extenso }}{% else %}—{% endif %}
       </div>
     </div>
 
     <div class="pt-diarias-summary-secondary-stack">
-      <div class="cv-summary-item cv-summary-item--secondary pt-diarias-summary-card">
-        <span class="cv-summary-label">Composição por servidor</span>
-        <div class="cv-summary-value" data-pt-resultado-composicao>
+      <div class="summary-item summary-item--secondary pt-diarias-summary-card">
+        <span class="summary-label">Composição por servidor</span>
+        <div class="summary-value" data-pt-resultado-composicao>
           {% if diarias_resultado.ok %}{{ diarias_resultado.composicao }}{% else %}—{% endif %}
         </div>
       </div>
 
-      <div class="cv-summary-item cv-summary-item--secondary pt-diarias-summary-card">
-        <span class="cv-summary-label">Efetivo total</span>
-        <div class="cv-summary-value" data-pt-resultado-efetivo>
+      <div class="summary-item summary-item--secondary pt-diarias-summary-card">
+        <span class="summary-label">Efetivo total</span>
+        <div class="summary-value" data-pt-resultado-efetivo>
           {% if diarias_resultado.ok %}{{ diarias_resultado.quantidade_servidores }} servidor(es){% else %}—{% endif %}
         </div>
       </div>

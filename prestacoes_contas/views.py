@@ -1,14 +1,14 @@
-import datetime
-import re
 
 from django.contrib import messages
-from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
+from core.pagination import contexto_paginacao
+
+from cadastros.selectors import get_configuracao_sistema
 from core.autosave import AutosavePayloadError
 from core.autosave import autosave_json_response
 from core.autosave import parse_autosave_payload
@@ -89,6 +89,9 @@ from .selectors import listar_prestacoes
 from .selectors import normalizar_aba
 from .services import diaria_inicial_da_prestacao
 from .services import garantir_campos_padrao_relatorio_tecnico
+from .solicitacao_services import salvar_solicitacao_do_autosave
+from .solicitacao_services import salvar_solicitacoes_em_lote
+from .solicitacao_services import valores_do_lote
 
 
 
@@ -144,9 +147,7 @@ from .view_common import (
     _build_identificacao,
     contexto_do_fluxo,
     _diario_queryset,
-    _marcar_servidor_em_preenchimento,
     _is_inline_request,
-    _marcar_servidores_pendentes,
     _prestacao_full,
     _prestacao_queryset,
     _prestacao_servidor_full,
@@ -199,9 +200,6 @@ __all__ = [
     "_date_autosave_value",
     "_diario_queryset",
     "_is_inline_request",
-    "_marcar_servidor_em_preenchimento",
-    "_marcar_servidores_pendentes",
-    "_parse_iso_date",
     "_prestacao_full",
     "_prestacao_queryset",
     "_prestacao_servidor_full",
@@ -307,13 +305,6 @@ def _date_autosave_value(payload, field_name):
     return None
 
 
-def _parse_iso_date(texto):
-    """Converte ``'AAAA-MM-DD'`` em ``date``; ``''`` vira ``None``."""
-    if not texto:
-        return None
-    return datetime.date.fromisoformat(texto)
-
-
 
 
 
@@ -386,12 +377,16 @@ def index(request):
         sort=sort or None,
     )
 
-    page_obj = Paginator(prestacoes, 20).get_page(request.GET.get("page"))
+    paginacao = contexto_paginacao(prestacoes, request, 20)
+    page_obj = paginacao["page_obj"]
+    # `NOVO-08`: uma consulta para a página inteira, não uma por card.
+    configuracao = get_configuracao_sistema()
     cards = marcar_agrupamento_cards(
-        [apresentar_prestacao_servidor_card(ps) for ps in page_obj.object_list]
+        [
+            apresentar_prestacao_servidor_card(ps, configuracao=configuracao)
+            for ps in page_obj.object_list
+        ]
     )
-    page_querystring = request.GET.copy()
-    page_querystring.pop("page", None)
 
     has_filters = any([q, status, viagem_de, viagem_ate, sort])
 
@@ -410,8 +405,7 @@ def index(request):
             "page_title": "Prestações de Contas",
             "page_description": "Acompanhamento das prestações de contas por servidor, agrupadas por ofício.",
             "cards": cards,
-            "page_obj": page_obj,
-            "page_querystring": page_querystring.urlencode(),
+            **paginacao,
             "q":          q,
             "status":     status,
             "aba":        aba,
@@ -438,51 +432,11 @@ def index(request):
 
 def _salvar_solicitacoes_em_lote(request):
     """Fallback sem JS para solicitação e período de liberação de cada servidor."""
-    atualizacoes = {}
-    liberacoes = {}
-    prazos = {}
-    for name, value in request.POST.items():
-        match = re.match(r"^ps-(\d+)-numero_solicitacao$", name)
-        if match:
-            atualizacoes[int(match.group(1))] = normalize_spaces(value or "")
-            continue
-        match_liberacao = re.match(r"^ps-(\d+)-data_liberacao_diarias$", name)
-        if match_liberacao:
-            liberacoes[int(match_liberacao.group(1))] = (value or "").strip()
-            continue
-        match_prazo = re.match(r"^ps-(\d+)-prazo_limite_saque$", name)
-        if match_prazo:
-            prazos[int(match_prazo.group(1))] = (value or "").strip()
-    if not atualizacoes and not liberacoes and not prazos:
+    valores = valores_do_lote(request.POST)
+    if not valores:
         return
-    servidores = _prestacao_servidor_queryset().filter(
-        pk__in=set(atualizacoes) | set(liberacoes) | set(prazos)
-    )
-    for ps in servidores:
-        update_fields = []
-        if ps.pk in atualizacoes:
-            novo = atualizacoes[ps.pk]
-            if ps.numero_solicitacao != novo:
-                ps.numero_solicitacao = novo
-                update_fields.append("numero_solicitacao")
-        if ps.pk in liberacoes:
-            try:
-                nova_liberacao = _parse_iso_date(liberacoes[ps.pk])
-            except ValueError:
-                nova_liberacao = ps.data_liberacao_diarias
-            if ps.data_liberacao_diarias != nova_liberacao:
-                ps.data_liberacao_diarias = nova_liberacao
-                update_fields.append("data_liberacao_diarias")
-        if ps.pk in prazos:
-            try:
-                novo_prazo = _parse_iso_date(prazos[ps.pk])
-            except ValueError:
-                novo_prazo = ps.prazo_limite_saque
-            if ps.prazo_limite_saque != novo_prazo:
-                ps.prazo_limite_saque = novo_prazo
-                update_fields.append("prazo_limite_saque")
-        if update_fields:
-            ps.save(update_fields=[*update_fields, "atualizado_em"])
+    servidores = _prestacao_servidor_queryset().filter(pk__in=valores)
+    salvar_solicitacoes_em_lote(servidores, valores)
 
 
 def _redirect_lista(request, _obj=None):
@@ -544,34 +498,16 @@ def prestacao_servidor_solicitacao_autosave(request, ps_pk):
     except AutosavePayloadError as exc:
         return autosave_json_response(ok=False, message=str(exc))
 
-    valor = _solicitacao_autosave_value(payload)
-    if valor is not None and ps.numero_solicitacao != valor:
-        ps.numero_solicitacao = valor
-        ps.save(update_fields=["numero_solicitacao", "atualizado_em"])
-        _marcar_servidor_em_preenchimento(ps)
-
-    liberacao_raw = _date_autosave_value(payload, "data_liberacao_diarias")
-    prazo_raw = _date_autosave_value(payload, "prazo_limite_saque")
-
-    if liberacao_raw is not None:
-        try:
-            nova_liberacao = _parse_iso_date(liberacao_raw)
-        except ValueError:
-            return autosave_json_response(ok=False, message="Data de liberação inválida.")
-        if ps.data_liberacao_diarias != nova_liberacao:
-            ps.data_liberacao_diarias = nova_liberacao
-            ps.save(update_fields=["data_liberacao_diarias", "atualizado_em"])
-            _marcar_servidor_em_preenchimento(ps)
-
-    if prazo_raw is not None:
-        try:
-            novo_prazo = _parse_iso_date(prazo_raw)
-        except ValueError:
-            return autosave_json_response(ok=False, message="Data de prazo limite inválida.")
-        if ps.prazo_limite_saque != novo_prazo:
-            ps.prazo_limite_saque = novo_prazo
-            ps.save(update_fields=["prazo_limite_saque", "atualizado_em"])
-            _marcar_servidor_em_preenchimento(ps)
+    resultado = salvar_solicitacao_do_autosave(
+        ps,
+        numero=_solicitacao_autosave_value(payload),
+        datas={
+            campo: _date_autosave_value(payload, campo)
+            for campo in ("data_liberacao_diarias", "prazo_limite_saque")
+        },
+    )
+    if resultado.erro:
+        return autosave_json_response(ok=False, message=resultado.erro)
 
     return autosave_json_response(
         ok=True,

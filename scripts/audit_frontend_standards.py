@@ -26,23 +26,19 @@ TEMPLATE_EXCEPTIONS: dict[str, dict] = {
 }
 
 CSS_EXCEPTIONS: dict[str, dict] = {
-    "static/css/forms.css": {
+    "static/css/fields/forms.css": {
         "reason": ".roteiro-editor__* permanece como dominio em CSS global; --route-* sao variaveis globais de tema.",
         "rules": {"domain_selector_in_global", "route_token_in_global", "hex_color_outside_tokens"},
     },
-    "static/css/cards.css": {
+    "static/css/lists/cards.css": {
         "reason": ".oficio-card em cards.css: domínio a mover para oficios.css (Prompt 5).",
         "rules": {"domain_selector_in_global"},
     },
-    "static/css/tokens.css": {
+    "static/css/base/tokens.css": {
         "reason": "Arquivo de tokens — cores hex são a definição original, permitidas aqui.",
         "rules": {"hex_color_outside_tokens"},
     },
-    "static/css/theme.css": {
-        "reason": "Arquivo de tema — cores hex são a definição original, permitidas aqui.",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/03-theme-dark.css": {
+    "static/css/base/03-theme-dark.css": {
         "reason": "Official dark-theme token layer; literal values define semantic tokens.",
         "rules": {"hex_color_outside_tokens"},
     },
@@ -50,12 +46,8 @@ CSS_EXCEPTIONS: dict[str, dict] = {
         "reason": "Transitional dark-theme component overrides; literals allowed until dissolved into components.",
         "rules": {"hex_color_outside_tokens"},
     },
-    "static/css/auth.css": {
+    "static/css/pages/auth.css": {
         "reason": "CSS de autenticação — isolado, pode ter cores específicas.",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/dashboard.css": {
-        "reason": "Dashboard e excecao oficial -- hex restantes sao fallbacks de var() no botao do hero.",
         "rules": {"hex_color_outside_tokens"},
     },
     "static/css/shell.bundle.css": {
@@ -73,6 +65,16 @@ CSS_EXCEPTIONS: dict[str, dict] = {
 # Regras de templates
 # ---------------------------------------------------------------------------
 TEMPLATE_RULES_ERRO = [
+    (
+        "component_include",
+        re.compile(r"{%\s*include\s+['\"](?:components|cotton)/"),
+        "Componente incluído como template — usar a tag <c-…>",
+    ),
+    (
+        "include_without_only",
+        re.compile(r"{%\s*include\b(?:(?!\bonly\b|%}).)*%}"),
+        "Include herda contexto ambiente — declarar parâmetros e usar only",
+    ),
     ("onsubmit_inline", re.compile(r'\bonsubmit='),           'Inline onsubmit event - use addEventListener'),
     ("css_inline",      re.compile(r'\bstyle="'),             'Atributo style="" inline — usar classe CSS'),
     ("onclick_inline",  re.compile(r'\bonclick='),            'Evento onclick inline — usar addEventListener'),
@@ -97,16 +99,47 @@ TEMPLATE_RULES_AVISO = [
 # ---------------------------------------------------------------------------
 # Regras de CSS
 # ---------------------------------------------------------------------------
+# Arquivos que viviam em `static/css/components/` e nunca foram auditados: a
+# varredura era rasa (`glob`), e o diretorio estava um nivel abaixo. O `NOVO-66`
+# os moveu para pastas por funcao e, de quebra, os traria para dentro da conta —
+# somando 114 avisos de divida PREEXISTENTE a uma catraca que so desce, num PR
+# que apenas move arquivo.
+#
+# A cobertura fica adiada para nao misturar as duas coisas. A lacuna esta
+# registrada como `NOVO-67`, com o numero ja medido: 240 -> 354.
+COBERTURA_ADIADA = {
+    "static/css/actions/action-system.css",
+    "static/css/feedback/dialog.css",
+    "static/css/feedback/document-download-loading.css",
+    "static/css/feedback/metric.css",
+    "static/css/feedback/notice.css",
+    "static/css/feedback/pendencias.css",
+    "static/css/feedback/summary-items.css",
+    "static/css/fields/date-picker.css",
+    "static/css/fields/field.css",
+    "static/css/fields/file-picker.css",
+    "static/css/fields/form-panel.css",
+    "static/css/fields/form-sections.css",
+    "static/css/layout/app-shell.css",
+    "static/css/lists/content-cards.css",
+    "static/css/lists/filter-header.css",
+    "static/css/lists/list-header.css",
+    "static/css/lists/list-tabs.css",
+    "static/css/lists/record-list.css",
+    "static/css/pages/document-generation-embedded.css",
+    "static/css/pages/document-viewer.css",
+}
+
 # Arquivos CSS globais onde seletores de domínio não devem aparecer
 GLOBAL_CSS = {
-    "static/css/forms.css",
-    "static/css/lists.css",
-    "static/css/cards.css",
-    "static/css/layout.css",
-    "static/css/base.css",
-    "static/css/utilities.css",
-    "static/css/stages.css",
-    "static/css/documents.css",
+    "static/css/fields/forms.css",
+    "static/css/lists/lists.css",
+    "static/css/lists/cards.css",
+    "static/css/layout/layout.css",
+    "static/css/base/base.css",
+    "static/css/base/utilities.css",
+    "static/css/layout/stages.css",
+    "static/css/pages/documents.css",
 }
 
 # Seletores de domínio que não devem estar em CSS global
@@ -137,6 +170,73 @@ CSS_RULES_AVISO = [
 
 JS_HTTP_OWNER = "static/js/core/http.js"
 JS_UTIL_OWNER = "static/js/core/app.js"
+JS_MASKS_OWNER = "static/js/components/masks.js"
+
+# JS-05 — exceções de JavaScript, com TETO por arquivo.
+#
+# Templates e CSS isentam o par (arquivo, regra) por inteiro; aqui o valor é a
+# contagem que existe hoje. Ficar dentro do teto é EXCEC informativo; passar
+# dele é ERRO. Assim a lista é catraca de verdade — só desce — e um arquivo
+# isento não vira porta de entrada para violação nova.
+#
+# Baixar um teto quando o número cair é parte do trabalho, não faxina opcional.
+JS_EXCEPTIONS: dict[str, dict] = {
+    "static/js/pages/roteiros/editor/index.js": {
+        "reason": "NOVO-14: classes de campo de tempo como condição, sai com o editor (BE-11, fase 6). NOVO-15: HTML de trechos já renderizado pelo servidor.",
+        "rules": {"css_class_as_logic": 6, "innerhtml_dynamic_without_escape": 1},
+    },
+    "static/js/components/overlay.js": {
+        "reason": "NOVO-14: estado aberto do menu lido pela classe; sai na reconstrução do CSS (fase 7).",
+        "rules": {"css_class_as_logic": 1},
+    },
+    "static/js/components/icon-tooltips.js": {
+        "reason": "NOVO-14: distingue o botão de gerenciar pela classe; sai com HT-08 (fase 7).",
+        "rules": {"css_class_as_logic": 1},
+    },
+    "static/js/components/picker-select.js": {
+        "reason": "NOVO-14: lê a própria classe de opção selecionada (fase 7). NOVO-15: interpola SVG constante do próprio arquivo.",
+        "rules": {"css_class_as_logic": 1, "innerhtml_dynamic_without_escape": 2},
+    },
+    # NOVO-15 — innerHTML com dado dinâmico sem escapar. Nenhum destes é XSS
+    # provado: a maioria interpola constante de ícone do próprio arquivo. Ficam
+    # com teto para que nenhum caminho novo entre sem revisão.
+    "static/js/components/location-rows.js": {
+        "reason": "NOVO-15: markup de linha e opções montado a partir de template do próprio DOM.",
+        "rules": {"innerhtml_dynamic_without_escape": 4},
+    },
+    "static/js/pages/gdrive-config.js": {
+        "reason": "NOVO-15: já usa escapeHtml nos dados; a linha marcada monta o invólucro.",
+        "rules": {"innerhtml_dynamic_without_escape": 1},
+    },
+    "static/js/pages/eventos-detalhe.js": {
+        "reason": "JS-02: enhancer sem listener global e sem estado para desmontar.",
+        "rules": {"enhancer_without_destroy": 1},
+    },
+    "static/js/pages/planos-trabalho-wizard.js": {
+        "reason": "NOVO-15: html vindo do servidor, já sanitizado na renderização do template.",
+        "rules": {"innerhtml_dynamic_without_escape": 1},
+    },
+    # JS-02 — enhancers sem `destroy` porque não há o que desmontar. A razão de
+    # cada um está em core/tests/test_js_registry_lifecycle.py, que fixa a lista.
+    "static/js/components/card-toggle.js":          {"reason": "JS-02: sem listener global.", "rules": {"enhancer_without_destroy": 1}},
+    "static/js/components/collection.js":           {"reason": "JS-02: sem listener global.", "rules": {"enhancer_without_destroy": 1}},
+    "static/js/components/diaria-derivados.js":     {"reason": "JS-02: sem listener global.", "rules": {"enhancer_without_destroy": 1}},
+    "static/js/components/document-number-field.js": {"reason": "JS-02: sem listener global.", "rules": {"enhancer_without_destroy": 1}},
+    "static/js/components/fields-init.js":          {"reason": "JS-02: sem listener global.", "rules": {"enhancer_without_destroy": 1}},
+    "static/js/components/masks.js":                {"reason": "JS-02: sem listener global.", "rules": {"enhancer_without_destroy": 1}},
+    "static/js/components/state-toggle.js":         {"reason": "JS-02: sem listener global.", "rules": {"enhancer_without_destroy": 1}},
+    "static/js/components/file-picker.js":          {"reason": "JS-02: delegação de página registrada uma vez no módulo.", "rules": {"enhancer_without_destroy": 1}},
+    "static/js/core/app.js":                        {"reason": "JS-02: delegação de página com guard de módulo. Higiene: o catch vazio é fallback de JSON.parse de atributo malformado.", "rules": {"enhancer_without_destroy": 1, "empty_catch": 1}},
+    # Higiene: `catch` vazio deliberado, com o motivo escrito no próprio código.
+    "static/js/components/document-search.js": {
+        "reason": "Falha de rede não pode derrubar o campo; o comentário no código explica.",
+        "rules": {"empty_catch": 1},
+    },
+    "static/js/core/theme-shared.js": {
+        "reason": "localStorage indisponível (modo privado) não pode quebrar o tema.",
+        "rules": {"empty_catch": 1},
+    },
+}
 JS_RULES_ERRO = [
     (
         "raw_fetch",
@@ -174,7 +274,53 @@ JS_RULES_ERRO = [
         "Feedback nativo — usar CV.feedback",
         None,
     ),
+    # JS-11 — a duplicação aconteceu porque `onlyDigits` não tinha saída
+    # pública em `masks.js`; agora tem, e estas duas regras impedem a volta.
+    (
+        "duplicated_only_digits",
+        re.compile(r"\b(?:function\s+onlyDigits\s*\(|(?:const|let|var)\s+onlyDigits\s*=\s*function)"),
+        "Implementação local de onlyDigits — usar CV.masks.onlyDigits",
+        JS_MASKS_OWNER,
+    ),
+    (
+        "duplicated_mask_cep",
+        re.compile(r"\b(?:function\s+maskCep\s*\(|(?:const|let|var)\s+maskCep\s*=\s*function)"),
+        "Máscara de CEP local — usar CV.masks.format(valor, 'cep')",
+        JS_MASKS_OWNER,
+    ),
 ]
+
+# JS-05 — regras que travam a regressão de JS-01, JS-02 e JS-06.
+#
+# O auditor cobria 6 dos ~9 invariantes medidos. Faltavam justamente as três
+# que guardam os defeitos irmãos desta etapa: sem elas, os dois commits
+# anteriores podiam ser desfeitos com o CI verde. São aplicadas sobre o arquivo
+# inteiro, não linha a linha, porque as três atravessam linhas.
+
+# Classe CSS como condição de lógica (trava JS-06). Estado (`is-*`, `has-*`) é
+# vocabulário legítimo de comportamento e fica de fora; o que a regra persegue
+# é depender do nome de um componente — o que impede renomear o CSS.
+_JS_CLASSE_LOGICA = re.compile(
+    r"""classList\.contains\(\s*(['"])(?!(?:is|has)-)[^'"]+\1"""
+)
+
+# Enhancer sem `destroy` (trava JS-02). O registry aceita o terceiro argumento
+# e o MutationObserver o chama; sem ele o componente vaza em silêncio.
+_JS_ENHANCER_SEM_DESTROY = re.compile(
+    r"""registerEnhancer\(\s*(['"])[^'"]+\1\s*,\s*[A-Za-z_$][\w$.]*\s*\)"""
+)
+
+# `catch` que engole o erro sem nem registrar.
+_JS_CATCH_VAZIO = re.compile(r"catch\s*\([^)]*\)\s*\{\s*\}")
+
+_JS_INNERHTML = re.compile(r"\.innerHTML\s*\+?=\s*")
+
+JS_RULES_ARQUIVO = {
+    "css_class_as_logic": "Nome de classe CSS como condição de lógica — usar data-* dedicado",
+    "enhancer_without_destroy": "registerEnhancer sem `destroy` — o registry chama, o componente ignora",
+    "innerhtml_dynamic_without_escape": "innerHTML com dado dinâmico sem CV.util.escapeHtml",
+    "empty_catch": "catch vazio — engole o erro sem registrar",
+}
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -190,6 +336,98 @@ def check_exception(rel_path: str, rule_name: str, exceptions: dict) -> tuple[bo
     if rule_name in exc.get("rules", set()):
         return True, exc["reason"]
     return False, ""
+
+
+def js_ceiling(rel_path: str, rule_name: str) -> tuple[int | None, str]:
+    """Teto declarado para (arquivo, regra) em JS_EXCEPTIONS, ou (None, "")."""
+    exc = JS_EXCEPTIONS.get(rel_path, {})
+    rules = exc.get("rules", {})
+    if rule_name in rules:
+        return rules[rule_name], exc["reason"]
+    return None, ""
+
+
+_JS_COMENTARIO_BLOCO = re.compile(r"/\*.*?\*/", re.S)
+_JS_COMENTARIO_LINHA = re.compile(r"//[^\n]*")
+
+
+def strip_js_comments(source: str) -> str:
+    """Apaga comentários preservando o número de linhas.
+
+    Sem isto a regra dispara no comentário que explica por que o padrão saiu —
+    é o mesmo erro de método que o NOVO-11 registra no auditor de ORM, que
+    conta `.objects` dentro de docstring.
+    """
+    source = _JS_COMENTARIO_BLOCO.sub(lambda m: "\n" * m.group(0).count("\n"), source)
+    return _JS_COMENTARIO_LINHA.sub("", source)
+
+
+def _linha_de(source: str, pos: int) -> int:
+    return source.count("\n", 0, pos) + 1
+
+
+def _expressao_apos(source: str, inicio: int) -> str:
+    """Devolve a expressão atribuída, até o `;` de nível zero (atravessa linhas)."""
+    i, profundidade, aspas, saida = inicio, 0, None, []
+    while i < len(source):
+        c = source[i]
+        if aspas:
+            if c == "\\":
+                saida.append(source[i : i + 2])
+                i += 2
+                continue
+            if c == aspas:
+                aspas = None
+        elif c in "\"'`":
+            aspas = c
+        elif c in "([{":
+            profundidade += 1
+        elif c in ")]}":
+            profundidade -= 1
+        elif c == ";" and profundidade <= 0:
+            break
+        saida.append(c)
+        i += 1
+    return "".join(saida).strip()
+
+
+def js_file_findings(source: str, raw_source: str) -> list[tuple[str, int, str]]:
+    """Regras de arquivo inteiro (JS-05). Devolve [(regra, linha, trecho)].
+
+    `source` vem sem comentários; `raw_source` é o texto original. A diferença
+    importa para `empty_catch`: um `catch` cujo corpo é só um comentário está
+    documentado — é o contrário do defeito — e só o texto cru sabe disso.
+    """
+    achados: list[tuple[str, int, str]] = []
+
+    for padrao, regra in (
+        (_JS_CLASSE_LOGICA, "css_class_as_logic"),
+        (_JS_ENHANCER_SEM_DESTROY, "enhancer_without_destroy"),
+    ):
+        for m in padrao.finditer(source):
+            achados.append((regra, _linha_de(source, m.start()), m.group(0)))
+
+    for m in _JS_CATCH_VAZIO.finditer(raw_source):
+        achados.append(("empty_catch", _linha_de(raw_source, m.start()), m.group(0).strip()))
+
+    for m in _JS_INNERHTML.finditer(source):
+        expressao = _expressao_apos(source, m.end())
+        if expressao in ('""', "''", "``"):
+            continue  # limpeza de container, sem dado
+        if "escapeHtml" in expressao:
+            continue
+        dinamico = re.search(r"\$\{|\+|[A-Za-z_$][\w$]*\s*\(|^[A-Za-z_$][\w$.]*$", expressao)
+        if not dinamico:
+            continue  # literal estático
+        achados.append(
+            (
+                "innerhtml_dynamic_without_escape",
+                _linha_de(source, m.start()),
+                expressao.replace("\n", " "),
+            )
+        )
+
+    return achados
 
 
 # ---------------------------------------------------------------------------
@@ -224,8 +462,14 @@ def audit_templates() -> list[tuple]:
 
 def audit_css() -> list[tuple]:
     findings = []
-    for path in sorted(CSS_DIR.glob("*.css")):
+    # `rglob`, nao `glob`: o `NOVO-66` moveu 58 arquivos para subpastas, e com a
+    # varredura rasa o auditor passou a enxergar 2 arquivos em vez de 60 — os
+    # avisos cairiam de 240 para 18 sem nenhuma melhora no codigo. Catraca que
+    # desce por cegueira e pior que catraca nenhuma.
+    for path in sorted(CSS_DIR.rglob("*.css")):
         rp = rel(path)
+        if rp in COBERTURA_ADIADA:
+            continue
         # Bundle gerado (NOVO-12): auditar as fontes, não a concatenação.
         if path.name.endswith(".bundle.css"):
             continue
@@ -267,6 +511,14 @@ def audit_js() -> list[tuple]:
         # Bundle gerado (NOVO-12): auditar as fontes, não a concatenação.
         if path.name.endswith(".bundle.js"):
             continue
+        # Teste de JS (JS-03): não é código entregue ao navegador, e o que ele monta
+        # para exercitar uma regra — `innerHTML` de fixture, classe usada como asserção —
+        # é exatamente o que estas regras proíbem no código de produção. Sem esta linha,
+        # escrever teste consome a folga do teto e reprova o CI por escrever teste
+        # (`NOVO-81`). Hoje o único teste existente não dispara nada; a trava é para o
+        # próximo, não para este.
+        if path.name.endswith(".test.js"):
+            continue
         try:
             lines = path.read_text(encoding="utf-8").splitlines()
         except UnicodeDecodeError:
@@ -278,6 +530,26 @@ def audit_js() -> list[tuple]:
                     continue
                 if pattern.search(line):
                     findings.append(("ERRO", rp, idx, rule_name, message, line.strip(), ""))
+
+        # JS-05 — regras de arquivo inteiro, com teto por (arquivo, regra).
+        bruto = "\n".join(lines)
+        por_regra: dict[str, list[tuple[int, str]]] = {}
+        for regra, linha, trecho in js_file_findings(strip_js_comments(bruto), bruto):
+            por_regra.setdefault(regra, []).append((linha, trecho))
+
+        for regra, ocorrencias in por_regra.items():
+            teto, motivo = js_ceiling(rp, regra)
+            mensagem = JS_RULES_ARQUIVO[regra]
+            if teto is not None and len(ocorrencias) <= teto:
+                for linha, trecho in ocorrencias:
+                    findings.append(("EXCEC", rp, linha, regra, mensagem, trecho, motivo))
+                continue
+            if teto is not None:
+                mensagem = (
+                    f"{mensagem} — teto declarado é {teto}, encontrei {len(ocorrencias)}"
+                )
+            for linha, trecho in ocorrencias:
+                findings.append(("ERRO", rp, linha, regra, mensagem, trecho, ""))
 
     return findings
 

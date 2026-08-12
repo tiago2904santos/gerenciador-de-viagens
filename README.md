@@ -8,7 +8,7 @@ Base Django modular e document-centric para o novo sistema `central-viagens-3`.
 
 O sistema e separado por apps de dominio: cadastros, roteiros, eventos, documentos, oficios, termos, justificativas, planos de trabalho, ordens de servico, prestacoes de contas, diario de bordo, assinaturas e integracoes.
 
-No estado atual, `cadastros` e `roteiros` sao os modulos maduros de referencia. O app `documentos` ja possui núcleo técnico reutilizável (tipos, registro, validação, nomenclatura e contratos de render), enquanto `eventos`, `oficios`, `termos`, `justificativas`, `planos_trabalho`, `ordens_servico`, `prestacoes_contas`, `diario_bordo` e `assinaturas` permanecem em fase de preparacao/placeholder funcional, com evolucao por etapas.
+No estado atual, `cadastros` e `roteiros` sao os modulos maduros de referencia. O app `documentos` ja possui núcleo técnico reutilizável (tipos, registro, validação, nomenclatura e contratos de render), enquanto `eventos`, `oficios`, `termos`, `justificativas`, `planos_trabalho`, `ordens_servico`, `prestacoes_contas` e `assinaturas` permanecem em fase de preparacao/placeholder funcional, com evolucao por etapas.
 
 Documentos sao o centro da arquitetura. Eventos podem agrupar documentos, mas nao sao obrigatorios para criar ou evoluir fluxos.
 

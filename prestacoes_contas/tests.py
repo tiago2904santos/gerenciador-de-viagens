@@ -28,16 +28,19 @@ from prestacoes_contas.services import build_relatorio_tecnico_context
 from prestacoes_contas.test_helpers import imagem_bytes
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroTrecho
+from core.testing import area_de_teste
+from core.testing import com_request
+from core.testing import vincular_area
 
 
 class PrestacaoContasSignalsTests(TestCase):
     def setUp(self):
-        self.cargo = Cargo.objects.create(nome="Agente")
-        self.servidor_a = Servidor.objects.create(nome="Servidor A", cargo=self.cargo, cpf="11122233344")
-        self.servidor_b = Servidor.objects.create(nome="Servidor B", cargo=self.cargo, cpf="55566677788")
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Agente")
+        self.servidor_a = Servidor.objects.create(area=area_de_teste(), nome="Servidor A", cargo=self.cargo, cpf="11122233344")
+        self.servidor_b = Servidor.objects.create(area=area_de_teste(), nome="Servidor B", cargo=self.cargo, cpf="55566677788")
 
     def test_cria_prestacao_para_cada_servidor_adicionado_ao_oficio(self):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             protocolo="123456789",
@@ -59,7 +62,7 @@ class PrestacaoContasSignalsTests(TestCase):
         usuário troca os servidores, os semeados não podem sobrar na prestação
         (era o que misturava equipes entre ofícios do mesmo evento).
         """
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=3,
             ano=2026,
             protocolo="111222333",
@@ -77,7 +80,7 @@ class PrestacaoContasSignalsTests(TestCase):
 
     def test_set_servidores_reconcilia_equipe_da_prestacao(self):
         """``.set()`` (usado pelo ModelForm) deve deixar a prestação idêntica à equipe."""
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=4,
             ano=2026,
             protocolo="444555666",
@@ -99,13 +102,14 @@ class RelatorioTecnicoDiariaTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="tester_prestacao", password="123456")
         self.client.force_login(self.user)
-        self.cargo = Cargo.objects.create(nome="Agente")
-        self.servidor_a = Servidor.objects.create(nome="Servidor A", cargo=self.cargo, cpf="11122233344")
-        self.servidor_b = Servidor.objects.create(nome="Servidor B", cargo=self.cargo, cpf="55566677788")
+        vincular_area(self.user)
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Agente")
+        self.servidor_a = Servidor.objects.create(area=area_de_teste(), nome="Servidor A", cargo=self.cargo, cpf="11122233344")
+        self.servidor_b = Servidor.objects.create(area=area_de_teste(), nome="Servidor B", cargo=self.cargo, cpf="55566677788")
 
     def test_diaria_inicial_e_valor_por_servidor_da_prestacao(self):
-        roteiro = Roteiro.objects.create(valor_diarias=Decimal("200.00"))
-        oficio = Oficio.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), valor_diarias=Decimal("200.00"))
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=1,
             ano=2026,
             protocolo="123456789",
@@ -126,7 +130,7 @@ class RelatorioTecnicoDiariaTests(TestCase):
         self.assertEqual(relatorio.passagem, "Não houve")
 
     def test_salvar_oficio_sincroniza_prestacoes_para_equipe_existente(self):
-        oficio = Oficio.objects.create(
+        oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=2,
             ano=2026,
             protocolo="987654321",
@@ -151,10 +155,11 @@ class PrestacaoServidorDiariaOverrideTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="tester_diaria_override", password="123456")
         self.client.force_login(self.user)
-        self.cargo = Cargo.objects.create(nome="Agente")
-        self.servidor_a = Servidor.objects.create(nome="Servidor A", cargo=self.cargo, cpf="11122233344")
-        self.servidor_b = Servidor.objects.create(nome="Servidor B", cargo=self.cargo, cpf="55566677788")
-        self.oficio = Oficio.objects.create(numero=9, ano=2026, protocolo="123456789")
+        vincular_area(self.user)
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Agente")
+        self.servidor_a = Servidor.objects.create(area=area_de_teste(), nome="Servidor A", cargo=self.cargo, cpf="11122233344")
+        self.servidor_b = Servidor.objects.create(area=area_de_teste(), nome="Servidor B", cargo=self.cargo, cpf="55566677788")
+        self.oficio = Oficio.objects.create(area=area_de_teste(), numero=9, ano=2026, protocolo="123456789")
         self.oficio.servidores.add(self.servidor_a, self.servidor_b)
         self.prestacao = PrestacaoContas.objects.get(oficio=self.oficio)
         self.relatorio = RelatorioTecnico.objects.create(
@@ -338,18 +343,19 @@ class PrestacaoAssinadoUploadTests(TestCase):
             password="123456",
         )
         self.client.force_login(self.user)
-        cargo = Cargo.objects.create(nome="Agente")
-        self.motorista = Servidor.objects.create(
+        vincular_area(self.user)
+        cargo = Cargo.objects.create(area=area_de_teste(), nome="Agente")
+        self.motorista = Servidor.objects.create(area=area_de_teste(), 
             nome="Motorista",
             cargo=cargo,
             cpf="11122233344",
         )
-        self.servidor = Servidor.objects.create(
+        self.servidor = Servidor.objects.create(area=area_de_teste(), 
             nome="Servidor",
             cargo=cargo,
             cpf="55566677788",
         )
-        self.oficio = Oficio.objects.create(
+        self.oficio = Oficio.objects.create(area=area_de_teste(), 
             numero=18,
             ano=2026,
             protocolo="123456789",
@@ -534,13 +540,45 @@ class PrestacaoAssinadoUploadTests(TestCase):
             ).exists()
         )
 
+    def test_upload_assinado_nao_segue_next_externo(self):
+        response = self.client.post(
+            reverse(
+                "prestacoes_contas:prestacao_despacho_assinado_anexar",
+                args=[self.prestacao.pk],
+            ),
+            {"next": "https://externo.invalido/coleta"},
+        )
+
+        self.assertRedirects(
+            response,
+            reverse("prestacoes_contas:index"),
+            fetch_redirect_response=False,
+        )
+
     def test_lista_exibe_uploads_assinados_conforme_o_papel(self):
+        """O item de anexar assinados migrou para o menu sob demanda (`PF-04`).
+
+        O modal e o seletor de tipo continuam na lista — são um por página. O item
+        que os dispara é que passou a vir de `prestacoes_contas:card_menus`, um
+        fragmento por card, e é lá que este teste foi conferir.
+        """
         response = self.client.get(reverse("prestacoes_contas:index"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Anexar documentos assinados", count=2)
         self.assertNotContains(response, "Anexar RT assinado")
         self.assertNotContains(response, "Anexar diário assinado")
+
+        fragmentos = [
+            self.client.get(
+                reverse("prestacoes_contas:card_menus", args=[card["servidores"][0]["ps_pk"]])
+            )
+            for card in response.context["cards"]
+        ]
+        self.assertEqual(len(fragmentos), 2)
+        for fragmento in fragmentos:
+            self.assertContains(fragmento, "Anexar documentos assinados", count=1)
+            self.assertNotContains(fragmento, "Anexar RT assinado")
+            self.assertNotContains(fragmento, "Anexar diário assinado")
         # `H-03`: era medido pelo nome dos atributos ordinais
         # (`...-secondary-url`, `...-tertiary-option-label`). O contrato de
         # verdade é *quais* três documentos o menu do card oferece e com que
@@ -556,7 +594,8 @@ class PrestacaoAssinadoUploadTests(TestCase):
                     ("comprovante", "Comprovante"),
                 ],
             )
-        self.assertContains(response, "data-attach-signed-kinds", count=2)
+        for fragmento in fragmentos:
+            self.assertContains(fragmento, "data-attach-signed-kinds", count=1)
         self.assertContains(response, "data-attach-signed-kind-selector", count=1)
         self.assertContains(response, "Anexar despacho assinado", count=4)
         self.assertContains(response, "data-attach-signed-modal", count=1)
@@ -566,9 +605,10 @@ class RelatorioTecnicoDocumentoTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="tester_rt_doc", password="123456")
         self.client.force_login(self.user)
-        self.cargo = Cargo.objects.create(nome="Agente")
-        self.servidor = Servidor.objects.create(nome="Servidor RT", cargo=self.cargo, cpf="11122233344")
-        self.oficio = Oficio.objects.create(numero=7, ano=2026, protocolo="123456789")
+        vincular_area(self.user)
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Agente")
+        self.servidor = Servidor.objects.create(area=area_de_teste(), nome="Servidor RT", cargo=self.cargo, cpf="11122233344")
+        self.oficio = Oficio.objects.create(area=area_de_teste(), numero=7, ano=2026, protocolo="123456789")
         self.oficio.servidores.add(self.servidor)
         self.prestacao = PrestacaoContas.objects.get(oficio=self.oficio)
         self.ps = self.prestacao.servidores_prestacao.get(servidor=self.servidor)
@@ -583,7 +623,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
 
     def test_contexto_preenche_cabecalho_e_rodape_do_template(self):
         cfg = ConfiguracaoSistema.get_singleton()
-        cfg.unidade = Unidade.objects.create(nome="UNIDADE TESTE")
+        cfg.unidade = Unidade.objects.create(area=area_de_teste(), nome="UNIDADE TESTE")
         cfg.logradouro = "RUA CENTRAL"
         cfg.numero = "123"
         cfg.bairro = "CENTRO"
@@ -604,7 +644,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.assertEqual(contexto["email"], "teste@pc.pr.gov.br")
 
     def test_data_rt_nao_fica_antes_do_retorno(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             retorno_chegada_dt=timezone.make_aware(datetime(2026, 6, 19, 18, 0)),
         )
         self.oficio.roteiro = roteiro
@@ -616,7 +656,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.assertEqual(contexto["data_atual_extenso"], "19 de junho de 2026")
 
     def test_data_rt_usa_hoje_dentro_de_tres_dias_uteis_apos_retorno(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             retorno_chegada_dt=timezone.make_aware(datetime(2026, 6, 19, 18, 0)),
         )
         self.oficio.roteiro = roteiro
@@ -628,7 +668,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.assertEqual(contexto["data_atual_extenso"], "23 de junho de 2026")
 
     def test_data_rt_limita_ao_terceiro_dia_util_apos_retorno(self):
-        roteiro = Roteiro.objects.create(
+        roteiro = Roteiro.objects.create(area=area_de_teste(), 
             retorno_chegada_dt=timezone.make_aware(datetime(2026, 6, 19, 18, 0)),
         )
         self.oficio.roteiro = roteiro
@@ -640,7 +680,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.assertEqual(contexto["data_atual_extenso"], "24 de junho de 2026")
 
     def test_contexto_rt_usa_padrao_quando_campos_custeio_estao_em_branco(self):
-        roteiro = Roteiro.objects.create(valor_diarias=Decimal("210.00"))
+        roteiro = Roteiro.objects.create(area=area_de_teste(), valor_diarias=Decimal("210.00"))
         self.oficio.roteiro = roteiro
         self.oficio.save(update_fields=["roteiro", "updated_at"])
         RelatorioTecnico.objects.filter(pk=self.relatorio.pk).update(
@@ -670,7 +710,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
 
     @mock.patch("prestacoes_contas.async_documents.gerar_relatorio_tecnico_docx", return_value=b"docx")
     def test_download_rt_materializa_campos_padrao_antes_de_gerar(self, _mock_docx):
-        roteiro = Roteiro.objects.create(valor_diarias=Decimal("210.00"))
+        roteiro = Roteiro.objects.create(area=area_de_teste(), valor_diarias=Decimal("210.00"))
         self.oficio.roteiro = roteiro
         self.oficio.save(update_fields=["roteiro", "updated_at"])
         RelatorioTecnico.objects.filter(pk=self.relatorio.pk).update(
@@ -880,7 +920,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
             )
 
             response = self.client.post(
-                reverse("prestacoes_contas:prestacao_documento_excluir", args=[self.prestacao.pk, anexo.pk]),
+                reverse("prestacoes_contas:prestacao_documento_delete", args=[self.prestacao.pk, anexo.pk]),
                 HTTP_X_REQUESTED_WITH="XMLHttpRequest",
             )
 
@@ -938,7 +978,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.assertEqual(self.relatorio.passagem, "Não houve")
 
     def test_autosave_diario_salva_km_e_abastecimento(self):
-        roteiro = Roteiro.objects.create()
+        roteiro = Roteiro.objects.create(area=area_de_teste())
         self.oficio.roteiro = roteiro
         self.oficio.save(update_fields=["roteiro", "updated_at"])
         RoteiroTrecho.objects.create(
@@ -979,7 +1019,7 @@ class RelatorioTecnicoDocumentoTests(TestCase):
         self.assertEqual(contexto["col_solicitacao"], "SOL-789")
 
     def test_coluna_solicitacao_preserva_linha_vazia_para_outro_servidor(self):
-        servidor_b = Servidor.objects.create(nome="Servidor ZZ", cargo=self.cargo, cpf="22233344455")
+        servidor_b = Servidor.objects.create(area=area_de_teste(), nome="Servidor ZZ", cargo=self.cargo, cpf="22233344455")
         self.oficio.servidores.add(servidor_b)
         self.ps.numero_solicitacao = "SOL-789"
         self.ps.save(update_fields=["numero_solicitacao", "atualizado_em"])
@@ -1050,20 +1090,24 @@ class PrestacaoAbasTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="tester_abas", password="123456")
         self.client.force_login(self.user)
-        self.cargo = Cargo.objects.create(nome="Agente")
-        self.servidor = Servidor.objects.create(nome="Servidor Abas", cargo=self.cargo, cpf="11122233344")
+        vincular_area(self.user)
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Agente")
+        self.servidor = Servidor.objects.create(area=area_de_teste(), nome="Servidor Abas", cargo=self.cargo, cpf="11122233344")
 
     def _criar_prestacao(self, *, numero=1):
         """Cria um ofício (e, via signal, a prestação) com um servidor vinculado."""
-        roteiro = Roteiro.objects.create(saida_dt=timezone.now())
-        oficio = Oficio.objects.create(numero=numero, ano=2026, protocolo=f"1000000{numero}", roteiro=roteiro)
+        roteiro = Roteiro.objects.create(area=area_de_teste(), saida_dt=timezone.now())
+        oficio = Oficio.objects.create(area=area_de_teste(), numero=numero, ano=2026, protocolo=f"1000000{numero}", roteiro=roteiro)
         oficio.servidores.add(self.servidor)
         return PrestacaoContas.objects.get(oficio=oficio).servidores_prestacao.get()
 
     def _pks(self, aba):
         from prestacoes_contas import selectors
 
-        return set(selectors.listar_prestacoes(aba=aba).values_list("pk", flat=True))
+        # DB-02: o selector recorta pela area do request; chamado direto (sem
+        # client) precisa do contexto que a view teria.
+        with com_request(area_de_teste()):
+            return set(selectors.listar_prestacoes(aba=aba).values_list("pk", flat=True))
 
     def _liberar(self, ps):
         """Marca a data de liberação das diárias do (único) servidor da prestação."""
@@ -1138,7 +1182,8 @@ class PrestacaoAbasTests(TestCase):
         p_fin = self._criar_prestacao(numero=4)
         p_fin.definir_finalizada(True)
 
-        contagem = selectors.contar_por_aba()
+        with com_request(area_de_teste()):
+            contagem = selectors.contar_por_aba()
         self.assertEqual(contagem[selectors.ABA_NAO_LIBERADAS], 1)
         self.assertEqual(contagem[selectors.ABA_LIBERADAS], 1)
         self.assertEqual(contagem[selectors.ABA_ARQUIVADOS], 1)
@@ -1152,10 +1197,11 @@ class PrestacaoPorServidorFluxoTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username="tester_fluxo_ps", password="123456")
         self.client.force_login(self.user)
-        self.cargo = Cargo.objects.create(nome="Agente")
-        self.servidor_a = Servidor.objects.create(nome="Servidor Um", cargo=self.cargo, cpf="11122233344")
-        self.servidor_b = Servidor.objects.create(nome="Servidor Dois", cargo=self.cargo, cpf="55566677788")
-        self.oficio = Oficio.objects.create(numero=21, ano=2026, protocolo="212121212")
+        vincular_area(self.user)
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Agente")
+        self.servidor_a = Servidor.objects.create(area=area_de_teste(), nome="Servidor Um", cargo=self.cargo, cpf="11122233344")
+        self.servidor_b = Servidor.objects.create(area=area_de_teste(), nome="Servidor Dois", cargo=self.cargo, cpf="55566677788")
+        self.oficio = Oficio.objects.create(area=area_de_teste(), numero=21, ano=2026, protocolo="212121212")
         self.oficio.servidores.add(self.servidor_a, self.servidor_b)
         self.prestacao = PrestacaoContas.objects.get(oficio=self.oficio)
         self.ps_a = self.prestacao.servidores_prestacao.get(servidor=self.servidor_a)
@@ -1178,14 +1224,15 @@ class PrestacaoPorServidorFluxoTests(TestCase):
         self.ps_b.refresh_from_db()
         self.assertTrue(self.ps_a.arquivada)
         self.assertFalse(self.ps_b.arquivada)
-        self.assertIn(
-            self.ps_a.pk,
-            set(selectors.listar_prestacoes(aba=selectors.ABA_ARQUIVADOS).values_list("pk", flat=True)),
-        )
-        self.assertIn(
-            self.ps_b.pk,
-            set(selectors.listar_prestacoes(aba=selectors.ABA_NAO_LIBERADAS).values_list("pk", flat=True)),
-        )
+        with com_request(area_de_teste()):
+            self.assertIn(
+                self.ps_a.pk,
+                set(selectors.listar_prestacoes(aba=selectors.ABA_ARQUIVADOS).values_list("pk", flat=True)),
+            )
+            self.assertIn(
+                self.ps_b.pk,
+                set(selectors.listar_prestacoes(aba=selectors.ABA_NAO_LIBERADAS).values_list("pk", flat=True)),
+            )
 
     def test_texto_rt_salvo_em_um_servidor_aparece_na_pagina_do_outro(self):
         RelatorioTecnico.objects.create(

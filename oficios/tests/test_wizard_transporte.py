@@ -10,6 +10,8 @@ from cadastros.models import Viatura
 from oficios.models import Oficio
 from oficios.services import pendencias_motorista_documento
 from oficios.services import validar_oficio_para_documento
+from core.testing import area_de_teste
+from core.testing import vincular_area
 
 
 class OficioWizardTransporteTests(TestCase):
@@ -19,17 +21,18 @@ class OficioWizardTransporteTests(TestCase):
             password="123456",
         )
         self.client.force_login(self.user)
-        self.cargo = Cargo.objects.create(nome="Motorista Cargo")
-        self.comb = Combustivel.objects.create(nome="Flex")
-        self.servidor = Servidor.objects.create(nome="Motorista Servidor", cargo=self.cargo, cpf="11122233344")
-        self.unidade_m = Unidade.objects.create(nome="ASCOM Central", sigla="ASCOM")
-        self.motorista_viatura = Servidor.objects.create(
+        vincular_area(self.user)
+        self.cargo = Cargo.objects.create(area=area_de_teste(), nome="Motorista Cargo")
+        self.comb = Combustivel.objects.create(area=area_de_teste(), nome="Flex")
+        self.servidor = Servidor.objects.create(area=area_de_teste(), nome="Motorista Servidor", cargo=self.cargo, cpf="11122233344")
+        self.unidade_m = Unidade.objects.create(area=area_de_teste(), nome="ASCOM Central", sigla="ASCOM")
+        self.motorista_viatura = Servidor.objects.create(area=area_de_teste(), 
             nome="João da Silva",
             cargo=self.cargo,
             cpf="22233344455",
             unidade=self.unidade_m,
         )
-        self.viatura = Viatura.objects.create(
+        self.viatura = Viatura.objects.create(area=area_de_teste(), 
             placa="ABC1234",
             modelo="Renault Duster",
             combustivel=self.comb,
@@ -167,7 +170,7 @@ class OficioWizardTransporteTests(TestCase):
         self.assertEqual(oficio.motorista_protocolo_ref, "")
 
     def test_post_motorista_servidor_fora_equipe_com_oficio_protocolo(self):
-        externo = Servidor.objects.create(nome="Fora Equipe", cargo=self.cargo, cpf="33344455566")
+        externo = Servidor.objects.create(area=area_de_teste(), nome="Fora Equipe", cargo=self.cargo, cpf="33344455566")
         oficio = self._oficio_com_etapa1_minima()
         response = self.client.post(
             reverse("oficios:transporte", args=[oficio.pk]),
@@ -206,7 +209,7 @@ class OficioWizardTransporteTests(TestCase):
         self.assertTrue(any("protocolo do motorista" in x.lower() for x in p))
 
     def test_documento_exige_oficio_protocolo_motorista_fora_equipe(self):
-        externo = Servidor.objects.create(nome="Fora Equipe Doc", cargo=self.cargo, cpf="44455566677")
+        externo = Servidor.objects.create(area=area_de_teste(), nome="Fora Equipe Doc", cargo=self.cargo, cpf="44455566677")
         oficio = self._oficio_com_etapa1_minima()
         oficio.motorista = externo
         oficio.motorista_modo = Oficio.MOTORISTA_MODO_SERVIDOR

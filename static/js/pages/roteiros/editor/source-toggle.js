@@ -13,9 +13,9 @@
     var wasActive = button.getAttribute("aria-pressed") === "true";
     button.setAttribute("aria-pressed", active ? "true" : "false");
     if (active && !wasActive) {
-      button.classList.remove("cv-segment-toggle__btn--pop");
+      button.classList.remove("segment-toggle__btn--pop");
       void button.offsetWidth;
-      button.classList.add("cv-segment-toggle__btn--pop");
+      button.classList.add("segment-toggle__btn--pop");
     }
   }
 

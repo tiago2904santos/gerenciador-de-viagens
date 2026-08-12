@@ -176,7 +176,7 @@ class SolicitacaoEmLoteTests(PrestacaoFixturesMixin, TestCase):
         self.assertEqual(self.ps.prazo_limite_saque, date(2026, 9, 15))
 
     def test_lote_ignora_data_invalida_em_silencio_mantendo_a_anterior(self):
-        """Divergência com o autosave, deliberadamente fotografada (NOVO-09).
+        """Divergência com o autosave, deliberadamente fotografada (NOVO-103).
 
         O autosave devolve ``ok=False`` com mensagem; o lote engole o erro e
         preserva o valor. Quem salva sem JS não descobre que a data não entrou.
@@ -190,7 +190,7 @@ class SolicitacaoEmLoteTests(PrestacaoFixturesMixin, TestCase):
         self.assertEqual(self.ps.data_liberacao_diarias, date(2026, 9, 1))
 
     def test_lote_nao_marca_em_preenchimento(self):
-        """Divergência com o autosave, deliberadamente fotografada (NOVO-09).
+        """Divergência com o autosave, deliberadamente fotografada (NOVO-103).
 
         O mesmo campo, salvo pelo caminho sem JS, deixa o servidor em PENDENTE.
         O status passa a depender de o navegador ter JavaScript.

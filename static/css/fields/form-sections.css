@@ -1,0 +1,409 @@
+/* ========================================================================
+   Canonical form composition
+
+   These classes describe reusable layout contracts. Page modules may add
+   data-* hooks for business behaviour, but should not duplicate this visual
+   structure with module-prefixed selectors.
+   ======================================================================== */
+
+.form-card > .form-section-body {
+  display: grid;
+  gap: 10px;
+}
+
+.form-block {
+  align-items: start;
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  /* NOVO-58 (E8): existia só no tema escuro, em
+     `theme-dark-components.css`. O claro é o desenho ANTERIOR ao redesenho, e é
+     o que o sistema mostra para quem nunca escolheu tema.
+
+     Não é ajuste cosmético: medido no navegador, o padding só-escuro encolhia a
+     caixa de conteúdo em 28px, os filhos iam de 434px para 406px, o texto
+     quebrava diferente e a página ganhava 48,55px — propagando por 14 níveis. É
+     essa cadeia que desestabilizava a régua de tema (`NOVO-84`).
+
+     `14px` literal, e não `var(--space-4)`: a escala vai de 12 (`--space-3`)
+     para 16, e não há token de 14. Usar 16 mexeria 2px no ESCURO, e a E8 é o
+     claro alcançando o escuro — não os dois indo para um terceiro lugar. O
+     valor fora de escala está registrado para a E9 (`NOVO-89`). */
+  padding: 14px;
+}
+
+.form-block__header {
+  align-items: baseline;
+  display: flex;
+  gap: var(--space-3);
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.form-block__copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.form-block:not(.form-block--split):not(.form-block--resource) >
+  .form-block__header .form-block__copy {
+  align-items: baseline;
+  display: flex;
+  gap: var(--space-3);
+  justify-content: space-between;
+  width: 100%;
+}
+
+.form-block__title,
+.form-block__description {
+  margin: 0;
+}
+
+.form-block__body {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.form-block__actions {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--space-2);
+}
+
+.form-block--split {
+  align-items: end;
+  grid-template-columns: minmax(160px, 0.7fr) minmax(0, 2fr);
+}
+
+.form-block--split > .form-block__header {
+  align-self: center;
+  display: grid;
+  gap: 3px;
+  justify-content: start;
+}
+
+.form-block--split > .form-block__body {
+  align-self: end;
+}
+
+.form-stack {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.travel-schedule {
+  display: grid;
+  /* Mesmo espaçamento Sede↔Destinos do ofício (14px). */
+  gap: 14px;
+  min-width: 0;
+}
+
+/* O bloco Destinos já traz margin-top no ofício; dentro do schedule o gap cobre. */
+.travel-schedule .route-destinos-block.route-destinos-block--split {
+  margin-top: 0;
+}
+
+.travel-schedule__period-fields {
+  align-items: start;
+  display: grid;
+  gap: var(--space-3) var(--space-4);
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+}
+
+.travel-schedule__period-fields--with-extra {
+  grid-template-columns: minmax(0, 2fr) minmax(14rem, 1fr);
+}
+
+.travel-period-block--split .travel-schedule__period-fields--with-extra {
+  align-items: end;
+  grid-template-columns: minmax(0, 2fr) minmax(12rem, 1fr);
+}
+
+.travel-schedule__period-fields > * {
+  min-width: 0;
+}
+
+.form-subsection {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.form-subsection + .form-subsection {
+  border-top: 1px solid var(--color-border-soft);
+  padding-top: var(--space-3);
+}
+
+.form-subsection--split > .form-subsection__header {
+  align-self: center;
+  display: grid;
+  gap: 3px;
+  justify-content: start;
+}
+
+.form-subsection--split > :not(.form-subsection__header) {
+  align-self: end;
+  min-width: 0;
+}
+
+.form-subsection__header {
+  align-items: baseline;
+  display: flex;
+  gap: var(--space-3);
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.form-subsection__copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.form-subsection__title,
+.form-subsection__description {
+  margin: 0;
+}
+
+.composite-field__control {
+  align-items: stretch;
+  display: grid;
+  gap: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.composite-field__control > .form-control {
+  min-width: 0;
+}
+
+.composite-field__suffix {
+  align-items: center;
+  display: inline-flex;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .form-block--split {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .form-block--split > .form-block__header {
+    align-items: baseline;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .form-subsection--split {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .form-subsection--split > .form-subsection__header {
+    align-items: baseline;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .travel-schedule__period-fields--with-extra {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .form-block:not(.form-block--split):not(.form-block--resource) >
+    .form-block__header .form-block__copy {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .form-block__header,
+  .form-block--split > .form-block__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .form-block__actions {
+    width: 100%;
+  }
+
+  .form-subsection__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .resource-picker__actions,
+  .resource-picker__actions .cv-btn {
+    width: 100%;
+  }
+}
+/* Segmented control canônico para opções mutuamente exclusivas. */
+.segment-toggle {
+  align-items: center;
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-strong));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  flex-shrink: 0;
+  gap: 2px;
+  padding: 3px;
+}
+
+.segment-toggle__btn {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: calc(var(--radius-pill) - 2px);
+  color: color-mix(in srgb, var(--color-accent) 60%, var(--color-muted-strong));
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  gap: var(--space-1);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  padding: 5px var(--space-3);
+  transition:
+    background 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 160ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  user-select: none;
+  white-space: nowrap;
+  will-change: transform, background;
+}
+
+html[data-theme="light"] .segment-toggle__btn {
+  color: color-mix(in srgb, var(--color-primary-bright) 60%, var(--color-muted-strong));
+}
+
+.segment-toggle__btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+html[data-theme="light"] .segment-toggle__btn:focus-visible {
+  outline-color: var(--color-primary-bright);
+}
+
+.segment-toggle__btn:hover:not([aria-pressed="true"]) {
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+  color: var(--color-accent);
+}
+
+html[data-theme="light"] .segment-toggle__btn:hover:not([aria-pressed="true"]) {
+  background: color-mix(in srgb, var(--color-primary-bright) 10%, transparent);
+  color: var(--color-primary-bright);
+}
+
+.segment-toggle__btn[aria-pressed="true"] {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+  border-color: var(--color-accent-hover);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.30),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  color: #071a33;
+  transform: scale(1.01);
+}
+
+/* ── Variante de navegacao (components/lists/list_toggle.html) ──
+   Mesma aparencia do .evento-doc-toggle (Eventos > documentos): poco chapado
+   em vez da pilha com borda de accent, cantos 10/7 e ativo preenchido.
+   Duas diferencas: fica compacto na barra de lista (inline-grid com colunas
+   automaticas, nao width:100%), e os segmentos sao links — link nao aceita
+   aria-pressed, entao o ativo vem de aria-current="page". */
+.segment-toggle--nav.segment-toggle {
+  background: var(--step1-panel, var(--color-surface-soft));
+  border-color: transparent;
+  border-radius: 10px;
+  box-shadow: none;
+  display: inline-grid;
+  gap: 2px;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  padding: 3px;
+}
+
+.segment-toggle--nav .segment-toggle__btn {
+  border-radius: 7px;
+  color: var(--color-muted-strong);
+  justify-content: center;
+  min-height: 34px;
+  padding: 7px var(--space-3);
+  text-align: center;
+  text-decoration: none;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform, background;
+}
+
+.segment-toggle--nav .segment-toggle__btn[aria-current="page"] {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: none;
+  color: var(--color-on-accent);
+  transform: scale(1.01);
+}
+
+.segment-toggle--nav .segment-toggle__btn--pop {
+  animation: cv-segment-pop 280ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.segment-toggle--nav .segment-toggle__btn:hover:not([aria-current="page"]) {
+  background: color-mix(in srgb, #fff 5%, transparent);
+  color: var(--color-text);
+}
+
+html[data-theme="light"] .segment-toggle--nav .segment-toggle__btn:hover:not([aria-current="page"]) {
+  background: color-mix(in srgb, #000 4%, transparent);
+  color: var(--color-text);
+}
+
+/* contador herda a cor do segmento, entao funciona nos dois estados */
+.segment-toggle__count {
+  background: color-mix(in srgb, currentColor 16%, transparent);
+  border-radius: var(--radius-pill);
+  font-size: 0.9em;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  padding: 2px 6px;
+}
+
+html[data-theme="light"] .segment-toggle__btn[aria-pressed="true"] {
+  background: var(--color-primary-bright);
+  border-color: color-mix(in srgb, var(--color-primary-bright) 70%, #000);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.18),
+    0 0 0 1px color-mix(in srgb, var(--color-primary-bright) 45%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.20);
+  color: #fff;
+  transform: scale(1.01);
+}
+
+html[data-theme="light"] .segment-toggle {
+  background: color-mix(in srgb, var(--color-primary-bright) 10%, var(--color-surface-strong));
+  border-color: color-mix(in srgb, var(--color-primary-bright) 35%, var(--color-border));
+}
+
+@keyframes cv-segment-pop {
+  0% { opacity: 0.55; transform: scale(0.88); }
+  55% { opacity: 1; transform: scale(1.06); }
+  100% { opacity: 1; transform: scale(1.01); }
+}
+
+.segment-toggle__btn--pop {
+  animation: cv-segment-pop 280ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}

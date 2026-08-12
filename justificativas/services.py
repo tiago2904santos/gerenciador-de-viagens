@@ -9,9 +9,12 @@ from django.utils import timezone
 
 from django.db import transaction
 
+from core.deletion import excluir_com_protecao
+
 from cadastros.models import ConfiguracaoSistema
 
 from .models import Justificativa
+from .models import ModeloJustificativa
 from .selectors import get_or_none_justificativa_by_oficio
 
 
@@ -273,21 +276,53 @@ def avaliar_etapa_justificativa_oficio(oficio) -> dict[str, Any]:
 
 @transaction.atomic
 def criar_modelo_justificativa(form):
-    """Persiste novo modelo (normalização em ModeloJustificativa.save)."""
-    return form.save()
+    """Persiste novo modelo (normalização em ModeloJustificativa.save).
+
+    `NOVO-09`: o modelo nasce na área ativa. Mesma forma de
+    `oficios.services.criar_modelo_motivo`, inclusive o recorte do `is_padrao` —
+    que o `save()` do model também faz, e aqui vale para o caso de o form trazer
+    uma área explícita.
+    """
+    modelo = form.save(commit=False)
+    if not modelo.area_id:
+        from core.tenancy import get_current_area
+
+        modelo.area = get_current_area()
+    if modelo.is_padrao:
+        # `BE-09`: `all_objects` — escopo é a área do modelo, já no filtro. Recortado,
+        # o padrão anterior sobrevive e a gravação estoura em
+        # `justificativas_modelo_area_padrao_unique` — desfazendo o `NOVO-09`.
+        ModeloJustificativa.all_objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(
+            is_padrao=False
+        )
+    modelo.save()
+    return modelo
 
 
 @transaction.atomic
 def atualizar_modelo_justificativa(instance, form):
     _ = instance
-    return form.save()
+    modelo = form.save(commit=False)
+    if not modelo.area_id:
+        from core.tenancy import get_current_area
+
+        modelo.area = get_current_area()
+    if modelo.is_padrao:
+        # `BE-09`: `all_objects` — escopo é a área do modelo, já no filtro. Recortado,
+        # o padrão anterior sobrevive e a gravação estoura em
+        # `justificativas_modelo_area_padrao_unique` — desfazendo o `NOVO-09`.
+        ModeloJustificativa.all_objects.exclude(pk=modelo.pk).filter(area=modelo.area).update(
+            is_padrao=False
+        )
+    modelo.save()
+    return modelo
 
 
 @transaction.atomic
 def excluir_modelo_justificativa(instance):
-    instance.delete()
+    excluir_com_protecao(instance)
 
 
 @transaction.atomic
 def excluir_justificativa(instance):
-    instance.delete()
+    excluir_com_protecao(instance)

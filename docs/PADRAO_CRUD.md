@@ -26,7 +26,7 @@ O app `roteiros` possui CRUD publico em `/roteiros/` (listagem, novo, editar, de
 - `admin.py`: cadastro manual auxiliar.
 - `selectors.py`: listagem, detalhe, trechos, cidades para select, estimativa.
 - `services/roteiro_editor.py`: fluxo do wizard avulso e exclusao com `ProtectedError`.
-- `presenters.py`: card, contexto de formulario (delega montagem profunda ao `roteiro_logic`), pagina de detalhe.
+- `presenters.py`: card, contexto de formulario (dono da montagem desde o `BE-13` fatia 2; o estado vem do `services/editor_state_builder.py`), pagina de detalhe.
 - `views.py`: orquestracao magra; endpoints de diarias e estimativa.
 - `templates/roteiros/` + `templates/components/travel/`: UI componentizada.
 
