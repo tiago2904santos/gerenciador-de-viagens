@@ -27,6 +27,7 @@ from django.test import TransactionTestCase
 
 from cadastros.models import ConfiguracaoSistema
 from planos_trabalho.models import PlanoTrabalho
+from planos_trabalho.services import salvar_plano_numerado
 from usuarios.models import AreaTrabalho
 
 
@@ -52,8 +53,8 @@ class PlanoNumberingConcurrencyTests(TransactionTestCase):
             try:
                 area_local = AreaTrabalho.objects.get(pk=area_id)
                 barrier.wait(timeout=5)
-                numero, _ano, _sufixo = PlanoTrabalho.proximo_numero(area_local)
-                return numero
+                plano = salvar_plano_numerado(PlanoTrabalho(area=area_local))
+                return plano.numero
             finally:
                 close_old_connections()
 
@@ -65,3 +66,4 @@ class PlanoNumberingConcurrencyTests(TransactionTestCase):
             [1, 2],
             "duas reservas simultâneas devolveram o mesmo número de plano",
         )
+        self.assertEqual(PlanoTrabalho.all_objects.filter(area=area).count(), 2)

@@ -8,10 +8,13 @@ from datetime import datetime
 from decimal import Decimal
 
 from django.conf import settings
+from django.db import transaction
 from django.db.models import Max
 from django.utils import timezone
 
 from cadastros.models import ConfiguracaoSistema
+from core.numeracao import NAMESPACE_PLANO_TRABALHO
+from core.numeracao import reservar_numero
 from core.tenancy import filter_queryset_by_area
 from core.tenancy import get_current_area
 from documentos.services.facade import build_default_facade
@@ -36,6 +39,8 @@ from .models import EventoPlano
 from .models import PlanoTrabalho
 
 logger = logging.getLogger(__name__)
+
+CONSTRAINT_NUMERO_PLANO_TRABALHO = "planos_trabalho_area_ano_numero_unique"
 
 _MESES_PT = (
     "", "janeiro", "fevereiro", "março", "abril", "maio", "junho",
@@ -1288,6 +1293,66 @@ def marcar_plano_gerado(plano: PlanoTrabalho) -> None:
         plano.save(update_fields=["status", "updated_at"])
 
 
+@transaction.atomic
+def salvar_plano_numerado(plano: PlanoTrabalho) -> PlanoTrabalho:
+    """Reserva e grava o Plano com a mecânica comum e a política de contador."""
+    if plano.numero and plano.ano:
+        plano.save()
+        return plano
+
+    ano = timezone.localdate().year
+    original_pk = plano.pk
+    original_adding = plano._state.adding
+    escolha = {}
+
+    def escolher():
+        numero, ano_escolhido, sufixo = type(plano).proximo_numero(plano.area)
+        escolha["ano"] = ano_escolhido
+        escolha["sufixo"] = sufixo
+        return numero
+
+    def gravar(numero):
+        plano.numero = numero
+        plano.ano = escolha["ano"]
+        plano.sufixo_numero = escolha["sufixo"]
+        plano.save()
+
+    def limpar():
+        plano.numero = None
+        plano.ano = None
+        plano.sufixo_numero = ""
+        if original_adding:
+            plano.pk = original_pk
+            plano._state.adding = True
+
+    def numero_ocupado(numero):
+        # `BE-09`: `all_objects` é deliberado; o filtro já usa a área do Plano,
+        # não a área ativa do request, e precisa funcionar em worker/comando.
+        return (
+            # O recorte explícito por `plano.area_id` está logo abaixo.
+            PlanoTrabalho.all_objects.filter(
+                area_id=plano.area_id,
+                ano=ano,
+                numero=numero,
+            )
+            .exclude(pk=plano.pk)
+            .exists()
+        )
+
+    reservar_numero(
+        namespace=NAMESPACE_PLANO_TRABALHO,
+        area_id=plano.area_id,
+        ano=ano,
+        modelo=PlanoTrabalho,
+        constraint=CONSTRAINT_NUMERO_PLANO_TRABALHO,
+        escolher=escolher,
+        gravar=gravar,
+        ja_ocupado=numero_ocupado,
+        apos_colisao=limpar,
+    )
+    return plano
+
+
 def criar_plano_rascunho(evento=None) -> PlanoTrabalho:
     seed = {}
     if evento is not None:
@@ -1298,7 +1363,6 @@ def criar_plano_rascunho(evento=None) -> PlanoTrabalho:
     area = getattr(evento, "area", None) or get_current_area()
     plano = PlanoTrabalho(data_criacao=timezone.localdate(), area=area)
     plano.evento = evento
-    plano.atribuir_numero()
     config = ConfiguracaoSistema.get_for_area(area)
     if config.coordenador_adm_plano_trabalho_id:
         plano.coordenador_adm = config.coordenador_adm_plano_trabalho
@@ -1324,5 +1388,4 @@ def criar_plano_rascunho(evento=None) -> PlanoTrabalho:
     # A contextualização NÃO herda o motivo do evento: o motivo é texto curto de
     # agenda, não o parágrafo de abertura do plano. Fica no modo automático
     # (destino + programa) até o usuário editar à mão.
-    plano.save()
-    return plano
+    return salvar_plano_numerado(plano)

@@ -434,7 +434,7 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       documento e termo automático. Falha no último passo desfaz todas as seis tabelas; 43 testes de
       Eventos verdes. O `P-01` permanece 27 porque o `NOVO-108` provou que esse caminho era invisível
       ao contador. Fecha `BE-14` e `NOVO-108`; a dívida unitária de posição em camada segue no `BE-16`
-- [ ] `BE-15` numeração reimplementada 3 vezes — **fatia 1 (a mecânica) feita**: o lock e o laço
+- [x] `BE-15` numeração reimplementada 3 vezes — **fatia 1 (a mecânica) feita**: o lock e o laço
       de retry, que eram ~60 linhas copiadas entre ofício e OS, viraram `core/numeracao.py`; a
       política de escolha de cada documento fica onde estava, porque diferente ali é desenho, não
       defeito. Apareceu um quarto site que o enunciado não citava (a edição de número manual), que
@@ -444,7 +444,10 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       número liberado por exclusão (decisão do dono; único ponto que muda número emitido) — **feita**
       com `OrdemServicoNumeroLacuna`, exclusão atômica e consumo por área/ano; salto manual não vira
       lacuna e falha no registro desfaz a exclusão. 53 testes de OS verdes.
-      **Fatia 3**: o plano entra na abstração e ganha o retry que não tem
+      **Fatia 3 feita**: `salvar_plano_numerado` preserva contador e sufixo do Plano, mas une avanço
+      e `INSERT` na mesma transação e usa o retry comum. Colisão real repete; falha após reserva
+      desfaz o contador; escolha+gravação compartilham o savepoint; a concorrência PostgreSQL agora
+      mede duas linhas gravadas. 116 testes verdes
 - [ ] `BE-16` abstrações de `core` adotadas pela metade
 - [x] `BE-17` `core/views.py` é 75% fixture de UI Lab — **fechado pelo PR #247**, que apagou os
       dois labs e as 1.013 linhas de fixture; a cascata de componentes que ele deixou é o

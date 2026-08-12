@@ -64,6 +64,7 @@ from django.db import transaction
 #: comportamento de nenhum nó que esteja no ar durante o deploy.
 NAMESPACE_OFICIO = 0x4F464943  # "OFIC"
 NAMESPACE_ORDEM_SERVICO = 0x4F534E55  # "OSNU"
+NAMESPACE_PLANO_TRABALHO = 0x50544E55  # "PTNU"
 
 #: Teto do `int4` que o `pg_advisory_xact_lock(int, int)` aceita.
 _LIMITE_INT4 = 2_147_483_647
@@ -160,9 +161,12 @@ def reservar_numero(
 
     ultimo_erro: IntegrityError | None = None
     for _tentativa in range(tentativas):
-        numero = escolher()
         try:
             with transaction.atomic():
+                # A política pode persistir estado ao escolher (o contador do Plano
+                # de Trabalho). Escolha e gravação precisam do mesmo savepoint para
+                # uma colisão não deixar o contador avançado sem documento.
+                numero = escolher()
                 gravar(numero)
             return numero
         except IntegrityError as exc:
