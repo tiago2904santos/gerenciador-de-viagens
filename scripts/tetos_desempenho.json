@@ -90,6 +90,16 @@
         "consultas": 7,
         "kb_html": 155.8
       }
+    },
+    "termos:index:busca": {
+      "200": {
+        "consultas": 6,
+        "kb_html": 155.3
+      },
+      "20000": {
+        "consultas": 6,
+        "kb_html": 155.8
+      }
     }
   }
 }

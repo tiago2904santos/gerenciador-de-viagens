@@ -134,14 +134,23 @@ class ArquivoDeTetosTests(SimpleTestCase):
         """Se alguém adicionar rota em `ROTAS` sem regravar os tetos, o CI só
         descobre depois de dois minutos de medição. Aqui descobre em milissegundos."""
         tetos = regua.carregar_tetos()
+        nomes_medidos = [nome for nome, _ in regua.ROTAS] + [
+            chave for chave, _nome_rota, _rotulo, _params in regua.CENARIOS_COM_QUERY
+        ]
         faltando = [
             f"{nome} @ {volume}"
-            for nome, _ in regua.ROTAS
+            for nome in nomes_medidos
             for volume in ("200", "20000")
             if volume not in tetos.get(nome, {})
         ]
 
         self.assertEqual(faltando, [], msg=f"sem teto declarado: {faltando}")
+
+    def test_db11_tem_cenario_de_busca_com_parametro(self):
+        self.assertIn(
+            ("termos:index:busca", "termos:index", "termos_busca", {"q": "137"}),
+            regua.CENARIOS_COM_QUERY,
+        )
 
 
 class GravarTetosNaoSobeTests(SimpleTestCase):
