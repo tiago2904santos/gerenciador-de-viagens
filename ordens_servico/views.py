@@ -33,6 +33,7 @@ from .presenters import apresentar_ordem_servico_card
 from .presenters import get_assinante_os
 from .selectors import get_ordem_servico_by_id
 from .selectors import listar_ordens_servico
+from .services import excluir_ordem_servico
 from cadastros.selectors import rotulo_da_sede_configurada
 
 
@@ -522,6 +523,6 @@ def pdf_inline(request, pk):
 def excluir(request, pk):
     ordem = get_ordem_servico_by_id(pk)
     numero = ordem.numero_formatado
-    ordem.delete()
+    excluir_ordem_servico(ordem)
     messages.success(request, f"Ordem de Serviço {numero} excluída.")
     return redirect("ordens_servico:index")

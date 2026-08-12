@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 
 from django.conf import settings as django_settings
+from django.db import transaction
 
 from documentos.services.adapters.docxtpl_render import render_docx_bytes
 from documentos.services.document_cache import build_document_cache_key
@@ -27,8 +28,24 @@ from oficios.models import Oficio
 
 from .docxtpl_context import build_os_docxtpl_context
 from .models import OrdemServico
+from .models import OrdemServicoNumeroLacuna
 
 logger = logging.getLogger(__name__)
+
+
+@transaction.atomic
+def excluir_ordem_servico(ordem: OrdemServico) -> None:
+    """Exclui a OS e registra somente o número que ela efetivamente liberou."""
+    numero, ano, area = ordem.numero, ordem.ano, ordem.area
+    ordem.delete()
+    if numero and ano:
+        # `BE-09`: `all_objects` é deliberado. A lacuna pertence à área explícita da
+        # OS excluída, mesmo se este serviço rodar fora do request ou sob outra área.
+        OrdemServicoNumeroLacuna.all_objects.get_or_create(
+            area=area,
+            ano=ano,
+            numero=numero,
+        )
 
 
 def _template_ordem_servico(ordem: OrdemServico) -> str:

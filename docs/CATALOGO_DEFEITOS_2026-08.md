@@ -775,6 +775,23 @@ vez só, e toda escolha além do número de threads é uma colisão que o retry 
 exatamente o que o lock existe para evitar. `test_o_lock_evita_a_colisao_em_vez_de_apenas_se_recuperar_dela`
 mede isso, e reprova 3 de 3 execuções com o lock desligado.
 
+#### Fatia 2 ✅ — OS reaproveita somente número liberado por exclusão
+
+A decisão do dono está implementada sem transformar qualquer buraco em número disponível.
+`OrdemServicoNumeroLacuna` registra `(área, ano, número)` somente no serviço atômico
+`excluir_ordem_servico`; saltar manualmente de 1 para 5 não cria as lacunas 2–4. Na reserva, a OS
+consome primeiro a menor lacuna registrada do seu próprio escopo e só então volta a `max+1`.
+
+Exclusão e registro formam uma transação: o teste de inversão força falha no `get_or_create` e prova
+que a OS continua no banco. A rede também prova que a lacuna nasce, que o número 2 é reaproveitado e
+que a linha de lacuna só desaparece depois do novo documento gravar. A suíte de `ordens_servico`
+fecha com **53 testes verdes** (3 pulados no SQLite; concorrência permanece no gate PostgreSQL).
+
+A migração `0014_ordemserviconumerolacuna` cria tabela vazia, sem backfill que pudesse inventar a
+origem de um buraco. Ela traz a query pré-deploy `area_id IS NULL` e o procedimento `pg_dump`; a
+volta remove apenas o registro de lacunas e não altera OS emitida. **Fatia 3 pendente:** integrar a
+política incremental de Plano de Trabalho à mesma mecânica de reserva e retry.
+
 
 ### BE-16 🟡 Abstrações de `core` adotadas pela metade · AUD · 2 d · risco baixo
 

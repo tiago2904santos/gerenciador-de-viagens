@@ -248,10 +248,19 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
 
         def gravar(_numero):
             super(OrdemServico, self).save(*args, **kwargs)
+            lacuna_id = getattr(self, "_lacuna_numeracao_id", None)
+            if lacuna_id is not None:
+                OrdemServicoNumeroLacuna.all_objects.filter(
+                    pk=lacuna_id,
+                    area_id=self.area_id,
+                    ano=self.ano,
+                    numero=self.numero,
+                ).delete()
 
         def limpar():
             self.numero = None
             self.ano = None
+            self._lacuna_numeracao_id = None
 
         # `BE-15`: o lock e o laço de três tentativas moravam aqui, copiados de
         # `oficios/services.py`. A política de escolha (`max+1`) fica; a mecânica é comum.
@@ -285,6 +294,21 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
 
     def _assign_numero(self):
         ano = timezone.localdate().year
+        lacuna = (
+            OrdemServicoNumeroLacuna.all_objects.filter(
+                area_id=self.area_id,
+                ano=ano,
+            )
+            .order_by("numero")
+            .first()
+        )
+        if lacuna is not None:
+            self.numero = lacuna.numero
+            self.ano = ano
+            self._lacuna_numeracao_id = lacuna.pk
+            return
+
+        self._lacuna_numeracao_id = None
         # `BE-09`: `all_objects` de propósito. O escopo da numeração é o desta OS
         # (`self.area_id`), decidido nas quatro linhas abaixo — não o da área ativa
         # do request. Com `objects`, uma OS sem área salva por quem está numa área
@@ -297,4 +321,36 @@ class OrdemServico(TimeStampedModel, CancelavelModel):
         last = queryset.order_by("-numero").values_list("numero", flat=True).first()
         self.numero = (last or 0) + 1
         self.ano = ano
+
+
+class OrdemServicoNumeroLacuna(models.Model):
+    """Número de OS liberado por exclusão; saltos manuais não entram aqui."""
+
+    area = models.ForeignKey(
+        "usuarios.AreaTrabalho",
+        on_delete=models.PROTECT,
+        related_name="ordens_servico_lacunas",
+        verbose_name="Area de trabalho",
+    )
+    ano = models.PositiveIntegerField(db_index=True)
+    numero = models.PositiveIntegerField()
+    liberado_em = models.DateTimeField(auto_now_add=True)
+
+    all_objects = models.Manager()
+    objects = AreaScopedManager()
+
+    class Meta:
+        default_manager_name = "all_objects"
+        ordering = ["ano", "numero"]
+        verbose_name = "Número de Ordem de Serviço liberado"
+        verbose_name_plural = "Números de Ordem de Serviço liberados"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["area", "ano", "numero"],
+                name="os_lacuna_area_ano_numero_unique",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.numero:02d}/{self.ano}"
 
