@@ -674,6 +674,7 @@ o token resolve.
 | **E8 listas e superfícies claras** | espelha a estrutura dos cards e restaura bloco azul-cinza com campo branco (`NOVO-113`) | ✅ Ofício 91 com 112 nós e **0** diferenças de dimensão, posição relativa ou estilo não-cor; página `var(--app-body-bg)`, wizard claro `#fff` / `#eef4fc` / `#fff` |
 | **E8 barra lateral** | seis cores de tema escuro fixas em `layout/sidebar.css`, aplicadas nos dois temas (`NOVO-117`) | ✅ viraram token com os mesmos valores — nenhum tema muda; arquivo zerado de literais e promovido a `STRICT_COLOR_LITERAL_FILES`; auditor 235/245. Onze paletas de shell prototipadas e reprovadas: **a paleta clara é a histórica**, decidido |
 | **E8 wizard claro** | card e campo saíam da mesma cor, então o campo não tinha contra o que se destacar (`NOVO-120`) | ✅ níveis alternam azul → branco → azul; supera o contrato do `NOVO-113`, com o teste renomeado e reapontado |
+| **E8 card de lista** | lista e formulário alternavam superfície em fases opostas (`NOVO-121`) | ✅ as duas famílias leem casca azul → bloco branco → item azul; cabeçalho e rodapé passam a acompanhar a casca; `--record-card-bg` isola o card de lista de `--card-family-bg`, que segue servindo barra de filtros e stepper |
 
 **O instrumento que a etapa exigiu, e que não existia.** A régua da E0
 (`medir_divergencia_tema.py`) compara **claro contra escuro no mesmo código**. A E9 precisa do

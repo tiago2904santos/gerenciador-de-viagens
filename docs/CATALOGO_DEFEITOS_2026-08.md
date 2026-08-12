@@ -7755,6 +7755,33 @@ fundindo-a com a página. `--entity-card-inner-bg` (que só alimenta
 `.itinerary__leg` já lia `--card-family-bg` e foi repontado junto: como é nível 3, ele acompanha a
 casca e a alternância fecha sozinha.
 
-**Prova.** Sonda computada no card de Evento #9: `#eef4fc` / `#ffffff` / `#eef4fc`. O escuro conserva
-a própria escala — `--record-card-bg` resolve para `--color-surface` lá, que é o valor que
+**Cabeçalho e rodapé do card** entraram na mesma passada. Nenhum dos dois lia token da própria
+família: o rodapé saía de `--form-section-bg` e o cabeçalho de `--card-family-header-bg`, ambos
+compartilhados com o formulário. Com a casca em azul, os dois viravam faixas brancas soltas na
+borda do card — degraus de superfície que não correspondem a nenhum nível da hierarquia. Passam a
+ler `--record-card-bg`. A troca é **no seletor, não no token**, justamente porque os tokens antigos
+seguem servindo cabeçalho de seção de formulário e painel principal.
+
+Isso **afrouxa um ponto do contrato do `NOVO-96`**, que travava o cabeçalho do card de lista e o de
+seção de formulário usando os mesmos três tokens. Aquele contrato foi escrito quando as duas cascas
+eram brancas; agora a da lista é azul e o bloco de formulário é branco, e exigir o mesmo fundo
+obrigaria um dos dois a destoar da própria casca. Só o **fundo** diverge: `--card-family-header-image`
+(o filete) e `--card-family-border-strong` seguem compartilhados e travados no teste, porque são eles
+que dão parentesco visual às duas famílias.
+
+**Linha do motorista.** A 8% de accent sobre `--color-card-muted` ela dava `#ecf2f7` contra uma casca
+`#eef4fc` — meio passo de diferença, e o realce sumia. Passa a `--color-primary-bright` a 20%,
+resultando em `#cadbeb`, a mesma expressão da tile de motorista do wizard. Vale registrar a
+armadilha encontrada: `.person-row--highlight` tem **três** regras concorrentes — uma em
+`components/theme-dark-components.css` e duas em `lists/entity-cards.css`, sendo a última já
+escopada em `html[data-theme="light"]` e vencedora por ordem de carga. Editar a regra compartilhada
+não teria efeito no claro e teria mudado o escuro por acidente.
+
+**Prova.** Sonda computada no card de Evento #9 — casca `#eef4fc`, cabeçalho `#eef4fc`, rodapé
+`#eef4fc`, bloco `#ffffff`, motorista `#cadbeb`, demais viajantes `#ffffff`. O escuro conserva a
+própria escala: `--record-card-bg` resolve para `--color-surface` lá, que é o valor que
 `--card-family-bg` já entregava; capturado e idêntico.
+
+**Não verificado.** A inversão foi conferida no card de Evento. Ofícios, Roteiros, OS, Planos de
+Trabalho e Prestações usam a mesma família `.record-card` / `.fact-block` e devem acompanhar, mas
+não foram abertos um a um.
