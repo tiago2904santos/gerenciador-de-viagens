@@ -78,3 +78,29 @@ class StaticAssetVersioningContractTests(SimpleTestCase):
                         f"{path.relative_to(settings.BASE_DIR).as_posix()} -> {referencia}"
                     )
         self.assertEqual(pendurados, [])
+
+    def test_imports_relativos_de_modulos_javascript_apontam_para_arquivo_existente(self):
+        """Mover um entrypoint não pode deixar import relativo quebrado.
+
+        O storage de produção reescreve imports ES durante o ``collectstatic`` e
+        aborta a entrega quando o alvo não existe. Este contrato antecipa a
+        mesma classe de erro com uma mensagem curta e sem coletar todos os assets.
+        """
+        padrao = re.compile(
+            r"(?:\bfrom\s+|\bimport\s*\()(?P<quote>['\"])(?P<path>\.[^'\"]+)"
+            r"(?P=quote)"
+        )
+        pendurados = []
+        static_root = Path(settings.BASE_DIR) / "static"
+        for path in static_root.rglob("*.js"):
+            if "vendor" in path.parts:
+                continue
+            source = path.read_text(encoding="utf-8-sig")
+            for match in padrao.finditer(source):
+                referencia = match.group("path").split("?", 1)[0].split("#", 1)[0]
+                if not (path.parent / referencia).resolve().is_file():
+                    pendurados.append(
+                        f"{path.relative_to(settings.BASE_DIR).as_posix()} -> "
+                        f"{match.group('path')}"
+                    )
+        self.assertEqual(pendurados, [])

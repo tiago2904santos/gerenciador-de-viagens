@@ -17,6 +17,7 @@ from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 
 from core.pagination import contexto_paginacao
+from core.deletion import DelecaoProtegidaError
 from documentos.services.async_generation import enfileirar_documento
 from documentos.services.types import DocumentoFormato
 from eventos.services import build_evento_document_seed
@@ -33,6 +34,7 @@ from .presenters import apresentar_ordem_servico_card
 from .presenters import get_assinante_os
 from .selectors import get_ordem_servico_by_id
 from .selectors import listar_ordens_servico
+from .services import excluir_ordem_servico
 from cadastros.selectors import rotulo_da_sede_configurada
 
 
@@ -423,7 +425,7 @@ def _form_context(*, request, form, ordem=None, evento=None):
         "ordem": ordem,
         "index_url": index_url,
         "back_label": back_label,
-        # `H-02`: contexto do casco único (`components/page/flow_base.html`).
+        # `H-02`: contexto do casco único (`cotton/page/flow_base.html`).
         "flow_eyebrow": "DOCUMENTOS",
         "flow_description": "Cadastro de ordem de serviço",
         "flow_icon_label": "OS",
@@ -522,6 +524,10 @@ def pdf_inline(request, pk):
 def excluir(request, pk):
     ordem = get_ordem_servico_by_id(pk)
     numero = ordem.numero_formatado
-    ordem.delete()
+    try:
+        excluir_ordem_servico(ordem)
+    except DelecaoProtegidaError as exc:
+        messages.error(request, str(exc))
+        return redirect("ordens_servico:index")
     messages.success(request, f"Ordem de Serviço {numero} excluída.")
     return redirect("ordens_servico:index")

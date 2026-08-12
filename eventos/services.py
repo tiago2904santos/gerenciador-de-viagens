@@ -1,12 +1,72 @@
 # Servicos de agrupamento OPCIONAL de documentos ficam neste modulo.
 from __future__ import annotations
 
+import json
 from pathlib import Path
+
+from core.deletion import excluir_com_protecao
 from urllib.parse import urlencode
 
 from django.core.files.base import ContentFile
 from django.db import transaction
 from django.urls import reverse
+
+
+_DOCUMENTOS_VINCULAVEIS = (
+    ("oficios_vinculados", "oficios"),
+    ("ordens_servico_vinculadas", "ordens_servico"),
+    ("planos_trabalho_vinculados", "planos_trabalho"),
+    ("termos_vinculados", "termos_autorizacao"),
+    ("roteiros_vinculados", "roteiros"),
+)
+
+
+def _aplicar_destinos_extras(evento, destinos_json):
+    try:
+        destinos = json.loads(destinos_json) if destinos_json else []
+    except (TypeError, ValueError):
+        destinos = []
+    if destinos and isinstance(destinos, list):
+        primeiro = destinos[0]
+        evento.destino_uf = primeiro.get("uf", "")
+        evento.destino_cidade = primeiro.get("cidade", "")
+        evento.destinos_extras = destinos[1:]
+        return
+    evento.destinos_extras = []
+
+
+def _sincronizar_documentos_vinculados(form, evento):
+    for field_name, related_name in _DOCUMENTOS_VINCULAVEIS:
+        if field_name not in form.cleaned_data:
+            continue
+        manager = getattr(evento, related_name)
+        selecionados_ids = {obj.pk for obj in form.cleaned_data[field_name]}
+        atuais_ids = set(manager.values_list("pk", flat=True))
+        para_adicionar = selecionados_ids - atuais_ids
+        para_remover = atuais_ids - selecionados_ids
+        # A area vem do proprio Evento, não do thread-local. Assim o serviço
+        # mantém o recorte também em chamada direta, worker e comando.
+        base = manager.model.all_objects.filter(area=evento.area)
+        if para_adicionar:
+            base.filter(pk__in=para_adicionar).update(evento=evento)
+        if para_remover:
+            base.filter(pk__in=para_remover).update(evento=None)
+
+
+@transaction.atomic
+def salvar_identificacao_evento(form, *, area, destinos_json):
+    """Persiste a etapa 1 inteira ou não persiste nenhuma parte (`BE-14`)."""
+    evento = form.save(commit=False)
+    if evento.area_id is None:
+        evento.area = area
+    nomes = [tipo.nome for tipo in form.cleaned_data.get("tipos") or []]
+    evento.titulo = " / ".join(nomes) if nomes else "Novo Evento"
+    _aplicar_destinos_extras(evento, destinos_json)
+    evento.save()
+    form.save_m2m()
+    _sincronizar_documentos_vinculados(form, evento)
+    garantir_termo_automatico(evento)
+    return evento
 
 
 def converter_para_pdf_se_necessario(arquivo):
@@ -97,7 +157,7 @@ def excluir_evento(evento) -> None:
             roteiro.evento = None
             roteiro.save(update_fields=["evento"])
 
-    evento.delete()
+    excluir_com_protecao(evento)
 
 
 def build_evento_document_context(evento) -> dict:

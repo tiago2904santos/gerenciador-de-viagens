@@ -6,7 +6,7 @@ mesma sequência com variações pequenas. Este módulo é o motor; cada app dec
 um `CatalogConfig` por catálogo e liga as views geradas no `urls.py`.
 
 **Nenhum template muda.** Os índices de catálogo já são invólucros de 5 a 10
-linhas sobre `components/lists/list_page_quick_add.html`; a duplicação estava
+linhas sobre `cotton/lists/list_page_quick_add.html`; a duplicação estava
 inteiramente nas views. Por isso `rows_context_key` existe: `planos_trabalho`
 passa as linhas como `linhas` e os outros como `rows`, e preservar essa diferença
 é mais barato (e mais seguro) do que mexer em quatro templates.
@@ -29,19 +29,20 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
 from typing import Callable
-from urllib.parse import urlencode
-
 from django.contrib import messages
-from django.core.paginator import Paginator
 from django.http import HttpRequest
 from django.http import HttpResponse
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils.http import url_has_allowed_host_and_scheme
 
+from core.deletion import DelecaoProtegidaError
+from core.deletion import excluir_com_protecao
+from core.pagination import contexto_paginacao
+from core.retorno import com_next
 from core.retorno import next_valido
+from core.retorno import voltar_para
 
 
 @dataclass(frozen=True)
@@ -134,12 +135,7 @@ def _next_url(request: HttpRequest, config: CatalogConfig) -> str:
     """`?next=` validado contra o host, com o fallback do catálogo."""
     if not config.url_fallback_next:
         return next_valido(request) if config.aceitar_next else ""
-    candidato = request.POST.get("next") or request.GET.get("next") or ""
-    if candidato and url_has_allowed_host_and_scheme(
-        candidato, allowed_hosts={request.get_host()}
-    ):
-        return candidato
-    return reverse(config.url_fallback_next)
+    return voltar_para(request, reverse(config.url_fallback_next))
 
 
 def _com_next(base: str, next_url: str, config: CatalogConfig) -> str:
@@ -151,7 +147,7 @@ def _com_next(base: str, next_url: str, config: CatalogConfig) -> str:
         and next_url == reverse(config.url_fallback_next)
     ):
         return base
-    return f"{base}?{urlencode({'next': next_url})}"
+    return com_next(base, next_url)
 
 
 def _url_index(config: CatalogConfig, next_url: str = "", base: str | None = None) -> str:
@@ -219,10 +215,20 @@ def index_view(
         objetos = config.listar(q=q or None) if config.buscar else config.listar()
 
         page_obj = None
+        paginacao = {}
         if config.paginar_por:
-            page_obj = Paginator(objetos, config.paginar_por).get_page(
-                request.GET.get("page")
+            page_params = {}
+            if q:
+                page_params["q"] = q
+            if config.aceitar_next and next_url:
+                page_params["next"] = next_url
+            paginacao = contexto_paginacao(
+                objetos,
+                request,
+                config.paginar_por,
+                query_params=page_params,
             )
+            page_obj = paginacao["page_obj"]
             objetos = page_obj.object_list
 
         linhas = [_linha(obj, config, next_url) for obj in objetos]
@@ -238,16 +244,7 @@ def index_view(
             **(contexto_extra(request, next_url) if contexto_extra else {}),
         }
         if page_obj is not None:
-            contexto["page_obj"] = page_obj
-            contexto["pagination_pages"] = _pagination_pages(page_obj)
-            page_params = {}
-            if q:
-                page_params["q"] = q
-            if config.aceitar_next and next_url:
-                page_params["next"] = next_url
-            contexto["page_querystring"] = (
-                urlencode(page_params) if page_params else ""
-            )
+            contexto.update(paginacao)
         return render(request, config.template_index, contexto)
 
     return view
@@ -262,17 +259,6 @@ def _contexto_navegacao(config: CatalogConfig, next_url: str, externo: bool) -> 
             config.back_label_com_next if externo else config.back_label_sem_next
         ),
     }
-
-
-def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1) -> list[int | str]:
-    return [
-        page_number if isinstance(page_number, int) else "..."
-        for page_number in page_obj.paginator.get_elided_page_range(
-            page_obj.number,
-            on_each_side=on_each_side,
-            on_ends=on_ends,
-        )
-    ]
 
 
 def _linha(obj, config: CatalogConfig, next_url: str) -> dict:
@@ -358,7 +344,11 @@ def delete_view(config: CatalogConfig) -> Callable[..., HttpResponse]:
                         config.tratar_erro_vinculo(request)
                     return redirect(destino)
             else:
-                (config.excluir or _excluir_padrao)(obj)
+                try:
+                    (config.excluir or _excluir_padrao)(obj)
+                except DelecaoProtegidaError as exc:
+                    messages.error(request, str(exc))
+                    return redirect(destino)
             messages.success(request, config.mensagens.excluido.format(rotulo))
             return redirect(destino)
 
@@ -381,7 +371,7 @@ def delete_view(config: CatalogConfig) -> Callable[..., HttpResponse]:
 
 
 def _excluir_padrao(obj) -> None:
-    obj.delete()
+    excluir_com_protecao(obj)
 
 
 def set_default_view(config: CatalogConfig) -> Callable[..., HttpResponse]:

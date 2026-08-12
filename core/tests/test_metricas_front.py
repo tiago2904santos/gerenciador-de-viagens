@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from django.test import SimpleTestCase
 
 from scripts import medir_css_por_rota as css_metric
 from scripts import medir_divergencia_tema as theme_metric
+from scripts import sonda_mesmo_tema as same_theme_metric
 from scripts.rotas_do_sistema import ROTAS
 
 
@@ -42,6 +45,63 @@ class CssPorRotaMetricTests(SimpleTestCase):
             result["usage_percent"],
             100 * result["bytes_matched"] / result["bytes_delivered"],
             places=4,
+        )
+
+    def test_diagnostico_atribui_bytes_e_fragmentos_por_folha(self):
+        first = ".a { color: red; }"
+        second = ".b { color: blue; }"
+        result = css_metric.summarize_stylesheet_usage(
+            {"sheet-a": first, "sheet-b": second},
+            [
+                {
+                    "styleSheetId": "sheet-a",
+                    "startOffset": 0,
+                    "endOffset": len(first),
+                    "used": True,
+                },
+                {
+                    "styleSheetId": "sheet-b",
+                    "startOffset": 0,
+                    "endOffset": len(second),
+                    "used": False,
+                },
+            ],
+            {"sheet-a": "http://test/static/a.css", "sheet-b": "http://test/static/b.css"},
+            include_fragments=True,
+        )
+
+        self.assertEqual(result[0]["bytes_matched"], len(first.encode("utf-8")))
+        self.assertEqual(result[0]["matched_fragments"], [first])
+        self.assertEqual(result[1]["bytes_matched"], 0)
+        self.assertEqual(result[1]["matched_fragments"], [])
+
+    def test_folha_externa_sem_regra_casada_entra_no_denominador(self):
+        self.assertEqual(
+            css_metric.stylesheet_ids(
+                [
+                    {
+                        "styleSheetId": "sheet-used",
+                        "startOffset": 0,
+                        "endOffset": 10,
+                        "used": True,
+                    }
+                ],
+                {
+                    "sheet-used": "http://test/static/used.css",
+                    "sheet-zero": "http://test/static/zero.css",
+                    "browser-sheet": "",
+                },
+            ),
+            {"sheet-used", "sheet-zero"},
+        )
+
+    def test_fragmento_respeita_offsets_utf16_do_cdp(self):
+        text = "/* 🚀 */ .a { color: red; }"
+        utf16_length = len(text.encode("utf-16-le")) // 2
+
+        self.assertEqual(
+            css_metric._text_for_utf16_offsets(text, 0, utf16_length),
+            text,
         )
 
     def test_piso_de_uso_so_pode_subir(self):
@@ -146,3 +206,131 @@ class DivergenciaTemaMetricTests(SimpleTestCase):
 
         self.assertEqual(theme_gate["direction"], "down")
         self.assertEqual(set(theme_gate["routes"]), expected)
+
+
+class MesmoTemaMetricTests(SimpleTestCase):
+    def _item(self, *, text="estavel", width="100px"):
+        return {
+            "label": "div.card",
+            "text_hash": same_theme_metric.text_hash(text),
+            "styles": {"width": width, "color": "rgb(0, 0, 0)"},
+            "pseudos": {},
+        }
+
+    def test_snapshot_identico_tem_zero_diferencas(self):
+        snapshot = {"html:nth-of-type(1)>body:nth-of-type(1)": self._item()}
+
+        result = same_theme_metric.compare_snapshots(snapshot, snapshot)
+
+        self.assertEqual(result["style_differences"], 0)
+        self.assertEqual(result["structural_differences"], 0)
+        self.assertEqual(result["text_changes"], 0)
+
+    def test_diferenca_de_cascata_nomeia_propriedade(self):
+        key = "html:nth-of-type(1)>body:nth-of-type(1)>div:nth-of-type(1)"
+
+        result = same_theme_metric.compare_snapshots(
+            {key: self._item(width="100px")},
+            {key: self._item(width="120px")},
+        )
+
+        self.assertEqual(result["style_differences"], 1)
+        self.assertEqual(result["text_correlated_style_differences"], 0)
+        self.assertEqual(result["top_properties"], [("width", 1)])
+
+    def test_texto_dinamico_nao_esconde_regressao_de_cascata(self):
+        key = "html:nth-of-type(1)>body:nth-of-type(1)>span:nth-of-type(1)"
+
+        result = same_theme_metric.compare_snapshots(
+            {key: self._item(text="12:59", width="40px")},
+            {key: self._item(text="13:00", width="42px")},
+        )
+
+        self.assertEqual(result["style_differences"], 1)
+        self.assertEqual(result["text_correlated_style_differences"], 1)
+        self.assertEqual(result["text_changes"], 1)
+
+    def test_dom_diferente_reprova_com_chaves_estruturais(self):
+        before = {"html:nth-of-type(1)": self._item()}
+        after = {
+            "html:nth-of-type(1)": self._item(),
+            "html:nth-of-type(1)>body:nth-of-type(1)": self._item(),
+        }
+
+        result = same_theme_metric.compare_snapshots(before, after)
+
+        self.assertEqual(result["structural_differences"], 1)
+        self.assertEqual(
+            result["missing_before"],
+            ["html:nth-of-type(1)>body:nth-of-type(1)"],
+        )
+
+    def test_ordem_invertida_expoe_captura_irreprodutivel(self):
+        first = {("node", "element", "width", "1px", "2px")}
+        reverse = {("node", "element", "height", "1px", "2px")}
+
+        only_first, only_reverse = same_theme_metric.order_exclusives(first, reverse)
+
+        self.assertEqual(only_first, first)
+        self.assertEqual(only_reverse, reverse)
+
+    def test_assinatura_de_reprodutibilidade_inclui_estrutura_e_texto(self):
+        snapshot = same_theme_metric.compare_snapshots(
+            {"html": self._item(text="antes")},
+            {"html": self._item(text="depois"), "html>body": self._item()},
+        )
+
+        keys = same_theme_metric.reproducibility_keys(snapshot)
+
+        self.assertIn(("missing-before", "html>body"), keys)
+        self.assertIn(("text-change", "html"), keys)
+
+    def test_rotas_publicas_ficam_em_contexto_separado_das_protegidas(self):
+        public = same_theme_metric.Route("login", "/login/", False)
+        protected = same_theme_metric.Route("oficios", "/oficios/", True)
+
+        groups = same_theme_metric.route_groups([protected, public])
+
+        self.assertEqual(groups, ([public], [protected]))
+
+    def test_rotas_json_aceitam_caminho_e_contrato_explicito(self):
+        with TemporaryDirectory() as directory:
+            routes_path = Path(directory) / "routes.json"
+            routes_path.write_text(
+                json.dumps(
+                    [
+                        "/oficios/1/",
+                        {"slug": "publica", "path": "/login/", "requires_auth": False},
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            routes = same_theme_metric.load_routes(routes_path)
+
+        self.assertEqual(routes[0], same_theme_metric.Route("/oficios/1/", "/oficios/1/", True))
+        self.assertEqual(routes[1], same_theme_metric.Route("publica", "/login/", False))
+
+    def test_corpus_vazio_e_rejeitado(self):
+        with TemporaryDirectory() as directory:
+            routes_path = Path(directory) / "routes.json"
+            routes_path.write_text("[]", encoding="utf-8")
+
+            with self.assertRaisesMessage(SystemExit, "corpus de rotas nao pode ser vazio"):
+                same_theme_metric.load_routes(routes_path)
+
+    def test_gate_nao_perdoa_estilo_correlacionado_a_texto(self):
+        report = {
+            "route_count": 1,
+            "viewports": [500],
+            "themes": ["light"],
+            "summary": {
+                "measurements": 1,
+                "structural_differences": 0,
+                "style_differences": 1,
+                "text_correlated_style_differences": 1,
+            },
+        }
+
+        failures = same_theme_metric.report_failures(report, max_style_differences=0)
+
+        self.assertEqual(failures, ["1 diferencas de estilo > teto 0"])

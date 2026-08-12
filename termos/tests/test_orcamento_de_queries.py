@@ -23,9 +23,12 @@ from cadastros.models import Cidade
 from cadastros.models import Estado
 from cadastros.models import Servidor
 from cadastros.models import Unidade
+from core.testing import com_request
 from termos.models import TermoAutorizacao
+from termos.selectors import listar_termos
 from core.testing import area_de_teste
 from core.testing import vincular_area
+from oficios.models import Oficio
 
 
 class OrcamentoDeQueriesTermoTests(TestCase):
@@ -46,6 +49,30 @@ class OrcamentoDeQueriesTermoTests(TestCase):
             )
             for numero in range(3)
         ]
+
+        cls.servidor_oficio = Servidor.objects.create(
+            area=area_de_teste(),
+            nome="Participante do oficio",
+            cargo=cargo,
+            unidade=unidade,
+            cpf="22222222220",
+            rg="6543210",
+        )
+        cls.servidor_termo_oficio = Servidor.objects.create(
+            area=area_de_teste(),
+            nome="Participante marcado para termo",
+            cargo=cargo,
+            unidade=unidade,
+            cpf="22222222221",
+            rg="6543211",
+        )
+        cls.oficio = Oficio.objects.create(area=area_de_teste(), numero=91, ano=2026)
+        cls.oficio.servidores.add(cls.servidor_oficio)
+        cls.oficio.servidores_termo_autorizacao.add(cls.servidor_termo_oficio)
+        cls.termo_do_oficio = TermoAutorizacao.objects.create(
+            area=area_de_teste(),
+            oficio=cls.oficio,
+        )
 
         for numero in range(20):
             termo = TermoAutorizacao.objects.create(area=area_de_teste(), 
@@ -87,6 +114,39 @@ class OrcamentoDeQueriesTermoTests(TestCase):
             msg="\n".join(q["sql"] for q in queries.captured_queries),
         )
 
+    def test_a_busca_pesada_nao_e_repetida_so_para_contar_a_pagina(self):
+        """A contagem das abas ja conhece o total usado pelo paginador (`DB-11`)."""
+        _total, queries = self._contar(reverse("termos:index") + "?q=Curitiba")
+
+        consultas_da_busca = [
+            query["sql"]
+            for query in queries.captured_queries
+            if 'FROM "termos_termoautorizacao"' in query["sql"]
+            and "CURITIBA" in query["sql"].upper()
+        ]
+        self.assertEqual(
+            len(consultas_da_busca),
+            2,
+            msg="\n\n".join(consultas_da_busca),
+        )
+
+    def test_a_busca_m2m_preserva_as_tres_origens_sem_multiplicar_termos(self):
+        with com_request(area_de_teste()):
+            ids_servidor_proprio = list(
+                listar_termos(q="Servidor 0").values_list("pk", flat=True)
+            )
+            ids_servidor_oficio = list(
+                listar_termos(q="Participante do oficio").values_list("pk", flat=True)
+            )
+            ids_servidor_termo_oficio = list(
+                listar_termos(q="Participante marcado para termo").values_list("pk", flat=True)
+            )
+
+        self.assertEqual(len(ids_servidor_proprio), 20)
+        self.assertEqual(len(ids_servidor_proprio), len(set(ids_servidor_proprio)))
+        self.assertEqual(ids_servidor_oficio, [self.termo_do_oficio.pk])
+        self.assertEqual(ids_servidor_termo_oficio, [self.termo_do_oficio.pk])
+
     def test_o_formulario_de_edicao_custa_o_mesmo_numero_de_queries(self):
         total, queries = self._contar(reverse("termos:editar", args=[self.termo.pk]))
 
@@ -114,8 +174,10 @@ class OrcamentoDeQueriesTermoTests(TestCase):
     # Onde o corte é **-1**, o teste mede a **primeira** requisição depois do
     # login: ali `core/tenancy.py:52` grava a área na sessão, que por isso é
     # salva de qualquer jeito, e só a leitura é economizada.
-    QUERIES_LISTA = 10
-    QUERIES_LISTA_BUSCA = 10
+    # `DB-11`: a agregacao das abas ja conhece o total da aba ativa e alimenta o
+    # paginador. Sai a repeticao da consulta de contagem, com ou sem busca.
+    QUERIES_LISTA = 9
+    QUERIES_LISTA_BUSCA = 9
     # 21 -> 28 na edicao. Duas causas separadas, e so uma era defeito:
     #  (a) N+1 REAL, corrigido: `termo_cadastro_assinado_info` consultava
     #      DocumentoArtefato uma vez por servidor. Agora e uma query so, via

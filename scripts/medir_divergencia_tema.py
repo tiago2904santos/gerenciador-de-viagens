@@ -18,6 +18,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.medir_css_por_rota import is_valid_final_url  # noqa: E402
+from scripts.navegador_medicao import abrir_chromium  # noqa: E402
 from scripts.rotas_do_sistema import ROTAS  # noqa: E402
 
 
@@ -81,8 +82,28 @@ async ({firstTheme, secondTheme}) => {
     return p.startsWith('--') || p.endsWith('color') ||
       ['color', 'background', 'fill', 'stroke', 'flood-color', 'lighting-color', 'stop-color'].includes(p);
   };
+  // NOVO-84: dois requestAnimationFrame bastam para o recalculo de estilo, nao
+  // para layout que continua chegando. Em roteiros-editar@500 o proprio switch
+  // para escuro disparava crescimento assincrono: duas leituras seguidas do
+  // MESMO tema davam 4367.39px e 4423.39px de altura, e a trava de ordem
+  // reprovava a rota — corretamente, porque o numero nao era reprodutivel.
+  // Esperar antes da primeira captura nao resolve: o crescimento vem DEPOIS da
+  // troca. Entao a espera mora aqui, em toda aplicacao de tema.
   const settle = async () => {
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const medida = () => `${root.scrollHeight}x${root.scrollWidth}`;
+    let anterior = medida();
+    let iguais = 0;
+    for (let i = 0; i < 40; i += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      const atual = medida();
+      if (atual === anterior) {
+        if (++iguais >= 3) return;
+      } else {
+        iguais = 0;
+        anterior = atual;
+      }
+    }
   };
   const apply = async (theme) => {
     root.setAttribute('data-theme', theme);
@@ -133,6 +154,45 @@ def _disable_motion(page) -> None:
             "transition-duration: 0s !important; animation: none !important; }"
         )
     )
+
+
+LAYOUT_ESTAVEL = r"""
+async ({tentativas, intervaloMs}) => {
+  const medida = () => {
+    const r = document.documentElement;
+    return `${r.scrollHeight}x${r.scrollWidth}x${document.body.scrollHeight}`;
+  };
+  let anterior = medida();
+  let iguais = 0;
+  for (let i = 0; i < tentativas; i += 1) {
+    await new Promise((resolve) => setTimeout(resolve, intervaloMs));
+    const atual = medida();
+    if (atual === anterior) {
+      iguais += 1;
+      if (iguais >= 3) return {estavel: true, voltas: i + 1, medida: atual};
+    } else {
+      iguais = 0;
+      anterior = atual;
+    }
+  }
+  return {estavel: false, voltas: tentativas, medida: anterior};
+}
+"""
+
+
+def _esperar_layout_estavel(page, tentativas: int = 40, intervalo_ms: int = 50) -> dict:
+    """Espera a altura do documento parar de mudar antes de medir (`NOVO-84`).
+
+    `networkidle` diz que a rede calou, não que o layout assentou. Em
+    `roteiros-editar@500` a página continuava **crescendo** depois disso: duas
+    capturas do tema escuro, sem troca de tema entre elas, davam 4367.39px e
+    4423.39px de altura. Aí a trava de ordem de `_summarize_pair` reprovava a
+    rota inteira — corretamente, porque o número não era reprodutível.
+
+    A trava não foi afrouxada: o que mudou é que agora a página é medida depois
+    de parada. Se ela não parar dentro do orçamento, o chamador decide.
+    """
+    return page.evaluate(LAYOUT_ESTAVEL, {"tentativas": tentativas, "intervaloMs": intervalo_ms})
 
 
 def _capture_order(page, first_theme: str, second_theme: str) -> dict:
@@ -195,9 +255,18 @@ def _measure_route(page, route, base_url: str, timeout_ms: int) -> dict:
     ):
         raise RuntimeError(f"{route.slug}: {route.path} terminou em URL inválida: {page.url}")
     _disable_motion(page)
+    assentou = _esperar_layout_estavel(page)
     first = _capture_order(page, "light", "dark")
     reverse = _capture_order(page, "dark", "light")
-    result = _summarize_pair(first, reverse)
+    try:
+        result = _summarize_pair(first, reverse)
+    except RuntimeError as erro:
+        # A rota é irreprodutível. Dizer QUAL e se ela chegou a assentar é o que
+        # separa "o instrumento falhou" de "a página não para de mudar".
+        raise RuntimeError(
+            f"{route.slug}: {erro} (layout estável: {assentou['estavel']}, "
+            f"medida final {assentou['medida']})"
+        ) from erro
     result.update(
         {
             "path": route.path,
@@ -263,7 +332,7 @@ def run_measurement(args) -> dict:
 
     results: dict[str, dict] = {}
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=not args.headful)
+        browser = abrir_chromium(playwright, headless=not args.headful)
         for width in args.viewports:
             context = browser.new_context(
                 viewport={"width": width, "height": args.viewport_height},

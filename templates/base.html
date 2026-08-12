@@ -8,12 +8,12 @@
   <script src="{% static 'js/core/theme-init.js' %}"></script>
   <title>{% block title %}Central de Viagens 3{% endblock %}</title>
   {# NOVO-12: um CSS de shell no lugar de 24 requests. Fontes em static/css/; regenere com scripts/build_shell_bundles.py #}
-  <link rel="stylesheet" href="{% static 'css/shell.bundle.css' %}">
+  {% block shell_css %}<link rel="stylesheet" href="{% static 'css/shell.bundle.css' %}">{% endblock %}
   {% block extra_css %}{% endblock %}
   {% block extra_css_after_theme %}{% endblock %}
 </head>
 <body>
-  {% include "components/ui/icons/_sprite.html" %}
+  <c-ui.icons._sprite />
   <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
   <div class="app-shell {% block shell_class %}{% endblock %}" data-app-shell>
     <header class="app-mobile-bar">
@@ -21,15 +21,15 @@
         <span class="sidebar-brand-badge" aria-hidden="true">CV</span>
         <span>Central de Viagens</span>
       </a>
-      <button class="app-mobile-bar__toggle" type="button" aria-controls="app-sidebar" aria-expanded="false" aria-label="Abrir menu principal" data-sidebar-drawer-toggle>
+      <c-ui.buttons.button class_name="app-mobile-bar__toggle" type="button" aria-controls="app-sidebar" aria-expanded="false" aria_label="Abrir menu principal" data-sidebar-drawer-toggle only>
         <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
-      </button>
+      </c-ui.buttons.button>
     </header>
-    {% include "components/layout/sidebar.html" %}
-    <button class="sidebar-scrim" type="button" aria-label="Fechar menu principal" tabindex="-1" data-sidebar-drawer-close></button>
+    <c-layout.sidebar  :navigation_items="navigation_items" :request="request" />
+    <c-ui.buttons.button class_name="sidebar-scrim" type="button" aria_label="Fechar menu principal" tabindex="-1" data-sidebar-drawer-close only></c-ui.buttons.button>
     <main class="app-main" id="main-content" tabindex="-1">
       <section class="content-wrap">
-        {% include "components/feedback/alerts.html" %}
+        <c-feedback.alerts  :messages="messages" />
         {% block content %}{% endblock %}
       </section>
     </main>
@@ -42,7 +42,20 @@
     </div>
   </div>
   {# NOVO-12: um JS de shell (defer) no lugar de 23 requests; theme-* ficam no head sem defer. #}
-  <script src="{% static 'js/shell.bundle.js' %}" defer></script>
+  <script
+    src="{% static 'js/shell.bundle.js' %}"
+    data-cv-lazy-components
+    data-cv-lazy-form-components-src="{% static 'js/form-components.bundle.js' %}"
+    data-cv-lazy-card-toggle-src="{% static 'js/components/card-toggle.js' %}"
+    data-cv-lazy-segment-nav-src="{% static 'js/components/segment-nav.js' %}"
+    data-cv-lazy-file-picker-src="{% static 'js/components/file-picker.js' %}"
+    data-cv-lazy-attach-signed-modal-src="{% static 'js/components/attach-signed-modal.js' %}"
+    data-cv-lazy-signature-actions-src="{% static 'js/components/signature-actions.js' %}"
+    data-cv-lazy-extra-download-src="{% static 'js/components/extra-download.js' %}"
+    data-cv-lazy-wizard-sticky-header-src="{% static 'js/components/wizard-sticky-header.js' %}"
+    defer
+  ></script>
+  {% block component_js %}{% endblock %}
   {% block extra_js %}{% endblock %}
 </body>
 </html>

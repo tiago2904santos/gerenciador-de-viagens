@@ -15,7 +15,7 @@ class JavascriptNamespaceContractTests(SimpleTestCase):
                 encoding="utf-8-sig"
             )
             for path in cls.static_js.rglob("*.js")
-            if "vendor" not in path.parts
+            if "vendor" not in path.parts and not path.name.endswith(".test.js")
         }
 
     def test_application_does_not_publish_namespaces_outside_cv(self):
@@ -52,11 +52,15 @@ class JavascriptNamespaceContractTests(SimpleTestCase):
             with self.subTest(namespace=legacy_name):
                 self.assertNotIn(f"window.{legacy_name}", combined)
 
-    def test_roteiro_modules_share_one_cv_subtree(self):
+    def test_roteiro_engines_share_one_cv_subtree_without_facade_stubs(self):
         editor = self.sources["pages/roteiros/editor/index.js"]
-        map_engine = self.sources["roteiros-map.js"]
-        wizard = self.sources["roteiros_wizard.js"]
+        map_engine = self.sources["pages/roteiros-map.js"]
+        wizard = self.sources["pages/roteiros-wizard.js"]
         self.assertIn("window.CV.roteiros.editor", editor)
         self.assertIn("window.CV.roteiros.modules", editor)
         self.assertIn("window.CV.roteiros.map", map_engine)
         self.assertIn("window.CV.roteiros.wizard", wizard)
+        for stub in ("state.js", "retorno.js", "diarias.js"):
+            with self.subTest(stub=stub):
+                self.assertNotIn(f"pages/roteiros/editor/{stub}", self.sources)
+                self.assertNotIn(f"'./{stub}'", editor)

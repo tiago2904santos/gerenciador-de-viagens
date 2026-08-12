@@ -4,10 +4,10 @@
 
 {% block content %}
   <div class="page-shell page-shell--standard-simple">
-    {% include "components/ui/headers/page_header.html" with eyebrow="PLANOS DE TRABALHO" title=page_title description=page_description icon_label="PT" module_label="Programas Solicitantes" only %}
+    <c-ui.headers.page_header eyebrow="PLANOS DE TRABALHO" :title="page_title" :description="page_description" icon_label="PT" module_label="Programas Solicitantes" only />
     <form class="main-form-panel" method="post">
       {% csrf_token %}
-      {% include "components/feedback/confirm_delete_block.html" with object_label=programa.nome message="Planos já criados que usam este programa não são alterados." primary_label="Excluir programa" back_url=cancel_url only %}
+      <c-feedback.confirm_delete_block :object_label="programa.nome" message="Planos já criados que usam este programa não são alterados." primary_label="Excluir programa" :back_url="cancel_url" only />
     </form>
   </div>
 {% endblock %}

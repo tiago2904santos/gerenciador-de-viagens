@@ -4,12 +4,12 @@
 
 {% block content %}
   <div class="page-shell page-shell--list">
-    {% include "components/ui/headers/filter_page_header.html" with eyebrow="PRESTAÇÕES" title=page_title icon_label="PC" form_action=request.path search_name="q" search_value=q search_placeholder="Buscar modelos de texto" search_clear_url=request.path %}
+    <c-ui.headers.filter_page_header eyebrow="PRESTAÇÕES" :title="page_title" icon_label="PC" :form_action="request.path" search_name="q" :search_value="q" search_placeholder="Buscar modelos de texto" :search_clear_url="request.path"  :abas="abas" :advanced="advanced" :band_tabs_template="band_tabs_template" :cargo_filter="cargo_filter" :combustivel_filter="combustivel_filter" :current_aba="current_aba" :date_end_id="date_end_id" :date_picker_id="date_picker_id" :date_start_id="date_start_id" :extra_class="extra_class" :hide_date_filter="hide_date_filter" :next_url="next_url" :primary_action_label="primary_action_label" :primary_action_url="primary_action_url" :q="q" :search_aria_label="search_aria_label" :sort="sort" :sort_options="sort_options" :status="status" :status_label="status_label" :status_name="status_name" :status_options="status_options" :status_value="status_value" :status_variant="status_variant" :tabs_aria_label="tabs_aria_label" :temporal="temporal" :temporal_options="temporal_options" :unidade_filter="unidade_filter" :viagem_ate="viagem_ate" :viagem_de="viagem_de" />
 
     <div class="list-panel">
     <div class="form-section-stack form-section-stack--comfortable">
       {% for grupo in grupos %}
-        {% include "components/ui/forms/form_block.html" with shell="card" element_id="grupo-"|add:grupo.campo extra_class="modelos-grupo" title=grupo.label actions_template="prestacoes_contas/partials/_modelos_grupo_actions.html" body_template="prestacoes_contas/partials/_modelos_grupo_body.html" %}
+        {% with cotton_attr_element_id="grupo-"|add:grupo.campo %}<c-ui.forms.form_block shell="card" :element_id="cotton_attr_element_id" extra_class="modelos-grupo" :title="grupo.label" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :description="description" :heading_level="heading_level" :section_id="section_id" :variant="variant"><c-slot name="actions">{% include "prestacoes_contas/partials/_modelos_grupo_actions.html" with grupo=grupo only %}</c-slot><c-slot name="body">{% include "prestacoes_contas/partials/_modelos_grupo_body.html" with grupo=grupo only %}</c-slot></c-ui.forms.form_block>{% endwith %}
       {% endfor %}
     </div>
     </div>

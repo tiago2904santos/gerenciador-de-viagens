@@ -7,7 +7,7 @@ que ele publica em `window.CV`. Não altera regra de negócio.
 
 Este documento cobre `static/js/core/`, `static/js/components/` e os motores de raiz — o código que
 qualquer tela pode acionar. **Não** indexa os atributos de uma página só (`static/js/pages/`): são
-**135** deles, cada um com um único consumidor, e a documentação certa para esses é o próprio
+**142** deles, cada um com um único consumidor, e a documentação certa para esses é o próprio
 módulo da página.
 
 A regra que decide: se o atributo aparece num motor compartilhado, ele está aqui. Isso é verificado
@@ -56,6 +56,35 @@ registry chama `destroy(root)` quando o nó sai do DOM (`JS-02`).
 
 O painel é o elemento apontado por `aria-controls`, com a transição `.is-open`.
 
+## Carregamento progressivo — `core/component-loader.js`
+
+O script do shell em `base.html` fornece URLs resolvidas pelo storage de estáticos. O loader pede
+cada componente somente quando encontra seu marcador no DOM inicial ou em conteúdo inserido por
+AJAX.
+
+| Atributo | Elemento | Uso |
+|---|---|---|
+| `data-cv-lazy-components` | script do shell | Declara a configuração única do loader |
+| `data-cv-lazy-form-components-src` | script do shell | URL de `form-components.bundle.js` |
+| `data-cv-lazy-card-toggle-src` | script do shell | URL de `card-toggle.js` |
+| `data-cv-lazy-segment-nav-src` | script do shell | URL de `segment-nav.js` |
+| `data-cv-lazy-file-picker-src` | script do shell | URL de `file-picker.js` |
+| `data-cv-lazy-attach-signed-modal-src` | script do shell | URL de `attach-signed-modal.js` |
+| `data-cv-lazy-signature-actions-src` | script do shell | URL de `signature-actions.js` |
+| `data-cv-lazy-extra-download-src` | script do shell | URL de `extra-download.js` |
+| `data-cv-lazy-wizard-sticky-header-src` | script do shell | URL de `wizard-sticky-header.js` |
+| `data-cv-component-bundle="forms"` | script opcional da página | Informa que o bundle de formulários já foi declarado antes do shell |
+
+API: `CV.lazyComponents.scan(root?)`, para uma varredura explícita, e `destroy()`, usado em testes.
+
+O bundle de formulários agrupa `picker-parts`, os dois renderers de picker, `location-rows`,
+`document-source`, `document-search` e `date-picker`. Páginas cujo JavaScript chama essas APIs
+diretamente incluem `includes/form_components_js.html` no bloco `component_js`, depois do shell e
+antes dos scripts de página;
+nas demais, o loader usa `[data-entity-picker]`, `[data-location-rows]` ou
+`[data-cv-date-picker]` como marcador. O inventário automatizado em
+`core/tests/test_shell_bundles.py` obriga todo consumidor direto novo a declarar a dependência.
+
 ## Coleções — `components/collection.js` / `CV.collection`
 
 Cada lista declara exatamente um modo. `client` filtra o que já está renderizado; `server` manda os
@@ -85,7 +114,7 @@ Evento no modo cliente: `cv:collection:updated` — `{ collection, filters, tota
 A busca cliente ignora caixa e acentos e combina palavras com AND. No modo servidor o backend
 continua dono da semântica de busca e paginação.
 
-## Picker de entidade — `components/picker.js`, `components/picker-select.js`
+## Pickers — `components/picker.js`, `components/picker-select.js`, `components/picker-parts.js`
 
 O `<select>` fonte declara o componente; a `<div>` que o motor renderiza declara **o que ela é**.
 Quem consome o picker de fora nunca deve procurá-lo pela classe CSS.
@@ -108,22 +137,10 @@ CV.picker.closestPart(no, nome)  // subindo a partir de um nó
 
 Duas armadilhas medidas no navegador: o **dropdown é portado para `document.body`** pelo overlay
 quando aberto, então `part(root, "dropdown")` devolve `null` nesse estado — use `closestPart` a
-partir do alvo do evento; e existe markup que **imita** o picker sem ser um (três templates o
-escrevem à mão, `NOVO-16`): tem as classes, não tem os atributos.
-
-## Dropdowns — `cv-select.js` / `CV.dropdowns`
-
-| Atributo | Elemento |
-|---|---|
-| `data-cv-dropdown` | raiz do dropdown simples |
-| `data-cv-dropdown-trigger` | botão que abre |
-| `data-cv-dropdown-menu` | menu |
-| `data-cv-filter-dropdown` | raiz do dropdown de filtro |
-| `data-cv-filter-dropdown-trigger` | botão que abre |
-| `data-cv-filter-dropdown-menu` | menu |
-| `data-cv-filter-dropdown-option` | opção |
-
-API: `CV.dropdowns.init(root?)`. Marcador de idempotência: `_cvDropdownReady`.
+partir do alvo do evento. Os pickers de relacionamento escritos pelo servidor usam
+`ui/forms/related_picker.html`; sua raiz semântica é `data-related-picker-root` e a apresentação
+(`card` ou `compact`) fica em `data-related-picker-presentation`. A estrutura criada por JS vem de
+`CV.pickerParts`, sem reconstruir classes BEM nos módulos de página (`NOVO-16`).
 
 ## Máscaras — `components/masks.js` / `CV.masks`
 
@@ -145,8 +162,6 @@ API: `CV.masks.scan(root?)`, `CV.masks.apply(input)`, `CV.masks.format(value, ma
 | `data-cv-state-input` | input / seletor | Campo sincronizado (padrão: primeiro checkbox) |
 | `data-cv-state-trigger` | botão | Gatilho binário |
 | `data-active-label`, `data-inactive-label` | botão/container | Rótulo por estado |
-| `data-rg-toggle` | botão | Legado — RG do servidor (binário), `HT-10` |
-| `data-motorista-fixo-toggle` | botão | Legado — motorista da viatura (binário), `HT-10` |
 | `data-cv-state-bound` | container (interno) | Idempotência |
 
 API: `CV.stateToggle.init(root?)`, `CV.stateToggle.update(group, value)`.
@@ -263,7 +278,6 @@ Orquestrador carregado depois dos motores em `base.html`.
 | `CV.fields.initSelects(root?)` | Só os selects customizados |
 | `CV.fields.initSearchPickers(root?)` | Só o picker de busca |
 | `CV.fields.initDatePickers(root?)` | Só os date pickers |
-| `CV.fields.initDropdowns(root?)` | Só os dropdowns |
 | `CV.fields.initMultiselects(root?)` | Só os multiselects |
 
 | Atributo | Uso |
@@ -271,10 +285,10 @@ Orquestrador carregado depois dos motores em `base.html`.
 | `data-form-errors` | Resumo de erro de formulário (`HT-03`) — recebe o foco uma vez por carga de página |
 
 Evento: `cv:fields:init` — `detail.initialized`:
-`{ masks, stateToggles, segmentNav, selects, searchPickers, datePickers, dropdowns, multiselects, filterableMultiselects, resumoDeErros }`.
+`{ masks, stateToggles, segmentNav, selects, searchPickers, datePickers, multiselects, filterableMultiselects, resumoDeErros }`.
 
 Ordem interna: masks → stateToggle → segmentNav → selects → searchPickers → datePickers →
-dropdowns → multiselects → filterableMultiselects → resumo de erros.
+multiselects → filterableMultiselects → resumo de erros.
 
 Depois de inserir DOM dinamicamente:
 
@@ -289,8 +303,8 @@ window.CV.fields.init(panelElement);
 | `data-diaria-base`, `data-diaria-derivado` | `components/diaria-derivados.js` | Espelha na tela a derivação de 15% e 30% que o modelo faz no `save()` — é pré-visualização, o servidor continua dono do valor |
 | `data-cv-signature-card`, `data-cv-signature-link`, `data-cv-signature-copy`, `data-cv-signature-wa` | `components/signature-actions.js` | Cartão de assinatura: copiar link e enviar por WhatsApp |
 | `data-cv-segment-nav-bound` | `components/segment-nav.js` | Navegação por segmentos — marcador de idempotência (o motor liga por classe, não por atributo) |
-| `data-map-focus-lat`, `data-map-focus-lng` | `roteiros-map.js` | Centro inicial do mapa |
-| `data-oficio-glance-panel`, `data-oficio-glance-toggle`, `data-oficio-glance-toggle-label`, `data-oficio-sticky-header` | `roteiros_wizard.js` | Painel de resumo do ofício no wizard de roteiro |
+| `data-map-focus-lat`, `data-map-focus-lng` | `pages/roteiros-map.js` | Centro inicial do mapa |
+| `data-oficio-glance-panel`, `data-oficio-glance-toggle`, `data-oficio-glance-toggle-label`, `data-oficio-sticky-header` | `pages/roteiros-wizard.js` | Painel de resumo do ofício no wizard de roteiro |
 
 ## Domínio de roteiro (no `#roteiro-editor-form`)
 

@@ -122,7 +122,7 @@ class NomeAcessivelDoSeletorTests(SimpleTestCase):
 
     def test_o_rotulo_sobrevive_como_sr_only_no_campo_de_busca(self):
         """Era omitido de vez; agora sai da tela mas fica na árvore de acessibilidade."""
-        html = ler("templates/components/ui/forms/field.html")
+        html = ler("templates/cotton/ui/forms/field.html")
 
         self.assertIn('<label class="sr-only" for="{{ field.id_for_label }}">', html)
 

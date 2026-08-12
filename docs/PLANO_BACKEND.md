@@ -182,7 +182,7 @@ Esta etapa é a que o [`PLANO_DESEMPENHO.md`](PLANO_DESEMPENHO.md) mede e não e
 |---|---|---|---:|
 | `DB-09` 🟠 | Lista de roteiros agrega antes do `LIMIT` (`roteiros/selectors.py:36`): trocar `annotate(Count)+exclude` por `Exists()` correlacionado | 24.000 roteiros: **56,6–127,7 ms** em duas medições | 2 |
 | `DB-10` 🟡 | Falta índice composto para a ordenação real das listas (`OrdemServico.Meta.indexes` vazio, ofícios idem) | **13× a 29×** em duas medições | 0,5 |
-| `DB-11` 🟡 | 80 buscas `__unaccent__icontains` sem índice: 0 GIN e 0 trigram em 390 índices | busca de ofícios: `Seq Scan` em 24.000 linhas, **31,3–35,7 ms** | 3 |
+| `DB-11` ✅ | A pior busca livre expandia 20.000 Termos em ~60.000 linhas por três M2M e rodava três vezes; virou `Exists()` por origem + contagem reutilizada, com cenário permanente no `PF-07` | busca de Termos em 20.000: **1.807,9 → 391,4 ms (4,62×)** | 3 |
 
 > **Os três números foram medidos duas vezes, por auditores independentes, e as faixas acima são as
 > duas medições.** Onde divergiram, a promessa que vale é a mais conservadora. O `DB-09` é o caso
@@ -202,9 +202,9 @@ Esta etapa é a que o [`PLANO_DESEMPENHO.md`](PLANO_DESEMPENHO.md) mede e não e
 | `BE-11` 🟠 | Editor de roteiro em 3 cópias (`roteiros/views.py:203,311` e `oficios/route_views.py:100`); só duas tratam roteiro duplicado | 3 |
 | `BE-12` 🟠 | `wizard_roteiro` concentra a regra de vínculo/cópia de roteiro na view: 181 linhas, 24 ramos, 4 gravações | 2 |
 | `BE-13` 🟠 | `roteiros/roteiro_logic.py`: 1.779 linhas, 57 funções privadas, fora do contrato de camadas, importado pelos services | 4 |
-| `BE-14` 🟠 | 48 sites de persistência em módulo de view sem service e sem transação (21 em prestações); zero `transaction.atomic` em `prestacoes_contas/services.py` (643 LOC), `termos/services.py` (709) e `planos_trabalho/services.py` (1.314) | 3 |
-| `BE-15` 🟡 | Numeração de documento reimplementada 3 vezes com garantias de concorrência diferentes | 2 |
-| `BE-16` 🟡 | Abstrações adotadas pela metade: paginação em 2 de 14 listas, exclusão protegida em 3 de 48 sites, 6 cópias de `_pagination_pages` | 2 |
+| `BE-14` ✅ | 48 sites de persistência em módulo de view sem service e sem transação — fechado em 6 fatias; o último caminho multigravação, identificação de Evento (~12 writes/6 tabelas), virou um service atômico com rollback provado nos cinco documentos vinculáveis | 3 |
+| `BE-15` ✅ | Três políticas preservadas sobre `core.numeracao`: OS reaproveita somente lacuna de exclusão; Plano mantém contador/sufixo e agora grava com retry e rollback do contador | 2 |
+| `BE-16` ✅ | Paginação centralizada em 15 pontos; exclusões de entidade adotam `core.deletion`; validação e composição de `next` pertencem somente a `core.retorno` | 2 |
 | `BE-17` 🟡 | `core/views.py` é 75% fixture de UI Lab (947 de 1.261 linhas), e existem **dois** UI Labs paralelos | 1,5 |
 
 **`BE-11`, `BE-12` e `BE-13` são a mesma superfície.** Fazer na ordem: editor primeiro (reduz o

@@ -1,2 +1,2 @@
-{% include "components/lists/simple_list.html" with rows=rows empty_message="Nenhum usuário vinculado a esta área." hide_realtime_count=True empty_variant="compact" %}
-{% include "components/ui/lists/pagination.html" with page_obj=page_obj pagination_pages=pagination_pages only %}
+<c-lists.simple_list :rows="rows" empty_message="Nenhum usuário vinculado a esta área." :hide_realtime_count="True" empty_variant="compact"  :empty_action_label="empty_action_label" :empty_action_url="empty_action_url" />
+<c-ui.lists.pagination :page_obj="page_obj" :pagination_pages="pagination_pages" only />

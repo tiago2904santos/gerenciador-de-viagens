@@ -19,6 +19,7 @@ class OverlayContractTests(SimpleTestCase):
             "openDialog: openDialog",
             "closeDialog: closeDialog",
             "attachDropdown: attachDropdown",
+            "attachDismiss: attachDismiss",
             "closeMenus: closeMenus",
         ):
             self.assertIn(contract, self.overlay)
@@ -67,11 +68,20 @@ class OverlayContractTests(SimpleTestCase):
         picker_select = (self.components / "picker-select.js").read_text(
             encoding="utf-8"
         )
+        date_picker = (self.components / "date-picker.js").read_text(
+            encoding="utf-8"
+        )
 
         self.assertIn("window.CV.overlay.openDialog", app)
         self.assertIn("window.CV.overlay.openDialog", attachment)
         self.assertIn("window.CV.overlay.attachDropdown", picker)
         self.assertIn("window.CV.overlay.attachDropdown", picker_select)
+        self.assertIn("window.CV.overlay.attachDismiss", picker)
+        self.assertIn("window.CV.overlay.attachDismiss", picker_select)
+        self.assertIn("window.CV.overlay.attachDismiss", date_picker)
+        self.assertNotIn('document.addEventListener("click", onDocumentClick)', picker)
+        self.assertNotIn("document.addEventListener('click', onDocumentClick)", date_picker)
+        self.assertNotIn("document.addEventListener('keydown', onKeydown)", date_picker)
 
     def test_base_loads_only_the_canonical_overlay_engine(self):
         base = (self.root / "templates" / "base.html").read_text(encoding="utf-8")

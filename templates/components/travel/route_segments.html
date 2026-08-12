@@ -1,8 +1,0 @@
-{# Segmentos da rota e retorno final. #}
-<div class="roteiro-editor__section--trechos roteiro-trechos-host" data-route-segments>
-  <div id="trechos-date-picker-park" class="roteiro-trechos-date-picker-park" hidden>
-    {% include "roteiros/partials/roteiro/_trechos_actions.html" %}
-  </div>
-  {% include "roteiros/partials/roteiro/_trechos_gerados_body.html" %}
-</div>
-{% include "components/ui/forms/form_block.html" with shell="" variant="resource" extra_class="roteiro-editor__section--retorno route-section-block" section_id="sec-retorno" title="Retorno" description="Último deslocamento até a sede." body_id="retorno-card" body_extra_class="roteiro-editor__retorno-body" body_template="roteiros/partials/roteiro/_retorno_body.html" %}

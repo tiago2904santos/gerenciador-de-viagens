@@ -3,8 +3,8 @@ from datetime import date
 from datetime import time
 
 from django.contrib.auth import get_user_model
+from django.http import QueryDict
 from django.test import Client
-from django.test import RequestFactory
 from django.test import TestCase
 from django.test import override_settings
 from django.urls import reverse
@@ -14,9 +14,19 @@ from cadastros.models import Estado
 from roteiros.models import Roteiro
 from roteiros.models import RoteiroDestino
 from roteiros.models import RoteiroTrecho
-from roteiros import roteiro_logic
+from roteiros.services import editor_state_builder
+from roteiros.services import editor_persistence
+from roteiros.services.editor_state import dedupe_roteiro_loop_retorno_final
 from core.testing import area_de_teste
 from core.testing import vincular_area
+
+
+def _querydict(dados):
+    """POST como o parser passou a recebê-lo no `BE-13`: sem request em volta."""
+    qd = QueryDict(mutable=True)
+    for chave, valor in dados.items():
+        qd[chave] = valor
+    return qd
 
 
 @override_settings(ALLOWED_HOSTS=["testserver", "localhost"])
@@ -110,7 +120,7 @@ class RoteirosBaseTests(TestCase):
             {"destino_estado_id": self.estado.pk, "destino_cidade_id": self.cidade_dest_3.pk, "destino_nome": "MARINGA"},
             {"destino_estado_id": self.estado.pk, "destino_cidade_id": self.cidade_dest_2.pk, "destino_nome": "LONDRINA"},
         ]
-        destinos = roteiro_logic._infer_roteiro_destinos_from_trechos(
+        destinos = editor_state_builder._infer_roteiro_destinos_from_trechos(
             trechos, sede_estado=self.estado, sede_cidade=self.cidade_sede
         )
         self.assertEqual(
@@ -126,7 +136,7 @@ class RoteirosBaseTests(TestCase):
             {"destino_estado_id": self.estado.pk, "destino_cidade_id": self.cidade_dest_2.pk, "destino_nome": "LONDRINA"},
             {"destino_estado_id": self.estado.pk, "destino_cidade_id": self.cidade_dest_3.pk, "destino_nome": "MARINGA"},
         ]
-        destinos = roteiro_logic._infer_roteiro_destinos_from_trechos(
+        destinos = editor_state_builder._infer_roteiro_destinos_from_trechos(
             trechos, sede_estado=self.estado, sede_cidade=self.cidade_sede
         )
         self.assertEqual(
@@ -147,20 +157,19 @@ class RoteirosBaseTests(TestCase):
             cidade=self.cidade_dest,
             ordem=0,
         )
-        request = RequestFactory().post(
-            reverse("roteiros:novo"),
-            data={
-                "roteiro_modo": roteiro_logic.ROTEIRO_MODO_EVENTO,
+        post = _querydict(
+            {
+                "roteiro_modo": editor_state_builder.ROTEIRO_MODO_EVENTO,
                 "roteiro_id": str(r.pk),
                 "origem_estado": str(self.estado.pk),
                 "origem_cidade": str(self.cidade_sede.pk),
                 "destino_estado_0": str(self.estado_destino.pk),
                 "destino_cidade_0": str(self.cidade_dest.pk),
-            },
+            }
         )
 
-        route_options, _, _, _ = roteiro_logic._build_roteiro_diarias_from_request(
-            request,
+        route_options, _, _, _ = editor_state_builder._build_roteiro_diarias_from_request(
+            post,
             roteiro=r,
         )
 
@@ -209,7 +218,7 @@ class RoteirosBaseTests(TestCase):
             duracao_estimada_min=135,
         )
 
-        roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
+        editor_persistence.salvar_roteiro_avulso_from_roteiro_state(
             roteiro,
             {
                 "destinos_atuais": [
@@ -303,7 +312,7 @@ class RoteirosBaseTests(TestCase):
             duracao_estimada_min=195,
         )
 
-        roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
+        editor_persistence.salvar_roteiro_avulso_from_roteiro_state(
             roteiro,
             {
                 "destinos_atuais": [
@@ -378,7 +387,7 @@ class RoteirosBaseTests(TestCase):
             duracao_estimada_min=135,
         )
 
-        roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
+        editor_persistence.salvar_roteiro_avulso_from_roteiro_state(
             roteiro,
             {
                 "destinos_atuais": [
@@ -431,13 +440,10 @@ class RoteirosBaseTests(TestCase):
         )
 
     def test_bate_volta_diario_remove_retorno_final_duplicado_do_post(self):
-        request = RequestFactory().post(
-            reverse("roteiros:novo"),
-            data=self._loop_diario_post_data(),
-        )
+        post = _querydict(self._loop_diario_post_data())
 
-        state = roteiro_logic._build_avulso_roteiro_state_from_post(request)
-        validated = roteiro_logic._validate_roteiro_state(state)
+        state = editor_state_builder._build_avulso_roteiro_state_from_post(post)
+        validated = editor_state_builder._validate_roteiro_state(state)
 
         self.assertTrue(validated["ok"], validated["errors"])
         self.assertEqual(len(state["trechos"]), 5)
@@ -460,14 +466,11 @@ class RoteirosBaseTests(TestCase):
             cidade=self.cidade_dest,
             ordem=0,
         )
-        request = RequestFactory().post(
-            reverse("roteiros:novo"),
-            data=self._loop_diario_post_data(),
-        )
-        state = roteiro_logic._build_avulso_roteiro_state_from_post(request)
-        validated = roteiro_logic._validate_roteiro_state(state)
+        post = _querydict(self._loop_diario_post_data())
+        state = editor_state_builder._build_avulso_roteiro_state_from_post(post)
+        validated = editor_state_builder._validate_roteiro_state(state)
 
-        roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(roteiro, state, validated)
+        editor_persistence.salvar_roteiro_avulso_from_roteiro_state(roteiro, state, validated)
 
         self.assertEqual(roteiro.trechos.filter(tipo=RoteiroTrecho.TIPO_IDA).count(), 5)
         self.assertEqual(roteiro.trechos.filter(tipo=RoteiroTrecho.TIPO_RETORNO).count(), 1)
@@ -496,15 +499,12 @@ class RoteirosBaseTests(TestCase):
             cidade=self.cidade_dest,
             ordem=0,
         )
-        request = RequestFactory().post(
-            reverse("roteiros:novo"),
-            data=self._loop_diario_post_data(),
-        )
-        state = roteiro_logic._build_avulso_roteiro_state_from_post(request)
-        validated = roteiro_logic._validate_roteiro_state(state)
-        roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(roteiro, state, validated)
+        post = _querydict(self._loop_diario_post_data())
+        state = editor_state_builder._build_avulso_roteiro_state_from_post(post)
+        validated = editor_state_builder._validate_roteiro_state(state)
+        editor_persistence.salvar_roteiro_avulso_from_roteiro_state(roteiro, state, validated)
 
-        reopened = roteiro_logic._build_roteiro_state_from_roteiro_evento(roteiro)
+        reopened = editor_state_builder._build_roteiro_state_from_roteiro_evento(roteiro)
 
         self.assertEqual(len(reopened["trechos"]), 5)
         self.assertTrue(reopened["bate_volta_diario"]["ativo"])
@@ -515,10 +515,10 @@ class RoteirosBaseTests(TestCase):
 
     def test_calculo_diarias_ignora_retorno_final_duplicado_no_loop_diario(self):
         base_state = self._loop_diario_state_com_retorno_duplicado()
-        deduped_state = roteiro_logic._dedupe_roteiro_loop_retorno_final(dict(base_state))
+        deduped_state = dedupe_roteiro_loop_retorno_final(dict(base_state))
 
-        markers_com_duplicado, _, chegada_com_duplicado, _, _ = roteiro_logic._collect_roteiro_markers_payload(base_state)
-        markers_sem_duplicado, _, chegada_sem_duplicado, _, _ = roteiro_logic._collect_roteiro_markers_payload(deduped_state)
+        markers_com_duplicado, _, chegada_com_duplicado, _, _ = editor_state_builder._collect_roteiro_markers_payload(base_state)
+        markers_sem_duplicado, _, chegada_sem_duplicado, _, _ = editor_state_builder._collect_roteiro_markers_payload(deduped_state)
 
         self.assertEqual(len(markers_com_duplicado), len(markers_sem_duplicado))
         self.assertEqual(len(markers_com_duplicado), 5)
@@ -527,7 +527,7 @@ class RoteirosBaseTests(TestCase):
     def _loop_diario_post_data(self):
         state = self._loop_diario_state_com_retorno_duplicado()
         data = {
-            "roteiro_modo": roteiro_logic.ROTEIRO_MODO_PROPRIO,
+            "roteiro_modo": editor_state_builder.ROTEIRO_MODO_PROPRIO,
             "origem_estado": str(self.estado.pk),
             "origem_cidade": str(self.cidade_sede.pk),
             "bate_volta_diario_ativo": "on",
@@ -589,7 +589,7 @@ class RoteirosBaseTests(TestCase):
                 }
             )
         return {
-            "roteiro_modo": roteiro_logic.ROTEIRO_MODO_PROPRIO,
+            "roteiro_modo": editor_state_builder.ROTEIRO_MODO_PROPRIO,
             "sede_estado_id": self.estado.pk,
             "sede_cidade_id": self.cidade_sede.pk,
             "destinos_atuais": [

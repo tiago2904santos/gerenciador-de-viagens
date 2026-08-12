@@ -9,31 +9,31 @@
 
 {% block wizard_content %}
   {% if mostrar_pendencias %}
-    {% include "components/ui/feedback/pendencias_card.html" with items=pendencias_documentos lead="Corrija os itens abaixo antes de finalizar o plano ou gerar DOCX/PDF." only %}
+    <c-ui.feedback.pendencias_card :items="pendencias_documentos" lead="Corrija os itens abaixo antes de finalizar o plano ou gerar DOCX/PDF." only />
   {% endif %}
 
   {# ── Adicionar outro evento ao plano ─────────────────────────── #}
   <section class="form-section-card pt-add-evento">
     <div class="form-section-body pt-add-evento__inner">
       <div class="pt-add-evento__copy">
-        {% include "components/ui/icons/icon.html" with icon="plus" extra_class="pt-add-evento__icon" only %}
+        <c-ui.icons.icon icon="plus" extra_class="pt-add-evento__icon" only />
         <p class="pt-add-evento__text">
           “Adicionar evento ao plano” salva os dados atuais como um evento e limpa o formulário para você preencher o próximo. O evento atual já está incluído no documento mesmo sem clicar.
         </p>
       </div>
       {# formaction: o botão está dentro do <form> do wizard (sem forms aninhados). #}
-      <button type="submit" formmethod="post" formaction="{{ evento_adicionar_url }}" formnovalidate
-              class="cv-btn cv-btn--primary pt-add-evento__btn">
+      <c-ui.buttons.button type="submit" formmethod="post" formaction="{{ evento_adicionar_url }}" formnovalidate
+              class_name="cv-btn cv-btn--primary pt-add-evento__btn" only>
         <span>Adicionar evento ao plano</span>
         <span class="cv-btn__icon" aria-hidden="true">
-          {% include "components/ui/icons/icon.html" with icon="arrow-right" only %}
+          <c-ui.icons.icon icon="arrow-right" only />
         </span>
-      </button>
+      </c-ui.buttons.button>
     </div>
   </section>
 
   <div class="pt-documentos-stage" data-travel-document-wizard-documentos>
-    {% include "components/form/card.html" with title="Resumo e documentos" description="Confira, baixe e finalize o plano de trabalho gerado" title_id="pt-documentos-card-title" extra_class="oficio-documentos-unified-card oficio-documentos-card pt-form-card" body_extra_class="oficio-documentos-body" body_template="planos_trabalho/partials/_documentos_wizard_body.html" footer_template="planos_trabalho/partials/_documentos_preview_footer.html" %}
+    <c-form.card title="Resumo e documentos" description="Confira, baixe e finalize o plano de trabalho gerado" title_id="pt-documentos-card-title" extra_class="oficio-documentos-unified-card oficio-documentos-card pt-form-card" body_extra_class="oficio-documentos-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "planos_trabalho/partials/_documentos_wizard_body.html" with baixar_docx_url=baixar_docx_url baixar_pdf_url=baixar_pdf_url documento_disponivel=documento_disponivel pdf_inline_url=pdf_inline_url plano=plano only %}</c-slot><c-slot name="footer">{% include "planos_trabalho/partials/_documentos_preview_footer.html" with mostrar_pendencias=mostrar_pendencias only %}</c-slot></c-form.card>
   </div>
 {% endblock %}
 

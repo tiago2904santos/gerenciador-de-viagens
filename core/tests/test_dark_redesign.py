@@ -10,10 +10,16 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.base_path = Path(settings.BASE_DIR) / "templates" / "base.html"
         css_root = Path(settings.BASE_DIR) / "static" / "css"
         self.tokens_path = css_root / "base" / "03-theme-dark.css"
+        self.base_tokens_path = css_root / "base" / "tokens.css"
         self.components_path = css_root / "components" / "theme-dark-components.css"
+        self.page_shell_path = css_root / "layout" / "page-shell.css"
+        self.list_header_path = css_root / "lists" / "list-header.css"
         self.base = self.base_path.read_text(encoding="utf-8")
         self.tokens_css = self.tokens_path.read_text(encoding="utf-8")
+        self.base_tokens_css = self.base_tokens_path.read_text(encoding="utf-8")
         self.components_css = self.components_path.read_text(encoding="utf-8")
+        self.page_shell_css = self.page_shell_path.read_text(encoding="utf-8")
+        self.list_header_css = self.list_header_path.read_text(encoding="utf-8")
         self.css = f"{self.tokens_css}\n{self.components_css}"
 
     def test_dark_redesign_is_the_final_global_css_layer(self):
@@ -21,9 +27,18 @@ class DarkRedesignContractTests(SimpleTestCase):
         bundle = (
             Path(settings.BASE_DIR) / "static" / "css" / "shell.bundle.css"
         ).read_text(encoding="utf-8")
+        form_bundle = (
+            Path(settings.BASE_DIR)
+            / "static"
+            / "css"
+            / "shell.form-components.bundle.css"
+        ).read_text(encoding="utf-8")
         style_index = bundle.index(">>> css/style.css >>>")
         theme_dark_tokens_index = bundle.index(">>> css/base/03-theme-dark.css >>>")
-        file_picker_index = bundle.index(">>> css/fields/file-picker.css >>>")
+        file_picker_index = form_bundle.index(">>> css/fields/file-picker.css >>>")
+        form_action_system_index = form_bundle.index(
+            ">>> css/actions/action-system.css >>>"
+        )
         action_system_index = bundle.index(">>> css/actions/action-system.css >>>")
         record_list_index = bundle.index(">>> css/lists/record-list.css >>>")
         filter_header_index = bundle.index(">>> css/lists/filter-header.css >>>")
@@ -44,7 +59,8 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertNotIn("css/dark-redesign.css", self.base)
         self.assertNotIn("css/dark-redesign.css", bundle)
         self.assertLess(shell_bundle_index, extra_css_index)
-        self.assertLess(file_picker_index, action_system_index)
+        self.assertNotIn(">>> css/fields/file-picker.css >>>", bundle)
+        self.assertLess(file_picker_index, form_action_system_index)
         self.assertLess(action_system_index, dialog_index)
         self.assertLess(action_system_index, record_list_index)
         self.assertLess(record_list_index, filter_header_index)
@@ -100,6 +116,106 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("height: 100dvh;", self.components_css)
         self.assertIn("max-height: none;", self.components_css)
 
+    def test_event_wizard_geometry_is_shared_by_both_themes(self):
+        # NOVO-58/NOVO-100: o claro e o escuro mudam de paleta, não de desenho.
+        self.assertIn(
+            ':is(html[data-theme])\n  :is([data-travel-document-wizard-step1] .travel-document-block',
+            self.components_css,
+        )
+        self.assertIn(
+            ':is(html[data-theme])\n  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block.route-destinos-block--split',
+            self.components_css,
+        )
+        self.assertIn(
+            ':is(html[data-theme])\n  .custom-select__trigger--v2 .custom-select__chevron',
+            self.components_css,
+        )
+        self.assertNotIn(
+            ':is(html[data-theme="dark"])\n  .custom-select__trigger--v2 .custom-select__chevron',
+            self.components_css,
+        )
+
+    def test_event_stepper_uses_one_shared_ring_and_shared_typography(self):
+        # Decisão visual do dono em 11/08/2026: um anel no passo ativo.
+        self.assertIn(
+            "0 0 0 3px color-mix(",
+            self.page_shell_css,
+        )
+        self.assertIn(
+            ':is(html[data-theme])\n  .list-header--wizard-stepper\n  .page-stepper__eyebrow',
+            self.list_header_css,
+        )
+        self.assertNotIn(
+            ':is(html[data-theme="dark"])\n  .list-header--wizard-stepper\n  .page-stepper__eyebrow',
+            self.list_header_css,
+        )
+
+    def test_custom_select_v2_uses_one_geometry_for_both_themes(self):
+        # NOVO-112: o claro espelha o escuro; somente os tokens de paleta mudam.
+        selectors = (
+            ".custom-select__menu--v2 {",
+            ".custom-select__menu--v2 .custom-select__option {",
+            ".custom-select__menu--v2 .custom-select__option--selected {",
+            ".custom-select__menu--v2 .custom-select__option-check {",
+        )
+        for selector in selectors:
+            with self.subTest(selector=selector):
+                shared = f':is(html[data-theme])\n  {selector}'
+                dark_only = f':is(html[data-theme="dark"])\n  {selector}'
+                self.assertIn(shared, self.components_css)
+                self.assertNotIn(dark_only, self.components_css)
+
+        self.assertIn("box-shadow: var(--shadow-custom-select-menu);", self.components_css)
+        self.assertIn("--shadow-custom-select-menu:", self.tokens_css)
+
+    def test_entity_cards_use_one_structure_for_both_themes(self):
+        # NOVO-113: listas claras e escuras compartilham geometria e tipografia;
+        # apenas os tokens de paleta mudam o resultado visual.
+        selectors = (
+            ".record-card {",
+            ".record-card__id-row {",
+            ".record-card__id-row .record-card__info-value {",
+            ":is(.fact-block, .person-row, .record-card__subcard) {",
+            ".itinerary__leg {",
+        )
+        for selector in selectors:
+            with self.subTest(selector=selector):
+                shared = f':is(html[data-theme])\n  {selector}'
+                dark_only = f':is(html[data-theme="dark"])\n  {selector}'
+                self.assertIn(shared, self.components_css)
+                self.assertNotIn(dark_only, self.components_css)
+
+        self.assertIn(
+            "--entity-card-inner-bg: var(--color-surface-powder);",
+            self.base_tokens_css,
+        )
+        self.assertIn(
+            "--entity-card-inner-bg: var(--color-surface-soft);",
+            self.tokens_css,
+        )
+        self.assertIn("background: var(--entity-card-inner-bg);", self.components_css)
+
+    def test_light_wizard_uses_blue_gray_sections_with_white_fields(self):
+        # NOVO-113: a referencia aprovada inverte a hierarquia que havia
+        # regredido: painel interno azul-cinza, controle branco.
+        light_contracts = (
+            "--wizard-card-bg: var(--color-surface);",
+            "--wizard-panel-bg: var(--color-surface-powder);",
+            "--wizard-field-bg: var(--color-surface);",
+        )
+        dark_contracts = (
+            "--wizard-panel-bg: var(--color-surface-soft);",
+            "--wizard-field-bg: var(--wizard-card-bg);",
+        )
+        for contract in light_contracts:
+            self.assertIn(contract, self.base_tokens_css)
+        for contract in dark_contracts:
+            self.assertIn(contract, self.tokens_css)
+
+        self.assertIn("--step1-surface: var(--wizard-card-bg);", self.components_css)
+        self.assertIn("--step1-panel: var(--wizard-panel-bg);", self.components_css)
+        self.assertIn("--step1-field: var(--wizard-field-bg);", self.components_css)
+
     def test_templates_do_not_reintroduce_inline_visual_or_event_contracts(self):
         templates = Path(settings.BASE_DIR) / "templates"
         forbidden = (" style=", " onclick=", " onchange=", " oninput=", " onsubmit=")
@@ -144,11 +260,13 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_page_header_has_one_canonical_markup_without_legacy_wrappers(self):
         headers = Path(settings.BASE_DIR) / "templates" / "components" / "ui" / "headers"
-        canonical = (headers / "page_header.html").read_text(encoding="utf-8")
+        canonical = (
+            Path(settings.BASE_DIR) / "templates" / "cotton" / "ui" / "headers" / "page_header.html"
+        ).read_text(encoding="utf-8")
 
         self.assertIn('<header class="page-header-stack', canonical)
-        self.assertIn("components/ui/buttons/button.html", canonical)
-        self.assertIn("components/ui/badges/status_badge.html", canonical)
+        self.assertIn("<c-ui.buttons.button", canonical)
+        self.assertIn("<c-ui.badges.status_badge", canonical)
 
         for wrapper_name in (
             "header_stack_simple.html",
@@ -164,7 +282,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         canonical = (
             Path(settings.BASE_DIR)
             / "templates"
-            / "components"
+            / "cotton"
             / "ui"
             / "headers"
             / "page_header.html"
@@ -178,7 +296,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         button = (
             Path(settings.BASE_DIR)
             / "templates"
-            / "components"
+            / "cotton"
             / "ui"
             / "buttons"
             / "button.html"
@@ -198,13 +316,11 @@ class DarkRedesignContractTests(SimpleTestCase):
         )
 
         self.assertFalse(wrapper.exists())
-        canonical = wrapper.parents[1] / "ui" / "forms" / "field.html"
+        canonical = Path(settings.BASE_DIR) / "templates" / "cotton" / "ui" / "forms" / "field.html"
         self.assertTrue(canonical.exists())
 
     def test_canonical_feedback_supports_existing_contracts(self):
-        feedback = (
-            Path(settings.BASE_DIR) / "templates" / "components" / "ui" / "feedback"
-        )
+        feedback = Path(settings.BASE_DIR) / "templates" / "cotton" / "ui" / "feedback"
         alert = (feedback / "alert.html").read_text(encoding="utf-8")
         empty_state = (feedback / "empty_state.html").read_text(encoding="utf-8")
         form_errors = (feedback / "form_errors.html").read_text(encoding="utf-8")
@@ -214,7 +330,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("notice", alert)
         self.assertIn("notice--", alert)
         self.assertIn("action_label and action_url", empty_state)
-        self.assertIn('components/ui/buttons/button.html', empty_state)
+        self.assertIn('<c-ui.buttons.button', empty_state)
         # `HT-03`: a guarda era `form.errors or errors`, num `{% if %}` só. Virou dois
         # ramos porque a forma antiga **estourava** quando o chamador passava `errors`
         # sem `form`: variável em argumento de filtro levanta `VariableDoesNotExist`
@@ -229,7 +345,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         component = (
             Path(settings.BASE_DIR)
             / "templates"
-            / "components"
+            / "cotton"
             / "ui"
             / "forms"
             / "file_picker.html"
@@ -260,7 +376,7 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_confirmation_flows_share_the_canonical_dialog_structure(self):
         modals = (
-            Path(settings.BASE_DIR) / "templates" / "components" / "ui" / "modals"
+            Path(settings.BASE_DIR) / "templates" / "cotton" / "ui" / "modals"
         )
         header = (modals / "dialog_header.html").read_text(encoding="utf-8")
 
@@ -275,7 +391,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             with self.subTest(modal=filename):
                 source = (modals / filename).read_text(encoding="utf-8")
                 self.assertIn("cv-dialog__panel", source)
-                self.assertIn("components/ui/modals/dialog_header.html", source)
+                self.assertIn("<c-ui.modals.dialog_header", source)
                 self.assertIn("cv-dialog__body", source)
                 self.assertIn("cv-dialog__footer", source)
                 self.assertIn(hook, source)
@@ -293,13 +409,13 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_incomplete_form_section_component_was_removed(self):
         templates = Path(settings.BASE_DIR) / "templates"
-        legacy_component = templates / "components" / "ui" / "layouts" / "form_section.html"
-        self.assertFalse(legacy_component.exists())
+        incomplete_component = templates / "cotton" / "ui" / "layouts" / "form_section.html"
+        self.assertFalse(incomplete_component.exists())
 
         offenders = []
         for template in templates.rglob("*.html"):
             source = template.read_text(encoding="utf-8")
-            if "components/ui/layouts/form_section.html" in source:
+            if "cotton/ui/layouts/form_section.html" in source:
                 offenders.append(str(template.relative_to(templates)))
 
         self.assertEqual(offenders, [])
@@ -315,20 +431,20 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR) / "static" / "css" / "layout" / "page-shell.css"
         ).read_text(encoding="utf-8")
 
-        # `H-02`: a página passou a estender `components/page/flow_base.html`,
+        # `H-02`: a página passou a estender `cotton/page/flow_base.html`,
         # que já é coberto por teste próprio. O eyebrow não é mais escrito à mão
         # no template — vem do contexto da view (`flow_eyebrow`), então o
         # contrato certo a medir é "a view manda EVENTOS", não "o template tem a
         # string" (mesma lição do card mestre de Prestações, ver
         # `test_summary_and_document_cards_share_global_contracts`).
-        self.assertIn('extends "components/page/flow_base.html"', template)
+        self.assertIn('extends "cotton/page/flow_base.html"', template)
         eventos_views = (
             Path(settings.BASE_DIR) / "eventos" / "views.py"
         ).read_text(encoding="utf-8")
         self.assertIn('"flow_eyebrow": "EVENTOS"', eventos_views)
         self.assertNotIn("CADASTRO DE OFICIO", template)
         # `H-05`: o card da etapa 1 saiu do `detalhe.html` e virou
-        # `components/form/card.html` com `body_template`; os títulos dos
+        # `cotton/form/card.html` com slot de corpo; os títulos dos
         # blocos internos moraram para o partial extraído.
         etapa1_body = (
             Path(settings.BASE_DIR)
@@ -395,7 +511,7 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_global_shell_has_accessible_mobile_navigation_contract(self):
         sidebar_template = (
-            Path(settings.BASE_DIR) / "templates" / "components" / "layout" / "sidebar.html"
+            Path(settings.BASE_DIR) / "templates" / "cotton" / "layout" / "sidebar.html"
         ).read_text(encoding="utf-8")
         sidebar_js = (
             Path(settings.BASE_DIR) / "static" / "js" / "components" / "sidebar.js"
@@ -419,14 +535,14 @@ class DarkRedesignContractTests(SimpleTestCase):
         component = (
             Path(settings.BASE_DIR)
             / "templates"
-            / "components"
+            / "cotton"
             / "ui"
             / "modals"
             / "confirm_delete.html"
         ).read_text(encoding="utf-8")
 
         self.assertIn("confirm-page", component)
-        self.assertIn("href=back_url", component)
+        self.assertIn(':href="back_url"', component)
         self.assertIn('variant="danger"', component)
         self.assertIn('type="submit"', component)
 
@@ -471,7 +587,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         # A versão anterior lia o `.html` da página com `read_text` e procurava a
         # string. Isso confundia "onde a string está escrita" com "o que a página
         # entrega": no `H-02` o card mestre passou a vir de
-        # `components/form/card.html`, o HTML final ficou idêntico e o teste
+        # `cotton/form/card.html`, o HTML final ficou idêntico e o teste
         # falhou mesmo assim — ele guardava o arquivo, não o contrato.
         for relative, card in (
             ("relatorio_tecnico_form.html", "rt-wizard-card"),
@@ -492,13 +608,13 @@ class DarkRedesignContractTests(SimpleTestCase):
     def test_rich_list_cards_share_the_entity_card_contract(self):
         templates = Path(settings.BASE_DIR) / "templates"
         canonical = (
-            templates / "components" / "ui" / "lists" / "entity_card.html"
+            templates / "cotton" / "ui" / "lists" / "entity_card.html"
         ).read_text(encoding="utf-8")
         for contract in (
             "entity-card",
             "entity-card__body",
-            "components/ui/lists/entity_card_header.html",
-            "components/ui/lists/entity_card_footer.html",
+            "<c-ui.lists.entity_card_header",
+            "<c-ui.lists.entity_card_footer",
         ):
             self.assertIn(contract, canonical)
 
@@ -512,9 +628,9 @@ class DarkRedesignContractTests(SimpleTestCase):
         ):
             with self.subTest(template=relative):
                 source = (templates / relative).read_text(encoding="utf-8")
-                self.assertIn('components/ui/lists/entity_card.html', source)
+                self.assertIn('<c-ui.lists.entity_card', source)
 
-        # `HT-06`: `components/lists/main_list_card.html` foi apagado. Ele afirmava o
+        # `HT-06`: o antigo `main_list_card.html` foi apagado. Ele afirmava o
         # mesmo contrato de `entity_card.html` e **nada o renderizava** — o único
         # citador do repositório era este arquivo de teste, e ainda por cima numa
         # asserção de que ele *não* aparece no lab (linha ~681). O contrato de
@@ -522,10 +638,10 @@ class DarkRedesignContractTests(SimpleTestCase):
 
     def test_document_viewer_and_signature_use_canonical_components(self):
         templates = Path(settings.BASE_DIR) / "templates"
-        viewer = (templates / "components" / "documents" / "pdf_viewer.html").read_text(encoding="utf-8")
-        signature = (templates / "components" / "documents" / "signature_card.html").read_text(encoding="utf-8")
+        viewer = (templates / "cotton" / "documents" / "pdf_viewer.html").read_text(encoding="utf-8")
+        signature = (templates / "cotton" / "documents" / "signature_card.html").read_text(encoding="utf-8")
         signature_body = (
-            templates / "components" / "documents" / "partials" / "_signature_card_body.html"
+            templates / "cotton" / "documents" / "partials" / "_signature_card_body.html"
         ).read_text(encoding="utf-8")
         viewer_page = (templates / "documentos" / "pdf_viewer.html").read_text(encoding="utf-8")
         signature_js = (
@@ -534,11 +650,11 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         self.assertIn("document-viewer", viewer)
         self.assertIn("doc-pdf-canvas-wrap", viewer)
-        self.assertIn('components/documents/pdf_viewer.html', viewer_page)
+        self.assertIn('<c-documents.pdf_viewer', viewer_page)
         self.assertIn("signature-card", signature)
         # `H-05`: o hook de cópia mora no partial do corpo, não no casco.
         self.assertIn("data-cv-signature-copy", signature_body)
-        self.assertIn('components/documents/signature_card.html', (
+        self.assertIn('<c-documents.signature_card', (
             templates / "prestacoes_contas" / "diario_bordo_form.html"
         ).read_text(encoding="utf-8"))
         self.assertIn("[data-cv-signature-copy]", signature_js)
@@ -551,7 +667,7 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR) / "templates" / "oficios" / "wizard_transporte.html"
         ).read_text(encoding="utf-8")
         card = (
-            Path(settings.BASE_DIR) / "templates" / "components" / "form" / "card.html"
+            Path(settings.BASE_DIR) / "templates" / "cotton" / "form" / "card.html"
         ).read_text(encoding="utf-8")
         header_actions = (
             Path(settings.BASE_DIR)
@@ -561,9 +677,9 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "_transporte_header_actions.html"
         ).read_text(encoding="utf-8")
 
-        # `H-05`: o casco do card veio de `components/form/card.html`; a página
+        # `H-05`: o casco do card veio de `cotton/form/card.html`; a página
         # só aponta o include. O contrato visual continua no componente canônico.
-        self.assertIn('components/form/card.html', source)
+        self.assertIn('<c-form.card', source)
         self.assertIn("form-section-card", card)
         self.assertIn("cv-form-section-header", card)
         self.assertIn("form-section-body", card)
@@ -574,7 +690,7 @@ class DarkRedesignContractTests(SimpleTestCase):
     def test_dashboard_uses_global_header_summary_and_module_cards(self):
         templates = Path(settings.BASE_DIR) / "templates"
         dashboard = (templates / "core" / "dashboard.html").read_text(encoding="utf-8")
-        module_card = (templates / "components" / "cards" / "module_card.html").read_text(encoding="utf-8")
+        module_card = (templates / "cotton" / "cards" / "module_card.html").read_text(encoding="utf-8")
 
         # O painel foi esvaziado a pedido do dono. O contrato mudou de "usa os
         # tres componentes globais" para "**nao tem vocabulario proprio**": o que
@@ -582,19 +698,19 @@ class DarkRedesignContractTests(SimpleTestCase):
         # classe `dashboard-*` pode voltar — era ela que justificava um CSS so
         # dela (`dashboard.css`, apagado) e 4 blocos no tema escuro.
         self.assertIn("page-shell", dashboard)
-        self.assertIn('components/ui/headers/page_header.html', dashboard)
-        self.assertIn('components/cards/module_card.html', dashboard)
+        self.assertIn('<c-ui.headers.page_header', dashboard)
+        self.assertIn('<c-cards.module_card', dashboard)
         self.assertNotIn("dashboard-page", dashboard)
         self.assertNotIn("summary_card.html", dashboard)
         self.assertIn("cv-module-card", module_card)
-        self.assertIn('components/ui/buttons/button.html', module_card)
+        self.assertIn('<c-ui.buttons.button', module_card)
 
         cadastros = (templates / "cadastros" / "index.html").read_text(encoding="utf-8")
         # `cadastros-hub` virou `catalog-hub` na reescrita visual da
         # Administracao; o contrato e o shell padrao mais o hub, nao o nome antigo.
         self.assertIn("page-shell page-shell--standard catalog-hub", cadastros)
-        self.assertIn('components/ui/headers/page_header.html', cadastros)
-        self.assertIn('components/cards/module_card.html', cadastros)
+        self.assertIn('<c-ui.headers.page_header', cadastros)
+        self.assertIn('<c-cards.module_card', cadastros)
         self.assertNotIn("app-page-hero", cadastros)
 
     def test_login_is_a_solid_responsive_dark_surface_without_flow_changes(self):
@@ -622,11 +738,17 @@ class DarkRedesignContractTests(SimpleTestCase):
             "--route-button-primary-bg:",
         ):
             with self.subTest(token=token):
-                declaration = next(
+                # A ÚLTIMA declaração, não a primeira: é a que vence a cascata.
+                # Até a E7 dava no mesmo, porque cada token aparecia uma vez só
+                # neste arquivo. Ao dissolver `base/theme.css` (UI-03) o bloco
+                # escuro dele passou a conviver aqui, e com ele 87 declarações
+                # que o bloco de baixo já sobrescrevia desde sempre (`NOVO-82`).
+                # Ler a primeira passou a significar ler justamente a perdedora.
+                declaration = [
                     line.strip()
                     for line in self.tokens_css.splitlines()
                     if line.strip().startswith(token)
-                )
+                ][-1]
                 self.assertIn("var(--color-primary", declaration)
                 self.assertNotIn("var(--color-accent", declaration)
 

@@ -1,0 +1,7 @@
+{% cotton:vars back_url confirm_label %}
+<p>O rascunho será criado somente após a sua confirmação.</p>
+<form method="post">
+  {% csrf_token %}
+  <button class="cv-btn cv-btn--primary" type="submit">{{ confirm_label }}</button>
+  <a class="cv-btn cv-btn--secondary" href="{{ back_url }}">Cancelar</a>
+</form>

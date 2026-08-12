@@ -1,6 +1,6 @@
 <div class="field-grid">
   <div class="field-size-4">
-    {% include "components/ui/forms/field.html" with field=form.nome only %}
+    <c-ui.forms.field :field="form.nome" only />
   </div>
 </div>
 <div class="field-grid">
@@ -14,7 +14,7 @@
         {{ form.atividades }}
       </section>
       {% if form.atividades.errors %}
-        {% include "components/ui/feedback/field_error.html" with errors=form.atividades.errors field_id=form.atividades.auto_id only %}
+        <c-ui.feedback.field_error :errors="form.atividades.errors" :field_id="form.atividades.auto_id" only />
       {% endif %}
     </div>
   </div>

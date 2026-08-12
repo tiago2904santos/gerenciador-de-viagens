@@ -1,0 +1,7 @@
+{% cotton:vars form %}
+{% if form.destino_estado.errors %}
+  <c-ui.feedback.field_error :errors="form.destino_estado.errors" :field_id="form.destino_estado.auto_id" only />
+{% endif %}
+{% if form.destino_cidade.errors %}
+  <c-ui.feedback.field_error :errors="form.destino_cidade.errors" :field_id="form.destino_cidade.auto_id" only />
+{% endif %}

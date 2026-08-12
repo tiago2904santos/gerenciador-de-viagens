@@ -3,10 +3,27 @@ from decimal import Decimal, InvalidOperation
 
 from django.utils import timezone
 
-from roteiros import roteiro_logic
+from roteiros.services import editor_persistence
+from roteiros.services import editor_state_builder
 from roteiros.models import Roteiro
 from roteiros.services.editor_state import dedupe_roteiro_loop_retorno_final
 from roteiros.services.roteiro_editor import _apply_saved_map_route_from_post
+
+
+def pk_de_autosave(post):
+    """`autosave_obj_id` do POST como int, ou `None`.
+
+    `BE-11`: o parse estava copiado em `roteiros/views.py` e `oficios/route_views.py`.
+    Só o parse é comum — o queryset é de quem chama, porque os escopos divergem de
+    propósito: o fluxo avulso recorta pela área ativa, o do ofício pela área do ofício.
+    """
+    raw = (post.get("autosave_obj_id") or "").strip()
+    if not raw:
+        return None
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        return None
 
 
 ROTEIRO_AUTOSAVE_FIELDS = {
@@ -90,9 +107,9 @@ def _apply_roteiro_snapshot(roteiro, snapshots):
     if not isinstance(state, dict):
         return
     state = dedupe_roteiro_loop_retorno_final(state)
-    validated = roteiro_logic._validate_roteiro_state(state)
+    validated = editor_state_builder._validate_roteiro_state(state)
     # Mesmo incompleto: persiste trechos/destinos parseados (datas podem ser null).
-    roteiro_logic._salvar_roteiro_avulso_from_roteiro_state(
+    editor_persistence.salvar_roteiro_avulso_from_roteiro_state(
         roteiro, state, validated, diarias_resultado=None
     )
 

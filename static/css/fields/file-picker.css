@@ -1,8 +1,7 @@
 /* Canonical file picker and attached-file list. Page CSS may position it, not skin it. */
 
 .file-input,
-.prestacao-file-input,
-.prestacao-file-widget__clear-input {
+.prestacao-file-input {
   clip: rect(0 0 0 0);
   clip-path: inset(50%);
   height: 1px;
@@ -28,8 +27,11 @@
 .file-picker,
 .prestacao-file-picker {
   align-items: stretch;
-  background: var(--cv-field-bg, var(--color-surface));
-  border: var(--cv-field-border, 1px solid var(--color-border));
+  background: var(--color-input-bg, var(--color-surface));
+  /* NOVO-51: era `border: var(--cv-field-border, 1px solid …)`, a unica leitura
+     como shorthand contra 14 como cor. No claro o token resolvia para cor pura e
+     esta borda saia com `style=none width=0px` — invisivel. */
+  border: 1px solid var(--color-input-border, var(--color-border));
   border-radius: var(--radius-control, 10px);
   box-shadow: var(--shadow-xs, none);
   display: grid;
@@ -47,9 +49,9 @@
 
 .file-widget.is-dragover .file-picker,
 .prestacao-file-widget.is-dragover .prestacao-file-picker {
-  background: color-mix(in srgb, var(--color-primary) 16%, var(--cv-field-bg, var(--color-surface)));
+  background: color-mix(in srgb, var(--color-primary) 16%, var(--color-input-bg, var(--color-surface)));
   border-color: var(--color-primary);
-  box-shadow: var(--cv-field-focus-ring, var(--focus-ring));
+  box-shadow: 0 0 0 var(--space-1) var(--input-focus-ring);
 }
 
 .file-widget.is-error .file-picker,
@@ -64,14 +66,14 @@
 
 .file-picker:focus-within,
 .prestacao-file-picker:focus-within {
-  border-color: var(--cv-field-border-focus, var(--color-focus));
-  box-shadow: var(--field-shadow-focus, var(--cv-field-focus-ring, var(--focus-ring)));
+  border-color: var(--input-border-focus);
+  box-shadow: var(--field-shadow-focus, 0 0 0 var(--space-1) var(--input-focus-ring));
 }
 
 .file-picker__action,
 .prestacao-file-picker__action {
   align-items: center;
-  background: color-mix(in srgb, var(--color-primary) 20%, var(--cv-field-bg, var(--color-surface)));
+  background: color-mix(in srgb, var(--color-primary) 20%, var(--color-input-bg, var(--color-surface)));
   border-right: 1px solid var(--color-border);
   color: var(--color-heading);
   cursor: pointer;
@@ -98,7 +100,7 @@
 
 .file-picker__action:hover,
 .prestacao-file-picker__action:hover {
-  background: color-mix(in srgb, var(--color-primary) 32%, var(--cv-field-bg, var(--color-surface)));
+  background: color-mix(in srgb, var(--color-primary) 32%, var(--color-input-bg, var(--color-surface)));
   color: var(--color-heading);
 }
 
@@ -121,8 +123,7 @@
 }
 
 .file-picker__upload,
-.prestacao-file-picker__upload,
-.prestacao-file-picker__clear {
+.prestacao-file-picker__upload {
   align-items: center;
   border: 0;
   border-left: 1px solid var(--color-border);
@@ -193,7 +194,7 @@
 
 .file-selection__toggle:focus-visible,
 .prestacao-file-selection__toggle:focus-visible {
-  box-shadow: var(--cv-field-focus-ring, var(--focus-ring));
+  box-shadow: 0 0 0 var(--space-1) var(--input-focus-ring);
   outline: 0;
 }
 
@@ -316,8 +317,7 @@
   }
 
   .file-picker__upload,
-  .prestacao-file-picker__upload,
-  .prestacao-file-picker__clear {
+  .prestacao-file-picker__upload {
     border-left: 0;
     border-top: 1px solid var(--color-border);
     min-height: 44px;

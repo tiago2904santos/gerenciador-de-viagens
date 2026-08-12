@@ -1,5 +1,8 @@
-{% extends "components/page/flow_base.html" %}
+{% extends "cotton/page/flow_base.html" %}
 {% load static %}
+{% block shell_css %}{% include 'includes/form_components_css.html' only %}{% endblock %}
+
+{% block component_js %}{% include 'includes/form_components_js.html' only %}{% endblock %}
 
 {% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
 {% block flow_shell_extra %} document-form-page cadastros-form-page{% endblock %}
@@ -9,9 +12,9 @@
   <form method="post" class="document-form travel-document-wizard__form" novalidate data-viatura-form>
     {% csrf_token %}
     {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
-    {% include "components/ui/feedback/form_errors.html" with form=form only %}
+    <c-ui.feedback.form_errors :form="form" only />
     <div class="form-section-stack form-section-stack--comfortable" data-travel-document-wizard-step1>
-      {% include "components/form/card.html" with title="Dados da viatura" description=page_description title_id="viaturas-form-card-title" extra_class="travel-document-card" body_extra_class="travel-document-body" body_template="cadastros/viaturas/partials/_form_card_body.html" footer_template="cadastros/viaturas/partials/_form_card_footer.html" %}
+      <c-form.card title="Dados da viatura" :description="page_description" title_id="viaturas-form-card-title" extra_class="travel-document-card" body_extra_class="travel-document-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "cadastros/viaturas/partials/_form_card_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id data_hook=data_hook heading_level=heading_level shell=shell combustiveis_manage_url=combustiveis_manage_url form=form servidores_manage_url=servidores_manage_url unidades_manage_url=unidades_manage_url only %}</c-slot><c-slot name="footer">{% include "cadastros/viaturas/partials/_form_card_footer.html" with back_url=back_url only %}</c-slot></c-form.card>
     </div>
   </form>
 {% endblock %}

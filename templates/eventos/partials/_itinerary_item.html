@@ -1,0 +1,24 @@
+<div class="itinerary__leg-body">
+  <div class="itinerary__route">
+    {% if item_kind == "oficio" %}
+      <span>{{ item.numero }}</span>
+    {% else %}
+      <span>{{ item.title }}</span>
+      <span class="person-row__badge">{{ item.kind }}</span>
+    {% endif %}
+  </div>
+  {% if item.meta_display %}<div class="itinerary__time">{{ item.meta_display }}</div>{% endif %}
+</div>
+<div class="itinerary__leg-actions">
+  <c-ui.buttons.button
+    type="button"
+    class_name="icon-btn icon-btn--settings icon-btn--documents"
+    aria_label="{% if item_kind == 'oficio' %}Abrir ações do ofício {{ item.numero }}{% else %}Abrir ações de {{ item.title }}{% endif %}"
+    aria-haspopup="true"
+    aria-expanded="false"
+    aria-controls="{% if item_kind == 'oficio' %}evento-oficio-menu-{{ item_context.pk }}-{{ item.oficio_pk }}{% else %}evento-documento-menu-{{ item_context.pk }}-{{ item_index }}{% endif %}"
+    data-tooltip="Ações e documentos"
+    data-overlay-trigger data-overlay-kind="menu"
+    data-overlay-target="{% if item_kind == 'oficio' %}evento-oficio-menu-{{ item_context.pk }}-{{ item.oficio_pk }}{% else %}evento-documento-menu-{{ item_context.pk }}-{{ item_index }}{% endif %}"
+    data_overlay_src="{{ item_context.menus_url }}" only><c-ui.icons.icon icon="folder" only /></c-ui.buttons.button>
+</div>

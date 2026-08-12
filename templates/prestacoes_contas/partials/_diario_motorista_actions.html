@@ -1,5 +1,5 @@
 {% if diaria_info.ajustado %}
-  {% include "components/ui/badges/chip.html" with label="Roteiro ajustado" tone="warning" size="compact" only %}
+  <c-ui.badges.chip label="Roteiro ajustado" tone="warning" size="compact" only />
 {% endif %}
-{% include "components/ui/buttons/button.html" with href=editar_motorista_url label="Trocar motorista" variant="secondary" icon="sync" only %}
-{% include "components/ui/buttons/button.html" with href=editar_roteiro_url label="Editar trechos" variant="secondary" icon="route" only %}
+<c-ui.buttons.button :href="editar_motorista_url" label="Trocar motorista" variant="secondary" icon="sync" only />
+<c-ui.buttons.button :href="editar_roteiro_url" label="Editar trechos" variant="secondary" icon="route" only />

@@ -97,7 +97,7 @@ Independentes de tudo; podem entrar junto da fase 0 do plano mestre.
 
 | ID | Defeito | Dias |
 |---|---|---:|
-| `JS-01` 🔴 | XSS: `pasta.name` cru em `aria-label` (`gdrive_config.js:112,117`), enquanto a linha 114 escapa a mesma variável | 0,25 |
+| `JS-01` 🔴 | XSS: `pasta.name` cru em `aria-label` (`gdrive-config.js:112,117`), enquanto a linha 114 escapa a mesma variável | 0,25 |
 | `HT-01` 🔴 | Foco de teclado invisível em `input`/`select`/`textarea` no sistema inteiro, inclusive no login | 1–2 |
 | `JS-04` ✅ | `.then()` sem `.catch` no editor de roteiros. Medido: a falha de rede **cancelava a fila inteira**, não só o trecho que falhou — 1 requisição em vez de 2, 0 de 2 trechos estimados | 0,5 |
 | `HT-09` ⚪ | Login sem skip link e sem `aria-describedby` no erro de campo | 0,5 |
@@ -205,11 +205,11 @@ arquivos; contraste medido (não estimado) nos pares alterados.
 
 | ID | Defeito | Dias |
 |---|---|---:|
-| `UI-04` 🟠 | 54 imports de CSS de outro domínio em 26 templates: extrair os componentes compartilhados dos arquivos de domínio | a definir |
-| `JS-08` 🟡 | 11% do bundle atende menos de 1% das páginas: segundo bundle sob demanda | 2 |
+| `UI-04` 🟠 PARCIAL | E10: `oficios.css` 19 → 13 imports (−44.376 B em seis listas); `roteiros-list.css` removido (−6.919 B/rota); date/file/search/custom-select fora do shell padrão (−59.338 B nas rotas sem eles); Justificativas sem três CSS de domínio (−128.712 B); Termos sem o CSS de Prestações (−23.003 B) e com o `file-picker` canônico. As demais famílias seguem abertas | a definir |
+| `JS-08` ✅ | Cinco componentes sob demanda por marcador DOM; shell global −6,0% | 2 |
 | `JS-09` 🟡 | Tela de espera de documento carrega 264 KB para usar 3,3 KB | 0,5 |
-| `JS-07` 🟡 | "Fechar ao clicar fora / Esc" reimplementado 4 vezes | 2 |
-| `JS-10` 🟡 | Decidir os stubs do editor de roteiros: completar a extração ou removê-los | 0,25 ou 3+ |
+| `JS-07` ✅ | "Fechar ao clicar fora / Esc": 3 implementações vivas consolidadas em `CV.overlay.attachDismiss` | 2 |
+| `JS-10` ✅ | Três stubs sem consumidor do editor de roteiros removidos | 0,25 |
 
 O dimensionamento de `UI-04` depende de F2: quantos componentes precisam sair dos arquivos de
 domínio só se sabe depois de saber quais componentes existem.
@@ -247,13 +247,14 @@ dentro de `{% for %}`). Os defeitos estão concentrados em acessibilidade de for
 | `HT-01` 🔴 | **Foco de teclado invisível em todo campo do sistema, inclusive no login** | 1–2 | F0 |
 | `HT-02` ✅ 🟠 | Erro de campo sem `aria-describedby`/`aria-invalid`/`role="alert"` — no componente com **154** usos; fechado junto do `HT-12`, que é o mesmo defeito pelo outro lado | 2–3 | F2 |
 | `HT-03` ✅ 🟠 | Sem padrão único para erro de formulário: o componente correto tinha **zero** usos em produção — e **jogava a mensagem fora**; agora são 20 chamadores, com o texto real e foco no resumo | 2 | F2 |
-| `HT-04` 🟠 | `base.html` carrega ~153 KB de JS e ~37 KB de CSS de domínio em toda página | 2–3 | F5 |
+| `HT-04` 🟡 | Entrega JS fechada: shell 266.254 → 108.937 B; os ~37 KB de CSS seguem na fronteira `UI-04`/E10 | 2–3 | F5 |
 | `HT-05` ✅ 🟡 | `empty_state.html` fixa `<h3>`, quebrando a ordem de headings em **10** das 10 listas | 0,5 | F2 |
 | `HT-06` 🟡 | 10 componentes mortos (6 órfãos diretos, 4 alcançáveis só sob `DEBUG`) | 0,5–1 | F3 |
 | `HT-07` 🟡 | Concatenação condicional com "·" no template, 10 pontos em 8 arquivos, sem parênteses | 1–2 | F5 |
 | `HT-08` 🟡 | 80 `<button>` reimplementados fora do componente, em 10 apps | 3–4 | F5 |
 | `HT-09` ⚪ | Login é HTML autônomo, sem skip link e sem `aria-describedby` no erro | 0,5 | F0 |
 | `HT-10` ⚪ | `data-rg-toggle`/`data-motorista-fixo-toggle` legados ainda emitidos por componente compartilhado | 0,5–1 | F5 |
+| `NOVO-99` ✅ 🔴 | `include ... only` isolava o token CSRF do formulário do editor de roteiro; os três chamadores agora o passam explicitamente | 0,25 | correção imediata |
 
 **`HT-01` sobe para F0** junto com o XSS: é falha WCAG 2.4.7 na primeira tela que qualquer usuário
 encontra, e a correção é aditiva.

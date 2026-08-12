@@ -6,7 +6,7 @@ from typing import List, Tuple
 from django.db.models import QuerySet
 
 from cadastros.models import Cidade
-from roteiros import roteiro_logic
+from roteiros.services import editor_state_builder
 from roteiros.models import Roteiro, RoteiroDestino, RoteiroTrecho
 
 from .route_exceptions import RouteCoordinateError, RouteValidationError
@@ -51,16 +51,16 @@ def build_route_points_for_roteiro(roteiro: Roteiro) -> Tuple[List[dict], bool]:
     if not roteiro.origem_cidade_id:
         raise RouteValidationError("Roteiro sem cidade de origem.")
 
-    state = roteiro_logic._build_roteiro_state_from_saved_trechos(roteiro)
+    state = editor_state_builder._build_roteiro_state_from_saved_trechos(roteiro)
     if not (state.get("trechos") or []):
-        state = roteiro_logic._build_roteiro_state_from_estrutura(
-            roteiro_logic._estrutura_trechos(roteiro),
-            roteiro_logic._destinos_roteiro_para_template(roteiro),
+        state = editor_state_builder._build_roteiro_state_from_estrutura(
+            editor_state_builder._estrutura_trechos(roteiro),
+            editor_state_builder._destinos_roteiro_para_template(roteiro),
             roteiro.origem_estado_id,
             roteiro.origem_cidade_id,
             "",
         )
-    bate = bool(roteiro_logic._infer_roteiro_bate_volta_diario_from_state(state).get("ativo"))
+    bate = bool(editor_state_builder._infer_roteiro_bate_volta_diario_from_state(state).get("ativo"))
 
     sede: Cidade = (
         Cidade.objects.select_related("estado")

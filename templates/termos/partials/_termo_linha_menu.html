@@ -5,17 +5,16 @@ Gatilho do menu de documentos de uma linha do card de termo (servidor ou viatura
 no primeiro clique. Sem `src`, continua embutido aqui.
 {% endcomment %}
 <div class="person-row__actions">
-  <button
+  <c-ui.buttons.button
     type="button"
-    class="icon-btn icon-btn--documents"
-    aria-label="Documentos de {{ alvo }}"
+    class_name="icon-btn icon-btn--documents"
+    aria_label="Documentos de {{ alvo }}"
     aria-haspopup="true"
     aria-expanded="false"
     aria-controls="{{ menu_id }}"
     data-tooltip="Visualizar e baixar"
     data-overlay-trigger data-overlay-kind="menu"
     data-overlay-target="{{ menu_id }}"
-    {% if src %}data-overlay-src="{{ src }}"{% endif %}
-  >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
+    :data_overlay_src="src" only><c-ui.icons.icon icon="folder" only /></c-ui.buttons.button>
   {% if not src %}{% include "termos/partials/_termo_linha_menu_body.html" with menu_id=menu_id titulo=titulo subtitulo=subtitulo view_url=view_url pdf_url=pdf_url docx_url=docx_url only %}{% endif %}
 </div>

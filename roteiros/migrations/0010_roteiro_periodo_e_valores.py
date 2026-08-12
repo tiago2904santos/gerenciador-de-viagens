@@ -9,7 +9,7 @@ externo é justamente o que o motor de diárias usa para contar dia de viagem.
 O terceiro elo, `saida_dt` ≤ `chegada_dt`, **ficou de fora** e é o `NOVO-36`. Ele
 existiu nesta migração e reprovou código de produção: reordenar destinos preserva
 os horários de cada trecho e deixa o roteiro com chegada antes da saída
-(`roteiros/roteiro_logic.py:219`). Aplicá-lo antes de consertar o produtor trocaria
+(`editor_state_builder._atualizar_datas_roteiro_apos_salvar_trechos`). Aplicá-lo antes de consertar o produtor trocaria
 dado silenciosamente errado por erro 500 numa tela de uso diário.
 
 Mais `valor_diarias` e as duas distâncias, não-negativos, no roteiro; e o par do

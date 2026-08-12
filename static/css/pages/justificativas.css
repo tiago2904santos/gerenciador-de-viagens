@@ -80,8 +80,12 @@
   --step1-panel: var(--color-surface-soft);
   --step1-field: var(--step1-surface);
   --step1-empty: var(--step1-field);
+  /* UI-03: re-ligacao COM ESCOPO, nao definicao global — permitida de proposito.
+     45 regras globais leem var(--color-input-bg); re-ligar aqui faz todas elas
+     pintarem o campo com a superficie do passo 1 sem que nenhuma delas precise
+     conhecer este container. Converter para estilo direto custaria duplicar as
+     45 sob este seletor, subindo especificidade — o oposto da Fase 7. */
   --color-input-bg: var(--step1-field);
-  --cv-field-bg: var(--step1-field);
 }
 
 /* Lista do Ofício vinculado: mesma do termo, só um pouco mais baixa. */
@@ -164,8 +168,7 @@
   min-height: var(--form-control-height, var(--control-height-md));
 }
 
-.justificativa-quick-add .field-with-action .custom-select,
-.justificativa-quick-add .field-with-action .cv-field__control {
+.justificativa-quick-add .field-with-action .custom-select {
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -185,7 +188,6 @@
 }
 
 .justificativa-quick-add .field-with-action--manage-reveal > .custom-select,
-.justificativa-quick-add .field-with-action--manage-reveal > .cv-field__control,
 .justificativa-quick-add .field-with-action--manage-reveal > .form-control,
 .justificativa-quick-add .field-with-action--manage-reveal > .form-select,
 .justificativa-quick-add .field-with-action--manage-reveal > select {
@@ -201,8 +203,6 @@
 
 .justificativa-quick-add .field-with-action--manage-reveal:hover > .custom-select,
 .justificativa-quick-add .field-with-action--manage-reveal:focus-within > .custom-select,
-.justificativa-quick-add .field-with-action--manage-reveal:hover > .cv-field__control,
-.justificativa-quick-add .field-with-action--manage-reveal:focus-within > .cv-field__control,
 .justificativa-quick-add .field-with-action--manage-reveal:hover > .form-control,
 .justificativa-quick-add .field-with-action--manage-reveal:focus-within > .form-control,
 .justificativa-quick-add .field-with-action--manage-reveal:hover > .form-select,
@@ -241,9 +241,6 @@
   width: 100%;
 }
 
-.justificativa-quick-add .cv-field__control--textarea {
-  min-height: var(--text-area-height-justificativa);
-}
 
 /*
  * Pronto para salvar: mesmo primary dourado do "Salvar rascunho" do cadastro

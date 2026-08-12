@@ -1,15 +1,15 @@
 <div class="field-grid">
   <div class="field-size-4">
-    {% include "components/ui/forms/field.html" with field=form.nome only %}
+    <c-ui.forms.field :field="form.nome" only />
   </div>
 </div>
 <div class="field-grid">
   <div class="field-size-4">
-    {% include "components/ui/forms/field.html" with field=form.recurso_necessario only %}
+    <c-ui.forms.field :field="form.recurso_necessario" only />
   </div>
 </div>
 <div class="field-grid">
   <div class="field-size-4">
-    {% include "components/ui/forms/field.html" with field=form.meta only %}
+    <c-ui.forms.field :field="form.meta" only />
   </div>
 </div>

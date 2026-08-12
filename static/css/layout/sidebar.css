@@ -47,7 +47,14 @@
 .sidebar-brand-badge {
   align-items: center;
   background: var(--sidebar-badge-bg);
-  border: 1px solid rgba(255, 243, 207, 0.5);
+  /* NOVO-58 (E8, família 8b): o anel creme existia só aqui — o escuro o
+     apagava com `border: 0` (`theme-dark-components.css`). Como
+     `--sidebar-badge-bg` é definido uma vez só (`base/tokens.css`), o badge já
+     era idêntico nos dois temas menos por este anel; agora é idêntico.
+
+     Editado onde o valor mora, e não movido, que é o que a etapa exige: a
+     regra continua na mesma posição da cascata e com a mesma especificidade. */
+  border: 0;
   border-radius: var(--radius-pill);
   color: var(--color-white);
   display: inline-flex;
@@ -412,4 +419,82 @@
   .sidebar-account__actions {
     gap: 6px;
   }
+}
+
+/* UI-03: vinha de base/theme.css, que era arquivo de token. Isto e componente
+   da sidebar (templates/cotton/layout/sidebar.html:99-106), nao vocabulario. */
+
+/* Seletor 2 temas — visual fixo sidebar (cores só --sidebar-*) */
+.sidebar-theme {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar-theme__label {
+  color: var(--sidebar-footer-fg);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.app-theme-grid {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.app-theme-grid__btn {
+  background: var(--sidebar-link-surface);
+  border: 1px solid var(--sidebar-link-border);
+  border-radius: var(--radius-sm);
+  color: var(--sidebar-fg-soft);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  min-height: calc(var(--control-height-md) - 2px);
+  padding: 8px 6px;
+  text-align: center;
+  transition:
+    background-color var(--transition-base),
+    color var(--transition-base),
+    box-shadow var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.app-theme-grid__btn:hover,
+.app-theme-grid__btn:focus-visible {
+  border-color: rgba(216, 162, 27, 0.35);
+  color: var(--sidebar-brand-fg);
+}
+
+.app-theme-grid__btn[aria-pressed="true"] {
+  background: var(--sidebar-theme-active-bg);
+  border-color: rgba(216, 162, 27, 0.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
+}
+
+.app-theme-grid__btn[aria-checked="true"] {
+  background: var(--sidebar-theme-active-bg);
+  border-color: rgba(216, 162, 27, 0.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
+}
+
+.app-theme-grid__btn:focus-visible {
+  outline: 2px solid var(--sidebar-focus-ring);
+  outline-offset: 2px;
+}
+
+.app-theme-grid__btn small {
+  display: block;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  margin-top: 3px;
+  opacity: 0.88;
 }

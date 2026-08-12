@@ -1,0 +1,18 @@
+{% cotton:vars errors field_id %}
+{% comment %}
+  Mensagem de erro de um campo. `HT-02`.
+
+  **`field_id` é o `auto_id` do campo, sem sufixo.** O Django 5.2 já põe
+  `aria-invalid="true"` e `aria-describedby="id_X_error"` no widget de todo campo
+  com erro (`django/forms/boundfield.py:290-310`); o que faltava era a âncora do
+  outro lado. Daí o sufixo `_error` ser escrito aqui e não pelo chamador: ele é
+  ditado pelo Django, não escolhido por nós.
+
+  Chamador que passa `form.non_field_errors` não tem campo e não passa `field_id`
+  — fica sem `id`, e é o `HT-03` que vai lhe dar componente próprio.
+
+  `join` e não `striptags`: `striptags` era aplicado ao `<ul>` inteiro da
+  `ErrorList` e removia as tags **sem pôr nada no lugar**, então dois validadores
+  falhando no mesmo campo saíam grudados — `…ele possui 3).Só dígitos.`
+{% endcomment %}
+<p class="field-error app-form-error"{% if field_id %} id="{{ field_id }}_error"{% endif %} role="alert">{{ errors|join:" " }}</p>

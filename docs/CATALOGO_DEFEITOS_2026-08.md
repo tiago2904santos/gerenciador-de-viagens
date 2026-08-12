@@ -234,7 +234,7 @@ aparecem no seletor; justificativas de outra área aparecem na lista e podem ser
 **Correção:** migração acrescentando `area` (FK PROTECT) aos dois modelos, com backfill a partir
 de `oficio.area`; `UniqueConstraint(area, nome)`; filtro nos 4 selectors e nos 2 pickers.
 
-### BE-11 🟠 Editor de roteiro em 3 cópias · AUD · 3 d · risco alto
+### BE-11 ✅ RESOLVIDO Editor de roteiro em 3 cópias · AUD · 3 d · risco alto
 
 `roteiros/views.py:203` (`novo`, 89 linhas úteis) e `:311` (`editar`, 86 linhas) têm similaridade
 0,629 e 41 linhas idênticas; `oficios/route_views.py:100` (`wizard_roteiro`, 175 linhas) partilha
@@ -244,7 +244,29 @@ de `oficio.area`; `UniqueConstraint(area, nome)`; filtro nos 4 selectors e nos 2
 **Correção:** `roteiros/services/editor_flow.py::processar_submissao_editor(...)` devolvendo
 resultado tipado, e um presenter único. As três views ficam com ~25 linhas.
 
-### BE-12 🟠 `wizard_roteiro` concentra a regra de vínculo/cópia na view · AUD · 2 d · risco alto
+**Duas medições corrigem o enunciado.** Contando interseção de multiconjunto de linhas
+normalizadas (sem comentário nem branco), `novo` × `editar` dá **55**, não 41 — as duas são mais
+parecidas do que o catálogo dizia. E `wizard_roteiro` partilha 20 de **165** linhas úteis: não é a
+terceira cópia do editor, é outro fluxo (reuso-sem-cópia, soft-advance, vínculo `Oficio.roteiro`,
+ações de wizard, outro template). Passá-lo pela mesma função exigiria bandeiras que desligam metade
+dela, ou mudaria o comportamento do fluxo do ofício. Por decisão do usuário o `BE-11` unificou
+**`novo` + `editar`**; a orquestração do wizard é o `BE-12`, que já era o PR seguinte.
+
+**Entregue:** `roteiros/services/editor_flow.py` com `ResultadoSubmissaoEditor` (frozen dataclass,
+sem `request`/`messages`/`redirect`) e `processar_submissao_editor`;
+`roteiros/presenters.py::apresentar_pagina_editor_roteiro` no lugar dos dois dicts de contexto
+literais; `roteiros/views.py::_responder_submissao_editor` traduzindo o resultado em redirect ou
+erro no form. `novo` 89 → **54** linhas úteis, `editar` 86 → **58**, interseção 55 → **31** — das
+quais 7 são só parênteses e vírgula. Comportamento inalterado: as duas mensagens de duplicado
+seguem com textos diferentes, `delete_url` segue existindo só em `editar`, e as três telas rendem
+prints byte a byte idênticos antes e depois.
+
+**O terceiro pedaço partilhado, esse sim resolvido nos dois lados:** o parse de `autosave_obj_id`
+estava copiado em `roteiros/views.py` e `oficios/route_views.py`. Virou
+`roteiros/services/autosave.py::pk_de_autosave`. Só o parse — os querysets divergem de propósito
+(área ativa contra área do ofício) e continuam em cada view, com o comentário de escopo.
+
+### BE-12 ✅ RESOLVIDO `wizard_roteiro` concentra a regra de vínculo/cópia na view · AUD · 2 d · risco alto
 
 `oficios/route_views.py:100` — 181 linhas e 24 ramos, a maior view do sistema (a segunda tem 125).
 Decide vínculo sem cópia ou rascunho novo (`:127-143`), instancia `Roteiro(...)` direto
@@ -253,14 +275,170 @@ Decide vínculo sem cópia ou rascunho novo (`:127-143`), instancia `Roteiro(...
 ofícios — não é testável sem subir request HTTP nem reusável pelo fluxo avulso.
 **Plan mode obrigatório.**
 
-### BE-13 🟠 `roteiros/roteiro_logic.py` fora do contrato de camadas · AUD · 4 d · risco alto
+**A cobertura media o defeito melhor que o tamanho.** Antes de mexer, `coverage` sobre
+`oficios/route_views.py` com a suíte da etapa: **69%**, e o que faltava era `:125-160` — o bloco
+inteiro de `if form.is_valid() and validated["ok"]`. Nenhum teste do repositório exercitava o
+reuso-sem-cópia, a materialização de rascunho novo, nem qualquer das quatro saídas de navegação do
+caminho válido. A regra "que mais gera bug de dados neste sistema" tinha cobertura **zero**.
+
+**Entregue:** `oficios/services.py` ganhou `ResultadoRoteiroDoOficio`, `salvar_roteiro_do_oficio`,
+`salvar_rascunho_parcial_do_oficio` e `montar_roteiro_inicial_do_oficio`, mais os privados
+`_materializar_rascunho_do_oficio` e `_revincular_roteiro_ao_oficio`. A view ficou com navegação,
+mensagens e render, e ganhou `_redirect_after_roteiro_save` — nome que segue o par já existente em
+`traveler_views.py`.
+
+| | antes | depois |
+|---|---:|---:|
+| `wizard_roteiro`, linhas úteis | 165 | **124** |
+| `wizard_roteiro`, ramos | **33** | **13** |
+| cobertura de `route_views.py` | 69% | 88% |
+
+Os 33 ramos eram o triplo da segunda maior view de wizard (12). Com 13, deixa de ser exceção.
+
+**As duas funções de gravação são `@transaction.atomic`** — decisão do usuário. A requisição grava
+`Oficio`, `Roteiro`, `RoteiroDestino` e `RoteiroTrecho` (mais um delete de rascunho), e os services
+chamados eram atômicos cada um mas o conjunto não. Isto fecha o **item 1** da lista de perigo do
+`BE-14`; os outros 46 sites seguem lá.
+
+**O que a extração destravou**, e é o que o enunciado pedia: três cenários que eram intestáveis
+antes. Falha no meio da gravação (não deixa roteiro órfão), gravação fora de request (`NOVO-88`), e
+a guarda de área cruzada de `vincular_roteiro_ao_oficio_sem_copia` — inalcançável pela view, porque
+`obter_roteiro_escolhido_do_post` já filtra pela área do ofício.
+
+### BE-13 ✅ RESOLVIDO · 🟠 `roteiros/roteiro_logic.py` fora do contrato de camadas · AUD · 4 d · risco alto
 
 1.779 linhas, o maior módulo de produção do repositório, 57 definições de topo **todas privadas**,
 misturando parsing de request, montagem de contexto e persistência. Importado pelos services.
 **Correção:** fatiar por responsabilidade em PRs sucessivos — parsing sai para forms, contexto
 para presenters, persistência para services. Depois de `BE-11`.
 
-### BE-14 🟠 48 sites de persistência em view, sem service e sem transação · AUD · 3 d
+#### Fatia 1 ✅ — o parsing de request (o resto segue aberto)
+
+**Três correções ao enunciado, medidas antes de mexer.**
+
+**As migrações não importam o módulo.** `roteiros/migrations/0010` e `0012` (e `roteiros/models.py`)
+apenas **citam** `roteiro_logic` em comentário, não importam. A amarra que travaria mover código não
+existe. Importam de verdade só três módulos, todos em `roteiros/services/`.
+
+**O acoplamento a `request` era raso.** Em 1.845 linhas, `request` aparecia **22 vezes como
+`request.POST` e uma como `request.method`** — nada de `user`, `GET`, `area` ou sessão. Sete funções
+o recebiam.
+
+**Mover as funções não cabia nesta fatia, e o grafo diz por quê.**
+`_build_roteiro_state_from_post` chama 12 funções do próprio módulo e
+`_build_roteiro_diarias_from_request` chama 6, incluindo o motor de diárias. Levá-las para um módulo
+novo arrastaria meia dúzia junto ou criaria import cruzado de volta.
+
+**O sintoma, com nome:** `docs/PADRAO_SERVICES.md:20` proíbe service manipular `request`, e o código
+contornava fabricando **seis objetos falsos** — dois deles dentro do próprio `roteiro_logic`, que
+montava um request para chamar a si mesmo. E `_validate_roteiro_state(state, oficio=None)` tinha
+**173 linhas e nunca lia `oficio`**: dois chamadores construíam `SimpleNamespace` para alimentar um
+parâmetro morto.
+
+**Entregue:** cinco assinaturas passaram a receber `post`; `_setup_roteiro_querysets` ganhou `method`
+explícito (o chamador já o tinha e o embrulhava só para desembrulhar do outro lado); **duas funções
+foram apagadas** — `_parse_destinos_post` e `_extract_roteiro_posted_trechos` eram invólucros de uma
+linha que só desembrulhavam o request para chamar `services/editor_parser.py`; os seis objetos falsos
+e o parâmetro morto sumiram; e quatro testes deixaram de montar `RequestFactory` para alcançar o
+parser.
+
+| | antes | depois |
+|---|---:|---:|
+| ocorrências de `request` no módulo | 23 | **1** (o nome de uma função) |
+| `SimpleNamespace` em `roteiros/services/` | 3 | **0** |
+| defs de topo | 57 | 55 |
+| linhas | 1.845 | 1.829 |
+
+**O módulo continua com 1.829 linhas, e isso é o esperado:** esta fatia tira o acoplamento, não o
+volume. Ela é pré-requisito das outras duas — função que recebe `request` não pode ser movida para
+parser, presenter nem service antes de deixar de recebê-lo.
+
+**Falta para fechar o `BE-13`:** contexto (3 funções, entre elas `_build_roteiro_form_context`, 113
+linhas → `presenters.py`) e persistência (3 funções, entre elas o gravador atômico de 3 tabelas).
+Levantamento sobre a próxima: das 57 funções, **17 são invólucros de uma linha** para módulos já
+extraídos (`services/editor_parser.py`, `editor_context.py`, `editor_state.py`, `map_defaults.py`) —
+86 linhas deletáveis a custo zero de teste, e nenhuma chamada de fora do módulo. É a fatia mais
+barata que sobrou.
+
+#### Fatia 2 ✅ — contexto para presenters, e os invólucros
+
+**Correção aos meus próprios números.** Eu havia registrado "17 invólucros, 86 linhas, custo zero".
+Medido por AST: **14** invólucros (dois já tinham morrido na fatia 1) mais um morto, **40 linhas**, e
+o custo não é zero — **107 call sites** a reescrever, `_parse_int` sozinho com 56.
+
+**O contexto era um subgrafo fechado.** `_build_roteiro_form_context` (113 linhas) não tinha
+chamador nenhum dentro do módulo e arrastava duas funções que só ela usa
+(`_trechos_list_json_compat`, `_build_roteiro_diarias_fallback`). As três foram para
+`roteiros/presenters.py`, que é o dono de montar dict para template (`docs/PADRAO_APP.md:10`).
+
+**A fachada foi junto, e esse é o ponto de camada.** `montar_contexto_editor_roteiro` estava em
+`services/roteiro_editor.py`; deixá-la lá faria um **service importar um presenter** — a violação que
+o `BE-13` existe para corrigir. Com ela no presenter, `oficios/route_views.py` passa a importar de
+`roteiros.presenters` (view → presenter, `docs/PADRAO_APP.md:11`) e `services/__init__.py` deixa de
+re-exportar.
+
+**Os invólucros.** 14 delegavam em uma linha para funções públicas que o próprio módulo já importava
+no topo; o 15º, `_resolve_uf_from_cep`, não tinha chamador em lugar nenhum. Três dos 14 tinham
+**zero chamadas** — eram função morta com import órfão junto, e o `ruff` apontou os três imports
+depois da remoção.
+
+| | antes da fatia 2 | depois |
+|---|---:|---:|
+| `roteiro_logic.py` | 1.829 linhas, 55 defs | **1.579 linhas, 37 defs** |
+| `presenters.py` | 421 linhas | 589 |
+
+**Rede antes de mover:** havia 20 linhas descobertas no subgrafo, e duas não eram detalhe — o ramo
+`roteiro_state is None` (reconstrução do estado) e os ramos que **dividem o valor das diárias pelo
+número de viajantes** com `ROUND_HALF_UP`. Sete cenários pela fachada pública, verdes antes da
+mudança de arquivo. O caso que trava o arredondamento é 1,00 ÷ 8 = 0,13 (truncando daria 0,12).
+
+**Primeira travessia de fronteira de fim de linha desta etapa:** `roteiro_logic.py` é CRLF puro e
+`presenters.py` é LF puro. Os dois seguem homogêneos depois da mudança.
+
+**Falta para fechar o `BE-13`:** a persistência — 3 funções, entre elas
+`_salvar_roteiro_avulso_from_roteiro_state`, o gravador atômico de 3 tabelas. É a mais arriscada, e
+a única citada por nome em migração, modelo e testes.
+
+#### Fatia 3 ✅ — a persistência sai, e o módulo ganha o nome certo (`BE-13` **fecha**)
+
+**O gravador era um sumidouro fechado**, o melhor caso das três fatias: ninguém dentro do módulo
+chamava `_salvar_roteiro_avulso_from_roteiro_state`, e as outras duas
+(`_atualizar_datas_roteiro_apos_salvar_trechos`, `_persistir_diarias_roteiro`) só ela chamava. Foram para
+`roteiros/services/editor_persistence.py` com `_roteiro_combine_date_time` junto, **as quatro
+públicas** — como nos módulos irmãos (`editor_parser` tem 9 públicas e 0 privadas). O
+`@transaction.atomic` foi com o gravador, decorando a função, não o módulo.
+
+**O módulo virou `roteiros/services/editor_state_builder.py`.** O nome antigo descrevia um saco de
+coisas; o que sobrou tem uma responsabilidade só — montar e validar o estado do editor a partir do
+POST e dos trechos gravados. O lugar novo é o que `docs/PADRAO_APP.md:8` reserva para isso; até aqui
+era um arquivo solto no topo do app. O ciclo de import que a análise dizia não existir **de fato não
+existe**: verificado subindo `manage.py check` com o módulo já dentro do pacote, antes de mover
+qualquer linha. Renomeação por `git mv`: rename puro no `git diff --find-renames`, CRLF preservado
+(1.337/1.337), e as 73 linhas alteradas são só os imports dos 17 chamadores — **sem alias**, para não
+repetir a "abstração adotada pela metade" que este catálogo critica.
+
+| | antes da fatia 3 | depois | acumulado nas 3 fatias |
+|---|---:|---:|---:|
+| o módulo | 1.579 linhas, 37 defs | **1.337 linhas, 33 defs** | 1.845 → **1.337** (−27%), 57 → **33** defs |
+| `editor_persistence.py` | — | **276 linhas, 4 defs, todas públicas** | — |
+
+**O módulo continua grande, e o PR diz isso.** 1.337 linhas dominadas por `_validate_roteiro_state`
+(171) e `_build_roteiro_state_from_post` (132). Mas grande **com uma responsabilidade** é outro
+problema, que este catálogo não nomeia: o enunciado do `BE-13` é "fora do contrato de camadas", e
+parsing de request, contexto e persistência não estão mais lá dentro. As 33 defs seguem privadas de
+propósito — dar contrato público a elas é trabalho de quem for reduzir o volume.
+
+**Nota de nome:** as menções a `roteiro_logic` em `docs/` **continuam com o nome antigo de
+propósito**. Elas registram medições e decisões datadas ("1.779 linhas", "57 defs"), e reescrevê-las
+tornaria o registro falso sobre o próprio passado. Só os documentos de arquitetura viva
+(`ROTEIROS_ARQUITETURA.md`, `PADRAO_CRUD.md`) foram ajustados, porque descrevem o hoje.
+
+**A rede desta fatia é pequena, e o motivo está no `NOVO-98`:** três dos cinco cenários que escrevi
+passavam com o código quebrado. Sobraram dois que mordem, e a garantia mais importante — o gravador
+ser atômico — já tinha teste desde o `DB-08`; conferi por inversão que ele reprova sem o
+`@transaction.atomic` em vez de duplicá-lo.
+
+### BE-14 ✅ RESOLVIDO · 48 sites de persistência em view, sem service e sem transação · AUD · 3 d
 
 Varredura AST dos `views.py`/`*_views.py`: 48 chamadas `.save`/`.delete`/`.create` fora de
 `form.save()` — prestações 21, ofícios 6, planos 6, integrações 6. Caso exemplar:
@@ -271,7 +449,269 @@ parsing de `request.POST` por regex e grava N linhas em laço.
 **Efeito:** salvar o lote de solicitações é operação parcial — se a quinta linha falhar, as quatro
 primeiras já foram gravadas.
 
-### BE-15 🟡 Numeração de documento reimplementada 3 vezes · AUD · 2 d · risco alto
+#### Fatia 1 ✅ — o dinheiro do RT (o resto segue aberto)
+
+**Os números do enunciado estavam altos, e um ponto cego os deixava baixos.** Medido por AST antes de
+mexer: **36 gravações em banco** em módulo de view (não 48), mais **4** por método de modelo que grava
+por dentro (`ps.definir_arquivada()`) — 40 caminhos, nenhum em transação. Confirmado que
+`ATOMIC_REQUESTS` é `False` e não há middleware de transação, então a premissa se sustenta. Prestações
+concentrava 21 dos 36.
+
+**A leitura ingênua do `BE-14` está errada em `rt_views.py`, e o próprio código dizia isso.** O
+comentário em `rt_views.py:271-274` defende que o texto do RT **fique salvo** quando o valor da diária
+é recusado — *"salvar automaticamente um valor que a regra proíbe seria pior que devolver erro"*.
+Envolver o par numa transação que desfaz tudo apagaria essa decisão. Não é o que acontece: `erros` é
+valor de retorno, não exceção, então o `atomic` commita normalmente. Mas isso virou teste em vez de
+confiança.
+
+**O defeito real era mais estreito:** o laço de diárias gravava um `UPDATE` por servidor, e uma falha
+no terceiro deixava os dois primeiros gravados — dinheiro por servidor, sem nada na tela dizendo que
+faltou o outro. Medido antes da correção: `Decimal('100.00') is not None`.
+
+**Entregue:** `prestacoes_contas/rt_services.py` (240 linhas, 4 funções públicas, todas
+`@transaction.atomic` onde grava), e `rt_views.py` de 305 para **203 linhas com zero acessos de
+manager**. Os 12 nomes de campo do autosave, escritos duas vezes palavra por palavra nas duas rotas,
+viraram `CAMPOS_AUTOSAVE_RT`; a única diferença real entre elas — qual status marcar — virou o
+parâmetro `escopo`, explícito. `aplicar_diaria_recebida` ficou onde estava: a regra já estava no lugar
+certo, o que mudou é quem fecha o laço e grava.
+
+| | antes | depois |
+|---|---:|---:|
+| gravações em módulo de view | 36 | **33** |
+| funções com gravação fora de transação | 26 | **23** |
+| `rt_views.py` | 305 linhas, 2 acessos de manager | **203 linhas, 0** |
+| catraca `P-01` | 24 (medindo 24 de 35) | **33 (medindo tudo)** |
+
+Dois achados de método saíram desta fatia e estão registrados à parte: o **`NOVO-101`** (a catraca
+tinha um buraco de 11 acessos porque prestações nunca entrou na lista fixa do auditor) e o
+**`NOVO-102`** (uma gravação em laço morava em `view_common.py`, fora de qualquer varredura por nome
+de arquivo). Os dois foram fechados aqui, e os dois valem para as fatias 2 a 4.
+
+**A inversão corrigiu o teste, não o código** — e vale como método. Tirar o `@transaction.atomic` de
+`salvar_diarias_recebidas` **não reprovava nada**, porque `salvar_rt_do_autosave` também é atômica e
+`atomic` aninhado vira SAVEPOINT: o decorador de fora segurava a garantia. A função pública ficaria sem
+rede própria, e um chamador futuro que entrasse direto herdaria a meia gravação de volta — foi
+exatamente o que o `BE-12` fez com `salvar_roteiro_do_oficio`. Cada decorador ganhou o teste que só ele
+faz passar.
+
+**Falta para fechar o `BE-14`:** fatia 2 (solicitação, `views.py` — o caso exemplar de 47 linhas e 17
+ramos, mais o autosave com três `save()` no mesmo objeto), fatia 3 (anexos e arquivo,
+`document_views.py`) e fatia 4 (diário, `diario_views.py`). **A fatia 3 não é "pôr `atomic`":** ali
+`atomic` sozinho **piora**, porque inverteria o órfão que o `BE-07` corrigiu — a linha ficaria viva no
+banco com o arquivo já destruído no storage, que não faz rollback. Precisa de `atomic` +
+`transaction.on_commit`, padrão que já existe em `core/audit.py:170`.
+
+#### Fatia 2 ✅ — a solicitação (faltam os anexos e o diário)
+
+As duas rotas que gravam número de solicitação, data de liberação e prazo limite foram para
+`prestacoes_contas/solicitacao_services.py`, ambas `@transaction.atomic`. O parsing do POST virou
+`valores_do_lote(post)`, que recebe o `QueryDict` e não o `request`.
+
+**A fatia não unifica as duas rotas, e isso é decisão consciente.** Elas divergem em três pontos, e
+os três estão fotografados — ver `NOVO-103`. Escolher qual comportamento vence muda o que o operador
+vê na tela; é decisão de produto, não de camada. O que mudou aqui é onde a gravação mora e o fato de
+ela ser atômica.
+
+**O que a transação não faz, e precisa ser dito:** ela **não** desfaz a gravação parcial do autosave.
+O erro de data sai por `return`, não por exceção, então o número continua salvo quando a data
+seguinte é recusada. Era assim antes e continua assim — a diferença é que agora está travado por
+teste, em vez de ser efeito colateral de onde o `return` estava escrito.
+
+| | antes da fatia 2 | depois |
+|---|---:|---:|
+| `views.py` | 743 linhas | **674** |
+| gravações em módulo de view | 33 | **29** |
+| funções com gravação fora de transação | 23 | **21** |
+| funções com 2+ gravações sem transação | 7 | **6** |
+
+**A extração deixou três órfãos, e os três saíram:** o import de `re`, o de
+`marcar_servidor_em_preenchimento` e a função `_parse_iso_date` — que sobrou com a própria definição
+e a entrada no `__all__`, e nada mais. Converter data passou a ser trabalho do service.
+
+#### Fatia 3 ✅ — os anexos assinados, onde `atomic` sozinho pioraria
+
+A persistência dos anexos foi para `prestacoes_contas/anexo_services.py`. É a única das quatro fatias
+em que **a transação sozinha piora o sistema**, e o motivo é que aqui o estado mora em dois lugares e
+só um desfaz: o banco tem `ROLLBACK`, o storage não.
+
+`atomic` puro faria `FieldFile.delete()` rodar dentro da transação, e um rollback depois dele
+devolveria a **linha viva apontando para um arquivo destruído** — o inverso exato do órfão que o
+`BE-07` corrigiu, e igualmente irrecuperável. O par correto é **linha na transação, arquivo no
+`transaction.on_commit`**.
+
+**O defeito maior aqui não era gravação parcial: era destruição.** `_prestacao_assinado_upload`
+apagava os arquivos anteriores do disco e as linhas **antes** de criar a linha nova. Um `create` que
+falhasse — erro de storage, disco cheio, erro de banco — levava o documento assinado anterior embora,
+do disco e do banco, sem volta. Agora as linhas antigas saem dentro da transação e os arquivos só
+depois do commit, então a falha devolve tudo.
+
+**A ordem do `BE-07` ficou mais firme por dentro.** Antes ela dependia de duas chamadas escritas na
+sequência certa; agora o arquivo sai no callback, então sair depois da linha deixou de ser convenção
+e virou consequência de onde a chamada está.
+
+| | antes da fatia 3 | depois |
+|---|---:|---:|
+| gravações em módulo de view | 29 | **24** |
+| funções com gravação fora de transação | 21 | **19** |
+| funções com 2+ gravações sem transação | 6 | **4** |
+| `document_views.py` | 376 linhas, 2 acessos de manager | **359 linhas, 0** |
+| catraca `P-01` | 33 | **31** |
+
+É a primeira vez que a catraca **desce** desde que passou a medir prestações (`NOVO-101`).
+
+**O que `on_commit` não promete, e está escrito no módulo:** se o callback falhar *depois* do commit,
+a linha já foi e sobra arquivo órfão no storage — igual a hoje. Ele não conserta isso, e prometer o
+contrário seria mentira. A garantia é a outra, e é a que importa: linha viva apontando para arquivo
+destruído nunca acontece. O resíduo está registrado como `NOVO-104`.
+
+**Consequência para quem escreve teste:** `on_commit` não dispara dentro de `TestCase`, que envolve
+cada teste numa transação desfeita no fim. `test_anexos.py::test_exclusao_remove_registro_e_o_arquivo_do_disco`
+passou a usar `captureOnCommitCallbacks(execute=True)` — mesma intenção, forma nova, com o motivo no
+comentário.
+
+#### Fatia 4 ✅ — o diário de bordo; **prestações fecha, o `BE-14` não**
+
+Os três caminhos de escrita de `diario_views.py` foram para `diario_services.py`, cada um
+`@transaction.atomic`: o autosave (laço, um `UPDATE` por campo sujo), o `POST` do formset (N linhas
+mais a marcação) e a troca de motorista/viatura (três gravações).
+
+**O caso mais afiado é o da troca**, e não pela contagem: ela grava o diário, depois a prévia de
+"informações complementares" do RT — que é justamente **o texto que explica a troca** no documento —
+e depois o status. Uma falha entre a primeira e a segunda emitia o documento com o motorista trocado
+e sem a explicação, e a tela não dizia nada. Medido antes da correção: `'SERVIDOR' == 'SERVIDOR'`.
+
+**`sincronizar_trechos` já era atômica desde o `DB-08` fatia 2.** Isto é, a parte que **cria** as
+linhas do diário estava protegida desde então, e a que **preenche** não estava — a divisão não vinha
+de análise, vinha de qual defeito passou por ali antes.
+
+| | antes da fatia 4 | depois |
+|---|---:|---:|
+| gravações fora de transação em módulo de view | 24 | **19** |
+| funções com gravação fora de transação | 19 | **15** |
+| funções com 2+ gravações sem transação | 4 | **3** |
+| `diario_views.py` | 388 linhas, 4 acessos de manager | **345 linhas, 0** |
+| catraca `P-01` | 31 | **27** |
+
+**A fatia 1 disse que as fatias 2, 3 e 4 fechariam o `BE-14`, e isso estava errado** — a frase valia
+para *prestações*, que era 21 dos 36 sites, não para o defeito. Medido agora, com o mesmo script nas
+duas pontas: **sobram 19 gravações fora de transação**, em `planos_trabalho` (6), `oficios` (4),
+`eventos` (2), `prestacoes_contas/model_views.py` (3, o CRUD dos modelos de texto do RT) e uma cada
+em `core`, `ordens_servico`, `roteiros` e `termos`.
+
+Das três funções que ainda gravam duas ou mais vezes sem transação, a pior é
+`planos_trabalho/per_diem_views.py::_apply_efetivo_snapshot`: `save` + `create` + `delete` sobre a
+mesma coleção, em laço. É a herdeira direta do caso exemplar do enunciado, agora noutro app.
+
+**O que fecha aqui é prestações**, e vale dizer o que isso significa: nenhum dos quatro fluxos do
+wizard — RT, solicitação, anexos, diário — grava mais fora de transação, e nenhum dos quatro módulos
+de tela constrói queryset. **O `BE-14` continua aberto** para os apps restantes; a quinta fatia é
+`planos_trabalho` + `oficios`, que juntos concentram 10 dos 19.
+
+**A fixture mentia em silêncio, e isso vale para quem for escrever teste de diário.**
+`criar_prestacao` monta um ofício **sem roteiro**, e sem roteiro `sincronizar_trechos` não cria linha
+nenhuma: o autosave vira um laço sobre lista vazia e **todo cenário fica verde por omissão** — o de
+rollback inclusive, que é o que deveria reprovar. Foi encontrado porque um cenário passou antes da
+correção existir. `_com_roteiro` resolve, e `test_a_fixture_produz_linha_de_diario` existe só para
+reprovar se o cenário vazio voltar. Registrado como `NOVO-107` — nasceu `NOVO-106` e
+cedeu o número ao `NOVO-106` do PR #331, que chegou ao `main` primeiro. É a quinta colisão de
+numeração desta etapa.
+
+**A inversão precisou de mira, não só de existir.** Injetar falha na segunda gravação de
+`DiarioBordoTrecho` fazia o teste passar sem medir nada: `sincronizar_trechos` roda antes, na mesma
+requisição, e também salva `DiarioBordoTrecho` — a falha caía **antes** do laço começar. O contador
+passou a olhar `update_fields`, que é o que distingue a gravação do autosave da gravação da
+sincronização. É a terceira vez nesta corrente que a inversão corrige o teste em vez do código.
+
+#### Fatia 5 ✅ — planos de trabalho e o rascunho de roteiro do ofício
+
+`planos_trabalho/services.py` tinha **1.314 linhas e zero `transaction.atomic`** — o módulo que o
+enunciado cita pelo nome e o único app grande que ainda não tinha camada de escrita nenhuma. Agora
+tem duas, pareadas com as telas do wizard: `efetivo_services.py` e `identificacao_services.py`. Em
+ofícios, `criar_rascunho_de_roteiro_do_oficio` entra em `services.py` ao lado do irmão que o `BE-12`
+extraiu.
+
+**O que tornava a falta de transação cara era a ordem, não a contagem.** O efetivo é reconciliado
+primeiro e a diária recalculada depois, porque o valor da diária é função do total do efetivo: uma
+falha entre as duas deixava o plano com o efetivo novo e o **valor do efetivo antigo**. Em
+`wizard_identificacao` são três `save()` no mesmo plano, e uma falha no terceiro deixava o texto que
+descreve o destino novo junto do valor da diária do destino antigo — os dois no mesmo documento.
+
+**Em ofícios o dano era de outra natureza:** não meia gravação, mas **um objeto inteiro sem dono**. O
+`Roteiro` nascia e o vínculo com o `Oficio` era a gravação seguinte; falhando ali, sobrava um roteiro
+inalcançável por qualquer tela enquanto o ofício voltava a sugerir o roteiro do evento — isto é, a
+falha reintroduzia exatamente o defeito que aquela rota foi escrita para corrigir.
+
+| | antes da fatia 5 | depois |
+|---|---:|---:|
+| gravações fora de transação em módulo de view | 24 | **17** |
+| funções com gravação fora de transação | 19 | **15** |
+| funções com 2+ gravações sem transação | 4 | **2** |
+| `transaction.atomic` em `planos_trabalho` | 0 | **5** |
+
+As duas funções com 2+ que sobram são `prestacoes_contas/diario_views.py::_salvar_diario_autosave`
+(resolvida pela fatia 4, que ainda não estava na base desta) e
+`oficios/wizard_document_views.py::wizard_documentos` — que **não é defeito**, ver abaixo.
+
+##### A contagem por AST chegou ao fim da sua utilidade, e erra nos dois sentidos
+
+Esta fatia mediu o resíduo item a item, e o número deixou de descrever o defeito.
+
+**Ela superconta.** Cinco dos 17 sites restantes são `delete()` solto
+(`core/views.py`, `ordens_servico`, `planos_trabalho/list_views.py`, `termos`,
+`prestacoes_contas/model_views.py`). `Collector.delete()` do Django **já abre
+`transaction.atomic(using=..., savepoint=False)`** — verificado no fonte instalado. Um `delete()` em
+view é dívida de **camada**, não risco de gravação parcial, e envolvê-lo em `atomic` não mudaria
+nada. Os dois sites de `wizard_documentos` são o mesmo caso por outro motivo: estão em ramos
+`if nav_action == …` mutuamente exclusivos, cada um com `return`. A função nunca grava duas vezes.
+
+**E ela subconta, que é o problema sério.** `eventos/views.py::detalhe` aparece com **1** gravação.
+O caminho real da etapa 1 é `evento.save()` → `form.save_m2m()` →
+`sincronizar_documentos_vinculados(evento)` → `garantir_termo_automatico(evento)`. O terceiro
+percorre cinco tipos de documento e dispara **até dois `UPDATE` em massa por tipo**, religando
+ofícios, ordens de serviço, planos, termos e roteiros ao evento; o quarto **cria** um
+`TermoAutorizacao`. É da ordem de doze gravações em seis tabelas, nenhuma em transação, e uma falha
+no meio deixa os documentos **meio religados** — um ofício apontando para o evento e um termo não.
+A contagem vê 1 porque as gravações moram atrás de chamadas de função, e o `ast` não atravessa isso.
+
+**Consequência para a fatia 6:** ela tem de ser dirigida por **leitura de caminho**, não pelo
+contador. O alvo é `eventos/views.py::detalhe`, que é o maior defeito restante do `BE-14` e o que a
+métrica menos enxerga. Registrado como `NOVO-108`.
+
+#### Fatia 6 ✅ — identificação do evento; o risco transacional do `BE-14` fecha
+
+A etapa 1 de `eventos/views.py::detalhe` agora delega o caminho inteiro a
+`eventos/services.py::salvar_identificacao_evento`, sob um único `transaction.atomic`: Evento,
+tipos, destinos, os cinco tipos de documento vinculável e o termo automático são confirmados juntos
+ou todos voltam ao estado anterior. A sincronização também deixou o form e passou a usar
+`all_objects.filter(area=evento.area)`, sem depender do thread-local quando o serviço é chamado por
+worker, comando ou teste.
+
+O teste foi escrito antes da implementação e invertido no último passo: uma falha simulada na criação
+do termo, depois dos vínculos, desfaz título, motivo, M2M e os vínculos de Ofício, OS, Plano, Termo e
+Roteiro. O cenário feliz prova as mesmas seis tabelas e os destinos extras. A suíte de `eventos`
+fecha com **43 testes verdes**.
+
+O `P-01` permanece em **27**, como esperado: o próprio `NOVO-108` demonstrou que a contagem AST não
+atravessava as chamadas e enxergava só um `save()` neste caminho. Os sites restantes medidos são
+operações unitárias, `delete()` já transacional pelo `Collector` ou ramos exclusivos; a dívida de
+posição em camada continua no `BE-16`, mas não há outro caminho multigravação sem transação dentro do
+escopo apurado do `BE-14`.
+
+##### A inversão precisou de uma rede a mais, e de uma área
+
+Seis `atomic` entraram, e os seis foram provados um a um. Dois exigiram trabalho extra:
+
+- **`reconciliar_efetivo` ganhou teste de chamada direta.** Chamada de dentro de
+  `salvar_efetivo_e_diarias`, que também é atômica, `atomic` aninhado vira SAVEPOINT e tirar o
+  decorador de dentro **não reprova pela rota HTTP** — a função pública ficaria com garantia vazia,
+  exatamente o que a fatia 1 mediu em `salvar_diarias_recebidas` e o `BE-12` pagou antes disso.
+- **O teste de chamada direta precisou de `com_request(area_de_teste())`.** `reconciliar_efetivo`
+  valida cargo e unidade contra a área corrente, e fora de um request não há área no thread-local:
+  **toda linha seria descartada em silêncio** e o cenário de falha viraria um laço sobre lista vazia,
+  verde por omissão. É o `NOVO-107` noutro app, e a segunda vez na mesma etapa que um cenário quase
+  passou sem medir nada.
+
+### BE-15 ✅ RESOLVIDO · Numeração de documento reimplementada 3 vezes · AUD · 2 d · risco alto
 
 (a) `oficios/services.py:425-440` — advisory lock, fallback `select_for_update`, reuso de lacunas,
 retry de 3 tentativas; (b) `ordens_servico/models.py:190-245` — `max+1` com
@@ -291,7 +731,84 @@ do que o catálogo sugeria.
 **Correção:** `core/numeracao.py::reservar_numero(...)`. Teste de concorrência com duas threads
 **antes** de qualquer mudança.
 
-### BE-16 🟡 Abstrações de `core` adotadas pela metade · AUD · 2 d · risco baixo
+> **Enunciado corrigido pela medição (11/08), em três pontos.**
+>
+> 1. **As linhas citadas acima envelheceram.** Os lugares reais são
+>    `oficios/services.py:607-677`, `ordens_servico/models.py:225-287` e
+>    `planos_trabalho/models.py:589-638`.
+> 2. **"OS não reaproveita número cancelado" está impreciso nos dois lados.** O ofício também
+>    não reaproveita cancelado — `cancelar_oficio` só marca a flag; quem cria a lacuna é
+>    `excluir_oficio`. E a OS **não tem caminho de cancelamento vivo**: herda `CancelavelModel`,
+>    mas nenhuma chamada a `.cancelar()` existe no app. O que ela tem é exclusão, que apaga sem
+>    registrar lacuna. A convergência que a fatia 2 entrega é, portanto, **reuso por exclusão** —
+>    a linha some do banco, então não há risco de dois documentos emitidos com o mesmo número.
+> 3. **`area` é `NOT NULL` nos três modelos desde o `DB-02`**, mas o ramo `area IS NULL` do lock
+>    **não é morto**: a reserva acontece antes do `save()`, e é o `save()` que preenche a área.
+>    No instante do lock o `area_id` ainda pode ser `None`. Isto foi medido, não presumido — o
+>    plano previa apagar o ramo e a medição o salvou.
+
+#### Fatia 1 ✅ — a mecânica sai das três cópias
+
+O que estava reimplementado três vezes **não era a política de escolha**. Reuso de lacuna, piso e
+contador são diferentes porque os documentos são diferentes, e unificá-los seria apagar desenho. O
+que era cópia literal é a **mecânica**: serializar o escopo e repetir quando outro processo vence a
+corrida — ~60 linhas idênticas entre ofício e OS, com a mesma fórmula
+`(((area_id or 0) * 4096) + (ano % 4096)) % 2_147_483_647` e só a constante do namespace mudando.
+
+`core/numeracao.py` fica com `bloquear_escopo_numeracao` e `reservar_numero`; a escolha entra como
+callback e continua em casa.
+
+**Apareceu um quarto site**, que o enunciado não citava: a edição de número **manual**
+(`atualizar_oficio_dados_viajantes`) também tomava o lock e também casava o nome da constraint.
+Ele passou a usar o mesmo lock **sem** o retry — e isso é o desenho certo, não uma omissão: número
+digitado pelo operador não pode ser trocado em silêncio, e ali a colisão vira
+`OficioNumeroConflitoError`, que a tela sabe apresentar.
+
+**A detecção de colisão deixou de ler a mensagem do banco** — ver `NOVO-109`, que é o achado maior
+desta fatia.
+
+**O teste de concorrência não prova o lock, e isso só apareceu na inversão.** Removendo o advisory
+lock, o teste de duas threads **continua passando**: as duas escolhem o mesmo número, uma colide, o
+retry escolhe outro, e o resultado final ainda é `[1, 2]`. Ele provava "lock **ou** retry". O que
+separa as duas garantias é **contar as escolhas**: com o escopo serializado cada thread escolhe uma
+vez só, e toda escolha além do número de threads é uma colisão que o retry teve de limpar — que é
+exatamente o que o lock existe para evitar. `test_o_lock_evita_a_colisao_em_vez_de_apenas_se_recuperar_dela`
+mede isso, e reprova 3 de 3 execuções com o lock desligado.
+
+#### Fatia 2 ✅ — OS reaproveita somente número liberado por exclusão
+
+A decisão do dono está implementada sem transformar qualquer buraco em número disponível.
+`OrdemServicoNumeroLacuna` registra `(área, ano, número)` somente no serviço atômico
+`excluir_ordem_servico`; saltar manualmente de 1 para 5 não cria as lacunas 2–4. Na reserva, a OS
+consome primeiro a menor lacuna registrada do seu próprio escopo e só então volta a `max+1`.
+
+Exclusão e registro formam uma transação: o teste de inversão força falha no `get_or_create` e prova
+que a OS continua no banco. A rede também prova que a lacuna nasce, que o número 2 é reaproveitado e
+que a linha de lacuna só desaparece depois do novo documento gravar. A suíte de `ordens_servico`
+fecha com **53 testes verdes** (3 pulados no SQLite; concorrência permanece no gate PostgreSQL).
+
+A migração `0014_ordemserviconumerolacuna` cria tabela vazia, sem backfill que pudesse inventar a
+origem de um buraco. Ela traz a query pré-deploy `area_id IS NULL` e o procedimento `pg_dump`; a
+volta remove apenas o registro de lacunas e não altera OS emitida. A fatia seguinte integra a
+política incremental de Plano de Trabalho à mesma mecânica de reserva e retry.
+
+#### Fatia 3 ✅ — Plano preserva o contador e entra na reserva/retry comum
+
+`salvar_plano_numerado` aplica `core.numeracao::reservar_numero` ao ponto de criação real do Plano.
+A política continua sendo `ConfiguracaoSistema.pt_ultimo_numero`, com o mesmo sufixo e o mesmo piso
+`max(contador, banco)`; o que mudou foi a garantia: contador e `INSERT` agora estão na mesma transação
+e uma colisão na constraint escolhe novamente, como Ofício e OS.
+
+O teste vermelho criou uma colisão real e antes recebia `IntegrityError`; agora prova duas escolhas,
+dois Planos persistidos e números distintos nos dois bancos. Outra inversão falha depois da reserva e
+prova que o contador volta ao valor anterior. O teste de duas threads no PostgreSQL passou a chamar o
+caminho completo e também exige duas linhas gravadas — não mede mais apenas a atualização isolada do
+contador. A escolha também entrou no savepoint de cada tentativa: a colisão força um avanço para 78,
+o desfaz e confirma que a nova tentativa grava **78**, não 79. A suíte de `planos_trabalho` fecha com **116 testes verdes** (1 concorrente pulado no
+SQLite). Com as três políticas preservadas sobre uma única mecânica, o `BE-15` está fechado.
+
+
+### BE-16 ✅ RESOLVIDO · Abstrações de `core` adotadas pela metade · AUD · 2 d · risco baixo
 
 - `core/pagination.contexto_paginacao`: 2 de 14 listas; as outras 12 instanciam `Paginator` direto
   e sobrevivem **6 cópias privadas** de `_pagination_pages` (`cadastros`, `roteiros`, `usuarios`,
@@ -307,6 +824,48 @@ do que o catálogo sugeria.
 > ainda **pior** do que o registrado.
 
 **Correção:** três PRs mecânicos, verificáveis por grep.
+
+#### Fatia 1 ✅ — paginação centralizada em todas as listas
+
+As seis cópias privadas de `_pagination_pages` foram removidas e não há mais instanciação de
+`Paginator` em código de produção fora de `core.pagination`. Os 15 pontos de paginação (as 14 listas
+do inventário mais o gerenciador interno de vínculos da área) agora chamam `contexto_paginacao`.
+
+O contrato comum passou a aceitar `query_params` para preservar exatamente os filtros reconhecidos
+por cada tela e `paginator_class`/`paginator_kwargs` para manter o total pré-agregado de Termos sem
+reintroduzir uma consulta. `page_obj`, `pagination_pages` e `page_querystring` conservam os mesmos
+nomes. Testes novos provam remoção de `page`, preservação da ordem dos filtros e descarte de parâmetro
+estranho; **922 testes** dos apps consumidores estão verdes.
+
+Prova mecânica após a fatia: `rg "Paginator\\(|def _pagination_pages"` encontra somente a subclasse
+especializada `TermosPaginator` e o helper de fixture do teste do componente — zero construção ou
+cópia em produção. Faltam as fatias de exclusão protegida e retorno para fechar o `BE-16`.
+
+#### Fatia 2 ✅ — exclusão protegida adotada nas entidades
+
+`core.deletion.excluir_com_protecao` agora é a fronteira dos serviços de exclusão acionados pelo
+usuário: catálogos comuns, área/conta, Evento, Termo, Justificativa, Ordem de Serviço, Plano de
+Trabalho, modelo de Prestação de Contas, Ofício e Roteiro. `ProtectedError` deixa de escapar como
+500 e vira `DelecaoProtegidaError`, preservando as mensagens específicas que já existiam em
+Cadastros, Usuários, Ofícios e Roteiros e usando a mensagem comum nos demais fluxos.
+
+A separação é deliberada: os `.delete()` restantes em produção removem filhos/coleções durante a
+persistência, arquivos, cache, sessão ou rascunhos internos; não são exclusões de entidade pedidas
+pelo usuário e convertê-los em mensagem de vínculo mudaria o contrato transacional. A regressão do
+catálogo prova o antigo 500 e o redirect com mensagem; a de OS prova que uma exclusão protegida não
+cria lacuna numérica. **299 testes consumidores** estão verdes. Falta somente a fatia de retorno.
+
+#### Fatia 3 ✅ — retorno tem um único validador
+
+A recontagem atual encontrou somente duas cópias sobreviventes, não os oito sites históricos de
+Prestações: `core.catalog._next_url` e `_prestacao_upload_next_url`. Os dois passaram a delegar a
+`core.retorno.voltar_para`; o catálogo também usa `com_next` para compor a querystring. A cópia de
+Prestações foi removida. Testes preservam o fallback do catálogo, o fragmento que reabre o modal de
+upload e a recusa de host externo nos dois caminhos.
+
+Prova mecânica: fora dos testes, `url_has_allowed_host_and_scheme` e a leitura direta de
+`request.POST/GET.get("next")` existem somente em `core/retorno.py`. **93 testes consumidores**
+estão verdes. Com paginação, exclusão protegida e retorno centralizados, o `BE-16` está fechado.
 
 ### BE-17 ✅ RESOLVIDO · 🟡 `core/views.py` é 75% fixture de UI Lab · AUD · 1,5 d
 
@@ -1033,7 +1592,7 @@ Ofícios têm situação análoga.
 > Migração `ordens_servico/0013`, com o procedimento de `CREATE INDEX CONCURRENTLY` no docstring
 > para o caso de a tabela em produção ser grande (limite 4 do `AGENTS.md`).
 
-### DB-11 🟡 As 80 buscas livres são varredura sequencial · AUD · 3 d
+### DB-11 ✅ RESOLVIDO (PR #349) · A busca livre mais cara multiplicava linhas antes de filtrar · AUD · 3 d
 
 80 ocorrências de `__unaccent__icontains`; extensão `unaccent` instalada, `pg_trgm` ausente;
 **0 índices GIN ou trigram** em 390 índices. Prova direta: busca de ofícios com `q="ambi"` sobre
@@ -1100,6 +1659,28 @@ expressão nas 4 ou 5 colunas realmente buscadas.
 > **A pergunta do privilégio era desnecessária:** `CREATE EXTENSION pg_trgm` funciona **sem
 > superusuário** desde o PostgreSQL 13, em que ela é *trusted* — e o `unaccent` deste projeto já
 > tinha sido criado assim.
+>
+> **Fechado em 12/08/2026 pela correção que a medição pediu, sem índice ornamental.** Os três
+> relacionamentos M2M de servidor saíram do `OR` externo e viraram `Exists()` independentes. A
+> linha de Termo deixa de ser multiplicada antes do filtro, o `DISTINCT` deixa de ser necessário e
+> testes de caracterização preservam as três origens: servidor próprio, servidor do Ofício e
+> servidor marcado para Termo no Ofício. A contagem das abas, que já conhece o total da aba ativa,
+> passou a alimentar o `Paginator`; a terceira execução da mesma busca saiu.
+>
+> O `PF-07` ganhou um cenário permanente `termos:index:busca` com `q=137`, teto próprio e teste que
+> impede removê-lo da régua. No PostgreSQL 16 do CI, com 20.000 registros por domínio e três áreas:
+>
+> | forma | consultas | mediana da rota |
+> |---|---:|---:|
+> | antes, `OR` pós-join executado três vezes | — | 1.807,9 ms |
+> | depois, `Exists()` + contagem reutilizada | 6 | **391,4 ms** |
+> | | | **4,62×** |
+>
+> No volume 200, a mesma régua mediu 3 consultas e 37,7 ms. A listagem sem busca também caiu de 7
+> para 6 consultas. Não entrou `pg_trgm`: a medição anterior já provou 1,00× enquanto a forma da
+> consulta era o gargalo, e este fechamento remove o defeito provado sem criar cinco índices sem
+> ganho demonstrado. As demais buscas livres permanecem sob a régua por rota; otimização futura
+> exige evidência própria, não herda a severidade nem a solução do pior caso.
 
 ### DB-12 ✅ RESOLVIDO (parte do índice) · 🟡 Trilha de auditoria cresce sem limite e encarece toda escrita · AUD · 3 d
 
@@ -1515,7 +2096,7 @@ quebra o roteamento de foco em 6 páginas, em silêncio.
 **Correção:** trocar por atributo dedicado (`data-entity-picker-root`) e deixar a classe só para
 estilo — **antes** de qualquer renomeação de CSS.
 
-### JS-07 🟡 "Fechar ao clicar fora / Esc" reimplementado 4 vezes · AUD · 2 d · risco médio
+### JS-07 ✅ RESOLVIDO (E11) · "Fechar ao clicar fora / Esc" reimplementado 4 vezes · AUD · 2 d · risco médio
 
 `components/picker.js:798,828`, `components/cv-date-picker.js:728-731,787-788`,
 `cv-select.js:131,179,302,313`, `components/picker-select.js:394,432` — quatro implementações sem
@@ -1527,7 +2108,14 @@ função compartilhada.
 > (`if (isOpen) positionPanel()`), não o fecha. **Nenhuma das quatro** fecha em scroll ou resize.
 > A duplicação continua real; a divergência citada, não.
 
-### JS-08 🟡 11% do bundle global atende menos de 1% das páginas · AUD · 2 d · risco médio
+**Fechamento (11/08/2026).** Depois da remoção de `cv-select.js` na E2, restavam três
+implementações vivas. `components/overlay.js` agora expõe `CV.overlay.attachDismiss`, com uma zona
+interna que aceita painéis portalizados, predicado de abertura, escopo opcional de Escape e
+`destroy()`. `picker.js`, `date-picker.js` e `picker-select.js` usam esse contrato; o calendário
+continua apenas reposicionando em `scroll`/`resize`. Testes de runtime cobrem clique externo,
+painel portalizado, Escape condicional e desmontagem; o gate JavaScript fechou com **43 testes**.
+
+### JS-08 ✅ RESOLVIDO (E11) · 11% do bundle global atende menos de 1% das páginas · AUD · 2 d · risco médio
 
 | componente | linhas | templates que usam |
 |---|---:|---:|
@@ -1550,14 +2138,28 @@ função compartilhada.
 > **Consequência:** o ganho de separar o bundle é menor do que o catálogo prometia, e o corte tem
 > que ser decidido por componente, não pelo bloco inteiro.
 
-### JS-09 🟡 Tela de espera de documento carrega 264 KB para usar 3,3 KB · AUD · 0,5 d
+**Fechamento (11/08/2026).** `cv-select.js` já havia sido apagado na E2. Os cinco componentes
+restantes saíram do bundle global e agora são solicitados por `core/component-loader.js` somente
+quando seu marcador real aparece no DOM, inclusive em conteúdo inserido por AJAX. As URLs vêm de
+`{% static %}` em `base.html`, preservando storage com hash; não há lista manual de páginas sujeita
+às indireções de Cotton/includes que invalidaram a contagem original. O shell caiu de **283.128
+para 266.254 bytes** (**−16.874; −6,0%**). Testes de runtime travam seleção, unicidade e conteúdo
+dinâmico; a suíte JavaScript passou de 43 para **45 testes**.
+
+### JS-09 ✅ RESOLVIDO (E11) · Tela de espera de documento carregava o bundle inteiro para usar 3,3 KB · AUD · 0,5 d
 
 `templates/documentos/geracao_aguarde_embedded.html:27` é um documento autônomo (não estende
 `base.html`) que carrega `shell.bundle.js` inteiro. O único uso de `CV.*` na tela é
 `CV.http.fetchJson` (`document-generation-wait.js:10`), definido em `core/http.js` (116 linhas).
 A tela só mostra um spinner e faz polling.
 
-### JS-10 🟡 Modularização do editor de roteiros é fachada · AUD · 0,25 d ou 3+ d
+**Fechado na E11.** A tela embutida agora entrega `core/http.js` diretamente antes de
+`document-generation-wait.js`; `shell.bundle.js` não participa mais desse documento autônomo. Na
+medição atual, o JavaScript específico da rota caiu de **283.282 para 4.255 bytes** (−279.027;
+**−98,5%**), preservando o contrato `CV.http.fetchJson`. O teste da resposta 202 trava presença,
+ausência e ordem dos dois scripts para impedir a regressão silenciosa.
+
+### JS-10 ✅ RESOLVIDO (E11) · Modularização do editor de roteiros é fachada · AUD · 0,25 d ou 3+ d
 
 `static/js/pages/roteiros/editor/state.js`, `retorno.js` e `diarias.js` têm **3 linhas cada** e
 devolvem só `{ name: 'state' }` etc. São importados e instanciados em `index.js:11-20`, e os
@@ -1566,6 +2168,13 @@ objetos não são usados em mais lugar nenhum. A lógica real continua nas 1.848
 **Efeito:** a estrutura de arquivos mente. Quem procurar a regra de diárias em `diarias.js` não
 acha.
 **Decisão:** completar a extração (3+ dias, depois de `BE-13`) ou remover os stubs (0,25 d).
+
+**Fechamento (11/08/2026).** Escolhida a poda de comportamento nulo: o grep de repositório inteiro
+confirmou que os três objetos só eram publicados em `window.CV.roteiros.modules` e não tinham
+consumidor. Os imports, as três propriedades e os arquivos `state.js`, `retorno.js` e `diarias.js`
+foram removidos. Os módulos reais `trechos.js` e `mapa.js`, inclusive o bootstrap do mapa, foram
+preservados. O contrato de namespace trava a ausência dos stubs; **33 testes focados** ficaram
+verdes.
 
 ### JS-11 ✅ RESOLVIDO (f9e3f72) · ⚪ Máscara de CEP duplicada e `onlyDigits` em 4 cópias · AUD · 0,25 d
 
@@ -1770,7 +2379,7 @@ não está documentado. É um `PADRAO_*` que aponta para o passado — quem segu
 > esperteza do teste e pôr o nome cheio no documento — referência que não dá para grepar não é
 > referência.
 
-### HT-14 🟡 28% dos includes não usam `only` · AUD · 2 d
+### HT-14 ✅ RESOLVIDO (E5, 10/08/2026) · 28% dos includes não usavam `only` · AUD · 2 d
 
 Componentes leem contexto ambiente do chamador em vez de receber só o que declaram. É como um
 componente passa a depender de uma variável que o chamador tem por acaso — e quebra quando outro
@@ -1786,7 +2395,12 @@ chamador não tem.
 > comportamento do motor. **Fila:** etapa E5 do
 > [`PLANO_RECONSTRUCAO_FRONT_2026-08.md`](PLANO_RECONSTRUCAO_FRONT_2026-08.md).
 
-### HT-15 🟡 Bloco `cv-itinerary` duplicado em 5 apps · AUD · 1,5 d
+**Resolvido na E5.** Os 868 call sites de componentes agora usam tags Cotton com contratos
+explícitos e isolamento habilitado. Os 190 includes Django que restaram são parciais de aplicação
+ou conteúdo de slot; todos declaram o contexto e usam `only`. A regra `include_without_only` do
+auditor transforma o zero atual em catraca de CI.
+
+### HT-15 ✅ RESOLVIDO (58776bcc) · Bloco `cv-itinerary` duplicado em 5 apps · AUD · 1,5 d
 
 Idêntico byte a byte entre dois deles. Mesma família do `HT-08`: markup de `cv-icon-btn` e
 `cv-action-menu__item` também reescrito à mão em templates de app.
@@ -1905,7 +2519,7 @@ assim, não é preciso tocar em `_field_control.html`.
 > editor escreve `errEl.textContent` direto no elemento, o que apagaria a estrutura interna do
 > `alert.html`. Converter exige mexer no JS do editor: é o `BE-13`.
 
-### HT-04 🟠 `base.html` carrega ~153 KB de JS de domínio em toda página · AUD · 2–3 d · risco médio
+### HT-04 🟡 PARCIAL · entrega JS concluída na E11; CSS segue em `UI-04`/E10 · AUD · 2–3 d · risco médio
 
 `templates/base.html:11,44` inclui `shell.bundle.css` (524.763 B) e `shell.bundle.js` (269.990 B)
 incondicionalmente. A lista `SHELL_JS` (`scripts/build_shell_bundles.py:24-73`) traz
@@ -1918,6 +2532,23 @@ wizards de ofício/roteiro/termo/prestação. `SHELL_CSS` soma ≈37 KB na mesma
 **Correção:** separar bundle "núcleo" de bundle "documentos", usando os `{% block extra_js %}`/
 `{% block extra_css %}` que `base.html:12-13,45` já tem. Mitigar a regressão silenciosa (template
 que esquece de declarar) com regra no auditor ou teste de fumaça por tela.
+
+**Entrega JS (11/08/2026).** A classificação “exclusivos dos wizards” estava desatualizada:
+pickers, calendário e linhas de destino também aparecem em cadastros, filtros e conteúdo AJAX.
+Sete módulos relacionados agora formam `form-components.bundle.js` em ordem determinística;
+11 templates com dependência direta o declaram depois do shell e antes dos scripts de página, e
+os demais usam fallback pelos marcadores reais do DOM. `attach-signed-modal.js` e
+`wizard-sticky-header.js` também passaram a
+carregar sob demanda. O shell global caiu de **266.254 para 108.937 bytes** (**−157.317; −59,1%**).
+Nas rotas que precisam do bundle de formulário, os dois arquivos somam **248.402 bytes**, ainda
+**17.852 bytes abaixo** do shell anterior. O gate mantém o inventário completo dos 12 scripts de
+página que chamam essas APIs e falha se um consumidor novo não for classificado. Os ~37 KB de CSS
+de `search-picker`/`select` continuam na fronteira `UI-04`/E10. Em 11/08,
+`date-picker`/`file-picker` saíram do shell padrão (−25.615 bytes nas rotas sem eles) e
+`search-picker.css` também passou à variante consumidora (−27.227 bytes). Na fatia seguinte,
+`select.css` foi dividido: os selects nativos e estruturas globais permanecem no shell, enquanto
+os **6.496 bytes** de `.custom-select*` passaram à variante consumidora. O ID permanece parcial
+pelas demais famílias de CSS de domínio.
 
 ### HT-05 ✅ RESOLVIDO · 🟡 `empty_state.html` quebra a ordem de headings · AUD+MED · 0,5 d
 
@@ -2024,7 +2655,7 @@ que ele **não** aparece no lab — foi descontinuado e não apagado),
 > citadores de produção que esta nota lhe media eram `list_grid` e `ui_lab2/views.py`). O
 > fechamento, com prova por arquivo, é o `NOVO-44`.
 
-### HT-07 🟡 Concatenação condicional com "·" no template · AUD · 1–2 d
+### HT-07 ✅ RESOLVIDO (5b58fac7) · Concatenação condicional com "·" no template · AUD · 1–2 d
 
 `templates/eventos/partials/_evento_card_body.html:17` (repetido nas linhas 75 e 137) monta o
 subtítulo com uma cadeia de `{% if %}` cujo separador depende de
@@ -2035,7 +2666,7 @@ O mesmo arquivo tem a maior profundidade de aninhamento do repositório: **6 ní
 123-198).
 **Correção:** `join_non_empty(parts, sep=" · ")` no presenter, testável.
 
-### HT-08 🟡 Oitenta `<button>` fora do sistema de componentes · AUD · 3–4 d · risco médio
+### HT-08 ✅ RESOLVIDO (70f369c6) · Oitenta `<button>` fora do sistema de componentes · AUD · 3–4 d · risco médio
 
 Por app, excluindo componentes e labs: `prestacoes_contas` 23, `oficios` 15, `eventos` 11,
 `planos_trabalho` 10, `roteiros` 10, `termos` 6, `ordens_servico` 3, `core` 1, `usuarios` 1.
@@ -2071,7 +2702,7 @@ de campo (`:56`, `:64`) têm `id`, mas `core/forms/__init__.py:14-27` nunca os r
 > título, subtítulo e a lista de três recursos antes do primeiro campo.
 
 
-### HT-10 ⚪ Migração de `data-*` de toggle parada no meio · AUD · 0,5–1 d · risco médio
+### HT-10 ✅ RESOLVIDO (e12672ff) · Migração de `data-*` de toggle parada no meio · AUD · 0,5–1 d · risco médio
 
 `docs/DATA_ATTRIBUTES_JS.md:96-97` já marca `data-rg-toggle` e `data-motorista-fixo-toggle` como
 legado, com `data-cv-state-trigger` como sucessor. `components/ui/buttons/field_action_button.html:6,16,17`
@@ -2282,8 +2913,8 @@ segura.
 
 **O que fica declarado como não resolvido**, para o ID não fechar prometendo mais do que entregou:
 seletor de atributo (`[data-state=…]`) nunca entrou em lente nenhuma; os 70 nomes mortos dentro de
-seletor agrupado vivo são o `NOVO-48`; e as classes `roteiro-list-card--faixa-*` continuam no CSS
-protegidas por prefixo, presas ao `NOVO-45`.
+seletor agrupado vivo são o `NOVO-48`. As classes `roteiro-list-card--faixa-*` que esta seção
+deixava presas ao prefixo foram removidas com a resolução do `NOVO-45/MOR` na E10.
 
 ### UI-02 🟠 Tema escuro é camada de exceção, não de token · MED
 
@@ -2291,15 +2922,73 @@ protegidas por prefixo, presas ao `NOVO-45`.
 projeto depois do bundle — e **190 `!important`**. O tema escuro não é resolvido por token: é
 resolvido sobrescrevendo componente por componente. Total de `!important` fora do bundle: **497**.
 
-### UI-03 🟠 Nove arquivos definem token de cor · MED
+### UI-03 ✅ RESOLVIDO (E7a) · Nove arquivos definem token de cor · MED
 
-`--color-*` é **definido** em `tokens.css`, `theme.css`, `03-theme-dark.css`,
+`--color-*` era **definido** em `tokens.css`, `theme.css`, `03-theme-dark.css`,
 `components/theme-dark-components.css`, `page-shell.css`, `roteiros.css`, `usuarios.css`,
 `justificativas.css` e `gdrive-config.css`. Redefinições campeãs: `--step1-surface` (15×),
 `--step1-panel` (15×), `--step1-field` (13×), `--field-border-focus` (7×), `--cv-field-bg` (7×),
 `--color-input-bg` (7×).
 
-### UI-04 🟠 CSS de outro domínio importado em 26 templates · MED
+**Remedido na E7:** eram **oito** arquivos, não nove — `gdrive-config.css` já tinha parado de
+definir. E o enunciado não mencionava a família `--theme-*` (40 nomes, 152 definições), que é uma
+camada intermediária real entre `--color-*` e os tokens de componente. Consolidar só `--color-*`
+teria deixado `--theme-*` como terceira camada global não declarada, que é o oposto do objetivo.
+
+**Como fechou.** `base/theme.css` foi dissolvido: os blocos `:root` e `html[data-theme="light"]`
+foram para o fim de `tokens.css`, e o bloco `html[data-theme="dark"]` para o **começo** de
+`03-theme-dark.css` — começo, e não fim, porque o `theme.css` carregava antes; apender embaixo
+inverteria a disputa e mudaria cor sem mudar valor nenhum. As regras do seletor de tema, que não
+eram token, foram para `layout/sidebar.css`.
+
+Em `page-shell.css`, dos 7 `--color-*` (× 2 temas), **4 eram mortos** — só definição, nenhuma
+leitura em CSS, JS, Python ou template. Foram apagados (8 declarações). Os 3 vivos foram
+**renomeados** para a família do próprio componente (`--text-filter`, `--text-filter-button`,
+`--text-filter-placeholder`), ficando junto dos irmãos `--surface-filter-*`/`--border-filter-*` em
+vez de migrarem para o arquivo de token e se separarem deles.
+
+**O que a regra alcança.** A catraca (`core/tests/test_tokens_em_duas_camadas.py`) vale para
+definição em escopo raiz — `:root` e `html[data-theme=…]`. Re-ligar um token dentro de um seletor
+de componente continua permitido, medido: **45 regras globais** leem `var(--color-input-bg)` e
+**10** leem `var(--color-focus)`. Um container que re-liga o nome dirige todas elas sem que
+nenhuma precise conhecê-lo; proibir obrigaria a duplicar as 55 sob seletor de container, subindo
+especificidade — a dívida que a Fase 7 veio pagar. Os 4 sites que exercem a permissão estão
+anotados no CSS, cada um dizendo qual regra global dirige.
+
+**A prova.** Nenhum gate do repositório protege valor de token: `medir_divergencia_tema.py` filtra
+fora custom property e cor, `audit_paleta.py` compara hex soltos, `test_css_tokens.py` restringe
+literal e não local. Dava para trocar uma cor e o CI inteiro passar. Por isso a etapa escreveu
+`scripts/resolver_tokens_css.py`, que resolve a cascata nos três escopos raiz e expande `var()` até
+o literal: **2131 valores computados, 0 diferenças** antes/depois.
+
+### NOVO-82 ✅ RESOLVIDO (E9-d) · `NOVO` 87 das 143 declarações escuras do `theme.css` já eram mortas · MOR · 1 d
+
+Ao dissolver o `theme.css` (`UI-03`), o bloco `html[data-theme="dark"]` dele passou a conviver com
+o bloco próprio do `03-theme-dark.css`, no mesmo arquivo. Aí ficou visível o que a separação
+escondia: das 143 declarações que vinham do `theme.css`, **87 já eram sobrescritas** pelo bloco de
+baixo — e **57 delas com valor diferente**.
+
+Não é regressão: era assim antes, porque o `theme.css` sempre carregou primeiro. O que muda é que
+agora dá para ver. Exemplos: `--app-hero-body-bg` declarava um `linear-gradient` e o que vale é
+`var(--color-surface)`; `--app-text-muted` declarava `var(--color-text-muted)` e o que vale é
+`var(--color-muted)`.
+
+O custo real é de leitura: quem abrir o arquivo para entender o tema escuro lê 87 declarações
+inertes, 57 delas apontando para o lugar errado. Já mordeu uma vez —
+`test_dark_redesign.py:618` lia a **primeira** declaração de cada token e passou a ler a perdedora;
+o teste foi corrigido para ler a última, que é a que vence a cascata.
+
+Fica para a **E9** (`UI-02`, "o tema escuro dissolvido em token"), que é onde o arquivo é reescrito
+de qualquer forma. Apagar as 87 é provável por `scripts/resolver_tokens_css.py` — se a tabela de
+valores computados não mudar, nenhuma era viva.
+
+**Fechado na E9-d.** As 87 declarações vencidas foram removidas, incluindo as 57 cujo valor
+enganoso diferia do vencedor. O bloco legado caiu de 143 para **56 declarações vivas** e ficou com
+**zero nomes** redefinidos pelos blocos canônicos seguintes. O resolvedor manteve os **2.135 valores
+computados** e o mesmo SHA-256 antes/depois
+(`55c095380e25f0735ad7bb8a40dd23a916df57cb9f47a98e91bd7ed54f064abc`).
+
+### UI-04 🟠 PARCIAL (E10) · CSS de outro domínio importado em 26 templates · MED
 
 **54 imports** de CSS de domínio alheio. Prestações importa CSS de Ofícios 11 vezes; Termos, 4;
 Planos de Trabalho importa de três domínios diferentes. Exemplo com uso medido:
@@ -2309,6 +2998,58 @@ página**) e `roteiros-list.css` (15 KB, **0,0%**).
 A causa não é descuido: o estilo dos componentes compartilhados mora **dentro** dos arquivos de
 domínio, então quem quer o componente leva o domínio inteiro junto. É a fronteira que o plano de
 front precisa desfazer.
+
+**Primeira família extraída em 11/08.** `record-card`, `person-row`, `fact-block`, `itinerary` e
+seus modificadores saíram de `pages/oficios.css` para `lists/entity-cards.css`. As sete listagens
+canônicas carregam o componente explicitamente e as seis que não são de Ofícios deixaram de
+importar o CSS do wizard: `oficios.css` caiu de **19 para 13 imports**. Nessas seis rotas, a entrega
+de CSS caiu **44.376 bytes por página**; na lista de Ofícios caiu 176 bytes. A porcentagem de uso só
+subiu nas sete rotas medidas (por exemplo, Prestações **13,9147% → 14,8009%**). Claro/escuro em
+1440, 800 e 500 px produziram JSONs de estilos computados idênticos, **1.616 leituras por
+viewport**. O ID permanece aberto para as demais famílias e para a meta final de 35% por rota.
+
+**Segunda família fechada em 11/08.** `roteiros-list.css` foi apagado: as três regras vivas de
+`record-card--roteiro` foram incorporadas ao componente; 265 linhas legadas e sete imports saíram.
+São **−6.919 bytes** em cada rota afetada. O corte também resolveu o `NOVO-45/MOR`, removendo o
+cálculo de `faixa_lateral_class` que nenhum template consumia.
+O modificador vivo foi comparado em card real: claro/escuro e 1440/800/500 px idênticos.
+
+**Terceira família fechada em 11/08 (`HT-04`, parcial).** `date-picker.css` e `file-picker.css`
+saíram do shell padrão. O gerador agora produz uma variante de um único request com os componentes
+na posição original da cascata; 18 templates consumidores a escolhem explicitamente. Rotas sem
+esses componentes recebem **25.615 bytes a menos**. Servidores, Eventos e Termos foram comparados
+por página inteira em claro/escuro e 1440/800/500 px: **2.632 leituras por viewport**, com os mesmos
+estilos computados. `search-picker.css` e `select.css` ainda mantêm o `HT-04` aberto na E10.
+
+**Quarta família fechada em 11/08 (`HT-04`, parcial).** O import de `search-picker.css` agora é
+injetado pelo gerador somente na variante consumidora, na mesma posição histórica. O shell padrão
+deixa de buscar **27.227 bytes**. Servidores e Eventos foram comparados por página inteira em
+claro/escuro e 1440/800/500 px: **1.704 leituras por viewport**, com estilos idênticos.
+`select.css` permanece global porque também estiliza selects nativos de `.list-panel`; separá-lo
+sem regressão exige antes dividir essa família.
+
+**Quinta família fechada em 11/08 (`HT-04`, parcial).** A família `.custom-select*` foi extraída
+para `fields/custom-select.css`, carregado somente pela variante consumidora e imediatamente após
+o núcleo global de `select.css`. Rotas sem o enhancer deixam de buscar mais **6.496 bytes**; os
+selects nativos, `.cv-field` e `.field-with-action` continuam globais. A redução acumulada dos
+pickers chega a **59.338 bytes** por rota não consumidora.
+
+**Sexta família fechada em 11/08 (`UI-04`/`HT-04`, parcial).** Justificativas deixou de
+importar `oficios.css`, `roteiros.css` e `termos.css`. As 32 regras que o cadastro rápido realmente
+usa foram consolidadas em `fields/related-route-picker.css`, depois do shell para preservar a
+ordem da cascata. Na rota, a entrega caiu de **753.913 para 625.201 bytes** (**-128.712 bytes**) e
+o uso medido subiu de **11,3912% para 13,5547%**. O painel aberto manteve os mesmos **233 nós**, a
+mesma geometria e os mesmos estilos computados em claro/escuro a 1440, 800 e 500 px. As assinaturas
+de estilo da família também ficaram idênticas nos consumidores originais: Ofícios, Roteiros,
+Termos e Ordem de Serviço, nas mesmas seis combinações.
+
+**Sétima família fechada em 11/08 (`UI-04`, parcial).** A lista de Termos deixou de importar
+`prestacoes_contas.css`: o único efeito da folha alheia eram 13 elementos do modal recebendo a
+superfície antiga em vez do `file-picker` canônico (14 elementos em 500 px). A lista, filtros,
+cards, calendário e menus mantiveram estilo e geometria; o modal passou deliberadamente ao desenho
+canônico de `fields/file-picker.css`, sem overflow em claro/escuro a 1440, 800 e 500 px. A entrega
+caiu de **673.378 para 650.375 bytes** (**-23.003 bytes**) e o uso medido subiu de **13,6518% para
+14,0594%**.
 
 ---
 
@@ -3118,7 +3859,7 @@ entre sem revisão, que é como o `JS-01` nasceu.
 
 ---
 
-### NOVO-16 🟠 `NOVO` O markup do picker está copiado à mão em 3 templates e 5 arquivos JS · QA · 2–3 d
+### NOVO-16 ✅ RESOLVIDO (c6dd81d1) · `NOVO` O markup do picker está copiado à mão em 3 templates e 5 arquivos JS · QA · 2–3 d
 
 O `JS-06` cortou a dependência do **JavaScript** com a classe do picker. Sobrou o outro lado: há
 markup que **imita** o picker, escrito à mão, e que a renomeação da fase 7 quebraria visualmente.
@@ -4110,7 +4851,7 @@ a suíte inteira antes do merge — a trava do `HT-06` é local e barata, e teri
 `main` verde. O run 697 (`NOVO-43`) passou sobre a árvore do #246 por sorte de ordem: o
 vermelho só apareceu quando o #247 entrou.
 
-### NOVO-45 🟡 `NOVO` `faixa_lateral_class` é calculada por card em duas listas e nenhum template a lê · MOR · 0,25 d
+### NOVO-45 ✅ RESOLVIDO (E10/MOR) · `NOVO` `faixa_lateral_class` era calculada por card em duas listas e nenhum template a lia · MOR · 0,25 d
 
 `roteiros/presenters.py:261` põe `"faixa_lateral_class": _roteiro_faixa_lateral_class(roteiro)` no
 dicionário do card, e `oficios/presenters.py:37` tem a função gêmea. As duas resolvem status,
@@ -4130,6 +4871,14 @@ dinâmico, estilizando um elemento que ninguém emite.
 **Consequência para o `UI-01`:** a proteção por prefixo é generosa de propósito, e o preço é este —
 classe morta que sobrevive porque o nome dela está numa string. Corrigir o `NOVO-45` derruba junto
 os blocos `--faixa-*`.
+
+**Resolvido em 11/08.** As duas funções e a chave sem consumidor foram removidas. A folha
+`roteiros-list.css` tinha **265 linhas / 7.180 bytes**: só três regras do modificador vivo
+`record-card--roteiro` sobreviveram em `lists/entity-cards.css` (+261 bytes); os 41 blocos do card
+legado, os seletores de hero sem markup e os sete imports saíram. Resultado líquido nas rotas que
+carregavam a folha: **−6.919 bytes por página**, sem alteração de seletor vivo.
+O card de roteiro real produziu JSONs de estilo computado idênticos entre `main` e a fatia em
+claro/escuro, nos viewports 1440, 800 e 500 px (8 leituras por viewport).
 
 ### NOVO-46 🟡 `NOVO` Contrato de widget e template apontam para CSS que produção nunca carregou · MOR · 0,25 d
 
@@ -4167,7 +4916,7 @@ Os três consumidores (`termos/services.py`, `prestacoes_contas/services.py` e
 `assinatura_services.py`) usam `PdfReader`/`PdfWriter` na superfície estável; suíte verde, 1.744
 testes, e `pip_audit` sem achado além do `PYSEC-2026-3412` já ignorado com justificativa.
 
-### NOVO-48 🟡 `NOVO` Setenta nomes de classe morta sobrevivem dentro de seletor agrupado vivo · MOR · 0,5 d
+### NOVO-48 ✅ RESOLVIDO (27e9642e, 09/08/2026) · `NOVO` Setenta nomes de classe morta sobrevivem dentro de seletor agrupado vivo · MOR · 0,5 d
 
 Medido depois de o `UI-01` fechar: **140 partes de seletor** citando **70 classes** que não existem
 em lugar nenhum do código, dentro de blocos que a poda não podia tocar. O caso típico:
@@ -4194,6 +4943,14 @@ acreditar que a classe existe, e é assim que ela reaparece num template.
 Os campeões, para dar tamanho: `roteiro-editor__*` (6 nomes), `oficio-documentos-*` (7),
 `cv-resource-picker__*` (4), `app-btn--*` e `btn-*` (9 entre os dois vocabulários de botão que o
 `cv-btn--` substituiu).
+
+**Resolvido na E2.** A varredura refeita depois do `NOVO-69` encontrou **66 nomes** ainda
+presentes: a diferença para 70 é sobreposição dentro da própria etapa, não mudança de critério. O
+pruner percorreu também regras aninhadas em `@media`/`@supports`, removeu **168 alternativas de
+seletor** e **57 regras completas** em 18 fontes, preservando alternativas vivas de `:is()` e
+simplificando `:not()` quando o argumento morto era o único. Depois: zero emissores em templates,
+JS e Python de produção, zero seletores fonte com os 66 nomes, parse CSS sem erro,
+`audit_css_morto --max 0` verde e `audit_ui_patterns` **2.622 → 2.583**.
 
 ---
 
@@ -4359,7 +5116,7 @@ diferentes no arquivo.
 `--cv-*` para `--color-*` (309 variáveis), decidida pelo dono, é o próximo passo — cor e nome de
 token são coisas separadas e não viajam no mesmo PR.
 
-### NOVO-51 🟠 PARCIAL · `NOVO` As 309 variáveis `--cv-*` são apelido de token, não token · MED · 2 d
+### NOVO-51 ✅ RESOLVIDO · `NOVO` As 309 variáveis `--cv-*` são apelido de token, não token · MED · 2 d
 
 Segunda etapa da padronização. O dono decidiu que **`--color-*` é a base semântica única** e que as
 `--cv-*` somem. Não é um `sed`: `--cv-card-bg` não tem equivalente pelo nome, tem pelo **valor**. A
@@ -4374,6 +5131,67 @@ Resolvendo as 309 **por tema** (o mesmo nome vale coisas diferentes no claro e n
 | valor próprio, precisam de token novo | 214 |
 
 **Entrou nesta leva:** as 58 órfãs e 21 dos 37 apelidos. Restam **231** `--cv-*` distintas.
+
+**Na E7b (10/08/2026).** O `NOVO-65` levou as 231 e preservou de propósito a família `cv-field`,
+porque o nome sem prefixo já pertencia a outra classe viva. Sobraram **4 nomes** — e um deles não
+era apelido, era defeito.
+
+`--cv-field-border` tinha **dois contratos incompatíveis**:
+
+```
+tokens.css:148          --cv-field-border: 1px solid var(--color-border-strong)   ← shorthand
+03-theme-dark.css:293   --cv-field-border: 1px solid var(--color-input-border)    ← shorthand
+select.css:94           --cv-field-border: var(--theme-input-border)              ← cor pura
+```
+
+`select.css` está em `:root` e carrega depois de `tokens.css` e antes de `03-theme-dark.css`, então
+o token resolvia **cor pura no claro e shorthand no escuro**. Contra isso, 14 consumidores escreviam
+`border: 1px solid var(--cv-field-border)` e 1 escrevia `border: var(--cv-field-border, …)`.
+
+Conferido em Chromium com `getComputedStyle`, não deduzido da especificação:
+
+| tema | forma | resultado |
+|---|---|---|
+| claro | `1px solid var()` — 14 sites | `solid 1px` ✅ |
+| claro | `var()` — `file-picker.css:31` | **`style=none width=0px`** ❌ |
+| escuro | `1px solid var()` — 14 sites | **`style=none width=0px`** ❌ |
+| escuro | `var()` — file-picker | `solid 1px` ✅ |
+
+No escuro os 14 viravam `border: 1px solid 1px solid #607d93`, declaração inválida que o parser
+descarta. **Eram 15 bordas invisíveis em produção**, em `page-shell.css:2789,2831`,
+`prestacoes_contas.css` (6×), `oficios.css:63`, `roteiros.css:2231` e `file-picker.css:31`.
+
+Resolvido o contrato para cor pura (14 contra 1), o token virou **apelido puro de
+`--color-input-border`** nos dois temas — e aí o `NOVO-51` se aplica como escrito. O mesmo valia
+para `--cv-field-bg`, apelido puro de `--color-input-bg`. Os dois foram eliminados: 9 definições
+apagadas, 36 consumidores apontados para a base semântica única.
+
+**Ficam 2**, e nenhum é apelido: `--cv-field-border-focus` (claro `#0b3a66`, escuro `#286fa4`) e
+`--cv-field-focus-ring` (claro `rgba(21, 91, 154, 0.18)`, escuro `none`). Nenhum `--color-*`
+resolve o mesmo par. O segundo diverge de **fonte** entre os temas — no escuro vem de
+`--focus-ring`, que vale `none` —, e isso toca visibilidade de foco, cujo auditor está com folga
+zero (30 de teto 30). Promover os dois a token próprio exige decidir se o anel de foco do campo
+deve mesmo sumir no escuro, que é pergunta de acessibilidade e não de vocabulário. Fica para a E8.
+
+**Fechamento em 11/08/2026, depois da decisão do dono: o escuro terá anel visível.** Os dois
+nomes restantes foram substituídos por contratos de tipo estável: `--input-border-focus` é sempre
+cor de borda e `--input-focus-ring` é sempre cor do halo. Antes, `--cv-field-focus-ring` alternava
+entre sombra completa, cor pura e `none` conforme a camada; consumidores de `box-shadow` ora
+compunham a cor, ora tentavam usar o valor diretamente. Os consumidores agora constroem a sombra
+explicitamente, e `--field-shadow-focus`/`--select-focus-shadow` deixam de ser `none` no escuro.
+
+Prova computada em `/oficios/`, com 42 dias do calendário e pseudoestado forçado pelo CDP:
+`dark|focus-visible` passou de `box-shadow: none` para um halo de 4 px
+`rgba(116, 170, 224, 0.24)` mais `--shadow-xs`; o mesmo ocorreu em
+`dark|focus+focus-visible` (**84 leituras alteradas**). Claro, repouso, hover, focus sem
+`focus-visible` e active ficaram com **0 diferenças**. A decisão nova também retirou do wizard de
+roteiro as supressões locais dos anéis de campo; apenas a borda de foco neutra e os contratos de
+botão/sidebar permanecem específicos daquele editor. A busca de definições `--cv-*` em CSS de
+fonte terminou em **0**.
+
+**Nota de método.** O auditor `audit_ui_patterns` conta `border: 1px solid var(…)` como
+`hardcoded_visual` (o valor não começa com `var`) e **isenta** `border: var(…)`. Ou seja, a forma
+quebrada era premiada e a correta é contada: 2453 → 2454. É falha da heurística, não da correção.
 
 **Três correções de método, cada uma achada por medição e não por leitura.**
 
@@ -4480,7 +5298,7 @@ e nada falharia: o atributo ficaria no HTML, inerte.
 A máscara vale do próximo cadastro em diante. Uniformizar o histórico é migração de dados, com
 contagem por campo, e é decisão separada.
 
-### NOVO-54 🟠 PARCIAL · `NOVO` `.cv-field__control` não tem regra base — o campo é o elemento cru mais 64 correções · UI · 2 d
+### NOVO-54 ✅ RESOLVIDO · `NOVO` `.cv-field__control` não tem regra base — o campo é o elemento cru mais 64 correções · UI · 2 d
 
 A classe de campo com maior alcance do sistema — **11 templates, 30 rotas** — não tinha nenhuma
 regra base. Ela existia só em **64 regras de sobrescrita** espalhadas por **14 arquivos**, com **70
@@ -4495,6 +5313,42 @@ monte de correção por cima. Daí saem, medidos:
 | `background` | **27 cadeias distintas** |
 | `border-radius` | 13 valores — `12px` escrito com 4 nomes de token, mais 4 literais de `10px` |
 | altura | 7, com **5 nomes de token diferentes valendo o mesmo 44px** |
+
+**Remedido na E7c (10/08/2026).** A regra base já existe — `:where(.cv-field__control)` em
+`fields/field.css:53`, com especificidade **zero** de propósito. O que falta é remover o que ela
+tornou redundante. Contando com parser de blocos (o grep de uma linha subconta: cheguei a reportar
+37 no PR #295, e estava errado):
+
+| | |
+|---|---:|
+| regras que tocam a classe | **63** em 19 arquivos |
+| base (`:where`) | 2 |
+| estado (`:hover`, `:focus`, `:disabled`…) | 15 |
+| tema escuro | 15 |
+| contexto (dentro de um container) | 24 |
+| outras | 7 |
+| `!important` | **67**, em 19 regras |
+
+Os 67 `!important` são o alvo mais óbvio: a base tem especificidade zero, então **nenhuma regra de
+classe precisa de `!important` para vencê-la**. Só que "não precisa contra a base" não é o mesmo
+que "não precisa contra as outras 62", e a diferença tem que ser medida, não deduzida.
+
+**O que trava a etapa: o instrumento não alcança.** `scripts/medir_campos_computados.py` (novo)
+fotografa o estilo computado de todo `.cv-field__control` nas 43 rotas, nos dois temas, em quatro
+estados forçados por `CSS.forcePseudoState`. Rodando, ele encontra campo em **8 rotas** — 64
+combinações, 224 leituras. As outras 35 devolvem zero, e não por defeito do script: dos 11
+templates que emitem a classe, a maioria é partial que só entra no DOM depois de interação
+(`cancel_reason_modal.html` atrás de um modal, `_atividades_body.html` dentro de um passo de
+wizard, `_diarias_fields.html` num corpo colapsável).
+
+Então um diff vazio hoje prova neutralidade para o que essas 8 rotas exercitam, e **nada além**.
+Remover regra de contexto que só vale dentro de modal seria remover sem prova — exatamente o que o
+plano proíbe ao exigir "uma medição por vez", e como a primeira tentativa mexeu em 55 elementos
+sem querer.
+
+**Nenhuma regra foi removida.** O que ficou pronto foi o instrumento e a medição do próprio
+instrumento. Ampliar o alcance — abrir os modais, navegar os passos do wizard, expandir os corpos
+colapsáveis — é a primeira metade da E7c, e é o que destrava a segunda.
 | borda | 6 formas de declarar a mesma linha de 1px |
 
 **`static/css/components/field.css`** dá o lar que faltava. Os valores são **exatamente** os que
@@ -4648,7 +5502,7 @@ Os quatro campos com divergência em dev: `eventos.TipoEvento.nome` (5), `Ativid
 **Fecha quando** a contagem rodar contra produção, os campos bloqueados (se houver) forem resolvidos
 no sistema, e o `--commit` for aplicado com backup.
 
-### NOVO-58 🔴 `NOVO` Claro e escuro não são dois temas do mesmo sistema: são dois desenhos diferentes · UI · a decidir
+### NOVO-58 🟠 EM ANDAMENTO · `NOVO` Claro e escuro não são dois temas do mesmo sistema: são dois desenhos diferentes · UI · a decidir
 
 Medido com `getComputedStyle` nas 44 rotas, comparando o **mesmo elemento** nas duas versões do
 **mesmo documento** e olhando **só propriedades que não são cor** — cor é o que um tema tem direito
@@ -4709,6 +5563,23 @@ vira espelho", como se fosse reorganização de token. Não é. Espelhar signifi
 ao tema claro**, o que muda a aparência de todas as 44 telas no modo claro — fonte, tamanho de texto,
 raio, borda e largura da barra lateral. É trabalho de desenho, não de arrumação, e precisa da decisão
 do dono antes da primeira linha de CSS.
+
+**Fechamento da E8 (11/08/2026).** A E8-zero foi repetida depois de todos os recortes intermediários,
+sem tocar em CSS: **43 rotas × 3 larguras = 129 medições**, **54.225 elementos comparados**, **0
+elementos divergentes, 0 diferenças não-cor e 0 pares distintos**. O instrumento mediu nas duas
+ordens de tema e manteve a trava de layout estável; o relatório passou os tetos vigentes. A dívida
+descrita acima foi consumida pelas famílias já integradas e não resta redesenho a aplicar. O foco de
+campo do `NOVO-51`, por ser cor/a11y, continua uma decisão separada e não altera este fechamento.
+
+**Correção e recorte Eventos/Wizard (11/08/2026).** A reauditoria posterior já registrada no plano
+refutou esse fechamento geral. Com a decisão explícita do dono — **um anel** no passo atual e
+**redesenhar superfícies** — a família Eventos/Wizard foi refeita sem predicado de tema: tipografia
+do stepper e dos blocos, alturas e espaçamentos, três níveis de superfície, campos e geometria dos
+selects/multiselects. Na rota autenticada `/eventos/10/guiado/etapa-1/`, a comparação do mesmo DOM
+em 1440, 800 e 500 px caiu para **0 divergências não-cor no conteúdo do wizard**. Restaram apenas
+as bordas do chrome móvel, já catalogadas na família 8h, e a diferença de `min-height` declarada no
+textarea; a altura renderizada continuou 88 px nos dois temas. Prints claro/escuro foram conferidos
+nas três larguras. A E8 geral permanece aberta para as demais famílias.
 
 ### NOVO-59 ✅ RESOLVIDO · 🔴 `NOVO` Todo ícone de botão é invisível no tema claro, no sistema inteiro · UI · 0,25 d
 
@@ -5244,7 +6115,7 @@ são instrumentos que não funcionam, e um é ambiente.
 > `components/`, `pages/`). Todos os caminhos citados abaixo e no plano de reconstrução já são os
 > novos. Os defeitos foram reconferidos depois do merge: **os oito continuam de pé**.
 
-### NOVO-69 🟡 `NOVO` `cv-select.js` está morto desde o PR #247 e continua no bundle de toda página · MOR · 0,25 d
+### NOVO-69 ✅ RESOLVIDO (8133d8af, 09/08/2026) · `NOVO` `cv-select.js` está morto desde o PR #247 e continua no bundle de toda página · MOR · 0,25 d
 
 `static/js/cv-select.js` tem **343 linhas** e responde a `[data-cv-dropdown]` e
 `[data-cv-filter-dropdown]`. **Nada no sistema emite esses atributos.** A varredura em `templates/`,
@@ -5262,7 +6133,10 @@ O PR #247 apagou os dois UI Labs, e aquele único uso virou **zero**. O arquivo 
 `components/picker-select.js`, via `data-entity-picker` — são 7 templates de produção. Apagar a
 família de CSS junto com o JS quebraria os seletores customizados do sistema inteiro.
 
-**Fila:** etapa E2 do plano de reconstrução.
+**Resolvido na E2.** `cv-select.js`, o no-op `CV.fields.initDropdowns`, sua documentação e a
+família CSS `action-dropdown`/`filter-dropdown` sem emissor foram removidos; `custom-select` e
+`data-entity-picker` permaneceram intactos. `SHELL_JS` passou de 26 para 25 fontes e o bundle JS
+versionado caiu de **289.831 para 274.420 bytes** (−15.411 bytes, −5,32%).
 
 ### NOVO-70 ✅ RESOLVIDO (7a1e2e03, af97ac56) · `NOVO` A métrica de aceite do `PF-02` não tem instrumento no repositório · QA · 1,5 d
 
@@ -5287,7 +6161,7 @@ A linha de base reproduzida em 09/08/2026 foi **11,3369%–70,5559%** de uso de 
 login; nas rotas autenticadas, 11,3369%–19,2908%) e **248.651 diferenças não-cor** em 61.700
 elementos, 129 combinações de rota/largura. A captura inversa deu zero diferenças exclusivas.
 
-### NOVO-71 🟠 `NOVO` Componente global não tem contrato de parâmetro · HT · 6+ d
+### NOVO-71 ✅ RESOLVIDO (E3–E5, 10/08/2026) · `NOVO` Componente global não tinha contrato de parâmetro · HT · 6+ d
 
 **275 dos 946 `{% include %}`** do sistema não usam `only`. O componente lê o contexto que o
 chamador tem por acaso, e quebra quando outro chamador não tem — que é o `HT-14` pelo lado do
@@ -5302,17 +6176,34 @@ passa só o atributo declarado — o `only` deixa de ser disciplina e vira o com
 Trocar o carregador muda a resolução de **407 templates** de uma vez, e o modo de falhar é
 `TemplateDoesNotExist` em rota que ninguém abriu no PR.
 
-**Fila:** etapas E3 (instalar), E4 (converter os 82 componentes) e E5 (migrar os call sites).
+**Resolvido.** A E3 instalou e configurou o motor, a E4 converteu os 82 componentes e a E5 migrou
+os 868 call sites, habilitou isolamento de contexto e apagou todas as cascas de compatibilidade.
 
-### NOVO-72 ⚪ `NOVO` `ui_lab2/` sobreviveu à remoção do PR #247 · MOR · 0,1 d
+**E3 concluída em 09/08/2026 (`e6a722ae`).** `django-cotton==2.7.2` entrou no lock com hashes e
+o projeto passou a usar configuração manual: `SimpleAppConfig`, loader em cache com Cotton antes
+de `filesystem.Loader` e `app_directories.Loader`, e a biblioteca de tags em `builtins`. Os cinco
+context processors declarados foram preservados e nenhum template mudou. Os **408 templates** do
+corpus compilam; 12 telas de domínio e o perfil que hospeda a integração Google renderizam no
+servidor sem `TemplateDoesNotExist` e sem erro de console.
+
+**E4 concluída em 10/08/2026.** Os 82 componentes foram convertidos para implementações canônicas
+em `templates/cotton/**`, mantendo 82 cascas compatíveis nos caminhos antigos. Os contratos cobrem
+todo o inventário, e a régua visual da E0 ficou estável nas 129 combinações de rota e largura. As
+catracas fecharam em 0 erros/240 avisos no auditor frontend, 2.535 suspeitas no auditor de padrões e
+78 no auditor de arquitetura. A E5 migrou os call sites, explicitou contratos inclusive em slots
+e templates dinâmicos, habilitou o isolamento e removeu as cascas; o defeito está fechado.
+
+### NOVO-72 ✅ RESOLVIDO (E2, 09/08/2026) · `NOVO` `ui_lab2/` sobreviveu à remoção do PR #247 · MOR · 0,1 d
 
 O `BE-25` decidiu que nenhum dos dois UI Labs é o vigente e o PR #247 os apagou. `ui_lab2/` ficou
 para trás como diretório contendo só `__pycache__/*.pyc`. Não está em `INSTALLED_APPS`, não tem
 rota, não tem fonte — é o rastro de um app que não existe mais.
 
-**Fila:** etapa E2.
+**Resolvido na E2.** O diretório só existia no checkout antigo por conter `__pycache__` ignorado.
+Uma worktree limpa de `origin/main` já não o materializa: `git ls-files ui_lab2` e `Test-Path
+ui_lab2` retornam, respectivamente, zero arquivos e falso. Não havia fonte versionada a apagar.
 
-### NOVO-73 ⚪ `NOVO` Nome e lugar de arquivo JS sem padrão · MOR · 0,5 d
+### NOVO-73 ✅ RESOLVIDO (8133d8af, 09/08/2026) · `NOVO` Nome e lugar de arquivo JS sem padrão · MOR · 0,5 d
 
 Duas divergências, nenhuma delas cosmética a longo prazo, porque é assim que o próximo
 desenvolvedor aprende o padrão errado:
@@ -5327,9 +6218,11 @@ desenvolvedor aprende o padrão errado:
 Mover exige atualizar `SHELL_JS` em `scripts/build_shell_bundles.py`, os `{% block extra_js %}` que
 os citam e `docs/DATA_ATTRIBUTES_JS.md`.
 
-**Fila:** etapa E2.
+**Resolvido na E2.** Os quatro módulos agora moram em `static/js/pages/` e usam kebab-case:
+`roteiros.js`, `roteiros-map.js`, `roteiros-wizard.js` e `gdrive-config.js`. Templates, testes,
+exceções do auditor e documentação foram atualizados no mesmo commit, sem alias de compatibilidade.
 
-### NOVO-74 🟡 `NOVO` Dois namespaces de componente concorrentes, com quatro pastas fantasma · HT · junto da E5
+### NOVO-74 ✅ RESOLVIDO (E5, 10/08/2026) · `NOVO` Dois namespaces de componente concorrentes, com quatro pastas fantasma · HT
 
 `templates/components/` tem **duas gerações vivas ao mesmo tempo**:
 
@@ -5345,6 +6238,9 @@ não seguiu. Quem for criar um botão novo tem dois lugares plausíveis e nenhum
 
 **Fila:** etapa E5, junto da migração dos call sites — mover para `templates/cotton/` resolve os
 dois namespaces de uma vez, em vez de renomear duas vezes.
+
+**Resolvido na E5.** `templates/cotton/**` é o único namespace: as 82 cascas e os cinco arquivos
+`.gitkeep` de `templates/components/**` foram removidos, sem alias de compatibilidade.
 
 ### NOVO-75 ✅ RESOLVIDO (e6e9c3d2) · `NOVO` O comando de suíte do `AGENTS.md` não funciona no ambiente que o projeto monta para os agentes · COR · 0,1 d
 
@@ -5416,3 +6312,1432 @@ A navegação real da E0 encontrou dois defeitos que o teste de `resolve()` não
 `/termos/oficio/<pk>/preview/` tentava serializar instâncias ORM com `DjangoJSONEncoder`, e
 `/justificativas/<pk>/editar/` encaminhava `pk` para uma view que não o aceitava. As duas rotas
 agora respondem, e cada falha ganhou teste de regressão.
+
+### NOVO-80 ✅ RESOLVIDO (3996f903) · `NOVO` A E5 apagou duas travas de regressão em vez de reapontá-las · QA · 0,25 d
+
+`test_componentes_sem_orfao.py` guardava duas listas nomeadas — os 7 componentes que o `HT-06`
+apagou e os 8 que caíram com o UI Lab (PR #247 e a cascata do `NOVO-44`) — afirmando por arquivo
+que nenhum deles voltou, que é a prova de grep exigida pelo `AGENTS.md` §3.6.
+
+A E5 extinguiu `templates/components/` e moveu tudo para `templates/cotton/`. Com o diretório
+antigo vazio, `(COMPONENTES / rel).exists()` virou vacuamente verdadeira: as asserções passaram a
+passar sem testar nada. O teste **tinha** mesmo que mudar; o que faltou foi trocar a raiz por
+`COTTON`, e não remover as duas travas. A E4 preservou a forma da árvore ao mover, então as duas
+listas seguem válidas letra por letra.
+
+O buraco foi medido, não suposto. Ressuscitando `ui/forms/dropdown.html`:
+
+    volta sem consumidor -> guarda de órfão pega, trava nomeada pega
+    volta COM consumidor -> guarda de órfão passa, trava nomeada pega
+
+A segunda linha é o defeito, e é como componente morto reaparece na prática: alguém copia de uma
+branch antiga e já sai usando. O `test_todo_componente_tem_quem_o_renderize` não cobre esse caso —
+por construção, ele só reclama de quem **não** tem consumidor.
+
+A E6 (todos os cinco IDs, `70f369c6`..`5b58fac7`) passou por esse arquivo três vezes e não repôs
+as travas: ajustou apenas a contagem do inventário, de 82 para 85.
+
+### NOVO-81 ✅ RESOLVIDO (3996f903) · `NOVO` O auditor de front audita os testes de JS que a E1 criou · QA · 0,1 d
+
+`audit_frontend_standards.py` varre `static/js/**.js` e pula só `*.bundle.js`. Com o runner de JS
+da E1 (`JS-03`), os arquivos `*.test.js` passaram a morar ao lado do código que testam e entraram
+na varredura.
+
+O que um teste monta para exercitar uma regra é exatamente o que a regra proíbe em produção:
+`innerHTML` de fixture dispara `innerhtml_dynamic_without_escape`, e afirmar sobre classe dispara
+`css_class_as_logic`. Como o teto é global (246, com 240 em uso), escrever teste de JS consome a
+folga e reprova o CI por escrever teste.
+
+Hoje o defeito é latente: o único `*.test.js` do repositório (`state-toggle.test.js`, da E6) não
+dispara nenhuma regra. A trava é para o próximo, e o custo dela é uma linha.
+
+### NOVO-83 🔴 · `NOVO` As duas réguas da E0 não sobem o navegador na sessão remota · COR · 0,25 d
+
+Irmão do `NOVO-72`, e o mesmo formato: **o comando que o projeto manda rodar não roda no ambiente
+que o próprio projeto monta para os agentes.**
+
+`medir_divergencia_tema.py:266` e `medir_css_por_rota.py:199` chamavam `playwright.chromium.launch()`
+sem `executable_path`. Isso procura um build de Chromium casado com a versão do pacote pip — hoje
+`playwright==1.62.0`, que espera o build **1234**.
+
+No CI funciona, porque `tests.yml:391` roda `python -m playwright install --with-deps chromium` e
+baixa o build certo. Na sessão remota, não: a imagem já traz o Chromium em
+`PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`, no build **1194**, e o ambiente pede explicitamente
+para **não** rodar `playwright install`. O launch morre com
+
+    Executable doesn't exist at .../chromium_headless_shell-1234/chrome-headless-shell
+
+Por que isso importa mais do que parece: a **E8 inteira** depende dessas duas réguas. O plano diz,
+com todas as letras, que a primeira coisa da E8 é remedir — "número velho é o quarto erro que mata
+um ciclo" — e a catraca da etapa é a divergência não-cor caindo. Sem o navegador subir, a E8 fica
+sem prova e sem catraca, e a alternativa seria mexer em 43 telas no olho.
+
+Descobri tentando fazer exatamente isso: rodar a régua para reescrever a tabela do enunciado.
+
+**Resolvido** por `scripts/navegador_medicao.py`: tenta o caminho normal primeiro e só cai para o
+build instalado quando o esperado não existe, e só quando o erro é esse — outro erro sobe sem
+disfarce. No CI o primeiro caminho sempre funciona, então lá nada muda.
+`core/tests/test_navegador_medicao.py` prende as duas metades, mais uma trava de regressão que
+reprova se alguma régua voltar ao `launch()` cru.
+
+**Segundo tropeço, no mesmo caminho.** Com o navegador de pé, a régua ainda parava em
+`oficios-detalhe: HTTP 404 em /oficios/1/`. O registro existe; o que faltava era o usuário de
+medição ter **vínculo de área** — o sistema é escopado por `AreaTrabalho`, e sem
+`VinculoUsuarioArea` as rotas de detalhe respondem 404. O `.github/workflows/tests.yml` faz esse
+vínculo; o `AGENTS.md` §7 não menciona, e quem rodar a régua à mão sem ler o workflow cai nele.
+
+### NOVO-84 🔴 · `NOVO` A régua de tema reprovava `roteiros-editar@500` — e tinha razão · COR · 0,5 d
+
+Com o `NOVO-83` resolvido, a régua da E0 finalmente subiu o navegador e parou noutro ponto:
+
+    RuntimeError: a ordem de captura alterou o resultado:
+    168 exclusivos claro→escuro; 164 exclusivos escuro→claro
+
+A mensagem não dizia **qual rota**. Deduzi contando linhas do log: `roteiros-editar@500` — e só a
+500 px; a 1440 e a 800 a mesma rota passava.
+
+**A trava estava certa, e não foi afrouxada.** Capturando as chaves exclusivas dentro da corrida, as
+332 são **todas** de propriedade derivada de layout (`height`, `width`, `transform-origin`,
+`perspective-origin`, `grid-template-*`) em 38 containers. Nenhuma é de estilo. E o valor do tema
+claro é idêntico nas duas ordens; só o do escuro muda:
+
+| ordem da captura | claro | escuro |
+|---|---|---|
+| claro→escuro | 4374.84px | **4367.39px** |
+| escuro→claro | 4374.84px | **4423.39px** |
+
+As duas leituras do escuro acontecem em sequência **sem troca de tema entre elas** — a captura 1
+termina em escuro e a captura 2 começa reaplicando escuro. A página cresceu **56px sozinha**. O
+número não era reprodutível porque a página não tinha parado de mudar: `networkidle` diz que a rede
+calou, não que o layout assentou.
+
+**Duas hipóteses caíram no caminho, e vale registrar para ninguém repetir:**
+
+- *"O DOM muda entre as capturas e desloca os índices"* — as chaves são `(índice, propriedade, …)`,
+  então parecia óbvio. Medido: **1142 elementos, constante**, inclusive através de quatro trocas de
+  tema. Falsa.
+- *"É corrida de temporização"* — duas corridas completas deram **168/164 idênticos**. Falsa.
+
+**A primeira correção também errou o lugar.** Pus a espera de estabilidade **antes** da primeira
+captura, com a página em tema claro. Não adiantou, e quem desmentiu foi a mensagem de erro que eu
+tinha acabado de melhorar: `layout estável: True` com a falha intacta. O crescimento vem **depois**
+da troca de tema, não antes dela — a espera passou para dentro do `apply()`, valendo em toda
+aplicação de tema.
+
+**PARCIAL — e eu cheguei a dar por resolvido, errado.** `settle()` deixou de ser dois
+`requestAnimationFrame` e passou a acompanhar `scrollHeight`/`scrollWidth` até três leituras iguais.
+Com isso a corrida de 500 px passou uma vez, com as 42 rotas. **Mas a corrida completa (três
+larguras) voltou a reprovar na mesma rota**, agora com `164/168` — os mesmos números, invertidos.
+
+Então a falha é **intermitente**, e a leitura anterior de "determinística" também estava errada: as
+duas primeiras corridas darem `168/164` idênticos foi coincidência, não determinismo. A passagem do
+run de 500 px foi sorte, e eu a tratei como prova. O erro de método aqui foi meu: **uma passagem não
+prova ausência de falha intermitente.**
+
+**O que está firme, medido:** aplicado o tema escuro e deixado assentar, a altura fica em **4423px,
+estável por 12 segundos** (24 leituras de 0,5 s). O valor que aparece na captura que reprova é
+**4367.39px** — 56px a menos. Ou seja, 4423 é o layout escuro de verdade, e 4367 é um estado
+intermediário que a janela de estabilidade de 150 ms às vezes toma por assentado.
+
+**O que cresce, medido.** Comparando altura de cada elemento entre os temas a 500 px:
+`.form-section-body` **cresce 66,34px** no escuro, enquanto os textos ao redor **encolhem** —
+`cv-form-section-header` −17,79px, `form-block__header` e `form-block__copy` −7,61px cada,
+`form-section-subtitle` −5,8px. Saldo: **+48,55px**. São métricas de texto divergindo entre os
+temas, que é exatamente o assunto da E8 — não é defeito da página, é o defeito que a etapa existe
+para fechar.
+
+**Por que a régua tropeça mesmo assim.** Indo de claro para escuro numa página ociosa, o escuro
+nasce **já em 4423,39px** — o valor certo — e fica lá por 12 s. O `4367.39px` que aparece na captura
+reprovada **não é um estado que assenta em 4423**: é outro layout, que só aparece dentro da captura.
+A diferença é a carga: logo antes de aplicar o escuro, a captura faz ~388 mil leituras de
+`getComputedStyle` (1.142 elementos × ~340 propriedades). Essa carga atrasa o relayout assíncrono e
+o faz cair no meio do laço de diff. Daí a intermitência: é corrida entre o relayout e o laço, e não
+falta de espera depois do carregamento.
+
+**Fechado: não havia trabalho assíncrono.** A pergunta estava mal posta, e eu a persegui por três
+hipóteses erradas — deslocamento de índice (falsa: 1.142 elementos constantes), carregamento de
+fonte (falsa: 4 faces, todas `loaded`, `fonts.ready` não muda altura) e corrida de temporização
+simples (falsa: não reproduz em 12 voltas replicando a captura exata).
+
+A causa é **uma regra de CSS**, e ela é síncrona. Instrumentando a corrida para nomear os elementos
+em vez de numerá-los, a coluna de largura entregou o caso: `.route-destinos-block__rail` e toda a
+subárvore vão de **406px no claro para 378px no escuro**. Subindo a árvore, os 28px nascem em
+`section.form-block--resource`:
+
+| propriedade | claro | escuro |
+|---|---|---|
+| `padding` | **0px** | **14px** |
+| `gap` | 16px | 12px |
+
+Perguntando ao navegador quem declara (`CSS.getMatchedStylesForNode`, que é autoridade e não
+palpite), a regra é `static/css/components/theme-dark-components.css:2332`:
+
+```css
+:is(html[data-theme="dark"]) .form-block {
+  background: var(--color-surface-soft);
+  border: 0;
+  border-radius: 14px;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+  padding: 14px;
+}
+```
+
+O `padding: 14px` só existe no escuro. Ele encolhe a caixa de conteúdo em 28px, os filhos vão de 434
+para 406, o texto quebra diferente, as alturas crescem, e a página inteira ganha 48,55px —
+propagando por **14 níveis** de árvore.
+
+**Por que isso desestabiliza a régua.** A cadeia é longa e cada `getComputedStyle` do laço de diff
+força layout. Em algumas corridas a captura lê a árvore com a cadeia ainda propagando, e aí registra
+o estado intermediário (4367,39px) em vez do final (4423,39px). Não é falta de espera depois do
+carregamento — é reflow profundo acontecendo durante a leitura, e por isso a espera que eu tinha
+posto no `settle()` reduziu a frequência sem eliminar.
+
+**O que fazer com isso é decisão da E8, não deste ID.** `.form-block` é classe de layout base, usada
+em 23 templates. Igualar o padding entre os temas é sub-etapa da E8 com `PARE E PERGUNTE`, e não
+cabe aqui.
+
+**Nota para a E8:** esta regra sozinha concentra quatro das famílias abertas — `padding`
+(espaçamento), `border: 0` (a **8b**, e na direção **oposta** à do enunciado, que fala em
+0px→1px), `border-radius: 14px` (a **8c** — e o 14px está no **escuro**, não no claro, ao contrário
+do que o enunciado diz) e `grid-template-columns`. Vale reabrir a tabela das famílias com isso em
+mãos: elas podem não ser quatro frentes espalhadas, e sim poucas regras densas.
+
+Fica também o diagnóstico melhor: quando a trava disparar, o erro passa a dizer qual rota é e se a
+página chegou a assentar, que é o que separa "o instrumento falhou" de "a página não para de mudar".
+
+**E fica um achado sobre o sistema, não sobre o instrumento:** trocar para o tema escuro dispara
+relayout assíncrono no editor de roteiro a 500 px, com 56px de crescimento. Isso é **comportamento**,
+não pintura, e mora perto da família 8h da E8 (a gaveta da barra lateral, que também é comportamento
+e também só existe abaixo de 840 px). Vale investigar junto quando a 8h for executada.
+
+### NOVO-85 🔴 · `NOVO` A armadilha de foco da gaveta vazava — e só no tema escuro · A11Y · 0,25 d
+
+Apareceu na investigação da família **8h** da E8, e no lugar do defeito que se esperava: a premissa
+catalogada ("a gaveta é `fixed` no escuro e `relative` no claro") **já estava morta** — o `NOVO-68`
+globalizou a geometria em 09/08, e `sidebar.css:353` é código que não vence mais nada. No lugar dela
+apareceu isto, que é comportamento de verdade.
+
+`sidebar.js` montava a lista de focáveis com
+
+    'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+e `button:not([disabled])` **casa com botão `tabindex="-1"`** — que o navegador nunca alcança por
+Tab. O descarte de `tabindex="-1"` só existia no ramo genérico `[tabindex]`.
+
+Por que isso vira defeito **de um tema só**: o seletor de tema é o último bloco da barra e é um
+radiogroup rotativo — `theme-toggle.js:19` deixa `tabindex="0"` apenas no tema ativo. No DOM,
+"Escuro" vem antes de "Claro" (`templates/cotton/layout/sidebar.html:102,106`).
+
+| tema | último do DOM | último **tabulável** | batem? |
+|---|---|---|---|
+| claro | "Claro" (`tabindex="0"`) | "Claro" | ✅ por acidente |
+| escuro | "Claro" (`tabindex="-1"`) | "Escuro" | ❌ |
+
+No escuro, `document.activeElement === last` dá falso quando o foco está no último tabulável real, o
+`event.preventDefault()` não roda, e **o foco sai da gaveta para o conteúdo atrás do scrim** — com a
+gaveta aberta e o `body` travado em `overflow: hidden`. O usuário perde o foco numa região que não
+consegue ver nem rolar.
+
+Vale também **antes de o `theme-toggle.js` rodar**: o template nasce com os dois botões em
+`tabindex="-1"`, e o script desiste cedo (`if (!shared) return;`) se `CV.theme` faltar.
+
+**Resolvido** trocando a filtragem por `element.tabIndex >= 0` mais o descarte explícito de
+`disabled` — o critério do navegador, e não uma aproximação por seletor.
+
+`static/js/components/sidebar.test.js` (novo, 5 casos) prende os dois temas, o estado inicial do
+template, o `Shift+Tab` e o botão desabilitado. A prova de que prendem: com o seletor antigo
+reposto, **4 dos 5 reprovam — e o que passa é justamente o do tema claro**, que é onde o defeito não
+existia.
+
+### NOVO-86 · `NOVO` O `NOVO-81` consertou um varredor de JS; existem dois · QA · 0,1 d
+
+O `NOVO-81` tirou os `*.test.js` da varredura do `audit_frontend_standards.py`, com o argumento de
+que o que um teste monta para exercitar uma regra é exatamente o que a regra proíbe em produção. O
+argumento estava certo e a correção estava incompleta: **`core/tests/test_javascript_namespace_contract.py`
+varre o mesmo `static/js/**` e tinha o mesmo problema.**
+
+Apareceu ao escrever o teste do `NOVO-85`. Para simular a media query da gaveta, ele faz
+`window.matchMedia = vi.fn()` — e o contrato reprova qualquer `window.X =` fora de `CV`. O teste
+mede código entregue ao navegador; um duplo de teste não é isso.
+
+Diferente do `NOVO-81`, que era latente, este **reprovou de imediato**: a suíte saiu de 1911 verdes
+para uma falha, com `static/js/components/sidebar.test.js: window.matchMedia`.
+
+Resolvido com o mesmo descarte, na origem da lista de fontes. A lição que fica é sobre a correção do
+`NOVO-81`, não sobre este teste: quando um problema é de categoria — "arquivo de teste sendo lido
+como produção" —, consertar a ocorrência que apareceu não fecha a categoria. Valia ter varrido quem
+mais lê `static/js/**`.
+
+### NOVO-87 · `NOVO` O fluxo do ofício não detecta roteiro duplicado · AUD · 0,5 d
+
+O catálogo já registrava isto como "divergência real já existente" dentro do `BE-11`. Ao unificar
+`novo` e `editar` a divergência ficou isolada e nomeável, então vira linha própria: `novo` e
+`editar` chamam `encontrar_roteiro_duplicado`, que procura **qualquer** roteiro idêntico já salvo e
+funde os dados nele. `oficios/route_views.py::wizard_roteiro` não chama.
+
+O que o wizard tem é outra coisa: `roteiro_state_equivalente_ao_roteiro` (`:133`) compara o estado
+submetido **só** com o roteiro que o usuário escolheu explicitamente no seletor. Se bater, vincula
+sem copiar; se não bater, grava rascunho novo. Ou seja, salvar a etapa de roteiro de um ofício pode
+criar um roteiro idêntico a um terceiro que o usuário nunca viu, sem aviso.
+
+**Não foi mexido de propósito.** Dar detecção de duplicado ao wizard não é refatoração: muda o que
+o usuário vê ao salvar a etapa, e `sobrescrever_roteiro_duplicado` migra ofícios e prestações e
+apaga o registro obsoleto — exatamente a classe de operação que o comentário de
+`oficios/route_views.py:139` manda nunca fazer com roteiro de outro ofício.
+
+**Antes de decidir, medir:** quantos roteiros idênticos o fluxo do ofício cria de fato em produção.
+Se forem poucos, a assimetria é aceitável e vira decisão documentada; se forem muitos, o desenho
+tem de mudar — e aí é `BE-12`, não este.
+
+### NOVO-88 ✅ RESOLVIDO `wizard_roteiro` repete dois blocos dentro de si mesma · AUD · 0,25 d
+
+Achado ao medir o `BE-11`, e insumo direto do `BE-12`. A view de 165 linhas úteis tem duas
+duplicações internas:
+
+1. **Materializa rascunho + revincula ao ofício**, em `:140-146` e `:168-185`. Mesmo
+   `if roteiro_vinculado is None or roteiro_vinculado.status != Roteiro.STATUS_RASCUNHO:` seguido de
+   `Roteiro(tipo=…, status=…)`, `form.instance = …`, e depois
+   `if oficio.roteiro_id != roteiro_salvo.pk: oficio.roteiro = …; oficio.save(...)`. **Só a segunda
+   cópia injeta `area=`** — a primeira deixa o `Roteiro` nascer sem área e depende de quem salva
+   para preenchê-la.
+2. **O fallback de área** (`from cadastros.models import ConfiguracaoSistema` /
+   `area = ConfiguracaoSistema.get_singleton().area`) está escrito duas vezes, em `:79-84` e
+   `:170-173`.
+
+A assimetria do item 1 é a parte que importa: duas escritas do mesmo registro com regras de área
+diferentes na mesma view, e nada na suíte distingue os dois caminhos.
+
+**Fechado no `BE-12`, e a causa era mais funda do que a redação acima.** As duas cópias viraram
+`oficios/services.py::_materializar_rascunho_do_oficio`, com a regra do segundo bloco: `area` do
+**ofício**, com queda para `ConfiguracaoSistema`.
+
+Eu tinha escrito que o primeiro bloco estouraria o `NOT NULL` do `DB-02` numa requisição sem área
+ativa. **Não estoura** — `get_oficio_by_id` filtra por `filter_queryset_by_area`, que lê o mesmo
+thread-local que `Roteiro.save()` vai ler; sem área ativa o ofício já não é encontrado e a view
+devolve 404 antes. O que existia era pior de achar: **o roteiro nascia na área certa por
+coincidência de duas leituras do mesmo thread-local**, nunca por garantia. Fora de request o
+`INSERT` vira `IntegrityError: NOT NULL constraint failed: roteiros_roteiro.area_id` — e foi assim
+que o teste provou a correção, porque desfazer o `area=` reproduz exatamente esse erro.
+<!-- Renumeração: o `#304` (BE-11) mesclou antes deste ramo e criou `NOVO-87` e `NOVO-88`.
+     Estes três nasceram como 88/89/90 no ramo da E8 e viraram 89/90/91 para não colidir.
+     Os commits `5d0c151f`, `7a4704f2` e `77dbaac9` citam os números antigos. -->
+
+### NOVO-89 · `NOVO` O padding do `.form-block` entrou fora da escala de espaçamento · UI · 0,1 d
+
+Dívida assumida de propósito na primeira sub-etapa da **E8**, e registrada no mesmo commit que a
+criou.
+
+Ao levar `padding: 14px` do tema escuro para a regra base de `.form-block`
+(`fields/form-sections.css`), o valor entrou **literal**. A escala de espaçamento não tem 14px: vai
+de `--space-3` (12px) para `--space-4` (16px).
+
+**Por que não arredondei.** Usar `--space-4` mexeria **2px no tema escuro**, e a E8 é o claro
+alcançando o escuro — não os dois indo para um terceiro lugar. Misturar "igualar os temas" com
+"arrumar a escala" na mesma edição é o que torna regressão visual impossível de atribuir, que é o
+risco que a etapa mais teme. O escuro tinha que sair byte a byte igual, e saiu: os prints das três
+larguras dão dimensão idêntica antes e depois.
+
+O 14px já não era estranho ao claro — `pages/roteiros.css` tem `padding: 14px` sem predicado de tema
+no `.route-sede-block`, e `theme-dark-components.css` usa `padding: 12px 14px` em outros pontos. O
+valor já circulava; o que este ID registra é que ele agora está na regra **base** de uma classe
+presente em 23 templates, e portanto vale a pena resolver de uma vez.
+
+**Fica para a E9** (`UI-02`), que reescreve `theme-dark-components.css` inteiro e é onde a escala
+pode ser decidida sem se confundir com a igualação dos temas. Duas saídas possíveis, e a escolha é
+do dono: arredondar para `--space-4` (16px, mexe 2px nos dois temas de uma vez) ou criar um token de
+14px, se o valor se provar recorrente.
+
+### NOVO-90 · `NOVO` A régua de tema não separa "diverge e pinta" de "diverge e não pinta" · QA · 0,5 d
+
+Achado ao executar a segunda sub-etapa da **E8**, e ele muda como o número da etapa deve ser lido.
+
+`medir_divergencia_tema.py` compara `getComputedStyle` entre os temas e conta toda diferença que não
+seja cor. Isso trata como equivalentes duas coisas muito diferentes: propriedade que **muda o que o
+usuário vê** e propriedade que o navegador **computa mas não pinta**.
+
+O caso que expôs isso: `-webkit-font-smoothing: antialiased`, declarado só em
+`html[data-theme="dark"] body`, valia **60.270 elementos — 48,2% de toda a divergência não-cor do
+sistema**, mais que as quatro famílias catalogadas da E8 somadas (~16%).
+
+Medido neste contêiner Linux, com Chromium:
+
+| | |
+|---|---|
+| estilo computado | `auto` (claro) vs `antialiased` (escuro) — **difere** |
+| largura renderizada do mesmo texto | 1264px vs 1264px — **idêntica** |
+| print da lista de ofícios, antes e depois de globalizar | **idêntico byte a byte** (mesmo md5, nos dois temas) |
+
+A propriedade tem efeito real no **macOS**. Então a divergência é verdadeira para quem usa Mac — o
+tema claro e o escuro renderizam texto diferente lá — e é **invisível** aqui. As duas afirmações
+convivem, e a régua não distingue uma da outra.
+
+**Consequência prática, que precisa estar escrita:** a meta do plano para o `NOVO-58` ("divergência
+próxima de zero") vai ser cumprida em boa parte por itens sem efeito visual nesta plataforma. Quem
+ler só o número vai superestimar o ganho de tela. Uma queda de 48% na métrica pode significar zero
+pixel movido — foi exatamente o que aconteceu.
+
+Isto **não** torna a correção errada: globalizar segue o princípio que o próprio projeto escreveu no
+`NOVO-62` ("tipografia não é decisão de tema") e conserta a divergência real no macOS. O que o ID
+registra é que o instrumento precisa de uma segunda coluna.
+
+O plano já avisava do parente deste defeito, na seção "a armadilha da tipografia": *"o número
+19.896 elementos media a pilha declarada, não a face que o usuário vê […] não dá para determinar
+daqui o que renderiza na máquina do usuário"*. O aviso valia para `font-family`; vale igual para
+tudo que é renderização de texto.
+
+**Saída sugerida para quem pegar este ID:** uma lista de propriedades sabidamente sem efeito de
+layout no motor usado pela régua (`-webkit-font-smoothing`, `-moz-osx-font-smoothing`,
+`text-rendering`, e as de `transition-*`, que só mudam a curva no tempo), contadas à parte no
+relatório. Duas somas, não uma: a que move pixel e a que não move.
+
+### NOVO-91 🔴 · `NOVO` A sessão remota mede ~35% menos divergência que o CI · QA · 0,5 d
+
+Descoberto errando: apertei os tetos de `scripts/tetos_front.json` com números medidos **aqui**, e o
+CI reprovou em 25+ rotas. O arquivo estava calibrado para o CI, e eu escrevi por cima dele medições
+de outro ambiente.
+
+A prova de que os tetos originais vieram do CI, e não daqui:
+
+| rota | teto gravado | CI mede | local mede |
+|---|---:|---:|---:|
+| `dashboard@1440` | 1125 | **1125** | 780 |
+| `cargo-editar@1440` | 1029 | **1029** | 672 |
+| `combustiveis-lista@1440` | 1036 | **1036** | 676 |
+
+Idêntico ao teto no CI, ~35% menor aqui. Não é ruído: são três casas decimais de coincidência em
+rotas independentes.
+
+**A causa provável é fonte.** O CI roda `python -m playwright install --with-deps chromium`, que traz
+o conjunto de fontes dele; a sessão remota usa o Chromium pré-instalado da imagem, com outro
+conjunto. Métrica de texto diferente muda quebra de linha, que muda altura, que muda quantos
+elementos divergem. É o mesmo mecanismo que o plano descreve na "armadilha da tipografia" — e a
+mesma advertência: *"não dá para determinar daqui o que renderiza na máquina do usuário"*.
+
+**Consequência operacional, que é o que importa:** medição local serve para **comparar antes/depois
+no mesmo ambiente** — foi assim que a cadeia do `.form-block` foi diagnosticada, e o diagnóstico
+está certo. Não serve para **gravar teto**. Regravar `tetos_front.json` só pode ser feito com números
+produzidos pelo CI.
+
+Isso deixa um buraco de processo: hoje o CI **não** commita o JSON de volta (`--json` vai para
+`$RUNNER_TEMP` e morre com o job), e regravar teto é passo manual. Ou seja, não existe caminho
+suportado para baixar a catraca a partir de uma corrida do CI — que é justamente o que uma etapa como
+a E8 precisa fazer a cada sub-etapa.
+
+**Saída sugerida:** um passo opcional no `tests.yml`, disparado por rótulo ou `workflow_dispatch`, que
+roda as duas réguas com `--atualizar-tetos` e publica o JSON como artefato — ou abre commit na
+branch. Enquanto isso não existe, a catraca só desce quando alguém copiar os números do log do CI à
+mão, e o log só mostra as rotas que **reprovaram**.
+
+**Efeito medido apesar de tudo:** o próprio log de reprovação mostra a queda real no ambiente certo.
+`configuracao` caiu de 1652 para 1425 a 1440px (−227), e o mesmo nas outras duas larguras (−204 cada).
+`eventos-lista@1440` caiu 14. É menos do que os −9.376 medidos localmente, e é o número que vale.
+
+### NOVO-92 · `NOVO` A tradução de ação do rodapé em redirect está copiada em cada passo do wizard · AUD · 0,75 d
+
+Achado ao fechar o `BE-12`. Todo passo de wizard lê a ação do rodapé com
+`core/wizard.py::normalizar_acao_do_wizard` — dono único desde o `BE-01` — e depois **cada um
+escreve a sua própria cadeia** de `if nav_action == …` para traduzir a ação em mensagem e redirect:
+
+| passo | onde | forma |
+|---|---|---|
+| `dados_viajantes` | `oficios/traveler_views.py:138` | helper privado `_redirect_after_dados_viajantes_save` |
+| `transporte` | `oficios/traveler_views.py:210` | helper privado `_redirect_after_transporte_save` |
+| `wizard_roteiro` | `oficios/route_views.py` | helper privado `_redirect_after_roteiro_save` (criado no `BE-12`; antes eram duas cadeias inline dentro da mesma view) |
+| `wizard_justificativa` | `oficios/wizard_document_views.py:48` | inline |
+| `wizard_documentos` | `oficios/wizard_document_views.py:144` | inline |
+
+São três helpers com o mesmo nome-padrão e nenhum reuso entre arquivos, mais dois inline. É a mesma
+família do `BE-01`, que centralizou a *leitura* do botão depois de duas cópias divergentes terem
+quebrado a navegação de quatro telas do plano de trabalho — a *escrita* do destino continua
+espalhada.
+
+**Não é cópia literal**, e é por isso que não entrou no `BE-12`: cada passo tem destinos próprios, e
+`wizard_documentos` ainda tem a ação `finalizar`, que os outros não têm. Unificar exige um mapa de
+etapa → próximo/anterior, que é desenho, não extração mecânica. Fica para depois do `BE-13`.
+<!-- Renumeração (2a vez nesta etapa): o `#305` (BE-12) mesclou antes deste ramo e criou
+     `NOVO-92`. Estes dois nasceram como 92/93 no ramo da E8 e viraram 93/94. Ramos paralelos
+     tiram número do mesmo contador sem reserva, e a colisão só aparece no merge — foi a
+     segunda vez na mesma sessão (a primeira foi o `#304`, com o `NOVO-88`). -->
+
+### NOVO-93 ✅ RESOLVIDO (11/08/2026) · `NOVO` A família 8b não é portável sozinha: no tema claro a borda é a única separação · UI · 1 d
+
+Achado ao executar a **E8**, com o dono já tendo decidido a direção ("o claro perde as bordas"). A
+medição contradiz a decisão, e por um motivo que não estava na mesa quando ela foi tomada.
+
+**O que a família 8b parecia ser.** 186 regras predicadas em `html[data-theme="dark"]` declaram
+borda. Medindo elemento a elemento nas 43 rotas, **54 têm efeito** — 754 elementos a 1440 e 800, 760
+a 500. As outras 132 não mudam nada.
+
+**Por que ela não pode ser aplicada inteira.** No tema escuro `border: 0` funciona porque as
+superfícies se separam por **luminância**; no claro elas são todas brancas, e a borda é a única
+separação que existe. Levar `border: 0` para o claro apaga a fronteira sem pôr nada no lugar. Cinco
+casos verificados, com arquivo e linha:
+
+1. **`.cv-module-card`** — o claro tem `border: 1px solid var(--color-border)` (`lists/cards.css:19`)
+   **e** `border-top: 3px solid var(--color-accent-border-strong)` (`cards.css:61`). O shorthand da
+   regra escura, neutralizado, **apaga o filete dourado do topo** de todo card do painel.
+2. **Os `--step1-*`** (`--step1-surface`, `--step1-panel`, `--step1-field`) são ligados **dentro de
+   regra escura** (`theme-dark-components.css:397-400` e `:5015-5017`). Fora dela existem só em
+   `.attach-signed-modal__dialog` (`actions/action-system.css:717`) e `.collection-panel`
+   (`lists/record-list.css:12`) — escopos que não alcançam o wizard. Um `border: 0` que vem casado
+   com `background: var(--step1-surface)` chega ao claro com **variável indefinida**.
+3. **`.cv-dialog__notice`** não tem regra clara nenhuma — só as duas escuras
+   (`theme-dark-components.css:3937` e `:3948`). Neutralizar a borda desenha **um retângulo em volta
+   de um `<p>` sem padding**. Não é mover declaração: é regra base que nunca foi escrita.
+4. **Seis componentes ficam branco-no-branco**: `.list-header__wizard-back`, os `−`/`+` do
+   `.pt-quantidade-stepper`, os botões de `.form-block__actions` do wizard,
+   `.card-footer__secondary .cv-btn`, `.roteiro-mapa__canvas-head .cv-btn--secondary` e — o pior —
+   `.roteiro-trecho-card__leg`, onde a borda é a única coisa que separa Saída de Chegada dentro de um
+   card branco.
+5. **`.search-picker__selected-card:last-child { border-bottom: 0 }`** é declaração morta no escuro
+   (outras regras já zeram os quatro lados) e **viva no claro**, onde o card tem borda inteira
+   (`fields/search-picker.css:590`). Neutralizada sozinha, o último card fica com contorno em U.
+
+**Consequência para o plano.** A 8b **não é "mover borda"**: é adotar o sistema de superfícies do
+escuro, e isso depende de os `--step1-*` existirem no tema claro. **A família está bloqueada na
+camada de token, que é a E9.** Enquanto isso não existir, cada regra de borda só pode ser decidida
+uma a uma, com print, e a maioria vai na direção contrária à que o enunciado supunha.
+
+**O que entrou apesar disso:** `.sidebar-brand-badge` (86 elementos), onde a borda é decoração — um
+anel creme sobre um badge dourado — e não separação.
+
+**Decisão do dono em 11/08: redesenhar as superfícies claras.** `--color-surface` continua branco;
+`--color-surface-muted` passa a `#f7fbff` e `--color-surface-soft` a `#e3eaf2`. Com três níveis de
+luminância, os fundos que já separavam card, painel e campo no escuro passam a cumprir a mesma função
+no claro. As regras completas de wizard, roteiro, pickers, rodapés e date-picker foram tornadas
+neutras — incluindo hover/foco e estados selecionados — para não transportar apenas `border: 0` e
+deixar metade do componente no desenho antigo. O shorthand de `.cv-module-card` ficou escuro: o
+filete dourado de 3 px do claro não foi apagado.
+
+**O número histórico de 40 não é reproduzível no `main` atual.** O novo inventário por CSSOM
+(`scripts/inventariar_bordas_tema.py`) percorre 43 rotas × 3 larguras, atribui o efeito computado à
+regra-fonte e separa “muda uma borda” de “remove uma borda que existia no claro”. Antes da correção,
+em 1440 px, havia **55 regras escuras com algum efeito em borda, 34 delas removendo ao menos um
+lado**. Depois, nas três larguras, restam **19 regras**, todas bordas positivas/deliberadas, e
+**0 removendo borda do claro**.
+
+**Prova visual e de regressão.** A régua completa, no mesmo corpus de 60.386 elementos, caiu de
+**138.978 para 115.963 diferenças não-cor** (−23.015; −16,6%). A contagem não vai a zero porque a
+reauditoria também refutou o fechamento geral da E8; outras famílias ainda divergem. Para isolar o
+risco desta mudança, o bundle anterior e o novo foram trocados dentro do mesmo DOM em tema escuro:
+**126 medições autenticadas, 60.497 elementos, 0 diferenças computadas**. Claro/escuro foram
+conferidos em 1440 e 500 px nas telas de equipe/transporte, roteiro de ofício e editor de roteiro.
+
+### NOVO-94 · `NOVO` A família 8g move a régua e não move um pixel · QA · fechada na medição
+
+Terceira ocorrência da mesma armadilha do `NOVO-90`, e a primeira detectada **antes** de virar
+commit.
+
+`justify-content` só desloca alguma coisa quando **sobra espaço** no container. Medindo o
+deslocamento real do primeiro e do último filho dentro do pai, nos dois temas, nas 43 rotas:
+
+| componente | elementos | `justify-content` difere | filho se move |
+|---|---:|---:|---:|
+| `.custom-select__option-check` | 72 | 72 | 1px, e só com o menu aberto |
+| `.custom-select__chevron` (v2) | 21 | 21 | **0** — caixa de 16px com filho de 16px |
+| `.segment-toggle__btn` (ofício/roteiro) | 8 | 8 | 2 |
+| `.ordered-field-row__badge` | 3 | 3 | **0** — `display: none` nos dois temas |
+| avatares do `search-picker` | 9 | 9 | **0** — `block` no claro contra `inline-flex` no escuro |
+| `.empty-state__mark` | 24 | 24 | **0** — `inline` no claro contra `inline-flex` no escuro |
+| `.list-tab` (≤600px) | 29 | 29 | **0** — os dois filhos já encostam nas duas bordas |
+
+Das 137 divergências que a família contribui a 1440 e das 170 a 500, o que pinta é **o deslocamento
+de 1px de um ícone de confirmação em lista suspensa aberta**. O que difere de verdade nesses
+elementos é `display`, largura e padding — geometria real, e que **não pertence a família nenhuma da
+tabela do plano**.
+
+**Decisão do dono:** pular a 8g. Fazê-la derrubaria ~150 pontos da catraca sem entregar tela.
+
+**O defeito verdadeiro que a medição encontrou** e que continua aberto: há componentes cujo desenho
+inteiro só existe no tema escuro — `.empty-state__mark` (24 elementos, sem nenhuma regra fora do
+arquivo escuro), os avatares do picker e o badge do wizard. Isso é maior que uma família e precisa de
+decisão própria.
+### NOVO-54 (continuação) 🟠 Trinta dos setenta `!important` de `.cv-field__control` não sustentavam nada · UI · 0,5 d
+
+Segunda leva do `NOVO-54`. A primeira deu à classe uma regra base; esta começa a cobrar a dívida que
+a base tornou visível.
+
+**O método foi medir, não julgar.** Em vez de ler cada regra e decidir se o `!important` "parece
+necessário", removi **todos os 70** de uma vez e medi. Depois fui restaurando até achar quem
+realmente sustentava algo.
+
+| passo | `!important` removidos | elementos alterados |
+|---|---:|---:|
+| todos | 70 | 10 |
+| tudo menos `theme-dark-components.css` | 32 | 1 |
+| tudo menos o tema e `base.css` | 30 | **0** |
+
+**Os 2 de `base.css` são piso de acessibilidade, e o próprio código já dizia.** São o `outline` de
+`:focus-visible` do `HT-01`, cujo comentário explica que **52 blocos** apagam o foco de campo sem pôr
+nada no lugar — o `!important` é o que impede qualquer componente de remover o indicador. Removê-los
+apagou o anel de foco em `/perfil/` no tema escuro, exatamente como o comentário previa.
+
+**Os 38 do arquivo de tema ficam, e um deles está provado necessário.** Perguntei ao navegador quais
+das 11 regras com `!important` daquele arquivo casam com os elementos afetados: **uma só**. As outras
+10 miram passos de wizard (`[data-travel-document-wizard-*]`).
+
+**E aí veio a parte que quase passou.** As 44 rotas da medição **não entram nos wizards**, então
+aquelas 10 regras nunca eram exercidas — "não mudou nada" ali significaria apenas "não foi testado".
+É a mesma armadilha do `.alert` no `NOVO-60`: *rota visitada não é cobertura*.
+
+Estendi o conjunto para **51 rotas**, incluindo `/oficios/<pk>/roteiro/`, `/justificativa/`,
+`/documentos/`, `/resumo/` e o editor de roteiro — de 41.946 para **53.636 elementos**, 102 telas.
+
+**Com a cobertura ampliada, os 30 continuam medindo 0.** E aqui o piso de ruído importa: as telas de
+wizard têm conteúdo variável, e duas capturas do **mesmo código** já diferem em **14 elementos**
+(todos em `/justificativas/`). Os 30 removidos ficam em **zero — abaixo do próprio ruído**.
+
+A comparação passou a ser **por caminho no DOM**, não por índice: com 53.534 elementos numa captura e
+53.636 na outra, alinhar por posição compararia elementos diferentes e produziria diferença onde não
+há.
+
+**Resta:** 40 `!important` (38 no arquivo de tema, 2 de acessibilidade) e as 68 regras em si, que a
+análise por família ainda vai separar entre contexto, estado, tema e divergência real.
+
+### NOVO-95 · `NOVO` A prova por não-interseção não vale: a cascata não é monotônica · QA · fechada na medição
+
+Erro de método cometido na **E9-a**, detectado pela própria régua antes de virar commit. Fica
+registrado porque a ideia é tentadora e vai ocorrer a quem retomar a etapa.
+
+**O raciocínio que parecia sólido.** Para descobrir quais das 307 regras só-escuras de cor podem
+sumir, a bisecção custaria ~9 rodadas de captura completa. O atalho proposto foi:
+
+> Apague **todas** as candidatas de uma vez e meça o conjunto `S` de elementos que mudaram. Para
+> uma regra `R`, se `R` não casa com nenhum elemento de `S`, apagar `R` não muda nada — os
+> elementos fora de `S` não mudaram nem com tudo removido, e os de `S` não são tocados por `R`.
+
+Com isso, 307 candidatas viraram **36 provadas** (inócua ∧ exercitada pelo corpus ∧ não de lista
+mista).
+
+**A medição derrubou.** Removendo exatamente essas 36: **75 elementos mudaram**, contra um piso de
+ruído de 4. E o diagnóstico está no detalhe: **71 dos 75 não estavam em `S`**.
+
+Removendo um **subconjunto**, mudaram elementos que removendo **tudo** não mudavam.
+
+**Por que.** O argumento supõe monotonicidade — que remover menos regras produz um subconjunto das
+mudanças. A cascata não funciona assim. Se `A` e `B` competem pelo mesmo elemento e `A` vence:
+remover só `A` **promove `B`**, e o valor final pode diferir tanto do estado original quanto do
+estado sem as duas. Com `A` e `B` fora, o elemento cai na regra base — que pode calhar de ser o
+valor original, e aí ele nem aparece em `S`.
+
+**O que sobra de válido.** O instrumento (`sonda_mesmo_tema.py`: mesmo tema, dois estados de
+código, 41.754 elementos chaveados por caminho no DOM, piso de ruído de 4 elementos em
+`justificativas-lista`) está certo e é rápido — uma captura completa. O que não vale é **inferir**
+o efeito de um diff a partir do efeito de outro. **Meça o diff que você pretende entregar**, não um
+diff maior do qual você deduz.
+
+**Consequência para a E9-a:** volta para bisecção de verdade, ou para lotes pequenos medidos um a
+um. O custo que o atalho tentava evitar é real e tem de ser pago.
+
+### NOVO-96 ✅ RESOLVIDO · 🔴 `NOVO` A faixa de filtros não tinha fundo no tema claro · UI · 0,25 d
+
+Primeira entrega da **E9**, e um defeito visual real que estava escondido atrás de uma variável.
+
+`lists/list-header.css:85` declara, em regra **sem predicado de tema**:
+
+```css
+.list-header__rail {
+  /* Mesmo token da área interna dos cards (.record-card__band). */
+  background: var(--card-family-bg);
+```
+
+`--card-family-bg` existia **só** em `base/03-theme-dark.css:299`. No tema claro a leitura era
+inválida (*invalid at computed-value time*) e a propriedade caía para o valor inicial. Medido no
+navegador, antes:
+
+| elemento | claro | escuro |
+|---|---|---|
+| `.list-header__rail` | **transparente** | superfície escura |
+
+O comentário logo acima da declaração chama o elemento de "faixa clara abaixo do título". Ele não
+era faixa nenhuma: a barra de filtros de **toda lista do sistema** aparecia sem fundo no tema que o
+sistema mostra para quem nunca escolheu tema.
+
+**Correção.** As nove definições `--card-family-*` passam a existir também no `:root` de
+`base/tokens.css`. Os valores são **os mesmos** do arquivo escuro, sem uma vírgula de diferença,
+porque todos são `var(--color-*)` — a mesma expressão resolve claro no `:root` e escuro no bloco de
+tema. Como `tokens.css` carrega antes de `03-theme-dark.css`, o escuro continua ganhando com os
+próprios valores, e as definições de lá viraram redundantes (a E9-a decide se saem).
+
+**Prova, com o instrumento novo da etapa** (`sonda_mesmo_tema.py`: mesmo tema, dois estados de
+código, 41.754 elementos chaveados por caminho no DOM, `transition` e `animation` desligadas):
+
+| | |
+|---|---:|
+| elementos alterados no **claro** | **47**, em 33 das 86 capturas |
+| elementos alterados no **escuro** | **2** |
+
+Os 2 do escuro são `justificativas-lista`, e são **exatamente o piso de ruído** medido capturando a
+mesma base duas vezes — o mesmo par de caminhos, causado por conteúdo que varia entre capturas.
+**O tema escuro não se moveu.**
+
+### Anotação: o `.record-card__band` é outro defeito, e continua aberto
+
+Ao medir esta correção ficou claro que `.record-card__band` **não** é o mesmo caso, embora o
+comentário do `list-header.css` o cite como fonte. Ele segue transparente no claro depois da
+correção, porque a sua única declaração de fundo mora dentro de regra predicada em `dark`
+(`theme-dark-components.css:4942`): no claro não existe regra nenhuma para ele.
+
+É a classe "componente cujo desenho só existe no escuro" — a mesma que barrou a família **8b**
+(`NOVO-93`) e que apareceu na medição da **8g** (`NOVO-94`, com `.empty-state__mark`). Token não
+resolve; precisa de regra base, e isso é decisão de desenho.
+
+### NOVO-97 · `NOVO` A E9-a entrega 32 regras, e o caminho até elas custou três tentativas · UI · em curso
+
+Primeira colheita medida da **E9-a**: 32 regras só-escuras de cor saem do repositório sem mudar um
+pixel em tema nenhum.
+
+**O caminho, porque ele é o resultado mais reaproveitável desta sub-etapa.**
+
+| tentativa | o que foi feito | resultado |
+|---|---|---|
+| 1 | apagar as 307 candidatas e ler o efeito | 6 mudanças **no claro** — impossível para regra predicada em `dark`. Causa: **17 regras de lista mista** (parte do seletor neutra, parte escura) apagadas inteiras |
+| 2 | recortar só as partes escuras da lista | **pior**: 274 mudanças no claro, nenhuma das 86 capturas intacta. Separar lista por vírgula com regex quebra `:is()` multi-linha — `lists/list-header.css:578` virou `:hover:not(:disabled))`, com parêntese desbalanceado |
+| 3 | regra de lista mista **não entra** | claro **zero** (as 2 leituras eram o piso de ruído). 2.598 mudanças no escuro, que é o sinal real |
+
+Da tentativa 3 saiu a lista de candidatas, e daí veio o `NOVO-95`: a prova por não-interseção não
+vale, porque a cascata não é monotônica. As 36 regras "provadas" por aquele atalho reprovaram com
+**75 elementos alterados**.
+
+**O que funcionou no lugar da bisecção.** Atribuir o resultado do diff **que foi de fato rodado** —
+não de um diff maior do qual se deduz. Perguntando quais das 36 casam com os 75 elementos
+alterados, saíram **4 culpadas**:
+
+```
+theme-dark-components.css:3782   .icon-btn--whatsapp
+theme-dark-components.css:3806   .icon-btn--delete
+theme-dark-components.css:5137   .person-row--highlight
+theme-dark-components.css:5161   .person-row--highlight .person-row__avatar
+```
+
+As duas primeiras pintam ícone de ação lendo `--action-success-*`/`--action-danger-*`; as duas
+últimas, a linha destacada do roster. São o caso que quebra a monotonicidade: competem com outra
+regra pelo mesmo elemento, então remover uma **promove** a outra.
+
+Removendo as 32 restantes, medido contra o estado imediatamente anterior: **4 elementos alterados,
+que são exatamente o piso de ruído** — o mesmo par de caminhos em `justificativas-lista`, nos dois
+temas.
+
+**Custo real do método:** duas capturas (~8 min cada) e uma atribuição (~4 min) por lote, e o lote
+termina com as culpadas **nomeadas** — não só com "a metade de cima reprovou", que é tudo o que a
+bisecção daria pelo mesmo preço.
+
+**Catracas, todas por mérito:**
+
+| | antes | depois |
+|---|---:|---:|
+| `theme-dark-components.css` | 5.788 linhas | **5.610** |
+| `!important` fora do bundle | 466 | **463** |
+| `audit_frontend_standards` | 239 | **237** |
+| `audit_ui_patterns` | 2.456 | **2.447** |
+
+**O que continua aberto:** 173 candidatas **nunca exercitadas** pelas 43 rotas em repouso — o
+elemento só existe com diálogo, menu ou dropdown aberto. Sobre elas a medição não diz nada, e
+tratá-las como inócuas seria repetir o `NOVO-90`. Medi-las exige estender o corpus aos estados de
+sobreposição, como o `NOVO-54` fez ao ir de 44 para 51 rotas.
+
+### NOVO-98 · `NOVO` Guardas do gravador do editor são inalcançáveis: regra defensiva duplicada do parser · QA · 0,5 d
+
+**Como apareceu.** Escrevendo a rede do `BE-13` fatia 3 eu ia "cobrir as 6 linhas descobertas" de
+`_salvar_roteiro_avulso_from_roteiro_state`. Cinco cenários, todos verdes — e **três passavam com o
+código quebrado**. A prova por inversão os reprovou como vazios. Investigando o porquê, com sondas no
+POST real:
+
+```
+tempo_adicional_min = -30 no POST   ->  chega ao gravador como 0
+duracao_estimada_min = "" no POST   ->  chega ao gravador como 285 (já derivada)
+trecho que duplica o retorno        ->  chega ao gravador já removido
+```
+
+`_build_roteiro_state_from_post` e `dedupe_roteiro_loop_retorno_final` **já normalizam** tudo isso a
+montante. As guardas correspondentes dentro do gravador (`max(0, …)`, a derivação de
+`duracao_estimada_min`, o descarte do trecho que duplica o retorno) são **cópias defensivas de regra
+que roda antes**. É por isso que `coverage` nunca as alcançou: não é lacuna de teste, é ramo
+inalcançável pelo caminho público.
+
+**Por que registrar em vez de apagar.** O gravador é público desde o `BE-13` fatia 3
+(`roteiros/services/editor_persistence.py`), e um chamador futuro pode entrar sem passar pelo parser
+— foi justamente o que o `BE-12` fez com `salvar_roteiro_do_oficio`. Apagar as guardas junto com a
+mudança de arquivo seria mudar comportamento numa fatia que se comprometeu a não mudar nenhum.
+
+**Correção:** decidir de que lado mora cada regra. Ou o gravador passa a confiar no estado validado
+(guardas saem, e o contrato "recebe estado já normalizado" vira docstring e teste), ou a
+normalização é dele e o parser para de fazê-la. Hoje as duas fazem, e a segunda é código que nenhum
+teste pode exercitar honestamente.
+
+**Escopo medido:** 3 guardas, 6 linhas, em `editor_persistence.py`.
+
+**Lição de método, que vale além deste caso:** cobertura descoberta não é sinônimo de teste faltando.
+Antes de escrever teste para uma linha vermelha, vale perguntar se ela é alcançável — a inversão
+responde em minutos e evita encher a suíte de cenários que não protegem nada. Este é o terceiro caso
+da etapa (`BE-11` e `BE-13` fatia 1 tiveram um cada), e os três só apareceram porque a inversão é
+obrigatória.
+
+### NOVO-99 ✅ RESOLVIDO · 🔴 · `NOVO` O formulário do editor de roteiro não recebe o token CSRF: salvar pela tela devolve 403 · HT · 0,25 d
+
+**Achado ao verificar o `BE-13` fatia 3 na tela.** O plano da fatia exigia *salvar de verdade pelo
+navegador*, porque o gravador só roda no POST. O POST voltou **403 — "Verificação CSRF falhou"**, nas
+quatro páginas do editor.
+
+**A causa, com o próprio Django dizendo o nome:**
+
+```
+UserWarning: A {% csrf_token %} was used in a template, but the context did not
+provide the value. This is usually caused by not using RequestContext.
+```
+
+`templates/roteiros/includes/_roteiro_editor.html:24` tem `{% csrf_token %}` dentro do
+`<form id="roteiro-editor-form">`. Mas os três lugares que incluem esse arquivo fecham o contexto com
+`only`:
+
+- `templates/roteiros/roteiro_form_page.html:25`
+- `templates/roteiros/partials/roteiro_form.html:1`
+- `templates/oficios/wizard_roteiro.html:20`
+
+O `only` isola o contexto e a lista explícita de variáveis **não passa `csrf_token`**. A tag então
+renderiza string vazia, e o formulário vai para o navegador sem token. Medido: **1 ocorrência de
+`csrfmiddlewaretoken` na página inteira**, e ela é do formulário de logout no cabeçalho — **zero
+dentro do formulário do editor**, em `/roteiros/novo/`, `/roteiros/<pk>/editar/` e nas duas variantes
+da etapa 2 do ofício.
+
+**Por que a suíte não pega.** O `Client` do Django é isento de CSRF por padrão
+(`enforce_csrf_checks=False`), então os 1.954 testes exercitam o POST do editor sem nunca passar pela
+checagem. É o `NOVO-20`/`NOVO-28` outra vez: ambiente de teste mais permissivo que produção.
+
+**A correção, provada:** acrescentar `csrf_token=csrf_token` à lista de cada um dos três `include`.
+Verificado em processo — com os três ajustados, o token aparece dentro do formulário nas três páginas
+e o aviso do Django some; e pelo navegador o POST passa a responder "Roteiro atualizado com sucesso."
+com redirecionamento para a lista. **A correção não entra no PR do `BE-13` fatia 3**: é template, é
+outra responsabilidade, e a fase 7 está sendo mexida por sessão paralela — conflito garantido.
+
+**Não é regressão da fase 7.** O `only` está nos três `include` desde `a4739eff` (01/08), o commit de
+importação do projeto. O `index.html` já passa `:csrf_token="csrf_token"` explicitamente para o
+componente de lista — a mesma armadilha, ali resolvida.
+
+**Vale varrer o resto:** qualquer `include ... only` que contenha `{% csrf_token %}` tem o mesmo
+defeito, e o aviso do Django é o detector — sobe no log a cada render.
+
+**Entregue:** os três `include ... only` agora passam `csrf_token` explicitamente. A rede verifica
+que o token está dentro de `#roteiro-editor-form` — não apenas no formulário de logout — em
+`roteiros:novo`, `roteiros:editar` e na etapa de roteiro do ofício. O teste financeiro adjacente
+também trava o caso de duas pessoas: a prévia mostra o total da equipe, o `Roteiro` persiste o valor
+unitário e o resumo aplica o efetivo uma única vez.
+<!-- Renumeração (3a vez nesta reconstrução): o `#312` (BE-13 fatia 3) mesclou antes deste ramo
+     e criou `NOVO-98` e `NOVO-99`. Este nasceu como `NOVO-98` no ramo da E9 e virou `NOVO-100`.
+     As anteriores foram com o `#304` (`NOVO-88`) e o `#305` (`NOVO-92`). Ramos paralelos tiram
+     número do mesmo contador sem reserva, e a colisão só aparece no merge. -->
+
+### NOVO-100 · `NOVO` O sistema de superfície do wizard só existia no tema escuro · UI · 0,5 d
+
+Terceira entrega da **E9**, e a que **destrava a família 8b** (`NOVO-93`).
+
+`theme-dark-components.css` ligava as quatro variáveis do sistema de superfície do wizard —
+`--step1-surface`, `--step1-panel`, `--step1-field`, `--step1-empty` — **dentro de uma regra
+predicada em `dark`**. No tema claro elas não existiam nesse escopo.
+
+**O tamanho do buraco, contado:**
+
+| leituras de `--step1-*` | quantas |
+|---|---:|
+| dentro de regra escura | 112 |
+| em regra que o claro alcança, **com** `fallback` | 62 |
+| em regra que o claro alcança, **sem** `fallback` | **32** |
+
+Essas 32 não resolviam nada no claro.
+
+**É a causa raiz do `NOVO-93`.** No escuro `border: 0` funciona porque o fundo separa as
+superfícies; levar só a borda para o claro tirava a fronteira **sem pôr nada no lugar**, porque o
+fundo dependia de um token que o claro não tinha. Era por isso que seis componentes ficariam
+branco-no-branco, entre eles o `.roteiro-trecho-card__leg`, onde a borda é a única coisa que separa
+Saída de Chegada.
+
+**Correção.** As duas regras que ligam os tokens (o cartão do wizard e o `.collection-panel`) são
+partidas em duas: um gêmeo `:is(html[data-theme])` carregando **só a definição das variáveis**, e a
+regra escura ficando com a **pintura** (`background`, `border-color`, `box-shadow`) e com a
+re-ligação de `--color-input-bg`. Pintura é decisão de tema; mexer nela é a 8b, com aprovação
+própria. Mesma especificidade, gêmeo adjacente — o argumento da E8.
+
+**Conclusão visual do sistema de superfície (11/08/2026).** Depois da aprovação do redesenho pelo
+dono, os consumidores estruturais do wizard também passaram a usar os tokens nos dois temas:
+cartão externo, painel intermediário, poço dos campos, blocos de período/destinos/documentos e
+chrome do custom select. O tema continua responsável somente pelos valores de cor. A prova dirigida
+da família Eventos/Wizard ficou em **0 divergências não-cor de conteúdo** nas larguras 1440, 800 e
+500 px.
+
+**Prova** (`sonda_mesmo_tema.py`, 41.754 elementos por caminho no DOM, com `--revelar --pseudo
+hover`):
+
+| | |
+|---|---:|
+| elementos alterados no **claro** | **36**, em 21 capturas |
+| elementos alterados no **escuro** | **2** |
+
+Os 2 do escuro são o piso de ruído. As maiores mudanças caem em `oficios-wizard-roteiro`,
+`roteiros-editar` e `roteiros-novo` — o wizard, como esperado.
+
+**Correção a um registro anterior:** eu havia escrito no `NOVO-93` que os `--step1-*` chegavam ao
+claro "com variável indefinida". Não globalmente — eles têm ligação neutra em
+`actions/action-system.css` (`.attach-signed-modal__dialog`) e `lists/record-list.css`
+(`.collection-panel`), e lá resolvem bem. O buraco era **só no escopo do wizard**. Isso muda o
+conserto: não era criar token, era ampliar escopo.
+### NOVO-54 (continuação 2) 🟠 As 72 regras de campo, classificadas por medição, e as 7 que caíram · UI · 1 d
+
+Terceira leva do `NOVO-54`. As duas primeiras deram à classe uma regra base e cobraram 30 dos 70
+`!important`. Esta ataca as **regras em si**, por remoção empírica: em vez de ler cada uma e julgar
+se "parece necessária", removi e medi.
+
+**Primeiro, o inventário estava vencido.** O `campo.json` da leva anterior tinha 68 regras; a
+globalização mecânica do `NOVO-68` reescreveu `[data-theme="dark"]` para `[data-theme]` em dezenas de
+seletores depois disso. Os instrumentos casavam regra por **texto do seletor**, então toda regra
+reescrita deixou de casar — e "não casou" foi lido como "não vence", isto é, como candidata a
+remoção. A poda falhou alto (`bloco em 2053 nao fecha`) em vez de apagar o bloco errado, mas por
+sorte, não por desenho. Re-extraído do CSS atual: **72 regras, 40 `!important`**.
+
+*Inventário de CSS tem prazo de validade de um merge.*
+
+**Dois instrumentos, porque um só não responde.** Um diz se a rota chega a **renderizar** o alvo da
+regra (`querySelectorAll` do seletor, sem as pseudo-classes de estado); o outro diz se a regra chega
+a **ganhar** alguma propriedade (`CSS.getMatchedStylesForNode`, percorrido em ordem de precedência,
+honrando `!important`). Sem o primeiro, "nunca venceu" confunde regra morta com regra que rota
+nenhuma abriu — a armadilha do `.alert` no `NOVO-60`.
+
+| destino | regras | o que significa |
+|---|---:|---|
+| vence | 23 | ganha alguma propriedade: fica |
+| candidata | 25 | alvo renderizado e mesmo assim não ganha nada |
+| sem cobertura | 16 | rota nenhuma renderizou o alvo: não dá para julgar |
+| pseudo-elemento | 8 | `::placeholder`, `::-webkit-scrollbar-*`: fora do alcance do CDP |
+
+**Candidata não é sinônimo de podável.** A captura mede o **repouso**: não sabe dizer o que acontece
+no `:hover` nem no `:focus`. Das 25 candidatas, 8 descrevem estado e ficaram de fora do lote — provar
+com medição de repouso seria trocar prova por suposição. Mais duas ficaram por intenção explícita:
+`:where(.cv-field__control)` e a variante `--textarea` "nunca vencem" **porque** `:where()` tem
+especificidade zero e perde para o seletor de elemento nu de `base.css` — que é exatamente o que o
+`NOVO-54` quer apagar *depois*. Removê-las seria andar para trás.
+
+**A bissecção, com o piso de ruído medido** (duas capturas do mesmo código, 112 telas, 59.006
+elementos):
+
+| lote podado | elementos alterados |
+|---|---:|
+| as 15 do lote inicial | 490 |
+| sem as 2 regras amplas do tema | 127 |
+| `list-header.css` sozinha responde por | 43 |
+| as 7 finais | **4 — o próprio piso** |
+
+**Caíram 7 regras**, provadas neutras: duas de `theme-dark-components.css` em `.composite-field__control`,
+uma duplicata de subconjunto (mesmo seletor de `roteiros.css:2412`, declarações contidas nas dela),
+`select.css` em `.field-with-action`, `justificativas.css` no textarea do quick-add, `usuarios.css` no
+modal de vínculo e a variante escura de `cadastros-config.css`.
+
+**Mais uma família inteira morreu por grep:** `.header-filter-datepicker` — 8 blocos em
+`page-shell.css`, incluindo um `@media` que só continha ela. A classe não existe em template, view
+nem script, e nada a monta em tempo de execução (`header-filter-input` e `header-filter-select`
+existem; `-datepicker` não). Uma das 8 é o `page-shell.css:2542` que aparece como "sem cobertura" na
+tabela acima — aqui o grep decidiu, e o navegador só confirmou.
+
+**Uma armadilha que custou uma rodada:** restaurar um **subconjunto** dos blocos podados reinsere
+cada um no índice que ele tinha no arquivo original, e com outros blocos ainda ausentes acima ele
+aterrissa no lugar errado. As chaves continuam balanceadas e o CSS continua válido — só que a ordem
+da cascata mudou, e apareceram 71 diferenças em `/roteiros/` que **não vinham de nenhuma regra
+removida**. Bissecção agora sempre parte do estado limpo (`git checkout`) e poda o subconjunto numa
+passada só.
+
+**O piso de ruído não era ruído de renderização — era o relógio.** `/justificativas/` mostra
+`ATUALIZADA 10/08/2026 23:32`, com precisão de minuto, e numa fonte proporcional os dígitos não têm
+todos a mesma largura. Duas capturas em minutos diferentes divergiam em 4 elementos; duas no mesmo
+minuto, em zero. O piso oscilava entre 0 e 4 conforme a hora da captura — e um piso que é loteria não
+serve de referência. A captura passou a guardar o **texto** de cada elemento e o comparador separa
+*"o texto mudou"* (reflow) de *"o estilo mudou"* (cascata). Com isso, piso e mudança medem a mesma
+coisa: **0 diferenças de estilo, 4 de conteúdo**, dos dois lados.
+
+**Uma rota do corpus era 404 e ninguém tinha notado.** `page.goto()` não levanta exceção em 404, 500
+nem em redirecionamento para o login: devolve a resposta e segue. `/prestacoes-contas/1/` não existe
+— o caminho real é `/prestacoes-contas/prestacao/<pk>/documentos/` — e a rota entrava na captura como
+uma tela de erro, sem campo nenhum, contando como cobertura. O instrumento agora confere o status e a
+URL final, e **aborta**. Foi assim que o defeito apareceu.
+
+**O instrumento do repositório subiu junto.** `scripts/medir_campos_computados.py` dizia, na própria
+docstring, que alcançava 8 rotas e que ampliar isso era "trabalho a fazer antes de remover essas
+regras". Ganhou `--rotas` (caminhos já resolvidos, com PK); troca de `networkidle` — que nunca
+fica ocioso nas páginas de roteiro — por espera até a árvore parar de crescer, porque o editor de
+roteiro só materializa os campos depois de `loadCities()` resolver e tempo fixo mediria a página
+antes de eles existirem; conferência de status HTTP e de URL final; e **aborta** quando uma rota
+falha, em vez de seguir comparando conjuntos de rotas diferentes. Medido: de 64 para **192
+combinações** rota|tema|estado e de 224 para **1048 leituras**.
+
+**Resta:** 65 regras. Das 25 candidatas, 8 de estado esperam um instrumento que meça `:hover`/`:focus`
+e 2 são a base intocável; 16 sem cobertura precisam de rota que abra modal, passo de wizard ou painel
+colapsado; 8 de pseudo-elemento precisam de outro caminho que não o `getMatchedStylesForNode`.
+
+### NOVO-54 (continuação 3) 🟠 As candidatas de estado foram medidas no estado certo · UI · 0,5 d
+
+A classificação anterior deixou oito candidatas de estado para trás porque o instrumento media
+repouso. A primeira tentativa de fechar essa lacuna achou quatro defeitos na própria régua antes de
+tocar no CSS:
+
+1. `medir_campos_computados.py` fixava um executável Linux em `/opt/pw-browsers`, embora o projeto
+   já tivesse `navegador_medicao.abrir_chromium()` para escolher o build correto no CI, na sessão
+   remota e no Windows;
+2. `focus` e `focus-visible` eram forçados sempre juntos, escondendo a diferença entre foco por
+   ponteiro e foco de teclado;
+3. transições e animações continuavam ativas. Duas capturas do mesmo código produziram **45
+   diferenças falsas**, com cores e sombras fracionárias fotografadas em frames distintos;
+4. a documentação dizia que conteúdo e estilo eram separados, mas `JS_COLETA` não registrava o
+   conteúdo do controle.
+
+A régua agora usa o lançador canônico, mede `focus`, `focus-visible` e a combinação separadamente,
+desliga movimento antes da captura, espera dois frames depois de cada pseudoestado e registra texto
+fora do dicionário de estilo. Duas execuções do mesmo código deram **0 diferenças de estrutura, 0 de
+estilo e 0 de conteúdo**, em **204 combinações rota|tema|estado e 1.116 leituras**.
+
+Com o piso limpo, as sete candidatas não-base caíram em três cortes, cada um medido em zero:
+
+- alternativas `:hover`/`:focus` repetidas dentro dos mesmos blocos que já continham
+  `.cv-field__control`/`.date-picker__control`, em `roteiros.css` e em três regras de
+  `theme-dark-components.css`;
+- o seletor de estado duplicado e o bloco de foco redundante do Quick Add em `list-header.css`;
+- o `outline: none` do campo do wizard de ofícios, inclusive no novo estado isolado `focus`.
+
+O oitavo bloco é o piso global de `:focus-visible` do `HT-01` e **fica**: não é dívida de contexto,
+é a trava de acessibilidade que impede as outras regras de apagarem o indicador de teclado.
+
+O corpus adicional também foi refeito sobre o banco descartável: **54 rotas, 312 combinações e
+1.488 leituras**. A conferência de status abortou corretamente ao encontrar `/eventos/1/` sem seed;
+a rota não foi contada como cobertura. Continuam para a próxima leva os 16 contextos interativos e
+os 8 pseudo-elementos (`::placeholder`/`::-webkit-scrollbar-*`).
+
+### NOVO-54 (continuação 4) 🟠 Pseudo-elementos medidos e a classe passa a possuir a base · UI · 0,5 d
+
+A régua passou a fotografar `::placeholder`, `::-webkit-scrollbar`, `-track` e `-thumb`, além de
+registrar a cadeia de ancestrais de cada controle. Também ganhou `--seletor`, porque mudar o seletor
+nu de `input/select/textarea` alcança controles que ainda não carregam `.cv-field__control` e medir
+só a classe não provaria neutralidade do corte.
+
+Duas capturas idênticas do novo formato deram o mesmo SHA-256: **54 rotas, 312 combinações e 1.272
+leituras** da classe. A captura ampla de `input, select, textarea` mediu **648 combinações e 7.260
+leituras**. Nela, trocar os seletores base de elemento por `:where(input, select, textarea)` e
+`:where(textarea)` produziu **0 diferenças de estilo, pseudo-estilo e estrutura**; 1.596 diferenças
+eram apenas valores dinâmicos de controles ocultos e ficaram corretamente fora do estilo. Como
+`field.css` é carregado depois de `base.css`, a regra canônica da classe passa finalmente a possuir
+a aparência sem quebrar controles legados que ainda dependem do seletor de elemento.
+
+As oito regras de pseudo-elemento foram retiradas juntas e repetidas contra o mesmo corpus amplo:
+**0 diferenças de pseudo-estilo**. Todas eram redundantes. O bloco
+`.justificativa-panel .cv-field__control--textarea` também caiu: o grep do repositório inteiro só
+encontrava a própria regra e `test_wizard_justificativa.py` exige explicitamente que essa classe não
+seja renderizada.
+
+O inventário atual fica em **47 regras, 13 arquivos, 0 pseudo-regra**. A E7c permanece parcial: os
+contextos de diário e `field-with-action` ainda não renderizam um `.cv-field__control` no corpus, e
+serão classificados sem inferir ausência a partir de rota visitada.
+
+### NOVO-54 (continuação 5) ✅ Os contextos interativos fecham a E7c · UI · 0,5 d
+
+O corpus ganhou as duas rotas que faltavam: `/prestacoes-contas/prestacao/1/diario/` e
+`/planos-trabalho/atividades/`. A primeira materializou **120 leituras** dentro de
+`.diario-trecho-block`; a segunda, **48** dentro de `#quick-add-atividade`. `field-with-action` já
+existia em **156 combinações**, mas seus controles atuais são `form-select` e `search-picker`, nunca
+um ramo exclusivo de `.cv-field__control`.
+
+Com essa cobertura, foram retirados somente ramos de seletor duplicados que casavam o mesmo elemento
+por `form-control`, `input`, `select` ou `textarea`: três regras de `field-with-action` em cada uma
+das duas folhas, duas do diário, uma do efetivo e duas da solicitação de equipe. O estilo permanece
+no contexto; saiu a segunda maneira de selecionar o mesmo nó.
+
+A medição antes/depois cobriu **56 rotas, 672 combinações rota|tema|estado e 7.536 leituras**:
+**0 diferenças de estilo, pseudo-estilo e estrutura**. As 1.656 diferenças eram somente valores
+dinâmicos, deliberadamente separados do estilo. O inventário fecha em **36 regras vivas de base, a11y ou contexto,
+11 arquivos e 0 pseudo-regra**, contra 72 regras no início da classificação. A regra canônica possui
+a base, e os contextos restantes são variações medidas, não correções cegas. **E7c concluída.**
+
+### NOVO-105 · `NOVO` A 8b precisa de três portões, não de um; e o piso de ruído era o relógio · QA · fechada na medição
+
+Duas correções a coisas que **eu mesmo escrevi** nesta sessão, ambas achadas medindo.
+
+**1. O "destrava a 8b" do `NOVO-100` valeu para menos regras do que eu disse.** A E9-c levou os
+`--step1-*` para um escopo que alcança o wizard, e eu concluí daí que a família 8b estava liberada
+dentro das rotas de wizard. Não estava: o token existir no claro não é o mesmo que o componente
+*consumir* o token. Medido regra a regra na família (41 com efeito contra o `main` de 11/08):
+
+| portão | o que ele pergunta | sobrevivem |
+|---|---|---:|
+| — | regras da família com efeito | 41 |
+| **alcance medido** | os elementos que a regra casa estão **todos** em rota de wizard? (`querySelectorAll` rota a rota) | 6 |
+| **âncora estrutural** | o seletor começa em `[data-travel-document-wizard-*]`, e a declaração é mesmo `border: 0`? | 4 |
+| **fronteira** | no **claro**, depois da mudança, o elemento ainda se distingue do pai — fundo próprio, sombra ou borda que sobrou? | **1** |
+
+O terceiro portão é o `NOVO-93` transformado em medição, e ele reencontrou sozinho, a partir dos
+pixels, os mesmos componentes que o `NOVO-93` tinha listado à mão: `.roteiro-trecho-card__leg` e
+`.roteiro-mapa__canvas-head .cv-btn--secondary` ficam **branco no branco**. O `NOVO-93` estava
+certo; o otimismo do `NOVO-100` é que estava errado.
+
+**Por que os dois primeiros portões não bastam.** O lote anterior foi recortado procurando
+`travel-document-wizard` no texto do seletor, e reprovou movendo 15 elementos no escuro. O atributo
+tem a palavra "wizard"; o elemento não mora em rota de wizard —
+`:is([data-travel-document-wizard-step1], …) .search-picker__selected-panel` casa em
+`oficios-detalhe`, `justificativas-lista` e `viatura-editar`. **Grep não é medição**, terceira vez
+nesta sessão.
+
+**2. O piso de ruído de 4 elementos nunca foi ruído de renderização — era o relógio.** É o mesmo
+defeito que o `075d77df` achou no `medir_campos_computados.py`, e ele valia igual nas sondas da E9,
+porque o furo é do método e não do arquivo. `/justificativas/` mostra `ATUALIZADA <data> HH:MM` com
+precisão de minuto; numa fonte proporcional os dígitos não têm todos a mesma largura, e como
+`width`/`height` estão na rede de segurança geométrica da sonda, o minuto virando entre duas
+capturas movia 4 elementos. Guardando um hash do texto ao lado do hash de estilo, o comparador
+separa **reflow** de **cascata**:
+
+```
+duas capturas do MESMO código, 41.754 elementos pareados por caminho no DOM
+  antes : 4 elementos "mudaram"        <- o minuto virou
+  agora : 0 de estilo, 30 só de texto
+```
+
+Isso importa retroativamente: todo "zero" que eu afirmei descontando um piso de 4 era, na verdade,
+"zero ou quatro". Agora é zero. As três correções do `075d77df` — status HTTP e URL final, espera
+pela árvore em vez do relógio, e o texto fora do diff de estilo — estão nas sondas
+`sonda_mesmo_tema.py`, `atribuir_e9.py` e `recortar_8b.py`; nas duas últimas a rota quebrada
+**aborta**, porque ali "não casou com nada" é justamente o critério que aprovaria a remoção.
+
+**O que entrou.** Uma regra, `theme-dark-components.css:2190` — os `−`/`+` dos steppers de tempo do
+editor de roteiro. Escuro **pixel-idêntico** (mesmo md5 no recorte do componente), claro com 18
+elementos alterados nas três rotas de roteiro, e os 10 elementos-alvo mantendo fronteira por fundo
+próprio contra o painel. As outras 40 regras da família continuam bloqueadas pelo `NOVO-93`: elas
+não precisam de mais medição, precisam de **decisão de desenho** sobre qual superfície o claro
+recebe no lugar da borda.
+### NOVO-101 ✅ RESOLVIDO · `NOVO` A catraca `P-01` media 24 com 35 no chão: prestações nunca entrou na lista · QA · 0,25 d
+
+`scripts/audit_django_architecture.py` conta acessos de manager em módulo de view, e só olha dois
+lugares: arquivos chamados `views.py` e a lista `P06_SPLIT_VIEW_MODULES`. Quando prestações foi
+fatiada em módulos por tela — como ofícios e planos de trabalho, que **estão** na lista —, os cinco
+módulos novos não foram acrescentados.
+
+Resultado medido: **11 acessos de manager fora da medição** (`diario_views` 4, `model_views` 3,
+`document_views` 2, `rt_views` 2). A catraca dizia **24**; o chão era **35**. Enquanto o buraco
+existisse, mexer em prestações não movia nenhum gate — e foi por isso que apareceu: a fatia 1 do
+`BE-14` tirou ORM de `rt_views.py` e o número não se mexeu.
+
+**Correção (`BE-14` fatia 1):** os cinco módulos entram na lista, a catraca vai a **33** — 35 menos
+os 2 que a própria fatia devolveu —, e `core/tests/test_view_module_boundaries.py` ganha a asserção
+de contagem de prestações, que é o teste que impede esvaziar a métrica por forma.
+
+**O número subiu, e a regra 5 do `AGENTS.md` continua valendo.** Ela proíbe a catraca subir por
+regressão; esta subiu por passar a medir o que já estava lá. É a diferença entre piorar e parar de
+mentir. Daqui em diante volta a só descer.
+
+**`prestacoes_contas` não entrou em `APP_MODULES`** do mesmo teste, de propósito:
+`test_facades_views_ficam_enxutas` exige `views.py` com no máximo 160 linhas, e o de prestações tem
+**743**. As duas listas medem coisas diferentes; fazer daquele arquivo uma fachada é `P-06`.
+
+**Vale conferir as outras catracas com lista fixa.** O defeito não é do número, é do **cadastro**: uma
+métrica que depende de lista escrita à mão envelhece toda vez que um app é fatiado, e falha em
+silêncio — para baixo, que é o pior sentido.
+
+### NOVO-102 ✅ RESOLVIDO · `NOVO` Gravação em laço escondida em `view_common.py`, fora de qualquer varredura · QA · fechada na medição
+
+`_marcar_servidores_pendentes` percorria os servidores pendentes de um ofício e gravava um por um, sem
+transação. Ela é chamada pelas views de RT, diário e documentos — em 11 sites — e **nenhuma varredura
+de `*views*.py` a encontrava**, porque o arquivo se chama `view_common.py`: tem "view", não tem
+"views".
+
+A metade que sobrava era pior que a média do `BE-14` porque **não se conserta sozinha**: quem já saiu
+de "pendente" deixa de entrar no filtro, então a gravação seguinte nem tenta de novo.
+
+**Correção (`BE-14` fatia 1):** as duas funções foram para `services.py` como públicas, e a que
+percorre o laço ganhou `@transaction.atomic`, com teste provado por inversão.
+
+**O registro é sobre o método, e vale para as fatias 2 a 4:** varrer por nome de arquivo perde código.
+O critério certo é "módulo alcançado a partir de `urls.py`", não "arquivo cujo nome casa com um
+padrão" — e é o mesmo mecanismo do `NOVO-101`, um andar acima.
+
+### NOVO-103 · `NOVO` As duas rotas da solicitação divergem em três pontos, e a divergência estava registrada com o ID errado · BE · 1 d · decisão de produto
+
+Número de solicitação, data de liberação e prazo limite são gravados por **dois caminhos** — o lote
+sem JS (`views.py::index`, ação `save_solicitacoes`) e o autosave com JS
+(`prestacao_servidor_solicitacao_autosave`). Eles nunca se comportaram igual:
+
+| | lote (sem JS) | autosave (com JS) |
+|---|---|---|
+| data inválida | **engole em silêncio** e mantém a anterior | devolve `ok=False` com mensagem |
+| status do servidor | **não marca** — fica em `PENDENTE` | marca "em preenchimento" |
+| erro no meio | segue para os outros servidores | para, **com o que já gravou no banco** |
+
+A primeira e a segunda estavam fotografadas em `test_solicitacao.py:178` e `:192`. A terceira não
+estava, e entrou na rede da fatia 2 do `BE-14`: digitar número e data juntos, com a data inválida,
+devolve erro **com o número já gravado** — e a tela não diz isso.
+
+**Efeito prático:** o status da prestação passa a depender de o navegador ter JavaScript, e quem
+salva sem JS não descobre que a data não entrou.
+
+**O ID estava errado.** Os dois testes citam `NOVO-09` no docstring, mas o `NOVO-09` do catálogo é
+*"modelo de justificativa é global e o padrão de uma área derruba o das outras"* — outro defeito, em
+outro app, já resolvido. A divergência das solicitações **nunca teve entrada própria**; foi
+registrada num número que pertencia a outra coisa, e por isso ninguém a encontrava procurando.
+
+**Correção:** decidir qual comportamento é o certo e aplicá-lo aos dois caminhos. Não é trabalho de
+camada — é de produto, e as três perguntas são independentes:
+
+1. data inválida deve avisar ou preservar em silêncio?
+2. salvar sem JS deve tirar o servidor de "pendente"?
+3. erro numa data deve desfazer o número já digitado, ou mantê-lo?
+
+A fatia 2 do `BE-14` **preservou os três comportamentos** de propósito e travou cada um com teste, o
+que torna a mudança futura barata e verificável: qualquer resposta às perguntas acima reprova um
+teste específico, e é isso que se quer.
+
+**Custo do que já foi feito:** os dois caminhos hoje moram no mesmo módulo
+(`prestacoes_contas/solicitacao_services.py`), lado a lado, com a tabela acima no docstring. Unificar
+virou uma edição local, não uma caçada.
+
+### NOVO-104 · `NOVO` Arquivo órfão no storage não tem quem varra · BE · 0,5 d
+
+Resíduo conhecido da fatia 3 do `BE-14`, registrado para não virar surpresa.
+
+Com `atomic` na linha e `transaction.on_commit` no arquivo, a combinação perigosa — linha viva
+apontando para arquivo destruído — deixou de existir. A outra combinação continua possível: **o
+callback falhar depois do commit**. Aí a linha já foi e o arquivo fica no disco, alcançável por
+ninguém. `on_commit` não conserta isso, e nenhuma ordenação conserta: são dois sistemas, e o commit
+de um não é transacional com o outro.
+
+O dano é pequeno por evento — disco ocupado, não dado errado — e por isso o resíduo é aceitável. O
+que falta é **poder saber**: hoje não existe nada que compare o storage com a tabela. Os comandos de
+diagnóstico do repositório (`roteiros/management/commands/limpar_roteiros_orfaos.py`,
+`diagnosticar_roteiros.py`, `prestacoes_contas/.../sincronizar_prestacao_servidores.py`) olham só
+banco.
+
+**Correção:** um comando que liste arquivos sob o diretório privado de prestações sem linha
+correspondente em `PrestacaoDocumentoAnexo`, com `--apagar` opcional e saída legível. Mesma forma dos
+irmãos: diagnostica por padrão, só apaga quando mandado.
+
+**Vale para além dos anexos:** todo `FileField` do sistema tem o mesmo buraco. Começar pelos anexos
+de prestação, que são os únicos com exclusão pela tela, e ver se o resto compensa.
+
+### NOVO-106 ✅ RESOLVIDO (11/08/2026) · `NOVO` A régua de CSS não contava folhas com uso zero · QA · 0,5 d
+
+`scripts/medir_css_por_rota.py` construía o conjunto de folhas a partir dos IDs devolvidos por
+`CSS.stopRuleUsageTracking`. O CDP não devolve intervalo para uma folha externa quando nenhuma
+regra casa; por isso a folha desaparecia inteira do denominador. A métrica dizia medir “CSS
+entregue”, mas ignorava exatamente o CSS entregue e totalmente inútil.
+
+O caso que revelou o buraco foi `templates/prestacoes_contas/index.html`. A retirada simultânea de
+`oficios.css` e `roteiros-list.css`, baseada no catálogo que atribuía 0,0% aos dois, derrubou os
+bytes casados em **10.167** e teria causado regressão visual. O diagnóstico por folha mostrou:
+
+- `oficios.css`: **64.095 bytes entregues, 9.383 casados**; contém a família compartilhada
+  `record-card`/`person-row`/`fact-block` usada pela listagem;
+- `roteiros-list.css`: **7.180 bytes entregues, zero casados**;
+- `prestacoes_contas.css`: **23.003 bytes entregues, zero casados no estado claro medido** — não é
+  prova de arquivo morto, porque a régua ainda não abre todos os estados nem alterna o tema.
+
+**Correção.** O cliente registra `CSS.styleSheetAdded` antes de habilitar o rastreamento e usa a
+união entre folhas externas anunciadas e folhas presentes na cobertura. O JSON passa a atribuir
+bytes entregues/casados por URL; `--route` permite diagnóstico de uma rota e
+`--include-matched-css` inclui os fragmentos exatos sem inflar a execução canônica das 43 rotas.
+Folhas internas sem URL continuam fora.
+
+**Reauditoria.** O intervalo oficial mudou de **11,3369%–70,5559%** para
+**11,1003%–55,8871%**. Os 29 pisos afetados em `scripts/tetos_front.json` foram corrigidos para o
+menor entre o piso anterior e a medição honesta — não se aproveitou a correção para subir os outros
+14 pisos. Esta é a mesma exceção documentada no `NOVO-101`: a catraca enfraquece uma vez porque
+parou de omitir dívida preexistente; depois volta a caminhar apenas no sentido exigido.
+### NOVO-107 · `NOVO` A fixture de prestação monta ofício sem roteiro, e o teste de diário fica verde por omissão · QA · 0,25 d
+
+Achado na fatia 4 do `BE-14`, e é do tipo que não aparece em revisão de código: **o teste passa**.
+
+`PrestacaoFixturesMixin.criar_prestacao` monta um ofício **sem roteiro**. As linhas do diário nascem
+de `sincronizar_trechos`, que percorre os trechos do roteiro — sem roteiro, nenhuma linha. O autosave
+do diário então percorre uma lista vazia, grava zero vezes, devolve `200 {"ok": true}`, e **todo
+cenário escrito sobre ele fica verde**, inclusive o de rollback, que é exatamente o que deveria
+reprovar antes da correção.
+
+Foi descoberto porque um cenário passou antes de a correção existir — a inversão obrigatória do
+`AGENTS.md` é o que o pegou. Sem ela, a fatia teria entregue quatro testes que não mediam nada,
+todos verdes, com a aparência de rede.
+
+**Contido na fatia 4:** `_com_roteiro(oficio, trechos=N)` dá o roteiro, e
+`test_a_fixture_produz_linha_de_diario` reprova se o cenário vazio voltar. Isso resolve o módulo de
+teste do diário, **não a fixture**.
+
+**O que falta:** decidir se `criar_prestacao` passa a montar roteiro por padrão. A favor: ofício de
+prestação sem roteiro não existe em produção — o fluxo inteiro nasce de um roteiro, e a fixture está
+fotografando um estado impossível. Contra: dezenove módulos de teste usam essa fixture, e mudar o
+padrão mexe em todos de uma vez. O caminho provável é um parâmetro `com_roteiro=True` como padrão
+novo, com a migração feita por módulo.
+
+**A família é maior que o diário.** Qualquer teste cuja asserção dependa de uma coleção derivada do
+roteiro (trechos, diárias por trecho, o próprio diário) tem o mesmo risco de medir vazio. Vale uma
+varredura por `criar_prestacao` antes de escrever a próxima rede sobre prestações.
+
+### NOVO-108 ✅ RESOLVIDO · `NOVO` A contagem por AST de gravação-em-view erra nos dois sentidos e não serve mais de alvo · QA · 0,5 d
+
+Achado na fatia 5 do `BE-14`, medindo o resíduo item a item em vez de confiar no total.
+
+O número que guiou as cinco fatias — "gravações fora de transação em módulo de view", por `ast` — foi
+útil enquanto o defeito era denso. Chegando a 17, ele deixou de descrever qualquer coisa.
+
+**Superconta cinco sites.** `Collector.delete()` do Django já abre
+`transaction.atomic(using=..., savepoint=False)` — conferido no fonte instalado, não de memória.
+Então `plano.delete()`, `ordem.delete()`, `termo.delete()`, `modelo.delete()` e `session.delete()`
+**não são risco de gravação parcial**. São dívida de camada (`P-06`), e envolvê-los em `atomic` não
+mudaria uma linha de comportamento.
+
+**Superconta mais dois.** Os dois `oficio.save()` de `oficios/wizard_document_views.py::wizard_documentos`
+estão em ramos `if nav_action == …` mutuamente exclusivos, cada um com `return` próprio. A função é
+contada como "2+ gravações sem transação" e nunca grava duas vezes.
+
+**E subconta o pior caso que sobrou.** `eventos/views.py::detalhe` conta **1**. O caminho real é:
+
+```
+evento.save()
+form.save_m2m()
+sincronizar_documentos_vinculados(evento)   # 5 tipos x até 2 UPDATE em massa
+garantir_termo_automatico(evento)           # cria TermoAutorizacao
+```
+
+Ordem de doze gravações em seis tabelas, nenhuma em transação. Uma falha no meio deixa os documentos
+**meio religados**: um ofício apontando para o evento e um termo não, sem nada na tela dizendo isso.
+A contagem vê 1 porque as gravações moram atrás de chamadas de função, e a varredura sintática não
+atravessa chamada.
+
+**Por que isto vira linha de catálogo em vez de virar catraca.** A correção óbvia — fazer o script
+seguir chamadas — é análise interprocedural, cara de escrever e fácil de errar em silêncio, que é o
+pior defeito possível num medidor. E há uma correção mais barata que resolve o que importa: **parar
+de usar este número como alvo**. Ele já fez o trabalho dele.
+
+**Correção:** a fatia 6 do `BE-14` é dirigida por leitura de caminho, começando por
+`eventos/views.py::detalhe`. O contador continua no repositório como relatório, e o catálogo passa a
+registrar, ao lado de cada número, quantos dos itens são `delete()` e quantos são ramo exclusivo —
+para que o próximo leitor não tome 17 por 17 defeitos.
+
+**Executado na fatia 6:** o caminho foi encapsulado em `salvar_identificacao_evento`, com transação
+única e teste de inversão que alcança as gravações escondidas nos cinco vínculos e no termo
+automático. O relatório AST permaneceu em 27 no gate `P-01`; ele continua informativo, mas não foi
+usado como falsa prova de que a correção não moveu o risco real.
+
+### NOVO-109 ✅ RESOLVIDO · `NOVO` O retry da numeração só funcionava no PostgreSQL, e o teste que o cobria fabricava a prova · QA · 0,25 d
+
+Achado na fatia 1 do `BE-15`, escrevendo um teste de colisão **real** em vez de sintética.
+
+As três implementações de numeração decidiam "isto foi corrida perdida?" lendo o texto do
+`IntegrityError`:
+
+```python
+if "oficios_oficio_area_ano_numero_unique" not in str(exc):
+    raise
+```
+
+**A mensagem não é portátil.** Medido nos dois bancos que a suíte roda:
+
+| banco | mensagem |
+|---|---|
+| PostgreSQL | `duplicate key value violates unique constraint "oficios_oficio_area_ano_numero_unique"` |
+| SQLite | `UNIQUE constraint failed: oficios_oficio.area_id, oficios_oficio.ano, oficios_oficio.numero` |
+
+O SQLite **não cita o nome da constraint**. O `not in` era sempre verdadeiro e o retry
+re-levantava na primeira colisão: em metade da suíte o laço de três tentativas era código morto.
+
+**Em produção não havia defeito** — produção é PostgreSQL, e lá o casamento funcionava. O defeito
+é de *garantia*: metade das execuções não exercia o mecanismo, e ninguém saberia se a parte
+PostgreSQL quebrasse.
+
+**E o teste que existia não teria avisado.** `test_reserva_repete_apos_colisao_de_worker_antigo`
+levantava um `IntegrityError` **fabricado**, já contendo o texto que o código procurava. Ele provava
+que o laço repete; nunca provou que a mensagem do banco casa com o nome procurado. Um teste que
+constrói a própria evidência não é rede — é espelho.
+
+**Correção (fatia 1 do `BE-15`):** a pergunta passou a ser feita ao banco, não à mensagem dele —
+*o número que eu escolhi está ocupado agora?* Se está, foi colisão e vale repetir; se não está, a
+violação foi de outra constraint e sobe. É portátil, sobrevive a renomear a constraint, e é **mais
+estreita** que o casamento por texto, porque não engole violação alheia. Os dois testes de colisão
+(ofício e OS) passaram a forçar uma colisão real e valem igual nos dois bancos.
+
+**Vale procurar a mesma forma noutros lugares:** qualquer `except IntegrityError` que decida por
+substring da mensagem tem este problema. Uma varredura por `not in str(exc)` é barata e ainda não
+foi feita.
+
+### NOVO-110 ✅ RESOLVIDO · `NOVO` Renderer tardio deixa selects e multiselects nativos visíveis · JS · 0,25 d
+
+O shell executa `fields-init.js` antes do bundle de formulários. Quando esse bundle chega depois de
+`DOMContentLoaded`, `picker.js` se registra e faz o primeiro passe imediatamente, ainda sem o
+renderer de `picker-select.js`. O renderer entra na lista logo depois, mas nenhum segundo passe é
+disparado. O resultado é um `<select multiple>` nativo visível, sem trigger customizado e sem erro
+no console — reproduzido no tipo do evento em `eventos:guiado_etapa`.
+
+**Correção.** `registerRenderer()` inicializa o renderer recém-registrado sobre o documento quando
+o DOM já está pronto; o registro continua idempotente e o enhancer permanece responsável por nós
+inseridos depois. Um teste Vitest reproduz a ordem real `shell → picker → renderer` e exige que o
+controle nativo fique oculto, com combobox e listbox customizados presentes.
+
+### NOVO-111 ✅ RESOLVIDO · `NOVO` Accent dourado vazava para o tema claro e accents azuis vazavam para o escuro · UI · 0,5 d
+
+O contrato visual confirmado pelo dono é binário: **tema claro usa azul e variações de azul para
+accent; tema escuro usa dourado e variações de dourado**. O sistema ainda tinha um único
+`--color-accent` dourado no `:root`, por isso filetes, stepper, tabs, chevrons, badges, brilhos e
+realces do claro herdavam a paleta escura. No sentido inverso, os realces da sidebar escura ainda
+usavam bordas e halos azulados.
+
+**Correção.** A escala clara agora define `accent` azul (`#155b9a`, hover `#17476f`, soft
+`#deebfb`) e a camada escura conserva a escala dourada (`#d8a21b`, hover `#e0ab3c`, soft
+`#3b3320`). Gradientes, badges, filetes, sidebar e brilho consomem os tokens do tema. `warning`
+continua dourado no claro como estado semântico e sua borda foi desacoplada de `accent`, para que
+trocar a identidade visual não transforme aviso em azul. O texto sobre accent é branco no azul
+claro e azul-marinho sobre o dourado escuro.
+
+**Prova.** Capturas autenticadas da família Eventos/Wizard em claro e escuro, nas larguras 1440 e
+500 px; teste de contrato cobre as duas escalas, o contraste de texto e o desacoplamento de
+`warning`. Contraste medido do texto sobre o accent: **7,01:1** no azul claro e **6,49:1** no
+dourado escuro.
+
+### NOVO-112 ✅ RESOLVIDO · `NOVO` Custom Select aberto tinha geometrias diferentes no claro e no escuro · UI · 0,5 d
+
+O `Custom Select v2` parecia pertencer a dois sistemas. No escuro, a opção selecionada tinha
+trilho lateral, recuo próprio e check em bloco de accent à direita; no claro, o check ficava solto
+à esquerda, sem trilho e com outro espaçamento. Menu, opções, scrollbar, estados desabilitado e de
+erro também recebiam dimensões e bordas apenas sob `data-theme="dark"`.
+
+**Correção.** Toda a geometria do componente passou ao seletor compartilhado `html[data-theme]`:
+altura, padding, gap, raio, deslocamento, scrollbar, trilho e bloco do check são idênticos. As
+cores continuam vindo dos tokens: azul e variações no claro; dourado e variações no escuro. A
+sombra usa `--shadow-custom-select-menu`, com a mesma geometria e pigmento próprio de cada paleta.
+
+**Prova.** O menu aberto é comparado em claro/escuro a 1440, 800 e 500 px; o contrato automatizado
+proíbe que os quatro seletores estruturais do componente voltem a ser exclusivos do tema escuro.
+
+### NOVO-113 ✅ RESOLVIDO · `NOVO` Listas e superfícies claras invertiam a hierarquia do desenho escuro · UI · 0,5 d
+
+O card canônico de listagem ainda recebia tipografia, cabeçalho, subcards, trechos e estados apenas
+sob `data-theme="dark"`. No claro, o mesmo Ofício abria e quebrava em caixas diferentes. Além disso,
+o wizard claro havia invertido a referência aprovada: blocos internos brancos e controles
+azul-cinza, quando o contrato pedido é bloco azul-cinza com controle branco.
+
+**Correção.** A estrutura completa de `.record-card` passou ao seletor compartilhado
+`html[data-theme]`. A paleta continua temática: superfícies internas azul-cinza e accents azuis no
+claro; grafite-azulado e accents dourados no escuro. O wizard usa três tokens semânticos separados
+para card, bloco e campo; no claro eles resolvem respectivamente para branco, `#eef4fc` e branco,
+sem alterar a composição escura.
+
+**Prova.** No Ofício 91, 112 nós foram comparados entre claro e escuro: zero diferenças de dimensão,
+posição relativa ou propriedade não-cor. No wizard de dados, a sonda computada confirma card
+`#fff`, bloco `#eef4fc` e campo `#fff`; contrato automatizado impede a volta dos seletores de lista
+exclusivos do escuro e da hierarquia de superfícies invertida.
+
+### NOVO-114 ✅ RESOLVIDO · `NOVO` A sonda de mesmo tema era evidência citada, mas não versionada · QA · 0,5 d
+
+Quatro trechos deste catálogo e a própria E9 citavam `sonda_mesmo_tema.py` como prova de que uma
+alteração preservava o mesmo tema entre dois estados do código. O arquivo, porém, nunca entrou no
+histórico Git. A evidência existia só na sessão que a produziu: não era reproduzível por outra
+pessoa, não tinha contrato automatizado e não podia servir de gate para as próximas fatias.
+
+**Correção.** A sonda agora recebe dois URLs e compara o mesmo tema, rota e largura. Cada elemento é
+chaveado por caminho estrutural no DOM; diferenças de estrutura e de estilo computado são separadas,
+e as duas ordens de captura são obrigatórias. Se ordem, texto correlacionado ou estrutura mudar o
+resultado, a combinação aborta. Texto/valor variável é metadado diagnóstico — nunca salvo-conduto
+para uma mudança de CSS. O tema é gravado antes de a rota inicializar, e rotas públicas são medidas
+em contexto anônimo separado das protegidas, inclusive quando se fornece `--storage-state`.
+
+O padrão cobre **43 rotas × 3 larguras × 2 temas = 258 combinações**, com teto inicial de zero para
+estrutura e estilo. `--revelar` expõe `[hidden]`/`aria-hidden` e abre `details`; `--pseudo` força
+`hover`, `focus`, `focus-visible` ou `active`. O contrato puro tem dez cenários e um smoke real da
+tela pública provou duas sessões, duas ordens e zero diferença; o corpus completo continua sendo a
+prova exigida para cada diff visual da E9, não uma inferência reaproveitada de outro diff.

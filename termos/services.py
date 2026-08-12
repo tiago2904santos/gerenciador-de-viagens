@@ -10,6 +10,7 @@ from cadastros.models import Servidor
 from cadastros.models import Viatura
 from cadastros.selectors import build_configuracao_context
 from core.utils.masks import format_placa
+from core.deletion import excluir_com_protecao
 
 from documentos.services.facade import DocumentoFacade
 from documentos.services.facade import DocumentoGerado
@@ -37,6 +38,10 @@ from oficios.documents import build_termo_payload
 from oficios.models import Oficio
 
 from .models import TermoAutorizacao
+
+
+def excluir_termo(instance: TermoAutorizacao) -> None:
+    excluir_com_protecao(instance)
 
 logger = logging.getLogger(__name__)
 

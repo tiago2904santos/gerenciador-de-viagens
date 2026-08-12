@@ -85,14 +85,15 @@ jobs:
       - name: Block new frontend standards debt
         # Catraca: este número só desce. A Etapa 1 levou 465 → 449; a Etapa 7
         # levou 449 → 438 na fase 2 e 438 → 417 na fase 1.
-        run: python scripts/audit_frontend_standards.py --max-warnings 246
+        run: python scripts/audit_frontend_standards.py --max-warnings 245
 
       - name: Block new UI pattern debt (NOVO-76)
-        # Catraca inaugurada em 09/08/2026 com 2.622 achados de dívida real.
+        # Catraca inaugurada em 09/08/2026 com 2.622 achados de dívida real;
+        # a poda de seletores agrupados da E2 levou 2.622 → 2.583.
         # O auditor anterior sempre saía 1 e contava duas vezes o bundle gerado,
         # além de tratar a própria definição de token como cor indevida. Sem
         # --max ele continua útil como relatório local; no CI o teto só desce.
-        run: python scripts/audit_ui_patterns.py --max 2622 --quiet
+        run: python scripts/audit_ui_patterns.py --max 2583 --quiet
 
       - name: Block new dead CSS (UI-01)
         # Catraca nova, e o teto nasce em ZERO. O `UI-01` mediu 981 blocos de
@@ -136,10 +137,22 @@ jobs:
         # do P-01: integracoes/google_drive (10), core (9), documentos (4),
         # oficios (4), roteiros (2) e justificativas (1). Alvo final segue
         # sendo zero; ver docs/PADRAO_SELECTORS.md.
+        #
+        # 24 → 33 (BE-14 fatia 1, NOVO-100): **o número subiu de propósito.**
+        # Prestações foi fatiada em módulos por tela, mas os cinco módulos
+        # nunca entraram em P06_SPLIT_VIEW_MODULES — 11 acessos de manager
+        # nunca foram medidos. A catraca não regrediu: ela passou a medir o
+        # que já estava no chão. A própria fatia devolveu 2 dos 11
+        # (rt_views.py foi a zero), e o saldo entra como 9. Daqui em diante
+        # volta a só descer. E desceu: 33 → 31 na fatia 3, quando a
+        # persistência dos anexos saiu de document_views.py, e 31 → 27 na
+        # fatia 4, quando diario_views.py foi a zero (a gravação do diário
+        # para diario_services.py, a consulta do auto-preenchimento de
+        # motorista para selectors.py). Dos 11 nunca medidos, 8 já voltaram.
         # P-05: todo `except Exception` do Drive começa com captura estruturada.
         run: >-
           python scripts/audit_django_architecture.py
-          --max-orm-em-view 24
+          --max-orm-em-view 27
           --max-drive-except-without-capture 0
           --max-sync-document-generations 0
 

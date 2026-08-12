@@ -16,6 +16,12 @@ from core.utils.masks import normalize_protocolo
 from roteiros.models import Roteiro
 
 
+#: Nome da `UniqueConstraint` que guarda (área, ano, número). Vive aqui, e não solto no
+#: `Meta`, porque `core.numeracao` compara o metadado da exceção contra ele: nome duplicado
+#: em dois lugares é nome que diverge no dia do rename, e a divergência seria silenciosa.
+CONSTRAINT_NUMERO_OFICIO = "oficios_oficio_area_ano_numero_unique"
+
+
 class Oficio(TimeStampedModel, CancelavelModel):
     STATUS_RASCUNHO = "RASCUNHO"
     STATUS_GERADO = "GERADO"
@@ -177,7 +183,7 @@ class Oficio(TimeStampedModel, CancelavelModel):
             models.UniqueConstraint(
                 fields=["area", "ano", "numero"],
                 condition=Q(ano__isnull=False, numero__isnull=False),
-                name="oficios_oficio_area_ano_numero_unique",
+                name=CONSTRAINT_NUMERO_OFICIO,
             )
         ]
 

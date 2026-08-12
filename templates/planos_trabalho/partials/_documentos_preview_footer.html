@@ -1,5 +1,5 @@
 {% if mostrar_pendencias %}
-  {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Salvar rascunho" primary_action="save_draft_list" only %}
+  <c-ui.layouts.card_footer_section secondary_label="Voltar" secondary_action="wizard_back" primary_label="Salvar rascunho" primary_action="save_draft_list" only />
 {% else %}
-  {% include "components/ui/layouts/card_footer_section.html" with secondary_label="Voltar" secondary_action="wizard_back" primary_label="Finalizar plano" primary_action="finalizar" only %}
+  <c-ui.layouts.card_footer_section secondary_label="Voltar" secondary_action="wizard_back" primary_label="Finalizar plano" primary_action="finalizar" only />
 {% endif %}

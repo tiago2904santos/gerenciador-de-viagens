@@ -14,6 +14,16 @@ body {
   font-size: var(--font-size-md);
   line-height: 1.5;
   min-height: 100vh;
+  /* NOVO-58 (E8): existia só em `html[data-theme="dark"] body`
+     (`theme-dark-components.css:18`), e era **48,2% de toda a divergência
+     não-cor do sistema** — 60.270 elementos, medidos pela régua da E0. Nenhuma
+     das quatro famílias catalogadas da E8 chega perto: somadas dão ~16%.
+
+     Está aqui, e não lá, pela regra que o próprio projeto escreveu duas linhas
+     acima daquela declaração, ao mover `font-family` no `NOVO-62`: tipografia
+     não é decisão de tema. Suavização de fonte é renderização de tipografia —
+     ficou para trás na mesma limpeza. */
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
@@ -40,9 +50,7 @@ h3 {
 }
 
 button,
-input,
-select,
-textarea {
+:where(input, select, textarea) {
   font: inherit;
 }
 
@@ -56,9 +64,7 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
-input,
-select,
-textarea {
+:where(input, select, textarea) {
   background: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -74,9 +80,7 @@ textarea {
   resize: vertical;
 }
 
-input::placeholder,
-select::placeholder,
-textarea::placeholder {
+:where(input, select, textarea)::placeholder {
   color: var(--color-input-placeholder, var(--color-subtle));
   opacity: 1;
 }

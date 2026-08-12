@@ -1,0 +1,50 @@
+{% cotton:vars attrs disabled empty_data_hook empty_data_value empty_id empty_text field hide_search input_aria_label input_data_hook input_data_value input_id input_placeholder list_data_hook list_data_value list_extra_class list_id native panel_aria_label panel_extra_class panel_header plain_list presentation root_extra_class %}
+<div class="search-picker{% if not hide_search %} search-picker--single search-picker--detailed search-picker--people search-picker--roster{% endif %}{% if root_extra_class %} {{ root_extra_class }}{% endif %}"
+     data-related-picker-root
+     data-related-picker-presentation="{{ presentation|default:'card' }}"
+     {{ attrs }}>
+  {% if not hide_search %}
+    <div class="search-picker__field">
+      <div class="search-picker__control">
+        <span class="search-picker__icon" aria-hidden="true"></span>
+        <input
+          type="search"
+          class="search-picker__input"
+          {% if input_id %}id="{{ input_id }}"{% endif %}
+          {% if input_placeholder %}placeholder="{{ input_placeholder }}"{% endif %}
+          {% if input_aria_label %}aria-label="{{ input_aria_label }}"{% endif %}
+          {% if input_data_hook %}data-{{ input_data_hook }}="{{ input_data_value }}"{% endif %}
+          {% if disabled %}disabled{% endif %}
+          data-related-picker-search
+          autocomplete="off"
+          role="searchbox"
+        >
+      </div>
+    </div>
+  {% endif %}
+
+  {% if native %}
+    {{ native }}
+  {% elif field %}
+    {{ field }}
+    {% if field.errors %}
+      <c-ui.feedback.field_error :errors="field.errors" :field_id="field.auto_id" only />
+    {% endif %}
+  {% endif %}
+
+  <section class="search-picker__selected-panel{% if panel_extra_class %} {{ panel_extra_class }}{% endif %}"
+           {% if panel_aria_label %}aria-label="{{ panel_aria_label }}"{% endif %}>
+    {{ panel_header }}
+    <div class="{% if not plain_list %}search-picker__selected-list {% endif %}roteiro-editor__route-list related-route-list{% if list_extra_class %} {{ list_extra_class }}{% endif %}"
+         {% if list_id %}id="{{ list_id }}"{% endif %}
+         {% if list_data_hook %}data-{{ list_data_hook }}="{{ list_data_value }}"{% endif %}
+         data-related-picker-list></div>
+    {% if empty_text %}
+      <p class="search-picker__selected-empty"
+         {% if empty_id %}id="{{ empty_id }}"{% endif %}
+         {% if empty_data_hook %}data-{{ empty_data_hook }}="{{ empty_data_value }}"{% endif %}
+         data-related-picker-empty
+         hidden>{{ empty_text }}</p>
+    {% endif %}
+  </section>
+</div>

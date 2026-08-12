@@ -1,0 +1,184 @@
+{% cotton:vars row row_index %}
+{# Linha canônica de catálogo — roster: identity + título/subtitle/facts + ações. #}
+{# row: title, avatar?, badges?, subtitle?, facts?, meta? (fallback), edit/delete/docs hooks. #}
+<div
+  class="record-row"
+  role="listitem"
+  data-collection-item
+  data-search-text="{{ row.title }}{% if row.search_extra %} {{ row.search_extra }}{% endif %}{% if row.subtitle %} {{ row.subtitle }}{% endif %}{% if row.facts %}{% for item in row.facts %} {{ item.value }}{% endfor %}{% elif row.meta %}{% if row.meta.0.label %}{% for item in row.meta %} {{ item.value }}{% endfor %}{% else %} {{ row.meta }}{% endif %}{% endif %}"
+  {% if row.status_value %}data-status-value="{{ row.status_value }}"{% endif %}
+>
+  {% if row.avatar %}
+    <span class="record-row__identity" aria-hidden="true"><span>{{ row.avatar }}</span></span>
+  {% endif %}
+
+  <div class="record-row__content">
+    <div class="record-row__heading">
+      <span class="record-row__title">{{ row.title }}</span>
+      {% if row.badges %}
+        <span class="record-row__badges">
+          {% for badge in row.badges %}
+            <span class="record-row__badge">{{ badge.text }}</span>
+          {% endfor %}
+        </span>
+      {% endif %}
+    </div>
+
+    {% if row.subtitle %}
+      <p class="record-row__subtitle">{{ row.subtitle }}</p>
+    {% endif %}
+
+    {% if row.facts %}
+      <div class="record-row__facts">
+        {% for item in row.facts %}
+          {% if not forloop.first %}<span class="record-row__facts-sep" aria-hidden="true">·</span>{% endif %}
+          <span class="record-row__fact">
+            {% if item.label %}<span class="record-row__fact-label">{{ item.label }}</span>{% endif %}
+            <span class="record-row__fact-value">{{ item.value }}</span>
+          </span>
+        {% endfor %}
+      </div>
+    {% elif row.meta %}
+      <div class="record-row__facts">
+        {% if row.meta.0.label %}
+          {% for item in row.meta %}
+            {% if not forloop.first %}<span class="record-row__facts-sep" aria-hidden="true">·</span>{% endif %}
+            <span class="record-row__fact">
+              <span class="record-row__fact-label">{{ item.label }}</span>
+              <span class="record-row__fact-value">{{ item.value }}</span>
+            </span>
+          {% endfor %}
+        {% else %}
+          <span class="record-row__fact"><span class="record-row__fact-value">{{ row.meta }}</span></span>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="record-row__actions">
+    {% if row.set_default_url %}
+      <form method="post" action="{{ row.set_default_url }}" class="record-row__inline-form">
+        {% csrf_token %}
+        <button
+          class="icon-btn icon-btn--star"
+          type="submit"
+          aria-label="Definir como padrão"
+          data-tooltip="Definir como padrão"
+        ><c-ui.icons.icon icon="star" only /></button>
+      </form>
+    {% endif %}
+    <div class="icon-btn-group">
+      {% if row.vincular_url %}
+        <button
+          type="button"
+          class="icon-btn icon-btn--link record-row__vincular"
+          data-overlay-trigger
+          data-overlay-kind="dialog"
+          data-overlay-target="vincular-usuario-modal"
+          data-vincular-url="{{ row.vincular_url }}"
+          data-vincular-usuario-id="{{ row.vincular_usuario_id }}"
+          data-vincular-usuario-label="{{ row.vincular_usuario_label }}"
+          aria-label="Vincular {{ row.title }} a uma área"
+          data-tooltip="Vincular a uma área"
+        ><c-ui.icons.icon icon="link" only /></button>
+      {% endif %}
+      {% if row.pdf_url or row.docx_url or row.anexar_assinado_url %}
+        {% with menu_suffix=row_index|default:"item" %}
+          <button
+            type="button"
+            class="icon-btn {% if row.remover_assinado_url %}icon-btn--complete{% else %}icon-btn--settings{% endif %}"
+            aria-label="Abrir documentos de {{ row.title }}"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-controls="simple-row-document-menu-{{ row.title|slugify }}-{{ menu_suffix }}"
+            data-tooltip="{% if row.remover_assinado_url %}Documentos e assinado{% else %}Documentos{% endif %}"
+            data-overlay-trigger data-overlay-kind="menu"
+            data-overlay-target="simple-row-document-menu-{{ row.title|slugify }}-{{ menu_suffix }}"
+          ><c-ui.icons.icon icon="folder" only /></button>
+          <div
+            class="action-menu action-menu--rich"
+            id="simple-row-document-menu-{{ row.title|slugify }}-{{ menu_suffix }}"
+            role="menu"
+            hidden
+          >
+            {% if row.remover_assinado_url %}
+              <c-ui.menus.rich_menu_header title="Documento assinado" :subtitle="row.title" icon="sign" only />
+            {% else %}
+              <c-ui.menus.rich_menu_header title="Documentos" :subtitle="row.title" icon="folder" only />
+            {% endif %}
+            {% if row.pdf_url %}
+              <c-ui.menus.rich_menu_link :href="row.pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" :download="True" only />
+            {% endif %}
+            {% if row.docx_url %}
+              <c-ui.menus.rich_menu_link :href="row.docx_url" title="Baixar DOCX" description="Arquivo editável" icon="docx" tone="docx" :download="True" only />
+            {% endif %}
+            {% if row.anexar_assinado_url %}
+              <button
+                type="button"
+                class="action-menu__item action-menu__item--rich"
+                role="menuitem"
+                data-attach-signed-trigger
+                data-attach-signed-url="{{ row.anexar_assinado_url }}"
+                data-attach-signed-doc-label="{{ row.title }}"
+                data-attach-signed-current-name="{{ row.assinado_nome_original }}"
+                data-attach-signed-current-view-url="{{ row.assinado_view_url }}"
+                data-attach-signed-current-remove-url="{{ row.remover_assinado_url }}"
+              >
+                <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
+                  <c-ui.icons.icon icon="sign" only />
+                </span>
+                <span class="action-menu__item-copy">
+                  <strong>{% if row.remover_assinado_url %}Gerenciar assinado{% else %}Anexar assinado{% endif %}</strong>
+                  <small>{% if row.remover_assinado_url %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
+                </span>
+              </button>
+            {% endif %}
+          </div>
+        {% endwith %}
+      {% endif %}
+      {% if row.edit_url %}
+        {% if row.edit_modal %}
+          {# Edição em diálogo: quem abre o modal é o script da página, que sabe #}
+          {# trocar a copy e sincronizar os pickers a partir de `edit_fields`.   #}
+          <button
+            class="icon-btn icon-btn--edit"
+            type="button"
+            data-row-edit-modal="{{ row.edit_modal }}"
+            data-edit-url="{{ row.edit_url }}"
+            data-edit-fields="{{ row.edit_fields_json }}"
+            data-edit-label="{{ row.title }}"
+            aria-label="Editar {{ row.title }}"
+            data-tooltip="Editar"
+          ><c-ui.icons.icon icon="edit" only /></button>
+        {% elif row.edit_fields_json %}
+          <button
+            class="icon-btn icon-btn--edit"
+            type="button"
+            data-quick-edit
+            data-edit-url="{{ row.edit_url }}"
+            data-edit-fields="{{ row.edit_fields_json }}"
+            aria-label="Editar"
+            data-tooltip="Editar"
+          ><c-ui.icons.icon icon="edit" only /></button>
+        {% else %}
+          <c-ui.buttons.icon_button :href="row.edit_url" action="edit" aria_label="Editar" tooltip="Editar" only />
+        {% endif %}
+      {% endif %}
+      {% if row.delete_url %}
+        {% if row.delete_modal %}
+          <button
+            class="icon-btn icon-btn--delete"
+            type="button"
+            data-overlay-trigger data-overlay-kind="dialog" data-overlay-target="delete-confirm-modal"
+            data-delete-url="{{ row.delete_url }}"
+            data-delete-label="{{ row.title }}"
+            aria-label="Excluir"
+            data-tooltip="Excluir"
+          ><c-ui.icons.icon icon="delete" only /></button>
+        {% else %}
+          <c-ui.buttons.icon_button :href="row.delete_url" action="delete" aria_label="Excluir" tooltip="Excluir" only />
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</div>

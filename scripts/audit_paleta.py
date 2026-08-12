@@ -31,7 +31,7 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[1]
 CSS = RAIZ / "static" / "css"
-IGNORA = {"shell.bundle.css"}
+IGNORA = {"shell.bundle.css", "shell.form-components.bundle.css"}
 CORTE = 2.5
 
 RE_HEX = re.compile(r"#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})\b")

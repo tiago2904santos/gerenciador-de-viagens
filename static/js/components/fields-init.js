@@ -77,17 +77,6 @@
     });
   }
 
-  function initDropdowns(root) {
-    return safeCall('dropdowns', function () {
-      var api = window.CV && window.CV.dropdowns;
-      if (api && typeof api.init === 'function') {
-        api.init(root);
-        return 1;
-      }
-      return 0;
-    });
-  }
-
   function initMultiselects(root) {
     return safeCall('multiselect', function () {
       var api = window.CV && window.CV.multiselect;
@@ -172,7 +161,6 @@
       selects: initSelects(scope),
       searchPickers: initSearchPickers(scope),
       datePickers: initDatePickers(scope),
-      dropdowns: initDropdowns(scope),
       multiselects: initMultiselects(scope),
       filterableMultiselects: initFilterableMultiselects(scope),
       resumoDeErros: initResumoDeErros(scope),
@@ -186,7 +174,6 @@
     initSelects: initSelects,
     initSearchPickers: initSearchPickers,
     initDatePickers: initDatePickers,
-    initDropdowns: initDropdowns,
     initMultiselects: initMultiselects,
   };
 

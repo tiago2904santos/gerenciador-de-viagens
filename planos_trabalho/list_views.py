@@ -1,17 +1,19 @@
 from __future__ import annotations
 from django.contrib import messages
-from django.core.paginator import Paginator
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
+from core.pagination import contexto_paginacao
+from core.deletion import DelecaoProtegidaError
 from eventos.services import resolve_evento_from_request
 from .models import PlanoTrabalho
 from .selectors import listar_planos_trabalho
 from .presenters import apresentar_plano_card
 from .services import criar_plano_rascunho
+from .services import excluir_plano
 from .view_helpers import _get_plano
 
 
@@ -44,10 +46,9 @@ def index(request):
                    "viagem_de": viagem_de, "viagem_ate": viagem_ate},
     )
 
-    page_obj = Paginator(lista, 20).get_page(request.GET.get("page"))
+    paginacao = contexto_paginacao(lista, request, 20)
+    page_obj = paginacao["page_obj"]
     cards = [apresentar_plano_card(plano) for plano in page_obj.object_list]
-    page_querystring = request.GET.copy()
-    page_querystring.pop("page", None)
     has_filters = any([q, status, viagem_de, viagem_ate, sort])
     return render(
         request,
@@ -64,8 +65,7 @@ def index(request):
             "sort": sort,
             "has_filters": has_filters,
             "cards": cards,
-            "page_obj": page_obj,
-            "page_querystring": page_querystring.urlencode(),
+            **paginacao,
             "create_url": reverse("planos_trabalho:novo"),
             "search_clear_url": f"{reverse('planos_trabalho:index')}?aba={aba}",
             "programas_url": reverse("planos_trabalho:programas_index"),
@@ -90,7 +90,7 @@ def novo(request):
     if request.method == "GET":
         return render(
             request,
-            "components/create_draft.html",
+            "cotton/create_draft.html",
             {
                 "page_title": "Novo plano de trabalho",
                 "page_description": "Confirme para reservar a numeração e iniciar o cadastro.",
@@ -114,7 +114,13 @@ def excluir(request, pk):
     plano = _get_plano(pk)
     numero = plano.numero_formatado
     evento_id = plano.evento_id
-    plano.delete()
+    try:
+        excluir_plano(plano)
+    except DelecaoProtegidaError as exc:
+        messages.error(request, str(exc))
+        if evento_id:
+            return redirect("eventos:guiado_etapa", pk=evento_id, etapa=4)
+        return redirect("planos_trabalho:index")
     messages.success(request, f"Plano de Trabalho {numero} excluído.")
     if evento_id:
         return redirect("eventos:guiado_etapa", pk=evento_id, etapa=4)

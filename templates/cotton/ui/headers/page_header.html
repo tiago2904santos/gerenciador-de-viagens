@@ -1,0 +1,46 @@
+{% cotton:vars back_label back_url band_only cotton_attr_variant description extra_class eyebrow icon_label module_label primary_action_label primary_action_url status_label status_variant stepper_template title %}
+{% comment %}
+  Cabeçalho canônico de página.
+
+  Variantes por responsabilidade: simples, ação de retorno, ação primária,
+  stepper e somente faixa (`band_only`). Todas compartilham este markup.
+{% endcomment %}
+<header class="page-header-stack{% if extra_class %} {{ extra_class }}{% endif %}">
+  <div class="page-header-band">
+    <div class="page-header-band__content">
+      <div class="page-header-band__text">
+        {% if eyebrow %}<span class="page-header-band__eyebrow">{{ eyebrow }}</span>{% endif %}
+        <h1 class="page-header-band__title">{{ title }}</h1>
+      </div>
+      {% if status_label %}
+        {% with cotton_attr_variant=status_variant|default:"draft" %}<c-ui.badges.status_badge :label="status_label" :variant="cotton_attr_variant" extra_class="page-header-status-chip" only />{% endwith %}
+      {% endif %}
+    </div>
+  </div>
+
+  {% if not band_only %}
+  <div class="page-header-rail{% if stepper_template %} page-header-rail--stepper{% endif %}">
+    {% if icon_label %}<div class="page-header-rail__marker" aria-hidden="true">{{ icon_label }}</div>{% endif %}
+    {% if module_label or description %}
+      <div class="page-header-rail__content">
+        {% if module_label %}<span class="page-header-rail__eyebrow">{{ module_label }}</span>{% endif %}
+        {% if description %}<p class="page-header-rail__subtitle">{{ description }}</p>{% endif %}
+      </div>
+    {% endif %}
+
+    {% if stepper_template %}
+      <div class="page-header-rail__stepper">{% include stepper_template with back_label=back_label back_url=back_url band_only=band_only description=description extra_class=extra_class eyebrow=eyebrow icon_label=icon_label module_label=module_label primary_action_label=primary_action_label primary_action_url=primary_action_url status_label=status_label status_variant=status_variant stepper_template=stepper_template title=title cotton_attr_variant=cotton_attr_variant only %}</div>
+    {% endif %}
+
+    {% if back_label or primary_action_label %}
+      <div class="page-header-rail__actions">
+        {% if primary_action_label %}
+          <c-ui.buttons.button :href="primary_action_url" :label="primary_action_label" variant="primary" icon="check" type="submit" :data_autosave_link="True" only />
+        {% elif back_label %}
+          <c-ui.buttons.button :href="back_url" :label="back_label" variant="back-list" icon="list" type="button" :data_autosave_link="True" only />
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+  {% endif %}
+</header>

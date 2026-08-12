@@ -1,8 +1,8 @@
 <div class="field-grid">
   <div class="field-size-3">
-    {% include "components/ui/forms/field.html" with field=form.nome only %}
+    <c-ui.forms.field :field="form.nome" only />
   </div>
   <div class="field-size-1">
-    {% include "components/ui/forms/field.html" with field=form.sigla only %}
+    <c-ui.forms.field :field="form.sigla" only />
   </div>
 </div>

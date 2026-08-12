@@ -57,12 +57,11 @@
 }
 
 /* ============================================================
-   Painel grid (design system) — base visual de .roteiro-editor__grid
+   Painel grid do design system.
    Tokens de rota; caixa extra só em .app-form-grid-panel.
    ============================================================ */
 
-.app-form-grid-panel,
-.roteiro-editor__grid {
+.app-form-grid-panel {
   background: var(--route-card-inner-bg);
   box-sizing: border-box;
   display: grid;
@@ -77,31 +76,25 @@
   padding: var(--space-4);
 }
 
-.app-form-grid-panel.align-items-end,
-.roteiro-editor__grid.align-items-end {
+.app-form-grid-panel.align-items-end {
   align-items: end;
 }
 
-.app-form-grid-panel > .field-span-6,
-.roteiro-editor__grid > .field-span-6 {
+.app-form-grid-panel > .field-span-6 {
   grid-column: span 6;
 }
 
-.app-form-grid-panel > .field-span-4,
-.roteiro-editor__grid > .field-span-4 {
+.app-form-grid-panel > .field-span-4 {
   grid-column: span 4;
 }
 
-.app-form-grid-panel > .field-span-12,
-.roteiro-editor__grid > .field-span-12 {
+.app-form-grid-panel > .field-span-12 {
   grid-column: span 12;
 }
 
 @media (max-width: 720px) {
   .app-form-grid-panel > .field-span-6,
-  .app-form-grid-panel > .field-span-4,
-  .roteiro-editor__grid > .field-span-6,
-  .roteiro-editor__grid > .field-span-4 {
+  .app-form-grid-panel > .field-span-4 {
     grid-column: span 12;
   }
 }
@@ -165,8 +158,7 @@
 }
 
 .app-page--roteiros-form .btn-secondary,
-.app-page--roteiros-form .btn-outline-secondary,
-.app-page--roteiros-form .btn-muted {
+.app-page--roteiros-form .btn-outline-secondary {
   background: var(--route-button-secondary-bg);
   border-color: var(--route-button-secondary-border);
   color: var(--route-button-secondary-text);
@@ -175,9 +167,7 @@
 .app-page--roteiros-form .btn-secondary:hover,
 .app-page--roteiros-form .btn-secondary:focus-visible,
 .app-page--roteiros-form .btn-outline-secondary:hover,
-.app-page--roteiros-form .btn-outline-secondary:focus-visible,
-.app-page--roteiros-form .btn-muted:hover,
-.app-page--roteiros-form .btn-muted:focus-visible {
+.app-page--roteiros-form .btn-outline-secondary:focus-visible {
   background: var(--route-button-secondary-hover-bg);
   border-color: var(--route-button-secondary-hover-border);
   color: var(--route-button-secondary-text);
@@ -665,30 +655,24 @@ html[data-theme="dark"] input[type="checkbox"] {
    ========================================================================== */
 
 .main-form-panel {
-  --field-bg: var(--cv-field-bg);
+  --field-bg: var(--color-input-bg);
   --field-bg-soft: var(--field-bg-hover);
-  --field-border: var(--cv-field-border);
+  --field-border: var(--color-input-border);
   --field-border-hover: var(--color-border-strong);
-  --field-border-focus: var(--cv-field-border-focus);
+  --field-border-focus: var(--input-border-focus);
   --field-text: var(--color-input-text);
-}
-
-.main-form-panel > .field-grid-rows {
-  box-sizing: border-box;
-  padding: var(--form-section-padding-y) var(--form-section-padding-x);
-  width: 100%;
 }
 
 .main-form-panel .field,
 .main-form-panel .app-form-field,
 .main-form-panel .cv-field {
-  --field-bg: var(--cv-field-bg);
+  --field-bg: var(--color-input-bg);
   --field-bg-soft: var(--field-bg-hover);
-  --field-border: var(--cv-field-border);
+  --field-border: var(--color-input-border);
   --field-border-hover: var(--color-border-strong);
-  --field-border-focus: var(--cv-field-border-focus);
+  --field-border-focus: var(--input-border-focus);
   --field-text: var(--color-input-text);
-  --field-focus-ring: var(--cv-field-focus-ring);
+  --field-focus-ring: var(--input-focus-ring);
   --form-control-height: var(--control-height-md);
   align-content: start;
   gap: var(--space-2);
@@ -805,8 +789,7 @@ html[data-theme="dark"] input[type="checkbox"] {
   min-height: var(--form-control-height);
 }
 
-.main-form-panel .field-with-action .custom-select,
-.main-form-panel .field-with-action .cv-field__control {
+.main-form-panel .field-with-action .custom-select {
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -827,7 +810,6 @@ html[data-theme="dark"] input[type="checkbox"] {
 }
 
 .main-form-panel .field-with-action--manage-reveal > .custom-select,
-.main-form-panel .field-with-action--manage-reveal > .cv-field__control,
 .main-form-panel .field-with-action--manage-reveal > .form-control,
 .main-form-panel .field-with-action--manage-reveal > .form-select,
 .main-form-panel .field-with-action--manage-reveal > select {
@@ -843,8 +825,6 @@ html[data-theme="dark"] input[type="checkbox"] {
 
 .main-form-panel .field-with-action--manage-reveal:hover > .custom-select,
 .main-form-panel .field-with-action--manage-reveal:focus-within > .custom-select,
-.main-form-panel .field-with-action--manage-reveal:hover > .cv-field__control,
-.main-form-panel .field-with-action--manage-reveal:focus-within > .cv-field__control,
 .main-form-panel .field-with-action--manage-reveal:hover > .form-control,
 .main-form-panel .field-with-action--manage-reveal:focus-within > .form-control,
 .main-form-panel .field-with-action--manage-reveal:hover > .form-select,

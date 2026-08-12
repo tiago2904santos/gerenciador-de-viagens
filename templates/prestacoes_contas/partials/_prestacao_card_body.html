@@ -24,7 +24,7 @@
                value="{{ servidor.numero_solicitacao }}">
         {% with ps_id=servidor.ps_pk|stringformat:"s" %}
           {% with liberacao_name="ps-"|add:ps_id|add:"-data_liberacao_diarias" liberacao_hidden_id="id_ps_"|add:ps_id|add:"_data_liberacao_diarias" prazo_name="ps-"|add:ps_id|add:"-prazo_limite_saque" prazo_hidden_id="id_ps_"|add:ps_id|add:"_prazo_limite_saque" range_picker_id="id_ps_"|add:ps_id|add:"_periodo_saque" %}
-            {% include "components/ui/forms/date_picker.html" with mode="range" control_variant="filter-pill" compact_range_display=True picker_id=range_picker_id extra_class="travel-period-filter record-card__inline-range" trigger_label="Liberação → saque" trigger_aria_label="Selecionar data de liberação e prazo para saque de "|add:servidor.name start_hidden_id=liberacao_hidden_id end_hidden_id=prazo_hidden_id start_hidden_name=liberacao_name end_hidden_name=prazo_name start_hidden_value=servidor.data_liberacao_diarias end_hidden_value=servidor.prazo_limite_saque initial_date=servidor.data_liberacao_diarias show_summary=False only %}
+            {% with cotton_attr_trigger_aria_label="Selecionar data de liberação e prazo para saque de "|add:servidor.name %}<c-ui.forms.date_picker mode="range" control_variant="filter-pill" :compact_range_display="True" :picker_id="range_picker_id" extra_class="travel-period-filter record-card__inline-range" trigger_label="Liberação → saque" :trigger_aria_label="cotton_attr_trigger_aria_label" :start_hidden_id="liberacao_hidden_id" :end_hidden_id="prazo_hidden_id" :start_hidden_name="liberacao_name" :end_hidden_name="prazo_name" :start_hidden_value="servidor.data_liberacao_diarias" :end_hidden_value="servidor.prazo_limite_saque" :initial_date="servidor.data_liberacao_diarias" :show_summary="False" only />{% endwith %}
           {% endwith %}
         {% endwith %}
       </form>
@@ -39,40 +39,36 @@
           <span class="person-row__badge person-row__badge--ok" title="Comprovante de saque anexado">✓ Comprovante</span>
           {% endif %}
         </div>
-        {% if servidor.cargo or servidor.unidade %}
-        <span class="person-row__meta">{% if servidor.cargo %}{{ servidor.cargo }}{% endif %}{% if servidor.cargo and servidor.unidade %} · {% endif %}{% if servidor.unidade %}{{ servidor.unidade }}{% endif %}</span>
-        {% endif %}
+      {% if servidor.meta %}<span class="person-row__meta">{{ servidor.meta }}</span>{% endif %}
       </div>
 
-      <button type="button"
-              class="icon-btn icon-btn--documents"
-              aria-label="Abrir opções de documentos de {{ servidor.name }}"
+      <c-ui.buttons.button type="button"
+              class_name="icon-btn icon-btn--documents"
+              aria_label="Abrir opções de documentos de {{ servidor.name }}"
               data-tooltip="Baixar documentos"
               aria-haspopup="true"
               aria-expanded="false"
               aria-controls="prestacao-docs-menu-{{ servidor.ps_pk }}"
               data-overlay-trigger data-overlay-kind="menu"
               data-overlay-target="prestacao-docs-menu-{{ servidor.ps_pk }}"
-              data-overlay-src="{{ card.menus_url }}"
-      >{% include "components/ui/icons/icon.html" with icon="folder" only %}</button>
+              data_overlay_src="{{ card.menus_url }}" only><c-ui.icons.icon icon="folder" only /></c-ui.buttons.button>
       
-      <button type="button"
-              class="icon-btn icon-btn--whatsapp"
-              aria-label="Enviar aviso de liberação de diárias por WhatsApp"
+      <c-ui.buttons.button type="button"
+              class_name="icon-btn icon-btn--whatsapp"
+              aria_label="Enviar aviso de liberação de diárias por WhatsApp"
               data-tooltip="Enviar aviso de liberação (WhatsApp)"
               aria-haspopup="true"
               aria-expanded="false"
               aria-controls="diaria-wa-menu-{{ servidor.ps_pk }}"
               data-overlay-trigger data-overlay-kind="menu"
               data-overlay-target="diaria-wa-menu-{{ servidor.ps_pk }}"
-              data-overlay-src="{{ card.menus_url }}"
+              data_overlay_src="{{ card.menus_url }}"
               data-wa-phone="{{ servidor.whatsapp_phone }}"
               data-wa-oficio="{{ servidor.whatsapp_oficio }}"
               data-wa-unidade="{{ servidor.whatsapp_unidade }}"
               data-wa-evento="{{ servidor.whatsapp_evento }}"
               data-wa-servidor="{{ servidor.name }}"
-              data-wa-diaria="{{ servidor.whatsapp_diaria }}"
-      >{% include "components/ui/icons/icon.html" with icon="whatsapp-modern" only %}</button>
+              data-wa-diaria="{{ servidor.whatsapp_diaria }}" only><c-ui.icons.icon icon="whatsapp-modern" only /></c-ui.buttons.button>
       
     </li>
     {% endfor %}
@@ -98,20 +94,7 @@
     {% if card.trechos %}
     <div class="fact-block fact-block--trechos">
       <span class="fact-block__label">Trechos encontrados</span>
-      <ul class="itinerary">
-        {% for trecho in card.trechos %}
-        <li class="itinerary__leg">
-          <div class="itinerary__route">{{ trecho.rota }}</div>
-          {% if trecho.saida or trecho.chegada %}
-          <div class="itinerary__time">
-            {% if trecho.saida %}{{ trecho.saida }}{% endif %}
-            {% if trecho.saida and trecho.chegada %} → {% endif %}
-            {% if trecho.chegada %}{{ trecho.chegada }}{% endif %}
-          </div>
-          {% endif %}
-        </li>
-        {% endfor %}
-      </ul>
+      <c-ui.lists.itinerary :items="card.trechos" only />
     </div>
     {% endif %}
 

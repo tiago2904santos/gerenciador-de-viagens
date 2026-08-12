@@ -3,7 +3,7 @@
 Havia duas cópias desta função, uma em `oficios/view_helpers.py` e outra em
 `planos_trabalho/view_helpers.py`, e elas divergiram. A de planos lia só
 `post.get("action")`, enquanto os rodapés — que vêm do componente compartilhado
-`components/ui/layouts/card_footer_actions.html` — emitem `name="wizard_action"`.
+`cotton/ui/layouts/card_footer_actions.html` — emitem `name="wizard_action"`.
 O valor do botão nunca chegava, e o helper caía no default:
 
 - "Finalizar plano" recarregava a mesma página, sem mensagem;

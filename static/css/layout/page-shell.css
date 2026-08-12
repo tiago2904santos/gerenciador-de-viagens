@@ -230,25 +230,21 @@ html[data-theme="dark"] {
   /* Quick Add Folder Tab */
   --surface-inline-create-tab:        rgba(11, 58, 102, 0.50);   /* azul primário com opacidade */
   --border-inline-create-tab:         rgba(255, 255, 255, 0.22);
-  --color-inline-create-tab:          #cddcf0;                   /* texto claro sobre fundo escuro */
-  --color-inline-create-tab-icon-bg:  var(--color-accent);       /* círculo dourado */
-  --color-inline-create-tab-icon-fg:  var(--color-primary-dark); /* texto escuro sobre dourado */
 
   /* Header Filter Bar */
   --surface-filter-input:         rgba(255, 255, 255, 0.05);
   --border-filter-input:          rgba(255, 255, 255, 0.12);
   --surface-filter-chip:          var(--surface-filter-input);
   --border-filter-chip:           var(--border-filter-input);
-  --color-filter-placeholder:     rgba(255, 255, 255, 0.35);
-  --color-filter-text:            var(--theme-text-body);
+  --text-filter-placeholder:     rgba(255, 255, 255, 0.35);
+  --text-filter:            var(--theme-text-body);
   --surface-filter-button:        rgba(255, 255, 255, 0.06);
   --border-filter-button:         rgba(255, 255, 255, 0.14);
-  --color-filter-button:          var(--theme-text-muted);
+  --text-filter-button:          var(--theme-text-muted);
 
   /* Filtros aplicados — chips */
   --surface-applied-chip:         rgba(255, 255, 255, 0.07);
   --border-applied-chip:          rgba(255, 255, 255, 0.16);
-  --color-applied-chip:           var(--theme-text-muted);
 
   /* Stepper — estados adicionais */
   --stepper-missing-bg:           rgba(180, 35, 24, 0.16);
@@ -337,25 +333,21 @@ html[data-theme="light"] {
   /* Quick Add Folder Tab */
   --surface-inline-create-tab:        #deebfb;
   --border-inline-create-tab:         #a8c4db;
-  --color-inline-create-tab:          var(--color-primary-strong);
-  --color-inline-create-tab-icon-bg:  var(--color-primary);
-  --color-inline-create-tab-icon-fg:  var(--color-white);
 
   /* Header Filter Bar */
   --surface-filter-input:         var(--color-surface);
   --border-filter-input:          var(--color-border);
   --surface-filter-chip:          var(--surface-filter-input);
   --border-filter-chip:           var(--border-filter-input);
-  --color-filter-placeholder:     var(--theme-text-muted);
-  --color-filter-text:            var(--theme-text-body);
+  --text-filter-placeholder:     var(--theme-text-muted);
+  --text-filter:            var(--theme-text-body);
   --surface-filter-button:        var(--color-surface);
   --border-filter-button:         var(--color-border);
-  --color-filter-button:          var(--theme-text-muted);
+  --text-filter-button:          var(--theme-text-muted);
 
   /* Filtros aplicados — chips */
   --surface-applied-chip:         var(--color-primary-soft);
   --border-applied-chip:          rgba(11, 58, 102, 0.18);
-  --color-applied-chip:           var(--color-primary-strong);
 
   /* Stepper — estados adicionais */
   --stepper-missing-bg:           var(--color-danger-soft);
@@ -638,8 +630,7 @@ html[data-theme="light"] {
   background: var(--stepper-connector-on);
 }
 
-.page-stepper__item.is-complete .page-stepper__marker,
-.page-stepper__item.is-complete .page-stepper__number {
+.page-stepper__item.is-complete .page-stepper__marker {
   background:   var(--stepper-done-bg);
   border-color: var(--stepper-done-border);
   color:        var(--stepper-done-color);
@@ -656,12 +647,10 @@ html[data-theme="light"] {
 
 /* ─── Estado: Atual / em andamento (.is-current | .is-active) ── */
 
-.page-stepper__item.is-current .page-stepper__marker,
-.page-stepper__item.is-active  .page-stepper__number {
+.page-stepper__item.is-current .page-stepper__marker {
   background:   var(--stepper-active-bg);
   border-color: var(--stepper-active-border);
-  box-shadow:   0 0 0 3px var(--stepper-idle-bg),
-                0 0 0 5px var(--stepper-active-bg);
+  box-shadow:   0 0 0 3px color-mix(in srgb, var(--stepper-active-bg) 28%, transparent);
   color:        var(--stepper-active-color);
 }
 
@@ -808,7 +797,6 @@ html[data-theme="light"] {
 }
 
 .main-form-panel .field-grid,
-.main-form-panel .field-grid-rows,
 .main-form-panel .field,
 .main-form-panel .cv-field,
 .main-form-panel .search-picker,
@@ -1415,7 +1403,7 @@ html[data-theme="light"] {
 .pagination-shell__page {
   background: transparent;
   border: 1px solid transparent;
-  color: var(--theme-text-muted, var(--color-filter-button));
+  color: var(--theme-text-muted, var(--text-filter-button));
 }
 
 .pagination-shell__page {
@@ -1454,7 +1442,7 @@ html[data-theme="light"] {
 .pagination-shell__nav--primary {
   background: transparent;
   border-color: transparent;
-  color: var(--theme-text-muted, var(--color-filter-button));
+  color: var(--theme-text-muted, var(--text-filter-button));
 }
 
 .pagination-shell__nav--prev,
@@ -2220,11 +2208,6 @@ body.has-delete-modal-open {
   }
 }
 
-html[data-theme="dark"] .inline-create__toggle {
-  background: var(--color-card-muted); /* #223348 */
-  color:      var(--theme-text-body);
-}
-
 html[data-theme="dark"] .inline-create__toggle:hover {
   background: color-mix(in srgb, var(--color-card-muted) 80%, var(--color-white) 20%);
 }
@@ -2504,7 +2487,7 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
   border:        1px solid var(--border-filter-input);
   border-radius: var(--radius-control);
   box-sizing:    border-box;
-  color:         var(--color-filter-text);
+  color:         var(--text-filter);
   font-size:     var(--font-size-sm);
   height:        var(--filter-input-height);
   outline:       none;
@@ -2513,7 +2496,7 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
   width:         100%;
 }
 
-.header-filter-input::placeholder { color: var(--color-filter-placeholder); }
+.header-filter-input::placeholder { color: var(--text-filter-placeholder); }
 
 .header-filter-input:focus,
 .header-filter-input:focus-visible {
@@ -2527,7 +2510,7 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
   border:        1px solid var(--border-filter-input);
   border-radius: var(--radius-control);
   box-sizing:    border-box;
-  color:         var(--color-filter-text);
+  color:         var(--text-filter);
   cursor:        pointer;
   font-size:     var(--font-size-sm);
   height:        var(--filter-input-height);
@@ -2540,63 +2523,6 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
 .header-filter-select:focus,
 .header-filter-select:focus-visible {
   outline: none;
-}
-
-/* Layout do controle (roteiros.css não carregado nesta página) */
-.header-filter-datepicker .date-picker__control {
-  align-items: stretch;
-  display:     flex;
-  gap:         0;
-  position:    relative;
-}
-
-.header-filter-datepicker .date-picker__control .cv-field__control {
-  flex:       1 1 auto;
-  cursor:     pointer;
-  min-height: unset;
-  height:     var(--filter-input-height, 38px);
-  padding-right: calc(var(--space-2) * 2 + 30px);
-}
-
-/* Botão do calendário — sempre visível, posicionado sobre o input */
-.header-filter-datepicker .date-picker__trigger--icon {
-  align-items:      center;
-  background:       transparent;
-  border:           1px solid transparent;
-  border-radius:    var(--radius-sm);
-  color:            var(--color-input-text, var(--color-filter-text));
-  cursor:           pointer;
-  display:          flex;
-  flex-shrink:      0;
-  height:           28px;
-  justify-content:  center;
-  opacity:          1;
-  padding:          0;
-  pointer-events:   auto;
-  position:         absolute;
-  right:            var(--space-2);
-  top:              50%;
-  transform:        translateY(-50%);
-  transition:       background var(--transition-fast), border-color var(--transition-fast);
-  width:            28px;
-  z-index:          2;
-}
-
-.header-filter-datepicker .date-picker__trigger--icon:hover {
-  background:   rgba(255, 255, 255, 0.1);
-  border-color: var(--border-active);
-}
-
-.header-filter-datepicker .date-picker__panel {
-  left:  auto;
-  right: 0;
-}
-
-@media (max-width: 840px) {
-  .header-filter-datepicker {
-    flex:      0 0 100%;
-    min-width: 0;
-  }
 }
 
 @media (max-width: 840px) {
@@ -2627,12 +2553,6 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
   .page-header-rail__actions .cv-btn {
     flex: 1 1 12rem;
     min-width: 0;
-  }
-
-  .header-filter-datepicker .date-picker__panel {
-    left: 0;
-    max-width: min(100%, 320px);
-    right: auto;
   }
 
   .cv-form-section-header {
@@ -2686,8 +2606,7 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
     flex: 0 0 auto;
   }
 
-  .header-filter-field,
-  .header-filter-datepicker {
+  .header-filter-field {
     flex: 0 0 100%;
   }
 
@@ -2796,8 +2715,8 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
 }
 
 #quick-add-modelo-motivo .cv-field__control--textarea {
-  background: var(--cv-field-bg);
-  border: 1px solid var(--cv-field-border);
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
   border-radius: var(--radius-control);
   box-shadow: var(--shadow-xs);
   box-sizing: border-box;
@@ -2839,7 +2758,7 @@ html[data-theme="dark"] .inline-create__toggle.is-filled:hover {
 
 #quick-add-atividade .cv-field__control--textarea {
   background: var(--color-input-bg);
-  border: 1px solid var(--cv-field-border);
+  border: 1px solid var(--color-input-border);
   border-radius: var(--radius-control);
   box-shadow: var(--shadow-xs);
   box-sizing: border-box;

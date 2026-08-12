@@ -1,8 +1,6 @@
-import json
 from urllib.parse import urlencode
 
 from django.contrib import messages
-from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect
@@ -10,6 +8,9 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_http_methods
+
+from core.pagination import contexto_paginacao
+from core.deletion import DelecaoProtegidaError
 from django.views.decorators.http import require_POST
 
 from cadastros.models import ConfiguracaoSistema
@@ -48,7 +49,7 @@ from .services import anexar_documentos_solicitacao
 from .services import build_evento_guided_context
 from .services import excluir_documento_solicitacao
 from .services import excluir_evento
-from .services import garantir_termo_automatico
+from .services import salvar_identificacao_evento
 
 
 
@@ -87,10 +88,9 @@ def index(request):
         preserved={"q": q, "sort": sort, "viagem_de": viagem_de, "viagem_ate": viagem_ate},
     )
     has_filters = any([q, viagem_de, viagem_ate, sort])
-    page_obj = Paginator(lista, 20).get_page(request.GET.get("page"))
+    paginacao = contexto_paginacao(lista, request, 20)
+    page_obj = paginacao["page_obj"]
     cards = [apresentar_evento_list_card(evento) for evento in page_obj.object_list]
-    page_querystring = request.GET.copy()
-    page_querystring.pop("page", None)
 
     return render(
         request,
@@ -107,8 +107,7 @@ def index(request):
             "has_filters": has_filters,
             "eventos": page_obj.object_list,
             "cards": cards,
-            "page_obj": page_obj,
-            "page_querystring": page_querystring.urlencode(),
+            **paginacao,
             "novo_url": reverse("eventos:novo"),
             "search_clear_url": f"{reverse('eventos:index')}?aba={aba}",
             "sort_options": [
@@ -137,7 +136,7 @@ def _form_context(form, evento=None):
         "panel_url": reverse("eventos:detalhe", kwargs={"pk": evento.pk}) if is_edit else "",
         "status_label": status_label,
         "status_variant": status_variant,
-        # `H-02`: contexto do casco único (`components/page/flow_base.html`).
+        # `H-02`: contexto do casco único (`cotton/page/flow_base.html`).
         "flow_eyebrow": "EVENTOS",
         "flow_description": page_description,
         "flow_icon_label": "EV",
@@ -147,22 +146,6 @@ def _form_context(form, evento=None):
         "flow_status_label": status_label,
         "flow_status_variant": status_variant,
     }
-
-
-def _save_destinos_extras(evento, request):
-    """Lê destinos_json do POST e salva extras no evento (primeiro = destino_uf/cidade)."""
-    raw = request.POST.get("destinos_json", "")
-    try:
-        destinos = json.loads(raw) if raw else []
-    except (ValueError, TypeError):
-        destinos = []
-    if destinos and isinstance(destinos, list):
-        primeiro = destinos[0] if destinos else {}
-        evento.destino_uf = primeiro.get("uf", "")
-        evento.destino_cidade = primeiro.get("cidade", "")
-        evento.destinos_extras = destinos[1:] if len(destinos) > 1 else []
-    else:
-        evento.destinos_extras = []
 
 
 def _roteiro_rows_do_evento(evento):
@@ -239,7 +222,7 @@ def novo(request):
     if request.method == "GET":
         return render(
             request,
-            "components/create_draft.html",
+            "cotton/create_draft.html",
             {
                 "page_title": "Novo evento",
                 "page_description": "Confirme para iniciar o cadastro guiado do evento.",
@@ -279,16 +262,11 @@ def detalhe(request, pk, etapa=1):
     if etapa == 1 and request.method == "POST":
         form = EventoNovoCadastroForm(request.POST, instance=evento)
         if form.is_valid():
-            evento = form.save(commit=False)
-            if evento.area_id is None:
-                evento.area = getattr(request, "area", None)
-            nomes = [tipo.nome for tipo in form.cleaned_data.get("tipos") or []]
-            evento.titulo = " / ".join(nomes) if nomes else "Novo Evento"
-            _save_destinos_extras(evento, request)
-            evento.save()
-            form.save_m2m()
-            form.sincronizar_documentos_vinculados(evento)
-            garantir_termo_automatico(evento)
+            evento = salvar_identificacao_evento(
+                form,
+                area=getattr(request, "area", None),
+                destinos_json=request.POST.get("destinos_json", ""),
+            )
             messages.success(request, "Dados do evento atualizados.")
             return redirect("eventos:guiado_etapa", pk=evento.pk, etapa=2)
     else:
@@ -359,7 +337,7 @@ def detalhe(request, pk, etapa=1):
             "evento": evento,
             "evento_header_title": evento_header_title,
             "evento_header_description": evento_header_description,
-            # `H-02`: contexto do casco único (`components/page/flow_base.html`).
+            # `H-02`: contexto do casco único (`cotton/page/flow_base.html`).
             "flow_eyebrow": "EVENTOS",
             "flow_description": evento_header_description,
             "flow_icon_label": "EV",
@@ -460,7 +438,11 @@ def guiado_termos(request, pk):
 def excluir(request, pk):
     evento = get_evento_by_id(pk)
     titulo = evento.titulo or f"Evento #{pk}"
-    excluir_evento(evento)
+    try:
+        excluir_evento(evento)
+    except DelecaoProtegidaError as exc:
+        messages.error(request, str(exc))
+        return redirect("eventos:index")
     messages.success(request, f'Evento "{titulo}" excluído.')
     return redirect("eventos:index")
 

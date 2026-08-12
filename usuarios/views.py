@@ -1,13 +1,12 @@
 from functools import wraps
-from urllib.parse import urlencode
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.core.paginator import Paginator
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
+
+from core.pagination import contexto_paginacao
 
 from . import selectors
 from . import services
@@ -40,15 +39,6 @@ def somente_administrador(view):
         return view(request, *args, **kwargs)
 
     return _wrapped
-
-
-def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
-    return [
-        page_number if isinstance(page_number, int) else "..."
-        for page_number in page_obj.paginator.get_elided_page_range(
-            page_obj.number, on_each_side=on_each_side, on_ends=on_ends
-        )
-    ]
 
 
 def _abas_administracao(*, ativa, contadores):
@@ -89,8 +79,13 @@ def index(request):
             return redirect("usuarios:index")
 
     usuarios = selectors.listar_usuarios(q=q)
-    paginator = Paginator(usuarios, ADMIN_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
+    paginacao = contexto_paginacao(
+        usuarios,
+        request,
+        ADMIN_PER_PAGE,
+        query_params={"q": q},
+    )
+    page_obj = paginacao["page_obj"]
     vincular_url = reverse("usuarios:vinculo_create")
     rows = [
         apresentar_linha_lista_simples_usuario(
@@ -120,9 +115,7 @@ def index(request):
             "page_description": "Contas do sistema e as áreas a que cada uma tem acesso.",
             "rows": rows,
             "q": q,
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({"q": q}) if q else "",
+            **paginacao,
             "abas": _abas_administracao(ativa="usuarios", contadores=contadores),
             "tabs_aria_label": "Alternar entre usuários e áreas",
             "quick_add_form": quick_add_form,
@@ -149,8 +142,13 @@ def areas_index(request):
             return redirect("usuarios:areas_index")
 
     areas = selectors.listar_areas(q=q)
-    paginator = Paginator(areas, ADMIN_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
+    paginacao = contexto_paginacao(
+        areas,
+        request,
+        ADMIN_PER_PAGE,
+        query_params={"q": q},
+    )
+    page_obj = paginacao["page_obj"]
     rows = [
         apresentar_linha_lista_simples_area(
             area,
@@ -173,9 +171,7 @@ def areas_index(request):
             "page_description": "Unidades de trabalho que isolam os dados do sistema.",
             "rows": rows,
             "q": q,
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({"q": q}) if q else "",
+            **paginacao,
             "abas": _abas_administracao(ativa="areas", contadores=contadores),
             "tabs_aria_label": "Alternar entre usuários e áreas",
             "quick_add_form": quick_add_form,
@@ -199,8 +195,8 @@ def area_update(request, pk):
         return redirect("usuarios:area_update", pk=area.pk)
 
     vinculos = selectors.listar_vinculos_da_area(area)
-    paginator = Paginator(vinculos, AREA_VINCULOS_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
+    paginacao = contexto_paginacao(vinculos, request, AREA_VINCULOS_PER_PAGE)
+    page_obj = paginacao["page_obj"]
     vinculo_action_url = reverse("usuarios:vinculo_create_na_area", args=[area.pk])
     rows = [
         apresentar_linha_lista_simples_vinculo(
@@ -223,8 +219,7 @@ def area_update(request, pk):
             "form": form,
             "area": area,
             "rows": rows,
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
+            **paginacao,
             "vinculo_form": vinculo_form,
             "vinculo_action_url": vinculo_action_url,
             "submit_label": "Salvar área",

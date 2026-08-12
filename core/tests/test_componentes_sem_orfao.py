@@ -1,187 +1,134 @@
-"""`HT-06` — nenhum componente de `templates/components/` fica sem quem o renderize.
-
-**As duas auditorias contaram 10 e 14 de 96 porque usavam critérios diferentes**, e a
-divergência era exatamente sobre o laboratório: uma contava como vivo o componente
-alcançável sob `DEBUG`, a outra não. A medição por arquivo (`AGENTS.md` §3.6)
-separou os casos e mostrou que existem **três** situações, não duas:
-
-| situação | quantos | o que foi feito |
-|---|---:|---|
-| nenhum citador em lugar nenhum | 5 | apagados |
-| citado só por um teste que afirma a **ausência** dele | 1 | apagado |
-| órfão **em cascata**, revelado pelos anteriores | 1 | apagado |
-| alcançável a partir do UI Lab, sob `DEBUG` | 7 | **mantidos** — ver abaixo |
-
-A cascata é a razão de a regra valer mais que a lista: `lists/list_filters.html` só
-era citado por `lists/main_list_card.html`, e virou órfão no instante em que o outro
-saiu. Quem contasse uma vez e apagasse a lista deixaria este para trás — quem roda a
-regra depois de apagar, não.
-
-Os 7 do laboratório não eram decisão daquela etapa: apagá-los era decidir para que
-serve o UI Lab (`BE-17`). A decisão veio com o `BE-25` (PR #247), que apagou os dois
-labs — e os 7 caíram na cascata no mesmo instante, provando a regra pela segunda vez.
-
-A trava é sobre a **regra**, não sobre a lista: componente novo que ninguém renderiza
-reprova aqui, e componente que perde o último consumidor também.
-"""
+"""HT-06/NOVO-74: todo componente Cotton tem consumidor de produção."""
 
 from __future__ import annotations
 
-import subprocess
 from pathlib import Path
 
 from django.conf import settings
 from django.test import SimpleTestCase
 
-RAIZ = Path(settings.BASE_DIR)
-COMPONENTES = RAIZ / "templates/components"
 
-#: Onde procurar por quem renderiza um componente. `templates/` e `static/` pegam
-#: include e JS; os pacotes Python pegam `render()`, `render_to_string()` e o
-#: template passado por variável (`body_template`, `card_template`).
-ONDE_PROCURAR = [
-    "templates", "static", "core", "cadastros", "oficios", "roteiros", "eventos",
-    "termos", "justificativas", "planos_trabalho", "ordens_servico",
-    "prestacoes_contas", "usuarios", "documentos", "google_drive",
-    "config", "scripts",
-]
+ROOT = Path(settings.BASE_DIR)
+COTTON = ROOT / "templates" / "cotton"
+SEARCH_SUFFIXES = {".html", ".py", ".js"}
 
-#: Componentes vivos **só** no UI Lab, sob `DEBUG`. A lista teve 7 nomes até o
-#: `BE-25` apagar os dois labs (PR #247) — no mesmo instante os 7 perderam o último
-#: citador e a regra dos órfãos os reprovou, no `main` inteiro: a cascata prevista
-#: no `HT-06`, na maior escala possível. Foram apagados com prova de grep
-#: (`test_os_apagados_da_cascata_do_be25_nao_voltaram`). A lista fica, vazia, para
-#: o próximo componente que nascer alcançável só por página de laboratório.
-SO_NO_LABORATORIO: dict[str, str] = {}
+# As duas listas abaixo são travas de regressão, não inventário: nomeiam componentes que
+# o projeto apagou pagando a prova de grep do `AGENTS.md` §3.6. O guarda de órfão pega um
+# deles se voltar sem consumidor; estas listas pegam o caso que ele não vê — voltar
+# **e ser usado**, que é como componente morto reaparece na prática.
+APAGADOS_PELO_HT06 = (
+    "perfil/gdrive_card.html",
+    "perfil/partials/_gdrive_card_header_meta.html",
+    "ui/filters/advanced_filters.html",
+    "ui/filters/search_input.html",
+    "ui/lists/list_card_actions.html",
+    "lists/main_list_card.html",
+    "lists/list_filters.html",  # órfão em cascata do anterior
+)
+
+APAGADOS_COM_O_LAB = (
+    "ui/buttons/field_action_button.html",
+    "ui/buttons/floating_primary_action.html",
+    "ui/buttons/footer_action.html",
+    "ui/forms/dropdown.html",
+    "ui/layouts/collection_header.html",
+    "lists/list_grid.html",
+    "ui/tables/data_table.html",
+    # Segunda ordem: os citadores dele eram `list_grid.html` (acima) e `ui_lab2/views.py`
+    # (PR #247). O `HT-06` o mediu vivo porque ambos ainda existiam.
+    "cards/document_card.html",
+)
 
 
-def citadores(rel_templates: str) -> list[str]:
-    """Arquivos que mencionam o caminho do componente, tirando ele mesmo."""
-    saida = subprocess.run(
-        ["grep", "-rl", "--", rel_templates, *ONDE_PROCURAR],
-        capture_output=True, text=True, cwd=RAIZ,
-    ).stdout.split()
+def _sources() -> list[Path]:
+    ignored = {".git", ".venv", "__pycache__"}
     return sorted(
-        x for x in saida
-        if not x.endswith(rel_templates)
-        and "__pycache__" not in x
-        and "bundle" not in x
+        path
+        for path in ROOT.rglob("*")
+        if path.is_file()
+        and path.suffix in SEARCH_SUFFIXES
+        and not ignored.intersection(path.parts)
     )
 
 
-def e_teste(caminho: str) -> bool:
-    return "/tests/" in caminho or Path(caminho).name.startswith("test_")
+def _is_test(path: Path) -> bool:
+    return "tests" in path.parts or path.name.startswith("test_")
 
 
 class NenhumComponenteOrfaoTests(SimpleTestCase):
-    def componentes(self) -> list[str]:
-        return sorted(
-            p.relative_to(COMPONENTES).as_posix() for p in COMPONENTES.rglob("*.html")
-        )
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.sources = {
+            path: path.read_text(encoding="utf-8-sig", errors="replace")
+            for path in _sources()
+        }
+
+    def components(self) -> list[Path]:
+        return sorted(COTTON.rglob("*.html"))
+
+    def citations(self, component: Path) -> list[Path]:
+        relative = component.relative_to(COTTON)
+        template_path = f"cotton/{relative.as_posix()}"
+        tag = "<c-" + ".".join(relative.with_suffix("").parts)
+        return [
+            path
+            for path, source in self.sources.items()
+            if path != component and (template_path in source or tag in source)
+        ]
 
     def test_todo_componente_tem_quem_o_renderize(self):
-        """Órfão de verdade: ninguém cita, nem produção, nem lab, nem teste."""
-        orfaos = [
-            rel for rel in self.componentes()
-            if not citadores(f"components/{rel}")
+        orphaned = [
+            str(path.relative_to(COTTON))
+            for path in self.components()
+            if not self.citations(path)
         ]
-
-        self.assertEqual(orfaos, [], "componente que ninguém renderiza")
+        self.assertEqual(orphaned, [], "componente Cotton sem consumidor")
 
     def test_nenhum_componente_vive_so_de_teste(self):
-        """`main_list_card.html` era isto, e o teste afirmava a **ausência** dele.
+        test_only = []
+        for component in self.components():
+            citations = self.citations(component)
+            if citations and all(_is_test(path) for path in citations):
+                test_only.append(str(component.relative_to(COTTON)))
+        self.assertEqual(test_only, [], "componente citado somente por teste")
 
-        Um componente cujo único vestígio no repositório é um teste não está em uso:
-        está sendo mantido vivo pela própria prova de que não é usado.
-        """
-        so_de_teste = [
-            rel for rel in self.componentes()
-            if (cit := citadores(f"components/{rel}")) and all(e_teste(x) for x in cit)
-        ]
-
-        self.assertEqual(so_de_teste, [], "componente citado só por teste")
-
-    def test_a_lista_do_laboratorio_esta_correta(self):
-        """Exceção que ninguém confere vira permissão.
-
-        Se um destes ganhar consumidor de produção, sai da lista; se perder o do lab,
-        vira órfão e cai na primeira regra. Nos dois casos, a lista mente antes de
-        alguém perceber — a não ser que ela seja conferida, que é o que isto faz.
-        """
-        for rel in sorted(SO_NO_LABORATORIO):
-            with self.subTest(componente=rel):
-                caminho = COMPONENTES / rel
-                self.assertTrue(caminho.exists(), "componente da lista não existe mais")
-
-                cit = citadores(f"components/{rel}")
-                self.assertTrue(cit, "perdeu o último citador — vire órfão ou saia da lista")
-
-                de_producao = [
-                    x for x in cit
-                    if not e_teste(x)
-                    and "dev/ui_lab" not in x
-                    and "ui_lab2" not in x
-                ]
-                self.assertEqual(
-                    de_producao, [],
-                    "ganhou consumidor de produção — tire da lista do laboratório",
-                )
+    def test_namespace_unico_tem_o_inventario_atual(self):
+        self.assertEqual(list((ROOT / "templates" / "components").rglob("*.*")), [])
+        self.assertEqual(len(self.components()), 85)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
-        """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige."""
-        apagados = [
-            "perfil/gdrive_card.html",
-            "perfil/partials/_gdrive_card_header_meta.html",
-            "ui/filters/advanced_filters.html",
-            "ui/filters/search_input.html",
-            "ui/lists/list_card_actions.html",
-            "lists/main_list_card.html",
-            "lists/list_filters.html",  # órfão em cascata do anterior
-        ]
+        """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.
 
-        for rel in apagados:
-            with self.subTest(componente=rel):
-                self.assertFalse((COMPONENTES / rel).exists())
+        A E5 apagou esta trava junto com o diretório `templates/components/`: quando o
+        diretório inteiro sumiu, `(COMPONENTES / rel).exists()` virou vacuamente
+        verdadeira e o teste foi removido em vez de reapontado (`NOVO-80`). O caminho
+        mudou; a lista, não — a E4 preservou a forma da árvore ao mover para
+        `templates/cotton/`.
+        """
+        voltaram = [rel for rel in APAGADOS_PELO_HT06 if (COTTON / rel).exists()]
+        self.assertEqual(voltaram, [], "componente apagado pelo HT-06 voltou")
 
     def test_os_apagados_da_cascata_do_be25_nao_voltaram(self):
-        """O `BE-25` apagou os dois labs (PR #247); os 7 da lista caíram junto.
+        """Idem para a cascata do `NOVO-44` e para o que caiu com o UI Lab (PR #247)."""
+        voltaram = [rel for rel in APAGADOS_COM_O_LAB if (COTTON / rel).exists()]
+        self.assertEqual(voltaram, [], "componente apagado com o lab voltou")
 
-        Era a cascata que o `HT-06` previu: perderam o último citador no mesmo
-        commit que removeu `dev/ui_lab` e `ui_lab2`, e a regra dos órfãos parou o
-        `main` inteiro até alguém tratar. Grep de prova no PR que os apagou:
-        zero referências fora de `docs/`.
+    def test_as_travas_nomeadas_pegam_o_que_o_guarda_de_orfao_nao_ve(self):
+        """O buraco do `NOVO-80` foi medido, não suposto.
+
+        Ressuscitando `ui/forms/dropdown.html`:
+
+          volta sem consumidor -> guarda de órfão pega, trava nomeada pega
+          volta COM consumidor -> guarda de órfão passa, trava nomeada pega
+
+        A segunda linha é o defeito, e é como componente morto reaparece na prática:
+        alguém copia de branch antiga e já sai usando. Este teste prende a razão de as
+        duas listas existirem, para que a próxima etapa não as apague de novo achando
+        que o guarda de órfão já cobre o caso.
         """
-        apagados_com_o_lab = [
-            "ui/buttons/field_action_button.html",
-            "ui/buttons/floating_primary_action.html",
-            "ui/buttons/footer_action.html",
-            "ui/forms/dropdown.html",
-            "ui/layouts/collection_header.html",
-            "lists/list_grid.html",
-            "ui/tables/data_table.html",
-            # Segunda ordem: os citadores dele eram `list_grid.html` (acima) e
-            # `ui_lab2/views.py` (PR #247). O `HT-06` o mediu vivo porque ambos
-            # ainda existiam; os dois sucessores de `status_badge` e `button`
-            # que ele citava seguem com dezenas de citadores próprios.
-            "cards/document_card.html",
-        ]
-
-        for rel in apagados_com_o_lab:
-            with self.subTest(componente=rel):
-                self.assertFalse((COMPONENTES / rel).exists())
-
-    def test_a_varredura_esta_achando_os_componentes(self):
-        """Sem isto, as regras acima passariam com a pasta vazia.
-
-        85 → 83 na cascata do `BE-25`: saíram os 7 do laboratório e o
-        `document_card`, que era de segunda ordem. 83 → 82 com o esvaziamento do
-        painel de `/`, que deixou `summary_card.html` sem citador. O piso
-        acompanha exclusão deliberada; queda que ninguém explicou continua
-        reprovando.
-
-        **O piso fica com folga zero de propósito e isso é um custo conhecido:**
-        toda remoção deliberada obriga a editar esta linha. É o preço de o teste
-        também servir de trava contra a pasta esvaziar por acidente — e a
-        obrigação de escrever o motivo aqui é justamente o que se quer.
-        """
-        self.assertGreaterEqual(len(self.componentes()), 82)
+        nomeados = set(APAGADOS_PELO_HT06) | set(APAGADOS_COM_O_LAB)
+        vivos = {str(path.relative_to(COTTON)) for path in self.components()}
+        self.assertEqual(nomeados & vivos, set())
+        # com consumidor, o guarda de órfão não teria o que reclamar — só a lista pega
+        self.assertIn("ui/forms/dropdown.html", nomeados)

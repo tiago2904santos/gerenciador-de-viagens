@@ -20,15 +20,6 @@ from termos.models import TermoAutorizacao
 from .models import Evento
 from .models import TipoEvento
 
-_DOCUMENTOS_VINCULAVEIS = [
-    ("oficios_vinculados", "oficios"),
-    ("ordens_servico_vinculadas", "ordens_servico"),
-    ("planos_trabalho_vinculados", "planos_trabalho"),
-    ("termos_vinculados", "termos_autorizacao"),
-    ("roteiros_vinculados", "roteiros"),
-]
-
-
 def _periodo_roteiro(roteiro) -> str:
     inicio = roteiro.saida_dt
     fim = roteiro.retorno_chegada_dt or roteiro.chegada_dt or roteiro.retorno_saida_dt
@@ -308,22 +299,6 @@ class EventoNovoCadastroForm(forms.ModelForm):
         if data_inicio and data_fim and data_fim < data_inicio:
             self.add_error("data_fim", "A data final não pode ser anterior à data inicial.")
         return cleaned
-
-    def sincronizar_documentos_vinculados(self, evento):
-        """Vincula/desvincula ofícios, OS, planos, termos e roteiros conforme a seleção do form."""
-        for field_name, related_name in _DOCUMENTOS_VINCULAVEIS:
-            if field_name not in self.cleaned_data:
-                continue
-            manager = getattr(evento, related_name)
-            selecionados_ids = {obj.pk for obj in self.cleaned_data[field_name]}
-            atuais_ids = set(manager.values_list("pk", flat=True))
-            para_adicionar = selecionados_ids - atuais_ids
-            para_remover = atuais_ids - selecionados_ids
-            if para_adicionar:
-                manager.model.objects.filter(pk__in=para_adicionar).update(evento=evento)
-            if para_remover:
-                manager.model.objects.filter(pk__in=para_remover).update(evento=None)
-
 
 class EventoForm(forms.ModelForm):
     class Meta:

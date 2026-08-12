@@ -103,9 +103,9 @@ class VazamentosQueOManagerFechaTests(TestCase):
         self.destino = Cidade.objects.create(nome="Londrina", estado=self.estado, uf="PR")
 
     def test_o_picker_de_roteiros_salvos_nao_lista_os_de_outra_area(self):
-        """`roteiros/roteiro_logic.py:_get_roteiro_saved_routes` filtrava só por
+        """`roteiros/services/editor_state_builder.py:_get_roteiro_saved_routes` filtrava só por
         status. O ofício de uma área via os roteiros finalizados de todas."""
-        from roteiros.roteiro_logic import _get_roteiro_saved_routes
+        from roteiros.services.editor_state_builder import _get_roteiro_saved_routes
 
         with sem_request():
             meu = Roteiro.objects.create(area=self.area, status=Roteiro.STATUS_FINALIZADO)
@@ -119,9 +119,9 @@ class VazamentosQueOManagerFechaTests(TestCase):
         self.assertNotIn(alheio.pk, encontrados, msg="o picker ofereceu roteiro de outra área")
 
     def test_o_roteiro_submetido_de_outra_area_nao_e_aceito(self):
-        """`roteiros/roteiro_logic.py:1088` validava o id sem recorte: bastava
+        """`editor_state_builder._build_roteiro_state_from_post` validava o id sem recorte: bastava
         submeter o pk de um roteiro alheio para ele ser aceito."""
-        from roteiros.roteiro_logic import Roteiro as RoteiroNoLogic
+        from roteiros.services.editor_state_builder import Roteiro as RoteiroNoLogic
 
         with sem_request():
             alheio = Roteiro.objects.create(area=self.outra)
