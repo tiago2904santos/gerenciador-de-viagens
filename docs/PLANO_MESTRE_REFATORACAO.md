@@ -557,4 +557,6 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       (mapa de capitais memorizado no processo decidindo diária com base velha, **fechado**)
 - [x] `NOVO-27` regressão do `NOVO-26`: uma consulta de capitais por card na lista de
       roteiros (teto do `PF-07` 32 → 47). Corrigida; teto sobe a 33 de propósito
+- [x] `NOVO-115` resíduo do PR #58: documentos vinculáveis acompanham o período ainda não salvo e
+      o picker recupera a ação de limpar, sobre os componentes atuais
 - [ ] `QA-17` triagem dos 13 PRs abertos
