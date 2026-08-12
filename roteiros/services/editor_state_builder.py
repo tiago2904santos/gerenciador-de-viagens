@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.utils import timezone
 
 from cadastros.models import Cidade, Estado, ConfiguracaoSistema
+from core.errors import capture
 
 from roteiros.services.diarias import (
     PeriodMarker,
@@ -102,7 +103,14 @@ def _estrutura_trechos(roteiro, destinos_list=None):
         try:
             d_cidade = Cidade.objects.filter(pk=cidade_id).select_related('estado').first()
             d_nome = d_cidade.nome if d_cidade else Estado.objects.filter(pk=estado_id).first().sigla if estado_id else 'â€”'
-        except Exception:
+        except Exception as exc:
+            capture(
+                exc,
+                "roteiros.editor.destino_label",
+                roteiro_id=roteiro.pk,
+                estado_id=estado_id,
+                cidade_id=cidade_id,
+            )
             d_nome = 'â€”'
         t_db = trechos_db.get(ordem)
         t_adic = getattr(t_db, 'tempo_adicional_min', None) if t_db else 0
@@ -562,7 +570,8 @@ def _build_roteiro_state_from_roteiro_evento(roteiro, seed_source_label='Pré-pr
 
     try:
         state['mapa_rota'] = serialize_existing_route(roteiro)
-    except Exception:
+    except Exception as exc:
+        capture(exc, "roteiros.editor.serializar_rota", roteiro_id=roteiro.pk)
         state['mapa_rota'] = None
     return state
 

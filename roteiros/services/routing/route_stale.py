@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 from roteiros.models import Roteiro
+from core.errors import capture
 
+from .route_exceptions import RouteServiceError
 from .route_signature import build_route_signature_for_roteiro
 
 
@@ -19,7 +21,15 @@ def mark_stale_when_signature_changed(roteiro: Roteiro, *, profile: str = "drivi
     fresh = Roteiro.all_objects.get(pk=roteiro.pk)
     try:
         new_sig = build_route_signature_for_roteiro(fresh, profile=profile)
-    except Exception:
+    except RouteServiceError:
+        return
+    except Exception as exc:
+        capture(
+            exc,
+            "roteiros.rota.assinatura_atualizada",
+            roteiro_id=roteiro.pk,
+            profile=profile,
+        )
         return
     if not (fresh.rota_assinatura or "").strip():
         return

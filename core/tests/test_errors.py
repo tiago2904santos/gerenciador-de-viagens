@@ -5,7 +5,10 @@ from django.test import SimpleTestCase
 
 from core.errors import capture
 from core.logging import JsonFormatter
-from scripts.audit_django_architecture import except_exception_without_capture
+from scripts.audit_django_architecture import (
+    except_exception_without_capture,
+    except_exception_without_observability,
+)
 
 
 class ErrorCaptureTests(SimpleTestCase):
@@ -85,6 +88,60 @@ except Exception as exc:
         capture(exc, "drive.enviar")
 """
         self.assertEqual(except_exception_without_capture(code), [4])
+
+
+class ProductionExceptionAuditTests(SimpleTestCase):
+    def test_detecta_handler_generico_silencioso(self):
+        code = """
+try:
+    executar()
+except Exception:
+    return None
+"""
+        self.assertEqual(except_exception_without_observability(code), [4])
+
+    def test_aceita_capture_estruturado(self):
+        code = """
+try:
+    executar()
+except Exception as exc:
+    capture(exc, "contexto")
+    return None
+"""
+        self.assertEqual(except_exception_without_observability(code), [])
+
+    def test_aceita_logger(self):
+        code = """
+try:
+    executar()
+except Exception:
+    logger.warning("falhou")
+    return None
+"""
+        self.assertEqual(except_exception_without_observability(code), [])
+
+    def test_aceita_re_raise(self):
+        code = """
+try:
+    executar()
+except Exception:
+    limpar()
+    raise
+"""
+        self.assertEqual(except_exception_without_observability(code), [])
+
+    def test_log_de_handler_aninhado_nao_mascara_handler_externo(self):
+        code = """
+try:
+    executar()
+except Exception:
+    try:
+        limpar()
+    except Exception:
+        logger.warning("limpeza falhou")
+    return None
+"""
+        self.assertEqual(except_exception_without_observability(code), [4])
 
 
 class _RecordHandler(logging.Handler):

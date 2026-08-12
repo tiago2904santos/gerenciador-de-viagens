@@ -154,6 +154,7 @@ jobs:
           python scripts/audit_django_architecture.py
           --max-orm-em-view 27
           --max-drive-except-without-capture 0
+          --max-except-without-observability 0
           --max-sync-document-generations 0
 
       - name: Block area-scoping regressions (BE-09)

@@ -11,6 +11,8 @@ from contextlib import contextmanager
 from functools import wraps
 from typing import Any
 
+from core.errors import capture
+
 logger = logging.getLogger("documentos.timing")
 
 
@@ -51,8 +53,8 @@ def measure_step(
                 from core.metrics import record_document_generation
 
                 record_document_generation(duration_ms=duration_ms)
-            except Exception:
-                pass
+            except Exception as exc:
+                capture(exc, "documentos.timing.record_metric", label=label)
         try:
             parts: list[str] = ["[documentos]"]
             for key in sorted(meta.keys()):
@@ -63,5 +65,5 @@ def measure_step(
             parts.append(f"etapa={label}")
             parts.append(f"duration_ms={duration_ms}")
             logger.info(" ".join(parts))
-        except Exception:
-            pass
+        except Exception as exc:
+            capture(exc, "documentos.timing.log_step", label=label)

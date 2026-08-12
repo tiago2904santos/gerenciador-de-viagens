@@ -1,6 +1,7 @@
 import json
 
 from django.urls import reverse
+from django.core.exceptions import ObjectDoesNotExist
 
 from cadastros.selectors import get_configuracao_sistema
 from core import entity_cards
@@ -180,7 +181,7 @@ def apresentar_prestacao_servidor_card(
     diario = None
     try:
         diario = prestacao.diario_bordo
-    except Exception:
+    except ObjectDoesNotExist:
         diario = None
     diario_pdf_url = (
         reverse("prestacoes_contas:diario_download_formato", args=[diario.pk, "pdf"])
@@ -199,8 +200,8 @@ def apresentar_prestacao_servidor_card(
     if oficio.data_criacao:
         try:
             data_criacao_display = oficio.data_criacao.strftime("%d/%m/%Y")
-        except Exception:
-            pass
+        except (AttributeError, TypeError, ValueError):
+            data_criacao_display = ""
 
     destino_display = _destino_display_oficio(oficio)
     data_evento_display = _data_evento_display_oficio(oficio)
@@ -254,7 +255,7 @@ def apresentar_prestacao_servidor_card(
     rt = None
     try:
         rt = prestacao.relatorio_tecnico
-    except Exception:
+    except ObjectDoesNotExist:
         rt = None
 
     despacho_assinado = _anexo_assinado_info(

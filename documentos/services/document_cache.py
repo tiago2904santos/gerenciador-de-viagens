@@ -16,6 +16,8 @@ from typing import Any, Mapping
 
 from django.conf import settings
 
+from core.errors import capture
+
 from documentos.models import DocumentoArtefato
 from documentos.services.resources_paths import resolve_resource_docx
 from documentos.services.templates import default_template_registry
@@ -171,7 +173,8 @@ def get_cached_document_artifact(
             return None
         if not art.arquivo.storage.exists(name):
             return None
-    except Exception:
+    except Exception as exc:
+        capture(exc, "documentos.cache.storage_exists", arquivo=getattr(art.arquivo, "name", ""))
         return None
     return art
 

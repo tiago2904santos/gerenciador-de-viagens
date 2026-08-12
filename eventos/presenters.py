@@ -421,7 +421,7 @@ def _iso_data(valor) -> str:
         return ""
     try:
         return data.isoformat()
-    except Exception:
+    except (AttributeError, TypeError, ValueError):
         return ""
 
 
@@ -431,7 +431,7 @@ def _data_br(valor) -> str:
         return ""
     try:
         return data.strftime("%d/%m/%Y")
-    except Exception:
+    except (AttributeError, TypeError, ValueError):
         return ""
 
 

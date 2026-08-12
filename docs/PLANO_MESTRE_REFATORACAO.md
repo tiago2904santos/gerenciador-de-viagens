@@ -526,7 +526,8 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
 `NOVO-64` 176 tokens sem prefixo · `NOVO-65` 545 classes sem prefixo.
 
 ### Fase 8 — Observabilidade e autorização
-- [ ] `BE-18` `capture()` só existe em um app; 72 `except` mudos
+- [x] `BE-18` handlers genéricos mudos 73 → 0; exceções esperadas tipadas, falhas inesperadas
+      observadas e catraca AST permanente no CI
 - [x] `BE-19` decisão de autorização registrada; helper e contexto sem consumidor removidos sem
       inventar operação exclusiva de ADMIN
 - [ ] `QA-16` sem rastreamento de erro centralizado

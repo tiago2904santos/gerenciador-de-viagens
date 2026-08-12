@@ -12,6 +12,7 @@ from typing import Mapping
 from django.utils import timezone
 
 from core.normalizers import normalize_upper
+from core.errors import capture
 from cadastros.selectors import build_configuracao_context
 from documentos.services.timing import measure_step
 from documentos.services.formatters import format_city_uf
@@ -509,8 +510,8 @@ def _solicitacoes_por_servidor(oficio: Oficio) -> dict[int, str]:
                 numero = _txt(getattr(ps, "numero_solicitacao", ""))
                 if numero:
                     solicitacoes[ps.servidor_id] = numero
-    except Exception:
-        pass
+    except Exception as exc:
+        capture(exc, "oficios.docxtpl.solicitacoes_por_servidor", oficio_id=oficio.pk)
     return solicitacoes
 
 

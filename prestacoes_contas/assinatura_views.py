@@ -7,6 +7,7 @@ app (template próprio) e isentas de login (``login_not_required``).
 from __future__ import annotations
 
 import base64
+import binascii
 import hashlib
 import ipaddress
 
@@ -294,7 +295,7 @@ def _decode_data_url_png(data_url):
         return None
     try:
         return base64.b64decode(b64)
-    except Exception:
+    except (binascii.Error, ValueError):
         return None
 
 

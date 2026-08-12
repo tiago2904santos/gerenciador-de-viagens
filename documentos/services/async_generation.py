@@ -16,6 +16,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from core.tenancy import filter_queryset_by_area
+from core.errors import capture
 from documentos.models import DocumentoGeracao
 from documentos.services.types import DocumentoFormato
 
@@ -311,6 +312,7 @@ def enfileirar_documento(
         try:
             gerar_documento_assincrono.delay(str(job.pk))
         except Exception as exc:
+            capture(exc, "documentos.enfileirar_geracao", job_id=str(job.pk))
             falhar_job(job, exc)
 
     job.refresh_from_db()

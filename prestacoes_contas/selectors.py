@@ -195,21 +195,15 @@ def _base_servidores(
         queryset = queryset.filter(filters).distinct()
 
     if viagem_de:
-        try:
-            queryset = queryset.filter(
-                prestacao__oficio__roteiro__isnull=False,
-                prestacao__oficio__roteiro__saida_dt__date__gte=viagem_de,
-            )
-        except Exception:
-            pass
+        queryset = queryset.filter(
+            prestacao__oficio__roteiro__isnull=False,
+            prestacao__oficio__roteiro__saida_dt__date__gte=viagem_de,
+        )
     if viagem_ate:
-        try:
-            queryset = queryset.filter(
-                prestacao__oficio__roteiro__isnull=False,
-                prestacao__oficio__roteiro__saida_dt__date__lte=viagem_ate,
-            )
-        except Exception:
-            pass
+        queryset = queryset.filter(
+            prestacao__oficio__roteiro__isnull=False,
+            prestacao__oficio__roteiro__saida_dt__date__lte=viagem_ate,
+        )
 
     return queryset
 

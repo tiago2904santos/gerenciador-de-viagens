@@ -19,6 +19,8 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 from django.utils import timezone
 
+from core.errors import capture
+
 from .models import AssinaturaDocumento
 from .models import DiarioBordo
 from .models import RelatorioTecnico
@@ -220,8 +222,8 @@ def _carimbar_pdf(origem_bytes, png_bytes, *, pagina, x, y, w, h, nome, codigo) 
     if getattr(reader, "is_encrypted", False):
         try:
             reader.decrypt("")
-        except Exception:
-            pass
+        except Exception as exc:
+            capture(exc, "prestacoes.assinatura.decrypt_pdf")
 
     total = len(reader.pages)
     if total == 0:

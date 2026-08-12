@@ -15,6 +15,7 @@ from django.db.models import Model
 from django.db.models.query import QuerySet
 from django.utils import timezone
 
+from core.errors import capture
 from documentos.models import DocumentoArtefato
 from documentos.models import DocumentoAssinaturaVersao
 from documentos.services.exceptions import ArquivoAssinadoInvalido
@@ -141,8 +142,8 @@ def anexar_arquivo_assinado(artefato: DocumentoArtefato, upload: UploadedFile) -
         from core.middleware import get_current_request
 
         request = get_current_request()
-    except Exception:
-        pass
+    except Exception as exc:
+        capture(exc, "documentos.persistence.resolve_actor")
     actor = getattr(request, "user", None)
     if not getattr(actor, "is_authenticated", False):
         actor = None
@@ -178,8 +179,8 @@ def remover_arquivo_assinado(artefato: DocumentoArtefato) -> DocumentoArtefato:
             from core.middleware import get_current_request
 
             request = get_current_request()
-        except Exception:
-            pass
+        except Exception as exc:
+            capture(exc, "documentos.persistence.resolve_revocation_actor")
         actor = getattr(request, "user", None)
         versao.revogada_em = timezone.now()
         versao.revogada_por = actor if getattr(actor, "is_authenticated", False) else None

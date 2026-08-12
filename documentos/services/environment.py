@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import importlib.util
 import io
+import logging
 import platform
 import sys
 from dataclasses import dataclass
@@ -15,6 +16,8 @@ from typing import Any
 from django.conf import settings
 
 from documentos.services.libreoffice_resolve import resolve_libreoffice_binary
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -83,13 +86,14 @@ def _word_com_available() -> tuple[bool, str]:
         word.Visible = False
         return True, "Word.Application respondeu"
     except Exception as exc:
+        logger.debug("Word COM falhou no diagnóstico", exc_info=True)
         return False, str(exc)[:200]
     finally:
         if word is not None:
             try:
                 word.Quit(SaveChanges=0)
             except Exception:
-                pass
+                logger.debug("Falha ao encerrar Word após diagnóstico", exc_info=True)
 
 
 def _weasyprint_functional() -> tuple[bool, str]:
@@ -104,6 +108,7 @@ def _weasyprint_functional() -> tuple[bool, str]:
             return False, "PDF gerado inválido ou vazio"
         return True, "render mínimo OK"
     except Exception as exc:
+        logger.debug("WeasyPrint falhou no diagnóstico", exc_info=True)
         return False, str(exc)[:240]
 
 

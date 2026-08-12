@@ -877,7 +877,7 @@ estão verdes. Com paginação, exclusão protegida e retorno centralizados, o `
 metrics, LoginView, dashboard, perfil — são 314 linhas. Em paralelo existem **dois** UI Labs:
 o app `ui_lab2` (656 LOC + 18 templates) e `templates/dev/ui_lab` (19 templates).
 
-### BE-18 🟠 Logging estruturado existe e só um app usa · AUD · 2,5 d
+### BE-18 ✅ RESOLVIDO · Logging estruturado existe e só um app usa · AUD · 2,5 d
 
 `core/errors.py:20` define `capture(exc, contexto, **dados)` e `core/logging.py:19` serializa em
 JSON. As **64 chamadas estão todas** sob `integracoes/google_drive`. Seis apps (cadastros,
@@ -886,6 +886,24 @@ diario_bordo, eventos, justificativas, prestacoes_contas, usuarios) não têm lo
 157 `except Exception`/bare em produção; **72 (46%) sem nenhum log**.
 **Correção:** `capture()` como contrato único, registrado no `AGENTS.md`; regra nova no
 `audit_django_architecture.py` com catraca que só desce.
+
+**Fatia 1 em 12/08.** A medição atualizada encontrou 73 handlers genéricos sem `capture` nem log.
+Onze foram eliminados: conversões esperadas agora capturam exceções específicas; falhas reais de
+importação geográfica, configuração de justificativa, auditoria, tenancy e encerramento de sessão
+entram em `capture()` com contexto estável. O saldo caiu para 62, e 41 testes direcionados passaram.
+
+**Fatia 2.** O domínio documental passou a observar falhas de tarefa/fila, resolução do ator,
+storage e telemetria; probes e limpeza de COM registram diagnóstico em nível debug; conversão
+decimal captura apenas erros esperados. A régua também foi corrigida para não chamar de “mudo” um
+handler que relança a exceção. Saldo real: **39**. Dos 176 testes de `documentos`, 175 passaram e
+somente a importação conhecida do WeasyPrint ficou bloqueada pela `libgobject` ausente no Windows.
+
+**Fechamento.** Os 39 handlers restantes foram classificados pelo contrato real: exceções
+esperadas agora têm tipo específico; handlers que limpam e relançam preservam o erro; relatórios e
+probes registram diagnóstico; toda degradação após falha inesperada chama `capture()` com contexto.
+A régua AST cobre todos os módulos Python de produção, ignora testes, migrações e os próprios
+auditores, e o workflow fixa `--max-except-without-observability 0`. O saldo medido caiu de **73
+para 0**; a regra também foi incorporada ao `AGENTS.md` para código novo não reabrir a lacuna.
 
 ### BE-19 ✅ RESOLVIDO · `require_area_role` tem zero usos · AUD · 1,5 d
 

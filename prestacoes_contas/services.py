@@ -13,6 +13,7 @@ from django.utils import timezone
 from cadastros.selectors import build_configuracao_context
 from core.normalizers import normalize_spaces
 from core.deletion import excluir_com_protecao
+from core.errors import capture
 from core.utils.dinheiro import ValorMonetarioInvalido
 from core.utils.dinheiro import parse_valor_monetario
 from documentos.services.facade import build_default_facade
@@ -138,7 +139,8 @@ def _sede(area) -> str:
         from cadastros.models import ConfiguracaoSistema
 
         return ConfiguracaoSistema.get_for_area(area).cidade_endereco or ""
-    except Exception:
+    except Exception as exc:
+        capture(exc, "prestacoes.cidade_configurada", area_id=getattr(area, "pk", None))
         return ""
 
 
@@ -156,8 +158,8 @@ def diaria_inicial_do_oficio(prestacao) -> str:
         valor = _diaria_por_servidor(getattr(oficio, "roteiro", None), total_servidores)
         if valor is not None:
             return format_currency_br(valor)
-    except Exception:
-        pass
+    except Exception as exc:
+        capture(exc, "prestacoes.diaria_prevista", oficio_id=oficio.pk)
     return ""
 
 
@@ -169,8 +171,8 @@ def diaria_inicial_da_prestacao(prestacao) -> str:
         valor = _diaria_por_servidor(roteiro_efetivo(prestacao), total_servidores)
         if valor is not None:
             return format_currency_br(valor)
-    except Exception:
-        pass
+    except Exception as exc:
+        capture(exc, "prestacoes.diaria_efetiva", prestacao_id=prestacao.pk)
     return ""
 
 
@@ -348,7 +350,8 @@ def _upper_header_value(value: object) -> str:
 def _assunto_relatorio_tecnico(oficio) -> str:
     try:
         termo = resolver_assunto_oficio(oficio).get("assunto_termo") or ""
-    except Exception:
+    except Exception as exc:
+        capture(exc, "prestacoes.assunto_relatorio_tecnico", oficio_id=oficio.pk)
         termo = ""
     if termo:
         return termo[:1].upper() + termo[1:]
@@ -441,6 +444,7 @@ def gerar_relatorio_tecnico_pdf(relatorio: RelatorioTecnico, servidor_prestacao)
                     raise DocumentValidationError("LibreOffice indisponivel para gerar PDF.")
                 return convert_docx_to_pdf_libreoffice(docx_bytes=docx_bytes, libreoffice_binary=binary)
         except Exception as exc:
+            capture(exc, "prestacoes.converter_relatorio_pdf", engine=engine)
             last_error = exc
             continue
 
@@ -567,8 +571,8 @@ def _solicitacoes_do_oficio(prestacao) -> dict[int, str]:
             numero = str(ps.numero_solicitacao or "").strip()
             if numero:
                 solicitacoes[ps.servidor_id] = numero
-    except Exception:
-        pass
+    except Exception as exc:
+        capture(exc, "prestacoes.solicitacoes_por_servidor", prestacao_id=prestacao.pk)
     return solicitacoes
 
 

@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.db import transaction
 
 from core.deletion import excluir_com_protecao
+from core.errors import capture
 
 from cadastros.models import ConfiguracaoSistema
 
@@ -22,7 +23,8 @@ def get_prazo_justificativa_dias() -> int:
     """Prazo mínimo em dias corridos; usa ConfiguracaoSistema com fallback 10."""
     try:
         return int(ConfiguracaoSistema.get_singleton().prazo_justificativa_dias)
-    except Exception:
+    except Exception as exc:
+        capture(exc, "justificativas.get_prazo_justificativa_dias")
         return 10
 
 

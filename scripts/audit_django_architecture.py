@@ -19,6 +19,16 @@ ROOT = Path(__file__).resolve().parents[1]
 # catraca no alto e explicar um ORM recém-removido fazia o CI reprovar um PR certo.
 ORM_MANAGER_ATTRS = {"objects", "all_objects"}
 DRIVE_ROOT = ROOT / "integracoes" / "google_drive"
+OBSERVABILITY_CALL_NAMES = {
+    "capture",
+    "critical",
+    "debug",
+    "error",
+    "exception",
+    "info",
+    "log",
+    "warning",
+}
 P06_SPLIT_VIEW_MODULES = {
     "oficios/api_views.py",
     "oficios/list_views.py",
@@ -211,6 +221,76 @@ def except_exception_without_capture(code: str) -> list[int]:
     ]
 
 
+class _HandlerObservabilityVisitor(ast.NodeVisitor):
+    def __init__(self):
+        self.found = False
+
+    def visit_Raise(self, node):
+        self.found = True
+
+    def visit_Call(self, node):
+        if isinstance(node.func, ast.Name):
+            name = node.func.id
+        elif isinstance(node.func, ast.Attribute):
+            name = node.func.attr
+        else:
+            name = ""
+        if name in OBSERVABILITY_CALL_NAMES:
+            self.found = True
+        if not self.found:
+            self.generic_visit(node)
+
+    def visit_ExceptHandler(self, node):
+        # Um log do handler interno não observa a falha capturada pelo externo.
+        return
+
+    def visit_FunctionDef(self, node):
+        return
+
+    visit_AsyncFunctionDef = visit_FunctionDef
+    visit_Lambda = visit_FunctionDef
+    visit_ClassDef = visit_FunctionDef
+
+
+def _handler_has_observability(node: ast.ExceptHandler) -> bool:
+    visitor = _HandlerObservabilityVisitor()
+    for statement in node.body:
+        visitor.visit(statement)
+        if visitor.found:
+            return True
+    return False
+
+
+def except_exception_without_observability(code: str) -> list[int]:
+    """Localiza handlers genéricos que engolem a falha sem registro nem re-raise."""
+
+    tree = ast.parse(code)
+    return [
+        node.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ExceptHandler)
+        and _is_exception_handler(node)
+        and not _handler_has_observability(node)
+    ]
+
+
+def production_excepts_without_observability():
+    findings = []
+    for path in iter_files(".py"):
+        path_rel = rel(path)
+        if (
+            path_rel.startswith("scripts/")
+            or "/tests/" in f"/{path_rel}"
+            or "/migrations/" in f"/{path_rel}"
+            or path.name.startswith("test")
+        ):
+            continue
+        text = path.read_text(encoding="utf-8-sig")
+        for line_no in except_exception_without_observability(text):
+            findings.append((path_rel, line_no))
+    return findings
+
+
 def drive_excepts_without_capture():
     findings = []
     for path in DRIVE_ROOT.rglob("*.py"):
@@ -269,6 +349,12 @@ def main():
         default=None,
         help="falha se handlers `except Exception` do Drive não chamarem core.errors.capture",
     )
+    parser.add_argument(
+        "--max-except-without-observability",
+        type=int,
+        default=None,
+        help="falha se handlers genéricos de produção engolirem erros sem log, capture ou re-raise",
+    )
     args = parser.parse_args()
 
     findings = [*audit_python(), *audit_templates()]
@@ -309,6 +395,23 @@ def main():
             f"\nERRO: {len(drive_findings)} handlers genéricos do Drive sem "
             "core.errors.capture, acima da catraca de "
             f"{args.max_drive_except_without_capture}.",
+        )
+        sys.exit(1)
+
+    silent_findings = production_excepts_without_observability()
+    print("\n== except Exception sem observabilidade em produção (BE-18) ==")
+    for file_path, line_no in silent_findings:
+        print(f"  {file_path}:{line_no}")
+    print(f"Total: {len(silent_findings)}")
+
+    if (
+        args.max_except_without_observability is not None
+        and len(silent_findings) > args.max_except_without_observability
+    ):
+        print(
+            f"\nERRO: {len(silent_findings)} handlers genéricos de produção "
+            "engolem falhas sem log, core.errors.capture ou re-raise; acima da catraca de "
+            f"{args.max_except_without_observability}.",
         )
         sys.exit(1)
 

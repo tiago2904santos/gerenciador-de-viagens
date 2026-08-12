@@ -74,12 +74,9 @@ def _wizard_dados_viajantes_context(
         viatura_selecionada_modelo = v.modelo or ""
         viatura_selecionada_combustivel = str(v.combustivel) if v.combustivel_id else ""
         viatura_selecionada_tipo = v.tipo or ""
-        try:
-            viatura_selecionada_edit_url = reverse(
-                "cadastros:viatura_update", args=[oficio.viatura_id]
-            )
-        except Exception:
-            viatura_selecionada_edit_url = ""
+        viatura_selecionada_edit_url = reverse(
+            "cadastros:viatura_update", args=[oficio.viatura_id]
+        )
 
     return {
         "page_title": "Cadastro de ofício",

@@ -10,6 +10,7 @@ from cadastros.models import Servidor
 from cadastros.models import Viatura
 from cadastros.selectors import build_configuracao_context
 from core.utils.masks import format_placa
+from core.errors import capture
 from core.deletion import excluir_com_protecao
 
 from documentos.services.facade import DocumentoFacade
@@ -507,7 +508,13 @@ def _persistir_termo_cadastro_artefato(
             try:
                 cidade = naming.cidade_evento(getattr(oficio, "evento", None), oficio)
                 nome_drive = naming.nome_termo(oficio, servidor, cidade)
-            except Exception:
+            except Exception as exc:
+                capture(
+                    exc,
+                    "termos.nome_drive_cadastro",
+                    oficio_id=oficio.pk,
+                    servidor_id=servidor_id,
+                )
                 nome_drive = ""
         persist_geracao(
             doc,

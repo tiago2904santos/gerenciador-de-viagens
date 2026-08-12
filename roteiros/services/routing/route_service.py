@@ -8,10 +8,15 @@ from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 
+from core.errors import capture
 from roteiros.models import Roteiro, RoteiroTrecho
 
 from .openrouteservice import get_openrouteservice_provider
-from .route_exceptions import RouteConfigurationError, RouteDailyRoundTripBlockedError
+from .route_exceptions import (
+    RouteConfigurationError,
+    RouteDailyRoundTripBlockedError,
+    RouteServiceError,
+)
 from .route_metrics import summarize_route_leg_metrics
 from .route_point_builder import build_route_points_for_roteiro
 from .route_signature import build_route_signature
@@ -88,7 +93,10 @@ def _roteiro_is_round_trip(roteiro: Roteiro) -> bool:
         if bate:
             return True
         return any(_infer_point_kind(p.get("id")) == "retorno" for p in points)
-    except Exception:
+    except RouteServiceError:
+        return False
+    except Exception as exc:
+        capture(exc, "roteiros.rota.detectar_retorno", roteiro_id=roteiro.pk)
         return False
 
 
@@ -165,8 +173,8 @@ def _route_payload_from_roteiro(
     }
     try:
         payload.update(_metrics_from_roteiro_trechos(roteiro))
-    except Exception:
-        pass
+    except Exception as exc:
+        capture(exc, "roteiros.rota.metricas_persistidas", roteiro_id=roteiro.pk)
     return payload
 
 
@@ -260,7 +268,10 @@ def serialize_existing_route(roteiro: Roteiro) -> Dict[str, Any] | None:
     try:
         built_points, _ = build_route_points_for_roteiro(roteiro)
         points = _points_for_frontend(built_points)
-    except Exception:
+    except RouteServiceError:
+        points = []
+    except Exception as exc:
+        capture(exc, "roteiros.rota.serializar_pontos", roteiro_id=roteiro.pk)
         points = []
     return {
         "roteiro_id": roteiro.pk,

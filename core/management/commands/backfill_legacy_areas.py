@@ -4,6 +4,7 @@ from django.apps import apps
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandError
+from django.db import DatabaseError
 from django.db import IntegrityError
 from django.db import transaction
 from django.db.models import Max
@@ -240,7 +241,7 @@ class Command(BaseCommand):
             queryset = model._default_manager.filter(area__isnull=True)
             try:
                 count = queryset.count()
-            except Exception:
+            except DatabaseError:
                 # Permite executar o comando durante uma implantação em que
                 # uma tabela nova ainda não exista.
                 continue
