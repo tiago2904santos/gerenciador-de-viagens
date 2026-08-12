@@ -1,15 +1,16 @@
+/* UI-03: le o par canonico `--wizard-*` em vez de re-derivar os valores.
+
+   Havia DUAS regras aqui — uma clara e uma escura —, e a escura repetia
+   letra por letra a expressao que `03-theme-dark.css` ja usa em
+   `--wizard-card-bg`. Como `--wizard-*` ja troca por tema, uma regra basta, e o
+   valor passa a ter uma origem so. O escuro sai identico; o claro adota o
+   esquema do NOVO-120, que e o mesmo do wizard. */
 .justificativas-page {
-  --step1-surface: var(--color-surface-muted, var(--color-card));
-  --step1-panel: var(--color-surface-soft, var(--color-card));
-  --step1-field: var(--step1-surface);
+  --step1-surface: var(--wizard-card-bg);
+  --step1-panel: var(--wizard-panel-bg);
+  --step1-field: var(--wizard-field-bg);
   display: grid;
   gap: var(--space-5);
-}
-
-:is(html[data-theme="dark"]) .justificativas-page {
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-panel: var(--color-surface-soft);
-  --step1-field: var(--step1-surface);
 }
 
 /* Lista (rail, botão e linhas) na superfície step1; band = cabeçalho dos ofícios. */
@@ -60,25 +61,19 @@
   gap: var(--space-3);
 }
 
-/* Tokens do step1 sem a caixa travel-document-card. */
-[data-justificativa-quick-add] .justificativa-quick-add__scope {
-  --step1-surface: var(--color-surface-muted, var(--color-card));
-  --step1-panel: var(--color-surface-soft, var(--color-card));
-  --step1-field: var(--step1-surface);
-  --step1-empty: var(--step1-field);
-  display: grid;
-  gap: 10px;
-  /* document-form-page no escopo só para herdar regras de lista 1 coluna. */
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-  padding: 0;
-}
+/* Tokens do step1 sem a caixa travel-document-card.
 
-:is(html[data-theme="dark"]) [data-justificativa-quick-add] .justificativa-quick-add__scope {
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-panel: var(--color-surface-soft);
-  --step1-field: var(--step1-surface);
+   UI-03: era um par clara+escura re-derivando os mesmos valores. Agora le o par
+   canonico `--wizard-*`, que ja troca por tema, e uma regra basta.
+
+   A fusao corrige de passagem uma assimetria: `--color-input-bg` era re-ligado
+   SO no bloco escuro, entao o campo do quick-add claro nunca acompanhou a
+   superficie do passo 1. Com uma regra so, os dois temas passam a ter a mesma
+   estrutura — que e o contrato desta familia. */
+[data-justificativa-quick-add] .justificativa-quick-add__scope {
+  --step1-surface: var(--wizard-card-bg);
+  --step1-panel: var(--wizard-panel-bg);
+  --step1-field: var(--wizard-field-bg);
   --step1-empty: var(--step1-field);
   /* UI-03: re-ligacao COM ESCOPO, nao definicao global — permitida de proposito.
      45 regras globais leem var(--color-input-bg); re-ligar aqui faz todas elas
@@ -86,6 +81,13 @@
      conhecer este container. Converter para estilo direto custaria duplicar as
      45 sob este seletor, subindo especificidade — o oposto da Fase 7. */
   --color-input-bg: var(--step1-field);
+  display: grid;
+  gap: 10px;
+  /* document-form-page no escopo só para herdar regras de lista 1 coluna. */
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
 }
 
 /* Lista do Ofício vinculado: mesma do termo, só um pouco mais baixa. */

@@ -7,11 +7,14 @@
   min-width: 0;
 }
 
-/* Painel intermediário — mesmo tom --step1-panel dos formulários. */
+/* Painel intermediário — mesmo tom --step1-panel dos formulários.
+
+   UI-03: as três declarações que ficavam aqui estavam MORTAS. O gêmeo em
+   `components/theme-dark-components.css` usa `:is(html[data-theme])`, que tem
+   especificidade maior e ainda carrega depois no bundle — vencia nos dois
+   temas. Ficavam como documentação enganosa: quem lesse este arquivo concluiria
+   o valor errado. A definição viva é a de lá, agora lendo `--wizard-*`. */
 .collection-panel {
-  --step1-panel: var(--color-surface-soft, var(--color-card-soft));
-  --step1-surface: var(--color-surface-muted, var(--color-card-muted, var(--color-input-bg)));
-  --step1-field: var(--step1-surface);
   background: var(--step1-panel);
   border: 0;
   border-radius: 14px;

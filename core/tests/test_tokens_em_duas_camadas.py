@@ -124,6 +124,46 @@ class TokenGlobalMoraEmDuasCamadasTests(SimpleTestCase):
                 )
         self.assertGreater(com_escopo, 0, "a permissão sumiu do CSS sem passar por aqui")
 
+    def test_step1_le_o_par_canonico_em_vez_de_re_derivar(self):
+        """UI-03: `--step1-*` sai de `--wizard-*`, e de mais lugar nenhum.
+
+        A família tinha 15 declarações em 7 arquivos. Nenhuma em escopo raiz —
+        eram todas re-ligações com escopo, que a regra permite — mas oito delas
+        **re-derivavam o valor na mão**, repetindo letra por letra a expressão
+        que `03-theme-dark.css` usa em `--wizard-card-bg`. Três consequências
+        medidas:
+
+        1. `.collection-panel` tinha um par: as três declarações de
+           `lists/record-list.css` estavam mortas, vencidas pelo gêmeo mais
+           específico em `theme-dark-components.css`. Quem lesse o primeiro
+           arquivo concluiria o valor errado.
+        2. Quatro escopos aplicavam a expressão do tema ESCURO **sem predicado
+           de tema**, então o modal de vincular usuário, a geração de documento
+           embutida e a etapa 4 do plano de trabalho saíam com superfície escura
+           também no claro.
+        3. Cada página precisava de duas regras — uma clara e uma escura —
+           porque o valor era literal. Lendo `--wizard-*`, que já troca por tema,
+           uma basta.
+
+        A trava é sobre a expressão, não sobre o arquivo: re-ligar `--step1-*`
+        com escopo continua permitido, desde que o valor venha do par canônico.
+        """
+        declaracao = re.compile(r"--step1-(?:surface|panel|field)\s*:\s*([^;]+);")
+        permitido = ("var(--wizard-", "var(--step1-")
+        infratores = []
+        for arquivo in _fontes():
+            texto = COMENTARIO.sub("", arquivo.read_text(encoding="utf-8"))
+            for valor in declaracao.findall(texto):
+                if not valor.strip().startswith(permitido):
+                    infratores.append(
+                        f"{arquivo.relative_to(CSS).as_posix()}: {valor.strip()[:70]}"
+                    )
+        self.assertEqual(
+            infratores,
+            [],
+            "--step1-* tem que ler --wizard-*, nao re-derivar o valor — ver UI-03",
+        )
+
     def test_o_bloco_escuro_herdado_ficou_antes_do_bloco_proprio(self):
         """Ordem, não conteúdo — e é o detalhe que mudaria cor em silêncio.
 

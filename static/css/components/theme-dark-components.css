@@ -5063,15 +5063,19 @@ html[data-theme="dark"] *::after {
   color: var(--color-heading);
 }
 
-/* NOVO-100 (E9-c): idem — a definicao das variaveis vale nos dois temas, a
-   pintura continua sendo decisao de tema. `lists/record-list.css:12` ja liga as
-   mesmas tres neutras para `.collection-panel`; aqui o gemeo garante que o
-   valor seja o mesmo do escuro, e nao o daquele arquivo. */
+/* NOVO-100 (E9-c): a definicao das variaveis vale nos dois temas, a pintura
+   continua sendo decisao de tema.
+
+   UI-03: o gemeo nasceu para garantir que o valor fosse o do escuro, e nao o de
+   `lists/record-list.css` — mas resolvia a expressao ESCURA nos dois temas, e as
+   tres declaracoes daquele arquivo ficaram mortas. Agora le `--wizard-*`, que ja
+   troca por tema: o escuro sai identico e o claro deixa de herdar superficie
+   escura. As declaracoes mortas do outro arquivo sairam. */
 :is(html[data-theme])
   .collection-panel {
-  --step1-panel: var(--color-surface-soft);
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-field: var(--step1-surface);
+  --step1-panel: var(--wizard-panel-bg);
+  --step1-surface: var(--wizard-card-bg);
+  --step1-field: var(--wizard-field-bg);
 }
 
 :is(html[data-theme="dark"])

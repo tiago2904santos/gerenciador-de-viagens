@@ -6588,8 +6588,10 @@ html[data-theme="dark"] .action-menu {
 /* Modal de documento assinado. */
 .attach-signed-modal__dialog.delete-confirm-modal__dialog,
 .attach-signed-modal__dialog {
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-panel: var(--color-surface-soft);
+  /* UI-03: a expressao era a do tema ESCURO, sem predicado — o modal saia com
+     superficie escura tambem no claro. `--wizard-*` da o valor de cada tema. */
+  --step1-surface: var(--wizard-card-bg);
+  --step1-panel: var(--wizard-panel-bg);
   background: var(--step1-surface);
   gap: 0;
   max-width: min(100%, 610px);
@@ -7218,11 +7220,14 @@ html[data-theme="dark"] #attach-signed-modal .icon-btn.icon-btn--delete,
   min-width: 0;
 }
 
-/* Painel intermediário — mesmo tom --step1-panel dos formulários. */
+/* Painel intermediário — mesmo tom --step1-panel dos formulários.
+
+   UI-03: as três declarações que ficavam aqui estavam MORTAS. O gêmeo em
+   `components/theme-dark-components.css` usa `:is(html[data-theme])`, que tem
+   especificidade maior e ainda carrega depois no bundle — vencia nos dois
+   temas. Ficavam como documentação enganosa: quem lesse este arquivo concluiria
+   o valor errado. A definição viva é a de lá, agora lendo `--wizard-*`. */
 .collection-panel {
-  --step1-panel: var(--color-surface-soft, var(--color-card-soft));
-  --step1-surface: var(--color-surface-muted, var(--color-card-muted, var(--color-input-bg)));
-  --step1-field: var(--step1-surface);
   background: var(--step1-panel);
   border: 0;
   border-radius: 14px;
@@ -14599,15 +14604,19 @@ html[data-theme="dark"] *::after {
   color: var(--color-heading);
 }
 
-/* NOVO-100 (E9-c): idem — a definicao das variaveis vale nos dois temas, a
-   pintura continua sendo decisao de tema. `lists/record-list.css:12` ja liga as
-   mesmas tres neutras para `.collection-panel`; aqui o gemeo garante que o
-   valor seja o mesmo do escuro, e nao o daquele arquivo. */
+/* NOVO-100 (E9-c): a definicao das variaveis vale nos dois temas, a pintura
+   continua sendo decisao de tema.
+
+   UI-03: o gemeo nasceu para garantir que o valor fosse o do escuro, e nao o de
+   `lists/record-list.css` — mas resolvia a expressao ESCURA nos dois temas, e as
+   tres declaracoes daquele arquivo ficaram mortas. Agora le `--wizard-*`, que ja
+   troca por tema: o escuro sai identico e o claro deixa de herdar superficie
+   escura. As declaracoes mortas do outro arquivo sairam. */
 :is(html[data-theme])
   .collection-panel {
-  --step1-panel: var(--color-surface-soft);
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-field: var(--step1-surface);
+  --step1-panel: var(--wizard-panel-bg);
+  --step1-surface: var(--wizard-card-bg);
+  --step1-field: var(--wizard-field-bg);
 }
 
 :is(html[data-theme="dark"])

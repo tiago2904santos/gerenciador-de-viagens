@@ -714,8 +714,10 @@ html[data-theme="dark"] .action-menu {
 /* Modal de documento assinado. */
 .attach-signed-modal__dialog.delete-confirm-modal__dialog,
 .attach-signed-modal__dialog {
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-panel: var(--color-surface-soft);
+  /* UI-03: a expressao era a do tema ESCURO, sem predicado — o modal saia com
+     superficie escura tambem no claro. `--wizard-*` da o valor de cada tema. */
+  --step1-surface: var(--wizard-card-bg);
+  --step1-panel: var(--wizard-panel-bg);
   background: var(--step1-surface);
   gap: 0;
   max-width: min(100%, 610px);

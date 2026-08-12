@@ -1,17 +1,13 @@
 /* Usuários — lista + quick-add no padrão das justificativas. */
 
+/* UI-03: uma regra em vez de clara+escura re-derivando os mesmos valores — ver
+   a nota em `pages/justificativas.css`, que tinha o par identico. */
 .usuarios-page {
-  --step1-surface: var(--color-surface-muted, var(--color-card));
-  --step1-panel: var(--color-surface-soft, var(--color-card));
-  --step1-field: var(--step1-surface);
+  --step1-surface: var(--wizard-card-bg);
+  --step1-panel: var(--wizard-panel-bg);
+  --step1-field: var(--wizard-field-bg);
   display: grid;
   gap: var(--space-5);
-}
-
-:is(html[data-theme="dark"]) .usuarios-page {
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-panel: var(--color-surface-soft);
-  --step1-field: var(--step1-surface);
 }
 
 .usuarios-page .list-header,
@@ -145,11 +141,12 @@
   gap: var(--space-3);
 }
 
+/* UI-03: idem — o par canonico troca por tema, entao uma regra basta. */
 [data-usuario-quick-add] .usuario-quick-add__scope,
 [data-area-quick-add] .area-quick-add__scope {
-  --step1-surface: var(--color-surface-muted, var(--color-card));
-  --step1-panel: var(--color-surface-soft, var(--color-card));
-  --step1-field: var(--step1-surface);
+  --step1-surface: var(--wizard-card-bg);
+  --step1-panel: var(--wizard-panel-bg);
+  --step1-field: var(--wizard-field-bg);
   --step1-empty: var(--step1-field);
   display: grid;
   gap: 10px;
@@ -157,14 +154,6 @@
   border: 0;
   box-shadow: none;
   padding: 0;
-}
-
-:is(html[data-theme="dark"]) [data-usuario-quick-add] .usuario-quick-add__scope,
-:is(html[data-theme="dark"]) [data-area-quick-add] .area-quick-add__scope {
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-panel: var(--color-surface-soft);
-  --step1-field: var(--step1-surface);
-  --step1-empty: var(--step1-field);
 }
 
 [data-usuario-quick-add] .travel-document-block,
@@ -189,9 +178,12 @@
 /* Modal Vincular usuário — mesmo contrato visual do anexar assinado. */
 .vincular-usuario-modal__dialog.delete-confirm-modal__dialog,
 .vincular-usuario-modal__dialog {
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-panel: var(--color-surface-soft);
-  --step1-field: var(--step1-surface);
+  /* UI-03: a expressao aqui era a do tema ESCURO, aplicada sem predicado — o
+     modal usava superficie escura tambem no claro. `--wizard-*` resolve cada
+     tema com o valor certo. */
+  --step1-surface: var(--wizard-card-bg);
+  --step1-panel: var(--wizard-panel-bg);
+  --step1-field: var(--wizard-field-bg);
   background: var(--step1-surface);
   gap: 0;
   max-width: min(100%, 520px);
