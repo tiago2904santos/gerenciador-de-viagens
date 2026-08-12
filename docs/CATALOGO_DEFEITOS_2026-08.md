@@ -995,7 +995,7 @@ isso lendo a linha do `QA-11` no catálogo, que estava desatualizada: a correç�
 `993e14c`, em 05/08. Por causa disso o teste nasceu com uma exceção para um arquivo que já estava
 limpo — um buraco na própria rede, por nada. A exceção foi removida junto do fechamento do `QA-11`.
 
-### BE-23 🟡 PARCIAL — sufixo CRUD padronizado; os outros 75% seguem sem vocabulário · AUD · 1 d · risco médio
+### BE-23 ✅ RESOLVIDO — sufixo CRUD padronizado; rotas de domínio preservadas · AUD · 1 d · risco médio
 
 Das 433 rotas nomeadas, **307 (71%)** não usam nenhum sufixo do `PADRAO_APP.md`. `cadastros` e
 `usuarios` usam inglês (`_create`/`_update`/`_delete`); `eventos`, `justificativas`, `oficios`,
@@ -1033,6 +1033,13 @@ parte das rotas de `core` só existe sob `settings.DEBUG` (`core/urls.py:18`), e
 **uma** (`core:ui_lab_eventos_lista`) estava justamente ali — um teste via resolver teria deixado
 passar. Segundo teste é o piso de 70 nomes com sufixo do padrão, para ninguém "padronizar" apagando
 o sufixo em vez de traduzi-lo.
+
+**Decisão final em 12/08.** O vocabulário normativo aplica-se às operações CRUD; esse recorte está
+integralmente fechado e protegido pela catraca. Os outros 213 nomes não são CRUD incompleto:
+`wizard_*`, `api_*`, `*_pdf`, `detalhe` e equivalentes descrevem operações e artefatos do domínio.
+Traduzir ou encaixar esses nomes à força em `index/create/update/delete` apagaria significado e
+ampliaria a troca para centenas de referências sem corrigir defeito observável. Permanecem nomes
+descritivos, namespaced pelo app, enquanto todo CRUD novo deve obedecer ao padrão já automatizado.
 
 ### BE-24 ✅ RESOLVIDO · Repositório com 133 MB de pack e arquivos indevidos · MED+VER · 1 d
 

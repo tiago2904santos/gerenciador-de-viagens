@@ -545,8 +545,8 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       achou **dois** presenters mortos no módulo, não um
 - [x] `BE-22` 10 arquivos `.py` com BOM — **fechado**: eram 11 (10 `.py` + um `.md`), e o
       `cadastros/views.py` era o único que obrigava o gate do `S-06` a ler com `utf-8-sig`
-- [~] `BE-23` vocabulário de rotas divergente — **sufixo CRUD fechado** (28 rotas PT→EN,
-      com catraca). Resta o vocabulário dos outros 75% dos nomes, que é decisão de sistema
+- [x] `BE-23` vocabulário de rotas — 28 sufixos CRUD padronizados e protegidos por catraca;
+      operações de domínio permanecem descritivas por decisão explícita
 - [x] `BE-24` artefatos locais removidos após extrair o corpus — **135 arquivos / 43,18 MiB**;
       `.gitignore` impede a reentrada
 - [x] `BE-25` decidir qual UI Lab é o vigente — **decidido e executado no PR #247: nenhum dos
