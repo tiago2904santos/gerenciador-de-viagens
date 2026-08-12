@@ -186,7 +186,7 @@ class DarkRedesignContractTests(SimpleTestCase):
                 self.assertNotIn(dark_only, self.components_css)
 
         self.assertIn(
-            "--entity-card-inner-bg: #eef4fc;",
+            "--entity-card-inner-bg: var(--color-surface-powder);",
             self.base_tokens_css,
         )
         self.assertIn(
@@ -200,7 +200,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         # regredido: painel interno azul-cinza, controle branco.
         light_contracts = (
             "--wizard-card-bg: var(--color-surface);",
-            "--wizard-panel-bg: #eef4fc;",
+            "--wizard-panel-bg: var(--color-surface-powder);",
             "--wizard-field-bg: var(--color-surface);",
         )
         dark_contracts = (
