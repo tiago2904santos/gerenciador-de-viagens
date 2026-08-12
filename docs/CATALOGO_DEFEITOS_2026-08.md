@@ -7811,6 +7811,7 @@ razão do `gte`, e serve de controle.
 falha na segunda gravação da *mesma* linha — o laço por campo que deixou de existir. A garantia é a
 mesma e continua medida; o ponto de injeção passou a ser a **segunda linha**. O comentário do teste
 já avisava que esse ponto tinha mudado uma vez antes.
+<<<<<<< HEAD
 
 ### NOVO-117 ✅ RESOLVIDO · `NOVO` Marcador de combustível ainda usava CB em vez de CT · UI · 0,1 d
 
@@ -7823,3 +7824,5 @@ cabeçalho não declarava o marcador do catálogo.
 o mesmo `brand_mark` ao cabeçalho compartilhado. Um teste do CRUD cria `GASOLINA` para provar que
 o resultado é `CT`, não as iniciais `GA`, e verifica a renderização. O rascunho antigo não foi
 mesclado; a intenção foi reaplicada sobre a arquitetura vigente.
+=======
+>>>>>>> f5a0c32a457598985a259e950b6ec137adbf6875
