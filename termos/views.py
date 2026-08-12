@@ -21,6 +21,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
 
 from core.pagination import contexto_paginacao
+from core.deletion import DelecaoProtegidaError
 
 from core.retorno import voltar_para
 from cadastros.selectors import rotulo_da_sede_configurada
@@ -50,6 +51,7 @@ from .selectors import Q_SIMPLES
 from .selectors import anotar_composicao
 from .selectors import listar_termos
 from .services import listar_servidores_com_termo
+from .services import excluir_termo
 from .services import preview_termo_context
 from .services import resolver_artefato_termo_cadastro
 from .services import resolver_artefato_termo_oficio
@@ -563,7 +565,11 @@ def editar(request, pk):
 @require_http_methods(["POST"])
 def excluir(request, pk):
     termo = get_termo_by_id(pk)
-    termo.delete()
+    try:
+        excluir_termo(termo)
+    except DelecaoProtegidaError as exc:
+        messages.error(request, str(exc))
+        return redirect("termos:index")
     messages.success(request, "Termo excluido.")
     return redirect("termos:index")
 

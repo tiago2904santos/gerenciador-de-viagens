@@ -40,6 +40,8 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 
+from core.deletion import DelecaoProtegidaError
+from core.deletion import excluir_com_protecao
 from core.pagination import contexto_paginacao
 from core.retorno import next_valido
 
@@ -348,7 +350,11 @@ def delete_view(config: CatalogConfig) -> Callable[..., HttpResponse]:
                         config.tratar_erro_vinculo(request)
                     return redirect(destino)
             else:
-                (config.excluir or _excluir_padrao)(obj)
+                try:
+                    (config.excluir or _excluir_padrao)(obj)
+                except DelecaoProtegidaError as exc:
+                    messages.error(request, str(exc))
+                    return redirect(destino)
             messages.success(request, config.mensagens.excluido.format(rotulo))
             return redirect(destino)
 
@@ -371,7 +377,7 @@ def delete_view(config: CatalogConfig) -> Callable[..., HttpResponse]:
 
 
 def _excluir_padrao(obj) -> None:
-    obj.delete()
+    excluir_com_protecao(obj)
 
 
 def set_default_view(config: CatalogConfig) -> Callable[..., HttpResponse]:

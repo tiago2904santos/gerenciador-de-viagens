@@ -15,6 +15,7 @@ from django.utils import timezone
 from cadastros.models import ConfiguracaoSistema
 from core.numeracao import NAMESPACE_PLANO_TRABALHO
 from core.numeracao import reservar_numero
+from core.deletion import excluir_com_protecao
 from core.tenancy import filter_queryset_by_area
 from core.tenancy import get_current_area
 from documentos.services.facade import build_default_facade
@@ -37,6 +38,10 @@ from roteiros.services.valor_extenso import valor_por_extenso_ptbr
 from .models import AtividadePlanoTrabalho
 from .models import EventoPlano
 from .models import PlanoTrabalho
+
+
+def excluir_plano(instance: PlanoTrabalho) -> None:
+    excluir_com_protecao(instance)
 
 logger = logging.getLogger(__name__)
 

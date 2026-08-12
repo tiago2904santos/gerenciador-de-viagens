@@ -452,7 +452,11 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       pontos usam `contexto_paginacao`, as 6 cópias de `_pagination_pages` foram removidas e não há
       `Paginator(...)` em produção fora do módulo comum. Termos mantém o total pré-agregado via
       `paginator_class`; chaves e filtros do contexto foram preservados. 922 testes consumidores
-      verdes. Faltam exclusão protegida e retorno
+      verdes. **Fatia 2 (exclusão protegida) feita**: catálogos e serviços de exclusão de entidades
+      acionados pelo usuário adotam `core.deletion`; `PROTECT` vira erro de domínio/mensagem e não
+      500. Remoções internas de filhos, arquivos, cache, sessão e rascunhos ficam fora por contrato.
+      A regressão de OS prova que bloqueio não cria lacuna; 299 testes consumidores verdes. Falta
+      retorno
 - [x] `BE-17` `core/views.py` é 75% fixture de UI Lab — **fechado pelo PR #247**, que apagou os
       dois labs e as 1.013 linhas de fixture; a cascata de componentes que ele deixou é o
       `NOVO-44`

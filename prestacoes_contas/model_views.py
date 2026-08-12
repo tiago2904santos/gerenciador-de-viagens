@@ -8,11 +8,13 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from core.normalizers import remove_accents
+from core.deletion import DelecaoProtegidaError
 from core.presenters.meta import build_meta
 from core.tenancy import filter_queryset_by_area
 
 from .forms import ModeloTextoRelatorioTecnicoForm
 from .models import ModeloTextoRelatorioTecnico
+from .services import excluir_modelo_texto
 
 # NOVO-03: ficou em `views.py` quando estas quatro views vieram para cá, e as duas
 # leituras abaixo viravam `NameError` em rota viva. Mora aqui, junto de quem lê.
@@ -118,7 +120,11 @@ def modelo_excluir(request, pk):
     modelo = get_object_or_404(filter_queryset_by_area(ModeloTextoRelatorioTecnico.objects), pk=pk)
     if request.method == "POST":
         campo = modelo.campo
-        modelo.delete()
+        try:
+            excluir_modelo_texto(modelo)
+        except DelecaoProtegidaError as exc:
+            messages.error(request, str(exc))
+            return redirect(_voltar_modelos_url(campo))
         messages.success(request, "Modelo excluído com sucesso.")
         return redirect(_voltar_modelos_url(campo))
 

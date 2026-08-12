@@ -23,6 +23,8 @@ from documentos.services.timing import track_document_generation
 from documentos.services.types import DocumentoFormato
 from documentos.services.types import DocumentoTipo
 
+from core.deletion import excluir_com_protecao
+
 from oficios.documents import build_canonical_document_payload
 from oficios.models import Oficio
 
@@ -37,7 +39,7 @@ logger = logging.getLogger(__name__)
 def excluir_ordem_servico(ordem: OrdemServico) -> None:
     """Exclui a OS e registra somente o número que ela efetivamente liberou."""
     numero, ano, area = ordem.numero, ordem.ano, ordem.area
-    ordem.delete()
+    excluir_com_protecao(ordem)
     if numero and ano:
         # `BE-09`: `all_objects` é deliberado. A lacuna pertence à área explícita da
         # OS excluída, mesmo se este serviço rodar fora do request ou sob outra área.

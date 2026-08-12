@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from core.pagination import contexto_paginacao
+from core.deletion import DelecaoProtegidaError
 from django.views.decorators.http import require_http_methods
 
 from core.normalizers import remove_accents
@@ -153,7 +154,11 @@ def index(request):
 @require_POST
 def justificativa_excluir(request, pk):
     justificativa = get_justificativa_by_id(pk)
-    excluir_justificativa(justificativa)
+    try:
+        excluir_justificativa(justificativa)
+    except DelecaoProtegidaError as exc:
+        messages.error(request, str(exc))
+        return redirect("justificativas:index")
     messages.success(request, "Justificativa excluída com sucesso.")
     return redirect("justificativas:index")
 

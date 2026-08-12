@@ -841,6 +841,20 @@ Prova mecânica após a fatia: `rg "Paginator\\(|def _pagination_pages"` encontr
 especializada `TermosPaginator` e o helper de fixture do teste do componente — zero construção ou
 cópia em produção. Faltam as fatias de exclusão protegida e retorno para fechar o `BE-16`.
 
+#### Fatia 2 ✅ — exclusão protegida adotada nas entidades
+
+`core.deletion.excluir_com_protecao` agora é a fronteira dos serviços de exclusão acionados pelo
+usuário: catálogos comuns, área/conta, Evento, Termo, Justificativa, Ordem de Serviço, Plano de
+Trabalho, modelo de Prestação de Contas, Ofício e Roteiro. `ProtectedError` deixa de escapar como
+500 e vira `DelecaoProtegidaError`, preservando as mensagens específicas que já existiam em
+Cadastros, Usuários, Ofícios e Roteiros e usando a mensagem comum nos demais fluxos.
+
+A separação é deliberada: os `.delete()` restantes em produção removem filhos/coleções durante a
+persistência, arquivos, cache, sessão ou rascunhos internos; não são exclusões de entidade pedidas
+pelo usuário e convertê-los em mensagem de vínculo mudaria o contrato transacional. A regressão do
+catálogo prova o antigo 500 e o redirect com mensagem; a de OS prova que uma exclusão protegida não
+cria lacuna numérica. **299 testes consumidores** estão verdes. Falta somente a fatia de retorno.
+
 ### BE-17 ✅ RESOLVIDO · 🟡 `core/views.py` é 75% fixture de UI Lab · AUD · 1,5 d
 
 **Fechado em 07/08 pela remoção do UI-lab.** `core/views.py` foi de **1.249 para 237 linhas**: saíram

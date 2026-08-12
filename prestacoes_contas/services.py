@@ -12,6 +12,7 @@ from django.utils import timezone
 
 from cadastros.selectors import build_configuracao_context
 from core.normalizers import normalize_spaces
+from core.deletion import excluir_com_protecao
 from core.utils.dinheiro import ValorMonetarioInvalido
 from core.utils.dinheiro import parse_valor_monetario
 from documentos.services.facade import build_default_facade
@@ -43,6 +44,10 @@ from .models import DiarioBordo
 from .models import PrestacaoDocumentoAnexo
 from .models import PrestacaoServidor
 from .models import RelatorioTecnico
+
+
+def excluir_modelo_texto(instance) -> None:
+    excluir_com_protecao(instance)
 
 _MESES = [
     "", "janeiro", "fevereiro", "março", "abril", "maio", "junho",

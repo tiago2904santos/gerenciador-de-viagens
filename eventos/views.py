@@ -10,6 +10,7 @@ from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_http_methods
 
 from core.pagination import contexto_paginacao
+from core.deletion import DelecaoProtegidaError
 from django.views.decorators.http import require_POST
 
 from cadastros.models import ConfiguracaoSistema
@@ -437,7 +438,11 @@ def guiado_termos(request, pk):
 def excluir(request, pk):
     evento = get_evento_by_id(pk)
     titulo = evento.titulo or f"Evento #{pk}"
-    excluir_evento(evento)
+    try:
+        excluir_evento(evento)
+    except DelecaoProtegidaError as exc:
+        messages.error(request, str(exc))
+        return redirect("eventos:index")
     messages.success(request, f'Evento "{titulo}" excluído.')
     return redirect("eventos:index")
 

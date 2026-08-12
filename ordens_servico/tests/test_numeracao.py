@@ -26,10 +26,12 @@ from unittest import mock
 from unittest import skipUnless
 
 from django.db import connection
+from django.db.models.deletion import ProtectedError
 from django.test import TestCase
 from django.utils import timezone
 
 from core.testing import area_de_teste
+from core.deletion import DelecaoProtegidaError
 from ordens_servico.models import OrdemServico
 from ordens_servico.models import OrdemServicoNumeroLacuna
 from ordens_servico.services import excluir_ordem_servico
@@ -118,6 +120,20 @@ class NumeracaoDaOrdemServicoTests(TestCase):
                 excluir_ordem_servico(ordem)
 
         self.assertTrue(OrdemServico.all_objects.filter(pk=ordem_pk).exists())
+
+    def test_exclusao_protegida_nao_cria_lacuna(self):
+        ordem = self.criar()
+
+        with mock.patch.object(
+            ordem,
+            "delete",
+            side_effect=ProtectedError("vinculada", {ordem}),
+        ):
+            with self.assertRaises(DelecaoProtegidaError):
+                excluir_ordem_servico(ordem)
+
+        self.assertTrue(OrdemServico.all_objects.filter(pk=ordem.pk).exists())
+        self.assertFalse(OrdemServicoNumeroLacuna.all_objects.exists())
 
     def test_numero_ja_definido_e_respeitado(self):
         """Numeração manual continua ganhando de qualquer sugestão automática."""
