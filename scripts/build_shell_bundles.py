@@ -44,6 +44,7 @@ SHELL_CSS: tuple[str, ...] = (
     "css/feedback/dialog.css",
     "css/feedback/document-download-loading.css",
     "css/components/theme-dark-components.css",
+    "css/components/theme-shared-components.css",
     "css/lists/list-header.css",
 )
 

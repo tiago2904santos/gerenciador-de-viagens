@@ -672,6 +672,7 @@ o token resolve.
 | **E8 Custom Select v2** | menu aberto, opções e check usam uma geometria nos dois temas (`NOVO-112`) | ✅ trilho, recuo, altura, raio, check e scrollbar compartilhados; azul no claro e dourado no escuro |
 | **E8 listas e superfícies claras** | espelha a estrutura dos cards e restaura bloco azul-cinza com campo branco (`NOVO-113`) | ✅ Ofício 91 com 112 nós e **0** diferenças de dimensão, posição relativa ou estilo não-cor; página `var(--app-body-bg)`, wizard claro `#fff` / `#eef4fc` / `#fff` |
 | **E9 — régua de mesmo tema** | versiona a prova usada pelas fatias da E8/E9 (`NOVO-114`) | ✅ dois URLs, contexto público separado do autenticado, duas ordens, estrutura e cascata sob teto 0; contrato automatizado e smoke real |
+| **E9-f — fronteira compartilhada** | retira da camada escura seletores que não escolhem tema, inclusive dentro de `@media` (`NOVO-119`) | ✅ 354 regras separadas; arquivo escuro 5.555 → **2.434** linhas e 184 → **98** `!important`; gate impede geometria neutra de voltar à camada escura |
 
 **O instrumento que a etapa exigiu, e que não existia.** A régua da E0
 (`medir_divergencia_tema.py`) compara **claro contra escuro no mesmo código**. A E9 precisa do

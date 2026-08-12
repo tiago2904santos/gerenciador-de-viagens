@@ -500,6 +500,8 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [x] `NOVO-82` 87 declarações escuras inertes, visíveis desde a fusão do `theme.css` · **E9**
 - [x] `NOVO-114` a régua de mesmo tema citada pela E9 não estava versionada; sonda reproduzível,
       contexto público/autenticado correto e contrato automatizado · **E9**
+- [x] `NOVO-119` separa 354 regras compartilhadas da camada escura; o arquivo transitório cai de
+      5.555 para 2.434 linhas e de 184 para 98 `!important`, com cascata estável · **E9**
 - [x] `NOVO-51` os 2 apelidos puros da família `cv-field` (e 15 bordas invisíveis) · **E7b**
 - [x] `NOVO-51` os 2 de valor próprio foram fechados em 11/08 após a decisão por anel visível no
       escuro: zero definições `--cv-field-*` vivas no CSS de fonte; a reauditoria de 12/08 encontra

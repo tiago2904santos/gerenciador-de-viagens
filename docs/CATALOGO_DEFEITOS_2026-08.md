@@ -7936,3 +7936,33 @@ cabeçalho não declarava o marcador do catálogo.
 o mesmo `brand_mark` ao cabeçalho compartilhado. Um teste do CRUD cria `GASOLINA` para provar que
 o resultado é `CT`, não as iniciais `GA`, e verifica a renderização. O rascunho antigo não foi
 mesclado; a intenção foi reaplicada sobre a arquitetura vigente.
+
+### NOVO-119 ✅ RESOLVIDO · `NOVO` Metade da camada de tema escuro nem escolhia tema · UI · 1 d
+
+`theme-dark-components.css` ainda misturava duas responsabilidades incompatíveis. Das 602 regras
+qualificadas no topo do arquivo, **313 não continham predicado `dark`**: eram contratos de
+geometria e composição que já valiam para claro e escuro, mas continuavam fisicamente enterrados
+na camada transitória de uma paleta. Isso escondia o progresso real da E9 e tornava cada nova
+remoção de regra escura mais arriscada, porque desenho compartilhado e exceção temática viajavam
+no mesmo arquivo de 5.555 linhas.
+
+**Correção.** As regras neutras passaram para `theme-shared-components.css`; o bundle mantém a
+camada escura imediatamente antes da compartilhada, preservando a precedência histórica das regras
+neutras tardias. Filhos neutros de `@media` foram separados preservando a ordem relativa dentro da
+nova fonte; listas mistas ficaram intactas, pois separar metade de uma lista sem medir repetiria o
+erro de método do `NOVO-95`.
+
+No total, **354 regras qualificadas** deixam a camada escura. O arquivo cai de **5.555 para 2.434
+linhas** e de **184 para 98 `!important`**. O novo arquivo compartilhado concentra 3.116 linhas e
+86 `!important` que já valiam nos dois temas; a
+dívida global não foi maquiada, apenas ganhou a fronteira correta. Um contrato com parser CSS
+proíbe seletor de topo sem `dark` no arquivo escuro e proíbe `data-theme="dark"` no compartilhado.
+Os contratos existentes passaram a ler as duas fontes explicitamente, e os bundles gerados travam
+a ordem de carga.
+
+**Prova.** 42 contratos de tokens/tema e Ruff passam. A sonda de mesmo tema encontrou duas
+propriedades do menu de Ofícios quando a ordem dos arquivos estava invertida e, numa segunda
+tentativa, **4.962 diferenças de estilo e 12 estruturais em 500 px** porque os filhos compartilhados
+de `@media` ainda estavam do lado escuro. Depois de corrigir as duas fronteiras, 12 medições móveis
+em seis rotas representativas — claro/escuro e duas ordens — deram **zero estilo e zero estrutura**.
+A E9/UI-02 continua aberta para listas mistas e exceções escuras restantes, em fatias medidas.
