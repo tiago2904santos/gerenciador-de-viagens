@@ -672,18 +672,25 @@ o token resolve.
 | **E8 Eventos/Wizard** | tipografia, stepper de um anel, campos, selects e hierarquia de superfícies (`NOVO-58`, `NOVO-100`) | ✅ conteúdo com **0 divergências não-cor** em 1440/800/500; chrome móvel permanece na 8h; prints claro/escuro conferidos |
 | **E8 Custom Select v2** | menu aberto, opções e check usam uma geometria nos dois temas (`NOVO-112`) | ✅ trilho, recuo, altura, raio, check e scrollbar compartilhados; azul no claro e dourado no escuro |
 | **E8 listas e superfícies claras** | espelha a estrutura dos cards e restaura bloco azul-cinza com campo branco (`NOVO-113`) | ✅ Ofício 91 com 112 nós e **0** diferenças de dimensão, posição relativa ou estilo não-cor; página `var(--app-body-bg)`, wizard claro `#fff` / `#eef4fc` / `#fff` |
+| **E9 — régua de mesmo tema** | versiona a prova usada pelas fatias da E8/E9 (`NOVO-114`) | ✅ dois URLs, contexto público separado do autenticado, duas ordens, estrutura e cascata sob teto 0; contrato automatizado e smoke real |
 
 **O instrumento que a etapa exigiu, e que não existia.** A régua da E0
 (`medir_divergencia_tema.py`) compara **claro contra escuro no mesmo código**. A E9 precisa do
-contrário: **o mesmo tema em dois códigos**. Daí `sonda_mesmo_tema.py` — 41.754 elementos chaveados
-por caminho no DOM, `transition` e `animation` desligadas, com `--revelar` (tira `[hidden]`, liga as
-classes de aberto) e `--pseudo hover` (força o estado em todo elemento).
+contrário: **o mesmo tema em dois códigos**. Daí `sonda_mesmo_tema.py` — citada nas medições
+históricas, mas só versionada no `NOVO-114` — chaveia elementos por caminho no DOM, desliga
+`transition` e `animation`, aceita `--revelar` (tira `[hidden]`/`aria-hidden` e abre `details`) e
+`--pseudo hover` (força o estado em todo elemento). A execução padrão cobre 43 rotas × 3 larguras ×
+2 temas = **258 combinações**; mudança estrutural, cascata ou resultado dependente da ordem reprova.
+Texto variável fica marcado no diagnóstico, mas não pode esconder diferença de estilo.
 
 > **Correção de 11/08 (`NOVO-105`):** o "piso de ruído de 4 elementos" que aparecia aqui **não era
 > ruído** — era o relógio de minuto de `/justificativas/` mudando a largura dos dígitos numa fonte
 > proporcional, o mesmo defeito que o `075d77df` achou no `medir_campos_computados.py`. Com o texto
-> guardado ao lado do estilo, o comparador separa reflow de cascata e **o piso é 0**: duas capturas
-> do mesmo código dão 0 de estilo e 30 só de texto. Os "zeros" anteriores desta tabela foram
+> guardado ao lado do estilo, mudança só de texto não vira diferença de CSS e **o piso é 0**: duas
+> capturas do mesmo código dão 0 de estilo e 30 só de texto. O `NOVO-114` fecha o outro lado do
+> contrato: se texto e estilo computado mudarem juntos, a correlação é informativa e o estilo
+> continua na catraca — ela não prova que a mudança visual veio apenas do texto. Os "zeros"
+> anteriores desta tabela foram
 > afirmados descontando 4 — ou seja, eram "zero ou quatro". Daqui em diante, zero é zero.
 
 **O que continua aberto na E9-a:** ~147 candidatas que reprovam em lote e **110 fora do alcance da
