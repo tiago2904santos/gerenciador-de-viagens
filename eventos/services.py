@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+
+from core.deletion import excluir_com_protecao
 from urllib.parse import urlencode
 
 from django.core.files.base import ContentFile
@@ -155,7 +157,7 @@ def excluir_evento(evento) -> None:
             roteiro.evento = None
             roteiro.save(update_fields=["evento"])
 
-    evento.delete()
+    excluir_com_protecao(evento)
 
 
 def build_evento_document_context(evento) -> dict:

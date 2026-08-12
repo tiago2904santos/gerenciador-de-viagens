@@ -9,6 +9,8 @@ from django.db.models import Q
 from django.utils import timezone
 
 from core.normalizers import normalize_upper
+from core.deletion import DelecaoProtegidaError
+from core.deletion import excluir_com_protecao
 from core.numeracao import NAMESPACE_OFICIO
 from core.numeracao import bloquear_escopo_numeracao
 from core.numeracao import colisao_de_numero
@@ -987,8 +989,8 @@ def _dados_viajantes_from_oficio(oficio):
 def excluir_oficio(instance):
     numero, ano, area = instance.numero, instance.ano, instance.area
     try:
-        instance.delete()
-    except ProtectedError as exc:
+        excluir_com_protecao(instance)
+    except DelecaoProtegidaError as exc:
         raise OficioVinculadoError from exc
     if numero and ano:
         # `BE-09`: `all_objects` — a lacuna pertence à área do ofício excluído, que
@@ -1108,7 +1110,7 @@ def atualizar_modelo_motivo(instance, form):
 
 @transaction.atomic
 def excluir_modelo_motivo(instance):
-    instance.delete()
+    excluir_com_protecao(instance)
 
 
 @transaction.atomic

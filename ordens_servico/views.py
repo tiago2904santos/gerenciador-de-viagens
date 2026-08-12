@@ -17,6 +17,7 @@ from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 
 from core.pagination import contexto_paginacao
+from core.deletion import DelecaoProtegidaError
 from documentos.services.async_generation import enfileirar_documento
 from documentos.services.types import DocumentoFormato
 from eventos.services import build_evento_document_seed
@@ -523,6 +524,10 @@ def pdf_inline(request, pk):
 def excluir(request, pk):
     ordem = get_ordem_servico_by_id(pk)
     numero = ordem.numero_formatado
-    excluir_ordem_servico(ordem)
+    try:
+        excluir_ordem_servico(ordem)
+    except DelecaoProtegidaError as exc:
+        messages.error(request, str(exc))
+        return redirect("ordens_servico:index")
     messages.success(request, f"Ordem de Serviço {numero} excluída.")
     return redirect("ordens_servico:index")

@@ -9,6 +9,8 @@ from django.utils import timezone
 
 from django.db import transaction
 
+from core.deletion import excluir_com_protecao
+
 from cadastros.models import ConfiguracaoSistema
 
 from .models import Justificativa
@@ -318,9 +320,9 @@ def atualizar_modelo_justificativa(instance, form):
 
 @transaction.atomic
 def excluir_modelo_justificativa(instance):
-    instance.delete()
+    excluir_com_protecao(instance)
 
 
 @transaction.atomic
 def excluir_justificativa(instance):
-    instance.delete()
+    excluir_com_protecao(instance)

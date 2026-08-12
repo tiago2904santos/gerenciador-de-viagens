@@ -4,10 +4,11 @@ from datetime import timedelta
 from decimal import Decimal, InvalidOperation
 
 from django.db import transaction
-from django.db.models.deletion import ProtectedError
 from django.utils import timezone
 
 from cadastros.models import ConfiguracaoSistema
+from core.deletion import DelecaoProtegidaError
+from core.deletion import excluir_com_protecao
 
 from roteiros.services import editor_state_builder
 from roteiros.services import editor_persistence
@@ -598,7 +599,7 @@ def sobrescrever_roteiro_duplicado(
 @transaction.atomic
 def excluir_roteiro(instance):
     try:
-        instance.delete()
-    except ProtectedError:
+        excluir_com_protecao(instance)
+    except DelecaoProtegidaError:
         return False
     return True

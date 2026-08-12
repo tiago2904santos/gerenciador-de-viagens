@@ -7,11 +7,13 @@ from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
 from core.pagination import contexto_paginacao
+from core.deletion import DelecaoProtegidaError
 from eventos.services import resolve_evento_from_request
 from .models import PlanoTrabalho
 from .selectors import listar_planos_trabalho
 from .presenters import apresentar_plano_card
 from .services import criar_plano_rascunho
+from .services import excluir_plano
 from .view_helpers import _get_plano
 
 
@@ -112,7 +114,13 @@ def excluir(request, pk):
     plano = _get_plano(pk)
     numero = plano.numero_formatado
     evento_id = plano.evento_id
-    plano.delete()
+    try:
+        excluir_plano(plano)
+    except DelecaoProtegidaError as exc:
+        messages.error(request, str(exc))
+        if evento_id:
+            return redirect("eventos:guiado_etapa", pk=evento_id, etapa=4)
+        return redirect("planos_trabalho:index")
     messages.success(request, f"Plano de Trabalho {numero} excluído.")
     if evento_id:
         return redirect("eventos:guiado_etapa", pk=evento_id, etapa=4)
