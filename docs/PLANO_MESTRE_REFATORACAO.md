@@ -559,4 +559,6 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       roteiros (teto do `PF-07` 32 → 47). Corrigida; teto sobe a 33 de propósito
 - [x] `NOVO-115` resíduo do PR #58: documentos vinculáveis acompanham o período ainda não salvo e
       o picker recupera a ação de limpar, sobre os componentes atuais
-- [ ] `QA-17` triagem dos 13 PRs abertos
+- [x] `NOVO-117` resíduo do PR #4: marcador de combustível `CB` → `CT` reaplicado no renderer atual
+- [x] `QA-17` triagem dos PRs abertos — eram 17: 12 fechados, 3 upgrades de Actions mesclados e
+      2 intenções reaplicadas com `NOVO-115`/`NOVO-117`; fila antiga zerada
