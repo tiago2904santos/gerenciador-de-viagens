@@ -560,10 +560,18 @@
 html[data-theme="light"] {
   --color-bg: #f7fbff;
   --color-surface: var(--color-white);
-  --color-surface-strong: #ffffff;
-  --color-surface-soft: #ffffff;
+  /* NOVO-119: `--color-surface-strong`, `--color-surface-soft` e
+     `--color-card-muted` eram forcados a #ffffff aqui, desfazendo a escada que
+     o `:root` ja define — surface #ffffff, muted #f7fbff, soft #e3eaf2.
+
+     Com os tres em branco, o claro tinha DOIS niveis de superficie onde o
+     escuro tem quatro: `#ffffff` do claro correspondia a `#132238`, `#111e2f`,
+     `#223348` e `#132538` do escuro. Um valor para quatro papeis, e por isso
+     card, painel e bloco interno nao se separavam.
+
+     As tres linhas sairam; o `:root` volta a valer. O escuro nao le este
+     bloco e nao muda. */
   --color-card: var(--color-white);
-  --color-card-muted: #ffffff;
   --color-border: #d4dde9;
   --color-border-strong: #afc0d3;
   --color-text: #132238;
