@@ -7567,3 +7567,18 @@ claro e azul-marinho sobre o dourado escuro.
 500 px; teste de contrato cobre as duas escalas, o contraste de texto e o desacoplamento de
 `warning`. Contraste medido do texto sobre o accent: **7,01:1** no azul claro e **6,49:1** no
 dourado escuro.
+
+### NOVO-112 ✅ RESOLVIDO · `NOVO` Custom Select aberto tinha geometrias diferentes no claro e no escuro · UI · 0,5 d
+
+O `Custom Select v2` parecia pertencer a dois sistemas. No escuro, a opção selecionada tinha
+trilho lateral, recuo próprio e check em bloco de accent à direita; no claro, o check ficava solto
+à esquerda, sem trilho e com outro espaçamento. Menu, opções, scrollbar, estados desabilitado e de
+erro também recebiam dimensões e bordas apenas sob `data-theme="dark"`.
+
+**Correção.** Toda a geometria do componente passou ao seletor compartilhado `html[data-theme]`:
+altura, padding, gap, raio, deslocamento, scrollbar, trilho e bloco do check são idênticos. As
+cores continuam vindo dos tokens: azul e variações no claro; dourado e variações no escuro. A
+sombra usa `--shadow-custom-select-menu`, com a mesma geometria e pigmento próprio de cada paleta.
+
+**Prova.** O menu aberto é comparado em claro/escuro a 1440, 800 e 500 px; o contrato automatizado
+proíbe que os quatro seletores estruturais do componente voltem a ser exclusivos do tema escuro.

@@ -71,6 +71,7 @@
   --shadow-soft: var(--shadow-sm);
   --shadow-card: var(--shadow-md);
   --shadow-panel: 0 18px 40px rgba(7, 26, 51, 0.16);
+  --shadow-custom-select-menu: 0 12px 28px rgba(7, 26, 51, 0.16);
   --shadow-section: 0 18px 36px rgba(15, 34, 54, 0.08);
   --shadow-elevated: var(--shadow-lg);
   --shadow-strong: 0 20px 44px rgba(15, 34, 54, 0.1);

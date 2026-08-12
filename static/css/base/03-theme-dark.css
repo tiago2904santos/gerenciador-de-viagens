@@ -168,6 +168,7 @@ html[data-theme="dark"] {
   --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 14px 34px rgba(0, 0, 0, 0.42);
   --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.3);
   --shadow-panel: 0 18px 44px rgba(0, 0, 0, 0.42);
+  --shadow-custom-select-menu: 0 12px 28px rgba(2, 10, 18, 0.28);
   --shadow-elevated: 0 26px 70px rgba(0, 0, 0, 0.55);
   /* NOVO-51: o foco escuro combina borda e halo visível. */
   --focus-ring: 0 0 0 var(--space-1) var(--input-focus-ring);
