@@ -8,6 +8,7 @@ from cadastros.models import Servidor
 from cadastros.models import Unidade
 from oficios.models import Oficio
 from ordens_servico.models import OrdemServico
+from ordens_servico.models import OrdemServicoNumeroLacuna
 from planos_trabalho.models import PlanoTrabalho
 from roteiros.models import Roteiro
 from termos.models import TermoAutorizacao
@@ -30,6 +31,7 @@ class ResetarBancoDemoTests(TransactionTestCase):
             PlanoTrabalho,
             TermoAutorizacao,
             OrdemServico,
+            OrdemServicoNumeroLacuna,
         ):
             with self.subTest(model=model._meta.label):
                 self.assertEqual(model._base_manager.count(), 5)

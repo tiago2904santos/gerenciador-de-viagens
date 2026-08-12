@@ -441,7 +441,9 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       passou a usar o lock **sem** o retry. Fecha `NOVO-109`: a detecção de colisão lia a mensagem
       do `IntegrityError` e **só funcionava no PostgreSQL** — em metade da suíte o retry era código
       morto, e o teste que o cobria fabricava a própria evidência. **Fatia 2**: OS reaproveita
-      número liberado por exclusão (decisão do dono; único ponto que muda número emitido).
+      número liberado por exclusão (decisão do dono; único ponto que muda número emitido) — **feita**
+      com `OrdemServicoNumeroLacuna`, exclusão atômica e consumo por área/ano; salto manual não vira
+      lacuna e falha no registro desfaz a exclusão. 53 testes de OS verdes.
       **Fatia 3**: o plano entra na abstração e ganha o retry que não tem
 - [ ] `BE-16` abstrações de `core` adotadas pela metade
 - [x] `BE-17` `core/views.py` é 75% fixture de UI Lab — **fechado pelo PR #247**, que apagou os

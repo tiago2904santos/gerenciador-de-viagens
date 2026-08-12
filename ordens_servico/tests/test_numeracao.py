@@ -31,6 +31,8 @@ from django.utils import timezone
 
 from core.testing import area_de_teste
 from ordens_servico.models import OrdemServico
+from ordens_servico.models import OrdemServicoNumeroLacuna
+from ordens_servico.services import excluir_ordem_servico
 
 
 class NumeracaoDaOrdemServicoTests(TestCase):
@@ -57,6 +59,65 @@ class NumeracaoDaOrdemServicoTests(TestCase):
         self.criar()
 
         self.assertEqual(self.criar().numero, 3)
+
+    def test_numero_liberado_por_exclusao_e_reaproveitado(self):
+        self.criar()
+        excluida = self.criar()
+        self.criar()
+
+        excluir_ordem_servico(excluida)
+        self.assertTrue(
+            OrdemServicoNumeroLacuna.all_objects.filter(
+                area=self.area,
+                ano=self.ano,
+                numero=2,
+            ).exists()
+        )
+
+        self.assertEqual(self.criar().numero, 2)
+        self.assertFalse(
+            OrdemServicoNumeroLacuna.all_objects.filter(
+                area=self.area,
+                ano=self.ano,
+                numero=2,
+            ).exists()
+        )
+
+    def test_numero_apenas_pulado_manualmente_nao_vira_lacuna(self):
+        self.criar()
+        self.criar(numero=5, ano=self.ano)
+
+        self.assertEqual(self.criar().numero, 6)
+        self.assertFalse(OrdemServicoNumeroLacuna.all_objects.exists())
+
+    def test_lacuna_de_outra_area_nao_e_consumida(self):
+        outra = area_de_teste(sigla="OUT", nome="Outra área")
+        OrdemServicoNumeroLacuna.all_objects.create(
+            area=outra,
+            ano=self.ano,
+            numero=2,
+        )
+        self.criar()
+        self.criar(numero=5, ano=self.ano)
+
+        self.assertEqual(self.criar().numero, 6)
+        self.assertTrue(
+            OrdemServicoNumeroLacuna.all_objects.filter(area=outra, numero=2).exists()
+        )
+
+    def test_falha_ao_registrar_lacuna_desfaz_a_exclusao(self):
+        ordem = self.criar()
+        ordem_pk = ordem.pk
+
+        with mock.patch.object(
+            OrdemServicoNumeroLacuna.all_objects,
+            "get_or_create",
+            side_effect=RuntimeError("falha ao registrar lacuna"),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "falha ao registrar lacuna"):
+                excluir_ordem_servico(ordem)
+
+        self.assertTrue(OrdemServico.all_objects.filter(pk=ordem_pk).exists())
 
     def test_numero_ja_definido_e_respeitado(self):
         """Numeração manual continua ganhando de qualquer sugestão automática."""
