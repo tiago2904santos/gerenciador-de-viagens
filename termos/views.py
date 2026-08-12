@@ -20,6 +20,8 @@ from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
 
+from core.pagination import contexto_paginacao
+
 from core.retorno import voltar_para
 from cadastros.selectors import rotulo_da_sede_configurada
 from documentos.selectors import mapa_artefatos_pdf_termo_cadastro
@@ -116,8 +118,15 @@ def index(request):
     # A agregacao acima ja calculou exatamente o total da aba ativa. Reusar esse
     # numero evita executar a mesma busca pesada uma terceira vez no `.count()`
     # interno do Paginator (`DB-11`).
-    paginator = TermosPaginator(termos, TERMOS_PER_PAGE, known_count=contagem[aba])
-    page_obj = paginator.get_page(request.GET.get("page"))
+    paginacao = contexto_paginacao(
+        termos,
+        request,
+        TERMOS_PER_PAGE,
+        paginator_class=TermosPaginator,
+        paginator_kwargs={"known_count": contagem[aba]},
+        query_params={"q": q, "aba": aba},
+    )
+    page_obj = paginacao["page_obj"]
     # `NOVO-08`: uma consulta para os artefatos da página inteira. Sem o mapa,
     # `termo_cadastro_assinado_info` consultava uma vez por linha.
     artefatos_por_termo = mapa_artefatos_pdf_termo_cadastro_em_lote(
@@ -170,24 +179,11 @@ def index(request):
             "abas": abas,
             "simples": simples,
             "q": q,
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({k: v for k, v in {"q": q, "aba": aba}.items() if v}),
+            **paginacao,
             "novo_url": reverse("termos:novo"),
             "oficios_url": reverse("oficios:index"),
         },
     )
-
-
-def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
-    return [
-        page_number if isinstance(page_number, int) else "..."
-        for page_number in page_obj.paginator.get_elided_page_range(
-            page_obj.number,
-            on_each_side=on_each_side,
-            on_ends=on_ends,
-        )
-    ]
 
 
 def _evento_etapa_url(evento_id):

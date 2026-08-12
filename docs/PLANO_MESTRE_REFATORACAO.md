@@ -448,7 +448,11 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       e `INSERT` na mesma transação e usa o retry comum. Colisão real repete; falha após reserva
       desfaz o contador; escolha+gravação compartilham o savepoint; a concorrência PostgreSQL agora
       mede duas linhas gravadas. 116 testes verdes
-- [ ] `BE-16` abstrações de `core` adotadas pela metade
+- [ ] `BE-16` abstrações de `core` adotadas pela metade — **fatia 1 (paginação) feita**: os 15
+      pontos usam `contexto_paginacao`, as 6 cópias de `_pagination_pages` foram removidas e não há
+      `Paginator(...)` em produção fora do módulo comum. Termos mantém o total pré-agregado via
+      `paginator_class`; chaves e filtros do contexto foram preservados. 922 testes consumidores
+      verdes. Faltam exclusão protegida e retorno
 - [x] `BE-17` `core/views.py` é 75% fixture de UI Lab — **fechado pelo PR #247**, que apagou os
       dois labs e as 1.013 linhas de fixture; a cascata de componentes que ele deixou é o
       `NOVO-44`

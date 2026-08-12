@@ -5,11 +5,12 @@ from datetime import time
 from urllib.parse import urlencode
 
 from django.contrib import messages
-from django.core.paginator import Paginator
 from django.http import Http404, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
+
+from core.pagination import contexto_paginacao
 
 from core.autosave import (
     AutosavePayloadError,
@@ -144,8 +145,13 @@ def index(request):
         preserved={"q": q},
     )
 
-    paginator = Paginator(lista, ROTEIROS_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
+    paginacao = contexto_paginacao(
+        lista,
+        request,
+        ROTEIROS_PER_PAGE,
+        query_params={"q": q, "aba": aba},
+    )
+    page_obj = paginacao["page_obj"]
     next_url = request.get_full_path()
     cards = []
     # Uma resolução para a página inteira (NOVO-27). Sem isto cada card paga a
@@ -173,22 +179,9 @@ def index(request):
             "q": q,
             "aba": aba,
             "abas": abas,
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({k: v for k, v in {"q": q, "aba": aba}.items() if v}),
+            **paginacao,
         },
     )
-
-
-def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
-    return [
-        page_number if isinstance(page_number, int) else "..."
-        for page_number in page_obj.paginator.get_elided_page_range(
-            page_obj.number,
-            on_each_side=on_each_side,
-            on_ends=on_ends,
-        )
-    ]
 
 
 def _resolver_rascunho_autosave(request):

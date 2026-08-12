@@ -32,7 +32,6 @@ from typing import Callable
 from urllib.parse import urlencode
 
 from django.contrib import messages
-from django.core.paginator import Paginator
 from django.http import HttpRequest
 from django.http import HttpResponse
 from django.http import HttpResponseNotAllowed
@@ -41,6 +40,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 
+from core.pagination import contexto_paginacao
 from core.retorno import next_valido
 
 
@@ -219,10 +219,20 @@ def index_view(
         objetos = config.listar(q=q or None) if config.buscar else config.listar()
 
         page_obj = None
+        paginacao = {}
         if config.paginar_por:
-            page_obj = Paginator(objetos, config.paginar_por).get_page(
-                request.GET.get("page")
+            page_params = {}
+            if q:
+                page_params["q"] = q
+            if config.aceitar_next and next_url:
+                page_params["next"] = next_url
+            paginacao = contexto_paginacao(
+                objetos,
+                request,
+                config.paginar_por,
+                query_params=page_params,
             )
+            page_obj = paginacao["page_obj"]
             objetos = page_obj.object_list
 
         linhas = [_linha(obj, config, next_url) for obj in objetos]
@@ -238,16 +248,7 @@ def index_view(
             **(contexto_extra(request, next_url) if contexto_extra else {}),
         }
         if page_obj is not None:
-            contexto["page_obj"] = page_obj
-            contexto["pagination_pages"] = _pagination_pages(page_obj)
-            page_params = {}
-            if q:
-                page_params["q"] = q
-            if config.aceitar_next and next_url:
-                page_params["next"] = next_url
-            contexto["page_querystring"] = (
-                urlencode(page_params) if page_params else ""
-            )
+            contexto.update(paginacao)
         return render(request, config.template_index, contexto)
 
     return view
@@ -262,17 +263,6 @@ def _contexto_navegacao(config: CatalogConfig, next_url: str, externo: bool) -> 
             config.back_label_com_next if externo else config.back_label_sem_next
         ),
     }
-
-
-def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1) -> list[int | str]:
-    return [
-        page_number if isinstance(page_number, int) else "..."
-        for page_number in page_obj.paginator.get_elided_page_range(
-            page_obj.number,
-            on_each_side=on_each_side,
-            on_ends=on_ends,
-        )
-    ]
 
 
 def _linha(obj, config: CatalogConfig, next_url: str) -> dict:

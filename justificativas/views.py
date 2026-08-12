@@ -1,13 +1,12 @@
-from urllib.parse import urlencode
-
 from django.contrib import messages
-from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.db.models import Q
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
+
+from core.pagination import contexto_paginacao
 from django.views.decorators.http import require_http_methods
 
 from core.normalizers import remove_accents
@@ -101,17 +100,6 @@ def api_buscar_oficios(request):
     return JsonResponse({"resultados": list(_resumos_de(oficios).values())})
 
 
-def _pagination_pages(page_obj, *, on_each_side=1, on_ends=1):
-    return [
-        page_number if isinstance(page_number, int) else "..."
-        for page_number in page_obj.paginator.get_elided_page_range(
-            page_obj.number,
-            on_each_side=on_each_side,
-            on_ends=on_ends,
-        )
-    ]
-
-
 def index(request):
     form = JustificativaQuickAddForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
@@ -131,8 +119,13 @@ def index(request):
             | Q(modelo__nome__unaccent__icontains=q_unaccent)
         )
 
-    paginator = Paginator(justificativas, JUSTIFICATIVAS_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get("page"))
+    paginacao = contexto_paginacao(
+        justificativas,
+        request,
+        JUSTIFICATIVAS_PER_PAGE,
+        query_params={"q": q},
+    )
+    page_obj = paginacao["page_obj"]
     rows = [
         apresentar_linha_lista_simples_justificativa(
             j,
@@ -152,9 +145,7 @@ def index(request):
             "q": q,
             "rows": rows,
             "modelos_url": reverse("justificativas:modelos_index"),
-            "page_obj": page_obj,
-            "pagination_pages": _pagination_pages(page_obj),
-            "page_querystring": urlencode({"q": q}) if q else "",
+            **paginacao,
         },
     )
 
