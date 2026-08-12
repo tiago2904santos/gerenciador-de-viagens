@@ -3253,6 +3253,14 @@ trabalho e prestações executou 784 testes: 783 verdes e uma importação do We
 Windows pela ausência conhecida de `libgobject-2.0-0`; o gate canônico Ubuntu fica a cargo do CI.
 Resta isolar o salto de Redis.
 
+### NOVO-118 ✅ RESOLVIDO · `docxcompose` era dependência transitiva usada diretamente · QA · 0,25 d
+
+O CI da atualização para `docxtpl` 0.20 provou que `termos/services.py::fundir_termos_docx`
+importava `docxcompose.composer.Composer`, embora o pacote não estivesse declarado. A versão antiga
+chegava por transitividade; a nova não. O download de múltiplos termos retornou 503 em vez de DOCX.
+`docxcompose>=1.4,<2` agora é dependência direta, coerente com o import de produção, e o teste
+existente de download múltiplo protege o contrato.
+
 > **Enunciado corrigido pela verificação (05/08).** O original dizia que "`pyHanko` assina e valida
 > PDF digitalmente, e é onde o atraso pesa". **É falso.** `grep -rn "pyhanko"` em todo o `.py` de
 > produção devolve **zero** — nenhum import, em lugar nenhum. O fluxo que os usava foi removido

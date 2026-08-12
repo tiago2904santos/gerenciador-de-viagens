@@ -12,6 +12,10 @@ asgiref==3.12.1 \
     --hash=sha256:59dcb51c272ad209d59bed5708a64a333083e86017d7fcdd67498eeab7784340 \
     --hash=sha256:fe386d1c2bff7259ea95929266d12a8cf9a8b5a1c2598402967d8792e7a7c094
     # via django
+babel==2.18.0 \
+    --hash=sha256:b80b99a14bd085fcacfa15c9165f651fbb3406e66cc603abf11c5750937c992d \
+    --hash=sha256:e2b422b277c2b9a9630c1d7903c2a00d0830c409c59ac8cae9081c92f1aeba35
+    # via docxcompose
 billiard==4.2.4 \
     --hash=sha256:525b42bdec68d2b983347ac312f892db930858495db601b5836ac24e6477cde5 \
     --hash=sha256:55f542c371209e03cd5862299b74e52e4fbcba8250ba611ad94276b369b6a85f
@@ -421,6 +425,10 @@ django-cotton==2.7.2 \
     --hash=sha256:1b293037ead54ab228362654da00ededc5ca52b2ff407b6087a81cfd9390850e \
     --hash=sha256:7e050042873f724beaa5824e86d5034ced2f7de1c5478c3a9d8c053e05caa8ac
     # via -r requirements/base.txt
+docxcompose==1.4.1 \
+    --hash=sha256:8a0a5c6f5bc8f4c0b2691d9714aac7195c05229c24d2dffc2222b5bdec547258 \
+    --hash=sha256:e816c3e73adce1f816054fcd0a7f7e0632e99b2155e6c6f56582d1c55c685135
+    # via -r requirements/base.txt
 docxtpl==0.20.2 \
     --hash=sha256:626d5c570a46a62b2ca73b4d08f1c240fa031a5bc45371e1466a4fe184923d10 \
     --hash=sha256:eddf3350d70b4d123208e801d585bcb313d21044a377a14f75a66d0965841de1
@@ -676,6 +684,7 @@ lxml==6.1.1 \
     --hash=sha256:ff3f333630ab480244a1bff72043e511a91eb22e7595dead8653ee5612dd8f3d \
     --hash=sha256:ffecec8eb889b58ba9be5b95fb1cc78e22ea8eedea38e8736a1568fe1979250e
     # via
+    #   docxcompose
     #   docxtpl
     #   python-docx
 markupsafe==3.0.3 \
@@ -1001,6 +1010,7 @@ python-docx==1.2.0 \
     --hash=sha256:7bc9d7b7d8a69c9c02ca09216118c86552704edc23bac179283f2e38f86220ce
     # via
     #   -r requirements/base.txt
+    #   docxcompose
     #   docxtpl
 python-dotenv==1.2.2 \
     --hash=sha256:1d8214789a24de455a8b8bd8ae6fe3c6b69a5e3d64aa8a8e5d68e694bbcb285a \
@@ -1032,7 +1042,9 @@ requests-oauthlib==2.0.0 \
 six==1.17.0 \
     --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274 \
     --hash=sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81
-    # via python-dateutil
+    # via
+    #   docxcompose
+    #   python-dateutil
 sqlparse==0.5.5 \
     --hash=sha256:12a08b3bf3eec877c519589833aed092e2444e68240a3577e8e26148acc7b1ba \
     --hash=sha256:e20d4a9b0b8585fdf63b10d30066c7c94c5d7a7ec47c889a2d83a3caa93ff28e
