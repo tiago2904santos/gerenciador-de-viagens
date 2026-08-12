@@ -627,7 +627,18 @@ class DiarioBordoTrecho(models.Model):
             # `DB-07`: km final antes do inicial dá rodagem negativa no diário de
             # bordo assinado — que é peça de prestação de contas de combustível.
             # `gte`, não `gt`: trecho sem deslocamento tem os dois iguais.
-            periodo_ordenado("km_inicial", "km_final", name="diario_trecho_km_ordenado"),
+            #
+            # `NOVO-116`: o km é digitado pelo operador na tela do diário, então a
+            # mensagem é lida por ele e não por quem lê log — o texto padrão do
+            # Django cita o nome da constraint e não diz o que fazer.
+            periodo_ordenado(
+                "km_inicial",
+                "km_final",
+                name="diario_trecho_km_ordenado",
+                violation_error_message=(
+                    "O km final não pode ser menor que o km inicial."
+                ),
+            ),
         ]
 
     def __str__(self):

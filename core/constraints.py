@@ -38,11 +38,25 @@ from django.db.models import F
 from django.db.models import Q
 
 
-def periodo_ordenado(inicio: str, fim: str, *, name: str) -> models.CheckConstraint:
-    """`fim` nunca antes de `inicio`. Nulo em qualquer um dos dois passa."""
+def periodo_ordenado(
+    inicio: str,
+    fim: str,
+    *,
+    name: str,
+    violation_error_message: str | None = None,
+) -> models.CheckConstraint:
+    """`fim` nunca antes de `inicio`. Nulo em qualquer um dos dois passa.
+
+    `violation_error_message` é o texto que `validate_constraints()` levanta quando a
+    regra é violada pelo caminho Python — formulário, autosave ou comando de gestão.
+    Sem ele o Django monta `Restrição "<name>" foi violada.`, que serve para o log e
+    não para a tela. Passe-o nas constraints que defendem campo que o operador digita;
+    nas que só o código escreve, o padrão basta.
+    """
     return models.CheckConstraint(
         condition=Q(**{f"{fim}__gte": F(inicio)}),
         name=name,
+        **({"violation_error_message": violation_error_message} if violation_error_message else {}),
     )
 
 
