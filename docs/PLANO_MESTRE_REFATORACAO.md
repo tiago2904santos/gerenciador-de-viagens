@@ -499,7 +499,9 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [x] `UI-03` nove (medidos: oito) arquivos definem token de cor → duas camadas · **E7a**
 - [x] `NOVO-82` 87 declarações escuras inertes, visíveis desde a fusão do `theme.css` · **E9**
 - [x] `NOVO-51` os 2 apelidos puros da família `cv-field` (e 15 bordas invisíveis) · **E7b**
-- [ ] `NOVO-51` os 2 restantes têm valor próprio; o do foco é decisão de a11y · **E8**
+- [x] `NOVO-51` os 2 de valor próprio foram fechados em 11/08 após a decisão por anel visível no
+      escuro: zero definições `--cv-field-*` vivas no CSS de fonte; a reauditoria de 12/08 encontra
+      somente comentários históricos nos bundles/folhas · **E7b**
 - [x] `NOVO-54` 72 regras (30 `!important` e 7 regras já fora); as 7 candidatas de estado não-base
       também fecharam por medição (2 blocos removidos e 5 grupos de seletor simplificados). A regra
       base agora vence o seletor de elemento cru com neutralidade medida; as 8 pseudo-regras e 1
