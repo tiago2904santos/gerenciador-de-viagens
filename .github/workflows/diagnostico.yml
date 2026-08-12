@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Infra do deploy (servico, socket, health, postgres)
         if: ${{ inputs.modo == 'infra' }}
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
@@ -91,7 +91,7 @@ jobs:
 
       - name: Google Drive (pasta raiz e credenciais)
         if: ${{ inputs.modo == 'drive' }}
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
