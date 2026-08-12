@@ -1,6 +1,7 @@
 import json
 
 from core import entity_cards
+from core.errors import capture
 from core.presenters.badges import build_badge
 from core.presenters.meta import build_meta
 from core.presenters.text import join_non_empty
@@ -8,6 +9,7 @@ from core.utils.masks import format_placa
 from core.utils.masks import format_protocolo
 from decimal import Decimal
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
@@ -162,8 +164,13 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
                 termo_pdf_url = reverse("termos:baixar_termo_servidor", args=[oficio.pk, s.pk, "pdf"])
                 termo_docx_url = reverse("termos:baixar_termo_servidor", args=[oficio.pk, s.pk, "docx"])
                 assinado_info = termo_oficio_assinado_info(oficio, s)
-            except Exception:
-                pass
+            except Exception as exc:
+                capture(
+                    exc,
+                    "oficios.presenter.termo_assinado",
+                    oficio_id=oficio.pk,
+                    servidor_id=s.pk,
+                )
         servidores_display.append({
             "servidor_pk": s.pk,
             "initials": _iniciais_nome_servidor(s.nome),
@@ -268,8 +275,10 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
                 "texto_resumido": texto_resumido,
                 "detail_url": reverse("oficios:wizard_justificativa", args=[oficio.pk]),
             }
-    except Exception:
+    except ObjectDoesNotExist:
         pass
+    except Exception as exc:
+        capture(exc, "oficios.presenter.justificativa", oficio_id=oficio.pk)
 
     if oficio.cancelado:
         status_chip_label = "Cancelado"
@@ -287,8 +296,8 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
     if oficio.data_criacao:
         try:
             data_criacao_display = oficio.data_criacao.strftime("%d/%m/%Y")
-        except Exception:
-            pass
+        except (AttributeError, TypeError, ValueError):
+            data_criacao_display = ""
 
     numero_display = oficio.numero_formatado
     protocolo_display = format_protocolo(oficio.protocolo) or ""

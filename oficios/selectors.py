@@ -129,19 +129,16 @@ def listar_oficios(
     # Sobreposição de período: mostra ofícios cuja viagem cruza com [viagem_de, viagem_ate].
     # Condição de sobreposição: saida <= viagem_ate  E  chegada >= viagem_de
     if viagem_de or viagem_ate:
-        try:
-            queryset = queryset.filter(roteiro__isnull=False)
-            if viagem_ate:
-                queryset = queryset.filter(roteiro__saida_dt__date__lte=viagem_ate)
-            if viagem_de:
-                fim_qs = (
-                    Q(roteiro__retorno_chegada_dt__date__gte=viagem_de)
-                    | Q(roteiro__retorno_chegada_dt__isnull=True, roteiro__chegada_dt__date__gte=viagem_de)
-                    | Q(roteiro__retorno_chegada_dt__isnull=True, roteiro__chegada_dt__isnull=True)
-                )
-                queryset = queryset.filter(fim_qs)
-        except Exception:
-            pass
+        queryset = queryset.filter(roteiro__isnull=False)
+        if viagem_ate:
+            queryset = queryset.filter(roteiro__saida_dt__date__lte=viagem_ate)
+        if viagem_de:
+            fim_qs = (
+                Q(roteiro__retorno_chegada_dt__date__gte=viagem_de)
+                | Q(roteiro__retorno_chegada_dt__isnull=True, roteiro__chegada_dt__date__gte=viagem_de)
+                | Q(roteiro__retorno_chegada_dt__isnull=True, roteiro__chegada_dt__isnull=True)
+            )
+            queryset = queryset.filter(fim_qs)
     return queryset
 
 
@@ -349,10 +346,7 @@ def viatura_para_resultado_busca(
         elif any(m.unidade_id in unidade_match_ids for m in motoristas if m.unidade_id):
             suggestion_reason = "unidade"
 
-    try:
-        edit_url = reverse("cadastros:viatura_update", args=[v.pk])
-    except Exception:
-        edit_url = ""
+    edit_url = reverse("cadastros:viatura_update", args=[v.pk])
 
     return {
         "id": v.pk,

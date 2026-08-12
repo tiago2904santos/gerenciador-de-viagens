@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
+
 from core.errors import capture
 
 AREA_SESSION_KEY = "area_trabalho_id"
@@ -84,6 +86,8 @@ def validate_cross_area_foreign_keys(sender, instance, raw=False, **kwargs):
             continue
         try:
             related = getattr(instance, field.name, None)
+        except ObjectDoesNotExist:
+            continue
         except Exception as exc:
             capture(
                 exc,
@@ -119,8 +123,7 @@ def validate_cross_area_many_to_many(
         return
     try:
         model._meta.get_field("area")
-    except Exception as exc:
-        capture(exc, "core.tenancy.validate_m2m_area", model=model._meta.label)
+    except FieldDoesNotExist:
         return
     if model._default_manager.filter(pk__in=pk_set).exclude(area_id=instance_area_id).exists():
         from django.core.exceptions import ValidationError

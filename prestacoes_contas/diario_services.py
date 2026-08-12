@@ -19,6 +19,7 @@ from django.utils import timezone
 
 from cadastros.selectors import build_configuracao_context
 from core.normalizers import normalize_spaces
+from core.errors import capture
 from core.utils.masks import format_cpf
 from core.utils.masks import format_placa
 from core.utils.masks import format_protocolo
@@ -166,7 +167,7 @@ def diaria_info(prestacao) -> dict:
             from documentos.services.formatters import format_currency_br
 
             return format_currency_br(v)
-        except Exception:
+        except (AttributeError, TypeError, ValueError):
             return str(v)
 
     alterada = (valor(original) != valor(copia)) or (qtd(original) != qtd(copia))
@@ -573,6 +574,7 @@ def gerar_diario_bordo_pdf(diario: DiarioBordo) -> bytes:
                 return convert_xlsx_to_pdf_libreoffice(xlsx_bytes=xlsx_bytes, libreoffice_binary=binary)
             # 'simple_fallback' não suporta planilhas — ignorado.
         except Exception as exc:
+            capture(exc, "prestacoes.converter_diario_pdf", engine=engine)
             last_error = exc
             continue
 

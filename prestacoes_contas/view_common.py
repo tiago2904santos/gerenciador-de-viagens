@@ -46,7 +46,7 @@ def _destino_display(oficio) -> str:
         if len(destinos) > 3:
             result += f" +{len(destinos) - 3}"
         return result
-    except Exception:
+    except (AttributeError, TypeError, ValueError):
         return ""
 
 
@@ -66,7 +66,7 @@ def _periodo_display(oficio) -> str:
                 return saida.strftime("%d/%m/%Y")
             return f"{saida.strftime('%d/%m/%Y')} a {chegada.strftime('%d/%m/%Y')}"
         return saida.strftime("%d/%m/%Y")
-    except Exception:
+    except (AttributeError, TypeError, ValueError):
         return ""
 
 

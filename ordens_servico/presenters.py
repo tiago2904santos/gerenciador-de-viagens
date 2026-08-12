@@ -4,7 +4,9 @@ from django.urls import reverse
 from django.utils import timezone
 
 from core import entity_cards
+from core.errors import capture
 from core.presenters.text import join_non_empty
+from core.utils.masks import format_protocolo
 from oficios.presenters import _iniciais_nome_servidor
 
 
@@ -30,8 +32,8 @@ def get_assinante_os(area=None) -> dict | None:
                 "nome": srv.nome,
                 "cargo": srv.cargo.nome if srv.cargo_id and srv.cargo else "",
             }
-    except Exception:
-        pass
+    except Exception as exc:
+        capture(exc, "ordens_servico.presenter.assinante")
     return None
 
 
@@ -98,16 +100,8 @@ def _destinos_display_os(ordem):
 def _oficios_vinculados_os(ordem):
     items = []
     for oficio in ordem.oficios.all():
-        try:
-            url = reverse("oficios:dados_viajantes", args=[oficio.pk])
-        except Exception:
-            url = ""
-        protocolo = ""
-        try:
-            from core.utils.masks import format_protocolo
-            protocolo = format_protocolo(oficio.protocolo) or ""
-        except Exception:
-            pass
+        url = reverse("oficios:dados_viajantes", args=[oficio.pk])
+        protocolo = format_protocolo(oficio.protocolo) or ""
         items.append(
             {
                 "numero": oficio.numero_formatado,
@@ -157,8 +151,8 @@ def apresentar_ordem_servico_card(ordem, *, assinante=_ASSINANTE_NAO_RESOLVIDO,
             if timezone.is_aware(dt):
                 dt = dt.astimezone(tz)
             data_criacao_display = dt.strftime("%d/%m/%Y")
-        except Exception:
-            pass
+        except (AttributeError, TypeError, ValueError):
+            data_criacao_display = ""
 
     temporal_label, temporal_tone = _temporal_badge_os(ordem)
 
