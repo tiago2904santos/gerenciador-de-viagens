@@ -711,7 +711,7 @@ Seis `atomic` entraram, e os seis foram provados um a um. Dois exigiram trabalho
   verde por omissão. É o `NOVO-107` noutro app, e a segunda vez na mesma etapa que um cenário quase
   passou sem medir nada.
 
-### BE-15 🟡 Numeração de documento reimplementada 3 vezes · AUD · 2 d · risco alto
+### BE-15 ✅ RESOLVIDO · Numeração de documento reimplementada 3 vezes · AUD · 2 d · risco alto
 
 (a) `oficios/services.py:425-440` — advisory lock, fallback `select_for_update`, reuso de lacunas,
 retry de 3 tentativas; (b) `ordens_servico/models.py:190-245` — `max+1` com
@@ -789,8 +789,23 @@ fecha com **53 testes verdes** (3 pulados no SQLite; concorrência permanece no 
 
 A migração `0014_ordemserviconumerolacuna` cria tabela vazia, sem backfill que pudesse inventar a
 origem de um buraco. Ela traz a query pré-deploy `area_id IS NULL` e o procedimento `pg_dump`; a
-volta remove apenas o registro de lacunas e não altera OS emitida. **Fatia 3 pendente:** integrar a
+volta remove apenas o registro de lacunas e não altera OS emitida. A fatia seguinte integra a
 política incremental de Plano de Trabalho à mesma mecânica de reserva e retry.
+
+#### Fatia 3 ✅ — Plano preserva o contador e entra na reserva/retry comum
+
+`salvar_plano_numerado` aplica `core.numeracao::reservar_numero` ao ponto de criação real do Plano.
+A política continua sendo `ConfiguracaoSistema.pt_ultimo_numero`, com o mesmo sufixo e o mesmo piso
+`max(contador, banco)`; o que mudou foi a garantia: contador e `INSERT` agora estão na mesma transação
+e uma colisão na constraint escolhe novamente, como Ofício e OS.
+
+O teste vermelho criou uma colisão real e antes recebia `IntegrityError`; agora prova duas escolhas,
+dois Planos persistidos e números distintos nos dois bancos. Outra inversão falha depois da reserva e
+prova que o contador volta ao valor anterior. O teste de duas threads no PostgreSQL passou a chamar o
+caminho completo e também exige duas linhas gravadas — não mede mais apenas a atualização isolada do
+contador. A escolha também entrou no savepoint de cada tentativa: a colisão força um avanço para 78,
+o desfaz e confirma que a nova tentativa grava **78**, não 79. A suíte de `planos_trabalho` fecha com **116 testes verdes** (1 concorrente pulado no
+SQLite). Com as três políticas preservadas sobre uma única mecânica, o `BE-15` está fechado.
 
 
 ### BE-16 🟡 Abstrações de `core` adotadas pela metade · AUD · 2 d · risco baixo
