@@ -24,7 +24,9 @@ class CoreConfig(AppConfig):
         connection_created.connect(_register_sqlite_unaccent)
         from . import checks  # noqa: F401
         from .audit import connect_audit_signals
+        from .observability import initialize_error_tracking
         from .tenancy import connect_area_integrity_signals
 
+        initialize_error_tracking()
         connect_audit_signals()
         connect_area_integrity_signals()

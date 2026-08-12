@@ -33,6 +33,7 @@ SECRET_KEY = "django-insecure-central-viagens-3-test-key"
 from cryptography.fernet import Fernet as _Fernet
 
 FIELD_ENCRYPTION_KEYS = (_Fernet.generate_key().decode(),)
+SENTRY_DSN = ""
 OFICIO_NUMERACAO_USAR_CONFIGURACAO = False
 ALLOWED_HOSTS = ["testserver", "localhost", "127.0.0.1"]
 

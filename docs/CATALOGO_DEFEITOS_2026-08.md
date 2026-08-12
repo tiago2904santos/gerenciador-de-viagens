@@ -3408,7 +3408,7 @@ configuração do WeasyPrint, erro do storage, falha do broker e documento ainda
 `warm_cache`. Em conjunto com os testes existentes dos adaptadores Word e LibreOffice, o gate
 direcionado executa 22/22 testes verdes sem depender dos binários externos.
 
-### QA-16 ⚪ Sem rastreamento de erro centralizado · AUD · 1 d
+### QA-16 ✅ RESOLVIDO · Sem rastreamento de erro centralizado · AUD · 1 d
 
 `grep -rin "sentry"` → nada. `core/errors.py:capture()` e `core/logging.py:JsonFormatter` produzem
 log estruturado em stdout, sem agregação, alerta ou agrupamento.
@@ -3416,6 +3416,14 @@ log estruturado em stdout, sem agregação, alerta ou agrupamento.
 silenciosa de sincronização com o Drive, por exemplo) se acumula sem que ninguém veja.
 Casa com o `BE-18`: adotar `capture()` nos outros apps só tem valor pleno se houver onde os
 eventos aterrissarem.
+
+**Fechamento em 12/08.** O SDK oficial do Sentry é inicializado pelo `CoreConfig` somente quando
+`SENTRY_DSN` existe. Ambiente e release são configuráveis, PII padrão e tracing ficam desligados.
+Exceções não tratadas entram pela integração automática do Django; exceções deliberadamente
+capturadas por `core.errors.capture()` são encaminhadas com `error.context` e dados estruturados.
+Falha do backend nunca mascara a falha original, e DSN vazio mantém desenvolvimento/testes sem
+rede. Falha ao inicializar o SDK também não impede o boot. Cinco testes cobrem desativação,
+configuração segura, inicialização degradada, envio e degradação do backend.
 
 ### NOVO-01 ✅ RESOLVIDO · `ASSINATURA_ETIQUETA_2_COMPAT.md` descrevia um fluxo que não existe mais · VER · 0,25 d
 
