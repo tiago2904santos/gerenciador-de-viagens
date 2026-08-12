@@ -214,6 +214,14 @@ class TiposEventoTests(_CatalogoMixin, TestCase):
         self.assertEqual(response.context["back_url"], destino)
         self.assertEqual(response.context["quick_add_next_url"], destino)
 
+    def test_next_externo_cai_no_fallback_do_catalogo(self):
+        response = self.client.get(
+            self._index(next="https://externo.invalido/coleta")
+        )
+
+        self.assertEqual(response.context["back_url"], reverse("eventos:index"))
+        self.assertEqual(response.context["quick_add_next_url"], "")
+
     def test_edicao_invalida_avisa_com_a_frase_unica(self):
         tipo = TipoEvento.objects.create(area=area_de_teste(), nome="Seminario")
 
