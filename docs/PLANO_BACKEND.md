@@ -204,7 +204,7 @@ Esta etapa é a que o [`PLANO_DESEMPENHO.md`](PLANO_DESEMPENHO.md) mede e não e
 | `BE-13` 🟠 | `roteiros/roteiro_logic.py`: 1.779 linhas, 57 funções privadas, fora do contrato de camadas, importado pelos services | 4 |
 | `BE-14` ✅ | 48 sites de persistência em módulo de view sem service e sem transação — fechado em 6 fatias; o último caminho multigravação, identificação de Evento (~12 writes/6 tabelas), virou um service atômico com rollback provado nos cinco documentos vinculáveis | 3 |
 | `BE-15` ✅ | Três políticas preservadas sobre `core.numeracao`: OS reaproveita somente lacuna de exclusão; Plano mantém contador/sufixo e agora grava com retry e rollback do contador | 2 |
-| `BE-16` 🟡 | Abstrações adotadas pela metade: paginação em 2 de 14 listas, exclusão protegida em 3 de 48 sites, 6 cópias de `_pagination_pages` | 2 |
+| `BE-16` 🟡 PARCIAL | Paginação fechada: 15 pontos centralizados, 6 cópias privadas removidas e zero `Paginator(...)` em produção fora de `core.pagination`; faltam exclusão protegida e retorno | 2 |
 | `BE-17` 🟡 | `core/views.py` é 75% fixture de UI Lab (947 de 1.261 linhas), e existem **dois** UI Labs paralelos | 1,5 |
 
 **`BE-11`, `BE-12` e `BE-13` são a mesma superfície.** Fazer na ordem: editor primeiro (reduz o

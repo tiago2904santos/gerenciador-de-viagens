@@ -1,11 +1,12 @@
 
 from django.contrib import messages
-from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
+
+from core.pagination import contexto_paginacao
 
 from cadastros.selectors import get_configuracao_sistema
 from core.autosave import AutosavePayloadError
@@ -376,7 +377,8 @@ def index(request):
         sort=sort or None,
     )
 
-    page_obj = Paginator(prestacoes, 20).get_page(request.GET.get("page"))
+    paginacao = contexto_paginacao(prestacoes, request, 20)
+    page_obj = paginacao["page_obj"]
     # `NOVO-08`: uma consulta para a página inteira, não uma por card.
     configuracao = get_configuracao_sistema()
     cards = marcar_agrupamento_cards(
@@ -385,8 +387,6 @@ def index(request):
             for ps in page_obj.object_list
         ]
     )
-    page_querystring = request.GET.copy()
-    page_querystring.pop("page", None)
 
     has_filters = any([q, status, viagem_de, viagem_ate, sort])
 
@@ -405,8 +405,7 @@ def index(request):
             "page_title": "Prestações de Contas",
             "page_description": "Acompanhamento das prestações de contas por servidor, agrupadas por ofício.",
             "cards": cards,
-            "page_obj": page_obj,
-            "page_querystring": page_querystring.urlencode(),
+            **paginacao,
             "q":          q,
             "status":     status,
             "aba":        aba,

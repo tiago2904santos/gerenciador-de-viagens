@@ -825,6 +825,22 @@ SQLite). Com as três políticas preservadas sobre uma única mecânica, o `BE-1
 
 **Correção:** três PRs mecânicos, verificáveis por grep.
 
+#### Fatia 1 ✅ — paginação centralizada em todas as listas
+
+As seis cópias privadas de `_pagination_pages` foram removidas e não há mais instanciação de
+`Paginator` em código de produção fora de `core.pagination`. Os 15 pontos de paginação (as 14 listas
+do inventário mais o gerenciador interno de vínculos da área) agora chamam `contexto_paginacao`.
+
+O contrato comum passou a aceitar `query_params` para preservar exatamente os filtros reconhecidos
+por cada tela e `paginator_class`/`paginator_kwargs` para manter o total pré-agregado de Termos sem
+reintroduzir uma consulta. `page_obj`, `pagination_pages` e `page_querystring` conservam os mesmos
+nomes. Testes novos provam remoção de `page`, preservação da ordem dos filtros e descarte de parâmetro
+estranho; **922 testes** dos apps consumidores estão verdes.
+
+Prova mecânica após a fatia: `rg "Paginator\\(|def _pagination_pages"` encontra somente a subclasse
+especializada `TermosPaginator` e o helper de fixture do teste do componente — zero construção ou
+cópia em produção. Faltam as fatias de exclusão protegida e retorno para fechar o `BE-16`.
+
 ### BE-17 ✅ RESOLVIDO · 🟡 `core/views.py` é 75% fixture de UI Lab · AUD · 1,5 d
 
 **Fechado em 07/08 pela remoção do UI-lab.** `core/views.py` foi de **1.249 para 237 linhas**: saíram

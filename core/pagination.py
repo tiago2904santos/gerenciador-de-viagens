@@ -15,6 +15,8 @@ para desempacotar no dicionário da view:
 ``page_querystring`` preserva os filtros da URL (busca, aba, período, ordenação)
 menos o próprio ``page``, para que navegar entre páginas não descarte o filtro.
 """
+from urllib.parse import urlencode
+
 from django.core.paginator import Paginator
 
 
@@ -30,12 +32,37 @@ def paginas_elididas(page_obj, *, on_each_side=1, on_ends=1):
     ]
 
 
-def contexto_paginacao(queryset, request, por_pagina):
-    page_obj = Paginator(queryset, por_pagina).get_page(request.GET.get("page"))
-    querystring = request.GET.copy()
-    querystring.pop("page", None)
+def contexto_paginacao(
+    queryset,
+    request,
+    por_pagina,
+    *,
+    paginator_class=Paginator,
+    paginator_kwargs=None,
+    query_params=None,
+):
+    """Pagina uma coleção e preserva o contrato único do componente.
+
+    ``paginator_class``/``paginator_kwargs`` mantêm casos especializados, como o
+    total já agregado dos Termos. ``query_params`` permite preservar exatamente
+    os filtros reconhecidos pela tela; omitido, copia o GET menos ``page``.
+    """
+    paginator = paginator_class(
+        queryset,
+        por_pagina,
+        **(paginator_kwargs or {}),
+    )
+    page_obj = paginator.get_page(request.GET.get("page"))
+    if query_params is None:
+        querystring = request.GET.copy()
+        querystring.pop("page", None)
+        page_querystring = querystring.urlencode()
+    else:
+        page_querystring = urlencode(
+            {chave: valor for chave, valor in query_params.items() if valor not in (None, "")}
+        )
     return {
         "page_obj": page_obj,
         "pagination_pages": paginas_elididas(page_obj),
-        "page_querystring": querystring.urlencode(),
+        "page_querystring": page_querystring,
     }

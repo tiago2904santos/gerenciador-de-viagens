@@ -1,7 +1,6 @@
 from urllib.parse import urlencode
 
 from django.contrib import messages
-from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect
@@ -9,6 +8,8 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_http_methods
+
+from core.pagination import contexto_paginacao
 from django.views.decorators.http import require_POST
 
 from cadastros.models import ConfiguracaoSistema
@@ -86,10 +87,9 @@ def index(request):
         preserved={"q": q, "sort": sort, "viagem_de": viagem_de, "viagem_ate": viagem_ate},
     )
     has_filters = any([q, viagem_de, viagem_ate, sort])
-    page_obj = Paginator(lista, 20).get_page(request.GET.get("page"))
+    paginacao = contexto_paginacao(lista, request, 20)
+    page_obj = paginacao["page_obj"]
     cards = [apresentar_evento_list_card(evento) for evento in page_obj.object_list]
-    page_querystring = request.GET.copy()
-    page_querystring.pop("page", None)
 
     return render(
         request,
@@ -106,8 +106,7 @@ def index(request):
             "has_filters": has_filters,
             "eventos": page_obj.object_list,
             "cards": cards,
-            "page_obj": page_obj,
-            "page_querystring": page_querystring.urlencode(),
+            **paginacao,
             "novo_url": reverse("eventos:novo"),
             "search_clear_url": f"{reverse('eventos:index')}?aba={aba}",
             "sort_options": [

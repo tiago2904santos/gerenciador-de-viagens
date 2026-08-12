@@ -12,7 +12,10 @@ from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
 from django.test import TestCase
+from django.test import RequestFactory
 from django.urls import reverse
+
+from core.pagination import contexto_paginacao
 
 
 ALERTA = "Paginação indisponível"
@@ -83,6 +86,32 @@ class PaginationComponentContractTests(TestCase):
         # Cada link de página carrega o filtro corrente junto.
         self.assertIn("?aba=atuais&amp;q=teste&page=3", html)
         self.assertIn("?aba=atuais&amp;q=teste&page=1", html)
+
+
+class ContextoPaginacaoTests(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_preserva_get_menos_page_por_padrao(self):
+        request = self.factory.get("/lista/", {"q": "teste", "aba": "atuais", "page": 2})
+
+        contexto = contexto_paginacao(range(50), request, 20)
+
+        self.assertEqual(contexto["page_obj"].number, 2)
+        self.assertEqual(contexto["pagination_pages"], [1, 2, 3])
+        self.assertEqual(contexto["page_querystring"], "q=teste&aba=atuais")
+
+    def test_query_params_limita_aos_filtros_reconhecidos(self):
+        request = self.factory.get("/lista/", {"q": "teste", "ruido": "1", "page": 2})
+
+        contexto = contexto_paginacao(
+            range(50),
+            request,
+            20,
+            query_params={"q": "teste", "aba": ""},
+        )
+
+        self.assertEqual(contexto["page_querystring"], "q=teste")
 
 
 class ListasEmCardsEntregamPageObjTests(TestCase):
