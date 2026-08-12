@@ -3256,7 +3256,7 @@ de mídia diferentes, e o de 32 linhas não tem `DOCUMENTOS_PDF_AUTO_FALLBACK`,
 **Efeito:** os dois nomes são igualmente plausíveis; seguir o errado configura caminhos que não
 batem com o que os scripts de deploy assumem.
 
-### QA-10 🟡 `/metrics/` e margem de cobertura fina · AUD · segue de QA-02 e QA-05
+### QA-10 ✅ RESOLVIDO POR QA-02 · `/metrics/` e margem de cobertura fina · AUD · segue de QA-02 e QA-05
 
 `core/metrics.py:20-38` usa `cache.incr`/`cache.add` do mesmo `CACHES` do `QA-02`: com
 `LocMemCache` e 3 workers, `/metrics/` reporta só os contadores do processo que atendeu à
@@ -3267,6 +3267,11 @@ Margem sobre o piso de cobertura abaixo de 1 ponto: `integracoes.google_drive` 5
 `roteiros` 74,83% contra 74,10% (0,73 pp sobre 4.069 statements);
 `diario_bordo` 91,67% contra 91,17% — artefato de arquivo minúsculo (12 statements, 1 linha =
 8,3 pp), que se resolve pelo `BE-20`, não perseguindo a métrica.
+
+**Reconciliação em 12/08.** A causa funcional foi eliminada por `QA-02`: produção agora exige
+`REDIS_URL`, e `base.py` seleciona `RedisCache`, compartilhando os mesmos contadores entre os
+workers. As margens de cobertura continuam protegidas pelos pisos do CI; a lacuna concreta do
+Drive permanece isolada em `QA-05`, e o artefato de `diario_bordo` foi removido em `BE-20`.
 
 ### QA-11 ✅ RESOLVIDO (993e14c, 05/08/2026) · 🟡 `reparar-producao.yml` em UTF-16LE · AUD · 0,25 d
 
@@ -3307,19 +3312,28 @@ por ele indefinidamente.
 **Correção:** Dependabot (`pip` + `github-actions`, semanal) é barato e fecha metade da lacuna;
 a11y automatizado (axe-core via Playwright, já disponível no ambiente) é investimento maior.
 
-### QA-13 ⚪ 218 de 1.266 testes são "magros" · AUD · —
+### QA-13 ✅ RECONCILIADO · 218 de 1.266 testes são "magros" · AUD · —
 
 17,2% dos testes têm no máximo 2 statements no corpo. Não é defeito por si — muitos são asserções
 de contrato legítimas —, mas é o número a olhar quando um app "tem cobertura" e ainda assim
 regride.
 
-### QA-14 ⚪ CRUD de modelos de texto do Relatório Técnico sem teste · AUD · 0,5 d
+**Decisão em 12/08.** Indicador aceito como sinal de triagem, sem conversão em meta mecânica:
+alongar testes curtos não aumenta sua capacidade de detectar regressões. As lacunas concretas
+continuam sendo tratadas por IDs próprios, como `QA-14` e `QA-15`.
+
+### QA-14 ✅ RESOLVIDO (993e14c5) · CRUD de modelos de texto do Relatório Técnico sem teste · AUD · 0,5 d
 
 `prestacoes_contas/model_views.py` — 66 statements, **25,76%**. As quatro views (`:19-137`) têm a
 lógica de criação, edição e exclusão inteiramente fora da cobertura, incluindo o filtro por área
 (`:25` e `:92`).
 
-### QA-15 ⚪ Caminhos de erro da geração de PDF sem teste · AUD+VER · 1,5 d
+**Reconciliação em 12/08.** O defeito já havia sido fechado por `993e14c5`, mas o status não foi
+atualizado. `prestacoes_contas/test_modelos_texto.py` tem sete testes: index, campo válido e
+inválido na criação, criar, editar, excluir e isolamento de outra área. Eles cobrem as quatro views
+e os redirects que antes levantavam `NameError`; a execução focada passou 7/7.
+
+### QA-15 ✅ RESOLVIDO · Caminhos de erro da geração de PDF sem teste · AUD+VER · 1,5 d
 
 `documentos/services/downloads.py` **0%** (16 statements, trata erro de geração) e
 `adapters/weasyprint_pdf.py` ~32% — os dois **confirmados** na verificação.
@@ -3330,6 +3344,12 @@ desbloqueada). (`adapters/excel_pdf.py` está em 0% mas é Windows-only
 via `win32com.client` — não conta como lacuna.)
 **Efeito:** os ramos de erro e *fallback* da função mais central do produto só executam quando algo
 já deu errado — exatamente onde falta prova.
+
+**Fechamento em 12/08.** Oito testes novos cobrem os contratos antes ausentes: propagação do erro
+de DOCX, redirecionamento com mensagem e resposta válida de PDF, ausência da biblioteca nativa e
+configuração do WeasyPrint, erro do storage, falha do broker e documento ainda pendente no
+`warm_cache`. Em conjunto com os testes existentes dos adaptadores Word e LibreOffice, o gate
+direcionado executa 22/22 testes verdes sem depender dos binários externos.
 
 ### QA-16 ⚪ Sem rastreamento de erro centralizado · AUD · 1 d
 
