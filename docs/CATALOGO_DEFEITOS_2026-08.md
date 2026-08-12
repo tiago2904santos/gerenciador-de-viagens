@@ -3291,11 +3291,15 @@ por ele indefinidamente.
 **Correção:** Dependabot (`pip` + `github-actions`, semanal) é barato e fecha metade da lacuna;
 a11y automatizado (axe-core via Playwright, já disponível no ambiente) é investimento maior.
 
-### QA-13 ⚪ 218 de 1.266 testes são "magros" · AUD · —
+### QA-13 ✅ RECONCILIADO · 218 de 1.266 testes são "magros" · AUD · —
 
 17,2% dos testes têm no máximo 2 statements no corpo. Não é defeito por si — muitos são asserções
 de contrato legítimas —, mas é o número a olhar quando um app "tem cobertura" e ainda assim
 regride.
+
+**Decisão em 12/08.** Indicador aceito como sinal de triagem, sem conversão em meta mecânica:
+alongar testes curtos não aumenta sua capacidade de detectar regressões. As lacunas concretas
+continuam sendo tratadas por IDs próprios, como `QA-14` e `QA-15`.
 
 ### QA-14 ✅ RESOLVIDO (993e14c5) · CRUD de modelos de texto do Relatório Técnico sem teste · AUD · 0,5 d
 

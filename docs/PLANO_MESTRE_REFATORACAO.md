@@ -535,7 +535,7 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       status reconciliado
 - [x] `QA-15` oito provas dos erros de download, WeasyPrint, storage e fila; 22 testes do conjunto
       de geração/conversão verdes
-- [ ] `QA-13` 218 testes "magros" — número a olhar, não meta a perseguir
+- [x] `QA-13` indicador reconciliado como sinal de triagem, não meta de tamanho de teste
 
 ### Fase 9 — Finalização e higiene
 - [x] `BE-20` `diario_bordo` é app-casca — **removido**: 33 linhas, rota inalcançável, sem
