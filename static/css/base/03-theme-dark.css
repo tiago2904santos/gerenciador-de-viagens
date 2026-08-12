@@ -203,6 +203,8 @@ html[data-theme="dark"] {
     0 0 0 1px color-mix(in srgb, var(--color-accent) 18%, transparent),
     0 0 10px color-mix(in srgb, var(--color-accent) 16%, transparent);
   --card-family-accent-width: 8px;
+  /* NOVO-121: o escuro conserva o que ja tinha — a inversao e so do claro. */
+  --record-card-bg: var(--color-surface);
   --entity-card-inner-bg: var(--color-surface-soft);
   --wizard-card-bg: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
   --wizard-panel-bg: var(--color-surface-soft);
@@ -317,6 +319,10 @@ html[data-theme="dark"] {
   --sidebar-logout-fg: #d2d9de;
   --sidebar-focus-ring: color-mix(in srgb, var(--color-accent) 52%, transparent);
   --sidebar-theme-active-bg: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  /* NOVO-117: os seis tokens que substituiram literais em `layout/sidebar.css`
+     nascem no `:root` com os valores historicos, que ja eram compartilhados
+     pelos dois temas — por isso o escuro nao precisa redefini-los. A costura
+     existe para quando precisarem divergir. */
 
   --app-body-bg:
     radial-gradient(ellipse 70% 50% at 50% 0%, rgba(21, 91, 154, 0.16), transparent 55%),

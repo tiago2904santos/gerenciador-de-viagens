@@ -672,6 +672,8 @@ o token resolve.
 | **E8 Eventos/Wizard** | tipografia, stepper de um anel, campos, selects e hierarquia de superfícies (`NOVO-58`, `NOVO-100`) | ✅ conteúdo com **0 divergências não-cor** em 1440/800/500; chrome móvel permanece na 8h; prints claro/escuro conferidos |
 | **E8 Custom Select v2** | menu aberto, opções e check usam uma geometria nos dois temas (`NOVO-112`) | ✅ trilho, recuo, altura, raio, check e scrollbar compartilhados; azul no claro e dourado no escuro |
 | **E8 listas e superfícies claras** | espelha a estrutura dos cards e restaura bloco azul-cinza com campo branco (`NOVO-113`) | ✅ Ofício 91 com 112 nós e **0** diferenças de dimensão, posição relativa ou estilo não-cor; página `var(--app-body-bg)`, wizard claro `#fff` / `#eef4fc` / `#fff` |
+| **E8 barra lateral** | seis cores de tema escuro fixas em `layout/sidebar.css`, aplicadas nos dois temas (`NOVO-117`) | ✅ viraram token com os mesmos valores — nenhum tema muda; arquivo zerado de literais e promovido a `STRICT_COLOR_LITERAL_FILES`; auditor 235/245. Onze paletas de shell prototipadas e reprovadas: **a paleta clara é a histórica**, decidido |
+| **E8 wizard claro** | card e campo saíam da mesma cor, então o campo não tinha contra o que se destacar (`NOVO-120`) | ✅ níveis alternam azul → branco → azul; supera o contrato do `NOVO-113`, com o teste renomeado e reapontado |
 
 **O instrumento que a etapa exigiu, e que não existia.** A régua da E0
 (`medir_divergencia_tema.py`) compara **claro contra escuro no mesmo código**. A E9 precisa do

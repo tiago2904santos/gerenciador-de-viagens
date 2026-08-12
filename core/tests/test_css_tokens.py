@@ -31,9 +31,13 @@ _CSS_COMMENT = re.compile(r"/\*.*?\*/")
 _CSS_VALUE = re.compile(r":\s*.+")
 
 # Arquivos novos da fase 13 — devem estar 100% livres de literais.
+# NOVO-117 acrescentou layout/sidebar.css: os literais que moravam nele eram
+# véu branco, `#ffffff` e bordas cor de creme, válidos só sobre fundo escuro e
+# aplicados nos DOIS temas. Zerado o arquivo, a trava impede que voltem.
 STRICT_COLOR_LITERAL_FILES = {
     "static/css/feedback/notice.css",
     "static/css/feedback/metric.css",
+    "static/css/layout/sidebar.css",
 }
 
 # Baseline medido em 30/07/2026 antes da fase 14; o gate falha se a dívida subir.
@@ -154,6 +158,33 @@ class CssTokenGateTests(SimpleTestCase):
         self.assertIn("--color-on-accent: var(--color-primary-dark);", dark)
         self.assertIn("--sidebar-active-border: var(--color-accent-border-strong);", dark)
         self.assertIn("--sidebar-panel-border: var(--color-accent-border-soft);", dark)
+
+    def test_sidebar_shared_literals_became_tokens(self):
+        """NOVO-117: a barra não volta a carregar cor fixa de tema escuro.
+
+        Seis valores moravam dentro de `layout/sidebar.css` sem predicado de
+        tema — véu branco, branco puro no nome do usuário, bordas cor de creme e
+        dourado no hover do logout. Só funcionam sobre fundo escuro, e valiam
+        nos dois temas; o botão de trocar de tema ficava ilegível em qualquer
+        barra clara. A paleta em si continua a histórica: o defeito era o
+        acoplamento, não a cor.
+
+        A trava real é `layout/sidebar.css` estar em STRICT_COLOR_LITERAL_FILES;
+        este teste garante que os tokens que o esvaziaram continuem existindo.
+        """
+        tokens = (CSS_DIR / "base" / "tokens.css").read_text(encoding="utf-8")
+
+        for token in (
+            "--sidebar-account-bg",
+            "--sidebar-link-hover-border",
+            "--sidebar-logout-hover-bg",
+            "--sidebar-theme-active-border",
+            "--sidebar-theme-active-fg",
+            "--sidebar-theme-active-inset",
+            "--sidebar-mobile-shadow",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(f"{token}:", tokens)
 
     def test_canonical_component_stylesheets_have_no_color_literals(self):
         """Novos componentes notice/metric devem usar apenas var() de token."""

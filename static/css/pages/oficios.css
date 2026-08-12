@@ -406,10 +406,19 @@
 }
 
 /* Motorista: mesmos tokens do roster Equipe (tint + borda + filete) */
+/* NOVO-117: a tile de motorista passa a usar a mesma expressao do card de
+   documento marcado — `--color-primary-bright` a 20%. No claro os dois tokens
+   resolvem para o mesmo azul, entao o que muda de fato e a tinta; no ESCURO
+   `--color-accent` e dourado e `--color-primary-bright` e azul, e por isso a
+   regra escura abaixo conserva o valor antigo. */
 .oficio-documentos-traveller-tile--motorista {
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-muted, var(--color-card-muted)));
+  background: color-mix(in srgb, var(--color-primary-bright) 20%, var(--color-surface-muted, var(--color-card)));
   border-color: var(--color-accent-border-soft, color-mix(in srgb, var(--color-accent) 40%, var(--color-border-soft)));
   box-shadow: inset 4px 0 0 var(--color-accent);
+}
+
+html[data-theme="dark"] .oficio-documentos-traveller-tile--motorista {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-muted, var(--color-card-muted)));
 }
 
 .oficio-documentos-traveller-tile__avatar {
@@ -1163,7 +1172,10 @@
    existe dentro de .related-route-picker. Nenhum dos dois envolve este card, então
    o clique marcava o item (select/aria-pressed) sem qualquer sinal visual. */
 #evento-card-documentos-d .related-route-item.is-active {
-  background: color-mix(in srgb, var(--color-primary-bright) 12%, var(--color-surface-muted, var(--color-card)));
+  /* NOVO-117: tinta de 12% para 20% — a 12% o card marcado quase nao se
+     separava do irmao nao marcado depois que a pagina clareou. O escuro tem
+     regra propria logo abaixo e nao e afetado. */
+  background: color-mix(in srgb, var(--color-primary-bright) 20%, var(--color-surface-muted, var(--color-card)));
   border-color: color-mix(in srgb, var(--color-primary-bright) 45%, var(--color-border-soft));
   box-shadow: inset 4px 0 0 var(--color-primary-bright);
 }

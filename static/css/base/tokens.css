@@ -2,7 +2,7 @@
   /* --------------------------------------------------------------------------
      Cores base
      -------------------------------------------------------------------------- */
-  --color-bg: #f7fbff;
+  --color-bg: #e3eaf3;
   --color-bg-strong: #e3eaf2;
   --color-bg-dark: #062847;
   --color-bg-subtle: #e3eaf2;
@@ -182,12 +182,31 @@
     calc(g + 10)
     calc(b + 10)
   );
-  --entity-card-inner-bg: var(--color-surface-powder);
-  /* NOVO-113: no claro, cards de formulario sao brancos, blocos internos
-     azul-cinza e controles brancos, como na referencia aprovada. */
-  --wizard-card-bg: var(--color-surface);
-  --wizard-panel-bg: var(--color-surface-powder);
-  --wizard-field-bg: var(--color-surface);
+  /* NOVO-121: a lista segue a MESMA ordem de cores do formulario.
+
+     O card de lista fazia branco → azul e o wizard, depois do NOVO-120, faz
+     azul → branco → azul: as duas familias alternavam em fases opostas, e a
+     mesma informacao mudava de cor conforme a tela. Agora as duas leem
+     `casca azul → bloco branco → item azul`.
+
+     `--record-card-bg` existe em vez de reusar `--card-family-bg` porque
+     aquele token tambem pinta a barra de filtros, o botao de criar inline e a
+     faixa do stepper do wizard — que devem seguir brancas. Alcance largo
+     demais para carregar a inversao junto. */
+  --record-card-bg: var(--color-surface-powder);
+  --entity-card-inner-bg: var(--color-surface);
+  /* NOVO-120: a hierarquia do wizard claro alterna azul → branco → azul.
+
+     Supera o contrato do `NOVO-113` ("bloco azul-cinza com controle branco"),
+     que o dono reviu olhando a tela. O problema do arranjo anterior era
+     medivel: o bloco saia `--color-surface-powder` e o campo saia
+     `--color-surface`, mas o CARD que envolve o bloco tambem era
+     `--color-surface` — entao campo e card tinham a mesma cor e o campo nao
+     tinha contra o que se destacar. Alternando, cada nivel se separa do
+     vizinho: casca azul, bloco branco, campo azul. */
+  --wizard-card-bg: var(--color-surface-powder);
+  --wizard-panel-bg: var(--color-surface);
+  --wizard-field-bg: var(--color-surface-powder);
 
   /* --------------------------------------------------------------------------
      Motion (duracao + easing + aliases semanticos)
@@ -390,7 +409,17 @@
   --theme-surface-card: var(--color-card);
   --theme-border-card: var(--color-border);
 
-  /* Sidebar institucional (fallback) */
+  /* Sidebar institucional (fallback).
+
+     NOVO-117: os valores de COR aqui sao os historicos — a barra clara continua
+     azul-marinho, por decisao do dono depois de prototipar oito alternativas na
+     tela. O que a etapa mudou nao foi a paleta: foram os seis literais que
+     moravam dentro de `layout/sidebar.css` e valiam nos DOIS temas (veu branco,
+     branco puro no nome do usuario, bordas cor de creme, dourado no hover do
+     logout). Eram cores que so funcionam sobre fundo escuro, aplicadas sem
+     predicado de tema — o mesmo vazamento que o NOVO-111 corrigiu nos accents e
+     nao alcancou aqui. Agora sao token, e o arquivo ficou sem nenhuma cor
+     literal, o que o teste de contrato passa a exigir. */
   --sidebar-surface: linear-gradient(180deg, #062847 0%, #031c33 100%);
   --sidebar-fg: #d4dde9;
   --sidebar-fg-soft: #cddcf0;
@@ -403,6 +432,8 @@
   --sidebar-link-border: rgba(175, 192, 211, 0.22);
   --sidebar-link-fg: #cddcf0;
   --sidebar-link-hover-bg: rgba(255, 255, 255, 0.08);
+  --sidebar-link-hover-border: rgba(255, 243, 207, 0.35);
+  --sidebar-account-bg: rgba(255, 255, 255, 0.045);
   --sidebar-icon-bg: color-mix(in srgb, var(--color-accent) 18%, transparent);
   --sidebar-icon-fg: #deebfb;
   --sidebar-active-bg: rgba(255, 255, 255, 0.1);
@@ -413,10 +444,19 @@
   --sidebar-logout-bg: rgba(4, 24, 46, 0.55);
   --sidebar-logout-border: rgba(175, 192, 211, 0.35);
   --sidebar-logout-fg: rgba(230, 241, 255, 0.95);
+  --sidebar-logout-hover-bg: rgba(216, 162, 27, 0.2);
   --sidebar-focus-ring: var(--color-accent-border-soft);
+  --sidebar-theme-active-border: rgba(216, 162, 27, 0.4);
+  --sidebar-theme-active-fg: var(--color-white);
+  --sidebar-theme-active-inset: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --sidebar-mobile-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
 
   /* Fallback antes do JS (equivalente a light) */
-  --app-body-bg: linear-gradient(180deg, #ffffff 0%, #e3eaf2 48%, #e3eaf2 100%);
+  /* NOVO-117: comecava em #ffffff puro, entao no topo da tela — exatamente
+     onde ficam a barra lateral e a faixa de titulo, agora brancas — o fundo e
+     a superficie eram a mesma cor e nada separava as duas. A pagina inteira
+     desce um degrau, na mesma proporcao que o escuro usa entre fundo e card. */
+  --app-body-bg: linear-gradient(180deg, #e3eaf3 0%, #dde6f1 55%, #d7e1ee 100%);
   --app-main-bg: transparent;
   --app-featured-bg-fallback: #b9cbe0;
   --app-featured-bg:
@@ -425,6 +465,11 @@
     radial-gradient(ellipse 70% 48% at 50% 108%, rgba(11, 58, 102, 0.12), transparent 56%),
     linear-gradient(168deg, #ffffff 0%, #e3eaf2 26%, #d4dde9 62%, #cddcf0 100%);
 
+  /* Faixa superior do hero (.app-page-hero__stage) */
+  /* NOVO-117: a faixa de titulo deixa de ser um slab escuro no claro.
+
+     Estes tres tokens viajam juntos e alimentam `.list-header__band`, o band do
+     wizard, `.page-header--clean .page-header__stage` e `.page-header-band`. No
   /* Faixa superior do hero (.app-page-hero__stage) */
   --app-hero-stage-start: #132238;
   --app-hero-stage-end: #17476f;
@@ -558,7 +603,7 @@
 
 /* ========== 3 tema claro oficial (inclui alias legado claro) ========== */
 html[data-theme="light"] {
-  --color-bg: #f7fbff;
+  --color-bg: #e3eaf3;
   --color-surface: var(--color-white);
   --color-surface-strong: #ffffff;
   --color-surface-soft: #ffffff;
@@ -577,7 +622,11 @@ html[data-theme="light"] {
   --color-input-placeholder: #71839a;
   --color-input-border: rgba(31, 76, 125, 0.22);
 
-  --app-body-bg: linear-gradient(180deg, #ffffff 0%, #e3eaf2 48%, #e3eaf2 100%);
+  /* NOVO-117: comecava em #ffffff puro, entao no topo da tela — exatamente
+     onde ficam a barra lateral e a faixa de titulo, agora brancas — o fundo e
+     a superficie eram a mesma cor e nada separava as duas. A pagina inteira
+     desce um degrau, na mesma proporcao que o escuro usa entre fundo e card. */
+  --app-body-bg: linear-gradient(180deg, #e3eaf3 0%, #dde6f1 55%, #d7e1ee 100%);
   --app-featured-bg-fallback: #d4dde9;
   --app-featured-bg:
     radial-gradient(ellipse 110% 75% at 0% 0%, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 52%),

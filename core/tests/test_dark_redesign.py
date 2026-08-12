@@ -185,23 +185,39 @@ class DarkRedesignContractTests(SimpleTestCase):
                 self.assertIn(shared, self.components_css)
                 self.assertNotIn(dark_only, self.components_css)
 
+        # NOVO-121: a lista alterna nas mesmas fases do formulário (NOVO-120) —
+        # casca azul, bloco branco, item azul. Antes o card de lista fazia
+        # branco → azul e o wizard azul → branco → azul: as duas famílias
+        # alternavam em fases opostas, e a mesma informação mudava de cor
+        # conforme a tela em que aparecia.
         self.assertIn(
-            "--entity-card-inner-bg: var(--color-surface-powder);",
+            "--record-card-bg: var(--color-surface-powder);",
             self.base_tokens_css,
         )
+        self.assertIn(
+            "--entity-card-inner-bg: var(--color-surface);",
+            self.base_tokens_css,
+        )
+        # O escuro conserva a escala que já tinha.
+        self.assertIn("--record-card-bg: var(--color-surface);", self.tokens_css)
         self.assertIn(
             "--entity-card-inner-bg: var(--color-surface-soft);",
             self.tokens_css,
         )
         self.assertIn("background: var(--entity-card-inner-bg);", self.components_css)
 
-    def test_light_wizard_uses_blue_gray_sections_with_white_fields(self):
-        # NOVO-113: a referencia aprovada inverte a hierarquia que havia
-        # regredido: painel interno azul-cinza, controle branco.
+        # `--card-family-bg` continua pintando barra de filtros, botão de criar
+        # inline e faixa do stepper; por isso o card de lista tem token próprio.
+        self.assertIn("background: var(--record-card-bg);", self.components_css)
+
+    def test_light_wizard_alternates_surfaces_between_levels(self):
+        # NOVO-120 supera o NOVO-113. O arranjo anterior punha card e campo na
+        # mesma cor (`--color-surface`), entao o campo nao tinha contra o que se
+        # destacar; agora os niveis alternam azul -> branco -> azul.
         light_contracts = (
-            "--wizard-card-bg: var(--color-surface);",
-            "--wizard-panel-bg: var(--color-surface-powder);",
-            "--wizard-field-bg: var(--color-surface);",
+            "--wizard-card-bg: var(--color-surface-powder);",
+            "--wizard-panel-bg: var(--color-surface);",
+            "--wizard-field-bg: var(--color-surface-powder);",
         )
         dark_contracts = (
             "--wizard-panel-bg: var(--color-surface-soft);",
@@ -808,14 +824,22 @@ class DarkRedesignContractTests(SimpleTestCase):
         list_header = self.css.split(".record-card__id-row {", 1)[1]
         list_header = list_header.split("}", 1)[0]
 
+        # NOVO-121 afrouxa este contrato em UM ponto, de propósito. O `NOVO-96`
+        # unificou os dois cabeçalhos quando as duas cascas eram brancas; agora
+        # a casca do card de lista é azul e o bloco de formulário é branco, e
+        # exigir o mesmo fundo nos dois obrigaria um dos dois a destoar da
+        # própria casca. O fundo passa a seguir cada família; o filete e a borda
+        # — que são o que dá identidade comum aos dois — seguem compartilhados.
         for shared_token in (
-            "var(--card-family-header-bg)",
             "var(--card-family-header-image)",
             "var(--card-family-border-strong)",
         ):
             with self.subTest(shared_token=shared_token):
                 self.assertIn(shared_token, wizard_header)
                 self.assertIn(shared_token, list_header)
+
+        self.assertIn("var(--card-family-header-bg)", wizard_header)
+        self.assertIn("var(--record-card-bg)", list_header)
 
         self.assertEqual(self.css.count(".record-card__id-row::before"), 1)
 

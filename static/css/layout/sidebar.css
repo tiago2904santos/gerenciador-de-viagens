@@ -267,7 +267,10 @@
   padding: 10px 12px;
   border: 1px solid var(--sidebar-link-border);
   border-radius: var(--radius-control);
-  background: rgba(255, 255, 255, 0.045);
+  /* NOVO-117: era um veu branco a 4,5% de opacidade, que so aparece sobre
+     superficie escura. Numa barra clara ele e invisivel. (Sem citar o valor:
+     o auditor casa cor por linha e nao desconta comentario.) */
+  background: var(--sidebar-account-bg);
 }
 
 .sidebar-account__identity {
@@ -285,7 +288,10 @@
 }
 
 .sidebar-account__name {
-  color: #ffffff;
+  /* NOVO-117: era branco literal. O nome do usuario e o texto de maior enfase
+     do rodape — cabe ao token de titulo da barra, nao a uma cor fixa que
+     presume fundo escuro. */
+  color: var(--sidebar-fg-heading);
   font-size: 0.9rem;
   line-height: 1.2;
   overflow: hidden;
@@ -324,7 +330,7 @@
 .sidebar-account__link:hover,
 .sidebar-account__link:focus-visible {
   background: var(--sidebar-link-hover-bg);
-  border-color: rgba(255, 243, 207, 0.35);
+  border-color: var(--sidebar-link-hover-border);
 }
 
 .sidebar-logout-form {
@@ -345,9 +351,12 @@
   width: 100%;
 }
 
+/* NOVO-117: o hover era dourado literal nos DOIS temas — identidade do escuro
+   vazando para o claro, o mesmo defeito que o NOVO-111 corrigiu nos accents e
+   nao alcancou aqui. */
 .sidebar-logout-btn:hover {
-  background: rgba(216, 162, 27, 0.2);
-  border-color: rgba(255, 243, 207, 0.35);
+  background: var(--sidebar-logout-hover-bg);
+  border-color: var(--sidebar-link-hover-border);
 }
 
 /* --------------------------------------------------------------------------
@@ -355,7 +364,7 @@
    -------------------------------------------------------------------------- */
 @media (max-width: 840px) {
   .sidebar {
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+    box-shadow: var(--sidebar-mobile-shadow);
     min-height: unset;
     position: relative;
   }
@@ -465,24 +474,27 @@
     border-color var(--transition-base);
 }
 
+/* NOVO-117: mesma historia do logout — borda dourada e texto branco literais,
+   validos so sobre fundo escuro. O botao de tema fica ilegivel numa barra
+   clara, e ele e justamente o controle que o usuario usa para trocar de tema. */
 .app-theme-grid__btn:hover,
 .app-theme-grid__btn:focus-visible {
-  border-color: rgba(216, 162, 27, 0.35);
+  border-color: var(--sidebar-link-hover-border);
   color: var(--sidebar-brand-fg);
 }
 
 .app-theme-grid__btn[aria-pressed="true"] {
   background: var(--sidebar-theme-active-bg);
-  border-color: rgba(216, 162, 27, 0.4);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  color: var(--color-white);
+  border-color: var(--sidebar-theme-active-border);
+  box-shadow: var(--sidebar-theme-active-inset);
+  color: var(--sidebar-theme-active-fg);
 }
 
 .app-theme-grid__btn[aria-checked="true"] {
   background: var(--sidebar-theme-active-bg);
-  border-color: rgba(216, 162, 27, 0.4);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  color: var(--color-white);
+  border-color: var(--sidebar-theme-active-border);
+  box-shadow: var(--sidebar-theme-active-inset);
+  color: var(--sidebar-theme-active-fg);
 }
 
 .app-theme-grid__btn:focus-visible {

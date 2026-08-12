@@ -4916,7 +4916,9 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme])
   .record-card {
-  background: var(--card-family-bg);
+  /* NOVO-121: `--record-card-bg`, nao `--card-family-bg` — ver a nota em
+     `base/tokens.css`. No escuro os dois resolvem igual. */
+  background: var(--record-card-bg);
   border: 1px solid var(--card-family-border);
   box-shadow: var(--card-family-shadow);
   transform: none;
@@ -4930,7 +4932,10 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme])
   .record-card__id-row {
-  background: var(--card-family-header-bg);
+  /* NOVO-121: o cabecalho acompanha a casca do card. `--card-family-header-bg`
+     continua servindo cabecalho de secao de formulario e do painel principal —
+     por isso a mudanca e aqui, no seletor, e nao no token. */
+  background: var(--record-card-bg);
   background-image: var(--card-family-header-image);
   border-bottom-color: var(--card-family-border-strong);
 }
@@ -4977,7 +4982,7 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme])
   .record-card__band {
-  background: var(--card-family-bg);
+  background: var(--record-card-bg);
 }
 
 :is(html[data-theme])
@@ -5026,13 +5031,13 @@ html[data-theme="dark"] *::after {
 
 :is(html[data-theme])
   .itinerary__leg {
-  background: var(--card-family-bg) !important;
+  background: var(--record-card-bg) !important;
   border-color: transparent !important;
 }
 
 :is(html[data-theme])
   .itinerary__leg:hover {
-  background: var(--card-family-bg) !important;
+  background: var(--record-card-bg) !important;
   border-color: transparent !important;
 }
 
@@ -5215,13 +5220,13 @@ html[data-theme="dark"] *::after {
 /* Linhas de trecho: mesmo fundo da seção do card. */
 :is(html[data-theme])
   .itinerary__leg {
-  background: var(--card-family-bg) !important;
+  background: var(--record-card-bg) !important;
   border-color: transparent !important;
 }
 
 :is(html[data-theme])
   .itinerary__leg:hover {
-  background: var(--card-family-bg) !important;
+  background: var(--record-card-bg) !important;
   border-color: transparent !important;
 }
 
@@ -5424,11 +5429,15 @@ html[data-theme="dark"] *::after {
   transition: background-color 100ms ease, color 100ms ease;
 }
 
+/* NOVO-117: era `--color-surface-soft`, que no claro resolve para #ffffff — a
+   mesma cor do menu, entao o hover simplesmente nao existia no tema claro.
+   `--option-hover-bg` (fields/select.css) da o valor certo em cada tema; no
+   escuro ele resolve para o mesmo `--color-surface-soft` de antes. */
 :is(html[data-theme])
   .custom-select__menu--v2 .custom-select__option:hover:not(.custom-select__option--disabled),
 :is(html[data-theme])
   .custom-select__menu--v2 .custom-select__option--focused {
-  background: var(--color-surface-soft);
+  background: var(--option-hover-bg);
   color: var(--color-heading);
 }
 

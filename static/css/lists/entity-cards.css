@@ -239,8 +239,13 @@
   color: var(--color-on-accent);
 }
 
+/* NOVO-121: a 8% sobre `--color-card-muted` a linha do motorista dava #ecf2f7
+   contra uma casca de card #eef4fc — dois tons quase iguais, e o realce sumia
+   depois que a casca virou azul. Sobe para 20% e le `--color-primary-bright`,
+   a mesma expressao da tile de motorista do wizard, para os dois combinarem.
+   Esta regra ja e escopada no claro, entao o escuro nao e tocado. */
 html[data-theme="light"] .person-row--highlight {
-  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-card-muted));
+  background: color-mix(in srgb, var(--color-primary-bright) 20%, var(--color-surface-muted, var(--color-card)));
   border-color: var(--color-accent-border-soft, var(--color-border-soft));
 }
 
@@ -578,8 +583,12 @@ html[data-theme="light"] .person-row--highlight .person-row__name {
 }
 
 /* ── FOOTER ── */
+/* NOVO-121: o rodape acompanha a casca do card, nao `--form-section-bg`. Com a
+   casca em azul (claro), um rodape branco virava uma faixa a mais na base do
+   card — um degrau de superficie que nao corresponde a nenhum nivel da
+   hierarquia. */
 .record-card__footer {
-  background: var(--form-section-bg, var(--color-surface));
+  background: var(--record-card-bg, var(--color-surface));
   border-top: 1px solid var(--form-section-border, var(--color-border-soft));
   padding: var(--space-3) var(--space-6);
 }

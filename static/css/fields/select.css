@@ -104,6 +104,12 @@ html[data-theme="light"] {
   --chip-border: var(--color-info-border-strong);
   --chip-color: var(--color-primary-strong);
   --option-selected-bg: var(--color-primary-soft);
+  /* NOVO-117: o hover da opcao lia `--color-surface-soft`, que no tema claro
+     resolve para #ffffff — a mesma cor do menu. Ou seja: no claro o menu de
+     select nao tinha hover nenhum. E um sintoma do NOVO-119 (os tres niveis de
+     superficie clara colapsados em dois), e aqui ele apagava um estado de
+     interacao inteiro. Token proprio, como ja e o caso do selecionado. */
+  --option-hover-bg: var(--theme-list-row-hover);
   --cs-trigger-shadow: var(--shadow-sm);
   --cs-chevron-color: var(--theme-text-muted);
   --cs-menu-bg: var(--theme-surface-card);
@@ -120,6 +126,8 @@ html[data-theme="dark"] {
   --chip-border: var(--color-info-border);
   --chip-color: var(--color-info-text);
   --option-selected-bg: var(--color-info-bg);
+  /* Valor que o escuro ja tinha na regra do menu v2 — nao muda um pixel. */
+  --option-hover-bg: var(--color-surface-soft);
   --cs-trigger-shadow: none;
   --cs-option-selected-color: var(--color-info-text);
 }

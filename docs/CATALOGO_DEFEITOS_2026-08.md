@@ -7600,3 +7600,161 @@ sem alterar a composição escura.
 posição relativa ou propriedade não-cor. No wizard de dados, a sonda computada confirma card
 `#fff`, bloco `#eef4fc` e campo `#fff`; contrato automatizado impede a volta dos seletores de lista
 exclusivos do escuro e da hierarquia de superfícies invertida.
+
+### NOVO-117 ✅ RESOLVIDO · `NOVO` A barra lateral tinha cor de tema escuro fixa, aplicada nos dois temas · UI · 0,5 d
+
+Seis valores moravam como literal dentro de `layout/sidebar.css`, **sem predicado de tema**, e
+portanto valiam no claro e no escuro: véu branco a 4,5% no bloco da conta, `#ffffff` no nome do
+usuário, bordas cor de creme no hover de link e do botão de tema, dourado no hover do logout. Todos
+só funcionam sobre fundo escuro. É o mesmo vazamento de identidade que o `NOVO-111` corrigiu nos
+accents e não alcançou aqui, e a consequência prática aparecia no controle mais irônico possível: o
+botão de **trocar de tema** ficava ilegível em qualquer barra clara.
+
+**Correção.** Os seis viraram token (`--sidebar-account-bg`, `--sidebar-link-hover-border`,
+`--sidebar-logout-hover-bg`, `--sidebar-theme-active-border`, `--sidebar-theme-active-fg`,
+`--sidebar-theme-active-inset`), mais `--sidebar-mobile-shadow` para a sombra da barra em telas
+estreitas. Nascem no `:root` com **exatamente os valores que tinham**, então nenhum tema muda um
+pixel — o defeito era o acoplamento, não a cor. Com isso `layout/sidebar.css` fica sem nenhum
+literal de cor e entra em `STRICT_COLOR_LITERAL_FILES`, o que faz a dívida de literais **cair**.
+
+**A paleta do shell não mudou, e isso é resultado de investigação, não de omissão.** O relato de
+partida era "não gosto do tema claro" sem causa nomeada. A medição mostrou uma assimetria real — no
+escuro a barra é superfície discreta (`#111e2f` sobre `#0d1725`) e a faixa da lista é
+`--color-surface-muted` (`lists/list-header.css:522`), enquanto no claro os dois eram slabs navy
+saturados. A hipótese era que esse peso fosse a causa. **Não era.** Onze alternativas foram
+prototipadas ao vivo e reprovadas pelo dono, que ao final preferiu o azul histórico:
+
+| Frente | Alternativas testadas | Veredito |
+|---|---|---|
+| Accent claro em dourado | ouro escuro (`#8a6410`); ouro vivo com superfície e texto separados (`#c8901a` / `#7d5a0e`) | reprovadas; reverteriam o `NOVO-111` |
+| Paleta do shell | papel (barra branca), pedra quente, marinho só na barra, azul dessaturado | reprovadas |
+| Hue do shell escuro | petróleo, grafite, vinho, floresta, ardósia, tabaco, índigo | reprovadas |
+| Tom de azul do shell | aço, cobalto, cerúleo, meia-noite, e quatro pontos entre aço e cerúleo | reprovadas — fica o azul original |
+
+Registrado para não ser refeito: **a paleta do shell claro está decidida e é a histórica.**
+
+**O que mudou de aparência**, tudo a pedido explícito do dono na mesma revisão:
+
+- `--color-bg` e `--app-body-bg` descem para `#e3eaf3` ("escureça um pouco mais o sistema todo").
+  Card contra página passa de 1,04 para **1,21** — o escuro tem 1,13. O card segue `#ffffff`:
+  `--color-surface` alimenta também campos, menus e painéis, e tirá-lo do branco puro tem blast
+  radius próprio.
+- Em `pages/oficios.css`, o card de documento marcado
+  (`#evento-card-documentos-d .related-route-item.is-active`) sobe de 12% para 20% de tinta, e a
+  tile de motorista passa a usar a mesma expressão. No claro `--color-accent` e
+  `--color-primary-bright` são a mesma cor, então muda só a tinta; no escuro não são, e por isso a
+  tile ganhou regra escura própria conservando o dourado.
+
+**Efeito colateral encontrado durante os protótipos claros:** o hover das opções de select lia
+`--color-surface-soft`, que no tema claro resolve para `#ffffff` — a mesma cor do menu. **No tema
+claro o select não tinha hover nenhum**, e ninguém tinha visto porque o defeito é a ausência de um
+estado, não um estado errado. Corrigido com `--option-hover-bg` (`fields/select.css`), token por
+tema como já era o `--option-selected-bg`; no escuro resolve para o mesmo valor de antes. É sintoma
+do `NOVO-119`.
+
+**Prova.** Lista de Eventos e wizard de ofício capturados nos dois temas; o escuro sai idêntico.
+`audit_frontend_standards`: 235 avisos (teto 245).
+
+### NOVO-118 · `NOVO` Os chips do tema claro perderam o código de cor: 7 variantes, 3 cores · UI · 0,5 d
+
+Medido nos chips renderizados no tema claro, com sonda computada na lista de Eventos:
+`chip--warning` e `chip--info` têm **o mesmo fundo** (`#f1f5f9`) e bordas indistinguíveis a olho
+(`#5b8cb8` contra `#5789b6`); `chip--pending` e `chip--entity` também colidem (`#f3f5f8`). Das sete
+variantes semânticas restam três cores separáveis — azul, verde e vermelho. No escuro são sete,
+porque `03-theme-dark.css:348-389` escolhe os tons à mão.
+
+São duas causas independentes, e as duas são de contrato, não de valor:
+
+1. `--state-warning-*` deriva de **`--color-accent`**, não de `--color-warning`
+   (`actions/buttons.css:71-79`). Como no claro o acento é o mesmo azul do `info`, "aviso" nasce
+   azul. O `NOVO-111` afirma ter desacoplado os dois, mas o desacoplamento saiu só em
+   `--color-warning-border`; a família que alimenta chips e botões de estado ficou presa ao acento.
+2. `--chip-pending-*` e `--chip-entity-*` derivam **ambos** de `--color-primary`, com 14% e 16% de
+   tinta (`base/utilities.css:245-254`). O escuro já os distingue por borda (violeta e teal), mas o
+   fundo colide lá também (`#132c48` nos dois).
+
+Agrava: `html[data-theme="light"]` derruba a tinta dos `--state-*` para 6%
+(`actions/buttons.css:174-181`), então mesmo com a matiz certa os fundos ficam entre 94% e 97% de
+branco.
+
+**Correção proposta.** `--state-warning-*` lê `--color-warning`; `pending` e `entity` ganham token
+de cor próprio; tinta clara sobe de 6% para ~14%. Trava sugerida: teste que reprova qualquer linha
+`--state-warning-*` ou `--chip-warning-*` que cite `var(--color-accent`.
+
+**Estado.** Medido e reproduzido, não corrigido — a sessão que o encontrou foi redirecionada para o
+`NOVO-117`.
+
+### NOVO-119 · `NOVO` No tema claro o card e o bloco interno saem da mesma cor · UI · 0,25 d
+
+Contraste medido entre superfícies vizinhas, antes do `NOVO-117`:
+
+| | fundo → card | card → bloco interno |
+|---|---|---|
+| escuro | 1,13 | 1,25 |
+| claro | 1,04 | 1,11 |
+
+O `NOVO-117` corrigiu a primeira coluna ao descer `--color-bg` um degrau. A segunda continua aberta:
+`html[data-theme="light"]` força `--color-surface-soft`, `--color-surface-strong` e
+`--color-card-muted` a `#ffffff` (`base/tokens.css`, bloco do tema claro), colapsando três níveis de
+profundidade em dois. O que sustenta a estrutura no claro passa a ser a sombra —
+`0 14px 34px` a 16% sobre superfície quase branca, que lê como mancha cinza em vez de elevação.
+
+Atenção ao mexer: o trio do wizard aprovado no `NOVO-113` (card `#fff`, bloco `#eef4fc`, campo
+`#fff`) usa tokens próprios `--wizard-*` e **não** deve ser alterado junto.
+
+**Estado.** Medido, parcialmente corrigido pelo `NOVO-117` (só o degrau fundo → card) e pelo
+`NOVO-120` (no wizard).
+
+### NOVO-120 ✅ RESOLVIDO · `NOVO` No wizard claro o campo tinha a mesma cor do card que o contém · UI · 0,25 d
+
+A hierarquia do wizard claro era card `--color-surface`, bloco `--color-surface-powder`, campo
+`--color-surface`. Os três níveis usavam **duas** cores, e as duas iguais caíam justamente em
+`card` e `campo` — que são vizinhos na tela. Resultado: o campo não tinha contra o que se destacar,
+e a tela de formulário lia como uma superfície branca contínua com um retângulo azul no meio.
+
+É o mesmo mecanismo do `NOVO-119` uma camada abaixo: profundidade desenhada com menos degraus do
+que a estrutura tem.
+
+**Correção.** Os níveis passam a alternar: casca `--color-surface-powder`, bloco `--color-surface`,
+campo `--color-surface-powder`. Azul → branco → azul, cada nível separado do vizinho. A cadeia
+`--wizard-card-bg` / `--wizard-panel-bg` / `--wizard-field-bg` já alimentava
+`--step1-surface` / `--step1-panel` / `--step1-field` (e `--color-input-bg` a partir deste último),
+então a troca é de três linhas em `base/tokens.css`.
+
+**Supera o contrato do `NOVO-113`**, que fixara "bloco azul-cinza com controle branco" como
+referência aprovada. O dono reviu olhando a tela e pediu a inversão; é a segunda correção de rumo
+sobre um contrato assinado nesta família, depois do `NOVO-111`. O teste
+`test_light_wizard_uses_blue_gray_sections_with_white_fields` foi renomeado para
+`test_light_wizard_alternates_surfaces_between_levels` e passa a prender o arranjo novo.
+
+**Prova.** Wizard de ofício 95 capturado no claro; contrato automatizado sobre os três tokens e
+sobre a cadeia `--step1-*`. O escuro não é tocado — lá `--wizard-field-bg` continua herdando de
+`--wizard-card-bg`.
+
+### NOVO-121 ✅ RESOLVIDO · `NOVO` Lista e formulário alternavam superfície em fases opostas · UI · 0,25 d
+
+Depois do `NOVO-120` o wizard claro passou a alternar **azul → branco → azul**, enquanto o card de
+lista continuava em **branco → azul**. As duas famílias alternavam em fases opostas: o mesmo dado —
+um ofício vinculado, um viajante — aparecia sobre fundo branco na lista e sobre fundo azul no
+formulário, e vice-versa. Não é diferença de componente, é a mesma informação trocando de cor
+conforme a tela.
+
+Medido no card de Evento antes da correção: `.record-card` `#ffffff`, `.fact-block` `#eef4fc`,
+`.itinerary__leg` `#ffffff`.
+
+**Correção.** A lista passa a ler as mesmas fases do formulário: casca `#eef4fc`, bloco `#ffffff`,
+item `#eef4fc`.
+
+O card de lista ganhou **token próprio** (`--record-card-bg`) em vez de reusar `--card-family-bg`.
+O motivo é alcance: aquele token também pinta `.list-header__rail` (a barra de filtros),
+`.inline-create__toggle` e `.list-header--wizard-stepper` (a faixa do stepper) — que devem seguir
+brancas. Carregar a inversão em `--card-family-bg` teria arrastado a faixa do stepper para azul,
+fundindo-a com a página. `--entity-card-inner-bg` (que só alimenta
+`:is(.fact-block, .person-row, .record-card__subcard)`) inverte direto, sem essa preocupação.
+
+`.itinerary__leg` já lia `--card-family-bg` e foi repontado junto: como é nível 3, ele acompanha a
+casca e a alternância fecha sozinha.
+
+**Prova.** Sonda computada no card de Evento #9: `#eef4fc` / `#ffffff` / `#eef4fc`. O escuro conserva
+a própria escala — `--record-card-bg` resolve para `--color-surface` lá, que é o valor que
+`--card-family-bg` já entregava; capturado e idêntico.
