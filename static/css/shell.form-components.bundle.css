@@ -223,6 +223,10 @@ html[data-theme="dark"] {
     0 0 0 1px color-mix(in srgb, var(--color-accent) 18%, transparent),
     0 0 10px color-mix(in srgb, var(--color-accent) 16%, transparent);
   --card-family-accent-width: 8px;
+  --entity-card-inner-bg: var(--color-surface-soft);
+  --wizard-card-bg: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
+  --wizard-panel-bg: var(--color-surface-soft);
+  --wizard-field-bg: var(--wizard-card-bg);
   --theme-surface-card: var(--color-surface);
   --theme-surface-card-soft: var(--color-surface-soft);
   --theme-border-card: var(--color-border);
@@ -9941,9 +9945,9 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
    nos dois temas. A regra abaixo continua sendo a ligacao semantica comum. */
 :is(html[data-theme])
   :is([data-travel-document-wizard-step1] .travel-document-card, [data-travel-document-wizard-rt] .travel-document-card, [data-travel-document-wizard-diario] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card, [data-travel-document-wizard-roteiro] .oficio-roteiro-card, [data-travel-document-wizard-justificativa] .oficio-justificativa-card, [data-travel-document-wizard-documentos] .oficio-documentos-unified-card, [data-travel-document-wizard-documentos] .travel-document-card, [data-travel-document-wizard-consolidado] .travel-document-card) {
-  --step1-surface: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  --step1-panel: var(--color-surface-soft);
-  --step1-field: var(--step1-surface);
+  --step1-surface: var(--wizard-card-bg);
+  --step1-panel: var(--wizard-panel-bg);
+  --step1-field: var(--wizard-field-bg);
   --step1-empty: var(--step1-field);
   --color-input-bg: var(--step1-field);
   background: var(--step1-surface);
@@ -14440,7 +14444,7 @@ html[data-theme="dark"] *::after {
   border-radius: 16px;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .record-card {
   background: var(--card-family-bg);
   border: 1px solid var(--card-family-border);
@@ -14448,34 +14452,34 @@ html[data-theme="dark"] *::after {
   transform: none;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .record-card:hover {
   box-shadow: var(--card-family-shadow);
   transform: none;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .record-card__id-row {
   background: var(--card-family-header-bg);
   background-image: var(--card-family-header-image);
   border-bottom-color: var(--card-family-border-strong);
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .record-card__id-row::before {
   background: var(--card-family-accent-bg);
   box-shadow: var(--card-family-accent-shadow);
   width: var(--card-family-accent-width);
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .record-card__info-label {
   color: var(--color-muted);
   font-size: 0.66rem;
   letter-spacing: 0.075em;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .record-card__info-value {
   color: var(--color-heading);
   font-size: clamp(1rem, 1.5vw, 1.35rem);
@@ -14486,7 +14490,7 @@ html[data-theme="dark"] *::after {
    cards de formulário (.form-section-title): uppercase, extrabold,
    letter-spacing e glow do acento. Só o item de título do id-row (o rótulo
    pequeno acima permanece como está). */
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .record-card__id-row .record-card__info-value {
   color: var(--theme-text-heading, var(--color-heading));
   font-size: clamp(0.92rem, 1.15vw, 1.05rem);
@@ -14501,7 +14505,7 @@ html[data-theme="dark"] *::after {
   letter-spacing: 0.03em;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .record-card__band {
   background: var(--card-family-bg);
 }
@@ -14511,20 +14515,20 @@ html[data-theme="dark"] *::after {
   display: none;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   :is(.fact-block, .person-row, .record-card__subcard) {
-  background: var(--color-surface-soft);
+  background: var(--entity-card-inner-bg);
   border-color: var(--color-border);
   box-shadow: none;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .fact-block__label {
   color: var(--color-accent);
   letter-spacing: 0.09em;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .person-row--highlight {
   background: color-mix(
     in srgb,
@@ -14535,7 +14539,7 @@ html[data-theme="dark"] *::after {
   box-shadow: inset 4px 0 0 var(--color-accent);
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .person-row__avatar {
   /* Mesmo tom do chip Pendente (.person-row__badge) */
   background: color-mix(in srgb, var(--color-accent) 18%, transparent);
@@ -14543,26 +14547,26 @@ html[data-theme="dark"] *::after {
   color: var(--color-accent);
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .person-row--highlight .person-row__avatar {
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: var(--color-on-accent);
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .itinerary__leg {
   background: var(--card-family-bg) !important;
   border-color: transparent !important;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .itinerary__leg:hover {
   background: var(--card-family-bg) !important;
   border-color: transparent !important;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .person-row--highlight .person-row__badge {
   background: var(--color-accent);
   border: 0;
@@ -14702,50 +14706,50 @@ html[data-theme="dark"] *::after {
 
 /* Sub-cards internos: superfície suave SEM borda — a borda só acende no hover.
    Menos linhas de grade dentro do card, visual mais leve. */
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   :is(.fact-block, .person-row, .record-card__subcard) {
   border-color: transparent;
   transition: border-color var(--transition-fast), background-color var(--transition-fast);
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   :is(.fact-block, .person-row, .record-card__subcard):hover {
   border-color: transparent;
 }
 
 /* Labels internos mais discretos que os valores — hierarquia label < valor. */
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   :is(.person-row__meta, .itinerary__time) {
   color: var(--color-subtle);
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .fact-block__label {
   color: var(--color-accent);
   font-size: 0.64rem;
 }
 
 /* Valores em destaque claro sobre os labels. */
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   :is(.fact-block__value--strong, .fact-block__value, .person-row__name) {
   color: var(--color-heading);
 }
 
 /* Chips do cabeçalho do card: sem glow, presença menor. */
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .record-card__temporal-chip {
   box-shadow: none;
   font-size: 0.68rem;
 }
 
 /* Linhas de trecho: mesmo fundo da seção do card. */
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .itinerary__leg {
   background: var(--card-family-bg) !important;
   border-color: transparent !important;
 }
 
-:is(html[data-theme="dark"])
+:is(html[data-theme])
   .itinerary__leg:hover {
   background: var(--card-family-bg) !important;
   border-color: transparent !important;
