@@ -511,10 +511,12 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
       base agora vence o seletor de elemento cru com neutralidade medida; as 8 pseudo-regras e 1
       contexto órfão caíram; diário, quick-add e `field-with-action` fecharam no corpus ampliado · **E7c**
 - [x] `NOVO-58` claro e escuro têm desenho único: 54.225 elementos, 129 medições, 0 divergências não-cor · **E8**
-- [ ] `UI-02` tema escuro deixa de ser camada de exceção (5.619 linhas, 190 `!important`) · **E9**
-- [ ] `UI-04` fronteiras CSS em redução: 97 imports históricos → **84 imports atuais** em 37
-      templates; última fatia removeu 68.306 B da etapa Documentos de Ofícios · **E10**
-- [ ] `HT-04` entrega JS fechada: shell 266.254 → 108.937 bytes; a fatia CSS continua em `UI-04`/E10 · **E11/E10**
+- [x] `UI-02` camada escura reconciliada: regras compartilhadas saíram; restam somente seletores
+      predicados por tema, sob catraca (5.619 → 2.434 linhas; 190 → 98 `!important`) · **E9**
+- [x] `UI-04` fronteiras CSS fechadas no escopo medido: 97 imports históricos → **82 atuais** em
+      37 templates; três folhas sem regra casada saíram na reauditoria final (`NOVO-120`) · **E10**
+- [x] `HT-04` entrega fechada: shell JS 266.254 → 108.937 bytes e componentes CSS pesados sob
+      demanda; a reauditoria final separa a eficiência do bundle da fronteira de domínio · **E11/E10**
 - [x] `JS-07` 3 implementações vivas de "fechar ao clicar fora / Esc" → `CV.overlay.attachDismiss` · **E11**
 - [x] `JS-08` cinco componentes sob demanda por marcador DOM; shell 283.128 → 266.254 bytes · **E11**
 - [x] `JS-09` tela embutida entrega só `http.js` + polling: 283.282 → 4.255 bytes de JS · **E11**
