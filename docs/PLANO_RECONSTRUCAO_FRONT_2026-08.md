@@ -771,6 +771,11 @@ folha; a extração deve mover a família compartilhada antes de retirar o prime
 > overflow em claro/escuro a 1440/800/500 px. A rota caiu de **673.378 para 650.375 bytes**
 > (**-23.003 bytes**) e subiu de **13,6518% para 14,0594% de uso**.
 
+> **Oitava fatia fechada em 12/08 (`UI-04`, parcial).** A etapa Documentos de Ofícios parou de
+> carregar `roteiros.css`: **-68.306 bytes** e uso **15,08% → 16,57%**. Nas seis combinações de
+> tema/largura, os 763 elementos mantiveram os estilos computados; só o `<link>` removido difere na
+> estrutura. A retirada isolada de `prestacoes_contas.css` alterou 89 estilos e foi rejeitada.
+
 **Passo a passo.** Extraia os componentes compartilhados dos arquivos de domínio para
 `fields/`, `actions/`, `lists/` e `feedback/`, domínio por domínio, e derrube o import correspondente. Dimensione com a
 régua da E0: o que não é usado na rota não devia estar sendo entregue nela.

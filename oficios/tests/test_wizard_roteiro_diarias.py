@@ -232,6 +232,7 @@ class OficioWizardRoteiroDiariasTests(TestCase):
         response = self.client.get(reverse("oficios:wizard_documentos", args=[oficio.pk]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Documentos")
+        self.assertNotContains(response, "css/pages/roteiros.css")
 
     def test_etapa3_preenche_sede_a_partir_das_configuracoes(self):
         """Roteiro sem origem salva recebe UF/cidade do singleton de configuração."""
