@@ -221,6 +221,7 @@
       var tokens = term.split(/\s+/).filter(Boolean);
       var pickerRoot = search ? search.closest('[data-related-picker-root]') : null;
       if (pickerRoot) pickerRoot.classList.toggle('search-picker--has-query', !!term);
+      if (clear) clear.hidden = !term;
 
       var visible = items.filter(function (summary) {
         var isSelected = selected.has(String(summary.id));

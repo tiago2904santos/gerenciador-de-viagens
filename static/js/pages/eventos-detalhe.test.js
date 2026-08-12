@@ -73,16 +73,16 @@ describe("documentos vinculados do evento", () => {
   });
 
   it("mostra e executa o limpar da busca padrao", () => {
-    const root = document.querySelector("[data-related-picker-root]");
     const search = document.querySelector('[data-evento-doc-search="oficios"]');
+    const clear = document.querySelector('[data-evento-doc-clear="oficios"]');
     search.value = "perto";
     search.dispatchEvent(new Event("input", { bubbles: true }));
-    expect(root.classList.contains("search-picker--has-query")).toBe(true);
+    expect(clear.hidden).toBe(false);
 
-    document.querySelector('[data-evento-doc-clear="oficios"]').click();
+    clear.click();
 
     expect(search.value).toBe("");
-    expect(root.classList.contains("search-picker--has-query")).toBe(false);
+    expect(clear.hidden).toBe(true);
     expect(document.activeElement).toBe(search);
   });
 
