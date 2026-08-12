@@ -67,6 +67,9 @@ segue o `PADRAO_*` correspondente; divergência é defeito, não estilo pessoal.
    auditorias mediram; regredir qualquer um deles reprova o PR.
 8. **Segredo não entra no repositório.** Chave, token, senha: só em `.env` e `.env.example`
    com placeholder.
+9. **Falha genérica não some em silêncio.** Todo `except Exception` de produção deve relançar a
+   exceção ou registrar a falha com logger/`core.errors.capture()`. Exceções esperadas devem ser
+   capturadas pelo tipo específico; fallback silencioso genérico reprova a auditoria de arquitetura.
 
 ## 4. Ciclo de trabalho obrigatório
 

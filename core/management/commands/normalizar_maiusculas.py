@@ -71,6 +71,7 @@ from __future__ import annotations
 
 import importlib
 import inspect
+import logging
 from collections import defaultdict
 
 from django import forms
@@ -81,6 +82,8 @@ from django.db import models
 from django.db import transaction
 
 from core.forms.widgets import NOMES_SEM_MAIUSCULA
+
+logger = logging.getLogger(__name__)
 
 MASCARA = "upper"
 
@@ -147,6 +150,12 @@ class Command(BaseCommand):
             try:
                 instancia = classe()
             except Exception as erro:  # noqa: BLE001 - o motivo vai no relatório
+                logger.debug(
+                    "Formulário ignorado no inventário de maiúsculas: %s.%s",
+                    classe.__module__,
+                    classe.__name__,
+                    exc_info=erro,
+                )
                 nao_lidos.append(
                     (f"{classe.__module__}.{classe.__name__}", type(erro).__name__),
                 )

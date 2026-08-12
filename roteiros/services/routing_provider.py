@@ -13,6 +13,8 @@ import logging
 import re
 from typing import Dict, List, Optional
 
+from core.errors import capture
+
 logger = logging.getLogger(__name__)
 
 _DEFAULT_TIMEOUT = 5
@@ -214,7 +216,8 @@ def get_default_routing_provider(
             if timeout_seconds is not None
             else getattr(settings, "OSRM_TIMEOUT_SECONDS", _DEFAULT_TIMEOUT)
         )
-    except Exception:
+    except Exception as exc:
+        capture(exc, "roteiros.routing_provider.configuracao", logger=logger)
         is_enabled = False
         url = ""
         timeout = _DEFAULT_TIMEOUT

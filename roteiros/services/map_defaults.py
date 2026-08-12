@@ -1,4 +1,5 @@
 from cadastros.models import ConfiguracaoSistema
+from core.errors import capture
 
 
 MAPA_UF_FALLBACK = "PR"
@@ -78,7 +79,8 @@ def build_roteiro_map_defaults():
     try:
         config = ConfiguracaoSistema.get_singleton()
         uf = resolve_uf_from_cep(config.cep)
-    except Exception:
+    except Exception as exc:
+        capture(exc, "roteiros.mapa_defaults.configuracao")
         uf = MAPA_UF_FALLBACK
     center = MAPA_UF_CENTERS.get(uf) or MAPA_UF_CENTERS[MAPA_UF_FALLBACK]
     return {
