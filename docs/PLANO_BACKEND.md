@@ -182,7 +182,7 @@ Esta etapa é a que o [`PLANO_DESEMPENHO.md`](PLANO_DESEMPENHO.md) mede e não e
 |---|---|---|---:|
 | `DB-09` 🟠 | Lista de roteiros agrega antes do `LIMIT` (`roteiros/selectors.py:36`): trocar `annotate(Count)+exclude` por `Exists()` correlacionado | 24.000 roteiros: **56,6–127,7 ms** em duas medições | 2 |
 | `DB-10` 🟡 | Falta índice composto para a ordenação real das listas (`OrdemServico.Meta.indexes` vazio, ofícios idem) | **13× a 29×** em duas medições | 0,5 |
-| `DB-11` 🟡 | 80 buscas `__unaccent__icontains` sem índice: 0 GIN e 0 trigram em 390 índices | busca de ofícios: `Seq Scan` em 24.000 linhas, **31,3–35,7 ms** | 3 |
+| `DB-11` ✅ | A pior busca livre expandia 20.000 Termos em ~60.000 linhas por três M2M e rodava três vezes; virou `Exists()` por origem + contagem reutilizada, com cenário permanente no `PF-07` | busca de Termos em 20.000: **1.807,9 → 391,4 ms (4,62×)** | 3 |
 
 > **Os três números foram medidos duas vezes, por auditores independentes, e as faixas acima são as
 > duas medições.** Onde divergiram, a promessa que vale é a mais conservadora. O `DB-09` é o caso

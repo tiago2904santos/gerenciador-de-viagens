@@ -93,8 +93,8 @@
     },
     "termos:index:busca": {
       "200": {
-        "consultas": 6,
-        "kb_html": 155.3
+        "consultas": 3,
+        "kb_html": 49.8
       },
       "20000": {
         "consultas": 6,
