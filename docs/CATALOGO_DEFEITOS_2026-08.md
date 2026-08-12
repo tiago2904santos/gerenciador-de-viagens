@@ -3308,7 +3308,7 @@ atualizado. `prestacoes_contas/test_modelos_texto.py` tem sete testes: index, ca
 inválido na criação, criar, editar, excluir e isolamento de outra área. Eles cobrem as quatro views
 e os redirects que antes levantavam `NameError`; a execução focada passou 7/7.
 
-### QA-15 ⚪ Caminhos de erro da geração de PDF sem teste · AUD+VER · 1,5 d
+### QA-15 ✅ RESOLVIDO · Caminhos de erro da geração de PDF sem teste · AUD+VER · 1,5 d
 
 `documentos/services/downloads.py` **0%** (16 statements, trata erro de geração) e
 `adapters/weasyprint_pdf.py` ~32% — os dois **confirmados** na verificação.
@@ -3319,6 +3319,12 @@ desbloqueada). (`adapters/excel_pdf.py` está em 0% mas é Windows-only
 via `win32com.client` — não conta como lacuna.)
 **Efeito:** os ramos de erro e *fallback* da função mais central do produto só executam quando algo
 já deu errado — exatamente onde falta prova.
+
+**Fechamento em 12/08.** Oito testes novos cobrem os contratos antes ausentes: propagação do erro
+de DOCX, redirecionamento com mensagem e resposta válida de PDF, ausência da biblioteca nativa e
+configuração do WeasyPrint, erro do storage, falha do broker e documento ainda pendente no
+`warm_cache`. Em conjunto com os testes existentes dos adaptadores Word e LibreOffice, o gate
+direcionado executa 22/22 testes verdes sem depender dos binários externos.
 
 ### QA-16 ⚪ Sem rastreamento de erro centralizado · AUD · 1 d
 

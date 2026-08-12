@@ -533,7 +533,8 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
 - [ ] `QA-05` cliente real do Google Drive com 42,5% de cobertura
 - [x] `QA-14` CRUD de modelos do Relatório Técnico — já fechado por 7 testes em `993e14c5`;
       status reconciliado
-- [ ] `QA-15` caminhos de erro da geração de PDF sem teste
+- [x] `QA-15` oito provas dos erros de download, WeasyPrint, storage e fila; 22 testes do conjunto
+      de geração/conversão verdes
 - [ ] `QA-13` 218 testes "magros" — número a olhar, não meta a perseguir
 
 ### Fase 9 — Finalização e higiene
