@@ -13,12 +13,10 @@ tabelas — `Roteiro`, `RoteiroDestino` e `RoteiroTrecho` — e o caminho do aut
 transação nenhuma. A prova está em
 `core/tests/test_colecoes_ordenadas_db08.py::test_falha_entre_os_dois_passos_nao_deixa_posicao_no_bloco`.
 
-**Nota sobre as guardas defensivas.** Três ramos daqui são inalcançáveis pelo caminho
-público — `_build_roteiro_state_from_post` e `dedupe_roteiro_loop_retorno_final` já
-normalizam o adicional negativo, derivam a duração do retorno e removem o trecho que
-duplica o retorno antes de o estado chegar aqui. Medido ao escrever a rede desta fatia, e
-registrado no catálogo; ficaram no lugar porque removê-las é decisão de comportamento, não
-de arrumação.
+**Contrato de entrada (`NOVO-98`).** O service recebe estado já normalizado pelo parser:
+adicional não negativo, duração do retorno derivada e volta duplicada removida. Essas
+regras moram exclusivamente em `_build_roteiro_state_from_post` e
+`dedupe_roteiro_loop_retorno_final`; o gravador não mantém uma segunda implementação.
 """
 
 from datetime import datetime
@@ -31,8 +29,6 @@ from roteiros.models import RoteiroDestino
 from roteiros.models import RoteiroTrecho
 from roteiros.services.editor_parser import parse_int
 from roteiros.services.editor_parser import parse_roteiro_decimal
-from roteiros.services.editor_state import build_roteiro_bate_volta_diario_state
-from roteiros.services.editor_state import roteiro_trecho_duplica_retorno
 
 
 #: `DB-08` fatia 2: bloco livre para onde as posições vão no primeiro passo.
@@ -128,6 +124,9 @@ def persistir_diarias_roteiro(roteiro, diarias_resultado):
 def salvar_roteiro_avulso_from_roteiro_state(roteiro, roteiro_state, validated, diarias_resultado=None):
     """Persiste o editor preservando trechos existentes por id e retorno em bloco proprio.
 
+    `roteiro_state` e `validated` são saídas normalizadas do parser; chamadores não devem
+    construir esses dicionários como entrada bruta (`NOVO-98`).
+
     `DB-08` fatia 2: atômica de ponta a ponta. Dois dos quatro caminhos que chegam
     aqui já vinham dentro de transação (`criar_roteiro` e `atualizar_roteiro` em
     `roteiros/services/roteiro_editor.py`) — nesses o `atomic` é só um savepoint
@@ -155,25 +154,6 @@ def salvar_roteiro_avulso_from_roteiro_state(roteiro, roteiro_state, validated, 
 
     retorno_state = roteiro_state.get('retorno') or {}
     trechos_validated = list(validated.get('trechos') or [])
-    if build_roteiro_bate_volta_diario_state(roteiro_state.get('bate_volta_diario'))['ativo'] and trechos_validated:
-        retorno_validado = {
-            'saida_cidade': retorno_state.get('saida_cidade') or retorno_state.get('origem_nome') or '',
-            'chegada_cidade': retorno_state.get('chegada_cidade') or retorno_state.get('destino_nome') or '',
-            'saida_data': validated.get('retorno_saida_data'),
-            'saida_hora': validated.get('retorno_saida_hora'),
-            'chegada_data': validated.get('retorno_chegada_data'),
-            'chegada_hora': validated.get('retorno_chegada_hora'),
-            'tempo_cru_estimado_min': parse_int(retorno_state.get('tempo_cru_estimado_min')),
-            'tempo_adicional_min': parse_int(retorno_state.get('tempo_adicional_min')) or 0,
-            'duracao_estimada_min': parse_int(retorno_state.get('duracao_estimada_min')),
-        }
-        if roteiro_trecho_duplica_retorno(
-            trechos_validated[-1],
-            retorno_validado,
-            sede_estado_id=roteiro.origem_estado_id,
-            sede_cidade_id=roteiro.origem_cidade_id,
-        ):
-            trechos_validated = trechos_validated[:-1]
     # `DB-08` fatia 2, **primeiro passo**. As posições finais são gravadas uma a
     # uma no laço abaixo, e o escritor reaproveita as linhas por `id`: trocar dois
     # trechos de lugar, ou encolher o roteiro e reposicionar o retorno, colide com
@@ -228,11 +208,7 @@ def salvar_roteiro_avulso_from_roteiro_state(roteiro, roteiro_state, validated, 
 
     retorno_tempo_cru = parse_int(retorno_state.get('tempo_cru_estimado_min'))
     retorno_tempo_adicional = parse_int(retorno_state.get('tempo_adicional_min')) or 0
-    if retorno_tempo_adicional < 0:
-        retorno_tempo_adicional = 0
     retorno_duracao = parse_int(retorno_state.get('duracao_estimada_min'))
-    if retorno_duracao is None and ((retorno_tempo_cru or 0) + retorno_tempo_adicional) > 0:
-        retorno_duracao = (retorno_tempo_cru or 0) + retorno_tempo_adicional
 
     ultimo_trecho = trechos_validated[-1] if trechos_validated else None
     origem_retorno_estado_id = (ultimo_trecho or {}).get('destino_estado_id') or roteiro.origem_estado_id
