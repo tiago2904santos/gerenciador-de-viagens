@@ -65,6 +65,22 @@ class RawButtonComponentTests(SimpleTestCase):
 
         self.assertEqual(failures, [])
 
+    def test_primitiva_flat_e_a_unica_excecao_e_preserva_acessibilidade(self):
+        self.assertEqual(
+            migrar_botoes_cotton.CANONICAL_RAW_BUTTON_TEMPLATES,
+            {"includes/performance/icon_control_flat.html"},
+        )
+        source = (
+            migrar_botoes_cotton.ROOT
+            / "templates"
+            / "includes"
+            / "performance"
+            / "icon_control_flat.html"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('type="button"', source)
+        self.assertIn('aria-label="{{ aria_label }}"', source)
+
     def test_templates_migrados_compilam(self):
         for path in migrar_botoes_cotton.targets():
             if "<c-ui.buttons.button" not in path.read_text(encoding="utf-8"):
