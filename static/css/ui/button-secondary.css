@@ -3,7 +3,7 @@
  * Depende de `ui/tokens.css`.
  */
 
-:is(html[data-theme]) .list-header--main .cv-btn--control {
+:is(html[data-theme]) .ui-button-secondary {
   background: var(--input-bg);
   border: 0;
   border-radius: var(--radius-sm);
@@ -21,9 +21,9 @@
    também zera o `outline` no foco, e copiar isso apagaria o anel de teclado
    abaixo. Precisa do caminho completo porque `lists/list-header.css:246` fixa o
    hover na mesma cor do repouso, com especificidade 500. */
-:is(html[data-theme]) .list-header--main
-  .list-header__rail
-  .cv-btn.cv-btn--secondary.cv-btn--control:hover {
+:is(html[data-theme])
+  .ui-sub-header
+  .cv-btn.cv-btn--secondary.ui-button-secondary:hover {
   background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted));
   background-image: none;
   border: 0;
@@ -31,7 +31,7 @@
   color: var(--color-accent-text, var(--color-accent));
 }
 
-:is(html[data-theme]) .list-header--main .cv-btn--control:focus-visible {
+:is(html[data-theme]) .ui-button-secondary:focus-visible {
   outline: 1px solid var(--color-focus-visible-ring);
   outline-offset: 2px;
 }

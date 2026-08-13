@@ -109,8 +109,24 @@ FORM_COMPONENTS_JS: tuple[str, ...] = (
     "js/components/date-picker.js",
 )
 
+# Componentes globais (NOVO-120). `tokens.css` PRIMEIRO: os outros só o leem.
+# A fonte continua um arquivo por componente; o bundle existe só para a
+# entrega, pelo mesmo motivo do NOVO-12 — e para nao subir a contagem de
+# <link> em template, que a catraca do `test_entity_card_styles` so deixa cair.
+UI_CSS: tuple[str, ...] = (
+    "css/ui/tokens.css",
+    "css/ui/header.css",
+    "css/ui/sub-header.css",
+    "css/ui/input.css",
+    "css/ui/select.css",
+    "css/ui/date-picker.css",
+    "css/ui/button-secondary.css",
+    "css/ui/segment-toggle.css",
+)
+
 CSS_BUNDLE = STATIC / "css" / "shell.bundle.css"
 FORM_CSS_BUNDLE = STATIC / "css" / "shell.form-components.bundle.css"
+UI_CSS_BUNDLE = STATIC / "css" / "ui.bundle.css"
 JS_BUNDLE = STATIC / "js" / "shell.bundle.js"
 FORM_COMPONENTS_BUNDLE = STATIC / "js" / "form-components.bundle.js"
 CSS_PROFILES_BUILDER = ROOT / "scripts" / "build_css_profiles.py"
@@ -175,6 +191,7 @@ def build() -> tuple[str, str, str, str]:
     CSS_BUNDLE.parent.mkdir(parents=True, exist_ok=True)
     JS_BUNDLE.parent.mkdir(parents=True, exist_ok=True)
     CSS_BUNDLE.write_text(css, encoding="utf-8", newline="\n")
+    UI_CSS_BUNDLE.write_text(_concat(UI_CSS, "css"), encoding="utf-8", newline="\n")
     FORM_CSS_BUNDLE.write_text(form_css, encoding="utf-8", newline="\n")
     JS_BUNDLE.write_text(js, encoding="utf-8", newline="\n")
     FORM_COMPONENTS_BUNDLE.write_text(
@@ -193,6 +210,11 @@ def check() -> int:
     )
     expected_js = _concat(SHELL_JS, "js")
     errors: list[str] = []
+    expected_ui = _concat(UI_CSS, "css")
+    if not UI_CSS_BUNDLE.is_file():
+        errors.append(f"ausente: {UI_CSS_BUNDLE.relative_to(ROOT).as_posix()}")
+    elif UI_CSS_BUNDLE.read_text(encoding="utf-8") != expected_ui:
+        errors.append(f"desatualizado: {UI_CSS_BUNDLE.relative_to(ROOT).as_posix()}")
     if not CSS_BUNDLE.is_file():
         errors.append(f"ausente: {CSS_BUNDLE.relative_to(ROOT).as_posix()}")
     elif CSS_BUNDLE.read_text(encoding="utf-8") != expected_css:

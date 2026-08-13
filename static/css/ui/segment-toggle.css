@@ -1,0 +1,95 @@
+/* Segment toggle — alterna entre duas ou três vistas da mesma lista.
+ *
+ * Par de `templates/cotton/ui/segment_toggle.html`. Depende de `ui/tokens.css`.
+ * O JS é o `js/components/segment-nav.js`, carregado sob demanda pelo seletor
+ * `.segment-toggle--nav`.
+ *
+ * O desenho é o do `.segment-toggle--nav` de `fields/form-sections.css:323-381`,
+ * promovido a componente global sem alteração de aparência: mesmos raios, mesma
+ * grade, mesmas transições, mesmos tokens (`--step1-panel`, `--color-accent`,
+ * `--color-on-accent`, `--color-muted-strong`). A versão anterior desta folha
+ * repintou isso com os tokens do sub-header e ficou errada — o modelo é este.
+ *
+ * Os segmentos são LINKS: link não aceita `aria-pressed`, então o ativo vem de
+ * `aria-current="page"`. É por isso que o hover se protege com
+ * `:not([aria-current="page"])` e não com `:not([aria-pressed="true"])` — a
+ * guarda errada deixava o hover cair justamente no item ativo.
+ *
+ * `:is(html[data-theme])` sobe a especificidade acima das regras legadas em
+ * `.segment-toggle`, que o componente ainda emite durante a migração.
+ */
+
+:is(html[data-theme]) .ui-segment-toggle {
+  /* Superfície do sub-header, não a do legado. O original lia
+     `var(--step1-panel, var(--color-surface-soft))`, e como `--step1-panel` não
+     existe nesta tela caía no fallback `#223348` — um valor pensado para o
+     trilho antigo, que destoa dentro do header novo. */
+  background: var(--sub-header-bg);
+  border-color: transparent;
+  border-radius: 10px;
+  box-shadow: none;
+  display: inline-grid;
+  gap: 2px;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  padding: 3px;
+}
+
+:is(html[data-theme]) .ui-segment-toggle__item {
+  align-items: center;
+  border-radius: 7px;
+  color: var(--color-muted-strong);
+  display: inline-flex;
+  gap: 6px;
+  justify-content: center;
+  min-height: 34px;
+  padding: 7px var(--space-3);
+  text-align: center;
+  text-decoration: none;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform, background;
+}
+
+/* O ativo declara o `:hover` junto: sem isso a regra legada de
+   `form-sections.css:296`, que só se protege de `aria-pressed`, pinta por cima
+   dele ao passar o mouse. */
+:is(html[data-theme]) .ui-segment-toggle__item[aria-current="page"],
+:is(html[data-theme]) .ui-segment-toggle__item[aria-current="page"]:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: none;
+  color: var(--color-on-accent);
+  transform: scale(1.01);
+}
+
+:is(html[data-theme])
+  .ui-segment-toggle__item:hover:not([aria-current="page"]) {
+  background: color-mix(in srgb, #fff 5%, transparent);
+  color: var(--color-text);
+}
+
+:is(html[data-theme="light"])
+  .ui-segment-toggle__item:hover:not([aria-current="page"]) {
+  background: color-mix(in srgb, #000 4%, transparent);
+  color: var(--color-text);
+}
+
+/* O contador herda a cor do segmento, então serve aos dois estados sem regra
+   por estado. */
+:is(html[data-theme]) .ui-segment-toggle__count {
+  background: color-mix(in srgb, currentColor 16%, transparent);
+  border-radius: var(--radius-pill);
+  font-size: 0.9em;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  padding: 2px 6px;
+}
+
+:is(html[data-theme]) .ui-segment-toggle__item:focus-visible {
+  outline: 1px solid var(--color-focus-visible-ring);
+  outline-offset: 2px;
+}

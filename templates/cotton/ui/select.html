@@ -1,0 +1,39 @@
+{% cotton:vars aria_label attrs collection_filter extra_class fallback_first name options value %}
+{% comment %}
+Select global (NOVO-120).
+
+O componente é dono APENAS do invólucro e do `<select>` nativo. O gatilho
+visível e o menu são criados em tempo de execução pelo
+`js/components/picker-select.js` (linhas 87-116), que os acha por
+`[data-entity-picker]` — o mesmo seletor que o `js/core/component-loader.js`
+usa para buscar o bundle de formulário sob demanda. Por isso o componente não
+declara script próprio: pôr o atributo já basta para o JS chegar.
+
+As classes `custom-select__*` do gatilho e do menu pertencem ao JS e não são
+renomeadas aqui; a folha do componente as estiliza pelo nome que elas já têm.
+
+A classe legada `list-header__select` sai junto enquanto a migração não termina.
+Ela é estrutural — nenhum JS a usa, conferido no repositório inteiro.
+{% endcomment %}
+<div
+  class="ui-select{% if extra_class %} {{ extra_class }}{% endif %} list-header__select filter-bar__select custom-select"
+  data-entity-picker
+  data-entity-picker-renderer="select"
+  data-entity-picker-mode="single"
+>
+  <select
+    name="{{ name }}"
+    aria-label="{{ aria_label }}"
+    {% if collection_filter %}data-collection-filter="{{ collection_filter }}"{% endif %}
+    {{ attrs }}
+  >
+    {% comment %}
+      `fallback_first`: sem valor escolhido, marca a primeira opção. É o que a
+      ordenação faz — sem isso a lista abriria sem nada selecionado e o rótulo
+      do gatilho sairia vazio.
+    {% endcomment %}
+    {% for opt in options %}
+      <option value="{{ opt.value }}"{% if opt.value == value or fallback_first and not value and forloop.first %} selected{% endif %}>{{ opt.label }}</option>
+    {% endfor %}
+  </select>
+</div>

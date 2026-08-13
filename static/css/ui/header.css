@@ -9,9 +9,12 @@
  * header + sub-header vira um objeto só por construção.
  */
 
-:is(html[data-theme]) .list-header--main {
+:is(html[data-theme]) .ui-header-block {
   background: transparent;
-  border: 1px solid var(--sub-header-border);
+  /* Sem borda no wrapper: uma linha só não serve às duas metades — a do
+     sub-header some sobre o azul do header. Cada uma traz a sua, com o raio
+     casando o recorte daqui para o canto não sair cortado. */
+  border: 0;
   border-radius: var(--header-radius) var(--header-radius)
     var(--sub-header-radius) var(--sub-header-radius);
   box-shadow: none;
@@ -19,11 +22,11 @@
   padding: 0;
 }
 
-:is(html[data-theme]) .list-header--main .list-header__band {
+:is(html[data-theme]) .ui-header {
   align-items: center;
   background: var(--header-bg);
-  border: 0;
-  border-radius: 0;
+  border: 1px solid var(--header-border);
+  border-radius: var(--header-radius) var(--header-radius) 0 0;
   box-sizing: border-box;
   display: flex;
   /* `lists/list-header.css:28` põe a banda em coluna. Sem redeclarar a direção,
@@ -35,7 +38,7 @@
   width: 100%;
 }
 
-:is(html[data-theme]) .list-header--main .list-header__eyebrow {
+:is(html[data-theme]) .ui-header__eyebrow {
   color: var(--header-eyebrow);
   display: block;
   font-size: var(--font-size-xs);
@@ -45,7 +48,7 @@
   text-transform: uppercase;
 }
 
-:is(html[data-theme]) .list-header--main .list-header__title {
+:is(html[data-theme]) .ui-header__title {
   color: var(--header-title);
   font-size: clamp(1.5rem, 2.2vw, 2rem);
   font-weight: var(--font-weight-extrabold);

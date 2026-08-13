@@ -1,0 +1,34 @@
+{% cotton:vars abas aside_template aria_label eyebrow extra_class slot status_label status_variant tabs_aria_label title %}
+{% comment %}
+Header global (NOVO-120) — a faixa de identidade: eyebrow, título e, à direita,
+o que o chamador puser no slot (ação, toggle, abas).
+
+Sem JS próprio.
+
+Substitui `ui/headers/_list_header_band.html` no caminho do `filter_page_header`.
+Aquele partial segue existindo para os outros três chamadores até migrarem; as
+classes legadas saem junto aqui para que a aparência deles não mude no meio do
+caminho. Nenhuma delas é gancho de JS — conferido no repositório inteiro.
+{% endcomment %}
+<div
+  class="ui-header{% if extra_class %} {{ extra_class }}{% endif %} list-header__band{% if aside_template %} list-header__band--with-aside{% endif %}"
+  {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+>
+  <div class="ui-header__copy list-header__title-block">
+    {% if eyebrow %}<span class="ui-header__eyebrow list-header__eyebrow">{{ eyebrow }}</span>{% endif %}
+    <div class="ui-header__headline list-header__title-row">
+      <h1 class="ui-header__title list-header__title">{{ title }}</h1>
+      {% if status_label %}
+        {% with cotton_attr_variant=status_variant|default:"draft" %}<c-ui.badges.status_badge :label="status_label" :variant="cotton_attr_variant" extra_class="page-header-status-chip" only />{% endwith %}
+      {% endif %}
+    </div>
+  </div>
+
+  {% if aside_template and abas %}
+    <div class="ui-header__aside list-header__band-aside">
+      {% include aside_template with abas=abas tabs_aria_label=tabs_aria_label eyebrow=eyebrow status_label=status_label status_variant=status_variant title=title only %}
+    </div>
+  {% elif slot %}
+    <div class="ui-header__aside">{{ slot }}</div>
+  {% endif %}
+</div>
