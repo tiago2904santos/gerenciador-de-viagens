@@ -12,7 +12,6 @@ from core.tenancy import filter_queryset_by_area
 from cadastros.models import Servidor
 from cadastros.models import Unidade
 from cadastros.models import Viatura
-from roteiros.models import Roteiro
 from roteiros.models import RoteiroDestino
 from roteiros.models import RoteiroTrecho
 
@@ -186,10 +185,6 @@ def get_oficio_by_id(pk: int):
         "justificativa",
     )
     return get_object_or_404(queryset, pk=pk)
-
-
-def listar_roteiros_para_oficio():
-    return Roteiro.objects.order_by("-created_at")
 
 
 def listar_servidores_para_oficio():

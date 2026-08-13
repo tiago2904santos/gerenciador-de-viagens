@@ -1,7 +1,7 @@
 # Auditoria Visual de Execução — Design System
 
-> Atualizado em 2026-05-10. Pós-Fase 16 + 8 Prompts de fechamento.  
-> Branch de referência: `chore/fechamento-design-system-visual`  
+> Atualizado em 2026-05-10. Pós-Fase 16 + 8 Prompts de fechamento.
+> Branch de referência: `chore/fechamento-design-system-visual`
 > Nota final: **10/10** — todos os critérios de aceite satisfeitos.
 
 ---
