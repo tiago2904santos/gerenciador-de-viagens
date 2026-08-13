@@ -5175,7 +5175,7 @@ JS e Python de produção, zero seletores fonte com os 66 nomes, parse CSS sem e
 
 ---
 
-### NOVO-49 🟠 `NOVO` Área nova nasce sem catálogo, e instalação nova mantém o catálogo no balde sem dono · DB · 1 d
+### NOVO-49 ✅ RESOLVIDO · 🟠 `NOVO` Área nova nasce sem catálogo, e instalação nova mantém o catálogo no balde sem dono · DB · 1 d
 
 Achado ao executar o grupo 2 do `DB-02`, e é o que **impede** aqueles quatro modelos de virarem
 `NOT NULL` agora.
@@ -5203,6 +5203,17 @@ limpo — que é o banco da suíte, todo dia no CI.
 que dois caminhos consumam — `criar_area`, ao criar a área, e uma migração de saneamento para as
 áreas que já existem. Os seeds históricos ficam onde estão (migração aplicada não se reescreve);
 o que muda é quem passa a ser a fonte da verdade daqui para a frente. Só então `NOT NULL`.
+
+> **Resolvido em 13/08/2026.** `core/catalogos_iniciais.py` passou a ser a fonte canônica das 22
+> linhas. `usuarios.services.criar_area` salva a área e instala os quatro catálogos dentro da mesma
+> transação — falhar no seed desfaz também a área. A migração `usuarios/0002` completa itens
+> ausentes em todas as áreas existentes e remove o balde global; `eventos/0017` e
+> `planos_trabalho/0025` retiram as constraints globais e tornam `area` obrigatória.
+>
+> A prova parte do estado histórico do `DB-02`, cria uma área, executa o upgrade real e exige
+> **5 tipos + 11 atividades + 3 programas + 3 horários**, sem nenhum `area=NULL`. Mais cinco
+> testes cobrem criação nova, cópias independentes e rollback transacional. A régua do `PF-07`
+> também passou a fabricar seus tipos e programas por área, em vez de reabrir o balde órfão.
 
 ---
 

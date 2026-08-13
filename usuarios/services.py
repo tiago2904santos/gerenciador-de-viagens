@@ -7,7 +7,9 @@ view chama, mantendo `form.save()` fora dela.
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.db import transaction
 
+from core.catalogos_iniciais import semear_catalogos_da_area
 from core.deletion import DelecaoProtegidaError
 from core.deletion import excluir_com_protecao
 
@@ -20,8 +22,11 @@ class AreaNaoPodeSerExcluida(ValidationError):
     """Exclusão bloqueada por vínculos de conta ou registros protegidos."""
 
 
+@transaction.atomic
 def criar_area(form):
-    return form.save()
+    area = form.save()
+    semear_catalogos_da_area(area)
+    return area
 
 
 def atualizar_area(form):

@@ -287,8 +287,13 @@ class Semeador:
         from eventos.models import Evento
         from eventos.models import TipoEvento
 
-        tipos = TipoEvento.objects.bulk_create([TipoEvento(nome=f"Tipo {i}") for i in range(5)])
         areas = _fatiar_por_area(self.volume, self.areas)
+        tipos_por_area = {
+            area.pk: TipoEvento.objects.bulk_create(
+                [TipoEvento(area=area, nome=f"Tipo {i}") for i in range(5)]
+            )
+            for area in self.areas
+        }
 
         self.eventos = Evento.objects.bulk_create(
             [
@@ -308,7 +313,10 @@ class Semeador:
         )
         Evento.tipos.through.objects.bulk_create(
             [
-                Evento.tipos.through(evento_id=evento.pk, tipoevento_id=tipos[i % len(tipos)].pk)
+                Evento.tipos.through(
+                    evento_id=evento.pk,
+                    tipoevento_id=tipos_por_area[evento.area_id][i % 5].pk,
+                )
                 for i, evento in enumerate(self.eventos)
             ]
         )
@@ -430,10 +438,16 @@ class Semeador:
         from planos_trabalho.models import PlanoTrabalho
         from planos_trabalho.models import ProgramaSolicitante
 
-        programas = ProgramaSolicitante.objects.bulk_create(
-            [ProgramaSolicitante(nome=f"Programa {i}") for i in range(5)]
-        )
         areas = _fatiar_por_area(self.volume, self.areas)
+        programas_por_area = {
+            area.pk: ProgramaSolicitante.objects.bulk_create(
+                [
+                    ProgramaSolicitante(area=area, nome=f"Programa {i}")
+                    for i in range(5)
+                ]
+            )
+            for area in self.areas
+        }
         planos = PlanoTrabalho.objects.bulk_create(
             [
                 PlanoTrabalho(
@@ -442,7 +456,7 @@ class Semeador:
                     ano=2026,
                     data_criacao=_data(i),
                     evento=self.eventos[i % len(self.eventos)] if self.eventos else None,
-                    programa=programas[i % len(programas)],
+                    programa=programas_por_area[areas[i].pk][i % 5],
                     destino_estado=self._estado(i),
                     destino_cidade=self._cidade(i),
                     data_evento_inicio=_data(i),

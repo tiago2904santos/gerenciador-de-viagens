@@ -30,30 +30,20 @@ class VarreduraCobreTodoModeloComAreaTests(TestCase):
     def setUp(self):
         self.area = AreaTrabalho.objects.create(nome="Área A", sigla="CHK-A")
 
-    def test_a_linha_de_base_de_um_banco_novo_ja_tem_orfas(self):
-        """O achado que o `NOVO-31` existia para produzir, e que muda o `DB-02`.
-
-        Num banco **recém-migrado**, sem nenhum dado de usuário, cinco modelos já
-        têm linha com `area IS NULL` — todas criadas por seed de migração:
-        `TipoEvento` (5), `ConfiguracaoNumeracaoOficio` (1), `ProgramaSolicitante`
-        (3), `HorarioAtendimento` (3) e `AtividadePlanoTrabalho` (11).
-
-        Elas não são resíduo a sanear: são o **padrão global** da instalação. A de
-        `ConfiguracaoNumeracaoOficio` é o piso de numeração de 2026
-        (`numero_inicial=75`), do qual todo ofício deste ano depende — e
-        `Oficio.get_next_available_numero` a busca de propósito com
-        `Q(area=area) | Q(area__isnull=True)`.
-
-        Ou seja: `area` NOT NULL **não** pode ser aplicado a estes cinco sem antes
-        decidir o que fazer com o global. Registrado como `NOVO-34`.
-        """
+    def test_novo49_remove_os_quatro_seeds_globais_sem_leitor(self):
+        """Só a numeração, que tem fallback explícito, continua global."""
         problemas = _por_id(check_operational_records_have_area(None))
 
         self.assertNotIn("core.E001", problemas, msg="banco novo não pode ter pendência bloqueante")
         self.assertIn("core.W001", problemas)
-        for semeado in ("eventos.TipoEvento", "oficios.ConfiguracaoNumeracaoOficio",
-                        "planos_trabalho.ProgramaSolicitante"):
-            self.assertIn(semeado, problemas["core.W001"].msg)
+        self.assertIn("oficios.ConfiguracaoNumeracaoOficio", problemas["core.W001"].msg)
+        for removido in (
+            "eventos.TipoEvento",
+            "planos_trabalho.ProgramaSolicitante",
+            "planos_trabalho.HorarioAtendimento",
+            "planos_trabalho.AtividadePlanoTrabalho",
+        ):
+            self.assertNotIn(removido, problemas["core.W001"].msg)
 
     def test_modelo_operacional_continua_bloqueando_o_deploy(self):
         # DB-02: o banco migrado recusa Oficio sem área, então o órfão de
@@ -63,15 +53,13 @@ class VarreduraCobreTodoModeloComAreaTests(TestCase):
         from unittest import mock
 
         from core import checks as core_checks
-        from eventos.models import TipoEvento
+        Servidor.all_objects.create(area=None, nome="Órfão operacional")
 
-        TipoEvento.all_objects.create(area=None, nome="Órfão operacional")
-
-        with mock.patch.object(core_checks, "_OPERATIONAL_MODELS", ("eventos.TipoEvento",)):
+        with mock.patch.object(core_checks, "_OPERATIONAL_MODELS", ("cadastros.Servidor",)):
             problemas = _por_id(check_operational_records_have_area(None))
 
         self.assertIn("core.E001", problemas)
-        self.assertRegex(problemas["core.E001"].msg, r"eventos\.TipoEvento=\d+")
+        self.assertRegex(problemas["core.E001"].msg, r"cadastros\.Servidor=\d+")
 
     def test_modelo_de_cadastros_passa_a_ser_relatado(self):
         """O defeito: `cadastros.Servidor` não era olhado por check nenhum."""

@@ -31,7 +31,13 @@ def area_de_teste(sigla="TST", nome="Área de teste"):
     """
     from usuarios.models import AreaTrabalho
 
-    area, _ = AreaTrabalho.objects.get_or_create(sigla=sigla, defaults={"nome": nome})
+    area, criada = AreaTrabalho.objects.get_or_create(sigla=sigla, defaults={"nome": nome})
+    if criada:
+        # NOVO-49: a fixture representa o fluxo de criação real, que instala os
+        # quatro catálogos no mesmo instante em que a área nasce.
+        from core.catalogos_iniciais import semear_catalogos_da_area
+
+        semear_catalogos_da_area(area)
     return area
 
 

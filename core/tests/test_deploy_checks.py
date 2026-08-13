@@ -12,7 +12,7 @@ from core.checks import check_document_generation_sla_configuration
 from core.checks import check_operational_records_have_area
 from core.checks import check_secret_key_strength
 from eventos.models import Evento
-from eventos.models import TipoEvento
+from cadastros.models import Servidor
 
 
 class OperationalAreaDeployCheckTests(TestCase):
@@ -26,23 +26,21 @@ class OperationalAreaDeployCheckTests(TestCase):
 
     def test_bloqueia_deploy_com_registro_operacional_sem_area(self):
         # Com o NOT NULL do DB-02 nao ha como semear um orfao operacional de
-        # verdade: o teste promove um modelo ainda anulavel (TipoEvento) a
+        # verdade: o teste promove um modelo ainda anulavel (Servidor) a
         # "operacional" para provar que a contagem vira core.E001 — a janela
         # real em que o check dispara e o deploy que ainda nao migrou, rodando
         # com o codigo antigo contra um banco com orfaos.
-        TipoEvento.objects.create(area=None, nome="Legado sem área")
+        Servidor.all_objects.create(area=None, nome="Legado sem área")
 
         with mock.patch.object(
             core_checks,
             "_OPERATIONAL_MODELS",
-            ("eventos.TipoEvento",),
+            ("cadastros.Servidor",),
         ):
             errors = check_operational_records_have_area(None)
 
         self.assertEqual(errors[0].id, "core.E001")
-        # =\d+ e nao =1: as migracoes de seed ja criam TipoEvento sem area
-        # (NOVO-34), entao a contagem inclui os seeds alem do criado acima.
-        self.assertRegex(errors[0].msg, r"eventos\.TipoEvento=\d+")
+        self.assertRegex(errors[0].msg, r"cadastros\.Servidor=\d+")
 
 
 class DocumentSLADeployCheckTests(SimpleTestCase):
