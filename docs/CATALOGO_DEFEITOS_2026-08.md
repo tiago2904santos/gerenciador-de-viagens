@@ -507,15 +507,10 @@ As duas rotas que gravam número de solicitação, data de liberação e prazo l
 `prestacoes_contas/solicitacao_services.py`, ambas `@transaction.atomic`. O parsing do POST virou
 `valores_do_lote(post)`, que recebe o `QueryDict` e não o `request`.
 
-**A fatia não unifica as duas rotas, e isso é decisão consciente.** Elas divergem em três pontos, e
-os três estão fotografados — ver `NOVO-103`. Escolher qual comportamento vence muda o que o operador
-vê na tela; é decisão de produto, não de camada. O que mudou aqui é onde a gravação mora e o fato de
-ela ser atômica.
-
-**O que a transação não faz, e precisa ser dito:** ela **não** desfaz a gravação parcial do autosave.
-O erro de data sai por `return`, não por exceção, então o número continua salvo quando a data
-seguinte é recusada. Era assim antes e continua assim — a diferença é que agora está travado por
-teste, em vez de ser efeito colateral de onde o `return` estava escrito.
+**A fatia inicialmente preservou as divergências**, que foram catalogadas em `NOVO-103`. Em
+13/08/2026 o contrato de produto foi definido e os dois caminhos foram unificados: validação antes
+da primeira escrita, erro visível, requisição inválida sem gravação parcial e status "em
+preenchimento" em qualquer alteração efetiva.
 
 | | antes da fatia 2 | depois |
 |---|---:|---:|
@@ -7725,7 +7720,7 @@ percorre o laço ganhou `@transaction.atomic`, com teste provado por inversão.
 O critério certo é "módulo alcançado a partir de `urls.py`", não "arquivo cujo nome casa com um
 padrão" — e é o mesmo mecanismo do `NOVO-101`, um andar acima.
 
-### NOVO-103 · `NOVO` As duas rotas da solicitação divergem em três pontos, e a divergência estava registrada com o ID errado · BE · 1 d · decisão de produto
+### NOVO-103 ✅ RESOLVIDO (13/08/2026) · `NOVO` As duas rotas da solicitação divergiam em três pontos, e a divergência estava registrada com o ID errado · BE · 1 d
 
 Número de solicitação, data de liberação e prazo limite são gravados por **dois caminhos** — o lote
 sem JS (`views.py::index`, ação `save_solicitacoes`) e o autosave com JS
@@ -7749,20 +7744,15 @@ salva sem JS não descobre que a data não entrou.
 outro app, já resolvido. A divergência das solicitações **nunca teve entrada própria**; foi
 registrada num número que pertencia a outra coisa, e por isso ninguém a encontrava procurando.
 
-**Correção:** decidir qual comportamento é o certo e aplicá-lo aos dois caminhos. Não é trabalho de
-camada — é de produto, e as três perguntas são independentes:
+**Decisão e correção (13/08/2026):** data inválida avisa nos dois caminhos; qualquer gravação
+efetiva tira o servidor de `PENDENTE`; e uma requisição inválida não persiste nenhum de seus campos.
+`solicitacao_services.py` agora valida todas as datas antes da primeira escrita. O autosave grava os
+campos alterados em um único `save()` e marca o status uma vez; o lote prepara todos os servidores
+antes de iniciar o laço de escrita. A view sem JS traduz o mesmo erro para `messages.error`.
 
-1. data inválida deve avisar ou preservar em silêncio?
-2. salvar sem JS deve tirar o servidor de "pendente"?
-3. erro numa data deve desfazer o número já digitado, ou mantê-lo?
-
-A fatia 2 do `BE-14` **preservou os três comportamentos** de propósito e travou cada um com teste, o
-que torna a mudança futura barata e verificável: qualquer resposta às perguntas acima reprova um
-teste específico, e é isso que se quer.
-
-**Custo do que já foi feito:** os dois caminhos hoje moram no mesmo módulo
-(`prestacoes_contas/solicitacao_services.py`), lado a lado, com a tabela acima no docstring. Unificar
-virou uma edição local, não uma caçada.
+**Prova:** 21 testes cobrem os caminhos com e sem JS, incluindo data inválida, ausência de gravação
+parcial dentro de um autosave, rejeição integral de lote com dois servidores, transação diante de
+falha real no segundo `save()` e transição uniforme para "em preenchimento".
 
 ### NOVO-104 ✅ RESOLVIDO (12/08/2026) · `NOVO` Arquivo órfão no storage não tem quem varra · BE · 0,5 d
 
