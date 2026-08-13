@@ -66,7 +66,7 @@ class OficioServicesTests(TestCase):
         self.assertTrue(form.is_valid(), form.errors)
         oficio = criar_oficio_dados_viajantes(form, action="save_draft")
         self.assertEqual(oficio.protocolo, "123456789")
-        self.assertEqual(oficio.numero, 1)
+        self.assertEqual(oficio.numero, 75)
         self.assertEqual(oficio.ano, timezone.localdate().year)
         self.assertEqual(oficio.status, Oficio.STATUS_RASCUNHO)
         self.assertEqual(list(oficio.servidores.all()), [self.servidor])
@@ -107,6 +107,7 @@ class OficioServicesTests(TestCase):
         self.assertEqual(reservado.numero, 78)
         self.assertEqual(_proximo_numero.call_count, 2, "o laço não repetiu na colisão")
 
+    @override_settings(OFICIO_NUMERACAO_USAR_CONFIGURACAO=False)
     def test_get_next_available_numero_reaproveita_lacuna_apos_exclusao(self):
         ano = timezone.localdate().year
         primeiro = Oficio.objects.create(area=area_de_teste(), numero=1, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
@@ -114,6 +115,7 @@ class OficioServicesTests(TestCase):
         excluir_oficio(primeiro)
         self.assertEqual(get_next_available_numero_oficio(ano), 1)
 
+    @override_settings(OFICIO_NUMERACAO_USAR_CONFIGURACAO=False)
     def test_get_next_available_numero_ignora_numeros_apenas_pulados_manualmente(self):
         # Cria 1..10 e depois "pula" para o 15 manualmente: 11-14 não devem ser
         # sugeridos automaticamente, só o 16 (maior + 1).
@@ -123,6 +125,7 @@ class OficioServicesTests(TestCase):
         Oficio.objects.create(area=area_de_teste(), numero=15, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         self.assertEqual(get_next_available_numero_oficio(ano), 16)
 
+    @override_settings(OFICIO_NUMERACAO_USAR_CONFIGURACAO=False)
     def test_excluir_oficio_libera_numero_para_reaproveitamento(self):
         ano = timezone.localdate().year
         oficios = [
@@ -133,6 +136,7 @@ class OficioServicesTests(TestCase):
         self.assertTrue(OficioNumeroLacuna.objects.filter(ano=ano, numero=7).exists())
         self.assertEqual(get_next_available_numero_oficio(ano), 7)
 
+    @override_settings(OFICIO_NUMERACAO_USAR_CONFIGURACAO=False)
     def test_editar_numero_nao_libera_numero_antigo_mas_consome_lacuna_do_novo(self):
         # Editar (corrigir) o número de um ofício existente não deve reintroduzir
         # o número antigo como sugestão automática — só a exclusão faz isso.
