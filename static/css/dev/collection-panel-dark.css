@@ -1,0 +1,10 @@
+/* Tokens principais do painel de coleção no tema escuro. */
+
+html[data-theme="dark"] .main-preview-shell {
+  --color-collection-panel-accent: #d8a21b;
+  --color-collection-panel-border: rgba(255, 255, 255, 0.1);
+  --color-collection-panel-danger: #ee9a91;
+  --color-collection-panel-muted: #afc0d3;
+  --color-collection-panel-on-accent: #132132;
+  --color-collection-panel-text: #ffffff;
+}

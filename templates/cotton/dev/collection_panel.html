@@ -1,0 +1,15 @@
+{% cotton:vars slot summary %}
+<section class="main-preview-collection-panel" aria-label="Coleção de unidades">
+  <header class="main-preview-collection-panel__toolbar">
+    <p class="main-preview-collection-panel__summary">{{ summary }}</p>
+    <nav class="main-preview-collection-panel__pagination" aria-label="Páginas da coleção">
+      <a class="main-preview-collection-panel__page main-preview-collection-panel__page--arrow" href="?page=1" aria-label="Página anterior">←</a>
+      <a class="main-preview-collection-panel__page main-preview-collection-panel__page--current" href="?page=1" aria-current="page">1</a>
+      <a class="main-preview-collection-panel__page" href="?page=2">2</a>
+      <span class="main-preview-collection-panel__ellipsis" aria-hidden="true">…</span>
+      <a class="main-preview-collection-panel__page" href="?page=7">7</a>
+      <a class="main-preview-collection-panel__page main-preview-collection-panel__page--arrow" href="?page=2" aria-label="Próxima página">→</a>
+    </nav>
+  </header>
+  <div class="main-preview-collection-panel__list">{{ slot }}</div>
+</section>

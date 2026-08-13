@@ -22,15 +22,19 @@
 
 .main-preview-sub-header-example > .main-preview-sub-header {
   border-radius: 0 0 14px 14px;
-  border-top: 0;
   margin: 0;
 }
 
 .main-preview-sub-header__filters,
+.main-preview-sub-header__quick-add-filter,
 .main-preview-sub-header__quick-add-controls {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+}
+
+.main-preview-sub-header__quick-add-filter {
+  margin-bottom: 12px;
 }
 
 .main-preview-shell .main-preview-sub-header .main-preview-sub-header__field,
@@ -98,7 +102,7 @@
 
 :is(html[data-theme]):has(.main-preview-shell)
   .custom-select__menu--v2 {
-  background: var(--color-primary);
+  background: var(--color-secondary);
   border: 1px solid var(--color-sub-header-border);
 }
 
@@ -120,14 +124,28 @@
   width: 6px;
 }
 
-html[data-theme="light"]:has(.main-preview-shell)
+:is(html[data-theme]):has(.main-preview-shell)
   .custom-select__menu--v2
   .custom-select__option:hover:not(.custom-select__option--disabled),
-html[data-theme="light"]:has(.main-preview-shell)
+:is(html[data-theme]):has(.main-preview-shell)
   .custom-select__menu--v2
   .custom-select__option--focused {
-  background: var(--theme-list-row-hover);
-  color: var(--color-heading);
+  background: var(--color-primary);
+}
+
+:is(html[data-theme]):has(.main-preview-shell)
+  .custom-select__menu--v2
+  .custom-select__option--selected {
+  background: var(--color-acent-secundary);
+}
+
+:is(html[data-theme]):has(.main-preview-shell)
+  .custom-select__menu--v2
+  .custom-select__option--selected:hover:not(.custom-select__option--disabled),
+:is(html[data-theme]):has(.main-preview-shell)
+  .custom-select__menu--v2
+  .custom-select__option--selected.custom-select__option--focused {
+  background: var(--color-acent-secundary);
 }
 
 .main-preview-sub-header__field {
@@ -144,8 +162,7 @@ html[data-theme="light"]:has(.main-preview-shell)
 }
 
 .main-preview-sub-header__title,
-.main-preview-sub-header__description,
-.main-preview-sub-header__step-copy p {
+.main-preview-sub-header__description {
   margin: 0;
 }
 
@@ -153,40 +170,101 @@ html[data-theme="light"]:has(.main-preview-shell)
   margin-bottom: 12px;
 }
 
-.main-preview-sub-header__steps {
+.main-preview-sub-header__quick-add-body {
+  background: var(--color-secondary);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+}
+
+.main-preview-shell
+  .main-preview-sub-header
+  .main-preview-sub-header__quick-add-body
+  .main-preview-sub-header__field,
+.main-preview-sub-header__quick-add-result {
+  background: var(--color-primary);
+}
+
+.main-preview-sub-header__quick-add-results {
   display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.main-preview-sub-header__quick-add-result {
+  align-items: center;
+  border-radius: var(--radius-sm);
+  display: flex;
   gap: 12px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.main-preview-sub-header__step {
-  align-items: center;
-  display: flex;
-  gap: 10px;
   min-width: 0;
+  padding: 12px;
 }
 
-.main-preview-sub-header__marker {
+.main-preview-sub-header__quick-add-result strong,
+.main-preview-sub-header__quick-add-result p {
+  margin: 0;
+}
+
+.main-preview-sub-header__quick-add-result p,
+.main-preview-sub-header__description {
+  color: var(--color-sub-header-muted);
+  font-size: 0.8rem;
+}
+
+.main-preview-sub-header__quick-add-marker {
   align-items: center;
-  border: 1px solid var(--color-sub-header-border);
-  border-radius: 50%;
-  display: flex;
-  flex: 0 0 36px;
-  height: 36px;
+  background: var(--color-secondary);
+  border-radius: var(--radius-sm);
+  color: var(--color-acent-primary);
+  display: inline-flex;
+  flex: 0 0 42px;
+  font-weight: var(--font-weight-bold);
+  height: 42px;
   justify-content: center;
 }
 
-@media (max-width: 760px) {
-  .main-preview-sub-header__steps {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+@media (max-width: 640px) {
+  .main-preview-sub-header__quick-add-filter {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 
-@media (max-width: 460px) {
-  .main-preview-sub-header__steps {
-    grid-template-columns: 1fr;
-  }
+.main-preview-sub-header--stepper .page-stepper {
+  --stepper-marker-size: 32px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  isolation: auto;
+  padding: var(--space-1) 0;
+  position: static;
+  width: 100%;
+}
+
+.main-preview-sub-header--stepper .page-stepper__eyebrow {
+  display: none;
+}
+
+.main-preview-sub-header--stepper
+  .page-stepper__item.is-current
+  .page-stepper__marker {
+  background: var(--color-acent-primary);
+}
+
+.main-preview-sub-header--stepper
+  .page-stepper__item.is-complete
+  .page-stepper__marker {
+  background: var(--color-acent-secundary);
+}
+
+.main-preview-sub-header--stepper .page-stepper__label {
+  font-size: 0.8rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.01em;
+}
+
+.main-preview-sub-header--stepper .page-stepper__status {
+  font-size: 0.68rem;
+  font-weight: var(--font-weight-semibold);
 }

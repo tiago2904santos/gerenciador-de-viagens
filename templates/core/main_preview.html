@@ -5,26 +5,35 @@
 {% block shell_class %}main-preview-shell{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/dev/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dev/main.css' %}?v=20260813-192058">
   <link rel="stylesheet" href="{% static 'css/dev/main-light.css' %}">
   <link rel="stylesheet" href="{% static 'css/dev/main-dark.css' %}">
   <link rel="stylesheet" href="{% static 'css/dev/header.css' %}">
   <link rel="stylesheet" href="{% static 'css/dev/header-light.css' %}">
   <link rel="stylesheet" href="{% static 'css/dev/header-dark.css' %}">
-  <link rel="stylesheet" href="{% static 'css/dev/sub-header.css' %}">
-  <link rel="stylesheet" href="{% static 'css/dev/sub-header-light.css' %}">
-  <link rel="stylesheet" href="{% static 'css/dev/sub-header-dark.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dev/sub-header.css' %}?v=20260813-190246">
+  <link rel="stylesheet" href="{% static 'css/dev/sub-header-light.css' %}?v=20260813-190246">
+  <link rel="stylesheet" href="{% static 'css/dev/sub-header-dark.css' %}?v=20260813-190246">
+  <link rel="stylesheet" href="{% static 'css/dev/form-card.css' %}?v=20260813-191605">
+  <link rel="stylesheet" href="{% static 'css/dev/form-card-light.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dev/form-card-dark.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dev/entity-card.css' %}?v=20260813-192620">
+  <link rel="stylesheet" href="{% static 'css/dev/entity-card-light.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dev/entity-card-dark.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dev/collection-panel.css' %}?v=20260813-191605">
+  <link rel="stylesheet" href="{% static 'css/dev/collection-panel-light.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dev/collection-panel-dark.css' %}?v=20260813-191334">
 {% endblock %}
 
 {% block content %}
   <c-dev.header variant="standard" eyebrow="OFÍCIOS" title="Ofícios" only />
   <c-dev.header variant="toggle" eyebrow="CONFIGURAÇÕES" title="Instituição">
     <c-slot name="toggle">
-      <nav class="main-preview-header__toggle-nav" aria-label="Seções de configuração">
-        <a class="main-preview-header__toggle-item main-preview-header__toggle-item--active" href="{% url 'core:main_preview' %}" aria-current="page">Instituição</a>
-        <a class="main-preview-header__toggle-item" href="{% url 'core:main_preview' %}">Ofício</a>
-        <a class="main-preview-header__toggle-item" href="{% url 'core:main_preview' %}">Roteiros</a>
-      </nav>
+      <c-dev.header_toggle aria_label="Seções de configuração">
+        <c-ui.buttons.button class_name="main-preview-header__toggle-item main-preview-header__toggle-item--active" type="button" aria-pressed="true">Instituição</c-ui.buttons.button>
+        <c-ui.buttons.button class_name="main-preview-header__toggle-item" type="button" aria-pressed="false">Ofício</c-ui.buttons.button>
+        <c-ui.buttons.button class_name="main-preview-header__toggle-item" type="button" aria-pressed="false">Roteiros</c-ui.buttons.button>
+      </c-dev.header_toggle>
     </c-slot>
   </c-dev.header>
   <c-dev.header variant="button" eyebrow="OFÍCIOS" title="Cadastro de ofício">
@@ -50,9 +59,35 @@
   <section class="main-preview-sub-header-example">
     <c-dev.header variant="standard" eyebrow="JUSTIFICATIVAS" title="Justificativas" only />
     <c-dev.sub_header variant="quick-add" aria_label="Inclusão rápida de ofício vinculado">
-      <div class="main-preview-sub-header__quick-add-controls">
-        <input class="main-preview-sub-header__field" type="search" placeholder="Buscar ofício" aria-label="Buscar ofício vinculado">
-      </div>
+      <form class="main-preview-sub-header__quick-add-filter" action="{% url 'core:main_preview' %}" method="get">
+        <input class="main-preview-sub-header__field" type="search" name="q" placeholder="Buscar justificativas" aria-label="Buscar justificativas">
+        <a class="main-preview-sub-header__control" href="{% url 'core:main_preview' %}">Limpar filtros</a>
+      </form>
+      <section class="main-preview-sub-header__quick-add-body" aria-labelledby="main-preview-quick-add-title">
+        <div class="main-preview-sub-header__quick-add-copy">
+          <h3 class="main-preview-sub-header__title" id="main-preview-quick-add-title">Ofício vinculado</h3>
+          <p class="main-preview-sub-header__description">Selecione um ou mais ofícios para receber a justificativa.</p>
+        </div>
+        <div class="main-preview-sub-header__quick-add-controls">
+          <input class="main-preview-sub-header__field" type="search" placeholder="Buscar por número, protocolo, destino, sede, viatura ou servidor" aria-label="Buscar ofício vinculado">
+        </div>
+        <div class="main-preview-sub-header__quick-add-results">
+          <article class="main-preview-sub-header__quick-add-result">
+            <span class="main-preview-sub-header__quick-add-marker" aria-hidden="true">S</span>
+            <div>
+              <strong>Ofício 152/2026 CURITIBA/PR → FAZENDA RIO GRANDE/PR</strong>
+              <p>05/08/2026 a 12/08/2026 · ADEMAR · AAA1234 DUSTER</p>
+            </div>
+          </article>
+          <article class="main-preview-sub-header__quick-add-result">
+            <span class="main-preview-sub-header__quick-add-marker" aria-hidden="true">S</span>
+            <div>
+              <strong>Ofício 151/2026</strong>
+              <p>Sem informações disponíveis</p>
+            </div>
+          </article>
+        </div>
+      </section>
     </c-dev.sub_header>
   </section>
 
@@ -63,24 +98,170 @@
       </c-slot>
     </c-dev.header>
     <c-dev.sub_header variant="stepper" aria_label="Etapas do cadastro de ofício">
-      <ol class="main-preview-sub-header__steps">
-        <li class="main-preview-sub-header__step main-preview-sub-header__step--complete">
-          <div class="main-preview-sub-header__marker">1</div>
-          <div class="main-preview-sub-header__step-copy"><strong>Dados e viajantes</strong><p>Concluída</p></div>
-        </li>
-        <li class="main-preview-sub-header__step main-preview-sub-header__step--current" aria-current="step">
-          <div class="main-preview-sub-header__marker">2</div>
-          <div class="main-preview-sub-header__step-copy"><strong>Roteiro e diárias</strong><p>Em andamento</p></div>
-        </li>
-        <li class="main-preview-sub-header__step">
-          <div class="main-preview-sub-header__marker">3</div>
-          <div class="main-preview-sub-header__step-copy"><strong>Justificativa</strong><p>Não iniciada</p></div>
-        </li>
-        <li class="main-preview-sub-header__step">
-          <div class="main-preview-sub-header__marker">4</div>
-          <div class="main-preview-sub-header__step-copy"><strong>Documentos</strong><p>Não iniciada</p></div>
-        </li>
-      </ol>
+      <c-ui.navigation.page_stepper :steps="preview_steps" aria_label="Etapas do cadastro de ofício" only />
     </c-dev.sub_header>
   </section>
+
+  <section class="main-preview-form-card-example" aria-label="Prévia do card de roteiro">
+    <c-dev.form_card title="Roteiro e diárias" description="Origem, percurso, deslocamentos e cálculo financeiro" title_id="main-preview-route-card-title">
+      <section class="main-preview-form-card__block">
+        <header class="main-preview-form-card__block-header">
+          <div>
+            <h3 class="main-preview-form-card__block-title">Origem e destinos</h3>
+            <p class="main-preview-form-card__block-description">Use um roteiro salvo ou defina a sede e os destinos.</p>
+          </div>
+          <div class="main-preview-form-card__block-actions">
+            <c-ui.buttons.button class_name="main-preview-form-card__button" type="button" label="Roteiro salvo" only />
+            <c-ui.buttons.button class_name="main-preview-form-card__button" type="button" label="Roteiro novo" only />
+          </div>
+        </header>
+        <div class="main-preview-form-card__locations">
+          <div class="main-preview-form-card__location-row">
+            <div class="main-preview-form-card__row-copy"><strong>Sede</strong><p>Unidade de origem da viagem.</p></div>
+            <div class="main-preview-form-card__value">PARANÁ (PR)</div>
+            <div class="main-preview-form-card__value">CURITIBA</div>
+          </div>
+          <div class="main-preview-form-card__location-row">
+            <div class="main-preview-form-card__row-copy"><strong>Destinos</strong><p>Locais na ordem da visita.</p></div>
+            <div class="main-preview-form-card__value">PARANÁ (PR)</div>
+            <div class="main-preview-form-card__value">ARAPONGAS</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="main-preview-form-card__block main-preview-form-card__block--compact">
+        <header class="main-preview-form-card__block-header">
+          <div>
+            <h3 class="main-preview-form-card__block-title">Bate-volta diário</h3>
+            <p class="main-preview-form-card__block-description">Repita automaticamente a ida e a volta em um período.</p>
+          </div>
+          <c-ui.buttons.button class_name="main-preview-form-card__button" type="button" label="Sem bate-volta diário" only />
+        </header>
+      </section>
+
+      <section class="main-preview-form-card__block">
+        <div class="main-preview-form-card__metrics">
+          <div class="main-preview-form-card__metric"><div class="main-preview-form-card__metric-label">Distância (ida e volta)</div><div class="main-preview-form-card__metric-value">758.1 km</div></div>
+          <div class="main-preview-form-card__metric"><div class="main-preview-form-card__metric-label">Tempo (ida e volta)</div><div class="main-preview-form-card__metric-value">9h</div></div>
+          <div class="main-preview-form-card__metric"><div class="main-preview-form-card__metric-label">Distância de ida</div><div class="main-preview-form-card__metric-value">379.05 km</div></div>
+          <div class="main-preview-form-card__metric"><div class="main-preview-form-card__metric-label">Tempo de ida</div><div class="main-preview-form-card__metric-value">4h30min</div></div>
+        </div>
+        <div class="main-preview-form-card__route-actions">
+          <c-ui.buttons.button class_name="main-preview-form-card__button" type="button" label="Calcular rota" only />
+          <c-ui.buttons.button class_name="main-preview-form-card__button" type="button" label="Recalcular rota" only />
+          <c-ui.buttons.button class_name="main-preview-form-card__button" type="button" label="Ver rota inteira" only />
+        </div>
+      </section>
+    </c-dev.form_card>
+  </section>
+
+  <section class="main-preview-entity-card-example" aria-label="Prévia do card de ofício">
+    <c-dev.entity_card eyebrow="OFÍCIO" title="Nº 153/2026 · PROTOCOLO 12.345.678-9 · ARAPONGAS/PR · 12/08 A 15/08/2026" state_label="FINALIZADO (LEGADO)" temporal="EM ANDAMENTO">
+      <div class="main-preview-entity-card__people">
+        <div class="main-preview-entity-card__person">
+          <span class="main-preview-entity-card__avatar" aria-hidden="true">AS</span>
+          <div class="main-preview-entity-card__person-copy">
+            <p class="main-preview-entity-card__person-name">ADEMAR SCHONS</p>
+            <p class="main-preview-entity-card__person-meta">AGENTE DE POLÍCIA JUDICIÁRIA</p>
+          </div>
+          <c-ui.buttons.button class_name="main-preview-entity-card__icon-button" type="button" aria_label="Ações de Ademar Schons">⋮</c-ui.buttons.button>
+        </div>
+        <div class="main-preview-entity-card__person">
+          <span class="main-preview-entity-card__avatar" aria-hidden="true">AS</span>
+          <div class="main-preview-entity-card__person-copy">
+            <p class="main-preview-entity-card__person-name">ADRIANO RODRIGUES DA SILVA</p>
+            <p class="main-preview-entity-card__person-meta">AGENTE DE POLÍCIA JUDICIÁRIA · COPE</p>
+          </div>
+          <c-ui.buttons.button class_name="main-preview-entity-card__icon-button" type="button" aria_label="Ações de Adriano Rodrigues da Silva">⋮</c-ui.buttons.button>
+        </div>
+      </div>
+
+      <div class="main-preview-entity-card__summary">
+        <section class="main-preview-entity-card__fact" aria-label="Veículo">
+          <span class="main-preview-entity-card__label">Placa</span>
+          <strong class="main-preview-entity-card__vehicle-value">AAA-1234</strong>
+          <span class="main-preview-entity-card__label">Modelo</span>
+          <strong class="main-preview-entity-card__vehicle-model">DUSTER</strong>
+        </section>
+        <section class="main-preview-entity-card__fact" aria-label="Trechos encontrados">
+          <span class="main-preview-entity-card__label">Trechos encontrados</span>
+          <div class="main-preview-entity-card__routes">
+            <div class="main-preview-entity-card__route-item">
+              <p class="main-preview-entity-card__route">CURITIBA/PR → ARAPONGAS/PR</p>
+              <p class="main-preview-entity-card__route-time">12/08/2026 09:00 → 12/08/2026 14:15</p>
+            </div>
+            <div class="main-preview-entity-card__route-item">
+              <p class="main-preview-entity-card__route">ARAPONGAS/PR → CURITIBA/PR</p>
+              <p class="main-preview-entity-card__route-time">15/08/2026 09:00 → 15/08/2026 14:15</p>
+            </div>
+          </div>
+        </section>
+        <section class="main-preview-entity-card__fact" aria-label="Valor total">
+          <span class="main-preview-entity-card__label">Valor total</span>
+          <strong class="main-preview-entity-card__amount">R$<br>1.743,30</strong>
+          <span class="main-preview-entity-card__label">Valor por extenso</span>
+          <p class="main-preview-entity-card__amount-long">mil setecentos e quarenta e três reais e trinta centavos</p>
+        </section>
+      </div>
+
+      <section class="main-preview-entity-card__justification" aria-label="Justificativa">
+        <div>
+          <div class="main-preview-entity-card__justification-heading">
+            <strong>JUSTIFICATIVA</strong>
+            <span class="main-preview-entity-card__badge">PREENCHIDA</span>
+          </div>
+          <p class="main-preview-entity-card__justification-text">Participação da equipe na atividade institucional programada.</p>
+        </div>
+        <div class="main-preview-entity-card__footer-group">
+          <c-ui.buttons.button class_name="main-preview-entity-card__icon-button" type="button" aria_label="Editar justificativa">✎</c-ui.buttons.button>
+          <c-ui.buttons.button class_name="main-preview-entity-card__icon-button main-preview-entity-card__icon-button--accent" type="button" aria_label="Abrir documentos da justificativa">□</c-ui.buttons.button>
+        </div>
+      </section>
+    </c-dev.entity_card>
+  </section>
+
+  <section class="main-preview-collection-panel-example" aria-label="Prévia da coleção de unidades">
+    <c-dev.collection_panel summary="Mostrando 1–15 de 98 registros">
+      <article class="main-preview-collection-panel__row">
+        <span class="main-preview-collection-panel__identity" aria-hidden="true">10</span>
+        <div class="main-preview-collection-panel__copy">
+          <h3 class="main-preview-collection-panel__title">10ª SUBDIVISÃO POLICIAL</h3>
+          <p class="main-preview-collection-panel__code">10SDP</p>
+          <p class="main-preview-collection-panel__fact">SIGLA <strong>10SDP</strong></p>
+        </div>
+        <div class="main-preview-collection-panel__actions">
+          <c-ui.buttons.button class_name="main-preview-collection-panel__action" type="button" aria_label="Editar 10ª Subdivisão Policial">✎</c-ui.buttons.button>
+          <c-ui.buttons.button class_name="main-preview-collection-panel__action main-preview-collection-panel__action--delete" type="button" aria_label="Excluir 10ª Subdivisão Policial">×</c-ui.buttons.button>
+        </div>
+      </article>
+      <article class="main-preview-collection-panel__row">
+        <span class="main-preview-collection-panel__identity" aria-hidden="true">10</span>
+        <div class="main-preview-collection-panel__copy">
+          <h3 class="main-preview-collection-panel__title">10º DISTRITO POLICIAL</h3>
+          <p class="main-preview-collection-panel__code">10DP</p>
+          <p class="main-preview-collection-panel__fact">SIGLA <strong>10DP</strong></p>
+        </div>
+        <div class="main-preview-collection-panel__actions">
+          <c-ui.buttons.button class_name="main-preview-collection-panel__action" type="button" aria_label="Editar 10º Distrito Policial">✎</c-ui.buttons.button>
+          <c-ui.buttons.button class_name="main-preview-collection-panel__action main-preview-collection-panel__action--delete" type="button" aria_label="Excluir 10º Distrito Policial">×</c-ui.buttons.button>
+        </div>
+      </article>
+      <article class="main-preview-collection-panel__row">
+        <span class="main-preview-collection-panel__identity" aria-hidden="true">11</span>
+        <div class="main-preview-collection-panel__copy">
+          <h3 class="main-preview-collection-panel__title">11ª SUBDIVISÃO POLICIAL</h3>
+          <p class="main-preview-collection-panel__code">11SDP</p>
+          <p class="main-preview-collection-panel__fact">SIGLA <strong>11SDP</strong></p>
+        </div>
+        <div class="main-preview-collection-panel__actions">
+          <c-ui.buttons.button class_name="main-preview-collection-panel__action" type="button" aria_label="Editar 11ª Subdivisão Policial">✎</c-ui.buttons.button>
+          <c-ui.buttons.button class_name="main-preview-collection-panel__action main-preview-collection-panel__action--delete" type="button" aria_label="Excluir 11ª Subdivisão Policial">×</c-ui.buttons.button>
+        </div>
+      </article>
+    </c-dev.collection_panel>
+  </section>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/dev/header-toggle.js' %}?v=20260813-185458" defer></script>
 {% endblock %}

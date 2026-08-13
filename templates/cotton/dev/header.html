@@ -1,5 +1,5 @@
-{% cotton:vars action eyebrow title toggle variant="standard" %}
-<header class="main-preview-header main-preview-header--{{ variant }}">
+{% cotton:vars action eyebrow title toggle variant %}
+<header class="main-preview-header main-preview-header--{{ variant|default:'standard' }}">
   <div class="main-preview-header__copy">
     <p class="main-preview-header__eyebrow">{{ eyebrow }}</p>
     <div class="main-preview-header__headline">

@@ -1,0 +1,282 @@
+/* Cartão de entidade isolado da página-piloto. */
+
+.main-preview-entity-card {
+  background: var(--color-primary);
+  border: 1px solid var(--color-entity-card-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-entity-card-text);
+  font-family: var(--font-sans);
+  overflow: hidden;
+}
+
+.main-preview-entity-card__header,
+.main-preview-entity-card__footer {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 16px 20px;
+}
+
+.main-preview-entity-card__header {
+  border-bottom: 0;
+}
+
+.main-preview-entity-card__heading,
+.main-preview-entity-card__chips,
+.main-preview-entity-card__footer-group,
+.main-preview-entity-card__person,
+.main-preview-entity-card__person-copy,
+.main-preview-entity-card__justification-heading {
+  align-items: center;
+  display: flex;
+}
+
+.main-preview-entity-card__heading {
+  gap: 12px;
+  min-width: 0;
+}
+
+.main-preview-entity-card__accent {
+  background: var(--color-entity-card-accent);
+  border-radius: var(--radius-pill);
+  flex: 0 0 8px;
+  height: 52px;
+}
+
+.main-preview-entity-card__eyebrow,
+.main-preview-entity-card__title,
+.main-preview-entity-card__person-name,
+.main-preview-entity-card__person-meta,
+.main-preview-entity-card__label,
+.main-preview-entity-card__route,
+.main-preview-entity-card__route-time,
+.main-preview-entity-card__amount,
+.main-preview-entity-card__amount-long,
+.main-preview-entity-card__justification-text {
+  margin: 0;
+}
+
+.main-preview-entity-card__eyebrow {
+  color: var(--color-entity-card-accent);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.main-preview-entity-card__label {
+  color: var(--color-entity-card-accent);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.main-preview-entity-card__title {
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.main-preview-entity-card__chips {
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.main-preview-entity-card__chip,
+.main-preview-entity-card__badge {
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  padding: 6px 14px;
+  text-transform: uppercase;
+}
+
+.main-preview-entity-card__chip--status {
+  background: var(--color-entity-card-success);
+  color: var(--color-entity-card-on-status);
+}
+
+.main-preview-entity-card__chip--temporal {
+  background: var(--color-entity-card-info);
+  color: var(--color-entity-card-on-status);
+}
+
+.main-preview-entity-card__body {
+  display: grid;
+  gap: 18px;
+  padding: 16px;
+}
+
+.main-preview-entity-card__people {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.main-preview-entity-card__person,
+.main-preview-entity-card__fact,
+.main-preview-entity-card__justification {
+  background: var(--color-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.main-preview-entity-card__person {
+  gap: 14px;
+  min-width: 0;
+  padding: 12px 14px;
+}
+
+.main-preview-entity-card__avatar {
+  align-items: center;
+  background: var(--color-primary);
+  border-radius: var(--radius-sm);
+  color: var(--color-entity-card-accent);
+  display: inline-flex;
+  flex: 0 0 42px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  height: 42px;
+  justify-content: center;
+}
+
+.main-preview-entity-card__person-copy {
+  align-items: flex-start;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.main-preview-entity-card__person-name {
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.main-preview-entity-card__person-meta,
+.main-preview-entity-card__route-time,
+.main-preview-entity-card__justification-text {
+  color: var(--color-entity-card-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.main-preview-entity-card__summary {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(180px, 0.9fr) minmax(220px, 1fr) minmax(220px, 1fr);
+}
+
+.main-preview-entity-card__fact {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 18px;
+}
+
+.main-preview-entity-card__vehicle-value {
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.main-preview-entity-card__vehicle-model {
+  font-size: 1.8rem;
+  font-weight: var(--font-weight-bold);
+}
+
+.main-preview-entity-card__routes {
+  display: grid;
+  gap: 8px;
+}
+
+.main-preview-entity-card__route-item {
+  background: var(--color-primary);
+  border-radius: var(--radius-sm);
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+}
+
+.main-preview-entity-card__route {
+  font-weight: var(--font-weight-bold);
+}
+
+.main-preview-entity-card__amount {
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: var(--font-weight-bold);
+  line-height: 0.95;
+}
+
+.main-preview-entity-card__amount-long {
+  font-weight: var(--font-weight-semibold);
+}
+
+.main-preview-entity-card__justification {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 14px 16px;
+}
+
+.main-preview-entity-card__justification-heading {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.main-preview-entity-card__badge {
+  background: var(--color-entity-card-accent);
+  color: var(--color-entity-card-on-accent);
+  padding-block: 4px;
+}
+
+.main-preview-entity-card__icon-button {
+  align-items: center;
+  background: var(--color-secondary);
+  border: 0;
+  border-radius: 50%;
+  color: var(--color-entity-card-text);
+  display: inline-flex;
+  font: inherit;
+  height: 44px;
+  justify-content: center;
+  width: 44px;
+}
+
+.main-preview-entity-card__icon-button--accent {
+  color: var(--color-entity-card-accent);
+}
+
+.main-preview-entity-card__footer {
+  border-top: 0;
+}
+
+@media (max-width: 900px) {
+  .main-preview-entity-card__summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .main-preview-entity-card__header,
+  .main-preview-entity-card__justification {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .main-preview-entity-card__chips {
+    justify-content: flex-start;
+  }
+
+  .main-preview-entity-card__people {
+    grid-template-columns: 1fr;
+  }
+}

@@ -129,12 +129,49 @@ def main_preview(request):
     """
     from core.dev_forms import MainPreviewFiltersForm
 
+    preview_steps = (
+        {
+            "marker": "✓",
+            "marker_aria_hidden": True,
+            "state_class": "is-complete",
+            "step_label": "Etapa 1",
+            "title": "Dados e viajantes",
+            "status": "Concluída",
+        },
+        {
+            "marker": "2",
+            "marker_aria_hidden": True,
+            "state_class": "is-current",
+            "aria_current": "step",
+            "step_label": "Etapa 2",
+            "title": "Roteiro e diárias",
+            "status": "Em andamento",
+        },
+        {
+            "marker": "3",
+            "marker_aria_hidden": True,
+            "state_class": "",
+            "step_label": "Etapa 3",
+            "title": "Justificativa",
+            "status": "Não iniciada",
+        },
+        {
+            "marker": "4",
+            "marker_aria_hidden": True,
+            "state_class": "",
+            "step_label": "Etapa 4",
+            "title": "Documentos",
+            "status": "Não iniciada",
+        },
+    )
+
     return render(
         request,
         "core/main_preview.html",
         {
             "page_title": "Prévia do main",
             "preview_filters": MainPreviewFiltersForm(request.GET or None),
+            "preview_steps": preview_steps,
             "shell_css_profile_path": "css/shell.form-components.bundle.css",
         },
     )

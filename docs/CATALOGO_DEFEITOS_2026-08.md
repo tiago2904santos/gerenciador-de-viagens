@@ -8519,6 +8519,9 @@ Na variação quick-add da página-piloto foram removidos o bloco explicativo �
 e a ação “Limpar filtros”. O campo acessível “Buscar ofício” permanece como único conteúdo
 do sub-header. Nenhuma página real foi alterada.
 
+> Substituído por `NOVO-20260813-184339-4be90a915693`: a revisão visual posterior definiu que a
+> variação deve retratar o fluxo completo existente em Justificativas.
+
 ### NOVO-20260813-172430-f0138f333d5c ✅ RESOLVIDO · `NOVO` Componentes novos não garantiam a mesma fonte do sistema nos controles nativos · UI · 0,1 d
 
 O shell da página-piloto, os headers e os sub-headers usam explicitamente `var(--font-sans)`.
@@ -8577,8 +8580,153 @@ O menu usa `border: 1px solid var(--color-sub-header-border)`, o mesmo contrato 
 listbox fica no `body`, o portal recebe diretamente o token de cada tema: branco a 14% no claro e
 branco a 10% no escuro.
 
+### NOVO-20260813-175332-5e403f4623e7 ✅ RESOLVIDO · `NOVO` Tokens principais do piloto dependiam de cores sem relação semântica · UI · 0,1 d
+
+Foram removidos `color-mix`, canais relativos e referências cruzadas dos tokens principais.
+O contrato agora é direto: claro usa primária `#eef4fc` e secundária `#ffffff`; escuro usa
+primária `#132132` e secundária `#223348`. A faixa consome a primária; controles e listbox
+consomem a secundária.
+
 ### NOVO-20260813-174203-53f71e9fa7e9 ✅ RESOLVIDO · `NOVO` Controles do filtro piloto usavam raios diferentes · UI · 0,1 d
 
 Busca, wrappers dos selects, triggers gerados e a ação “Limpar filtros” passam a consumir
 `border-radius: var(--radius-sm)`. O token oficial resolve para `8px`; nenhuma página real foi
 alterada.
+
+### NOVO-20260813-175642-534d862bebf9 ✅ RESOLVIDO · `NOVO` Listbox do select consumia o papel de cor da faixa · UI · 0,1 d
+
+No piloto, o menu aberto do select agora usa diretamente `--color-secondary`, enquanto hover e
+foco das opções usam `--color-primary`. Os valores principais permanecem independentes e não foram
+alterados.
+
+### NOVO-20260813-180435-8659b1be555f ✅ RESOLVIDO · `NOVO` Stepper piloto não seguia a linguagem do cadastro de Ofícios · UI · 0,1 d
+
+O grid manual foi substituído pelo componente canônico `page_stepper`, já usado pelo wizard de
+Ofícios. O sub-header permanece independente dos headers legados e apenas neutraliza a superfície
+externa do componente para manter a composição emendada.
+
+### NOVO-20260813-181307-5480426bf196 ✅ RESOLVIDO · `NOVO` Marcador atual do stepper não possuía token principal próprio · UI · 0,1 d
+
+O marcador da etapa atual passa a consumir diretamente `--color-acent-primary`. O token nasce com
+valor próprio nos dois temas do piloto: `#0b3a66` no claro e `#d8a21b` no escuro, preservando a
+aparência aprovada sem depender de `--color-primary` ou `--color-accent`.
+
+### NOVO-20260813-181456-5fb6cde15b32 ✅ RESOLVIDO · `NOVO` Marcador concluído do stepper não possuía token secundário próprio · UI · 0,1 d
+
+O fundo do marcador concluído passa a consumir diretamente `--color-acent-secundary`. O token nasce
+com valor próprio nos dois temas do piloto: `#e3eaf2` no claro e `rgba(216, 162, 27, 0.16)` no
+escuro, sem referência a tokens antigos.
+
+### NOVO-20260813-181722-0ac121ceee46 ✅ RESOLVIDO · `NOVO` Halo da etapa atual era recortado pelo overflow do stepper · UI · 0,1 d
+
+O `page_stepper` dentro do sub-header passa a reservar `var(--space-1)` de padding vertical. O halo
+de 3px fica integralmente dentro da área rolável, enquanto o padding horizontal permanece zerado e
+a resposta em telas estreitas é preservada.
+
+### NOVO-20260813-181839-ce8dd0e582cb ✅ RESOLVIDO · `NOVO` Card complexo de roteiro não possuía reprodução isolada para revisão visual · UI · 0,3 d
+
+Foi criado `c-dev.form_card`, consumido somente pela página-piloto, com camadas compartilhada,
+clara e escura próprias. A reprodução usa dados estáticos para origem, destinos, bate-volta e
+métricas; nenhuma classe, regra ou comportamento do editor real foi alterado.
+
+### NOVO-20260813-182642-5af6808073e6 ✅ RESOLVIDO · `NOVO` Elementos internos do card piloto criavam um terceiro papel de superfície · UI · 0,1 d
+
+O token terciário foi removido das camadas clara e escura, eliminando o terceiro papel de
+superfície. Nenhuma nova cor foi introduzida e o editor real permanece intacto.
+
+### NOVO-20260813-182804-7bb5ba76ccc5 ✅ RESOLVIDO · `NOVO` Controles e valores internos do card piloto usavam o papel de cor incorreto · UI · 0,1 d
+
+Botões, linhas de origem e destino e valores de métricas passam a consumir diretamente a cor
+primária do card nos dois temas. A definição substitui o alinhamento provisório desses elementos
+à superfície secundária, sem reintroduzir um terceiro token.
+
+### NOVO-20260813-182902-7670c81c1b29 ✅ RESOLVIDO · `NOVO` Valores de estado e cidade não se distinguiam da linha de local · UI · 0,1 d
+
+Os quatro valores internos de estado e cidade passam a usar diretamente a cor secundária do card.
+As linhas de Sede e Destinos, os botões e as métricas permanecem na cor primária, preservando os
+dois únicos papéis de superfície do componente.
+
+### NOVO-20260813-183018-f847a6f4d130 ✅ RESOLVIDO · `NOVO` Card complexo de Ofício não possuía reprodução isolada para revisão visual · UI · 0,4 d
+
+Foi criado `c-dev.entity_card`, consumido somente pela página-piloto, com cabeçalho, estados,
+viajantes, veículo, trechos, valor, justificativa e ações estáticas. O componente possui CSS e
+tokens diretos próprios para os dois temas; o card real de Ofícios permanece intacto.
+
+### NOVO-20260813-183956-c0a8b4f574a0 ✅ RESOLVIDO · `NOVO` Painel de coleção de unidades não possuía reprodução isolada para revisão visual · UI · 0,3 d
+
+Foi criado `c-dev.collection_panel`, consumido somente pela página-piloto, com resumo de
+resultados, paginação, linhas de unidade e ações estáticas. O componente possui CSS e tokens
+diretos próprios nos temas claro e escuro; a listagem real de Unidades permanece intacta.
+
+### NOVO-20260813-184339-4be90a915693 ✅ RESOLVIDO · `NOVO` Variação quick-add do piloto não retratava o fluxo completo de Justificativas · UI · 0,2 d
+
+O sub-header quick-add passa a incluir a faixa de busca e limpeza, o título e a orientação do
+ofício vinculado, a busca contextual e dois resultados estáticos. O componente e seus tokens
+permanecem isolados no piloto; a página real de Justificativas não foi alterada.
+
+### NOVO-20260813-184600-8256932ed3b4 ✅ RESOLVIDO · `NOVO` Cards piloto divergiam da hierarquia tipográfica dos cards de lista · UI · 0,2 d
+
+Os cards de formulário e de entidade passam a aplicar diretamente a fonte canônica do sistema e
+a hierarquia tipográfica das listas: títulos `xl`/800, nomes e valores `sm`/800, metadados
+`xs`/500 e rótulos de fatos em 10px/900. Nenhuma classe legada foi importada e cores e estrutura
+dos componentes permanecem inalteradas.
+
+### NOVO-20260813-185012-ea394e1429c9 ✅ RESOLVIDO · `NOVO` Opção selecionada do select piloto usava o papel de superfície incorreto · UI · 0,1 d
+
+A opção selecionada do menu passa a usar diretamente `--color-acent-secundary`, inclusive durante
+hover e foco. Como o menu é transportado para o `body`, o token recebe valor direto nas camadas
+clara e escura desse contexto; opções não selecionadas mantêm hover e foco na cor primária.
+
+### NOVO-20260813-185458-e5169fc903c8 ✅ RESOLVIDO · `NOVO` Variação toggle do header piloto era apenas uma navegação estática · JS/UI · 0,2 d
+
+Foi criado `c-dev.header_toggle`, com botões de estado e `aria-pressed`. O JavaScript externo do
+piloto alterna o item ativo e atualiza o título do header entre Instituição, Ofício e Roteiros,
+sem recarregar a página. O enhancer oferece inicialização e destruição; headers reais permanecem
+inalterados.
+
+### NOVO-20260813-185807-5476832caabe ✅ RESOLVIDO · `NOVO` Card de formulário piloto exibia borda externa e divisor de header indesejados · UI · 0,1 d
+
+A borda externa do `main-preview-form-card` e o divisor inferior de seu header foram zerados. A
+superfície, o raio, o espaçamento e a barra de destaque permanecem inalterados; o editor real de
+Roteiro não foi modificado.
+
+### NOVO-20260813-185953-04e844fdd145 ✅ RESOLVIDO · `NOVO` Busca contextual do quick-add era sobrescrita pela cor secundária geral dos campos · UI · 0,1 d
+
+A regra da busca “Ofício vinculado” recebeu a especificidade do escopo completo e passa a consumir
+diretamente `--color-primary`. A busca superior “Buscar justificativas” permanece na secundária;
+nenhuma página real foi alterada.
+
+### NOVO-20260813-190246-08d35cec2a64 ✅ RESOLVIDO · `NOVO` Bordas dos sub-headers não eram perceptíveis em todas as variações · UI · 0,1 d
+
+Filtros, quick-add e stepper usam a mesma borda discreta de 1px, com valor direto e adequado ao
+contraste de cada tema. A borda superior também foi preservada quando o sub-header está emendado ao
+seu header, sem alterar os headers principais nem o card de formulário.
+
+### NOVO-20260813-191334-d518c08a44a1 ✅ RESOLVIDO · `NOVO` Painel de coleção escuro usava os papéis primário e secundário invertidos · UI · 0,1 d
+
+No tema escuro, a superfície externa do painel passa a usar diretamente a primária `#132132` e
+linhas e paginação passam a usar a secundária `#223348`. O tema claro e a estrutura do componente
+permanecem inalterados.
+
+### NOVO-20260813-191605-c807e2879db4 ✅ RESOLVIDO · `NOVO` Componentes piloto duplicavam os tokens principais de superfície · UI · 0,2 d
+
+Form-card, entity-card e collection-panel passam a consumir diretamente `--color-primary` e
+`--color-secondary`. Foram removidos os seis nomes específicos que repetiam esses mesmos valores;
+nenhum alias ou novo token de superfície foi criado. Tokens próprios de texto, borda, estado e
+accent foram preservados porque representam papéis diferentes.
+
+### NOVO-20260813-192058-f5754ae91818 ✅ RESOLVIDO · `NOVO` Footer do card de Ofício possuía divisor e exemplos não tinham espaçamento uniforme · UI · 0,1 d
+
+O divisor superior do footer do entity-card foi removido. Form-card, entity-card e
+collection-panel passam a usar o mesmo espaçamento externo de 20px já aplicado aos conjuntos de
+header e sub-header, evitando componentes visualmente colados.
+
+### NOVO-20260813-192309-77b4176da884 ✅ RESOLVIDO · `NOVO` Header do card de Ofício ainda possuía divisor inferior · UI · 0,1 d
+
+O divisor inferior do header do entity-card foi removido, assim como já havia ocorrido com o
+footer. O espaçamento interno e a separação uniforme entre os componentes foram preservados.
+
+### NOVO-20260813-192620-0d0a2ee2604b ✅ RESOLVIDO · `NOVO` Entity-card usava paddings externos diferentes do form-card · UI · 0,1 d
+
+O entity-card passa a repetir o contrato do form-card: `16px 20px` no header e no footer e `16px`
+no corpo. O conteúdo, os gaps internos e o comportamento responsivo permanecem inalterados.

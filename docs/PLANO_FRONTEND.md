@@ -315,6 +315,54 @@ alcançável em produção. Não vira ID.
 - [x] `NOVO-20260813-174518-c11a152b3951` — fundo das três variações de sub-header
   passa a usar a cor primária do piloto.
 - [x] `NOVO-20260813-174650-8d42b37baa7e` — cores aprovadas preservadas com semântica corrigida:
-  faixa/listbox primários e controles internos secundários.
+  faixa primária e controles internos secundários; o listbox foi alinhado à secundária depois.
 - [x] `NOVO-20260813-174920-05e64dddaf01` — listbox usa a mesma espessura e o mesmo token
   de borda do sub-header em cada tema.
+- [x] `NOVO-20260813-175332-5e403f4623e7` — primária e secundária do piloto têm valores
+  diretos por tema, sem aliases, misturas ou dependências cruzadas.
+- [x] `NOVO-20260813-175642-534d862bebf9` — listbox usa a secundária e hover/foco das opções
+  usam a primária, sem mudar os valores dos tokens.
+- [x] `NOVO-20260813-180435-8659b1be555f` — sub-header stepper do piloto reutiliza o
+  `page_stepper` oficial de Ofícios, com conectores, marcadores e estados canônicos.
+- [x] `NOVO-20260813-181307-5480426bf196` — marcador atual do stepper usa diretamente
+  `--color-acent-primary`, com valor próprio em cada tema do piloto.
+- [x] `NOVO-20260813-181456-5fb6cde15b32` — marcador concluído do stepper usa diretamente
+  `--color-acent-secundary`, com valor próprio em cada tema do piloto.
+- [x] `NOVO-20260813-181722-0ac121ceee46` — respiro vertical do stepper preserva integralmente
+  o halo da etapa atual sem remover a rolagem horizontal responsiva.
+- [x] `NOVO-20260813-181839-ce8dd0e582cb` — card de roteiro recriado como componente isolado
+  na página-piloto, com dados estáticos e CSS próprio para os dois temas.
+- [x] `NOVO-20260813-182642-5af6808073e6` — terceiro papel de superfície removido do card
+  piloto nos dois temas, sem introduzir nova cor.
+- [x] `NOVO-20260813-182804-7bb5ba76ccc5` — botões, linhas de local e valores do card piloto
+  usam diretamente sua cor primária nos dois temas.
+- [x] `NOVO-20260813-182902-7670c81c1b29` — valores internos de estado e cidade usam a
+  secundária, mantendo linhas, botões e métricas na primária.
+- [x] `NOVO-20260813-183018-f847a6f4d130` — card completo de Ofício recriado como componente
+  isolado na página-piloto, com dados estáticos e temas próprios.
+- [x] `NOVO-20260813-183956-c0a8b4f574a0` — painel de coleção de Unidades recriado como
+  componente isolado no piloto, com paginação e linhas estáticas.
+- [x] `NOVO-20260813-184339-4be90a915693` — sub-header quick-add do piloto ampliado para
+  retratar busca, orientação e resultados do fluxo de Justificativas.
+- [x] `NOVO-20260813-184600-8256932ed3b4` — cards de formulário e entidade do piloto
+  alinhados à fonte e à hierarquia tipográfica canônica dos cards de lista.
+- [x] `NOVO-20260813-185012-ea394e1429c9` — opção selecionada do select piloto usa
+  `--color-acent-secundary` também durante hover e foco.
+- [x] `NOVO-20260813-185458-e5169fc903c8` — toggle do header piloto alterna estado visual,
+  `aria-pressed` e título, sem navegação ou recarregamento.
+- [x] `NOVO-20260813-185807-5476832caabe` — card de formulário piloto sem borda externa e
+  sem divisor inferior no header, preservando superfícies e espaçamentos.
+- [x] `NOVO-20260813-185953-04e844fdd145` — busca contextual do quick-add usa a primária,
+  enquanto a busca superior permanece na secundária.
+- [x] `NOVO-20260813-190246-08d35cec2a64` — filtros, quick-add e stepper exibem a mesma borda
+  discreta de 1px, com contraste próprio nos temas claro e escuro.
+- [x] `NOVO-20260813-191334-d518c08a44a1` — painel de coleção escuro usa a primária na
+  superfície externa e a secundária nas linhas e na paginação.
+- [x] `NOVO-20260813-191605-c807e2879db4` — form-card, entity-card e collection-panel usam
+  diretamente `--color-primary` e `--color-secondary`, sem aliases de superfície.
+- [x] `NOVO-20260813-192058-f5754ae91818` — divisor do footer do entity-card removido e
+  espaçamento vertical dos exemplos uniformizado em 20px.
+- [x] `NOVO-20260813-192309-77b4176da884` — divisor inferior do header do entity-card removido,
+  preservando o espaçamento interno do componente.
+- [x] `NOVO-20260813-192620-0d0a2ee2604b` — entity-card alinhado aos paddings do form-card:
+  `16px 20px` nas extremidades e `16px` no corpo.

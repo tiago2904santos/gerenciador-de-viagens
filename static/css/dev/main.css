@@ -8,3 +8,9 @@
   background: var(--color-app-bg);
   padding: clamp(20px, 2.6vw, 40px);
 }
+
+.main-preview-form-card-example,
+.main-preview-entity-card-example,
+.main-preview-collection-panel-example {
+  margin-top: 20px;
+}

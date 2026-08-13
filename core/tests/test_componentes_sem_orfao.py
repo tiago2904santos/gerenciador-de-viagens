@@ -95,7 +95,7 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
 
     def test_namespace_unico_tem_o_inventario_atual(self):
         self.assertEqual(list((ROOT / "templates" / "components").rglob("*.*")), [])
-        self.assertEqual(len(self.components()), 85)
+        self.assertEqual(len(self.components()), 91)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.

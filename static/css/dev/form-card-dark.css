@@ -1,0 +1,8 @@
+/* Tokens principais do card de formulário no tema escuro. */
+
+html[data-theme="dark"] .main-preview-shell {
+  --color-form-card-accent: #d8a21b;
+  --color-form-card-border: rgba(255, 255, 255, 0.1);
+  --color-form-card-muted: #afc0d3;
+  --color-form-card-text: #ffffff;
+}

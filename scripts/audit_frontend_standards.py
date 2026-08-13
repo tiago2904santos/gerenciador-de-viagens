@@ -66,6 +66,30 @@ CSS_EXCEPTIONS: dict[str, dict] = {
         "reason": "Camada de tokens principais do sub-header no tema escuro da pagina-piloto.",
         "rules": {"hex_color_outside_tokens"},
     },
+    "static/css/dev/form-card-light.css": {
+        "reason": "Camada de tokens principais do card de formulario no tema claro da pagina-piloto.",
+        "rules": {"hex_color_outside_tokens"},
+    },
+    "static/css/dev/form-card-dark.css": {
+        "reason": "Camada de tokens principais do card de formulario no tema escuro da pagina-piloto.",
+        "rules": {"hex_color_outside_tokens"},
+    },
+    "static/css/dev/entity-card-light.css": {
+        "reason": "Camada de tokens principais do card de entidade no tema claro da pagina-piloto.",
+        "rules": {"hex_color_outside_tokens"},
+    },
+    "static/css/dev/entity-card-dark.css": {
+        "reason": "Camada de tokens principais do card de entidade no tema escuro da pagina-piloto.",
+        "rules": {"hex_color_outside_tokens"},
+    },
+    "static/css/dev/collection-panel-light.css": {
+        "reason": "Camada de tokens principais do painel de colecao no tema claro da pagina-piloto.",
+        "rules": {"hex_color_outside_tokens"},
+    },
+    "static/css/dev/collection-panel-dark.css": {
+        "reason": "Camada de tokens principais do painel de colecao no tema escuro da pagina-piloto.",
+        "rules": {"hex_color_outside_tokens"},
+    },
     "static/css/components/theme-dark-components.css": {
         "reason": "Transitional dark-theme component overrides; literals allowed until dissolved into components.",
         "rules": {"hex_color_outside_tokens"},

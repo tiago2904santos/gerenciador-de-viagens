@@ -5,4 +5,7 @@ html[data-theme="dark"] .main-preview-shell {
   --color-header-border: rgba(255, 255, 255, 0.1);
   --color-header-eyebrow: #d8a21b;
   --color-header-title: #ffffff;
+  --color-header-toggle-active-bg: #d8a21b;
+  --color-header-toggle-active-text: #132132;
+  --color-header-toggle-bg: #132132;
 }
