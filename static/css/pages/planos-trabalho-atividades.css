@@ -487,11 +487,6 @@ html[data-theme="dark"] .pt-live-col {
   background: var(--list-header-control-bg, var(--color-card-muted));
 }
 
-.pt-preset-activities-panel__header {
-  display: grid;
-  gap: 3px;
-}
-
 .pt-preset-activities-panel__title,
 .pt-preset-activities-panel__description {
   margin: 0;
