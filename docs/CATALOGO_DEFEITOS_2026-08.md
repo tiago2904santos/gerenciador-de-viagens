@@ -1816,6 +1816,13 @@ rota `/prestacoes-contas/`, `oficios.css` (106 KB) chega com **0,0%** de uso.
 O trabalho está no [`PLANO_FRONTEND.md`](PLANO_FRONTEND.md); aqui fica a métrica de aceite:
 **uso acima de 35% por rota** ao fim da reconstrução.
 
+> **Remedido em 13/08/2026, depois do fechamento do `NOVO-15`: continua aberto.** A régua
+> versionada do `NOVO-70` passou nas 43 rotas, mas ela é uma catraca contra regressão, não prova o
+> aceite de 35%. O relatório do CI do PR #397 mediu, por exemplo, `oficios-lista` em **16,38%**,
+> as etapas do wizard entre **16,23% e 23,35%**, e as telas de modelos de motivo em **15,01%**.
+> Portanto o carregamento ainda entrega centenas de KB que a rota não usa; não há base para marcar
+> este ID como resolvido só porque a reconstrução avançou.
+
 ### PF-03 ✅ RESOLVIDO · 🟡 Toda requisição escreve na tabela de sessão · MED · 1–2 d · risco médio
 
 `config/settings/base.py:111` — `SESSION_SAVE_EVERY_REQUEST = True`. Custo fixo de uma requisição
@@ -5521,7 +5528,7 @@ Apagar o excesso bastava; acrescentar foi o instinto errado.
 
 **Catraca:** `audit_foco_visivel` **32 → 30**.
 
-### NOVO-53 🟠 PARCIAL · `NOVO` A maiúscula dos campos é decidida campo a campo, em dois apps de onze · HT · 1 d
+### NOVO-53 ✅ RESOLVIDO · `NOVO` A maiúscula dos campos era decidida campo a campo, em dois apps de onze · HT · 1 d
 
 O dono pediu "tudo uppercase" nos campos e escolheu, entre duas opções, a que **muda o valor** —
 máscara — e não `text-transform`. A diferença é de produto: o que chega ao banco vem em maiúscula, e
@@ -5556,6 +5563,12 @@ e nada falharia: o atributo ficaria no HTML, inerte.
 **Fica declarado o que este ID NÃO faz:** os registros já gravados continuam com a caixa que tinham.
 A máscara vale do próximo cadastro em diante. Uniformizar o histórico é migração de dados, com
 contagem por campo, e é decisão separada.
+
+> **Reconciliado em 13/08/2026.** O `PARCIAL` ficou obsoleto quando `NOVO-55` cobriu os 29
+> `TextInput` inline e `NOVO-56` retirou a máscara dos dois `username` que ela não podia atingir.
+> O contrato final inspeciona os formulários reais: **57 campos de texto** recebem `upper`, nenhum
+> nome reservado, campo de busca ou widget incompatível recebe. A dívida dos valores históricos é
+> outra unidade de trabalho, `NOVO-57`, e não mantém este ID aberto.
 
 ### NOVO-54 ✅ RESOLVIDO · `NOVO` `.cv-field__control` não tem regra base — o campo é o elemento cru mais 64 correções · UI · 2 d
 
@@ -5936,7 +5949,7 @@ combinam. É declaração que não faz nada, não fundo faltando. Fica registrad
 resto do `NOVO-58`, não como correção urgente — e o `var(--x, fallback)` que já existe em dois usos
 do mesmo token (linhas 988 e 993) mostra que alguém já tropeçou nisto antes.
 
-### NOVO-60 🟠 `NOVO` A renomeação por função é 98% mecânica — e os 2% restantes são arqueologia, não digitação · UI · a decidir
+### NOVO-60 ✅ RESOLVIDO (dimensionamento) · `NOVO` A renomeação por função é 98% mecânica — e os 2% restantes são arqueologia, não digitação · UI · a decidir
 
 Levantamento para a renomeação que o dono aprovou (inglês, sem `cv-`, nome pela função, prefixo só
 quando o nome sozinho for ambíguo). O número que decide o formato do trabalho:
@@ -5994,6 +6007,12 @@ A regra está morta hoje, mas o nome não estaria depois da troca. `chip` é amb
 **Ordem sugerida:** (1) apagar os 10 nomes mortos, com prova de grep; (2) resolver os 3 vivos, um
 por vez, porque cada um é uma decisão; (3) só então a renomeação mecânica dos 585, família por
 família.
+
+> **Reconciliado em 13/08/2026.** Este ID foi aberto como levantamento “a decidir”, e esse produto
+> está completo: 598 classes foram inventariadas, 13 colisões classificadas e a sequência segura
+> foi definida. A execução não ficou escondida aqui: `NOVO-61` fechou a poda provada, enquanto a
+> renomeação por famílias pertence às fatias E7b/E7c. O plano mestre já registrava `NOVO-60` como
+> **levantamento fechado**; o título do catálogo é que ainda parecia uma correção pendente.
 
 ### NOVO-61 ✅ RESOLVIDO · 🟡 `NOVO` Dez nomes de classe mortos sobrevivem dentro de seletor agrupado vivo · MOR · 0,25 d
 
