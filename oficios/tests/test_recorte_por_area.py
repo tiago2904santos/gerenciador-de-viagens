@@ -25,12 +25,20 @@ from __future__ import annotations
 from django.conf import settings
 from django.test import TestCase
 
+from cadastros.models import Combustivel
+from cadastros.models import Servidor
+from cadastros.models import Unidade
+from cadastros.models import Viatura
 from core.testing import com_request
 from core.testing import sem_request
+from oficios.forms import OficioDadosViajantesForm
+from oficios.forms import OficioForm
+from oficios.forms import OficioTransporteForm
 from oficios.models import ConfiguracaoNumeracaoOficio
 from oficios.models import ModeloMotivoOficio
 from oficios.models import Oficio
 from oficios.models import OficioNumeroLacuna
+from roteiros.models import Roteiro
 from usuarios.models import AreaTrabalho
 
 
@@ -93,6 +101,53 @@ class RecorteChegaNosQuatroModelosTests(TestCase):
             with self.subTest(modelo=modelo.__name__):
                 self.assertIs(modelo._default_manager, modelo.all_objects)
                 self.assertEqual(modelo._meta.default_manager_name, "all_objects")
+
+
+class ModelFormsRecortamRelacoesTests(TestCase):
+    def setUp(self):
+        self.area = AreaTrabalho.objects.create(nome="Área Form A", sigla="FRM-A")
+        self.outra = AreaTrabalho.objects.create(nome="Área Form B", sigla="FRM-B")
+        with sem_request():
+            for area, sufixo in ((self.area, "A"), (self.outra, "B")):
+                Unidade.objects.create(area=area, nome=f"Unidade {sufixo}")
+                Combustivel.objects.create(area=area, nome=f"Combustível {sufixo}")
+                Servidor.objects.create(area=area, nome=f"Servidor {sufixo}")
+                Viatura.objects.create(area=area, placa=f"ABC000{sufixo}")
+                Roteiro.objects.create(area=area)
+
+    def assert_so_area_ativa(self, field):
+        self.assertEqual(
+            set(field.queryset.values_list("area_id", flat=True)),
+            {self.area.pk},
+        )
+
+    def test_oficio_form_recorta_as_seis_relacoes(self):
+        with com_request(self.area):
+            form = OficioForm()
+
+        for nome in (
+            "roteiro",
+            "solicitante",
+            "servidores",
+            "servidores_termo_autorizacao",
+            "viatura",
+            "motorista",
+        ):
+            with self.subTest(campo=nome):
+                self.assert_so_area_ativa(form.fields[nome])
+
+    def test_forms_do_wizard_recortam_relacoes_herdadas_e_transporte(self):
+        with com_request(self.area):
+            dados = OficioDadosViajantesForm()
+            transporte = OficioTransporteForm()
+
+        for form, nomes in (
+            (dados, ("servidores", "servidores_termo_autorizacao", "viatura")),
+            (transporte, ("viatura", "motorista", "transporte_combustivel_manual")),
+        ):
+            for nome in nomes:
+                with self.subTest(form=form.__class__.__name__, campo=nome):
+                    self.assert_so_area_ativa(form.fields[nome])
 
 
 class NumeracaoNaoPodeSerRecortadaTests(TestCase):
