@@ -540,10 +540,13 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [x] `JS-09` tela embutida entrega só `http.js` + polling: 283.282 → 4.255 bytes de JS · **E11**
 - [x] `JS-10` três stubs sem consumidor removidos; módulos reais e bootstrap preservados · **E11**
 
-**Fechados nesta fase antes do dimensionamento** (a reconstrução parcial de 07–08/08, que o quadro
-não registrava): `NOVO-50/MED` paleta de 255 cores duplicadas · `NOVO-51` poda dos 55 apelidos
-puros de token · `NOVO-52` foco no editor de roteiro · `NOVO-53`/`NOVO-55`/`NOVO-56`/`NOVO-57`
-máscara de maiúscula · `NOVO-59` ícone de botão invisível no tema claro · `NOVO-60` levantamento da
+**Fechados nesta fase** (inclui a reconstrução parcial de 07–08/08, que o quadro não registrava, e
+o fechamento operacional posterior do `NOVO-57`): `NOVO-50/MED` paleta de 255 cores duplicadas ·
+`NOVO-51` poda dos 55 apelidos
+puros de token · `NOVO-52` foco no editor de roteiro · `NOVO-53`/`NOVO-55`/`NOVO-56` máscara de
+maiúscula · `NOVO-57` histórico normalizado em produção (6.597 valores, 77 gravados e zero
+divergentes após backup e pós-checagem) · `NOVO-59` ícone de botão invisível no tema claro ·
+`NOVO-60` levantamento da
 renomeação por função · `NOVO-61` dez nomes mortos em seletor agrupado · `NOVO-62` `Inter`
 empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral globalizada ·
 `NOVO-64` 176 tokens sem prefixo · `NOVO-65` 545 classes sem prefixo.
