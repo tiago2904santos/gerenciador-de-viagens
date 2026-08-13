@@ -4559,7 +4559,7 @@ real trava os três lados do contrato: grupo, nome acessível e instrução asso
 
 ---
 
-### NOVO-42 🟠 `NOVO` Seis telas de catálogo exibem ao usuário o alerta de contrato quebrado do `N-07` · HT · 0,5 d
+### NOVO-42 ✅ RESOLVIDO (12/08/2026) · `NOVO` Seis telas de catálogo exibem ao usuário o alerta de contrato quebrado do `N-07` · HT · 0,5 d
 
 Visto na tela ao conferir o `HT-02` no navegador, e depois medido por varredura das 20 rotas de
 lista com `test.Client`:
@@ -4588,6 +4588,11 @@ telas param de declarar `paginacao_obrigatoria`. A primeira é a certa: catálog
 
 **Não é regressão desta etapa** — conferido no `main` antes de qualquer edição do `HT-02`, e o
 alerta já estava lá.
+
+**Fechamento e remedição:** os sete catálogos construídos por `core.catalog` — os seis medidos
+acima e também atividades, que passou a usar o mesmo shell — agora declaram `paginar_por=20`. A
+fábrica entrega `page_obj`, páginas elididas e querystring preservada em todos eles. Uma catraca
+percorre as sete rotas reais, exige ausência do alerta e confirma o tamanho de página.
 
 **Medição que falta:** quantos ofícios já emitidos teriam contagem diferente hoje. Sem isso não dá
 para saber se é dívida histórica ou risco corrente.

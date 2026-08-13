@@ -55,6 +55,7 @@ MODELOS_JUSTIFICATIVA = CatalogConfig(
         erro_ao_salvar="Não foi possível salvar o modelo. Verifique os dados informados.",
         padrao_definido="Modelo definido como padrao.",
     ),
+    paginar_por=20,
     url_fallback_next="justificativas:index",
     # O presenter monta o `set_default_url` e precisa do `next_url` para isso.
     presenter_recebe_set_default=False,
