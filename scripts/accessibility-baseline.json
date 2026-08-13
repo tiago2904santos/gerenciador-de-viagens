@@ -1,0 +1,1757 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "route": "cargo-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "cargo-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "cargo-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "cargo-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "cargo-editar",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".record-row__badge"
+    },
+    {
+      "route": "cargo-novo",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "cargo-novo",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "cargo-novo",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "cargo-novo",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "cargo-novo",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".record-row__badge"
+    },
+    {
+      "route": "cargos-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "cargos-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "cargos-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "cargos-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "cargos-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".record-row__badge"
+    },
+    {
+      "route": "combustiveis-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "combustiveis-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "combustiveis-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "combustiveis-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "combustivel-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "combustivel-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "combustivel-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "combustivel-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "combustivel-novo",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "combustivel-novo",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "combustivel-novo",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "combustivel-novo",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "configuracao",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "configuracao",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "configuracao",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "configuracao",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "dashboard",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "dashboard",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "dashboard",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "dashboard",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "eventos-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "eventos-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "eventos-lista",
+      "theme": "dark",
+      "rule": "button-name",
+      "target": "#cs-1-trigger"
+    },
+    {
+      "route": "eventos-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "eventos-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "eventos-lista",
+      "theme": "light",
+      "rule": "button-name",
+      "target": "#cs-1-trigger"
+    },
+    {
+      "route": "justificativas-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "justificativas-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "justificativas-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "justificativas-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "justificativas-editar",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".record-row__badge"
+    },
+    {
+      "route": "justificativas-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "justificativas-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "justificativas-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "justificativas-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "justificativas-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".list-header__eyebrow"
+    },
+    {
+      "route": "justificativas-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": "h1"
+    },
+    {
+      "route": "justificativas-novo",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "justificativas-novo",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "justificativas-novo",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "justificativas-novo",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "justificativas-novo",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".record-row__badge"
+    },
+    {
+      "route": "login",
+      "theme": "dark",
+      "rule": "color-contrast",
+      "target": "button"
+    },
+    {
+      "route": "login",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": "footer"
+    },
+    {
+      "route": "oficios-detalhe",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-detalhe",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-detalhe",
+      "theme": "dark",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"justificativa/\"]"
+    },
+    {
+      "route": "oficios-detalhe",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-detalhe",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-detalhe",
+      "theme": "light",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"justificativa/\"]"
+    },
+    {
+      "route": "oficios-detalhe",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".field-side-action"
+    },
+    {
+      "route": "oficios-detalhe",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".page-stepper__content-link[href$=\"documentos/\"][data-autosave-link=\"1\"] > .page-stepper__status"
+    },
+    {
+      "route": "oficios-detalhe",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".page-stepper__content-link[href$=\"roteiro/\"][data-autosave-link=\"1\"] > .page-stepper__status"
+    },
+    {
+      "route": "oficios-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-editar",
+      "theme": "dark",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"justificativa/\"]"
+    },
+    {
+      "route": "oficios-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-editar",
+      "theme": "light",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"justificativa/\"]"
+    },
+    {
+      "route": "oficios-editar",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".field-side-action"
+    },
+    {
+      "route": "oficios-editar",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".page-stepper__content-link[href$=\"documentos/\"][data-autosave-link=\"1\"] > .page-stepper__status"
+    },
+    {
+      "route": "oficios-editar",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".page-stepper__content-link[href$=\"roteiro/\"][data-autosave-link=\"1\"] > .page-stepper__status"
+    },
+    {
+      "route": "oficios-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-lista",
+      "theme": "dark",
+      "rule": "button-name",
+      "target": "#cs-1-trigger"
+    },
+    {
+      "route": "oficios-lista",
+      "theme": "dark",
+      "rule": "color-contrast",
+      "target": ".fact-row > .person-row__body > .person-row__meta"
+    },
+    {
+      "route": "oficios-lista",
+      "theme": "dark",
+      "rule": "color-contrast",
+      "target": ".fact-row > .person-row__body > .person-row__name-row > .person-row__badge"
+    },
+    {
+      "route": "oficios-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-lista",
+      "theme": "light",
+      "rule": "button-name",
+      "target": "#cs-1-trigger"
+    },
+    {
+      "route": "oficios-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".fact-row > .person-row__body > .person-row__meta"
+    },
+    {
+      "route": "oficios-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".itinerary__time"
+    },
+    {
+      "route": "oficios-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".person-row--highlight > .person-row__body > .person-row__meta"
+    },
+    {
+      "route": "oficios-modelos-motivo-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-modelos-motivo-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-modelos-motivo-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-modelos-motivo-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-modelos-motivo-editar",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".record-row__badge"
+    },
+    {
+      "route": "oficios-modelos-motivo-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-modelos-motivo-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-modelos-motivo-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-modelos-motivo-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-modelos-motivo-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".record-row__badge"
+    },
+    {
+      "route": "oficios-modelos-motivo-novo",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-modelos-motivo-novo",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-modelos-motivo-novo",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-modelos-motivo-novo",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-modelos-motivo-novo",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".record-row__badge"
+    },
+    {
+      "route": "oficios-novo",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-novo",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-novo",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-novo",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-wizard-dados-viajantes",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-wizard-dados-viajantes",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-wizard-dados-viajantes",
+      "theme": "dark",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"justificativa/\"]"
+    },
+    {
+      "route": "oficios-wizard-dados-viajantes",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-wizard-dados-viajantes",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-wizard-dados-viajantes",
+      "theme": "light",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"justificativa/\"]"
+    },
+    {
+      "route": "oficios-wizard-dados-viajantes",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".field-side-action"
+    },
+    {
+      "route": "oficios-wizard-dados-viajantes",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".page-stepper__content-link[href$=\"documentos/\"][data-autosave-link=\"1\"] > .page-stepper__status"
+    },
+    {
+      "route": "oficios-wizard-dados-viajantes",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".page-stepper__content-link[href$=\"roteiro/\"][data-autosave-link=\"1\"] > .page-stepper__status"
+    },
+    {
+      "route": "oficios-wizard-documentos",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-wizard-documentos",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-wizard-documentos",
+      "theme": "dark",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"dados-viajantes/\"]"
+    },
+    {
+      "route": "oficios-wizard-documentos",
+      "theme": "dark",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"justificativa/\"]"
+    },
+    {
+      "route": "oficios-wizard-documentos",
+      "theme": "dark",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"roteiro/\"]"
+    },
+    {
+      "route": "oficios-wizard-documentos",
+      "theme": "dark",
+      "rule": "nested-interactive",
+      "target": ".document-inline-card--lazy[data-lazy-inline=\"\"]:nth-child(2) > summary"
+    },
+    {
+      "route": "oficios-wizard-documentos",
+      "theme": "dark",
+      "rule": "nested-interactive",
+      "target": ".oficio-documentos-preview-section__body > .document-inline-card--lazy[data-lazy-inline=\"\"]:nth-child(1) > summary"
+    },
+    {
+      "route": "oficios-wizard-documentos",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-wizard-documentos",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-wizard-documentos",
+      "theme": "light",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"dados-viajantes/\"]"
+    },
+    {
+      "route": "oficios-wizard-documentos",
+      "theme": "light",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"justificativa/\"]"
+    },
+    {
+      "route": "oficios-wizard-documentos",
+      "theme": "light",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"roteiro/\"]"
+    },
+    {
+      "route": "oficios-wizard-documentos",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".oficio-documentos-traveller-tile__termo"
+    },
+    {
+      "route": "oficios-wizard-documentos",
+      "theme": "light",
+      "rule": "nested-interactive",
+      "target": ".document-inline-card--lazy[data-lazy-inline=\"\"]:nth-child(2) > summary"
+    },
+    {
+      "route": "oficios-wizard-documentos",
+      "theme": "light",
+      "rule": "nested-interactive",
+      "target": ".oficio-documentos-preview-section__body > .document-inline-card--lazy[data-lazy-inline=\"\"]:nth-child(1) > summary"
+    },
+    {
+      "route": "oficios-wizard-justificativa",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-wizard-justificativa",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-wizard-justificativa",
+      "theme": "dark",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"dados-viajantes/\"]"
+    },
+    {
+      "route": "oficios-wizard-justificativa",
+      "theme": "dark",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"roteiro/\"]"
+    },
+    {
+      "route": "oficios-wizard-justificativa",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-wizard-justificativa",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-wizard-justificativa",
+      "theme": "light",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"dados-viajantes/\"]"
+    },
+    {
+      "route": "oficios-wizard-justificativa",
+      "theme": "light",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"roteiro/\"]"
+    },
+    {
+      "route": "oficios-wizard-justificativa",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".page-stepper__content-link[href$=\"documentos/\"][data-autosave-link=\"1\"] > .page-stepper__status"
+    },
+    {
+      "route": "oficios-wizard-resumo",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-wizard-resumo",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-wizard-resumo",
+      "theme": "dark",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"dados-viajantes/\"]"
+    },
+    {
+      "route": "oficios-wizard-resumo",
+      "theme": "dark",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"justificativa/\"]"
+    },
+    {
+      "route": "oficios-wizard-resumo",
+      "theme": "dark",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"roteiro/\"]"
+    },
+    {
+      "route": "oficios-wizard-resumo",
+      "theme": "dark",
+      "rule": "nested-interactive",
+      "target": ".document-inline-card--lazy[data-lazy-inline=\"\"]:nth-child(2) > summary"
+    },
+    {
+      "route": "oficios-wizard-resumo",
+      "theme": "dark",
+      "rule": "nested-interactive",
+      "target": ".oficio-documentos-preview-section__body > .document-inline-card--lazy[data-lazy-inline=\"\"]:nth-child(1) > summary"
+    },
+    {
+      "route": "oficios-wizard-resumo",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-wizard-resumo",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-wizard-resumo",
+      "theme": "light",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"dados-viajantes/\"]"
+    },
+    {
+      "route": "oficios-wizard-resumo",
+      "theme": "light",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"justificativa/\"]"
+    },
+    {
+      "route": "oficios-wizard-resumo",
+      "theme": "light",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"roteiro/\"]"
+    },
+    {
+      "route": "oficios-wizard-resumo",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".oficio-documentos-traveller-tile__termo"
+    },
+    {
+      "route": "oficios-wizard-resumo",
+      "theme": "light",
+      "rule": "nested-interactive",
+      "target": ".document-inline-card--lazy[data-lazy-inline=\"\"]:nth-child(2) > summary"
+    },
+    {
+      "route": "oficios-wizard-resumo",
+      "theme": "light",
+      "rule": "nested-interactive",
+      "target": ".oficio-documentos-preview-section__body > .document-inline-card--lazy[data-lazy-inline=\"\"]:nth-child(1) > summary"
+    },
+    {
+      "route": "oficios-wizard-roteiro",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-wizard-roteiro",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-wizard-roteiro",
+      "theme": "dark",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"dados-viajantes/\"]"
+    },
+    {
+      "route": "oficios-wizard-roteiro",
+      "theme": "dark",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"justificativa/\"]"
+    },
+    {
+      "route": "oficios-wizard-roteiro",
+      "theme": "dark",
+      "rule": "label",
+      "target": ".roteiro-deslocamento__body > .field-grid--cols-3.oficio-roteiro-time-calc-grid.roteiro-time-calc-grid > .cv-field--readonly.field-size-1.cv-field > .trecho-tempo-total[aria-readonly=\"true\"][readonly=\"\"]"
+    },
+    {
+      "route": "oficios-wizard-roteiro",
+      "theme": "dark",
+      "rule": "label",
+      "target": "input[value=\"CURITIBA\"][aria-readonly=\"true\"][readonly=\"\"]"
+    },
+    {
+      "route": "oficios-wizard-roteiro",
+      "theme": "dark",
+      "rule": "label",
+      "target": "input[value=\"LONDRINA\"][aria-readonly=\"true\"][readonly=\"\"]"
+    },
+    {
+      "route": "oficios-wizard-roteiro",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-wizard-roteiro",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-wizard-roteiro",
+      "theme": "light",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"dados-viajantes/\"]"
+    },
+    {
+      "route": "oficios-wizard-roteiro",
+      "theme": "light",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"justificativa/\"]"
+    },
+    {
+      "route": "oficios-wizard-roteiro",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".page-stepper__content-link[href$=\"documentos/\"][data-autosave-link=\"1\"] > .page-stepper__status"
+    },
+    {
+      "route": "oficios-wizard-roteiro",
+      "theme": "light",
+      "rule": "label",
+      "target": ".roteiro-deslocamento__body > .field-grid--cols-3.oficio-roteiro-time-calc-grid.roteiro-time-calc-grid > .cv-field--readonly.field-size-1.cv-field > .trecho-tempo-total[aria-readonly=\"true\"][readonly=\"\"]"
+    },
+    {
+      "route": "oficios-wizard-roteiro",
+      "theme": "light",
+      "rule": "label",
+      "target": "input[value=\"CURITIBA\"][aria-readonly=\"true\"][readonly=\"\"]"
+    },
+    {
+      "route": "oficios-wizard-roteiro",
+      "theme": "light",
+      "rule": "label",
+      "target": "input[value=\"LONDRINA\"][aria-readonly=\"true\"][readonly=\"\"]"
+    },
+    {
+      "route": "oficios-wizard-transporte",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-wizard-transporte",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-wizard-transporte",
+      "theme": "dark",
+      "rule": "aria-hidden-focus",
+      "target": ".oficio-motorista-manual"
+    },
+    {
+      "route": "oficios-wizard-transporte",
+      "theme": "dark",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"dados-viajantes/\"]"
+    },
+    {
+      "route": "oficios-wizard-transporte",
+      "theme": "dark",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"justificativa/\"]"
+    },
+    {
+      "route": "oficios-wizard-transporte",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "oficios-wizard-transporte",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "oficios-wizard-transporte",
+      "theme": "light",
+      "rule": "aria-hidden-focus",
+      "target": ".oficio-motorista-manual"
+    },
+    {
+      "route": "oficios-wizard-transporte",
+      "theme": "light",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"dados-viajantes/\"]"
+    },
+    {
+      "route": "oficios-wizard-transporte",
+      "theme": "light",
+      "rule": "aria-hidden-focus",
+      "target": ".page-stepper__marker.page-stepper__marker--link[href$=\"justificativa/\"]"
+    },
+    {
+      "route": "oficios-wizard-transporte",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": "#id_motorista_helptext"
+    },
+    {
+      "route": "oficios-wizard-transporte",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".page-stepper__content-link[href$=\"documentos/\"][data-autosave-link=\"1\"] > .page-stepper__status"
+    },
+    {
+      "route": "oficios-wizard-transporte",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".page-stepper__content-link[href$=\"roteiro/\"][data-autosave-link=\"1\"] > .page-stepper__status"
+    },
+    {
+      "route": "oficios-wizard-transporte",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": "p[data-oficio-motorista-helper-in=\"\"]"
+    },
+    {
+      "route": "ordens-servico-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "ordens-servico-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "ordens-servico-lista",
+      "theme": "dark",
+      "rule": "button-name",
+      "target": "#cs-1-trigger"
+    },
+    {
+      "route": "ordens-servico-lista",
+      "theme": "dark",
+      "rule": "color-contrast",
+      "target": ".fact-row > .person-row__body > .person-row__meta"
+    },
+    {
+      "route": "ordens-servico-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "ordens-servico-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "ordens-servico-lista",
+      "theme": "light",
+      "rule": "button-name",
+      "target": "#cs-1-trigger"
+    },
+    {
+      "route": "ordens-servico-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".fact-row > .person-row__body > .person-row__meta"
+    },
+    {
+      "route": "ordens-servico-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".person-row--highlight > .person-row__body > .person-row__meta"
+    },
+    {
+      "route": "planos-trabalho-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "planos-trabalho-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "planos-trabalho-lista",
+      "theme": "dark",
+      "rule": "button-name",
+      "target": "#cs-1-trigger"
+    },
+    {
+      "route": "planos-trabalho-lista",
+      "theme": "dark",
+      "rule": "button-name",
+      "target": "#cs-2-trigger"
+    },
+    {
+      "route": "planos-trabalho-lista",
+      "theme": "dark",
+      "rule": "color-contrast",
+      "target": ".person-row:nth-child(1) > .person-row__body > .person-row__name-row > .person-row__badge"
+    },
+    {
+      "route": "planos-trabalho-lista",
+      "theme": "dark",
+      "rule": "color-contrast",
+      "target": ".person-row:nth-child(2) > .person-row__body > .person-row__meta"
+    },
+    {
+      "route": "planos-trabalho-lista",
+      "theme": "dark",
+      "rule": "color-contrast",
+      "target": ".person-row:nth-child(2) > .person-row__body > .person-row__name-row > .person-row__badge"
+    },
+    {
+      "route": "planos-trabalho-lista",
+      "theme": "dark",
+      "rule": "color-contrast",
+      "target": ".person-row:nth-child(3) > .person-row__body > .person-row__meta"
+    },
+    {
+      "route": "planos-trabalho-lista",
+      "theme": "dark",
+      "rule": "color-contrast",
+      "target": ".person-row:nth-child(3) > .person-row__body > .person-row__name-row > .person-row__badge"
+    },
+    {
+      "route": "planos-trabalho-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "planos-trabalho-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "planos-trabalho-lista",
+      "theme": "light",
+      "rule": "button-name",
+      "target": "#cs-1-trigger"
+    },
+    {
+      "route": "planos-trabalho-lista",
+      "theme": "light",
+      "rule": "button-name",
+      "target": "#cs-2-trigger"
+    },
+    {
+      "route": "planos-trabalho-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".custom-select__value--placeholder"
+    },
+    {
+      "route": "planos-trabalho-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".person-row:nth-child(2) > .person-row__body > .person-row__meta"
+    },
+    {
+      "route": "planos-trabalho-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".person-row:nth-child(3) > .person-row__body > .person-row__meta"
+    },
+    {
+      "route": "prestacoes-contas-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "prestacoes-contas-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "prestacoes-contas-lista",
+      "theme": "dark",
+      "rule": "button-name",
+      "target": "#cs-1-trigger"
+    },
+    {
+      "route": "prestacoes-contas-lista",
+      "theme": "dark",
+      "rule": "button-name",
+      "target": "#cs-2-trigger"
+    },
+    {
+      "route": "prestacoes-contas-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "prestacoes-contas-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "prestacoes-contas-lista",
+      "theme": "light",
+      "rule": "button-name",
+      "target": "#cs-1-trigger"
+    },
+    {
+      "route": "prestacoes-contas-lista",
+      "theme": "light",
+      "rule": "button-name",
+      "target": "#cs-2-trigger"
+    },
+    {
+      "route": "prestacoes-contas-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".custom-select__value--placeholder"
+    },
+    {
+      "route": "prestacoes-contas-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".itinerary__time"
+    },
+    {
+      "route": "prestacoes-contas-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".person-row__meta"
+    },
+    {
+      "route": "roteiros-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "roteiros-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "roteiros-editar",
+      "theme": "dark",
+      "rule": "label",
+      "target": ".roteiro-deslocamento__body > .field-grid--cols-3.oficio-roteiro-time-calc-grid.roteiro-time-calc-grid > .cv-field--readonly.field-size-1.cv-field > .trecho-tempo-total[aria-readonly=\"true\"][readonly=\"\"]"
+    },
+    {
+      "route": "roteiros-editar",
+      "theme": "dark",
+      "rule": "label",
+      "target": "input[value=\"CURITIBA\"][aria-readonly=\"true\"][readonly=\"\"]"
+    },
+    {
+      "route": "roteiros-editar",
+      "theme": "dark",
+      "rule": "label",
+      "target": "input[value=\"LONDRINA\"][aria-readonly=\"true\"][readonly=\"\"]"
+    },
+    {
+      "route": "roteiros-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "roteiros-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "roteiros-editar",
+      "theme": "light",
+      "rule": "label",
+      "target": ".roteiro-deslocamento__body > .field-grid--cols-3.oficio-roteiro-time-calc-grid.roteiro-time-calc-grid > .cv-field--readonly.field-size-1.cv-field > .trecho-tempo-total[aria-readonly=\"true\"][readonly=\"\"]"
+    },
+    {
+      "route": "roteiros-editar",
+      "theme": "light",
+      "rule": "label",
+      "target": "input[value=\"CURITIBA\"][aria-readonly=\"true\"][readonly=\"\"]"
+    },
+    {
+      "route": "roteiros-editar",
+      "theme": "light",
+      "rule": "label",
+      "target": "input[value=\"LONDRINA\"][aria-readonly=\"true\"][readonly=\"\"]"
+    },
+    {
+      "route": "roteiros-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "roteiros-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "roteiros-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "roteiros-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "roteiros-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".itinerary__time"
+    },
+    {
+      "route": "roteiros-novo",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "roteiros-novo",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "roteiros-novo",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "roteiros-novo",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "servidor-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "servidor-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "servidor-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "servidor-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "servidor-novo",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "servidor-novo",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "servidor-novo",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "servidor-novo",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "servidores-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "servidores-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "servidores-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "servidores-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "termos-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "termos-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "termos-lista",
+      "theme": "dark",
+      "rule": "color-contrast",
+      "target": ".person-row--viatura > .person-row__avatar[aria-hidden=\"true\"]"
+    },
+    {
+      "route": "termos-lista",
+      "theme": "dark",
+      "rule": "color-contrast",
+      "target": ".person-row--viatura > .person-row__body > .person-row__meta"
+    },
+    {
+      "route": "termos-lista",
+      "theme": "dark",
+      "rule": "color-contrast",
+      "target": ".person-row--viatura > .person-row__body > .person-row__name-row > .person-row__badge"
+    },
+    {
+      "route": "termos-lista",
+      "theme": "dark",
+      "rule": "color-contrast",
+      "target": ".person-row:nth-child(1) > .person-row__avatar[aria-hidden=\"true\"]"
+    },
+    {
+      "route": "termos-lista",
+      "theme": "dark",
+      "rule": "color-contrast",
+      "target": ".person-row:nth-child(1) > .person-row__body > .person-row__meta"
+    },
+    {
+      "route": "termos-lista",
+      "theme": "dark",
+      "rule": "color-contrast",
+      "target": ".person-row:nth-child(1) > .person-row__body > .person-row__name-row > .person-row__badge"
+    },
+    {
+      "route": "termos-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "termos-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "termos-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".person-row--viatura > .person-row__body > .person-row__meta"
+    },
+    {
+      "route": "termos-lista",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".person-row:nth-child(1) > .person-row__body > .person-row__meta"
+    },
+    {
+      "route": "termos-preview-oficio",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "termos-preview-oficio",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "termos-preview-oficio",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "termos-preview-oficio",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "unidade-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "unidade-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "unidade-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "unidade-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "unidade-nova",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "unidade-nova",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "unidade-nova",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "unidade-nova",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "unidades-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "unidades-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "unidades-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "unidades-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "viatura-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "viatura-editar",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "viatura-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "viatura-editar",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "viatura-nova",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "viatura-nova",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "viatura-nova",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "viatura-nova",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "viatura-nova",
+      "theme": "light",
+      "rule": "color-contrast",
+      "target": ".custom-select__value--placeholder"
+    },
+    {
+      "route": "viaturas-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "viaturas-lista",
+      "theme": "dark",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    },
+    {
+      "route": "viaturas-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"dark\"]"
+    },
+    {
+      "route": "viaturas-lista",
+      "theme": "light",
+      "rule": "aria-allowed-attr",
+      "target": "button[data-theme-mode=\"light\"]"
+    }
+  ]
+}
