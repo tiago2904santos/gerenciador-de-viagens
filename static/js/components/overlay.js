@@ -286,7 +286,7 @@
   }
 
   function abrirMenuResolvido(trigger, menu) {
-    var wasOpen = menu.classList.contains("action-menu--open");
+    var wasOpen = !menu.hidden;
     closeMenus();
     if (wasOpen) return;
     rememberOwner(menu);

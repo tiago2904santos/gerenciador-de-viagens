@@ -182,20 +182,12 @@ JS_MASKS_OWNER = "static/js/components/masks.js"
 # Baixar um teto quando o número cair é parte do trabalho, não faxina opcional.
 JS_EXCEPTIONS: dict[str, dict] = {
     "static/js/pages/roteiros/editor/index.js": {
-        "reason": "NOVO-14: classes de campo de tempo como condição, sai com o editor (BE-11, fase 6). NOVO-15: HTML de trechos já renderizado pelo servidor.",
-        "rules": {"css_class_as_logic": 6, "innerhtml_dynamic_without_escape": 1},
-    },
-    "static/js/components/overlay.js": {
-        "reason": "NOVO-14: estado aberto do menu lido pela classe; sai na reconstrução do CSS (fase 7).",
-        "rules": {"css_class_as_logic": 1},
-    },
-    "static/js/components/icon-tooltips.js": {
-        "reason": "NOVO-14: distingue o botão de gerenciar pela classe; sai com HT-08 (fase 7).",
-        "rules": {"css_class_as_logic": 1},
+        "reason": "NOVO-15: HTML de trechos já renderizado pelo servidor.",
+        "rules": {"innerhtml_dynamic_without_escape": 1},
     },
     "static/js/components/picker-select.js": {
-        "reason": "NOVO-14: lê a própria classe de opção selecionada (fase 7). NOVO-15: interpola SVG constante do próprio arquivo.",
-        "rules": {"css_class_as_logic": 1, "innerhtml_dynamic_without_escape": 2},
+        "reason": "NOVO-15: interpola SVG constante do próprio arquivo.",
+        "rules": {"innerhtml_dynamic_without_escape": 2},
     },
     # NOVO-15 — innerHTML com dado dinâmico sem escapar. Nenhum destes é XSS
     # provado: a maioria interpola constante de ícone do próprio arquivo. Ficam

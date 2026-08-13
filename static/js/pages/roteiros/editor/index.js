@@ -1676,17 +1676,18 @@ export function initRoteirosEditor() {
     if (!c || applyingState) return;
     var n = e.target.name || '';
     var isTrechoDate = e.target.matches('[data-cv-date-picker-value]') && n.indexOf('_data') !== -1;
+    var timeKind = e.target.getAttribute('data-route-time-kind');
     if (
       n.indexOf('_saida_') !== -1 ||
       n.indexOf('_chegada_') !== -1 ||
       n.indexOf('_tempo_adicional_min') !== -1 ||
       n.indexOf('_tempo_cru_estimado_min') !== -1 ||
-      e.target.classList.contains('trecho-tempo-viagem-hhmm') ||
-      e.target.classList.contains('trecho-tempo-adicional-hhmm') ||
+      timeKind === 'travel' ||
+      timeKind === 'additional' ||
       isTrechoDate
     ) {
       if (n.indexOf('_tempo_adicional_min') !== -1) e.target.dataset.manual = '1';
-      if (e.target.classList.contains('trecho-tempo-adicional-hhmm')) {
+      if (timeKind === 'additional') {
         var h = c.querySelector('[name="trecho_' + c.dataset.ordem + '_tempo_adicional_min"]');
         if (h) h.dataset.manual = '1';
       }
@@ -1699,17 +1700,18 @@ export function initRoteirosEditor() {
     if (!c || applyingState) return;
     var n = e.target.name || '';
     var isTrechoDate = e.target.matches('[data-cv-date-picker-value]') && n.indexOf('_data') !== -1;
+    var timeKind = e.target.getAttribute('data-route-time-kind');
     if (
       n.indexOf('_saida_') !== -1 ||
       n.indexOf('_chegada_') !== -1 ||
       n.indexOf('_tempo_adicional_min') !== -1 ||
       n.indexOf('_tempo_cru_estimado_min') !== -1 ||
-      e.target.classList.contains('trecho-tempo-viagem-hhmm') ||
-      e.target.classList.contains('trecho-tempo-adicional-hhmm') ||
+      timeKind === 'travel' ||
+      timeKind === 'additional' ||
       isTrechoDate
     ) {
       if (n.indexOf('_tempo_adicional_min') !== -1) e.target.dataset.manual = '1';
-      if (e.target.classList.contains('trecho-tempo-adicional-hhmm')) {
+      if (timeKind === 'additional') {
         var h2 = c.querySelector('[name="trecho_' + c.dataset.ordem + '_tempo_adicional_min"]');
         if (h2) h2.dataset.manual = '1';
       }
