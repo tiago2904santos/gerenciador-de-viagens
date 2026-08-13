@@ -7706,7 +7706,7 @@ Folhas internas sem URL continuam fora.
 menor entre o piso anterior e a medição honesta — não se aproveitou a correção para subir os outros
 14 pisos. Esta é a mesma exceção documentada no `NOVO-101`: a catraca enfraquece uma vez porque
 parou de omitir dívida preexistente; depois volta a caminhar apenas no sentido exigido.
-### NOVO-107 · `NOVO` A fixture de prestação monta ofício sem roteiro, e o teste de diário fica verde por omissão · QA · 0,25 d
+### NOVO-107 ✅ RESOLVIDO · `NOVO` Fixture de prestação reproduz o roteiro obrigatório do fluxo real · QA · 0,25 d
 
 Achado na fatia 4 do `BE-14`, e é do tipo que não aparece em revisão de código: **o teste passa**.
 
@@ -7733,6 +7733,11 @@ novo, com a migração feita por módulo.
 **A família é maior que o diário.** Qualquer teste cuja asserção dependa de uma coleção derivada do
 roteiro (trechos, diárias por trecho, o próprio diário) tem o mesmo risco de medir vazio. Vale uma
 varredura por `criar_prestacao` antes de escrever a próxima rede sobre prestações.
+
+**Fechado.** `criar_prestacao` agora cria roteiro com um trecho por padrão, aceita
+`trechos_roteiro=N` para redes de laço e conserva `com_roteiro=False` somente para cenários que
+declarem explicitamente o estado legado impossível. As redes de diário deixaram de anexar roteiro
+depois da criação e passam a usar a mesma fixture que os outros dezenove módulos.
 
 ### NOVO-108 ✅ RESOLVIDO · `NOVO` A contagem por AST de gravação-em-view erra nos dois sentidos e não serve mais de alvo · QA · 0,5 d
 
