@@ -211,7 +211,9 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       Não restaura backup de propósito: para e instrui. **Fecha a Fase 1.**
 - [x] `QA-06` teste da CVE do WeasyPrint verifica texto-fonte, não comportamento
 - [x] `QA-07` sem lint/formatação/tipo em Python no CI — **lint fechado** (`ruff` em zero,
-      gate em `tests.yml`). Formatação e tipo seguem abertos como `NOVO-05`. A folga zero do
+      gate em `tests.yml`). Formatação, famílias adicionais e tipo foram dimensionados no
+      `NOVO-05` (571 arquivos fora do formato; 3.782 erros de tipo), sem fingir que uma ativação
+      global seria correção atômica. A folga zero do
       `--max-orm-em-view 30` continua de pé: qualquer ORM novo em view reprova o CI.
 - [x] `NOVO-11` o auditor de ORM em view conta `.objects` dentro de docstring — a contagem agora
       é por `ast` (`contar_orm_no_codigo`), com teste que falharia antes. A troca não mudou o

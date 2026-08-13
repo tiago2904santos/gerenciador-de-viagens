@@ -35,11 +35,13 @@ extend-exclude = [
 # não quebram, só produzem o resultado errado.
 #
 # Fora deste PR, com número medido para quem for ratchetar depois:
-#   `I`   (import order)  351 — reordenação mecânica em quase todo arquivo
-#   `UP`  (pyupgrade)     206
-#   `RUF`                 330
-#   `S`   (bandit)        128 — vale como ID próprio, não como efeito colateral
-#   `SIM`                  56
+#   `I`   (import order)  513 — reordenação mecânica em quase todo arquivo
+#   `UP`  (pyupgrade)     226
+#   `RUF`                 797
+#   `S`   (bandit)        116 — vale como ID próprio, não como efeito colateral
+#   `SIM`                 104
+# Remedido em 13/08/2026 pelo `NOVO-05`; formatação alcança 571/885 arquivos e
+# Pyright encontra 3.782 erros nos mesmos 885 arquivos.
 # Catraca só desce: quem adicionar um destes zera antes de selecionar.
 select = ["E4", "E7", "E9", "F", "B"]
 

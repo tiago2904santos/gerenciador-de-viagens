@@ -3486,7 +3486,7 @@ combinação que reproduziu.**
 A sondagem não foi em vão: forçar dependência de ordem com `--reverse` na **suíte completa** achou
 um vazamento de estado global de verdade, com causa nomeada — está no `NOVO-26`.
 
-### NOVO-03 🔴 `NameError` em rota viva: `_CAMPO_LABELS` indefinido · COR · FEITO (05/08)
+### NOVO-03 ✅ RESOLVIDO · 🔴 `NameError` em rota viva: `_CAMPO_LABELS` indefinido · COR · FEITO (05/08)
 
 `prestacoes_contas/model_views.py` lia `_CAMPO_LABELS` em duas linhas; o nome estava definido no
 fim de `prestacoes_contas/views.py`, de onde as quatro views tinham saído. `NameError` — HTTP 500 —
@@ -3500,7 +3500,7 @@ lacuna que o `QA-07` nomeia.
 `prestacoes_contas/test_modelos_texto.py` cobre as quatro views (7 testes) — provado falhando com
 5 erros antes da correção.
 
-### NOVO-04 🟡 Chave repetida no inventário do UI Lab apagava uma tela · COR · FEITO (05/08)
+### NOVO-04 ✅ RESOLVIDO · 🟡 Chave repetida no inventário do UI Lab apagava uma tela · COR · FEITO (05/08)
 
 `ui_lab2/views.py`: `COMPONENT_USAGE` declarava `"status_badge"` duas vezes. Em literal de dict a
 segunda ocorrência descarta a primeira em silêncio, então
@@ -3509,7 +3509,7 @@ alguém consulta antes de mexer no componente. `page_header_status_chip` tinha o
 listado duas vezes.
 Achado pelo `ruff` (`F601`) na mesma execução. **Corrigido:** listas unidas, duplicata removida.
 
-### NOVO-05 ⚪ O que o `QA-07` deixou de fora: mais regras, formatação e tipo · MED · a dimensionar
+### NOVO-05 ✅ DIMENSIONADO · ⚪ O que o `QA-07` deixou de fora: mais regras, formatação e tipo · MED
 
 O `QA-07` fechou **lint**. O enunciado dele nomeia três coisas — "lint, formatação ou tipo" — e as
 outras duas seguem sem gate. Três frentes, deliberadamente separadas:
@@ -3527,6 +3527,16 @@ sistemática, isso não é "ligar uma regra": é um projeto com fase de adoção
 de agendar.
 
 **Não confundir com dívida nova:** é dívida existente que o gate ainda não vigia.
+
+> **Dimensionado em 13/08/2026, sem ligar catraca por decreto.** A base atual tem **513** achados
+> de ordem de import (`I`), **226** de modernização (`UP`), **797** da família `RUF`, **104** de
+> simplificação (`SIM`) e **116** de segurança (`S`). `ruff format --check` alteraria **571 de 885
+> arquivos Python**. A primeira execução real do Pyright analisou os 885 e encontrou **3.782 erros**.
+>
+> Esses números fecham o produto deste ID — medir e separar as frentes — e provam por que ele não
+> pode virar uma única correção mecânica. `S` continua sendo triagem de segurança; formatação e
+> importação exigem PRs sem mudança de conteúdo; tipo precisa de adoção gradual por módulo. O gate
+> vigente do `QA-07` permanece em zero e não foi enfraquecido.
 
 ### NOVO-06 ✅ RESOLVIDO · 🔴 A lista de justificativas mostra as de todas as áreas · COR · 1 d
 
