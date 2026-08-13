@@ -7,6 +7,7 @@ só, com 5,9 MB de HTML e 300 cards no DOM. Estes testes fixam os dois lados do
 contrato: página de tamanho fixo e nº de queries que **não cresce** com a base.
 """
 from datetime import timedelta
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.db import connection
@@ -14,6 +15,7 @@ from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from django.utils import timezone
+from django_cotton.templatetags._component import CottonComponentNode
 
 from oficios.models import Oficio
 from oficios.views import OFICIOS_POR_PAGINA
@@ -77,6 +79,32 @@ class OficioListPaginacaoTests(TestCase):
             len(com_300),
             17,
             msg="\n".join(q["sql"] for q in com_300.captured_queries),
+        )
+
+    def test_cards_nao_expandem_componentes_cotton_dentro_do_laco(self):
+        """PF-05: o custo do interpretador de componentes deve ser fixo por página."""
+
+        def contar_componentes(url):
+            with patch.object(
+                CottonComponentNode,
+                "render",
+                autospec=True,
+                wraps=CottonComponentNode.render,
+            ) as render:
+                self.assertEqual(self.client.get(url).status_code, 200)
+            return render.call_count
+
+        sem_cards = contar_componentes(f"{self.url}?aba=atuais")
+        _criar_oficios(OFICIOS_POR_PAGINA)
+        com_cards = contar_componentes(f"{self.url}?aba=atuais")
+
+        self.assertLessEqual(
+            com_cards,
+            sem_cards,
+            msg=(
+                "cada card voltou a expandir componentes Cotton: "
+                f"página vazia={sem_cards}, página cheia={com_cards}"
+            ),
         )
 
     def test_pagina_limita_ids_antes_de_hidratar_as_dimensoes(self):
