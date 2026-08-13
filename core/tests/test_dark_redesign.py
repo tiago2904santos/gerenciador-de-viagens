@@ -683,7 +683,7 @@ class DarkRedesignContractTests(SimpleTestCase):
                 self.assertTrue(
                     '<c-ui.lists.entity_card' in source
                     or 'include "cotton/ui/lists/entity_card.html"' in source
-                    or 'include "cotton/ui/lists/entity_card_flat.html"' in source
+                    or 'include "includes/performance/entity_card_flat.html"' in source
                     or (
                         "entity-card record-card" in source
                         and "entity-card__footer record-card__footer" in source

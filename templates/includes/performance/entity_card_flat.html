@@ -34,20 +34,20 @@
       <div class="record-card__footer-actions">
         <div class="record-card__footer-actions-main icon-btn-group">
           {% if card.footer.edit_url %}
-          {% include "cotton/ui/buttons/icon_control_flat.html" with class_name="icon-btn icon-btn--edit" href=card.footer.edit_url aria_label=card.footer.edit_aria tooltip=card.footer.edit_tooltip|default:"Editar" icon="edit" only %}
+          {% include "includes/performance/icon_control_flat.html" with class_name="icon-btn icon-btn--edit" href=card.footer.edit_url aria_label=card.footer.edit_aria tooltip=card.footer.edit_tooltip|default:"Editar" icon="edit" only %}
           {% endif %}
           {% for menu in card.footer.menus %}
-          {% include "cotton/ui/buttons/icon_control_flat.html" with variant=menu.trigger_variant|default:"settings" state_class=menu.trigger_state_class aria_label=menu.trigger_aria tooltip=menu.trigger_tooltip|default:"Visualizar e baixar" icon=menu.trigger_icon|default:"folder" overlay_kind="menu" overlay_target=menu.id overlay_src=menu.src controls=menu.id only %}
+          {% include "includes/performance/icon_control_flat.html" with variant=menu.trigger_variant|default:"settings" state_class=menu.trigger_state_class aria_label=menu.trigger_aria tooltip=menu.trigger_tooltip|default:"Visualizar e baixar" icon=menu.trigger_icon|default:"folder" overlay_kind="menu" overlay_target=menu.id overlay_src=menu.src controls=menu.id only %}
           {% endfor %}
         </div>
         <div class="record-card__footer-actions--danger icon-btn-group">
           {% if card.footer.delete_modal_url %}
-          {% include "cotton/ui/buttons/icon_control_flat.html" with class_name="icon-btn icon-btn--delete" aria_label=card.footer.delete_aria|default:"Excluir" tooltip="Excluir" icon="delete" overlay_kind="dialog" overlay_target="delete-confirm-modal" delete_url=card.footer.delete_modal_url delete_label=card.footer.delete_modal_label delete_title=card.footer.delete_modal_title only %}
+          {% include "includes/performance/icon_control_flat.html" with class_name="icon-btn icon-btn--delete" aria_label=card.footer.delete_aria|default:"Excluir" tooltip="Excluir" icon="delete" overlay_kind="dialog" overlay_target="delete-confirm-modal" delete_url=card.footer.delete_modal_url delete_label=card.footer.delete_modal_label delete_title=card.footer.delete_modal_title only %}
           {% elif card.footer.delete_url %}
-          {% include "cotton/ui/buttons/icon_control_flat.html" with class_name="icon-btn icon-btn--delete" href=card.footer.delete_url aria_label=card.footer.delete_aria|default:"Excluir" tooltip="Excluir" icon="delete" only %}
+          {% include "includes/performance/icon_control_flat.html" with class_name="icon-btn icon-btn--delete" href=card.footer.delete_url aria_label=card.footer.delete_aria|default:"Excluir" tooltip="Excluir" icon="delete" only %}
           {% endif %}
           {% for menu in card.footer.danger_menus %}
-          {% include "cotton/ui/buttons/icon_control_flat.html" with variant=menu.trigger_variant|default:"settings" state_class=menu.trigger_state_class aria_label=menu.trigger_aria tooltip=menu.trigger_tooltip|default:"Visualizar e baixar" icon=menu.trigger_icon|default:"folder" overlay_kind="menu" overlay_target=menu.id overlay_src=menu.src controls=menu.id only %}
+          {% include "includes/performance/icon_control_flat.html" with variant=menu.trigger_variant|default:"settings" state_class=menu.trigger_state_class aria_label=menu.trigger_aria tooltip=menu.trigger_tooltip|default:"Visualizar e baixar" icon=menu.trigger_icon|default:"folder" overlay_kind="menu" overlay_target=menu.id overlay_src=menu.src controls=menu.id only %}
           {% endfor %}
         </div>
       </div>

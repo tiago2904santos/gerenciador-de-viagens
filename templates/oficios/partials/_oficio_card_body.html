@@ -17,7 +17,7 @@
 
       {% if s.has_termo %}
       <div class="person-row__actions">
-        {% include "cotton/ui/buttons/icon_control_flat.html" with class_name=s.termo_action_class aria_label=s.termo_action_aria tooltip=s.termo_action_tooltip icon="more" overlay_kind="menu" overlay_target=s.termo_action_menu_id overlay_src=card.menus_url controls=s.termo_action_menu_id only %}
+        {% include "includes/performance/icon_control_flat.html" with class_name=s.termo_action_class aria_label=s.termo_action_aria tooltip=s.termo_action_tooltip icon="more" overlay_kind="menu" overlay_target=s.termo_action_menu_id overlay_src=card.menus_url controls=s.termo_action_menu_id only %}
         
       </div>
       {% endif %}
@@ -55,7 +55,7 @@
     {% if card.trechos %}
     <div class="fact-block fact-block--trechos">
       <span class="fact-block__label">Trechos encontrados</span>
-      {% include "cotton/ui/lists/itinerary.html" with items=card.trechos only %}
+      {% include "includes/performance/itinerary_flat.html" with items=card.trechos only %}
     </div>
     {% endif %}
 
@@ -94,8 +94,8 @@
         </span>
       </div>
       <div class="person-row__termo icon-btn-group">
-        {% include "cotton/ui/buttons/icon_control_flat.html" with class_name="icon-btn icon-btn--edit" href=card.justificativa_url aria_label="Editar justificativa" tooltip="Editar justificativa" icon="edit" only %}
-        {% include "cotton/ui/buttons/icon_control_flat.html" with class_name="icon-btn icon-btn--documents" aria_label="Abrir documentos da justificativa" tooltip="Visualizar e baixar" icon="folder" overlay_kind="menu" overlay_target=card.justificativa_menu_id overlay_src=card.menus_url controls=card.justificativa_menu_id only %}
+        {% include "includes/performance/icon_control_flat.html" with class_name="icon-btn icon-btn--edit" href=card.justificativa_url aria_label="Editar justificativa" tooltip="Editar justificativa" icon="edit" only %}
+        {% include "includes/performance/icon_control_flat.html" with class_name="icon-btn icon-btn--documents" aria_label="Abrir documentos da justificativa" tooltip="Visualizar e baixar" icon="folder" overlay_kind="menu" overlay_target=card.justificativa_menu_id overlay_src=card.menus_url controls=card.justificativa_menu_id only %}
         
       </div>
     </li>
