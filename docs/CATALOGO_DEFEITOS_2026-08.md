@@ -4575,6 +4575,12 @@ cabe na fase de reconstrução, não numa correção de componente.
 renderizado uma única vez num parágrafo apontado pelo `aria-describedby` do grupo. O teste da rota
 real trava os três lados do contrato: grupo, nome acessível e instrução associada.
 
+**Correção complementar em 13/08/2026:** a troca também removeu do markup o invólucro
+`.pt-preset-activities-panel__header`, mas deixou seu bloco CSS para trás. A catraca `UI-01`
+reprovou os merges `#387`–`#389` por esse único bloco. A regra órfã foi removida após prova de
+repositório inteiro: título e descrição continuam vivos; somente o invólucro eliminado tinha zero
+referências. `audit_css_morto.py --max 0` voltou a passar.
+
 ---
 
 ### NOVO-42 ✅ RESOLVIDO (12/08/2026) · `NOVO` Seis telas de catálogo exibem ao usuário o alerta de contrato quebrado do `N-07` · HT · 0,5 d
