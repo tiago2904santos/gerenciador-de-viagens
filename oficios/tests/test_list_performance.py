@@ -18,6 +18,7 @@ from django.utils import timezone
 from django_cotton.templatetags._component import CottonComponentNode
 
 from oficios.models import Oficio
+from oficios import presenters
 from oficios.views import OFICIOS_POR_PAGINA
 from roteiros.models import Roteiro
 from usuarios.models import AreaTrabalho
@@ -106,6 +107,21 @@ class OficioListPaginacaoTests(TestCase):
                 f"página vazia={sem_cards}, página cheia={com_cards}"
             ),
         )
+
+    def test_resolucao_de_urls_nao_cresce_com_os_cards(self):
+        def contar_reverses(url):
+            presenters._oficio_card_url_templates.cache_clear()
+            with patch("oficios.presenters.reverse", wraps=reverse) as resolver:
+                self.assertEqual(self.client.get(url).status_code, 200)
+            return resolver.call_count
+
+        _criar_oficios(1)
+        com_um_card = contar_reverses(f"{self.url}?aba=atuais")
+        _criar_oficios(OFICIOS_POR_PAGINA - 1, primeiro_numero=2)
+        com_cards = contar_reverses(f"{self.url}?aba=atuais")
+
+        self.assertEqual(com_cards, com_um_card)
+        self.assertLessEqual(com_cards, 14)
 
     def test_pagina_limita_ids_antes_de_hidratar_as_dimensoes(self):
         """NOVO-50: o LIMIT não pode carregar a árvore inteira de joins.

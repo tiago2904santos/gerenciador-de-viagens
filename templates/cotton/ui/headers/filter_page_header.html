@@ -1,5 +1,6 @@
 {% cotton:vars abas advanced band_tabs_template cargo_filter combustivel_filter current_aba date_end_id date_picker_id date_start_id extra_class eyebrow form_action hide_date_filter next_url primary_action_label primary_action_url q search_aria_label search_clear_url search_name search_placeholder search_value sort sort_options status status_label status_name status_options status_value status_variant tabs_aria_label temporal temporal_options title unidade_filter viagem_ate viagem_de %}
 {# filter_page_header.html — cabeçalho canônico de listas com filtros. #}
+{% load icones %}
 {% if form_action %}
   <form class="list-header filter-header{% if extra_class %} {{ extra_class }}{% endif %}" method="get" action="{{ form_action }}" data-collection-form>
 {% else %}
@@ -13,7 +14,7 @@
     <div class="list-header__filters list-header__filters--advanced">
       <div class="list-header__search list-header__search--with-icon">
         <span class="list-header__search-icon" aria-hidden="true">
-          <c-ui.icons.icon icon="search" only />
+          {% icone_svg "search" %}
         </span>
         <input
           class="list-header__search-input header-filter-input"

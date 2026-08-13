@@ -107,6 +107,14 @@ class FolhaDeIconesTests(SimpleTestCase):
         self.assertIn(f'href="#cv-icon-{DESCONHECIDO}"', saida)
         self.assertNotIn("cv-icon-nao-existe", saida)
 
+    def test_tag_leve_preserva_o_html_do_componente(self):
+        componente = engines["django"].get_template(ICONE).render({"icon": "delete"})
+        tag = engines["django"].from_string(
+            '{% load icones %}{% icone_svg "delete" %}'
+        ).render()
+
+        self.assertHTMLEqual(tag, componente)
+
     def test_todo_nome_literal_usado_em_template_tem_simbolo(self):
         orfaos = []
         for nome, texto in _templates().items():
