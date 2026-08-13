@@ -7665,7 +7665,7 @@ teste específico, e é isso que se quer.
 (`prestacoes_contas/solicitacao_services.py`), lado a lado, com a tabela acima no docstring. Unificar
 virou uma edição local, não uma caçada.
 
-### NOVO-104 · `NOVO` Arquivo órfão no storage não tem quem varra · BE · 0,5 d
+### NOVO-104 ✅ RESOLVIDO (12/08/2026) · `NOVO` Arquivo órfão no storage não tem quem varra · BE · 0,5 d
 
 Resíduo conhecido da fatia 3 do `BE-14`, registrado para não virar surpresa.
 
@@ -7687,6 +7687,13 @@ irmãos: diagnostica por padrão, só apaga quando mandado.
 
 **Vale para além dos anexos:** todo `FileField` do sistema tem o mesmo buraco. Começar pelos anexos
 de prestação, que são os únicos com exclusão pela tela, e ver se o resto compensa.
+
+**Fechamento:** `python manage.py limpar_arquivos_orfaos` percorre recursivamente
+`prestacoes_contas/`, mostra cada órfão e não altera o storage por padrão. A exclusão só ocorre com
+`--apagar`. Para a varredura não classificar um despacho ou uma assinatura vivos como resíduo, a
+comparação reúne as referências de todos os `FileField` sob esse prefixo, não apenas a tabela de
+anexos. Três testes em storage temporário provam o diagnóstico conservador, a exclusão explícita e
+a preservação de arquivos vivos que compartilham a pasta.
 
 ### NOVO-106 ✅ RESOLVIDO (11/08/2026) · `NOVO` A régua de CSS não contava folhas com uso zero · QA · 0,5 d
 
