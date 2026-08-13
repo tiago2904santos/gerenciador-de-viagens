@@ -8345,3 +8345,240 @@ também ficaram duplicados e contraditórios.
 de CSS por rota que o outro lado do merge removia. Uma nova catraca percorre todos os arquivos de
 texto rastreados pelo Git e reprova qualquer marcador de conflito no início de linha. As listas de
 Ofícios e Eventos compilam novamente, e a verificação de repositório encontra zero resíduos.
+
+### NOVO-20260813-155132-a4073beeec22 ✅ RESOLVIDO · `NOVO` Main global precisava de uma prévia isolada antes da migração · UI/HT · 0,5 d
+
+O dono definiu o contrato futuro do `<main>` para todas as páginas: uma folha de estrutura e duas
+folhas temáticas independentes. Aplicar a ideia diretamente em Ofícios misturaria a aprovação do
+novo desenho com uma página real em revisão e ampliaria o risco para o restante do shell.
+
+**Página-piloto.** Sob `DEBUG`, `/dev/main-preview/` oferece um `<main>` deliberadamente vazio, sem
+consultar ou alterar dados e sem entrar na navegação de produção. `static/css/dev/main.css` contém
+somente o fundo por `var(--color-app-bg)` e o padding do main; `main-light.css` e `main-dark.css`
+definem esse token principal diretamente em seus respectivos temas, sem apontar para tokens
+legados. Ofícios e as demais páginas continuam sem carregar essas três folhas.
+
+**Prova.** O contrato automatizado compila o template, trava a ordem das três folhas, impede
+seletores de tema na camada compartilhada e exige que o bloco de conteúdo nasça vazio. No Chromium,
+claro e escuro renderizam sem erro de console. A aprovação visual e a reconstrução incremental do
+piloto continuam sendo as condições para migrar Ofícios e, depois, as demais páginas.
+
+### NOVO-20260813-161418-7b4a2158446c ✅ RESOLVIDO · `NOVO` Header precisava nascer isolado no piloto · UI/HT · 0,25 d
+
+Depois da aprovação do fundo e padding do main, a reconstrução precisava avançar sem importar o
+header legado nem antecipar decisões visuais. A página-piloto agora renderiza o componente Cotton
+`c-dev.header`, cujo HTML contém somente um `<header class="main-preview-header"></header>` vazio.
+
+O componente carrega três folhas próprias, na ordem `header.css`, `header-light.css` e
+`header-dark.css`. Elas começam sem regras ou tokens: estrutura, paleta e conteúdo serão adicionados
+incrementalmente conforme aprovação visual. Nenhuma página real ou header de produção foi alterado.
+
+### NOVO-20260813-161918-083bb6a055c0 ✅ RESOLVIDO · `NOVO` Piloto precisava representar os três papéis de header · UI/HT · 0,25 d
+
+As telas reais mostraram três responsabilidades distintas: identificação simples na listagem,
+identificação com seletor de seção em Configurações e identificação com status e ação de retorno no
+wizard. Copiar os três headers legados perpetuaria marcação e classes divergentes.
+
+O componente novo `c-dev.header` possui uma única base e as variações explícitas `standard`,
+`toggle` e `button`. A página-piloto renderiza as três com conteúdo demonstrativo, mas não importa
+`list-header`, `page-header` nem componentes antigos. A geometria e os tokens das variações continuam
+reservados para as próximas aprovações; nenhuma página real migrou nesta etapa.
+
+### NOVO-20260813-162347-91fd58dc4cff ✅ RESOLVIDO · `NOVO` Headers novos ainda não tinham a geometria de faixa · UI · 0,25 d
+
+As três variações do piloto passam a compartilhar a mesma geometria horizontal: largura integral,
+alinhamento flexível, altura mínima, padding e cantos arredondados. O fundo é consumido pelo token
+principal `--color-header-bg`, definido diretamente como branco no tema claro e azul-marinho no
+tema escuro, sem referência a tokens legados. As páginas reais continuam inalteradas.
+
+### NOVO-20260813-162722-151acc9bfeea ✅ RESOLVIDO · `NOVO` Faixas do piloto divergiam do sidebar e da tipografia oficial · UI · 0,25 d
+
+As faixas agora repetem diretamente a superfície computada do sidebar em cada tema: gradiente azul
+institucional no claro e `#111e2f` no escuro. Esses valores permanecem nos tokens principais do
+header, sem alias para tokens antigos. A estrutura compartilhada passa a usar a família oficial
+`--font-sans` e os mesmos contratos de tamanho, peso, espaçamento e altura de linha do eyebrow e do
+título dos headers vigentes. Nenhuma classe legada foi importada e nenhuma página real foi migrada.
+
+### NOVO-20260813-163142-7b2b82711969 ✅ RESOLVIDO · `NOVO` Header escuro se confundia com o sidebar e o fundo do main · UI · 0,1 d
+
+Na revisão visual, repetir `#111e2f` no header, no sidebar e no início do fundo do main reduziu a
+separação entre as superfícies. O token principal `--color-header-bg` do tema escuro passa a usar o
+azul institucional sólido `#17476f`. O tema claro, a geometria e a tipografia não mudaram.
+
+### NOVO-20260813-163308-04b5c5505c7b ✅ RESOLVIDO · `NOVO` Header claro ainda usava duas cores em gradiente · UI · 0,1 d
+
+O gradiente do tema claro criava duas regiões visuais dentro da mesma faixa. O token principal
+`--color-header-bg` passa a usar somente a cor do lado direito, `#155b9a`, em toda a superfície.
+Os dois temas agora possuem fundos sólidos; o tema escuro permanece em `#17476f`.
+
+### NOVO-20260813-163452-e10043dc085b ✅ RESOLVIDO · `NOVO` Contraste do header escuro dependia de um preenchimento claro demais · UI · 0,1 d
+
+O preenchimento `#17476f` separava o header do main aumentando demais sua luminosidade. A faixa
+escura passa a usar o azul profundo sólido `#0b3a66`; a separação visual agora vem da borda
+`#286fa4`, exposta pelo token principal `--color-header-border`. O tema claro preserva sua aparência
+com a borda da mesma cor do próprio fundo.
+
+### NOVO-20260813-163707-e9c2226fbaf0 ✅ RESOLVIDO · `NOVO` Conteúdo auxiliar do header podia herdar texto ilegível · UI · 0,1 d
+
+O status da variação `button` herdava a cor escura global de texto e perdia contraste sobre o fundo
+azul. O componente agora aplica explicitamente `--color-header-title` ao status, aos itens do toggle
+e à ação. O contrato automatizado impede que qualquer uma das três áreas auxiliares volte a depender
+da cor ambiente da página.
+
+### NOVO-20260813-163827-b4733a3ef15f ✅ RESOLVIDO · `NOVO` Eyebrow do header escuro não usava o dourado accent · UI · 0,1 d
+
+O eyebrow das três variações no tema escuro passa a usar diretamente `#d8a21b`, valor oficial da
+cor accent dourada do sistema. O token principal `--color-header-eyebrow` continua independente e
+não aponta para tokens legados. Títulos, status, toggle e ação permanecem brancos.
+
+### NOVO-20260813-163953-06484f8db28f ✅ RESOLVIDO · `NOVO` Header escuro precisava de maior profundidade sem contorno · UI · 0,1 d
+
+O fundo escuro passa de `#0b3a66` para o azul institucional profundo `#062847`. A borda foi removida
+da estrutura compartilhada e o token `--color-header-border` deixou de existir nos dois temas; a
+separação agora depende somente da diferença entre as superfícies sólidas e do espaço ao redor.
+
+### NOVO-20260813-164208-774d64105a96 ✅ RESOLVIDO · `NOVO` Header novo ainda permitia status em `span` · HT/UI · 0,1 d
+
+O status `FINALIZADO (LEGADO)` foi removido da variação `button`, junto com seu parâmetro e seletor
+CSS. O eyebrow deixou de usar `span` e passa a ser um parágrafo. O contrato automatizado proíbe
+qualquer `<span>`, parâmetro de status ou seletor de status dentro do componente novo de header.
+
+### NOVO-20260813-164339-62694084c20d ✅ RESOLVIDO · `NOVO` Título do header piloto tinha pouca hierarquia visual · UI · 0,1 d
+
+O título das três variações passa de `clamp(1.2rem, 1.8vw, 1.55rem)` para
+`clamp(1.5rem, 2.2vw, 2rem)`. A escala continua responsiva e não altera eyebrow, conteúdo auxiliar,
+padding ou altura mínima da faixa.
+
+### NOVO-20260813-164531-6a76dbcf32c3 ✅ RESOLVIDO · `NOVO` Eyebrow parecia outra fonte e competia com o título · UI · 0,1 d
+
+O eyebrow das três variações passa a declarar a mesma família `--font-sans` do título, volta ao
+tamanho compacto `--font-size-xs` (`12px`) e remove o espaçamento largo entre letras. A cor dourada,
+o peso 700 e a caixa alta permanecem.
+
+### NOVO-20260813-164653-e3fb33e156a5 ✅ RESOLVIDO · `NOVO` Faixas precisavam de contorno discreto por tema · UI · 0,1 d
+
+As três variações recebem uma borda compartilhada de `1px` consumindo o token principal
+`--color-header-border`. O tema claro define branco com 22% de opacidade e o escuro, branco com 10%.
+Os valores são diretos em cada tema e não alteram fundo, raio ou tipografia.
+
+### NOVO-20260813-165919-cca287602253 ✅ RESOLVIDO · `NOVO` Rails precisavam de uma família nova de sub-headers · UI/HT · 0,5 d
+
+O piloto passa a ter o componente `c-dev.sub_header` com uma base única e as variações `filters`,
+`quick-add` e `stepper`. O conteúdo é recebido por slot, permitindo quantidades diferentes de filtros,
+ordenações, etapas ou controles sem fixar campos no componente. A demonstração inclui quatro filtros,
+uma área de vínculo rápido e quatro etapas com estados.
+
+As três folhas `sub-header.css`, `sub-header-light.css` e `sub-header-dark.css` não importam classes
+`list-header`, `page-stepper` ou `wizard-stepper`. Os temas definem diretamente os tokens principais
+de fundo, borda e texto, sem aliases. Nenhuma página real foi migrada.
+
+### NOVO-20260813-170400-ec6b9a1571b5 ✅ RESOLVIDO · `NOVO` Sub-headers alteravam a leitura dos headers de teste · HT/UI · 0,25 d
+
+Os três sub-headers foram retirados de baixo das demonstrações de header. As três variações de
+header voltam a ficar juntas e intactas. Cada `c-dev.sub_header` agora possui seu próprio `<header>`
+interno, eyebrow e título em classes exclusivas `main-preview-sub-header__*`, sem chamar
+`c-dev.header` nem consumir classes ou tokens da família de headers.
+
+### NOVO-20260813-170653-186468597c03 ✅ RESOLVIDO · `NOVO` Cada demonstração de sub-header precisava de um header completo próprio · HT/UI · 0,25 d
+
+O cabeçalho interno provisório foi removido de `c-dev.sub_header`. Abaixo dos três headers de teste,
+o piloto agora monta três pares independentes: um novo header “Ofícios” com filtros, um novo header
+“Justificativas” com quick-add e um novo header “Cadastro de ofício” com stepper. Assim, os headers
+originais continuam intactos e cada sub-header possui uma instância completa de header imediatamente
+antes dele.
+
+### NOVO-20260813-170921-fcd0df6f2a36 ✅ RESOLVIDO · `NOVO` Pares header + sub-header ainda tinham vão visual · UI · 0,1 d
+
+Nos três exemplos pareados, o header perde apenas os cantos inferiores e o sub-header perde apenas
+os cantos superiores. A margem entre eles é zero e a borda superior duplicada do sub-header é
+removida. As regras são limitadas a `.main-preview-sub-header-example`, portanto os três headers de
+teste originais preservam raio e espaçamento próprios.
+
+### NOVO-20260813-171150-4772a7bebcf5 ✅ RESOLVIDO · `NOVO` Sub-header ainda não consumia a nova cor primária do piloto · UI · 0,1 d
+
+As três variações agora usam diretamente `background: var(--color-primary)`. Nos dois temas do
+piloto, `--color-primary` nasce como token principal com o valor direto `#223348`, sem apontar para
+tokens antigos. Texto e borda foram mantidos com contraste adequado para a nova superfície sólida.
+
+### NOVO-20260813-171408-221bef7cfe88 ✅ RESOLVIDO · `NOVO` Controles do sub-header não usavam a nova cor secundária · UI · 0,1 d
+
+Campos, seletores e a ação do sub-header agora usam `background: var(--color-secondary)`.
+Nos temas claro e escuro do piloto, o token nasce diretamente da fórmula solicitada:
+`color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%)`.
+
+### NOVO-20260813-171859-8fe0da057c11 ✅ RESOLVIDO · `NOVO` Hierarquia de cores do sub-header estava invertida e controles ainda tinham borda · UI · 0,1 d
+
+A tira passa a usar `--color-secondary`, enquanto campos, seletores, botões e ações internas
+usam `--color-primary`. Esses controles recebem `border: 0` em uma regra limitada ao novo
+sub-header. Os valores independentes já definidos por cada tema foram preservados; no tema claro,
+o texto da tira usa diretamente `#223348` para preservar contraste.
+
+### NOVO-20260813-172249-36d8bc8fea04 ✅ RESOLVIDO · `NOVO` Quick-add piloto continha texto e ação desnecessários · HT · 0,1 d
+
+Na variação quick-add da página-piloto foram removidos o bloco explicativo “Ofício vinculado”
+e a ação “Limpar filtros”. O campo acessível “Buscar ofício” permanece como único conteúdo
+do sub-header. Nenhuma página real foi alterada.
+
+### NOVO-20260813-172430-f0138f333d5c ✅ RESOLVIDO · `NOVO` Componentes novos não garantiam a mesma fonte do sistema nos controles nativos · UI · 0,1 d
+
+O shell da página-piloto, os headers e os sub-headers usam explicitamente `var(--font-sans)`.
+Inputs, selects, botões e ações internas herdam essa família com `font-family: inherit`, evitando
+que controles nativos retornem para a fonte padrão do navegador.
+
+### NOVO-20260813-172706-ca9bc207b6d1 ✅ RESOLVIDO · `NOVO` Piloto ainda simulava filtros com selects nativos avulsos · HT/UI · 0,25 d
+
+Os filtros “Ordenação” e “Status” agora usam o componente existente `c-ui.forms.select`, alimentado
+por `MainPreviewFiltersForm` com `ChoiceField` reais. A rota DEBUG carrega o perfil oficial de CSS
+de formulários, permitindo revisar o componente no piloto sem migrar páginas reais nem alterar o
+contrato global do select nesta etapa. Dentro do piloto, o trigger gerado obedece aos contratos já
+aprovados: fundo primário, nenhuma borda, nenhuma sombra e a fonte herdada do sistema.
+
+### NOVO-20260813-173205-02d6906c766e ✅ RESOLVIDO · `NOVO` Chevron do select piloto tinha fundo separado e seta invisível · UI · 0,1 d
+
+Na página-piloto, a área do chevron usa o mesmo `--color-primary` aplicado ao input e ao restante
+do trigger. Uma seta discreta é desenhada por CSS e gira de `45deg` para `225deg` quando o combobox
+recebe `aria-expanded="true"`. As regras permanecem limitadas a `.main-preview-shell`.
+
+### NOVO-20260813-173642-044c2e0689fc ✅ RESOLVIDO · `NOVO` Opção selecionada do select piloto não exibia o marcador · UI · 0,1 d
+
+O espaço de seleção do menu agora mostra um marcador gráfico na opção com
+`.custom-select__option--selected`. Como o menu é transportado para o `body`, o escopo usa
+`:has(.main-preview-shell)` para limitar a correção à página-piloto. O desenho usa bordas CSS
+dentro do elemento `aria-hidden`, sem inserir texto duplicado na árvore de acessibilidade.
+
+### NOVO-20260813-173922-180b4f6bb759 ✅ RESOLVIDO · `NOVO` Hover das opções era invisível no tema claro do piloto · UI · 0,1 d
+
+No tema claro, `--color-surface-soft` resolvia para o mesmo branco do menu. Hover e foco por teclado
+das opções não selecionadas passam a usar `--theme-list-row-hover` (`#e3eaf2`) dentro do escopo
+da página-piloto. O tema escuro e as opções selecionadas mantêm o contrato existente.
+
+### NOVO-20260813-174333-fe5e62f284a6 ✅ RESOLVIDO · `NOVO` Listbox do select piloto não consumia a cor primária · UI · 0,1 d
+
+O menu transportado para o `body` usa `background: var(--color-primary)`. Para não herdar o token
+global antigo fora do shell, o portal recebe diretamente `--color-primary: #ffffff` no tema claro e
+`--color-primary: #223348` no escuro, mantendo os valores aprovados do piloto sem aliases.
+
+### NOVO-20260813-174518-c11a152b3951 ✅ RESOLVIDO · `NOVO` Faixa do sub-header piloto ainda usava a cor secundária · UI · 0,1 d
+
+O fundo base de `main-preview-sub-header` passa a consumir `background: var(--color-primary)`.
+A regra vale para filtros, quick-add e stepper, mantendo as três variações na mesma família.
+Controles e listbox continuam usando o mesmo token primário aprovado.
+
+### NOVO-20260813-174650-8d42b37baa7e ✅ RESOLVIDO · `NOVO` Cores estavam visualmente certas, mas associadas aos tokens invertidos · UI · 0,1 d
+
+A aparência aprovada foi preservada e os papéis foram corrigidos: `--color-primary` representa a
+superfície da faixa e do listbox; `--color-secondary` representa busca, triggers, chevrons e ações.
+No claro os valores continuam sendo a superfície suave e branco; no escuro, a mistura profunda e
+`#223348`, respectivamente.
+
+### NOVO-20260813-174920-05e64dddaf01 ✅ RESOLVIDO · `NOVO` Listbox piloto ainda usava a borda azul global do select · UI · 0,1 d
+
+O menu usa `border: 1px solid var(--color-sub-header-border)`, o mesmo contrato da faixa. Como o
+listbox fica no `body`, o portal recebe diretamente o token de cada tema: branco a 14% no claro e
+branco a 10% no escuro.
+
+### NOVO-20260813-174203-53f71e9fa7e9 ✅ RESOLVIDO · `NOVO` Controles do filtro piloto usavam raios diferentes · UI · 0,1 d
+
+Busca, wrappers dos selects, triggers gerados e a ação “Limpar filtros” passam a consumir
+`border-radius: var(--radius-sm)`. O token oficial resolve para `8px`; nenhuma página real foi
+alterada.

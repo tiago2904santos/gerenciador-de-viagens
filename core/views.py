@@ -119,6 +119,27 @@ def dashboard(request):
     )
 
 
+@login_not_required
+def main_preview(request):
+    """Prévia isolada do novo contrato visual do ``main``.
+
+    A rota só é registrada sob ``DEBUG``. Ela não consulta dados, aceita escrita
+    nem entra na navegação de produção; existe para o dono aprovar as camadas
+    visualmente antes de qualquer página real adotar o contrato.
+    """
+    from core.dev_forms import MainPreviewFiltersForm
+
+    return render(
+        request,
+        "core/main_preview.html",
+        {
+            "page_title": "Prévia do main",
+            "preview_filters": MainPreviewFiltersForm(request.GET or None),
+            "shell_css_profile_path": "css/shell.form-components.bundle.css",
+        },
+    )
+
+
 @login_required(login_url="core:login")
 def perfil(request):
     from django.conf import settings

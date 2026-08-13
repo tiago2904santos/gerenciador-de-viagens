@@ -606,3 +606,41 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       2 intenções reaplicadas com `NOVO-115`/`NOVO-117`; fila antiga zerada
 - [x] `NOVO-20260813-154133-b0d4495f5dec` remove os conflitos gravados pelo merge `0434421b` em
       duas páginas e três planos; catraca impede novo marcador em arquivo de texto rastreado
+- [x] `NOVO-20260813-155132-a4073beeec22` cria sob `DEBUG` a página-piloto do novo `<main>` com
+      estrutura, tema claro e tema escuro em três CSS separados; nenhuma página real migrou ainda
+- [x] `NOVO-20260813-161418-7b4a2158446c` cria no piloto um componente `<header>` vazio com
+      estrutura, tema claro e tema escuro próprios; nenhum header real migrou ainda
+- [x] `NOVO-20260813-161918-083bb6a055c0` divide o componente novo nas variações `standard`,
+      `toggle` e `button`, sem importar marcação ou classes dos headers legados
+- [x] `NOVO-20260813-162347-91fd58dc4cff` aplica às três variações a geometria de faixa arredondada
+      e um token principal de fundo definido diretamente em cada tema
+- [x] `NOVO-20260813-162722-151acc9bfeea` iguala as faixas ao sidebar em cada tema e aplica a
+      tipografia oficial do sistema sem importar classes legadas
+- [x] `NOVO-20260813-163142-7b2b82711969` aumenta o contraste visual do header escuro com um fundo
+      azul institucional sólido, sem alterar o tema claro
+- [x] `NOVO-20260813-163308-04b5c5505c7b` remove o gradiente restante do header claro e usa
+      `#155b9a` em toda a faixa
+- [x] `NOVO-20260813-163452-e10043dc085b` mantém o header escuro com preenchimento profundo e cria
+      contraste pela borda, sem clarear a superfície
+- [x] `NOVO-20260813-163707-e9c2226fbaf0` impede texto auxiliar ilegível no status, toggle e ação
+      das três variações do header
+- [x] `NOVO-20260813-163827-b4733a3ef15f` aplica o dourado accent oficial ao eyebrow das três
+      variações no tema escuro
+- [x] `NOVO-20260813-163953-06484f8db28f` aprofunda o fundo do header escuro e remove por completo
+      as bordas e seu token dos dois temas
+- [x] `NOVO-20260813-164208-774d64105a96` remove status e todo uso de `<span>` do componente novo
+      de header, com trava automatizada contra reintrodução
+- [x] `NOVO-20260813-164339-62694084c20d` aumenta responsivamente o título das três variações sem
+      alterar os demais elementos do header
+- [x] `NOVO-20260813-164531-6a76dbcf32c3` alinha o eyebrow à fonte do título e reduz sua hierarquia
+      para 12px sem espaçamento largo
+- [x] `NOVO-20260813-164653-e3fb33e156a5` adiciona às três faixas uma borda fina e discreta com
+      intensidade própria em cada tema
+- [x] `NOVO-20260813-165919-cca287602253` cria a família nova de sub-headers nas variações
+      `filters`, `quick-add` e `stepper`, com slots e tokens próprios sem aliases
+- [x] `NOVO-20260813-170400-ec6b9a1571b5` separa os catálogos: headers de teste ficam intactos e
+      cada sub-header recebe cabeçalho interno próprio sem reutilizar a família de headers
+- [x] `NOVO-20260813-170653-186468597c03` substitui o cabeçalho interno provisório por três novos
+      pares completos header + sub-header, preservando os headers de teste originais
+- [x] `NOVO-20260813-170921-fcd0df6f2a36` emenda visualmente os três pares removendo vão, cantos
+      internos e borda duplicada sem afetar os headers de teste

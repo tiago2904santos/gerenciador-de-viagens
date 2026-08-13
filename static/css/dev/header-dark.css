@@ -1,0 +1,8 @@
+/* Tokens principais do header no tema escuro. */
+
+html[data-theme="dark"] .main-preview-shell {
+  --color-header-bg: #062847;
+  --color-header-border: rgba(255, 255, 255, 0.1);
+  --color-header-eyebrow: #d8a21b;
+  --color-header-title: #ffffff;
+}

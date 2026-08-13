@@ -42,6 +42,30 @@ CSS_EXCEPTIONS: dict[str, dict] = {
         "reason": "Official dark-theme token layer; literal values define semantic tokens.",
         "rules": {"hex_color_outside_tokens"},
     },
+    "static/css/dev/main-light.css": {
+        "reason": "Camada de tokens principais do main no tema claro da pagina-piloto.",
+        "rules": {"hex_color_outside_tokens"},
+    },
+    "static/css/dev/main-dark.css": {
+        "reason": "Camada de tokens principais do main no tema escuro da pagina-piloto.",
+        "rules": {"hex_color_outside_tokens"},
+    },
+    "static/css/dev/header-light.css": {
+        "reason": "Camada de tokens principais do header no tema claro da pagina-piloto.",
+        "rules": {"hex_color_outside_tokens"},
+    },
+    "static/css/dev/header-dark.css": {
+        "reason": "Camada de tokens principais do header no tema escuro da pagina-piloto.",
+        "rules": {"hex_color_outside_tokens"},
+    },
+    "static/css/dev/sub-header-light.css": {
+        "reason": "Camada de tokens principais do sub-header no tema claro da pagina-piloto.",
+        "rules": {"hex_color_outside_tokens"},
+    },
+    "static/css/dev/sub-header-dark.css": {
+        "reason": "Camada de tokens principais do sub-header no tema escuro da pagina-piloto.",
+        "rules": {"hex_color_outside_tokens"},
+    },
     "static/css/components/theme-dark-components.css": {
         "reason": "Transitional dark-theme component overrides; literals allowed until dissolved into components.",
         "rules": {"hex_color_outside_tokens"},

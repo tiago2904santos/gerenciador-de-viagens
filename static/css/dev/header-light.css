@@ -1,0 +1,8 @@
+/* Tokens principais do header no tema claro. */
+
+html[data-theme="light"] .main-preview-shell {
+  --color-header-bg: #155b9a;
+  --color-header-border: rgba(255, 255, 255, 0.22);
+  --color-header-eyebrow: #ffffff;
+  --color-header-title: #ffffff;
+}

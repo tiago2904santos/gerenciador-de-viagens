@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.views import LogoutView
 from django.urls import path
 
@@ -13,3 +14,8 @@ urlpatterns = [
     path("perfil/", views.perfil, name="perfil"),
     path("", views.dashboard, name="dashboard"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [
+        path("dev/main-preview/", views.main_preview, name="main_preview"),
+    ]

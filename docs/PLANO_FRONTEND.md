@@ -287,3 +287,34 @@ alcançável em produção. Não vira ID.
   que toda tela herda, e mudança ali não tem regressão automatizada que a pegue.
 - **Não persegue número de Lighthouse.** A régua é a de [`PLANO_DESEMPENHO.md`](PLANO_DESEMPENHO.md):
   KB de HTML, uso de CSS por rota e milissegundos no servidor, tudo reproduzível por comando.
+
+## Piloto visual isolado (13/08/2026)
+
+- [x] `NOVO-20260813-171150-4772a7bebcf5` — sub-headers pareados usam o token principal
+  `--color-primary: #223348` diretamente nos temas claro e escuro, sem alias e sem migrar páginas reais.
+- [x] `NOVO-20260813-171408-221bef7cfe88` — controles dos sub-headers usam `--color-secondary`
+  com a fórmula 88% superfície atenuada e 12% primária nos dois temas do piloto.
+- [x] `NOVO-20260813-171859-8fe0da057c11` — hierarquia visual invertida: tira secundária,
+  controles primários e nenhuma borda em `input`, `select`, `button` ou ação do sub-header.
+- [x] `NOVO-20260813-172249-36d8bc8fea04` — quick-add piloto reduzido ao campo de busca,
+  removendo o texto explicativo e a ação de limpar filtros sem afetar páginas reais.
+- [x] `NOVO-20260813-172430-f0138f333d5c` — fonte oficial aplicada ao shell, headers,
+  sub-headers e controles nativos do piloto por herança explícita.
+- [x] `NOVO-20260813-172706-ca9bc207b6d1` — selects nativos avulsos da prévia substituídos
+  por duas instâncias do componente oficial `c-ui.forms.select`, ainda sem migração de páginas reais.
+- [x] `NOVO-20260813-173205-02d6906c766e` — chevron do select piloto usa o fundo do input,
+  volta a ficar visível e gira conforme o estado expandido, sem alterar páginas reais.
+- [x] `NOVO-20260813-173642-044c2e0689fc` — opção ativa do menu select exibe um marcador
+  gráfico, com escopo preservado mesmo quando o menu é transportado para o `body`.
+- [x] `NOVO-20260813-173922-180b4f6bb759` — hover e foco das opções não selecionadas
+  usam uma superfície contrastante no tema claro, sem alterar o tema escuro.
+- [x] `NOVO-20260813-174203-53f71e9fa7e9` — busca, selects e ação da faixa de filtros
+  compartilham `border-radius: var(--radius-sm)` no piloto.
+- [x] `NOVO-20260813-174333-fe5e62f284a6` — listbox transportado do select usa a cor primária
+  definida diretamente por cada tema do piloto.
+- [x] `NOVO-20260813-174518-c11a152b3951` — fundo das três variações de sub-header
+  passa a usar a cor primária do piloto.
+- [x] `NOVO-20260813-174650-8d42b37baa7e` — cores aprovadas preservadas com semântica corrigida:
+  faixa/listbox primários e controles internos secundários.
+- [x] `NOVO-20260813-174920-05e64dddaf01` — listbox usa a mesma espessura e o mesmo token
+  de borda do sub-header em cada tema.

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block shell_class %}main-preview-shell{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/dev/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dev/main-light.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dev/main-dark.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dev/header.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dev/header-light.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dev/header-dark.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dev/sub-header.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dev/sub-header-light.css' %}">
+  <link rel="stylesheet" href="{% static 'css/dev/sub-header-dark.css' %}">
+{% endblock %}
+
+{% block content %}
+  <c-dev.header variant="standard" eyebrow="OFÍCIOS" title="Ofícios" only />
+  <c-dev.header variant="toggle" eyebrow="CONFIGURAÇÕES" title="Instituição">
+    <c-slot name="toggle">
+      <nav class="main-preview-header__toggle-nav" aria-label="Seções de configuração">
+        <a class="main-preview-header__toggle-item main-preview-header__toggle-item--active" href="{% url 'core:main_preview' %}" aria-current="page">Instituição</a>
+        <a class="main-preview-header__toggle-item" href="{% url 'core:main_preview' %}">Ofício</a>
+        <a class="main-preview-header__toggle-item" href="{% url 'core:main_preview' %}">Roteiros</a>
+      </nav>
+    </c-slot>
+  </c-dev.header>
+  <c-dev.header variant="button" eyebrow="OFÍCIOS" title="Cadastro de ofício">
+    <c-slot name="action">
+      <a class="main-preview-header__button" href="{% url 'core:main_preview' %}">Voltar à lista</a>
+    </c-slot>
+  </c-dev.header>
+
+  <section class="main-preview-sub-header-example">
+    <c-dev.header variant="standard" eyebrow="OFÍCIOS" title="Ofícios" only />
+    <c-dev.sub_header variant="filters" aria_label="Filtros e ordenação de ofícios">
+      <form class="main-preview-sub-header__filters" action="{% url 'core:main_preview' %}" method="get">
+        <input class="main-preview-sub-header__field" type="search" name="q" placeholder="Buscar ofícios" aria-label="Buscar ofícios">
+        <label class="sr-only" for="{{ preview_filters.sort.id_for_label }}">Ordenação</label>
+        <c-ui.forms.select :field="preview_filters.sort" extra_class="main-preview-sub-header__field" only />
+        <label class="sr-only" for="{{ preview_filters.status.id_for_label }}">Status</label>
+        <c-ui.forms.select :field="preview_filters.status" extra_class="main-preview-sub-header__field" only />
+        <a class="main-preview-sub-header__control" href="{% url 'core:main_preview' %}">Limpar filtros</a>
+      </form>
+    </c-dev.sub_header>
+  </section>
+
+  <section class="main-preview-sub-header-example">
+    <c-dev.header variant="standard" eyebrow="JUSTIFICATIVAS" title="Justificativas" only />
+    <c-dev.sub_header variant="quick-add" aria_label="Inclusão rápida de ofício vinculado">
+      <div class="main-preview-sub-header__quick-add-controls">
+        <input class="main-preview-sub-header__field" type="search" placeholder="Buscar ofício" aria-label="Buscar ofício vinculado">
+      </div>
+    </c-dev.sub_header>
+  </section>
+
+  <section class="main-preview-sub-header-example">
+    <c-dev.header variant="button" eyebrow="OFÍCIOS" title="Cadastro de ofício">
+      <c-slot name="action">
+        <a class="main-preview-header__button" href="{% url 'core:main_preview' %}">Voltar à lista</a>
+      </c-slot>
+    </c-dev.header>
+    <c-dev.sub_header variant="stepper" aria_label="Etapas do cadastro de ofício">
+      <ol class="main-preview-sub-header__steps">
+        <li class="main-preview-sub-header__step main-preview-sub-header__step--complete">
+          <div class="main-preview-sub-header__marker">1</div>
+          <div class="main-preview-sub-header__step-copy"><strong>Dados e viajantes</strong><p>Concluída</p></div>
+        </li>
+        <li class="main-preview-sub-header__step main-preview-sub-header__step--current" aria-current="step">
+          <div class="main-preview-sub-header__marker">2</div>
+          <div class="main-preview-sub-header__step-copy"><strong>Roteiro e diárias</strong><p>Em andamento</p></div>
+        </li>
+        <li class="main-preview-sub-header__step">
+          <div class="main-preview-sub-header__marker">3</div>
+          <div class="main-preview-sub-header__step-copy"><strong>Justificativa</strong><p>Não iniciada</p></div>
+        </li>
+        <li class="main-preview-sub-header__step">
+          <div class="main-preview-sub-header__marker">4</div>
+          <div class="main-preview-sub-header__step-copy"><strong>Documentos</strong><p>Não iniciada</p></div>
+        </li>
+      </ol>
+    </c-dev.sub_header>
+  </section>
+{% endblock %}

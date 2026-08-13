@@ -1,0 +1,14 @@
+/* Tokens principais do sub-header no tema escuro. */
+
+html[data-theme="dark"] .main-preview-shell {
+  --color-primary: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-secondary) 12%);
+  --color-secondary: #223348;
+  --color-sub-header-border: rgba(255, 255, 255, 0.1);
+  --color-sub-header-text: #ffffff;
+}
+
+html[data-theme="dark"]:has(.main-preview-shell) .custom-select__menu--v2 {
+  --color-primary: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-secondary) 12%);
+  --color-secondary: #223348;
+  --color-sub-header-border: rgba(255, 255, 255, 0.1);
+}
