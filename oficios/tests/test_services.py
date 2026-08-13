@@ -70,6 +70,7 @@ class OficioServicesTests(TestCase):
         self.assertEqual(oficio.ano, timezone.localdate().year)
         self.assertEqual(oficio.status, Oficio.STATUS_RASCUNHO)
         self.assertEqual(list(oficio.servidores.all()), [self.servidor])
+        self.assertEqual(oficio.diarias_quantidade_servidores, 1)
 
     @mock.patch(
         "oficios.services.get_next_available_numero_oficio",
@@ -233,6 +234,7 @@ class OficioServicesTests(TestCase):
             custeio=Oficio.CUSTEIO_UNIDADE_DPC,
             viatura=self.viatura,
             motorista=self.servidor,
+            diarias_quantidade_servidores=2,
         )
         data_original = oficio.data_criacao
         oficio.servidores.add(self.servidor)
@@ -255,7 +257,49 @@ class OficioServicesTests(TestCase):
         self.assertEqual(atualizado.viatura, self.viatura)
         self.assertEqual(atualizado.motorista, self.servidor)
         self.assertEqual(list(atualizado.servidores.all()), [self.servidor])
+        self.assertEqual(
+            atualizado.diarias_quantidade_servidores,
+            2,
+            "editar metadados não recalcula o snapshot após uma exclusão cadastral",
+        )
         self.assertEqual(atualizado.status, Oficio.STATUS_GERADO)
+
+    def test_atualizar_equipe_substitui_snapshot_de_diarias(self):
+        outro = Servidor.objects.create(
+            area=area_de_teste(),
+            nome="Servidor Dois",
+            cargo=self.cargo,
+            cpf="10987654321",
+        )
+        oficio = Oficio.objects.create(
+            area=area_de_teste(),
+            numero=2,
+            ano=2026,
+            status=Oficio.STATUS_RASCUNHO,
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+            diarias_quantidade_servidores=3,
+        )
+        oficio.servidores.add(self.servidor)
+        form = OficioDadosViajantesForm(
+            data={
+                "protocolo": "12.345.678-4",
+                "motivo": "Equipe deliberadamente alterada",
+                "servidores": [str(self.servidor.pk), str(outro.pk)],
+                "custeio": Oficio.CUSTEIO_UNIDADE_DPC,
+                "custeio_observacao": "",
+            },
+            instance=oficio,
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+
+        atualizado = atualizar_oficio_dados_viajantes(
+            oficio,
+            form,
+            action="save_draft",
+        )
+        atualizado.refresh_from_db()
+
+        self.assertEqual(atualizado.diarias_quantidade_servidores, 2)
 
     def test_atualizar_oficio_dados_viajantes_preenche_ano_quando_ausente(self):
         oficio = Oficio.objects.create(area=area_de_teste(), 

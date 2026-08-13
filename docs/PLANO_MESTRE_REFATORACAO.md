@@ -306,6 +306,9 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       **também fechado**: excluir o servidor no cadastro passou a ser recusado quando apagaria
       comprovante, assinatura ou número de solicitação — com predicado próprio, mais estreito que o
       do `DB-06`, porque prender um cadastro pesa mais do que preservar uma linha.
+- [x] `NOVO-39` exclusão cadastral mudava o total de diárias dos colegas — o ofício agora
+      persiste o efetivo monetário; somente uma alteração deliberada da equipe renova o snapshot.
+      A migração `oficios/0020` congela o efetivo vigente nos registros existentes.
 - [x] `DB-07` 2 `CheckConstraint` em 54 modelos — viraram **26**: doze de ordem (o último veio com o
       `NOVO-36`) e doze de sinal, em
       oito modelos de seis apps, saídas de três fábricas em `core/constraints.py`. O levantamento

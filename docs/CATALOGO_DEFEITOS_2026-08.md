@@ -4592,7 +4592,7 @@ antes de a regra ser escolhida.
 
 ---
 
-### NOVO-39 🟠 `NOVO` Excluir um servidor muda o valor de diária impresso dos colegas dele · COR · 1 d
+### NOVO-39 ✅ RESOLVIDO (13/08/2026) · `NOVO` Excluir um servidor muda o valor de diária impresso dos colegas dele · COR · 1 d
 
 Achado pela verificação adversarial do `NOVO-35`, sob a lente "dinheiro e documento", e reproduzido:
 
@@ -4619,6 +4619,17 @@ indelével.
 renderização — que é a mesma família do `DB-06` (`TabelaDiaria` guarda os três valores calculados
 "para congelar o valor que valeu"). Alternativa mais barata: gravar `quantidade_servidores` no
 `Roteiro`/`Oficio` no momento da geração.
+
+**Fechamento:** `Oficio.diarias_quantidade_servidores` passou a guardar o efetivo monetário do
+documento. A criação e uma alteração deliberada da equipe atualizam esse snapshot; salvar apenas
+metadados ou excluir depois um servidor do cadastro não o recalcula. O valor unitário continua
+persistido no `Roteiro`, portanto a multiplicação segue ocorrendo uma única vez.
+
+A migração `oficios/0020` congela o efetivo atual de todos os ofícios existentes (com piso 1).
+O teste de caracterização foi executado antes da mudança e reproduziu **R$ 200,00 → R$ 100,00**;
+depois da correção, a mesma exclusão preserva **R$ 200,00**, a quantidade 2 e o texto por
+extenso. Testes adicionais travam os dois limites: editar metadados preserva o snapshot e trocar
+a equipe conscientemente cria um novo snapshot.
 
 ---
 
