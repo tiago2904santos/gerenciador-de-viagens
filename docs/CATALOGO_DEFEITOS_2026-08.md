@@ -35,10 +35,9 @@ catálogo · `MOR` = código morto achado por varredura · `COR` = correção de
 > 09/08, que nasceu em `NOVO-66`…`73` e virou `NOVO-69`…`76` quando os PRs #283 e #284 chegaram
 > primeiro à `main`.
 >
-> **E a causa, que continua aberta:** a numeração é descoberta lendo o maior `NOVO` do arquivo.
-> Duas sessões que começam juntas leem o mesmo número e reservam o mesmo ID. Cinco colisões em um
-> ciclo não é azar, é o método. Quem for fechar isso, feche com um comando que reserva
-> (`scripts/`), não com disciplina.
+> **Causa posteriormente fechada pelo `NOVO-29`:** a numeração era descoberta lendo o maior
+> `NOVO` do arquivo. `scripts/novo_id.py` passou a gerar IDs independentes de contador global e
+> sua suíte trava formato e independência entre sessões.
 
 ## A passada de verificação de 05/08
 
@@ -597,10 +596,10 @@ Das três funções que ainda gravam duas ou mais vezes sem transação, a pior 
 `planos_trabalho/per_diem_views.py::_apply_efetivo_snapshot`: `save` + `create` + `delete` sobre a
 mesma coleção, em laço. É a herdeira direta do caso exemplar do enunciado, agora noutro app.
 
-**O que fecha aqui é prestações**, e vale dizer o que isso significa: nenhum dos quatro fluxos do
+**O que esta fatia fechou foi prestações**, e vale dizer o que isso significa: nenhum dos quatro fluxos do
 wizard — RT, solicitação, anexos, diário — grava mais fora de transação, e nenhum dos quatro módulos
-de tela constrói queryset. **O `BE-14` continua aberto** para os apps restantes; a quinta fatia é
-`planos_trabalho` + `oficios`, que juntos concentram 10 dos 19.
+de tela constrói queryset. Naquele ponto, o `BE-14` ainda seguia para os apps restantes; as fatias
+seguintes fecharam `planos_trabalho`, `oficios` e os demais produtores inventariados.
 
 **A fixture mentia em silêncio, e isso vale para quem for escrever teste de diário.**
 `criar_prestacao` monta um ofício **sem roteiro**, e sem roteiro `sincronizar_trechos` não cria linha
@@ -1829,12 +1828,12 @@ rota `/prestacoes-contas/`, `oficios.css` (106 KB) chega com **0,0%** de uso.
 O trabalho está no [`PLANO_FRONTEND.md`](PLANO_FRONTEND.md); aqui fica a métrica de aceite:
 **uso acima de 35% por rota** ao fim da reconstrução.
 
-> **Remedido em 13/08/2026, depois do fechamento do `NOVO-15`: continua aberto.** A régua
+> **Remedição intermediária de 13/08/2026, depois do fechamento do `NOVO-15`.** A régua
 > versionada do `NOVO-70` passou nas 43 rotas, mas ela é uma catraca contra regressão, não prova o
 > aceite de 35%. O relatório do CI do PR #397 mediu, por exemplo, `oficios-lista` em **16,38%**,
 > as etapas do wizard entre **16,23% e 23,35%**, e as telas de modelos de motivo em **15,01%**.
-> Portanto o carregamento ainda entrega centenas de KB que a rota não usa; não há base para marcar
-> este ID como resolvido só porque a reconstrução avançou.
+> Naquele ponto ainda não havia base para fechar o ID. O aceite foi cumprido depois, com os perfis
+> determinísticos descritos abaixo: **37,5118%–60,3148%** nas 43 rotas.
 
 **Fechamento em 13/08/2026.** O shell monolítico foi substituído, nas rotas conhecidas, por 15
 perfis CSS determinísticos por família de tela. O gerador preserva a ordem da cascata, expande os
@@ -2001,16 +2000,17 @@ Com 17 queries planas e 20 cards. As outras listas ficam entre 15 e 46 ms. É co
 `PF-01` e `PF-04`; existe como **métrica de aceite** deles: abaixo de 40 ms sem subir a contagem
 de queries.
 
-> **Remedido em 13/08/2026; o critério de 40 ms continua aberto.** A causa dominante não era
+> **Remedição intermediária de 13/08/2026.** A causa dominante não era
 > só o card: as quatro contagens das abas repetiam a mesma classificação com `Exists`, e o
 > paginador fazia um quinto `COUNT`. Uma agregação e o total conhecido do paginador reduziram a
 > rota de **13 para 9 consultas**. No CI, volume 200 caiu de **125,5 para 76,7 ms**; em 20.000,
-> de **1.554,4 para 235,6 ms**. É uma queda material, mas 76,7 ainda não é menor que 40.
+> de **1.554,4 para 235,6 ms**. Era uma queda material, mas ainda não cumpria 40 ms; a fatia final
+> abaixo fecha em **33,2 ms e 7 consultas**.
 >
 > O perfil também provou que Cotton executava o processador de navegação nove vezes na mesma
 > requisição. O resultado agora é memorizado **somente no objeto `request`**; o teste exige uma
 > única construção e impede cache entre usuários. A medição canônica desta última queda fica no
-> CI do PR; o ID não fecha enquanto o teto original não for atingido.
+> CI do PR. O teto original foi atingido na fatia final registrada abaixo.
 
 > **Fechamento canônico.** O custo restante tinha três partes mensuráveis: resolução repetida das
 > mesmas rotas por card, duas consultas M2M separadas para equipe/termo e duas consultas separadas
@@ -2641,8 +2641,8 @@ de `search-picker`/`select` continuam na fronteira `UI-04`/E10. Em 11/08,
 `date-picker`/`file-picker` saíram do shell padrão (−25.615 bytes nas rotas sem eles) e
 `search-picker.css` também passou à variante consumidora (−27.227 bytes). Na fatia seguinte,
 `select.css` foi dividido: os selects nativos e estruturas globais permanecem no shell, enquanto
-os **6.496 bytes** de `.custom-select*` passaram à variante consumidora. O ID permanece parcial
-pelas demais famílias de CSS de domínio.
+os **6.496 bytes** de `.custom-select*` passaram à variante consumidora. Naquele ponto o ID ainda
+era parcial; as famílias restantes foram fechadas pelas fatias E10/E11 registradas neste catálogo.
 
 ### HT-05 ✅ RESOLVIDO · 🟡 `empty_state.html` quebra a ordem de headings · AUD+MED · 0,5 d
 
@@ -3373,8 +3373,8 @@ completa a cada bump.
 > **Fatia 1 concluída.** A dependência morta saiu. A regeneração sem `--upgrade` removeu dos locks
 > `pyHanko`, `pyhanko-certvalidator`, `asn1crypto`, `oscrypto`, `uritools` e o `PyYAML` que só essa
 > cadeia puxava; nenhuma versão das bibliotecas usadas mudou. A prova cobre 32 testes dos fluxos
-> atuais e `pip-audit` sem vulnerabilidade conhecida nova. O ID permanece parcial até os upgrades
-> isolados de `docxtpl`, WeasyPrint, ReportLab e Redis.
+> atuais e `pip-audit` sem vulnerabilidade conhecida nova. Naquele ponto ainda faltavam os upgrades
+> isolados de `docxtpl`, WeasyPrint, ReportLab e Redis, concluídos nas fatias seguintes do `QA-08`.
 
 ### QA-09 ✅ RESOLVIDO (fe43b1d8) · 🟡 Dois templates de `.env` de produção divergentes · AUD · 0,25 d
 
@@ -4580,8 +4580,9 @@ derruba todas as linhas de prestação dele e, por cascata, os `PrestacaoDocumen
 elas — o comprovante de saque entre eles. Medido em transação revertida (ver `DB-06` no
 `PLANO_BACKEND.md`): 1 servidor com 1 comprovante, `servidor.delete()`, restam **0 anexos**.
 
-É o mesmo defeito do `DB-06` por outra porta. O `DB-06` fechou a porta da equipe do ofício
-(`PrestacaoServidor.sair_da_equipe` preserva quem tem dados coletados); esta continua aberta.
+É o mesmo defeito do `DB-06` por outra porta. O `DB-06` fechou primeiro a porta da equipe do ofício
+(`PrestacaoServidor.sair_da_equipe` preserva quem tem dados coletados); esta porta foi fechada
+depois pelo `NOVO-35`.
 
 **Protegido hoje só por acidente:** `AssinaturaDocumento.signer` é `on_delete=PROTECT`, então um
 servidor que já assinou algum RT não pode ser excluído — o `ProtectedError` vira a mensagem de
@@ -5359,8 +5360,9 @@ tabelas de dimensão irreais.
 >
 > **E o `Nested Loop` sobreviveu.** Com as dimensões de produção, `oficios:index` continua montando
 > 20 linhas por `Nested Loop Left Join` com `Join Filter` (`Rows Removed by Join Filter: 90`), em
-> ~99 ms. Não era artefato de semeadura: é defeito, e continua aberto. A correção provável segue
-> sendo reduzir o `select_related` da lista ao que o card imprime.
+> ~99 ms. Não era artefato de semeadura: o defeito ainda estava aberto naquele estágio. A hipótese
+> de reduzir o `select_related` foi testada na fatia seguinte e a correção final fechou o regime
+> quente em **33,2 ms e 7 consultas**.
 >
 > **O conserto do semeador desbloqueou outra medição na hora:** o `DB-11` (`pg_trgm`) só pôde ser
 > respondido depois dele — ver lá.
@@ -7281,10 +7283,9 @@ tabela do plano**.
 
 **Decisão do dono:** pular a 8g. Fazê-la derrubaria ~150 pontos da catraca sem entregar tela.
 
-**O defeito verdadeiro que a medição encontrou** e que continua aberto: há componentes cujo desenho
-inteiro só existe no tema escuro — `.empty-state__mark` (24 elementos, sem nenhuma regra fora do
-arquivo escuro), os avatares do picker e o badge do wizard. Isso é maior que uma família e precisa de
-decisão própria.
+**O defeito verdadeiro que a medição encontrou naquele ponto:** havia componentes cujo desenho
+inteiro só existia no tema escuro — `.empty-state__mark`, avatares do picker e badge do wizard.
+As fatias posteriores da E9 deram base compartilhada a essas superfícies e fecharam a divergência.
 ### NOVO-54 (continuação) ✅ RESOLVIDO · Trinta dos setenta `!important` de `.cv-field__control` não sustentavam nada · UI · 0,5 d
 
 Segunda leva do `NOVO-54`. A primeira deu à classe uma regra base; esta começa a cobrar a dívida que
@@ -7404,16 +7405,17 @@ Os 2 do escuro são `justificativas-lista`, e são **exatamente o piso de ruído
 mesma base duas vezes — o mesmo par de caminhos, causado por conteúdo que varia entre capturas.
 **O tema escuro não se moveu.**
 
-### Anotação: o `.record-card__band` é outro defeito, e continua aberto
+### Anotação histórica: o `.record-card__band` era outro defeito, fechado depois pelo `NOVO-119`/`NOVO-120`
 
 Ao medir esta correção ficou claro que `.record-card__band` **não** é o mesmo caso, embora o
 comentário do `list-header.css` o cite como fonte. Ele segue transparente no claro depois da
 correção, porque a sua única declaração de fundo mora dentro de regra predicada em `dark`
 (`theme-dark-components.css:4942`): no claro não existe regra nenhuma para ele.
 
-É a classe "componente cujo desenho só existe no escuro" — a mesma que barrou a família **8b**
-(`NOVO-93`) e que apareceu na medição da **8g** (`NOVO-94`, com `.empty-state__mark`). Token não
-resolve; precisa de regra base, e isso é decisão de desenho.
+Era a classe "componente cujo desenho só existe no escuro" — a mesma que barrou a família **8b**
+(`NOVO-93`) e que apareceu na medição da **8g** (`NOVO-94`, com `.empty-state__mark`). A anotação
+descreve corretamente aquele instante, mas deixou de ser pendência: o `NOVO-119` separou as regras
+compartilhadas e o `NOVO-120` reaudita as 43 rotas e fecha o residual de fronteira/cascata.
 
 ### NOVO-97 ✅ RESOLVIDO · `NOVO` A E9-a entrega 32 regras, e o caminho até elas custou três tentativas · UI
 
@@ -7464,10 +7466,10 @@ bisecção daria pelo mesmo preço.
 | `audit_frontend_standards` | 239 | **237** |
 | `audit_ui_patterns` | 2.456 | **2.447** |
 
-**O que continua aberto:** 173 candidatas **nunca exercitadas** pelas 43 rotas em repouso — o
+**O que ainda estava aberto nesta medição:** 173 candidatas **nunca exercitadas** pelas 43 rotas em repouso — o
 elemento só existe com diálogo, menu ou dropdown aberto. Sobre elas a medição não diz nada, e
 tratá-las como inócuas seria repetir o `NOVO-90`. Medi-las exige estender o corpus aos estados de
-sobreposição, como o `NOVO-54` fez ao ir de 44 para 51 rotas.
+sobreposição. As continuações do `NOVO-54` ampliaram o corpus e fecharam esses estados sem inferência.
 
 ### NOVO-98 ✅ RESOLVIDO · `NOVO` Gravador confia no contrato normalizado do parser · QA · 0,5 d
 
@@ -7766,9 +7768,9 @@ As oito regras de pseudo-elemento foram retiradas juntas e repetidas contra o me
 encontrava a própria regra e `test_wizard_justificativa.py` exige explicitamente que essa classe não
 seja renderizada.
 
-O inventário atual fica em **47 regras, 13 arquivos, 0 pseudo-regra**. A E7c permanece parcial: os
+Naquela fatia, o inventário ficou em **47 regras, 13 arquivos, 0 pseudo-regra** e a E7c ainda era parcial: os
 contextos de diário e `field-with-action` ainda não renderizam um `.cv-field__control` no corpus, e
-serão classificados sem inferir ausência a partir de rota visitada.
+seriam classificados sem inferir ausência a partir de rota visitada. A continuação seguinte fecha os dois.
 
 ### NOVO-54 (continuação 5) ✅ Os contextos interativos fecham a E7c · UI · 0,5 d
 

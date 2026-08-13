@@ -142,6 +142,20 @@ class OficioListPaginacaoTests(TestCase):
         self.assertNotEqual(primeiro, alterado)
         self.assertEqual(render.call_count, 2)
 
+    def test_html_do_card_permanece_escapado_quando_vem_do_cache(self):
+        card = {
+            "status_variant": "rascunho",
+            "search_text": '<script>alert("xss")</script>',
+        }
+        card_rendering.cache.clear()
+
+        primeiro = card_rendering.renderizar_oficio_card_cacheado(card)
+        cacheado = card_rendering.renderizar_oficio_card_cacheado(dict(card))
+
+        self.assertEqual(primeiro, cacheado)
+        self.assertNotIn("<script>", cacheado)
+        self.assertIn("&lt;script&gt;", cacheado)
+
     def test_pagina_limita_ids_antes_de_hidratar_as_dimensoes(self):
         """NOVO-50: o LIMIT não pode carregar a árvore inteira de joins.
 

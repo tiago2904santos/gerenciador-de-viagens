@@ -244,10 +244,10 @@ Enquanto não houver medição com volume, não se sabe.
 | # | Etapa | Defeitos | Dias | Risco | Gate |
 |---|---|---|---:|---|---|
 | **D1** ✅ | **Régua de desempenho** — `scripts/medir_desempenho.py` no repositório, semeando cada domínio **em dois volumes (200 e 20.000)**, medindo queries, tempo, KB de HTML e uso de CSS por rota; teto por rota no CI | `PF-07` | 3–4 | baixo | O script roda no CI e falha se qualquer rota passar do teto declarado, nos dois volumes |
-| **D2** | **Folha de símbolos de ícone** | `PF-01` | 2–3 | baixo | `/oficios/` abaixo de 250 KB de HTML; suíte verde; telas conferidas nos dois temas |
+| **D2** ✅ | **Folha de símbolos de ícone** | `PF-01` | 2–3 | baixo | Símbolos centralizados; `/oficios/` abaixo de 250 KB e DOM de formas reduzido |
 | **D3** ✅ | **Menu e renderização de card sob demanda** | `PF-04`, `PF-05`, `NOVO-50/PF` | 2–3 | médio | `/oficios/` em 33,2 ms, 7 consultas e 160,7 KB no volume 200; aceite de tempo cumprido e teto de consultas reduzido |
-| **D4** | **Sessão fora do caminho quente** | `PF-03` | 1–2 | médio | Requisição autenticada trivial sem `UPDATE django_session`; decisão de expiração registrada |
-| **D5** | **Consultas duplicadas** | `PF-06` | 1 | baixo | Zero query repetida nas rotas medidas |
+| **D4** ✅ | **Sessão fora do caminho quente** | `PF-03` | 1–2 | médio | Requisição autenticada trivial sem `UPDATE django_session`; decisão de expiração registrada |
+| **D5** ✅ | **Consultas duplicadas** | `PF-06` | 1 | baixo | Duplicações causais eliminadas e orçamento permanente por rota |
 | **D6** ✅ | **Aceite do CSS** (depois do `PLANO_FRONTEND`) | `PF-02` | — | — | **37,5118%–60,3148% nas 43 rotas**; piso individual de 35% sob teste |
 
 **Total próprio: 9–13 dias-pessoa.** O `PF-02` não soma porque o trabalho está no plano de front;

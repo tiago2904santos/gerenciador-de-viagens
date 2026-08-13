@@ -21,6 +21,11 @@ O ciclo de julho fechou. Das oito etapas, sete foram concluídas e a oitava fico
 verdes**, o auditor de front caiu de 465 para **392 avisos**, o motor de diárias passou a bater
 ao centavo com os demonstrativos oficiais, e as listas deixaram de ter N+1.
 
+> **Ciclo de agosto encerrado em 13/08/2026.** Todos os **224 cabeçalhos de defeito ou fatia** do
+> catálogo têm desfecho marcado, as dez fases abaixo não possuem item pendente e as duas métricas
+> transversais de aceite foram cumpridas: `PF-02` em **37,5118%–60,3148%** de CSS usado por rota e
+> `PF-05` em **33,2 ms / 7 consultas** no regime quente canônico.
+
 Continuar marcando linha naquele plano seria errado por um motivo simples: **os enunciados
 venceram**. O próprio plano registra três correções de rumo (`J-05`, `J-11`, tokens indefinidos)
 em que o defeito descrito não era o defeito existente. Depois de ~120 PRs, citar `D-14` é citar
@@ -79,7 +84,7 @@ configurações segue como proposta sem posição na fila.
 | **1** | **Réguas e rede de segurança** | `PF-07`, `QA-03`, `QA-06`, `QA-07`, `QA-11`, `QA-12` | 7 | médio | `scripts/medir_desempenho.py` no CI com volume realista, `ruff`, Dependabot, o rollback de deploy que hoje não desfaz migração, e o teste da CVE do WeasyPrint que hoje verifica texto-fonte. Sem régua, toda fase seguinte é afirmação sem prova e a regressão volta no PR seguinte sem ninguém ver. |
 | **2** | **Isolamento por área vira invariante** | `BE-09`, `BE-10`, `DB-01`…`DB-05` | 18 | **alto** | Quatro vazamentos entre tenants já provados por teste. É o maior risco do sistema e toda fase posterior escreve código que precisa respeitar o recorte. |
 | **3** | **O banco defende os dados** | `DB-06`…`DB-08` | 8 | médio | Cascata que apaga comprovante e assinatura; 2 `CheckConstraint` em 54 modelos. Depende da fase 2: pôr `NOT NULL` sobre modelo que ainda vaza é lacrar a porta errada. |
-| **4** | **Fundação do front** | `PF-01`, `HT`, `UI` (CSS morto) | ver plano de front | médio | Folha de símbolos de ícone, componentes que faltam, remoção do CSS comprovadamente morto. Fixa **quais classes existem** — pré-requisito da reconstrução. **F1 concluída** (`JS-06`, `JS-05`, `JS-02`); faltam F2 e F3. |
+| **4** | **Fundação do front** | `PF-01`, `HT`, `UI` (CSS morto) | ver plano de front | médio | Folha de símbolos de ícone, componentes e remoção do CSS comprovadamente morto. Fixa **quais classes existem** — pré-requisito da reconstrução. **Concluída** nas três fatias, com os resíduos posteriores registrados e fechados por ID. |
 | **5** | **Consulta e índice** | `DB-09`…`DB-12` | 8,5 | médio | Ganho medido de 13× a 29× num índice composto; busca livre em varredura sequencial. Depois da fase 3, porque constraint muda plano de consulta. |
 | **6** | **Camadas e duplicação** | `BE-11`…`BE-17` | 17,5 | alto | Editor de roteiro em 3 cópias, `roteiro_logic.py` com 1.779 linhas fora do contrato. Mexe em roteiro e diárias: **plan mode obrigatório**. |
 | **7** | **Reconstrução do front** — CSS, HTML e JS. Dimensionada em 09/08 no [`PLANO_RECONSTRUCAO_FRONT_2026-08.md`](PLANO_RECONSTRUCAO_FRONT_2026-08.md): doze etapas | `UI`, `HT`, `JS` | ver o documento | médio, com a E8 em **alto** | A mais visível e a mais reversível. Depois da fase 4, que define os nomes. Escopo ampliado por decisão do dono: componentização por `django-cotton`, desenho único entre os temas e teste de JS no CI |
@@ -144,17 +149,18 @@ Vale o do [`AGENTS.md`](../AGENTS.md) §4, com dois acréscimos deste ciclo:
 6. **Deixar o escopo novo entrar no meio de uma fase.** Vai para o catálogo com `NOVO` e recebe
    posição na fila.
 
-## 8. Decisões pendentes
+## 8. Decisões registradas
 
-Precisam de resposta humana; nenhuma bloqueia a fase 0.
+Registro histórico das decisões. Todas as que pertenciam às dez fases foram respondidas; a
+arquitetura de configurações permaneceu deliberadamente fora deste ciclo.
 
 | Decisão | Onde entra | Por que precisa de você |
 |---|---|---|
-| Comportamento de expiração de sessão | `PF-03` (fase 1) | Tirar a escrita do caminho quente muda se a sessão de 8 h conta do login ou da última ação |
-| Quais operações exigem `PAPEL_ADMIN` | `BE-19` (fase 8) | O modelo de dados promete três papéis; o código aplica dois |
+| ~~Comportamento de expiração de sessão~~ **decidida em 07/08: `cached_db` + renovação periódica** | `PF-03` (fase 1) | Janela deslizante de 7–8 h sem escrita em toda requisição; fechamento do navegador preservado |
+| ~~Quais operações exigem `PAPEL_ADMIN`~~ **decidida em 12/08: nenhuma operação existente é elevada arbitrariamente** | `BE-19` (fase 8) | Administração global já exige `is_staff`; operações da área pertencem a EDITOR; helper morto removido |
 | ~~Qual UI Lab é o vigente~~ **decidida em 07/08 (PR #247): nenhum — os dois saíram** | `BE-25` (fase 9) | A cascata de componentes órfãos que a decisão deixou é o `NOVO-44`, fechado |
 | Arquitetura de configurações | fora das 9 fases | Proposta de 17–28 dias, em `historico/2026-07-refactor/planos/PROPOSTA_CONFIGURACOES.md`; entra como fase própria ou fica fora do ciclo |
-| Triagem dos 13 PRs abertos | fase 9 | 12 são de maio–julho, anteriores ao refactor; fechar ou reabrir é chamada sua |
+| ~~Triagem dos PRs abertos~~ **concluída pelo `QA-17`** | fase 9 | Eram 17: 12 fechados, 3 upgrades mesclados e 2 intenções reaplicadas como `NOVO-115`/`NOVO-117` |
 | ~~Catálogo global do `DB-02` (grupo 2)~~ **decidida em 07/08: cópia por área, seguindo o `NOVO-09`** | `DB-02` (fase 2) | Executada nas migrações `eventos/0016` e `planos_trabalho/0024`. As linhas de seed eram vistas por **zero** usuários com área. O resíduo de instalação/área nova foi fechado pelo `NOVO-49`: fonte canônica, seed transacional e `NOT NULL` nas migrações `usuarios/0002`, `eventos/0017` e `planos_trabalho/0025`. |
 
 ## 9. Quadro de acompanhamento
@@ -162,9 +168,11 @@ Precisam de resposta humana; nenhuma bloqueia a fase 0.
 Marque aqui, no mesmo PR que faz o trabalho. `[ ]` pendente · `[~]` em andamento · `[x]` pronto.
 O detalhe de cada ID está no [`CATALOGO_DEFEITOS_2026-08.md`](CATALOGO_DEFEITOS_2026-08.md).
 
-**São 95 IDs no catálogo e 93 neste quadro.** Os dois de fora são **métricas de aceite** de outros
-IDs, não trabalho próprio: `PF-02` mede uso de CSS por rota e `PF-05`, tempo/HTML da lista de
-Ofícios. O `DB-13`, antes adiado pelo risco monetário, entrou depois do `DB-01`: composição
+**O quadro original acompanha 93 IDs; o catálogo cresceu durante a execução e hoje contém 224
+cabeçalhos de defeito ou fatia, todos com desfecho marcado.** Os dois itens transversais são
+**métricas de aceite** de outros IDs, não trabalho próprio: `PF-02` mede uso de CSS por rota (**cumprido: 37,5118%–60,3148%**) e
+`PF-05`, tempo da lista de Ofícios (**cumprido: 33,2 ms e 7 consultas**). O `DB-13`, antes adiado
+pelo risco monetário, entrou depois do `DB-01`: composição
 estruturada e auditável sem mudar nem recalcular a regra de dinheiro.
 
 ### Fase 0 — Defeitos que atingem o usuário agora ✅ **COMPLETA** (06/08/2026)
@@ -234,7 +242,7 @@ estruturada e auditável sem mudar nem recalcular a regra de dinheiro.
 - [x] `NOVO-43` SLA documental depois da suíte, log como artefato e mediana quente com teto por
       modelo (`docx=250 ms`, `xlsx=750 ms`); pico isolado não apaga os gates funcionais
 
-### Fase 2 — Isolamento por área
+### Fase 2 — Isolamento por área ✅ **COMPLETA** (13/08/2026)
 - [x] `DB-03` limpeza de rascunhos apaga rascunho de outra área — e mais: sem limite de idade, ela
       apagava o rascunho que outra pessoa da **mesma** área estava editando, porque `Roteiro` não
       tem dono. Registrado como `NOVO-13` e corrigido junto (mesmas três linhas de `filter`).
@@ -297,7 +305,7 @@ estruturada e auditável sem mudar nem recalcular a regra de dinheiro.
       sem recorte e a mensagem de erro confirmava placa de outra unidade. Drill mostrou que a
       **volta da migração deixa de funcionar** depois que duas áreas usarem a mesma placa.
 
-### Fase 3 — O banco defende os dados
+### Fase 3 — O banco defende os dados ✅ **COMPLETA** (13/08/2026)
 - [x] `DB-13` composição das diárias estruturada e vinculada à tarifa usada — teste monetário de
       caracterização veio antes; linhas novas congelam faixa, percentual, quantidade, vigência,
       valor e subtotal. O backfill só interpreta resumos inequívocos e não recalcula históricos.
@@ -325,7 +333,7 @@ estruturada e auditável sem mudar nem recalcular a regra de dinheiro.
       `transaction.atomic` — nenhum dos dois abria transação. A medição de duplicata só vale em
       produção: quatro das cinco tabelas estão vazias no banco de desenvolvimento
 
-### Fase 4 — Fundação do front
+### Fase 4 — Fundação do front ✅ **COMPLETA** (13/08/2026)
 - [x] `JS-06` JS larga o nome de classe `cv-search-picker` — e as **partes** junto (`NOVO-19`):
       a superfície real era 45 sites em 11 arquivos, não 10 em 7. Contrato novo:
       `data-entity-picker-root`/`-part` + `CV.picker.rootFor/part`
@@ -370,10 +378,10 @@ estruturada e auditável sem mudar nem recalcular a regra de dinheiro.
 - [x] `DB-10` índice composto para a ordenação real das listas — **um índice, não cinco**.
       Das cinco listas que ordenavam em memória, só `OrdemServico` ganha (64× na consulta,
       1,08× na rota); nas outras quatro o índice análogo não move o tempo e em `roteiros`
-      piora. "Ofícios têm situação análoga" era falso, e o que sobra ali é o `NOVO-50`
-      (**parcial em 13/08**): ids antes da hidratação, contagens das abas agregadas e total do
-      paginador reutilizado derrubaram a escala em 20.000 registros, mas o `PF-05` ainda mede
-      76,7 ms no volume 200 contra o aceite de 40 ms
+      piora. "Ofícios têm situação análoga" era falso; o `NOVO-50/PF` separou as causas: ids antes
+      da hidratação, contagens agregadas, relações achatadas e fragmento por conteúdo derrubaram
+      Ofícios de 125,5 para **33,2 ms** no volume 200 e de 1.554,4 para **163,9 ms** em 20.000;
+      consultas **13 → 7**, fechando também o `PF-05`
 - [x] `DB-11` busca livre de Termos multiplicava 20.000 linhas por três M2M e rodava três vezes —
       `Exists()` por origem + contagem das abas reutilizada pelo paginador. O `PF-07` agora mede
       `termos:index:busca` permanentemente: **1.807,9 → 391,4 ms (4,62×)** em 20.000 registros,
@@ -392,7 +400,7 @@ estruturada e auditável sem mudar nem recalcular a regra de dinheiro.
       14. `/usuarios/` tinha 1, não 2, e foi corrigida. Sobram três de 1 consulta, com o
       mecanismo já identificado no catálogo
 
-### Fase 6 — Camadas e duplicação
+### Fase 6 — Camadas e duplicação ✅ **COMPLETA** (13/08/2026)
 - [x] `BE-11` editor de roteiro em 3 cópias — **eram 2**: medida a interseção, `novo` × `editar` dá
       55 linhas idênticas (o enunciado dizia 41) e `wizard_roteiro` só 20 de 165. As duas primeiras
       foram unificadas atrás de `roteiros/services/editor_flow.py`; a terceira é outro fluxo e cai
@@ -480,7 +488,7 @@ estruturada e auditável sem mudar nem recalcular a regra de dinheiro.
       dois labs e as 1.013 linhas de fixture; a cascata de componentes que ele deixou é o
       `NOVO-44`
 
-### Fase 7 — Reconstrução do front (CSS, HTML e JavaScript)
+### Fase 7 — Reconstrução do front (CSS, HTML e JavaScript) ✅ **COMPLETA** (13/08/2026)
 
 **Dimensionada em 09/08/2026 no [`PLANO_RECONSTRUCAO_FRONT_2026-08.md`](PLANO_RECONSTRUCAO_FRONT_2026-08.md)**,
 que é o documento a seguir para esta fase: doze etapas (E0–E11), cada uma com arquivos, comando de
@@ -551,7 +559,7 @@ renomeação por função · `NOVO-61` dez nomes mortos em seletor agrupado · `
 empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral globalizada ·
 `NOVO-64` 176 tokens sem prefixo · `NOVO-65` 545 classes sem prefixo.
 
-### Fase 8 — Observabilidade e autorização
+### Fase 8 — Observabilidade e autorização ✅ **COMPLETA** (13/08/2026)
 - [x] `BE-18` handlers genéricos mudos 73 → 0; exceções esperadas tipadas, falhas inesperadas
       observadas e catraca AST permanente no CI
 - [x] `BE-19` decisão de autorização registrada; helper e contexto sem consumidor removidos sem
@@ -566,7 +574,7 @@ empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral glob
       de geração/conversão verdes
 - [x] `QA-13` indicador reconciliado como sinal de triagem, não meta de tamanho de teste
 
-### Fase 9 — Finalização e higiene
+### Fase 9 — Finalização e higiene ✅ **COMPLETA** (13/08/2026)
 - [x] `BE-20` `diario_bordo` é app-casca — **removido**: 33 linhas, rota inalcançável, sem
       migration nem tabela. A funcionalidade real, em `prestacoes_contas`, ficou intacta
 - [x] `BE-21` presenter morto prometendo "DOCX (em breve)" — **removido**; a varredura por AST
