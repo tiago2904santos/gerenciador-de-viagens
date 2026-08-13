@@ -63,14 +63,10 @@ def sem_request():
     teste comum ele já está vazio — o valor deste helper é declarar a intenção
     e proteger contra teste vizinho que tenha vazado estado.
     """
-    from core import middleware
+    from core.middleware import sem_request as contexto_sem_request
 
-    anterior = getattr(middleware._local, "request", None)
-    middleware._local.request = None
-    try:
+    with contexto_sem_request():
         yield
-    finally:
-        middleware._local.request = anterior
 
 
 @contextmanager

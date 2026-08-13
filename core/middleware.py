@@ -2,6 +2,8 @@ import logging
 import threading
 import time
 import uuid
+from contextlib import contextmanager
+from functools import wraps
 from urllib.parse import urlsplit
 
 from django.conf import settings
@@ -21,6 +23,29 @@ request_logger = logging.getLogger("core.request")
 def get_current_request():
     """Retorna a request da thread atual, ou ``None`` fora de um request (shell, comando, task)."""
     return getattr(_local, "request", None)
+
+
+@contextmanager
+def sem_request():
+    """Executa como worker/comando e restaura o contexto anterior ao sair."""
+    anterior = get_current_request()
+    _local.request = None
+    try:
+        yield
+    finally:
+        _local.request = anterior
+
+
+def executar_sem_request(func):
+    """Impede que uma task eager herde o request que a enfileirou."""
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        with sem_request():
+            return func(*args, **kwargs)
+
+    wrapper.executa_sem_request = True
+    return wrapper
 
 
 class CurrentRequestMiddleware:

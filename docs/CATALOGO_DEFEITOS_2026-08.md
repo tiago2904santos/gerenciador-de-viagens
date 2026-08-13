@@ -4018,7 +4018,7 @@ defeito. Não é bloqueio para F2/F3.
 
 ---
 
-### NOVO-20 🟠 `NOVO` `CELERY_TASK_ALWAYS_EAGER` faz a suíte rodar a tarefa dentro do request · QA · 1 d
+### NOVO-20 ✅ RESOLVIDO (12/08/2026) · `NOVO` `CELERY_TASK_ALWAYS_EAGER` faz a suíte rodar a tarefa dentro do request · QA · 1 d
 
 `config/settings/test.py:64` liga `CELERY_TASK_ALWAYS_EAGER = True`. Em teste, toda tarefa executa
 no mesmo thread e no mesmo instante do request que a disparou — com
@@ -4037,6 +4037,12 @@ ganha ao menos um teste dentro dele. Alternativa mais forte, e mais cara: um gru
 `CELERY_TASK_ALWAYS_EAGER = False` e worker de verdade.
 
 **Prioridade:** 🟠 pelo que ela esconde, não pelo trabalho de fechá-la.
+
+**Fechamento:** `core.middleware.executar_sem_request` envolve as 14 tarefas com efeito de dados
+dos módulos documental e Google Drive. Mesmo em `CELERY_TASK_ALWAYS_EAGER`, a task limpa o
+thread-local durante a execução e restaura o request anterior ao terminar. A catraca enumera todas
+as tasks e reprova se alguma perder o contrato; duas provas funcionais criam o objeto numa área,
+simulam request em outra e confirmam que os workers documental e Drive ainda o encontram.
 
 ---
 

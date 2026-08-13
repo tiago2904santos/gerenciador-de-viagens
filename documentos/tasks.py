@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from core.errors import capture
+from core.middleware import executar_sem_request
 
 try:
     from celery import shared_task
@@ -26,6 +27,7 @@ except ModuleNotFoundError:
     retry_jitter=True,
     max_retries=3,
 )
+@executar_sem_request
 def gerar_pdf_oficio_cache(oficio_id: int) -> None:
     from documentos.services.types import DocumentoFormato
     from oficios.models import Oficio
@@ -41,6 +43,7 @@ def gerar_pdf_oficio_cache(oficio_id: int) -> None:
 
 
 @shared_task
+@executar_sem_request
 def gerar_documento_assincrono(job_id: str) -> None:
     from django.utils import timezone
 
@@ -65,6 +68,7 @@ def gerar_documento_assincrono(job_id: str) -> None:
 
 
 @shared_task
+@executar_sem_request
 def manter_geracoes_documentais(
     *,
     max_age_minutes: int = 30,
