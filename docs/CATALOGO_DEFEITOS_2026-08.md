@@ -2561,7 +2561,7 @@ assim, não é preciso tocar em `_field_control.html`.
 > editor escreve `errEl.textContent` direto no elemento, o que apagaria a estrutura interna do
 > `alert.html`. Converter exige mexer no JS do editor: é o `BE-13`.
 
-### HT-04 🟡 PARCIAL · entrega JS concluída na E11; CSS segue em `UI-04`/E10 · AUD · 2–3 d · risco médio
+### HT-04 ✅ RESOLVIDO (E10/E11) · Entrega pesada saiu do shell comum · AUD · 2–3 d · risco médio
 
 `templates/base.html:11,44` inclui `shell.bundle.css` (524.763 B) e `shell.bundle.js` (269.990 B)
 incondicionalmente. A lista `SHELL_JS` (`scripts/build_shell_bundles.py:24-73`) traz
@@ -3237,7 +3237,7 @@ pasta, movimento com remoção dos pais antigos, atalhos, atualização de conte
 de nome, listagem, exclusão e lixeira. Assim os parâmetros enviados à API e os efeitos locais são
 provados sem rede, credencial real ou gravação externa.
 
-### QA-06 🟡 Teste da CVE do WeasyPrint verifica texto-fonte, não comportamento · AUD · 0,5 d
+### QA-06 ✅ RESOLVIDO · Teste da CVE do WeasyPrint verifica comportamento · AUD · 0,5 d
 
 `documentos/tests/test_weasyprint_security.py:8-10` — o único teste é
 `assertIn("presentational_hints=False", inspect.getsource(render_pdf_bytes_weasyprint))`. E
@@ -3268,7 +3268,7 @@ ela, passa no teste e regride a mitigação que sustenta o *ignore* da CVE.
 > `<font>`; desligadas, transparente e preto. É literalmente o que a CVE explora.
 > Medido: 8 execuções seguidas, 8 verdes; invertendo a flag no adaptador, 2 de 3 reprovam.
 
-### QA-07 🟡 Nenhum gate de lint, formatação ou tipo em Python · AUD · 1 d
+### QA-07 ✅ RESOLVIDO · Nenhum gate de lint, formatação ou tipo em Python · AUD · 1 d
 
 `grep -i "ruff\|black\|flake8\|mypy\|isort\|pylint"` em `requirements/*.txt`,
 `.github/workflows/*.yml` e `pyproject.toml` → **vazio**. Os únicos auditores estáticos são os dois
@@ -4075,7 +4075,7 @@ para que o padrão da suíte seja o de produção.
 
 ---
 
-### NOVO-30 🟠 `NOVO` Três consultas de roteiro sem recorte de área — fechadas pelo `BE-09` · AUD · 0 d
+### NOVO-30 ✅ RESOLVIDO pelo `BE-09` · `NOVO` Três consultas de roteiro sem recorte de área · AUD · 0 d
 
 Apareceram na varredura da fatia 3 do `BE-09`, não no catálogo original. Nenhuma tinha filtro de
 área nenhum:
@@ -4613,7 +4613,7 @@ caía no balde `area IS NULL`, exatamente o estado que o `DB-02` eliminou dos mo
 
 ---
 
-### NOVO-32 🟡 `NOVO` `resetar_banco_demo` recria `ConfiguracaoSistema` sem área · QA · 0,25 d
+### NOVO-32 ✅ RESOLVIDO · `NOVO` `resetar_banco_demo` recria `ConfiguracaoSistema` com área · QA · 0,25 d
 
 `cadastros/management/commands/resetar_banco_demo.py:231` instancia `ConfiguracaoSistema()` cru e
 salva, criando linha com `area=NULL`. É exatamente o que o docstring de `get_singleton`
@@ -4622,6 +4622,10 @@ salva, criando linha com `area=NULL`. É exatamente o que o docstring de `get_si
 
 Contradição entre o comando de demonstração e a regra do modelo, e ela repovoa o balde que o
 `backfill_legacy_areas` existe para drenar.
+
+**Fechado na E0.** O comando agora cria cada configuração com `area=areas[i]`; o *blame* aponta a
+correção para `5d2c07a9`, que também alinhou os demais objetos do banco de demonstração ao
+escopo de área.
 
 ---
 
@@ -5636,7 +5640,7 @@ Os quatro campos com divergência em dev: `eventos.TipoEvento.nome` (5), `Ativid
 **Fecha quando** a contagem rodar contra produção, os campos bloqueados (se houver) forem resolvidos
 no sistema, e o `--commit` for aplicado com backup.
 
-### NOVO-58 🟠 EM ANDAMENTO · `NOVO` Claro e escuro não são dois temas do mesmo sistema: são dois desenhos diferentes · UI · a decidir
+### NOVO-58 ✅ RESOLVIDO · `NOVO` Claro e escuro não eram dois temas do mesmo sistema · UI · a decidir
 
 Medido com `getComputedStyle` nas 44 rotas, comparando o **mesmo elemento** nas duas versões do
 **mesmo documento** e olhando **só propriedades que não são cor** — cor é o que um tema tem direito
@@ -6157,7 +6161,7 @@ fonte simplesmente não carrega. Os dois ganharam um `../` a mais, e conferi no 
 por `css/actions/…` no texto não alcança isso: **43 testes quebraram** com `FileNotFoundError`.
 Corrigido com uma varredura que entende a forma `X / "pasta" / "arquivo.css"`.
 
-### NOVO-67 🟡 `NOVO` O auditor de padrões de front nunca varreu `static/css/components/` · CI · 0,5 d
+### NOVO-67 ✅ RESOLVIDO · `NOVO` O auditor de padrões de front nunca varreu `static/css/components/` · CI · 0,5 d
 
 Descoberto pelo `NOVO-66`. `scripts/audit_frontend_standards.py:444` usava `CSS_DIR.glob("*.css")` —
 **varredura rasa**. Enquanto os componentes moravam um nível abaixo, eles simplesmente não entravam
@@ -6179,7 +6183,7 @@ o corpo medido continua idêntico ao de antes — 240 avisos —, e um PR que s�
 **Abrir a cobertura é trabalho próprio**, com o número já medido: `240 → 354`. Os avisos se
 concentram em `actions/` (152) e `pages/` (128).
 
-### NOVO-68 🟠 PARCIAL · `NOVO` 155 regras de geometria deixam de depender do tema · UI · 1 d
+### NOVO-68 ✅ RESOLVIDO · `NOVO` 155 regras de geometria deixam de depender do tema · UI · 1 d
 
 Terceiro recorte do `NOVO-58`, e o primeiro **mecânico** — os anteriores (barra lateral) foram
 regra a regra.
@@ -6487,7 +6491,7 @@ folga e reprova o CI por escrever teste.
 Hoje o defeito é latente: o único `*.test.js` do repositório (`state-toggle.test.js`, da E6) não
 dispara nenhuma regra. A trava é para o próximo, e o custo dela é uma linha.
 
-### NOVO-83 🔴 · `NOVO` As duas réguas da E0 não sobem o navegador na sessão remota · COR · 0,25 d
+### NOVO-83 ✅ RESOLVIDO · 🔴 `NOVO` As duas réguas da E0 não subiam o navegador na sessão remota · COR · 0,25 d
 
 Irmão do `NOVO-72`, e o mesmo formato: **o comando que o projeto manda rodar não roda no ambiente
 que o próprio projeto monta para os agentes.**
@@ -6522,7 +6526,7 @@ medição ter **vínculo de área** — o sistema é escopado por `AreaTrabalho`
 `VinculoUsuarioArea` as rotas de detalhe respondem 404. O `.github/workflows/tests.yml` faz esse
 vínculo; o `AGENTS.md` §7 não menciona, e quem rodar a régua à mão sem ler o workflow cai nele.
 
-### NOVO-84 🔴 · `NOVO` A régua de tema reprovava `roteiros-editar@500` — e tinha razão · COR · 0,5 d
+### NOVO-84 ✅ RESOLVIDO · 🔴 `NOVO` A régua de tema reprovava `roteiros-editar@500` — e tinha razão · COR · 0,5 d
 
 Com o `NOVO-83` resolvido, a régua da E0 finalmente subiu o navegador e parou noutro ponto:
 
@@ -6647,7 +6651,7 @@ relayout assíncrono no editor de roteiro a 500 px, com 56px de crescimento. Iss
 não pintura, e mora perto da família 8h da E8 (a gaveta da barra lateral, que também é comportamento
 e também só existe abaixo de 840 px). Vale investigar junto quando a 8h for executada.
 
-### NOVO-85 🔴 · `NOVO` A armadilha de foco da gaveta vazava — e só no tema escuro · A11Y · 0,25 d
+### NOVO-85 ✅ RESOLVIDO · 🔴 `NOVO` A armadilha de foco da gaveta vazava — e só no tema escuro · A11Y · 0,25 d
 
 Apareceu na investigação da família **8h** da E8, e no lugar do defeito que se esperava: a premissa
 catalogada ("a gaveta é `fixed` no escuro e `relative` no claro") **já estava morta** — o `NOVO-68`
@@ -6686,7 +6690,7 @@ template, o `Shift+Tab` e o botão desabilitado. A prova de que prendem: com o s
 reposto, **4 dos 5 reprovam — e o que passa é justamente o do tema claro**, que é onde o defeito não
 existia.
 
-### NOVO-86 · `NOVO` O `NOVO-81` consertou um varredor de JS; existem dois · QA · 0,1 d
+### NOVO-86 ✅ RESOLVIDO · `NOVO` O `NOVO-81` consertou um varredor de JS; existem dois · QA · 0,1 d
 
 O `NOVO-81` tirou os `*.test.js` da varredura do `audit_frontend_standards.py`, com o argumento de
 que o que um teste monta para exercitar uma regra é exatamente o que a regra proíbe em produção. O
@@ -6960,7 +6964,7 @@ risco desta mudança, o bundle anterior e o novo foram trocados dentro do mesmo 
 **126 medições autenticadas, 60.497 elementos, 0 diferenças computadas**. Claro/escuro foram
 conferidos em 1440 e 500 px nas telas de equipe/transporte, roteiro de ofício e editor de roteiro.
 
-### NOVO-94 · `NOVO` A família 8g move a régua e não move um pixel · QA · fechada na medição
+### NOVO-94 ✅ RESOLVIDO · `NOVO` A família 8g move a régua e não move um pixel · QA · fechada na medição
 
 Terceira ocorrência da mesma armadilha do `NOVO-90`, e a primeira detectada **antes** de virar
 commit.
@@ -6989,7 +6993,7 @@ tabela do plano**.
 inteiro só existe no tema escuro — `.empty-state__mark` (24 elementos, sem nenhuma regra fora do
 arquivo escuro), os avatares do picker e o badge do wizard. Isso é maior que uma família e precisa de
 decisão própria.
-### NOVO-54 (continuação) 🟠 Trinta dos setenta `!important` de `.cv-field__control` não sustentavam nada · UI · 0,5 d
+### NOVO-54 (continuação) ✅ RESOLVIDO · Trinta dos setenta `!important` de `.cv-field__control` não sustentavam nada · UI · 0,5 d
 
 Segunda leva do `NOVO-54`. A primeira deu à classe uma regra base; esta começa a cobrar a dívida que
 a base tornou visível.
@@ -7031,7 +7035,7 @@ há.
 **Resta:** 40 `!important` (38 no arquivo de tema, 2 de acessibilidade) e as 68 regras em si, que a
 análise por família ainda vai separar entre contexto, estado, tema e divergência real.
 
-### NOVO-95 · `NOVO` A prova por não-interseção não vale: a cascata não é monotônica · QA · fechada na medição
+### NOVO-95 ✅ RESOLVIDO · `NOVO` A prova por não-interseção não vale: a cascata não é monotônica · QA · fechada na medição
 
 Erro de método cometido na **E9-a**, detectado pela própria régua antes de virar commit. Fica
 registrado porque a ideia é tentadora e vai ocorrer a quem retomar a etapa.
@@ -7119,7 +7123,7 @@ correção, porque a sua única declaração de fundo mora dentro de regra predi
 (`NOVO-93`) e que apareceu na medição da **8g** (`NOVO-94`, com `.empty-state__mark`). Token não
 resolve; precisa de regra base, e isso é decisão de desenho.
 
-### NOVO-97 · `NOVO` A E9-a entrega 32 regras, e o caminho até elas custou três tentativas · UI · em curso
+### NOVO-97 ✅ RESOLVIDO · `NOVO` A E9-a entrega 32 regras, e o caminho até elas custou três tentativas · UI
 
 Primeira colheita medida da **E9-a**: 32 regras só-escuras de cor saem do repositório sem mudar um
 pixel em tema nenhum.
@@ -7264,7 +7268,7 @@ unitário e o resumo aplica o efetivo uma única vez.
      As anteriores foram com o `#304` (`NOVO-88`) e o `#305` (`NOVO-92`). Ramos paralelos tiram
      número do mesmo contador sem reserva, e a colisão só aparece no merge. -->
 
-### NOVO-100 · `NOVO` O sistema de superfície do wizard só existia no tema escuro · UI · 0,5 d
+### NOVO-100 ✅ RESOLVIDO · `NOVO` O sistema de superfície do wizard só existia no tema escuro · UI · 0,5 d
 
 Terceira entrega da **E9**, e a que **destrava a família 8b** (`NOVO-93`).
 
@@ -7317,7 +7321,7 @@ claro "com variável indefinida". Não globalmente — eles têm ligação neutr
 `actions/action-system.css` (`.attach-signed-modal__dialog`) e `lists/record-list.css`
 (`.collection-panel`), e lá resolvem bem. O buraco era **só no escopo do wizard**. Isso muda o
 conserto: não era criar token, era ampliar escopo.
-### NOVO-54 (continuação 2) 🟠 As 72 regras de campo, classificadas por medição, e as 7 que caíram · UI · 1 d
+### NOVO-54 (continuação 2) ✅ RESOLVIDO · As 72 regras de campo, classificadas por medição, e as 7 que caíram · UI · 1 d
 
 Terceira leva do `NOVO-54`. As duas primeiras deram à classe uma regra base e cobraram 30 dos 70
 `!important`. Esta ataca as **regras em si**, por remoção empírica: em vez de ler cada uma e julgar
@@ -7407,7 +7411,7 @@ combinações** rota|tema|estado e de 224 para **1048 leituras**.
 e 2 são a base intocável; 16 sem cobertura precisam de rota que abra modal, passo de wizard ou painel
 colapsado; 8 de pseudo-elemento precisam de outro caminho que não o `getMatchedStylesForNode`.
 
-### NOVO-54 (continuação 3) 🟠 As candidatas de estado foram medidas no estado certo · UI · 0,5 d
+### NOVO-54 (continuação 3) ✅ RESOLVIDO · As candidatas de estado foram medidas no estado certo · UI · 0,5 d
 
 A classificação anterior deixou oito candidatas de estado para trás porque o instrumento media
 repouso. A primeira tentativa de fechar essa lacuna achou quatro defeitos na própria régua antes de
@@ -7444,7 +7448,7 @@ O corpus adicional também foi refeito sobre o banco descartável: **54 rotas, 3
 a rota não foi contada como cobertura. Continuam para a próxima leva os 16 contextos interativos e
 os 8 pseudo-elementos (`::placeholder`/`::-webkit-scrollbar-*`).
 
-### NOVO-54 (continuação 4) 🟠 Pseudo-elementos medidos e a classe passa a possuir a base · UI · 0,5 d
+### NOVO-54 (continuação 4) ✅ RESOLVIDO · Pseudo-elementos medidos e a classe passa a possuir a base · UI · 0,5 d
 
 A régua passou a fotografar `::placeholder`, `::-webkit-scrollbar`, `-track` e `-thumb`, além de
 registrar a cadeia de ancestrais de cada controle. Também ganhou `--seletor`, porque mudar o seletor
@@ -7488,7 +7492,7 @@ dinâmicos, deliberadamente separados do estilo. O inventário fecha em **36 reg
 11 arquivos e 0 pseudo-regra**, contra 72 regras no início da classificação. A regra canônica possui
 a base, e os contextos restantes são variações medidas, não correções cegas. **E7c concluída.**
 
-### NOVO-105 · `NOVO` A 8b precisa de três portões, não de um; e o piso de ruído era o relógio · QA · fechada na medição
+### NOVO-105 ✅ RESOLVIDO · `NOVO` A 8b precisa de três portões, não de um; e o piso de ruído era o relógio · QA · fechada na medição
 
 Duas correções a coisas que **eu mesmo escrevi** nesta sessão, ambas achadas medindo.
 
@@ -8008,3 +8012,17 @@ escura. As candidatas restantes que mudam a cascata, ou que não aparecem no cor
 apagadas por inferência: `theme-dark-components.css` encerra o ciclo com **2.434 linhas e 98
 `!important`**, somente seletores predicados por tema e catraca que só desce. A eficiência do bundle
 global é uma decisão distinta de waterfall/cache, não resíduo oculto de `UI-02` ou `UI-04`.
+
+### NOVO-121 ✅ RESOLVIDO · `NOVO` Vinte e um cabeçalhos continuavam abertos depois da própria prova de fechamento · QA · 0,25 d
+
+A reauditoria após o encerramento do plano mestre encontrou **21 cabeçalhos** cujo estado não
+acompanhou o corpo da seção nem os commits já mesclados. Não eram 21 correções novas de produção:
+eram estados documentais vencidos de `HT-04`, `QA-06`, `QA-07`, `NOVO-30`, `NOVO-32`, `NOVO-54`
+(quatro continuações), `NOVO-58`, `NOVO-67`, `NOVO-68`, `NOVO-83`–`86`, `NOVO-94`, `NOVO-95`,
+`NOVO-97`, `NOVO-100` e `NOVO-105`.
+
+**Correção.** Cada título agora diz `✅ RESOLVIDO` somente quando a própria seção registra a
+implementação/prova e o histórico de Git contém a entrega correspondente. Nenhum cabeçalho foi
+fechado só porque o plano mestre terminou. `PF-02`, `QA-12`, `NOVO-89`, `NOVO-90`, `NOVO-91` e os
+demais defeitos sem implementação comprovada continuam abertos e formam as próximas unidades de
+trabalho.
