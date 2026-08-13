@@ -1768,16 +1768,29 @@ expressão nas 4 ou 5 colunas realmente buscadas.
 auditoria realmente faz (uma área, um período) cai em dois índices de coluna única em vez de um
 composto.
 
-### DB-13 🟡 A composição da diária é texto livre · AUD · 4 d · risco alto · **fora desta rodada**
+### DB-13 ✅ RESOLVIDO · A composição da diária era texto livre · AUD · risco alto
 
 `roteiros/models.py:78-82` — `quantidade_diarias = CharField(max_length=120)` guarda uma frase
 ("2 x 100% + 1 x 30%") ao lado de `valor_diarias`. O `Roteiro` não tem FK nem cópia da linha de
 `TabelaDiaria` usada.
 **Efeito:** não há como responder por consulta "quantas diárias de 30% foram pagas em 2026" nem
 reconciliar um valor pago com a tabela vigente na época.
-**Por que fica de fora:** mexer aqui reabre a regra de dinheiro, fechada no ciclo de julho com os
-demonstrativos oficiais travados por teste. O ganho é de auditabilidade, não de correção.
-Catalogado para uma rodada futura, com `DB-01` como pré-requisito.
+**Fechado em 13/08, depois do pré-requisito `DB-01`, sem mudar a regra monetária.** O teste de
+caracterização entrou em commit anterior à implementação e trava o demonstrativo oficial
+Curitiba → São Paulo → Abatiá → Curitiba em **R$ 773,19**, com o mesmo resumo
+`2 x 100% + 1 x 30%`.
+
+`RoteiroDiariaComponente` passa a guardar, para cada parcela: faixa, percentual, quantidade,
+período, FK da `TabelaDiaria`, vigência, valor unitário e subtotal copiados. Assim uma consulta
+com `Sum(..., filter=Q(percentual=30))` responde a quantidade sem interpretar texto, e a soma dos
+subtotais reconcilia o `valor_diarias`. A FK usa `PROTECT`; editar a tabela referenciada não muda
+os valores congelados. O recálculo substitui as linhas e o total na mesma transação.
+
+A migração `roteiros/0016` traz a query de validação e o procedimento de backup exigidos para
+dados financeiros. Ela extrai somente quantidade/percentual de resumos legados inequívocos;
+deixa FK, faixa e valores nulos e **não recalcula dinheiro histórico**. Resumos ambíguos como
+`2,5` permanecem intactos. O contrato tem 7 testes próprios, inclusive rollback causal quando a
+gravação das parcelas falha.
 
 ---
 
