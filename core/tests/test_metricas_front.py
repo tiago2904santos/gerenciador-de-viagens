@@ -153,6 +153,16 @@ class CssPorRotaMetricTests(SimpleTestCase):
             all(item["usage_percent_min"] > 0 for item in css_gate["routes"].values())
         )
 
+    def test_todas_as_rotas_cumprem_o_aceite_pf02_de_35_por_cento(self):
+        thresholds = json.loads(css_metric.DEFAULT_THRESHOLDS.read_text(encoding="utf-8"))
+        abaixo = {
+            slug: item["usage_percent_min"]
+            for slug, item in thresholds["css_by_route"]["routes"].items()
+            if item["usage_percent_min"] < 35.0
+        }
+
+        self.assertEqual(abaixo, {}, msg=f"PF-02 ainda aberto: {abaixo}")
+
     def test_ci_migra_o_banco_descartavel_antes_de_semear(self):
         workflow = (css_metric.ROOT / ".github" / "workflows" / "tests.yml").read_text(
             encoding="utf-8"
