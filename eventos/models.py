@@ -184,8 +184,6 @@ class TipoEvento(TimeStampedModel):
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
         on_delete=models.PROTECT,
-        null=True,
-        blank=True,
         related_name="tipos_evento",
         verbose_name="Area de trabalho",
     )
@@ -207,13 +205,7 @@ class TipoEvento(TimeStampedModel):
         ]
         constraints = [
             models.UniqueConstraint(
-                fields=["nome"],
-                condition=Q(area__isnull=True),
-                name="eventos_tipo_nome_global_unique",
-            ),
-            models.UniqueConstraint(
                 fields=["area", "nome"],
-                condition=Q(area__isnull=False),
                 name="eventos_tipo_area_nome_unique",
             ),
         ]

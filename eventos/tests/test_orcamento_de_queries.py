@@ -131,7 +131,9 @@ class OrcamentoDeQueriesEventoTests(TestCase):
     # consome (`termos.selectors.prefetch_servidores_efetivos`), então a
     # consulta que o prefetch cru desperdiçava deixou de existir.
     QUERIES_DETALHE = 64  # remedido no DB-02: usuário de teste passou a ter vínculo de área
-    QUERIES_TIPOS = 6
+    # `NOVO-49`: a área de teste passou a nascer com os cinco tipos canônicos;
+    # a paginação agora conta um conjunto real em vez de encerrar sobre vazio.
+    QUERIES_TIPOS = 7
 
 
 class OrcamentoDeQueriesEventoComOrdensTests(TestCase):

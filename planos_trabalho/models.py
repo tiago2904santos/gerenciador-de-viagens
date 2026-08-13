@@ -29,8 +29,6 @@ class ProgramaSolicitante(TimeStampedModel):
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
         on_delete=models.PROTECT,
-        null=True,
-        blank=True,
         related_name="programas_solicitantes",
         verbose_name="Area de trabalho",
     )
@@ -53,8 +51,7 @@ class ProgramaSolicitante(TimeStampedModel):
             models.Index(fields=["area", "ordem", "nome"], name="planos_prog_area_ordem_idx"),
         ]
         constraints = [
-            models.UniqueConstraint(fields=["nome"], condition=Q(area__isnull=True), name="planos_programa_nome_global_unique"),
-            models.UniqueConstraint(fields=["area", "nome"], condition=Q(area__isnull=False), name="planos_programa_area_nome_unique"),
+            models.UniqueConstraint(fields=["area", "nome"], name="planos_programa_area_nome_unique"),
         ]
 
     def __str__(self):
@@ -71,8 +68,6 @@ class HorarioAtendimento(TimeStampedModel):
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
         on_delete=models.PROTECT,
-        null=True,
-        blank=True,
         related_name="horarios_atendimento",
         verbose_name="Area de trabalho",
     )
@@ -91,8 +86,7 @@ class HorarioAtendimento(TimeStampedModel):
             models.Index(fields=["area", "ordem", "faixa"], name="planos_horario_area_ordem_idx"),
         ]
         constraints = [
-            models.UniqueConstraint(fields=["faixa"], condition=Q(area__isnull=True), name="planos_horario_faixa_global_unique"),
-            models.UniqueConstraint(fields=["area", "faixa"], condition=Q(area__isnull=False), name="planos_horario_area_faixa_unique"),
+            models.UniqueConstraint(fields=["area", "faixa"], name="planos_horario_area_faixa_unique"),
         ]
         verbose_name = "Horário de atendimento"
         verbose_name_plural = "Horários de atendimento"
@@ -116,8 +110,6 @@ class AtividadePlanoTrabalho(TimeStampedModel):
     area = models.ForeignKey(
         "usuarios.AreaTrabalho",
         on_delete=models.PROTECT,
-        null=True,
-        blank=True,
         related_name="atividades_plano_trabalho",
         verbose_name="Area de trabalho",
     )
@@ -139,8 +131,7 @@ class AtividadePlanoTrabalho(TimeStampedModel):
             models.Index(fields=["area", "ordem", "nome"], name="planos_ativ_area_ordem_idx"),
         ]
         constraints = [
-            models.UniqueConstraint(fields=["codigo"], condition=Q(area__isnull=True), name="planos_atividade_codigo_global_unique"),
-            models.UniqueConstraint(fields=["area", "codigo"], condition=Q(area__isnull=False), name="planos_atividade_area_codigo_unique"),
+            models.UniqueConstraint(fields=["area", "codigo"], name="planos_atividade_area_codigo_unique"),
         ]
         verbose_name = "Atividade (Plano de Trabalho)"
         verbose_name_plural = "Atividades (Plano de Trabalho)"

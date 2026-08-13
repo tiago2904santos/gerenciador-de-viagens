@@ -155,7 +155,7 @@ Precisam de resposta humana; nenhuma bloqueia a fase 0.
 | ~~Qual UI Lab é o vigente~~ **decidida em 07/08 (PR #247): nenhum — os dois saíram** | `BE-25` (fase 9) | A cascata de componentes órfãos que a decisão deixou é o `NOVO-44`, fechado |
 | Arquitetura de configurações | fora das 9 fases | Proposta de 17–28 dias, em `historico/2026-07-refactor/planos/PROPOSTA_CONFIGURACOES.md`; entra como fase própria ou fica fora do ciclo |
 | Triagem dos 13 PRs abertos | fase 9 | 12 são de maio–julho, anteriores ao refactor; fechar ou reabrir é chamada sua |
-| ~~Catálogo global do `DB-02` (grupo 2)~~ **decidida em 07/08: cópia por área, seguindo o `NOVO-09`** | `DB-02` (fase 2) | Executada nas migrações `eventos/0016` e `planos_trabalho/0024`. **Correção de fato:** as linhas de seed **não** eram "servidas a todas as áreas" — medido nas três áreas, eram vistas por **zero** usuários com área, porque `filter_queryset_by_area` é estrito. Duplicar não repartiu nada: deu a cada área um catálogo que ela não tinha. O resíduo (instalação nova e área criada depois) é o `NOVO-49` |
+| ~~Catálogo global do `DB-02` (grupo 2)~~ **decidida em 07/08: cópia por área, seguindo o `NOVO-09`** | `DB-02` (fase 2) | Executada nas migrações `eventos/0016` e `planos_trabalho/0024`. As linhas de seed eram vistas por **zero** usuários com área. O resíduo de instalação/área nova foi fechado pelo `NOVO-49`: fonte canônica, seed transacional e `NOT NULL` nas migrações `usuarios/0002`, `eventos/0017` e `planos_trabalho/0025`. |
 
 ## 9. Quadro de acompanhamento
 
@@ -282,9 +282,11 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       `scripts/validar_not_null_db02.py` mede sem esperar um deploy (limite 4). O balde legado
       operacional ficou vazio **por construção**, escrita sem área falha alto, e o passo
       "`filter_queryset_by_area` sem área vira `none()`" caiu por desnecessário para o grupo 1.
-      Grupos 2 e 3 seguem anuláveis **por desenho**; a decisão de produto do grupo 2 está no §8
-      e no `NOVO-45`. A conversão da suíte rendeu `core/testing.py` (área e vínculo de teste,
+      O grupo 2 foi saneado e tornou-se obrigatório no `NOVO-49`; apenas o grupo 3 segue
+      anulável **por desenho**. A conversão da suíte rendeu `core/testing.py` (área e vínculo de teste,
       `com_request`) e fechou de carona um N+1 nas pendências do Drive. **Fecha a Fase 2.**
+- [x] `NOVO-49` fonte canônica dos quatro catálogos semeados; área nova recebe 22 itens em
+      transação única, instalações existentes são saneadas e `area` passa a `NOT NULL`
 - [x] `DB-04` cache documental não recorta por área — latente, como o enunciado dizia, mas por
       outro motivo: quem separa as áreas é a **referência**, que era opcional. Agora é obrigatória
       (`ValueError` sem ela). A afirmação de que todo artefato nascia `area=NULL` **era falsa** —
