@@ -210,6 +210,12 @@ Com 17 queries planas e 20 cards, o tempo não está no banco:
 à parte porque é a **métrica de aceite** deles: a rota precisa cair para a faixa das outras
 listas (< 40 ms) sem que a contagem de queries suba.
 
+> **Parcial em 13/08/2026.** A rota caiu de 13 para 9 consultas e de 125,5 para 76,7 ms no
+> volume 200; em 20.000 registros, 1.554,4 virou 235,6 ms. A eliminação das contagens repetidas
+> resolveu a escala principal e baixou as catracas, mas o aceite de 40 ms segue aberto. O
+> processador de navegação repetido por componentes Cotton também ganhou cache por requisição;
+> sua medida final será registrada pelo CI da fatia.
+
 ### 2.6 `PF-06` — queries duplicadas em duas rotas
 
 `/usuarios/` emite **2** queries idênticas repetidas; `/prestacoes-contas/`, **1**. Volume
@@ -233,7 +239,7 @@ Enquanto não houver medição com volume, não se sabe.
 |---|---|---|---:|---|---|
 | **D1** ✅ | **Régua de desempenho** — `scripts/medir_desempenho.py` no repositório, semeando cada domínio **em dois volumes (200 e 20.000)**, medindo queries, tempo, KB de HTML e uso de CSS por rota; teto por rota no CI | `PF-07` | 3–4 | baixo | O script roda no CI e falha se qualquer rota passar do teto declarado, nos dois volumes |
 | **D2** | **Folha de símbolos de ícone** | `PF-01` | 2–3 | baixo | `/oficios/` abaixo de 250 KB de HTML; suíte verde; telas conferidas nos dois temas |
-| **D3** | **Menu de ação sob demanda** | `PF-04`, `PF-05` | 2–3 | médio | `/oficios/` abaixo de 40 ms e abaixo de 150 KB; teste de teclado e ARIA |
+| **D3** 🟠 | **Menu de ação sob demanda** | `PF-04`, `PF-05` | 2–3 | médio | `PF-04` entregue; `/oficios/` em 76,7 ms e 165,6 KB, ainda acima do aceite de 40 ms / 150 KB |
 | **D4** | **Sessão fora do caminho quente** | `PF-03` | 1–2 | médio | Requisição autenticada trivial sem `UPDATE django_session`; decisão de expiração registrada |
 | **D5** | **Consultas duplicadas** | `PF-06` | 1 | baixo | Zero query repetida nas rotas medidas |
 | **D6** | **Aceite do CSS** (depois do `PLANO_FRONTEND`) | `PF-02` | — | — | Uso de CSS acima de 35% em todas as rotas medidas |

@@ -1969,11 +1969,22 @@ dois temas.
 
 `roteiros` não entra: não tem menu.
 
-### PF-05 🟡 A lista de Ofícios leva 127 ms no servidor · MED · —
+### PF-05 🟠 PARCIAL · A lista de Ofícios leva 127 ms no servidor · MED · —
 
 Com 17 queries planas e 20 cards. As outras listas ficam entre 15 e 46 ms. É consequência de
 `PF-01` e `PF-04`; existe como **métrica de aceite** deles: abaixo de 40 ms sem subir a contagem
 de queries.
+
+> **Remedido em 13/08/2026; o critério de 40 ms continua aberto.** A causa dominante não era
+> só o card: as quatro contagens das abas repetiam a mesma classificação com `Exists`, e o
+> paginador fazia um quinto `COUNT`. Uma agregação e o total conhecido do paginador reduziram a
+> rota de **13 para 9 consultas**. No CI, volume 200 caiu de **125,5 para 76,7 ms**; em 20.000,
+> de **1.554,4 para 235,6 ms**. É uma queda material, mas 76,7 ainda não é menor que 40.
+>
+> O perfil também provou que Cotton executava o processador de navegação nove vezes na mesma
+> requisição. O resultado agora é memorizado **somente no objeto `request`**; o teste exige uma
+> única construção e impede cache entre usuários. A medição canônica desta última queda fica no
+> CI do PR; o ID não fecha enquanto o teto original não for atingido.
 
 ### PF-06 ✅ RESOLVIDO (parte) · ⚪ Queries duplicadas em duas rotas · MED · 0,5 d cada
 
@@ -5266,7 +5277,7 @@ o que muda é quem passa a ser a fonte da verdade daqui para a frente. Só entã
 
 ---
 
-### NOVO-50 🟡 `NOVO` Listas de ofícios e planos gastam ~130 ms em 20 linhas resolvendo `select_related` por `Nested Loop` · PF · a medir
+### NOVO-50 🟠 PARCIAL (13/08/2026) · `NOVO` Listas de ofícios e planos gastam ~130 ms em 20 linhas resolvendo `select_related` por `Nested Loop` · PF · a medir
 
 Achado ao medir o `DB-10`, e é o motivo de o índice de ordenação não ter ajudado essas duas.
 
@@ -5303,6 +5314,19 @@ tabelas de dimensão irreais.
 >
 > **O conserto do semeador desbloqueou outra medição na hora:** o `DB-11` (`pg_trgm`) só pôde ser
 > respondido depois dele — ver lá.
+
+> **Fatia causal de 13/08/2026.** A hipótese do `select_related` foi testada diretamente: a
+> paginação passou a selecionar primeiro os 20 ids e só então hidratar suas dimensões. Isolada,
+> ela quase não moveu o volume 200 e reduziu cerca de 5% no volume 20.000 — portanto não era a
+> causa dominante que o título supunha. O custo maior eram as quatro contagens temporais repetindo
+> os mesmos `Exists`; elas viraram uma agregação, e o paginador reutiliza o total da aba.
+>
+> Resultado canônico antes → depois: Ofícios **125,5 → 76,7 ms** (200) e
+> **1.554,4 → 235,6 ms** (20.000); Planos **88,0 → 81,7 ms** e
+> **2.840,9 → 1.090,2 ms**. Consultas: Ofícios **13 → 9**, Planos **14 → 9**;
+> pela mesma função compartilhada, Eventos **30 → 27** e Ordens **15 → 12**. Esses quatro
+> tetos descem no mesmo PR. O ganho em volume alto fecha a causa de escala, mas o ID permanece
+> parcial junto com o `PF-05`: o aceite de 40 ms no volume 200 ainda não foi alcançado.
 
 ### NOVO-49 ✅ RESOLVIDO · 🟡 `NOVO` O painel de `/` custava cinco consultas por login para uma tela que o dono não queria · MOR · 0,25 d
 

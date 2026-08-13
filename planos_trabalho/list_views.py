@@ -7,9 +7,11 @@ from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.http import require_POST
 from core.pagination import contexto_paginacao
+from core.pagination import KnownCountPaginator
 from core.deletion import DelecaoProtegidaError
 from eventos.services import resolve_evento_from_request
 from .models import PlanoTrabalho
+from .selectors import hidratar_planos_da_pagina
 from .selectors import listar_planos_trabalho
 from .presenters import apresentar_plano_card
 from .services import criar_plano_rascunho
@@ -46,9 +48,17 @@ def index(request):
                    "viagem_de": viagem_de, "viagem_ate": viagem_ate},
     )
 
-    paginacao = contexto_paginacao(lista, request, 20)
+    paginacao = contexto_paginacao(
+        lista,
+        request,
+        20,
+        paginator_class=KnownCountPaginator,
+        paginator_kwargs={"known_count": contagem[aba]},
+    )
     page_obj = paginacao["page_obj"]
-    cards = [apresentar_plano_card(plano) for plano in page_obj.object_list]
+    objetos_da_pagina = hidratar_planos_da_pagina(page_obj.object_list)
+    page_obj.object_list = objetos_da_pagina
+    cards = [apresentar_plano_card(plano) for plano in objetos_da_pagina]
     has_filters = any([q, status, viagem_de, viagem_ate, sort])
     return render(
         request,

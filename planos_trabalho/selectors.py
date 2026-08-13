@@ -13,6 +13,7 @@ inteiro. Movê-las agora seria trabalho jogado fora.
 from __future__ import annotations
 
 from django.db.models import OuterRef
+from django.db.models import Prefetch
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
@@ -27,6 +28,7 @@ from prestacoes_contas.models import PrestacaoServidor
 from .models import AtividadePlanoTrabalho
 from .models import EventoPlano
 from .models import HorarioAtendimento
+from .models import PlanoDestino
 from .models import PlanoTrabalho
 from .models import PresetAtividadesPlanoTrabalho
 from .models import ProgramaSolicitante
@@ -94,6 +96,36 @@ def listar_planos_trabalho(q=None, status=None, viagem_de=None, viagem_ate=None,
     else:
         sub = sub.filter(prestacao__area=area)
     return tabs.anotar_finalizacao(planos, sub, sub.filter(finalizada=False))
+
+
+def hidratar_planos_da_pagina(pagina):
+    """Limita primeiro; resolve catálogos e coleções apenas para os 20 IDs."""
+    ids = list(pagina.values_list("pk", flat=True))
+    if not ids:
+        return []
+
+    queryset = (
+        filter_queryset_by_area(PlanoTrabalho.objects)
+        .filter(pk__in=ids)
+        .select_related(
+            "programa",
+            "destino_cidade__estado",
+            "coordenador_adm__cargo",
+            "coordenador_op__cargo",
+        )
+        .prefetch_related(
+            "atividades_selecionadas",
+            "efetivos",
+            Prefetch(
+                "destinos",
+                queryset=PlanoDestino.objects.select_related("cidade", "estado").order_by("ordem", "pk"),
+            ),
+            "eventos",
+            "eventos__efetivos",
+        )
+    )
+    por_id = {plano.pk: plano for plano in queryset}
+    return [por_id[pk] for pk in ids]
 
 
 def queryset_plano_detalhe():

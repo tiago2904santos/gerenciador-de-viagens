@@ -7,9 +7,14 @@ from .navigation import build_navigation
 
 
 def navigation(request):
-    return {
-        "navigation_items": build_navigation(request),
-    }
+    cached = getattr(request, "_cv_navigation_context", None)
+    if cached is None:
+        # django-cotton cria um contexto por componente e volta a executar os
+        # processadores. A navegação depende apenas desta requisição: montá-la
+        # uma vez evita dezenas de reverse() por página sem cache entre usuários.
+        cached = {"navigation_items": build_navigation(request)}
+        request._cv_navigation_context = cached
+    return cached
 
 
 def _login_enforced() -> bool:

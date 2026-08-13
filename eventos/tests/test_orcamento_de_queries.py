@@ -124,8 +124,8 @@ class OrcamentoDeQueriesEventoTests(TestCase):
     # Onde o corte é **-1**, o teste mede a **primeira** requisição depois do
     # login: ali `core/tenancy.py:52` grava a área na sessão, que por isso é
     # salva de qualquer jeito, e só a leitura é economizada.
-    QUERIES_LISTA = 17
-    QUERIES_LISTA_BUSCA = 17
+    QUERIES_LISTA = 14  # NOVO-50: quatro contagens de aba viraram uma agregação
+    QUERIES_LISTA_BUSCA = 14
     # `NOVO-08` (06/08/2026): 78 -> 77. O detalhe do evento passou a usar o
     # `Prefetch` de servidores na forma que `TermoAutorizacao.servidores_efetivos()`
     # consome (`termos.selectors.prefetch_servidores_efetivos`), então a
