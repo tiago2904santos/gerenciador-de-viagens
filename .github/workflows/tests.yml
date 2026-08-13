@@ -467,6 +467,10 @@ jobs:
             --password-env FRONT_METRICS_PASSWORD \
             --json "$RUNNER_TEMP/divergencia-tema.json" \
             "${metric_args[@]}"
+          python scripts/audit_accessibility.py \
+            --username front_metrics \
+            --password-env FRONT_METRICS_PASSWORD \
+            --json "$RUNNER_TEMP/accessibility-axe.json"
 
       - name: Publish frontend measurements and recalibrated ceilings (NOVO-91)
         if: always()
@@ -477,4 +481,5 @@ jobs:
           path: |
             ${{ runner.temp }}/css-por-rota.json
             ${{ runner.temp }}/divergencia-tema.json
+            ${{ runner.temp }}/accessibility-axe.json
             scripts/tetos_front.json

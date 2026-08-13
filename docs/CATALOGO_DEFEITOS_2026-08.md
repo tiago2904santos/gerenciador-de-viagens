@@ -3380,7 +3380,7 @@ Actions.
 conferência de encoding seria usar produção como ambiente de teste, e o que se ganharia já está
 provado por outros meios.
 
-### QA-12 🟡 Sem Dependabot, sem CodeQL, sem gate de acessibilidade · AUD · 0,25 d + 3 d
+### QA-12 ✅ RESOLVIDO (13/08/2026) · Sem Dependabot, sem CodeQL, sem gate de acessibilidade · AUD · 0,25 d + 3 d
 
 `find .github -iname "*dependabot*" -o -iname "*codeql*"` → vazio. O `pip-audit` de
 `tests.yml:112-115` só roda em `push`/`pull_request`: CVE divulgada depois do último merge só
@@ -3389,6 +3389,23 @@ ou `alt` — o `HT-01` (foco invisível) e o `HT-02` (erro sem `aria-describedby
 por ele indefinidamente.
 **Correção:** Dependabot (`pip` + `github-actions`, semanal) é barato e fecha metade da lacuna;
 a11y automatizado (axe-core via Playwright, já disponível no ambiente) é investimento maior.
+
+**Fechamento em 13/08/2026.** O diagnóstico original ficou parcialmente vencido antes do
+fechamento: `.github/dependabot.yml` já vigiava semanalmente `pip` e `github-actions`. A lacuna
+restante foi fechada por duas catracas independentes:
+
+- `.github/workflows/codeql.yml` executa CodeQL para Python e JavaScript/TypeScript em PR, push,
+  agenda semanal e disparo manual;
+- `scripts/audit_accessibility.py` injeta o `axe-core` 4.12.1 pelo Playwright na aplicação Django
+  real, mede as **43 rotas canônicas nos temas claro e escuro (86 medições)** e publica o JSON
+  junto das demais réguas de frontend.
+
+A primeira medição integral encontrou **148 combinações rota/tema/regra**, correspondentes a
+**292 alvos DOM** já existentes. Elas ficaram registradas por rota, tema, regra e seletor em
+`scripts/accessibility-baseline.json`: a catraca aceita a dívida diminuir, mas qualquer alvo novo
+reprova o CI. Assim o gate não finge que o legado já está em zero e também não permite que a
+baseline seja atualizada com uma amostra parcial. Seis testes travam Dependabot, CodeQL, versão
+do axe, corpus/temas, integração no CI, baseline e a preservação do alvo no diagnóstico.
 
 ### QA-13 ✅ RECONCILIADO · 218 de 1.266 testes são "magros" · AUD · —
 

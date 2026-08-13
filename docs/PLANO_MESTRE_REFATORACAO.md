@@ -228,8 +228,8 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       `Error`, senão o gate não pegaria o próprio defeito que o motivou. `ALLOWED_HOSTS` vazia
       passou a falhar cedo no `prod.py`, padrão `REDIS_URL`. **Fecha a Fase 1 inteira.**
 - [x] `QA-11` `reparar-producao.yml` em UTF-16LE
-- [x] `QA-12` sem Dependabot, sem CodeQL, sem gate de acessibilidade — **Dependabot entrou**;
-      CodeQL e gate de acessibilidade seguem abertos
+- [x] `QA-12` Dependabot semanal (`pip` + Actions), CodeQL para Python/JavaScript e axe-core no
+      corpus real: 43 rotas × 2 temas; baseline por alvo impede dívida nova e só pode descer
 
 ### Fase 2 — Isolamento por área
 - [x] `DB-03` limpeza de rascunhos apaga rascunho de outra área — e mais: sem limite de idade, ela
