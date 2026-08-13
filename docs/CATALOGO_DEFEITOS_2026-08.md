@@ -3973,7 +3973,7 @@ funcionando pelo contrato novo.
 
 ---
 
-### NOVO-14 🟡 `NOVO` Doze `classList.contains` ainda leem classe de componente como condição · QA · 1 d
+### NOVO-14 ✅ RESOLVIDO (13/08/2026) · `NOVO` `classList.contains` lia classe de componente como condição · QA · 1 d
 
 Sobra do `JS-06` fora do picker, agora com teto no auditor (`css_class_as_logic`):
 
@@ -3990,6 +3990,23 @@ comportamento, não nome de componente, e não impede renomear o CSS.
 
 **Fila:** as 6 do editor saem com `BE-11` (fase 6); as outras 6 com a reconstrução do CSS (fase 7),
 junto de `HT-08`. Enquanto isso o teto impede que o número suba.
+
+**Remedição (13/08/2026):** a remedição encontrou **9 ocorrências ativas**, não 12. As duas
+atribuídas a `cv-select.js` desapareceram quando o arquivo morto foi removido no `NOVO-69`, e a soma
+da tabela original era 11, apesar de o título dizer 12. As nove restantes foram substituídas por
+estado ou hook semântico:
+
+| família | contrato de lógica novo |
+|---|---|
+| opção selecionada | `aria-selected="true"` |
+| menu aberto | propriedade `hidden` |
+| tooltip de gerenciamento | `data-tooltip-tone="accent"` emitido pelo componente Cotton |
+| tempo de viagem/adicional | `data-route-time-kind="travel|additional"` nos renderizadores estático e dinâmico |
+
+As classes continuam sendo escritas para o CSS, mas nenhuma delas é lida como condição. A catraca
+`css_class_as_logic` caiu de 9 para **0** e as quatro exceções correspondentes foram removidas de
+`JS_EXCEPTIONS`. Quatro testes de contrato impedem a volta da dependência e também renderizam o
+botão Cotton para provar que o hook chega ao HTML.
 
 ---
 

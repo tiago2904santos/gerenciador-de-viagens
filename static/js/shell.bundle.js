@@ -2248,7 +2248,7 @@ document.documentElement.dataset.appReady = "true";
     tooltip.textContent = text;
     tooltip.classList.toggle(
       "global-tooltip--accent",
-      target.classList.contains("icon-btn--field-manage")
+      target.getAttribute("data-tooltip-tone") === "accent"
     );
     tooltip.hidden = false;
     tooltip.classList.add("is-visible");
@@ -2593,7 +2593,7 @@ document.documentElement.dataset.appReady = "true";
   }
 
   function abrirMenuResolvido(trigger, menu) {
-    var wasOpen = menu.classList.contains("action-menu--open");
+    var wasOpen = !menu.hidden;
     closeMenus();
     if (wasOpen) return;
     rememberOwner(menu);

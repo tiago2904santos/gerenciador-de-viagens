@@ -251,7 +251,7 @@
     // Focar opção selecionada ou a primeira disponível
     var startIdx = -1;
     for (var j = 0; j < this._items.length; j++) {
-      if (this._items[j].el.classList.contains('custom-select__option--selected')) {
+      if (this._items[j].el.getAttribute('aria-selected') === 'true') {
         startIdx = j;
         break;
       }

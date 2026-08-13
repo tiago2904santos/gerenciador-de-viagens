@@ -50,7 +50,7 @@
     tooltip.textContent = text;
     tooltip.classList.toggle(
       "global-tooltip--accent",
-      target.classList.contains("icon-btn--field-manage")
+      target.getAttribute("data-tooltip-tone") === "accent"
     );
     tooltip.hidden = false;
     tooltip.classList.add("is-visible");

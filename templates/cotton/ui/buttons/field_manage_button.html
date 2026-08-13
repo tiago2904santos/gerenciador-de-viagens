@@ -1,3 +1,3 @@
 {% cotton:vars action_label aria_label data_autosave_link href size type %}
 {# Botão circular de gerenciar (engrenagem) — mesmo padrão das listas; tooltip no hover. #}
-{% with cotton_attr_aria_label=aria_label|default:action_label %}<c-ui.buttons.icon_button :href="href" action="settings" :type="type" :aria_label="cotton_attr_aria_label" :tooltip="action_label" :size="size" extra_class="icon-btn--field-manage" :data_autosave_link="data_autosave_link" only />{% endwith %}
+{% with cotton_attr_aria_label=aria_label|default:action_label %}<c-ui.buttons.icon_button :href="href" action="settings" :type="type" :aria_label="cotton_attr_aria_label" :tooltip="action_label" data_tooltip_tone="accent" :size="size" extra_class="icon-btn--field-manage" :data_autosave_link="data_autosave_link" only />{% endwith %}

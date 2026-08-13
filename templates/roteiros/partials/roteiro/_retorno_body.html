@@ -39,13 +39,13 @@
 <div class="field-grid field-grid--cols-3 oficio-roteiro-time-calc-grid roteiro-time-calc-grid roteiro-trecho-card__time-grid">
   <div class="field cv-field field-size-1">
     <label class="cv-field__label" for="id_retorno_tempo_viagem_hhmm">Tempo de viagem</label>
-    <input type="text" class="cv-field__control" id="id_retorno_tempo_viagem_hhmm" value="" placeholder="00:00" data-mask="time" inputmode="numeric" maxlength="5" autocomplete="off">
+    <input type="text" class="cv-field__control" id="id_retorno_tempo_viagem_hhmm" data-route-time-kind="travel" value="" placeholder="00:00" data-mask="time" inputmode="numeric" maxlength="5" autocomplete="off">
     <input type="hidden" name="retorno_tempo_cru_estimado_min" id="id_retorno_tempo_cru_estimado_min" value="{{ retorno_state.tempo_cru_estimado_min|default:'' }}">
   </div>
   <div class="field cv-field field-size-1">
     <label class="cv-field__label" for="id_retorno_tempo_adicional_hhmm">Tempo adicional</label>
     <div class="roteiro-time-calc-stepper roteiro-trecho-card__time-stepper">
-      <input type="text" class="cv-field__control trecho-tempo-adicional-hhmm" id="id_retorno_tempo_adicional_hhmm" value="" placeholder="00:00" data-mask="time" inputmode="numeric" maxlength="5" autocomplete="off">
+      <input type="text" class="cv-field__control trecho-tempo-adicional-hhmm" id="id_retorno_tempo_adicional_hhmm" data-route-time-kind="additional" value="" placeholder="00:00" data-mask="time" inputmode="numeric" maxlength="5" autocomplete="off">
       <c-ui.buttons.button type="button" class_name="cv-btn cv-btn--secondary cv-btn--control trecho-tempo-add-btn" id="retorno_tempo_add_menos" data-tempo-add-delta="-15" aria_label="Menos 15 minutos" only>−</c-ui.buttons.button>
       <c-ui.buttons.button type="button" class_name="cv-btn cv-btn--secondary cv-btn--control trecho-tempo-add-btn" id="retorno_tempo_add_mais" data-tempo-add-delta="15" aria_label="Mais 15 minutos" only>+</c-ui.buttons.button>
     </div>
