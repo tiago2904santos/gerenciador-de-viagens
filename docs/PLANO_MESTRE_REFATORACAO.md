@@ -387,6 +387,8 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       55 linhas idênticas (o enunciado dizia 41) e `wizard_roteiro` só 20 de 165. As duas primeiras
       foram unificadas atrás de `roteiros/services/editor_flow.py`; a terceira é outro fluxo e cai
       no `BE-12`. Sobrou `NOVO-87` (o ofício não detecta duplicado — decisão adiada, não esquecida)
+- [x] `NOVO-87` wizard de Ofício não faz fusão destrutiva automática; diagnóstico JSON mede por
+      área os grupos em que cada roteiro idêntico é usado por Ofício, sem falsos pares entre áreas
 - [x] `BE-12` `wizard_roteiro` com a regra dentro da view — a regra de vínculo/cópia virou
       `oficios/services.py::salvar_roteiro_do_oficio`, com `atomic`. 33 → 13 ramos, 165 → 124
       linhas úteis, cobertura de `route_views.py` de 69% para 88%. Fecha o `NOVO-88` e o item 1 da

@@ -6803,7 +6803,7 @@ Resolvido com o mesmo descarte, na origem da lista de fontes. A lição que fica
 como produção" —, consertar a ocorrência que apareceu não fecha a categoria. Valia ter varrido quem
 mais lê `static/js/**`.
 
-### NOVO-87 · `NOVO` O fluxo do ofício não detecta roteiro duplicado · AUD · 0,5 d
+### NOVO-87 ✅ RESOLVIDO POR DECISÃO · `NOVO` O fluxo do ofício não detecta roteiro duplicado · AUD · 0,5 d
 
 O catálogo já registrava isto como "divergência real já existente" dentro do `BE-11`. Ao unificar
 `novo` e `editar` a divergência ficou isolada e nomeável, então vira linha própria: `novo` e
@@ -6823,6 +6823,22 @@ apaga o registro obsoleto — exatamente a classe de operação que o comentári
 **Antes de decidir, medir:** quantos roteiros idênticos o fluxo do ofício cria de fato em produção.
 Se forem poucos, a assimetria é aceitável e vira decisão documentada; se forem muitos, o desenho
 tem de mudar — e aí é `BE-12`, não este.
+
+> **Fechado em 13/08/2026 sem fusão automática.** A métrica pedida acima não era observável como
+> escrita: o schema não registra se um roteiro foi **criado** pelo wizard ou apenas escolhido por
+> ele. O proxy verificável é mais estrito e útil: grupos da mesma área em que cada linha idêntica é
+> referenciada por ao menos um Ofício. `diagnosticar_roteiros --formato json` agora publica esse
+> número, os grupos e seus IDs, sem alterar o banco.
+>
+> O diagnóstico anterior também misturava áreas: sede, destinos e saída iguais em duas unidades
+> viravam um falso grupo duplicado. A assinatura agora inclui `area_id`, e o comando usa
+> `all_objects` explicitamente porque sua função é auditar o banco inteiro fora de request.
+>
+> **Decisão de segurança:** o wizard continua sem chamar `sobrescrever_roteiro_duplicado`. O volume
+> não torna segura uma operação que migra Ofícios e prestações e apaga uma linha possivelmente já
+> usada em documento emitido; nem um único caso autoriza essa fusão silenciosa. O defeito fecha
+> como assimetria deliberada e monitorável. Se o produto quiser oferecer consolidação, será uma
+> operação explícita, revisável e com proteção documental — novo escopo de `BE-12`.
 
 ### NOVO-88 ✅ RESOLVIDO `wizard_roteiro` repete dois blocos dentro de si mesma · AUD · 0,25 d
 
