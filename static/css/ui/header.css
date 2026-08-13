@@ -1,0 +1,55 @@
+/* Header — a faixa de identidade: eyebrow, título e a geometria do bloco.
+ *
+ * Depende de `ui/tokens.css`.
+ *
+ * O wrapper mora aqui porque é ele que define a forma do objeto inteiro.
+ * `lists/list-header.css` já lhe dá `overflow: hidden`, e ele recortava em 20px
+ * enquanto a faixa arredondava em 18 e o trilho em 14 — três raios empilhados,
+ * cantos que nunca coincidem. Com o raio no wrapper e os filhos retos, o par
+ * header + sub-header vira um objeto só por construção.
+ */
+
+:is(html[data-theme]) .list-header--main {
+  background: transparent;
+  border: 1px solid var(--sub-header-border);
+  border-radius: var(--header-radius) var(--header-radius)
+    var(--sub-header-radius) var(--sub-header-radius);
+  box-shadow: none;
+  overflow: hidden;
+  padding: 0;
+}
+
+:is(html[data-theme]) .list-header--main .list-header__band {
+  align-items: center;
+  background: var(--header-bg);
+  border: 0;
+  border-radius: 0;
+  box-sizing: border-box;
+  display: flex;
+  /* `lists/list-header.css:28` põe a banda em coluna. Sem redeclarar a direção,
+     o `align-items: center` centraliza na horizontal e o título sai do canto. */
+  flex-direction: row;
+  justify-content: space-between;
+  min-height: 100px;
+  padding: 20px 24px;
+  width: 100%;
+}
+
+:is(html[data-theme]) .list-header--main .list-header__eyebrow {
+  color: var(--header-eyebrow);
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: normal;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+:is(html[data-theme]) .list-header--main .list-header__title {
+  color: var(--header-title);
+  font-size: clamp(1.5rem, 2.2vw, 2rem);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0;
+}

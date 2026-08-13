@@ -1,0 +1,32 @@
+/* Input — o campo de busca do trilho, com ícone e placeholder.
+ *
+ * Depende de `ui/tokens.css`.
+ */
+
+:is(html[data-theme]) .list-header--main .list-header__search-input {
+  background: var(--input-bg);
+  border: 0;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  box-sizing: border-box;
+  color: var(--sub-header-text);
+  font-family: inherit;
+  min-height: 44px;
+}
+
+:is(html[data-theme]) .list-header--main .list-header__search-icon {
+  background: var(--input-bg);
+  color: var(--sub-header-text-muted);
+}
+
+:is(html[data-theme]) .list-header--main .list-header__search-input::placeholder {
+  color: var(--sub-header-text-muted);
+}
+
+/* `lists/list-header.css:259-266` zera o `outline` deste campo no foco. O anel
+   volta aqui, com o token oficial que o `HT-01` mediu. */
+:is(html[data-theme]) .list-header--main
+  .list-header__search-input:focus-visible {
+  outline: 1px solid var(--color-focus-visible-ring);
+  outline-offset: 2px;
+}

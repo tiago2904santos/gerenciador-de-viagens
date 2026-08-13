@@ -1,0 +1,47 @@
+/* Sub-header — o trilho de controles sob o header.
+ *
+ * Depende de `ui/tokens.css`. Não estiliza os controles em si: cada um tem a
+ * sua folha (`input.css`, `select.css`, `date-picker.css`,
+ * `button-secondary.css`). Aqui ficam a superfície, o layout e o token que os
+ * controles herdam.
+ */
+
+:is(html[data-theme]) .list-header--main .list-header__rail {
+  /* `lists/list-header.css:234` expõe este token justamente para ser trocado, e
+     `:237-250` o usa como fundo único de TODOS os controles do trilho. Trocar o
+     token vale mais que disputar seletor: aquelas regras têm especificidade 500
+     e venceriam de qualquer jeito. */
+  --list-header-control-bg: var(--input-bg);
+  background: var(--sub-header-bg);
+  border: 0;
+  border-radius: 0;
+  box-sizing: border-box;
+  color: var(--sub-header-text);
+  margin: 0;
+  padding: 16px 20px;
+  width: 100%;
+}
+
+:is(html[data-theme]) .list-header--main .list-header__filters {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+:is(html[data-theme]) .list-header--main
+  :is(.list-header__search, .list-header__select) {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .list-header--main .list-header__filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .list-header--main :is(.list-header__search, .list-header__select) {
+    flex: 1 1 auto;
+  }
+}

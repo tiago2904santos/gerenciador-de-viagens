@@ -374,8 +374,15 @@
     }
 
     function position() {
-      var rect = anchor.getBoundingClientRect();
+      // `position: fixed` ANTES de medir a âncora. O `open()` faz
+      // `body.appendChild(menu)` com o menu ainda em fluxo: ele alonga o
+      // documento, a barra de rolagem aparece e o conteúdo estreita. Medindo
+      // nesse estado, a âncora vem deslocada pela largura da barra (15px
+      // medidos), e ao tirar o menu do fluxo o conteúdo volta a alargar — o
+      // menu fica com a medida velha, à esquerda do gatilho. Só alinhava ao
+      // rolar, porque o `scroll` reexecuta esta função com o menu já fixo.
       menu.style.position = "fixed";
+      var rect = anchor.getBoundingClientRect();
       menu.style.left = rect.left + "px";
       menu.style.top = rect.bottom + "px";
       menu.style.width = Math.max(rect.width, 0) + "px";

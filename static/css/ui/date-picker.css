@@ -1,0 +1,220 @@
+/* Date picker — o gatilho no trilho e os botões do painel.
+ *
+ * Depende de `ui/tokens.css`.
+ *
+ * O painel é montado em portal fora do trilho, como o menu do select, então as
+ * regras dele partem da raiz com `:has()`.
+ */
+
+/* O gatilho é um controle do trilho como os outros: mesma superfície do input e
+   mesmo raio. Ele vinha transparente e em pílula, destoando dos vizinhos. */
+:is(html[data-theme]) .list-header--main .travel-period-filter__btn {
+  background: var(--input-bg);
+  background-image: none;
+  border: 0;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+  color: var(--sub-header-text);
+  cursor: pointer;
+  min-height: 44px;
+}
+
+/* Sem realce de hover — igual ao campo de busca e ao gatilho do select, que
+   também não têm. `lists/list-header.css:244` já fixa o hover na cor de
+   repouso; isto garante o mesmo quando o fundo passa a sair daqui. */
+:is(html[data-theme]) .list-header--main
+  .travel-period-filter__btn:hover:not(:disabled) {
+  background: var(--input-bg);
+  background-image: none;
+  box-shadow: none;
+}
+
+:is(html[data-theme]) .list-header--main .travel-period-filter__label {
+  color: var(--sub-header-text);
+  font-weight: var(--font-weight-semibold);
+}
+
+:is(html[data-theme]) .list-header--main
+  .travel-period-filter__btn:focus-visible {
+  outline: 1px solid var(--color-focus-visible-ring);
+  outline-offset: 2px;
+}
+
+/* O vão entre as datas fica no valor original (2px, `fields/date-picker.css:145`).
+   Aumentá-lo estoura o painel: a largura da grade é `(7 × 40px) + (6 × vão)`, e
+   o painel tem largura fixa — com 5px a grade passava 0,8px da borda direita. */
+
+/* Dias selecionados e o intervalo entre eles.
+ *
+ * Estas regras existem em `fields/date-picker.css`, mas aquela folha entra no
+ * `shell.bundle.css`, e o `build_css_profiles.py` poda o bundle pelas classes
+ * que observa num DOM capturado. `--selected` e `--range` só aparecem depois
+ * que alguém escolhe uma data, então a captura nunca as vê e elas são cortadas
+ * do perfil: o dia fica sem pintura nenhuma. Medido em
+ * `profiles/eventos-list.css` — zero ocorrências, enquanto a fonte tem cinco.
+ *
+ * Aqui elas sobrevivem porque esta folha é carregada direto, fora do bundle.
+ * A base de `.date-picker__day::before` (posição e tamanho) veio no perfil e
+ * não precisa ser repetida — só o preenchimento.
+ */
+/* Desenho do intervalo: extremos circulares ligados por uma faixa contínua.
+ *
+ * A cápsula sólida vem do fundo do PRÓPRIO botão, que já é 40×40 com raio
+ * 999px — círculo perfeito, sem custar um pseudo-elemento. O `::before` fica
+ * livre para ser só a faixa. (`::after` não serve: é o ponto do "hoje".)
+ *
+ * A faixa precisa transbordar: a coluna tem 40px e o vão sai de
+ * `--date-picker-day-gap`, então um `::before` do tamanho da célula deixaria
+ * buraco entre os dias. Ela cresce meio vão de cada lado e vira uma linha só.
+ * Mexer no vão sem mexer aqui reabre o buraco — por isso os dois leem o mesmo
+ * token. */
+:is(html[data-theme]):has(.list-header--main)
+  [data-cv-date-picker-panel]
+  .date-picker__day--range::before {
+  background: var(--date-picker-day-range-bg);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  width: calc(100% + var(--date-picker-day-gap));
+}
+
+/* Onde a faixa encosta na parede da semana, o canto que toca arredonda de leve,
+   e ela para de transbordar para fora — o meio vão extra fica só do lado de
+   dentro. A grade tem 7 colunas fixas, então a última é `7n` e a primeira
+   `7n + 1`.
+
+   Vale só para o MIOLO. Num extremo que calha de cair na parede — 16→17, por
+   exemplo, com o 16 no domingo — o achatamento brigava com o círculo do botão
+   e a pílula virava um quadrado arredondado. A forma de pílula do extremo
+   importa mais que o arremate da parede, então os extremos ficam de fora. */
+:is(html[data-theme]):has(.list-header--main)
+  [data-cv-date-picker-panel]
+  .date-picker__day--range:nth-child(7n):not(.date-picker__day--selected):not(.date-picker__day--range-start):not(.date-picker__day--range-end)::before {
+  border-radius: 0 var(--date-picker-day-range-cap-radius)
+    var(--date-picker-day-range-cap-radius) 0;
+  left: calc(var(--date-picker-day-gap) / -2);
+  right: auto;
+  transform: translateY(-50%);
+  width: calc(100% + var(--date-picker-day-gap) / 2);
+}
+
+:is(html[data-theme]):has(.list-header--main)
+  [data-cv-date-picker-panel]
+  .date-picker__day--range:nth-child(7n + 1):not(.date-picker__day--selected):not(.date-picker__day--range-start):not(.date-picker__day--range-end)::before {
+  border-radius: var(--date-picker-day-range-cap-radius) 0 0
+    var(--date-picker-day-range-cap-radius);
+  left: auto;
+  right: calc(var(--date-picker-day-gap) / -2);
+  transform: translateY(-50%);
+  width: calc(100% + var(--date-picker-day-gap) / 2);
+}
+
+/* Faixa cheia pede o texto da seleção: o rótulo do dia comum sumiria sobre
+   ela. */
+:is(html[data-theme]):has(.list-header--main)
+  [data-cv-date-picker-panel]
+  .date-picker__day--range {
+  color: var(--date-picker-day-selected-text);
+}
+
+/* Nos extremos a faixa sai só para o lado de dentro do intervalo, senão ela
+   escaparia para fora da primeira e da última data. */
+:is(html[data-theme]):has(.list-header--main)
+  [data-cv-date-picker-panel]
+  .date-picker__day--range-start::before {
+  left: auto;
+  right: calc(var(--date-picker-day-gap) / -2);
+  transform: translateY(-50%);
+  width: calc(50% + var(--date-picker-day-gap) / 2);
+}
+
+:is(html[data-theme]):has(.list-header--main)
+  [data-cv-date-picker-panel]
+  .date-picker__day--range-end::before {
+  left: calc(var(--date-picker-day-gap) / -2);
+  right: auto;
+  transform: translateY(-50%);
+  width: calc(50% + var(--date-picker-day-gap) / 2);
+}
+
+/* Sem faixa quando não há para onde emendar — fica só o círculo:
+   - um dia só selecionado (início e fim no mesmo botão);
+   - início no último dia da semana, cujo vizinho está na linha de baixo;
+   - fim no primeiro dia da semana, cujo vizinho está na linha de cima.
+   Nesses dois últimos a faixa escapava para fora da grade e o extremo parecia
+   maior que os outros dias: 40px de botão mais 21,7px de faixa vazando. */
+:is(html[data-theme]):has(.list-header--main)
+  [data-cv-date-picker-panel]
+  :is(
+    .date-picker__day--range-start.date-picker__day--range-end,
+    .date-picker__day--range-start:nth-child(7n),
+    .date-picker__day--range-end:nth-child(7n + 1)
+  )::before {
+  content: none;
+}
+
+:is(html[data-theme]):has(.list-header--main)
+  [data-cv-date-picker-panel]
+  :is(
+    .date-picker__day--selected,
+    .date-picker__day--range-start,
+    .date-picker__day--range-end
+  ) {
+  background: var(--date-picker-day-selected-bg);
+  border-radius: 50%;
+  color: var(--date-picker-day-selected-text);
+  z-index: 2;
+}
+
+/* Extremos são MEIA pílula: arredondam do lado de fora do intervalo e ficam
+   retos do lado que encosta na faixa — é o que faz a ponta ler como fim da
+   barra em vez de um ponto solto. */
+:is(html[data-theme]):has(.list-header--main)
+  [data-cv-date-picker-panel]
+  .date-picker__day--range-start {
+  border-radius: 50% 0 0 50%;
+}
+
+:is(html[data-theme]):has(.list-header--main)
+  [data-cv-date-picker-panel]
+  .date-picker__day--range-end {
+  border-radius: 0 50% 50% 0;
+}
+
+/* Um dia só selecionado não tem lado de dentro: pílula inteira. */
+:is(html[data-theme]):has(.list-header--main)
+  [data-cv-date-picker-panel]
+  :is(
+    .date-picker__day--range-start.date-picker__day--range-end,
+    .date-picker__day--selected:not(.date-picker__day--range)
+  ) {
+  border-radius: 50%;
+}
+
+/* "Anterior"/"Próximo" e "Hoje"/"Limpar" na PRIMARY do sub-header, sem borda.
+   `background-image: none` é necessário porque `fields/date-picker.css` pinta
+   esses botões com gradiente de duas camadas (padding-box + border-box), e só
+   trocar a cor de fundo deixaria a borda desenhada por gradiente no lugar. */
+:is(html[data-theme]):has(.list-header--main)
+  [data-cv-date-picker-panel]
+  :is(.date-picker__nav, .date-picker__footer-action) {
+  background: var(--sub-header-bg);
+  background-image: none;
+  border: 0;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+/* Mesmo hover do "Limpar filtros" do trilho (`ui/button-secondary.css`). Ao
+   fixar o fundo destes botões em `--input-bg` acima, o hover que eles tinham
+   deixou de aparecer — ele volta aqui, com a mesma mistura, para os quatro
+   controles do painel se comportarem como o botão secundário do sub-header. */
+:is(html[data-theme]):has(.list-header--main)
+  [data-cv-date-picker-panel]
+  :is(.date-picker__nav, .date-picker__footer-action):hover {
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted));
+  background-image: none;
+  border: 0;
+  box-shadow: none;
+  color: var(--color-accent-text, var(--color-accent));
+}
