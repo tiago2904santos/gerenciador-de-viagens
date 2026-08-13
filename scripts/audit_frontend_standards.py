@@ -181,40 +181,9 @@ JS_MASKS_OWNER = "static/js/components/masks.js"
 #
 # Baixar um teto quando o número cair é parte do trabalho, não faxina opcional.
 JS_EXCEPTIONS: dict[str, dict] = {
-    "static/js/pages/roteiros/editor/index.js": {
-        "reason": "NOVO-14: classes de campo de tempo como condição, sai com o editor (BE-11, fase 6). NOVO-15: HTML de trechos já renderizado pelo servidor.",
-        "rules": {"css_class_as_logic": 6, "innerhtml_dynamic_without_escape": 1},
-    },
-    "static/js/components/overlay.js": {
-        "reason": "NOVO-14: estado aberto do menu lido pela classe; sai na reconstrução do CSS (fase 7).",
-        "rules": {"css_class_as_logic": 1},
-    },
-    "static/js/components/icon-tooltips.js": {
-        "reason": "NOVO-14: distingue o botão de gerenciar pela classe; sai com HT-08 (fase 7).",
-        "rules": {"css_class_as_logic": 1},
-    },
-    "static/js/components/picker-select.js": {
-        "reason": "NOVO-14: lê a própria classe de opção selecionada (fase 7). NOVO-15: interpola SVG constante do próprio arquivo.",
-        "rules": {"css_class_as_logic": 1, "innerhtml_dynamic_without_escape": 2},
-    },
-    # NOVO-15 — innerHTML com dado dinâmico sem escapar. Nenhum destes é XSS
-    # provado: a maioria interpola constante de ícone do próprio arquivo. Ficam
-    # com teto para que nenhum caminho novo entre sem revisão.
-    "static/js/components/location-rows.js": {
-        "reason": "NOVO-15: markup de linha e opções montado a partir de template do próprio DOM.",
-        "rules": {"innerhtml_dynamic_without_escape": 4},
-    },
-    "static/js/pages/gdrive-config.js": {
-        "reason": "NOVO-15: já usa escapeHtml nos dados; a linha marcada monta o invólucro.",
-        "rules": {"innerhtml_dynamic_without_escape": 1},
-    },
     "static/js/pages/eventos-detalhe.js": {
         "reason": "JS-02: enhancer sem listener global e sem estado para desmontar.",
         "rules": {"enhancer_without_destroy": 1},
-    },
-    "static/js/pages/planos-trabalho-wizard.js": {
-        "reason": "NOVO-15: html vindo do servidor, já sanitizado na renderização do template.",
-        "rules": {"innerhtml_dynamic_without_escape": 1},
     },
     # JS-02 — enhancers sem `destroy` porque não há o que desmontar. A razão de
     # cada um está em core/tests/test_js_registry_lifecycle.py, que fixa a lista.
@@ -471,7 +440,7 @@ def audit_css() -> list[tuple]:
         if rp in COBERTURA_ADIADA:
             continue
         # Bundle gerado (NOVO-12): auditar as fontes, não a concatenação.
-        if path.name.endswith(".bundle.css"):
+        if path.name.endswith(".bundle.css") or path.parent == CSS_DIR / "profiles":
             continue
         try:
             lines = path.read_text(encoding="utf-8").splitlines()

@@ -12,6 +12,7 @@ Uso:
     python manage.py diagnosticar_roteiros --apenas-problemas
 """
 
+import json
 from collections import defaultdict
 
 from django.core.management.base import BaseCommand
@@ -35,23 +36,33 @@ class Command(BaseCommand):
             help="Omite da listagem os roteiros que não têm nenhum problema encontrado.",
         )
 
+        parser.add_argument(
+            "--formato",
+            choices=("texto", "json"),
+            default="texto",
+            help="Formato da saida; JSON e estavel para medir o NOVO-87 em producao.",
+        )
+
     def handle(self, *args, **options):
         apenas_problemas = options["apenas_problemas"]
+        formato = options["formato"]
 
         roteiros = list(
-            Roteiro.objects.select_related("origem_estado", "origem_cidade")
+            # Comando global de diagnóstico: `all_objects` é deliberado para não
+            # depender da área ambiente de um request que não existe aqui.
+            Roteiro.all_objects.select_related("origem_estado", "origem_cidade")
             .prefetch_related("destinos__cidade", "trechos")
             .order_by("origem_cidade__nome", "pk")
         )
 
         oficios_por_roteiro = defaultdict(list)
-        for oficio in Oficio.objects.filter(roteiro_id__isnull=False).only(
+        for oficio in Oficio.all_objects.filter(roteiro_id__isnull=False).only(
             "pk", "numero", "ano", "roteiro_id"
         ):
             oficios_por_roteiro[oficio.roteiro_id].append(oficio)
 
         prestacoes_por_roteiro = defaultdict(list)
-        for pc in PrestacaoContas.objects.filter(roteiro_ajustado_id__isnull=False).only(
+        for pc in PrestacaoContas.all_objects.filter(roteiro_ajustado_id__isnull=False).only(
             "pk", "roteiro_ajustado_id"
         ):
             prestacoes_por_roteiro[pc.roteiro_ajustado_id].append(pc)
@@ -62,7 +73,12 @@ class Command(BaseCommand):
             destino_ids = tuple(d.cidade_id for d in roteiro.destinos.all())
             info_por_roteiro[roteiro.pk] = destino_ids
             if roteiro.origem_cidade_id and destino_ids:
-                assinatura = (roteiro.origem_cidade_id, destino_ids, roteiro.saida_dt)
+                assinatura = (
+                    roteiro.area_id,
+                    roteiro.origem_cidade_id,
+                    destino_ids,
+                    roteiro.saida_dt,
+                )
                 grupos_duplicados[assinatura].append(roteiro.pk)
 
         total = len(roteiros)
@@ -70,12 +86,40 @@ class Command(BaseCommand):
         total_vazios = 0
         total_duplicados = 0
         linhas = []
+        grupos_json = []
+
+        for assinatura, roteiro_ids in grupos_duplicados.items():
+            if len(roteiro_ids) < 2:
+                continue
+            area_id, origem_cidade_id, destino_ids, saida_dt = assinatura
+            grupos_json.append(
+                {
+                    "area_id": area_id,
+                    "origem_cidade_id": origem_cidade_id,
+                    "destino_ids": list(destino_ids),
+                    "saida_dt": saida_dt.isoformat() if saida_dt else None,
+                    "roteiro_ids": sorted(roteiro_ids),
+                    "oficio_ids": sorted(
+                        oficio.pk
+                        for pk in roteiro_ids
+                        for oficio in oficios_por_roteiro.get(pk, [])
+                    ),
+                    "usado_por_oficios": all(
+                        oficios_por_roteiro.get(pk) for pk in roteiro_ids
+                    ),
+                }
+            )
 
         for roteiro in roteiros:
             destino_ids = info_por_roteiro[roteiro.pk]
             oficios = oficios_por_roteiro.get(roteiro.pk, [])
             prestacoes = prestacoes_por_roteiro.get(roteiro.pk, [])
-            assinatura = (roteiro.origem_cidade_id, destino_ids, roteiro.saida_dt)
+            assinatura = (
+                roteiro.area_id,
+                roteiro.origem_cidade_id,
+                destino_ids,
+                roteiro.saida_dt,
+            )
             grupo = grupos_duplicados.get(assinatura, [roteiro.pk])
 
             eh_duplicado = len(grupo) > 1
@@ -126,6 +170,23 @@ class Command(BaseCommand):
                 f"[{', '.join(tags)}] {refs_str}"
             )
 
+        if formato == "json":
+            payload = {
+                "resumo": {
+                    "total_roteiros": total,
+                    "roteiros_orfaos": total_orfaos,
+                    "roteiros_vazios": total_vazios,
+                    "grupos_duplicados": len(grupos_json),
+                    "roteiros_em_grupos_duplicados": total_duplicados,
+                    "grupos_duplicados_usados_por_oficios": sum(
+                        grupo["usado_por_oficios"] for grupo in grupos_json
+                    ),
+                },
+                "grupos_duplicados": grupos_json,
+            }
+            self.stdout.write(json.dumps(payload, ensure_ascii=False, sort_keys=True))
+            return
+
         for linha in linhas:
             self.stdout.write(linha)
 
@@ -133,7 +194,10 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.WARNING(
                 f"Resumo: {total} roteiros | {total_orfaos} orfaos | "
-                f"{total_vazios} vazios | {total_duplicados} em grupos duplicados"
+                f"{total_vazios} vazios | {len(grupos_json)} grupos duplicados | "
+                f"{total_duplicados} roteiros nesses grupos | "
+                f"{sum(grupo['usado_por_oficios'] for grupo in grupos_json)} grupos "
+                "usados por Oficios"
             )
         )
 

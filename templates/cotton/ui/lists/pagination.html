@@ -1,4 +1,5 @@
 {% cotton:vars page_obj page_querystring paginacao_obrigatoria pagination_pages pagination_part %}
+{% load icones %}
 {# Paginação das listas.                                                             #}
 {# Parâmetros: page_obj (obrigatório para renderizar), pagination_pages,             #}
 {#   page_querystring, paginacao_obrigatoria,                                        #}
@@ -47,11 +48,11 @@
   <div class="pagination-shell__controls">
     {% if page_obj.has_previous %}
       <a class="pagination-shell__nav pagination-shell__nav--prev" href="?{% if page_querystring %}{{ page_querystring }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Página anterior">
-        <span class="pagination-shell__icon" aria-hidden="true"><c-ui.icons.icon icon="arrow-left" only /></span>
+        <span class="pagination-shell__icon" aria-hidden="true">{% icone_svg "arrow-left" %}</span>
       </a>
     {% else %}
       <span class="pagination-shell__nav pagination-shell__nav--prev is-disabled" aria-disabled="true">
-        <span class="pagination-shell__icon" aria-hidden="true"><c-ui.icons.icon icon="arrow-left" only /></span>
+        <span class="pagination-shell__icon" aria-hidden="true">{% icone_svg "arrow-left" %}</span>
       </span>
     {% endif %}
 
@@ -69,11 +70,11 @@
 
     {% if page_obj.has_next %}
       <a class="pagination-shell__nav pagination-shell__nav--next pagination-shell__nav--primary" href="?{% if page_querystring %}{{ page_querystring }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Próxima página">
-        <span class="pagination-shell__icon" aria-hidden="true"><c-ui.icons.icon icon="arrow-right" only /></span>
+        <span class="pagination-shell__icon" aria-hidden="true">{% icone_svg "arrow-right" %}</span>
       </a>
     {% else %}
       <span class="pagination-shell__nav pagination-shell__nav--next is-disabled" aria-disabled="true">
-        <span class="pagination-shell__icon" aria-hidden="true"><c-ui.icons.icon icon="arrow-right" only /></span>
+        <span class="pagination-shell__icon" aria-hidden="true">{% icone_svg "arrow-right" %}</span>
       </span>
     {% endif %}
   </div>

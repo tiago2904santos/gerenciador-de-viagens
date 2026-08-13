@@ -22,10 +22,8 @@ Como nas fatias 1 e 3, as duas rotas de autosave divergem na marcação de statu
 `diario_servidor_autosave` marca só o servidor da URL, `diario_autosave` marca a equipe
 pendente inteira. E como na fatia 1, a rota por servidor **não tinha teste nenhum**.
 
-Uma nota de fixture que vale para quem escrever teste de diário: `criar_prestacao` monta
-um ofício **sem roteiro**, e sem roteiro `sincronizar_trechos` não cria linha nenhuma —
-o autosave passa a ser um laço sobre lista vazia e todo cenário vira verde por omissão.
-`_com_roteiro` existe para isso.
+`NOVO-107` fechou a armadilha da fixture: `criar_prestacao` agora monta roteiro por
+padrão. Testes que exercitam laços informam `trechos_roteiro=N` na própria criação.
 """
 
 from __future__ import annotations
@@ -36,25 +34,11 @@ from unittest import mock
 from django.test import TestCase
 from django.urls import reverse
 
-from core.testing import area_de_teste
-from oficios.models import Oficio
 from prestacoes_contas.models import DiarioBordo
 from prestacoes_contas.models import DiarioBordoTrecho
 from prestacoes_contas.models import PrestacaoServidor
 from prestacoes_contas.models import RelatorioTecnico
 from prestacoes_contas.test_helpers import PrestacaoFixturesMixin
-from roteiros.models import Roteiro
-from roteiros.models import RoteiroTrecho
-
-
-def _com_roteiro(oficio, trechos=1):
-    """Dá ao ofício um roteiro com trechos — sem isso o diário nasce sem linhas."""
-    roteiro = Roteiro.objects.create(area=area_de_teste())
-    for ordem in range(trechos):
-        RoteiroTrecho.objects.create(roteiro=roteiro, tipo=RoteiroTrecho.TIPO_IDA, ordem=ordem)
-    Oficio.objects.filter(pk=oficio.pk).update(roteiro=roteiro)
-    oficio.refresh_from_db()
-    return roteiro
 
 
 class DiarioAutosaveTests(PrestacaoFixturesMixin, TestCase):
@@ -66,10 +50,10 @@ class DiarioAutosaveTests(PrestacaoFixturesMixin, TestCase):
         self.fixture = self.criar_prestacao(
             numero=71,
             servidores=[self.criar_servidor("Um DB"), self.criar_servidor("Dois DB")],
+            trechos_roteiro=2,
         )
         # Duas linhas: é o que o teste da falha no meio do laço precisa medir desde que
         # o `NOVO-116` passou a gravar uma vez por linha. Os demais só usam a `form-0`.
-        _com_roteiro(self.fixture.oficio, trechos=2)
         self.prestacao = self.fixture.prestacao
         self.ps_a, self.ps_b = self.fixture.prestacoes_servidor
         self.diario, _ = DiarioBordo.objects.get_or_create(prestacao=self.prestacao)
@@ -193,8 +177,7 @@ class FormsetDoDiarioTests(PrestacaoFixturesMixin, TestCase):
     def setUp(self):
         super().setUp()
         self.setUpPrestacaoFixtures()
-        self.fixture = self.criar_prestacao(numero=73)
-        _com_roteiro(self.fixture.oficio, trechos=2)
+        self.fixture = self.criar_prestacao(numero=73, trechos_roteiro=2)
         self.prestacao = self.fixture.prestacao
         self.ps = self.fixture.prestacoes_servidor[0]
         self.diario, _ = DiarioBordo.objects.get_or_create(prestacao=self.prestacao)
@@ -267,7 +250,6 @@ class TrocaDeMotoristaTests(PrestacaoFixturesMixin, TestCase):
         self.fixture = self.criar_prestacao(
             numero=72, servidores=[self.criar_servidor("Titular DB"), self.outro]
         )
-        _com_roteiro(self.fixture.oficio)
         self.prestacao = self.fixture.prestacao
         self.ps = self.fixture.prestacoes_servidor[0]
         self.diario, _ = DiarioBordo.objects.get_or_create(prestacao=self.prestacao)

@@ -2,7 +2,7 @@
 
 **Escopo:** auditoria apenas (documentação). Nenhuma implementação no projeto novo foi feita nesta fase.
 
-**Raiz do código legado analisado:** `legacy/central de viagens 2.0/`  
+**Raiz do código legado analisado:** `legacy/central de viagens 2.0/`
 (Paths no texto abaixo são relativos a essa raiz, salvo indicação.)
 
 **Observação:** Não existem `legacy/eventos/document_renderer.py`, `document_generator.py`, `downloads.py`, `placeholders.py` nem `assinatura*` soltos na raiz de `eventos/` — a geração documental concentra-se em `eventos/services/documentos/` e módulos relacionados. `eventos/termos.py` complementa contexto de termos às views.

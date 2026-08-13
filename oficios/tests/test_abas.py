@@ -80,11 +80,12 @@ class DocumentoAbasOficioTests(TestCase):
         self._oficio(1, saida_offset=5)
         self._oficio(2, saida_offset=-5)
         self._oficio(3, cancelado=True)
-        contagem = tabs.contar_por_aba(
-            self._base_anotada(Oficio.objects.all()),
-            date_field="roteiro__saida_dt__date",
-            cancelado_q=Q(cancelado=True),
-        )
+        with self.assertNumQueries(1):
+            contagem = tabs.contar_por_aba(
+                self._base_anotada(Oficio.objects.all()),
+                date_field="roteiro__saida_dt__date",
+                cancelado_q=Q(cancelado=True),
+            )
         self.assertEqual(sum(contagem.values()), Oficio.objects.count())
 
     def test_index_padrao_mostra_aba_futuras(self):

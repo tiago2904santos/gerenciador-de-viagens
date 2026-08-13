@@ -94,6 +94,7 @@ ATIVIDADES = CatalogConfig(
         excluido="Atividade “{}” excluída.",
     ),
     rotulo=lambda atividade: atividade.nome,
+    paginar_por=20,
     url_fallback_next="planos_trabalho:index",
     back_label_com_next=_VOLTA_AO_WIZARD,
     back_label_sem_next="Voltar",
@@ -124,6 +125,7 @@ PRESETS = CatalogConfig(
         padrao_definido="Preset “{}” definido como padrão.",
     ),
     rotulo=lambda preset: preset.nome,
+    paginar_por=20,
     url_fallback_next="planos_trabalho:index",
     back_label_com_next=_VOLTA_AO_WIZARD,
     back_label_sem_next="Voltar",
@@ -155,6 +157,7 @@ PROGRAMAS = CatalogConfig(
         erro_ao_salvar="Não foi possível salvar o programa. Verifique os dados informados.",
     ),
     rotulo=lambda programa: programa.nome,
+    paginar_por=20,
     url_fallback_next="planos_trabalho:index",
     back_label_com_next="Voltar",
     back_label_sem_next="Voltar",
@@ -187,6 +190,7 @@ HORARIOS = CatalogConfig(
         erro_ao_salvar="Não foi possível salvar o horário. Verifique os dados informados.",
     ),
     rotulo=lambda horario: horario.faixa,
+    paginar_por=20,
 )
 
 

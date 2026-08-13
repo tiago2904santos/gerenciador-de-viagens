@@ -1,27 +1,8 @@
-"""`BE-14` fatia 2 — rede para a gravação da solicitação, antes de ela sair da view.
+"""Rede transacional de `BE-14` e contrato unificado por `NOVO-103`.
 
-Duas rotas implementam a mesma regra (número da solicitação, data de liberação e prazo
-limite), e elas **divergem em três pontos**, todos já fotografados em
-`test_solicitacao.py`. Esta fatia não decide qual comportamento é o certo: ela move a
-gravação para um service com transação e **preserva o que está fotografado**. Unificar as
-rotas muda o que o operador vê e é decisão própria.
-
-O que esta rede acrescenta ao que já existia:
-
-1. **A gravação parcial do autosave, com `ok=False`.** `prestacao_servidor_solicitacao_autosave`
-   grava o número, depois valida a data de liberação, e se ela for inválida **retorna erro
-   com o número já gravado**. Nenhum teste fotografava isso, e é o comportamento que a
-   transação **não pode** mudar sem decisão — `return` não é exceção, então o `atomic`
-   commita e o número continua salvo.
-2. **Falha real no meio do laço do lote.** `_salvar_solicitacoes_em_lote` percorre N
-   servidores e grava um por um. Se o terceiro falhar, os dois primeiros ficam. É o
-   defeito do `BE-14`, e é o único cenário aqui que **reprova hoje**.
-3. **Três `save()` no mesmo objeto numa requisição.** O autosave grava campo a campo, e
-   cada gravação dispara a marcação de status — até seis escritas numa requisição só.
-
-Os testes de divergência que já existem (`test_solicitacao.py:178` e `:192`) citam
-`NOVO-09` no docstring, mas o `NOVO-09` do catálogo é outro defeito — modelo de
-justificativa sem `area`. A divergência das solicitações nunca teve entrada própria.
+As duas rotas implementam a mesma regra (número da solicitação, data de liberação e
+prazo limite). A rede prova atomicidade diante de falha de banco e de validação, tanto
+dentro de um autosave quanto entre servidores do lote.
 """
 
 from __future__ import annotations
@@ -59,14 +40,8 @@ class SolicitacaoAutosaveParcialTests(PrestacaoFixturesMixin, TestCase):
             content_type="application/json",
         )
 
-    def test_numero_fica_gravado_mesmo_quando_a_data_seguinte_e_recusada(self):
-        """A gravação parcial que o autosave faz hoje, fotografada.
-
-        O operador digita número e data na mesma tela. A data sai inválida, ele recebe
-        "Data de liberação inválida." — e o número **já está no banco**, sem nada dizendo
-        isso. Preservado nesta fatia de propósito: mudar aqui é decisão de produto, não de
-        camada.
-        """
+    def test_data_invalida_impede_gravacao_parcial_do_numero(self):
+        """O autosave valida todos os campos antes da primeira escrita (NOVO-103)."""
         resposta = self.autosave(
             numero_solicitacao="SOL-2026-1",
             data_liberacao_diarias="01/09/2026",
@@ -77,15 +52,11 @@ class SolicitacaoAutosaveParcialTests(PrestacaoFixturesMixin, TestCase):
         self.assertEqual(corpo["message"], "Data de liberação inválida.")
 
         self.ps.refresh_from_db()
-        self.assertEqual(
-            self.ps.numero_solicitacao,
-            "SOL-2026-1",
-            "o número foi gravado antes de a data ser validada — é o comportamento de hoje",
-        )
+        self.assertEqual(self.ps.numero_solicitacao, "")
         self.assertIsNone(self.ps.data_liberacao_diarias)
 
-    def test_prazo_invalido_deixa_numero_e_liberacao_gravados(self):
-        """A mesma coisa um passo adiante: dois campos gravados, o terceiro recusado."""
+    def test_prazo_invalido_impede_gravacao_parcial_dos_campos_anteriores(self):
+        """Erro no terceiro campo rejeita a requisição inteira (NOVO-103)."""
         resposta = self.autosave(
             numero_solicitacao="SOL-2026-2",
             data_liberacao_diarias="2026-09-01",
@@ -97,8 +68,8 @@ class SolicitacaoAutosaveParcialTests(PrestacaoFixturesMixin, TestCase):
         self.assertEqual(corpo["message"], "Data de prazo limite inválida.")
 
         self.ps.refresh_from_db()
-        self.assertEqual(self.ps.numero_solicitacao, "SOL-2026-2")
-        self.assertEqual(self.ps.data_liberacao_diarias, date(2026, 9, 1))
+        self.assertEqual(self.ps.numero_solicitacao, "")
+        self.assertIsNone(self.ps.data_liberacao_diarias)
         self.assertIsNone(self.ps.prazo_limite_saque)
 
     def test_tudo_valido_grava_os_tres_campos_e_marca_o_servidor(self):
@@ -161,6 +132,23 @@ class SolicitacaoEmLoteTransacaoTests(PrestacaoFixturesMixin, TestCase):
         self.ps_b.refresh_from_db()
         self.assertEqual(self.ps_a.numero_solicitacao, "LOTE-A")
         self.assertEqual(self.ps_b.numero_solicitacao, "LOTE-B")
+
+    def test_data_invalida_em_um_servidor_rejeita_o_lote_inteiro(self):
+        self.salvar_em_lote(
+            **{
+                str(self.ps_a.pk): {"numero_solicitacao": "NAO-ENTRA-A"},
+                str(self.ps_b.pk): {
+                    "numero_solicitacao": "NAO-ENTRA-B",
+                    "data_liberacao_diarias": "01/09/2026",
+                },
+            }
+        )
+
+        self.ps_a.refresh_from_db()
+        self.ps_b.refresh_from_db()
+        self.assertEqual(self.ps_a.numero_solicitacao, "")
+        self.assertEqual(self.ps_b.numero_solicitacao, "")
+        self.assertIsNone(self.ps_b.data_liberacao_diarias)
 
     def test_falha_no_meio_do_laco_nao_deixa_meia_gravacao(self):
         """Era o defeito do `BE-14` no lote, e é a razão de o service ser atômico.

@@ -13,6 +13,9 @@ BUTTON = re.compile(r"<button(?P<attrs>\b.*?)>(?P<body>.*?)</button>", re.IGNORE
 CLASS_ATTR = re.compile(r"(?<![\w:-])class(?=\s*=)", re.IGNORECASE)
 GENERIC_COMPONENT = re.compile(r"<c-ui\.buttons\.button(?P<attrs>\b.*?)>", re.DOTALL)
 PUBLIC_TEMPLATES = {"core/login.html"}
+CANONICAL_RAW_BUTTON_TEMPLATES = {
+    "includes/performance/icon_control_flat.html",
+}
 
 
 def targets() -> list[Path]:
@@ -20,6 +23,8 @@ def targets() -> list[Path]:
     for path in (ROOT / "templates").rglob("*.html"):
         relative = path.relative_to(ROOT / "templates")
         if relative.parts[0] in {"cotton", "dev"}:
+            continue
+        if relative.as_posix() in CANONICAL_RAW_BUTTON_TEMPLATES:
             continue
         if any("ui_lab" in part for part in relative.parts):
             continue

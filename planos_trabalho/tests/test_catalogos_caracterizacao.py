@@ -175,6 +175,14 @@ class PresetsTests(CatalogoCaracterizacaoMixin, TestCase):
         self.assertEqual(linha["title"], "PRESET A")
         self.assertIn("Palestra caracterizacao", str(linha["meta"]))
 
+    def test_grupo_de_atividades_associa_legenda_e_ajuda(self):
+        response = self.client.get(self._index())
+
+        html = response.content.decode()
+        self.assertIn('<fieldset class="pt-preset-activities-panel" aria-describedby="id_atividades_helptext">', html)
+        self.assertIn('<legend class="pt-preset-activities-panel__title">Atividades previstas</legend>', html)
+        self.assertIn('id="id_atividades_helptext">Clique nas atividades para incluir ou retirar do preset.</p>', html)
+
     def test_criacao_avisa_com_a_frase_do_preset(self):
         atividade = AtividadePlanoTrabalho.objects.create(area=area_de_teste(), 
             nome="Atividade do preset", meta="M", codigo="ATIVPRESET"

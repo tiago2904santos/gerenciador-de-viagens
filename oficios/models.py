@@ -86,6 +86,16 @@ class Oficio(TimeStampedModel, CancelavelModel):
     )
     custeio_observacao = models.CharField(max_length=255, blank=True, default="")
     servidores = models.ManyToManyField(Servidor, blank=True, related_name="oficios")
+    diarias_quantidade_servidores = models.PositiveIntegerField(
+        "Quantidade de servidores considerada nas diárias",
+        null=True,
+        blank=True,
+        editable=False,
+        help_text=(
+            "Snapshot do efetivo usado no total de diárias; não muda quando um "
+            "servidor é excluído posteriormente do cadastro."
+        ),
+    )
     servidores_termo_autorizacao = models.ManyToManyField(
         Servidor,
         blank=True,
@@ -269,9 +279,9 @@ class Oficio(TimeStampedModel, CancelavelModel):
     def diarias_para_servidores(self):
         """Diárias deste ofício = valor por servidor (persistido no roteiro) × nº de servidores.
 
-        O roteiro guarda sempre o valor para 1 servidor; cada ofício aplica aqui a
-        multiplicação pelo seu próprio efetivo, de modo que adicionar/remover servidores
-        atualize o resumo e o documento final.
+        O roteiro guarda sempre o valor para 1 servidor. O ofício aplica o snapshot
+        do efetivo aceito no passo de viajantes, para que uma exclusão posterior no
+        cadastro não reescreva o valor de documento já emitido.
         """
         from decimal import Decimal
 
@@ -281,8 +291,11 @@ class Oficio(TimeStampedModel, CancelavelModel):
         if not roteiro or roteiro.valor_diarias is None:
             return None
 
-        # Sem servidores ainda (rascunho): mantém o valor base de 1 servidor.
-        qtd_servidores = (self.servidores.count() if self.pk else 0) or 1
+        # Registros anteriores à migração, instâncias ainda não salvas e fixtures
+        # montadas diretamente continuam com fallback seguro para o efetivo vivo.
+        qtd_servidores = self.diarias_quantidade_servidores
+        if qtd_servidores is None:
+            qtd_servidores = (self.servidores.count() if self.pk else 0) or 1
         por_servidor = roteiro.valor_diarias
         if not isinstance(por_servidor, Decimal):
             por_servidor = Decimal(str(por_servidor))

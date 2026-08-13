@@ -148,7 +148,9 @@ class GlobalDatePickerTests(SimpleTestCase):
             if "staticfiles" in source_path.parts or "legacy" in source_path.parts:
                 continue
             # NOVO-12: bundles só concatenam as fontes canônicas — auditar as fontes.
-            if source_path.name.endswith((".bundle.css", ".bundle.js")):
+            if source_path.name.endswith((".bundle.css", ".bundle.js")) or (
+                source_path.parent == base_dir / "static" / "css" / "profiles"
+            ):
                 continue
             source = source_path.read_text(encoding="utf-8")
             is_global_css = source_path == base_dir / "static" / "css" / "fields" / "date-picker.css"

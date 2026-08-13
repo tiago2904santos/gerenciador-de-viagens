@@ -13,11 +13,11 @@
     },
     "eventos:index": {
       "200": {
-        "consultas": 30,
+        "consultas": 27,
         "kb_html": 222.5
       },
       "20000": {
-        "consultas": 30,
+        "consultas": 27,
         "kb_html": 266.9
       }
     },
@@ -33,31 +33,31 @@
     },
     "oficios:index": {
       "200": {
-        "consultas": 13,
+        "consultas": 7,
         "kb_html": 174.8
       },
       "20000": {
-        "consultas": 13,
+        "consultas": 7,
         "kb_html": 175.5
       }
     },
     "ordens_servico:index": {
       "200": {
-        "consultas": 15,
+        "consultas": 12,
         "kb_html": 133.0
       },
       "20000": {
-        "consultas": 15,
+        "consultas": 12,
         "kb_html": 133.3
       }
     },
     "planos_trabalho:index": {
       "200": {
-        "consultas": 14,
+        "consultas": 9,
         "kb_html": 135.5
       },
       "20000": {
-        "consultas": 14,
+        "consultas": 9,
         "kb_html": 179.1
       }
     },

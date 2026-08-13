@@ -34,7 +34,6 @@ from oficios.services import get_next_available_numero_oficio
 from oficios.services import criar_oficio_rascunho
 from oficios.services import OficioNumeroConflitoError
 from oficios.services import reservar_numero_oficio
-from oficios.services import _preencher_roteiro_oficio_com_evento
 from oficios.services import redirect_para_corrigir_documento_oficio
 from oficios.services import validar_oficio_para_documento
 from roteiros.models import Roteiro
@@ -67,10 +66,11 @@ class OficioServicesTests(TestCase):
         self.assertTrue(form.is_valid(), form.errors)
         oficio = criar_oficio_dados_viajantes(form, action="save_draft")
         self.assertEqual(oficio.protocolo, "123456789")
-        self.assertEqual(oficio.numero, 1)
+        self.assertEqual(oficio.numero, 75)
         self.assertEqual(oficio.ano, timezone.localdate().year)
         self.assertEqual(oficio.status, Oficio.STATUS_RASCUNHO)
         self.assertEqual(list(oficio.servidores.all()), [self.servidor])
+        self.assertEqual(oficio.diarias_quantidade_servidores, 1)
 
     @mock.patch(
         "oficios.services.get_next_available_numero_oficio",
@@ -108,6 +108,7 @@ class OficioServicesTests(TestCase):
         self.assertEqual(reservado.numero, 78)
         self.assertEqual(_proximo_numero.call_count, 2, "o laço não repetiu na colisão")
 
+    @override_settings(OFICIO_NUMERACAO_USAR_CONFIGURACAO=False)
     def test_get_next_available_numero_reaproveita_lacuna_apos_exclusao(self):
         ano = timezone.localdate().year
         primeiro = Oficio.objects.create(area=area_de_teste(), numero=1, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
@@ -115,6 +116,7 @@ class OficioServicesTests(TestCase):
         excluir_oficio(primeiro)
         self.assertEqual(get_next_available_numero_oficio(ano), 1)
 
+    @override_settings(OFICIO_NUMERACAO_USAR_CONFIGURACAO=False)
     def test_get_next_available_numero_ignora_numeros_apenas_pulados_manualmente(self):
         # Cria 1..10 e depois "pula" para o 15 manualmente: 11-14 não devem ser
         # sugeridos automaticamente, só o 16 (maior + 1).
@@ -124,6 +126,7 @@ class OficioServicesTests(TestCase):
         Oficio.objects.create(area=area_de_teste(), numero=15, ano=ano, custeio=Oficio.CUSTEIO_UNIDADE_DPC)
         self.assertEqual(get_next_available_numero_oficio(ano), 16)
 
+    @override_settings(OFICIO_NUMERACAO_USAR_CONFIGURACAO=False)
     def test_excluir_oficio_libera_numero_para_reaproveitamento(self):
         ano = timezone.localdate().year
         oficios = [
@@ -134,6 +137,7 @@ class OficioServicesTests(TestCase):
         self.assertTrue(OficioNumeroLacuna.objects.filter(ano=ano, numero=7).exists())
         self.assertEqual(get_next_available_numero_oficio(ano), 7)
 
+    @override_settings(OFICIO_NUMERACAO_USAR_CONFIGURACAO=False)
     def test_editar_numero_nao_libera_numero_antigo_mas_consome_lacuna_do_novo(self):
         # Editar (corrigir) o número de um ofício existente não deve reintroduzir
         # o número antigo como sugestão automática — só a exclusão faz isso.
@@ -204,34 +208,6 @@ class OficioServicesTests(TestCase):
                 action="save_draft",
             )
 
-    def test_preencher_roteiro_oficio_com_evento_so_preenche_sede_e_destino(self):
-        estado = Estado.objects.create(nome="Parana", sigla="PR")
-        cidade_sede = Cidade.objects.create(nome="Curitiba", estado=estado, uf="PR")
-        cidade_destino = Cidade.objects.create(nome="Londrina", estado=estado, uf="PR")
-        config = ConfiguracaoSistema.get_singleton()
-        config.cidade_sede_padrao = cidade_sede
-        config.save()
-        evento = Evento.objects.create(area=area_de_teste(), 
-            destino_uf="PR",
-            destino_cidade="Londrina",
-            data_inicio=datetime.date(2026, 7, 10),
-            data_fim=datetime.date(2026, 7, 12),
-            horario_inicio=datetime.time(9, 30),
-            horario_fim=datetime.time(18, 45),
-        )
-        roteiro = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
-
-        _preencher_roteiro_oficio_com_evento(roteiro, evento)
-        roteiro.refresh_from_db()
-
-        self.assertEqual(roteiro.origem_cidade_id, cidade_sede.pk)
-        self.assertEqual(roteiro.origem_estado_id, estado.pk)
-        self.assertTrue(
-            roteiro.destinos.filter(estado=estado, cidade=cidade_destino).exists()
-        )
-        self.assertIsNone(roteiro.saida_dt)
-        self.assertIsNone(roteiro.retorno_saida_dt)
-
     def test_criar_oficio_rascunho_herda_motivo_mas_nao_servidores_ou_viatura(self):
         evento = Evento.objects.create(area=area_de_teste(), 
             destino_uf="PR",
@@ -258,6 +234,7 @@ class OficioServicesTests(TestCase):
             custeio=Oficio.CUSTEIO_UNIDADE_DPC,
             viatura=self.viatura,
             motorista=self.servidor,
+            diarias_quantidade_servidores=2,
         )
         data_original = oficio.data_criacao
         oficio.servidores.add(self.servidor)
@@ -280,7 +257,49 @@ class OficioServicesTests(TestCase):
         self.assertEqual(atualizado.viatura, self.viatura)
         self.assertEqual(atualizado.motorista, self.servidor)
         self.assertEqual(list(atualizado.servidores.all()), [self.servidor])
+        self.assertEqual(
+            atualizado.diarias_quantidade_servidores,
+            2,
+            "editar metadados não recalcula o snapshot após uma exclusão cadastral",
+        )
         self.assertEqual(atualizado.status, Oficio.STATUS_GERADO)
+
+    def test_atualizar_equipe_substitui_snapshot_de_diarias(self):
+        outro = Servidor.objects.create(
+            area=area_de_teste(),
+            nome="Servidor Dois",
+            cargo=self.cargo,
+            cpf="10987654321",
+        )
+        oficio = Oficio.objects.create(
+            area=area_de_teste(),
+            numero=2,
+            ano=2026,
+            status=Oficio.STATUS_RASCUNHO,
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+            diarias_quantidade_servidores=3,
+        )
+        oficio.servidores.add(self.servidor)
+        form = OficioDadosViajantesForm(
+            data={
+                "protocolo": "12.345.678-4",
+                "motivo": "Equipe deliberadamente alterada",
+                "servidores": [str(self.servidor.pk), str(outro.pk)],
+                "custeio": Oficio.CUSTEIO_UNIDADE_DPC,
+                "custeio_observacao": "",
+            },
+            instance=oficio,
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+
+        atualizado = atualizar_oficio_dados_viajantes(
+            oficio,
+            form,
+            action="save_draft",
+        )
+        atualizado.refresh_from_db()
+
+        self.assertEqual(atualizado.diarias_quantidade_servidores, 2)
 
     def test_atualizar_oficio_dados_viajantes_preenche_ano_quando_ausente(self):
         oficio = Oficio.objects.create(area=area_de_teste(), 

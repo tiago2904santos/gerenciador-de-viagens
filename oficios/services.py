@@ -46,7 +46,6 @@ from .models import Oficio
 from .models import OficioNumeroLacuna
 
 from roteiros.models import Roteiro
-from roteiros.models import RoteiroDestino
 
 logger = logging.getLogger(__name__)
 
@@ -367,42 +366,6 @@ def montar_roteiro_inicial_do_oficio(oficio: Oficio):
     return form_instance, destinos_atuais, trechos_list, roteiro_state
 
 
-def _preencher_roteiro_oficio_com_evento(roteiro: Roteiro, evento) -> None:
-    """Preenche sede e destino de um roteiro ja persistido a partir do evento.
-
-    So mexe em campos ainda vazios (safety net para roteiros antigos/ja vinculados).
-    Nao preenche datas: cada oficio pode ter horarios de viagem proprios.
-    """
-    if roteiro is None or evento is None:
-        return
-
-    from cadastros.models import ConfiguracaoSistema
-    from eventos.services import build_evento_document_seed
-
-    seed = build_evento_document_seed(evento)
-    cidade = seed.get("cidade")
-    estado = seed.get("estado") or getattr(cidade, "estado", None)
-
-    changed_fields = []
-    if not roteiro.origem_cidade_id and not roteiro.origem_estado_id:
-        config = ConfiguracaoSistema.get_singleton()
-        cidade_sede = getattr(config, "cidade_sede_padrao", None)
-        if cidade_sede:
-            roteiro.origem_cidade = cidade_sede
-            roteiro.origem_estado = cidade_sede.estado
-            changed_fields.extend(["origem_cidade", "origem_estado"])
-    if changed_fields:
-        roteiro.save(update_fields=[*changed_fields, "updated_at"])
-
-    if cidade and estado and not roteiro.destinos.exists():
-        RoteiroDestino.objects.create(
-            roteiro=roteiro,
-            estado=estado,
-            cidade=cidade,
-            ordem=1,
-        )
-
-
 @transaction.atomic
 def criar_oficio(form):
     return form.save()
@@ -446,12 +409,21 @@ def criar_oficio_dados_viajantes(form, action="save_draft"):
     atualizar_status_automatico_oficio(oficio, action=action, form=form)
     oficio.save()
     form.save_m2m()
+    oficio.diarias_quantidade_servidores = max(oficio.servidores.count(), 1)
+    # `BE-09`: o pk vem do ofício que acabou de ser criado nesta transação;
+    # `all_objects` evita depender do contexto de área ao completar o mesmo registro.
+    Oficio.all_objects.filter(pk=oficio.pk).update(
+        diarias_quantidade_servidores=oficio.diarias_quantidade_servidores,
+    )
     return oficio
 
 
 @transaction.atomic
 def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
     original = Oficio.objects.get(pk=oficio.pk)
+    servidores_anteriores = set(
+        original.servidores.values_list("pk", flat=True),
+    )
     transporte_original = {
         "viatura": original.viatura,
         "porte_transporte_armas": original.porte_transporte_armas,
@@ -471,6 +443,9 @@ def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
         "motorista_protocolo_ref": original.motorista_protocolo_ref,
     }
     atualizado = form.save(commit=False)
+    atualizado.diarias_quantidade_servidores = (
+        original.diarias_quantidade_servidores
+    )
     if atualizado.numero is None:
         atualizado.numero = original.numero
     # Ano não vem no formulário da etapa; rascunhos legados podem estar sem ano.
@@ -527,6 +502,17 @@ def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
             "por outro ofício. Atualize a página e escolha outro número.",
         ) from exc
     form.save_m2m()
+    servidores_atuais = set(atualizado.servidores.values_list("pk", flat=True))
+    if (
+        servidores_atuais != servidores_anteriores
+        or atualizado.diarias_quantidade_servidores is None
+    ):
+        atualizado.diarias_quantidade_servidores = max(len(servidores_atuais), 1)
+        # `BE-09`: o pk é da instância já carregada e validada por este service;
+        # a atualização do snapshot não deve mudar de alvo com a área ativa.
+        Oficio.all_objects.filter(pk=atualizado.pk).update(
+            diarias_quantidade_servidores=atualizado.diarias_quantidade_servidores,
+        )
     return atualizado
 
 

@@ -13,6 +13,8 @@ from cadastros.models import Cargo
 from cadastros.models import Servidor
 from oficios.models import Oficio
 from prestacoes_contas.models import PrestacaoContas
+from roteiros.models import Roteiro
+from roteiros.models import RoteiroTrecho
 from usuarios.models import AreaTrabalho
 from usuarios.models import VinculoUsuarioArea
 
@@ -42,6 +44,7 @@ class PrestacaoFixture:
     prestacao: PrestacaoContas
     servidores: tuple[Servidor, ...]
     prestacoes_servidor: tuple
+    roteiro: Roteiro | None
 
 
 class PrestacaoFixturesMixin:
@@ -99,6 +102,8 @@ class PrestacaoFixturesMixin:
         finalizada=False,
         cancelado=False,
         criado_em: datetime | None = None,
+        com_roteiro=True,
+        trechos_roteiro=1,
     ):
         area = area or self.area
         if servidores is None:
@@ -106,11 +111,22 @@ class PrestacaoFixturesMixin:
         else:
             servidores = tuple(servidores)
 
+        roteiro = None
+        if com_roteiro:
+            roteiro = Roteiro.objects.create(area=area)
+            for ordem in range(trechos_roteiro):
+                RoteiroTrecho.objects.create(
+                    roteiro=roteiro,
+                    tipo=RoteiroTrecho.TIPO_IDA,
+                    ordem=ordem,
+                )
+
         oficio = Oficio.objects.create(
             area=area,
             numero=numero,
             ano=ano,
             protocolo=f"{area.pk:02d}{ano}{numero:05d}",
+            roteiro=roteiro,
         )
         oficio.servidores.add(*servidores)
         prestacao = PrestacaoContas.objects.get(oficio=oficio)
@@ -145,6 +161,7 @@ class PrestacaoFixturesMixin:
             prestacao=prestacao,
             servidores=servidores,
             prestacoes_servidor=prestacoes_servidor,
+            roteiro=roteiro,
         )
 
     def get_listagem(self, *, area=None, **params):

@@ -85,6 +85,38 @@ class PeriodMarker:
         return self.chegada or self.saida
 
 
+class _ResultadoDiarias(dict):
+    """Contrato publico em dict; composicao privada segue ate a persistencia."""
+
+    def __init__(self, *args, componentes=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.componentes = componentes or []
+
+
+def _tabelas_vigentes_com_fonte(data_referencia) -> dict:
+    """Valores e identidade da linha que sustentou cada faixa (DB-13)."""
+    from cadastros.models import TabelaDiaria
+
+    resultado = {}
+    for faixa, _rotulo in TabelaDiaria.FAIXA_CHOICES:
+        vigente = TabelaDiaria.vigente_em(faixa, data_referencia)
+        if vigente is None:
+            resultado[faixa] = {
+                **TABELA_DIARIAS_HISTORICA[faixa],
+                "_tabela_id": None,
+                "_vigencia_inicio": None,
+            }
+            continue
+        resultado[faixa] = {
+            "24h": vigente.valor_24h,
+            "15": vigente.valor_15,
+            "30": vigente.valor_30,
+            "_tabela_id": vigente.pk,
+            "_vigencia_inicio": vigente.vigencia_inicio,
+        }
+    return resultado
+
+
 def tabela_vigente_em(data_referencia) -> dict:
     """Valores por faixa vigentes na data, no formato usado pelo cálculo.
 
@@ -97,20 +129,10 @@ def tabela_vigente_em(data_referencia) -> dict:
     falhar. Um roteiro anterior à primeira vigência é situação de dados, não de
     código, e derrubar a calculadora deixaria o operador sem saída.
     """
-    from cadastros.models import TabelaDiaria
-
-    resultado = {}
-    for faixa, _rotulo in TabelaDiaria.FAIXA_CHOICES:
-        vigente = TabelaDiaria.vigente_em(faixa, data_referencia)
-        if vigente is None:
-            resultado[faixa] = TABELA_DIARIAS_HISTORICA[faixa]
-            continue
-        resultado[faixa] = {
-            "24h": vigente.valor_24h,
-            "15": vigente.valor_15,
-            "30": vigente.valor_30,
-        }
-    return resultado
+    return {
+        faixa: {chave: valores[chave] for chave in ("24h", "15", "30")}
+        for faixa, valores in _tabelas_vigentes_com_fonte(data_referencia).items()
+    }
 
 
 def _data_de_referencia(markers) -> "date":
@@ -291,7 +313,7 @@ def build_periods(
     # Uma resolução por cálculo: a vigência é a mesma para o roteiro inteiro,
     # decidida pela saída mais antiga. Resolver por trecho abriria a porta para
     # um roteiro que atravessa a virada de vigência cobrar dois valores.
-    tabela_por_faixa = tabela_vigente_em(_data_de_referencia(markers))
+    tabela_por_faixa = _tabelas_vigentes_com_fonte(_data_de_referencia(markers))
     # Uma consulta por calculo, nao por marcador (NOVO-26). Era um mapa
     # memorizado no modulo, que ficava velho depois de qualquer edicao da base.
     capitais = capitais_por_uf()
@@ -437,10 +459,13 @@ def build_periods(
         trecho['total_horas_periodo'] = float(total_horas)
         trecho['subtotal'] = formatar_valor_diarias(subtotal)
         trecho['subtotal_decimal'] = subtotal
+        trecho['_tabela_id'] = tabela.get('_tabela_id')
+        trecho['_tabela_vigencia_inicio'] = tabela.get('_vigencia_inicio')
+        trecho['_valor_24h'] = tabela['24h']
+        trecho['_valor_15'] = tabela['15']
+        trecho['_valor_30'] = tabela['30']
 
     for trecho in trechos:
-        trecho.pop('_period_start', None)
-        trecho.pop('_period_end', None)
         trecho.pop('_pernoites_periodo', None)
         trecho.pop('_parcial_periodo', None)
         trecho.pop('_retorno_final', None)
@@ -487,14 +512,58 @@ def calculate_periodized_diarias(
     else:
         valor_unitario_referencia = ''
 
+    componentes = []
+    for item in periodos:
+        tabela_id = item.get('_tabela_id')
+        vigencia_inicio = item.get('_tabela_vigencia_inicio')
+        faixa = item['tipo']
+        inicio = item.get('_period_start')
+        fim = item.get('_period_end')
+        quantidade_integra = int(item.get('n_diarias', 0) or 0)
+        valor_24h = item['_valor_24h']
+        if quantidade_integra:
+            componentes.append({
+                'tabela_diaria_id': tabela_id,
+                'tabela_vigencia_inicio': vigencia_inicio,
+                'faixa': faixa,
+                'percentual': 100,
+                'quantidade': quantidade_integra,
+                'valor_unitario': valor_24h,
+                'subtotal': valor_24h * quantidade_integra * servidores,
+                'periodo_inicio': inicio,
+                'periodo_fim': fim,
+            })
+        percentual = int(item.get('percentual_adicional', 0) or 0)
+        if percentual:
+            chave = '24h' if percentual == 100 else str(percentual)
+            valor_unitario = item[f'_valor_{chave}']
+            componentes.append({
+                'tabela_diaria_id': tabela_id,
+                'tabela_vigencia_inicio': vigencia_inicio,
+                'faixa': faixa,
+                'percentual': percentual,
+                'quantidade': 1,
+                'valor_unitario': valor_unitario,
+                'subtotal': valor_unitario * servidores,
+                'periodo_inicio': inicio,
+                'periodo_fim': fim,
+            })
+
     periodos_out = []
     for item in periodos:
         row = dict(item)
         row.pop('subtotal_decimal', None)
         row.pop('total_horas_periodo', None)
+        row.pop('_period_start', None)
+        row.pop('_period_end', None)
+        row.pop('_tabela_id', None)
+        row.pop('_tabela_vigencia_inicio', None)
+        row.pop('_valor_24h', None)
+        row.pop('_valor_15', None)
+        row.pop('_valor_30', None)
         periodos_out.append(row)
 
-    return {
+    return _ResultadoDiarias({
         'periodos': periodos_out,
         'totais': {
             'total_diarias': resumo_diarias,
@@ -508,4 +577,4 @@ def calculate_periodized_diarias(
             'valor_por_servidor_decimal': valor_por_servidor,
             'valor_unitario_referencia': valor_unitario_referencia,
         },
-    }
+    }, componentes=componentes)

@@ -171,6 +171,7 @@ def _measure_page(
     timeout_ms: int,
     *,
     include_stylesheet_fragments: bool = False,
+    reveal: bool = False,
 ) -> dict:
     from playwright.sync_api import Error as PlaywrightError
 
@@ -186,6 +187,21 @@ def _measure_page(
     session.send("CSS.enable")
     session.send("CSS.startRuleUsageTracking")
     response = page.goto(urljoin(base_url, route.path.lstrip("/")), wait_until="networkidle", timeout=timeout_ms)
+    if reveal:
+        page.evaluate(
+            """() => {
+              document.querySelectorAll('[hidden]').forEach((el) => el.removeAttribute('hidden'));
+              document.querySelectorAll('[aria-hidden="true"]').forEach((el) => el.setAttribute('aria-hidden', 'false'));
+              document.querySelectorAll('details').forEach((el) => { el.open = true; });
+              void document.documentElement.offsetHeight;
+            }"""
+        )
+    dom_classes = page.evaluate(
+        """() => Array.from(new Set(
+          Array.from(document.querySelectorAll('[class]'))
+            .flatMap((element) => Array.from(element.classList))
+        )).sort()"""
+    )
     coverage = session.send("CSS.stopRuleUsageTracking").get("ruleUsage", [])
 
     if response is None:
@@ -223,6 +239,7 @@ def _measure_page(
             "final_url": page.url,
             "redirected": urlparse(page.url).path.rstrip("/") != route.path.rstrip("/"),
             "stylesheets": len(stylesheets),
+            "dom_classes": dom_classes,
         }
     )
     session.detach()
@@ -284,6 +301,7 @@ def run_measurement(args) -> dict:
                 args.base_url,
                 args.timeout_ms,
                 include_stylesheet_fragments=args.include_matched_css,
+                reveal=args.reveal,
             )
 
         if protected_routes and not args.storage_state:
@@ -295,6 +313,7 @@ def run_measurement(args) -> dict:
                 args.base_url,
                 args.timeout_ms,
                 include_stylesheet_fragments=args.include_matched_css,
+                reveal=args.reveal,
             )
             print(
                 f"{route.slug}: {measurements[route.slug]['usage_percent']:.2f}% "
@@ -332,6 +351,11 @@ def main(argv: list[str] | None = None) -> int:
         "--include-matched-css",
         action="store_true",
         help="inclui no JSON os fragmentos casados de cada folha (use com --route)",
+    )
+    parser.add_argument(
+        "--reveal",
+        action="store_true",
+        help="mede também conteúdo hidden/aria-hidden/details aberto (diagnóstico de perfis)",
     )
     parser.add_argument("--thresholds", type=Path, default=DEFAULT_THRESHOLDS)
     parser.add_argument("--atualizar-tetos", action="store_true")

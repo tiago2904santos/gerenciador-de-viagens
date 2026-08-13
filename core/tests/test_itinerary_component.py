@@ -118,12 +118,18 @@ class ItineraryComponentTests(SimpleTestCase):
         templates_root = ROOT / "templates"
         for relative in CONSUMERS:
             source = (templates_root / relative).read_text(encoding="utf-8")
-            self.assertIn("<c-ui.lists.itinerary", source, relative)
+            self.assertTrue(
+                "<c-ui.lists.itinerary" in source
+                or 'include "cotton/ui/lists/itinerary.html"' in source
+                or 'include "includes/performance/itinerary_flat.html"' in source,
+                relative,
+            )
             get_template(relative)
 
         raw = []
         for path in templates_root.rglob("*.html"):
-            if "cotton" in path.relative_to(templates_root).parts:
+            relative_parts = path.relative_to(templates_root).parts
+            if "cotton" in relative_parts or relative_parts[:2] == ("includes", "performance"):
                 continue
             source = path.read_text(encoding="utf-8")
             if '<ul class="itinerary' in source or '<li class="itinerary__leg' in source:

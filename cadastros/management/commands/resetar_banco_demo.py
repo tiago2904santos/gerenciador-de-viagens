@@ -45,6 +45,7 @@ from planos_trabalho.models import ProgramaSolicitante
 from planos_trabalho.services import sincronizar_atividades
 from planos_trabalho.services import sincronizar_textos_padrao
 from roteiros.models import Roteiro
+from roteiros.models import RoteiroDiariaComponente
 from roteiros.models import RoteiroDestino
 from roteiros.models import RoteiroTrecho
 from termos.models import TermoAutorizacao
@@ -499,6 +500,13 @@ class Command(BaseCommand):
                 distancia_km=distancias[i],
                 duracao_estimada_min=duracoes[i],
                 rota_fonte=Roteiro.ROTA_FONTE_MANUAL,
+            )
+            RoteiroDiariaComponente.objects.create(
+                roteiro=roteiro,
+                ordem=0,
+                origem=RoteiroDiariaComponente.ORIGEM_LEGADO,
+                percentual=100,
+                quantidade=1,
             )
             roteiros.append(roteiro)
         return roteiros

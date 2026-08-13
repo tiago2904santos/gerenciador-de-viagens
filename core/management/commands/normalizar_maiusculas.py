@@ -77,6 +77,7 @@ from collections import defaultdict
 from django import forms
 from django.apps import apps
 from django.core.management.base import BaseCommand
+from django.core.management.base import CommandError
 from django.db import IntegrityError
 from django.db import models
 from django.db import transaction
@@ -99,6 +100,14 @@ class Command(BaseCommand):
             "--commit",
             action="store_true",
             help="Aplica as alterações; sem esta opção apenas exibe o plano.",
+        )
+        parser.add_argument(
+            "--strict",
+            action="store_true",
+            help=(
+                "Falha e desfaz toda a transação se qualquer campo for bloqueado "
+                "por unicidade. Use em automação e produção."
+            ),
         )
         parser.add_argument(
             "--campo",
@@ -264,7 +273,12 @@ class Command(BaseCommand):
         # é isso que faz o relatório valer — um "vai dar certo" que não tentou
         # escrever não vale nada num campo com restrição de unicidade.
         with transaction.atomic():
-            resumo = self._percorrer(pares)
+            resumo, bloqueados = self._percorrer(pares)
+            if options["strict"] and bloqueados:
+                raise CommandError(
+                    f"normalização bloqueada em {bloqueados} campo(s); "
+                    "nenhuma alteração foi gravada",
+                )
             if not options["commit"]:
                 transaction.set_rollback(True)
 
@@ -285,7 +299,7 @@ class Command(BaseCommand):
             self.style.SUCCESS(f"Normalização concluída: {resumo} linha(s)."),
         )
 
-    def _percorrer(self, pares) -> int:
+    def _percorrer(self, pares) -> tuple[int, int]:
         self.stdout.write(f"{'modelo.campo':<52}{'linhas':>8}{'divergem':>10}")
         bloqueado: list[tuple[str, str]] = []
         total_linhas = total_divergem = total_aplicado = 0
@@ -324,4 +338,4 @@ class Command(BaseCommand):
             for alvo, erro in bloqueado:
                 self.stdout.write(f"  {alvo}")
                 self.stdout.write(f"    {erro}")
-        return total_aplicado
+        return total_aplicado, len(bloqueado)

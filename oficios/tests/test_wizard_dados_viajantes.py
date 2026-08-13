@@ -84,7 +84,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         oficio = Oficio.objects.get()
         self.assertEqual(response.url, reverse("oficios:dados_viajantes", args=[oficio.pk]))
         self.assertEqual(oficio.status, Oficio.STATUS_RASCUNHO)
-        self.assertEqual(oficio.numero, 1)
+        self.assertEqual(oficio.numero, 75)
         self.assertEqual(oficio.ano, timezone.localdate().year)
         self.assertEqual(oficio.data_criacao, timezone.localdate())
 
@@ -189,9 +189,9 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertEqual(response.status_code, 302)
         oficio = Oficio.objects.get()
         self.assertEqual(response.url, reverse("oficios:dados_viajantes", args=[oficio.pk]))
-        self.assertEqual(oficio.numero, 1)
+        self.assertEqual(oficio.numero, 75)
         self.assertEqual(oficio.ano, timezone.localdate().year)
-        self.assertEqual(oficio.numero_formatado, f"01/{timezone.localdate().year}")
+        self.assertEqual(oficio.numero_formatado, f"75/{timezone.localdate().year}")
         self.assertEqual(oficio.protocolo, "123456789")
         self.assertEqual(oficio.motivo, "Motivo inicial")
         self.assertEqual(oficio.status, Oficio.STATUS_RASCUNHO)
@@ -565,12 +565,12 @@ class OficioWizardDadosViajantesTests(TestCase):
         ano = timezone.localdate().year
         self.client.post(self._novo_rascunho_url(), data=self._payload(action="save_draft"))
         self.client.post(self._novo_rascunho_url(), data=self._payload(protocolo="12.345.678-8", action="save_draft"))
-        primeiro = Oficio.objects.get(numero=1, ano=ano)
+        primeiro = Oficio.objects.get(numero=75, ano=ano)
         self.client.post(reverse("oficios:excluir", args=[primeiro.pk]))
 
         self.client.post(self._novo_rascunho_url(), data=self._payload(protocolo="12.345.678-7", action="save_draft"))
 
-        self.assertTrue(Oficio.objects.filter(numero=1, ano=ano, protocolo="123456787").exists())
+        self.assertTrue(Oficio.objects.filter(numero=75, ano=ano, protocolo="123456787").exists())
 
     def test_pendencias_aparecem_apenas_apos_tentativa_documental(self):
         oficio = Oficio.objects.create(area=area_de_teste(), numero=1, ano=timezone.localdate().year, custeio=Oficio.CUSTEIO_UNIDADE_DPC)

@@ -149,6 +149,12 @@ para casar ~10% delas, em toda navegação.
 **Correção:** é obra do [`PLANO_FRONTEND.md`](PLANO_FRONTEND.md) (`UI-*`), não deste plano.
 Aqui fica a **métrica de aceite**: uso de CSS por rota acima de 35% ao fim da reconstrução.
 
+**Fechado em 13/08/2026 (`PF-02`).** Quinze perfis determinísticos por família de rota substituem o
+shell completo onde há mapeamento conhecido, com fallback por feature flag. A medição das 43 rotas
+encerrou em **37,5118%–60,3148%** e a suíte trava o piso de 35% individualmente. A paridade
+perfil/bundle foi comprovada em 20 medições de cinco famílias, temas claro/escuro e 1440/500 px:
+zero diferenças de estilo e estruturais.
+
 > **Ressalva:** o banco desta sessão estava vazio; as telas tinham 134–453 nós. Com listas
 > cheias o número de nós sobe e o uso de CSS sobe um pouco — mas não muda a ordem de grandeza,
 > porque a maior parte das regras não pertence ao domínio da página.
@@ -210,6 +216,12 @@ Com 17 queries planas e 20 cards, o tempo não está no banco:
 à parte porque é a **métrica de aceite** deles: a rota precisa cair para a faixa das outras
 listas (< 40 ms) sem que a contagem de queries suba.
 
+> **Parcial em 13/08/2026.** A rota caiu de 13 para 9 consultas e de 125,5 para 76,7 ms no
+> volume 200; em 20.000 registros, 1.554,4 virou 235,6 ms. A eliminação das contagens repetidas
+> resolveu a escala principal e baixou as catracas, mas o aceite de 40 ms segue aberto. O
+> processador de navegação repetido por componentes Cotton também ganhou cache por requisição;
+> sua medida final será registrada pelo CI da fatia.
+
 ### 2.6 `PF-06` — queries duplicadas em duas rotas
 
 `/usuarios/` emite **2** queries idênticas repetidas; `/prestacoes-contas/`, **1**. Volume
@@ -232,11 +244,11 @@ Enquanto não houver medição com volume, não se sabe.
 | # | Etapa | Defeitos | Dias | Risco | Gate |
 |---|---|---|---:|---|---|
 | **D1** ✅ | **Régua de desempenho** — `scripts/medir_desempenho.py` no repositório, semeando cada domínio **em dois volumes (200 e 20.000)**, medindo queries, tempo, KB de HTML e uso de CSS por rota; teto por rota no CI | `PF-07` | 3–4 | baixo | O script roda no CI e falha se qualquer rota passar do teto declarado, nos dois volumes |
-| **D2** | **Folha de símbolos de ícone** | `PF-01` | 2–3 | baixo | `/oficios/` abaixo de 250 KB de HTML; suíte verde; telas conferidas nos dois temas |
-| **D3** | **Menu de ação sob demanda** | `PF-04`, `PF-05` | 2–3 | médio | `/oficios/` abaixo de 40 ms e abaixo de 150 KB; teste de teclado e ARIA |
-| **D4** | **Sessão fora do caminho quente** | `PF-03` | 1–2 | médio | Requisição autenticada trivial sem `UPDATE django_session`; decisão de expiração registrada |
-| **D5** | **Consultas duplicadas** | `PF-06` | 1 | baixo | Zero query repetida nas rotas medidas |
-| **D6** | **Aceite do CSS** (depois do `PLANO_FRONTEND`) | `PF-02` | — | — | Uso de CSS acima de 35% em todas as rotas medidas |
+| **D2** ✅ | **Folha de símbolos de ícone** | `PF-01` | 2–3 | baixo | Símbolos centralizados; `/oficios/` abaixo de 250 KB e DOM de formas reduzido |
+| **D3** ✅ | **Menu e renderização de card sob demanda** | `PF-04`, `PF-05`, `NOVO-50/PF` | 2–3 | médio | `/oficios/` em 33,2 ms, 7 consultas e 160,7 KB no volume 200; aceite de tempo cumprido e teto de consultas reduzido |
+| **D4** ✅ | **Sessão fora do caminho quente** | `PF-03` | 1–2 | médio | Requisição autenticada trivial sem `UPDATE django_session`; decisão de expiração registrada |
+| **D5** ✅ | **Consultas duplicadas** | `PF-06` | 1 | baixo | Duplicações causais eliminadas e orçamento permanente por rota |
+| **D6** ✅ | **Aceite do CSS** (depois do `PLANO_FRONTEND`) | `PF-02` | — | — | **37,5118%–60,3148% nas 43 rotas**; piso individual de 35% sob teste |
 
 **Total próprio: 9–13 dias-pessoa.** O `PF-02` não soma porque o trabalho está no plano de front;
 aqui ele só tem a régua.
@@ -268,8 +280,9 @@ prova, e a regressão volta no PR seguinte sem ninguém ver. D2 antes de D3 porq
 
 ## 5. O que este plano não faz
 
-- **Não introduz cache de página nem de fragmento.** Com queries planas e tempo dominado por
-  render de ícone, cache seria esconder o problema e criar invalidação para manter.
+- **Não introduz cache de página.** O fechamento do `PF-05` adicionou cache apenas do fragmento de
+  card já apresentado, depois de reduzir consultas e componentes; a chave é o hash de todo o
+  conteúdo do presenter, portanto mudança de dado invalida por conteúdo, sem sinal ou janela stale.
 - **Não mexe em índice nem em consulta de banco.** O ganho existe e é grande (§1.1), mas toda
   correção ali é mudança de esquema ou de selector, sujeita ao limite 4 do `AGENTS.md`. Mora no
   [`PLANO_BACKEND.md`](PLANO_BACKEND.md); aqui fica só a régua que prova o ganho.

@@ -91,6 +91,22 @@ class OrcamentoDeQueriesPlanoTrabalhoTests(TestCase):
             msg="\n".join(q["sql"] for q in queries.captured_queries),
         )
 
+    def test_a_pagina_limita_ids_antes_de_hidratar_as_dimensoes(self):
+        """NOVO-50: os 20 IDs são escolhidos antes dos joins de catálogo."""
+        _total, queries = self._contar(reverse("planos_trabalho:index") + "?aba=atuais")
+
+        consultas_da_pagina = [
+            item["sql"]
+            for item in queries.captured_queries
+            if 'FROM "planos_trabalho_planotrabalho"' in item["sql"]
+            and "LIMIT 20" in item["sql"]
+        ]
+        self.assertTrue(consultas_da_pagina, "não encontrei a consulta paginada de Planos")
+        self.assertTrue(
+            any('JOIN "cadastros_' not in sql for sql in consultas_da_pagina),
+            msg="o LIMIT ainda paga os joins das dimensões:\n" + "\n".join(consultas_da_pagina),
+        )
+
     def test_a_lista_com_busca_custa_o_mesmo_numero_de_queries(self):
         total, queries = self._contar(
             reverse("planos_trabalho:index") + "?aba=atuais&q=Apoio"
@@ -125,6 +141,9 @@ class OrcamentoDeQueriesPlanoTrabalhoTests(TestCase):
     # Onde o corte é **-1**, o teste mede a **primeira** requisição depois do
     # login: ali `core/tenancy.py:52` grava a área na sessão, que por isso é
     # salva de qualquer jeito, e só a leitura é economizada.
-    QUERIES_LISTA = 16
-    QUERIES_LISTA_BUSCA = 16
+    # `NOVO-50`: a página passou a escolher IDs antes de hidratar dimensões.
+    # O prefetch de destinos agora resolve cidade/estado na mesma consulta e o
+    # card não busca mais `eventos__programa`, relação que ele não lê: -2.
+    QUERIES_LISTA = 10
+    QUERIES_LISTA_BUSCA = 10
     QUERIES_WIZARD = 19

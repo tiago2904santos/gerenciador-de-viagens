@@ -73,7 +73,11 @@ def _e_escopo_raiz(seletor: str) -> bool:
 
 
 def _fontes() -> list[Path]:
-    return sorted(p for p in CSS.rglob("*.css") if "bundle" not in p.name)
+    return sorted(
+        p
+        for p in CSS.rglob("*.css")
+        if "bundle" not in p.name and p.parent != CSS / "profiles"
+    )
 
 
 class TokenGlobalMoraEmDuasCamadasTests(SimpleTestCase):

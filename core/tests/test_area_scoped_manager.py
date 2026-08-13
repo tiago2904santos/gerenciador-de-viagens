@@ -91,26 +91,20 @@ class ContratoDoAreaScopedManagerTests(TestCase):
 
         self.assertEqual(encontrados, {self.meu.pk})
 
-    def test_com_request_sem_area_devolve_o_balde_legado(self):
+    def test_com_request_sem_area_nao_enxerga_catalogo_com_dono(self):
         """`core/tenancy.py:70-71` devolve `area IS NULL` quando não há área ativa.
 
-        `DB-02` partiu esse contrato em dois: num modelo **operacional** o balde é
-        vazio por construção — o banco recusa a linha sem área —, então request sem
-        área deixa de enxergar qualquer dado de trabalho. Nos modelos ainda
-        anuláveis (catálogo com padrão global, grupo 2 do enunciado) a semântica
-        segue a de sempre, e é aqui que ela fica cravada.
+        `DB-02` esvaziou o balde operacional, e o `NOVO-49` fez o mesmo nos quatro
+        catálogos semeados: todo item agora pertence obrigatoriamente a uma área.
         """
         from eventos.models import TipoEvento
 
         with sem_request():
-            legado_catalogo = TipoEvento.objects.create(area=None, nome="Global MGR")
+            catalogo_da_area = TipoEvento.objects.create(area=self.area, nome="Catálogo MGR")
 
         with com_request(None):
             self.assertEqual(self._pks(TermoAutorizacao.objects.all()), set())
-            self.assertIn(
-                legado_catalogo.pk,
-                self._pks(TipoEvento.objects.all()),
-            )
+            self.assertNotIn(catalogo_da_area.pk, self._pks(TipoEvento.objects.all()))
 
     def test_all_objects_devolve_tudo_nos_tres_casos(self):
         esperado = {self.meu.pk, self.alheio.pk}

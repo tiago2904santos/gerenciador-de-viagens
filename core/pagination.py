@@ -18,6 +18,19 @@ menos o próprio ``page``, para que navegar entre páginas não descarte o filtr
 from urllib.parse import urlencode
 
 from django.core.paginator import Paginator
+from django.utils.functional import cached_property
+
+
+class KnownCountPaginator(Paginator):
+    """Paginator que reutiliza um total calculado pela mesma tela."""
+
+    def __init__(self, object_list, per_page, *, known_count):
+        self.known_count = known_count
+        super().__init__(object_list, per_page)
+
+    @cached_property
+    def count(self):
+        return self.known_count
 
 
 def paginas_elididas(page_obj, *, on_each_side=1, on_ends=1):

@@ -3,13 +3,74 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from types import SimpleNamespace
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 
+from core.context_processors import shell_css_profile
 from scripts import medir_css_por_rota as css_metric
+from scripts import build_css_profiles as css_profiles
 from scripts import medir_divergencia_tema as theme_metric
 from scripts import sonda_mesmo_tema as same_theme_metric
 from scripts.rotas_do_sistema import ROTAS
+
+
+class ShellCssProfileTests(SimpleTestCase):
+    def test_expansao_dom_acrescenta_apenas_estados_interativos(self):
+        rules = css_profiles.tinycss2.parse_stylesheet(
+            ".card { color: red; } .card:hover { color: blue; }",
+            skip_comments=True,
+            skip_whitespace=True,
+        )
+        selected = css_profiles._with_dom_families(rules, set(), {"card"})
+
+        self.assertNotIn(css_profiles._rule_id(rules[0]), selected)
+        self.assertIn(css_profiles._rule_id(rules[1]), selected)
+
+    def test_perfil_emite_apenas_keyframe_referenciado(self):
+        rules = css_profiles.tinycss2.parse_stylesheet(
+            ".spinner { animation: spin 1s; } "
+            "@keyframes spin { to { rotate: 1turn; } } "
+            "@keyframes unused { to { opacity: 0; } }",
+            skip_comments=True,
+            skip_whitespace=True,
+        )
+
+        rendered = css_profiles._render_rules(
+            rules,
+            {css_profiles._rule_id(rules[0])},
+            {"spin"},
+        )
+
+        self.assertIn("@keyframes spin", rendered)
+        self.assertNotIn("@keyframes unused", rendered)
+
+    @override_settings(CSS_ROUTE_PROFILES_ENABLED=True)
+    def test_rota_mapeada_recebe_perfil(self):
+        request = SimpleNamespace(
+            resolver_match=SimpleNamespace(view_name="core:dashboard")
+        )
+
+        self.assertEqual(
+            shell_css_profile(request),
+            {"shell_css_profile_path": "css/profiles/dashboard.css"},
+        )
+
+    @override_settings(CSS_ROUTE_PROFILES_ENABLED=True)
+    def test_rota_desconhecida_mantem_bundle_completo(self):
+        request = SimpleNamespace(
+            resolver_match=SimpleNamespace(view_name="admin:index")
+        )
+
+        self.assertEqual(shell_css_profile(request), {"shell_css_profile_path": None})
+
+    @override_settings(CSS_ROUTE_PROFILES_ENABLED=False)
+    def test_feature_flag_desativa_perfis(self):
+        request = SimpleNamespace(
+            resolver_match=SimpleNamespace(view_name="core:dashboard")
+        )
+
+        self.assertEqual(shell_css_profile(request), {"shell_css_profile_path": None})
 
 
 class CssPorRotaMetricTests(SimpleTestCase):
@@ -104,6 +165,11 @@ class CssPorRotaMetricTests(SimpleTestCase):
             text,
         )
 
+    def test_cli_expoe_cobertura_de_conteudo_revelado_para_os_perfis(self):
+        source = Path(css_metric.__file__).read_text(encoding="utf-8")
+        self.assertIn('parser.add_argument(\n        "--reveal"', source)
+        self.assertIn("document.querySelectorAll('[hidden]')", source)
+
     def test_piso_de_uso_so_pode_subir(self):
         old = {"oficios-lista": {"usage_percent_min": 11.5}}
         measured_better = {"oficios-lista": {"usage_percent": 14.0}}
@@ -153,6 +219,16 @@ class CssPorRotaMetricTests(SimpleTestCase):
             all(item["usage_percent_min"] > 0 for item in css_gate["routes"].values())
         )
 
+    def test_todas_as_rotas_cumprem_o_aceite_pf02_de_35_por_cento(self):
+        thresholds = json.loads(css_metric.DEFAULT_THRESHOLDS.read_text(encoding="utf-8"))
+        abaixo = {
+            slug: item["usage_percent_min"]
+            for slug, item in thresholds["css_by_route"]["routes"].items()
+            if item["usage_percent_min"] < 35.0
+        }
+
+        self.assertEqual(abaixo, {}, msg=f"PF-02 ainda aberto: {abaixo}")
+
     def test_ci_migra_o_banco_descartavel_antes_de_semear(self):
         workflow = (css_metric.ROOT / ".github" / "workflows" / "tests.yml").read_text(
             encoding="utf-8"
@@ -173,6 +249,17 @@ class DivergenciaTemaMetricTests(SimpleTestCase):
         self.assertFalse(theme_metric.is_color_property("border-top-width"))
         self.assertFalse(theme_metric.is_color_property("font-family"))
 
+    def test_propriedades_computadas_sem_pintura_sao_classificadas_a_parte(self):
+        for prop in (
+            "-webkit-font-smoothing",
+            "-moz-osx-font-smoothing",
+            "text-rendering",
+            "transition-duration",
+        ):
+            with self.subTest(prop=prop):
+                self.assertTrue(theme_metric.is_non_paint_property(prop))
+        self.assertFalse(theme_metric.is_non_paint_property("border-top-width"))
+
     def test_compara_o_mesmo_elemento_e_conta_pares_distintos(self):
         light = [
             {"key": "0", "label": "html", "styles": {"font-family": "Arial", "border-radius": "0px"}},
@@ -188,7 +275,24 @@ class DivergenciaTemaMetricTests(SimpleTestCase):
         self.assertEqual(result["elements_compared"], 2)
         self.assertEqual(result["elements_divergent"], 2)
         self.assertEqual(result["differences"], 3)
+        self.assertEqual(result["paint_relevant_differences"], 3)
+        self.assertEqual(result["non_paint_differences"], 0)
         self.assertEqual(result["distinct_pairs"], 2)
+
+    def test_divergencia_sem_pintura_nao_infla_a_coluna_visual(self):
+        light = [{"key": "0", "styles": {"-webkit-font-smoothing": "auto", "width": "10px"}}]
+        dark = [
+            {
+                "key": "0",
+                "styles": {"-webkit-font-smoothing": "antialiased", "width": "12px"},
+            }
+        ]
+
+        result = theme_metric.compare_snapshots(light, dark)
+
+        self.assertEqual(result["differences"], 2)
+        self.assertEqual(result["paint_relevant_differences"], 1)
+        self.assertEqual(result["non_paint_differences"], 1)
 
     def test_ordem_de_captura_e_estavel_quando_os_diffs_sao_os_mesmos(self):
         first = {("0", "font-family", "Arial", "Inter")}
@@ -206,6 +310,17 @@ class DivergenciaTemaMetricTests(SimpleTestCase):
 
         self.assertEqual(theme_gate["direction"], "down")
         self.assertEqual(set(theme_gate["routes"]), expected)
+
+    def test_ci_publica_medidas_e_tetos_recalibrados(self):
+        workflow = (theme_metric.ROOT / ".github" / "workflows" / "tests.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("atualizar_tetos_front:", workflow)
+        self.assertIn("metric_args+=(--atualizar-tetos)", workflow)
+        self.assertIn("actions/upload-artifact@v4", workflow)
+        self.assertIn("divergencia-tema.json", workflow)
+        self.assertIn("scripts/tetos_front.json", workflow)
 
 
 class MesmoTemaMetricTests(SimpleTestCase):

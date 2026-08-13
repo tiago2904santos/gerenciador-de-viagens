@@ -75,15 +75,15 @@ def _duplicar():
 class CatalogoSemeadoTests(TestCase):
     """O estado de partida: o seed de migração, sem área."""
 
-    def test_o_seed_nasce_sem_area(self):
-        """Se um dia nascer com área, esta fatia inteira perde o objeto."""
+    def test_novo49_remove_o_seed_global_da_instalacao_nova(self):
+        """O seed histórico é saneado antes de ``area`` virar obrigatório."""
         for modelo in CATALOGOS:
             with self.subTest(modelo=modelo._meta.label):
                 total = modelo._base_manager.count()
                 sem_area = modelo._base_manager.filter(area__isnull=True).count()
 
-                self.assertGreater(total, 0, "o seed sumiu")
-                self.assertEqual(sem_area, total, "alguma linha já tem área")
+                self.assertEqual(total, 0)
+                self.assertEqual(sem_area, 0)
 
     def test_o_catalogo_global_e_invisivel_para_quem_tem_area(self):
         """**O defeito, medido.**

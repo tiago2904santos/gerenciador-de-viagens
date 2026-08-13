@@ -22,15 +22,23 @@ propósito**. Sob `objects`, `area=A AND (area=A OR area IS NULL)` colapsa em
 
 from __future__ import annotations
 
+from django.conf import settings
 from django.test import TestCase
-from django.test import override_settings
 
-from core.tests.test_area_scoped_manager import com_request
-from core.tests.test_area_scoped_manager import sem_request
+from cadastros.models import Combustivel
+from cadastros.models import Servidor
+from cadastros.models import Unidade
+from cadastros.models import Viatura
+from core.testing import com_request
+from core.testing import sem_request
+from oficios.forms import OficioDadosViajantesForm
+from oficios.forms import OficioForm
+from oficios.forms import OficioTransporteForm
 from oficios.models import ConfiguracaoNumeracaoOficio
 from oficios.models import ModeloMotivoOficio
 from oficios.models import Oficio
 from oficios.models import OficioNumeroLacuna
+from roteiros.models import Roteiro
 from usuarios.models import AreaTrabalho
 
 
@@ -95,12 +103,51 @@ class RecorteChegaNosQuatroModelosTests(TestCase):
                 self.assertEqual(modelo._meta.default_manager_name, "all_objects")
 
 
-#: `config/settings/test.py:36` desliga `OFICIO_NUMERACAO_USAR_CONFIGURACAO`, que em
-#: produção é `True` (`config/settings/base.py:179`). Com ele desligado o ramo inteiro
-#: de `ConfiguracaoNumeracaoOficio` nem é consultado e `piso` é sempre 1 — ou seja, o
-#: site mais perigoso desta fatia seria **inalcançável pela suíte**. Mesma família do
-#: `NOVO-20` (`CELERY_TASK_ALWAYS_EAGER`), registrada como `NOVO-28`.
-COMO_EM_PRODUCAO = override_settings(OFICIO_NUMERACAO_USAR_CONFIGURACAO=True)
+class ModelFormsRecortamRelacoesTests(TestCase):
+    def setUp(self):
+        self.area = AreaTrabalho.objects.create(nome="Área Form A", sigla="FRM-A")
+        self.outra = AreaTrabalho.objects.create(nome="Área Form B", sigla="FRM-B")
+        with sem_request():
+            for area, sufixo in ((self.area, "A"), (self.outra, "B")):
+                Unidade.objects.create(area=area, nome=f"Unidade {sufixo}")
+                Combustivel.objects.create(area=area, nome=f"Combustível {sufixo}")
+                Servidor.objects.create(area=area, nome=f"Servidor {sufixo}")
+                Viatura.objects.create(area=area, placa=f"ABC000{sufixo}")
+                Roteiro.objects.create(area=area)
+
+    def assert_so_area_ativa(self, field):
+        self.assertEqual(
+            set(field.queryset.values_list("area_id", flat=True)),
+            {self.area.pk},
+        )
+
+    def test_oficio_form_recorta_as_seis_relacoes(self):
+        with com_request(self.area):
+            form = OficioForm()
+
+        for nome in (
+            "roteiro",
+            "solicitante",
+            "servidores",
+            "servidores_termo_autorizacao",
+            "viatura",
+            "motorista",
+        ):
+            with self.subTest(campo=nome):
+                self.assert_so_area_ativa(form.fields[nome])
+
+    def test_forms_do_wizard_recortam_relacoes_herdadas_e_transporte(self):
+        with com_request(self.area):
+            dados = OficioDadosViajantesForm()
+            transporte = OficioTransporteForm()
+
+        for form, nomes in (
+            (dados, ("servidores", "servidores_termo_autorizacao", "viatura")),
+            (transporte, ("viatura", "motorista", "transporte_combustivel_manual")),
+        ):
+            for nome in nomes:
+                with self.subTest(form=form.__class__.__name__, campo=nome):
+                    self.assert_so_area_ativa(form.fields[nome])
 
 
 class NumeracaoNaoPodeSerRecortadaTests(TestCase):
@@ -124,9 +171,11 @@ class NumeracaoNaoPodeSerRecortadaTests(TestCase):
         self.area = AreaTrabalho.objects.create(nome="Área A", sigla="NUM-A")
         self.outra = AreaTrabalho.objects.create(nome="Área B", sigla="NUM-B")
 
+    def test_suite_exerce_a_mesma_configuracao_de_producao(self):
+        self.assertTrue(settings.OFICIO_NUMERACAO_USAR_CONFIGURACAO)
+
     # ── o piso global: o site mais perigoso do ID ──
 
-    @COMO_EM_PRODUCAO
     def test_o_piso_global_sobrevive_ao_recorte(self):
         """`ConfiguracaoNumeracaoOficio` com `area IS NULL` é o padrão de todos.
 
@@ -146,7 +195,6 @@ class NumeracaoNaoPodeSerRecortadaTests(TestCase):
             msg="o piso global sumiu e a numeração reiniciou",
         )
 
-    @COMO_EM_PRODUCAO
     def test_o_piso_da_propria_area_continua_ganhando_do_global(self):
         """O recorte não pode ter atropelado a precedência que já existia:
         `order_by(F("area_id").desc(nulls_last=True))` põe a área na frente."""
@@ -275,7 +323,6 @@ class NumeracaoNaoPodeSerRecortadaTests(TestCase):
 
     # ── o piso global que existe de verdade em produção ──
 
-    @COMO_EM_PRODUCAO
     def test_o_piso_global_semeado_pela_migracao_continua_valendo(self):
         """A versão mais forte do primeiro teste: o dado é o de produção.
 

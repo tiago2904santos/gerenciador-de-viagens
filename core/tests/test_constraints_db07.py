@@ -43,6 +43,7 @@ from prestacoes_contas.models import DiarioBordoTrecho
 from prestacoes_contas.models import PrestacaoContas
 from prestacoes_contas.models import PrestacaoServidor
 from roteiros.models import Roteiro
+from roteiros.models import RoteiroDiariaComponente
 from roteiros.models import RoteiroTrecho
 from termos.models import TermoAutorizacao
 from core.testing import area_de_teste
@@ -63,6 +64,22 @@ class ConstraintsBase(TestCase):
             ordem=1,
             saida_dt=AGORA,
             chegada_dt=AGORA + timedelta(hours=1),
+        )
+
+    def _roteiro_diaria_componente(self):
+        tabela = self._tabela_diaria()
+        return RoteiroDiariaComponente.objects.create(
+            roteiro=self._roteiro(),
+            tabela_diaria=tabela,
+            ordem=0,
+            origem=RoteiroDiariaComponente.ORIGEM_CALCULO,
+            faixa=TabelaDiaria.FAIXA_INTERIOR,
+            percentual=100,
+            quantidade=1,
+            valor_unitario=Decimal("300.00"),
+            subtotal=Decimal("300.00"),
+            periodo_inicio=AGORA,
+            periodo_fim=AGORA + timedelta(days=1),
         )
 
     def _evento(self):
@@ -150,6 +167,8 @@ class ConstraintsBase(TestCase):
 #: que a reprovava. Foi esta lista que reprovou quando ela reapareceu sem caso —
 #: era para isso que a régua de introspecção existia.
 CASOS_ORDEM = [
+    ("_roteiro_diaria_componente", "roteiro_diaria_componente_periodo_ordenado",
+     {"periodo_fim": AGORA - timedelta(hours=1)}, {"periodo_fim": AGORA}),
     ("_roteiro", "roteiro_ida_ordenada",
      {"chegada_dt": AGORA - timedelta(hours=1)}, {"chegada_dt": AGORA}),
     ("_roteiro", "roteiro_permanencia_ordenada",
@@ -181,6 +200,14 @@ CASOS_ORDEM = [
 ]
 
 CASOS_SINAL = [
+    ("_roteiro_diaria_componente", "roteiro_diaria_componente_qtd_positiva",
+     {"quantidade": 0}, {"quantidade": 1}),
+    ("_roteiro_diaria_componente", "roteiro_diaria_componente_pct_valido",
+     {"percentual": 0}, {"percentual": 15}),
+    ("_roteiro_diaria_componente", "roteiro_diaria_componente_unit_nao_negativo",
+     {"valor_unitario": Decimal("-0.01")}, {"valor_unitario": Decimal("0.00")}),
+    ("_roteiro_diaria_componente", "roteiro_diaria_componente_subtotal_nao_negativo",
+     {"subtotal": Decimal("-0.01")}, {"subtotal": Decimal("0.00")}),
     ("_roteiro", "roteiro_valor_diarias_nao_negativo",
      {"valor_diarias": Decimal("-0.01")}, {"valor_diarias": Decimal("0.00")}),
     ("_roteiro", "roteiro_distancia_calc_nao_negativa",

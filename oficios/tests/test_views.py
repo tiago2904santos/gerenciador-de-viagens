@@ -67,7 +67,7 @@ class OficioViewsTests(TestCase):
         oficio = Oficio.objects.get()
         self.assertEqual(response.url, reverse("oficios:dados_viajantes", args=[oficio.pk]))
         self.assertEqual(oficio.status, Oficio.STATUS_RASCUNHO)
-        self.assertEqual(oficio.numero, 1)
+        self.assertEqual(oficio.numero, 75)
         self.assertEqual(oficio.ano, timezone.localdate().year)
         self.assertEqual(oficio.data_criacao, timezone.localdate())
 

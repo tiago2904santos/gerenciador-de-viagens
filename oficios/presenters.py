@@ -1,4 +1,5 @@
 import json
+from functools import cache
 
 from core import entity_cards
 from core.errors import capture
@@ -10,11 +11,47 @@ from core.utils.masks import format_protocolo
 from decimal import Decimal
 
 from django.core.exceptions import ObjectDoesNotExist
+from django.urls import get_urlconf
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
 
 from .models import Oficio
+
+
+@cache
+def _oficio_card_url_templates(urlconf):
+    """Resolve cada rota uma vez e deixa somente o PK variar entre os cards."""
+    marker = 987654321
+
+    def path(name, *extra):
+        return reverse(name, args=[marker, *extra], urlconf=urlconf).replace(
+            str(marker), "{pk}", 1
+        )
+
+    return {
+        "menus": path("oficios:card_menus"),
+        "justificativa": path("oficios:wizard_justificativa"),
+        "editar": path("oficios:dados_viajantes"),
+        "cancelar": path("oficios:cancelar"),
+        "retificar": path("oficios:retificar"),
+        "complementar": path("oficios:marcar_complementar"),
+        "visualizar": path("oficios:oficio_pdf_inline"),
+        "pdf": path("oficios:baixar_documento", "pdf"),
+        "docx": path("oficios:baixar_documento", "docx"),
+        "justificativa_visualizar": path("oficios:justificativa_pdf_inline"),
+        "justificativa_pdf": path("oficios:baixar_justificativa_documento", "pdf"),
+        "justificativa_docx": path("oficios:baixar_justificativa_documento", "docx"),
+        "documentos": path("oficios:wizard_documentos"),
+        "excluir": path("oficios:excluir"),
+    }
+
+
+def _oficio_card_urls(pk):
+    return {
+        key: template.format(pk=pk)
+        for key, template in _oficio_card_url_templates(get_urlconf()).items()
+    }
 
 
 def _format_brl_diarias(value) -> str:
@@ -40,6 +77,16 @@ def _status_variant(status: str) -> str:
 def _destino_display_oficio(oficio) -> str:
     if not oficio.roteiro_id:
         return ""
+    destinos_da_lista = getattr(oficio, "_destinos_da_lista", None)
+    if destinos_da_lista is not None:
+        parts = [
+            _label_cidade_uf_texto(item["destino_nome"], item["destino_uf"])
+            for item in destinos_da_lista[:2]
+        ]
+        result = ", ".join(parts)
+        if len(destinos_da_lista) > 2:
+            result += f" +{len(destinos_da_lista) - 2}"
+        return result
     destinos = list(oficio.roteiro.destinos.all())
     if not destinos:
         return ""
@@ -78,6 +125,13 @@ def _label_cidade_uf_trecho(cidade, estado) -> str:
     if estado_txt:
         return f"{cidade_txt}/{estado_txt}"
     return cidade_txt
+
+
+def _label_cidade_uf_texto(cidade, uf) -> str:
+    cidade_txt = (cidade or "").upper()
+    if "/" in cidade_txt:
+        return cidade_txt
+    return f"{cidade_txt}/{uf}" if uf else cidade_txt
 
 
 def _format_dt_trecho(dt) -> str:
@@ -129,10 +183,15 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
     """
     from termos.services import termo_oficio_assinado_info
 
-    menus_src = reverse("oficios:card_menus", args=[oficio.pk]) if menus_sob_demanda else ""
+    urls = _oficio_card_urls(oficio.pk)
+    menus_src = urls["menus"] if menus_sob_demanda else ""
 
-    servidores = list(oficio.servidores.all())
-    termos_pks = {s.pk for s in oficio.servidores_termo_autorizacao.all()}
+    servidores = getattr(oficio, "_servidores_da_lista", None)
+    if servidores is None:
+        servidores = list(oficio.servidores.all())
+    termos_pks = getattr(oficio, "_servidores_termo_pks_da_lista", None)
+    if termos_pks is None:
+        termos_pks = {s.pk for s in oficio.servidores_termo_autorizacao.all()}
     servidor_pks = {s.pk for s in servidores}
     motorista_pk = oficio.motorista_id
 
@@ -171,6 +230,7 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
                     oficio_id=oficio.pk,
                     servidor_id=s.pk,
                 )
+        termo_assinado = assinado_info["assinado"]
         servidores_display.append({
             "servidor_pk": s.pk,
             "initials": _iniciais_nome_servidor(s.nome),
@@ -184,7 +244,17 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
             "termo_open_url": termo_open_url,
             "termo_pdf_url": termo_pdf_url,
             "termo_docx_url": termo_docx_url,
-            "termo_assinado": assinado_info["assinado"],
+            "termo_assinado": termo_assinado,
+            "termo_action_class": (
+                "icon-btn icon-btn--edit is-assinado"
+                if termo_assinado
+                else "icon-btn icon-btn--edit"
+            ),
+            "termo_action_aria": f"Ações do termo de {s.nome}",
+            "termo_action_tooltip": (
+                "Termo assinado — ações" if termo_assinado else "Ações do termo"
+            ),
+            "termo_action_menu_id": f"termo-action-menu-{oficio.pk}-{s.pk}",
             "termo_anexar_assinado_url": assinado_info["anexar_assinado_url"],
             "termo_remover_assinado_url": assinado_info["remover_assinado_url"],
             "termo_assinado_nome_original": assinado_info["assinado_nome_original"],
@@ -201,13 +271,23 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
     valor_diarias_extenso = ""
     if oficio.roteiro_id:
         roteiro = oficio.roteiro
-        for t in roteiro.trechos.all():
-            orig = _label_cidade_uf_trecho(t.origem_cidade, t.origem_estado)
-            dest = _label_cidade_uf_trecho(t.destino_cidade, t.destino_estado)
+        trechos_da_lista = getattr(oficio, "_trechos_da_lista", None)
+        trechos = trechos_da_lista if trechos_da_lista is not None else roteiro.trechos.all()
+        for t in trechos:
+            if trechos_da_lista is not None:
+                orig = _label_cidade_uf_texto(t["origem_nome"], t["origem_uf"])
+                dest = _label_cidade_uf_texto(t["destino_nome"], t["destino_uf"])
+                saida = t["saida"]
+                chegada = t["chegada"]
+            else:
+                orig = _label_cidade_uf_trecho(t.origem_cidade, t.origem_estado)
+                dest = _label_cidade_uf_trecho(t.destino_cidade, t.destino_estado)
+                saida = t.saida_dt
+                chegada = t.chegada_dt
             trechos_display.append({
                 "rota": f"{orig} → {dest}",
-                "saida": _format_dt_trecho(t.saida_dt),
-                "chegada": _format_dt_trecho(t.chegada_dt),
+                "saida": _format_dt_trecho(saida),
+                "chegada": _format_dt_trecho(chegada),
             })
         diarias_oficio = oficio.diarias_para_servidores()
         if diarias_oficio:
@@ -273,7 +353,7 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
                 "status_css_class": status_css_class,
                 "created_at_display": created_at_display,
                 "texto_resumido": texto_resumido,
-                "detail_url": reverse("oficios:wizard_justificativa", args=[oficio.pk]),
+                "detail_url": urls["justificativa"],
             }
     except ObjectDoesNotExist:
         pass
@@ -301,11 +381,11 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
 
     numero_display = oficio.numero_formatado
     protocolo_display = format_protocolo(oficio.protocolo) or ""
-    editar_url = reverse("oficios:dados_viajantes", args=[oficio.pk])
-    excluir_url = _excluir_url_oficio(oficio.pk, excluir_next_url)
-    cancelar_url = reverse("oficios:cancelar", args=[oficio.pk])
-    retificar_url = reverse("oficios:retificar", args=[oficio.pk])
-    marcar_complementar_url = reverse("oficios:marcar_complementar", args=[oficio.pk])
+    editar_url = urls["editar"]
+    excluir_url = _excluir_url_oficio(oficio.pk, excluir_next_url, base_url=urls["excluir"])
+    cancelar_url = urls["cancelar"]
+    retificar_url = urls["retificar"]
+    marcar_complementar_url = urls["complementar"]
 
     header_parts = [f"Nº {numero_display}"]
     if protocolo_display:
@@ -367,9 +447,9 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
                     f"oficio-document-menu-{oficio.pk}",
                     numero_display,
                     title="Documentos do ofício",
-                    view_url=reverse("oficios:oficio_pdf_inline", args=[oficio.pk]),
-                    pdf_url=reverse("oficios:baixar_documento", args=[oficio.pk, "pdf"]),
-                    docx_url=reverse("oficios:baixar_documento", args=[oficio.pk, "docx"]),
+                    view_url=urls["visualizar"],
+                    pdf_url=urls["pdf"],
+                    docx_url=urls["docx"],
                     view_title="Visualizar ofício",
                     docx_description="Arquivo editável do ofício",
                     trigger_aria=f"Abrir documentos do ofício {numero_display}",
@@ -424,21 +504,22 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
         "valor_diarias_display": valor_diarias_display,
         "valor_diarias_extenso": valor_diarias_extenso,
         "justificativa": justificativa,
-        "justificativa_url": reverse("oficios:wizard_justificativa", args=[oficio.pk]),
-        "justificativa_visualizar_url": reverse("oficios:justificativa_pdf_inline", args=[oficio.pk]),
-        "justificativa_pdf_url": reverse("oficios:baixar_justificativa_documento", args=[oficio.pk, "pdf"]),
-        "justificativa_docx_url": reverse("oficios:baixar_justificativa_documento", args=[oficio.pk, "docx"]),
-        "documentos_url": reverse("oficios:wizard_documentos", args=[oficio.pk]),
-        "visualizar_url": reverse("oficios:oficio_pdf_inline", args=[oficio.pk]),
-        "pdf_url": reverse("oficios:baixar_documento", args=[oficio.pk, "pdf"]),
-        "docx_url": reverse("oficios:baixar_documento", args=[oficio.pk, "docx"]),
+        "justificativa_url": urls["justificativa"],
+        "justificativa_menu_id": f"justificativa-document-menu-{oficio.pk}",
+        "justificativa_visualizar_url": urls["justificativa_visualizar"],
+        "justificativa_pdf_url": urls["justificativa_pdf"],
+        "justificativa_docx_url": urls["justificativa_docx"],
+        "documentos_url": urls["documentos"],
+        "visualizar_url": urls["visualizar"],
+        "pdf_url": urls["pdf"],
+        "docx_url": urls["docx"],
         "editar_url": editar_url,
         "excluir_url": excluir_url,
     }
 
 
-def _excluir_url_oficio(pk, next_url=None):
-    url = reverse("oficios:excluir", args=[pk])
+def _excluir_url_oficio(pk, next_url=None, *, base_url=None):
+    url = base_url or reverse("oficios:excluir", args=[pk])
     if next_url:
         url = f"{url}?{urlencode({'next': next_url})}"
     return url
@@ -1012,4 +1093,3 @@ def apresentar_oficio_wizard_documentos_context(oficio):
         "generation_status": generation_status,
         "documentos_inline": documentos_inline,
     }
-

@@ -1,6 +1,6 @@
 # Plano técnico — Etapas 4 e 5 do wizard de Ofício
 
-Documento de auditoria, contrato funcional e ordem de implementação.  
+Documento de auditoria, contrato funcional e ordem de implementação.
 **Estado da última revisão:** baseline antes da implementação das etapas Justificativa (4) e Documentos (5).
 
 ---
@@ -74,7 +74,7 @@ Documento de auditoria, contrato funcional e ordem de implementação.
 
 ## 7. Regra exata — 10 dias corridos
 
-**Campo de referência da data do ofício:** `Oficio.data_criacao` (**DateField** de domínio).  
+**Campo de referência da data do ofício:** `Oficio.data_criacao` (**DateField** de domínio).
 **Não usar** `created_at` / `updated_at` do `TimeStampedModel` para esta regra.
 
 Seja `D0 = oficio.data_criacao` e `S = primeira_data_saida` (extraída da primeira saída efetiva em datetime, depois `.date()` em UTC local conforme implementação).

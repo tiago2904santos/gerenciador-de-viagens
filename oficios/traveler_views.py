@@ -1,5 +1,3 @@
-from django.contrib import messages
-from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
@@ -25,7 +23,7 @@ from .view_navigation import oficio_back_url as _oficio_back_url
 from .view_navigation import url_with_next as _url_with_next
 from core.wizard import normalizar_acao_do_wizard
 
-from .view_helpers import _redirect_lista_oficio, _wizard_persist_action_para_dados_viajantes, _wizard_footer_ctx, _wizard_shell_ctx, _motorista_oficio_numero_display, _prepare_dados_viajantes_form, _prepare_transporte_form, _merge_payload_fields, _oficio_dados_viajantes_autosave_data, _oficio_transporte_autosave_data, _oficio_autosave_version, _autosave_form_errors
+from .view_helpers import _redirect_after_wizard_save, _wizard_persist_action_para_dados_viajantes, _wizard_footer_ctx, _wizard_shell_ctx, _motorista_oficio_numero_display, _prepare_dados_viajantes_form, _prepare_transporte_form, _merge_payload_fields, _oficio_dados_viajantes_autosave_data, _oficio_transporte_autosave_data, _oficio_autosave_version, _autosave_form_errors
 
 
 def _wizard_dados_viajantes_context(
@@ -132,30 +130,6 @@ def _wizard_dados_viajantes_context(
     }
 
 
-def _redirect_after_dados_viajantes_save(request, oficio, *, nav_action: str, created=False):
-    if nav_action in ("wizard_back", "save_draft_list"):
-        return _redirect_lista_oficio(
-            request,
-            oficio,
-            "Ofício cadastrado com sucesso."
-            if created
-            else "Dados e viajantes salvos.",
-        )
-    if nav_action == "wizard_next":
-        messages.success(
-            request,
-            "Ofício cadastrado com sucesso."
-            if created
-            else "Dados e viajantes atualizados com sucesso.",
-        )
-        return redirect("oficios:wizard_roteiro", pk=oficio.pk)
-    messages.success(
-        request,
-        "Ofício cadastrado com sucesso." if created else "Dados e viajantes atualizados com sucesso.",
-    )
-    return redirect("oficios:dados_viajantes", pk=oficio.pk)
-
-
 def _wizard_transporte_context(*, form, oficio):
     dados_av = avaliar_oficio_dados_viajantes(oficio=oficio)
     transp_av = avaliar_oficio_transporte(oficio)
@@ -204,19 +178,6 @@ def _wizard_transporte_context(*, form, oficio):
     }
 
 
-def _redirect_after_transporte_save(request, oficio, *, nav_action: str):
-    if nav_action == "wizard_back":
-        messages.success(request, "Transporte salvo.")
-        return redirect("oficios:dados_viajantes", pk=oficio.pk)
-    if nav_action == "save_draft_list":
-        return _redirect_lista_oficio(request, oficio, "Transporte salvo.")
-    if nav_action == "wizard_next":
-        messages.success(request, "Transporte salvo. Continue para a próxima etapa quando estiver pronto.")
-        return redirect("oficios:wizard_roteiro", pk=oficio.pk)
-    messages.success(request, "Rascunho do transporte salvo.")
-    return redirect("oficios:transporte", pk=oficio.pk)
-
-
 def dados_viajantes(request, pk):
     oficio = get_oficio_by_id(pk)
     form = OficioDadosViajantesForm(request.POST or None, instance=oficio)
@@ -245,7 +206,16 @@ def dados_viajantes(request, pk):
                         transporte_form,
                         action="save_continue" if nav_action == "wizard_next" else "save_draft",
                     )
-                return _redirect_after_dados_viajantes_save(request, oficio, nav_action=nav_action, created=False)
+                return _redirect_after_wizard_save(
+                    request,
+                    oficio,
+                    nav_action,
+                    current_route="oficios:dados_viajantes",
+                    default_message="Dados e viajantes atualizados com sucesso.",
+                    next_route="oficios:wizard_roteiro",
+                    next_message="Dados e viajantes atualizados com sucesso.",
+                    list_message="Dados e viajantes salvos.",
+                )
     avaliacao = avaliar_oficio_dados_viajantes(form=form, oficio=oficio)
     mostrar_pendencias_documento = request.GET.get("documento_incompleto") == "1"
     return render(
@@ -322,7 +292,18 @@ def transporte(request, pk):
             form,
             action="save_continue" if nav_action == "wizard_next" else "save_draft",
         )
-        return _redirect_after_transporte_save(request, oficio, nav_action=nav_action)
+        return _redirect_after_wizard_save(
+            request,
+            oficio,
+            nav_action,
+            current_route="oficios:transporte",
+            default_message="Rascunho do transporte salvo.",
+            back_route="oficios:dados_viajantes",
+            back_message="Transporte salvo.",
+            next_route="oficios:wizard_roteiro",
+            next_message="Transporte salvo. Continue para a próxima etapa quando estiver pronto.",
+            list_message="Transporte salvo.",
+        )
     return render(
         request,
         "oficios/wizard_transporte.html",

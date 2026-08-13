@@ -1,0 +1,57 @@
+{% load icones %}
+{# Variante canônica para listas quentes: mesmo contrato do entity_card, apenas includes Django. #}
+<article
+  class="entity-card record-card record-card--{{ card.status_variant|default:'outro' }}"
+  data-collection-item
+  data-search-text="{{ card.search_text }}"
+  {% if card.status_value %}data-status-value="{{ card.status_value }}"{% endif %}
+>
+  <div class="entity-card__body record-card__layout">
+    {% if card.header %}
+    <div class="entity-card__header record-card__id-row">
+      {% for item in card.header.items %}
+      <div class="record-card__info-item{% if item.wide %} record-card__info-item--wide{% endif %}">
+        <span class="record-card__info-label">{{ item.label }}</span>
+        <span class="record-card__info-value{% if item.wrap %} record-card__info-value--wrap{% endif %}{% if item.value_class %} {{ item.value_class }}{% endif %}">{{ item.value }}</span>
+      </div>
+      {% endfor %}
+      {% for chip in card.header.chips %}
+      <span class="chip chip--{{ chip.tone }} record-card__temporal-chip"><span class="chip__label">{{ chip.label }}</span></span>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if card.cancel_note %}
+    <div class="record-card__band">
+      <p class="empty-hint"><strong>Motivo do cancelamento:</strong> {{ card.cancel_note }}</p>
+    </div>
+    {% endif %}
+
+    {% include body_template with card=card csrf_token=csrf_token only %}
+
+    {% if card.footer %}
+    <div class="entity-card__footer record-card__footer">
+      <div class="record-card__footer-actions">
+        <div class="record-card__footer-actions-main icon-btn-group">
+          {% if card.footer.edit_url %}
+          {% include "includes/performance/icon_control_flat.html" with class_name="icon-btn icon-btn--edit" href=card.footer.edit_url aria_label=card.footer.edit_aria tooltip=card.footer.edit_tooltip|default:"Editar" icon="edit" only %}
+          {% endif %}
+          {% for menu in card.footer.menus %}
+          {% include "includes/performance/icon_control_flat.html" with variant=menu.trigger_variant|default:"settings" state_class=menu.trigger_state_class aria_label=menu.trigger_aria tooltip=menu.trigger_tooltip|default:"Visualizar e baixar" icon=menu.trigger_icon|default:"folder" overlay_kind="menu" overlay_target=menu.id overlay_src=menu.src controls=menu.id only %}
+          {% endfor %}
+        </div>
+        <div class="record-card__footer-actions--danger icon-btn-group">
+          {% if card.footer.delete_modal_url %}
+          {% include "includes/performance/icon_control_flat.html" with class_name="icon-btn icon-btn--delete" aria_label=card.footer.delete_aria|default:"Excluir" tooltip="Excluir" icon="delete" overlay_kind="dialog" overlay_target="delete-confirm-modal" delete_url=card.footer.delete_modal_url delete_label=card.footer.delete_modal_label delete_title=card.footer.delete_modal_title only %}
+          {% elif card.footer.delete_url %}
+          {% include "includes/performance/icon_control_flat.html" with class_name="icon-btn icon-btn--delete" href=card.footer.delete_url aria_label=card.footer.delete_aria|default:"Excluir" tooltip="Excluir" icon="delete" only %}
+          {% endif %}
+          {% for menu in card.footer.danger_menus %}
+          {% include "includes/performance/icon_control_flat.html" with variant=menu.trigger_variant|default:"settings" state_class=menu.trigger_state_class aria_label=menu.trigger_aria tooltip=menu.trigger_tooltip|default:"Visualizar e baixar" icon=menu.trigger_icon|default:"folder" overlay_kind="menu" overlay_target=menu.id overlay_src=menu.src controls=menu.id only %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</article>

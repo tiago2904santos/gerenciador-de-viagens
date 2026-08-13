@@ -54,3 +54,40 @@ class DiariasDocxtplTests(TestCase):
         # 100,00 × 3 servidores = 300,00 (e por extenso recalculado).
         self.assertIn("R$300,00", ctx["diaria"])
         self.assertIn("(Trezentos reais)", ctx["diaria"])
+
+    def test_excluir_servidor_preserva_total_impresso(self):
+        """NOVO-39: uma exclusão cadastral não reescreve dinheiro histórico."""
+        roteiro = Roteiro.objects.create(
+            area=area_de_teste(),
+            tipo=Roteiro.TIPO_AVULSO,
+            status=Roteiro.STATUS_RASCUNHO,
+            quantidade_diarias="1 x 100%",
+            valor_diarias=Decimal("100"),
+            valor_diarias_extenso="CEM REAIS",
+        )
+        oficio = Oficio.objects.create(area=area_de_teste(), roteiro=roteiro)
+        cargo = Cargo.objects.create(area=area_de_teste(), nome="Cargo NOVO-39")
+        primeiro = Servidor.objects.create(
+            area=area_de_teste(),
+            nome="Servidor mantido",
+            cargo=cargo,
+            cpf="12345678901",
+        )
+        excluido = Servidor.objects.create(
+            area=area_de_teste(),
+            nome="Servidor excluído",
+            cargo=cargo,
+            cpf="10987654321",
+        )
+        oficio.servidores.add(primeiro, excluido)
+        oficio.diarias_quantidade_servidores = 2
+        oficio.save(update_fields=["diarias_quantidade_servidores"])
+
+        antes = oficio.diarias_para_servidores()
+        excluido.delete()
+        depois = oficio.diarias_para_servidores()
+
+        self.assertEqual(antes["quantidade_servidores"], 2)
+        self.assertEqual(antes["valor_decimal"], Decimal("200"))
+        self.assertEqual(depois["quantidade_servidores"], 2)
+        self.assertEqual(depois["valor_decimal"], Decimal("200"))

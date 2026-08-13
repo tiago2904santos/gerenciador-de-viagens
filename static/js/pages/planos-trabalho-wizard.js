@@ -389,13 +389,32 @@
     var totalInput = scope.querySelector("input[name='efetivo-TOTAL_FORMS']");
     if (!rowsContainer || !template || !totalInput) return;
 
+    function instantiateTemplate(index) {
+      var fragment = template.content.cloneNode(true);
+      var walker = document.createTreeWalker(
+        fragment,
+        NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT
+      );
+      var node;
+      while ((node = walker.nextNode())) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          node.nodeValue = node.nodeValue.replace(/__prefix__/g, String(index));
+          continue;
+        }
+        Array.prototype.slice.call(node.attributes || []).forEach(function(attr) {
+          if (attr.value.indexOf('__prefix__') !== -1) {
+            node.setAttribute(attr.name, attr.value.replace(/__prefix__/g, String(index)));
+          }
+        });
+      }
+      return fragment;
+    }
+
     function addEfetivoRow() {
       var index = parseInt(totalInput.value || "0", 10);
-      var html = template.innerHTML.replace(/__prefix__/g, String(index));
-      var holder = document.createElement("div");
-      holder.innerHTML = html.trim();
-      var row = holder.firstElementChild;
-      rowsContainer.appendChild(row);
+      var fragment = instantiateTemplate(index);
+      var row = fragment.firstElementChild;
+      rowsContainer.appendChild(fragment);
       totalInput.value = String(index + 1);
       bindEfetivoInputs(scope, row);
       var picker = window.CV && window.CV.picker;

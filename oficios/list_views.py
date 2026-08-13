@@ -4,10 +4,13 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from core.pagination import contexto_paginacao
+from core.pagination import KnownCountPaginator
 from eventos.services import resolve_evento_from_request
 from .models import Oficio
 from .presenters import apresentar_oficio_card
+from .card_rendering import renderizar_oficio_card_cacheado
 from .selectors import get_oficio_by_id
+from .selectors import hidratar_oficios_da_pagina
 from .selectors import listar_oficios
 from .services import criar_oficio_rascunho
 
@@ -51,10 +54,20 @@ def index(request):
                    "criacao_de": criacao_de, "criacao_ate": criacao_ate,
                    "viagem_de": viagem_de, "viagem_ate": viagem_ate},
     )
-    paginacao = contexto_paginacao(oficios, request, OFICIOS_POR_PAGINA)
+    paginacao = contexto_paginacao(
+        oficios,
+        request,
+        OFICIOS_POR_PAGINA,
+        paginator_class=KnownCountPaginator,
+        paginator_kwargs={"known_count": contagem[aba]},
+    )
+    objetos_da_pagina = hidratar_oficios_da_pagina(paginacao["page_obj"].object_list)
+    paginacao["page_obj"].object_list = objetos_da_pagina
     cards = []
-    for oficio in paginacao["page_obj"].object_list:
+    for oficio in objetos_da_pagina:
         cards.append(apresentar_oficio_card(oficio, excluir_next_url=reverse("oficios:index")))
+    for card in cards:
+        card["rendered_html"] = renderizar_oficio_card_cacheado(card)
 
     has_filters = any([q, status, criacao_de, criacao_ate, viagem_de, viagem_ate, sort])
 

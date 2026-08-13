@@ -127,8 +127,9 @@ class OrcamentoDeQueriesOrdemServicoTests(TestCase):
     # Onde o corte é **-1**, o teste mede a **primeira** requisição depois do
     # login: ali `core/tenancy.py:52` grava a área na sessão, que por isso é
     # salva de qualquer jeito, e só a leitura é economizada.
-    QUERIES_LISTA = 15  # remedido no DB-02: usuário de teste passou a ter vínculo de área
-    QUERIES_LISTA_BUSCA = 15
+    # NOVO-50: as quatro contagens de aba são uma agregação, -3 consultas.
+    QUERIES_LISTA = 12
+    QUERIES_LISTA_BUSCA = 12
     # 26 -> 30 na edicao, sem N+1: a lista segue em 22, entao nada voltou para
     # dentro do laco dos cards. Os quatro sao custo constante da previa de
     # destinos, que resolve a sede das Configuracoes e rele o singleton por

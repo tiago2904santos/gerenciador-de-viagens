@@ -1,8 +1,9 @@
 {% cotton:vars data_attach_signed_cancel data_cancel_modal_cancel data_confirm_action_cancel data_delete_modal_cancel eyebrow icon icon_extra_class title title_id tone %}
 {% comment %}Canonical dialog header shared by confirmation, cancellation and attachment flows.{% endcomment %}
+{% load icones %}
 <header class="cv-dialog__header{% if tone %} cv-dialog__header--{{ tone }}{% endif %}">
   <span class="cv-dialog__icon{% if tone %} cv-dialog__icon--{{ tone }}{% endif %} delete-confirm-modal__icon{% if icon_extra_class %} {{ icon_extra_class }}{% endif %}" aria-hidden="true">
-    {% with cotton_attr_icon=icon|default:"more" %}<c-ui.icons.icon :icon="cotton_attr_icon" only />{% endwith %}
+    {% icone_svg icon|default:"more" %}
   </span>
   <div class="cv-dialog__heading delete-confirm-modal__copy">
     {% if eyebrow %}<span class="cv-dialog__eyebrow delete-confirm-modal__eyebrow">{{ eyebrow }}</span>{% endif %}
@@ -15,5 +16,5 @@
     data-tooltip="Fechar"
     {% if data_delete_modal_cancel or data_cancel_modal_cancel or data_confirm_action_cancel %}data-overlay-close{% endif %}
     {% if data_attach_signed_cancel %}data-attach-signed-cancel{% endif %}
-  ><c-ui.icons.icon icon="x" only /></button>
+  >{% icone_svg "x" %}</button>
 </header>

@@ -57,6 +57,7 @@ MODELOS_MOTIVO = CatalogConfig(
         erro_ao_salvar="Não foi possível salvar o modelo. Verifique os dados informados.",
         padrao_definido="Modelo definido como padrão.",
     ),
+    paginar_por=20,
     url_fallback_next="oficios:novo",
     # O presenter monta o `set_default_url` por dentro e as URLs da linha são
     # nuas — comportamento preservado da view antiga.

@@ -167,12 +167,15 @@ class ShellBundleGateTests(SimpleTestCase):
         )
 
     def test_ht04_form_css_consumers_choose_the_form_shell(self):
-        marker = "{% include 'includes/form_components_css.html' only %}"
+        include_marker = (
+            "{% include 'includes/form_components_css.html' "
+            "with shell_css_profile_path=shell_css_profile_path only %}"
+        )
         for relative in FORM_COMPONENT_STYLE_TEMPLATES:
             with self.subTest(template=relative):
                 text = (ROOT / relative).read_text(encoding="utf-8")
                 self.assertIn("{% block shell_css %}", text)
-                self.assertIn(marker, text)
+                self.assertIn(include_marker, text)
 
     def test_ui04_justificativas_uses_shared_related_route_picker_css(self):
         template = (ROOT / "templates/justificativas/index.html").read_text(

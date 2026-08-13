@@ -35,9 +35,13 @@ Uso:
 from __future__ import annotations
 
 import argparse
+import importlib
+import importlib.util
+import inspect
 import os
 import re
 import sys
+import textwrap
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[1]
@@ -105,6 +109,110 @@ def modelos_sem_recorte():
     return sorted(pendentes)
 
 
+def _queryset_atribuido_no_init(form_class, field_name: str) -> bool:
+    """Reconhece o recorte explícito feito no ``__init__`` do form ou de uma base."""
+    literal = re.compile(
+        rf"self\.fields\[['\"]{re.escape(field_name)}['\"]\]\.queryset\s*="
+    )
+    for base in form_class.__mro__:
+        init = base.__dict__.get("__init__")
+        if init is None:
+            continue
+        try:
+            fonte = textwrap.dedent(inspect.getsource(init))
+        except (OSError, TypeError):
+            continue
+        if literal.search(fonte):
+            return True
+
+        alias = re.search(
+            rf"(\w+)\s*=\s*self\.fields\[['\"]{re.escape(field_name)}['\"]\]",
+            fonte,
+        )
+        if alias and re.search(rf"{re.escape(alias.group(1))}\.queryset\s*=", fonte):
+            return True
+
+        # Alguns forms aplicam o mesmo queryset a uma tupla de campos de papel.
+        for variavel in re.findall(r"self\.fields\[(\w+)\]\.queryset\s*=", fonte):
+            iteravel = re.search(
+                rf"for\s+{re.escape(variavel)}\s+in\s+([A-Za-z_]\w*|\(.*?\))\s*:",
+                fonte,
+                re.S,
+            )
+            if not iteravel:
+                continue
+            expressao = iteravel.group(1)
+            if expressao.startswith("("):
+                bloco_texto = expressao
+            else:
+                bloco = re.search(rf"{re.escape(expressao)}\s*=\s*\((.*?)\)", fonte, re.S)
+                bloco_texto = bloco.group(1) if bloco else ""
+            if field_name in re.findall(r"['\"]([^'\"]+)['\"]", bloco_texto):
+                return True
+
+        # Variante do laço acima que primeiro guarda o campo numa variável local.
+        for variavel, alias_nome in re.findall(
+            r"(\w+)\s*=\s*self\.fields\[(\w+)\]",
+            fonte,
+        ):
+            if not re.search(rf"{re.escape(variavel)}\.queryset\s*=", fonte):
+                continue
+            iteravel = re.search(
+                rf"for\s+{re.escape(alias_nome)}(?:\s*,[^\n]+)?\s+in\s+\((.*?)\)\s*:",
+                fonte,
+                re.S,
+            )
+            if iteravel and field_name in re.findall(
+                r"['\"]([^'\"]+)['\"]", iteravel.group(1)
+            ):
+                return True
+        if (
+            field_name in fonte
+            and re.search(r"(\w+)\s*=\s*self\.fields\[\w+\]", fonte)
+            and re.search(r"\w+\.queryset\s*=", fonte)
+        ):
+            return True
+    return False
+
+
+def model_form_fields_sem_recorte():
+    """Lista relações auto-geradas que continuam usando o manager global do modelo."""
+    from django import forms
+    from django.apps import apps
+
+    achados = []
+    for app_config in apps.get_app_configs():
+        modulo_nome = f"{app_config.name}.forms"
+        try:
+            spec = importlib.util.find_spec(modulo_nome)
+        except (ModuleNotFoundError, ValueError):
+            continue
+        if spec is None:
+            continue
+        modulo = importlib.import_module(modulo_nome)
+        for _, form_class in inspect.getmembers(modulo, inspect.isclass):
+            if form_class.__module__ != modulo_nome or not issubclass(form_class, forms.ModelForm):
+                continue
+            for field_name, field in form_class.base_fields.items():
+                if not isinstance(field, (forms.ModelChoiceField, forms.ModelMultipleChoiceField)):
+                    continue
+                related_model = field.queryset.model
+                if not any(f.name == "area" for f in related_model._meta.concrete_fields):
+                    continue
+                query = field.queryset.query
+                if query.is_empty() or query.where:
+                    continue
+                if _queryset_atribuido_no_init(form_class, field_name):
+                    continue
+                achados.append(
+                    (
+                        f"{modulo_nome}.{form_class.__name__}.{field_name}",
+                        related_model._meta.label,
+                    )
+                )
+    return sorted(achados)
+
+
 def all_objects_sem_justificativa():
     """Devolve `[(caminho:linha, trecho), ...]` de `all_objects` sem comentário perto."""
     achados = []
@@ -132,6 +240,7 @@ def main(argv=None) -> int:
 
     pendentes = modelos_sem_recorte()
     sem_justificativa = all_objects_sem_justificativa()
+    forms_sem_recorte = model_form_fields_sem_recorte()
 
     print(f"Modelos com `area` ainda sem recorte no `objects`: {len(pendentes)}")
     for label, motivo in pendentes:
@@ -141,6 +250,10 @@ def main(argv=None) -> int:
     for local, trecho in sem_justificativa:
         print(f"  {local}: {trecho}")
 
+    print(f"\nCampos relacionais de ModelForm sem recorte explícito: {len(forms_sem_recorte)}")
+    for campo, modelo in forms_sem_recorte:
+        print(f"  {campo}: queryset global de {modelo}")
+
     falhou = False
     if args.max is not None and len(pendentes) > args.max:
         print(f"\nFALHOU: {len(pendentes)} pendentes passa do teto de {args.max}.")
@@ -149,6 +262,12 @@ def main(argv=None) -> int:
         print(
             "\nFALHOU: `all_objects` em caminho de request precisa de um comentário "
             "dizendo por que aquela consulta é deliberadamente global.",
+        )
+        falhou = True
+    if forms_sem_recorte:
+        print(
+            "\nFALHOU: todo campo relacional para modelo com `area` precisa declarar "
+            "queryset recortado no próprio form.",
         )
         falhou = True
     return 1 if falhou else 0
