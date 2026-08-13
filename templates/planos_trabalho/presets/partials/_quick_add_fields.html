@@ -6,13 +6,11 @@
 <div class="field-grid">
   <div class="field-size-4">
     <div class="field app-form-field cv-field pt-preset-activities-field">
-      <section class="pt-preset-activities-panel" aria-labelledby="pt-preset-activities-title">
-        <header class="pt-preset-activities-panel__header">
-          <h3 class="pt-preset-activities-panel__title" id="pt-preset-activities-title">Atividades previstas</h3>
-          <p class="pt-preset-activities-panel__description">Clique nas atividades para incluí-las ou retirá-las deste preset.</p>
-        </header>
+      <fieldset class="pt-preset-activities-panel" aria-describedby="{{ form.atividades.auto_id }}_helptext">
+        <legend class="pt-preset-activities-panel__title">Atividades previstas</legend>
+        <p class="pt-preset-activities-panel__description" id="{{ form.atividades.auto_id }}_helptext">{{ form.atividades.help_text }}</p>
         {{ form.atividades }}
-      </section>
+      </fieldset>
       {% if form.atividades.errors %}
         <c-ui.feedback.field_error :errors="form.atividades.errors" :field_id="form.atividades.auto_id" only />
       {% endif %}

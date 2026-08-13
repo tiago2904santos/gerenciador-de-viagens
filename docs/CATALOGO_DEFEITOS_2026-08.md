@@ -4532,7 +4532,7 @@ renderização — que é a mesma família do `DB-06` (`TabelaDiaria` guarda os 
 
 ---
 
-### NOVO-41 ⚪ `NOVO` Grupo de checkboxes não associa a própria ajuda, e o Django não vai fazer isso · HT · 0,5 d
+### NOVO-41 ✅ RESOLVIDO (12/08/2026) · `NOVO` Grupo de checkboxes não associa a própria ajuda, e o Django não vai fazer isso · HT · 0,5 d
 
 Achado ao fechar o `HT-02`, e deixado de fora dele **por ser outra correção**, não por cansaço.
 
@@ -4552,6 +4552,10 @@ quebrado — o Django não emite ponteiro nenhum —, então o `HT-02` fecha ver
 cabe na fase de reconstrução, não numa correção de componente.
 
 **Único caso do sistema:** é o único campo de produção com `use_fieldset=True` e `help_text`.
+
+**Fechamento:** o painel agora é um `<fieldset>` com `<legend>`, e o próprio `help_text` do form é
+renderizado uma única vez num parágrafo apontado pelo `aria-describedby` do grupo. O teste da rota
+real trava os três lados do contrato: grupo, nome acessível e instrução associada.
 
 ---
 
