@@ -1838,7 +1838,8 @@ O trabalho está no [`PLANO_FRONTEND.md`](PLANO_FRONTEND.md); aqui fica a métri
 
 **Fechamento em 13/08/2026.** O shell monolítico foi substituído, nas rotas conhecidas, por 15
 perfis CSS determinísticos por família de tela. O gerador preserva a ordem da cascata, expande os
-imports das fontes canônicas e inclui as famílias de seletores presentes no DOM; o bundle completo
+imports das fontes canônicas, mantém as regras normais medidas e completa os estados interativos
+das famílias presentes no DOM; o bundle completo
 permanece como fallback controlado pela flag `CSS_ROUTE_PROFILES_ENABLED`. A catraca passou a exigir
 o piso de **35% em cada uma das 43 rotas**, sem média que esconda uma tela abaixo do aceite.
 

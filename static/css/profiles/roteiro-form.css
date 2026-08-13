@@ -715,11 +715,6 @@ textarea[readonly] {
     padding: 16px;
   }
 }
-@media (max-width: 420px) {
-.app-main {
-    padding: 12px;
-  }
-}
 .sidebar {
   background: var(--sidebar-surface);
   border-right: 1px solid var(--sidebar-border);
@@ -870,14 +865,6 @@ textarea[readonly] {
 .sidebar-accordion__inner {
   min-height: 0;
   overflow: hidden;
-}
-@media (prefers-reduced-motion: reduce) {
-.sidebar-accordion {
-    transition: none;
-  }
-.sidebar-module-expand__chevron {
-    transition: none;
-  }
 }
 .sidebar-panel {
   border-left: 2px solid var(--sidebar-panel-border);
@@ -1479,16 +1466,6 @@ html[data-theme="dark"] input[type="checkbox"] {
   scrollbar-color: var(--field-border-hover) transparent;
   scrollbar-width: thin;
 }
-.search-picker__list::-webkit-scrollbar {
-  width: var(--space-1);
-}
-.search-picker__list::-webkit-scrollbar-track {
-  background: transparent;
-}
-.search-picker__list::-webkit-scrollbar-thumb {
-  background: var(--field-border-hover);
-  border-radius: var(--radius-pill);
-}
 .search-picker__empty,
 .search-picker__selected-empty {
   background: var(--field-bg-soft);
@@ -1519,13 +1496,6 @@ html[data-theme="dark"] input[type="checkbox"] {
   gap: var(--space-3);
   grid-template-columns: 1fr;
   min-width: 0;
-}
-.search-picker--compact .search-picker__selected-list {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-.search-picker--compact .search-picker__selected-card:only-child,
-.search-picker--compact .search-picker__selected-card:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
 }
 .search-picker__selected-card {
   align-items: start;
@@ -1691,10 +1661,6 @@ html[data-theme="dark"] {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   line-height: 1.2;
-}
-@keyframes cv-cs-menu-enter {
-  from { opacity: 0; transform: translateY(-4px) scaleY(0.97); }
-  to   { opacity: 1; transform: translateY(0) scaleY(1); }
 }
 html[data-theme="dark"] {
   --color-danger-bg: rgba(180, 35, 24, 0.22);
@@ -2101,10 +2067,6 @@ html[data-theme="dark"] {
   grid-template-columns: auto minmax(0, 1fr);
   padding: var(--space-3) var(--space-4);
   position: relative;
-}
-.alert > * {
-  grid-column: 2;
-  min-width: 0;
 }
 .alert::before {
   border-radius: var(--radius-pill);
@@ -2635,12 +2597,6 @@ html[data-theme="light"] {
   --_stack-gap: var(--space-8);
   gap:          var(--_stack-gap);
 }
-.form-section-stack > form {
-  display:        flex;
-  flex-direction: column;
-  gap:            var(--_stack-gap, var(--space-4));
-  width:          100%;
-}
 .form-section-card {
   background:    var(--form-section-bg);
   border:        1px solid var(--form-section-border);
@@ -2788,22 +2744,6 @@ html[data-theme="light"] {
   padding:        3px var(--space-3);
   white-space:    nowrap;
 }
-@keyframes inline-create-btn-fill {
-  from {
-    background:   var(--surface-filter-bar);
-    border-color: var(--border-filter-bar);
-    box-shadow:   none;
-    color:        var(--theme-text-body);
-  }
-}
-@keyframes inline-create-btn-fill-dark {
-  from {
-    background:   var(--color-card-muted);
-    border-color: var(--border-filter-bar);
-    box-shadow:   none;
-    color:        var(--theme-text-body);
-  }
-}
 .field-grid--cols-2 {
   display: grid;
   gap: var(--field-grid-gap);
@@ -2868,16 +2808,6 @@ html[data-theme="light"] {
     flex-direction: column;
     width: 100%;
   }
-}
-#quick-add-modelo-motivo .app-form-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-#quick-add-atividade .app-form-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
 }
 :root {
   
@@ -3121,9 +3051,6 @@ html[data-theme="light"] {
   padding: 0 var(--btn-padding-x-control);
   border-radius: var(--radius-control);
 }
-@keyframes cv-btn-spin {
-  to { transform: rotate(360deg); }
-}
 :root {
   --icon-btn-size: var(--control-height-md);
   --icon-btn-size-sm: 32px;
@@ -3172,37 +3099,9 @@ html[data-theme="light"] {
   min-width: 0;
   position: relative;
 }
-.date-picker__trigger:not(.cv-btn):not(.date-picker__trigger--icon) {
-  align-items: center;
-  appearance: none;
-  background:
-    linear-gradient(var(--theme-surface-card), var(--theme-surface-card)) padding-box,
-    linear-gradient(var(--color-input-border, var(--color-border-strong)), var(--color-input-border, var(--color-border-strong))) border-box;
-  border: 1px solid transparent;
-  border-radius: var(--radius-control);
-  box-shadow: var(--shadow-xs);
-  color: var(--theme-text-body);
-  cursor: pointer;
-  display: inline-flex;
-  flex: 0 0 auto;
-  font: inherit;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  justify-content: center;
-  min-height: var(--control-height-md);
-  padding: 0 var(--space-4);
-  transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast),
-    color var(--transition-fast);
-}
 .date-picker__trigger:not(.cv-btn):not(.date-picker__trigger--icon):focus,
 .date-picker__trigger:not(.cv-btn):not(.date-picker__trigger--icon):focus-visible {
   outline: none;
-}
-.date-picker__trigger.cv-btn {
-  flex: 0 0 auto;
 }
 .date-picker__trigger--icon {
   align-items: center;
@@ -3267,10 +3166,6 @@ html[data-theme="light"] {
   position: fixed;
   width: min(calc(var(--date-picker-grid-width) + (2 * var(--space-4))), calc(100vw - 16px));
   z-index: calc(var(--z-sticky-stepper, 1100) + 20);
-}
-@keyframes cv-date-picker-enter {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 .date-picker__panel-header {
   align-items: center;
@@ -3649,9 +3544,6 @@ html[data-theme="dark"] {
   min-height: 34px;
   padding-inline: 11px;
 }
-.main-form-panel > .card-footer {
-  margin: 0;
-}
 .form-card > .form-section-body {
   display: grid;
   gap: 10px;
@@ -3717,10 +3609,6 @@ html[data-theme="dark"] {
   display: grid;
   gap: var(--space-3);
   min-width: 0;
-}
-.form-subsection + .form-subsection {
-  border-top: 1px solid var(--color-border-soft);
-  padding-top: var(--space-3);
 }
 @media (max-width: 900px) {
 .form-block--split {
@@ -4042,13 +3930,6 @@ html[data-theme="light"] .segment-toggle {
     max-height: none;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-.sidebar,
-  .sidebar-scrim,
-  .skip-link {
-    transition: none;
-  }
-}
 .document-loading {
   position: fixed;
   right: 20px;
@@ -4105,11 +3986,6 @@ html[data-theme="light"] .segment-toggle {
 @keyframes cv-document-loading-spin {
   to {
     transform: rotate(360deg);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-.document-loading__spinner {
-    animation-duration: 1.8s;
   }
 }
 html[data-theme="dark"] body {
@@ -4705,11 +4581,6 @@ html[data-theme="dark"] :is(.alert-danger, .alert-error, .alert--error) {
   transform: none;
 }
 :is(html[data-theme="dark"])
-  .main-form-panel > .card-footer {
-  background: var(--card-family-bg);
-  border-top-color: var(--card-family-border);
-}
-:is(html[data-theme="dark"])
   :is(.cv-btn--primary, .btn-primary, .app-primary-action, .cv-btn--primary-action, .cv-btn--next, .cv-btn--sign) {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 2px 6px rgba(3, 10, 18, 0.4);
 }
@@ -5057,12 +4928,6 @@ html[data-theme] .app-main {
   width: 1px;
 }
 :is(html[data-theme])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .ordered-field-row__drag-handle .icon {
-  display: block;
-  height: 16px;
-  width: 16px;
-}
-:is(html[data-theme])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row--single .ordered-field-row__drag-handle {
   display: none;
 }
@@ -5091,11 +4956,6 @@ html[data-theme] .app-main {
   transform: none !important;
   transition: none;
   width: 44px;
-}
-:is(html[data-theme])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .ordered-field-row__remove::before {
-  content: none !important;
-  display: none !important;
 }
 @media (max-width: 720px) {
 :is(html[data-theme])
@@ -5229,11 +5089,6 @@ html[data-theme] .app-main {
     grid-template-columns: minmax(0, 1fr);
     row-gap: 8px;
   }
-}
-:is(html[data-theme])
-  [data-travel-document-wizard-roteiro]
-  #sec-mapa-rota > .form-block__header {
-  display: none !important;
 }
 :is(html[data-theme])
   .roteiro-editor--oficio :is(
@@ -5587,16 +5442,6 @@ html[data-theme] .app-main {
   .field-side-action--toggle:is(.field-side-action--danger, .is-inactive):is(:hover, :focus-visible) {
   background: color-mix(in srgb, var(--color-white) 4%, var(--step1-panel, var(--color-surface-soft))) !important;
   border-color: color-mix(in srgb, var(--color-border) 70%, transparent) !important;
-}
-:is(html[data-theme])
-  [data-travel-document-wizard-roteiro]
-  .oficio-roteiro-bate-volta-toggle
-  .field-side-action--state::before {
-  border-radius: 999px;
-  box-shadow: none !important;
-  flex: 0 0 auto;
-  height: 7px;
-  width: 7px;
 }
 :is(html[data-theme])
   [data-travel-document-wizard-roteiro]
@@ -5983,11 +5828,6 @@ html[data-theme] .app-main {
 }
 :is(html[data-theme])
   .form-card__footer
-  .card-footer__secondary:empty {
-  display: none;
-}
-:is(html[data-theme])
-  .form-card__footer
   .card-footer__secondary
   .cv-btn,
 :is(html[data-theme])
@@ -6142,13 +5982,6 @@ html[data-theme] .alert::before {
   grid-row: 1 / -1;
   margin: 6px 0 0;
 }
-html[data-theme] .alert > * {
-  grid-column: 2;
-  min-width: 0;
-}
-@keyframes cv-skeleton-pulse {
-  to { background-position: -200% 0; }
-}
 @media (max-width: 840px) {
 html[data-theme] .sidebar {
     height: 100dvh;
@@ -6261,13 +6094,6 @@ html[data-theme] .app-theme-grid__btn small {
   background: var(--list-header-control-bg);
   border: 0;
   box-shadow: none;
-}
-@keyframes list-header-inline-create-fill {
-  from {
-    background: color-mix(in srgb, var(--color-primary-soft) 55%, var(--color-white));
-    box-shadow: none;
-    color: var(--theme-text-body);
-  }
 }
 :is(html[data-theme="dark"])
   .list-header {
@@ -6471,23 +6297,8 @@ html[data-theme] .app-theme-grid__btn small {
 .related-route-list {
   scrollbar-color: rgba(191, 211, 234, 0.6) transparent;
 }
-.related-route-list::-webkit-scrollbar {
-  width: 28px;
-}
-.related-route-list::-webkit-scrollbar-track {
-  background: transparent;
-  margin: var(--space-1) 0;
-}
-.related-route-list::-webkit-scrollbar-thumb {
-  background: rgba(191, 211, 234, 0.45);
-  border-radius: var(--radius-pill);
-  transition: background 0.2s;
-}
 .related-route-list::-webkit-scrollbar-thumb:hover {
   background: var(--color-accent);
-}
-.related-route-list::-webkit-scrollbar-button {
-  display: none;
 }
 .related-route-item {
   background: var(--route-card-inner-bg);

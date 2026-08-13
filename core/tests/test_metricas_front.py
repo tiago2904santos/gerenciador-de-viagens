@@ -9,12 +9,42 @@ from django.test import SimpleTestCase, override_settings
 
 from core.context_processors import shell_css_profile
 from scripts import medir_css_por_rota as css_metric
+from scripts import build_css_profiles as css_profiles
 from scripts import medir_divergencia_tema as theme_metric
 from scripts import sonda_mesmo_tema as same_theme_metric
 from scripts.rotas_do_sistema import ROTAS
 
 
 class ShellCssProfileTests(SimpleTestCase):
+    def test_expansao_dom_acrescenta_apenas_estados_interativos(self):
+        rules = css_profiles.tinycss2.parse_stylesheet(
+            ".card { color: red; } .card:hover { color: blue; }",
+            skip_comments=True,
+            skip_whitespace=True,
+        )
+        selected = css_profiles._with_dom_families(rules, set(), {"card"})
+
+        self.assertNotIn(css_profiles._rule_id(rules[0]), selected)
+        self.assertIn(css_profiles._rule_id(rules[1]), selected)
+
+    def test_perfil_emite_apenas_keyframe_referenciado(self):
+        rules = css_profiles.tinycss2.parse_stylesheet(
+            ".spinner { animation: spin 1s; } "
+            "@keyframes spin { to { rotate: 1turn; } } "
+            "@keyframes unused { to { opacity: 0; } }",
+            skip_comments=True,
+            skip_whitespace=True,
+        )
+
+        rendered = css_profiles._render_rules(
+            rules,
+            {css_profiles._rule_id(rules[0])},
+            {"spin"},
+        )
+
+        self.assertIn("@keyframes spin", rendered)
+        self.assertNotIn("@keyframes unused", rendered)
+
     @override_settings(CSS_ROUTE_PROFILES_ENABLED=True)
     def test_rota_mapeada_recebe_perfil(self):
         request = SimpleNamespace(

@@ -133,7 +133,15 @@ def _with_dom_families(
     for rule in qualified:
         selector = _selector(rule)
         classes = set(_CLASS.findall(selector))
-        if classes and classes.issubset(dom_classes):
+        # Regras normais presentes no DOM ja entram pelos fragmentos medidos do
+        # manifesto. A expansao por familia existe somente para estados que o
+        # CDP nao casa sem interacao (hover/focus/checked etc.); incluir toda
+        # regra da familia inflava o perfil com CSS comprovadamente nao usado.
+        if (
+            classes
+            and classes.issubset(dom_classes)
+            and _INTERACTIVE_STATE.search(selector)
+        ):
             result.add(_rule_id(rule))
         elif _INTERACTIVE_STATE.search(selector) and not classes and re.search(
             r"\b(?:a|button|input|select|textarea):", selector
@@ -212,7 +220,7 @@ def capture(reports: list[Path]) -> dict:
     return {"schema_version": 1, "profiles": profiles}
 
 
-def _render_rules(rules, selected: set[str]) -> str:
+def _render_rules(rules, selected: set[str], used_keyframes: set[str]) -> str:
     chunks: list[str] = []
     for rule in rules:
         if rule.type == "qualified-rule":
@@ -226,7 +234,9 @@ def _render_rules(rules, selected: set[str]) -> str:
             chunks.append(_serialized(rule))
             continue
         if keyword.endswith("keyframes"):
-            chunks.append(_serialized(rule))
+            name = tinycss2.serialize(rule.prelude).strip()
+            if name in used_keyframes:
+                chunks.append(_serialized(rule))
             continue
         if rule.content is None:
             continue
@@ -235,7 +245,7 @@ def _render_rules(rules, selected: set[str]) -> str:
         nested = tinycss2.parse_rule_list(
             rule.content, skip_comments=True, skip_whitespace=True
         )
-        body = _render_rules(nested, selected)
+        body = _render_rules(nested, selected, used_keyframes)
         if body:
             prelude = tinycss2.serialize(rule.prelude).strip()
             chunks.append(f"@{rule.at_keyword} {prelude} {{\n{body}\n}}")
@@ -256,7 +266,18 @@ def build(manifest: dict) -> dict[Path, str]:
             set(config["rule_ids"]),
             set(config.get("dom_classes", [])),
         )
-        body = _render_rules(rules, selected)
+        selected_css = "\n".join(
+            _serialized(rule)
+            for rule in _qualified_rules(rules)
+            if _rule_id(rule) in selected
+        )
+        keyframe_names = {
+            tinycss2.serialize(rule.prelude).strip()
+            for rule in rules
+            if rule.type == "at-rule" and rule.lower_at_keyword.endswith("keyframes")
+            and tinycss2.serialize(rule.prelude).strip() in selected_css
+        }
+        body = _render_rules(rules, selected, keyframe_names)
         outputs[OUTPUT_DIR / f"{profile}.css"] = banner + body + "\n"
     return outputs
 
