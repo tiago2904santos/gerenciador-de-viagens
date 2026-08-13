@@ -5,6 +5,12 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      atualizar_tetos_front:
+        description: "Recalibrar tetos de frontend no runner canônico e publicá-los como artefato"
+        type: boolean
+        default: false
 
 jobs:
   django:
@@ -445,11 +451,30 @@ jobs:
             exit 1
           }
 
+          metric_args=()
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && \
+             [ "${{ inputs.atualizar_tetos_front }}" = "true" ]; then
+            metric_args+=(--atualizar-tetos)
+          fi
+
           python scripts/medir_css_por_rota.py \
             --username front_metrics \
             --password-env FRONT_METRICS_PASSWORD \
-            --json "$RUNNER_TEMP/css-por-rota.json"
+            --json "$RUNNER_TEMP/css-por-rota.json" \
+            "${metric_args[@]}"
           python scripts/medir_divergencia_tema.py \
             --username front_metrics \
             --password-env FRONT_METRICS_PASSWORD \
-            --json "$RUNNER_TEMP/divergencia-tema.json"
+            --json "$RUNNER_TEMP/divergencia-tema.json" \
+            "${metric_args[@]}"
+
+      - name: Publish frontend measurements and recalibrated ceilings (NOVO-91)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-route-metrics-${{ github.run_id }}
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/css-por-rota.json
+            ${{ runner.temp }}/divergencia-tema.json
+            scripts/tetos_front.json
