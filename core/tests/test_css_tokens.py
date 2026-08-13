@@ -133,6 +133,14 @@ def _css_bundle_text() -> str:
 
 
 class CssTokenGateTests(SimpleTestCase):
+    def test_form_block_usa_o_passo_de_14px_da_escala(self):
+        tokens = (CSS_DIR / "base" / "tokens.css").read_text(encoding="utf-8")
+        sections = (CSS_DIR / "fields" / "form-sections.css").read_text(encoding="utf-8")
+
+        self.assertIn("--space-3-5: 14px;", tokens)
+        self.assertIn("padding: var(--space-3-5);", sections)
+        self.assertNotIn("padding: 14px;", sections)
+
     def test_theme_accents_are_blue_in_light_and_gold_in_dark(self):
         """NOVO-111: accent é paleta de tema; warning continua semântico."""
         light = (CSS_DIR / "base" / "tokens.css").read_text(encoding="utf-8")
