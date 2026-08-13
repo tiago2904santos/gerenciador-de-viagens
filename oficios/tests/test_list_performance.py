@@ -7,6 +7,7 @@ só, com 5,9 MB de HTML e 300 cards no DOM. Estes testes fixam os dois lados do
 contrato: página de tamanho fixo e nº de queries que **não cresce** com a base.
 """
 from datetime import timedelta
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.db import connection
@@ -14,8 +15,11 @@ from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from django.utils import timezone
+from django_cotton.templatetags._component import CottonComponentNode
 
 from oficios.models import Oficio
+from oficios import card_rendering
+from oficios import presenters
 from oficios.views import OFICIOS_POR_PAGINA
 from roteiros.models import Roteiro
 from usuarios.models import AreaTrabalho
@@ -72,12 +76,85 @@ class OficioListPaginacaoTests(TestCase):
             msg="a lista passou a emitir query por registro:\n"
             + "\n".join(q["sql"] for q in com_300.captured_queries),
         )
-        # Teto: as 16 queries fixas medidas na auditoria + o COUNT do Paginator.
+        # PF-05: seleção, hidratação e dimensões cabem no teto canônico atual.
         self.assertLessEqual(
             len(com_300),
-            17,
+            7,
             msg="\n".join(q["sql"] for q in com_300.captured_queries),
         )
+
+    def test_cards_nao_expandem_componentes_cotton_dentro_do_laco(self):
+        """PF-05: o custo do interpretador de componentes deve ser fixo por página."""
+
+        def contar_componentes(url):
+            with patch.object(
+                CottonComponentNode,
+                "render",
+                autospec=True,
+                wraps=CottonComponentNode.render,
+            ) as render:
+                self.assertEqual(self.client.get(url).status_code, 200)
+            return render.call_count
+
+        sem_cards = contar_componentes(f"{self.url}?aba=atuais")
+        _criar_oficios(OFICIOS_POR_PAGINA)
+        com_cards = contar_componentes(f"{self.url}?aba=atuais")
+
+        self.assertLessEqual(
+            com_cards,
+            sem_cards,
+            msg=(
+                "cada card voltou a expandir componentes Cotton: "
+                f"página vazia={sem_cards}, página cheia={com_cards}"
+            ),
+        )
+
+    def test_resolucao_de_urls_nao_cresce_com_os_cards(self):
+        def contar_reverses(url):
+            presenters._oficio_card_url_templates.cache_clear()
+            with patch("oficios.presenters.reverse", wraps=reverse) as resolver:
+                self.assertEqual(self.client.get(url).status_code, 200)
+            return resolver.call_count
+
+        _criar_oficios(1)
+        com_um_card = contar_reverses(f"{self.url}?aba=atuais")
+        _criar_oficios(OFICIOS_POR_PAGINA - 1, primeiro_numero=2)
+        com_cards = contar_reverses(f"{self.url}?aba=atuais")
+
+        self.assertEqual(com_cards, com_um_card)
+        self.assertLessEqual(com_cards, 14)
+
+    def test_html_do_card_reutiliza_cache_ate_o_conteudo_mudar(self):
+        card = {"status_variant": "rascunho", "search_text": "Ofício 1"}
+        card_rendering.cache.clear()
+
+        with patch(
+            "oficios.card_rendering.render_to_string",
+            wraps=card_rendering.render_to_string,
+        ) as render:
+            primeiro = card_rendering.renderizar_oficio_card_cacheado(card)
+            repetido = card_rendering.renderizar_oficio_card_cacheado(dict(card))
+            alterado = card_rendering.renderizar_oficio_card_cacheado(
+                {**card, "search_text": "Ofício alterado"}
+            )
+
+        self.assertEqual(primeiro, repetido)
+        self.assertNotEqual(primeiro, alterado)
+        self.assertEqual(render.call_count, 2)
+
+    def test_html_do_card_permanece_escapado_quando_vem_do_cache(self):
+        card = {
+            "status_variant": "rascunho",
+            "search_text": '<script>alert("xss")</script>',
+        }
+        card_rendering.cache.clear()
+
+        primeiro = card_rendering.renderizar_oficio_card_cacheado(card)
+        cacheado = card_rendering.renderizar_oficio_card_cacheado(dict(card))
+
+        self.assertEqual(primeiro, cacheado)
+        self.assertNotIn("<script>", cacheado)
+        self.assertIn("&lt;script&gt;", cacheado)
 
     def test_pagina_limita_ids_antes_de_hidratar_as_dimensoes(self):
         """NOVO-50: o LIMIT não pode carregar a árvore inteira de joins.

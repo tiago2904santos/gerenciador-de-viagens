@@ -1,4 +1,5 @@
 {% cotton:vars %}
+{% load icones %}
 <div id="attach-signed-modal" class="cv-dialog cv-dialog--document delete-confirm-modal attach-signed-modal" data-attach-signed-modal data-overlay-panel hidden>
   <div class="cv-dialog__backdrop delete-confirm-modal__backdrop" data-attach-signed-cancel></div>
   <section
@@ -14,7 +15,7 @@
     <form method="post" enctype="multipart/form-data" class="cv-dialog__form attach-signed-modal__form" data-attach-signed-form>
       <div class="cv-dialog__body attach-signed-modal__body">
         <p class="cv-dialog__message attach-signed-modal__intro" id="attach-signed-description">
-          <c-ui.icons.icon icon="document" only />
+          {% icone_svg "document" %}
           <span>
             Envie <span data-attach-signed-file-description>o PDF já assinado</span> de <strong data-attach-signed-label>este documento</strong>.
             Ele substituirá o arquivo gerado na tela e no Google Drive.
@@ -58,14 +59,14 @@
                 aria-label="Visualizar arquivo assinado"
                 data-tooltip="Visualizar"
                 data-attach-signed-current-open
-              ><c-ui.icons.icon icon="eye" only /></a>
+              >{% icone_svg "eye" %}</a>
               <button
                 type="button"
                 class="icon-btn icon-btn--delete prestacao-file-widget__action"
                 aria-label="Remover arquivo assinado"
                 data-tooltip="Remover"
                 data-attach-signed-remove
-              ><c-ui.icons.icon icon="delete" only /></button>
+              >{% icone_svg "delete" %}</button>
             </div>
           </li>
         </ul>

@@ -22,6 +22,7 @@ A tupla abaixo é a fonte única do conjunto de ícones;
 from __future__ import annotations
 
 from django import template
+from django.utils.html import format_html
 
 register = template.Library()
 
@@ -86,3 +87,13 @@ def nome_de_icone(valor) -> str:
     if nome in ICONES:
         return nome
     return APELIDOS.get(nome, DESCONHECIDO)
+
+
+@register.simple_tag
+def icone_svg(valor):
+    """Renderiza o invólucro pequeno sem abrir um componente Cotton por ícone."""
+    return format_html(
+        '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" '
+        'focusable="false"><use href="#cv-icon-{}"></use></svg>',
+        nome_de_icone(valor),
+    )

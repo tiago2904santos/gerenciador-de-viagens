@@ -33,11 +33,11 @@
     },
     "oficios:index": {
       "200": {
-        "consultas": 9,
+        "consultas": 7,
         "kb_html": 174.8
       },
       "20000": {
-        "consultas": 9,
+        "consultas": 7,
         "kb_html": 175.5
       }
     },
