@@ -126,6 +126,7 @@ class ServidorCrudTests(TestCase):
         create_page = self.client.get(reverse("cadastros:servidor_create"))
         self.assertEqual(create_page.status_code, 200)
         self.assertNotContains(create_page, 'name="matricula"')
+        self.assertNotContains(create_page, "cv-field-row")
 
         response = self.client.post(
             reverse("cadastros:servidor_create"),

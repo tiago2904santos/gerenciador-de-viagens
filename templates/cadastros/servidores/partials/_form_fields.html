@@ -8,7 +8,7 @@
   <c-ui.forms.field :field="form.telefone" size_class="field-size-1" only />
   <div class="field app-form-field cv-field field-size-1 field-rg-wrap" data-rg-field-wrap>
     <label class="cv-field__label" for="{{ form.rg.id_for_label }}">{{ form.rg.label }}</label>
-    <div class="cv-field-row">{{ form.rg }}</div>
+    <div>{{ form.rg }}</div>
     {% if form.rg.errors %}<c-ui.feedback.field_error :errors="form.rg.errors" :field_id="form.rg.auto_id" only />{% endif %}
   </div>
 </div>

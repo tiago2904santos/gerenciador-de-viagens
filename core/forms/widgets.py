@@ -29,7 +29,7 @@ class WidgetStyle(StrEnum):
     EVENT_DOCUMENT_SOURCE = "evento-doc-source-select"
     CARD_TOGGLE_SR_ONLY = "app-card-toggle__input sr-only"
     CARD_TOGGLE = "app-card-toggle__input"
-    FORM_SELECT_FIELD_CONTROL = "form-select cv-field__control cv-field__control--select"
+    FORM_SELECT_FIELD_CONTROL = "form-select cv-field__control"
     FORM_SELECT_TERMS_PICKER = "form-select search-picker__termos-native"
     SEARCH_PICKER_INPUT = "search-picker__input"
     TERM_OFICIO_OS_SOURCE = "termo-oficio-source-select os-oficio-source-select"
