@@ -34,7 +34,6 @@ from oficios.services import get_next_available_numero_oficio
 from oficios.services import criar_oficio_rascunho
 from oficios.services import OficioNumeroConflitoError
 from oficios.services import reservar_numero_oficio
-from oficios.services import _preencher_roteiro_oficio_com_evento
 from oficios.services import redirect_para_corrigir_documento_oficio
 from oficios.services import validar_oficio_para_documento
 from roteiros.models import Roteiro
@@ -203,34 +202,6 @@ class OficioServicesTests(TestCase):
                 form,
                 action="save_draft",
             )
-
-    def test_preencher_roteiro_oficio_com_evento_so_preenche_sede_e_destino(self):
-        estado = Estado.objects.create(nome="Parana", sigla="PR")
-        cidade_sede = Cidade.objects.create(nome="Curitiba", estado=estado, uf="PR")
-        cidade_destino = Cidade.objects.create(nome="Londrina", estado=estado, uf="PR")
-        config = ConfiguracaoSistema.get_singleton()
-        config.cidade_sede_padrao = cidade_sede
-        config.save()
-        evento = Evento.objects.create(area=area_de_teste(), 
-            destino_uf="PR",
-            destino_cidade="Londrina",
-            data_inicio=datetime.date(2026, 7, 10),
-            data_fim=datetime.date(2026, 7, 12),
-            horario_inicio=datetime.time(9, 30),
-            horario_fim=datetime.time(18, 45),
-        )
-        roteiro = Roteiro.objects.create(area=area_de_teste(), tipo=Roteiro.TIPO_AVULSO, status=Roteiro.STATUS_RASCUNHO)
-
-        _preencher_roteiro_oficio_com_evento(roteiro, evento)
-        roteiro.refresh_from_db()
-
-        self.assertEqual(roteiro.origem_cidade_id, cidade_sede.pk)
-        self.assertEqual(roteiro.origem_estado_id, estado.pk)
-        self.assertTrue(
-            roteiro.destinos.filter(estado=estado, cidade=cidade_destino).exists()
-        )
-        self.assertIsNone(roteiro.saida_dt)
-        self.assertIsNone(roteiro.retorno_saida_dt)
 
     def test_criar_oficio_rascunho_herda_motivo_mas_nao_servidores_ou_viatura(self):
         evento = Evento.objects.create(area=area_de_teste(), 

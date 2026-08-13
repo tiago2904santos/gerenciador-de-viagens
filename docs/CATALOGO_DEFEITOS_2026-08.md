@@ -4102,7 +4102,7 @@ para ser executada.
 
 ---
 
-### NOVO-27 🟡 `NOVO` `oficios/selectors.py:listar_roteiros_para_oficio` não tem chamador · BE · 0,25 d
+### NOVO-27 ✅ RESOLVIDO · `NOVO` selector sem chamador removido · BE · 0,25 d
 
 Varredura da fatia 3: `grep -rn "listar_roteiros_para_oficio"` devolve **só a própria definição**
 (`oficios/selectors.py:162`). Devolve `Roteiro.objects.order_by("-created_at")` sem recorte de área
@@ -4110,6 +4110,9 @@ Varredura da fatia 3: `grep -rn "listar_roteiros_para_oficio"` devolve **só a p
 
 Não removido aqui por `AGENTS.md` §3.6: código morto sai com a prova de varredura no PR, e isso é
 assunto da fase 9, não do `BE-09`.
+
+**Fechado na fase 9.** A varredura voltou a encontrar somente a definição; a função e o import
+de `Roteiro` que existia exclusivamente para ela foram removidos.
 
 ---
 
@@ -4629,17 +4632,20 @@ escopo de área.
 
 ---
 
-### NOVO-33 🟡 `NOVO` `_preencher_roteiro_oficio_com_evento` não tem chamador de produção · BE · 0,25 d
+### NOVO-33 ✅ RESOLVIDO · `NOVO` helper sem chamador de produção removido · BE · 0,25 d
 
 `oficios/services.py:205`. Varredura no repositório inteiro: o único chamador é
 `oficios/tests/test_services.py:221`. Irmão do `NOVO-27`; código morto sai na fase 9, com a prova de
 varredura no PR (`AGENTS.md` §3.6).
 
----
+**Fechado na fase 9.** A segunda varredura confirmou que apenas o teste dedicado chamava o helper.
+Helper, teste artificial e import exclusivo de `RoteiroDestino` foram removidos juntos.
 
 ---
 
-### NOVO-18 🟡 PARCIAL — `.js` fechado, resto na fase 9 · `NOVO` CRLF misto reescreve o diff inteiro · QA · 0,5 d
+---
+
+### NOVO-18 ✅ RESOLVIDO · `NOVO` finais de linha canônicos em todo texto do repositório · QA · 0,5 d
 
 > **Número corrigido duas vezes.** A primeira medição contou 2 arquivos porque olhou só os que a
 > etapa tinha tocado. A segunda, em 06/08, varreu `static/js` e achou 8 mistos + 6 CRLF puro. **A
@@ -4671,9 +4677,9 @@ regra cobre exatamente o que foi normalizado. Fazer os 164 de uma vez
 (`git add --renormalize .`) é o certo, mas **dá conflito em toda branch em voo**, e havia 10 PRs
 abertos e as fatias 5 e 6 do `BE-09` em andamento noutra sessão.
 
-**Resta a fase 9:** `.gitattributes` completo + `git add --renormalize .` nos outros 150, com a fila
-vazia. Vizinho do `BE-22` (10 arquivos `.py` com BOM) — mesma família, e o sweep dos `.py` deveria
-sair junto com ele.
+**Fechado na fase 9.** Depois das normalizações intermediárias restavam 103 arquivos CRLF/mistos.
+Todos foram regravados mecanicamente com LF por `git add --renormalize .`; `.gitattributes` agora
+declara `* text=auto eol=lf`, e a rede automatizada cobre as extensões textuais do projeto inteiro.
 
 ---
 
