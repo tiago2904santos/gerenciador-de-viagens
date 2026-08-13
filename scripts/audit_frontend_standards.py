@@ -440,7 +440,7 @@ def audit_css() -> list[tuple]:
         if rp in COBERTURA_ADIADA:
             continue
         # Bundle gerado (NOVO-12): auditar as fontes, não a concatenação.
-        if path.name.endswith(".bundle.css"):
+        if path.name.endswith(".bundle.css") or path.parent == CSS_DIR / "profiles":
             continue
         try:
             lines = path.read_text(encoding="utf-8").splitlines()

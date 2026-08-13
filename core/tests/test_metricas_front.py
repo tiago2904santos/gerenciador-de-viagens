@@ -3,13 +3,44 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from types import SimpleNamespace
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 
+from core.context_processors import shell_css_profile
 from scripts import medir_css_por_rota as css_metric
 from scripts import medir_divergencia_tema as theme_metric
 from scripts import sonda_mesmo_tema as same_theme_metric
 from scripts.rotas_do_sistema import ROTAS
+
+
+class ShellCssProfileTests(SimpleTestCase):
+    @override_settings(CSS_ROUTE_PROFILES_ENABLED=True)
+    def test_rota_mapeada_recebe_perfil(self):
+        request = SimpleNamespace(
+            resolver_match=SimpleNamespace(view_name="core:dashboard")
+        )
+
+        self.assertEqual(
+            shell_css_profile(request),
+            {"shell_css_profile_path": "css/profiles/dashboard.css"},
+        )
+
+    @override_settings(CSS_ROUTE_PROFILES_ENABLED=True)
+    def test_rota_desconhecida_mantem_bundle_completo(self):
+        request = SimpleNamespace(
+            resolver_match=SimpleNamespace(view_name="admin:index")
+        )
+
+        self.assertEqual(shell_css_profile(request), {"shell_css_profile_path": None})
+
+    @override_settings(CSS_ROUTE_PROFILES_ENABLED=False)
+    def test_feature_flag_desativa_perfis(self):
+        request = SimpleNamespace(
+            resolver_match=SimpleNamespace(view_name="core:dashboard")
+        )
+
+        self.assertEqual(shell_css_profile(request), {"shell_css_profile_path": None})
 
 
 class CssPorRotaMetricTests(SimpleTestCase):
@@ -103,6 +134,11 @@ class CssPorRotaMetricTests(SimpleTestCase):
             css_metric._text_for_utf16_offsets(text, 0, utf16_length),
             text,
         )
+
+    def test_cli_expoe_cobertura_de_conteudo_revelado_para_os_perfis(self):
+        source = Path(css_metric.__file__).read_text(encoding="utf-8")
+        self.assertIn('parser.add_argument(\n        "--reveal"', source)
+        self.assertIn("document.querySelectorAll('[hidden]')", source)
 
     def test_piso_de_uso_so_pode_subir(self):
         old = {"oficios-lista": {"usage_percent_min": 11.5}}

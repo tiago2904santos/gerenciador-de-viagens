@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% block shell_css %}{% include 'includes/form_components_css.html' only %}{% endblock %}
+{% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
 {% block title %}{{ page_title }}{% endblock %}
 {% block extra_css %}
   <link rel="stylesheet" href="{% static 'css/lists/entity-cards.css' %}">
