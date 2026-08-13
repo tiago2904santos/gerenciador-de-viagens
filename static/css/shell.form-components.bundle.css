@@ -7872,11 +7872,9 @@ html[data-theme="dark"] #attach-signed-modal .icon-btn.icon-btn--delete,
      quebrava diferente e a página ganhava 48,55px — propagando por 14 níveis. É
      essa cadeia que desestabilizava a régua de tema (`NOVO-84`).
 
-     `14px` literal, e não `var(--space-4)`: a escala vai de 12 (`--space-3`)
-     para 16, e não há token de 14. Usar 16 mexeria 2px no ESCURO, e a E8 é o
-     claro alcançando o escuro — não os dois indo para um terceiro lugar. O
-     valor fora de escala está registrado para a E9 (`NOVO-89`). */
-  padding: 14px;
+     O `NOVO-89` formalizou o valor medido como passo intermediário da escala:
+     arredondar para 16px mudaria os dois temas e quebraria a paridade visual. */
+  padding: var(--space-3-5);
 }
 
 .form-block__header {

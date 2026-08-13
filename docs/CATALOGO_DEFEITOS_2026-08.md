@@ -6774,7 +6774,7 @@ que o teste provou a correção, porque desfazer o `area=` reproduz exatamente e
      Estes três nasceram como 88/89/90 no ramo da E8 e viraram 89/90/91 para não colidir.
      Os commits `5d0c151f`, `7a4704f2` e `77dbaac9` citam os números antigos. -->
 
-### NOVO-89 · `NOVO` O padding do `.form-block` entrou fora da escala de espaçamento · UI · 0,1 d
+### NOVO-89 ✅ RESOLVIDO · `NOVO` O padding do `.form-block` integra a escala de espaçamento · UI · 0,1 d
 
 Dívida assumida de propósito na primeira sub-etapa da **E8**, e registrada no mesmo commit que a
 criou.
@@ -6798,6 +6798,11 @@ presente em 23 templates, e portanto vale a pena resolver de uma vez.
 pode ser decidida sem se confundir com a igualação dos temas. Duas saídas possíveis, e a escolha é
 do dono: arredondar para `--space-4` (16px, mexe 2px nos dois temas de uma vez) ou criar um token de
 14px, se o valor se provar recorrente.
+
+**Fechado sem alterar geometria.** Como o valor de 14px permaneceu recorrente nos componentes e a
+paridade visual já foi aceita, a escala ganhou `--space-3-5: 14px`. `.form-block` usa o token e o
+teste fixa tanto a definição quanto a ausência do literal nessa folha; o valor computado continua
+14px nos dois temas.
 
 ### NOVO-90 ✅ RESOLVIDO · `NOVO` A régua de tema separa "diverge e pinta" de "diverge e não pinta" · QA · 0,5 d
 
