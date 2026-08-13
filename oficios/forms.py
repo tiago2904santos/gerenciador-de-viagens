@@ -17,7 +17,11 @@ from core.utils.masks import normalize_protocolo
 from cadastros.form_widgets import ServidorEquipeSelectMultiple
 from cadastros.form_widgets import ServidorMotoristaSelect
 from cadastros.form_widgets import ViaturaSelectSingle
+from cadastros.models import Combustivel
+from cadastros.models import Servidor
+from cadastros.models import Unidade
 from cadastros.models import Viatura
+from roteiros.models import Roteiro
 
 from .models import ModeloMotivoOficio
 from .models import Oficio
@@ -179,6 +183,24 @@ class OficioForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        servidores = filter_queryset_by_area(Servidor.objects).select_related(
+            "cargo", "unidade"
+        ).order_by("nome")
+        if "roteiro" in self.fields:
+            self.fields["roteiro"].queryset = filter_queryset_by_area(
+                Roteiro.objects
+            ).order_by("-created_at")
+        if "solicitante" in self.fields:
+            self.fields["solicitante"].queryset = filter_queryset_by_area(
+                Unidade.objects
+            ).order_by("nome")
+        for nome in ("servidores", "servidores_termo_autorizacao", "motorista"):
+            if nome in self.fields:
+                self.fields[nome].queryset = servidores
+        if "viatura" in self.fields:
+            self.fields["viatura"].queryset = filter_queryset_by_area(
+                Viatura.objects
+            ).order_by("placa")
         for field_name, field in self.fields.items():
             if isinstance(field.widget, (forms.TextInput, forms.NumberInput)):
                 set_widget_style(
@@ -455,6 +477,15 @@ class OficioTransporteForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["viatura"].queryset = filter_queryset_by_area(Viatura.objects).order_by(
+            "placa"
+        )
+        self.fields["motorista"].queryset = filter_queryset_by_area(Servidor.objects).order_by(
+            "nome"
+        )
+        self.fields["transporte_combustivel_manual"].queryset = filter_queryset_by_area(
+            Combustivel.objects
+        ).order_by("nome")
         self.fields["viatura"].required = False
         self.fields["viatura"].empty_label = ""
         self.fields["motorista"].required = False

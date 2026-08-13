@@ -4046,7 +4046,7 @@ simulam request em outra e confirmam que os workers documental e Drive ainda o e
 
 ---
 
-### NOVO-21 🟡 `NOVO` Campo de FK gerado por `ModelForm` ignora o recorte por área · AUD · 1 d
+### NOVO-21 ✅ RESOLVIDO (12/08/2026) · `NOVO` Campo de FK gerado por `ModelForm` ignora o recorte por área · AUD · 1 d
 
 Decisão deliberada do `BE-09`: `Meta.default_manager_name = "all_objects"`, para não neutralizar o
 guarda m2m de `core/tenancy.py:116`, o check `core.E001` de `core/checks.py:50`, os dois comandos de
@@ -4061,6 +4061,13 @@ Não é regressão: é o comportamento de hoje, que o `BE-09` deliberadamente n�
 do queryset auto-gerado. O repositório já aplica `filter_queryset_by_area` em 64 linhas de
 `forms.py`, então a lacuna pode ser pequena — ou pode não ser. A régua natural é estender
 `scripts/audit_area_scoped_managers.py` com essa varredura.
+
+**Medição e fechamento:** a nova lente do auditor encontrou **11 campos efetivamente abertos**, em
+`OficioForm` (roteiro, solicitante, dois grupos de servidores, viatura e motorista) e
+`OficioTransporteForm` (viatura, motorista e combustível), mais as heranças do form da primeira
+etapa. Todos agora recebem queryset recortado explicitamente. A catraca introspecta todos os
+`ModelForm` instalados e reprova em zero; duas provas com áreas A/B exercitam os nove campos nas
+três classes concretas usadas pelo wizard.
 
 ### NOVO-28 ✅ RESOLVIDO (12/08/2026) · `NOVO` A suíte desliga a configuração de numeração e não enxerga o piso do ofício · QA · 0,5 d
 
