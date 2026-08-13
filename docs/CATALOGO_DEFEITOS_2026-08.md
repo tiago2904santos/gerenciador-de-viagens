@@ -5788,7 +5788,7 @@ silêncio. A regra local saiu; quem decide agora é a central, que pergunta pelo
 `oficios` eram exatamente cobertas pela central. A cobertura da máscara vai de **59 para 57**
 campos; o número 59 registrado no `NOVO-55` estava certo quando foi medido e incluía estes dois.
 
-### NOVO-57 🟠 PARCIAL · `NOVO` A máscara vale do próximo cadastro; os registros já gravados ficam na caixa antiga · DB · 0,5 d
+### NOVO-57 ✅ RESOLVIDO · `NOVO` A máscara valia do próximo cadastro; os registros já gravados ficavam na caixa antiga · DB · 0,5 d
 
 O `NOVO-53`/`NOVO-55` puseram a máscara em 57 campos de texto. Ela age no navegador, então vale do
 próximo salvamento em diante: o que já estava no banco continua como foi digitado. O mesmo campo
@@ -5833,9 +5833,9 @@ linha: migrar as outras e deixar o par para trás daria um campo meio migrado, q
 **A simulação escreve e desfaz**, pelo mesmo caminho da aplicação. Um "vai dar certo" que não tentou
 escrever não vale nada num campo com restrição de unicidade.
 
-**Por que fica PARCIAL.** O levantamento abaixo é do banco de **desenvolvimento**, e ele é pequeno
-demais para decidir qualquer coisa — 72 linhas no total. O número que importa é o de produção, e
-este comando existe justamente para que ele possa ser levantado lá sem escrever nada:
+**Levantamento que precedeu a operação.** O banco de desenvolvimento era pequeno demais para decidir
+qualquer coisa — 72 linhas no total. Ele serviu somente para validar o comando antes de medir a base
+real:
 
 | | |
 |---|---|
@@ -5847,17 +5847,27 @@ este comando existe justamente para que ele possa ser levantado lá sem escrever
 Os quatro campos com divergência em dev: `eventos.TipoEvento.nome` (5), `AtividadePlanoTrabalho.nome`
 (11), `HorarioAtendimento.faixa` (3), `usuarios.AreaTrabalho.nome` (1).
 
-**Fecha quando** a contagem rodar contra produção, os campos bloqueados (se houver) forem resolvidos
-no sistema, e o `--commit` for aplicado com backup.
-
 **Preparação operacional em 13/08.** O comando ganhou `--strict`: se qualquer campo colidir com uma
 restrição, a execução falha e a transação inteira volta, em vez de deixar uma aplicação parcial. O
 workflow manual passou a criar backup criptografado, rodar a simulação estrita e exigir a frase de
 confirmação antes do `--commit`; depois ele repete a medição e exige zero divergências. A primeira
 tentativa na VPS criou o backup
 `gerenciador-20260813T091653Z.tar.gz.enc` e parou antes da leitura/escrita porque produção ainda
-estava no comando anterior, sem `--strict`. Nenhuma linha foi alterada. O ID permanece parcial até
-este código passar por CI/deploy e a execução operacional concluir.
+estava no comando anterior, sem `--strict`. Nenhuma linha foi alterada naquela tentativa; o código
+precisava primeiro passar por CI e deploy para a execução operacional prosseguir.
+
+**Fechamento operacional em 13/08/2026.** O commit testado passou no CI
+([run 31687073653](https://github.com/tiago2904santos/gerenciador-de-viagens/actions/runs/31687073653))
+e foi implantado pelo deploy automático
+([run 31688212739, tentativa 2](https://github.com/tiago2904santos/gerenciador-de-viagens/actions/runs/31688212739)).
+A simulação estrita em produção
+([run 31689014449](https://github.com/tiago2904santos/gerenciador-de-viagens/actions/runs/31689014449))
+criou o backup criptografado `gerenciador-20260813T095840Z.tar.gz.enc`, leu **6.597** valores em 44
+campos e encontrou **77 divergentes**, sem colisão ou campo bloqueado. A aplicação confirmada
+([run 31689059818](https://github.com/tiago2904santos/gerenciador-de-viagens/actions/runs/31689059818))
+criou um segundo backup criptografado, `gerenciador-20260813T095917Z.tar.gz.enc`, repetiu a
+simulação, gravou as 77 normalizações dentro da transação estrita e terminou com a verificação
+pós-aplicação **`TOTAL 6597 / divergentes 0`**. O critério de fechamento foi cumprido integralmente.
 
 ### NOVO-58 ✅ RESOLVIDO · `NOVO` Claro e escuro não eram dois temas do mesmo sistema · UI · a decidir
 
