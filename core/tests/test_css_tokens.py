@@ -15,6 +15,10 @@ from django.test import SimpleTestCase
 ROOT = Path(settings.BASE_DIR)
 CSS_DIR = ROOT / "static" / "css"
 
+
+def _is_generated_css(path: Path) -> bool:
+    return path.name.endswith(".bundle.css") or path.parent == CSS_DIR / "profiles"
+
 # Mesma política de exceção do audit_frontend_standards.py (Etapa 7 gate).
 COLOR_LITERAL_ALLOWED = {
     "static/css/base/tokens.css",  # UI-03: absorveu base/theme.css na E7
@@ -94,7 +98,7 @@ def _find_color_literals(path: Path) -> list[tuple[int, str]]:
 def _find_media_width_violations() -> list[str]:
     violations: list[str] = []
     for path in sorted(CSS_DIR.rglob("*.css")):
-        if path.name.endswith(".bundle.css"):
+        if _is_generated_css(path):
             continue
         try:
             text = path.read_text(encoding="utf-8")
@@ -113,7 +117,7 @@ def _find_media_width_violations() -> list[str]:
 def _count_all_color_literal_violations() -> list[str]:
     violations: list[str] = []
     for path in sorted(CSS_DIR.rglob("*.css")):
-        if path.name.endswith(".bundle.css"):
+        if _is_generated_css(path):
             continue
         for line_no, snippet in _find_color_literals(path):
             violations.append(f"{_rel_css(path)}:{line_no}: {snippet}")
@@ -123,7 +127,7 @@ def _count_all_color_literal_violations() -> list[str]:
 def _css_bundle_text() -> str:
     parts: list[str] = []
     for path in sorted(CSS_DIR.rglob("*.css")):
-        if path.name.endswith(".bundle.css"):
+        if _is_generated_css(path):
             continue
         try:
             parts.append(path.read_text(encoding="utf-8"))
