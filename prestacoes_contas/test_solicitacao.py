@@ -1,14 +1,13 @@
 """Fatia 2/6 de T-01 — número de solicitação e datas de liberação.
 
 Primeira fatia que exercita **escrita**: as anteriores só liam. O mesmo campo
-(``numero_solicitacao``) tem dois caminhos de gravação, e eles não se comportam
-igual — o que está caracterizado aqui, não corrigido:
+(``numero_solicitacao``) tem dois caminhos de gravação:
 
 * ``prestacao_servidor_solicitacao_autosave`` — o caminho com JS;
 * ``index`` com ``action=save_solicitacoes`` — o *fallback* sem JS.
 
-Estes testes fotografam o comportamento atual. Divergências encontradas viram
-linha ``NOVO`` no catálogo; a correção é outro PR.
+O ``NOVO-103`` exige o mesmo contrato nos dois: validar toda a requisição antes de
+gravar, informar data inválida e marcar o servidor em preenchimento.
 """
 
 from __future__ import annotations
@@ -175,31 +174,29 @@ class SolicitacaoEmLoteTests(PrestacaoFixturesMixin, TestCase):
         self.assertEqual(self.ps.data_liberacao_diarias, date(2026, 9, 1))
         self.assertEqual(self.ps.prazo_limite_saque, date(2026, 9, 15))
 
-    def test_lote_ignora_data_invalida_em_silencio_mantendo_a_anterior(self):
-        """Divergência com o autosave, deliberadamente fotografada (NOVO-103).
-
-        O autosave devolve ``ok=False`` com mensagem; o lote engole o erro e
-        preserva o valor. Quem salva sem JS não descobre que a data não entrou.
-        """
+    def test_lote_avisa_data_invalida_e_nao_grava_outro_campo(self):
+        """A requisição sem JS é atômica também para erro de validação (NOVO-103)."""
         self.salvar_em_lote(data_liberacao_diarias="2026-09-01")
 
-        response = self.salvar_em_lote(data_liberacao_diarias="01/09/2026")
+        response = self.salvar_em_lote(
+            numero_solicitacao="NAO-DEVE-ENTRAR",
+            data_liberacao_diarias="01/09/2026",
+        )
 
         self.assertEqual(response.status_code, 302)
+        mensagens = [str(message) for message in response.wsgi_request._messages]
+        self.assertEqual(mensagens[-1], "Data de liberação inválida.")
         self.ps.refresh_from_db()
+        self.assertEqual(self.ps.numero_solicitacao, "")
         self.assertEqual(self.ps.data_liberacao_diarias, date(2026, 9, 1))
 
-    def test_lote_nao_marca_em_preenchimento(self):
-        """Divergência com o autosave, deliberadamente fotografada (NOVO-103).
-
-        O mesmo campo, salvo pelo caminho sem JS, deixa o servidor em PENDENTE.
-        O status passa a depender de o navegador ter JavaScript.
-        """
+    def test_lote_marca_em_preenchimento(self):
+        """O status não depende de o navegador executar JavaScript (NOVO-103)."""
         self.salvar_em_lote(numero_solicitacao="SEM-JS-1")
 
         self.ps.refresh_from_db()
         self.assertEqual(self.ps.numero_solicitacao, "SEM-JS-1")
-        self.assertEqual(self.ps.status, PrestacaoServidor.STATUS_PENDENTE)
+        self.assertEqual(self.ps.status, PrestacaoServidor.STATUS_EM_PREENCHIMENTO)
 
     def test_lote_sem_campos_reconhecidos_nao_altera_nada(self):
         self.salvar_em_lote(numero_solicitacao="ORIGINAL")

@@ -409,8 +409,8 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       `NOVO-101` (a catraca `P-01` media 24 com 35 no chão) e `NOVO-102` (gravação em laço escondida
       em `view_common.py`). **Fatia 2 (solicitação) feita**: as duas rotas foram para
       `solicitacao_services.py` com transação, `views.py` caiu de 743 para 674 linhas e as gravações
-      fora de transação de 33 para 29. Sobrou `NOVO-103` (as duas rotas divergem em três pontos, e a
-      divergência estava registrada com o ID de outro defeito — é decisão de produto). **Fatia 3
+      fora de transação de 33 para 29. `NOVO-103` foi fechado em 13/08/2026: as duas rotas agora
+      validam antes de gravar, rejeitam a requisição inválida inteira e marcam o mesmo status. **Fatia 3
       (anexos) feita**: `atomic` na linha e `transaction.on_commit` no arquivo, porque ali `atomic`
       sozinho inverteria o órfão do `BE-07`. O defeito maior não era gravação parcial: era
       destruição — um `create` que falhasse levava o documento assinado anterior do disco e do

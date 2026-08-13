@@ -89,6 +89,7 @@ from .selectors import listar_prestacoes
 from .selectors import normalizar_aba
 from .services import diaria_inicial_da_prestacao
 from .services import garantir_campos_padrao_relatorio_tecnico
+from .solicitacao_services import ResultadoSolicitacao
 from .solicitacao_services import salvar_solicitacao_do_autosave
 from .solicitacao_services import salvar_solicitacoes_em_lote
 from .solicitacao_services import valores_do_lote
@@ -357,8 +358,11 @@ def _build_abas(request, aba_atual, contagem, *, q="", status="", sort=""):
 
 def index(request):
     if request.method == "POST" and request.POST.get("action") == "save_solicitacoes":
-        _salvar_solicitacoes_em_lote(request)
-        messages.success(request, "Números de solicitação salvos.")
+        resultado = _salvar_solicitacoes_em_lote(request)
+        if resultado.erro:
+            messages.error(request, resultado.erro)
+        else:
+            messages.success(request, "Números de solicitação salvos.")
         return redirect("prestacoes_contas:index")
 
     q         = request.GET.get("q",         "").strip()
@@ -434,9 +438,9 @@ def _salvar_solicitacoes_em_lote(request):
     """Fallback sem JS para solicitação e período de liberação de cada servidor."""
     valores = valores_do_lote(request.POST)
     if not valores:
-        return
+        return ResultadoSolicitacao()
     servidores = _prestacao_servidor_queryset().filter(pk__in=valores)
-    salvar_solicitacoes_em_lote(servidores, valores)
+    return salvar_solicitacoes_em_lote(servidores, valores)
 
 
 def _redirect_lista(request, _obj=None):
