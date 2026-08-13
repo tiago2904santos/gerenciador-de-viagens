@@ -30,6 +30,16 @@ LISTAS_EM_CARDS = [
     "prestacoes_contas:index",
 ]
 
+CATALOGOS_QUICK_ADD = [
+    "eventos:tipos_index",
+    "justificativas:modelos_index",
+    "oficios:modelos_motivo_index",
+    "planos_trabalho:atividades_index",
+    "planos_trabalho:horarios_index",
+    "planos_trabalho:programas_index",
+    "planos_trabalho:presets_index",
+]
+
 
 def _page(total, por_pagina=20, numero=1):
     return Paginator(list(range(total)), por_pagina).get_page(numero)
@@ -128,3 +138,19 @@ class ListasEmCardsEntregamPageObjTests(TestCase):
                 self.assertEqual(response.status_code, 200)
                 self.assertNotContains(response, ALERTA)
                 self.assertIn("page_obj", response.context)
+
+
+class CatalogosQuickAddEntregamPageObjTests(TestCase):
+    def setUp(self):
+        user = get_user_model().objects.create_user(username="paginacao_catalogos")
+        self.client.force_login(user)
+
+    def test_todos_os_catalogos_quick_add_cumprem_o_contrato(self):
+        for nome in CATALOGOS_QUICK_ADD:
+            with self.subTest(catalogo=nome):
+                response = self.client.get(reverse(nome))
+
+                self.assertEqual(response.status_code, 200)
+                self.assertNotContains(response, ALERTA)
+                self.assertIn("page_obj", response.context)
+                self.assertEqual(response.context["page_obj"].paginator.per_page, 20)

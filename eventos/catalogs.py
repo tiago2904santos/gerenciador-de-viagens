@@ -45,6 +45,7 @@ TIPOS_EVENTO = CatalogConfig(
         excluido="Tipo de evento excluído com sucesso.",
         erro_ao_salvar="Não foi possível salvar o tipo. Verifique os dados informados.",
     ),
+    paginar_por=20,
     url_fallback_next="eventos:index",
     # As URLs de editar/excluir da linha são nuas, como na view antiga.
     urls_de_linha_com_next=False,
