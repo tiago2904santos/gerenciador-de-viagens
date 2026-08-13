@@ -4010,7 +4010,7 @@ botão Cotton para provar que o hook chega ao HTML.
 
 ---
 
-### NOVO-15 🟡 `NOVO` Quatorze `innerHTML` com dado dinâmico sem `escapeHtml` · QA · 1–2 d
+### NOVO-15 ✅ RESOLVIDO (13/08/2026) · `NOVO` `innerHTML` recebia expressão dinâmica · QA · 1–2 d
 
 Achado ao escrever a regra do `JS-05`. **Nenhum é XSS provado** — a maioria interpola constante de
 ícone declarada no próprio arquivo (`ROUTE_AVATAR_ICON`, `DOC_AVATAR_ICON`, `svgChevron()`), e
@@ -4024,6 +4024,21 @@ arquivo no auditor.
 
 O valor da regra não é a dívida de hoje — é impedir que o próximo `innerHTML` com dado de usuário
 entre sem revisão, que é como o `JS-01` nasceu.
+
+**Remediação (13/08/2026):** a medição atual encontrou **8 expressões em 5 arquivos**, não as
+14 históricas. Todas saíram de `innerHTML`, respeitando a origem do conteúdo:
+
+- SVG constante vira nó via `DOMParser` e `importNode`;
+- linhas de `<template>` são clonadas por `template.content`, com substituição de prefixo em texto
+  e atributos;
+- nomes vindos do Drive e nomes de cidades entram por `textContent`/`setAttribute`;
+- a prévia de trechos é construída com `createElement`;
+- o HTML do editor, produzido pelos renderizadores internos com dados escapados, é analisado fora
+  do documento vivo com `DOMParser` e importado como nó.
+
+A regra `innerhtml_dynamic_without_escape` caiu de 8 para **0**, cinco exceções foram removidas e um
+teste percorre todo JavaScript de produção para impedir regressão. Limpezas estáticas de container
+(`innerHTML = ""`) não são injeção e permanecem fora do escopo da regra.
 
 ---
 

@@ -109,9 +109,15 @@ export function initRoteirosEditor() {
   function mountTrechosHtml(html) {
     var container = $('trechos-gerados-container');
     if (!container) return;
-    // Preserva #trechos-date-picker fora do container antes do innerHTML.
+    // Preserva #trechos-date-picker fora do container antes da troca do DOM.
     parkTrechosDatePicker();
-    container.innerHTML = html;
+    var parsed = new DOMParser().parseFromString(String(html || ''), 'text/html');
+    container.replaceChildren.apply(
+      container,
+      Array.prototype.map.call(parsed.body.childNodes, function(node) {
+        return document.importNode(node, true);
+      })
+    );
     initTrechosFields(container);
     placeTrechosDatePickerInFirstHeader();
   }

@@ -108,24 +108,29 @@
         item.dataset.nome = pasta.name;
         item.setAttribute("aria-pressed", "false");
 
-        // JS-01: o nome vem do Drive e pode conter aspas — em pasta compartilhada,
-        // quem tem escrita escolhe o nome. Sem escape, o atributo fecha e o resto
-        // do texto vira atributo do elemento (ex.: onmouseover), executado na
-        // página autenticada. A linha do meio já escapava; faltavam os aria-label.
-        const nomeSeguro = window.CV.util.escapeHtml(pasta.name);
-        item.innerHTML = `
-          <button type="button" class="gdrive-folder-item__select" aria-label="Selecionar pasta ${nomeSeguro}">
-            <span class="gdrive-folder-item__icon" aria-hidden="true">${icon}</span>
-            <span class="gdrive-folder-item__name">${nomeSeguro}</span>
-          </button>
-          <button type="button" class="gdrive-folder-item__enter cv-btn cv-btn--ghost cv-btn--xs"
-                  aria-label="Abrir pasta ${nomeSeguro}">
-            Abrir →
-          </button>
-        `;
+        // JS-01/NOVO-15: o nome vem do Drive e pode conter marcação. APIs de DOM
+        // mantêm o valor como texto/atributo, sem reinterpretá-lo como HTML.
+        const btnSelect = document.createElement("button");
+        btnSelect.type = "button";
+        btnSelect.className = "gdrive-folder-item__select";
+        btnSelect.setAttribute("aria-label", `Selecionar pasta ${pasta.name}`);
+        const iconWrap = document.createElement("span");
+        iconWrap.className = "gdrive-folder-item__icon";
+        iconWrap.setAttribute("aria-hidden", "true");
+        const parsedIcon = new DOMParser().parseFromString(icon, "image/svg+xml");
+        iconWrap.appendChild(document.importNode(parsedIcon.documentElement, true));
+        const name = document.createElement("span");
+        name.className = "gdrive-folder-item__name";
+        name.textContent = pasta.name;
+        btnSelect.append(iconWrap, name);
 
-        const btnSelect = item.querySelector(".gdrive-folder-item__select");
-        const btnEnter = item.querySelector(".gdrive-folder-item__enter");
+        const btnEnter = document.createElement("button");
+        btnEnter.type = "button";
+        btnEnter.className = "gdrive-folder-item__enter cv-btn cv-btn--ghost cv-btn--xs";
+        btnEnter.setAttribute("aria-label", `Abrir pasta ${pasta.name}`);
+        btnEnter.textContent = "Abrir →";
+        item.append(btnSelect, btnEnter);
+
 
         btnSelect.addEventListener("click", () => {
           clearSelection();

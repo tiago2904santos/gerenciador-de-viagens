@@ -496,6 +496,7 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [x] `NOVO-74` dois namespaces de componente, quatro pastas fantasma de `.gitkeep` · **E5**
 - [x] `HT-08` 82 `<button>` fora do sistema de componentes · **E6**
 - [x] `NOVO-14` nove leituras de classe visual como lógica → ARIA, `hidden` e `data-*` dedicados · **E6**
+- [x] `NOVO-15` oito expressões dinâmicas em `innerHTML` → APIs de DOM e parsing isolado · **E6**
 - [x] `HT-15` bloco `cv-itinerary` duplicado em 5 apps · **E6**
 - [x] `NOVO-16` markup do picker copiado à mão em 3 templates e 5 arquivos JS · **E6**
 - [x] `HT-10` `data-*` de toggle legado em componente compartilhado · **E6**
