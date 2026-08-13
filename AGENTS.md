@@ -39,6 +39,10 @@ segue o `PADRAO_*` correspondente; divergência é defeito, não estilo pessoal.
 - **Não existe trabalho fora de ID.** Se você encontrar um defeito não catalogado, adicione
   uma linha nova em `docs/CATALOGO_DEFEITOS_2026-08.md` (com `NOVO` na coluna de origem) e só
   então conserte — ou registre e siga em frente, se estiver fora do escopo da etapa.
+- **ID novo não usa contador sequencial.** Rode `python scripts/novo_id.py` e use exatamente o
+  identificador emitido (`NOVO-AAAAMMDD-HHMMSS-xxxxxxxxxxxx`). Data/hora UTC mantêm ordenação e o
+  sufixo aleatório permite que sessões paralelas registrem defeitos sem reservar número. Os IDs
+  sequenciais antigos permanecem como histórico; não crie outro `NOVO-122`, `NOVO-123` etc.
 
 ## 3. Limites invioláveis
 

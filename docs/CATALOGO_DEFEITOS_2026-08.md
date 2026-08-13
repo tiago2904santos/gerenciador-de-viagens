@@ -4116,7 +4116,7 @@ de `Roteiro` que existia exclusivamente para ela foram removidos.
 
 ---
 
-### NOVO-29 🟠 `NOVO` Duas sessões alocam ID `NOVO-` sem reserva e colidem · QA · 0,5 d
+### NOVO-29 ✅ RESOLVIDO · `NOVO` IDs novos não dependem de reserva sequencial · QA · 0,5 d
 
 Terceira colisão em um dia. Cada sessão pega "o próximo número livre" lendo o catálogo, e duas
 sessões que leem ao mesmo tempo pegam o mesmo. Já aconteceu com `NOVO-13` (desfeita renumerando o
@@ -4135,6 +4135,11 @@ prefixo por frente (`NOVO-BE-07`, `NOVO-QA-11`) ou sufixo da data de registro
 
 **Enquanto isso:** conferir `grep "^### NOVO-" docs/CATALOGO_DEFEITOS_2026-08.md | tail` **imediatamente
 antes** de escrever a entrada, e renumerar as próprias, nunca as alheias — quem chega depois cede.
+
+**Fechado.** `python scripts/novo_id.py` emite `NOVO-AAAAMMDD-HHMMSS-xxxxxxxxxxxx`: instante UTC para
+ordenação e 48 bits aleatórios para sessões no mesmo segundo não disputarem contador. O
+`AGENTS.md` tornou o comando obrigatório para achados futuros e a suíte fixa formato, independência
+entre sessões e validação do sufixo.
 
 ---
 
