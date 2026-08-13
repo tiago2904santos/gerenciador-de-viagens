@@ -4965,7 +4965,7 @@ select de `Cidade`, o que me fez ler 4 consultas onde havia 1.
 
 ---
 
-### NOVO-43 🟠 `NOVO` O teto quente do passo 15 nunca foi calibrado contra a amostra que o decide, e reprovar ali anula todos os gates a jusante · CI · 0,5 d
+### NOVO-43 ✅ RESOLVIDO (13/08/2026) · `NOVO` O teto quente do passo 15 nunca foi calibrado contra a amostra que o decide, e reprovar ali anula todos os gates a jusante · CI · 0,5 d
 
 O passo 15 do `tests.yml` roda `documentos_unoserver_check --benchmark --representative-resources
 --iterations 3 --max-ms 1000 --max-cold-ms 3000`. O orçamento **quente** compara `max()` de 4
@@ -5030,6 +5030,18 @@ espalhamento de 4,3×, pior que o valor absoluto, 4,0×).
 >
 > Os passos 16 a 20 ficaram `skipped` no run 696 — a suíte, a cobertura e o `PF-07` do `HT-06`
 > ficaram sem prova naquele run, e a têm no 697.
+
+**Fechamento em 13/08/2026.** O gate foi movido para depois da suíte completa e dos pisos de
+cobertura, e o log do unoserver agora é publicado como artefato mesmo quando o passo falha. A
+estatística quente deixou de ser o `max()` agregado: são quatro execuções por modelo (uma fria e
+três quentes), com **mediana quente por recurso**. Os tetos seguem a amostra que realmente decide
+cada população: `ordem_servico_modelos.docx=250 ms` e `diario_bordo.xlsx=750 ms`; recurso
+configurado que não for medido reprova em vez de desaparecer silenciosamente. Comparação passou
+de `>=` para `>`, portanto igualdade atende ao contrato. A partida a frio continua separada e
+vigiada em 3000 ms.
+
+Doze testes do comando cobrem regressão sustentada, pico isolado, limite por recurso, igualdade,
+partida a frio, compatibilidade do modo antigo e a posição/argumentos/artefato do workflow.
 
 ### NOVO-44 ✅ RESOLVIDO · 🔴 `NOVO` O `BE-25` apagou os dois labs e deixou a cascata para trás — `main` vermelho em 8 testes · COR · 0,5 d
 

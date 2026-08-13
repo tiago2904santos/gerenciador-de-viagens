@@ -1,11 +1,13 @@
 import sys
 from io import StringIO
+from pathlib import Path
 from types import ModuleType
 from unittest import mock
 
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.core.cache import cache
+from django.conf import settings
 from django.test import SimpleTestCase
 from django.test import override_settings
 
@@ -249,6 +251,51 @@ class UnoserverCheckPartidaAFrioTests(SimpleTestCase):
         with self.assertRaisesRegex(CommandError, "SLA excedido"):
             self._rodar(marcas, "--max-ms", "1000", "--max-cold-ms", "1500")
 
+    def test_um_pico_isolado_nao_anula_toda_a_esteira(self):
+        """NOVO-43: a mediana quente distingue cauda de regressão sustentada."""
+        marcas = [(10.0, 10.1), (12.0, 12.1), (14.0, 16.0), (17.0, 17.1)]
+
+        saida = self._rodar(marcas, "--max-ms", "1000", "--max-cold-ms", "1500")
+
+        self.assertIn("mediana quente 100.0 ms", saida)
+
+    def test_limite_por_recurso_e_aplicado_ao_recurso_certo(self):
+        marcas = [(10.0, 10.1), (12.0, 12.4), (14.0, 14.4), (16.0, 16.4)]
+
+        with self.assertRaisesRegex(CommandError, "sintetico.docx.*350 ms"):
+            self._rodar(
+                marcas,
+                "--max-ms",
+                "1000",
+                "--max-cold-ms",
+                "1500",
+                "--max-ms-resource",
+                "sintetico.docx=350",
+            )
+
+    def test_limite_de_recurso_que_nao_foi_medido_reprova(self):
+        with self.assertRaisesRegex(CommandError, "recurso não medido: ausente.xlsx"):
+            self._rodar(
+                self.MARCAS_DO_CI,
+                "--max-ms-resource",
+                "ausente.xlsx=750",
+                "--max-cold-ms",
+                "1500",
+            )
+
+    def test_valor_igual_ao_limite_nao_reprova(self):
+        marcas = [(10.0, 10.1), (12.0, 12.4), (14.0, 14.4), (16.0, 16.4)]
+
+        saida = self._rodar(
+            marcas,
+            "--max-ms-resource",
+            "sintetico.docx=400",
+            "--max-cold-ms",
+            "100",
+        )
+
+        self.assertIn("SLA atendido", saida)
+
     def test_sem_o_argumento_o_comportamento_antigo_e_preservado(self):
         """Quem chamar sem `--max-cold-ms` segue com um limite só, como antes."""
         with self.assertRaisesRegex(CommandError, "SLA excedido"):
@@ -258,3 +305,16 @@ class UnoserverCheckPartidaAFrioTests(SimpleTestCase):
         """Com `--iterations 1` não há regime estável: a única medida vale pelos dois."""
         with self.assertRaisesRegex(CommandError, "SLA excedido"):
             self._rodar([(10.0, 11.1194)], "--max-ms", "1000", "--max-cold-ms", "1500")
+
+    def test_ci_usa_mediana_por_modelo_depois_da_suite_e_publica_log(self):
+        workflow = (Path(settings.BASE_DIR) / ".github/workflows/tests.yml").read_text(
+            encoding="utf-8"
+        )
+        suite = workflow.index("Run complete Django test suite with coverage on PostgreSQL")
+        gate = workflow.index("Enforce real document generation SLA (NOVO-43)")
+
+        self.assertLess(suite, gate)
+        self.assertIn("--iterations 4", workflow[gate:])
+        self.assertIn("ordem_servico_modelos.docx=250", workflow[gate:])
+        self.assertIn("diario_bordo.xlsx=750", workflow[gate:])
+        self.assertIn("Publish unoserver diagnostic (NOVO-43)", workflow[gate:])

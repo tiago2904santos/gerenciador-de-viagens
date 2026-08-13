@@ -199,48 +199,6 @@ jobs:
           python -m pip_audit -r requirements/lock.txt --disable-pip
           --ignore-vuln PYSEC-2026-3412
 
-      - name: Enforce real document generation SLA
-        run: |
-          # Este é o único passo que roda sem --settings, então cai em
-          # config.settings.dev — que agora exige FIELD_ENCRYPTION_KEYS. O valor
-          # é irrelevante aqui (nada é cifrado), então é gerado, não commitado.
-          export FIELD_ENCRYPTION_KEYS="$(python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())')"
-          SITE_PACKAGES="$(python -c 'import site; print(site.getsitepackages()[0])')"
-          PYTHONPATH="$SITE_PACKAGES" /usr/bin/python3 -m unoserver.server \
-            --interface 127.0.0.1 --port 2003 \
-            --uno-interface 127.0.0.1 --uno-port 2002 \
-            --conversion-timeout 10 --stop-after 1000 \
-            > "$RUNNER_TEMP/unoserver.log" 2>&1 &
-          for attempt in $(seq 1 40); do
-            if (echo > /dev/tcp/127.0.0.1/2003) 2>/dev/null; then break; fi
-            sleep 0.25
-          done
-          # Dois orçamentos, porque são dois custos. A primeira conversão de
-          # cada modelo paga o start do LibreOffice/UNO — medido em 1119 ms
-          # contra 96 e 93 ms nas seguintes. Com um limite só, o gate reprovava
-          # por aquecimento (3 vezes seguidas em 29/07, inclusive no main) e não
-          # dizia nada sobre o regime estável. Descartar a primeira medição
-          # esconderia um custo que o usuário sente na primeira geração depois
-          # de ocioso; por isso ela continua vigiada, com limite próprio.
-          #
-          # `--max-cold-ms` foi de 1500 para 3000 em 06/08 (NOVO-28). O teto de
-          # 1500 nasceu em 03/08 sobre 1119 ms medidos; em 06/08 a partida a
-          # frio reprovou três vezes seguidas, com 2553,8 ms (run 654, main),
-          # 1868,4 ms (run 657) e a mesma falha no run 653 — sempre SÓ a frio,
-          # com o regime estável entre 96 e 101 ms, dentro do `--max-ms` de
-          # 1000. Não foi código: nada mudou em `documentos/` nem no lock desde
-          # 03/08, e o passo "Install LibreOffice" saiu de 28 s no último run
-          # verde para 58, 60 e 77 s nos três reprovados — a mesma máquina 2 a
-          # 3× mais lenta. Como o passo fica ANTES da suíte e da régua do
-          # PF-07, um teto calibrado numa geração de runner que não existe mais
-          # bloqueava toda prova de CI do projeto. `--max-ms` fica em 1000: é
-          # ele que mede o custo que o usuário sente em uso normal.
-          DOCUMENTOS_UNOSERVER_URL=http://127.0.0.1:2003 \
-          DOCUMENTOS_DEFAULT_PDF_ENGINE=unoserver \
-          python manage.py documentos_unoserver_check \
-            --benchmark --representative-resources --iterations 3 \
-            --max-ms 1000 --max-cold-ms 3000
-
       - name: Exercise encrypted database and media restore
         env:
           # Sem PG* de propósito: pg_dump/pg_restore leem PGHOST/PGPORT/PGUSER,
@@ -370,6 +328,40 @@ jobs:
                   print(f"::error title=Coverage floor regression::{failure}")
               sys.exit(1)
           PY
+
+      - name: Enforce real document generation SLA (NOVO-43)
+        run: |
+          # Fica depois da suíte e da cobertura: flutuação do runner não apaga
+          # a prova funcional. O log do servidor é publicado mesmo se falhar.
+          export FIELD_ENCRYPTION_KEYS="$(python -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())')"
+          SITE_PACKAGES="$(python -c 'import site; print(site.getsitepackages()[0])')"
+          PYTHONPATH="$SITE_PACKAGES" /usr/bin/python3 -m unoserver.server \
+            --interface 127.0.0.1 --port 2003 \
+            --uno-interface 127.0.0.1 --uno-port 2002 \
+            --conversion-timeout 10 --stop-after 1000 \
+            > "$RUNNER_TEMP/unoserver.log" 2>&1 &
+          for attempt in $(seq 1 40); do
+            if (echo > /dev/tcp/127.0.0.1/2003) 2>/dev/null; then break; fi
+            sleep 0.25
+          done
+          # Três amostras quentes por modelo permitem usar a mediana: um pico
+          # isolado deixa evidência, mas só regressão sustentada reprova. Os
+          # tetos separados dão folga comparável ao DOCX e ao XLSX medidos.
+          DOCUMENTOS_UNOSERVER_URL=http://127.0.0.1:2003 \
+          DOCUMENTOS_DEFAULT_PDF_ENGINE=unoserver \
+          python manage.py documentos_unoserver_check \
+            --benchmark --representative-resources --iterations 4 \
+            --max-ms-resource ordem_servico_modelos.docx=250 \
+            --max-ms-resource diario_bordo.xlsx=750 \
+            --max-cold-ms 3000
+
+      - name: Publish unoserver diagnostic (NOVO-43)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unoserver-${{ github.run_id }}
+          if-no-files-found: warn
+          path: ${{ runner.temp }}/unoserver.log
 
       - name: Enforce list performance ceilings (PF-07)
         # Último passo do job de propósito: é o mais caro (~2min30 medidos, dos

@@ -230,6 +230,8 @@ para uma rodada futura, com `DB-01` como pré-requisito.
 - [x] `QA-11` `reparar-producao.yml` em UTF-16LE
 - [x] `QA-12` Dependabot semanal (`pip` + Actions), CodeQL para Python/JavaScript e axe-core no
       corpus real: 43 rotas × 2 temas; baseline por alvo impede dívida nova e só pode descer
+- [x] `NOVO-43` SLA documental depois da suíte, log como artefato e mediana quente com teto por
+      modelo (`docx=250 ms`, `xlsx=750 ms`); pico isolado não apaga os gates funcionais
 
 ### Fase 2 — Isolamento por área
 - [x] `DB-03` limpeza de rascunhos apaga rascunho de outra área — e mais: sem limite de idade, ela

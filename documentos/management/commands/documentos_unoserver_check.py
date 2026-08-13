@@ -5,6 +5,7 @@ Verifica se DOCUMENTOS_UNOSERVER_URL está acessível (porta TCP).
 from __future__ import annotations
 
 import io
+import statistics
 import time
 from pathlib import Path
 
@@ -33,6 +34,13 @@ class Command(BaseCommand):
             type=float,
             default=1000,
             help="Limite do benchmark em milissegundos (padrão: 1000).",
+        )
+        parser.add_argument(
+            "--max-ms-resource",
+            action="append",
+            default=[],
+            metavar="ARQUIVO=MS",
+            help="Limite quente específico por recurso; repetível.",
         )
         parser.add_argument(
             "--iterations",
@@ -91,7 +99,6 @@ class Command(BaseCommand):
             document.save(docx)
             targets = [("sintetico.docx", ".docx", docx.getvalue())]
 
-        elapsed_values = []
         elapsed_by_resource = {}
         result_sizes = {}
         iterations = max(1, int(options["iterations"]))
@@ -112,11 +119,16 @@ class Command(BaseCommand):
                             timeout_seconds=timeout,
                         )
                     elapsed = (time.perf_counter() - started) * 1000
-                    elapsed_values.append(elapsed)
                     elapsed_by_resource.setdefault(filename, []).append(elapsed)
                     result_sizes[filename] = len(pdf)
         limit_ms = max(1.0, float(options["max_ms"]))
         cold_limit_ms = options["max_cold_ms"]
+        resource_limits = self._parse_resource_limits(options["max_ms_resource"])
+        unknown_resources = sorted(resource_limits.keys() - elapsed_by_resource.keys())
+        if unknown_resources:
+            raise CommandError(
+                "limite configurado para recurso não medido: " + ", ".join(unknown_resources)
+            )
 
         # A primeira conversão de cada modelo paga o start do LibreOffice/UNO e
         # custa uma ordem de grandeza a mais que as seguintes (medido no CI:
@@ -125,18 +137,19 @@ class Command(BaseCommand):
         # jogar a primeira fora esconderia um custo que o usuário sente de
         # verdade, na primeira geração depois de um período ocioso. Por isso
         # são dois orçamentos, não um.
-        if cold_limit_ms is None:
-            frios = []
-            quentes = elapsed_values
-        else:
-            frios = [valores[0] for valores in elapsed_by_resource.values()]
-            quentes = [
-                valor
-                for valores in elapsed_by_resource.values()
-                for valor in valores[1:]
-            ] or frios
-
-        elapsed_ms = max(quentes)
+        frios = [] if cold_limit_ms is None else [values[0] for values in elapsed_by_resource.values()]
+        warm_by_resource = {
+            filename: values if cold_limit_ms is None else (values[1:] or values)
+            for filename, values in elapsed_by_resource.items()
+        }
+        warm_statistics = {
+            filename: round(
+                max(values) if cold_limit_ms is None else statistics.median(values),
+                1,
+            )
+            for filename, values in warm_by_resource.items()
+        }
+        elapsed_ms = max(warm_statistics.values())
         resources = ", ".join(
             f"{filename}→{size} bytes"
             for filename, size in result_sizes.items()
@@ -145,18 +158,46 @@ class Command(BaseCommand):
             f"{filename}: " + ", ".join(f"{value:.1f} ms" for value in values)
             for filename, values in elapsed_by_resource.items()
         )
+        statistic_label = "máximo" if cold_limit_ms is None else "maior mediana quente"
         message = (
-            f"conversão real: máximo {elapsed_ms:.1f} ms; "
+            f"conversão real: {statistic_label} {elapsed_ms:.1f} ms; "
             f"{iterations} execução(ões) por modelo; {timings}; {resources}"
         )
         if frios:
             frio_ms = max(frios)
             message = f"{message}; primeira conversão (a frio) {frio_ms:.1f} ms"
             cold_limit = max(1.0, float(cold_limit_ms))
-            if frio_ms >= cold_limit:
+            if frio_ms > cold_limit:
                 raise CommandError(
                     f"{message}; SLA de partida a frio excedido ({cold_limit:.0f} ms)"
                 )
-        if elapsed_ms >= limit_ms:
-            raise CommandError(f"{message}; SLA excedido ({limit_ms:.0f} ms)")
+        for filename, median_ms in warm_statistics.items():
+            resource_limit = resource_limits.get(filename, limit_ms)
+            if median_ms > resource_limit:
+                raise CommandError(
+                    f"{message}; {filename}: mediana quente {median_ms:.1f} ms; "
+                    f"SLA excedido ({resource_limit:.0f} ms)"
+                )
+        medians = "; ".join(
+            f"{filename}: mediana quente {median_ms:.1f} ms"
+            for filename, median_ms in warm_statistics.items()
+        )
+        message = f"{message}; {medians}"
         self.stdout.write(self.style.SUCCESS(f"{message}; SLA atendido"))
+
+    @staticmethod
+    def _parse_resource_limits(raw_limits):
+        limits = {}
+        for raw in raw_limits:
+            filename, separator, raw_value = raw.partition("=")
+            filename = filename.strip()
+            if not separator or not filename:
+                raise CommandError(f"limite por recurso inválido: {raw!r}; use ARQUIVO=MS")
+            try:
+                value = float(raw_value)
+            except ValueError as exc:
+                raise CommandError(f"limite por recurso inválido: {raw!r}") from exc
+            if value <= 0 or filename in limits:
+                raise CommandError(f"limite por recurso inválido ou duplicado: {raw!r}")
+            limits[filename] = value
+        return limits
