@@ -77,6 +77,16 @@ def _status_variant(status: str) -> str:
 def _destino_display_oficio(oficio) -> str:
     if not oficio.roteiro_id:
         return ""
+    destinos_da_lista = getattr(oficio, "_destinos_da_lista", None)
+    if destinos_da_lista is not None:
+        parts = [
+            _label_cidade_uf_texto(item["destino_nome"], item["destino_uf"])
+            for item in destinos_da_lista[:2]
+        ]
+        result = ", ".join(parts)
+        if len(destinos_da_lista) > 2:
+            result += f" +{len(destinos_da_lista) - 2}"
+        return result
     destinos = list(oficio.roteiro.destinos.all())
     if not destinos:
         return ""
@@ -115,6 +125,13 @@ def _label_cidade_uf_trecho(cidade, estado) -> str:
     if estado_txt:
         return f"{cidade_txt}/{estado_txt}"
     return cidade_txt
+
+
+def _label_cidade_uf_texto(cidade, uf) -> str:
+    cidade_txt = (cidade or "").upper()
+    if "/" in cidade_txt:
+        return cidade_txt
+    return f"{cidade_txt}/{uf}" if uf else cidade_txt
 
 
 def _format_dt_trecho(dt) -> str:
@@ -169,8 +186,12 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
     urls = _oficio_card_urls(oficio.pk)
     menus_src = urls["menus"] if menus_sob_demanda else ""
 
-    servidores = list(oficio.servidores.all())
-    termos_pks = {s.pk for s in oficio.servidores_termo_autorizacao.all()}
+    servidores = getattr(oficio, "_servidores_da_lista", None)
+    if servidores is None:
+        servidores = list(oficio.servidores.all())
+    termos_pks = getattr(oficio, "_servidores_termo_pks_da_lista", None)
+    if termos_pks is None:
+        termos_pks = {s.pk for s in oficio.servidores_termo_autorizacao.all()}
     servidor_pks = {s.pk for s in servidores}
     motorista_pk = oficio.motorista_id
 
@@ -250,13 +271,23 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
     valor_diarias_extenso = ""
     if oficio.roteiro_id:
         roteiro = oficio.roteiro
-        for t in roteiro.trechos.all():
-            orig = _label_cidade_uf_trecho(t.origem_cidade, t.origem_estado)
-            dest = _label_cidade_uf_trecho(t.destino_cidade, t.destino_estado)
+        trechos_da_lista = getattr(oficio, "_trechos_da_lista", None)
+        trechos = trechos_da_lista if trechos_da_lista is not None else roteiro.trechos.all()
+        for t in trechos:
+            if trechos_da_lista is not None:
+                orig = _label_cidade_uf_texto(t["origem_nome"], t["origem_uf"])
+                dest = _label_cidade_uf_texto(t["destino_nome"], t["destino_uf"])
+                saida = t["saida"]
+                chegada = t["chegada"]
+            else:
+                orig = _label_cidade_uf_trecho(t.origem_cidade, t.origem_estado)
+                dest = _label_cidade_uf_trecho(t.destino_cidade, t.destino_estado)
+                saida = t.saida_dt
+                chegada = t.chegada_dt
             trechos_display.append({
                 "rota": f"{orig} → {dest}",
-                "saida": _format_dt_trecho(t.saida_dt),
-                "chegada": _format_dt_trecho(t.chegada_dt),
+                "saida": _format_dt_trecho(saida),
+                "chegada": _format_dt_trecho(chegada),
             })
         diarias_oficio = oficio.diarias_para_servidores()
         if diarias_oficio:

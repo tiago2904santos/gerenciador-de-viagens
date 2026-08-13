@@ -8,6 +8,7 @@ from core.pagination import KnownCountPaginator
 from eventos.services import resolve_evento_from_request
 from .models import Oficio
 from .presenters import apresentar_oficio_card
+from .card_rendering import renderizar_oficio_card_cacheado
 from .selectors import get_oficio_by_id
 from .selectors import hidratar_oficios_da_pagina
 from .selectors import listar_oficios
@@ -65,6 +66,8 @@ def index(request):
     cards = []
     for oficio in objetos_da_pagina:
         cards.append(apresentar_oficio_card(oficio, excluir_next_url=reverse("oficios:index")))
+    for card in cards:
+        card["rendered_html"] = renderizar_oficio_card_cacheado(card)
 
     has_filters = any([q, status, criacao_de, criacao_ate, viagem_de, viagem_ate, sort])
 

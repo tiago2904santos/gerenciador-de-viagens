@@ -18,6 +18,7 @@ from django.utils import timezone
 from django_cotton.templatetags._component import CottonComponentNode
 
 from oficios.models import Oficio
+from oficios import card_rendering
 from oficios import presenters
 from oficios.views import OFICIOS_POR_PAGINA
 from roteiros.models import Roteiro
@@ -75,10 +76,10 @@ class OficioListPaginacaoTests(TestCase):
             msg="a lista passou a emitir query por registro:\n"
             + "\n".join(q["sql"] for q in com_300.captured_queries),
         )
-        # Teto: as 16 queries fixas medidas na auditoria + o COUNT do Paginator.
+        # PF-05: seleção, hidratação e dimensões cabem no teto canônico atual.
         self.assertLessEqual(
             len(com_300),
-            17,
+            7,
             msg="\n".join(q["sql"] for q in com_300.captured_queries),
         )
 
@@ -122,6 +123,24 @@ class OficioListPaginacaoTests(TestCase):
 
         self.assertEqual(com_cards, com_um_card)
         self.assertLessEqual(com_cards, 14)
+
+    def test_html_do_card_reutiliza_cache_ate_o_conteudo_mudar(self):
+        card = {"status_variant": "rascunho", "search_text": "Ofício 1"}
+        card_rendering.cache.clear()
+
+        with patch(
+            "oficios.card_rendering.render_to_string",
+            wraps=card_rendering.render_to_string,
+        ) as render:
+            primeiro = card_rendering.renderizar_oficio_card_cacheado(card)
+            repetido = card_rendering.renderizar_oficio_card_cacheado(dict(card))
+            alterado = card_rendering.renderizar_oficio_card_cacheado(
+                {**card, "search_text": "Ofício alterado"}
+            )
+
+        self.assertEqual(primeiro, repetido)
+        self.assertNotEqual(primeiro, alterado)
+        self.assertEqual(render.call_count, 2)
 
     def test_pagina_limita_ids_antes_de_hidratar_as_dimensoes(self):
         """NOVO-50: o LIMIT não pode carregar a árvore inteira de joins.

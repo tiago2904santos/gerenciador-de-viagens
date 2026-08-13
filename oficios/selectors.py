@@ -1,7 +1,13 @@
 from datetime import date
 
 from django.db.models import Prefetch
+from django.db.models import Exists
+from django.db.models import F
+from django.db.models import OuterRef
 from django.db.models import Q
+from django.db.models import CharField
+from django.db.models import DateTimeField
+from django.db.models import Value
 from django.shortcuts import get_object_or_404
 from django.utils.dateparse import parse_date
 
@@ -162,34 +168,97 @@ def hidratar_oficios_da_pagina(pagina):
             "motorista",
             "justificativa",
         )
-        .prefetch_related(
-            Prefetch(
-                "servidores",
-                queryset=filter_queryset_by_area(Servidor.objects)
-                .select_related("cargo", "unidade")
-                .order_by("nome"),
-            ),
-            Prefetch(
-                "servidores_termo_autorizacao",
-                queryset=filter_queryset_by_area(Servidor.objects).order_by("nome"),
-            ),
-            Prefetch(
-                "roteiro__destinos",
-                queryset=RoteiroDestino.objects.select_related("cidade", "estado").order_by("ordem"),
-            ),
-            Prefetch(
-                "roteiro__trechos",
-                queryset=RoteiroTrecho.objects.select_related(
-                    "origem_cidade",
-                    "origem_estado",
-                    "destino_cidade",
-                    "destino_estado",
-                ).order_by("ordem"),
-            ),
-        )
     )
     por_id = {oficio.pk: oficio for oficio in queryset}
+    _anexar_servidores_da_pagina(por_id)
+    _anexar_rota_da_pagina(por_id)
     return [por_id[pk] for pk in ids]
+
+
+def _anexar_servidores_da_pagina(oficios_por_id):
+    """Carrega equipe e pertença ao termo na mesma consulta da tabela M2M."""
+    if not oficios_por_id:
+        return
+    equipe_through = Oficio.servidores.through
+    termo_through = Oficio.servidores_termo_autorizacao.through
+    termo_do_mesmo_oficio = termo_through.objects.filter(
+        oficio_id=OuterRef("oficio_id"),
+        servidor_id=OuterRef("servidor_id"),
+    )
+    vinculos = (
+        equipe_through.objects.filter(
+            oficio_id__in=oficios_por_id,
+            servidor__area_id=F("oficio__area_id"),
+        )
+        .select_related("servidor__cargo", "servidor__unidade")
+        .annotate(_has_termo=Exists(termo_do_mesmo_oficio))
+        .order_by("oficio_id", "servidor__nome")
+    )
+    equipes = {pk: [] for pk in oficios_por_id}
+    termos = {pk: set() for pk in oficios_por_id}
+    for vinculo in vinculos:
+        servidor = vinculo.servidor
+        equipes[vinculo.oficio_id].append(servidor)
+        if vinculo._has_termo:
+            termos[vinculo.oficio_id].add(servidor.pk)
+    for pk, oficio in oficios_por_id.items():
+        oficio._servidores_da_lista = equipes[pk]
+        oficio._servidores_termo_pks_da_lista = termos[pk]
+
+
+def _anexar_rota_da_pagina(oficios_por_id):
+    """Une destinos e trechos num round-trip e entrega só campos de exibição."""
+    roteiros = {
+        oficio.roteiro_id: oficio
+        for oficio in oficios_por_id.values()
+        if oficio.roteiro_id
+    }
+    for oficio in oficios_por_id.values():
+        oficio._destinos_da_lista = []
+        oficio._trechos_da_lista = []
+    if not roteiros:
+        return
+
+    destinos = (
+        RoteiroDestino.objects.filter(roteiro_id__in=roteiros)
+        .order_by()
+        .annotate(
+            kind=Value("destino", output_field=CharField()),
+            origem_nome=Value("", output_field=CharField()),
+            origem_uf=Value("", output_field=CharField()),
+            destino_nome=F("cidade__nome"),
+            destino_uf=F("estado__sigla"),
+            saida=Value(None, output_field=DateTimeField()),
+            chegada=Value(None, output_field=DateTimeField()),
+        )
+        .values(
+            "roteiro_id", "ordem", "kind", "origem_nome", "origem_uf",
+            "destino_nome", "destino_uf", "saida", "chegada",
+        )
+    )
+    trechos = (
+        RoteiroTrecho.objects.filter(roteiro_id__in=roteiros)
+        .order_by()
+        .annotate(
+            kind=Value("trecho", output_field=CharField()),
+            origem_nome=F("origem_cidade__nome"),
+            origem_uf=F("origem_estado__sigla"),
+            destino_nome=F("destino_cidade__nome"),
+            destino_uf=F("destino_estado__sigla"),
+            saida=F("saida_dt"),
+            chegada=F("chegada_dt"),
+        )
+        .values(
+            "roteiro_id", "ordem", "kind", "origem_nome", "origem_uf",
+            "destino_nome", "destino_uf", "saida", "chegada",
+        )
+    )
+    for item in destinos.union(trechos, all=True).order_by("roteiro_id", "kind", "ordem"):
+        oficio = roteiros[item["roteiro_id"]]
+        if item["kind"] == "destino":
+            oficio._destinos_da_lista.append(item)
+        else:
+            oficio._trechos_da_lista.append(item)
 
 
 def get_oficio_by_id(pk: int):
