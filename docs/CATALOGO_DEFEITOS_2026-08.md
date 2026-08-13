@@ -6898,7 +6898,7 @@ réguas executam `--atualizar-tetos` no mesmo runner usado pelo gate. Os relató
 `tetos_front.json` resultante são publicados sempre como artefato, inclusive quando uma régua
 reprova, criando o caminho suportado para revisar e versionar a catraca.
 
-### NOVO-92 · `NOVO` A tradução de ação do rodapé em redirect está copiada em cada passo do wizard · AUD · 0,75 d
+### NOVO-92 ✅ RESOLVIDO · `NOVO` Um helper traduz ação do rodapé em redirect · AUD · 0,75 d
 
 Achado ao fechar o `BE-12`. Todo passo de wizard lê a ação do rodapé com
 `core/wizard.py::normalizar_acao_do_wizard` — dono único desde o `BE-01` — e depois **cada um
@@ -6920,6 +6920,11 @@ espalhada.
 **Não é cópia literal**, e é por isso que não entrou no `BE-12`: cada passo tem destinos próprios, e
 `wizard_documentos` ainda tem a ação `finalizar`, que os outros não têm. Unificar exige um mapa de
 etapa → próximo/anterior, que é desenho, não extração mecânica. Fica para depois do `BE-13`.
+
+**Fechado.** `_redirect_after_wizard_save` recebe as rotas e mensagens de cada etapa e possui uma
+única tradução para `wizard_back`, `save_draft_list`, `wizard_next` e a permanência na etapa. Dados
+e viajantes, transporte, roteiro, justificativa e documentos usam o helper. `finalizar` permanece
+antes dele porque altera status e valida pendências, não é simples navegação.
 <!-- Renumeração (2a vez nesta etapa): o `#305` (BE-12) mesclou antes deste ramo e criou
      `NOVO-92`. Estes dois nasceram como 92/93 no ramo da E8 e viraram 93/94. Ramos paralelos
      tiram número do mesmo contador sem reserva, e a colisão só aparece no merge — foi a
