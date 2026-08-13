@@ -7197,7 +7197,7 @@ elemento só existe com diálogo, menu ou dropdown aberto. Sobre elas a mediçã
 tratá-las como inócuas seria repetir o `NOVO-90`. Medi-las exige estender o corpus aos estados de
 sobreposição, como o `NOVO-54` fez ao ir de 44 para 51 rotas.
 
-### NOVO-98 · `NOVO` Guardas do gravador do editor são inalcançáveis: regra defensiva duplicada do parser · QA · 0,5 d
+### NOVO-98 ✅ RESOLVIDO · `NOVO` Gravador confia no contrato normalizado do parser · QA · 0,5 d
 
 **Como apareceu.** Escrevendo a rede do `BE-13` fatia 3 eu ia "cobrir as 6 linhas descobertas" de
 `_salvar_roteiro_avulso_from_roteiro_state`. Cinco cenários, todos verdes — e **três passavam com o
@@ -7227,6 +7227,11 @@ normalização é dele e o parser para de fazê-la. Hoje as duas fazem, e a segu
 teste pode exercitar honestamente.
 
 **Escopo medido:** 3 guardas, 6 linhas, em `editor_persistence.py`.
+
+**Fechado.** O contrato foi escolhido do lado do parser. O gravador documenta que recebe estado
+normalizado e as três cópias saíram: piso do adicional, derivação da duração e descarte da volta
+duplicada. A rede entra pelo POST real e prova que `-30`/duração vazia chegam persistidos como
+`0`/`240`; a cobertura de bate-volta existente continua provando a remoção a montante.
 
 **Lição de método, que vale além deste caso:** cobertura descoberta não é sinônimo de teste faltando.
 Antes de escrever teste para uma linha vermelha, vale perguntar se ela é alcançável — a inversão

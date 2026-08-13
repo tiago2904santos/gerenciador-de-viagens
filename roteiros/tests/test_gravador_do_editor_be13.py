@@ -154,3 +154,17 @@ class GravadorDoEditorTests(TestCase):
         )
         self.assertEqual(roteiro.trechos.exclude(tipo=RoteiroTrecho.TIPO_RETORNO).count(), 1)
         self.assertEqual(roteiro.trechos.filter(tipo=RoteiroTrecho.TIPO_RETORNO).count(), 1)
+
+    def test_parser_entrega_retorno_normalizado_ao_gravador(self):
+        """A normalização tem um dono só: o parser (`NOVO-98`)."""
+        roteiro = self._roteiro()
+
+        self._gravar(
+            roteiro,
+            trechos=[self._trecho(origem=self.sede, destino=self.destino, dia=1)],
+            retorno={"tempo_cru_estimado_min": "240", "tempo_adicional_min": "-30"},
+        )
+
+        volta = roteiro.trechos.get(tipo=RoteiroTrecho.TIPO_RETORNO)
+        self.assertEqual(volta.tempo_adicional_min, 0)
+        self.assertEqual(volta.duracao_estimada_min, 240)
