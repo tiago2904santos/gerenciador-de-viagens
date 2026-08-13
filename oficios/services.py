@@ -410,6 +410,8 @@ def criar_oficio_dados_viajantes(form, action="save_draft"):
     oficio.save()
     form.save_m2m()
     oficio.diarias_quantidade_servidores = max(oficio.servidores.count(), 1)
+    # `BE-09`: o pk vem do ofício que acabou de ser criado nesta transação;
+    # `all_objects` evita depender do contexto de área ao completar o mesmo registro.
     Oficio.all_objects.filter(pk=oficio.pk).update(
         diarias_quantidade_servidores=oficio.diarias_quantidade_servidores,
     )
@@ -506,6 +508,8 @@ def atualizar_oficio_dados_viajantes(oficio, form, action="save_draft"):
         or atualizado.diarias_quantidade_servidores is None
     ):
         atualizado.diarias_quantidade_servidores = max(len(servidores_atuais), 1)
+        # `BE-09`: o pk é da instância já carregada e validada por este service;
+        # a atualização do snapshot não deve mudar de alvo com a área ativa.
         Oficio.all_objects.filter(pk=atualizado.pk).update(
             diarias_quantidade_servidores=atualizado.diarias_quantidade_servidores,
         )
