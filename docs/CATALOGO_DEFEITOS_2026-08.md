@@ -5837,6 +5837,15 @@ Os quatro campos com divergência em dev: `eventos.TipoEvento.nome` (5), `Ativid
 **Fecha quando** a contagem rodar contra produção, os campos bloqueados (se houver) forem resolvidos
 no sistema, e o `--commit` for aplicado com backup.
 
+**Preparação operacional em 13/08.** O comando ganhou `--strict`: se qualquer campo colidir com uma
+restrição, a execução falha e a transação inteira volta, em vez de deixar uma aplicação parcial. O
+workflow manual passou a criar backup criptografado, rodar a simulação estrita e exigir a frase de
+confirmação antes do `--commit`; depois ele repete a medição e exige zero divergências. A primeira
+tentativa na VPS criou o backup
+`gerenciador-20260813T091653Z.tar.gz.enc` e parou antes da leitura/escrita porque produção ainda
+estava no comando anterior, sem `--strict`. Nenhuma linha foi alterada. O ID permanece parcial até
+este código passar por CI/deploy e a execução operacional concluir.
+
 ### NOVO-58 ✅ RESOLVIDO · `NOVO` Claro e escuro não eram dois temas do mesmo sistema · UI · a decidir
 
 Medido com `getComputedStyle` nas 44 rotas, comparando o **mesmo elemento** nas duas versões do
