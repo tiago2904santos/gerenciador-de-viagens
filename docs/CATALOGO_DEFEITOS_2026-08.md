@@ -1969,7 +1969,7 @@ dois temas.
 
 `roteiros` não entra: não tem menu.
 
-### PF-05 🟠 PARCIAL · A lista de Ofícios leva 127 ms no servidor · MED · —
+### PF-05 ✅ RESOLVIDO (13/08/2026) · A lista de Ofícios levava 127 ms no servidor · MED · —
 
 Com 17 queries planas e 20 cards. As outras listas ficam entre 15 e 46 ms. É consequência de
 `PF-01` e `PF-04`; existe como **métrica de aceite** deles: abaixo de 40 ms sem subir a contagem
@@ -1985,6 +1985,19 @@ de queries.
 > requisição. O resultado agora é memorizado **somente no objeto `request`**; o teste exige uma
 > única construção e impede cache entre usuários. A medição canônica desta última queda fica no
 > CI do PR; o ID não fecha enquanto o teto original não for atingido.
+
+> **Fechamento canônico.** O custo restante tinha três partes mensuráveis: resolução repetida das
+> mesmas rotas por card, duas consultas M2M separadas para equipe/termo e duas consultas separadas
+> para destinos/trechos, além de renderizar novamente o mesmo fragmento já apresentado. As rotas
+> agora são resolvidas uma vez por URLconf; equipe + pertença ao termo e destinos + trechos são
+> carregados em uma consulta por família; o HTML do card usa cache chaveada pelo hash de **todo o
+> conteúdo apresentado** — qualquer mudança de campo produz outra chave e força nova renderização.
+> O teto canônico desceu de 9 para **7 consultas**.
+>
+> No CI [run 31691613939](https://github.com/tiago2904santos/gerenciador-de-viagens/actions/runs/31691613939),
+> `oficios:index` mediu **33,2 ms**, 7 consultas e 160,7 KB no volume 200; no volume 20.000,
+> **163,9 ms**, 7 consultas e 161,3 KB. O aceite original era **abaixo de 40 ms sem subir
+> consultas**: cumprido, com 73,9% de redução contra os 127 ms do enunciado.
 
 ### PF-06 ✅ RESOLVIDO (parte) · ⚪ Queries duplicadas em duas rotas · MED · 0,5 d cada
 
@@ -5288,7 +5301,7 @@ o que muda é quem passa a ser a fonte da verdade daqui para a frente. Só entã
 
 ---
 
-### NOVO-50 🟠 PARCIAL (13/08/2026) · `NOVO` Listas de ofícios e planos gastam ~130 ms em 20 linhas resolvendo `select_related` por `Nested Loop` · PF · a medir
+### NOVO-50 ✅ RESOLVIDO (13/08/2026) · `NOVO` Listas de ofícios e planos gastavam ~130 ms em 20 linhas; o `Nested Loop` não era a causa única · PF · medido
 
 Achado ao medir o `DB-10`, e é o motivo de o índice de ordenação não ter ajudado essas duas.
 
@@ -5338,6 +5351,15 @@ tabelas de dimensão irreais.
 > pela mesma função compartilhada, Eventos **30 → 27** e Ordens **15 → 12**. Esses quatro
 > tetos descem no mesmo PR. O ganho em volume alto fecha a causa de escala, mas o ID permanece
 > parcial junto com o `PF-05`: o aceite de 40 ms no volume 200 ainda não foi alcançado.
+
+> **Fechamento.** A hipótese do título foi definitivamente separada em causas. Paginar antes de
+> hidratar eliminou o `Nested Loop` do `LIMIT`, mas quase não moveu a rota sozinho. A agregação das
+> abas fechou o crescimento em volume alto; depois, a hidratação achatada das relações e o cache
+> causal de fragmento fecharam o custo fixo. No CI final, Ofícios ficou em **33,2 ms** com 200 e
+> **163,9 ms** com 20.000 registros, contra 125,5/1.554,4 ms antes; consultas **13 → 7**. Planos
+> preservou os ganhos já obtidos de escala, mas nunca foi o critério de aceite do `PF-05`. O
+> diagnóstico do `Nested Loop`, o semeador realista e o regime quente estão agora cobertos por
+> testes e pela régua PostgreSQL do CI.
 
 ### NOVO-49 ✅ RESOLVIDO · 🟡 `NOVO` O painel de `/` custava cinco consultas por login para uma tela que o dono não queria · MOR · 0,25 d
 
