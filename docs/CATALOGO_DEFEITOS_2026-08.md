@@ -6794,7 +6794,7 @@ pode ser decidida sem se confundir com a igualação dos temas. Duas saídas pos
 do dono: arredondar para `--space-4` (16px, mexe 2px nos dois temas de uma vez) ou criar um token de
 14px, se o valor se provar recorrente.
 
-### NOVO-90 · `NOVO` A régua de tema não separa "diverge e pinta" de "diverge e não pinta" · QA · 0,5 d
+### NOVO-90 ✅ RESOLVIDO · `NOVO` A régua de tema separa "diverge e pinta" de "diverge e não pinta" · QA · 0,5 d
 
 Achado ao executar a segunda sub-etapa da **E8**, e ele muda como o número da etapa deve ser lido.
 
@@ -6837,7 +6837,11 @@ layout no motor usado pela régua (`-webkit-font-smoothing`, `-moz-osx-font-smoo
 `text-rendering`, e as de `transition-*`, que só mudam a curva no tempo), contadas à parte no
 relatório. Duas somas, não uma: a que move pixel e a que não move.
 
-### NOVO-91 🔴 · `NOVO` A sessão remota mede ~35% menos divergência que o CI · QA · 0,5 d
+**Fechado.** O JSON e o resumo agora mantêm `differences` para compatibilidade com a catraca e
+publicam também `paint_relevant_differences` e `non_paint_differences`. A classificação é aplicada
+nas duas ordens de captura e tem teste que combina uma diferença visual com uma de suavização.
+
+### NOVO-91 ✅ RESOLVIDO · `NOVO` Tetos de frontend são recalibrados e publicados pelo CI canônico · QA · 0,5 d
 
 Descoberto errando: apertei os tetos de `scripts/tetos_front.json` com números medidos **aqui**, e o
 CI reprovou em 25+ rotas. O arquivo estava calibrado para o CI, e eu escrevi por cima dele medições
@@ -6878,6 +6882,11 @@ mão, e o log só mostra as rotas que **reprovaram**.
 **Efeito medido apesar de tudo:** o próprio log de reprovação mostra a queda real no ambiente certo.
 `configuracao` caiu de 1652 para 1425 a 1440px (−227), e o mesmo nas outras duas larguras (−204 cada).
 `eventos-lista@1440` caiu 14. É menos do que os −9.376 medidos localmente, e é o número que vale.
+
+**Fechado.** O workflow pode ser disparado manualmente com `atualizar_tetos_front=true`; as duas
+réguas executam `--atualizar-tetos` no mesmo runner usado pelo gate. Os relatórios completos e o
+`tetos_front.json` resultante são publicados sempre como artefato, inclusive quando uma régua
+reprova, criando o caminho suportado para revisar e versionar a catraca.
 
 ### NOVO-92 · `NOVO` A tradução de ação do rodapé em redirect está copiada em cada passo do wizard · AUD · 0,75 d
 

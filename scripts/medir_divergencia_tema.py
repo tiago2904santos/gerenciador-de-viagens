@@ -35,16 +35,29 @@ COLOR_PROPERTIES = {
     "stop-color",
 }
 
+NON_PAINT_PROPERTIES = {
+    "-moz-osx-font-smoothing",
+    "-webkit-font-smoothing",
+    "text-rendering",
+}
+
 
 def is_color_property(name: str) -> bool:
     lowered = name.lower()
     return lowered.startswith("--") or lowered.endswith("color") or lowered in COLOR_PROPERTIES
 
 
+def is_non_paint_property(name: str) -> bool:
+    """Propriedades computadas que a régua conta, mas não pintam neste motor."""
+    lowered = name.lower()
+    return lowered in NON_PAINT_PROPERTIES or lowered.startswith("transition-")
+
+
 def compare_snapshots(light: list[dict], dark: list[dict]) -> dict:
     if len(light) != len(dark):
         raise ValueError(f"DOM mudou entre temas: {len(light)} elementos no claro e {len(dark)} no escuro")
     differences: set[tuple[str, str, str, str]] = set()
+    non_paint_differences: set[tuple[str, str, str, str]] = set()
     divergent_elements: set[str] = set()
     pairs: set[tuple[str, str, str]] = set()
     for light_item, dark_item in zip(light, dark, strict=True):
@@ -55,13 +68,18 @@ def compare_snapshots(light: list[dict], dark: list[dict]) -> dict:
             dark_value = dark_item["styles"].get(prop)
             if dark_value is None or light_value == dark_value:
                 continue
-            differences.add((key, prop, light_value, dark_value))
+            difference = (key, prop, light_value, dark_value)
+            differences.add(difference)
+            if is_non_paint_property(prop):
+                non_paint_differences.add(difference)
             divergent_elements.add(key)
             pairs.add((prop, light_value, dark_value))
     return {
         "elements_compared": len(light),
         "elements_divergent": len(divergent_elements),
         "differences": len(differences),
+        "paint_relevant_differences": len(differences - non_paint_differences),
+        "non_paint_differences": len(non_paint_differences),
         "distinct_pairs": len(pairs),
         "difference_keys": differences,
     }
@@ -81,6 +99,11 @@ async ({firstTheme, secondTheme}) => {
     const p = name.toLowerCase();
     return p.startsWith('--') || p.endsWith('color') ||
       ['color', 'background', 'fill', 'stroke', 'flood-color', 'lighting-color', 'stop-color'].includes(p);
+  };
+  const isNonPaint = (name) => {
+    const p = name.toLowerCase();
+    return ['-moz-osx-font-smoothing', '-webkit-font-smoothing', 'text-rendering'].includes(p) ||
+      p.startsWith('transition-');
   };
   // NOVO-84: dois requestAnimationFrame bastam para o recalculo de estilo, nao
   // para layout que continua chegando. Em roteiros-editar@500 o proprio switch
@@ -119,6 +142,7 @@ async ({firstTheme, secondTheme}) => {
   });
   await apply(secondTheme);
   const diffs = [];
+  let nonPaintDifferences = 0;
   const divergent = new Set();
   const pairs = new Set();
   elements.forEach((element, index) => {
@@ -132,6 +156,7 @@ async ({firstTheme, secondTheme}) => {
       const key = String(index);
       divergent.add(key);
       pairs.add(JSON.stringify([property, light, dark]));
+      if (isNonPaint(property)) nonPaintDifferences += 1;
       diffs.push([key, property, light, dark,
         element.id ? `${element.tagName.toLowerCase()}#${element.id}` :
           `${element.tagName.toLowerCase()}.${Array.from(element.classList).slice(0, 3).join('.')}`]);
@@ -141,6 +166,7 @@ async ({firstTheme, secondTheme}) => {
     elementsCompared: elements.length,
     elementsDivergent: divergent.size,
     distinctPairs: pairs.size,
+    nonPaintDifferences,
     diffs,
   };
 }
@@ -202,6 +228,8 @@ def _capture_order(page, first_theme: str, second_theme: str) -> dict:
         "elements_compared": raw["elementsCompared"],
         "elements_divergent": raw["elementsDivergent"],
         "differences": len(raw["diffs"]),
+        "paint_relevant_differences": len(raw["diffs"]) - raw["nonPaintDifferences"],
+        "non_paint_differences": raw["nonPaintDifferences"],
         "distinct_pairs": raw["distinctPairs"],
         "difference_keys": keys,
         "diffs": raw["diffs"],
@@ -225,6 +253,8 @@ def _summarize_pair(first: dict, reverse: dict) -> dict:
         "elements_compared": first["elements_compared"],
         "elements_divergent": first["elements_divergent"],
         "differences": first["differences"],
+        "paint_relevant_differences": first["paint_relevant_differences"],
+        "non_paint_differences": first["non_paint_differences"],
         "distinct_pairs": first["distinct_pairs"],
         "order_exclusive_light_dark": 0,
         "order_exclusive_dark_light": 0,
@@ -366,6 +396,12 @@ def run_measurement(args) -> dict:
             "elements_compared": sum(item["elements_compared"] for item in results.values()),
             "elements_divergent": sum(item["elements_divergent"] for item in results.values()),
             "differences": sum(item["differences"] for item in results.values()),
+            "paint_relevant_differences": sum(
+                item["paint_relevant_differences"] for item in results.values()
+            ),
+            "non_paint_differences": sum(
+                item["non_paint_differences"] for item in results.values()
+            ),
             "distinct_pairs": len(
                 {
                     (pair["property"], pair["light"], pair["dark"])

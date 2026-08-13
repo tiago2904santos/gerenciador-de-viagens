@@ -173,6 +173,17 @@ class DivergenciaTemaMetricTests(SimpleTestCase):
         self.assertFalse(theme_metric.is_color_property("border-top-width"))
         self.assertFalse(theme_metric.is_color_property("font-family"))
 
+    def test_propriedades_computadas_sem_pintura_sao_classificadas_a_parte(self):
+        for prop in (
+            "-webkit-font-smoothing",
+            "-moz-osx-font-smoothing",
+            "text-rendering",
+            "transition-duration",
+        ):
+            with self.subTest(prop=prop):
+                self.assertTrue(theme_metric.is_non_paint_property(prop))
+        self.assertFalse(theme_metric.is_non_paint_property("border-top-width"))
+
     def test_compara_o_mesmo_elemento_e_conta_pares_distintos(self):
         light = [
             {"key": "0", "label": "html", "styles": {"font-family": "Arial", "border-radius": "0px"}},
@@ -188,7 +199,24 @@ class DivergenciaTemaMetricTests(SimpleTestCase):
         self.assertEqual(result["elements_compared"], 2)
         self.assertEqual(result["elements_divergent"], 2)
         self.assertEqual(result["differences"], 3)
+        self.assertEqual(result["paint_relevant_differences"], 3)
+        self.assertEqual(result["non_paint_differences"], 0)
         self.assertEqual(result["distinct_pairs"], 2)
+
+    def test_divergencia_sem_pintura_nao_infla_a_coluna_visual(self):
+        light = [{"key": "0", "styles": {"-webkit-font-smoothing": "auto", "width": "10px"}}]
+        dark = [
+            {
+                "key": "0",
+                "styles": {"-webkit-font-smoothing": "antialiased", "width": "12px"},
+            }
+        ]
+
+        result = theme_metric.compare_snapshots(light, dark)
+
+        self.assertEqual(result["differences"], 2)
+        self.assertEqual(result["paint_relevant_differences"], 1)
+        self.assertEqual(result["non_paint_differences"], 1)
 
     def test_ordem_de_captura_e_estavel_quando_os_diffs_sao_os_mesmos(self):
         first = {("0", "font-family", "Arial", "Inter")}
@@ -206,6 +234,17 @@ class DivergenciaTemaMetricTests(SimpleTestCase):
 
         self.assertEqual(theme_gate["direction"], "down")
         self.assertEqual(set(theme_gate["routes"]), expected)
+
+    def test_ci_publica_medidas_e_tetos_recalibrados(self):
+        workflow = (theme_metric.ROOT / ".github" / "workflows" / "tests.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("atualizar_tetos_front:", workflow)
+        self.assertIn("metric_args+=(--atualizar-tetos)", workflow)
+        self.assertIn("actions/upload-artifact@v4", workflow)
+        self.assertIn("divergencia-tema.json", workflow)
+        self.assertIn("scripts/tetos_front.json", workflow)
 
 
 class MesmoTemaMetricTests(SimpleTestCase):
