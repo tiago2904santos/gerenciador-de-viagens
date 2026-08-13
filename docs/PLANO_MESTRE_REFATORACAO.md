@@ -364,6 +364,9 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       Das cinco listas que ordenavam em memória, só `OrdemServico` ganha (64× na consulta,
       1,08× na rota); nas outras quatro o índice análogo não move o tempo e em `roteiros`
       piora. "Ofícios têm situação análoga" era falso, e o que sobra ali é o `NOVO-50`
+      (**parcial em 13/08**): ids antes da hidratação, contagens das abas agregadas e total do
+      paginador reutilizado derrubaram a escala em 20.000 registros, mas o `PF-05` ainda mede
+      76,7 ms no volume 200 contra o aceite de 40 ms
 - [x] `DB-11` busca livre de Termos multiplicava 20.000 linhas por três M2M e rodava três vezes —
       `Exists()` por origem + contagem das abas reutilizada pelo paginador. O `PF-07` agora mede
       `termos:index:busca` permanentemente: **1.807,9 → 391,4 ms (4,62×)** em 20.000 registros,
