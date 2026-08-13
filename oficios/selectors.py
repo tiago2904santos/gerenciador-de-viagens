@@ -141,6 +141,57 @@ def listar_oficios(
     return queryset
 
 
+def hidratar_oficios_da_pagina(pagina):
+    """Carrega relações somente depois de a paginação escolher os IDs.
+
+    `NOVO-50`: deixar o `select_related` no queryset paginado fazia o PostgreSQL
+    resolver cidades, unidades, viaturas e servidores enquanto ainda escolhia
+    os 20 registros. A primeira consulta agora é estreita; a segunda recebe no
+    máximo os IDs da página e hidrata exatamente o que o card usa.
+    """
+    ids = list(pagina.values_list("pk", flat=True))
+    if not ids:
+        return []
+
+    queryset = (
+        filter_queryset_by_area(Oficio.objects)
+        .filter(pk__in=ids)
+        .select_related(
+            "roteiro",
+            "viatura",
+            "motorista",
+            "justificativa",
+        )
+        .prefetch_related(
+            Prefetch(
+                "servidores",
+                queryset=filter_queryset_by_area(Servidor.objects)
+                .select_related("cargo", "unidade")
+                .order_by("nome"),
+            ),
+            Prefetch(
+                "servidores_termo_autorizacao",
+                queryset=filter_queryset_by_area(Servidor.objects).order_by("nome"),
+            ),
+            Prefetch(
+                "roteiro__destinos",
+                queryset=RoteiroDestino.objects.select_related("cidade", "estado").order_by("ordem"),
+            ),
+            Prefetch(
+                "roteiro__trechos",
+                queryset=RoteiroTrecho.objects.select_related(
+                    "origem_cidade",
+                    "origem_estado",
+                    "destino_cidade",
+                    "destino_estado",
+                ).order_by("ordem"),
+            ),
+        )
+    )
+    por_id = {oficio.pk: oficio for oficio in queryset}
+    return [por_id[pk] for pk in ids]
+
+
 def get_oficio_by_id(pk: int):
     """Um ofício da área ativa, com a carga que o card do presenter toca.
 

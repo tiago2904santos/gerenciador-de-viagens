@@ -79,6 +79,29 @@ class OficioListPaginacaoTests(TestCase):
             msg="\n".join(q["sql"] for q in com_300.captured_queries),
         )
 
+    def test_pagina_limita_ids_antes_de_hidratar_as_dimensoes(self):
+        """NOVO-50: o LIMIT não pode carregar a árvore inteira de joins.
+
+        A consulta que escolhe os 20 registros da página precisa tocar apenas o
+        documento e o campo usado pela aba/ordenação. Cidade, servidor, viatura
+        e demais dimensões são hidratados depois, já sobre somente esses IDs.
+        """
+        _criar_oficios(25)
+
+        with CaptureQueriesContext(connection) as queries:
+            self.assertEqual(self.client.get(f"{self.url}?aba=atuais").status_code, 200)
+
+        consultas_da_pagina = [
+            item["sql"]
+            for item in queries.captured_queries
+            if 'FROM "oficios_oficio"' in item["sql"] and "LIMIT 20" in item["sql"]
+        ]
+        self.assertTrue(consultas_da_pagina, "não encontrei a consulta paginada de Ofícios")
+        self.assertTrue(
+            any('JOIN "cadastros_' not in sql for sql in consultas_da_pagina),
+            msg="o LIMIT ainda paga os joins das dimensões:\n" + "\n".join(consultas_da_pagina),
+        )
+
     def test_pagina_2_preserva_filtros_e_nao_repete_registros(self):
         _criar_oficios(45)
 
