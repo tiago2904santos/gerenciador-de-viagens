@@ -27,6 +27,22 @@ class ShellCssProfileTests(SimpleTestCase):
         self.assertNotIn(css_profiles._rule_id(rules[0]), selected)
         self.assertIn(css_profiles._rule_id(rules[1]), selected)
 
+    def test_expansao_dom_nao_exige_classe_de_estado_que_so_aparece_apos_clique(self):
+        rules = css_profiles.tinycss2.parse_stylesheet(
+            ".sidebar-item--collapsible.is-open > .sidebar-accordion "
+            "{ grid-template-rows: 1fr; }",
+            skip_comments=True,
+            skip_whitespace=True,
+        )
+
+        selected = css_profiles._with_dom_families(
+            rules,
+            set(),
+            {"sidebar-item--collapsible", "sidebar-accordion"},
+        )
+
+        self.assertIn(css_profiles._rule_id(rules[0]), selected)
+
     def test_perfil_emite_apenas_keyframe_referenciado(self):
         rules = css_profiles.tinycss2.parse_stylesheet(
             ".spinner { animation: spin 1s; } "

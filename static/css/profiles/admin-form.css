@@ -3295,6 +3295,12 @@ html[data-theme="light"] {
   pointer-events: none;
   transform: none !important;
 }
+.cv-btn.is-loading {
+  cursor: wait;
+  opacity: 0.75;
+  pointer-events: none;
+  position: relative;
+}
 .cv-btn--primary {
   background: var(--btn-primary-bg);
   border-color: var(--btn-primary-border);
@@ -3318,6 +3324,31 @@ html[data-theme="light"] {
   background: var(--btn-secondary-hover-bg);
   border-color: var(--btn-secondary-hover-border);
   color: var(--btn-secondary-hover-color);
+}
+.cv-btn.is-loading::after {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: cv-btn-spin 0.6s linear infinite;
+  margin-left: var(--btn-gap);
+  flex-shrink: 0;
+}
+@keyframes cv-btn-spin {
+  to { transform: rotate(360deg); }
+}
+.cv-btn.is-selected,
+.cv-btn[aria-pressed="true"] {
+  box-shadow: var(--btn-focus-ring), var(--shadow-xs);
+  outline: none;
+}
+.cv-btn--secondary.is-selected,
+.cv-btn--secondary[aria-pressed="true"] {
+  background: var(--color-secondary-soft);
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
 }
 :root {
   --icon-btn-size: var(--control-height-md);
@@ -3399,6 +3430,16 @@ html[data-theme="light"] {
   border-color: var(--color-accent);
   color: var(--color-accent-text, var(--color-accent));
 }
+.icon-btn--settings.is-assinado {
+  background: linear-gradient(135deg, #1f8f4e 0%, var(--color-success, #24a25b) 100%);
+  border-color: #167039;
+  color: var(--color-white, #fff);
+}
+.icon-btn--settings.is-assinado:hover,
+.icon-btn--settings.is-assinado:focus {
+  background: linear-gradient(135deg, #1a7a43 0%, #1f8f4e 100%);
+  border-color: #125d30;
+}
 .icon-btn[data-tooltip]::after {
   background: var(--icon-btn-tooltip-bg);
   border: 1px solid var(--icon-btn-tooltip-border);
@@ -3431,6 +3472,11 @@ html[data-theme="light"] {
   z-index: calc(var(--z-dropdown) + 1);
 }
 .icon-btn[data-tooltip][aria-expanded="true"]::after {
+  content: none;
+  display: none;
+}
+.has-cv-global-tooltips .icon-btn[data-tooltip]::after,
+.has-cv-global-tooltips [data-tooltip]::after {
   content: none;
   display: none;
 }
@@ -3938,6 +3984,9 @@ html[data-theme="light"] .segment-toggle {
     width: 100%;
     z-index: var(--z-sidebar, 20);
   }
+body.has-sidebar-open .sidebar {
+    transform: translateX(0);
+  }
 .sidebar-scrim {
     background: rgba(2, 9, 16, 0.7);
     border: 0;
@@ -3949,6 +3998,10 @@ html[data-theme="light"] .segment-toggle {
     position: fixed;
     transition: opacity 180ms ease;
     z-index: calc(var(--z-sidebar, 20) - 1);
+  }
+body.has-sidebar-open .sidebar-scrim {
+    opacity: 1;
+    pointer-events: auto;
   }
 .sidebar-nav {
     display: flex;
@@ -3999,6 +4052,18 @@ html[data-theme="light"] .segment-toggle {
   color: var(--color-text-muted);
   font-size: 0.875rem;
   line-height: 1.45;
+}
+.document-loading.is-error .document-loading__spinner {
+  border-color: var(--color-danger);
+  animation: none;
+}
+.document-loading.is-error .document-loading__spinner::after {
+  content: "!";
+  display: grid;
+  height: 100%;
+  place-items: center;
+  color: var(--color-danger);
+  font-weight: 900;
 }
 @media (max-width: 600px) {
 .document-loading {
@@ -4211,6 +4276,12 @@ html[data-theme="dark"]
   background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface-soft));
   border-color: color-mix(in srgb, var(--color-accent) 50%, transparent);
   color: var(--color-accent);
+}
+html[data-theme="dark"]
+  .icon-btn--field-manage.icon-btn--settings:not(.is-assinado):is(:hover, :focus, :focus-visible) {
+  background: color-mix(in srgb, var(--color-accent) 28%, var(--color-surface-muted));
+  border-color: var(--color-accent);
+  color: var(--color-accent-text, var(--color-accent));
 }
 html[data-theme="dark"] :is(.app-card, .card, .subcard, .form-section, .app-form-section, .form-section-card, .main-list-card, .list-card, .empty-state) {
   background-color: var(--color-surface);
@@ -5234,6 +5305,10 @@ html[data-theme] .app-theme-grid__btn small {
   overflow: hidden;
   position: relative;
   z-index: 1;
+}
+.list-header--wizard-band.is-detached {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
 }
 .list-header--wizard-band .list-header__band {
   align-items: center;

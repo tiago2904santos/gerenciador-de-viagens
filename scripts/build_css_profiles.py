@@ -83,6 +83,7 @@ _INTERACTIVE_STATE = re.compile(
     r":(?:hover|focus(?:-visible|-within)?|active|checked|disabled|enabled|open)\b"
     r"|\.(?:is|has)-[\w-]+|\[(?:aria-(?:expanded|selected|pressed|checked)|open)="
 )
+_STATE_CLASS = re.compile(r"^(?:is|has)-")
 _IMPORT = re.compile(r'@import\s+url\(["\']?([^"\')]+)["\']?\)\s*;')
 
 def _serialized(rule) -> str:
@@ -133,13 +134,17 @@ def _with_dom_families(
     for rule in qualified:
         selector = _selector(rule)
         classes = set(_CLASS.findall(selector))
+        structural_classes = {
+            class_name for class_name in classes if not _STATE_CLASS.match(class_name)
+        }
         # Regras normais presentes no DOM ja entram pelos fragmentos medidos do
         # manifesto. A expansao por familia existe somente para estados que o
-        # CDP nao casa sem interacao (hover/focus/checked etc.); incluir toda
-        # regra da familia inflava o perfil com CSS comprovadamente nao usado.
+        # CDP nao casa sem interacao (hover/focus/checked etc.). Classes de
+        # estado como ``is-open`` so aparecem depois da interacao e, portanto,
+        # nao podem ser exigidas no retrato inicial do DOM.
         if (
-            classes
-            and classes.issubset(dom_classes)
+            structural_classes
+            and structural_classes.issubset(dom_classes)
             and _INTERACTIVE_STATE.search(selector)
         ):
             result.add(_rule_id(rule))
