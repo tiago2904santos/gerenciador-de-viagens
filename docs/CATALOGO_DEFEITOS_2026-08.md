@@ -4062,7 +4062,7 @@ do queryset auto-gerado. O repositório já aplica `filter_queryset_by_area` em 
 `forms.py`, então a lacuna pode ser pequena — ou pode não ser. A régua natural é estender
 `scripts/audit_area_scoped_managers.py` com essa varredura.
 
-### NOVO-28 🟠 `NOVO` A suíte desliga a configuração de numeração e não enxerga o piso do ofício · QA · 0,5 d
+### NOVO-28 ✅ RESOLVIDO (12/08/2026) · `NOVO` A suíte desliga a configuração de numeração e não enxerga o piso do ofício · QA · 0,5 d
 
 `config/settings/test.py:36` põe `OFICIO_NUMERACAO_USAR_CONFIGURACAO = False`; em produção é
 `True` (`config/settings/base.py:179`). Com ele desligado, `Oficio.get_next_available_numero`
@@ -4083,6 +4083,11 @@ outras duas: `NOVO-20` (`CELERY_TASK_ALWAYS_EAGER` roda a task dentro do request
 **Correção:** decidir se o `False` ainda serve a algum teste — ele foi posto para tornar a
 numeração previsível — e, se servir, invertê-lo (`True` por padrão, `False` só onde for pedido),
 para que o padrão da suíte seja o de produção.
+
+**Fechamento:** `config.settings.test` não sobrescreve mais a configuração de produção. Os fluxos
+reais de criação agora provam o piso global 75 de 2026; somente quatro testes unitários do algoritmo
+genérico abaixo do piso pedem `False` explicitamente. As três provas que antes precisavam do alias
+`COMO_EM_PRODUCAO` rodam agora sob o padrão da suíte, e uma asserção trava essa paridade.
 
 ---
 

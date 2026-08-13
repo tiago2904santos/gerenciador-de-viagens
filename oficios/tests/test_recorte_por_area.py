@@ -22,11 +22,11 @@ propósito**. Sob `objects`, `area=A AND (area=A OR area IS NULL)` colapsa em
 
 from __future__ import annotations
 
+from django.conf import settings
 from django.test import TestCase
-from django.test import override_settings
 
-from core.tests.test_area_scoped_manager import com_request
-from core.tests.test_area_scoped_manager import sem_request
+from core.testing import com_request
+from core.testing import sem_request
 from oficios.models import ConfiguracaoNumeracaoOficio
 from oficios.models import ModeloMotivoOficio
 from oficios.models import Oficio
@@ -95,14 +95,6 @@ class RecorteChegaNosQuatroModelosTests(TestCase):
                 self.assertEqual(modelo._meta.default_manager_name, "all_objects")
 
 
-#: `config/settings/test.py:36` desliga `OFICIO_NUMERACAO_USAR_CONFIGURACAO`, que em
-#: produção é `True` (`config/settings/base.py:179`). Com ele desligado o ramo inteiro
-#: de `ConfiguracaoNumeracaoOficio` nem é consultado e `piso` é sempre 1 — ou seja, o
-#: site mais perigoso desta fatia seria **inalcançável pela suíte**. Mesma família do
-#: `NOVO-20` (`CELERY_TASK_ALWAYS_EAGER`), registrada como `NOVO-28`.
-COMO_EM_PRODUCAO = override_settings(OFICIO_NUMERACAO_USAR_CONFIGURACAO=True)
-
-
 class NumeracaoNaoPodeSerRecortadaTests(TestCase):
     """Os onze sites de `all_objects`, um teste por consequência.
 
@@ -124,9 +116,11 @@ class NumeracaoNaoPodeSerRecortadaTests(TestCase):
         self.area = AreaTrabalho.objects.create(nome="Área A", sigla="NUM-A")
         self.outra = AreaTrabalho.objects.create(nome="Área B", sigla="NUM-B")
 
+    def test_suite_exerce_a_mesma_configuracao_de_producao(self):
+        self.assertTrue(settings.OFICIO_NUMERACAO_USAR_CONFIGURACAO)
+
     # ── o piso global: o site mais perigoso do ID ──
 
-    @COMO_EM_PRODUCAO
     def test_o_piso_global_sobrevive_ao_recorte(self):
         """`ConfiguracaoNumeracaoOficio` com `area IS NULL` é o padrão de todos.
 
@@ -146,7 +140,6 @@ class NumeracaoNaoPodeSerRecortadaTests(TestCase):
             msg="o piso global sumiu e a numeração reiniciou",
         )
 
-    @COMO_EM_PRODUCAO
     def test_o_piso_da_propria_area_continua_ganhando_do_global(self):
         """O recorte não pode ter atropelado a precedência que já existia:
         `order_by(F("area_id").desc(nulls_last=True))` põe a área na frente."""
@@ -275,7 +268,6 @@ class NumeracaoNaoPodeSerRecortadaTests(TestCase):
 
     # ── o piso global que existe de verdade em produção ──
 
-    @COMO_EM_PRODUCAO
     def test_o_piso_global_semeado_pela_migracao_continua_valendo(self):
         """A versão mais forte do primeiro teste: o dado é o de produção.
 
