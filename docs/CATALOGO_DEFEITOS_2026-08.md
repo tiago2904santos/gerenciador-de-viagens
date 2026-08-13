@@ -3889,7 +3889,7 @@ mesmo tratamento.
 **Prioridade:** 🔴 pelo que o defeito original permitia, não pelo trabalho de fechá-lo. A chave já
 foi trocada; o gate é para a próxima.
 
-### NOVO-13 🟠 `NOVO` A limpeza de rascunhos apagava trabalho em curso de outra pessoa da mesma área · COR · 0,5 d
+### NOVO-13 ✅ RESOLVIDO (12/08/2026) · `NOVO` A limpeza de rascunhos apagava trabalho em curso de outra pessoa da mesma área · COR · 0,5 d
 
 Achado ao consertar o `DB-03`, e é a metade do defeito que o catálogo não viu.
 
@@ -3919,6 +3919,11 @@ cedo demais é trabalho perdido.
 demorem mais de duas horas ainda colidem. A correção completa é `Roteiro` ter dono — campo de
 usuário criador —, o que é migração e entra em `DB-02`/Fase 2 quando o modelo for mexido de todo
 jeito. Registrado aqui para não se perder.
+
+**Reconciliação:** o código e os cinco testes de `test_limpeza_rascunhos.py` já materializavam essa
+correção, mas o título ainda permanecia aberto. O status agora reflete a implementação vigente: a
+limpeza preserva rascunhos recentes e de outra área, remove o órfão antigo da própria área e nunca
+remove o roteiro atual nem um roteiro com conteúdo.
 
 ### QA-17 ✅ RESOLVIDO · Dezessete PRs abertos sem triagem · MED · 1 d
 
