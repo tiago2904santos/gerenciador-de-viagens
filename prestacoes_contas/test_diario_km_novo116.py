@@ -18,9 +18,7 @@ O segundo é o que dá o teste mais valioso do arquivo
 (`test_trocar_os_dois_km_para_valores_maiores_grava`): ele não fala de dado inválido
 nenhum, e reprovava do mesmo jeito.
 
-Nota de fixture herdada do `BE-14` e do `NOVO-107`: `criar_prestacao` monta ofício
-**sem roteiro**, e sem roteiro `sincronizar_trechos` não cria linha — todo cenário
-viraria verde por omissão. Daí o `_com_roteiro`.
+O `NOVO-107` tornou o roteiro parte do estado padrão da fixture, como em produção.
 """
 
 from __future__ import annotations
@@ -33,9 +31,6 @@ from django.urls import reverse
 from prestacoes_contas.models import DiarioBordo
 from prestacoes_contas.test_helpers import PrestacaoFixturesMixin
 
-from .test_diario_transacao_be14 import _com_roteiro
-
-
 MENSAGEM = "O km final não pode ser menor que o km inicial."
 
 
@@ -46,7 +41,6 @@ class KmDoDiarioNoAutosaveTests(PrestacaoFixturesMixin, TestCase):
         super().setUp()
         self.setUpPrestacaoFixtures()
         self.fixture = self.criar_prestacao(numero=81)
-        _com_roteiro(self.fixture.oficio)
         self.prestacao = self.fixture.prestacao
         self.ps = self.fixture.prestacoes_servidor[0]
         self.diario, _ = DiarioBordo.objects.get_or_create(prestacao=self.prestacao)
@@ -154,7 +148,6 @@ class KmDoDiarioNoFormsetTests(PrestacaoFixturesMixin, TestCase):
         super().setUp()
         self.setUpPrestacaoFixtures()
         self.fixture = self.criar_prestacao(numero=82)
-        _com_roteiro(self.fixture.oficio)
         self.prestacao = self.fixture.prestacao
         self.ps = self.fixture.prestacoes_servidor[0]
         self.diario, _ = DiarioBordo.objects.get_or_create(prestacao=self.prestacao)
