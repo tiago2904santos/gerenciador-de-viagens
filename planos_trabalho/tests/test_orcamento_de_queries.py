@@ -144,6 +144,6 @@ class OrcamentoDeQueriesPlanoTrabalhoTests(TestCase):
     # `NOVO-50`: a página passou a escolher IDs antes de hidratar dimensões.
     # O prefetch de destinos agora resolve cidade/estado na mesma consulta e o
     # card não busca mais `eventos__programa`, relação que ele não lê: -2.
-    QUERIES_LISTA = 11
-    QUERIES_LISTA_BUSCA = 11
+    QUERIES_LISTA = 10
+    QUERIES_LISTA_BUSCA = 10
     QUERIES_WIZARD = 19
