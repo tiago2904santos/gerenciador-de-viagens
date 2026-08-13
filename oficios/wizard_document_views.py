@@ -25,7 +25,7 @@ from .view_navigation import oficio_back_url as _oficio_back_url
 from .view_navigation import url_with_next as _url_with_next
 from core.wizard import normalizar_acao_do_wizard
 
-from .view_helpers import _redirect_lista_oficio, _wizard_footer_ctx, _wizard_shell_ctx, _wizard_roteiro_step_status, _merge_payload_fields, _oficio_autosave_version, _justificativa_autosave_data, _autosave_form_errors
+from .view_helpers import _redirect_after_wizard_save, _redirect_lista_oficio, _wizard_footer_ctx, _wizard_shell_ctx, _wizard_roteiro_step_status, _merge_payload_fields, _oficio_autosave_version, _justificativa_autosave_data, _autosave_form_errors
 
 
 def wizard_justificativa(request, pk):
@@ -52,19 +52,18 @@ def wizard_justificativa(request, pk):
             form,
             action="save_continue" if nav_action == "wizard_next" else "save_draft",
         )
-        if nav_action == "wizard_back":
-            messages.success(request, "Justificativa salva.")
-            return redirect("oficios:wizard_roteiro", pk=oficio.pk)
-        if nav_action == "save_draft_list":
-            return _redirect_lista_oficio(request, oficio, "Justificativa salva.")
-        if nav_action == "wizard_next":
-            messages.success(
-                request,
-                "Justificativa salva. Continue para documentos quando estiver pronto.",
-            )
-            return redirect("oficios:wizard_documentos", pk=oficio.pk)
-        messages.success(request, "Rascunho da justificativa salvo.")
-        return redirect("oficios:wizard_justificativa", pk=oficio.pk)
+        return _redirect_after_wizard_save(
+            request,
+            oficio,
+            nav_action,
+            current_route="oficios:wizard_justificativa",
+            default_message="Rascunho da justificativa salvo.",
+            back_route="oficios:wizard_roteiro",
+            back_message="Justificativa salva.",
+            next_route="oficios:wizard_documentos",
+            next_message="Justificativa salva. Continue para documentos quando estiver pronto.",
+            list_message="Justificativa salva.",
+        )
 
     dados_av = avaliar_oficio_dados_viajantes(oficio=oficio)
     transp_av = avaliar_oficio_transporte(oficio)
@@ -157,13 +156,19 @@ def wizard_documentos(request, pk):
             from documentos.services.warm_cache import ensure_document_artifact_cached
 
             ensure_document_artifact_cached(oficio)
-            messages.info(request, "Retornando à etapa anterior.")
-            return redirect("oficios:wizard_justificativa", pk=pk)
         if nav_action == "save_draft_list":
             oficio.save(update_fields=["updated_at"])
-            return _redirect_lista_oficio(request, oficio, "Rascunho salvo.")
-        messages.success(request, "Rascunho salvo.")
-        return redirect("oficios:wizard_documentos", pk=pk)
+        return _redirect_after_wizard_save(
+            request,
+            oficio,
+            nav_action,
+            current_route="oficios:wizard_documentos",
+            default_message="Rascunho salvo.",
+            back_route="oficios:wizard_justificativa",
+            back_message="Retornando à etapa anterior.",
+            list_message="Rascunho salvo.",
+            nivel=messages.info if nav_action == "wizard_back" else messages.success,
+        )
 
     dados_av = avaliar_oficio_dados_viajantes(oficio=oficio)
     transp_av = avaliar_oficio_transporte(oficio)

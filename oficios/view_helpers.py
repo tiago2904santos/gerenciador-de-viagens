@@ -23,6 +23,36 @@ def _redirect_lista_oficio(request, oficio, message):
     return redirect("oficios:index")
 
 
+def _redirect_after_wizard_save(
+    request,
+    oficio,
+    nav_action,
+    *,
+    current_route,
+    default_message,
+    back_route=None,
+    back_message=None,
+    next_route=None,
+    next_message=None,
+    list_message=None,
+    nivel=messages.success,
+):
+    """Traduz uma ação normalizada em mensagem e destino (`NOVO-92`)."""
+    if nav_action == "wizard_back":
+        if back_route:
+            nivel(request, back_message or default_message)
+            return redirect(back_route, pk=oficio.pk)
+        if list_message:
+            return _redirect_lista_oficio(request, oficio, list_message)
+    if nav_action == "save_draft_list" and list_message:
+        return _redirect_lista_oficio(request, oficio, list_message)
+    if nav_action == "wizard_next" and next_route:
+        nivel(request, next_message or default_message)
+        return redirect(next_route, pk=oficio.pk)
+    nivel(request, default_message)
+    return redirect(current_route, pk=oficio.pk)
+
+
 # BE-01: a implementação mora em core/wizard.py, compartilhada com planos de
 # trabalho. O alias sobrevive porque `oficios.views._wizard_normalizar_acao` é
 # contrato de um teste existente.

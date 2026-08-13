@@ -1,6 +1,5 @@
 from django.contrib import messages
 from django.db.models import Q
-from django.shortcuts import redirect
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
 from core.autosave import AutosavePayloadError
@@ -26,7 +25,7 @@ from .view_navigation import oficio_back_label as _oficio_back_label
 from .view_navigation import oficio_back_url as _oficio_back_url
 from core.wizard import normalizar_acao_do_wizard
 
-from .view_helpers import _redirect_lista_oficio, _wizard_footer_ctx, _wizard_shell_ctx, _wizard_roteiro_step_status
+from .view_helpers import _redirect_after_wizard_save, _wizard_footer_ctx, _wizard_shell_ctx, _wizard_roteiro_step_status
 
 
 def _resolver_roteiro_rascunho_autosave(post, *, oficio):
@@ -84,41 +83,6 @@ def wizard_roteiro_autosave_criar(request, pk):
     return autosave_json_response(ok=True, object_id=roteiro.pk, created=True, version=version)
 
 
-def _redirect_after_roteiro_save(
-    request,
-    oficio,
-    nav_action,
-    *,
-    nivel,
-    msg_next,
-    msg_back,
-    msg_lista=None,
-    msg_default=None,
-):
-    """Traduz a ação do rodapé em redirect, depois de a Etapa 2 ter gravado.
-
-    `BE-12`: as duas cadeias `if nav_action == …` da view eram a mesma coisa com textos
-    diferentes. `wizard_next` desvia para a justificativa quando a antecedência da saída a
-    torna obrigatória — e por isso a checagem tem de vir **depois** da gravação, que é
-    quem grava a data de saída. Segue o par já existente em `traveler_views.py`
-    (`_redirect_after_dados_viajantes_save`, `_redirect_after_transporte_save`).
-
-    `nav_action` chega já normalizado por `normalizar_acao_do_wizard`, nunca cru.
-    """
-    if nav_action == "wizard_next":
-        nivel(request, msg_next)
-        if oficio_exige_justificativa(oficio):
-            return redirect("oficios:wizard_justificativa", pk=oficio.pk)
-        return redirect("oficios:wizard_documentos", pk=oficio.pk)
-    if nav_action == "wizard_back":
-        nivel(request, msg_back)
-        return redirect("oficios:dados_viajantes", pk=oficio.pk)
-    if nav_action == "save_draft_list" and msg_lista is not None:
-        return _redirect_lista_oficio(request, oficio, msg_lista)
-    nivel(request, msg_default or msg_back)
-    return redirect("oficios:wizard_roteiro", pk=oficio.pk)
-
-
 def wizard_roteiro(request, pk):
     oficio = get_oficio_by_id(pk)
     # Nao cria mais um Roteiro vazio so por abrir a etapa: enquanto o oficio nao tiver
@@ -156,15 +120,23 @@ def wizard_roteiro(request, pk):
                 roteiro_vinculado=roteiro_vinculado,
             )
             roteiro_vinculado = resultado.roteiro
-            return _redirect_after_roteiro_save(
+            next_route = (
+                "oficios:wizard_justificativa"
+                if oficio_exige_justificativa(oficio)
+                else "oficios:wizard_documentos"
+            )
+            return _redirect_after_wizard_save(
                 request,
                 oficio,
                 nav_action,
+                current_route="oficios:wizard_roteiro",
+                default_message="Rascunho do roteiro salvo.",
+                back_route="oficios:dados_viajantes",
+                back_message="Roteiro e diárias salvos.",
+                next_route=next_route,
+                next_message="Roteiro e diárias salvos. Continue para a próxima etapa quando estiver pronto.",
+                list_message="Roteiro e diárias salvos.",
                 nivel=messages.success,
-                msg_next="Roteiro e diárias salvos. Continue para a próxima etapa quando estiver pronto.",
-                msg_back="Roteiro e diárias salvos.",
-                msg_lista="Roteiro e diárias salvos.",
-                msg_default="Rascunho do roteiro salvo.",
             )
 
         if nav_action in ("wizard_next", "wizard_back"):
@@ -177,13 +149,22 @@ def wizard_roteiro(request, pk):
                 roteiro_vinculado=roteiro_vinculado,
             )
             roteiro_vinculado = resultado.roteiro
-            return _redirect_after_roteiro_save(
+            next_route = (
+                "oficios:wizard_justificativa"
+                if oficio_exige_justificativa(oficio)
+                else "oficios:wizard_documentos"
+            )
+            return _redirect_after_wizard_save(
                 request,
                 oficio,
                 nav_action,
+                current_route="oficios:wizard_roteiro",
+                default_message="Roteiro incompleto salvo como rascunho.",
+                back_route="oficios:dados_viajantes",
+                back_message="Roteiro incompleto salvo como rascunho.",
+                next_route=next_route,
+                next_message="Roteiro incompleto salvo como rascunho. Você pode completar depois.",
                 nivel=messages.info,
-                msg_next="Roteiro incompleto salvo como rascunho. Você pode completar depois.",
-                msg_back="Roteiro incompleto salvo como rascunho.",
             )
 
         for error in validated.get("errors", []):
