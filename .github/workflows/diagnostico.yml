@@ -9,7 +9,14 @@ on:
         options:
           - infra
           - drive
+          - maiusculas_simular
+          - maiusculas_aplicar
         default: infra
+      confirmar_maiusculas:
+        description: "Para aplicar, digite exatamente: NORMALIZAR PRODUCAO"
+        type: string
+        required: false
+        default: ""
 
 jobs:
   diagnostico:
@@ -139,3 +146,61 @@ jobs:
             PYEOF
             python manage.py shell < /tmp/diag.py
             rm -f /tmp/diag.py
+
+      - name: Normalizar maiúsculas com backup (NOVO-57)
+        if: ${{ startsWith(inputs.modo, 'maiusculas_') }}
+        uses: appleboy/ssh-action@v1.2.5
+        env:
+          MODO_MAIUSCULAS: ${{ inputs.modo }}
+          CONFIRMACAO_MAIUSCULAS: ${{ inputs.confirmar_maiusculas }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: MODO_MAIUSCULAS,CONFIRMACAO_MAIUSCULAS
+          script: |
+            set -Eeuo pipefail
+            cd /var/www/gerenciador-viagens/app
+            source /var/www/gerenciador-viagens/venv/bin/activate
+            set -a
+            source .env
+            set +a
+            export DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE:-config.settings.prod}"
+
+            : "${DB_NAME:?DB_NAME ausente}"
+            : "${DB_USER:?DB_USER ausente}"
+            : "${DB_PASSWORD:?DB_PASSWORD ausente}"
+            : "${BACKUP_ENCRYPTION_KEY:?BACKUP_ENCRYPTION_KEY ausente}"
+            export PGHOST="${DB_HOST:-127.0.0.1}"
+            export PGPORT="${DB_PORT:-5432}"
+            export PGUSER="${DB_USER}"
+            export PGPASSWORD="${DB_PASSWORD}"
+
+            mkdir -p /var/backups/gerenciador-viagens
+            BACKUP_FILE="$(APP_ROOT=/var/www/gerenciador-viagens/app bash scripts/backup_production.sh | tail -1)"
+            test -s "${BACKUP_FILE}"
+            echo "backup NOVO-57 criado: ${BACKUP_FILE}"
+
+            echo "=== Simulação estrita ==="
+            python manage.py normalizar_maiusculas --strict
+
+            if [ "${MODO_MAIUSCULAS}" = "maiusculas_simular" ]; then
+              echo "simulação concluída; nenhuma linha foi alterada"
+              exit 0
+            fi
+
+            if [ "${CONFIRMACAO_MAIUSCULAS}" != "NORMALIZAR PRODUCAO" ]; then
+              echo "confirmação inválida; nada foi alterado"
+              exit 1
+            fi
+
+            echo "=== Aplicação estrita ==="
+            python manage.py normalizar_maiusculas --strict --commit
+
+            echo "=== Verificação pós-aplicação ==="
+            POS="$(mktemp)"
+            python manage.py normalizar_maiusculas --strict | tee "${POS}"
+            DIVERGENTES="$(awk '$1 == "TOTAL" {print $3}' "${POS}")"
+            rm -f "${POS}"
+            test "${DIVERGENTES}" = "0"
+            echo "NOVO-57 concluído: zero linhas divergentes"
