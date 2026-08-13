@@ -17,17 +17,7 @@
 
       {% if s.has_termo %}
       <div class="person-row__actions">
-        <button
-          type="button"
-          class="icon-btn icon-btn--edit{% if s.termo_assinado %} is-assinado{% endif %}"
-          aria-label="Ações do termo de {{ s.name }}"
-          aria-haspopup="true"
-          aria-expanded="false"
-          aria-controls="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}"
-          data-tooltip="{% if s.termo_assinado %}Termo assinado — ações{% else %}Ações do termo{% endif %}"
-          data-overlay-trigger data-overlay-kind="menu"
-          data-overlay-target="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}"
-          data-overlay-src="{{ card.menus_url }}"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#cv-icon-more"></use></svg></button>
+        {% include "cotton/ui/buttons/icon_control_flat.html" with class_name=s.termo_action_class aria_label=s.termo_action_aria tooltip=s.termo_action_tooltip icon="more" overlay_kind="menu" overlay_target=s.termo_action_menu_id overlay_src=card.menus_url controls=s.termo_action_menu_id only %}
         
       </div>
       {% endif %}
@@ -65,20 +55,7 @@
     {% if card.trechos %}
     <div class="fact-block fact-block--trechos">
       <span class="fact-block__label">Trechos encontrados</span>
-      <ul class="itinerary">
-        {% for trecho in card.trechos %}
-        <li class="itinerary__leg">
-          <div class="itinerary__route">{{ trecho.rota }}</div>
-          {% if trecho.saida or trecho.chegada %}
-          <div class="itinerary__time">
-            {% if trecho.saida %}{{ trecho.saida }}{% endif %}
-            {% if trecho.saida and trecho.chegada %} → {% endif %}
-            {% if trecho.chegada %}{{ trecho.chegada }}{% endif %}
-          </div>
-          {% endif %}
-        </li>
-        {% endfor %}
-      </ul>
+      {% include "cotton/ui/lists/itinerary.html" with items=card.trechos only %}
     </div>
     {% endif %}
 
@@ -117,18 +94,8 @@
         </span>
       </div>
       <div class="person-row__termo icon-btn-group">
-        <a class="icon-btn icon-btn--edit" href="{{ card.justificativa_url }}" aria-label="Editar justificativa" data-tooltip="Editar justificativa"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#cv-icon-edit"></use></svg></a>
-        <button
-          class="icon-btn icon-btn--documents"
-          type="button"
-          aria-label="Abrir documentos da justificativa"
-          aria-haspopup="true"
-          aria-expanded="false"
-          aria-controls="justificativa-document-menu-{{ card.oficio_pk }}"
-          data-tooltip="Visualizar e baixar"
-          data-overlay-trigger data-overlay-kind="menu"
-          data-overlay-target="justificativa-document-menu-{{ card.oficio_pk }}"
-          data-overlay-src="{{ card.menus_url }}"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#cv-icon-folder"></use></svg></button>
+        {% include "cotton/ui/buttons/icon_control_flat.html" with class_name="icon-btn icon-btn--edit" href=card.justificativa_url aria_label="Editar justificativa" tooltip="Editar justificativa" icon="edit" only %}
+        {% include "cotton/ui/buttons/icon_control_flat.html" with class_name="icon-btn icon-btn--documents" aria_label="Abrir documentos da justificativa" tooltip="Visualizar e baixar" icon="folder" overlay_kind="menu" overlay_target=card.justificativa_menu_id overlay_src=card.menus_url controls=card.justificativa_menu_id only %}
         
       </div>
     </li>

@@ -118,7 +118,11 @@ class ItineraryComponentTests(SimpleTestCase):
         templates_root = ROOT / "templates"
         for relative in CONSUMERS:
             source = (templates_root / relative).read_text(encoding="utf-8")
-            self.assertIn("<c-ui.lists.itinerary", source, relative)
+            self.assertTrue(
+                "<c-ui.lists.itinerary" in source
+                or 'include "cotton/ui/lists/itinerary.html"' in source,
+                relative,
+            )
             get_template(relative)
 
         raw = []

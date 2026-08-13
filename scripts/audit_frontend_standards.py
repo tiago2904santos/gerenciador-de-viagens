@@ -23,6 +23,18 @@ TEMPLATE_EXCEPTIONS: dict[str, dict] = {
         "reason": "Shell dashboard-login-inspired e excecao oficial -- usa 100% CSS vars.",
         "rules": {"legacy_page_header"},
     },
+    "templates/oficios/partials/oficio_list_card.html": {
+        "reason": "PF-05: caminho quente inclui a variante canonica achatada para nao expandir Cotton por card.",
+        "rules": {"component_include"},
+    },
+    "templates/oficios/partials/_oficio_card_body.html": {
+        "reason": "PF-05: primitivas canonicas por include preservam o contrato sem custo Cotton no laco.",
+        "rules": {"component_include"},
+    },
+    "templates/cotton/ui/lists/entity_card_flat.html": {
+        "reason": "PF-05: variante canonica de alto volume usa includes Django deliberadamente.",
+        "rules": {"component_include"},
+    },
 }
 
 CSS_EXCEPTIONS: dict[str, dict] = {

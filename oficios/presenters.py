@@ -171,6 +171,7 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
                     oficio_id=oficio.pk,
                     servidor_id=s.pk,
                 )
+        termo_assinado = assinado_info["assinado"]
         servidores_display.append({
             "servidor_pk": s.pk,
             "initials": _iniciais_nome_servidor(s.nome),
@@ -184,7 +185,17 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
             "termo_open_url": termo_open_url,
             "termo_pdf_url": termo_pdf_url,
             "termo_docx_url": termo_docx_url,
-            "termo_assinado": assinado_info["assinado"],
+            "termo_assinado": termo_assinado,
+            "termo_action_class": (
+                "icon-btn icon-btn--edit is-assinado"
+                if termo_assinado
+                else "icon-btn icon-btn--edit"
+            ),
+            "termo_action_aria": f"Ações do termo de {s.nome}",
+            "termo_action_tooltip": (
+                "Termo assinado — ações" if termo_assinado else "Ações do termo"
+            ),
+            "termo_action_menu_id": f"termo-action-menu-{oficio.pk}-{s.pk}",
             "termo_anexar_assinado_url": assinado_info["anexar_assinado_url"],
             "termo_remover_assinado_url": assinado_info["remover_assinado_url"],
             "termo_assinado_nome_original": assinado_info["assinado_nome_original"],
@@ -425,6 +436,7 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
         "valor_diarias_extenso": valor_diarias_extenso,
         "justificativa": justificativa,
         "justificativa_url": reverse("oficios:wizard_justificativa", args=[oficio.pk]),
+        "justificativa_menu_id": f"justificativa-document-menu-{oficio.pk}",
         "justificativa_visualizar_url": reverse("oficios:justificativa_pdf_inline", args=[oficio.pk]),
         "justificativa_pdf_url": reverse("oficios:baixar_justificativa_documento", args=[oficio.pk, "pdf"]),
         "justificativa_docx_url": reverse("oficios:baixar_justificativa_documento", args=[oficio.pk, "docx"]),
@@ -1012,4 +1024,3 @@ def apresentar_oficio_wizard_documentos_context(oficio):
         "generation_status": generation_status,
         "documentos_inline": documentos_inline,
     }
-
