@@ -57,6 +57,18 @@ class AuditUiPatternsTests(SimpleTestCase):
                     )
                     self.assertEqual(auditor.scan_file(bundle, root=root), [])
 
+    def test_perfil_css_gerado_nao_duplica_a_divida_das_fontes(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            profile = root / "static" / "css" / "profiles" / "dashboard.css"
+            profile.parent.mkdir(parents=True)
+            profile.write_text(
+                ".card { background: #ffffff; }\n",
+                encoding="utf-8",
+            )
+
+            self.assertEqual(auditor.scan_file(profile, root=root), [])
+
     def test_componentes_cotton_preservam_a_excecao_dos_componentes_ui(self):
         with TemporaryDirectory() as tmp:
             root = Path(tmp)

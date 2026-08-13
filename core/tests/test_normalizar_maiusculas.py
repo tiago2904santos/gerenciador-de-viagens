@@ -24,6 +24,7 @@ from io import StringIO
 
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.test import TestCase
 
 from eventos.models import TipoEvento
@@ -193,3 +194,14 @@ class NormalizarMaiusculasTests(TestCase):
             ),
             {"Reunião", "REUNIÃO"},
         )
+
+    def test_strict_reverte_todos_os_campos_e_falha_alto(self):
+        """Produção não pode aceitar sucesso parcial quando há colisão."""
+        TipoEvento.objects.create(area=self.area, nome="Reunião")
+        TipoEvento.objects.create(area=self.area, nome="REUNIÃO")
+
+        with self.assertRaisesMessage(CommandError, "nenhuma alteração foi gravada"):
+            rodar("--strict", "--commit")
+
+        self.area.refresh_from_db()
+        self.assertEqual(self.area.nome, "Área de Teste")

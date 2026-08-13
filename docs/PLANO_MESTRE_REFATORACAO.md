@@ -162,11 +162,10 @@ Precisam de resposta humana; nenhuma bloqueia a fase 0.
 Marque aqui, no mesmo PR que faz o trabalho. `[ ]` pendente · `[~]` em andamento · `[x]` pronto.
 O detalhe de cada ID está no [`CATALOGO_DEFEITOS_2026-08.md`](CATALOGO_DEFEITOS_2026-08.md).
 
-**São 95 IDs no catálogo e 92 neste quadro.** Os três de fora estão de fora de propósito:
-`PF-02` e `PF-05` são **métricas de aceite** de outros IDs, não trabalho próprio (uso de CSS por
-rota e tempo da lista de Ofícios); `DB-13` (composição da diária como texto livre) está
-deliberadamente fora desta rodada, porque mexer nele reabre a regra de dinheiro — está catalogado
-para uma rodada futura, com `DB-01` como pré-requisito.
+**São 95 IDs no catálogo e 93 neste quadro.** Os dois de fora são **métricas de aceite** de outros
+IDs, não trabalho próprio: `PF-02` mede uso de CSS por rota e `PF-05`, tempo/HTML da lista de
+Ofícios. O `DB-13`, antes adiado pelo risco monetário, entrou depois do `DB-01`: composição
+estruturada e auditável sem mudar nem recalcular a regra de dinheiro.
 
 ### Fase 0 — Defeitos que atingem o usuário agora ✅ **COMPLETA** (06/08/2026)
 - [x] `BE-01` wizard de plano de trabalho não finaliza e "Voltar" avança
@@ -299,6 +298,9 @@ para uma rodada futura, com `DB-01` como pré-requisito.
       **volta da migração deixa de funcionar** depois que duas áreas usarem a mesma placa.
 
 ### Fase 3 — O banco defende os dados
+- [x] `DB-13` composição das diárias estruturada e vinculada à tarifa usada — teste monetário de
+      caracterização veio antes; linhas novas congelam faixa, percentual, quantidade, vigência,
+      valor e subtotal. O backfill só interpreta resumos inequívocos e não recalcula históricos.
 - [x] `DB-06` cascata apaga comprovante e assinatura já coletados — `sair_da_equipe` marca
       (`removida_em`) quem tem dado coletado e apaga quem não tem; `_default_manager` esconde os
       marcados, então os ~15 pontos de leitura (inclusive `prefetch_related` por string) herdam o
@@ -538,10 +540,13 @@ O quadro abaixo é por ID; a ordem de execução é a das etapas, não a desta l
 - [x] `JS-09` tela embutida entrega só `http.js` + polling: 283.282 → 4.255 bytes de JS · **E11**
 - [x] `JS-10` três stubs sem consumidor removidos; módulos reais e bootstrap preservados · **E11**
 
-**Fechados nesta fase antes do dimensionamento** (a reconstrução parcial de 07–08/08, que o quadro
-não registrava): `NOVO-50/MED` paleta de 255 cores duplicadas · `NOVO-51` poda dos 55 apelidos
-puros de token · `NOVO-52` foco no editor de roteiro · `NOVO-53`/`NOVO-55`/`NOVO-56`/`NOVO-57`
-máscara de maiúscula · `NOVO-59` ícone de botão invisível no tema claro · `NOVO-60` levantamento da
+**Fechados nesta fase** (inclui a reconstrução parcial de 07–08/08, que o quadro não registrava, e
+o fechamento operacional posterior do `NOVO-57`): `NOVO-50/MED` paleta de 255 cores duplicadas ·
+`NOVO-51` poda dos 55 apelidos
+puros de token · `NOVO-52` foco no editor de roteiro · `NOVO-53`/`NOVO-55`/`NOVO-56` máscara de
+maiúscula · `NOVO-57` histórico normalizado em produção (6.597 valores, 77 gravados e zero
+divergentes após backup e pós-checagem) · `NOVO-59` ícone de botão invisível no tema claro ·
+`NOVO-60` levantamento da
 renomeação por função · `NOVO-61` dez nomes mortos em seletor agrupado · `NOVO-62` `Inter`
 empacotada e válida nos dois temas · `NOVO-63` geometria da barra lateral globalizada ·
 `NOVO-64` 176 tokens sem prefixo · `NOVO-65` 545 classes sem prefixo.

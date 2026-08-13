@@ -214,9 +214,10 @@ arquivos; contraste medido (não estimado) nos pares alterados.
 O dimensionamento de `UI-04` depende de F2: quantos componentes precisam sair dos arquivos de
 domínio só se sabe depois de saber quais componentes existem.
 
-**Métrica de aceite da frente inteira:** uso de CSS por rota acima de **35%**. A E0 fixou a linha
-de base reproduzível em **11,3369%–19,2908% nas rotas autenticadas** (70,5559% no login), medida
-por `scripts/medir_css_por_rota.py` e guardada em `scripts/tetos_front.json`.
+**Métrica de aceite da frente inteira (`PF-02`, fechada em 13/08):** uso de CSS por rota acima de
+**35%**. A linha de base reproduzível era **11,3369%–19,2908% nas rotas autenticadas**; os 15 perfis
+por família de tela encerraram o corpus de 43 rotas em **37,5118%–60,3148%**, medido por
+`scripts/medir_css_por_rota.py` e guardado em `scripts/tetos_front.json`.
 
 ### F6 — Teste de JavaScript · **virou a etapa E1 do documento novo**
 

@@ -1,2 +1,2 @@
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/shell.form-components.bundle.css' %}">
+<link rel="stylesheet" href="{% if shell_css_profile_path %}{% static shell_css_profile_path %}{% else %}{% static 'css/shell.form-components.bundle.css' %}{% endif %}">

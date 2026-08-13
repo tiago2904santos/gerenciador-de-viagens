@@ -224,6 +224,88 @@ class Roteiro(CancelavelModel):
         self.valor_diarias_extenso = totais.get("valor_extenso") or ""
 
 
+class RoteiroDiariaComponente(models.Model):
+    """Parcela imutavel que explica o total de diarias de um roteiro (DB-13).
+
+    A FK identifica a tabela oficial usada; os valores copiados preservam a
+    evidencia mesmo se uma vigencia futura for cadastrada. Registros migrados
+    do campo textual ficam com fonte e valores nulos: a migracao recupera o que
+    e demonstravel, sem recalcular dinheiro historico com a tabela atual.
+    """
+
+    ORIGEM_CALCULO = "CALCULO"
+    ORIGEM_LEGADO = "LEGADO"
+    ORIGEM_CHOICES = [
+        (ORIGEM_CALCULO, "Calculo estruturado"),
+        (ORIGEM_LEGADO, "Resumo legado"),
+    ]
+    PERCENTUAL_CHOICES = [(15, "15%"), (30, "30%"), (100, "100%")]
+    FAIXA_CHOICES = [
+        ("INTERIOR", "Interior"),
+        ("CAPITAL", "Capital"),
+        ("BRASILIA", "Brasilia"),
+    ]
+
+    roteiro = models.ForeignKey(
+        Roteiro,
+        on_delete=models.CASCADE,
+        related_name="componentes_diarias",
+    )
+    tabela_diaria = models.ForeignKey(
+        "cadastros.TabelaDiaria",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="+",
+    )
+    ordem = models.PositiveIntegerField(default=0)
+    origem = models.CharField(max_length=12, choices=ORIGEM_CHOICES)
+    faixa = models.CharField(max_length=20, choices=FAIXA_CHOICES, blank=True, default="")
+    percentual = models.PositiveSmallIntegerField(choices=PERCENTUAL_CHOICES)
+    quantidade = models.PositiveIntegerField()
+    valor_unitario = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True
+    )
+    subtotal = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    tabela_vigencia_inicio = models.DateField(null=True, blank=True)
+    periodo_inicio = models.DateTimeField(null=True, blank=True)
+    periodo_fim = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["ordem"]
+        indexes = [
+            models.Index(
+                fields=["percentual", "periodo_inicio"],
+                name="roteiro_diaria_pct_periodo_idx",
+            ),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=("roteiro", "ordem"),
+                name="uniq_roteiro_diaria_componente_ordem",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(quantidade__gt=0),
+                name="roteiro_diaria_componente_qtd_positiva",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(percentual__in=(15, 30, 100)),
+                name="roteiro_diaria_componente_pct_valido",
+            ),
+            nao_negativo(
+                "valor_unitario", name="roteiro_diaria_componente_unit_nao_negativo"
+            ),
+            nao_negativo(
+                "subtotal", name="roteiro_diaria_componente_subtotal_nao_negativo"
+            ),
+            periodo_ordenado(
+                "periodo_inicio",
+                "periodo_fim",
+                name="roteiro_diaria_componente_periodo_ordenado",
+            ),
+        ]
+
+
 class RoteiroDestino(models.Model):
     roteiro = models.ForeignKey(
         Roteiro,

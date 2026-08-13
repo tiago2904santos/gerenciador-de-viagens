@@ -1768,16 +1768,29 @@ expressão nas 4 ou 5 colunas realmente buscadas.
 auditoria realmente faz (uma área, um período) cai em dois índices de coluna única em vez de um
 composto.
 
-### DB-13 🟡 A composição da diária é texto livre · AUD · 4 d · risco alto · **fora desta rodada**
+### DB-13 ✅ RESOLVIDO · A composição da diária era texto livre · AUD · risco alto
 
 `roteiros/models.py:78-82` — `quantidade_diarias = CharField(max_length=120)` guarda uma frase
 ("2 x 100% + 1 x 30%") ao lado de `valor_diarias`. O `Roteiro` não tem FK nem cópia da linha de
 `TabelaDiaria` usada.
 **Efeito:** não há como responder por consulta "quantas diárias de 30% foram pagas em 2026" nem
 reconciliar um valor pago com a tabela vigente na época.
-**Por que fica de fora:** mexer aqui reabre a regra de dinheiro, fechada no ciclo de julho com os
-demonstrativos oficiais travados por teste. O ganho é de auditabilidade, não de correção.
-Catalogado para uma rodada futura, com `DB-01` como pré-requisito.
+**Fechado em 13/08, depois do pré-requisito `DB-01`, sem mudar a regra monetária.** O teste de
+caracterização entrou em commit anterior à implementação e trava o demonstrativo oficial
+Curitiba → São Paulo → Abatiá → Curitiba em **R$ 773,19**, com o mesmo resumo
+`2 x 100% + 1 x 30%`.
+
+`RoteiroDiariaComponente` passa a guardar, para cada parcela: faixa, percentual, quantidade,
+período, FK da `TabelaDiaria`, vigência, valor unitário e subtotal copiados. Assim uma consulta
+com `Sum(..., filter=Q(percentual=30))` responde a quantidade sem interpretar texto, e a soma dos
+subtotais reconcilia o `valor_diarias`. A FK usa `PROTECT`; editar a tabela referenciada não muda
+os valores congelados. O recálculo substitui as linhas e o total na mesma transação.
+
+A migração `roteiros/0016` traz a query de validação e o procedimento de backup exigidos para
+dados financeiros. Ela extrai somente quantidade/percentual de resumos legados inequívocos;
+deixa FK, faixa e valores nulos e **não recalcula dinheiro histórico**. Resumos ambíguos como
+`2,5` permanecem intactos. O contrato tem 7 testes próprios, inclusive rollback causal quando a
+gravação das parcelas falha.
 
 ---
 
@@ -1809,7 +1822,7 @@ de `kb_html` baixado.
 Some da lista o modo de falha antigo (nome errado desenhava interrogação): `id` inexistente não
 desenha nada e não levanta erro. Coberto por `core/tests/test_folha_de_icones.py`.
 
-### PF-02 🟠 90% do CSS entregue não casa com a página · MED · ver plano de front
+### PF-02 ✅ RESOLVIDO (13/08/2026) · 90% do CSS entregue não casa com a página · MED · ver plano de front
 
 Medido no Chromium via CDP: 664–816 KB de CSS entregues por rota, **10,1% a 11,8% casado**. Na
 rota `/prestacoes-contas/`, `oficios.css` (106 KB) chega com **0,0%** de uso.
@@ -1822,6 +1835,19 @@ O trabalho está no [`PLANO_FRONTEND.md`](PLANO_FRONTEND.md); aqui fica a métri
 > as etapas do wizard entre **16,23% e 23,35%**, e as telas de modelos de motivo em **15,01%**.
 > Portanto o carregamento ainda entrega centenas de KB que a rota não usa; não há base para marcar
 > este ID como resolvido só porque a reconstrução avançou.
+
+**Fechamento em 13/08/2026.** O shell monolítico foi substituído, nas rotas conhecidas, por 15
+perfis CSS determinísticos por família de tela. O gerador preserva a ordem da cascata, expande os
+imports das fontes canônicas, mantém as regras normais medidas e completa os estados interativos
+das famílias presentes no DOM; o bundle completo
+permanece como fallback controlado pela flag `CSS_ROUTE_PROFILES_ENABLED`. A catraca passou a exigir
+o piso de **35% em cada uma das 43 rotas**, sem média que esconda uma tela abaixo do aceite.
+
+No corpus local completo — temas claro/escuro, 1440/500 px e conteúdo revelado — o intervalo final
+foi **37,5118%–60,3148%**. Uma comparação independente entre bundle completo e perfis, cobrindo
+cinco famílias representativas nos dois temas e larguras, registrou **20 medições, zero diferenças
+de estilo e zero diferenças estruturais**. `build_shell_bundles.py --check` também valida que os 15
+artefatos e seu manifesto continuam reproduzíveis a partir das fontes.
 
 ### PF-03 ✅ RESOLVIDO · 🟡 Toda requisição escreve na tabela de sessão · MED · 1–2 d · risco médio
 
@@ -5784,7 +5810,7 @@ silêncio. A regra local saiu; quem decide agora é a central, que pergunta pelo
 `oficios` eram exatamente cobertas pela central. A cobertura da máscara vai de **59 para 57**
 campos; o número 59 registrado no `NOVO-55` estava certo quando foi medido e incluía estes dois.
 
-### NOVO-57 🟠 PARCIAL · `NOVO` A máscara vale do próximo cadastro; os registros já gravados ficam na caixa antiga · DB · 0,5 d
+### NOVO-57 ✅ RESOLVIDO · `NOVO` A máscara valia do próximo cadastro; os registros já gravados ficavam na caixa antiga · DB · 0,5 d
 
 O `NOVO-53`/`NOVO-55` puseram a máscara em 57 campos de texto. Ela age no navegador, então vale do
 próximo salvamento em diante: o que já estava no banco continua como foi digitado. O mesmo campo
@@ -5829,9 +5855,9 @@ linha: migrar as outras e deixar o par para trás daria um campo meio migrado, q
 **A simulação escreve e desfaz**, pelo mesmo caminho da aplicação. Um "vai dar certo" que não tentou
 escrever não vale nada num campo com restrição de unicidade.
 
-**Por que fica PARCIAL.** O levantamento abaixo é do banco de **desenvolvimento**, e ele é pequeno
-demais para decidir qualquer coisa — 72 linhas no total. O número que importa é o de produção, e
-este comando existe justamente para que ele possa ser levantado lá sem escrever nada:
+**Levantamento que precedeu a operação.** O banco de desenvolvimento era pequeno demais para decidir
+qualquer coisa — 72 linhas no total. Ele serviu somente para validar o comando antes de medir a base
+real:
 
 | | |
 |---|---|
@@ -5843,8 +5869,27 @@ este comando existe justamente para que ele possa ser levantado lá sem escrever
 Os quatro campos com divergência em dev: `eventos.TipoEvento.nome` (5), `AtividadePlanoTrabalho.nome`
 (11), `HorarioAtendimento.faixa` (3), `usuarios.AreaTrabalho.nome` (1).
 
-**Fecha quando** a contagem rodar contra produção, os campos bloqueados (se houver) forem resolvidos
-no sistema, e o `--commit` for aplicado com backup.
+**Preparação operacional em 13/08.** O comando ganhou `--strict`: se qualquer campo colidir com uma
+restrição, a execução falha e a transação inteira volta, em vez de deixar uma aplicação parcial. O
+workflow manual passou a criar backup criptografado, rodar a simulação estrita e exigir a frase de
+confirmação antes do `--commit`; depois ele repete a medição e exige zero divergências. A primeira
+tentativa na VPS criou o backup
+`gerenciador-20260813T091653Z.tar.gz.enc` e parou antes da leitura/escrita porque produção ainda
+estava no comando anterior, sem `--strict`. Nenhuma linha foi alterada naquela tentativa; o código
+precisava primeiro passar por CI e deploy para a execução operacional prosseguir.
+
+**Fechamento operacional em 13/08/2026.** O commit testado passou no CI
+([run 31687073653](https://github.com/tiago2904santos/gerenciador-de-viagens/actions/runs/31687073653))
+e foi implantado pelo deploy automático
+([run 31688212739, tentativa 2](https://github.com/tiago2904santos/gerenciador-de-viagens/actions/runs/31688212739)).
+A simulação estrita em produção
+([run 31689014449](https://github.com/tiago2904santos/gerenciador-de-viagens/actions/runs/31689014449))
+criou o backup criptografado `gerenciador-20260813T095840Z.tar.gz.enc`, leu **6.597** valores em 44
+campos e encontrou **77 divergentes**, sem colisão ou campo bloqueado. A aplicação confirmada
+([run 31689059818](https://github.com/tiago2904santos/gerenciador-de-viagens/actions/runs/31689059818))
+criou um segundo backup criptografado, `gerenciador-20260813T095917Z.tar.gz.enc`, repetiu a
+simulação, gravou as 77 normalizações dentro da transação estrita e terminou com a verificação
+pós-aplicação **`TOTAL 6597 / divergentes 0`**. O critério de fechamento foi cumprido integralmente.
 
 ### NOVO-58 ✅ RESOLVIDO · `NOVO` Claro e escuro não eram dois temas do mesmo sistema · UI · a decidir
 
