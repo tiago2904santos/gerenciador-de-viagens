@@ -15,6 +15,7 @@ As abas são mutuamente exclusivas.
 """
 from urllib.parse import urlencode
 
+from django.db.models import Count
 from django.db.models import Exists
 from django.db.models import Q
 from django.utils import timezone
@@ -85,12 +86,16 @@ def q_da_aba(aba, *, date_field, cancelado_q):
 
 def contar_por_aba(base_qs, *, date_field, cancelado_q):
     """Total de documentos em cada aba, respeitando os filtros do ``base_qs``."""
-    return {
-        chave: base_qs.filter(
-            q_da_aba(chave, date_field=date_field, cancelado_q=cancelado_q)
-        ).values("pk").distinct().count()
+    filtros = {
+        chave: q_da_aba(chave, date_field=date_field, cancelado_q=cancelado_q)
         for chave, _ in ABA_LABELS
     }
+    return base_qs.aggregate(
+        **{
+            chave: Count("pk", filter=filtro, distinct=True)
+            for chave, filtro in filtros.items()
+        },
+    )
 
 
 def build_abas(index_url, aba_atual, contagem, preserved=None):
