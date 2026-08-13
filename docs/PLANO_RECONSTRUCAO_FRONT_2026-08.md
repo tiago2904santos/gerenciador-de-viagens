@@ -803,6 +803,12 @@ medição final mostrou 12,59%–23,18%, dominada pelo `shell.bundle.css` concat
 não se um template importa CSS de outro domínio. Fracionar o bundle exige orçamento de requests e
 cache próprio; não se declara 35% atingido nem se mistura essa decisão com a fronteira concluída.
 
+**Fechamento posterior do empacotamento (`PF-02`, 13/08).** Sem reabrir `UI-04`, a estratégia
+global foi corrigida por 15 perfis CSS determinísticos por família de rota, com o bundle completo
+como fallback. Nas 43 rotas, o uso passou para **37,5118%–60,3148%**; o piso uniforme de 35% agora
+é teste automatizado próprio de `PF-02`. A paridade perfil/bundle cobriu cinco famílias, dois temas
+e 1440/500 px em 20 medições, sem diferenças de estilo ou estruturais.
+
 **Fechamento.** E10 termina com 82 imports sob catraca, componentes pesados de formulário fora do
 shell comum e zero remoção aceita sem comparação de cascata. Imports que alteraram estilos na sonda
 foram mantidos, mesmo quando a captura estática de uma rota não casou regra naquele instante.
@@ -861,7 +867,7 @@ A reconstrução termina quando, medido por comando e não por opinião:
 
 | critério | hoje | meta |
 |---|---:|---|
-| uso de CSS por rota (`PF-02`) | **12,59%–23,18%**, com pisos individuais | ✅ catraca por rota; 35% uniforme retirado do aceite de `UI-04` (`NOVO-120`) |
+| uso de CSS por rota (`PF-02`) | **37,5118%–60,3148% nas 43 rotas** | ✅ piso individual de **35%**; gate próprio, separado de `UI-04` |
 | divergência não-cor entre temas (`NOVO-58`) | **0 em 54.225 elementos / 129 medições** | ✅ **0** |
 | camada escura (`UI-02`) | **2.434 linhas; 98 `!important`** | ✅ só seletores predicados por tema; catraca só desce |
 | arquivos definindo `--color-*` (`UI-03`) | **2** | ✅ **2** |

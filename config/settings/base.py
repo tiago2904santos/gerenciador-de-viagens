@@ -22,6 +22,11 @@ FIELD_ENCRYPTION_KEYS = tuple(
     if key.strip()
 )
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+CSS_ROUTE_PROFILES_ENABLED = os.getenv("CSS_ROUTE_PROFILES_ENABLED", "true").lower() in {
+    "1",
+    "true",
+    "yes",
+}
 
 ALLOWED_HOSTS = [
     host.strip()
@@ -184,6 +189,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "core.context_processors.area_permissions",
                 "core.context_processors.navigation",
+                "core.context_processors.shell_css_profile",
             ],
         },
     },

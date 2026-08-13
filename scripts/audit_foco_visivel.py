@@ -61,7 +61,7 @@ def supressores() -> list[tuple[str, str]]:
     """Blocos que apagam o foco de um controle sem substituto no mesmo bloco."""
     achados = []
     for arquivo in sorted(CSS.rglob("*.css")):
-        if arquivo.name.endswith(".bundle.css"):
+        if arquivo.name.endswith(".bundle.css") or arquivo.parent == CSS / "profiles":
             continue
         texto = arquivo.read_text(encoding="utf-8", errors="replace")
         for bloco in BLOCO.finditer(texto):

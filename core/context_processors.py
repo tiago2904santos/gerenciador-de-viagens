@@ -6,6 +6,65 @@ from core.permissions import has_area_role
 from .navigation import build_navigation
 
 
+SHELL_CSS_PROFILE_BY_VIEW = {
+    "core:dashboard": "dashboard",
+    "oficios:index": "entity-lists",
+    "roteiros:index": "entity-lists",
+    "prestacoes_contas:index": "entity-lists",
+    "termos:index": "entity-lists",
+    "planos_trabalho:index": "entity-lists",
+    "ordens_servico:index": "entity-lists",
+    "eventos:index": "eventos-list",
+    "justificativas:index": "justificativas-list",
+    "oficios:modelos_motivo_index": "catalog-lists",
+    "cadastros:servidores_index": "catalog-lists",
+    "cadastros:viaturas_index": "catalog-lists",
+    "cadastros:unidades_index": "catalog-lists",
+    "cadastros:cargos_index": "catalog-lists",
+    "cadastros:combustiveis_index": "catalog-lists",
+    "oficios:novo": "oficio-new",
+    "termos:preview_termo_oficio": "termo-preview",
+    "oficios:modelo_motivo_create": "model-forms",
+    "oficios:modelo_motivo_update": "model-forms",
+    "justificativas:legacy_modelo_create": "model-forms",
+    "justificativas:legacy_modelo_update": "model-forms",
+    "justificativas:modelos_index": "model-forms",
+    "justificativas:modelo_create": "model-forms",
+    "justificativas:modelo_update": "model-forms",
+    "cadastros:unidade_create": "model-forms",
+    "cadastros:unidade_update": "model-forms",
+    "cadastros:cargo_create": "model-forms",
+    "cadastros:cargo_update": "model-forms",
+    "cadastros:combustivel_create": "model-forms",
+    "cadastros:combustivel_update": "model-forms",
+    "oficios:detalhe": "oficio-core",
+    "oficios:editar": "oficio-core",
+    "oficios:dados_viajantes": "oficio-core",
+    "oficios:transporte": "oficio-transport",
+    "oficios:wizard_roteiro": "oficio-route",
+    "oficios:wizard_justificativa": "oficio-justification",
+    "oficios:wizard_resumo": "oficio-documents",
+    "oficios:wizard_documentos": "oficio-documents",
+    "roteiros:novo": "roteiro-form",
+    "roteiros:editar": "roteiro-form",
+    "cadastros:configuracao": "admin-form",
+    "cadastros:servidor_create": "admin-form",
+    "cadastros:servidor_update": "admin-form",
+    "cadastros:viatura_create": "admin-form",
+    "cadastros:viatura_update": "admin-form",
+}
+
+
+def shell_css_profile(request):
+    if not settings.CSS_ROUTE_PROFILES_ENABLED:
+        return {"shell_css_profile_path": None}
+    match = getattr(request, "resolver_match", None)
+    profile = SHELL_CSS_PROFILE_BY_VIEW.get(getattr(match, "view_name", None))
+    return {
+        "shell_css_profile_path": f"css/profiles/{profile}.css" if profile else None
+    }
+
+
 def navigation(request):
     cached = getattr(request, "_cv_navigation_context", None)
     if cached is None:

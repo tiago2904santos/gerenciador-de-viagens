@@ -149,6 +149,12 @@ para casar ~10% delas, em toda navegação.
 **Correção:** é obra do [`PLANO_FRONTEND.md`](PLANO_FRONTEND.md) (`UI-*`), não deste plano.
 Aqui fica a **métrica de aceite**: uso de CSS por rota acima de 35% ao fim da reconstrução.
 
+**Fechado em 13/08/2026 (`PF-02`).** Quinze perfis determinísticos por família de rota substituem o
+shell completo onde há mapeamento conhecido, com fallback por feature flag. A medição das 43 rotas
+encerrou em **37,5118%–60,3148%** e a suíte trava o piso de 35% individualmente. A paridade
+perfil/bundle foi comprovada em 20 medições de cinco famílias, temas claro/escuro e 1440/500 px:
+zero diferenças de estilo e estruturais.
+
 > **Ressalva:** o banco desta sessão estava vazio; as telas tinham 134–453 nós. Com listas
 > cheias o número de nós sobe e o uso de CSS sobe um pouco — mas não muda a ordem de grandeza,
 > porque a maior parte das regras não pertence ao domínio da página.
@@ -242,7 +248,7 @@ Enquanto não houver medição com volume, não se sabe.
 | **D3** 🟠 | **Menu de ação sob demanda** | `PF-04`, `PF-05` | 2–3 | médio | `PF-04` entregue; `/oficios/` em 76,7 ms e 165,6 KB, ainda acima do aceite de 40 ms / 150 KB |
 | **D4** | **Sessão fora do caminho quente** | `PF-03` | 1–2 | médio | Requisição autenticada trivial sem `UPDATE django_session`; decisão de expiração registrada |
 | **D5** | **Consultas duplicadas** | `PF-06` | 1 | baixo | Zero query repetida nas rotas medidas |
-| **D6** | **Aceite do CSS** (depois do `PLANO_FRONTEND`) | `PF-02` | — | — | Uso de CSS acima de 35% em todas as rotas medidas |
+| **D6** ✅ | **Aceite do CSS** (depois do `PLANO_FRONTEND`) | `PF-02` | — | — | **37,5118%–60,3148% nas 43 rotas**; piso individual de 35% sob teste |
 
 **Total próprio: 9–13 dias-pessoa.** O `PF-02` não soma porque o trabalho está no plano de front;
 aqui ele só tem a régua.

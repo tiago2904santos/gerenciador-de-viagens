@@ -116,7 +116,7 @@ def pares_de_estado() -> set:
     """Cores que convivem na mesma propriedade do mesmo seletor-base."""
     por_base: dict = {}
     for caminho in sorted(CSS.rglob("*.css")):
-        if caminho.name in IGNORA:
+        if caminho.name in IGNORA or caminho.parent == CSS / "profiles":
             continue
         texto = re.sub(r"/\*.*?\*/", " ", caminho.read_text(encoding="utf-8"), flags=re.S)
         for sel, corpo in RE_BLOCO.findall(texto):
@@ -140,7 +140,7 @@ def pares_de_estado() -> set:
 def duplicatas():
     usos: dict = {}
     for caminho in sorted(CSS.rglob("*.css")):
-        if caminho.name in IGNORA:
+        if caminho.name in IGNORA or caminho.parent == CSS / "profiles":
             continue
         for m in RE_HEX.findall(caminho.read_text(encoding="utf-8")):
             cor = normaliza(m)
