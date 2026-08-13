@@ -13,6 +13,8 @@ from datetime import timedelta
 
 from django.utils import timezone
 
+from core.middleware import executar_sem_request
+
 try:
     from celery import shared_task
 except ModuleNotFoundError:
@@ -56,6 +58,7 @@ def _usuario_por_id(usuario_id):
 
 
 @shared_task(**_TASK_KWARGS)
+@executar_sem_request
 def processar_artefato(self, artefato_id: int, usuario_id=None) -> None:
     from documentos.models import DocumentoArtefato
 
@@ -69,6 +72,7 @@ def processar_artefato(self, artefato_id: int, usuario_id=None) -> None:
 
 
 @shared_task(**_TASK_KWARGS)
+@executar_sem_request
 def sincronizar_assinatura_manual(self, artefato_id: int, usuario_id=None) -> None:
     from documentos.models import DocumentoArtefato
 
@@ -86,6 +90,7 @@ def sincronizar_assinatura_manual(self, artefato_id: int, usuario_id=None) -> No
 
 
 @shared_task(**_TASK_KWARGS)
+@executar_sem_request
 def processar_prestacao(self, prestacao_id: int, usuario_id=None) -> None:
     from prestacoes_contas.models import PrestacaoContas
 
@@ -99,6 +104,7 @@ def processar_prestacao(self, prestacao_id: int, usuario_id=None) -> None:
 
 
 @shared_task(**_TASK_KWARGS)
+@executar_sem_request
 def processar_evento_anexo(self, anexo_id: int, usuario_id=None) -> None:
     from eventos.models import EventoAnexo
 
@@ -112,6 +118,7 @@ def processar_evento_anexo(self, anexo_id: int, usuario_id=None) -> None:
 
 
 @shared_task(**_TASK_KWARGS)
+@executar_sem_request
 def processar_solicitacao_evento(self, solicitacao_id: int, usuario_id=None) -> None:
     from eventos.models import EventoDocumentoSolicitacao
 
@@ -125,6 +132,7 @@ def processar_solicitacao_evento(self, solicitacao_id: int, usuario_id=None) -> 
 
 
 @shared_task(**_TASK_KWARGS)
+@executar_sem_request
 def processar_sincronizar_pasta_evento(self, evento_id: int, usuario_id=None) -> None:
     from eventos.models import Evento
 
@@ -137,6 +145,7 @@ def processar_sincronizar_pasta_evento(self, evento_id: int, usuario_id=None) ->
 
 
 @shared_task(**_TASK_KWARGS)
+@executar_sem_request
 def organizar_oficio(self, oficio_id: int, usuario_id=None) -> None:
     from oficios.models import Oficio
 
@@ -149,6 +158,7 @@ def organizar_oficio(self, oficio_id: int, usuario_id=None) -> None:
 
 
 @shared_task(**_TASK_KWARGS)
+@executar_sem_request
 def organizar_evento(self, evento_id: int, usuario_id=None) -> None:
     from eventos.models import Evento
 
@@ -161,6 +171,7 @@ def organizar_evento(self, evento_id: int, usuario_id=None) -> None:
 
 
 @shared_task(**_TASK_KWARGS)
+@executar_sem_request
 def reorganizar_drive(self, job_id: int, usuario_id=None, area_id=None) -> None:
     from usuarios.models import AreaTrabalho
     from .views import _executar_reorganizacao
@@ -171,6 +182,7 @@ def reorganizar_drive(self, job_id: int, usuario_id=None, area_id=None) -> None:
 
 
 @shared_task(**_TASK_KWARGS)
+@executar_sem_request
 def reprocessar_pendencias(self, usuario_id=None, area_id=None) -> None:
     from usuarios.models import AreaTrabalho
     from .views import _reprocessar_pendencias_em_thread
@@ -181,6 +193,7 @@ def reprocessar_pendencias(self, usuario_id=None, area_id=None) -> None:
 
 
 @shared_task
+@executar_sem_request
 def marcar_reorganizacoes_orfas(max_age_minutes: int = 30) -> int:
     """Encerra jobs abandonados sem consultar o banco no startup do Django."""
     from .models import DriveReorganizacaoJob
