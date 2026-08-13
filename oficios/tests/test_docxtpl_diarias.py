@@ -55,8 +55,8 @@ class DiariasDocxtplTests(TestCase):
         self.assertIn("R$300,00", ctx["diaria"])
         self.assertIn("(Trezentos reais)", ctx["diaria"])
 
-    def test_caracterizacao_excluir_servidor_recalcula_total_impresso(self):
-        """NOVO-39: caracteriza a deriva monetária vigente antes da correção."""
+    def test_excluir_servidor_preserva_total_impresso(self):
+        """NOVO-39: uma exclusão cadastral não reescreve dinheiro histórico."""
         roteiro = Roteiro.objects.create(
             area=area_de_teste(),
             tipo=Roteiro.TIPO_AVULSO,
@@ -80,6 +80,8 @@ class DiariasDocxtplTests(TestCase):
             cpf="10987654321",
         )
         oficio.servidores.add(primeiro, excluido)
+        oficio.diarias_quantidade_servidores = 2
+        oficio.save(update_fields=["diarias_quantidade_servidores"])
 
         antes = oficio.diarias_para_servidores()
         excluido.delete()
@@ -87,5 +89,5 @@ class DiariasDocxtplTests(TestCase):
 
         self.assertEqual(antes["quantidade_servidores"], 2)
         self.assertEqual(antes["valor_decimal"], Decimal("200"))
-        self.assertEqual(depois["quantidade_servidores"], 1)
-        self.assertEqual(depois["valor_decimal"], Decimal("100"))
+        self.assertEqual(depois["quantidade_servidores"], 2)
+        self.assertEqual(depois["valor_decimal"], Decimal("200"))
