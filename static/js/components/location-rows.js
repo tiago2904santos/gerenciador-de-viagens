@@ -65,7 +65,11 @@
     options = options || {};
     var selected = String(selectedValue || "");
     resetSearchPicker(select);
-    select.innerHTML = options.emptyOptionHtml || '<option value="">---------</option>';
+    select.replaceChildren();
+    var empty = document.createElement("option");
+    empty.value = "";
+    empty.textContent = options.emptyOptionLabel || "---------";
+    select.appendChild(empty);
     (items || []).forEach(function (item) {
       var opt = document.createElement("option");
       opt.value = String(optionValue(item));
@@ -192,10 +196,23 @@
     if (!list || !template) return null;
 
     var index = options.index != null ? options.index : nextIndex(list, options);
-    var holder = document.createElement("div");
-    holder.innerHTML = String(template.innerHTML || "").replace(/__index__/g, String(index)).trim();
-    var fragment = document.createDocumentFragment();
-    while (holder.firstChild) fragment.appendChild(holder.firstChild);
+    var fragment = template.content.cloneNode(true);
+    var walker = document.createTreeWalker(
+      fragment,
+      NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT
+    );
+    var node;
+    while ((node = walker.nextNode())) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        node.nodeValue = node.nodeValue.replace(/__index__/g, String(index));
+        continue;
+      }
+      Array.prototype.slice.call(node.attributes || []).forEach(function (attr) {
+        if (attr.value.indexOf("__index__") !== -1) {
+          node.setAttribute(attr.name, attr.value.replace(/__index__/g, String(index)));
+        }
+      });
+    }
 
     Array.prototype.slice.call(fragment.querySelectorAll("[data-entity-picker-ready]")).forEach(function (el) {
       delete el.dataset.entityPickerReady;
@@ -382,12 +399,18 @@
     return nome;
   }
 
-  function trechoHtml(step) {
-    return (
-      '<span class="route-destinos-trechos__from">' + window.CV.util.escapeHtml(step.from) + "</span>" +
-      '<span class="route-destinos-trechos__sep" aria-hidden="true">&gt;</span>' +
-      '<span class="route-destinos-trechos__to">' + window.CV.util.escapeHtml(step.to) + "</span>"
-    );
+  function appendTrecho(parent, step) {
+    var from = document.createElement("span");
+    from.className = "route-destinos-trechos__from";
+    from.textContent = step.from;
+    var separator = document.createElement("span");
+    separator.className = "route-destinos-trechos__sep";
+    separator.setAttribute("aria-hidden", "true");
+    separator.textContent = ">";
+    var to = document.createElement("span");
+    to.className = "route-destinos-trechos__to";
+    to.textContent = step.to;
+    parent.append(from, separator, to);
   }
 
   /**
@@ -422,8 +445,9 @@
         if (single) {
           subtitle.textContent = staticSubtitleCopy();
           subtitle.hidden = false;
-        } else if (opts && opts.firstHtml) {
-          subtitle.innerHTML = opts.firstHtml;
+        } else if (opts && opts.firstStep) {
+          subtitle.replaceChildren();
+          appendTrecho(subtitle, opts.firstStep);
           subtitle.hidden = false;
         }
       }
@@ -478,11 +502,15 @@
     }
 
     var first = steps.shift();
-    trechosList.innerHTML = steps.map(function (step) {
-      return '<li class="route-destinos-trechos__item">' + trechoHtml(step) + "</li>";
-    }).join("");
+    trechosList.replaceChildren();
+    steps.forEach(function (step) {
+      var item = document.createElement("li");
+      item.className = "route-destinos-trechos__item";
+      appendTrecho(item, step);
+      trechosList.appendChild(item);
+    });
     setMode("multi", {
-      firstHtml: first ? trechoHtml(first) : "",
+      firstStep: first || null,
       restCount: steps.length,
     });
     return section;

@@ -36,6 +36,11 @@
     return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
   }
 
+  function svgNode(markup) {
+    var parsed = new DOMParser().parseFromString(markup, 'image/svg+xml');
+    return document.importNode(parsed.documentElement, true);
+  }
+
   // ─────────────────────────────────────────────────────────────────────────
   // Constructor
   // ─────────────────────────────────────────────────────────────────────────
@@ -99,7 +104,7 @@
     var chevSpan = document.createElement('span');
     chevSpan.className = 'custom-select__chevron';
     chevSpan.setAttribute('aria-hidden', 'true');
-    chevSpan.innerHTML = svgChevron();
+    chevSpan.appendChild(svgNode(svgChevron()));
 
     trigger.appendChild(valSpan);
     trigger.appendChild(chevSpan);
@@ -131,7 +136,7 @@
       var check = document.createElement('span');
       check.className = 'custom-select__option-check';
       check.setAttribute('aria-hidden', 'true');
-      check.innerHTML = svgCheck();
+      check.appendChild(svgNode(svgCheck()));
 
       var label = document.createElement('span');
       label.className = 'custom-select__option-label';
