@@ -4684,7 +4684,7 @@ para saber se é dívida histórica ou risco corrente.
 
 ---
 
-### NOVO-45 🟠 `NOVO` O catálogo global de seed não é ofertado a usuário com área — os pickers recortam sem fallback · DB · decisão de produto
+### NOVO-45 ✅ RESOLVIDO via `NOVO-49` · `NOVO` O catálogo global de seed não é ofertado a usuário com área — os pickers recortam sem fallback · DB · decisão de produto
 
 Medido em 07/08/2026, ao reescrever os testes do `DB-02`. `filter_queryset_by_area` é estrito:
 com área ativa devolve só `area = X`, nunca o global (`area IS NULL`). Consequência: os registros
@@ -4709,9 +4709,14 @@ caía no balde `area IS NULL`, exatamente o estado que o `DB-02` eliminou dos mo
 > `NOVO-09`. Executado nas migrações `eventos/0016` e `planos_trabalho/0024`, que dão a cada área
 > os quatro catálogos inteiros — **o acervo existente**.
 >
-> A outra metade da frase, "na criação de cada área", **não** está feita, e a instalação nova
-> também não: `criar_area` não semeia catálogo, e numa base limpa os seeds rodam quando nenhuma
-> área existe. É o `NOVO-49`, e é ele que segura o `NOT NULL` nesses quatro.
+> **Fechado em 13/08/2026 pelo `NOVO-49`.** A outra metade da decisão também foi entregue:
+> `core/catalogos_iniciais.py` concentra as 22 linhas canônicas;
+> `usuarios.services.criar_area` semeia os quatro catálogos na mesma transação da área; a
+> migração `usuarios/0002` completa as áreas existentes e elimina o balde global; e
+> `eventos/0017`/`planos_trabalho/0025` tornam `area` obrigatória. Os seis testes de
+> `usuarios.tests.test_catalogos_area_novo49` cobrem a instalação migrada, área nova, cópias
+> independentes e rollback transacional. Portanto os pickers estritos por área agora encontram
+> o acervo materializado que a decisão escolheu, sem fallback global.
 >
 > **Aviso de numeração:** existem hoje duas entradas `NOVO-45` neste arquivo — esta e a do
 > `faixa_lateral_class`, de outra sessão. As duas entraram na `main` antes deste PR e não renomeio
