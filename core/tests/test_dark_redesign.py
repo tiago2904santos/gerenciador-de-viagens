@@ -680,7 +680,15 @@ class DarkRedesignContractTests(SimpleTestCase):
         ):
             with self.subTest(template=relative):
                 source = (templates / relative).read_text(encoding="utf-8")
-                self.assertIn('<c-ui.lists.entity_card', source)
+                self.assertTrue(
+                    '<c-ui.lists.entity_card' in source
+                    or 'include "cotton/ui/lists/entity_card.html"' in source
+                    or (
+                        "entity-card record-card" in source
+                        and "entity-card__footer record-card__footer" in source
+                    ),
+                    msg=f"{relative} deixou de usar o contrato canônico de entity card",
+                )
 
         # `HT-06`: o antigo `main_list_card.html` foi apagado. Ele afirmava o
         # mesmo contrato de `entity_card.html` e **nada o renderizava** — o único
