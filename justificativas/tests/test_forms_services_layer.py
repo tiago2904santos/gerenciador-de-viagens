@@ -125,3 +125,11 @@ class JustificativaFormServicesLayerTests(TestCase):
             obrigatoria=False,
         )
         self.assertTrue(form.is_valid())
+
+    def test_select_emite_apenas_classes_com_contrato_de_producao(self):
+        form = JustificativaOficioForm()
+
+        self.assertEqual(
+            form.fields["modelo"].widget.attrs["class"],
+            "form-select cv-field__control",
+        )

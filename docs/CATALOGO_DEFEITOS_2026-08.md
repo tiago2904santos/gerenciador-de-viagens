@@ -5034,7 +5034,7 @@ carregavam a folha: **−6.919 bytes por página**, sem alteração de seletor v
 O card de roteiro real produziu JSONs de estilo computado idênticos entre `main` e a fatia em
 claro/escuro, nos viewports 1440, 800 e 500 px (8 leituras por viewport).
 
-### NOVO-46 🟡 `NOVO` Contrato de widget e template apontam para CSS que produção nunca carregou · MOR · 0,25 d
+### NOVO-46 ✅ RESOLVIDO (12/08/2026) · `NOVO` Contrato de widget e template apontam para CSS que produção nunca carregou · MOR · 0,25 d
 
 Já estava escrito dentro do `UI-01` como "defeito novo, separado"; vira linha para deixar de ser
 nota de rodapé. `WidgetStyle.FORM_SELECT_FIELD_CONTROL` (`core/forms/widgets.py:27`) emite
@@ -5047,6 +5047,11 @@ Com o `BE-25` (PR #247) os dois arquivos foram apagados. Nada mudou de aparênci
 nunca os carregou: as duas classes já eram enfeite. O defeito não é visual, é de contrato — um enum
 de widget que promete um gancho de estilo inexistente convida o próximo a estilizar por cima do que
 ele acha que existe.
+
+**Fechamento:** os dois emissores deixaram de publicar os ganchos inexistentes. O select de
+justificativa preserva as classes vivas `form-select cv-field__control`; o invólucro funcional do RG
+preserva `data-rg-field-wrap`, consumido pelo JS, mas não anuncia mais `cv-field-row`. Testes travam
+o valor exato do widget e a ausência da classe morta na página real de cadastro.
 
 ---
 
