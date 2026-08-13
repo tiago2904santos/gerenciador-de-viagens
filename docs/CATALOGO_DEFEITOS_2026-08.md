@@ -1822,7 +1822,7 @@ de `kb_html` baixado.
 Some da lista o modo de falha antigo (nome errado desenhava interrogação): `id` inexistente não
 desenha nada e não levanta erro. Coberto por `core/tests/test_folha_de_icones.py`.
 
-### PF-02 🟠 90% do CSS entregue não casa com a página · MED · ver plano de front
+### PF-02 ✅ RESOLVIDO (13/08/2026) · 90% do CSS entregue não casa com a página · MED · ver plano de front
 
 Medido no Chromium via CDP: 664–816 KB de CSS entregues por rota, **10,1% a 11,8% casado**. Na
 rota `/prestacoes-contas/`, `oficios.css` (106 KB) chega com **0,0%** de uso.
@@ -1835,6 +1835,18 @@ O trabalho está no [`PLANO_FRONTEND.md`](PLANO_FRONTEND.md); aqui fica a métri
 > as etapas do wizard entre **16,23% e 23,35%**, e as telas de modelos de motivo em **15,01%**.
 > Portanto o carregamento ainda entrega centenas de KB que a rota não usa; não há base para marcar
 > este ID como resolvido só porque a reconstrução avançou.
+
+**Fechamento em 13/08/2026.** O shell monolítico foi substituído, nas rotas conhecidas, por 15
+perfis CSS determinísticos por família de tela. O gerador preserva a ordem da cascata, expande os
+imports das fontes canônicas e inclui as famílias de seletores presentes no DOM; o bundle completo
+permanece como fallback controlado pela flag `CSS_ROUTE_PROFILES_ENABLED`. A catraca passou a exigir
+o piso de **35% em cada uma das 43 rotas**, sem média que esconda uma tela abaixo do aceite.
+
+No corpus local completo — temas claro/escuro, 1440/500 px e conteúdo revelado — o intervalo final
+foi **37,5118%–60,3148%**. Uma comparação independente entre bundle completo e perfis, cobrindo
+cinco famílias representativas nos dois temas e larguras, registrou **20 medições, zero diferenças
+de estilo e zero diferenças estruturais**. `build_shell_bundles.py --check` também valida que os 15
+artefatos e seu manifesto continuam reproduzíveis a partir das fontes.
 
 ### PF-03 ✅ RESOLVIDO · 🟡 Toda requisição escreve na tabela de sessão · MED · 1–2 d · risco médio
 
