@@ -266,9 +266,9 @@ medição depois.
 - **Não reescreve `prestacoes_contas` do zero.** É o app com mais dinheiro e assinatura pública;
   entra por fatias com teste de caracterização antes de cada uma.
 - **Não muda a regra de diárias.** O motor foi fechado no ciclo de julho, com os demonstrativos
-  oficiais travados por teste. `DB-13` (composição da diária como texto livre, sem vínculo com a
-  tabela que produziu o valor) fica catalogado e **fora desta rodada** — mexer nele é abrir de
-  novo a regra de dinheiro, e o ganho é de auditabilidade, não de correção.
+  oficiais travados por teste. O `DB-13`, executado depois do `DB-01`, mudou apenas a evidência:
+  cada parcela referencia e copia a tarifa usada; o total oficial continuou R$ 773,19 e a
+  migração não recalcula valores históricos.
 - **Não decide a arquitetura de configurações.** A proposta está em
   `docs/historico/2026-07-refactor/planos/PROPOSTA_CONFIGURACOES.md`; a posição dela na fila está
   no plano mestre.

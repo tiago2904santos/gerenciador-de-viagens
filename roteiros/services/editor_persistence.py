@@ -26,6 +26,7 @@ from django.db.models import F
 from django.utils import timezone
 
 from roteiros.models import RoteiroDestino
+from roteiros.models import RoteiroDiariaComponente
 from roteiros.models import RoteiroTrecho
 from roteiros.services.editor_parser import parse_int
 from roteiros.services.editor_parser import parse_roteiro_decimal
@@ -114,11 +115,33 @@ def roteiro_combine_date_time(data_value, hora_value):
         return None
     return datetime.combine(data_value, hora_value)
 
+
+def _datetime_para_banco(value):
+    if value is not None and timezone.is_naive(value):
+        return timezone.make_aware(value, timezone.get_current_timezone())
+    return value
+
+
+@transaction.atomic
 def persistir_diarias_roteiro(roteiro, diarias_resultado):
     if not diarias_resultado:
         return
     roteiro.aplicar_diarias_calculadas(diarias_resultado)
     roteiro.save(update_fields=['quantidade_diarias', 'valor_diarias', 'valor_diarias_extenso'])
+    roteiro.componentes_diarias.all().delete()
+    RoteiroDiariaComponente.objects.bulk_create([
+        RoteiroDiariaComponente(
+            roteiro=roteiro,
+            ordem=ordem,
+            origem=RoteiroDiariaComponente.ORIGEM_CALCULO,
+            **{
+                **componente,
+                'periodo_inicio': _datetime_para_banco(componente.get('periodo_inicio')),
+                'periodo_fim': _datetime_para_banco(componente.get('periodo_fim')),
+            },
+        )
+        for ordem, componente in enumerate(getattr(diarias_resultado, 'componentes', []))
+    ])
 
 @transaction.atomic
 def salvar_roteiro_avulso_from_roteiro_state(roteiro, roteiro_state, validated, diarias_resultado=None):
