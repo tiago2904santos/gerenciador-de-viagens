@@ -1,9 +1,14 @@
-{% cotton:vars aria_label disabled extra_class href icon label size slot type variant %}
+{% cotton:vars aria_label disabled extra_class hook href icon label size slot type variant %}
 {% comment %}
   Button v2 — par de `static/css/v2/button.css`.
 
   6 variantes (primary, secondary, ghost, danger) e 2 tamanhos (sm, xs). O
   legado tinha 18, das quais 8 sem uso nenhum.
+
+  `hook` é o atributo `data-*` que liga o botão a um motor JS já existente —
+  `hook="data-location-add"`, por exemplo. É declarado em vez de repassado
+  solto porque o gancho é contrato do JS: se ele virar um atributo qualquer,
+  ninguém percebe quando o nome muda e o botão para de responder calado.
 {% endcomment %}
 {% load icones %}
 {% if href %}
@@ -22,6 +27,7 @@
     type="{{ type|default:'button' }}"
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
     {% if disabled %}disabled{% endif %}
+    {% if hook %}{{ hook }}{% endif %}
   >
     {% if icon %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
     {% if slot %}{{ slot }}{% else %}<span>{{ label }}</span>{% endif %}

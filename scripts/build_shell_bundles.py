@@ -139,6 +139,7 @@ UI_CSS: tuple[str, ...] = (
     "css/v2/card-footer.css",
     "css/v2/stepper.css",
     "css/v2/destination-row.css",
+    "css/v2/destinations.css",
     "css/v2/picker.css",
     "css/v2/date-picker.css",
     "css/v2/surface.css",

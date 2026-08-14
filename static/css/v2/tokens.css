@@ -25,10 +25,29 @@
 
 :root {
   /* ---- superfícies ---------------------------------------------------- */
-  --surface-page: #e8eef6;
-  --surface-rail: #eef4fc;
+  /* Os degraus do claro medem o MESMO contraste dos do escuro: 1.13 de page
+     para rail e 1.27 de rail para field. Antes eram 1.055 e 1.106 — metade —, e
+     com isso a alternância de superfície, que é o que separa uma camada da
+     outra em todo o sistema, sumia no tema claro: a tela parecia sem estilo
+     aplicado. O campo continua branco, o ponto mais alto da escada. */
+  --surface-page: #d3d8e0;
+  --surface-rail: #dfe5ed;
   --surface-field: #ffffff;
   --surface-brand: #155b9a;
+  /* Fundo da linha escolhida numa lista de opções. É a cor que o desenho antigo
+     usava para "selecionado" — no tema escuro, o azul-marinho profundo do
+     `--surface-brand`; no claro, o accent diluído, que era o que a folha
+     compartilhada já fazia. Precisa ser um token porque não é um degrau da
+     escada de superfícies: é significado, e some se virar `rail` ou `field`. */
+  /* 17%, e não os mesmos 16% do escuro: o que precisa bater entre os temas é o
+     CONTRASTE contra o fundo do menu, não a porcentagem. Com 10% dava 1.18
+     contra os 1.35 do escuro, e a linha escolhida praticamente sumia no claro
+     enquanto saltava no escuro. Agora os dois medem 1.34. */
+  --surface-selected: color-mix(in srgb, var(--accent) 17%, var(--surface-field));
+  /* Sombra da camada que flutua sobre a página (menu do select, lista do
+     picker). Vira token porque as duas precisam ser a MESMA, e cada folha
+     escrevendo o seu valor foi como elas divergiram. */
+  --shadow-menu: 0 12px 28px rgb(7 26 51 / 0.16);
 
   /* ---- texto ---------------------------------------------------------- */
   --text-strong: #223348;
@@ -102,6 +121,12 @@
   --surface-rail: #132132;
   --surface-field: #223348;
   --surface-brand: #062847;
+  /* O accent diluído — o tom amarelado que o desenho antigo dava à linha
+     escolhida. É a exceção deliberada à regra de não misturar accent com
+     superfície no tema escuro: aqui a mistura É o sinal, e o dono a escolheu
+     com a cor na tela. */
+  --surface-selected: color-mix(in srgb, var(--accent) 16%, var(--surface-field));
+  --shadow-menu: 0 12px 28px rgb(2 10 18 / 0.28);
 
   --text-strong: #ffffff;
   --text-muted: #afc0d3;

@@ -1,0 +1,37 @@
+/* Destinos — a seção que gerencia as linhas. Depende de `v2/tokens.css`.
+ *
+ * As classes `search-picker__*` dentro das linhas são geradas pelo `picker.js`
+ * e vestidas por `v2/picker.css`; aqui só entra o arranjo da seção.
+ */
+
+:is(html[data-theme]) .destinations {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .destinations__header {
+  align-items: center;
+  display: flex;
+  gap: var(--gap);
+  justify-content: space-between;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .destinations__title {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+}
+
+:is(html[data-theme]) .destinations__list {
+  display: grid;
+  gap: var(--gap-tight);
+  min-width: 0;
+}
+
+/* A lista vazia não colapsa: sem altura mínima, remover a última linha faz o
+   bloco inteiro pular de tamanho. */
+:is(html[data-theme]) .destinations__list:empty {
+  min-height: var(--control-height);
+}

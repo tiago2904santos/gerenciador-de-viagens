@@ -1673,16 +1673,6 @@ textarea[readonly] {
     transform: translateY(0) scaleY(1);
   }
 }
-.search-picker__list {
-  display: grid;
-  gap: var(--space-1);
-  max-height: calc(var(--control-height-lg) * 5);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: var(--space-2);
-  scrollbar-color: var(--field-border-hover) transparent;
-  scrollbar-width: thin;
-}
 .search-picker__empty,
 .search-picker__selected-empty {
   background: var(--field-bg-soft);

@@ -4,8 +4,14 @@
  * pertencem a ele; não são renomeadas aqui. Renomear sem tocar o JS quebraria
  * em silêncio, como já aconteceu com o select.
  *
- * Tudo parte de `.picker`, então nenhuma destas regras alcança o picker legado
- * das telas ainda não migradas.
+ * A raiz é `.picker` OU `.destination-row`: nos destinos o picker não tem
+ * invólucro próprio no template — o `data-entity-picker` fica no `<select>` e
+ * quem monta a estrutura é o JS, que não conhece a classe `.picker`. Sem a
+ * linha de destino aqui, aqueles dois campos caíam no desenho legado, com raio
+ * de 12px e fonte de 16px onde o resto do sistema usa 8 e 14.
+ *
+ * De qualquer forma nenhuma regra alcança o picker das telas ainda não
+ * migradas: as duas raízes são do v2.
  */
 
 :is(html[data-theme]) .picker {
@@ -16,11 +22,16 @@
 
 /* ---- o campo de busca --------------------------------------------------- */
 
-:is(html[data-theme]) .picker .search-picker__control {
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__control {
   align-items: center;
   background: var(--surface-contrast, var(--surface-field));
   border: 1px solid transparent;
   border-radius: var(--radius-field);
+  /* Sem sombra. O legado punha `0 1px 2px rgb(0 0 0 / .3)` aqui, e como esta
+     folha não declarava nada a regra antiga sobrevivia — o campo de busca era o
+     único controle do sistema com relevo. No v2 a única sombra de campo é a
+     vermelha do erro; separação entre camadas é superfície, não profundidade. */
+  box-shadow: none;
   box-sizing: border-box;
   display: flex;
   gap: var(--gap-tight);
@@ -28,11 +39,11 @@
   padding: var(--pad-field);
 }
 
-:is(html[data-theme]) .picker .search-picker__control:focus-within {
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__control:focus-within {
   border-color: var(--focus-ring);
 }
 
-:is(html[data-theme]) .picker .search-picker__input {
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__input {
   background: none;
   border: 0;
   color: var(--text-strong);
@@ -43,18 +54,18 @@
   outline: none !important;
 }
 
-:is(html[data-theme]) .picker .search-picker__input::placeholder {
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__input::placeholder {
   color: var(--text-muted);
 }
 
-:is(html[data-theme]) .picker .search-picker__icon {
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__icon {
   align-items: center;
   color: var(--text-muted);
   display: inline-flex;
   flex: none;
 }
 
-:is(html[data-theme]) .picker .search-picker__clear {
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__clear {
   background: none;
   border: 0;
   color: var(--text-muted);
@@ -62,16 +73,172 @@
   flex: none;
 }
 
-/* ---- a lista de resultados ---------------------------------------------- */
+/* ---- a lista de resultados ------------------------------------------------
+ *
+ * Mesma formatação do menu do select (`v2/select.css`), com as mesmas medidas
+ * e a mesma conta de altura. Os dois são a mesma coisa — lista de opções que
+ * cai de um campo —, e enquanto cada um tinha o seu desenho a mesma escolha
+ * aparecia de dois jeitos na mesma tela.
+ *
+ * O dropdown é movido para o `body` ao abrir. Ele perde os ancestrais, então a
+ * raiz aqui é a marca `search-picker__dropdown--v2`, que o `picker.js` põe no
+ * próprio elemento — mesma convenção do `custom-select__menu--v2`. Também não
+ * herda `--surface-*` de ninguém: as cores vêm dos tokens diretamente.
+ */
 
-:is(html[data-theme]) .picker .search-picker__dropdown {
+/* A segunda linha empata com a regra legada, que qualifica o dropdown aberto
+   com `.floating-dropdown--active` e por isso vencia por uma classe. No empate
+   decide a ordem, e o `ui.bundle.css` entra depois do bundle legado. */
+:is(html[data-theme]) .search-picker__dropdown--v2,
+:is(html[data-theme]) .search-picker__dropdown--v2.floating-dropdown--active {
+  --option-height: 40px;
+  --option-gap: 8px;
+  --menu-padding: 6px;
+  --menu-border: 1px;
+
   background: var(--surface-field);
-  border: 1px solid var(--line);
+  border: var(--menu-border) solid var(--line);
   border-radius: var(--radius-field);
-  padding: 4px;
+  /* A mesma sombra do menu do select — os dois flutuam sobre a página e
+     precisam se descolar dela do mesmo jeito. */
+  box-shadow: var(--shadow-menu);
+  /* Quem rola é a CAIXA, como no select. Enquanto rolava a lista de dentro, a
+     barra de rolagem aparecia 6px para dentro da borda e com o desenho padrão
+     do navegador, em vez de colada na borda e fina como a do select. */
+  display: grid;
+  max-height: calc(
+    var(--option-height) * 5 + var(--option-gap) * 5 +
+      var(--menu-padding) * 2 + var(--menu-border) * 2
+  );
+  overflow-y: auto;
+  /* Inerte aqui — quem separa os itens é o `row-gap` da lista —, mas declarado
+     para a caixa não divergir do menu do select em nenhuma propriedade. */
+  row-gap: var(--option-gap);
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-width: thin;
+  box-sizing: border-box;
+  /* Descola do campo. O módulo de posicionamento cola a caixa com folga zero,
+     então o afastamento vem daqui. Mesmo valor no menu do select. */
+  margin-top: 6px;
+  /* Sem animação de entrada: o menu do select aparece direto, e uma das duas
+     listas surgindo com deslize era diferença visível entre elas. */
+  animation: none;
+  overscroll-behavior: contain;
+  padding: var(--menu-padding);
 }
 
-:is(html[data-theme]) .picker .search-picker__empty {
+/* A lista SÓ distribui os itens. O teto, a rolagem e o recuo são da caixa, como
+   no select.
+ *
+ * As três anulações abaixo não são zelo: a folha legada dá à lista um
+ * `max-height: 260px` com `overflow: auto` PRÓPRIOS e, no tema claro, ainda um
+ * `padding: 8px`. Com a caixa também rolando, apareciam duas barras de rolagem
+ * — e, no claro, recuo dobrado. Passei a rolagem para a caixa e esqueci de
+ * desligar a de dentro. */
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__list {
+  display: grid;
+  max-height: none;
+  overflow: visible;
+  padding: 0;
+  row-gap: var(--option-gap);
+}
+
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option {
+  align-items: center;
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  box-sizing: border-box;
+  color: var(--text-strong);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  font-size: var(--text-size-base);
+  gap: var(--gap-tight);
+  height: var(--option-height);
+  /* O legado impõe `min-height: 62px` no item. `min-height` vence `height`,
+     então declarar só a altura não adiantava — o item continuava com 62px e a
+     conta do teto, feita sobre 40, cortava a lista no lugar errado. */
+  min-height: var(--option-height);
+  /* Margem zerada: a folha legada põe margem no item, que SOMARIA ao `row-gap`
+     e tornaria indeterminada a conta do teto acima. Uma origem só. */
+  margin: 0;
+  min-width: 0;
+  /* O mesmo recuo do item do select. */
+  padding: 0 8px;
+  text-align: left;
+  /* Mesma transição e mesmo comportamento de seleção do item do select. */
+  transition: background-color 0.1s ease, color 0.1s ease;
+  user-select: none;
+  width: 100%;
+}
+
+/* Hover é um degrau na escada, nunca mistura de matiz. */
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option:hover,
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option--active {
+  background: var(--surface-rail);
+  color: var(--text-strong);
+}
+
+/* Mesma cor E mesmo peso do selecionado no select — os dois são a mesma lista. */
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option[aria-selected="true"],
+:is(html[data-theme]) .search-picker__dropdown--v2
+  .search-picker__option--selected {
+  background: var(--surface-selected);
+  /* A mesma fita lateral do item escolhido do select. */
+  box-shadow: inset 3px 0 0 0 var(--accent);
+  color: var(--accent);
+  font-weight: var(--weight-strong);
+}
+
+/* O rótulo trunca em vez de empurrar o item para fora do menu.
+ *
+ * `inherit` nos três: cor, peso e corpo vêm do item, como no select. A folha
+ * legada pintava este span de branco, com peso 900 e 13.76px, e era ISSO que
+ * fazia as duas listas continuarem diferentes mesmo com a caixa e o item já
+ * idênticos — a linha escolhida do select saía dourada e a do picker, branca.
+ */
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option-content,
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option-main {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* O menu do select mostra o rótulo e o "v" da escolhida, nada mais. O picker
+   vinha com um marcador vazio e um ponto decorativo além disso. */
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option-marker,
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option-visual {
+  display: none;
+}
+
+/* O "v" ocupa o lugar do antigo texto de status, à direita — a mesma posição em
+   que o select o mostra. O `picker.js` só o preenche na opção escolhida; nas
+   outras o span fica vazio e não ocupa espaço. */
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option-status {
+  align-items: center;
+  color: var(--accent);
+  display: inline-flex;
+  flex: none;
+  margin-left: auto;
+}
+
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option-status svg {
+  display: block;
+  fill: none;
+  height: 14px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+  width: 14px;
+}
+
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__empty {
   color: var(--text-muted);
   font-size: var(--text-size-base);
   padding: 12px;
@@ -83,12 +250,12 @@
  * se confundir com a caixa de busca logo acima.
  */
 
-:is(html[data-theme]) .picker .search-picker__selected-list {
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-list {
   display: grid;
   gap: var(--gap-tight);
 }
 
-:is(html[data-theme]) .picker .search-picker__selected-card {
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-card {
   align-items: center;
   background: var(--surface-contrast, var(--surface-field));
   border: 0;
@@ -102,7 +269,7 @@
   width: 100%;
 }
 
-:is(html[data-theme]) .picker .search-picker__selected-avatar {
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-avatar {
   align-items: center;
   background: color-mix(in srgb, var(--accent) 18%, transparent);
   border-radius: var(--radius-field);
@@ -116,30 +283,30 @@
   width: 36px;
 }
 
-:is(html[data-theme]) .picker .search-picker__selected-main {
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-main {
   display: grid;
   gap: 2px;
   min-width: 0;
 }
 
-:is(html[data-theme]) .picker .search-picker__selected-name {
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-name {
   font-size: var(--text-size-base);
   font-weight: var(--weight-strong);
 }
 
-:is(html[data-theme]) .picker .search-picker__selected-meta {
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-meta {
   color: var(--text-muted);
   font-size: var(--text-size-eyebrow);
 }
 
-:is(html[data-theme]) .picker .search-picker__selected-empty {
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-empty {
   color: var(--text-muted);
   font-size: var(--text-size-base);
   margin: 0;
   padding: 12px;
 }
 
-:is(html[data-theme]) .picker .search-picker__remove {
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove {
   background: none;
   border: 0;
   color: var(--text-muted);
@@ -147,6 +314,6 @@
   flex: none;
 }
 
-:is(html[data-theme]) .picker .search-picker__remove:hover {
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:hover {
   color: var(--status-late);
 }

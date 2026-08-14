@@ -192,6 +192,12 @@
     var(--select-option-height) * 5 + var(--select-option-gap) * 5 +
       var(--select-menu-padding) * 2 + var(--select-menu-border) * 2
   );
+  /* Descola do gatilho — o mesmo vão do dropdown do picker. */
+  margin-top: 6px;
+  box-shadow: var(--shadow-menu);
+  overscroll-behavior: contain;
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-width: thin;
   overflow-y: auto;
   padding: var(--select-menu-padding);
 }
@@ -216,18 +222,61 @@
   font-size: var(--text-size-base);
   gap: var(--gap-tight);
   height: var(--select-option-height);
-  padding: 0 14px;
+  padding: 0 8px;
 }
 
-/* Hover: um degrau na escada de superfícies, nunca mistura de matiz. */
-:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option:hover,
-:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option--focused {
+/* Hover: um degrau na escada de superfícies, nunca mistura de matiz.
+ *
+ * O `:not(--selected)` é o que torna isso possível. Antes de o selecionado
+ * ganhar cor própria, os dois usavam `--surface-rail` e ficavam idênticos
+ * assim que o mouse passava em outra linha; a exclusão diz explicitamente que
+ * o realce não alcança a escolhida, em vez de depender da ordem das regras.
+ */
+:is(html[data-theme]) .custom-select__menu--v2
+  .custom-select__option:hover:not(.custom-select__option--selected),
+:is(html[data-theme]) .custom-select__menu--v2
+  .custom-select__option--focused:not(.custom-select__option--selected) {
   background: var(--surface-rail);
   color: var(--text-strong);
 }
 
-:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option--selected {
-  background: var(--surface-rail);
+/* ---- a opção selecionada -------------------------------------------------
+ *
+ * Ela dividia o fundo com o hover, então bastava o mouse passar em outra linha
+ * para as duas ficarem idênticas — a marca de "esta é a escolhida" sumia. Agora
+ * tem cor própria, `--surface-selected`, e a mantém em qualquer combinação:
+ * sozinha, sob o mouse ou com o foco do teclado.
+ *
+ * Não é um degrau da escada de superfícies de propósito: "selecionado" é
+ * significado, não profundidade. Como degrau, ele empatava com o realce e
+ * desaparecia.
+ *
+ * Os três seletores repetem as formas exatas que as folhas legadas usam
+ * (`--selected`, `--selected:hover:not(--disabled)`, `--selected.--focused`).
+ * Sem repeti-las, aquelas regras venciam por terem uma classe a mais e o
+ * selecionado voltava a mudar de cor conforme o mouse. No empate decide a
+ * ordem, e o `ui.bundle.css` entra depois do bundle legado.
+ */
+:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option--selected,
+:is(html[data-theme]) .custom-select__menu--v2
+  .custom-select__option--selected:hover:not(.custom-select__option--disabled),
+:is(html[data-theme]) .custom-select__menu--v2
+  .custom-select__option--selected.custom-select__option--focused {
+  background: var(--surface-selected);
+  /* A fita lateral que marca a escolhida. Declarada aqui, com o accent do tema,
+     porque a lista do picker precisa da MESMA — e ela vinha de uma regra legada
+     que não alcançava as duas. */
+  box-shadow: inset 3px 0 0 0 var(--accent);
+  color: var(--accent);
+  font-weight: var(--weight-strong);
+}
+
+/* O check é um traço, não um selo: o legado o pintava como um chip cheio de
+   accent (`#d8a21b`), que competia com o próprio rótulo pela atenção. */
+:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option-check,
+:is(html[data-theme]) .custom-select__menu--v2
+  .custom-select__option--selected .custom-select__option-check {
+  background: none;
   color: var(--accent);
 }
 

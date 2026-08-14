@@ -733,6 +733,32 @@
       sections.unshift(scope);
     }
     sections.forEach(initSearchPickers);
+    sections.forEach(autoManage);
+  }
+
+  /* Seção que se gerencia sozinha.
+   *
+   * `initSearchPickers` só transforma os selects em busca; adicionar, remover e
+   * renumerar linha vinham de `initManagedRows`, que cada tela chamava no seu
+   * próprio script — são 4 arquivos em `js/pages/` fazendo a mesma chamada.
+   * Uma seção marcada com `data-location-managed` dispensa esse script: tudo
+   * que o motor precisa está no próprio markup.
+   *
+   * As referências vão explícitas porque `initManagedRows` cai no `form` para
+   * achar botão e molde, e numa página com duas seções ele acharia os da
+   * primeira.
+   */
+  function autoManage(section) {
+    if (!section.hasAttribute("data-location-managed")) return;
+    if (section.dataset.locationManagedReady === "true") return;
+    section.dataset.locationManagedReady = "true";
+    initManagedRows({
+      form: section.closest("form") || section,
+      section: section,
+      list: section.querySelector("[data-location-list]"),
+      addButton: section.querySelector("[data-location-add]"),
+      template: section.querySelector("template[data-location-template]"),
+    });
   }
 
   window.CV = window.CV || {};

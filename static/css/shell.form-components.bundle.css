@@ -9828,7 +9828,7 @@ html[data-theme="dark"] :is(input, select, textarea):disabled {
   .custom-select__menu--v2.floating-dropdown--active:is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) {
   --cs-menu-bg: var(--step1-surface, color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%));
   background: color-mix(in srgb, var(--color-surface-muted) 88%, var(--color-primary) 12%);
-  border-color: color-mix(in srgb, var(--color-border) 55%, transparent);
+  border-color: 1px solid var(--line);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
 }
 
@@ -14591,8 +14591,8 @@ html[data-theme] .empty-state__mark {
 
 :is(html[data-theme])
   .custom-select__menu--v2.floating-dropdown--active {
-  background: var(--color-input-bg);
-  border: 1px solid var(--color-border-strong);
+  background: var(--surface-field);
+  border: 1px solid var(--line);
   border-radius: 12px;
   overflow-x: hidden;
   overflow-y: auto;

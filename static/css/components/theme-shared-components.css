@@ -2743,8 +2743,8 @@ html[data-theme] .empty-state__mark {
 
 :is(html[data-theme])
   .custom-select__menu--v2.floating-dropdown--active {
-  background: var(--color-input-bg);
-  border: 1px solid var(--color-border-strong);
+  background: var(--surface-field);
+  border: 1px solid var(--line);
   border-radius: 12px;
   overflow-x: hidden;
   overflow-y: auto;

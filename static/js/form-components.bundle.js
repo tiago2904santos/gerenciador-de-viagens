@@ -504,6 +504,14 @@
       : null;
     if (manageBtn) field.appendChild(manageBtn);
 
+    /* O dropdown é transplantado para o `body` e perde os ancestrais — com eles
+     * some a única forma de o CSS saber de que campo ele veio. A marca vai no
+     * próprio elemento, como o `custom-select__menu--v2` que o select já usa;
+     * sem ela as telas migradas e as legadas dividiriam a mesma lista. */
+    if (select.closest(".picker, .destination-row")) {
+      dropdown.classList.add("search-picker__dropdown--v2");
+    }
+
     const floatingMenu =
       window.CV.overlay && window.CV.overlay.attachDropdown
         ? window.CV.overlay.attachDropdown(dropdown, control)
@@ -780,6 +788,26 @@
       status.textContent = item.selected
         ? "Selecionado"
         : (mode === "multi" ? "Adicionar" : "Escolher");
+
+      /* No v2 a escolha é marcada com o mesmo "v" do select, no lugar do texto
+       * ("Selecionado" repetido em toda linha competia com o próprio rótulo).
+       *
+       * O `xmlns` NÃO é decorativo: sem o namespace declarado na raiz o
+       * elemento vira um "svg" de HTML — tem caixa, aceita width/height e
+       * responde a getComputedStyle, mas não desenha nada. Foi assim que a seta
+       * do select ficou invisível, e o CSS antigo compensava desenhando o traço
+       * com bordas em vez de corrigir a origem. */
+      if (dropdown.classList.contains("search-picker__dropdown--v2")) {
+        status.textContent = "";
+        if (item.selected) {
+          status.innerHTML =
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ' +
+            'aria-hidden="true" focusable="false" width="14" height="14" ' +
+            'fill="none" stroke="currentColor" stroke-width="2.5" ' +
+            'stroke-linecap="round" stroke-linejoin="round">' +
+            '<path d="M20 6L9 17l-5-5"/></svg>';
+        }
+      }
 
       body.appendChild(main);
       if (item.rascunho) {
@@ -2419,6 +2447,32 @@
       sections.unshift(scope);
     }
     sections.forEach(initSearchPickers);
+    sections.forEach(autoManage);
+  }
+
+  /* Seção que se gerencia sozinha.
+   *
+   * `initSearchPickers` só transforma os selects em busca; adicionar, remover e
+   * renumerar linha vinham de `initManagedRows`, que cada tela chamava no seu
+   * próprio script — são 4 arquivos em `js/pages/` fazendo a mesma chamada.
+   * Uma seção marcada com `data-location-managed` dispensa esse script: tudo
+   * que o motor precisa está no próprio markup.
+   *
+   * As referências vão explícitas porque `initManagedRows` cai no `form` para
+   * achar botão e molde, e numa página com duas seções ele acharia os da
+   * primeira.
+   */
+  function autoManage(section) {
+    if (!section.hasAttribute("data-location-managed")) return;
+    if (section.dataset.locationManagedReady === "true") return;
+    section.dataset.locationManagedReady = "true";
+    initManagedRows({
+      form: section.closest("form") || section,
+      section: section,
+      list: section.querySelector("[data-location-list]"),
+      addButton: section.querySelector("[data-location-add]"),
+      template: section.querySelector("template[data-location-template]"),
+    });
   }
 
   window.CV = window.CV || {};

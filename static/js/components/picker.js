@@ -310,6 +310,14 @@
       : null;
     if (manageBtn) field.appendChild(manageBtn);
 
+    /* O dropdown é transplantado para o `body` e perde os ancestrais — com eles
+     * some a única forma de o CSS saber de que campo ele veio. A marca vai no
+     * próprio elemento, como o `custom-select__menu--v2` que o select já usa;
+     * sem ela as telas migradas e as legadas dividiriam a mesma lista. */
+    if (select.closest(".picker, .destination-row")) {
+      dropdown.classList.add("search-picker__dropdown--v2");
+    }
+
     const floatingMenu =
       window.CV.overlay && window.CV.overlay.attachDropdown
         ? window.CV.overlay.attachDropdown(dropdown, control)
@@ -586,6 +594,26 @@
       status.textContent = item.selected
         ? "Selecionado"
         : (mode === "multi" ? "Adicionar" : "Escolher");
+
+      /* No v2 a escolha é marcada com o mesmo "v" do select, no lugar do texto
+       * ("Selecionado" repetido em toda linha competia com o próprio rótulo).
+       *
+       * O `xmlns` NÃO é decorativo: sem o namespace declarado na raiz o
+       * elemento vira um "svg" de HTML — tem caixa, aceita width/height e
+       * responde a getComputedStyle, mas não desenha nada. Foi assim que a seta
+       * do select ficou invisível, e o CSS antigo compensava desenhando o traço
+       * com bordas em vez de corrigir a origem. */
+      if (dropdown.classList.contains("search-picker__dropdown--v2")) {
+        status.textContent = "";
+        if (item.selected) {
+          status.innerHTML =
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ' +
+            'aria-hidden="true" focusable="false" width="14" height="14" ' +
+            'fill="none" stroke="currentColor" stroke-width="2.5" ' +
+            'stroke-linecap="round" stroke-linejoin="round">' +
+            '<path d="M20 6L9 17l-5-5"/></svg>';
+        }
+      }
 
       body.appendChild(main);
       if (item.rascunho) {

@@ -55,7 +55,7 @@
  */
 :is(html[data-theme]) .form-block--v2.form-block--split {
   align-items: center;
-  grid-template-columns: minmax(max-content, 0.62fr) minmax(0, 2.1fr);
+  grid-template-columns: minmax(max-content, 0.62fr) minmax(0, 2fr);
 }
 
 /* Empilha título e descrição: na coluna estreita eles não cabem lado a lado,
