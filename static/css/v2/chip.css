@@ -7,7 +7,7 @@
  * variantes do botão legado, das quais 8 acabaram mortas.
  */
 
-.chip--v2 {
+:is(html[data-theme]) .chip--v2 {
   align-items: center;
   background: color-mix(in srgb, var(--chip-tone, var(--text-muted)) 16%, transparent);
   border-radius: var(--radius-pill);

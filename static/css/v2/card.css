@@ -4,9 +4,9 @@
  * atômica.
  */
 
-.card--v2 {
-  background: var(--ui-surface, var(--surface-field));
-  border: 1px solid var(--line);
+:is(html[data-theme]) .card--v2 {
+  --surface-contrast: var(--surface-field);
+  background: var(--surface, var(--surface-rail));
   border-radius: var(--radius-rail);
   box-sizing: border-box;
   display: grid;
@@ -15,24 +15,20 @@
   padding: var(--gap);
 }
 
-.card--v2:hover {
-  border-color: var(--accent);
-}
-
-.card__title {
+:is(html[data-theme]) .card__title {
   color: var(--text-strong);
   font-size: var(--text-size-base);
   font-weight: var(--weight-strong);
   margin: 0;
 }
 
-.card__meta {
+:is(html[data-theme]) .card__meta {
   color: var(--text-muted);
   font-size: var(--text-size-eyebrow);
   margin: 0;
 }
 
-.card__actions {
+:is(html[data-theme]) .card__actions {
   align-items: center;
   display: flex;
   gap: var(--gap-tight);

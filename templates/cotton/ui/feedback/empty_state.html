@@ -25,7 +25,7 @@
   <p class="empty-state__message">{% firstof message title "Nada encontrado." %}</p>
   {% if action_label and action_url %}
     <div class="empty-state__actions">
-      <c-ui.buttons.button :label="action_label" :href="action_url" variant="secondary" size="sm" only />
+      <c-ui.buttons.button :label="action_label" :href="action_url" variant="secondary" only />
     </div>
   {% endif %}
 </div>

@@ -4,14 +4,15 @@
  * lugar: a mesma faixa serve lista, wizard e detalhe.
  */
 
-.rail {
-  background: var(--ui-surface, var(--surface-rail));
-  border-radius: 0 0 var(--radius-rail) var(--radius-rail);
+:is(html[data-theme]) .rail {
+  --surface-contrast: var(--surface-field);
+  background: var(--surface, var(--surface-rail));
+  border-radius: var(--radius-rail);
   box-sizing: border-box;
   padding: var(--pad-rail);
 }
 
-.rail__controls {
+:is(html[data-theme]) .rail__controls {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
@@ -20,14 +21,20 @@
 }
 
 /* A busca ocupa a sobra; os demais controles ficam no tamanho natural. */
-.rail__controls > .input {
+:is(html[data-theme]) .rail__controls > .input {
   flex: 1 1 220px;
   min-width: 0;
 }
 
-/* Quando algo vem DEPOIS do rail — o botão que abre o quick-add, por exemplo —
-   quem fecha o bloco é esse algo, e o rail perde o arredondamento de baixo. */
-.rail:not(:last-child) {
-  border-bottom: 0;
-  border-radius: 0;
+/* O rail é o contêiner que segura as seções da página (os `form-block`), então
+   tem raio inteiro por padrão. Só quando encosta no header ele perde os cantos
+   de cima, para os dois lerem como uma peça só. */
+:is(html[data-theme]) .header + .rail {
+  border-radius: 0 0 var(--radius-rail) var(--radius-rail);
+}
+
+/* Empilha o conteúdo: uma barra de controles e/ou as seções da página. */
+:is(html[data-theme]) .rail {
+  display: grid;
+  gap: var(--gap);
 }

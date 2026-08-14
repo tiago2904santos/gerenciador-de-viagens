@@ -279,6 +279,10 @@
       </c-slot>
     </c-v2.header>
 
+    {% comment %}
+      O rail encosta no header (perde os cantos de cima) e segura duas coisas: a
+      barra de controles e as seções da página, que são os `form-block`.
+    {% endcomment %}
     <c-v2.rail>
       <c-slot name="controls">
         <c-v2.input icon="search" placeholder="Buscar" aria_label="Buscar" />
@@ -291,24 +295,18 @@
     {# ---------------------------------------------------------------- AÇÃO #}
     <h2 class="v2-lab__group">Ação</h2>
 
-    <c-v2.form_block title="Botão · variantes" description="4 variantes. O legado tinha 18, das quais 8 sem uso nenhum.">
+    <c-v2.form_block title="Botão · variantes" description="3 variantes. O legado tinha 18, das quais 8 sem uso nenhum.">
       <c-slot name="body">
         <div class="v2-lab__row">
           <c-v2.button label="Primary" variant="primary" />
           <c-v2.button label="Secondary" variant="secondary" />
-          <c-v2.button label="Ghost" variant="ghost" />
           <c-v2.button label="Danger" variant="danger" />
         </div>
       </c-slot>
     </c-v2.form_block>
 
-    <c-v2.form_block title="Botão · tamanhos e estados">
+    <c-v2.form_block title="Botão · estados">
       <c-slot name="body">
-        <div class="v2-lab__row">
-          <c-v2.button label="Padrão (44px)" />
-          <c-v2.button label="Pequeno (34px)" size="sm" />
-          <c-v2.button label="Mínimo (28px)" size="xs" />
-        </div>
         <div class="v2-lab__row">
           <c-v2.button label="Com ícone" icon="plus" variant="primary" />
           <c-v2.button label="Só ícone" icon="x" aria_label="Fechar" />
@@ -329,34 +327,77 @@
             <c-v2.input placeholder="Digite aqui" aria_label="Campo em field" />
           </c-slot>
         </c-v2.field>
-        <c-v2.field label="Superfície rail">
-          <c-slot name="control">
-            <c-v2.input placeholder="Digite aqui" aria_label="Campo em rail" surface="rail" />
+        <c-v2.form_block title="Bloco aninhado" description="Assume o degrau oposto sozinho — sem precisar de `surface`.">
+          <c-slot name="body">
+            <c-v2.field label="Superfície rail">
+              <c-slot name="control">
+                <c-v2.input placeholder="Digite aqui" aria_label="Campo no bloco aninhado" />
+              </c-slot>
+            </c-v2.field>
           </c-slot>
-        </c-v2.field>
+        </c-v2.form_block>
       </c-slot>
     </c-v2.form_block>
 
-    <c-v2.form_block title="Campo · estados">
+    {% comment %}
+      Os mesmos quatro estados aparecem duas vezes: direto no rail e dentro de
+      um bloco. É a única forma de ver se a superfície do campo alterna certo
+      nos dois contextos — foi comparando assim que apareceu a inversão entre
+      contêiner e campo.
+    {% endcomment %}
+    <h3 class="v2-lab__sub">Campo · estados — em bloco dentro de bloco</h3>
+
+    <c-v2.form_block title="Bloco externo" description="Segura a seção de campos.">
+      <c-slot name="body">
+        <c-v2.form_block title="Campo · estados" description="Bloco dentro de bloco — os dois no mesmo degrau.">
+          <c-slot name="body">
+            <c-v2.field label="Com ajuda" help="Texto de ajuda explicando o campo.">
+              <c-slot name="control">
+                <c-v2.input placeholder="Digite aqui" aria_label="Com ajuda, sobre o rail" />
+              </c-slot>
+            </c-v2.field>
+            <c-v2.field label="Com erro" error="Este campo é obrigatório.">
+              <c-slot name="control">
+                <c-v2.input placeholder="Digite aqui" aria_label="Com erro, sobre o rail" />
+              </c-slot>
+            </c-v2.field>
+            <c-v2.field label="Com ajuda e erro" help="A ajuda continua visível." error="E o erro aparece abaixo dela.">
+              <c-slot name="control">
+                <c-v2.input placeholder="Digite aqui" aria_label="Com ajuda e erro, sobre o rail" />
+              </c-slot>
+            </c-v2.field>
+            <c-v2.field label="Desabilitado">
+              <c-slot name="control">
+                <c-v2.input placeholder="Não editável" aria_label="Desabilitado, sobre o rail" :disabled="True" />
+              </c-slot>
+            </c-v2.field>
+          </c-slot>
+        </c-v2.form_block>
+      </c-slot>
+    </c-v2.form_block>
+
+    <h3 class="v2-lab__sub">Campo · estados — dentro de um bloco</h3>
+
+    <c-v2.form_block title="Campo · estados" description="Os mesmos quatro, um degrau adentro.">
       <c-slot name="body">
         <c-v2.field label="Com ajuda" help="Texto de ajuda explicando o campo.">
           <c-slot name="control">
-            <c-v2.input placeholder="Digite aqui" aria_label="Campo com ajuda" />
+            <c-v2.input placeholder="Digite aqui" aria_label="Com ajuda, no bloco" />
           </c-slot>
         </c-v2.field>
         <c-v2.field label="Com erro" error="Este campo é obrigatório.">
           <c-slot name="control">
-            <c-v2.input placeholder="Digite aqui" aria_label="Campo com erro" />
+            <c-v2.input placeholder="Digite aqui" aria_label="Com erro, no bloco" />
           </c-slot>
         </c-v2.field>
         <c-v2.field label="Com ajuda e erro" help="A ajuda continua visível." error="E o erro aparece abaixo dela.">
           <c-slot name="control">
-            <c-v2.input placeholder="Digite aqui" aria_label="Campo com ajuda e erro" />
+            <c-v2.input placeholder="Digite aqui" aria_label="Com ajuda e erro, no bloco" />
           </c-slot>
         </c-v2.field>
         <c-v2.field label="Desabilitado">
           <c-slot name="control">
-            <c-v2.input placeholder="Não editável" aria_label="Campo desabilitado" :disabled="True" />
+            <c-v2.input placeholder="Não editável" aria_label="Desabilitado, no bloco" :disabled="True" />
           </c-slot>
         </c-v2.field>
       </c-slot>
@@ -374,9 +415,9 @@
             <c-v2.select aria_label="Select de exemplo" :options="v2_opcoes" />
           </c-slot>
         </c-v2.field>
-        <c-v2.field label="Select na superfície rail">
+        <c-v2.field label="Select com 8 opções" help="O menu para em 5 itens e rola o resto.">
           <c-slot name="control">
-            <c-v2.select aria_label="Select em rail" :options="v2_opcoes" surface="rail" />
+            <c-v2.select aria_label="Select longo" :options="v2_opcoes_longas" />
           </c-slot>
         </c-v2.field>
         <c-v2.field label="Área de texto">
@@ -384,6 +425,37 @@
             <c-v2.input type="textarea" placeholder="Texto longo" aria_label="Área de texto" />
           </c-slot>
         </c-v2.field>
+      </c-slot>
+    </c-v2.form_block>
+
+
+    <h3 class="v2-lab__sub">Campo · tipos — uma camada a mais</h3>
+
+    {% comment %}
+      O mesmo conteúdo, um nível adentro. O bloco interno NÃO passa `surface`:
+      ele assume `field` sozinho, pela alternância por profundidade.
+    {% endcomment %}
+    <c-v2.form_block title="Bloco externo" description="Nível 1 — superfície rail.">
+      <c-slot name="body">
+        <c-v2.form_block title="Campo · tipos" description="Nível 2 — superfície field, assumida automaticamente.">
+          <c-slot name="body">
+            <c-v2.field label="Com ícone">
+              <c-slot name="control">
+                <c-v2.input icon="search" placeholder="Buscar" aria_label="Busca, nível 2" />
+              </c-slot>
+            </c-v2.field>
+            <c-v2.field label="Select" help="Gatilho e menu são criados pelo picker-select.js.">
+              <c-slot name="control">
+                <c-v2.select aria_label="Select, nível 2" :options="v2_opcoes" />
+              </c-slot>
+            </c-v2.field>
+            <c-v2.field label="Área de texto">
+              <c-slot name="control">
+                <c-v2.input type="textarea" placeholder="Texto longo" aria_label="Área de texto, nível 2" />
+              </c-slot>
+            </c-v2.field>
+          </c-slot>
+        </c-v2.form_block>
       </c-slot>
     </c-v2.form_block>
 
@@ -398,8 +470,8 @@
         </div>
         <div class="v2-lab__row">
           <c-v2.toggle variant="state" aria_label="Modo de preenchimento">
-            <button type="button" class="toggle__item" aria-pressed="true">No sistema</button>
-            <button type="button" class="toggle__item" aria-pressed="false">Manual</button>
+            <c-ui.buttons.button class_name="toggle__item" type="button" aria-pressed="true">No sistema</c-ui.buttons.button>
+            <c-ui.buttons.button class_name="toggle__item" type="button" aria-pressed="false">Manual</c-ui.buttons.button>
           </c-v2.toggle>
         </div>
       </c-slot>
@@ -424,8 +496,8 @@
         <c-v2.card title="Completo" meta="05/08/2026 a 12/08/2026 · ADEMAR · AAA1234">
           <c-slot name="actions">
             <c-v2.chip label="Em andamento" tone="var(--accent)" />
-            <c-v2.button label="Abrir" size="sm" />
-            <c-v2.button label="Excluir" size="sm" variant="danger" />
+            <c-v2.button label="Abrir" />
+            <c-v2.button label="Excluir" variant="danger" />
           </c-slot>
         </c-v2.card>
         <c-v2.card title="Só título e meta" meta="Sem ações." />
@@ -439,7 +511,7 @@
     <c-v2.form_block title="Header" description="Com e sem eyebrow, com e sem aside.">
       <c-slot name="body">
         <c-v2.header eyebrow="Eyebrow" title="Com eyebrow e ação">
-          <c-slot name="aside"><c-v2.button label="Ação" variant="primary" size="sm" /></c-slot>
+          <c-slot name="aside"><c-v2.button label="Ação" variant="primary" /></c-slot>
         </c-v2.header>
         <c-v2.header title="Só título" />
       </c-slot>

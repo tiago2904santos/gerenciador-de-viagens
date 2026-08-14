@@ -57,7 +57,7 @@
         </button>
       </div>
       <div class="gdrive-navrow">
-        <button type="button" class="button button--ghost button--sm" id="gdrive-btn-voltar" hidden>
+        <button type="button" class="button button--secondary" id="gdrive-btn-voltar" hidden>
           ← Voltar
         </button>
         <span class="gdrive-breadcrumb" id="gdrive-breadcrumb"></span>
@@ -81,7 +81,7 @@
                placeholder="Nome da nova pasta"
                maxlength="255"
                aria-label="Nome da nova pasta">
-        <button type="button" class="button button--secondary button--sm" id="gdrive-btn-criar">
+        <button type="button" class="button button--secondary" id="gdrive-btn-criar">
           Criar pasta
         </button>
       </div>
@@ -95,10 +95,10 @@
     </form>
 
     <div class="gdrive-browser-actions" id="gdrive-browser-actions" hidden>
-      <button type="button" class="button button--ghost button--sm" id="gdrive-btn-toggle-criar">
+      <button type="button" class="button button--secondary" id="gdrive-btn-toggle-criar">
         + Criar nova pasta aqui
       </button>
-      <button type="button" class="button button--primary button--sm" id="gdrive-btn-selecionar" disabled>
+      <button type="button" class="button button--primary" id="gdrive-btn-selecionar" disabled>
         Usar esta pasta como destino
       </button>
     </div>
@@ -116,13 +116,13 @@
           </p>
         </div>
         <div class="gdrive-actions gdrive-actions--massa">
-          <button type="button" class="button button--secondary button--sm" id="gdrive-btn-previa">
+          <button type="button" class="button button--secondary" id="gdrive-btn-previa">
             Ver prévia
           </button>
           <form method="post" action="{% url 'google_drive:reorganizar_tudo' %}"
                 data-confirm-submit data-confirm-message="Reorganizar TODOS os eventos e ofícios avulsos no Drive? Isso move/renomeia arquivos já enviados e sobe os que faltam.">
             {% csrf_token %}
-            <button type="submit" class="button button--primary button--sm">Reorganizar tudo no Drive</button>
+            <button type="submit" class="button button--primary">Reorganizar tudo no Drive</button>
           </form>
         </div>
       </div>

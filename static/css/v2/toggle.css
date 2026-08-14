@@ -8,7 +8,7 @@
  * fazia o hover cair justamente sobre o item já ativo.
  */
 
-.toggle {
+:is(html[data-theme]) .toggle {
   align-items: center;
   background: var(--ui-surface, var(--surface-rail));
   border-radius: var(--radius-field);
@@ -17,7 +17,7 @@
   padding: 3px;
 }
 
-.toggle__item {
+:is(html[data-theme]) .toggle__item {
   align-items: center;
   background: transparent;
   border: 0;
@@ -34,8 +34,8 @@
   white-space: nowrap;
 }
 
-.toggle__item[aria-current="page"],
-.toggle__item[aria-pressed="true"] {
+:is(html[data-theme]) .toggle__item[aria-current="page"],
+:is(html[data-theme]) .toggle__item[aria-pressed="true"] {
   background: var(--accent);
   color: var(--text-on-accent);
   font-weight: var(--weight-strong);
@@ -43,20 +43,20 @@
 
 /* O ativo declara o hover junto: sem isso o realce do inativo pinta por cima
    dele e o estado desaparece justamente onde importa. */
-.toggle__item[aria-current="page"]:hover,
-.toggle__item[aria-pressed="true"]:hover {
+:is(html[data-theme]) .toggle__item[aria-current="page"]:hover,
+:is(html[data-theme]) .toggle__item[aria-pressed="true"]:hover {
   background: var(--accent);
   color: var(--text-on-accent);
 }
 
-.toggle__item:hover:not([aria-current="page"]):not([aria-pressed="true"]) {
+:is(html[data-theme]) .toggle__item:hover:not([aria-current="page"]):not([aria-pressed="true"]) {
   background: var(--surface-field);
   color: var(--text-strong);
 }
 
 /* O contador herda a cor do segmento, então serve aos dois estados sem regra
    por estado. */
-.toggle__count {
+:is(html[data-theme]) .toggle__count {
   background: color-mix(in srgb, currentColor 16%, transparent);
   border-radius: var(--radius-pill);
   font-size: var(--text-size-eyebrow);

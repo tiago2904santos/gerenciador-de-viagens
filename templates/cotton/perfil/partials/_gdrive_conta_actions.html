@@ -1,15 +1,15 @@
 {% cotton:vars drive_autorizado drive_creds %}
 {% if drive_autorizado and drive_creds %}
   <div class="gdrive-actions gdrive-actions--head">
-    <a href="{% url 'google_drive:oauth_iniciar' %}" class="button button--secondary button--sm">Trocar conta</a>
+    <a href="{% url 'google_drive:oauth_iniciar' %}" class="button button--secondary">Trocar conta</a>
     <form method="post" action="{% url 'google_drive:oauth_revogar' %}"
           data-confirm-submit data-confirm-message="Desconectar a conta Google vai remover os tokens salvos. Continuar?">
       {% csrf_token %}
-      <button type="submit" class="button button--sm gdrive-btn-unlink">Desconectar</button>
+      <button type="submit" class="button gdrive-btn-unlink">Desconectar</button>
     </form>
   </div>
 {% else %}
   <div class="gdrive-actions gdrive-actions--head">
-    <a href="{% url 'google_drive:oauth_iniciar' %}" class="button button--primary button--sm">Conectar conta Google</a>
+    <a href="{% url 'google_drive:oauth_iniciar' %}" class="button button--primary">Conectar conta Google</a>
   </div>
 {% endif %}

@@ -1,0 +1,96 @@
+/* Superfícies — o modificador que o chamador escolhe, via `surface="rail"` ou
+ * `surface="field"`.
+ *
+ * Esta folha é a ÚLTIMA do bundle de propósito. Um modificador precisa vencer o
+ * padrão do componente, e ele empata em especificidade com ele — quem decide é
+ * a ordem. Enquanto essas regras moraram em `base.css`, que carrega antes, o
+ * `--surface-contrast` fixo do `form-block` as sobrescrevia e a alternância
+ * parava no primeiro nível.
+ *
+ * Cada camada declara duas coisas: a própria superfície (`--surface`) e a do
+ * degrau vizinho (`--surface-contrast`), que é o que os filhos usam. É isso que
+ * faz `page → rail → field → rail → field → …` alternar em qualquer
+ * profundidade, sem um quarto token.
+ */
+
+/* Cada camada declara duas coisas: a própria superfície (`--surface`) e a do
+   degrau vizinho (`--surface-contrast`), que é o que os controles internos usam
+   para se destacar sem precisar de borda. */
+:is(html[data-theme]) .surface--page {
+  --surface: var(--surface-page);
+  --surface-contrast: var(--surface-rail);
+}
+
+:is(html[data-theme]) .surface--rail {
+  --surface: var(--surface-rail);
+  --surface-contrast: var(--surface-field);
+}
+
+:is(html[data-theme]) .surface--field {
+  --surface: var(--surface-field);
+  --surface-contrast: var(--surface-rail);
+}
+
+/* A alternância não tem limite de profundidade: `page → rail → field → rail →
+   field → …`. Quem determina o degrau é o CHAMADOR, via `surface`; o contêiner
+   só o respeita e oferece o oposto aos filhos. Um quarto token de superfície
+   resolveria um nível e quebraria no seguinte. */
+
+
+/* ---- a única borda do sistema -------------------------------------------
+ *
+ * Só a PRIMEIRA camada depois do `page` tem contorno: o contêiner que se apoia
+ * direto no fundo da página. O `:not()` diz exatamente isso — "contêiner que
+ * não é descendente de outro contêiner".
+ *
+ * Dentro dela, nada de linha: a separação entre contêineres aninhados é a
+ * alternância de superfície, e quem aninha passa `surface` com o degrau oposto.
+ * O card também perdeu a borda própria; a regra é do sistema, não do
+ * componente, senão cada folha volta a decidir por conta e o desenho se
+ * fragmenta de novo.
+ */
+:is(html[data-theme])
+  :is(.panel, .form-block--v2, .card--v2, .rail):not(
+    :is(.panel, .form-block--v2, .card--v2, .rail) *
+  ) {
+  border: 1px solid var(--line);
+}
+
+/* ---- alternância automática por profundidade -----------------------------
+ *
+ * O contêiner aninhado assume sozinho o degrau oposto ao do pai:
+ *
+ *     page → rail → field → rail → field
+ *
+ * Não dá para o CSS "inverter uma variável" — referência circular em custom
+ * property é inválida. Mas dá para alternar por PROFUNDIDADE, com seletor
+ * descendente. Quatro níveis cobrem qualquer tela real; se um dia faltar, a
+ * regra seguinte é uma linha.
+ *
+ * `surface="…"` continua valendo e vence estas regras, para o caso em que a
+ * tela quer quebrar a alternância de propósito.
+ *
+ * Cada nível declara também `--surface-contrast`, que é o degrau que os
+ * CONTROLES (campo, select) usam — eles ficam sempre no oposto do contêiner.
+ */
+
+:is(html[data-theme]) :is(.panel, .form-block--v2, .card--v2, .rail)
+  :is(.panel, .form-block--v2, .card--v2, .rail) {
+  background: var(--surface-field);
+  --surface-contrast: var(--surface-rail);
+}
+
+:is(html[data-theme]) :is(.panel, .form-block--v2, .card--v2, .rail)
+  :is(.panel, .form-block--v2, .card--v2, .rail)
+  :is(.panel, .form-block--v2, .card--v2, .rail) {
+  background: var(--surface-rail);
+  --surface-contrast: var(--surface-field);
+}
+
+:is(html[data-theme]) :is(.panel, .form-block--v2, .card--v2, .rail)
+  :is(.panel, .form-block--v2, .card--v2, .rail)
+  :is(.panel, .form-block--v2, .card--v2, .rail)
+  :is(.panel, .form-block--v2, .card--v2, .rail) {
+  background: var(--surface-field);
+  --surface-contrast: var(--surface-rail);
+}

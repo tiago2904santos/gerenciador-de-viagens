@@ -2,11 +2,14 @@
  *
  * Depende de `v2/tokens.css`. Não escreve cor literal.
  *
- * ## Por que 6 variantes e não 18
+ * ## Por que 3 variantes e não 18
  *
  * O botão legado (`actions/buttons.css`, 1141 linhas) tinha 18 variantes.
  * Medido no repositório, **8 estavam mortas** — zero uso em template e em JS:
  * `soft-danger`, `neutral`, `icon`, `pill`, `tool`, `docx`, `back`, `lg`.
+ *
+ * `ghost` saiu por decisão do dono: os 3 usos que tinha eram todos do navegador
+ * de pastas do Drive, e viraram `secondary`.
  *
  * Das que restam, `preview` (2 usos), `pdf` (2) e `back-list` (1) não são
  * variantes de botão: são aparências de uma tela específica que viraram
@@ -24,7 +27,7 @@
  * linha inteira de botões tremer quando o mouse passa.
  */
 
-.button {
+:is(html[data-theme]) .button {
   align-items: center;
   background: var(--surface-field);
   border: 1px solid transparent;
@@ -47,42 +50,41 @@
   white-space: nowrap;
 }
 
-.button:focus-visible {
+:is(html[data-theme]) .button:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
 /* Desabilitado vale para `<button disabled>` e para `<a aria-disabled>`, que
    não aceita o atributo `disabled`. */
-.button:disabled,
-.button[aria-disabled="true"] {
+:is(html[data-theme]) .button:disabled,
+:is(html[data-theme]) .button[aria-disabled="true"] {
   cursor: not-allowed;
   opacity: 0.55;
 }
 
 /* ---- variantes ---------------------------------------------------------- */
 
-.button--primary {
-  background: var(--action);
-  color: var(--text-on-action);
+/* A ação principal é o accent do tema: azul-marinho no claro, dourado no
+   escuro. É a decisão que também desatou o nó do contraste — nenhum azul com
+   texto branco satisfazia, ao mesmo tempo, o mínimo de leitura (4.5) e o
+   destaque contra a caixa (3.0) no tema escuro. */
+:is(html[data-theme]) .button--primary {
+  background: var(--accent);
+  color: var(--text-on-accent);
   font-weight: var(--weight-strong);
 }
 
-/* O secondary repousa na MESMA superfície do bloco que costuma contê-lo, então
-   a borda não é enfeite: é o que lhe dá contorno. Removê-la faz o botão sumir
-   dentro do card. */
-.button--secondary {
-  background: var(--surface-field);
-  border-color: var(--line);
+/* O secondary INTERCALA a superfície: fica no degrau oposto ao da camada que o
+   contém, e é esse contraste — não uma borda — que lhe dá contorno. Quem
+   define o degrau é o contêiner, via `--surface-contrast`. */
+:is(html[data-theme]) .button--secondary {
+  background: var(--surface-contrast, var(--surface-rail));
+  border-color: transparent;
   color: var(--text-strong);
 }
 
-.button--ghost {
-  background: transparent;
-  color: var(--accent);
-}
-
-.button--danger {
+:is(html[data-theme]) .button--danger {
   background: var(--danger);
   color: var(--text-on-danger);
   font-weight: var(--weight-strong);
@@ -94,47 +96,49 @@
  * dourado, e `color-mix` dele com o azul-marinho do fundo cai em oliva
  * (medido: `#2d302c`). Foi um erro cometido duas vezes no sistema antigo. */
 
-.button--secondary:hover:not(:disabled):not([aria-disabled="true"]),
-.button--ghost:hover:not(:disabled):not([aria-disabled="true"]) {
-  background: var(--surface-rail);
+/* Mesmo hover do "Limpar" do calendário (`fields/date-picker.css:234`, na
+   versão de `ui/date-picker.css`): a superfície recebe 14% do accent e o texto
+   assume o accent.
+
+   Decisão do dono, tomada com o número na mesa: no tema escuro o accent é
+   dourado e a mistura com o azul-marinho dá `#3b4342`, um pardo. Fica
+   registrado aqui para quem reabrir o arquivo não "consertar" achando que é
+   descuido. */
+:is(html[data-theme]) .button--secondary:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface-contrast, var(--surface-rail)));
+  color: var(--accent);
 }
 
-.button--primary:hover:not(:disabled):not([aria-disabled="true"]),
-.button--danger:hover:not(:disabled):not([aria-disabled="true"]) {
-  /* Já estão numa cor cheia: escurecer com sobreposição preserva o matiz. */
+/* ACENDE, não apaga: sobreposição branca sobre a cor cheia. A sobreposição
+   preserva o matiz do accent — clarear com `color-mix` para o branco
+   dessaturaria o dourado do tema escuro. */
+:is(html[data-theme]) .button--primary:hover:not(:disabled):not([aria-disabled="true"]) {
+  box-shadow: inset 0 0 0 999px rgb(255 255 255 / 0.16);
+}
+
+/* O danger continua escurecendo: no vermelho, clarear lê como "menos grave" —
+   o oposto do que o botão comunica. */
+:is(html[data-theme]) .button--danger:hover:not(:disabled):not([aria-disabled="true"]) {
   box-shadow: inset 0 0 0 999px rgb(0 0 0 / 0.12);
 }
 
-/* ---- tamanhos ------------------------------------------------------------
- *
- * `control` não é tamanho: é o botão que divide a barra com os campos, então
- * herda a altura do controle e só perde o realce. Continua existindo porque
- * tem 11 usos reais. */
 
-.button--sm {
-  font-size: 13px;
-  min-height: 34px;
-  padding: 0 11px;
-}
+/* Tamanho único: 44px. O legado tinha três alturas para o mesmo controle e
+   nenhuma escala por trás — os valores de `sm` e `xs` eram fixos e arbitrários.
+   Um botão é um botão.
 
-.button--xs {
-  font-size: var(--text-size-eyebrow);
-  min-height: 28px;
-  padding: 0 8px;
-}
-
-/* ---- ícone ---------------------------------------------------------------
+   ---- ícone ---------------------------------------------------------------
  *
  * Dimensão fixa para o ícone não esticar quando o rótulo quebra. */
 
-.button__icon {
+:is(html[data-theme]) .button__icon {
   align-items: center;
   display: inline-flex;
   flex: none;
   justify-content: center;
 }
 
-.button__icon svg {
+:is(html[data-theme]) .button__icon svg {
   height: 16px;
   width: 16px;
 }

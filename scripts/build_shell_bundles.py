@@ -131,6 +131,7 @@ UI_CSS: tuple[str, ...] = (
     "css/v2/card.css",
     "css/v2/chip.css",
     "css/v2/panel.css",
+    "css/v2/surface.css",
     "css/ui/tokens.css",
     "css/ui/header.css",
     "css/ui/sub-header.css",

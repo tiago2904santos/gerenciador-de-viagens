@@ -6,7 +6,7 @@
  * exatamente o que esta folha existe para não deixar acontecer de novo.
  */
 
-.input {
+:is(html[data-theme]) .input {
   align-items: center;
   display: flex;
   gap: var(--gap-tight);
@@ -14,8 +14,12 @@
   position: relative;
 }
 
-.input__control {
-  background: var(--ui-surface, var(--surface-field));
+:is(html[data-theme]) .input__control {
+  /* A superfície do campo é `--surface-field` — o token leva o nome dele. Quem
+     muda é o CONTÊINER, que fica um degrau abaixo (`--surface-rail`). Cheguei a
+     fazer o contrário, com o bloco em `field` e o campo intercalando para
+     `rail`; ficava invertido, com o campo mais escuro que a caixa. */
+  background: var(--surface-contrast, var(--surface-field));
   border: 1px solid transparent;
   border-radius: var(--radius-field);
   box-sizing: border-box;
@@ -28,22 +32,30 @@
   width: 100%;
 }
 
-.input__control::placeholder {
+:is(html[data-theme]) .input__control::placeholder {
   color: var(--text-muted);
 }
 
-.input__control:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: -1px;
+/* O foco ACENDE A BORDA. O campo já reserva `1px solid transparent`, então
+   colorir esse fio não desloca nada — e ocupa o lugar da borda que o campo não
+   usa em repouso. Sem anel, sem sombra: a sombra fica reservada ao erro.
+ *
+ * O `!important` é a ÚNICA forma de dispensar o anel: `base/base.css:128` o
+ * impõe a todo controle com `!important`, como garantia global de
+ * acessibilidade. A garantia não cai — a borda acesa cumpre a mesma função.
+ * Quando o CSS legado sair, este `!important` sai junto. */
+:is(html[data-theme]) .input__control:focus-visible {
+  border-color: var(--focus-ring);
+  outline: none !important;
 }
 
 /* Ícone dentro do campo: sai do fluxo e o texto ganha recuo para não passar
    por baixo dele. */
-.input--with-icon .input__control {
+:is(html[data-theme]) .input--with-icon .input__control {
   padding-left: 38px;
 }
 
-.input__icon {
+:is(html[data-theme]) .input__icon {
   align-items: center;
   color: var(--text-muted);
   display: inline-flex;
@@ -52,19 +64,27 @@
   position: absolute;
 }
 
-.input__icon svg {
+:is(html[data-theme]) .input__icon svg {
   height: 16px;
   width: 16px;
 }
 
-.input__control:disabled {
+:is(html[data-theme]) .input__control:disabled {
   cursor: not-allowed;
   opacity: 0.55;
 }
 
-/* A área de texto cresce na vertical e por isso não usa `--control-height`;
-   o padding vira simétrico, senão o texto cola no topo. */
-.input__control--textarea {
+/* A área de texto cresce na vertical e por isso não usa `--control-height`; o
+   padding vira simétrico, senão o texto cola no topo.
+ *
+ * NÃO neutralizar a altura inline aqui. Cheguei a pôr `height: auto !important`
+ * para ter "uma fonte só" — e isso matou o redimensionamento manual, porque o
+ * arrasto do canto também escreve altura inline, igual ao auto-ajuste do JS. O
+ * CSS não distingue os dois.
+ *
+ * O `min-height` já garante o piso: altura inline menor que ele não tem efeito.
+ * O que o usuário aumenta, fica. */
+:is(html[data-theme]) .input__control--textarea {
   min-height: 96px;
   padding: 10px 12px;
   resize: vertical;

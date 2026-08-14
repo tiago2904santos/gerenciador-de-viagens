@@ -40,8 +40,14 @@ class MainPreviewContractTests(SimpleTestCase):
             with self.subTest(variant=variant):
                 self.assertIn(f'variant="{variant}"', source)
         self.assertIn("<c-dev.header_toggle ", source)
-        self.assertEqual(source.count('aria-pressed="true"'), 1)
-        self.assertEqual(source.count('aria-pressed="false"'), 2)
+        # NOVO-120: a contagem é escopada no bloco do header dev. Ela media o
+        # arquivo inteiro, o que deixou de valer quando a galeria do v2 trouxe
+        # um segundo toggle para a mesma página.
+        inicio = source.index("<c-dev.header_toggle ")
+        fim = source.index("</c-dev.header_toggle>", inicio)
+        bloco_do_header = source[inicio:fim]
+        self.assertEqual(bloco_do_header.count('aria-pressed="true"'), 1)
+        self.assertEqual(bloco_do_header.count('aria-pressed="false"'), 2)
         self.assertIn("data-main-preview-header-toggle", toggle_component)
         self.assertIn("main-preview-header__title", toggle_js)
         self.assertIn('setAttribute("aria-pressed"', toggle_js)

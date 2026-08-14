@@ -5,25 +5,25 @@
  * migrada. O escopo cai junto com o legado.
  */
 
-.form-block--v2 .field {
+:is(html[data-theme]) .field {
   display: grid;
   gap: 6px;
   min-width: 0;
 }
 
-.form-block--v2 .field__label {
+:is(html[data-theme]) .field__label {
   color: var(--text-strong);
   font-size: var(--text-size-base);
   font-weight: var(--weight-strong);
 }
 
-.form-block--v2 .field__help {
+:is(html[data-theme]) .field__help {
   color: var(--text-muted);
   font-size: var(--text-size-eyebrow);
   margin: 0;
 }
 
-.form-block--v2 .field__error {
+:is(html[data-theme]) .field__error {
   color: var(--danger);
   font-size: var(--text-size-eyebrow);
   margin: 0;
@@ -31,6 +31,15 @@
 
 /* O campo inválido muda de traço, nunca de forma: mudar geometria no erro faz
    o formulário inteiro pular quando a validação roda. */
-.form-block--v2 .field--invalid .input__control {
+:is(html[data-theme]) .field--invalid .input__control {
   border-color: var(--danger);
+}
+
+/* O erro é o ÚNICO caso com sombra. Nos demais o foco só acende a borda; aqui
+   a borda já está vermelha em repouso, então precisa de outro sinal para o foco
+   não passar despercebido. */
+:is(html[data-theme]) .field--invalid .input__control:focus-visible {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 40%, transparent);
+  outline: none !important;
 }

@@ -3,7 +3,7 @@
  * Único componente que usa `--surface-brand`.
  */
 
-.header {
+:is(html[data-theme]) .header {
   align-items: center;
   background: var(--surface-brand);
   border-radius: var(--radius-brand) var(--radius-brand) 0 0;
@@ -15,13 +15,13 @@
   padding: var(--pad-rail);
 }
 
-.header__copy {
+:is(html[data-theme]) .header__copy {
   display: grid;
   gap: 2px;
   min-width: 0;
 }
 
-.header__eyebrow {
+:is(html[data-theme]) .header__eyebrow {
   color: var(--accent);
   font-size: var(--text-size-eyebrow);
   font-weight: var(--weight-strong);
@@ -29,7 +29,7 @@
   text-transform: uppercase;
 }
 
-.header__title {
+:is(html[data-theme]) .header__title {
   color: var(--text-on-brand);
   font-size: var(--text-size-title);
   font-weight: var(--weight-strong);
@@ -37,7 +37,7 @@
   margin: 0;
 }
 
-.header__aside {
+:is(html[data-theme]) .header__aside {
   align-items: center;
   display: flex;
   flex: none;

@@ -180,6 +180,10 @@ def main_preview(request):
                 {"value": "2", "label": "Segunda opção"},
                 {"value": "3", "label": "Terceira opção"},
             ),
+            # Oito opções: o menu tem teto de cinco, então este prova a rolagem.
+            "v2_opcoes_longas": tuple(
+                {"value": str(i), "label": f"Opção {i:02d}"} for i in range(1, 9)
+            ),
             "v2_abas": (
                 {"label": "Exemplo", "count": 3, "url": "#", "is_active": True},
                 {"label": "Outro", "count": 0, "url": "#", "is_active": False},

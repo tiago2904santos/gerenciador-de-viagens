@@ -1,7 +1,8 @@
 /* Panel — a superfície que agrupa uma lista ou um conjunto de blocos. */
 
-.panel {
-  background: var(--ui-surface, var(--surface-field));
+:is(html[data-theme]) .panel {
+  --surface-contrast: var(--surface-field);
+  background: var(--surface, var(--surface-rail));
   border-radius: var(--radius-rail);
   box-sizing: border-box;
   display: grid;
@@ -10,7 +11,7 @@
   padding: var(--gap-loose);
 }
 
-.panel__empty {
+:is(html[data-theme]) .panel__empty {
   color: var(--text-muted);
   display: grid;
   gap: var(--gap-tight);
@@ -19,7 +20,7 @@
   text-align: center;
 }
 
-.panel__empty-title {
+:is(html[data-theme]) .panel__empty-title {
   color: var(--text-strong);
   font-size: var(--text-size-title);
   font-weight: var(--weight-strong);

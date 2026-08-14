@@ -12,34 +12,12 @@
  * um só, fica na folha dele.
  */
 
-/* ---- superfície escolhida pelo chamador ---------------------------------
- *
- * `surface="rail"` / `surface="field"` no template viram estas classes. O
- * modificador declara uma VARIÁVEL em vez de pintar: variável herda pela
- * árvore e não disputa especificidade, então funciona também nos elementos que
- * o JS cria em tempo de execução (o gatilho e o menu do select, por exemplo).
- *
- * Pintar direto foi a primeira tentativa e falhou: a regra padrão de cada
- * componente vencia por peso e o atributo no HTML não tinha efeito nenhum.
- */
-.surface--page {
-  --surface: var(--surface-page);
-}
-
-.surface--rail {
-  --surface: var(--surface-rail);
-}
-
-.surface--field {
-  --surface: var(--surface-field);
-}
-
 /* ---- foco -----------------------------------------------------------------
  *
  * Um anel só para todo o sistema. `:focus-visible` e não `:focus`: quem clica
  * com o mouse não vê anel, quem navega por teclado vê.
  */
-.focus-ring:focus-visible {
+:is(html[data-theme]) .focus-ring:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
@@ -58,12 +36,12 @@
  * ela. Ficam aqui, e não numa folha de página, porque a galeria é o lugar onde
  * o sistema v2 se prova.
  */
-.v2-lab {
+:is(html[data-theme]) .v2-lab {
   display: grid;
   gap: var(--gap);
 }
 
-.v2-lab__group {
+:is(html[data-theme]) .v2-lab__group {
   color: var(--text-muted);
   font-size: var(--text-size-eyebrow);
   font-weight: var(--weight-strong);
@@ -72,9 +50,16 @@
   text-transform: uppercase;
 }
 
-.v2-lab__row {
+:is(html[data-theme]) .v2-lab__row {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
   gap: var(--gap);
+}
+
+:is(html[data-theme]) .v2-lab__sub {
+  color: var(--text-muted);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-normal);
+  margin: var(--gap) 0 0;
 }

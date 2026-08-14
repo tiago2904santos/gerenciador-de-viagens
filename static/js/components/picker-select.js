@@ -28,12 +28,18 @@
     return 'cs-' + (++uid);
   }
 
+  // NOVO-120: o `xmlns` NAO e decorativo. `svgNode()` usa DOMParser com
+  // 'image/svg+xml', e sem o namespace declarado na raiz o documento sai com
+  // namespace nulo — o resultado e um elemento HTML chamado "svg", que tem
+  // caixa, aceita width/height e responde a getComputedStyle, mas NAO desenha
+  // nada. A seta ficou invisivel por isso; o CSS antigo compensava desenhando
+  // um triangulo com `::before` e bordas, em vez de corrigir a origem.
   function svgChevron() {
-    return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
   }
 
   function svgCheck() {
-    return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
   }
 
   function svgNode(markup) {
