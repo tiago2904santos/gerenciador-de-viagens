@@ -95,10 +95,11 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
 
     def test_namespace_unico_tem_o_inventario_atual(self):
         self.assertEqual(list((ROOT / "templates" / "components").rglob("*.*")), [])
-        # NOVO-120: 104 = 91 originais + 3 globais da primeira leva + 10 do
+        # NOVO-120: 115 = 121 - os 6 componentes do lab v1 (), apagados
+        # com a prévia antiga. Dentro dos 115 estão os 26 do
         # sistema v2 (`cotton/v2/`), cujo consumidor de produção é a galeria do
         # UI Lab. `forms/select.html` saiu, fundido no select global.
-        self.assertEqual(len(self.components()), 104)
+        self.assertEqual(len(self.components()), 115)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.

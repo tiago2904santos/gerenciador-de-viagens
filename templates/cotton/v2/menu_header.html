@@ -1,0 +1,9 @@
+{% cotton:vars description extra_class title %}
+{% comment %}
+  Cabeçalho de um grupo dentro do menu de ações. Separa seções sem precisar de
+  uma linha divisória.
+{% endcomment %}
+<div class="menu__header{% if extra_class %} {{ extra_class }}{% endif %}" role="presentation">
+  <strong class="menu__header-title">{{ title }}</strong>
+  {% if description %}<small class="menu__header-description">{{ description }}</small>{% endif %}
+</div>

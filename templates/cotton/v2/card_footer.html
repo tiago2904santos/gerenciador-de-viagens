@@ -1,0 +1,11 @@
+{% cotton:vars extra_class primary secondary %}
+{% comment %}
+  Rodapé de card/formulário v2 — a faixa de ações que fecha um bloco.
+
+  `secondary` fica à esquerda e `primary` à direita: a ação de avançar mora
+  sempre no mesmo canto, em todas as telas.
+{% endcomment %}
+<footer class="card-footer{% if extra_class %} {{ extra_class }}{% endif %}">
+  <div class="card-footer__side">{{ secondary }}</div>
+  <div class="card-footer__side">{{ primary }}</div>
+</footer>

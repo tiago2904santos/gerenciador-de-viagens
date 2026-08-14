@@ -300,6 +300,14 @@
 
     function positionPanel() {
       if (panel.parentElement !== document.body) {
+        /* O painel vai para o `body` e perde os ancestrais — com eles some a
+         * única forma de o CSS saber de que campo ele veio. Como o partial do
+         * calendário é o mesmo nas telas migradas e nas legadas, sem essa marca
+         * qualquer regra nova alcançaria as duas. Ela é copiada da raiz v2
+         * (`.date-field`) na hora do transplante. */
+        if (root.closest('.date-field')) {
+          panel.classList.add('date-field__panel');
+        }
         document.body.appendChild(panel);
       }
       var anchor = startDisplay || trigger;
@@ -362,6 +370,39 @@
 
     function openPicker() {
       setOpen(true);
+    }
+
+    /* Abre o calendário a partir de um campo de exibição.
+     *
+     * O `focus` sozinho não serve: ele chega no `mousedown`, ANTES do `mouseup`.
+     * O painel nasce embaixo do cursor, o `mouseup` cai numa célula do
+     * calendário em vez de cair no campo, e o navegador — vendo alvos
+     * diferentes na descida e na subida — dispara o `click` no ancestral comum,
+     * o `body`. O `attachDismiss` lê isso como clique fora e fecha. Resultado:
+     * o primeiro clique abria e fechava no mesmo gesto, e só o segundo pegava.
+     *
+     * Então quando o foco vem do ponteiro, quem abre é o `click`, depois do
+     * `mouseup` — o alvo continua sendo o campo e nada fecha. Pelo teclado não
+     * há ponteiro, o `focus` abre como antes e o Tab continua alcançando o
+     * calendário.
+     */
+    function bindAbertura(display) {
+      var focoVeioDoPonteiro = false;
+
+      display.addEventListener('pointerdown', function () {
+        focoVeioDoPonteiro = true;
+      });
+      display.addEventListener('focus', function () {
+        if (focoVeioDoPonteiro) return;
+        openPicker();
+      });
+      display.addEventListener('click', function () {
+        focoVeioDoPonteiro = false;
+        openPicker();
+      });
+      display.addEventListener('blur', function () {
+        focoVeioDoPonteiro = false;
+      });
     }
 
     function setMonth(monthDate) {
@@ -735,12 +776,7 @@
     });
 
     if (display) {
-      display.addEventListener('click', function () {
-        openPicker();
-      });
-      display.addEventListener('focus', function () {
-        openPicker();
-      });
+      bindAbertura(display);
     }
 
     prev.addEventListener('click', function () {
@@ -812,8 +848,7 @@
     }
 
     if (startDisplay) {
-      startDisplay.addEventListener('click', openPicker);
-      startDisplay.addEventListener('focus', openPicker);
+      bindAbertura(startDisplay);
       startDisplay.addEventListener('change', function () {
         var parsed = parseDisplayDate(startDisplay.value);
         if (parsed) {
@@ -830,8 +865,7 @@
     }
 
     if (endDisplay) {
-      endDisplay.addEventListener('click', openPicker);
-      endDisplay.addEventListener('focus', openPicker);
+      bindAbertura(endDisplay);
       endDisplay.addEventListener('change', function () {
         var parsed = parseDisplayDate(endDisplay.value);
         if (parsed) {

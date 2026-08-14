@@ -1,0 +1,51 @@
+/* Alert — a pilha de mensagens. Depende de `v2/tokens.css`.
+ *
+ * O tom vem de `data-tone`, com os MESMOS tokens de estado do chip: uma
+ * mensagem de sucesso e um selo "Concluído" são a mesma informação em formatos
+ * diferentes, e precisam da mesma cor.
+ */
+
+:is(html[data-theme]) .alert-stack {
+  display: grid;
+  gap: var(--gap-tight);
+}
+
+:is(html[data-theme]) .alert {
+  /* Mesma fórmula do chip: o tom a 16% sobre TRANSPARENTE, não sobre a
+     superfície. Misturar com transparente deixa o fundo da camada aparecer por
+     baixo, então o resultado se adapta aos dois temas sozinho.
+     
+     Foi isso que apagou a única regra do v2 com valor por tema: a versão
+     anterior misturava com `--surface-field` e sujava no escuro — o amarelo
+     caía em pardo (#3c423f) e o vermelho em arroxeado (#383444), medidos. */
+  background: color-mix(in srgb, var(--alert-tone, var(--status-info)) 16%, transparent);
+  /* A fitinha lateral fica: ela dá o sinal mesmo em leitura rápida, quando o
+     fundo translúcido é sutil demais para ser percebido de canto de olho. É a
+     única borda do componente. */
+  border: 0;
+  border-left: 3px solid var(--alert-tone, var(--status-info));
+  border-radius: var(--radius-field);
+  color: var(--alert-tone, var(--status-info));
+  font-size: var(--text-size-base);
+  margin: 0;
+  /* Recuo menor à esquerda: a fitinha já ocupa parte do espaço, e o padding
+     cheio dos dois lados afastava o texto do sinal. */
+  padding: 12px 14px 12px 10px;
+}
+
+:is(html[data-theme]) .alert[data-tone="success"] {
+  --alert-tone: var(--status-done);
+}
+
+:is(html[data-theme]) .alert[data-tone="warning"] {
+  --alert-tone: var(--status-progress);
+}
+
+:is(html[data-theme]) .alert[data-tone="error"] {
+  --alert-tone: var(--status-late);
+}
+
+:is(html[data-theme]) .alert[data-tone="info"] {
+  --alert-tone: var(--status-info);
+}
+

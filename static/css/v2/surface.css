@@ -50,8 +50,8 @@
  * fragmenta de novo.
  */
 :is(html[data-theme])
-  :is(.panel, .form-block--v2, .card--v2, .rail):not(
-    :is(.panel, .form-block--v2, .card--v2, .rail) *
+  :is(.panel, .form-block--v2, .record, .rail):not(
+    :is(.panel, .form-block--v2, .record, .rail) *
   ) {
   border: 1px solid var(--line);
 }
@@ -70,27 +70,34 @@
  * `surface="…"` continua valendo e vence estas regras, para o caso em que a
  * tela quer quebrar a alternância de propósito.
  *
- * Cada nível declara também `--surface-contrast`, que é o degrau que os
- * CONTROLES (campo, select) usam — eles ficam sempre no oposto do contêiner.
+ * Cada nível declara os DOIS: `--surface`, o degrau do próprio contêiner, e
+ * `--surface-contrast`, o degrau que os CONTROLES (campo, select) usam para
+ * ficar no oposto dele. Enquanto só o contraste era declarado, `var(--surface)`
+ * vinha vazio dentro de qualquer aninhamento e quem dependia dele caía no
+ * fallback — foi o que deixou o botão do calendário na mesma cor do campo
+ * dentro de um bloco split.
  */
 
-:is(html[data-theme]) :is(.panel, .form-block--v2, .card--v2, .rail)
-  :is(.panel, .form-block--v2, .card--v2, .rail) {
+:is(html[data-theme]) :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail) {
   background: var(--surface-field);
+  --surface: var(--surface-field);
   --surface-contrast: var(--surface-rail);
 }
 
-:is(html[data-theme]) :is(.panel, .form-block--v2, .card--v2, .rail)
-  :is(.panel, .form-block--v2, .card--v2, .rail)
-  :is(.panel, .form-block--v2, .card--v2, .rail) {
+:is(html[data-theme]) :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail) {
   background: var(--surface-rail);
+  --surface: var(--surface-rail);
   --surface-contrast: var(--surface-field);
 }
 
-:is(html[data-theme]) :is(.panel, .form-block--v2, .card--v2, .rail)
-  :is(.panel, .form-block--v2, .card--v2, .rail)
-  :is(.panel, .form-block--v2, .card--v2, .rail)
-  :is(.panel, .form-block--v2, .card--v2, .rail) {
+:is(html[data-theme]) :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail)
+  :is(.panel, .form-block--v2, .record, .rail) {
   background: var(--surface-field);
+  --surface: var(--surface-field);
   --surface-contrast: var(--surface-rail);
 }

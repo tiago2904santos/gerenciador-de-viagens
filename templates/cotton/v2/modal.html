@@ -1,0 +1,20 @@
+{% cotton:vars actions aria_label body extra_class modal_id title %}
+{% comment %}
+  Modal v2 — diálogo. Par de `static/css/v2/modal.css`.
+
+  Usa `<dialog>` nativo: ele já traz foco preso, fechamento por Esc e a camada
+  de topo do navegador. O sistema antigo reimplementava isso em JS, e era de lá
+  que vinham os defeitos de foco.
+
+  O JS de abertura continua sendo o `js/components/overlay.js`, que acha o
+  diálogo por `id` — por isso `modal_id` é obrigatório.
+{% endcomment %}
+<dialog class="modal{% if extra_class %} {{ extra_class }}{% endif %}" id="{{ modal_id }}" aria-label="{{ aria_label|default:title }}">
+  <form method="dialog" class="modal__shell">
+    <header class="modal__header">
+      <h2 class="modal__title">{{ title }}</h2>
+    </header>
+    <div class="modal__body">{{ body }}</div>
+    {% if actions %}<footer class="modal__actions">{{ actions }}</footer>{% endif %}
+  </form>
+</dialog>

@@ -1,0 +1,152 @@
+/* Picker — busca de entidade. Depende de `v2/tokens.css`.
+ *
+ * As classes `search-picker__*` são geradas por `js/components/picker.js` e
+ * pertencem a ele; não são renomeadas aqui. Renomear sem tocar o JS quebraria
+ * em silêncio, como já aconteceu com o select.
+ *
+ * Tudo parte de `.picker`, então nenhuma destas regras alcança o picker legado
+ * das telas ainda não migradas.
+ */
+
+:is(html[data-theme]) .picker {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+/* ---- o campo de busca --------------------------------------------------- */
+
+:is(html[data-theme]) .picker .search-picker__control {
+  align-items: center;
+  background: var(--surface-contrast, var(--surface-field));
+  border: 1px solid transparent;
+  border-radius: var(--radius-field);
+  box-sizing: border-box;
+  display: flex;
+  gap: var(--gap-tight);
+  min-height: var(--control-height);
+  padding: var(--pad-field);
+}
+
+:is(html[data-theme]) .picker .search-picker__control:focus-within {
+  border-color: var(--focus-ring);
+}
+
+:is(html[data-theme]) .picker .search-picker__input {
+  background: none;
+  border: 0;
+  color: var(--text-strong);
+  flex: 1 1 auto;
+  font: inherit;
+  font-size: var(--text-size-base);
+  min-width: 0;
+  outline: none !important;
+}
+
+:is(html[data-theme]) .picker .search-picker__input::placeholder {
+  color: var(--text-muted);
+}
+
+:is(html[data-theme]) .picker .search-picker__icon {
+  align-items: center;
+  color: var(--text-muted);
+  display: inline-flex;
+  flex: none;
+}
+
+:is(html[data-theme]) .picker .search-picker__clear {
+  background: none;
+  border: 0;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex: none;
+}
+
+/* ---- a lista de resultados ---------------------------------------------- */
+
+:is(html[data-theme]) .picker .search-picker__dropdown {
+  background: var(--surface-field);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-field);
+  padding: 4px;
+}
+
+:is(html[data-theme]) .picker .search-picker__empty {
+  color: var(--text-muted);
+  font-size: var(--text-size-base);
+  padding: 12px;
+}
+
+/* ---- os selecionados ----------------------------------------------------
+ *
+ * O cartão fica no degrau OPOSTO ao do campo, para a lista de escolhidos não
+ * se confundir com a caixa de busca logo acima.
+ */
+
+:is(html[data-theme]) .picker .search-picker__selected-list {
+  display: grid;
+  gap: var(--gap-tight);
+}
+
+:is(html[data-theme]) .picker .search-picker__selected-card {
+  align-items: center;
+  background: var(--surface-contrast, var(--surface-field));
+  border: 0;
+  border-radius: var(--radius-field);
+  color: var(--text-strong);
+  cursor: pointer;
+  display: flex;
+  gap: var(--gap);
+  padding: 10px 12px;
+  text-align: left;
+  width: 100%;
+}
+
+:is(html[data-theme]) .picker .search-picker__selected-avatar {
+  align-items: center;
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border-radius: var(--radius-field);
+  color: var(--accent);
+  display: inline-flex;
+  flex: none;
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  height: 36px;
+  justify-content: center;
+  width: 36px;
+}
+
+:is(html[data-theme]) .picker .search-picker__selected-main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .picker .search-picker__selected-name {
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+}
+
+:is(html[data-theme]) .picker .search-picker__selected-meta {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+}
+
+:is(html[data-theme]) .picker .search-picker__selected-empty {
+  color: var(--text-muted);
+  font-size: var(--text-size-base);
+  margin: 0;
+  padding: 12px;
+}
+
+:is(html[data-theme]) .picker .search-picker__remove {
+  background: none;
+  border: 0;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex: none;
+}
+
+:is(html[data-theme]) .picker .search-picker__remove:hover {
+  color: var(--status-late);
+}

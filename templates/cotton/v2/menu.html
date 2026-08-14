@@ -1,0 +1,11 @@
+{% cotton:vars aria_label extra_class slot %}
+{% comment %}
+  Menu v2 — a lista de ações de um registro. Par de `static/css/v2/menu.css`.
+
+  Os itens vêm por SLOT, e não de uma lista: cada ação carrega `href`, ícone e
+  ganchos `data-*` próprios do domínio. É a mesma razão da variante `state` do
+  toggle.
+{% endcomment %}
+<div class="menu{% if extra_class %} {{ extra_class }}{% endif %}" role="menu" aria-label="{{ aria_label }}">
+  {{ slot }}
+</div>

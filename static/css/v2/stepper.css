@@ -1,0 +1,64 @@
+/* Stepper — etapas do wizard. Depende de `v2/tokens.css`.
+ *
+ * O estado vem de `data-state`, não de classe: são três valores mutuamente
+ * exclusivos, e atributo deixa isso explícito no markup.
+ */
+
+:is(html[data-theme]) .stepper__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-loose);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+:is(html[data-theme]) .stepper__item {
+  align-items: center;
+  color: var(--text-muted);
+  display: flex;
+  gap: var(--gap-tight);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .stepper__marker {
+  align-items: center;
+  background: var(--surface-contrast, var(--surface-field));
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  flex: none;
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  height: 28px;
+  justify-content: center;
+  width: 28px;
+}
+
+:is(html[data-theme]) .stepper__item[data-state="done"] .stepper__marker {
+  background: var(--status-done);
+  color: #ffffff;
+}
+
+:is(html[data-theme]) .stepper__item[data-state="current"] .stepper__marker {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+
+:is(html[data-theme]) .stepper__item[data-state="current"] {
+  color: var(--text-strong);
+}
+
+:is(html[data-theme]) .stepper__copy {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .stepper__label {
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-normal);
+}
+
+:is(html[data-theme]) .stepper__status {
+  font-size: var(--text-size-eyebrow);
+}

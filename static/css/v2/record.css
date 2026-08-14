@@ -1,0 +1,72 @@
+/* Record — o card de um registro na lista. Depende de `v2/tokens.css`.
+ *
+ * Segue a escada: assume o degrau oposto ao do contêiner, como os demais.
+ */
+
+:is(html[data-theme]) .record {
+  background: var(--surface-contrast, var(--surface-field));
+  /* Raio de nível INTERNO (`--radius-field`), não o do contêiner: um filho com
+     o mesmo raio do pai nunca encaixa — a curva interna precisa ser menor que a
+     externa, senão sobra um vão nos cantos. O painel usa `--radius-rail`. */
+  border-radius: var(--radius-field);
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--gap-tight);
+  min-width: 0;
+  padding: var(--gap);
+}
+
+/* `center` e não `start`: o alvo de ação fica na mesma altura em todos os
+   registros, mesmo quando um deles tem meta mais longa e quebra. */
+:is(html[data-theme]) .record__row {
+  align-items: center;
+  display: flex;
+  gap: var(--gap);
+  justify-content: space-between;
+  min-width: 0;
+}
+
+/* O selo acompanha o título na mesma linha e quebra junto quando falta espaço. */
+:is(html[data-theme]) .record__title-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-tight);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .record__heading {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* Inline, não em bloco: ele divide a primeira linha com título e selo. */
+:is(html[data-theme]) .record__eyebrow {
+  color: var(--text-muted);
+  flex: none;
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+:is(html[data-theme]) .record__title {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  margin: 0;
+}
+
+:is(html[data-theme]) .record__meta {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  margin: 0;
+}
+
+:is(html[data-theme]) .record__actions {
+  align-items: center;
+  display: flex;
+  flex: none;
+  gap: var(--gap-tight);
+}

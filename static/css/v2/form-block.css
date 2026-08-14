@@ -41,3 +41,39 @@
   gap: var(--gap);
   min-width: 0;
 }
+
+/* ---- split: cabeçalho à esquerda, corpo à direita -------------------------
+ *
+ * Para o bloco de UM controle só, onde empilhar título e campo desperdiça uma
+ * linha inteira para dizer duas palavras. A primeira coluna tem piso de 148px
+ * para o rótulo não quebrar em duas linhas, e teto em fração para o campo — que
+ * é o que se preenche — ficar com a maior parte da largura.
+ *
+ * `.form-block--split` existe no legado, mas lá toda regra exige um ancestral
+ * `[data-travel-document-wizard-*]`; fora dos wizards ela não alcança nada.
+ * Aqui o par com `.form-block--v2` mantém as duas separadas até o legado sair.
+ */
+:is(html[data-theme]) .form-block--v2.form-block--split {
+  align-items: center;
+  grid-template-columns: minmax(max-content, 0.62fr) minmax(0, 2.1fr);
+}
+
+/* Empilha título e descrição: na coluna estreita eles não cabem lado a lado,
+   que é o arranjo do cabeçalho normal. */
+:is(html[data-theme]) .form-block--v2.form-block--split > .form-block__header {
+  display: grid;
+  gap: 2px;
+}
+
+/* Uma linha só. É por isso que o piso da coluna é `max-content`: a descrição
+   dita a largura em vez de quebrar dentro dela. Em troca, a descrição de um
+   bloco split precisa ser curta — se ela crescer, come a largura do campo. */
+:is(html[data-theme]) .form-block--v2.form-block--split .form-block__description {
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  :is(html[data-theme]) .form-block--v2.form-block--split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

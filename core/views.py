@@ -119,62 +119,63 @@ def dashboard(request):
     )
 
 
+class _MensagemDeExemplo:
+    """Imita uma mensagem do Django na galeria do v2 (só `tags` e texto)."""
+
+    def __init__(self, tags: str, texto: str):
+        self.tags = tags
+        self._texto = texto
+
+    def __str__(self) -> str:
+        return self._texto
+
+
 @login_not_required
 def main_preview(request):
-    """Prévia isolada do novo contrato visual do ``main``.
+    """Galeria do sistema de componentes v2.
 
-    A rota só é registrada sob ``DEBUG``. Ela não consulta dados, aceita escrita
-    nem entra na navegação de produção; existe para o dono aprovar as camadas
-    visualmente antes de qualquer página real adotar o contrato.
+    A rota só é registrada sob ``DEBUG``. Não consulta dados nem aceita escrita:
+    existe para o dono aprovar cada componente visualmente, nos dois temas,
+    antes de qualquer página real adotá-lo.
+
+    Também é o consumidor de produção dos componentes de ``cotton/v2/`` — o
+    repositório proíbe Cotton órfão (``test_componentes_sem_orfao``).
+
+    NOVO-120: a prévia anterior (``main-preview-header``, ``sub-header``,
+    ``form-card``, ``entity-card`` e ``collection-panel``) foi apagada junto com
+    ``cotton/dev/``, ``css/dev/`` e ``js/dev/``.
     """
-    from core.dev_forms import MainPreviewFiltersForm
-
-    preview_steps = (
-        {
-            "marker": "✓",
-            "marker_aria_hidden": True,
-            "state_class": "is-complete",
-            "step_label": "Etapa 1",
-            "title": "Dados e viajantes",
-            "status": "Concluída",
-        },
-        {
-            "marker": "2",
-            "marker_aria_hidden": True,
-            "state_class": "is-current",
-            "aria_current": "step",
-            "step_label": "Etapa 2",
-            "title": "Roteiro e diárias",
-            "status": "Em andamento",
-        },
-        {
-            "marker": "3",
-            "marker_aria_hidden": True,
-            "state_class": "",
-            "step_label": "Etapa 3",
-            "title": "Justificativa",
-            "status": "Não iniciada",
-        },
-        {
-            "marker": "4",
-            "marker_aria_hidden": True,
-            "state_class": "",
-            "step_label": "Etapa 4",
-            "title": "Documentos",
-            "status": "Não iniciada",
-        },
-    )
-
     return render(
         request,
         "core/main_preview.html",
         {
             "page_title": "Prévia do main",
-            "preview_filters": MainPreviewFiltersForm(request.GET or None),
-            "preview_steps": preview_steps,
             # NOVO-120: alimenta a galeria do sistema v2. Dados fixos, como o
             # resto desta rota — ela existe para aprovar aparência, não para
             # consultar nada.
+            # O alerta espera objetos com `tags` e que saibam se imprimir, como
+            # as mensagens do Django — um dict sairia como "{'tags': ...}" no
+            # template, porque `{{ message }}` chama `str()`.
+            "v2_mensagens": tuple(
+                _MensagemDeExemplo(tag, texto)
+                for tag, texto in (
+                    ("success", "Termo salvo com sucesso."),
+                    ("warning", "Faltam dados do motorista."),
+                    ("error", "Não foi possível gerar o documento."),
+                    ("info", "O rascunho é criado na confirmação."),
+                )
+            ),
+            "v2_erros": (
+                "Selecione ao menos um servidor.",
+                "O período do evento é obrigatório quando não vem do ofício.",
+            ),
+            "v2_erros_de_campo": ("Este campo é obrigatório.",),
+            "v2_etapas": (
+                {"label": "Dados e viajantes", "status": "Concluída", "state": "done"},
+                {"label": "Roteiro e diárias", "status": "Em andamento", "state": "current"},
+                {"label": "Justificativa", "status": "Não iniciada", "state": ""},
+                {"label": "Documentos", "status": "Não iniciada", "state": ""},
+            ),
             "v2_opcoes": (
                 {"value": "1", "label": "Primeira opção"},
                 {"value": "2", "label": "Segunda opção"},

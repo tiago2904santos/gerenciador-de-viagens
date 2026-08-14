@@ -2,6 +2,12 @@
  *
  * COLISÃO: `.chip` já existe no legado (7 usos). Usa `--v2` até a migração.
  *
+ * O estilo é o tom TRANSLÚCIDO sobre a superfície, escolhido entre quatro
+ * alternativas testadas na galeria (sólido, pastel, translúcido e brilhante).
+ * É o único que se adapta ao fundo: os outros três fixavam a mistura no branco
+ * ou no preenchimento cheio, e um deles precisava de valores diferentes por
+ * tema para não desaparecer.
+ *
  * A cor vem por `--chip-tone`, declarada por quem usa; sem tom, o chip é
  * neutro. NÃO existe uma classe por cor — era assim que nasciam as 18
  * variantes do botão legado, das quais 8 acabaram mortas.
@@ -18,4 +24,22 @@
   gap: 4px;
   padding: 3px 10px;
   white-space: nowrap;
+}
+
+
+/* O chamador nomeia o estado; o sistema decide a cor. */
+:is(html[data-theme]) .chip--v2[data-tone="done"] {
+  --chip-tone: var(--status-done);
+}
+
+:is(html[data-theme]) .chip--v2[data-tone="progress"] {
+  --chip-tone: var(--status-progress);
+}
+
+:is(html[data-theme]) .chip--v2[data-tone="late"] {
+  --chip-tone: var(--status-late);
+}
+
+:is(html[data-theme]) .chip--v2[data-tone="info"] {
+  --chip-tone: var(--status-info);
 }

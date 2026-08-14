@@ -1,0 +1,24 @@
+{% cotton:vars aside controls empty_message extra_class eyebrow rows title %}
+{% comment %}
+  List page v2 — o esqueleto de uma tela de lista: identidade, controles e o
+  painel de registros.
+
+  Não tem CSS próprio: é composição de `header`, `rail` e `panel`, que já
+  existem. Um componente que só arruma outros não precisa de folha — se
+  precisasse, seria sinal de que a composição está errada.
+{% endcomment %}
+<div class="list-page{% if extra_class %} {{ extra_class }}{% endif %}">
+  <c-v2.header :eyebrow="eyebrow" :title="title">
+    {% if aside %}<c-slot name="aside">{{ aside }}</c-slot>{% endif %}
+  </c-v2.header>
+
+  {% if controls %}
+    <c-v2.rail>
+      <c-slot name="controls">{{ controls }}</c-slot>
+    </c-v2.rail>
+  {% endif %}
+
+  <c-v2.panel :empty_message="empty_message">
+    {% if rows %}<c-slot name="body">{{ rows }}</c-slot>{% endif %}
+  </c-v2.panel>
+</div>

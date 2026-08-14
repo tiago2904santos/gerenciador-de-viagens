@@ -1,0 +1,20 @@
+{% cotton:vars destinations period_id title %}
+{% comment %}
+  Período e destinos v2 — a dupla que aparece em ofício, termo e plano de
+  trabalho: um intervalo de datas e a lista de destinos na ordem da visita.
+
+  Sem folha própria: é composição de `panel`, `date_picker` e `destination_row`.
+
+  Usa `panel` e não `form_block` porque é uma SEÇÃO de página — vive na primeira
+  camada, direto sobre o fundo, e precisa do raio externo.
+{% endcomment %}
+<c-v2.panel :title="title|default:'Período e destinos'" description="Datas da viagem e locais na ordem da visita.">
+  <c-slot name="body">
+    <c-v2.form_block :split="True" title="Período" description="Ida e volta no mesmo calendário.">
+      <c-slot name="body">
+        <c-v2.date_picker mode="range" :picker_id="period_id" placeholder_start="Data de ida" placeholder_end="Data de volta" aria_label="Período da viagem" />
+      </c-slot>
+    </c-v2.form_block>
+    {{ destinations }}
+  </c-slot>
+</c-v2.panel>

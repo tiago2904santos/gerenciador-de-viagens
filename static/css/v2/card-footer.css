@@ -1,0 +1,18 @@
+/* Rodapé de ações. Depende de `v2/tokens.css`. */
+
+:is(html[data-theme]) .card-footer {
+  align-items: center;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  justify-content: space-between;
+  margin-top: var(--gap);
+  padding-top: var(--gap);
+}
+
+:is(html[data-theme]) .card-footer__side {
+  align-items: center;
+  display: flex;
+  gap: var(--gap-tight);
+}

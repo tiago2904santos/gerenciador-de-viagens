@@ -1,0 +1,18 @@
+{% cotton:vars aria_label extra_class href icon tone %}
+{% comment %}
+  Icon button v2 — ação sem rótulo, em forma circular.
+
+  Não é uma variante do `button`: aquele é retangular e existe para carregar
+  texto. Aqui a forma é redonda e o rótulo vive no `aria-label`, que é
+  OBRIGATÓRIO — sem ele a ação não existe para quem usa leitor de tela.
+{% endcomment %}
+{% load icones %}
+{% if href %}
+  <a class="icon-button{% if extra_class %} {{ extra_class }}{% endif %}" href="{{ href }}" aria-label="{{ aria_label }}"{% if tone %} data-tone="{{ tone }}"{% endif %}>
+    {% icone_svg icon %}
+  </a>
+{% else %}
+  <button type="button" class="icon-button{% if extra_class %} {{ extra_class }}{% endif %}" aria-label="{{ aria_label }}"{% if tone %} data-tone="{{ tone }}"{% endif %}>
+    {% icone_svg icon %}
+  </button>
+{% endif %}

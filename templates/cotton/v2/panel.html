@@ -1,9 +1,24 @@
-{% cotton:vars body empty_message empty_title extra_class surface %}
+{% cotton:vars actions body description empty_message empty_title extra_class surface title %}
 {% comment %}
-  Panel v2 — a superfície que agrupa uma lista ou blocos. Par de
-  `static/css/v2/panel.css`.
+  Panel v2 — a caixa de uma seção de página: o que fica na PRIMEIRA camada,
+  direto sobre o fundo. Par de `static/css/v2/panel.css`.
+
+  Diferença para o `form_block`: o panel é o contêiner externo, com o raio maior
+  (`--radius-rail`) e a borda da primeira camada; o form_block é o bloco de
+  dentro, com raio menor. Usar form_block no primeiro nível dava à seção o
+  arredondamento de um bloco interno, e a hierarquia sumia.
 {% endcomment %}
 <div class="panel{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
+  {% if title or description or actions %}
+    <header class="panel__header">
+      <div>
+        {% if title %}<h2 class="panel__title">{{ title }}</h2>{% endif %}
+        {% if description %}<p class="panel__description">{{ description }}</p>{% endif %}
+      </div>
+      {% if actions %}<div class="panel__actions">{{ actions }}</div>{% endif %}
+    </header>
+  {% endif %}
+
   {% if body %}
     {{ body }}
   {% else %}

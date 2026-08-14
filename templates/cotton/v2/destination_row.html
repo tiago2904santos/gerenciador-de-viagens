@@ -1,0 +1,17 @@
+{% cotton:vars extra_class label removable slot %}
+{% comment %}
+  Linha de destino v2 — estado e cidade, na ordem da visita.
+
+  Os dois campos vêm por slot? Não: aqui a estrutura é fixa (estado + cidade),
+  e é justamente isso que o componente garante. Quem varia é o conteúdo dos
+  pickers, que o chamador injeta por `state_field` e `city_field`.
+{% endcomment %}
+<div class="destination-row{% if extra_class %} {{ extra_class }}{% endif %}">
+  {% if label %}<span class="destination-row__label">{{ label }}</span>{% endif %}
+  <div class="destination-row__fields">{{ slot }}</div>
+  {% if removable %}
+    <button type="button" class="destination-row__remove" aria-label="Remover destino">
+      <span aria-hidden="true">×</span>
+    </button>
+  {% endif %}
+</div>

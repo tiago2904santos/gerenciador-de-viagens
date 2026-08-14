@@ -1,0 +1,39 @@
+/* Icon button — ação sem rótulo, circular. Depende de `v2/tokens.css`. */
+
+:is(html[data-theme]) .icon-button {
+  align-items: center;
+  background: var(--surface-contrast, var(--surface-field));
+  border: 0;
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  flex: none;
+  height: var(--control-height);
+  justify-content: center;
+  text-decoration: none;
+  transition: background var(--ease), color var(--ease);
+  width: var(--control-height);
+}
+
+:is(html[data-theme]) .icon-button svg {
+  height: 18px;
+  width: 18px;
+}
+
+/* Mesmo hover do botão secundário (`v2/button.css:107`): a superfície recebe
+   14% do accent e o conteúdo assume o accent. Os dois são ações de mesma
+   ênfase; ter realces diferentes faria a lista piscar em dois padrões. */
+:is(html[data-theme]) .icon-button:hover {
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface-contrast, var(--surface-rail)));
+  color: var(--accent);
+}
+
+:is(html[data-theme]) .icon-button[data-tone="late"]:hover {
+  color: var(--status-late);
+}
+
+:is(html[data-theme]) .icon-button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}

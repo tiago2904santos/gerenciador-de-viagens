@@ -1,8 +1,0 @@
-/* Tema escuro do main vazio: somente a cor de fundo. */
-
-html[data-theme="dark"] .main-preview-shell {
-  --color-app-bg:
-    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(21, 91, 154, 0.16), transparent 55%),
-    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(216, 162, 27, 0.06), transparent 60%),
-    linear-gradient(180deg, #111e2f 0%, #050d16 100%);
-}

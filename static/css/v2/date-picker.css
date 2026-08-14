@@ -1,0 +1,170 @@
+/* Date picker — campo de data. Depende de `v2/tokens.css`.
+ *
+ * A marcação vem do partial global `cotton/ui/forms/date_picker.html` e o painel
+ * é montado por `js/components/date-picker.js`; as classes são deles. Esta
+ * folha só veste o que chega, sob a raiz `.date-field` — nenhuma regra alcança
+ * as telas ainda não migradas.
+ */
+
+/* Diâmetro do botão do calendário. Fica na raiz porque três regras dependem
+   dele — tamanho, recuo e o espaço que o texto abre para não passar por baixo —
+   e é o que garante que ele continue redondo se a altura do campo mudar. */
+:is(html[data-theme]) .date-field {
+  --trigger-size: 32px;
+}
+
+:is(html[data-theme]) .date-field__controls,
+:is(html[data-theme]) .date-field .field-grid {
+  display: flex;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+/* Âncora do posicionamento. Precisa valer também para `.cv-field`, que é o
+   invólucro que o partial usa no modo intervalo — sem isso o botão se
+   posicionava por um ancestral mais alto e subia meia altura do campo. */
+:is(html[data-theme]) .date-field .date-picker__control,
+:is(html[data-theme]) .date-field .cv-field {
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+}
+
+/* O campo é o MESMO do select: mesma superfície, altura, raio e recuo. Um
+   campo de data não é um controle diferente — só tem outro jeito de preencher. */
+:is(html[data-theme]) .date-field .cv-field__control {
+  background: var(--surface-contrast, var(--surface-field));
+  border: 1px solid transparent;
+  border-radius: var(--radius-field);
+  box-sizing: border-box;
+  color: var(--text-strong);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--text-size-base);
+  min-height: var(--control-height);
+  padding: var(--pad-field);
+  width: 100%;
+}
+
+:is(html[data-theme]) .date-field .cv-field__control::placeholder {
+  color: var(--text-muted);
+}
+
+:is(html[data-theme]) .date-field .cv-field__control:focus-visible {
+  border-color: var(--focus-ring);
+  outline: none !important;
+}
+
+/* ---- o botão do calendário ------------------------------------------------
+ *
+ * Só aparece no hover — e no FOCO também, senão quem navega por teclado nunca
+ * o veria. `opacity` em vez de `display: none` justamente para ele continuar
+ * focável e alcançável por Tab enquanto está invisível.
+ */
+:is(html[data-theme]) .date-field .date-picker__trigger {
+  align-items: center;
+  /* Fundo na cor do painel — o degrau ACIMA do campo, em cascata. `--surface` é
+     o degrau do contêiner e `--surface-contrast` o do campo, então o botão se
+     destaca do campo sobre o qual flutua sem cor literal e sem precisar saber
+     em que camada da escada o date picker foi parar. */
+  background: var(--surface, var(--surface-rail));
+  border: 0;
+  /* Circular: raio total, com largura e altura presas ao mesmo valor. */
+  border-radius: 999px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  height: var(--trigger-size);
+  justify-content: center;
+  opacity: 0;
+  position: absolute;
+  /* Recuo igual ao de cima e de baixo: o círculo fica com folga igual nos três
+     lados, em vez de encostar na borda direita do campo. */
+  right: calc((var(--control-height) - var(--trigger-size)) / 2);
+  /* Centrado pelo meio, não pelo topo: a altura do invólucro varia entre o modo
+     simples e o de intervalo, e ancorar no topo desalinhava num deles. */
+  top: 50%;
+  transform: translateY(-50%);
+  transition: opacity var(--ease), color var(--ease);
+  width: var(--trigger-size);
+}
+
+:is(html[data-theme]) .date-field .date-picker__control:hover .date-picker__trigger,
+:is(html[data-theme]) .date-field .date-picker__control:focus-within .date-picker__trigger,
+:is(html[data-theme]) .date-field .date-picker__trigger:focus-visible {
+  opacity: 1;
+}
+
+:is(html[data-theme]) .date-field .date-picker__trigger:hover {
+  color: var(--accent);
+}
+
+/* ---- o painel do calendário ----------------------------------------------
+ *
+ * O painel é transplantado para o `body` e perde os ancestrais, então a raiz
+ * aqui é `.date-field__panel` — marca que o JS copia no transplante. Sem ela
+ * estas regras alcançariam também o calendário das telas ainda não migradas,
+ * que dividem o mesmo partial.
+ */
+
+/* Declara o próprio degrau e o oposto. Fora do fluxo da página o painel não
+   herda de camada nenhuma, então quem está dentro dele não teria de onde tirar
+   a cor. O fundo vem daqui e não do legado: enquanto a folha antiga desse a cor
+   e esta desse o contraste, bastava a antiga sair para os dois ficarem iguais —
+   foi o que aconteceu na primeira tentativa, painel e botões no mesmo tom. */
+:is(html[data-theme]) .date-field__panel {
+  --surface: var(--surface-field);
+  --surface-contrast: var(--surface-rail);
+  background: var(--surface-field);
+}
+
+/* Anterior, Próximo, Hoje e Limpar são o botão secundário: mesmo degrau
+   alternado, mesmo raio, mesma altura e o mesmo hover do resto do sistema. Eram
+   a última aparência de botão que o calendário desenhava por conta própria. */
+:is(html[data-theme]) .date-field__panel .date-picker__nav,
+:is(html[data-theme]) .date-field__panel .date-picker__footer-action {
+  align-items: center;
+  background: var(--surface-contrast, var(--surface-rail));
+  border: 1px solid transparent;
+  border-radius: var(--radius-field);
+  box-sizing: border-box;
+  color: var(--text-strong);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-normal);
+  gap: var(--gap-tight);
+  justify-content: center;
+  line-height: 1;
+  min-height: var(--control-height);
+  padding: var(--pad-field);
+  transition: background var(--ease), border-color var(--ease), color var(--ease);
+  white-space: nowrap;
+}
+
+:is(html[data-theme]) .date-field__panel .date-picker__nav:hover,
+:is(html[data-theme]) .date-field__panel .date-picker__footer-action:hover {
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface-contrast, var(--surface-rail)));
+  color: var(--accent);
+}
+
+:is(html[data-theme]) .date-field__panel .date-picker__nav:focus-visible,
+:is(html[data-theme]) .date-field__panel .date-picker__footer-action:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* O sumário repetia em texto corrido o que os dois campos já mostram. Fica no
+   partial porque 11 telas não migradas ainda o exibem; sai de vez quando o
+   partial for só do v2. */
+:is(html[data-theme]) .date-field .date-picker__summary {
+  display: none;
+}
+
+/* Enquanto o botão está escondido o texto pode ocupar a largura toda; quando
+   ele aparece, o recuo evita que o valor passe por baixo do ícone. */
+:is(html[data-theme]) .date-field .date-picker__control:hover .cv-field__control,
+:is(html[data-theme]) .date-field .date-picker__control:focus-within .cv-field__control {
+  padding-right: calc(var(--trigger-size) + 16px);
+}

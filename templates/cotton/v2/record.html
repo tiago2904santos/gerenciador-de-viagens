@@ -1,0 +1,31 @@
+{% cotton:vars actions body extra_class eyebrow meta status status_tone title %}
+{% comment %}
+  Record v2 — o card de um registro na lista. Par de `static/css/v2/record.css`.
+
+  DUAS linhas, no máximo: eyebrow, título e selo na primeira; a meta na
+  segunda. Numa lista longa cada linha extra multiplica pela quantidade de
+  registros, e a varredura vertical fica mais lenta.
+
+  O selo fica junto do título porque qualifica o registro — separá-lo obrigava
+  o olho a ir e voltar para ligar um ao outro.
+
+  As ações ficam à direita e centradas na faixa: em lista o olho percorre a
+  coluna da esquerda lendo e a da direita agindo, e o alvo fica sempre na mesma
+  altura, registro após registro.
+{% endcomment %}
+<article class="record{% if extra_class %} {{ extra_class }}{% endif %}">
+  <div class="record__row">
+    <div class="record__heading">
+      <div class="record__title-row">
+        {% if eyebrow %}<span class="record__eyebrow">{{ eyebrow }}</span>{% endif %}
+        <h3 class="record__title">{{ title }}</h3>
+        {% if status %}<c-v2.chip :label="status" :tone="status_tone" />{% endif %}
+      </div>
+      {% if meta %}<p class="record__meta">{{ meta }}</p>{% endif %}
+    </div>
+
+    {% if actions %}<div class="record__actions">{{ actions }}</div>{% endif %}
+  </div>
+
+  {% if body %}<div class="record__body">{{ body }}</div>{% endif %}
+</article>

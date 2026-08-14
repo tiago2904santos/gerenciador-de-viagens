@@ -55,6 +55,18 @@
   --danger: #c0392b;
   --text-on-danger: #ffffff;
 
+  /* ---- estados (selos) --------------------------------------------------
+   *
+   * FIXAS nos dois temas, de propósito: "concluído" é verde no claro e no
+   * escuro. Estado é significado, não decoração — se a cor mudasse com o tema,
+   * o usuário teria de reaprender o código de cores ao trocar de tema.
+   *
+   * Por isso NÃO aparecem no bloco `[data-theme="dark"]` abaixo. */
+  --status-done: #1e8e4f;
+  --status-progress: #d99e0b;
+  --status-late: #c0392b;
+  --status-info: #2b6cb0;
+
 
   /* ---- forma ----------------------------------------------------------- */
   --radius-field: 8px;
@@ -67,7 +79,11 @@
   --gap: 12px;
   --gap-loose: 20px;
   --pad-field: 0 12px;
-  --pad-rail: 16px 20px;
+  /* 12px, igual ao painel e ao registro: o recuo é o mesmo em toda a escada, e
+     só o RAIO diminui para dentro. Era 16px 20px, o que dava ao header e ao
+     rail um respiro maior que o do conteúdo — a página lia como se a moldura
+     importasse mais que o dado. */
+  --pad-rail: 12px;
   --control-height: 44px;
 
   /* ---- tipografia ------------------------------------------------------ */

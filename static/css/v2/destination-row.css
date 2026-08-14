@@ -1,0 +1,41 @@
+/* Linha de destino. Depende de `v2/tokens.css`. */
+
+:is(html[data-theme]) .destination-row {
+  align-items: center;
+  display: flex;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .destination-row__label {
+  color: var(--text-muted);
+  flex: none;
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  min-width: 64px;
+}
+
+:is(html[data-theme]) .destination-row__fields {
+  display: flex;
+  flex: 1 1 auto;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .destination-row__remove {
+  align-items: center;
+  background: var(--surface-contrast, var(--surface-field));
+  border: 0;
+  border-radius: var(--radius-field);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  flex: none;
+  height: var(--control-height);
+  justify-content: center;
+  width: var(--control-height);
+}
+
+:is(html[data-theme]) .destination-row__remove:hover {
+  color: var(--status-late);
+}

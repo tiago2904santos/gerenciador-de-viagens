@@ -1,8 +1,0 @@
-/* Tokens principais do card de formulário no tema claro. */
-
-html[data-theme="light"] .main-preview-shell {
-  --color-form-card-accent: #0b3a66;
-  --color-form-card-border: rgba(11, 58, 102, 0.14);
-  --color-form-card-muted: #52657a;
-  --color-form-card-text: #223348;
-}

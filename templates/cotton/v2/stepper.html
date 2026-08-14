@@ -1,0 +1,21 @@
+{% cotton:vars aria_label extra_class steps %}
+{% comment %}
+  Stepper v2 — as etapas de um wizard. Par de `static/css/v2/stepper.css`.
+
+  `steps`: lista de dicts {label, status, state} onde `state` é "done",
+  "current" ou vazio. A etapa atual leva `aria-current="step"`, que é o que um
+  leitor de tela anuncia — a cor sozinha não informa nada.
+{% endcomment %}
+<nav class="stepper{% if extra_class %} {{ extra_class }}{% endif %}" aria-label="{{ aria_label|default:'Etapas' }}">
+  <ol class="stepper__list">
+    {% for step in steps %}
+      <li class="stepper__item" data-state="{{ step.state }}"{% if step.state == "current" %} aria-current="step"{% endif %}>
+        <span class="stepper__marker" aria-hidden="true">{{ forloop.counter }}</span>
+        <span class="stepper__copy">
+          <strong class="stepper__label">{{ step.label }}</strong>
+          {% if step.status %}<small class="stepper__status">{{ step.status }}</small>{% endif %}
+        </span>
+      </li>
+    {% endfor %}
+  </ol>
+</nav>

@@ -5067,7 +5067,6 @@ html[data-theme="light"] {
 .date-picker--open .date-picker__trigger--icon {
   background: var(--btn-secondary-bg);
   border-color: var(--btn-secondary-border);
-  box-shadow: var(--shadow-xs);
   color: var(--btn-secondary-color);
   opacity: 1;
   pointer-events: auto;

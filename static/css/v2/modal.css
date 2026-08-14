@@ -1,0 +1,41 @@
+/* Modal — diálogo. Depende de `v2/tokens.css`.
+ *
+ * O `<dialog>` nativo já dá camada de topo, foco preso e Esc. Não há JS aqui.
+ */
+
+:is(html[data-theme]) .modal {
+  background: var(--surface-rail);
+  border: 0;
+  border-radius: var(--radius-rail);
+  color: var(--text-strong);
+  max-width: min(560px, calc(100vw - 32px));
+  padding: 0;
+  width: 100%;
+}
+
+:is(html[data-theme]) .modal::backdrop {
+  background: rgb(0 0 0 / 0.5);
+}
+
+:is(html[data-theme]) .modal__shell {
+  display: grid;
+  gap: var(--gap);
+  padding: var(--gap-loose);
+}
+
+:is(html[data-theme]) .modal__title {
+  font-size: var(--text-size-title);
+  font-weight: var(--weight-strong);
+  margin: 0;
+}
+
+:is(html[data-theme]) .modal__body {
+  display: grid;
+  gap: var(--gap);
+}
+
+:is(html[data-theme]) .modal__actions {
+  display: flex;
+  gap: var(--gap-tight);
+  justify-content: flex-end;
+}

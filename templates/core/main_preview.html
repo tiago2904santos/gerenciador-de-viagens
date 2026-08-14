@@ -1,266 +1,9 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block title %}{{ page_title }}{% endblock %}
 {% block shell_class %}main-preview-shell{% endblock %}
 
-{% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/dev/main.css' %}?v=20260813-192058">
-  <link rel="stylesheet" href="{% static 'css/dev/main-light.css' %}">
-  <link rel="stylesheet" href="{% static 'css/dev/main-dark.css' %}">
-  <link rel="stylesheet" href="{% static 'css/dev/header.css' %}">
-  <link rel="stylesheet" href="{% static 'css/dev/header-light.css' %}">
-  <link rel="stylesheet" href="{% static 'css/dev/header-dark.css' %}">
-  <link rel="stylesheet" href="{% static 'css/dev/sub-header.css' %}?v=20260813-190246">
-  <link rel="stylesheet" href="{% static 'css/dev/sub-header-light.css' %}?v=20260813-190246">
-  <link rel="stylesheet" href="{% static 'css/dev/sub-header-dark.css' %}?v=20260813-190246">
-  <link rel="stylesheet" href="{% static 'css/dev/form-card.css' %}?v=20260813-191605">
-  <link rel="stylesheet" href="{% static 'css/dev/form-card-light.css' %}">
-  <link rel="stylesheet" href="{% static 'css/dev/form-card-dark.css' %}">
-  <link rel="stylesheet" href="{% static 'css/dev/entity-card.css' %}?v=20260813-192620">
-  <link rel="stylesheet" href="{% static 'css/dev/entity-card-light.css' %}">
-  <link rel="stylesheet" href="{% static 'css/dev/entity-card-dark.css' %}">
-  <link rel="stylesheet" href="{% static 'css/dev/collection-panel.css' %}?v=20260813-191605">
-  <link rel="stylesheet" href="{% static 'css/dev/collection-panel-light.css' %}">
-  <link rel="stylesheet" href="{% static 'css/dev/collection-panel-dark.css' %}?v=20260813-191334">
-{% endblock %}
-
 {% block content %}
-  <c-dev.header variant="standard" eyebrow="OFÍCIOS" title="Ofícios" only />
-  <c-dev.header variant="toggle" eyebrow="CONFIGURAÇÕES" title="Instituição">
-    <c-slot name="toggle">
-      <c-dev.header_toggle aria_label="Seções de configuração">
-        <c-ui.buttons.button class_name="main-preview-header__toggle-item main-preview-header__toggle-item--active" type="button" aria-pressed="true">Instituição</c-ui.buttons.button>
-        <c-ui.buttons.button class_name="main-preview-header__toggle-item" type="button" aria-pressed="false">Ofício</c-ui.buttons.button>
-        <c-ui.buttons.button class_name="main-preview-header__toggle-item" type="button" aria-pressed="false">Roteiros</c-ui.buttons.button>
-      </c-dev.header_toggle>
-    </c-slot>
-  </c-dev.header>
-  <c-dev.header variant="button" eyebrow="OFÍCIOS" title="Cadastro de ofício">
-    <c-slot name="action">
-      <a class="main-preview-header__button" href="{% url 'core:main_preview' %}">Voltar à lista</a>
-    </c-slot>
-  </c-dev.header>
-
-  <section class="main-preview-sub-header-example">
-    <c-dev.header variant="standard" eyebrow="OFÍCIOS" title="Ofícios" only />
-    <c-dev.sub_header variant="filters" aria_label="Filtros e ordenação de ofícios">
-      <form class="main-preview-sub-header__filters" action="{% url 'core:main_preview' %}" method="get">
-        <input class="main-preview-sub-header__field" type="search" name="q" placeholder="Buscar ofícios" aria-label="Buscar ofícios">
-        <label class="sr-only" for="{{ preview_filters.sort.id_for_label }}">Ordenação</label>
-        <c-ui.select :field="preview_filters.sort" extra_class="main-preview-sub-header__field" only />
-        <label class="sr-only" for="{{ preview_filters.status.id_for_label }}">Status</label>
-        <c-ui.select :field="preview_filters.status" extra_class="main-preview-sub-header__field" only />
-        <a class="main-preview-sub-header__control" href="{% url 'core:main_preview' %}">Limpar filtros</a>
-      </form>
-    </c-dev.sub_header>
-  </section>
-
-  <section class="main-preview-sub-header-example">
-    <c-dev.header variant="standard" eyebrow="JUSTIFICATIVAS" title="Justificativas" only />
-    <c-dev.sub_header variant="quick-add" aria_label="Inclusão rápida de ofício vinculado">
-      <form class="main-preview-sub-header__quick-add-filter" action="{% url 'core:main_preview' %}" method="get">
-        <input class="main-preview-sub-header__field" type="search" name="q" placeholder="Buscar justificativas" aria-label="Buscar justificativas">
-        <a class="main-preview-sub-header__control" href="{% url 'core:main_preview' %}">Limpar filtros</a>
-      </form>
-      <section class="main-preview-sub-header__quick-add-body" aria-labelledby="main-preview-quick-add-title">
-        <div class="main-preview-sub-header__quick-add-copy">
-          <h3 class="main-preview-sub-header__title" id="main-preview-quick-add-title">Ofício vinculado</h3>
-          <p class="main-preview-sub-header__description">Selecione um ou mais ofícios para receber a justificativa.</p>
-        </div>
-        <div class="main-preview-sub-header__quick-add-controls">
-          <input class="main-preview-sub-header__field" type="search" placeholder="Buscar por número, protocolo, destino, sede, viatura ou servidor" aria-label="Buscar ofício vinculado">
-        </div>
-        <div class="main-preview-sub-header__quick-add-results">
-          <article class="main-preview-sub-header__quick-add-result">
-            <span class="main-preview-sub-header__quick-add-marker" aria-hidden="true">S</span>
-            <div>
-              <strong>Ofício 152/2026 CURITIBA/PR → FAZENDA RIO GRANDE/PR</strong>
-              <p>05/08/2026 a 12/08/2026 · ADEMAR · AAA1234 DUSTER</p>
-            </div>
-          </article>
-          <article class="main-preview-sub-header__quick-add-result">
-            <span class="main-preview-sub-header__quick-add-marker" aria-hidden="true">S</span>
-            <div>
-              <strong>Ofício 151/2026</strong>
-              <p>Sem informações disponíveis</p>
-            </div>
-          </article>
-        </div>
-      </section>
-    </c-dev.sub_header>
-  </section>
-
-  <section class="main-preview-sub-header-example">
-    <c-dev.header variant="button" eyebrow="OFÍCIOS" title="Cadastro de ofício">
-      <c-slot name="action">
-        <a class="main-preview-header__button" href="{% url 'core:main_preview' %}">Voltar à lista</a>
-      </c-slot>
-    </c-dev.header>
-    <c-dev.sub_header variant="stepper" aria_label="Etapas do cadastro de ofício">
-      <c-ui.navigation.page_stepper :steps="preview_steps" aria_label="Etapas do cadastro de ofício" only />
-    </c-dev.sub_header>
-  </section>
-
-  <section class="main-preview-form-card-example" aria-label="Prévia do card de roteiro">
-    <c-dev.form_card title="Roteiro e diárias" description="Origem, percurso, deslocamentos e cálculo financeiro" title_id="main-preview-route-card-title">
-      <section class="main-preview-form-card__block">
-        <header class="main-preview-form-card__block-header">
-          <div>
-            <h3 class="main-preview-form-card__block-title">Origem e destinos</h3>
-            <p class="main-preview-form-card__block-description">Use um roteiro salvo ou defina a sede e os destinos.</p>
-          </div>
-          <div class="main-preview-form-card__block-actions">
-            <c-ui.buttons.button class_name="main-preview-form-card__button" type="button" label="Roteiro salvo" only />
-            <c-ui.buttons.button class_name="main-preview-form-card__button" type="button" label="Roteiro novo" only />
-          </div>
-        </header>
-        <div class="main-preview-form-card__locations">
-          <div class="main-preview-form-card__location-row">
-            <div class="main-preview-form-card__row-copy"><strong>Sede</strong><p>Unidade de origem da viagem.</p></div>
-            <div class="main-preview-form-card__value">PARANÁ (PR)</div>
-            <div class="main-preview-form-card__value">CURITIBA</div>
-          </div>
-          <div class="main-preview-form-card__location-row">
-            <div class="main-preview-form-card__row-copy"><strong>Destinos</strong><p>Locais na ordem da visita.</p></div>
-            <div class="main-preview-form-card__value">PARANÁ (PR)</div>
-            <div class="main-preview-form-card__value">ARAPONGAS</div>
-          </div>
-        </div>
-      </section>
-
-      <section class="main-preview-form-card__block main-preview-form-card__block--compact">
-        <header class="main-preview-form-card__block-header">
-          <div>
-            <h3 class="main-preview-form-card__block-title">Bate-volta diário</h3>
-            <p class="main-preview-form-card__block-description">Repita automaticamente a ida e a volta em um período.</p>
-          </div>
-          <c-ui.buttons.button class_name="main-preview-form-card__button" type="button" label="Sem bate-volta diário" only />
-        </header>
-      </section>
-
-      <section class="main-preview-form-card__block">
-        <div class="main-preview-form-card__metrics">
-          <div class="main-preview-form-card__metric"><div class="main-preview-form-card__metric-label">Distância (ida e volta)</div><div class="main-preview-form-card__metric-value">758.1 km</div></div>
-          <div class="main-preview-form-card__metric"><div class="main-preview-form-card__metric-label">Tempo (ida e volta)</div><div class="main-preview-form-card__metric-value">9h</div></div>
-          <div class="main-preview-form-card__metric"><div class="main-preview-form-card__metric-label">Distância de ida</div><div class="main-preview-form-card__metric-value">379.05 km</div></div>
-          <div class="main-preview-form-card__metric"><div class="main-preview-form-card__metric-label">Tempo de ida</div><div class="main-preview-form-card__metric-value">4h30min</div></div>
-        </div>
-        <div class="main-preview-form-card__route-actions">
-          <c-ui.buttons.button class_name="main-preview-form-card__button" type="button" label="Calcular rota" only />
-          <c-ui.buttons.button class_name="main-preview-form-card__button" type="button" label="Recalcular rota" only />
-          <c-ui.buttons.button class_name="main-preview-form-card__button" type="button" label="Ver rota inteira" only />
-        </div>
-      </section>
-    </c-dev.form_card>
-  </section>
-
-  <section class="main-preview-entity-card-example" aria-label="Prévia do card de ofício">
-    <c-dev.entity_card eyebrow="OFÍCIO" title="Nº 153/2026 · PROTOCOLO 12.345.678-9 · ARAPONGAS/PR · 12/08 A 15/08/2026" state_label="FINALIZADO (LEGADO)" temporal="EM ANDAMENTO">
-      <div class="main-preview-entity-card__people">
-        <div class="main-preview-entity-card__person">
-          <span class="main-preview-entity-card__avatar" aria-hidden="true">AS</span>
-          <div class="main-preview-entity-card__person-copy">
-            <p class="main-preview-entity-card__person-name">ADEMAR SCHONS</p>
-            <p class="main-preview-entity-card__person-meta">AGENTE DE POLÍCIA JUDICIÁRIA</p>
-          </div>
-          <c-ui.buttons.button class_name="main-preview-entity-card__icon-button" type="button" aria_label="Ações de Ademar Schons">⋮</c-ui.buttons.button>
-        </div>
-        <div class="main-preview-entity-card__person">
-          <span class="main-preview-entity-card__avatar" aria-hidden="true">AS</span>
-          <div class="main-preview-entity-card__person-copy">
-            <p class="main-preview-entity-card__person-name">ADRIANO RODRIGUES DA SILVA</p>
-            <p class="main-preview-entity-card__person-meta">AGENTE DE POLÍCIA JUDICIÁRIA · COPE</p>
-          </div>
-          <c-ui.buttons.button class_name="main-preview-entity-card__icon-button" type="button" aria_label="Ações de Adriano Rodrigues da Silva">⋮</c-ui.buttons.button>
-        </div>
-      </div>
-
-      <div class="main-preview-entity-card__summary">
-        <section class="main-preview-entity-card__fact" aria-label="Veículo">
-          <span class="main-preview-entity-card__label">Placa</span>
-          <strong class="main-preview-entity-card__vehicle-value">AAA-1234</strong>
-          <span class="main-preview-entity-card__label">Modelo</span>
-          <strong class="main-preview-entity-card__vehicle-model">DUSTER</strong>
-        </section>
-        <section class="main-preview-entity-card__fact" aria-label="Trechos encontrados">
-          <span class="main-preview-entity-card__label">Trechos encontrados</span>
-          <div class="main-preview-entity-card__routes">
-            <div class="main-preview-entity-card__route-item">
-              <p class="main-preview-entity-card__route">CURITIBA/PR → ARAPONGAS/PR</p>
-              <p class="main-preview-entity-card__route-time">12/08/2026 09:00 → 12/08/2026 14:15</p>
-            </div>
-            <div class="main-preview-entity-card__route-item">
-              <p class="main-preview-entity-card__route">ARAPONGAS/PR → CURITIBA/PR</p>
-              <p class="main-preview-entity-card__route-time">15/08/2026 09:00 → 15/08/2026 14:15</p>
-            </div>
-          </div>
-        </section>
-        <section class="main-preview-entity-card__fact" aria-label="Valor total">
-          <span class="main-preview-entity-card__label">Valor total</span>
-          <strong class="main-preview-entity-card__amount">R$<br>1.743,30</strong>
-          <span class="main-preview-entity-card__label">Valor por extenso</span>
-          <p class="main-preview-entity-card__amount-long">mil setecentos e quarenta e três reais e trinta centavos</p>
-        </section>
-      </div>
-
-      <section class="main-preview-entity-card__justification" aria-label="Justificativa">
-        <div>
-          <div class="main-preview-entity-card__justification-heading">
-            <strong>JUSTIFICATIVA</strong>
-            <span class="main-preview-entity-card__badge">PREENCHIDA</span>
-          </div>
-          <p class="main-preview-entity-card__justification-text">Participação da equipe na atividade institucional programada.</p>
-        </div>
-        <div class="main-preview-entity-card__footer-group">
-          <c-ui.buttons.button class_name="main-preview-entity-card__icon-button" type="button" aria_label="Editar justificativa">✎</c-ui.buttons.button>
-          <c-ui.buttons.button class_name="main-preview-entity-card__icon-button main-preview-entity-card__icon-button--accent" type="button" aria_label="Abrir documentos da justificativa">□</c-ui.buttons.button>
-        </div>
-      </section>
-    </c-dev.entity_card>
-  </section>
-
-  <section class="main-preview-collection-panel-example" aria-label="Prévia da coleção de unidades">
-    <c-dev.collection_panel summary="Mostrando 1–15 de 98 registros">
-      <article class="main-preview-collection-panel__row">
-        <span class="main-preview-collection-panel__identity" aria-hidden="true">10</span>
-        <div class="main-preview-collection-panel__copy">
-          <h3 class="main-preview-collection-panel__title">10ª SUBDIVISÃO POLICIAL</h3>
-          <p class="main-preview-collection-panel__code">10SDP</p>
-          <p class="main-preview-collection-panel__fact">SIGLA <strong>10SDP</strong></p>
-        </div>
-        <div class="main-preview-collection-panel__actions">
-          <c-ui.buttons.button class_name="main-preview-collection-panel__action" type="button" aria_label="Editar 10ª Subdivisão Policial">✎</c-ui.buttons.button>
-          <c-ui.buttons.button class_name="main-preview-collection-panel__action main-preview-collection-panel__action--delete" type="button" aria_label="Excluir 10ª Subdivisão Policial">×</c-ui.buttons.button>
-        </div>
-      </article>
-      <article class="main-preview-collection-panel__row">
-        <span class="main-preview-collection-panel__identity" aria-hidden="true">10</span>
-        <div class="main-preview-collection-panel__copy">
-          <h3 class="main-preview-collection-panel__title">10º DISTRITO POLICIAL</h3>
-          <p class="main-preview-collection-panel__code">10DP</p>
-          <p class="main-preview-collection-panel__fact">SIGLA <strong>10DP</strong></p>
-        </div>
-        <div class="main-preview-collection-panel__actions">
-          <c-ui.buttons.button class_name="main-preview-collection-panel__action" type="button" aria_label="Editar 10º Distrito Policial">✎</c-ui.buttons.button>
-          <c-ui.buttons.button class_name="main-preview-collection-panel__action main-preview-collection-panel__action--delete" type="button" aria_label="Excluir 10º Distrito Policial">×</c-ui.buttons.button>
-        </div>
-      </article>
-      <article class="main-preview-collection-panel__row">
-        <span class="main-preview-collection-panel__identity" aria-hidden="true">11</span>
-        <div class="main-preview-collection-panel__copy">
-          <h3 class="main-preview-collection-panel__title">11ª SUBDIVISÃO POLICIAL</h3>
-          <p class="main-preview-collection-panel__code">11SDP</p>
-          <p class="main-preview-collection-panel__fact">SIGLA <strong>11SDP</strong></p>
-        </div>
-        <div class="main-preview-collection-panel__actions">
-          <c-ui.buttons.button class_name="main-preview-collection-panel__action" type="button" aria_label="Editar 11ª Subdivisão Policial">✎</c-ui.buttons.button>
-          <c-ui.buttons.button class_name="main-preview-collection-panel__action main-preview-collection-panel__action--delete" type="button" aria_label="Excluir 11ª Subdivisão Policial">×</c-ui.buttons.button>
-        </div>
-      </article>
-    </c-dev.collection_panel>
-  </section>
-
   {% comment %}
     NOVO-120 — galeria do sistema v2, agrupada por UTILIDADE e não por arquivo.
 
@@ -273,7 +16,7 @@
     não está nesta página, ele não foi decidido.
   {% endcomment %}
   <section class="v2-lab" aria-label="Sistema v2">
-    <c-v2.header eyebrow="Sistema v2" title="Componentes novos">
+    <c-v2.header eyebrow="Catálogo" title="Componentes do sistema v2">
       <c-slot name="aside">
         <c-v2.toggle aria_label="Alternar exemplo" :items="v2_abas" />
       </c-slot>
@@ -295,7 +38,7 @@
     {# ---------------------------------------------------------------- AÇÃO #}
     <h2 class="v2-lab__group">Ação</h2>
 
-    <c-v2.form_block title="Botão · variantes" description="3 variantes. O legado tinha 18, das quais 8 sem uso nenhum.">
+    <c-v2.panel title="Botão · variantes" description="3 variantes. O legado tinha 18, das quais 8 sem uso nenhum.">
       <c-slot name="body">
         <div class="v2-lab__row">
           <c-v2.button label="Primary" variant="primary" />
@@ -303,9 +46,9 @@
           <c-v2.button label="Danger" variant="danger" />
         </div>
       </c-slot>
-    </c-v2.form_block>
+    </c-v2.panel>
 
-    <c-v2.form_block title="Botão · estados">
+    <c-v2.panel title="Botão · estados">
       <c-slot name="body">
         <div class="v2-lab__row">
           <c-v2.button label="Com ícone" icon="plus" variant="primary" />
@@ -315,12 +58,12 @@
           <c-v2.button label="Link desabilitado" href="#" :disabled="True" />
         </div>
       </c-slot>
-    </c-v2.form_block>
+    </c-v2.panel>
 
     {# -------------------------------------------------------------- ENTRADA #}
     <h2 class="v2-lab__group">Entrada</h2>
 
-    <c-v2.form_block title="Campo · superfícies" description="As duas: field (padrão) e rail. Um degrau separa campo de caixa.">
+    <c-v2.panel title="Campo · superfícies" description="As duas: field (padrão) e rail. Um degrau separa campo de caixa.">
       <c-slot name="body">
         <c-v2.field label="Superfície field (padrão)">
           <c-slot name="control">
@@ -337,7 +80,7 @@
           </c-slot>
         </c-v2.form_block>
       </c-slot>
-    </c-v2.form_block>
+    </c-v2.panel>
 
     {% comment %}
       Os mesmos quatro estados aparecem duas vezes: direto no rail e dentro de
@@ -347,7 +90,7 @@
     {% endcomment %}
     <h3 class="v2-lab__sub">Campo · estados — em bloco dentro de bloco</h3>
 
-    <c-v2.form_block title="Bloco externo" description="Segura a seção de campos.">
+    <c-v2.panel title="Bloco externo" description="Segura a seção de campos.">
       <c-slot name="body">
         <c-v2.form_block title="Campo · estados" description="Bloco dentro de bloco — os dois no mesmo degrau.">
           <c-slot name="body">
@@ -374,11 +117,11 @@
           </c-slot>
         </c-v2.form_block>
       </c-slot>
-    </c-v2.form_block>
+    </c-v2.panel>
 
     <h3 class="v2-lab__sub">Campo · estados — dentro de um bloco</h3>
 
-    <c-v2.form_block title="Campo · estados" description="Os mesmos quatro, um degrau adentro.">
+    <c-v2.panel title="Campo · estados" description="Os mesmos quatro, um degrau adentro.">
       <c-slot name="body">
         <c-v2.field label="Com ajuda" help="Texto de ajuda explicando o campo.">
           <c-slot name="control">
@@ -401,9 +144,9 @@
           </c-slot>
         </c-v2.field>
       </c-slot>
-    </c-v2.form_block>
+    </c-v2.panel>
 
-    <c-v2.form_block title="Campo · tipos" description="Ícone, busca e área de texto.">
+    <c-v2.panel title="Campo · tipos" description="Ícone, busca e área de texto.">
       <c-slot name="body">
         <c-v2.field label="Com ícone">
           <c-slot name="control">
@@ -426,7 +169,7 @@
           </c-slot>
         </c-v2.field>
       </c-slot>
-    </c-v2.form_block>
+    </c-v2.panel>
 
 
     <h3 class="v2-lab__sub">Campo · tipos — uma camada a mais</h3>
@@ -435,7 +178,7 @@
       O mesmo conteúdo, um nível adentro. O bloco interno NÃO passa `surface`:
       ele assume `field` sozinho, pela alternância por profundidade.
     {% endcomment %}
-    <c-v2.form_block title="Bloco externo" description="Nível 1 — superfície rail.">
+    <c-v2.panel title="Bloco externo" description="Nível 1 — superfície rail.">
       <c-slot name="body">
         <c-v2.form_block title="Campo · tipos" description="Nível 2 — superfície field, assumida automaticamente.">
           <c-slot name="body">
@@ -457,12 +200,12 @@
           </c-slot>
         </c-v2.form_block>
       </c-slot>
-    </c-v2.form_block>
+    </c-v2.panel>
 
     {# ------------------------------------------------------------ NAVEGAÇÃO #}
     <h2 class="v2-lab__group">Navegação</h2>
 
-    <c-v2.form_block title="Toggle" description="nav usa links e aria-current; state usa botões e aria-pressed.">
+    <c-v2.panel title="Toggle" description="nav usa links e aria-current; state usa botões e aria-pressed.">
       <c-slot name="body">
         <div class="v2-lab__row">
           <c-v2.toggle aria_label="Duas vistas" :items="v2_abas" />
@@ -475,59 +218,202 @@
           </c-v2.toggle>
         </div>
       </c-slot>
-    </c-v2.form_block>
+    </c-v2.panel>
 
     {# ------------------------------------------------------------- CONTEÚDO #}
     <h2 class="v2-lab__group">Conteúdo</h2>
 
-    <c-v2.form_block title="Selo" description="A cor entra por --chip-tone. Não existe uma classe por cor.">
+    <c-v2.panel title="Selo" description="A cor entra por --chip-tone e é fixa nos dois temas — estado é significado, não decoração.">
       <c-slot name="body">
         <div class="v2-lab__row">
+          <c-v2.chip label="Concluído" tone="done" />
+          <c-v2.chip label="Em andamento" tone="progress" />
+          <c-v2.chip label="Atrasado" tone="late" />
+          <c-v2.chip label="Informativo" tone="info" />
           <c-v2.chip label="Neutro" />
-          <c-v2.chip label="Em andamento" tone="var(--accent)" />
-          <c-v2.chip label="Atrasado" tone="var(--danger)" />
-          <c-v2.chip label="Concluído" tone="var(--surface-brand)" />
         </div>
       </c-slot>
-    </c-v2.form_block>
+    </c-v2.panel>
 
-    <c-v2.form_block title="Card" description="Título, meta e ações — os três opcionais.">
+    {# ---------------------------------------------------------------- LISTA #}
+    <h2 class="v2-lab__group">Lista</h2>
+
+    <c-v2.panel title="Alerta" description="Mesmos tokens de estado do selo — sucesso e 'Concluído' são a mesma informação.">
       <c-slot name="body">
-        <c-v2.card title="Completo" meta="05/08/2026 a 12/08/2026 · ADEMAR · AAA1234">
+        <c-v2.alert :messages="v2_mensagens" />
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Menu de ações" description="Itens por slot: cada ação carrega href, ícone e ganchos próprios do domínio.">
+      <c-slot name="body">
+        <c-v2.menu aria_label="Ações do registro">
+          <c-v2.menu_item href="#" icon="pencil" title="Editar" description="Alterar os dados do registro." />
+          <c-v2.menu_item href="#" icon="download" title="Baixar documento" description="Gera o PDF assinado." />
+          <c-v2.menu_item href="#" icon="x" title="Excluir" description="Remove em definitivo." tone="late" />
+        </c-v2.menu>
+      </c-slot>
+    </c-v2.panel>
+
+    <h3 class="v2-lab__sub">Tela de lista completa</h3>
+
+    {% comment %}
+      `list_page` não tem folha própria: é composição de `header`, `rail` e
+      `panel`. Um componente que só arruma outros não precisa de CSS — se
+      precisasse, seria sinal de que a composição está errada.
+    {% endcomment %}
+    <c-v2.list_page eyebrow="Lista" title="Termos de Autorização" empty_message="Nenhum termo cadastrado.">
+      <c-slot name="aside">
+        <c-v2.toggle aria_label="Alternar lista" :items="v2_abas" />
+      </c-slot>
+      <c-slot name="controls">
+        <c-v2.input icon="search" placeholder="Buscar termos" aria_label="Buscar termos" />
+        <c-v2.select aria_label="Ordenação" :options="v2_opcoes" />
+        <c-v2.button label="Limpar filtros" icon="x" />
+        <c-v2.button label="Novo termo" variant="primary" icon="plus" />
+      </c-slot>
+      <c-slot name="rows">
+        <c-v2.record eyebrow="Termo" title="Nº 153/2026 · ARAPONGAS/PR" meta="12/08 a 15/08/2026 · ADEMAR SCHONS" status="Em andamento" status_tone="progress">
+          <c-slot name="actions"><c-v2.icon_button icon="more" aria_label="Ações do termo" /></c-slot>
+        </c-v2.record>
+        <c-v2.record eyebrow="Termo" title="Nº 152/2026 · CURITIBA/PR" meta="05/08 a 12/08/2026 · ADRIANO SILVA" status="Concluído" status_tone="done">
+          <c-slot name="actions"><c-v2.icon_button icon="more" aria_label="Ações do termo" /></c-slot>
+        </c-v2.record>
+      </c-slot>
+    </c-v2.list_page>
+
+    <h3 class="v2-lab__sub">Tela de lista vazia</h3>
+
+    <c-v2.list_page eyebrow="Lista" title="Termos de Autorização" empty_message="Nenhum termo cadastrado ainda.">
+      <c-slot name="controls">
+        <c-v2.input icon="search" placeholder="Buscar termos" aria_label="Buscar termos, lista vazia" />
+      </c-slot>
+    </c-v2.list_page>
+
+    {# ------------------------------------------------------- FORMULÁRIO AVANÇADO #}
+    <h2 class="v2-lab__group">Formulário avançado</h2>
+
+    <c-v2.panel title="Picker" description="Busca de entidade. O motor é o picker.js — o v2 veste o que ele cria, sem clonar 1013 linhas.">
+      <c-slot name="body">
+        <c-v2.picker mode="multi" name="v2_equipe" aria_label="Buscar servidor" placeholder="Buscar por nome, CPF ou RG" />
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Data" description="Campo simples e intervalo. O painel é montado pelo date-picker.js.">
+      <c-slot name="body">
+        <c-v2.field label="Data simples">
+          <c-slot name="control">
+            <c-v2.date_picker picker_id="v2-data-simples" placeholder_start="Selecione a data" aria_label="Data simples" />
+          </c-slot>
+        </c-v2.field>
+        <c-v2.field label="Intervalo">
+          <c-slot name="control">
+            <c-v2.date_picker mode="range" picker_id="v2-data-intervalo" placeholder_start="Data de ida" placeholder_end="Data de volta" aria_label="Intervalo" />
+          </c-slot>
+        </c-v2.field>
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.period_destinations period_id="v2-periodo" title="Período e destinos">
+      <c-slot name="destinations">
+        <c-v2.field label="Destinos">
+          <c-slot name="control">
+            <c-v2.destination_row label="1º" :removable="True">
+              <c-v2.input icon="search" placeholder="Buscar estado" aria_label="Estado do 1º destino" />
+              <c-v2.input icon="search" placeholder="Buscar cidade" aria_label="Cidade do 1º destino" />
+            </c-v2.destination_row>
+            <c-v2.destination_row label="2º" :removable="True">
+              <c-v2.input icon="search" placeholder="Buscar estado" aria_label="Estado do 2º destino" />
+              <c-v2.input icon="search" placeholder="Buscar cidade" aria_label="Cidade do 2º destino" />
+            </c-v2.destination_row>
+          </c-slot>
+        </c-v2.field>
+      </c-slot>
+    </c-v2.period_destinations>
+
+    <c-v2.panel title="Erros" description="Resumo do formulário (fora do corpo em grade) e erro de campo avulso.">
+      <c-slot name="body">
+        <c-v2.form_errors :errors="v2_erros" />
+        <c-v2.field_error :errors="v2_erros_de_campo" />
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Rodapé de ações" description="Secundária à esquerda, principal à direita — sempre no mesmo canto.">
+      <c-slot name="body">
+        <c-v2.card_footer>
+          <c-slot name="secondary"><c-v2.button label="Voltar" /></c-slot>
+          <c-slot name="primary"><c-v2.button label="Avançar" variant="primary" /></c-slot>
+        </c-v2.card_footer>
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Menu com grupos" description="Cabeçalho de seção dentro do menu de ações.">
+      <c-slot name="body">
+        <c-v2.menu aria_label="Ações agrupadas">
+          <c-v2.menu_header title="Documento" description="O que dá para gerar." />
+          <c-v2.menu_item href="#" icon="download" title="Baixar PDF" />
+          <c-v2.menu_header title="Registro" />
+          <c-v2.menu_item href="#" icon="pencil" title="Editar" />
+          <c-v2.menu_item href="#" icon="x" title="Excluir" tone="late" />
+        </c-v2.menu>
+      </c-slot>
+    </c-v2.panel>
+
+    <h3 class="v2-lab__sub">Etapa de wizard</h3>
+
+    <c-v2.wizard_page eyebrow="Cadastro" title="Ofício 153/2026" :steps="v2_etapas">
+      <c-slot name="body">
+        <c-v2.panel title="Dados da etapa" description="O corpo da etapa entra aqui.">
+          <c-slot name="body">
+            <c-v2.field label="Campo da etapa">
+              <c-slot name="control">
+                <c-v2.input placeholder="Digite aqui" aria_label="Campo da etapa" />
+              </c-slot>
+            </c-v2.field>
+          </c-slot>
+        </c-v2.panel>
+      </c-slot>
+      <c-slot name="footer">
+        <c-v2.card_footer>
+          <c-slot name="secondary"><c-v2.button label="Voltar" /></c-slot>
+          <c-slot name="primary"><c-v2.button label="Avançar" variant="primary" /></c-slot>
+        </c-v2.card_footer>
+      </c-slot>
+    </c-v2.wizard_page>
+
+    <c-v2.panel title="Modal" description="&lt;dialog&gt; nativo: foco preso, Esc e camada de topo sem JS.">
+      <c-slot name="body">
+        <c-v2.button label="Abrir modal" extra_class="v2-lab__abre-modal" />
+        <c-v2.modal modal_id="v2-modal-exemplo" title="Confirmar exclusão">
+          <c-slot name="body">
+            <p>Esta ação não pode ser desfeita.</p>
+          </c-slot>
           <c-slot name="actions">
-            <c-v2.chip label="Em andamento" tone="var(--accent)" />
-            <c-v2.button label="Abrir" />
+            <c-v2.button label="Cancelar" />
             <c-v2.button label="Excluir" variant="danger" />
           </c-slot>
-        </c-v2.card>
-        <c-v2.card title="Só título e meta" meta="Sem ações." />
-        <c-v2.card title="Só título" />
+        </c-v2.modal>
       </c-slot>
-    </c-v2.form_block>
+    </c-v2.panel>
 
     {# ------------------------------------------------------------ ESTRUTURA #}
     <h2 class="v2-lab__group">Estrutura</h2>
 
-    <c-v2.form_block title="Header" description="Com e sem eyebrow, com e sem aside.">
+    <c-v2.panel title="Header" description="Com e sem eyebrow, com e sem aside.">
       <c-slot name="body">
-        <c-v2.header eyebrow="Eyebrow" title="Com eyebrow e ação">
+        <c-v2.header eyebrow="Edição" title="Com tipo de página e ação">
           <c-slot name="aside"><c-v2.button label="Ação" variant="primary" /></c-slot>
         </c-v2.header>
         <c-v2.header title="Só título" />
       </c-slot>
-    </c-v2.form_block>
+    </c-v2.panel>
 
-    <c-v2.form_block title="Panel" description="Com conteúdo e no estado vazio.">
+    <c-v2.panel title="Panel" description="Com conteúdo e no estado vazio.">
       <c-slot name="body">
         <c-v2.panel>
           <c-slot name="body"><p>Conteúdo qualquer dentro do panel.</p></c-slot>
         </c-v2.panel>
         <c-v2.panel empty_title="Nenhum registro cadastrado" empty_message="Este é o estado vazio." />
       </c-slot>
-    </c-v2.form_block>
+    </c-v2.panel>
   </section>
-{% endblock %}
-
-{% block extra_js %}
-  <script src="{% static 'js/dev/header-toggle.js' %}?v=20260813-185458" defer></script>
 {% endblock %}

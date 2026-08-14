@@ -1,12 +1,15 @@
-{% cotton:vars actions body description extra_class surface title %}
+{% cotton:vars actions body description extra_class split surface title %}
 {% comment %}
   Form block v2 — cabeçalho e corpo. Par de `static/css/v2/form-block.css`.
 
   Usa `--v2` no nome porque `.form-block` colide com a classe legada (16 usos).
   O sufixo cai na migração atômica: adicionar o novo, apagar o legado e apontar
   os chamadores na MESMA etapa.
+
+  `split` põe o cabeçalho à esquerda e o corpo à direita, na mesma linha — para
+  o bloco de um controle só, onde empilhar gasta uma linha à toa.
 {% endcomment %}
-<section class="form-block--v2{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
+<section class="form-block--v2{% if split %} form-block--split{% endif %}{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
   {% if title or description or actions %}
     <header class="form-block__header">
       <div>

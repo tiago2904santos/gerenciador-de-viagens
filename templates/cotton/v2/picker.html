@@ -1,0 +1,28 @@
+{% cotton:vars aria_label extra_class field mode name placeholder %}
+{% comment %}
+  Picker v2 — busca de entidade com resultados e itens selecionados.
+
+  NÃO clona o JS. O `js/components/picker.js` (1013 linhas) monta campo,
+  lista e cartões a partir de `[data-entity-picker]`, e as classes
+  `search-picker__*` que ele gera são contrato dele. Este componente entrega o
+  markup que o motor espera e a folha `v2/picker.css` estiliza o que ele cria —
+  o mesmo arranjo já validado no select.
+
+  Clonar 1013 linhas para trocar nomes de classe criaria dois motores de busca
+  em paralelo, com o dobro de superfície para divergir.
+
+  `mode`: "single" ou "multi".
+{% endcomment %}
+<div
+  class="picker{% if extra_class %} {{ extra_class }}{% endif %} search-picker search-picker--{{ mode|default:'single' }}"
+  data-entity-picker
+  data-entity-picker-root
+  data-entity-picker-mode="{{ mode|default:'single' }}"
+  {% if placeholder %}data-entity-picker-placeholder="{{ placeholder }}"{% endif %}
+>
+  {% if field %}
+    {{ field.as_widget }}
+  {% else %}
+    <select name="{{ name }}" aria-label="{{ aria_label }}" class="search-picker__native" hidden></select>
+  {% endif %}
+</div>

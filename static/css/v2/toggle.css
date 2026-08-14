@@ -10,7 +10,10 @@
 
 :is(html[data-theme]) .toggle {
   align-items: center;
-  background: var(--ui-surface, var(--surface-rail));
+  /* Segue a escada: o toggle é um controle, então assume o degrau oposto ao do
+     contêiner, igual ao campo e ao select. Lia `--ui-surface`, variável do
+     sistema v1 que nunca chega aqui — na prática ficava sempre no fallback. */
+  background: var(--surface-contrast, var(--surface-field));
   border-radius: var(--radius-field);
   display: inline-flex;
   gap: 2px;
@@ -50,7 +53,7 @@
 }
 
 :is(html[data-theme]) .toggle__item:hover:not([aria-current="page"]):not([aria-pressed="true"]) {
-  background: var(--surface-field);
+  background: var(--surface, var(--surface-rail));
   color: var(--text-strong);
 }
 

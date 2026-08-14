@@ -1,5 +1,0 @@
-/* Tema claro do main vazio: somente a cor de fundo. */
-
-html[data-theme="light"] .main-preview-shell {
-  --color-app-bg: linear-gradient(180deg, #ffffff 0%, #e3eaf2 48%, #e3eaf2 100%);
-}

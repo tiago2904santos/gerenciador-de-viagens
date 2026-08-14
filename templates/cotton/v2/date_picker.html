@@ -1,0 +1,27 @@
+{% cotton:vars aria_label extra_class mode picker_id placeholder_end placeholder_start %}
+{% comment %}
+  Date picker v2 — campo de data, simples ou intervalo.
+
+  DELEGA ao partial global `cotton/ui/forms/date_picker.html`, que é o único
+  ponto de verdade da marcação do calendário — há um teste de contrato para
+  isso (`test_calendar_markup_exists_only_in_the_global_partial`), e ele me
+  pegou: a primeira versão deste componente recriou o markup, o que reintroduzia
+  exatamente a divergência que o partial existe para impedir.
+
+  O v2 acrescenta só o invólucro `.date-field`, para a folha
+  `static/css/v2/date-picker.css` vestir o campo sem alcançar as telas legadas.
+
+  O JS é o `js/components/date-picker.js`, achado pelo partial.
+{% endcomment %}
+<div class="date-field{% if extra_class %} {{ extra_class }}{% endif %}">
+  <c-ui.forms.date_picker
+    :mode="mode"
+    :picker_id="picker_id"
+    :start_placeholder="placeholder_start"
+    :end_placeholder="placeholder_end"
+    :single_placeholder="placeholder_start"
+    :single_aria_label="aria_label"
+    hide_labels="1"
+    only
+  />
+</div>

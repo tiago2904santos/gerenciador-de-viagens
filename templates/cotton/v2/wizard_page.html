@@ -1,0 +1,21 @@
+{% cotton:vars aside body extra_class eyebrow footer steps title %}
+{% comment %}
+  Wizard page v2 — o esqueleto de uma etapa de wizard: identidade, stepper e o
+  corpo da etapa.
+
+  Sem folha própria: é composição de `header`, `rail` e `stepper`.
+{% endcomment %}
+<div class="wizard-page{% if extra_class %} {{ extra_class }}{% endif %}">
+  <c-v2.header :eyebrow="eyebrow" :title="title">
+    {% if aside %}<c-slot name="aside">{{ aside }}</c-slot>{% endif %}
+  </c-v2.header>
+
+  {% if steps %}
+    <c-v2.rail>
+      <c-slot name="controls"><c-v2.stepper :steps="steps" /></c-slot>
+    </c-v2.rail>
+  {% endif %}
+
+  {{ body }}
+  {{ footer }}
+</div>

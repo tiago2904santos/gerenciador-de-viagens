@@ -1,0 +1,17 @@
+{% cotton:vars errors extra_class title %}
+{% comment %}
+  Resumo de erros do formulário v2 — os erros que não pertencem a um campo
+  (o `clean()` do Django). Par de `static/css/v2/form-errors.css`.
+
+  Fica FORA do corpo do bloco, como irmão direto do formulário: dentro de um
+  corpo em grade ele vira uma coluna ao lado dos campos e desloca tudo. Foi
+  esse o defeito `HT-03` no sistema antigo.
+{% endcomment %}
+{% if errors %}
+  <div class="form-errors{% if extra_class %} {{ extra_class }}{% endif %}" role="alert">
+    <p class="form-errors__title">{{ title|default:"Corrija antes de continuar" }}</p>
+    <ul class="form-errors__list">
+      {% for erro in errors %}<li>{{ erro }}</li>{% endfor %}
+    </ul>
+  </div>
+{% endif %}
