@@ -745,8 +745,10 @@
    * que o motor precisa está no próprio markup.
    *
    * As referências vão explícitas porque `initManagedRows` cai no `form` para
-   * achar botão e molde, e numa página com duas seções ele acharia os da
-   * primeira.
+   * achar lista e molde, e numa página com duas seções ele acharia os da
+   * primeira. O botão de adicionar NÃO vai: ele existe por linha, e quem o
+   * atende é o ouvinte delegado da seção, que sabe inserir a nova logo abaixo
+   * daquela em que se clicou.
    */
   function autoManage(section) {
     if (!section.hasAttribute("data-location-managed")) return;
@@ -756,7 +758,6 @@
       form: section.closest("form") || section,
       section: section,
       list: section.querySelector("[data-location-list]"),
-      addButton: section.querySelector("[data-location-add]"),
       template: section.querySelector("template[data-location-template]"),
     });
   }

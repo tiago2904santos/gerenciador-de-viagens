@@ -53,9 +53,22 @@
  * `[data-travel-document-wizard-*]`; fora dos wizards ela não alcança nada.
  * Aqui o par com `.form-block--v2` mantém as duas separadas até o legado sair.
  */
+/* A coluna do cabeçalho tem largura FIXA, e não `max-content`.
+ *
+ * Com `max-content` cada bloco media a sua própria descrição: "Ida e volta no
+ * mesmo calendário." dava 188px e "Na ordem da visita." dava 162px, então dois
+ * blocos split empilhados começavam os campos em x diferentes (475 e 450) e as
+ * colunas não se alinhavam entre si. Alinhar blocos é o motivo de existir um
+ * sistema de grade — deixar cada um se medir sozinho o desfaz.
+ *
+ * Em troca, a descrição de um bloco split precisa caber em uma linha nesta
+ * largura. Ela não quebra (`white-space: nowrap` abaixo): se passar, transborda
+ * — e é para transbordar mesmo, senão o desalinhamento volta em silêncio. */
 :is(html[data-theme]) .form-block--v2.form-block--split {
+  --split-label: 200px;
+
   align-items: center;
-  grid-template-columns: minmax(max-content, 0.62fr) minmax(0, 2fr);
+  grid-template-columns: var(--split-label) minmax(0, 1fr);
 }
 
 /* Empilha título e descrição: na coluna estreita eles não cabem lado a lado,

@@ -20,7 +20,22 @@
   data-location-row
   data-location-index="{{ index|default:0 }}"
 >
-  <span class="destination-row__label" data-location-order aria-hidden="true">{{ index|default:0|add:1 }}</span>
+  {% comment %}
+    No lugar do número da linha vai o "+": ele adiciona um destino LOGO ABAIXO
+    desta, que é o que o `location-rows.js` faz quando o clique parte de dentro
+    de uma linha (`insertAfter: sourceRow`). Sem `data-location-order` de
+    propósito — o JS escreve o número da posição nesse gancho, e escrevê-lo aqui
+    apagaria o "+" na primeira renumeração.
+  {% endcomment %}
+  <button
+    type="button"
+    class="destinations__add"
+    data-location-add
+    title="Adicionar destino abaixo"
+    aria-label="Adicionar destino abaixo"
+  >
+    <span aria-hidden="true">+</span>
+  </button>
 
   <div class="destination-row__fields">
     <select
@@ -58,17 +73,22 @@
     >
       <option value=""></option>
     </select>
-  </div>
 
-  {% if removable %}
-    <button
-      type="button"
-      class="destination-row__remove"
-      data-location-remove
-      title="Remover destino"
-      aria-label="Remover destino"
-    >
-      <span aria-hidden="true">×</span>
-    </button>
-  {% endif %}
+    {% comment %}
+      O "×" fica na MESMA faixa da cidade, e não como irmão dela na linha: é
+      isso que faz o vão dele sumir junto com o botão quando há um destino só,
+      devolvendo os 56px inteiros ao campo de cidade.
+    {% endcomment %}
+    {% if removable %}
+      <button
+        type="button"
+        class="destination-row__remove"
+        data-location-remove
+        title="Remover destino"
+        aria-label="Remover destino"
+      >
+        <span aria-hidden="true">×</span>
+      </button>
+    {% endif %}
+  </div>
 </div>

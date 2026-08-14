@@ -24,6 +24,13 @@
   font-weight: var(--weight-strong);
 }
 
+/* O botão de adicionar mora na coluna do número da linha, onde estaria o "4" da
+   próxima. `justify-self: start` porque a seção é uma grade de coluna única: sem
+   isso ele esticaria pela largura toda. */
+:is(html[data-theme]) .destinations__add {
+  justify-self: start;
+}
+
 :is(html[data-theme]) .destinations__list {
   display: grid;
   gap: var(--gap-tight);

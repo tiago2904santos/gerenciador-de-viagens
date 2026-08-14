@@ -127,6 +127,7 @@ UI_CSS: tuple[str, ...] = (
     "css/v2/header.css",
     "css/v2/rail.css",
     "css/v2/select.css",
+    "css/v2/listbox.css",
     "css/v2/toggle.css",
     "css/v2/chip.css",
     "css/v2/panel.css",

@@ -1,0 +1,236 @@
+/* Listbox — a lista de opções que cai de um campo. O MODELO GLOBAL.
+ *
+ * Duas listas existem no sistema e são a mesma coisa para quem usa: o menu do
+ * select (`custom-select__menu--v2`, criado por `picker-select.js`) e o
+ * dropdown do picker (`search-picker__dropdown--v2`, criado por `picker.js`).
+ * Os nomes das classes são dos dois motores JS e não se renomeiam aqui.
+ *
+ * ## Por que uma folha só
+ *
+ * Enquanto cada componente descrevia a sua lista na própria folha, elas
+ * divergiram em quinze propriedades ao mesmo tempo — raio, recuo, altura do
+ * item, peso e cor do rótulo, sombra, fita da escolhida, animação de entrada,
+ * barra de rolagem — e a mesma escolha aparecia de dois jeitos na mesma tela.
+ * Nenhuma divergência foi decidida: todas nasceram de uma folha declarar o que
+ * a outra não declarava, deixando o legado preencher a lacuna.
+ *
+ * Aqui os dois seletores andam SEMPRE juntos, em todas as regras. Mexer numa
+ * lista sem mexer na outra deixou de ser possível por construção, e não por
+ * disciplina — `core/tests/test_listbox_unico.py` reprova quem tentar.
+ *
+ * As folhas dos componentes ficam com o que é só delas: o gatilho e a seta no
+ * `select.css`, o campo de busca e as peças que o picker cria a mais no
+ * `picker.css`.
+ */
+
+/* ---- a caixa --------------------------------------------------------------
+ *
+ * Ela é movida para o `body` ao abrir, então NÃO herda nada do campo: sem
+ * ancestral comum, `--surface-contrast` não chega até aqui. Por isso as cores
+ * vêm dos tokens diretamente.
+ *
+ * A altura da opção é declarada, não deduzida do conteúdo: é ela que define
+ * quantos itens cabem, e o teto é um múltiplo exato dela. Sem isso o corte
+ * cairia no meio de uma linha.
+ *
+ * A segunda e a quarta linha de seletor empatam com as regras legadas, que
+ * qualificam a lista aberta com `.floating-dropdown--active` e por isso venciam
+ * por uma classe. No empate decide a ordem, e o `ui.bundle.css` entra depois do
+ * bundle legado.
+ */
+:is(html[data-theme]) .custom-select__menu--v2,
+:is(html[data-theme]) .custom-select__menu--v2.floating-dropdown--active,
+:is(html[data-theme]) .search-picker__dropdown--v2,
+:is(html[data-theme]) .search-picker__dropdown--v2.floating-dropdown--active {
+  --listbox-option-height: 40px;
+  --listbox-option-gap: 8px;
+  --listbox-padding: 6px;
+  --listbox-border: 1px;
+
+  /* Sem animação de entrada: uma das duas listas surgindo com deslize e a outra
+     aparecendo direto era diferença visível entre elas. */
+  animation: none;
+  background: var(--surface-field);
+  border: var(--listbox-border) solid var(--line);
+  border-radius: var(--radius-field);
+  box-shadow: var(--shadow-menu);
+  box-sizing: border-box;
+  display: grid;
+  /* Cinco itens INTEIROS, os quatro vãos entre eles e mais um vão de respiro
+     abaixo do quinto — que é o que denuncia a existência do sexto.
+
+     A BORDA entra na conta: com `box-sizing: border-box` o `max-height` a
+     inclui, e omiti-la encurtava a área útil em 2px — o respiro caía de 8 para
+     6 e o corte subia. */
+  max-height: calc(
+    var(--listbox-option-height) * 5 + var(--listbox-option-gap) * 5 +
+      var(--listbox-padding) * 2 + var(--listbox-border) * 2
+  );
+  /* Descola do campo: o módulo de posicionamento cola a caixa com folga zero. */
+  margin-top: 6px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--listbox-padding);
+  row-gap: var(--listbox-option-gap);
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-width: thin;
+}
+
+/* O picker tem um invólucro a mais entre a caixa e as opções; o select não.
+ * Ele SÓ distribui os itens — teto, rolagem e recuo são da caixa nos dois.
+ *
+ * As três anulações não são zelo: a folha legada dá a este invólucro
+ * `max-height` e `overflow` próprios e, no tema claro, ainda um `padding`. Com
+ * a caixa também rolando, apareciam duas barras de rolagem e recuo dobrado. */
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__list {
+  display: grid;
+  max-height: none;
+  overflow: visible;
+  padding: 0;
+  row-gap: var(--listbox-option-gap);
+}
+
+/* ---- o item ---------------------------------------------------------------
+ *
+ * `min-width: 0` porque item de grade não encolhe abaixo do próprio
+ * `min-content`: com ícone, vão, rótulo e recuo somando 162px numa faixa de
+ * 140, ele transbordava e o `overflow` da caixa cortava. Assim o rótulo trunca.
+ *
+ * `margin: 0` porque a folha legada põe margem no item, que SOMARIA ao
+ * `row-gap` e tornaria indeterminada a conta do teto acima. Uma origem só.
+ *
+ * `min-height` além de `height` porque o legado impõe `min-height: 62px` ao
+ * item do picker, e `min-height` vence `height`.
+ */
+:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option,
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option {
+  align-items: center;
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  box-sizing: border-box;
+  color: var(--text-strong);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  font-size: var(--text-size-base);
+  gap: var(--gap-tight);
+  height: var(--listbox-option-height);
+  margin: 0;
+  min-height: var(--listbox-option-height);
+  min-width: 0;
+  padding: 0 8px 0 12px;
+  text-align: left;
+  transition: background-color 0.1s ease, color 0.1s ease;
+  user-select: none;
+  width: 100%;
+}
+
+/* Realce: um degrau na escada de superfícies, nunca mistura de matiz.
+ *
+ * O `:not(--selected)` é o que torna isso possível. Antes de a escolhida ganhar
+ * cor própria, as duas usavam `--surface-rail` e ficavam idênticas assim que o
+ * mouse passava em outra linha; a exclusão diz explicitamente que o realce não
+ * alcança a escolhida, em vez de depender da ordem das regras. */
+:is(html[data-theme]) .custom-select__menu--v2
+  .custom-select__option:hover:not(.custom-select__option--selected),
+:is(html[data-theme]) .custom-select__menu--v2
+  .custom-select__option--focused:not(.custom-select__option--selected),
+:is(html[data-theme]) .search-picker__dropdown--v2
+  .search-picker__option:hover:not(.search-picker__option--selected),
+:is(html[data-theme]) .search-picker__dropdown--v2
+  .search-picker__option--active:not(.search-picker__option--selected) {
+  background: var(--surface-rail);
+  color: var(--text-strong);
+}
+
+/* ---- a opção escolhida ----------------------------------------------------
+ *
+ * Cor própria (`--surface-selected`), mantida em qualquer combinação: sozinha,
+ * sob o mouse ou com o foco do teclado. Não é um degrau da escada de propósito
+ * — "escolhida" é significado, não profundidade; como degrau, ela empatava com
+ * o realce e desaparecia.
+ *
+ * As formas repetem exatamente as que as folhas legadas usam
+ * (`--selected`, `--selected:hover:not(--disabled)`, `--selected.--focused`).
+ * Sem repeti-las, aquelas regras venciam por terem uma classe a mais e a
+ * escolhida voltava a mudar de cor conforme o mouse.
+ */
+:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option--selected,
+:is(html[data-theme]) .custom-select__menu--v2
+  .custom-select__option--selected:hover:not(.custom-select__option--disabled),
+:is(html[data-theme]) .custom-select__menu--v2
+  .custom-select__option--selected.custom-select__option--focused,
+:is(html[data-theme]) .search-picker__dropdown--v2
+  .search-picker__option--selected,
+:is(html[data-theme]) .search-picker__dropdown--v2
+  .search-picker__option[aria-selected="true"] {
+  background: var(--surface-selected);
+  /* A fita lateral que marca a escolhida, com o accent do tema. Vinha de uma
+     regra legada que alcançava uma lista e não a outra. */
+  box-shadow: inset 3px 0 0 0 var(--accent);
+  color: var(--accent);
+  font-weight: var(--weight-strong);
+}
+
+/* ---- o rótulo -------------------------------------------------------------
+ *
+ * `inherit` nos três: cor, peso e corpo vêm do item. A folha legada pintava o
+ * rótulo do picker de branco, com peso 900 e 13.76px, e era isso que mantinha
+ * as duas listas diferentes mesmo com a caixa e o item já idênticos — a linha
+ * escolhida saía dourada num e branca no outro.
+ *
+ * O rótulo trunca em vez de empurrar o item para fora da caixa.
+ */
+:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option-label,
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option-content,
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option-main {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- o "v" da escolhida ---------------------------------------------------
+ *
+ * O select o traz num span próprio; no picker o `picker.js` o põe no span que
+ * antes repetia "Selecionado" em toda linha. Os dois ficam à direita, em
+ * accent, com o mesmo traço.
+ */
+:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option-check,
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option-status {
+  align-items: center;
+  background: none;
+  color: var(--accent);
+  display: inline-flex;
+  flex: none;
+  margin-left: auto;
+}
+
+:is(html[data-theme]) .custom-select__menu--v2 .custom-select__option-check svg,
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option-status svg {
+  display: block;
+  fill: none;
+  height: 14px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+  width: 14px;
+}
+
+/* O picker cria duas peças por opção que o select não tem: um marcador vazio e
+   um ponto decorativo. A lista padrão mostra o rótulo e o "v", nada mais. */
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option-marker,
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option-visual {
+  display: none;
+}
+
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__empty {
+  color: var(--text-muted);
+  font-size: var(--text-size-base);
+  padding: 12px;
+}

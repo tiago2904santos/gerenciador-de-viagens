@@ -1,28 +1,60 @@
 /* Linha de destino. Depende de `v2/tokens.css`. */
 
+/* Grade de duas colunas: o "+" e o resto.
+ *
+ * O "+" tem largura fixa e não se mexe. Estado, cidade e "×" repartem a segunda
+ * coluna, cuja largura não muda — é a da linha menos o botão e um vão.
+ *
+ * O ESTADO tem largura fixa, calculada sobre 100% dessa coluna: metade do que
+ * sobra quando a linha está cheia. Como a coluna não muda, ele também não.
+ *
+ * A CIDADE fica com o resto. Com um destino só, o `location-rows.js` marca o
+ * "×" com `hidden` — não faz sentido remover o único — e o botão deixa de gerar
+ * caixa. Estando os três no MESMO flex, o vão dele some junto, e os 56px vão
+ * inteiros para a cidade.
+ *
+ * Duas tentativas anteriores não resolvem, e ficam registradas para não voltarem:
+ * reservar a coluna com `visibility: hidden` perde para o
+ * `[hidden] { display: none !important }` do bundle legado; e deixar o "×" como
+ * quarta coluna da linha o empurrava para uma segunda fileira, porque a grade
+ * só declarava três. */
 :is(html[data-theme]) .destination-row {
+  align-items: center;
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: var(--control-height) minmax(0, 1fr);
+  min-width: 0;
+}
+
+
+/* Estado, cidade e "×" na mesma faixa: é o que faz o vão do botão sumir com ele
+   quando não há o que remover. */
+:is(html[data-theme]) .destination-row__fields {
   align-items: center;
   display: flex;
   gap: var(--gap);
   min-width: 0;
 }
 
-:is(html[data-theme]) .destination-row__label {
-  color: var(--text-muted);
-  flex: none;
-  font-size: var(--text-size-eyebrow);
-  font-weight: var(--weight-strong);
-  min-width: 64px;
-}
-
-:is(html[data-theme]) .destination-row__fields {
-  display: flex;
-  flex: 1 1 auto;
-  gap: var(--gap);
+/* O estado não se mexe: largura fixa, tirada de 100% da faixa — que não muda. */
+:is(html[data-theme]) .destination-row__fields > .search-picker:first-of-type {
+  flex: 0 0 calc((100% - var(--control-height) - var(--gap) * 2) / 2);
   min-width: 0;
 }
 
-:is(html[data-theme]) .destination-row__remove {
+/* A cidade fica com o que sobrar. */
+:is(html[data-theme]) .destination-row__fields > .search-picker:last-of-type {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Remover e adicionar são o mesmo botão: mesma medida, mesma superfície, mesmo
+   raio. Só o que eles significam difere, e isso está no hover — vermelho para
+   quem tira, accent para quem põe. Declarados juntos porque desenhá-los em
+   regras separadas é como o sistema antigo acumulou dezoito variantes de botão
+   que ninguém tinha decidido. */
+:is(html[data-theme]) .destination-row__remove,
+:is(html[data-theme]) .destinations__add {
   align-items: center;
   background: var(--surface-contrast, var(--surface-field));
   border: 0;
@@ -31,11 +63,19 @@
   cursor: pointer;
   display: inline-flex;
   flex: none;
+  font: inherit;
+  font-size: 20px;
   height: var(--control-height);
   justify-content: center;
+  line-height: 1;
   width: var(--control-height);
 }
 
 :is(html[data-theme]) .destination-row__remove:hover {
   color: var(--status-late);
+}
+
+
+:is(html[data-theme]) .destinations__add:hover {
+  color: var(--accent);
 }

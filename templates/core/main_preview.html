@@ -315,7 +315,9 @@
 
     <c-v2.period_destinations period_id="v2-periodo" title="Período e destinos">
       <c-slot name="destinations">
-        <c-v2.destinations title="Destinos" :estados="v2_estados" :cities_url="v2_cidades_url">
+        <c-v2.form_block :split="True" title="Destinos" description="Na ordem da visita.">
+        <c-slot name="body">
+        <c-v2.destinations :estados="v2_estados" :cities_url="v2_cidades_url">
           <c-slot name="rows">
             {% comment %}
               A primeira linha também nasce removível: quem esconde o × quando
@@ -326,6 +328,8 @@
             <c-v2.destination_row :index="0" :estados="v2_estados" :removable="True" />
           </c-slot>
         </c-v2.destinations>
+        </c-slot>
+        </c-v2.form_block>
       </c-slot>
     </c-v2.period_destinations>
 

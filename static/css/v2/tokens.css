@@ -25,13 +25,17 @@
 
 :root {
   /* ---- superfícies ---------------------------------------------------- */
-  /* Os degraus do claro medem o MESMO contraste dos do escuro: 1.13 de page
-     para rail e 1.27 de rail para field. Antes eram 1.055 e 1.106 — metade —, e
-     com isso a alternância de superfície, que é o que separa uma camada da
-     outra em todo o sistema, sumia no tema claro: a tela parecia sem estilo
-     aplicado. O campo continua branco, o ponto mais alto da escada. */
+  /* O `page` é mais fundo que o original (#e8eef6) porque o degrau para o rail
+     media 1.055 — praticamente nada — e a alternância de superfície, que é o
+     que separa uma camada da outra em todo o sistema, sumia no tema claro.
+     Agora mede 1.29.
+
+     O `rail` voltou ao valor original por decisão do dono: a versão mais funda
+     que eu tinha posto (#dfe5ed) igualava o degrau rail→field ao do escuro,
+     mas puxava o azul para o cinza. Em troca, rail→field fica em 1.106 no
+     claro contra 1.27 no escuro — o campo se separa menos da caixa aqui. */
   --surface-page: #d3d8e0;
-  --surface-rail: #dfe5ed;
+  --surface-rail: #eef4fc;
   --surface-field: #ffffff;
   --surface-brand: #155b9a;
   /* Fundo da linha escolhida numa lista de opções. É a cor que o desenho antigo

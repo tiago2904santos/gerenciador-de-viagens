@@ -23,14 +23,26 @@
   {% if cities_url %}data-api-cidades-url="{{ cities_url }}"{% endif %}
   aria-label="{{ title|default:'Destinos' }}"
 >
-  <header class="destinations__header">
-    <span class="destinations__title">{{ title|default:'Destinos' }}</span>
-    <c-v2.button label="Adicionar destino" icon="plus" variant="secondary" hook="data-location-add" />
-  </header>
+  {% comment %}
+    O título é opcional: dentro de um `form_block` com `split` quem o mostra é o
+    cabeçalho do bloco, à esquerda, e repeti-lo aqui daria duas vezes a mesma
+    palavra na mesma linha.
+  {% endcomment %}
+  {% if title %}
+    <header class="destinations__header">
+      <span class="destinations__title">{{ title }}</span>
+    </header>
+  {% endif %}
 
+  {% comment %}
+    Não há botão de adicionar aqui: ele mora em CADA linha, no lugar do número,
+    e insere a nova logo abaixo daquela em que se clicou. Um botão único no
+    rodapé só sabe acrescentar ao fim.
+  {% endcomment %}
   <div class="destinations__list" data-location-list aria-label="Destinos adicionados">
     {{ rows }}
   </div>
+
 
   {% comment %}
     O molde da próxima linha. `__index__` é o marcador que o JS troca pelo
