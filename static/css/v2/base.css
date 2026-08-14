@@ -1,0 +1,80 @@
+/* v2 — primitivas.
+ *
+ * Depende de `v2/tokens.css`.
+ *
+ * NÃO é um reset. Nada aqui atinge seletor de elemento (`body`, `button`,
+ * `input`) nem classe legada: enquanto uma tela não migrar, esta folha não
+ * pode mudar um pixel dela. Toda regra é opt-in, ancorada numa classe que só o
+ * sistema novo emite.
+ *
+ * O que mora aqui são as primitivas que mais de um componente compartilha.
+ * Regra de admissão: entra quando o SEGUNDO componente precisar. Enquanto for
+ * um só, fica na folha dele.
+ */
+
+/* ---- superfície escolhida pelo chamador ---------------------------------
+ *
+ * `surface="rail"` / `surface="field"` no template viram estas classes. O
+ * modificador declara uma VARIÁVEL em vez de pintar: variável herda pela
+ * árvore e não disputa especificidade, então funciona também nos elementos que
+ * o JS cria em tempo de execução (o gatilho e o menu do select, por exemplo).
+ *
+ * Pintar direto foi a primeira tentativa e falhou: a regra padrão de cada
+ * componente vencia por peso e o atributo no HTML não tinha efeito nenhum.
+ */
+.surface--page {
+  --surface: var(--surface-page);
+}
+
+.surface--rail {
+  --surface: var(--surface-rail);
+}
+
+.surface--field {
+  --surface: var(--surface-field);
+}
+
+/* ---- foco -----------------------------------------------------------------
+ *
+ * Um anel só para todo o sistema. `:focus-visible` e não `:focus`: quem clica
+ * com o mouse não vê anel, quem navega por teclado vê.
+ */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* `.visually-hidden` NÃO entra aqui, embora pertença a esta camada: ela já
+   existe em `base/utilities.css:9`, com outra implementação (`clip: rect()` e
+   margem negativa, contra `clip-path`). Redefinir criaria duas fontes para a
+   mesma classe — e como esta folha carrega depois, mudaria o comportamento das
+   telas ainda não migradas. Volta para cá quando `base/utilities.css` for
+   apagado, na etapa final. */
+
+
+/* ---- andaime da galeria do UI Lab ---------------------------------------
+ *
+ * Não são componentes: existem só para a vitrine respirar e sairiam junto com
+ * ela. Ficam aqui, e não numa folha de página, porque a galeria é o lugar onde
+ * o sistema v2 se prova.
+ */
+.v2-lab {
+  display: grid;
+  gap: var(--gap);
+}
+
+.v2-lab__group {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  letter-spacing: 0.08em;
+  margin: var(--gap-loose) 0 0;
+  text-transform: uppercase;
+}
+
+.v2-lab__row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+}

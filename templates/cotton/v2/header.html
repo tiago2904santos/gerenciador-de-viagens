@@ -1,0 +1,14 @@
+{% cotton:vars aside extra_class eyebrow title %}
+{% comment %}
+  Header v2 — a faixa de identidade. Par de `static/css/v2/header.css`.
+
+  Único componente que usa `--surface-brand`. O que vai à direita é livre:
+  ação, toggle ou abas, pelo slot `aside`.
+{% endcomment %}
+<div class="header{% if extra_class %} {{ extra_class }}{% endif %}">
+  <div class="header__copy">
+    {% if eyebrow %}<span class="header__eyebrow">{{ eyebrow }}</span>{% endif %}
+    <h1 class="header__title">{{ title }}</h1>
+  </div>
+  {% if aside %}<div class="header__aside">{{ aside }}</div>{% endif %}
+</div>

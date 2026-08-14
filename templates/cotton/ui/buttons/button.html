@@ -1,8 +1,18 @@
 {% cotton:vars aria_label attrs class_name data_attach_signed_cancel data_autosave_link data_cancel_label data_cancel_modal_cancel data_cancel_url data_confirm_action_cancel data_confirm_action_label_text data_confirm_action_url data_cv_filter_clear data_delete_label data_delete_modal_cancel data_delete_title data_delete_url data_inline_create_close data_overlay_src data_quick_add_close disabled extra_class hidden href icon icon_after label link_rel link_target loading name size slot type value variant %}
-{# button.html — ver docs/ui-components.md #}
+{% comment %}
+  button.html — ver docs/ui-components.md
+
+  NOVO-120: emite `.button` (v2). O legado `.button` tinha 18 variantes, das
+  quais 8 sem uso nenhum; o v2 tem 6. As três da cauda (`preview`, `pdf`,
+  `back-list`) são aparências de tela específica e continuam vindo por
+  `class_name`/`extra_class` enquanto as telas delas não migram.
+
+  `class_name` SUBSTITUI a lista inteira de classes — quem passa isso não
+  recebe `.button` e é responsável pelo próprio desenho.
+{% endcomment %}
 {% load icones %}
 {% if href %}
-  <a class="{% if class_name %}{{ class_name }}{% else %}cv-btn cv-btn--{{ variant|default:'secondary' }}{% if size %} cv-btn--{{ size }}{% endif %}{% if loading %} is-loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}{% endif %}"
+  <a class="{% if class_name %}{{ class_name }}{% else %}button button--{{ variant|default:'secondary' }}{% if size %} button--{{ size }}{% endif %}{% if loading %} is-loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}{% endif %}"
      href="{{ href }}"
      {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
      {% if disabled or loading %}aria-disabled="true" tabindex="-1"{% endif %}
@@ -22,15 +32,15 @@
      {% if hidden %}hidden{% endif %}
   >
     {% if slot %}{{ slot }}{% else %}{% if icon and not icon_after %}
-      <span class="cv-btn__icon" aria-hidden="true">{% icone_svg icon %}</span>
+      <span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>
     {% endif %}
     {% if label %}<span>{{ label }}</span>{% endif %}
     {% if icon and icon_after %}
-      <span class="cv-btn__icon" aria-hidden="true">{% icone_svg icon %}</span>
+      <span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>
     {% endif %}{% endif %}
   </a>
 {% else %}
-  <button class="{% if class_name %}{{ class_name }}{% else %}cv-btn cv-btn--{{ variant|default:'secondary' }}{% if size %} cv-btn--{{ size }}{% endif %}{% if loading %} is-loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}{% endif %}"
+  <button class="{% if class_name %}{{ class_name }}{% else %}button button--{{ variant|default:'secondary' }}{% if size %} button--{{ size }}{% endif %}{% if loading %} is-loading{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}{% endif %}"
           type="{{ type|default:'button' }}"
           {% if name %}name="{{ name }}"{% endif %}
           {% if value %}value="{{ value }}"{% endif %}
@@ -50,11 +60,11 @@
      {% if hidden %}hidden{% endif %}
   >
     {% if slot %}{{ slot }}{% else %}{% if icon and not icon_after %}
-      <span class="cv-btn__icon" aria-hidden="true">{% icone_svg icon %}</span>
+      <span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>
     {% endif %}
     {% if label %}<span>{{ label }}</span>{% endif %}
     {% if icon and icon_after %}
-      <span class="cv-btn__icon" aria-hidden="true">{% icone_svg icon %}</span>
+      <span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>
     {% endif %}{% endif %}
   </button>
 {% endif %}

@@ -1,0 +1,27 @@
+{% cotton:vars aria_label extra_class name options surface value %}
+{% comment %}
+  Select v2 — par de `static/css/v2/select.css`.
+
+  O componente é dono APENAS do invólucro e do `<select>` nativo. O gatilho
+  visível e o menu são criados em tempo de execução por
+  `js/components/picker-select.js`, que os acha por `[data-entity-picker]` — o
+  mesmo seletor que o `js/core/component-loader.js` usa para buscar o bundle de
+  formulário sob demanda. Por isso não há script próprio aqui: pôr o atributo
+  já basta para o JS chegar.
+
+  As classes `custom-select__*` do gatilho e do menu pertencem ao JS e NÃO são
+  renomeadas para BEM: renomear sem tocar o JS quebra em silêncio — a página
+  não dá erro, o componente simplesmente não inicializa.
+{% endcomment %}
+<div
+  class="select{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+  data-entity-picker
+  data-entity-picker-renderer="select"
+  data-entity-picker-mode="single"
+>
+  <select name="{{ name }}" aria-label="{{ aria_label }}">
+    {% for opt in options %}
+      <option value="{{ opt.value }}"{% if opt.value == value %} selected{% endif %}>{{ opt.label }}</option>
+    {% endfor %}
+  </select>
+</div>

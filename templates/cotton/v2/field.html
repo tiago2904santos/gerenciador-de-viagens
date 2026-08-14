@@ -1,0 +1,16 @@
+{% cotton:vars control error extra_class help label label_for %}
+{% comment %}
+  Field v2 — rótulo, controle, ajuda e erro. Par de `static/css/v2/field.css`.
+
+  O controle vem por slot (`control`): o campo não sabe se dentro dele há um
+  input, um select ou um picker, e não deve saber.
+
+  A folha só vale dentro de `.form-block--v2` enquanto o `.field` legado (33
+  usos) existir — sem esse escopo, repintaria tela não migrada.
+{% endcomment %}
+<div class="field{% if error %} field--invalid{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
+  {% if label %}<label class="field__label"{% if label_for %} for="{{ label_for }}"{% endif %}>{{ label }}</label>{% endif %}
+  {{ control }}
+  {% if help %}<p class="field__help">{{ help }}</p>{% endif %}
+  {% if error %}<p class="field__error">{{ error }}</p>{% endif %}
+</div>

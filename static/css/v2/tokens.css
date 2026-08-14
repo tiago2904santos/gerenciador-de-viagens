@@ -42,6 +42,18 @@
   --accent: #0b3a66;
   --focus-ring: #155b9a;
 
+  /* Perigo. Um tom sólido, não gradiente: o botão legado usava
+     `linear-gradient(135deg, #c0392b, ...)`, que só existia para dar volume e
+     não sobrevive a fundo variável. */
+  --danger: #c0392b;
+  --text-on-danger: #ffffff;
+
+  /* Ação principal. NÃO é `--surface-brand`: aquele é o fundo do cabeçalho, e
+     no tema escuro (#062847) fica mais escuro que a superfície do campo — a
+     ação principal recuava em vez de saltar. Medido na galeria. */
+  --action: #155b9a;
+  --text-on-action: #ffffff;
+
   /* ---- forma ----------------------------------------------------------- */
   --radius-field: 8px;
   --radius-rail: 14px;
@@ -83,4 +95,12 @@
   --line-on-brand: rgb(255 255 255 / 0.1);
   --accent: #d8a21b;
   --focus-ring: #d8a21b;
+
+  /* Mais claro que no tema claro: sobre fundo escuro o vermelho fechado some. */
+  --danger: #e05a4d;
+  --text-on-danger: #2a0d0a;
+
+  /* Mais claro que a superfície do campo (#223348), para a ação saltar. */
+  --action: #2a7fc4;
+  --text-on-action: #ffffff;
 }

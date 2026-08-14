@@ -655,7 +655,7 @@
   }
 
   function updateSubmitButtonLabel(form) {
-    var button = form.querySelector(".os-submit-btn span:not(.cv-btn__icon)");
+    var button = form.querySelector(".os-submit-btn span:not(.button__icon)");
     if (!button) return;
     button.textContent = osIsCompleta(form) ? "Finalizar Ordem de Serviço" : "Salvar como rascunho";
   }

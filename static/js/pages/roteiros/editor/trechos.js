@@ -213,8 +213,8 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
     '<input type="text" class="cv-field__control trecho-tempo-adicional-hhmm" data-route-time-kind="additional" value="' +
     esc(add ? fmt(add) : '') +
     '" placeholder="00:00" data-mask="time" inputmode="numeric" maxlength="5" autocomplete="off">' +
-    '<button type="button" class="cv-btn cv-btn--secondary cv-btn--control trecho-tempo-add-btn" data-tempo-add-delta="-15" aria-label="Menos 15 minutos">−</button>' +
-    '<button type="button" class="cv-btn cv-btn--secondary cv-btn--control trecho-tempo-add-btn" data-tempo-add-delta="15" aria-label="Mais 15 minutos">+</button>' +
+    '<button type="button" class="button button--secondary trecho-tempo-add-btn" data-tempo-add-delta="-15" aria-label="Menos 15 minutos">−</button>' +
+    '<button type="button" class="button button--secondary trecho-tempo-add-btn" data-tempo-add-delta="15" aria-label="Mais 15 minutos">+</button>' +
     '</div>' +
     '<input type="hidden" name="trecho_' +
     o +

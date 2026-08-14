@@ -1,0 +1,45 @@
+/* Header — a faixa de identidade: eyebrow, título e ações à direita.
+ *
+ * Único componente que usa `--surface-brand`.
+ */
+
+.header {
+  align-items: center;
+  background: var(--surface-brand);
+  border-radius: var(--radius-brand) var(--radius-brand) 0 0;
+  box-sizing: border-box;
+  display: flex;
+  gap: var(--gap-loose);
+  justify-content: space-between;
+  min-width: 0;
+  padding: var(--pad-rail);
+}
+
+.header__copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.header__eyebrow {
+  color: var(--accent);
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.header__title {
+  color: var(--text-on-brand);
+  font-size: var(--text-size-title);
+  font-weight: var(--weight-strong);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.header__aside {
+  align-items: center;
+  display: flex;
+  flex: none;
+  gap: var(--gap-tight);
+}

@@ -1,0 +1,29 @@
+{% cotton:vars aria_label disabled extra_class href icon label size slot type variant %}
+{% comment %}
+  Button v2 — par de `static/css/v2/button.css`.
+
+  6 variantes (primary, secondary, ghost, danger) e 2 tamanhos (sm, xs). O
+  legado tinha 18, das quais 8 sem uso nenhum.
+{% endcomment %}
+{% load icones %}
+{% if href %}
+  <a
+    class="button button--{{ variant|default:'secondary' }}{% if size %} button--{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    href="{{ href }}"
+    {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+    {% if disabled %}aria-disabled="true" tabindex="-1"{% endif %}
+  >
+    {% if icon %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
+    {% if slot %}{{ slot }}{% else %}<span>{{ label }}</span>{% endif %}
+  </a>
+{% else %}
+  <button
+    class="button button--{{ variant|default:'secondary' }}{% if size %} button--{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+    type="{{ type|default:'button' }}"
+    {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+    {% if disabled %}disabled{% endif %}
+  >
+    {% if icon %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
+    {% if slot %}{{ slot }}{% else %}<span>{{ label }}</span>{% endif %}
+  </button>
+{% endif %}

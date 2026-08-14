@@ -114,6 +114,23 @@ FORM_COMPONENTS_JS: tuple[str, ...] = (
 # entrega, pelo mesmo motivo do NOVO-12 — e para nao subir a contagem de
 # <link> em template, que a catraca do `test_entity_card_styles` so deixa cair.
 UI_CSS: tuple[str, ...] = (
+    # v2 (NOVO-120) PRIMEIRO: é a fundação que as folhas seguintes leem. Entra
+    # neste bundle, e não num <link> novo, porque este é o ponto de entrega que
+    # NÃO passa pelo podador de `build_css_profiles.py` — e o orçamento de dois
+    # arquivos do NOVO-12 fica preservado.
+    "css/v2/tokens.css",
+    "css/v2/base.css",
+    "css/v2/button.css",
+    "css/v2/input.css",
+    "css/v2/field.css",
+    "css/v2/form-block.css",
+    "css/v2/header.css",
+    "css/v2/rail.css",
+    "css/v2/select.css",
+    "css/v2/toggle.css",
+    "css/v2/card.css",
+    "css/v2/chip.css",
+    "css/v2/panel.css",
     "css/ui/tokens.css",
     "css/ui/header.css",
     "css/ui/sub-header.css",

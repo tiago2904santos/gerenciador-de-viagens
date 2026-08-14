@@ -391,12 +391,12 @@ document.documentElement.dataset.appReady = "true";
       id: "feedback-message",
     });
     var footer = element("div", "cv-dialog__footer delete-confirm-modal__actions");
-    var cancelButton = element("button", "cv-btn cv-btn--secondary", {
+    var cancelButton = element("button", "button button--secondary", {
       type: "button",
       "data-cv-feedback-cancel": "",
     });
     cancelButton.textContent = "Voltar";
-    var acceptButton = element("button", "cv-btn cv-btn--secondary", {
+    var acceptButton = element("button", "button button--secondary", {
       type: "button",
       "data-cv-feedback-accept": "",
     });
@@ -437,7 +437,7 @@ document.documentElement.dataset.appReady = "true";
     var isConfirm = active.kind === "confirm";
     var title = container.querySelector("#feedback-title");
     var message = container.querySelector("#feedback-message");
-    var cancelButton = container.querySelector("[data-cv-feedback-cancel].cv-btn");
+    var cancelButton = container.querySelector("[data-cv-feedback-cancel].button");
     var acceptButton = container.querySelector("[data-cv-feedback-accept]");
     var panel = container.querySelector('[role="dialog"]');
 

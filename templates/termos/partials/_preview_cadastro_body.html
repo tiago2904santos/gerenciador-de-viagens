@@ -27,8 +27,8 @@
 </ul>
 
 <div class="termo-actions">
-  <a class="cv-btn cv-btn--primary" href="{% url 'termos:termo_cadastro_pdf_inline' termo.pk %}" target="_blank" rel="noopener"><span>Ver PDF</span></a>
-  <a class="cv-btn cv-btn--secondary" href="{% url 'termos:baixar_termo_cadastro_pdf' termo.pk %}"><span>Baixar PDF</span></a>
-  <a class="cv-btn cv-btn--secondary" href="{% url 'termos:baixar_termo_cadastro_docx' termo.pk %}"><span>Baixar DOCX</span></a>
-  <a class="cv-btn cv-btn--secondary" href="?format=json"><span>Ver JSON</span></a>
+  <a class="button button--primary" href="{% url 'termos:termo_cadastro_pdf_inline' termo.pk %}" target="_blank" rel="noopener"><span>Ver PDF</span></a>
+  <a class="button button--secondary" href="{% url 'termos:baixar_termo_cadastro_pdf' termo.pk %}"><span>Baixar PDF</span></a>
+  <a class="button button--secondary" href="{% url 'termos:baixar_termo_cadastro_docx' termo.pk %}"><span>Baixar DOCX</span></a>
+  <a class="button button--secondary" href="?format=json"><span>Ver JSON</span></a>
 </div>

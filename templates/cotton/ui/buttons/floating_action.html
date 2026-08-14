@@ -1,13 +1,13 @@
 {% cotton:vars aria_label extra_class href icon label type variant %}
 {% load icones %}
 {% if href %}
-  <a class="floating-action cv-btn cv-btn--{{ variant|default:'primary' }}{% if extra_class %} {{ extra_class }}{% endif %}" href="{{ href }}" {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}>
-    {% if icon %}<span class="cv-btn__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
+  <a class="floating-action button button--{{ variant|default:'primary' }}{% if extra_class %} {{ extra_class }}{% endif %}" href="{{ href }}" {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}>
+    {% if icon %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
     <span>{{ label }}</span>
   </a>
 {% else %}
-  <button class="floating-action cv-btn cv-btn--{{ variant|default:'primary' }}{% if extra_class %} {{ extra_class }}{% endif %}" type="{{ type|default:'submit' }}" {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}>
-    {% if icon %}<span class="cv-btn__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
+  <button class="floating-action button button--{{ variant|default:'primary' }}{% if extra_class %} {{ extra_class }}{% endif %}" type="{{ type|default:'submit' }}" {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}>
+    {% if icon %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
     <span>{{ label }}</span>
   </button>
 {% endif %}

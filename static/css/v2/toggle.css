@@ -1,0 +1,66 @@
+/* Toggle — alterna entre duas ou três vistas da mesma lista.
+ *
+ * Duas variantes, porque a semântica difere de verdade:
+ *   `--nav`    segmentos são LINKS  -> ativo por `aria-current="page"`
+ *   `--state`  segmentos são BOTÕES -> ativo por `aria-pressed="true"`
+ *
+ * Link não aceita `aria-pressed`. Foi essa confusão que, no sistema antigo,
+ * fazia o hover cair justamente sobre o item já ativo.
+ */
+
+.toggle {
+  align-items: center;
+  background: var(--ui-surface, var(--surface-rail));
+  border-radius: var(--radius-field);
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+}
+
+.toggle__item {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--text-size-base);
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 14px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.toggle__item[aria-current="page"],
+.toggle__item[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font-weight: var(--weight-strong);
+}
+
+/* O ativo declara o hover junto: sem isso o realce do inativo pinta por cima
+   dele e o estado desaparece justamente onde importa. */
+.toggle__item[aria-current="page"]:hover,
+.toggle__item[aria-pressed="true"]:hover {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+
+.toggle__item:hover:not([aria-current="page"]):not([aria-pressed="true"]) {
+  background: var(--surface-field);
+  color: var(--text-strong);
+}
+
+/* O contador herda a cor do segmento, então serve aos dois estados sem regra
+   por estado. */
+.toggle__count {
+  background: color-mix(in srgb, currentColor 16%, transparent);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-size-eyebrow);
+  min-width: 18px;
+  padding: 2px 6px;
+  text-align: center;
+}

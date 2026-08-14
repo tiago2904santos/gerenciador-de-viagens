@@ -1,0 +1,71 @@
+/* Input — campo de texto e busca. Depende de `v2/tokens.css`.
+ *
+ * Um campo é a mesma coisa em qualquer contexto: barra de filtros, formulário
+ * ou wizard. O sistema antigo tinha TRÊS superfícies diferentes para isto na
+ * mesma tela (medido em `/roteiros/novo/`: #243541, #112439, #111e2f) — é
+ * exatamente o que esta folha existe para não deixar acontecer de novo.
+ */
+
+.input {
+  align-items: center;
+  display: flex;
+  gap: var(--gap-tight);
+  min-width: 0;
+  position: relative;
+}
+
+.input__control {
+  background: var(--ui-surface, var(--surface-field));
+  border: 1px solid transparent;
+  border-radius: var(--radius-field);
+  box-sizing: border-box;
+  color: var(--text-strong);
+  font: inherit;
+  font-size: var(--text-size-base);
+  min-height: var(--control-height);
+  min-width: 0;
+  padding: var(--pad-field);
+  width: 100%;
+}
+
+.input__control::placeholder {
+  color: var(--text-muted);
+}
+
+.input__control:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -1px;
+}
+
+/* Ícone dentro do campo: sai do fluxo e o texto ganha recuo para não passar
+   por baixo dele. */
+.input--with-icon .input__control {
+  padding-left: 38px;
+}
+
+.input__icon {
+  align-items: center;
+  color: var(--text-muted);
+  display: inline-flex;
+  left: 12px;
+  pointer-events: none;
+  position: absolute;
+}
+
+.input__icon svg {
+  height: 16px;
+  width: 16px;
+}
+
+.input__control:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* A área de texto cresce na vertical e por isso não usa `--control-height`;
+   o padding vira simétrico, senão o texto cola no topo. */
+.input__control--textarea {
+  min-height: 96px;
+  padding: 10px 12px;
+  resize: vertical;
+}

@@ -1,0 +1,15 @@
+{% cotton:vars body empty_message empty_title extra_class surface %}
+{% comment %}
+  Panel v2 — a superfície que agrupa uma lista ou blocos. Par de
+  `static/css/v2/panel.css`.
+{% endcomment %}
+<div class="panel{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
+  {% if body %}
+    {{ body }}
+  {% else %}
+    <div class="panel__empty">
+      <p class="panel__empty-title">{{ empty_title|default:'Nenhum registro cadastrado' }}</p>
+      {% if empty_message %}<p>{{ empty_message }}</p>{% endif %}
+    </div>
+  {% endif %}
+</div>

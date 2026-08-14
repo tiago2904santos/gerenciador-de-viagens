@@ -1,0 +1,33 @@
+/* Rail — a faixa de controles abaixo do header (busca, filtros, ações).
+ *
+ * Chamava-se "sub-header" no sistema antigo. O nome novo diz o PAPEL e não o
+ * lugar: a mesma faixa serve lista, wizard e detalhe.
+ */
+
+.rail {
+  background: var(--ui-surface, var(--surface-rail));
+  border-radius: 0 0 var(--radius-rail) var(--radius-rail);
+  box-sizing: border-box;
+  padding: var(--pad-rail);
+}
+
+.rail__controls {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+/* A busca ocupa a sobra; os demais controles ficam no tamanho natural. */
+.rail__controls > .input {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+/* Quando algo vem DEPOIS do rail — o botão que abre o quick-add, por exemplo —
+   quem fecha o bloco é esse algo, e o rail perde o arredondamento de baixo. */
+.rail:not(:last-child) {
+  border-bottom: 0;
+  border-radius: 0;
+}

@@ -76,7 +76,7 @@ Modo multi:
         aria-controls="{{ panel_id }}"
         aria-label="{{ trigger_aria_label|default:'Filtrar por período da viagem' }}"
       >
-        <span class="cv-btn__icon" aria-hidden="true">
+        <span class="button__icon" aria-hidden="true">
           <c-ui.forms._date_picker_icon />
         </span>
         <span
@@ -163,7 +163,7 @@ Modo multi:
         aria-controls="{{ panel_id }}"
         aria-label="{{ trigger_aria_label|default:trigger_label|default:'Abrir calendario' }}"
       >
-        <span class="cv-btn__icon" aria-hidden="true">
+        <span class="button__icon" aria-hidden="true">
           <c-ui.forms._date_picker_icon />
         </span>
         <span class="travel-period-filter__label">{{ trigger_label|default:"Preencher datas" }}</span>
@@ -171,13 +171,13 @@ Modo multi:
     {% elif control_variant == "action-button" %}
       <button
         type="button"
-        class="{{ trigger_class|default:'cv-btn cv-btn--secondary' }} date-picker__trigger"
+        class="{{ trigger_class|default:'button button--secondary' }} date-picker__trigger"
         data-cv-date-picker-trigger
         aria-expanded="false"
         aria-controls="{{ panel_id }}"
         aria-label="{{ trigger_aria_label|default:trigger_label|default:'Abrir calendario' }}"
       >
-        <span class="cv-btn__icon" aria-hidden="true">
+        <span class="button__icon" aria-hidden="true">
           <c-ui.forms._date_picker_icon />
         </span>
         <span>{{ trigger_label|default:"Preencher datas" }}</span>
@@ -268,7 +268,7 @@ Modo multi:
           <button type="button" class="date-picker__footer-action" data-cv-date-picker-undo>Desfazer</button>
         {% endif %}
         {% if show_confirm|default_if_none:True %}
-          <button type="button" class="cv-btn cv-btn--primary cv-btn--sm" data-cv-date-picker-confirm><span>Aplicar datas</span></button>
+          <button type="button" class="button button--primary button--sm" data-cv-date-picker-confirm><span>Aplicar datas</span></button>
         {% endif %}
       {% else %}
         <button type="button" class="date-picker__footer-action" data-cv-date-picker-today>Hoje</button>

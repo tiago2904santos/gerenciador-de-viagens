@@ -744,7 +744,7 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertIn("form-section-card", card)
         self.assertIn("cv-form-section-header", card)
         self.assertIn("form-section-body", card)
-        self.assertIn("cv-btn cv-btn--secondary", header_actions)
+        self.assertIn("button button--secondary", header_actions)
         self.assertNotIn("form-section app-form-section", source)
         self.assertNotIn("btn btn-secondary", source)
 

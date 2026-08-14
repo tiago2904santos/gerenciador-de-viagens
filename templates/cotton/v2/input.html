@@ -1,0 +1,34 @@
+{% cotton:vars aria_label attrs disabled extra_class icon name placeholder surface type value %}
+{% comment %}
+  Input v2 — par de `static/css/v2/input.css`.
+
+  `surface` escolhe o degrau: "field" (padrão) ou "rail". O modificador declara
+  a variável `--ui-surface`; ele não pinta direto, porque pintar perde a disputa
+  de especificidade com a regra do próprio componente.
+{% endcomment %}
+{% load icones %}
+<div class="input{% if icon %} input--with-icon{% endif %}{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
+  {% if icon %}<span class="input__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
+  {% if type == "textarea" %}
+  <textarea
+    class="input__control input__control--textarea"
+    rows="4"
+    {% if name %}name="{{ name }}"{% endif %}
+    {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+    {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+    {% if disabled %}disabled{% endif %}
+    {{ attrs }}
+  >{{ value }}</textarea>
+  {% else %}
+  <input
+    class="input__control"
+    type="{{ type|default:'text' }}"
+    {% if disabled %}disabled{% endif %}
+    {% if name %}name="{{ name }}"{% endif %}
+    {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+    {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+    {% if value %}value="{{ value }}"{% endif %}
+    {{ attrs }}
+  >
+  {% endif %}
+</div>

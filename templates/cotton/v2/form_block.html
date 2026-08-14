@@ -1,0 +1,20 @@
+{% cotton:vars actions body description extra_class surface title %}
+{% comment %}
+  Form block v2 — cabeçalho e corpo. Par de `static/css/v2/form-block.css`.
+
+  Usa `--v2` no nome porque `.form-block` colide com a classe legada (16 usos).
+  O sufixo cai na migração atômica: adicionar o novo, apagar o legado e apontar
+  os chamadores na MESMA etapa.
+{% endcomment %}
+<section class="form-block--v2{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
+  {% if title or description or actions %}
+    <header class="form-block__header">
+      <div>
+        {% if title %}<h2 class="form-block__title">{{ title }}</h2>{% endif %}
+        {% if description %}<p class="form-block__description">{{ description }}</p>{% endif %}
+      </div>
+      {% if actions %}<div>{{ actions }}</div>{% endif %}
+    </header>
+  {% endif %}
+  <div class="form-block__body">{{ body }}</div>
+</section>

@@ -1,0 +1,39 @@
+/* Card — o contêiner de um registro na lista.
+ *
+ * COLISÃO: `.card` já existe no legado (9 usos). Usa `--v2` até a migração
+ * atômica.
+ */
+
+.card--v2 {
+  background: var(--ui-surface, var(--surface-field));
+  border: 1px solid var(--line);
+  border-radius: var(--radius-rail);
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--gap-tight);
+  min-width: 0;
+  padding: var(--gap);
+}
+
+.card--v2:hover {
+  border-color: var(--accent);
+}
+
+.card__title {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  margin: 0;
+}
+
+.card__meta {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  margin: 0;
+}
+
+.card__actions {
+  align-items: center;
+  display: flex;
+  gap: var(--gap-tight);
+}

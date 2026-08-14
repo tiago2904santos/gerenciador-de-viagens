@@ -23,7 +23,10 @@ class RawButtonComponentTests(SimpleTestCase):
         self.assertIn('aria-pressed="false"', html)
         self.assertIn("data-state-trigger", html)
         self.assertIn("Texto <em>original</em>", html)
-        self.assertNotIn("cv-btn", html)
+        # NOVO-120: o componente emite `.button` (v2); `cv-btn` saiu. A checagem
+        # é pelo ATRIBUTO class e não pela palavra solta — `type="button"` está
+        # no HTML e tornaria a asserção sempre falsa.
+        self.assertNotIn('class="button', html)
 
     def test_botao_vazio_nao_ganha_span_artificial(self):
         html = self._render(
@@ -39,10 +42,10 @@ class RawButtonComponentTests(SimpleTestCase):
             'type="submit" only / %}'
         )
 
-        self.assertIn('class="cv-btn cv-btn--primary"', html)
+        self.assertIn('class="button button--primary"', html)
         self.assertIn('type="submit"', html)
         self.assertIn("<span>Salvar</span>", html)
-        self.assertIn("cv-btn__icon", html)
+        self.assertIn("button__icon", html)
 
     def test_atributo_booleano_condicional_so_aparece_quando_verdadeiro(self):
         source = (

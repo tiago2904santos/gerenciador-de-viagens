@@ -172,6 +172,23 @@ def main_preview(request):
             "page_title": "Prévia do main",
             "preview_filters": MainPreviewFiltersForm(request.GET or None),
             "preview_steps": preview_steps,
+            # NOVO-120: alimenta a galeria do sistema v2. Dados fixos, como o
+            # resto desta rota — ela existe para aprovar aparência, não para
+            # consultar nada.
+            "v2_opcoes": (
+                {"value": "1", "label": "Primeira opção"},
+                {"value": "2", "label": "Segunda opção"},
+                {"value": "3", "label": "Terceira opção"},
+            ),
+            "v2_abas": (
+                {"label": "Exemplo", "count": 3, "url": "#", "is_active": True},
+                {"label": "Outro", "count": 0, "url": "#", "is_active": False},
+            ),
+            "v2_abas_tres": (
+                {"label": "Todos", "count": 12, "url": "#", "is_active": True},
+                {"label": "Ativos", "count": 8, "url": "#", "is_active": False},
+                {"label": "Arquivados", "count": 4, "url": "#", "is_active": False},
+            ),
             "shell_css_profile_path": "css/shell.form-components.bundle.css",
         },
     )

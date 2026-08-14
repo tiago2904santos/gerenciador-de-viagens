@@ -1,0 +1,21 @@
+/* Chip — o selo de estado (status, contagem, marcador).
+ *
+ * COLISÃO: `.chip` já existe no legado (7 usos). Usa `--v2` até a migração.
+ *
+ * A cor vem por `--chip-tone`, declarada por quem usa; sem tom, o chip é
+ * neutro. NÃO existe uma classe por cor — era assim que nasciam as 18
+ * variantes do botão legado, das quais 8 acabaram mortas.
+ */
+
+.chip--v2 {
+  align-items: center;
+  background: color-mix(in srgb, var(--chip-tone, var(--text-muted)) 16%, transparent);
+  border-radius: var(--radius-pill);
+  color: var(--chip-tone, var(--text-muted));
+  display: inline-flex;
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  gap: 4px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}

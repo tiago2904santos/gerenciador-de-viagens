@@ -37,7 +37,7 @@ opção: a aparência é a do componente em todas as telas que passam por aqui.
       {% endif %}
 
       {% if search_clear_url %}
-        <c-ui.buttons.button :href="search_clear_url" label="Limpar filtros" variant="secondary" icon="x" extra_class="ui-button-secondary cv-btn--control" only />
+        <c-ui.buttons.button :href="search_clear_url" label="Limpar filtros" variant="secondary" icon="x" extra_class="ui-button-secondary" only />
       {% endif %}
   </c-ui.sub_header>
   {% else %}
@@ -55,13 +55,13 @@ opção: a aparência é a do componente em todas as telas que passam por aqui.
         <div class="list-header__actions">
           {% if search_value or status_value %}
             {% if search_clear_url and next_url %}
-              {% with cotton_attr_href=search_clear_url|add:"?next="|add:next_url %}<c-ui.buttons.button :href="cotton_attr_href" label="Limpar filtros" variant="secondary" icon="x" extra_class="ui-button-secondary cv-btn--control" :data_cv_filter_clear="True" only />{% endwith %}
+              {% with cotton_attr_href=search_clear_url|add:"?next="|add:next_url %}<c-ui.buttons.button :href="cotton_attr_href" label="Limpar filtros" variant="secondary" icon="x" extra_class="ui-button-secondary" :data_cv_filter_clear="True" only />{% endwith %}
             {% elif search_clear_url %}
-              <c-ui.buttons.button :href="search_clear_url" label="Limpar filtros" variant="secondary" icon="x" extra_class="ui-button-secondary cv-btn--control" :data_cv_filter_clear="True" only />
+              <c-ui.buttons.button :href="search_clear_url" label="Limpar filtros" variant="secondary" icon="x" extra_class="ui-button-secondary" :data_cv_filter_clear="True" only />
             {% endif %}
           {% endif %}
           {% if primary_action_label and primary_action_url %}
-            <c-ui.buttons.button :href="primary_action_url" :label="primary_action_label" variant="primary" icon="plus" extra_class="cv-btn--control" only />
+            <c-ui.buttons.button :href="primary_action_url" :label="primary_action_label" variant="primary" icon="plus" extra_class="" only />
           {% endif %}
         </div>
       {% endif %}

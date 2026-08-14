@@ -1,0 +1,36 @@
+/* Field — rótulo, controle, ajuda e erro. Depende de `v2/tokens.css`.
+ *
+ * COLISÃO: `.field` já existe no legado (33 usos). Enquanto ele viver, estas
+ * regras só valem dentro de `.form-block--v2`, para não repintar tela não
+ * migrada. O escopo cai junto com o legado.
+ */
+
+.form-block--v2 .field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.form-block--v2 .field__label {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+}
+
+.form-block--v2 .field__help {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  margin: 0;
+}
+
+.form-block--v2 .field__error {
+  color: var(--danger);
+  font-size: var(--text-size-eyebrow);
+  margin: 0;
+}
+
+/* O campo inválido muda de traço, nunca de forma: mudar geometria no erro faz
+   o formulário inteiro pular quando a validação roda. */
+.form-block--v2 .field--invalid .input__control {
+  border-color: var(--danger);
+}

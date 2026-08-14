@@ -28,19 +28,19 @@
     </dl>
 
     <div class="assinaturas-central-actions">
-      <a class="cv-btn cv-btn--secondary" href="{{ painel.pdf_visualizar_url }}" target="_blank" rel="noopener noreferrer">Visualizar documento original</a>
+      <a class="button button--secondary" href="{{ painel.pdf_visualizar_url }}" target="_blank" rel="noopener noreferrer">Visualizar documento original</a>
       {% if painel.etiqueta_urls.pdf_assinado %}
-        <a class="cv-btn cv-btn--secondary" href="{{ painel.etiqueta_urls.pdf_assinado }}" target="_blank" rel="noopener noreferrer">Ver PDF assinado</a>
+        <a class="button button--secondary" href="{{ painel.etiqueta_urls.pdf_assinado }}" target="_blank" rel="noopener noreferrer">Ver PDF assinado</a>
       {% endif %}
       {% if painel.pedido_pendente %}
-        <c-ui.buttons.button class_name="cv-btn cv-btn--secondary" type="button" only>Copiar link</c-ui.buttons.button>
+        <c-ui.buttons.button class_name="button button--secondary" type="button" only>Copiar link</c-ui.buttons.button>
         <form method="post" action="{{ painel.etiqueta_urls.revogar }}" class="assinaturas-central-inline-form">
           {% csrf_token %}
           <input type="hidden" name="next" value="{{ request.get_full_path }}">
-          <c-ui.buttons.button class_name="cv-btn cv-btn--secondary" type="submit" only>Revogar link</c-ui.buttons.button>
+          <c-ui.buttons.button class_name="button button--secondary" type="submit" only>Revogar link</c-ui.buttons.button>
         </form>
       {% else %}
-        <a class="cv-btn cv-btn--primary" href="{{ painel.etiqueta_urls.gerar_link }}?next={{ request.get_full_path|urlencode }}">Gerar solicitação</a>
+        <a class="button button--primary" href="{{ painel.etiqueta_urls.gerar_link }}?next={{ request.get_full_path|urlencode }}">Gerar solicitação</a>
       {% endif %}
     </div>
 
@@ -63,11 +63,11 @@
             </dl>
             <div class="assinaturas-central-row__actions">
               {% if pedido.status == "assinado" and pedido.assinatura %}
-                <a class="cv-btn cv-btn--secondary" href="{% url 'assinaturas:assinatura-verificar-codigo' pedido.assinatura.codigo_verificacao %}">Ver comprovante</a>
+                <a class="button button--secondary" href="{% url 'assinaturas:assinatura-verificar-codigo' pedido.assinatura.codigo_verificacao %}">Ver comprovante</a>
               {% elif pedido.status == "expirado" or pedido.status == "revogada" or pedido.status == "recusada" %}
-                <a class="cv-btn cv-btn--secondary" href="{{ painel.etiqueta_urls.gerar_link }}?next={{ request.get_full_path|urlencode }}&forcar_novo=1">Gerar novo link</a>
+                <a class="button button--secondary" href="{{ painel.etiqueta_urls.gerar_link }}?next={{ request.get_full_path|urlencode }}&forcar_novo=1">Gerar novo link</a>
               {% else %}
-                <c-ui.buttons.button class_name="cv-btn cv-btn--secondary" type="button" only>Copiar link</c-ui.buttons.button>
+                <c-ui.buttons.button class_name="button button--secondary" type="button" only>Copiar link</c-ui.buttons.button>
               {% endif %}
             </div>
           </article>

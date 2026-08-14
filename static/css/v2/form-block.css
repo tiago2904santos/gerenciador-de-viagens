@@ -1,0 +1,42 @@
+/* Form block — cabeçalho (título, descrição, ações) e corpo.
+ *
+ * COLISÃO: `.form-block` já existe no legado (16 usos). Usa `--v2` até a
+ * migração atômica descrita no plano; o modificador cai quando o legado sair.
+ */
+
+.form-block--v2 {
+  background: var(--ui-surface, var(--surface-field));
+  border-radius: var(--radius-field);
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+  padding: var(--gap);
+}
+
+.form-block--v2 > .form-block__header {
+  align-items: baseline;
+  display: flex;
+  gap: var(--gap);
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.form-block--v2 .form-block__title {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  margin: 0;
+}
+
+.form-block--v2 .form-block__description {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  margin: 0;
+}
+
+.form-block--v2 > .form-block__body {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}

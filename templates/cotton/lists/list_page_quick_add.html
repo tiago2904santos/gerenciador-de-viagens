@@ -20,9 +20,9 @@
         {% endif %}
         <div class="list-header__actions">
           {% if extra_hidden_field_name and extra_hidden_field_value %}
-            {% with cotton_attr_href=request.path|add:"?"|add:extra_hidden_field_name|add:"="|add:extra_hidden_field_value %}<c-ui.buttons.button :href="cotton_attr_href" label="Limpar filtros" variant="secondary" icon="x" extra_class="ui-button-secondary cv-btn--control" :data_cv_filter_clear="True" only />{% endwith %}
+            {% with cotton_attr_href=request.path|add:"?"|add:extra_hidden_field_name|add:"="|add:extra_hidden_field_value %}<c-ui.buttons.button :href="cotton_attr_href" label="Limpar filtros" variant="secondary" icon="x" extra_class="ui-button-secondary" :data_cv_filter_clear="True" only />{% endwith %}
           {% else %}
-            <c-ui.buttons.button :href="request.path" label="Limpar filtros" variant="secondary" icon="x" extra_class="ui-button-secondary cv-btn--control" :data_cv_filter_clear="True" only />
+            <c-ui.buttons.button :href="request.path" label="Limpar filtros" variant="secondary" icon="x" extra_class="ui-button-secondary" :data_cv_filter_clear="True" only />
           {% endif %}
         </div>
       </form>

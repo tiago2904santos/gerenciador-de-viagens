@@ -1,0 +1,25 @@
+{% cotton:vars aria_label extra_class items slot variant %}
+{% comment %}
+  Toggle v2 — par de `static/css/v2/toggle.css`.
+
+  `variant="state"`: os segmentos são BOTÕES e vêm por slot, porque cada uso
+  carrega ganchos `data-*` próprios que o JS da página lê.
+
+  Padrão (`nav`): os segmentos são LINKS, gerados de `items`. Link não aceita
+  `aria-pressed`, então o ativo usa `aria-current="page"` — confundir os dois
+  foi o que, no sistema antigo, fazia o hover cair sobre o item já ativo.
+{% endcomment %}
+{% if variant == "state" %}
+  <div class="toggle toggle--state{% if extra_class %} {{ extra_class }}{% endif %}" role="group" aria-label="{{ aria_label }}">
+    {{ slot }}
+  </div>
+{% else %}
+  <nav class="toggle toggle--nav{% if extra_class %} {{ extra_class }}{% endif %}" aria-label="{{ aria_label|default:'Alternar lista' }}">
+    {% for item in items %}
+      <a class="toggle__item" href="{{ item.url }}"{% if item.is_active %} aria-current="page"{% endif %}>
+        <span>{{ item.label }}</span>
+        {% if item.count is not None %}<span class="toggle__count">{{ item.count }}</span>{% endif %}
+      </a>
+    {% endfor %}
+  </nav>
+{% endif %}

@@ -126,7 +126,7 @@
 
         const btnEnter = document.createElement("button");
         btnEnter.type = "button";
-        btnEnter.className = "gdrive-folder-item__enter cv-btn cv-btn--ghost cv-btn--xs";
+        btnEnter.className = "gdrive-folder-item__enter button button--ghost button--xs";
         btnEnter.setAttribute("aria-label", `Abrir pasta ${pasta.name}`);
         btnEnter.textContent = "Abrir →";
         item.append(btnSelect, btnEnter);

@@ -1,0 +1,68 @@
+/* Select — gatilho e menu. Depende de `v2/tokens.css`.
+ *
+ * O gatilho e o menu são criados em tempo de execução por
+ * `js/components/picker-select.js`. As classes `custom-select__*` pertencem ao
+ * JS e NÃO são renomeadas aqui: renomear sem tocar o JS quebra em silêncio —
+ * a página não dá erro, o componente só não inicializa.
+ */
+
+.select {
+  min-width: 0;
+  position: relative;
+}
+
+.select .custom-select__trigger {
+  align-items: center;
+  background: var(--ui-surface, var(--surface-field));
+  border: 1px solid transparent;
+  border-radius: var(--radius-field);
+  box-sizing: border-box;
+  color: var(--text-strong);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  font-size: var(--text-size-base);
+  gap: var(--gap-tight);
+  justify-content: space-between;
+  min-height: var(--control-height);
+  padding: var(--pad-field);
+  width: 100%;
+}
+
+.select .custom-select__trigger:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.select .custom-select__chevron {
+  align-items: center;
+  color: var(--text-muted);
+  display: inline-flex;
+  flex: none;
+}
+
+/* O menu é movido para o `body` ao abrir, então sai do alcance de qualquer
+   seletor descendente do campo — por isso parte da raiz. */
+.select-menu {
+  background: var(--surface-field);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-field);
+  padding: 4px;
+}
+
+.select-menu__option {
+  border-radius: 6px;
+  color: var(--text-strong);
+  cursor: pointer;
+  font-size: var(--text-size-base);
+  padding: 10px 12px;
+}
+
+.select-menu__option:hover {
+  background: var(--surface-rail);
+}
+
+.select-menu__option[aria-selected="true"] {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}

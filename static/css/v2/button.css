@@ -1,0 +1,140 @@
+/* Button — o controle de ação. Par de `templates/cotton/ui/buttons/button.html`.
+ *
+ * Depende de `v2/tokens.css`. Não escreve cor literal.
+ *
+ * ## Por que 6 variantes e não 18
+ *
+ * O botão legado (`actions/buttons.css`, 1141 linhas) tinha 18 variantes.
+ * Medido no repositório, **8 estavam mortas** — zero uso em template e em JS:
+ * `soft-danger`, `neutral`, `icon`, `pill`, `tool`, `docx`, `back`, `lg`.
+ *
+ * Das que restam, `preview` (2 usos), `pdf` (2) e `back-list` (1) não são
+ * variantes de botão: são aparências de uma tela específica que viraram
+ * variante global. Elas continuam no CSS legado até as telas delas migrarem,
+ * quando viram composição na própria tela — não entram aqui.
+ *
+ * ## Forma única
+ *
+ * O legado tinha três raios (12px no primary, 8px no secondary, 10px no sm) e
+ * dois pesos de fonte (720 e 600) para o mesmo controle — medido no navegador.
+ * Aqui é um raio só, o mesmo do campo (`--radius-field`), porque botão e campo
+ * dividem a mesma barra e precisam ler como a mesma família.
+ *
+ * O `translateY(-1px)` do hover legado saiu: mexer a geometria no hover faz a
+ * linha inteira de botões tremer quando o mouse passa.
+ */
+
+.button {
+  align-items: center;
+  background: var(--surface-field);
+  border: 1px solid transparent;
+  border-radius: var(--radius-field);
+  box-sizing: border-box;
+  color: var(--text-strong);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-normal);
+  gap: var(--gap-tight);
+  justify-content: center;
+  line-height: 1;
+  min-height: var(--control-height);
+  padding: var(--pad-field);
+  text-decoration: none;
+  transition: background var(--ease), border-color var(--ease), color var(--ease);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Desabilitado vale para `<button disabled>` e para `<a aria-disabled>`, que
+   não aceita o atributo `disabled`. */
+.button:disabled,
+.button[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* ---- variantes ---------------------------------------------------------- */
+
+.button--primary {
+  background: var(--action);
+  color: var(--text-on-action);
+  font-weight: var(--weight-strong);
+}
+
+/* O secondary repousa na MESMA superfície do bloco que costuma contê-lo, então
+   a borda não é enfeite: é o que lhe dá contorno. Removê-la faz o botão sumir
+   dentro do card. */
+.button--secondary {
+  background: var(--surface-field);
+  border-color: var(--line);
+  color: var(--text-strong);
+}
+
+.button--ghost {
+  background: transparent;
+  color: var(--accent);
+}
+
+.button--danger {
+  background: var(--danger);
+  color: var(--text-on-danger);
+  font-weight: var(--weight-strong);
+}
+
+/* ---- hover --------------------------------------------------------------
+ *
+ * Um degrau de superfície, nunca mistura de matiz: no tema escuro o accent é
+ * dourado, e `color-mix` dele com o azul-marinho do fundo cai em oliva
+ * (medido: `#2d302c`). Foi um erro cometido duas vezes no sistema antigo. */
+
+.button--secondary:hover:not(:disabled):not([aria-disabled="true"]),
+.button--ghost:hover:not(:disabled):not([aria-disabled="true"]) {
+  background: var(--surface-rail);
+}
+
+.button--primary:hover:not(:disabled):not([aria-disabled="true"]),
+.button--danger:hover:not(:disabled):not([aria-disabled="true"]) {
+  /* Já estão numa cor cheia: escurecer com sobreposição preserva o matiz. */
+  box-shadow: inset 0 0 0 999px rgb(0 0 0 / 0.12);
+}
+
+/* ---- tamanhos ------------------------------------------------------------
+ *
+ * `control` não é tamanho: é o botão que divide a barra com os campos, então
+ * herda a altura do controle e só perde o realce. Continua existindo porque
+ * tem 11 usos reais. */
+
+.button--sm {
+  font-size: 13px;
+  min-height: 34px;
+  padding: 0 11px;
+}
+
+.button--xs {
+  font-size: var(--text-size-eyebrow);
+  min-height: 28px;
+  padding: 0 8px;
+}
+
+/* ---- ícone ---------------------------------------------------------------
+ *
+ * Dimensão fixa para o ícone não esticar quando o rótulo quebra. */
+
+.button__icon {
+  align-items: center;
+  display: inline-flex;
+  flex: none;
+  justify-content: center;
+}
+
+.button__icon svg {
+  height: 16px;
+  width: 16px;
+}
