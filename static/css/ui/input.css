@@ -17,7 +17,7 @@
 }
 
 .ui-input__control {
-  background: var(--input-bg);
+  background: var(--ui-surface, var(--input-bg));
   border: 0;
   border-radius: var(--radius-sm);
   box-shadow: none;
@@ -50,12 +50,12 @@
    especificidade 500 e venceria a classe do componente. Some quando a última
    página deixar de usar `filter_page_header` sem componente. */
 :is(html[data-theme]) .ui-input__control {
-  background: var(--input-bg);
+  background: var(--ui-surface, var(--input-bg));
   border-radius: var(--radius-sm);
 }
 
 :is(html[data-theme]) .ui-input__icon {
-  background: var(--input-bg);
+  background: var(--ui-surface, var(--input-bg));
 }
 
 /* `lists/list-header.css:259-266` zera o `outline` deste campo no foco com

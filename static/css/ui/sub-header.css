@@ -12,7 +12,7 @@
      token vale mais que disputar seletor: aquelas regras têm especificidade 500
      e venceriam de qualquer jeito. */
   --list-header-control-bg: var(--input-bg);
-  background: var(--sub-header-bg);
+  background: var(--ui-surface, var(--sub-header-bg));
   /* Borda própria, sem a de cima: ali encosta no header e a emenda fica reta. */
   border: 1px solid var(--sub-header-border);
   border-radius: 0 0 var(--sub-header-radius) var(--sub-header-radius);
@@ -22,6 +22,13 @@
   margin: 0;
   padding: 16px 20px;
   width: 100%;
+}
+
+/* No quick-add o trilho não é o último filho — vem o botão de abrir o painel
+   depois dele. Nesse caso o arredondamento de baixo é de quem fecha o bloco. */
+:is(html[data-theme]) .ui-sub-header:not(:last-child) {
+  border-bottom: 0;
+  border-radius: 0;
 }
 
 :is(html[data-theme]) .ui-sub-header__controls {
@@ -46,4 +53,23 @@
   :is(.ui-input, .ui-select) {
     flex: 1 1 auto;
   }
+}
+
+/* Fechador do bloco: quando algo vem depois do trilho — hoje o botão que abre o
+   quick-add — é ele que encosta na base, então leva a superfície, a borda e o
+   arredondamento de baixo do sub-header. Sem isso o bloco terminava reto e com
+   uma cor de fora do sistema. */
+:is(html[data-theme]) .ui-sub-header__closer {
+  background: var(--ui-surface, var(--sub-header-bg));
+  border: 1px solid var(--sub-header-border);
+  border-radius: 0 0 var(--sub-header-radius) var(--sub-header-radius);
+  box-sizing: border-box;
+  color: var(--sub-header-text);
+  width: 100%;
+}
+
+/* O fechador repousa na superfície do sub-header e sobe para a do input ao
+   passar o mouse — o mesmo degrau que separa trilho e campo. */
+:is(html[data-theme]) .ui-sub-header__closer:hover {
+  background: var(--ui-surface, var(--input-bg));
 }

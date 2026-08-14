@@ -1,4 +1,4 @@
-{% cotton:vars aria_label extra_class items %}
+{% cotton:vars aria_label attrs extra_class items slot surface variant %}
 {% comment %}
 Segment toggle global (NOVO-120) — alterna entre duas ou três vistas da mesma
 lista, no lugar das abas quando são poucas opções.
@@ -10,26 +10,46 @@ busca sob demanda ao ver `.segment-toggle--nav` no DOM. Essa classe é gancho �
 `segment-nav.js:8-9` procura por ela e por `a.segment-toggle__btn` — então ela
 fica ao lado da classe do componente, não no lugar dela.
 
-Os itens são links de navegação, não botões de estado: o ativo usa
-`aria-current="page"`, porque `aria-pressed` não vale para `<a>`.
+Duas variantes, porque a semântica é diferente de verdade:
 
-`items`: lista de dicts {label, count, url, is_active}.
+- `nav` (padrão) — segmentos são LINKS de navegação. O ativo usa
+  `aria-current="page"`, porque `aria-pressed` não vale para `<a>`. Os itens vêm
+  de `items`: lista de dicts {label, count, url, is_active}.
+
+- `state` — segmentos são BOTÕES de estado, com `aria-pressed`. Aqui os botões
+  vêm pelo SLOT, não de uma lista: cada uso carrega ganchos `data-*` próprios
+  que o JS daquela página lê (`data-oficio-motorista-modo-btn`, `data-value`…),
+  e gerar isso a partir de uma estrutura genérica só empurraria a variação para
+  dentro do componente. Ele entrega a trilha e o papel ARIA.
 {% endcomment %}
-<nav
-  class="ui-segment-toggle{% if extra_class %} {{ extra_class }}{% endif %} segment-toggle segment-toggle--nav"
-  aria-label="{{ aria_label|default:'Alternar lista' }}"
->
-  {% for item in items %}
-    <a
-      class="ui-segment-toggle__item segment-toggle__btn"
-      href="{{ item.url }}"
-      title="{{ item.label }}"
-      {% if item.is_active %}aria-current="page"{% endif %}
-    >
-      <span class="ui-segment-toggle__label">{{ item.label }}</span>
-      {% if item.count is not None %}
-        <span class="ui-segment-toggle__count segment-toggle__count">{{ item.count }}</span>
-      {% endif %}
-    </a>
-  {% endfor %}
-</nav>
+{% if variant == "state" %}
+  {# Variante de ESTADO: botões por slot, com os ganchos `data-*` de cada página. #}
+  <div
+    class="ui-segment-toggle{% if surface %} ui-surface--{{ surface }}{% endif %} ui-segment-toggle--state{% if extra_class %} {{ extra_class }}{% endif %} segment-toggle"
+    role="group"
+    aria-label="{{ aria_label }}"
+    {{ attrs }}
+  >
+    {{ slot }}
+  </div>
+{% else %}
+  <nav
+    class="ui-segment-toggle ui-segment-toggle--nav{% if extra_class %} {{ extra_class }}{% endif %} segment-toggle segment-toggle--nav"
+    aria-label="{{ aria_label|default:'Alternar lista' }}"
+    {{ attrs }}
+  >
+    {% for item in items %}
+      <a
+        class="ui-segment-toggle__item segment-toggle__btn"
+        href="{{ item.url }}"
+        title="{{ item.label }}"
+        {% if item.is_active %}aria-current="page"{% endif %}
+      >
+        <span class="ui-segment-toggle__label">{{ item.label }}</span>
+        {% if item.count is not None %}
+          <span class="ui-segment-toggle__count segment-toggle__count">{{ item.count }}</span>
+        {% endif %}
+      </a>
+    {% endfor %}
+  </nav>
+{% endif %}

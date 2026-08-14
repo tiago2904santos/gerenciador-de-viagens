@@ -122,6 +122,8 @@ UI_CSS: tuple[str, ...] = (
     "css/ui/date-picker.css",
     "css/ui/button-secondary.css",
     "css/ui/segment-toggle.css",
+    "css/ui/form-block.css",
+    "css/ui/surface.css",
 )
 
 CSS_BUNDLE = STATIC / "css" / "shell.bundle.css"

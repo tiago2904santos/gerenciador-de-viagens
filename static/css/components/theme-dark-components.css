@@ -1,3 +1,9 @@
+/* NOVO-120: as regras que davam superfície, raio e padding próprios aos
+   campos e blocos dentro dos wizards de documento foram removidas. Elas
+   duplicavam — com `!important` — o que os componentes globais de
+   `static/css/ui/` agora fazem, e o resultado eram duas camadas disputando
+   a mesma peça. O componente é a fonte única. */
+
 /*
  * theme-dark-components.css — transitional dark-theme component overrides.
  * Tokens live in 03-theme-dark.css. Long-term: dissolve into owning component files.
@@ -259,12 +265,6 @@ html[data-theme="dark"] :is(input, select, textarea):disabled {
   opacity: 1;
 }
 
-html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .search-picker__control, .date-picker__input, .date-picker .cv-field__control) {
-  background: var(--color-input-bg);
-  border-color: var(--color-input-border);
-  color: var(--color-input-text);
-}
-
 :is(html[data-theme="dark"])
   .search-picker {
   --search-picker-focus-shadow: none;
@@ -323,23 +323,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   transition: none !important;
 }
 
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-sede-block .roteiro-sede-grid :is(
-    .search-picker__control,
-    .search-picker__input,
-    .search-picker__control:hover,
-    .search-picker__control:focus,
-    .search-picker__control:focus-within,
-    .search-picker__input:hover,
-    .search-picker__input:focus
-  ) {
-  background: var(--step1-panel) !important;
-  background-color: var(--step1-panel) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  transition: none !important;
-}
-
 /* Período: mesmo card/split dos Destinos; rail 14rem | datas. */
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block.travel-period-block--split,
@@ -380,23 +363,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   line-height: 1.45;
   margin: 0;
   text-align: left;
-}
-
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block--split :is(
-    .date-picker__control,
-    .date-picker__control .cv-field__control,
-    .date-picker__control > input.cv-field__control,
-    .cv-field__control,
-    input.cv-field__control,
-    input.cv-field__control[readonly]
-  ) {
-  background: var(--step1-panel, var(--color-surface-soft)) !important;
-  background-color: var(--step1-panel, var(--color-surface-soft)) !important;
-  border-color: transparent !important;
-  border-radius: 10px !important;
-  box-shadow: none !important;
-  transition: none !important;
 }
 
 /* Calendário do período: mesmo filled soft de "Novo viajante". */
@@ -486,23 +452,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   color: var(--color-heading) !important;
   font-size: 1.25rem;
   justify-self: auto;
-}
-
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row__field :is(
-    .search-picker__control,
-    .search-picker__input,
-    .search-picker__control:hover,
-    .search-picker__control:focus,
-    .search-picker__control:focus-within,
-    .search-picker__input:hover,
-    .search-picker__input:focus
-  ) {
-  background: var(--step1-panel) !important;
-  background-color: var(--step1-panel) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  transition: none !important;
 }
 
 :is(html[data-theme="dark"])
@@ -683,35 +632,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   font-size: 0.78rem;
   font-weight: var(--font-weight-black);
   text-transform: none;
-}
-
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__control {
-  align-items: center;
-  background: var(--step1-field, var(--color-input-bg)) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  box-sizing: border-box;
-  display: flex;
-  gap: 8px;
-  height: var(--form-control-height);
-  max-height: var(--form-control-height);
-  min-height: var(--form-control-height);
-  padding: 0 12px;
-}
-
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__input {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  flex: 1 1 auto;
-  line-height: 1.25;
-  min-height: 0;
-  min-width: 0;
-  outline: none;
-  padding: 0 5px;
-  width: 100%;
 }
 
 /* Destinos (ofício): subsection limpa + linhas no tom do roster/Equipe. */
@@ -951,33 +871,11 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg :is(
-    .cv-field__control,
-    .date-picker__control,
-    .date-picker__control .cv-field__control
-  ) {
-  background: var(--step1-panel) !important;
-  background-color: var(--step1-panel) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  transition: none !important;
-}
-
-:is(html[data-theme="dark"])
   .form-stack {
   border: 0;
   gap: 12px;
   margin: 0;
   padding: 0;
-}
-
-:is(html[data-theme="dark"])
-  .form-card :is(.form-control, .custom-select__trigger, textarea) {
-  background: var(--color-input-bg);
-  border: 1px solid var(--color-border);
-  box-shadow: none;
-  color: var(--color-text);
-  min-height: var(--control-height-md);
 }
 
 :is(html[data-theme="dark"])
@@ -1108,20 +1006,6 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 2.2;
-}
-
-/* Selecionado: mesmo preenchimento dourado do motorista (--driver). */
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker
-  .search-picker__selected-card.related-route-item.is-active
-  .search-picker__selected-avatar,
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker
-  .search-picker__selected-card.related-route-item[aria-pressed="true"]
-  .search-picker__selected-avatar {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--color-on-accent);
 }
 
 html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .date-picker__popover, .action-menu__panel) {

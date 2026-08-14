@@ -9,7 +9,7 @@
 /* O gatilho é um controle do trilho como os outros: mesma superfície do input e
    mesmo raio. Ele vinha transparente e em pílula, destoando dos vizinhos. */
 :is(html[data-theme]) .ui-date-picker .travel-period-filter__btn {
-  background: var(--input-bg);
+  background: var(--ui-surface, var(--input-bg));
   background-image: none;
   border: 0;
   border-radius: var(--radius-sm);
@@ -24,7 +24,7 @@
    repouso; isto garante o mesmo quando o fundo passa a sair daqui. */
 :is(html[data-theme]) .ui-date-picker
   .travel-period-filter__btn:hover:not(:disabled) {
-  background: var(--input-bg);
+  background: var(--ui-surface, var(--input-bg));
   background-image: none;
   box-shadow: none;
 }
@@ -198,7 +198,7 @@
 :is(html[data-theme]):has(.ui-sub-header)
   [data-cv-date-picker-panel]
   :is(.date-picker__nav, .date-picker__footer-action) {
-  background: var(--sub-header-bg);
+  background: var(--ui-surface, var(--sub-header-bg));
   background-image: none;
   border: 0;
   box-shadow: none;

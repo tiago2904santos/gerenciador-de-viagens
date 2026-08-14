@@ -20,7 +20,8 @@
 {% elif "search-picker__native" in classe_do_widget %}
   {{ field.as_widget }}
 {% elif field.field.widget.input_type == 'select' %}
-  <c-ui.forms.select :field="field" only />
+  {# Select de campo: superfície do sub-header, um degrau abaixo do bloco. #}
+  <c-ui.select :field="field" surface="sub-header" only />
 {% else %}
   {{ field.as_widget }}
 {% endif %}

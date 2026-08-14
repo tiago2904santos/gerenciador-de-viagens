@@ -50,7 +50,7 @@
   </div>
   <div class="field cv-field field-size-1">
     <label class="cv-field__label" for="{{ form.abastecimento.id_for_label }}">Abastecimento</label>
-    <c-ui.forms.select :field="form.abastecimento" only />
+    <c-ui.select :field="form.abastecimento" surface="sub-header" only />
     {% if form.abastecimento.errors %}<c-ui.feedback.field_error :errors="form.abastecimento.errors" :field_id="form.abastecimento.auto_id" only />{% endif %}
   </div>
 </div>

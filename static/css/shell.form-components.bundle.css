@@ -9526,6 +9526,12 @@ html[data-theme="dark"] .cv-dialog--document :is(.cv-dialog__icon, .cv-dialog__e
 /* <<< css/feedback/document-download-loading.css <<< */
 
 /* >>> css/components/theme-dark-components.css >>> */
+/* NOVO-120: as regras que davam superfície, raio e padding próprios aos
+   campos e blocos dentro dos wizards de documento foram removidas. Elas
+   duplicavam — com `!important` — o que os componentes globais de
+   `static/css/ui/` agora fazem, e o resultado eram duas camadas disputando
+   a mesma peça. O componente é a fonte única. */
+
 /*
  * theme-dark-components.css — transitional dark-theme component overrides.
  * Tokens live in 03-theme-dark.css. Long-term: dissolve into owning component files.
@@ -9787,12 +9793,6 @@ html[data-theme="dark"] :is(input, select, textarea):disabled {
   opacity: 1;
 }
 
-html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .search-picker__control, .date-picker__input, .date-picker .cv-field__control) {
-  background: var(--color-input-bg);
-  border-color: var(--color-input-border);
-  color: var(--color-input-text);
-}
-
 :is(html[data-theme="dark"])
   .search-picker {
   --search-picker-focus-shadow: none;
@@ -9851,23 +9851,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   transition: none !important;
 }
 
-:is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .route-sede-block .roteiro-sede-grid :is(
-    .search-picker__control,
-    .search-picker__input,
-    .search-picker__control:hover,
-    .search-picker__control:focus,
-    .search-picker__control:focus-within,
-    .search-picker__input:hover,
-    .search-picker__input:focus
-  ) {
-  background: var(--step1-panel) !important;
-  background-color: var(--step1-panel) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  transition: none !important;
-}
-
 /* Período: mesmo card/split dos Destinos; rail 14rem | datas. */
 :is(html[data-theme="dark"])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block.travel-period-block--split,
@@ -9908,23 +9891,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   line-height: 1.45;
   margin: 0;
   text-align: left;
-}
-
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .travel-period-block--split :is(
-    .date-picker__control,
-    .date-picker__control .cv-field__control,
-    .date-picker__control > input.cv-field__control,
-    .cv-field__control,
-    input.cv-field__control,
-    input.cv-field__control[readonly]
-  ) {
-  background: var(--step1-panel, var(--color-surface-soft)) !important;
-  background-color: var(--step1-panel, var(--color-surface-soft)) !important;
-  border-color: transparent !important;
-  border-radius: 10px !important;
-  box-shadow: none !important;
-  transition: none !important;
 }
 
 /* Calendário do período: mesmo filled soft de "Novo viajante". */
@@ -10014,23 +9980,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   color: var(--color-heading) !important;
   font-size: 1.25rem;
   justify-self: auto;
-}
-
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .route-destinos-block .destination-row__field :is(
-    .search-picker__control,
-    .search-picker__input,
-    .search-picker__control:hover,
-    .search-picker__control:focus,
-    .search-picker__control:focus-within,
-    .search-picker__input:hover,
-    .search-picker__input:focus
-  ) {
-  background: var(--step1-panel) !important;
-  background-color: var(--step1-panel) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  transition: none !important;
 }
 
 :is(html[data-theme="dark"])
@@ -10211,35 +10160,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   font-size: 0.78rem;
   font-weight: var(--font-weight-black);
   text-transform: none;
-}
-
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__control {
-  align-items: center;
-  background: var(--step1-field, var(--color-input-bg)) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  box-sizing: border-box;
-  display: flex;
-  gap: 8px;
-  height: var(--form-control-height);
-  max-height: var(--form-control-height);
-  min-height: var(--form-control-height);
-  padding: 0 12px;
-}
-
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__input {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  flex: 1 1 auto;
-  line-height: 1.25;
-  min-height: 0;
-  min-width: 0;
-  outline: none;
-  padding: 0 5px;
-  width: 100%;
 }
 
 /* Destinos (ofício): subsection limpa + linhas no tom do roster/Equipe. */
@@ -10479,33 +10399,11 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
 }
 
 :is(html[data-theme="dark"])
-  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg :is(
-    .cv-field__control,
-    .date-picker__control,
-    .date-picker__control .cv-field__control
-  ) {
-  background: var(--step1-panel) !important;
-  background-color: var(--step1-panel) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  transition: none !important;
-}
-
-:is(html[data-theme="dark"])
   .form-stack {
   border: 0;
   gap: 12px;
   margin: 0;
   padding: 0;
-}
-
-:is(html[data-theme="dark"])
-  .form-card :is(.form-control, .custom-select__trigger, textarea) {
-  background: var(--color-input-bg);
-  border: 1px solid var(--color-border);
-  box-shadow: none;
-  color: var(--color-text);
-  min-height: var(--control-height-md);
 }
 
 :is(html[data-theme="dark"])
@@ -10636,20 +10534,6 @@ html[data-theme="dark"] .composite-field__control .form-control:focus-visible {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 2.2;
-}
-
-/* Selecionado: mesmo preenchimento dourado do motorista (--driver). */
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker
-  .search-picker__selected-card.related-route-item.is-active
-  .search-picker__selected-avatar,
-:is(html[data-theme="dark"])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker
-  .search-picker__selected-card.related-route-item[aria-pressed="true"]
-  .search-picker__selected-avatar {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--color-on-accent);
 }
 
 html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .date-picker__popover, .action-menu__panel) {
@@ -11963,6 +11847,12 @@ html[data-theme="dark"] *::after {
 /* <<< css/components/theme-dark-components.css <<< */
 
 /* >>> css/components/theme-shared-components.css >>> */
+/* NOVO-120: as regras que davam superfície, raio e padding próprios aos
+   campos e blocos dentro dos wizards de documento foram removidas. Elas
+   duplicavam — com `!important` — o que os componentes globais de
+   `static/css/ui/` agora fazem, e o resultado eram duas camadas disputando
+   a mesma peça. O componente é a fonte única. */
+
 /*
  * theme-shared-components.css - contratos visuais compartilhados entre temas.
  *
@@ -12133,17 +12023,6 @@ html[data-theme] .page-header-rail__marker {
   padding: 14px 18px 18px;
 }
 
-/* Camada intermediária: cada seção é um painel suave. */
-:is(html[data-theme])
-  :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block) {
-  border-radius: 14px;
-  background: var(--step1-panel);
-  border: 0;
-  gap: 12px;
-  margin: 0;
-  padding: 14px;
-}
-
 :is(html[data-theme])
   :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block) > .form-block__header {
   align-items: flex-start;
@@ -12174,52 +12053,6 @@ html[data-theme] .page-header-rail__marker {
 :is(html[data-theme])
   :is([data-travel-document-wizard-step1] .travel-document-block, [data-travel-document-wizard-rt] .travel-document-block, [data-travel-document-wizard-diario] .travel-document-block, [data-travel-document-wizard-consolidado] .travel-document-block, [data-travel-document-wizard-roteiro] .route-section-block, [data-travel-document-wizard-justificativa] .oficio-justificativa-block, [data-travel-document-wizard-documentos] .oficio-documentos-block, [data-travel-document-wizard-documentos] .travel-document-block).form-block--split > .form-block__body {
   align-self: center;
-}
-
-/* Campos no tom do card: poço inset dentro do painel intermediário.
-   Exclui o filtro do list-header (soft panel / --color-surface-soft): o attr
-   data-travel-document-wizard-step1 no quick-add não deve pintar a busca. */
-:is(html[data-theme])
-  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) :is(
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not(.list-header__search-input):not(.header-filter-input),
-    textarea,
-    select,
-    .form-control,
-    .form-select,
-    .composite-field__control,
-    .custom-select__trigger,
-    .cv-field__control,
-    .search-picker__input,
-    .search-picker__control
-  ) {
-  border-radius: 10px;
-}
-
-:is(html[data-theme])
-  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) :is(
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not(.list-header__search-input):not(.header-filter-input),
-    textarea,
-    select,
-    .form-control,
-    .form-select,
-    .composite-field__control,
-    .custom-select__trigger,
-    .cv-field__control,
-    .search-picker__input,
-    .search-picker__control
-  ) {
-  background: var(--step1-field) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-}
-
-/* Open state do select: mesmo poço; sem chrome extra de hover/focus nos campos. */
-:is(html[data-theme])
-  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) .custom-select--open .custom-select__trigger {
-  background: var(--step1-field) !important;
-  border-color: transparent !important;
-  border-radius: 10px;
-  box-shadow: none !important;
 }
 
 :is(html[data-theme])
@@ -12732,11 +12565,6 @@ html[data-theme] .page-header-rail__marker {
 }
 
 :is(html[data-theme])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__control {
-  border-radius: 10px;
-}
-
-:is(html[data-theme])
   :is([data-travel-document-wizard-roteiro], .termos-page, [data-travel-document-wizard-step1], [data-evento-guided-form]) .ordered-field-collection__header {
   align-items: flex-start;
   gap: 12px;
@@ -12990,15 +12818,6 @@ html[data-theme] .page-header-rail__marker {
   min-width: 0;
 }
 
-:is(html[data-theme])
-  [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg :is(
-    .cv-field__control,
-    .date-picker__control,
-    .date-picker__control .cv-field__control
-  ) {
-  border-radius: 10px;
-}
-
 @media (max-width: 720px) {
   :is(html[data-theme])
     [data-travel-document-wizard-roteiro] .oficio-roteiro-bate-volta__leg.route-bate-volta-leg.form-block--split {
@@ -13091,92 +12910,6 @@ html[data-theme] .page-header-rail__marker {
   background: transparent;
   border: 0;
   box-shadow: none;
-}
-
-/* Inputs dos trechos/retorno: mesmo poço dos demais campos do wizard.
-   NÃO misturar #retorno-card no mesmo :is() que classes: a especificidade
-   do :is() usa o argumento mais específico (o ID), e a regra vencia o
-   override surface-soft dos legs em todo o wizard. */
-:is(html[data-theme])
-  [data-travel-document-wizard-roteiro]
-  :is(.roteiro-editor__section--trecho, .roteiro-editor__section--retorno)
-  :is(
-    .cv-field__control,
-    .date-picker .cv-field__control,
-    .date-picker__control .cv-field__control,
-    .date-picker__input,
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"])
-  ),
-:is(html[data-theme])
-  [data-travel-document-wizard-roteiro]
-  #retorno-card
-  :is(
-    .cv-field__control,
-    .date-picker .cv-field__control,
-    .date-picker__control .cv-field__control,
-    .date-picker__input,
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"])
-  ) {
-  background: var(--step1-field, var(--color-input-bg)) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  color: var(--color-text);
-}
-
-:is(html[data-theme])
-  [data-travel-document-wizard-roteiro]
-  :is(.roteiro-editor__section--trecho, .roteiro-editor__section--retorno)
-  :is(.cv-field--readonly .cv-field__control, .cv-field__control[readonly], input[readonly]),
-:is(html[data-theme])
-  [data-travel-document-wizard-roteiro]
-  #retorno-card
-  :is(.cv-field--readonly .cv-field__control, .cv-field__control[readonly], input[readonly]) {
-  background: var(--step1-field, var(--color-input-bg)) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  color: var(--color-text);
-  opacity: 1;
-}
-
-/* Inversão no leg: inputs em surface-soft (#223348) sobre o poço step1-field
-   (#132538). Seletor inclui seções + #retorno-card para empatar/vencer a
-   especificidade das regras acima (incl. ramo com ID). */
-:is(html[data-theme])
-  [data-travel-document-wizard-roteiro]
-  :is(.roteiro-editor__section--trecho, .roteiro-editor__section--retorno)
-  .roteiro-trecho-card__leg
-  :is(
-    .cv-field__control,
-    .date-picker .cv-field__control,
-    .date-picker__control .cv-field__control,
-    .date-picker__input,
-    .search-picker__input,
-    .search-picker__control,
-    .custom-select__trigger,
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
-    select,
-    textarea
-  ),
-:is(html[data-theme])
-  [data-travel-document-wizard-roteiro]
-  #retorno-card
-  .roteiro-trecho-card__leg
-  :is(
-    .cv-field__control,
-    .date-picker .cv-field__control,
-    .date-picker__control .cv-field__control,
-    .date-picker__input,
-    .search-picker__input,
-    .search-picker__control,
-    .custom-select__trigger,
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
-    select,
-    textarea
-  ) {
-  background: var(--color-surface-soft) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  color: var(--color-text);
 }
 
 /* Stepper −/+: mesmo secondary filled soft do "Preencher datas"
@@ -14140,24 +13873,6 @@ html[data-theme] .page-header-rail__marker {
 }
 
 :is(html[data-theme])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker.search-picker--people.search-picker--roster
-  .search-picker__selected-card.related-route-item:hover {
-  background: color-mix(in srgb, var(--color-accent) 5%, var(--color-input-bg));
-  border-color: var(--color-border);
-}
-
-:is(html[data-theme])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker.search-picker--people.search-picker--roster
-  .search-picker__selected-card.related-route-item.is-active,
-:is(html[data-theme])
-  :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker.search-picker--people.search-picker--roster
-  .search-picker__selected-card.related-route-item.is-active:hover {
-  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-muted));
-  border-color: var(--color-accent-border-soft);
-  box-shadow: inset 4px 0 0 var(--color-accent);
-}
-
-:is(html[data-theme])
   :is([data-travel-document-wizard-roteiro], [data-travel-document-wizard-step1]) .related-route-picker .search-picker__selected-avatar {
   font-size: 0;
   letter-spacing: 0;
@@ -15043,41 +14758,6 @@ html[data-theme] .empty-state__mark {
   background: transparent;
   border: 0;
   box-shadow: none;
-}
-
-:is(html[data-theme])
-  [data-travel-document-wizard-diario]
-  .diario-trecho-block
-  :is(
-    .date-picker__input,
-    .custom-select__trigger,
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
-    select,
-    textarea
-  ) {
-  background: var(--step1-field, var(--color-input-bg)) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  color: var(--color-text);
-}
-
-:is(html[data-theme])
-  [data-travel-document-wizard-diario]
-  .diario-trecho-block
-  .roteiro-trecho-card__leg
-  :is(
-    .date-picker__input,
-    .custom-select__trigger,
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
-    select,
-    textarea,
-    input[readonly]
-  ) {
-  background: var(--color-surface-soft) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  color: var(--color-text);
-  opacity: 1;
 }
 /* <<< css/components/theme-shared-components.css <<< */
 

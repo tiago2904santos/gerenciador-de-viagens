@@ -53,7 +53,10 @@ DIRECT_FORM_API_CONSUMERS = (
 )
 
 # Limites do shell após o bundle (extra_css/extra_js por página ficam de fora).
-MAX_SHELL_CSS_LINKS = 1
+# NOVO-120: 2 = shell + a camada de componentes globais. O teto existe para
+# impedir o retorno dos 24 <link> que o NOVO-12 eliminou; dois arquivos fixos
+# preservam esse ganho.
+MAX_SHELL_CSS_LINKS = 2
 MAX_SHELL_HEAD_SCRIPTS = 2  # theme-shared + theme-init
 MAX_SHELL_BODY_SCRIPTS = 1  # shell.bundle.js
 
@@ -82,7 +85,12 @@ class ShellBundleGateTests(SimpleTestCase):
             flags=re.S,
         )
 
-        self.assertEqual(css_links, ["css/shell.bundle.css"])
+        # NOVO-120: a camada de componentes globais entra como um <link> próprio,
+        # depois do shell. É de propósito: este é o único ponto de entrega que NÃO
+        # passa pelo podador de `scripts/build_css_profiles.py` — o perfil por rota
+        # descarta regra cujo `rule_id` mudou, e foi isso que inviabilizou editar as
+        # folhas legadas. O orçamento continua fechado: dois arquivos, não N.
+        self.assertEqual(css_links, ["css/shell.bundle.css", "css/ui.bundle.css"])
         self.assertEqual(
             scripts,
             [

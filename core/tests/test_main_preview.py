@@ -193,12 +193,15 @@ class MainPreviewContractTests(SimpleTestCase):
         self.assertNotIn("padding: 16px 24px;", entity)
 
     def test_filtros_piloto_usam_o_componente_select_existente(self):
-        get_template("cotton/ui/forms/select.html")
+        # NOVO-120: `cotton/ui/forms/select.html` foi apagado; o select de campo e o
+        # do trilho passaram a ser o mesmo componente global, `cotton/ui/select.html`,
+        # que aceita tanto `options` quanto um `field` do Django.
+        get_template("cotton/ui/select.html")
         source = (ROOT / "templates/core/main_preview.html").read_text(encoding="utf-8")
-        component = (ROOT / "templates/cotton/ui/forms/select.html").read_text(encoding="utf-8")
+        component = (ROOT / "templates/cotton/ui/select.html").read_text(encoding="utf-8")
         form = MainPreviewFiltersForm()
 
-        self.assertEqual(source.count("<c-ui.forms.select "), 2)
+        self.assertEqual(source.count("<c-ui.select "), 2)
         self.assertNotIn('<select class="main-preview-sub-header__field"', source)
         self.assertIn(":field=\"preview_filters.sort\"", source)
         self.assertIn(":field=\"preview_filters.status\"", source)

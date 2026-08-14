@@ -8,8 +8,11 @@
  */
 
 :is(html[data-theme]) .ui-select .custom-select__trigger {
-  background: var(--input-bg);
+  background: var(--ui-surface, var(--input-bg));
   border: 0;
+  /* 8px é o valor do modelo do UI Lab (`/dev/main-preview/`), medido no
+     gatilho. Cheguei a trocar por 12px tentando "devolver o desenho legado" e
+     estava errado — o modelo é este. */
   border-radius: var(--radius-sm);
   box-shadow: none;
   box-sizing: border-box;
@@ -24,7 +27,7 @@
 :is(html[data-theme]) .ui-select
   .custom-select__trigger--v2
   .custom-select__chevron {
-  background: var(--input-bg);
+  background: var(--ui-surface, var(--input-bg));
   color: var(--sub-header-text-muted);
 }
 
@@ -58,7 +61,7 @@
 /* Menu no portal. O raio acompanha o do campo; a margem afasta do gatilho, que
    o módulo de posicionamento cola com folga zero. */
 :is(html[data-theme]):has(.ui-sub-header) .custom-select__menu--v2 {
-  background: var(--input-bg);
+  background: var(--ui-surface, var(--input-bg));
   border: 1px solid var(--sub-header-border);
   border-radius: var(--radius-sm);
   margin-top: 6px;
@@ -90,7 +93,7 @@
 :is(html[data-theme]):has(.ui-sub-header)
   .custom-select__menu--v2
   .custom-select__option--focused {
-  background: var(--sub-header-bg);
+  background: var(--ui-surface, var(--sub-header-bg));
 }
 
 :is(html[data-theme]):has(.ui-sub-header)

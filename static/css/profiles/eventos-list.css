@@ -4623,11 +4623,6 @@ html[data-theme="dark"] :is(input, select, textarea) {
   outline: none;
   outline-offset: 0;
 }
-html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .search-picker__control, .date-picker__input, .date-picker .cv-field__control) {
-  background: var(--color-input-bg);
-  border-color: var(--color-input-border);
-  color: var(--color-input-text);
-}
 html[data-theme="dark"] :is(.custom-select__menu, .search-picker__dropdown, .date-picker__popover, .action-menu__panel) {
   background: var(--color-surface-elevated);
   border: 1px solid var(--color-border-strong);

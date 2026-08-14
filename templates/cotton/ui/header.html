@@ -1,17 +1,21 @@
-{% cotton:vars abas aside_template aria_label eyebrow extra_class slot status_label status_variant tabs_aria_label title %}
+{% cotton:vars abas aria_label aside_template extra_class eyebrow slot status_label status_variant surface tabs_aria_label title %}
 {% comment %}
 Header global (NOVO-120) — a faixa de identidade: eyebrow, título e, à direita,
 o que o chamador puser no slot (ação, toggle, abas).
 
 Sem JS próprio.
 
-Substitui `ui/headers/_list_header_band.html` no caminho do `filter_page_header`.
-Aquele partial segue existindo para os outros três chamadores até migrarem; as
-classes legadas saem junto aqui para que a aparência deles não mude no meio do
-caminho. Nenhuma delas é gancho de JS — conferido no repositório inteiro.
+Substituiu `ui/headers/_list_header_band.html`, que foi apagado depois que os
+três chamadores dele migraram (`list_page_quick_add`, `cadastros/configuracao`
+e `core/perfil`).
+
+As classes legadas (`list-header__band`, `__title-block`, `__eyebrow`…) ainda
+saem junto: `lists/list-header.css` continua as estilizando, e removê-las é o
+passo seguinte, com a poda daquela folha. Nenhuma é gancho de JS — conferido
+no repositório inteiro.
 {% endcomment %}
 <div
-  class="ui-header{% if extra_class %} {{ extra_class }}{% endif %} list-header__band{% if aside_template %} list-header__band--with-aside{% endif %}"
+  class="ui-header{% if surface %} ui-surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %} list-header__band{% if aside_template %} list-header__band--with-aside{% endif %}"
   {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
 >
   <div class="ui-header__copy list-header__title-block">

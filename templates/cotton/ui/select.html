@@ -1,4 +1,4 @@
-{% cotton:vars aria_label attrs collection_filter extra_class fallback_first name options value %}
+{% cotton:vars aria_label attrs collection_filter extra_class fallback_first field name options surface value %}
 {% comment %}
 Select global (NOVO-120).
 
@@ -12,15 +12,25 @@ declara script próprio: pôr o atributo já basta para o JS chegar.
 As classes `custom-select__*` do gatilho e do menu pertencem ao JS e não são
 renomeadas aqui; a folha do componente as estiliza pelo nome que elas já têm.
 
+Duas origens de dados, mesmo desenho:
+
+- `options` — lista de dicts {value, label}, usada pelos filtros do trilho.
+- `field`   — campo Django; o `<select>` nativo vem de `field.as_widget`, com as
+  choices e o `name` que o form já define. Substitui o antigo
+  `cotton/ui/forms/select.html`, apagado nesta etapa.
+
 A classe legada `list-header__select` sai junto enquanto a migração não termina.
 Ela é estrutural — nenhum JS a usa, conferido no repositório inteiro.
 {% endcomment %}
 <div
-  class="ui-select{% if extra_class %} {{ extra_class }}{% endif %} list-header__select filter-bar__select custom-select"
+  class="ui-select{% if surface %} ui-surface--{{ surface }}{% endif %}{% if field.errors %} custom-select--error{% endif %}{% if field.field.disabled %} custom-select--disabled{% endif %}{% if extra_class %} {{ extra_class }}{% endif %} list-header__select filter-bar__select custom-select"
   data-entity-picker
   data-entity-picker-renderer="select"
   data-entity-picker-mode="single"
 >
+  {% if field %}
+    {{ field.as_widget }}
+  {% else %}
   <select
     name="{{ name }}"
     aria-label="{{ aria_label }}"
@@ -36,4 +46,5 @@ Ela é estrutural — nenhum JS a usa, conferido no repositório inteiro.
       <option value="{{ opt.value }}"{% if opt.value == value or fallback_first and not value and forloop.first %} selected{% endif %}>{{ opt.label }}</option>
     {% endfor %}
   </select>
+  {% endif %}
 </div>

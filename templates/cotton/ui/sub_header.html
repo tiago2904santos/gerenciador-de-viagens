@@ -1,4 +1,4 @@
-{% cotton:vars aria_label extra_class slot %}
+{% cotton:vars aria_label extra_class slot surface %}
 {% comment %}
 Sub-header global (NOVO-120) — a faixa de controles logo abaixo do header.
 
@@ -11,7 +11,7 @@ não por este invólucro.
 As classes legadas do trilho saem junto enquanto a migração não termina.
 {% endcomment %}
 <div
-  class="ui-sub-header{% if extra_class %} {{ extra_class }}{% endif %} list-header__rail list-header__rail--advanced"
+  class="ui-sub-header{% if surface %} ui-surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %} list-header__rail list-header__rail--advanced"
   {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
 >
   <div class="ui-sub-header__controls list-header__filters list-header__filters--advanced">

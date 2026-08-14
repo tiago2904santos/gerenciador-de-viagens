@@ -1,0 +1,86 @@
+/* v2 — vocabulário. A ÚNICA folha do sistema novo que declara valor literal.
+ *
+ * Todas as outras só leem daqui. Se um componente precisar de uma cor que não
+ * está neste arquivo, o token está faltando — não é para escrever o hex lá.
+ * Foi a ausência dessa regra que produziu as seis camadas do sistema antigo.
+ *
+ * ## Superfícies
+ *
+ * A escada é fechada e tem três degraus, do fundo para a frente:
+ *
+ *     --surface-page  →  --surface-rail  →  --surface-field
+ *
+ * `--surface-page` é o fundo da tela; `--surface-rail` é a faixa de controles
+ * (o que o sistema antigo chamava de sub-header); `--surface-field` é o campo
+ * em si. Um componente escolhe UM degrau. Não existe degrau intermediário e
+ * não se mistura cor com cor — no tema escuro o accent é dourado e qualquer
+ * `color-mix` dele com o azul-marinho cai em oliva (medido: `#2d302c`).
+ *
+ * ## Temas
+ *
+ * O claro vive em `:root` e é o padrão de quem nunca escolheu tema. O escuro
+ * REDEFINE apenas os tokens que mudam. Nenhum componente consulta o tema: se
+ * uma regra precisa de `html[data-theme="dark"]`, é sinal de que falta token.
+ */
+
+:root {
+  /* ---- superfícies ---------------------------------------------------- */
+  --surface-page: #e8eef6;
+  --surface-rail: #eef4fc;
+  --surface-field: #ffffff;
+  --surface-brand: #155b9a;
+
+  /* ---- texto ---------------------------------------------------------- */
+  --text-strong: #223348;
+  --text-muted: #52657a;
+  --text-on-brand: #ffffff;
+  --text-on-accent: #ffffff;
+
+  /* ---- traço e realce -------------------------------------------------- */
+  --line: rgb(11 58 102 / 0.16);
+  --line-on-brand: rgb(255 255 255 / 0.22);
+  --accent: #0b3a66;
+  --focus-ring: #155b9a;
+
+  /* ---- forma ----------------------------------------------------------- */
+  --radius-field: 8px;
+  --radius-rail: 14px;
+  --radius-brand: 18px;
+  --radius-pill: 999px;
+
+  /* ---- ritmo ----------------------------------------------------------- */
+  --gap-tight: 8px;
+  --gap: 12px;
+  --gap-loose: 20px;
+  --pad-field: 0 12px;
+  --pad-rail: 16px 20px;
+  --control-height: 44px;
+
+  /* ---- tipografia ------------------------------------------------------ */
+  --text-size-eyebrow: 12px;
+  --text-size-base: 14px;
+  --text-size-title: 24px;
+  --weight-normal: 500;
+  --weight-strong: 700;
+
+  /* ---- movimento ------------------------------------------------------- */
+  --ease: 150ms ease;
+}
+
+:is(html[data-theme="dark"]) {
+  --surface-page: #0b1520;
+  --surface-rail: #132132;
+  --surface-field: #223348;
+  --surface-brand: #062847;
+
+  --text-strong: #ffffff;
+  --text-muted: #afc0d3;
+  --text-on-brand: #ffffff;
+  /* O accent escuro é dourado: texto sobre ele é ESCURO, não branco. */
+  --text-on-accent: #062847;
+
+  --line: rgb(175 192 211 / 0.2);
+  --line-on-brand: rgb(255 255 255 / 0.1);
+  --accent: #d8a21b;
+  --focus-ring: #d8a21b;
+}

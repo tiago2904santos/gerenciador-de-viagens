@@ -1,4 +1,4 @@
-{% cotton:vars aria_label attrs collection_filter extra_class icon name placeholder type value %}
+{% cotton:vars aria_label attrs collection_filter extra_class icon name placeholder surface type value %}
 {% comment %}
 Campo de busca global (NOVO-120).
 
@@ -12,7 +12,7 @@ continuam com a aparência de hoje. Ela é só estrutural — nenhum JS a usa,
 conferido no repositório inteiro — então pode cair quando a última página migrar.
 {% endcomment %}
 {% load icones %}
-<div class="ui-input{% if icon %} ui-input--with-icon{% endif %}{% if extra_class %} {{ extra_class }}{% endif %} list-header__search{% if icon %} list-header__search--with-icon{% endif %}">
+<div class="ui-input{% if surface %} ui-surface--{{ surface }}{% endif %}{% if icon %} ui-input--with-icon{% endif %}{% if extra_class %} {{ extra_class }}{% endif %} list-header__search{% if icon %} list-header__search--with-icon{% endif %}">
   {% if icon %}
     <span class="ui-input__icon list-header__search-icon" aria-hidden="true">{% icone_svg icon %}</span>
   {% endif %}

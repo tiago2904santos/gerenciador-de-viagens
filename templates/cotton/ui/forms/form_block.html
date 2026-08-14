@@ -1,4 +1,4 @@
-{% cotton:vars action_autosave action_label action_url action_variant actions aria_label body body_extra_class body_id data_hook description element_id extra_class footer heading_level section_id shell title variant %}
+{% cotton:vars action_autosave action_label action_url action_variant actions aria_label body body_extra_class body_id data_hook description element_id extra_class footer heading_level section_id shell surface title variant %}
 {% comment %}
   Bloco de formulário canônico. Body, actions e footer são slots explícitos.
   shell="card" mantém a variante de card de página; o padrão é form-block.
@@ -35,7 +35,7 @@
 </section>
 {% else %}
 <section
-  class="form-block{% if variant %} form-block--{{ variant }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+  class="ui-form-block{% if surface %} ui-surface--{{ surface }}{% endif %} form-block{% if variant %} ui-form-block--{{ variant }} form-block--{{ variant }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
   {% if element_id %}id="{{ element_id }}"{% endif %}
   {% if section_id %}aria-labelledby="{{ section_id }}"{% elif aria_label %}aria-label="{{ aria_label }}"{% endif %}
   {% if data_hook %}data-{{ data_hook }}{% endif %}

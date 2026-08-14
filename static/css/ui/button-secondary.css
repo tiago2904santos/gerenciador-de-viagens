@@ -4,7 +4,7 @@
  */
 
 :is(html[data-theme]) .ui-button-secondary {
-  background: var(--input-bg);
+  background: var(--ui-surface, var(--input-bg));
   border: 0;
   border-radius: var(--radius-sm);
   box-shadow: none;
@@ -16,19 +16,23 @@
   min-height: 44px;
 }
 
-/* Mesmo realce do "Hoje" do calendário
-   (`components/theme-shared-components.css:2415`). Só a aparência: aquela regra
-   também zera o `outline` no foco, e copiar isso apagaria o anel de teclado
-   abaixo. Precisa do caminho completo porque `lists/list-header.css:246` fixa o
-   hover na mesma cor do repouso, com especificidade 500. */
+/* Hover na cor do input — a mesma superfície do repouso deste botão, ou seja,
+   sem realce. É a "superfície única" que `lists/list-header.css:237-250` já
+   estabelece para os controles do trilho.
+   
+   A versão anterior copiava o realce do "Hoje" do calendário,
+   `color-mix(--color-accent 14%, --color-surface-muted)`. No claro dá azul
+   limpo (#d7e5f1), mas no escuro o accent é dourado e a mistura com o
+   azul-marinho cai em oliva (#2d302c) — o mesmo erro que já tinha aparecido na
+   faixa do date picker. */
 :is(html[data-theme])
   .ui-sub-header
   .cv-btn.cv-btn--secondary.ui-button-secondary:hover {
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-muted));
+  background: var(--ui-surface, var(--input-bg));
   background-image: none;
   border: 0;
   box-shadow: none;
-  color: var(--color-accent-text, var(--color-accent));
+  color: var(--sub-header-text);
 }
 
 :is(html[data-theme]) .ui-button-secondary:focus-visible {

@@ -5,29 +5,24 @@
     class="list-header list-header--inline-create filter-header{% if quick_add_compact %} list-header--inline-create-compact{% endif %}"
     {% if can_edit_area %}data-travel-document-wizard-step1{% endif %}
   >
-    <c-ui.headers._list_header_band :title="title" :eyebrow="eyebrow" :band_tabs_template="band_tabs_template" :abas="abas" :tabs_aria_label="tabs_aria_label" only />
+    <c-ui.header :title="title" :eyebrow="eyebrow" :aside_template="band_tabs_template" :abas="abas" :tabs_aria_label="tabs_aria_label" only />
 
-    <div class="list-header__rail list-header__rail--inline-create">
-      <form class="list-header__filters" method="get" action="{{ request.path }}" data-collection-form>
-        <div class="list-header__search">
-          <input
-            class="list-header__search-input header-filter-input"
-            type="search"
-            name="q"
-            placeholder="{{ search_placeholder|default:'Buscar itens' }}"
-            aria-label="{{ search_placeholder|default:'Buscar itens' }}"
-            data-collection-filter="search"
-            {% if q %}value="{{ q }}"{% endif %}
-          >
-        </div>
+    {% comment %}
+      O trilho usa a superfície e o espaçamento do `ui.sub_header`. Não vira o
+      componente inteiro porque aqui ele também abriga o painel de criação, que
+      tem JS próprio de abrir/fechar — só a linha de filtros é a de controles.
+    {% endcomment %}
+    <div class="ui-sub-header list-header__rail list-header__rail--inline-create">
+      <form class="ui-sub-header__controls list-header__filters" method="get" action="{{ request.path }}" data-collection-form>
+        {% with cotton_attr_placeholder=search_placeholder|default:"Buscar itens" %}<c-ui.input icon="search" collection_filter="search" name="q" :placeholder="cotton_attr_placeholder" :aria_label="cotton_attr_placeholder" :value="q" only />{% endwith %}
         {% if extra_hidden_field_name and extra_hidden_field_value %}
           <input type="hidden" name="{{ extra_hidden_field_name }}" value="{{ extra_hidden_field_value }}">
         {% endif %}
         <div class="list-header__actions">
           {% if extra_hidden_field_name and extra_hidden_field_value %}
-            {% with cotton_attr_href=request.path|add:"?"|add:extra_hidden_field_name|add:"="|add:extra_hidden_field_value %}<c-ui.buttons.button :href="cotton_attr_href" label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" :data_cv_filter_clear="True" only />{% endwith %}
+            {% with cotton_attr_href=request.path|add:"?"|add:extra_hidden_field_name|add:"="|add:extra_hidden_field_value %}<c-ui.buttons.button :href="cotton_attr_href" label="Limpar filtros" variant="secondary" icon="x" extra_class="ui-button-secondary cv-btn--control" :data_cv_filter_clear="True" only />{% endwith %}
           {% else %}
-            <c-ui.buttons.button :href="request.path" label="Limpar filtros" variant="secondary" icon="x" extra_class="cv-btn--control" :data_cv_filter_clear="True" only />
+            <c-ui.buttons.button :href="request.path" label="Limpar filtros" variant="secondary" icon="x" extra_class="ui-button-secondary cv-btn--control" :data_cv_filter_clear="True" only />
           {% endif %}
         </div>
       </form>
@@ -73,7 +68,7 @@
 
     {% if can_edit_area %}
     <button
-      class="inline-create__toggle"
+      class="ui-sub-header__closer inline-create__toggle"
       type="button"
       data-inline-create-toggle
       {% if quick_add_compact %}data-inline-create-submit-when-open data-inline-create-save-label="{{ quick_add_submit_label|default:'Salvar' }}"{% endif %}

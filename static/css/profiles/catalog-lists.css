@@ -4184,38 +4184,6 @@ html[data-theme] .app-main {
   margin-inline: 0;
 }
 :is(html[data-theme])
-  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) :is(
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not(.list-header__search-input):not(.header-filter-input),
-    textarea,
-    select,
-    .form-control,
-    .form-select,
-    .composite-field__control,
-    .custom-select__trigger,
-    .cv-field__control,
-    .search-picker__input,
-    .search-picker__control
-  ) {
-  border-radius: 10px;
-}
-:is(html[data-theme])
-  :is([data-travel-document-wizard-step1], [data-travel-document-wizard-roteiro], [data-travel-document-wizard-justificativa], [data-travel-document-wizard-documentos], [data-travel-document-wizard-rt], [data-travel-document-wizard-diario], [data-travel-document-wizard-consolidado]) :is(
-    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not(.list-header__search-input):not(.header-filter-input),
-    textarea,
-    select,
-    .form-control,
-    .form-select,
-    .composite-field__control,
-    .custom-select__trigger,
-    .cv-field__control,
-    .search-picker__input,
-    .search-picker__control
-  ) {
-  background: var(--step1-field) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-}
-:is(html[data-theme])
   :is(.app-form-label, .cv-field__label, .search-picker__label) {
   color: var(--color-heading);
   font-size: 0.78rem;

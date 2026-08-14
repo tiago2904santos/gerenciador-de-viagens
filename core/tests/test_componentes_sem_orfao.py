@@ -95,7 +95,10 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
 
     def test_namespace_unico_tem_o_inventario_atual(self):
         self.assertEqual(list((ROOT / "templates" / "components").rglob("*.*")), [])
-        self.assertEqual(len(self.components()), 91)
+        # NOVO-120: 94 = 91 + os componentes globais criados na reconstrução da
+        # camada de apresentação (header, sub_header, input, segment_toggle,
+        # form_block já existia). `forms/select.html` saiu, fundido no global.
+        self.assertEqual(len(self.components()), 94)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.

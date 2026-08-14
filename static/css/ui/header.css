@@ -9,11 +9,16 @@
  * header + sub-header vira um objeto só por construção.
  */
 
-:is(html[data-theme]) .ui-header-block {
+/* O invólucro é markup legado (`form.list-header`), que traz raio de 20px e
+   `overflow: hidden` de `lists/list-header.css`. Esse recorte não casa com os
+   raios do header (18) e do sub-header (14) e cortava os cantos. Neutralizamos
+   só onde o componente vive — `:has(.ui-header)` — em vez de mexer na folha
+   legada, que ainda serve as telas não migradas. */
+:is(html[data-theme]) .list-header:has(.ui-header) {
   background: transparent;
-  /* Sem borda no wrapper: uma linha só não serve às duas metades — a do
-     sub-header some sobre o azul do header. Cada uma traz a sua, com o raio
-     casando o recorte daqui para o canto não sair cortado. */
+  /* Sem borda aqui: uma linha só não serve às duas metades — a do sub-header
+     some sobre o azul do header. Cada uma traz a sua, com o raio casando este
+     recorte para o canto não sair cortado. */
   border: 0;
   border-radius: var(--header-radius) var(--header-radius)
     var(--sub-header-radius) var(--sub-header-radius);

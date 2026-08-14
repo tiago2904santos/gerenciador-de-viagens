@@ -3838,11 +3838,6 @@ html[data-theme="dark"] :is(input, select, textarea) {
   border: 1px solid var(--color-input-border);
   box-shadow: none;
 }
-html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .search-picker__control, .date-picker__input, .date-picker .cv-field__control) {
-  background: var(--color-input-bg);
-  border-color: var(--color-input-border);
-  color: var(--color-input-text);
-}
 :is(html[data-theme="dark"])
   .search-picker {
   --search-picker-focus-shadow: none;
@@ -3858,14 +3853,6 @@ html[data-theme="dark"] :is(.custom-select__trigger, .search-picker__input, .sea
   border: 0;
   box-shadow: none;
   outline: none;
-}
-:is(html[data-theme="dark"])
-  .form-card :is(.form-control, .custom-select__trigger, textarea) {
-  background: var(--color-input-bg);
-  border: 1px solid var(--color-border);
-  box-shadow: none;
-  color: var(--color-text);
-  min-height: var(--control-height-md);
 }
 html[data-theme="dark"] .composite-field__control .form-control:hover,
 html[data-theme="dark"] .composite-field__control .form-control:focus,

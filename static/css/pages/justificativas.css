@@ -12,20 +12,18 @@
   --step1-field: var(--step1-surface);
 }
 
-/* Lista (rail, botão e linhas) na superfície step1; band = cabeçalho dos ofícios. */
-.justificativas-page .list-header,
-.justificativas-page .list-header__rail,
-.justificativas-page .list-header .inline-create__toggle,
-:is(html[data-theme="dark"]) .justificativas-page .list-header,
-:is(html[data-theme="dark"]) .justificativas-page .list-header__rail,
-:is(html[data-theme="dark"]) .justificativas-page .list-header .inline-create__toggle {
-  background: var(--step1-surface);
-}
+/* NOVO-120: a regra que pintava `.list-header`, `.list-header__rail` e o
+   `inline-create__toggle` com `--step1-surface` saiu. Essas três peças agora
+   são o `ui.sub_header` e respondem pela superfície dele.
 
-.justificativas-page .list-header__band,
-:is(html[data-theme="dark"]) .justificativas-page .list-header__band {
-  background: var(--color-surface-muted);
-}
+   As DECLARAÇÕES de `--step1-*` acima ficam: o painel de criação renderiza
+   blocos de wizard por dentro (`data-travel-document-wizard-step1`), e há 200
+   consumidores desses tokens no repositório. O que era exceção de página era a
+   pintura do trilho, não o esquema de superfície do formulário. */
+
+/* NOVO-120: a exceção que pintava a banda desta página saiu. O cabeçalho é o
+   componente global `ui.header`, e ele responde pelo próprio fundo — uma regra
+   de página aqui só voltaria a divergir esta tela das outras. */
 
 .justificativas-page .record-row,
 :is(html[data-theme="dark"]) .justificativas-page .record-row {
@@ -41,12 +39,6 @@
   background: color-mix(in srgb, var(--color-accent) 5%, var(--step1-field, var(--step1-surface)));
   border: 0;
   box-shadow: none;
-}
-
-/* Aberto: sem linha; gap só o do rail (mesmo ritmo do padding). */
-.justificativas-page .list-header__rail--inline-create {
-  gap: var(--space-3);
-  padding: var(--space-3) clamp(var(--space-4), 2vw, var(--space-5));
 }
 
 .justificativas-page .list-header .inline-create__panel.is-open,
