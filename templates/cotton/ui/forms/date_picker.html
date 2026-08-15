@@ -202,7 +202,30 @@ Modo multi:
       <p class="date-picker__summary" data-cv-date-picker-summary></p>
     {% endif %}
   {% else %}
-    {% if control_variant == "input-only" %}
+    {% if control_variant == "filter-pill" %}
+      {% comment %}
+        Gatilho único também no modo simples: o rótulo vira a data escolhida,
+        por extenso. As variantes de range e multi já existiam; sem esta, uma
+        data avulsa não tinha como ser um botão só.
+      {% endcomment %}
+      <button
+        type="button"
+        class="travel-period-filter__btn"
+        data-cv-date-picker-trigger
+        aria-expanded="false"
+        aria-controls="{{ panel_id }}"
+        aria-label="{{ trigger_aria_label|default:trigger_label|default:'Escolher data' }}"
+      >
+        <span class="button__icon" aria-hidden="true">
+          <c-ui.forms._date_picker_icon />
+        </span>
+        <span
+          class="travel-period-filter__label"
+          data-cv-date-picker-display-text
+          data-placeholder="{{ trigger_label|default:'Escolher data' }}"
+        >{{ trigger_label|default:"Escolher data" }}</span>
+      </button>
+    {% elif control_variant == "input-only" %}
       <input
         type="text"
         class="{{ input_class|default:'cv-field__control' }}"

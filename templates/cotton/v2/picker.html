@@ -1,29 +1,45 @@
-{% cotton:vars aria_label extra_class field mode name placeholder %}
+{% cotton:vars aria_label extra_class field mode name options placeholder selected_title %}
 {% comment %}
   Picker v2 — busca de entidade com resultados e itens selecionados.
 
-  NÃO clona o JS. O `js/components/picker.js` (1013 linhas) monta campo,
-  lista e cartões a partir de `[data-entity-picker]`, e as classes
-  `search-picker__*` que ele gera são contrato dele. Este componente entrega o
-  markup que o motor espera e a folha `v2/picker.css` estiliza o que ele cria —
-  o mesmo arranjo já validado no select.
+  NÃO clona o JS. O `js/components/picker.js` (1013 linhas) monta campo, lista e
+  cartões a partir do `<select>`, e as classes `search-picker__*` que ele gera
+  são contrato dele. Este componente entrega o `<select>` que o motor espera, e
+  a folha `v2/picker.css` veste o que ele cria.
 
-  Clonar 1013 linhas para trocar nomes de classe criaria dois motores de busca
-  em paralelo, com o dobro de superfície para divergir.
+  O GANCHO VAI NO `<select>`, não no invólucro. O motor procura exatamente
+  `select[data-entity-picker]` — com o atributo na `<div>`, como estava aqui, o
+  componente renderizava e simplesmente não inicializava: nenhum erro, nenhum
+  aviso, um campo morto na tela. A `.picker` fica no invólucro só para o CSS
+  alcançar a estrutura que o JS insere ao lado do `<select>`.
 
-  `mode`: "single" ou "multi".
+  `mode`: "single" ou "multi". `options` é uma lista de `{value, label}` para
+  quem não passa um `field` de formulário.
+
+  `selected_title` é o rótulo da caixa dos escolhidos. O padrão do JS é
+  "SELECIONADOS", em caixa alta — herança do desenho antigo, onde o rótulo era
+  miúdo e espaçado. Aqui ele é um título como os outros do sistema.
 {% endcomment %}
-<div
-  class="picker{% if extra_class %} {{ extra_class }}{% endif %} search-picker search-picker--{{ mode|default:'single' }}"
-  data-entity-picker
-  data-entity-picker-root
-  data-picker-v2
-  data-entity-picker-mode="{{ mode|default:'single' }}"
-  {% if placeholder %}data-entity-picker-placeholder="{{ placeholder }}"{% endif %}
->
+<div class="picker{% if extra_class %} {{ extra_class }}{% endif %}">
   {% if field %}
     {{ field.as_widget }}
   {% else %}
-    <select name="{{ name }}" aria-label="{{ aria_label }}" class="search-picker__native" hidden></select>
+    <select
+      class="search-picker__native"
+      data-entity-picker="true"
+      data-picker-v2
+      data-entity-picker-mode="{{ mode|default:'single' }}"
+      data-picker-variant="compact"
+      data-placeholder="{{ placeholder|default:'Digite para buscar' }}"
+      data-panel-title="{{ selected_title|default:'Selecionados' }}"
+      name="{{ name }}"
+      aria-label="{{ aria_label }}"
+      {% if mode == "multi" %}multiple{% endif %}
+    >
+      <option value=""></option>
+      {% for opcao in options %}
+        <option value="{{ opcao.value }}">{{ opcao.label }}</option>
+      {% endfor %}
+    </select>
   {% endif %}
 </div>

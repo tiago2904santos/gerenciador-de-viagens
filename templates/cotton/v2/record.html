@@ -1,4 +1,4 @@
-{% cotton:vars actions body extra_class eyebrow meta status status_tone title %}
+{% cotton:vars actions body extra_class eyebrow meta search_text status status_tone title %}
 {% comment %}
   Record v2 — o card de um registro na lista. Par de `static/css/v2/record.css`.
 
@@ -12,8 +12,18 @@
   As ações ficam à direita e centradas na faixa: em lista o olho percorre a
   coluna da esquerda lendo e a da direita agindo, e o alvo fica sempre na mesma
   altura, registro após registro.
+
+  `data-collection-item` é o que faz o `collection.js` enxergar este registro
+  como filtrável. `search_text` diz por quais palavras ele responde; sem ele o
+  motor cai no texto visível, que serve, mas não alcança o que não está na tela
+  — protocolo, CPF, número do ofício.
 {% endcomment %}
-<article class="record{% if extra_class %} {{ extra_class }}{% endif %}">
+<article
+  class="record{% if extra_class %} {{ extra_class }}{% endif %}"
+  data-collection-item
+  {% if search_text %}data-search-text="{{ search_text }}"{% endif %}
+  {% if status %}data-status-value="{{ status }}"{% endif %}
+>
   <div class="record__row">
     <div class="record__heading">
       <div class="record__title-row">

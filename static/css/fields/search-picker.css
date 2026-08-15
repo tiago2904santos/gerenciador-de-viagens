@@ -248,7 +248,7 @@
 
 .search-picker__selected-card > .search-picker__remove {
   background: var(--danger-bg);
-  align-self: stretch;
+  align-self: center;
   border: 0;
   border-radius: calc(var(--search-picker-radius) - 1px) 0 0 calc(var(--search-picker-radius) - 1px);
   border-right: 1px solid var(--danger-border);

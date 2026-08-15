@@ -1586,34 +1586,6 @@ textarea[readonly] {
   text-transform: none;
   width: auto;
 }
-.search-picker__selected-card > .search-picker__remove {
-  background: var(--danger-bg);
-  align-self: stretch;
-  border: 0;
-  border-radius: calc(var(--search-picker-radius) - 1px) 0 0 calc(var(--search-picker-radius) - 1px);
-  border-right: 1px solid var(--danger-border);
-  box-shadow: none;
-  color: var(--danger-text);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-black);
-  grid-column: 1;
-  grid-row: 1;
-  height: auto;
-  margin: calc(var(--space-3) * -1) 0 calc(var(--space-3) * -1) calc(var(--space-3) * -1);
-  min-width: 0;
-  opacity: 0;
-  overflow: hidden;
-  text-transform: uppercase;
-  transform: translateX(calc(var(--space-2) * -1));
-  transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    color var(--transition-fast),
-    opacity var(--transition-base),
-    transform var(--transition-base),
-    width var(--transition-base);
-  width: var(--remove-rail-width);
-}
 .search-picker__selected-card:not(.search-picker__selected-card--with-term):not(.search-picker__selected-card--with-driver) {
   --remove-rail-width: var(--space-9);
 }

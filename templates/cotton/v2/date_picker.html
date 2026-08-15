@@ -1,4 +1,4 @@
-{% cotton:vars aria_label extra_class mode picker_id placeholder_end placeholder_start %}
+{% cotton:vars aria_label button_label extra_class mode picker_id placeholder_end placeholder_start %}
 {% comment %}
   Date picker v2 — campo de data, simples ou intervalo.
 
@@ -14,9 +14,18 @@
   O JS é o `js/components/date-picker.js`, achado pelo partial.
 {% endcomment %}
 <div class="date-field{% if extra_class %} {{ extra_class }}{% endif %}">
+  {% comment %}
+    `button_label` troca os dois campos por um GATILHO ÚNICO: o botão mostra o
+    intervalo escolhido no próprio rótulo ("10/08 → 12/08/2026") ou a data por
+    extenso, quando é uma só. O rótulo passado é o texto de chamada, exibido
+    enquanto nada foi escolhido.
+  {% endcomment %}
   <c-ui.forms.date_picker
     :mode="mode"
     :picker_id="picker_id"
+    control_variant="{% if button_label %}filter-pill{% endif %}"
+    :trigger_label="button_label"
+    compact_range_display="{% if button_label %}1{% endif %}"
     :start_placeholder="placeholder_start"
     :end_placeholder="placeholder_end"
     :single_placeholder="placeholder_start"

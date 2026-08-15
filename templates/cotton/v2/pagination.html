@@ -1,0 +1,55 @@
+{% cotton:vars extra_class page_obj page_querystring pages required %}
+{% comment %}
+  Paginação v2 — contagem e controles de página.
+
+  Consome o mesmo contrato que as views já produzem: `page_obj` (a `Page` do
+  Django), `pages` (a régua com reticências, opcional) e `page_querystring` (os
+  filtros da URL, sem o `page`).
+
+  `required` diz "esta lista É paginada". Sem ele, uma lista que perdeu o
+  `page_obj` no contexto simplesmente não mostra os controles, e a tela fica
+  parecendo ter só a primeira página — falha silenciosa. Com ele, o componente
+  denuncia na tela.
+
+  A `Page` vazia é falsy em Django, então o teste é por `page_obj.paginator` e
+  não por `page_obj`.
+{% endcomment %}
+{% load icones %}
+{% if not page_obj.paginator %}
+  {% if required %}
+    <p class="pagination pagination--erro" role="alert">
+      Paginação indisponível: esta lista foi renderizada sem <code>page_obj</code>.
+    </p>
+  {% endif %}
+{% elif page_obj.paginator.num_pages > 1 %}
+  <nav class="pagination{% if extra_class %} {{ extra_class }}{% endif %}" aria-label="Paginação">
+    <p class="pagination__info" aria-live="polite">
+      Mostrando <strong>{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong>
+      de <strong>{{ page_obj.paginator.count }}</strong>
+    </p>
+
+    <div class="pagination__controls">
+      {% if page_obj.has_previous %}
+        <a class="pagination__nav" href="?{% if page_querystring %}{{ page_querystring }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Página anterior">{% icone_svg "arrow-left" %}</a>
+      {% else %}
+        <span class="pagination__nav" aria-disabled="true">{% icone_svg "arrow-left" %}</span>
+      {% endif %}
+
+      {% for numero in pages|default:page_obj.paginator.page_range %}
+        {% if numero == "..." %}
+          <span class="pagination__ellipsis" aria-hidden="true">…</span>
+        {% elif numero == page_obj.number %}
+          <span class="pagination__page pagination__page--current" aria-current="page">{{ numero }}</span>
+        {% else %}
+          <a class="pagination__page" href="?{% if page_querystring %}{{ page_querystring }}&{% endif %}page={{ numero }}" aria-label="Ir para a página {{ numero }}">{{ numero }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a class="pagination__nav" href="?{% if page_querystring %}{{ page_querystring }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Próxima página">{% icone_svg "arrow-right" %}</a>
+      {% else %}
+        <span class="pagination__nav" aria-disabled="true">{% icone_svg "arrow-right" %}</span>
+      {% endif %}
+    </div>
+  </nav>
+{% endif %}

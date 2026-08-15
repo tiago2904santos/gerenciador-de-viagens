@@ -565,6 +565,15 @@
         if (display) {
           display.value = selectedSingle ? formatDisplayDate(selectedSingle) : '';
         }
+        /* Gatilho único: o rótulo do botão É o valor. Por extenso, porque num
+         * botão sozinho "12 de outubro de 2026" se lê de relance e "12/10/2026"
+         * obriga a decifrar. Sem data, volta ao texto de chamada. */
+        if (displayText) {
+          displayText.textContent = selectedSingle
+            ? formatLongDate(selectedSingle)
+            : (displayText.dataset.placeholder || 'Escolher data');
+          root.classList.toggle('travel-period-filter--active', !!selectedSingle);
+        }
         if (singleHidden) {
           singleHidden.value = selectedSingle ? formatIsoDate(selectedSingle) : '';
         }
@@ -606,7 +615,11 @@
           displayText.textContent = startRangeFormatter(selectedStart) + '  →  ' + formatDisplayDate(selectedEnd);
           root.classList.add('travel-period-filter--active');
         } else if (selectedStart) {
-          displayText.textContent = startRangeFormatter(selectedStart) + '  →  …';
+          /* Uma data só é um resultado válido, não um intervalo pela metade: o
+           * mesmo controle aceita as duas coisas. Por extenso, como no modo
+           * simples — "10/08 → …" anunciava uma segunda data que pode nunca
+           * vir. O calendário aberto já mostra que a volta está em aberto. */
+          displayText.textContent = formatLongDate(selectedStart);
           root.classList.add('travel-period-filter--active');
         } else {
           displayText.textContent = displayPlaceholder;

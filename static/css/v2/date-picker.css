@@ -104,6 +104,87 @@
   color: var(--accent);
 }
 
+/* ---- o gatilho único ------------------------------------------------------
+ *
+ * Um botão só, no lugar dos dois campos: o rótulo dele É o valor escolhido.
+ * As classes são do partial global (`travel-period-filter__*`); aqui ele veste
+ * o botão secundário do sistema, para não ser mais uma aparência de botão.
+ */
+:is(html[data-theme]) .date-field .travel-period-filter__btn {
+  align-items: center;
+  background: var(--surface-contrast, var(--surface-field));
+  border: 1px solid transparent;
+  border-radius: var(--radius-field);
+  box-sizing: border-box;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--text-size-base);
+  gap: var(--gap-tight);
+  justify-content: flex-start;
+  min-height: var(--control-height);
+  padding: var(--pad-field);
+  text-align: left;
+  transition: background var(--ease), color var(--ease);
+  width: 100%;
+}
+
+/* Com data escolhida o texto deixa de ser chamada e vira conteúdo — por isso
+   assume a cor de leitura. O JS marca a raiz com `--active`. */
+:is(html[data-theme]) .date-field.travel-period-filter--active .travel-period-filter__btn,
+:is(html[data-theme]) .date-field .travel-period-filter--active .travel-period-filter__btn {
+  color: var(--text-strong);
+}
+
+/* Sem realce ao passar o mouse, com ou sem data escolhida.
+ *
+ * Este gatilho é um CAMPO — o rótulo dele é o valor —, e campo não muda de cor
+ * sob o cursor. É a mesma regra do gatilho do select (`v2/select.css`).
+ *
+ * As três formas abaixo são as que a folha legada usa, e cada uma fazia uma
+ * coisa: o hover trocava o fundo por um par de gradientes (o truque de borda
+ * que já apareceu nos botões do painel); a classe `--active`, que o JS põe
+ * quando há data, tingia o botão de accent; e o hover COM data somava as duas.
+ * Cobrir só uma delas deixaria as outras aparecendo. */
+:is(html[data-theme]) .date-field .travel-period-filter__btn:hover:not(:disabled),
+:is(html[data-theme]) .date-field .travel-period-filter--active .travel-period-filter__btn,
+:is(html[data-theme]) .date-field.travel-period-filter--active .travel-period-filter__btn,
+:is(html[data-theme]) .date-field
+  .travel-period-filter--active .travel-period-filter__btn:hover:not(:disabled),
+:is(html[data-theme]) .date-field.travel-period-filter--active
+  .travel-period-filter__btn:hover:not(:disabled) {
+  background: var(--surface-contrast, var(--surface-field));
+  background-image: none;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+:is(html[data-theme]) .date-field .travel-period-filter__btn:focus-visible {
+  border-color: var(--focus-ring);
+  outline: none !important;
+}
+
+:is(html[data-theme]) .date-field .travel-period-filter__btn .button__icon {
+  align-items: center;
+  color: var(--accent);
+  display: inline-flex;
+  flex: none;
+}
+
+:is(html[data-theme]) .date-field .travel-period-filter__btn .button__icon svg {
+  height: 16px;
+  width: 16px;
+}
+
+/* O rótulo trunca em vez de esticar o botão. */
+:is(html[data-theme]) .date-field .travel-period-filter__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ---- o painel do calendário ----------------------------------------------
  *
  * O painel é transplantado para o `body` e perde os ancestrais, então a raiz
@@ -223,14 +304,7 @@
 
 :is(html[data-theme]) .date-field__panel .date-picker__day {
   aspect-ratio: 1;
-  /* Sem borda: ela é transparente, mas ocupa 1px de cada lado, e o realce —
-     que se ancora na caixa de recuo — ficava 1,6px menor que a célula. */
-  border: 0;
   height: auto;
-  /* `line-height: 1` para o número cair no centro exato. Com os 21px herdados,
-     a entrelinha sobra embaixo e o dígito fica 1px acima do meio; dentro de um
-     círculo isso salta à vista. */
-  line-height: 1;
   width: 100%;
 }
 

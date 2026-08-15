@@ -1983,9 +1983,103 @@
  * se confundir com a caixa de busca logo acima.
  */
 
+/* A caixa dos escolhidos: sem borda, e declarando o degrau que os itens usam.
+ *
+ * Ela estava na MESMA cor dos itens (`surface-field` nos dois), porque nenhuma
+ * das duas declarava o próprio degrau — as duas liam o `--surface-contrast` do
+ * painel da página. O resultado era uma lista chapada, com o contorno fazendo o
+ * trabalho que a superfície devia fazer.
+ *
+ * Declarando aqui, a caixa fica num degrau e os itens no oposto, que é a regra
+ * do resto do sistema. A borda sai junto: separação entre camadas é superfície,
+ * não linha. */
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-panel {
+  --surface: var(--surface-field);
+  --surface-contrast: var(--surface-rail);
+
+  background: var(--surface-field);
+  border: 0;
+  /* As mesmas medidas do `form-block`: raio de campo, recuo e vão de `--gap`.
+     A caixa dos escolhidos É uma seção de conteúdo — trocar o desenho dela por
+     um próprio é o começo de mais uma família de caixas. */
+  border-radius: var(--radius-field);
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+  padding: var(--gap);
+}
+
+/* O contador é o selo do accent: fundo cheio, texto na cor que o accent pede.
+   O legado o pintava com azul e borda próprios (`#12507f`), que não vinham de
+   token nenhum e não acompanhavam a troca de tema. */
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-count {
+  align-items: center;
+  background: var(--accent);
+  border: 0;
+  border-radius: var(--radius-pill);
+  color: var(--text-on-accent);
+  display: inline-flex;
+  flex: none;
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  justify-content: center;
+  min-width: 22px;
+  padding: 2px 6px;
+}
+
+/* Cabeçalho no arranjo do `form-block`: título à esquerda, contador à direita. */
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-header {
+  align-items: baseline;
+  display: flex;
+  gap: var(--gap);
+  justify-content: space-between;
+  min-width: 0;
+  padding: 0;
+}
+
+/* Tipografia do `form-block__title`. O legado escrevia este rótulo em
+   maiúsculas miúdas com espaçamento de letra; aqui ele é um título como
+   qualquer outro do sistema. */
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-title {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  letter-spacing: normal;
+  margin: 0;
+  text-transform: none;
+}
+
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-empty {
+  border: 0;
+}
+
+/* Teto de TRÊS escolhidos; do quarto em diante, rola.
+ *
+ * A conta é a mesma do menu do select (`v2/listbox.css`): três itens inteiros e
+ * três vãos — os dois entre eles e mais um de respiro, que é o que denuncia
+ * haver um quarto. Sem esse terceiro vão, o item de baixo encosta na borda e a
+ * lista parece terminar ali.
+ *
+ * A altura do item é DECLARADA, não deduzida do conteúdo: é ela que define
+ * quantos cabem, e o teto é um múltiplo exato dela. Deduzir faria o corte cair
+ * no meio de um cartão assim que um nome ocupasse duas linhas. */
 :is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-list {
+  --escolhido-height: 56px;
+
   display: grid;
   gap: var(--gap-tight);
+  max-height: calc(
+    var(--escolhido-height) * 3 + var(--gap-tight) * 3
+  );
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-width: thin;
+}
+
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-card {
+  min-height: var(--escolhido-height);
 }
 
 :is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-card {
@@ -2039,16 +2133,106 @@
   padding: 12px;
 }
 
+/* Sempre visível, e encostado na direita da faixa.
+ *
+ * O legado o deixava com `opacity: 0`, revelando no hover — quem usa toque não
+ * tem hover, e mesmo no mouse a ação de remover ficava escondida até alguém
+ * passar por cima por acaso. E uma margem negativa de -12px o puxava para junto
+ * do texto: com o conteúdo curto, ele parava no meio do cartão.
+ *
+ * `margin-left: auto` empurra para o fim da faixa e cancela a margem negativa
+ * numa declaração só. */
 :is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove {
   background: none;
   border: 0;
   color: var(--text-muted);
   cursor: pointer;
   flex: none;
+  /* Margem inteira: o legado usa `margin: -12px`, e sobrescrever só a da
+     esquerda deixava as de cima e de baixo negativas — o botão transbordava a
+     altura do cartão. */
+  margin: 0 0 0 auto;
+  opacity: 1;
+  /* O legado ainda o desloca 8px para a esquerda com `translateX(-8px)` — o
+     botão já estava no lugar certo e era movido depois. Zerar a margem não
+     resolvia porque o deslocamento não é margem. */
+  transform: none;
 }
 
+/* A geometria do botão é a MESMA em todo estado — repouso, sob o mouse, com
+ * foco, no clique, e também quando o mouse está sobre a faixa inteira.
+ *
+ * O legado mexe na posição dele em mais de um estado (o `translateX(-8px)` do
+ * repouso é só um deles), e o resultado é um botão que dá um pulo quando o
+ * cursor entra no cartão. Botão que se move sob o cursor é botão que se erra:
+ * a mira é feita antes do movimento.
+ *
+ * Trava a caixa inteira, não só o `transform`: largura, altura, margem e recuo
+ * juntos, porque qualquer um deles desloca o que está ao lado. */
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove,
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:hover,
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:focus,
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:focus-visible,
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:active,
+:is(html[data-theme]) :is(.picker, .destination-row)
+  .search-picker__selected-card:hover .search-picker__remove,
+:is(html[data-theme]) :is(.picker, .destination-row)
+  .search-picker__selected-card:focus-within .search-picker__remove {
+  background: none;
+  border: 0;
+  /* Pílula sempre: é um botão de ícone quadrado. O legado deixava o raio
+     assimétrico (`11px 0 0 11px`), e era ele que o anel de foco seguia. */
+  border-radius: var(--radius-pill);
+  box-shadow: none;
+  height: var(--control-height-sm);
+  margin: 0 0 0 auto;
+  opacity: 1;
+  padding: 0;
+  transform: none;
+  translate: none;
+  width: var(--control-height-sm);
+}
+
+/* O conteúdo ocupa o que sobra, para o botão ter para onde ser empurrado. */
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-main {
+  flex: 1 1 auto;
+}
+
+/* Anel SÓ no teclado, e redondo.
+ *
+ * `:focus:not(:focus-visible)` é o clique do mouse: o foco existe — o botão
+ * acabou de ser acionado —, mas nenhum anel aparece. O legado marcava `:focus`
+ * puro, que dispara nos dois casos, e era por isso que o anel nascia ao clicar
+ * e ficava lá até o clique seguinte.
+ *
+ * `:focus-visible` é o que o navegador entende como "chegou por teclado". O
+ * anel segue o `border-radius` do elemento, então o raio de pílula num botão
+ * quadrado de 28px dá um círculo.
+ *
+ * O `!important` nos dois é para vencer o de `base/base.css`, que impõe o anel
+ * a todo controle como garantia global — aqui ela não cai, só troca de gatilho
+ * e de forma. */
+/* Sob o mouse muda a COR, e só: vermelho de perigo, avisando o que o botão faz.
+   Nenhum anel, nenhum fundo, nenhuma borda — foi o anel de `outline` no hover,
+   herdado do legado, que parecia foco e aparecia sem ninguém ter usado o Tab. */
 :is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:hover {
-  color: var(--status-late);
+  color: var(--danger);
+}
+
+/* Nada de anel fora do teclado. O legado põe `outline` no HOVER — é ele que
+   aparecia ao passar o mouse e que parecia foco. E `:focus:not(:focus-visible)`
+   cobre o clique, onde o foco existe mas não deve se anunciar. */
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove,
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:hover,
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:active,
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:focus:not(:focus-visible) {
+  outline: none !important;
+}
+
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:focus-visible {
+  border-radius: var(--radius-pill);
+  outline: 2px solid var(--focus-ring) !important;
+  outline-offset: 2px;
 }
 /* <<< css/v2/picker.css <<< */
 
@@ -2157,6 +2341,87 @@
 
 :is(html[data-theme]) .date-field .date-picker__trigger:hover {
   color: var(--accent);
+}
+
+/* ---- o gatilho único ------------------------------------------------------
+ *
+ * Um botão só, no lugar dos dois campos: o rótulo dele É o valor escolhido.
+ * As classes são do partial global (`travel-period-filter__*`); aqui ele veste
+ * o botão secundário do sistema, para não ser mais uma aparência de botão.
+ */
+:is(html[data-theme]) .date-field .travel-period-filter__btn {
+  align-items: center;
+  background: var(--surface-contrast, var(--surface-field));
+  border: 1px solid transparent;
+  border-radius: var(--radius-field);
+  box-sizing: border-box;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--text-size-base);
+  gap: var(--gap-tight);
+  justify-content: flex-start;
+  min-height: var(--control-height);
+  padding: var(--pad-field);
+  text-align: left;
+  transition: background var(--ease), color var(--ease);
+  width: 100%;
+}
+
+/* Com data escolhida o texto deixa de ser chamada e vira conteúdo — por isso
+   assume a cor de leitura. O JS marca a raiz com `--active`. */
+:is(html[data-theme]) .date-field.travel-period-filter--active .travel-period-filter__btn,
+:is(html[data-theme]) .date-field .travel-period-filter--active .travel-period-filter__btn {
+  color: var(--text-strong);
+}
+
+/* Sem realce ao passar o mouse, com ou sem data escolhida.
+ *
+ * Este gatilho é um CAMPO — o rótulo dele é o valor —, e campo não muda de cor
+ * sob o cursor. É a mesma regra do gatilho do select (`v2/select.css`).
+ *
+ * As três formas abaixo são as que a folha legada usa, e cada uma fazia uma
+ * coisa: o hover trocava o fundo por um par de gradientes (o truque de borda
+ * que já apareceu nos botões do painel); a classe `--active`, que o JS põe
+ * quando há data, tingia o botão de accent; e o hover COM data somava as duas.
+ * Cobrir só uma delas deixaria as outras aparecendo. */
+:is(html[data-theme]) .date-field .travel-period-filter__btn:hover:not(:disabled),
+:is(html[data-theme]) .date-field .travel-period-filter--active .travel-period-filter__btn,
+:is(html[data-theme]) .date-field.travel-period-filter--active .travel-period-filter__btn,
+:is(html[data-theme]) .date-field
+  .travel-period-filter--active .travel-period-filter__btn:hover:not(:disabled),
+:is(html[data-theme]) .date-field.travel-period-filter--active
+  .travel-period-filter__btn:hover:not(:disabled) {
+  background: var(--surface-contrast, var(--surface-field));
+  background-image: none;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+:is(html[data-theme]) .date-field .travel-period-filter__btn:focus-visible {
+  border-color: var(--focus-ring);
+  outline: none !important;
+}
+
+:is(html[data-theme]) .date-field .travel-period-filter__btn .button__icon {
+  align-items: center;
+  color: var(--accent);
+  display: inline-flex;
+  flex: none;
+}
+
+:is(html[data-theme]) .date-field .travel-period-filter__btn .button__icon svg {
+  height: 16px;
+  width: 16px;
+}
+
+/* O rótulo trunca em vez de esticar o botão. */
+:is(html[data-theme]) .date-field .travel-period-filter__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ---- o painel do calendário ----------------------------------------------
@@ -2278,14 +2543,7 @@
 
 :is(html[data-theme]) .date-field__panel .date-picker__day {
   aspect-ratio: 1;
-  /* Sem borda: ela é transparente, mas ocupa 1px de cada lado, e o realce —
-     que se ancora na caixa de recuo — ficava 1,6px menor que a célula. */
-  border: 0;
   height: auto;
-  /* `line-height: 1` para o número cair no centro exato. Com os 21px herdados,
-     a entrelinha sobra embaixo e o dígito fica 1px acima do meio; dentro de um
-     círculo isso salta à vista. */
-  line-height: 1;
   width: 100%;
 }
 

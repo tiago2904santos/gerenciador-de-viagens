@@ -1,0 +1,98 @@
+/* Paginação — contagem e controles. Depende de `v2/tokens.css`. */
+
+:is(html[data-theme]) .pagination {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  justify-content: space-between;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .pagination__info {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  margin: 0;
+}
+
+:is(html[data-theme]) .pagination__info strong {
+  color: var(--text-strong);
+  font-weight: var(--weight-strong);
+}
+
+:is(html[data-theme]) .pagination__controls {
+  align-items: center;
+  display: flex;
+  gap: var(--gap-tight);
+}
+
+/* Página e seta são o mesmo controle miúdo: quadrados da altura reduzida, no
+   degrau oposto ao do contêiner. Um botão por página numa lista longa vira uma
+   fileira comprida — por isso a régua de páginas vem pronta da view, com
+   reticências, e não é decidida aqui. */
+:is(html[data-theme]) .pagination__page,
+:is(html[data-theme]) .pagination__nav {
+  align-items: center;
+  background: var(--surface-contrast, var(--surface-field));
+  border: 1px solid transparent;
+  border-radius: var(--radius-field);
+  box-sizing: border-box;
+  color: var(--text-strong);
+  display: inline-flex;
+  font-size: var(--text-size-eyebrow);
+  height: var(--control-height-sm);
+  justify-content: center;
+  min-width: var(--control-height-sm);
+  padding: 0 8px;
+  text-decoration: none;
+  transition: background var(--ease), color var(--ease);
+}
+
+:is(html[data-theme]) .pagination__nav svg {
+  height: 16px;
+  width: 16px;
+}
+
+/* Mesmo realce do botão secundário: 14% do accent na superfície e o conteúdo
+   assumindo o accent. Nunca mistura de matiz com a cor do texto. */
+:is(html[data-theme]) .pagination__page:hover,
+:is(html[data-theme]) .pagination__nav:hover {
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface-contrast, var(--surface-rail)));
+  color: var(--accent);
+}
+
+/* A página atual é o único elemento em accent cheio: é onde se está. */
+:is(html[data-theme]) .pagination__page--current {
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font-weight: var(--weight-strong);
+}
+
+/* Seta sem para onde ir continua ocupando o lugar, apagada: some o alvo, não a
+   caixa — senão a fileira de controles muda de largura na última página. */
+:is(html[data-theme]) .pagination__nav[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+:is(html[data-theme]) .pagination__ellipsis {
+  color: var(--text-muted);
+  padding: 0 4px;
+}
+
+:is(html[data-theme]) .pagination__page:focus-visible,
+:is(html[data-theme]) .pagination__nav:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* O aviso de lista paginada sem `page_obj`. É erro de contexto, não estado da
+   interface — por isso grita em vez de se acomodar no desenho. */
+:is(html[data-theme]) .pagination--erro {
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  border-radius: var(--radius-field);
+  color: var(--danger);
+  font-size: var(--text-size-base);
+  margin: 0;
+  padding: var(--gap);
+}

@@ -294,7 +294,11 @@
 
     <c-v2.panel title="Picker" description="Busca de entidade. O motor é o picker.js — o v2 veste o que ele cria, sem clonar 1013 linhas.">
       <c-slot name="body">
-        <c-v2.picker mode="multi" name="v2_equipe" aria_label="Buscar servidor" placeholder="Buscar por nome, CPF ou RG" />
+        {% comment %}
+          Com opções de verdade: um picker sem nada para buscar não prova que
+          está funcionando — foi assim que ele passou por pronto estando morto.
+        {% endcomment %}
+        <c-v2.picker mode="multi" name="v2_equipe" aria_label="Buscar servidor" placeholder="Buscar por nome, CPF ou RG" :options="v2_opcoes_longas" />
       </c-slot>
     </c-v2.panel>
 
@@ -308,6 +312,15 @@
         <c-v2.field label="Intervalo">
           <c-slot name="control">
             <c-v2.date_picker mode="range" picker_id="v2-data-intervalo" placeholder_start="Data de ida" placeholder_end="Data de volta" aria_label="Intervalo" />
+          </c-slot>
+        </c-v2.field>
+        {% comment %}
+          Um controle só, que aceita as duas coisas: marcar um dia e fechar dá
+          uma data; marcar dois dá o intervalo. O rótulo do botão é o valor.
+        {% endcomment %}
+        <c-v2.field label="Botão de período" help="Um dia dá uma data; dois dias dão o intervalo.">
+          <c-slot name="control">
+            <c-v2.date_picker mode="range" picker_id="v2-data-botao" button_label="Período" aria_label="Período" />
           </c-slot>
         </c-v2.field>
       </c-slot>
