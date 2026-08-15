@@ -1,0 +1,9 @@
+{% comment %}
+  Opções do picker de estado. Renderizado por `{% destinos_opcoes_estado %}`
+  (`core/templatetags/destinos.py`), que busca a lista quando ela não vem e
+  pré-seleciona a UF da sede quando a linha não traz estado.
+{% endcomment %}
+<option value=""></option>
+{% for estado in estados %}
+  <option value="{{ estado.pk }}"{% if selecionado == estado.pk|stringformat:'s' %} selected{% endif %}>{{ estado.nome }} ({{ estado.sigla }})</option>
+{% endfor %}

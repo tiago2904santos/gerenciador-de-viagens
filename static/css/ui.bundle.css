@@ -112,6 +112,11 @@
      importasse mais que o dado. */
   --pad-rail: 12px;
   --control-height: 44px;
+  /* A altura miúda, para controles que vivem DENTRO de outro — o gatilho do
+     calendário dentro do campo, os botões dentro do painel. Duas alturas, não
+     três: a antiga escala legada tinha `sm` e `xs` sem nada por trás, e o que
+     justifica esta é a hierarquia, não o gosto. */
+  --control-height-sm: 28px;
 
   /* ---- tipografia ------------------------------------------------------ */
   --text-size-eyebrow: 12px;
@@ -346,9 +351,40 @@
 }
 
 
-/* Tamanho único: 44px. O legado tinha três alturas para o mesmo controle e
-   nenhuma escala por trás — os valores de `sm` e `xs` eram fixos e arbitrários.
-   Um botão é um botão.
+/* Só o ícone, em caixa quadrada da altura do controle. Existe para as ações que
+   se repetem numa lista, onde o rótulo seria a mesma palavra em toda linha; o
+   nome vive no `aria-label`, que passa a ser obrigatório. Vale com qualquer
+   variante — é forma, não ênfase. */
+:is(html[data-theme]) .button--icon {
+  padding: 0;
+  width: var(--control-height);
+}
+
+/* ---- miúdo --------------------------------------------------------------- */
+
+:is(html[data-theme]) .button--sm {
+  font-size: var(--text-size-eyebrow);
+  min-height: var(--control-height-sm);
+  padding: 0 10px;
+}
+
+:is(html[data-theme]) .button--sm.button--icon {
+  width: var(--control-height-sm);
+}
+
+:is(html[data-theme]) .button--sm .button__icon svg {
+  height: 14px;
+  width: 14px;
+}
+
+/* Duas alturas: 44px, a padrão, e 28px para o botão que vive DENTRO de outro
+   controle — o painel do calendário, por exemplo, onde quatro botões de 44px
+   ocupam mais do que o mês inteiro que eles navegam.
+
+   O legado tinha três (`sm`, `xs` e a base) sem nada por trás: valores fixos
+   escolhidos um a um. A diferença aqui é que a segunda altura tem critério —
+   está aninhada dentro de outro controle — e sai do mesmo token que todo o
+   resto lê.
 
    ---- ícone ---------------------------------------------------------------
  *
@@ -1708,84 +1744,109 @@
 /* >>> css/v2/destination-row.css >>> */
 /* Linha de destino. Depende de `v2/tokens.css`. */
 
-/* Grade de duas colunas: o "+" e o resto.
+/* Duas metades EXATAS.
  *
- * O "+" tem largura fixa e não se mexe. Estado, cidade e "×" repartem a segunda
- * coluna, cuja largura não muda — é a da linha menos o botão e um vão.
+ * Esquerda: alça, "+" e o campo de estado. Direita: o campo de cidade e o "×".
+ * Cada lado é 1fr, então o que entra ou sai de um não mexe no outro — foi essa
+ * a regra que faltava nas tentativas anteriores.
  *
- * O ESTADO tem largura fixa, calculada sobre 100% dessa coluna: metade do que
- * sobra quando a linha está cheia. Como a coluna não muda, ele também não.
- *
- * A CIDADE fica com o resto. Com um destino só, o `location-rows.js` marca o
- * "×" com `hidden` — não faz sentido remover o único — e o botão deixa de gerar
- * caixa. Estando os três no MESMO flex, o vão dele some junto, e os 56px vão
- * inteiros para a cidade.
- *
- * Duas tentativas anteriores não resolvem, e ficam registradas para não voltarem:
- * reservar a coluna com `visibility: hidden` perde para o
- * `[hidden] { display: none !important }` do bundle legado; e deixar o "×" como
- * quarta coluna da linha o empurrava para uma segunda fileira, porque a grade
- * só declarava três. */
+ * As duas que não deram certo, para não voltarem: colunas fixas para cada
+ * controle fazem o campo de estado pagar por tudo que nasce à esquerda (a alça
+ * o levou de 200 para 131); e fixar o grupo da direita em 256px funciona na
+ * largura em que foi medido e desanda em qualquer outra (numa tela larga o
+ * estado ia a 690 com a cidade presa em 256). */
 :is(html[data-theme]) .destination-row {
   align-items: center;
   display: grid;
   gap: var(--gap);
-  grid-template-columns: var(--control-height) minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   min-width: 0;
+  /* Âncora do indicador de destino do arraste, que é desenhado no vão. */
+  position: relative;
 }
 
 
-/* Estado, cidade e "×" na mesma faixa: é o que faz o vão do botão sumir com ele
-   quando não há o que remover. */
-:is(html[data-theme]) .destination-row__fields {
+/* As duas metades. Dentro de cada uma, o campo estica e os botões não. */
+:is(html[data-theme]) .destination-row__start,
+:is(html[data-theme]) .destination-row__end {
   align-items: center;
   display: flex;
   gap: var(--gap);
   min-width: 0;
 }
 
-/* O estado não se mexe: largura fixa, tirada de 100% da faixa — que não muda. */
-:is(html[data-theme]) .destination-row__fields > .search-picker:first-of-type {
-  flex: 0 0 calc((100% - var(--control-height) - var(--gap) * 2) / 2);
-  min-width: 0;
-}
-
-/* A cidade fica com o que sobrar. */
-:is(html[data-theme]) .destination-row__fields > .search-picker:last-of-type {
+:is(html[data-theme]) .destination-row__start > .search-picker,
+:is(html[data-theme]) .destination-row__end > .search-picker {
   flex: 1 1 0;
   min-width: 0;
 }
 
-/* Remover e adicionar são o mesmo botão: mesma medida, mesma superfície, mesmo
-   raio. Só o que eles significam difere, e isso está no hover — vermelho para
-   quem tira, accent para quem põe. Declarados juntos porque desenhá-los em
-   regras separadas é como o sistema antigo acumulou dezoito variantes de botão
-   que ninguém tinha decidido. */
-:is(html[data-theme]) .destination-row__remove,
-:is(html[data-theme]) .destinations__add {
+/* Com um destino só, o `location-rows.js` marca o "×" com `hidden` — não faz
+   sentido remover o único. Estando os dois no MESMO flex, o vão dele some junto
+   com o botão, e a cidade fica com a metade inteira. */
+
+/* Os dois botões da linha são o `button` do sistema, na forma `--icon`: o de
+   adicionar é `primary`, o de remover é `danger`. Nenhum desenho próprio aqui —
+   foi assim que o sistema antigo acumulou dezoito variantes que ninguém tinha
+   decidido. Só o que é POSIÇÃO fica nesta folha. */
+
+/* ---- reordenar por arraste ------------------------------------------------
+ *
+ * O motor é o `initDragDrop` do `location-rows.js`, que só precisa da alça e
+ * das três classes de estado abaixo. Elas existiam apenas em
+ * `pages/roteiros.css`, folha de uma tela — fora dela o arraste funcionava sem
+ * dar nenhum retorno visual, que é o mesmo que não funcionar.
+ */
+:is(html[data-theme]) .destination-row__handle {
   align-items: center;
-  background: var(--surface-contrast, var(--surface-field));
-  border: 0;
-  border-radius: var(--radius-field);
   color: var(--text-muted);
-  cursor: pointer;
+  cursor: grab;
   display: inline-flex;
-  flex: none;
-  font: inherit;
-  font-size: 20px;
-  height: var(--control-height);
   justify-content: center;
-  line-height: 1;
-  width: var(--control-height);
+  /* `touch-action` é o que faz o arraste valer no toque: sem ela o navegador
+     interpreta o gesto como rolagem e o `pointermove` nunca chega. */
+  touch-action: none;
+  width: 20px;
 }
 
-:is(html[data-theme]) .destination-row__remove:hover {
-  color: var(--status-late);
-}
-
-
-:is(html[data-theme]) .destinations__add:hover {
+:is(html[data-theme]) .destination-row__handle:hover {
   color: var(--accent);
+}
+
+:is(html[data-theme]) .destination-row__handle svg {
+  height: 16px;
+  width: 16px;
+}
+
+/* Reordenar sem desenhar nada: a linha na mão apaga, e a vizinha ABRE ESPAÇO
+ * para onde ela vai cair. O vão que se alarga já diz o lugar — não precisa de
+ * fio, e some sozinho quando o ponteiro sai dali.
+ *
+ * `is-drop-before` significa "entra ANTES desta", então a vizinha desce e o vão
+ * de cima cresce; `is-drop-after` faz o contrário. São 4px sobre um vão de 8:
+ * o suficiente para ler o lugar, pouco para não sacudir a lista.
+ */
+:is(html[data-theme]) .destination-row {
+  transition: transform 140ms ease, opacity 140ms ease;
+}
+
+:is(html[data-theme]) .destination-row.is-dragging {
+  cursor: grabbing;
+  opacity: 0.4;
+}
+
+:is(html[data-theme]) .destination-row.is-drop-target.is-drop-before {
+  transform: translateY(4px);
+}
+
+:is(html[data-theme]) .destination-row.is-drop-target.is-drop-after {
+  transform: translateY(-4px);
+}
+
+/* Durante o arraste, nada de seleção de texto pelo caminho. */
+:is(html[data-theme]) .is-dragging-destination,
+:is(html[data-theme]) .is-dragging-destination * {
+  user-select: none;
 }
 /* <<< css/v2/destination-row.css <<< */
 
@@ -2002,9 +2063,14 @@
 
 /* Diâmetro do botão do calendário. Fica na raiz porque três regras dependem
    dele — tamanho, recuo e o espaço que o texto abre para não passar por baixo —
-   e é o que garante que ele continue redondo se a altura do campo mudar. */
+   e é o que garante que ele continue redondo se a altura do campo mudar.
+ *
+ * Valor próprio, e não a escala miúda dos botões: aqui o que manda é caber
+ * dentro do campo de 44px com folga igual nos três lados. Amarrá-lo à escala
+ * faria o círculo crescer junto quando um botão de painel crescesse, que são
+ * coisas sem relação. */
 :is(html[data-theme]) .date-field {
-  --trigger-size: 32px;
+  --trigger-size: 28px;
 }
 
 :is(html[data-theme]) .date-field__controls,
@@ -2110,15 +2176,29 @@
   --surface: var(--surface-field);
   --surface-contrast: var(--surface-rail);
   background: var(--surface-field);
+  /* O MESMO traço do painel, nos dois temas: `--line`, que é o único token de
+     borda do sistema. O legado usava valores próprios — `rgb(214 227 244 /
+     .4)` no escuro e `#d4dde9` no claro —, então o calendário era a única
+     superfície com um contorno que não vinha do token e não acompanhava
+     mudança de tema junto com o resto. */
+  border: 1px solid var(--line);
 }
 
-/* Anterior, Próximo, Hoje e Limpar são o botão secundário: mesmo degrau
-   alternado, mesmo raio, mesma altura e o mesmo hover do resto do sistema. Eram
-   a última aparência de botão que o calendário desenhava por conta própria. */
+/* Anterior, Próximo, Hoje e Limpar são o botão secundário na altura MIÚDA:
+   mesmo degrau alternado, mesmo raio e o mesmo hover do resto do sistema, mas
+   28px em vez de 44 — são controles dentro do painel, e quatro botões de altura
+   cheia ocupavam mais que o mês inteiro que eles navegam. */
 :is(html[data-theme]) .date-field__panel .date-picker__nav,
 :is(html[data-theme]) .date-field__panel .date-picker__footer-action {
   align-items: center;
   background: var(--surface-contrast, var(--surface-rail));
+  /* `background-image: none` NÃO é redundante. A folha legada desenha a borda
+     destes botões com o truque dos dois gradientes — um em `padding-box` para o
+     fundo e outro em `border-box` para a borda, com `border: 1px solid
+     transparent`. Declarar só a cor de fundo apaga o truque no repouso, mas
+     qualquer estado legado que reponha `background-image` traz a borda de volta
+     sozinha. Zerar a imagem em todos os estados é o que corta a raiz. */
+  background-image: none;
   border: 1px solid transparent;
   border-radius: var(--radius-field);
   box-sizing: border-box;
@@ -2126,21 +2206,32 @@
   cursor: pointer;
   display: inline-flex;
   font: inherit;
-  font-size: var(--text-size-base);
+  font-size: var(--text-size-eyebrow);
   font-weight: var(--weight-normal);
   gap: var(--gap-tight);
   justify-content: center;
   line-height: 1;
-  min-height: var(--control-height);
-  padding: var(--pad-field);
+  min-height: var(--control-height-sm);
+  padding: 0 10px;
   transition: background var(--ease), border-color var(--ease), color var(--ease);
   white-space: nowrap;
 }
 
-:is(html[data-theme]) .date-field__panel .date-picker__nav:hover,
-:is(html[data-theme]) .date-field__panel .date-picker__footer-action:hover {
+/* Todos os estados juntos, e não só o `:hover`: o legado tem regra própria para
+   `:hover`, `:focus` e `:active` — e a de `:active` ainda deslocava o botão com
+   `transform: translateY`. Cobrindo os quatro, nenhuma delas alcança. */
+:is(html[data-theme]) .date-field__panel .date-picker__nav:is(:hover, :focus, :active),
+:is(html[data-theme]) .date-field__panel
+  .date-picker__footer-action:is(:hover, :focus, :active) {
   background: color-mix(in srgb, var(--accent) 14%, var(--surface-contrast, var(--surface-rail)));
+  background-image: none;
+  /* A borda inteira, e não só a cor: sob foco, o legado a zerava (`border: 0`),
+     o botão encolhia 2px e o rótulo pulava de lugar. Fixar `border-color`
+     sozinho deixava a LARGURA por conta da regra antiga. */
+  border: 1px solid transparent;
+  box-shadow: none;
   color: var(--accent);
+  transform: none;
 }
 
 :is(html[data-theme]) .date-field__panel .date-picker__nav:focus-visible,
@@ -2161,6 +2252,48 @@
 :is(html[data-theme]) .date-field .date-picker__control:hover .cv-field__control,
 :is(html[data-theme]) .date-field .date-picker__control:focus-within .cv-field__control {
   padding-right: calc(var(--trigger-size) + 16px);
+}
+
+/* ---- a grade dos dias -----------------------------------------------------
+ *
+ * Sem vão entre as células, e o realce preenchendo a célula inteira.
+ *
+ * O legado usa `gap: 2px` e posiciona o realce pelo CENTRO — `top: 50%;
+ * left: 50%` com um `translate(-20px, -20px)` de valor FIXO. Os dois só se
+ * cancelam se metade da célula for exatamente 20px; quando 50% não cai num
+ * inteiro, sobra fração (medido: 19.2 contra 20, ou seja, 0,8px fora do lugar).
+ *
+ * Numa data solta ninguém vê. Num intervalo longo, cada célula erra para o
+ * mesmo lado, as sobras se somam e a grade PARECE ter colunas e linhas de
+ * larguras diferentes — com todas as células medindo exatamente o mesmo.
+ *
+ * Colunas em `1fr` porque, sem vão, largura fixa deixaria sobra à direita da
+ * grade. `aspect-ratio` mantém o dia quadrado sem amarrar a altura a um número.
+ */
+:is(html[data-theme]) .date-field__panel [data-cv-date-picker-days],
+:is(html[data-theme]) .date-field__panel [data-cv-date-picker-weekdays] {
+  gap: 0;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+:is(html[data-theme]) .date-field__panel .date-picker__day {
+  aspect-ratio: 1;
+  /* Sem borda: ela é transparente, mas ocupa 1px de cada lado, e o realce —
+     que se ancora na caixa de recuo — ficava 1,6px menor que a célula. */
+  border: 0;
+  height: auto;
+  /* `line-height: 1` para o número cair no centro exato. Com os 21px herdados,
+     a entrelinha sobra embaixo e o dígito fica 1px acima do meio; dentro de um
+     círculo isso salta à vista. */
+  line-height: 1;
+  width: 100%;
+}
+
+:is(html[data-theme]) .date-field__panel .date-picker__day::before {
+  height: 100%;
+  inset: 0;
+  transform: none;
+  width: 100%;
 }
 /* <<< css/v2/date-picker.css <<< */
 

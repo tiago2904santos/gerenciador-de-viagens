@@ -508,8 +508,12 @@
      * some a única forma de o CSS saber de que campo ele veio. A marca vai no
      * próprio elemento, como o `custom-select__menu--v2` que o select já usa;
      * sem ela as telas migradas e as legadas dividiriam a mesma lista. */
-    if (select.closest(".picker, .destination-row")) {
+    if (select.hasAttribute("data-picker-v2")) {
+      /* A CLASSE é só para o CSS; a marca que o JS lê é o atributo. Nome de
+       * classe não é condição de lógica neste repositório (JS-06) — quem
+       * renomeia uma classe não espera desligar comportamento. */
       dropdown.classList.add("search-picker__dropdown--v2");
+      dropdown.setAttribute("data-entity-picker-v2", "");
     }
 
     const floatingMenu =
@@ -747,6 +751,34 @@
 
     /* ── Render: Resultados do dropdown ─────────────────────────── */
 
+    /* O "v" da opção escolhida, montado nó a nó.
+     *
+     * `createElementNS` e não `innerHTML`: o repositório proíbe HTML dinâmico
+     * em produção, e aqui a regra ainda evita a armadilha do SVG — sem o
+     * namespace correto o elemento vira um "svg" de HTML, que tem caixa e
+     * responde a getComputedStyle mas NÃO DESENHA nada. Foi assim que a seta do
+     * select ficou invisível, e o CSS antigo compensava desenhando o traço com
+     * bordas em vez de corrigir a origem. Pela API o namespace é obrigatório. */
+    const SVG_NS = "http://www.w3.org/2000/svg";
+
+    function svgCheck() {
+      const svg = document.createElementNS(SVG_NS, "svg");
+      svg.setAttribute("viewBox", "0 0 24 24");
+      svg.setAttribute("width", "14");
+      svg.setAttribute("height", "14");
+      svg.setAttribute("fill", "none");
+      svg.setAttribute("stroke", "currentColor");
+      svg.setAttribute("stroke-width", "2.5");
+      svg.setAttribute("stroke-linecap", "round");
+      svg.setAttribute("stroke-linejoin", "round");
+      svg.setAttribute("aria-hidden", "true");
+      svg.setAttribute("focusable", "false");
+      const path = document.createElementNS(SVG_NS, "path");
+      path.setAttribute("d", "M20 6L9 17l-5-5");
+      svg.appendChild(path);
+      return svg;
+    }
+
     function renderOptionItem(item, index) {
       const btn    = markPart(el("button", "search-picker__option"), "option");
       const marker = el("span",   "search-picker__option-marker", "");
@@ -797,16 +829,9 @@
        * responde a getComputedStyle, mas não desenha nada. Foi assim que a seta
        * do select ficou invisível, e o CSS antigo compensava desenhando o traço
        * com bordas em vez de corrigir a origem. */
-      if (dropdown.classList.contains("search-picker__dropdown--v2")) {
+      if (dropdown.hasAttribute("data-entity-picker-v2")) {
         status.textContent = "";
-        if (item.selected) {
-          status.innerHTML =
-            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" ' +
-            'aria-hidden="true" focusable="false" width="14" height="14" ' +
-            'fill="none" stroke="currentColor" stroke-width="2.5" ' +
-            'stroke-linecap="round" stroke-linejoin="round">' +
-            '<path d="M20 6L9 17l-5-5"/></svg>';
-        }
+        if (item.selected) status.appendChild(svgCheck());
       }
 
       body.appendChild(main);
@@ -2360,6 +2385,11 @@
     initDragDrop(list, {
       rowSelector: options.rowSelector,
       removeSelector: options.removeSelector,
+      /* Sem alça, o arraste começa em qualquer ponto da linha que não seja
+       * controle — e na linha do v2 não sobra ponto nenhum: os dois pickers e
+       * os dois botões cobrem tudo, e o motor bloqueia o arraste em cima
+       * deles. Passando o seletor, ele só começa pela alça. */
+      dragHandleSelector: options.dragHandleSelector,
       onReorder: function () {
         renameRows();
         refreshRows();
@@ -2473,6 +2503,7 @@
       section: section,
       list: section.querySelector("[data-location-list]"),
       template: section.querySelector("template[data-location-template]"),
+      dragHandleSelector: "[data-location-drag-handle]",
     });
   }
 

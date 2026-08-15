@@ -10,10 +10,8 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
-from django.urls import reverse
 from django.utils.decorators import method_decorator
 
-from cadastros.models import Estado
 from core import login_throttle
 from core.errors import capture
 from eventos.models import Evento
@@ -152,15 +150,6 @@ def main_preview(request):
         "core/main_preview.html",
         {
             "page_title": "Prévia do main",
-            # Os destinos são a exceção ao "dados fixos" abaixo. A seção não é
-            # aparência: ela adiciona linha, renumera e cascateia estado →
-            # cidade. Sem os estados reais e sem a rota de cidades não dá para
-            # aprovar o que ela faz — só o desenho parado, que foi justamente o
-            # que passou por pronto e não funcionava.
-            "v2_estados": Estado.objects.order_by("nome"),
-            "v2_cidades_url": reverse(
-                "roteiros:api_cidades_por_estado", kwargs={"estado_id": 0}
-            ),
             # NOVO-120: alimenta a galeria do sistema v2. Dados fixos, como o
             # resto desta rota — ela existe para aprovar aparência, não para
             # consultar nada.

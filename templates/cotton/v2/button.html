@@ -19,7 +19,7 @@
     {% if disabled %}aria-disabled="true" tabindex="-1"{% endif %}
   >
     {% if icon %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
-    {% if slot %}{{ slot }}{% else %}<span>{{ label }}</span>{% endif %}
+    {% if slot %}{{ slot }}{% elif label %}<span>{{ label }}</span>{% endif %}
   </a>
 {% else %}
   <button
@@ -30,6 +30,6 @@
     {% if hook %}{{ hook }}{% endif %}
   >
     {% if icon %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
-    {% if slot %}{{ slot }}{% else %}<span>{{ label }}</span>{% endif %}
+    {% if slot %}{{ slot }}{% elif label %}<span>{{ label }}</span>{% endif %}
   </button>
 {% endif %}

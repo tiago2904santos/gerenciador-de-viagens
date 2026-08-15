@@ -1,81 +1,106 @@
 /* Linha de destino. Depende de `v2/tokens.css`. */
 
-/* Grade de duas colunas: o "+" e o resto.
+/* Duas metades EXATAS.
  *
- * O "+" tem largura fixa e não se mexe. Estado, cidade e "×" repartem a segunda
- * coluna, cuja largura não muda — é a da linha menos o botão e um vão.
+ * Esquerda: alça, "+" e o campo de estado. Direita: o campo de cidade e o "×".
+ * Cada lado é 1fr, então o que entra ou sai de um não mexe no outro — foi essa
+ * a regra que faltava nas tentativas anteriores.
  *
- * O ESTADO tem largura fixa, calculada sobre 100% dessa coluna: metade do que
- * sobra quando a linha está cheia. Como a coluna não muda, ele também não.
- *
- * A CIDADE fica com o resto. Com um destino só, o `location-rows.js` marca o
- * "×" com `hidden` — não faz sentido remover o único — e o botão deixa de gerar
- * caixa. Estando os três no MESMO flex, o vão dele some junto, e os 56px vão
- * inteiros para a cidade.
- *
- * Duas tentativas anteriores não resolvem, e ficam registradas para não voltarem:
- * reservar a coluna com `visibility: hidden` perde para o
- * `[hidden] { display: none !important }` do bundle legado; e deixar o "×" como
- * quarta coluna da linha o empurrava para uma segunda fileira, porque a grade
- * só declarava três. */
+ * As duas que não deram certo, para não voltarem: colunas fixas para cada
+ * controle fazem o campo de estado pagar por tudo que nasce à esquerda (a alça
+ * o levou de 200 para 131); e fixar o grupo da direita em 256px funciona na
+ * largura em que foi medido e desanda em qualquer outra (numa tela larga o
+ * estado ia a 690 com a cidade presa em 256). */
 :is(html[data-theme]) .destination-row {
   align-items: center;
   display: grid;
   gap: var(--gap);
-  grid-template-columns: var(--control-height) minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   min-width: 0;
+  /* Âncora do indicador de destino do arraste, que é desenhado no vão. */
+  position: relative;
 }
 
 
-/* Estado, cidade e "×" na mesma faixa: é o que faz o vão do botão sumir com ele
-   quando não há o que remover. */
-:is(html[data-theme]) .destination-row__fields {
+/* As duas metades. Dentro de cada uma, o campo estica e os botões não. */
+:is(html[data-theme]) .destination-row__start,
+:is(html[data-theme]) .destination-row__end {
   align-items: center;
   display: flex;
   gap: var(--gap);
   min-width: 0;
 }
 
-/* O estado não se mexe: largura fixa, tirada de 100% da faixa — que não muda. */
-:is(html[data-theme]) .destination-row__fields > .search-picker:first-of-type {
-  flex: 0 0 calc((100% - var(--control-height) - var(--gap) * 2) / 2);
-  min-width: 0;
-}
-
-/* A cidade fica com o que sobrar. */
-:is(html[data-theme]) .destination-row__fields > .search-picker:last-of-type {
+:is(html[data-theme]) .destination-row__start > .search-picker,
+:is(html[data-theme]) .destination-row__end > .search-picker {
   flex: 1 1 0;
   min-width: 0;
 }
 
-/* Remover e adicionar são o mesmo botão: mesma medida, mesma superfície, mesmo
-   raio. Só o que eles significam difere, e isso está no hover — vermelho para
-   quem tira, accent para quem põe. Declarados juntos porque desenhá-los em
-   regras separadas é como o sistema antigo acumulou dezoito variantes de botão
-   que ninguém tinha decidido. */
-:is(html[data-theme]) .destination-row__remove,
-:is(html[data-theme]) .destinations__add {
+/* Com um destino só, o `location-rows.js` marca o "×" com `hidden` — não faz
+   sentido remover o único. Estando os dois no MESMO flex, o vão dele some junto
+   com o botão, e a cidade fica com a metade inteira. */
+
+/* Os dois botões da linha são o `button` do sistema, na forma `--icon`: o de
+   adicionar é `primary`, o de remover é `danger`. Nenhum desenho próprio aqui —
+   foi assim que o sistema antigo acumulou dezoito variantes que ninguém tinha
+   decidido. Só o que é POSIÇÃO fica nesta folha. */
+
+/* ---- reordenar por arraste ------------------------------------------------
+ *
+ * O motor é o `initDragDrop` do `location-rows.js`, que só precisa da alça e
+ * das três classes de estado abaixo. Elas existiam apenas em
+ * `pages/roteiros.css`, folha de uma tela — fora dela o arraste funcionava sem
+ * dar nenhum retorno visual, que é o mesmo que não funcionar.
+ */
+:is(html[data-theme]) .destination-row__handle {
   align-items: center;
-  background: var(--surface-contrast, var(--surface-field));
-  border: 0;
-  border-radius: var(--radius-field);
   color: var(--text-muted);
-  cursor: pointer;
+  cursor: grab;
   display: inline-flex;
-  flex: none;
-  font: inherit;
-  font-size: 20px;
-  height: var(--control-height);
   justify-content: center;
-  line-height: 1;
-  width: var(--control-height);
+  /* `touch-action` é o que faz o arraste valer no toque: sem ela o navegador
+     interpreta o gesto como rolagem e o `pointermove` nunca chega. */
+  touch-action: none;
+  width: 20px;
 }
 
-:is(html[data-theme]) .destination-row__remove:hover {
-  color: var(--status-late);
-}
-
-
-:is(html[data-theme]) .destinations__add:hover {
+:is(html[data-theme]) .destination-row__handle:hover {
   color: var(--accent);
+}
+
+:is(html[data-theme]) .destination-row__handle svg {
+  height: 16px;
+  width: 16px;
+}
+
+/* Reordenar sem desenhar nada: a linha na mão apaga, e a vizinha ABRE ESPAÇO
+ * para onde ela vai cair. O vão que se alarga já diz o lugar — não precisa de
+ * fio, e some sozinho quando o ponteiro sai dali.
+ *
+ * `is-drop-before` significa "entra ANTES desta", então a vizinha desce e o vão
+ * de cima cresce; `is-drop-after` faz o contrário. São 4px sobre um vão de 8:
+ * o suficiente para ler o lugar, pouco para não sacudir a lista.
+ */
+:is(html[data-theme]) .destination-row {
+  transition: transform 140ms ease, opacity 140ms ease;
+}
+
+:is(html[data-theme]) .destination-row.is-dragging {
+  cursor: grabbing;
+  opacity: 0.4;
+}
+
+:is(html[data-theme]) .destination-row.is-drop-target.is-drop-before {
+  transform: translateY(4px);
+}
+
+:is(html[data-theme]) .destination-row.is-drop-target.is-drop-after {
+  transform: translateY(-4px);
+}
+
+/* Durante o arraste, nada de seleção de texto pelo caminho. */
+:is(html[data-theme]) .is-dragging-destination,
+:is(html[data-theme]) .is-dragging-destination * {
+  user-select: none;
 }

@@ -123,9 +123,40 @@
 }
 
 
-/* Tamanho único: 44px. O legado tinha três alturas para o mesmo controle e
-   nenhuma escala por trás — os valores de `sm` e `xs` eram fixos e arbitrários.
-   Um botão é um botão.
+/* Só o ícone, em caixa quadrada da altura do controle. Existe para as ações que
+   se repetem numa lista, onde o rótulo seria a mesma palavra em toda linha; o
+   nome vive no `aria-label`, que passa a ser obrigatório. Vale com qualquer
+   variante — é forma, não ênfase. */
+:is(html[data-theme]) .button--icon {
+  padding: 0;
+  width: var(--control-height);
+}
+
+/* ---- miúdo --------------------------------------------------------------- */
+
+:is(html[data-theme]) .button--sm {
+  font-size: var(--text-size-eyebrow);
+  min-height: var(--control-height-sm);
+  padding: 0 10px;
+}
+
+:is(html[data-theme]) .button--sm.button--icon {
+  width: var(--control-height-sm);
+}
+
+:is(html[data-theme]) .button--sm .button__icon svg {
+  height: 14px;
+  width: 14px;
+}
+
+/* Duas alturas: 44px, a padrão, e 28px para o botão que vive DENTRO de outro
+   controle — o painel do calendário, por exemplo, onde quatro botões de 44px
+   ocupam mais do que o mês inteiro que eles navegam.
+
+   O legado tinha três (`sm`, `xs` e a base) sem nada por trás: valores fixos
+   escolhidos um a um. A diferença aqui é que a segunda altura tem critério —
+   está aninhada dentro de outro controle — e sai do mesmo token que todo o
+   resto lê.
 
    ---- ícone ---------------------------------------------------------------
  *

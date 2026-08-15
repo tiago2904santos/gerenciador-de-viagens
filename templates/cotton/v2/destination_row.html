@@ -1,4 +1,5 @@
-{% cotton:vars city_disabled estados extra_class index removable %}
+{% cotton:vars city_disabled estado_selecionado estados extra_class index removable %}
+{% load destinos icones %}
 {% comment %}
   Linha de destino v2 — estado e cidade, na ordem da visita.
 
@@ -27,68 +28,87 @@
     propósito — o JS escreve o número da posição nesse gancho, e escrevê-lo aqui
     apagaria o "+" na primeira renumeração.
   {% endcomment %}
-  <button
-    type="button"
-    class="destinations__add"
-    data-location-add
-    title="Adicionar destino abaixo"
-    aria-label="Adicionar destino abaixo"
+  {% comment %}
+    A linha é 50/50. À esquerda: alça, "+" e o campo de estado. À direita: o
+    campo de cidade e o "×". Os dois lados são metades EXATAS — o que muda
+    dentro de um não mexe no outro.
+  {% endcomment %}
+  <div class="destination-row__start">
+  {% comment %}
+    A alça do arraste. Só ela inicia o gesto: o motor de reordenação bloqueia o
+    arraste sobre botões e pickers, e na linha não sobra outro ponto livre.
+  {% endcomment %}
+  <span
+    class="destination-row__handle"
+    data-location-drag-handle
+    title="Arrastar para reordenar"
+    aria-hidden="true"
+  >{% icone_svg "grip" %}</span>
+
+  <c-v2.button
+    variant="primary"
+    icon="plus"
+    extra_class="button--icon destinations__add"
+    aria_label="Adicionar destino abaixo"
+    hook="data-location-add"
+  />
+
+  <select
+    class="search-picker__native"
+    data-entity-picker="true"
+    data-picker-v2
+    data-entity-picker-mode="single"
+    data-picker-variant="compact"
+    data-placeholder="Buscar estado..."
+    data-empty-message="Nenhum estado encontrado."
+    data-location-state
+    name="{% if index %}destino_estado_{{ index }}{% else %}destino_estado{% endif %}"
+    aria-label="Estado do destino"
   >
-    <span aria-hidden="true">+</span>
-  </button>
+    {% destinos_opcoes_estado estados estado_selecionado %}
+  </select>
+  </div>
 
-  <div class="destination-row__fields">
-    <select
-      class="search-picker__native"
-      data-entity-picker="true"
-      data-entity-picker-mode="single"
-      data-picker-variant="compact"
-      data-placeholder="Buscar estado..."
-      data-empty-message="Nenhum estado encontrado."
-      data-location-state
-      name="{% if index %}destino_estado_{{ index }}{% else %}destino_estado{% endif %}"
-      aria-label="Estado do destino"
-    >
-      <option value=""></option>
-      {% for estado in estados %}
-        <option value="{{ estado.pk }}">{{ estado.nome }} ({{ estado.sigla }})</option>
-      {% endfor %}
-    </select>
-
-    {% comment %}
-      A cidade nasce desabilitada: sem estado escolhido não há lista para
-      buscar. É o `location-rows.js` que a habilita e a preenche.
-    {% endcomment %}
-    <select
-      class="search-picker__native"
-      data-entity-picker="true"
-      data-entity-picker-mode="single"
-      data-picker-variant="compact"
-      data-placeholder="Buscar cidade..."
-      data-empty-message="Nenhuma cidade encontrada."
-      data-location-city
-      name="{% if index %}destino_cidade_{{ index }}{% else %}destino_cidade{% endif %}"
-      aria-label="Cidade do destino"
-      {% if city_disabled|default_if_none:True %}disabled{% endif %}
-    >
-      <option value=""></option>
-    </select>
-
-    {% comment %}
-      O "×" fica na MESMA faixa da cidade, e não como irmão dela na linha: é
-      isso que faz o vão dele sumir junto com o botão quando há um destino só,
-      devolvendo os 56px inteiros ao campo de cidade.
-    {% endcomment %}
-    {% if removable %}
-      <button
-        type="button"
-        class="destination-row__remove"
-        data-location-remove
-        title="Remover destino"
-        aria-label="Remover destino"
+  {% comment %}
+    A metade da direita: cidade e "×". Estando os dois no mesmo flex, o vão do
+    botão some junto com ele quando não há o que remover, e a cidade fica com a
+    metade inteira.
+  {% endcomment %}
+  <div class="destination-row__end">
+      {% comment %}
+        A cidade nasce desabilitada: sem estado escolhido não há lista para
+        buscar. É o `location-rows.js` que a habilita e a preenche.
+      {% endcomment %}
+      <select
+        class="search-picker__native"
+        data-entity-picker="true"
+        data-picker-v2
+      data-picker-v2
+        data-entity-picker-mode="single"
+        data-picker-variant="compact"
+        data-placeholder="Buscar cidade..."
+        data-empty-message="Nenhuma cidade encontrada."
+        data-location-city
+        name="{% if index %}destino_cidade_{{ index }}{% else %}destino_cidade{% endif %}"
+        aria-label="Cidade do destino"
+        {% if city_disabled|default_if_none:True %}disabled{% endif %}
       >
-        <span aria-hidden="true">×</span>
-      </button>
+        <option value=""></option>
+      </select>
+
+      {% comment %}
+        O "×" fica na MESMA faixa da cidade, e não como irmão dela na linha: é
+        isso que faz o vão dele sumir junto com o botão quando há um destino só,
+        devolvendo os 56px inteiros ao campo de cidade.
+      {% endcomment %}
+      {% if removable %}
+        <c-v2.button
+          variant="danger"
+          icon="x"
+          extra_class="button--icon destination-row__remove"
+          aria_label="Remover destino"
+          hook="data-location-remove"
+        />
     {% endif %}
   </div>
 </div>

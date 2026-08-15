@@ -646,6 +646,11 @@
     initDragDrop(list, {
       rowSelector: options.rowSelector,
       removeSelector: options.removeSelector,
+      /* Sem alça, o arraste começa em qualquer ponto da linha que não seja
+       * controle — e na linha do v2 não sobra ponto nenhum: os dois pickers e
+       * os dois botões cobrem tudo, e o motor bloqueia o arraste em cima
+       * deles. Passando o seletor, ele só começa pela alça. */
+      dragHandleSelector: options.dragHandleSelector,
       onReorder: function () {
         renameRows();
         refreshRows();
@@ -759,6 +764,7 @@
       section: section,
       list: section.querySelector("[data-location-list]"),
       template: section.querySelector("template[data-location-template]"),
+      dragHandleSelector: "[data-location-drag-handle]",
     });
   }
 

@@ -7,7 +7,7 @@ que ele publica em `window.CV`. Não altera regra de negócio.
 
 Este documento cobre `static/js/core/`, `static/js/components/` e os motores de raiz — o código que
 qualquer tela pode acionar. **Não** indexa os atributos de uma página só (`static/js/pages/`): são
-**143** deles, cada um com um único consumidor, e a documentação certa para esses é o próprio
+**142** deles, cada um com um único consumidor, e a documentação certa para esses é o próprio
 módulo da página.
 
 A regra que decide: se o atributo aparece num motor compartilhado, ele está aqui. Isso é verificado
@@ -125,6 +125,8 @@ Quem consome o picker de fora nunca deve procurá-lo pela classe CSS.
 | `data-entity-picker-mode` | `<select>` | `single` \| `multi` |
 | `data-entity-picker-renderer="select"` | `<select>` | Escolhe o renderer alternativo (`picker-select.js`) |
 | `data-entity-picker-ready` | `<select>` | Marcador de idempotência |
+| `data-picker-v2` | `<select>` fonte | Declara que este picker é do sistema v2 |
+| **`data-entity-picker-v2`** | dropdown **renderizado** | Cópia da marca acima no dropdown, que é portado para o `body` e perde os ancestrais. É por ela que o CSS e o próprio motor distinguem a lista v2 da legada — nunca pela classe |
 | **`data-entity-picker-root`** | raiz **renderizada** | É por aqui que se acha o picker no DOM |
 | **`data-entity-picker-part="…"`** | partes renderizadas | `field`, `control`, `input`, `clear`, `dropdown`, `list`, `empty`, `option`, `remove`, `selected-panel`, `selected-card`, `selected-title-row`, `term-control`, `driver-toggle`, `driver-surface`, `driver-text` |
 
@@ -234,6 +236,8 @@ Raiz: `data-location-rows`; a lista é `data-location-list` e o molde `data-loca
 | `data-location-row` | Uma linha |
 | `data-location-state` / `data-location-city` | Selects de UF e cidade |
 | `data-location-add` / `data-location-remove` | Botões |
+| `data-location-drag-handle` | Alça do arraste. Só ela inicia a reordenação: o motor bloqueia o gesto sobre botões e pickers, e numa linha cheia de controles não sobra outro ponto |
+| `data-location-managed` | Na raiz: a seção se liga sozinha, sem script de página chamando `initManagedRows` |
 | `data-location-order` | Campo de ordem |
 | `data-route-destinos-trechos` / `data-route-destinos-subtitle` | Resumo do roteiro |
 

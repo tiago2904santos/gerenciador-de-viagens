@@ -8,9 +8,14 @@
 
 /* Diâmetro do botão do calendário. Fica na raiz porque três regras dependem
    dele — tamanho, recuo e o espaço que o texto abre para não passar por baixo —
-   e é o que garante que ele continue redondo se a altura do campo mudar. */
+   e é o que garante que ele continue redondo se a altura do campo mudar.
+ *
+ * Valor próprio, e não a escala miúda dos botões: aqui o que manda é caber
+ * dentro do campo de 44px com folga igual nos três lados. Amarrá-lo à escala
+ * faria o círculo crescer junto quando um botão de painel crescesse, que são
+ * coisas sem relação. */
 :is(html[data-theme]) .date-field {
-  --trigger-size: 32px;
+  --trigger-size: 28px;
 }
 
 :is(html[data-theme]) .date-field__controls,
@@ -116,15 +121,29 @@
   --surface: var(--surface-field);
   --surface-contrast: var(--surface-rail);
   background: var(--surface-field);
+  /* O MESMO traço do painel, nos dois temas: `--line`, que é o único token de
+     borda do sistema. O legado usava valores próprios — `rgb(214 227 244 /
+     .4)` no escuro e `#d4dde9` no claro —, então o calendário era a única
+     superfície com um contorno que não vinha do token e não acompanhava
+     mudança de tema junto com o resto. */
+  border: 1px solid var(--line);
 }
 
-/* Anterior, Próximo, Hoje e Limpar são o botão secundário: mesmo degrau
-   alternado, mesmo raio, mesma altura e o mesmo hover do resto do sistema. Eram
-   a última aparência de botão que o calendário desenhava por conta própria. */
+/* Anterior, Próximo, Hoje e Limpar são o botão secundário na altura MIÚDA:
+   mesmo degrau alternado, mesmo raio e o mesmo hover do resto do sistema, mas
+   28px em vez de 44 — são controles dentro do painel, e quatro botões de altura
+   cheia ocupavam mais que o mês inteiro que eles navegam. */
 :is(html[data-theme]) .date-field__panel .date-picker__nav,
 :is(html[data-theme]) .date-field__panel .date-picker__footer-action {
   align-items: center;
   background: var(--surface-contrast, var(--surface-rail));
+  /* `background-image: none` NÃO é redundante. A folha legada desenha a borda
+     destes botões com o truque dos dois gradientes — um em `padding-box` para o
+     fundo e outro em `border-box` para a borda, com `border: 1px solid
+     transparent`. Declarar só a cor de fundo apaga o truque no repouso, mas
+     qualquer estado legado que reponha `background-image` traz a borda de volta
+     sozinha. Zerar a imagem em todos os estados é o que corta a raiz. */
+  background-image: none;
   border: 1px solid transparent;
   border-radius: var(--radius-field);
   box-sizing: border-box;
@@ -132,21 +151,32 @@
   cursor: pointer;
   display: inline-flex;
   font: inherit;
-  font-size: var(--text-size-base);
+  font-size: var(--text-size-eyebrow);
   font-weight: var(--weight-normal);
   gap: var(--gap-tight);
   justify-content: center;
   line-height: 1;
-  min-height: var(--control-height);
-  padding: var(--pad-field);
+  min-height: var(--control-height-sm);
+  padding: 0 10px;
   transition: background var(--ease), border-color var(--ease), color var(--ease);
   white-space: nowrap;
 }
 
-:is(html[data-theme]) .date-field__panel .date-picker__nav:hover,
-:is(html[data-theme]) .date-field__panel .date-picker__footer-action:hover {
+/* Todos os estados juntos, e não só o `:hover`: o legado tem regra própria para
+   `:hover`, `:focus` e `:active` — e a de `:active` ainda deslocava o botão com
+   `transform: translateY`. Cobrindo os quatro, nenhuma delas alcança. */
+:is(html[data-theme]) .date-field__panel .date-picker__nav:is(:hover, :focus, :active),
+:is(html[data-theme]) .date-field__panel
+  .date-picker__footer-action:is(:hover, :focus, :active) {
   background: color-mix(in srgb, var(--accent) 14%, var(--surface-contrast, var(--surface-rail)));
+  background-image: none;
+  /* A borda inteira, e não só a cor: sob foco, o legado a zerava (`border: 0`),
+     o botão encolhia 2px e o rótulo pulava de lugar. Fixar `border-color`
+     sozinho deixava a LARGURA por conta da regra antiga. */
+  border: 1px solid transparent;
+  box-shadow: none;
   color: var(--accent);
+  transform: none;
 }
 
 :is(html[data-theme]) .date-field__panel .date-picker__nav:focus-visible,
@@ -167,4 +197,46 @@
 :is(html[data-theme]) .date-field .date-picker__control:hover .cv-field__control,
 :is(html[data-theme]) .date-field .date-picker__control:focus-within .cv-field__control {
   padding-right: calc(var(--trigger-size) + 16px);
+}
+
+/* ---- a grade dos dias -----------------------------------------------------
+ *
+ * Sem vão entre as células, e o realce preenchendo a célula inteira.
+ *
+ * O legado usa `gap: 2px` e posiciona o realce pelo CENTRO — `top: 50%;
+ * left: 50%` com um `translate(-20px, -20px)` de valor FIXO. Os dois só se
+ * cancelam se metade da célula for exatamente 20px; quando 50% não cai num
+ * inteiro, sobra fração (medido: 19.2 contra 20, ou seja, 0,8px fora do lugar).
+ *
+ * Numa data solta ninguém vê. Num intervalo longo, cada célula erra para o
+ * mesmo lado, as sobras se somam e a grade PARECE ter colunas e linhas de
+ * larguras diferentes — com todas as células medindo exatamente o mesmo.
+ *
+ * Colunas em `1fr` porque, sem vão, largura fixa deixaria sobra à direita da
+ * grade. `aspect-ratio` mantém o dia quadrado sem amarrar a altura a um número.
+ */
+:is(html[data-theme]) .date-field__panel [data-cv-date-picker-days],
+:is(html[data-theme]) .date-field__panel [data-cv-date-picker-weekdays] {
+  gap: 0;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+:is(html[data-theme]) .date-field__panel .date-picker__day {
+  aspect-ratio: 1;
+  /* Sem borda: ela é transparente, mas ocupa 1px de cada lado, e o realce —
+     que se ancora na caixa de recuo — ficava 1,6px menor que a célula. */
+  border: 0;
+  height: auto;
+  /* `line-height: 1` para o número cair no centro exato. Com os 21px herdados,
+     a entrelinha sobra embaixo e o dígito fica 1px acima do meio; dentro de um
+     círculo isso salta à vista. */
+  line-height: 1;
+  width: 100%;
+}
+
+:is(html[data-theme]) .date-field__panel .date-picker__day::before {
+  height: 100%;
+  inset: 0;
+  transform: none;
+  width: 100%;
 }

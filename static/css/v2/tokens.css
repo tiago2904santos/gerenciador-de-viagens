@@ -108,6 +108,11 @@
      importasse mais que o dado. */
   --pad-rail: 12px;
   --control-height: 44px;
+  /* A altura miúda, para controles que vivem DENTRO de outro — o gatilho do
+     calendário dentro do campo, os botões dentro do painel. Duas alturas, não
+     três: a antiga escala legada tinha `sm` e `xs` sem nada por trás, e o que
+     justifica esta é a hierarquia, não o gosto. */
+  --control-height-sm: 28px;
 
   /* ---- tipografia ------------------------------------------------------ */
   --text-size-eyebrow: 12px;

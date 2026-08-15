@@ -1,26 +1,43 @@
 {% cotton:vars cities_url estados extra_class rows title %}
 {% comment %}
-  Destinos v2 — a seção que gerencia as linhas de destino.
+  Destinos v2 — a seção completa: linhas de estado e cidade, adicionar, remover
+  e reordenar por arraste.
 
-  Emite o contrato de `js/components/location-rows.js`: a seção
-  (`data-location-rows`), a lista (`data-location-list`), o botão de adicionar
-  (`data-location-add`) e o molde (`template[data-location-template]`) que o JS
-  clona a cada nova linha. `data-location-managed` pede que o motor se ligue
-  sozinho — sem isso, cada tela precisava de um script próprio chamando
-  `initManagedRows`, que é como as 4 telas legadas fazem hoje.
+  ## Usar
 
-  `cities_url` é a rota de cidades por estado com `0` no lugar do id; o JS troca
-  o `0` pelo estado escolhido. Sem ela a cascata estado → cidade não acontece.
+      <c-v2.destinations />
+
+  É só isso. A seção busca os próprios dados (`core/templatetags/destinos.py`),
+  liga o próprio motor e já nasce com uma linha. Nada precisa ir para a view, e
+  nenhuma tela precisa de script próprio.
+
+  `estados` e `cities_url` existem para quem tiver motivo para contrariar a
+  busca automática — uma tela que filtre estados, por exemplo. Fora isso, não
+  passe: são as duas linhas que, esquecidas, faziam a seção renderizar bonita e
+  não funcionar.
+
+  ## O que ela emite
+
+  O contrato de `js/components/location-rows.js`: a seção
+  (`data-location-rows`), a lista (`data-location-list`), o molde
+  (`template[data-location-template]`) que o JS clona, e o `data-api-cidades-url`
+  da cascata estado → cidade. `data-location-managed` pede que o motor se ligue
+  sozinho — sem isso, cada tela precisava chamar `initManagedRows` no próprio
+  script, que é como as 4 telas legadas ainda fazem.
+
+  Trocar o nome de qualquer um desses ganchos desliga a seção EM SILÊNCIO: a
+  página não dá erro, os campos só param de responder.
 
   O legado equivalente (`cotton/travel/destination_section.html`) declara 44
   variáveis para os mesmos ganchos, quase todas repassadas por `include` de
-  quatro níveis. Aqui são quatro.
+  quatro níveis.
 {% endcomment %}
+{% load destinos %}
 <section
   class="destinations{% if extra_class %} {{ extra_class }}{% endif %}"
   data-location-rows
   data-location-managed
-  {% if cities_url %}data-api-cidades-url="{{ cities_url }}"{% endif %}
+  data-api-cidades-url="{% if cities_url %}{{ cities_url }}{% else %}{% destinos_url_cidades %}{% endif %}"
   aria-label="{{ title|default:'Destinos' }}"
 >
   {% comment %}
@@ -35,18 +52,22 @@
   {% endif %}
 
   {% comment %}
-    Não há botão de adicionar aqui: ele mora em CADA linha, no lugar do número,
-    e insere a nova logo abaixo daquela em que se clicou. Um botão único no
-    rodapé só sabe acrescentar ao fim.
+    Não há botão de adicionar na seção: ele mora em CADA linha, e insere a nova
+    logo abaixo daquela em que se clicou. Um botão único no rodapé só sabe
+    acrescentar ao fim.
+
+    Sem `rows`, a seção nasce com uma linha vazia — uma lista de destinos sem
+    nenhuma linha não tem por onde começar.
   {% endcomment %}
   <div class="destinations__list" data-location-list aria-label="Destinos adicionados">
-    {{ rows }}
+    {% if rows %}{{ rows }}{% else %}
+      <c-v2.destination_row :index="0" :estados="estados" :removable="True" />
+    {% endif %}
   </div>
-
 
   {% comment %}
     O molde da próxima linha. `__index__` é o marcador que o JS troca pelo
-    número real; nasce removível porque toda linha clonada pode sair.
+    número real ao clonar.
   {% endcomment %}
   <template data-location-template>
     <c-v2.destination_row index="__index__" :estados="estados" :removable="True" />
