@@ -1,18 +1,54 @@
-{% cotton:vars aria_label extra_class href icon tone %}
+{% cotton:vars aria_label extra_class href icon menu_id menu_src tone tooltip tooltip_tone %}
 {% comment %}
   Icon button v2 — ação sem rótulo, em forma circular.
 
   Não é uma variante do `button`: aquele é retangular e existe para carregar
   texto. Aqui a forma é redonda e o rótulo vive no `aria-label`, que é
   OBRIGATÓRIO — sem ele a ação não existe para quem usa leitor de tela.
+
+  `menu_id` transforma o botão no gatilho de um `menu` com o mesmo id. Os três
+  atributos (`data-overlay-trigger`, `-kind`, `-target`) são contrato do
+  `js/components/overlay.js`; declará-los aqui, e não soltos pelo chamador,
+  evita o defeito que já custou caro nesta migração — a marcação parece certa,
+  a tela renderiza e o botão simplesmente não abre nada.
+
+  `tooltip_tone="accent"` pinta a caixinha do tooltip no accent — o
+  `icon-tooltips.js` lê isso de `data-tooltip-tone`. Serve para a ação que
+  precisa se anunciar, como a que só aparece quando o ponteiro entra no campo.
+
+  `menu_src` é a variante `PF-04`: o corpo do menu não vai no HTML da lista,
+  vem do servidor no primeiro clique.
 {% endcomment %}
 {% load icones %}
 {% if href %}
-  <a class="icon-button{% if extra_class %} {{ extra_class }}{% endif %}" href="{{ href }}" aria-label="{{ aria_label }}"{% if tone %} data-tone="{{ tone }}"{% endif %}>
+  <a
+    class="icon-button{% if extra_class %} {{ extra_class }}{% endif %}"
+    href="{{ href }}"
+    aria-label="{{ aria_label }}"
+    {% if tone %}data-tone="{{ tone }}"{% endif %}
+    {% if tooltip %}data-tooltip="{{ tooltip }}"{% endif %}
+    {% if tooltip_tone %}data-tooltip-tone="{{ tooltip_tone }}"{% endif %}
+  >
     {% icone_svg icon %}
   </a>
 {% else %}
-  <button type="button" class="icon-button{% if extra_class %} {{ extra_class }}{% endif %}" aria-label="{{ aria_label }}"{% if tone %} data-tone="{{ tone }}"{% endif %}>
+  <button
+    type="button"
+    class="icon-button{% if extra_class %} {{ extra_class }}{% endif %}"
+    aria-label="{{ aria_label }}"
+    {% if tone %}data-tone="{{ tone }}"{% endif %}
+    {% if tooltip %}data-tooltip="{{ tooltip }}"{% endif %}
+    {% if tooltip_tone %}data-tooltip-tone="{{ tooltip_tone }}"{% endif %}
+    {% if menu_id %}
+      aria-haspopup="true"
+      aria-expanded="false"
+      aria-controls="{{ menu_id }}"
+      data-overlay-trigger
+      data-overlay-kind="menu"
+      data-overlay-target="{{ menu_id }}"
+      {% if menu_src %}data-overlay-src="{{ menu_src }}"{% endif %}
+    {% endif %}
+  >
     {% icone_svg icon %}
   </button>
 {% endif %}

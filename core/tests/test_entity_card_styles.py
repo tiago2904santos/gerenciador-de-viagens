@@ -5,14 +5,17 @@ from django.test import SimpleTestCase
 
 
 ROOT = Path(__file__).resolve().parents[2]
+#: Listas que ainda renderizam `entity_card`. `templates/termos/index.html` saiu
+#: em 2026-08-15: ela é a primeira migrada para o v2 e não carrega folha de
+#: página nenhuma — cobrá-la aqui seria cobrar o legado de volta. Cada lista que
+#: migrar sai desta tupla, e quando ela esvaziar a folha compartilhada morre.
+#: Saíram: termos (2026-08-15) e ordens de serviço (2026-08-15).
 LIST_TEMPLATES = (
     "templates/oficios/index.html",
     "templates/eventos/index.html",
     "templates/roteiros/index.html",
     "templates/prestacoes_contas/index.html",
-    "templates/termos/index.html",
     "templates/planos_trabalho/index.html",
-    "templates/ordens_servico/index.html",
 )
 
 

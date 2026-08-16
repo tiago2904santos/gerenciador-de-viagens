@@ -103,7 +103,7 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # 116: entrou `v2/destinations.html`, a seção que gerencia as linhas de
         # destino. O `destination_row` sozinho era só desenho — não adicionava,
         # não removia e não cascateava estado → cidade.
-        self.assertEqual(len(self.components()), 116)
+        self.assertEqual(len(self.components()), 122)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.

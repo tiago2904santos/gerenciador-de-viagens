@@ -1,9 +1,14 @@
-{% cotton:vars description extra_class href icon title tone %}
+{% cotton:vars description download extra_class href icon icon_tone target_blank title tone %}
 {% comment %}
   Item do menu v2. O ícone é opcional; a descrição também.
 
   `tone="late"` pinta o item como ação destrutiva, usando o mesmo vocabulário
-  de estado do chip e do alerta.
+  de estado do chip e do alerta. `icon_tone` pinta só a caixa do ícone — é o que
+  distingue PDF de DOCX de assinado numa lista de downloads.
+
+  `download` e `target_blank` existem porque a diferença entre "baixar" e "abrir
+  no navegador" é do LINK, não do rótulo: sem eles um item chamado "Baixar PDF"
+  abria o arquivo na mesma aba.
 {% endcomment %}
 {% load icones %}
 <a
@@ -11,8 +16,10 @@
   href="{{ href }}"
   role="menuitem"
   {% if tone %}data-tone="{{ tone }}"{% endif %}
+  {% if download %}download{% endif %}
+  {% if target_blank %}target="_blank" rel="noopener"{% endif %}
 >
-  {% if icon %}<span class="menu__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
+  {% if icon %}<span class="menu__icon"{% if icon_tone %} data-tone="{{ icon_tone }}"{% endif %} aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
   <span class="menu__copy">
     <strong class="menu__title">{{ title }}</strong>
     {% if description %}<small class="menu__description">{{ description }}</small>{% endif %}

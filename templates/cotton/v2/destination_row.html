@@ -1,4 +1,4 @@
-{% cotton:vars city_disabled estado_selecionado estados extra_class index removable %}
+{% cotton:vars cidade_selecionada cidades city_disabled estado_selecionado estados extra_class index removable %}
 {% load destinos icones %}
 {% comment %}
   Linha de destino v2 — estado e cidade, na ordem da visita.
@@ -15,6 +15,12 @@
 
   `index` é a posição na lista. O `<template>` da seção usa `__index__`, que o
   JS troca pelo número real ao clonar.
+
+  `estado_selecionado`/`cidade_selecionada`/`cidades` fazem a linha nascer
+  preenchida na EDIÇÃO. O `data-picker-initial-value` é o que o `picker.js` lê
+  para mostrar o rótulo escolhido: sem ele o `<option selected>` continua certo
+  no POST, mas o campo aparece vazio na tela — e a pessoa reescolhe um destino
+  que já estava lá.
 {% endcomment %}
 <div
   class="destination-row{% if extra_class %} {{ extra_class }}{% endif %}"
@@ -62,6 +68,7 @@
     data-placeholder="Buscar estado..."
     data-empty-message="Nenhum estado encontrado."
     data-location-state
+    data-picker-initial-value="{{ estado_selecionado|default:'' }}"
     name="{% if index %}destino_estado_{{ index }}{% else %}destino_estado{% endif %}"
     aria-label="Estado do destino"
   >
@@ -83,17 +90,20 @@
         class="search-picker__native"
         data-entity-picker="true"
         data-picker-v2
-      data-picker-v2
         data-entity-picker-mode="single"
         data-picker-variant="compact"
         data-placeholder="Buscar cidade..."
         data-empty-message="Nenhuma cidade encontrada."
         data-location-city
+        data-picker-initial-value="{{ cidade_selecionada|default:'' }}"
         name="{% if index %}destino_cidade_{{ index }}{% else %}destino_cidade{% endif %}"
         aria-label="Cidade do destino"
         {% if city_disabled|default_if_none:True %}disabled{% endif %}
       >
         <option value=""></option>
+        {% for cidade in cidades %}
+          <option value="{{ cidade.pk }}"{% if cidade_selecionada == cidade.pk|stringformat:'s' %} selected{% endif %}>{{ cidade.nome }}</option>
+        {% endfor %}
       </select>
 
       {% comment %}

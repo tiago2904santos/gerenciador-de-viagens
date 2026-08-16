@@ -1,0 +1,51 @@
+/* Tooltip global — a caixinha que `js/components/icon-tooltips.js` cria no
+ * `<body>` e posiciona à mão. Depende de `v2/tokens.css`.
+ *
+ * POR QUE ISTO MORA AQUI. O desenho existia em `actions/buttons.css`, que passa
+ * pelo podador de perfis: numa página v2 sobrou só a regra que DESLIGA o
+ * tooltip de `::after`, e a que estiliza o elemento real foi podada. O
+ * resultado é o pior tipo de falha — o `<div>` fica com `position: static`,
+ * cai no fim do corpo e o texto "Visualizar e baixar" aparece solto embaixo da
+ * página, empurrando a altura e fazendo nascer uma barra de rolagem.
+ *
+ * O `ui.bundle.css` não é podado. Enquanto o motor JS for global, o desenho
+ * dele precisa vir de um lugar que chegue a toda tela.
+ */
+
+:is(html[data-theme]) .global-tooltip {
+  background: var(--surface-field);
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  box-shadow: 0 12px 28px rgb(5 22 38 / 0.24);
+  color: var(--text-strong);
+  font-size: 11px;
+  font-weight: var(--weight-strong);
+  line-height: 1.2;
+  max-width: min(260px, calc(100vw - 16px));
+  opacity: 0;
+  padding: 5px 9px;
+  pointer-events: none;
+  position: fixed;
+  text-align: center;
+  transform: translateY(4px);
+  transition: opacity var(--ease), transform var(--ease);
+  white-space: nowrap;
+  /* Acima do menu de ações: os dois convivem quando o cursor passa pelo gatilho
+     com o menu aberto. */
+  z-index: calc(var(--z-modal, 1000) + 20);
+}
+
+:is(html[data-theme="dark"]) .global-tooltip {
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.45);
+}
+
+:is(html[data-theme]) .global-tooltip.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+:is(html[data-theme]) .global-tooltip.global-tooltip--accent {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-on-accent);
+}

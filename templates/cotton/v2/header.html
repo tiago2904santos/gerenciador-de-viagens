@@ -1,20 +1,17 @@
-{% cotton:vars aside extra_class eyebrow title %}
+{% cotton:vars aside extra_class title %}
 {% comment %}
   Header v2 — a faixa de identidade. Par de `static/css/v2/header.css`.
 
   Único componente que usa `--surface-brand`. O que vai à direita é livre:
   ação, toggle ou abas, pelo slot `aside`.
 
-  `eyebrow` é o TIPO DA PÁGINA — "Lista", "Cadastro", "Edição", "Convalidação",
-  "Retificação" —, nunca o domínio. O domínio já está no título, e repeti-lo
-  acima dele gasta a linha sem informar nada.
-
-  É o que responde "onde estou e o que esta tela faz", que é a pergunta de quem
-  chega por um link direto e não pela navegação.
+  SEM sobrancelha. Ela dizia o tipo da página — "Lista", "Cadastro", "Edição" —
+  e isso ou já está no título ou não muda decisão nenhuma: quem abriu a tela de
+  termos sabe que está numa lista. Duas linhas de tipografia diferente para
+  informar uma coisa só fazem o olho ler duas vezes antes de chegar ao nome.
 {% endcomment %}
 <div class="header{% if extra_class %} {{ extra_class }}{% endif %}">
   <div class="header__copy">
-    {% if eyebrow %}<span class="header__eyebrow">{{ eyebrow }}</span>{% endif %}
     <h1 class="header__title">{{ title }}</h1>
   </div>
   {% if aside %}<div class="header__aside">{{ aside }}</div>{% endif %}

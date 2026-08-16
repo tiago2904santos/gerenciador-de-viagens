@@ -2,14 +2,65 @@
 {% load static %}
 {% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
 {% block title %}{{ page_title }}{% endblock %}
-{% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/lists/entity-cards.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/termos.css' %}">
-{% endblock %}
 {% block content %}
-  {% if simples %}
-    <c-lists.list_page_standard eyebrow="Termos" :title="page_title" search_placeholder="Buscar por destino ou ofício" :search_clear_url="termos_url" tabs_aria_label="Alternar entre termos com e sem equipe" band_tabs_template="cotton/lists/list_toggle.html" empty_message="Nenhum termo sem equipe." empty_action_label="Novo termo" :empty_action_url="novo_url" action_label="Novo termo" :action_url="novo_url" :delete_modal_enabled="True" :attach_signed_modal_enabled="True"  :abas="abas" :action_aria_label="action_aria_label" :back_label="back_label" :back_url="back_url" :brand_mark="brand_mark" :can_edit_area="can_edit_area" :cargo_filter="cargo_filter" :combustivel_filter="combustivel_filter" :current_aba="current_aba" :hide_realtime_count="hide_realtime_count" :next_url="next_url" :page_obj="page_obj" :page_querystring="page_querystring" :pagination_pages="pagination_pages" :q="q" :request="request" :rows="rows" :status_options="status_options" :status_value="status_value" :tabs_template="tabs_template" :unidade_filter="unidade_filter" :advanced="advanced" :date_end_id="date_end_id" :date_picker_id="date_picker_id" :date_start_id="date_start_id" :delete_modal_entity="delete_modal_entity" :delete_modal_title="delete_modal_title" :extra_class="extra_class" :hide_date_filter="hide_date_filter" :primary_action_label="primary_action_label" :primary_action_url="primary_action_url" :search_aria_label="search_aria_label" :sort="sort" :sort_options="sort_options" :status="status" :status_label="status_label" :status_name="status_name" :status_variant="status_variant" :temporal="temporal" :temporal_options="temporal_options" :viagem_ate="viagem_ate" :viagem_de="viagem_de" />
-  {% else %}
-    <c-lists.list_page_cards :title="page_title" eyebrow="Termos" search_placeholder="Buscar por destino, ofício, protocolo, viatura ou servidor" search_aria_label="Buscar termos" card_template="termos/partials/termo_list_card.html" tabs_aria_label="Alternar entre termos com e sem equipe" band_tabs_template="cotton/lists/list_toggle.html" empty_message="Nenhum termo com equipe." empty_action_label="Novo termo" :empty_action_url="novo_url" action_label="Novo termo" :action_url="novo_url" delete_modal_title="Excluir termo?" delete_modal_entity="este termo" :attach_signed_modal="True"  :aba="aba" :abas="abas" :action_aria_label="action_aria_label" :can_edit_area="can_edit_area" :cancel_modal_entity="cancel_modal_entity" :cancel_modal_hint="cancel_modal_hint" :cancel_modal_title="cancel_modal_title" :cards="cards" :confirm_action_button_label="confirm_action_button_label" :confirm_action_entity="confirm_action_entity" :confirm_action_eyebrow="confirm_action_eyebrow" :confirm_action_hint="confirm_action_hint" :confirm_action_title="confirm_action_title" :csrf_token="csrf_token" :date_end_id="date_end_id" :date_picker_id="date_picker_id" :date_start_id="date_start_id" :filter_empty_message="filter_empty_message" :page_extra_class="page_extra_class" :page_obj="page_obj" :page_querystring="page_querystring" :page_title="page_title" :pagination_pages="pagination_pages" :request="request" :tabs_template="tabs_template" :cargo_filter="cargo_filter" :combustivel_filter="combustivel_filter" :confirm_action_icon="confirm_action_icon" :extra_class="extra_class" :hide_date_filter="hide_date_filter" :next_url="next_url" :primary_action_label="primary_action_label" :primary_action_url="primary_action_url" :q="q" :search_clear_url="search_clear_url" :search_name="search_name" :search_value="search_value" :sort="sort" :sort_options="sort_options" :status="status" :status_label="status_label" :status_name="status_name" :status_options="status_options" :status_value="status_value" :status_variant="status_variant" :temporal="temporal" :temporal_options="temporal_options" :unidade_filter="unidade_filter" :viagem_ate="viagem_ate" :viagem_de="viagem_de" :cotton_attr_aria_label="cotton_attr_aria_label" :cotton_attr_message="cotton_attr_message" :cotton_attr_title="cotton_attr_title" />
-  {% endif %}
+  {% comment %}
+    Lista de termos no sistema v2. As duas abas são a MESMA tela: o que muda é
+    o miolo de cada registro, não o esqueleto — as abas trocam o conjunto, não
+    a página.
+
+    A busca é do servidor (`?q=`), então o motor de coleções fica de fora
+    (`filter_mode="none"`). Filtrar no cliente sobre uma lista paginada
+    esconderia parte do que o servidor mandou e nada diria sobre o resto.
+
+    Os dois modais são os globais do legado: `overlay.js` os acha pelo `id`, e
+    os gatilhos que o `menu_body` v2 emite apontam para os mesmos ids. Trocá-los
+    por modais v2 é outra etapa; enquanto não for, excluir e anexar assinado
+    continuam funcionando exatamente como antes.
+  {% endcomment %}
+  <c-v2.list_page
+    :title="page_title"
+    filter_mode="none"
+    :page_obj="page_obj"
+    :pages="pagination_pages"
+    :page_querystring="page_querystring"
+    :paginated="True"
+    :empty_title="empty_title"
+    :empty_message="empty_message"
+    action_label="Novo termo"
+    :action_url="novo_url"
+  >
+    <c-slot name="tabs">
+      <c-v2.toggle aria_label="Alternar entre termos com e sem equipe" :items="abas" />
+    </c-slot>
+
+    <c-slot name="controls">
+      <form method="get" action="{{ request.path }}" class="rail__form" role="search">
+        <input type="hidden" name="aba" value="{{ aba }}">
+        <c-v2.input
+          icon="search"
+          name="q"
+          :value="q"
+          placeholder="Buscar por destino, ofício, protocolo, viatura ou servidor"
+          aria_label="Buscar termos"
+        />
+        <c-v2.button type="submit" label="Buscar" icon="search" />
+        {% if q %}<c-v2.button label="Limpar" icon="x" :href="termos_url" />{% endif %}
+      </form>
+    </c-slot>
+
+    <c-slot name="rows">
+      {% if simples %}
+        {% for row in rows %}
+          {% include "termos/partials/_termo_linha.html" with row=row row_index=forloop.counter only %}
+        {% endfor %}
+      {% else %}
+        {% for card in cards %}
+          {% include "termos/partials/termo_list_card.html" with card=card csrf_token=csrf_token only %}
+        {% endfor %}
+      {% endif %}
+    </c-slot>
+  </c-v2.list_page>
+
+  <c-ui.modals.delete_confirm_modal delete_modal_title="Excluir termo?" delete_modal_entity="este termo" />
+  <c-ui.modals.attach_signed_modal />
 {% endblock %}

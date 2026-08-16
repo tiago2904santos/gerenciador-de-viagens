@@ -63,8 +63,11 @@ class OrdemDeHeadingsNasListasTests(TestCase):
                 resposta = self.client.get(url)
                 self.assertEqual(resposta.status_code, 200, f"{url} não abriu")
                 html = resposta.content.decode()
-                self.assertIn(
-                    "empty-state", html,
+                # Duas marcações, porque a migração é gradual: `empty-state` é
+                # a do legado e `panel__empty` a do v2. Sem esta checagem o
+                # teste passaria numa tela que parou de mostrar o estado vazio.
+                self.assertTrue(
+                    "empty-state" in html or "panel__empty" in html,
                     f"{url} não está exibindo estado vazio — o teste perdeu o alvo",
                 )
                 niveis = niveis_de_heading(html)

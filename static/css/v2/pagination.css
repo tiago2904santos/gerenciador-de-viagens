@@ -48,6 +48,13 @@
   transition: background var(--ease), color var(--ease);
 }
 
+/* A seta não tem texto, então o respiro lateral do número só a deixa retangular
+   ao lado de quadrados. Sem o `padding`, ela fecha nos mesmos 28px. */
+:is(html[data-theme]) .pagination__nav {
+  padding: 0;
+  width: var(--control-height-sm);
+}
+
 :is(html[data-theme]) .pagination__nav svg {
   height: 16px;
   width: 16px;

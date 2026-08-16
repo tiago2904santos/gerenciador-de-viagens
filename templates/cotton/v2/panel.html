@@ -1,4 +1,4 @@
-{% cotton:vars actions body description empty_message empty_title extra_class surface title %}
+{% cotton:vars actions body description empty_message empty_title extra_class filter_empty_message filter_empty_title surface title %}
 {% comment %}
   Panel v2 — a caixa de uma seção de página: o que fica na PRIMEIRA camada,
   direto sobre o fundo. Par de `static/css/v2/panel.css`.
@@ -7,6 +7,17 @@
   (`--radius-rail`) e a borda da primeira camada; o form_block é o bloco de
   dentro, com raio menor. Usar form_block no primeiro nível dava à seção o
   arredondamento de um bloco interno, e a hierarquia sumia.
+
+  São DOIS vazios diferentes, e confundi-los mente para quem olha. "Nenhum
+  registro cadastrado" é a lista que nunca teve nada; quando o filtro esconde
+  tudo o que existe, o texto tem de dizer que o filtro é que não achou — senão
+  a busca por um termo errado parece perda de dados. O segundo nasce oculto e é
+  o `collection.js` quem o mostra, por `data-collection-empty`.
+
+  O teste é `body.strip`, e não `body`: um slot preenchido por um `{% for %}`
+  que não iterou nada devolve espaço em branco, que Django considera verdadeiro.
+  Com `{% if body %}` a lista vazia entrava pelo ramo do conteúdo e a mensagem
+  de "nada cadastrado" nunca aparecia — em nenhuma tela.
 {% endcomment %}
 <div class="panel{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
   {% if title or description or actions %}
@@ -19,11 +30,15 @@
     </header>
   {% endif %}
 
-  {% if body %}
+  {% if body.strip %}
     {{ body }}
+    <div class="panel__empty" data-collection-empty hidden>
+      <h2 class="panel__empty-title">{{ filter_empty_title|default:'Nenhum registro para este filtro' }}</h2>
+      <p>{{ filter_empty_message|default:'Ajuste a busca ou limpe os filtros.' }}</p>
+    </div>
   {% else %}
     <div class="panel__empty">
-      <p class="panel__empty-title">{{ empty_title|default:'Nenhum registro cadastrado' }}</p>
+      <h2 class="panel__empty-title">{{ empty_title|default:'Nenhum registro cadastrado' }}</h2>
       {% if empty_message %}<p>{{ empty_message }}</p>{% endif %}
     </div>
   {% endif %}

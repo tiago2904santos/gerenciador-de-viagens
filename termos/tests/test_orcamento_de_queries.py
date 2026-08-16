@@ -198,4 +198,11 @@ class OrcamentoDeQueriesTermoTests(TestCase):
     # O 26 aqui e o do `NOVO-08`, nao o 28 antigo: os dois IDs baixaram esta
     # mesma catraca por motivos diferentes e o merge tinha de somar as duas
     # quedas, nao repetir uma. Este numero e medido depois do merge.
-    QUERIES_EDITAR = 17  # remedido no DB-02: usuário de teste passou a ter vínculo de área
+    # 17 -> 18 em 15/08/2026, na migração do formulário para o v2: a seção de
+    # destinos passou a buscar a lista de estados sozinha (27 linhas, sem join)
+    # em vez de recebê-la da view. É deliberado — o componente funciona em
+    # qualquer tela sem que ninguém lembre de alimentar o contexto, e esquecer
+    # essa linha não dava erro: o campo de estado abria vazio. A tag memoriza o
+    # resultado no `request`, então uma tela com quatro destinos continua
+    # custando UMA consulta, não cinco.
+    QUERIES_EDITAR = 18  # remedido no DB-02: usuário de teste passou a ter vínculo de área

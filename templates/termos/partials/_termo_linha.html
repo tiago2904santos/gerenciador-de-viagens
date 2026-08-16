@@ -1,0 +1,30 @@
+{% comment %}
+  Linha da lista de termos SEM equipe — os que não têm servidor nem viatura.
+  Sem gente e sem veículo o card em camadas não tem faixa para mostrar, então
+  esses termos usam o registro raso.
+
+  O menu vem pronto do presenter (`row.menu`) e é renderizado pelo mesmo
+  componente que atende os cards. Editar e excluir ficam fora dele: são as duas
+  ações que se usa sem pensar, e escondê-las atrás de um clique a mais custaria
+  em toda linha da lista.
+{% endcomment %}
+<c-v2.record
+  eyebrow="Termo"
+  :title="row.title"
+  :search_text="row.search_extra"
+>
+  <c-slot name="meta">{% for item in row.facts %}{% if not forloop.first %} · {% endif %}{{ item.label }}: {{ item.value }}{% endfor %}</c-slot>
+  <c-slot name="actions">
+    {% if row.menu %}
+      <c-v2.icon_button
+        icon="folder"
+        :menu_id="row.menu.id"
+        :aria_label="row.menu.trigger_aria"
+        tooltip="Visualizar e baixar"
+      />
+      <c-v2.menu_body :menu="row.menu" />
+    {% endif %}
+    <c-v2.icon_button icon="edit" :href="row.edit_url" aria_label="Editar termo" tooltip="Editar" />
+    <c-v2.delete_button :url="row.delete_url" :label="row.title" title="Excluir termo?" aria_label="Excluir termo" />
+  </c-slot>
+</c-v2.record>

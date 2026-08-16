@@ -134,4 +134,10 @@ class OrcamentoDeQueriesOrdemServicoTests(TestCase):
     # dentro do laco dos cards. Os quatro sao custo constante da previa de
     # destinos, que resolve a sede das Configuracoes e rele o singleton por
     # request (4x ConfiguracaoSistema + 4x AreaTrabalho). Registrado NOVO-27.
-    QUERIES_EDITAR = 20
+    # 20 -> 21 em 15/08/2026, na migração do formulário para o v2: a seção de
+    # destinos passou a buscar a lista de estados sozinha (27 linhas, sem join)
+    # em vez de recebê-la da view. Mesma troca já feita em Termos, e pelo mesmo
+    # motivo: esquecer de alimentar o contexto não dava erro — o campo de estado
+    # abria vazio. A tag memoriza o resultado no `request`, então a tela com
+    # vários destinos continua custando UMA consulta.
+    QUERIES_EDITAR = 21

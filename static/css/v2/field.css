@@ -43,3 +43,65 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 40%, transparent);
   outline: none !important;
 }
+
+/* ---- campo com ação -------------------------------------------------------
+ *
+ * Uma ação secundária ao lado do controle — "gerenciar modelos" ao lado do
+ * select que os escolhe. Ela fica OCULTA e aparece quando o ponteiro entra no
+ * campo; o controle encolhe para abrir espaço, em vez de a ação flutuar por
+ * cima dele.
+ *
+ * `:focus-within` junto com `:hover` NÃO é zelo: uma ação que só existe sob o
+ * cursor desaparece para quem navega por teclado e para quem usa toque. Com o
+ * foco dentro do campo ela aparece igual, e o Tab alcança o botão.
+ */
+:is(html[data-theme]) .field-with-action {
+  align-items: center;
+  display: flex;
+  gap: 0;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .field-with-action > :first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Some pela LARGURA, e não por `display`: assim o controle ao lado cresce e
+   encolhe com transição, em vez de saltar. */
+:is(html[data-theme]) .field-with-action__action {
+  flex: 0 0 auto;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: opacity var(--ease), width var(--ease), margin-left var(--ease);
+  width: 0;
+}
+
+:is(html[data-theme]) .field-with-action:hover .field-with-action__action,
+:is(html[data-theme]) .field-with-action:focus-within .field-with-action__action {
+  margin-left: var(--gap-tight);
+  opacity: 1;
+  pointer-events: auto;
+  width: var(--control-height);
+}
+
+/* O botão nunca encolhe junto com a caixa que o esconde — ele só some de vista.
+ *
+ * No ACCENT, e não na cor neutra dos outros botões de ícone: ele aparece só
+ * quando o ponteiro entra no campo, e nesse instante precisa se anunciar. Um
+ * botão que surge apagado ao lado do controle parece parte dele. */
+:is(html[data-theme]) .field-with-action__action > .icon-button {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+  color: var(--accent);
+  flex: none;
+  height: var(--control-height);
+  width: var(--control-height);
+}
+
+:is(html[data-theme]) .field-with-action__action > .icon-button:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-on-accent);
+}

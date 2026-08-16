@@ -1,0 +1,154 @@
+/* Linha de pessoa — o item da faixa de um registro. Depende de `v2/tokens.css`.
+ *
+ * A faixa é o degrau seguinte ao do registro: `--surface-contrast` já aponta
+ * para ele, então a lista não precisa de borda para se separar do cartão. Foi
+ * a mesma decisão da caixa dos escolhidos no picker.
+ */
+
+/* A faixa continua a escada: o registro ocupa o degrau `field`, então ela volta
+   ao `rail` e as linhas dela sobem de novo para `field`.
+
+   As duas cores vêm dos tokens BASE, e não de `--surface-contrast`. Pintar a
+   faixa com a variável que ela mesma redefine para os filhos é uma referência
+   circular: o `background` lê o valor novo, e faixa e linha saem da mesma cor —
+   foi exatamente o que aconteceu na primeira versão desta folha, e na tela a
+   escada simplesmente sumiu, sem erro nenhum. */
+:is(html[data-theme]) .person-list {
+  --surface-contrast: var(--surface-field);
+  background: var(--surface-rail);
+  border-radius: var(--radius-field);
+  display: grid;
+  gap: var(--gap-tight);
+  list-style: none;
+  margin: 0;
+  padding: var(--gap-tight);
+}
+
+:is(html[data-theme]) .person-row {
+  align-items: center;
+  background: var(--surface-contrast, var(--surface-field));
+  border-radius: var(--radius-field);
+  display: grid;
+  gap: var(--gap-tight);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-width: 0;
+  padding: var(--gap-tight);
+}
+
+/* Iniciais em caixa quadrada, no accent — é a âncora de varredura da faixa. */
+:is(html[data-theme]) .person-row__avatar {
+  align-items: center;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+  border-radius: var(--radius-field);
+  color: var(--accent);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  height: var(--control-height-sm);
+  justify-content: center;
+  letter-spacing: 0.02em;
+  width: var(--control-height-sm);
+}
+
+/* A viatura é a mesma linha com outro tom: o selo já diz o que ela é, e mudar
+   a forma faria a faixa parecer duas listas. */
+:is(html[data-theme]) .person-row--viatura .person-row__avatar {
+  background: color-mix(in srgb, var(--status-info) 16%, transparent);
+  border-color: color-mix(in srgb, var(--status-info) 32%, transparent);
+  color: var(--status-info);
+}
+
+:is(html[data-theme]) .person-row__body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .person-row__name-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-tight);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .person-row__name {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Selo informativo, no tom accent e na mesma linguagem do `chip--v2`: fundo
+   translúcido a 16% e a cor cheia no texto. Em cinza sobre a superfície vizinha
+   ele desaparecia — e um selo que não se vê não informa nada. */
+:is(html[data-theme]) .person-row__badge {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border-radius: var(--radius-pill);
+  color: var(--accent);
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+:is(html[data-theme]) .person-row__meta {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:is(html[data-theme]) .person-row__actions {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--gap-tight);
+}
+
+/* Linha de FATO: um par rótulo + texto na mesma faixa das pessoas — motivo da
+   viagem, quem assina. Não tem âncora porque não é alguém: as iniciais existem
+   para achar uma pessoa na lista, e uma caixa vazia no lugar delas só abriria
+   um buraco no alinhamento. */
+:is(html[data-theme]) .person-row--fact {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+:is(html[data-theme]) .person-row--fact .person-row__avatar {
+  display: none;
+}
+
+/* Aqui o rótulo é que é miúdo, e o texto embaixo é o dado — o contrário da
+   linha de pessoa, onde o nome lidera. */
+:is(html[data-theme]) .person-row--fact .person-row__name {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+:is(html[data-theme]) .person-row--fact .person-row__meta {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  white-space: normal;
+}
+
+/* O motorista é o único servidor com realce na faixa — mesmo critério do picker:
+   numa lista em que todos foram escolhidos, o que se precisa saber de relance é
+   quem dirige. Cor própria e âncora cheia, como o escolhido em destaque. */
+:is(html[data-theme]) .person-row--driver {
+  background: var(--surface-selected);
+  box-shadow: inset 3px 0 0 0 var(--accent);
+}
+
+:is(html[data-theme]) .person-row--driver .person-row__avatar {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-on-accent);
+}

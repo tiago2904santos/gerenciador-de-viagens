@@ -672,9 +672,10 @@ class DarkRedesignContractTests(SimpleTestCase):
 
         for relative in (
             "oficios/partials/oficio_list_card.html",
+            # Migrados para o v2 e portanto fora deste contrato: termos
+            # (2026-08-15) e ordens de serviço (2026-08-15).
             "eventos/partials/evento_list_card.html",
             "planos_trabalho/partials/plano_list_card.html",
-            "ordens_servico/partials/os_list_card.html",
             "prestacoes_contas/partials/prestacao_list_card.html",
             "roteiros/partials/roteiro_list_card.html",
         ):

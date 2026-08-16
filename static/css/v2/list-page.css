@@ -1,0 +1,117 @@
+/* List page — o esqueleto de uma tela de lista. Depende de `v2/tokens.css`.
+ *
+ * O componente é composição pura (header + rail + panel + pagination), mas o
+ * RITMO entre as peças é dele: sem esta folha as três empilhavam sem vão nenhum
+ * e o painel de registros nascia colado na faixa de controles.
+ */
+
+:is(html[data-theme]) .list-page {
+  display: grid;
+  gap: var(--gap);
+}
+
+/* Header e rail são uma peça só — o rail já perde os cantos de cima quando
+   encosta no header, e o vão da grade os separaria de novo. Puxá-lo de volta
+   aqui é o que mantém a regra de forma e a de ritmo dizendo a mesma coisa. */
+:is(html[data-theme]) .list-page > .header + .rail {
+  margin-top: calc(var(--gap) * -1);
+}
+
+/* As abas ficam à DIREITA, alinhadas com as ações dos registros logo abaixo, e
+   rolam na horizontal em tela estreita em vez de quebrar: uma fileira de abas
+   partida ao meio deixa de ser lida como um grupo de opções. */
+:is(html[data-theme]) .list-page__tabs {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+/* Menores que o padrão do toggle: aqui elas são um recorte da lista, não a
+   navegação principal da tela — competir em tamanho com o título seria dar a
+   elas um peso que não têm. */
+:is(html[data-theme]) .list-page__tabs .toggle__item {
+  font-size: var(--text-size-eyebrow);
+  gap: 5px;
+  min-height: var(--control-height-sm);
+  padding: 0 10px;
+}
+
+:is(html[data-theme]) .list-page__tabs .toggle__count {
+  font-size: 10px;
+  min-width: 16px;
+  padding: 1px 5px;
+}
+
+:is(html[data-theme]) .list-page__tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---- ação principal, flutuante -------------------------------------------
+ *
+ * Fica no canto inferior direito, fixa na janela. Numa lista longa a ação de
+ * criar estava no topo, fora da tela justamente quando a pessoa termina de
+ * percorrer a lista e conclui que precisa de um registro novo.
+ */
+:is(html[data-theme]) .list-page__action {
+  align-items: center;
+  background: var(--accent);
+  border-radius: var(--radius-pill);
+  bottom: max(var(--gap-loose), env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 12px 32px rgb(5 22 38 / 0.32);
+  color: var(--text-on-accent);
+  display: inline-flex;
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  gap: var(--gap-tight);
+  min-height: var(--control-height);
+  padding: 0 var(--gap-loose);
+  position: fixed;
+  right: max(var(--gap-loose), env(safe-area-inset-right, 0px));
+  text-decoration: none;
+  transition: box-shadow var(--ease), transform var(--ease);
+  z-index: var(--z-sticky, 900);
+}
+
+:is(html[data-theme]) .list-page__action:hover {
+  box-shadow: 0 16px 40px rgb(5 22 38 / 0.42);
+}
+
+:is(html[data-theme]) .list-page__action:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+:is(html[data-theme]) .list-page__action svg {
+  height: 18px;
+  width: 18px;
+}
+
+/* O botão paira sobre o fim da lista. Sem esta folga ele cobre a paginação
+   exatamente quando a pessoa chega nela. */
+:is(html[data-theme]) .list-page:has(.list-page__action) {
+  padding-bottom: calc(var(--control-height) + var(--gap-loose));
+}
+
+/* Em tela estreita o rótulo sai e fica só o ícone: um botão largo fixo come
+   parte útil da lista. */
+@media (max-width: 640px) {
+  :is(html[data-theme]) .list-page__action {
+    border-radius: 999px;
+    height: var(--control-height);
+    justify-content: center;
+    padding: 0;
+    width: var(--control-height);
+  }
+
+  :is(html[data-theme]) .list-page__action span {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+}

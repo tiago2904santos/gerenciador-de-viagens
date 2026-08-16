@@ -33,10 +33,21 @@
      vermelha do erro; separação entre camadas é superfície, não profundidade. */
   box-shadow: none;
   box-sizing: border-box;
+  color: var(--text-strong);
   display: flex;
+  /* 14px como todo campo do sistema. O legado deixava o texto do picker em
+     16px e numa cor própria (`#f0f6ff`), e o campo de busca era o único
+     controle com letra maior que os vizinhos — lado a lado com um `input`, a
+     diferença aparecia sem que nada a explicasse. */
+  font-size: var(--text-size-base);
   gap: var(--gap-tight);
   min-height: var(--control-height);
   padding: var(--pad-field);
+}
+
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__input {
+  color: var(--text-strong);
+  font: inherit;
 }
 
 :is(html[data-theme]) :is(.picker, .destination-row) .search-picker__control:focus-within {
@@ -94,64 +105,70 @@
  * do resto do sistema. A borda sai junto: separação entre camadas é superfície,
  * não linha. */
 :is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-panel {
-  --surface: var(--surface-field);
+  /* A caixa dos escolhidos não desenha mais NADA: quem faz o box é o
+     `form_block` em volta, e o painel dentro dele era caixa dentro de caixa —
+     dois raios, dois recuos e duas superfícies para uma seção só. Sobrou a
+     lista, direto no bloco.
+
+     O degrau continua declarado aqui porque os cartões o usam: o bloco é
+     `field`, então cada escolhido sobe para `rail` e se separa do fundo sem
+     precisar de borda. */
   --surface-contrast: var(--surface-rail);
 
-  background: var(--surface-field);
+  background: none;
   border: 0;
-  /* As mesmas medidas do `form-block`: raio de campo, recuo e vão de `--gap`.
-     A caixa dos escolhidos É uma seção de conteúdo — trocar o desenho dela por
-     um próprio é o começo de mais uma família de caixas. */
-  border-radius: var(--radius-field);
+  border-radius: 0;
   box-sizing: border-box;
   display: grid;
-  gap: var(--gap);
-  min-width: 0;
-  padding: var(--gap);
-}
-
-/* O contador é o selo do accent: fundo cheio, texto na cor que o accent pede.
-   O legado o pintava com azul e borda próprios (`#12507f`), que não vinham de
-   token nenhum e não acompanhavam a troca de tema. */
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-count {
-  align-items: center;
-  background: var(--accent);
-  border: 0;
-  border-radius: var(--radius-pill);
-  color: var(--text-on-accent);
-  display: inline-flex;
-  flex: none;
-  font-size: var(--text-size-eyebrow);
-  font-weight: var(--weight-strong);
-  justify-content: center;
-  min-width: 22px;
-  padding: 2px 6px;
-}
-
-/* Cabeçalho no arranjo do `form-block`: título à esquerda, contador à direita. */
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-header {
-  align-items: baseline;
-  display: flex;
-  gap: var(--gap);
-  justify-content: space-between;
+  gap: var(--gap-tight);
   min-width: 0;
   padding: 0;
 }
 
-/* Tipografia do `form-block__title`. O legado escrevia este rótulo em
-   maiúsculas miúdas com espaçamento de letra; aqui ele é um título como
-   qualquer outro do sistema. */
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-title {
-  color: var(--text-strong);
-  font-size: var(--text-size-base);
-  font-weight: var(--weight-strong);
-  letter-spacing: normal;
-  margin: 0;
-  text-transform: none;
+/* O cabeçalho ("Selecionados" e o contador em accent) sai junto com a caixa: o
+   título do `form_block` já nomeia a seção, e repeti-lo logo abaixo dizia duas
+   vezes a mesma coisa. O contador some com ele — a lista tem no máximo três
+   itens visíveis, e contar até três não precisa de selo. */
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-header {
+  display: none;
 }
 
+/* Nada escolhido também é um estado, e ele ocupa uma FAIXA — a mesma geometria
+   do cartão que vai aparecer ali quando houver escolha: altura, raio e degrau
+   iguais. Assim a caixa não salta de tamanho no primeiro item, e o lugar onde
+   os escolhidos vão morar já está visível antes de existir algum. */
 :is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-empty {
+  align-items: center;
+  background: var(--surface-contrast, var(--surface-field));
   border: 0;
+  border-radius: var(--radius-field);
+  box-sizing: border-box;
+  color: var(--text-muted);
+  display: flex;
+  font-size: var(--text-size-base);
+  justify-content: center;
+  margin: 0;
+  /* Altura FIXA, e não a do cartão daquele picker: a faixa de vazio diz a mesma
+     coisa em todos eles, e três pickers na mesma tela com faixas de alturas
+     diferentes leem como três estados diferentes. O preço é que, no picker de
+     documento vinculado — cujos cartões são mais altos —, a caixa cresce ao
+     aparecer o primeiro resultado. Entre saltar uma vez e desalinhar sempre,
+     escolhi o salto. */
+  min-height: 56px;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+/* O `display` acima vence o `[hidden]`, que é regra de agente do usuário — e o
+   picker de ofício vinculado esconde o aviso de "nenhum resultado" por esse
+   atributo, mostrando-o só quando a busca não acha nada. Sem este guarda, a
+   frase ficava permanente na tela, embaixo da lista cheia.
+
+   É a TERCEIRA vez que este mesmo descuido aparece nesta migração: aconteceu
+   com o menu de ações e com o estado vazio do painel. Sempre que uma regra do
+   v2 declara `display`, ela precisa declarar o par `[hidden]`. */
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-empty[hidden] {
+  display: none;
 }
 
 /* Teto de TRÊS escolhidos; do quarto em diante, rola.
@@ -182,10 +199,14 @@
   min-height: var(--escolhido-height);
 }
 
+/* Estar na lista já é o estado normal do escolhido: um degrau da escada, sem
+   realce. O destaque de accent fica reservado ao que se DESTACA entre eles —
+   ver o bloco do motorista e da viatura, mais abaixo. */
 :is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-card {
   align-items: center;
   background: var(--surface-contrast, var(--surface-field));
   border: 0;
+  box-shadow: none;
   border-radius: var(--radius-field);
   color: var(--text-strong);
   cursor: pointer;
@@ -196,9 +217,13 @@
   width: 100%;
 }
 
+/* A mesma âncora da opção da lista (`v2/listbox.css`): o item que se escolhe e
+   o que fica escolhido têm de ser reconhecíveis como a mesma coisa. Antes o
+   contorno vinha de uma regra legada, num azul que não era o accent do tema. */
 :is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-avatar {
   align-items: center;
-  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
   border-radius: var(--radius-field);
   color: var(--accent);
   display: inline-flex;
@@ -334,3 +359,310 @@
   outline: 2px solid var(--focus-ring) !important;
   outline-offset: 2px;
 }
+
+/* ---- a raiz das apresentações detalhadas ---------------------------------
+ *
+ * O legado desenha uma CAIXA em volta do picker de pessoas e de veículos —
+ * fundo próprio e contorno TRACEJADO —, herança de quando ele era uma área de
+ * soltar. No v2 quem faz a caixa é o `form_block` em volta, e o tracejado
+ * aparecia como um retângulo pontilhado dentro de outro retângulo.
+ *
+ * Os seletores repetem as combinações exatas do legado
+ * (`--people.--roster`, `--vehicle`) porque é assim que aquelas regras
+ * alcançam a raiz; um seletor mais curto empataria e perderia a disputa.
+ */
+:is(html[data-theme]) .picker .search-picker--detailed,
+:is(html[data-theme]) .picker .search-picker--people.search-picker--roster,
+:is(html[data-theme]) .picker .search-picker--vehicle {
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+/* ---- o escolhido nas apresentações detalhadas ----------------------------
+ *
+ * O legado descreve o cartão de pessoa e o de veículo com UMA CLASSE A MAIS que
+ * as regras acima (`--people.--roster`, `--vehicle`), e por isso vencia todas
+ * elas: o cartão saía com o fundo do campo — igual ao do bloco em volta, sem se
+ * destacar de nada —, raio de 12px que não é o do sistema, uma grade com coluna
+ * fixa de 42px e uma LINHA VERTICAL separando o "×" do resto.
+ *
+ * Repetir aqui as combinações exatas é o que devolve a disputa. Um seletor mais
+ * curto empata e perde.
+ */
+:is(html[data-theme]) .picker .search-picker--people.search-picker--roster .search-picker__selected-card,
+:is(html[data-theme]) .picker .search-picker--vehicle .search-picker__selected-card,
+:is(html[data-theme]) .picker .search-picker--detailed .search-picker__selected-card {
+  align-items: center;
+  background: var(--surface-contrast, var(--surface-rail));
+  border: 0;
+  border-radius: var(--radius-field);
+  box-shadow: none;
+  display: flex;
+  gap: var(--gap);
+  grid-template-columns: none;
+  min-height: var(--escolhido-height);
+  padding: 10px 12px;
+}
+
+/* O "×" não é uma coluna com divisória: é o mesmo botão redondo de sempre, à
+   direita, do tamanho do controle miúdo. A LINHA VERTICAL à esquerda dele era o
+   que fazia o cartão parecer uma tabela de duas células.
+
+   São duas formas porque o motor monta o cartão de dois jeitos: em alguns ele
+   embrulha o botão num grupo de ações, em outros o botão é filho direto. O
+   legado descreve as duas, cada uma com uma classe a mais que a regra geral do
+   v2 — cobrir só uma deixava a divisória viva na outra, e foi o que aconteceu:
+   sumiu do cartão de pessoa e continuou no de viatura. */
+:is(html[data-theme]) .picker :is(.search-picker--detailed, .search-picker--roster, .search-picker--people, .search-picker--vehicle) .search-picker__selected-actions .search-picker__remove,
+:is(html[data-theme]) .picker :is(.search-picker--detailed, .search-picker--roster, .search-picker--people, .search-picker--vehicle) .search-picker__selected-card > .search-picker__remove {
+  align-self: center;
+  background: none;
+  border: 0;
+  border-radius: var(--radius-pill);
+  height: var(--control-height-sm);
+  margin: 0 0 0 auto;
+  padding: 0;
+  width: var(--control-height-sm);
+}
+
+:is(html[data-theme]) .picker .search-picker__selected-actions {
+  border: 0;
+  margin-left: auto;
+  padding: 0;
+}
+
+/* O selo "Viatura" do cartão escolhido. O legado o pintava de dourado CHEIO —
+ * num tom fixo (`#d8a21b`) que nem é o accent do tema —, em 10px, peso 900,
+ * caixa alta e com espaçamento entre letras. Um selo assim grita mais que a
+ * placa que ele acompanha, e o olho lê primeiro a palavra "VIATURA", que é a
+ * mesma em todos os cartões, antes do dado que distingue um do outro.
+ *
+ * Vale para os dois selos informativos do cartão — "Viatura" e "Motorista" —,
+ * que o legado pintava do mesmo jeito. Aqui usam a linguagem de selo do sistema,
+ * a do `chip--v2`, com o tom ACCENT: fundo translúcido a 16% e a cor cheia no
+ * texto. Translúcido porque é o único tom que se adapta ao fundo; o dourado
+ * cheio dominava o cartão e obrigava o texto a virar escuro para sobreviver.
+ *
+ * Sobre o cartão do motorista, que JÁ está na cor da escolha, o translúcido
+ * continua legível — foi por isso que ele venceu as outras três alternativas
+ * testadas na galeria.
+ */
+:is(html[data-theme]) .picker .search-picker__driver-chip,
+:is(html[data-theme]) .picker .search-picker__vehicle-chip {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border: 0;
+  border-radius: var(--radius-pill);
+  color: var(--accent);
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  letter-spacing: normal;
+  padding: 3px 10px;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+/* ---- o que se destaca entre os escolhidos --------------------------------
+ *
+ * Numa equipe de cinco, todos foram escolhidos — o que a lista precisa
+ * responder de relance é OUTRA coisa: quem dirige. Por isso o realce de accent
+ * (cor própria, fita à esquerda e âncora cheia) marca só o MOTORISTA, e não
+ * todo cartão. Com todos realçados, o realce não dizia nada.
+ *
+ * A viatura entra no mesmo desenho porque ali só existe uma: o cartão dela É a
+ * escolha da seção, não um item entre vários.
+ *
+ * Os seletores repetem as variantes COMPOSTAS (`--people.--roster`) em vez de
+ * um `:is(...)`: a especificidade de um `:is()` é a do seu argumento MAIS
+ * específico — uma classe —, e por isso a primeira versão desta regra perdia
+ * para a que pinta o cartão neutro logo acima, que soma duas. O motorista
+ * ficava com a âncora cheia e sem a cor e a fita, um estado pela metade.
+ */
+:is(html[data-theme]) .picker .search-picker--people.search-picker--roster .search-picker__selected-card--driver,
+:is(html[data-theme]) .picker .search-picker--detailed .search-picker__selected-card--driver,
+:is(html[data-theme]) .picker .search-picker--vehicle .search-picker__selected-card--vehicle,
+:is(html[data-theme]) .picker .search-picker--detailed .search-picker__selected-card--vehicle {
+  background: var(--surface-selected);
+  box-shadow: inset 3px 0 0 0 var(--accent);
+}
+
+/* Âncora CHEIA só nesses dois: na lista de opções ela concorre com as irmãs e
+   precisa ser translúcida; aqui ela aponta um item só. */
+:is(html[data-theme]) .picker .search-picker__selected-card--driver .search-picker__selected-avatar,
+:is(html[data-theme]) .picker .search-picker__selected-card--vehicle .search-picker__selected-avatar {
+  background: var(--accent);
+  border: 0;
+  color: var(--text-on-accent);
+}
+
+/* O campo de busca é O MESMO nas três apresentações. O legado dá ao de pessoas
+ * (`--people.--roster`) fundo e borda próprios, com uma classe a mais que a
+ * regra geral do v2 — e por isso vencia: lado a lado, o picker de equipe tinha
+ * um campo em outro tom e com contorno cinza visível, enquanto o de viatura e o
+ * de uma linha ficavam sem contorno. Nada explicava a diferença; ela era só o
+ * resto de uma folha que ninguém apagou.
+ */
+:is(html[data-theme]) .picker .search-picker--people.search-picker--roster .search-picker__control,
+:is(html[data-theme]) .picker .search-picker--detailed .search-picker__control,
+:is(html[data-theme]) .picker .search-picker--vehicle .search-picker__control {
+  background: var(--surface-contrast, var(--surface-field));
+  border: 1px solid transparent;
+  border-radius: var(--radius-field);
+}
+
+/* O vão entre o campo de busca e a lista de escolhidos. O legado o deixa em
+ * 16px, e com o vão da própria lista somando por baixo o campo ficava distante
+ * do que ele acabou de produzir — as duas peças são uma coisa só, e o espaço
+ * entre elas tem de ser menor que o que separa um bloco do outro.
+ */
+:is(html[data-theme]) .picker .search-picker {
+  gap: var(--gap-tight);
+}
+
+/* A lista vazia continua sendo uma LINHA da grade, de altura zero, e o vão dela
+   para a faixa seguinte soma ao vão do campo — 8 + 8, quando o desenho pede 8.
+   Um contêiner sem filhos não ocupa lugar nenhum.
+
+   Vale também para a lista de RESULTADOS do picker de documento vinculado, que
+   nasce vazia no HTML e é preenchida pelo script da página. Cheguei a excluí-la
+   daqui achando que a regra a escondia para sempre — não esconde: `:empty` é
+   avaliado ao vivo e deixa de casar no instante em que o script insere o
+   primeiro cartão. O que eu tinha visto era uma lista vazia porque não havia
+   ofício a mostrar, e a exclusão só devolveu o vão dobrado entre o campo e a
+   faixa de "nenhum resultado". */
+:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-list:empty {
+  display: none;
+}
+
+/* ---- o que a varredura das três apresentações encontrou ------------------
+ *
+ * Comparando propriedade a propriedade o picker de uma linha, o de pessoas e o
+ * de veículos, sobraram duas diferenças que ninguém decidiu — as demais são de
+ * conteúdo (largura de texto) ou de estado (o realce do motorista e o da
+ * viatura).
+ */
+
+/* 1. O vão interno do campo saía 8px numa apresentação e 7px nas outras. Um
+      pixel de diferença não se vê sozinho, mas é o tipo de resto que faz duas
+      telas nunca fecharem quando alguém tenta alinhá-las. */
+:is(html[data-theme]) .picker .search-picker__field,
+:is(html[data-theme]) .picker .search-picker--people.search-picker--roster .search-picker__field,
+:is(html[data-theme]) .picker .search-picker--detailed .search-picker__field {
+  gap: var(--gap-tight);
+}
+
+/* 2. O cartão com selo ficava 6px mais alto que o sem selo (62 contra 56), e a
+      conta do teto de três escolhidos é feita sobre 56 — a lista cortava no
+      lugar errado assim que um item tinha "Viatura" ou "Motorista". O selo
+      agora cabe DENTRO da linha do nome em vez de esticá-la. */
+:is(html[data-theme]) .picker .search-picker__driver-chip,
+:is(html[data-theme]) .picker .search-picker__vehicle-chip {
+  /* Altura FIXA, igual à caixa de linha do nome ao lado (18px). Só o
+     `line-height` não bastava: o legado ainda somava altura mínima própria, e o
+     selo continuava esticando a linha em 3px. */
+  box-sizing: border-box;
+  height: 18px;
+  line-height: 1;
+  min-height: 0;
+  padding: 0 8px;
+}
+
+/* ---- picker de documento vinculado ---------------------------------------
+ *
+ * A lista fica à vista o tempo todo, então ela é quem rola — o teto é o mesmo
+ * de três cartões dos outros pickers, para as duas listas do formulário
+ * pararem na mesma altura.
+ */
+/* O cartão daqui é mais alto que o dos outros pickers: ele carrega um documento
+   inteiro — número, rota, período, equipe e viatura —, e os 56px que bastam
+   para um nome e um cargo deixavam as duas linhas espremidas contra as bordas.
+   A altura vive numa variável porque é ela que fecha a conta do teto de três. */
+/* A altura do item daqui vale para o picker INTEIRO, e não só para a lista: a
+   faixa de "nenhum resultado" é irmã da lista, não filha dela, e sem esta
+   declaração na raiz ela ficava nos 56px genéricos enquanto os cartões tinham
+   68 — a caixa mudava de altura no instante em que o primeiro resultado
+   aparecia. */
+:is(html[data-theme]) .picker--related {
+  --escolhido-height: 68px;
+}
+
+:is(html[data-theme]) .picker--related .search-picker__selected-list {
+  /* Repetida NA LISTA porque a regra geral declara `--escolhido-height: 56px`
+     nela mesma, e o valor da própria lista vence o herdado da raiz — tanto para
+     ela quanto para os cartões dentro dela. */
+  --escolhido-height: 68px;
+
+  max-height: calc(var(--escolhido-height, 56px) * 3 + var(--gap-tight) * 3);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-width: thin;
+}
+
+/* O cartão da lista é um BOTÃO, e o navegador lhe dá fonte e alinhamento
+   próprios. O arranjo também precisa ser declarado aqui: o legado empilha ícone
+   e texto numa grade centralizada, e o cartão saía com 92px e o ícone acima do
+   nome — em vez dos 56px e do ícone à esquerda dos outros pickers. */
+:is(html[data-theme]) .picker--related .search-picker__selected-card {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  /* `row` declarado: o legado empilha em coluna, e com o ícone em cima do nome
+     o cartão saía com 92px onde o conteúdo pede 56. */
+  flex-direction: row;
+  flex-wrap: nowrap;
+  font: inherit;
+  gap: var(--gap);
+  grid-template-columns: none;
+  min-height: var(--escolhido-height, 56px);
+  padding: 14px 12px;
+  text-align: left;
+  width: 100%;
+}
+
+/* O texto do cartão empilha em duas linhas e se alinha à esquerda; centralizado
+   ele lia como um aviso, não como um item de lista. */
+:is(html[data-theme]) .picker--related .search-picker__selected-main {
+  align-items: flex-start;
+  display: grid;
+  gap: 2px;
+  justify-items: start;
+  min-width: 0;
+  text-align: left;
+}
+
+/* O escolhido da lista usa o MESMO estado da opção escolhida no menu e do
+   cartão do motorista: cor própria e fita de accent. `is-active` é a classe que
+   `CV.pickerParts.createRelatedCard` escreve — nome do motor, não do desenho. */
+:is(html[data-theme]) .picker--related .search-picker__selected-card.is-active {
+  background: var(--surface-selected);
+  box-shadow: inset 3px 0 0 0 var(--accent);
+}
+
+:is(html[data-theme]) .picker--related .search-picker__selected-card.is-active .search-picker__selected-avatar {
+  background: var(--accent);
+  border: 0;
+  color: var(--text-on-accent);
+}
+
+:is(html[data-theme]) .picker--related .search-picker__selected-avatar svg {
+  height: 18px;
+  width: 18px;
+}
+
+/* O teto de três escolhidos vale nas apresentações detalhadas também. O legado
+ * declara `overflow: visible` na lista de pessoas com uma classe a mais — e o
+ * `max-height` do v2 continuava valendo, então a caixa parava em 192px e os
+ * cartões seguintes VAZAVAM para fora dela, por cima do bloco de baixo. Teto
+ * sem rolagem não corta: só esconde a borda do problema.
+ */
+:is(html[data-theme]) .picker .search-picker--people.search-picker--roster .search-picker__selected-list,
+:is(html[data-theme]) .picker .search-picker--detailed .search-picker__selected-list,
+:is(html[data-theme]) .picker .search-picker--vehicle .search-picker__selected-list {
+  max-height: calc(var(--escolhido-height, 56px) * 3 + var(--gap-tight) * 3);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-width: thin;
+}
+

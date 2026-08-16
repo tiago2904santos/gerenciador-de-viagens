@@ -1,13 +1,73 @@
 {% extends "base.html" %}
 {% load static %}
 {% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
-
 {% block title %}{{ page_title }}{% endblock %}
 
-{% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/lists/entity-cards.css' %}">
-{% endblock %}
-
 {% block content %}
-  <c-lists.list_page_cards :title="page_title" eyebrow="DOCUMENTOS" search_placeholder="Buscar por número, motivo, destino ou servidor..." search_aria_label="Buscar ordens de serviço" date_picker_id="os-filter-date-picker" date_start_id="id_os_viagem_de" date_end_id="id_os_viagem_ate" tabs_aria_label="Abas de ordens de serviço" card_template="ordens_servico/partials/os_list_card.html" :empty_message="empty_message" empty_action_label="Nova OS" :empty_action_url="nova_url" action_label="Nova OS" :action_url="nova_url" action_aria_label="Nova Ordem de Serviço" delete_modal_title="Excluir Ordem de Serviço?" delete_modal_entity="esta Ordem de Serviço"  :aba="aba" :abas="abas" :attach_signed_modal="attach_signed_modal" :band_tabs_template="band_tabs_template" :can_edit_area="can_edit_area" :cancel_modal_entity="cancel_modal_entity" :cancel_modal_hint="cancel_modal_hint" :cancel_modal_title="cancel_modal_title" :cards="cards" :confirm_action_button_label="confirm_action_button_label" :confirm_action_entity="confirm_action_entity" :confirm_action_eyebrow="confirm_action_eyebrow" :confirm_action_hint="confirm_action_hint" :confirm_action_title="confirm_action_title" :csrf_token="csrf_token" :filter_empty_message="filter_empty_message" :page_extra_class="page_extra_class" :page_obj="page_obj" :page_querystring="page_querystring" :page_title="page_title" :pagination_pages="pagination_pages" :request="request" :tabs_template="tabs_template" :cargo_filter="cargo_filter" :combustivel_filter="combustivel_filter" :confirm_action_icon="confirm_action_icon" :extra_class="extra_class" :hide_date_filter="hide_date_filter" :next_url="next_url" :primary_action_label="primary_action_label" :primary_action_url="primary_action_url" :q="q" :search_clear_url="search_clear_url" :search_name="search_name" :search_value="search_value" :sort="sort" :sort_options="sort_options" :status="status" :status_label="status_label" :status_name="status_name" :status_options="status_options" :status_value="status_value" :status_variant="status_variant" :temporal="temporal" :temporal_options="temporal_options" :unidade_filter="unidade_filter" :viagem_ate="viagem_ate" :viagem_de="viagem_de" :cotton_attr_aria_label="cotton_attr_aria_label" :cotton_attr_message="cotton_attr_message" :cotton_attr_title="cotton_attr_title" />
+  {% comment %}
+    Lista de Ordens de Serviço no sistema v2 — mesma forma da lista de termos.
+
+    A busca e os filtros são do SERVIDOR (`?q=`, `?sort=`, `?viagem_de=`), então
+    o motor de coleções fica de fora: filtrar no cliente sobre uma lista
+    paginada esconderia parte do que o servidor mandou sem dizer que escondeu.
+
+    Os modais são os globais do legado. Os gatilhos que o `menu_body` v2 e o
+    `delete_button` emitem apontam para os mesmos ids, então excluir e anexar
+    assinado seguem funcionando como antes.
+  {% endcomment %}
+  <c-v2.list_page
+    :title="page_title"
+    filter_mode="none"
+    :page_obj="page_obj"
+    :pages="pagination_pages"
+    :page_querystring="page_querystring"
+    :paginated="True"
+    :empty_title="empty_title"
+    :empty_message="empty_message"
+    action_label="Nova OS"
+    :action_url="nova_url"
+  >
+    <c-slot name="tabs">
+      <c-v2.toggle aria_label="Abas de ordens de serviço" :items="abas" />
+    </c-slot>
+
+    <c-slot name="controls">
+      <form method="get" action="{{ request.path }}" class="rail__form" role="search">
+        <input type="hidden" name="aba" value="{{ aba }}">
+        <c-v2.input
+          icon="search"
+          name="q"
+          :value="q"
+          placeholder="Buscar por número, motivo, destino ou servidor"
+          aria_label="Buscar ordens de serviço"
+        />
+        <c-v2.select name="sort" :value="sort" :options="sort_options" aria_label="Ordenação" />
+        {% comment %}
+          O intervalo de viagem viaja em dois campos ocultos, sem formulário
+          Django por trás: numa lista o filtro é querystring, não POST.
+        {% endcomment %}
+        <c-v2.date_picker
+          mode="range"
+          picker_id="os-filter-date-picker"
+          button_label="Período"
+          start_hidden_name="viagem_de"
+          end_hidden_name="viagem_ate"
+          :start_hidden_value="viagem_de"
+          :end_hidden_value="viagem_ate"
+          aria_label="Período da viagem"
+        />
+        <c-v2.button type="submit" label="Buscar" icon="search" />
+        {% if has_filters %}<c-v2.button label="Limpar" icon="x" :href="search_clear_url" />{% endif %}
+      </form>
+    </c-slot>
+
+    <c-slot name="rows">
+      {% for card in cards %}
+        {% include "ordens_servico/partials/os_list_card.html" with card=card csrf_token=csrf_token only %}
+      {% endfor %}
+    </c-slot>
+  </c-v2.list_page>
+
+  <c-ui.modals.delete_confirm_modal delete_modal_title="Excluir Ordem de Serviço?" delete_modal_entity="esta Ordem de Serviço" />
+  <c-ui.modals.attach_signed_modal />
 {% endblock %}

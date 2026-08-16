@@ -50,7 +50,11 @@
   /* Sem animação de entrada: uma das duas listas surgindo com deslize e a outra
      aparecendo direto era diferença visível entre elas. */
   animation: none;
-  background: var(--surface-field);
+  /* A caixa fica na cor do PAINEL e o realce na do campo — invertido em relação
+     à primeira versão. Aberta sobre um formulário, a lista na cor do campo
+     virava mais uma faixa igual às que já estão na tela; na cor do painel ela
+     lê como uma camada que veio por cima, e o item sob o cursor é que sobe. */
+  background: var(--surface-rail);
   border: var(--listbox-border) solid var(--line);
   border-radius: var(--radius-field);
   box-shadow: var(--shadow-menu);
@@ -67,7 +71,6 @@
       var(--listbox-padding) * 2 + var(--listbox-border) * 2
   );
   /* Descola do campo: o módulo de posicionamento cola a caixa com folga zero. */
-  margin-top: 6px;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: var(--listbox-padding);
@@ -140,7 +143,7 @@
   .search-picker__option:hover:not(.search-picker__option--selected),
 :is(html[data-theme]) .search-picker__dropdown--v2
   .search-picker__option--active:not(.search-picker__option--selected) {
-  background: var(--surface-rail);
+  background: var(--surface-field);
   color: var(--text-strong);
 }
 
@@ -229,8 +232,122 @@
   display: none;
 }
 
-:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__empty {
+/* ---- variação de DUAS LINHAS ----------------------------------------------
+ *
+ * Servidor e viatura não cabem em uma linha: "AAA-1234 - DUSTER" sozinho não
+ * distingue três Dusters idênticas, e é o combustível, a caracterização e a
+ * unidade que decidem qual é qual. O mesmo vale para o servidor, onde cargo e
+ * unidade desempatam homônimos.
+ *
+ * A variação NÃO é do select: só o `picker.js` produz a segunda linha
+ * (`search-picker__option-meta`). Exigir simetria aqui seria exigir markup que
+ * não existe do outro lado — é a mesma exceção já aberta para o invólucro e as
+ * peças decorativas em `test_listbox_unico`.
+ *
+ * O gatilho é a PRESENÇA da segunda linha, não o nome da apresentação:
+ * `picker.js` monta `--meta` sempre que o item traz um segundo texto, inclusive
+ * fora de "people"/"vehicle". Ligar a regra ao nome deixaria de fora casos que
+ * já são de duas linhas hoje.
+ */
+:is(html[data-theme]) .search-picker__dropdown--v2:has(.search-picker__option-meta),
+:is(html[data-theme]) .search-picker__dropdown--v2.floating-dropdown--active:has(.search-picker__option-meta) {
+  /* A altura do item é o que fecha a conta do teto de cinco. Trocá-la aqui, e
+     não no item, mantém corte e rolagem coerentes com a lista de uma linha.
+
+     52px, e não 56: as duas linhas somam 35px e o recuo vertical fecha em 51.
+     Com 56 sobravam 21px de vão morto e o texto boiava dentro da faixa — de
+     longe a lista parecia uma fileira de barras vazias com letra no meio. */
+  --listbox-option-height: 52px;
+}
+
+/* O vão entre a âncora e o texto acompanha o vertical. Com 8px na horizontal e
+   uma faixa de 52 na vertical, o item ficava apertado de um lado e frouxo do
+   outro — e é essa discordância que se lê como desalinho. */
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option:has(.search-picker__option-meta) {
+  gap: var(--gap);
+  padding-left: 8px;
+}
+
+/* A primeira linha LIDERA. Nas duas listas de uma linha o rótulo herda o peso
+   do item, para as duas serem idênticas; aqui ele precisa se separar da linha
+   de apoio, e cor e corpo sozinhos não bastavam — as duas liam como um bloco
+   cinza só. A escolhida continua se distinguindo pelo accent e pela fita. */
+:is(html[data-theme]) .search-picker__dropdown--v2
+  .search-picker__option:has(.search-picker__option-meta) .search-picker__option-main {
+  font-weight: var(--weight-strong);
+  line-height: 1.25;
+}
+
+/* As duas linhas empilham; o `min-width: 0` é o que permite as duas truncarem
+   em vez de esticar o item para fora da caixa. */
+:is(html[data-theme]) .search-picker__dropdown--v2
+  .search-picker__option:has(.search-picker__option-meta) .search-picker__option-content {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  overflow: visible;
+  white-space: normal;
+}
+
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__option-meta {
   color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-base, 400);
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A segunda linha NÃO acompanha o accent da escolhida: ela é o dado de apoio,
+   e pintá-la junto faz a linha inteira gritar e o rótulo perder o destaque. */
+:is(html[data-theme]) .search-picker__dropdown--v2
+  .search-picker__option--selected .search-picker__option-meta,
+:is(html[data-theme]) .search-picker__dropdown--v2
+  .search-picker__option[aria-selected="true"] .search-picker__option-meta {
+  color: var(--text-muted);
+}
+
+/* A âncora de varredura: iniciais do servidor, "V" da viatura. Mesma caixa do
+   avatar da faixa de equipe, para as duas telas lerem como o mesmo sistema.
+   Só aparece onde há identidade — no item genérico o `picker.js` põe um "•",
+   que é ruído. */
+:is(html[data-theme]) .search-picker__dropdown--v2
+  .search-picker__option--person .search-picker__option-visual,
+:is(html[data-theme]) .search-picker__dropdown--v2
+  .search-picker__option--vehicle .search-picker__option-visual {
+  align-items: center;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+  border-radius: var(--radius-field);
+  color: var(--accent);
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  /* 36px: a altura das DUAS linhas de texto. Nos 28px do controle miúdo ela
+     ficava do tamanho de uma linha só, ao lado de um bloco com o dobro da
+     altura — parecia um selo perdido, e não a âncora da faixa. */
+  height: 36px;
+  justify-content: center;
+  width: 36px;
+}
+
+/* O vazio ocupa uma OPÇÃO: mesma altura, mesmo raio, mesmo recuo lateral. Solto
+   na caixa ele ficava sem caixa nenhuma e com recuos diferentes em cima e
+   embaixo — o de cima vinha do `padding` da própria lista, o de baixo do dele.
+   Como opção, a caixa não muda de forma quando a busca deixa de achar. */
+:is(html[data-theme]) .search-picker__dropdown--v2 .search-picker__empty {
+  align-items: center;
+  background: var(--surface-contrast, var(--surface-field));
+  border-radius: 6px;
+  box-sizing: border-box;
+  color: var(--text-muted);
+  display: flex;
   font-size: var(--text-size-base);
-  padding: 12px;
+  justify-content: center;
+  margin: 0;
+  min-height: var(--listbox-option-height);
+  padding: 0 12px;
+  text-align: center;
 }

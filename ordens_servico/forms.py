@@ -55,6 +55,8 @@ class OrdemServicoForm(forms.ModelForm):
             attrs={
                 **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                 "data-entity-picker": "true",
+            "data-picker-v2": "",
+                "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "compact",
                 "data-picker-open-all": "true",
@@ -70,6 +72,8 @@ class OrdemServicoForm(forms.ModelForm):
             attrs={
                 **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                 "data-entity-picker": "true",
+            "data-picker-v2": "",
+                "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "compact",
                 "data-picker-open-all": "true",
@@ -120,6 +124,8 @@ class OrdemServicoForm(forms.ModelForm):
             "servidores": ServidorEquipeSelectMultiple(attrs={
                 **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-entity-picker": "true",
+            "data-picker-v2": "",
+                "data-picker-v2": "",
                 "data-entity-picker-mode": "multi",
                 "data-picker-variant": "detailed",
                 "data-picker-presentation": "people",
@@ -136,6 +142,8 @@ class OrdemServicoForm(forms.ModelForm):
             "motorista_equipe": ServidorMotoristaSelect(attrs={
                 **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-entity-picker": "true",
+            "data-picker-v2": "",
+                "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "detailed",
                 "data-placeholder": "Selecionar motorista...",
@@ -144,6 +152,8 @@ class OrdemServicoForm(forms.ModelForm):
             "tecnico_equipe": ServidorMotoristaSelect(attrs={
                 **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-entity-picker": "true",
+            "data-picker-v2": "",
+                "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "detailed",
                 "data-placeholder": "Selecionar técnico...",
@@ -152,6 +162,8 @@ class OrdemServicoForm(forms.ModelForm):
             "apoio_montagem": ServidorMotoristaSelect(attrs={
                 **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-entity-picker": "true",
+            "data-picker-v2": "",
+                "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "detailed",
                 "data-placeholder": "Selecionar apoio de montagem...",
@@ -160,6 +172,8 @@ class OrdemServicoForm(forms.ModelForm):
             "apoio_escolta": ServidorMotoristaSelect(attrs={
                 **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-entity-picker": "true",
+            "data-picker-v2": "",
+                "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "detailed",
                 "data-placeholder": "Selecionar apoio de escolta...",
@@ -168,6 +182,8 @@ class OrdemServicoForm(forms.ModelForm):
             "coordenador_cerimonial": ServidorMotoristaSelect(attrs={
                 **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-entity-picker": "true",
+            "data-picker-v2": "",
+                "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "detailed",
                 "data-placeholder": "Selecionar coordenação...",
@@ -176,6 +192,8 @@ class OrdemServicoForm(forms.ModelForm):
             "apoio_cerimonial": ServidorMotoristaSelect(attrs={
                 **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-entity-picker": "true",
+            "data-picker-v2": "",
+                "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "detailed",
                 "data-placeholder": "Selecionar apoio de cerimonial...",
@@ -184,14 +202,20 @@ class OrdemServicoForm(forms.ModelForm):
             "apoio_preparacao": ServidorMotoristaSelect(attrs={
                 **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-entity-picker": "true",
+            "data-picker-v2": "",
+                "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "detailed",
                 "data-placeholder": "Selecionar apoio de preparação...",
                 "data-empty-message": "Nenhum servidor encontrado.",
             }),
+            # `class` do v2, e não `WidgetStyle.FIELD_CONTROL_TEXTAREA`: o
+            # controle tem de ser o mesmo `input__control` da galeria. Com a
+            # classe legada a área de texto ficava com outra borda, outro raio e
+            # outro recuo que os campos vizinhos da mesma tela.
             "motivo": forms.Textarea(attrs={
                 "rows": 5,
-                **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
+                "class": "input__control input__control--textarea",
                 "placeholder": "Descreva o motivo ou finalidade desta ordem de serviço...",
                 "data-motivo-textarea": "true",
             }),

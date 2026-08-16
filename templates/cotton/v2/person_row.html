@@ -1,0 +1,23 @@
+{% cotton:vars actions badge extra_class initials meta name %}
+{% comment %}
+  Linha de pessoa — o item da faixa de um registro: quem viaja, e no que viaja.
+  Par de `static/css/v2/person-row.css`.
+
+  A viatura ocupa uma linha desta mesma lista, com o selo "viatura", porque ela
+  se comporta como um viajante: tem documento próprio para baixar. Separá-la em
+  outra estrutura duplicaria a faixa inteira para ganhar nada.
+
+  As iniciais NÃO são decoração: numa faixa de quatro ou cinco nomes elas são a
+  âncora que o olho usa para achar a linha certa sem ler.
+{% endcomment %}
+<li class="person-row{% if extra_class %} {{ extra_class }}{% endif %}">
+  <span class="person-row__avatar" aria-hidden="true">{{ initials }}</span>
+  <div class="person-row__body">
+    <div class="person-row__name-row">
+      <span class="person-row__name">{{ name }}</span>
+      {% if badge %}<span class="person-row__badge">{{ badge }}</span>{% endif %}
+    </div>
+    {% if meta %}<span class="person-row__meta">{{ meta }}</span>{% endif %}
+  </div>
+  {% if actions %}<div class="person-row__actions">{{ actions }}</div>{% endif %}
+</li>

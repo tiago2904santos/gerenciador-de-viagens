@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load icones %}
 
 {% block title %}{{ page_title }}{% endblock %}
 {% block shell_class %}main-preview-shell{% endblock %}
@@ -16,7 +17,7 @@
     não está nesta página, ele não foi decidido.
   {% endcomment %}
   <section class="v2-lab" aria-label="Sistema v2">
-    <c-v2.header eyebrow="Catálogo" title="Componentes do sistema v2">
+    <c-v2.header title="Componentes do sistema v2">
       <c-slot name="aside">
         <c-v2.toggle aria_label="Alternar exemplo" :items="v2_abas" />
       </c-slot>
@@ -250,6 +251,12 @@
           <c-v2.menu_item href="#" icon="pencil" title="Editar" description="Alterar os dados do registro." />
           <c-v2.menu_item href="#" icon="download" title="Baixar documento" description="Gera o PDF assinado." />
           <c-v2.menu_item href="#" icon="x" title="Excluir" description="Remove em definitivo." tone="late" />
+          {% comment %}
+            O item que abre o diálogo do assinado. Os cinco ganchos dele são
+            contrato do `attach-signed-modal.js` e moram num componente próprio
+            justamente para não serem redigitados a cada menu.
+          {% endcomment %}
+          <c-v2.menu_attach_signed url="#" doc_label="o termo genérico" />
         </c-v2.menu>
       </c-slot>
     </c-v2.panel>
@@ -257,33 +264,91 @@
     <h3 class="v2-lab__sub">Tela de lista completa</h3>
 
     {% comment %}
-      `list_page` não tem folha própria: é composição de `header`, `rail` e
-      `panel`. Um componente que só arruma outros não precisa de CSS — se
-      precisasse, seria sinal de que a composição está errada.
+      `list_page` não tem folha própria: é composição de `header`, `rail`,
+      `panel` e `pagination`. Um componente que só arruma outros não precisa de
+      CSS — se precisasse, seria sinal de que a composição está errada.
+
+      Esta lista FILTRA de verdade: `data-collection` vem do próprio list_page,
+      `filter="search"` e `filter="status"` ligam os campos, e cada registro
+      declara por quais palavras responde. Digitar "curitiba" ou "18.220" deixa
+      um registro; escolher um status deixa os daquele status.
     {% endcomment %}
-    <c-v2.list_page eyebrow="Lista" title="Termos de Autorização" empty_message="Nenhum termo cadastrado.">
+    <c-v2.list_page
+      title="Termos de Autorização"
+      empty_message="Nenhum termo cadastrado."
+      :page_obj="v2_pagina"
+      :pages="v2_paginas"
+      :paginated="True"
+      action_label="Novo termo"
+      action_url="#"
+    >
       <c-slot name="aside">
         <c-v2.toggle aria_label="Alternar lista" :items="v2_abas" />
       </c-slot>
       <c-slot name="controls">
-        <c-v2.input icon="search" placeholder="Buscar termos" aria_label="Buscar termos" />
-        <c-v2.select aria_label="Ordenação" :options="v2_opcoes" />
-        <c-v2.button label="Limpar filtros" icon="x" />
+        <c-v2.input icon="search" placeholder="Buscar termos" aria_label="Buscar termos" filter="search" />
+        <c-v2.select aria_label="Filtrar por status" :options="v2_status_opcoes" filter="status" />
+        <c-v2.button label="Limpar filtros" icon="x" hook="data-collection-clear" />
         <c-v2.button label="Novo termo" variant="primary" icon="plus" />
       </c-slot>
       <c-slot name="rows">
-        <c-v2.record eyebrow="Termo" title="Nº 153/2026 · ARAPONGAS/PR" meta="12/08 a 15/08/2026 · ADEMAR SCHONS" status="Em andamento" status_tone="progress">
-          <c-slot name="actions"><c-v2.icon_button icon="more" aria_label="Ações do termo" /></c-slot>
-        </c-v2.record>
-        <c-v2.record eyebrow="Termo" title="Nº 152/2026 · CURITIBA/PR" meta="05/08 a 12/08/2026 · ADRIANO SILVA" status="Concluído" status_tone="done">
-          <c-slot name="actions"><c-v2.icon_button icon="more" aria_label="Ações do termo" /></c-slot>
-        </c-v2.record>
+        {% for registro in v2_registros %}
+          <c-v2.record
+            :title="registro.titulo"
+            :meta="registro.meta"
+            :status="registro.status"
+            :status_tone="registro.tone"
+            :search_text="registro.busca"
+          >
+            <c-slot name="actions"><c-v2.icon_button icon="more" aria_label="Ações do termo" /></c-slot>
+          </c-v2.record>
+        {% endfor %}
       </c-slot>
     </c-v2.list_page>
 
+    <h3 class="v2-lab__sub">Registro com faixa de equipe</h3>
+
+    {% comment %}
+      O registro cresce por camadas: quando há quem viaje, a faixa aparece; sem
+      equipe e sem viatura, o mesmo componente fica raso. É o card da lista de
+      termos, e é aqui que se confere o desenho — a tela real exige login.
+    {% endcomment %}
+    <c-v2.panel>
+      <c-slot name="body">
+        <c-v2.record title="ARAPONGAS/PR · 12/08 a 15/08/2026" search_text="arapongas">
+          <c-slot name="meta">Ofício: 153/2026</c-slot>
+          <c-slot name="actions">
+            {% comment %}
+              O menu vem dos DADOS, pelo mesmo dicionário que os presenters já
+              produzem (`core.entity_cards.menu`). É o que permite migrar a
+              lista de qualquer domínio sem reescrever presenter nenhum — e é
+              esse caminho, não o de slots, que as telas reais usam.
+            {% endcomment %}
+            <c-v2.icon_button icon="folder" :menu_id="v2_menu.id" aria_label="Documentos do termo" tooltip="Visualizar e baixar" />
+            <c-v2.menu_body :menu="v2_menu" />
+            <c-v2.icon_button icon="edit" href="#" aria_label="Editar termo" tooltip="Editar" />
+            <c-v2.delete_button url="#" label="ARAPONGAS/PR" aria_label="Excluir termo" />
+          </c-slot>
+          <c-slot name="body">
+            <ul class="person-list">
+              <c-v2.person_row initials="AS" name="ADEMAR SCHONS" meta="Agente · 1ª Delegacia" badge="com viatura">
+                <c-slot name="actions"><c-v2.icon_button icon="folder" aria_label="Documentos de Ademar" tooltip="Visualizar e baixar" /></c-slot>
+              </c-v2.person_row>
+              <c-v2.person_row initials="BC" name="BEATRIZ CARDOSO" meta="Escrivã · 1ª Delegacia" badge="com viatura">
+                <c-slot name="actions"><c-v2.icon_button icon="folder" aria_label="Documentos de Beatriz" tooltip="Visualizar e baixar" /></c-slot>
+              </c-v2.person_row>
+              <c-v2.person_row extra_class="person-row--viatura" initials="VT" name="ABC-1D23 · Duster" meta="Automóvel · 1ª Delegacia" badge="viatura">
+                <c-slot name="actions"><c-v2.icon_button icon="folder" aria_label="Documentos da viatura" tooltip="Visualizar e baixar" /></c-slot>
+              </c-v2.person_row>
+            </ul>
+          </c-slot>
+        </c-v2.record>
+      </c-slot>
+    </c-v2.panel>
+
     <h3 class="v2-lab__sub">Tela de lista vazia</h3>
 
-    <c-v2.list_page eyebrow="Lista" title="Termos de Autorização" empty_message="Nenhum termo cadastrado ainda.">
+    <c-v2.list_page title="Termos de Autorização" empty_message="Nenhum termo cadastrado ainda.">
       <c-slot name="controls">
         <c-v2.input icon="search" placeholder="Buscar termos" aria_label="Buscar termos, lista vazia" />
       </c-slot>
@@ -292,13 +357,82 @@
     {# ------------------------------------------------------- FORMULÁRIO AVANÇADO #}
     <h2 class="v2-lab__group">Formulário avançado</h2>
 
+    {% comment %}
+      As três variações do picker num painel só, cada uma no seu `form_block`.
+      Lado a lado é como se compara: a de uma linha e as de duas dividem campo,
+      caixa de escolhidos e comportamento — o que muda é só a opção da lista, e
+      isso só fica evidente quando as três estão na mesma superfície.
+
+      Painéis separados diziam o contrário: sugeriam três componentes.
+    {% endcomment %}
     <c-v2.panel title="Picker" description="Busca de entidade. O motor é o picker.js — o v2 veste o que ele cria, sem clonar 1013 linhas.">
       <c-slot name="body">
+        <c-v2.form_block title="Uma linha" description="O padrão: só o rótulo da opção.">
+          <c-slot name="body">
+            {% comment %}
+              Com opções de verdade: um picker sem nada para buscar não prova
+              que está funcionando — foi assim que ele passou por pronto estando
+              morto.
+            {% endcomment %}
+            <c-v2.picker mode="multi" name="v2_equipe" aria_label="Buscar servidor" placeholder="Buscar por nome, CPF ou RG" :options="v2_opcoes_longas" />
+          </c-slot>
+        </c-v2.form_block>
+
         {% comment %}
-          Com opções de verdade: um picker sem nada para buscar não prova que
-          está funcionando — foi assim que ele passou por pronto estando morto.
+          A variação de DUAS LINHAS. Uma linha só não distingue três viaturas do
+          mesmo modelo nem dois servidores homônimos — é o cargo, a unidade, o
+          combustível que decidem qual é qual. A segunda linha é dado de apoio:
+          ela não acompanha o accent da opção escolhida, senão a linha inteira
+          grita e o rótulo perde o destaque.
         {% endcomment %}
-        <c-v2.picker mode="multi" name="v2_equipe" aria_label="Buscar servidor" placeholder="Buscar por nome, CPF ou RG" :options="v2_opcoes_longas" />
+        <c-v2.form_block title="Duas linhas · pessoas" description="Iniciais, nome e a lotação embaixo. Só o motorista recebe o realce.">
+          <c-slot name="body">
+            <c-v2.picker mode="multi" presentation="people" :driver="True" name="lab_equipe" aria_label="Equipe de exemplo" selected_title="Equipe" :options="v2_opcoes_pessoas" />
+          </c-slot>
+        </c-v2.form_block>
+
+        <c-v2.form_block title="Duas linhas · veículos" description="Placa e modelo em cima, o resto embaixo.">
+          <c-slot name="body">
+            <c-v2.picker presentation="vehicle" name="lab_viatura" aria_label="Viatura de exemplo" selected_title="Viatura" :options="v2_opcoes_viaturas" />
+          </c-slot>
+        </c-v2.form_block>
+
+        {% comment %}
+          Documento vinculado: a lista NÃO é menu suspenso. Os candidatos ficam
+          à vista e o campo só os filtra — escolher um ofício é comparar rota,
+          período e equipe de dois deles, e isso exige vê-los lado a lado.
+
+          Na tela real quem monta os cartões é o script da página, a partir de
+          uma busca no servidor; aqui eles são fixos, para o catálogo mostrar o
+          componente cheio.
+        {% endcomment %}
+        <c-v2.form_block title="Documento vinculado" description="A lista fica aberta; o campo filtra. O escolhido leva a fita de accent.">
+          <c-slot name="body">
+            <c-v2.related_picker
+              input_id="lab-vinculado-busca"
+              list_id="lab-vinculado-lista"
+              placeholder="Buscar por número, protocolo, destino ou servidor"
+              aria_label="Buscar ofício vinculado"
+            >
+              <c-slot name="rows">
+                <button type="button" class="search-picker__selected-card related-route-item is-active" aria-pressed="true">
+                  <span class="search-picker__selected-avatar" aria-hidden="true">{% icone_svg "document" %}</span>
+                  <div class="search-picker__selected-main">
+                    <span class="search-picker__selected-name">Ofício 109/2026 CURITIBA/PR → JACAREZINHO/PR</span>
+                    <span class="search-picker__selected-meta related-route-period">17/08/2026 a 19/08/2026 · GABRIELLE, JANINE · SFC0C30 DUSTER</span>
+                  </div>
+                </button>
+                <button type="button" class="search-picker__selected-card related-route-item" aria-pressed="false">
+                  <span class="search-picker__selected-avatar" aria-hidden="true">{% icone_svg "document" %}</span>
+                  <div class="search-picker__selected-main">
+                    <span class="search-picker__selected-name">Ofício 108/2026 CURITIBA/PR → ARAPOTI/PR</span>
+                    <span class="search-picker__selected-meta related-route-period">20/08/2026 a 22/08/2026 · JANINE, JULIANA · SFC0C30 DUSTER</span>
+                  </div>
+                </button>
+              </c-slot>
+            </c-v2.related_picker>
+          </c-slot>
+        </c-v2.form_block>
       </c-slot>
     </c-v2.panel>
 
@@ -370,7 +504,7 @@
 
     <h3 class="v2-lab__sub">Etapa de wizard</h3>
 
-    <c-v2.wizard_page eyebrow="Cadastro" title="Ofício 153/2026" :steps="v2_etapas">
+    <c-v2.wizard_page title="Ofício 153/2026" :steps="v2_etapas">
       <c-slot name="body">
         <c-v2.panel title="Dados da etapa" description="O corpo da etapa entra aqui.">
           <c-slot name="body">
@@ -410,7 +544,7 @@
 
     <c-v2.panel title="Header" description="Com e sem eyebrow, com e sem aside.">
       <c-slot name="body">
-        <c-v2.header eyebrow="Edição" title="Com tipo de página e ação">
+        <c-v2.header title="Com tipo de página e ação">
           <c-slot name="aside"><c-v2.button label="Ação" variant="primary" /></c-slot>
         </c-v2.header>
         <c-v2.header title="Só título" />

@@ -1,4 +1,4 @@
-{% cotton:vars cities_url estados extra_class rows title %}
+{% cotton:vars cities_url estados extra_class id rows title %}
 {% comment %}
   Destinos v2 — a seção completa: linhas de estado e cidade, adicionar, remover
   e reordenar por arraste.
@@ -10,6 +10,10 @@
   É só isso. A seção busca os próprios dados (`core/templatetags/destinos.py`),
   liga o próprio motor e já nasce com uma linha. Nada precisa ir para a view, e
   nenhuma tela precisa de script próprio.
+
+  `id` existe para as telas cujo script próprio ainda procura a seção pelo id —
+  `js/pages/termos-form.js` faz isso para copiar o destino do ofício vinculado.
+  Sem ele a seção renderiza e a cópia para de acontecer, sem erro nenhum.
 
   `estados` e `cities_url` existem para quem tiver motivo para contrariar a
   busca automática — uma tela que filtre estados, por exemplo. Fora isso, não
@@ -35,6 +39,7 @@
 {% load destinos %}
 <section
   class="destinations{% if extra_class %} {{ extra_class }}{% endif %}"
+  {% if id %}id="{{ id }}"{% endif %}
   data-location-rows
   data-location-managed
   data-api-cidades-url="{% if cities_url %}{{ cities_url }}{% else %}{% destinos_url_cidades %}{% endif %}"

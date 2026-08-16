@@ -1,4 +1,4 @@
-{% cotton:vars actions body extra_class eyebrow meta search_text status status_tone title %}
+{% cotton:vars actions body extra_class eyebrow heading_level meta search_text status status_tone title %}
 {% comment %}
   Record v2 — o card de um registro na lista. Par de `static/css/v2/record.css`.
 
@@ -12,6 +12,11 @@
   As ações ficam à direita e centradas na faixa: em lista o olho percorre a
   coluna da esquerda lendo e a da direita agindo, e o alvo fica sempre na mesma
   altura, registro após registro.
+
+  O título é um `h2` por padrão: numa lista o registro é filho direto do `h1` da
+  página, e o `h3` que ele usava pulava um degrau — leitor de tela navega por
+  cabeçalho, e o degrau perdido some com a estrutura (WCAG 1.3.1, `HT-05`).
+  `heading_level` existe para quem o aninhe sob uma seção com título próprio.
 
   `data-collection-item` é o que faz o `collection.js` enxergar este registro
   como filtrável. `search_text` diz por quais palavras ele responde; sem ele o
@@ -28,7 +33,7 @@
     <div class="record__heading">
       <div class="record__title-row">
         {% if eyebrow %}<span class="record__eyebrow">{{ eyebrow }}</span>{% endif %}
-        <h3 class="record__title">{{ title }}</h3>
+        <h{{ heading_level|default:2 }} class="record__title">{{ title }}</h{{ heading_level|default:2 }}>
         {% if status %}<c-v2.chip :label="status" :tone="status_tone" />{% endif %}
       </div>
       {% if meta %}<p class="record__meta">{{ meta }}</p>{% endif %}

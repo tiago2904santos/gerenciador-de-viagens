@@ -184,6 +184,22 @@ def index(request):
             **paginacao,
             "novo_url": reverse("termos:novo"),
             "oficios_url": reverse("oficios:index"),
+            "termos_url": reverse("termos:index"),
+            # O vazio precisa dizer de QUAL vazio se trata: a aba sem nada, ou
+            # a busca que não achou. Um texto só faria um termo digitado errado
+            # parecer lista apagada.
+            "empty_title": (
+                "Nenhum termo encontrado" if q else "Nenhum termo cadastrado"
+            ),
+            "empty_message": (
+                f"Nada corresponde a “{q}”. Limpe a busca para ver a lista inteira."
+                if q
+                else (
+                    "Termos sem servidor e sem viatura aparecem aqui."
+                    if simples
+                    else "Termos com equipe ou viatura aparecem aqui."
+                )
+            ),
         },
     )
 

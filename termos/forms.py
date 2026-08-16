@@ -60,6 +60,7 @@ class TermoAutorizacaoForm(forms.ModelForm):
                 attrs={
                     **widget_attrs(WidgetStyle.TERM_OFICIO_SOURCE),
                     "hidden": True,
+                    "data-picker-v2": "",
                     "data-source-document": "termos-oficios-summary",
                     # `NOVO-07`: liga o modo remoto do seletor. Sem este atributo
                     # ele segue filtrando só o que está no DOM, como antes.
@@ -70,6 +71,7 @@ class TermoAutorizacaoForm(forms.ModelForm):
                 attrs={
                     **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                     "data-entity-picker": "true",
+                    "data-picker-v2": "",
                     "data-entity-picker-mode": "single",
                     "data-picker-variant": "compact",
                     "data-placeholder": "Buscar estado...",
@@ -80,6 +82,7 @@ class TermoAutorizacaoForm(forms.ModelForm):
                 attrs={
                     **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                     "data-entity-picker": "true",
+                    "data-picker-v2": "",
                     "data-entity-picker-mode": "single",
                     "data-picker-variant": "compact",
                     "data-placeholder": "Buscar cidade...",
@@ -92,6 +95,7 @@ class TermoAutorizacaoForm(forms.ModelForm):
                 attrs={
                     **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                     "data-entity-picker": "true",
+                    "data-picker-v2": "",
                     "data-entity-picker-mode": "multi",
                     "data-picker-variant": "detailed",
                     "data-picker-presentation": "people",
@@ -107,6 +111,7 @@ class TermoAutorizacaoForm(forms.ModelForm):
                 attrs={
                     **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                     "data-entity-picker": "true",
+                    "data-picker-v2": "",
                     "data-entity-picker-mode": "single",
                     "data-picker-variant": "detailed",
                     "data-picker-presentation": "vehicle",

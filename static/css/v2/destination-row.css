@@ -104,3 +104,16 @@
 :is(html[data-theme]) .is-dragging-destination * {
   user-select: none;
 }
+
+/* A alça só existe quando há o que reordenar. Com um destino só ela oferece um
+   gesto que não faz nada — e ocupa a largura que o campo de estado precisa.
+   Some por `display`, para o vão sumir junto com ela.
+ *
+ * O `:has` olha se existe uma SEGUNDA linha na lista; como é avaliado ao vivo,
+ * a alça aparece sozinha assim que o segundo destino é criado e some quando ele
+ * é removido, sem o `location-rows.js` precisar saber disso.
+ */
+:is(html[data-theme]) .destinations__list:not(:has(> [data-location-row] ~ [data-location-row]))
+  .destination-row__handle {
+  display: none;
+}

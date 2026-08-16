@@ -1,14 +1,39 @@
-{% cotton:vars aside controls empty_message extra_class eyebrow rows title %}
+{% cotton:vars action_icon action_label action_url aside controls empty_message empty_title extra_class filter_mode page_obj page_querystring pages paginated rows tabs title %}
+{% load icones %}
 {% comment %}
-  List page v2 — o esqueleto de uma tela de lista: identidade, controles e o
-  painel de registros.
+  List page v2 — o esqueleto de uma tela de lista: identidade, controles, o
+  painel de registros e a paginação.
 
-  Não tem CSS próprio: é composição de `header`, `rail` e `panel`, que já
-  existem. Um componente que só arruma outros não precisa de folha — se
+  Não tem CSS próprio: é composição de `header`, `rail`, `panel` e `pagination`,
+  que já existem. Um componente que só arruma outros não precisa de folha — se
   precisasse, seria sinal de que a composição está errada.
+
+  É AQUI que a lista vira uma coleção para o `js/components/collection.js`. O
+  atributo `data-collection` marca o escopo; tudo o que o motor procura —
+  filtros, itens, contador, o vazio de filtro — ele procura DENTRO desta raiz.
+  Por isso os controles e o painel têm de ficar sob o mesmo nó: um filtro fora
+  da raiz não é encontrado, e o campo fica na tela sem filtrar nada.
+
+  `filter_mode`: "client" (padrão) filtra as linhas já renderizadas, sem ida ao
+  servidor — é o certo para uma página de cada vez. "server" reenvia o
+  formulário e troca o painel. "none" não liga motor nenhum, e é o certo quando
+  a busca é do SERVIDOR por um `<form method="get">`: aí filtrar no cliente
+  esconderia parte do que o servidor acabou de mandar, sem dizer que escondeu.
+
+  `action_label`/`action_url` são a ação principal da tela — criar um registro.
+  Ela NÃO fica na faixa de controles: numa lista longa o topo sai da tela
+  justamente quando a pessoa termina de percorrer tudo e conclui que precisa de
+  um registro novo. Flutua no canto inferior direito, sempre no mesmo lugar.
+
+  `paginated` diz "esta lista É paginada". Sem ele, uma lista que perdeu o
+  `page_obj` no contexto some com os controles em silêncio e a tela parece ter
+  só a primeira página.
 {% endcomment %}
-<div class="list-page{% if extra_class %} {{ extra_class }}{% endif %}">
-  <c-v2.header :eyebrow="eyebrow" :title="title">
+<div
+  class="list-page{% if extra_class %} {{ extra_class }}{% endif %}"
+  {% if filter_mode != "none" %}data-collection data-collection-mode="{{ filter_mode|default:'client' }}"{% endif %}
+>
+  <c-v2.header :title="title">
     {% if aside %}<c-slot name="aside">{{ aside }}</c-slot>{% endif %}
   </c-v2.header>
 
@@ -18,7 +43,31 @@
     </c-v2.rail>
   {% endif %}
 
-  <c-v2.panel :empty_message="empty_message">
+  {% comment %}
+    As abas ficam ENTRE a faixa de controles e o painel, soltas, sem caixa
+    própria. Elas são o recorte do que está logo abaixo — coladas ao painel
+    respondem "isto que você está vendo é este recorte". Dentro da faixa
+    pareciam mais um filtro ao lado da busca; dentro do header, competiam com o
+    título.
+  {% endcomment %}
+  {% if tabs %}<div class="list-page__tabs">{{ tabs }}</div>{% endif %}
+
+  <c-v2.panel :empty_message="empty_message" :empty_title="empty_title">
     {% if rows %}<c-slot name="body">{{ rows }}</c-slot>{% endif %}
   </c-v2.panel>
+
+  {% if action_url %}
+    <a class="list-page__action" href="{{ action_url }}">
+      {% icone_svg action_icon|default:"plus" %}<span>{{ action_label }}</span>
+    </a>
+  {% endif %}
+
+  {% if paginated or page_obj %}
+    <c-v2.pagination
+      :page_obj="page_obj"
+      :page_querystring="page_querystring"
+      :pages="pages"
+      :required="paginated"
+    />
+  {% endif %}
 </div>

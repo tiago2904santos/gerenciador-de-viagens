@@ -1,9 +1,80 @@
-<c-ui.forms.form_block element_id="os-card-oficios" section_id="os-oficios-title" extra_class="travel-document-block document-form-block os-block" title="Ofícios vinculados" description="Opcional. Reaproveite destino, período, servidores e motivo de um ou mais ofícios." body_extra_class="termo-block__body" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_id="body_id" :data_hook="data_hook" :heading_level="heading_level" :shell="shell" :variant="variant"><c-slot name="body">{% include "ordens_servico/partials/_oficios_body.html" with form=form only %}</c-slot></c-ui.forms.form_block>
+{% comment %}
+  Os blocos da ordem de serviço, na ordem do preenchimento real: primeiro os
+  ofícios, que quando escolhidos preenchem destino, período, equipe e motivo de
+  uma vez; depois cada um deles, para quem não vincula ofício nenhum.
 
-<c-ui.forms.form_block element_id="os-card-motivo" section_id="os-motivo-title" extra_class="travel-document-block document-form-block os-block" title="Necessidade" description="Escolha o tipo de OS." body_extra_class="termo-block__body" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_id="body_id" :data_hook="data_hook" :heading_level="heading_level" :shell="shell" :variant="variant"><c-slot name="body">{% include "ordens_servico/partials/_motivo_body.html" with form=form only %}</c-slot></c-ui.forms.form_block>
+  Dois blocos ainda carregam marcação própria da OS — a escolha da necessidade e
+  o painel de funções da equipe. Os dois são dirigidos por
+  `js/pages/ordens-servico-form.js` e vestidos por `css/pages/ordens-servico.css`,
+  a última folha de página desta tela.
+{% endcomment %}
+<c-v2.form_block
+  title="Ofícios vinculados"
+  description="Opcional. Reaproveite destino, período, servidores e motivo de um ou mais ofícios."
+>
+  <c-slot name="body">
+    {% include "ordens_servico/partials/_oficios_body.html" with form=form only %}
+  </c-slot>
+</c-v2.form_block>
 
-<c-ui.forms.form_block element_id="os-card-motivo-texto" section_id="os-motivo-texto-title" extra_class="travel-document-block document-form-block os-block" title="Motivo" description="Complemente com o motivo ou finalidade específica." body_extra_class="termo-block__body" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_id="body_id" :data_hook="data_hook" :heading_level="heading_level" :shell="shell" :variant="variant"><c-slot name="body">{% include "ordens_servico/partials/_motivo_texto_body.html" with form=form modelos_motivo_url=modelos_motivo_url tem_modelos_motivo=tem_modelos_motivo only %}</c-slot></c-ui.forms.form_block>
+<c-v2.form_block title="Necessidade" description="Escolha o tipo de OS.">
+  <c-slot name="body">
+    {% include "ordens_servico/partials/_motivo_body.html" with form=form only %}
+  </c-slot>
+</c-v2.form_block>
 
-<c-ui.forms.form_block element_id="os-card-evento" section_id="os-evento-title" extra_class="travel-document-block document-form-block os-block" title="Evento" description="Período e destinos da atividade." body_extra_class="form-stack termo-evento-body" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_id="body_id" :data_hook="data_hook" :heading_level="heading_level" :shell="shell" :variant="variant"><c-slot name="body">{% include "ordens_servico/partials/_evento_body.html" with add_button_evento=add_button_evento add_button_evento_d=add_button_evento_d add_button_pt=add_button_pt add_button_termo=add_button_termo destination_extra_class=destination_extra_class destination_title=destination_title end_hidden_id=end_hidden_id end_hidden_name=end_hidden_name end_hidden_value=end_hidden_value end_label=end_label form=form initial_date=initial_date period_extra_class=period_extra_class period_extra_template=period_extra_template period_fields_extra_class=period_fields_extra_class picker_open_all=picker_open_all start_hidden_id=start_hidden_id start_hidden_name=start_hidden_name start_hidden_value=start_hidden_value start_label=start_label cotton_attr_description=cotton_attr_description cotton_attr_end_label=cotton_attr_end_label cotton_attr_end_placeholder=cotton_attr_end_placeholder cotton_attr_start_label=cotton_attr_start_label cotton_attr_start_placeholder=cotton_attr_start_placeholder cotton_attr_title=cotton_attr_title city_field=city_field data_index=data_index destino_index=destino_index has_data_index=has_data_index has_destino_index=has_destino_index horarios_url=horarios_url remove_hidden=remove_hidden row_extra_class=row_extra_class row_single=row_single show_drag_handle=show_drag_handle state_field=state_field estados=estados evento=evento location_city_value=location_city_value location_legacy_event=location_legacy_event location_state_code=location_state_code location_state_id=location_state_id row=row row_index=row_index only %}</c-slot></c-ui.forms.form_block>
+<c-v2.form_block title="Motivo" description="Complemente com o motivo ou finalidade específica.">
+  <c-slot name="body">
+    {% include "ordens_servico/partials/_motivo_texto_body.html" with form=form modelos_motivo_url=modelos_motivo_url tem_modelos_motivo=tem_modelos_motivo only %}
+  </c-slot>
+</c-v2.form_block>
 
-<c-ui.forms.form_block element_id="os-card-servidores" section_id="os-servidores-title" variant="resource" extra_class="travel-document-block document-form-block os-block" title="Equipe" description="Viajantes da ordem de serviço." action_label="Novo viajante" :action_url="servidor_create_url" :action_autosave="True" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :heading_level="heading_level" :shell="shell"><c-slot name="body">{% include "ordens_servico/partials/_servidores_body.html" with form=form only %}</c-slot></c-ui.forms.form_block>
+<c-v2.form_block :split="True" title="Período" description="Datas de ida e volta da atividade.">
+  <c-slot name="body">
+    <c-v2.date_picker
+      mode="range"
+      picker_id="os-evento-date-picker"
+      :start_field="form.data_evento_inicio"
+      :end_field="form.data_evento_fim"
+      start_input_id="id_data_evento_inicio_display"
+      end_input_id="id_data_evento_fim_display"
+      placeholder_start="Data de ida"
+      placeholder_end="Data de volta"
+      aria_label="Período da atividade"
+    />
+  </c-slot>
+</c-v2.form_block>
+
+<c-v2.form_block :split="True" title="Destinos" description="Locais na ordem da visita.">
+  <c-slot name="body">
+    {% comment %}
+      As linhas vêm do formulário: os nomes dos campos são os que ele lê no POST
+      — `destino_estado` na primeira e `destino_estado_N` nas seguintes —, e o
+      componente v2 já os emite assim. Foi por isso que ele pôde substituir a
+      seção legada sem tocar no formulário, aqui como no termo.
+    {% endcomment %}
+    <c-v2.destinations id="os-evento-destinos">
+      <c-slot name="rows">
+        {% for row in form.destination_rows %}
+          <c-v2.destination_row
+            :index="row.index"
+            :estado_selecionado="row.estado_id"
+            :cidade_selecionada="row.cidade_id"
+            :cidades="row.cidades"
+            :city_disabled="row.estado_id|yesno:'False,True'"
+            :removable="True"
+          />
+        {% endfor %}
+      </c-slot>
+    </c-v2.destinations>
+  </c-slot>
+</c-v2.form_block>
+
+<c-v2.form_block title="Equipe" description="Viajantes da ordem de serviço.">
+  <c-slot name="actions">
+    <c-v2.button label="Novo viajante" icon="plus" :href="servidor_create_url" />
+  </c-slot>
+  <c-slot name="body">
+    {% include "ordens_servico/partials/_servidores_body.html" with form=form only %}
+  </c-slot>
+</c-v2.form_block>

@@ -1,1 +1,14 @@
-<c-ui.forms.related_picker :field="form.oficios" root_extra_class="related-route-picker termo-oficio-picker os-oficio-picker" input_id="id_os_oficio_busca" input_placeholder="Buscar por número, protocolo, destino, sede, viatura ou servidor" input_aria_label="Buscar ofício vinculado" panel_extra_class="termo-oficio-summary-panel" panel_aria_label="Ofícios encontrados" list_id="os-oficio-lista" empty_id="os-oficio-lista-empty" empty_text="Nenhum ofício encontrado para a busca." only />
+{% comment %}
+  Ofícios vinculados da OS. Os identificadores são procurados por nome em
+  `js/pages/ordens-servico-form.js`; mudá-los desliga a busca e a cópia dos
+  dados do ofício sem dar erro nenhum.
+{% endcomment %}
+<c-v2.related_picker
+  :field="form.oficios"
+  input_id="id_os_oficio_busca"
+  list_id="os-oficio-lista"
+  empty_id="os-oficio-lista-empty"
+  placeholder="Buscar por número, protocolo, destino, sede, viatura ou servidor"
+  aria_label="Buscar ofício vinculado"
+  empty_text="Nenhum ofício encontrado para a busca."
+/>

@@ -31,9 +31,14 @@ class GlobalPeriodDestinationsSectionTests(SimpleTestCase):
 
     def test_operational_travel_forms_use_the_composite(self):
         templates_root = Path(settings.BASE_DIR) / "templates"
+        # Termos saiu em 15/08/2026: o formulário migrou para o v2 e monta
+        # período e destinos com `c-v2.date_picker` + `c-v2.destinations`, que
+        # emitem os MESMOS nomes de campo (`destino_estado`,
+        # `destino_estado_N`) e os mesmos ganchos `data-location-*`. Quem
+        # garante isso agora é `termos/tests/test_form_v2.py`. Cada tela que
+        # migrar sai desta tupla; quando ela esvaziar, o composto legado morre.
         consumers = (
             "eventos/partials/_detalhe_dados_body.html",
-            "termos/partials/_evento_body.html",
             "ordens_servico/partials/_evento_body.html",
             "planos_trabalho/partials/_identificacao_evento_body.html",
         )

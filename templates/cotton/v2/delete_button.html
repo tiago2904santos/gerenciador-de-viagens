@@ -1,0 +1,29 @@
+{% cotton:vars aria_label extra_class label title url %}
+{% comment %}
+  Gatilho de exclusão — abre o diálogo global de confirmação em vez de excluir
+  no clique. Par visual do `icon_button`, com o tom de perigo.
+
+  Os quatro atributos são contrato do `js/components/overlay.js` e do modal
+  `delete-confirm-modal`, que já existe na base: `data-delete-url` é para onde
+  o POST vai depois do "sim", e `data-delete-label` é o que o diálogo mostra
+  para a pessoa confirmar QUAL registro está prestes a sumir.
+
+  É um componente próprio, e não uma variante do `icon_button`, porque o que o
+  distingue não é a aparência — é o que acontece no clique.
+{% endcomment %}
+{% load icones %}
+<button
+  type="button"
+  class="icon-button{% if extra_class %} {{ extra_class }}{% endif %}"
+  data-tone="late"
+  aria-label="{{ aria_label|default:'Excluir' }}"
+  data-tooltip="Excluir"
+  data-overlay-trigger
+  data-overlay-kind="dialog"
+  data-overlay-target="delete-confirm-modal"
+  data-delete-url="{{ url }}"
+  data-delete-label="{{ label }}"
+  {% if title %}data-delete-title="{{ title }}"{% endif %}
+>
+  {% icone_svg "delete" %}
+</button>

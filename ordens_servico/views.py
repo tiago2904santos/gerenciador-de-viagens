@@ -117,7 +117,16 @@ def index(request):
                 {"value": "viagem_asc", "label": "Viagem: mais próxima"},
                 {"value": "viagem_desc", "label": "Viagem: mais distante"},
             ],
-            "empty_message": "Nenhuma OS encontrada com os filtros aplicados." if has_filters else "Nenhuma OS cadastrada ainda.",
+            # Dois vazios diferentes: a aba sem nada e o filtro que não achou.
+            # Um texto só faz uma busca malsucedida parecer perda de dados.
+            "empty_title": (
+                "Nenhuma OS encontrada" if has_filters else "Nenhuma OS cadastrada"
+            ),
+            "empty_message": (
+                "Ajuste os filtros ou limpe a busca para ver a lista inteira."
+                if has_filters
+                else "As ordens de serviço cadastradas aparecem aqui."
+            ),
             **paginacao,
         },
     )

@@ -15,8 +15,12 @@
   padding: var(--gap);
 }
 
+/* `center`, e não `baseline`: com a ação alinhada pela primeira linha do texto,
+   ela ficava colada no título e a descrição sobrava embaixo dela — a ação
+   parecia pertencer ao título, e não ao bloco inteiro. Centrada, ela se alinha
+   ao conjunto título + descrição. */
 :is(html[data-theme]) .form-block--v2 > .form-block__header {
-  align-items: baseline;
+  align-items: center;
   display: flex;
   gap: var(--gap);
   justify-content: space-between;

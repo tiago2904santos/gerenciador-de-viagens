@@ -1,1 +1,87 @@
-<c-ui.lists.entity_card :card="card" modifier="termo" :extra_class="card.extra_class" body_template="termos/partials/_termo_card_body.html" :csrf_token="csrf_token" only />
+{% comment %}
+  Card do termo COM equipe — o registro cresce por camadas: destino e período
+  na faixa de cima, e a lista de quem viaja (mais a viatura, quando existe)
+  numa faixa própria abaixo.
+
+  O selo do servidor usa `{% if %}` dentro das aspas, e não `:badge` com
+  `yesno`: um filtro dentro do atributo dinâmico NÃO chega ao cotton — o valor
+  some sem erro nenhum, e o selo simplesmente não aparece. Já custou uma rodada
+  nesta migração.
+
+  Cada linha da faixa tem menu próprio porque o documento é por pessoa: o termo
+  do servidor A não é o do servidor B. `PF-04`: esses menus NÃO vão no HTML da
+  lista — o gatilho leva `menu_src`, e o corpo vem de `termos:card_menus` no
+  primeiro clique. Na lista de ofícios essa mesma mudança tirou 48% do peso da
+  página.
+{% endcomment %}
+<c-v2.record
+  eyebrow="Termo"
+  :title="card.header.items.0.value"
+  :search_text="card.search_text"
+>
+  <c-slot name="meta">{% if card.oficio_label and card.oficio_label != "—" %}Ofício: {{ card.oficio_label }}{% endif %}</c-slot>
+
+  <c-slot name="actions">
+    {% for menu in card.footer.menus %}
+      <c-v2.icon_button
+        icon="folder"
+        :menu_id="menu.id"
+        :menu_src="menu.src"
+        :aria_label="menu.trigger_aria"
+        tooltip="Visualizar e baixar"
+      />
+      {% if not menu.src %}<c-v2.menu_body :menu="menu" />{% endif %}
+    {% endfor %}
+    <c-v2.icon_button icon="edit" :href="card.footer.edit_url" :aria_label="card.footer.edit_aria" tooltip="Editar" />
+    <c-v2.delete_button
+      :url="card.footer.delete_modal_url"
+      :label="card.footer.delete_modal_label"
+      :title="card.footer.delete_modal_title"
+      aria_label="Excluir termo"
+    />
+  </c-slot>
+
+  {% if card.servidores or card.viatura_row %}
+    <c-slot name="body">
+      <ul class="person-list">
+        {% for s in card.servidores %}
+          <c-v2.person_row :initials="s.initials" :name="s.name" :meta="s.meta" badge="{% if card.com_viatura %}com viatura{% endif %}">
+            {% if s.view_url or s.pdf_url or s.docx_url %}
+              <c-slot name="actions">
+                <c-v2.icon_button
+                  icon="folder"
+                  :menu_id="s.menu_id"
+                  :menu_src="card.menus_url"
+                  aria_label="Documentos de {{ s.name }}"
+                  tooltip="Visualizar e baixar"
+                />
+              </c-slot>
+            {% endif %}
+          </c-v2.person_row>
+        {% endfor %}
+
+        {% if card.viatura_row %}
+          <c-v2.person_row
+            extra_class="person-row--viatura"
+            :initials="card.viatura_row.initials"
+            :name="card.viatura_row.name"
+            :meta="card.viatura_row.meta"
+            badge="viatura"
+          >
+            {% if card.viatura_row.view_url or card.viatura_row.pdf_url or card.viatura_row.docx_url %}
+              <c-slot name="actions">
+                <c-v2.icon_button
+                  icon="folder"
+                  :menu_id="card.viatura_row.menu_id"
+                  :menu_src="card.menus_url"
+                  aria_label="Documentos de {{ card.viatura_row.name }}"
+                  tooltip="Visualizar e baixar"
+                />
+              </c-slot>
+            {% endif %}
+          </c-v2.person_row>
+        {% endif %}
+      </ul>
+    </c-slot>
+  {% endif %}
+</c-v2.record>

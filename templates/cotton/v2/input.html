@@ -5,6 +5,10 @@
   `surface` escolhe o degrau: "field" (padrão) ou "rail". O modificador declara
   a variável `--ui-surface`; ele não pinta direto, porque pintar perde a disputa
   de especificidade com a regra do próprio componente.
+
+  `filter` liga o campo ao motor de coleções (`collection.js`): "search" filtra
+  a lista pelo texto digitado. Sem ele o campo é só um campo — e essa é a
+  diferença entre uma barra de filtros que funciona e uma que só parece.
 {% endcomment %}
 {% load icones %}
 <div class="input{% if icon %} input--with-icon{% endif %}{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
@@ -28,6 +32,7 @@
     {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
     {% if value %}value="{{ value }}"{% endif %}
+    {% if filter %}data-collection-filter="{{ filter }}"{% endif %}
     {{ attrs }}
   >
   {% endif %}

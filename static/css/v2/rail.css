@@ -9,6 +9,9 @@
   background: var(--surface, var(--surface-rail));
   border-radius: var(--radius-rail);
   box-sizing: border-box;
+  /* Mesma conta do header: as duas bandas fecham na mesma altura quando cada
+     uma tem uma linha de conteúdo. */
+  min-height: calc(var(--control-height) + var(--pad-rail) * 2);
   padding: var(--pad-rail);
 }
 
@@ -26,15 +29,60 @@
   min-width: 0;
 }
 
+/* Busca do SERVIDOR: os campos vão dentro de um `<form method="get">`, e sem
+   esta regra o formulário viraria um bloco só na fila de controles, empilhando
+   campo e botão. Ele se comporta como a própria fila, e o campo continua
+   comendo a sobra. */
+:is(html[data-theme]) .rail__form {
+  align-items: center;
+  display: flex;
+  flex: 1 1 320px;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .rail__form > .input {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
 /* O rail é o contêiner que segura as seções da página (os `form-block`), então
    tem raio inteiro por padrão. Só quando encosta no header ele perde os cantos
-   de cima, para os dois lerem como uma peça só. */
+   de cima, para os dois lerem como uma peça só — e perde a borda de cima junto:
+   header e faixa são uma peça, e um traço entre eles a divide em duas. */
 :is(html[data-theme]) .header + .rail {
   border-radius: 0 0 var(--radius-rail) var(--radius-rail);
+  border-top: 0;
 }
 
 /* Empilha o conteúdo: uma barra de controles e/ou as seções da página. */
 :is(html[data-theme]) .rail {
   display: grid;
   gap: var(--gap);
+}
+
+/* ---- descrição na faixa ---------------------------------------------------
+ *
+ * Uma linha apagada dizendo o que é o documento e o que se faz na tela, com a
+ * volta para a lista no canto direito — o mesmo canto em que fica a ação
+ * primária de toda tela do sistema.
+ */
+:is(html[data-theme]) .rail__description {
+  color: var(--text-muted);
+  flex: 1 1 auto;
+  font-size: var(--text-size-base);
+  margin: 0;
+  min-width: 0;
+  /* A descrição QUEBRA em telas estreitas em vez de truncar: um resumo de dados
+     cortado ainda informa o que sobrou, mas uma frase cortada pela metade não
+     diz nada. */
+  max-width: 68ch;
+}
+
+/* O botão é empurrado para a direita pela sobra da linha, e não por uma ordem
+   fixa: assim ele continua à direita mesmo quando o resumo não existe — que é o
+   caso do termo ainda não salvo. */
+:is(html[data-theme]) .rail__controls > .button:last-child {
+  margin-left: auto;
 }

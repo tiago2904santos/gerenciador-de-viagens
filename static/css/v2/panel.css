@@ -22,6 +22,13 @@
   text-align: center;
 }
 
+/* O `display` acima vence o `[hidden]`, que é regra de agente do usuário — e o
+   vazio de filtro NASCE oculto. Sem este guarda ele aparece embaixo da lista
+   cheia, dizendo que não há nada logo abaixo de tudo o que há. */
+:is(html[data-theme]) .panel__empty[hidden] {
+  display: none;
+}
+
 :is(html[data-theme]) .panel__empty-title {
   color: var(--text-strong);
   font-size: var(--text-size-title);

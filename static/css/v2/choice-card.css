@@ -1,0 +1,144 @@
+/* Cartão de escolha — o rádio que ocupa uma caixa, com título e explicação.
+ * Depende de `v2/tokens.css`.
+ *
+ * Veste a marcação que a Ordem de Serviço já emite (`os-model-card`). Ela ainda
+ * não é um componente do v2; quando virar, esta folha troca de seletor e não de
+ * desenho.
+ *
+ * SEM hover: aqui o cartão inteiro é o alvo do clique, e um realce que segue o
+ * cursor pela grade compete com a marca do que está de fato escolhido. Numa
+ * lista de opções o que importa é qual delas vale, não por onde o mouse passou.
+ *
+ * O estado escolhido é o MESMO do resto do sistema — cor própria
+ * (`--surface-selected`) e fita de accent à esquerda —, o mesmo que marca a
+ * opção do menu, o motorista da equipe e a viatura do termo. Uma quarta forma
+ * de dizer "este é o escolhido" seria uma quarta coisa para aprender.
+ */
+
+:is(html[data-theme]) .os-model-picker {
+  border: 0;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+:is(html[data-theme]) .os-model-picker__grid {
+  display: grid;
+  gap: var(--gap-tight);
+  /* DUAS colunas, ou uma. `auto-fit` com mínimo estreito deixava a grade cair
+     para três em tela larga, e com três a explicação de cada opção fica com uma
+     coluna de texto fina demais para se ler de corrida. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+}
+
+/* Em número ímpar, o último ocupa a linha inteira. Sozinho em meia largura ele
+   fica ao lado de um vazio, e o vazio se lê como opção faltando. */
+:is(html[data-theme]) .os-model-picker__grid > .os-model-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 720px) {
+  :is(html[data-theme]) .os-model-picker__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+:is(html[data-theme]) .os-model-card {
+  /* `center`: a marca do rádio acompanha o bloco de texto inteiro, e não a
+     primeira linha dele. Alinhada ao topo, ela ficava solta acima da explicação
+     nos cartões de duas ou três linhas. */
+  align-items: center;
+  background: var(--surface-contrast, var(--surface-field));
+  border: 0;
+  border-radius: var(--radius-field);
+  box-shadow: none;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: grid;
+  gap: var(--gap-tight);
+  grid-template-columns: auto minmax(0, 1fr);
+  margin: 0;
+  min-width: 0;
+  padding: var(--gap);
+}
+
+/* O `<input>` de verdade fica invisível mas continua no fluxo do teclado: quem
+   navega por Tab precisa alcançá-lo, e `display: none` o tiraria da ordem. */
+:is(html[data-theme]) .os-model-card input[type="radio"] {
+  height: 0;
+  opacity: 0;
+  position: absolute;
+  width: 0;
+}
+
+/* A marca é desenhada: o rádio nativo não aceita cor de forma confiável entre
+   navegadores, e aqui ele precisa acompanhar o accent do tema. */
+:is(html[data-theme]) .os-model-card__mark {
+  block-size: 18px;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  box-sizing: border-box;
+  display: block;
+  flex: none;
+  inline-size: 18px;
+  position: relative;
+  transition: border-color var(--ease);
+}
+
+:is(html[data-theme]) .os-model-card__body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .os-model-card__title {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  line-height: 1.25;
+}
+
+:is(html[data-theme]) .os-model-card__hint {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  line-height: 1.35;
+}
+
+/* ---- o escolhido ---------------------------------------------------------- */
+
+:is(html[data-theme]) .os-model-card.is-selected,
+:is(html[data-theme]) .os-model-card:has(input:checked) {
+  background: var(--surface-selected);
+  box-shadow: inset 3px 0 0 0 var(--accent);
+}
+
+:is(html[data-theme]) .os-model-card.is-selected .os-model-card__title,
+:is(html[data-theme]) .os-model-card:has(input:checked) .os-model-card__title {
+  color: var(--accent);
+}
+
+:is(html[data-theme]) .os-model-card.is-selected .os-model-card__mark,
+:is(html[data-theme]) .os-model-card:has(input:checked) .os-model-card__mark {
+  border-color: var(--accent);
+}
+
+/* O ponto central só existe no escolhido — desenhado, e não um segundo
+   elemento, porque a marcação vem do formulário e não tem onde pendurá-lo. */
+:is(html[data-theme]) .os-model-card.is-selected .os-model-card__mark::after,
+:is(html[data-theme]) .os-model-card:has(input:checked) .os-model-card__mark::after {
+  background: var(--accent);
+  block-size: 8px;
+  border-radius: 999px;
+  content: "";
+  inline-size: 8px;
+  inset: 3px;
+  position: absolute;
+}
+
+/* O anel de foco vai no CARTÃO, porque o `<input>` é invisível: sem isto quem
+   navega por teclado percorre as opções sem ver onde está. */
+:is(html[data-theme]) .os-model-card:focus-within {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}

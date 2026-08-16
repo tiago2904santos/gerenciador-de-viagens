@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.core.cache import cache
+from django.core.paginator import Paginator
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import JsonResponse
@@ -12,6 +13,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 
+from core import entity_cards
 from core import login_throttle
 from core.errors import capture
 from eventos.models import Evento
@@ -194,6 +196,77 @@ def main_preview(request):
                 {"label": "Ativos", "count": 8, "url": "#", "is_active": False},
                 {"label": "Arquivados", "count": 4, "url": "#", "is_active": False},
             ),
+            # A lista da galeria filtra de verdade: sem registros que difiram
+            # entre si, um filtro quebrado passa despercebido — foi assim que o
+            # picker ficou uma sessão inteira sem inicializar, com a tela certa.
+            "v2_registros": (
+                {
+                    "titulo": "Nº 153/2026 · ARAPONGAS/PR",
+                    "meta": "12/08 a 15/08/2026 · ADEMAR SCHONS",
+                    "status": "Em andamento",
+                    "tone": "progress",
+                    "busca": "153/2026 arapongas ademar schons protocolo 18.221.443-0",
+                },
+                {
+                    "titulo": "Nº 152/2026 · CURITIBA/PR",
+                    "meta": "05/08 a 12/08/2026 · ADRIANO SILVA",
+                    "status": "Concluído",
+                    "tone": "done",
+                    "busca": "152/2026 curitiba adriano silva protocolo 18.220.917-4",
+                },
+                {
+                    "titulo": "Nº 151/2026 · MARINGÁ/PR",
+                    "meta": "01/08 a 03/08/2026 · BEATRIZ CARDOSO",
+                    "status": "Em andamento",
+                    "tone": "progress",
+                    "busca": "151/2026 maringa beatriz cardoso protocolo 18.220.554-2",
+                },
+                {
+                    "titulo": "Nº 150/2026 · LONDRINA/PR",
+                    "meta": "28/07 a 30/07/2026 · CARLOS MENDES",
+                    "status": "Cancelado",
+                    "tone": "late",
+                    "busca": "150/2026 londrina carlos mendes protocolo 18.219.880-5",
+                },
+            ),
+            # O valor tem de bater com o `status` do registro: o motor compara
+            # os dois normalizados, e um rótulo diferente do valor filtra nada.
+            "v2_status_opcoes": (
+                {"value": "", "label": "Todos os status"},
+                {"value": "Em andamento", "label": "Em andamento"},
+                {"value": "Concluído", "label": "Concluído"},
+                {"value": "Cancelado", "label": "Cancelado"},
+            ),
+            # O menu de ações montado a partir dos dados, como os presenters o
+            # entregam — o caminho que as telas reais usam.
+            "v2_menu": entity_cards.menu(
+                "lab-menu-docs",
+                "Documentos",
+                "ARAPONGAS/PR",
+                [
+                    entity_cards.menu_link(
+                        "#", "Baixar PDF", "Todos os servidores do termo",
+                        "pdf", "pdf", download=True,
+                    ),
+                    entity_cards.menu_link(
+                        "#", "Baixar DOCX", "Arquivo editável", "docx", "docx", download=True,
+                    ),
+                    entity_cards.menu_attach_signed("#", "ARAPONGAS/PR"),
+                ],
+            ),
+            # Opções de duas linhas: o `meta` é o que a variação mostra embaixo.
+            "v2_opcoes_pessoas": (
+                {"value": "1", "label": "ADEMAR SCHONS", "meta": "Agente de Polícia Judiciária • 1ª Delegacia"},
+                {"value": "2", "label": "BEATRIZ CARDOSO", "meta": "Escrivã • 1ª Delegacia"},
+                {"value": "3", "label": "CARLOS MENDES", "meta": "Papiloscopista • COPE"},
+            ),
+            "v2_opcoes_viaturas": (
+                {"value": "1", "label": "AAA-1234 - DUSTER", "meta": "FLEX • Descaracterizada • ASCOM"},
+                {"value": "2", "label": "AAA-1235 - DUSTER", "meta": "FLEX • Descaracterizada • ASCOM"},
+                {"value": "3", "label": "AAA-1244 - DUSTER", "meta": "DIESEL • Descaracterizada"},
+            ),
+            "v2_pagina": Paginator(range(48), 10).page(2),
+            "v2_paginas": (1, 2, 3, "...", 5),
             "shell_css_profile_path": "css/shell.form-components.bundle.css",
         },
     )

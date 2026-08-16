@@ -1,3 +1,14 @@
+{% comment %}
+  Documentos do termo, para conferência antes da assinatura.
+
+  Cada cartão é um `<details>` de verdade: abrir e fechar é do navegador, e o
+  `js/pages/oficios-documentos-inline.js` só carrega o `data-src` do `<iframe>`
+  no primeiro `toggle` — um PDF por cartão, carregado antes de alguém pedir, é
+  peso que ninguém vê. `data-lazy-inline` é o gancho desse motor.
+
+  Os menus vêm do v2 (`c-v2.menu`), e os cinco ganchos do anexo assinado moram
+  em `c-v2.menu_attach_signed`, declarados uma vez só.
+{% endcomment %}
 {% with docs=termo_preview_documents %}
   <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
     <summary class="document-inline-card__header">
@@ -6,50 +17,35 @@
       </span>
       <span class="document-inline-card__header-end">
         <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do termo genérico">
-          <c-ui.buttons.button
-            class_name="icon-btn icon-btn--settings"
-            type="button"
+          <c-v2.icon_button
+            icon="folder"
+            menu_id="termo-cadastro-generico-menu"
             aria_label="Abrir ações do termo genérico"
-            aria-haspopup="true"
-            aria-expanded="false"
-            aria-controls="termo-cadastro-generico-menu"
-            data-tooltip="Visualizar, baixar e anexar"
-            data-overlay-trigger data-overlay-kind="menu"
-            data-overlay-target="termo-cadastro-generico-menu" only><c-ui.icons.icon icon="folder" only /></c-ui.buttons.button>
-          <div class="action-menu action-menu--rich" id="termo-cadastro-generico-menu" role="menu" hidden>
-            {% if docs.generico.assinado %}
-              <c-ui.menus.rich_menu_header title="Termo genérico assinado" :subtitle="termo.destino_display" icon="sign" only />
-            {% else %}
-              <c-ui.menus.rich_menu_header title="Termo genérico" :subtitle="termo.destino_display" icon="folder" only />
-            {% endif %}
-            <c-ui.menus.rich_menu_link :href="docs.generico.inline_url" title="Visualizar termo" description="Abrir o PDF no navegador" icon="eye" tone="preview" :target_blank="True" only />
+            tooltip="Visualizar, baixar e anexar"
+          />
+          <c-v2.menu id="termo-cadastro-generico-menu" aria_label="Ações do termo genérico">
+            <c-v2.menu_header
+              title="{% if docs.generico.assinado %}Termo genérico assinado{% else %}Termo genérico{% endif %}"
+              :description="termo.destino_display"
+            />
+            <c-v2.menu_item :href="docs.generico.inline_url" icon="eye" icon_tone="info" title="Visualizar termo" description="Abrir o PDF no navegador" :target_blank="True" />
             {% if docs.generico.download_pdf_url %}
-              <c-ui.menus.rich_menu_link :href="docs.generico.download_pdf_url" title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" :download="True" only />
+              <c-v2.menu_item :href="docs.generico.download_pdf_url" icon="pdf" icon_tone="pdf" title="Baixar PDF" description="Documento pronto para assinatura" :download="True" />
             {% endif %}
             {% if docs.generico.download_docx_url %}
-              <c-ui.menus.rich_menu_link :href="docs.generico.download_docx_url" title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" :download="True" only />
+              <c-v2.menu_item :href="docs.generico.download_docx_url" icon="docx" icon_tone="docx" title="Baixar DOCX" description="Arquivo editável do termo" :download="True" />
             {% endif %}
             {% if docs.generico.anexar_assinado_url %}
-            <c-ui.buttons.button
-              type="button"
-              class_name="action-menu__item action-menu__item--rich{% if docs.generico.assinado %} is-assinado{% endif %}"
-              role="menuitem"
-              data-attach-signed-trigger
-              data-attach-signed-url="{{ docs.generico.anexar_assinado_url }}"
-              data-attach-signed-doc-label="o termo genérico"
-              data-attach-signed-current-name="{{ docs.generico.assinado_nome_original }}"
-              data-attach-signed-current-view-url="{{ docs.generico.assinado_view_url }}"
-              data-attach-signed-current-remove-url="{{ docs.generico.remover_assinado_url }}" only>
-              <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
-                <c-ui.icons.icon icon="sign" only />
-              </span>
-              <span class="action-menu__item-copy">
-                <strong>{% if docs.generico.assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
-                <small>{% if docs.generico.assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
-              </span>
-            </c-ui.buttons.button>
+              <c-v2.menu_attach_signed
+                :url="docs.generico.anexar_assinado_url"
+                doc_label="o termo genérico"
+                :signed="docs.generico.assinado"
+                :current_name="docs.generico.assinado_nome_original"
+                :current_view_url="docs.generico.assinado_view_url"
+                :current_remove_url="docs.generico.remover_assinado_url"
+              />
             {% endif %}
-          </div>
+          </c-v2.menu>
         </span>
       </span>
     </summary>
@@ -72,23 +68,16 @@
         {% if docs.servidores|length > 1 and docs.download_todos_pdf_url %}
           <span class="document-inline-card__header-end">
             <span class="document-inline-actions document-inline-actions--header" aria-label="Ações de todos os termos">
-              <c-ui.buttons.button
-                class_name="icon-btn icon-btn--settings"
-                type="button"
+              <c-v2.icon_button
+                icon="folder"
+                menu_id="termo-cadastro-todos-menu"
                 aria_label="Abrir ações dos termos"
-                aria-haspopup="true"
-                aria-expanded="false"
-                aria-controls="termo-cadastro-todos-menu"
-                data-tooltip="Baixar todos"
-                data-overlay-trigger data-overlay-kind="menu"
-                data-overlay-target="termo-cadastro-todos-menu" only><c-ui.icons.icon icon="folder" only /></c-ui.buttons.button>
-              <div class="action-menu action-menu--rich" id="termo-cadastro-todos-menu" role="menu" hidden>
-                <c-ui.menus.rich_menu_header title="Termos de autorização" subtitle="Todos os servidores" icon="folder" only />
-                <c-ui.menus.rich_menu_link :href="docs.download_todos_pdf_url" title="Baixar PDF" description="Pacote com todos os termos" icon="pdf" tone="pdf" :download="True" only />
-                {% if docs.download_todos_docx_url %}
-                  <c-ui.menus.rich_menu_link :href="docs.download_todos_docx_url" title="Baixar DOCX" description="Arquivos editáveis" icon="docx" tone="docx" :download="True" only />
-                {% endif %}
-              </div>
+                tooltip="Baixar todos"
+              />
+              <c-v2.menu id="termo-cadastro-todos-menu" aria_label="Ações de todos os termos">
+                <c-v2.menu_header title="Termos de autorização" description="Todos os servidores" />
+                <c-v2.menu_item :href="docs.download_todos_pdf_url" icon="pdf" icon_tone="pdf" title="Baixar todos em PDF" description="Um arquivo com os termos de todos os servidores" :download="True" />
+              </c-v2.menu>
             </span>
           </span>
         {% endif %}
@@ -102,44 +91,35 @@
               <span class="document-inline-card__title">{{ doc.titulo }}</span>
               <span class="document-inline-card__header-end">
                 <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do termo de {{ doc.servidor_nome }}">
-                  <c-ui.buttons.button
-                    class_name="icon-btn icon-btn--settings"
-                    type="button"
+                  <c-v2.icon_button
+                    icon="folder"
+                    menu_id="termo-cadastro-servidor-menu-{{ doc.id }}"
                     aria_label="Abrir ações do termo de {{ doc.servidor_nome }}"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                    aria-controls="termo-cadastro-servidor-menu-{{ doc.id }}"
-                    data-tooltip="Visualizar, baixar e anexar"
-                    data-overlay-trigger data-overlay-kind="menu"
-                    data-overlay-target="termo-cadastro-servidor-menu-{{ doc.id }}" only><c-ui.icons.icon icon="folder" only /></c-ui.buttons.button>
-                  <div class="action-menu action-menu--rich" id="termo-cadastro-servidor-menu-{{ doc.id }}" role="menu" hidden>
-                    {% if doc.assinado %}
-                      <c-ui.menus.rich_menu_header title="Termo assinado" :subtitle="doc.servidor_nome" icon="sign" only />
-                    {% else %}
-                      <c-ui.menus.rich_menu_header title="Termo de autorização" :subtitle="doc.servidor_nome" icon="folder" only />
+                    tooltip="Visualizar, baixar e anexar"
+                  />
+                  <c-v2.menu id="termo-cadastro-servidor-menu-{{ doc.id }}" aria_label="Ações do termo de {{ doc.servidor_nome }}">
+                    <c-v2.menu_header
+                      title="{% if doc.assinado %}Termo assinado{% else %}Termo do servidor{% endif %}"
+                      :description="doc.servidor_nome"
+                    />
+                    <c-v2.menu_item :href="doc.inline_url" icon="eye" icon_tone="info" title="Visualizar termo" description="Abrir o PDF no navegador" :target_blank="True" />
+                    {% if doc.download_pdf_url %}
+                      <c-v2.menu_item :href="doc.download_pdf_url" icon="pdf" icon_tone="pdf" title="Baixar PDF" description="Documento pronto para assinatura" :download="True" />
                     {% endif %}
-                    <c-ui.menus.rich_menu_link :href="doc.inline_url" title="Visualizar termo" description="Abrir o PDF no navegador" icon="eye" tone="preview" :target_blank="True" only />
+                    {% if doc.download_docx_url %}
+                      <c-v2.menu_item :href="doc.download_docx_url" icon="docx" icon_tone="docx" title="Baixar DOCX" description="Arquivo editável do termo" :download="True" />
+                    {% endif %}
                     {% if doc.anexar_assinado_url %}
-                    <c-ui.buttons.button
-                      type="button"
-                      class_name="action-menu__item action-menu__item--rich{% if doc.assinado %} is-assinado{% endif %}"
-                      role="menuitem"
-                      data-attach-signed-trigger
-                      data-attach-signed-url="{{ doc.anexar_assinado_url }}"
-                      data-attach-signed-doc-label="o termo de {{ doc.servidor_nome }}"
-                      data-attach-signed-current-name="{{ doc.assinado_nome_original }}"
-                      data-attach-signed-current-view-url="{{ doc.assinado_view_url }}"
-                      data-attach-signed-current-remove-url="{{ doc.remover_assinado_url }}" only>
-                      <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
-                        <c-ui.icons.icon icon="sign" only />
-                      </span>
-                      <span class="action-menu__item-copy">
-                        <strong>{% if doc.assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
-                        <small>{% if doc.assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
-                      </span>
-                    </c-ui.buttons.button>
+                      <c-v2.menu_attach_signed
+                        :url="doc.anexar_assinado_url"
+                        doc_label="o termo de {{ doc.servidor_nome }}"
+                        :signed="doc.assinado"
+                        :current_name="doc.assinado_nome_original"
+                        :current_view_url="doc.assinado_view_url"
+                        :current_remove_url="doc.remover_assinado_url"
+                      />
                     {% endif %}
-                  </div>
+                  </c-v2.menu>
                 </span>
               </span>
             </summary>

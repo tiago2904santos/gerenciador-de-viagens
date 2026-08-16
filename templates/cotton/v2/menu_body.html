@@ -1,0 +1,126 @@
+{% cotton:vars menu %}
+{% comment %}
+  Corpo do menu de ações de um registro, montado a partir dos dados — gêmeo v2
+  de `cotton/ui/lists/entity_card_menu_body.html`.
+
+  `menu` é o dicionário de `core.entity_cards.menu(...)`, e os itens são os
+  tipos que os presenters já produzem: link, post, confirm, cancel, delete e
+  attach_signed. Renderizar por tipo, e não por slot, é o que permite migrar as
+  listas de qualquer domínio sem reescrever presenter nenhum.
+
+  Cada tipo carrega ganchos que são contrato de um motor JS diferente
+  (`overlay.js` para os diálogos, `attach-signed-modal.js` para o assinado).
+  Eles são copiados daqui EXATAMENTE como o legado os emite: um nome trocado
+  não dá erro, só faz o item parar de responder.
+
+  O menu abre transplantado para o `<body>`; `data-menu-v2` viaja no elemento
+  porque nenhum ancestral sobrevive à mudança.
+
+  A classe `action-menu` NÃO é decoração: quando o corpo vem do servidor no
+  primeiro clique, o `overlay.js` procura os menus na resposta por esse seletor
+  literal. Sem ela o clique busca, recebe a marcação certa e conclui "resposta
+  sem menu". A aparência continua sendo a do v2 — `.menu` vence por
+  especificidade.
+{% endcomment %}
+{% load icones %}
+<div class="menu action-menu" id="{{ menu.id }}" data-menu-v2 role="menu" hidden>
+  <c-v2.menu_header :title="menu.title" :description="menu.subtitle" />
+
+  {% for item in menu.items %}
+    {% if item.type == "link" %}
+      <a
+        class="menu__item"
+        href="{{ item.href }}"
+        role="menuitem"
+        {% if item.download %}download{% endif %}
+        {% if item.target_blank %}target="_blank" rel="noopener"{% endif %}
+      >
+        <span class="menu__icon" data-tone="{{ item.tone }}" aria-hidden="true">{% icone_svg item.icon %}</span>
+        <span class="menu__copy">
+          <strong class="menu__title">{{ item.title }}</strong>
+          <small class="menu__description">{{ item.description }}</small>
+        </span>
+      </a>
+
+    {% elif item.type == "post" %}
+      <form method="post" action="{{ item.action_url }}" class="menu__form">
+        {% csrf_token %}
+        <button type="submit" class="menu__item" role="menuitem">
+          <span class="menu__icon" data-tone="{{ item.icon_tone }}" aria-hidden="true">{% icone_svg item.icon %}</span>
+          <span class="menu__copy">
+            <strong class="menu__title">{{ item.title }}</strong>
+            <small class="menu__description">{{ item.description }}</small>
+          </span>
+        </button>
+      </form>
+
+    {% elif item.type == "confirm" %}
+      <button
+        type="button"
+        class="menu__item"
+        role="menuitem"
+        data-overlay-trigger data-overlay-kind="dialog" data-overlay-target="confirm-action-modal"
+        data-confirm-action-url="{{ item.url }}"
+        data-confirm-action-label-text="{{ item.label }}"
+      >
+        <span class="menu__icon" data-tone="{{ item.icon_tone|default:'success' }}" aria-hidden="true">{% icone_svg item.icon|default:"check" %}</span>
+        <span class="menu__copy">
+          <strong class="menu__title">{{ item.title }}</strong>
+          <small class="menu__description">{{ item.description }}</small>
+        </span>
+      </button>
+
+    {% elif item.type == "cancel" %}
+      <button
+        type="button"
+        class="menu__item"
+        role="menuitem"
+        data-overlay-trigger data-overlay-kind="dialog" data-overlay-target="cancel-reason-modal"
+        data-cancel-url="{{ item.url }}"
+        data-cancel-label="{{ item.label }}"
+      >
+        <span class="menu__icon" data-tone="warning" aria-hidden="true">{% icone_svg "ban" %}</span>
+        <span class="menu__copy">
+          <strong class="menu__title">{{ item.title }}</strong>
+          <small class="menu__description">{{ item.description }}</small>
+        </span>
+      </button>
+
+    {% elif item.type == "delete" %}
+      <button
+        type="button"
+        class="menu__item"
+        role="menuitem"
+        data-tone="late"
+        data-overlay-trigger data-overlay-kind="dialog" data-overlay-target="delete-confirm-modal"
+        data-delete-url="{{ item.url }}"
+        data-delete-label="{{ item.label }}"
+      >
+        <span class="menu__icon" aria-hidden="true">{% icone_svg "delete" %}</span>
+        <span class="menu__copy">
+          <strong class="menu__title">{{ item.title }}</strong>
+          <small class="menu__description">{{ item.description }}</small>
+        </span>
+      </button>
+
+    {% elif item.type == "attach_signed" %}
+      <button
+        type="button"
+        class="menu__item"
+        role="menuitem"
+        data-attach-signed-trigger
+        data-attach-signed-url="{{ item.url }}"
+        data-attach-signed-doc-label="{{ item.doc_label }}"
+        data-attach-signed-current-name="{{ item.current_name }}"
+        data-attach-signed-current-view-url="{{ item.current_view_url }}"
+        data-attach-signed-current-remove-url="{{ item.current_remove_url }}"
+      >
+        <span class="menu__icon" data-tone="success" aria-hidden="true">{% icone_svg "sign" %}</span>
+        <span class="menu__copy">
+          <strong class="menu__title">{% if item.assinado %}Gerenciar assinado{% else %}Anexar assinado{% endif %}</strong>
+          <small class="menu__description">{% if item.assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
+        </span>
+      </button>
+    {% endif %}
+  {% endfor %}
+</div>

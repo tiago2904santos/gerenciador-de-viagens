@@ -2,14 +2,25 @@
 
 :is(html[data-theme]) .card-footer {
   align-items: center;
-  border-top: 1px solid var(--line);
+  /* Declarada, e não omitida: `.card-footer` colide com uma classe legada que
+     desenha a régua. Não declarar aqui é deixar a régua viva — omissão não
+     vence regra nenhuma. */
+  border: 0;
   display: flex;
+  /* Sem recuo próprio: o rodapé se alinha com os blocos do painel, e quem dá o
+     respiro é o painel. O legado põe `padding: 16px 24px` aqui — e, como a
+     classe colide, não declarar é herdar: os botões nasciam 24px para dentro da
+     borda dos blocos, desalinhados de tudo na página. */
+  margin: 0;
+  padding: 0;
   flex-wrap: wrap;
   gap: var(--gap);
   justify-content: space-between;
-  margin-top: var(--gap);
-  padding-top: var(--gap);
 }
+
+/* Sem linha de separação: o rodapé mora DENTRO do painel, e ali a separação já
+   vem do vão entre ele e o último bloco. A régua era necessária quando ele
+   flutuava solto no fundo da página, sem nada em volta que o contivesse. */
 
 :is(html[data-theme]) .card-footer__side {
   align-items: center;

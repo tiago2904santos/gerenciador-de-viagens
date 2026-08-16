@@ -1,13 +1,43 @@
-<div class="field-grid">
-  <c-ui.forms.field :field="form.modelo_motivo" :action_url="modelos_motivo_url" action_label="Gerenciar modelos" size_class="field-size-4" only />
-  {% if not tem_modelos_motivo %}
-    <div class="field field-size-4">
-      <p class="field-help">Nenhum modelo cadastrado. <a href="{{ modelos_motivo_url }}">Abrir gerenciamento de modelos</a></p>
+{% comment %}
+  Modelo de motivo e o texto livre.
+
+  O `<textarea>` vem do formulário (é ele que carrega `name`, `id` e o gancho
+  `data-motivo-textarea` que o script da página lê), mas embrulhado no `input`
+  do v2 — a classe do controle é definida no widget, em `forms.py`.
+{% endcomment %}
+<c-v2.field label="Modelo de motivo">
+  <c-slot name="control">
+    {% comment %}
+      O invólucro é o mesmo do `c-v2.select`: são estes três atributos que o
+      `picker-select.js` procura para trocar o `<select>` nativo pelo gatilho e
+      pelo menu do sistema. Sem eles o campo fica sendo o select do navegador —
+      com a seta, a fonte e o menu dele, diferente de todos os outros da tela.
+
+      O `<select>` continua vindo do formulário porque é ele que carrega `name`,
+      `id` e o gancho `data-modelo-motivo-select` que o script da página lê.
+    {% endcomment %}
+    <div class="field-with-action">
+      <div class="select" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
+        {{ form.modelo_motivo }}
+      </div>
+      <span class="field-with-action__action">
+        <c-v2.icon_button
+          icon="settings"
+          :href="modelos_motivo_url"
+          aria_label="Gerenciar modelos de motivo"
+          tooltip="Gerenciar modelos"
+          tooltip_tone="accent"
+        />
+      </span>
     </div>
+  </c-slot>
+  {% if not tem_modelos_motivo %}
+    <c-slot name="help">Nenhum modelo cadastrado ainda.</c-slot>
   {% endif %}
-  <div class="field field-size-4 app-form-field cv-field oficio-motivo-field oficio-reveal-panel is-open">
-    <label class="cv-field__label" for="{{ form.motivo.id_for_label }}">Motivo</label>
-    {{ form.motivo }}
-    {% if form.motivo.errors %}<c-ui.feedback.field_error :errors="form.motivo.errors" :field_id="form.motivo.auto_id" only />{% endif %}
-  </div>
-</div>
+</c-v2.field>
+
+<c-v2.field label="Motivo" :error="form.motivo.errors.0">
+  <c-slot name="control">
+    <div class="input">{{ form.motivo }}</div>
+  </c-slot>
+</c-v2.field>

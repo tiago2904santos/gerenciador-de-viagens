@@ -215,13 +215,19 @@ class ShellBundleGateTests(SimpleTestCase):
                 source = (ROOT / relative).read_text(encoding="utf-8")
                 self.assertNotIn(selector, source)
 
-    def test_ui04_terms_list_does_not_import_prestacoes_css(self):
+    def test_ui04_terms_list_nao_carrega_folha_de_pagina(self):
+        """UI-04 proibia a lista de termos puxar a folha das prestações.
+
+        Migrada para o v2 (2026-08-15), ela não carrega folha de PÁGINA alguma:
+        tudo o que desenha vem do `ui.bundle.css`. A regra ficou mais forte que
+        a original — e o `<link>` que voltasse seria pego aqui, qualquer que
+        fosse a folha.
+        """
         template = (ROOT / "templates/termos/index.html").read_text(
             encoding="utf-8"
         )
-        self.assertIn("css/lists/entity-cards.css", template)
-        self.assertIn("css/pages/termos.css", template)
-        self.assertNotIn("css/pages/prestacoes_contas.css", template)
+        self.assertNotIn("css/pages/", template)
+        self.assertNotIn("css/lists/", template)
 
     def test_base_html_keeps_extra_blocks(self):
         text = BASE_HTML.read_text(encoding="utf-8")

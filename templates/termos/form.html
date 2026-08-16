@@ -1,48 +1,113 @@
-{% extends "cotton/page/flow_base.html" %}
+{% extends "base.html" %}
 {% load static %}
 {% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
+{% block title %}{{ page_title }}{% endblock %}
 
 {% block component_js %}{% include 'includes/form_components_js.html' only %}{% endblock %}
-
-{% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/pages/oficios.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/roteiros.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/oficios-documentos-inline.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/termos.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/prestacoes_contas.css' %}">
-{% endblock %}
 
 {% block extra_js %}
   <script src="{% static 'js/pages/termos-form.js' %}" defer></script>
   <script src="{% static 'js/pages/oficios-documentos-inline.js' %}" defer></script>
 {% endblock %}
 
-{% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
-{% block flow_shell_extra %} document-form-page{% endblock %}
-{% block flow_shell_attrs %} data-termo-wizard-shell{% endblock %}
+{% block content %}
+  {% comment %}
+    Cadastro/edição de termo no sistema v2.
 
-{% block flow_body %}
-  {{ oficios_summary|json_script:"termos-oficios-summary" }}
+    A página não estende mais `cotton/page/flow_base.html` nem carrega folha de
+    página alguma: casca, blocos e rodapé vêm do `ui.bundle.css`. As cinco
+    folhas que ela puxava (`oficios`, `roteiros`, `oficios-documentos-inline`,
+    `termos`, `prestacoes_contas`) saíram junto.
 
-  <form
-    method="post"
-    class="document-form travel-document-wizard__form"
-    data-termo-form
-    data-api-cidades-url="{{ api_cidades_por_estado_url }}"
-    data-sede-label="{{ sede_config_label|default:'' }}"
-    data-termo-evento-selected-dates='{{ termo_evento_selected_dates_json|escape }}'
-  >
-    {% csrf_token %}
+    Os `data-*` do `<form>` continuam idênticos: `js/pages/termos-form.js` lê
+    todos eles para copiar destino, período, equipe e viatura do ofício
+    vinculado. Renomear qualquer um desliga a cópia EM SILÊNCIO — a tela
+    renderiza igual e o ofício simplesmente para de preencher o resto.
+  {% endcomment %}
+  <div class="form-page">
+    {% comment %}
+      Sem sobrancelha: o título grande sozinho já nomeia a tela. O que ela
+      informava era o MODO (cadastro ou edição), e isso migrou para o próprio
+      título — em duas linhas de tipografia diferente a pessoa lia duas vezes
+      para saber uma coisa só.
+    {% endcomment %}
+    <c-v2.header title="{% if termo and termo.pk %}Editar termo de autorização{% else %}Novo termo de autorização{% endif %}" />
 
-    <c-ui.feedback.form_errors :form="form" only />
+    {% comment %}
+      A faixa diz O QUE é o documento e o que se faz nesta tela — nada mais. Uma
+      versão anterior repetia aqui os dados do termo (ofício, destino, período),
+      e eles já estão logo abaixo, cada um no seu bloco: quem abre a tela lê a
+      mesma coisa duas vezes antes de chegar ao que veio fazer.
 
-    <div data-termo-wizard-form data-travel-document-wizard-step1>
-      <c-form.card title="Dados do termo" description="Ofício, evento, equipe, transporte e documentos" title_id="termo-form-main-title" footer_id="termo-form-footer" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :body_extra_class="body_extra_class" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :extra_class="extra_class" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "termos/partials/_termo_form_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id data_hook=data_hook heading_level=heading_level servidor_create_url=servidor_create_url shell=shell termo=termo variant=variant viatura_create_url=viatura_create_url add_button_evento=add_button_evento add_button_evento_d=add_button_evento_d add_button_os=add_button_os add_button_pt=add_button_pt cotton_attr_description=cotton_attr_description cotton_attr_end_label=cotton_attr_end_label cotton_attr_end_placeholder=cotton_attr_end_placeholder cotton_attr_start_label=cotton_attr_start_label cotton_attr_start_placeholder=cotton_attr_start_placeholder cotton_attr_title=cotton_attr_title destination_extra_class=destination_extra_class destination_title=destination_title end_hidden_id=end_hidden_id end_hidden_name=end_hidden_name end_hidden_value=end_hidden_value end_label=end_label extra_class=extra_class form=form initial_date=initial_date period_extra_class=period_extra_class period_extra_template=period_extra_template period_fields_extra_class=period_fields_extra_class picker_open_all=picker_open_all start_hidden_id=start_hidden_id start_hidden_name=start_hidden_name start_hidden_value=start_hidden_value start_label=start_label termo_preview_documents=termo_preview_documents city_field=city_field data_index=data_index destino_index=destino_index has_data_index=has_data_index has_destino_index=has_destino_index horarios_url=horarios_url remove_hidden=remove_hidden row_extra_class=row_extra_class row_single=row_single show_drag_handle=show_drag_handle state_field=state_field estados=estados evento=evento location_city_value=location_city_value location_legacy_event=location_legacy_event location_state_code=location_state_code location_state_id=location_state_id row=row row_index=row_index only %}</c-slot><c-slot name="footer">{% include "termos/partials/_viatura_footer.html" with back_label=back_label index_url=index_url only %}</c-slot></c-form.card>
-    </div>
-  </form>
-{% endblock %}
+      Quem chega por um link direto, sem passar pela lista, é quem precisa desta
+      linha: ela responde "onde estou e para que serve isto".
+    {% endcomment %}
+    <c-v2.rail>
+      <c-slot name="controls">
+        <p class="rail__description">
+          {% if termo and termo.pk %}
+            Altere os dados e salve para gerar os documentos de novo.
+          {% else %}
+            Vincule um ofício ou preencha os dados abaixo.
+          {% endif %}
+        </p>
+        <c-v2.button :label="back_label" icon="arrow-left" :href="index_url" />
+      </c-slot>
+    </c-v2.rail>
 
-{% block flow_modals %}
+    {{ oficios_summary|json_script:"termos-oficios-summary" }}
+
+    <form
+      method="post"
+      class="form-page__form"
+      data-termo-form
+      data-api-cidades-url="{{ api_cidades_por_estado_url }}"
+      data-sede-label="{{ sede_config_label|default:'' }}"
+      data-termo-evento-selected-dates='{{ termo_evento_selected_dates_json|escape }}'
+    >
+      {% csrf_token %}
+
+      <c-v2.form_errors :errors="form.non_field_errors" />
+
+      {% comment %}
+        SEM `data-travel-document-wizard-step1`. Esse marcador é o gancho de um
+        tema legado inteiro: 160 regras que se penduram nele, várias com
+        `!important` — e o `overlay.js` ainda o copia para os menus que abre,
+        levando o tema junto. Numa tela v2 ele não decora, ele DESFAZ: a faixa
+        de "nenhum item selecionado" saía sem fundo porque `--step1-empty`
+        vencia a regra do componente com `!important`.
+
+        Os dois scripts que leem esse marcador (`oficios-viatura-sugestoes` e
+        `oficios-wizard-driver-state`) são do wizard de ofício e não são
+        carregados aqui.
+      {% endcomment %}
+      <div data-termo-wizard-form>
+        <c-v2.panel
+          title="Dados do termo"
+          description="Ofício, evento, equipe, transporte e documentos."
+        >
+          <c-slot name="body">
+            {% include "termos/partials/_termo_form_body.html" with form=form termo=termo servidor_create_url=servidor_create_url viatura_create_url=viatura_create_url termo_preview_documents=termo_preview_documents only %}
+
+            {% comment %}
+              O rodapé fica DENTRO do painel, junto do que ele salva. Fora dele
+              flutuava no fundo da página, e a régua que o separava existia só
+              para compensar essa falta de contêiner.
+            {% endcomment %}
+            <c-v2.card_footer>
+              <c-slot name="secondary">
+                <c-v2.button :label="back_label" icon="arrow-left" :href="index_url" />
+              </c-slot>
+              <c-slot name="primary">
+                <c-v2.button label="Salvar termo" variant="primary" icon="check" type="submit" />
+              </c-slot>
+            </c-v2.card_footer>
+          </c-slot>
+        </c-v2.panel>
+      </div>
+    </form>
+  </div>
+
   {% if termo and termo.pk %}
     <c-ui.modals.attach_signed_modal />
   {% endif %}

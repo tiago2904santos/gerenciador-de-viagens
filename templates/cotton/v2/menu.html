@@ -1,11 +1,26 @@
-{% cotton:vars aria_label extra_class slot %}
+{% cotton:vars aria_label extra_class id slot %}
 {% comment %}
   Menu v2 — a lista de ações de um registro. Par de `static/css/v2/menu.css`.
 
   Os itens vêm por SLOT, e não de uma lista: cada ação carrega `href`, ícone e
   ganchos `data-*` próprios do domínio. É a mesma razão da variante `state` do
   toggle.
+
+  Com `id`, o menu passa a ser dirigido pelo `js/components/overlay.js`: nasce
+  `hidden` e só abre pelo gatilho que aponta para este id. Sem `id`, é um bloco
+  estático — é assim que a galeria o mostra.
+
+  O menu ABERTO é transplantado para o `<body>` e perde os ancestrais. Por isso
+  a marca do v2 (`data-menu-v2`) vai no próprio elemento: qualquer regra que
+  dependesse de um pai deixaria de valer no instante em que ele abre, e o menu
+  cairia no desenho do legado sem erro nenhum. Mesma lição do picker e do
+  calendário.
 {% endcomment %}
-<div class="menu{% if extra_class %} {{ extra_class }}{% endif %}" role="menu" aria-label="{{ aria_label }}">
+<div
+  class="menu{% if extra_class %} {{ extra_class }}{% endif %}"
+  {% if id %}id="{{ id }}" data-menu-v2 hidden{% endif %}
+  role="menu"
+  aria-label="{{ aria_label }}"
+>
   {{ slot }}
 </div>

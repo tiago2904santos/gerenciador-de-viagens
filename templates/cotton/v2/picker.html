@@ -1,4 +1,4 @@
-{% cotton:vars aria_label extra_class field mode name options placeholder selected_title %}
+{% cotton:vars aria_label driver extra_class field mode name options placeholder presentation selected_title %}
 {% comment %}
   Picker v2 — busca de entidade com resultados e itens selecionados.
 
@@ -16,6 +16,15 @@
   `mode`: "single" ou "multi". `options` é uma lista de `{value, label}` para
   quem não passa um `field` de formulário.
 
+  `driver` liga o botão "Definir motorista" em cada escolhido. Numa equipe todos
+  foram escolhidos; o que a lista precisa responder de relance é quem DIRIGE, e
+  é esse o único cartão que recebe o realce de accent.
+
+  `presentation`: "people" ou "vehicle" liga a variação de DUAS LINHAS — rótulo
+  em cima, o que desempata embaixo (cargo e unidade; combustível e lotação).
+  Três Dusters com a mesma placa-modelo são indistinguíveis numa linha só. Os
+  dados da segunda linha viajam em `meta` de cada opção.
+
   `selected_title` é o rótulo da caixa dos escolhidos. O padrão do JS é
   "SELECIONADOS", em caixa alta — herança do desenho antigo, onde o rótulo era
   miúdo e espaçado. Aqui ele é um título como os outros do sistema.
@@ -29,7 +38,9 @@
       data-entity-picker="true"
       data-picker-v2
       data-entity-picker-mode="{{ mode|default:'single' }}"
-      data-picker-variant="compact"
+      data-picker-variant="{% if presentation %}detailed{% else %}compact{% endif %}"
+      {% if presentation %}data-picker-presentation="{{ presentation }}"{% endif %}
+      {% if driver %}data-picker-driver-control="true"{% endif %}
       data-placeholder="{{ placeholder|default:'Digite para buscar' }}"
       data-panel-title="{{ selected_title|default:'Selecionados' }}"
       name="{{ name }}"
@@ -38,7 +49,18 @@
     >
       <option value=""></option>
       {% for opcao in options %}
-        <option value="{{ opcao.value }}">{{ opcao.label }}</option>
+        <option
+          value="{{ opcao.value }}"
+          {% comment %}
+            Os DOIS atributos, com o mesmo texto. O motor não lê um só: na
+            apresentação padrão ele usa `data-meta`, e em "people"/"vehicle"
+            monta a segunda linha a partir de `data-cargo` (com `data-unidade`),
+            caindo em textos genéricos como "Servidor cadastrado" quando não
+            acha. Mandar só `data-meta` fazia a variação de duas linhas
+            renderizar certinho e mostrar o texto errado.
+          {% endcomment %}
+          {% if opcao.meta %}data-meta="{{ opcao.meta }}" data-cargo="{{ opcao.meta }}"{% endif %}
+        >{{ opcao.label }}</option>
       {% endfor %}
     </select>
   {% endif %}

@@ -1,0 +1,80 @@
+{% cotton:vars aria_label empty_id empty_text field input_id list_id placeholder rows %}
+{% comment %}
+  Picker de documento vinculado — o do ofício no termo, e o mesmo desenho serve
+  ordem de serviço e justificativa.
+
+  DIFERENÇA para o `picker`: aqui a lista NÃO é um menu suspenso. Os candidatos
+  ficam à vista o tempo todo, e o campo de busca só os filtra. É proposital: o
+  que se escolhe é um documento inteiro — número, rota, período, equipe,
+  viatura —, e comparar dois deles exige vê-los lado a lado, não um de cada vez
+  atrás de um clique.
+
+  Também não usa `picker.js`: quem monta e filtra a lista é o script da página
+  (`js/pages/termos-form.js`), porque os candidatos vêm de uma busca no
+  servidor (`NOVO-07`) e o cartão de cada um é montado por
+  `CV.pickerParts.createRouteCard`.
+
+  ## Os ganchos
+
+  `data-related-picker-root`, `-search` e `-list` são contrato desse script e
+  dos editores de roteiro e evento, que acham a raiz por `closest()`. Os IDS
+  também são: `termos-form.js` procura `#id_oficio_busca` e
+  `#termo-oficio-lista` por nome. Trocar qualquer um deixa o campo na tela e
+  desliga a busca EM SILÊNCIO.
+
+  `field` é o `<select>` do formulário — é ele que carrega o valor no POST. Sem
+  ele o componente é uma lista bonita que não salva nada.
+{% endcomment %}
+<div class="picker picker--related">
+  <div
+    class="search-picker search-picker--single search-picker--related"
+    data-related-picker-root
+    data-related-picker-presentation="card"
+  >
+    <div class="search-picker__field">
+      <div class="search-picker__control">
+        {% comment %}
+          O `<span>` fica VAZIO de propósito. A lupa vem do `::before` que o
+          legado desenha nele — é assim que os pickers montados pelo `picker.js`
+          ganham a deles, e pôr um `<svg>` aqui fazia este campo ficar diferente
+          dos vizinhos na mesma tela.
+        {% endcomment %}
+        <span class="search-picker__icon" aria-hidden="true"></span>
+        <input
+          type="search"
+          class="search-picker__input"
+          {% if input_id %}id="{{ input_id }}"{% endif %}
+          placeholder="{{ placeholder|default:'Buscar' }}"
+          aria-label="{{ aria_label|default:placeholder|default:'Buscar' }}"
+          data-related-picker-search
+          autocomplete="off"
+          role="searchbox"
+        >
+      </div>
+    </div>
+
+    {% if field %}
+      {{ field }}
+      {% if field.errors %}
+        <c-v2.field_error :errors="field.errors" />
+      {% endif %}
+    {% endif %}
+
+    <div
+      class="search-picker__selected-list related-route-list"
+      {% if list_id %}id="{{ list_id }}"{% endif %}
+      data-related-picker-list
+    >{{ rows }}</div>
+
+    {% comment %}
+      O aviso nasce oculto e é o script que o mostra quando a busca não acha
+      nada. Nunca dar-lhe `display` sem o par `[hidden]`.
+    {% endcomment %}
+    <p
+      class="search-picker__selected-empty"
+      {% if empty_id %}id="{{ empty_id }}"{% endif %}
+      data-related-picker-empty
+      hidden
+    >{{ empty_text|default:'Nenhum resultado para a busca.' }}</p>
+  </div>
+</div>

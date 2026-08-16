@@ -1,0 +1,24 @@
+/* Form page — o esqueleto de uma tela de cadastro. Depende de `v2/tokens.css`.
+ *
+ * Irmã de `list-page.css`: o ritmo entre header, formulário e rodapé é dela.
+ * Sem esta folha as peças empilham sem vão, e o rodapé de ações nasce colado no
+ * último bloco — que é o pior lugar para uma ação irreversível ficar.
+ */
+
+:is(html[data-theme]) .form-page {
+  display: grid;
+  gap: var(--gap);
+}
+
+:is(html[data-theme]) .form-page__form {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+/* Header e faixa são uma peça só — a faixa já perde os cantos de cima quando
+   encosta no header, e o vão da grade os separava de novo. Mesma regra da tela
+   de lista, pelo mesmo motivo: forma e ritmo têm de dizer a mesma coisa. */
+:is(html[data-theme]) .form-page > .header + .rail {
+  margin-top: calc(var(--gap) * -1);
+}

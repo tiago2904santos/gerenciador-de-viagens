@@ -1,35 +1,97 @@
-{% extends "cotton/page/flow_base.html" %}
+{% extends "base.html" %}
 {% load static %}
 {% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
+{% block title %}{{ page_title }}{% endblock %}
 
 {% block component_js %}{% include 'includes/form_components_js.html' only %}{% endblock %}
 
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/pages/oficios.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/roteiros.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/termos.css' %}">
+  {% comment %}
+    A ÚNICA folha de página que sobra. Ela guarda dois widgets que só existem
+    aqui e ainda não têm par no v2: os cartões de escolha da necessidade
+    (`os-model-picker`) e o painel de funções da equipe
+    (`os-servidor-role-panel`), ambos dirigidos por `ordens-servico-form.js`.
+
+    Saíram `oficios.css`, `roteiros.css` e `termos.css`: elas vestiam os blocos
+    que agora são componentes do v2.
+  {% endcomment %}
   <link rel="stylesheet" href="{% static 'css/pages/ordens-servico.css' %}">
-{% endblock %}
-
-{% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
-{% block flow_shell_extra %} document-form-page os-page{% endblock %}
-{% block flow_shell_attrs %} data-os-wizard-shell{% endblock %}
-
-{% block flow_body %}
-  {{ os_oficios_summary|json_script:"os-oficios-summary" }}
-  {{ os_funcoes_servidores|json_script:"os-servidor-funcoes" }}
-
-  <form method="post" class="document-form travel-document-wizard__form os-form" data-os-form data-api-cidades-url="{{ api_cidades_por_estado_url }}" data-sede-label="{{ sede_config_label|default:'' }}">
-    {% csrf_token %}
-
-    <c-ui.feedback.form_errors :form="form" only />
-
-    <div class="form-section-stack form-section-stack--comfortable" data-os-wizard-form data-travel-document-wizard-step1>
-      <c-form.card title="Dados da ordem de serviço" description="Ofícios, evento, equipe e necessidade da OS" title_id="os-form-main-title" extra_class="os-form-card" body_extra_class="os-form-body" footer_id="os-form-footer" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "ordens_servico/partials/_os_form_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id data_hook=data_hook heading_level=heading_level servidor_create_url=servidor_create_url shell=shell variant=variant add_button_evento=add_button_evento add_button_evento_d=add_button_evento_d add_button_pt=add_button_pt add_button_termo=add_button_termo cotton_attr_description=cotton_attr_description cotton_attr_end_label=cotton_attr_end_label cotton_attr_end_placeholder=cotton_attr_end_placeholder cotton_attr_start_label=cotton_attr_start_label cotton_attr_start_placeholder=cotton_attr_start_placeholder cotton_attr_title=cotton_attr_title destination_extra_class=destination_extra_class destination_title=destination_title end_hidden_id=end_hidden_id end_hidden_name=end_hidden_name end_hidden_value=end_hidden_value end_label=end_label form=form initial_date=initial_date modelos_motivo_url=modelos_motivo_url period_extra_class=period_extra_class period_extra_template=period_extra_template period_fields_extra_class=period_fields_extra_class picker_open_all=picker_open_all start_hidden_id=start_hidden_id start_hidden_name=start_hidden_name start_hidden_value=start_hidden_value start_label=start_label tem_modelos_motivo=tem_modelos_motivo city_field=city_field data_index=data_index destino_index=destino_index has_data_index=has_data_index has_destino_index=has_destino_index horarios_url=horarios_url remove_hidden=remove_hidden row_extra_class=row_extra_class row_single=row_single show_drag_handle=show_drag_handle state_field=state_field estados=estados evento=evento location_city_value=location_city_value location_legacy_event=location_legacy_event location_state_code=location_state_code location_state_id=location_state_id row=row row_index=row_index only %}</c-slot><c-slot name="footer">{% include "ordens_servico/partials/_motivo_footer.html" with back_label=back_label index_url=index_url os_is_completa=os_is_completa only %}</c-slot></c-form.card>
-    </div>
-  </form>
 {% endblock %}
 
 {% block extra_js %}
   <script src="{% static 'js/pages/ordens-servico-form.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+  <div class="form-page">
+    {% comment %}
+      Sem sobrancelha: o `page_title` já diz o modo — "Nova Ordem de Serviço" ou
+      "Editar OS 002/2026".
+    {% endcomment %}
+    <c-v2.header :title="page_title" />
+
+    <c-v2.rail>
+      <c-slot name="controls">
+        <p class="rail__description">
+          {% if ordem and ordem.pk %}
+            Altere os dados e salve para gerar o documento de novo.
+          {% else %}
+            Vincule ofícios ou preencha os dados abaixo.
+          {% endif %}
+        </p>
+        <c-v2.button :label="back_label" icon="arrow-left" :href="index_url" />
+      </c-slot>
+    </c-v2.rail>
+
+    {{ os_oficios_summary|json_script:"os-oficios-summary" }}
+    {{ os_funcoes_servidores|json_script:"os-servidor-funcoes" }}
+
+    {% comment %}
+      Os `data-*` do formulário são contrato de `js/pages/ordens-servico-form.js`
+      — é deles que ele parte para copiar os dados dos ofícios vinculados e para
+      cascatear estado → cidade. Renomear qualquer um desliga a cópia em
+      silêncio.
+
+      SEM `data-travel-document-wizard-step1`: aquele marcador arrasta um tema
+      legado inteiro (160 regras, várias com `!important`) e desfaz o v2 por
+      baixo. Foi o que apagou o fundo das faixas no formulário de termo.
+    {% endcomment %}
+    <form
+      method="post"
+      class="form-page__form os-form"
+      data-os-form
+      data-api-cidades-url="{{ api_cidades_por_estado_url }}"
+      data-sede-label="{{ sede_config_label|default:'' }}"
+    >
+      {% csrf_token %}
+
+      <c-v2.form_errors :errors="form.non_field_errors" />
+
+      <div data-os-wizard-form>
+        <c-v2.panel
+          title="Dados da ordem de serviço"
+          description="Ofícios, necessidade, evento e equipe."
+        >
+          <c-slot name="body">
+            {% include "ordens_servico/partials/_os_form_body.html" with form=form modelos_motivo_url=modelos_motivo_url tem_modelos_motivo=tem_modelos_motivo servidor_create_url=servidor_create_url only %}
+
+            <c-v2.card_footer>
+              <c-slot name="secondary">
+                <c-v2.button :label="back_label" icon="arrow-left" :href="index_url" />
+              </c-slot>
+              <c-slot name="primary">
+                <c-v2.button
+                  label="{% if os_is_completa %}Finalizar Ordem de Serviço{% else %}Salvar como rascunho{% endif %}"
+                  variant="primary"
+                  icon="check"
+                  type="submit"
+                  extra_class="os-submit-btn"
+                />
+              </c-slot>
+            </c-v2.card_footer>
+          </c-slot>
+        </c-v2.panel>
+      </div>
+    </form>
+  </div>
 {% endblock %}

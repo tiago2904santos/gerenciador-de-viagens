@@ -1,4 +1,4 @@
-{% cotton:vars aria_label button_label extra_class mode picker_id placeholder_end placeholder_start %}
+{% cotton:vars aria_label button_label end_field end_hidden_name end_hidden_value end_input_id extra_class mode picker_id placeholder_end placeholder_start start_field start_hidden_name start_hidden_value start_input_id %}
 {% comment %}
   Date picker v2 — campo de data, simples ou intervalo.
 
@@ -10,6 +10,15 @@
 
   O v2 acrescenta só o invólucro `.date-field`, para a folha
   `static/css/v2/date-picker.css` vestir o campo sem alcançar as telas legadas.
+
+  `start_field`/`end_field` são os `BoundField` do formulário. Passá-los faz o
+  calendário escrever nos campos ocultos que o Django vai ler no POST — sem
+  eles o componente é só um seletor de tela, que mostra a data e não salva
+  nada.
+
+  `start_hidden_name`/`end_hidden_name` são a alternativa para quem NÃO tem
+  formulário: o filtro de uma lista, que manda os valores por querystring. Um
+  ou outro, nunca os dois.
 
   O JS é o `js/components/date-picker.js`, achado pelo partial.
 {% endcomment %}
@@ -30,6 +39,14 @@
     :end_placeholder="placeholder_end"
     :single_placeholder="placeholder_start"
     :single_aria_label="aria_label"
+    :start_field="start_field"
+    :end_field="end_field"
+    :start_input_id="start_input_id"
+    :end_input_id="end_input_id"
+    :start_hidden_name="start_hidden_name"
+    :end_hidden_name="end_hidden_name"
+    :start_hidden_value="start_hidden_value"
+    :end_hidden_value="end_hidden_value"
     hide_labels="1"
     only
   />

@@ -34,9 +34,34 @@ def apresentar_linha_simples_termo(
         facts.append(build_meta("Período", termo.periodo_display))
     if termo.oficio_id:
         facts.append(build_meta("Ofício", termo.oficio.numero_formatado))
+
+    destino = termo.destino_display
+    # As ações da linha viram um MENU montado pelos mesmos helpers do card. É o
+    # que permite ao v2 renderizar linha e card com um só componente
+    # (`cotton/v2/menu_body.html`) em vez de dois caminhos que divergem em
+    # silêncio — e cada item já traz o gancho do motor JS que o atende.
+    itens = []
+    if pdf_url:
+        itens.append(entity_cards.menu_link(
+            pdf_url, "Baixar PDF", "Documento pronto para impressão", "pdf", "pdf", download=True,
+        ))
+    if docx_url:
+        itens.append(entity_cards.menu_link(
+            docx_url, "Baixar DOCX", "Arquivo editável", "docx", "docx", download=True,
+        ))
+    if anexar_assinado_url:
+        itens.append(entity_cards.menu_attach_signed(
+            anexar_assinado_url,
+            destino,
+            assinado=assinado or bool(remover_assinado_url),
+            current_name=assinado_nome_original,
+            current_view_url=assinado_view_url,
+            current_remove_url=remover_assinado_url,
+        ))
+
     return {
         "avatar": "TA",
-        "title": termo.destino_display,
+        "title": destino,
         "facts": facts,
         "search_extra": termo.periodo_display if not periodo_vazio else "",
         "edit_url": edit_url,
@@ -48,6 +73,13 @@ def apresentar_linha_simples_termo(
         "assinado_nome_original": assinado_nome_original,
         "assinado_view_url": assinado_view_url,
         "remover_assinado_url": remover_assinado_url,
+        "menu": entity_cards.menu(
+            f"termo-linha-{termo.pk}-docs",
+            "Documentos",
+            destino,
+            itens,
+            trigger_aria=f"Documentos de {destino}",
+        ) if itens else None,
     }
 
 
@@ -205,7 +237,7 @@ def apresentar_termo_card(
         "footer": entity_cards.footer(**footer_kwargs),
         "periodo": periodo,
         "oficio_label": oficio_label or "—",
-        # Os gatilhos de linha (`_termo_linha_menu.html`) apontam para cá (PF-04).
+        # Os gatilhos de linha (`termo_list_card.html`) apontam para cá (PF-04).
         "menus_url": menus_src,
         "servidores": servidores_display,
         "servidores_count": len(servidores_display),

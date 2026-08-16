@@ -1,0 +1,130 @@
+/* Documento inline — o cartão que abre e mostra o PDF na própria página.
+ * Depende de `v2/tokens.css`.
+ *
+ * É um `<details>`/`<summary>` de verdade: abrir e fechar é do navegador, e o
+ * `js/pages/oficios-documentos-inline.js` só carrega o `src` do `<iframe>` no
+ * primeiro `toggle` — um PDF por cartão, carregado antes de alguém pedir, é
+ * peso que ninguém vê.
+ *
+ * O desenho veio de `css/pages/oficios-documentos-inline.css`, que saiu do
+ * formulário de termo na migração. Sem esta folha o cartão perde a moldura e o
+ * `<iframe>` fica com a altura zero que o navegador dá por padrão: o visualizador
+ * some da tela sem que nada quebre.
+ */
+
+/* O cartão pinta a partir do token BASE e declara o degrau seguinte para quem
+   está dentro dele. Enquanto ele se pintava com `--surface-contrast` e não
+   declarava nada, o botão de ações no cabeçalho herdava a MESMA variável e saía
+   da cor do próprio cartão — um botão invisível em cima do que ele deveria
+   destacar. É a mesma referência circular que apagou a escada da faixa de
+   equipe. */
+:is(html[data-theme]) .document-inline-card {
+  --surface: var(--surface-rail);
+  --surface-contrast: var(--surface-field);
+
+  background: var(--surface-rail);
+  border: 0;
+  border-radius: var(--radius-field);
+  margin: 0;
+  overflow: hidden;
+}
+
+/* O `<summary>` traz um triângulo próprio em toda plataforma; ele some porque a
+   linha inteira é o alvo do clique, e o marcador competia com o título. */
+:is(html[data-theme]) .document-inline-card__header {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-tight) var(--gap);
+  justify-content: space-between;
+  list-style: none;
+  min-height: var(--control-height);
+  padding: var(--gap);
+}
+
+:is(html[data-theme]) .document-inline-card__header::-webkit-details-marker {
+  display: none;
+}
+
+:is(html[data-theme]) .document-inline-card__header::marker {
+  content: "";
+}
+
+:is(html[data-theme]) .document-inline-card__title {
+  color: var(--text-strong);
+  flex: 1 1 12rem;
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  min-width: 0;
+  text-align: left;
+}
+
+:is(html[data-theme]) .document-inline-card__header-end {
+  align-items: center;
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  gap: var(--gap-tight);
+  justify-content: flex-end;
+}
+
+:is(html[data-theme]) .document-inline-card__body {
+  display: grid;
+  gap: var(--gap-tight);
+  padding: 0 var(--gap) var(--gap);
+}
+
+/* Cartão dentro de cartão (os termos por servidor): sobe um degrau, e inverte o
+   par de novo para os botões dele continuarem visíveis. */
+:is(html[data-theme]) .document-inline-card .document-inline-card {
+  --surface: var(--surface-field);
+  --surface-contrast: var(--surface-rail);
+
+  background: var(--surface-field);
+}
+
+/* ---- o visualizador -------------------------------------------------------
+ *
+ * A ALTURA é a razão de esta folha existir. `<iframe>` sem altura declarada
+ * assume 150px em alguns navegadores e 0 em outros quando está dentro de uma
+ * grade — e o documento aparece como uma faixa vazia, ou não aparece.
+ *
+ * `min()` com `vh` porque o documento tem de caber na tela sem rolar a página
+ * inteira: quem lê um termo antes de assinar precisa do documento e do resto do
+ * formulário no mesmo campo de visão.
+ */
+:is(html[data-theme]) .document-inline-viewer {
+  background: var(--surface-field);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-field);
+  min-height: 200px;
+  overflow: hidden;
+}
+
+:is(html[data-theme]) .document-inline-viewer__frame {
+  border: 0;
+  display: block;
+  height: min(78vh, 820px);
+  width: 100%;
+}
+
+@media (max-width: 1080px) {
+  :is(html[data-theme]) .document-inline-viewer__frame {
+    height: min(72vh, 620px);
+  }
+}
+
+@media (max-width: 640px) {
+  :is(html[data-theme]) .document-inline-viewer__frame {
+    height: min(68vh, 520px);
+  }
+}
+
+/* A fileira de ações do cabeçalho e a de dentro do corpo. */
+:is(html[data-theme]) .document-inline-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-tight);
+}

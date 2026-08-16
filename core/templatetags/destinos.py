@@ -23,6 +23,31 @@ from django.urls import reverse
 register = template.Library()
 
 
+def _memo(chave, calcular):
+    """Guarda o resultado no `request` da vez — uma consulta por TELA, não por linha.
+
+    Uma tela com quatro destinos chama a tag cinco vezes (as linhas mais o
+    molde), e sem isto cada chamada refazia a lista de estados e a leitura da
+    configuração. O orçamento de queries do formulário de termo pegou
+    exatamente isso.
+
+    O cache morre com a requisição de propósito: guardá-lo no módulo faria uma
+    mudança em Configurações só aparecer depois de reiniciar o processo.
+    """
+    from core.middleware import get_current_request
+
+    request = get_current_request()
+    if request is None:
+        return calcular()
+    cache = getattr(request, "_destinos_memo", None)
+    if cache is None:
+        cache = {}
+        request._destinos_memo = cache
+    if chave not in cache:
+        cache[chave] = calcular()
+    return cache[chave]
+
+
 def _uf_da_sede():
     """A UF da sede, como pk de `Estado` — ou `""` se não houver.
 
@@ -72,9 +97,9 @@ def destinos_opcoes_estado(estados=None, selecionado=None):
     if estados is None or estados == "":
         from cadastros.models import Estado
 
-        estados = Estado.objects.order_by("nome")
+        estados = _memo("estados", lambda: list(Estado.objects.order_by("nome")))
     if selecionado in (None, ""):
-        selecionado = _uf_da_sede()
+        selecionado = _memo("uf_da_sede", _uf_da_sede)
     return {"estados": estados, "selecionado": str(selecionado or "")}
 
 
