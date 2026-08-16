@@ -6,12 +6,13 @@
   segunda. Numa lista longa cada linha extra multiplica pela quantidade de
   registros, e a varredura vertical fica mais lenta.
 
-  O selo fica junto do título porque qualifica o registro — separá-lo obrigava
-  o olho a ir e voltar para ligar um ao outro.
+  O selo fica AO LADO DO TEXTO, logo depois do bloco de título e meta — ele
+  qualifica o registro, e jogado na ponta oposta obrigava o olho a atravessar a
+  linha para ligar um ao outro. Quem vai para a ponta são as ações.
 
-  As ações ficam à direita e centradas na faixa: em lista o olho percorre a
-  coluna da esquerda lendo e a da direita agindo, e o alvo fica sempre na mesma
-  altura, registro após registro.
+  As ações ficam no RODAPÉ, à direita, QUANDO o cartão tem miolo: aí ele se lê de
+  cima para baixo — o que é, o que tem dentro, o que dá para fazer. Sem miolo
+  não há "para baixo": elas ficam na própria linha do título.
 
   O título é um `h2` por padrão: numa lista o registro é filho direto do `h1` da
   página, e o `h3` que ele usava pulava um degrau — leitor de tela navega por
@@ -34,13 +35,27 @@
       <div class="record__title-row">
         {% if eyebrow %}<span class="record__eyebrow">{{ eyebrow }}</span>{% endif %}
         <h{{ heading_level|default:2 }} class="record__title">{{ title }}</h{{ heading_level|default:2 }}>
-        {% if status %}<c-v2.chip :label="status" :tone="status_tone" />{% endif %}
       </div>
       {% if meta %}<p class="record__meta">{{ meta }}</p>{% endif %}
     </div>
-
-    {% if actions %}<div class="record__actions">{{ actions }}</div>{% endif %}
+    {% if status %}<span class="record__status"><c-v2.chip :label="status" :tone="status_tone" /></span>{% endif %}
+    {% comment %}
+      Cartão SEM miolo: as ações voltam para a linha do título. Num registro de
+      uma linha só, mandá-las para o rodapé abria uma faixa vazia embaixo do
+      texto para pendurar um botão — e o botão ficava solto, longe do que ele
+      opera. Com miolo, elas seguem no rodapé (abaixo).
+    {% endcomment %}
+    {% if actions and not body.strip %}<div class="record__actions">{{ actions }}</div>{% endif %}
   </div>
 
   {% if body %}<div class="record__body">{{ body }}</div>{% endif %}
+
+  {% comment %}
+    As ações fecham o cartão, e não a primeira linha dele. Ao lado do título elas
+    disputavam a atenção com o que identifica o registro; no rodapé o olho lê
+    primeiro O QUE é, depois o que dá para fazer com ele — e num cartão que
+    cresce por camadas (equipe, fatos) a ação continua no mesmo lugar,
+    previsível, em vez de subir e descer com o tamanho do miolo.
+  {% endcomment %}
+  {% if actions and body.strip %}<div class="record__footer">{{ actions }}</div>{% endif %}
 </article>

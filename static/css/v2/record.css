@@ -17,16 +17,32 @@
 }
 
 /* `center` e não `start`: o alvo de ação fica na mesma altura em todos os
-   registros, mesmo quando um deles tem meta mais longa e quebra. */
+   registros, mesmo quando um deles tem meta mais longa e quebra.
+
+   SEM `space-between`: com ele o selo era jogado para o meio do vazio, longe do
+   título que ele qualifica — num cartão largo o olho tinha de atravessar a
+   linha inteira para ligar um ao outro. O selo fica colado ao texto e são as
+   AÇÕES que vão para a ponta, por `margin-left: auto`. */
 :is(html[data-theme]) .record__row {
   align-items: center;
   display: flex;
   gap: var(--gap);
-  justify-content: space-between;
   min-width: 0;
 }
 
-/* O selo acompanha o título na mesma linha e quebra junto quando falta espaço. */
+:is(html[data-theme]) .record__row > .record__actions {
+  margin-left: auto;
+}
+
+/* O selo ao lado do texto: `flex: none` para ele não encolher quando o título é
+   longo — um selo espremido perde a pílula e vira texto solto. */
+:is(html[data-theme]) .record__status {
+  align-items: center;
+  display: inline-flex;
+  flex: none;
+}
+
+/* Sobrou para o eyebrow, que continua ao lado do título. */
 :is(html[data-theme]) .record__title-row {
   align-items: center;
   display: flex;
@@ -64,9 +80,38 @@
   margin: 0;
 }
 
+/* A `ul` da equipe NÃO conta como caixa: `display: contents` a dissolve e as
+   linhas viram filhas diretas do miolo, alinhadas na mesma régua do título.
+   Enquanto ela era um bloco, a lista tinha um contêiner a mais entre o cartão e
+   a linha, e o desalinho aparecia justamente aí. A `ul` fica na marcação porque
+   uma equipe É uma lista — leitor de tela anuncia "lista de 3 itens". */
+:is(html[data-theme]) .record__body:has(> .person-list) {
+  display: grid;
+  gap: var(--gap-tight);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  :is(html[data-theme]) .record__body:has(> .person-list) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 :is(html[data-theme]) .record__actions {
   align-items: center;
   display: flex;
   flex: none;
   gap: var(--gap-tight);
+}
+
+/* Rodapé do registro: as ações fecham o cartão, alinhadas à direita e sem régua
+   de separação — o vão da grade do próprio cartão já as separa do miolo. */
+:is(html[data-theme]) .record__footer {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-tight);
+  justify-content: flex-end;
+  min-width: 0;
 }

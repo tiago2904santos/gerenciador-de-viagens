@@ -10,7 +10,6 @@ por especificidade.
 {% endcomment %}
 {% load icones %}
 <div class="menu action-menu" id="{{ menu_id }}" data-menu-v2 role="menu" hidden>
-  <c-v2.menu_header :title="titulo" :description="subtitulo" />
   {% if view_url %}
     <a class="menu__item" href="{{ view_url }}" role="menuitem" target="_blank" rel="noopener">
       <span class="menu__icon" data-tone="info" aria-hidden="true">{% icone_svg "eye" %}</span>

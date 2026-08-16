@@ -121,8 +121,8 @@ class AparenciaTests(SimpleTestCase):
     def test_o_menu_transplantado_declara_o_proprio_degrau(self):
         bloco = self.css[self.css.index(".menu[data-menu-v2]") :]
         bloco = bloco[: bloco.index("}")]
-        self.assertIn("--surface: var(--surface-field);", bloco)
-        self.assertIn("--surface-contrast: var(--surface-rail);", bloco)
+        self.assertIn("--surface: var(--surface-rail);", bloco)
+        self.assertIn("--surface-contrast: var(--surface-field);", bloco)
 
     def test_item_botao_perde_o_desenho_do_navegador(self):
         """Link e botão ficam lado a lado no mesmo menu."""
@@ -142,16 +142,19 @@ class FaixaDeEquipeTests(SimpleTestCase):
             r"/\*.*?\*/", "", PESSOA_CSS.read_text(encoding="utf-8"), flags=re.DOTALL
         )
 
-    def test_a_faixa_nao_pinta_com_a_variavel_que_ela_redefine(self):
-        """Referência circular: o `background` leria o valor novo.
+    def test_a_lista_nao_tem_superficie_propria(self):
+        """A `ul` é grade, não caixa (2026-08-16).
 
-        Na primeira versão desta folha faixa e linha saíam da mesma cor e a
-        escada sumia da tela, sem erro em lugar nenhum.
+        Enquanto ela se pintava, havia três degraus empilhados entre o cartão e
+        a linha — e o do meio não delimitava nada que o registro já não
+        delimitasse. Sem superfície, a linha herda o degrau do PAI, que é quem
+        sabe em que superfície está.
         """
         bloco = self.css[self.css.index(".person-list {") :]
         bloco = bloco[: bloco.index("}")]
-        self.assertIn("--surface-contrast: var(--surface-field);", bloco)
-        self.assertIn("background: var(--surface-rail);", bloco)
+        self.assertNotIn("background", bloco)
+        self.assertNotIn("--surface-contrast", bloco)
+        self.assertNotIn("border-radius", bloco)
 
     def test_a_linha_sobe_um_degrau(self):
         bloco = self.css[self.css.index(".person-row {") :]

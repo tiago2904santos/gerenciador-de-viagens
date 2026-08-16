@@ -53,6 +53,13 @@
    header e faixa são uma peça, e um traço entre eles a divide em duas. */
 :is(html[data-theme]) .header + .rail {
   border-radius: 0 0 var(--radius-rail) var(--radius-rail);
+}
+
+/* A borda vem de `v2/surface.css`, que é a ÚLTIMA do bundle e empata em
+   especificidade com a regra acima — no empate decide a ordem, e ela vence. Por
+   isso o `.form-page`/`.list-page` no seletor: uma classe a mais é o que devolve
+   a disputa. */
+:is(html[data-theme]) :is(.form-page, .list-page) > .header + .rail {
   border-top: 0;
 }
 

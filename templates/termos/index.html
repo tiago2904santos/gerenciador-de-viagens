@@ -29,10 +29,12 @@
     action_label="Novo termo"
     :action_url="novo_url"
   >
-    <c-slot name="tabs">
-      <c-v2.toggle aria_label="Alternar entre termos com e sem equipe" :items="abas" />
-    </c-slot>
-
+    {% comment %}
+      SEM abas (2026-08-16). "Com equipe / Sem equipe" dividia a lista por um
+      detalhe interno do documento, não por como se procura um termo — e uma das
+      duas quase sempre vinha vazia, então a aba servia para mostrar o nada. A
+      view continua aceitando `?aba=` para não quebrar link guardado.
+    {% endcomment %}
     <c-slot name="controls">
       <form method="get" action="{{ request.path }}" class="rail__form" role="search">
         <input type="hidden" name="aba" value="{{ aba }}">

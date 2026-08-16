@@ -16,20 +16,13 @@
       O `<select>` continua vindo do formulário porque é ele que carrega `name`,
       `id` e o gancho `data-modelo-motivo-select` que o script da página lê.
     {% endcomment %}
-    <div class="field-with-action">
-      <div class="select" data-entity-picker data-entity-picker-renderer="select" data-entity-picker-mode="single">
-        {{ form.modelo_motivo }}
-      </div>
-      <span class="field-with-action__action">
-        <c-v2.icon_button
-          icon="settings"
-          :href="modelos_motivo_url"
-          aria_label="Gerenciar modelos de motivo"
-          tooltip="Gerenciar modelos"
-          tooltip_tone="accent"
-        />
-      </span>
-    </div>
+    <c-v2.select_with_action
+      :field="form.modelo_motivo"
+      :action_href="modelos_motivo_url"
+      action_icon="settings"
+      action_aria_label="Gerenciar modelos de motivo"
+      action_tooltip="Gerenciar modelos"
+    />
   </c-slot>
   {% if not tem_modelos_motivo %}
     <c-slot name="help">Nenhum modelo cadastrado ainda.</c-slot>

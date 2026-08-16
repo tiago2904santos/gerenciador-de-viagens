@@ -13,6 +13,11 @@
   Eles são copiados daqui EXATAMENTE como o legado os emite: um nome trocado
   não dá erro, só faz o item parar de responder.
 
+  SEM cabeçalho. "Documentos / ARAPONGAS/PR" repetia o que o gatilho e o cartão
+  logo atrás já dizem, e ocupava a altura de um item para não oferecer ação
+  nenhuma. O `menu_header` continua existindo para o caso em que um menu tem
+  GRUPOS e o rótulo separa um do outro.
+
   O menu abre transplantado para o `<body>`; `data-menu-v2` viaja no elemento
   porque nenhum ancestral sobrevive à mudança.
 
@@ -24,8 +29,6 @@
 {% endcomment %}
 {% load icones %}
 <div class="menu action-menu" id="{{ menu.id }}" data-menu-v2 role="menu" hidden>
-  <c-v2.menu_header :title="menu.title" :description="menu.subtitle" />
-
   {% for item in menu.items %}
     {% if item.type == "link" %}
       <a

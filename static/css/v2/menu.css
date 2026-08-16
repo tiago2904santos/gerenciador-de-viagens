@@ -9,8 +9,12 @@
  * com contorno, altura mínima de 52px, sombra funda.
  */
 
+/* Caixa na cor do PAINEL e realce na do campo — a mesma inversão feita na lista
+   suspensa, e pelo mesmo motivo: aberto sobre um formulário, um menu na cor do
+   campo vira mais uma faixa igual às que já estão na tela; na cor do painel ele
+   lê como camada por cima, e o item sob o cursor é que sobe. */
 :is(html[data-theme]) .menu {
-  background: var(--surface-field);
+  background: var(--surface-rail);
   border: 1px solid var(--line);
   border-radius: 16px;
   box-shadow: 0 20px 52px rgb(5 22 38 / 0.28);
@@ -31,8 +35,8 @@
 /* O menu é transplantado para o `<body>` ao abrir; o degrau precisa vir dele
    mesmo, porque nenhum contêiner o acompanha. */
 :is(html[data-theme]) .menu[data-menu-v2] {
-  --surface: var(--surface-field);
-  --surface-contrast: var(--surface-rail);
+  --surface: var(--surface-rail);
+  --surface-contrast: var(--surface-field);
 }
 
 /* Item que é `<button>`: o navegador lhe dá fundo, borda e fonte próprios, e
@@ -65,13 +69,16 @@
   min-height: 52px;
   padding: 7px;
   text-decoration: none;
-  transition: background-color 140ms ease, border-color 140ms ease;
+  transition: border-color 140ms ease;
 }
 
+/* O realce é só o CONTORNO. Com fundo, o item sob o cursor virava uma faixa
+   cheia dentro de uma caixa pequena — muita tinta para dizer "é este". A borda
+   já estava reservada (o item base tem 1px transparente, então nada se move ao
+   acender) e diz o mesmo com um traço. */
 :is(html[data-theme]) .menu__item:hover,
 :is(html[data-theme]) .menu__item:focus-visible {
-  background: var(--surface-contrast, var(--surface-rail));
-  border-color: var(--line);
+  border-color: var(--line-strong, var(--line));
   outline: none;
 }
 

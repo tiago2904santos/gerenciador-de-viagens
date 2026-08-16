@@ -159,6 +159,17 @@
             <c-v2.select aria_label="Select de exemplo" :options="v2_opcoes" />
           </c-slot>
         </c-v2.field>
+        {% comment %}
+          Select com ação secundária: ela nasce oculta e aparece quando o
+          ponteiro — ou o foco — entra no campo, e o select encolhe para abrir
+          espaço. Revelar também no foco não é zelo: uma ação que só existe sob
+          o cursor desaparece para quem navega por teclado e para quem usa toque.
+        {% endcomment %}
+        <c-v2.field label="Select com ação" help="Passe o mouse no campo — ou chegue nele pelo Tab.">
+          <c-slot name="control">
+            <c-v2.select_with_action name="lab_modelo" aria_label="Modelo de exemplo" :options="v2_opcoes" action_href="#" action_icon="settings" action_aria_label="Gerenciar modelos" action_tooltip="Gerenciar modelos" />
+          </c-slot>
+        </c-v2.field>
         <c-v2.field label="Select com 8 opções" help="O menu para em 5 itens e rola o resto.">
           <c-slot name="control">
             <c-v2.select aria_label="Select longo" :options="v2_opcoes_longas" />
@@ -282,9 +293,6 @@
       action_label="Novo termo"
       action_url="#"
     >
-      <c-slot name="aside">
-        <c-v2.toggle aria_label="Alternar lista" :items="v2_abas" />
-      </c-slot>
       <c-slot name="controls">
         <c-v2.input icon="search" placeholder="Buscar termos" aria_label="Buscar termos" filter="search" />
         <c-v2.select aria_label="Filtrar por status" :options="v2_status_opcoes" filter="status" />
@@ -306,43 +314,28 @@
       </c-slot>
     </c-v2.list_page>
 
-    <h3 class="v2-lab__sub">Registro com faixa de equipe</h3>
+    <h3 class="v2-lab__sub">Linha de pessoa e ações do registro</h3>
 
     {% comment %}
-      O registro cresce por camadas: quando há quem viaje, a faixa aparece; sem
-      equipe e sem viatura, o mesmo componente fica raso. É o card da lista de
-      termos, e é aqui que se confere o desenho — a tela real exige login.
+      Fora de um cartão, e de propósito. Dentro do registro da lista a faixa de
+      equipe repetia o que ninguém usa para ESCOLHER um termo e triplicava a
+      altura do item — saiu de lá em 2026-08-16. A linha continua viva onde
+      responde a uma pergunta de verdade (a Ordem de Serviço, o formulário), e é
+      aqui que se confere o desenho dela e o das ações do registro.
     {% endcomment %}
     <c-v2.panel>
       <c-slot name="body">
-        <c-v2.record title="ARAPONGAS/PR · 12/08 a 15/08/2026" search_text="arapongas">
-          <c-slot name="meta">Ofício: 153/2026</c-slot>
-          <c-slot name="actions">
-            {% comment %}
-              O menu vem dos DADOS, pelo mesmo dicionário que os presenters já
-              produzem (`core.entity_cards.menu`). É o que permite migrar a
-              lista de qualquer domínio sem reescrever presenter nenhum — e é
-              esse caminho, não o de slots, que as telas reais usam.
-            {% endcomment %}
-            <c-v2.icon_button icon="folder" :menu_id="v2_menu.id" aria_label="Documentos do termo" tooltip="Visualizar e baixar" />
-            <c-v2.menu_body :menu="v2_menu" />
-            <c-v2.icon_button icon="edit" href="#" aria_label="Editar termo" tooltip="Editar" />
-            <c-v2.delete_button url="#" label="ARAPONGAS/PR" aria_label="Excluir termo" />
-          </c-slot>
-          <c-slot name="body">
-            <ul class="person-list">
-              <c-v2.person_row initials="AS" name="ADEMAR SCHONS" meta="Agente · 1ª Delegacia" badge="com viatura">
-                <c-slot name="actions"><c-v2.icon_button icon="folder" aria_label="Documentos de Ademar" tooltip="Visualizar e baixar" /></c-slot>
-              </c-v2.person_row>
-              <c-v2.person_row initials="BC" name="BEATRIZ CARDOSO" meta="Escrivã · 1ª Delegacia" badge="com viatura">
-                <c-slot name="actions"><c-v2.icon_button icon="folder" aria_label="Documentos de Beatriz" tooltip="Visualizar e baixar" /></c-slot>
-              </c-v2.person_row>
-              <c-v2.person_row extra_class="person-row--viatura" initials="VT" name="ABC-1D23 · Duster" meta="Automóvel · 1ª Delegacia" badge="viatura">
-                <c-slot name="actions"><c-v2.icon_button icon="folder" aria_label="Documentos da viatura" tooltip="Visualizar e baixar" /></c-slot>
-              </c-v2.person_row>
-            </ul>
-          </c-slot>
-        </c-v2.record>
+        <ul class="person-list">
+          <c-v2.person_row initials="AS" name="ADEMAR SCHONS" meta="Agente · 1ª Delegacia" badge="com viatura">
+            <c-slot name="actions">
+              <c-v2.icon_button icon="folder" :menu_id="v2_menu.id" aria_label="Documentos de Ademar" tooltip="Visualizar e baixar" />
+              <c-v2.menu_body :menu="v2_menu" />
+              <c-v2.delete_button url="#" label="ADEMAR SCHONS" aria_label="Excluir servidor" />
+            </c-slot>
+          </c-v2.person_row>
+          <c-v2.person_row extra_class="person-row--driver" initials="BC" name="BEATRIZ CARDOSO" meta="Escrivã · 1ª Delegacia" badge="motorista" />
+          <c-v2.person_row extra_class="person-row--viatura" initials="VT" name="ABC-1D23 · Duster" meta="Automóvel · 1ª Delegacia" badge="viatura" />
+        </ul>
       </c-slot>
     </c-v2.panel>
 

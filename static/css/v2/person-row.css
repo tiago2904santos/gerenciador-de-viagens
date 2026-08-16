@@ -5,23 +5,31 @@
  * a mesma decisão da caixa dos escolhidos no picker.
  */
 
-/* A faixa continua a escada: o registro ocupa o degrau `field`, então ela volta
-   ao `rail` e as linhas dela sobem de novo para `field`.
+/* A lista NÃO tem superfície própria: ela é só a grade que arruma as linhas.
+   A caixa que existia aqui punha um terceiro degrau entre o registro e as
+   linhas — três tons empilhados para uma informação só, e a linha ficava
+   afundada num quadro que não delimitava nada que o registro já não
+   delimitasse. Sem ela, as linhas seguem o degrau do PAI, que é quem sabe em
+   qual superfície está.
 
-   As duas cores vêm dos tokens BASE, e não de `--surface-contrast`. Pintar a
-   faixa com a variável que ela mesma redefine para os filhos é uma referência
-   circular: o `background` lê o valor novo, e faixa e linha saem da mesma cor —
-   foi exatamente o que aconteceu na primeira versão desta folha, e na tela a
-   escada simplesmente sumiu, sem erro nenhum. */
+   E não tem CAIXA: `display: contents` a dissolve, e quem arruma as colunas é o
+   contêiner — o miolo do registro, em `v2/record.css`. Enquanto ela era um
+   bloco havia um nível a mais entre o cartão e a linha, e a lista não batia com
+   a régua do título logo acima. A `ul` continua na marcação pela semântica: uma
+   equipe é uma lista, e o leitor de tela anuncia quantos são. */
 :is(html[data-theme]) .person-list {
-  --surface-contrast: var(--surface-field);
-  background: var(--surface-rail);
-  border-radius: var(--radius-field);
-  display: grid;
-  gap: var(--gap-tight);
+  display: contents;
   list-style: none;
   margin: 0;
-  padding: var(--gap-tight);
+  padding: 0;
+}
+
+/* Em número ímpar, o último ocupa a linha inteira — sozinho em meia largura ele
+   fica ao lado de um vazio, e o vazio se lê como alguém faltando. A conta de
+   `nth-child` continua valendo com `display: contents`: ela olha a marcação,
+   não a caixa. */
+:is(html[data-theme]) .person-list > .person-row:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
 }
 
 :is(html[data-theme]) .person-row {
@@ -46,10 +54,13 @@
   flex: 0 0 auto;
   font-size: var(--text-size-eyebrow);
   font-weight: var(--weight-strong);
-  height: var(--control-height-sm);
+  /* Do tamanho das DUAS linhas que ela ancora — nome e cargo. Na medida menor a
+     caixa flutuava no meio da linha, sem encostar em nada, e a fileira de
+     iniciais perdia a régua que a torna varrível. */
+  height: var(--control-height);
   justify-content: center;
   letter-spacing: 0.02em;
-  width: var(--control-height-sm);
+  width: var(--control-height);
 }
 
 /* A viatura é a mesma linha com outro tom: o selo já diz o que ela é, e mudar
@@ -151,4 +162,13 @@
   background: var(--accent);
   border-color: var(--accent);
   color: var(--text-on-accent);
+}
+
+/* O botão da linha na cor do CAMPO: a linha é a superfície de baixo, e o botão
+   precisa de um degrau para se ler como alvo de clique e não como parte do
+   texto. O contorno acompanha, porque em algumas linhas (o motorista, a
+   viatura) o fundo já é próprio e só a cor não bastaria para destacá-lo. */
+:is(html[data-theme]) .person-row__actions .icon-button {
+  background: var(--surface-field);
+  border: 1px solid var(--line);
 }

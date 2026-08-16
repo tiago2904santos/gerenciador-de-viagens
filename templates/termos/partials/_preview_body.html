@@ -61,81 +61,11 @@
     </div>
   </details>
 
-  {% if docs.servidores %}
-    <details class="document-inline-card document-inline-card--termos">
-      <summary class="document-inline-card__header">
-        <span class="document-inline-card__title">Termos por servidor</span>
-        {% if docs.servidores|length > 1 and docs.download_todos_pdf_url %}
-          <span class="document-inline-card__header-end">
-            <span class="document-inline-actions document-inline-actions--header" aria-label="Ações de todos os termos">
-              <c-v2.icon_button
-                icon="folder"
-                menu_id="termo-cadastro-todos-menu"
-                aria_label="Abrir ações dos termos"
-                tooltip="Baixar todos"
-              />
-              <c-v2.menu id="termo-cadastro-todos-menu" aria_label="Ações de todos os termos">
-                <c-v2.menu_header title="Termos de autorização" description="Todos os servidores" />
-                <c-v2.menu_item :href="docs.download_todos_pdf_url" icon="pdf" icon_tone="pdf" title="Baixar todos em PDF" description="Um arquivo com os termos de todos os servidores" :download="True" />
-              </c-v2.menu>
-            </span>
-          </span>
-        {% endif %}
-      </summary>
-      <div class="document-inline-card__body document-inline-card__body--termos">
-        {% for doc in docs.servidores %}
-          <details class="document-inline-card document-inline-card--nested document-inline-card--lazy"
-                   data-lazy-inline
-                   data-termo-inline-url="{{ doc.inline_url }}">
-            <summary class="document-inline-card__header">
-              <span class="document-inline-card__title">{{ doc.titulo }}</span>
-              <span class="document-inline-card__header-end">
-                <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do termo de {{ doc.servidor_nome }}">
-                  <c-v2.icon_button
-                    icon="folder"
-                    menu_id="termo-cadastro-servidor-menu-{{ doc.id }}"
-                    aria_label="Abrir ações do termo de {{ doc.servidor_nome }}"
-                    tooltip="Visualizar, baixar e anexar"
-                  />
-                  <c-v2.menu id="termo-cadastro-servidor-menu-{{ doc.id }}" aria_label="Ações do termo de {{ doc.servidor_nome }}">
-                    <c-v2.menu_header
-                      title="{% if doc.assinado %}Termo assinado{% else %}Termo do servidor{% endif %}"
-                      :description="doc.servidor_nome"
-                    />
-                    <c-v2.menu_item :href="doc.inline_url" icon="eye" icon_tone="info" title="Visualizar termo" description="Abrir o PDF no navegador" :target_blank="True" />
-                    {% if doc.download_pdf_url %}
-                      <c-v2.menu_item :href="doc.download_pdf_url" icon="pdf" icon_tone="pdf" title="Baixar PDF" description="Documento pronto para assinatura" :download="True" />
-                    {% endif %}
-                    {% if doc.download_docx_url %}
-                      <c-v2.menu_item :href="doc.download_docx_url" icon="docx" icon_tone="docx" title="Baixar DOCX" description="Arquivo editável do termo" :download="True" />
-                    {% endif %}
-                    {% if doc.anexar_assinado_url %}
-                      <c-v2.menu_attach_signed
-                        :url="doc.anexar_assinado_url"
-                        doc_label="o termo de {{ doc.servidor_nome }}"
-                        :signed="doc.assinado"
-                        :current_name="doc.assinado_nome_original"
-                        :current_view_url="doc.assinado_view_url"
-                        :current_remove_url="doc.remover_assinado_url"
-                      />
-                    {% endif %}
-                  </c-v2.menu>
-                </span>
-              </span>
-            </summary>
-            <div class="document-inline-card__body">
-              <div class="document-inline-viewer">
-                <iframe
-                  class="document-inline-viewer__frame"
-                  data-src="{{ doc.inline_url }}"
-                  title="Visualização do termo de {{ doc.servidor_nome }}"
-                  loading="lazy"
-                ></iframe>
-              </div>
-            </div>
-          </details>
-        {% endfor %}
-      </div>
-    </details>
-  {% endif %}
+  {% comment %}
+    O bloco "Termos por servidor" saiu daqui em 2026-08-16. Ele repetia, dentro
+    do formulário, o documento que a LISTA já entrega por pessoa — e ainda em
+    dois níveis de sanfona, um dentro do outro, para chegar ao mesmo PDF. No
+    formulário o que se quer ver é a prévia do termo que se está editando; a de
+    cada servidor tem lugar próprio, no cartão da lista.
+  {% endcomment %}
 {% endwith %}

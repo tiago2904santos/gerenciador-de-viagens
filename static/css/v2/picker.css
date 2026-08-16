@@ -650,6 +650,34 @@
   width: 18px;
 }
 
+/* O DESENHO do ícone dentro do avatar segue a cor do avatar, sempre. O ícone de
+   rota do ofício vinculado traz `fill`/`stroke` no próprio SVG e o legado ainda
+   pinta `.related-route-icon path` por fora — resultado: no picker de ofício o
+   avatar saía num verde que não existe em nenhum outro escolhido do sistema,
+   enquanto o de pessoa e o de viatura seguiam o accent. Herdar a cor do avatar
+   é o que torna as três apresentações a mesma peça. */
+:is(html[data-theme]) .picker .search-picker__selected-avatar :is(svg, .icon, .related-route-icon) {
+  color: inherit;
+  fill: none;
+}
+
+:is(html[data-theme]) .picker .search-picker__selected-avatar :is(svg, .icon, .related-route-icon) circle {
+  fill: currentColor;
+  stroke: none;
+}
+
+:is(html[data-theme]) .picker .search-picker__selected-avatar :is(svg, .icon, .related-route-icon) path {
+  fill: none;
+  stroke: currentColor;
+}
+
+/* Ícone de traço puro (`use` do sprite): ele pinta por `fill`, e a regra acima o
+   apagaria. O sprite não tem `stroke`, então separar os dois casos pelo `use` é
+   o que mantém os dois visíveis. */
+:is(html[data-theme]) .picker .search-picker__selected-avatar svg:has(use) {
+  fill: currentColor;
+}
+
 /* O teto de três escolhidos vale nas apresentações detalhadas também. O legado
  * declara `overflow: visible` na lista de pessoas com uma classe a mais — e o
  * `max-height` do v2 continuava valendo, então a caixa parava em 192px e os
@@ -666,3 +694,33 @@
   scrollbar-width: thin;
 }
 
+
+/* ---- painel de funções da equipe (OS) ------------------------------------
+ *
+ * O toggle de funções (Condução / Técnico / Apoio) transbordava a caixa: os
+ * botões são itens de flex e, por padrão, não encolhem abaixo do próprio
+ * `min-content` — com três rótulos e o recuo do painel, a fileira ficava mais
+ * larga que o contêiner e vazava para fora dele.
+ *
+ * Colunas iguais resolvem sem depender do comprimento do rótulo, e `min-width:
+ * 0` é o que permite ao texto truncar em vez de esticar a coluna.
+ */
+:is(html[data-theme]) .picker .os-servidor-role-panel {
+  min-width: 0;
+}
+
+:is(html[data-theme]) .picker .os-servidor-role-panel .segment-toggle {
+  box-sizing: border-box;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  max-width: 100%;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .picker .os-servidor-role-panel .segment-toggle__btn {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

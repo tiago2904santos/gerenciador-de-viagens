@@ -821,6 +821,13 @@
    header e faixa são uma peça, e um traço entre eles a divide em duas. */
 :is(html[data-theme]) .header + .rail {
   border-radius: 0 0 var(--radius-rail) var(--radius-rail);
+}
+
+/* A borda vem de `v2/surface.css`, que é a ÚLTIMA do bundle e empata em
+   especificidade com a regra acima — no empate decide a ordem, e ela vence. Por
+   isso o `.form-page`/`.list-page` no seletor: uma classe a mais é o que devolve
+   a disputa. */
+:is(html[data-theme]) :is(.form-page, .list-page) > .header + .rail {
   border-top: 0;
 }
 
@@ -1607,8 +1614,12 @@
  * com contorno, altura mínima de 52px, sombra funda.
  */
 
+/* Caixa na cor do PAINEL e realce na do campo — a mesma inversão feita na lista
+   suspensa, e pelo mesmo motivo: aberto sobre um formulário, um menu na cor do
+   campo vira mais uma faixa igual às que já estão na tela; na cor do painel ele
+   lê como camada por cima, e o item sob o cursor é que sobe. */
 :is(html[data-theme]) .menu {
-  background: var(--surface-field);
+  background: var(--surface-rail);
   border: 1px solid var(--line);
   border-radius: 16px;
   box-shadow: 0 20px 52px rgb(5 22 38 / 0.28);
@@ -1629,8 +1640,8 @@
 /* O menu é transplantado para o `<body>` ao abrir; o degrau precisa vir dele
    mesmo, porque nenhum contêiner o acompanha. */
 :is(html[data-theme]) .menu[data-menu-v2] {
-  --surface: var(--surface-field);
-  --surface-contrast: var(--surface-rail);
+  --surface: var(--surface-rail);
+  --surface-contrast: var(--surface-field);
 }
 
 /* Item que é `<button>`: o navegador lhe dá fundo, borda e fonte próprios, e
@@ -1663,13 +1674,16 @@
   min-height: 52px;
   padding: 7px;
   text-decoration: none;
-  transition: background-color 140ms ease, border-color 140ms ease;
+  transition: border-color 140ms ease;
 }
 
+/* O realce é só o CONTORNO. Com fundo, o item sob o cursor virava uma faixa
+   cheia dentro de uma caixa pequena — muita tinta para dizer "é este". A borda
+   já estava reservada (o item base tem 1px transparente, então nada se move ao
+   acender) e diz o mesmo com um traço. */
 :is(html[data-theme]) .menu__item:hover,
 :is(html[data-theme]) .menu__item:focus-visible {
-  background: var(--surface-contrast, var(--surface-rail));
-  border-color: var(--line);
+  border-color: var(--line-strong, var(--line));
   outline: none;
 }
 
@@ -1794,16 +1808,32 @@
 }
 
 /* `center` e não `start`: o alvo de ação fica na mesma altura em todos os
-   registros, mesmo quando um deles tem meta mais longa e quebra. */
+   registros, mesmo quando um deles tem meta mais longa e quebra.
+
+   SEM `space-between`: com ele o selo era jogado para o meio do vazio, longe do
+   título que ele qualifica — num cartão largo o olho tinha de atravessar a
+   linha inteira para ligar um ao outro. O selo fica colado ao texto e são as
+   AÇÕES que vão para a ponta, por `margin-left: auto`. */
 :is(html[data-theme]) .record__row {
   align-items: center;
   display: flex;
   gap: var(--gap);
-  justify-content: space-between;
   min-width: 0;
 }
 
-/* O selo acompanha o título na mesma linha e quebra junto quando falta espaço. */
+:is(html[data-theme]) .record__row > .record__actions {
+  margin-left: auto;
+}
+
+/* O selo ao lado do texto: `flex: none` para ele não encolher quando o título é
+   longo — um selo espremido perde a pílula e vira texto solto. */
+:is(html[data-theme]) .record__status {
+  align-items: center;
+  display: inline-flex;
+  flex: none;
+}
+
+/* Sobrou para o eyebrow, que continua ao lado do título. */
 :is(html[data-theme]) .record__title-row {
   align-items: center;
   display: flex;
@@ -1841,11 +1871,40 @@
   margin: 0;
 }
 
+/* A `ul` da equipe NÃO conta como caixa: `display: contents` a dissolve e as
+   linhas viram filhas diretas do miolo, alinhadas na mesma régua do título.
+   Enquanto ela era um bloco, a lista tinha um contêiner a mais entre o cartão e
+   a linha, e o desalinho aparecia justamente aí. A `ul` fica na marcação porque
+   uma equipe É uma lista — leitor de tela anuncia "lista de 3 itens". */
+:is(html[data-theme]) .record__body:has(> .person-list) {
+  display: grid;
+  gap: var(--gap-tight);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  :is(html[data-theme]) .record__body:has(> .person-list) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 :is(html[data-theme]) .record__actions {
   align-items: center;
   display: flex;
   flex: none;
   gap: var(--gap-tight);
+}
+
+/* Rodapé do registro: as ações fecham o cartão, alinhadas à direita e sem régua
+   de separação — o vão da grade do próprio cartão já as separa do miolo. */
+:is(html[data-theme]) .record__footer {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-tight);
+  justify-content: flex-end;
+  min-width: 0;
 }
 /* <<< css/v2/record.css <<< */
 
@@ -1857,23 +1916,31 @@
  * a mesma decisão da caixa dos escolhidos no picker.
  */
 
-/* A faixa continua a escada: o registro ocupa o degrau `field`, então ela volta
-   ao `rail` e as linhas dela sobem de novo para `field`.
+/* A lista NÃO tem superfície própria: ela é só a grade que arruma as linhas.
+   A caixa que existia aqui punha um terceiro degrau entre o registro e as
+   linhas — três tons empilhados para uma informação só, e a linha ficava
+   afundada num quadro que não delimitava nada que o registro já não
+   delimitasse. Sem ela, as linhas seguem o degrau do PAI, que é quem sabe em
+   qual superfície está.
 
-   As duas cores vêm dos tokens BASE, e não de `--surface-contrast`. Pintar a
-   faixa com a variável que ela mesma redefine para os filhos é uma referência
-   circular: o `background` lê o valor novo, e faixa e linha saem da mesma cor —
-   foi exatamente o que aconteceu na primeira versão desta folha, e na tela a
-   escada simplesmente sumiu, sem erro nenhum. */
+   E não tem CAIXA: `display: contents` a dissolve, e quem arruma as colunas é o
+   contêiner — o miolo do registro, em `v2/record.css`. Enquanto ela era um
+   bloco havia um nível a mais entre o cartão e a linha, e a lista não batia com
+   a régua do título logo acima. A `ul` continua na marcação pela semântica: uma
+   equipe é uma lista, e o leitor de tela anuncia quantos são. */
 :is(html[data-theme]) .person-list {
-  --surface-contrast: var(--surface-field);
-  background: var(--surface-rail);
-  border-radius: var(--radius-field);
-  display: grid;
-  gap: var(--gap-tight);
+  display: contents;
   list-style: none;
   margin: 0;
-  padding: var(--gap-tight);
+  padding: 0;
+}
+
+/* Em número ímpar, o último ocupa a linha inteira — sozinho em meia largura ele
+   fica ao lado de um vazio, e o vazio se lê como alguém faltando. A conta de
+   `nth-child` continua valendo com `display: contents`: ela olha a marcação,
+   não a caixa. */
+:is(html[data-theme]) .person-list > .person-row:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
 }
 
 :is(html[data-theme]) .person-row {
@@ -1898,10 +1965,13 @@
   flex: 0 0 auto;
   font-size: var(--text-size-eyebrow);
   font-weight: var(--weight-strong);
-  height: var(--control-height-sm);
+  /* Do tamanho das DUAS linhas que ela ancora — nome e cargo. Na medida menor a
+     caixa flutuava no meio da linha, sem encostar em nada, e a fileira de
+     iniciais perdia a régua que a torna varrível. */
+  height: var(--control-height);
   justify-content: center;
   letter-spacing: 0.02em;
-  width: var(--control-height-sm);
+  width: var(--control-height);
 }
 
 /* A viatura é a mesma linha com outro tom: o selo já diz o que ela é, e mudar
@@ -2003,6 +2073,15 @@
   background: var(--accent);
   border-color: var(--accent);
   color: var(--text-on-accent);
+}
+
+/* O botão da linha na cor do CAMPO: a linha é a superfície de baixo, e o botão
+   precisa de um degrau para se ler como alvo de clique e não como parte do
+   texto. O contorno acompanha, porque em algumas linhas (o motorista, a
+   viatura) o fundo já é próprio e só a cor não bastaria para destacá-lo. */
+:is(html[data-theme]) .person-row__actions .icon-button {
+  background: var(--surface-field);
+  border: 1px solid var(--line);
 }
 /* <<< css/v2/person-row.css <<< */
 
@@ -3187,6 +3266,34 @@
   width: 18px;
 }
 
+/* O DESENHO do ícone dentro do avatar segue a cor do avatar, sempre. O ícone de
+   rota do ofício vinculado traz `fill`/`stroke` no próprio SVG e o legado ainda
+   pinta `.related-route-icon path` por fora — resultado: no picker de ofício o
+   avatar saía num verde que não existe em nenhum outro escolhido do sistema,
+   enquanto o de pessoa e o de viatura seguiam o accent. Herdar a cor do avatar
+   é o que torna as três apresentações a mesma peça. */
+:is(html[data-theme]) .picker .search-picker__selected-avatar :is(svg, .icon, .related-route-icon) {
+  color: inherit;
+  fill: none;
+}
+
+:is(html[data-theme]) .picker .search-picker__selected-avatar :is(svg, .icon, .related-route-icon) circle {
+  fill: currentColor;
+  stroke: none;
+}
+
+:is(html[data-theme]) .picker .search-picker__selected-avatar :is(svg, .icon, .related-route-icon) path {
+  fill: none;
+  stroke: currentColor;
+}
+
+/* Ícone de traço puro (`use` do sprite): ele pinta por `fill`, e a regra acima o
+   apagaria. O sprite não tem `stroke`, então separar os dois casos pelo `use` é
+   o que mantém os dois visíveis. */
+:is(html[data-theme]) .picker .search-picker__selected-avatar svg:has(use) {
+  fill: currentColor;
+}
+
 /* O teto de três escolhidos vale nas apresentações detalhadas também. O legado
  * declara `overflow: visible` na lista de pessoas com uma classe a mais — e o
  * `max-height` do v2 continuava valendo, então a caixa parava em 192px e os
@@ -3203,6 +3310,36 @@
   scrollbar-width: thin;
 }
 
+
+/* ---- painel de funções da equipe (OS) ------------------------------------
+ *
+ * O toggle de funções (Condução / Técnico / Apoio) transbordava a caixa: os
+ * botões são itens de flex e, por padrão, não encolhem abaixo do próprio
+ * `min-content` — com três rótulos e o recuo do painel, a fileira ficava mais
+ * larga que o contêiner e vazava para fora dele.
+ *
+ * Colunas iguais resolvem sem depender do comprimento do rótulo, e `min-width:
+ * 0` é o que permite ao texto truncar em vez de esticar a coluna.
+ */
+:is(html[data-theme]) .picker .os-servidor-role-panel {
+  min-width: 0;
+}
+
+:is(html[data-theme]) .picker .os-servidor-role-panel .segment-toggle {
+  box-sizing: border-box;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  max-width: 100%;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .picker .os-servidor-role-panel .segment-toggle__btn {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 /* <<< css/v2/picker.css <<< */
 
 /* >>> css/v2/date-picker.css >>> */
