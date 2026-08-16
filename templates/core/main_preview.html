@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load icones %}
+{% load static %}
 
 {% block title %}{{ page_title }}{% endblock %}
 {% block shell_class %}main-preview-shell{% endblock %}
@@ -339,6 +340,60 @@
       </c-slot>
     </c-v2.panel>
 
+    <h3 class="v2-lab__sub">Escolher o que baixar</h3>
+
+    {% comment %}
+      Um termo vira vários documentos — o genérico, o da viatura e um por
+      servidor. O gatilho pergunta ao servidor o que existe: com um documento só
+      ele baixa direto, sem diálogo; com mais de um, abre esta escolha e baixa em
+      FILA, um de cada vez, porque cada arquivo é gerado sob demanda.
+
+      O miolo do diálogo é montado pelo JS a partir da resposta do servidor; o
+      painel abaixo mostra a aparência das peças (linha marcável e fila) para
+      quem estiver conferindo o desenho.
+    {% endcomment %}
+    <c-v2.panel>
+      <c-slot name="body">
+        <c-v2.download_picker
+          picker_id="lab-downloads"
+          src="{% url 'termos:termo_cadastro_downloads' 1 %}"
+        />
+
+        <div class="download-picker">
+          <ul class="download-picker__list">
+            <li class="download-picker__item">
+              <label class="download-picker__check">
+                <input type="checkbox" checked>
+                <span class="download-picker__item-copy">
+                  <strong class="download-picker__item-title">Termo em branco</strong>
+                  <small class="download-picker__item-meta">Sem preenchimento, para assinar à mão</small>
+                </span>
+              </label>
+            </li>
+            <li class="download-picker__item">
+              <label class="download-picker__check">
+                <input type="checkbox">
+                <span class="download-picker__item-copy">
+                  <strong class="download-picker__item-title">ADEMAR SCHONS</strong>
+                  <small class="download-picker__item-meta">Agente · 1ª Delegacia</small>
+                </span>
+              </label>
+            </li>
+          </ul>
+          <ul class="download-picker__queue">
+            <li class="download-picker__queue-item" data-state="done">
+              <span class="download-picker__queue-name">Termo em branco</span>
+              <span class="download-picker__queue-state">Baixado</span>
+            </li>
+            <li class="download-picker__queue-item" data-state="running">
+              <span class="download-picker__queue-name">ADEMAR SCHONS</span>
+              <span class="download-picker__queue-state">Gerando…</span>
+            </li>
+          </ul>
+        </div>
+      </c-slot>
+    </c-v2.panel>
+
     <h3 class="v2-lab__sub">Tela de lista vazia</h3>
 
     <c-v2.list_page title="Termos de Autorização" empty_message="Nenhum termo cadastrado ainda.">
@@ -553,4 +608,12 @@
       </c-slot>
     </c-v2.panel>
   </section>
+{% endblock %}
+
+{% block extra_js %}
+  {% comment %}
+    O seletor de download é o único componente da galeria com motor próprio:
+    sem ele o gatilho não abre nada, e a peça não dá para conferir.
+  {% endcomment %}
+  <script src="{% static 'js/components/download-queue.js' %}" defer></script>
 {% endblock %}

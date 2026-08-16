@@ -2,6 +2,10 @@
 {% load static %}
 {% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
 {% block title %}{{ page_title }}{% endblock %}
+{% block extra_js %}
+  <script src="{% static 'js/components/download-queue.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
   {% comment %}
     Lista de termos no sistema v2. As duas abas são a MESMA tela: o que muda é

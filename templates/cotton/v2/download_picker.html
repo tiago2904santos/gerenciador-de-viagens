@@ -1,0 +1,92 @@
+{% cotton:vars picker_id src %}
+{% comment %}
+  Download picker v2 — escolher QUAIS documentos baixar, e baixá-los em fila.
+
+  Um termo não é um documento: são o genérico, o da viatura e um por servidor.
+  O botão de baixar entregava sempre o pacote inteiro fundido num arquivo só, e
+  quem queria o termo de uma pessoa não tinha por onde pedir.
+
+  O gatilho NÃO abre o modal por conta própria: ele pergunta primeiro ao
+  `src` o que existe, e quando existe um documento só baixa direto — abrir um
+  diálogo para marcar a única caixa disponível seria um clique a mais para dizer
+  o óbvio.
+
+  A lista vem do servidor (`termos:termo_cadastro_downloads`), montada a partir
+  do MESMO card da lista — os rótulos aqui e no cartão não podem divergir.
+
+  O `data-download-picker` mora num `<div>` dentro do corpo, e não no `<dialog>`:
+  `c-v2.modal` não repassa atributos, e o JS chega ao diálogo com `closest`.
+  Trocar isso exigiria mudar o modal para todo mundo.
+
+  O gancho do gatilho é SEM VALOR, e o JS acha o diálogo pelo elemento que
+  envolve os dois. Um `hook` com valor sairia escapado (`&quot;`) e o seletor
+  nunca casaria — o botão renderiza igual e não responde a nada.
+
+  Sem variável de rótulo: o `contrato()` que valida `cotton:vars` não enxerga
+  variável usada só em atributo de componente filho, e declarar uma que ele não
+  vê quebra o contrato. Os textos são os mesmos em todos os chamadores — o
+  parâmetro seria uma alavanca que ninguém puxa.
+{% endcomment %}
+<span class="download-picker-mount">
+<c-v2.icon_button
+  icon="download"
+  aria_label="Escolher documentos para baixar"
+  tooltip="Baixar"
+  hook="data-download-picker-trigger"
+/>
+
+<c-v2.modal :modal_id="picker_id" title="Baixar documentos">
+  <c-slot name="body">
+    <div class="download-picker" data-download-picker data-src="{{ src }}">
+      <p class="download-picker__hint">Marque o que você quer baixar.</p>
+
+      <ul class="download-picker__list" data-download-picker-list></ul>
+
+      <div class="download-picker__options">
+        <fieldset class="download-picker__option">
+          <legend class="download-picker__legend">Formato</legend>
+          <label class="download-picker__radio">
+            <input type="radio" name="{{ picker_id }}-formato" value="pdf" checked>
+            <span>PDF</span>
+          </label>
+          <label class="download-picker__radio">
+            <input type="radio" name="{{ picker_id }}-formato" value="docx">
+            <span>DOCX</span>
+          </label>
+        </fieldset>
+
+        <fieldset class="download-picker__option">
+          <legend class="download-picker__legend">Saída</legend>
+          <label class="download-picker__radio">
+            <input type="radio" name="{{ picker_id }}-saida" value="separados" checked>
+            <span>Arquivos separados</span>
+          </label>
+          <label class="download-picker__radio">
+            <input type="radio" name="{{ picker_id }}-saida" value="compilado">
+            <span>Um arquivo só</span>
+          </label>
+        </fieldset>
+      </div>
+
+      {% comment %}
+        A fila fica DENTRO do modal, e não numa notificação de canto: cada
+        documento é gerado no servidor e pode demorar; sem o estado à vista, o
+        segundo arquivo chega sem aviso e parece um download que ninguém pediu.
+      {% endcomment %}
+      <ul class="download-picker__queue" data-download-picker-queue hidden></ul>
+      <p class="download-picker__error" data-download-picker-error hidden role="alert"></p>
+    </div>
+  </c-slot>
+
+  <c-slot name="actions">
+    <c-v2.button label="Fechar" type="submit" />
+    <c-v2.button
+      label="Baixar"
+      variant="primary"
+      icon="download"
+      type="button"
+      hook="data-download-picker-confirm"
+    />
+  </c-slot>
+</c-v2.modal>
+</span>

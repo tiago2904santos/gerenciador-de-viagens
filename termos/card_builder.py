@@ -43,6 +43,56 @@ def _servidor_view_url(termo_pk):
     return build
 
 
+def montar_downloads_do_termo(termo) -> dict:
+    """O que dá para baixar de um termo, na ordem do compilado.
+
+    Sai do MESMO card que a lista monta, e não de uma segunda montagem: os
+    rótulos do modal de download são os que aparecem no cartão, e quando um
+    servidor entra ou sai do termo os dois mudam juntos. Foi o motivo de o
+    `PF-04` ter trazido a montagem para este arquivo.
+
+    `unico` é o atalho da tela: com um documento só não há o que escolher, e o
+    front baixa direto em vez de abrir o modal.
+    """
+    card = montar_card_de_termo(termo, menus_sob_demanda=False)
+
+    itens = [{
+        "id": "generico",
+        "titulo": "Termo em branco",
+        "subtitulo": "Sem preenchimento, para assinar à mão",
+        "urls": {
+            "pdf": reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "pdf"]),
+            "docx": reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "docx"]),
+        },
+    }]
+
+    viatura = card.get("viatura_row")
+    if viatura:
+        itens.append({
+            "id": "viatura",
+            "titulo": viatura["name"],
+            "subtitulo": viatura["meta"],
+            "urls": {"pdf": viatura["pdf_url"], "docx": viatura["docx_url"]},
+        })
+
+    for servidor in card.get("servidores") or []:
+        itens.append({
+            "id": f"servidor-{servidor['servidor_pk']}",
+            "titulo": servidor["name"],
+            "subtitulo": servidor["meta"],
+            "urls": {"pdf": servidor["pdf_url"], "docx": servidor["docx_url"]},
+        })
+
+    return {
+        "itens": itens,
+        "compilado": {
+            "pdf": reverse("termos:baixar_termo_cadastro_pdf", args=[termo.pk]),
+            "docx": reverse("termos:baixar_termo_cadastro_docx", args=[termo.pk]),
+        },
+        "unico": len(itens) == 1,
+    }
+
+
 def montar_card_de_termo(termo, *, artefatos=None, menus_sob_demanda=True):
     """Card de um termo, do jeito que a lista monta.
 

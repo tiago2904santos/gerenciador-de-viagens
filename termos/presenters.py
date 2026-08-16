@@ -161,6 +161,8 @@ def apresentar_termo_card(
         }
 
     menus_src = reverse("termos:card_menus", args=[termo.pk]) if menus_sob_demanda else ""
+    # O modal de download pergunta a este endpoint o que existe para baixar.
+    downloads_url = reverse("termos:termo_cadastro_downloads", args=[termo.pk]) if termo.pk else ""
 
     menus = []
     doc_items = []
@@ -239,6 +241,7 @@ def apresentar_termo_card(
         "oficio_label": oficio_label or "—",
         # Os gatilhos de linha (`termo_list_card.html`) apontam para cá (PF-04).
         "menus_url": menus_src,
+        "downloads_url": downloads_url,
         "servidores": servidores_display,
         "servidores_count": len(servidores_display),
         "com_viatura": com_viatura,

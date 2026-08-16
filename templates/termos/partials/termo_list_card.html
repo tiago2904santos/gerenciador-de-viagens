@@ -31,6 +31,10 @@
       />
       {% if not menu.src %}<c-v2.menu_body :menu="menu" />{% endif %}
     {% endfor %}
+    <c-v2.download_picker
+      picker_id="termo-{{ card.termo_pk }}-downloads"
+      :src="card.downloads_url"
+    />
     <c-v2.icon_button icon="edit" :href="card.footer.edit_url" :aria_label="card.footer.edit_aria" tooltip="Editar" />
     <c-v2.delete_button
       :url="card.footer.delete_modal_url"

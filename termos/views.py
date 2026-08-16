@@ -44,6 +44,7 @@ from .forms import TermoAutorizacaoForm
 from .models import TermoAutorizacao
 from .presenters import apresentar_linha_simples_termo
 from .card_builder import montar_card_de_termo
+from .card_builder import montar_downloads_do_termo
 from .selectors import get_servidor_do_termo_do_oficio
 from .selectors import get_servidor_para_termo
 from .selectors import get_termo_by_id
@@ -592,6 +593,13 @@ def excluir(request, pk):
 
 @require_GET
 def termo_cadastro_pdf_inline(request, pk):
+    """Prévia do termo: o documento COMPILADO — genérico, viatura e um por servidor.
+
+    Usava `modo="selecionados"`, que monta só os servidores: com equipe, o
+    genérico e a viatura não apareciam; sem equipe, a prévia era o genérico
+    sozinho. A tela mostrava, então, um conjunto diferente do que o botão de
+    baixar entregava (2026-08-16).
+    """
     termo = get_termo_by_id(pk)
     return enfileirar_documento(
         request,
@@ -599,10 +607,22 @@ def termo_cadastro_pdf_inline(request, pk):
         parametros={
             "object_id": termo.pk,
             "formato": DocumentoFormato.PDF.value,
-            "modo": "selecionados",
+            "modo": "compilado",
         },
         disposicao="inline",
     )
+
+
+@require_GET
+def termo_cadastro_downloads(request, pk):
+    """O que dá para baixar deste termo, para o modal de seleção.
+
+    Só descreve; quem baixa são as rotas que já existiam por documento. Assim o
+    modal não ganha um caminho de download próprio, que teria de repetir a
+    resolução de assinado, o cache de artefato e a fila.
+    """
+    termo = get_termo_by_id(pk)
+    return JsonResponse(montar_downloads_do_termo(termo))
 
 
 @require_GET
