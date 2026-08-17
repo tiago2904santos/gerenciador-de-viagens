@@ -11,6 +11,7 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 
 from core import entity_cards
@@ -132,9 +133,23 @@ class _MensagemDeExemplo:
         return self._texto
 
 
+# Uma seção por página (2026-08-16). A ordem é a de leitura de uma tela: primeiro
+# o que se clica, depois o que se preenche, depois como se navega, e por fim as
+# telas montadas. Os slugs entram na URL, então mudá-los quebra link guardado.
+SECOES_DA_GALERIA = (
+    ("acao", "Ação"),
+    ("entrada", "Entrada"),
+    ("navegacao", "Navegação"),
+    ("conteudo", "Conteúdo"),
+    ("lista", "Lista"),
+    ("formulario", "Formulário avançado"),
+    ("estrutura", "Estrutura"),
+)
+
+
 @login_not_required
-def main_preview(request):
-    """Galeria do sistema de componentes v2.
+def main_preview(request, secao=None):
+    """Galeria do sistema de componentes v2, uma seção por página.
 
     A rota só é registrada sob ``DEBUG``. Não consulta dados nem aceita escrita:
     existe para o dono aprovar cada componente visualmente, nos dois temas,
@@ -146,12 +161,29 @@ def main_preview(request):
     NOVO-120: a prévia anterior (``main-preview-header``, ``sub-header``,
     ``form-card``, ``entity-card`` e ``collection-panel``) foi apagada junto com
     ``cotton/dev/``, ``css/dev/`` e ``js/dev/``.
+
+    Sem ``secao``, cai na primeira — a rota sem slug continua valendo porque é
+    ela que está no menu lateral e nos links já anotados.
     """
+    rotulos = dict(SECOES_DA_GALERIA)
+    if secao not in rotulos:
+        secao = SECOES_DA_GALERIA[0][0]
     return render(
         request,
         "core/main_preview.html",
         {
-            "page_title": "Prévia do main",
+            "page_title": f"UI Lab · {rotulos[secao]}",
+            "secao_atual": secao,
+            "secao_label": rotulos[secao],
+            "secao_template": f"core/main_preview/{secao}.html",
+            "secoes": [
+                {
+                    "label": label,
+                    "url": reverse("core:main_preview_secao", args=[slug]),
+                    "is_active": slug == secao,
+                }
+                for slug, label in SECOES_DA_GALERIA
+            ],
             # NOVO-120: alimenta a galeria do sistema v2. Dados fixos, como o
             # resto desta rota — ela existe para aprovar aparência, não para
             # consultar nada.

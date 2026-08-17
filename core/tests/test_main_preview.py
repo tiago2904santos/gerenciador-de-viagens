@@ -26,6 +26,12 @@ from django.test import SimpleTestCase
 
 ROOT = Path(settings.BASE_DIR)
 LAB = ROOT / "templates" / "core" / "main_preview.html"
+# A galeria virou uma página por seção (2026-08-16): a casca continua em
+# `main_preview.html` e cada grupo mora num fragmento ao lado. Este contrato
+# passa a ler a CASCA MAIS OS FRAGMENTOS — se olhasse só o arquivo antigo,
+# todo componente que saiu para um fragmento seria dado como ausente da
+# vitrine, e o guarda de órfão reprovaria a biblioteca inteira.
+LAB_SECOES = ROOT / "templates" / "core" / "main_preview"
 V2 = ROOT / "templates" / "cotton" / "v2"
 
 GRUPOS = (
@@ -51,10 +57,34 @@ class GaleriaV2ContractTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.source = LAB.read_text(encoding="utf-8")
+        cls.fragmentos = sorted(LAB_SECOES.glob("*.html"))
+        cls.source = LAB.read_text(encoding="utf-8") + "".join(
+            fragmento.read_text(encoding="utf-8") for fragmento in cls.fragmentos
+        )
 
     def test_a_galeria_compila(self):
         get_template("core/main_preview.html")
+        for fragmento in self.fragmentos:
+            with self.subTest(secao=fragmento.name):
+                get_template(f"core/main_preview/{fragmento.name}")
+
+    def test_cada_secao_da_view_tem_fragmento(self):
+        """A view aponta para `core/main_preview/<slug>.html`; um slug sem arquivo
+        derruba a página com `TemplateDoesNotExist` só quando alguém a abre."""
+        from core.views import SECOES_DA_GALERIA
+
+        nomes = {fragmento.name for fragmento in self.fragmentos}
+        faltando = [slug for slug, _ in SECOES_DA_GALERIA if f"{slug}.html" not in nomes]
+        self.assertEqual(faltando, [], "seção declarada na view sem fragmento")
+
+    def test_cada_fragmento_esta_declarado_na_view(self):
+        """O contrário: fragmento que ninguém alcança é página órfã — não há link
+        para ela, e ela sai do ar sem que nenhum teste perceba."""
+        from core.views import SECOES_DA_GALERIA
+
+        slugs = {slug for slug, _ in SECOES_DA_GALERIA}
+        sobrando = [f.name for f in self.fragmentos if f.stem not in slugs]
+        self.assertEqual(sobrando, [], "fragmento sem seção na view")
 
     def test_todo_componente_v2_aparece_na_galeria(self):
         """Sem consumidor, `test_componentes_sem_orfao` reprova o componente.

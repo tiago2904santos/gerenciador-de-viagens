@@ -1,0 +1,26 @@
+{% comment %}
+  Seção "Conteúdo" da galeria do v2 — incluída por `core/main_preview.html`.
+
+  A galeria era uma página só, de 758 linhas, e conferir um botão exigia
+  rolar por um formulário inteiro. Cada grupo virou uma página
+  (2026-08-16); os grupos são os mesmos `v2-lab__group` que já
+  organizavam a página empilhada, então o corte não inventou taxonomia.
+
+  Este arquivo é FRAGMENTO: não estende `base.html` e não abre a
+  `<section>` — a casca é do `main_preview.html`.
+{% endcomment %}
+    <h2 class="v2-lab__group">Conteúdo</h2>
+
+    <c-v2.panel title="Selo" description="A cor entra por --chip-tone e é fixa nos dois temas — estado é significado, não decoração.">
+      <c-slot name="body">
+        <div class="v2-lab__row">
+          <c-v2.chip label="Concluído" tone="done" />
+          <c-v2.chip label="Em andamento" tone="progress" />
+          <c-v2.chip label="Atrasado" tone="late" />
+          <c-v2.chip label="Informativo" tone="info" />
+          <c-v2.chip label="Neutro" />
+        </div>
+      </c-slot>
+    </c-v2.panel>
+
+    {# ---------------------------------------------------------------- LISTA #}

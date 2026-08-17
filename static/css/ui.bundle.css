@@ -1494,22 +1494,12 @@
   padding: var(--gap);
 }
 
-/* LISTA DE CARTÕES: o painel some e fica só o espaçamento. O cartão é a caixa —
-   e uma caixa dentro de outra, com o mesmo raio e o mesmo recuo, vira moldura
-   dupla: dois contornos concêntricos separando o registro de nada. Numa lista
-   de vinte, são vinte molduras a mais para o olho descartar.
-   (2026-08-16 — "o card vai direto no panel".)
-
-   O `:has` é o que faz isso valer só quando há cartões: a tela vazia continua
-   com a caixa, porque ali a mensagem precisa de uma superfície onde pousar. E o
-   degrau segue declarado — sem superfície própria, o painel ainda é quem diz
-   aos cartões em que degrau eles estão. */
-:is(html[data-theme]) .panel:has(> .record) {
-  background: none;
-  border-radius: 0;
-  padding: 0;
-}
-
+/* NOTA (2026-08-16): por algumas horas o painel de cartões ficou transparente,
+   para acabar com a sensação de moldura dupla. Voltou a ser caixa: o que causava
+   a moldura dupla não era o painel, era o CARTÃO ter ganhado cor de caixa e
+   contorno próprio ao mesmo tempo. Corrigida a escada (o cartão é o degrau
+   `field`, sem borda), uma caixa só desenha o grupo e as linhas sobem um degrau
+   dentro dela — que é o desenho do sistema desde o começo. */
 :is(html[data-theme]) .panel__empty {
   color: var(--text-muted);
   display: grid;
@@ -1845,12 +1835,14 @@
   padding-bottom: var(--gap-tight);
 }
 
-/* O selo vai para a PONTA DIREITA da linha, por `margin-left: auto`.
+/* O selo fica JUNTO DO TEXTO, e não na ponta direita.
 
-   Colado ao título ele mudava de posição a cada registro, conforme o
-   comprimento do número e do destino; na direita os selos formam uma coluna
-   própria, e o estado da lista inteira se lê descendo por ela — que é a
-   pergunta que se faz a uma lista antes de qualquer outra.
+   Passou uma volta em `margin-left: auto`, para os selos formarem uma coluna
+   própria; o dono preferiu de volta ao lado do título (2026-08-16). O argumento
+   que decide: o selo QUALIFICA o título — "Nº 150/2026 · LONDRINA/PR" mais
+   "Cancelado" é uma frase só, e separá-los por meia tela obriga o olho a ir e
+   voltar para juntar as duas metades. Quem vai para a ponta são as AÇÕES, por
+   `margin-left: auto` na regra acima.
 
    `flex: none` para ele não encolher quando o título é longo: um selo espremido
    perde a pílula e vira texto solto. */
@@ -1858,7 +1850,6 @@
   align-items: center;
   display: inline-flex;
   flex: none;
-  margin-left: auto;
 }
 
 /* Sobrou para o eyebrow, que continua ao lado do título. */
@@ -4934,44 +4925,12 @@
   --surface-contrast: var(--surface-rail);
 }
 
-/* ---- o painel de cartões não conta como degrau ---------------------------
- *
- * Desde 2026-08-16 o painel que segura cartões não pinta nada (`v2/panel.css`):
- * ele é só o espaçamento entre eles, porque caixa dentro de caixa com o mesmo
- * raio virava moldura dupla. Só que a alternância acima conta CAMADAS DE
- * MARCAÇÃO, não camadas visíveis — e contava esse painel invisível, jogando o
- * cartão para o degrau `field`, o segundo. Na tela o cartão era a primeira
- * coisa apoiada na página e saía com a cor da segunda.
- *
- * Aqui ele volta ao degrau que lhe cabe: `rail`, o mesmo que o painel usava
- * quando ainda era caixa. E ganha o contorno pelo mesmo motivo — a regra da
- * única borda do sistema é "a primeira camada sobre a página", e agora é ele.
- *
- * Especificidade: `.panel` + `:has(> .record)` + `.record` = três classes,
- * contra as duas das regras de profundidade. É o que faz esta vencer sem
- * `!important` — e é por isso que ela precisa vir DEPOIS delas.
- */
-:is(html[data-theme]) .panel:has(> .record) > .record {
-  background: var(--surface-rail);
-  border: 1px solid var(--line);
-  --surface: var(--surface-rail);
-  --surface-contrast: var(--surface-field);
-}
-
-/* E o mesmo desconto vale para quem está DENTRO do cartão: como o painel
- * invisível não conta, um bloco dentro do cartão é a segunda camada visível, e
- * não a terceira. Sem esta regra ele caía no degrau 3 da escada acima — que é
- * `rail` — e saía da mesma cor do cartão que o contém, sem nada os separando.
- *
- * Quatro classes contra as três da regra de profundidade: vence, e por isso
- * também precisa vir depois dela.
- */
-:is(html[data-theme]) .panel:has(> .record) > .record
-  :is(.panel, .form-block--v2, .rail) {
-  background: var(--surface-field);
-  --surface: var(--surface-field);
-  --surface-contrast: var(--surface-rail);
-}
+/* NOTA (2026-08-16): aqui existiram dois pinos que tiravam o painel de cartões
+   da contagem de degraus, para o cartão assumir `rail` e ganhar contorno. Saíram
+   junto com o painel transparente: com o painel pintando de novo, a escada por
+   profundidade acima já dá o resultado certo — painel `rail` com a única borda
+   do sistema, cartão `field` sem borda, e os blocos dentro dele de volta ao
+   `rail`. Menos regra, mesmo desenho. */
 /* <<< css/v2/surface.css <<< */
 
 /* >>> css/ui/tokens.css >>> */

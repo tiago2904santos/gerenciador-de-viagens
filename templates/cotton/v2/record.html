@@ -2,12 +2,15 @@
 {% comment %}
   Record v2 — o card de um registro na lista. Par de `static/css/v2/record.css`.
 
-  A raiz carrega TAMBÉM a classe `panel` (2026-08-16): o cartão é uma caixa, e a
-  caixa do sistema é o `panel` — cor, raio e recuo vêm de lá, não de uma segunda
-  definição aqui. Enquanto o `record` desenhava a própria caixa, havia duas
-  folhas decidindo a mesma coisa, e o cartão saía com raio menor que o de
-  qualquer outra caixa da tela. O degrau é fixado em `v2/surface.css`, que é
-  onde a escada mora.
+  A raiz carrega TAMBÉM a classe `form-block--v2` (2026-08-16): o cartão é uma
+  caixa, e a caixa de conteúdo do sistema é o bloco de formulário — cor, raio e
+  recuo vêm de lá, não de uma segunda definição aqui. Enquanto o `record`
+  desenhava a própria caixa havia duas folhas decidindo a mesma coisa, e ele
+  saía com raio diferente de qualquer outra caixa da tela.
+
+  Passou algumas horas com a classe `panel` no lugar desta: `panel` é a caixa que
+  AGRUPA (raio maior, é ela que segura a lista), e o cartão é conteúdo dentro do
+  grupo. O degrau continua vindo de `v2/surface.css`, onde a escada mora.
 
   DUAS linhas, no máximo: eyebrow, título e selo na primeira; a meta na
   segunda. Numa lista longa cada linha extra multiplica pela quantidade de
@@ -32,7 +35,7 @@
   — protocolo, CPF, número do ofício.
 {% endcomment %}
 <article
-  class="record panel{% if extra_class %} {{ extra_class }}{% endif %}"
+  class="record form-block--v2{% if extra_class %} {{ extra_class }}{% endif %}"
   data-collection-item
   {% if search_text %}data-search-text="{{ search_text }}"{% endif %}
   {% if status %}data-status-value="{{ status }}"{% endif %}

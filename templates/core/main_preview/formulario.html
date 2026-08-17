@@ -1,0 +1,197 @@
+{% load icones %}
+{% comment %}
+  Seção "Formulário avançado" da galeria do v2 — incluída por `core/main_preview.html`.
+
+  A galeria era uma página só, de 758 linhas, e conferir um botão exigia
+  rolar por um formulário inteiro. Cada grupo virou uma página
+  (2026-08-16); os grupos são os mesmos `v2-lab__group` que já
+  organizavam a página empilhada, então o corte não inventou taxonomia.
+
+  Este arquivo é FRAGMENTO: não estende `base.html` e não abre a
+  `<section>` — a casca é do `main_preview.html`.
+{% endcomment %}
+    <h2 class="v2-lab__group">Formulário avançado</h2>
+
+    {% comment %}
+      As três variações do picker num painel só, cada uma no seu `form_block`.
+      Lado a lado é como se compara: a de uma linha e as de duas dividem campo,
+      caixa de escolhidos e comportamento — o que muda é só a opção da lista, e
+      isso só fica evidente quando as três estão na mesma superfície.
+
+      Painéis separados diziam o contrário: sugeriam três componentes.
+    {% endcomment %}
+    <c-v2.panel title="Picker" description="Busca de entidade. O motor é o picker.js — o v2 veste o que ele cria, sem clonar 1013 linhas.">
+      <c-slot name="body">
+        <c-v2.form_block title="Uma linha" description="O padrão: só o rótulo da opção.">
+          <c-slot name="body">
+            {% comment %}
+              Com opções de verdade: um picker sem nada para buscar não prova
+              que está funcionando — foi assim que ele passou por pronto estando
+              morto.
+            {% endcomment %}
+            <c-v2.picker mode="multi" name="v2_equipe" aria_label="Buscar servidor" placeholder="Buscar por nome, CPF ou RG" :options="v2_opcoes_longas" />
+          </c-slot>
+        </c-v2.form_block>
+
+        {% comment %}
+          A variação de DUAS LINHAS. Uma linha só não distingue três viaturas do
+          mesmo modelo nem dois servidores homônimos — é o cargo, a unidade, o
+          combustível que decidem qual é qual. A segunda linha é dado de apoio:
+          ela não acompanha o accent da opção escolhida, senão a linha inteira
+          grita e o rótulo perde o destaque.
+        {% endcomment %}
+        <c-v2.form_block title="Duas linhas · pessoas" description="Iniciais, nome e a lotação embaixo. Só o motorista recebe o realce.">
+          <c-slot name="body">
+            <c-v2.picker mode="multi" presentation="people" :driver="True" name="lab_equipe" aria_label="Equipe de exemplo" selected_title="Equipe" :options="v2_opcoes_pessoas" />
+          </c-slot>
+        </c-v2.form_block>
+
+        <c-v2.form_block title="Duas linhas · veículos" description="Placa e modelo em cima, o resto embaixo.">
+          <c-slot name="body">
+            <c-v2.picker presentation="vehicle" name="lab_viatura" aria_label="Viatura de exemplo" selected_title="Viatura" :options="v2_opcoes_viaturas" />
+          </c-slot>
+        </c-v2.form_block>
+
+        {% comment %}
+          Documento vinculado: a lista NÃO é menu suspenso. Os candidatos ficam
+          à vista e o campo só os filtra — escolher um ofício é comparar rota,
+          período e equipe de dois deles, e isso exige vê-los lado a lado.
+
+          Na tela real quem monta os cartões é o script da página, a partir de
+          uma busca no servidor; aqui eles são fixos, para o catálogo mostrar o
+          componente cheio.
+        {% endcomment %}
+        <c-v2.form_block title="Documento vinculado" description="A lista fica aberta; o campo filtra. O escolhido leva a fita de accent.">
+          <c-slot name="body">
+            <c-v2.related_picker
+              input_id="lab-vinculado-busca"
+              list_id="lab-vinculado-lista"
+              placeholder="Buscar por número, protocolo, destino ou servidor"
+              aria_label="Buscar ofício vinculado"
+            >
+              <c-slot name="rows">
+                <button type="button" class="search-picker__selected-card related-route-item is-active" aria-pressed="true">
+                  <span class="search-picker__selected-avatar" aria-hidden="true">{% icone_svg "document" %}</span>
+                  <div class="search-picker__selected-main">
+                    <span class="search-picker__selected-name">Ofício 109/2026 CURITIBA/PR → JACAREZINHO/PR</span>
+                    <span class="search-picker__selected-meta related-route-period">17/08/2026 a 19/08/2026 · GABRIELLE, JANINE · SFC0C30 DUSTER</span>
+                  </div>
+                </button>
+                <button type="button" class="search-picker__selected-card related-route-item" aria-pressed="false">
+                  <span class="search-picker__selected-avatar" aria-hidden="true">{% icone_svg "document" %}</span>
+                  <div class="search-picker__selected-main">
+                    <span class="search-picker__selected-name">Ofício 108/2026 CURITIBA/PR → ARAPOTI/PR</span>
+                    <span class="search-picker__selected-meta related-route-period">20/08/2026 a 22/08/2026 · JANINE, JULIANA · SFC0C30 DUSTER</span>
+                  </div>
+                </button>
+              </c-slot>
+            </c-v2.related_picker>
+          </c-slot>
+        </c-v2.form_block>
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Data" description="Campo simples e intervalo. O painel é montado pelo date-picker.js.">
+      <c-slot name="body">
+        <c-v2.field label="Data simples">
+          <c-slot name="control">
+            <c-v2.date_picker picker_id="v2-data-simples" placeholder_start="Selecione a data" aria_label="Data simples" />
+          </c-slot>
+        </c-v2.field>
+        <c-v2.field label="Intervalo">
+          <c-slot name="control">
+            <c-v2.date_picker mode="range" picker_id="v2-data-intervalo" placeholder_start="Data de ida" placeholder_end="Data de volta" aria_label="Intervalo" />
+          </c-slot>
+        </c-v2.field>
+        {% comment %}
+          Um controle só, que aceita as duas coisas: marcar um dia e fechar dá
+          uma data; marcar dois dá o intervalo. O rótulo do botão é o valor.
+        {% endcomment %}
+        <c-v2.field label="Botão de período" help="Um dia dá uma data; dois dias dão o intervalo.">
+          <c-slot name="control">
+            <c-v2.date_picker mode="range" picker_id="v2-data-botao" button_label="Período" aria_label="Período" />
+          </c-slot>
+        </c-v2.field>
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.period_destinations period_id="v2-periodo" title="Período e destinos">
+      <c-slot name="destinations">
+        <c-v2.form_block :split="True" title="Destinos" description="Na ordem da visita.">
+        <c-slot name="body">
+        {% comment %}
+          A forma mínima, que é como as telas reais devem usar: a seção busca os
+          próprios dados e liga o próprio motor.
+        {% endcomment %}
+        <c-v2.destinations />
+        </c-slot>
+        </c-v2.form_block>
+      </c-slot>
+    </c-v2.period_destinations>
+
+    <c-v2.panel title="Erros" description="Resumo do formulário (fora do corpo em grade) e erro de campo avulso.">
+      <c-slot name="body">
+        <c-v2.form_errors :errors="v2_erros" />
+        <c-v2.field_error :errors="v2_erros_de_campo" />
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Rodapé de ações" description="Secundária à esquerda, principal à direita — sempre no mesmo canto.">
+      <c-slot name="body">
+        <c-v2.card_footer>
+          <c-slot name="secondary"><c-v2.button label="Voltar" /></c-slot>
+          <c-slot name="primary"><c-v2.button label="Avançar" variant="primary" /></c-slot>
+        </c-v2.card_footer>
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Menu com grupos" description="Cabeçalho de seção dentro do menu de ações.">
+      <c-slot name="body">
+        <c-v2.menu aria_label="Ações agrupadas">
+          <c-v2.menu_header title="Documento" description="O que dá para gerar." />
+          <c-v2.menu_item href="#" icon="download" title="Baixar PDF" />
+          <c-v2.menu_header title="Registro" />
+          <c-v2.menu_item href="#" icon="pencil" title="Editar" />
+          <c-v2.menu_item href="#" icon="x" title="Excluir" tone="late" />
+        </c-v2.menu>
+      </c-slot>
+    </c-v2.panel>
+
+    <h3 class="v2-lab__sub">Etapa de wizard</h3>
+
+    <c-v2.wizard_page title="Ofício 153/2026" :steps="v2_etapas">
+      <c-slot name="body">
+        <c-v2.panel title="Dados da etapa" description="O corpo da etapa entra aqui.">
+          <c-slot name="body">
+            <c-v2.field label="Campo da etapa">
+              <c-slot name="control">
+                <c-v2.input placeholder="Digite aqui" aria_label="Campo da etapa" />
+              </c-slot>
+            </c-v2.field>
+          </c-slot>
+        </c-v2.panel>
+      </c-slot>
+      <c-slot name="footer">
+        <c-v2.card_footer>
+          <c-slot name="secondary"><c-v2.button label="Voltar" /></c-slot>
+          <c-slot name="primary"><c-v2.button label="Avançar" variant="primary" /></c-slot>
+        </c-v2.card_footer>
+      </c-slot>
+    </c-v2.wizard_page>
+
+    <c-v2.panel title="Modal" description="&lt;dialog&gt; nativo: foco preso, Esc e camada de topo sem JS.">
+      <c-slot name="body">
+        <c-v2.button label="Abrir modal" extra_class="v2-lab__abre-modal" />
+        <c-v2.modal modal_id="v2-modal-exemplo" title="Confirmar exclusão">
+          <c-slot name="body">
+            <p>Esta ação não pode ser desfeita.</p>
+          </c-slot>
+          <c-slot name="actions">
+            <c-v2.button label="Cancelar" />
+            <c-v2.button label="Excluir" variant="danger" />
+          </c-slot>
+        </c-v2.modal>
+      </c-slot>
+    </c-v2.panel>
+
+    {# ------------------------------------------------------------ ESTRUTURA #}

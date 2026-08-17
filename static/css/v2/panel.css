@@ -13,22 +13,12 @@
   padding: var(--gap);
 }
 
-/* LISTA DE CARTÕES: o painel some e fica só o espaçamento. O cartão é a caixa —
-   e uma caixa dentro de outra, com o mesmo raio e o mesmo recuo, vira moldura
-   dupla: dois contornos concêntricos separando o registro de nada. Numa lista
-   de vinte, são vinte molduras a mais para o olho descartar.
-   (2026-08-16 — "o card vai direto no panel".)
-
-   O `:has` é o que faz isso valer só quando há cartões: a tela vazia continua
-   com a caixa, porque ali a mensagem precisa de uma superfície onde pousar. E o
-   degrau segue declarado — sem superfície própria, o painel ainda é quem diz
-   aos cartões em que degrau eles estão. */
-:is(html[data-theme]) .panel:has(> .record) {
-  background: none;
-  border-radius: 0;
-  padding: 0;
-}
-
+/* NOTA (2026-08-16): por algumas horas o painel de cartões ficou transparente,
+   para acabar com a sensação de moldura dupla. Voltou a ser caixa: o que causava
+   a moldura dupla não era o painel, era o CARTÃO ter ganhado cor de caixa e
+   contorno próprio ao mesmo tempo. Corrigida a escada (o cartão é o degrau
+   `field`, sem borda), uma caixa só desenha o grupo e as linhas sobem um degrau
+   dentro dela — que é o desenho do sistema desde o começo. */
 :is(html[data-theme]) .panel__empty {
   color: var(--text-muted);
   display: grid;

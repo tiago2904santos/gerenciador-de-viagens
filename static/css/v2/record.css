@@ -38,12 +38,14 @@
   padding-bottom: var(--gap-tight);
 }
 
-/* O selo vai para a PONTA DIREITA da linha, por `margin-left: auto`.
+/* O selo fica JUNTO DO TEXTO, e não na ponta direita.
 
-   Colado ao título ele mudava de posição a cada registro, conforme o
-   comprimento do número e do destino; na direita os selos formam uma coluna
-   própria, e o estado da lista inteira se lê descendo por ela — que é a
-   pergunta que se faz a uma lista antes de qualquer outra.
+   Passou uma volta em `margin-left: auto`, para os selos formarem uma coluna
+   própria; o dono preferiu de volta ao lado do título (2026-08-16). O argumento
+   que decide: o selo QUALIFICA o título — "Nº 150/2026 · LONDRINA/PR" mais
+   "Cancelado" é uma frase só, e separá-los por meia tela obriga o olho a ir e
+   voltar para juntar as duas metades. Quem vai para a ponta são as AÇÕES, por
+   `margin-left: auto` na regra acima.
 
    `flex: none` para ele não encolher quando o título é longo: um selo espremido
    perde a pílula e vira texto solto. */
@@ -51,7 +53,6 @@
   align-items: center;
   display: inline-flex;
   flex: none;
-  margin-left: auto;
 }
 
 /* Sobrou para o eyebrow, que continua ao lado do título. */

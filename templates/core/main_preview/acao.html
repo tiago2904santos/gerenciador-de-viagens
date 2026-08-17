@@ -1,0 +1,162 @@
+{% comment %}
+  Seção "Ação" da galeria do v2 — incluída por `core/main_preview.html`.
+
+  Aqui está o INVENTÁRIO COMPLETO do que clica: as três variantes do `button`
+  cruzadas com todos os estados, os dois tamanhos, o `icon_button` com cada tom
+  que o CSS conhece, o botão de excluir e o gatilho de download.
+
+  A matriz é cruzada de propósito. Uma lista de variantes soltas esconde o caso
+  que quebra — foi o "link desabilitado" que apareceu assim: `<a>` não tem
+  `:disabled`, e sem cruzar variante × estado ninguém veria que ele precisava de
+  `aria-disabled`. O que não está nesta página não foi decidido.
+
+  Este arquivo é FRAGMENTO: não estende `base.html` e não abre a `<section>`.
+{% endcomment %}
+{# ---------------------------------------------------------------- AÇÃO #}
+<h2 class="v2-lab__group">Ação</h2>
+
+<c-v2.panel title="Botão · variantes" description="Três, e só três. O legado tinha 18, das quais 8 sem uso nenhum.">
+  <c-slot name="body">
+    <div class="v2-lab__row">
+      <c-v2.button label="Primary" variant="primary" />
+      <c-v2.button label="Secondary" variant="secondary" />
+      <c-v2.button label="Danger" variant="danger" />
+    </div>
+  </c-slot>
+</c-v2.panel>
+
+{% comment %}
+  A matriz: cada variante em cada estado. É lendo as colunas que se vê se o
+  desabilitado continua distinguível do normal, e as linhas que dizem se as três
+  variantes se comportam igual.
+{% endcomment %}
+<c-v2.panel title="Botão · variante × estado" description="Com ícone, só ícone, como link, desabilitado.">
+  <c-slot name="body">
+    <c-v2.form_block title="Primary">
+      <c-slot name="body">
+        <div class="v2-lab__row">
+          <c-v2.button label="Normal" variant="primary" />
+          <c-v2.button label="Com ícone" icon="plus" variant="primary" />
+          <c-v2.button icon="plus" variant="primary" aria_label="Adicionar" extra_class="button--icon" />
+          <c-v2.button label="É um link" variant="primary" href="#" />
+          <c-v2.button label="Desabilitado" variant="primary" :disabled="True" />
+          <c-v2.button label="Link desabilitado" variant="primary" href="#" :disabled="True" />
+        </div>
+      </c-slot>
+    </c-v2.form_block>
+
+    <c-v2.form_block title="Secondary">
+      <c-slot name="body">
+        <div class="v2-lab__row">
+          <c-v2.button label="Normal" variant="secondary" />
+          <c-v2.button label="Com ícone" icon="search" variant="secondary" />
+          <c-v2.button icon="x" variant="secondary" aria_label="Fechar" extra_class="button--icon" />
+          <c-v2.button label="É um link" variant="secondary" href="#" />
+          <c-v2.button label="Desabilitado" variant="secondary" :disabled="True" />
+          <c-v2.button label="Link desabilitado" variant="secondary" href="#" :disabled="True" />
+        </div>
+      </c-slot>
+    </c-v2.form_block>
+
+    <c-v2.form_block title="Danger">
+      <c-slot name="body">
+        <div class="v2-lab__row">
+          <c-v2.button label="Normal" variant="danger" />
+          <c-v2.button label="Com ícone" icon="trash" variant="danger" />
+          <c-v2.button icon="trash" variant="danger" aria_label="Excluir" extra_class="button--icon" />
+          <c-v2.button label="É um link" variant="danger" href="#" />
+          <c-v2.button label="Desabilitado" variant="danger" :disabled="True" />
+          <c-v2.button label="Link desabilitado" variant="danger" href="#" :disabled="True" />
+        </div>
+      </c-slot>
+    </c-v2.form_block>
+  </c-slot>
+</c-v2.panel>
+
+{% comment %}
+  Dois tamanhos, não cinco: o padrão e o `sm`, que é o das barras de controle e
+  dos rodapés apertados. `type="submit"` fica aqui porque é o botão de formulário
+  e o navegador lhe dá desenho próprio quando ninguém zera.
+{% endcomment %}
+<c-v2.panel title="Botão · tamanhos e tipos">
+  <c-slot name="body">
+    <div class="v2-lab__row">
+      <c-v2.button label="Padrão" variant="primary" />
+      <c-v2.button label="Pequeno (sm)" variant="primary" size="sm" />
+      <c-v2.button label="Pequeno secondary" size="sm" />
+      <c-v2.button label="Pequeno com ícone" icon="plus" size="sm" />
+      <c-v2.button icon="x" size="sm" aria_label="Fechar pequeno" extra_class="button--icon" />
+      <c-v2.button label="Submit" type="submit" variant="primary" />
+    </div>
+  </c-slot>
+</c-v2.panel>
+
+{% comment %}
+  `icon_button` NÃO é variante do `button`: aquele é retangular e existe para
+  carregar texto; este é redondo e o rótulo vive no `aria-label`. Os tons são os
+  que a folha conhece — o `late` é o único com hover próprio, porque excluir é a
+  ação que não se desfaz.
+{% endcomment %}
+<c-v2.panel title="Botão de ícone · tons e estados" description="Redondo, rótulo no aria-label. O tooltip aparece no hover.">
+  <c-slot name="body">
+    <div class="v2-lab__row">
+      <c-v2.icon_button icon="folder" aria_label="Documentos" tooltip="Visualizar e baixar" />
+      <c-v2.icon_button icon="edit" href="#" aria_label="Editar" tooltip="Editar" />
+      <c-v2.icon_button icon="download" aria_label="Baixar" tooltip="Baixar" />
+      <c-v2.icon_button icon="eye" aria_label="Visualizar" tooltip="Visualizar" />
+      <c-v2.icon_button icon="trash" tone="late" aria_label="Excluir" tooltip="Excluir" />
+      <c-v2.icon_button icon="more" aria_label="Mais ações" tooltip="Mais ações" />
+      <c-v2.icon_button icon="settings" aria_label="Gerenciar" tooltip="Gerenciar" tooltip_tone="accent" />
+    </div>
+  </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Ações de registro" description="As três que todo card de lista carrega, na ordem em que aparecem no rodapé.">
+  <c-slot name="body">
+    <div class="v2-lab__row">
+      <c-v2.icon_button icon="folder" :menu_id="v2_menu.id" aria_label="Documentos do registro" tooltip="Visualizar e baixar" />
+      <c-v2.menu_body :menu="v2_menu" />
+      <c-v2.download_picker picker_id="lab-acao-downloads" src="{% url 'termos:termo_cadastro_downloads' 1 %}" />
+      <c-v2.delete_button url="#" label="ARAPONGAS/PR" aria_label="Excluir registro" />
+    </div>
+  </c-slot>
+</c-v2.panel>
+
+{% comment %}
+  O MENU montado por slot, aberto, para conferir cada item. Ele morava na seção
+  "Lista" porque o cartão é quem o abre; mas o que se aprova aqui é a ação — o
+  item, o ícone, o tom da destrutiva —, e ação é esta página (2026-08-16).
+
+  Aberto de propósito: no cartão ele nasce com `hidden`, e um menu fechado não
+  se aprova.
+{% endcomment %}
+<c-v2.panel title="Menu de ações" description="Itens por slot: cada ação carrega href, ícone e ganchos próprios do domínio.">
+  <c-slot name="body">
+    <c-v2.menu aria_label="Ações do registro">
+      <c-v2.menu_item href="#" icon="pencil" title="Editar" description="Alterar os dados do registro." />
+      <c-v2.menu_item href="#" icon="download" title="Baixar documento" description="Gera o PDF assinado." />
+      <c-v2.menu_item href="#" icon="x" title="Excluir" description="Remove em definitivo." tone="late" />
+      {% comment %}
+        O item que abre o diálogo do assinado. Os cinco ganchos dele são contrato
+        do `attach-signed-modal.js` e moram num componente próprio justamente
+        para não serem redigitados a cada menu.
+      {% endcomment %}
+      <c-v2.menu_attach_signed url="#" doc_label="o termo genérico" />
+    </c-v2.menu>
+  </c-slot>
+</c-v2.panel>
+
+{% comment %}
+  O cabeçalho de grupo do menu, para quando um menu tem SEÇÕES — o único caso em
+  que ele se justifica. Nos menus de documento ele saiu: repetia o que o gatilho
+  e o cartão atrás já diziam.
+{% endcomment %}
+<c-v2.panel title="Menu com cabeçalho de grupo">
+  <c-slot name="body">
+    <c-v2.menu aria_label="Ações agrupadas">
+      <c-v2.menu_header title="Documentos" description="ARAPONGAS/PR" />
+      <c-v2.menu_item href="#" icon="download" title="Baixar PDF" description="Documento pronto." />
+      <c-v2.menu_item href="#" icon="x" title="Cancelar" description="Encerra o registro." tone="late" />
+    </c-v2.menu>
+  </c-slot>
+</c-v2.panel>

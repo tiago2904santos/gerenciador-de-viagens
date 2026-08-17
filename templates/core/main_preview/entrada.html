@@ -1,0 +1,164 @@
+{% comment %}
+  Seção "Entrada" da galeria do v2 — incluída por `core/main_preview.html`.
+
+  A galeria era uma página só, de 758 linhas, e conferir um botão exigia
+  rolar por um formulário inteiro. Cada grupo virou uma página
+  (2026-08-16); os grupos são os mesmos `v2-lab__group` que já
+  organizavam a página empilhada, então o corte não inventou taxonomia.
+
+  Este arquivo é FRAGMENTO: não estende `base.html` e não abre a
+  `<section>` — a casca é do `main_preview.html`.
+{% endcomment %}
+    <h2 class="v2-lab__group">Entrada</h2>
+
+    <c-v2.panel title="Campo · superfícies" description="As duas: field (padrão) e rail. Um degrau separa campo de caixa.">
+      <c-slot name="body">
+        <c-v2.field label="Superfície field (padrão)">
+          <c-slot name="control">
+            <c-v2.input placeholder="Digite aqui" aria_label="Campo em field" />
+          </c-slot>
+        </c-v2.field>
+        <c-v2.form_block title="Bloco aninhado" description="Assume o degrau oposto sozinho — sem precisar de `surface`.">
+          <c-slot name="body">
+            <c-v2.field label="Superfície rail">
+              <c-slot name="control">
+                <c-v2.input placeholder="Digite aqui" aria_label="Campo no bloco aninhado" />
+              </c-slot>
+            </c-v2.field>
+          </c-slot>
+        </c-v2.form_block>
+      </c-slot>
+    </c-v2.panel>
+
+    {% comment %}
+      Os mesmos quatro estados aparecem duas vezes: direto no rail e dentro de
+      um bloco. É a única forma de ver se a superfície do campo alterna certo
+      nos dois contextos — foi comparando assim que apareceu a inversão entre
+      contêiner e campo.
+    {% endcomment %}
+    <h3 class="v2-lab__sub">Campo · estados — em bloco dentro de bloco</h3>
+
+    <c-v2.panel title="Bloco externo" description="Segura a seção de campos.">
+      <c-slot name="body">
+        <c-v2.form_block title="Campo · estados" description="Bloco dentro de bloco — os dois no mesmo degrau.">
+          <c-slot name="body">
+            <c-v2.field label="Com ajuda" help="Texto de ajuda explicando o campo.">
+              <c-slot name="control">
+                <c-v2.input placeholder="Digite aqui" aria_label="Com ajuda, sobre o rail" />
+              </c-slot>
+            </c-v2.field>
+            <c-v2.field label="Com erro" error="Este campo é obrigatório.">
+              <c-slot name="control">
+                <c-v2.input placeholder="Digite aqui" aria_label="Com erro, sobre o rail" />
+              </c-slot>
+            </c-v2.field>
+            <c-v2.field label="Com ajuda e erro" help="A ajuda continua visível." error="E o erro aparece abaixo dela.">
+              <c-slot name="control">
+                <c-v2.input placeholder="Digite aqui" aria_label="Com ajuda e erro, sobre o rail" />
+              </c-slot>
+            </c-v2.field>
+            <c-v2.field label="Desabilitado">
+              <c-slot name="control">
+                <c-v2.input placeholder="Não editável" aria_label="Desabilitado, sobre o rail" :disabled="True" />
+              </c-slot>
+            </c-v2.field>
+          </c-slot>
+        </c-v2.form_block>
+      </c-slot>
+    </c-v2.panel>
+
+    <h3 class="v2-lab__sub">Campo · estados — dentro de um bloco</h3>
+
+    <c-v2.panel title="Campo · estados" description="Os mesmos quatro, um degrau adentro.">
+      <c-slot name="body">
+        <c-v2.field label="Com ajuda" help="Texto de ajuda explicando o campo.">
+          <c-slot name="control">
+            <c-v2.input placeholder="Digite aqui" aria_label="Com ajuda, no bloco" />
+          </c-slot>
+        </c-v2.field>
+        <c-v2.field label="Com erro" error="Este campo é obrigatório.">
+          <c-slot name="control">
+            <c-v2.input placeholder="Digite aqui" aria_label="Com erro, no bloco" />
+          </c-slot>
+        </c-v2.field>
+        <c-v2.field label="Com ajuda e erro" help="A ajuda continua visível." error="E o erro aparece abaixo dela.">
+          <c-slot name="control">
+            <c-v2.input placeholder="Digite aqui" aria_label="Com ajuda e erro, no bloco" />
+          </c-slot>
+        </c-v2.field>
+        <c-v2.field label="Desabilitado">
+          <c-slot name="control">
+            <c-v2.input placeholder="Não editável" aria_label="Desabilitado, no bloco" :disabled="True" />
+          </c-slot>
+        </c-v2.field>
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Campo · tipos" description="Ícone, busca e área de texto.">
+      <c-slot name="body">
+        <c-v2.field label="Com ícone">
+          <c-slot name="control">
+            <c-v2.input icon="search" placeholder="Buscar" aria_label="Busca" />
+          </c-slot>
+        </c-v2.field>
+        <c-v2.field label="Select" help="Gatilho e menu são criados pelo picker-select.js.">
+          <c-slot name="control">
+            <c-v2.select aria_label="Select de exemplo" :options="v2_opcoes" />
+          </c-slot>
+        </c-v2.field>
+        {% comment %}
+          Select com ação secundária: ela nasce oculta e aparece quando o
+          ponteiro — ou o foco — entra no campo, e o select encolhe para abrir
+          espaço. Revelar também no foco não é zelo: uma ação que só existe sob
+          o cursor desaparece para quem navega por teclado e para quem usa toque.
+        {% endcomment %}
+        <c-v2.field label="Select com ação" help="Passe o mouse no campo — ou chegue nele pelo Tab.">
+          <c-slot name="control">
+            <c-v2.select_with_action name="lab_modelo" aria_label="Modelo de exemplo" :options="v2_opcoes" action_href="#" action_icon="settings" action_aria_label="Gerenciar modelos" action_tooltip="Gerenciar modelos" />
+          </c-slot>
+        </c-v2.field>
+        <c-v2.field label="Select com 8 opções" help="O menu para em 5 itens e rola o resto.">
+          <c-slot name="control">
+            <c-v2.select aria_label="Select longo" :options="v2_opcoes_longas" />
+          </c-slot>
+        </c-v2.field>
+        <c-v2.field label="Área de texto">
+          <c-slot name="control">
+            <c-v2.input type="textarea" placeholder="Texto longo" aria_label="Área de texto" />
+          </c-slot>
+        </c-v2.field>
+      </c-slot>
+    </c-v2.panel>
+
+
+    <h3 class="v2-lab__sub">Campo · tipos — uma camada a mais</h3>
+
+    {% comment %}
+      O mesmo conteúdo, um nível adentro. O bloco interno NÃO passa `surface`:
+      ele assume `field` sozinho, pela alternância por profundidade.
+    {% endcomment %}
+    <c-v2.panel title="Bloco externo" description="Nível 1 — superfície rail.">
+      <c-slot name="body">
+        <c-v2.form_block title="Campo · tipos" description="Nível 2 — superfície field, assumida automaticamente.">
+          <c-slot name="body">
+            <c-v2.field label="Com ícone">
+              <c-slot name="control">
+                <c-v2.input icon="search" placeholder="Buscar" aria_label="Busca, nível 2" />
+              </c-slot>
+            </c-v2.field>
+            <c-v2.field label="Select" help="Gatilho e menu são criados pelo picker-select.js.">
+              <c-slot name="control">
+                <c-v2.select aria_label="Select, nível 2" :options="v2_opcoes" />
+              </c-slot>
+            </c-v2.field>
+            <c-v2.field label="Área de texto">
+              <c-slot name="control">
+                <c-v2.input type="textarea" placeholder="Texto longo" aria_label="Área de texto, nível 2" />
+              </c-slot>
+            </c-v2.field>
+          </c-slot>
+        </c-v2.form_block>
+      </c-slot>
+    </c-v2.panel>
+
+    {# ------------------------------------------------------------ NAVEGAÇÃO #}

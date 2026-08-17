@@ -18,4 +18,9 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += [
         path("dev/main-preview/", views.main_preview, name="main_preview"),
+        path(
+            "dev/main-preview/<slug:secao>/",
+            views.main_preview,
+            name="main_preview_secao",
+        ),
     ]

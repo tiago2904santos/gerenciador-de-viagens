@@ -1,5 +1,6 @@
 from copy import deepcopy
 
+from django.conf import settings
 from django.urls import NoReverseMatch
 from django.urls import reverse
 
@@ -40,6 +41,30 @@ NAVIGATION_ITEMS = [
                 "label": "Prestações de Contas",
                 "url_name": "prestacoes_contas:index",
                 "active_when": ["prestacoes_contas:"],
+            },
+        ],
+    },
+    {
+        "id": "ui-lab",
+        "label": "UI Lab",
+        "icon": "UI",
+        "active_when": ["core:main_preview"],
+        # SEM `staff_only`: quem abre o laboratório é quem desenha a tela, e o
+        # usuário de desenvolvimento não é `is_staff` — o item ficava invisível
+        # exatamente para quem ele existe.
+        #
+        # `debug_only` é o que o protege: a rota da galeria só é registrada sob
+        # DEBUG (`core/urls.py`), então em produção o item não existe. Sem este
+        # sinal ele apareceria lá com `href` vazio, porque `_resolve_url` engole
+        # o `NoReverseMatch` e devolve `None` — link morto em vez de nada.
+        "debug_only": True,
+        "children": [
+            {
+                "id": "ui-lab-componentes",
+                "label": "Componentes v2",
+                "url_name": "core:main_preview",
+                "active_when": ["core:main_preview"],
+                "debug_only": True,
             },
         ],
     },
@@ -119,6 +144,12 @@ def _matches_current_view(item, current_view_name):
 
 
 def _is_visible_for_request(item, request):
+    # `debug_only`: a rota da galeria só é registrada sob DEBUG (`core/urls.py`).
+    # Sem este guarda o item aparecia em produção com `href` vazio, porque
+    # `_resolve_url` engole o `NoReverseMatch` e devolve `None` — um link morto no
+    # menu em vez de nenhum item.
+    if item.get("debug_only") and not settings.DEBUG:
+        return False
     user = getattr(request, "user", None)
     if item.get("auth_only") and not (user and user.is_authenticated):
         return False

@@ -53,23 +53,34 @@
   {% if tabs %}<div class="list-page__tabs">{{ tabs }}</div>{% endif %}
 
   {% comment %}
-    A paginação fica ACIMA da lista. Embaixo, ela só aparecia depois de rolar os
-    vinte itens — e "mostrando 11–20 de 48" é justamente o que se precisa saber
-    ANTES de começar a ler, para decidir se é aqui que se procura ou se é caso
-    de trocar de página. Os controles ficam à mão no mesmo movimento que trouxe
-    o olho até o topo da lista.
+    A paginação fica ACIMA da lista, dentro do painel. Embaixo, ela só aparecia
+    depois de rolar os vinte itens — e "mostrando 11–20 de 48" é justamente o que
+    se precisa saber ANTES de começar a ler, para decidir se é aqui que se procura
+    ou se é caso de trocar de página.
   {% endcomment %}
-  {% if paginated or page_obj %}
-    <c-v2.pagination
-      :page_obj="page_obj"
-      :page_querystring="page_querystring"
-      :pages="pages"
-      :required="paginated"
-    />
-  {% endif %}
-
   <c-v2.panel :empty_message="empty_message" :empty_title="empty_title">
-    {% if rows %}<c-slot name="body">{{ rows }}</c-slot>{% endif %}
+    {% comment %}
+      A paginação mora DENTRO do painel (2026-08-16), e não solta entre o rail e a
+      lista: ela fala sobre esta lista — "mostrando 11–20 de 48" —, e fora da
+      caixa ficava pairando sobre o fundo da página, sem dizer de que grupo era.
+
+      Ela entra no MESMO slot dos registros, e só quando existem registros: o
+      painel decide mostrar o vazio olhando se o corpo veio em branco, e uma
+      paginação sempre presente faria o "nenhum termo cadastrado" nunca aparecer.
+    {% endcomment %}
+    {% if rows %}
+      <c-slot name="body">
+        {% if paginated or page_obj %}
+          <c-v2.pagination
+            :page_obj="page_obj"
+            :page_querystring="page_querystring"
+            :pages="pages"
+            :required="paginated"
+          />
+        {% endif %}
+        {{ rows }}
+      </c-slot>
+    {% endif %}
   </c-v2.panel>
 
   {% if action_url %}

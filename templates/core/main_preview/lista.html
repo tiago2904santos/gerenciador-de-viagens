@@ -1,0 +1,288 @@
+{% comment %}
+  Seção "Lista" da galeria do v2 — incluída por `core/main_preview.html`.
+
+  A galeria era uma página só, de 758 linhas, e conferir um botão exigia
+  rolar por um formulário inteiro. Cada grupo virou uma página
+  (2026-08-16); os grupos são os mesmos `v2-lab__group` que já
+  organizavam a página empilhada, então o corte não inventou taxonomia.
+
+  Este arquivo é FRAGMENTO: não estende `base.html` e não abre a
+  `<section>` — a casca é do `main_preview.html`.
+{% endcomment %}
+    <h2 class="v2-lab__group">Lista</h2>
+
+    <c-v2.panel title="Alerta" description="Mesmos tokens de estado do selo — sucesso e 'Concluído' são a mesma informação.">
+      <c-slot name="body">
+        <c-v2.alert :messages="v2_mensagens" />
+      </c-slot>
+    </c-v2.panel>
+
+    <h3 class="v2-lab__sub">Tela de lista completa</h3>
+
+    {% comment %}
+      `list_page` não tem folha própria: é composição de `header`, `rail`,
+      `panel` e `pagination`. Um componente que só arruma outros não precisa de
+      CSS — se precisasse, seria sinal de que a composição está errada.
+
+      Esta lista FILTRA de verdade: `data-collection` vem do próprio list_page,
+      `filter="search"` e `filter="status"` ligam os campos, e cada registro
+      declara por quais palavras responde. Digitar "curitiba" ou "18.220" deixa
+      um registro; escolher um status deixa os daquele status.
+    {% endcomment %}
+    <c-v2.list_page
+      title="Termos de Autorização"
+      empty_message="Nenhum termo cadastrado."
+      :page_obj="v2_pagina"
+      :pages="v2_paginas"
+      :paginated="True"
+      action_label="Novo termo"
+      action_url="#"
+    >
+      <c-slot name="controls">
+        <c-v2.input icon="search" placeholder="Buscar termos" aria_label="Buscar termos" filter="search" />
+        <c-v2.select aria_label="Filtrar por status" :options="v2_status_opcoes" filter="status" />
+        <c-v2.button label="Limpar filtros" icon="x" hook="data-collection-clear" />
+        <c-v2.button label="Novo termo" variant="primary" icon="plus" />
+      </c-slot>
+      <c-slot name="rows">
+        {% for registro in v2_registros %}
+          <c-v2.record
+            :title="registro.titulo"
+            :meta="registro.meta"
+            :status="registro.status"
+            :status_tone="registro.tone"
+            :search_text="registro.busca"
+          >
+            <c-slot name="actions"><c-v2.icon_button icon="more" aria_label="Ações do termo" /></c-slot>
+          </c-v2.record>
+        {% endfor %}
+      </c-slot>
+    </c-v2.list_page>
+
+    <h3 class="v2-lab__sub">Linha de pessoa e ações do registro</h3>
+
+    {% comment %}
+      Fora de um cartão, e de propósito. Dentro do registro da lista a faixa de
+      equipe repetia o que ninguém usa para ESCOLHER um termo e triplicava a
+      altura do item — saiu de lá em 2026-08-16. A linha continua viva onde
+      responde a uma pergunta de verdade (a Ordem de Serviço, o formulário), e é
+      aqui que se confere o desenho dela e o das ações do registro.
+    {% endcomment %}
+    <c-v2.panel>
+      <c-slot name="body">
+        <ul class="person-list">
+          <c-v2.person_row initials="AS" name="ADEMAR SCHONS" meta="Agente · 1ª Delegacia" badge="com viatura">
+            <c-slot name="actions">
+              <c-v2.icon_button icon="folder" :menu_id="v2_menu.id" aria_label="Documentos de Ademar" tooltip="Visualizar e baixar" />
+              <c-v2.menu_body :menu="v2_menu" />
+              <c-v2.delete_button url="#" label="ADEMAR SCHONS" aria_label="Excluir servidor" />
+            </c-slot>
+          </c-v2.person_row>
+          <c-v2.person_row extra_class="person-row--driver" initials="BC" name="BEATRIZ CARDOSO" meta="Escrivã · 1ª Delegacia" badge="motorista" />
+          <c-v2.person_row extra_class="person-row--viatura" initials="VT" name="ABC-1D23 · Duster" meta="Automóvel · 1ª Delegacia" badge="viatura" />
+        </ul>
+      </c-slot>
+    </c-v2.panel>
+
+    <h3 class="v2-lab__sub">Card de lista completo — o modelo do ofício</h3>
+
+    {% comment %}
+      O cartão que cresce por FAIXAS: quem viaja, os fatos da viagem, e uma
+      linha de estado no fim. É o desenho do cartão de ofício, que é o mais
+      completo do sistema — as outras listas usam as mesmas peças, só que
+      menos delas.
+
+      A faixa não pinta nada: quem tem cor é a peça dentro dela. E o selo fica
+      na ponta direita do título, formando a coluna de estado pela qual a lista
+      inteira se lê de cima a baixo.
+    {% endcomment %}
+    <c-v2.panel>
+      <c-slot name="body">
+        <c-v2.record
+          title="Nº 153/2026 · ARAPONGAS/PR"
+          meta="12/08 a 15/08/2026 · Evento: Operação Integrada"
+          status="Em andamento"
+          status_tone="progress"
+          search_text="arapongas 153"
+        >
+          <c-slot name="actions">
+            <c-v2.icon_button icon="folder" :menu_id="v2_menu.id" aria_label="Documentos do ofício" tooltip="Visualizar e baixar" />
+            <c-v2.menu_body :menu="v2_menu" />
+            <c-v2.delete_button url="#" label="Nº 153/2026" aria_label="Excluir ofício" />
+          </c-slot>
+          <c-slot name="body">
+            <div class="record__band">
+              <ul class="person-list">
+                <c-v2.person_row extra_class="person-row--driver" initials="AS" name="ADEMAR SCHONS" meta="Agente · 1ª Delegacia" badge="motorista" />
+                <c-v2.person_row initials="BC" name="BEATRIZ CARDOSO" meta="Escrivã · 1ª Delegacia" />
+                <c-v2.person_row initials="CM" name="CARLOS MENDES" meta="Delegado · 1ª Delegacia" />
+              </ul>
+            </div>
+
+            {% comment %}
+              TRÊS blocos, um por assunto: a viatura (com o motorista externo
+              dentro dela, quando quem dirige não é do ofício — é informação do
+              transporte, não uma quarta coluna), os trechos e o valor.
+            {% endcomment %}
+            {% comment %}
+              Os blocos vão SEM título: o rótulo em accent de cada fato já diz o
+              que é o número embaixo dele, e "Viatura" acima de "PLACA" era o
+              mesmo aviso duas vezes, gastando a altura de uma linha em cada um
+              dos três (2026-08-16).
+            {% endcomment %}
+            <div class="record__band">
+              <c-v2.form_block>
+                <c-slot name="body">
+                  {% comment %}
+                    COM motorista externo, o bloco tem DOIS fatos: o modelo desce
+                    para a linha de apoio da placa e a vaga que era dele passa a
+                    ser do motorista (2026-08-16). Quem dirige de fora do ofício é
+                    a informação que muda a leitura do transporte — o modelo do
+                    carro, não; e três fatos empilhados não cabem no teto de 170px
+                    sem o valor virar letra miúda.
+
+                    Sem motorista externo, o bloco volta a ser Placa + Modelo.
+                  {% endcomment %}
+                  <c-v2.fact label="Placa" value="ABC-1D23" note="Duster · Caracterizada" />
+                  <c-v2.fact label="Motorista externo" value="JOÃO PEREIRA" note="Carona autorizada · Ofício 141/2026" />
+                </c-slot>
+              </c-v2.form_block>
+
+              <c-v2.form_block>
+                <c-slot name="body">
+                  <c-v2.itinerary :legs="v2_trechos" />
+                </c-slot>
+              </c-v2.form_block>
+
+              <c-v2.form_block>
+                <c-slot name="body">
+                  <c-v2.fact label="Valor total" value="R$ 1.248,00" :strong="True" note="mil duzentos e quarenta e oito reais" />
+                  <c-v2.fact label="Diárias" value="3,5" />
+                </c-slot>
+              </c-v2.form_block>
+            </div>
+
+            <div class="record__band">
+              <ul class="person-list">
+                <c-v2.person_row extra_class="person-row--fact" name="JUSTIFICATIVA" meta="Deslocamento para apoio operacional na comarca vizinha." badge="Enviada">
+                  <c-slot name="actions">
+                    <c-v2.icon_button icon="edit" href="#" aria_label="Editar justificativa" tooltip="Editar" />
+                  </c-slot>
+                </c-v2.person_row>
+              </ul>
+            </div>
+          </c-slot>
+        </c-v2.record>
+      </c-slot>
+    </c-v2.panel>
+
+    <h3 class="v2-lab__sub">Card de lista — Ordem de Serviço</h3>
+
+    {% comment %}
+      Lista SIMPLES, como a de roteiros e a de termos. A OS se acha pelo número,
+      pelo período e pelo destino; equipe e motivo estão na tela de edição.
+    {% endcomment %}
+    <c-v2.panel>
+      <c-slot name="body">
+        <c-v2.record
+          title="OS nº 41/2026 · ARAPONGAS/PR"
+          meta="12/08 a 15/08/2026"
+          status="Em andamento"
+          status_tone="progress"
+          search_text="os 41"
+        >
+          <c-slot name="actions">
+            <c-v2.icon_button icon="folder" :menu_id="v2_menu.id" aria_label="Documentos da OS" tooltip="Visualizar e baixar" />
+            <c-v2.menu_body :menu="v2_menu" />
+            <c-v2.delete_button url="#" label="OS nº 41/2026" aria_label="Excluir OS" />
+          </c-slot>
+        </c-v2.record>
+      </c-slot>
+    </c-v2.panel>
+
+    <h3 class="v2-lab__sub">Card de lista — Roteiro</h3>
+
+    {% comment %}
+      Lista SIMPLES: título, período e as ações. O roteiro se identifica pela
+      origem, pelo destino e pela data — trechos, valor e diárias são o que se vê
+      ao abri-lo, e na lista só somavam altura por registro.
+    {% endcomment %}
+    <c-v2.panel>
+      <c-slot name="body">
+        <c-v2.record
+          title="CURITIBA/PR → ADRIANÓPOLIS/PR"
+          meta="02/06 a 11/06/2026 · 2 trechos · R$ 2.658,53"
+          search_text="curitiba adrianopolis"
+        >
+          <c-slot name="actions">
+            <c-v2.icon_button icon="folder" :menu_id="v2_menu.id" aria_label="Documentos do roteiro" tooltip="Visualizar e baixar" />
+            <c-v2.menu_body :menu="v2_menu" />
+            <c-v2.delete_button url="#" label="Roteiro de Curitiba" aria_label="Excluir roteiro" />
+          </c-slot>
+        </c-v2.record>
+      </c-slot>
+    </c-v2.panel>
+
+    <h3 class="v2-lab__sub">Escolher o que baixar</h3>
+
+    {% comment %}
+      Um termo vira vários documentos — o genérico, o da viatura e um por
+      servidor. O gatilho pergunta ao servidor o que existe: com um documento só
+      ele baixa direto, sem diálogo; com mais de um, abre esta escolha e baixa em
+      FILA, um de cada vez, porque cada arquivo é gerado sob demanda.
+
+      O miolo do diálogo é montado pelo JS a partir da resposta do servidor; o
+      painel abaixo mostra a aparência das peças (linha marcável e fila) para
+      quem estiver conferindo o desenho.
+    {% endcomment %}
+    <c-v2.panel>
+      <c-slot name="body">
+        <c-v2.download_picker
+          picker_id="lab-downloads"
+          src="{% url 'termos:termo_cadastro_downloads' 1 %}"
+        />
+
+        <div class="download-picker">
+          <ul class="download-picker__list">
+            <li class="download-picker__item">
+              <label class="download-picker__check">
+                <input type="checkbox" checked>
+                <span class="download-picker__item-copy">
+                  <strong class="download-picker__item-title">Termo em branco</strong>
+                  <small class="download-picker__item-meta">Sem preenchimento, para assinar à mão</small>
+                </span>
+              </label>
+            </li>
+            <li class="download-picker__item">
+              <label class="download-picker__check">
+                <input type="checkbox">
+                <span class="download-picker__item-copy">
+                  <strong class="download-picker__item-title">ADEMAR SCHONS</strong>
+                  <small class="download-picker__item-meta">Agente · 1ª Delegacia</small>
+                </span>
+              </label>
+            </li>
+          </ul>
+          <ul class="download-picker__queue">
+            <li class="download-picker__queue-item" data-state="done">
+              <span class="download-picker__queue-name">Termo em branco</span>
+              <span class="download-picker__queue-state">Baixado</span>
+            </li>
+            <li class="download-picker__queue-item" data-state="running">
+              <span class="download-picker__queue-name">ADEMAR SCHONS</span>
+              <span class="download-picker__queue-state">Gerando…</span>
+            </li>
+          </ul>
+        </div>
+      </c-slot>
+    </c-v2.panel>
+
+    <h3 class="v2-lab__sub">Tela de lista vazia</h3>
+
+    <c-v2.list_page title="Termos de Autorização" empty_message="Nenhum termo cadastrado ainda.">
+      <c-slot name="controls">
+        <c-v2.input icon="search" placeholder="Buscar termos" aria_label="Buscar termos, lista vazia" />
+      </c-slot>
+    </c-v2.list_page>
+
+    {# ------------------------------------------------------- FORMULÁRIO AVANÇADO #}

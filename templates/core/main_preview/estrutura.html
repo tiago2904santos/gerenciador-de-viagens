@@ -1,0 +1,30 @@
+{% comment %}
+  Seção "Estrutura" da galeria do v2 — incluída por `core/main_preview.html`.
+
+  A galeria era uma página só, de 758 linhas, e conferir um botão exigia
+  rolar por um formulário inteiro. Cada grupo virou uma página
+  (2026-08-16); os grupos são os mesmos `v2-lab__group` que já
+  organizavam a página empilhada, então o corte não inventou taxonomia.
+
+  Este arquivo é FRAGMENTO: não estende `base.html` e não abre a
+  `<section>` — a casca é do `main_preview.html`.
+{% endcomment %}
+    <h2 class="v2-lab__group">Estrutura</h2>
+
+    <c-v2.panel title="Header" description="Com e sem eyebrow, com e sem aside.">
+      <c-slot name="body">
+        <c-v2.header title="Com tipo de página e ação">
+          <c-slot name="aside"><c-v2.button label="Ação" variant="primary" /></c-slot>
+        </c-v2.header>
+        <c-v2.header title="Só título" />
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Panel" description="Com conteúdo e no estado vazio.">
+      <c-slot name="body">
+        <c-v2.panel>
+          <c-slot name="body"><p>Conteúdo qualquer dentro do panel.</p></c-slot>
+        </c-v2.panel>
+        <c-v2.panel empty_title="Nenhum registro cadastrado" empty_message="Este é o estado vazio." />
+      </c-slot>
+    </c-v2.panel>
