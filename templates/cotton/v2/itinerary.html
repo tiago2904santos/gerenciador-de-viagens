@@ -1,0 +1,25 @@
+{% cotton:vars legs %}
+{% comment %}
+  Itinerário v2 — os trechos de um roteiro. Par de `static/css/v2/fact.css`.
+
+  Cada item do `legs` é um dicionário com `rota`, `saida` e `chegada` — a mesma
+  forma que os presenters de ofício já produzem (`card.trechos`), para o
+  componente entrar nas telas reais sem reescrever presenter nenhum.
+
+  A seta só aparece quando existem os dois horários: "08:00 →" sozinho promete
+  uma informação que não vem.
+{% endcomment %}
+{% if legs %}
+  <ul class="route-legs">
+    {% for leg in legs %}
+      <li class="route-legs__leg">
+        <span class="route-legs__path">{{ leg.rota }}</span>
+        {% if leg.saida or leg.chegada %}
+          <span class="route-legs__time">
+            {{ leg.saida }}{% if leg.saida and leg.chegada %} → {% endif %}{{ leg.chegada }}
+          </span>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}

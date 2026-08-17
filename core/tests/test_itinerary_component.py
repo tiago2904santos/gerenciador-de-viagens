@@ -10,9 +10,11 @@ ROOT = Path(settings.BASE_DIR)
 CONSUMERS = (
     "eventos/partials/_evento_card_body.html",
     "oficios/partials/_oficio_card_body.html",
-    "planos_trabalho/partials/_plano_card_body.html",
     "prestacoes_contas/partials/_prestacao_card_body.html",
-    "roteiros/partials/_roteiro_card_body.html",
+    # `planos_trabalho/partials/_plano_card_body.html` saiu junto, no mesmo dia e
+    # pelo mesmo motivo.
+    # `roteiros/partials/_roteiro_card_body.html` saiu em 2026-08-16: a lista de
+    # roteiros virou lista simples, sem miolo — não há mais itinerário no card.
 )
 
 

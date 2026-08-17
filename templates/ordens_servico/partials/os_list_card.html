@@ -1,17 +1,21 @@
 {% comment %}
-  Card da Ordem de Serviço. Cresce por camadas, como o de termo: identidade em
-  cima, quem viaja na primeira faixa, e o que a viagem é na segunda.
+  Card da Ordem de Serviço — lista SIMPLES (2026-08-16): título, período, destino
+  e o selo de estado. Nada de miolo.
 
-  As duas faixas são a mesma estrutura com papéis diferentes — pessoas de um
-  lado, fatos do outro. O motorista é o único servidor com realce, pelo mesmo
-  motivo do picker: numa lista em que todos foram escolhidos, o que se precisa
-  saber de relance é quem dirige.
+  Passaram por aqui, no mesmo dia, a faixa de equipe + fatos e depois a dupla
+  "nomes + motivo". O dono encerrou em lista simples: a OS se acha pelo número,
+  pelo período e pelo destino, e é isso que a linha mostra. Equipe, motivo,
+  assinante e cancelamento estão na tela de edição — na lista, cada um deles
+  multiplicava a altura por registro.
 
   `PF-04`: o menu de documentos NÃO vai no HTML da lista. O gatilho leva
   `menu_src` e o corpo vem de `ordens_servico:card_menus` no primeiro clique.
 {% endcomment %}
+{% comment %}
+  Sem eyebrow: o título já começa por "OS", e o rótulo acima dele repetia a
+  palavra — a mesma decisão tomada nos cartões de termo.
+{% endcomment %}
 <c-v2.record
-  eyebrow="OS"
   :title="card.header.items.0.value"
   :search_text="card.search_text"
   :status="card.temporal_label"
@@ -39,43 +43,4 @@
     />
   </c-slot>
 
-  <c-slot name="body">
-    {% if card.servidores %}
-      <ul class="person-list">
-        {% for s in card.servidores %}
-          <c-v2.person_row
-            :initials="s.initials"
-            :name="s.name"
-            :meta="s.meta"
-            badge="{% if s.is_motorista %}Motorista{% endif %}"
-            extra_class="{% if s.is_motorista %}person-row--driver{% endif %}"
-          />
-        {% endfor %}
-      </ul>
-    {% endif %}
-
-    <ul class="person-list">
-      {% comment %}
-        O motivo do cancelamento entra como o PRIMEIRO fato, e não como alerta:
-        num cartão de lista o alerta rouba a atenção de todos os outros, e aqui
-        ele é mais um dado do registro — quem procura uma OS cancelada já sabe
-        que ela está cancelada, o selo no título diz isso.
-      {% endcomment %}
-      {% if card.cancel_note %}
-        <c-v2.person_row extra_class="person-row--fact" name="Cancelamento" :meta="card.cancel_note" />
-      {% endif %}
-      <c-v2.person_row
-        extra_class="person-row--fact"
-        name="Motivo"
-        meta="{% if card.motivo_resumido %}{{ card.motivo_resumido }}{% else %}Nenhum motivo informado.{% endif %}"
-      />
-      {% if card.assinante %}
-        <c-v2.person_row
-          extra_class="person-row--fact"
-          name="Assinante"
-          meta="{{ card.assinante.nome }}{% if card.assinante.cargo %} · {{ card.assinante.cargo }}{% endif %}"
-        />
-      {% endif %}
-    </ul>
-  </c-slot>
 </c-v2.record>

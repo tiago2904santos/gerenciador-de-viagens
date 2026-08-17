@@ -19,6 +19,15 @@
   margin: 0;
 }
 
+/* A lista tem teto: com dez servidores o modal passava da altura da tela e o
+   rodapé com o botão "Baixar" saía de vista — o botão que a caixa existe para
+   oferecer. */
+:is(html[data-theme]) .download-picker__list {
+  max-height: 15rem;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
 :is(html[data-theme]) .download-picker__list,
 :is(html[data-theme]) .download-picker__queue {
   display: grid;
@@ -35,6 +44,11 @@
   display: none;
 }
 
+/* A marca fica à DIREITA, e o quadradinho do navegador sai de cena. O check
+   nativo é pequeno, muda de forma entre sistemas e não aceita cor de maneira
+   confiável; e à esquerda ele disputava a entrada da linha com o nome do
+   documento, que é o que se lê primeiro. À direita, a coluna de marcas se lê de
+   cima a baixo e diz de relance o que vai ser baixado. */
 :is(html[data-theme]) .download-picker__check {
   align-items: center;
   background: var(--surface-contrast, var(--surface-field));
@@ -42,9 +56,51 @@
   cursor: pointer;
   display: grid;
   gap: var(--gap-tight);
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto;
   min-width: 0;
   padding: var(--gap-tight) var(--gap);
+}
+
+/* O `<input>` continua no fluxo do teclado — `display: none` o tiraria da ordem
+   do Tab e a lista deixaria de ser marcável sem mouse. */
+:is(html[data-theme]) .download-picker__check input[type="checkbox"] {
+  height: 0;
+  opacity: 0;
+  position: absolute;
+  width: 0;
+}
+
+/* O "V" é DESENHADO com duas bordas e um giro de 45°: não depende de fonte nem
+   de emoji, e herda a cor do tema. A caixa dele existe sempre, marcada ou não —
+   é o que impede a linha de pular de largura ao ser marcada. */
+:is(html[data-theme]) .download-picker__check::after {
+  block-size: 0.6em;
+  border-bottom: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  color: var(--accent);
+  content: "";
+  grid-column: 2;
+  inline-size: 0.35em;
+  /* Menor e afastado da borda: o "V" é confirmação, não título — encostado no
+     canto ele competia com o nome do documento pela atenção. A margem lateral
+     entra no `::after` e não no recuo do rótulo, senão a linha inteira se
+     desloca e a coluna de nomes deixa de bater entre uma e outra. */
+  margin-inline-end: var(--gap-tight);
+  opacity: 0;
+  rotate: 45deg;
+  transition: opacity var(--ease);
+  translate: 0 -0.1em;
+}
+
+:is(html[data-theme]) .download-picker__check:has(input:checked)::after {
+  opacity: 1;
+}
+
+/* Anel de foco no RÓTULO, porque o input é invisível: sem isto quem navega por
+   teclado percorre a lista sem ver onde está. */
+:is(html[data-theme]) .download-picker__check:has(input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 :is(html[data-theme]) .download-picker__check:has(input:checked) {
@@ -75,6 +131,14 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+/* Uma régua separa a ESCOLHA (o que baixar) do AJUSTE (como baixar). São duas
+   perguntas diferentes, e empilhadas sem divisão o modal virava uma coluna de
+   coisas soltas do mesmo peso. */
+:is(html[data-theme]) .download-picker__options {
+  border-top: 1px solid var(--line);
+  padding-top: var(--gap);
+}
+
 @media (max-width: 720px) {
   :is(html[data-theme]) .download-picker__options {
     grid-template-columns: minmax(0, 1fr);
@@ -86,10 +150,20 @@
 :is(html[data-theme]) .download-picker__option {
   border: 0;
   display: grid;
-  gap: var(--gap-tight);
+  /* As duas opções LADO A LADO, em pílulas. Empilhadas, cada grupo ocupava a
+     altura de duas linhas e o modal ficava alto e vazio; e o rádio nativo, solto
+     à esquerda de cada rótulo, era o único controle do sistema que ainda tinha
+     desenho de navegador. */
+  gap: 6px var(--gap-tight);
+  grid-template-columns: repeat(2, auto);
+  justify-content: start;
   margin: 0;
   min-width: 0;
   padding: 0;
+}
+
+:is(html[data-theme]) .download-picker__legend {
+  grid-column: 1 / -1;
 }
 
 :is(html[data-theme]) .download-picker__legend {
@@ -101,13 +175,42 @@
   text-transform: uppercase;
 }
 
+/* Pílula: mesma linguagem do `toggle` do sistema — o escolhido no accent cheio,
+   o outro na superfície de baixo. */
 :is(html[data-theme]) .download-picker__radio {
   align-items: center;
-  color: var(--text-strong);
+  background: var(--surface-contrast, var(--surface-field));
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
   cursor: pointer;
   display: flex;
-  font-size: var(--text-size-base);
-  gap: var(--gap-tight);
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  justify-content: center;
+  min-height: var(--control-height-sm);
+  padding: 0 var(--gap);
+  transition: background var(--ease), color var(--ease), border-color var(--ease);
+  white-space: nowrap;
+}
+
+/* O rádio nativo sai de vista mas continua no fluxo do teclado. */
+:is(html[data-theme]) .download-picker__radio input[type="radio"] {
+  height: 0;
+  opacity: 0;
+  position: absolute;
+  width: 0;
+}
+
+:is(html[data-theme]) .download-picker__radio:has(input:checked) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-on-accent);
+}
+
+:is(html[data-theme]) .download-picker__radio:has(input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 /* ---- a fila ---------------------------------------------------------------
@@ -153,10 +256,16 @@
   color: var(--status-late);
 }
 
+/* O erro é uma FAIXA, não uma linha de texto vermelho: solto entre as opções e
+   o rodapé, ele se lia como legenda do último campo. */
 :is(html[data-theme]) .download-picker__error {
+  background: color-mix(in srgb, var(--status-late) 12%, transparent);
+  border-radius: var(--radius-field);
   color: var(--status-late);
   font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
   margin: 0;
+  padding: var(--gap-tight) var(--gap);
 }
 
 :is(html[data-theme]) .download-picker__error[hidden] {

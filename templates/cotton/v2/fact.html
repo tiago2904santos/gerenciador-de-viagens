@@ -1,0 +1,34 @@
+{% cotton:vars extra_class label note strong value %}
+{% comment %}
+  Fato v2 — rótulo miúdo em cima, valor embaixo. Par de `static/css/v2/fact.css`.
+
+  É o par rótulo/valor do cartão de lista: placa, modelo, valor das diárias. O
+  cartão de ofício já fazia isso com `fact-block`; aqui a peça é declarada uma
+  vez e todo cartão do v2 herda a mesma medida.
+
+  Sem `value`, o fato NÃO some: ele mostra "Não informado" em itálico apagado.
+  Um cartão com um buraco no lugar da placa parece quebrado; um que diz que não
+  há viatura informa. Some só quando o `label` não vem — aí não é um fato.
+
+  `note` é a linha de apoio: o valor por extenso, a referência do motorista de
+  carona. Vem depois do valor porque explica o que já foi lido.
+
+  No bloco de viatura do cartão de lista vale uma regra de composição: com
+  motorista externo, o MODELO desce para o `note` da placa e a vaga do modelo
+  passa a ser do motorista. São duas vagas no teto de 170px, e quem dirige de
+  fora do ofício muda a leitura do transporte — o modelo do carro, não.
+
+  `strong` é para o fato que a lista existe para comparar — o valor total das
+  diárias. Um por cartão: se dois gritam, nenhum grita.
+{% endcomment %}
+{% if label %}
+  <div class="fact{% if extra_class %} {{ extra_class }}{% endif %}">
+    <span class="fact__label">{{ label }}</span>
+    {% if value %}
+      <div class="fact__value{% if strong %} fact__value--strong{% endif %}">{{ value }}</div>
+    {% else %}
+      <div class="fact__value fact__value--empty">Não informado</div>
+    {% endif %}
+    {% if note %}<span class="fact__note">{{ note }}</span>{% endif %}
+  </div>
+{% endif %}

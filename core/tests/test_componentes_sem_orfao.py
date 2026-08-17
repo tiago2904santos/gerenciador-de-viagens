@@ -108,7 +108,13 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # vários documentos (genérico, viatura, um por servidor) e o botão de
         # baixar entregava sempre o pacote inteiro fundido; o seletor é quem
         # pergunta o que se quer e baixa em fila.
-        self.assertEqual(len(self.components()), 124)
+        #
+        # 126 (2026-08-16): `v2/fact.html` e `v2/itinerary.html`. São as peças
+        # que faltavam para o cartão do v2 dizer o que o de ofício já dizia —
+        # placa, valor, trechos. Os nomes de classe são novos (`fact`,
+        # `route-legs`) porque `fact-block` e `itinerary` ainda estão vivos nas
+        # telas não migradas: declarar os mesmos repintaria a lista de ofícios.
+        self.assertEqual(len(self.components()), 126)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.

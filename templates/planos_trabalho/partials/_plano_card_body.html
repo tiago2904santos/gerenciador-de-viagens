@@ -1,51 +1,8 @@
-{# Miolo do card de Plano de Trabalho — participantes + atividades/efetivo/valores. #}
-{% if card.participantes %}
-<div class="record-card__band">
-  <ul class="person-list person-list--n{{ card.participantes|length }}">
-    {% for p in card.participantes %}
-    <li class="person-row">
-      <div class="person-row__body">
-        <div class="person-row__name-row">
-          <span class="person-row__name">{{ p.name }}</span>
-          <span class="person-row__badge">{{ p.badge }}</span>
-        </div>
-        {% if p.meta %}
-        <span class="person-row__meta">{{ p.meta }}</span>
-        {% endif %}
-      </div>
-    </li>
-    {% endfor %}
-  </ul>
-</div>
-{% endif %}
+{% comment %}
+  Card de Plano de Trabalho: lista SIMPLES, sem miolo (2026-08-16).
 
-<div class="record-card__band">
-  <div class="fact-grid">
-    <div class="fact-block fact-block--trechos">
-      <span class="fact-block__label">Atividades selecionadas{% if card.atividades_count %} ({{ card.atividades_count }}){% endif %}</span>
-      <c-ui.lists.itinerary :items="card.atividades" :text_items="True" empty_label="Nenhuma atividade selecionada" empty_class="fact-block__value--secondary empty-hint" only />
-    </div>
-
-    <div class="fact-block fact-block--valor">
-      <span class="fact-block__label">Efetivo</span>
-      <div class="fact-block__value--strong fact-block__value--strong--fit">{{ card.efetivo_total }} servidores</div>
-      {% if card.valor_unitario_display %}
-      <span class="fact-block__label">Valor por Servidor</span>
-      <div class="fact-block__value--average fact-block__value--average--fit">{{ card.valor_unitario_display }}</div>
-      {% endif %}
-    </div>
-
-    <div class="fact-block fact-block--valor">
-      <span class="fact-block__label">Valor Total</span>
-      {% if card.valor_total_display %}
-      <div class="fact-block__value--strong fact-block__value--strong--fit">{{ card.valor_total_display }}</div>
-      {% else %}
-      <div class="fact-block__value--strong empty-hint fact-block__value--strong--fit">—</div>
-      {% endif %}
-      {% if card.diarias_composicao %}
-      <span class="fact-block__label">Diárias</span>
-      <div class="fact-block__value--average fact-block__value--average--fit">{{ card.diarias_composicao }}</div>
-      {% endif %}
-    </div>
-  </div>
-</div>
+  Renderiza NADA de propósito. O arquivo continua existindo porque o
+  `entity_card` legado inclui o `body_template` sem guarda — sem ele a lista
+  quebra. Quando a tela migrar para o `list_page` do v2, o parâmetro sai do
+  chamador e este arquivo vai com ele.
+{% endcomment %}

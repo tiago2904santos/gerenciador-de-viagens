@@ -239,11 +239,25 @@ def main_preview(request):
             ),
             # O menu de ações montado a partir dos dados, como os presenters o
             # entregam — o caminho que as telas reais usam.
+            # Trechos do itinerário, na forma que os presenters de ofício já
+            # produzem (`card.trechos`) — a galeria consome o mesmo formato das
+            # telas reais, senão o componente só funciona aqui.
+            "v2_trechos": [
+                {"rota": "ARAPONGAS/PR → LONDRINA/PR", "saida": "12/08 08:00", "chegada": "12/08 09:10"},
+                {"rota": "LONDRINA/PR → ARAPONGAS/PR", "saida": "15/08 17:30", "chegada": "15/08 18:40"},
+            ],
             "v2_menu": entity_cards.menu(
                 "lab-menu-docs",
                 "Documentos",
                 "ARAPONGAS/PR",
                 [
+                    # Editar é a PRIMEIRA ação do menu: é a que se usa mais, e
+                    # tirá-la da fileira de botões devolve espaço ao rodapé sem
+                    # esconder nada — o menu é o lugar onde as ações do registro
+                    # já moram.
+                    entity_cards.menu_link(
+                        "#", "Editar", "Abrir o formulário do registro", "edit", "info",
+                    ),
                     entity_cards.menu_link(
                         "#", "Baixar PDF", "Todos os servidores do termo",
                         "pdf", "pdf", download=True,

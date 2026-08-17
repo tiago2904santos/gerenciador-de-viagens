@@ -13,6 +13,22 @@
   padding: var(--gap);
 }
 
+/* LISTA DE CARTÕES: o painel some e fica só o espaçamento. O cartão é a caixa —
+   e uma caixa dentro de outra, com o mesmo raio e o mesmo recuo, vira moldura
+   dupla: dois contornos concêntricos separando o registro de nada. Numa lista
+   de vinte, são vinte molduras a mais para o olho descartar.
+   (2026-08-16 — "o card vai direto no panel".)
+
+   O `:has` é o que faz isso valer só quando há cartões: a tela vazia continua
+   com a caixa, porque ali a mensagem precisa de uma superfície onde pousar. E o
+   degrau segue declarado — sem superfície própria, o painel ainda é quem diz
+   aos cartões em que degrau eles estão. */
+:is(html[data-theme]) .panel:has(> .record) {
+  background: none;
+  border-radius: 0;
+  padding: 0;
+}
+
 :is(html[data-theme]) .panel__empty {
   color: var(--text-muted);
   display: grid;

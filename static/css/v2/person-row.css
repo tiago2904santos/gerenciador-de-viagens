@@ -164,11 +164,12 @@
   color: var(--text-on-accent);
 }
 
-/* O botão da linha na cor do CAMPO: a linha é a superfície de baixo, e o botão
-   precisa de um degrau para se ler como alvo de clique e não como parte do
-   texto. O contorno acompanha, porque em algumas linhas (o motorista, a
-   viatura) o fundo já é próprio e só a cor não bastaria para destacá-lo. */
+/* O botão da linha no RAIL, e SEM contorno: a linha está no degrau `field`, e o
+   botão desce um degrau — a diferença de superfície já o separa do que está
+   atrás. O contorno em cima disso era a segunda vez que a mesma borda era dita,
+   e é a regra do sistema (`v2/surface.css`) que só a primeira camada sobre a
+   página tem linha. */
 :is(html[data-theme]) .person-row__actions .icon-button {
-  background: var(--surface-field);
-  border: 1px solid var(--line);
+  background: var(--surface-rail);
+  border: 0;
 }

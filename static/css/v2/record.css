@@ -3,26 +3,22 @@
  * Segue a escada: assume o degrau oposto ao do contêiner, como os demais.
  */
 
+/* SEM caixa própria: cor, raio e recuo vêm da classe `panel`, que a raiz do
+   componente também carrega. Aqui fica só o que é do registro — o ritmo interno
+   entre cabeçalho, miolo e rodapé. */
 :is(html[data-theme]) .record {
-  background: var(--surface-contrast, var(--surface-field));
-  /* Raio de nível INTERNO (`--radius-field`), não o do contêiner: um filho com
-     o mesmo raio do pai nunca encaixa — a curva interna precisa ser menor que a
-     externa, senão sobra um vão nos cantos. O painel usa `--radius-rail`. */
-  border-radius: var(--radius-field);
-  box-sizing: border-box;
   display: grid;
   gap: var(--gap-tight);
   min-width: 0;
-  padding: var(--gap);
 }
 
 /* `center` e não `start`: o alvo de ação fica na mesma altura em todos os
    registros, mesmo quando um deles tem meta mais longa e quebra.
 
-   SEM `space-between`: com ele o selo era jogado para o meio do vazio, longe do
-   título que ele qualifica — num cartão largo o olho tinha de atravessar a
-   linha inteira para ligar um ao outro. O selo fica colado ao texto e são as
-   AÇÕES que vão para a ponta, por `margin-left: auto`. */
+   SEM `space-between`: quem vai para a ponta direita é dito por
+   `margin-left: auto` no selo e nas ações — com `space-between` o espaço se
+   distribuiria também ENTRE eles, e os dois se afastariam um do outro no meio
+   do vazio em vez de fecharem a linha juntos. */
 :is(html[data-theme]) .record__row {
   align-items: center;
   display: flex;
@@ -34,12 +30,28 @@
   margin-left: auto;
 }
 
-/* O selo ao lado do texto: `flex: none` para ele não encolher quando o título é
-   longo — um selo espremido perde a pílula e vira texto solto. */
+/* A régua do cabeçalho só existe quando há MIOLO logo abaixo: num registro de
+   uma linha só, uma linha horizontal sob o título fecharia um bloco vazio. É a
+   mesma condição que manda as ações para a linha do título nesse caso. */
+:is(html[data-theme]) .record__row:has(+ .record__body) {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: var(--gap-tight);
+}
+
+/* O selo vai para a PONTA DIREITA da linha, por `margin-left: auto`.
+
+   Colado ao título ele mudava de posição a cada registro, conforme o
+   comprimento do número e do destino; na direita os selos formam uma coluna
+   própria, e o estado da lista inteira se lê descendo por ela — que é a
+   pergunta que se faz a uma lista antes de qualquer outra.
+
+   `flex: none` para ele não encolher quando o título é longo: um selo espremido
+   perde a pílula e vira texto solto. */
 :is(html[data-theme]) .record__status {
   align-items: center;
   display: inline-flex;
   flex: none;
+  margin-left: auto;
 }
 
 /* Sobrou para o eyebrow, que continua ao lado do título. */
@@ -98,6 +110,157 @@
   }
 }
 
+/* FAIXA do cartão: o miolo se divide em blocos horizontais — equipe, fatos,
+   justificativa —, cada um separado pelo vão da grade e não por régua. É o
+   desenho do cartão de ofício, que empilha camadas de informação sem que o
+   cartão vire uma tabela.
+
+   A faixa não tem cor própria: quem pinta é a peça dentro dela. Uma faixa com
+   fundo seria um terceiro degrau entre o cartão e o dado — foi o que a lista de
+   pessoas tinha, e saiu hoje pelo mesmo motivo. */
+:is(html[data-theme]) .record__band {
+  display: grid;
+  gap: var(--gap-tight);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .record__body:has(> .record__band) {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+/* Teto de 170px na faixa de blocos, para o cartão ter altura previsível numa
+   lista: com o valor em corpo grande e três fatos empilhados, o bloco da viatura
+   esticava sozinho e o cartão passava de 600px de altura — dois registros já não
+   caíam na mesma tela. O teto é o que faz a lista voltar a ser varrível.
+
+   `min-height: 0` nos blocos porque item de grade tem mínimo automático igual ao
+   conteúdo: sem isso o teto não teria efeito nenhum, o bloco simplesmente
+   ignoraria o pai. O corpo é quem rola. */
+:is(html[data-theme]) .record__band:has(> .form-block--v2) {
+  max-height: 170px;
+}
+
+:is(html[data-theme]) .record__band > .form-block--v2 {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Faixa de BLOCOS: três colunas, uma por assunto — a viatura, os trechos e o
+   valor. Empilhados, os três somavam meia tela de altura para dizer o que cabe
+   numa faixa; lado a lado, o cartão inteiro se lê sem rolar.
+
+   Três fixas e não `auto-fit`: os assuntos são três e não crescem com o dado.
+   Com `auto-fit` a mesma lista mudava de arranjo entre um registro e o
+   seguinte, conforme o comprimento do texto de cada um. */
+:is(html[data-theme]) .record__band:has(> .form-block--v2) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 720px) {
+  :is(html[data-theme]) .record__band:has(> .form-block--v2) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Os três blocos têm a MESMA ALTURA: a grade já estica as colunas da linha, e o
+   bloco de trechos tem altura fixa (`v2/fact.css`), então é ele quem define a
+   régua. `space-between` espalha os fatos na caixa esticada, em vez de deixá-los
+   acumulados no topo com um vazio embaixo.
+
+   `container-type: inline-size` é o que permite ao valor se medir pela largura
+   do BLOCO — é daqui que vem o `cqw` do `fact__value`. */
+:is(html[data-theme]) .record__band > .form-block--v2 > .form-block__body {
+  /* `space-between` reparte a folga que sobra entre os fatos. Ele só é seguro
+     porque duas outras coisas foram resolvidas primeiro: o `row-gap` do
+     `form_block` deixou de somar 16px ao vão, e o corpo do texto passou a crescer
+     até quase encher a caixa. Antes disso, a folga era grande e o
+     `space-between` a jogava toda no meio, abrindo um vão maior que a altura de
+     um fato — o bloco parecia dois blocos distantes. */
+  align-content: space-between;
+  container-type: inline-size;
+  /* O vão entre fatos é só o `--fact-gap` (na regra do próprio fato). O
+     `gap: var(--gap)` que o `form_block` dá ao corpo somava 16px a ele e abria
+     entre dois fatos um vão maior que a altura de um deles. */
+  row-gap: 0;
+  min-height: 0;
+  /* SEM rolagem: quem cede é o CORPO DO TEXTO, não o leitor. Um bloco de três
+     fatos com barra de rolagem esconde o terceiro atrás de um gesto — e o fato
+     escondido é justamente o que diferencia um registro do outro. A adaptação
+     está logo abaixo, por quantidade de fatos. */
+  overflow: hidden;
+}
+
+/* O corpo que segura TRECHOS estica a lista: ali há um filho só, e ele deve
+   ocupar a caixa inteira para os trechos dividirem a altura entre si. */
+:is(html[data-theme]) .record__band > .form-block--v2 > .form-block__body:has(> .route-legs) {
+  align-content: stretch;
+}
+
+/* Dois fatos, mas só UM com linha de apoio: sobra altura, e o valor pode crescer
+   mais. Medi 13px de folga no bloco de Diárias enquanto o de Viatura — dois
+   fatos, dois apoios — estava exatamente no limite com o mesmo corpo. Contar
+   fatos não bastava; o que gasta a altura é o apoio.
+
+   O seletor diz "tem apoio, mas não no segundo fato". */
+:is(html[data-theme]) .record__band > .form-block--v2 > .form-block__body:has(.fact__note):not(:has(.fact:nth-child(2) .fact__note)) {
+  --fact-value-size: clamp(1.05rem, 13cqw, 2.15rem);
+  --fact-value-size-strong: clamp(1.15rem, 16cqw, 2.5rem);
+}
+
+/* ---- o corpo se ajusta à quantidade de fatos ------------------------------
+ *
+ * O teto da faixa é fixo, então o que varia é o tamanho do texto. Não existe
+ * "encolher até caber" em CSS, mas existe contar: `:has(.fact:nth-child(N))`
+ * diz quantos fatos o bloco tem, e cada faixa recebe o corpo que cabe no teto.
+ *
+ * Um fato sozinho ganha o corpo máximo — é o caso do bloco de um número só, que
+ * é para ser lido de longe. Três já dividem a caixa em três, e o valor recai
+ * para pouco acima do texto normal.
+ */
+:is(html[data-theme]) .record__band > .form-block--v2 > .form-block__body:has(.fact:nth-child(2)) {
+  /* Teto alto de propósito: com DOIS fatos sobra altura na caixa de 170px, e o
+     valor é o que deve ocupá-la. O `cqw` faz a conta pela largura do bloco, e o
+     teto só entra em cena em bloco largo — medi 35px de folga vertical no de
+     Diárias antes de subir de 1,9 para 2,4rem. */
+  --fact-value-size: clamp(1.05rem, 12cqw, 1.9rem);
+  --fact-value-size-strong: clamp(1.15rem, 14cqw, 2.2rem);
+}
+
+:is(html[data-theme]) .record__band > .form-block--v2 > .form-block__body:has(.fact:nth-child(3)) {
+  /* Empilhado, cada fato gasta TRÊS alturas de texto; três deles em 146px úteis
+     obrigam o corpo a ceder de verdade. Daqui não dá para subir sem estourar o
+     teto — se o valor precisar ser maior, é o teto de 170px que tem de crescer. */
+  --fact-value-size: clamp(0.85rem, 6cqw, 1rem);
+  --fact-value-size-strong: clamp(0.9rem, 7cqw, 1.1rem);
+  --fact-gap: 2px;
+  /* A entrelinha da linha de apoio entra na conta: com três fatos, dois deles
+     com apoio, 0,15 de entrelinha a mais em cada era o que estourava o teto
+     por 12px — medido, não estimado. */
+  --fact-note-line: 1.2;
+}
+
+:is(html[data-theme]) .record__band > .form-block--v2 > .form-block__body:has(.fact:nth-child(4)) {
+  --fact-value-size: clamp(0.9rem, 6cqw, 1rem);
+  --fact-value-size-strong: var(--fact-value-size);
+  --fact-gap: 2px;
+}
+
+/* A equipe em duas colunas vale dentro da faixa também: a `ul` está dissolvida
+   (`display: contents`), então quem arruma as colunas é sempre o contêiner —
+   aqui a faixa, ali o miolo. Sem esta regra, a lista dentro de uma faixa
+   empilha em coluna única e o cartão triplica de altura. */
+:is(html[data-theme]) .record__band:has(> .person-list) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 720px) {
+  :is(html[data-theme]) .record__band:has(> .person-list) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 :is(html[data-theme]) .record__actions {
   align-items: center;
   display: flex;
@@ -105,13 +268,32 @@
   gap: var(--gap-tight);
 }
 
-/* Rodapé do registro: as ações fecham o cartão, alinhadas à direita e sem régua
-   de separação — o vão da grade do próprio cartão já as separa do miolo. */
+/* Rodapé do registro: as ações fecham o cartão, alinhadas à direita e separadas
+   do miolo por uma RÉGUA.
+
+   O vão da grade não bastava: num cartão que cresce por faixas, o vão entre o
+   último bloco e os botões é o mesmo vão que existe ENTRE os blocos — então a
+   fileira de ações lia como mais uma faixa de conteúdo. A linha diz o que o
+   espaço não dizia: daqui para baixo não é mais informação, é o que se pode
+   fazer com ela.
+
+   O recuo acompanha a linha. Sem ele o traço encosta nos botões e parece borda
+   de um deles. */
 :is(html[data-theme]) .record__footer {
   align-items: center;
+  border-top: 1px solid var(--line);
   display: flex;
   flex-wrap: wrap;
   gap: var(--gap-tight);
   justify-content: flex-end;
   min-width: 0;
+  padding-top: var(--gap-tight);
+}
+
+/* O primeiro botão do rodapé abre a ESQUERDA. Ele é o menu do registro — o que
+   dá acesso a tudo —, e as ações diretas (excluir) ficam na ponta oposta: a
+   distância entre um clique e o outro é o que evita excluir querendo abrir.
+   `margin-right: auto` no primeiro, e o resto se empurra para a direita. */
+:is(html[data-theme]) .record__footer > *:first-child {
+  margin-right: auto;
 }
