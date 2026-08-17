@@ -115,3 +115,13 @@
     width: 1px;
   }
 }
+
+/* A sequência de cartões: o vão entre painéis é o mesmo `--gap` que cada um usa
+   de recuo interno, para a distância ENTRE registros e a distância DENTRO do
+   registro ficarem no mesmo ritmo. Era o que o painel envolvente fazia antes de
+   sair (2026-08-16). */
+:is(html[data-theme]) .list-page__rows {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}

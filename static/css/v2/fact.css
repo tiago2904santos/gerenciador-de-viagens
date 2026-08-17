@@ -84,7 +84,14 @@
   letter-spacing: -0.02em;
   line-height: 1.1;
   min-width: 0;
-  overflow-wrap: anywhere;
+  /* UMA linha, e o `fit-text.js` reduz o corpo até caber. O `overflow-wrap` que
+     morava aqui deixava "JOÃO PEREIRA" e "R$ 1.248,00" quebrarem em duas linhas
+     no bloco estreito — e valor em duas linhas estoura o teto de altura do
+     cartão. O `ellipsis` é rede de segurança para o caso em que o piso do JS
+     ainda não basta. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* O total das diárias é o valor que a lista existe para comparar — um degrau

@@ -1,4 +1,4 @@
-{% cotton:vars action_icon action_label action_url aside controls empty_message empty_title extra_class filter_mode page_obj page_querystring pages paginated rows tabs title %}
+{% cotton:vars action_icon action_label action_url aside controls empty_message empty_title extra_class filter_empty_message filter_empty_title filter_mode page_obj page_querystring pages paginated rows tabs title %}
 {% load icones %}
 {% comment %}
   List page v2 — o esqueleto de uma tela de lista: identidade, controles, o
@@ -53,35 +53,49 @@
   {% if tabs %}<div class="list-page__tabs">{{ tabs }}</div>{% endif %}
 
   {% comment %}
-    A paginação fica ACIMA da lista, dentro do painel. Embaixo, ela só aparecia
-    depois de rolar os vinte itens — e "mostrando 11–20 de 48" é justamente o que
-    se precisa saber ANTES de começar a ler, para decidir se é aqui que se procura
-    ou se é caso de trocar de página.
-  {% endcomment %}
-  <c-v2.panel :empty_message="empty_message" :empty_title="empty_title">
-    {% comment %}
-      A paginação mora DENTRO do painel (2026-08-16), e não solta entre o rail e a
-      lista: ela fala sobre esta lista — "mostrando 11–20 de 48" —, e fora da
-      caixa ficava pairando sobre o fundo da página, sem dizer de que grupo era.
+    SEM painel envolvente (2026-08-16): cada registro é um painel, e a lista é a
+    sequência deles. Um painel segurando vários cartões punha duas caixas
+    concêntricas em volta do mesmo conteúdo — e o cartão, que é a unidade que se
+    lê e se clica, ficava sendo conteúdo de outra coisa.
 
-      Ela entra no MESMO slot dos registros, e só quando existem registros: o
-      painel decide mostrar o vazio olhando se o corpo veio em branco, e uma
-      paginação sempre presente faria o "nenhum termo cadastrado" nunca aparecer.
+    A paginação fica ACIMA da lista, junto das abas: "mostrando 11–20 de 48" é o
+    que se precisa saber ANTES de começar a ler. Sem o painel envolvente ela não
+    tem mais uma caixa para morar dentro — fica na régua da página, alinhada com
+    os cartões.
+  {% endcomment %}
+  {% if paginated or page_obj %}
+    <c-v2.pagination
+      :page_obj="page_obj"
+      :page_querystring="page_querystring"
+      :pages="pages"
+      :required="paginated"
+    />
+  {% endif %}
+
+  {% if rows %}
+    <div class="list-page__rows">{{ rows }}</div>
+    {% comment %}
+      Os DOIS vazios continuam existindo, e são coisas diferentes: "nada
+      cadastrado" (abaixo) e "o filtro não achou nada" (aqui). Este nasce oculto e
+      é o `collection.js` quem o mostra, por `data-collection-empty` — sem ele,
+      buscar um termo errado deixa a tela em branco e parece perda de dados.
+
+      Ele vive FORA dos cartões porque não há mais painel envolvente para
+      hospedá-lo; a caixa é a dele mesma, `panel` sem miolo.
     {% endcomment %}
-    {% if rows %}
-      <c-slot name="body">
-        {% if paginated or page_obj %}
-          <c-v2.pagination
-            :page_obj="page_obj"
-            :page_querystring="page_querystring"
-            :pages="pages"
-            :required="paginated"
-          />
-        {% endif %}
-        {{ rows }}
-      </c-slot>
-    {% endif %}
-  </c-v2.panel>
+    <div class="panel panel--empty-band" data-collection-empty hidden>
+      <div class="panel__empty">
+        <h2 class="panel__empty-title">{{ filter_empty_title|default:'Nenhum registro para este filtro' }}</h2>
+        <p>{{ filter_empty_message|default:'Ajuste a busca ou limpe os filtros.' }}</p>
+      </div>
+    </div>
+  {% else %}
+    {% comment %}
+      O vazio da lista que nunca teve nada continua numa caixa: a mensagem precisa
+      de uma superfície onde pousar, senão fica texto solto no fundo da página.
+    {% endcomment %}
+    <c-v2.panel :empty_message="empty_message" :empty_title="empty_title" />
+  {% endif %}
 
   {% if action_url %}
     <a class="list-page__action" href="{{ action_url }}">

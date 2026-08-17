@@ -71,3 +71,12 @@
   flex: none;
   gap: var(--gap-tight);
 }
+
+/* A faixa do vazio de FILTRO, quando a lista não tem painel envolvente: é um
+   painel sem miolo, e nasce oculta. O par `[hidden]` é obrigatório porque o
+   `display: grid` do `.panel` vence a regra de agente do usuário — sem ele a
+   faixa aparece embaixo da lista cheia, dizendo que não há nada logo abaixo de
+   tudo o que há. */
+:is(html[data-theme]) .panel--empty-band[hidden] {
+  display: none;
+}

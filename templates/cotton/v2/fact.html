@@ -25,7 +25,7 @@
   <div class="fact{% if extra_class %} {{ extra_class }}{% endif %}">
     <span class="fact__label">{{ label }}</span>
     {% if value %}
-      <div class="fact__value{% if strong %} fact__value--strong{% endif %}">{{ value }}</div>
+      <div class="fact__value{% if strong %} fact__value--strong{% endif %}" data-fit-text>{{ value }}</div>
     {% else %}
       <div class="fact__value fact__value--empty">Não informado</div>
     {% endif %}

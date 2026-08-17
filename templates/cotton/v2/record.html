@@ -8,9 +8,10 @@
   desenhava a própria caixa havia duas folhas decidindo a mesma coisa, e ele
   saía com raio diferente de qualquer outra caixa da tela.
 
-  Passou algumas horas com a classe `panel` no lugar desta: `panel` é a caixa que
-  AGRUPA (raio maior, é ela que segura a lista), e o cartão é conteúdo dentro do
-  grupo. O degrau continua vindo de `v2/surface.css`, onde a escada mora.
+  Voltou a ser `panel` (e não `form-block--v2`): o cartão É o painel. A lista é
+  uma sequência de painéis, um por registro, e não vários blocos dentro de um
+  painel só — foi a decisão do dono ao ver a lista montada. O degrau continua
+  vindo de `v2/surface.css`, onde a escada mora.
 
   DUAS linhas, no máximo: eyebrow, título e selo na primeira; a meta na
   segunda. Numa lista longa cada linha extra multiplica pela quantidade de
@@ -35,7 +36,7 @@
   — protocolo, CPF, número do ofício.
 {% endcomment %}
 <article
-  class="record form-block--v2{% if extra_class %} {{ extra_class }}{% endif %}"
+  class="record panel{% if extra_class %} {{ extra_class }}{% endif %}"
   data-collection-item
   {% if search_text %}data-search-text="{{ search_text }}"{% endif %}
   {% if status %}data-status-value="{{ status }}"{% endif %}

@@ -13,9 +13,9 @@
   <ul class="route-legs">
     {% for leg in legs %}
       <li class="route-legs__leg">
-        <span class="route-legs__path">{{ leg.rota }}</span>
+        <span class="route-legs__path" data-fit-text>{{ leg.rota }}</span>
         {% if leg.saida or leg.chegada %}
-          <span class="route-legs__time">
+          <span class="route-legs__time" data-fit-text data-fit-text-min="9">
             {{ leg.saida }}{% if leg.saida and leg.chegada %} → {% endif %}{{ leg.chegada }}
           </span>
         {% endif %}

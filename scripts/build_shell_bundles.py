@@ -93,6 +93,7 @@ SHELL_JS: tuple[str, ...] = (
     "js/components/overlay.js",
     "js/components/fields-init.js",
     "js/components/document-download.js",
+    "js/components/fit-text.js",
 )
 
 # HT-04: componentes pesados de formulario/documento saem do shell global. A
