@@ -4,6 +4,17 @@
  */
 
 :is(html[data-theme]) .modal {
+  /* O diálogo DECLARA o próprio degrau, e não só a cor de fundo. Sem isto o botão
+     secundário dentro dele — que se pinta com `--surface-contrast` — herdava o
+     contraste da página e saía da MESMA cor da caixa: o "Voltar" ficava invisível
+     nos três diálogos de ação, e só se achava pelo texto.
+
+     As duas cores vêm dos tokens BASE: pintar de `--surface-contrast` e redefinir
+     essa mesma variável para os filhos é referência circular, e a escada
+     desaparece sem erro. É a terceira vez que este par aparece nesta migração
+     (faixa de pessoas, painel do quick add, aqui). */
+  --surface: var(--surface-rail);
+  --surface-contrast: var(--surface-field);
   background: var(--surface-rail);
   border: 0;
   border-radius: var(--radius-rail);
@@ -38,4 +49,40 @@
   display: flex;
   gap: var(--gap-tight);
   justify-content: flex-end;
+}
+
+/* A mensagem do diálogo de confirmação: texto corrido, com o nome do registro em
+   destaque. O `<strong>` é o que o `overlay.js` preenche — o rótulo vem do gatilho
+   e não do template, porque um diálogo serve a lista inteira. */
+:is(html[data-theme]) .modal__message {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  margin: 0 0 var(--gap);
+}
+
+/* ---- anexar assinado ------------------------------------------------------
+   O seletor de TIPO nasce oculto e o JS monta os botoes dentro dele: ele so
+   existe quando o gatilho declara mais de um documento anexavel. O par
+   `[hidden]` e obrigatorio porque o `display` daqui vence a regra de agente do
+   usuario -- sem ele o seletor aparece vazio em todo diálogo. */
+:is(html[data-theme]) .attach-signed__kind {
+  display: grid;
+  gap: var(--gap-tight);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .attach-signed__kind[hidden] {
+  display: none;
+}
+
+:is(html[data-theme]) .attach-signed__kind-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-tight);
+}
+
+/* A lista do arquivo ja anexado tambem nasce oculta: so faz sentido quando existe
+   um assinado, e e o JS que a revela com o nome preenchido. */
+:is(html[data-theme]) .attach-signed__current[hidden] {
+  display: none;
 }

@@ -1,0 +1,87 @@
+{% comment %}
+  Seção "Diálogos" da galeria — todos os modais do sistema, cada um com o botão que
+  o abre de verdade.
+
+  Diálogo é a peça que ninguém conseguia aprovar: nasce fechado, e na vitrine o
+  gatilho não tinha para onde ir. Tentei antes renderizá-los ABERTOS no fluxo da
+  página; não sobreviveu — o `overlay.js` inicializa junto e fecha os que estão no
+  registro dele. A saída é a óbvia: dar à vitrine o gatilho COMPLETO, com a URL da
+  ação e o nome do registro, que é o que a tela real manda.
+
+  Cada botão declara três coisas para o `overlay.js`: o `id` do diálogo (`dialog`),
+  a URL que o formulário vai receber e o nome que aparece no texto. Sem a URL o
+  motor retorna sem abrir — e era exatamente isso que acontecia.
+{% endcomment %}
+<h2 class="v2-lab__group">Diálogos</h2>
+
+<c-v2.panel title="Cancelar com motivo" description="Pede a justificativa antes de cancelar. O motivo é obrigatório.">
+  <c-slot name="body">
+    <div class="v2-lab__row">
+      <c-v2.button
+        label="Cancelar roteiro"
+        icon="x"
+        variant="danger"
+        dialog="cancel-reason-modal"
+        dialog_url_attr="data-cancel-url"
+        dialog_url="#"
+        dialog_label_attr="data-cancel-label"
+        dialog_label="o roteiro de Curitiba"
+      />
+    </div>
+  </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Confirmar ação" description="O 'tem certeza?' de ação que não é exclusão — reativar, desarquivar, finalizar.">
+  <c-slot name="body">
+    <div class="v2-lab__row">
+      <c-v2.button
+        label="Reativar roteiro"
+        icon="check"
+        variant="primary"
+        dialog="confirm-action-modal"
+        dialog_url_attr="data-confirm-action-url"
+        dialog_url="#"
+        dialog_label_attr="data-confirm-action-label"
+        dialog_label="o roteiro de Curitiba"
+      />
+    </div>
+  </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Excluir" description="Tem diálogo próprio: o tom é destrutivo e o texto não se reaproveita.">
+  <c-slot name="body">
+    <div class="v2-lab__row">
+      <c-v2.delete_button url="#" label="o roteiro de Curitiba" title="Excluir roteiro?" aria_label="Excluir roteiro" />
+    </div>
+  </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Anexar documento assinado" description="Upload do PDF assinado, com o estado de arquivo já anexado.">
+  <c-slot name="body">
+    {% comment %}
+      Este tem motor próprio (`attach-signed-modal.js`) e cinco ganchos no gatilho —
+      todos declarados de uma vez pelo `menu_attach_signed`, que é como as telas
+      reais o abrem: de dentro do menu de documentos.
+    {% endcomment %}
+    <c-v2.menu aria_label="Ações do documento">
+      <c-v2.menu_attach_signed url="#" doc_label="o termo genérico" />
+    </c-v2.menu>
+  </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Escolher o que baixar" description="Modal de seleção com fila de download.">
+  <c-slot name="body">
+    <div class="v2-lab__row">
+      <c-v2.download_picker picker_id="lab-modais-downloads" src="{% url 'termos:termo_cadastro_downloads' 1 %}" />
+    </div>
+  </c-slot>
+</c-v2.panel>
+
+{% comment %}
+  Os diálogos em si ficam no fim, fora dos painéis: eles são filhos do `<body>` na
+  prática (o `<dialog>` sobe para a camada de topo ao abrir) e um só serve toda a
+  página.
+{% endcomment %}
+<c-v2.cancel_modal entity="este registro" />
+<c-v2.confirm_modal entity="este registro" button_label="Reativar" hint="Ele volta para a lista de ativos." />
+<c-v2.attach_signed_modal />

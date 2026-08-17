@@ -1,0 +1,56 @@
+{% cotton:vars button_label entity hint %}
+{% comment %}
+  Modal de CONFIRMAÇÃO de ação. Sobre o `c-v2.modal`.
+
+  Traduz `cotton/ui/modals/confirm_action_modal.html`. É o diálogo genérico de
+  "tem certeza?" para ação que não é exclusão — reativar, desarquivar, finalizar.
+  Exclusão tem o seu (`delete_button` + `delete-confirm-modal`), porque lá o tom é
+  destrutivo e o texto não é reaproveitável.
+
+  Ganchos do `overlay.js`, procurados por NOME:
+
+  - `id="confirm-action-modal"` e `data-confirm-action-modal` na raiz;
+  - `data-confirm-action-form` no `<form>`, que recebe a `action`;
+  - `data-confirm-action-label` no `<strong>`, que recebe o nome do registro;
+  - `data-confirm-action-label-text` no rótulo do botão, que o JS troca conforme a
+    ação (reativar, desarquivar…);
+  - `data-confirm-action-cancel` em cada botão que fecha.
+
+  SEM variável de título nem de ícone: o `contrato()` que valida `cotton:vars` não
+  enxerga variável usada só em atributo de componente FILHO, e declarar uma que ele
+  não vê quebra o contrato (foi o mesmo caso do `download_picker`). O título destes
+  diálogos é fixo porque a frase que varia é a do CORPO — o nome do registro, que o
+  `overlay.js` preenche a partir do gatilho.
+
+{% endcomment %}
+<c-v2.modal
+  :own_form="True"
+  hook="data-confirm-action-modal"
+  modal_id="confirm-action-modal"
+  title="Confirmar ação?"
+  extra_class="modal--confirm"
+>
+  <c-slot name="body">
+    <div>
+      <p class="modal__message">
+        Você está prestes a alterar <strong data-confirm-action-label>{{ entity|default:"este registro" }}</strong>.
+        {{ hint }}
+      </p>
+      <form method="post" data-confirm-action-form id="confirm-action-form">
+        {% csrf_token %}
+      </form>
+    </div>
+  </c-slot>
+
+  <c-slot name="actions">
+    <c-v2.button label="Voltar" hook="data-confirm-action-cancel" />
+    <c-v2.button
+      variant="primary"
+      icon="check"
+      type="submit"
+      form="confirm-action-form"
+    >
+      <span data-confirm-action-label-text>{% if button_label %}{{ button_label }}{% else %}Confirmar{% endif %}</span>
+    </c-v2.button>
+  </c-slot>
+</c-v2.modal>

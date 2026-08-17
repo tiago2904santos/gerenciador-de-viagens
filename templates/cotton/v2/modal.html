@@ -1,4 +1,4 @@
-{% cotton:vars actions aria_label body extra_class modal_id title %}
+{% cotton:vars actions aria_label body extra_class hook modal_id own_form title %}
 {% comment %}
   Modal v2 — diálogo. Par de `static/css/v2/modal.css`.
 
@@ -8,13 +8,42 @@
 
   O JS de abertura continua sendo o `js/components/overlay.js`, que acha o
   diálogo por `id` — por isso `modal_id` é obrigatório.
+
+  Para VER um diálogo na galeria, quem o abre é `js/dev/lab-dialogs.js`, que põe o
+  atributo `open` nos diálogos da vitrine. Não existe parâmetro `open` neste
+  componente por dois motivos: o validador de `cotton:vars` não enxerga variável
+  usada só em atributo de componente filho (então os diálogos de ação não poderiam
+  repassá-la), e `open` é atributo booleano do HTML — nome que não sobrevive à
+  viagem. Medi as duas coisas antes de desistir do parâmetro.
 {% endcomment %}
-<dialog class="modal{% if extra_class %} {{ extra_class }}{% endif %}" id="{{ modal_id }}" aria-label="{{ aria_label|default:title }}">
-  <form method="dialog" class="modal__shell">
+{% comment %}
+  `hook` é o atributo `data-*` que o motor procura para ACHAR este diálogo, e ele
+  vai na raiz `<dialog>` — não num filho.
+
+  Isto custou uma depuração: o `openSimple` do `overlay.js` faz
+  `document.querySelector(config.modal)` e chama `openDialog` no que achar. Com o
+  gancho num `<div>` interno, ele recebia o div, mandava `hidden = false` nele (que
+  não faz nada) e o `<dialog>` nunca abria — enquanto o resto funcionava: o
+  formulário recebia a `action` e o rótulo era preenchido, porque esses são
+  buscados DENTRO do que ele achou. Abria tudo, menos o diálogo.
+{% endcomment %}
+<dialog class="modal{% if extra_class %} {{ extra_class }}{% endif %}" id="{{ modal_id }}" aria-label="{{ aria_label|default:title }}"{% if hook %} {{ hook }}{% endif %}>
+  {% comment %}
+    A casca é `<form method="dialog">` por padrão: assim o botão de fechar é um
+    `submit` e o próprio navegador fecha o diálogo, sem JS.
+
+    `own_form` troca a casca por um `<div>`, e existe por uma razão medida: quando o
+    CONTEÚDO do modal traz o seu próprio `<form>` — os diálogos de cancelar,
+    confirmar e anexar assinado —, o navegador DESCARTA o form de dentro, porque
+    HTML não aninha formulário. Os ganchos que o JS procura (`data-*-form`)
+    simplesmente não existiam no DOM, e nada acusava: o diálogo abria bonito e não
+    submetia nada. Medi zero `data-*-form` nos três antes de achar isto.
+  {% endcomment %}
+  {% if own_form %}<div class="modal__shell">{% else %}<form method="dialog" class="modal__shell">{% endif %}
     <header class="modal__header">
       <h2 class="modal__title">{{ title }}</h2>
     </header>
     <div class="modal__body">{{ body }}</div>
     {% if actions %}<footer class="modal__actions">{{ actions }}</footer>{% endif %}
-  </form>
+  {% if own_form %}</div>{% else %}</form>{% endif %}
 </dialog>

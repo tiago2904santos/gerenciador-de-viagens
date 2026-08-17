@@ -90,7 +90,21 @@
       return item !== container;
     });
     openDialogs.push(container);
-    container.hidden = false;
+    /* Duas famílias de diálogo convivem: o legado é um `<div hidden>` e abre
+       tirando o atributo; o do v2 é `<dialog>` nativo, e um `<dialog>` sem o
+       atributo `open` continua invisível por regra de agente do usuário — tirar o
+       `hidden` dele não faz nada. Foi assim que os três diálogos de ação do v2
+       abriam "com sucesso" sem aparecer na tela.
+
+       `showModal()` também traz de graça o que o caminho legado faz à mão: foco
+       presso, Esc e a camada de topo. */
+    if (container.tagName === "DIALOG") {
+      if (!container.open && typeof container.showModal === "function") {
+        container.showModal();
+      }
+    } else {
+      container.hidden = false;
+    }
     document.body.classList.add("has-dialog-open", "has-delete-modal-open");
 
     var initialFocus =
@@ -112,7 +126,14 @@
     if (!container) return false;
     var config = options || {};
     var state = dialogStates.get(container) || {};
-    container.hidden = true;
+    /* Par do `showModal()`: `<dialog>` fecha por `close()`. Pôr `hidden` num
+       `<dialog>` aberto não o fecha — ele fica aberto e invisível, e o Esc para de
+       responder porque o navegador ainda o considera modal. */
+    if (container.tagName === "DIALOG") {
+      if (container.open && typeof container.close === "function") container.close();
+    } else {
+      container.hidden = true;
+    }
     openDialogs = openDialogs.filter(function (item) {
       return item !== container;
     });

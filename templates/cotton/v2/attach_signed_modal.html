@@ -1,0 +1,132 @@
+{% cotton:vars %}
+{% comment %}
+  Modal de ANEXAR ASSINADO. Sobre o `c-v2.modal`.
+
+  Traduz `cotton/ui/modals/attach_signed_modal.html` para o v2 sem tocar em nenhum
+  dos ganchos: quem manda aqui é o `components/attach-signed-modal.js`, e ele
+  procura CADA um por nome. São treze, e a lista não é decorativa — cada gancho é
+  um estado que o diálogo assume:
+
+  - `id="attach-signed-modal"` + `data-attach-signed-modal` na raiz;
+  - `data-attach-signed-cancel` em tudo que fecha;
+  - `data-attach-signed-form` no `<form>` (multipart, é upload);
+  - `data-attach-signed-label` e `-file-description`: o nome do documento e o que
+    se espera receber, preenchidos a partir do gatilho;
+  - `data-attach-signed-kind-selector` / `-kind-options`: quando o gatilho declara
+    MAIS DE UM tipo anexável, o JS monta os botões aqui. Antes do `H-03` eram cinco
+    botões escritos à mão, nomeados por ordinal latino, e o número de documentos
+    anexáveis virava constante em três lugares;
+  - `data-attach-signed-next` no hidden do retorno;
+  - `data-attach-signed-file-help`, o texto para leitor de tela;
+  - `data-attach-signed-error`: remover o assinado é a única ação AJAX daqui, e sem
+    esta faixa a falha não tinha onde aparecer (`NOVO-23`);
+  - `data-attach-signed-current` + `-current-name` + `-current-open` + `-remove`:
+    o estado "já existe um assinado anexado", com visualizar e remover.
+
+  Diferenças em relação ao legado, e só estas: a casca é o `c-v2.modal` (`<dialog>`
+  nativo, com foco preso e Esc de graça), o erro usa o `alert` global no lugar do
+  `notice`, e o arquivo anexado usa a `person_row` — a mesma linha de "item com
+  nome, apoio e ações" que o resto do v2 já usa.
+
+  O seletor de arquivo é o `c-v2.file_picker` (2026-08-16): escolher no topo,
+  arquivo como linha de lista, anexar no rodapé DESTE diálogo. O motor continua
+  sendo o `components/file-picker.js` — o componente novo é desenho sobre os
+  mesmos ganchos, não um upload novo.
+{% endcomment %}
+{% load icones %}
+<c-v2.modal :own_form="True"
+  hook="data-attach-signed-modal" modal_id="attach-signed-modal" title="Anexar documento assinado" extra_class="modal--attach-signed">
+  <c-slot name="body">
+    <div>
+      <p class="modal__message">
+        Envie <span data-attach-signed-file-description>o PDF já assinado</span> de
+        <strong data-attach-signed-label>este documento</strong>. Ele substituirá o
+        arquivo gerado na tela e no Google Drive.
+      </p>
+
+      <form method="post" enctype="multipart/form-data" data-attach-signed-form id="attach-signed-form">
+        {% csrf_token %}
+        <input type="hidden" name="next" data-attach-signed-next value="">
+
+        {% comment %}
+          O seletor de tipo nasce oculto: só aparece quando o gatilho declara mais
+          de um documento anexável, e é o JS que monta os botões dentro dele.
+        {% endcomment %}
+        <div class="attach-signed__kind" data-attach-signed-kind-selector hidden>
+          <span class="fact__label">Documento</span>
+          <div
+            class="attach-signed__kind-options"
+            role="group"
+            aria-label="Selecionar documento assinado"
+            data-attach-signed-kind-options
+          ></div>
+        </div>
+
+        <span class="sr-only" data-attach-signed-file-help>Selecione um único arquivo em formato PDF.</span>
+        {% comment %}
+          `upload_label` vazio de propósito: o botão de anexar vai no RODAPÉ do
+          diálogo, e dois elementos com `data-file-upload-button` fariam o motor
+          habilitar só o primeiro.
+        {% endcomment %}
+        <c-v2.file_picker
+          field_id="id-attach-signed-arquivo"
+          field_name="arquivo"
+          accept="application/pdf,.pdf"
+          :single="True"
+          action_label="Escolher PDF"
+          empty_label="Nenhum documento escolhido"
+        />
+
+        <p class="alert" data-tone="error" data-attach-signed-error hidden role="alert"></p>
+
+        <ul class="person-list attach-signed__current" data-attach-signed-current hidden>
+          <li class="person-row person-row--fact">
+            <div class="person-row__body">
+              <div class="person-row__name-row">
+                <span class="person-row__name" data-attach-signed-current-name></span>
+              </div>
+              <span class="person-row__meta">Arquivo anexado</span>
+            </div>
+            <div class="person-row__actions">
+              <a
+                class="icon-button"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Visualizar arquivo assinado"
+                data-tooltip="Visualizar"
+                data-attach-signed-current-open
+              >{% icone_svg "eye" %}</a>
+              <button
+                type="button"
+                class="icon-button"
+                data-tone="late"
+                aria-label="Remover arquivo assinado"
+                data-tooltip="Remover"
+                data-attach-signed-remove
+              >{% icone_svg "trash" %}</button>
+            </div>
+          </li>
+        </ul>
+      </form>
+    </div>
+  </c-slot>
+
+  <c-slot name="actions">
+    <c-v2.button label="Cancelar" hook="data-attach-signed-cancel" />
+    {% comment %}
+      O botão de anexar mora AQUI, no rodapé, e pertence ao formulário por `form=`
+      — no legado ele ficava dentro da faixa do picker, por cima do nome do
+      arquivo, que saía cortado. Nasce desabilitado; quem o habilita é o
+      `file-picker.js` quando há arquivo escolhido.
+    {% endcomment %}
+    <c-v2.button
+      label="Anexar PDF"
+      variant="primary"
+      icon="check"
+      type="submit"
+      form="attach-signed-form"
+      :disabled="True"
+      hook="data-file-upload-button"
+    />
+  </c-slot>
+</c-v2.modal>

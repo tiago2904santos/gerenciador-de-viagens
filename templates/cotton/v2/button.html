@@ -1,4 +1,4 @@
-{% cotton:vars aria_label controls disabled extra_class hook href icon label size slot type variant %}
+{% cotton:vars aria_label controls dialog dialog_label dialog_label_attr dialog_url dialog_url_attr disabled extra_class form hook href icon label size slot type variant %}
 {% comment %}
   Button v2 — par de `static/css/v2/button.css`.
 
@@ -9,6 +9,15 @@
   inicial. Existe como parâmetro próprio porque `hook` é impresso com escape: um
   gancho com valor sai com `&quot;` e o seletor do JS nunca casa — três motores
   desta migração já foram mordidos por isso.
+
+  `dialog` é o `id` do diálogo que o botão abre: emite os três atributos que o
+  `overlay.js` procura (`data-overlay-trigger`, `-kind`, `-target`) mais o
+  `aria-haspopup`. Existe como parâmetro pelo mesmo motivo do `controls` — o
+  `-target` leva VALOR, e valor dentro de `hook` sai escapado.
+
+  `form` é o `id` do `<form>` que um `type="submit"` fora dele envia. Sem isto o
+  botão de rodapé de diálogo era um submit sem formulário: o atributo era passado e
+  descartado calado (não estava declarado), e o clique não fazia nada.
 
   `hook` é o atributo `data-*` que liga o botão a um motor JS já existente —
   `hook="data-location-add"`, por exemplo. É declarado em vez de repassado
@@ -33,6 +42,21 @@
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
     {% if disabled %}disabled{% endif %}
     {% if controls %}aria-controls="{{ controls }}" aria-expanded="false"{% endif %}
+    {% if dialog %}
+      aria-haspopup="dialog"
+      data-overlay-trigger
+      data-overlay-kind="dialog"
+      data-overlay-target="{{ dialog }}"
+    {% endif %}
+    {% comment %}
+      O `overlay.js` exige, NO GATILHO, a URL da ação e o nome do registro: sem eles
+      o `openSimple` retorna sem abrir nada (`if (!form || !action) return;`). Como
+      o nome do atributo muda por diálogo — `data-cancel-url`,
+      `data-confirm-action-url`, `data-delete-url` —, quem chama diz qual é.
+    {% endcomment %}
+    {% if dialog_url_attr and dialog_url %}{{ dialog_url_attr }}="{{ dialog_url }}"{% endif %}
+    {% if dialog_label_attr and dialog_label %}{{ dialog_label_attr }}="{{ dialog_label }}"{% endif %}
+    {% if form %}form="{{ form }}"{% endif %}
     {% if hook %}{{ hook }}{% endif %}
   >
     {% if icon %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}

@@ -1,0 +1,153 @@
+{% cotton:vars accept action_label empty_label field_id field_name required single upload_label %}
+{% comment %}
+  File picker v2 — escolher arquivo, ver o escolhido, anexar. Par de
+  `static/css/v2/file-picker.css`.
+
+  Porte de `cotton/ui/forms/file_picker.html` com a estrutura que o dono pediu:
+
+  1. o botão de ESCOLHER no topo, como bloco próprio e não no meio de uma faixa;
+  2. o arquivo escolhido como LINHA DE LISTA — uma só vez. No legado o nome
+     aparecia duas vezes (na faixa e na linha), e o botão de anexar ficava POR CIMA
+     do nome, cortando-o (medido: "termo-autorizacao-assinad…");
+  3. o botão de ANEXAR no rodapé, longe do nome.
+
+  Nada disso muda o motor: `components/file-picker.js` continua no comando, e todos
+  os ganchos vêm do legado na letra —
+
+  - `data-file-picker` no invólucro (é por ele que o JS acha o conjunto);
+  - `data-file-native` no `<input type="file">`;
+  - `data-file-picker-action-label`, o texto do botão de escolher;
+  - `data-file-picker-name` + `data-default-label`, onde o nome é escrito;
+  - `data-file-inline-actions`, onde o JS põe as ações do arquivo;
+  - `data-file-upload-button`, o submit que ele habilita quando há arquivo;
+  - `data-file-picker-status`, o `sr-only` com `aria-live` que anuncia a troca;
+  - o bloco de seleção (`-selection-dropdown`, `-toggle`, `-summary`, `-menu`,
+    `-list`) e o `<template data-file-selection-template>` com `-row`, `-name`,
+    `-size`, `-preview-selection` e `-remove-selection`. O JS CLONA esse template
+    para cada arquivo: mudar um nome ali quebra a lista sem quebrar nada visível.
+
+  O `upload_slot` não existe: quem quiser o botão de anexar no rodapé de um modal
+  usa `upload_label=""` aqui e põe o próprio `<button data-file-upload-button>` lá.
+  Dois elementos com o mesmo gancho fariam o JS habilitar só o primeiro.
+{% endcomment %}
+{% load icones %}
+<div class="file-picker--v2" data-file-picker>
+  <input
+    type="file"
+    class="file-picker__native"
+    name="{{ field_name }}"
+    id="{{ field_id }}"
+    accept="{{ accept|default:'application/pdf,image/png,image/jpeg,image/*' }}"
+    {% if not single %}multiple{% endif %}
+    aria-describedby="{{ field_id }}-status"
+    {% if required %}required{% endif %}
+    data-file-native="true"
+  >
+
+  {% comment %}
+    A LISTA é uma só, e escolher é a primeira linha dela — não um bloco separado
+    acima. Assim a ação e o resultado ficam na mesma pilha, com a mesma largura e o
+    mesmo recuo: o olho desce por uma coluna, e não por dois blocos de formas
+    diferentes.
+  {% endcomment %}
+  {% comment %}
+    A lista mora num `form_block`: é ele a caixa de conteúdo do sistema, com o
+    degrau, o raio e o recuo já resolvidos. Antes eu tinha posto contorno e recuo à
+    mão na própria `<ul>` — desenho paralelo, que é exatamente o que a migração
+    existe para acabar. Sem título: quem chama já explica o que é (no modal, a
+    frase acima diz), e um cabeçalho aqui repetiria.
+  {% endcomment %}
+  <c-v2.form_block>
+    <c-slot name="body">
+  <ul class="file-picker__list">
+    <li class="file-picker__row file-picker__row--choose">
+      <label class="file-picker__choose" for="{{ field_id }}">
+        <span data-file-picker-action-label>{{ action_label|default:"Escolher arquivo" }}</span>
+      </label>
+    </li>
+
+    <li class="file-picker__row">
+      <span
+        class="file-picker__name"
+        data-file-picker-name
+        data-default-label="{{ empty_label|default:'Nenhum arquivo selecionado' }}"
+      >{{ empty_label|default:"Nenhum arquivo selecionado" }}</span>
+      <span class="file-picker__actions" data-file-inline-actions hidden></span>
+    </li>
+  </ul>
+
+  {% comment %}
+    A lista dos arquivos escolhidos mora DENTRO do mesmo bloco, logo abaixo da
+    linha de escolher — é uma lista só, do ponto de vista de quem olha. Ela ficava
+    fora do `form_block`, e o cartão do arquivo aparecia solto embaixo da caixa,
+    como se fosse outro assunto.
+
+    Os ganchos (`-dropdown`, `-toggle`, `-summary`, `-menu`, `-list`) vêm do legado
+    sem alteração: é o JS que revela este bloco e clona cada linha aqui dentro.
+  {% endcomment %}
+  <div class="file-picker__selection" data-file-selection-dropdown hidden>
+    <button
+      class="file-picker__selection-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="{{ field_id }}-file-menu"
+      data-file-selection-toggle
+    >
+      <span data-file-selection-summary>Arquivos selecionados</span>
+      <span class="file-picker__selection-chevron" aria-hidden="true"></span>
+    </button>
+    <div class="file-picker__selection-menu" id="{{ field_id }}-file-menu" data-file-selection-menu hidden>
+      <ul class="file-picker__list" data-file-selection-list></ul>
+    </div>
+  </div>
+    </c-slot>
+  </c-v2.form_block>
+
+  <span
+    class="sr-only"
+    id="{{ field_id }}-status"
+    role="status"
+    aria-live="polite"
+    data-file-picker-status
+  >Nenhum arquivo selecionado</span>
+
+  {% comment %}
+    3. anexar, no rodapé. Nasce desabilitado e é o JS que o habilita quando há
+    arquivo — foi o que a medição mostrou funcionando no legado.
+  {% endcomment %}
+  {% if upload_label %}
+    <div class="file-picker__footer">
+      <button class="button button--primary" type="submit" data-file-upload-button disabled>
+        {{ upload_label }}
+      </button>
+    </div>
+  {% endif %}
+
+  <template data-file-selection-template>
+    <li class="file-picker__row" data-file-selection-row>
+      <span class="file-picker__copy">
+        <strong class="file-picker__name" data-file-selection-name></strong>
+        <small class="file-picker__meta" data-file-selection-size></small>
+      </span>
+      <span class="file-picker__actions">
+        <a
+          class="icon-button"
+          href=""
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Abrir arquivo selecionado"
+          data-tooltip="Abrir"
+          data-file-preview-selection
+        >{% icone_svg "eye" %}</a>
+        <button
+          class="icon-button"
+          type="button"
+          data-tone="late"
+          aria-label="Remover arquivo da seleção"
+          data-tooltip="Remover"
+          data-file-remove-selection
+        >{% icone_svg "trash" %}</button>
+      </span>
+    </li>
+  </template>
+</div>

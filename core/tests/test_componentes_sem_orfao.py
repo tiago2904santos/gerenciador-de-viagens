@@ -122,7 +122,21 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         #
         # 126 (2026-08-16): saiu `v2/menu_header.html`. Nenhum menu do sistema
         # leva cabeçalho — ele repetia o que o gatilho e o cartão atrás já diziam.
-        self.assertEqual(len(self.components()), 126)
+        #
+        # 128 (2026-08-16): `v2/cancel_modal.html` e `v2/confirm_modal.html`, os
+        # dois diálogos de ação que faltavam para migrar uma lista real sem peça
+        # legada. Os ganchos são os do `overlay.js` e vêm do legado na letra.
+        #
+        # 129 (2026-08-16): `v2/attach_signed_modal.html`, o terceiro e maior dos
+        # dialogos de acao -- treze ganchos do `attach-signed-modal.js`, upload e o
+        # estado "ja existe um assinado". O `file_picker` dentro dele segue legado
+        # de proposito: e motor de upload, nao peca de desenho.
+        #
+        # 130 (2026-08-16): `v2/file_picker.html`. O legado punha escolher, nome e
+        # anexar na MESMA faixa, e o botao cobria o nome do arquivo. Aqui os tres
+        # sao blocos empilhados, na ordem da tarefa. Os ganchos do
+        # `file-picker.js` vem do legado na letra, template de clone incluido.
+        self.assertEqual(len(self.components()), 130)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.
