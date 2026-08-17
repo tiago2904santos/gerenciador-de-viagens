@@ -1,0 +1,96 @@
+/* Provador de tipografia do UI Lab — par de
+ * `templates/core/main_preview/tipografia.html`.
+ *
+ * As pilhas moram AQUI, e não em `style=` no template: o contrato
+ * `test_dark_redesign` proíbe estilo inline, e com razão — foi assim que o
+ * sistema antigo acumulou desenho espalhado por dezenas de templates. O JS do
+ * provador lê a pilha da amostra por `getComputedStyle`, e por isso não precisa
+ * conhecer nenhuma delas.
+ */
+
+:is(html[data-theme]) .font-try__sample {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .font-try__title {
+  color: var(--text-strong);
+  font-size: 1.05rem;
+  font-weight: var(--weight-strong);
+  margin: 0;
+}
+
+:is(html[data-theme]) .font-try__meta {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  margin: 0 0 var(--gap);
+}
+
+:is(html[data-theme]) .font-try__value {
+  color: var(--text-strong);
+  font-size: 2rem;
+  font-weight: var(--fact-weight, 800);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* Inter Variable (atual) */
+:is(html[data-theme]) .font-try--inter {
+  font-family: "Inter Variable", Inter, "Segoe UI", system-ui, sans-serif;
+}
+
+/* Segoe UI Variable */
+:is(html[data-theme]) .font-try--segoe {
+  font-family: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+}
+
+/* Bahnschrift (DIN) */
+:is(html[data-theme]) .font-try--bahnschrift {
+  font-family: Bahnschrift, "DIN Next", "Segoe UI", sans-serif;
+}
+
+/* Bahnschrift SemiBold */
+:is(html[data-theme]) .font-try--bahnschrift-semibold {
+  font-family: "Bahnschrift SemiBold", "Bahnschrift SemiBold Condensed", Bahnschrift, "Segoe UI", sans-serif;
+}
+
+/* Bahnschrift Condensed */
+:is(html[data-theme]) .font-try--bahnschrift-condensed {
+  font-family: "Bahnschrift Condensed", "Bahnschrift SemiCondensed", Bahnschrift, "Segoe UI", sans-serif;
+}
+
+/* Bahnschrift SemiCondensed */
+:is(html[data-theme]) .font-try--bahnschrift-semicondensed {
+  font-family: "Bahnschrift SemiCondensed", Bahnschrift, "Segoe UI", sans-serif;
+}
+
+/* Franklin Gothic */
+:is(html[data-theme]) .font-try--franklin {
+  font-family: "Franklin Gothic Medium", "Franklin Gothic", "Segoe UI", sans-serif;
+}
+
+/* Corbel */
+:is(html[data-theme]) .font-try--corbel {
+  font-family: Corbel, "Segoe UI", sans-serif;
+}
+
+/* Candara */
+:is(html[data-theme]) .font-try--candara {
+  font-family: Candara, "Segoe UI", sans-serif;
+}
+
+/* Trebuchet MS */
+:is(html[data-theme]) .font-try--trebuchet {
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+/* Cambria (serifada) */
+:is(html[data-theme]) .font-try--cambria {
+  font-family: Cambria, Georgia, serif;
+}
+
+/* Georgia (serifada) */
+:is(html[data-theme]) .font-try--georgia {
+  font-family: Georgia, Cambria, serif;
+}

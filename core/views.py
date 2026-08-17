@@ -144,6 +144,7 @@ SECOES_DA_GALERIA = (
     ("lista", "Lista"),
     ("formulario", "Formulário avançado"),
     ("estrutura", "Estrutura"),
+    ("tipografia", "Tipografia"),
 )
 
 

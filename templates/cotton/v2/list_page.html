@@ -1,4 +1,4 @@
-{% cotton:vars action_icon action_label action_url aside controls empty_message empty_title extra_class filter_empty_message filter_empty_title filter_mode page_obj page_querystring pages paginated rows tabs title %}
+{% cotton:vars action_icon action_label action_url aside cards controls empty_message empty_title extra_class filter_empty_message filter_empty_title filter_mode page_obj page_querystring pages paginated quick_add rows tabs title %}
 {% load icones %}
 {% comment %}
   List page v2 — o esqueleto de uma tela de lista: identidade, controles, o
@@ -40,6 +40,14 @@
   {% if controls %}
     <c-v2.rail>
       <c-slot name="controls">{{ controls }}</c-slot>
+      {% comment %}
+        O painel de criação inline mora no TRILHO, abaixo dos filtros: ele nasce
+        oculto e, ao abrir, empurra a lista para baixo em vez de cobri-la — quem
+        cadastra continua vendo o que já existe, que é como se percebe que o item
+        já estava lá. O gatilho vai junto, na fileira de controles, porque é de lá
+        que a ação parte.
+      {% endcomment %}
+      {% if quick_add %}<c-slot name="quick_add">{{ quick_add }}</c-slot>{% endif %}
     </c-v2.rail>
   {% endif %}
 
@@ -53,48 +61,62 @@
   {% if tabs %}<div class="list-page__tabs">{{ tabs }}</div>{% endif %}
 
   {% comment %}
-    SEM painel envolvente (2026-08-16): cada registro é um painel, e a lista é a
-    sequência deles. Um painel segurando vários cartões punha duas caixas
-    concêntricas em volta do mesmo conteúdo — e o cartão, que é a unidade que se
-    lê e se clica, ficava sendo conteúdo de outra coisa.
+    DOIS modos, e o `cards` escolhe (2026-08-16):
 
-    A paginação fica ACIMA da lista, junto das abas: "mostrando 11–20 de 48" é o
-    que se precisa saber ANTES de começar a ler. Sem o painel envolvente ela não
-    tem mais uma caixa para morar dentro — fica na régua da página, alinhada com
-    os cartões.
+    - `cards=True` — LISTA DE CARDS: um painel por item, sem painel envolvente. Um
+      painel segurando vários cartões punha duas caixas concêntricas em volta do
+      mesmo conteúdo. A paginação fica na régua da página, acima deles, porque não
+      há caixa onde morar.
+    - padrão — LISTA SIMPLES: um painel com os registros dentro, e a paginação
+      dentro dele também, acima da primeira linha. Ela fala sobre esta lista, e
+      fora da caixa ficava pairando sobre o fundo sem dizer de que grupo era.
+
+    Nos dois casos a paginação vem ANTES das linhas: "mostrando 11–20 de 48" é o
+    que se precisa saber para decidir se é aqui que se procura.
   {% endcomment %}
-  {% if paginated or page_obj %}
-    <c-v2.pagination
-      :page_obj="page_obj"
-      :page_querystring="page_querystring"
-      :pages="pages"
-      :required="paginated"
-    />
-  {% endif %}
+  {% if cards %}
+    {% if paginated or page_obj %}
+      <c-v2.pagination :page_obj="page_obj" :page_querystring="page_querystring" :pages="pages" :required="paginated" />
+    {% endif %}
 
-  {% if rows %}
-    <div class="list-page__rows">{{ rows }}</div>
-    {% comment %}
-      Os DOIS vazios continuam existindo, e são coisas diferentes: "nada
-      cadastrado" (abaixo) e "o filtro não achou nada" (aqui). Este nasce oculto e
-      é o `collection.js` quem o mostra, por `data-collection-empty` — sem ele,
-      buscar um termo errado deixa a tela em branco e parece perda de dados.
-
-      Ele vive FORA dos cartões porque não há mais painel envolvente para
-      hospedá-lo; a caixa é a dele mesma, `panel` sem miolo.
-    {% endcomment %}
-    <div class="panel panel--empty-band" data-collection-empty hidden>
-      <div class="panel__empty">
-        <h2 class="panel__empty-title">{{ filter_empty_title|default:'Nenhum registro para este filtro' }}</h2>
-        <p>{{ filter_empty_message|default:'Ajuste a busca ou limpe os filtros.' }}</p>
+    {% if rows %}
+      <div class="list-page__rows">{{ rows }}</div>
+      {% comment %}
+        O vazio de FILTRO nasce oculto e é o `collection.js` quem o mostra. Sem ele,
+        buscar um termo errado deixa a tela em branco e parece perda de dados. Aqui
+        ele tem caixa própria, porque não há painel envolvente para hospedá-lo.
+      {% endcomment %}
+      <div class="panel panel--empty-band" data-collection-empty hidden>
+        <div class="panel__empty">
+          <h2 class="panel__empty-title">{{ filter_empty_title|default:'Nenhum registro para este filtro' }}</h2>
+          <p>{{ filter_empty_message|default:'Ajuste a busca ou limpe os filtros.' }}</p>
+        </div>
       </div>
-    </div>
+    {% else %}
+      <c-v2.panel :empty_message="empty_message" :empty_title="empty_title" />
+    {% endif %}
   {% else %}
-    {% comment %}
-      O vazio da lista que nunca teve nada continua numa caixa: a mensagem precisa
-      de uma superfície onde pousar, senão fica texto solto no fundo da página.
-    {% endcomment %}
-    <c-v2.panel :empty_message="empty_message" :empty_title="empty_title" />
+    <c-v2.panel
+      :empty_message="empty_message"
+      :empty_title="empty_title"
+      :filter_empty_message="filter_empty_message"
+      :filter_empty_title="filter_empty_title"
+    >
+      {% comment %}
+        A paginação entra no MESMO slot dos registros, e só quando existem
+        registros: o painel decide mostrar o vazio olhando se o corpo veio em
+        branco, e uma paginação sempre presente faria o "nenhum registro
+        cadastrado" nunca aparecer.
+      {% endcomment %}
+      {% if rows %}
+        <c-slot name="body">
+          {% if paginated or page_obj %}
+            <c-v2.pagination :page_obj="page_obj" :page_querystring="page_querystring" :pages="pages" :required="paginated" />
+          {% endif %}
+          {{ rows }}
+        </c-slot>
+      {% endif %}
+    </c-v2.panel>
   {% endif %}
 
   {% if action_url %}

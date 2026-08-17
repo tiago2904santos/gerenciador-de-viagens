@@ -114,7 +114,12 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # placa, valor, trechos. Os nomes de classe são novos (`fact`,
         # `route-legs`) porque `fact-block` e `itinerary` ainda estão vivos nas
         # telas não migradas: declarar os mesmos repintaria a lista de ofícios.
-        self.assertEqual(len(self.components()), 126)
+        #
+        # 127 (2026-08-16): entrou `v2/quick_add.html`. O legado fazia criação
+        # inline dentro de um componente de ~50 variáveis que montava a tela
+        # inteira (`lists/list_page_quick_add.html`); aqui o painel é só o painel,
+        # e a lista o recebe pelo slot `quick_add` do `list_page`.
+        self.assertEqual(len(self.components()), 127)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.

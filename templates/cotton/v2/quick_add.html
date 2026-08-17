@@ -1,0 +1,67 @@
+{% cotton:vars action errors panel_id slot submit_label title toggle_label %}
+{% comment %}
+  Quick add v2 — criação inline na própria lista. Par de
+  `static/css/v2/quick-add.css`.
+
+  Modelo: o quick add de JUSTIFICATIVAS, e o comportamento é o dele, não uma
+  reinterpretação. O que isso significa, em concreto:
+
+  1. Há UM botão, não três. Fechado ele diz "Cadastrar …"; aberto, o próprio
+     `app.js` troca o texto para o rótulo de salvar e o clique SUBMETE o
+     formulário. Por isso o painel não tem rodapé de ações — foi o erro da
+     primeira versão, que pôs Cancelar/Salvar dentro dele e deixou o usuário com
+     dois caminhos para a mesma coisa.
+  2. O gatilho vem DEPOIS do painel na marcação, como no legado: ele é o fecho da
+     faixa de controles.
+  3. `aria-expanded` nasce `true` quando o formulário tem erro — um POST que
+     falhou reabre o painel com a mensagem, em vez de esconder o que deu errado.
+
+  Ganchos do `js/core/app.js:310-433`, que NÃO podem mudar de nome:
+
+  - `data-inline-create-toggle` no gatilho, com `aria-controls` do painel;
+  - `data-inline-create-submit-when-open` e `data-inline-create-save-label`, que
+    são o que faz o gatilho virar o botão de salvar;
+  - `.inline-create__toggle-label` no `<span>` do texto — é por esta CLASSE que o
+    JS acha o rótulo para trocar (`app.js:433`), e é a única classe do legado que
+    sobrevive aqui, porque renomeá-la deixaria o botão mudo;
+  - `id`, `hidden` e `data-create-action` no `<form>`.
+
+  O `<button>` é cru de propósito: são cinco atributos de contrato, três deles com
+  VALOR, e o `hook` do `c-v2.button` é impresso com escape — `&quot;` no valor faz
+  o seletor do JS não casar, defeito que já apareceu quatro vezes nesta migração.
+  Dentro de `templates/cotton/` o guarda de botão cru não se aplica
+  (`scripts/migrar_botoes_cotton.py:25`), e é para casos como este que a exceção
+  existe.
+
+  O resumo de erros fica FORA do corpo dos campos, filho direto do `<form>`: no
+  legado ele foi posto dentro e, como o corpo é `flex`, virou uma terceira coluna
+  ao lado dos campos e empurrou o formulário.
+{% endcomment %}
+{% load icones %}
+<form
+  class="quick-add__panel"
+  id="{{ panel_id }}"
+  method="post"
+  action="{{ action }}"
+  data-create-action="{{ action }}"
+  {% if not errors %}hidden{% endif %}
+  novalidate
+>
+  {% csrf_token %}
+  {% if errors %}<c-v2.form_errors :errors="errors" />{% endif %}
+  {% if title %}<h2 class="quick-add__title">{{ title }}</h2>{% endif %}
+  <div class="quick-add__body">{{ slot }}</div>
+</form>
+
+<button
+  class="button button--primary quick-add__toggle"
+  type="button"
+  data-inline-create-toggle
+  data-inline-create-submit-when-open
+  data-inline-create-save-label="{{ submit_label|default:'Salvar' }}"
+  aria-controls="{{ panel_id }}"
+  aria-expanded="{% if errors %}true{% else %}false{% endif %}"
+>
+  <span class="button__icon" aria-hidden="true">{% icone_svg "plus" %}</span>
+  <span class="inline-create__toggle-label">{{ toggle_label|default:"Cadastrar item" }}</span>
+</button>

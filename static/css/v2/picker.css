@@ -583,14 +583,20 @@
    68 — a caixa mudava de altura no instante em que o primeiro resultado
    aparecia. */
 :is(html[data-theme]) .picker--related {
-  --escolhido-height: 68px;
+  --escolhido-height: 52px;
 }
 
 :is(html[data-theme]) .picker--related .search-picker__selected-list {
-  /* Repetida NA LISTA porque a regra geral declara `--escolhido-height: 56px`
+  /* 52px, a MESMA altura do item de duas linhas da lista suspensa
+     (`--listbox-option-height` em `v2/listbox.css`): as duas peças mostram o
+     mesmo tipo de coisa — um item com nome em cima e detalhe embaixo —, e é a
+     mesma escolha feita duas vezes na tela. Com 68 aqui e 52 lá, o cartão do
+     ofício vinculado parecia de outra família (2026-08-16).
+
+     Repetida NA LISTA porque a regra geral declara `--escolhido-height: 56px`
      nela mesma, e o valor da própria lista vence o herdado da raiz — tanto para
      ela quanto para os cartões dentro dela. */
-  --escolhido-height: 68px;
+  --escolhido-height: 52px;
 
   max-height: calc(var(--escolhido-height, 56px) * 3 + var(--gap-tight) * 3);
   overflow-y: auto;

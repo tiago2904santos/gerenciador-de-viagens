@@ -1,4 +1,4 @@
-{% cotton:vars actions body extra_class eyebrow heading_level meta search_text status status_tone title %}
+{% cotton:vars actions body box extra_class eyebrow heading_level meta search_text status status_tone title %}
 {% comment %}
   Record v2 — o card de um registro na lista. Par de `static/css/v2/record.css`.
 
@@ -8,10 +8,19 @@
   desenhava a própria caixa havia duas folhas decidindo a mesma coisa, e ele
   saía com raio diferente de qualquer outra caixa da tela.
 
-  Voltou a ser `panel` (e não `form-block--v2`): o cartão É o painel. A lista é
-  uma sequência de painéis, um por registro, e não vários blocos dentro de um
-  painel só — foi a decisão do dono ao ver a lista montada. O degrau continua
-  vindo de `v2/surface.css`, onde a escada mora.
+  A CAIXA depende do tipo de lista, e as duas existem (2026-08-16):
+
+  - `box="panel"` — LISTA DE CARDS: um painel por item. O cartão cresce por
+    camadas (equipe, blocos de fato, rodapé) e é a unidade que se lê e se clica,
+    então ele é a primeira caixa sobre a página. É o modelo do ofício.
+  - padrão (`form-block--v2`) — LISTA SIMPLES: vários registros dentro de um
+    painel só. Cada linha é um bloco de conteúdo do grupo, não um grupo. É o que
+    termos, OS e roteiros usam.
+
+  Quem escolhe é o `list_page`, por `cards`: as duas metades da decisão têm de
+  combinar, senão sai painel dentro de painel ou bloco solto sobre a página.
+
+  O degrau de superfície continua vindo de `v2/surface.css`, onde a escada mora.
 
   DUAS linhas, no máximo: eyebrow, título e selo na primeira; a meta na
   segunda. Numa lista longa cada linha extra multiplica pela quantidade de
@@ -36,7 +45,7 @@
   — protocolo, CPF, número do ofício.
 {% endcomment %}
 <article
-  class="record panel{% if extra_class %} {{ extra_class }}{% endif %}"
+  class="record {% if box == 'panel' %}panel{% else %}form-block--v2{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
   data-collection-item
   {% if search_text %}data-search-text="{{ search_text }}"{% endif %}
   {% if status %}data-status-value="{{ status }}"{% endif %}

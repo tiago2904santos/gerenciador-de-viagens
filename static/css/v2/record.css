@@ -68,6 +68,13 @@
 :is(html[data-theme]) .record__status {
   align-items: center;
   display: inline-flex;
+  /* JUNTO DO TEXTO — sem `margin-left: auto`. Esta posição foi e voltou três
+     vezes em 2026-08-16; o estado final é este. O que a sustenta: o selo
+     qualifica o título, e "Nº 150/2026 · LONDRINA/PR" + "Cancelado" é uma frase
+     só. Quem vai para a ponta direita são as AÇÕES.
+
+     `flex: none` para ele não encolher quando o título é longo: um selo espremido
+     perde a pílula e vira texto solto. */
   flex: none;
 }
 
@@ -144,6 +151,28 @@
    dissolve a caixa dele para o layout mas não muda a árvore — o bloco continua
    filho do miolo no DOM. É a mesma armadilha que já custou uma medição com as
    linhas de pessoa, e ela reaparece a cada camada que se dissolve. */
+/* O corpo do bloco: SEM vão e alinhado ao TOPO.
+ *
+ * Esta regra já existiu e foi apagada por engano num corte de linhas quando as
+ * faixas saíram — foi ela que levou os degraus de corpo por quantidade de fatos
+ * embora, e o que eu na hora atribuí ao `clamp` apertado era isto.
+ *
+ * `align-content: start` e `row-gap: 0` porque distribuir folga É criar vão: com
+ * `space-between` e dois fatos, abria-se entre eles um espaço do tamanho de um
+ * deles. Agora ficam juntos e a folga sobra embaixo, junta.
+ *
+ * `container-type: inline-size` é o que dá sentido ao `cqw` do `fact__value`:
+ * por cento da largura do BLOCO, não da janela. Sem ele o corpo ideal do texto
+ * passa a se medir pela viewport, e um bloco estreito recebe corpo de tela cheia.
+ */
+:is(html[data-theme]) .record .form-block--v2 > .form-block__body {
+  align-content: start;
+  container-type: inline-size;
+  min-height: 0;
+  overflow: hidden;
+  row-gap: 0;
+}
+
 :is(html[data-theme]) .record .form-block--v2 {
   grid-column: span 2;
   /* O teto vive no BLOCO, e não numa linha da grade: `grid-auto-rows` não sabe
@@ -161,6 +190,28 @@
    dissolve a caixa dele para o layout mas não muda a árvore — o bloco continua
    filho do miolo no DOM. É a mesma armadilha que já custou uma medição com as
    linhas de pessoa, e ela reaparece a cada camada que se dissolve. */
+/* O corpo do bloco: SEM vão e alinhado ao TOPO.
+ *
+ * Esta regra já existiu e foi apagada por engano num corte de linhas quando as
+ * faixas saíram — foi ela que levou os degraus de corpo por quantidade de fatos
+ * embora, e o que eu na hora atribuí ao `clamp` apertado era isto.
+ *
+ * `align-content: start` e `row-gap: 0` porque distribuir folga É criar vão: com
+ * `space-between` e dois fatos, abria-se entre eles um espaço do tamanho de um
+ * deles. Agora ficam juntos e a folga sobra embaixo, junta.
+ *
+ * `container-type: inline-size` é o que dá sentido ao `cqw` do `fact__value`:
+ * por cento da largura do BLOCO, não da janela. Sem ele o corpo ideal do texto
+ * passa a se medir pela viewport, e um bloco estreito recebe corpo de tela cheia.
+ */
+:is(html[data-theme]) .record .form-block--v2 > .form-block__body {
+  align-content: start;
+  container-type: inline-size;
+  min-height: 0;
+  overflow: hidden;
+  row-gap: 0;
+}
+
 :is(html[data-theme]) .record .form-block--v2 {
     grid-column: 1 / -1;
   }

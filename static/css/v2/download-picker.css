@@ -126,9 +126,14 @@
 }
 
 :is(html[data-theme]) .download-picker__options {
+  /* Os dois grupos EMPILHADOS, um por linha. Lado a lado, cada um recebia metade
+     da largura e as pílulas ficavam de tamanhos diferentes conforme o rótulo
+     ("PDF" contra "Arquivos separados") — quatro caixas de quatro larguras,
+     desalinhadas entre si. Empilhados, cada linha tem duas pílulas iguais e as
+     duas linhas se alinham uma sob a outra. */
   display: grid;
   gap: var(--gap);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
 }
 
 /* Uma régua separa a ESCOLHA (o que baixar) do AJUSTE (como baixar). São duas
@@ -150,18 +155,19 @@
 :is(html[data-theme]) .download-picker__option {
   border: 0;
   display: grid;
-  /* As duas opções LADO A LADO, em pílulas. Empilhadas, cada grupo ocupava a
-     altura de duas linhas e o modal ficava alto e vazio; e o rádio nativo, solto
-     à esquerda de cada rótulo, era o único controle do sistema que ainda tinha
-     desenho de navegador. */
-  gap: 6px var(--gap-tight);
-  grid-template-columns: repeat(2, auto);
-  justify-content: start;
+  gap: 6px;
+  /* Duas colunas IGUAIS: a escolha é binária nos dois grupos, e pílulas de
+     tamanhos diferentes davam à opção de rótulo mais longo um peso que ela não
+     tem. `1fr` iguala as duas e alinha as linhas entre si. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin: 0;
   min-width: 0;
   padding: 0;
 }
 
+/* `legend` dentro de grid é elemento especial: sem `grid-column` explícito ele
+   ocupa a primeira trilha e empurra a primeira pílula para a segunda, deixando
+   um buraco na terceira. */
 :is(html[data-theme]) .download-picker__legend {
   grid-column: 1 / -1;
 }
@@ -256,19 +262,11 @@
   color: var(--status-late);
 }
 
-/* O erro é uma FAIXA, não uma linha de texto vermelho: solto entre as opções e
-   o rodapé, ele se lia como legenda do último campo. */
-:is(html[data-theme]) .download-picker__error {
-  background: color-mix(in srgb, var(--status-late) 12%, transparent);
-  border-radius: var(--radius-field);
-  color: var(--status-late);
-  font-size: var(--text-size-eyebrow);
-  font-weight: var(--weight-strong);
-  margin: 0;
-  padding: var(--gap-tight) var(--gap);
-}
-
-:is(html[data-theme]) .download-picker__error[hidden] {
+/* O erro é o `.alert` global; aqui fica só o guarda do `[hidden]`, porque o
+   alerta declara `display` e isso vence a regra de agente do usuário — sem o par
+   ele apareceria vazio dentro do modal desde a abertura. A folha do picker não
+   redesenha o alerta: foi o que evitou uma segunda aparência para "deu erro". */
+:is(html[data-theme]) .download-picker .alert[hidden] {
   display: none;
 }
 

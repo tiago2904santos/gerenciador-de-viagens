@@ -47,7 +47,7 @@
      CONTRASTE contra o fundo do menu, não a porcentagem. Com 10% dava 1.18
      contra os 1.35 do escuro, e a linha escolhida praticamente sumia no claro
      enquanto saltava no escuro. Agora os dois medem 1.34. */
-  --surface-selected: color-mix(in srgb, var(--accent) 17%, var(--surface-field));
+  --surface-selected: color-mix(in srgb, var(--accent) 17%, var(--surface-rail));
   /* Sombra da camada que flutua sobre a página (menu do select, lista do
      picker). Vira token porque as duas precisam ser a MESMA, e cada folha
      escrevendo o seu valor foi como elas divergiram. */
@@ -119,7 +119,13 @@
   --text-size-base: 14px;
   --text-size-title: 24px;
   --weight-normal: 500;
-  --weight-strong: 700;
+  /* 900, e não 700 (2026-08-16): o traço da Bahnschrift é mais fino que o da
+     Inter no mesmo número, e a 700 as peças fortes ficavam sem presença. O peso
+     foi escolhido no provador do UI Lab, com a interface inteira na fonte nova —
+     não numa amostra isolada. `--fact-weight` acompanha, para o valor grande do
+     cartão não ficar mais leve que o título. */
+  --weight-strong: 900;
+  --fact-weight: 900;
 
   /* ---- movimento ------------------------------------------------------- */
   --ease: 150ms ease;

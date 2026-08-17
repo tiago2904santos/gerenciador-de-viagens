@@ -1,0 +1,45 @@
+/* Quick add — criação inline na lista. Depende de `v2/tokens.css`.
+ * Par de `templates/cotton/v2/quick_add.html`.
+ *
+ * O painel é a caixa que se abre ENTRE os filtros e a lista: quem cadastra um
+ * cargo ou um combustível não sai da tela para isso, e é essa a razão do quick
+ * add existir. Por isso ele assume a superfície do contêiner que o recebe (o
+ * trilho), e não a da página.
+ */
+
+:is(html[data-theme]) .quick-add__panel {
+  background: var(--surface-contrast, var(--surface-field));
+  border-radius: var(--radius-field);
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+  padding: var(--gap);
+}
+
+/* O `display: grid` acima vence o `[hidden]`, que é regra de agente do usuário —
+   e o painel NASCE oculto: é o `app.js` quem o abre. Sem este par ele aparece
+   escancarado embaixo dos filtros em todas as oito telas de cadastro. */
+:is(html[data-theme]) .quick-add__panel[hidden] {
+  display: none;
+}
+
+:is(html[data-theme]) .quick-add__title {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  margin: 0;
+}
+
+:is(html[data-theme]) .quick-add__body {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+/* SEM rodapé de ações: o gatilho é que salva quando o painel está aberto (é o
+   comportamento do quick add de justificativas). O que sobra aqui é o lugar dele
+   na faixa — fecho da linha de controles, alinhado à direita. */
+:is(html[data-theme]) .quick-add__toggle {
+  justify-self: end;
+}

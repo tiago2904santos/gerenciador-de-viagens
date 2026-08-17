@@ -74,7 +74,14 @@
         segundo arquivo chega sem aviso e parece um download que ninguém pediu.
       {% endcomment %}
       <ul class="download-picker__queue" data-download-picker-queue hidden></ul>
-      <p class="download-picker__error" data-download-picker-error hidden role="alert"></p>
+      {% comment %}
+        O erro usa o ALERTA GLOBAL (`.alert` + `data-tone="error"`), e não um
+        estilo próprio: a mensagem de falha é a mesma coisa em toda a tela do
+        sistema, e uma segunda aparência para ela seria uma segunda convenção
+        para aprender. `role="alert"` fica porque aqui a mensagem surge DEPOIS
+        de uma ação — o leitor de tela precisa ser interrompido.
+      {% endcomment %}
+      <p class="alert" data-tone="error" data-download-picker-error hidden role="alert"></p>
     </div>
   </c-slot>
 

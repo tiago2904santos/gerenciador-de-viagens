@@ -1,11 +1,15 @@
-{% cotton:vars controls extra_class surface %}
+{% cotton:vars controls extra_class quick_add surface %}
 {% comment %}
   Rail v2 — a faixa de controles abaixo do header. Par de `static/css/v2/rail.css`.
 
   Chamava-se "sub-header" no sistema antigo; o nome novo diz o papel e não o
   lugar, porque a mesma faixa serve lista, wizard e detalhe.
 
+  `quick_add` é o painel de criação inline, que fica ABAIXO dos controles e nasce
+  oculto. Ele mora aqui, e não solto na página, porque ao abrir precisa empurrar a
+  lista para baixo — dentro do trilho isso é o comportamento natural do fluxo.
 {% endcomment %}
 <div class="rail{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
   {% if controls %}<div class="rail__controls">{{ controls }}</div>{% endif %}
+  {% if quick_add %}{{ quick_add }}{% endif %}
 </div>

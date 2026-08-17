@@ -1,6 +1,12 @@
 /* Fatos e trechos — o miolo informativo do card de lista. Depende de
  * `v2/tokens.css`.
  *
+ * O peso das peças fortes sai de `--fact-weight` (800 por padrão). A variável
+ * existe para o provador de tipografia poder mexer nele ao vivo: `800` cravado
+ * no lugar ignorava o controle de peso, e comparar duas famílias sem poder
+ * ajustar o peso mente sobre as duas — a Bahnschrift a 700 parece leve porque o
+ * traço dela é mais fino que o da Inter no mesmo número.
+ *
  * É a peça que faltava para o cartão do v2 dizer o que o cartão de ofício já
  * dizia: placa e modelo, o itinerário, o valor das diárias. O legado resolvia
  * isso com `.fact-grid`/`.fact-block`/`.itinerary`, nomes que ainda estão
@@ -54,13 +60,21 @@
    para achar o que procura. */
 :is(html[data-theme]) .fact__label {
   color: var(--accent);
-  font-size: var(--text-size-eyebrow);
+  /* Menor que o `eyebrow` do sistema: o rótulo é etiqueta, e no cartão ele divide
+     uma caixa apertada com um valor grande. Do tamanho anterior, "MOTORISTA
+     EXTERNO" ocupava quase a mesma altura visual do número que ele nomeia. O
+     accent e o peso 800 continuam dando a ele o destaque de que precisa para ser
+     achado de relance — não precisa de corpo para isso. */
+  font-size: 0.68rem;
   /* 800, não 700: a Inter é variável e o peso extra é o que faz o rótulo miúdo
      aguentar o valor gigante logo abaixo sem parecer legenda esquecida. */
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font-weight: var(--fact-weight, 800);
+  letter-spacing: 0.07em;
   line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 /* O valor é GRANDE. No original a placa e o total ocupam a altura de duas
@@ -80,7 +94,7 @@
 :is(html[data-theme]) .fact__value {
   color: var(--text-strong);
   font-size: var(--fact-value-size, clamp(1.05rem, 11cqw, 1.65rem));
-  font-weight: 800;
+  font-weight: var(--fact-weight, 800);
   letter-spacing: -0.02em;
   line-height: 1.1;
   min-width: 0;
@@ -97,7 +111,13 @@
 /* O total das diárias é o valor que a lista existe para comparar — um degrau
    acima dos outros, e só ele. */
 :is(html[data-theme]) .fact__value--strong {
-  font-size: var(--fact-value-size-strong, clamp(1.15rem, 13cqw, 1.95rem));
+  /* 18cqw e teto de 3rem: é o número que a lista existe para comparar, e com o
+     `fit-text.js` medindo não há risco de estourar — se não couber, ele desce. O
+     valor anterior (13cqw / 1,95rem) deixava o total menor do que a caixa
+     permitia. Este é o FALLBACK e hoje é o valor efetivo: os degraus por
+     quantidade de fatos que ficavam em `v2/record.css` foram apagados por engano
+     num corte e não voltaram — quando voltarem, é aqui que se comparam. */
+  font-size: var(--fact-value-size-strong, clamp(1.15rem, 18cqw, 3rem));
 }
 
 /* Valor ausente não vira espaço em branco: um cartão com um buraco no lugar da
@@ -113,11 +133,17 @@
 }
 
 /* A linha de apoio fica logo sob o valor, miúda, com um respiro que a separa do
-   próximo rótulo. */
+   próximo rótulo — e em UMA linha, como o valor: "mil duzentos e quarenta e oito
+   reais" quebrando em duas somava altura que o teto do bloco não tem, e empurrava
+   o fato seguinte para fora. Quem encolhe é o `fit-text.js`, com piso de 9px
+   (mais baixo que o do valor, porque aqui o texto é longo por natureza). */
 :is(html[data-theme]) .fact__note {
   color: var(--text-muted);
   font-size: var(--text-size-eyebrow);
   line-height: var(--fact-note-line, 1.35);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ---- trechos --------------------------------------------------------------
@@ -155,7 +181,7 @@
 :is(html[data-theme]) .route-legs__path {
   color: var(--text-strong);
   font-size: var(--text-size-base);
-  font-weight: 800;
+  font-weight: var(--fact-weight, 800);
   min-width: 0;
   overflow-wrap: anywhere;
 }

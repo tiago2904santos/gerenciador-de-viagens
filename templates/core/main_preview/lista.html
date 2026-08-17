@@ -102,7 +102,13 @@
       conteúdo, e era isso que se via na galeria — a lista real não faz isso
       desde que o painel envolvente saiu do `list_page` (2026-08-16).
     {% endcomment %}
+    {% comment %}
+      `box="panel"`: este é o cartão da LISTA DE CARDS — um painel por item. Os
+      dois cartões simples abaixo ficam no padrão (`form-block--v2`), que é a peça
+      da lista simples, onde vários registros dividem um painel só.
+    {% endcomment %}
     <c-v2.record
+      box="panel"
       title="Nº 153/2026 · ARAPONGAS/PR"
       meta="12/08 a 15/08/2026 · Evento: Operação Integrada"
       status="Em andamento"
@@ -172,6 +178,44 @@
       </c-slot>
     </c-v2.record>
 
+    <h3 class="v2-lab__sub">Criação inline (quick add)</h3>
+
+    {% comment %}
+      O painel nasce OCULTO e é o `js/core/app.js` quem o abre, pelo gatilho com
+      `data-inline-create-toggle` + `aria-controls`. Aqui ele está fora de uma
+      lista completa só para caber na vitrine; nas oito telas de cadastro ele
+      entra pelo slot `quick_add` do `list_page`, dentro do trilho.
+
+      Modelo: o quick add de justificativas, o mais completo dos oito.
+    {% endcomment %}
+    <c-v2.panel>
+      <c-slot name="body">
+        {% comment %}
+          UM botão: fechado diz "Cadastrar cargo", aberto vira "Salvar cargo" e
+          submete — é o comportamento do quick add de justificativas, que é o
+          modelo. Quem troca o texto é o `app.js`, pela classe do `<span>`.
+        {% endcomment %}
+        <c-v2.quick_add
+          panel_id="lab-quick-add"
+          action="#"
+          toggle_label="Cadastrar cargo"
+          submit_label="Salvar cargo"
+          title="Novo cargo"
+        >
+          <c-v2.field label="Nome do cargo">
+            <c-slot name="control">
+              <c-v2.input placeholder="Ex.: Investigador" aria_label="Nome do cargo" />
+            </c-slot>
+          </c-v2.field>
+          <c-v2.field label="Sigla" help="Aparece nos documentos gerados.">
+            <c-slot name="control">
+              <c-v2.input placeholder="Ex.: INV" aria_label="Sigla do cargo" />
+            </c-slot>
+          </c-v2.field>
+        </c-v2.quick_add>
+      </c-slot>
+    </c-v2.panel>
+
     <h3 class="v2-lab__sub">Card de lista — Ordem de Serviço</h3>
 
     {% comment %}
@@ -184,19 +228,29 @@
       conteúdo, e era isso que se via na galeria — a lista real não faz isso
       desde que o painel envolvente saiu do `list_page` (2026-08-16).
     {% endcomment %}
-    <c-v2.record
-      title="OS nº 41/2026 · ARAPONGAS/PR"
-      meta="12/08 a 15/08/2026"
-      status="Em andamento"
-      status_tone="progress"
-      search_text="os 41"
-    >
-      <c-slot name="actions">
-        <c-v2.icon_button icon="folder" :menu_id="v2_menu.id" aria_label="Documentos da OS" tooltip="Visualizar e baixar" />
-        <c-v2.menu_body :menu="v2_menu" />
-        <c-v2.delete_button url="#" label="OS nº 41/2026" aria_label="Excluir OS" />
+    {% comment %}
+      Lista SIMPLES, no modelo da de termos: UM painel com os registros dentro,
+      cada um como bloco (`form-block--v2`, o padrão do `record`). Solto sobre a
+      página o registro virava um cartão da lista de cards, que é o outro modelo.
+      Todas as listas simples do sistema partem daqui.
+    {% endcomment %}
+    <c-v2.panel>
+      <c-slot name="body">
+        <c-v2.record
+          title="OS nº 41/2026 · ARAPONGAS/PR"
+          meta="12/08 a 15/08/2026"
+          status="Em andamento"
+          status_tone="progress"
+          search_text="os 41"
+        >
+          <c-slot name="actions">
+            <c-v2.icon_button icon="folder" :menu_id="v2_menu.id" aria_label="Documentos da OS" tooltip="Visualizar e baixar" />
+            <c-v2.menu_body :menu="v2_menu" />
+            <c-v2.delete_button url="#" label="OS nº 41/2026" aria_label="Excluir OS" />
+          </c-slot>
+        </c-v2.record>
       </c-slot>
-    </c-v2.record>
+    </c-v2.panel>
 
     <h3 class="v2-lab__sub">Card de lista — Roteiro</h3>
 
@@ -211,17 +265,27 @@
       conteúdo, e era isso que se via na galeria — a lista real não faz isso
       desde que o painel envolvente saiu do `list_page` (2026-08-16).
     {% endcomment %}
-    <c-v2.record
-      title="CURITIBA/PR → ADRIANÓPOLIS/PR"
-      meta="02/06 a 11/06/2026 · 2 trechos · R$ 2.658,53"
-      search_text="curitiba adrianopolis"
-    >
-      <c-slot name="actions">
-        <c-v2.icon_button icon="folder" :menu_id="v2_menu.id" aria_label="Documentos do roteiro" tooltip="Visualizar e baixar" />
-        <c-v2.menu_body :menu="v2_menu" />
-        <c-v2.delete_button url="#" label="Roteiro de Curitiba" aria_label="Excluir roteiro" />
+    {% comment %}
+      Lista SIMPLES, no modelo da de termos: UM painel com os registros dentro,
+      cada um como bloco (`form-block--v2`, o padrão do `record`). Solto sobre a
+      página o registro virava um cartão da lista de cards, que é o outro modelo.
+      Todas as listas simples do sistema partem daqui.
+    {% endcomment %}
+    <c-v2.panel>
+      <c-slot name="body">
+        <c-v2.record
+          title="CURITIBA/PR → ADRIANÓPOLIS/PR"
+          meta="02/06 a 11/06/2026 · 2 trechos · R$ 2.658,53"
+          search_text="curitiba adrianopolis"
+        >
+          <c-slot name="actions">
+            <c-v2.icon_button icon="folder" :menu_id="v2_menu.id" aria_label="Documentos do roteiro" tooltip="Visualizar e baixar" />
+            <c-v2.menu_body :menu="v2_menu" />
+            <c-v2.delete_button url="#" label="Roteiro de Curitiba" aria_label="Excluir roteiro" />
+          </c-slot>
+        </c-v2.record>
       </c-slot>
-    </c-v2.record>
+    </c-v2.panel>
 
     <h3 class="v2-lab__sub">Escolher o que baixar</h3>
 

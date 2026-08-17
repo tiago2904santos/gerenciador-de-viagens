@@ -1,0 +1,220 @@
+{% comment %}
+  Seção "Tipografia" da galeria — o PROVADOR de fontes.
+
+  Cada candidata aparece com as medidas que o sistema usa de verdade: título de
+  registro, meta, rótulo em caixa alta e o valor grande. É onde as diferenças
+  aparecem — não num parágrafo de exemplo.
+
+  "Aplicar na interface" reescreve `--font-sans` no `<html>` e a tela INTEIRA
+  troca de fonte, sidebar inclusive; o controle de peso mexe em
+  `--weight-strong` e `--fact-weight`. Nada é gravado: recarregar volta ao padrão.
+
+  As pilhas estão em `static/css/v2/font-try.css`, uma classe por candidata —
+  `style=` inline é proibido por contrato (`test_dark_redesign`).
+
+  Só a Inter está empacotada em `base/fonts.css`; as demais dependem da fonte
+  instalada no Windows. Adotar uma é etapa própria: baixar a webfont, empacotar
+  como a Inter está, e trocar o token.
+{% endcomment %}
+<h2 class="v2-lab__group">Tipografia</h2>
+
+<c-v2.panel title="Provador" description="Clique em uma candidata para ver o sistema inteiro nela. Recarregar desfaz.">
+  <c-slot name="body">
+    <p class="font-try__meta">Em uso agora: <strong data-font-try-current>Inter Variable (padrão do sistema)</strong> · peso <strong data-font-weight-current>700</strong></p>
+    {% comment %}
+      O peso é controle SEPARADO da família, e vale para título, valor, rótulo e
+      selo de uma vez. Bahnschrift a 700 parece leve porque o traço dela é mais
+      fino que o da Inter no mesmo número — sem poder subir o peso, a comparação
+      entre famílias mente sobre as duas. O número sai do RÓTULO do botão: gancho
+      com valor é impresso com escape e o seletor nunca casa.
+    {% endcomment %}
+    <div class="v2-lab__row">
+      <c-v2.button label="Peso 600" size="sm" hook="data-font-weight-step" />
+      <c-v2.button label="Peso 700" size="sm" hook="data-font-weight-step" />
+      <c-v2.button label="Peso 800" size="sm" hook="data-font-weight-step" />
+      <c-v2.button label="Peso 900" size="sm" hook="data-font-weight-step" />
+      <c-v2.button label="Voltar ao padrão" icon="x" hook="data-font-try-reset" />
+    </div>
+  </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Inter Variable (atual)" description="A de hoje. Neutra por projeto — é a razão de parecer sem graça, e também de nunca atrapalhar.">
+  <c-slot name="body">
+    <div class="font-try__sample font-try--inter" data-font-sample>
+      <p class="font-try__title">Nº 153/2026 · ARAPONGAS/PR</p>
+      <p class="font-try__meta">12/08 a 15/08/2026 · Evento: Operação Integrada</p>
+      <span class="fact__label">Valor total</span>
+      <div class="font-try__value">R$ 1.248,00</div>
+      <span class="fact__note">mil duzentos e quarenta e oito reais · 3,5 diárias · ABC-1D23</span>
+    </div>
+  </c-slot>
+  <c-slot name="actions">
+    <c-v2.button label="Aplicar na interface" size="sm" hook="data-font-try" />
+  </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Segoe UI Variable" description="A do próprio Windows. Ganha em nitidez nos corpos miúdos, que é metade do texto de um cartão.">
+  <c-slot name="body">
+    <div class="font-try__sample font-try--segoe" data-font-sample>
+      <p class="font-try__title">Nº 153/2026 · ARAPONGAS/PR</p>
+      <p class="font-try__meta">12/08 a 15/08/2026 · Evento: Operação Integrada</p>
+      <span class="fact__label">Valor total</span>
+      <div class="font-try__value">R$ 1.248,00</div>
+      <span class="fact__note">mil duzentos e quarenta e oito reais · 3,5 diárias · ABC-1D23</span>
+    </div>
+  </c-slot>
+  <c-slot name="actions">
+    <c-v2.button label="Aplicar na interface" size="sm" hook="data-font-try" />
+  </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Bahnschrift (DIN)" description="Condensada, de sinalização. Números altos e estreitos — favorece placa e valor.">
+  <c-slot name="body">
+    <div class="font-try__sample font-try--bahnschrift" data-font-sample>
+      <p class="font-try__title">Nº 153/2026 · ARAPONGAS/PR</p>
+      <p class="font-try__meta">12/08 a 15/08/2026 · Evento: Operação Integrada</p>
+      <span class="fact__label">Valor total</span>
+      <div class="font-try__value">R$ 1.248,00</div>
+      <span class="fact__note">mil duzentos e quarenta e oito reais · 3,5 diárias · ABC-1D23</span>
+    </div>
+  </c-slot>
+  <c-slot name="actions">
+    <c-v2.button label="Aplicar na interface" size="sm" hook="data-font-try" />
+  </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Bahnschrift SemiBold" description="O corte SemiBold da mesma família: o desenho que você gostou, com mais traço de fábrica.">
+  <c-slot name="body">
+    <div class="font-try__sample font-try--bahnschrift-semibold" data-font-sample>
+      <p class="font-try__title">Nº 153/2026 · ARAPONGAS/PR</p>
+      <p class="font-try__meta">12/08 a 15/08/2026 · Evento: Operação Integrada</p>
+      <span class="fact__label">Valor total</span>
+      <div class="font-try__value">R$ 1.248,00</div>
+      <span class="fact__note">mil duzentos e quarenta e oito reais · 3,5 diárias · ABC-1D23</span>
+    </div>
+  </c-slot>
+  <c-slot name="actions">
+    <c-v2.button label="Aplicar na interface" size="sm" hook="data-font-try" />
+  </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Bahnschrift Condensed" description="Mais estreita: parece mais pesada porque o mesmo traço ocupa menos largura.">
+  <c-slot name="body">
+    <div class="font-try__sample font-try--bahnschrift-condensed" data-font-sample>
+      <p class="font-try__title">Nº 153/2026 · ARAPONGAS/PR</p>
+      <p class="font-try__meta">12/08 a 15/08/2026 · Evento: Operação Integrada</p>
+      <span class="fact__label">Valor total</span>
+      <div class="font-try__value">R$ 1.248,00</div>
+      <span class="fact__note">mil duzentos e quarenta e oito reais · 3,5 diárias · ABC-1D23</span>
+    </div>
+  </c-slot>
+  <c-slot name="actions">
+    <c-v2.button label="Aplicar na interface" size="sm" hook="data-font-try" />
+  </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Bahnschrift SemiCondensed" description="Meio caminho entre a normal e a condensada — costuma ser a mais legível das três.">
+  <c-slot name="body">
+    <div class="font-try__sample font-try--bahnschrift-semicondensed" data-font-sample>
+      <p class="font-try__title">Nº 153/2026 · ARAPONGAS/PR</p>
+      <p class="font-try__meta">12/08 a 15/08/2026 · Evento: Operação Integrada</p>
+      <span class="fact__label">Valor total</span>
+      <div class="font-try__value">R$ 1.248,00</div>
+      <span class="fact__note">mil duzentos e quarenta e oito reais · 3,5 diárias · ABC-1D23</span>
+    </div>
+  </c-slot>
+  <c-slot name="actions">
+    <c-v2.button label="Aplicar na interface" size="sm" hook="data-font-try" />
+  </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Franklin Gothic" description="Peso alto por natureza, ar de documento oficial. Rótulos em caixa alta ficam firmes.">
+  <c-slot name="body">
+    <div class="font-try__sample font-try--franklin" data-font-sample>
+      <p class="font-try__title">Nº 153/2026 · ARAPONGAS/PR</p>
+      <p class="font-try__meta">12/08 a 15/08/2026 · Evento: Operação Integrada</p>
+      <span class="fact__label">Valor total</span>
+      <div class="font-try__value">R$ 1.248,00</div>
+      <span class="fact__note">mil duzentos e quarenta e oito reais · 3,5 diárias · ABC-1D23</span>
+    </div>
+  </c-slot>
+  <c-slot name="actions">
+    <c-v2.button label="Aplicar na interface" size="sm" hook="data-font-try" />
+  </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Corbel" description="Humanista, letra mais aberta. Texto corrido mais macio; números um pouco menos rígidos.">
+  <c-slot name="body">
+    <div class="font-try__sample font-try--corbel" data-font-sample>
+      <p class="font-try__title">Nº 153/2026 · ARAPONGAS/PR</p>
+      <p class="font-try__meta">12/08 a 15/08/2026 · Evento: Operação Integrada</p>
+      <span class="fact__label">Valor total</span>
+      <div class="font-try__value">R$ 1.248,00</div>
+      <span class="fact__note">mil duzentos e quarenta e oito reais · 3,5 diárias · ABC-1D23</span>
+    </div>
+  </c-slot>
+  <c-slot name="actions">
+    <c-v2.button label="Aplicar na interface" size="sm" hook="data-font-try" />
+  </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Candara" description="Humanista com mais personalidade — a que menos parece formulário.">
+  <c-slot name="body">
+    <div class="font-try__sample font-try--candara" data-font-sample>
+      <p class="font-try__title">Nº 153/2026 · ARAPONGAS/PR</p>
+      <p class="font-try__meta">12/08 a 15/08/2026 · Evento: Operação Integrada</p>
+      <span class="fact__label">Valor total</span>
+      <div class="font-try__value">R$ 1.248,00</div>
+      <span class="fact__note">mil duzentos e quarenta e oito reais · 3,5 diárias · ABC-1D23</span>
+    </div>
+  </c-slot>
+  <c-slot name="actions">
+    <c-v2.button label="Aplicar na interface" size="sm" hook="data-font-try" />
+  </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Trebuchet MS" description="Desenho com caráter, quase informal. Boa em título, discutível em tabela.">
+  <c-slot name="body">
+    <div class="font-try__sample font-try--trebuchet" data-font-sample>
+      <p class="font-try__title">Nº 153/2026 · ARAPONGAS/PR</p>
+      <p class="font-try__meta">12/08 a 15/08/2026 · Evento: Operação Integrada</p>
+      <span class="fact__label">Valor total</span>
+      <div class="font-try__value">R$ 1.248,00</div>
+      <span class="fact__note">mil duzentos e quarenta e oito reais · 3,5 diárias · ABC-1D23</span>
+    </div>
+  </c-slot>
+  <c-slot name="actions">
+    <c-v2.button label="Aplicar na interface" size="sm" hook="data-font-try" />
+  </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Cambria (serifada)" description="Serifada. Dá peso institucional; o contraste com a interface é grande.">
+  <c-slot name="body">
+    <div class="font-try__sample font-try--cambria" data-font-sample>
+      <p class="font-try__title">Nº 153/2026 · ARAPONGAS/PR</p>
+      <p class="font-try__meta">12/08 a 15/08/2026 · Evento: Operação Integrada</p>
+      <span class="fact__label">Valor total</span>
+      <div class="font-try__value">R$ 1.248,00</div>
+      <span class="fact__note">mil duzentos e quarenta e oito reais · 3,5 diárias · ABC-1D23</span>
+    </div>
+  </c-slot>
+  <c-slot name="actions">
+    <c-v2.button label="Aplicar na interface" size="sm" hook="data-font-try" />
+  </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Georgia (serifada)" description="Serifada de tela, números antigos (old-style). A mais distante da atual.">
+  <c-slot name="body">
+    <div class="font-try__sample font-try--georgia" data-font-sample>
+      <p class="font-try__title">Nº 153/2026 · ARAPONGAS/PR</p>
+      <p class="font-try__meta">12/08 a 15/08/2026 · Evento: Operação Integrada</p>
+      <span class="fact__label">Valor total</span>
+      <div class="font-try__value">R$ 1.248,00</div>
+      <span class="fact__note">mil duzentos e quarenta e oito reais · 3,5 diárias · ABC-1D23</span>
+    </div>
+  </c-slot>
+  <c-slot name="actions">
+    <c-v2.button label="Aplicar na interface" size="sm" hook="data-font-try" />
+  </c-slot>
+</c-v2.panel>
+
