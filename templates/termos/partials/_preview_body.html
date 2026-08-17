@@ -30,10 +30,13 @@
             tooltip="Visualizar, baixar e anexar"
           />
           <c-v2.menu id="termo-cadastro-generico-menu" aria_label="Ações do termo genérico">
-            <c-v2.menu_header
-              title="{% if docs.generico.assinado %}Termo genérico assinado{% else %}Termo genérico{% endif %}"
-              :description="termo.destino_display"
-            />
+            {% comment %}
+              Sem cabeçalho de menu (2026-08-16): o componente foi apagado, porque
+              o gatilho e o cartão atrás já dizem de que documento se trata. Esta
+              era a ÚLTIMA chamada dele fora da galeria — e ela sobreviveu à
+              primeira varredura, o que teria dado `TemplateDoesNotExist` ao abrir
+              o formulário de termo.
+            {% endcomment %}
             <c-v2.menu_item :href="docs.generico.inline_url" icon="eye" icon_tone="info" title="Visualizar termo" description="Abrir o PDF no navegador" :target_blank="True" />
             {% if docs.generico.download_pdf_url %}
               <c-v2.menu_item :href="docs.generico.download_pdf_url" icon="pdf" icon_tone="pdf" title="Baixar PDF" description="Documento pronto para assinatura" :download="True" />

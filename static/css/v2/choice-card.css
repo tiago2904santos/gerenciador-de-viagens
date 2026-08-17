@@ -57,7 +57,7 @@
   cursor: pointer;
   display: grid;
   gap: var(--gap-tight);
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   margin: 0;
   min-width: 0;
   padding: var(--gap);
@@ -72,18 +72,15 @@
   width: 0;
 }
 
-/* A marca é desenhada: o rádio nativo não aceita cor de forma confiável entre
-   navegadores, e aqui ele precisa acompanhar o accent do tema. */
+/* SEM marca de rádio (2026-08-16). O cartão escolhido já se anuncia por três
+   coisas ao mesmo tempo — cor própria (`--surface-selected`), fita de accent à
+   esquerda e título no accent —, e o círculo era uma quarta. Numa lista de duas a
+   quatro opções, quatro sinais para "este é o escolhido" é ruído, não reforço.
+
+   O `<input>` continua no fluxo do teclado (invisível, mas presente) e o anel de
+   foco vai no CARTÃO, mais abaixo: quem navega por Tab não perde a posição. */
 :is(html[data-theme]) .os-model-card__mark {
-  block-size: 18px;
-  border: 2px solid var(--line);
-  border-radius: 999px;
-  box-sizing: border-box;
-  display: block;
-  flex: none;
-  inline-size: 18px;
-  position: relative;
-  transition: border-color var(--ease);
+  display: none;
 }
 
 :is(html[data-theme]) .os-model-card__body {
@@ -116,24 +113,6 @@
 :is(html[data-theme]) .os-model-card.is-selected .os-model-card__title,
 :is(html[data-theme]) .os-model-card:has(input:checked) .os-model-card__title {
   color: var(--accent);
-}
-
-:is(html[data-theme]) .os-model-card.is-selected .os-model-card__mark,
-:is(html[data-theme]) .os-model-card:has(input:checked) .os-model-card__mark {
-  border-color: var(--accent);
-}
-
-/* O ponto central só existe no escolhido — desenhado, e não um segundo
-   elemento, porque a marcação vem do formulário e não tem onde pendurá-lo. */
-:is(html[data-theme]) .os-model-card.is-selected .os-model-card__mark::after,
-:is(html[data-theme]) .os-model-card:has(input:checked) .os-model-card__mark::after {
-  background: var(--accent);
-  block-size: 8px;
-  border-radius: 999px;
-  content: "";
-  inline-size: 8px;
-  inset: 3px;
-  position: absolute;
 }
 
 /* O anel de foco vai no CARTÃO, porque o `<input>` é invisível: sem isto quem

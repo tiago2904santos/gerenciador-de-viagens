@@ -59,6 +59,31 @@
   box-shadow: 0 22px 58px rgb(0 0 0 / 0.5);
 }
 
+/* No CLARO o menu vai para `field` (o branco), e não para `rail`.
+ *
+ * A razão é a distância entre os degraus, que é diferente nos dois temas: no
+ * escuro rail→field mede 1,27 e o menu em `rail` se separa bem do que está
+ * atrás; no claro mede 1,106 (`v2/tokens.css`), e o menu em `rail` sobre um
+ * painel `rail` praticamente encostava — flutuava sem se anunciar. O branco lhe
+ * dá o degrau que o token não dá.
+ *
+ * `:root:not([data-theme="dark"])` cobre também quem nunca escolheu tema: o claro
+ * é o padrão e vive no `:root`, então testar `[data-theme="light"]` sozinho
+ * deixaria de fora a primeira visita.
+ *
+ * O contraste dos itens acompanha, senão o item sob o cursor sairia da mesma cor
+ * da caixa. */
+:is(html:not([data-theme="dark"])) .menu,
+:is(html[data-theme="light"]) .menu {
+  background: var(--surface-field);
+}
+
+:is(html:not([data-theme="dark"])) .menu[data-menu-v2],
+:is(html[data-theme="light"]) .menu[data-menu-v2] {
+  --surface: var(--surface-field);
+  --surface-contrast: var(--surface-rail);
+}
+
 :is(html[data-theme]) .menu__item {
   align-items: center;
   border: 1px solid transparent;
@@ -162,22 +187,7 @@
   color: var(--status-progress);
 }
 
-/* Cabeçalho de grupo dentro do menu — separa seções sem linha divisória. */
-:is(html[data-theme]) .menu__header {
-  display: grid;
-  gap: 1px;
-  padding: 8px 12px 4px;
-}
-
-:is(html[data-theme]) .menu__header-title {
-  color: var(--text-muted);
-  font-size: var(--text-size-eyebrow);
-  font-weight: var(--weight-strong);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-:is(html[data-theme]) .menu__header-description {
-  color: var(--text-muted);
-  font-size: var(--text-size-eyebrow);
-}
+/* O cabeçalho de grupo do menu foi APAGADO em 2026-08-16, com o componente
+   `v2/menu_header.html`: nenhum menu do sistema leva cabeçalho. Ele repetia o que
+   o gatilho e o cartão atrás já diziam, e gastava a altura de um item para não
+   oferecer ação nenhuma. Prova de grep no PR, como manda o `AGENTS.md` §3.6. */

@@ -115,6 +115,13 @@
   background: var(--surface-contrast, var(--surface-field));
   border: 1px solid transparent;
   border-radius: var(--radius-field);
+  /* SEM sombra, e DECLARADO: a folha legada dá sombra a esta classe, e omitir
+     aqui não é escolher — é herdar. O v2 não usa sombra em controle: o degrau de
+     superfície é que separa o campo da caixa, e sombra em cima disso dá relevo a
+     algo que está no plano. É a mesma armadilha que já custou borda, recuo e
+     overflow nesta migração: para classe que colide com o legado, a folha nova
+     tem de DECLARAR o valor. */
+  box-shadow: none;
   box-sizing: border-box;
   color: var(--text-muted);
   cursor: pointer;

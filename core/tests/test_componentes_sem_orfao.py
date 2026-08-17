@@ -119,7 +119,10 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # inline dentro de um componente de ~50 variáveis que montava a tela
         # inteira (`lists/list_page_quick_add.html`); aqui o painel é só o painel,
         # e a lista o recebe pelo slot `quick_add` do `list_page`.
-        self.assertEqual(len(self.components()), 127)
+        #
+        # 126 (2026-08-16): saiu `v2/menu_header.html`. Nenhum menu do sistema
+        # leva cabeçalho — ele repetia o que o gatilho e o cartão atrás já diziam.
+        self.assertEqual(len(self.components()), 126)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.

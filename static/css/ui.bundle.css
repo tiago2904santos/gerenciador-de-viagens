@@ -51,7 +51,7 @@
      CONTRASTE contra o fundo do menu, não a porcentagem. Com 10% dava 1.18
      contra os 1.35 do escuro, e a linha escolhida praticamente sumia no claro
      enquanto saltava no escuro. Agora os dois medem 1.34. */
-  --surface-selected: color-mix(in srgb, var(--accent) 17%, var(--surface-field));
+  --surface-selected: color-mix(in srgb, var(--accent) 17%, var(--surface-rail));
   /* Sombra da camada que flutua sobre a página (menu do select, lista do
      picker). Vira token porque as duas precisam ser a MESMA, e cada folha
      escrevendo o seu valor foi como elas divergiram. */
@@ -1685,6 +1685,31 @@
   box-shadow: 0 22px 58px rgb(0 0 0 / 0.5);
 }
 
+/* No CLARO o menu vai para `field` (o branco), e não para `rail`.
+ *
+ * A razão é a distância entre os degraus, que é diferente nos dois temas: no
+ * escuro rail→field mede 1,27 e o menu em `rail` se separa bem do que está
+ * atrás; no claro mede 1,106 (`v2/tokens.css`), e o menu em `rail` sobre um
+ * painel `rail` praticamente encostava — flutuava sem se anunciar. O branco lhe
+ * dá o degrau que o token não dá.
+ *
+ * `:root:not([data-theme="dark"])` cobre também quem nunca escolheu tema: o claro
+ * é o padrão e vive no `:root`, então testar `[data-theme="light"]` sozinho
+ * deixaria de fora a primeira visita.
+ *
+ * O contraste dos itens acompanha, senão o item sob o cursor sairia da mesma cor
+ * da caixa. */
+:is(html:not([data-theme="dark"])) .menu,
+:is(html[data-theme="light"]) .menu {
+  background: var(--surface-field);
+}
+
+:is(html:not([data-theme="dark"])) .menu[data-menu-v2],
+:is(html[data-theme="light"]) .menu[data-menu-v2] {
+  --surface: var(--surface-field);
+  --surface-contrast: var(--surface-rail);
+}
+
 :is(html[data-theme]) .menu__item {
   align-items: center;
   border: 1px solid transparent;
@@ -1788,25 +1813,10 @@
   color: var(--status-progress);
 }
 
-/* Cabeçalho de grupo dentro do menu — separa seções sem linha divisória. */
-:is(html[data-theme]) .menu__header {
-  display: grid;
-  gap: 1px;
-  padding: 8px 12px 4px;
-}
-
-:is(html[data-theme]) .menu__header-title {
-  color: var(--text-muted);
-  font-size: var(--text-size-eyebrow);
-  font-weight: var(--weight-strong);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-:is(html[data-theme]) .menu__header-description {
-  color: var(--text-muted);
-  font-size: var(--text-size-eyebrow);
-}
+/* O cabeçalho de grupo do menu foi APAGADO em 2026-08-16, com o componente
+   `v2/menu_header.html`: nenhum menu do sistema leva cabeçalho. Ele repetia o que
+   o gatilho e o cartão atrás já diziam, e gastava a altura de um item para não
+   oferecer ação nenhuma. Prova de grep no PR, como manda o `AGENTS.md` §3.6. */
 /* <<< css/v2/menu.css <<< */
 
 /* >>> css/v2/record.css >>> */
@@ -2305,7 +2315,7 @@
   cursor: pointer;
   display: grid;
   gap: var(--gap-tight);
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   margin: 0;
   min-width: 0;
   padding: var(--gap);
@@ -2320,18 +2330,15 @@
   width: 0;
 }
 
-/* A marca é desenhada: o rádio nativo não aceita cor de forma confiável entre
-   navegadores, e aqui ele precisa acompanhar o accent do tema. */
+/* SEM marca de rádio (2026-08-16). O cartão escolhido já se anuncia por três
+   coisas ao mesmo tempo — cor própria (`--surface-selected`), fita de accent à
+   esquerda e título no accent —, e o círculo era uma quarta. Numa lista de duas a
+   quatro opções, quatro sinais para "este é o escolhido" é ruído, não reforço.
+
+   O `<input>` continua no fluxo do teclado (invisível, mas presente) e o anel de
+   foco vai no CARTÃO, mais abaixo: quem navega por Tab não perde a posição. */
 :is(html[data-theme]) .os-model-card__mark {
-  block-size: 18px;
-  border: 2px solid var(--line);
-  border-radius: 999px;
-  box-sizing: border-box;
-  display: block;
-  flex: none;
-  inline-size: 18px;
-  position: relative;
-  transition: border-color var(--ease);
+  display: none;
 }
 
 :is(html[data-theme]) .os-model-card__body {
@@ -2364,24 +2371,6 @@
 :is(html[data-theme]) .os-model-card.is-selected .os-model-card__title,
 :is(html[data-theme]) .os-model-card:has(input:checked) .os-model-card__title {
   color: var(--accent);
-}
-
-:is(html[data-theme]) .os-model-card.is-selected .os-model-card__mark,
-:is(html[data-theme]) .os-model-card:has(input:checked) .os-model-card__mark {
-  border-color: var(--accent);
-}
-
-/* O ponto central só existe no escolhido — desenhado, e não um segundo
-   elemento, porque a marcação vem do formulário e não tem onde pendurá-lo. */
-:is(html[data-theme]) .os-model-card.is-selected .os-model-card__mark::after,
-:is(html[data-theme]) .os-model-card:has(input:checked) .os-model-card__mark::after {
-  background: var(--accent);
-  block-size: 8px;
-  border-radius: 999px;
-  content: "";
-  inline-size: 8px;
-  inset: 3px;
-  position: absolute;
 }
 
 /* O anel de foco vai no CARTÃO, porque o `<input>` é invisível: sem isto quem
@@ -2481,13 +2470,15 @@
 /* >>> css/v2/form-errors.css >>> */
 /* Resumo de erros do formulário. Depende de `v2/tokens.css`. */
 
+/* A caixa vem do `alert` global — fundo, fitinha, raio e recuo. Aqui fica só o
+   que é do RESUMO: as duas partes empilhadas com respiro entre si.
+
+   O que estava aqui antes misturava o tom com `--surface-field` a 14%, e era a
+   última regra do v2 a fazer isso: no escuro o vermelho virava arroxeado. O
+   alerta mistura com transparente e se adapta aos dois temas. */
 :is(html[data-theme]) .form-errors {
-  background: color-mix(in srgb, var(--status-late) 14%, var(--surface-field));
-  border-left: 3px solid var(--status-late);
-  border-radius: var(--radius-field);
   display: grid;
   gap: 6px;
-  padding: 12px 14px;
 }
 
 :is(html[data-theme]) .form-errors__title {
@@ -3626,6 +3617,13 @@
   background: var(--surface-contrast, var(--surface-field));
   border: 1px solid transparent;
   border-radius: var(--radius-field);
+  /* SEM sombra, e DECLARADO: a folha legada dá sombra a esta classe, e omitir
+     aqui não é escolher — é herdar. O v2 não usa sombra em controle: o degrau de
+     superfície é que separa o campo da caixa, e sombra em cima disso dá relevo a
+     algo que está no plano. É a mesma armadilha que já custou borda, recuo e
+     overflow nesta migração: para classe que colide com o legado, a folha nova
+     tem de DECLARAR o valor. */
+  box-shadow: none;
   box-sizing: border-box;
   color: var(--text-muted);
   cursor: pointer;
@@ -3946,7 +3944,18 @@
  */
 
 :is(html[data-theme]) .quick-add__panel {
-  background: var(--surface-contrast, var(--surface-field));
+  /* O painel fica no degrau `field` — ele está dentro do trilho, que é `rail` — e
+     DECLARA o degrau seguinte para os filhos. Sem esta linha os campos herdavam
+     `--surface-contrast` do trilho, ou seja, o mesmo `field` do painel: caixa e
+     campo saíam da mesma cor e o formulário virava uma mancha só.
+
+     As duas cores vêm dos tokens BASE. Pintar de `--surface-contrast` e redefinir
+     essa mesma variável para os filhos é referência circular — o `background` lê
+     o valor novo e a escada desaparece sem erro. Já aconteceu duas vezes nesta
+     migração (faixa de pessoas, cartão de documento). */
+  --surface: var(--surface-field);
+  --surface-contrast: var(--surface-rail);
+  background: var(--surface-field);
   border-radius: var(--radius-field);
   box-sizing: border-box;
   display: grid;
@@ -3962,24 +3971,77 @@
   display: none;
 }
 
-:is(html[data-theme]) .quick-add__title {
-  color: var(--text-strong);
-  font-size: var(--text-size-base);
-  font-weight: var(--weight-strong);
-  margin: 0;
-}
-
 :is(html[data-theme]) .quick-add__body {
   display: grid;
   gap: var(--gap);
+  /* Os campos LADO A LADO. Um cadastro rápido tem dois ou três campos curtos
+     (nome, sigla); empilhados, o painel ficava alto para dizer pouco e empurrava
+     a lista para fora da tela — que é justamente o que o quick add existe para
+     evitar. `auto-fit` com mínimo de 220px devolve a coluna única em tela
+     estreita, sem media query. */
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   min-width: 0;
 }
 
-/* SEM rodapé de ações: o gatilho é que salva quando o painel está aberto (é o
-   comportamento do quick add de justificativas). O que sobra aqui é o lugar dele
-   na faixa — fecho da linha de controles, alinhado à direita. */
+/* O GATILHO é a faixa que fecha o trilho: largura inteira, contorno só no topo,
+   sem raio próprio — ele encosta nas bordas do trilho e sangra o recuo dele com
+   margem negativa. É a forma do legado (`page-shell.css:2151`), e ela existe por
+   um motivo: a ação de cadastrar pertence à faixa de controles, não flutua ao
+   lado dela.
+
+   Neutro por padrão. O accent entra só com `is-filled`, que o `app.js` marca
+   quando algum campo foi preenchido — antes disso o botão não promete salvar
+   nada. */
 :is(html[data-theme]) .quick-add__toggle {
-  justify-self: end;
+  align-items: center;
+  appearance: none;
+  background: var(--surface, var(--surface-rail));
+  border: 0;
+  border-radius: 0 0 var(--radius-rail) var(--radius-rail);
+  border-top: 1px solid var(--line);
+  box-sizing: border-box;
+  color: var(--text-strong);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: var(--gap-tight);
+  justify-content: center;
+  /* Margem só nos três lados que SANGRAM o recuo do contêiner. No topo, zero: o
+     `gap` da grade do painel já separa a faixa do que vem acima, e a margem em
+     cima somava a ele — 32px onde o ritmo da tela é 16 (2026-08-16). */
+  margin: 0 calc(var(--gap) * -1) calc(var(--gap) * -1);
+  min-height: var(--control-height);
+  padding: 0 var(--gap);
+  transition: background var(--ease), color var(--ease);
+  width: calc(100% + var(--gap) * 2);
+}
+
+:is(html[data-theme]) .quick-add__toggle:hover {
+  background: var(--surface-contrast, var(--surface-field));
+}
+
+:is(html[data-theme]) .quick-add__toggle:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+/* `is-filled` é do `app.js`: há campo preenchido, então agora o botão salva — e é
+   aí que ele fica primário. */
+:is(html[data-theme]) .quick-add__toggle.is-filled {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+
+:is(html[data-theme]) .inline-create__toggle-icon {
+  align-items: center;
+  display: inline-flex;
+  font-size: 1.1rem;
+  justify-content: center;
+  line-height: 1;
+}
+
+:is(html[data-theme]) .inline-create__toggle-label {
+  font-weight: var(--weight-strong);
 }
 /* <<< css/v2/quick-add.css <<< */
 

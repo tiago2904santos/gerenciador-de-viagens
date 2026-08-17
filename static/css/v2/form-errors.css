@@ -1,12 +1,14 @@
 /* Resumo de erros do formulário. Depende de `v2/tokens.css`. */
 
+/* A caixa vem do `alert` global — fundo, fitinha, raio e recuo. Aqui fica só o
+   que é do RESUMO: as duas partes empilhadas com respiro entre si.
+
+   O que estava aqui antes misturava o tom com `--surface-field` a 14%, e era a
+   última regra do v2 a fazer isso: no escuro o vermelho virava arroxeado. O
+   alerta mistura com transparente e se adapta aos dois temas. */
 :is(html[data-theme]) .form-errors {
-  background: color-mix(in srgb, var(--status-late) 14%, var(--surface-field));
-  border-left: 3px solid var(--status-late);
-  border-radius: var(--radius-field);
   display: grid;
   gap: 6px;
-  padding: 12px 14px;
 }
 
 :is(html[data-theme]) .form-errors__title {

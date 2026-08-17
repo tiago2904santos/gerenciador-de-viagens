@@ -397,6 +397,28 @@ document.documentElement.dataset.appReady = "true";
         }
       }
 
+      /* O painel só está "preenchido" quando TODOS os campos que ele exige têm
+         valor — antes bastava o primeiro campo, e o botão prometia salvar um
+         cadastro incompleto: o POST voltava com erro de `clean()` e quem estava
+         cadastrando descobria o que faltava depois de tentar.
+
+         Se o formulário declara `required`, são esses os campos que contam; se
+         não declara nenhum (o caso dos cadastros de uma palavra), conta o
+         conjunto visível. Campo oculto e botão ficam fora dos dois casos. */
+      function painelPreenchido(panel) {
+        var seletor = "input:not([type=hidden]):not([type=submit]):not([type=button]), select, textarea";
+        var todos = Array.prototype.slice.call(panel.querySelectorAll(seletor));
+        var obrigatorios = todos.filter(function (campo) {
+          return campo.hasAttribute("required");
+        });
+        var contam = obrigatorios.length ? obrigatorios : todos;
+        if (!contam.length) return false;
+        return contam.every(function (campo) {
+          if (campo.type === "checkbox" || campo.type === "radio") return campo.checked;
+          return String(campo.value || "").trim() !== "";
+        });
+      }
+
       toggle.addEventListener("click", function () {
         if (toggle.getAttribute("aria-expanded") !== "true") {
           openPanel();
@@ -405,9 +427,7 @@ document.documentElement.dataset.appReady = "true";
         // Painel aberto: no modo compacto o botão de rodapé salva quando há
         // valor preenchido e apenas recolhe quando está vazio.
         if (toggle.hasAttribute("data-inline-create-submit-when-open")) {
-          var field = panel.querySelector("input:not([type=hidden]), select, textarea");
-          var filled = field && String(field.value || "").trim() !== "";
-          if (filled) {
+          if (painelPreenchido(panel)) {
             submitPanel();
           } else {
             closePanel();
@@ -427,8 +447,7 @@ document.documentElement.dataset.appReady = "true";
         var saveLabel = toggle.getAttribute("data-inline-create-save-label") || "Salvar";
 
         function updateToggleState() {
-          var field = panel.querySelector("input:not([type=hidden]), select, textarea");
-          var filled = field && String(field.value || "").trim() !== "";
+          var filled = painelPreenchido(panel);
           toggle.classList.toggle("is-filled", filled);
           if (labelEl) labelEl.textContent = filled ? saveLabel : originalLabel;
         }

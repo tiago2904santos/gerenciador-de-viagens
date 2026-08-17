@@ -1,10 +1,17 @@
-{% cotton:vars action errors panel_id slot submit_label title toggle_label %}
+{% cotton:vars action errors panel_id slot submit_label toggle_label %}
 {% comment %}
   Quick add v2 — criação inline na própria lista. Par de
   `static/css/v2/quick-add.css`.
 
   Modelo: o quick add de JUSTIFICATIVAS, e o comportamento é o dele, não uma
   reinterpretação. O que isso significa, em concreto:
+
+  0. O gatilho é uma FAIXA que fecha o trilho, largura inteira, com contorno só
+     no topo — não um botão solto num canto. Ele fica neutro enquanto não há nada
+     para salvar e só assume o accent quando o `app.js` marca `is-filled`, ou
+     seja, quando algum campo foi preenchido. Foi o erro da segunda versão:
+     botãozinho primário alinhado à direita, que prometia salvar antes de haver o
+     que salvar. O "+" é caractere, não ícone — é assim no legado.
 
   1. Há UM botão, não três. Fechado ele diz "Cadastrar …"; aberto, o próprio
      `app.js` troca o texto para o rótulo de salvar e o clique SUBMETE o
@@ -33,11 +40,13 @@
   (`scripts/migrar_botoes_cotton.py:25`), e é para casos como este que a exceção
   existe.
 
+  SEM título no painel: o gatilho logo abaixo diz "Cadastrar cargo", e um "Novo
+  cargo" acima dos campos repetia a mesma frase a dois centímetros de distância.
+
   O resumo de erros fica FORA do corpo dos campos, filho direto do `<form>`: no
   legado ele foi posto dentro e, como o corpo é `flex`, virou uma terceira coluna
   ao lado dos campos e empurrou o formulário.
 {% endcomment %}
-{% load icones %}
 <form
   class="quick-add__panel"
   id="{{ panel_id }}"
@@ -49,19 +58,19 @@
 >
   {% csrf_token %}
   {% if errors %}<c-v2.form_errors :errors="errors" />{% endif %}
-  {% if title %}<h2 class="quick-add__title">{{ title }}</h2>{% endif %}
   <div class="quick-add__body">{{ slot }}</div>
 </form>
 
 <button
-  class="button button--primary quick-add__toggle"
+  class="quick-add__toggle"
   type="button"
   data-inline-create-toggle
   data-inline-create-submit-when-open
   data-inline-create-save-label="{{ submit_label|default:'Salvar' }}"
   aria-controls="{{ panel_id }}"
   aria-expanded="{% if errors %}true{% else %}false{% endif %}"
+  aria-label="{{ toggle_label|default:'Cadastrar item' }}"
 >
-  <span class="button__icon" aria-hidden="true">{% icone_svg "plus" %}</span>
+  <span class="inline-create__toggle-icon" aria-hidden="true">+</span>
   <span class="inline-create__toggle-label">{{ toggle_label|default:"Cadastrar item" }}</span>
 </button>

@@ -8,7 +8,18 @@
  */
 
 :is(html[data-theme]) .quick-add__panel {
-  background: var(--surface-contrast, var(--surface-field));
+  /* O painel fica no degrau `field` — ele está dentro do trilho, que é `rail` — e
+     DECLARA o degrau seguinte para os filhos. Sem esta linha os campos herdavam
+     `--surface-contrast` do trilho, ou seja, o mesmo `field` do painel: caixa e
+     campo saíam da mesma cor e o formulário virava uma mancha só.
+
+     As duas cores vêm dos tokens BASE. Pintar de `--surface-contrast` e redefinir
+     essa mesma variável para os filhos é referência circular — o `background` lê
+     o valor novo e a escada desaparece sem erro. Já aconteceu duas vezes nesta
+     migração (faixa de pessoas, cartão de documento). */
+  --surface: var(--surface-field);
+  --surface-contrast: var(--surface-rail);
+  background: var(--surface-field);
   border-radius: var(--radius-field);
   box-sizing: border-box;
   display: grid;
@@ -24,22 +35,75 @@
   display: none;
 }
 
-:is(html[data-theme]) .quick-add__title {
-  color: var(--text-strong);
-  font-size: var(--text-size-base);
-  font-weight: var(--weight-strong);
-  margin: 0;
-}
-
 :is(html[data-theme]) .quick-add__body {
   display: grid;
   gap: var(--gap);
+  /* Os campos LADO A LADO. Um cadastro rápido tem dois ou três campos curtos
+     (nome, sigla); empilhados, o painel ficava alto para dizer pouco e empurrava
+     a lista para fora da tela — que é justamente o que o quick add existe para
+     evitar. `auto-fit` com mínimo de 220px devolve a coluna única em tela
+     estreita, sem media query. */
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   min-width: 0;
 }
 
-/* SEM rodapé de ações: o gatilho é que salva quando o painel está aberto (é o
-   comportamento do quick add de justificativas). O que sobra aqui é o lugar dele
-   na faixa — fecho da linha de controles, alinhado à direita. */
+/* O GATILHO é a faixa que fecha o trilho: largura inteira, contorno só no topo,
+   sem raio próprio — ele encosta nas bordas do trilho e sangra o recuo dele com
+   margem negativa. É a forma do legado (`page-shell.css:2151`), e ela existe por
+   um motivo: a ação de cadastrar pertence à faixa de controles, não flutua ao
+   lado dela.
+
+   Neutro por padrão. O accent entra só com `is-filled`, que o `app.js` marca
+   quando algum campo foi preenchido — antes disso o botão não promete salvar
+   nada. */
 :is(html[data-theme]) .quick-add__toggle {
-  justify-self: end;
+  align-items: center;
+  appearance: none;
+  background: var(--surface, var(--surface-rail));
+  border: 0;
+  border-radius: 0 0 var(--radius-rail) var(--radius-rail);
+  border-top: 1px solid var(--line);
+  box-sizing: border-box;
+  color: var(--text-strong);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: var(--gap-tight);
+  justify-content: center;
+  /* Margem só nos três lados que SANGRAM o recuo do contêiner. No topo, zero: o
+     `gap` da grade do painel já separa a faixa do que vem acima, e a margem em
+     cima somava a ele — 32px onde o ritmo da tela é 16 (2026-08-16). */
+  margin: 0 calc(var(--gap) * -1) calc(var(--gap) * -1);
+  min-height: var(--control-height);
+  padding: 0 var(--gap);
+  transition: background var(--ease), color var(--ease);
+  width: calc(100% + var(--gap) * 2);
+}
+
+:is(html[data-theme]) .quick-add__toggle:hover {
+  background: var(--surface-contrast, var(--surface-field));
+}
+
+:is(html[data-theme]) .quick-add__toggle:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+/* `is-filled` é do `app.js`: há campo preenchido, então agora o botão salva — e é
+   aí que ele fica primário. */
+:is(html[data-theme]) .quick-add__toggle.is-filled {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+
+:is(html[data-theme]) .inline-create__toggle-icon {
+  align-items: center;
+  display: inline-flex;
+  font-size: 1.1rem;
+  justify-content: center;
+  line-height: 1;
+}
+
+:is(html[data-theme]) .inline-create__toggle-label {
+  font-weight: var(--weight-strong);
 }

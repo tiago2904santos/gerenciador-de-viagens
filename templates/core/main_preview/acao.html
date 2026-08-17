@@ -146,17 +146,3 @@
   </c-slot>
 </c-v2.panel>
 
-{% comment %}
-  O cabeçalho de grupo do menu, para quando um menu tem SEÇÕES — o único caso em
-  que ele se justifica. Nos menus de documento ele saiu: repetia o que o gatilho
-  e o cartão atrás já diziam.
-{% endcomment %}
-<c-v2.panel title="Menu com cabeçalho de grupo">
-  <c-slot name="body">
-    <c-v2.menu aria_label="Ações agrupadas">
-      <c-v2.menu_header title="Documentos" description="ARAPONGAS/PR" />
-      <c-v2.menu_item href="#" icon="download" title="Baixar PDF" description="Documento pronto." />
-      <c-v2.menu_item href="#" icon="x" title="Cancelar" description="Encerra o registro." tone="late" />
-    </c-v2.menu>
-  </c-slot>
-</c-v2.panel>

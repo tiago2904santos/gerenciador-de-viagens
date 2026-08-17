@@ -6,9 +6,16 @@
   Fica FORA do corpo do bloco, como irmão direto do formulário: dentro de um
   corpo em grade ele vira uma coluna ao lado dos campos e desloca tudo. Foi
   esse o defeito `HT-03` no sistema antigo.
+
+  A CAIXA é o `alert` global (`.alert` + `data-tone="error"`), e não um desenho
+  próprio: erro de formulário é a mesma informação que qualquer outra falha da
+  tela. Além de unificar, isso conserta um defeito conhecido — a folha daqui
+  misturava o tom com `--surface-field`, e no escuro o vermelho caía em arroxeado
+  (`#383444`, medido). O alerta mistura com TRANSPARENTE, e por isso funciona nos
+  dois temas sozinho.
 {% endcomment %}
 {% if errors %}
-  <div class="form-errors{% if extra_class %} {{ extra_class }}{% endif %}" role="alert">
+  <div class="alert form-errors{% if extra_class %} {{ extra_class }}{% endif %}" data-tone="error" role="alert">
     <p class="form-errors__title">{{ title|default:"Corrija antes de continuar" }}</p>
     <ul class="form-errors__list">
       {% for erro in errors %}<li>{{ erro }}</li>{% endfor %}
