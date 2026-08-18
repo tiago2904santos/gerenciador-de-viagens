@@ -3592,9 +3592,13 @@
         if (temPassoDoMeio) {
           var badge = document.createElement('span');
           badge.className = 'date-picker__day-badge';
-          badge.textContent = multiStepIndexes.map(function (index) {
-            return String(index + 1);
-          }).join('·');
+          /* UM número, o do primeiro trecho que a data atende. Com mais de um
+           * (a mesma data serve à chegada de um trecho e à saída do seguinte) o
+           * texto virava "1·2", a ficha esticava para a esquerda e cobria o
+           * número do dia — medido: 19px de largura numa célula de 42. Quem
+           * precisa da lista inteira tem o `title` e o `aria-label` logo abaixo,
+           * que já a trazem por extenso. */
+          badge.textContent = String(multiStepIndexes[0] + 1);
           button.appendChild(badge);
           var stepLabels = multiStepIndexes.map(function (index) {
             return routeSteps[index] ? routeSteps[index].label : '';

@@ -494,41 +494,44 @@
  * dia escolhido: fundo na superfície do painel, contorno e número no accent.
  */
 :is(html[data-theme]) .date-field__panel .date-picker__day-badge {
-  /* Círculo no canto superior direito, encostado na borda da cápsula. Ele é o
-     NEGATIVO do dia escolhido: fundo na cor do painel, número no accent — sobre
-     a cápsula accent, um círculo accent desapareceria.
-
-     O anel na cor do painel (`box-shadow`, não `border`) é o que o descola da
-     cápsula sem comer o espaço do número: borda encolhe o conteúdo, sombra
-     desenha por fora. Sem ele o círculo encosta no amarelo e os dois viram uma
-     mancha só. */
-  /* `position: absolute` DECLARADO aqui: a folha legada que o declarava
-     (`fields/date-picker.css`) não entra no pacote desta tela, e sem ela o
-     círculo caía no fluxo dentro do botão — empurrava o número do dia para o
-     lado e ficava 12px abaixo do topo (medido). Omitir o que a folha antiga
-     dava é o erro clássico desta migração. */
+  /* Ficha redonda DENTRO da cápsula, encostada no canto superior direito.
+   *
+   * Ela morava meio fora, sobre a borda, e o disco na cor do painel abria um
+   * buraco no contorno da cápsula — de longe parecia um defeito na faixa, não um
+   * número. Por dentro, a silhueta do dia continua inteira e a ficha lê como uma
+   * etiqueta colada nele.
+   *
+   * `position` e `z-index` declarados aqui porque a folha legada que os dava
+   * (`fields/date-picker.css`) não entra no pacote desta tela — sem eles a ficha
+   * cai no fluxo e empurra o número do dia.
+   */
   align-items: center;
+  /* Ficha NEUTRA: superfície do painel com o texto forte do tema. O número em
+     accent sobre a cápsula accent era amarelo dentro de amarelo — duas vezes a
+     mesma cor a três pixels de distância. Com o par superfície/texto, ela é
+     legível nos dois temas sem depender do accent, e o amarelo continua sendo só
+     da cápsula. */
   background: var(--surface-rail);
   border: 0;
   border-radius: var(--radius-pill);
+  box-shadow: none;
+  color: var(--text-strong);
+  display: inline-flex;
+  /* 14px com o número em 9px: dentro de uma célula de 42 ela precisa caber no
+     arco da cápsula sem encostar no número do dia. */
+  font-size: 9px;
+  font-weight: var(--weight-strong);
+  height: 14px;
+  justify-content: center;
+  left: auto;
+  line-height: 1;
+  min-width: 14px;
+  padding: 0 2px;
   pointer-events: none;
   position: absolute;
+  right: 3px;
+  top: 3px;
   z-index: 4;
-  box-shadow: 0 0 0 2px var(--surface-rail);
-  color: var(--accent);
-  display: inline-flex;
-  font-size: 10px;
-  font-weight: var(--weight-strong);
-  height: 18px;
-  justify-content: center;
-  line-height: 1;
-  min-width: 18px;
-  /* No CANTO superior direito. O anel na cor do painel é o que evita que ele se
-     confunda com a cápsula do dia vizinho quando duas datas caem lado a lado. */
-  left: auto;
-  padding: 0 3px;
-  right: -5px;
-  top: -6px;
 }
 
 /* Dia ESCOLHIDO não apaga quando o calendário trava a escolha. No modo múltiplo
