@@ -12,10 +12,10 @@
     "statements": 91.89
   },
   "static/js/core/app.js": {
-    "branches": 16.96,
-    "functions": 45.58,
-    "lines": 27.74,
-    "statements": 26.51
+    "branches": 37.16,
+    "functions": 66.19,
+    "lines": 49.68,
+    "statements": 48.73
   },
   "static/js/core/http.js": {
     "branches": 97.82,

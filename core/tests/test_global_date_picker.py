@@ -153,12 +153,22 @@ class GlobalDatePickerTests(SimpleTestCase):
             ):
                 continue
             source = source_path.read_text(encoding="utf-8")
-            # Duas folhas globais, e não uma: `fields/date-picker.css` é a do
-            # sistema antigo e `v2/date-picker.css` a do novo — as duas são O
+            # TRÊS folhas globais, e não uma: `fields/date-picker.css` é a do
+            # sistema antigo, `v2/date-picker.css` a do novo e
+            # `ui/date-picker.css` a pele do trilho de filtro — todas são O
             # calendário do seu sistema, não um calendário alternativo. É a
             # mesma convivência que o resto da migração já tem.
+            #
+            # NOVO-20260818-213141-9f2f0d2c4c95: a terceira entrou com o trilho
+            # de filtro (`ui-date-picker`, em `ui/headers/filter_page_header`) e
+            # esta lista não acompanhou, deixando o contrato vermelho. Ela é
+            # escopada em `.ui-date-picker` e só repinta o GATILHO e os botões
+            # do painel do mesmo motor (`js/components/date-picker.js`); não há
+            # segundo calendário. Quando o trilho legado sair, a folha sai com
+            # ele e esta entrada volta a duas.
             is_global_css = source_path in (
                 base_dir / "static" / "css" / "fields" / "date-picker.css",
+                base_dir / "static" / "css" / "ui" / "date-picker.css",
                 base_dir / "static" / "css" / "v2" / "date-picker.css",
             )
             is_global_js = source_path == base_dir / "static" / "js" / "components" / "date-picker.js"
