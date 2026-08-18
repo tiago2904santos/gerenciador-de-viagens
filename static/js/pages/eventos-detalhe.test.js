@@ -21,13 +21,12 @@ describe("documentos vinculados do evento", () => {
         <div data-evento-doc-picker data-evento-periodo-inicio="2026-08-10" data-evento-periodo-fim="2026-08-12" data-evento-doc-tolerancia="5">
           <section data-doc-tab-panel="oficios">
             <div data-related-picker-root>
-              <input data-evento-doc-search="oficios">
-              <button type="button" data-evento-doc-clear="oficios">x</button>
+              <input type="search" data-related-picker-search>
               <select multiple data-evento-doc-field="oficios">
                 <option value="1">Perto</option><option value="2">Longe</option>
               </select>
-              <div data-evento-doc-list="oficios"></div>
-              <p data-evento-doc-empty="oficios" hidden></p>
+              <div data-related-picker-list></div>
+              <p data-related-picker-empty hidden></p>
             </div>
           </section>
         </div>
@@ -51,7 +50,7 @@ describe("documentos vinculados do evento", () => {
   });
 
   it("refiltra com o periodo ativo ainda nao salvo", () => {
-    const list = document.querySelector('[data-evento-doc-list="oficios"]');
+    const list = document.querySelector("[data-related-picker-list]");
     expect(list.textContent).toContain("Oficio perto");
     expect(list.textContent).not.toContain("Oficio longe");
 
@@ -72,18 +71,35 @@ describe("documentos vinculados do evento", () => {
     expect(list.textContent).toContain("Oficio longe");
   });
 
-  it("mostra e executa o limpar da busca padrao", () => {
-    const search = document.querySelector('[data-evento-doc-search="oficios"]');
-    const clear = document.querySelector('[data-evento-doc-clear="oficios"]');
+  it("filtra pela busca do picker, sem botao de limpar proprio", () => {
+    // O botão "×" desenhado à mão saiu com a migração para o `c-v2.related_picker`
+    // (2026-08-18): o campo é `type="search"` e o navegador já entrega o dele.
+    // O que o painel deve provar agora é o filtro, e que ninguém reintroduziu o
+    // botão — se ele voltar, passam a existir dois "limpar" na mesma linha.
+    const search = document.querySelector("[data-related-picker-search]");
+    const list = document.querySelector("[data-related-picker-list]");
+
+    expect(search.type).toBe("search");
+    // Pelo GANCHO, nunca pela classe: `test_picker_contract` proíbe achar parte
+    // de picker por classe CSS, e era por este atributo que o código bindava o
+    // botão. Nenhum `<button>` genérico serve de trava aqui — as próprias
+    // linhas do resultado são botões.
+    expect(document.querySelector("[data-evento-doc-clear]")).toBeNull();
+
     search.value = "perto";
     search.dispatchEvent(new Event("input", { bubbles: true }));
-    expect(clear.hidden).toBe(false);
+    expect(list.textContent).toContain("Oficio perto");
+    expect(list.textContent).not.toContain("Oficio longe");
+    expect(search.closest("[data-related-picker-root]").classList).toContain(
+      "search-picker--has-query",
+    );
 
-    clear.click();
-
-    expect(search.value).toBe("");
-    expect(clear.hidden).toBe(true);
-    expect(document.activeElement).toBe(search);
+    search.value = "";
+    search.dispatchEvent(new Event("input", { bubbles: true }));
+    expect(list.textContent).toContain("Oficio perto");
+    expect(search.closest("[data-related-picker-root]").classList).not.toContain(
+      "search-picker--has-query",
+    );
   });
 
   it("mantem um listener delegado quando o enhancer roda de novo", () => {

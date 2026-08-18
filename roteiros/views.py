@@ -43,7 +43,6 @@ from .presenters import (
     apresentar_contexto_formulario_roteiro_avulso,
     apresentar_linha_lista_simples_roteiro,
     apresentar_pagina_editor_roteiro,
-    apresentar_roteiro_card,
 )
 from .selectors import (
     get_roteiro_by_id,

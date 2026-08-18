@@ -55,7 +55,6 @@ class OrdemServicoForm(forms.ModelForm):
             attrs={
                 **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                 "data-entity-picker": "true",
-            "data-picker-v2": "",
                 "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "compact",
@@ -72,7 +71,6 @@ class OrdemServicoForm(forms.ModelForm):
             attrs={
                 **widget_attrs(WidgetStyle.SEARCH_PICKER_NATIVE),
                 "data-entity-picker": "true",
-            "data-picker-v2": "",
                 "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "compact",
@@ -124,7 +122,6 @@ class OrdemServicoForm(forms.ModelForm):
             "servidores": ServidorEquipeSelectMultiple(attrs={
                 **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-entity-picker": "true",
-            "data-picker-v2": "",
                 "data-picker-v2": "",
                 "data-entity-picker-mode": "multi",
                 "data-picker-variant": "detailed",
@@ -142,7 +139,6 @@ class OrdemServicoForm(forms.ModelForm):
             "motorista_equipe": ServidorMotoristaSelect(attrs={
                 **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-entity-picker": "true",
-            "data-picker-v2": "",
                 "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "detailed",
@@ -152,7 +148,6 @@ class OrdemServicoForm(forms.ModelForm):
             "tecnico_equipe": ServidorMotoristaSelect(attrs={
                 **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-entity-picker": "true",
-            "data-picker-v2": "",
                 "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "detailed",
@@ -162,7 +157,6 @@ class OrdemServicoForm(forms.ModelForm):
             "apoio_montagem": ServidorMotoristaSelect(attrs={
                 **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-entity-picker": "true",
-            "data-picker-v2": "",
                 "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "detailed",
@@ -172,7 +166,6 @@ class OrdemServicoForm(forms.ModelForm):
             "apoio_escolta": ServidorMotoristaSelect(attrs={
                 **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-entity-picker": "true",
-            "data-picker-v2": "",
                 "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "detailed",
@@ -182,7 +175,6 @@ class OrdemServicoForm(forms.ModelForm):
             "coordenador_cerimonial": ServidorMotoristaSelect(attrs={
                 **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-entity-picker": "true",
-            "data-picker-v2": "",
                 "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "detailed",
@@ -192,7 +184,6 @@ class OrdemServicoForm(forms.ModelForm):
             "apoio_cerimonial": ServidorMotoristaSelect(attrs={
                 **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-entity-picker": "true",
-            "data-picker-v2": "",
                 "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "detailed",
@@ -202,7 +193,6 @@ class OrdemServicoForm(forms.ModelForm):
             "apoio_preparacao": ServidorMotoristaSelect(attrs={
                 **widget_attrs(WidgetStyle.FORM_SELECT_SEARCH_PICKER),
                 "data-entity-picker": "true",
-            "data-picker-v2": "",
                 "data-picker-v2": "",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "detailed",

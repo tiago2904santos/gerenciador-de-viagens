@@ -210,13 +210,25 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # primeira rolagem — quem chega ao fim da lista voltaria ao topo para
         # criar o próximo item.
         #
-        # 148 (2026-08-18): `v2/quick_add_section.html`, o `<fieldset>` de um
-        # grupo dentro do painel de cadastro rápido. O painel é UM formulário com
-        # um POST só, então os grupos não podem ser `form_block` — cartão dentro
-        # de cartão para o mesmo envio.
+        # 148 (NOVO-20260818-200724-685b186c033b): `v2/quick_add_section.html`,
+        # o `<fieldset>` de um grupo do quick add. O painel é UM POST e ficou
+        # visualmente neutro; a superfície passou para a seção, e ela mora em
+        # componente porque as quinze telas de cadastro rápido repetiam a mesma
+        # casca de grupo. A vitrine só ganhou o consumidor agora
+        # (NOVO-20260818-213141-764248d0a297) — o corte que criou o componente
+        # deixou este contrato e o da galeria vermelhos.
         #
-        # 155 (2026-08-18): as sete peças que faltavam para o wizard de Plano de
-        # Trabalho ser v2 de ponta a ponta. Cinco são do SISTEMA, e nasceram aqui
+        # 149 (NOVO-20260818-213141-00cd8bcc960a): `v2/related_row.html`, a
+        # linha do picker de documento vinculado. É o gêmeo declarativo de
+        # `CV.pickerParts.createRelatedCard`: nas telas reais o script monta a
+        # linha, e onde ela é conhecida no servidor — a vitrine — era escrita à
+        # mão em `<button>` cru, contra o `HT-08`. Mora em componente pela razão
+        # de sempre: `data-route-id` carrega VALOR, e valor no `hook` do
+        # `c-v2.button` sai escapado.
+        #
+        # 156 (NOVO-20260818-223338-aa3c31f87b9d): as sete peças que faltavam
+        # para o wizard de Plano de Trabalho ser v2 de ponta a ponta. Cinco são
+        # do SISTEMA, e nasceram aqui
         # porque nenhuma tela tinha por onde dizê-las sem reinventar o desenho:
         # `v2/pending_card.html` (o que falta antes de finalizar, que é o `alert`
         # com uma lista dentro), `v2/choice_card.html` e `v2/choice_grid.html` (a
@@ -229,7 +241,7 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # equipe — irmã da linha de destino —, e `v2/document_preview.html`, o
         # cartão que abre o PDF na própria página, cuja folha
         # (`v2/document-inline.css`) já existia sem componente.
-        self.assertEqual(len(self.components()), 155)
+        self.assertEqual(len(self.components()), 156)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.

@@ -64,9 +64,18 @@ def _uf_da_sede():
     from cadastros.models import Estado
     from cadastros.selectors import get_configuracao_sistema
 
+    from core.errors import capture
+
     try:
         sigla = (get_configuracao_sistema().uf or "").strip().upper()
-    except Exception:
+    except Exception as exc:
+        # Degradar é certo — uma tag de inclusão não pode derrubar toda tela com
+        # destino porque a configuração da área não resolveu. Sumir com a falha,
+        # não: `get_configuracao_sistema()` faz `get_or_create` no banco, e o que
+        # cai aqui é problema de infraestrutura, não ausência de dado. Sem o
+        # registro, o sintoma é o campo de estado abrir em branco — indistinguível
+        # de "não há UF cadastrada", que é o caso legítimo logo abaixo.
+        capture(exc, "destinos.uf_da_sede")
         return ""
     if not sigla:
         return ""

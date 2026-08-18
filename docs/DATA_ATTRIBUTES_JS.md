@@ -7,7 +7,7 @@ que ele publica em `window.CV`. Não altera regra de negócio.
 
 Este documento cobre `static/js/core/`, `static/js/components/` e os motores de raiz — o código que
 qualquer tela pode acionar. **Não** indexa os atributos de uma página só (`static/js/pages/`): são
-**142** deles, cada um com um único consumidor, e a documentação certa para esses é o próprio
+**140** deles, cada um com um único consumidor, e a documentação certa para esses é o próprio
 módulo da página.
 
 A regra que decide: se o atributo aparece num motor compartilhado, ele está aqui. Isso é verificado
