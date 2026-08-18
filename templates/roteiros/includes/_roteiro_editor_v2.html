@@ -1,11 +1,25 @@
 {% comment %}
-  Editor de roteiro no v2 (2026-08-17) — o formulário da tela `roteiros:novo` e
-  `roteiros:editar`.
+  Editor de roteiro no v2 — o formulário de `roteiros:novo`, `roteiros:editar` e,
+  desde NOVO-20260818-213853-fab772ef1b6e, também o da etapa de roteiro do wizard
+  de ofício (`oficios/wizard_roteiro.html`), que era a última tela da fila.
 
-  O legado equivalente (`_roteiro_editor.html`) continua vivo e NÃO foi tocado:
-  ele também serve a etapa de roteiro do wizard de ofício
-  (`oficios/wizard_roteiro.html`), que é a última tela da fila de migração. Os
-  dois convivem até lá; o que muda entre eles é só a marcação.
+  DUAS telas, um editor. O que muda entre elas são três coisas:
+
+  - a marca no invólucro (`--oficio` × `--avulso`), que é como `roteiros-wizard.js`
+    sabe em qual das duas está;
+
+  O sinal é `roteiro_editor_wizard`, posto por `oficios/route_views.py`. NÃO é
+  `roteiro_editor_oficio`: a página avulsa também o recebe True
+  (`roteiros/presenters.py`), e usá-lo aqui punha a marca do wizard numa tela
+  que não é wizard — foi o que o contrato do editor v2 pegou.
+  - a URL de criação do rascunho, que no ofício grava o roteiro já vinculado ao
+    documento;
+  - o rodapé: no ofício as ações são as do WIZARD (voltar e avançar, por
+    `wizard_action`), porque salvar aqui é passar de etapa; na tela avulsa é
+    "Salvar roteiro", porque não há etapa seguinte.
+
+  `data-travel-document-wizard-roteiro` é um dos escopos de menu do `overlay.js`
+  e só existe no modo ofício.
 
   O motor é o mesmo, e é ele que dita o que aqui não pode mudar de nome:
 
@@ -24,7 +38,17 @@
   procura o estado nela; `roteiro-editor--oficio` NÃO entra, e é assim que o JS
   sabe que esta tela é a avulsa.
 {% endcomment %}
-<div class="roteiro-wizard__editor roteiro-editor--avulso" data-glance-state="closed">
+{% if roteiro_editor_wizard and oficio %}
+  {% url 'oficios:wizard_roteiro_autosave_criar' pk=oficio.pk as roteiro_autosave_create_url %}
+{% else %}
+  {% url 'roteiros:roteiro-autosave-create' as roteiro_autosave_create_url %}
+{% endif %}
+
+<div
+  class="roteiro-wizard__editor {% if roteiro_editor_wizard %}roteiro-editor--oficio{% else %}roteiro-editor--avulso{% endif %}"
+  {% if roteiro_editor_wizard %}data-travel-document-wizard-roteiro{% endif %}
+  data-glance-state="closed"
+>
   <form
     method="post"
     id="roteiro-editor-form"
@@ -34,7 +58,7 @@
     data-autosave="true"
     data-autosave-model="roteiro"
     data-autosave-url="{% if object %}{% url 'roteiros:roteiro-autosave' object.pk %}{% endif %}"
-    data-autosave-create-url="{% url 'roteiros:roteiro-autosave-create' %}{% if evento %}?evento={{ evento.pk }}{% endif %}"
+    data-autosave-create-url="{{ roteiro_autosave_create_url }}{% if evento %}?evento={{ evento.pk }}{% endif %}"
     data-autosave-edit-url-template="/roteiros/__ID__/autosave/"
     data-autosave-object-id="{{ object.pk|default:'' }}"
     data-api-cidades-url="{{ api_cidades_por_estado_url }}"
@@ -82,12 +106,26 @@
         {% endcomment %}
         <c-v2.travel_allowance :quantidade_servidores="diarias_quantidade_servidores" />
 
+        {% comment %}
+          No ofício, salvar É avançar: os dois botões submetem o mesmo
+          formulário e se distinguem por `wizard_action`, que é o que
+          `oficios/wizard_document_views.py` lê. Na tela avulsa não há etapa
+          anterior nem seguinte — o secundário é um link de volta.
+        {% endcomment %}
         <c-v2.card_footer>
           <c-slot name="secondary">
-            <c-v2.button :label="wizard_back_label" icon="arrow-left" :href="wizard_back_url" />
+            {% if roteiro_editor_wizard %}
+              <c-v2.button label="Voltar" icon="arrow-left" type="submit" name="wizard_action" value="wizard_back" />
+            {% else %}
+              <c-v2.button :label="wizard_back_label" icon="arrow-left" :href="wizard_back_url" :autosave_link="True" />
+            {% endif %}
           </c-slot>
           <c-slot name="primary">
-            <c-v2.button label="Salvar roteiro" variant="primary" icon="check" type="submit" />
+            {% if roteiro_editor_wizard %}
+              <c-v2.button label="Avançar" variant="primary" icon="arrow-right" :icon_after="True" type="submit" name="wizard_action" value="wizard_next" />
+            {% else %}
+              <c-v2.button label="Salvar roteiro" variant="primary" icon="check" type="submit" />
+            {% endif %}
           </c-slot>
         </c-v2.card_footer>
       </c-slot>

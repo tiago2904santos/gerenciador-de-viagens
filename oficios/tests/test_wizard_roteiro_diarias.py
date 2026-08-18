@@ -94,10 +94,15 @@ class OficioWizardRoteiroDiariasTests(TestCase):
         inicio_form = html.rindex("<form", 0, id_form)
         fim_form = html.index("</form>", inicio_form)
         self.assertIn('name="csrfmiddlewaretoken"', html[inicio_form:fim_form])
-        self.assertContains(response, "Etapa 2")
+        # O stepper do v2 numera pelo próprio marcador e nomeia a etapa pelo
+        # título; a sobrancelha "Etapa 2" do stepper legado saiu junto com ele.
+        # O que prova que a etapa certa está aberta é o `aria-current`, que é
+        # também o que um leitor de tela anuncia.
+        self.assertContains(response, 'aria-current="step"')
+        self.assertContains(response, "Roteiro e diárias")
         self.assertContains(response, reverse("oficios:index"))
         self.assertContains(response, "Voltar à lista")
-        self.assertContains(response, "card-footer-section")
+        self.assertContains(response, "card-footer")
         self.assertContains(response, "Avançar")
 
         oficio.refresh_from_db()
@@ -217,7 +222,11 @@ class OficioWizardRoteiroDiariasTests(TestCase):
             data={"action": "save_draft"},
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "alert alert-danger")
+        # `alert alert-danger` eram classes do Bootstrap legado, que o editor
+        # escrevia à mão. O resumo de erros do v2 é o `.alert` do sistema com o
+        # tom do estado — a mesma caixa de qualquer outra falha da tela.
+        self.assertContains(response, 'class="alert"')
+        self.assertContains(response, 'data-tone="error"')
 
     def test_wizard_resumo_e_alias_da_etapa_documentos(self):
         oficio = self._oficio_ate_transporte([self.servidor_a.pk])

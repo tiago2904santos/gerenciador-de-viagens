@@ -1,0 +1,34 @@
+{% cotton:vars mode %}
+{% comment %}
+  Modo de preenchimento do motorista — buscar no sistema ou digitar o nome.
+
+  Aparece em duas telas do ofício: no cartão de motorista externo da etapa 1 e
+  no cartão de motorista da etapa de transporte. Era o `segment-toggle` legado
+  escrito à mão nas duas, com os botões repetidos.
+
+  Os botões são CRUS porque `data-value` carrega VALOR, e valor dentro do `hook`
+  do `c-v2.button` sai escapado — dentro de `templates/cotton/` o botão cru é o
+  caminho previsto (mesma razão do `v2/route_mode_toggle.html` e do
+  `v2/os_role_toggle.html`).
+
+  `js/pages/oficios-wizard-driver-state.js` acha os dois por
+  `data-oficio-motorista-modo-btn`, lê `data-value` e é ELE quem manda no
+  `aria-pressed` depois do primeiro clique — o estado inicial daqui existe para
+  a página nascer coerente antes de o script rodar, não para competir com ele.
+{% endcomment %}
+<c-v2.toggle variant="state" aria_label="Modo de preenchimento do motorista" extra_class="toggle--sm">
+  <button
+    type="button"
+    class="toggle__item"
+    data-oficio-motorista-modo-btn
+    data-value="SERVIDOR"
+    aria-pressed="{% if mode != 'MANUAL' %}true{% else %}false{% endif %}"
+  ><span>No sistema</span></button>
+  <button
+    type="button"
+    class="toggle__item"
+    data-oficio-motorista-modo-btn
+    data-value="MANUAL"
+    aria-pressed="{% if mode == 'MANUAL' %}true{% else %}false{% endif %}"
+  ><span>Manual</span></button>
+</c-v2.toggle>

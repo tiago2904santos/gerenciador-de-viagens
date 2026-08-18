@@ -173,15 +173,22 @@ def apresentar_roteiro_card(roteiro, *, todos_trechos=False, capitais=None):
 
     status = roteiro.get_status_display() if hasattr(roteiro, "get_status_display") else roteiro.status
     status_code = getattr(roteiro, "status", "") or ""
+    # `status_chip_tone_v2` nomeia o ESTADO no vocabulário do `c-v2.chip`
+    # (`done`, `progress`, `late`, `info`), que é o que as telas migradas usam.
+    # A classe e a `variant` continuam para as que ainda não migraram; as três
+    # saem juntas quando a última sair.
     if status_code == Roteiro.STATUS_FINALIZADO:
         status_chip_class = "status-chip--completed"
         status_variant = "finalizado"
+        status_chip_tone_v2 = "done"
     elif status_code == Roteiro.STATUS_RASCUNHO:
         status_chip_class = "status-chip--draft"
         status_variant = "rascunho"
+        status_chip_tone_v2 = "progress"
     else:
         status_chip_class = "status-chip--muted"
         status_variant = "outro"
+        status_chip_tone_v2 = ""
 
     trechos_payload = []
     for trecho in roteiro.trechos.all():
@@ -248,6 +255,7 @@ def apresentar_roteiro_card(roteiro, *, todos_trechos=False, capitais=None):
         "status": status,
         "status_chip_label": status,
         "status_chip_class": status_chip_class,
+        "status_chip_tone_v2": status_chip_tone_v2,
         "status_variant": status_variant,
         "diaria_moeda": diaria_moeda,
         "diaria_resumo": diaria_resumo,

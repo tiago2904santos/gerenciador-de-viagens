@@ -17,6 +17,25 @@
       </c-slot>
     </c-v2.panel>
 
+    {% comment %}
+      O irmão do alerta com LISTA — o que falta para uma etapa fechar. Fica ao
+      lado dele de propósito: são a mesma caixa e o mesmo vocabulário de tom, e
+      é aqui que se confere se continuam parecendo a mesma peça.
+    {% endcomment %}
+    <c-v2.panel title="Alerta com lista" description="A pendência de etapa: título, frase de abertura e um item por linha.">
+      <c-slot name="body">
+        <c-v2.alert_list
+          :items="v2_pendencias"
+          lead="Corrija os itens abaixo antes de finalizar o documento."
+        />
+        <c-v2.alert_list
+          title="Pendências para concluir esta etapa"
+          tone="warning"
+          :items="v2_pendencias"
+        />
+      </c-slot>
+    </c-v2.panel>
+
     <h3 class="v2-lab__sub">Tela de lista completa</h3>
 
     {% comment %}
@@ -237,16 +256,29 @@
           toggle_label="Cadastrar cargo"
           submit_label="Salvar cargo"
         >
-          <c-v2.field label="Nome do cargo">
-            <c-slot name="control">
-              <c-v2.input placeholder="Ex.: Investigador" aria_label="Nome do cargo" />
+          {% comment %}
+            Os campos NÃO são filhos soltos do painel: cada grupo do cadastro
+            rápido é um `quick_add_section`, que é o `<fieldset>` do sistema. É
+            ele que carrega superfície, raio e recuo — o `<form>` do painel é
+            visualmente neutro. Quinze catálogos usam esta composição, e a
+            vitrine tinha só os campos crus.
+          {% endcomment %}
+          <c-v2.quick_add_section title="Dados do cargo" description="Nome e sigla">
+            <c-slot name="body">
+              <div class="field-grid">
+                <c-v2.field label="Nome do cargo">
+                  <c-slot name="control">
+                    <c-v2.input placeholder="Ex.: Investigador" aria_label="Nome do cargo" />
+                  </c-slot>
+                </c-v2.field>
+                <c-v2.field label="Sigla">
+                  <c-slot name="control">
+                    <c-v2.input placeholder="Ex.: INV" aria_label="Sigla do cargo" />
+                  </c-slot>
+                </c-v2.field>
+              </div>
             </c-slot>
-          </c-v2.field>
-          <c-v2.field label="Sigla">
-            <c-slot name="control">
-              <c-v2.input placeholder="Ex.: INV" aria_label="Sigla do cargo" />
-            </c-slot>
-          </c-v2.field>
+          </c-v2.quick_add_section>
         </c-v2.quick_add>
       </c-slot>
     </c-v2.panel>

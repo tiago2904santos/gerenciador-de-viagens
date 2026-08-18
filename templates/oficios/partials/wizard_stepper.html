@@ -1,6 +1,0 @@
-{# Legado: delega ao page_stepper global. Preferir wizard_page_steps no contexto. #}
-{% if wizard_page_steps %}
-  <c-ui.navigation.page_stepper :steps="wizard_page_steps" only />
-{% else %}
-  <c-ui.navigation.page_stepper :steps="steps" only />
-{% endif %}

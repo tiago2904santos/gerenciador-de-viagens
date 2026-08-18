@@ -788,10 +788,16 @@ def apresentar_oficio_wizard_header(etapa_atual, oficio=None):
         ctx["status_label"] = oficio.get_status_display()
         if oficio.status == Oficio.STATUS_RASCUNHO:
             ctx["status_variant"] = "draft"
+            # O v2 nomeia o ESTADO, não a cor, e o vocabulário dele tem quatro
+            # palavras. Rascunho é trabalho em curso; arquivado saiu do fluxo e
+            # é informação; o resto está fechado.
+            ctx["status_tone_v2"] = "progress"
         elif oficio.status == Oficio.STATUS_ARQUIVADO:
             ctx["status_variant"] = "pending"
+            ctx["status_tone_v2"] = "info"
         else:
             ctx["status_variant"] = "active"
+            ctx["status_tone_v2"] = "done"
     return ctx
 
 
@@ -822,46 +828,35 @@ def apresentar_status_etapa_oficio(status):
     }
 
 
-def _oficio_step_state_class(step: dict) -> str:
-    state = step.get("state") or step.get("completion_state") or "not_started"
-    if state == "current":
-        return "is-current"
-    if state == "complete":
-        return "is-complete"
-    if state == "locked":
-        return "is-disabled"
-    if state in ("incomplete",):
-        return "is-missing"
-    if state in ("not_started", "not_required"):
-        return "is-pending"
-    return "is-pending"
-
-
-def _oficio_step_marker(step: dict) -> tuple[str, bool]:
-    state = step.get("state") or step.get("completion_state") or "not_started"
-    if state == "complete":
-        return "✓", True
-    if state == "locked":
-        return str(step.get("number") or ""), True
-    return str(step.get("number") or ""), False
+#: Estados do wizard de ofício -> estados do `c-v2.stepper`, que conhece três:
+#: "done", "current" e vazio. O legado tinha cinco classes (`is-complete`,
+#: `is-current`, `is-disabled`, `is-missing`, `is-pending`) e pintava quatro
+#: cores para dizer a mesma coisa — "esta etapa ainda não está pronta".
+#:
+#: "incomplete" cai no vazio junto com "not_started": para quem lê o stepper, a
+#: etapa começada e abandonada e a etapa nunca aberta pedem a mesma ação. O que
+#: as distingue é a FRASE (`state_label`), que continua ao lado do número.
+ESTADOS_DO_STEPPER_V2 = {
+    "complete": "done",
+    "current": "current",
+}
 
 
 def apresentar_oficio_wizard_page_steps(steps):
-    """Adapta steps do wizard de ofício para o componente global page_stepper."""
+    """Adapta os passos do wizard de ofício para o `c-v2.stepper`.
+
+    Sem `url`: o wizard de ofício é LINEAR, e pular adiante deixaria o documento
+    pela metade. O stepper daqui é indicador, não navegação — ao contrário do
+    painel de evento, que é um hub e cujas etapas existem todas ao mesmo tempo.
+    """
     page_steps = []
     for step in steps or []:
-        state_class = _oficio_step_state_class(step)
-        marker, marker_hidden = _oficio_step_marker(step)
+        state = step.get("state") or step.get("completion_state") or "not_started"
         page_steps.append(
             {
-                "url": step.get("url") or "",
-                "state_class": state_class,
-                "step_label": f"Etapa {step.get('number', '')}",
-                "title": step.get("title") or "",
+                "label": step.get("title") or "",
                 "status": step.get("state_label") or "",
-                "marker": marker,
-                "marker_aria_hidden": marker_hidden,
-                "aria_current": "step" if state_class == "is-current" else "",
+                "state": ESTADOS_DO_STEPPER_V2.get(state, ""),
             }
         )
     return page_steps

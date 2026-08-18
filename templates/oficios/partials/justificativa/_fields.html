@@ -1,4 +1,22 @@
-<c-ui.forms.field :field="form.modelo" label="Modelo" only />
-<div class="oficio-justificativa-card__wide-field cv-field--full-width">
-  <c-ui.forms.field :field="form.texto" label="Justificativa" only />
-</div>
+{% comment %}
+  Justificativa — o modelo e o texto.
+
+  O modelo é o `select_with_action`: escolher um e ir gerenciá-los são a mesma
+  tarefa, e a ação leva `data-autosave-link` para quem sai no meio da escrita
+  não perder o que já digitou.
+{% endcomment %}
+<c-v2.field label="Modelo" :label_for="form.modelo.id_for_label" :error="form.modelo.errors.0">
+  <c-slot name="control">
+    <c-v2.select_with_action
+      :field="form.modelo"
+      aria_label="Modelo de justificativa"
+      :action_href="modelos_justificativa_url"
+      action_icon="settings"
+      action_aria_label="Gerenciar modelos"
+      action_tooltip="Gerenciar modelos"
+      :action_autosave="True"
+    />
+  </c-slot>
+</c-v2.field>
+
+<c-v2.form_field :field="form.texto" label="Justificativa" />

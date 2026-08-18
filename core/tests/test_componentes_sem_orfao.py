@@ -36,6 +36,14 @@ APAGADOS_COM_OS_CADASTROS = (
 )
 
 
+# Migração de Ofícios para o v2 (NOVO-20260818-213853-fab772ef1b6e): o segment
+# toggle legado perdeu o último consumidor quando o par SERVIDOR × MANUAL do
+# motorista virou `c-v2.driver_mode_toggle`. Prova de grep no PR: zero
+# ocorrências de `segment_toggle` e `c-ui.segment_toggle` em `templates/`,
+# `static/js/` e `*.py`.
+APAGADOS_COM_OS_OFICIOS = ("ui/segment_toggle.html",)
+
+
 APAGADOS_COM_O_LAB = (
     "ui/buttons/field_action_button.html",
     "ui/buttons/floating_primary_action.html",
@@ -209,7 +217,36 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # do evento são listas longas, e a ação no cabeçalho do painel some na
         # primeira rolagem — quem chega ao fim da lista voltaria ao topo para
         # criar o próximo item.
-        self.assertEqual(len(self.components()), 147)
+        #
+        # 148 (2026-08-18): `v2/quick_add_section.html`, o `<fieldset>` de cada
+        # grupo do cadastro rápido. Entrou com os quinze catálogos e o número
+        # não foi atualizado junto — este contrato estava vermelho, e a galeria
+        # não o citava (`test_todo_componente_v2_aparece_na_galeria` apontava
+        # exatamente ele). As duas pontas foram fechadas na migração de Ofícios.
+        #
+        # 152 (NOVO-20260818-213853-fab772ef1b6e): as quatro peças que faltavam
+        # para Ofícios não chamar mais nada de fora do v2 —
+        # `v2/document_inline.html` (o PDF aberto na própria página, cuja folha
+        # já estava no bundle sem componente: a marcação era copiada à mão em
+        # nove telas), `v2/alert_list.html` (a pendência de etapa, que no legado
+        # era um QUARTO desenho de "atenção" com caixa própria),
+        # `v2/document_number.html` (o número/ano, último campo a desenhar a
+        # própria moldura em vez de usar o `field`) e `v2/suggestions.html` (a
+        # faixa de atalhos do formulário, cujos dois ganchos se separavam quando
+        # soltos no template).
+        #
+        # 154 (mesmo corte): `v2/driver_mode_toggle.html` e `v2/menu_button.html`.
+        # O primeiro é o segmento SERVIDOR × MANUAL do motorista, que aparecia
+        # escrito à mão em duas etapas do ofício; o segundo é o item de menu que
+        # EXECUTA em vez de navegar ("Visualizar termos"). Os dois existem como
+        # componente pelo mesmo motivo dos irmãos `os_role_toggle` e
+        # `route_mode_toggle`: `<button>` cru com `data-*` só é permitido dentro
+        # de `templates/cotton/`.
+        #
+        # 153 (mesmo corte): saiu `ui/segment_toggle.html`. Era o último
+        # componente do sistema antigo vivo no ofício, e o `toggle` do v2 já
+        # fazia as duas variantes dele.
+        self.assertEqual(len(self.components()), 153)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.
@@ -227,6 +264,11 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         """A lista padrão legada e o alternador de abas, sem consumidor."""
         voltaram = [rel for rel in APAGADOS_COM_OS_CADASTROS if (COTTON / rel).exists()]
         self.assertEqual(voltaram, [], "componente apagado com os cadastros voltou")
+
+    def test_os_apagados_com_os_oficios_nao_voltaram(self):
+        """O segment toggle legado, sem consumidor depois do `driver_mode_toggle`."""
+        voltaram = [rel for rel in APAGADOS_COM_OS_OFICIOS if (COTTON / rel).exists()]
+        self.assertEqual(voltaram, [], "componente apagado com os ofícios voltou")
 
     def test_os_apagados_da_cascata_do_be25_nao_voltaram(self):
         """Idem para a cascata do `NOVO-44` e para o que caiu com o UI Lab (PR #247)."""
@@ -250,6 +292,7 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
             set(APAGADOS_PELO_HT06)
             | set(APAGADOS_COM_O_LAB)
             | set(APAGADOS_COM_OS_CADASTROS)
+            | set(APAGADOS_COM_OS_OFICIOS)
         )
         vivos = {str(path.relative_to(COTTON)) for path in self.components()}
         self.assertEqual(nomeados & vivos, set())

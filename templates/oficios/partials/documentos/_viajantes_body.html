@@ -1,33 +1,26 @@
-<article class="oficio-documentos-card oficio-documentos-card--travellers" aria-label="Viajantes">
-  <div class="oficio-documentos-card__body">
-    {% with n=documentos_ctx.viajantes_cards|length %}
-    <div class="oficio-documentos-travellers-grid{% if n == 1 %} oficio-documentos-travellers-grid--single{% endif %}" role="list">
-      {% for viajante in documentos_ctx.viajantes_cards %}
-        <article
-          class="oficio-documentos-traveller-tile{% if viajante.is_motorista %} oficio-documentos-traveller-tile--motorista{% endif %}"
-          role="listitem"
-        >
-          <span class="oficio-documentos-traveller-tile__avatar" aria-hidden="true">{{ viajante.iniciais }}</span>
-          <div class="oficio-documentos-traveller-tile__main">
-            <div class="oficio-documentos-traveller-tile__title-row">
-              <strong class="oficio-documentos-traveller-tile__name">{{ viajante.nome }}</strong>
-              {% if viajante.is_motorista %}
-                <span class="oficio-documentos-traveller-tile__badge">Motorista</span>
-              {% endif %}
-            </div>
-            {% if viajante.meta %}<span class="oficio-documentos-traveller-tile__meta">{{ viajante.meta }}</span>{% endif %}
-          </div>
-          <span
-            class="oficio-documentos-traveller-tile__termo{% if viajante.has_termo %} oficio-documentos-traveller-tile__termo--sim{% else %} oficio-documentos-traveller-tile__termo--nao{% endif %}"
-          >
-            <span class="oficio-documentos-traveller-tile__termo-dot" aria-hidden="true"></span>
-            Termo: {% if viajante.has_termo %}sim{% else %}não{% endif %}
-          </span>
-        </article>
-      {% empty %}
-        <div class="oficio-documentos-travellers-empty">Nenhum viajante vinculado a este ofício.</div>
-      {% endfor %}
-    </div>
-    {% endwith %}
-  </div>
-</article>
+{% comment %}
+  Viajantes — uma linha por servidor, com o motorista realçado e o estado do
+  termo ao lado.
+
+  É a `person_row` do sistema, a mesma do cartão da lista de ofícios. Os
+  "ladrilhos" que moravam aqui (`oficio-documentos-traveller-tile`) eram uma
+  segunda forma de desenhar exatamente isto — avatar, nome, selo e uma marca de
+  estado —, com grade própria e um caso especial para quando havia um viajante
+  só.
+
+  O estado do termo vira `meta` da linha em vez de um ponto colorido: a cor
+  sozinha não informa quem não a distingue (WCAG 1.4.1), e a linha já tem onde
+  escrever.
+{% endcomment %}
+<ul class="person-list">
+  {% for viajante in documentos_ctx.viajantes_cards %}
+    <c-v2.person_row
+      :initials="viajante.iniciais"
+      :name="viajante.nome"
+      meta="{{ viajante.meta }}{% if viajante.meta %} · {% endif %}Termo: {% if viajante.has_termo %}sim{% else %}não{% endif %}"
+      badge="{% if viajante.is_motorista %}Motorista{% endif %}"
+    />
+  {% empty %}
+    <li class="person-row"><span class="person-row__meta">Nenhum viajante vinculado a este ofício.</span></li>
+  {% endfor %}
+</ul>

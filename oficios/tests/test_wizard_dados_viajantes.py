@@ -100,15 +100,15 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, f'name="numero" value="{oficio.numero}"')
         self.assertContains(response, f"/ {oficio.ano}")
         self.assertNotContains(response, "Data criação:")
-        self.assertContains(response, "form-section-card")
+        self.assertContains(response, "form-block--v2")
         self.assertContains(response, "field-grid")
         self.assertNotContains(response, "DOCX")
         self.assertContains(response, "Avançar")
         self.assertNotContains(response, "Gerado automaticamente ao salvar.")
         self.assertNotContains(response, "será definida automaticamente ao salvar")
         self.assertNotContains(response, "Status:")
-        self.assertContains(response, "page-stepper")
-        self.assertContains(response, "page-shell--wizard")
+        self.assertContains(response, "stepper__list")
+        self.assertContains(response, "wizard-page")
         self.assertContains(response, 'data-autosave-link="1"')
         self.assertNotContains(response, "Pendências para concluir esta etapa")
         self.assertContains(response, "Protocolo")
@@ -122,14 +122,20 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, 'data-entity-picker="true"')
         self.assertContains(response, 'data-picker-variant="detailed"')
         self.assertContains(response, 'data-picker-term-control="true"')
-        self.assertContains(response, "form-section-stack--comfortable")
+        self.assertContains(response, "panel")
         self.assertContains(response, "Equipe")
         self.assertNotContains(response, "Selecione os viajantes; um deles pode ser o motorista")
         html = response.content.decode()
         self.assertEqual(len(re.findall(r"<main\b", html)), 1)
+        # No v2 a hierarquia é h1 (identidade da página) → h2 (painel) → h2
+        # (bloco). Os dois níveis de caixa compartilham o h2 porque o sistema
+        # inteiro é assim — o cadastro de servidor e o formulário de OS também.
+        # Quem guarda a regra de não PULAR degrau é `core.tests.test_ordem_de_headings`,
+        # que vale em todas as rotas; aqui basta provar que a etapa tem um h1 e
+        # que o conteúdo vem sob um h2.
         self.assertIsNotNone(
             re.search(
-                r"<h1\b[^>]*>.*?</h1>.*?<h2\b[^>]*>.*?</h2>.*?<h3\b",
+                r"<h1\b[^>]*>.*?</h1>.*?<h2\b",
                 html,
                 flags=re.DOTALL,
             )
@@ -146,8 +152,12 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, "data-cargo=")
         self.assertContains(response, "data-unidade=")
         self.assertNotContains(response, "data-filterable-multiselect-input")
-        self.assertContains(response, "field-with-action--manage-reveal")
-        self.assertContains(response, "icon-btn--field-manage")
+        # No v2 a ação de gerenciar mora DENTRO do controle: `field-with-action`
+        # é o invólucro que revela o botão no hover/foco, e o botão é o
+        # `icon_button` do sistema — o par `--manage-reveal`/`icon-btn--field-manage`
+        # era o desenho anterior da mesma coisa.
+        self.assertContains(response, "field-with-action")
+        self.assertContains(response, "icon-button")
         self.assertContains(response, reverse("oficios:modelos_motivo_index"))
         self.assertContains(response, "Modelo de motivo")
         self.assertContains(response, 'name="modelo_motivo"')
@@ -155,8 +165,16 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, 'name="motivo"')
         self.assertContains(response, "cv-field__control cv-field__control--textarea")
         self.assertContains(response, 'rows="4"')
-        self.assertContains(response, "form-block--resource")
-        self.assertContains(response, 'id="travel-document-purpose-title"')
+        # `form-block--resource` era a variante que punha uma ação no cabeçalho
+        # do bloco. No v2 a ação de gerenciar mora dentro do próprio controle
+        # (`field-with-action`), então a variante deixou de existir: o que se
+        # confere é que o bloco é o do v2 e que a ação está lá.
+        self.assertContains(response, "form-block--v2")
+        # O `id` no título do bloco existia para o `aria-labelledby` do
+        # `<section>` legado. O `form_block` do v2 não o usa: o título já é o
+        # primeiro filho do bloco, e um `<section>` com cabeçalho próprio é
+        # nomeado por ele sem precisar de referência cruzada.
+        self.assertContains(response, "Finalidade")
         self.assertNotContains(
             response,
             "Escolha um modelo para iniciar com texto pré-preenchido ou escreva manualmente o motivo.",
@@ -364,12 +382,12 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "oficios/wizard_dados_viajantes.html")
         self.assertContains(response, "Motivo existente")
-        self.assertContains(response, "page-stepper")
-        self.assertContains(response, "page-shell--wizard")
+        self.assertContains(response, "stepper__list")
+        self.assertContains(response, "wizard-page")
         self.assertContains(response, 'name="numero" value="1"')
         self.assertContains(response, "/ 2026")
         self.assertNotContains(response, "Data criação:")
-        self.assertContains(response, "page-header-status-chip")
+        self.assertContains(response, "chip--v2")
         self.assertContains(response, oficio.get_status_display())
 
     def test_post_dados_viajantes_atualiza_sem_apagar_transporte(self):
@@ -641,8 +659,8 @@ class OficioWizardDadosViajantesTests(TestCase):
             Path("templates/oficios/wizard_roteiro.html"),
             Path("templates/oficios/wizard_justificativa.html"),
             Path("templates/oficios/wizard_documentos.html"),
-            Path("templates/oficios/partials/wizard_stepper.html"),
-            Path("templates/oficios/partials/wizard_actions.html"),
+            Path("templates/oficios/partials/_dados_viajantes_body.html"),
+            Path("templates/oficios/partials/wizard_dados_card_motorista_externo.html"),
         ]
         for template_path in template_paths:
             content = template_path.read_text(encoding="utf-8")
@@ -665,8 +683,8 @@ class OficioWizardDadosViajantesTests(TestCase):
         response = self.client.get(self._novo_rascunho_url())
         self.assertContains(response, "data-oficio-custeio-field")
         self.assertContains(response, "data-oficio-instituicao-field")
-        self.assertContains(response, "form-field--hidden")
         self.assertContains(response, "data-custeio-observacao-wrapper")
+        self.assertContains(response, 'data-oficio-custeio-outra-value="OUTRA_INSTITUICAO"\n    hidden')
 
     def test_custeio_observacao_aparece_quando_outra_instituicao(self):
         oficio = Oficio.objects.create(area=area_de_teste(), 
@@ -680,7 +698,7 @@ class OficioWizardDadosViajantesTests(TestCase):
         self.assertContains(response, "data-custeio-observacao-wrapper")
         self.assertNotContains(
             response,
-            'data-oficio-instituicao-field form-field--hidden',
+            'data-oficio-custeio-outra-value="OUTRA_INSTITUICAO"\n    hidden',
         )
 
     def test_post_custeio_outra_instituicao_sem_observacao_salva_rascunho(self):

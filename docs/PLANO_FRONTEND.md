@@ -391,3 +391,28 @@ alcançável em produção. Não vira ID.
 - [x] `NOVO-20260818-200724-685b186c033b` — substituir os `form-blocks` dos quinze cadastros
   rápidos por `fieldset` filhos do único formulário visualmente neutro, mantendo campos, hooks
   e responsividade.
+
+## Conclusão dos ofícios no v2 (18/08/2026)
+
+Ofícios era a última fila da migração: a lista já era v2 desde o dia anterior, mas as cinco etapas
+do wizard ainda respondiam ao sistema anterior — e a etapa de roteiro mantinha uma segunda cópia
+de uma tela que já existia migrada.
+
+- [x] `NOVO-20260818-213853-fab772ef1b6e` — migrar as cinco etapas do wizard de Ofícios para
+  `wizard_page`, `panel`, `form_block` e `card_footer` v2; unificar a etapa de roteiro no mesmo
+  `_roteiro_editor_v2.html` da tela avulsa; criar os seis componentes que faltavam
+  (`document_inline`, `alert_list`, `document_number`, `suggestions`, `driver_mode_toggle`,
+  `menu_button`) com vitrine na galeria; e apagar o `segment_toggle` legado mais treze parciais
+  sem consumidor.
+- [ ] `NOVO-20260818-223102-58bda2a28945` — podar `roteiros/includes/_roteiro_editor.html` e a
+  árvore de ~20 parciais sob ele, órfã desde que a etapa de roteiro passou ao editor v2. **É uma
+  etapa de Roteiros:** a cascata alcança `c-travel.route_segments` e
+  `c-travel.travel_allowance_calculator`, que caem no guarda de órfão e mudam o inventário de
+  componentes.
+
+**O que a conclusão de Ofícios deixa medido para a próxima frente.** Ofícios fecha em **zero**
+chamadas a namespace anterior ao v2 (`grep -rhoE '<c-ui\.|<c-cards\.|<c-feedback\.|<c-form\.|<c-lists\.|<c-travel\.' templates/oficios/ | wc -l`).
+Prestações de Contas passa a ser a maior dívida visual do repositório (**134 chamadas** contra 8
+do v2), seguida de Planos de Trabalho (**83** contra 48). As peças que faltavam para Ofícios — o documento inline e a
+pendência de etapa — são exatamente as que essas duas telas mais repetem à mão, então boa parte do
+trabalho de componente já está paga.

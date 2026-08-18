@@ -1,5 +1,34 @@
+{% comment %}
+  Equipe — o picker de servidores no v2, com o atalho de cadastrar um novo ao
+  lado. É a mesma composição do cadastro de viatura: o `field` dá rótulo e erro,
+  o `picker` dá o controle, e a ação de gerenciar mora DENTRO dele, para o hover
+  de um revelar a outra.
+
+  Os dois campos ocultos são contrato do POST, não desenho: o `_present` diz ao
+  servidor que a lista de termos veio no formulário mesmo quando vazia (sem ele,
+  desmarcar todos era indistinguível de não enviar nada), e o
+  `servidores_termo_autorizacao` é escrito pelo próprio picker, pelo
+  `data-cv-termos-name` do widget.
+{% endcomment %}
 <input type="hidden" name="servidores_termo_autorizacao_present" value="1">
-<c-ui.forms.field :field="form.servidores" only />
+
+<c-v2.field :label="form.servidores.label" :label_for="form.servidores.id_for_label" :error="form.servidores.errors.0">
+  <c-slot name="control">
+    <c-v2.picker
+      :field="form.servidores"
+      mode="multi"
+      presentation="people"
+      :driver="True"
+      selected_title="Pessoas na equipe"
+      :action_href="servidor_create_url"
+      action_icon="plus"
+      action_aria_label="Novo viajante"
+      action_tooltip="Novo viajante"
+      :action_autosave="True"
+    />
+  </c-slot>
+</c-v2.field>
+
 <div hidden aria-hidden="true">
   {{ form.servidores_termo_autorizacao }}
 </div>

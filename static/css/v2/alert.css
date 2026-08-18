@@ -87,3 +87,55 @@
     transition: none;
   }
 }
+
+
+/* ---- alerta com lista ------------------------------------------------------
+ *
+ * A pendência de etapa: a mesma caixa, o mesmo tom, mas com título e itens em
+ * vez de uma frase. Ela substituiu `.pendencias*` (`ui/feedback/`), que era um
+ * QUARTO desenho de "atenção" na mesma tela onde já viviam o alerta, o selo e o
+ * erro de campo — com caixa, marcador e tipografia próprios.
+ *
+ * O `<section>` sobrepõe o `display` do `.alert`, que é de parágrafo: aqui há
+ * três filhos empilhados, e o recuo à esquerda volta ao cheio porque o texto
+ * não é mais uma linha rente à fitinha.
+ */
+:is(html[data-theme]) .alert--list {
+  display: grid;
+  gap: 6px;
+  /* A COLUNA é declarada, e não herdada. As folhas de página do sistema antigo
+     ainda vivem nas rotas não migradas e dão a `.alert` uma grade de DUAS
+     colunas (`auto minmax(0,1fr)`) mais um marcador em `::before`, feita para
+     um parágrafo só. Com três filhos, o título ia para a coluna do marcador e a
+     lista subia para o lado da frase — medido na etapa de documentos do ofício.
+     Uma coluna só, e o marcador desligado, tornam o bloco independente de quem
+     mais tenha opinião sobre `.alert`. */
+  grid-template-columns: minmax(0, 1fr);
+  padding: 12px 14px;
+}
+
+/* O sinal do v2 é a fitinha lateral, e ela já está no `.alert`. O ponto extra
+   vinha da folha legada; aqui ele some sem que ela precise mudar. */
+:is(html[data-theme]) .alert--list::before {
+  content: none;
+}
+
+:is(html[data-theme]) .alert__title {
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+}
+
+:is(html[data-theme]) .alert__lead {
+  margin: 0;
+}
+
+/* Os itens herdam a cor do tom, mas o marcador fica DENTRO da caixa
+   (`inside`): com o padrão do navegador, o disco cai fora do recuo e encosta na
+   fitinha lateral. */
+:is(html[data-theme]) .alert__items {
+  display: grid;
+  gap: 2px;
+  list-style-position: inside;
+  margin: 0;
+  padding: 0;
+}

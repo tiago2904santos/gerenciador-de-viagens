@@ -3,12 +3,49 @@
 
 {% block wizard_content %}
   {% if mostrar_pendencias_documento and pendencias %}
-    <c-ui.feedback.pendencias_card :items="pendencias" title="Pendências para concluir esta etapa" tone="warning" only />
+    <c-v2.alert_list :items="pendencias" title="Pendências para concluir esta etapa" tone="warning" />
   {% endif %}
 
+  {% comment %}
+    `transporte_embed` diz ao servidor que os campos do motorista vieram junto
+    com a etapa 1 — sem ele o POST salva a viagem e descarta o condutor.
+
+    `data-travel-document-wizard-step1` FICA: é o seletor-raiz de
+    `js/pages/oficios-wizard-driver-state.js` e de `oficios-viatura-sugestoes.js`,
+    além de um dos escopos de menu do `overlay.js`. As regras legadas presas a
+    ele são todas descendentes de classes que esta etapa não emite mais
+    (`travel-document-card`, `search-picker__*`, `travel-period-block__*`), então
+    o marcador não arrasta desenho nenhum para cá — o que arrastava era a
+    marcação, não o atributo.
+  {% endcomment %}
   <input type="hidden" name="transporte_embed" value="1">
-  <div class="form-section-stack form-section-stack--comfortable" data-travel-document-wizard-step1 data-oficio-driver-source>
-    <c-form.card title="Informações da viagem" description="Identificação, finalidade, equipe e transporte" title_id="travel-document-wizard-dados-principais" :heading_level="2" body_extra_class="travel-document-body" footer_data_hook="oficio-viatura-footer" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :extra_class="extra_class" :eyebrow="eyebrow" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "oficios/partials/_dados_viajantes_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id data_hook=data_hook element_id=element_id servidor_create_url=servidor_create_url shell=shell variant=variant viatura_create_url=viatura_create_url motorista_compact_widget=motorista_compact_widget motorista_oficio_ano=motorista_oficio_ano motorista_oficio_numero_inicial=motorista_oficio_numero_inicial show_motorista_card=show_motorista_card transporte_form=transporte_form form=form modelos_motivo_url=modelos_motivo_url mostrar_custeio_observacao=mostrar_custeio_observacao oficio_numero_ano_hint=oficio_numero_ano_hint outra_instituicao_custeio_value=outra_instituicao_custeio_value tem_modelos_motivo=tem_modelos_motivo only %}</c-slot><c-slot name="footer">{% include "oficios/partials/_dados_viajantes_footer.html" only %}</c-slot></c-form.card>
+
+  <div data-travel-document-wizard-step1 data-oficio-driver-source>
+    <c-v2.form_errors :form="form" />
+
+    <c-v2.panel title="Informações da viagem" description="Identificação, finalidade, equipe e transporte.">
+      <c-slot name="body">
+        {% include "oficios/partials/_dados_viajantes_body.html" with form=form modelos_motivo_url=modelos_motivo_url mostrar_custeio_observacao=mostrar_custeio_observacao motorista_compact_widget=motorista_compact_widget motorista_extras_visivel=motorista_extras_visivel motorista_oficio_ano=motorista_oficio_ano motorista_oficio_numero_inicial=motorista_oficio_numero_inicial oficio_numero_ano_hint=oficio_numero_ano_hint outra_instituicao_custeio_value=outra_instituicao_custeio_value servidor_create_url=servidor_create_url show_motorista_card=show_motorista_card tem_modelos_motivo=tem_modelos_motivo transporte_form=transporte_form viatura_create_url=viatura_create_url only %}
+
+        {% comment %}
+          A primeira etapa não tem "Voltar": voltar dela é sair do wizard, e essa
+          saída já está no cabeçalho.
+        {% endcomment %}
+        <c-v2.card_footer>
+          <c-slot name="primary">
+            <c-v2.button
+              label="Avançar"
+              variant="primary"
+              icon="arrow-right"
+              :icon_after="True"
+              type="submit"
+              name="wizard_action"
+              value="wizard_next"
+            />
+          </c-slot>
+        </c-v2.card_footer>
+      </c-slot>
+    </c-v2.panel>
   </div>
 {% endblock %}
 

@@ -1,0 +1,66 @@
+{% cotton:vars actions actions_label body download_url empty_message extra_class frame_title group nested open_url src title %}
+{% comment %}
+  Documento inline — o cartão que abre e mostra o PDF na própria página. Par de
+  `static/css/v2/document-inline.css`, que já estava no bundle do v2 sem ter
+  componente: o desenho existia, a marcação era copiada à mão em nove telas.
+
+  É um `<details>`/`<summary>` de verdade — abrir e fechar é do navegador. O
+  `src` NÃO vai no `<iframe>`: vai em `data-src`, e quem o promove a `src` no
+  primeiro `toggle` é `js/pages/oficios-documentos-inline.js`, pelo gancho
+  `data-lazy-inline`. Um PDF por cartão carregado antes de alguém pedir é peso
+  que ninguém vê.
+
+  Três corpos possíveis, nesta ordem:
+
+  - `src` — o visualizador;
+  - `body` — os cartões filhos, quando este é o cartão de GRUPO (`group`), como
+    "Termos de Autorização", que reúne um cartão por servidor;
+  - nenhum dos dois — `empty_message`, que é o caso do documento ainda não
+    gerado. O cartão continua na tela dizendo por que está vazio, em vez de
+    sumir e deixar a lista com um buraco.
+
+  O cartão de grupo não é preguiçoso: não tem `<iframe>` próprio para hidratar,
+  e marcá-lo como tal faria o motor procurar o que não existe.
+
+  `open_url`/`download_url` emitem `data-termo-inline-url` e
+  `data-termo-download-pdf-url`, que são contrato do mesmo script: é por eles
+  que "Visualizar termos" e "Baixar PDFs" acham, no cartão de grupo, os filhos
+  que devem abrir. Os nomes vêm do legado na letra — trocar um deixa o item de
+  menu na tela e desliga a ação em silêncio.
+{% endcomment %}
+<details
+  class="document-inline-card{% if group %} document-inline-card--termos{% else %} document-inline-card--lazy{% endif %}{% if nested %} document-inline-card--nested{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+  {% if not group %}data-lazy-inline{% endif %}
+  {% if open_url %}data-termo-inline-url="{{ open_url }}"{% endif %}
+  {% if download_url %}data-termo-download-pdf-url="{{ download_url }}"{% endif %}
+>
+  <summary class="document-inline-card__header">
+    <span class="document-inline-card__title">{{ title }}</span>
+    {% if actions %}
+      {% comment %}
+        As ações moram DENTRO do `<summary>`, e o script para o clique delas
+        antes que ele alterne o `<details>` — menos os gatilhos de overlay, que
+        precisam borbulhar até a delegação no `document`.
+      {% endcomment %}
+      <span class="document-inline-card__header-end">
+        <span class="document-inline-actions document-inline-actions--header" aria-label="{{ actions_label|default:'Ações do documento' }}">{{ actions }}</span>
+      </span>
+    {% endif %}
+  </summary>
+  <div class="document-inline-card__body{% if group %} document-inline-card__body--termos{% endif %}">
+    {% if src %}
+      <div class="document-inline-viewer">
+        <iframe
+          class="document-inline-viewer__frame"
+          data-src="{{ src }}"
+          title="{{ frame_title|default:title }}"
+          loading="lazy"
+        ></iframe>
+      </div>
+    {% elif body.strip %}
+      {{ body }}
+    {% else %}
+      <p class="document-inline-empty">{{ empty_message }}</p>
+    {% endif %}
+  </div>
+</details>

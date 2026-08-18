@@ -1,13 +1,37 @@
-<c-ui.forms.field :field="form.modelo_motivo" label="Modelo de motivo" :action_url="modelos_motivo_url" action_label="Gerenciar modelos" only />
+{% comment %}
+  Finalidade — o modelo de motivo e o texto da viagem, no sistema v2.
+
+  O modelo é o `select_with_action`: escolher um modelo e ir gerenciá-los são a
+  mesma tarefa, e a ação aparece quando o ponteiro (ou o Tab) entra no campo. A
+  ação leva `data-autosave-link`, sem o qual quem clica em "Gerenciar modelos"
+  no meio do cadastro perde o que digitou.
+
+  A descrição não tem rótulo visível: o bloco já se chama "Finalidade" e o campo
+  é o único texto longo dele. O rótulo existe para o leitor de tela, no `field`.
+
+  `data-oficio-custeio-observacao-panel` é contrato de
+  `js/pages/oficios-dados-viajantes.js` e fica no invólucro do texto.
+{% endcomment %}
+<c-v2.field label="Modelo de motivo" :label_for="form.modelo_motivo.id_for_label" :error="form.modelo_motivo.errors.0">
+  <c-slot name="control">
+    <c-v2.select_with_action
+      :field="form.modelo_motivo"
+      aria_label="Modelo de motivo"
+      :action_href="modelos_motivo_url"
+      action_icon="settings"
+      action_aria_label="Gerenciar modelos"
+      action_tooltip="Gerenciar modelos"
+      :action_autosave="True"
+    />
+  </c-slot>
+</c-v2.field>
+
 {% if not tem_modelos_motivo %}
-  <div class="field">
-    <p class="field-help">Nenhum modelo cadastrado. <a href="{{ modelos_motivo_url }}">Abrir gerenciamento de modelos</a></p>
-  </div>
+  <c-v2.alert tone="info" message="Nenhum modelo cadastrado — escreva a descrição abaixo ou abra o gerenciamento de modelos." />
 {% endif %}
-<div class="field app-form-field cv-field oficio-motivo-field oficio-reveal-panel is-open" data-oficio-custeio-observacao-panel>
-  <label class="sr-only" for="{{ form.motivo.id_for_label }}">Descrição</label>
-  {{ form.motivo }}
-  {% if form.motivo.errors %}
-    <c-ui.feedback.field_error :errors="form.motivo.errors" :field_id="form.motivo.auto_id" only />
-  {% endif %}
+
+<div data-oficio-custeio-observacao-panel>
+  <c-v2.field label="Descrição" :label_for="form.motivo.id_for_label" :error="form.motivo.errors.0">
+    <c-slot name="control">{{ form.motivo }}</c-slot>
+  </c-v2.field>
 </div>

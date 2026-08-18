@@ -49,4 +49,49 @@
       </c-slot>
     </c-v2.panel>
 
+    {% comment %}
+      Documento inline — o cartão que abre e mostra o PDF na própria página.
+      Três estados, porque são três coisas diferentes na tela real: o documento
+      pronto (com o visualizador), o que ainda não foi gerado (com o motivo) e o
+      GRUPO, que reúne um cartão por servidor.
+
+      O visualizador fica vazio aqui: o `src` só vira `src` de verdade no
+      primeiro clique, e esta rota não tem documento nenhum para apontar. O que
+      se confere aqui é a moldura, o cabeçalho com ações e o encaixe do
+      aninhado — não o PDF.
+    {% endcomment %}
+    {% url "core:main_preview_secao" "conteudo" as conteudo_url %}
+    <c-v2.panel title="Documento inline" description="O PDF aberto na própria página, carregado só no primeiro clique.">
+      <c-slot name="body">
+        <c-v2.document_inline title="Ofício 153/2026" :src="conteudo_url" frame_title="Visualização do ofício em PDF">
+          <c-slot name="actions">
+            <c-v2.icon_button icon="folder" :href="conteudo_url" aria_label="Abrir ações do ofício" tooltip="Visualizar e baixar" />
+          </c-slot>
+        </c-v2.document_inline>
+
+        <c-v2.document_inline
+          title="Justificativa"
+          empty_message="A justificativa ainda não foi gerada para este ofício."
+        />
+
+        <c-v2.document_inline :group="True" title="Termos de Autorização">
+          <c-slot name="body">
+            <c-v2.document_inline
+              :nested="True"
+              title="Termo — ADEMAR SCHONS"
+              :src="conteudo_url"
+              :open_url="conteudo_url"
+              :download_url="conteudo_url"
+              actions_label="Ações do termo — ADEMAR SCHONS"
+            />
+            <c-v2.document_inline
+              :nested="True"
+              title="Termo — ADRIANO SILVA"
+              empty_message="Documento indisponível no momento."
+            />
+          </c-slot>
+        </c-v2.document_inline>
+      </c-slot>
+    </c-v2.panel>
+
     {# ---------------------------------------------------------------- LISTA #}

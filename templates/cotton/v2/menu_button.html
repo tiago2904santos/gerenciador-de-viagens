@@ -1,0 +1,32 @@
+{% cotton:vars description hook icon icon_tone title tone %}
+{% comment %}
+  Item de menu que EXECUTA em vez de navegar — "Visualizar termos", que abre de
+  uma vez todos os documentos do grupo.
+
+  É o gêmeo em `<button>` do `c-v2.menu_item`: mesma linha, mesmo ícone, mesma
+  caixa de tom. Existe separado porque a diferença é semântica e não visual —
+  um item que não leva a lugar nenhum não é um link, e como link ele obrigaria
+  um destino falso, que o contrato dos templates do wizard proíbe.
+
+  Fica em `templates/cotton/` porque é `<button>` cru, que é o caminho previsto
+  aqui e proibido em template de aplicação (`test_raw_button_component`).
+
+  `hook` é o `data-*` do motor que executa a ação — `data-open-all-termos`, lido
+  por `js/pages/oficios-documentos-inline.js`. É valeless, então atravessa o
+  escape sem estrago; um gancho COM valor não caberia aqui, pelo mesmo motivo
+  que não cabe no `c-v2.button`.
+{% endcomment %}
+{% load icones %}
+<button
+  type="button"
+  class="menu__item"
+  role="menuitem"
+  {% if tone %}data-tone="{{ tone }}"{% endif %}
+  {% if hook %}{{ hook }}{% endif %}
+>
+  {% if icon %}<span class="menu__icon"{% if icon_tone %} data-tone="{{ icon_tone }}"{% endif %} aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
+  <span class="menu__copy">
+    <strong class="menu__title">{{ title }}</strong>
+    {% if description %}<small class="menu__description">{{ description }}</small>{% endif %}
+  </span>
+</button>
