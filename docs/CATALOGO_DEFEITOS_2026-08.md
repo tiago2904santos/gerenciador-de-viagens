@@ -9023,3 +9023,66 @@ branco não impede, painel sem `required` conta o conjunto visível, oculto/subm
 fora, caixa de seleção conta por marcada, painel sem campo nunca conta, e recolher devolve o
 rótulo e limpa. `app.js` foi de 27,21% a **49,68%** de linhas (66,19% funções, 37,16% ramos,
 48,73% comandos) e o piso subiu para o medido, como manda a catraca.
+
+### NOVO-20260818-221535-ee93a21ca8f2 ✅ RESOLVIDO · `NOVO` O job de CI morria no primeiro passo e nenhum gate do projeto rodava desde 17/08 · QA · 0,4 d
+
+O passo 3 de `.github/workflows/tests.yml` é `npm ci && npm test`, com `shell: bash -e`. Com os
+dois testes vermelhos do `NOVO-20260818-215126-4bbdd8f7e848`, ele saía 1 e **o job inteiro parava
+ali** — antes de instalar Python. Nas oito execuções de `main` entre `363461d` (17/08) e `8a8ab20`
+(18/08), **nada** foi verificado: nem a suíte Django, nem `ruff`, nem os seis auditores, nem o
+`check --deploy`. O painel do GitHub mostrava vermelho e o motivo real ficava escondido no primeiro
+passo.
+
+Com os testes JS verdes o pipeline andou e revelou o acumulado. Dois bloqueadores foram fechados
+aqui porque **param os passos seguintes**; o resto está registrado abaixo.
+
+`ruff check` (sem teto por decisão: o conjunto de `ruff.toml` fica em zero) marcava **12 erros**,
+todos do trabalho de agosto e todos mecânicos:
+
+- **10 × `F601`** em `ordens_servico/forms.py` — `"data-picker-v2": ""` repetido no mesmo `attrs`,
+  uma cópia com indentação errada logo acima da correta. Edição em massa malfeita: as duas têm o
+  mesmo valor, então apagar a cópia é no-op verificado (57 testes de Ordens de Serviço verdes).
+- **`F401`** em `roteiros/views.py:46` — `apresentar_roteiro_card` importado e não usado. A função
+  vive e é chamada de `oficios/presenters.py:1034` e `roteiros/presenters.py:272`; morto é só o
+  import.
+- **`F841`** em `core/tests/test_dark_redesign.py:482` — `page_shell` lido e nunca usado, sobra de
+  quando o painel do evento migrou para `c-v2.wizard_page` e as asserções sobre `page-shell.css`
+  saíram junto.
+
+### NOVO-20260818-221535-941262e83b32 ✅ RESOLVIDO · `NOVO` `_uf_da_sede()` engole qualquer falha da configuração em silêncio · BE-18 · 0,1 d
+
+`core/templatetags/destinos.py:69` fazia `except Exception: return ""`. É o invariante do
+`AGENTS.md` §3.9 e a catraca `--max-except-without-observability 0`, que estava em **1**.
+
+Degradar está certo: uma tag de inclusão não pode derrubar toda tela com destino porque a
+configuração da área não resolveu. Sumir com a falha, não — `get_configuracao_sistema()` faz
+`get_or_create` no banco, e o que cai ali é problema de infraestrutura. Pior, o sintoma
+(campo de estado em branco) é **indistinguível** do caso legítimo tratado na linha seguinte,
+"não há UF cadastrada". O handler passou a chamar `core.errors.capture(exc, "destinos.uf_da_sede")`
+antes de devolver `""`: mesmo comportamento, falha observável. Catraca de volta a 0.
+
+### NOVO-20260818-221535-0258e76352d5 🔴 ABERTO · `NOVO` CSS morto acumulado atrás do gate quebrado: 20 blocos em 6 arquivos · UI-01 · 0,5 d
+
+Com o pipeline andando, `audit_css_morto.py --max 0` acusa **20 blocos / 5,6 KB** cujo seletor só
+cita classe que ninguém usa: `pages/ordens-servico.css` (7 blocos, 2,0 KB), `layout/page-shell.css`
+(6, 1,7 KB), `pages/usuarios.css` (2, 0,7 KB), `pages/oficios.css` (2, 0,6 KB), `pages/eventos-list.css`
+(2, 0,3 KB) e `pages/planos-trabalho-eventos.css` (1, 0,3 KB). É o rastro previsto no enunciado do
+`UI-01`: cada template migrado para o v2 apagou marcação e deixou o CSS para trás.
+
+Idêntico na `main` (20) — não é regressão deste recorte. Não corrigido aqui porque a poda tem
+protocolo próprio (`AGENTS.md` §3.6: por família de classe, com prova de grep de repositório
+inteiro colada no PR), e isso é o assunto de um PR, não carona no de contratos.
+
+### NOVO-20260818-221535-8858f5d13229 🔴 ABERTO · `NOVO` Paleta e padrões de UI acima do teto atrás do mesmo gate · UI-03 / NOVO-76 · a dimensionar
+
+Os outros dois auditores que o pipeline voltou a alcançar:
+
+- `audit_paleta.py --max 0` → **12** pares de cor perceptualmente duplicada (teto zero, fechado em
+  13/08 com `--max 0`). Mesmo número na `main`.
+- `audit_ui_patterns.py --max 2583` → **2651** ocorrências. Este recorte já devolveu 2 (2653 → 2651),
+  mas faltam 68 para o teto.
+
+Os dois são a mesma causa do `NOVO-20260818-213938-228adea09e1d` — cor literal escrita direto no
+trabalho visual de agosto — e devem ser fechados no mesmo corte de token, medindo os três
+auditores juntos: mexer em `hex_color_outside_tokens` sem olhar `audit_paleta` troca um teto pelo
+outro.

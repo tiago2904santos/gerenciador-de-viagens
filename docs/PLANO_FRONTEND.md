@@ -424,3 +424,11 @@ Fica aberto, medido e fora deste recorte:
 - [x] `NOVO-20260818-215706-f765fe0fabad` — a catraca de cobertura de JS voltou a rodar (estava
   curto-circuitada pelos testes vermelhos) e `app.js` subiu de 27,21% a 49,68% de linhas, com
   7 testes novos sobre o quick add; piso elevado ao medido.
+- [x] `NOVO-20260818-221535-ee93a21ca8f2` — o job de CI morria no `npm test` e nenhum gate rodava
+  desde 17/08; com a suíte JS verde o pipeline andou, e os 12 erros de `ruff` (10 chaves de dict
+  repetidas, 1 import morto, 1 local morto) foram fechados.
+- [x] `NOVO-20260818-221535-941262e83b32` — `_uf_da_sede()` passa a observar a falha por
+  `core.errors.capture()`; catraca `BE-18` de volta a 0.
+- [ ] `NOVO-20260818-221535-0258e76352d5` — 20 blocos de CSS morto (5,6 KB) em 6 arquivos.
+- [ ] `NOVO-20260818-221535-8858f5d13229` — `audit_paleta` em 12 (teto 0) e `audit_ui_patterns`
+  em 2651 (teto 2583); mesmo corte de token do `NOVO-20260818-213938-228adea09e1d`.
