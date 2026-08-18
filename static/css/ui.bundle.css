@@ -1373,6 +1373,23 @@
  *
  * Link não aceita `aria-pressed`. Foi essa confusão que, no sistema antigo,
  * fazia o hover cair justamente sobre o item já ativo.
+ *
+ * Uma peça de fora usa as MESMAS regras, por seletor adicional em vez de valores
+ * repetidos na folha dela: as pílulas de formato e saída do seletor de download,
+ * que são `<label>` com `<input type="radio">` dentro — o ativo é
+ * `:has(input:checked)`, não `aria-pressed`, porque quem guarda o estado é o
+ * rádio.
+ *
+ * O seletor de tipo do anexar assinado não aparece aqui: em vez de ensinar esta
+ * folha a classe que o JS criava, o JS passou a criar os segmentos JÁ como
+ * `toggle__item` quando o grupo é este toggle.
+ *
+ * `--sm` é o tamanho pequeno, para toggle que AJUSTA e não navega.
+ * `--fill` ocupa a linha inteira e reparte os segmentos em colunas IGUAIS — para
+ * quando o toggle é a escolha da vez (o tipo de documento a anexar, por exemplo)
+ * e não um filtro ao lado de outra coisa. Colunas iguais e não `flex: 1`: com
+ * `flex` cada segmento cresce a partir do próprio texto, e "Diário" ficava menor
+ * que "Viatura".
  */
 
 :is(html[data-theme]) .toggle {
@@ -1387,6 +1404,26 @@
   padding: 3px;
 }
 
+:is(html[data-theme]) .toggle--fill {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+}
+
+/* Com o segmento maior que o texto, o rotulo tem de ir para o MEIO dele: alinhado
+   a esquerda (padrao do flex), tres colunas iguais pareciam tres textos soltos com
+   uma faixa colorida atras de um deles. */
+:is(html[data-theme]) .toggle--fill .toggle__item {
+  justify-content: center;
+}
+
+:is(html[data-theme]) .toggle--sm {
+  --toggle-item-height: 26px;
+  --toggle-item-padding: 10px;
+  --toggle-item-size: var(--text-size-eyebrow);
+  padding: 2px;
+}
+
 :is(html[data-theme]) .toggle__item {
   align-items: center;
   background: transparent;
@@ -1396,16 +1433,17 @@
   cursor: pointer;
   display: inline-flex;
   font: inherit;
-  font-size: var(--text-size-base);
+  font-size: var(--toggle-item-size, var(--text-size-base));
   gap: 6px;
-  min-height: 34px;
-  padding: 0 14px;
+  min-height: var(--toggle-item-height, 34px);
+  padding: 0 var(--toggle-item-padding, 14px);
   text-decoration: none;
   white-space: nowrap;
 }
 
 :is(html[data-theme]) .toggle__item[aria-current="page"],
-:is(html[data-theme]) .toggle__item[aria-pressed="true"] {
+:is(html[data-theme]) .toggle__item[aria-pressed="true"],
+:is(html[data-theme]) .toggle__item:has(input:checked) {
   background: var(--accent);
   color: var(--text-on-accent);
   font-weight: var(--weight-strong);
@@ -1414,12 +1452,13 @@
 /* O ativo declara o hover junto: sem isso o realce do inativo pinta por cima
    dele e o estado desaparece justamente onde importa. */
 :is(html[data-theme]) .toggle__item[aria-current="page"]:hover,
-:is(html[data-theme]) .toggle__item[aria-pressed="true"]:hover {
+:is(html[data-theme]) .toggle__item[aria-pressed="true"]:hover,
+:is(html[data-theme]) .toggle__item:has(input:checked):hover {
   background: var(--accent);
   color: var(--text-on-accent);
 }
 
-:is(html[data-theme]) .toggle__item:hover:not([aria-current="page"]):not([aria-pressed="true"]) {
+:is(html[data-theme]) .toggle__item:hover:not([aria-current="page"]):not([aria-pressed="true"]):not(:has(input:checked)) {
   background: var(--surface, var(--surface-rail));
   color: var(--text-strong);
 }
@@ -2494,6 +2533,10 @@
 :is(html[data-theme]) .attach-signed__kind {
   display: grid;
   gap: var(--gap-tight);
+  /* Estica (padrão da grade): aqui o toggle é `--fill`, ocupa a linha e reparte
+     os tipos em colunas iguais. Ele já ficou ancorado à esquerda, no tamanho do
+     texto — e a faixa vazia à direita fazia a escolha parecer secundária, quando
+     é ela que decide o que o diálogo vai anexar. */
   min-width: 0;
 }
 
@@ -2501,10 +2544,14 @@
   display: none;
 }
 
-:is(html[data-theme]) .attach-signed__kind-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gap-tight);
+/* O corpo do diálogo é uma PILHA com vão: seletor de tipo, seletor de arquivo,
+   erro, arquivo já anexado. Sem isto o toggle encostava no bloco do picker, como
+   se fossem a mesma peça. Grade, e não margem em cada filho: quem entra ou sai da
+   pilha (o tipo só existe com dois ou mais documentos) não precisa saber de vão —
+   e filho oculto não deixa buraco, que é o que margem faria. */
+:is(html[data-theme]) .modal--attach-signed [data-attach-signed-form] {
+  display: grid;
+  gap: var(--gap);
 }
 
 /* A lista do arquivo ja anexado tambem nasce oculta: so faz sentido quando existe
@@ -5048,9 +5095,15 @@
    rodapé com o botão "Baixar" saía de vista — o botão que a caixa existe para
    oferecer. */
 :is(html[data-theme]) .download-picker__list {
-  max-height: 15rem;
+  max-height: 11.7rem;
   overflow-y: auto;
+  /* A barra é a MESMA das outras caixas roláveis do v2 (listbox e picker): fina e
+     na cor do texto secundário. Sem estas duas linhas o navegador desenha a barra
+     do sistema — larga, clara e com seta, que no tema escuro fica um risco branco
+     colado na lista. */
+  scrollbar-color: var(--text-muted) transparent;
   scrollbar-gutter: stable;
+  scrollbar-width: thin;
 }
 
 :is(html[data-theme]) .download-picker__list,
@@ -5151,14 +5204,15 @@
 }
 
 :is(html[data-theme]) .download-picker__options {
-  /* Os dois grupos EMPILHADOS, um por linha. Lado a lado, cada um recebia metade
-     da largura e as pílulas ficavam de tamanhos diferentes conforme o rótulo
-     ("PDF" contra "Arquivos separados") — quatro caixas de quatro larguras,
-     desalinhadas entre si. Empilhados, cada linha tem duas pílulas iguais e as
-     duas linhas se alinham uma sob a outra. */
-  display: grid;
+  /* Os dois grupos na MESMA LINHA. Eles já foram empilhados em faixas de largura
+     cheia, e o problema de então (pílulas de larguras diferentes, "PDF" contra
+     "Arquivos separados") não vinha do lado a lado: vinha de pílula esticada.
+     Agora cada toggle tem a largura do próprio texto, no tamanho pequeno, e os
+     dois ajustes cabem numa linha — a lista do que baixar volta a ser o que pesa. */
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--gap);
-  grid-template-columns: minmax(0, 1fr);
 }
 
 /* Uma régua separa a ESCOLHA (o que baixar) do AJUSTE (como baixar). São duas
@@ -5169,32 +5223,18 @@
   padding-top: var(--gap);
 }
 
-@media (max-width: 720px) {
-  :is(html[data-theme]) .download-picker__options {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
 /* `fieldset` chega com borda, margem e recuo do navegador — zerar é o que faz o
-   grupo parecer parte do modal, e não uma caixa dentro dele. */
+   grupo parecer parte do modal, e não uma caixa dentro dele. O rótulo fica ao LADO
+   do toggle, na mesma linha: com ele em cima, dois grupos lado a lado viravam
+   quatro linhas de texto em duas colunas. */
 :is(html[data-theme]) .download-picker__option {
+  align-items: center;
   border: 0;
-  display: grid;
-  gap: 6px;
-  /* Duas colunas IGUAIS: a escolha é binária nos dois grupos, e pílulas de
-     tamanhos diferentes davam à opção de rótulo mais longo um peso que ela não
-     tem. `1fr` iguala as duas e alinha as linhas entre si. */
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  gap: var(--gap-tight);
   margin: 0;
   min-width: 0;
   padding: 0;
-}
-
-/* `legend` dentro de grid é elemento especial: sem `grid-column` explícito ele
-   ocupa a primeira trilha e empurra a primeira pílula para a segunda, deixando
-   um buraco na terceira. */
-:is(html[data-theme]) .download-picker__legend {
-  grid-column: 1 / -1;
 }
 
 :is(html[data-theme]) .download-picker__legend {
@@ -5206,37 +5246,15 @@
   text-transform: uppercase;
 }
 
-/* Pílula: mesma linguagem do `toggle` do sistema — o escolhido no accent cheio,
-   o outro na superfície de baixo. */
-:is(html[data-theme]) .download-picker__radio {
-  align-items: center;
-  background: var(--surface-contrast, var(--surface-field));
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  color: var(--text-muted);
-  cursor: pointer;
-  display: flex;
-  font-size: var(--text-size-eyebrow);
-  font-weight: var(--weight-strong);
-  justify-content: center;
-  min-height: var(--control-height-sm);
-  padding: 0 var(--gap);
-  transition: background var(--ease), color var(--ease), border-color var(--ease);
-  white-space: nowrap;
-}
-
+/* A pílula É o `toggle__item` do sistema (`v2/toggle.css`), e não uma cópia dos
+   valores dele: as regras de lá foram estendidas para cobrir o `<label>` com rádio
+   dentro. Aqui fica só o que é próprio deste uso. */
 /* O rádio nativo sai de vista mas continua no fluxo do teclado. */
 :is(html[data-theme]) .download-picker__radio input[type="radio"] {
   height: 0;
   opacity: 0;
   position: absolute;
   width: 0;
-}
-
-:is(html[data-theme]) .download-picker__radio:has(input:checked) {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--text-on-accent);
 }
 
 :is(html[data-theme]) .download-picker__radio:has(input:focus-visible) {

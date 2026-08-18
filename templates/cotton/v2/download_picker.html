@@ -40,31 +40,59 @@
     <div class="download-picker" data-download-picker data-src="{{ src }}">
       <p class="download-picker__hint">Marque o que você quer baixar.</p>
 
+      {% comment %}
+        O erro usa o ALERTA GLOBAL (`.alert` + `data-tone="error"`), e não um
+        estilo próprio: a mensagem de falha é a mesma coisa em toda a tela do
+        sistema, e uma segunda aparência para ela seria uma segunda convenção
+        para aprender. `role="alert"` fica porque aqui a mensagem surge DEPOIS
+        de uma ação — o leitor de tela precisa ser interrompido.
+
+        Ele fica LOGO ABAIXO da instrução, e não no fim do modal: a falha mais
+        comum é a consulta da lista não voltar, e aí a mensagem tem de estar onde
+        a lista deveria estar — no fim, ela aparecia depois da fila e dos ajustes,
+        longe do vazio que explica.
+      {% endcomment %}
+      <p class="alert" data-tone="error" data-download-picker-error hidden role="alert"></p>
+
       <ul class="download-picker__list" data-download-picker-list></ul>
 
+      {% comment %}
+        Formato e saída são TOGGLES na mesma linha, no tamanho pequeno: são dois
+        ajustes de uma linha só, e empilhados em duas faixas de largura cheia
+        pesavam mais que a lista do que baixar, que é a decisão principal.
+
+        Os `<input type="radio">` continuam aí por baixo: a escolha é excludente,
+        e é o rádio que dá isso ao teclado e ao leitor de tela de graça (setas
+        circulam o grupo, o `name` garante um só marcado). O desenho é o do
+        `toggle` do sistema — as regras moram em `v2/toggle.css`, uma fonte só.
+      {% endcomment %}
       <div class="download-picker__options">
         <fieldset class="download-picker__option">
           <legend class="download-picker__legend">Formato</legend>
-          <label class="download-picker__radio">
-            <input type="radio" name="{{ picker_id }}-formato" value="pdf" checked>
-            <span>PDF</span>
-          </label>
-          <label class="download-picker__radio">
-            <input type="radio" name="{{ picker_id }}-formato" value="docx">
-            <span>DOCX</span>
-          </label>
+          <div class="toggle toggle--state toggle--sm download-picker__segments">
+            <label class="toggle__item download-picker__radio">
+              <input type="radio" name="{{ picker_id }}-formato" value="pdf" checked>
+              <span>PDF</span>
+            </label>
+            <label class="toggle__item download-picker__radio">
+              <input type="radio" name="{{ picker_id }}-formato" value="docx">
+              <span>DOCX</span>
+            </label>
+          </div>
         </fieldset>
 
         <fieldset class="download-picker__option">
           <legend class="download-picker__legend">Saída</legend>
-          <label class="download-picker__radio">
-            <input type="radio" name="{{ picker_id }}-saida" value="separados" checked>
-            <span>Arquivos separados</span>
-          </label>
-          <label class="download-picker__radio">
-            <input type="radio" name="{{ picker_id }}-saida" value="compilado">
-            <span>Um arquivo só</span>
-          </label>
+          <div class="toggle toggle--state toggle--sm download-picker__segments">
+            <label class="toggle__item download-picker__radio">
+              <input type="radio" name="{{ picker_id }}-saida" value="separados" checked>
+              <span>Separados</span>
+            </label>
+            <label class="toggle__item download-picker__radio">
+              <input type="radio" name="{{ picker_id }}-saida" value="compilado">
+              <span>Um arquivo</span>
+            </label>
+          </div>
         </fieldset>
       </div>
 
@@ -74,14 +102,6 @@
         segundo arquivo chega sem aviso e parece um download que ninguém pediu.
       {% endcomment %}
       <ul class="download-picker__queue" data-download-picker-queue hidden></ul>
-      {% comment %}
-        O erro usa o ALERTA GLOBAL (`.alert` + `data-tone="error"`), e não um
-        estilo próprio: a mensagem de falha é a mesma coisa em toda a tela do
-        sistema, e uma segunda aparência para ela seria uma segunda convenção
-        para aprender. `role="alert"` fica porque aqui a mensagem surge DEPOIS
-        de uma ação — o leitor de tela precisa ser interrompido.
-      {% endcomment %}
-      <p class="alert" data-tone="error" data-download-picker-error hidden role="alert"></p>
     </div>
   </c-slot>
 

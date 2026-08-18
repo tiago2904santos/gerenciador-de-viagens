@@ -1,0 +1,60 @@
+{% cotton:vars entity %}
+{% comment %}
+  Modal de EXCLUSÃO. Sobre o `c-v2.modal`. É o quarto e último diálogo de ação —
+  os outros três (cancelar com motivo, confirmar ação, anexar assinado) já são v2.
+
+  Traduz `cotton/ui/modals/delete_confirm_modal.html` sem tocar no contrato do
+  `overlay.js`, que abre este diálogo pela configuração `delete-confirm-modal`
+  (`static/js/components/overlay.js`) e procura CADA peça por nome:
+
+  - `data-delete-confirm-modal` na raiz — é por ele que o JS acha o diálogo, e não
+    pelo `id`; o `id` serve ao `aria-controls` do gatilho;
+  - `data-delete-confirm-form` no `<form>`, que recebe a `action` de
+    `data-delete-url` do gatilho. Sem action o `openSimple` retorna sem abrir nada;
+  - `data-delete-confirm-label` no `<strong>`, que recebe `data-delete-label`;
+  - `.delete-confirm-modal__title` no título, que recebe `data-delete-title` — é
+    por isso que o `c-v2.modal` ganhou `title_class`: a classe é seletor de JS, e
+    sem ela o título fica preso em "Excluir registro?" mesmo com o gatilho pedindo
+    outro;
+  - `data-overlay-close` em tudo que fecha (é o `cancel` da configuração).
+
+  Sem variável de título: o `contrato()` que valida `cotton:vars` não enxerga
+  variável usada só em atributo de componente FILHO. O que varia por gatilho é
+  preenchido pelo JS, não pelo template.
+
+  A frase sobre vínculos não é enfeite: a exclusão é bloqueada quando há
+  referências, e dizê-lo ANTES evita o erro que só apareceria depois do clique.
+{% endcomment %}
+<c-v2.modal
+  :own_form="True"
+  hook="data-delete-confirm-modal"
+  modal_id="delete-confirm-modal"
+  title="Excluir registro?"
+  title_class="delete-confirm-modal__title"
+  extra_class="modal--delete"
+>
+  <c-slot name="body">
+    <div>
+      <p class="modal__message">
+        Você está prestes a excluir <strong data-delete-confirm-label>{{ entity|default:"este registro" }}</strong>.
+        Se houver vínculos com outros registros, a exclusão será bloqueada.
+      </p>
+
+      {% comment %}
+        O aviso usa o ALERTA GLOBAL, como o resto do sistema: "permanente" é a
+        informação mais importante da tela, e ela não pode ter uma aparência que
+        só existe aqui.
+      {% endcomment %}
+      <p class="alert" data-tone="error">Esta ação é permanente e não poderá ser desfeita.</p>
+
+      <form method="post" data-delete-confirm-form id="delete-confirm-form">
+        {% csrf_token %}
+      </form>
+    </div>
+  </c-slot>
+
+  <c-slot name="actions">
+    <c-v2.button label="Voltar" hook="data-overlay-close" />
+    <c-v2.button label="Excluir" variant="danger" icon="delete" type="submit" form="delete-confirm-form" />
+  </c-slot>
+</c-v2.modal>

@@ -6,6 +6,23 @@
  *
  * Link não aceita `aria-pressed`. Foi essa confusão que, no sistema antigo,
  * fazia o hover cair justamente sobre o item já ativo.
+ *
+ * Uma peça de fora usa as MESMAS regras, por seletor adicional em vez de valores
+ * repetidos na folha dela: as pílulas de formato e saída do seletor de download,
+ * que são `<label>` com `<input type="radio">` dentro — o ativo é
+ * `:has(input:checked)`, não `aria-pressed`, porque quem guarda o estado é o
+ * rádio.
+ *
+ * O seletor de tipo do anexar assinado não aparece aqui: em vez de ensinar esta
+ * folha a classe que o JS criava, o JS passou a criar os segmentos JÁ como
+ * `toggle__item` quando o grupo é este toggle.
+ *
+ * `--sm` é o tamanho pequeno, para toggle que AJUSTA e não navega.
+ * `--fill` ocupa a linha inteira e reparte os segmentos em colunas IGUAIS — para
+ * quando o toggle é a escolha da vez (o tipo de documento a anexar, por exemplo)
+ * e não um filtro ao lado de outra coisa. Colunas iguais e não `flex: 1`: com
+ * `flex` cada segmento cresce a partir do próprio texto, e "Diário" ficava menor
+ * que "Viatura".
  */
 
 :is(html[data-theme]) .toggle {
@@ -20,6 +37,26 @@
   padding: 3px;
 }
 
+:is(html[data-theme]) .toggle--fill {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+}
+
+/* Com o segmento maior que o texto, o rotulo tem de ir para o MEIO dele: alinhado
+   a esquerda (padrao do flex), tres colunas iguais pareciam tres textos soltos com
+   uma faixa colorida atras de um deles. */
+:is(html[data-theme]) .toggle--fill .toggle__item {
+  justify-content: center;
+}
+
+:is(html[data-theme]) .toggle--sm {
+  --toggle-item-height: 26px;
+  --toggle-item-padding: 10px;
+  --toggle-item-size: var(--text-size-eyebrow);
+  padding: 2px;
+}
+
 :is(html[data-theme]) .toggle__item {
   align-items: center;
   background: transparent;
@@ -29,16 +66,17 @@
   cursor: pointer;
   display: inline-flex;
   font: inherit;
-  font-size: var(--text-size-base);
+  font-size: var(--toggle-item-size, var(--text-size-base));
   gap: 6px;
-  min-height: 34px;
-  padding: 0 14px;
+  min-height: var(--toggle-item-height, 34px);
+  padding: 0 var(--toggle-item-padding, 14px);
   text-decoration: none;
   white-space: nowrap;
 }
 
 :is(html[data-theme]) .toggle__item[aria-current="page"],
-:is(html[data-theme]) .toggle__item[aria-pressed="true"] {
+:is(html[data-theme]) .toggle__item[aria-pressed="true"],
+:is(html[data-theme]) .toggle__item:has(input:checked) {
   background: var(--accent);
   color: var(--text-on-accent);
   font-weight: var(--weight-strong);
@@ -47,12 +85,13 @@
 /* O ativo declara o hover junto: sem isso o realce do inativo pinta por cima
    dele e o estado desaparece justamente onde importa. */
 :is(html[data-theme]) .toggle__item[aria-current="page"]:hover,
-:is(html[data-theme]) .toggle__item[aria-pressed="true"]:hover {
+:is(html[data-theme]) .toggle__item[aria-pressed="true"]:hover,
+:is(html[data-theme]) .toggle__item:has(input:checked):hover {
   background: var(--accent);
   color: var(--text-on-accent);
 }
 
-:is(html[data-theme]) .toggle__item:hover:not([aria-current="page"]):not([aria-pressed="true"]) {
+:is(html[data-theme]) .toggle__item:hover:not([aria-current="page"]):not([aria-pressed="true"]):not(:has(input:checked)) {
   background: var(--surface, var(--surface-rail));
   color: var(--text-strong);
 }

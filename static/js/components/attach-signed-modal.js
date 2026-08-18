@@ -154,11 +154,19 @@
      * no template: era ali que o número de documentos anexáveis ficava fixo em 5. */
     function montarBotoesDeTipo() {
       if (!kindOptions) return;
+      var ehToggle = kindOptions.hasAttribute("data-attach-signed-kind-toggle");
       kindOptions.innerHTML = "";
       kindsAtivos.forEach(function (item) {
         var button = document.createElement("button");
         button.type = "button";
-        button.className = "attach-signed-modal__kind-option";
+        /* A classe do segmento vem do GRUPO, não daqui: no v2 o grupo é o
+         * `toggle` do sistema e os itens são `toggle__item`; nas telas legadas
+         * segue a classe antiga, que as folhas de lá esperam. O sinalizador é
+         * SEM VALOR de propósito — atributo com valor dentro do `hook` do
+         * componente sai escapado e o seletor nunca casa. */
+        button.className = ehToggle
+          ? "toggle__item"
+          : "attach-signed-modal__kind-option";
         button.setAttribute("aria-pressed", "false");
         button.setAttribute("data-attach-signed-kind", item.key);
         var rotulo = document.createElement("span");

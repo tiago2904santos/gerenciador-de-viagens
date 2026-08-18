@@ -1,4 +1,4 @@
-{% cotton:vars actions aria_label body extra_class hook modal_id own_form title %}
+{% cotton:vars actions aria_label body extra_class hook modal_id own_form title title_class %}
 {% comment %}
   Modal v2 — diálogo. Par de `static/css/v2/modal.css`.
 
@@ -41,7 +41,13 @@
   {% endcomment %}
   {% if own_form %}<div class="modal__shell">{% else %}<form method="dialog" class="modal__shell">{% endif %}
     <header class="modal__header">
-      <h2 class="modal__title">{{ title }}</h2>
+      {% comment %}
+        `title_class` existe porque em um dos diálogos a classe do título é
+        SELETOR DE JS: o `overlay.js` escreve o título vindo do gatilho em
+        `.delete-confirm-modal__title`. Sem ela o diálogo abre com o título fixo do
+        template e ninguém acusa — o JS só não acha onde escrever.
+      {% endcomment %}
+      <h2 class="modal__title{% if title_class %} {{ title_class }}{% endif %}">{{ title }}</h2>
     </header>
     <div class="modal__body">{{ body }}</div>
     {% if actions %}<footer class="modal__actions">{{ actions }}</footer>{% endif %}

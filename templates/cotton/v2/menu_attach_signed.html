@@ -1,4 +1,4 @@
-{% cotton:vars current_name current_remove_url current_view_url doc_label signed url %}
+{% cotton:vars current_name current_remove_url current_view_url doc_label kinds_json signed url %}
 {% comment %}
   Item de menu que abre o diálogo de anexar o documento assinado.
 
@@ -7,6 +7,13 @@
   deles que o diálogo tira para onde enviar o arquivo, o que mostrar como já
   anexado e por onde removê-lo. Um nome trocado não dá erro — o item abre um
   diálogo vazio.
+
+  `kinds_json` é o caso de VÁRIOS documentos anexáveis: um payload JSON com um
+  objeto por tipo (`key`, `option_label`, `doc_label`, `url` e, se houver assinado,
+  `current_name`/`current_view_url`/`current_remove_url`). Com dois ou mais, o
+  diálogo mostra o toggle de seleção; com um, ele fica oculto. Aqui o valor SAI
+  escapado no HTML e isso está certo: quem lê é `getAttribute`, que devolve o texto
+  já decodificado — diferente do `hook`, onde o escape estraga o nome do atributo.
 
   O rótulo muda com o estado: sem assinado é "Anexar", com assinado é
   "Gerenciar", porque as ações disponíveis passam a ser outras.
@@ -22,6 +29,7 @@
   data-attach-signed-current-name="{{ current_name }}"
   data-attach-signed-current-view-url="{{ current_view_url }}"
   data-attach-signed-current-remove-url="{{ current_remove_url }}"
+  {% if kinds_json %}data-attach-signed-kinds="{{ kinds_json }}"{% endif %}
 >
   <span class="menu__icon" data-tone="success" aria-hidden="true">{% icone_svg "sign" %}</span>
   <span class="menu__copy">

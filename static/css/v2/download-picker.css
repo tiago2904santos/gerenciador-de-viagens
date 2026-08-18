@@ -23,9 +23,15 @@
    rodapé com o botão "Baixar" saía de vista — o botão que a caixa existe para
    oferecer. */
 :is(html[data-theme]) .download-picker__list {
-  max-height: 15rem;
+  max-height: 11.7rem;
   overflow-y: auto;
+  /* A barra é a MESMA das outras caixas roláveis do v2 (listbox e picker): fina e
+     na cor do texto secundário. Sem estas duas linhas o navegador desenha a barra
+     do sistema — larga, clara e com seta, que no tema escuro fica um risco branco
+     colado na lista. */
+  scrollbar-color: var(--text-muted) transparent;
   scrollbar-gutter: stable;
+  scrollbar-width: thin;
 }
 
 :is(html[data-theme]) .download-picker__list,
@@ -126,14 +132,15 @@
 }
 
 :is(html[data-theme]) .download-picker__options {
-  /* Os dois grupos EMPILHADOS, um por linha. Lado a lado, cada um recebia metade
-     da largura e as pílulas ficavam de tamanhos diferentes conforme o rótulo
-     ("PDF" contra "Arquivos separados") — quatro caixas de quatro larguras,
-     desalinhadas entre si. Empilhados, cada linha tem duas pílulas iguais e as
-     duas linhas se alinham uma sob a outra. */
-  display: grid;
+  /* Os dois grupos na MESMA LINHA. Eles já foram empilhados em faixas de largura
+     cheia, e o problema de então (pílulas de larguras diferentes, "PDF" contra
+     "Arquivos separados") não vinha do lado a lado: vinha de pílula esticada.
+     Agora cada toggle tem a largura do próprio texto, no tamanho pequeno, e os
+     dois ajustes cabem numa linha — a lista do que baixar volta a ser o que pesa. */
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--gap);
-  grid-template-columns: minmax(0, 1fr);
 }
 
 /* Uma régua separa a ESCOLHA (o que baixar) do AJUSTE (como baixar). São duas
@@ -144,32 +151,18 @@
   padding-top: var(--gap);
 }
 
-@media (max-width: 720px) {
-  :is(html[data-theme]) .download-picker__options {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
 /* `fieldset` chega com borda, margem e recuo do navegador — zerar é o que faz o
-   grupo parecer parte do modal, e não uma caixa dentro dele. */
+   grupo parecer parte do modal, e não uma caixa dentro dele. O rótulo fica ao LADO
+   do toggle, na mesma linha: com ele em cima, dois grupos lado a lado viravam
+   quatro linhas de texto em duas colunas. */
 :is(html[data-theme]) .download-picker__option {
+  align-items: center;
   border: 0;
-  display: grid;
-  gap: 6px;
-  /* Duas colunas IGUAIS: a escolha é binária nos dois grupos, e pílulas de
-     tamanhos diferentes davam à opção de rótulo mais longo um peso que ela não
-     tem. `1fr` iguala as duas e alinha as linhas entre si. */
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  gap: var(--gap-tight);
   margin: 0;
   min-width: 0;
   padding: 0;
-}
-
-/* `legend` dentro de grid é elemento especial: sem `grid-column` explícito ele
-   ocupa a primeira trilha e empurra a primeira pílula para a segunda, deixando
-   um buraco na terceira. */
-:is(html[data-theme]) .download-picker__legend {
-  grid-column: 1 / -1;
 }
 
 :is(html[data-theme]) .download-picker__legend {
@@ -181,37 +174,15 @@
   text-transform: uppercase;
 }
 
-/* Pílula: mesma linguagem do `toggle` do sistema — o escolhido no accent cheio,
-   o outro na superfície de baixo. */
-:is(html[data-theme]) .download-picker__radio {
-  align-items: center;
-  background: var(--surface-contrast, var(--surface-field));
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  color: var(--text-muted);
-  cursor: pointer;
-  display: flex;
-  font-size: var(--text-size-eyebrow);
-  font-weight: var(--weight-strong);
-  justify-content: center;
-  min-height: var(--control-height-sm);
-  padding: 0 var(--gap);
-  transition: background var(--ease), color var(--ease), border-color var(--ease);
-  white-space: nowrap;
-}
-
+/* A pílula É o `toggle__item` do sistema (`v2/toggle.css`), e não uma cópia dos
+   valores dele: as regras de lá foram estendidas para cobrir o `<label>` com rádio
+   dentro. Aqui fica só o que é próprio deste uso. */
 /* O rádio nativo sai de vista mas continua no fluxo do teclado. */
 :is(html[data-theme]) .download-picker__radio input[type="radio"] {
   height: 0;
   opacity: 0;
   position: absolute;
   width: 0;
-}
-
-:is(html[data-theme]) .download-picker__radio:has(input:checked) {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--text-on-accent);
 }
 
 :is(html[data-theme]) .download-picker__radio:has(input:focus-visible) {

@@ -7,7 +7,15 @@
   procura CADA um por nome. São treze, e a lista não é decorativa — cada gancho é
   um estado que o diálogo assume:
 
-  - `id="attach-signed-modal"` + `data-attach-signed-modal` na raiz;
+  - `id="attach-signed-modal-v2"` + `data-attach-signed-modal` na raiz. O id é
+    OUTRO, e isso é intencional: `actions/action-system.css` tem quinze blocos
+    presos a `#attach-signed-modal` com `!important`, e contra `!important` quem
+    decide é a especificidade — um ID vence qualquer folha do v2. Herdando o id, o
+    diálogo novo herdava a pintura do velho (medido: o segmento ativo do seletor
+    de tipo saía azul-escuro em vez do accent). Nada em JS ou Python procura o
+    diálogo por id; o motor o acha por `data-attach-signed-modal`. E, durante a
+    migração, os dois diálogos convivem na mesma página — id repetido seria
+    documento inválido;
   - `data-attach-signed-cancel` em tudo que fecha;
   - `data-attach-signed-form` no `<form>` (multipart, é upload);
   - `data-attach-signed-label` e `-file-description`: o nome do documento e o que
@@ -35,7 +43,7 @@
 {% endcomment %}
 {% load icones %}
 <c-v2.modal :own_form="True"
-  hook="data-attach-signed-modal" modal_id="attach-signed-modal" title="Anexar documento assinado" extra_class="modal--attach-signed">
+  hook="data-attach-signed-modal" modal_id="attach-signed-modal-v2" title="Anexar documento assinado" extra_class="modal--attach-signed">
   <c-slot name="body">
     <div>
       <p class="modal__message">
@@ -54,12 +62,18 @@
         {% endcomment %}
         <div class="attach-signed__kind" data-attach-signed-kind-selector hidden>
           <span class="fact__label">Documento</span>
-          <div
-            class="attach-signed__kind-options"
-            role="group"
-            aria-label="Selecionar documento assinado"
-            data-attach-signed-kind-options
-          ></div>
+          {% comment %}
+            Dois ganchos SEM VALOR: o primeiro é onde o JS monta os segmentos, o
+            segundo diz a ele que este grupo é o toggle do sistema — e aí os
+            segmentos nascem como `toggle__item`. Valor dentro de `hook` sairia
+            escapado (`&quot;`) e nenhum dos dois casaria.
+          {% endcomment %}
+          <c-v2.toggle
+            variant="state"
+            extra_class="toggle--sm toggle--fill"
+            aria_label="Selecionar documento assinado"
+            hook="data-attach-signed-kind-options data-attach-signed-kind-toggle"
+          />
         </div>
 
         <span class="sr-only" data-attach-signed-file-help>Selecione um único arquivo em formato PDF.</span>

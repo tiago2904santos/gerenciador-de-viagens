@@ -136,7 +136,11 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # anexar na MESMA faixa, e o botao cobria o nome do arquivo. Aqui os tres
         # sao blocos empilhados, na ordem da tarefa. Os ganchos do
         # `file-picker.js` vem do legado na letra, template de clone incluido.
-        self.assertEqual(len(self.components()), 130)
+        #
+        # 131 (2026-08-17): `v2/delete_modal.html`, o QUARTO e último diálogo de
+        # ação. Sem ele o botão de excluir do v2 apontava para um diálogo que só
+        # existia em legado — na galeria, para nenhum: o clique não fazia nada.
+        self.assertEqual(len(self.components()), 131)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.

@@ -68,6 +68,10 @@
 :is(html[data-theme]) .attach-signed__kind {
   display: grid;
   gap: var(--gap-tight);
+  /* Estica (padrão da grade): aqui o toggle é `--fill`, ocupa a linha e reparte
+     os tipos em colunas iguais. Ele já ficou ancorado à esquerda, no tamanho do
+     texto — e a faixa vazia à direita fazia a escolha parecer secundária, quando
+     é ela que decide o que o diálogo vai anexar. */
   min-width: 0;
 }
 
@@ -75,10 +79,14 @@
   display: none;
 }
 
-:is(html[data-theme]) .attach-signed__kind-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gap-tight);
+/* O corpo do diálogo é uma PILHA com vão: seletor de tipo, seletor de arquivo,
+   erro, arquivo já anexado. Sem isto o toggle encostava no bloco do picker, como
+   se fossem a mesma peça. Grade, e não margem em cada filho: quem entra ou sai da
+   pilha (o tipo só existe com dois ou mais documentos) não precisa saber de vão —
+   e filho oculto não deixa buraco, que é o que margem faria. */
+:is(html[data-theme]) .modal--attach-signed [data-attach-signed-form] {
+  display: grid;
+  gap: var(--gap);
 }
 
 /* A lista do arquivo ja anexado tambem nasce oculta: so faz sentido quando existe

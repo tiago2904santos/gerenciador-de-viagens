@@ -48,7 +48,7 @@
   </c-slot>
 </c-v2.panel>
 
-<c-v2.panel title="Excluir" description="Tem diálogo próprio: o tom é destrutivo e o texto não se reaproveita.">
+<c-v2.panel title="Excluir" description="Tem diálogo próprio: o tom é destrutivo, e o título e o nome do registro vêm do gatilho.">
   <c-slot name="body">
     <div class="v2-lab__row">
       <c-v2.delete_button url="#" label="o roteiro de Curitiba" title="Excluir roteiro?" aria_label="Excluir roteiro" />
@@ -62,10 +62,24 @@
       Este tem motor próprio (`attach-signed-modal.js`) e cinco ganchos no gatilho —
       todos declarados de uma vez pelo `menu_attach_signed`, que é como as telas
       reais o abrem: de dentro do menu de documentos.
+
+      Dois gatilhos porque o diálogo tem DOIS modos, e o segundo não aparecia na
+      vitrine: com um documento anexável só, o seletor de tipo fica oculto (o JS o
+      revela em `kindsAtivos.length >= 2`). O de baixo declara três tipos pelo
+      payload `data-attach-signed-kinds` — a mesma forma que as prestações usam.
     {% endcomment %}
-    <c-v2.menu aria_label="Ações do documento">
-      <c-v2.menu_attach_signed url="#" doc_label="o termo genérico" />
-    </c-v2.menu>
+    <div class="v2-lab__row">
+      <c-v2.menu aria_label="Ações do documento">
+        <c-v2.menu_attach_signed url="#" doc_label="o termo genérico" />
+      </c-v2.menu>
+      <c-v2.menu aria_label="Ações do documento (três tipos)">
+        <c-v2.menu_attach_signed
+          url="#"
+          doc_label="o termo genérico"
+          kinds_json='[{"key": "generico", "option_label": "Termo", "doc_label": "o termo genérico", "url": "#"}, {"key": "viatura", "option_label": "Viatura", "doc_label": "o termo da viatura", "url": "#"}, {"key": "diario", "option_label": "Diário", "doc_label": "o diário de bordo", "url": "#"}]'
+        />
+      </c-v2.menu>
+    </div>
   </c-slot>
 </c-v2.panel>
 
@@ -85,3 +99,4 @@
 <c-v2.cancel_modal entity="este registro" />
 <c-v2.confirm_modal entity="este registro" button_label="Reativar" hint="Ele volta para a lista de ativos." />
 <c-v2.attach_signed_modal />
+<c-v2.delete_modal entity="o roteiro de Curitiba" />
