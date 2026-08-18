@@ -42,52 +42,17 @@ CSS_EXCEPTIONS: dict[str, dict] = {
         "reason": "Official dark-theme token layer; literal values define semantic tokens.",
         "rules": {"hex_color_outside_tokens"},
     },
-    "static/css/dev/main-light.css": {
-        "reason": "Camada de tokens principais do main no tema claro da pagina-piloto.",
+    # NOVO-20260818-213938-85119ea16117: os dois arquivos de token que a
+    # migracao criou nunca entraram aqui, e o auditor os contava como 50 avisos
+    # de cor literal. Neles o hex E a definicao — mesma razao de
+    # `base/tokens.css`, isento desde sempre. Os unicos hex fora de uma
+    # declaracao `--token:` sao comentarios registrando o valor medido.
+    "static/css/ui/tokens.css": {
+        "reason": "Arquivo de tokens do namespace ui — cores hex sao a definicao original.",
         "rules": {"hex_color_outside_tokens"},
     },
-    "static/css/dev/main-dark.css": {
-        "reason": "Camada de tokens principais do main no tema escuro da pagina-piloto.",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/dev/header-light.css": {
-        "reason": "Camada de tokens principais do header no tema claro da pagina-piloto.",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/dev/header-dark.css": {
-        "reason": "Camada de tokens principais do header no tema escuro da pagina-piloto.",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/dev/sub-header-light.css": {
-        "reason": "Camada de tokens principais do sub-header no tema claro da pagina-piloto.",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/dev/sub-header-dark.css": {
-        "reason": "Camada de tokens principais do sub-header no tema escuro da pagina-piloto.",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/dev/form-card-light.css": {
-        "reason": "Camada de tokens principais do card de formulario no tema claro da pagina-piloto.",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/dev/form-card-dark.css": {
-        "reason": "Camada de tokens principais do card de formulario no tema escuro da pagina-piloto.",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/dev/entity-card-light.css": {
-        "reason": "Camada de tokens principais do card de entidade no tema claro da pagina-piloto.",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/dev/entity-card-dark.css": {
-        "reason": "Camada de tokens principais do card de entidade no tema escuro da pagina-piloto.",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/dev/collection-panel-light.css": {
-        "reason": "Camada de tokens principais do painel de colecao no tema claro da pagina-piloto.",
-        "rules": {"hex_color_outside_tokens"},
-    },
-    "static/css/dev/collection-panel-dark.css": {
-        "reason": "Camada de tokens principais do painel de colecao no tema escuro da pagina-piloto.",
+    "static/css/v2/tokens.css": {
+        "reason": "Arquivo de tokens do namespace v2 — cores hex sao a definicao original.",
         "rules": {"hex_color_outside_tokens"},
     },
     "static/css/components/theme-dark-components.css": {

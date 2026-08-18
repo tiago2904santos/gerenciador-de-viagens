@@ -8875,3 +8875,151 @@ Unidades foram conferidos no tema escuro, Justificativas no tema claro e o layou
 apresentou rolagem horizontal. As 699 verificações dos seis aplicativos afetados passaram, assim
 como bundles, arquitetura, padrões de UI e `git diff --check`. O auditor frontend permaneceu no
 baseline preexistente de 4 erros e 303 avisos, acima do teto vigente de 245.
+
+### NOVO-20260818-213141-764248d0a297 ✅ RESOLVIDO · `NOVO` `quick_add_section` entrou na biblioteca sem consumidor na vitrine · HT/UI · 0,2 d
+
+O corte que criou o componente (`NOVO-20260818-200724-685b186c033b`) o pôs nos quinze cadastros
+rápidos e não na galeria. Dois contratos ficaram vermelhos no mesmo commit:
+`test_todo_componente_v2_aparece_na_galeria` acusou "componente v2 sem consumidor" e
+`test_namespace_unico_tem_o_inventario_atual` acusou `148 != 147`. A vitrine seguia mostrando o
+quick add com campos soltos — a forma que o próprio corte tinha acabado de proibir.
+
+A seção "Criação inline (quick add)" passou a declarar duas `c-v2.quick_add_section` dentro do
+painel, que é a forma das telas reais: o `<form>` é neutro e a superfície é do `<fieldset>`. São
+duas porque um único fieldset não mostra a separação, que é a razão de o componente existir; nas
+quinze telas a contagem vai de uma (a maioria) a três (Usuários). O inventário subiu a 149 com a
+justificativa por componente que a convenção do arquivo exige.
+
+### NOVO-20260818-213141-00cd8bcc960a ✅ RESOLVIDO · `NOVO` A vitrine escreve à mão as linhas do picker de documento vinculado · HT-08 · 0,3 d
+
+`templates/core/main_preview/formulario.html` montava dois `<button
+class="search-picker__selected-card related-route-item">` com avatar, nome e meta copiados de
+`CV.pickerParts.createRelatedCard`. Era botão cru fora de componente — o `HT-08` — e
+`test_templates_de_aplicacao_nao_reimplementam_button` reprovava o arquivo. Copiar a marcação de
+um motor de JS num template é pior que botão cru comum: as duas cópias divergem em silêncio.
+
+Nasceu `templates/cotton/v2/related_row.html`, o gêmeo declarativo do motor, sem folha própria —
+as regras já vivem na folha do picker. O `<button>` continua cru DENTRO do componente, que é o
+caminho previsto para `data-*` com valor (mesma razão de `evento_doc_toggle` e `os_role_toggle`).
+As duas linhas da vitrine passaram a `<c-v2.related_row>`; o `{% load icones %}` do fragmento saiu
+junto, sem outro uso.
+
+### NOVO-20260818-213141-9f2f0d2c4c95 ✅ RESOLVIDO · `NOVO` O contrato do calendário conhecia duas folhas globais e existem três · QA · 0,1 d
+
+`test_no_alternative_calendar_ui_remains_in_source` isenta as folhas que são O calendário do
+sistema e reprova qualquer outra que desenhe `date-picker__day--`. A lista tinha
+`fields/date-picker.css` (a antiga) e `v2/date-picker.css` (a nova), mas não `ui/date-picker.css`,
+que entrou com o trilho de filtro e é viva: `build_shell_bundles.py:169` a empacota e
+`ui/headers/filter_page_header.html` a consome via `extra_class="ui-date-picker"`.
+
+A folha é escopada em `.ui-date-picker` e só repinta o gatilho e os botões do painel do mesmo
+motor (`js/components/date-picker.js`) — não há segundo calendário, e o contrato acusava um. Ela
+entrou na lista com a nota de que sai junto com o trilho legado, devolvendo a lista a duas.
+
+### NOVO-20260818-213141-8c4bb8d9f0d5 ✅ RESOLVIDO · `NOVO` O contrato dos cinco pickers exige a raiz legada de quem já migrou · QA · 0,2 d
+
+`test_cinco_consumidores_nao_reimplementam_a_raiz` exigia `<c-ui.forms.related_picker` nos cinco.
+Três migraram para `c-v2.related_picker` (eventos, ordens de serviço e termos) e o contrato passou
+a reprovar o trabalho que ele deveria proteger. Exigir a raiz v2 dos cinco seria o mesmo erro
+invertido: o v2 ainda não tem `hide_search`, `plain_list`, `presentation` nem `disabled`, de que
+justificativas e roteiros dependem.
+
+O contrato voltou ao que sempre protegeu — nenhum dos cinco reimplementa a raiz à mão — e ganhou
+`NA_RAIZ_LEGADA`, uma catraca com os dois que faltam. Um segundo teste impede que ela vire
+inventário: consumidor que migrar e continuar listado reprova, e o tamanho da lista só desce.
+
+### NOVO-20260818-213938-85119ea16117 ✅ RESOLVIDO · `NOVO` A lista de isenções do auditor de front não acompanhou a migração · QA · 0,2 d
+
+Duas falhas na mesma tabela `CSS_EXCEPTIONS`. Os doze arquivos `static/css/dev/*.css` da
+página-piloto saíram com o `NOVO-120` e as isenções ficaram, apontando para arquivos que não
+existem. E os dois arquivos de token que a migração criou — `static/css/ui/tokens.css` e
+`static/css/v2/tokens.css` — nunca entraram: o auditor contava 50 avisos de "cor literal fora dos
+arquivos de token" **dentro de arquivos de token**, onde o hex É a definição. É a mesma isenção
+que `base/tokens.css` tem desde sempre; conferido linha a linha, o único hex fora de uma
+declaração `--token:` nos dois é comentário registrando valor medido.
+
+Doze entradas mortas removidas, duas corretas acrescentadas: o auditor caiu de **303 para 253
+avisos**, sem que nenhuma regra fosse afrouxada e sem que o teto de 245 fosse tocado. O que sobra
+acima do teto é dívida real, registrada em `NOVO-20260818-213938-228adea09e1d`.
+
+### NOVO-20260818-213938-228adea09e1d 🔴 ABERTO · `NOVO` 225 cores literais fora dos arquivos de token mantêm o auditor de front acima do teto · UI · a dimensionar
+
+Com a contagem honesta (`NOVO-20260818-213938-85119ea16117`), o auditor fica em **253 avisos
+contra o teto de 245** — 8 acima, e o gate do CI está vermelho na `main`, não só neste recorte.
+O grosso é o invariante do `AGENTS.md` §3.7: **225** avisos `hex_color_outside_tokens` fora de
+qualquer arquivo de token, concentrados em `actions/buttons.css` (68), `layout/page-shell.css`
+(24), `pages/diario-troca.css` (20), `pages/prestacoes_contas.css` (16) e `pages/roteiros.css`
+(15). São literais reintroduzidos pelo trabalho visual de agosto, depois de o ciclo ter fechado
+com `audit_paleta.py --max 0`.
+
+Não corrigido aqui por escopo: cada literal precisa do token certo, e trocar 225 deles é a etapa
+de token, não a reconciliação de contratos. O teto **não** foi levantado.
+
+### NOVO-20260818-214024-f57647d8c996 🔴 ABERTO · `NOVO` `download-queue.js` usa `fetch()` cru, quebrando o invariante do §3.7 · JS · 0,2 d
+
+O `AGENTS.md` §3.7 lista "zero `fetch()` cru" entre os invariantes que as auditorias mediram, e o
+`PLANO_RECONSTRUCAO_FRONT` §2 registra o sistema em zero. O picker de download (`33262f0`) trouxe
+dois: `static/js/components/download-queue.js:24` e `:221`, ambos com `credentials` e
+`X-Requested-With` remontados à mão — que é exatamente o que `CV.http` centraliza.
+
+Registrado e não corrigido: é regressão de invariante, merece o recorte próprio que prova o
+caminho de erro dos dois pontos, e não a carona numa reconciliação de contratos.
+
+### NOVO-20260818-214741-66a45be14770 🔴 ABERTO · `NOVO` `--surface-selected` do tema escuro cai em oliva, contra a regra escrita no próprio arquivo · UI · 0,2 d
+
+`static/css/v2/tokens.css:17` fixa a regra: *"no tema escuro o accent é dourado e qualquer
+`color-mix` dele com o azul-marinho cai em oliva (medido: `#2d302c`)"*. A linha 143 do mesmo
+arquivo faz exatamente isso — `--surface-selected: color-mix(in srgb, var(--accent) 16%,
+var(--surface-field))`, com `--accent: #f3ae00` e `--surface-field: #223348`.
+
+Medido no navegador, na linha escolhida do picker de documento vinculado
+(`.picker--related .search-picker__selected-card.is-active`, `v2/picker.css:664`), o tema escuro
+resolve para **`#43473C`** — oliva, e a única cor da paleta que não é nem azul nem dourada. O
+claro está correto: `color-mix(#004a90 17%, #eef4fc)` dá um azul-claro coerente com a superfície.
+
+Não é regressão deste recorte: o `c-v2.related_row` emite as mesmas classes que os `<button>`
+crus emitiam, então o computado é bit a bit o de antes. O token é que está errado, e conserta-se
+onde ele mora, num corte de token — não na vitrine que o revelou.
+
+Alcance a medir antes de corrigir: `--surface-selected` é usado pelo cartão do motorista e pela
+opção escolhida do menu do select, além desta linha. Trocar por um degrau próprio no escuro (sem
+`color-mix` com o dourado) muda os três de uma vez.
+
+### NOVO-20260818-215126-4bbdd8f7e848 ✅ RESOLVIDO · `NOVO` Os testes de JS do painel de documentos do evento ficaram na marcação anterior ao v2 · JS/QA · 0,3 d
+
+O commit `46da62d` migrou `static/js/pages/eventos-detalhe.js` para os ganchos do
+`c-v2.related_picker` — as peças passaram a ser procuradas DENTRO do
+`[data-doc-tab-panel]`, por `data-related-picker-list`, `-search` e `-empty`, sem o nome do tipo
+no valor. O `eventos-detalhe.test.js` continuou montando a marcação antiga
+(`data-evento-doc-list="oficios"` e irmãos), e dois dos três testes ficaram vermelhos.
+
+Um deles cobria o botão "×" desenhado à mão, que o mesmo commit removeu de propósito: o campo é
+`type="search"` e o navegador já entrega o dele (`eventos-detalhe.js:226`, `clear = null`). Não
+havia teste a "consertar" ali — havia um teste apontando para um comportamento retirado.
+
+O fixture passou aos ganchos reais. O teste do "limpar" virou o teste do filtro, que é o que
+sobrou de comportamento, com duas travas contra o botão voltar: nem `[data-evento-doc-clear]`
+nem `.search-picker__clear` podem existir no painel, senão a linha ganha dois "limpar".
+Os 3 testes do arquivo e os 52 da suíte JS passam.
+
+### NOVO-20260818-215706-f765fe0fabad ✅ RESOLVIDO · `NOVO` A catraca de cobertura de JS estava desligada por testes vermelhos, escondendo uma queda em `app.js` · JS/QA · 0,4 d
+
+`npm test` é `vitest run --coverage && node scripts/check_js_coverage.mjs`. Com os dois testes do
+`NOVO-20260818-215126-4bbdd8f7e848` vermelhos, o `vitest` saía diferente de zero, o `&&`
+curto-circuitava e **o verificador de piso nunca rodava** — nem escrevia
+`coverage-js/coverage-summary.json`. O passo de CI continuava existindo e não media nada.
+
+Com os testes verdes o verificador voltou a rodar e acusou o que escondia: `363461d` acrescentou
+`painelPreenchido()` a `static/js/core/app.js` (24 linhas, quatro ramos) sem teste, e as quatro
+métricas caíram abaixo do piso — linhas 27,74% → 27,21%, funções 45,58% → 43,66%, ramos
+16,96% → 16,81%, comandos 26,51% → 25,91%. Confirmado por bissecção: com o `app.js` anterior a
+`363461d`, a medição dá exatamente o piso nas quatro.
+
+A função decide se um cadastro incompleto vira POST — antes dela bastava o PRIMEIRO campo ter
+valor, o botão prometia "Salvar" e o servidor recusava no `clean()`. Nasceu
+`static/js/core/inline-create.test.js` com 7 testes sobre o par gatilho/painel: obrigatório
+faltando recolhe em vez de enviar, todos preenchidos enviam e trocam o rótulo, campo opcional em
+branco não impede, painel sem `required` conta o conjunto visível, oculto/submit/button ficam de
+fora, caixa de seleção conta por marcada, painel sem campo nunca conta, e recolher devolve o
+rótulo e limpa. `app.js` foi de 27,21% a **49,68%** de linhas (66,19% funções, 37,16% ramos,
+48,73% comandos) e o piso subiu para o medido, como manda a catraca.

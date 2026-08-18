@@ -231,22 +231,48 @@
           submete — é o comportamento do quick add de justificativas, que é o
           modelo. Quem troca o texto é o `app.js`, pela classe do `<span>`.
         {% endcomment %}
+        {% comment %}
+          O conteúdo do painel é uma sequência de `quick_add_section` — e nunca
+          campos soltos. O `<form>` do quick add é UM POST e é visualmente
+          neutro; quem tem superfície, raio e recuo é o `<fieldset>` de cada
+          seção. Duas aqui porque um único fieldset não mostra a separação, que
+          é a razão de o componente existir; nas quinze telas reais a contagem
+          varia de uma (a maioria) a três (Usuários).
+        {% endcomment %}
         <c-v2.quick_add
           panel_id="lab-quick-add"
           action="#"
           toggle_label="Cadastrar cargo"
           submit_label="Salvar cargo"
         >
-          <c-v2.field label="Nome do cargo">
-            <c-slot name="control">
-              <c-v2.input placeholder="Ex.: Investigador" aria_label="Nome do cargo" />
+          <c-v2.quick_add_section :split="True" title="Dados do cargo" description="Nome e sigla">
+            <c-slot name="body">
+              <div class="field-grid">
+                <c-v2.field label="Nome do cargo">
+                  <c-slot name="control">
+                    <c-v2.input placeholder="Ex.: Investigador" aria_label="Nome do cargo" />
+                  </c-slot>
+                </c-v2.field>
+                <c-v2.field label="Sigla">
+                  <c-slot name="control">
+                    <c-v2.input placeholder="Ex.: INV" aria_label="Sigla do cargo" />
+                  </c-slot>
+                </c-v2.field>
+              </div>
             </c-slot>
-          </c-v2.field>
-          <c-v2.field label="Sigla">
-            <c-slot name="control">
-              <c-v2.input placeholder="Ex.: INV" aria_label="Sigla do cargo" />
+          </c-v2.quick_add_section>
+
+          <c-v2.quick_add_section :split="True" title="Lotação" description="Unidade inicial do cargo">
+            <c-slot name="body">
+              <div class="field-grid">
+                <c-v2.field label="Unidade">
+                  <c-slot name="control">
+                    <c-v2.input placeholder="Ex.: DELEGACIA DE CURITIBA" aria_label="Unidade" />
+                  </c-slot>
+                </c-v2.field>
+              </div>
             </c-slot>
-          </c-v2.field>
+          </c-v2.quick_add_section>
         </c-v2.quick_add>
       </c-slot>
     </c-v2.panel>

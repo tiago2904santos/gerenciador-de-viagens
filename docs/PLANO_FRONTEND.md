@@ -391,3 +391,36 @@ alcançável em produção. Não vira ID.
 - [x] `NOVO-20260818-200724-685b186c033b` — substituir os `form-blocks` dos quinze cadastros
   rápidos por `fieldset` filhos do único formulário visualmente neutro, mantendo campos, hooks
   e responsividade.
+
+## Reconciliação das catracas da migração v2 (18/08/2026)
+
+A conclusão dos cadastros deixou a suíte vermelha em cinco contratos — todos guardas da própria
+migração, cujo enunciado não acompanhou o trabalho. O `AGENTS.md` §4 manda parar antes de abrir
+etapa nova com a suíte vermelha; esta é essa parada.
+
+- [x] `NOVO-20260818-213141-764248d0a297` — `quick_add_section` na vitrine, na forma que as quinze
+  telas reais usam; inventário de componentes reconciliado em 149.
+- [x] `NOVO-20260818-213141-00cd8bcc960a` — as linhas do picker de documento vinculado saem do
+  `<button>` cru para `c-v2.related_row`, o gêmeo declarativo de `createRelatedCard`.
+- [x] `NOVO-20260818-213141-9f2f0d2c4c95` — o contrato do calendário passa a conhecer as três
+  folhas globais do mesmo motor, e não duas.
+- [x] `NOVO-20260818-213141-8c4bb8d9f0d5` — o contrato dos cinco pickers aceita as duas raízes
+  durante a migração, com catraca que só encolhe sobre quem falta.
+- [x] `NOVO-20260818-213938-85119ea16117` — isenções do auditor de front reconciliadas: doze
+  entradas mortas fora, os dois arquivos de token dentro; 303 → 253 avisos.
+
+Fica aberto, medido e fora deste recorte:
+
+- [ ] `NOVO-20260818-213938-228adea09e1d` — 225 cores literais fora dos arquivos de token; o
+  auditor segue 8 acima do teto de 245 e o gate do CI está vermelho na `main`.
+- [ ] `NOVO-20260818-214024-f57647d8c996` — dois `fetch()` crus em `download-queue.js`,
+  regressão do invariante do `AGENTS.md` §3.7.
+- [ ] `NOVO-20260818-214741-66a45be14770` — `--surface-selected` do escuro resolve em `#43473C`
+  (oliva), contra a regra escrita em `v2/tokens.css:17`; atinge linha do picker, cartão do
+  motorista e opção escolhida do select.
+- [x] `NOVO-20260818-215126-4bbdd8f7e848` — fixture de `eventos-detalhe.test.js` reapontado para
+  os ganchos do `c-v2.related_picker`; o teste do "limpar" virou teste do filtro, com trava
+  contra o botão retirado voltar.
+- [x] `NOVO-20260818-215706-f765fe0fabad` — a catraca de cobertura de JS voltou a rodar (estava
+  curto-circuitada pelos testes vermelhos) e `app.js` subiu de 27,21% a 49,68% de linhas, com
+  7 testes novos sobre o quick add; piso elevado ao medido.
