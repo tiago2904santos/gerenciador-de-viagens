@@ -479,10 +479,6 @@ class DarkRedesignContractTests(SimpleTestCase):
         script = (
             Path(settings.BASE_DIR) / "static" / "js" / "pages" / "eventos-detalhe.js"
         ).read_text(encoding="utf-8")
-        page_shell = (
-            Path(settings.BASE_DIR) / "static" / "css" / "layout" / "page-shell.css"
-        ).read_text(encoding="utf-8")
-
         # 2026-08-18: o painel migrou para o v2 e a casca virou
         # `c-v2.wizard_page` — header, trilho e stepper numa peça só. O
         # `flow_base.html` do sistema antigo saiu de cena aqui.

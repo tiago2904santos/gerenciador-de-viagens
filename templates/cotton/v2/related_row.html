@@ -1,0 +1,37 @@
+{% cotton:vars active meta title value %}
+{% load icones %}
+{% comment %}
+  Linha do picker de DOCUMENTO VINCULADO — o item que aparece dentro do
+  `c-v2.related_picker`. Não tem folha própria: as regras
+  `search-picker__selected-card` e `related-route-item` já vivem na folha do
+  picker, que é onde a linha é desenhada.
+
+  Ele é o GÊMEO DECLARATIVO de `CV.pickerParts.createRelatedCard`
+  (`static/js/components/picker-parts.js:69`). Nas telas reais quem monta a
+  linha é o script da página, porque os candidatos vêm de uma busca no servidor
+  (`NOVO-07`); onde ela é conhecida no servidor — a vitrine, hoje — declara-se
+  aqui em vez de ser reescrita à mão, que é o que o `HT-08` proíbe. Se a
+  marcação mudar de um lado, muda do outro: é a mesma linha.
+
+  O `<button>` é CRU porque `data-route-id` carrega VALOR, e valor dentro do
+  `hook` do `c-v2.button` sai escapado. Dentro de `templates/cotton/` o botão
+  cru é o caminho previsto — mesma razão de `v2/evento_doc_toggle.html` e
+  `v2/os_role_toggle.html`.
+
+  `data-route-id` é contrato: é por ele que `termos-form.js`,
+  `ordens-servico-form.js` e `justificativas-index.js` sabem qual documento foi
+  escolhido. O nome vale para os cinco tipos vinculáveis, não só para roteiro —
+  é o `dataKey` padrão do motor, e nenhum chamador passa outro.
+{% endcomment %}
+<button
+  type="button"
+  class="search-picker__selected-card related-route-item{% if active %} is-active{% endif %}"
+  data-route-id="{{ value }}"
+  aria-pressed="{% if active %}true{% else %}false{% endif %}"
+>
+  <span class="search-picker__selected-avatar" aria-hidden="true">{% icone_svg "document" %}</span>
+  <div class="search-picker__selected-main">
+    <span class="search-picker__selected-name">{{ title }}</span>
+    <span class="search-picker__selected-meta related-route-period">{{ meta }}</span>
+  </div>
+</button>

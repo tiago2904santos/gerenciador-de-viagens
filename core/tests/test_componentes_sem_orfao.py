@@ -218,35 +218,47 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # primeira rolagem — quem chega ao fim da lista voltaria ao topo para
         # criar o próximo item.
         #
-        # 148 (2026-08-18): `v2/quick_add_section.html`, o `<fieldset>` de cada
-        # grupo do cadastro rápido. Entrou com os quinze catálogos e o número
-        # não foi atualizado junto — este contrato estava vermelho, e a galeria
-        # não o citava (`test_todo_componente_v2_aparece_na_galeria` apontava
-        # exatamente ele). As duas pontas foram fechadas na migração de Ofícios.
+        # 148 (NOVO-20260818-200724-685b186c033b): `v2/quick_add_section.html`,
+        # o `<fieldset>` de um grupo do quick add. O painel é UM POST e ficou
+        # visualmente neutro; a superfície passou para a seção, e ela mora em
+        # componente porque as quinze telas de cadastro rápido repetiam a mesma
+        # casca de grupo. A vitrine só ganhou o consumidor agora
+        # (NOVO-20260818-213141-764248d0a297) — o corte que criou o componente
+        # deixou este contrato e o da galeria vermelhos.
         #
-        # 152 (NOVO-20260818-213853-fab772ef1b6e): as quatro peças que faltavam
-        # para Ofícios não chamar mais nada de fora do v2 —
-        # `v2/document_inline.html` (o PDF aberto na própria página, cuja folha
-        # já estava no bundle sem componente: a marcação era copiada à mão em
-        # nove telas), `v2/alert_list.html` (a pendência de etapa, que no legado
-        # era um QUARTO desenho de "atenção" com caixa própria),
-        # `v2/document_number.html` (o número/ano, último campo a desenhar a
+        # 149 (NOVO-20260818-213141-00cd8bcc960a): `v2/related_row.html`, a
+        # linha do picker de documento vinculado. É o gêmeo declarativo de
+        # `CV.pickerParts.createRelatedCard`: nas telas reais o script monta a
+        # linha, e onde ela é conhecida no servidor — a vitrine — era escrita à
+        # mão em `<button>` cru, contra o `HT-08`. Mora em componente pela razão
+        # de sempre: `data-route-id` carrega VALOR, e valor no `hook` do
+        # `c-v2.button` sai escapado.
+        #
+        # 155 (NOVO-20260818-213853-fab772ef1b6e): as seis peças que faltavam
+        # para Ofícios não chamar mais nada de fora do v2.
+        #
+        # Quatro são de conteúdo: `v2/document_inline.html` (o PDF aberto na
+        # própria página — a folha `v2/document-inline.css` já viajava no bundle
+        # SEM componente, e a marcação era copiada à mão em nove telas),
+        # `v2/alert_list.html` (a pendência de etapa, que no sistema anterior era
+        # um QUARTO desenho de "atenção", com caixa e marcador próprios),
+        # `v2/document_number.html` (o par número/ano — último campo a desenhar a
         # própria moldura em vez de usar o `field`) e `v2/suggestions.html` (a
         # faixa de atalhos do formulário, cujos dois ganchos se separavam quando
-        # soltos no template).
+        # escritos soltos no template).
         #
-        # 154 (mesmo corte): `v2/driver_mode_toggle.html` e `v2/menu_button.html`.
-        # O primeiro é o segmento SERVIDOR × MANUAL do motorista, que aparecia
-        # escrito à mão em duas etapas do ofício; o segundo é o item de menu que
-        # EXECUTA em vez de navegar ("Visualizar termos"). Os dois existem como
-        # componente pelo mesmo motivo dos irmãos `os_role_toggle` e
-        # `route_mode_toggle`: `<button>` cru com `data-*` só é permitido dentro
-        # de `templates/cotton/`.
+        # Duas são de ação, e existem pela razão de sempre — `<button>` cru com
+        # `data-*` só é permitido dentro de `templates/cotton/`:
+        # `v2/driver_mode_toggle.html` (o segmento SERVIDOR × MANUAL do
+        # motorista, escrito à mão em duas etapas do ofício, irmão do
+        # `os_role_toggle` e do `route_mode_toggle`) e `v2/menu_button.html` (o
+        # item de menu que EXECUTA em vez de navegar — "Visualizar termos"; como
+        # link ele precisaria de um destino falso).
         #
-        # 153 (mesmo corte): saiu `ui/segment_toggle.html`. Era o último
-        # componente do sistema antigo vivo no ofício, e o `toggle` do v2 já
+        # 154 (mesmo corte): saiu `ui/segment_toggle.html`. Era o último
+        # componente do sistema anterior vivo em Ofícios, e o `toggle` do v2 já
         # fazia as duas variantes dele.
-        self.assertEqual(len(self.components()), 153)
+        self.assertEqual(len(self.components()), 154)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.
