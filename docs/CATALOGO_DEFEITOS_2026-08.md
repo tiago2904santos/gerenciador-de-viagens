@@ -8941,3 +8941,27 @@ caem no guarda de órfão (`test_componentes_sem_orfao`) e mudam o inventário. 
 prova de grep de repositório inteiro que o `AGENTS.md` §3.6 pede, e o CSS que os veste sai junto.
 
 O corte é uma etapa de Roteiros, não de Ofícios.
+
+### NOVO-20260818-223721-606d293c1180 🔴 ABERTO · `NOVO` Teste de JS do painel de Eventos ficou no gancho anterior ao `related_picker` · JS/QA · 0,2 d
+
+`npm test` está **vermelho no `main`** (2 de 52 casos), e por isso o job `django` do CI nunca chega
+a rodar a suíte Python — ele morre no passo do Vitest, que vem antes.
+
+O commit `46da62d` migrou `js/pages/eventos-detalhe.js` para os ganchos do `c-v2.related_picker`
+(`data-related-picker-list`, `-search`, `-empty`, todos sem valor) e removeu o botão de limpar, que
+passou a ser o "×" nativo do `type="search"`. `static/js/pages/eventos-detalhe.test.js` continuou
+montando o fixture anterior (`data-evento-doc-list="oficios"`, `-search`, `-clear`, `-empty`).
+
+As duas falhas seguem daí, e nenhuma é do motor:
+
+- *"refiltra com o periodo ativo ainda nao salvo"* — `list` sai `null`, o `if (!select || !list)
+  return` corta antes de renderizar, e a lista fica vazia;
+- *"mostra e executa o limpar da busca padrao"* — afirma um botão de limpar que o corte tirou de
+  propósito.
+
+O conserto é do TESTE, não do JS: atualizar o fixture para os ganchos do picker e substituir o caso
+do botão pelo comportamento que ficou. Vale conferir de passagem se o `data-evento-doc-clear`
+sobrou em algum template.
+
+É uma etapa de Eventos/QA — foi encontrada durante a conclusão de Ofícios no v2
+(`NOVO-20260818-213853-fab772ef1b6e`) e registrada sem correção, como manda o `AGENTS.md` §2.
