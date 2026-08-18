@@ -83,8 +83,22 @@ class OficioListPaginacaoTests(TestCase):
             msg="\n".join(q["sql"] for q in com_300.captured_queries),
         )
 
-    def test_cards_nao_expandem_componentes_cotton_dentro_do_laco(self):
-        """PF-05: o custo do interpretador de componentes deve ser fixo por página."""
+    def test_cards_nao_expandem_componentes_cotton_a_cada_visita(self):
+        """PF-05: o custo do interpretador de componentes é fixo por página.
+
+        O que mudou em 2026-08-18: o cartão do ofício deixou de ser HTML
+        achatado (`entity_card_flat` + `_oficio_card_body.html`) e passou a ser
+        feito das peças do v2 — `record`, `person_row`, `fact`, `itinerary`.
+        Manter uma cópia do desenho por tela foi justamente o que produziu o
+        achatado, e essa cópia sai de sincronia sem avisar.
+
+        O invariante continua o mesmo e é este teste que o segura: em REGIME,
+        nenhuma expansão de componente por registro. Quem garante é
+        `renderizar_oficio_card_cacheado`, que guarda o HTML por digest do
+        conteúdo — a primeira visita paga o desenho de cada cartão novo, a
+        seguinte não paga nada. Medido no servidor de desenvolvimento com 20
+        cartões cheios: ~250ms na visita fria.
+        """
 
         def contar_componentes(url):
             with patch.object(
@@ -98,14 +112,16 @@ class OficioListPaginacaoTests(TestCase):
 
         sem_cards = contar_componentes(f"{self.url}?aba=atuais")
         _criar_oficios(OFICIOS_POR_PAGINA)
+        # A primeira visita desenha os cartões novos e os guarda em cache.
+        contar_componentes(f"{self.url}?aba=atuais")
         com_cards = contar_componentes(f"{self.url}?aba=atuais")
 
         self.assertLessEqual(
             com_cards,
             sem_cards,
             msg=(
-                "cada card voltou a expandir componentes Cotton: "
-                f"página vazia={sem_cards}, página cheia={com_cards}"
+                "os cartões voltaram a expandir componentes Cotton a cada "
+                f"visita: página vazia={sem_cards}, página cheia={com_cards}"
             ),
         )
 

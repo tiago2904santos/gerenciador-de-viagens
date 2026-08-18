@@ -1,3 +1,13 @@
+{% comment %}
+  Documentos vinculáveis ao evento: cinco tipos, um painel de busca cada, e o
+  alternador do sistema por cima.
+
+  Os três `data-*` da raiz são contrato de `js/pages/eventos-detalhe.js`: é
+  deles que sai o pré-filtro por datas (só aparecem documentos cujo período
+  encosta no do evento, com a tolerância configurada). O JSON dos resumos vem
+  pelo `json_script`, que é como o Django entrega dados a um script sem
+  interpolar HTML.
+{% endcomment %}
 {{ evento_doc_summaries|json_script:"evento-doc-summaries" }}
 
 <div
@@ -7,13 +17,7 @@
   data-evento-periodo-fim="{{ evento_doc_periodo.fim }}"
   data-evento-doc-tolerancia="{{ evento_doc_tolerancia_dias }}"
 >
-  <div class="segment-toggle evento-doc-toggle" role="group" aria-label="Tipo de documento" data-evento-doc-toggle>
-    <c-ui.buttons.button type="button" class_name="segment-toggle__btn" data-doc-tab-target="oficios" aria-pressed="true" only>Ofícios</c-ui.buttons.button>
-    <c-ui.buttons.button type="button" class_name="segment-toggle__btn" data-doc-tab-target="roteiros" aria-pressed="false" only>Roteiros</c-ui.buttons.button>
-    <c-ui.buttons.button type="button" class_name="segment-toggle__btn" data-doc-tab-target="pt" aria-pressed="false" only>Plano de Trabalho</c-ui.buttons.button>
-    <c-ui.buttons.button type="button" class_name="segment-toggle__btn" data-doc-tab-target="os" aria-pressed="false" only>Ordem de Serviço</c-ui.buttons.button>
-    <c-ui.buttons.button type="button" class_name="segment-toggle__btn" data-doc-tab-target="termos" aria-pressed="false" only>Termos</c-ui.buttons.button>
-  </div>
+  <c-v2.evento_doc_toggle />
 
   {% include "eventos/partials/_documento_panel.html" with panel_key="oficios" field=form.oficios_vinculados label="Adicionar ofício" placeholder="Buscar por número, protocolo, destino ou servidor" empty="Nenhum ofício disponível para o período." hidden=False only %}
   {% include "eventos/partials/_documento_panel.html" with panel_key="roteiros" field=form.roteiros_vinculados label="Adicionar roteiro" placeholder="Buscar por origem, destino ou período" empty="Nenhum roteiro disponível para o período." hidden=True only %}

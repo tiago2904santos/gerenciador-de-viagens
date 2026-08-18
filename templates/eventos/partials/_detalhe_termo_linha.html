@@ -1,0 +1,36 @@
+{% comment %}
+  Linha de termo dentro do painel do evento (etapa 5). Mesmo desenho da linha de
+  roteiro: título, meta e as ações à direita.
+
+  A lista aqui mistura dois tipos de linha — o termo genérico do evento e um por
+  servidor —, e as duas vêm do mesmo presenter. O que muda é quais URLs a linha
+  traz: por isso cada ação é condicional.
+{% endcomment %}
+<c-v2.record
+  eyebrow="Termo"
+  :title="row.title"
+  :search_text="row.search_extra"
+>
+  <c-slot name="meta">{{ row.meta_line }}</c-slot>
+  <c-slot name="actions">
+    {% if row.pdf_url %}
+      <c-v2.icon_button icon="pdf" :href="row.pdf_url" target="_blank" aria_label="Abrir o PDF do termo" tooltip="Ver PDF" />
+    {% endif %}
+    {% if row.anexar_assinado_url %}
+      <c-v2.attach_signed_button
+        :url="row.anexar_assinado_url"
+        :signed="row.remover_assinado_url"
+        :doc_label="row.title"
+        :current_name="row.assinado_nome_original"
+        :current_view_url="row.assinado_view_url"
+        :current_remove_url="row.remover_assinado_url"
+      />
+    {% endif %}
+    {% if row.edit_url %}
+      <c-v2.icon_button icon="edit" :href="row.edit_url" aria_label="Editar termo" tooltip="Editar" />
+    {% endif %}
+    {% if row.delete_url %}
+      <c-v2.delete_button :url="row.delete_url" :label="row.title" title="Excluir termo?" aria_label="Excluir termo" />
+    {% endif %}
+  </c-slot>
+</c-v2.record>

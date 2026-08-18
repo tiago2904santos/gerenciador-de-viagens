@@ -173,6 +173,8 @@ class UsuarioAreaCreationForm(EstiloCamposMixin, UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["area"].queryset = AreaTrabalho.objects.filter(ativa=True).order_by("sigla")
+        self.fields["area"].widget.attrs["data-picker-v2"] = "true"
+        self.fields["area"].widget.attrs.pop("data-picker-label", None)
         self.fields["email"].required = True
         self.fields["username"].widget.attrs.update(
             {
@@ -188,6 +190,13 @@ class UsuarioAreaCreationForm(EstiloCamposMixin, UserCreationForm):
         )
         self.fields["password1"].widget.attrs["autocomplete"] = "new-password"
         self.fields["password2"].widget.attrs["autocomplete"] = "new-password"
+        for field_name in ("username", "email", "nome_completo", "password1", "password2"):
+            set_widget_style(
+                self.fields[field_name].widget,
+                WidgetStyle.INPUT_V2,
+                nome=field_name,
+            )
+        set_widget_style(self.fields["papel"].widget, WidgetStyle.UNSTYLED)
 
     @transaction.atomic
     def save(self, commit=True):

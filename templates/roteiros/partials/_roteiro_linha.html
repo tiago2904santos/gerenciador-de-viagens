@@ -20,12 +20,12 @@
   :search_text="row.search_extra"
 >
   {% comment %}
-    Só os VALORES, sem os rótulos: "Trechos: 16 trechos" e "Valor: R$ 2.789,44"
-    dizem duas vezes a mesma coisa, e numa lista o que se lê é a diferença entre
-    uma linha e a outra — a data, a contagem, o dinheiro. É o mesmo formato da
-    lista de termos.
+    A linha vem PRONTA do presenter (`core.presenters.meta.linha_de_meta`): só
+    os valores, sem rótulo, e só os preenchidos. Montá-la aqui com `{% if %}`
+    seria o separador condicional que o contrato proíbe, e espalharia por cada
+    tela uma decisão de apresentação que é de um lugar só.
   {% endcomment %}
-  <c-slot name="meta">{% for item in row.meta %}{% if not forloop.first %} · {% endif %}{{ item.value }}{% endfor %}</c-slot>
+  <c-slot name="meta">{{ row.meta_line }}</c-slot>
   <c-slot name="actions">
     <c-v2.icon_button icon="edit" :href="row.edit_url" aria_label="Editar roteiro" tooltip="Editar" />
     <c-v2.delete_button :url="row.delete_url" :label="row.title" title="Excluir roteiro?" aria_label="Excluir roteiro" />

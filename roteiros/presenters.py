@@ -11,6 +11,7 @@ from core.presenters.actions import build_edit_action
 from core.presenters.actions import build_open_action
 from core.presenters.badges import tom_de_chip_v2
 from core.presenters.meta import build_meta
+from core.presenters.meta import linha_de_meta
 from .models import Roteiro
 from .services.editor_state_builder import _build_roteiro_state_from_estrutura
 from .services.editor_state_builder import _calculate_avulso_diarias_from_state
@@ -286,16 +287,18 @@ def apresentar_linha_lista_simples_roteiro(
     else:
         chip = {"label": "", "tone": ""}
 
+    meta = [
+        build_meta("Período", periodo),
+        build_meta("Trechos", trechos_label),
+        build_meta("Valor", card["valor_diarias_display"] or "—"),
+    ]
     return {
         "avatar": "RT",
         "chip": chip,
         "title": card["rota_display"],
         "badges": [{"text": "Cancelado", "variant": "danger"}] if roteiro.cancelado else [],
-        "meta": [
-            build_meta("Período", periodo),
-            build_meta("Trechos", trechos_label),
-            build_meta("Valor", card["valor_diarias_display"] or "—"),
-        ],
+        "meta": meta,
+        "meta_line": linha_de_meta(meta),
         "search_extra": " ".join(t["rota"] for t in card["trechos"]),
         "status_value": card["status_variant"],
         "edit_url": edit_url,

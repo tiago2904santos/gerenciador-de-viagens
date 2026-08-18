@@ -1,1 +1,12 @@
-<c-v2.form_field :field="form.unidade" :action_url="unidades_manage_url" action_label="Gerenciar unidades" />
+<c-v2.field :label="form.unidade.label" :label_for="form.unidade.id_for_label" :error="form.unidade.errors.0">
+  <c-slot name="control">
+    <c-v2.picker
+      :field="form.unidade"
+      :action_href="unidades_manage_url"
+      action_icon="settings"
+      action_aria_label="Gerenciar unidades"
+      action_tooltip="Gerenciar unidades"
+      :action_autosave="True"
+    />
+  </c-slot>
+</c-v2.field>

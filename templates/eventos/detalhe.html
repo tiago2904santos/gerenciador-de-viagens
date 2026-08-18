@@ -1,168 +1,197 @@
-{% extends "cotton/page/flow_base.html" %}
+{% extends "base.html" %}
 {% load static %}
 {% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
 
 {% block component_js %}{% include 'includes/form_components_js.html' only %}{% endblock %}
 
-{% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/pages/oficios.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/roteiros.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/termos.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/planos-trabalho-eventos.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/prestacoes_contas.css' %}">
-{% endblock %}
-
-{% block flow_shell_extra %} evento-guided-page{% endblock %}
+{% block title %}{{ page_title }}{% endblock %}
 
 {% block extra_js %}
-  {# Depois do shell.bundle — destinos/cidade dependem de CV.locationRows. #}
+  {# Depois do bundle: os destinos dependem de CV.locationRows. #}
   <script src="{% static 'js/pages/oficios-dados-viajantes.js' %}" defer></script>
   <script src="{% static 'js/pages/eventos-detalhe.js' %}" defer></script>
 {% endblock %}
 
-{% block flow_header %}
-  <c-ui.headers.wizard_page_header eyebrow="EVENTOS" :title="page_title" :status_label="flow_status_label" :status_variant="flow_status_variant" :steps="evento_page_steps" stepper_aria_label="Etapas do evento" :back_label="flow_back_label" :back_url="flow_back_url" only />
-{% endblock %}
+{% block content %}
+  {% comment %}
+    Painel do evento no v2 (2026-08-18). Cinco etapas que NÃO são um wizard
+    linear: são um hub. O evento existe desde o primeiro clique, e cada etapa é
+    um tipo de documento que pode ou não ganhar conteúdo — por isso o stepper
+    daqui é navegável, ao contrário do de ofício e roteiro.
 
-{% block flow_stepper %}
-  {% if evento.status == "cancelado" %}
-    <div class="notice notice--danger notice--action cv-alert cv-alert--danger cv-alert--action">
-      <span>
-        <strong>Evento cancelado.</strong>
-        {% if evento.motivo_cancelamento %} Motivo: {{ evento.motivo_cancelamento }}{% endif %}
-      </span>
-      <form method="post" action="{{ reativar_evento_url }}" data-confirm-submit data-confirm-message="Reativar este evento? Os documentos cancelados junto com ele também serão reativados.">
-        {% csrf_token %}
-        <c-ui.buttons.button label="Reativar evento" variant="secondary" type="submit" icon="unarchive" only />
-      </form>
-    </div>
-  {% endif %}
-{% endblock %}
+    As cinco folhas de página saíram (`oficios`, `roteiros`, `termos`,
+    `planos-trabalho-eventos`, `prestacoes_contas`): casca, blocos, cartões e
+    modais vêm do bundle do v2. A tela também deixou de estender
+    `cotton/page/flow_base.html`, que era o casco do sistema antigo.
 
-{% block flow_body %}
-  {% if etapa_atual == 1 %}
-    <form method="post" class="travel-document-wizard__form" novalidate data-evento-guided-form data-api-cidades-url="{% url 'roteiros:api_cidades_por_estado' estado_id=0 %}" data-sede-uf="{{ sede_uf }}" data-sede-label="{{ sede_config_label|default:'' }}">
-      {% csrf_token %}
-      {% with form=evento_form %}
-      <div data-travel-document-wizard-step1>
+    A ação principal de cada etapa é FLUTUANTE (`c-v2.fab`): as etapas são
+    listas longas, e a ação presa ao cabeçalho do painel some na primeira
+    rolagem — quem chega ao fim da lista teria de voltar ao topo para criar o
+    próximo item.
 
-        <c-ui.feedback.form_errors :form="form" only />
+    E o painel das etapas de lista (2, 3 e 5) não tem cabeçalho: com a ação no
+    canto, sobrava um título que repetia o nome da etapa logo acima, no stepper,
+    e uma descrição que dizia a mesma coisa com outras palavras. A etapa 4
+    mantém os dois títulos porque ali convivem DOIS painéis, e é o título que
+    diz qual é qual.
+  {% endcomment %}
+  <c-v2.wizard_page eyebrow="Eventos" :title="page_title" :steps="evento_page_steps">
+    <c-slot name="aside">
+      <c-v2.chip :label="flow_status_label" :tone="evento_status_tone" />
+      <c-v2.button label="Voltar para lista" icon="arrow-left" :href="flow_back_url" />
+    </c-slot>
 
-        <c-form.card title="Dados do evento" description="Identificação, período, destinos e documentos vinculados" title_id="evento-step1-title" extra_class="evento-step1-card" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :body_extra_class="body_extra_class" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "eventos/partials/_detalhe_etapa1_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_id=body_id data_hook=data_hook heading_level=heading_level shell=shell variant=variant add_button_evento=add_button_evento add_button_evento_d=add_button_evento_d add_button_os=add_button_os add_button_pt=add_button_pt add_button_termo=add_button_termo city_field=city_field cotton_attr_description=cotton_attr_description cotton_attr_end_label=cotton_attr_end_label cotton_attr_end_placeholder=cotton_attr_end_placeholder cotton_attr_start_label=cotton_attr_start_label cotton_attr_start_placeholder=cotton_attr_start_placeholder cotton_attr_title=cotton_attr_title data_index=data_index destination_add_button_id=destination_add_button_id destination_errors_template=destination_errors_template destination_extra_class=destination_extra_class destination_row_template=destination_row_template destination_title=destination_title end_hidden_id=end_hidden_id end_hidden_name=end_hidden_name end_hidden_value=end_hidden_value end_label=end_label evento_doc_periodo=evento_doc_periodo evento_doc_summaries=evento_doc_summaries evento_doc_tolerancia_dias=evento_doc_tolerancia_dias form=form has_data_index=has_data_index initial_date=initial_date modelos_motivo_url=modelos_motivo_url period_extra_class=period_extra_class period_extra_template=period_extra_template period_fields_extra_class=period_fields_extra_class picker_open_all=picker_open_all prefix=prefix remove_hidden=remove_hidden row_extra_class=row_extra_class row_index=row_index row_single=row_single show_drag_handle=show_drag_handle start_hidden_id=start_hidden_id start_hidden_name=start_hidden_name start_hidden_value=start_hidden_value start_label=start_label state_field=state_field tipos_evento_url=tipos_evento_url destino_index=destino_index has_destino_index=has_destino_index horarios_url=horarios_url estados=estados evento=evento location_city_value=location_city_value location_legacy_event=location_legacy_event location_state_code=location_state_code location_state_id=location_state_id row=row only %}</c-slot><c-slot name="footer">{% include "eventos/partials/_detalhe_etapa1_footer.html" only %}</c-slot></c-form.card>
-      </div>
-      {% endwith %}
+    <c-slot name="body">
+      {% if evento.status == "cancelado" %}
+        {% comment %}
+          O aviso e a saída dele na mesma faixa: quem lê "evento cancelado"
+          quer, na mesma linha, saber como desfazer.
+        {% endcomment %}
+        {% with aviso_cancelado="Evento cancelado."|add:evento_motivo_sufixo %}
+          <div class="evento-cancelado">
+            <c-v2.alert :message="aviso_cancelado" tone="error" />
+            <form method="post" action="{{ reativar_evento_url }}" data-confirm-submit data-confirm-message="Reativar este evento? Os documentos cancelados junto com ele também serão reativados.">
+              {% csrf_token %}
+              <c-v2.button label="Reativar evento" icon="unarchive" type="submit" />
+            </form>
+          </div>
+        {% endwith %}
+      {% endif %}
 
-    </form>
-  {% endif %}
+      {% if etapa_atual == 1 %}
+        {% comment %}
+          Os `data-*` do formulário são contrato de `js/pages/eventos-detalhe.js`:
+          a rota de cidades da cascata estado → cidade e a sede, que nomeia a
+          origem da primeira linha de destino.
+        {% endcomment %}
+        <form
+          method="post"
+          class="form-page__form"
+          novalidate
+          data-evento-guided-form
+          data-api-cidades-url="{% url 'roteiros:api_cidades_por_estado' estado_id=0 %}"
+          data-sede-uf="{{ sede_uf }}"
+          data-sede-label="{{ sede_config_label|default:'' }}"
+        >
+          {% csrf_token %}
+          <c-v2.form_errors :form="evento_form" />
 
-  {% if etapa_atual == 2 %}
-    <section class="wizard-collection" aria-label="Roteiros do evento">
-      <div class="wizard-collection__body">
-        <c-lists.simple_list :rows="roteiro_rows" empty_message="Nenhum roteiro vinculado a este evento." :hide_realtime_count="True" only />
-      </div>
-    </section>
-    <div class="fab-container">
-      <c-ui.buttons.button :href="create_urls.roteiro" label="Novo roteiro" variant="primary" icon="plus" extra_class="fab" only />
-    </div>
-  {% endif %}
+          <c-v2.panel title="Dados do evento" description="Identificação, período, destinos e documentos vinculados.">
+            <c-slot name="body">
+              {% include "eventos/partials/_detalhe_etapa1_body.html" with form=evento_form destino_rows=destino_rows modelos_motivo_url=modelos_motivo_url tipos_evento_url=tipos_evento_url evento_doc_periodo=evento_doc_periodo evento_doc_summaries=evento_doc_summaries evento_doc_tolerancia_dias=evento_doc_tolerancia_dias only %}
 
-  {% if etapa_atual == 3 %}
-    <section class="wizard-collection" aria-label="Ofícios e justificativas">
-      <div class="wizard-collection__body list-content app-list-grid">
-        {% for card in oficio_cards %}
-          {% include "oficios/partials/oficio_list_card.html" with card=card csrf_token=csrf_token only %}
-        {% empty %}
-          <c-lists.list_empty message="Nenhum ofício vinculado a este evento." only />
-        {% endfor %}
-      </div>
-    </section>
-    <div class="fab-container">
-      <c-ui.buttons.button :href="create_urls.oficio" label="Novo ofício" variant="primary" icon="plus" extra_class="fab" only />
-    </div>
-  {% endif %}
+              <c-v2.card_footer>
+                <c-slot name="secondary"><c-v2.button label="Voltar à lista" icon="arrow-left" :href="flow_back_url" /></c-slot>
+                <c-slot name="primary"><c-v2.button label="Salvar e avançar" variant="primary" icon="check" type="submit" /></c-slot>
+              </c-v2.card_footer>
+            </c-slot>
+          </c-v2.panel>
+        </form>
+      {% endif %}
 
-  {% if etapa_atual == 4 %}
-    {% if solicitacao_anexos %}
-      <section class="wizard-collection" aria-label="Documentos de solicitação">
-        <div class="wizard-collection__body">
-          {% include "eventos/partials/_detalhe_solicitacao_body.html" with csrf_token=csrf_token solicitacao_anexos=solicitacao_anexos only %}
-        </div>
-      </section>
-    {% endif %}
+      {% if etapa_atual == 2 %}
+        <c-v2.panel empty_message="Nenhum roteiro vinculado a este evento.">
+          <c-slot name="body">
+            {% for row in roteiro_rows %}
+              {% include "roteiros/partials/_roteiro_linha.html" with row=row only %}
+            {% endfor %}
+          </c-slot>
+        </c-v2.panel>
 
-    <section class="wizard-collection" aria-label="Planejamento e autorização">
-      <div class="wizard-collection__body list-content app-list-grid">
-        {% for card in plano_cards %}
-          {% include "planos_trabalho/partials/plano_list_card.html" with card=card csrf_token=csrf_token only %}
-        {% endfor %}
-        {% for card in ordem_cards %}
-          {% include "ordens_servico/partials/os_list_card.html" with card=card csrf_token=csrf_token only %}
-        {% endfor %}
-        {% if not plano_cards and not ordem_cards %}
-          <c-lists.list_empty message="Nenhum plano ou OS vinculado a este evento." only />
+        <c-v2.fab>
+          <c-v2.button label="Novo roteiro" variant="primary" icon="plus" :href="create_urls.roteiro" />
+        </c-v2.fab>
+      {% endif %}
+
+      {% if etapa_atual == 3 %}
+        {% comment %}
+          SEM painel envolvente: o cartão de ofício JÁ é um painel
+          (`c-v2.record box="panel"`), e um painel segurando vários punha duas
+          caixas concêntricas em volta do mesmo conteúdo. É a mesma decisão que
+          o `list_page` toma no modo `cards`, e por isso o espaçamento vem da
+          mesma classe que ele usa.
+
+          As outras etapas continuam com painel porque as linhas delas NÃO são
+          painéis — roteiro, termo, plano e OS são blocos de conteúdo, e ali o
+          painel é o grupo.
+        {% endcomment %}
+        {% if oficio_cards %}
+          <div class="list-page__rows">
+            {% for card in oficio_cards %}
+              {% include "oficios/partials/oficio_list_card.html" with card=card csrf_token=csrf_token only %}
+            {% endfor %}
+          </div>
+        {% else %}
+          <c-v2.panel empty_message="Nenhum ofício vinculado a este evento." />
         {% endif %}
-      </div>
-    </section>
-    <div class="fab-container">
-      <c-ui.buttons.button
-        type="button"
-        class_name="button button--primary"
-        aria_label="Mais ações"
-        aria-haspopup="true"
-        aria-expanded="false"
-        aria-controls="evento-etapa4-actions-menu"
-        data-overlay-trigger
-        data-overlay-kind="menu"
-        data-overlay-target="evento-etapa4-actions-menu" only>
-        <span class="button__icon" aria-hidden="true"><c-ui.icons.icon icon="more" only /></span>
-        <span>Mais ações</span>
-      </c-ui.buttons.button>
-      <div class="action-menu action-menu--rich" id="evento-etapa4-actions-menu" role="menu" hidden>
-        <c-ui.menus.rich_menu_header title="Mais ações" subtitle="Documentos e planejamento" icon="folder" only />
-        <c-ui.buttons.button
-          type="button"
-          class_name="action-menu__item action-menu__item--rich"
-          role="menuitem"
-          data-attach-signed-trigger
-          data-attach-signed-url="{% url 'eventos:solicitacao_anexar' evento.pk %}"
-          data-attach-signed-doc-label=""
-          data-attach-signed-title="Anexar documento"
-          data-attach-signed-eyebrow="Documentos de solicitação"
-          data-attach-signed-accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg"
-          data-attach-signed-file-description="o ofício solicitante, convite, despacho ou imagem deste evento"
-          data-attach-signed-file-help="Selecione um arquivo em PDF, PNG, JPG ou JPEG."
-          data-attach-signed-hint="Ele fica disponível na lista de documentos de solicitação."
-          data-attach-signed-choose-label="Escolher arquivo"
-          data-attach-signed-upload-label="Anexar documento" only>
-          <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
-            <c-ui.icons.icon icon="document" only />
-          </span>
-          <span class="action-menu__item-copy">
-            <strong>Anexar documento</strong>
-            <small>Ofícios solicitantes, convites, despachos ou imagens</small>
-          </span>
-        </c-ui.buttons.button>
-        <c-ui.menus.rich_menu_link :href="create_urls.plano" title="Plano de trabalho" description="Criar um novo plano vinculado a este evento" icon="document" tone="preview" only />
-        <c-ui.menus.rich_menu_link :href="create_urls.ordem" title="Ordem de serviço" description="Criar uma nova OS vinculada a este evento" icon="clipboard-copy" tone="pdf" only />
-      </div>
-    </div>
-  {% endif %}
 
-  {% if etapa_atual == 5 %}
-    <section class="wizard-collection" aria-label="Termos do evento">
-      <div class="wizard-collection__body">
-        <c-lists.simple_list :rows="termo_rows" empty_message="Nenhum termo vinculado a este evento." :hide_realtime_count="True" only />
-      </div>
-    </section>
+        <c-v2.fab>
+          <c-v2.button label="Novo ofício" variant="primary" icon="plus" :href="create_urls.oficio" />
+        </c-v2.fab>
+      {% endif %}
 
-    <div class="fab-container">
-      <c-ui.buttons.button :href="create_urls.termo" label="Novo termo" variant="primary" icon="plus" extra_class="fab" only />
-    </div>
-  {% endif %}
-{% endblock %}
+      {% if etapa_atual == 4 %}
+        {% comment %}
+          Anexar documento de solicitação usa o mesmo diálogo do anexar
+          assinado: os `data-attach-signed-*` trocam a cópia dele para "anexar
+          documento". Um segundo diálogo com o mesmo comportamento seria a
+          duplicação que este refactor existe para desfazer.
+        {% endcomment %}
+        <c-v2.panel title="Documentos de solicitação" description="Ofícios solicitantes, convites, despachos ou imagens.">
+          <c-slot name="actions">
+            <c-v2.attach_signed_button
+              :url="anexar_solicitacao_url"
+              icon="document"
+              aria_label="Anexar documento de solicitação"
+              title="Anexar documento"
+              eyebrow="Documentos de solicitação"
+              accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg"
+              file_description="o ofício solicitante, convite, despacho ou imagem deste evento"
+              file_help="Selecione um arquivo em PDF, PNG, JPG ou JPEG."
+              hint="Ele fica disponível na lista de documentos de solicitação."
+              choose_label="Escolher arquivo"
+              upload_label="Anexar documento"
+            />
+          </c-slot>
+          <c-slot name="body">
+            {% include "eventos/partials/_detalhe_solicitacao_body.html" with solicitacao_anexos=solicitacao_anexos csrf_token=csrf_token only %}
+          </c-slot>
+        </c-v2.panel>
 
-{% block flow_modals %}
-  <c-ui.modals.delete_confirm_modal  :delete_modal_entity="delete_modal_entity" :delete_modal_title="delete_modal_title" />
-  <c-ui.modals.cancel_reason_modal cancel_modal_hint="Um ofício cancelado deixa de gerar prestação de contas e não pode mais ser usado em novas Ordens de Serviço. Ao cancelar o evento, todos os documentos vinculados a ele também serão cancelados."  :cancel_modal_entity="cancel_modal_entity" :cancel_modal_title="cancel_modal_title" />
-  <c-ui.modals.attach_signed_modal />
+        <c-v2.panel title="Planejamento e autorização" description="Planos de trabalho e ordens de serviço do evento." empty_message="Nenhum plano ou OS vinculado a este evento.">
+          <c-slot name="body">
+            {% for card in plano_cards %}
+              {% include "planos_trabalho/partials/plano_list_card.html" with card=card csrf_token=csrf_token only %}
+            {% endfor %}
+            {% for card in ordem_cards %}
+              {% include "ordens_servico/partials/os_list_card.html" with card=card csrf_token=csrf_token only %}
+            {% endfor %}
+          </c-slot>
+        </c-v2.panel>
+
+        <c-v2.fab>
+          <c-v2.button label="Novo plano" icon="plus" :href="create_urls.plano" />
+          <c-v2.button label="Nova OS" variant="primary" icon="plus" :href="create_urls.ordem" />
+        </c-v2.fab>
+      {% endif %}
+
+      {% if etapa_atual == 5 %}
+        <c-v2.panel empty_message="Nenhum termo vinculado a este evento.">
+          <c-slot name="body">
+            {% for row in termo_rows %}
+              {% include "eventos/partials/_detalhe_termo_linha.html" with row=row row_index=forloop.counter only %}
+            {% endfor %}
+          </c-slot>
+        </c-v2.panel>
+
+        <c-v2.fab>
+          <c-v2.button label="Novo termo" variant="primary" icon="plus" :href="create_urls.termo" />
+        </c-v2.fab>
+      {% endif %}
+    </c-slot>
+  </c-v2.wizard_page>
+
+  <c-v2.delete_modal entity="este documento" />
+  <c-v2.cancel_modal entity="este documento" hint="Um ofício cancelado deixa de gerar prestação de contas e não pode mais ser usado em novas Ordens de Serviço. Ao cancelar o evento, todos os documentos vinculados a ele também serão cancelados." />
+  <c-v2.attach_signed_modal />
 {% endblock %}

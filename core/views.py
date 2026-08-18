@@ -396,6 +396,13 @@ def main_preview(request, secao=None):
                 {"value": "2", "label": "AAA-1235 - DUSTER", "meta": "FLEX • Descaracterizada • ASCOM"},
                 {"value": "3", "label": "AAA-1244 - DUSTER", "meta": "DIESEL • Descaracterizada"},
             ),
+            # Anexos de exemplo da lista de arquivos. `delete_url` aponta para a
+            # própria galeria: ela não escreve nada, e um `#` faria o botão
+            # parecer quebrado em vez de inerte.
+            "v2_anexos": (
+                {"nome": "oficio-solicitante-2026.pdf", "url": "#", "delete_url": "#"},
+                {"nome": "convite-cerimonia.pdf", "url": "#", "delete_url": "#"},
+            ),
             "v2_pagina": Paginator(range(48), 10).page(2),
             "v2_paginas": (1, 2, 3, "...", 5),
             "shell_css_profile_path": "css/shell.form-components.bundle.css",

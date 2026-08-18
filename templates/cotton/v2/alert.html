@@ -1,11 +1,19 @@
-{% cotton:vars extra_class messages %}
+{% cotton:vars extra_class message messages tone %}
 {% comment %}
   Alert v2 — a pilha de mensagens do Django. Par de `static/css/v2/alert.css`.
 
   O tom vem do `tags` da mensagem (`success`, `warning`, `error`, `info`) e é
   traduzido em token pelo CSS, como no chip: o template nomeia o ESTADO, nunca
   a cor.
+
+  `message` + `tone` é o aviso AVULSO — o motivo do cancelamento dentro de um
+  cartão, por exemplo. Mesmo desenho, uma mensagem só, sem a pilha em volta:
+  antes disso, cada tela que precisava de um aviso solto reescrevia o `<p
+  class="alert">` na mão, e o desenho passava a ter dois donos.
 {% endcomment %}
+{% if message %}
+  <p class="alert{% if extra_class %} {{ extra_class }}{% endif %}" data-tone="{{ tone|default:'info' }}" role="status">{{ message }}</p>
+{% endif %}
 {% if messages %}
   <div class="alert-stack{% if extra_class %} {{ extra_class }}{% endif %}" role="status" aria-live="polite">
     {% for message in messages %}

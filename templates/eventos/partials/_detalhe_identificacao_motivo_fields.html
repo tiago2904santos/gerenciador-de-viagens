@@ -1,2 +1,21 @@
-<c-ui.forms.field :field="form.modelo_motivo" :action_url="modelos_motivo_url" action_label="Gerenciar modelos" size_class="field-size-4" only />
-<c-ui.forms.field :field="form.motivo" size_class="field-size-4" only />
+{% comment %}
+  Motivo do evento: o modelo (com o atalho de gerenciar modelos ao lado) e o
+  texto livre. Mesmo par da OS e do ofício.
+{% endcomment %}
+<c-v2.field label="Modelo de motivo">
+  <c-slot name="control">
+    <c-v2.select_with_action
+      :field="form.modelo_motivo"
+      :action_href="modelos_motivo_url"
+      action_icon="settings"
+      action_aria_label="Gerenciar modelos de motivo"
+      action_tooltip="Gerenciar modelos"
+    />
+  </c-slot>
+</c-v2.field>
+
+<c-v2.field label="Motivo" :error="form.motivo.errors.0">
+  <c-slot name="control">
+    <div class="input">{{ form.motivo }}</div>
+  </c-slot>
+</c-v2.field>

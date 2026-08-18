@@ -1,4 +1,15 @@
-{# Tipo do evento — corpo do bloco Identificação (split). #}
-<div class="field-grid">
-  <c-ui.forms.field :field="form.tipos" :action_url="tipos_evento_url" action_label="Gerenciar tipos" size_class="field-size-4" only />
-</div>
+{% comment %}
+  Tipo do evento — corpo do bloco Identificação. O botão ao lado leva ao
+  catálogo de tipos e volta para cá (`?next=`, montado na view).
+{% endcomment %}
+<c-v2.field label="Tipo do evento" :error="form.tipos.errors.0">
+  <c-slot name="control">
+    <c-v2.select_with_action
+      :field="form.tipos"
+      :action_href="tipos_evento_url"
+      action_icon="settings"
+      action_aria_label="Gerenciar tipos de evento"
+      action_tooltip="Gerenciar tipos"
+    />
+  </c-slot>
+</c-v2.field>

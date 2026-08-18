@@ -190,7 +190,7 @@ class DownloadsDoTermoTests(TestCase):
         from termos.card_builder import montar_card_de_termo
 
         termo = self._com_equipe_e_viatura()
-        card = montar_card_de_termo(termo, menus_sob_demanda=False)
+        card = montar_card_de_termo(termo)
         dados = montar_downloads_do_termo(termo)
 
         titulos = [item["titulo"] for item in dados["itens"]]

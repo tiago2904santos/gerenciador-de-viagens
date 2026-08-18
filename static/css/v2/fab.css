@@ -1,0 +1,41 @@
+/* Ação flutuante — par de `cotton/v2/fab.html`.
+ *
+ * Ancorada no canto inferior direito da JANELA (`fixed`), e não do conteúdo:
+ * numa etapa com trinta registros, a ação presa ao cabeçalho do painel some na
+ * primeira rolagem — e quem chega ao fim da lista teria de voltar ao topo para
+ * criar o próximo item.
+ *
+ * A sombra é o que a separa do conteúdo por baixo. Sem ela, o botão parece
+ * grudado na linha que estiver passando atrás dele.
+ */
+
+:is(html[data-theme]) .fab {
+  align-items: flex-end;
+  bottom: var(--gap-loose);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-tight);
+  position: fixed;
+  right: var(--gap-loose);
+  /* Acima do conteúdo e abaixo de diálogo e menu, que precisam cobri-la. */
+  z-index: 40;
+}
+
+/* A sombra vale para QUALQUER botão que a tela ponha aqui dentro — o `fab` não
+   sabe se recebeu um ou dois, nem qual é primário. */
+:is(html[data-theme]) .fab > .button {
+  box-shadow: 0 6px 18px color-mix(in srgb, #000 32%, transparent);
+}
+
+:is(html[data-theme]) .fab > .button--primary {
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 34%, transparent);
+}
+
+/* Em tela estreita ela encosta menos nas bordas: a faixa útil é menor, e o
+   botão grande no canto cobria parte do último registro da lista. */
+@media (max-width: 720px) {
+  :is(html[data-theme]) .fab {
+    bottom: var(--gap);
+    right: var(--gap);
+  }
+}

@@ -20,6 +20,21 @@
   min-width: 0;
 }
 
+/* O select é a fonte de dados do motor, não um segundo controle visível. Nas
+   páginas que carregam apenas o bundle v2, a regra equivalente do CSS legado
+   não existe; sem este contrato o select multiple fica exposto acima do picker
+   já inicializado. */
+:is(html[data-theme]) .picker > .search-picker__native {
+  display: none !important;
+}
+
+/* A ação nasce no componente ao lado do select-fonte e o motor a transplanta
+   para a linha do controle. Antes dessa inicialização ela não pode ocupar uma
+   linha própria nem piscar no carregamento. */
+:is(html[data-theme]) .picker > .picker__action {
+  display: none;
+}
+
 /* ---- o campo de busca ---------------------------------------------------
  *
  * `.field` entrou na lista em 2026-08-17: um picker posto dentro do campo do v2
@@ -602,7 +617,7 @@
      Repetida NA LISTA porque a regra geral declara `--escolhido-height: 56px`
      nela mesma, e o valor da própria lista vence o herdado da raiz — tanto para
      ela quanto para os cartões dentro dela. */
-  --escolhido-height: 52px;
+  --escolhido-height: 62px;
 
   max-height: calc(var(--escolhido-height, 56px) * 3 + var(--gap-tight) * 3);
   overflow-y: auto;
@@ -720,9 +735,16 @@
 }
 
 :is(html[data-theme]) .picker .os-servidor-role-panel .toggle {
+  /* 38 + 3 + 3 = 44px, a MESMA altura do campo de busca que vem logo abaixo.
+     Os dois formam uma coluna só de controles, e o toggle no tamanho padrão
+     (40px) ficava três pixels mais baixo — o bastante para a borda esquerda dos
+     dois não se alinhar. */
+  --toggle-item-height: 38px;
+
   box-sizing: border-box;
   max-width: 100%;
   min-width: 0;
+  padding: 3px;
 }
 
 :is(html[data-theme]) .picker .os-servidor-role-panel .toggle__item {
@@ -742,4 +764,43 @@
   line-height: 1;
   min-height: 0;
   padding: 0 8px;
+}
+
+/* ---- documentos vinculáveis ao evento -------------------------------------
+ *
+ * Cinco painéis de busca, um por tipo de documento, sob o alternador. Só o
+ * painel do tipo escolhido fica visível — e o `[hidden]` precisa do par: o
+ * `display` do painel venceria a regra do navegador e os cinco apareceriam
+ * empilhados.
+ */
+:is(html[data-theme]) .evento-doc-picker {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .evento-doc-panel {
+  display: grid;
+  gap: var(--gap-tight);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .evento-doc-panel[hidden] {
+  display: none;
+}
+
+/* O aviso de evento cancelado e o botão de reativar na mesma faixa: quem lê o
+   aviso quer, na mesma linha, saber como desfazer. Em tela estreita o botão cai
+   para baixo do texto, em vez de espremer os dois. */
+:is(html[data-theme]) .evento-cancelado {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  margin-bottom: var(--gap);
+}
+
+:is(html[data-theme]) .evento-cancelado .alert {
+  flex: 1 1 320px;
+  margin: 0;
 }

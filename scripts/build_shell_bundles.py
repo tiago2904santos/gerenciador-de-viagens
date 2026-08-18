@@ -150,6 +150,8 @@ UI_CSS: tuple[str, ...] = (
     "css/v2/date-picker.css",
     "css/v2/pagination.css",
     "css/v2/file-picker.css",
+    "css/v2/file-list.css",
+    "css/v2/fab.css",
     "css/v2/quick-add.css",
     "css/v2/list-page.css",
     "css/v2/form-page.css",

@@ -48,6 +48,14 @@
   margin: 0;
 }
 
+:is(html[data-theme]) .header__description {
+  color: var(--text-on-brand);
+  font-size: var(--text-size-body);
+  line-height: 1.45;
+  margin: 0;
+  opacity: 0.78;
+}
+
 :is(html[data-theme]) .header__aside {
   align-items: center;
   display: flex;

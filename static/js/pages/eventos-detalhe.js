@@ -32,8 +32,12 @@
   }
 
   function initAddDestinoD() {
-    var card = document.getElementById('evento-card-dados-d');
-    var form = card ? card.closest('form') : null;
+    /* O formulário é achado pelo gancho do próprio wizard, e não pelo `id` do
+       bloco: os blocos do v2 não carregam `id` — o que separa um do outro é o
+       título. Enquanto isto procurava `#evento-card-dados-d`, o motor de
+       destinos NUNCA ligava: o "+" não inseria linha e `destinos_json` ia vazio
+       no POST, apagando os destinos do evento em silêncio (2026-08-18). */
+    var form = document.querySelector('[data-evento-guided-form]');
     if (!form) return false;
     if (!window.CV || !window.CV.locationRows || typeof window.CV.locationRows.initManagedRows !== 'function') {
       return false;
@@ -208,10 +212,18 @@
 
   function initDocPanel(root, key, items, getPeriod, tolerance) {
     var select = sourceSelectFor(root, key);
-    var list = root.querySelector('[data-evento-doc-list="' + key + '"]');
-    var search = root.querySelector('[data-evento-doc-search="' + key + '"]');
-    var clear = root.querySelector('[data-evento-doc-clear="' + key + '"]');
-    var empty = root.querySelector('[data-evento-doc-empty="' + key + '"]');
+    /* As peças são procuradas DENTRO do painel do tipo, e não por um gancho com
+       o nome do tipo no valor: o `c-v2.related_picker` emite os ganchos do
+       picker sem valor (`data-related-picker-list`, `-search`, `-empty`), como
+       todos os outros pickers do sistema. O painel é o que separa um tipo do
+       outro. */
+    var painel = root.querySelector('[data-doc-tab-panel="' + key + '"]');
+    var list = painel ? painel.querySelector('[data-related-picker-list]') : null;
+    var search = painel ? painel.querySelector('[data-related-picker-search]') : null;
+    var empty = painel ? painel.querySelector('[data-related-picker-empty]') : null;
+    /* Sem botão de limpar: o campo é `type="search"`, e o "×" dele é do
+       navegador. Um botão a mais aqui repetiria o que o campo já faz. */
+    var clear = null;
     if (!select || !list) return;
 
     function render() {
@@ -329,14 +341,10 @@
     function activate(target, moveFocus) {
       buttons.forEach(function (button) {
         var active = button.dataset.docTabTarget === target;
-        var wasActive = button.getAttribute('aria-pressed') === 'true';
         button.setAttribute('aria-pressed', active ? 'true' : 'false');
         button.tabIndex = active ? 0 : -1;
-        if (active && !wasActive) {
-          button.classList.remove('segment-toggle__btn--pop');
-          void button.offsetWidth;
-          button.classList.add('segment-toggle__btn--pop');
-        }
+        /* A animação de entrada saiu com o toggle legado: o modelo global marca
+           a troca pela transição do próprio segmento. */
         if (active && moveFocus) button.focus();
       });
       panels.forEach(function (panel) {

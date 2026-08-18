@@ -205,41 +205,10 @@ class EventosMenusTests(RedeDeMenusSobDemanda, TestCase):
         return evento
 
 
-class TermosMenusTests(RedeDeMenusSobDemanda, TestCase):
-    """Termos tem menu no rodapé e um por linha — cada servidor mais a viatura.
-
-    O termo da fixture precisa ter servidor: sem linha, os menus de linha não são
-    renderizados e a rede volta a não exercitar o que este PR move — foi o que
-    aconteceu com `eventos`.
-    """
-
-    rota_lista = "termos:index"
-    rota_menus = "termos:card_menus"
-    query_da_lista = ""
-
-    @staticmethod
-    def presenter(registro, **kwargs):
-        from termos.card_builder import montar_card_de_termo
-
-        return montar_card_de_termo(registro, **kwargs)
-
-    def criar_registro(self, *, area=None):
-        from cadastros.models import Cargo
-        from cadastros.models import Servidor
-        from termos.models import TermoAutorizacao
-
-        propria = area is None
-        area = area or area_de_teste()
-        termo = TermoAutorizacao.all_objects.create(area=area)
-        cargo = Cargo.all_objects.create(nome="Analista", area=area)
-        servidor = Servidor.all_objects.create(
-            nome="Servidor" if propria else "Alheio",
-            cargo=cargo,
-            cpf="1234567890" + ("1" if propria else "2"),
-            area=area,
-        )
-        termo.servidores.add(servidor)
-        return termo
+# Termos saiu desta rede em 2026-08-18: o cartão perdeu o menu "Documentos" —
+# era um segundo caminho para o mesmo download que o seletor da linha já faz — e
+# com ele o endpoint `termos:card_menus`. Sem gatilho não há o que medir aqui;
+# o que restou do cartão é coberto por `termos/tests`.
 
 
 class PrestacoesMenusTests(RedeDeMenusSobDemanda, TestCase):

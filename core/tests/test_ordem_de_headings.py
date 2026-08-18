@@ -85,7 +85,11 @@ class OrdemDeHeadingsNasListasTests(TestCase):
         resposta = self.client.get("/oficios/")
         html = resposta.content.decode()
 
+        # As duas marcações, pelo mesmo motivo do teste acima: `empty-state` é
+        # a do legado e `panel__empty-title` a do v2, e a lista de ofícios já
+        # migrou. O que se prova aqui é o NÍVEL do título, não qual folha o
+        # desenha.
         self.assertRegex(
-            html, r'<h2 class="empty-state__title">',
+            html, r'<h2 class="(empty-state__title|panel__empty-title)">',
             "o título do estado vazio deixou de ser h2",
         )

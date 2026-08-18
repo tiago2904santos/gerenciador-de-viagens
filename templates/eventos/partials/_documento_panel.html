@@ -1,7 +1,26 @@
+{% comment %}
+  Um painel de busca por tipo de documento vinculável. Os cinco são iguais; o
+  que muda é o campo do formulário e o texto.
+
+  `data-doc-tab-panel` casa com o `data-doc-tab-target` do segmento no
+  `c-v2.evento_doc_toggle` — o script mostra este e esconde os outros quatro.
+
+  O picker é o de DOCUMENTO VINCULADO (`c-v2.related_picker`): a lista fica
+  aberta e o campo só filtra, porque escolher um ofício é comparar rota, período
+  e equipe de dois deles.
+{% endcomment %}
 <section
   class="evento-doc-panel"
   data-doc-tab-panel="{{ panel_key }}"
   {% if hidden %}hidden{% endif %}
 >
-  {% with picker_input_id="id_evento_doc_busca_"|add:panel_key %}<c-ui.forms.related_picker :field="field" root_extra_class="evento-doc-source-picker" :input_id="picker_input_id" :input_placeholder="placeholder" :input_aria_label="label" input_data_hook="evento-doc-search" :input_data_value="panel_key" clear_data_hook="evento-doc-clear" :clear_data_value="panel_key" clear_aria_label="Limpar busca de documentos" panel_extra_class="evento-doc-summary-panel" panel_aria_label="Documentos encontrados" list_data_hook="evento-doc-list" :list_data_value="panel_key" empty_data_hook="evento-doc-empty" :empty_data_value="panel_key" :empty_text="empty" only />{% endwith %}
+  {% with picker_input_id="id_evento_doc_busca_"|add:panel_key %}
+    <c-v2.related_picker
+      :field="field"
+      :input_id="picker_input_id"
+      :placeholder="placeholder"
+      :aria_label="label"
+      :empty_text="empty"
+    />
+  {% endwith %}
 </section>

@@ -654,3 +654,66 @@ def apresentar_linha_lista_simples_tipo_evento(tipo, edit_url="#", delete_url="#
         "delete_url": delete_url,
         "delete_modal": delete_modal,
     }
+
+
+def linhas_de_destino_do_evento(evento):
+    """As linhas de destino da etapa 1, prontas para o `c-v2.destination_row`.
+
+    O evento guarda destino como TEXTO — `destino_uf` é a sigla e
+    `destino_cidade` é o nome —, e não como chave estrangeira. O componente de
+    destino do v2 trabalha com os `pk` de `Estado` e `Cidade`, que é o que os
+    dois `<select>` carregam. Esta função faz a ponte, e faz uma vez por tela:
+    resolver isso no template custaria uma consulta por linha.
+
+    O caminho de volta não passa por aqui: quem serializa é
+    `js/pages/eventos-detalhe.js`, lendo a sigla de `data-location-state-code` e
+    o nome do texto da opção de cidade.
+
+    Um destino gravado com cidade que não existe mais na tabela vem com a cidade
+    em branco e o estado preenchido — melhor do que sumir com a linha inteira,
+    porque a pessoa vê o que precisa corrigir.
+    """
+    from cadastros.models import Cidade
+    from cadastros.models import Estado
+
+    brutos = [{"uf": evento.destino_uf or "", "cidade": evento.destino_cidade or ""}]
+    brutos += [
+        {"uf": (d or {}).get("uf") or "", "cidade": (d or {}).get("cidade") or ""}
+        for d in (evento.destinos_extras or [])
+    ]
+
+    siglas = {d["uf"].strip().upper() for d in brutos if d["uf"].strip()}
+    estados_por_sigla = {
+        e.sigla: e for e in Estado.objects.filter(sigla__in=siglas)
+    } if siglas else {}
+
+    # Uma consulta para as cidades de todos os estados envolvidos: a lista de
+    # opções de cada linha sai daqui, e o `<select>` precisa dela para mostrar a
+    # cidade já escolhida.
+    cidades_por_estado = {}
+    if estados_por_sigla:
+        for cidade in Cidade.objects.filter(
+            estado_id__in=[e.pk for e in estados_por_sigla.values()]
+        ).order_by("nome"):
+            cidades_por_estado.setdefault(cidade.estado_id, []).append(cidade)
+
+    linhas = []
+    for bruto in brutos:
+        estado = estados_por_sigla.get(bruto["uf"].strip().upper())
+        cidades = cidades_por_estado.get(estado.pk, []) if estado else []
+        nome_cidade = bruto["cidade"].strip().casefold()
+        cidade = next(
+            (c for c in cidades if c.nome.strip().casefold() == nome_cidade), None
+        ) if nome_cidade else None
+        linhas.append({
+            "estado_id": str(estado.pk) if estado else "",
+            "cidade_id": str(cidade.pk) if cidade else "",
+            "cidades": cidades,
+            # Sem estado não há lista para buscar, então a cidade nasce travada.
+            # Vazio/"1" e não False/True: o que chega ao componente é uma
+            # STRING, e a string "False" é verdadeira num `{% if %}`.
+            "cidade_travada": "" if estado else "1",
+        })
+
+    # A primeira linha existe sempre: sem nenhuma, não há por onde começar.
+    return linhas

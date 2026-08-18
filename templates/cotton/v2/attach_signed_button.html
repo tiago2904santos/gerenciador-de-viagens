@@ -1,0 +1,55 @@
+{% cotton:vars accept aria_label choose_label current_name current_remove_url current_view_url doc_label eyebrow file_description file_help hint icon signed title upload_label url %}
+{% load icones %}
+{% comment %}
+  Botão de linha que abre o diálogo de anexar arquivo.
+
+  Irmão do `v2.menu_attach_signed`: os mesmos ganchos, num lugar diferente. O
+  item de menu serve quando o anexar é uma entre várias ações de documento; este
+  serve quando é a ÚNICA que não é "baixar" e merece estar à vista.
+
+  Todo `data-attach-signed-*` é contrato de `js/components/attach-signed-modal.js`
+  — é deles que o diálogo tira para onde enviar o arquivo, o que já está anexado,
+  por onde removê-lo e QUAL cópia mostrar. Nome trocado não dá erro: o diálogo
+  abre vazio.
+
+  Os seis últimos (`title`, `eyebrow`, `accept`, `file_description`,
+  `file_help`, `hint`, e os dois rótulos) existem porque o MESMO diálogo serve a
+  dois usos: o documento assinado que volta da assinatura e o documento de
+  solicitação que se anexa ao evento. Um segundo diálogo com o mesmo
+  comportamento seria a duplicação que este refactor existe para desfazer.
+
+  Botão CRU porque todo `data-*` aqui carrega valor, e valor dentro do `hook` do
+  `c-v2.button` sai escapado. Dentro de `templates/cotton/` esse é o caminho
+  previsto.
+
+  `is-assinado` é o que pinta o ícone de "já tem assinado" — o estado não vira
+  texto porque numa lista o selo ocuparia a linha inteira por uma informação de
+  um bit.
+{% endcomment %}
+{% comment %}
+  Sem `{% with rotulo=aria_label|default:title %}`: variável NÃO PASSADA não
+  existe no contexto do componente, e o `{% with %}` levanta
+  `VariableDoesNotExist` em vez de cair no `default` — a tela inteira morre com
+  erro 500. `{% if %}` encadeado tolera a ausência, que é o caso normal aqui:
+  quase todo chamador passa só a URL.
+{% endcomment %}
+<button
+  type="button"
+  class="icon-button{% if signed %} is-assinado{% endif %}"
+  aria-label="{% if aria_label %}{{ aria_label }}{% elif title %}{{ title }}{% elif signed %}Gerenciar termo assinado{% else %}Anexar termo assinado{% endif %}"
+  data-tooltip="{% if aria_label %}{{ aria_label }}{% elif title %}{{ title }}{% elif signed %}Termo assinado — gerenciar{% else %}Anexar termo assinado{% endif %}"
+  data-attach-signed-trigger
+  data-attach-signed-url="{{ url }}"
+  data-attach-signed-doc-label="{{ doc_label }}"
+  data-attach-signed-current-name="{{ current_name }}"
+  data-attach-signed-current-view-url="{{ current_view_url }}"
+  data-attach-signed-current-remove-url="{{ current_remove_url }}"
+  {% if title %}data-attach-signed-title="{{ title }}"{% endif %}
+  {% if eyebrow %}data-attach-signed-eyebrow="{{ eyebrow }}"{% endif %}
+  {% if accept %}data-attach-signed-accept="{{ accept }}"{% endif %}
+  {% if file_description %}data-attach-signed-file-description="{{ file_description }}"{% endif %}
+  {% if file_help %}data-attach-signed-file-help="{{ file_help }}"{% endif %}
+  {% if hint %}data-attach-signed-hint="{{ hint }}"{% endif %}
+  {% if choose_label %}data-attach-signed-choose-label="{{ choose_label }}"{% endif %}
+  {% if upload_label %}data-attach-signed-upload-label="{{ upload_label }}"{% endif %}
+>{% if icon %}{% icone_svg icon %}{% else %}{% icone_svg "sign" %}{% endif %}</button>

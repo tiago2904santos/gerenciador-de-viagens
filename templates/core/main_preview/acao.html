@@ -111,12 +111,39 @@
   </c-slot>
 </c-v2.panel>
 
-<c-v2.panel title="Ações de registro" description="As três que todo card de lista carrega, na ordem em que aparecem no rodapé.">
+<c-v2.panel title="Ação flutuante" description="Ancorada no canto da JANELA — ela está flutuando nesta página agora, no canto inferior direito.">
+  <c-slot name="body">
+    {% comment %}
+      Sem versão "presa" para comparar: o componente é `position: fixed`, e
+      mostrá-lo dentro de uma caixa seria mostrar outra coisa. O exemplo é o
+      próprio canto da tela.
+    {% endcomment %}
+    <c-v2.fab>
+      <c-v2.button label="Novo registro" variant="primary" icon="plus" href="#" />
+    </c-v2.fab>
+      </c-slot>
+</c-v2.panel>
+
+<c-v2.panel title="Ações de registro" description="As que um card de lista carrega, na ordem em que aparecem na linha.">
   <c-slot name="body">
     <div class="v2-lab__row">
       <c-v2.icon_button icon="folder" :menu_id="v2_menu.id" aria_label="Documentos do registro" tooltip="Visualizar e baixar" />
       <c-v2.menu_body :menu="v2_menu" />
       <c-v2.download_picker picker_id="lab-acao-downloads" src="{% url 'termos:termo_cadastro_downloads' 1 %}" />
+      {% comment %}
+        Os dois estados do anexar assinado, lado a lado: sem arquivo o ícone é
+        neutro e o rótulo diz "Anexar"; com arquivo ele ganha o realce de
+        `is-assinado` e passa a "Gerenciar", porque as ações disponíveis mudam.
+      {% endcomment %}
+      <c-v2.attach_signed_button url="#" doc_label="o termo de ARAPONGAS/PR" />
+      <c-v2.attach_signed_button
+        url="#"
+        :signed="True"
+        doc_label="o termo de ARAPONGAS/PR"
+        current_name="termo-assinado.pdf"
+        current_view_url="#"
+        current_remove_url="#"
+      />
       <c-v2.delete_button url="#" label="ARAPONGAS/PR" aria_label="Excluir registro" />
     </div>
   </c-slot>

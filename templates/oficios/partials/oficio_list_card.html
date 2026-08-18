@@ -1,2 +1,149 @@
-{# PF-05: inclui a variante canônica achatada sem expandir Cotton por registro. #}
-{% include "includes/performance/entity_card_flat.html" with card=card body_template="oficios/partials/_oficio_card_body.html" csrf_token=csrf_token only %}
+{% comment %}
+  Card do Ofício no v2 (2026-08-18) — o cartão de PAINEL: o registro cresce por
+  faixas, e é a unidade que se lê e se clica.
+
+  Três faixas, na ordem em que a pergunta é feita:
+
+  1. **quem viaja** — uma linha por servidor, com o motorista realçado e, para
+     quem tem termo, o menu do termo dele;
+  2. **a viagem** — placa e modelo, trechos e o valor das diárias;
+  3. **a justificativa** — o estado dela e o texto resumido, com editar e
+     documentos ao lado.
+
+  O que saiu do legado junto com o desenho: `entity_card_flat` e o
+  `_oficio_card_body.html`, que reimplementavam faixa, fato e linha de pessoa em
+  HTML solto porque o `entity_card` cobrava um componente Cotton por registro.
+  As peças do v2 (`person_row`, `fact`, `itinerary`) já são achatadas — não há
+  componente por linha para economizar.
+
+  `PF-04`: nenhum menu vai no HTML da lista. Todo gatilho leva `menu_src` e o
+  corpo vem de `oficios:card_menus` no primeiro clique. Os `id` (termo do
+  servidor, justificativa) casam com os do fragmento servido por lá: renomear um
+  lado desliga o menu do outro sem levantar erro.
+{% endcomment %}
+<c-v2.record
+  box="panel"
+  :title="card.header.items.0.value"
+  :status="card.status_chip_label"
+  :status_tone="card.status_chip_tone_v2"
+  :search_text="card.search_text"
+>
+  {% comment %}
+    Só o temporal: número, protocolo, destino e período JÁ estão no título, e a
+    meta repetindo o protocolo gastava a única linha livre com o que o olho
+    acabara de ler.
+  {% endcomment %}
+  <c-slot name="meta">{{ card.temporal_label }}</c-slot>
+
+  <c-slot name="body">
+    {% if card.cancel_note %}
+      <c-v2.alert tone="error" :message="card.cancel_note_display" />
+    {% endif %}
+
+    <ul class="person-list">
+      {% for s in card.servidores %}
+        <c-v2.person_row
+          :initials="s.initials"
+          :name="s.name"
+          :meta="s.meta"
+          :badge="s.badge"
+          :extra_class="s.row_class"
+        >
+          {% if s.has_termo %}
+            <c-slot name="actions">
+              <c-v2.icon_button
+                icon="more"
+                :menu_id="s.termo_action_menu_id"
+                :menu_src="card.menus_url"
+                :aria_label="s.termo_action_aria"
+                :tooltip="s.termo_action_tooltip"
+              />
+            </c-slot>
+          {% endif %}
+        </c-v2.person_row>
+      {% empty %}
+        <li class="person-row"><span class="person-row__meta">Nenhum servidor informado</span></li>
+      {% endfor %}
+    </ul>
+
+    <div class="oficio-card__facts">
+      <c-v2.form_block>
+        <c-slot name="body">
+          <div class="fact-list">
+            <c-v2.fact label="Placa" :value="card.veiculo_placa_display" note_label="Modelo" :note="card.veiculo_modelo" />
+            {% if card.motorista_is_carona and card.motorista_display %}
+              <c-v2.fact label="Motorista" :value="card.motorista_display" :note="card.motorista_referencia_display" note_label="Referência" />
+            {% endif %}
+          </div>
+        </c-slot>
+      </c-v2.form_block>
+
+      {% if card.trechos %}
+        <c-v2.form_block>
+          <c-slot name="body">
+            <span class="fact__label">Trechos encontrados</span>
+            <c-v2.itinerary :legs="card.trechos" />
+          </c-slot>
+        </c-v2.form_block>
+      {% endif %}
+
+      {% if card.valor_diarias_display %}
+        <c-v2.form_block>
+          <c-slot name="body">
+            <div class="fact-list">
+              <c-v2.fact
+                label="Valor total"
+                :value="card.valor_diarias_display"
+                note_label="Valor por extenso"
+                :note="card.valor_diarias_extenso"
+                :strong="True"
+              />
+            </div>
+          </c-slot>
+        </c-v2.form_block>
+      {% endif %}
+    </div>
+
+    <ul class="person-list">
+      <c-v2.person_row
+        initials="JU"
+        name="Justificativa"
+        :badge="card.justificativa_badge"
+        :meta="card.justificativa_resumo"
+      >
+        <c-slot name="actions">
+          <c-v2.icon_button icon="edit" :href="card.justificativa_url" aria_label="Editar justificativa" tooltip="Editar justificativa" />
+          <c-v2.icon_button
+            icon="folder"
+            :menu_id="card.justificativa_menu_id"
+            :menu_src="card.menus_url"
+            aria_label="Abrir documentos da justificativa"
+            tooltip="Visualizar e baixar"
+          />
+        </c-slot>
+      </c-v2.person_row>
+    </ul>
+  </c-slot>
+
+  <c-slot name="actions">
+    <c-v2.icon_button icon="edit" :href="card.footer.edit_url" :aria_label="card.footer.edit_aria" tooltip="Editar" />
+    {% for menu in card.footer.menus %}
+      <c-v2.icon_button
+        icon="folder"
+        :menu_id="menu.id"
+        :menu_src="menu.src"
+        :aria_label="menu.trigger_aria"
+        tooltip="Visualizar e baixar"
+      />
+    {% endfor %}
+    {% for menu in card.footer.danger_menus %}
+      <c-v2.icon_button
+        icon="more"
+        :menu_id="menu.id"
+        :menu_src="menu.src"
+        :aria_label="menu.trigger_aria"
+        :tooltip="menu.trigger_tooltip"
+      />
+    {% endfor %}
+  </c-slot>
+</c-v2.record>

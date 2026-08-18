@@ -1,0 +1,89 @@
+/* Lista de arquivos anexados — par de `cotton/v2/file_list.html`.
+ *
+ * Um arquivo não é um registro: não tem título, selo nem meta, tem nome e duas
+ * ações. Por isso ele não usa o `record` — a linha aqui é do tamanho do que
+ * mostra, e uma pilha de seis anexos continua cabendo na etapa.
+ *
+ * A linha assume o degrau oposto ao do bloco que a contém (`--surface-contrast`,
+ * a mesma escada do campo e do toggle): dentro de um `form_block` ela precisa
+ * se destacar do fundo, e declarar uma cor fixa a faria sumir no tema oposto.
+ */
+
+:is(html[data-theme]) .file-list {
+  display: grid;
+  gap: var(--gap-tight);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+:is(html[data-theme]) .file-list__item {
+  align-items: center;
+  background: var(--surface-contrast, var(--surface-field));
+  border-radius: var(--radius-field);
+  display: flex;
+  gap: var(--gap);
+  min-height: 56px;
+  padding: 10px 12px;
+}
+
+/* O ícone é o mesmo quadrado do avatar do picker: 36px, raio de campo e o
+   accent translúcido. Mantém as duas listas do sistema com a mesma cadência
+   vertical. */
+:is(html[data-theme]) .file-list__icon {
+  align-items: center;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border-radius: 8px;
+  color: var(--accent);
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 36px;
+  justify-content: center;
+  width: 36px;
+}
+
+:is(html[data-theme]) .file-list__icon svg {
+  height: 18px;
+  width: 18px;
+}
+
+:is(html[data-theme]) .file-list__copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* O nome do arquivo é longo e não se corta ao meio: `ellipsis` guarda o começo,
+   que é por onde se reconhece o documento, e o `title` mostra o resto. */
+:is(html[data-theme]) .file-list__name {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:is(html[data-theme]) .file-list__meta {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+}
+
+:is(html[data-theme]) .file-list__actions {
+  align-items: center;
+  display: flex;
+  gap: var(--gap-tight);
+  margin-left: auto;
+}
+
+/* O formulário existe só para carregar o POST do excluir; ele não pode ocupar
+   espaço nem quebrar a fileira de botões. */
+:is(html[data-theme]) .file-list__form {
+  display: contents;
+}
+
+:is(html[data-theme]) .file-list__empty {
+  color: var(--text-muted);
+  margin: 0;
+  padding: var(--gap-tight) 0;
+}

@@ -4,7 +4,7 @@
   /** Evita que cliques nos links do cabeçalho alternem o estado do <details>.
    *
    * Exceto gatilhos que dependem de delegação no `document`
-   * (CV.overlay e attach-signed-modal.js):
+   * (CV.overlay, attach-signed-modal.js e download-queue.js):
    * esses precisam que o clique continue borbulhando até lá.
    * CV.overlay já chama preventDefault no trigger, então o <details>
    * não alterna.
@@ -13,7 +13,7 @@
     el.addEventListener("click", function (e) {
       if (
         e.target.closest(
-          '[data-overlay-trigger], [data-attach-signed-trigger]',
+          '[data-overlay-trigger], [data-attach-signed-trigger], [data-download-picker-trigger]',
         )
       ) {
         return;

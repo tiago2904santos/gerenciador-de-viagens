@@ -1,5 +1,17 @@
 <div class="field-grid field-grid--cols-3">
-  <c-ui.forms.field :field="form.username" size_class="field-size-1" only />
-  <c-ui.forms.field :field="form.email" size_class="field-size-1" only />
-  <c-ui.forms.field :field="form.nome_completo" size_class="field-size-1" only />
+  {% with help_id=form.username.id_for_label|add:"_helptext" error_id=form.username.id_for_label|add:"_error" %}
+  <c-v2.field :label="form.username.label" :label_for="form.username.id_for_label" :help="form.username.help_text" :help_id="help_id" :error="form.username.errors.0" :error_id="error_id">
+    <c-slot name="control"><c-v2.input :field="form.username" /></c-slot>
+  </c-v2.field>
+  {% endwith %}
+  {% with help_id=form.email.id_for_label|add:"_helptext" error_id=form.email.id_for_label|add:"_error" %}
+  <c-v2.field :label="form.email.label" :label_for="form.email.id_for_label" :help="form.email.help_text" :help_id="help_id" :error="form.email.errors.0" :error_id="error_id">
+    <c-slot name="control"><c-v2.input :field="form.email" /></c-slot>
+  </c-v2.field>
+  {% endwith %}
+  {% with help_id=form.nome_completo.id_for_label|add:"_helptext" error_id=form.nome_completo.id_for_label|add:"_error" %}
+  <c-v2.field :label="form.nome_completo.label" :label_for="form.nome_completo.id_for_label" :help="form.nome_completo.help_text" :help_id="help_id" :error="form.nome_completo.errors.0" :error_id="error_id">
+    <c-slot name="control"><c-v2.input :field="form.nome_completo" /></c-slot>
+  </c-v2.field>
+  {% endwith %}
 </div>

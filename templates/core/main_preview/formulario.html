@@ -219,6 +219,13 @@
       </c-slot>
     </c-v2.panel>
 
+    <c-v2.panel title="Função na equipe" description="Três segmentos repartindo a linha inteira; na OS o script troca o conjunto conforme o tipo.">
+      <c-slot name="body">
+        <c-v2.os_role_toggle aria_label="Função dos servidores no caminhão" />
+        <c-v2.evento_doc_toggle />
+      </c-slot>
+    </c-v2.panel>
+
     {% comment %}
       Campo a partir de um `BoundField` — é como os catálogos renderizam os
       formulários que vêm do Python, sem reescrever `name`, `value` e `required`

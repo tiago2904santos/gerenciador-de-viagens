@@ -18,7 +18,10 @@ def renderizar_oficio_card_cacheado(card):
         separators=(",", ":"),
     ).encode("utf-8")
     digest = hashlib.blake2s(payload, digest_size=16).hexdigest()
-    key = f"oficios:list-card:v1:{digest}"
+    # A versão sobe SEMPRE que o desenho do cartão muda: o digest é do dado, e
+    # sem isso a lista serviria o HTML antigo até o próprio ofício mudar.
+    # v2 (2026-08-18): cartão migrado para as peças do v2.
+    key = f"oficios:list-card:v2:{digest}"
     html = cache.get(key)
     if html is None:
         html = render_to_string("oficios/partials/oficio_list_card.html", {"card": card})

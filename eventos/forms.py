@@ -203,10 +203,16 @@ class EventoNovoCadastroForm(forms.ModelForm):
             "destino_cidade",
         ]
         widgets = {
+            # `class` do v2, e não `WidgetStyle.FIELD_CONTROL_TEXTAREA`: o
+            # controle tem de ser o mesmo `input__control` do resto da tela.
+            # Com a classe legada a área de texto ficava com outra borda, outro
+            # raio, e — porque nada declarava a largura — parava nos 40 `cols`
+            # do HTML, ocupando 40% da faixa que era dela.
             "motivo": forms.Textarea(
                 attrs={
-                    **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
+                    "class": "input__control input__control--textarea",
                     "rows": 4,
+                    "placeholder": "Contextualize a atividade…",
                     "data-motivo-textarea": "true",
                 }
             ),

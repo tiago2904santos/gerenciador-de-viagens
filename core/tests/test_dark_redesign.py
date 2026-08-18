@@ -483,13 +483,11 @@ class DarkRedesignContractTests(SimpleTestCase):
             Path(settings.BASE_DIR) / "static" / "css" / "layout" / "page-shell.css"
         ).read_text(encoding="utf-8")
 
-        # `H-02`: a página passou a estender `cotton/page/flow_base.html`,
-        # que já é coberto por teste próprio. O eyebrow não é mais escrito à mão
-        # no template — vem do contexto da view (`flow_eyebrow`), então o
-        # contrato certo a medir é "a view manda EVENTOS", não "o template tem a
-        # string" (mesma lição do card mestre de Prestações, ver
-        # `test_summary_and_document_cards_share_global_contracts`).
-        self.assertIn('extends "cotton/page/flow_base.html"', template)
+        # 2026-08-18: o painel migrou para o v2 e a casca virou
+        # `c-v2.wizard_page` — header, trilho e stepper numa peça só. O
+        # `flow_base.html` do sistema antigo saiu de cena aqui.
+        self.assertIn("<c-v2.wizard_page", template)
+        self.assertNotIn('extends "cotton/page/flow_base.html"', template)
         eventos_views = (
             Path(settings.BASE_DIR) / "eventos" / "views.py"
         ).read_text(encoding="utf-8")
@@ -507,8 +505,9 @@ class DarkRedesignContractTests(SimpleTestCase):
         ).read_text(encoding="utf-8")
         self.assertIn("Identificação", etapa1_body)
         self.assertIn("Motivo", etapa1_body)
-        self.assertIn("Evento", etapa1_body)
-        self.assertIn("Destino e período", etapa1_body)
+        # "Período e destinos" no v2: um bloco só para as datas e os locais, em
+        # vez de "Evento" + "Destino e período" em dois.
+        self.assertIn("Período e destinos", etapa1_body)
         self.assertIn("Documentos vinculados", etapa1_body)
         # Scripts de página depois do shell.bundle (extra_js), senão
         # CV.locationRows ainda não existe e destinos/cidade quebram.
@@ -525,17 +524,27 @@ class DarkRedesignContractTests(SimpleTestCase):
             / "partials"
             / "_detalhe_documentos_body.html"
         ).read_text(encoding="utf-8")
-        # Toggle segmentado (mesmo componente do Condução/Técnico/Apoio da OS)
-        self.assertIn("segment-toggle evento-doc-toggle", documentos_body)
-        self.assertIn("data-evento-doc-toggle", documentos_body)
-        self.assertIn('data-doc-tab-target="oficios"', documentos_body)
-        self.assertIn("form-section-card--compact", page_shell)
-        self.assertIn("form-section-card--described", page_shell)
+        # O alternador é o toggle do sistema, agora num componente próprio
+        # (`c-v2.evento_doc_toggle`) — mesmo caminho do Condução/Técnico/Apoio
+        # da OS, porque `data-doc-tab-target` carrega valor e valor dentro do
+        # `hook` do botão do v2 sai escapado.
+        self.assertIn("<c-v2.evento_doc_toggle", documentos_body)
+        doc_toggle = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "cotton"
+            / "v2"
+            / "evento_doc_toggle.html"
+        ).read_text(encoding="utf-8")
+        self.assertIn("data-evento-doc-toggle", doc_toggle)
+        self.assertIn('data-doc-tab-target="oficios"', doc_toggle)
         self.assertIn("event.key === 'ArrowRight'", script)
         self.assertIn("event.key === 'Home'", script)
         self.assertIn("registerEnhancer('eventoGuided', initD)", script)
-        self.assertEqual(template.count('class="fab-container"'), 4)
-        self.assertIn('extra_class="fab"', template)
+        # Sem botão flutuante: a ação de cada etapa foi para o cabeçalho do
+        # painel dela, como nas listas já migradas.
+        self.assertNotIn('class="fab-container"', template)
+        self.assertNotIn('extra_class="fab"', template)
 
         # `collection_header.html` era conferido aqui; saiu na cascata do
         # `NOVO-44` — o componente só vivia no UI Lab, que o `BE-25` apagou.
@@ -670,15 +679,17 @@ class DarkRedesignContractTests(SimpleTestCase):
         ):
             self.assertIn(contract, canonical)
 
-        for relative in (
-            "oficios/partials/oficio_list_card.html",
-            # Migrados para o v2 e portanto fora deste contrato: termos
-            # (2026-08-15), ordens de serviço (2026-08-15), roteiros
-            # (2026-08-17), eventos e prestações de contas (2026-08-18). Os dois arquivos de card de roteiro foram APAGADOS
-            # junto — `roteiro_list_card.html` e `_roteiro_card_body.html` só
-            # existiam para o `entity_card`.
-            "planos_trabalho/partials/plano_list_card.html",
-        ):
+        # Migrados para o v2 e portanto fora deste contrato: termos
+        # (2026-08-15), ordens de serviço (2026-08-15), roteiros (2026-08-17),
+        # eventos e prestações de contas (2026-08-18), ofícios e planos de
+        # trabalho (2026-08-18). Com os dois últimos, NENHUM card de lista usa
+        # mais o `entity_card` — o contrato segue afirmado sobre o componente
+        # canônico acima, que ainda serve o detalhe do evento até ele migrar.
+        # Foram apagados junto os arquivos que só existiam para o motor legado:
+        # `_oficio_card_body.html`, `_plano_card_body.html`,
+        # `roteiro_list_card.html`, `_roteiro_card_body.html` e o
+        # `includes/performance/entity_card_flat.html`.
+        for relative in ():
             with self.subTest(template=relative):
                 source = (templates / relative).read_text(encoding="utf-8")
                 self.assertTrue(
@@ -752,7 +763,7 @@ class DarkRedesignContractTests(SimpleTestCase):
     def test_dashboard_uses_global_header_summary_and_module_cards(self):
         templates = Path(settings.BASE_DIR) / "templates"
         dashboard = (templates / "core" / "dashboard.html").read_text(encoding="utf-8")
-        module_card = (templates / "cotton" / "cards" / "module_card.html").read_text(encoding="utf-8")
+        module_card = (templates / "cotton" / "v2" / "module_card.html").read_text(encoding="utf-8")
 
         # O painel foi esvaziado a pedido do dono. O contrato mudou de "usa os
         # tres componentes globais" para "**nao tem vocabulario proprio**": o que
@@ -761,18 +772,18 @@ class DarkRedesignContractTests(SimpleTestCase):
         # dela (`dashboard.css`, apagado) e 4 blocos no tema escuro.
         self.assertIn("page-shell", dashboard)
         self.assertIn('<c-ui.headers.page_header', dashboard)
-        self.assertIn('<c-cards.module_card', dashboard)
+        self.assertIn('<c-v2.module_card', dashboard)
         self.assertNotIn("dashboard-page", dashboard)
         self.assertNotIn("summary_card.html", dashboard)
         self.assertIn("cv-module-card", module_card)
-        self.assertIn('<c-ui.buttons.button', module_card)
+        self.assertIn('<c-v2.button', module_card)
 
         cadastros = (templates / "cadastros" / "index.html").read_text(encoding="utf-8")
         # `cadastros-hub` virou `catalog-hub` na reescrita visual da
         # Administracao; o contrato e o shell padrao mais o hub, nao o nome antigo.
         self.assertIn("page-shell page-shell--standard catalog-hub", cadastros)
-        self.assertIn('<c-ui.headers.page_header', cadastros)
-        self.assertIn('<c-cards.module_card', cadastros)
+        self.assertIn('<c-v2.header', cadastros)
+        self.assertIn('<c-v2.module_card', cadastros)
         self.assertNotIn("app-page-hero", cadastros)
 
     def test_login_is_a_solid_responsive_dark_surface_without_flow_changes(self):

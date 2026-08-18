@@ -6,8 +6,10 @@
   no primeiro `toggle` — um PDF por cartão, carregado antes de alguém pedir, é
   peso que ninguém vê. `data-lazy-inline` é o gancho desse motor.
 
-  Os menus vêm do v2 (`c-v2.menu`), e os cinco ganchos do anexo assinado moram
-  em `c-v2.menu_attach_signed`, declarados uma vez só.
+  O menu de ações saiu daqui (2026-08-18). Ele repetia, num menu, o que o cartão
+  já resolve: VER é o próprio visualizador embutido logo abaixo, e BAIXAR é o
+  seletor de downloads ao lado. Anexar o termo assinado continua no cartão da
+  LISTA, que é de onde se cuida do documento pronto.
 {% endcomment %}
 {% with docs=termo_preview_documents %}
   <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
@@ -23,38 +25,6 @@
               src="{% url 'termos:termo_cadastro_downloads' termo.pk %}"
             />
           {% endif %}
-          <c-v2.icon_button
-            icon="folder"
-            menu_id="termo-cadastro-generico-menu"
-            aria_label="Abrir ações do termo genérico"
-            tooltip="Visualizar, baixar e anexar"
-          />
-          <c-v2.menu id="termo-cadastro-generico-menu" aria_label="Ações do termo genérico">
-            {% comment %}
-              Sem cabeçalho de menu (2026-08-16): o componente foi apagado, porque
-              o gatilho e o cartão atrás já dizem de que documento se trata. Esta
-              era a ÚLTIMA chamada dele fora da galeria — e ela sobreviveu à
-              primeira varredura, o que teria dado `TemplateDoesNotExist` ao abrir
-              o formulário de termo.
-            {% endcomment %}
-            <c-v2.menu_item :href="docs.generico.inline_url" icon="eye" icon_tone="info" title="Visualizar termo" description="Abrir o PDF no navegador" :target_blank="True" />
-            {% if docs.generico.download_pdf_url %}
-              <c-v2.menu_item :href="docs.generico.download_pdf_url" icon="pdf" icon_tone="pdf" title="Baixar PDF" description="Documento pronto para assinatura" :download="True" />
-            {% endif %}
-            {% if docs.generico.download_docx_url %}
-              <c-v2.menu_item :href="docs.generico.download_docx_url" icon="docx" icon_tone="docx" title="Baixar DOCX" description="Arquivo editável do termo" :download="True" />
-            {% endif %}
-            {% if docs.generico.anexar_assinado_url %}
-              <c-v2.menu_attach_signed
-                :url="docs.generico.anexar_assinado_url"
-                doc_label="o termo genérico"
-                :signed="docs.generico.assinado"
-                :current_name="docs.generico.assinado_nome_original"
-                :current_view_url="docs.generico.assinado_view_url"
-                :current_remove_url="docs.generico.remover_assinado_url"
-              />
-            {% endif %}
-          </c-v2.menu>
         </span>
       </span>
     </summary>

@@ -1,14 +1,17 @@
 <div class="usuario-quick-add" data-usuario-quick-add>
-  {# step1 só para herdar tokens/estilos; sem travel-document-card (caixa externa). #}
-  <div data-travel-document-wizard-step1 class="document-form-page usuario-quick-add__scope">
-    <c-ui.forms.form_block element_id="usuario-qa-identificacao" section_id="usuario-qa-identificacao-title" variant="split" extra_class="travel-document-block document-form-block" title="Identificação" description="Usuário, e-mail e nome" body_extra_class="form-stack" :heading_level="3" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_id="body_id" :data_hook="data_hook" :shell="shell"><c-slot name="body">{% include "usuarios/partials/_criar_usuario_identidade_fields.html" with form=form only %}</c-slot></c-ui.forms.form_block>
+  <c-v2.form_block :split="True" surface="rail" title="Identificação" description="Usuário, e-mail e nome">
+    <c-slot name="body">{% include "usuarios/partials/_criar_usuario_identidade_fields.html" with form=form only %}</c-slot>
+  </c-v2.form_block>
 
-    <div data-usuario-qa-create-only>
-      <c-ui.forms.form_block element_id="usuario-qa-senha" section_id="usuario-qa-senha-title" variant="split" extra_class="travel-document-block document-form-block" title="Senha" description="Defina e confirme a senha" :heading_level="3" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :shell="shell"><c-slot name="body">{% include "usuarios/partials/_criar_usuario_senha_fields.html" with form=form only %}</c-slot></c-ui.forms.form_block>
-    </div>
+  <div data-usuario-qa-create-only>
+    <c-v2.form_block :split="True" surface="rail" title="Senha" description="Defina e confirme a senha">
+      <c-slot name="body">{% include "usuarios/partials/_criar_usuario_senha_fields.html" with form=form only %}</c-slot>
+    </c-v2.form_block>
+  </div>
 
-    <div data-usuario-qa-create-only>
-      <c-ui.forms.form_block element_id="usuario-qa-acesso" section_id="usuario-qa-acesso-title" variant="split" extra_class="travel-document-block document-form-block" title="Primeiro acesso" description="Área e perfil iniciais" :heading_level="3" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :shell="shell"><c-slot name="body">{% include "usuarios/partials/_criar_usuario_acesso_fields.html" with form=form only %}</c-slot></c-ui.forms.form_block>
-    </div>
+  <div data-usuario-qa-create-only>
+    <c-v2.form_block :split="True" surface="rail" title="Primeiro acesso" description="Área e perfil iniciais">
+      <c-slot name="body">{% include "usuarios/partials/_criar_usuario_acesso_fields.html" with form=form only %}</c-slot>
+    </c-v2.form_block>
   </div>
 </div>

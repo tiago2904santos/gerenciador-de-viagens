@@ -23,4 +23,30 @@
       </c-slot>
     </c-v2.panel>
 
+    {% url "core:main_preview_secao" "conteudo" as conteudo_url %}
+    <c-v2.panel title="Card de módulo" description="Atalho compartilhado pelo Dashboard e pelo hub de Cadastros.">
+      <c-slot name="body">
+        <c-v2.module_card
+          title="Servidores"
+          description="Pessoas vinculadas aos fluxos."
+          eyebrow="Cadastro"
+          mark="SE"
+          :href="conteudo_url"
+          action_label="Abrir"
+        />
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Lista de arquivos" description="Anexos de um registro: nome, ver e excluir. Não é um `record` — um arquivo não tem título, selo e meta.">
+      <c-slot name="body">
+        <c-v2.file_list :anexos="v2_anexos" subtitle="Documento de solicitação" :csrf_token="csrf_token" />
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Lista de arquivos · vazia" description="O mesmo componente sem nenhum anexo.">
+      <c-slot name="body">
+        <c-v2.file_list empty_message="Nenhum documento de solicitação anexado ainda." />
+      </c-slot>
+    </c-v2.panel>
+
     {# ---------------------------------------------------------------- LISTA #}

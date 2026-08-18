@@ -1,1 +1,15 @@
-<c-v2.form_field :field="form.motoristas" :action_url="servidores_manage_url" action_label="Gerenciar servidores" />
+<c-v2.field :label="form.motoristas.label" :label_for="form.motoristas.id_for_label" :error="form.motoristas.errors.0">
+  <c-slot name="control">
+    <c-v2.picker
+      :field="form.motoristas"
+      mode="multi"
+      presentation="people"
+      selected_title="Motoristas"
+      :action_href="servidores_manage_url"
+      action_icon="settings"
+      action_aria_label="Gerenciar servidores"
+      action_tooltip="Gerenciar servidores"
+      :action_autosave="True"
+    />
+  </c-slot>
+</c-v2.field>

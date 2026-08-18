@@ -271,7 +271,20 @@
     control.appendChild(icon);
     control.appendChild(input);
     control.appendChild(clearBtn);
-    field.appendChild(control);
+    const manageAction = select.parentElement
+      ? select.parentElement.querySelector(":scope > .picker__action")
+      : null;
+    if (manageAction) {
+      const controlRow = markPart(
+        el("div", "search-picker__control-row field-with-action"),
+        "control-row"
+      );
+      controlRow.appendChild(control);
+      controlRow.appendChild(manageAction);
+      field.appendChild(controlRow);
+    } else {
+      field.appendChild(control);
+    }
     field.appendChild(dropdown);
     root.appendChild(field);
 
@@ -298,17 +311,6 @@
       root.appendChild(panel);
     }
     select.insertAdjacentElement("afterend", root);
-
-    /* Campo com botão de gerenciar (field.html): o botão nasce como irmão
-       do <select> dentro do wrapper .field-with-action--manage-reveal.
-       Move para o `.search-picker__field` (irmão do controle, não dentro
-       dele) para o mesmo padrão do cargo: encolhe no hover e revela a
-       engrenagem à direita, sem competir com "Limpar busca" nem ficar
-       centrado sobre o rótulo/dica. */
-    const manageBtn = select.parentElement
-      ? select.parentElement.querySelector(":scope > .icon-btn--field-manage")
-      : null;
-    if (manageBtn) field.appendChild(manageBtn);
 
     /* O dropdown é transplantado para o `body` e perde os ancestrais — com eles
      * some a única forma de o CSS saber de que campo ele veio. A marca vai no

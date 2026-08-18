@@ -2,91 +2,15 @@ from django.urls import reverse
 
 from core import entity_cards
 from core.presenters.meta import build_meta
+from core.presenters.meta import linha_de_meta
 from core.presenters.text import join_non_empty
 from core.utils.masks import format_placa
-
-
-def apresentar_linha_simples_termo(
-    termo,
-    *,
-    edit_url="#",
-    delete_url="#",
-    pdf_url="",
-    docx_url="",
-    # termo_cadastro_assinado_info() devolve este par junto das URLs; a linha
-    # decide o estado assinado por remover_assinado_url, mas precisa aceita-lo.
-    assinado=False,
-    anexar_assinado_url="",
-    assinado_nome_original="",
-    assinado_view_url="",
-    remover_assinado_url="",
-):
-    """Linha da lista de termos simples — os que nao tem servidor nem viatura.
-
-    Sem equipe e sem veiculo o card em camadas nao tem o que mostrar, entao
-    esses termos usam a linha de catálogo (cotton/lists/simple_list_row).
-    O download e o do termo generico: e a variante SEMIPREENCHIDO, a unica
-    que faz sentido sem servidor — ver termos.services.
-    """
-    periodo_vazio = termo.periodo_efetivo()[0] is None
-    facts = []
-    if not periodo_vazio:
-        facts.append(build_meta("Período", termo.periodo_display))
-    if termo.oficio_id:
-        facts.append(build_meta("Ofício", termo.oficio.numero_formatado))
-
-    destino = termo.destino_display
-    # As ações da linha viram um MENU montado pelos mesmos helpers do card. É o
-    # que permite ao v2 renderizar linha e card com um só componente
-    # (`cotton/v2/menu_body.html`) em vez de dois caminhos que divergem em
-    # silêncio — e cada item já traz o gancho do motor JS que o atende.
-    itens = []
-    if pdf_url:
-        itens.append(entity_cards.menu_link(
-            pdf_url, "Baixar PDF", "Documento pronto para impressão", "pdf", "pdf", download=True,
-        ))
-    if docx_url:
-        itens.append(entity_cards.menu_link(
-            docx_url, "Baixar DOCX", "Arquivo editável", "docx", "docx", download=True,
-        ))
-    if anexar_assinado_url:
-        itens.append(entity_cards.menu_attach_signed(
-            anexar_assinado_url,
-            destino,
-            assinado=assinado or bool(remover_assinado_url),
-            current_name=assinado_nome_original,
-            current_view_url=assinado_view_url,
-            current_remove_url=remover_assinado_url,
-        ))
-
-    return {
-        "avatar": "TA",
-        "title": destino,
-        "facts": facts,
-        "search_extra": termo.periodo_display if not periodo_vazio else "",
-        "edit_url": edit_url,
-        "delete_url": delete_url,
-        "delete_modal": True,
-        "pdf_url": pdf_url,
-        "docx_url": docx_url,
-        "anexar_assinado_url": anexar_assinado_url,
-        "assinado_nome_original": assinado_nome_original,
-        "assinado_view_url": assinado_view_url,
-        "remover_assinado_url": remover_assinado_url,
-        "menu": entity_cards.menu(
-            f"termo-linha-{termo.pk}-docs",
-            "Documentos",
-            destino,
-            itens,
-            trigger_aria=f"Documentos de {destino}",
-        ) if itens else None,
-    }
+from termos.abas import situacao_do_termo
 
 
 def apresentar_termo_card(
     termo,
     *,
-    menus_sob_demanda=True,
     edit_url="#",
     delete_url="#",
     delete_modal=False,
@@ -129,7 +53,6 @@ def apresentar_termo_card(
         unidade_nome = str(servidor.unidade) if servidor.unidade_id else ""
         servidores_display.append({
             "servidor_pk": servidor.pk,
-            "menu_id": f"termo-{termo.pk}-servidor-{servidor.pk}-docs",
             "initials": _iniciais_nome_servidor(servidor.nome),
             "name": servidor.nome,
             "cargo": cargo_nome,
@@ -151,7 +74,6 @@ def apresentar_termo_card(
             str(viatura.unidade) if viatura.unidade_id else "",
         ] if p)
         viatura_row = {
-            "menu_id": f"termo-{termo.pk}-viatura-docs",
             "initials": "VT",
             "name": titulo or "Viatura",
             "meta": meta,
@@ -160,48 +82,15 @@ def apresentar_termo_card(
             "docx_url": viatura_docx_url,
         }
 
-    menus_src = reverse("termos:card_menus", args=[termo.pk]) if menus_sob_demanda else ""
     # O modal de download pergunta a este endpoint o que existe para baixar.
     downloads_url = reverse("termos:termo_cadastro_downloads", args=[termo.pk]) if termo.pk else ""
 
+    # SEM menus (2026-08-18). O cartão tinha um menu "Documentos" que era um
+    # segundo caminho para o mesmo download que o seletor ao lado já faz, com a
+    # diferença de esconder a escolha atrás de dois cliques. Com ele foi embora
+    # o endpoint sob demanda (`termos:card_menus`) — não havia mais gatilho
+    # nenhum para servir.
     menus = []
-    doc_items = []
-    if pdf_url:
-        doc_items.append(entity_cards.menu_link(
-            pdf_url, "Baixar PDF", "Todos os servidores do termo", "pdf", "pdf", download=True,
-        ))
-    if docx_url:
-        doc_items.append(entity_cards.menu_link(
-            docx_url, "Baixar DOCX", "Arquivo editável", "docx", "docx", download=True,
-        ))
-    if generico_pdf_url:
-        doc_items.append(entity_cards.menu_link(
-            generico_pdf_url, "Termo em branco (PDF)",
-            "Sem preenchimento, para assinar à mão", "pdf", "pdf", download=True,
-        ))
-    if generico_docx_url:
-        doc_items.append(entity_cards.menu_link(
-            generico_docx_url, "Termo em branco (DOCX)",
-            "Sem preenchimento, para editar", "docx", "docx", download=True,
-        ))
-    if anexar_assinado_url:
-        doc_items.append(entity_cards.menu_attach_signed(
-            anexar_assinado_url,
-            destino,
-            assinado=assinado,
-            current_name=assinado_nome_original,
-            current_view_url=assinado_view_url,
-            current_remove_url=remover_assinado_url,
-        ))
-    if doc_items:
-        menus.append(entity_cards.menu(
-            f"termo-docs-{termo.pk}",
-            "Documentos",
-            destino,
-            doc_items,
-            trigger_state_class="is-assinado" if assinado else "",
-            src=menus_src,
-        ))
 
     footer_kwargs = {
         "edit_url": edit_url,
@@ -220,6 +109,17 @@ def apresentar_termo_card(
     # periodo_display devolve a sentinela "Periodo nao informado" (truthy)
     # quando nao ha data; nesse caso o titulo fica so com o destino.
     tem_periodo = termo.periodo_efetivo()[0] is not None
+    # A meta responde "de quem é este termo" sem abrir: ofício, equipe e
+    # viatura na mesma linha. Os nomes vêm inteiros — o primeiro nome sozinho
+    # não distingue dois ADEMAR da mesma unidade.
+    meta_partes = []
+    if oficio_label:
+        meta_partes.append(f"Ofício: {oficio_label}")
+    if servidores_display:
+        meta_partes.append(", ".join(s["name"] for s in servidores_display))
+    if viatura is not None:
+        placa_meta = format_placa(viatura.placa) if viatura.placa else ""
+        meta_partes.append(" ".join(p for p in [placa_meta, viatura.modelo or ""] if p))
     titulo = " · ".join(p for p in [destino, periodo if tem_periodo else ""] if p)
     header_items = [
         entity_cards.header_item("Termo", titulo or destino, wide=True, wrap=True)
@@ -230,6 +130,19 @@ def apresentar_termo_card(
     # cabecalho e acoes dividem a mesma linha (ver static/css/pages/termos.css).
     return {
         "termo_pk": termo.pk,
+        "situacao": situacao_do_termo(termo),
+        "meta_line": " · ".join(meta_partes),
+        # O anexar-assinado deixou de ser item de menu e virou botão da linha:
+        # é a única ação do termo que não é "baixar", e estava escondida dois
+        # cliques abaixo de um menu chamado "Documentos".
+        "assinatura": {
+            "url": anexar_assinado_url,
+            "assinado": assinado,
+            "doc_label": f"o termo de {destino}",
+            "nome_original": assinado_nome_original,
+            "view_url": assinado_view_url,
+            "remover_url": remover_assinado_url,
+        },
         "search_text": " ".join(filter(None, [
             destino, periodo, oficio_label,
             str(viatura) if viatura else "",
@@ -239,8 +152,6 @@ def apresentar_termo_card(
         "footer": entity_cards.footer(**footer_kwargs),
         "periodo": periodo,
         "oficio_label": oficio_label or "—",
-        # Os gatilhos de linha (`termo_list_card.html`) apontam para cá (PF-04).
-        "menus_url": menus_src,
         "downloads_url": downloads_url,
         "servidores": servidores_display,
         "servidores_count": len(servidores_display),
@@ -277,18 +188,20 @@ def apresentar_linha_lista_simples_termo_servidor(
     # próprio ícone "anexar assinado" muda de cor via classe `is-assinado`.
     badges = []
 
+    meta = [
+        build_meta("Destino", termo.destino_display),
+        build_meta("Período", termo.periodo_display),
+        build_meta("Cargo", cargo_nome or "—"),
+        build_meta("Unidade", unidade_nome or "—"),
+        build_meta("Ofício", oficio_label),
+        build_meta("Viatura", str(viatura) if viatura else "—"),
+    ]
     return {
         "avatar": _iniciais_nome_servidor(servidor.nome),
         "title": servidor.nome,
         "badges": badges,
-        "meta": [
-            build_meta("Destino", termo.destino_display),
-            build_meta("Período", termo.periodo_display),
-            build_meta("Cargo", cargo_nome or "—"),
-            build_meta("Unidade", unidade_nome or "—"),
-            build_meta("Ofício", oficio_label),
-            build_meta("Viatura", str(viatura) if viatura else "—"),
-        ],
+        "meta": meta,
+        "meta_line": linha_de_meta(meta),
         "edit_url": edit_url,
         "delete_url": "",
         "delete_modal": False,
@@ -332,16 +245,18 @@ def apresentar_linha_lista_simples_termo(
     # próprio ícone "anexar assinado" muda de cor via classe `is-assinado`.
     badges = []
 
+    meta = [
+        build_meta("Período", termo.periodo_display),
+        build_meta("Ofício", oficio_label),
+        build_meta("Servidores", servidores_label),
+        build_meta("Viatura", str(viatura) if viatura else "—"),
+    ]
     return {
         "avatar": "TM",
         "title": termo.destino_display,
         "badges": badges,
-        "meta": [
-            build_meta("Período", termo.periodo_display),
-            build_meta("Ofício", oficio_label),
-            build_meta("Servidores", servidores_label),
-            build_meta("Viatura", str(viatura) if viatura else "—"),
-        ],
+        "meta": meta,
+        "meta_line": linha_de_meta(meta),
         "edit_url": edit_url,
         "delete_url": delete_url,
         "delete_modal": delete_modal,

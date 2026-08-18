@@ -1,4 +1,12 @@
 <div class="field-grid field-grid--cols-2">
-  <c-ui.forms.field :field="form.area" size_class="field-size-1" only />
-  <c-ui.forms.field :field="form.papel" size_class="field-size-1" only />
+  {% with area_help_id=form.area.id_for_label|add:"_helptext" area_error_id=form.area.id_for_label|add:"_error" %}
+  <c-v2.field :label="form.area.label" :label_for="form.area.id_for_label" :help="form.area.help_text" :help_id="area_help_id" :error="form.area.errors.0" :error_id="area_error_id">
+    <c-slot name="control"><c-v2.picker :field="form.area" /></c-slot>
+  </c-v2.field>
+  {% endwith %}
+  {% with papel_help_id=form.papel.id_for_label|add:"_helptext" papel_error_id=form.papel.id_for_label|add:"_error" %}
+  <c-v2.field :label="form.papel.label" :label_for="form.papel.id_for_label" :help="form.papel.help_text" :help_id="papel_help_id" :error="form.papel.errors.0" :error_id="papel_error_id">
+    <c-slot name="control"><c-v2.select :field="form.papel" /></c-slot>
+  </c-v2.field>
+  {% endwith %}
 </div>

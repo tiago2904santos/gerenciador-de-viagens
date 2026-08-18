@@ -108,7 +108,7 @@
 {% if termo and termo.pk %}
   <c-v2.form_block
     title="Documentos para conferência"
-    description="Visualize, baixe e anexe os termos assinados."
+    description="Confira a prévia e baixe o termo. O documento assinado se anexa pelo cartão da lista."
   >
     <c-slot name="body">
       {% include "termos/partials/_preview_body.html" with termo=termo termo_preview_documents=termo_preview_documents only %}

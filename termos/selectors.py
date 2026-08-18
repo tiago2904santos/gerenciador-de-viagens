@@ -43,47 +43,9 @@ def prefetch_servidores_efetivos():
     )
 
 
-def anotar_composicao(termos):
-    """Anota se cada fonte de servidores do termo tem conteudo.
-
-    `TermoAutorizacao.servidores_efetivos()` cai em cascata — servidores
-    proprios, senao os do oficio, senao os dos oficios do evento — e
-    `viatura_efetiva()` faz o mesmo com a viatura. Para dividir a lista no
-    banco (em Python quebraria paginacao e contagem) cada fonte vira um
-    booleano via Exists, que nega de forma previsivel; `servidores__isnull`
-    direto no filtro passaria por join m2m e descartaria linhas nos dois lados.
-    """
-    from oficios.models import Oficio
-
-    through = TermoAutorizacao.servidores.through
-    return termos.annotate(
-        _tem_servidor_proprio=Exists(
-            through.objects.filter(termoautorizacao_id=OuterRef("pk"))
-        ),
-        _tem_servidor_oficio=Exists(
-            Oficio.objects.filter(
-                pk=OuterRef("oficio_id"), servidores_termo_autorizacao__isnull=False
-            )
-        ),
-        _tem_servidor_evento=Exists(
-            Oficio.objects.filter(evento_id=OuterRef("evento_id")).filter(
-                Q(servidores_termo_autorizacao__isnull=False) | Q(servidores__isnull=False)
-            )
-        ),
-    )
 
 
-# Termo "simples": nenhuma fonte de servidor e nenhuma viatura efetiva.
-Q_SIMPLES = Q(
-    _tem_servidor_proprio=False,
-    _tem_servidor_oficio=False,
-    _tem_servidor_evento=False,
-    viatura__isnull=True,
-    oficio__viatura__isnull=True,
-)
-
-
-def listar_termos(q=None, q_digits=None, simples=None):
+def listar_termos(q=None, q_digits=None):
     """Lista de termos da área, com a busca livre da tela.
 
     `q_digits` são os dígitos extraídos de `q` pela view — número e protocolo do
@@ -93,6 +55,11 @@ def listar_termos(q=None, q_digits=None, simples=None):
         filter_queryset_by_area(TermoAutorizacao.objects)
         .select_related(
             "oficio",
+            # O roteiro do ofício entra junto porque o PERÍODO do termo pode ser
+            # dele (`periodo_efetivo`): sem isto, todo termo sem datas próprias
+            # custava uma consulta a mais só para o selo de situação saber se a
+            # viagem já foi.
+            "oficio__roteiro",
             "destino_estado",
             "destino_cidade",
             "viatura",
@@ -100,9 +67,6 @@ def listar_termos(q=None, q_digits=None, simples=None):
         .prefetch_related(prefetch_servidores_efetivos())
         .order_by("-created_at")
     )
-    if simples is not None:
-        termos = anotar_composicao(termos)
-        termos = termos.filter(Q_SIMPLES) if simples else termos.exclude(Q_SIMPLES)
     if not q:
         return termos
 

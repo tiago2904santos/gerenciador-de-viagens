@@ -1,6 +1,21 @@
 <div class="field-grid">
   <c-v2.form_field :field="form.placa" />
   <c-v2.form_field :field="form.modelo" />
-  <c-v2.form_field :field="form.tipo" />
-  <c-v2.form_field :field="form.combustivel" :action_url="combustiveis_manage_url" action_label="Gerenciar combustíveis" />
+  {% with tipo_error_id=form.tipo.id_for_label|add:"_error" %}
+  <c-v2.field :label="form.tipo.label" :label_for="form.tipo.id_for_label" :error="form.tipo.errors.0" :error_id="tipo_error_id">
+    <c-slot name="control"><c-v2.select :field="form.tipo" /></c-slot>
+  </c-v2.field>
+  {% endwith %}
+  <c-v2.field :label="form.combustivel.label" :label_for="form.combustivel.id_for_label" :error="form.combustivel.errors.0">
+    <c-slot name="control">
+      <c-v2.select_with_action
+        :field="form.combustivel"
+        :action_href="combustiveis_manage_url"
+        action_icon="settings"
+        action_aria_label="Gerenciar combustíveis"
+        action_tooltip="Gerenciar combustíveis"
+        :action_autosave="True"
+      />
+    </c-slot>
+  </c-v2.field>
 </div>

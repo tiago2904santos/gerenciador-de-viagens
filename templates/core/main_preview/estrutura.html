@@ -28,3 +28,16 @@
         <c-v2.panel empty_title="Nenhum registro cadastrado" empty_message="Este é o estado vazio." />
       </c-slot>
     </c-v2.panel>
+
+    {% url "core:main_preview_secao" "estrutura" as estrutura_url %}
+    <c-v2.panel title="Página de confirmação" description="Fallback compartilhado para exclusões acessadas por URL direta.">
+      <c-slot name="body">
+        <c-v2.confirm_delete_page
+          title="Excluir registro?"
+          object_label="Registro de exemplo"
+          message="Não é possível excluir enquanto houver vínculos."
+          primary_label="Excluir registro"
+          :back_url="estrutura_url"
+        />
+      </c-slot>
+    </c-v2.panel>

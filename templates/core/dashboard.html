@@ -28,10 +28,10 @@
         {% url 'termos:index' as url_termos %}
         {% url 'justificativas:index' as url_justificativas %}
         {% url 'roteiros:index' as url_roteiros %}
-        <c-cards.module_card mark="OF" eyebrow="Documentos" title="Ofícios" description="Emissão e acompanhamento dos documentos oficiais de viagem." :href="url_oficios" action_label="Abrir Ofícios" only />
-        <c-cards.module_card mark="TA" eyebrow="Documentos" title="Termos" description="Geração e acompanhamento de termos vinculados aos ofícios." :href="url_termos" action_label="Abrir Termos" only />
-        <c-cards.module_card mark="JT" eyebrow="Textos formais" title="Justificativas" description="Modelos e textos formais vinculados aos documentos." :href="url_justificativas" action_label="Abrir Justificativas" only />
-        <c-cards.module_card mark="RT" eyebrow="Planejamento" title="Roteiros" description="Cadastro e reaproveitamento de trajetos oficiais." :href="url_roteiros" action_label="Abrir Roteiros" only />
+        <c-v2.module_card mark="OF" eyebrow="Documentos" title="Ofícios" description="Emissão e acompanhamento dos documentos oficiais de viagem." :href="url_oficios" action_label="Abrir Ofícios" />
+        <c-v2.module_card mark="TA" eyebrow="Documentos" title="Termos" description="Geração e acompanhamento de termos vinculados aos ofícios." :href="url_termos" action_label="Abrir Termos" />
+        <c-v2.module_card mark="JT" eyebrow="Textos formais" title="Justificativas" description="Modelos e textos formais vinculados aos documentos." :href="url_justificativas" action_label="Abrir Justificativas" />
+        <c-v2.module_card mark="RT" eyebrow="Planejamento" title="Roteiros" description="Cadastro e reaproveitamento de trajetos oficiais." :href="url_roteiros" action_label="Abrir Roteiros" />
       </div>
     </section>
   </div>

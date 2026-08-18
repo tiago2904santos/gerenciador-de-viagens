@@ -1,4 +1,4 @@
-{% cotton:vars aside extra_class title %}
+{% cotton:vars aside description extra_class title %}
 {% comment %}
   Header v2 — a faixa de identidade. Par de `static/css/v2/header.css`.
 
@@ -13,6 +13,7 @@
 <div class="header{% if extra_class %} {{ extra_class }}{% endif %}">
   <div class="header__copy">
     <h1 class="header__title">{{ title }}</h1>
+    {% if description %}<p class="header__description">{{ description }}</p>{% endif %}
   </div>
   {% if aside %}<div class="header__aside">{{ aside }}</div>{% endif %}
 </div>

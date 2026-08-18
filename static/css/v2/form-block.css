@@ -46,6 +46,18 @@
   min-width: 0;
 }
 
+/* A grade pertence ao bloco v2 e precisa viajar no `ui.bundle.css`. Algumas
+   páginas de catálogo carregam um perfil enxuto que conhece `.field-grid`, mas
+   não seus modificadores de coluna; sem esta regra `--cols-2` virava uma grade
+   de uma coluna justamente no desktop. */
+:is(html[data-theme]) .form-block--v2 .field-grid--cols-2 {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+  width: 100%;
+}
+
 /* Corpo com TODOS os filhos ocultos não reserva trilha na grade. O bloco é
    `display: grid` com `gap` e `padding` do mesmo tamanho: com o corpo vazio, os
    dois se somavam e o bloco fechava com o dobro do respiro embaixo do cabeçalho
@@ -103,6 +115,12 @@
 
 @media (max-width: 720px) {
   :is(html[data-theme]) .form-block--v2.form-block--split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  :is(html[data-theme]) .form-block--v2 .field-grid--cols-2 {
     grid-template-columns: minmax(0, 1fr);
   }
 }

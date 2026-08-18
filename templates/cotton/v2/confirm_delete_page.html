@@ -1,0 +1,33 @@
+{% cotton:vars back_url message object_label primary_label title %}
+{% comment %}
+  Confirmação de exclusão em PÁGINA. É o caminho de fallback para quem chega
+  por URL direta; nas listas, a mesma ação continua no `c-v2.delete_modal`.
+
+  Estado, Servidor e Viatura repetiam esta composição em três templates. A
+  página é uma só; cada domínio informa apenas o registro, a consequência e o
+  rótulo da ação.
+{% endcomment %}
+<div class="form-page confirm-delete-page">
+  <c-v2.header :title="title" />
+
+  <form class="form-page__form confirm-delete-page__form" method="post">
+    {% csrf_token %}
+    <c-v2.panel :title="title" description="Esta ação é permanente e não poderá ser desfeita.">
+      <c-slot name="body">
+        <p class="modal__message">
+          Você está prestes a excluir <strong>{{ object_label }}</strong>.
+        </p>
+        {% if message %}<p class="alert" data-tone="error">{{ message }}</p>{% endif %}
+
+        <c-v2.card_footer>
+          <c-slot name="secondary">
+            <c-v2.button label="Voltar" icon="arrow-left" :href="back_url" />
+          </c-slot>
+          <c-slot name="primary">
+            <c-v2.button :label="primary_label" variant="danger" icon="delete" type="submit" />
+          </c-slot>
+        </c-v2.card_footer>
+      </c-slot>
+    </c-v2.panel>
+  </form>
+</div>

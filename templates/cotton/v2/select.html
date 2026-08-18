@@ -1,4 +1,4 @@
-{% cotton:vars aria_label extra_class filter name options surface value %}
+{% cotton:vars aria_label extra_class field filter name options surface value %}
 {% comment %}
   Select v2 — par de `static/css/v2/select.css`.
 
@@ -22,13 +22,17 @@
   data-entity-picker-renderer="select"
   data-entity-picker-mode="single"
 >
-  <select
-    name="{{ name }}"
-    aria-label="{{ aria_label }}"
-    {% if filter %}data-collection-filter="{{ filter }}"{% endif %}
-  >
-    {% for opt in options %}
-      <option value="{{ opt.value }}"{% if opt.value == value %} selected{% endif %}>{{ opt.label }}</option>
-    {% endfor %}
-  </select>
+  {% if field %}
+    {{ field }}
+  {% else %}
+    <select
+      name="{{ name }}"
+      aria-label="{{ aria_label }}"
+      {% if filter %}data-collection-filter="{{ filter }}"{% endif %}
+    >
+      {% for opt in options %}
+        <option value="{{ opt.value }}"{% if opt.value == value %} selected{% endif %}>{{ opt.label }}</option>
+      {% endfor %}
+    </select>
+  {% endif %}
 </div>

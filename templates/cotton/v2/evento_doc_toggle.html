@@ -1,0 +1,29 @@
+{% cotton:vars %}
+{% comment %}
+  Tipo de documento a vincular ao evento — ofício, roteiro, PT, OS ou termo.
+
+  É o `toggle` do sistema ocupando a linha inteira (`--fill`): são cinco vistas
+  de UMA escolha, não cinco botões. Cada segmento mostra o painel de busca do
+  seu tipo e esconde os outros.
+
+  Os botões são CRUS porque `data-doc-tab-target` carrega VALOR, e valor dentro
+  do `hook` do `c-v2.button` sai escapado — dentro de `templates/cotton/` o botão
+  cru é o caminho previsto (mesma razão do `v2/os_role_toggle.html`).
+
+  `js/pages/eventos-detalhe.js` acha o grupo por `[data-evento-doc-toggle]` e
+  casa cada `data-doc-tab-target` com o `data-doc-tab-panel` do painel
+  correspondente. Renomear um dos dois lados deixa o alternador na tela e
+  desliga a troca de painel EM SILÊNCIO.
+{% endcomment %}
+<c-v2.toggle
+  variant="state"
+  aria_label="Tipo de documento"
+  extra_class="toggle--fill evento-doc-toggle"
+  hook="data-evento-doc-toggle"
+>
+  <button type="button" class="toggle__item" data-doc-tab-target="oficios" aria-pressed="true"><span>Ofícios</span></button>
+  <button type="button" class="toggle__item" data-doc-tab-target="roteiros" aria-pressed="false"><span>Roteiros</span></button>
+  <button type="button" class="toggle__item" data-doc-tab-target="pt" aria-pressed="false"><span>Plano de Trabalho</span></button>
+  <button type="button" class="toggle__item" data-doc-tab-target="os" aria-pressed="false"><span>Ordem de Serviço</span></button>
+  <button type="button" class="toggle__item" data-doc-tab-target="termos" aria-pressed="false"><span>Termos</span></button>
+</c-v2.toggle>

@@ -153,7 +153,14 @@ class GlobalDatePickerTests(SimpleTestCase):
             ):
                 continue
             source = source_path.read_text(encoding="utf-8")
-            is_global_css = source_path == base_dir / "static" / "css" / "fields" / "date-picker.css"
+            # Duas folhas globais, e não uma: `fields/date-picker.css` é a do
+            # sistema antigo e `v2/date-picker.css` a do novo — as duas são O
+            # calendário do seu sistema, não um calendário alternativo. É a
+            # mesma convivência que o resto da migração já tem.
+            is_global_css = source_path in (
+                base_dir / "static" / "css" / "fields" / "date-picker.css",
+                base_dir / "static" / "css" / "v2" / "date-picker.css",
+            )
             is_global_js = source_path == base_dir / "static" / "js" / "components" / "date-picker.js"
             is_template_or_form = source_path.suffix == ".html" or source_path.name == "forms.py"
             has_alternative = (

@@ -130,7 +130,13 @@ class OrcamentoDeQueriesEventoTests(TestCase):
     # `Prefetch` de servidores na forma que `TermoAutorizacao.servidores_efetivos()`
     # consome (`termos.selectors.prefetch_servidores_efetivos`), então a
     # consulta que o prefetch cru desperdiçava deixou de existir.
-    QUERIES_DETALHE = 64  # remedido no DB-02: usuário de teste passou a ter vínculo de área
+    # 2026-08-18 (+1): o painel migrou para o v2 e a etapa 1 passou a resolver as
+    # LINHAS DE DESTINO em `eventos.presenters.linhas_de_destino_do_evento`. O
+    # evento guarda destino como texto (sigla + nome da cidade) e o componente
+    # do v2 trabalha com `pk`, então a ponte custa uma busca de estados por
+    # sigla — e, quando algum resolve, uma de cidades desses estados. É UMA
+    # consulta por TELA, não por linha: as duas são feitas em lote.
+    QUERIES_DETALHE = 65  # remedido no DB-02: usuário de teste passou a ter vínculo de área
     # `NOVO-49`: a área de teste passou a nascer com os cinco tipos canônicos;
     # a paginação agora conta um conjunto real em vez de encerrar sobre vazio.
     QUERIES_TIPOS = 7
@@ -186,4 +192,6 @@ class OrcamentoDeQueriesEventoComOrdensTests(TestCase):
     # Três OS na página. Se este número crescer de três em três, o assinante
     # voltou a ser resolvido por card.
     # Atualizado em 02/08/2026 (+4) junto com QUERIES_DETALHE (mesmo delta).
-    QUERIES_DETALHE_COM_OS = 52
+    # 2026-08-18 (+1): mesma causa do `QUERIES_DETALHE` — as linhas de destino
+    # da etapa 1 resolvidas em lote para o componente do v2.
+    QUERIES_DETALHE_COM_OS = 53

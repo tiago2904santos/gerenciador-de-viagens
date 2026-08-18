@@ -275,13 +275,29 @@
 }
 
 /* Os três blocos de fato do cartão dividem a largura; em tela estreita eles
-   empilham, como no cartão de ofício. */
+   empilham, como no cartão de ofício.
+
+   `grid-column: 1 / -1` porque este invólucro é ITEM da grade de seis colunas do
+   cartão: sem a faixa inteira ele ficava com uma coluna (112px) e os blocos de
+   220px vazavam para fora dela, um por cima do outro. As linhas de pessoa e os
+   blocos de fato soltos têm o span declarado; este, que chegou depois, não
+   tinha. */
 :is(html[data-theme]) .prestacao-card__facts,
+:is(html[data-theme]) .oficio-card__facts,
 :is(html[data-theme]) .evento-card__docs {
   display: grid;
   gap: var(--gap);
+  grid-column: 1 / -1;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   min-width: 0;
+}
+
+/* Dentro do invólucro, o bloco volta a valer UMA coluna. O `span 2` acima é da
+   grade de seis colunas do CARTÃO e chega aqui por descendência — numa grade de
+   três colunas ele fazia cada bloco ocupar duas, e os três fatos empilhavam um
+   por linha em vez de dividirem a faixa. */
+:is(html[data-theme]) :is(.prestacao-card__facts, .oficio-card__facts, .evento-card__docs) .form-block--v2 {
+  grid-column: auto;
 }
 
 /* O formulário de uma ação só não quebra a fila de ações do rodapé. */

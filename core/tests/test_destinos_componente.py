@@ -13,10 +13,24 @@ sozinho parece correto.
 
 from __future__ import annotations
 
+import re
+
 from django.template import Context, Template
 from django.test import TestCase
 
 from cadastros.models import ConfiguracaoSistema, Estado
+
+def opcao_marcada(html, pk):
+    """A `<option>` deste estado está marcada?
+
+    A prova não pode depender da ORDEM dos atributos: a opção ganhou
+    `data-location-state-code` (a sigla, que o painel do evento lê para
+    serializar o destino) entre o `value` e o `selected`, e a comparação por
+    texto corrido quebrou sem que nada tivesse mudado de comportamento.
+    """
+    achado = re.search(rf'<option value="{pk}"[^>]*>', html)
+    return bool(achado) and " selected" in achado.group(0)
+
 
 
 def render(source: str, **contexto) -> str:
@@ -100,8 +114,8 @@ class EstadoInicialVemDaSedeTests(TestCase):
         self._configurar_uf("SC")
         html = render("{% cotton v2.destinations only / %}")
 
-        self.assertIn(f'value="{self.santa_catarina.pk}" selected', html)
-        self.assertNotIn(f'value="{self.parana.pk}" selected', html)
+        self.assertTrue(opcao_marcada(html, self.santa_catarina.pk))
+        self.assertFalse(opcao_marcada(html, self.parana.pk))
 
     def test_sem_uf_cadastrada_nada_e_pre_selecionado(self):
         """Chutar um estado é pior que deixar em branco: o errado passa batido."""
@@ -120,5 +134,5 @@ class EstadoInicialVemDaSedeTests(TestCase):
             pk=str(self.parana.pk),
         )
 
-        self.assertIn(f'value="{self.parana.pk}" selected', html)
-        self.assertNotIn(f'value="{self.santa_catarina.pk}" selected', html)
+        self.assertTrue(opcao_marcada(html, self.parana.pk))
+        self.assertFalse(opcao_marcada(html, self.santa_catarina.pk))

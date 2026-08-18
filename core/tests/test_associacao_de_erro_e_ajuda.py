@@ -359,14 +359,18 @@ class ContratoDosChamadoresTests(SimpleTestCase):
 
         Eram 59 chamadores; o `HT-03` levou 18 para o `form_errors.html`. O
         `NOVO-16` substituiu outros 3 chamadores duplicados por um único chamador
-        dentro de `related_picker.html`, restando **38 erros de campo** nos
-        templates de aplicação. O número desce quando um chamador legítimo sai, e
-        é para isso que ele está escrito aqui em vez de num comentário.
+        dentro de `related_picker.html`, restando 38 erros de campo nos templates
+        de aplicação. O número desce quando um chamador legítimo sai, e é para
+        isso que ele está escrito aqui em vez de num comentário.
+
+        2026-08-18: **36**. As telas migradas para o v2 passaram a usar
+        `c-v2.form_field`, que embute o erro no próprio campo — o chamador não
+        desapareceu, mudou de dono.
         """
         achados = list(chamadores_de_field_error())
 
-        self.assertGreaterEqual(len(achados), 38)
-        self.assertGreaterEqual(sum(1 for _, _, v, a in achados if "field_id=" in a), 38)
+        self.assertGreaterEqual(len(achados), 36)
+        self.assertGreaterEqual(sum(1 for _, _, v, a in achados if "field_id=" in a), 36)
 
 
 class DicaEscritaAMaoTests(SimpleTestCase):

@@ -475,15 +475,9 @@
     form.addEventListener("click", function (event) {
       var button = event.target.closest("[data-os-role-mode]");
       if (!button || !form.contains(button)) return;
-      var wasActive = button.getAttribute("aria-pressed") === "true";
       form.querySelectorAll("[data-os-role-mode]").forEach(function (candidate) {
         candidate.setAttribute("aria-pressed", candidate === button ? "true" : "false");
       });
-      if (!wasActive) {
-        button.classList.remove("segment-toggle__btn--pop");
-        void button.offsetWidth;
-        button.classList.add("segment-toggle__btn--pop");
-      }
       syncServidorRoleUi(form);
     });
     form.addEventListener("change", function (event) {

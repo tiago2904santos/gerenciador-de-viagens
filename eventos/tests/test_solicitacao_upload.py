@@ -78,17 +78,25 @@ class UploadSolicitacaoViewTests(TestCase):
         anexo = EventoDocumentoSolicitacao.objects.get(evento=self.evento)
         self.assertTrue(anexo.arquivo.name.lower().endswith(".pdf"))
 
-    def test_etapa4_oferece_mais_acoes_com_anexar_documento(self):
+    def test_etapa4_oferece_anexar_documento_e_os_dois_atalhos_de_criacao(self):
+        """As ações da etapa 4, agora no cabeçalho dos painéis (2026-08-18).
+
+        Elas moravam num menu "Mais ações" atrás de um botão flutuante. No v2, a
+        ação de um painel fica no cabeçalho DELE — mesmo lugar em toda tela do
+        sistema —, e o menu deixou de existir: eram três itens, dois dos quais
+        simples links de criar.
+
+        O anexar continua sendo o MESMO diálogo do anexar assinado, com a cópia
+        trocada pelos `data-attach-signed-*`.
+        """
         resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, 200)
-        self.assertContains(resp, "evento-etapa4-actions-menu")
+        self.assertNotContains(resp, "evento-etapa4-actions-menu")
         self.assertContains(resp, "Anexar documento")
-        self.assertContains(resp, "Plano de trabalho")
-        self.assertContains(resp, "Ordem de serviço")
         self.assertContains(resp, "data-attach-signed-url")
         self.assertContains(resp, self.anexar_url)
-        self.assertNotContains(resp, "Novo plano")
-        self.assertNotContains(resp, "Nova OS")
+        self.assertContains(resp, "Novo plano")
+        self.assertContains(resp, "Nova OS")
 
 
 class SolicitacaoConteudoPrivadoTests(TestCase):

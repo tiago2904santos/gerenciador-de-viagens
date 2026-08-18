@@ -395,13 +395,16 @@ def build_evento_guided_context(evento, *, etapa_atual: int = 1) -> dict:
         is_current = number == etapa_atual
         page_steps.append(
             {
+                # Vocabulário do `c-v2.stepper`: `label`, `state` e `url`. O
+                # painel do evento é um HUB — as cinco etapas existem ao mesmo
+                # tempo —, então cada uma vai como link.
                 "url": reverse(url_name, kwargs={"pk": evento.pk, "etapa": number}),
-                "state_class": "is-current" if is_current else ("is-complete" if complete else "is-pending"),
-                "step_label": f"Etapa {number}",
-                "title": title,
+                "label": title,
+                "state": "current" if is_current else ("done" if complete else ""),
                 "status": "Atual" if is_current else ("Concluída" if complete else "Pendente"),
-                "marker": str(number),
-                "marker_aria_hidden": False,
+                # `title` e `aria_current` continuam porque a view lê os dois
+                # para montar a descrição do cabeçalho.
+                "title": title,
                 "aria_current": "step" if is_current else "",
             }
         )

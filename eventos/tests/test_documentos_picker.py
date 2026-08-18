@@ -64,15 +64,21 @@ class DocumentosPickerContextTests(TestCase):
         url = reverse("eventos:guiado_etapa", kwargs={"pk": self.evento.pk, "etapa": 1})
         html = self.client.get(url).content.decode("utf-8")
 
-        self.assertIn("segment-toggle evento-doc-toggle", html)
+        # O alternador é o `toggle` do sistema (2026-08-18), no modo que ocupa a
+        # linha inteira; o gancho do script continua o mesmo.
+        self.assertIn("toggle--fill evento-doc-toggle", html)
         self.assertIn("data-evento-doc-toggle", html)
+        self.assertIn('data-doc-tab-target="oficios"', html)
         self.assertIn('id="evento-doc-summaries"', html)
         self.assertIn('data-evento-doc-field="oficios"', html)
         # O <select> de origem fica oculto (a lista é montada pelo JS).
         self.assertIn("evento-doc-source-select", html)
-        self.assertIn('data-evento-doc-clear="oficios"', html)
-        self.assertIn("search-picker__clear", html)
-        self.assertIn('aria-label="Limpar busca de documentos"', html)
+        # As peças do picker são achadas DENTRO do painel do tipo, e não por um
+        # gancho com o nome do tipo no valor: o `c-v2.related_picker` emite os
+        # ganchos sem valor, como todos os outros pickers do sistema.
+        self.assertIn('data-doc-tab-panel="oficios"', html)
+        self.assertIn("data-related-picker-search", html)
+        self.assertIn("data-related-picker-list", html)
 
     def test_periodo_referencia_usa_dados_do_form_bound(self):
         form = EventoNovoCadastroForm(

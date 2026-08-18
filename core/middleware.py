@@ -151,7 +151,13 @@ class SecurityHeadersMiddleware:
                     # Tiles OSM do Leaflet (mapa do roteiro).
                     "img-src 'self' data: blob: https://*.tile.openstreetmap.org",
                     "font-src 'self' data:",
-                    "connect-src 'self'",
+                    # `blob:` porque a fila de download (`download-queue.js`)
+                    # salva o arquivo a partir do blob que ela mesma criou — é
+                    # assim que ela sabe que um download terminou antes de
+                    # começar o próximo. Sem isto o navegador recusa o
+                    # `blob:` e o arquivo, já gerado, nunca chega ao disco:
+                    # a fila marcava "Baixado" e nada acontecia.
+                    "connect-src 'self' blob:",
                     "frame-src 'self'",
                     "object-src 'none'",
                     "base-uri 'self'",

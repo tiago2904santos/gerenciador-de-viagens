@@ -1,4 +1,4 @@
-{% cotton:vars action_aria_label action_href action_icon action_tooltip aria_label extra_class field name options value %}
+{% cotton:vars action_aria_label action_autosave action_href action_icon action_tooltip aria_label extra_class field name options value %}
 {% comment %}
   Select com uma ação secundária ao lado — escolher um modelo e ir gerenciá-los,
   escolher uma unidade e ir cadastrá-las.
@@ -49,6 +49,7 @@
           :href="action_href"
           :aria_label="action_aria_label"
           :tooltip="action_tooltip"
+          :autosave_link="action_autosave"
           tooltip_tone="accent"
         />
       </span>

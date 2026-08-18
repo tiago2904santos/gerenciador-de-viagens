@@ -8730,3 +8730,107 @@ footer. O espaçamento interno e a separação uniforme entre os componentes for
 
 O entity-card passa a repetir o contrato do form-card: `16px 20px` no header e no footer e `16px`
 no corpo. O conteúdo, os gaps internos e o comportamento responsivo permanecem inalterados.
+
+### NOVO-20260818-161641-9c71598641c6 ✅ RESOLVIDO · `NOVO` Migração dos cadastros para o v2 deixou componentes legados e composições duplicadas · HT/UI · 0,5 d
+
+Após a migração principal de 18/08, cinco formulários de cadastro rápido ainda chamavam
+`c-ui.forms.field`; Estado mantinha a confirmação legada enquanto Servidor e Viatura repetiam a
+mesma página v2 em dois templates; o hub de Cadastros e o Dashboard compartilhavam o card de
+módulo pelo namespace anterior; e cinco parciais substituídas continuavam no repositório sem
+consumidor. O corte conclui esses consumidores sem alterar nomes de campos, URLs, regras de
+exclusão ou contratos JavaScript.
+
+Concluído com um único `c-v2.confirm_delete_page` para Estado, Servidor e Viatura; um único
+`c-v2.module_card` para Dashboard e hub de Cadastros; os cinco cadastros rápidos no
+`c-v2.form_field`; e remoção de cinco parciais após busca de repositório inteiro sem consumidor.
+O app manteve 156 testes verdes, os 22 contratos focados passaram e as telas foram verificadas
+nos temas claro/escuro e em 500 px.
+
+### NOVO-20260818-173204-55aec7fb0127 ✅ RESOLVIDO · `NOVO` Campos relacionais da Viatura ainda renderizam composição híbrida em vez dos controles v2 · HT/UI · 0,3 d
+
+Combustível, Unidade e Motoristas eram chamados por `c-v2.form_field`, mas esse componente apenas
+despejava os widgets antigos e acrescentava um link textual cru para “Gerenciar”. Unidade e
+Motoristas também não recebiam o marcador `data-picker-v2`, mantendo o desenho anterior mesmo
+dentro da página migrada. O corte deve usar `select_with_action` e `picker` canônicos, preservando
+os nomes dos campos, valores selecionados, URLs de retorno e o autosave antes da navegação.
+
+Combustível passou a `c-v2.select_with_action`; Unidade e Motoristas passaram a `c-v2.picker`
+com `data-picker-v2`. As três ações de gerenciamento agora usam `c-v2.icon_button`, aparecem
+contextualmente e carregam `data-autosave-link="1"`. Os rótulos duplicados dos pickers foram
+eliminados. A validação fechou com 159 testes de Cadastros e 46 testes focados verdes, além de
+conferência nos temas claro/escuro e em 500 px.
+
+### NOVO-20260818-180959-c19b650c0c5b ✅ RESOLVIDO · `NOVO` Cargo e Unidade do Servidor ainda usam composição híbrida anterior ao v2 · HT/UI · 0,2 d
+
+Cargo e Unidade ainda são renderizados por `c-v2.form_field`, que despeja os widgets anteriores
+e acrescenta um botão textual cru para “Gerenciar”. Unidade também não recebe o marcador
+`data-picker-v2` e repete o rótulo no controle. O corte deve aplicar `select_with_action` e
+`picker` canônicos, com a engrenagem circular contextual, preservando nomes, valores, URLs e o
+autosave antes da navegação.
+
+Cargo passou a `c-v2.select_with_action` e Unidade a `c-v2.picker` com `data-picker-v2`.
+As duas ações usam a engrenagem circular contextual e preservam `data-autosave-link="1"`;
+o rótulo interno duplicado da Unidade foi removido. A validação fechou com 162 testes de
+Cadastros e 28 contratos focados verdes, além de conferência nos temas claro/escuro e em 500 px.
+
+### NOVO-20260818-183006-40ad9eb5163f ✅ RESOLVIDO · `NOVO` Cadastros rápidos de Usuários, Áreas e Unidades ainda misturam componentes anteriores ao v2 · HT/UI · 0,4 d
+
+Usuários e Áreas ainda chamam `c-ui.forms.form_block` e `c-ui.forms.field`, além de dependerem
+da casca visual do wizard antigo. Unidade usa `c-v2.form_field` em parte dos campos, mas deixa o
+picker de servidores no modo anterior e todos os controles soltos no mesmo corpo. O corte deve
+usar apenas componentes v2 e separar Identificação, Senha, Primeiro acesso, Dados da área,
+Dados da unidade e Servidores em `form_block` próprios, preservando nomes, IDs, POSTs e hooks JS.
+
+Usuários passou a três `form_block` v2 (Identificação, Senha e Primeiro acesso), Áreas a um
+(Dados da área) e Unidades a dois (Dados da unidade e Servidores). Todos os campos deste recorte
+agora usam componentes v2; os relacionamentos usam os pickers canônicos e o `select` nativo que
+alimenta o picker múltiplo permanece no DOM, mas oculto. Os IDs de ajuda e erro foram incorporados
+ao componente `field` v2 para manter válidas as referências `aria-describedby` do Django.
+Validação: 63 contratos focados e 239 testes de Usuários/Cadastros verdes; conferência real nas
+três rotas, nos temas claro/escuro e em 500 px. A suíte global executou 2.354 testes e permaneceu
+vermelha por 15 falhas e 1 erro externos ao recorte, incluindo contratos concorrentes de
+Eventos/Core e a dependência nativa ausente do WeasyPrint no Windows.
+
+### NOVO-20260818-190244-36d8603f3b28 ✅ RESOLVIDO · `NOVO` Tipo da Viatura ainda usa select nativo e a ação do picker redimensiona também a lista · HT/UI · 0,2 d
+
+O campo Tipo ainda é despejado por `form_field`, mantendo o select do navegador enquanto os
+demais selects da seção já usam o renderer v2. Nos pickers com ação, o `field-with-action`
+envolve a raiz inteira: ao revelar a engrenagem, busca e lista de selecionados encolhem juntas e
+o botão fica centralizado pela altura combinada. O corte deve aplicar o select v2 ao Tipo e
+restringir o botão à linha do controle de busca, preservando campos, valores, autosave e URLs.
+
+O Tipo passou ao `c-v2.select`, que agora aceita diretamente um `BoundField`, e a opção vazia
+“---------” foi removida do formulário: restam somente Caracterizada e Descaracterizada. A ação
+do `c-v2.picker` nasce dentro do componente e o motor a move para um `field-with-action` que
+envolve apenas o controle de busca; a lista selecionada permanece fora dessa linha e conserva
+toda a largura. No navegador, com a ação aberta, o desktop mediu 770 px de busca + 44 px de ação
+contra 822 px da lista; em 500 px, 355 px + 44 px contra 407 px da lista. Validação em claro,
+escuro e 500 px, 36 contratos focados e 164 testes de Cadastros verdes. A suíte global executou
+2.356 testes e permaneceu vermelha por 5 falhas e 1 erro externos ao recorte, incluindo contratos
+concorrentes de Core e a dependência nativa ausente do WeasyPrint no Windows.
+
+### NOVO-20260818-192027-451efb3fc693 ✅ RESOLVIDO · `NOVO` Cadastro rápido de Usuários ainda entrega widgets visuais anteriores dentro dos blocos v2 · HT/UI · 0,3 d
+
+Os cinco campos textuais ainda são despejados por `form_field` com a classe `form-control`; Área
+usa o picker v2, mas Perfil passa por `select_with_action` sem ação e deixa o select nativo
+visível junto do gatilho customizado. O corte deve renderizar os cinco campos por `c-v2.input`,
+manter Área no `c-v2.picker` pesquisável e levar Perfil ao `c-v2.select`, removendo classes
+visuais anteriores e preservando nomes, IDs, validação, ajuda, POST e edição rápida.
+
+Os cinco campos passaram a `c-v2.input` com a classe semântica `input__control`; o componente
+agora aceita diretamente o `BoundField` do Django, sem perder atributos ou validação. Área
+permaneceu no picker pesquisável v2 e Perfil passou ao `c-v2.select`. A folha canônica do select
+oculta o elemento nativo depois que o renderer cria o gatilho, eliminando a duplicação visual.
+No navegador, os cinco inputs mediram 44 px, Área apresentou um único controle visível e Perfil
+um único gatilho, com o select-fonte oculto. Validação em claro, escuro e 500 px, 35 contratos
+focados e 78 testes de Usuários verdes. A suíte global executou 2.357 testes e permaneceu
+vermelha por 5 falhas e 1 erro externos ao recorte, incluindo contratos concorrentes de Core e
+a dependência nativa ausente do WeasyPrint no Windows.
+
+### NOVO-20260818-193403-74ca0c875514 🟡 EM ANDAMENTO · `NOVO` Cadastro rápido de Unidade exibe vínculo de Servidores e empilha Nome/Sigla no desktop · HT/UI · 0,1 d
+
+O formulário rápido mostra um segundo bloco para vincular Servidores, embora essa associação não
+deva fazer parte da criação rápida. No bloco de dados, a grade padrão de quatro colunas somada ao
+layout dividido deixa Nome e Sigla em linhas diferentes. O corte deve remover integralmente o
+bloco de Servidores e usar a grade explícita de duas colunas para Nome/Sigla, preservando os dois
+campos, o POST da unidade e o empilhamento responsivo abaixo de 600 px.

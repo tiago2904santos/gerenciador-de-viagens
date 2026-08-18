@@ -11,6 +11,12 @@
   position: relative;
 }
 
+/* O select nativo continua no DOM como fonte do valor enviado pelo formulário,
+   mas o controle visível é o gatilho criado pelo renderer v2. */
+:is(html[data-theme]) .select > .custom-select__native {
+  display: none !important;
+}
+
 :is(html[data-theme]) .select .custom-select__trigger {
   align-items: center;
   background: var(--surface-contrast, var(--surface-field));

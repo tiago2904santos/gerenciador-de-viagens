@@ -18,6 +18,7 @@ class WidgetStyle(StrEnum):
     """Exact, pre-P-04 class values emitted by the project's forms."""
 
     UNSTYLED = ""
+    INPUT_V2 = "input__control"
     AUTH_FIELD_INPUT = "auth-field-input"
     FORM_CONTROL = "form-control"
     FORM_SELECT = "form-select"

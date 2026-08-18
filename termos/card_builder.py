@@ -54,7 +54,7 @@ def montar_downloads_do_termo(termo) -> dict:
     `unico` é o atalho da tela: com um documento só não há o que escolher, e o
     front baixa direto em vez de abrir o modal.
     """
-    card = montar_card_de_termo(termo, menus_sob_demanda=False)
+    card = montar_card_de_termo(termo)
 
     itens = [{
         "id": "generico",
@@ -93,7 +93,7 @@ def montar_downloads_do_termo(termo) -> dict:
     }
 
 
-def montar_card_de_termo(termo, *, artefatos=None, menus_sob_demanda=True):
+def montar_card_de_termo(termo, *, artefatos=None):
     """Card de um termo, do jeito que a lista monta.
 
     `artefatos` é o mapa que o `NOVO-08` introduziu para a lista não consultar
@@ -105,7 +105,6 @@ def montar_card_de_termo(termo, *, artefatos=None, menus_sob_demanda=True):
 
     return apresentar_termo_card(
         termo,
-        menus_sob_demanda=menus_sob_demanda,
         edit_url=reverse("termos:editar", args=[termo.pk]),
         delete_url=reverse("termos:excluir", args=[termo.pk]),
         delete_modal=True,

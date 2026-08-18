@@ -366,3 +366,23 @@ alcançável em produção. Não vira ID.
   preservando o espaçamento interno do componente.
 - [x] `NOVO-20260813-192620-0d0a2ee2604b` — entity-card alinhado aos paddings do form-card:
   `16px 20px` nas extremidades e `16px` no corpo.
+
+## Conclusão dos cadastros no v2 (18/08/2026)
+
+- [x] `NOVO-20260818-161641-9c71598641c6` — eliminar chamadas visuais legadas restantes em
+  `templates/cadastros`, compartilhar uma única confirmação de exclusão v2, consolidar o card de
+  módulo usado por Dashboard/Cadastros e remover as parciais comprovadamente sem consumidor.
+- [x] `NOVO-20260818-173204-55aec7fb0127` — substituir os campos híbridos de Combustível,
+  Unidade e Motoristas da Viatura pelos controles `select_with_action` e `picker` v2, mantendo
+  autosave, valores e URLs de gerenciamento.
+- [x] `NOVO-20260818-180959-c19b650c0c5b` — substituir os campos híbridos de Cargo e Unidade
+  do Servidor pelos controles `select_with_action` e `picker` v2, com ação de gerenciamento
+  circular e contextual, mantendo autosave, valores e URLs.
+- [x] `NOVO-20260818-183006-40ad9eb5163f` — migrar os cadastros rápidos de Usuários, Áreas e
+  Unidades para campos e `form_block` v2, separando cada seção lógica sem alterar os POSTs.
+- [x] `NOVO-20260818-190244-36d8603f3b28` — migrar o Tipo da Viatura para o select v2 e
+  restringir a ação de gerenciamento dos pickers à linha de busca, sem encolher a lista.
+- [x] `NOVO-20260818-192027-451efb3fc693` — substituir os widgets visuais anteriores do
+  cadastro rápido de Usuários por `input`, `picker` e `select` v2, sem controles duplicados.
+- [ ] `NOVO-20260818-193403-74ca0c875514` — remover Servidores do cadastro rápido de Unidade e
+  manter Nome e Sigla na mesma linha no desktop.

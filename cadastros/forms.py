@@ -160,7 +160,7 @@ class UnidadeForm(BaseCadastroForm):
                 "data-entity-picker": "true",
                 "data-entity-picker-mode": "multi",
                 "data-picker-variant": "compact",
-                "data-picker-label": "Servidores",
+                "data-picker-v2": "true",
                 "data-picker-hint": "Busque por nome, cargo, CPF ou RG.",
                 "data-panel-title": "SERVIDORES VINCULADOS",
                 "data-empty-selected": "Nenhum servidor vinculado.",
@@ -359,7 +359,7 @@ class ServidorForm(BaseCadastroForm):
                 "data-entity-picker": "true",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "compact",
-                "data-picker-label": "Unidade",
+                "data-picker-v2": "true",
                 "data-placeholder": "Buscar unidade",
                 "data-empty-message": "Nenhuma unidade encontrada.",
             }
@@ -457,8 +457,8 @@ class ViaturaForm(BaseCadastroForm):
                     "data-entity-picker-mode": "multi",
                     "data-picker-variant": "detailed",
                     "data-picker-presentation": "people",
+                    "data-picker-v2": "true",
                     "data-picker-all-drivers": "true",
-                    "data-picker-label": "Motoristas",
                     "data-picker-hide-selected-header": "true",
                     "data-placeholder": "Digite nome, cargo ou CPF",
                     "data-empty-message": "Nenhum motorista encontrado.",
@@ -474,6 +474,7 @@ class ViaturaForm(BaseCadastroForm):
         set_widget_style(self.fields["combustivel"].widget, WidgetStyle.FORM_SELECT)
         self.fields["combustivel"].queryset = filter_queryset_by_area(Combustivel.objects).order_by("nome")
         self.fields["tipo"].required = False
+        self.fields["tipo"].choices = Viatura.TIPO_CHOICES
         self.fields["unidade"].required = False
         self.fields["unidade"].empty_label = "Selecione (opcional)"
         self.fields["unidade"].label = "Unidade (opcional)"
@@ -483,7 +484,7 @@ class ViaturaForm(BaseCadastroForm):
                 "data-entity-picker": "true",
                 "data-entity-picker-mode": "single",
                 "data-picker-variant": "compact",
-                "data-picker-label": "Unidade (opcional)",
+                "data-picker-v2": "true",
                 "data-placeholder": "Buscar unidade",
                 "data-empty-message": "Nenhuma unidade encontrada.",
             }

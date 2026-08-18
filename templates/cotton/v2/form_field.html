@@ -30,12 +30,14 @@
   de servidor apareceram só com o texto de exemplo. Resolvido aqui, o atributo
   recebe uma variável simples.
 {% endcomment %}
-{% with rotulo=label|default:field.label ajuda=help|default:field.help_text erro=field.errors.0 %}
+{% with rotulo=label|default:field.label ajuda=help|default:field.help_text erro=field.errors.0 ajuda_id=field.id_for_label|add:"_helptext" erro_id=field.id_for_label|add:"_error" %}
 <c-v2.field
   :label="rotulo"
   :label_for="field.id_for_label"
   :help="ajuda"
+  :help_id="ajuda_id"
   :error="erro"
+  :error_id="erro_id"
   :extra_class="extra_class"
 >
   <c-slot name="control">

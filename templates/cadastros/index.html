@@ -4,7 +4,7 @@
 
 {% block content %}
   <div class="page-shell page-shell--standard catalog-hub">
-    <c-ui.headers.page_header eyebrow="CADASTROS" :title="page_title" :description="page_description" icon_label="CD" module_label="Base administrativa" only />
+    <c-v2.header :title="page_title" :description="page_description" />
 
     <section class="catalog-section" aria-labelledby="cadastros-operacionais-title">
       <div class="catalog-section__heading">
@@ -16,7 +16,7 @@
       </div>
       <div class="catalog-grid">
         {% for module in modules %}
-          <c-cards.module_card :title="module.title" :description="module.description" :href="module.href" action_label="Abrir" :eyebrow="module.eyebrow" only />
+          <c-v2.module_card :title="module.title" :description="module.description" :href="module.href" action_label="Abrir" :eyebrow="module.eyebrow" />
         {% endfor %}
       </div>
     </section>
@@ -32,7 +32,7 @@
         </div>
         <div class="catalog-grid">
           {% for module in internal_modules %}
-            <c-cards.module_card :title="module.title" :description="module.description" :href="module.href" action_label="Abrir" :eyebrow="module.eyebrow" only />
+            <c-v2.module_card :title="module.title" :description="module.description" :href="module.href" action_label="Abrir" :eyebrow="module.eyebrow" />
           {% endfor %}
         </div>
       </section>

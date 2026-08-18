@@ -1,4 +1,4 @@
-{% cotton:vars aria_label attrs disabled extra_class filter icon name placeholder surface type value %}
+{% cotton:vars aria_label attrs disabled extra_class field filter icon name placeholder surface type value %}
 {% comment %}
   Input v2 — par de `static/css/v2/input.css`.
 
@@ -13,7 +13,9 @@
 {% load icones %}
 <div class="input{% if icon %} input--with-icon{% endif %}{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
   {% if icon %}<span class="input__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
-  {% if type == "textarea" %}
+  {% if field %}
+    {{ field }}
+  {% elif type == "textarea" %}
   <textarea
     class="input__control input__control--textarea"
     rows="4"

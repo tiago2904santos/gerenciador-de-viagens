@@ -182,7 +182,34 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # linha (um deles com seis `data-wa-*`) e o anexar-assinado no rodapé —,
         # e mora em componente porque quase toda ação dele é `<button>` cru com
         # `data-*` COM VALOR, que não cabe no `hook` do `c-v2.button`.
-        self.assertEqual(len(self.components()), 141)
+        #
+        # 142 (2026-08-18): `v2/os_role_toggle.html`. O toggle de função da
+        # equipe da OS (Condução / Técnico / Apoio) era o `segment-toggle`
+        # legado escrito no template da tela; virou o `toggle--fill` do sistema.
+        # Mora em componente porque `data-os-role-mode` carrega VALOR, e valor
+        # dentro do `hook` do `c-v2.button` sai escapado.
+        #
+        # 143 (NOVO-20260818-161641-9c71598641c6): entrou a página única de
+        # confirmação de exclusão. O `module_card` apenas mudou do namespace
+        # `cards` para `v2`, com os dois consumidores migrados no mesmo corte.
+        #
+        # 144 (2026-08-18): `v2/attach_signed_button.html`. Irmão do
+        # `menu_attach_signed`: os mesmos ganchos do `attach-signed-modal.js`,
+        # num botão de linha em vez de item de menu. Nasceu quando o cartão de
+        # termo perdeu o menu "Documentos" — anexar o assinado é a única ação
+        # dali que não é "baixar", e ficava escondida dois cliques abaixo.
+        #
+        # 146 (2026-08-18): as duas peças que faltavam ao painel do evento —
+        # `v2/file_list.html` (a lista de arquivos anexados: nome, ver e
+        # excluir, que não é um `record` porque um arquivo não tem título, selo
+        # e meta) e `v2/evento_doc_toggle.html` (os cinco tipos de documento
+        # vinculável, botão cru porque `data-doc-tab-target` carrega valor).
+        #
+        # 147 (2026-08-18): `v2/fab.html`, a ação flutuante. As etapas do painel
+        # do evento são listas longas, e a ação no cabeçalho do painel some na
+        # primeira rolagem — quem chega ao fim da lista voltaria ao topo para
+        # criar o próximo item.
+        self.assertEqual(len(self.components()), 147)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.

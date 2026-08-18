@@ -1,5 +1,9 @@
 {% cotton:vars action_label description eyebrow href mark title %}
-<article class="cv-module-card module-card app-card">
+{% comment %}
+  Atalho de módulo compartilhado pelo Dashboard e pelo hub de Cadastros.
+  A marcação visual existente fica preservada; a ação passa a usar o botão v2.
+{% endcomment %}
+<article class="module-card-v2 cv-module-card module-card app-card">
   <header class="cv-module-card__header">
     <span class="cv-module-card__mark" aria-hidden="true">{{ mark|default:title|slice:":2"|upper }}</span>
     <span class="cv-module-card__eyebrow eyebrow">{{ eyebrow|default:"Módulo" }}</span>
@@ -10,7 +14,7 @@
   </div>
   {% if href %}
     <footer class="cv-module-card__footer">
-      {% with cotton_attr_label=action_label|default:"Abrir" %}<c-ui.buttons.button :href="href" :label="cotton_attr_label" variant="secondary" icon="arrow-right" :icon_after="True" only />{% endwith %}
+      {% with rotulo=action_label|default:"Abrir" %}<c-v2.button :href="href" :label="rotulo" variant="secondary" icon="arrow-right" :icon_after="True" />{% endwith %}
     </footer>
   {% endif %}
 </article>

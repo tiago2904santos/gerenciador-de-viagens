@@ -9,7 +9,9 @@ from django.test import SimpleTestCase
 ROOT = Path(settings.BASE_DIR)
 CONSUMERS = (
     "eventos/partials/_evento_card_body.html",
-    "oficios/partials/_oficio_card_body.html",
+    # O card de ofício migrou para o v2 em 2026-08-18: o miolo deixou de ser um
+    # parcial achatado e virou `c-v2.record` + `c-v2.itinerary`.
+    "oficios/partials/oficio_list_card.html",
     "prestacoes_contas/partials/_prestacao_card_body.html",
     # `planos_trabalho/partials/_plano_card_body.html` saiu junto, no mesmo dia e
     # pelo mesmo motivo.
@@ -122,6 +124,7 @@ class ItineraryComponentTests(SimpleTestCase):
             source = (templates_root / relative).read_text(encoding="utf-8")
             self.assertTrue(
                 "<c-ui.lists.itinerary" in source
+                or "<c-v2.itinerary" in source
                 or 'include "cotton/ui/lists/itinerary.html"' in source
                 or 'include "includes/performance/itinerary_flat.html"' in source,
                 relative,

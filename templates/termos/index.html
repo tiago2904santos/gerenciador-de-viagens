@@ -8,9 +8,13 @@
 
 {% block content %}
   {% comment %}
-    Lista de termos no sistema v2. As duas abas são a MESMA tela: o que muda é
-    o miolo de cada registro, não o esqueleto — as abas trocam o conjunto, não
-    a página.
+    Lista de termos no sistema v2. As abas são a MESMA tela: o que muda é o
+    conjunto, não a página.
+
+    As abas são de PERÍODO (`termos/abas.py`): "Que vão acontecer", "Em
+    andamento" e "Já realizados" — a única pergunta que se faz a um termo na
+    lista. As antigas ("Com equipe" / "Sem equipe") dividiam por um detalhe
+    interno do documento, e a padrão ESCONDIA os termos sem equipe.
 
     A busca é do servidor (`?q=`), então o motor de coleções fica de fora
     (`filter_mode="none"`). Filtrar no cliente sobre uma lista paginada
@@ -33,12 +37,6 @@
     action_label="Novo termo"
     :action_url="novo_url"
   >
-    {% comment %}
-      SEM abas (2026-08-16). "Com equipe / Sem equipe" dividia a lista por um
-      detalhe interno do documento, não por como se procura um termo — e uma das
-      duas quase sempre vinha vazia, então a aba servia para mostrar o nada. A
-      view continua aceitando `?aba=` para não quebrar link guardado.
-    {% endcomment %}
     <c-slot name="controls">
       <form method="get" action="{{ request.path }}" class="rail__form" role="search">
         <input type="hidden" name="aba" value="{{ aba }}">
@@ -54,16 +52,14 @@
       </form>
     </c-slot>
 
+    <c-slot name="tabs">
+      <c-v2.toggle :items="abas" aria_label="Abas de termos" />
+    </c-slot>
+
     <c-slot name="rows">
-      {% if simples %}
-        {% for row in rows %}
-          {% include "termos/partials/_termo_linha.html" with row=row row_index=forloop.counter only %}
-        {% endfor %}
-      {% else %}
-        {% for card in cards %}
-          {% include "termos/partials/termo_list_card.html" with card=card csrf_token=csrf_token only %}
-        {% endfor %}
-      {% endif %}
+      {% for card in cards %}
+        {% include "termos/partials/termo_list_card.html" with card=card csrf_token=csrf_token only %}
+      {% endfor %}
     </c-slot>
   </c-v2.list_page>
 

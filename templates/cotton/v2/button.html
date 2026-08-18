@@ -1,4 +1,4 @@
-{% cotton:vars aria_label controls dialog dialog_label dialog_label_attr dialog_url dialog_url_attr disabled extra_class form hook href icon label size slot type variant %}
+{% cotton:vars aria_label controls dialog dialog_label dialog_label_attr dialog_url dialog_url_attr disabled extra_class form hook href icon icon_after label size slot type variant %}
 {% comment %}
   Button v2 — par de `static/css/v2/button.css`.
 
@@ -32,8 +32,9 @@
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
     {% if disabled %}aria-disabled="true" tabindex="-1"{% endif %}
   >
-    {% if icon %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
+    {% if icon and not icon_after %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
     {% if slot %}{{ slot }}{% elif label %}<span>{{ label }}</span>{% endif %}
+    {% if icon and icon_after %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
   </a>
 {% else %}
   <button
@@ -59,7 +60,8 @@
     {% if form %}form="{{ form }}"{% endif %}
     {% if hook %}{{ hook }}{% endif %}
   >
-    {% if icon %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
+    {% if icon and not icon_after %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
     {% if slot %}{{ slot }}{% elif label %}<span>{{ label }}</span>{% endif %}
+    {% if icon and icon_after %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
   </button>
 {% endif %}

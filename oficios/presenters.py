@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.utils.http import urlencode
 
 from .models import Oficio
+from core.presenters.badges import tom_de_chip_v2
 
 
 @cache
@@ -239,6 +240,11 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
             "unidade": unidade_nome,
             "meta": join_non_empty([cargo_nome, unidade_nome]),
             "is_motorista": bool(motorista_pk and s.pk == motorista_pk),
+            # Selo e classe da linha já resolvidos: `yesno` dentro de `:attr` do
+            # Cotton não roda — o atributo chegaria vazio e o motorista perderia
+            # o realce (`test_cotton_component_contracts` guarda isso).
+            "badge": "Motorista" if bool(motorista_pk and s.pk == motorista_pk) else "",
+            "row_class": "person-row--driver" if bool(motorista_pk and s.pk == motorista_pk) else "",
             "telefone": s.telefone_formatado if s.telefone else "",
             "has_termo": has_termo,
             "termo_open_url": termo_open_url,
@@ -433,6 +439,26 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
 
     return {
         "search_text": " ".join(p for p in search_parts if p).strip(),
+        # O selo do v2 fala `done`/`progress`/`late`/`info`. A tradução é feita
+        # AQUI porque filtro dentro de `:attr` do Cotton não é avaliado — o selo
+        # chegaria sem cor nenhuma.
+        "status_chip_tone_v2": tom_de_chip_v2(status_chip_tone),
+        "veiculo_placa_display": veiculo_placa or "Não informado",
+        "cancel_note_display": (
+            f"Ofício cancelado. Motivo: {oficio.motivo_cancelamento}"
+            if oficio.cancelado and oficio.motivo_cancelamento
+            else ("Ofício cancelado." if oficio.cancelado else "")
+        ),
+        # A justificativa é uma LINHA do cartão, e a linha pede dois campos
+        # prontos: o selo e o resumo. Sem isso o template repetiria o
+        # `{% if justificativa %}` em três lugares para dizer "Pendente".
+        "justificativa_badge": (
+            justificativa["status_label"] if justificativa else "Pendente"
+        ),
+        "justificativa_resumo": (
+            justificativa["texto_resumido"] if justificativa
+            else "Nenhuma justificativa informada."
+        ),
         "header": entity_cards.header(
             [entity_cards.header_item("Ofício", " · ".join(header_parts), wide=True, wrap=True)],
             header_chips,

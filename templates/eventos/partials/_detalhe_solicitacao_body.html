@@ -1,1 +1,10 @@
-<c-ui.lists.file_list :anexos="solicitacao_anexos" subtitle="Documento de solicitação" extra_class="content-spaced evento-solicitacao-list" :delete_form="True" empty_message="Nenhum documento de solicitação anexado ainda." :csrf_token="csrf_token" only />
+{% comment %}
+  Documentos de solicitação anexados ao evento — ofício solicitante, convite,
+  despacho. O upload é o diálogo de anexar, no cabeçalho do bloco.
+{% endcomment %}
+<c-v2.file_list
+  :anexos="solicitacao_anexos"
+  subtitle="Documento de solicitação"
+  empty_message="Nenhum documento de solicitação anexado ainda."
+  :csrf_token="csrf_token"
+/>

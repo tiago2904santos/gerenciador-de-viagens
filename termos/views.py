@@ -7,7 +7,6 @@ from urllib.parse import urlencode
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import Count
 from django.db.models import Model
 from django.http import Http404
 from django.http import HttpResponse
@@ -40,16 +39,19 @@ from oficios.selectors import listar_oficios
 from oficios.services import redirect_para_corrigir_documento_oficio
 from oficios.services import validar_oficio_para_documento
 
+from .abas import ABA_LABELS
+from .abas import anotar_periodo
+from .abas import build_abas
+from .abas import contar_por_aba
+from .abas import normalizar_aba
+from .abas import q_da_aba
 from .forms import TermoAutorizacaoForm
 from .models import TermoAutorizacao
-from .presenters import apresentar_linha_simples_termo
 from .card_builder import montar_card_de_termo
 from .card_builder import montar_downloads_do_termo
 from .selectors import get_servidor_do_termo_do_oficio
 from .selectors import get_servidor_para_termo
 from .selectors import get_termo_by_id
-from .selectors import Q_SIMPLES
-from .selectors import anotar_composicao
 from .selectors import listar_termos
 from .services import listar_servidores_com_termo
 from .services import excluir_termo
@@ -86,37 +88,18 @@ class TermosPaginator(Paginator):
 
 
 
-# Duas listas: o termo sem servidor e sem viatura nao tem o que mostrar no card
-# em camadas, entao vai para a lista de linhas simples.
-ABAS_TERMO = (("especificos", "Com equipe"), ("simples", "Sem equipe"))
-
-
 def index(request):
     q = request.GET.get("q", "").strip()
     q_digits = _digits(q)
-    aba = request.GET.get("aba", "")
-    if aba not in dict(ABAS_TERMO):
-        aba = "especificos"
-    simples = aba == "simples"
+    aba = normalizar_aba(request.GET.get("aba", ""))
 
     busca = {"q": q or None, "q_digits": q_digits or None}
-    termos = listar_termos(**busca, simples=simples)
-    # Uma agregacao condicional em vez de dois .count(): as abas custam 1 query.
-    contagem = anotar_composicao(listar_termos(**busca)).aggregate(
-        simples=Count("pk", filter=Q_SIMPLES),
-        especificos=Count("pk", filter=~Q_SIMPLES),
-    )
-    preservado = urlencode({"q": q}) if q else ""
-    abas = [
-        {
-            "key": chave,
-            "label": label,
-            "count": contagem[chave],
-            "url": f"{reverse('termos:index')}?aba={chave}" + (f"&{preservado}" if preservado else ""),
-            "is_active": chave == aba,
-        }
-        for chave, label in ABAS_TERMO
-    ]
+    # As abas são de PERÍODO (`termos/abas.py`): o que se pergunta a um termo na
+    # lista é se a viagem já foi, está acontecendo ou ainda vem.
+    termos = anotar_periodo(listar_termos(**busca)).filter(q_da_aba(aba))
+    # Uma agregacao condicional em vez de tres .count(): as abas custam 1 query.
+    contagem = contar_por_aba(listar_termos(**busca))
+    abas = build_abas(reverse("termos:index"), aba, contagem, {"q": q})
 
     # A agregacao acima ja calculou exatamente o total da aba ativa. Reusar esse
     # numero evita executar a mesma busca pesada uma terceira vez no `.count()`
@@ -135,38 +118,10 @@ def index(request):
     artefatos_por_termo = mapa_artefatos_pdf_termo_cadastro_em_lote(
         [termo.pk for termo in page_obj.object_list]
     )
-    def _servidor_url(termo_pk):
-        def build(servidor_pk, formato):
-            return reverse(
-                "termos:baixar_termo_cadastro_servidor",
-                args=[termo_pk, servidor_pk, formato],
-            )
-        return build
-
-    def _servidor_view_url(termo_pk):
-        def build(servidor_pk):
-            return reverse(
-                "termos:termo_cadastro_servidor_pdf_inline",
-                args=[termo_pk, servidor_pk],
-            )
-        return build
-
-    rows = [
-        apresentar_linha_simples_termo(
-            termo,
-            edit_url=reverse("termos:editar", args=[termo.pk]),
-            delete_url=reverse("termos:excluir", args=[termo.pk]),
-            pdf_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "pdf"]),
-            docx_url=reverse("termos:baixar_termo_cadastro_generico", args=[termo.pk, "docx"]),
-            **termo_cadastro_assinado_info(termo, None, artefatos_por_termo.get(termo.pk, {})),
-        )
-        for termo in page_obj.object_list
-    ] if simples else []
-
     # `PF-04`: a montagem mora em `card_builder` porque o endpoint de menus monta o
     # mesmo card. Repetir a dúzia de argumentos nos dois faria o menu divergir da
     # lista em silêncio.
-    cards = [] if simples else [
+    cards = [
         montar_card_de_termo(termo, artefatos=artefatos_por_termo.get(termo.pk, {}))
         for termo in page_obj.object_list
     ]
@@ -177,10 +132,8 @@ def index(request):
             "page_title": "Termos de Autorização",
             "page_description": "Cadastre termos avulsos ou vinculados a ofícios existentes.",
             "cards": cards,
-            "rows": rows,
             "aba": aba,
             "abas": abas,
-            "simples": simples,
             "q": q,
             **paginacao,
             "novo_url": reverse("termos:novo"),
@@ -195,11 +148,7 @@ def index(request):
             "empty_message": (
                 f"Nada corresponde a “{q}”. Limpe a busca para ver a lista inteira."
                 if q
-                else (
-                    "Termos sem servidor e sem viatura aparecem aqui."
-                    if simples
-                    else "Termos com equipe ou viatura aparecem aqui."
-                )
+                else f"Nenhum termo em “{dict(ABA_LABELS)[aba]}”. Veja as outras abas."
             ),
         },
     )

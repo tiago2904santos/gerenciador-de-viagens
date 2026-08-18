@@ -626,7 +626,10 @@ class OficioWizardDadosViajantesTests(TestCase):
 
         response = self.client.get(reverse("oficios:index") + "?aba=atuais")
 
-        self.assertContains(response, "fact-block--motorista-externo")
+        # O motorista de fora aparece como FATO do cartão (no desenho legado era
+        # a classe `fact-block--motorista-externo`), com a referência embaixo.
+        self.assertContains(response, '<span class="fact__label">Motorista</span>')
+        self.assertContains(response, self.outro_servidor.nome)
         self.assertContains(response, "Ofício 79/2026 · Protocolo 15.000.003-9")
         self.assertNotContains(response, "Externo ao ofício")
 

@@ -67,7 +67,7 @@
      inclui, e omiti-la encurtava a área útil em 2px — o respiro caía de 8 para
      6 e o corte subia. */
   max-height: calc(
-    var(--listbox-option-height) * 5 + var(--listbox-option-gap) * 5 +
+    var(--listbox-option-height) * 5 + var(--listbox-option-gap) * 4 +
       var(--listbox-padding) * 2 + var(--listbox-border) * 2
   );
   /* Descola do campo: o módulo de posicionamento cola a caixa com folga zero. */

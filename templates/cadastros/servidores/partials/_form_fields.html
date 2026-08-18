@@ -4,7 +4,18 @@
 {% endcomment %}
 <div class="field-grid">
   <c-v2.form_field :field="form.nome" extra_class="field--wide" />
-  <c-v2.form_field :field="form.cargo" :action_url="cargos_manage_url" action_label="Gerenciar cargos" />
+  <c-v2.field :label="form.cargo.label" :label_for="form.cargo.id_for_label" :error="form.cargo.errors.0">
+    <c-slot name="control">
+      <c-v2.select_with_action
+        :field="form.cargo"
+        :action_href="cargos_manage_url"
+        action_icon="settings"
+        action_aria_label="Gerenciar cargos"
+        action_tooltip="Gerenciar cargos"
+        :action_autosave="True"
+      />
+    </c-slot>
+  </c-v2.field>
   <c-v2.form_field :field="form.cpf" />
   <c-v2.form_field :field="form.telefone" />
   <div data-rg-field-wrap>

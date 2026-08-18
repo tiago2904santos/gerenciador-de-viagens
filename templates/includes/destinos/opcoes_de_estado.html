@@ -5,5 +5,11 @@
 {% endcomment %}
 <option value=""></option>
 {% for estado in estados %}
-  <option value="{{ estado.pk }}"{% if selecionado == estado.pk|stringformat:'s' %} selected{% endif %}>{{ estado.nome }} ({{ estado.sigla }})</option>
+  {% comment %}
+    `data-location-state-code` carrega a SIGLA. O evento guarda o destino como
+    texto (UF + nome da cidade), não como chave estrangeira, e é daqui que
+    `js/pages/eventos-detalhe.js` tira a sigla ao serializar `destinos_json`.
+    Sem o atributo a linha renderiza igual e o evento salva com a UF em branco.
+  {% endcomment %}
+  <option value="{{ estado.pk }}" data-location-state-code="{{ estado.sigla }}"{% if selecionado == estado.pk|stringformat:'s' %} selected{% endif %}>{{ estado.nome }} ({{ estado.sigla }})</option>
 {% endfor %}

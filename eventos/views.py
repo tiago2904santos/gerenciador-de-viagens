@@ -27,6 +27,8 @@ from planos_trabalho.presenters import apresentar_plano_card
 from roteiros.presenters import apresentar_linha_lista_simples_roteiro
 from termos.presenters import apresentar_linha_lista_simples_termo
 
+from .presenters import linhas_de_destino_do_evento
+
 
 from .forms import EventoForm
 from .forms import EventoNovoCadastroForm
@@ -367,6 +369,17 @@ def detalhe(request, pk, etapa=1):
             "tipos_evento_url": f"{_reverse('eventos:tipos_index')}?{urlencode({'next': request.path})}",
             "solicitacao_anexos": solicitacao_anexos,
             "evento_status_variant": "danger" if evento.status == Evento.STATUS_CANCELADO else "active",
+            # Vocabulário do chip do v2: `late` para cancelado, `progress` para
+            # o evento vivo. O filtro `tom_v2` não serve aqui — filtro dentro de
+            # `:attr` do Cotton não é avaliado.
+            "evento_status_tone": "late" if evento.status == Evento.STATUS_CANCELADO else "progress",
+            "evento_motivo_sufixo": (
+                f" Motivo: {evento.motivo_cancelamento}" if evento.motivo_cancelamento else ""
+            ),
+            # As linhas de destino já resolvidas em pk de Estado/Cidade: o
+            # evento guarda sigla e nome, e o componente do v2 trabalha com pk.
+            "destino_rows": linhas_de_destino_do_evento(evento),
+            "anexar_solicitacao_url": _reverse("eventos:solicitacao_anexar", kwargs={"pk": evento.pk}),
             "flow_status_variant": "danger" if evento.status == Evento.STATUS_CANCELADO else "active",
             "cancelar_evento_url": _reverse("eventos:cancelar", kwargs={"pk": evento.pk}),
             "reativar_evento_url": _reverse("eventos:reativar", kwargs={"pk": evento.pk}),

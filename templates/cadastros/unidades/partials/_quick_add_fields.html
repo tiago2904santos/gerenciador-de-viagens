@@ -1,11 +1,8 @@
-<div class="field-grid">
-  <div class="field-size-3">
-    <c-ui.forms.field :field="form.nome" only />
-  </div>
-  <div class="field-size-1">
-    <c-ui.forms.field :field="form.sigla" only />
-  </div>
-  <div class="field-size-4">
-    <c-ui.forms.field :field="form.servidores" label="Filtrar servidores" help_text="Digite para buscar servidores cadastrados e vincular a esta unidade." only />
-  </div>
-</div>
+<c-v2.form_block :split="True" surface="rail" title="Dados da unidade" description="Nome e sigla">
+  <c-slot name="body">
+    <div class="field-grid field-grid--cols-2">
+      <c-v2.form_field :field="form.nome" />
+      <c-v2.form_field :field="form.sigla" />
+    </div>
+  </c-slot>
+</c-v2.form_block>

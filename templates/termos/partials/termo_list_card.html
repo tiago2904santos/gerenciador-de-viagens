@@ -5,36 +5,36 @@
   a lista não usa para escolher um termo — quem escolhe procura o destino e o
   período —, e triplicava a altura de cada item: uma lista de vinte termos
   passava a exigir três telas de rolagem para mostrar o mesmo que cabia em uma.
+  Os nomes voltaram, mas na META: uma linha de texto, não uma faixa por pessoa.
 
-  Nada se perdeu de acesso: cada servidor JÁ tem o próprio botão de documentos
-  em `card.footer.menus`, na linha de ações — o documento é por pessoa, e o
-  termo do servidor A não é o do B.
-
-  `PF-04`: esses menus NÃO vão no HTML da lista — o gatilho leva `menu_src`, e o
-  corpo vem de `termos:card_menus` no primeiro clique. Na lista de ofícios essa
-  mesma mudança tirou 48% do peso da página.
+  O menu "Documentos" saiu em 2026-08-18. Ele era um segundo caminho para o
+  mesmo download que o seletor ao lado já faz — com a diferença de esconder a
+  escolha atrás de dois cliques. O que ele tinha de exclusivo, o anexar
+  assinado, virou botão próprio na linha.
 {% endcomment %}
 <c-v2.record
   :title="card.header.items.0.value"
   :search_text="card.search_text"
+  :status="card.situacao.label"
+  :status_tone="card.situacao.tone"
 >
-  <c-slot name="meta">{% if card.oficio_label and card.oficio_label != "—" %}Ofício: {{ card.oficio_label }}{% endif %}</c-slot>
+  <c-slot name="meta">{{ card.meta_line }}</c-slot>
 
   <c-slot name="actions">
-    {% for menu in card.footer.menus %}
-      <c-v2.icon_button
-        icon="folder"
-        :menu_id="menu.id"
-        :menu_src="menu.src"
-        :aria_label="menu.trigger_aria"
-        tooltip="Visualizar e baixar"
-      />
-      {% if not menu.src %}<c-v2.menu_body :menu="menu" />{% endif %}
-    {% endfor %}
     <c-v2.download_picker
       picker_id="termo-{{ card.termo_pk }}-downloads"
       :src="card.downloads_url"
     />
+    {% if card.assinatura.url %}
+      <c-v2.attach_signed_button
+        :url="card.assinatura.url"
+        :signed="card.assinatura.assinado"
+        :doc_label="card.assinatura.doc_label"
+        :current_name="card.assinatura.nome_original"
+        :current_view_url="card.assinatura.view_url"
+        :current_remove_url="card.assinatura.remover_url"
+      />
+    {% endif %}
     <c-v2.icon_button icon="edit" :href="card.footer.edit_url" :aria_label="card.footer.edit_aria" tooltip="Editar" />
     <c-v2.delete_button
       :url="card.footer.delete_modal_url"

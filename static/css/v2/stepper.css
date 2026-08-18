@@ -62,3 +62,19 @@
 :is(html[data-theme]) .stepper__status {
   font-size: var(--text-size-eyebrow);
 }
+
+/* A etapa navegável (painel do evento). O link herda a cor do item — pintá-lo
+   de azul de link faria as cinco etapas competirem com o conteúdo da página —,
+   e é ele quem carrega o alvo do clique, do tamanho da etapa inteira. */
+:is(html[data-theme]) .stepper__link {
+  align-items: center;
+  color: inherit;
+  display: flex;
+  gap: var(--gap-tight);
+  min-width: 0;
+  text-decoration: none;
+}
+
+:is(html[data-theme]) .stepper__link:hover .stepper__label {
+  text-decoration: underline;
+}

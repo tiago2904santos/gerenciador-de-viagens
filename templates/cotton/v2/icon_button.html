@@ -1,4 +1,4 @@
-{% cotton:vars aria_label extra_class hook href icon menu_id menu_src tone tooltip tooltip_tone %}
+{% cotton:vars aria_label autosave_link extra_class hook href icon menu_id menu_src target tone tooltip tooltip_tone type %}
 {% comment %}
   Icon button v2 — ação sem rótulo, em forma circular.
 
@@ -22,22 +22,35 @@
   `hook` é o atributo `data-*` que liga o botão a um motor JS, pelo mesmo motivo
   do `c-v2.button`: o gancho é contrato do JS, e declarado aqui não muda de nome
   sem que alguém veja.
+
+  `autosave_link` preserva o formulário antes de uma ação que navega para outro
+  cadastro. O valor `1` é contrato de `autosave.js` e de scripts de página.
+
+  `type="submit"` é para a ação que vive DENTRO de um formulário — excluir um
+  anexo, por exemplo. Sem ele o botão nasce `type="button"` e o clique não
+  submete nada: a tela não dá erro, o botão só não faz.
+
+  `target="_blank"` abre o destino noutra aba; vale só para o botão-link, e vem
+  com `rel="noopener noreferrer"`, que a aba nova exige para não receber o
+  controle desta.
 {% endcomment %}
 {% load icones %}
 {% if href %}
   <a
     class="icon-button{% if extra_class %} {{ extra_class }}{% endif %}"
     href="{{ href }}"
+    {% if target %}target="{{ target }}" rel="noopener noreferrer"{% endif %}
     aria-label="{{ aria_label }}"
     {% if tone %}data-tone="{{ tone }}"{% endif %}
     {% if tooltip %}data-tooltip="{{ tooltip }}"{% endif %}
     {% if tooltip_tone %}data-tooltip-tone="{{ tooltip_tone }}"{% endif %}
+    {% if autosave_link %}data-autosave-link="1"{% endif %}
   >
     {% icone_svg icon %}
   </a>
 {% else %}
   <button
-    type="button"
+    type="{{ type|default:'button' }}"
     class="icon-button{% if extra_class %} {{ extra_class }}{% endif %}"
     aria-label="{{ aria_label }}"
     {% if tone %}data-tone="{{ tone }}"{% endif %}

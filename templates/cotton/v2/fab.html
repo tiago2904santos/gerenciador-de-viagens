@@ -1,0 +1,18 @@
+{% cotton:vars slot %}
+{% comment %}
+  Ação flutuante — o botão que acompanha a rolagem, ancorado no canto inferior
+  direito.
+
+  Existe para a ação PRINCIPAL de uma tela longa: numa etapa com trinta
+  registros, a ação no cabeçalho do painel some depois da primeira rolagem, e
+  quem chega ao fim da lista precisa voltar ao topo para criar o próximo item.
+
+  Os botões vêm por SLOT, e não de uma lista: cada tela tem o seu rótulo, o seu
+  ícone e o seu destino, e são um ou dois botões — inventar um formato de dados
+  para isso seria mais código do que a chamada direta.
+
+  Par de `static/css/v2/fab.css`. Não é uma variante do `button`: o botão
+  continua sendo o mesmo componente; o que muda é ONDE ele fica, e isso é do
+  contêiner.
+{% endcomment %}
+<div class="fab">{{ slot }}</div>

@@ -37,8 +37,11 @@ class GlobalPeriodDestinationsSectionTests(SimpleTestCase):
         # `destino_estado_N`) e os mesmos ganchos `data-location-*`. Quem
         # garante isso agora é `termos/tests/test_form_v2.py`. Cada tela que
         # migrar sai desta tupla; quando ela esvaziar, o composto legado morre.
+        # Evento saiu em 18/08/2026, pelo mesmo caminho do termo: o painel
+        # migrou para o v2 e monta período e destinos com `c-v2.date_picker` +
+        # `c-v2.destinations`, com os MESMOS ganchos `data-location-*` que o
+        # script da tela lê para serializar `destinos_json`.
         consumers = (
-            "eventos/partials/_detalhe_dados_body.html",
             "ordens_servico/partials/_evento_body.html",
             "planos_trabalho/partials/_identificacao_evento_body.html",
         )

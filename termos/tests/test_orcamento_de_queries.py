@@ -97,7 +97,7 @@ class OrcamentoDeQueriesTermoTests(TestCase):
         return len(queries), queries
 
     def test_a_lista_custa_o_mesmo_numero_de_queries(self):
-        total, queries = self._contar(reverse("termos:index"))
+        total, queries = self._contar(self.URL_COM_DADOS)
 
         self.assertEqual(
             total,
@@ -106,7 +106,7 @@ class OrcamentoDeQueriesTermoTests(TestCase):
         )
 
     def test_a_lista_com_busca_custa_o_mesmo_numero_de_queries(self):
-        total, queries = self._contar(reverse("termos:index") + "?q=Curitiba")
+        total, queries = self._contar(self.URL_COM_DADOS + "&q=Curitiba")
 
         self.assertEqual(
             total,
@@ -116,7 +116,7 @@ class OrcamentoDeQueriesTermoTests(TestCase):
 
     def test_a_busca_pesada_nao_e_repetida_so_para_contar_a_pagina(self):
         """A contagem das abas ja conhece o total usado pelo paginador (`DB-11`)."""
-        _total, queries = self._contar(reverse("termos:index") + "?q=Curitiba")
+        _total, queries = self._contar(self.URL_COM_DADOS + "&q=Curitiba")
 
         consultas_da_busca = [
             query["sql"]
@@ -176,6 +176,17 @@ class OrcamentoDeQueriesTermoTests(TestCase):
     # salva de qualquer jeito, e só a leitura é economizada.
     # `DB-11`: a agregacao das abas ja conhece o total da aba ativa e alimenta o
     # paginador. Sai a repeticao da consulta de contagem, com ou sem busca.
+    # 18/08/2026: as abas passaram a ser de PERÍODO (`termos/abas.py`) e a lista
+    # deixou de se dividir em "Com equipe"/"Sem equipe". O número não mudou —
+    # saiu a anotação de composição, entrou a agregação das três abas —, e o
+    # roteiro do ofício entrou no `select_related` no mesmo movimento: é ele que
+    # impede o N+1 que o selo de situação criaria nos termos que herdam o
+    # período do ofício.
+    #
+    # As medições apontam para a aba onde os dados de teste vivem: o fixture usa
+    # datas de junho/2026, que caem em "Já realizados". Medir a aba vazia
+    # esconderia o custo por linha, que é justamente o que este teste guarda.
+    URL_COM_DADOS = "/termos/?aba=realizados"
     QUERIES_LISTA = 9
     QUERIES_LISTA_BUSCA = 9
     # 21 -> 28 na edicao. Duas causas separadas, e so uma era defeito:

@@ -375,16 +375,47 @@ def apresentar_plano_card(plano, *, menus_sob_demanda=True):
     numero_label = plano.numero_formatado
     status_label = "Cancelado" if plano.cancelado else plano.get_status_display()
     status_state = "danger" if plano.cancelado else str(plano.status or "").lower()
+    # O selo do v2 fala outro vocabulário: `done`, `progress`, `late`, `info`.
+    # A tradução é FEITA AQUI e não com o filtro `tom_v2` no template porque
+    # filtro dentro de `:attr` do Cotton não é avaliado — o selo chegaria sem
+    # cor. `rascunho` e `gerado` não passam pelo mapa de tons antigo: são
+    # estados só do plano, e cada um nomeia o seu.
+    status_tone_v2 = {
+        "danger": "late",
+        "rascunho": "info",
+        "gerado": "done",
+    }.get(status_state, "")
     editar_url = reverse("planos_trabalho:wizard_identificacao", args=[plano.pk])
     excluir_url = reverse("planos_trabalho:excluir", args=[plano.pk])
+    # O título só junta o que EXISTE. `destino_display` e `periodo_display`
+    # devolvem sentinelas ("Destino não informado") em vez de vazio, e elas
+    # entravam no título: um plano recém-criado saía como "30/2026/ASCOM ·
+    # Destino não informado · Período não informado" — três vezes mais texto
+    # para dizer que não há texto.
+    SEM_VALOR = {"—", "Destino não informado", "Período não informado", "Periodo nao informado"}
     header_value = " · ".join(
         parte
-        for parte in [numero_label, destino_label if destino_label != "—" else "", periodo_label if periodo_label != "—" else ""]
+        for parte in [
+            numero_label,
+            "" if destino_label in SEM_VALOR else destino_label,
+            "" if periodo_label in SEM_VALOR else periodo_label,
+        ]
         if parte
     )
 
+    # A meta responde o que o título não diz: de quem é o plano e quantos vão.
+    # Programa e coordenador são o que se procura quando há vários planos do
+    # mesmo destino no mesmo mês.
+    meta_partes = [parte for parte in [
+        programa_label if programa_label != "—" else "",
+        f"Coord.: {coordenador_nome}" if coordenador_nome else "",
+        f"{efetivo_total} no efetivo" if efetivo_total else "",
+    ] if parte]
+
     return {
         "id": plano.pk,
+        "status_tone_v2": status_tone_v2,
+        "meta_line": " · ".join(meta_partes),
         "search_text": " ".join(
             p for p in [numero_label, destino_label, programa_label, coordenador_nome or ""] if p
         ).strip(),

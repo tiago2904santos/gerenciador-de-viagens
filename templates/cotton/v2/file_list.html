@@ -1,0 +1,48 @@
+{% cotton:vars anexos csrf_token empty_message subtitle %}
+{% load icones %}
+{% comment %}
+  Lista de arquivos anexados — nome, ver e excluir.
+
+  `anexos`: `[{nome, url, delete_url}]`. É o formato que as views já montam.
+
+  A linha NÃO é um `record`: um arquivo não tem título, selo e meta — tem nome e
+  duas ações. Usar o cartão de registro aqui daria 68px de altura para mostrar
+  uma linha de texto, e uma pilha de seis anexos empurraria o resto da etapa
+  para fora da tela.
+
+  O excluir é um POST com `data-confirm-submit`: apagar arquivo não tem desfazer,
+  e um link GET some com o anexo no primeiro clique errado — ou no primeiro
+  robô que varra a página.
+
+  `csrf_token` precisa vir do chamador. O componente é renderizado com `only` em
+  algumas telas, e sem ele o Django recusa o POST com 403 — o botão parece
+  quebrado sem dizer por quê.
+{% endcomment %}
+{% if anexos %}
+  <ul class="file-list">
+    {% for anexo in anexos %}
+      <li class="file-list__item">
+        <span class="file-list__icon" aria-hidden="true">{% icone_svg "document" %}</span>
+        <span class="file-list__copy">
+          <strong class="file-list__name" title="{{ anexo.nome }}">{{ anexo.nome }}</strong>
+          <small class="file-list__meta">{{ subtitle|default:"Arquivo anexado" }}</small>
+        </span>
+        <span class="file-list__actions">
+          <c-v2.icon_button
+            icon="eye"
+            :href="anexo.url"
+            target="_blank"
+            aria_label="Visualizar arquivo"
+            tooltip="Visualizar"
+          />
+          <form method="post" action="{{ anexo.delete_url }}" class="file-list__form" data-confirm-submit data-confirm-message="Excluir este arquivo? A ação não pode ser desfeita.">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            <c-v2.icon_button icon="trash" type="submit" tone="danger" aria_label="Excluir arquivo" tooltip="Excluir" />
+          </form>
+        </span>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="file-list__empty">{{ empty_message|default:"Nenhum arquivo anexado ainda." }}</p>
+{% endif %}
