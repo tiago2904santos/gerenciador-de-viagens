@@ -13,7 +13,7 @@
 {% with di=documentos_ctx.documentos_inline %}
   <c-v2.document_inline
     :title="di.oficio.titulo"
-    :src="di.oficio.url"
+    :src="di.oficio.src"
     frame_title="Visualização do ofício em PDF"
     :empty_message="di.oficio.mensagem"
     actions_label="Ações do documento"
@@ -40,7 +40,7 @@
 
   <c-v2.document_inline
     :title="di.justificativa.titulo"
-    :src="di.justificativa.url"
+    :src="di.justificativa.src"
     frame_title="Visualização da justificativa em PDF"
     :empty_message="di.justificativa.mensagem"
     actions_label="Ações do documento"
@@ -83,11 +83,20 @@
 
     <c-slot name="body">
       {% for t in di.termos %}
-        {% with menu_id="wizard-termo-document-menu-"|add:forloop.counter|stringformat:"s" rotulo_termo="Termo de "|add:t.servidor_nome %}
+        {% comment %}
+          O contador vira TEXTO antes de entrar no `add`. O filtro tenta
+          `int(valor) + int(arg)`, falha no prefixo, tenta `valor + arg`, e
+          somar `str` com `int` falha também — o `add` então devolve string
+          VAZIA, sem erro. Com o id vazio o `icon_button` não emite os atributos
+          de overlay e o menu nasce sem `id` e sem `hidden`: o botão fica inerte
+          e a lista de ações aparece cravada na página. Medido no template.
+        {% endcomment %}
+        {% with contador=forloop.counter|stringformat:"s" %}
+        {% with menu_id="wizard-termo-document-menu-"|add:contador rotulo_termo="Termo de "|add:t.servidor_nome %}
           <c-v2.document_inline
             :nested="True"
             :title="t.titulo"
-            :src="t.inline_url"
+            :src="t.inline_src"
             :frame_title="rotulo_termo"
             :empty_message="di.mensagem_indisponivel"
             :open_url="t.inline_url"
@@ -121,6 +130,7 @@
               />
             {% endif %}
           </c-v2.menu>
+        {% endwith %}
         {% endwith %}
       {% endfor %}
     </c-slot>

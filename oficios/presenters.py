@@ -1072,6 +1072,17 @@ def apresentar_oficio_wizard_documentos_context(oficio):
                 "servidor_id": servidor.pk,
                 "servidor_pk": servidor.pk,
                 "inline_url": reverse("termos:termo_servidor_pdf_inline", args=[oficio.pk, servidor.pk]),
+                # `inline_src` é a MESMA URL, mas só quando há documento para
+                # mostrar. O visualizador do `c-v2.document_inline` liga pela
+                # presença do `src`, e `inline_url` existe sempre — é rota
+                # revertida, não estado. Passar uma pela outra fazia o cartão
+                # abrir um `<iframe>` para um PDF inexistente em vez de dizer
+                # por que ele ainda não existe.
+                "inline_src": (
+                    reverse("termos:termo_servidor_pdf_inline", args=[oficio.pk, servidor.pk])
+                    if disponivel
+                    else ""
+                ),
                 **assinado_info,
                 "download_pdf_url": reverse(
                     "termos:baixar_termo_servidor",
@@ -1089,6 +1100,9 @@ def apresentar_oficio_wizard_documentos_context(oficio):
         "oficio": {
             "titulo": "Documento original (Ofício)",
             "url": reverse("oficios:oficio_pdf_inline", args=[oficio.pk]),
+            # Ver a nota de `inline_src` nos termos: a URL existe sempre, o
+            # documento não.
+            "src": reverse("oficios:oficio_pdf_inline", args=[oficio.pk]) if disponivel else "",
             "download_pdf_url": reverse("oficios:baixar_documento", args=[oficio.pk, "pdf"]),
             "download_docx_url": reverse("oficios:baixar_documento", args=[oficio.pk, "docx"]),
             "disponivel": disponivel,
@@ -1097,6 +1111,9 @@ def apresentar_oficio_wizard_documentos_context(oficio):
         "justificativa": {
             "titulo": "Justificativa",
             "url": reverse("oficios:justificativa_pdf_inline", args=[oficio.pk]),
+            # Ver a nota de `inline_src` nos termos: a URL existe sempre, o
+            # documento não.
+            "src": reverse("oficios:justificativa_pdf_inline", args=[oficio.pk]) if disponivel else "",
             "download_pdf_url": reverse("oficios:baixar_justificativa_documento", args=[oficio.pk, "pdf"]),
             "download_docx_url": reverse("oficios:baixar_justificativa_documento", args=[oficio.pk, "docx"]),
             "disponivel": disponivel,

@@ -11,6 +11,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.test import SimpleTestCase
+from django.test import TestCase
 
 
 ROOT = Path(settings.BASE_DIR)
@@ -127,3 +128,79 @@ class ComponentesOficiosV2SourceTests(SimpleTestCase):
         source = marcacao(OFICIOS / "wizard_roteiro.html")
         self.assertIn("roteiros/includes/_roteiro_editor_v2.html", source)
         self.assertNotIn("roteiros/includes/_roteiro_editor.html", source)
+
+
+class ConferenciaDeDocumentosV2Tests(TestCase):
+    """Os dois defeitos que a revisão automática pegou na etapa de documentos.
+
+    Ambos passavam calados: o Django não levanta erro em nenhum dos dois, e o
+    contrato de marcação não olha valor renderizado.
+    """
+
+    def setUp(self):
+        from django.contrib.auth import get_user_model
+
+        from cadastros.models import Cargo
+        from cadastros.models import Servidor
+        from core.testing import area_de_teste
+        from core.testing import vincular_area
+        from oficios.models import Oficio
+
+        usuario = get_user_model().objects.create_user(username="conferencia", password="123456")
+        self.client.force_login(usuario)
+        vincular_area(usuario)
+        area = area_de_teste()
+        cargo = Cargo.objects.create(area=area, nome="AGENTE")
+        self.oficio = Oficio.objects.create(
+            area=area,
+            numero=1,
+            ano=2026,
+            custeio=Oficio.CUSTEIO_UNIDADE_DPC,
+        )
+        for indice, nome in enumerate(("ADEMAR SCHONS", "ADRIANO SILVA"), start=1):
+            servidor = Servidor.objects.create(
+                area=area,
+                nome=nome,
+                cargo=cargo,
+                cpf=f"1234567890{indice}",
+            )
+            self.oficio.servidores.add(servidor)
+            self.oficio.servidores_termo_autorizacao.add(servidor)
+
+    def _html(self):
+        from django.urls import reverse
+
+        resposta = self.client.get(reverse("oficios:wizard_documentos", args=[self.oficio.pk]))
+        self.assertEqual(resposta.status_code, 200)
+        return resposta.content.decode("utf-8")
+
+    def test_cada_termo_tem_o_id_do_proprio_menu(self):
+        """`"texto"|add:forloop.counter` devolve string VAZIA, sem erro.
+
+        O filtro tenta `int(valor) + int(arg)`, falha no prefixo, tenta
+        `valor + arg`, e somar `str` com `int` falha de novo — `add` cai no
+        `except` e devolve `''`. Com o id vazio o gatilho perdia os três
+        atributos de overlay e o menu nascia sem `id` e sem `hidden`: botão
+        inerte e lista de ações cravada na página.
+        """
+        html = self._html()
+        for contador in (1, 2):
+            with self.subTest(termo=contador):
+                self.assertIn(f'id="wizard-termo-document-menu-{contador}"', html)
+                self.assertIn(
+                    f'data-overlay-target="wizard-termo-document-menu-{contador}"',
+                    html,
+                )
+
+    def test_documento_indisponivel_mostra_o_motivo_em_vez_do_visualizador(self):
+        """A URL existe sempre; o documento, não.
+
+        `di.oficio.url` é rota revertida e nunca vem vazia, então usá-la como
+        `src` fazia o cartão abrir um `<iframe>` para um PDF que não existe — em
+        vez de dizer por que ele ainda não foi gerado. É o guarda de
+        disponibilidade que o sistema anterior tinha e que a migração quase
+        perdeu.
+        """
+        html = self._html()
+        self.assertIn("document-inline-empty", html)
+        self.assertNotIn("document-inline-viewer__frame", html)
