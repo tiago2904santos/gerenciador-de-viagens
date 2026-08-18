@@ -1,15 +1,9 @@
-<div class="field-grid">
-  <div class="field-size-4">
-    <c-ui.forms.field :field="form.nome" only />
-  </div>
-</div>
-<div class="field-grid">
-  <div class="field-size-4">
-    <c-ui.forms.field :field="form.recurso_necessario" only />
-  </div>
-</div>
-<div class="field-grid">
-  <div class="field-size-4">
-    <c-ui.forms.field :field="form.meta" only />
-  </div>
-</div>
+<c-v2.quick_add_section title="Dados da atividade" description="Nome, recurso necessário e meta">
+  <c-slot name="body">
+    <div class="field-grid">
+      <c-v2.form_field :field="form.nome" />
+      <c-v2.form_field :field="form.recurso_necessario" />
+      <c-v2.form_field :field="form.meta" />
+    </div>
+  </c-slot>
+</c-v2.quick_add_section>

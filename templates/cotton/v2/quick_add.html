@@ -58,7 +58,7 @@
 >
   {% csrf_token %}
   <c-v2.form_errors :errors="errors" :form="form" />
-  <div class="quick-add__body">{{ slot }}</div>
+  {{ slot }}
 </form>
 
 <button

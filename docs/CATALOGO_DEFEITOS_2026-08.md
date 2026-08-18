@@ -8827,10 +8827,51 @@ focados e 78 testes de Usuários verdes. A suíte global executou 2.357 testes e
 vermelha por 5 falhas e 1 erro externos ao recorte, incluindo contratos concorrentes de Core e
 a dependência nativa ausente do WeasyPrint no Windows.
 
-### NOVO-20260818-193403-74ca0c875514 🟡 EM ANDAMENTO · `NOVO` Cadastro rápido de Unidade exibe vínculo de Servidores e empilha Nome/Sigla no desktop · HT/UI · 0,1 d
+### NOVO-20260818-193403-74ca0c875514 ✅ RESOLVIDO · `NOVO` Cadastro rápido de Unidade exibe vínculo de Servidores e empilha Nome/Sigla no desktop · HT/UI · 0,1 d
 
 O formulário rápido mostra um segundo bloco para vincular Servidores, embora essa associação não
 deva fazer parte da criação rápida. No bloco de dados, a grade padrão de quatro colunas somada ao
 layout dividido deixa Nome e Sigla em linhas diferentes. O corte deve remover integralmente o
 bloco de Servidores e usar a grade explícita de duas colunas para Nome/Sigla, preservando os dois
 campos, o POST da unidade e o empilhamento responsivo abaixo de 600 px.
+
+O bloco de Servidores foi removido integralmente e o cadastro rápido mantém apenas Nome e Sigla.
+A grade canônica v2 usa duas colunas no desktop e uma abaixo de 600 px. No navegador, os campos
+mediram 287 px cada e compartilharam a mesma coordenada vertical no desktop; em 500 px, ambos
+mediram 383 px e ficaram empilhados. Os contratos focados e os 164 testes de Cadastros passaram.
+
+### NOVO-20260818-194623-43b7fa7ecf86 ✅ RESOLVIDO · `NOVO` Quick adds aninham seções dentro de wrappers em vez de entregar form-blocks diretamente ao painel · HT/UI · 0,5 d
+
+O componente compartilhado envolve todo o conteúdo em `.quick-add__body`, e vários parciais ainda
+acrescentam wrappers próprios ou grades soltas. Assim, três seções lógicas do cadastro de Usuário
+não são três filhos `form_block` do painel, e o mesmo desvio se repete nos demais catálogos. O corte
+deve fazer cada parcial declarar seus blocos v2 como conteúdo direto do `<form>` do painel,
+preservando CSRF, erros, campos, POST, edição rápida e comportamento responsivo.
+
+O wrapper compartilhado `.quick-add__body` foi removido e os quinze parciais agora entregam apenas
+`form_block` v2 como conteúdo direto do painel. Usuários renderiza três blocos diretos;
+Justificativas e Presets, dois; os outros doze catálogos, um cada. Os hooks de criação/edição de
+Usuários foram transferidos para os próprios blocos sem mudar nomes de campos ou ações. A matriz
+das quinze rotas foi conferida no navegador e todos os painéis apresentaram contagem direta igual
+à contagem total, sem wrapper intermediário. Validação: 38 contratos de catálogo verdes; o único
+contrato de caracterização inicialmente afetado foi restaurado e os 698 testes dos seis aplicativos
+passaram na suíte global. A suíte global executou 2.359 testes e permaneceu vermelha por
+5 falhas e 4 erros externos ao recorte (os mesmos contratos concorrentes de Core, três erros de
+codificação CP1252 e a dependência nativa ausente do WeasyPrint no Windows). O auditor frontend
+permaneceu no baseline conhecido de 4 erros e 303 avisos; bundles e `git diff --check` passaram.
+
+### NOVO-20260818-200724-685b186c033b ✅ RESOLVIDO · `NOVO` Cadastros rápidos usam cartões internos para grupos do mesmo POST · HT/UI · 0,5 d
+
+O painel `quick-add` já é o único formulário que envia o cadastro completo, mas seus grupos ainda
+eram representados por cartões `form-block`. O corte deve manter um único `<form>` visualmente
+neutro e transformar cada grupo em `<fieldset>` filho direto; somente os fieldsets recebem
+superfície, raio, padding e separação. Campos, hooks, POST, acessibilidade e responsividade devem
+permanecer intactos.
+
+O componente `quick_add_section` passou a representar as 19 seções dos quinze parciais. Todos os
+formulários computam fundo transparente, borda, raio, gap e padding zerados; os fieldsets recebem
+a superfície e o espaçamento do sistema sem novos tokens ou aliases. No navegador, Usuários e
+Unidades foram conferidos no tema escuro, Justificativas no tema claro e o layout de 500 px não
+apresentou rolagem horizontal. As 699 verificações dos seis aplicativos afetados passaram, assim
+como bundles, arquitetura, padrões de UI e `git diff --check`. O auditor frontend permaneceu no
+baseline preexistente de 4 erros e 303 avisos, acima do teto vigente de 245.

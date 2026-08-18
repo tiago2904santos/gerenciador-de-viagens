@@ -384,5 +384,10 @@ alcançável em produção. Não vira ID.
   restringir a ação de gerenciamento dos pickers à linha de busca, sem encolher a lista.
 - [x] `NOVO-20260818-192027-451efb3fc693` — substituir os widgets visuais anteriores do
   cadastro rápido de Usuários por `input`, `picker` e `select` v2, sem controles duplicados.
-- [ ] `NOVO-20260818-193403-74ca0c875514` — remover Servidores do cadastro rápido de Unidade e
+- [x] `NOVO-20260818-193403-74ca0c875514` — remover Servidores do cadastro rápido de Unidade e
   manter Nome e Sigla na mesma linha no desktop.
+- [x] `NOVO-20260818-194623-43b7fa7ecf86` — tornar cada seção lógica dos quinze quick adds um
+  `form_block` v2 filho direto do painel, eliminando wrappers estruturais intermediários.
+- [x] `NOVO-20260818-200724-685b186c033b` — substituir os `form-blocks` dos quinze cadastros
+  rápidos por `fieldset` filhos do único formulário visualmente neutro, mantendo campos, hooks
+  e responsividade.

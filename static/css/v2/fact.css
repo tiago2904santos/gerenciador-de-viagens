@@ -108,6 +108,43 @@
   white-space: nowrap;
 }
 
+/* O corpo do valor CEDE por quantidade de fatos no bloco.
+ *
+ * Estes são os degraus que o comentário acima diz terem sido apagados por
+ * engano num corte. Eles voltam porque a conta é de ALTURA, e o `fit-text.js`
+ * só sabe de largura: ele encolhe o que não cabe na linha, e nunca o que não
+ * cabe na caixa.
+ *
+ * A caixa útil do bloco são ~133px (157 menos o recuo). Um rótulo mede 13px e o
+ * vão entre fatos, 8. Com DOIS fatos sobram ~50px por valor, que é o que os
+ * 2,2rem ocupam com a entrelinha de 1,1 — o bloco fica cheio sem empurrar os
+ * vizinhos. Com TRÊS, o teto volta ao valor conservador, senão a terceira linha
+ * nasce cortada.
+ *
+ * Um fato só (a placa sozinha, quando não há modelo) pode crescer mais: é o
+ * caso em que a caixa inteira é dele.
+ */
+/* A exceção do valor forte vai DENTRO das duas regras, e não numa terceira: os
+   seletores de contagem usam `:has()` e `:not()` e somam especificidade alta, e
+   a terceira regra — mais simples — perdia para eles em silêncio. Onde já há o
+   destaque do cartão, o outro fato cede: medido, "Valor total" a 48px mais a
+   linha do por extenso mais um segundo fato crescido transbordavam a caixa em
+   11px. */
+:is(html[data-theme]) .fact-list:not(:has(> .fact:nth-child(2))):not(:has(.fact__value--strong)) {
+  --fact-value-size: clamp(1.2rem, 20cqw, 2.6rem);
+}
+
+:is(html[data-theme]) .fact-list:has(> .fact:nth-child(2)):not(:has(> .fact:nth-child(3))):not(:has(.fact__value--strong)) {
+  --fact-value-size: clamp(1.1rem, 16cqw, 2.2rem);
+}
+
+/* O valor forte ACOMPANHADO cede um degrau. Sozinho ele fica nos 3rem; com um
+   segundo fato no mesmo bloco — "Valor total" e "Quantidade de diárias" — a
+   soma passava a caixa por 1px. Um pixel não se vê, mas é o começo do corte. */
+:is(html[data-theme]) .fact-list:has(> .fact:nth-child(2)):has(.fact__value--strong) {
+  --fact-value-size-strong: clamp(1.15rem, 18cqw, 2.8rem);
+}
+
 /* O total das diárias é o valor que a lista existe para comparar — um degrau
    acima dos outros, e só ele. */
 :is(html[data-theme]) .fact__value--strong {
@@ -261,6 +298,11 @@
   /* Aqui a calha vale: ela reserva o espaço da barra para o texto não mudar de
      largura enquanto se rola. */
   scrollbar-gutter: stable;
+  /* A MESMA barra do resto do v2 — picker, listbox e seletor de download já a
+     declaram assim. Sem estas duas linhas o navegador desenha a barra do
+     sistema, larga e clara, e ela era a única peça do cartão fora do modelo. */
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-width: thin;
 }
 
 /* O horário segue a mesma regra da rota: UMA linha, corpo medido pela largura do

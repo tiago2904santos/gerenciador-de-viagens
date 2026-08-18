@@ -1,8 +1,7 @@
-<div class="justificativa-quick-add" data-justificativa-quick-add>
-  {# step1 só para herdar tokens/estilos; sem travel-document-card (caixa externa). #}
-  <div data-travel-document-wizard-step1 class="document-form-page justificativa-quick-add__scope">
-    <c-ui.forms.form_block element_id="justificativa-block-oficio" section_id="justificativa-oficio-title" extra_class="travel-document-block document-form-block" title="Ofício vinculado" description="Selecione um ou mais ofícios para receber a justificativa." body_extra_class="termo-block__body" :heading_level="2" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_id="body_id" :data_hook="data_hook" :shell="shell" :variant="variant"><c-slot name="body">{% include "justificativas/partials/_oficio_picker.html" with form=form only %}</c-slot></c-ui.forms.form_block>
+<c-v2.quick_add_section title="Ofício vinculado" description="Selecione um ou mais ofícios para receber a justificativa.">
+  <c-slot name="body">{% include "justificativas/partials/_oficio_picker.html" with form=form only %}</c-slot>
+</c-v2.quick_add_section>
 
-    <c-ui.forms.form_block element_id="justificativa-block-finalidade" section_id="justificativa-finalidade-title" extra_class="travel-document-block document-form-block" title="Finalidade" description="Modelo e texto da justificativa" body_extra_class="form-stack" :heading_level="2" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_id="body_id" :data_hook="data_hook" :shell="shell" :variant="variant"><c-slot name="body">{% include "justificativas/partials/_finalidade_fields.html" with form=form only %}</c-slot></c-ui.forms.form_block>
-  </div>
-</div>
+<c-v2.quick_add_section title="Finalidade" description="Modelo e texto da justificativa">
+  <c-slot name="body">{% include "justificativas/partials/_finalidade_fields.html" with form=form only %}</c-slot>
+</c-v2.quick_add_section>

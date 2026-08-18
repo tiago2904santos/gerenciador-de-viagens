@@ -1,9 +1,9 @@
-<div class="field-grid">
-  <div class="field-size-3">
-    <c-ui.forms.field :field="form.nome" only />
-  </div>
-  <c-ui.forms.card_toggle :field="form.ativo" title="Ativo" description="Disponível no select do plano" :compact="True" size_class="field-size-1" only />
-  <div class="field-size-1">
-    <c-ui.forms.field :field="form.ordem" only />
-  </div>
-</div>
+<c-v2.quick_add_section title="Dados do programa" description="Nome, disponibilidade e ordem">
+  <c-slot name="body">
+    <div class="field-grid field-grid--cols-3">
+      <c-v2.form_field :field="form.nome" />
+      <c-ui.forms.card_toggle :field="form.ativo" title="Ativo" description="Disponível no select do plano" :compact="True" only />
+      <c-v2.form_field :field="form.ordem" />
+    </div>
+  </c-slot>
+</c-v2.quick_add_section>

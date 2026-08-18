@@ -275,6 +275,7 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
     trechos_display = []
     valor_diarias_display = ""
     valor_diarias_extenso = ""
+    quantidade_diarias_display = ""
     if oficio.roteiro_id:
         roteiro = oficio.roteiro
         trechos_da_lista = getattr(oficio, "_trechos_da_lista", None)
@@ -299,6 +300,10 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
         if diarias_oficio:
             valor_diarias_display = _format_brl_diarias(diarias_oficio["valor_decimal"])
             valor_diarias_extenso = (diarias_oficio["valor_extenso"] or "").strip()
+            # A QUANTIDADE fica ao lado do valor no cartão: "R$ 9.297,60" sozinho
+            # não diz se são duas diárias caras ou dez baratas, e é essa conta
+            # que se faz ao comparar dois ofícios na lista.
+            quantidade_diarias_display = str(diarias_oficio["quantidade"] or "").strip()
 
     # Transporte
     veiculo_placa = ""
@@ -393,13 +398,27 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
     retificar_url = urls["retificar"]
     marcar_complementar_url = urls["complementar"]
 
+    # O TÍTULO identifica o DOCUMENTO: número e protocolo, que é como ele é
+    # procurado e citado fora do sistema. A segunda linha responde "quando e
+    # onde" — período e destino (2026-08-18).
     header_parts = [f"Nº {numero_display}"]
     if protocolo_display:
         header_parts.append(f"Protocolo {protocolo_display}")
-    if destino:
-        header_parts.append(destino)
+
+    meta_parts = []
     if data_evento:
-        header_parts.append(data_evento)
+        meta_parts.append(data_evento)
+    if destino:
+        meta_parts.append(destino)
+    meta_display = " · ".join(meta_parts)
+
+    # O SELO do cartão é o temporal — "faltam 8 dias", "em andamento", "há 6
+    # dias". Ele é o que muda de um dia para o outro e o que se procura ao
+    # varrer a lista; o status do documento ("Finalizado", "Rascunho") só volta
+    # ao selo quando não há temporal — ofício sem roteiro, ou cancelado, onde
+    # contar dias não significa nada.
+    chip_label = temporal_label or status_chip_label
+    chip_tone_v2 = tom_de_chip_v2(temporal_tone if temporal_label else status_chip_tone)
     header_chips = [entity_cards.chip(status_chip_tone, status_chip_label)]
     if oficio.retificado_documento:
         header_chips.append(entity_cards.chip("warning", "Retificado"))
@@ -443,6 +462,8 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
         # AQUI porque filtro dentro de `:attr` do Cotton não é avaliado — o selo
         # chegaria sem cor nenhuma.
         "status_chip_tone_v2": tom_de_chip_v2(status_chip_tone),
+        "chip_label": chip_label,
+        "chip_tone_v2": chip_tone_v2,
         "veiculo_placa_display": veiculo_placa or "Não informado",
         "cancel_note_display": (
             f"Ofício cancelado. Motivo: {oficio.motivo_cancelamento}"
@@ -517,6 +538,7 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
         "complementar": oficio.complementar_documento,
         "marcar_complementar_url": marcar_complementar_url,
         "temporal_label": temporal_label,
+        "meta_display": meta_display,
         "temporal_tone": temporal_tone,
         "servidores": servidores_display,
         "servidores_count": len(servidores),
@@ -529,6 +551,7 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
         "trechos": trechos_display,
         "valor_diarias_display": valor_diarias_display,
         "valor_diarias_extenso": valor_diarias_extenso,
+        "quantidade_diarias_display": quantidade_diarias_display,
         "justificativa": justificativa,
         "justificativa_url": urls["justificativa"],
         "justificativa_menu_id": f"justificativa-document-menu-{oficio.pk}",

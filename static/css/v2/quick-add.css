@@ -8,24 +8,19 @@
  */
 
 :is(html[data-theme]) .quick-add__panel {
-  /* O painel fica no degrau `field` — ele está dentro do trilho, que é `rail` — e
-     DECLARA o degrau seguinte para os filhos. Sem esta linha os campos herdavam
-     `--surface-contrast` do trilho, ou seja, o mesmo `field` do painel: caixa e
-     campo saíam da mesma cor e o formulário virava uma mancha só.
-
-     As duas cores vêm dos tokens BASE. Pintar de `--surface-contrast` e redefinir
-     essa mesma variável para os filhos é referência circular — o `background` lê
-     o valor novo e a escada desaparece sem erro. Já aconteceu duas vezes nesta
-     migração (faixa de pessoas, cartão de documento). */
+  /* O form só reúne os campos para um POST. Ele declara a alternância das
+     superfícies para os controles, mas não desenha uma caixa própria. */
   --surface: var(--surface-field);
   --surface-contrast: var(--surface-rail);
-  background: var(--surface-field);
-  border-radius: var(--radius-field);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   box-sizing: border-box;
+  box-shadow: none;
   display: grid;
-  gap: var(--gap);
+  gap: 0;
   min-width: 0;
-  padding: var(--gap);
+  padding: 0;
 }
 
 /* O `display: grid` acima vence o `[hidden]`, que é regra de agente do usuário —
@@ -35,16 +30,66 @@
   display: none;
 }
 
-:is(html[data-theme]) .quick-add__body {
+/* Seção interna sem cartão próprio. O fieldset mantém a relação semântica entre
+   título e campos, enquanto o painel fornece a única superfície visual. */
+:is(html[data-theme]) .quick-add__section {
+  border: 0;
+  margin: 0;
+  min-inline-size: 0;
+  padding: 0;
+}
+
+:is(html[data-theme]) .quick-add__panel > .quick-add__section {
+  background: var(--surface-field);
+  border-radius: var(--radius-field);
+  margin-block-end: var(--gap);
+  padding: var(--gap);
+}
+
+:is(html[data-theme]) .quick-add__panel > .quick-add__section:last-child {
+  margin-block-end: 0;
+}
+
+:is(html[data-theme]) .quick-add__section-layout {
+  align-items: start;
   display: grid;
   gap: var(--gap);
-  /* Os campos LADO A LADO. Um cadastro rápido tem dois ou três campos curtos
-     (nome, sigla); empilhados, o painel ficava alto para dizer pouco e empurrava
-     a lista para fora da tela — que é justamente o que o quick add existe para
-     evitar. `auto-fit` com mínimo de 220px devolve a coluna única em tela
-     estreita, sem media query. */
-  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   min-width: 0;
+}
+
+:is(html[data-theme]) .quick-add__section-layout--split {
+  grid-template-columns: 200px minmax(0, 1fr);
+}
+
+:is(html[data-theme]) .quick-add__section-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .quick-add__section-title {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  margin: 0;
+}
+
+:is(html[data-theme]) .quick-add__section-description {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  margin: 0;
+}
+
+:is(html[data-theme]) .quick-add__section-body {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  :is(html[data-theme]) .quick-add__section-layout--split {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* O GATILHO é a faixa que fecha o trilho: largura inteira, contorno só no topo,

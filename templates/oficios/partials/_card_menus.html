@@ -8,49 +8,42 @@ depois o de "Mais ações" paga uma requisição, não duas.
 `apresentar_oficio_card(oficio, menus_sob_demanda=False)`, então os corpos aqui
 são, por construção, os mesmos que estavam embutidos antes.
 {% endcomment %}
-{% for menu in card.footer.menus %}<c-ui.lists.entity_card_menu_body :menu="menu" :csrf_token="csrf_token" only />{% endfor %}
-{% for menu in card.footer.danger_menus %}<c-ui.lists.entity_card_menu_body :menu="menu" :csrf_token="csrf_token" only />{% endfor %}
-<div class="action-menu action-menu--rich" id="justificativa-document-menu-{{ card.oficio_pk }}" role="menu" hidden>
-  <c-ui.menus.rich_menu_header title="Justificativa" :subtitle="card.numero_display" icon="folder" only />
-  <c-ui.menus.rich_menu_link :href="card.justificativa_visualizar_url" title="Visualizar justificativa" description="Abrir o documento no navegador" icon="eye" tone="preview" :target_blank="True" only />
-  <c-ui.menus.rich_menu_link :href="card.justificativa_pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" tone="pdf" :download="True" only />
-  <c-ui.menus.rich_menu_link :href="card.justificativa_docx_url" title="Baixar DOCX" description="Arquivo editável da justificativa" icon="docx" tone="docx" :download="True" only />
-</div>
+{% for menu in card.footer.menus %}<c-v2.menu_body :menu="menu" only />{% endfor %}
+{% for menu in card.footer.danger_menus %}<c-v2.menu_body :menu="menu" only />{% endfor %}
+{% comment %}
+  Os dois menus abaixo são escritos à mão porque os itens deles não vêm de
+  `core.entity_cards` — são URLs do próprio cartão. `extra_class="action-menu"`
+  não é decoração: quando o corpo do menu chega do servidor no primeiro clique,
+  o `overlay.js` procura os menus na resposta por esse seletor literal, e sem
+  ele o clique busca, recebe a marcação certa e conclui "resposta sem menu".
+{% endcomment %}
+<c-v2.menu id="justificativa-document-menu-{{ card.oficio_pk }}" extra_class="action-menu" aria_label="Documentos da justificativa">
+  <c-v2.menu_item :href="card.justificativa_visualizar_url" title="Visualizar justificativa" description="Abrir o documento no navegador" icon="eye" icon_tone="info" :target_blank="True" />
+  <c-v2.menu_item :href="card.justificativa_pdf_url" title="Baixar PDF" description="Documento pronto para impressão" icon="pdf" icon_tone="late" :download="True" />
+  <c-v2.menu_item :href="card.justificativa_docx_url" title="Baixar DOCX" description="Arquivo editável da justificativa" icon="docx" icon_tone="progress" :download="True" />
+</c-v2.menu>
 {% for s in card.servidores %}{% if s.has_termo %}
-<div class="action-menu action-menu--rich" id="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}" role="menu" hidden>
-  {% if s.termo_assinado %}
-    <c-ui.menus.rich_menu_header title="Termo assinado" :subtitle="s.name" icon="sign" only />
-  {% else %}
-    <c-ui.menus.rich_menu_header title="Termo do servidor" :subtitle="s.name" icon="document" only />
-  {% endif %}
+<c-v2.menu id="termo-action-menu-{{ card.oficio_pk }}-{{ s.servidor_pk }}" extra_class="action-menu" aria_label="Termo de {{ s.name }}">
   {% if s.termo_open_url %}
-    <c-ui.menus.rich_menu_link :href="s.termo_open_url" title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" tone="preview" :target_blank="True" only />
+    <c-v2.menu_item :href="s.termo_open_url" title="Visualizar termo" description="Abrir o documento no navegador" icon="eye" icon_tone="info" :target_blank="True" />
   {% endif %}
   {% if s.termo_pdf_url %}
-    <c-ui.menus.rich_menu_link :href="s.termo_pdf_url" title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" tone="pdf" :download="True" only />
+    <c-v2.menu_item :href="s.termo_pdf_url" title="Baixar PDF" description="Documento pronto para assinatura" icon="pdf" icon_tone="late" :download="True" />
   {% endif %}
   {% if s.termo_docx_url %}
-    <c-ui.menus.rich_menu_link :href="s.termo_docx_url" title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" tone="docx" :download="True" only />
+    <c-v2.menu_item :href="s.termo_docx_url" title="Baixar DOCX" description="Arquivo editável do termo" icon="docx" icon_tone="progress" :download="True" />
   {% endif %}
   {% if s.termo_anexar_assinado_url %}
-  <c-ui.buttons.button
-    type="button"
-    class_name="action-menu__item action-menu__item--rich{% if s.termo_assinado %} is-assinado{% endif %}"
-    role="menuitem"
-    data-attach-signed-trigger
-    data-attach-signed-url="{{ s.termo_anexar_assinado_url }}"
-    data-attach-signed-doc-label="o termo de {{ s.name }}"
-    data-attach-signed-current-name="{{ s.termo_assinado_nome_original }}"
-    data-attach-signed-current-view-url="{{ s.termo_assinado_view_url }}"
-    data-attach-signed-current-remove-url="{{ s.termo_remover_assinado_url }}" only>
-    <span class="action-menu__item-icon action-menu__item-icon--success" aria-hidden="true">
-      <c-ui.icons.icon icon="sign" only />
-    </span>
-    <span class="action-menu__item-copy">
-      <strong>{% if s.termo_assinado %}Gerenciar assinado{% else %}Anexar termo assinado{% endif %}</strong>
-      <small>{% if s.termo_assinado %}Visualizar, substituir ou remover{% else %}Enviar o PDF depois da assinatura{% endif %}</small>
-    </span>
-  </c-ui.buttons.button>
+    {% with rotulo_termo="o termo de "|add:s.name %}
+      <c-v2.menu_attach_signed
+        :url="s.termo_anexar_assinado_url"
+        :doc_label="rotulo_termo"
+        :signed="s.termo_assinado"
+        :current_name="s.termo_assinado_nome_original"
+        :current_view_url="s.termo_assinado_view_url"
+        :current_remove_url="s.termo_remover_assinado_url"
+      />
+    {% endwith %}
   {% endif %}
-</div>
+</c-v2.menu>
 {% endif %}{% endfor %}

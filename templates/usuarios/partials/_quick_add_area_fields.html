@@ -1,5 +1,3 @@
-<div class="area-quick-add" data-area-quick-add>
-  <c-v2.form_block :split="True" surface="rail" title="Dados da área" description="Nome e sigla da unidade">
-    <c-slot name="body">{% include "usuarios/partials/_criar_area_fields.html" with form=form only %}</c-slot>
-  </c-v2.form_block>
-</div>
+<c-v2.quick_add_section :split="True" title="Dados da área" description="Nome e sigla da unidade">
+  <c-slot name="body">{% include "usuarios/partials/_criar_area_fields.html" with form=form only %}</c-slot>
+</c-v2.quick_add_section>

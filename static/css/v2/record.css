@@ -54,28 +54,32 @@
   padding-bottom: var(--gap-tight);
 }
 
-/* O selo fica JUNTO DO TEXTO, e não na ponta direita.
+/* O selo vai para a PONTA DIREITA da linha (decisão do dono, 2026-08-18).
 
-   Passou uma volta em `margin-left: auto`, para os selos formarem uma coluna
-   própria; o dono preferiu de volta ao lado do título (2026-08-16). O argumento
-   que decide: o selo QUALIFICA o título — "Nº 150/2026 · LONDRINA/PR" mais
-   "Cancelado" é uma frase só, e separá-los por meia tela obriga o olho a ir e
-   voltar para juntar as duas metades. Quem vai para a ponta são as AÇÕES, por
-   `margin-left: auto` na regra acima.
+   A posição foi e voltou algumas vezes em 2026-08-16, quando o argumento em uso
+   era "o selo qualifica o título, e os dois são uma frase só". O corte agora é
+   outro: com os selos alinhados numa coluna própria, percorrer a lista de cima a
+   baixo lendo só o estado deixa de exigir que o olho pare em cada título de
+   comprimento diferente.
+
+   Nas listas simples, onde as ações moram na mesma linha, o selo encosta nelas —
+   os dois fecham a linha juntos, e é por isso que `.record__row` não usa
+   `space-between`: ele abriria um vazio entre o selo e os botões.
 
    `flex: none` para ele não encolher quando o título é longo: um selo espremido
    perde a pílula e vira texto solto. */
 :is(html[data-theme]) .record__status {
   align-items: center;
   display: inline-flex;
-  /* JUNTO DO TEXTO — sem `margin-left: auto`. Esta posição foi e voltou três
-     vezes em 2026-08-16; o estado final é este. O que a sustenta: o selo
-     qualifica o título, e "Nº 150/2026 · LONDRINA/PR" + "Cancelado" é uma frase
-     só. Quem vai para a ponta direita são as AÇÕES.
-
-     `flex: none` para ele não encolher quando o título é longo: um selo espremido
-     perde a pílula e vira texto solto. */
   flex: none;
+  margin-left: auto;
+}
+
+/* Com o selo empurrado para a direita, as ações não precisam empurrar de novo —
+   e não podem: dois `margin-left: auto` na mesma linha abrem um vão ENTRE eles.
+   O primeiro elemento a empurrar já leva os dois para a ponta. */
+:is(html[data-theme]) .record__row > .record__status ~ .record__actions {
+  margin-left: 0;
 }
 
 /* Sobrou para o eyebrow, que continua ao lado do título. */

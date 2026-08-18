@@ -2,8 +2,8 @@
   "use strict";
 
   function initUsuarioQuickAdd() {
-    var root = document.querySelector("[data-usuario-quick-add]");
-    var panel = root ? root.closest("form.inline-create__panel") : null;
+    var root = document.querySelector("#quick-add-usuario");
+    var panel = root;
     var toggle = document.querySelector(
       ".usuarios-page .inline-create__toggle[data-inline-create-toggle][aria-controls='quick-add-usuario']"
     );
@@ -71,8 +71,8 @@
   }
 
   function initAreaQuickAdd() {
-    var root = document.querySelector("[data-area-quick-add]");
-    var panel = root ? root.closest("form.inline-create__panel") : null;
+    var root = document.querySelector("#quick-add-area");
+    var panel = root;
     var toggle = document.querySelector(
       ".usuarios-page .inline-create__toggle[data-inline-create-toggle][aria-controls='quick-add-area']"
     );

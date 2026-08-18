@@ -1,5 +1,7 @@
-<div class="field-grid">
-  <div class="field-size-4">
-    <c-v2.form_field :field="form.nome" />
-  </div>
-</div>
+<c-v2.quick_add_section :split="True" title="Dados do combustível" description="Nome do combustível">
+  <c-slot name="body">
+    <div class="field-grid">
+      <c-v2.form_field :field="form.nome" />
+    </div>
+  </c-slot>
+</c-v2.quick_add_section>

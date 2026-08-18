@@ -2078,28 +2078,32 @@
   padding-bottom: var(--gap-tight);
 }
 
-/* O selo fica JUNTO DO TEXTO, e não na ponta direita.
+/* O selo vai para a PONTA DIREITA da linha (decisão do dono, 2026-08-18).
 
-   Passou uma volta em `margin-left: auto`, para os selos formarem uma coluna
-   própria; o dono preferiu de volta ao lado do título (2026-08-16). O argumento
-   que decide: o selo QUALIFICA o título — "Nº 150/2026 · LONDRINA/PR" mais
-   "Cancelado" é uma frase só, e separá-los por meia tela obriga o olho a ir e
-   voltar para juntar as duas metades. Quem vai para a ponta são as AÇÕES, por
-   `margin-left: auto` na regra acima.
+   A posição foi e voltou algumas vezes em 2026-08-16, quando o argumento em uso
+   era "o selo qualifica o título, e os dois são uma frase só". O corte agora é
+   outro: com os selos alinhados numa coluna própria, percorrer a lista de cima a
+   baixo lendo só o estado deixa de exigir que o olho pare em cada título de
+   comprimento diferente.
+
+   Nas listas simples, onde as ações moram na mesma linha, o selo encosta nelas —
+   os dois fecham a linha juntos, e é por isso que `.record__row` não usa
+   `space-between`: ele abriria um vazio entre o selo e os botões.
 
    `flex: none` para ele não encolher quando o título é longo: um selo espremido
    perde a pílula e vira texto solto. */
 :is(html[data-theme]) .record__status {
   align-items: center;
   display: inline-flex;
-  /* JUNTO DO TEXTO — sem `margin-left: auto`. Esta posição foi e voltou três
-     vezes em 2026-08-16; o estado final é este. O que a sustenta: o selo
-     qualifica o título, e "Nº 150/2026 · LONDRINA/PR" + "Cancelado" é uma frase
-     só. Quem vai para a ponta direita são as AÇÕES.
-
-     `flex: none` para ele não encolher quando o título é longo: um selo espremido
-     perde a pílula e vira texto solto. */
   flex: none;
+  margin-left: auto;
+}
+
+/* Com o selo empurrado para a direita, as ações não precisam empurrar de novo —
+   e não podem: dois `margin-left: auto` na mesma linha abrem um vão ENTRE eles.
+   O primeiro elemento a empurrar já leva os dois para a ponta. */
+:is(html[data-theme]) .record__row > .record__status ~ .record__actions {
+  margin-left: 0;
 }
 
 /* Sobrou para o eyebrow, que continua ao lado do título. */
@@ -5437,24 +5441,19 @@
  */
 
 :is(html[data-theme]) .quick-add__panel {
-  /* O painel fica no degrau `field` — ele está dentro do trilho, que é `rail` — e
-     DECLARA o degrau seguinte para os filhos. Sem esta linha os campos herdavam
-     `--surface-contrast` do trilho, ou seja, o mesmo `field` do painel: caixa e
-     campo saíam da mesma cor e o formulário virava uma mancha só.
-
-     As duas cores vêm dos tokens BASE. Pintar de `--surface-contrast` e redefinir
-     essa mesma variável para os filhos é referência circular — o `background` lê
-     o valor novo e a escada desaparece sem erro. Já aconteceu duas vezes nesta
-     migração (faixa de pessoas, cartão de documento). */
+  /* O form só reúne os campos para um POST. Ele declara a alternância das
+     superfícies para os controles, mas não desenha uma caixa própria. */
   --surface: var(--surface-field);
   --surface-contrast: var(--surface-rail);
-  background: var(--surface-field);
-  border-radius: var(--radius-field);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   box-sizing: border-box;
+  box-shadow: none;
   display: grid;
-  gap: var(--gap);
+  gap: 0;
   min-width: 0;
-  padding: var(--gap);
+  padding: 0;
 }
 
 /* O `display: grid` acima vence o `[hidden]`, que é regra de agente do usuário —
@@ -5464,16 +5463,66 @@
   display: none;
 }
 
-:is(html[data-theme]) .quick-add__body {
+/* Seção interna sem cartão próprio. O fieldset mantém a relação semântica entre
+   título e campos, enquanto o painel fornece a única superfície visual. */
+:is(html[data-theme]) .quick-add__section {
+  border: 0;
+  margin: 0;
+  min-inline-size: 0;
+  padding: 0;
+}
+
+:is(html[data-theme]) .quick-add__panel > .quick-add__section {
+  background: var(--surface-field);
+  border-radius: var(--radius-field);
+  margin-block-end: var(--gap);
+  padding: var(--gap);
+}
+
+:is(html[data-theme]) .quick-add__panel > .quick-add__section:last-child {
+  margin-block-end: 0;
+}
+
+:is(html[data-theme]) .quick-add__section-layout {
+  align-items: start;
   display: grid;
   gap: var(--gap);
-  /* Os campos LADO A LADO. Um cadastro rápido tem dois ou três campos curtos
-     (nome, sigla); empilhados, o painel ficava alto para dizer pouco e empurrava
-     a lista para fora da tela — que é justamente o que o quick add existe para
-     evitar. `auto-fit` com mínimo de 220px devolve a coluna única em tela
-     estreita, sem media query. */
-  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
   min-width: 0;
+}
+
+:is(html[data-theme]) .quick-add__section-layout--split {
+  grid-template-columns: 200px minmax(0, 1fr);
+}
+
+:is(html[data-theme]) .quick-add__section-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .quick-add__section-title {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  margin: 0;
+}
+
+:is(html[data-theme]) .quick-add__section-description {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  margin: 0;
+}
+
+:is(html[data-theme]) .quick-add__section-body {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  :is(html[data-theme]) .quick-add__section-layout--split {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* O GATILHO é a faixa que fecha o trilho: largura inteira, contorno só no topo,
@@ -5939,6 +5988,43 @@
   white-space: nowrap;
 }
 
+/* O corpo do valor CEDE por quantidade de fatos no bloco.
+ *
+ * Estes são os degraus que o comentário acima diz terem sido apagados por
+ * engano num corte. Eles voltam porque a conta é de ALTURA, e o `fit-text.js`
+ * só sabe de largura: ele encolhe o que não cabe na linha, e nunca o que não
+ * cabe na caixa.
+ *
+ * A caixa útil do bloco são ~133px (157 menos o recuo). Um rótulo mede 13px e o
+ * vão entre fatos, 8. Com DOIS fatos sobram ~50px por valor, que é o que os
+ * 2,2rem ocupam com a entrelinha de 1,1 — o bloco fica cheio sem empurrar os
+ * vizinhos. Com TRÊS, o teto volta ao valor conservador, senão a terceira linha
+ * nasce cortada.
+ *
+ * Um fato só (a placa sozinha, quando não há modelo) pode crescer mais: é o
+ * caso em que a caixa inteira é dele.
+ */
+/* A exceção do valor forte vai DENTRO das duas regras, e não numa terceira: os
+   seletores de contagem usam `:has()` e `:not()` e somam especificidade alta, e
+   a terceira regra — mais simples — perdia para eles em silêncio. Onde já há o
+   destaque do cartão, o outro fato cede: medido, "Valor total" a 48px mais a
+   linha do por extenso mais um segundo fato crescido transbordavam a caixa em
+   11px. */
+:is(html[data-theme]) .fact-list:not(:has(> .fact:nth-child(2))):not(:has(.fact__value--strong)) {
+  --fact-value-size: clamp(1.2rem, 20cqw, 2.6rem);
+}
+
+:is(html[data-theme]) .fact-list:has(> .fact:nth-child(2)):not(:has(> .fact:nth-child(3))):not(:has(.fact__value--strong)) {
+  --fact-value-size: clamp(1.1rem, 16cqw, 2.2rem);
+}
+
+/* O valor forte ACOMPANHADO cede um degrau. Sozinho ele fica nos 3rem; com um
+   segundo fato no mesmo bloco — "Valor total" e "Quantidade de diárias" — a
+   soma passava a caixa por 1px. Um pixel não se vê, mas é o começo do corte. */
+:is(html[data-theme]) .fact-list:has(> .fact:nth-child(2)):has(.fact__value--strong) {
+  --fact-value-size-strong: clamp(1.15rem, 18cqw, 2.8rem);
+}
+
 /* O total das diárias é o valor que a lista existe para comparar — um degrau
    acima dos outros, e só ele. */
 :is(html[data-theme]) .fact__value--strong {
@@ -6092,6 +6178,11 @@
   /* Aqui a calha vale: ela reserva o espaço da barra para o texto não mudar de
      largura enquanto se rola. */
   scrollbar-gutter: stable;
+  /* A MESMA barra do resto do v2 — picker, listbox e seletor de download já a
+     declaram assim. Sem estas duas linhas o navegador desenha a barra do
+     sistema, larga e clara, e ela era a única peça do cartão fora do modelo. */
+  scrollbar-color: var(--text-muted) transparent;
+  scrollbar-width: thin;
 }
 
 /* O horário segue a mesma regra da rota: UMA linha, corpo medido pela largura do

@@ -21,7 +21,14 @@ def renderizar_oficio_card_cacheado(card):
     # A versão sobe SEMPRE que o desenho do cartão muda: o digest é do dado, e
     # sem isso a lista serviria o HTML antigo até o próprio ofício mudar.
     # v2 (2026-08-18): cartão migrado para as peças do v2.
-    key = f"oficios:list-card:v2:{digest}"
+    # v3 (2026-08-18): faixa de fatos alinhada ao modelo da galeria — blocos
+    # como filhos diretos do corpo, sem os rótulos de nota.
+    # v4 (2026-08-18): placa e modelo como dois fatos inteiros, e a
+    # quantidade de diárias ao lado do valor.
+    # v5 (2026-08-18): título curto (número · destino) e o resto na meta.
+    # v6 (2026-08-18): título número+protocolo, meta período+destino, e o
+    # selo passou a ser o temporal.
+    key = f"oficios:list-card:v6:{digest}"
     html = cache.get(key)
     if html is None:
         html = render_to_string("oficios/partials/oficio_list_card.html", {"card": card})

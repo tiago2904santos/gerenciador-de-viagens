@@ -1,4 +1,4 @@
-{% cotton:vars actions body description extra_class split surface title %}
+{% cotton:vars actions body data_hook description extra_class split surface title %}
 {% comment %}
   Form block v2 — cabeçalho e corpo. Par de `static/css/v2/form-block.css`.
 
@@ -9,7 +9,7 @@
   `split` põe o cabeçalho à esquerda e o corpo à direita, na mesma linha — para
   o bloco de um controle só, onde empilhar gasta uma linha à toa.
 {% endcomment %}
-<section class="form-block--v2{% if split %} form-block--split{% endif %}{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
+<section class="form-block--v2{% if split %} form-block--split{% endif %}{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if data_hook %} {{ data_hook }}{% endif %}>
   {% if title or description or actions %}
     <header class="form-block__header">
       <div>

@@ -1,5 +1,9 @@
-<div class="field-grid">
-  <c-v2.form_field :field="form.nome" extra_class="field-size-2" />
-  <c-v2.form_field :field="form.sigla" extra_class="field-size-1" />
-  <c-v2.form_field :field="form.codigo_ibge" extra_class="field-size-1" />
-</div>
+<c-v2.quick_add_section :split="True" title="Dados do estado" description="Nome, sigla e código IBGE">
+  <c-slot name="body">
+    <div class="field-grid field-grid--cols-3">
+      <c-v2.form_field :field="form.nome" />
+      <c-v2.form_field :field="form.sigla" />
+      <c-v2.form_field :field="form.codigo_ibge" />
+    </div>
+  </c-slot>
+</c-v2.quick_add_section>

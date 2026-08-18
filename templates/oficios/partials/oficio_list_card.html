@@ -24,16 +24,22 @@
 <c-v2.record
   box="panel"
   :title="card.header.items.0.value"
-  :status="card.status_chip_label"
-  :status_tone="card.status_chip_tone_v2"
+  {% comment %}
+    O selo é o TEMPORAL — o que muda de um dia para o outro e o que se procura
+    ao varrer a lista. O status do documento volta ao selo só quando não há
+    temporal: ofício sem roteiro, ou cancelado, onde contar dias não diz nada.
+    Quem decide é o presenter, em `chip_label`.
+  {% endcomment %}
+  :status="card.chip_label"
+  :status_tone="card.chip_tone_v2"
   :search_text="card.search_text"
 >
   {% comment %}
-    Só o temporal: número, protocolo, destino e período JÁ estão no título, e a
-    meta repetindo o protocolo gastava a única linha livre com o que o olho
-    acabara de ler.
+    Título: número e protocolo, que é como o ofício é citado fora do sistema.
+    Meta: período e destino — "quando e onde". As duas linhas são montadas no
+    presenter para não virar separador condicional aqui.
   {% endcomment %}
-  <c-slot name="meta">{{ card.temporal_label }}</c-slot>
+  <c-slot name="meta">{{ card.meta_display }}</c-slot>
 
   <c-slot name="body">
     {% if card.cancel_note %}
@@ -66,43 +72,74 @@
       {% endfor %}
     </ul>
 
-    <div class="oficio-card__facts">
+    {% comment %}
+      Os três blocos são filhos DIRETOS do corpo, como no modelo da galeria: o
+      corpo é `display: contents` e cada bloco vale duas das seis colunas do
+      cartão — três blocos, uma faixa. O invólucro `oficio-card__facts` que
+      morava aqui reencaixava os mesmos blocos numa grade própria e devolvia
+      colunas 3px mais estreitas que as do modelo.
+
+      Sem `note_label` e sem título no bloco de trechos, também pelo modelo: o
+      rótulo em accent de cada fato já diz o que é o valor embaixo dele, e
+      "MODELO" sobre "DUSTER" era o mesmo aviso duas vezes — em três blocos,
+      12px de altura por cartão.
+    {% endcomment %}
+    <c-v2.form_block>
+      <c-slot name="body">
+        <div class="fact-list">
+          {% comment %}
+            SEM motorista de fora, o bloco é Placa + Modelo, os DOIS como fatos
+            inteiros — mesmo rótulo miúdo em cima, mesmo valor embaixo. O modelo
+            como linha de apoio da placa saía em letra de nota, e "DUSTER" não é
+            nota de nada: é o outro dado da viatura.
+
+            COM motorista de fora, o modelo desce para a linha de apoio e a vaga
+            passa a ser dele: quem dirige de fora do ofício muda a leitura do
+            transporte, o modelo do carro não — e três fatos não cabem no teto
+            de 170px sem o valor virar letra miúda.
+          {% endcomment %}
+          {% if card.motorista_is_carona and card.motorista_display %}
+            <c-v2.fact label="Placa" :value="card.veiculo_placa_display" :note="card.veiculo_modelo" />
+            <c-v2.fact label="Motorista" :value="card.motorista_display" :note="card.motorista_referencia_display" />
+          {% else %}
+            <c-v2.fact label="Placa" :value="card.veiculo_placa_display" />
+            <c-v2.fact label="Modelo" :value="card.veiculo_modelo" />
+          {% endif %}
+        </div>
+      </c-slot>
+    </c-v2.form_block>
+
+    {% if card.trechos %}
+      <c-v2.form_block>
+        <c-slot name="body">
+          <c-v2.itinerary :legs="card.trechos" />
+        </c-slot>
+      </c-v2.form_block>
+    {% endif %}
+
+    {% if card.valor_diarias_display %}
       <c-v2.form_block>
         <c-slot name="body">
           <div class="fact-list">
-            <c-v2.fact label="Placa" :value="card.veiculo_placa_display" note_label="Modelo" :note="card.veiculo_modelo" />
-            {% if card.motorista_is_carona and card.motorista_display %}
-              <c-v2.fact label="Motorista" :value="card.motorista_display" :note="card.motorista_referencia_display" note_label="Referência" />
+            <c-v2.fact
+              label="Valor total"
+              :value="card.valor_diarias_display"
+              :note="card.valor_diarias_extenso"
+              :strong="True"
+            />
+            {% comment %}
+              A quantidade ao lado do valor: "R$ 9.297,60" sozinho não diz se
+              são duas diárias caras ou dez baratas, e é essa conta que se faz
+              ao comparar dois ofícios na lista. É o mesmo par do modelo da
+              galeria (Valor total + Diárias).
+            {% endcomment %}
+            {% if card.quantidade_diarias_display %}
+              <c-v2.fact label="Quantidade de diárias" :value="card.quantidade_diarias_display" />
             {% endif %}
           </div>
         </c-slot>
       </c-v2.form_block>
-
-      {% if card.trechos %}
-        <c-v2.form_block>
-          <c-slot name="body">
-            <span class="fact__label">Trechos encontrados</span>
-            <c-v2.itinerary :legs="card.trechos" />
-          </c-slot>
-        </c-v2.form_block>
-      {% endif %}
-
-      {% if card.valor_diarias_display %}
-        <c-v2.form_block>
-          <c-slot name="body">
-            <div class="fact-list">
-              <c-v2.fact
-                label="Valor total"
-                :value="card.valor_diarias_display"
-                note_label="Valor por extenso"
-                :note="card.valor_diarias_extenso"
-                :strong="True"
-              />
-            </div>
-          </c-slot>
-        </c-v2.form_block>
-      {% endif %}
-    </div>
+    {% endif %}
 
     <ul class="person-list">
       <c-v2.person_row

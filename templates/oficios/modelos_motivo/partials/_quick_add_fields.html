@@ -1,10 +1,8 @@
-<div class="field-grid">
-  <div class="field-size-4">
-    <c-ui.forms.field :field="form.nome" only />
-  </div>
-</div>
-<div class="field-grid">
-  <div class="field-size-4">
-    <c-ui.forms.field :field="form.texto" only />
-  </div>
-</div>
+<c-v2.quick_add_section title="Dados do modelo" description="Nome e texto do motivo">
+  <c-slot name="body">
+    <div class="field-grid">
+      <c-v2.form_field :field="form.nome" />
+      <c-v2.form_field :field="form.texto" />
+    </div>
+  </c-slot>
+</c-v2.quick_add_section>

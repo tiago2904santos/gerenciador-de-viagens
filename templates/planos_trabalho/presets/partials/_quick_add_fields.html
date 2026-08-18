@@ -1,10 +1,13 @@
-<div class="field-grid">
-  <div class="field-size-4">
-    <c-ui.forms.field :field="form.nome" only />
-  </div>
-</div>
-<div class="field-grid">
-  <div class="field-size-4">
+<c-v2.quick_add_section :split="True" title="Identificação" description="Nome do modelo">
+  <c-slot name="body">
+    <div class="field-grid">
+      <c-v2.form_field :field="form.nome" />
+    </div>
+  </c-slot>
+</c-v2.quick_add_section>
+
+<c-v2.quick_add_section title="Atividades previstas" description="Atividades incluídas no modelo">
+  <c-slot name="body">
     <div class="field app-form-field cv-field pt-preset-activities-field">
       <fieldset class="pt-preset-activities-panel" aria-describedby="{{ form.atividades.auto_id }}_helptext">
         <legend class="pt-preset-activities-panel__title">Atividades previstas</legend>
@@ -15,5 +18,5 @@
         <c-ui.feedback.field_error :errors="form.atividades.errors" :field_id="form.atividades.auto_id" only />
       {% endif %}
     </div>
-  </div>
-</div>
+  </c-slot>
+</c-v2.quick_add_section>

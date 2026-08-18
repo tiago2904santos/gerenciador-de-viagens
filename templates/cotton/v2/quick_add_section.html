@@ -1,0 +1,17 @@
+{% cotton:vars body data_hook description split title %}
+{% comment %}
+  Grupo semântico dentro de um quick-add. O formulário pai é neutro e realiza
+  um único POST; cada fieldset fornece a superfície visual da seção.
+{% endcomment %}
+<fieldset class="quick-add__section"{% if data_hook %} {{ data_hook }}{% endif %}>
+  <legend class="sr-only">{{ title }}{% if description %} — {{ description }}{% endif %}</legend>
+  <div class="quick-add__section-layout{% if split %} quick-add__section-layout--split{% endif %}">
+    {% if title or description %}
+      <div class="quick-add__section-copy">
+        {% if title %}<h2 class="quick-add__section-title">{{ title }}</h2>{% endif %}
+        {% if description %}<p class="quick-add__section-description">{{ description }}</p>{% endif %}
+      </div>
+    {% endif %}
+    <div class="quick-add__section-body">{{ body }}</div>
+  </div>
+</fieldset>
