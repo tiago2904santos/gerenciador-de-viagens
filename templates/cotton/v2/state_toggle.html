@@ -1,0 +1,34 @@
+{% cotton:vars active active_label inactive_label input_id input_name %}
+{% comment %}
+  Interruptor de ESTADO — liga e desliga uma seção inteira do formulário.
+
+  O valor viaja num campo oculto (`true`/`false`), e o botão é só a cara dele:
+  quem escreve no campo, troca o rótulo e mostra/esconde o corpo é o
+  `js/components/state-toggle.js`, pelos ganchos `data-cv-state-toggle`,
+  `data-cv-state-binary`, `data-cv-state-input`, `data-cv-state-trigger` e o par
+  `data-active-label`/`data-inactive-label`.
+
+  É componente, e não dois elementos soltos no template da tela, por duas razões:
+  o contrato `test_templates_de_aplicacao_nao_reimplementam_button` proíbe
+  `<button>` cru em template de aplicação, e o mesmo par (oculto + botão)
+  aparece no bate-volta do roteiro e nas etapas do ofício.
+{% endcomment %}
+<div
+  class="state-toggle"
+  data-cv-state-toggle
+  data-cv-state-binary
+  data-cv-state-input="#{{ input_id }}"
+  data-active-label="{{ active_label }}"
+  data-inactive-label="{{ inactive_label }}"
+>
+  <input type="hidden" id="{{ input_id }}" name="{{ input_name }}" value="{% if active %}true{% else %}false{% endif %}">
+  <button
+    type="button"
+    class="button {% if active %}button--primary{% else %}button--secondary{% endif %}"
+    data-cv-state-trigger
+    aria-label="{{ active_label }}"
+    aria-pressed="{% if active %}true{% else %}false{% endif %}"
+  >
+    <span>{% if active %}{{ active_label }}{% else %}{{ inactive_label }}{% endif %}</span>
+  </button>
+</div>

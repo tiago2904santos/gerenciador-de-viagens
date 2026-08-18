@@ -1,0 +1,86 @@
+{% comment %}
+  Bate-volta diário, no v2 — repete ida e volta todo dia de um período.
+
+  O bloco inteiro é opcional, e quem o liga é o botão de estado no cabeçalho:
+  `data-cv-state-toggle` + `data-cv-state-input` são o contrato de
+  `js/components/state-toggle.js`, que escreve `true`/`false` no campo oculto
+  `bate_volta_diario_ativo` e troca o rótulo do botão. `#bate-volta-body` é o
+  que ele mostra e esconde.
+
+  Os quatro horários são campos independentes com máscara de hora
+  (`data-mask="time"`, de `js/components/masks.js`); o período usa o date picker
+  do sistema em modo intervalo. Os `name` são lidos pelo parser do editor
+  (`roteiros/services/editor_parser.py`).
+{% endcomment %}
+<c-v2.form_block
+  title="Bate-volta diário"
+  description="Repita automaticamente a ida e a volta em um período."
+  extra_class="route-daily"
+>
+  <c-slot name="actions">
+    <c-v2.state_toggle
+      input_id="id_bate_volta_diario_ativo"
+      input_name="bate_volta_diario_ativo"
+      :active="estado.ativo"
+      active_label="Com bate-volta diário"
+      inactive_label="Sem bate-volta diário"
+    />
+  </c-slot>
+
+  <c-slot name="body">
+    <div id="bate-volta-body" {% if not estado.ativo %}hidden{% endif %}>
+      <div id="bate-volta-panel" class="route-daily__grid">
+        <c-v2.date_picker
+          mode="range"
+          picker_id="bate-volta-date-picker"
+          start_input_id="id_bate_volta_data_inicio_display"
+          end_input_id="id_bate_volta_data_fim_display"
+          start_hidden_name="bate_volta_data_inicio"
+          end_hidden_name="bate_volta_data_fim"
+          :start_hidden_value="estado.data_inicio"
+          :end_hidden_value="estado.data_fim"
+          :initial_date="estado.data_inicio"
+          placeholder_start="Data inicial"
+          placeholder_end="Data final"
+          aria_label="Período do bate-volta"
+        />
+
+        <div class="route-daily__times">
+          <c-v2.field label="Saída da ida" label_for="id_bate_volta_ida_saida_hora">
+            <c-slot name="control">
+              <input type="text" class="input__control" id="id_bate_volta_ida_saida_hora" name="bate_volta_ida_saida_hora"
+                     data-mask="time" value="{{ estado.ida_saida_hora|default:'' }}" placeholder="00:00"
+                     inputmode="numeric" maxlength="5" autocomplete="off">
+            </c-slot>
+          </c-v2.field>
+
+          <c-v2.field label="Tempo da ida" label_for="id_bate_volta_ida_tempo_hhmm">
+            <c-slot name="control">
+              <input type="text" class="input__control" id="id_bate_volta_ida_tempo_hhmm"
+                     data-mask="time" value="" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+              <input type="hidden" id="id_bate_volta_ida_tempo_min" name="bate_volta_ida_tempo_min"
+                     value="{{ estado.ida_tempo_min|default:'' }}">
+            </c-slot>
+          </c-v2.field>
+
+          <c-v2.field label="Saída da volta" label_for="id_bate_volta_volta_saida_hora">
+            <c-slot name="control">
+              <input type="text" class="input__control" id="id_bate_volta_volta_saida_hora" name="bate_volta_volta_saida_hora"
+                     data-mask="time" value="{{ estado.volta_saida_hora|default:'' }}" placeholder="00:00"
+                     inputmode="numeric" maxlength="5" autocomplete="off">
+            </c-slot>
+          </c-v2.field>
+
+          <c-v2.field label="Tempo da volta" label_for="id_bate_volta_volta_tempo_hhmm">
+            <c-slot name="control">
+              <input type="text" class="input__control" id="id_bate_volta_volta_tempo_hhmm"
+                     data-mask="time" value="" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+              <input type="hidden" id="id_bate_volta_volta_tempo_min" name="bate_volta_volta_tempo_min"
+                     value="{{ estado.volta_tempo_min|default:'' }}">
+            </c-slot>
+          </c-v2.field>
+        </div>
+      </div>
+    </div>
+  </c-slot>
+</c-v2.form_block>

@@ -47,6 +47,17 @@ def roteiro_time_input(value):
 
 
 def parse_destinos_post(post):
+    """Lê os destinos do POST, na ordem das linhas.
+
+    A primeira linha vem SEM sufixo (`destino_estado`) e as demais numeradas
+    (`destino_estado_1`, `_2`...). É como o `c-v2.destination_row` nomeia os
+    campos, e é o que termos e ordens de serviço já enviam.
+
+    O formato antigo — todas numeradas a partir de `_0` — continua valendo: é o
+    que a etapa de roteiro do wizard de ofício ainda manda, e ler só um dos dois
+    descartaria um destino inteiro **em silêncio**, que é o pior jeito de
+    perder dado de viagem.
+    """
     prefix_estado = "destino_estado_"
     prefix_cidade = "destino_cidade_"
     indices = set()
@@ -57,15 +68,26 @@ def parse_destinos_post(post):
                 indices.add(idx)
             except ValueError:
                 continue
+
+    def par(estado_key, cidade_key):
+        estado_id = post.get(estado_key)
+        cidade_id = post.get(cidade_key)
+        if not (estado_id and cidade_id):
+            return None
+        try:
+            return (int(estado_id), int(cidade_id))
+        except (TypeError, ValueError):
+            return None
+
     destinos = []
+    # A linha sem sufixo é sempre a PRIMEIRA da lista, venha ou não numerada.
+    primeiro = par("destino_estado", "destino_cidade")
+    if primeiro:
+        destinos.append(primeiro)
     for idx in sorted(indices):
-        estado_id = post.get(f"{prefix_estado}{idx}")
-        cidade_id = post.get(f"{prefix_cidade}{idx}")
-        if estado_id and cidade_id:
-            try:
-                destinos.append((int(estado_id), int(cidade_id)))
-            except (TypeError, ValueError):
-                continue
+        atual = par(f"{prefix_estado}{idx}", f"{prefix_cidade}{idx}")
+        if atual:
+            destinos.append(atual)
     return destinos
 
 

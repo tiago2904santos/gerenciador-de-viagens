@@ -140,7 +140,22 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # 131 (2026-08-17): `v2/delete_modal.html`, o QUARTO e último diálogo de
         # ação. Sem ele o botão de excluir do v2 apontava para um diálogo que só
         # existia em legado — na galeria, para nenhum: o clique não fazia nada.
-        self.assertEqual(len(self.components()), 131)
+        #
+        # 134 (2026-08-17): `v2/map.html`, `v2/route_segments.html` e
+        # `v2/travel_allowance.html` — os três motores do editor de roteiro, a
+        # última tela de formulário presa ao legado fora do wizard de ofício. Os
+        # ganchos de JS vêm na letra (Leaflet, editor de trechos, cálculo de
+        # diárias); o que mudou foi a marcação em volta deles.
+        #
+        # 137 (2026-08-17): `v2/state_toggle.html`, `v2/time_stepper.html` e
+        # `v2/route_mode_toggle.html`. Os três nasceram do contrato de botão: o
+        # `test_templates_de_aplicacao_nao_reimplementam_button` proíbe `<button>`
+        # cru em template de aplicação, e os três casos do editor de roteiro
+        # (interruptor de estado, ajuste de 15 minutos, modo do roteiro) precisam
+        # de `id` e de `data-*` COM VALOR, que não cabem no `hook` do
+        # `c-v2.button`. Dentro de `templates/cotton/` o botão cru é o caminho
+        # previsto — é o diretório que o scanner exclui.
+        self.assertEqual(len(self.components()), 137)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.

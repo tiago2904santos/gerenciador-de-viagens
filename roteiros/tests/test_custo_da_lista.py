@@ -5,8 +5,8 @@ velho e `classify` decide valor de diária. A rede que escrevi lá media o eixo
 errado: **marcadores dentro de um cálculo**. O que estourou foi o outro eixo —
 **cálculos por página**.
 
-`roteiros/views.py` monta um card por roteiro, e cada card chamava
-`capitais_por_uf()`. Com 15 cards, 15 consultas a mais: o teto do `PF-07` para
+`roteiros/views.py` monta uma linha por roteiro, e cada uma chamava
+`capitais_por_uf()`. Com 15 linhas, 15 consultas a mais: o teto do `PF-07` para
 `roteiros:index` foi de 32 para **47**, e derrubou a `main` (run 651).
 
 Corrigido resolvendo o mapa **uma vez por página** e passando adiante, no mesmo
@@ -72,15 +72,17 @@ class CustoDaListaDeRoteirosTests(TestCase):
                 ordem=0,
             )
 
-    def _consultas_de_capitais(self, *, cards_esperados):
+    def _consultas_de_capitais(self, *, linhas_esperadas):
         with CaptureQueriesContext(connection) as capturadas:
             resposta = self.client.get(reverse("roteiros:index"))
         self.assertEqual(resposta.status_code, 200)
         # Sem esta asserção o teste mede uma lista vazia e passa sempre.
         self.assertEqual(
-            len(resposta.context["cards"]),
-            cards_esperados,
-            "a lista não renderizou os cards esperados; a medição não vale",
+            # `cards` virou `linhas` quando a tela migrou para o v2 (2026-08-17):
+            # a lista deixou de ser de cards e passou a ser lista simples.
+            len(resposta.context["linhas"]),
+            linhas_esperadas,
+            "a lista não renderizou as linhas esperadas; a medição não vale",
         )
         # O filtro precisa ser o `WHERE`, não a palavra "capital" solta: ela
         # aparece na lista de colunas de QUALQUER select de `Cidade`, e contar
@@ -95,18 +97,18 @@ class CustoDaListaDeRoteirosTests(TestCase):
     def test_o_mapa_de_capitais_e_resolvido_uma_vez_por_pagina(self):
         self._criar_roteiros(3)
         self.assertEqual(
-            self._consultas_de_capitais(cards_esperados=3),
+            self._consultas_de_capitais(linhas_esperadas=3),
             1,
-            "cada card resolvendo o mapa por conta própria é o NOVO-27: com 15 "
+            "cada linha resolvendo o mapa por conta própria é o NOVO-27: com 15 "
             "roteiros na página vira 15 consultas, e o teto do PF-07 estoura",
         )
 
     def test_dobrar_os_roteiros_nao_dobra_as_consultas(self):
         self._criar_roteiros(2)
-        poucos = self._consultas_de_capitais(cards_esperados=2)
+        poucos = self._consultas_de_capitais(linhas_esperadas=2)
 
         self._criar_roteiros(6)
-        muitos = self._consultas_de_capitais(cards_esperados=8)
+        muitos = self._consultas_de_capitais(linhas_esperadas=8)
 
         self.assertEqual(
             poucos,

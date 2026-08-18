@@ -192,4 +192,37 @@
       </c-slot>
     </c-v2.panel>
 
+    {% comment %}
+      As três peças do editor de roteiro. Elas trazem os próprios blocos, então
+      aparecem aqui soltas, como aparecem na tela real — embrulhá-las num painel
+      daria caixa dentro de caixa.
+
+      Sem dados: o mapa fica no lugar vazio (o Leaflet não é carregado nesta
+      página), os trechos mostram o estado "ainda não disponíveis", que é o que a
+      tela real mostra antes de haver destinos, e as diárias mostram os traços.
+    {% endcomment %}
+    <c-v2.panel title="Interruptor de estado" description="Liga e desliga uma seção inteira; o valor viaja num campo oculto.">
+      <c-slot name="body">
+        <c-v2.state_toggle input_id="v2-lab-estado" input_name="v2_lab_estado" active_label="Com bate-volta diário" inactive_label="Sem bate-volta diário" />
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Tempo com ajuste" description="Digite ou ajuste de 15 em 15 minutos.">
+      <c-slot name="body">
+        <c-v2.time_stepper input_id="v2-lab-tempo" minus_id="v2-lab-tempo-menos" plus_id="v2-lab-tempo-mais" />
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Modo do roteiro" description="Reaproveitar um roteiro salvo ou montar um novo.">
+      <c-slot name="body">
+        <c-v2.route_mode_toggle mode="ROTEIRO_PROPRIO" />
+      </c-slot>
+    </c-v2.panel>
+
+    <h3 class="v2-lab__sub">Editor de roteiro</h3>
+
+    <c-v2.map />
+    <c-v2.route_segments />
+    <c-v2.travel_allowance />
+
     {# ------------------------------------------------------------ ESTRUTURA #}

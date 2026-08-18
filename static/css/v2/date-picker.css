@@ -321,3 +321,258 @@
   transform: none;
   width: 100%;
 }
+
+/* ---- a FAIXA do intervalo ---------------------------------------------------
+ *
+ * Sem ela o intervalo não se lê como intervalo: os extremos aparecem como dois
+ * círculos soltos no mês e o meio fica igual a qualquer outro dia.
+ *
+ * As regras que desenhavam isso existem, mas em `static/css/ui/date-picker.css`
+ * escopadas em `:has(.ui-sub-header)` — o cabeçalho de uma casca LEGADA, que
+ * nenhuma tela do v2 tem. Por isso a faixa sumiu no v2 inteiro, galeria
+ * incluída.
+ *
+ * A faixa é o ACCENT CHEIO, do primeiro ao último dia (decisão do dono,
+ * 2026-08-17): o intervalo inteiro é uma faixa só, e os extremos se distinguem
+ * pela cápsula arredondada, não pela cor. Cheguei a usar um tom de 22% para
+ * separar as pontas do miolo — ficou fraco, e o que se quer ver aqui é o
+ * PERÍODO, não as duas datas.
+ *
+ * No painel do v2 a grade de dias tem `gap: 0` e o `::before` cobre a célula
+ * inteira, então os retângulos se encostam e viram uma barra contínua sem
+ * precisar transbordar de meio vão como a versão legada faz. */
+:is(html[data-theme])
+  .date-field__panel
+  .date-picker__day--range:not(.date-picker__day--range-start):not(.date-picker__day--range-end):not(.date-picker__day--selected)::before {
+  background: var(--accent);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Nas duas pontas da SEMANA a faixa arremata com um canto arredondado, senão ela
+   parece cortada no meio ao virar a linha. */
+:is(html[data-theme])
+  .date-field__panel
+  .date-picker__day--range:not(.date-picker__day--range-start):not(.date-picker__day--range-end):not(.date-picker__day--selected):nth-child(7n)::before {
+  border-radius: 0 var(--radius-field) var(--radius-field) 0;
+}
+
+:is(html[data-theme])
+  .date-field__panel
+  .date-picker__day--range:not(.date-picker__day--range-start):not(.date-picker__day--range-end):not(.date-picker__day--selected):nth-child(7n + 1)::before {
+  border-radius: var(--radius-field) 0 0 var(--radius-field);
+}
+
+/* Número BRANCO dentro do que está escolhido — faixa e pontas —, por decisão do
+   dono (2026-08-17). É `--text-on-brand`, e não `--text-on-accent`: o segundo é
+   ESCURO no tema escuro (lá o accent é amarelo), e o pedido foi branco nos dois.
+   `--text-on-brand` é branco nas duas camadas do token, então acompanha o tema
+   sem cor literal — literal aqui é reprovado por contrato
+   (`test_nao_usa_cor_literal`), e com razão: é cor que não troca com o tema. */
+:is(html[data-theme])
+  .date-field__panel
+  .date-picker__day--range:not(.date-picker__day--range-start):not(.date-picker__day--range-end):not(.date-picker__day--selected) {
+  color: var(--text-on-brand);
+}
+
+/* ---- as PONTAS do intervalo -------------------------------------------------
+ *
+ * Elas vinham da folha legada com um gradiente mais escuro que o accent
+ * (`#d8a21b` contra `#f3ae00`) e com o número em BRANCO — ou seja, dentro de um
+ * mesmo intervalo havia três tratamentos: ponta escura com texto branco, faixa
+ * accent com texto escuro, e o fundo do painel. Medido.
+ *
+ * Aqui o intervalo é UMA cor: as pontas usam o mesmo accent cheio da faixa, com
+ * o mesmo texto de contraste. O que as distingue é a FORMA — o arredondado fica
+ * só na borda de fora, e o lado que encosta na faixa é reto, para as três peças
+ * lerem como uma faixa só com as pontas em cápsula. */
+:is(html[data-theme]) .date-field__panel .date-picker__day--selected::before,
+:is(html[data-theme]) .date-field__panel .date-picker__day--range-start::before,
+:is(html[data-theme]) .date-field__panel .date-picker__day--range-end::before {
+  background: var(--accent);
+  border: 0;
+  box-shadow: none;
+}
+
+:is(html[data-theme]) .date-field__panel .date-picker__day--selected,
+:is(html[data-theme]) .date-field__panel .date-picker__day--range-start,
+:is(html[data-theme]) .date-field__panel .date-picker__day--range-end {
+  color: var(--text-on-brand);
+}
+
+/* O achatamento só vale quando HÁ intervalo. Com uma data escolhida só — o
+   estado entre o primeiro e o segundo clique — o dia é `--range-start` sozinho, e
+   com a regra incondicional ele saía como meia cápsula apontando para um fim que
+   ainda não existe. Data única é CÍRCULO.
+ *
+ * O `:has` pergunta à grade se existe o outro extremo (ou algum dia de miolo,
+ * para o caso de o fim cair no mês seguinte e não estar à vista). Sem essa
+ * pergunta não há como saber: a informação está em OUTRO elemento, não neste. */
+:is(html[data-theme])
+  .date-field__panel
+  .date-picker__days:has(.date-picker__day--range-end, .date-picker__day--range:not(.date-picker__day--range-start))
+  .date-picker__day--range-start:not(.date-picker__day--range-end)::before {
+  border-radius: var(--radius-pill) 0 0 var(--radius-pill);
+}
+
+:is(html[data-theme])
+  .date-field__panel
+  .date-picker__days:has(.date-picker__day--range-start, .date-picker__day--range:not(.date-picker__day--range-end))
+  .date-picker__day--range-end:not(.date-picker__day--range-start)::before {
+  border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
+}
+
+/* O ponto do "hoje" dentro da seleção fica BRANCO nos dois temas, como o número
+   ao lado dele: fora dela o ponto é da cor de destaque, e sobre o accent cheio
+   ele desaparecia — no tema escuro virava um furo escuro no meio da faixa
+   amarela. `--text-on-brand` é branco nas duas camadas do token. */
+:is(html[data-theme]) .date-field__panel .date-picker__day--range::after,
+:is(html[data-theme]) .date-field__panel .date-picker__day--selected::after,
+:is(html[data-theme]) .date-field__panel .date-picker__day--range-start::after,
+:is(html[data-theme]) .date-field__panel .date-picker__day--range-end::after {
+  background: var(--text-on-brand);
+  box-shadow: none;
+}
+
+/* ---- seleção de VÁRIAS datas (o calendário dos trechos) ---------------------
+ *
+ * Mesmo desenho do intervalo, com as classes que o `date-picker.js` usa no modo
+ * `multi`: `--multi-selected` em todo dia escolhido, `--multi-single` no que
+ * está isolado, e `--multi-start/-middle/-end` quando eles caem em sequência.
+ *
+ * Sem estas regras o modo múltiplo ficava com a cápsula do legado — gradiente
+ * mais escuro que o accent e número branco —, enquanto o intervalo ao lado, na
+ * mesma tela, já era accent cheio. Duas seleções de datas com dois desenhos.
+ */
+:is(html[data-theme]) .date-field__panel .date-picker__day--multi-selected::before {
+  background: var(--accent);
+  border: 0;
+  box-shadow: none;
+}
+
+:is(html[data-theme]) .date-field__panel .date-picker__day--multi-selected {
+  color: var(--text-on-brand);
+}
+
+:is(html[data-theme]) .date-field__panel .date-picker__day--multi-selected::after {
+  background: var(--text-on-brand);
+  box-shadow: none;
+}
+
+/* Data isolada é CÍRCULO; em sequência, a cápsula abre só para fora e o lado que
+   encosta na vizinha é reto — as três formas do intervalo, pelos mesmos motivos. */
+:is(html[data-theme]) .date-field__panel .date-picker__day--multi-single::before {
+  border-radius: var(--radius-pill);
+}
+
+:is(html[data-theme])
+  .date-field__panel
+  .date-picker__day--multi-start:not(.date-picker__day--multi-single)::before {
+  border-radius: var(--radius-pill) 0 0 var(--radius-pill);
+}
+
+:is(html[data-theme])
+  .date-field__panel
+  .date-picker__day--multi-end:not(.date-picker__day--multi-single)::before {
+  border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
+}
+
+:is(html[data-theme]) .date-field__panel .date-picker__day--multi-middle::before {
+  border-radius: 0;
+}
+
+/* ---- o número da ordem no dia ----------------------------------------------
+ *
+ * Bolinha no canto superior direito do dia, com 1, 2, 3… — a posição daquela
+ * data na sequência de trechos. Substitui a lista de trechos que ficava no topo
+ * do painel: a informação é a mesma, e no próprio dia ela não empurra o
+ * calendário para baixo.
+ *
+ * A folha legada já a desenhava, mas com `--color-white`, `--color-primary-strong`
+ * e uma sombra própria — três valores que o v2 não usa. Aqui ela é o inverso do
+ * dia escolhido: fundo na superfície do painel, contorno e número no accent.
+ */
+:is(html[data-theme]) .date-field__panel .date-picker__day-badge {
+  /* Círculo no canto superior direito, encostado na borda da cápsula. Ele é o
+     NEGATIVO do dia escolhido: fundo na cor do painel, número no accent — sobre
+     a cápsula accent, um círculo accent desapareceria.
+
+     O anel na cor do painel (`box-shadow`, não `border`) é o que o descola da
+     cápsula sem comer o espaço do número: borda encolhe o conteúdo, sombra
+     desenha por fora. Sem ele o círculo encosta no amarelo e os dois viram uma
+     mancha só. */
+  /* `position: absolute` DECLARADO aqui: a folha legada que o declarava
+     (`fields/date-picker.css`) não entra no pacote desta tela, e sem ela o
+     círculo caía no fluxo dentro do botão — empurrava o número do dia para o
+     lado e ficava 12px abaixo do topo (medido). Omitir o que a folha antiga
+     dava é o erro clássico desta migração. */
+  align-items: center;
+  background: var(--surface-rail);
+  border: 0;
+  border-radius: var(--radius-pill);
+  pointer-events: none;
+  position: absolute;
+  z-index: 4;
+  box-shadow: 0 0 0 2px var(--surface-rail);
+  color: var(--accent);
+  display: inline-flex;
+  font-size: 10px;
+  font-weight: var(--weight-strong);
+  height: 18px;
+  justify-content: center;
+  line-height: 1;
+  min-width: 18px;
+  /* No CANTO superior direito. O anel na cor do painel é o que evita que ele se
+     confunda com a cápsula do dia vizinho quando duas datas caem lado a lado. */
+  left: auto;
+  padding: 0 3px;
+  right: -5px;
+  top: -6px;
+}
+
+/* Dia ESCOLHIDO não apaga quando o calendário trava a escolha. No modo múltiplo
+   o motor desabilita os dias assim que o número de datas fecha (o roteiro pede
+   uma por trecho), e a regra geral de desabilitado derruba a opacidade para
+   0.35 — as datas já escolhidas ficavam lavadas, enquanto no bate-volta, que não
+   trava nada, a faixa continuava sólida. Duas telas com o mesmo estado pintadas
+   de dois jeitos. O que está escolhido é resultado, não controle indisponível. */
+:is(html[data-theme]) .date-field__panel .date-picker__day--multi-selected[disabled],
+:is(html[data-theme]) .date-field__panel .date-picker__day--range[disabled],
+:is(html[data-theme]) .date-field__panel .date-picker__day--selected[disabled] {
+  opacity: 1;
+}
+
+/* ---- a faixa arremata na PAREDE DA SEMANA ----------------------------------
+ *
+ * A grade tem sete colunas: a última é `7n` e a primeira, `7n + 1`. Quando a
+ * faixa encosta nelas, o canto que toca a parede arredonda — sem isso a barra
+ * parecia cortada a faca ao virar a linha, e a mesma seleção lia como dois
+ * blocos sem relação.
+ *
+ * Vale para os três papéis: o miolo do intervalo (regra acima), o miolo da
+ * seleção múltipla e as pontas que por acaso caem na parede — uma ponta na
+ * borda fecha dos dois lados, porque não há vizinho para emendar.
+ */
+/* O arremate é `--radius-field`, o MESMO do miolo do intervalo (regra acima) —
+   não a pílula. A pílula é a forma das PONTAS da seleção, e usá-la também na
+   parede fazia cada semana parecer uma seleção fechada em si. */
+:is(html[data-theme]) .date-field__panel .date-picker__day--multi-middle:nth-child(7n)::before {
+  border-radius: 0 var(--radius-field) var(--radius-field) 0;
+}
+
+:is(html[data-theme]) .date-field__panel .date-picker__day--multi-middle:nth-child(7n + 1)::before {
+  border-radius: var(--radius-field) 0 0 var(--radius-field);
+}
+
+/* Uma PONTA que calha de cair na parede mantém a pílula do lado de fora e
+   arremata com o canto de campo do lado que toca a parede. */
+:is(html[data-theme]) .date-field__panel .date-picker__day--multi-start:nth-child(7n)::before,
+:is(html[data-theme]) .date-field__panel .date-picker__day--range-start:nth-child(7n)::before {
+  border-radius: var(--radius-pill) var(--radius-field) var(--radius-field) var(--radius-pill);
+}
+
+:is(html[data-theme]) .date-field__panel .date-picker__day--multi-end:nth-child(7n + 1)::before,
+:is(html[data-theme]) .date-field__panel .date-picker__day--range-end:nth-child(7n + 1)::before {
+  border-radius: var(--radius-field) var(--radius-pill) var(--radius-pill) var(--radius-field);
+}

@@ -3170,6 +3170,7 @@
       }
     }
 
+
     function positionPanel() {
       if (panel.parentElement !== document.body) {
         /* O painel vai para o `body` e perde os ancestrais — com eles some a
@@ -3580,9 +3581,15 @@
             multiStepIndexes.push(stepIndex);
           }
         }
-        var multiStepIndex = multiStepIndexes.length ? multiStepIndexes[0] : -1;
-        var hasMiddleStep = multiStepIndex > 0 && multiStepIndex < selectedDates.length - 1;
-        if (hasMiddleStep || multiStepIndexes.length > 1) {
+        /* O número aparece nos trechos DO MEIO. O primeiro e o último não
+         * precisam: um é o começo da viagem e o outro é a volta, e a posição
+         * deles na sequência já se lê pela própria data — o mais cedo e o mais
+         * tarde. Numerar os quatro polui o calendário com o que ele já mostra. */
+        var ultimoPasso = routeSteps.length - 1;
+        var temPassoDoMeio = multiStepIndexes.some(function (index) {
+          return index > 0 && index < ultimoPasso;
+        });
+        if (temPassoDoMeio) {
           var badge = document.createElement('span');
           badge.className = 'date-picker__day-badge';
           badge.textContent = multiStepIndexes.map(function (index) {

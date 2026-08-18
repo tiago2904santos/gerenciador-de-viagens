@@ -1,0 +1,101 @@
+{% comment %}
+  Editor de roteiro no v2 (2026-08-17) — o formulário da tela `roteiros:novo` e
+  `roteiros:editar`.
+
+  O legado equivalente (`_roteiro_editor.html`) continua vivo e NÃO foi tocado:
+  ele também serve a etapa de roteiro do wizard de ofício
+  (`oficios/wizard_roteiro.html`), que é a última tela da fila de migração. Os
+  dois convivem até lá; o que muda entre eles é só a marcação.
+
+  O motor é o mesmo, e é ele que dita o que aqui não pode mudar de nome:
+
+  - `#roteiro-editor-form` — `editor/index.js`, `roteiros.js` e `roteiros-map.js`
+    acham o formulário por este id;
+  - os `data-api-*` e `data-autosave-*` no `<form>` — são as URLs que o editor
+    chama para cidades, diárias, rota e rascunho automático;
+  - os campos ocultos `id_tipo_destino`, `id_quantidade_diarias`,
+    `id_valor_diarias`, `id_valor_diarias_extenso` e os seis `map_route_*` —
+    é neles que o resultado do cálculo e da rota é gravado para o POST;
+  - `#roteiro-selector-wrapper` e `#panel-roteiro-novo` — os dois lados do modo
+    (roteiro salvo × roteiro novo), que `editor/source-toggle.js` alterna;
+  - `data-glance-state` no invólucro — o "olhar rápido" do `roteiros-wizard.js`.
+
+  A `roteiro-wizard__editor` continua no invólucro porque `roteiros-wizard.js`
+  procura o estado nela; `roteiro-editor--oficio` NÃO entra, e é assim que o JS
+  sabe que esta tela é a avulsa.
+{% endcomment %}
+<div class="roteiro-wizard__editor roteiro-editor--avulso" data-glance-state="closed">
+  <form
+    method="post"
+    id="roteiro-editor-form"
+    novalidate
+    class="form-page__form"
+    {% if roteiro_form_action %}action="{{ roteiro_form_action }}"{% endif %}
+    data-autosave="true"
+    data-autosave-model="roteiro"
+    data-autosave-url="{% if object %}{% url 'roteiros:roteiro-autosave' object.pk %}{% endif %}"
+    data-autosave-create-url="{% url 'roteiros:roteiro-autosave-create' %}{% if evento %}?evento={{ evento.pk }}{% endif %}"
+    data-autosave-edit-url-template="/roteiros/__ID__/autosave/"
+    data-autosave-object-id="{{ object.pk|default:'' }}"
+    data-api-cidades-url="{{ api_cidades_por_estado_url }}"
+    data-api-diarias-url="{{ api_calcular_diarias_url }}"
+    data-api-calcular-rota-url="{{ api_calcular_rota_url }}"
+    data-api-calcular-rota-preview-url="{{ api_calcular_rota_preview_url }}"
+    data-destino-estado-default-id="{{ destino_estado_fixo_id|default:'' }}"
+    data-url-trechos-estimar="{% url 'roteiros:trechos_estimar' %}"
+    data-diarias-quantidade-servidores="{{ diarias_quantidade_servidores|default:1 }}"
+  >
+    {% csrf_token %}
+    <input type="hidden" name="autosave_obj_id" id="id_autosave_obj_id" value="{{ object.pk|default:'' }}">
+    <span class="sr-only" id="roteiro-autosave-status" aria-live="polite"></span>
+    <input type="hidden" name="quantidade_servidores" id="id_quantidade_servidores" value="{{ diarias_quantidade_servidores|default:1 }}">
+    <input type="hidden" name="tipo_destino" id="id_tipo_destino" value="{{ roteiro_diarias_resultado.tipo_destino|default:'' }}">
+    <input type="hidden" name="quantidade_diarias" id="id_quantidade_diarias" value="{{ roteiro_diarias_resultado.totais.total_diarias|default:'' }}">
+    <input type="hidden" name="valor_diarias" id="id_valor_diarias" value="{{ roteiro_diarias_resultado.totais.total_valor|default:'' }}">
+    <input type="hidden" name="valor_diarias_extenso" id="id_valor_diarias_extenso" value="{{ roteiro_diarias_resultado.totais.valor_extenso|default:'' }}">
+    <input type="hidden" name="map_route_geometry_json" id="id_map_route_geometry_json" value="">
+    <input type="hidden" name="map_route_points_json" id="id_map_route_points_json" value="">
+    <input type="hidden" name="map_route_distance_km" id="id_map_route_distance_km" value="">
+    <input type="hidden" name="map_route_duration_minutes" id="id_map_route_duration_minutes" value="">
+    <input type="hidden" name="map_route_provider" id="id_map_route_provider" value="">
+    <input type="hidden" name="map_route_calculated_at" id="id_map_route_calculated_at" value="">
+
+    <c-v2.form_errors :errors="form.non_field_errors" />
+
+    <c-v2.panel
+      title="Roteiro e diárias"
+      description="Origem, percurso, deslocamentos e cálculo financeiro."
+    >
+      <c-slot name="body">
+        {% include "roteiros/partials/roteiro/v2/_origem_body.html" with estados=estados form=form has_event_routes=has_event_routes roteiro_id=roteiro_id roteiro_modo=roteiro_modo sede_cidade_id=sede_cidade_id sede_cidades_qs=sede_cidades_qs sede_estado_id=sede_estado_id destinos_rows=destinos_rows only %}
+
+        {% include "roteiros/partials/roteiro/v2/_bate_volta.html" with estado=roteiro_editor_state_json.bate_volta_diario only %}
+
+        <c-v2.map />
+
+        <c-v2.route_segments :retorno="retorno_state" />
+
+        {% comment %}
+          O resultado do cálculo NÃO é passado por atributo: o componente o lê do
+          contexto (`roteiro_diarias_resultado`), porque variável usada só dentro
+          de atributo de filho é invisível para o contrato de `cotton:vars`.
+        {% endcomment %}
+        <c-v2.travel_allowance :quantidade_servidores="diarias_quantidade_servidores" />
+
+        <c-v2.card_footer>
+          <c-slot name="secondary">
+            <c-v2.button :label="wizard_back_label" icon="arrow-left" :href="wizard_back_url" />
+          </c-slot>
+          <c-slot name="primary">
+            <c-v2.button label="Salvar roteiro" variant="primary" icon="check" type="submit" />
+          </c-slot>
+        </c-v2.card_footer>
+      </c-slot>
+    </c-v2.panel>
+  </form>
+</div>
+
+{{ roteiro_editor_state_json|default:'{}'|json_script:"roteiro-editor-state-data" }}
+{{ roteiro_routes_json|default_if_none:''|json_script:"roteiro-editor-routes-data" }}
+{{ roteiro_diarias_resultado|default_if_none:''|json_script:"roteiro-editor-diarias-data" }}
+{{ roteiro_mapa_inicial|json_script:"roteiro-mapa-inicial" }}

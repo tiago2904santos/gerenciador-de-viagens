@@ -1,0 +1,77 @@
+{% cotton:vars quantidade_servidores %}
+{% comment %}
+  Diárias v2 — o resumo financeiro do roteiro. Par de
+  `static/css/v2/travel-allowance.css`.
+
+  Quem calcula é `js/pages/roteiros/editor/index.js` (`calculateDiarias`), a
+  partir dos trechos e da equipe. Aqui só se mostra o resultado, e cada gancho é
+  contrato dele:
+
+  - `#diarias-valor`, `#diarias-extenso`, `#diarias-tipo`, `#diarias-qtd` — os
+    quatro números. O JS escreve em `.textContent`;
+  - `#diarias-error` — a falha do cálculo, no alerta global;
+  - `#diarias-header-chip` — o "cálculo atualizado", que aparece depois de cada
+    recálculo bem-sucedido;
+  - `#diarias-status` — a região viva que anuncia o estado. **Ela não existia em
+    lugar nenhum do sistema** (medido em 2026-08-17: nenhum template a
+    renderizava), e `setDiariasStatus` começa com `if (!status) return;` — ou
+    seja, o chip acima também nunca aparecia. Repô-la aqui devolve os dois.
+
+  `resultado` NÃO é declarado, e isso é intencional: o `contrato()` que valida
+  `cotton:vars` não enxerga variável usada só dentro de atributo de componente
+  FILHO, e declarar uma que ele não vê quebra o contrato. O valor chega pelo
+  contexto de quem inclui (o editor passa `roteiro_diarias_resultado`), que é o
+  mesmo caminho do `download_picker` e dos diálogos de ação.
+
+  Os valores vêm em `c-v2.fact`, a mesma peça do cartão da lista: valor total em
+  destaque, com o extenso como nota, e os dois secundários ao lado. No legado
+  eram `summary-item` com `summary-value--principal`, um vocabulário que só esta
+  tela usava.
+{% endcomment %}
+<c-v2.form_block
+  title="Diárias"
+  description="Resumo financeiro calculado pelo roteiro e pela equipe."
+  extra_class="travel-allowance"
+>
+  <c-slot name="actions">
+    <span class="chip--v2" data-tone="progress" id="diarias-header-chip" hidden aria-live="polite">
+      <span class="chip__label">Cálculo atualizado.</span>
+    </span>
+  </c-slot>
+
+  <c-slot name="body">
+    <span class="sr-only" id="diarias-status" role="status" aria-live="polite">Aguardando dados para cálculo.</span>
+    <p class="alert" data-tone="error" id="diarias-error" hidden role="alert"></p>
+
+    {% if quantidade_servidores == 0 %}
+      <p class="alert" data-tone="info" id="diarias-aviso-sem-viajantes" role="status">
+        Selecione ao menos um viajante na Etapa 1 para calcular o valor total das diárias.
+      </p>
+    {% endif %}
+
+    <div class="fact-list travel-allowance__facts">
+      {% comment %}
+        Atributos INTERPOLADOS (`{{ }}`), e não `:value="...|default:'—'"`: com
+        dois pontos a expressão é repassada para o componente filho avaliar e o
+        filtro não roda — o valor sai vazio, o fato cai no estado "não informado"
+        e, pior, o `note` some junto com o `id` que o cálculo procura. Medido
+        aqui e no título do `c-v2.map`, no mesmo dia.
+
+        O traço e o "Não informado" existem porque a tela ABRE sem cálculo: o
+        editor só calcula depois que há trechos, e um espaço em branco no lugar
+        do valor parece defeito.
+      {% endcomment %}
+      <c-v2.fact
+        label="Valor total"
+        value="{{ roteiro_diarias_resultado.totais.total_valor|default:'—' }}"
+        value_id="diarias-valor"
+        note_label="Valor por extenso"
+        note="{{ roteiro_diarias_resultado.totais.valor_extenso|default:'Não informado' }}"
+        note_id="diarias-extenso"
+        :strong="True"
+      />
+      <c-v2.fact label="Tipo de destino" value="{{ roteiro_diarias_resultado.tipo_destino|default:'—' }}" value_id="diarias-tipo" />
+      <c-v2.fact label="Quantidade de diárias" value="{{ roteiro_diarias_resultado.totais.total_diarias|default:'—' }}" value_id="diarias-qtd" />
+    </div>
+  </c-slot>
+</c-v2.form_block>

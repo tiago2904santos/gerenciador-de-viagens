@@ -20,9 +20,15 @@
   min-width: 0;
 }
 
-/* ---- o campo de busca --------------------------------------------------- */
+/* ---- o campo de busca ---------------------------------------------------
+ *
+ * `.field` entrou na lista em 2026-08-17: um picker posto dentro do campo do v2
+ * (a sede do roteiro, por exemplo) não casava com nenhuma das duas raízes e
+ * ficava com a pintura do legado — fundo transparente e raio de 12px, contra o
+ * `#223348` e os 8px do picker de destinos, na mesma tela e um debaixo do outro.
+ */
 
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__control {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__control {
   align-items: center;
   background: var(--surface-contrast, var(--surface-field));
   border: 1px solid transparent;
@@ -45,16 +51,16 @@
   padding: var(--pad-field);
 }
 
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__input {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__input {
   color: var(--text-strong);
   font: inherit;
 }
 
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__control:focus-within {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__control:focus-within {
   border-color: var(--focus-ring);
 }
 
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__input {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__input {
   background: none;
   border: 0;
   color: var(--text-strong);
@@ -65,18 +71,18 @@
   outline: none !important;
 }
 
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__input::placeholder {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__input::placeholder {
   color: var(--text-muted);
 }
 
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__icon {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__icon {
   align-items: center;
   color: var(--text-muted);
   display: inline-flex;
   flex: none;
 }
 
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__clear {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__clear {
   background: none;
   border: 0;
   color: var(--text-muted);
@@ -104,7 +110,7 @@
  * Declarando aqui, a caixa fica num degrau e os itens no oposto, que é a regra
  * do resto do sistema. A borda sai junto: separação entre camadas é superfície,
  * não linha. */
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-panel {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-panel {
   /* A caixa dos escolhidos não desenha mais NADA: quem faz o box é o
      `form_block` em volta, e o painel dentro dele era caixa dentro de caixa —
      dois raios, dois recuos e duas superfícies para uma seção só. Sobrou a
@@ -129,7 +135,7 @@
    título do `form_block` já nomeia a seção, e repeti-lo logo abaixo dizia duas
    vezes a mesma coisa. O contador some com ele — a lista tem no máximo três
    itens visíveis, e contar até três não precisa de selo. */
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-header {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-header {
   display: none;
 }
 
@@ -137,7 +143,7 @@
    do cartão que vai aparecer ali quando houver escolha: altura, raio e degrau
    iguais. Assim a caixa não salta de tamanho no primeiro item, e o lugar onde
    os escolhidos vão morar já está visível antes de existir algum. */
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-empty {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-empty {
   align-items: center;
   background: var(--surface-contrast, var(--surface-field));
   border: 0;
@@ -167,7 +173,7 @@
    É a TERCEIRA vez que este mesmo descuido aparece nesta migração: aconteceu
    com o menu de ações e com o estado vazio do painel. Sempre que uma regra do
    v2 declara `display`, ela precisa declarar o par `[hidden]`. */
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-empty[hidden] {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-empty[hidden] {
   display: none;
 }
 
@@ -181,7 +187,7 @@
  * A altura do item é DECLARADA, não deduzida do conteúdo: é ela que define
  * quantos cabem, e o teto é um múltiplo exato dela. Deduzir faria o corte cair
  * no meio de um cartão assim que um nome ocupasse duas linhas. */
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-list {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-list {
   --escolhido-height: 56px;
 
   display: grid;
@@ -195,14 +201,14 @@
   scrollbar-width: thin;
 }
 
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-card {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-card {
   min-height: var(--escolhido-height);
 }
 
 /* Estar na lista já é o estado normal do escolhido: um degrau da escada, sem
    realce. O destaque de accent fica reservado ao que se DESTACA entre eles —
    ver o bloco do motorista e da viatura, mais abaixo. */
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-card {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-card {
   align-items: center;
   background: var(--surface-contrast, var(--surface-field));
   border: 0;
@@ -220,7 +226,7 @@
 /* A mesma âncora da opção da lista (`v2/listbox.css`): o item que se escolhe e
    o que fica escolhido têm de ser reconhecíveis como a mesma coisa. Antes o
    contorno vinha de uma regra legada, num azul que não era o accent do tema. */
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-avatar {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-avatar {
   align-items: center;
   background: color-mix(in srgb, var(--accent) 16%, transparent);
   border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
@@ -235,23 +241,23 @@
   width: 36px;
 }
 
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-main {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-main {
   display: grid;
   gap: 2px;
   min-width: 0;
 }
 
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-name {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-name {
   font-size: var(--text-size-base);
   font-weight: var(--weight-strong);
 }
 
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-meta {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-meta {
   color: var(--text-muted);
   font-size: var(--text-size-eyebrow);
 }
 
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-empty {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-empty {
   color: var(--text-muted);
   font-size: var(--text-size-base);
   margin: 0;
@@ -267,7 +273,7 @@
  *
  * `margin-left: auto` empurra para o fim da faixa e cancela a margem negativa
  * numa declaração só. */
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove {
   background: none;
   border: 0;
   color: var(--text-muted);
@@ -294,14 +300,14 @@
  *
  * Trava a caixa inteira, não só o `transform`: largura, altura, margem e recuo
  * juntos, porque qualquer um deles desloca o que está ao lado. */
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove,
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:hover,
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:focus,
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:focus-visible,
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:active,
-:is(html[data-theme]) :is(.picker, .destination-row)
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove,
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove:hover,
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove:focus,
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove:focus-visible,
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove:active,
+:is(html[data-theme]) :is(.picker, .destination-row, .field)
   .search-picker__selected-card:hover .search-picker__remove,
-:is(html[data-theme]) :is(.picker, .destination-row)
+:is(html[data-theme]) :is(.picker, .destination-row, .field)
   .search-picker__selected-card:focus-within .search-picker__remove {
   background: none;
   border: 0;
@@ -319,7 +325,7 @@
 }
 
 /* O conteúdo ocupa o que sobra, para o botão ter para onde ser empurrado. */
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-main {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-main {
   flex: 1 1 auto;
 }
 
@@ -340,21 +346,21 @@
 /* Sob o mouse muda a COR, e só: vermelho de perigo, avisando o que o botão faz.
    Nenhum anel, nenhum fundo, nenhuma borda — foi o anel de `outline` no hover,
    herdado do legado, que parecia foco e aparecia sem ninguém ter usado o Tab. */
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:hover {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove:hover {
   color: var(--danger);
 }
 
 /* Nada de anel fora do teclado. O legado põe `outline` no HOVER — é ele que
    aparecia ao passar o mouse e que parecia foco. E `:focus:not(:focus-visible)`
    cobre o clique, onde o foco existe mas não deve se anunciar. */
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove,
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:hover,
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:active,
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:focus:not(:focus-visible) {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove,
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove:hover,
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove:active,
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove:focus:not(:focus-visible) {
   outline: none !important;
 }
 
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__remove:focus-visible {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__remove:focus-visible {
   border-radius: var(--radius-pill);
   outline: 2px solid var(--focus-ring) !important;
   outline-offset: 2px;
@@ -530,7 +536,7 @@
    primeiro cartão. O que eu tinha visto era uma lista vazia porque não havia
    ofício a mostrar, e a exclusão só devolveu o vão dobrado entre o campo e a
    faixa de "nenhum resultado". */
-:is(html[data-theme]) :is(.picker, .destination-row) .search-picker__selected-list:empty {
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__selected-list:empty {
   display: none;
 }
 

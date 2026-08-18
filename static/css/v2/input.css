@@ -89,3 +89,24 @@
   padding: 10px 12px;
   resize: vertical;
 }
+
+/* ---- só leitura -------------------------------------------------------------
+ *
+ * Campo `readonly` tem a MESMA aparência do campo comum — a diferença é só não
+ * aceitar digitação (decisão do dono, 2026-08-17). As folhas legadas
+ * (`base/base.css`, `fields/forms.css`) pintam `input[readonly]` com fundo,
+ * contorno e texto próprios, e como esta folha não declarava nada, quem mandava
+ * era a regra antiga: medido `#243541` com traço claro e texto acinzentado,
+ * contra `#223348` sem traço e texto branco do campo comum. Lado a lado — a
+ * distância do mapa ao lado da hora do trecho — pareciam dois componentes.
+ *
+ * O cursor continua o de texto e o campo segue selecionável: o valor é para ser
+ * lido e copiado. Quem informa que não se digita ali é o `aria-readonly`, que o
+ * leitor de tela anuncia. */
+:is(html[data-theme]) .input__control[readonly],
+:is(html[data-theme]) .cv-field__control[readonly] {
+  background: var(--surface-contrast, var(--surface-field));
+  border-color: transparent;
+  color: var(--text-strong);
+  opacity: 1;
+}

@@ -91,7 +91,17 @@ export function initRoteirosEditor() {
     var picker = getTrechosDatePicker();
     var park = $('trechos-date-picker-park');
     if (!picker || !park) return;
-    if (picker.parentNode !== park) park.appendChild(picker);
+    var movel = trechosDatePickerMovel(picker);
+    if (movel.parentNode !== park) park.appendChild(movel);
+  }
+  /* O que se move é o INVÓLUCRO `.date-field`, não o calendário nu: é dele que o
+   * `date-picker.js` copia a marca `date-field__panel` para o painel na hora de
+   * transplantá-lo para o `body`. Movendo só o miolo, o calendário dos trechos
+   * saía do v2 e ficava com a aparência do legado — a única peça da tela assim. */
+  function trechosDatePickerMovel(picker) {
+    if (!picker) return picker;
+    var campo = picker.closest ? picker.closest('.date-field') : null;
+    return campo || picker;
   }
   function placeTrechosDatePickerInFirstHeader() {
     var picker = getTrechosDatePicker();
@@ -100,11 +110,12 @@ export function initRoteirosEditor() {
     var slot = document.querySelector(
       '#trechos-gerados-container [data-trechos-date-picker-slot]'
     );
+    var movel = trechosDatePickerMovel(picker);
     if (slot) {
-      slot.appendChild(picker);
+      slot.appendChild(movel);
       return;
     }
-    if (picker.parentNode !== park) park.appendChild(picker);
+    if (movel.parentNode !== park) park.appendChild(movel);
   }
   function mountTrechosHtml(html) {
     var container = $('trechos-gerados-container');
@@ -634,13 +645,19 @@ export function initRoteirosEditor() {
     if (suggestArrival && $('id_retorno_saida_data') && $('id_retorno_saida_hora') && $('id_retorno_chegada_data') && $('id_retorno_chegada_hora')) {
       var rsd = $('id_retorno_saida_data').value;
       var rsh = $('id_retorno_saida_hora').value;
+      /* Escrever no oculto NAO basta: o campo visivel do calendario e outro
+         elemento (`..._display`), e o componente so o le ao iniciar. A chegada
+         do retorno era calculada certo e ficava invisivel — a pessoa via
+         "dd/mm/aaaa" com o tempo total ja preenchido ao lado. `setRoteiroDatePickerValue`
+         escreve nos dois e avisa o componente, que e o mesmo caminho que os
+         cards de trecho ja usavam. */
       if (!rsd || !rsh || tot2 <= 0) {
-        $('id_retorno_chegada_data').value = '';
+        setRoteiroDatePickerValue('id_retorno_chegada_data', 'id_retorno_chegada_data_display', '');
         $('id_retorno_chegada_hora').value = '';
       } else {
         var rCheg = calcularChegada(rsd, rsh, cru2, add2);
         if (rCheg) {
-          $('id_retorno_chegada_data').value = rCheg.data;
+          setRoteiroDatePickerValue('id_retorno_chegada_data', 'id_retorno_chegada_data_display', rCheg.data);
           $('id_retorno_chegada_hora').value = rCheg.hora;
         }
       }
@@ -1350,9 +1367,9 @@ export function initRoteirosEditor() {
     if (chip) {
       if (state === 'updated') {
         chip.querySelector('.chip__label').textContent = text || 'Cálculo atualizado.';
-        chip.classList.remove('d-none');
+        chip.hidden = false;
       } else {
-        chip.classList.add('d-none');
+        chip.hidden = true;
       }
     }
   }
@@ -1361,7 +1378,7 @@ export function initRoteirosEditor() {
     var errEl = $('diarias-error');
     if (errEl) {
       errEl.textContent = '';
-      errEl.classList.add('d-none');
+      errEl.hidden = true;
     }
     $('diarias-tipo').textContent = result && result.tipo_destino ? result.tipo_destino : '-';
     $('diarias-qtd').textContent = totais && totais.total_diarias ? totais.total_diarias : '-';
@@ -1376,7 +1393,7 @@ export function initRoteirosEditor() {
     var errEl = $('diarias-error');
     if (errEl) {
       errEl.textContent = '';
-      errEl.classList.add('d-none');
+      errEl.hidden = true;
     }
     applyDiarias(null);
     setDiariasStatus('pending', 'Aguardando dados para cálculo.');
@@ -1419,7 +1436,7 @@ export function initRoteirosEditor() {
     var errPre = $('diarias-error');
     if (errPre) {
       errPre.textContent = '';
-      errPre.classList.add('d-none');
+      errPre.hidden = true;
     }
     setDiariasStatus('pending', 'Calculando diárias...');
     return window.CV.http.fetchJson(apiDiarias, {
@@ -1451,7 +1468,7 @@ export function initRoteirosEditor() {
         var errBox = $('diarias-error');
         if (errBox) {
           errBox.textContent = msg;
-          errBox.classList.remove('d-none');
+          errBox.hidden = false;
         }
         setDiariasStatus('error', 'Falha no cálculo.');
       }).finally(function() {
@@ -1596,7 +1613,8 @@ export function initRoteirosEditor() {
     var panel = $('roteiro-selector-wrapper');
     var routeInput = getSelectedRouteInput();
     if (panel) {
-      panel.classList.toggle('d-none', !em);
+      /* `hidden` sozinho: o `d-none` era redundante (a linha de baixo ja
+         escondia o painel) e e classe do Bootstrap legado, que o v2 nao tem. */
       panel.hidden = !em;
     }
     if (routeInput) routeInput.disabled = !em || !routes.length;

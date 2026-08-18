@@ -1,4 +1,4 @@
-{% cotton:vars cities_url estados extra_class id rows title %}
+{% cotton:vars cities_url estados extra_class id list_id managed rows template_id title %}
 {% comment %}
   Destinos v2 — a seção completa: linhas de estado e cidade, adicionar, remover
   e reordenar por arraste.
@@ -15,6 +15,13 @@
   `js/pages/termos-form.js` faz isso para copiar o destino do ofício vinculado.
   Sem ele a seção renderiza e a cópia para de acontecer, sem erro nenhum.
 
+  `list_id` e `template_id` são a mesma história do `id`, um nível abaixo: o
+  editor de roteiro procura a LISTA (`destinos-container`) e o MOLDE
+  (`tmpl-destino-roteiro`) por id, porque reindexa as linhas e clona o molde por
+  conta própria — ele faz mais coisa com os destinos do que as outras telas
+  (recalcula trechos, rota e diárias a cada mudança). Sem eles a seção renderiza
+  e o editor não acha o que reindexar.
+
   `estados` e `cities_url` existem para quem tiver motivo para contrariar a
   busca automática — uma tela que filtre estados, por exemplo. Fora isso, não
   passe: são as duas linhas que, esquecidas, faziam a seção renderizar bonita e
@@ -29,6 +36,13 @@
   sozinho — sem isso, cada tela precisava chamar `initManagedRows` no próprio
   script, que é como as 4 telas legadas ainda fazem.
 
+  `:managed="False"` desliga essa auto-ligação, e existe por um defeito medido: o
+  editor de roteiro JÁ liga o motor por conta própria (ele precisa disso para
+  recalcular trechos, rota e diárias a cada mudança de destino), e com os dois
+  ligados **um clique em "+" inseria DUAS linhas**. Só desligue aqui quem já
+  chama `initManagedRows`; desligar sem substituto deixa a seção sem motor
+  nenhum, e ela renderiza igual.
+
   Trocar o nome de qualquer um desses ganchos desliga a seção EM SILÊNCIO: a
   página não dá erro, os campos só param de responder.
 
@@ -41,7 +55,7 @@
   class="destinations{% if extra_class %} {{ extra_class }}{% endif %}"
   {% if id %}id="{{ id }}"{% endif %}
   data-location-rows
-  data-location-managed
+  {% if managed is None or managed %}data-location-managed{% endif %}
   data-api-cidades-url="{% if cities_url %}{{ cities_url }}{% else %}{% destinos_url_cidades %}{% endif %}"
   aria-label="{{ title|default:'Destinos' }}"
 >
@@ -64,7 +78,7 @@
     Sem `rows`, a seção nasce com uma linha vazia — uma lista de destinos sem
     nenhuma linha não tem por onde começar.
   {% endcomment %}
-  <div class="destinations__list" data-location-list aria-label="Destinos adicionados">
+  <div class="destinations__list"{% if list_id %} id="{{ list_id }}"{% endif %} data-location-list aria-label="Destinos adicionados">
     {% if rows %}{{ rows }}{% else %}
       <c-v2.destination_row :index="0" :estados="estados" :removable="True" />
     {% endif %}
@@ -74,7 +88,7 @@
     O molde da próxima linha. `__index__` é o marcador que o JS troca pelo
     número real ao clonar.
   {% endcomment %}
-  <template data-location-template>
+  <template{% if template_id %} id="{{ template_id }}"{% endif %} data-location-template>
     <c-v2.destination_row index="__index__" :estados="estados" :removable="True" />
   </template>
 </section>

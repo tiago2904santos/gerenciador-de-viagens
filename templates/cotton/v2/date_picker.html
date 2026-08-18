@@ -1,4 +1,4 @@
-{% cotton:vars aria_label button_label end_field end_hidden_name end_hidden_value end_input_id extra_class mode picker_id placeholder_end placeholder_start start_field start_hidden_name start_hidden_value start_input_id %}
+{% cotton:vars allow_repeat_dates aria_label button_label end_field end_hidden_name end_hidden_value end_input_id extra_class initial_date mode picker_id placeholder_end placeholder_start show_confirm show_context show_summary single_field single_hidden_id single_hidden_name single_hidden_value single_input_id single_label start_field start_hidden_name start_hidden_value start_input_id trecho_date trigger_aria_label %}
 {% comment %}
   Date picker v2 — campo de data, simples ou intervalo.
 
@@ -19,6 +19,23 @@
   `start_hidden_name`/`end_hidden_name` são a alternativa para quem NÃO tem
   formulário: o filtro de uma lista, que manda os valores por querystring. Um
   ou outro, nunca os dois.
+
+  Três modos, e o editor de roteiro usa os três (2026-08-17):
+
+  - `range` — o intervalo, que é o caso de termos e ordens de serviço;
+  - `single` — UMA data, com campo visível e oculto separados
+    (`single_input_id`/`single_hidden_id`). É o de cada trecho e o do retorno;
+  - `multi` — várias datas de uma vez, com confirmação
+    (`show_confirm`) e repetição permitida (`allow_repeat_dates`). É o
+    "preencher datas" que enche a pilha de trechos em sequência.
+
+  `trecho_date` marca o papel da data no card do trecho (`saida`/`chegada`) — o
+  editor procura por ele para saber onde escrever.
+
+  Os três eram só do componente legado até esta data, e é por isso que o editor
+  de roteiro era a última tela de formulário presa a ele. Nenhum markup de
+  calendário foi copiado: o que mudou aqui é a lista de parâmetros repassados ao
+  partial global.
 
   O JS é o `js/components/date-picker.js`, achado pelo partial.
 {% endcomment %}
@@ -47,7 +64,20 @@
     :end_hidden_name="end_hidden_name"
     :start_hidden_value="start_hidden_value"
     :end_hidden_value="end_hidden_value"
-    hide_labels="1"
+    :single_field="single_field"
+    :single_label="single_label"
+    :single_input_id="single_input_id"
+    :single_hidden_id="single_hidden_id"
+    :single_hidden_name="single_hidden_name"
+    :single_hidden_value="single_hidden_value"
+    :initial_date="initial_date"
+    :trecho_date="trecho_date"
+    :show_confirm="show_confirm"
+    :show_context="show_context"
+    :show_summary="show_summary"
+    :allow_repeat_dates="allow_repeat_dates"
+    :trigger_aria_label="trigger_aria_label"
+    hide_labels="{% if single_label %}{% else %}1{% endif %}"
     only
   />
 </div>

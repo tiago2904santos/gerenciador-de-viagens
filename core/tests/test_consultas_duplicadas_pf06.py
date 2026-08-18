@@ -88,7 +88,9 @@ class ListaDeRoteirosTests(TestCase):
         with CaptureQueriesContext(connection) as ctx:
             resposta = self.client.get(reverse("roteiros:index"))
         self.assertEqual(resposta.status_code, 200)
-        self.assertTrue(resposta.context["cards"], "a lista renderizou zero cards")
+        # `cards` virou `linhas` na migração da tela para o v2 (2026-08-17):
+        # a lista de roteiros é lista simples, e o contexto acompanha o nome.
+        self.assertTrue(resposta.context["linhas"], "a lista renderizou zero linhas")
         return [q for q in ctx.captured_queries if "cadastros_estado" in q["sql"]]
 
     def test_o_custo_de_estado_nao_cresce_com_o_numero_de_cards(self):

@@ -1,0 +1,33 @@
+{% comment %}
+  Linha da lista de roteiros no v2. Par do `_termo_linha.html`, e de propósito:
+  as duas são listas simples, e lista simples é UM desenho no sistema — quem
+  aprende a de termos já sabe ler esta.
+
+  O que a linha responde: qual é a rota (título), quando é, quantos trechos tem e
+  quanto custa (meta). O resto — destinos, composição das diárias, mapa — é o que
+  se vê ao ABRIR o roteiro; foi a decisão de 2026-08-16, quando o miolo do card
+  saiu.
+
+  Editar e excluir ficam à vista, sem menu: são as duas ações que se usa sem
+  pensar, e um clique a mais em cada uma delas se paga em toda linha da lista.
+  Excluir passa pelo diálogo global (`c-v2.delete_modal`, renderizado na página).
+{% endcomment %}
+<c-v2.record
+  eyebrow="Roteiro"
+  :title="row.title"
+  :status="row.chip.label"
+  :status_tone="row.chip.tone"
+  :search_text="row.search_extra"
+>
+  {% comment %}
+    Só os VALORES, sem os rótulos: "Trechos: 16 trechos" e "Valor: R$ 2.789,44"
+    dizem duas vezes a mesma coisa, e numa lista o que se lê é a diferença entre
+    uma linha e a outra — a data, a contagem, o dinheiro. É o mesmo formato da
+    lista de termos.
+  {% endcomment %}
+  <c-slot name="meta">{% for item in row.meta %}{% if not forloop.first %} · {% endif %}{{ item.value }}{% endfor %}</c-slot>
+  <c-slot name="actions">
+    <c-v2.icon_button icon="edit" :href="row.edit_url" aria_label="Editar roteiro" tooltip="Editar" />
+    <c-v2.delete_button :url="row.delete_url" :label="row.title" title="Excluir roteiro?" aria_label="Excluir roteiro" />
+  </c-slot>
+</c-v2.record>

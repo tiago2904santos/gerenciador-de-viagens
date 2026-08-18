@@ -4,10 +4,72 @@
 
 {% block title %}Roteiros{% endblock %}
 
-{% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/lists/entity-cards.css' %}">
-{% endblock %}
-
 {% block content %}
-  <c-lists.list_page_cards :title="page_title" :description="page_description" eyebrow="Roteiros" search_placeholder="Buscar por sede, destino ou observações" search_aria_label="Buscar roteiros" card_template="roteiros/partials/roteiro_list_card.html" :empty_message="empty_message" empty_action_label="Novo roteiro" :empty_action_url="create_url" action_label="Novo roteiro" :action_url="create_url" tabs_aria_label="Abas de roteiros" delete_modal_title="Excluir roteiro?" delete_modal_entity="este roteiro"  :aba="aba" :abas="abas" :action_aria_label="action_aria_label" :attach_signed_modal="attach_signed_modal" :band_tabs_template="band_tabs_template" :can_edit_area="can_edit_area" :cancel_modal_entity="cancel_modal_entity" :cancel_modal_hint="cancel_modal_hint" :cancel_modal_title="cancel_modal_title" :cards="cards" :confirm_action_button_label="confirm_action_button_label" :confirm_action_entity="confirm_action_entity" :confirm_action_eyebrow="confirm_action_eyebrow" :confirm_action_hint="confirm_action_hint" :confirm_action_title="confirm_action_title" :csrf_token="csrf_token" :date_end_id="date_end_id" :date_picker_id="date_picker_id" :date_start_id="date_start_id" :filter_empty_message="filter_empty_message" :page_extra_class="page_extra_class" :page_obj="page_obj" :page_querystring="page_querystring" :page_title="page_title" :pagination_pages="pagination_pages" :request="request" :tabs_template="tabs_template" :cargo_filter="cargo_filter" :combustivel_filter="combustivel_filter" :confirm_action_icon="confirm_action_icon" :extra_class="extra_class" :hide_date_filter="hide_date_filter" :next_url="next_url" :primary_action_label="primary_action_label" :primary_action_url="primary_action_url" :q="q" :search_clear_url="search_clear_url" :search_name="search_name" :search_value="search_value" :sort="sort" :sort_options="sort_options" :status="status" :status_label="status_label" :status_name="status_name" :status_options="status_options" :status_value="status_value" :status_variant="status_variant" :temporal="temporal" :temporal_options="temporal_options" :unidade_filter="unidade_filter" :viagem_ate="viagem_ate" :viagem_de="viagem_de" :cotton_attr_aria_label="cotton_attr_aria_label" :cotton_attr_message="cotton_attr_message" :cotton_attr_title="cotton_attr_title" />
+  {% comment %}
+    Lista de roteiros no sistema v2 (2026-08-17). Antes daqui havia UMA chamada
+    ao `list_page_cards` legado com 60 atributos, dos quais a tela usava seis: o
+    componente montava a página inteira — filtros, abas, cards, paginação e os
+    quatro diálogos —, e passar tudo era mais barato que descobrir o que ele
+    realmente lia.
+
+    Sem folha de página: `entity-cards.css` saiu junto com o `entity_card`, e o
+    v2 inteiro vem do `ui.bundle.css` que o `base.html` já carrega.
+
+    A busca é do SERVIDOR (`?q=`), como o dono pediu — ela precisa achar o
+    roteiro que está na página 3. Por isso `filter_mode="none"`: filtrar no
+    cliente sobre uma lista paginada esconderia parte do que o servidor mandou,
+    sem dizer que escondeu.
+
+    As abas continuam sendo as quatro do `core/documento_abas.py`, agora no
+    `toggle` do sistema — `build_abas` já devolve `url`, `label`, `count` e
+    `is_active`, que é exatamente o que o componente lê.
+  {% endcomment %}
+  <c-v2.list_page
+    :title="page_title"
+    filter_mode="none"
+    :page_obj="page_obj"
+    :pages="pagination_pages"
+    :page_querystring="page_querystring"
+    :paginated="True"
+    :empty_message="empty_message"
+    filter_empty_message="Ajuste a busca ou troque de aba."
+    action_label="Novo roteiro"
+    :action_url="create_url"
+  >
+    <c-slot name="controls">
+      <form method="get" action="{{ request.path }}" class="rail__form" role="search">
+        {% comment %}
+          A aba viaja escondida no formulário: buscar dentro de "Finalizados" tem
+          de continuar em "Finalizados". Sem este campo, toda busca voltava para a
+          aba padrão e parecia que o filtro tinha se perdido.
+        {% endcomment %}
+        <input type="hidden" name="aba" value="{{ aba }}">
+        <c-v2.input
+          icon="search"
+          name="q"
+          :value="q"
+          placeholder="Buscar por sede, destino ou observações"
+          aria_label="Buscar roteiros"
+        />
+        <c-v2.button type="submit" label="Buscar" icon="search" />
+        {% if q %}<c-v2.button label="Limpar" icon="x" :href="search_clear_url" />{% endif %}
+      </form>
+    </c-slot>
+
+    <c-slot name="tabs">
+      <c-v2.toggle :items="abas" aria_label="Abas de roteiros" />
+    </c-slot>
+
+    <c-slot name="rows">
+      {% for row in linhas %}
+        {% include "roteiros/partials/_roteiro_linha.html" with row=row only %}
+      {% endfor %}
+    </c-slot>
+  </c-v2.list_page>
+
+  {% comment %}
+    O diálogo de exclusão é o do v2 (2026-08-17). Um por página: os gatilhos de
+    cada linha apontam para ele pelo `overlay.js`.
+  {% endcomment %}
+  <c-v2.delete_modal entity="este roteiro" />
 {% endblock %}

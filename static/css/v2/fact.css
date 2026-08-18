@@ -273,3 +273,10 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* O rótulo da linha de apoio (o "valor por extenso") ganha respiro em cima: ele
+   abre um segundo par rótulo/valor dentro do mesmo fato, e colado ao número
+   parecia legenda dele. */
+:is(html[data-theme]) .fact__label--note {
+  margin-top: var(--gap-tight);
+}

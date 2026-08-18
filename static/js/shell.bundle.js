@@ -2704,12 +2704,22 @@ document.documentElement.dataset.appReady = "true";
       onDismiss("escape", event);
     }
 
-    document.addEventListener("click", onDocumentClick);
+    /* CAPTURA, não bolha: na fase de bolha qualquer componente que chame
+       `stopPropagation` no caminho impede o clique de chegar ao documento, e o
+       que estava aberto não fecha. Medido no editor de roteiro — o calendário
+       dos trechos abre por cima do mapa, e o Leaflet interrompe a propagação
+       dos cliques no próprio contêiner: clicar no mapa não fechava o
+       calendário. Na captura o documento vê o clique primeiro, antes de
+       qualquer um poder interrompê-lo.
+
+       Quem legitimamente não deve fechar continua protegido: `eventIsInside`
+       compara com os nós declarados em `inside`, e isso independe de fase. */
+    document.addEventListener("click", onDocumentClick, true);
     document.addEventListener("keydown", onDocumentKeydown);
 
     return {
       destroy: function () {
-        document.removeEventListener("click", onDocumentClick);
+        document.removeEventListener("click", onDocumentClick, true);
         document.removeEventListener("keydown", onDocumentKeydown);
       },
     };

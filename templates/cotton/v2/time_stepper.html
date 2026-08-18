@@ -1,0 +1,32 @@
+{% cotton:vars extra_class input_id input_name minus_id plus_id step value %}
+{% comment %}
+  Campo de tempo com ajuste de 15 em 15 minutos — o par "digite ou clique".
+
+  Os dois botões carregam `data-tempo-add-delta` (o passo em minutos, positivo e
+  negativo) e um `id` próprio, que é como o `editor/index.js` os liga. Valor e
+  `id` não cabem no `hook` do `c-v2.button` — atributo com valor sai escapado —,
+  então os botões são crus, e é por isso que isto é um componente: dentro de
+  `templates/cotton/` o botão cru é o caminho previsto.
+
+  `input_id` é o campo visível em HH:MM; quem guarda os minutos para o POST é o
+  oculto que a tela declara ao lado, porque o nome dele muda por trecho.
+{% endcomment %}
+<div class="time-stepper{% if extra_class %} {{ extra_class }}{% endif %}">
+  <input
+    type="text"
+    class="input__control trecho-tempo-adicional-hhmm"
+    id="{{ input_id }}"
+    {% if input_name %}name="{{ input_name }}"{% endif %}
+    data-route-time-kind="additional"
+    value="{{ value|default:'' }}"
+    placeholder="00:00"
+    data-mask="time"
+    inputmode="numeric"
+    maxlength="5"
+    autocomplete="off"
+  >
+  <button type="button" class="button button--secondary button--icon trecho-tempo-add-btn"
+          id="{{ minus_id }}" data-tempo-add-delta="-{{ step|default:15 }}" aria-label="Menos {{ step|default:15 }} minutos">−</button>
+  <button type="button" class="button button--secondary button--icon trecho-tempo-add-btn"
+          id="{{ plus_id }}" data-tempo-add-delta="{{ step|default:15 }}" aria-label="Mais {{ step|default:15 }} minutos">+</button>
+</div>

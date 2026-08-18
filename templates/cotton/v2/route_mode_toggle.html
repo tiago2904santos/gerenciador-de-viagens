@@ -1,0 +1,25 @@
+{% cotton:vars mode %}
+{% comment %}
+  Escolha entre reaproveitar um roteiro salvo e montar um novo.
+
+  Os dois botões são achados por `id` (`toggle-btn-salvo`, `toggle-btn-novo`) e
+  carregam o modo em `data-roteiro-toggle`, que o `editor/source-toggle.js` lê
+  para alternar os dois painéis e marcar o rádio correspondente. `id` e atributo
+  com valor não cabem no `hook` do `c-v2.button`, então os botões são crus —
+  dentro de `templates/cotton/` esse é o caminho previsto.
+
+  A casca é o `toggle` do sistema no tamanho pequeno: são dois segmentos de uma
+  escolha só, não dois botões independentes.
+{% endcomment %}
+<c-v2.toggle variant="state" aria_label="Modo do roteiro" extra_class="toggle--sm route-source__mode">
+  <button type="button" class="toggle__item" id="toggle-btn-salvo"
+          aria-pressed="{% if mode == 'EVENTO_EXISTENTE' %}true{% else %}false{% endif %}"
+          data-roteiro-toggle="EVENTO_EXISTENTE">
+    <span>Roteiro salvo</span>
+  </button>
+  <button type="button" class="toggle__item" id="toggle-btn-novo"
+          aria-pressed="{% if mode != 'EVENTO_EXISTENTE' %}true{% else %}false{% endif %}"
+          data-roteiro-toggle="ROTEIRO_PROPRIO">
+    <span>Roteiro novo</span>
+  </button>
+</c-v2.toggle>

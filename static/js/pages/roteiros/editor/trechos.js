@@ -1,12 +1,13 @@
 /**
- * Cards de trechos do editor — markup alinhado ao design system (cv-field, date-picker, máscaras).
+ * Cards de trechos do editor — marcação do v2 (field/input, date picker global, máscaras).
  */
 
 export const TRECHOS_EMPTY_HTML =
-  '<div class="roteiro-editor__empty">' +
-  '<p class="roteiro-editor__empty-title">Trechos ainda não disponíveis</p>' +
-  '<p class="roteiro-editor__empty-text">Os trechos aparecem aqui após definir os destinos.</p>' +
-  '</div>';
+  '<section class="form-block--v2 route-segments__empty">' +
+  '<div class="form-block__body">' +
+  '<p class="route-segments__empty-title">Trechos ainda não disponíveis</p>' +
+  '<p class="route-segments__empty-text">Os trechos aparecem aqui após definir os destinos.</p>' +
+  '</div></section>';
 
 export const TRECHO_CARD_SELECTOR = '.roteiro-trecho-card[data-key]';
 
@@ -56,13 +57,13 @@ function buildDatePickerField(ordem, role, label, isoValue, esc) {
 function buildTimeField(ordem, role, label, value, esc) {
   var id = 'trecho_' + ordem + '_' + role + '_hora';
   return (
-    '<div class="field cv-field field-size-1">' +
-    '<label class="cv-field__label" for="' +
+    '<div class="field">' +
+    '<label class="field__label" for="' +
     id +
     '">' +
     esc(label) +
     '</label>' +
-    '<input type="text" class="cv-field__control" name="trecho_' +
+    '<input type="text" class="input__control" name="trecho_' +
     ordem +
     '_' +
     role +
@@ -77,14 +78,14 @@ function buildTimeField(ordem, role, label, value, esc) {
 
 function buildLegPanel(ordem, role, title, cityName, dateValue, timeValue, esc) {
   return (
-    '<div class="roteiro-trecho-card__leg">' +
-    '<div class="roteiro-trecho-card__leg-title">' +
+    '<div class="route-return__leg">' +
+    '<div class="route-return__leg-title">' +
     esc(title) +
     '</div>' +
-    '<div class="field-grid field-grid--cols-2 roteiro-trecho-card__leg-grid">' +
-    '<div class="field cv-field cv-field--readonly roteiro-trecho-card__leg-cidade">' +
-    '<label class="cv-field__label">Cidade</label>' +
-    '<input type="text" class="cv-field__control" value="' +
+    '<div class="route-return__leg-fields">' +
+    '<div class="field route-return__city">' +
+    '<label class="field__label">Cidade</label>' +
+    '<input type="text" class="input__control" value="' +
     esc(cityName) +
     '" readonly tabindex="-1" aria-readonly="true">' +
     '</div>' +
@@ -119,7 +120,7 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
   var titleId = 'sec-trecho-' + num;
 
   var article =
-    '<article class="roteiro-trecho-card roteiro-deslocamento" data-key="' +
+    '<article class="roteiro-trecho-card route-leg form-block--v2" data-key="' +
     esc(trecho.key) +
     '" data-trecho-id="' +
     esc(trechoId) +
@@ -140,14 +141,24 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
     '">' +
     (oficio
       ? ''
-      : '<div class="roteiro-leg-label">' +
-        '<span class="roteiro-leg-label__num">Trecho ' +
+      : '<header class="form-block__header"><div>' +
+        '<h3 class="form-block__title">Trecho ' +
         num +
-        '</span>' +
-        '<span class="roteiro-leg-label__route">' +
+        '</h3>' +
+        '<p class="form-block__description">' +
         routeText +
-        '</span></div>') +
-    '<div class="roteiro-deslocamento__body">' +
+        '</p></div>' +
+        /* O botão de PERÍODO entra no cabeçalho do primeiro trecho, e num só:
+         * ele preenche a pilha inteira de uma vez — cada data escolhida vai para
+         * um deslocamento, na ordem, incluindo o retorno. Quem o move para cá é
+         * `placeTrechosDatePickerInFirstHeader`, que procura este slot; sem ele o
+         * calendário fica estacionado e oculto, e a tela perde a única forma de
+         * datar tudo sem abrir trecho por trecho. */
+        (num === 1
+          ? '<div class="form-block__actions" data-trechos-date-picker-slot></div>'
+          : '') +
+        '</header>') +
+    '<div class="form-block__body">' +
     '<input type="hidden" name="trecho_' +
     o +
     '_origem_nome" value="' +
@@ -183,7 +194,7 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
     '_destino_cidade_id" value="' +
     esc(trecho.destino_cidade_id) +
     '">' +
-    '<div class="roteiro-trecho-card__route-row field-grid field-grid--cols-2">' +
+    '<div class="route-return__legs">' +
     buildLegPanel(o, 'saida', 'Saída', trecho.origem_nome, value.saida_data || '', value.saida_hora || '', esc) +
     buildLegPanel(
       o,
@@ -195,10 +206,10 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
       esc
     ) +
     '</div>' +
-    '<div class="field-grid field-grid--cols-3 oficio-roteiro-time-calc-grid roteiro-time-calc-grid roteiro-trecho-card__time-grid">' +
-    '<div class="field cv-field field-size-1">' +
-    '<label class="cv-field__label">Tempo de viagem</label>' +
-    '<input type="text" class="cv-field__control trecho-tempo-viagem-hhmm" data-route-time-kind="travel" value="' +
+    '<div class="route-return__times">' +
+    '<div class="field">' +
+    '<label class="field__label">Tempo de viagem</label>' +
+    '<input type="text" class="input__control trecho-tempo-viagem-hhmm" data-route-time-kind="travel" value="' +
     esc(fmt(cru)) +
     '" placeholder="00:00" data-mask="time" inputmode="numeric" maxlength="5" autocomplete="off">' +
     '<input type="hidden" name="trecho_' +
@@ -207,14 +218,14 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
     esc(cru) +
     '">' +
     '</div>' +
-    '<div class="field cv-field field-size-1">' +
-    '<label class="cv-field__label">Tempo adicional</label>' +
-    '<div class="roteiro-time-calc-stepper roteiro-trecho-card__time-stepper">' +
-    '<input type="text" class="cv-field__control trecho-tempo-adicional-hhmm" data-route-time-kind="additional" value="' +
+    '<div class="field">' +
+    '<label class="field__label">Tempo adicional</label>' +
+    '<div class="route-return__stepper">' +
+    '<input type="text" class="input__control trecho-tempo-adicional-hhmm" data-route-time-kind="additional" value="' +
     esc(add ? fmt(add) : '') +
     '" placeholder="00:00" data-mask="time" inputmode="numeric" maxlength="5" autocomplete="off">' +
-    '<button type="button" class="button button--secondary trecho-tempo-add-btn" data-tempo-add-delta="-15" aria-label="Menos 15 minutos">−</button>' +
-    '<button type="button" class="button button--secondary trecho-tempo-add-btn" data-tempo-add-delta="15" aria-label="Mais 15 minutos">+</button>' +
+    '<button type="button" class="button button--secondary button--icon trecho-tempo-add-btn" data-tempo-add-delta="-15" aria-label="Menos 15 minutos">−</button>' +
+    '<button type="button" class="button button--secondary button--icon trecho-tempo-add-btn" data-tempo-add-delta="15" aria-label="Mais 15 minutos">+</button>' +
     '</div>' +
     '<input type="hidden" name="trecho_' +
     o +
@@ -222,9 +233,9 @@ export function buildTrechoCard(trecho, value, esc, formatDurationInput) {
     esc(add) +
     '">' +
     '</div>' +
-    '<div class="field cv-field cv-field--readonly field-size-1">' +
-    '<label class="cv-field__label">Tempo total</label>' +
-    '<input type="text" class="cv-field__control trecho-tempo-total" value="" readonly tabindex="-1" aria-readonly="true">' +
+    '<div class="field">' +
+    '<label class="field__label">Tempo total</label>' +
+    '<input type="text" class="input__control trecho-tempo-total" value="" readonly tabindex="-1" aria-readonly="true">' +
     '</div></div>' +
     '<input type="hidden" name="trecho_' +
     o +

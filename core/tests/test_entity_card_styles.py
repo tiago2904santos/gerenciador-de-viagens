@@ -9,11 +9,11 @@ ROOT = Path(__file__).resolve().parents[2]
 #: em 2026-08-15: ela é a primeira migrada para o v2 e não carrega folha de
 #: página nenhuma — cobrá-la aqui seria cobrar o legado de volta. Cada lista que
 #: migrar sai desta tupla, e quando ela esvaziar a folha compartilhada morre.
-#: Saíram: termos (2026-08-15) e ordens de serviço (2026-08-15).
+#: Saíram: termos (2026-08-15), ordens de serviço (2026-08-15) e roteiros
+#: (2026-08-17, a primeira das telas restantes).
 LIST_TEMPLATES = (
     "templates/oficios/index.html",
     "templates/eventos/index.html",
-    "templates/roteiros/index.html",
     "templates/prestacoes_contas/index.html",
     "templates/planos_trabalho/index.html",
 )

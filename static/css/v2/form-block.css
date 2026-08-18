@@ -46,6 +46,18 @@
   min-width: 0;
 }
 
+/* Corpo com TODOS os filhos ocultos não reserva trilha na grade. O bloco é
+   `display: grid` com `gap` e `padding` do mesmo tamanho: com o corpo vazio, os
+   dois se somavam e o bloco fechava com o dobro do respiro embaixo do cabeçalho
+   — é o que se via no bate-volta desligado.
+
+   `:has(> *)` primeiro para não pegar corpo de texto puro; depois "nenhum filho
+   visível". `:empty` não serviria: o Cotton deixa espaço em branco entre as
+   tags, e um corpo com espaços não é `:empty`. */
+:is(html[data-theme]) .form-block--v2 > .form-block__body:has(> *):not(:has(> :not([hidden]))) {
+  display: none;
+}
+
 /* ---- split: cabeçalho à esquerda, corpo à direita -------------------------
  *
  * Para o bloco de UM controle só, onde empilhar título e campo desperdiça uma

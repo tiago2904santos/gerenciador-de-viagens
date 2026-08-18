@@ -1,0 +1,350 @@
+/* Editor de roteiro — as cinco peças da tela `roteiros:novo`/`:editar`.
+ *
+ * Uma folha só, e não cinco, porque as peças não existem separadas: origem,
+ * bate-volta, mapa, trechos e diárias são o MESMO editor, e a medida de uma
+ * depende da outra (o mapa herda a largura do bloco, os tempos do retorno usam a
+ * mesma grade dos horários do bate-volta). Cinco arquivos dariam cinco lugares
+ * para procurar o mesmo `gap`.
+ *
+ * O legado disto era `static/css/pages/roteiros.css`, com 2.332 linhas. O que
+ * sobrou aqui é o que a tela realmente usa: o resto era do editor antigo, de
+ * variantes que sumiram e do card de lista, que agora vem do `record`.
+ */
+
+/* ---- origem e destinos ---------------------------------------------------- */
+
+:is(html[data-theme]) .route-source__saved,
+:is(html[data-theme]) .route-source__new {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+/* Par obrigatório: o `display` acima vence a regra de agente do usuário, e sem
+   ele os DOIS modos aparecem ao mesmo tempo — o de roteiro salvo e o de roteiro
+   novo, um embaixo do outro. */
+:is(html[data-theme]) .route-source__saved[hidden],
+:is(html[data-theme]) .route-source__new[hidden] {
+  display: none;
+}
+
+/* Estado e cidade lado a lado, e em uma coluna quando não couberem: são um par
+   em cascata (escolher o estado é o que enche a cidade), e separá-los em linhas
+   distintas desfaz a leitura de "de onde sai". */
+:is(html[data-theme]) .route-source__sede-fields {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  min-width: 0;
+}
+
+/* ---- bate-volta diário ---------------------------------------------------- */
+
+:is(html[data-theme]) .route-daily__grid {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .route-daily__times {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  min-width: 0;
+}
+
+:is(html[data-theme]) #bate-volta-body[hidden] {
+  display: none;
+}
+
+/* ---- mapa ------------------------------------------------------------------ */
+
+/* As quatro medidas em auto-fit, e não em quatro colunas fixas: "Distância (ida
+   e volta)" é rótulo longo, e em coluna fixa ele quebrava no meio da palavra. */
+:is(html[data-theme]) .route-map__metrics {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  margin-bottom: var(--gap);
+  min-width: 0;
+}
+
+/* A moldura do mapa é uma CAIXA em `rail`, com a barra de ações dentro dela: o
+   mapa e os botões que o comandam são a mesma peça, e sobre o fundo do bloco os
+   botões pareciam soltos entre as medidas e o mapa. Os botões sobem para `field`,
+   que é o degrau seguinte — é o que os separa da caixa. */
+:is(html[data-theme]) .route-map__shell {
+  --surface: var(--surface-rail);
+  --surface-contrast: var(--surface-field);
+  background: var(--surface-rail);
+  border-radius: var(--radius-field);
+  display: grid;
+  gap: var(--gap-tight);
+  min-width: 0;
+  padding: var(--gap-tight);
+  position: relative;
+}
+
+:is(html[data-theme]) .route-map__action {
+  background: var(--surface-field);
+}
+
+:is(html[data-theme]) .route-map__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-tight);
+  justify-content: flex-end;
+}
+
+/* O `hidden` dos dois botões que só aparecem depois da primeira rota. */
+:is(html[data-theme]) .route-map__action[hidden] {
+  display: none;
+}
+
+/* Altura fixa: o Leaflet mede o contêiner ao montar, e um contêiner de altura
+   automática nasce com 0 — o mapa fica invisível e nada acusa. 380px é o que
+   cabe numa tela de notebook sem esconder o bloco de trechos abaixo. */
+:is(html[data-theme]) .route-map__canvas {
+  background: var(--surface-rail);
+  border-radius: var(--radius-field);
+  height: 380px;
+  min-width: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+:is(html[data-theme]) .route-map__loading {
+  align-items: center;
+  background: color-mix(in srgb, var(--surface-rail) 88%, transparent);
+  border-radius: var(--radius-field);
+  color: var(--text-strong);
+  display: flex;
+  gap: var(--gap-tight);
+  inset: auto 0 0 0;
+  justify-content: center;
+  padding: var(--gap-tight);
+  position: absolute;
+}
+
+:is(html[data-theme]) .route-map__loading[hidden] {
+  display: none;
+}
+
+:is(html[data-theme]) .route-map__spinner {
+  animation: route-map-spin 0.9s linear infinite;
+  border: 2px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  border-radius: 50%;
+  border-top-color: var(--accent);
+  height: 16px;
+  width: 16px;
+}
+
+@keyframes route-map-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- trechos --------------------------------------------------------------- */
+
+:is(html[data-theme]) .route-segments,
+:is(html[data-theme]) .route-segments__host {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .route-segments__park[hidden] {
+  display: none;
+}
+
+:is(html[data-theme]) .route-segments__stack {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}
+
+/* O vazio é um BLOCO como os trechos serão, para a pilha não mudar de forma
+   quando eles chegarem. O texto ao centro é a única diferença. */
+:is(html[data-theme]) .route-segments__empty {
+  text-align: center;
+}
+
+:is(html[data-theme]) .route-segments__empty-title {
+  color: var(--text-strong);
+  font-weight: var(--weight-strong);
+  margin: 0;
+}
+
+:is(html[data-theme]) .route-segments__empty-text {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  margin: 0;
+}
+
+/* Cada trecho é um CARD dentro da pilha: rótulo em cima ("Trecho 2" e a rota),
+   corpo embaixo. O card é montado pelo `editor/trechos.js`, e por isso o nome da
+   classe estrutural (`roteiro-trecho-card`) continua o antigo — ele é o seletor
+   que o editor usa para achar os cards (`TRECHO_CARD_SELECTOR`). O desenho é o
+   do v2. */
+/* Pinta com `--surface-rail` À MÃO, e não com `--surface-contrast`: o próprio
+   card redefine `--surface-contrast` para os campos dele (regra abaixo), então
+   ler a variável aqui devolvia a cor DOS CAMPOS — card e campo saíam do mesmo
+   tom, e as caixas de data e hora sumiam dentro do card. Medido. */
+/* O card do trecho É um `form-block--v2` (o `editor/trechos.js` o monta com essa
+   classe), então caixa, raio e recuo vêm de lá. Aqui fica só o que é próprio
+   dele. A classe estrutural `roteiro-trecho-card` continua no elemento porque é
+   por ela que o editor acha os cards. */
+
+/* Dentro do card os campos já estão no degrau `rail`, então o controle sobe para
+   `field` — é a mesma escada do resto do formulário, uma camada adiante. */
+:is(html[data-theme]) .route-leg {
+  --surface: var(--surface-rail);
+  --surface-contrast: var(--surface-field);
+}
+
+/* ---- retorno --------------------------------------------------------------- */
+
+/* `align-items: stretch` (padrão) mais `grid-auto-rows: 1fr`: as duas pernas
+   ficam da MESMA altura mesmo quando um dos nomes de cidade quebra em duas
+   linhas — sem isso a caixa da chegada descia em relação à da saída, e as duas
+   deixavam de ler como um par. */
+:is(html[data-theme]) .route-return__legs {
+  display: grid;
+  gap: var(--gap);
+  grid-auto-rows: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  min-width: 0;
+}
+
+/* Saída e chegada são CAIXAS, e não duas colunas de campos soltos: são os dois
+   lados do mesmo deslocamento, e com os campos soltos "Cidade / Data / Hora"
+   aparecia duas vezes seguidas sem nada dizendo onde uma metade termina e a
+   outra começa. Foi o desenho que o dono pediu. */
+:is(html[data-theme]) .route-return__leg {
+  background: var(--surface);
+  border-radius: var(--radius-field);
+  display: grid;
+  gap: var(--gap-tight);
+  min-width: 0;
+  padding: var(--gap);
+}
+
+:is(html[data-theme]) .route-return__leg-title {
+  color: var(--text-strong);
+  font-size: 1.05rem;
+  font-weight: var(--weight-strong);
+}
+
+/* Cidade ocupando a linha inteira, data e hora dividindo a de baixo: a cidade é
+   nome próprio e cresce; data e hora têm largura conhecida. */
+:is(html[data-theme]) .route-return__leg-fields {
+  display: grid;
+  gap: var(--gap-tight);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: 0;
+}
+
+:is(html[data-theme]) .route-return__city {
+  grid-column: 1 / -1;
+}
+
+/* Sem `margin-top`: quem separa esta faixa das pernas é o vão do corpo do bloco
+   (no retorno) e o do próprio card (no trecho). A margem somava um segundo
+   espaçamento em cima do primeiro, e a linha dos tempos ficava descolada. */
+:is(html[data-theme]) .route-return__times {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  min-width: 0;
+}
+
+/* O campo e os dois botões de 15 em 15 minutos na mesma linha: o passo só faz
+   sentido colado ao número que ele muda. */
+:is(html[data-theme]) .route-return__stepper {
+  display: flex;
+  gap: var(--gap-tight);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .route-return__stepper .input__control {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Quadrados: são dois botões de um sinal só (− e +), e com o recuo lateral do
+   botão comum saíam estreitos e altos — 29x44 medidos. Lado do quadrado é a
+   altura do controle, para casarem com o campo ao lado. */
+:is(html[data-theme]) .route-return__stepper .trecho-tempo-add-btn {
+  aspect-ratio: 1;
+  flex: none;
+  justify-content: center;
+  padding: 0;
+  width: var(--control-height);
+}
+
+/* A caixa da perna assume o degrau do bloco, e os campos dentro dela sobem para
+   o contraste — sem isto o campo e a caixa saem da mesma cor e a moldura do
+   campo desaparece, que foi o defeito medido no card de trecho. */
+:is(html[data-theme]) .route-return__leg {
+  --surface: var(--surface-rail);
+  --surface-contrast: var(--surface-field);
+}
+
+/* As pernas do TRECHO usam o mesmo degrau das do retorno — a regra acima vale
+   para as duas. Havia aqui uma inversão (`field` na caixa, `rail` no campo) que
+   deixava o card do trecho mais claro que o do retorno, lado a lado na mesma
+   pilha. */
+
+/* ---- diárias --------------------------------------------------------------- */
+
+/* Seletor COMPOSTO (`.fact-list.travel-allowance__facts`): `v2/fact.css` entra
+   DEPOIS desta folha no pacote, e com a mesma especificidade quem decide é a
+   ORDEM — a grade de três colunas do `fact-list` se reimpunha e o resumo saía em
+   três colunas, não em duas com os secundários empilhados. Medido.
+
+   Duas colunas: o VALOR TOTAL ocupa a esquerda inteira, em caixa própria e com o
+   número grande; tipo de destino e quantidade ficam empilhados à direita, cada um
+   na sua. É o resumo financeiro, e o que se procura nele é uma cifra só — as
+   outras duas explicam de onde ela veio. */
+:is(html[data-theme]) .fact-list.travel-allowance__facts {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto auto;
+}
+
+:is(html[data-theme]) .fact-list.travel-allowance__facts .fact {
+  background: var(--surface-contrast, var(--surface-field));
+  border-radius: var(--radius-field);
+  padding: var(--gap);
+}
+
+/* `margin-top` entre fatos é do cartão da lista, onde eles se empilham. Aqui a
+   grade já dá o vão, e a margem somava um degrau extra na segunda linha. */
+:is(html[data-theme]) .fact-list.travel-allowance__facts .fact + .fact {
+  margin-top: 0;
+}
+
+:is(html[data-theme]) .fact-list.travel-allowance__facts .fact:first-child {
+  grid-row: span 2;
+}
+
+/* O número grande de verdade: é a resposta da tela inteira. `clamp` porque o
+   valor cresce com o número de diárias e a caixa não. */
+:is(html[data-theme]) .fact-list.travel-allowance__facts .fact:first-child .fact__value {
+  font-size: clamp(1.8rem, 6cqw, 3.2rem);
+  line-height: 1.05;
+}
+
+:is(html[data-theme]) .fact-list.travel-allowance__facts .fact:first-child .fact__note {
+  margin-top: var(--gap-tight);
+}
+
+@media (max-width: 640px) {
+  :is(html[data-theme]) .fact-list.travel-allowance__facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :is(html[data-theme]) .fact-list.travel-allowance__facts .fact:first-child {
+    grid-row: auto;
+  }
+}

@@ -1,0 +1,139 @@
+{% comment %}
+  Origem e destinos, no v2 — o primeiro bloco do editor de roteiro.
+
+  Dois modos, e os dois `id` abaixo são o que `editor/source-toggle.js` alterna:
+
+  - `#roteiro-selector-wrapper` — reaproveitar um roteiro salvo. Só existe
+    quando há roteiros para escolher (`has_event_routes`);
+  - `#panel-roteiro-novo` — sede e destinos, para montar um do zero.
+
+  Os dois rádios ocultos (`id_roteiro_modo_evento` / `_proprio`) são quem guarda
+  o modo escolhido para o POST — o JS lê `.checked` deles.
+
+  Os destinos são o `c-v2.destinations`, o mesmo componente de termos e ordens de
+  serviço. `list_id` e `template_id` existem porque o editor de roteiro procura a
+  lista e o molde por id (`destinos-container`, `tmpl-destino-roteiro`) — o
+  restante do contrato (`data-location-*`) o componente já emitia.
+{% endcomment %}
+<c-v2.form_block
+  title="Origem e destinos"
+  description="Use um roteiro salvo ou defina a sede e os destinos."
+  extra_class="route-source"
+>
+  {% if has_event_routes %}
+    <c-slot name="actions">
+      <c-v2.route_mode_toggle :mode="roteiro_modo" />
+    </c-slot>
+  {% endif %}
+
+  <c-slot name="body">
+    {% comment %}
+      Rádios OCULTOS: quem mostra a escolha é o toggle acima, mas quem a envia é
+      o rádio — é ele que o `editor/index.js` lê em `.checked` e o Django recebe
+      no POST.
+    {% endcomment %}
+    <input type="radio" name="roteiro_modo" id="id_roteiro_modo_evento" value="EVENTO_EXISTENTE"
+           {% if roteiro_modo == 'EVENTO_EXISTENTE' %}checked{% endif %}
+           {% if not has_event_routes %}disabled{% endif %} hidden>
+    <input type="radio" name="roteiro_modo" id="id_roteiro_modo_proprio" value="ROTEIRO_PROPRIO"
+           {% if roteiro_modo != 'EVENTO_EXISTENTE' %}checked{% endif %} hidden>
+
+    <div id="roteiro-selector-wrapper" class="route-source__saved"
+         {% if roteiro_modo != 'EVENTO_EXISTENTE' %}hidden{% endif %}>
+      <c-v2.related_picker
+        input_id="id_roteiro_busca"
+        placeholder="Buscar por destino, tipo ou trecho..."
+        aria_label="Buscar roteiro salvo"
+        list_id="roteiro-lista"
+        empty_id="roteiro-lista-empty"
+        empty_text="Nenhum roteiro encontrado para a busca."
+      />
+      <input type="hidden" name="roteiro_id" id="id_roteiro_id" value="{{ roteiro_id|default:'' }}"
+             data-route-selected-input {% if not has_event_routes %}disabled{% endif %}>
+    </div>
+
+    <div id="panel-roteiro-novo" class="route-source__new"
+         {% if roteiro_modo == 'EVENTO_EXISTENTE' %}hidden{% endif %}>
+      <c-v2.form_block
+        :split="True"
+        title="Sede"
+        description="Unidade de origem da viagem."
+        extra_class="route-source__sede"
+      >
+        <c-slot name="body">
+          <div class="route-source__sede-fields">
+            {% comment %}
+              SEM rótulo: o bloco é `split` e o cabeçalho à esquerda já diz
+              "Sede"; cada campo diz o que é pelo próprio texto de chamada
+              ("Buscar estado...", "Buscar cidade..."). Com rótulo eram quatro
+              linhas de texto para dois campos. O nome acessível continua no
+              `aria-label` do `<select>`.
+            {% endcomment %}
+            <c-v2.field label_for="id_origem_estado" :error="form.origem_estado.errors">
+              <c-slot name="control">
+                <select name="origem_estado" id="id_origem_estado"
+                        class="search-picker__native"
+                        data-entity-picker="true"
+                        data-picker-v2
+                        data-entity-picker-mode="single"
+                        data-picker-variant="compact"
+                        data-placeholder="Buscar estado..."
+                        data-empty-message="Nenhum estado encontrado."
+                        aria-label="Estado da sede">
+                  <option value=""></option>
+                  {% for estado in estados %}
+                    <option value="{{ estado.pk }}"{% if sede_estado_id == estado.pk %} selected{% endif %}>{{ estado.nome }} ({{ estado.sigla }})</option>
+                  {% endfor %}
+                </select>
+              </c-slot>
+            </c-v2.field>
+
+            <c-v2.field label_for="id_origem_cidade" :error="form.origem_cidade.errors">
+              <c-slot name="control">
+                <select name="origem_cidade" id="id_origem_cidade"
+                        class="search-picker__native"
+                        data-entity-picker="true"
+                        data-picker-v2
+                        data-entity-picker-mode="single"
+                        data-picker-variant="compact"
+                        data-placeholder="Buscar cidade..."
+                        data-empty-message="Nenhuma cidade encontrada."
+                        aria-label="Cidade da sede"
+                        {% if not sede_estado_id %}disabled{% endif %}>
+                  <option value=""></option>
+                  {% for cidade in sede_cidades_qs %}
+                    <option value="{{ cidade.pk }}"{% if sede_cidade_id == cidade.pk %} selected{% endif %}>{{ cidade.nome }}</option>
+                  {% endfor %}
+                </select>
+              </c-slot>
+            </c-v2.field>
+          </div>
+        </c-slot>
+      </c-v2.form_block>
+
+      <c-v2.form_block
+        :split="True"
+        title="Destinos"
+        description="Locais na ordem da visita."
+        extra_class="route-source__destinos"
+      >
+        <c-slot name="body">
+          {% comment %}
+            `managed=False`: quem liga o motor de linhas aqui é o
+            `editor/index.js`, que faz mais do que adicionar e remover — ele
+            recalcula trechos, rota e diárias a cada destino. Com a auto-ligação
+            da seção somada à dele, um clique em "+" inseria DUAS linhas (medido).
+          {% endcomment %}
+          <c-v2.destinations
+            id="sec-destinos"
+            list_id="destinos-container"
+            template_id="tmpl-destino-roteiro"
+            :managed="False"
+            :estados="estados"
+            :rows="destinos_rows"
+          />
+        </c-slot>
+      </c-v2.form_block>
+    </div>
+  </c-slot>
+</c-v2.form_block>

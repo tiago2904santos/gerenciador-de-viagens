@@ -9,6 +9,7 @@ from core import entity_cards
 from core.presenters.actions import build_delete_action
 from core.presenters.actions import build_edit_action
 from core.presenters.actions import build_open_action
+from core.presenters.badges import tom_de_chip_v2
 from core.presenters.meta import build_meta
 from .models import Roteiro
 from .services.editor_state_builder import _build_roteiro_state_from_estrutura
@@ -261,8 +262,13 @@ def apresentar_roteiro_card(roteiro, *, todos_trechos=False, capitais=None):
     }
 
 
-def apresentar_linha_lista_simples_roteiro(roteiro, *, edit_url="#", delete_url="#", delete_modal=False):
-    card = apresentar_roteiro_card(roteiro)
+def apresentar_linha_lista_simples_roteiro(
+    roteiro, *, edit_url="#", delete_url="#", delete_modal=False, capitais=None
+):
+    # `capitais` é repasse, não enfeite: sem ele cada linha resolve as capitais
+    # por conta própria e a lista paga uma consulta por roteiro. Foi esse o custo
+    # que o `NOVO-27` derrubou no card, e a lista simples herdaria de volta.
+    card = apresentar_roteiro_card(roteiro, capitais=capitais)
     periodo = "—"
     if card["inicio_display"] or card["fim_display"]:
         periodo = f"{card['inicio_display'] or '—'} a {card['fim_display'] or '—'}"
@@ -270,8 +276,19 @@ def apresentar_linha_lista_simples_roteiro(roteiro, *, edit_url="#", delete_url=
     trechos_count = card["trechos_count"]
     trechos_label = "1 trecho" if trechos_count == 1 else f"{trechos_count} trechos"
 
+    # O selo é o MESMO que o card mostrava: quanto falta, em andamento, ou há
+    # quanto tempo passou. Numa lista de roteiros reutilizáveis é a única coisa
+    # que muda sozinha com o tempo, e é por ela que se acha o de agora.
+    if getattr(roteiro, "cancelado", False):
+        chip = {"label": "Cancelado", "tone": "late"}
+    elif card["temporal_label"]:
+        chip = {"label": card["temporal_label"], "tone": tom_de_chip_v2(card["temporal_tone"])}
+    else:
+        chip = {"label": "", "tone": ""}
+
     return {
         "avatar": "RT",
+        "chip": chip,
         "title": card["rota_display"],
         "badges": [{"text": "Cancelado", "variant": "danger"}] if roteiro.cancelado else [],
         "meta": [

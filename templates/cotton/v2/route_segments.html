@@ -1,0 +1,98 @@
+{% cotton:vars retorno %}
+{% comment %}
+  Trechos e retorno v2 — par de `static/css/v2/route-segments.css`.
+
+  Os cards de trecho NÃO são escritos aqui: quem os monta é
+  `js/pages/roteiros/editor/trechos.js`, a partir dos destinos. Este componente é
+  o lugar onde eles nascem, mais o retorno, que é fixo.
+
+  Ganchos que o editor procura (`editor/index.js` e `editor/trechos.js`):
+
+  - `#trechos-gerados-container` — a pilha onde os cards entram. Renomear deixa a
+    tela sem trecho nenhum, sem erro no console;
+  - `#trechos-error` — a faixa de falha da estimativa automática (`JS-04`: antes
+    dela, a estimativa falhava calada porque não havia onde escrever);
+  - `#trechos-date-picker-park` — o "estacionamento" do calendário de preencher
+    datas em sequência. Fica oculto e o JS o move para dentro do card certo;
+  - `#trecho-single-date-picker-template` — o molde de UM calendário de data, que
+    o `trechos.js` clona por trecho trocando `__LABEL__`, `__DISPLAY_ID__`,
+    `__HIDDEN_ID__`, `__HIDDEN_NAME__`, `__ISO_VALUE__`, `__INITIAL_DATE__` e
+    `__ROLE__`. Os sete marcadores são contrato;
+  - `#retorno-card` e os campos `retorno_*` — o último deslocamento até a sede.
+
+  O retorno é um BLOCO irmão, não um card dentro da pilha: ele existe sempre, com
+  ou sem trechos, e ler "Retorno" com título próprio é o que separa "o percurso"
+  de "a volta para casa".
+{% endcomment %}
+{% comment %}
+  SEM bloco em volta da pilha (2026-08-17, a pedido do dono): cada trecho JÁ é um
+  bloco, e um bloco de trechos contendo blocos de trecho punha três molduras em
+  volta dos mesmos campos. A pilha aqui é só a lista; quem tem cabeçalho é cada
+  trecho, como o retorno logo abaixo.
+{% endcomment %}
+<div class="route-segments">
+    <div class="route-segments__host" data-route-segments>
+      <div id="trechos-date-picker-park" class="route-segments__park" hidden>
+        {% comment %}
+          O calendário de preencher datas em sequência. Mora aqui e o JS o
+          empresta ao card do trecho da vez — um só para a pilha inteira.
+        {% endcomment %}
+        <c-v2.date_picker
+          mode="multi"
+          picker_id="trechos-date-picker"
+          button_label="Período"
+          trigger_aria_label="Preencher as datas de todos os trechos"
+          :show_summary="False"
+          :show_context="True"
+          {% comment %}
+            SEM botão de aplicar: o editor diz quantas datas a viagem tem
+            (`data-max-dates` = trechos + retorno) e o motor confirma e fecha
+            sozinho ao receber a última. Pedir mais um clique em "Aplicar" depois
+            da última data é um passo que não decide nada.
+          {% endcomment %}
+          :show_confirm="False"
+          :allow_repeat_dates="True"
+        />
+      </div>
+
+      <p class="alert" data-tone="warning" id="trechos-error" hidden role="alert"></p>
+
+      <div id="trechos-gerados-container" class="route-segments__stack">
+        {% comment %}
+          O vazio é um bloco, e não um aviso solto: ele ocupa o lugar do primeiro
+          trecho, e a pilha não muda de forma quando eles chegam. O mesmo HTML
+          está em `editor/trechos.js` (`TRECHOS_EMPTY_HTML`), que o reescreve a
+          cada recálculo — os dois têm de dizer a mesma coisa.
+        {% endcomment %}
+        <section class="form-block--v2 route-segments__empty">
+          <div class="form-block__body">
+            <p class="route-segments__empty-title">Trechos ainda não disponíveis</p>
+            <p class="route-segments__empty-text">Os trechos aparecem aqui após definir os destinos.</p>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <template id="trecho-single-date-picker-template">
+      <c-v2.date_picker
+        mode="single"
+        single_label="__LABEL__"
+        single_input_id="__DISPLAY_ID__"
+        single_hidden_id="__HIDDEN_ID__"
+        single_hidden_name="__HIDDEN_NAME__"
+        single_hidden_value="__ISO_VALUE__"
+        initial_date="__INITIAL_DATE__"
+        trecho_date="__ROLE__"
+      />
+    </template>
+</div>
+
+<c-v2.form_block
+  title="Retorno"
+  description="Último deslocamento até a sede."
+  extra_class="route-return"
+>
+  <c-slot name="body">
+    {% include "roteiros/partials/roteiro/v2/_retorno_body.html" with retorno=retorno only %}
+  </c-slot>
+</c-v2.form_block>

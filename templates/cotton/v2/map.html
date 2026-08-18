@@ -1,0 +1,103 @@
+{% cotton:vars %}
+{% comment %}
+  Mapa da rota v2 — par de `static/css/v2/map.css`.
+
+  Quatro medidas em cima (ida e volta, e só a ida), o mapa embaixo, e a barra de
+  ações sobre ele. Quem desenha o traçado é `js/pages/roteiros-map.js` com
+  Leaflet; este componente é a moldura, e cada gancho abaixo é contrato dele:
+
+  - `#roteiro-mapa-container` — onde o Leaflet monta. Renomear = mapa em branco;
+  - `#roteiro-mapa-distancia`, `-tempo`, `-distancia-ida`, `-tempo-ida` — as
+    quatro leituras. São `readonly`, não texto solto, porque o JS escreve em
+    `.value` e porque a moldura de campo é o que as faz lerem-se como medida;
+  - `#btn-calcular-rota-mapa`, `#btn-recalcular-rota-mapa`, `#btn-fit-rota-mapa`
+    — o segundo e o terceiro nascem ocultos e o JS os revela depois da primeira
+    rota;
+  - `#roteiro-mapa-loading`, `#roteiro-mapa-error`, `#roteiro-mapa-stale-hint` —
+    os três estados. O "stale" é o que avisa que a ordem dos destinos mudou e a
+    rota na tela é de antes.
+
+  O erro e o aviso usam o ALERTA GLOBAL (`.alert` + `data-tone`), não uma faixa
+  própria: no legado eram `alert alert-warning py-2 small` — classes do Bootstrap
+  que o resto do sistema não conhece.
+{% endcomment %}
+{% load icones %}
+{% comment %}
+  Título e descrição são FIXOS, sem variável: o `contrato()` que valida
+  `cotton:vars` não enxerga variável usada só dentro de atributo de componente
+  FILHO, e declarar uma que ele não vê quebra o contrato — é a mesma armadilha do
+  `download_picker` e dos diálogos de ação. E o mapa da rota não tem por que se
+  chamar outra coisa em outra tela.
+{% endcomment %}
+{% comment %}
+  SEM título nem descrição (2026-08-17, a pedido do dono): as quatro medidas e o
+  mapa dizem o que são sozinhos, e "Mapa da rota / Distância e tempo estimados do
+  percurso" era uma linha e meia de texto para anunciar um mapa que já está logo
+  abaixo.
+{% endcomment %}
+<c-v2.form_block extra_class="route-map">
+  <c-slot name="body">
+    <p class="alert" data-tone="warning" id="roteiro-mapa-stale-hint" hidden role="status">
+      A ordem dos destinos mudou. Recalcule a rota para atualizar distância e tempo estimados.
+    </p>
+
+    {% comment %}
+      As quatro medidas em UMA faixa de campos. No legado eram quatro `field-size-1`
+      numa grade de 4 colunas fixas, que em tela estreita cortava o rótulo
+      "Distância (ida e volta)" no meio.
+    {% endcomment %}
+    <div class="route-map__metrics" id="roteiro-mapa-summary">
+      <c-v2.field label="Distância (ida e volta)" label_for="roteiro-mapa-distancia">
+        <c-slot name="control">
+          <input type="text" class="input__control" id="roteiro-mapa-distancia" value="—" readonly tabindex="-1" aria-readonly="true">
+        </c-slot>
+      </c-v2.field>
+      <c-v2.field label="Tempo (ida e volta)" label_for="roteiro-mapa-tempo">
+        <c-slot name="control">
+          <input type="text" class="input__control" id="roteiro-mapa-tempo" value="—" readonly tabindex="-1" aria-readonly="true">
+        </c-slot>
+      </c-v2.field>
+      <c-v2.field label="Distância de ida" label_for="roteiro-mapa-distancia-ida">
+        <c-slot name="control">
+          <input type="text" class="input__control" id="roteiro-mapa-distancia-ida" value="—" readonly tabindex="-1" aria-readonly="true">
+        </c-slot>
+      </c-v2.field>
+      <c-v2.field label="Tempo de ida" label_for="roteiro-mapa-tempo-ida">
+        <c-slot name="control">
+          <input type="text" class="input__control" id="roteiro-mapa-tempo-ida" value="—" readonly tabindex="-1" aria-readonly="true">
+        </c-slot>
+      </c-v2.field>
+    </div>
+
+    <div class="route-map__shell">
+      <div class="route-map__toolbar" role="toolbar" aria-label="Ações do mapa da rota">
+        {% comment %}
+          Botões CRUS, e não `c-v2.button`: os três são achados por `id` pelo
+          `roteiros-map.js`, e `id` não cabe no `hook` — valor dentro de `hook`
+          sai escapado e o seletor nunca casa. `templates/cotton/` é o diretório
+          que `scripts/migrar_botoes_cotton.py` exclui, exatamente para isto.
+        {% endcomment %}
+        <button type="button" class="button button--secondary route-map__action" id="btn-calcular-rota-mapa">
+          <span class="button__icon" aria-hidden="true">{% icone_svg "route" %}</span>
+          <span>Calcular rota</span>
+        </button>
+        <button type="button" class="button button--secondary route-map__action" id="btn-recalcular-rota-mapa" hidden>
+          <span class="button__icon" aria-hidden="true">{% icone_svg "route" %}</span>
+          <span>Recalcular rota</span>
+        </button>
+        <button type="button" class="button button--secondary route-map__action" id="btn-fit-rota-mapa" hidden>
+          <span>Ver rota inteira</span>
+        </button>
+      </div>
+
+      <div class="route-map__canvas" id="roteiro-mapa-container" data-testid="roteiro-mapa-container"></div>
+
+      <div class="route-map__loading" id="roteiro-mapa-loading" hidden role="status" aria-live="polite">
+        <span class="route-map__spinner" aria-hidden="true"></span>
+        <span>Calculando rota…</span>
+      </div>
+    </div>
+
+    <p class="alert" data-tone="warning" id="roteiro-mapa-error" hidden role="alert"></p>
+  </c-slot>
+</c-v2.form_block>

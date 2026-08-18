@@ -1,0 +1,110 @@
+{% comment %}
+  Retorno do roteiro, no v2. Corpo do `c-v2.route_segments`.
+
+  Duas metades — saída e chegada —, cada uma com cidade (só leitura, preenchida
+  pelo editor a partir do último trecho), data e hora. Embaixo, os três tempos:
+  o de viagem (estimado), o adicional (ajustado de 15 em 15 minutos) e o total,
+  que é a soma e não se digita.
+
+  Todos os `id` e `name` abaixo são contrato de
+  `js/pages/roteiros/editor/index.js` — ele escreve nos campos por id
+  (`id_retorno_saida_cidade`, `id_retorno_*_data`, `id_retorno_tempo_*`) e lê os
+  ocultos no POST (`retorno_distancia_km`, `retorno_duracao_estimada_min`,
+  `retorno_rota_fonte`). As classes `trecho-tempo-adicional-hhmm` e
+  `trecho-tempo-total` também são: o mesmo cálculo vale para os cards de trecho,
+  e o script acha os três campos por elas.
+{% endcomment %}
+<div class="route-return__legs">
+  <div class="route-return__leg">
+    <span class="route-return__leg-title">Saída</span>
+    <div class="route-return__leg-fields">
+      <c-v2.field label="Cidade de saída" label_for="id_retorno_saida_cidade" extra_class="route-return__city">
+        <c-slot name="control">
+          <input type="text" class="input__control" id="id_retorno_saida_cidade" value="{{ retorno.saida_cidade|default:'' }}" readonly tabindex="-1" aria-readonly="true">
+        </c-slot>
+      </c-v2.field>
+      <c-v2.field label="Data" label_for="id_retorno_saida_data_display">
+        <c-slot name="control">
+          <c-v2.date_picker
+            mode="single"
+            picker_id="retorno-saida-date-picker"
+            single_input_id="id_retorno_saida_data_display"
+            single_hidden_id="id_retorno_saida_data"
+            single_hidden_name="retorno_saida_data"
+            :single_hidden_value="retorno.saida_data"
+            :initial_date="retorno.saida_data"
+            trecho_date="saida"
+          />
+        </c-slot>
+      </c-v2.field>
+      <c-v2.field label="Hora" label_for="id_retorno_saida_hora">
+        <c-slot name="control">
+          <input type="text" class="input__control" name="retorno_saida_hora" id="id_retorno_saida_hora" data-mask="time" value="{{ retorno.saida_hora|default:'' }}" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+        </c-slot>
+      </c-v2.field>
+    </div>
+  </div>
+
+  <div class="route-return__leg">
+    <span class="route-return__leg-title">Chegada</span>
+    <div class="route-return__leg-fields">
+      <c-v2.field label="Cidade de chegada" label_for="id_retorno_chegada_cidade" extra_class="route-return__city">
+        <c-slot name="control">
+          <input type="text" class="input__control" id="id_retorno_chegada_cidade" value="{{ retorno.chegada_cidade|default:'' }}" readonly tabindex="-1" aria-readonly="true">
+        </c-slot>
+      </c-v2.field>
+      <c-v2.field label="Data" label_for="id_retorno_chegada_data_display">
+        <c-slot name="control">
+          <c-v2.date_picker
+            mode="single"
+            picker_id="retorno-chegada-date-picker"
+            single_input_id="id_retorno_chegada_data_display"
+            single_hidden_id="id_retorno_chegada_data"
+            single_hidden_name="retorno_chegada_data"
+            :single_hidden_value="retorno.chegada_data"
+            :initial_date="retorno.chegada_data"
+            trecho_date="chegada"
+          />
+        </c-slot>
+      </c-v2.field>
+      <c-v2.field label="Hora" label_for="id_retorno_chegada_hora">
+        <c-slot name="control">
+          <input type="text" class="input__control" name="retorno_chegada_hora" id="id_retorno_chegada_hora" data-mask="time" value="{{ retorno.chegada_hora|default:'' }}" placeholder="00:00" inputmode="numeric" maxlength="5" autocomplete="off">
+        </c-slot>
+      </c-v2.field>
+    </div>
+  </div>
+</div>
+
+<div class="route-return__times">
+  <c-v2.field label="Tempo de viagem" label_for="id_retorno_tempo_viagem_hhmm">
+    <c-slot name="control">
+      <input type="text" class="input__control" id="id_retorno_tempo_viagem_hhmm" data-route-time-kind="travel" value="" placeholder="00:00" data-mask="time" inputmode="numeric" maxlength="5" autocomplete="off">
+    </c-slot>
+  </c-v2.field>
+
+  <c-v2.field label="Tempo adicional" label_for="id_retorno_tempo_adicional_hhmm">
+    <c-slot name="control">
+      <c-v2.time_stepper
+        input_id="id_retorno_tempo_adicional_hhmm"
+        minus_id="retorno_tempo_add_menos"
+        plus_id="retorno_tempo_add_mais"
+        extra_class="route-return__stepper"
+      />
+    </c-slot>
+  </c-v2.field>
+
+  <c-v2.field label="Tempo total" label_for="id_retorno_tempo_total">
+    <c-slot name="control">
+      <input type="text" class="input__control trecho-tempo-total" id="id_retorno_tempo_total" value="" readonly tabindex="-1" aria-readonly="true">
+    </c-slot>
+  </c-v2.field>
+</div>
+
+<input type="hidden" name="retorno_tempo_cru_estimado_min" id="id_retorno_tempo_cru_estimado_min" value="{{ retorno.tempo_cru_estimado_min|default:'' }}">
+<input type="hidden" name="retorno_tempo_adicional_min" id="id_retorno_tempo_adicional_min" value="{{ retorno.tempo_adicional_min|default:0 }}">
+<input type="hidden" name="retorno_distancia_km" id="id_retorno_distancia_km" value="{{ retorno.distancia_km|default:'' }}">
+<input type="hidden" name="retorno_duracao_estimada_min" id="id_retorno_duracao_estimada_min" value="{{ retorno.duracao_estimada_min|default:'' }}">
+<input type="hidden" name="retorno_rota_fonte" id="id_retorno_rota_fonte" value="{{ retorno.rota_fonte|default:'' }}">
+
+<p class="alert" data-tone="error" id="retorno-erro" hidden role="alert"></p>

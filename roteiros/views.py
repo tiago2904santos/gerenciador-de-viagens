@@ -41,6 +41,7 @@ from .services.routing.route_preview_service import calculate_route_preview
 from .models import Roteiro
 from .presenters import (
     apresentar_contexto_formulario_roteiro_avulso,
+    apresentar_linha_lista_simples_roteiro,
     apresentar_pagina_editor_roteiro,
     apresentar_roteiro_card,
 )
@@ -153,19 +154,20 @@ def index(request):
     )
     page_obj = paginacao["page_obj"]
     next_url = request.get_full_path()
-    cards = []
-    # Uma resolução para a página inteira (NOVO-27). Sem isto cada card paga a
-    # consulta de capitais: 15 cards = 15 consultas a mais, e o teto do PF-07
+    # Uma resolução para a página inteira (NOVO-27). Sem isto cada linha paga a
+    # consulta de capitais: 15 linhas = 15 consultas a mais, e o teto do PF-07
     # para `roteiros:index` saiu de 32 para 47.
     capitais = capitais_por_uf()
-    for roteiro in page_obj.object_list:
-        card = apresentar_roteiro_card(roteiro, capitais=capitais)
-        card["footer"]["edit_url"] = f"{reverse('roteiros:editar', args=[roteiro.pk])}?{urlencode({'next': next_url})}"
-        card["footer"]["delete_modal_url"] = reverse("roteiros:excluir", args=[roteiro.pk])
-        card["footer"]["delete_modal_label"] = card["title"]
-        card["footer"]["delete_modal_title"] = "Excluir roteiro?"
-        card["footer"]["delete_url"] = None
-        cards.append(card)
+    linhas = [
+        apresentar_linha_lista_simples_roteiro(
+            roteiro,
+            edit_url=f"{reverse('roteiros:editar', args=[roteiro.pk])}?{urlencode({'next': next_url})}",
+            delete_url=reverse("roteiros:excluir", args=[roteiro.pk]),
+            delete_modal=True,
+            capitais=capitais,
+        )
+        for roteiro in page_obj.object_list
+    ]
     return render(
         request,
         "roteiros/index.html",
@@ -175,7 +177,7 @@ def index(request):
             "create_url": reverse("roteiros:novo"),
             "search_clear_url": f"{reverse('roteiros:index')}?aba={aba}",
             "empty_message": "Nenhum roteiro cadastrado ainda.",
-            "cards": cards,
+            "linhas": linhas,
             "q": q,
             "aba": aba,
             "abas": abas,
