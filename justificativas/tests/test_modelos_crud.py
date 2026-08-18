@@ -32,7 +32,12 @@ class ModelosJustificativaCrudTests(TestCase):
         self.assertContains(r, "Novo modelo")
         self.assertContains(r, 'name="nome"')
         self.assertContains(r, 'name="texto"')
-        self.assertContains(r, "floating-action")
+        # `floating-action` era a classe do botão flutuante legado. A tela
+        # migrou para o v2 em 2026-08-18 e a ação flutuante agora é
+        # `list-page__action`; o que este teste protege — existe caminho de
+        # volta na tela — continua sendo cobrado, com o rótulo junto.
+        self.assertContains(r, "list-page__action")
+        self.assertContains(r, self.back_label if hasattr(self, "back_label") else "Voltar")
         self.assertContains(r, "Voltar para as justificativas")
         self.assertContains(r, reverse("justificativas:index"))
 

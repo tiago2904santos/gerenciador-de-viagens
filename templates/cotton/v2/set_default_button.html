@@ -1,0 +1,22 @@
+{% cotton:vars csrf_token label url %}
+{% comment %}
+  Definir como padrão — a estrela do cadastro que já vem escolhido nos
+  formulários (o cargo padrão, o combustível padrão).
+
+  É um `<form method="post">`, e não um link: muda estado no servidor. Fica em
+  componente porque o `<button type="submit">` dentro dele é cru, e porque a
+  mesma estrela aparece em quatro catálogos.
+
+  Quem chama precisa passar o `csrf_token` — dentro de um componente Cotton com
+  isolamento de contexto, `{% csrf_token %}` não enxerga o token da página.
+{% endcomment %}
+{% load icones %}
+<form method="post" action="{{ url }}" class="catalog-row__default-form">
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+  <button
+    type="submit"
+    class="icon-button"
+    aria-label="Definir {% if label %}{{ label }} {% endif %}como padrão"
+    data-tooltip="Definir como padrão"
+  >{% icone_svg "star" %}</button>
+</form>

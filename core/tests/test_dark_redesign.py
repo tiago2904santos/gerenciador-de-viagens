@@ -673,13 +673,11 @@ class DarkRedesignContractTests(SimpleTestCase):
         for relative in (
             "oficios/partials/oficio_list_card.html",
             # Migrados para o v2 e portanto fora deste contrato: termos
-            # (2026-08-15), ordens de serviço (2026-08-15) e roteiros
-            # (2026-08-17). Os dois arquivos de card de roteiro foram APAGADOS
+            # (2026-08-15), ordens de serviço (2026-08-15), roteiros
+            # (2026-08-17), eventos e prestações de contas (2026-08-18). Os dois arquivos de card de roteiro foram APAGADOS
             # junto — `roteiro_list_card.html` e `_roteiro_card_body.html` só
             # existiam para o `entity_card`.
-            "eventos/partials/evento_list_card.html",
             "planos_trabalho/partials/plano_list_card.html",
-            "prestacoes_contas/partials/prestacao_list_card.html",
         ):
             with self.subTest(template=relative):
                 source = (templates / relative).read_text(encoding="utf-8")

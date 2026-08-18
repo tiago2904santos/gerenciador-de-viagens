@@ -1,0 +1,26 @@
+{% cotton:vars fields_json label url %}
+{% comment %}
+  Editar sem sair da lista: abre o painel de edição rápida com os valores da
+  linha já preenchidos.
+
+  Três ganchos do `js/core/app.js`, e os dois últimos levam VALOR — por isso o
+  botão é cru e mora aqui dentro, onde o guarda de botão cru não alcança:
+
+  - `data-quick-edit` marca o gatilho;
+  - `data-edit-url` é para onde o POST vai;
+  - `data-edit-fields` é o JSON com os valores atuais do registro.
+
+  O `app.js` escuta por DELEGAÇÃO no documento, e não por ligação direta: a lista
+  é trocada por AJAX quando se filtra, e um botão ligado na carga da página
+  para de responder depois da primeira busca.
+{% endcomment %}
+{% load icones %}
+<button
+  type="button"
+  class="icon-button"
+  data-quick-edit
+  data-edit-url="{{ url }}"
+  data-edit-fields="{{ fields_json }}"
+  aria-label="Editar{% if label %} {{ label }}{% endif %}"
+  data-tooltip="Editar"
+>{% icone_svg "edit" %}</button>

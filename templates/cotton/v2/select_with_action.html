@@ -36,14 +36,22 @@
   </div>
 
   {% if action_href %}
-    <span class="field-with-action__action">
-      <c-v2.icon_button
-        :icon="action_icon|default:'settings'"
-        :href="action_href"
-        :aria_label="action_aria_label"
-        :tooltip="action_tooltip"
-        tooltip_tone="accent"
-      />
-    </span>
+    {% comment %}
+      O `|default` resolvido ANTES, num `{% with %}`: `:attr="..."` do Cotton é
+      uma BUSCA de variável, não uma expressão — o filtro não roda ali, a busca
+      falha e o atributo chega VAZIO. Ícone vazio cai no símbolo `unknown`, e o
+      botão de gerenciar modelos aparecia na tela como um "?" (2026-08-18).
+    {% endcomment %}
+    {% with icone=action_icon|default:'settings' %}
+      <span class="field-with-action__action">
+        <c-v2.icon_button
+          :icon="icone"
+          :href="action_href"
+          :aria_label="action_aria_label"
+          :tooltip="action_tooltip"
+          tooltip_tone="accent"
+        />
+      </span>
+    {% endwith %}
   {% endif %}
 </div>

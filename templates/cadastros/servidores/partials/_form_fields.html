@@ -1,14 +1,13 @@
-<div class="field-grid field-grid--cols-3">
-  <c-ui.forms.field :field="form.nome" size_class="field-size-2" only />
-  <c-ui.forms.field :field="form.cargo" :action_url="cargos_manage_url" action_label="Gerenciar cargos" size_class="field-size-1" only />
-</div>
-
-<div class="field-grid field-grid--cols-3">
-  <c-ui.forms.field :field="form.cpf" size_class="field-size-1" only />
-  <c-ui.forms.field :field="form.telefone" size_class="field-size-1" only />
-  <div class="field app-form-field cv-field field-size-1 field-rg-wrap" data-rg-field-wrap>
-    <label class="cv-field__label" for="{{ form.rg.id_for_label }}">{{ form.rg.label }}</label>
-    <div>{{ form.rg }}</div>
-    {% if form.rg.errors %}<c-ui.feedback.field_error :errors="form.rg.errors" :field_id="form.rg.auto_id" only />{% endif %}
+{% comment %}
+  Identificação do servidor. O RG tem invólucro próprio (`data-rg-field-wrap`):
+  `servidores-form.js` o esconde quando "sem RG" está marcado.
+{% endcomment %}
+<div class="field-grid">
+  <c-v2.form_field :field="form.nome" extra_class="field--wide" />
+  <c-v2.form_field :field="form.cargo" :action_url="cargos_manage_url" action_label="Gerenciar cargos" />
+  <c-v2.form_field :field="form.cpf" />
+  <c-v2.form_field :field="form.telefone" />
+  <div data-rg-field-wrap>
+    <c-v2.form_field :field="form.rg" />
   </div>
 </div>

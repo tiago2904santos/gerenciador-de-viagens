@@ -1,0 +1,56 @@
+{% cotton:vars action_label action_url extra_class field help label %}
+{% comment %}
+  Campo de formulário a partir de um `BoundField` do Django — rótulo, widget,
+  ajuda e erro, no desenho do v2.
+
+  Existe porque os catálogos (cargos, unidades, justificativas…) renderizam
+  formulários inteiros vindos do Python, e escrever `<input>` à mão em cada um
+  significaria repetir `name`, `value`, `required` e `maxlength` que o form já
+  sabe — e perder a validação do Django no caminho.
+
+  O widget sai com as classes que o form dá (`form-control`, `cv-field__control`,
+  `form-select`), que são as mesmas das telas legadas: `v2/input.css` veste essas
+  classes DENTRO de um `.field`, e é isso que evita mexer no Python para migrar a
+  aparência.
+
+  `action_url`/`action_label` acoplam ao campo o atalho de gerenciar o catálogo
+  que o alimenta — "Gerenciar cargos" ao lado do cargo do servidor. O link leva
+  `data-autosave-link="1"`, e o VALOR importa: `autosave.js` procura por
+  `[data-autosave-link="1"]` para salvar o rascunho antes de sair da página. Sem
+  ele, quem clica em "Gerenciar cargos" no meio do cadastro perde o que digitou.
+  É por causa desse valor que o link é cru: `hook` do `c-v2.button` sai escapado.
+
+  Checkbox não passa por aqui: no v2 ele é um cartão clicável, e o cartão tem
+  contrato próprio.
+{% endcomment %}
+{% comment %}
+  O `{% with %}` não é enfeite: em atributo de componente Cotton (`:attr=`) o
+  valor é uma BUSCA DE VARIÁVEL, não uma expressão — `label|default:field.label`
+  chega vazio e o campo sai sem rótulo nenhum. Medido: cinco campos do cadastro
+  de servidor apareceram só com o texto de exemplo. Resolvido aqui, o atributo
+  recebe uma variável simples.
+{% endcomment %}
+{% with rotulo=label|default:field.label ajuda=help|default:field.help_text erro=field.errors.0 %}
+<c-v2.field
+  :label="rotulo"
+  :label_for="field.id_for_label"
+  :help="ajuda"
+  :error="erro"
+  :extra_class="extra_class"
+>
+  <c-slot name="control">
+    {% if action_url %}
+      <div class="field__control-row">
+        {{ field }}
+        <a
+          class="button button--secondary button--sm field__manage"
+          href="{{ action_url }}"
+          data-autosave-link="1"
+        >{{ action_label|default:"Gerenciar" }}</a>
+      </div>
+    {% else %}
+      {{ field }}
+    {% endif %}
+  </c-slot>
+</c-v2.field>
+{% endwith %}

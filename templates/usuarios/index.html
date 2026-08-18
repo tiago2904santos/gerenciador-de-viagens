@@ -3,16 +3,42 @@
 
 {% block title %}Usuários{% endblock %}
 
-{% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/pages/usuarios.css' %}">
-{% endblock %}
-
 {% block content %}
-  <div class="usuarios-page">
-    <c-lists.list_page_quick_add :title="page_title" eyebrow="Administração" search_placeholder="Buscar por nome, usuário, e-mail ou área" empty_message="Nenhum usuário encontrado." :rows="rows" :q="q" :page_obj="page_obj" :pagination_pages="pagination_pages" :page_querystring="page_querystring" :quick_add_form="quick_add_form" quick_add_panel_id="quick-add-usuario" quick_add_label="Cadastrar usuário" quick_add_submit_label="Criar usuário" quick_add_body_template="usuarios/partials/_quick_add_usuario_fields.html" :quick_add_compact="True" :hide_realtime_count="True" band_tabs_template="cotton/lists/list_toggle.html" :abas="abas" :tabs_aria_label="tabs_aria_label" :can_edit_area="can_edit_area" :delete_modal_enabled="True" delete_modal_title="Excluir usuário?" delete_modal_entity="este usuário"  :back_label="back_label" :back_url="back_url" :extra_hidden_field_name="extra_hidden_field_name" :extra_hidden_field_value="extra_hidden_field_value" :quick_add_next_url="quick_add_next_url" :request="request" :empty_action_label="empty_action_label" :empty_action_url="empty_action_url" :empty_variant="empty_variant" :cotton_attr_aria_label="cotton_attr_aria_label" :cotton_attr_href="cotton_attr_href" :cotton_attr_label="cotton_attr_label" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :shell="shell" :variant="variant" />
+  {% comment %}
+    Catálogo de contas no v2 (2026-08-18). Duas telas, um par de abas: usuários e
+    áreas são a mesma lista com recortes diferentes, e o `toggle` do sistema é a
+    passagem entre elas — `abas` já vem pronto da view, no formato que o
+    componente lê (`url`, `label`, `count`, `is_active`).
 
-    {% include "usuarios/partials/_vincular_usuario_modal.html" with vincular_form=vincular_form only %}
-  </div>
+    O diálogo de vincular usuário a uma área continua o legado: é o único do
+    sistema com esse contrato e não tem par no v2 ainda.
+  {% endcomment %}
+  <c-v2.catalog_page
+    :title="page_title"
+    search_placeholder="Buscar por nome, usuário, e-mail ou área"
+    empty_message="Nenhum usuário encontrado."
+    :rows="rows"
+    :q="q"
+    :form="quick_add_form"
+    panel_id="quick-add-usuario"
+    toggle_label="Cadastrar usuário"
+    submit_label="Criar usuário"
+    delete_entity="este usuário"
+    delete_title="Excluir usuário?"
+    :next_value="quick_add_next_url"
+    :back_url="back_url"
+    :back_label="back_label"
+    :page_obj="page_obj"
+    :pages="pagination_pages"
+    :page_querystring="page_querystring"
+    :csrf_token="csrf_token"
+    :request="request"
+  >
+    <c-slot name="tabs"><c-v2.toggle :items="abas" aria_label="Administração" /></c-slot>
+    <c-slot name="fields">{% include "usuarios/partials/_quick_add_usuario_fields.html" with form=quick_add_form only %}</c-slot>
+  </c-v2.catalog_page>
+
+  {% include "usuarios/partials/_vincular_usuario_modal.html" with vincular_form=vincular_form only %}
 {% endblock %}
 
 {% block extra_js %}

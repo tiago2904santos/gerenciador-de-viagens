@@ -1,0 +1,73 @@
+{% cotton:vars back_label back_url csrf_token delete_entity delete_title empty_message fields form next_value page_obj page_querystring pages panel_id q request rows search_placeholder submit_label tabs title toggle_label %}
+{% comment %}
+  A página de um CATÁLOGO no v2 — a lista simples com cadastro rápido que os
+  quinze cadastros do sistema compartilham (cargos, cidades, combustíveis,
+  estados, unidades, tipos de evento, justificativas e modelos, modelos de
+  motivo, os quatro de planos de trabalho, usuários e áreas).
+
+  Antes cada uma dessas telas chamava `c-lists.list_page_quick_add` com ~50
+  atributos, quase todos repassados só para atravessar quatro níveis de include.
+  Aqui a tela diz o que muda entre elas: o nome, o texto de busca, o rótulo do
+  botão e os campos do formulário. O resto é igual porque sempre foi.
+
+  A busca é do SERVIDOR (`filter_mode="none"`): a lista é paginada, e filtrar no
+  cliente esconderia o que está nas outras páginas sem dizer que escondeu.
+
+  `next_value` é o `?next=` que atravessa o cadastro rápido quando se chega aqui
+  de outra tela — é ele que faz "Salvar" voltar para onde se estava.
+
+  `back_url`/`back_label` são o par dele na tela: quem chega de uma Ordem de
+  Serviço para cadastrar um modelo de motivo precisa de um caminho de volta
+  visível. Ele ocupa a ação flutuante da lista, que num catálogo está livre —
+  quem cria aqui é o cadastro rápido, não um botão de "novo".
+{% endcomment %}
+<c-v2.list_page
+  :title="title"
+  filter_mode="none"
+  :empty_message="empty_message"
+  :page_obj="page_obj"
+  :pages="pages"
+  :page_querystring="page_querystring"
+  :paginated="True"
+  :action_label="back_label"
+  :action_url="back_url"
+  action_icon="arrow-left"
+>
+  <c-slot name="controls">
+    <form method="get" action="{{ request.path }}" class="rail__form" role="search">
+      {% if next_value %}<input type="hidden" name="next" value="{{ next_value }}">{% endif %}
+      <c-v2.input
+        icon="search"
+        name="q"
+        :value="q"
+        :placeholder="search_placeholder"
+        :aria_label="search_placeholder"
+      />
+      <c-v2.button type="submit" label="Buscar" icon="search" />
+      {% if q %}<c-v2.button label="Limpar" icon="x" :href="request.path" />{% endif %}
+    </form>
+  </c-slot>
+
+  <c-slot name="quick_add">
+    <c-v2.quick_add
+      :panel_id="panel_id"
+      :toggle_label="toggle_label"
+      :submit_label="submit_label"
+      :errors="form.non_field_errors"
+      :form="form"
+    >
+      {% if next_value %}<input type="hidden" name="next" value="{{ next_value }}">{% endif %}
+      {{ fields }}
+    </c-v2.quick_add>
+  </c-slot>
+
+  {% if tabs %}<c-slot name="tabs">{{ tabs }}</c-slot>{% endif %}
+
+  <c-slot name="rows">
+    {% for row in rows %}
+      <c-v2.catalog_row :row="row" :csrf_token="csrf_token" :delete_title="delete_title" />
+    {% endfor %}
+  </c-slot>
+</c-v2.list_page>
+
+<c-v2.delete_modal :entity="delete_entity" />

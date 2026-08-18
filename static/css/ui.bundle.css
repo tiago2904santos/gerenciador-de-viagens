@@ -522,6 +522,46 @@
   color: var(--text-strong);
   opacity: 1;
 }
+
+/* ---- o widget do Django dentro de um campo do v2 ---------------------------
+ *
+ * Os formulários do sistema mandam as classes do widget desde o Python
+ * (`core/forms/widgets.py`): `form-control`, `form-select`, `cv-field__control`.
+ * São as mesmas classes das telas legadas, então elas não podem ser trocadas por
+ * `input__control` sem repintar o que ainda não migrou.
+ *
+ * A saída é vesti-las AQUI, e só dentro de um `.field` do v2: o catálogo
+ * renderiza `{{ field }}` como o Django o entrega, e o campo veste a roupa da
+ * tela. Sem isto o cadastro rápido saía com o input branco do navegador no meio
+ * de uma tela escura.
+ */
+:is(html[data-theme]) .field > .form-control,
+:is(html[data-theme]) .field > .form-select,
+:is(html[data-theme]) .field > .cv-field__control {
+  background: var(--surface-contrast, var(--surface-field));
+  border: 1px solid transparent;
+  border-radius: var(--radius-field);
+  box-sizing: border-box;
+  color: var(--text-strong);
+  font: inherit;
+  font-size: var(--text-size-base);
+  min-height: var(--control-height);
+  padding: var(--pad-field);
+  width: 100%;
+}
+
+:is(html[data-theme]) .field > .form-control:focus-visible,
+:is(html[data-theme]) .field > .form-select:focus-visible,
+:is(html[data-theme]) .field > .cv-field__control:focus-visible {
+  border-color: var(--focus-ring);
+  outline: none;
+}
+
+/* A estrela de "definir como padrão" é um formulário de um botão só; sem isto o
+   `<form>` quebra a linha das ações. */
+:is(html[data-theme]) .catalog-row__default-form {
+  display: contents;
+}
 /* <<< css/v2/input.css <<< */
 
 /* >>> css/v2/field.css >>> */
@@ -631,6 +671,26 @@
   background: var(--accent);
   border-color: var(--accent);
   color: var(--text-on-accent);
+}
+
+/* Campo com atalho de gerenciar ao lado: o controle come a sobra e o link fica
+   do tamanho do texto. Em tela estreita ele desce para a linha de baixo em vez
+   de espremer o campo. */
+:is(html[data-theme]) .field__control-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-tight);
+  min-width: 0;
+}
+
+:is(html[data-theme]) .field__control-row > :not(.field__manage) {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .field__manage {
+  flex: none;
 }
 /* <<< css/v2/field.css <<< */
 
@@ -1693,6 +1753,44 @@
   --alert-tone: var(--status-info);
 }
 
+
+/* ---- a pilha de avisos da página -------------------------------------------
+ *
+ * São as mensagens do Django, no topo do conteúdo. Elas ganham respiro embaixo
+ * para não encostar no cabeçalho da tela — sem isso o aviso e o título ficam
+ * colados e leem como uma peça só.
+ *
+ * A saída é animada por `js/components/notice-auto-dismiss.js`: depois de cinco
+ * segundos o aviso perde opacidade e altura, e o conteúdo sobe. As duas
+ * propriedades precisam estar na transição DAQUI — o JS só troca os valores.
+ */
+:is(html[data-theme]) .notice-stack,
+:is(html[data-theme]) .alerts {
+  margin-bottom: var(--gap);
+  padding-bottom: var(--gap-tight);
+}
+
+:is(html[data-theme]) .notice-stack .notice,
+:is(html[data-theme]) .alerts .alert {
+  transition:
+    height var(--ease),
+    margin var(--ease),
+    opacity var(--ease),
+    padding var(--ease);
+}
+
+:is(html[data-theme]) .notice--saindo {
+  opacity: 0;
+}
+
+/* Quem pediu menos movimento não recebe transição nenhuma: o aviso some, e é
+   isso. A remoção continua acontecendo no JS. */
+@media (prefers-reduced-motion: reduce) {
+  :is(html[data-theme]) .notice-stack .notice,
+  :is(html[data-theme]) .alerts .alert {
+    transition: none;
+  }
+}
 /* <<< css/v2/alert.css <<< */
 
 /* >>> css/v2/menu.css >>> */
@@ -2147,6 +2245,48 @@
 :is(html[data-theme]) .record__footer > *:first-child {
   margin-right: auto;
 }
+
+/* ---- linha de prestação: a que se edita na própria lista --------------------
+ *
+ * Cada servidor traz um formulário com o número da solicitação e o intervalo de
+ * liberação → saque. Ele fica ANTES do nome, na mesma linha: é o que se vem
+ * fazer nesta tela, e mandá-lo para baixo do nome faria a lista crescer o dobro.
+ */
+:is(html[data-theme]) .prestacao-row__form {
+  align-items: center;
+  display: flex;
+  flex: 1 1 320px;
+  gap: var(--gap-tight);
+  min-width: 0;
+  order: -1;
+}
+
+:is(html[data-theme]) .prestacao-row__solicitacao {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+/* Os três blocos de fato do cartão dividem a largura; em tela estreita eles
+   empilham, como no cartão de ofício. */
+:is(html[data-theme]) .prestacao-card__facts,
+:is(html[data-theme]) .evento-card__docs {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  min-width: 0;
+}
+
+/* O formulário de uma ação só não quebra a fila de ações do rodapé. */
+:is(html[data-theme]) .prestacao-card__inline-action {
+  display: contents;
+}
+
+/* A dica de vazio dentro de um bloco do cartão. */
+:is(html[data-theme]) .record__empty-hint {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  margin: 0;
+}
 /* <<< css/v2/record.css <<< */
 
 /* >>> css/v2/route-editor.css >>> */
@@ -2499,6 +2639,54 @@
   :is(html[data-theme]) .fact-list.travel-allowance__facts .fact:first-child {
     grid-row: auto;
   }
+}
+
+/* ---- as etiquetas de cidade no mapa ----------------------------------------
+ *
+ * O Leaflet desenha tooltip com caixa branca, borda cinza e seta — a cara dele,
+ * não a do sistema. O desenho delas morava em `pages/roteiros.css`, que saiu da
+ * tela na migração (2026-08-18), e por isso voltaram ao padrão da biblioteca no
+ * meio de um mapa dentro de uma tela escura.
+ *
+ * Aqui elas são pílulas na superfície do sistema, com o nome em caixa alta e
+ * miúda — legível sobre o mapa claro sem pedir atenção. Sede e destino diferem
+ * pela cor da borda: a sede usa o accent, o destino a linha comum.
+ */
+:is(html[data-theme]) .roteiro-mapa__city-tooltip.leaflet-tooltip {
+  background: var(--surface-rail);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 6px 16px rgb(0 0 0 / 0.28);
+  color: var(--text-strong);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: var(--weight-strong);
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  pointer-events: auto;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* A seta do balão é desenhada por `::before` com `border-top-color`; sem esta
+   linha ela continuava branca, apontando para uma pílula escura. */
+:is(html[data-theme]) .roteiro-mapa__city-tooltip.leaflet-tooltip-top::before {
+  border-top-color: var(--surface-rail);
+}
+
+:is(html[data-theme]) .roteiro-mapa__city-tooltip.leaflet-tooltip-bottom::before {
+  border-bottom-color: var(--surface-rail);
+}
+
+:is(html[data-theme]) .roteiro-mapa__city-tooltip--sede.leaflet-tooltip {
+  border-color: var(--accent);
+}
+
+/* O ponto no traçado: o Leaflet o pinta com `fill`/`stroke` no atributo, então
+   a folha só alcança o que ele deixa livre — o contorno branco em volta, que é
+   o que separa o ponto do mapa por baixo. */
+:is(html[data-theme]) .route-map__canvas .leaflet-interactive {
+  paint-order: stroke;
 }
 /* <<< css/v2/route-editor.css <<< */
 
@@ -3655,7 +3843,7 @@
   gap: var(--gap);
   grid-template-columns: none;
   min-height: var(--escolhido-height);
-  padding: 10px 12px;
+  padding: 14px 12px;
 }
 
 /* O "×" não é uma coluna com divisória: é o mesmo botão redondo de sempre, à
@@ -3874,7 +4062,7 @@
   gap: var(--gap);
   grid-template-columns: none;
   min-height: var(--escolhido-height, 56px);
-  padding: 14px 12px;
+  padding: 32px 12px;
   text-align: left;
   width: 100%;
 }
@@ -3956,32 +4144,39 @@
 
 /* ---- painel de funções da equipe (OS) ------------------------------------
  *
- * O toggle de funções (Condução / Técnico / Apoio) transbordava a caixa: os
- * botões são itens de flex e, por padrão, não encolhem abaixo do próprio
- * `min-content` — com três rótulos e o recuo do painel, a fileira ficava mais
- * larga que o contêiner e vazava para fora dele.
- *
- * Colunas iguais resolvem sem depender do comprimento do rótulo, e `min-width:
- * 0` é o que permite ao texto truncar em vez de esticar a coluna.
+ * O toggle de funções (Condução / Técnico / Apoio) é o `toggle--fill` do
+ * sistema, que já reparte a linha em colunas iguais. O que sobra para cá é o
+ * que depende de estar DENTRO do picker: a caixa não pode crescer além dele, e
+ * o rótulo precisa truncar em vez de esticar a coluna — com três rótulos e o
+ * recuo do painel, a fileira ficava mais larga que o contêiner e vazava.
  */
 :is(html[data-theme]) .picker .os-servidor-role-panel {
   min-width: 0;
 }
 
-:is(html[data-theme]) .picker .os-servidor-role-panel .segment-toggle {
+:is(html[data-theme]) .picker .os-servidor-role-panel .toggle {
   box-sizing: border-box;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
   max-width: 100%;
   min-width: 0;
 }
 
-:is(html[data-theme]) .picker .os-servidor-role-panel .segment-toggle__btn {
+:is(html[data-theme]) .picker .os-servidor-role-panel .toggle__item {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* O selo de função do servidor. O cartão destacado leva o selo de accent do
+   motorista; os demais, o chip neutro do v2 — e os dois têm de medir o MESMO,
+   senão a fileira de cartões ganha alturas diferentes conforme a função. 18px é
+   a caixa da linha do nome ao lado, a mesma conta do selo de motorista. */
+:is(html[data-theme]) .picker .search-picker__selected-card .chip--v2 {
+  box-sizing: border-box;
+  height: 18px;
+  line-height: 1;
+  min-height: 0;
+  padding: 0 8px;
 }
 /* <<< css/v2/picker.css <<< */
 
@@ -4566,6 +4761,36 @@
 :is(html[data-theme]) .date-field__panel .date-picker__day--multi-end:nth-child(7n + 1)::before,
 :is(html[data-theme]) .date-field__panel .date-picker__day--range-end:nth-child(7n + 1)::before {
   border-radius: var(--radius-field) var(--radius-pill) var(--radius-pill) var(--radius-field);
+}
+
+/* O campo interno do calendário se comporta como o `.field` do v2 — mesma
+   grade, mesmo vão entre rótulo e controle.
+ *
+ * O partial global monta o próprio invólucro na classe legada (`cv-field`), que
+ * no v2 não tem layout nenhum. Lado a lado com um campo do sistema — "Data" ao
+ * lado de "Hora", dentro do card de trecho — o rótulo colava no controle e os
+ * dois inputs começavam em alturas diferentes. */
+:is(html[data-theme]) .date-field .cv-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* O rótulo do calendário usa a MEDIDA do rótulo do sistema. O partial global o
+   traz na classe legada (`cv-field__label`, 0.78rem), e ao lado de um campo do
+   v2 (`field__label`, 14px) os dois rótulos saíam de tamanhos diferentes — os
+   campos "Data" e "Hora" do mesmo trecho começavam em alturas distintas.
+
+   Esta regra já existia e caiu quando esta folha foi cortada para remover a
+   lista de trechos do painel; voltou com a medição que a pegou de novo. */
+:is(html[data-theme]) .date-field .cv-field__label {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  /* 1.5, a mesma entrelinha do rótulo do sistema: com 1.3 o rótulo do calendário
+     media 18,2px contra 21px do vizinho, e os dois campos começavam com 2px de
+     diferença — pouco para nomear, o bastante para ver. */
+  line-height: 1.5;
 }
 /* <<< css/v2/date-picker.css <<< */
 

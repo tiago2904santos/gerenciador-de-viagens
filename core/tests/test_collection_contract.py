@@ -42,7 +42,9 @@ class CollectionContractTests(SimpleTestCase):
         for filename in (
             "list_page_cards.html",
             "list_page_quick_add.html",
-            "list_page_standard.html",
+            # `list_page_standard.html` saiu em 2026-08-18: servidores e
+            # viaturas, seus dois últimos consumidores, migraram para o
+            # `c-v2.list_page`.
         ):
             with self.subTest(component=filename):
                 source = (components / filename).read_text(encoding="utf-8")

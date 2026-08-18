@@ -275,28 +275,28 @@
 
     if (needsRebuild) {
       toggle.replaceChildren();
-      modes.forEach(function (mode, index) {
+      modes.forEach(function (mode) {
+        /* MESMA estrutura do `v2/os_role_toggle.html` — `toggle__item` com o
+           rótulo num `<span>`. Montar diferente daqui faria o toggle trocar de
+           cara na primeira vez que o tipo de OS mudasse o conjunto de funções. */
         var button = document.createElement("button");
         button.type = "button";
-        button.className = "segment-toggle__btn";
+        button.className = "toggle__item";
         button.dataset.osRoleMode = mode;
         button.setAttribute("aria-pressed", mode === activeRole ? "true" : "false");
-        button.textContent = OS_ROLE_LABELS[mode] || mode;
+        var label = document.createElement("span");
+        label.textContent = OS_ROLE_LABELS[mode] || mode;
+        button.appendChild(label);
         toggle.appendChild(button);
       });
     }
 
+    /* Só o estado: a animação de entrada saiu junto com o toggle legado. O
+       modelo global marca a troca pela transição do próprio segmento, e o
+       "pop" era desenho que só este toggle tinha. */
     form.querySelectorAll("[data-os-role-mode]").forEach(function (button) {
       var active = button.dataset.osRoleMode === activeRole;
-      var wasActive = button.getAttribute("aria-pressed") === "true";
       button.setAttribute("aria-pressed", active ? "true" : "false");
-
-      /* Dispara a animação de entrada apenas na troca (não no carregamento) */
-      if (active && !wasActive) {
-        button.classList.remove("segment-toggle__btn--pop");
-        void button.offsetWidth;
-        button.classList.add("segment-toggle__btn--pop");
-      }
     });
   }
 
@@ -343,7 +343,6 @@
     }
     if (!badge) {
       badge = document.createElement("span");
-      badge.className = "os-servidor-role-badge";
       badge.dataset.osRoleBadge = "true";
       var titleRow = window.CV.picker.part(card, "selected-title-row");
       if (titleRow) {
@@ -353,7 +352,11 @@
       }
     }
     var label = role ? OS_ROLE_LABELS[role] : "Sem função - texto padrão";
-    badge.classList.toggle("search-picker__driver-chip", highlighted);
+    /* Dois selos do v2, e nenhum desenho próprio da página: no cartão
+       destacado, o mesmo selo de accent do motorista; nos demais, o chip
+       neutro. A altura é a mesma nos dois (18px, a caixa da linha do nome),
+       senão o cartão com selo fica mais alto que o sem. */
+    badge.className = highlighted ? "search-picker__driver-chip" : "chip--v2";
     badge.textContent = label;
   }
 

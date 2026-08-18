@@ -1,1 +1,122 @@
-<c-ui.lists.entity_card :card="card" extra_class="evento-lc" body_template="eventos/partials/_evento_card_body.html" :csrf_token="csrf_token" only />
+{% load chips %}
+{% comment %}
+  Card de EVENTO no v2 (2026-08-18). Um painel por evento: título com destino e
+  período, selo de situação, e o miolo em três faixas — ofícios vinculados,
+  documentos do evento e quem viaja.
+
+  Os menus são servidos SOB DEMANDA (`PF-04`): o card traz só os gatilhos, com
+  `data-overlay-target` e `data-overlay-src`, e o corpo de cada menu vem de
+  `eventos:card_menus` no primeiro clique. Os `id` dos gatilhos têm de casar com
+  os do fragmento — `_card_menus.html` percorre as mesmas coleções na mesma
+  ordem, e há teste que compara os dois lados
+  (`test_todo_gatilho_da_lista_encontra_o_menu_dele_no_fragmento`).
+{% endcomment %}
+{% comment %}
+  Dois `{% with %}` aninhados: filtro dentro de `:attr` do Cotton não roda —
+  ali é BUSCA de variável —, e `chip` só existe para o `with` de dentro.
+{% endcomment %}
+{% with chip=card.header.chips.0 %}{% with chip_tom=chip.tone|tom_v2 %}
+<c-v2.record
+  box="panel"
+  :title="card.header.items.0.value"
+  :status="chip.label"
+  :status_tone="chip_tom"
+  :search_text="card.search_text"
+>
+  <c-slot name="actions">
+    <c-v2.icon_button icon="edit" :href="card.footer.edit_url" :aria_label="card.footer.edit_aria" tooltip="Editar evento" />
+    {% for menu in card.footer.danger_menus %}
+      <c-v2.icon_button
+        icon="more"
+        :menu_id="menu.id"
+        :menu_src="card.menus_url"
+        aria_label="Gerenciar evento"
+        tooltip="Mais ações"
+        tone="late"
+      />
+    {% endfor %}
+  </c-slot>
+
+  <c-slot name="body">
+    <div class="evento-card__docs">
+      <c-v2.form_block>
+        <c-slot name="body">
+          <span class="fact__label">Ofícios{% if card.oficios_count %} ({{ card.oficios_count }}){% endif %}</span>
+          {% if card.oficios %}
+            <ul class="person-list">
+              {% for oficio in card.oficios %}
+                <c-v2.person_row :name="oficio.numero" :meta="oficio.meta_display">
+                  <c-slot name="actions">
+                    <c-v2.icon_button
+                      icon="folder"
+                      menu_id="evento-oficio-menu-{{ card.pk }}-{{ oficio.oficio_pk }}"
+                      :menu_src="card.menus_url"
+                      aria_label="Abrir ações do ofício {{ oficio.numero }}"
+                      tooltip="Ações e documentos"
+                    />
+                  </c-slot>
+                </c-v2.person_row>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="record__empty-hint">Nenhum ofício vinculado</p>
+          {% endif %}
+        </c-slot>
+      </c-v2.form_block>
+
+      <c-v2.form_block>
+        <c-slot name="body">
+          <span class="fact__label">Documentos{% if card.documentos_count %} ({{ card.documentos_count }}){% endif %}</span>
+          {% if card.documentos %}
+            <ul class="person-list">
+              {% for documento in card.documentos %}
+                <c-v2.person_row :name="documento.title" :meta="documento.meta_display" :badge="documento.kind">
+                  <c-slot name="actions">
+                    <c-v2.icon_button
+                      icon="folder"
+                      menu_id="evento-documento-menu-{{ card.pk }}-{{ forloop.counter }}"
+                      :menu_src="card.menus_url"
+                      aria_label="Abrir ações de {{ documento.title }}"
+                      tooltip="Ações e documentos"
+                    />
+                  </c-slot>
+                </c-v2.person_row>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="record__empty-hint">Nenhum plano, convite ou OS vinculado</p>
+          {% endif %}
+        </c-slot>
+      </c-v2.form_block>
+    </div>
+
+    {% if card.servidores_flat %}
+      <ul class="person-list">
+        {% for oficio in card.oficios %}
+          {% for s in oficio.servidores %}
+            <c-v2.person_row
+              :initials="s.initials"
+              :name="s.name"
+              :meta="s.meta"
+              :badge="oficio.numero"
+              extra_class="{% if s.is_motorista %}person-row--driver{% endif %}"
+            >
+              {% if s.has_termo %}
+                <c-slot name="actions">
+                  <c-v2.icon_button
+                    icon="more"
+                    menu_id="evento-termo-action-menu-{{ oficio.oficio_pk }}-{{ s.servidor_pk }}"
+                    :menu_src="card.menus_url"
+                    aria_label="Ações do termo de {{ s.name }}"
+                    tooltip="{% if s.termo_assinado %}Termo assinado — ações{% else %}Ações do termo{% endif %}"
+                  />
+                </c-slot>
+              {% endif %}
+            </c-v2.person_row>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </c-slot>
+</c-v2.record>
+{% endwith %}{% endwith %}

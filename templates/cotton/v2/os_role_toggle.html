@@ -1,0 +1,28 @@
+{% cotton:vars aria_label %}
+{% comment %}
+  Função do servidor na OS — Condução, Técnico, Apoio.
+
+  É o `toggle` do sistema no tamanho pequeno, ocupando a linha inteira
+  (`--fill`): as três funções são uma escolha só, e não três botões
+  independentes. `--fill` reparte em colunas IGUAIS; com `flex` cada segmento
+  cresceria a partir do próprio rótulo e "Apoio" ficaria menor que "Condução".
+
+  Os botões são CRUS porque `data-os-role-mode` carrega VALOR, e valor dentro do
+  `hook` do `c-v2.button` sai escapado — dentro de `templates/cotton/` o botão
+  cru é o caminho previsto (mesma razão do `v2/route_mode_toggle.html`).
+
+  `js/pages/ordens-servico-form.js` acha o grupo por
+  `.os-servidor-role-panel__toggle`, lê `data-os-role-mode` e REFAZ os segmentos
+  quando o tipo de OS muda o conjunto de funções. Ele monta a mesma estrutura
+  daqui — `toggle__item` com o rótulo num `<span>`; escrever diferente de um
+  lado faz o toggle trocar de cara no primeiro clique.
+{% endcomment %}
+<c-v2.toggle
+  variant="state"
+  :aria_label="aria_label"
+  extra_class="toggle--fill toggle--sm os-servidor-role-panel__toggle"
+>
+  <button type="button" class="toggle__item" data-os-role-mode="CONDUCAO" aria-pressed="true"><span>Condução</span></button>
+  <button type="button" class="toggle__item" data-os-role-mode="TECNICO" aria-pressed="false"><span>Técnico</span></button>
+  <button type="button" class="toggle__item" data-os-role-mode="APOIO" aria-pressed="false"><span>Apoio</span></button>
+</c-v2.toggle>

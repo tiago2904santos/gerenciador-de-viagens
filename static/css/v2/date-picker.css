@@ -579,3 +579,33 @@
 :is(html[data-theme]) .date-field__panel .date-picker__day--range-end:nth-child(7n + 1)::before {
   border-radius: var(--radius-field) var(--radius-pill) var(--radius-pill) var(--radius-field);
 }
+
+/* O campo interno do calendário se comporta como o `.field` do v2 — mesma
+   grade, mesmo vão entre rótulo e controle.
+ *
+ * O partial global monta o próprio invólucro na classe legada (`cv-field`), que
+ * no v2 não tem layout nenhum. Lado a lado com um campo do sistema — "Data" ao
+ * lado de "Hora", dentro do card de trecho — o rótulo colava no controle e os
+ * dois inputs começavam em alturas diferentes. */
+:is(html[data-theme]) .date-field .cv-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* O rótulo do calendário usa a MEDIDA do rótulo do sistema. O partial global o
+   traz na classe legada (`cv-field__label`, 0.78rem), e ao lado de um campo do
+   v2 (`field__label`, 14px) os dois rótulos saíam de tamanhos diferentes — os
+   campos "Data" e "Hora" do mesmo trecho começavam em alturas distintas.
+
+   Esta regra já existia e caiu quando esta folha foi cortada para remover a
+   lista de trechos do painel; voltou com a medição que a pegou de novo. */
+:is(html[data-theme]) .date-field .cv-field__label {
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  /* 1.5, a mesma entrelinha do rótulo do sistema: com 1.3 o rótulo do calendário
+     media 18,2px contra 21px do vizinho, e os dois campos começavam com 2px de
+     diferença — pouco para nomear, o bastante para ver. */
+  line-height: 1.5;
+}

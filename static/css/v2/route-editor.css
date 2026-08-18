@@ -348,3 +348,51 @@
     grid-row: auto;
   }
 }
+
+/* ---- as etiquetas de cidade no mapa ----------------------------------------
+ *
+ * O Leaflet desenha tooltip com caixa branca, borda cinza e seta — a cara dele,
+ * não a do sistema. O desenho delas morava em `pages/roteiros.css`, que saiu da
+ * tela na migração (2026-08-18), e por isso voltaram ao padrão da biblioteca no
+ * meio de um mapa dentro de uma tela escura.
+ *
+ * Aqui elas são pílulas na superfície do sistema, com o nome em caixa alta e
+ * miúda — legível sobre o mapa claro sem pedir atenção. Sede e destino diferem
+ * pela cor da borda: a sede usa o accent, o destino a linha comum.
+ */
+:is(html[data-theme]) .roteiro-mapa__city-tooltip.leaflet-tooltip {
+  background: var(--surface-rail);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 6px 16px rgb(0 0 0 / 0.28);
+  color: var(--text-strong);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: var(--weight-strong);
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  pointer-events: auto;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* A seta do balão é desenhada por `::before` com `border-top-color`; sem esta
+   linha ela continuava branca, apontando para uma pílula escura. */
+:is(html[data-theme]) .roteiro-mapa__city-tooltip.leaflet-tooltip-top::before {
+  border-top-color: var(--surface-rail);
+}
+
+:is(html[data-theme]) .roteiro-mapa__city-tooltip.leaflet-tooltip-bottom::before {
+  border-bottom-color: var(--surface-rail);
+}
+
+:is(html[data-theme]) .roteiro-mapa__city-tooltip--sede.leaflet-tooltip {
+  border-color: var(--accent);
+}
+
+/* O ponto no traçado: o Leaflet o pinta com `fill`/`stroke` no atributo, então
+   a folha só alcança o que ele deixa livre — o contorno branco em volta, que é
+   o que separa o ponto do mapa por baixo. */
+:is(html[data-theme]) .route-map__canvas .leaflet-interactive {
+  paint-order: stroke;
+}

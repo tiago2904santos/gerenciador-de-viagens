@@ -26,6 +26,16 @@ APAGADOS_PELO_HT06 = (
     "lists/list_filters.html",  # órfão em cascata do anterior
 )
 
+# Migração dos cadastros para o v2 (2026-08-18): as duas telas que ainda
+# chamavam a lista padrão legada — servidores e viaturas — passaram ao
+# `c-v2.list_page`, e o alternador de abas virou o `toggle` do sistema. Sem
+# consumidor, os dois saíram; a prova de grep está no PR.
+APAGADOS_COM_OS_CADASTROS = (
+    "lists/list_page_standard.html",
+    "lists/list_toggle.html",
+)
+
+
 APAGADOS_COM_O_LAB = (
     "ui/buttons/field_action_button.html",
     "ui/buttons/floating_primary_action.html",
@@ -155,7 +165,24 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # de `id` e de `data-*` COM VALOR, que não cabem no `hook` do
         # `c-v2.button`. Dentro de `templates/cotton/` o botão cru é o caminho
         # previsto — é o diretório que o scanner exclui.
-        self.assertEqual(len(self.components()), 137)
+        #
+        # 140 (2026-08-18): +5 das peças de CATÁLOGO, -2 da lista legada e do
+        # alternador de abas, que ficaram sem consumidor quando servidores e
+        # viaturas migraram, -1 do rodapé de formulário da configuração.
+        # As cinco peças de catálogo são —
+        # `v2/catalog_page.html` (a tela inteira), `v2/catalog_row.html` (a
+        # linha), `v2/form_field.html` (um `BoundField` do Django no desenho do
+        # v2) e os dois botões de ação da linha, `v2/quick_edit_button.html` e
+        # `v2/set_default_button.html`. Os quinze catálogos do sistema chamavam
+        # `list_page_quick_add` com ~50 atributos cada; agora cada tela declara
+        # só o que tem de próprio.
+        #
+        # 141 (2026-08-18): `v2/prestacao_card.html`. É o cartão mais denso do
+        # sistema — um formulário com autosave por servidor, dois menus por
+        # linha (um deles com seis `data-wa-*`) e o anexar-assinado no rodapé —,
+        # e mora em componente porque quase toda ação dele é `<button>` cru com
+        # `data-*` COM VALOR, que não cabe no `hook` do `c-v2.button`.
+        self.assertEqual(len(self.components()), 141)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.
@@ -168,6 +195,11 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         """
         voltaram = [rel for rel in APAGADOS_PELO_HT06 if (COTTON / rel).exists()]
         self.assertEqual(voltaram, [], "componente apagado pelo HT-06 voltou")
+
+    def test_os_apagados_com_os_cadastros_nao_voltaram(self):
+        """A lista padrão legada e o alternador de abas, sem consumidor."""
+        voltaram = [rel for rel in APAGADOS_COM_OS_CADASTROS if (COTTON / rel).exists()]
+        self.assertEqual(voltaram, [], "componente apagado com os cadastros voltou")
 
     def test_os_apagados_da_cascata_do_be25_nao_voltaram(self):
         """Idem para a cascata do `NOVO-44` e para o que caiu com o UI Lab (PR #247)."""
@@ -187,7 +219,11 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         duas listas existirem, para que a próxima etapa não as apague de novo achando
         que o guarda de órfão já cobre o caso.
         """
-        nomeados = set(APAGADOS_PELO_HT06) | set(APAGADOS_COM_O_LAB)
+        nomeados = (
+            set(APAGADOS_PELO_HT06)
+            | set(APAGADOS_COM_O_LAB)
+            | set(APAGADOS_COM_OS_CADASTROS)
+        )
         vivos = {str(path.relative_to(COTTON)) for path in self.components()}
         self.assertEqual(nomeados & vivos, set())
         # com consumidor, o guarda de órfão não teria o que reclamar — só a lista pega

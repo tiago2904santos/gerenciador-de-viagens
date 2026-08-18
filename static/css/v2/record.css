@@ -253,3 +253,45 @@
 :is(html[data-theme]) .record__footer > *:first-child {
   margin-right: auto;
 }
+
+/* ---- linha de prestação: a que se edita na própria lista --------------------
+ *
+ * Cada servidor traz um formulário com o número da solicitação e o intervalo de
+ * liberação → saque. Ele fica ANTES do nome, na mesma linha: é o que se vem
+ * fazer nesta tela, e mandá-lo para baixo do nome faria a lista crescer o dobro.
+ */
+:is(html[data-theme]) .prestacao-row__form {
+  align-items: center;
+  display: flex;
+  flex: 1 1 320px;
+  gap: var(--gap-tight);
+  min-width: 0;
+  order: -1;
+}
+
+:is(html[data-theme]) .prestacao-row__solicitacao {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+
+/* Os três blocos de fato do cartão dividem a largura; em tela estreita eles
+   empilham, como no cartão de ofício. */
+:is(html[data-theme]) .prestacao-card__facts,
+:is(html[data-theme]) .evento-card__docs {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  min-width: 0;
+}
+
+/* O formulário de uma ação só não quebra a fila de ações do rodapé. */
+:is(html[data-theme]) .prestacao-card__inline-action {
+  display: contents;
+}
+
+/* A dica de vazio dentro de um bloco do cartão. */
+:is(html[data-theme]) .record__empty-hint {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  margin: 0;
+}

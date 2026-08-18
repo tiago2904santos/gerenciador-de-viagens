@@ -110,3 +110,43 @@
   color: var(--text-strong);
   opacity: 1;
 }
+
+/* ---- o widget do Django dentro de um campo do v2 ---------------------------
+ *
+ * Os formulários do sistema mandam as classes do widget desde o Python
+ * (`core/forms/widgets.py`): `form-control`, `form-select`, `cv-field__control`.
+ * São as mesmas classes das telas legadas, então elas não podem ser trocadas por
+ * `input__control` sem repintar o que ainda não migrou.
+ *
+ * A saída é vesti-las AQUI, e só dentro de um `.field` do v2: o catálogo
+ * renderiza `{{ field }}` como o Django o entrega, e o campo veste a roupa da
+ * tela. Sem isto o cadastro rápido saía com o input branco do navegador no meio
+ * de uma tela escura.
+ */
+:is(html[data-theme]) .field > .form-control,
+:is(html[data-theme]) .field > .form-select,
+:is(html[data-theme]) .field > .cv-field__control {
+  background: var(--surface-contrast, var(--surface-field));
+  border: 1px solid transparent;
+  border-radius: var(--radius-field);
+  box-sizing: border-box;
+  color: var(--text-strong);
+  font: inherit;
+  font-size: var(--text-size-base);
+  min-height: var(--control-height);
+  padding: var(--pad-field);
+  width: 100%;
+}
+
+:is(html[data-theme]) .field > .form-control:focus-visible,
+:is(html[data-theme]) .field > .form-select:focus-visible,
+:is(html[data-theme]) .field > .cv-field__control:focus-visible {
+  border-color: var(--focus-ring);
+  outline: none;
+}
+
+/* A estrela de "definir como padrão" é um formulário de um botão só; sem isto o
+   `<form>` quebra a linha das ações. */
+:is(html[data-theme]) .catalog-row__default-form {
+  display: contents;
+}

@@ -1,10 +1,42 @@
-{% extends "cotton/page/flow_base.html" %}
+{% extends "base.html" %}
+{% load static %}
+{% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
 
-{% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
+{% block component_js %}{% include 'includes/form_components_js.html' only %}{% endblock %}
 
-{% block flow_body %}
-  <form method="post">
-    {% csrf_token %}
-    <c-form.card title="Informações do evento" title_id="evento-form-title" :heading_level="2" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :body_extra_class="body_extra_class" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :description="description" :extra_class="extra_class" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "eventos/partials/_form_body.html" with form=form action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id data_hook=data_hook element_id=element_id extra_class=extra_class heading_level=heading_level shell=shell variant=variant only %}</c-slot><c-slot name="footer">{% include "eventos/partials/_form_footer.html" with index_url=index_url panel_url=panel_url only %}</c-slot></c-form.card>
-  </form>
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  {% comment %}
+    Cadastro de evento no v2 (2026-08-18). As quatro seções continuam vindo de
+    `eventos/includes/_evento_form_sections.html`, que agora monta blocos do v2 —
+    o mesmo include serve o painel do evento, e por isso ele não foi absorvido
+    aqui.
+  {% endcomment %}
+  <div class="form-page">
+    <c-v2.header eyebrow="Eventos" :title="page_title" />
+
+    <c-v2.rail>
+      <c-slot name="controls">
+        <p class="rail__description">Identificação, destino, período e documentos do evento.</p>
+        <c-v2.button label="Cancelar" icon="arrow-left" :href="index_url" />
+        {% if panel_url %}<c-v2.button label="Abrir painel do evento" :href="panel_url" />{% endif %}
+      </c-slot>
+    </c-v2.rail>
+
+    <form method="post" class="form-page__form">
+      {% csrf_token %}
+
+      <c-v2.panel title="Informações do evento">
+        <c-slot name="body">
+          {% include "eventos/includes/_evento_form_sections.html" with form=form section_prefix="evento-real" only %}
+
+          <c-v2.card_footer>
+            <c-slot name="secondary"><c-v2.button label="Cancelar" icon="arrow-left" :href="index_url" /></c-slot>
+            <c-slot name="primary"><c-v2.button label="Salvar evento" variant="primary" icon="check" type="submit" /></c-slot>
+          </c-v2.card_footer>
+        </c-slot>
+      </c-v2.panel>
+    </form>
+  </div>
 {% endblock %}

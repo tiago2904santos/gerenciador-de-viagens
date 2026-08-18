@@ -258,12 +258,21 @@ class UmPadraoSoTests(SimpleTestCase):
         self.assertIn("errEl.textContent = ''", js)
 
     def test_o_resumo_saiu_de_zero_chamadores(self):
-        """O enunciado do `HT-03` é justamente que ele tinha zero em produção."""
+        """O enunciado do `HT-03` é justamente que ele tinha zero em produção.
+
+        Conta os DOIS resumos, o legado e o do v2 (`c-v2.form_errors`): à medida
+        que as telas migram, o chamador troca de nome sem que o formulário deixe
+        de ter resumo. Contar só o legado transformaria a migração em regressão —
+        e foi o que aconteceu quando os catálogos passaram para o v2
+        (2026-08-18): o número caiu de 19 para 15 sem nenhum formulário perder a
+        faixa de erro.
+        """
         producao = [
             caminho.relative_to(RAIZ).as_posix()
             for caminho, texto in self.templates()
-            if "feedback/form_errors.html" in texto or "ui.feedback.form_errors" in texto
-           
+            if "feedback/form_errors.html" in texto
+            or "ui.feedback.form_errors" in texto
+            or "c-v2.form_errors" in texto
         ]
 
         self.assertGreaterEqual(len(producao), 19, "esperava 18 formulários + o editor de roteiros")
@@ -381,7 +390,10 @@ class TelaRealTests(TestCase):
         html = resposta.content.decode()
 
         self.assertIn("data-form-errors", html)
-        self.assertIn("Não foi possível continuar", html)
+        # O título do resumo no v2 é "Corrija antes de continuar" — a tela de
+        # usuários migrou em 2026-08-18. O gancho de foco acima é o que este
+        # teste realmente protege, e ele continua.
+        self.assertIn("Corrija antes de continuar", html)
 
     def test_a_lista_sem_post_nao_mostra_resumo(self):
         html = self.client.get(reverse("usuarios:index")).content.decode()

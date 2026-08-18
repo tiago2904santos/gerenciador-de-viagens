@@ -55,14 +55,26 @@
     <c-v2.destinations id="termo-evento-destinos">
       <c-slot name="rows">
         {% for row in form.destination_rows %}
-          <c-v2.destination_row
-            :index="row.index"
-            :estado_selecionado="row.estado_id"
-            :cidade_selecionada="row.cidade_id"
-            :cidades="row.cidades"
-            :city_disabled="row.estado_id|yesno:'False,True'"
-            :removable="True"
-          />
+          {% comment %}
+            `travar_cidade` resolvido no `{% with %}`: filtro dentro de `:attr`
+            do Cotton não é avaliado, o valor chegava VAZIO — e vazio é falso,
+            então a cidade ficava liberada mesmo sem estado escolhido.
+
+            `yesno:',1'` e não `'False,True'`: o que chega ao componente é uma
+            STRING, e a string "False" é verdadeira num `{% if %}` — travaria a
+            cidade justamente nas linhas que já têm estado. Vazio/`1` são falso
+            e verdadeiro de verdade para o template.
+          {% endcomment %}
+          {% with travar_cidade=row.estado_id|yesno:',1' %}
+            <c-v2.destination_row
+              :index="row.index"
+              :estado_selecionado="row.estado_id"
+              :cidade_selecionada="row.cidade_id"
+              :cidades="row.cidades"
+              :city_disabled="travar_cidade"
+              :removable="True"
+            />
+          {% endwith %}
         {% endfor %}
       </c-slot>
     </c-v2.destinations>

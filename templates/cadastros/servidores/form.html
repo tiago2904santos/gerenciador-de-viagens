@@ -1,22 +1,59 @@
-{% extends "cotton/page/flow_base.html" %}
+{% extends "base.html" %}
 {% load static %}
 {% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
 
 {% block component_js %}{% include 'includes/form_components_js.html' only %}{% endblock %}
 
-{% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
-{% block flow_shell_extra %} document-form-page cadastros-form-page{% endblock %}
-{% block flow_shell_attrs %} data-servidor-form-shell{% endblock %}
+{% block title %}{{ page_title }}{% endblock %}
 
-{% block flow_body %}
-  <form method="post" class="document-form travel-document-wizard__form" novalidate data-servidor-form>
-    {% csrf_token %}
-    {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
-    <c-ui.feedback.form_errors :form="form" only />
-    <div class="form-section-stack form-section-stack--comfortable" data-travel-document-wizard-step1>
-      <c-form.card title="Dados do servidor" :description="page_description" title_id="servidores-form-card-title" extra_class="travel-document-card" body_extra_class="travel-document-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "cadastros/servidores/partials/_form_card_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_extra_class=body_extra_class body_id=body_id data_hook=data_hook heading_level=heading_level shell=shell cargos_manage_url=cargos_manage_url form=form unidades_manage_url=unidades_manage_url only %}</c-slot><c-slot name="footer">{% include "cadastros/servidores/partials/_form_card_footer.html" with back_url=back_url only %}</c-slot></c-form.card>
-    </div>
-  </form>
+{% block content %}
+  {% comment %}
+    Cadastro de servidor no v2 (2026-08-18). `data-servidor-form` fica: é por ele
+    que `js/pages/servidores-form.js` acha o formulário para restaurar o rascunho
+    e para tratar os atalhos de "Gerenciar cargos"/"Gerenciar unidades".
+
+    SEM `data-travel-document-wizard-step1`: aquele marcador arrasta um tema
+    legado inteiro (160 regras, várias com `!important`) e numa tela v2 ele
+    desfaz mais do que decora — foi assim na migração de termos.
+  {% endcomment %}
+  <div class="form-page">
+    <c-v2.header eyebrow="Cadastros" :title="page_title" />
+
+    <c-v2.rail>
+      <c-slot name="controls">
+        <p class="rail__description">{{ page_description }}</p>
+        <c-v2.button label="Voltar" icon="arrow-left" :href="back_url" />
+      </c-slot>
+    </c-v2.rail>
+
+    <form method="post" class="form-page__form" novalidate data-servidor-form>
+      {% csrf_token %}
+      {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+
+      <c-v2.form_errors :form="form" />
+
+      <c-v2.panel title="Dados do servidor" :description="page_description">
+        <c-slot name="body">
+          <c-v2.form_block :split="True" title="Identificação funcional" description="Dados pessoais e cargo">
+            <c-slot name="body">
+              {% include "cadastros/servidores/partials/_form_fields.html" with form=form cargos_manage_url=cargos_manage_url only %}
+            </c-slot>
+          </c-v2.form_block>
+
+          <c-v2.form_block :split="True" title="Lotação" description="Unidade de lotação do servidor">
+            <c-slot name="body">
+              {% include "cadastros/servidores/partials/_lotacao_fields.html" with form=form unidades_manage_url=unidades_manage_url only %}
+            </c-slot>
+          </c-v2.form_block>
+
+          <c-v2.card_footer>
+            <c-slot name="secondary"><c-v2.button label="Voltar" icon="arrow-left" :href="back_url" /></c-slot>
+            <c-slot name="primary"><c-v2.button label="Salvar" variant="primary" icon="check" type="submit" /></c-slot>
+          </c-v2.card_footer>
+        </c-slot>
+      </c-v2.panel>
+    </form>
+  </div>
 {% endblock %}
 
 {% block extra_js %}

@@ -4,10 +4,60 @@
 
 {% block title %}{{ page_title }}{% endblock %}
 
-{% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/lists/entity-cards.css' %}">
-{% endblock %}
-
 {% block content %}
-  <c-lists.list_page_cards :title="page_title" eyebrow="EVENTOS" search_placeholder="Buscar por título, destino ou responsável..." search_aria_label="Buscar eventos" date_picker_id="ev-filter-date-picker" date_start_id="id_ev_viagem_de" date_end_id="id_ev_viagem_ate" tabs_aria_label="Abas de eventos" page_extra_class="eventos-list-page" card_template="eventos/partials/evento_list_card.html" empty_message="Nenhum evento encontrado." empty_action_label="Novo evento" :empty_action_url="novo_url" filter_empty_message="Nenhum evento encontrado com os filtros aplicados." action_label="Novo evento" :action_url="novo_url" delete_modal_title="Excluir Evento?" delete_modal_entity="este evento" cancel_modal_title="Cancelar evento?" cancel_modal_entity="este evento" cancel_modal_hint="Um evento cancelado deixa de gerar prestação de contas e não pode mais ser usado em novas Ordens de Serviço. Ao cancelar o evento, todos os documentos vinculados a ele também serão cancelados." confirm_action_eyebrow="Confirmar reativação" confirm_action_title="Reativar evento?" confirm_action_entity="este evento" confirm_action_hint="Os documentos cancelados junto com ele também serão reativados." confirm_action_button_label="Reativar evento" :attach_signed_modal="True"  :aba="aba" :abas="abas" :action_aria_label="action_aria_label" :band_tabs_template="band_tabs_template" :can_edit_area="can_edit_area" :cards="cards" :csrf_token="csrf_token" :page_obj="page_obj" :page_querystring="page_querystring" :page_title="page_title" :pagination_pages="pagination_pages" :request="request" :tabs_template="tabs_template" :cargo_filter="cargo_filter" :combustivel_filter="combustivel_filter" :confirm_action_icon="confirm_action_icon" :extra_class="extra_class" :hide_date_filter="hide_date_filter" :next_url="next_url" :primary_action_label="primary_action_label" :primary_action_url="primary_action_url" :q="q" :search_clear_url="search_clear_url" :search_name="search_name" :search_value="search_value" :sort="sort" :sort_options="sort_options" :status="status" :status_label="status_label" :status_name="status_name" :status_options="status_options" :status_value="status_value" :status_variant="status_variant" :temporal="temporal" :temporal_options="temporal_options" :unidade_filter="unidade_filter" :viagem_ate="viagem_ate" :viagem_de="viagem_de" :cotton_attr_aria_label="cotton_attr_aria_label" :cotton_attr_message="cotton_attr_message" :cotton_attr_title="cotton_attr_title" />
+  {% comment %}
+    Lista de eventos no v2 (2026-08-18). Lista de CARDS: um painel por evento,
+    porque o cartão cresce por faixas (ofícios, documentos, quem viaja) e é a
+    unidade que se lê e se clica.
+
+    Os quatro diálogos de ação são os do v2. A busca é do servidor.
+  {% endcomment %}
+  <c-v2.list_page
+    :title="page_title"
+    :cards="True"
+    filter_mode="none"
+    empty_message="Nenhum evento encontrado."
+    filter_empty_message="Nenhum evento encontrado com os filtros aplicados."
+    :page_obj="page_obj"
+    :pages="pagination_pages"
+    :page_querystring="page_querystring"
+    :paginated="True"
+    action_label="Novo evento"
+    :action_url="novo_url"
+  >
+    <c-slot name="controls">
+      <form method="get" action="{{ request.path }}" class="rail__form" role="search">
+        <input type="hidden" name="aba" value="{{ aba }}">
+        <c-v2.input
+          icon="search"
+          name="q"
+          :value="q"
+          placeholder="Buscar por título, destino ou responsável…"
+          aria_label="Buscar eventos"
+        />
+        <c-v2.button type="submit" label="Buscar" icon="search" />
+        {% if q %}<c-v2.button label="Limpar" icon="x" :href="search_clear_url" />{% endif %}
+      </form>
+    </c-slot>
+
+    <c-slot name="tabs"><c-v2.toggle :items="abas" aria_label="Abas de eventos" /></c-slot>
+
+    <c-slot name="rows">
+      {% for card in cards %}
+        {% include "eventos/partials/evento_list_card.html" with card=card csrf_token=csrf_token only %}
+      {% endfor %}
+    </c-slot>
+  </c-v2.list_page>
+
+  <c-v2.delete_modal entity="este evento" />
+  <c-v2.cancel_modal
+    entity="este evento"
+    hint="Um evento cancelado deixa de gerar prestação de contas e não pode mais ser usado em novas Ordens de Serviço. Ao cancelar o evento, todos os documentos vinculados a ele também serão cancelados."
+  />
+  <c-v2.confirm_modal
+    entity="este evento"
+    button_label="Reativar evento"
+    hint="Os documentos cancelados junto com ele também serão reativados."
+  />
+  <c-v2.attach_signed_modal />
 {% endblock %}

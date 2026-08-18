@@ -1,0 +1,229 @@
+{% cotton:vars card csrf_token current_url %}
+{% load icones chips %}
+{% comment %}
+  Card de PRESTAÇÃO DE CONTAS no v2 (2026-08-18). É o cartão mais denso do
+  sistema, e está aqui dentro — e não num parcial da tela — por uma razão de
+  contrato: quase toda ação dele é um `<button>` com `data-*` COM VALOR, e valor
+  dentro do `hook` do `c-v2.button` sai escapado. `templates/cotton/` é o
+  diretório onde o botão cru é o caminho previsto.
+
+  Três faixas:
+
+  1. **quem viaja** — uma linha por servidor, e cada linha carrega um FORMULÁRIO
+     próprio, com autosave (`data-autosave-*`), o número da solicitação e o
+     intervalo "liberação → saque". É o único cartão do sistema que se edita sem
+     sair da lista, e é por isso que o `<form>` mora dentro da linha;
+  2. **a viagem** — placa, modelo, trechos e o valor das diárias;
+  3. **o rodapé** — abrir a prestação, anexar o despacho assinado (13 ganchos do
+     `attach-signed-modal.js`) e os dois POST de finalizar e arquivar.
+
+  Os `id` dos menus (`prestacao-docs-menu-<ps>`, `diaria-wa-menu-<ps>`) casam com
+  os do fragmento servido por `prestacoes_contas:card_menus` (`PF-04`): renomear
+  um lado desliga o menu do outro sem levantar erro.
+{% endcomment %}
+{% comment %}
+  Dois `{% with %}` aninhados, e não um só: o filtro precisa rodar FORA do
+  `:attr` (lá ele não é avaliado, e o tom chegava vazio), e `chip` só existe
+  para o `with` de dentro.
+{% endcomment %}
+{% with chip=card.header.chips.0 %}{% with chip_tom=chip.tone|tom_v2 %}
+<c-v2.record
+  box="panel"
+  :title="card.header.items.0.value"
+  :status="chip.label"
+  :status_tone="chip_tom"
+  :search_text="card.search_text"
+  :extra_class="card.group_class"
+>
+  <c-slot name="body">
+    <ul class="person-list">
+      {% for servidor in card.servidores %}
+        <li class="person-row person-row--prestacao{% if servidor.is_motorista %} person-row--driver{% endif %}">
+          {% comment %}
+            O formulário da linha: salva sozinho e também aceita o POST da lista
+            (`action=save_solicitacoes`) para quem submete pelo teclado.
+          {% endcomment %}
+          <form
+            method="post"
+            action="{% url 'prestacoes_contas:index' %}"
+            class="prestacao-row__form"
+            novalidate
+            data-autosave="true"
+            data-autosave-model="prestacao_servidor"
+            data-autosave-step="lista"
+            data-autosave-url="{{ servidor.solicitacao_autosave_url }}"
+            data-autosave-object-id="{{ servidor.ps_pk }}"
+          >
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            <input type="hidden" name="action" value="save_solicitacoes">
+
+            <input
+              type="text"
+              name="ps-{{ servidor.ps_pk }}-numero_solicitacao"
+              class="input__control prestacao-row__solicitacao"
+              placeholder="Solicitação"
+              aria-label="Número da solicitação de {{ servidor.name }}"
+              autocomplete="off"
+              maxlength="60"
+              value="{{ servidor.numero_solicitacao }}"
+            >
+
+            {% with ps_id=servidor.ps_pk|stringformat:"s" %}
+              {% with liberacao_name="ps-"|add:ps_id|add:"-data_liberacao_diarias" liberacao_id="id_ps_"|add:ps_id|add:"_data_liberacao_diarias" prazo_name="ps-"|add:ps_id|add:"-prazo_limite_saque" prazo_id="id_ps_"|add:ps_id|add:"_prazo_limite_saque" picker_id="id_ps_"|add:ps_id|add:"_periodo_saque" aria_saque="Selecionar data de liberação e prazo para saque de "|add:servidor.name %}
+                <c-v2.date_picker
+                  mode="range"
+                  :picker_id="picker_id"
+                  button_label="Liberação → saque"
+                  :trigger_aria_label="aria_saque"
+                  :start_hidden_id="liberacao_id"
+                  :end_hidden_id="prazo_id"
+                  :start_hidden_name="liberacao_name"
+                  :end_hidden_name="prazo_name"
+                  :start_hidden_value="servidor.data_liberacao_diarias"
+                  :end_hidden_value="servidor.prazo_limite_saque"
+                  :initial_date="servidor.data_liberacao_diarias"
+                  :show_summary="False"
+                />
+              {% endwith %}
+            {% endwith %}
+          </form>
+
+          <div class="person-row__body">
+            <div class="person-row__name-row">
+              <span class="person-row__name">{{ servidor.name }}</span>
+              {% if servidor.is_motorista %}<span class="person-row__badge">Motorista</span>{% endif %}
+              {% if servidor.comprovante_ok %}
+                <span class="person-row__badge" title="Comprovante de saque anexado">✓ Comprovante</span>
+              {% endif %}
+            </div>
+            {% if servidor.meta %}<span class="person-row__meta">{{ servidor.meta }}</span>{% endif %}
+          </div>
+
+          <div class="person-row__actions">
+            <button
+              type="button"
+              class="icon-button"
+              aria-label="Abrir opções de documentos de {{ servidor.name }}"
+              data-tooltip="Baixar documentos"
+              aria-haspopup="true"
+              aria-expanded="false"
+              aria-controls="prestacao-docs-menu-{{ servidor.ps_pk }}"
+              data-overlay-trigger
+              data-overlay-kind="menu"
+              data-overlay-target="prestacao-docs-menu-{{ servidor.ps_pk }}"
+              data-overlay-src="{{ card.menus_url }}"
+            >{% icone_svg "folder" %}</button>
+
+            {% comment %}
+              Os seis `data-wa-*` são os campos da mensagem que
+              `prestacoes-diaria-wa.js` monta antes de abrir o WhatsApp.
+            {% endcomment %}
+            <button
+              type="button"
+              class="icon-button"
+              aria-label="Enviar aviso de liberação de diárias por WhatsApp"
+              data-tooltip="Enviar aviso de liberação (WhatsApp)"
+              aria-haspopup="true"
+              aria-expanded="false"
+              aria-controls="diaria-wa-menu-{{ servidor.ps_pk }}"
+              data-overlay-trigger
+              data-overlay-kind="menu"
+              data-overlay-target="diaria-wa-menu-{{ servidor.ps_pk }}"
+              data-overlay-src="{{ card.menus_url }}"
+              data-wa-phone="{{ servidor.whatsapp_phone }}"
+              data-wa-oficio="{{ servidor.whatsapp_oficio }}"
+              data-wa-unidade="{{ servidor.whatsapp_unidade }}"
+              data-wa-evento="{{ servidor.whatsapp_evento }}"
+              data-wa-servidor="{{ servidor.name }}"
+              data-wa-diaria="{{ servidor.whatsapp_diaria }}"
+            >{% icone_svg "whatsapp-modern" %}</button>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <div class="prestacao-card__facts">
+      <c-v2.form_block>
+        <c-slot name="body">
+          <div class="fact-list">
+            <c-v2.fact label="Placa" :value="card.veiculo_placa" :note="card.veiculo_modelo" note_label="Modelo" />
+          </div>
+        </c-slot>
+      </c-v2.form_block>
+
+      {% if card.trechos %}
+        <c-v2.form_block>
+          <c-slot name="body">
+            <span class="fact__label">Trechos encontrados</span>
+            <c-v2.itinerary :legs="card.trechos" />
+          </c-slot>
+        </c-v2.form_block>
+      {% endif %}
+
+      {% if card.valor_diarias_display %}
+        <c-v2.form_block>
+          <c-slot name="body">
+            <div class="fact-list">
+              <c-v2.fact
+                label="Valor total"
+                :value="card.valor_diarias_display"
+                note_label="Valor por extenso"
+                :note="card.valor_diarias_extenso"
+                :strong="True"
+              />
+            </div>
+          </c-slot>
+        </c-v2.form_block>
+      {% endif %}
+    </div>
+  </c-slot>
+
+  <c-slot name="actions">
+    <c-v2.icon_button icon="edit" :href="card.rt_url" aria_label="Abrir prestação na etapa 1" tooltip="Abrir prestação" />
+
+    {% comment %}
+      Anexar o despacho assinado. Os treze `data-attach-signed-*` são o contrato
+      de `components/attach-signed-modal.js`; `reopen-key` é o que faz o diálogo
+      voltar a abrir no lugar certo depois do upload.
+    {% endcomment %}
+    <button
+      type="button"
+      class="icon-button{% if card.despacho_assinado.assinado %} is-assinado{% endif %}"
+      aria-label="{% if card.despacho_assinado.assinado %}Gerenciar despacho assinado{% else %}Anexar despacho assinado{% endif %}"
+      data-tooltip="{% if card.despacho_assinado.assinado %}Despacho assinado — gerenciar{% else %}Anexar despacho assinado{% endif %}"
+      data-attach-signed-trigger
+      data-attach-signed-reopen-key="prestacao-despacho-{{ card.prestacao_pk }}"
+      data-attach-signed-accept="application/pdf,image/png,image/jpeg,.pdf,.png,.jpg,.jpeg"
+      data-attach-signed-file-description="um arquivo em PDF, PNG ou JPEG"
+      data-attach-signed-file-help="Selecione um único arquivo em PDF, PNG, JPG ou JPEG."
+      data-attach-signed-choose-label="Escolher arquivo"
+      data-attach-signed-upload-label="Anexar arquivo"
+      data-attach-signed-url="{{ card.despacho_assinado.anexar_url }}"
+      data-attach-signed-doc-label="o despacho do ofício {{ card.numero_display }}"
+      data-attach-signed-current-name="{{ card.despacho_assinado.nome_original }}"
+      data-attach-signed-current-view-url="{{ card.despacho_assinado.view_url }}"
+      data-attach-signed-current-remove-url="{{ card.despacho_assinado.remover_url }}"
+    >{% icone_svg "sign" %}</button>
+
+    <form method="post" action="{{ card.finalizar_url }}" class="prestacao-card__inline-action">
+      <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+      <input type="hidden" name="next" value="{{ current_url }}">
+      {% if card.finalizada %}
+        <button type="submit" class="icon-button" aria-label="Reabrir prestação" data-tooltip="Reabrir prestação">{% icone_svg "arrow-left" %}</button>
+      {% else %}
+        <button type="submit" class="icon-button" aria-label="Finalizar prestação" data-tooltip="Finalizar prestação">{% icone_svg "check" %}</button>
+      {% endif %}
+    </form>
+
+    <form method="post" action="{{ card.arquivar_url }}" class="prestacao-card__inline-action">
+      <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+      <input type="hidden" name="next" value="{{ current_url }}">
+      {% if card.arquivada %}
+        <button type="submit" class="icon-button" aria-label="Desarquivar prestação" data-tooltip="Desarquivar prestação">{% icone_svg "unarchive" %}</button>
+      {% else %}
+        <button type="submit" class="icon-button" aria-label="Arquivar prestação" data-tooltip="Arquivar prestação">{% icone_svg "archive" %}</button>
+      {% endif %}
+    </form>
+  </c-slot>
+</c-v2.record>
+{% endwith %}{% endwith %}

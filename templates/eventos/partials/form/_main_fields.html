@@ -1,7 +1,7 @@
 <div class="field-grid">
-  <c-ui.forms.field :field="form.titulo" size_class="field-size-4" only />
-  <c-ui.forms.field :field="form.descricao" size_class="field-size-4" only />
-  <c-ui.forms.field :field="form.status" size_class="field-size-2" only />
-  <c-ui.forms.field :field="form.unidade_responsavel" size_class="field-size-2" only />
-  <c-ui.forms.field :field="form.responsavel" size_class="field-size-4" only />
+  <c-v2.form_field :field="form.titulo" extra_class="field--wide" />
+  <c-v2.form_field :field="form.descricao" extra_class="field--wide" />
+  <c-v2.form_field :field="form.status" />
+  <c-v2.form_field :field="form.unidade_responsavel" />
+  <c-v2.form_field :field="form.responsavel" extra_class="field--wide" />
 </div>

@@ -1,5 +1,11 @@
-<c-ui.forms.form_block element_id="config-assinante-oficio" section_id="config-assinante-oficio-title" extra_class="travel-document-block document-form-block" title="Assinante do Ofício" description="Servidor que assina o ofício por padrão" :heading_level="3" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :shell="shell" :variant="variant"><c-slot name="body">{% include "cadastros/configuracao/partials/_assinante_oficio_fields.html" with assinaturas_form=assinaturas_form only %}</c-slot></c-ui.forms.form_block>
+<c-v2.form_block title="Assinante do Ofício" description="Servidor que assina o ofício por padrão">
+  <c-slot name="body">{% include "cadastros/configuracao/partials/_assinante_oficio_fields.html" with assinaturas_form=assinaturas_form only %}</c-slot>
+</c-v2.form_block>
 
-<c-ui.forms.form_block element_id="config-destinatario" section_id="config-destinatario-title" extra_class="travel-document-block document-form-block" title="Destinatário do Ofício" description="Nome, cargo e unidade lotada" :heading_level="3" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :shell="shell" :variant="variant"><c-slot name="body">{% include "cadastros/configuracao/partials/_destinatario_fields.html" with destinatario_form=destinatario_form only %}</c-slot></c-ui.forms.form_block>
+<c-v2.form_block title="Destinatário do Ofício" description="Nome, cargo e unidade lotada">
+  <c-slot name="body">{% include "cadastros/configuracao/partials/_destinatario_fields.html" with destinatario_form=destinatario_form only %}</c-slot>
+</c-v2.form_block>
 
-<c-ui.forms.form_block element_id="config-assinantes" section_id="config-assinantes-title" extra_class="travel-document-block document-form-block" title="Demais assinantes" description="Servidor que assina cada espécie por padrão" :heading_level="3" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :shell="shell" :variant="variant"><c-slot name="body">{% include "cadastros/configuracao/partials/_assinantes_outros_fields.html" with assinaturas_form=assinaturas_form only %}</c-slot></c-ui.forms.form_block>
+<c-v2.form_block title="Demais assinantes" description="Servidor que assina cada espécie por padrão">
+  <c-slot name="body">{% include "cadastros/configuracao/partials/_assinantes_outros_fields.html" with assinaturas_form=assinaturas_form only %}</c-slot>
+</c-v2.form_block>

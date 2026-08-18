@@ -1,6 +1,49 @@
 {% extends "base.html" %}
 {% block title %}Viaturas{% endblock %}
+
 {% block content %}
+  {% comment %}
+    Lista de viaturas no v2 (2026-08-18). Antes era o `list_page_standard`
+    legado com ~45 atributos; o que a tela tem de próprio são quatro linhas.
+
+    A busca é do SERVIDOR (`filter_mode="none"`): a lista é paginada, e filtrar
+    no cliente esconderia o que está nas outras páginas.
+  {% endcomment %}
   {% url "cadastros:viatura_create" as create_url %}
-  <c-lists.list_page_standard :title="page_title" :description="page_description" eyebrow="Cadastros" search_placeholder="Buscar viaturas" action_label="Nova viatura" :action_url="create_url" action_aria_label="Cadastrar viatura" empty_message="Nenhuma viatura cadastrada ainda." :rows="rows" :q="q" :disable_realtime_filter="True" :hide_realtime_count="True" :delete_modal_enabled="True" delete_modal_title="Excluir viatura?" delete_modal_entity="esta viatura"  :abas="abas" :attach_signed_modal_enabled="attach_signed_modal_enabled" :back_label="back_label" :back_url="back_url" :band_tabs_template="band_tabs_template" :brand_mark="brand_mark" :can_edit_area="can_edit_area" :cargo_filter="cargo_filter" :combustivel_filter="combustivel_filter" :current_aba="current_aba" :empty_action_label="empty_action_label" :empty_action_url="empty_action_url" :next_url="next_url" :page_obj="page_obj" :page_querystring="page_querystring" :pagination_pages="pagination_pages" :request="request" :search_clear_url="search_clear_url" :status_options="status_options" :status_value="status_value" :tabs_aria_label="tabs_aria_label" :tabs_template="tabs_template" :unidade_filter="unidade_filter" :advanced="advanced" :date_end_id="date_end_id" :date_picker_id="date_picker_id" :date_start_id="date_start_id" :extra_class="extra_class" :hide_date_filter="hide_date_filter" :primary_action_label="primary_action_label" :primary_action_url="primary_action_url" :search_aria_label="search_aria_label" :sort="sort" :sort_options="sort_options" :status="status" :status_label="status_label" :status_name="status_name" :status_variant="status_variant" :temporal="temporal" :temporal_options="temporal_options" :viagem_ate="viagem_ate" :viagem_de="viagem_de" />
+  <c-v2.list_page
+    :title="page_title"
+    filter_mode="none"
+    empty_message="Nenhuma viatura cadastrada ainda."
+    :page_obj="page_obj"
+    :pages="pagination_pages"
+    :page_querystring="page_querystring"
+    :paginated="True"
+    action_label="Nova viatura"
+    :action_url="create_url"
+  >
+    {% comment %}
+      As abas recortam a lista pelo CAMPO abaixo, e o recorte tem de sobreviver à
+      busca: por isso ele viaja num campo oculto do formulário. Sem ele, buscar
+      dentro de uma aba jogava a pessoa de volta para "Todos" sem avisar.
+    {% endcomment %}
+    <c-slot name="tabs"><c-v2.toggle :items="abas" aria_label="Filtrar viaturas por unidade ou combustível" /></c-slot>
+
+    <c-slot name="controls">
+      <form method="get" action="{{ request.path }}" class="rail__form" role="search">
+        {% if combustivel_filter %}<input type="hidden" name="combustivel" value="{{ combustivel_filter }}">{% endif %}
+        {% if unidade_filter %}<input type="hidden" name="unidade" value="{{ unidade_filter }}">{% endif %}
+        <c-v2.input icon="search" name="q" :value="q" placeholder="Buscar viaturas" aria_label="Buscar viaturas" />
+        <c-v2.button type="submit" label="Buscar" icon="search" />
+        {% if q %}<c-v2.button label="Limpar" icon="x" :href="request.path" />{% endif %}
+      </form>
+    </c-slot>
+
+    <c-slot name="rows">
+      {% for row in rows %}
+        <c-v2.catalog_row :row="row" :csrf_token="csrf_token" delete_title="Excluir viatura?" />
+      {% endfor %}
+    </c-slot>
+  </c-v2.list_page>
+
+  <c-v2.delete_modal entity="esta viatura" />
 {% endblock %}

@@ -1,27 +1,42 @@
-<c-ui.feedback.form_errors :form="diaria_form" only />
+{% comment %}
+  Os dois campos calculados (15% e 30%) são só PRÉVIA: `data-diaria-derivado` é
+  o gancho de `js/components/diaria-derivados.js`, que os recalcula enquanto se
+  digita o valor de 24 horas. Quem grava é o servidor — por isso eles são
+  `readonly` e `disabled`, e não entram no POST.
+{% endcomment %}
+<div class="field-grid">
+  <c-v2.form_field :field="diaria_form.faixa" />
 
-<div class="field-layout">
-  <div class="field-row field-row--3">
-    <c-ui.forms.field :field="diaria_form.faixa" only />
-    <c-ui.forms.date_picker mode="single" picker_id="diaria-vigencia-picker" :single_field="diaria_form.vigencia_inicio" only />
-    <c-ui.forms.field :field="diaria_form.valor_24h" only />
-  </div>
+  {% comment %}
+    O erro vai à mão porque o controle é o calendário, e não o widget do campo:
+    sem esta linha, "Já existe uma vigência para esta faixa nesta data" era
+    calculado, recusado no servidor e NUNCA aparecia na tela.
+  {% endcomment %}
+  {% with erro_vigencia=diaria_form.vigencia_inicio.errors.0 %}
+  <c-v2.field label="Vigência a partir de" label_for="id_vigencia_inicio" :error="erro_vigencia">
+    <c-slot name="control">
+      <c-v2.date_picker
+        mode="single"
+        picker_id="diaria-vigencia-picker"
+        :single_field="diaria_form.vigencia_inicio"
+      />
+    </c-slot>
+  </c-v2.field>
+  {% endwith %}
 
-  <div class="field-row field-row--2">
-    <div class="cv-field">
-      <label class="cv-field__label" for="diaria-calc-15">15% (calculado)</label>
-      <input class="form-control cv-field__control" id="diaria-calc-15" type="text"
+  <c-v2.form_field :field="diaria_form.valor_24h" />
+
+  <c-v2.field label="15% (calculado)" label_for="diaria-calc-15">
+    <c-slot name="control">
+      <input class="input__control" id="diaria-calc-15" type="text"
              data-diaria-derivado="0.15" readonly disabled aria-describedby="diaria-calc-ajuda">
-    </div>
-    <div class="cv-field">
-      <label class="cv-field__label" for="diaria-calc-30">30% (calculado)</label>
-      <input class="form-control cv-field__control" id="diaria-calc-30" type="text"
-             data-diaria-derivado="0.30" readonly disabled aria-describedby="diaria-calc-ajuda">
-    </div>
-  </div>
+    </c-slot>
+  </c-v2.field>
 
-  <p class="cv-field__hint" id="diaria-calc-ajuda">
-    Prévia do cálculo. Os percentuais não são editáveis e são gravados pelo
-    servidor a partir do valor de 24 horas.
-  </p>
+  <c-v2.field label="30% (calculado)" label_for="diaria-calc-30" help="Prévia do cálculo. Os percentuais não são editáveis e são gravados pelo servidor a partir do valor de 24 horas.">
+    <c-slot name="control">
+      <input class="input__control" id="diaria-calc-30" type="text"
+             data-diaria-derivado="0.30" readonly disabled aria-describedby="diaria-calc-ajuda">
+    </c-slot>
+  </c-v2.field>
 </div>

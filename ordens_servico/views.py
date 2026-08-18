@@ -147,9 +147,18 @@ def _ordem_back_label(ordem=None, evento=None):
 
 
 def _redirect_ordem_lista(ordem):
+    """Depois de salvar, a pessoa sai do formulário.
+
+    Voltava para a própria tela de edição: a mensagem de sucesso aparecia sobre
+    o mesmo formulário e nada dizia que o trabalho tinha terminado — quem salva
+    uma OS quer conferi-la na lista, não continuar editando.
+
+    A OS nascida dentro de um evento volta para a etapa dele, que é a lista
+    daquele fluxo.
+    """
     if getattr(ordem, "evento_id", None):
         return redirect("eventos:guiado_etapa", pk=ordem.evento_id, etapa=4)
-    return redirect("ordens_servico:editar", pk=ordem.pk)
+    return redirect("ordens_servico:index")
 
 
 def _build_oficio_summary(oficio):

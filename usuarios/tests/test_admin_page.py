@@ -91,7 +91,9 @@ class UsuariosAdminPageTests(TestCase):
         self.assertContains(response, reverse("usuarios:area_update", args=[area.pk]))
         self.assertContains(response, reverse("usuarios:area_delete", args=[area.pk]))
         self.assertContains(response, 'data-overlay-target="delete-confirm-modal"')
-        self.assertContains(response, "icon-btn--delete")
+        # A classe legada `icon-btn--delete` saiu na migração da tela para o v2
+        # (2026-08-18). O que este teste protege — a linha oferece exclusão — é
+        # cobrado pela asserção acima, no gatilho do diálogo.
         self.assertContains(response, "Excluir área?")
 
     def test_exclui_area_pela_lista(self):
@@ -321,7 +323,9 @@ class UsuariosAdminPageTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "record-row__vincular")
-        self.assertContains(response, "icon-btn--link")
+        # `icon-btn--link` era a classe legada do botão e saiu com a migração
+        # (2026-08-18). A de comportamento — `record-row__vincular`, que o
+        # `usuarios-admin.js` procura — sobreviveu, e é a asserção acima.
         self.assertContains(response, 'data-overlay-target="vincular-usuario-modal"')
         self.assertContains(response, f'data-vincular-usuario-id="{user.pk}"')
         self.assertContains(response, f'data-vincular-url="{reverse("usuarios:vinculo_create")}"')
@@ -331,7 +335,9 @@ class UsuariosAdminPageTests(TestCase):
         self.assertContains(response, reverse("usuarios:usuario_update", args=[user.pk]))
         self.assertContains(response, reverse("usuarios:usuario_delete", args=[user.pk]))
         self.assertContains(response, 'data-overlay-target="delete-confirm-modal"')
-        self.assertContains(response, "icon-btn--delete")
+        # A classe legada `icon-btn--delete` saiu na migração da tela para o v2
+        # (2026-08-18). O que este teste protege — a linha oferece exclusão — é
+        # cobrado pela asserção acima, no gatilho do diálogo.
         self.assertContains(response, "Excluir usuário?")
         # A própria conta logada não oferece exclusão.
         self.assertNotContains(

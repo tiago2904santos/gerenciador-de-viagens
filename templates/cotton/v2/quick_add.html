@@ -1,4 +1,4 @@
-{% cotton:vars action errors panel_id slot submit_label toggle_label %}
+{% cotton:vars action errors form panel_id slot submit_label toggle_label %}
 {% comment %}
   Quick add v2 — criação inline na própria lista. Par de
   `static/css/v2/quick-add.css`.
@@ -53,11 +53,11 @@
   method="post"
   action="{{ action }}"
   data-create-action="{{ action }}"
-  {% if not errors %}hidden{% endif %}
+  {% if not errors and not form.errors %}hidden{% endif %}
   novalidate
 >
   {% csrf_token %}
-  {% if errors %}<c-v2.form_errors :errors="errors" />{% endif %}
+  <c-v2.form_errors :errors="errors" :form="form" />
   <div class="quick-add__body">{{ slot }}</div>
 </form>
 
@@ -68,7 +68,7 @@
   data-inline-create-submit-when-open
   data-inline-create-save-label="{{ submit_label|default:'Salvar' }}"
   aria-controls="{{ panel_id }}"
-  aria-expanded="{% if errors %}true{% else %}false{% endif %}"
+  aria-expanded="{% if errors or form.errors %}true{% else %}false{% endif %}"
   aria-label="{{ toggle_label|default:'Cadastrar item' }}"
 >
   <span class="inline-create__toggle-icon" aria-hidden="true">+</span>

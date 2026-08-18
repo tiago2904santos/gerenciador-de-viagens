@@ -8,7 +8,12 @@
   Usa `panel` e não `form_block` porque é uma SEÇÃO de página — vive na primeira
   camada, direto sobre o fundo, e precisa do raio externo.
 {% endcomment %}
-<c-v2.panel :title="title|default:'Período e destinos'" description="Datas da viagem e locais na ordem da visita.">
+{% comment %}
+  `titulo` resolvido aqui fora: filtro dentro de `:attr` do Cotton não roda —
+  a busca falha e o painel ficaria sem título nenhum.
+{% endcomment %}
+{% with titulo=title|default:'Período e destinos' %}
+<c-v2.panel :title="titulo" description="Datas da viagem e locais na ordem da visita.">
   <c-slot name="body">
     <c-v2.form_block :split="True" title="Período" description="Ida e volta no mesmo calendário.">
       <c-slot name="body">
@@ -18,3 +23,4 @@
     {{ destinations }}
   </c-slot>
 </c-v2.panel>
+{% endwith %}

@@ -1,6 +1,6 @@
 {% if diarias_vigentes %}
   <table class="data-table">
-    <caption class="cv-field__hint">Histórico de valores por faixa.</caption>
+    <caption class="field__help">Histórico de valores por faixa.</caption>
     <thead>
       <tr>
         <th scope="col">Faixa</th>
@@ -23,5 +23,5 @@
     </tbody>
   </table>
 {% else %}
-  <c-ui.feedback.empty_state message="Nenhuma vigência cadastrada." variant="compact" only />
+  <p class="panel__empty-text">Nenhuma vigência cadastrada.</p>
 {% endif %}

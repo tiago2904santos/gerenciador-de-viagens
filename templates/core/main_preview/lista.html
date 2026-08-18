@@ -59,6 +59,32 @@
       </c-slot>
     </c-v2.list_page>
 
+    {% comment %}
+      A tela de CATÁLOGO inteira — a lista simples com cadastro rápido que os
+      quinze cadastros do sistema usam. Aqui ela aparece com duas linhas de
+      exemplo; na tela real as linhas vêm do presenter do catálogo.
+    {% endcomment %}
+    <h3 class="v2-lab__sub">Catálogo</h3>
+
+    <c-v2.catalog_page
+      title="Cargos"
+      search_placeholder="Buscar cargos"
+      empty_message="Nenhum cargo cadastrado ainda."
+      :rows="v2_catalogo_linhas"
+      panel_id="v2-lab-catalogo"
+      toggle_label="Cadastrar cargo"
+      submit_label="Salvar cargo"
+      delete_entity="este cargo"
+      delete_title="Excluir cargo?"
+      :request="request"
+    >
+      <c-slot name="fields">
+        <c-v2.field label="Nome">
+          <c-slot name="control"><c-v2.input placeholder="Nome do cargo" aria_label="Nome do cargo" /></c-slot>
+        </c-v2.field>
+      </c-slot>
+    </c-v2.catalog_page>
+
     <h3 class="v2-lab__sub">Linha de pessoa e ações do registro</h3>
 
     {% comment %}
@@ -83,6 +109,16 @@
         </ul>
       </c-slot>
     </c-v2.panel>
+
+    {% comment %}
+      O cartão de PRESTAÇÃO, que é o mais denso do sistema: uma linha por
+      servidor com edição na própria lista, os fatos da viagem e o rodapé de
+      ações. Aqui ele aparece com um card de exemplo; na tela real o `card` vem
+      do presenter de prestações.
+    {% endcomment %}
+    <h3 class="v2-lab__sub">Card de prestação</h3>
+
+    <c-v2.prestacao_card :card="v2_prestacao" :csrf_token="csrf_token" current_url="#" />
 
     <h3 class="v2-lab__sub">Card de lista completo — o modelo do ofício</h3>
 

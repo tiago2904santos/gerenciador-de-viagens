@@ -74,12 +74,18 @@
     Nos dois casos a paginação vem ANTES das linhas: "mostrando 11–20 de 48" é o
     que se precisa saber para decidir se é aqui que se procura.
   {% endcomment %}
+  {% comment %}
+    `rows.strip` e não `rows`: o slot chega como texto já renderizado, e um laço
+    sem itens devolve espaço em branco — que é VERDADEIRO. Sem o `strip`, uma
+    lista vazia em modo cards mostrava uma faixa de nada no lugar da mensagem
+    "nenhum registro", e cada aba perdia o texto que explica o próprio vazio.
+  {% endcomment %}
   {% if cards %}
     {% if paginated or page_obj %}
       <c-v2.pagination :page_obj="page_obj" :page_querystring="page_querystring" :pages="pages" :required="paginated" />
     {% endif %}
 
-    {% if rows %}
+    {% if rows.strip %}
       <div class="list-page__rows">{{ rows }}</div>
       {% comment %}
         O vazio de FILTRO nasce oculto e é o `collection.js` quem o mostra. Sem ele,
@@ -108,7 +114,7 @@
         branco, e uma paginação sempre presente faria o "nenhum registro
         cadastrado" nunca aparecer.
       {% endcomment %}
-      {% if rows %}
+      {% if rows.strip %}
         <c-slot name="body">
           {% if paginated or page_obj %}
             <c-v2.pagination :page_obj="page_obj" :page_querystring="page_querystring" :pages="pages" :required="paginated" />

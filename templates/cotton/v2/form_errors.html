@@ -1,4 +1,4 @@
-{% cotton:vars errors extra_class title %}
+{% cotton:vars errors extra_class form title %}
 {% comment %}
   Resumo de erros do formulário v2 — os erros que não pertencem a um campo
   (o `clean()` do Django). Par de `static/css/v2/form-errors.css`.
@@ -14,11 +14,35 @@
   (`#383444`, medido). O alerta mistura com TRANSPARENTE, e por isso funciona nos
   dois temas sozinho.
 {% endcomment %}
-{% if errors %}
-  <div class="alert form-errors{% if extra_class %} {{ extra_class }}{% endif %}" data-tone="error" role="alert">
+{% if errors or form.errors %}
+  {% comment %}
+    `data-form-errors` é o gancho que `js/core/fields-init.js` procura para
+    MOVER O FOCO até aqui depois de um POST inválido. Sem ele o formulário
+    recarrega com a mensagem no alto e o foco onde estava — quem usa teclado
+    ou leitor de tela não é levado ao que deu errado.
+  {% endcomment %}
+  <div class="alert form-errors{% if extra_class %} {{ extra_class }}{% endif %}" data-tone="error" role="alert" data-form-errors tabindex="-1">
     <p class="form-errors__title">{{ title|default:"Corrija antes de continuar" }}</p>
     <ul class="form-errors__list">
-      {% for erro in errors %}<li>{{ erro }}</li>{% endfor %}
+      {% comment %}
+        Sem erro de formulário INTEIRO, o resumo continua existindo e aponta para
+        os campos: um POST que falhou só por campo obrigatório recarregava a tela
+        sem nada explicando por quê — e é o caso mais comum.
+      {% endcomment %}
+      {% comment %}
+        Quem passa o formulário inteiro (`:form=`) não precisa repetir os erros:
+        eles saem de `non_field_errors`. Sem esta linha o resumo aparecia com o
+        texto genérico e ENGOLIA a mensagem do `clean()` — "Já existe uma
+        vigência desta faixa nesta data" era calculada, recusada no servidor e
+        nunca chegava à tela.
+      {% endcomment %}
+      {% if errors %}
+        {% for erro in errors %}<li>{{ erro }}</li>{% endfor %}
+      {% elif form.non_field_errors %}
+        {% for erro in form.non_field_errors %}<li>{{ erro }}</li>{% endfor %}
+      {% else %}
+        <li>Revise os campos destacados antes de continuar.</li>
+      {% endif %}
     </ul>
   </div>
 {% endif %}

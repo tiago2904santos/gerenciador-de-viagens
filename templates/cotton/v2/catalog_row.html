@@ -1,0 +1,62 @@
+{% cotton:vars csrf_token delete_title row %}
+{% load icones %}
+{% comment %}
+  Uma linha de catálogo — cargos, unidades, justificativas, horários, todos os
+  quinze. É o `record` do v2 com as três ações que um catálogo tem: definir como
+  padrão, editar sem sair da lista e excluir pelo diálogo global.
+
+  A sobrancelha é a sigla de duas letras que o presenter monta (`row.avatar`) —
+  "CT" para combustível, "CG" para cargo. Ela é o marcador do catálogo na linha,
+  e há teste que a cobra (`test_lista_usa_ct_como_marcador_do_catalogo`).
+
+  O presenter é o mesmo para todos (`apresentar_linha_lista_simples_*`), e é dele
+  que vêm `title`, `badges`, `meta`, `edit_url`, `edit_fields_json`,
+  `delete_url` e `set_default_url`. Uma linha só existe para essas três ações;
+  não há menu porque não há uma quarta.
+{% endcomment %}
+<c-v2.record
+  :eyebrow="row.avatar"
+  :title="row.title"
+  :status="row.badges.0.text"
+  :search_text="row.search_extra"
+>
+  {% if row.meta %}
+    <c-slot name="meta">{% for item in row.meta %}{% if not forloop.first %} · {% endif %}{{ item.value|default:item }}{% endfor %}</c-slot>
+  {% elif row.subtitle %}
+    <c-slot name="meta">{{ row.subtitle }}</c-slot>
+  {% endif %}
+
+  <c-slot name="actions">
+    {% if row.set_default_url %}
+      <c-v2.set_default_button :url="row.set_default_url" :label="row.title" :csrf_token="csrf_token" />
+    {% endif %}
+    {% comment %}
+      Vincular a uma área — só a lista de usuários tem. O botão é cru porque os
+      quatro `data-*` do `usuarios-admin.js` levam VALOR, e valor dentro do
+      `hook` do `c-v2.button` sai escapado; dentro de `templates/cotton/` o botão
+      cru é o caminho previsto.
+    {% endcomment %}
+    {% if row.vincular_url %}
+      <button
+        type="button"
+        class="icon-button record-row__vincular"
+        data-overlay-trigger
+        data-overlay-kind="dialog"
+        data-overlay-target="vincular-usuario-modal"
+        data-vincular-url="{{ row.vincular_url }}"
+        data-vincular-usuario-id="{{ row.vincular_usuario_id }}"
+        data-vincular-usuario-label="{{ row.vincular_usuario_label }}"
+        aria-label="Vincular {{ row.title }} a uma área"
+        data-tooltip="Vincular a uma área"
+      >{% icone_svg "link" %}</button>
+    {% endif %}
+    {% if row.edit_fields_json %}
+      <c-v2.quick_edit_button :url="row.edit_url" :fields_json="row.edit_fields_json" :label="row.title" />
+    {% elif row.edit_url %}
+      <c-v2.icon_button icon="edit" :href="row.edit_url" aria_label="Editar" tooltip="Editar" />
+    {% endif %}
+    {% if row.delete_url %}
+      <c-v2.delete_button :url="row.delete_url" :label="row.title" :title="delete_title" aria_label="Excluir" />
+    {% endif %}
+  </c-slot>
+</c-v2.record>

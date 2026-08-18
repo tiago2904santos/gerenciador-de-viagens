@@ -205,6 +205,12 @@ Raiz: `data-cv-date-picker`. Idempotência e ciclo de vida por `registerEnhancer
 | Intervalo | `data-cv-date-picker-start-value`, `data-cv-date-picker-start-display`, `data-cv-date-picker-start-label`, `data-cv-date-picker-end-value`, `data-cv-date-picker-end-display`, `data-cv-date-picker-end-label` |
 | Contexto | `data-cv-date-picker-context`, `data-cv-date-picker-context-route`, `data-cv-date-picker-context-step` |
 
+## Avisos que somem — `components/notice-auto-dismiss.js`
+
+Sem gancho `data-*`: o módulo acha os avisos pela pilha (`.notice-stack`,
+`.alerts`) e marca os que já armou com `data-auto-dismiss-armado`. Avisos de
+erro e de atenção (`--danger`, `--error`, `--warning`) ficam na tela.
+
 ## File picker — `components/file-picker.js`
 
 Raiz: `data-file-picker`, com o `<input type=file>` nativo em `data-file-native`.

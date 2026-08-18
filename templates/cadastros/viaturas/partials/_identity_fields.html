@@ -1,6 +1,6 @@
-<div class="field-grid field-grid--cols-4">
-  <c-ui.forms.field :field="form.placa" size_class="field-size-1" only />
-  <c-ui.forms.field :field="form.modelo" size_class="field-size-1" only />
-  <c-ui.forms.field :field="form.tipo" size_class="field-size-1" only />
-  <c-ui.forms.field :field="form.combustivel" :action_url="combustiveis_manage_url" action_label="Gerenciar combustíveis" size_class="field-size-1" only />
+<div class="field-grid">
+  <c-v2.form_field :field="form.placa" />
+  <c-v2.form_field :field="form.modelo" />
+  <c-v2.form_field :field="form.tipo" />
+  <c-v2.form_field :field="form.combustivel" :action_url="combustiveis_manage_url" action_label="Gerenciar combustíveis" />
 </div>

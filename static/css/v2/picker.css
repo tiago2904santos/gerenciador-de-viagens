@@ -408,7 +408,7 @@
   gap: var(--gap);
   grid-template-columns: none;
   min-height: var(--escolhido-height);
-  padding: 10px 12px;
+  padding: 14px 12px;
 }
 
 /* O "×" não é uma coluna com divisória: é o mesmo botão redondo de sempre, à
@@ -627,7 +627,7 @@
   gap: var(--gap);
   grid-template-columns: none;
   min-height: var(--escolhido-height, 56px);
-  padding: 14px 12px;
+  padding: 32px 12px;
   text-align: left;
   width: 100%;
 }
@@ -709,30 +709,37 @@
 
 /* ---- painel de funções da equipe (OS) ------------------------------------
  *
- * O toggle de funções (Condução / Técnico / Apoio) transbordava a caixa: os
- * botões são itens de flex e, por padrão, não encolhem abaixo do próprio
- * `min-content` — com três rótulos e o recuo do painel, a fileira ficava mais
- * larga que o contêiner e vazava para fora dele.
- *
- * Colunas iguais resolvem sem depender do comprimento do rótulo, e `min-width:
- * 0` é o que permite ao texto truncar em vez de esticar a coluna.
+ * O toggle de funções (Condução / Técnico / Apoio) é o `toggle--fill` do
+ * sistema, que já reparte a linha em colunas iguais. O que sobra para cá é o
+ * que depende de estar DENTRO do picker: a caixa não pode crescer além dele, e
+ * o rótulo precisa truncar em vez de esticar a coluna — com três rótulos e o
+ * recuo do painel, a fileira ficava mais larga que o contêiner e vazava.
  */
 :is(html[data-theme]) .picker .os-servidor-role-panel {
   min-width: 0;
 }
 
-:is(html[data-theme]) .picker .os-servidor-role-panel .segment-toggle {
+:is(html[data-theme]) .picker .os-servidor-role-panel .toggle {
   box-sizing: border-box;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
   max-width: 100%;
   min-width: 0;
 }
 
-:is(html[data-theme]) .picker .os-servidor-role-panel .segment-toggle__btn {
+:is(html[data-theme]) .picker .os-servidor-role-panel .toggle__item {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* O selo de função do servidor. O cartão destacado leva o selo de accent do
+   motorista; os demais, o chip neutro do v2 — e os dois têm de medir o MESMO,
+   senão a fileira de cartões ganha alturas diferentes conforme a função. 18px é
+   a caixa da linha do nome ao lado, a mesma conta do selo de motorista. */
+:is(html[data-theme]) .picker .search-picker__selected-card .chip--v2 {
+  box-sizing: border-box;
+  height: 18px;
+  line-height: 1;
+  min-height: 0;
+  padding: 0 8px;
 }

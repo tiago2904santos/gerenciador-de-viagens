@@ -14,34 +14,24 @@
     return node;
   }
 
-  function routeIcon() {
+  /* O MESMO ícone do modelo do v2 (`{% icone_svg "document" %}` na galeria): um
+     `use` do sprite, e não um desenho próprio montado aqui.
+
+     O que estas listas mostram é um DOCUMENTO — ofício, termo, justificativa —,
+     e o glifo de rota que morava aqui dizia outra coisa: era o único ícone do
+     sistema desenhado à mão dentro do JS, com `fill`/`stroke` próprios, e por
+     isso a lista real nunca ficava igual à do catálogo. */
+  function documentIcon() {
     var namespace = "http://www.w3.org/2000/svg";
     var svg = document.createElementNS(namespace, "svg");
-    svg.setAttribute("class", "icon related-route-icon");
+    svg.setAttribute("class", "icon");
     svg.setAttribute("viewBox", "0 0 24 24");
-    svg.setAttribute("width", "20");
-    svg.setAttribute("height", "20");
     svg.setAttribute("aria-hidden", "true");
     svg.setAttribute("focusable", "false");
-    svg.setAttribute("fill", "none");
 
-    [["6", "19"], ["18", "5"]].forEach(function (center) {
-      var circle = document.createElementNS(namespace, "circle");
-      circle.setAttribute("cx", center[0]);
-      circle.setAttribute("cy", center[1]);
-      circle.setAttribute("r", "2.5");
-      circle.setAttribute("fill", "currentColor");
-      svg.appendChild(circle);
-    });
-
-    var path = document.createElementNS(namespace, "path");
-    path.setAttribute("d", "M8.2 18.2h6.1a3.3 3.3 0 0 0 0-6.6H9.7a3.3 3.3 0 0 1 0-6.6h6.1");
-    path.setAttribute("stroke", "currentColor");
-    path.setAttribute("stroke-width", "2.2");
-    path.setAttribute("stroke-linecap", "round");
-    path.setAttribute("stroke-linejoin", "round");
-    path.setAttribute("fill", "none");
-    svg.appendChild(path);
+    var use = document.createElementNS(namespace, "use");
+    use.setAttribute("href", "#cv-icon-document");
+    svg.appendChild(use);
     return svg;
   }
 
@@ -87,7 +77,7 @@
 
     var avatar = el("span", "search-picker__selected-avatar");
     avatar.setAttribute("aria-hidden", "true");
-    avatar.appendChild(routeIcon());
+    avatar.appendChild(documentIcon());
 
     var main = el("div", "search-picker__selected-main");
     main.appendChild(el("span", "search-picker__selected-name", config.title || ""));

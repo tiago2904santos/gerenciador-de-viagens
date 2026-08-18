@@ -136,6 +136,25 @@ class _MensagemDeExemplo:
 # Uma seção por página (2026-08-16). A ordem é a de leitura de uma tela: primeiro
 # o que se clica, depois o que se preenche, depois como se navega, e por fim as
 # telas montadas. Os slugs entram na URL, então mudá-los quebra link guardado.
+def _campo_de_exemplo():
+    """Um `BoundField` de verdade para a vitrine do `c-v2.form_field`.
+
+    Inventar um objeto com `label`, `errors` e `id_for_label` seria mostrar uma
+    imitação: o componente existe justamente para lidar com o que o Django
+    entrega, incluindo as classes de widget que vêm do Python.
+    """
+    from django import forms
+
+    class _Exemplo(forms.Form):
+        nome = forms.CharField(
+            label="Nome do cargo",
+            help_text="Como aparece nos documentos.",
+            widget=forms.TextInput(attrs={"class": "form-control"}),
+        )
+
+    return _Exemplo()["nome"]
+
+
 SECOES_DA_GALERIA = (
     ("acao", "Ação"),
     ("entrada", "Entrada"),
@@ -233,6 +252,70 @@ def main_preview(request, secao=None):
             # A lista da galeria filtra de verdade: sem registros que difiram
             # entre si, um filtro quebrado passa despercebido — foi assim que o
             # picker ficou uma sessão inteira sem inicializar, com a tela certa.
+            # Duas linhas de catálogo e um `BoundField` de verdade: a galeria
+            # mostra as peças com o mesmo formato que as telas reais entregam.
+            # O cartão de prestação da vitrine: um servidor, a viagem e as
+            # ações. As chaves são as mesmas que `prestacoes_contas/presenters.py`
+            # publica — mostrar o componente com outro formato seria mostrar
+            # outra coisa.
+            "v2_prestacao": {
+                "prestacao_pk": 1,
+                "group_class": "",
+                "search_text": "153/2026 ademar",
+                "header": {
+                    "items": [{"label": "Ofício", "value": "Nº 153/2026 · ARAPONGAS/PR"}],
+                    "chips": [{"tone": "info", "label": "Em andamento"}],
+                },
+                "numero_display": "153/2026",
+                "menus_url": "#",
+                "rt_url": "#",
+                "finalizar_url": "#",
+                "arquivar_url": "#",
+                "despacho_assinado": {"assinado": False, "anexar_url": "#"},
+                "veiculo_placa": "ABC-1D23",
+                "veiculo_modelo": "DUSTER",
+                "valor_diarias_display": "R$ 1.248,00",
+                "valor_diarias_extenso": "mil duzentos e quarenta e oito reais",
+                "trechos": (),
+                "servidores": (
+                    {
+                        "ps_pk": 1,
+                        "name": "ADEMAR SCHONS",
+                        "meta": "Agente · 1ª Delegacia",
+                        "is_motorista": True,
+                        "comprovante_ok": True,
+                        "numero_solicitacao": "2026/0153",
+                        "solicitacao_autosave_url": "#",
+                        "data_liberacao_diarias": "",
+                        "prazo_limite_saque": "",
+                        "whatsapp_phone": "",
+                        "whatsapp_oficio": "153/2026",
+                        "whatsapp_unidade": "1ª Delegacia",
+                        "whatsapp_evento": "Operação Integrada",
+                        "whatsapp_diaria": "R$ 1.248,00",
+                    },
+                ),
+            },
+            "v2_catalogo_linhas": (
+                {
+                    "avatar": "CG",
+                    "title": "AGENTE DE POLÍCIA JUDICIÁRIA",
+                    "badges": [{"text": "Padrão", "variant": "default"}],
+                    "edit_url": "#",
+                    "edit_fields_json": '{"nome": "AGENTE DE POLÍCIA JUDICIÁRIA"}',
+                    "delete_url": "#",
+                },
+                {
+                    "avatar": "CG",
+                    "title": "ESCRIVÃO DE POLÍCIA JUDICIÁRIA",
+                    "badges": [],
+                    "edit_url": "#",
+                    "edit_fields_json": '{"nome": "ESCRIVÃO DE POLÍCIA JUDICIÁRIA"}',
+                    "delete_url": "#",
+                    "set_default_url": "#",
+                },
+            ),
+            "v2_campo_exemplo": _campo_de_exemplo(),
             "v2_registros": (
                 {
                     "titulo": "Nº 153/2026 · ARAPONGAS/PR",

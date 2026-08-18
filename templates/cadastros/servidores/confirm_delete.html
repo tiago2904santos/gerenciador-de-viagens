@@ -1,11 +1,29 @@
-{% extends "cotton/page/flow_base.html" %}
+{% extends "base.html" %}
+{% block title %}Excluir servidor?{% endblock %}
 
-{% block flow_shell_modifier %}page-shell--standard cv-page--form{% endblock %}
-{% block flow_shell_extra %} document-form-page cadastros-form-page{% endblock %}
+{% block content %}
+  {% comment %}
+    Confirmação de exclusão em PÁGINA — existe para quem chega por link direto,
+    sem passar pela lista (onde a exclusão é um diálogo). O alerta é o global.
+  {% endcomment %}
+  <div class="form-page">
+    <c-v2.header eyebrow="Cadastros" title="Excluir servidor?" />
 
-{% block flow_body %}
-  <form method="post" class="document-form travel-document-wizard__form" data-travel-document-wizard-step1>
-    {% csrf_token %}
-    <c-feedback.confirm_delete_block :object_label="object.nome" primary_label="Excluir servidor" :back_url="back_url" only />
-  </form>
+    <form method="post" class="form-page__form">
+      {% csrf_token %}
+      <c-v2.panel title="Excluir servidor?" description="Esta ação é permanente e não poderá ser desfeita.">
+        <c-slot name="body">
+          <p class="modal__message">
+            Você está prestes a excluir <strong>{{ object.nome }}</strong>.
+            Se houver vínculos com outros registros, a exclusão será bloqueada.
+          </p>
+
+          <c-v2.card_footer>
+            <c-slot name="secondary"><c-v2.button label="Voltar" icon="arrow-left" :href="back_url" /></c-slot>
+            <c-slot name="primary"><c-v2.button label="Excluir servidor" variant="danger" icon="delete" type="submit" /></c-slot>
+          </c-v2.card_footer>
+        </c-slot>
+      </c-v2.panel>
+    </form>
+  </div>
 {% endblock %}

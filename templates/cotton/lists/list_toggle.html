@@ -1,9 +1,0 @@
-{% cotton:vars abas tabs_aria_label %}
-{% comment %}
-Ponte para o componente global `ui.segment_toggle` (NOVO-120).
-
-Existe só enquanto os cinco chamadores atuais não passam a invocar o
-componente direto. Não acrescenta markup nem estilo: só traduz o nome das
-props (`abas` -> `items`, `tabs_aria_label` -> `aria_label`).
-{% endcomment %}
-<c-ui.segment_toggle :items="abas" :aria_label="tabs_aria_label" only />

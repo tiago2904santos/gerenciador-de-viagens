@@ -49,3 +49,41 @@
   --alert-tone: var(--status-info);
 }
 
+
+/* ---- a pilha de avisos da página -------------------------------------------
+ *
+ * São as mensagens do Django, no topo do conteúdo. Elas ganham respiro embaixo
+ * para não encostar no cabeçalho da tela — sem isso o aviso e o título ficam
+ * colados e leem como uma peça só.
+ *
+ * A saída é animada por `js/components/notice-auto-dismiss.js`: depois de cinco
+ * segundos o aviso perde opacidade e altura, e o conteúdo sobe. As duas
+ * propriedades precisam estar na transição DAQUI — o JS só troca os valores.
+ */
+:is(html[data-theme]) .notice-stack,
+:is(html[data-theme]) .alerts {
+  margin-bottom: var(--gap);
+  padding-bottom: var(--gap-tight);
+}
+
+:is(html[data-theme]) .notice-stack .notice,
+:is(html[data-theme]) .alerts .alert {
+  transition:
+    height var(--ease),
+    margin var(--ease),
+    opacity var(--ease),
+    padding var(--ease);
+}
+
+:is(html[data-theme]) .notice--saindo {
+  opacity: 0;
+}
+
+/* Quem pediu menos movimento não recebe transição nenhuma: o aviso some, e é
+   isso. A remoção continua acontecendo no JS. */
+@media (prefers-reduced-motion: reduce) {
+  :is(html[data-theme]) .notice-stack .notice,
+  :is(html[data-theme]) .alerts .alert {
+    transition: none;
+  }
+}

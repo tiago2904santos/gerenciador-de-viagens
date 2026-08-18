@@ -76,3 +76,47 @@ class CottonComponentContractTests(SimpleTestCase):
             if pattern.search(path.read_text(encoding="utf-8-sig")):
                 failures.append(str(path.relative_to(ROOT)))
         self.assertEqual(failures, [])
+
+
+class AtributoDinamicoSemFiltroTests(SimpleTestCase):
+    """`:attr="..."` do Cotton é BUSCA de variável, não expressão.
+
+    O filtro escrito ali dentro nunca roda: a busca falha e o atributo chega
+    VAZIO ao componente — sem erro, sem aviso, e a tela só mostra o buraco.
+    Foi assim que o botão de gerenciar modelos virou um "?" (ícone vazio cai no
+    símbolo `unknown`), que o chip de status do card de evento perdeu o tom e
+    que a cidade do destino deixou de nascer travada (2026-08-18).
+
+    O conserto é sempre o mesmo: resolver o filtro antes, num `{% with %}`, e
+    passar a variável já pronta.
+    """
+
+    #: `:nome="algo|filtro"` — o `{{` de fora é interpolação, e essa funciona.
+    FILTRO_EM_ATRIBUTO = re.compile(r'(?<![\w-]):([a-z_]\w*)="([^"{}]*\|[^"]*)"')
+
+    def test_nenhum_template_passa_filtro_dentro_de_atributo_dinamico(self):
+        falhas = []
+        for caminho in sorted((ROOT / "templates").rglob("*.html")):
+            texto = caminho.read_text(encoding="utf-8")
+            for achado in self.FILTRO_EM_ATRIBUTO.finditer(self._sem_comentarios(texto)):
+                linha = texto[: achado.start()].count("\n") + 1
+                falhas.append(
+                    f"{caminho.relative_to(ROOT)}:{linha}: "
+                    f':{achado.group(1)}="{achado.group(2)}"'
+                )
+
+        self.assertEqual(falhas, [])
+
+    @staticmethod
+    def _sem_comentarios(texto: str) -> str:
+        """Apaga o corpo dos comentários MANTENDO as quebras de linha.
+
+        O comentário de vários componentes documenta este defeito com o exemplo
+        errado escrito por extenso — o teste bateria neles. Trocar o corpo por
+        espaços, e não removê-lo, é o que preserva o número da linha no relato.
+        """
+
+        def branco(achado: re.Match) -> str:
+            return "\n" * achado.group(0).count("\n")
+
+        return re.sub(r"{% comment %}.*?{% endcomment %}", branco, texto, flags=re.S)

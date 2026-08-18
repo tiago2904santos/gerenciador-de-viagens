@@ -219,6 +219,17 @@
       </c-slot>
     </c-v2.panel>
 
+    {% comment %}
+      Campo a partir de um `BoundField` — é como os catálogos renderizam os
+      formulários que vêm do Python, sem reescrever `name`, `value` e `required`
+      à mão em cada tela.
+    {% endcomment %}
+    <c-v2.panel title="Campo de formulário do Django" description="Rótulo, widget e erro a partir de um BoundField.">
+      <c-slot name="body">
+        <c-v2.form_field :field="v2_campo_exemplo" />
+      </c-slot>
+    </c-v2.panel>
+
     <h3 class="v2-lab__sub">Editor de roteiro</h3>
 
     <c-v2.map />
