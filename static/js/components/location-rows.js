@@ -604,6 +604,7 @@
             stateId: stateSelect.value,
             selectedId: "",
             form: form,
+            urlTemplate: options.urlTemplate,
             scope: row,
             cache: options.cache || locationCache,
           }).then(function (cities) {
@@ -618,6 +619,7 @@
           stateId: stateSelect.value || initialStateId,
           selectedId: citySelect.value || initialCityId,
           form: form,
+          urlTemplate: options.urlTemplate,
           scope: row,
           cache: options.cache || locationCache,
         }).then(function (cities) {
@@ -765,6 +767,15 @@
       list: section.querySelector("[data-location-list]"),
       template: section.querySelector("template[data-location-template]"),
       dragHandleSelector: "[data-location-drag-handle]",
+      /* A rota de cidades vem da SEÇÃO, que é quem a emite (`c-v2.destinations`).
+       *
+       * Sem isto o `loadCities` só olhava `form.dataset.apiCidadesUrl`, e a
+       * seção que "busca os próprios dados" dependia de a tela repetir o
+       * atributo no `<form>` — exatamente a linha esquecida que o componente
+       * existe para dispensar. O modo de falha era silencioso e pior que campo
+       * vazio: sem URL, `loadCities` LIMPA o select, então a cidade já escolhida
+       * sumia da tela na edição e voltava vazia no POST. */
+      urlTemplate: section.dataset.apiCidadesUrl || "",
     });
   }
 

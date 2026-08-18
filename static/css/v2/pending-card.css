@@ -1,0 +1,57 @@
+/* Pendências — a lista do que falta antes de finalizar.
+ * Depende de `v2/tokens.css`.
+ *
+ * Mesma fórmula do alerta: o tom a 16% sobre TRANSPARENTE, fitinha lateral de
+ * 3px e nenhuma outra borda. Misturar com transparente é o que faz a caixa
+ * servir aos dois temas sem uma única regra por tema — o legado precisava de
+ * duas, porque pintava com `--color-danger-soft`, que só existe no claro.
+ */
+
+:is(html[data-theme]) .pending-card {
+  background: color-mix(in srgb, var(--pending-tone, var(--status-late)) 16%, transparent);
+  border: 0;
+  border-left: 3px solid var(--pending-tone, var(--status-late));
+  border-radius: var(--radius-field);
+  color: var(--pending-tone, var(--status-late));
+  display: grid;
+  gap: var(--gap-tight);
+  margin: 0 0 var(--gap);
+  padding: 12px 14px 12px 10px;
+}
+
+:is(html[data-theme]) .pending-card[data-tone="error"] {
+  --pending-tone: var(--status-late);
+}
+
+:is(html[data-theme]) .pending-card[data-tone="warning"] {
+  --pending-tone: var(--status-progress);
+}
+
+:is(html[data-theme]) .pending-card[data-tone="info"] {
+  --pending-tone: var(--status-info);
+}
+
+:is(html[data-theme]) .pending-card__title {
+  color: inherit;
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  margin: 0;
+}
+
+/* A linha de apoio e os itens voltam ao texto normal: se TUDO na caixa sai na
+   cor do tom, nada dentro dela se destaca e o título perde a função de dizer o
+   que é. O tom fica na moldura e no título. */
+:is(html[data-theme]) .pending-card__lead {
+  color: var(--text-muted);
+  font-size: var(--text-size-base);
+  margin: 0;
+}
+
+:is(html[data-theme]) .pending-card__items {
+  color: var(--text-strong);
+  display: grid;
+  font-size: var(--text-size-base);
+  gap: var(--gap-tight);
+  margin: 0;
+  padding-left: var(--gap);
+}

@@ -8,15 +8,45 @@
 
 <c-v2.quick_add_section title="Atividades previstas" description="Atividades incluídas no modelo">
   <c-slot name="body">
-    <div class="field app-form-field cv-field pt-preset-activities-field">
-      <fieldset class="pt-preset-activities-panel" aria-describedby="{{ form.atividades.auto_id }}_helptext">
-        <legend class="pt-preset-activities-panel__title">Atividades previstas</legend>
-        <p class="pt-preset-activities-panel__description" id="{{ form.atividades.auto_id }}_helptext">{{ form.atividades.help_text }}</p>
-        {{ form.atividades }}
-      </fieldset>
-      {% if form.atividades.errors %}
-        <c-ui.feedback.field_error :errors="form.atividades.errors" :field_id="form.atividades.auto_id" only />
-      {% endif %}
-    </div>
+    {% comment %}
+      A grade é montada opção a opção, e não pelo `{{ form.atividades }}`: o
+      widget do Django imprime uma lista de caixas de seleção, e a classe que a
+      transformava em grade morava numa folha de página que esta tela nunca
+      carregou — a marcação chegava ao navegador sem estilo nenhum. Percorrendo
+      as opções, cada uma vira um `choice_card` do sistema, o mesmo da seleção de
+      atividades do wizard.
+
+      `opcao.data.name`/`.value`/`.selected` são o que o `BoundWidget` do Django
+      expõe: o `name` do POST continua sendo o do formulário, e a seleção
+      continua vindo dele.
+    {% endcomment %}
+    {% with ajuda_id=form.atividades.auto_id|add:"_helptext" erro_atividades=form.atividades.errors.0 %}
+      {% comment %}
+        Sem rótulo: a legenda do `<fieldset>` logo acima já diz "Atividades
+        previstas", e repeti-la a dois centímetros faz o olho ler duas vezes
+        para saber uma coisa só. Quem nomeia o grupo para leitor de tela é o
+        `aria-label` da grade.
+      {% endcomment %}
+      <c-v2.field
+        :help="form.atividades.help_text"
+        :help_id="ajuda_id"
+        :error="erro_atividades"
+      >
+        <c-slot name="control">
+          <c-v2.choice_grid :dense="True" aria_label="Atividades do preset">
+            <c-slot name="body">
+              {% for opcao in form.atividades %}
+                <c-v2.choice_card
+                  :input_name="opcao.data.name"
+                  :value="opcao.data.value"
+                  :input_id="opcao.id_for_label"
+                  :checked="opcao.data.selected"
+                >{{ opcao.choice_label }}</c-v2.choice_card>
+              {% endfor %}
+            </c-slot>
+          </c-v2.choice_grid>
+        </c-slot>
+      </c-v2.field>
+    {% endwith %}
   </c-slot>
 </c-v2.quick_add_section>

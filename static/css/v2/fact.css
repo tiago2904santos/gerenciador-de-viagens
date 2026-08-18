@@ -322,3 +322,26 @@
 :is(html[data-theme]) .fact__label--note {
   margin-top: var(--gap-tight);
 }
+
+/* Duas faixas de fatos empilhadas precisam de vão entre elas — sem isto o
+   rótulo da segunda encosta na nota da primeira e as duas leem como uma. */
+:is(html[data-theme]) .fact-list + .fact-list,
+:is(html[data-theme]) .fact-chips + .fact-list {
+  margin-top: var(--gap);
+}
+
+
+/* ---- a lista que vira chip ------------------------------------------------
+ *
+ * Efetivo e atividades de um plano são LISTAS de itens curtos. Como valor de um
+ * fato elas viram uma frase corrida que não se lê; como `record` cada item
+ * ganharia 68px de altura para mostrar duas palavras. O chip é o meio-termo que
+ * o sistema já tem, e ele quebra em linha sozinho.
+ */
+:is(html[data-theme]) .fact-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-tight);
+  margin-top: var(--gap-tight);
+  min-width: 0;
+}

@@ -26,10 +26,6 @@
     }
   }
 
-  function syncDestinationCities(form) {
-    window.CV.locationRows.initManagedRows({ form: form });
-  }
-
   function syncProgramaOutros(form) {
     var programaSelect = form.querySelector("[data-pt-programa-select]");
     var programaOutrosField = form.querySelector("[data-pt-programa-outros-field]");
@@ -434,7 +430,7 @@
 
       var btn = e.target.closest("[data-pt-quantidade-delta]");
       if (!btn || !rowsContainer.contains(btn)) return;
-      var stepper = btn.closest(".pt-quantidade-stepper");
+      var stepper = btn.closest(".number-stepper");
       if (!stepper) return;
       var input = stepper.querySelector("input");
       if (!input) return;
@@ -490,7 +486,7 @@
       var removeBtn = row.querySelector("[data-pt-efetivo-remove]");
       if (!removeBtn) return;
       removeBtn.hidden = visibleRows.length <= 1 && index === 0;
-      row.classList.toggle("destination-row--single", visibleRows.length <= 1 && index === 0);
+      row.classList.toggle("efetivo-row--single", visibleRows.length <= 1 && index === 0);
     });
   }
 
@@ -587,7 +583,7 @@
 
   function setChipLabel(wrapper, text) {
     if (!wrapper) return;
-    var label = wrapper.querySelector(".chip__label");
+    var label = wrapper.querySelector(".chip--v2");
     if (label) label.textContent = text;
   }
 
@@ -609,9 +605,9 @@
       listEl.innerHTML = "";
       values.forEach(function (text) {
         var li = document.createElement("li");
-        li.className = "pt-live-entry";
+        li.className = "live-list__item";
         var span = document.createElement("span");
-        span.className = "pt-live-entry-text";
+        span.className = "live-list__text";
         span.textContent = text;
         li.appendChild(span);
         listEl.appendChild(li);
@@ -756,7 +752,7 @@
         var term = (search.value || "").trim().toLowerCase();
         var anyVisible = false;
         items.forEach(function (card) {
-          var name = card.dataset.nome || "";
+          var name = card.dataset.choiceFilter || "";
           var match = !term || name.indexOf(term) >= 0;
           card.hidden = !match;
           if (match) anyVisible = true;
@@ -884,7 +880,10 @@
     var identificacao = document.querySelector("[data-pt-form]");
     if (identificacao) {
       syncProgramaOutros(identificacao);
-      syncDestinationCities(identificacao);
+      // A seção de destinos do v2 se liga sozinha (`data-location-managed`), e é
+      // o `autoManage` do `location-rows.js` quem passa lista e molde ao motor.
+      // Chamar `initManagedRows` aqui TAMBÉM deixaria dois ouvintes no "+", e um
+      // clique inseriria duas linhas.
       initTextosPadrao(identificacao);
       initCoordenadores(identificacao);
     }

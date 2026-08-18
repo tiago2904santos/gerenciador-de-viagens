@@ -3,11 +3,11 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-  <div class="page-shell page-shell--standard-simple">
-    <c-ui.headers.page_header eyebrow="PLANOS DE TRABALHO" :title="page_title" description="Confirma a exclusão do preset de atividades." icon_label="PT" module_label="Presets" only />
-    <form class="main-form-panel" method="post">
-      {% csrf_token %}
-      <c-feedback.confirm_delete_block :object_label="preset.nome" message="Planos já criados não são alterados — o preset só deixa de ficar disponível para novas aplicações." primary_label="Excluir preset" :back_url="cancel_url" only />
-    </form>
-  </div>
+  <c-v2.confirm_delete_page
+    :title="page_title"
+    :object_label="preset.nome"
+    message="Planos já criados não são alterados — o preset só deixa de ficar disponível para novas aplicações."
+    primary_label="Excluir preset"
+    :back_url="cancel_url"
+  />
 {% endblock %}

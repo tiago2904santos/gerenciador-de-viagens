@@ -1,0 +1,52 @@
+{% cotton:vars actions empty_message eyebrow frame_title hint open src title %}
+{% comment %}
+  Prévia de documento v2 — o cartão que abre e mostra o PDF na própria página.
+  Par de `static/css/v2/document-inline.css`.
+
+  É um `<details>` de verdade: abrir e fechar é do navegador. Quem carrega o
+  `<iframe>` é o `js/pages/oficios-documentos-inline.js`, e ele o faz no primeiro
+  `toggle` — um PDF carregado antes de alguém pedir é peso que ninguém vê.
+  `data-lazy-inline` é o gancho desse motor, e `data-src` (não `src`) é o que ele
+  copia. Aberto por padrão (`open`), o mesmo motor hidrata na carga, porque o
+  `toggle` não dispara sozinho.
+
+  As ações do cabeçalho ficam em `.document-inline-actions--header`: essa classe
+  não é decoração — é por ela que o motor impede que um clique em "baixar"
+  feche o cartão. Trocada, cada download passa a fechar a prévia.
+
+  Sem `src`, o cartão mostra a frase de vazio em vez de um visualizador em
+  branco. Um `<iframe>` sem endereço é uma moldura cinza que parece falha de
+  carregamento.
+
+  `eyebrow` e `hint` são as duas linhas de apoio do título — "Documento gerado"
+  e "Prévia atualizada com os dados das etapas anteriores". Nenhuma delas é
+  obrigatória: no cadastro de termo o título já diz tudo.
+{% endcomment %}
+<details class="document-inline-card document-inline-card--lazy" data-lazy-inline{% if open %} open{% endif %}>
+  <summary class="document-inline-card__header">
+    <span class="document-inline-card__title">
+      {% if eyebrow %}<span class="document-inline-card__eyebrow">{{ eyebrow }}</span>{% endif %}
+      <strong>{{ title }}</strong>
+      {% if hint %}<span class="document-inline-card__hint">{{ hint }}</span>{% endif %}
+    </span>
+    {% if actions %}
+      <span class="document-inline-card__header-end">
+        <span class="document-inline-actions document-inline-actions--header">{{ actions }}</span>
+      </span>
+    {% endif %}
+  </summary>
+  <div class="document-inline-card__body">
+    {% if src %}
+      <div class="document-inline-viewer">
+        <iframe
+          class="document-inline-viewer__frame"
+          data-src="{{ src }}"
+          title="{{ frame_title|default:'Visualização do documento em PDF' }}"
+          loading="lazy"
+        ></iframe>
+      </div>
+    {% else %}
+      <p class="document-inline-card__empty">{{ empty_message|default:"O documento ainda não está disponível." }}</p>
+    {% endif %}
+  </div>
+</details>

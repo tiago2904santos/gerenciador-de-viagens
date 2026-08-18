@@ -1,17 +1,30 @@
 {% extends "planos_trabalho/wizard_base.html" %}
 {% load static %}
 
-{% block extra_css %}
-  {{ block.super }}
-  <link rel="stylesheet" href="{% static 'css/pages/roteiros.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/termos.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/planos-trabalho-eventos.css' %}">
-{% endblock %}
-
 {% block wizard_content %}
-  <div data-pt-efetivo-diarias data-api-calcular-url="{{ api_calcular_diarias_url }}" data-travel-document-wizard-step1>
+  {% comment %}
+    Etapa 2 no sistema v2 (2026-08-18). `data-pt-efetivo-diarias` é a raiz que
+    `js/pages/planos-trabalho-wizard.js` procura, e `data-api-calcular-url` é de
+    onde ele tira a rota do cálculo ao vivo — os dois continuam iguais.
+  {% endcomment %}
+  <div data-pt-efetivo-diarias data-api-calcular-url="{{ api_calcular_diarias_url }}">
+    <c-v2.panel
+      title="Efetivo e diárias"
+      description="Composição da equipe e cálculo automático das diárias"
+    >
+      <c-slot name="body">
+        {% include "planos_trabalho/partials/_efetivo_diarias_wizard_body.html" with cargos_url=cargos_url formset=formset diarias_form=diarias_form diarias_resultado=diarias_resultado only %}
 
-    <c-form.card title="Efetivo e diárias" description="Composição da equipe e cálculo automático das diárias" title_id="pt-efetivo-diarias-title" extra_class="pt-form-card" body_extra_class="travel-document-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "planos_trabalho/partials/_efetivo_diarias_wizard_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_id=body_id data_hook=data_hook heading_level=heading_level shell=shell variant=variant cargos_url=cargos_url formset=formset diarias_form=diarias_form diarias_resultado=diarias_resultado total_forms=total_forms only %}</c-slot><c-slot name="footer">{% include "planos_trabalho/partials/_efetivo_diarias_wizard_footer.html" only %}</c-slot></c-form.card>
+        <c-v2.card_footer>
+          <c-slot name="secondary">
+            <c-v2.button label="Voltar" icon="arrow-left" type="submit" name="wizard_action" value="wizard_back" />
+          </c-slot>
+          <c-slot name="primary">
+            <c-v2.button label="Salvar e avançar" variant="primary" icon="arrow-right" :icon_after="True" type="submit" name="wizard_action" value="wizard_next" />
+          </c-slot>
+        </c-v2.card_footer>
+      </c-slot>
+    </c-v2.panel>
   </div>
 {% endblock %}
 

@@ -1,21 +1,31 @@
+{% comment %}
+  Os dois painéis de coordenador. `data-pt-coordenador-panel` é contrato do
+  `planos-trabalho-wizard.js`: é por ele que o script acha o par
+  servidor/manual, troca entre escolher da lista e digitar o nome, e mantém o
+  gênero em dia. Renomear deixa os campos na tela e desliga a troca EM SILÊNCIO.
+
+  Os dois primeiros campos de cada painel são ocultos (o modo e o nome digitado)
+  e por isso saem crus, sem rótulo: um `field` em volta de um `<input hidden>`
+  desenharia uma linha vazia na grade.
+{% endcomment %}
 <div class="form-stack">
-  <div class="field app-form-field" data-pt-coordenador-panel="adm">
+  <div data-pt-coordenador-panel="adm">
     {{ form.coordenador_adm_modo }}
     {{ form.coordenador_adm_nome_manual }}
     <div class="field-grid field-grid--cols-3">
-      <c-ui.forms.field :field="form.coordenador_adm" label="Nome" only />
-      <c-ui.forms.field :field="form.coordenador_adm_cargo_manual" label="Cargo" :action_url="cargos_url" action_label="Gerenciar cargos" only />
-      <c-ui.forms.field :field="form.coordenador_adm_genero" label="Gênero" only />
+      <c-v2.form_field :field="form.coordenador_adm" label="Nome" />
+      <c-v2.form_field :field="form.coordenador_adm_cargo_manual" label="Cargo" :action_url="cargos_url" action_label="Gerenciar cargos" />
+      <c-v2.form_field :field="form.coordenador_adm_genero" label="Gênero" />
     </div>
   </div>
 
-  <div class="field app-form-field" data-pt-coordenador-panel="op">
+  <div data-pt-coordenador-panel="op">
     {{ form.coordenador_op_modo }}
     {{ form.coordenador_op_nome_manual }}
     <div class="field-grid field-grid--cols-3">
-      <c-ui.forms.field :field="form.coordenador_op" label="Nome" only />
-      <c-ui.forms.field :field="form.coordenador_op_cargo_manual" label="Cargo" :action_url="cargos_url" action_label="Gerenciar cargos" only />
-      <c-ui.forms.field :field="form.coordenador_op_genero" label="Gênero" only />
+      <c-v2.form_field :field="form.coordenador_op" label="Nome" />
+      <c-v2.form_field :field="form.coordenador_op_cargo_manual" label="Cargo" :action_url="cargos_url" action_label="Gerenciar cargos" />
+      <c-v2.form_field :field="form.coordenador_op_genero" label="Gênero" />
     </div>
   </div>
 </div>

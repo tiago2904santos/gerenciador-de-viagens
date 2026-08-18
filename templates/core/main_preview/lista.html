@@ -231,22 +231,45 @@
           submete — é o comportamento do quick add de justificativas, que é o
           modelo. Quem troca o texto é o `app.js`, pela classe do `<span>`.
         {% endcomment %}
+        {% comment %}
+          Os grupos do painel são `quick_add_section`, e não `form_block`: o
+          formulário é UM só e faz um POST só, então cada grupo é um
+          `<fieldset>` filho direto dele. Só os fieldsets recebem superfície,
+          raio e recuo — o `<form>` em volta é visualmente neutro.
+        {% endcomment %}
         <c-v2.quick_add
           panel_id="lab-quick-add"
           action="#"
           toggle_label="Cadastrar cargo"
           submit_label="Salvar cargo"
         >
-          <c-v2.field label="Nome do cargo">
-            <c-slot name="control">
-              <c-v2.input placeholder="Ex.: Investigador" aria_label="Nome do cargo" />
+          <c-v2.quick_add_section title="Dados do cargo" description="Nome e sigla">
+            <c-slot name="body">
+              <div class="field-grid">
+                <c-v2.field label="Nome do cargo">
+                  <c-slot name="control">
+                    <c-v2.input placeholder="Ex.: Investigador" aria_label="Nome do cargo" />
+                  </c-slot>
+                </c-v2.field>
+                <c-v2.field label="Sigla">
+                  <c-slot name="control">
+                    <c-v2.input placeholder="Ex.: INV" aria_label="Sigla do cargo" />
+                  </c-slot>
+                </c-v2.field>
+              </div>
             </c-slot>
-          </c-v2.field>
-          <c-v2.field label="Sigla">
-            <c-slot name="control">
-              <c-v2.input placeholder="Ex.: INV" aria_label="Sigla do cargo" />
+          </c-v2.quick_add_section>
+
+          <c-v2.quick_add_section :split="True" title="Disponibilidade" description="Aparece nos selects do sistema">
+            <c-slot name="body">
+              <c-v2.choice_card
+                input_name="lab-quick-add-ativo"
+                value="on"
+                :checked="True"
+                hint="Disponível no select do plano"
+              >Ativo</c-v2.choice_card>
             </c-slot>
-          </c-v2.field>
+          </c-v2.quick_add_section>
         </c-v2.quick_add>
       </c-slot>
     </c-v2.panel>

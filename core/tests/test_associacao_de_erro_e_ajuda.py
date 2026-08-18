@@ -366,11 +366,17 @@ class ContratoDosChamadoresTests(SimpleTestCase):
         2026-08-18: **36**. As telas migradas para o v2 passaram a usar
         `c-v2.form_field`, que embute o erro no próprio campo — o chamador não
         desapareceu, mudou de dono.
+
+        2026-08-18, mais tarde: **33**. A migração de Planos de Trabalho levou os
+        três últimos chamadores do app — a linha de efetivo (dois: unidade e
+        quantidade) e o campo de atividades do cadastro rápido de modelos. Todos
+        passaram ao `c-v2.form_field` ou ao `c-v2.field`, que trazem o erro
+        embutido e emitem o `id` que o `aria-describedby` do Django aponta.
         """
         achados = list(chamadores_de_field_error())
 
-        self.assertGreaterEqual(len(achados), 36)
-        self.assertGreaterEqual(sum(1 for _, _, v, a in achados if "field_id=" in a), 36)
+        self.assertGreaterEqual(len(achados), 33)
+        self.assertGreaterEqual(sum(1 for _, _, v, a in achados if "field_id=" in a), 33)
 
 
 class DicaEscritaAMaoTests(SimpleTestCase):

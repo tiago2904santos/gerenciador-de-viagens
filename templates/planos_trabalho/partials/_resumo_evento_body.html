@@ -1,75 +1,65 @@
-<div class="summary-card__body pt-resumo-evento">
+{% comment %}
+  O corpo do resumo de um evento — tudo em `c-v2.fact`, a mesma peça
+  rótulo/valor do cartão de lista e do resumo de diárias. No legado eram
+  `pt-resumo-box`, um vocabulário que só esta tela usava, com três grades
+  próprias (`summary-grid--2`, `--3` e `--4`) para dizer o que a `fact-list` já
+  decide sozinha pelo número de fatos.
 
-  {# ── Linha 1: identificação (4 colunas) ───────────────────── #}
-  <div class="summary-grid summary-grid--4 pt-resumo-grid pt-resumo-grid--4">
-    <div class="pt-resumo-box">
-      <span class="pt-resumo-box__label">Número do plano</span>
-      <span class="pt-resumo-box__value">{{ numero }}</span>
-    </div>
-    <div class="pt-resumo-box">
-      <span class="pt-resumo-box__label">Destino</span>
-      <span class="pt-resumo-box__value">{{ ev.destino }}</span>
-    </div>
-    <div class="pt-resumo-box">
-      <span class="pt-resumo-box__label">Data do evento</span>
-      <span class="pt-resumo-box__value">{{ ev.data_evento_extenso|upper }}</span>
-    </div>
-    <div class="pt-resumo-box">
-      <span class="pt-resumo-box__label">Horário de atendimento</span>
-      <span class="pt-resumo-box__value">{{ ev.horario }}</span>
-    </div>
-  </div>
+  Três faixas, na ordem em que se lê um plano: o que é (número, destino,
+  quando), quem pediu e quem executa, e quanto custa.
 
-  {# ── Linha 2: solicitante + coordenação ───────────────────── #}
-  <div class="summary-grid {% if ev.coordenador_op_presente %}summary-grid--3 pt-resumo-grid--3{% else %}summary-grid--2 pt-resumo-grid--2{% endif %} pt-resumo-grid">
-    <div class="pt-resumo-box">
-      <span class="pt-resumo-box__label">Solicitante</span>
-      <span class="pt-resumo-box__value">{{ ev.programa }}</span>
-    </div>
-    <div class="pt-resumo-box">
-      <span class="pt-resumo-box__label">Coordenador administrativo</span>
-      <span class="pt-resumo-box__value">{{ coordenador_adm_nome }}{% if coordenador_adm_cargo %} <span class="pt-resumo-soft">· {{ coordenador_adm_cargo }}</span>{% endif %}</span>
-    </div>
-    {% if ev.coordenador_op_presente %}
-      <div class="pt-resumo-box">
-        <span class="pt-resumo-box__label">Coordenador operacional</span>
-        <span class="pt-resumo-box__value">{{ ev.coordenador_op }}{% if ev.coordenador_op_cargo %} <span class="pt-resumo-soft">· {{ ev.coordenador_op_cargo }}</span>{% endif %}</span>
-      </div>
-    {% endif %}
-  </div>
+  Cada faixa tem NO MÍNIMO três fatos, e isso não é arranjo: a folha aumenta o
+  corpo do valor quando a faixa tem um ou dois (`--fact-value-size`), porque lá
+  a caixa inteira é deles. Numa faixa de duas, "PCPR NA COMUNIDADE" saía a 35px
+  e o resumo inteiro gritava. Com três ou mais vale o corpo padrão, que é o do
+  cartão de lista.
 
-  {# ── Linha 3: efetivo · valor/diárias · atividades (3 colunas) #}
-  <div class="summary-grid summary-grid--3 pt-resumo-grid3">
-    <div class="pt-resumo-box pt-resumo-efetivo">
-      <span class="pt-resumo-box__label">Efetivo{% if ev.efetivo_total %} ({{ ev.efetivo_total }} servidor{{ ev.efetivo_total|pluralize:"es" }}){% endif %}</span>
-      <div class="pt-resumo-list">
-        {% for it in ev.efetivo_itens %}
-          <span class="pt-resumo-list__item">
-            <span class="pt-resumo-list__qty">{{ it.quantidade }}</span>
-            <span class="pt-resumo-list__text">{{ it.cargo }}{% if it.unidade %} <span class="pt-resumo-soft">· {{ it.unidade }}</span>{% endif %}</span>
-          </span>
-        {% empty %}
-          <span class="pt-resumo-atividades__empty">Nenhum efetivo informado.</span>
-        {% endfor %}
-      </div>
-    </div>
+  Efetivo e atividades ganham uma faixa de chip embaixo: são LISTAS, e o valor
+  de um fato é uma frase curta — "2 · Agente, 1 · Escrivão" numa linha só deixa
+  de se ler assim que o cargo tem duas palavras.
+{% endcomment %}
+<div class="fact-list">
+  <c-v2.fact label="Número do plano" :value="numero" />
+  <c-v2.fact label="Destino" :value="ev.destino" />
+  {% with data_extenso=ev.data_evento_extenso|upper %}
+    <c-v2.fact label="Data do evento" :value="data_extenso" />
+  {% endwith %}
+  <c-v2.fact label="Horário de atendimento" :value="ev.horario" />
+</div>
 
-    <div class="pt-resumo-box pt-resumo-valor">
-      <span class="pt-resumo-box__label pt-resumo-box__label--accent">Valor total</span>
-      <span class="pt-resumo-valor__amount">{{ ev.valor_total_display }}</span>
-      <span class="pt-resumo-box__label pt-resumo-box__label--accent">Quantidade de diárias</span>
-      <span class="pt-resumo-box__value pt-resumo-box__value--lg">{{ ev.diarias_composicao }}</span>
-    </div>
+<div class="fact-list">
+  <c-v2.fact label="Solicitante" :value="ev.programa" />
+  <c-v2.fact label="Coordenador administrativo" :value="coordenador_adm_nome" :note="coordenador_adm_cargo" />
+  {% if ev.coordenador_op_presente %}
+    <c-v2.fact label="Coordenador operacional" :value="ev.coordenador_op" :note="ev.coordenador_op_cargo" />
+  {% endif %}
+  {% with efetivo_titulo=ev.efetivo_total|stringformat:"s"|add:" servidor(es)" %}
+    <c-v2.fact label="Efetivo" :value="efetivo_titulo" />
+  {% endwith %}
+</div>
 
-    <div class="pt-resumo-box pt-resumo-atividades">
-      <span class="pt-resumo-box__label">Atividades{% if ev.atividades_count %} ({{ ev.atividades_count }}){% endif %}</span>
-      <div class="pt-resumo-atividades__list">
-        {% for nome in ev.atividades %}
-          <span class="pt-resumo-atividades__item">{{ nome }}</span>
-        {% empty %}
-          <span class="pt-resumo-atividades__empty">Nenhuma atividade selecionada.</span>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
+<div class="fact-chips">
+  {% for it in ev.efetivo_itens %}
+    {% with item_label=it.quantidade|stringformat:"s"|add:" · "|add:it.cargo %}
+      <c-v2.chip :label="item_label" tone="info" />
+    {% endwith %}
+  {% empty %}
+    <c-v2.chip label="Nenhum efetivo informado" />
+  {% endfor %}
+</div>
+
+<div class="fact-list">
+  <c-v2.fact label="Valor total" :value="ev.valor_total_display" :strong="True" />
+  <c-v2.fact label="Quantidade de diárias" :value="ev.diarias_composicao" />
+  {% with atividades_titulo=ev.atividades_count|stringformat:"s"|add:" selecionada(s)" %}
+    <c-v2.fact label="Atividades" :value="atividades_titulo" />
+  {% endwith %}
+</div>
+
+<div class="fact-chips">
+  {% for nome in ev.atividades %}
+    <c-v2.chip :label="nome" />
+  {% empty %}
+    <c-v2.chip label="Nenhuma atividade selecionada" />
+  {% endfor %}
 </div>

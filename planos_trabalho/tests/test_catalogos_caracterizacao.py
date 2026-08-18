@@ -176,12 +176,26 @@ class PresetsTests(CatalogoCaracterizacaoMixin, TestCase):
         self.assertIn("Palestra caracterizacao", str(linha["meta"]))
 
     def test_grupo_de_atividades_associa_legenda_e_ajuda(self):
+        """As atividades do modelo são a grade de escolha do v2, com nome e ajuda.
+
+        Antes era um `<fieldset>` com `<legend>` próprio e a marcação que o
+        widget do Django imprime — e a classe que a transformava em grade
+        (`pt-preset-activity-grid`) morava numa folha de página que ESTA tela
+        nunca carregou: a grade chegava ao navegador sem estilo nenhum.
+
+        O que o teste guarda continua sendo o mesmo: o grupo tem nome acessível e
+        a frase de ajuda está ligada a ele.
+        """
         response = self.client.get(self._index())
 
         html = response.content.decode()
-        self.assertIn('<fieldset class="pt-preset-activities-panel" aria-describedby="id_atividades_helptext">', html)
-        self.assertIn('<legend class="pt-preset-activities-panel__title">Atividades previstas</legend>', html)
-        self.assertIn('id="id_atividades_helptext">Clique nas atividades para incluir ou retirar do preset.</p>', html)
+        self.assertIn("Atividades previstas", html)
+        self.assertIn('role="group"', html)
+        self.assertIn('aria-label="Atividades do preset"', html)
+        self.assertIn(
+            'id="id_atividades_helptext">Clique nas atividades para incluir ou retirar do preset.',
+            html,
+        )
 
     def test_criacao_avisa_com_a_frase_do_preset(self):
         atividade = AtividadePlanoTrabalho.objects.create(area=area_de_teste(), 

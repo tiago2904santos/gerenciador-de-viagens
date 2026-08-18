@@ -1,4 +1,4 @@
-{% cotton:vars aria_label attrs disabled extra_class field filter icon name placeholder surface type value %}
+{% cotton:vars aria_label attrs disabled extra_class field filter hook icon input_id name placeholder surface type value %}
 {% comment %}
   Input v2 — par de `static/css/v2/input.css`.
 
@@ -9,6 +9,16 @@
   `filter` liga o campo ao motor de coleções (`collection.js`): "search" filtra
   a lista pelo texto digitado. Sem ele o campo é só um campo — e essa é a
   diferença entre uma barra de filtros que funciona e uma que só parece.
+
+  `hook` é o atributo `data-*` SEM valor por onde um motor de PÁGINA acha o campo
+  — o `data-pt-activity-search` da grade de atividades, por exemplo. Existe pelo
+  mesmo motivo do `hook` do botão: o gancho é contrato do JS, e declarado aqui
+  ele não muda de nome sem que alguém veja. Para o filtro de uma lista já
+  renderizada o parâmetro certo continua sendo `filter`; `hook` é para o campo
+  que tem motor próprio.
+
+  `input_id` é o `id` do controle, para o `<label for>` de fora e para o script
+  que o procura por nome.
 {% endcomment %}
 {% load icones %}
 <div class="input{% if icon %} input--with-icon{% endif %}{% if surface %} surface--{{ surface }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}">
@@ -35,6 +45,8 @@
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
     {% if value %}value="{{ value }}"{% endif %}
     {% if filter %}data-collection-filter="{{ filter }}"{% endif %}
+    {% if input_id %}id="{{ input_id }}"{% endif %}
+    {% if hook %}{{ hook }}{% endif %}
     {{ attrs }}
   >
   {% endif %}

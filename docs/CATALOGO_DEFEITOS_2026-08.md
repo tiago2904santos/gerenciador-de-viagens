@@ -8875,3 +8875,60 @@ Unidades foram conferidos no tema escuro, Justificativas no tema claro e o layou
 apresentou rolagem horizontal. As 699 verificações dos seis aplicativos afetados passaram, assim
 como bundles, arquitetura, padrões de UI e `git diff --check`. O auditor frontend permaneceu no
 baseline preexistente de 4 erros e 303 avisos, acima do teto vigente de 245.
+
+### NOVO-20260818-223338-aa3c31f87b9d ✅ RESOLVIDO · `NOVO` Telas de Plano de Trabalho ainda montam a casca e os blocos com componentes anteriores ao v2 · HT/UI · 0,8 d
+
+As quatro etapas do wizard, a lista, os quatro catálogos e os quinze parciais de Planos de
+Trabalho ainda chamavam `c-ui.*`, `c-form.card`, `c-feedback.*` e `c-travel.*`: 63 chamadas de
+componente legado, várias com trinta ou mais atributos repassados só para atravessar quatro níveis
+de `include`. A etapa 1 sozinha passava 44 variáveis ao composto de período e destinos. As telas
+carregavam quatro folhas de página (`oficios`, `roteiros`, `termos`, `planos-trabalho-eventos`,
+`planos-trabalho-atividades`) e emitiam `data-travel-document-wizard-step1`, o marcador de um tema
+legado que o `overlay.js` copia para os menus que abre — numa tela v2 ele desfaz o desenho em vez
+de completá-lo.
+
+O corte deve trocar TODA chamada por `c-v2.*`, sem tocar em nome de campo do POST nem em gancho
+`data-*` de JS, e sem que a suíte perca teste verde.
+
+Resolvido: os 24 templates de `planos_trabalho` passaram a usar exclusivamente `c-v2.*` (0 chamadas
+`c-ui.`/`c-form.`/`c-feedback.`/`c-travel.` restantes, com guarda em
+`planos_trabalho/tests/test_wizard_v2.py`). Sete componentes novos entraram no v2 para cobrir o que
+faltava — `pending_card`, `choice_card`, `choice_grid`, `number_stepper`, `live_list`,
+`efetivo_row` e `document_preview` —, todos publicados na galeria. As duas folhas de página do app
+(`pages/planos-trabalho-atividades.css`, 15,5 KB, e `pages/planos-trabalho-eventos.css`, 33,9 KB)
+saíram com prova de grep, e os dois marcadores de tema legado deixaram de ser emitidos. Os 22
+ganchos `data-pt-*` foram preservados um a um; cinco nomes internos mudaram de lado a lado no mesmo
+PR (`data-nome` → `data-choice-filter`, `.pt-quantidade-stepper` → `.number-stepper`,
+`destination-row--single` → `efetivo-row--single`, `.chip__label` → `.chip--v2`, `pt-live-entry` →
+`live-list__item`), com o JS ajustado junto. Verificação: 132 testes do app verdes (118 antes, +14
+do contrato novo), suíte global de 2.376 testes com as mesmas 3 falhas pré-existentes do `main`,
+auditor de front de 303 → 289 avisos e `audit_ui_patterns` de 2.653 → 2.532 ocorrências. As quatro
+etapas, a lista, os quatro catálogos e três seções da galeria foram conferidas no navegador nos
+dois temas.
+
+### NOVO-20260818-223339-bba28c52707d ✅ RESOLVIDO · `NOVO` Seção de destinos que se gerencia sozinha não achava a rota de cidades e apagava a cidade escolhida · JS · 0,1 d
+
+O `c-v2.destinations` emite `data-api-cidades-url` na própria seção — é o ponto do componente
+"buscar os próprios dados". Mas o `autoManage` do `location-rows.js` só repassava `form`, e o
+`loadCities` lia a rota de `form.dataset.apiCidadesUrl`: sem o atributo TAMBÉM no `<form>`, a URL
+saía vazia e o motor caía no `clearSelect`. O modo de falha é pior que campo vazio — na edição, a
+cidade já escolhida sumia da tela e voltava vazia no POST. As telas que funcionavam (termo, evento)
+só funcionavam porque repetiam o atributo no formulário, que é exatamente a linha esquecida que o
+componente existe para dispensar.
+
+Resolvido: `autoManage` passa `urlTemplate` a partir de `section.dataset.apiCidadesUrl`, e
+`initManagedRows` o repassa às duas chamadas de `loadCities`. Medido no navegador antes e depois na
+etapa 1 de Plano de Trabalho: `cityOptions` de 1 (só a vazia) para 3, com `value` de volta em "2".
+
+### NOVO-20260818-223340-738ebc1515e4 ✅ RESOLVIDO · `NOVO` Grade de atividades do cadastro rápido de presets chegava ao navegador sem folha de estilo · UI · 0,1 d
+
+`PresetAtividadesQuickAddForm` marcava o `CheckboxSelectMultiple` com
+`pt-preset-activity-grid`, e essa classe só existia em `pages/planos-trabalho-atividades.css` —
+folha que a tela de presets nunca carregou (ela estende `base.html` sem `extra_css`). A grade
+descia como lista de caixas nativas empilhadas, e o `<fieldset>` em volta desenhava um cartão
+dentro do painel do cadastro rápido.
+
+Resolvido: o parcial percorre as opções e monta um `c-v2.choice_grid` de `c-v2.choice_card`, com o
+`name` e a seleção vindos do próprio `BoundWidget`. A classe morta saiu do formulário e o
+`WidgetStyle.PT_PRESET_ACTIVITY_GRID` saiu do enum, com prova de grep (zero referências fora do
+comentário que registra a saída).

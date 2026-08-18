@@ -155,6 +155,41 @@ def _campo_de_exemplo():
     return _Exemplo()["nome"]
 
 
+def _linha_de_efetivo_de_exemplo():
+    """Um formulário do feitio que o `c-v2.efetivo_row` espera, sem tocar no banco.
+
+    A linha lê `hidden_fields`, `DELETE`, `unidade`, `cargo` e `quantidade` — a
+    forma de um formulário de formset. Aqui as escolhas são fixas, como o resto
+    desta rota: a vitrine existe para aprovar aparência, não para consultar
+    cadastro nenhum.
+    """
+    from django import forms
+
+    class _LinhaDeEfetivo(forms.Form):
+        id = forms.CharField(widget=forms.HiddenInput(), required=False)
+        DELETE = forms.BooleanField(widget=forms.HiddenInput(), required=False)
+        unidade = forms.ChoiceField(
+            label="Unidade",
+            required=False,
+            choices=(("", ""), ("1", "Delegacia de Londrina")),
+            widget=forms.Select(attrs={"class": "form-select"}),
+        )
+        cargo = forms.ChoiceField(
+            label="Cargo",
+            required=False,
+            choices=(("", "Selecione o cargo"), ("1", "Investigador")),
+            widget=forms.Select(attrs={"class": "form-select"}),
+        )
+        quantidade = forms.IntegerField(
+            label="Quantidade",
+            required=False,
+            initial=2,
+            widget=forms.NumberInput(attrs={"class": "cv-field__control", "min": "1", "step": "1"}),
+        )
+
+    return _LinhaDeEfetivo()
+
+
 SECOES_DA_GALERIA = (
     ("acao", "Ação"),
     ("entrada", "Entrada"),
@@ -316,6 +351,25 @@ def main_preview(request, secao=None):
                 },
             ),
             "v2_campo_exemplo": _campo_de_exemplo(),
+            "v2_linha_efetivo": _linha_de_efetivo_de_exemplo(),
+            # As pendências de uma etapa que ainda não fecha, e as duas listas
+            # que a seleção de atividades de um plano de trabalho alimenta.
+            "v2_pendencias": (
+                "Informe o período do evento.",
+                "Selecione ao menos uma atividade.",
+                "O efetivo está sem cargo em uma das linhas.",
+            ),
+            "v2_metas": (
+                "Atender 200 pessoas em ações de cidadania.",
+                "Emitir 80 documentos de identificação civil.",
+            ),
+            "v2_recursos": ("Unidade móvel de identificação.",),
+            "v2_atividades": (
+                {"codigo": "IDENT", "nome": "Identificação civil", "selected": True},
+                {"codigo": "PALES", "nome": "Palestra educativa", "selected": False},
+                {"codigo": "ORIEN", "nome": "Orientação sobre violência doméstica", "selected": True},
+                {"codigo": "BOLET", "nome": "Registro de boletim de ocorrência", "selected": False},
+            ),
             "v2_registros": (
                 {
                     "titulo": "Nº 153/2026 · ARAPONGAS/PR",

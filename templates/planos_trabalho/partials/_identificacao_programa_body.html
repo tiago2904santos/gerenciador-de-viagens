@@ -1,6 +1,12 @@
-<div class="field-grid pt-programa-fields">
-  <c-ui.forms.field :field="form.programa" label="Programa" :action_url="programas_url" action_label="Gerenciar programas" only />
-  <div class="pt-programa-outros" data-pt-programa-outros-field {% if not form.programa_outros_selected %}hidden{% endif %}>
-    <c-ui.forms.field :field="form.programa_outros" label="Outro programa" only />
+<div class="field-grid field-grid--cols-2">
+  <c-v2.form_field :field="form.programa" label="Programa" :action_url="programas_url" action_label="Gerenciar programas" />
+  {% comment %}
+    O campo "outro programa" nasce oculto e é o `planos-trabalho-wizard.js` quem
+    o revela, pelo `data-pt-programa-outros-field`. O invólucro é dele: sem um
+    elemento próprio para esconder, ocultar o campo esconderia junto o rótulo da
+    coluna vizinha na grade.
+  {% endcomment %}
+  <div data-pt-programa-outros-field {% if not form.programa_outros_selected %}hidden{% endif %}>
+    <c-v2.form_field :field="form.programa_outros" label="Outro programa" />
   </div>
 </div>

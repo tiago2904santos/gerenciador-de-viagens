@@ -1,4 +1,4 @@
-{% cotton:vars aria_label controls dialog dialog_label dialog_label_attr dialog_url dialog_url_attr disabled extra_class form hook href icon icon_after label size slot type variant %}
+{% cotton:vars aria_label autosave_link confirm_message controls dialog dialog_label dialog_label_attr dialog_url dialog_url_attr disabled extra_class form formaction formnovalidate hidden hook href icon icon_after label name size slot type value variant %}
 {% comment %}
   Button v2 — par de `static/css/v2/button.css`.
 
@@ -23,6 +23,32 @@
   `hook="data-location-add"`, por exemplo. É declarado em vez de repassado
   solto porque o gancho é contrato do JS: se ele virar um atributo qualquer,
   ninguém percebe quando o nome muda e o botão para de responder calado.
+
+  `name`/`value` são o par que diz QUAL ação o submit pede. O wizard de plano de
+  trabalho decide para onde vai pelo `wizard_action` que o botão envia
+  (`wizard_next`, `wizard_back`, `save_draft_list`, `finalizar`): sem eles o
+  rodapé vira um submit anônimo e a etapa recarrega em si mesma. Eram atributos
+  passados soltos, e Cotton os descartava calado por não estarem declarados.
+
+  `formaction`/`formnovalidate` mandam ESTE submit para outra URL sem exigir o
+  formulário inteiro válido. É o que permite "Adicionar evento ao plano" e as
+  ações de cada evento viverem DENTRO do `<form>` do wizard: formulário aninhado
+  o HTML não tem, e um `<form>` irmão perderia os campos da etapa.
+
+  `confirm_message` liga o botão ao guarda de `js/core/app.js`
+  (`data-confirm-submit` + `data-confirm-message`), que pergunta antes de enviar.
+  Remover um evento do plano não tem desfazer.
+
+  `hidden` é o botão que existe mas ainda não tem o que fazer — o "×" da única
+  linha de uma coleção. Ele nasce oculto e o motor JS o revela quando aparece a
+  segunda linha; sem o atributo no servidor, ele pisca na tela até o script
+  rodar.
+
+  `autosave_link` preserva o formulário antes de uma ação que NAVEGA para outro
+  cadastro — "Gerenciar atividades" no meio de uma etapa. O valor `1` é contrato
+  de `autosave.js`, que procura por `[data-autosave-link="1"]`; sem ele, quem
+  sai para cadastrar uma atividade perde o que preencheu. Vale só para o
+  botão-link.
 {% endcomment %}
 {% load icones %}
 {% if href %}
@@ -31,6 +57,7 @@
     href="{{ href }}"
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
     {% if disabled %}aria-disabled="true" tabindex="-1"{% endif %}
+    {% if autosave_link %}data-autosave-link="1"{% endif %}
   >
     {% if icon and not icon_after %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
     {% if slot %}{{ slot }}{% elif label %}<span>{{ label }}</span>{% endif %}
@@ -58,6 +85,12 @@
     {% if dialog_url_attr and dialog_url %}{{ dialog_url_attr }}="{{ dialog_url }}"{% endif %}
     {% if dialog_label_attr and dialog_label %}{{ dialog_label_attr }}="{{ dialog_label }}"{% endif %}
     {% if form %}form="{{ form }}"{% endif %}
+    {% if name %}name="{{ name }}"{% endif %}
+    {% if value %}value="{{ value }}"{% endif %}
+    {% if formaction %}formaction="{{ formaction }}"{% endif %}
+    {% if formnovalidate %}formnovalidate{% endif %}
+    {% if confirm_message %}data-confirm-submit data-confirm-message="{{ confirm_message }}"{% endif %}
+    {% if hidden %}hidden{% endif %}
     {% if hook %}{{ hook }}{% endif %}
   >
     {% if icon and not icon_after %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}

@@ -2,7 +2,7 @@
   <c-slot name="body">
     <div class="field-grid field-grid--cols-3">
       <c-v2.form_field :field="form.faixa" />
-      <c-ui.forms.card_toggle :field="form.ativo" title="Ativo" description="Disponível no select do plano" :compact="True" only />
+      <c-v2.choice_card :field="form.ativo" hint="Disponível no select do plano">Ativo</c-v2.choice_card>
       <c-v2.form_field :field="form.ordem" />
     </div>
   </c-slot>

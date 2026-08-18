@@ -209,7 +209,27 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # do evento são listas longas, e a ação no cabeçalho do painel some na
         # primeira rolagem — quem chega ao fim da lista voltaria ao topo para
         # criar o próximo item.
-        self.assertEqual(len(self.components()), 147)
+        #
+        # 148 (2026-08-18): `v2/quick_add_section.html`, o `<fieldset>` de um
+        # grupo dentro do painel de cadastro rápido. O painel é UM formulário com
+        # um POST só, então os grupos não podem ser `form_block` — cartão dentro
+        # de cartão para o mesmo envio.
+        #
+        # 155 (2026-08-18): as sete peças que faltavam para o wizard de Plano de
+        # Trabalho ser v2 de ponta a ponta. Cinco são do SISTEMA, e nasceram aqui
+        # porque nenhuma tela tinha por onde dizê-las sem reinventar o desenho:
+        # `v2/pending_card.html` (o que falta antes de finalizar, que é o `alert`
+        # com uma lista dentro), `v2/choice_card.html` e `v2/choice_grid.html` (a
+        # opção que ocupa uma caixa clicável e a grade delas — o desenho já
+        # existia em `v2/choice-card.css`, vestindo a marcação que a OS escreve à
+        # mão), `v2/number_stepper.html` (o campo com "−" e "+") e
+        # `v2/live_list.html` (a coluna que um JS reescreve, com contagem e
+        # vazio). As outras duas são de DOMÍNIO, como `prestacao_card` e
+        # `route_segments`: `v2/efetivo_row.html`, a linha de coleção ordenada da
+        # equipe — irmã da linha de destino —, e `v2/document_preview.html`, o
+        # cartão que abre o PDF na própria página, cuja folha
+        # (`v2/document-inline.css`) já existia sem componente.
+        self.assertEqual(len(self.components()), 155)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.

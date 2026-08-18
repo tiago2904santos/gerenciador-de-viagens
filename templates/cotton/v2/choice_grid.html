@@ -1,0 +1,33 @@
+{% cotton:vars aria_label body dense empty_hook empty_message extra_class hook toolbar %}
+{% comment %}
+  Grade de cartões de escolha v2 — a caixa dos `choice_card`. Par de
+  `static/css/v2/choice-card.css`.
+
+  Duas colunas por padrão, uma em tela estreita. Com `dense`, tantas colunas
+  quanto couberem em 220px: é a forma da lista de atividades, onde cada cartão
+  carrega só um nome e trinta deles em duas colunas viram uma coluna de rolagem.
+
+  `role="group"` com `aria-label`: as opções são UMA escolha, e sem o grupo o
+  leitor de tela anuncia trinta caixas soltas sem dizer do que são.
+
+  A mensagem de vazio nasce OCULTA e é o script da tela que a mostra, quando a
+  busca não acha nada — por isso ela recebe o próprio gancho (`empty_hook`) em
+  vez de depender de um `{% if %}` do servidor: quem filtra aqui é o cliente.
+
+  `toolbar` é a faixa de controles da grade — filtrar, aplicar um modelo, limpar
+  a seleção. Ela mora AQUI, e não solta no template da tela, porque é a grade que
+  ela governa: fora do componente, cada tela decidia de novo o espaçamento entre
+  o campo de busca e a primeira linha de opções.
+{% endcomment %}
+{% if toolbar %}<div class="choice-grid__toolbar">{{ toolbar }}</div>{% endif %}
+<div
+  class="choice-grid{% if dense %} choice-grid--dense{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
+  role="group"
+  {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
+  {% if hook %}{{ hook }}{% endif %}
+>
+  {{ body }}
+</div>
+{% if empty_message %}
+  <p class="choice-grid__empty" hidden {% if empty_hook %}{{ empty_hook }}{% endif %}>{{ empty_message }}</p>
+{% endif %}

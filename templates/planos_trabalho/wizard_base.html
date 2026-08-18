@@ -6,40 +6,65 @@
 
 {% block title %}{{ page_title }}{% endblock %}
 
-{% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/pages/oficios.css' %}">
-{% endblock %}
-
 {% block content %}
-  <div class="page-shell page-shell--wizard travel-document-wizard app-wizard" data-pt-wizard-shell>
-    <div class="wizard-sticky-scope" data-wizard-sticky-header>
-      <c-ui.headers.wizard_page_header eyebrow="PLANOS DE TRABALHO" :title="wizard_header.title" :steps="wizard_page_steps" :back_label="wizard_back_label" :back_url="wizard_back_url" only />
+  {% comment %}
+    Casca do wizard de Plano de Trabalho no sistema v2 (2026-08-18).
 
-      <div class="main-form-panel main-form-panel--stack travel-document-wizard__main">
-        <div class="form-section-stack form-section-stack--comfortable">
-          {% if wizard_use_outer_form != False %}
-            <form
-              class="travel-document-wizard__form"
-              method="post"
-              novalidate
-              {% if wizard_autosave_url %}
-                data-autosave="true"
-                data-autosave-model="plano_trabalho"
-                data-autosave-step="{{ wizard_autosave_step }}"
-                data-autosave-url="{{ wizard_autosave_url }}"
-                data-autosave-object-id="{{ plano.pk|default:'' }}"
-              {% endif %}
-            >
-              {% csrf_token %}
+    A tela deixou de montar o próprio esqueleto (`page-shell--wizard`,
+    `main-form-panel`, `form-section-stack` e a caixa pegajosa do cabeçalho) e
+    passou a ser o `c-v2.wizard_page`: identidade, stepper e corpo. As quatro
+    folhas de página que ela puxava (`oficios`, `roteiros`, `termos`,
+    `planos-trabalho-eventos`) saíram junto — casca, blocos, cartões e diálogos
+    vêm do `ui.bundle.css`.
+
+    O stepper NÃO é navegável: as etapas do plano são lineares, e pular adiante
+    deixaria o documento pela metade. É a diferença para o painel do evento, que
+    é um hub.
+
+    SEM `data-travel-document-wizard-step1`. Esse marcador é o gancho de um tema
+    legado inteiro — 160 regras penduradas nele, várias com `!important` —, e o
+    `overlay.js` ainda o copia para os menus que abre, levando o tema junto. Numa
+    tela v2 ele não decora, ele DESFAZ. Os dois scripts que o leem
+    (`oficios-viatura-sugestoes` e `oficios-wizard-driver-state`) são do wizard de
+    ofício e não são carregados aqui.
+
+    Os `data-autosave-*` do `<form>` continuam idênticos: é por eles que o
+    `autosave.js` salva o rascunho da etapa. Renomear qualquer um desliga o
+    autosave EM SILÊNCIO — a tela renderiza igual e o rascunho para de ser
+    gravado.
+  {% endcomment %}
+  <c-v2.wizard_page eyebrow="Planos de trabalho" :title="wizard_header.subtitle" :steps="wizard_page_steps">
+    <c-slot name="aside">
+      {% if wizard_header.status_label %}
+        {% with tom_do_status=wizard_header.status_variant|yesno:"info,info" %}
+          <c-v2.chip :label="wizard_header.status_label" :tone="tom_do_status" />
+        {% endwith %}
+      {% endif %}
+      <c-v2.button :label="wizard_back_label" icon="arrow-left" :href="wizard_back_url" />
+    </c-slot>
+
+    <c-slot name="body">
+      {% if wizard_use_outer_form != False %}
+        <form
+          class="form-page__form"
+          method="post"
+          novalidate
+          {% if wizard_autosave_url %}
+            data-autosave="true"
+            data-autosave-model="plano_trabalho"
+            data-autosave-step="{{ wizard_autosave_step }}"
+            data-autosave-url="{{ wizard_autosave_url }}"
+            data-autosave-object-id="{{ plano.pk|default:'' }}"
           {% endif %}
+        >
+          {% csrf_token %}
+      {% endif %}
 
-          {% block wizard_content %}{% endblock %}
+      {% block wizard_content %}{% endblock %}
 
-          {% if wizard_use_outer_form != False %}
-            </form>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
+      {% if wizard_use_outer_form != False %}
+        </form>
+      {% endif %}
+    </c-slot>
+  </c-v2.wizard_page>
 {% endblock %}

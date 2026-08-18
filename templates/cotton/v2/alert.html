@@ -1,4 +1,4 @@
-{% cotton:vars extra_class message messages tone %}
+{% cotton:vars extra_class hook message messages tone %}
 {% comment %}
   Alert v2 — a pilha de mensagens do Django. Par de `static/css/v2/alert.css`.
 
@@ -10,9 +10,23 @@
   cartão, por exemplo. Mesmo desenho, uma mensagem só, sem a pilha em volta:
   antes disso, cada tela que precisava de um aviso solto reescrevia o `<p
   class="alert">` na mão, e o desenho passava a ter dois donos.
+
+  `hook` é o atributo `data-*` de um aviso que um motor JS PREENCHE — o erro do
+  cálculo de diárias, que muda a cada recálculo. Com ele o aviso existe mesmo
+  vazio, porque é preciso haver onde escrever quando a falha chegar; sem ele, um
+  aviso sem mensagem não é renderizado. Vazio ele some pelo CSS (`.alert:empty`),
+  e não por `hidden`: o motor escreve em `.textContent` e não sabe desfazer um
+  atributo — com `hidden` a falha chegaria ao elemento certo e continuaria
+  invisível. É a mesma lição do `#diarias-error` do editor de roteiro, onde a
+  faixa que não existia fazia a estimativa falhar calada (`JS-04`).
 {% endcomment %}
-{% if message %}
-  <p class="alert{% if extra_class %} {{ extra_class }}{% endif %}" data-tone="{{ tone|default:'info' }}" role="status">{{ message }}</p>
+{% if message or hook %}
+  <p
+    class="alert{% if extra_class %} {{ extra_class }}{% endif %}"
+    data-tone="{{ tone|default:'info' }}"
+    role="status"
+    {% if hook %}{{ hook }}{% endif %}
+  >{{ message }}</p>
 {% endif %}
 {% if messages %}
   <div class="alert-stack{% if extra_class %} {{ extra_class }}{% endif %}" role="status" aria-live="polite">

@@ -237,6 +237,46 @@
       </c-slot>
     </c-v2.panel>
 
+    {% comment %}
+      A linha de coleção ordenada do efetivo — irmã da linha de destino: o "+"
+      insere uma abaixo, os campos ficam no meio e o "×" remove na ponta. Aqui
+      aparecem as duas formas: a linha única, em que o "×" nasce oculto porque
+      não há o que remover, e a linha de uma pilha.
+    {% endcomment %}
+    <c-v2.panel title="Linha de efetivo" description="Unidade, cargo e quantidade na composição da equipe de um plano de trabalho.">
+      <c-slot name="body">
+        <div class="efetivo-rows">
+          <c-v2.efetivo_row :form="v2_linha_efetivo" :ordinal="1" cargos_url="#" :removable="False" />
+          <c-v2.efetivo_row :form="v2_linha_efetivo" :ordinal="2" cargos_url="#" :removable="True" />
+        </div>
+      </c-slot>
+    </c-v2.panel>
+
+    {% comment %}
+      A prévia de um documento gerado. É um `<details>` de verdade — abrir e
+      fechar é do navegador — e o `<iframe>` só carrega no primeiro `toggle`.
+      Aqui ele aparece vazio, que é o estado de uma etapa que ainda não produziu
+      documento: sem `src` o cartão diz o que falta, em vez de mostrar uma
+      moldura cinza que parece falha de carregamento.
+    {% endcomment %}
+    <c-v2.panel title="Prévia de documento" description="O cartão que abre e mostra o PDF na própria página.">
+      <c-slot name="body">
+        <c-v2.document_preview
+          title="Plano de Trabalho 20/2026/ASCOM"
+          eyebrow="Documento gerado"
+          hint="Prévia atualizada com os dados das etapas anteriores"
+          :open="True"
+          empty_message="Complete as etapas anteriores para visualizar o documento."
+        >
+          <c-slot name="actions">
+            <c-v2.icon_button icon="eye" href="#" aria_label="Visualizar documento" tooltip="Visualizar documento" />
+            <c-v2.icon_button icon="pdf" href="#" aria_label="Baixar PDF" tooltip="Baixar PDF" />
+            <c-v2.icon_button icon="docx" href="#" aria_label="Baixar DOCX" tooltip="Baixar DOCX" />
+          </c-slot>
+        </c-v2.document_preview>
+      </c-slot>
+    </c-v2.panel>
+
     <h3 class="v2-lab__sub">Editor de roteiro</h3>
 
     <c-v2.map />

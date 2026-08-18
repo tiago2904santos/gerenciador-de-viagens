@@ -1,0 +1,41 @@
+{% cotton:vars aria_label control decrease_label extra_class hook increase_label step %}
+{% comment %}
+  Stepper numérico v2 — o campo com "−" e "+" ao lado. Par de
+  `static/css/v2/number-stepper.css`.
+
+  O controle vem por SLOT, como no `field`: quem sabe o `name`, o `value` e os
+  limites é o formulário do Django, e um `<input>` escrito aqui perderia a
+  validação junto com eles.
+
+  `hook` é o NOME do atributo que carrega o passo em cada botão — o
+  `data-pt-quantidade-delta` do efetivo do plano de trabalho, por exemplo. É o
+  nome, e não o par pronto, porque o VALOR muda de sinal entre os dois botões; e
+  ele não pode viajar no `hook` do `c-v2.button` porque atributo com valor sai
+  escapado ali, e `&quot;` faz o seletor do JS não casar. Por isso os dois botões
+  são crus — dentro de `templates/cotton/` esse é o caminho previsto.
+
+  O rótulo de cada botão é obrigatório em `aria-label`: "−" e "+" sozinhos são
+  pontuação para um leitor de tela, não uma ação.
+
+  Sem `hook`, os botões não aparecem: um stepper que não soma nada é um campo de
+  número com dois enfeites do lado.
+{% endcomment %}
+<div class="number-stepper{% if extra_class %} {{ extra_class }}{% endif %}" role="group"{% if aria_label %} aria-label="{{ aria_label }}"{% endif %}>
+  {% if hook %}
+    <button
+      type="button"
+      class="button button--secondary button--icon number-stepper__button"
+      {{ hook }}="-{{ step|default:1 }}"
+      aria-label="{{ decrease_label|default:'Diminuir' }}"
+    >−</button>
+  {% endif %}
+  {{ control }}
+  {% if hook %}
+    <button
+      type="button"
+      class="button button--secondary button--icon number-stepper__button"
+      {{ hook }}="{{ step|default:1 }}"
+      aria-label="{{ increase_label|default:'Aumentar' }}"
+    >+</button>
+  {% endif %}
+</div>

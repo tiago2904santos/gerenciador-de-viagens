@@ -161,4 +161,87 @@
       </c-slot>
     </c-v2.panel>
 
+    <c-v2.panel title="Cartão de escolha" description="A opção que ocupa uma caixa clicável inteira. Escolhido = superfície própria, fita de accent e título no accent — sem uma quarta marca.">
+      <c-slot name="body">
+        <c-v2.choice_grid aria_label="Modelo de motivo, exemplo">
+          <c-slot name="body">
+            <c-v2.choice_card
+              input_type="radio"
+              input_name="v2-lab-motivo"
+              value="pernoite"
+              :checked="True"
+              hint="Justifica permanência da equipe um dia após a operação."
+            >Pernoite após a operação</c-v2.choice_card>
+            <c-v2.choice_card
+              input_type="radio"
+              input_name="v2-lab-motivo"
+              value="montagem"
+              hint="Inclui motorista, técnico e apoios de montagem."
+            >Montagem e escolta</c-v2.choice_card>
+            <c-v2.choice_card
+              input_type="radio"
+              input_name="v2-lab-motivo"
+              value="cerimonial"
+              hint="Ida antecipada da equipe de cerimonial."
+            >Cerimonial</c-v2.choice_card>
+          </c-slot>
+        </c-v2.choice_grid>
+      </c-slot>
+    </c-v2.panel>
+
+    {% comment %}
+      A mesma peça na grade DENSA e em múltipla escolha: é a seleção de
+      atividades de um plano de trabalho. Cada cartão carrega só um nome, então
+      as colunas vêm da largura disponível, não de um número fixo — em duas
+      colunas trinta atividades viram uma rolagem longa com metade da tela vazia.
+
+      A faixa de controles é do próprio componente: filtrar, aplicar um modelo e
+      limpar governam esta grade, e fora dela cada tela decidia de novo o
+      espaçamento até a primeira linha.
+    {% endcomment %}
+    <c-v2.panel title="Grade de escolha · densa" description="Múltipla escolha com faixa de controles. É a seleção de atividades do plano de trabalho.">
+      <c-slot name="body">
+        <c-v2.choice_grid
+          :dense="True"
+          aria_label="Atividades disponíveis, exemplo"
+          empty_message="Nenhuma atividade encontrada para a busca informada."
+        >
+          <c-slot name="toolbar">
+            <c-v2.select aria_label="Modelo de atividades, exemplo" :options="v2_opcoes" />
+            <c-v2.button label="Gerenciar modelos" href="#" />
+            <c-v2.input type="search" icon="search" placeholder="Filtrar atividades por nome" aria_label="Filtrar atividades, exemplo" />
+            <c-v2.button label="Limpar seleção" icon="x" />
+          </c-slot>
+          <c-slot name="body">
+            {% for atividade in v2_atividades %}
+              <c-v2.choice_card
+                input_name="v2-lab-atividades"
+                :value="atividade.codigo"
+                :checked="atividade.selected"
+              >{{ atividade.nome }}</c-v2.choice_card>
+            {% endfor %}
+          </c-slot>
+        </c-v2.choice_grid>
+      </c-slot>
+    </c-v2.panel>
+
+    <c-v2.panel title="Stepper numérico" description="O par “digite ou clique”, para o número de um ou dois dígitos. Sem `hook` os botões não aparecem: um stepper que não soma nada é um campo com dois enfeites.">
+      <c-slot name="body">
+        <c-v2.field label="Quantidade">
+          <c-slot name="control">
+            <c-v2.number_stepper
+              hook="data-lab-quantidade-delta"
+              aria_label="Quantidade, exemplo"
+              decrease_label="Diminuir quantidade"
+              increase_label="Aumentar quantidade"
+            >
+              <c-slot name="control">
+                <c-v2.input type="number" value="2" aria_label="Quantidade de servidores, exemplo" />
+              </c-slot>
+            </c-v2.number_stepper>
+          </c-slot>
+        </c-v2.field>
+      </c-slot>
+    </c-v2.panel>
+
     {# ------------------------------------------------------------ NAVEGAÇÃO #}

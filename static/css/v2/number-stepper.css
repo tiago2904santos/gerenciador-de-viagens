@@ -1,0 +1,51 @@
+/* Stepper numérico — o campo com "−" e "+" ao lado.
+ * Depende de `v2/tokens.css`.
+ *
+ * Os botões ficam NAS PONTAS e o campo no meio, com o número centralizado: é a
+ * forma que o olho já conhece de qualquer contador, e ela dispensa rótulo para
+ * dizer o que cada botão faz.
+ *
+ * Os três têm a mesma altura do campo do sistema (`--control-height`). Com o
+ * botão mais baixo que o campo o conjunto lia como campo com dois adereços
+ * soltos, e não como um controle só.
+ */
+
+:is(html[data-theme]) .number-stepper {
+  align-items: center;
+  display: grid;
+  gap: var(--gap-tight);
+  grid-template-columns: var(--control-height) minmax(0, 1fr) var(--control-height);
+}
+
+/* O campo herda a moldura do input do sistema; aqui só o número vai ao centro,
+   porque encostado à esquerda ele fica longe dos dois botões que o mudam.
+   Os dois seletores existem porque o controle chega das duas formas: cru, quando
+   vem do widget do Django (`{{ form.quantidade }}`), e dentro de `.input`,
+   quando vem do `c-v2.input`. */
+:is(html[data-theme]) .number-stepper > input,
+:is(html[data-theme]) .number-stepper > .input {
+  min-width: 0;
+}
+
+:is(html[data-theme]) .number-stepper input {
+  text-align: center;
+}
+
+/* As setinhas nativas saem: com "−" e "+" do lado, elas são um terceiro par de
+   controles para a mesma coisa, e num campo estreito comem a largura do
+   número. */
+:is(html[data-theme]) .number-stepper input[type="number"] {
+  appearance: textfield;
+}
+
+:is(html[data-theme]) .number-stepper input[type="number"]::-webkit-inner-spin-button,
+:is(html[data-theme]) .number-stepper input[type="number"]::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+:is(html[data-theme]) .number-stepper__button {
+  height: var(--control-height);
+  padding: 0;
+  width: var(--control-height);
+}

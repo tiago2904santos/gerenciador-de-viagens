@@ -1,0 +1,56 @@
+/* Linha de efetivo — unidade, cargo e quantidade.
+ * Depende de `v2/tokens.css`.
+ *
+ * Mesma anatomia da linha de destino: o "+" que insere uma linha abaixo, os
+ * campos no meio e o "×" na ponta. O que muda é o miolo — lá são dois campos e
+ * aqui são três, e um deles é estreito por natureza.
+ *
+ * Os botões ficam alinhados pela BASE da faixa dos campos, e não pelo centro da
+ * linha: os campos têm rótulo em cima, e centralizado o "+" flutuava na altura
+ * do rótulo, longe do controle que ele acompanha.
+ */
+
+:is(html[data-theme]) .efetivo-row {
+  align-items: end;
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-width: 0;
+}
+
+/* Unidade e cargo repartem o que sobra; a quantidade recebe o suficiente para o
+   stepper e não mais — é um número de um ou dois dígitos, e em 1fr ela ficava
+   tão larga quanto o nome de uma unidade. */
+:is(html[data-theme]) .efetivo-row__fields {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 148px;
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  :is(html[data-theme]) .efetivo-row__fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Com uma linha só, o "×" nasce oculto — não há o que remover. Estando ele numa
+   coluna `auto`, o vão some junto com o botão e os campos ficam com a largura
+   inteira. */
+:is(html[data-theme]) .efetivo-row--single .efetivo-row__remove {
+  display: none;
+}
+
+/* Os dois botões são o `button` do sistema na forma `--icon`. Só o que é
+   POSIÇÃO fica aqui: o desenho é de `v2/button.css`, e uma segunda definição é
+   como o sistema antigo chegou a dezoito variantes de botão. */
+:is(html[data-theme]) .efetivo-row__add,
+:is(html[data-theme]) .efetivo-row__remove {
+  margin-bottom: 2px;
+}
+
+:is(html[data-theme]) .efetivo-rows {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}

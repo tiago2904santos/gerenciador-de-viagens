@@ -1,0 +1,38 @@
+{% cotton:vars extra_class items lead title tone %}
+{% comment %}
+  Pendências v2 — o que falta antes de finalizar. Par de
+  `static/css/v2/pending-card.css`.
+
+  É o `alert` com uma LISTA dentro, e não um desenho próprio: pendência é um
+  aviso da tela como qualquer outro — mesmo tom, mesma fitinha, mesma fórmula de
+  cor sobre transparente que funciona nos dois temas sozinha. O que muda é que
+  aqui os avisos são vários e cada um é acionável, então eles vêm em `<ul>` e não
+  numa frase corrida: uma lista de seis itens escrita como parágrafo obriga a
+  reler para saber quantas coisas faltam.
+
+  `tone` nomeia o ESTADO (`error`, `warning`, `info`), como no chip e no alerta —
+  o CSS traduz em token. O padrão é `error` porque a pendência bloqueia a ação
+  que a pessoa acabou de pedir.
+
+  `aria-live="polite"` porque o card aparece DEPOIS de um POST que falhou: quem
+  usa leitor de tela precisa ouvir o que faltou sem procurar pela página.
+
+  O legado (`cotton/ui/feedback/pendencias_card.html`) desenhava um marcador
+  redondo com "!" em `::after` e pintava fundo e borda com `*-soft`, tokens sem
+  variante escura — o tema escuro precisava de duas regras de exceção só para
+  este card.
+{% endcomment %}
+{% if items %}
+  <section
+    class="pending-card{% if extra_class %} {{ extra_class }}{% endif %}"
+    data-tone="{{ tone|default:'error' }}"
+    role="status"
+    aria-live="polite"
+  >
+    <h2 class="pending-card__title">{{ title|default:"Pendências encontradas" }}</h2>
+    {% if lead %}<p class="pending-card__lead">{{ lead }}</p>{% endif %}
+    <ul class="pending-card__items">
+      {% for item in items %}<li>{{ item }}</li>{% endfor %}
+    </ul>
+  </section>
+{% endif %}
