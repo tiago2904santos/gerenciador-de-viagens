@@ -20,7 +20,7 @@
       expõe: o `name` do POST continua sendo o do formulário, e a seleção
       continua vindo dele.
     {% endcomment %}
-    {% with ajuda_id=form.atividades.auto_id|add:"_helptext" erro_atividades=form.atividades.errors.0 %}
+    {% with ajuda_id=form.atividades.auto_id|add:"_helptext" erro_id=form.atividades.auto_id|add:"_error" erro_atividades=form.atividades.errors.0 %}
       {% comment %}
         Sem rótulo: a legenda do `<fieldset>` logo acima já diz "Atividades
         previstas", e repeti-la a dois centímetros faz o olho ler duas vezes
@@ -31,9 +31,29 @@
         :help="form.atividades.help_text"
         :help_id="ajuda_id"
         :error="erro_atividades"
+        :error_id="erro_id"
       >
         <c-slot name="control">
-          <c-v2.choice_grid :dense="True" aria_label="Atividades do preset">
+          {% comment %}
+            O grupo aponta para a ajuda — e para o erro, quando há um. O
+            `aria-label` diz o que ele é; a frase "Clique nas atividades para
+            incluir ou retirar do preset" diz como usá-lo, e sem o
+            `aria-describedby` ela fica visível e muda. Era o que o `<fieldset>`
+            legado fazia.
+
+            O `yesno` com variável monta a referência do erro só quando existe
+            erro: sem ele eu teria de duplicar a grade inteira em dois ramos de
+            `{% if %}`, porque a abertura de um componente Cotton não pode ficar
+            num ramo e o fechamento fora dele.
+          {% endcomment %}
+          {% with opcoes_do_erro=erro_id|add:"," %}
+            {% with erro_ref=erro_atividades|yesno:opcoes_do_erro %}
+              <c-v2.choice_grid
+                :dense="True"
+                aria_label="Atividades do preset"
+                :describedby="ajuda_id"
+                :error_id="erro_ref"
+              >
             <c-slot name="body">
               {% for opcao in form.atividades %}
                 <c-v2.choice_card
@@ -44,7 +64,9 @@
                 >{{ opcao.choice_label }}</c-v2.choice_card>
               {% endfor %}
             </c-slot>
-          </c-v2.choice_grid>
+              </c-v2.choice_grid>
+            {% endwith %}
+          {% endwith %}
         </c-slot>
       </c-v2.field>
     {% endwith %}

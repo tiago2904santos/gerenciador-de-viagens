@@ -82,7 +82,12 @@ def _atividades_context(*, plano, catalogo, selected_codes):
             {"value": "", "label": "Aplicar preset…"},
             *(
                 {
-                    "value": str(preset.pk),
+                    # `pk` INTEIRO, não `str(pk)`: o `c-v2.select` marca a opção
+                    # com `opt.value == value`, e `atividades_preset_padrao_id` é
+                    # o `pk` do padrão — `"1" == 1` é falso no template, então
+                    # nenhuma opção casava e o campo abria em "Aplicar preset…"
+                    # mesmo com o preset padrão já aplicado e persistido.
+                    "value": preset.pk,
                     "label": f"{preset.nome} — Padrão" if preset.is_padrao else preset.nome,
                 }
                 for preset in presets

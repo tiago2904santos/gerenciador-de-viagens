@@ -141,6 +141,18 @@ class WizardV2Tests(TestCase):
         # A chamada, não a menção: o comentário que registra a saída a cita.
         self.assertNotIn("locationRows.initManagedRows(", SCRIPT.read_text(encoding="utf-8"))
 
+    def test_o_voltar_do_cabecalho_preserva_o_rascunho_antes_de_sair(self):
+        """`autosave.js` procura `[data-autosave-link="1"]` para esperar o salvamento.
+
+        Sem o atributo, quem edita e clica em "voltar" dentro da janela do
+        debounce depende só do beacon de `unload`, que corre contra a navegação.
+        O cabeçalho legado marcava este link; a migração o perdeu por um turno.
+        """
+        html = self._html("planos_trabalho:wizard_identificacao")
+        voltar = html[: html.index(">Voltar", html.index("wizard-page"))]
+        inicio = voltar.rindex("<a")
+        self.assertIn('data-autosave-link="1"', voltar[inicio:])
+
     def test_o_calendario_do_evento_escreve_nos_campos_do_formulario(self):
         html = self._html("planos_trabalho:wizard_identificacao")
         self.assertIn("data-cv-date-picker-start-value", html)
@@ -183,6 +195,27 @@ class WizardV2Tests(TestCase):
             "data-pt-resultado-composicao",
             "data-pt-resultado-efetivo",
             "data-pt-diarias-erros",
+        ):
+            with self.subTest(gancho=gancho):
+                self.assertIn(gancho, html)
+
+    def test_a_nota_de_cada_fato_de_diarias_existe_mesmo_sem_calculo(self):
+        """A tela abre SEM cálculo, e é aí que o script mais precisa de onde escrever.
+
+        `setText` procura `[data-pt-resultado-*-extenso]` por nome: se a nota só
+        nascesse com texto, o valor por extenso nunca apareceria num plano que
+        ainda não tem datas — que é exatamente o plano em que se acabou de
+        preencher a etapa.
+        """
+        self.plano.saida_sede_data = None
+        self.plano.chegada_sede_data = None
+        self.plano.diarias_valor_total = None
+        self.plano.save()
+        html = self._html("planos_trabalho:wizard_efetivo_diarias")
+        for gancho in (
+            "data-pt-resultado-total-extenso",
+            "data-pt-resultado-unitario-extenso",
+            "data-pt-resultado-efetivo",
         ):
             with self.subTest(gancho=gancho):
                 self.assertIn(gancho, html)

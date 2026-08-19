@@ -40,7 +40,15 @@
           <c-v2.chip :label="wizard_header.status_label" :tone="tom_do_status" />
         {% endwith %}
       {% endif %}
-      <c-v2.button :label="wizard_back_label" icon="arrow-left" :href="wizard_back_url" />
+      {% comment %}
+        `autosave_link` não é enfeite: `autosave.js` procura
+        `[data-autosave-link="1"]` para chamar `prepareNavigation()` e esperar o
+        rascunho pendente ANTES de sair. Sem ele, quem edita e clica em "voltar"
+        dentro da janela do debounce depende só do beacon de `unload`, que corre
+        contra a navegação. O cabeçalho legado marcava este link; o v2 tem de
+        marcar também.
+      {% endcomment %}
+      <c-v2.button :label="wizard_back_label" icon="arrow-left" :href="wizard_back_url" :autosave_link="True" />
     </c-slot>
 
     <c-slot name="body">

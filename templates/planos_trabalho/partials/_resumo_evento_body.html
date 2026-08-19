@@ -39,9 +39,21 @@
 </div>
 
 <div class="fact-chips">
+  {% comment %}
+    A UNIDADE entra no chip quando existe: duas linhas de efetivo podem ter o
+    mesmo cargo em unidades diferentes, e sem ela viram dois chips idênticos.
+    O presenter sempre a fornece (`_efetivo_itens`); quem a perdeu foi a
+    migração.
+  {% endcomment %}
   {% for it in ev.efetivo_itens %}
-    {% with item_label=it.quantidade|stringformat:"s"|add:" · "|add:it.cargo %}
-      <c-v2.chip :label="item_label" tone="info" />
+    {% with base_label=it.quantidade|stringformat:"s"|add:" · "|add:it.cargo %}
+      {% if it.unidade %}
+        {% with item_label=base_label|add:" · "|add:it.unidade %}
+          <c-v2.chip :label="item_label" tone="info" />
+        {% endwith %}
+      {% else %}
+        <c-v2.chip :label="base_label" tone="info" />
+      {% endif %}
     {% endwith %}
   {% empty %}
     <c-v2.chip label="Nenhum efetivo informado" />
