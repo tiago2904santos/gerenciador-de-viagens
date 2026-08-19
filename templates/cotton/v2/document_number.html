@@ -1,0 +1,65 @@
+{% cotton:vars extra_class field label numero_inicial suffix year %}
+{% comment %}
+  Campo de número de documento — o número e o ano que sempre andam juntos:
+  "12/2026". Par de `static/css/v2/document-number.css`.
+
+  Traduz `cotton/ui/forms/document_number_field.html`, que era o último campo
+  do sistema a desenhar a própria caixa (`composite-field`) em vez de usar o
+  `field` do v2.
+
+  DOIS modos, e a diferença é quem guarda o valor:
+
+  - com `year`, é o modo COMPOSTO: o `field` do formulário é oculto e guarda
+    "12/2026" inteiro; o que se digita é um `<input>` só de número, e quem
+    costura os dois é `js/components/document-number-field.js`, pelos ganchos
+    `data-document-number-field` e `-input` (o `-value` vem do widget, definido
+    no `forms.py`). O ano viaja em `data-document-year`/`data-mask-year` porque
+    é ele que o script concatena.
+  - com `suffix`, é o modo SIMPLES: o próprio campo do formulário é o que se
+    edita, e o ano é só o sufixo impresso ao lado. É o número do ofício, que o
+    servidor já numera — o ano ali informa, não entra no POST.
+
+  O `<input>` visível é `type="number"` com teto de 999: o número do ofício é
+  sequencial dentro do ano, e um campo de texto aceitava "12/2026" digitado
+  inteiro, que o script então concatenava outra vez.
+{% endcomment %}
+{% with erro=field.errors.0 erro_id=field.id_for_label|add:"_error" numero_id=field.id_for_label|add:"_numero" aria_numero=label|add:" — só o número" %}
+<c-v2.field
+  :label="label"
+  :label_for="numero_id"
+  :error="erro"
+  :error_id="erro_id"
+  :extra_class="extra_class"
+>
+  <c-slot name="control">
+    {% if year %}
+      <div
+        class="document-number"
+        data-document-number-field
+        data-document-year="{{ year }}"
+        data-mask-year="{{ year }}"
+      >
+        {{ field }}
+        <input
+          type="number"
+          id="{{ numero_id }}"
+          class="input__control document-number__input"
+          min="1"
+          max="999"
+          inputmode="numeric"
+          autocomplete="off"
+          value="{{ numero_inicial }}"
+          data-document-number-input
+          aria-label="{{ aria_numero }}"
+        >
+        <span class="document-number__suffix">/ {{ year }}</span>
+      </div>
+    {% else %}
+      <div class="document-number">
+        {{ field }}
+        {% if suffix %}<span class="document-number__suffix">{{ suffix }}</span>{% endif %}
+      </div>
+    {% endif %}
+  </c-slot>
+</c-v2.field>
+{% endwith %}

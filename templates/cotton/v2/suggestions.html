@@ -1,0 +1,24 @@
+{% cotton:vars extra_class hook label list_hook %}
+{% comment %}
+  Faixa de sugestões — os atalhos que o formulário oferece a partir do que já
+  foi preenchido. Par de `static/css/v2/suggestions.css`.
+
+  Nasce OCULTA e vazia: quem decide se há o que sugerir, e desenha cada chip, é
+  o script da tela — no ofício, `js/pages/oficios-viatura-sugestoes.js`, que
+  cruza a unidade da equipe e o motorista ativo com as viaturas do picker.
+  Renderizar aqui uma lista de exemplo faria a faixa aparecer antes de existir
+  sugestão, que é pior que não aparecer.
+
+  Por isso o componente é a CASCA, e não os chips: o que ele garante é que a
+  faixa tenha o mesmo rótulo, o mesmo respiro e o mesmo estado oculto onde quer
+  que apareça — e que os dois ganchos que o script procura nasçam juntos. Solto
+  no template, o par se separava: o `hidden` ficava no invólucro e a lista de
+  chips migrava para outro nó, e a faixa aparecia vazia.
+
+  `hook` e `list_hook` são atributos SEM valor, e por isso viajam pelo caminho
+  do `hook` sem sofrer com escape.
+{% endcomment %}
+<div class="suggestions{% if extra_class %} {{ extra_class }}{% endif %}"{% if hook %} {{ hook }}{% endif %} hidden>
+  <p class="suggestions__label">{{ label|default:"Sugestões" }}</p>
+  <div class="suggestions__chips"{% if list_hook %} {{ list_hook }}{% endif %}></div>
+</div>

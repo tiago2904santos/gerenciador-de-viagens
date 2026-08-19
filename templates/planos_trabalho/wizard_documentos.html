@@ -6,14 +6,14 @@
     Etapa 4 no sistema v2 (2026-08-18). As duas folhas de página
     (`oficios-documentos-inline` e `planos-trabalho-eventos`) saíram: o cartão de
     prévia é o `c-v2.document_preview` e o aviso de pendências é o
-    `c-v2.pending_card`.
+    `c-v2.alert_list` — o mesmo que o wizard de ofício usa.
 
     SEM `data-travel-document-wizard-documentos`: como o `-step1`, ele é gancho
     de um tema legado que o `overlay.js` copia para os menus que abre — numa tela
     v2 ele desfaz o desenho em vez de completá-lo.
   {% endcomment %}
   {% if mostrar_pendencias %}
-    <c-v2.pending_card
+    <c-v2.alert_list
       :items="pendencias_documentos"
       lead="Corrija os itens abaixo antes de finalizar o plano ou gerar DOCX/PDF."
     />

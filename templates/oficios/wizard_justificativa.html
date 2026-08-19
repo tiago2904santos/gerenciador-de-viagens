@@ -2,8 +2,35 @@
 {% load static %}
 
 {% block wizard_content %}
+  {% comment %}
+    Etapa de justificativa no v2. `data-travel-document-wizard-justificativa` é
+    um dos escopos de menu do `overlay.js` e fica.
+
+    Um bloco só dentro do painel: a etapa tem dois campos, e o corpo do painel
+    já é a caixa. O legado abria um `form_block` "Conteúdo" dentro do cartão
+    "Justificativa" para dizer duas vezes a mesma coisa.
+  {% endcomment %}
   <div data-travel-document-wizard-justificativa>
-    <c-form.card title="Justificativa" description="Texto que fundamenta a necessidade da viagem" title_id="justificativa-panel-title" extra_class="oficio-justificativa-card" body_extra_class="oficio-justificativa-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "oficios/partials/_justificativa_wizard_body.html" with action_variant=action_variant aria_label=aria_label body_id=body_id data_hook=data_hook element_id=element_id heading_level=heading_level modelos_justificativa_url=modelos_justificativa_url shell=shell form=form only %}</c-slot><c-slot name="footer">{% include "oficios/partials/_justificativa_wizard_footer.html" only %}</c-slot></c-form.card>
+    <c-v2.form_errors :form="form" />
+
+    <c-v2.panel title="Justificativa" description="Use um modelo ou escreva o texto que fundamenta a necessidade da viagem.">
+      <c-slot name="body">
+        <c-v2.form_block title="Conteúdo" description="Modelo e texto da justificativa">
+          <c-slot name="body">
+            {% include "oficios/partials/justificativa/_fields.html" with form=form modelos_justificativa_url=modelos_justificativa_url only %}
+          </c-slot>
+        </c-v2.form_block>
+
+        <c-v2.card_footer>
+          <c-slot name="secondary">
+            <c-v2.button label="Voltar" icon="arrow-left" type="submit" name="wizard_action" value="wizard_back" />
+          </c-slot>
+          <c-slot name="primary">
+            <c-v2.button label="Avançar" variant="primary" icon="arrow-right" :icon_after="True" type="submit" name="wizard_action" value="wizard_next" />
+          </c-slot>
+        </c-v2.card_footer>
+      </c-slot>
+    </c-v2.panel>
   </div>
 {% endblock %}
 

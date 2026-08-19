@@ -104,15 +104,18 @@ class WizardJustificativaTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "oficios/wizard_justificativa.html")
-        self.assertContains(response, "oficio-justificativa-card")
-        self.assertContains(response, "form-block--resource")
+        # A etapa é um painel do v2 com um bloco dentro. As duas classes de
+        # página (`oficio-justificativa-card`, `form-block--resource`) saíram com
+        # a folha `css/pages/oficios.css`.
+        self.assertContains(response, "panel")
+        self.assertContains(response, "form-block--v2")
         self.assertContains(response, "Gerenciar modelos")
         self.assertContains(response, "Justificativa")
         self.assertContains(response, "data-modelo-justificativa-select")
         self.assertContains(response, reverse("justificativas:modelos_index"))
         self.assertContains(response, reverse('oficios:index'))
         self.assertContains(response, 'Voltar à lista')
-        self.assertContains(response, "card-footer-section")
+        self.assertContains(response, "card-footer")
         self.assertContains(response, 'data-autosave-link="1"')
         self.assertContains(response, "Avançar")
         self.assertNotContains(response, "cv-field-panel justificativa-panel")
@@ -122,7 +125,7 @@ class WizardJustificativaTests(TestCase):
         self._roteiro_com_saida(oficio, 11)
         response = self.client.get(reverse("oficios:wizard_justificativa", args=[oficio.pk]))
         self.assertContains(response, "Justificativa")
-        self.assertContains(response, "page-stepper")
+        self.assertContains(response, "stepper__list")
 
     def test_exige_justificativa_menor_igual_10_dias(self):
         oficio = self._oficio_ate_transporte()

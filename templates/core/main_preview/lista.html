@@ -17,6 +17,25 @@
       </c-slot>
     </c-v2.panel>
 
+    {% comment %}
+      O irmão do alerta com LISTA — o que falta para uma etapa fechar. Fica ao
+      lado dele de propósito: são a mesma caixa e o mesmo vocabulário de tom, e
+      é aqui que se confere se continuam parecendo a mesma peça.
+    {% endcomment %}
+    <c-v2.panel title="Alerta com lista" description="A pendência de etapa: título, frase de abertura e um item por linha.">
+      <c-slot name="body">
+        <c-v2.alert_list
+          :items="v2_pendencias"
+          lead="Corrija os itens abaixo antes de finalizar o documento."
+        />
+        <c-v2.alert_list
+          title="Pendências para concluir esta etapa"
+          tone="warning"
+          :items="v2_pendencias"
+        />
+      </c-slot>
+    </c-v2.panel>
+
     <h3 class="v2-lab__sub">Tela de lista completa</h3>
 
     {% comment %}

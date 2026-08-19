@@ -401,7 +401,11 @@
       showExtras = true;
     }
     if (this.extrasPanel) {
-      this.extrasPanel.classList.toggle("form-field--hidden", !showExtras);
+      /* `hidden`, e não a classe `form-field--hidden`: aquela utilidade mora nas
+       * folhas de página do sistema antigo, que saíram do wizard na migração
+       * para o v2 — o painel ficaria preso escondido, sem erro nenhum. O
+       * invólucro é uma `<div>` nua justamente para o `hidden` do HTML bastar. */
+      this.extrasPanel.hidden = !showExtras;
       this.extrasPanel.setAttribute("aria-hidden", showExtras ? "false" : "true");
     }
     const showIn = !manual && Boolean(motoristaId) && equipeIds.indexOf(motoristaId) !== -1;
@@ -409,11 +413,11 @@
     const showMan = manual;
     [this.helperIn, this.helperOut, this.helperManual].forEach(function (el) {
       if (!el) return;
-      el.classList.add("form-field--hidden");
+      el.hidden = true;
     });
-    if (showIn && this.helperIn) this.helperIn.classList.remove("form-field--hidden");
-    if (showOut && this.helperOut) this.helperOut.classList.remove("form-field--hidden");
-    if (showMan && this.helperManual) this.helperManual.classList.remove("form-field--hidden");
+    if (showIn && this.helperIn) this.helperIn.hidden = false;
+    if (showOut && this.helperOut) this.helperOut.hidden = false;
+    if (showMan && this.helperManual) this.helperManual.hidden = false;
   };
 
   OficioTransporte.prototype.applyInitialMotoristaModo = function () {
@@ -444,11 +448,11 @@
       }
     }
     if (this.servidorPanel) {
-      this.servidorPanel.classList.toggle("form-field--hidden", manual);
+      this.servidorPanel.hidden = manual;
       this.servidorPanel.setAttribute("aria-hidden", manual ? "true" : "false");
     }
     if (this.manualPanel) {
-      this.manualPanel.classList.toggle("form-field--hidden", !manual);
+      this.manualPanel.hidden = !manual;
       this.manualPanel.setAttribute("aria-hidden", !manual ? "true" : "false");
     }
     if (motoristaSelect) {
@@ -465,11 +469,11 @@
     });
     if (this.foundBanner) {
       this.foundBanner.hidden = !locked;
-      this.foundBanner.classList.toggle("form-field--hidden", !locked);
+      this.foundBanner.hidden = !locked;
     }
     // Mostra/esconde painel de campos manuais com base no estado.
     if (this.manualPanelVeic) {
-      this.manualPanelVeic.classList.toggle("form-field--hidden", !!locked);
+      this.manualPanelVeic.hidden = !!locked;
       this.manualPanelVeic.setAttribute("aria-hidden", locked ? "true" : "false");
     }
     if (!locked) {

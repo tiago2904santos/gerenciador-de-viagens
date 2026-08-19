@@ -1,0 +1,72 @@
+/* Sugestões — a faixa de atalhos que o formulário oferece a partir do que já
+ * foi preenchido. Depende de `v2/tokens.css`.
+ *
+ * O chip aqui é BOTÃO, e não o `.chip--v2`: aquele é um selo, que informa; este
+ * é uma ação, que preenche o campo ao lado. Compartilham a forma de pílula e
+ * nada mais — o selo não tem hover, não tem foco e não tem estado escolhido.
+ *
+ * Os chips são criados pelo script da tela, então as regras casam por CLASSE e
+ * não por filho direto: o motor injeta `<button class="viatura-sugestao-chip">`
+ * dentro de `.suggestions__chips`, e o nome vem do legado na letra porque
+ * trocá-lo deixaria a faixa na tela com chips sem desenho nenhum.
+ */
+
+:is(html[data-theme]) .suggestions {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+:is(html[data-theme]) .suggestions__label {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+:is(html[data-theme]) .suggestions__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-tight);
+}
+
+:is(html[data-theme]) .viatura-sugestao-chip {
+  align-items: center;
+  background: var(--surface-field);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  color: var(--text-strong);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: var(--text-size-eyebrow);
+  gap: 6px;
+  padding: 4px 10px;
+  transition: background var(--ease), border-color var(--ease);
+}
+
+:is(html[data-theme]) .viatura-sugestao-chip:hover {
+  border-color: var(--accent);
+}
+
+/* O chip escolhido é o mesmo da linha selecionada em qualquer lista do sistema:
+   a superfície de seleção, e não uma cor própria. */
+:is(html[data-theme]) .viatura-sugestao-chip--active {
+  background: var(--surface-selected);
+  border-color: var(--accent);
+}
+
+/* A razão da sugestão — o nome do motorista ou o da unidade. É dado de apoio:
+   diz POR QUE aquela viatura foi lembrada, e não o que ela é. */
+:is(html[data-theme]) .viatura-sugestao-badge {
+  color: var(--text-muted);
+  font-size: var(--text-size-eyebrow);
+}
+
+:is(html[data-theme]) .viatura-sugestao-badge--motorista {
+  color: var(--status-info);
+}
+
+:is(html[data-theme]) .viatura-sugestao-badge--unidade {
+  color: var(--text-muted);
+}

@@ -3,11 +3,21 @@
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block content %}
-  <div class="page-shell page-shell--standard-simple">
-    <c-ui.headers.page_header eyebrow="OFÍCIOS" :title="page_title" :description="page_description" icon_label="OF" module_label="Modelos de Motivo" only />
-    <form class="main-form-panel" method="post">
-      {% csrf_token %}
-      <c-feedback.confirm_delete_block :object_label="object.nome" message="Esta ação remove o modelo da lista de sugestões, mas não altera ofícios já criados." preview_label="Prévia do texto" :preview_text="object.texto" primary_label="Excluir modelo" :back_url="back_url" only />
-    </form>
-  </div>
+  {% comment %}
+    Confirmação de exclusão em PÁGINA — o caminho de quem chega por URL direta;
+    na lista, a mesma ação passa pelo `c-v2.delete_modal`.
+
+    A página inteira é o `c-v2.confirm_delete_page`, que já traz o `<form>` e o
+    CSRF: é a mesma peça de Estado, Servidor e Viatura. O que este arquivo
+    informa é só o que muda — o registro, a consequência e o rótulo da ação.
+  {% endcomment %}
+  <c-v2.confirm_delete_page
+    title="Excluir modelo de motivo?"
+    :object_label="object.nome"
+    message="Esta ação remove o modelo da lista de sugestões, mas não altera ofícios já criados."
+    preview_label="Prévia do texto"
+    :preview_text="object.texto"
+    primary_label="Excluir modelo"
+    :back_url="back_url"
+  />
 {% endblock %}

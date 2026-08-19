@@ -51,8 +51,12 @@
 
   document.querySelectorAll("[data-open-all-termos]").forEach(function (btn) {
     btn.addEventListener("click", function () {
-      var card = btn.closest(".document-inline-card--termos");
-      if (!card) return;
+      /* `closest` primeiro, `document` depois: o menu que hospeda este botão é
+       * transplantado para o `<body>` quando abre (CV.overlay), e ali ele já
+       * não tem o cartão de termos entre os ancestrais. Sem o segundo caminho,
+       * "Visualizar termos" abria o menu e não fazia nada — a página tem um
+       * único grupo de termos, então o escopo largo é o mesmo conjunto. */
+      var card = btn.closest(".document-inline-card--termos") || document;
       clickUrls(collectTermUrls(card, "data-termo-inline-url"), { newTab: true });
     });
   });

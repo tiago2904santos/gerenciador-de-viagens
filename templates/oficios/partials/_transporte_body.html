@@ -1,40 +1,72 @@
+{% comment %}
+  Motorista — o miolo da etapa de transporte, no sistema v2.
+
+  Três estados do mesmo campo, e é por isso que os três painéis convivem
+  ocultos: o motorista pode ser um servidor da equipe, um servidor de fora dela
+  ou alguém digitado à mão. Quem alterna é `js/pages/oficios-transporte.js`,
+  pelos ganchos `data-oficio-motorista-*`.
+
+  Os invólucros são `<div>` NUAS de propósito: o script os esconde pela
+  propriedade `hidden`, e sobre um elemento com `display` declarado o `[hidden]`
+  perde — foi o que obrigava o legado a carregar `form-field--hidden` junto,
+  uma utilidade que mora nas folhas de página que saíram daqui.
+
+  As três frases de apoio dizem QUAL dos três estados está valendo. Ficam juntas
+  e ocultas porque só uma vale por vez; separá-las pelos painéis faria a mesma
+  explicação aparecer em dois lugares.
+{% endcomment %}
 {{ form.motorista_modo }}
-<div class="oficio-motorista-servidor" data-oficio-motorista-servidor>
-  <div class="form-grid app-form-grid">
-    <div class="field-span-12">
-      <c-ui.forms.field :field="form.motorista" label="MOTORISTA SERVIDOR" help_text="Busque e selecione um servidor; você pode trocar a qualquer momento." only />
-    </div>
-  </div>
+
+<div data-oficio-motorista-servidor>
+  <c-v2.field
+    label="Motorista servidor"
+    :label_for="form.motorista.id_for_label"
+    :error="form.motorista.errors.0"
+    help="Busque e selecione um servidor; você pode trocar a qualquer momento."
+  >
+    <c-slot name="control">
+      <c-v2.picker
+        :field="form.motorista"
+        presentation="people"
+        selected_title="Motorista selecionado"
+        :action_href="servidor_create_url"
+        action_icon="plus"
+        action_aria_label="Adicionar servidor"
+        action_tooltip="Adicionar servidor"
+        :action_autosave="True"
+      />
+    </c-slot>
+  </c-v2.field>
 </div>
-<div class="oficio-motorista-manual app-form-grid-panel oficio-data-block form-field--hidden" data-oficio-motorista-manual>
-  <div class="oficio-data-grid oficio-data-grid--full">
-    <div class="oficio-data-grid__field">
-      <c-ui.forms.field :field="form.motorista_manual_nome" label="NOME DO MOTORISTA" only />
-    </div>
-  </div>
+
+<div data-oficio-motorista-manual hidden>
+  <c-v2.form_field :field="form.motorista_manual_nome" label="Nome do motorista" />
 </div>
-<div class="oficio-motorista-helpers" data-oficio-motorista-helpers>
-  <p class="field-help form-field--hidden" data-oficio-motorista-helper-in>
+
+<div data-oficio-motorista-helpers>
+  <p class="field__help" data-oficio-motorista-helper-in hidden>
     Motorista selecionado faz parte da equipe do ofício.
   </p>
-  <p class="field-help form-field--hidden" data-oficio-motorista-helper-out>
+  <p class="field__help" data-oficio-motorista-helper-out hidden>
     Motorista fora da equipe do ofício. Informe o ofício e o protocolo do motorista.
   </p>
-  <p class="field-help form-field--hidden" data-oficio-motorista-helper-manual>
+  <p class="field__help" data-oficio-motorista-helper-manual hidden>
     Motorista informado manualmente. Informe também o ofício e o protocolo do motorista.
   </p>
 </div>
-<div
-  class="app-form-grid-panel oficio-data-block oficio-motorista-extras{% if not motorista_extras_visivel %} form-field--hidden{% endif %}"
-  data-oficio-motorista-extras
-  {% if not motorista_extras_visivel %}aria-hidden="true"{% else %}aria-hidden="false"{% endif %}
->
-  <div class="oficio-data-grid oficio-data-grid--two">
-    <div class="oficio-data-grid__field">
-      <c-ui.forms.document_number_field :field="form.motorista_oficio_referencia" label="Nº OFÍCIO MOTORISTA" :ano="motorista_oficio_ano" :numero_inicial="motorista_oficio_numero_inicial" only />
-    </div>
-    <div class="oficio-data-grid__field">
-      <c-ui.forms.field :field="form.motorista_protocolo_ref" label="PROTOCOLO DO MOTORISTA" only />
-    </div>
-  </div>
+
+<div data-oficio-motorista-extras {% if not motorista_extras_visivel %}hidden{% endif %}>
+  <c-v2.form_block title="Ofício de origem" description="O documento que autorizou este motorista.">
+    <c-slot name="body">
+      <div class="field-grid">
+        <c-v2.document_number
+          :field="form.motorista_oficio_referencia"
+          label="Nº do ofício do motorista"
+          :year="motorista_oficio_ano"
+          :numero_inicial="motorista_oficio_numero_inicial"
+        />
+        <c-v2.form_field :field="form.motorista_protocolo_ref" label="Protocolo do motorista" />
+      </div>
+    </c-slot>
+  </c-v2.form_block>
 </div>

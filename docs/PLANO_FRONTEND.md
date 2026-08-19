@@ -433,6 +433,31 @@ Fica aberto, medido e fora deste recorte:
 - [ ] `NOVO-20260818-221535-8858f5d13229` — `audit_paleta` em 12 (teto 0) e `audit_ui_patterns`
   em 2651 (teto 2583); mesmo corte de token do `NOVO-20260818-213938-228adea09e1d`.
 
+## Conclusão dos ofícios no v2 (18/08/2026)
+
+Ofícios era a última fila da migração: a lista já era v2 desde o dia anterior, mas as cinco etapas
+do wizard ainda respondiam ao sistema anterior — e a etapa de roteiro mantinha uma segunda cópia
+de uma tela que já existia migrada.
+
+- [x] `NOVO-20260818-213853-fab772ef1b6e` — migrar as cinco etapas do wizard de Ofícios para
+  `wizard_page`, `panel`, `form_block` e `card_footer` v2; unificar a etapa de roteiro no mesmo
+  `_roteiro_editor_v2.html` da tela avulsa; criar os seis componentes que faltavam
+  (`document_inline`, `alert_list`, `document_number`, `suggestions`, `driver_mode_toggle`,
+  `menu_button`) com vitrine na galeria; e apagar o `segment_toggle` legado mais treze parciais
+  sem consumidor.
+- [ ] `NOVO-20260818-223102-58bda2a28945` — podar `roteiros/includes/_roteiro_editor.html` e a
+  árvore de ~20 parciais sob ele, órfã desde que a etapa de roteiro passou ao editor v2. **É uma
+  etapa de Roteiros:** a cascata alcança `c-travel.route_segments` e
+  `c-travel.travel_allowance_calculator`, que caem no guarda de órfão e mudam o inventário de
+  componentes.
+
+**O que a conclusão de Ofícios deixa medido para a próxima frente.** Ofícios fecha em **zero**
+chamadas a namespace anterior ao v2 (`grep -rhoE '<c-ui\.|<c-cards\.|<c-feedback\.|<c-form\.|<c-lists\.|<c-travel\.' templates/oficios/ | wc -l`).
+Prestações de Contas passa a ser a maior dívida visual do repositório (**134 chamadas** contra 8
+do v2), seguida de Planos de Trabalho (**83** contra 48). As peças que faltavam para Ofícios — o documento inline e a
+pendência de etapa — são exatamente as que essas duas telas mais repetem à mão, então boa parte do
+trabalho de componente já está paga.
+
 ## Planos de Trabalho no v2 (18/08/2026)
 
 O último app inteiro fora do sistema v2. Vinte e quatro templates — as quatro etapas do wizard, a
@@ -440,9 +465,12 @@ lista, os quatro catálogos e os parciais — passaram a usar exclusivamente `c-
 chamada anterior ao v2 pode voltar sem reprovar `planos_trabalho/tests/test_wizard_v2.py`.
 
 - [x] `NOVO-20260818-223338-aa3c31f87b9d` — as 63 chamadas de `c-ui.`, `c-form.card`,
-  `c-feedback.` e `c-travel.` saem; entram sete componentes que faltavam ao v2 (`pending_card`,
-  `choice_card`, `choice_grid`, `number_stepper`, `live_list`, `efetivo_row`,
-  `document_preview`), todos publicados na vitrine, e o inventário reconcilia em 156. Saem
+  `c-feedback.` e `c-travel.` saem; entram seis componentes que faltavam ao v2 (`choice_card`,
+  `choice_grid`, `number_stepper`, `live_list`, `efetivo_row`, `document_preview`), todos
+  publicados na vitrine, e o inventário reconcilia em 160. O aviso de pendências do wizard NÃO
+  virou peça nova: nasceu aqui como `pending_card` e no mesmo dia como `alert_list` no corte de
+  Ofícios, com contrato idêntico — ficou o que já estava na `main`, e o `pending_card` foi
+  apagado antes de chegar lá. Saem
   também as duas folhas de página do app (49,4 KB, com prova de grep) e os marcadores
   `data-travel-document-wizard-*`, que carregam o tema legado para dentro da tela nova. Os 22
   ganchos `data-pt-*` foram preservados; cinco nomes internos mudaram dos dois lados no mesmo

@@ -190,6 +190,32 @@ def _linha_de_efetivo_de_exemplo():
     return _LinhaDeEfetivo()
 
 
+def _campo_de_numero_de_exemplo():
+    """O `BoundField` OCULTO que o `c-v2.document_number` composto exige.
+
+    O modo composto não renderiza o campo do formulário: ele o esconde e o usa
+    como depósito de "12/2026", enquanto o `<input>` visível edita só o número.
+    Os três `data-*` são o contrato de `js/components/document-number-field.js`,
+    e vêm do `forms.py` da tela real — reproduzi-los aqui é o que faz a vitrine
+    mostrar o campo que existe, e não uma casca parecida.
+    """
+    from django import forms
+
+    class _Exemplo(forms.Form):
+        referencia = forms.CharField(
+            label="N° do Ofício de referência",
+            widget=forms.HiddenInput(
+                attrs={
+                    "data-document-number-value": "true",
+                    "data-document-year": "2026",
+                    "data-mask-year": "2026",
+                }
+            ),
+        )
+
+    return _Exemplo(initial={"referencia": "12/2026"})["referencia"]
+
+
 SECOES_DA_GALERIA = (
     ("acao", "Ação"),
     ("entrada", "Entrada"),
@@ -352,13 +378,18 @@ def main_preview(request, secao=None):
             ),
             "v2_campo_exemplo": _campo_de_exemplo(),
             "v2_linha_efetivo": _linha_de_efetivo_de_exemplo(),
-            # As pendências de uma etapa que ainda não fecha, e as duas listas
-            # que a seleção de atividades de um plano de trabalho alimenta.
+            "v2_campo_numero": _campo_de_numero_de_exemplo(),
+            # As pendências de uma etapa de wizard, no formato que os presenters
+            # de ofício e de plano de trabalho publicam: uma frase por item, já
+            # pronta para leitura.
             "v2_pendencias": (
-                "Informe o período do evento.",
+                "Informe o motorista da viatura.",
+                "O roteiro ainda não tem trechos calculados.",
+                "Falta o termo de autorização de ADEMAR SCHONS.",
                 "Selecione ao menos uma atividade.",
-                "O efetivo está sem cargo em uma das linhas.",
             ),
+            # As duas listas que a seleção de atividades de um plano de trabalho
+            # alimenta.
             "v2_metas": (
                 "Atender 200 pessoas em ações de cidadania.",
                 "Emitir 80 documentos de identificação civil.",

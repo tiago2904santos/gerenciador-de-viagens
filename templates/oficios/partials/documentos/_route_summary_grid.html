@@ -1,75 +1,43 @@
-{# Grade de trechos + valor das diárias do roteiro. Uso: include ... with card=roteiro_card only #}
-<article class="oficio-documentos-route-card oficio-documentos-route-card--trechos-{{ card.trechos_count|default:0 }}{% if card.trechos_count > 3 %} oficio-documentos-route-card--trechos-many{% endif %}">
-  <div class="oficio-documentos-route-card__body oficio-documentos-route-summary-grid">
+{% comment %}
+  Trechos e diárias do roteiro — o itinerário e os números que saem nos
+  documentos.
 
-    {# Trechos: cards individuais (<=3) ou lista com scroll (>3) #}
-    {% if card.trechos_count <= 3 %}
-      {% for t in card.trechos %}
-        <div class="summary-item oficio-documentos-route-trecho-item">
-          <span class="summary-label">{{ t.rota }}</span>
-          <div class="oficio-documentos-route-trecho-times">
-            <span class="summary-value">{{ t.saida }}</span>
-            <span class="oficio-documentos-route-trecho-arrow">→</span>
-            <span class="summary-value">{{ t.chegada }}</span>
-          </div>
-        </div>
-      {% endfor %}
-    {% else %}
-      <div class="oficio-documentos-route-trechos-scroll-card">
-        <span class="summary-label">Trechos encontrados</span>
-        <div class="oficio-documentos-route-trechos-scroll-list">
-          {% for t in card.trechos %}
-            <div class="summary-item oficio-documentos-route-trecho-scroll-item">
-              <span class="summary-label">{{ t.rota }}</span>
-              <div class="oficio-documentos-route-trecho-times">
-                <span class="summary-value">{{ t.saida }}</span>
-                <span class="oficio-documentos-route-trecho-arrow">→</span>
-                <span class="summary-value">{{ t.chegada }}</span>
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-    {% endif %}
+  Os trechos são o `c-v2.itinerary`, o mesmo do cartão da lista: `card.trechos`
+  já vem no formato que ele espera (`rota`, `saida`, `chegada`), e por isso a
+  peça entrou aqui sem tocar em presenter nenhum.
 
-    {# Col 3: Valor total (2 trechos = grande; 3+ = com extenso) #}
-    <div class="summary-item oficio-documentos-route-valor-card">
-      <span class="summary-label">Valor total</span>
-      <span class="summary-value oficio-documentos-route-diarias-valor">{% if card.diaria_vazio %}Não calculado{% elif card.diaria_moeda %}{{ card.diaria_moeda }}{% else %}—{% endif %}</span>
-      <span class="summary-label">Valor por extenso</span>
-      <span class="summary-value oficio-documentos-route-diarias-extenso">
-        {{ card.diaria_extenso|default:"Não informado" }}
-      </span>
-    </div>
+  A grade de quatro colunas saiu. Ela tinha três formas — até 3 trechos, mais de
+  3 com rolagem, e uma quarta coluna que trocava de conteúdo conforme quem
+  chamava — e cada forma tinha classes próprias. O que ela dizia são fatos, e o
+  fato do sistema empilha sozinho.
 
-    {# Col 4: Placa + Modelo (card da lista) ou Tipo destino + Quantidade de diárias (wizard) #}
-    <div class="oficio-documentos-route-col4">
-      {% if col4_viatura %}
-        <div class="summary-item">
-          <span class="summary-label">Placa</span>
-          <span class="summary-value">{{ viatura_placa|default:"—" }}</span>
-        </div>
-        <div class="summary-item">
-          <span class="summary-label">Modelo</span>
-          <span class="summary-value">{{ viatura_modelo|default:"—" }}</span>
-        </div>
-      {% else %}
-        <div class="summary-item">
-          <span class="summary-label">Tipo destino</span>
-          <span class="summary-value">{{ card.diaria_tipo_destino|default:"—" }}</span>
-        </div>
-        <div class="summary-item">
-          <span class="summary-label">Quantidade de diárias</span>
-          {% if card.diaria_composicao_linhas %}
-            <ul class="oficio-documentos-route-composicao-list">
-              {% for linha in card.diaria_composicao_linhas %}<li class="summary-value">{{ linha }}</li>{% endfor %}
-            </ul>
-          {% else %}
-            <span class="summary-value">—</span>
-          {% endif %}
-        </div>
-      {% endif %}
-    </div>
+  `col4_viatura` continua decidindo o par final: na lista interessa a viatura
+  (placa e modelo); no wizard, o que compõe a diária (tipo de destino e
+  quantidade).
+{% endcomment %}
+{% if card.trechos %}
+  <c-v2.itinerary :legs="card.trechos" />
+{% endif %}
 
-  </div>
-</article>
+<div class="fact-list">
+  <c-v2.fact
+    label="Valor total"
+    value="{% if card.diaria_vazio %}Não calculado{% elif card.diaria_moeda %}{{ card.diaria_moeda }}{% endif %}"
+    note_label="Valor por extenso"
+    :note="card.diaria_extenso"
+    :strong="True"
+  />
+  {% if col4_viatura %}
+    <c-v2.fact label="Placa" :value="viatura_placa" />
+    <c-v2.fact label="Modelo" :value="viatura_modelo" />
+  {% else %}
+    <c-v2.fact label="Tipo destino" :value="card.diaria_tipo_destino" />
+    {% comment %}
+      A composição da diária pode ter mais de uma linha ("2 integrais",
+      "1 parcial"). Elas viram uma frase só: o fato tem um valor e uma linha de
+      apoio, e uma lista dentro dele reabriria a grade que este arquivo acabou
+      de fechar.
+    {% endcomment %}
+    <c-v2.fact label="Quantidade de diárias" value="{{ card.diaria_composicao_linhas|join:' · ' }}" />
+  {% endif %}
+</div>

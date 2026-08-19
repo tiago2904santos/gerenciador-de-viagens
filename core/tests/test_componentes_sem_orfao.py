@@ -36,6 +36,14 @@ APAGADOS_COM_OS_CADASTROS = (
 )
 
 
+# Migração de Ofícios para o v2 (NOVO-20260818-213853-fab772ef1b6e): o segment
+# toggle legado perdeu o último consumidor quando o par SERVIDOR × MANUAL do
+# motorista virou `c-v2.driver_mode_toggle`. Prova de grep no PR: zero
+# ocorrências de `segment_toggle` e `c-ui.segment_toggle` em `templates/`,
+# `static/js/` e `*.py`.
+APAGADOS_COM_OS_OFICIOS = ("ui/segment_toggle.html",)
+
+
 APAGADOS_COM_O_LAB = (
     "ui/buttons/field_action_button.html",
     "ui/buttons/floating_primary_action.html",
@@ -226,22 +234,48 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         # de sempre: `data-route-id` carrega VALOR, e valor no `hook` do
         # `c-v2.button` sai escapado.
         #
-        # 156 (NOVO-20260818-223338-aa3c31f87b9d): as sete peças que faltavam
-        # para o wizard de Plano de Trabalho ser v2 de ponta a ponta. Cinco são
-        # do SISTEMA, e nasceram aqui
-        # porque nenhuma tela tinha por onde dizê-las sem reinventar o desenho:
-        # `v2/pending_card.html` (o que falta antes de finalizar, que é o `alert`
-        # com uma lista dentro), `v2/choice_card.html` e `v2/choice_grid.html` (a
-        # opção que ocupa uma caixa clicável e a grade delas — o desenho já
-        # existia em `v2/choice-card.css`, vestindo a marcação que a OS escreve à
-        # mão), `v2/number_stepper.html` (o campo com "−" e "+") e
-        # `v2/live_list.html` (a coluna que um JS reescreve, com contagem e
-        # vazio). As outras duas são de DOMÍNIO, como `prestacao_card` e
-        # `route_segments`: `v2/efetivo_row.html`, a linha de coleção ordenada da
-        # equipe — irmã da linha de destino —, e `v2/document_preview.html`, o
-        # cartão que abre o PDF na própria página, cuja folha
-        # (`v2/document-inline.css`) já existia sem componente.
-        self.assertEqual(len(self.components()), 156)
+        # 155 (NOVO-20260818-213853-fab772ef1b6e): as seis peças que faltavam
+        # para Ofícios não chamar mais nada de fora do v2.
+        #
+        # Quatro são de conteúdo: `v2/document_inline.html` (o PDF aberto na
+        # própria página — a folha `v2/document-inline.css` já viajava no bundle
+        # SEM componente, e a marcação era copiada à mão em nove telas),
+        # `v2/alert_list.html` (a pendência de etapa, que no sistema anterior era
+        # um QUARTO desenho de "atenção", com caixa e marcador próprios),
+        # `v2/document_number.html` (o par número/ano — último campo a desenhar a
+        # própria moldura em vez de usar o `field`) e `v2/suggestions.html` (a
+        # faixa de atalhos do formulário, cujos dois ganchos se separavam quando
+        # escritos soltos no template).
+        #
+        # Duas são de ação, e existem pela razão de sempre — `<button>` cru com
+        # `data-*` só é permitido dentro de `templates/cotton/`:
+        # `v2/driver_mode_toggle.html` (o segmento SERVIDOR × MANUAL do
+        # motorista, escrito à mão em duas etapas do ofício, irmão do
+        # `os_role_toggle` e do `route_mode_toggle`) e `v2/menu_button.html` (o
+        # item de menu que EXECUTA em vez de navegar — "Visualizar termos"; como
+        # link ele precisaria de um destino falso).
+        #
+        # 154 (mesmo corte): saiu `ui/segment_toggle.html`. Era o último
+        # componente do sistema anterior vivo em Ofícios, e o `toggle` do v2 já
+        # fazia as duas variantes dele.
+        #
+        # 160 (NOVO-20260818-223338-aa3c31f87b9d): as seis peças que faltavam
+        # para o wizard de Plano de Trabalho ser v2 de ponta a ponta. Quatro são
+        # do SISTEMA, e nasceram aqui porque nenhuma tela tinha por onde
+        # dizê-las sem reinventar o desenho: `v2/choice_card.html` e
+        # `v2/choice_grid.html` (a opção que ocupa uma caixa clicável e a grade
+        # delas — o desenho já existia em `v2/choice-card.css`, vestindo a
+        # marcação que a OS escreve à mão), `v2/number_stepper.html` (o campo com
+        # "−" e "+") e `v2/live_list.html` (a coluna que um JS reescreve, com
+        # contagem e vazio). As outras duas são de DOMÍNIO, como `prestacao_card`
+        # e `route_segments`: `v2/efetivo_row.html`, a linha de coleção ordenada
+        # da equipe — irmã da linha de destino —, e `v2/document_preview.html`, o
+        # cartão que abre o PDF na própria página.
+        #
+        # O aviso de pendências do wizard NÃO é uma sétima peça: é o
+        # `v2/alert_list.html` que Ofícios trouxe no mesmo dia. Nasceram em
+        # paralelo com o mesmo contrato, e sobrou o que já estava no `main`.
+        self.assertEqual(len(self.components()), 160)
 
     def test_os_apagados_do_HT06_nao_voltaram(self):
         """Sete arquivos, com a prova por arquivo que o `AGENTS.md` §3.6 exige.
@@ -259,6 +293,11 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
         """A lista padrão legada e o alternador de abas, sem consumidor."""
         voltaram = [rel for rel in APAGADOS_COM_OS_CADASTROS if (COTTON / rel).exists()]
         self.assertEqual(voltaram, [], "componente apagado com os cadastros voltou")
+
+    def test_os_apagados_com_os_oficios_nao_voltaram(self):
+        """O segment toggle legado, sem consumidor depois do `driver_mode_toggle`."""
+        voltaram = [rel for rel in APAGADOS_COM_OS_OFICIOS if (COTTON / rel).exists()]
+        self.assertEqual(voltaram, [], "componente apagado com os ofícios voltou")
 
     def test_os_apagados_da_cascata_do_be25_nao_voltaram(self):
         """Idem para a cascata do `NOVO-44` e para o que caiu com o UI Lab (PR #247)."""
@@ -282,6 +321,7 @@ class NenhumComponenteOrfaoTests(SimpleTestCase):
             set(APAGADOS_PELO_HT06)
             | set(APAGADOS_COM_O_LAB)
             | set(APAGADOS_COM_OS_CADASTROS)
+            | set(APAGADOS_COM_OS_OFICIOS)
         )
         vivos = {str(path.relative_to(COTTON)) for path in self.components()}
         self.assertEqual(nomeados & vivos, set())

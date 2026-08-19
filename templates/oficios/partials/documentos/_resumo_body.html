@@ -1,22 +1,13 @@
-<section class="oficio-documentos-admin-facts" aria-label="Dados administrativos">
-  <div class="oficio-documentos-card__body">
-    <dl class="oficio-documentos-facts oficio-documentos-facts--admin">
-      <div class="oficio-documentos-fact">
-        <dt>Número do ofício</dt>
-        <dd>{{ documentos_ctx.detalhe.numero_formatado }}</dd>
-      </div>
-      <div class="oficio-documentos-fact">
-        <dt>Protocolo</dt>
-        <dd>{{ documentos_ctx.detalhe.protocolo }}</dd>
-      </div>
-      <div class="oficio-documentos-fact">
-        <dt>Data de criação</dt>
-        <dd>{{ documentos_ctx.detalhe.data_criacao }}</dd>
-      </div>
-      <div class="oficio-documentos-fact">
-        <dt>Custeio</dt>
-        <dd>{{ documentos_ctx.detalhe.custeio }}</dd>
-      </div>
-    </dl>
-  </div>
-</section>
+{% comment %}
+  Resumo — os dados administrativos do ofício, como fatos do sistema.
+
+  Era um `<dl>` com classes próprias (`oficio-documentos-facts`); agora é a
+  mesma peça que o cartão da lista usa para dizer placa e valor. Um par
+  rótulo/valor não muda de desenho por estar numa etapa em vez de numa lista.
+{% endcomment %}
+<div class="fact-list">
+  <c-v2.fact label="Número do ofício" :value="documentos_ctx.detalhe.numero_formatado" />
+  <c-v2.fact label="Protocolo" :value="documentos_ctx.detalhe.protocolo" />
+  <c-v2.fact label="Data de criação" :value="documentos_ctx.detalhe.data_criacao" />
+  <c-v2.fact label="Custeio" :value="documentos_ctx.detalhe.custeio" />
+</div>

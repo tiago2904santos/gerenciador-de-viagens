@@ -243,5 +243,27 @@
         </c-v2.field>
       </c-slot>
     </c-v2.panel>
+    {% comment %}
+      Número de documento — os dois modos lado a lado, que é a única forma de
+      ver que são o mesmo campo. À esquerda o COMPOSTO: o valor inteiro
+      ("12/2026") mora num campo oculto e o script costura o que se digita com o
+      ano. À direita o SIMPLES: o próprio campo do formulário é o que se edita, e
+      o ano é só o sufixo impresso.
+    {% endcomment %}
+    <c-v2.panel title="Número de documento" description="Número e ano na mesma linha — composto (com campo oculto) e simples.">
+      <c-slot name="body">
+        <c-v2.document_number
+          :field="v2_campo_numero"
+          label="N° do Ofício de referência"
+          year="2026"
+          numero_inicial="12"
+        />
+        <c-v2.document_number
+          :field="v2_campo_exemplo"
+          label="N° do Ofício"
+          suffix="/ 2026"
+        />
+      </c-slot>
+    </c-v2.panel>
 
     {# ------------------------------------------------------------ NAVEGAÇÃO #}

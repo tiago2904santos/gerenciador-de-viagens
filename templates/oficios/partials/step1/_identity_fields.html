@@ -1,21 +1,35 @@
-<div class="field-grid field-grid--cols-3 travel-document-identification-grid">
-  <div class="field app-form-field cv-field composite-field">
-    <label class="app-form-label cv-field__label" for="{{ form.numero.id_for_label }}">N° do Ofício</label>
-    <div class="composite-field__control">
-      {{ form.numero }}
-      {% if oficio_numero_ano_hint %}<span class="composite-field__suffix">{{ oficio_numero_ano_hint }}</span>{% endif %}
-    </div>
-    {% if form.numero.errors %}<c-ui.feedback.field_error :errors="form.numero.errors" :field_id="form.numero.auto_id" only />{% endif %}
-  </div>
-  <c-ui.forms.field :field="form.protocolo" label="Protocolo" only />
-  <c-ui.forms.field :field="form.custeio" label="Custeio" only />
+{% comment %}
+  Identificação — número, protocolo e custeio, no sistema v2.
+
+  O número do ofício é o `c-v2.document_number` no modo SIMPLES: quem numera é o
+  servidor, e o ano ao lado só informa de que série aquele número é. Antes, esta
+  era a última caixa do sistema a desenhar a própria moldura (`composite-field`),
+  com borda e altura que só coincidiam com as dos vizinhos por acaso.
+
+  O campo da instituição nasce oculto e é revelado pelo `js/pages/oficios-dados-viajantes.js`
+  quando o custeio vira "outra instituição" — os três `data-*` do invólucro são
+  contrato dele, e `data-oficio-custeio-outra-value` carrega VALOR, por isso o
+  invólucro é escrito aqui e não vem de um componente.
+{% endcomment %}
+<div class="field-grid">
+  <c-v2.document_number :field="form.numero" label="N° do Ofício" :suffix="oficio_numero_ano_hint" />
+  <c-v2.form_field :field="form.protocolo" label="Protocolo" />
+  {% comment %}
+    O custeio passa pelo `c-v2.select`, e não pelo `form_field`: aquele entrega o
+    widget do Django cru, e o `<select>` nativo mantém a seta do navegador em vez
+    do gatilho do sistema. `data-oficio-custeio-field`, que o JS lê para revelar
+    o campo da instituição, continua vindo do próprio widget.
+  {% endcomment %}
+  <c-v2.field label="Custeio" :label_for="form.custeio.id_for_label" :error="form.custeio.errors.0">
+    <c-slot name="control"><c-v2.select :field="form.custeio" aria_label="Custeio" /></c-slot>
+  </c-v2.field>
   <div
-    class="field field-size-4{% if not mostrar_custeio_observacao %} form-field--hidden{% else %} is-open{% endif %}"
+    class="oficio-custeio-instituicao"
     data-custeio-observacao-wrapper
     data-oficio-instituicao-field
     data-oficio-custeio-outra-value="{{ outra_instituicao_custeio_value|default:'OUTRA_INSTITUICAO' }}"
     {% if not mostrar_custeio_observacao %}hidden{% endif %}
   >
-    <c-ui.forms.field :field="form.custeio_observacao" label="Nome da Instituição" only />
+    <c-v2.form_field :field="form.custeio_observacao" label="Nome da Instituição" />
   </div>
 </div>

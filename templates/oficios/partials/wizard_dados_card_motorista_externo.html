@@ -1,47 +1,58 @@
-{# Seção de motorista externo: irmã de Equipe e Transporte. #}
-<section
-  class="form-block form-block--resource travel-document-block oficio-external-driver{% if show_motorista_card %} is-open{% else %} form-field--hidden{% endif %}"
-  aria-labelledby="travel-document-wizard-motorista-title"
-  data-oficio-driver-external-card
-  {% if not show_motorista_card %}hidden{% endif %}
->
-  <header class="form-block__header">
-    <div class="form-block__copy">
-      <h3 class="form-block__title" id="travel-document-wizard-motorista-title">Motorista</h3>
-      <p class="form-block__description">Condutor da viatura</p>
-    </div>
-    <div class="form-block__actions">
-      {% include "oficios/partials/_motorista_modo_toggle.html" with modo_atual=transporte_form.motorista_modo.value only %}
-    </div>
-  </header>
+{% comment %}
+  Motorista externo — a seção que aparece quando a viatura está escolhida e
+  ninguém da equipe foi marcado como motorista. Irmã de Equipe e Transporte, e
+  por isso um `form_block` como elas.
 
-  <div class="form-block__body oficio-external-driver__body">
-    {{ transporte_form.motorista_modo }}
+  O invólucro é uma `<div>` NUA, e não o próprio bloco: quem abre e fecha a
+  seção é `js/pages/oficios-wizard-driver-state.js`, e ele usa a propriedade
+  `hidden`. Sobre um elemento cujo CSS declara `display`, `[hidden]` perde — foi
+  por isso que o legado precisava carregar `form-field--hidden` junto. Numa
+  `<div>` sem regra nenhuma o `hidden` do HTML basta, e a seção não depende de
+  uma classe para sumir.
 
-    <div class="oficio-external-driver__identity" data-oficio-motorista-servidor>
-      <label class="sr-only" for="{{ transporte_form.motorista.id_for_label }}">Buscar motorista no sistema</label>
-      {{ motorista_compact_widget }}
-    </div>
+  O mesmo vale para os três painéis de dentro: `-servidor` e `-manual` alternam
+  pelo toggle do cabeçalho, e `-extras` só aparece quando o motorista é de fora
+  da equipe.
+{% endcomment %}
+<div data-oficio-driver-external-card {% if not show_motorista_card %}hidden{% endif %}>
+  <c-v2.form_block title="Motorista" description="Condutor da viatura">
+    <c-slot name="actions">
+      <c-v2.driver_mode_toggle :mode="transporte_form.motorista_modo.value" />
+    </c-slot>
 
-    <div class="oficio-external-driver__identity" data-oficio-motorista-manual>
-      <div class="field app-form-field cv-field">
-        <label class="sr-only" for="{{ transporte_form.motorista_manual_nome.id_for_label }}">Nome completo</label>
-        {{ transporte_form.motorista_manual_nome }}
-        {% if transporte_form.motorista_manual_nome.errors %}
-          <c-ui.feedback.field_error :errors="transporte_form.motorista_manual_nome.errors" :field_id="transporte_form.motorista_manual_nome.auto_id" only />
-        {% endif %}
+    <c-slot name="body">
+      {{ transporte_form.motorista_modo }}
+
+      <div data-oficio-motorista-servidor>
+        <c-v2.field label="Buscar motorista no sistema" :label_for="transporte_form.motorista.id_for_label">
+          <c-slot name="control">{{ motorista_compact_widget }}</c-slot>
+        </c-v2.field>
       </div>
-    </div>
 
-    <div class="oficio-external-driver__reference" data-oficio-motorista-extras>
-      <div class="oficio-external-driver__reference-copy">
-        <strong>Ofício de origem</strong>
-        <span>Identifique o documento que autorizou este motorista.</span>
+      <div data-oficio-motorista-manual>
+        <c-v2.form_field :field="transporte_form.motorista_manual_nome" label="Nome completo" />
       </div>
-      <div class="oficio-external-driver__reference-fields">
-        <c-ui.forms.document_number_field :field="transporte_form.motorista_oficio_referencia" label="N° do Ofício" :ano="motorista_oficio_ano" :numero_inicial="motorista_oficio_numero_inicial" only />
-        <c-ui.forms.field :field="transporte_form.motorista_protocolo_ref" label="Protocolo" only />
+
+      {% comment %}
+        A referência do ofício de origem responde a outra pergunta — não é "quem
+        dirige", é "com que documento". Por isso é um bloco à parte, e não mais
+        dois campos soltos embaixo dos outros.
+      {% endcomment %}
+      <div data-oficio-motorista-extras {% if not motorista_extras_visivel %}hidden{% endif %}>
+        <c-v2.form_block title="Ofício de origem" description="Identifique o documento que autorizou este motorista.">
+          <c-slot name="body">
+            <div class="field-grid">
+              <c-v2.document_number
+                :field="transporte_form.motorista_oficio_referencia"
+                label="N° do Ofício"
+                :year="motorista_oficio_ano"
+                :numero_inicial="motorista_oficio_numero_inicial"
+              />
+              <c-v2.form_field :field="transporte_form.motorista_protocolo_ref" label="Protocolo" />
+            </div>
+          </c-slot>
+        </c-v2.form_block>
       </div>
-    </div>
-  </div>
-</section>
+    </c-slot>
+  </c-v2.form_block>
+</div>

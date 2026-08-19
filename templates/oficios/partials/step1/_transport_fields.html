@@ -1,5 +1,24 @@
-<div class="viatura-sugestoes" data-viatura-sugestoes hidden>
-  <p class="viatura-sugestoes__label">Sugestões</p>
-  <div class="viatura-sugestoes__chips" data-viatura-sugestoes-chips></div>
-</div>
-<c-ui.forms.field :field="form.viatura" only />
+{% comment %}
+  Transporte — a viatura, com as sugestões acima do picker.
+
+  A faixa de sugestões vem ANTES do campo porque é atalho: quem já preencheu a
+  equipe costuma achar ali a viatura certa e não chega a digitar nada. Ela nasce
+  oculta e só aparece quando `js/pages/oficios-viatura-sugestoes.js` encontra
+  viatura da unidade da equipe ou do motorista ativo.
+{% endcomment %}
+<c-v2.suggestions hook="data-viatura-sugestoes" list_hook="data-viatura-sugestoes-chips" />
+
+<c-v2.field :label="form.viatura.label" :label_for="form.viatura.id_for_label" :error="form.viatura.errors.0">
+  <c-slot name="control">
+    <c-v2.picker
+      :field="form.viatura"
+      presentation="vehicle"
+      selected_title="Viatura selecionada"
+      :action_href="viatura_create_url"
+      action_icon="plus"
+      action_aria_label="Nova viatura"
+      action_tooltip="Nova viatura"
+      :action_autosave="True"
+    />
+  </c-slot>
+</c-v2.field>
