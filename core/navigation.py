@@ -6,11 +6,11 @@ from django.urls import reverse
 
 
 NAVIGATION_ITEMS = [
-    {"id": "dashboard", "label": "Dashboard", "url_name": "core:dashboard", "icon": "DG"},
+    {"id": "dashboard", "label": "Dashboard", "url_name": "core:dashboard", "icon": "home"},
     {
         "id": "planejamento",
         "label": "Planejamento",
-        "icon": "PL",
+        "icon": "calendar",
         "active_when": ["eventos:", "roteiros:", "planos_trabalho:", "ordens_servico:"],
         "children": [
             {"id": "eventos", "label": "Eventos", "url_name": "eventos:index", "active_when": ["eventos:"]},
@@ -22,7 +22,7 @@ NAVIGATION_ITEMS = [
     {
         "id": "documentos-operacionais",
         "label": "Documentos",
-        "icon": "DC",
+        "icon": "document",
         "active_when": ["oficios:", "termos:", "justificativas:"],
         "children": [
             {"id": "oficios", "label": "Ofícios", "url_name": "oficios:index", "active_when": ["oficios:"]},
@@ -33,7 +33,7 @@ NAVIGATION_ITEMS = [
     {
         "id": "execucao",
         "label": "Execução e prestação",
-        "icon": "EX",
+        "icon": "calculator",
         "active_when": ["prestacoes_contas:"],
         "children": [
             {
@@ -47,7 +47,7 @@ NAVIGATION_ITEMS = [
     {
         "id": "ui-lab",
         "label": "UI Lab",
-        "icon": "UI",
+        "icon": "code",
         "active_when": ["core:main_preview"],
         # SEM `staff_only`: quem abre o laboratório é quem desenha a tela, e o
         # usuário de desenvolvimento não é `is_staff` — o item ficava invisível
@@ -71,7 +71,7 @@ NAVIGATION_ITEMS = [
     {
         "id": "administracao",
         "label": "Administração",
-        "icon": "AD",
+        "icon": "settings",
         "active_when": ["cadastros:", "usuarios:"],
         "children": [
             {"id": "servidores", "label": "Servidores", "url_name": "cadastros:servidores_index", "active_when": ["cadastros:servidor_", "cadastros:servidores_index"]},

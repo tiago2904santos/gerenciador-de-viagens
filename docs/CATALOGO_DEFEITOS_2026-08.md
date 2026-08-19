@@ -9632,3 +9632,60 @@ Saída e chegada eram divididas em uma grade de datas e outra grade de horas, ap
 único conjunto temporal. **Correção:** reunir o calendário de intervalo e os dois campos de hora
 em uma grade V2 de quatro colunas. O calendário ocupa as duas primeiras, uma por data, e as horas
 ocupam as duas restantes; a grade reduz para duas e depois uma coluna em larguras menores.
+
+### NOVO-20260819-220313-6c7bd5d89165 🟢 RESOLVIDO · `NOVO` A barra lateral era o último componente global fora do sistema v2 · UI/HT · risco médio
+
+A barra resolvia a própria aparência com **28 tokens `--sidebar-*` exclusivos** em
+`base/tokens.css`, uma folha própria de 500 linhas (`layout/sidebar.css`), um gradiente de
+superfície por tema e mais 10 regras de exceção em `theme-dark-components.css`. Ela era a peça mais
+vista do sistema — está em toda tela autenticada — e a única que não lia nenhum token do v2: uma
+cor mudada em `v2/tokens.css` não a alcançava, e o item escolhido não usava o accent do tema.
+
+**Correção:** o componente passa a compor `c-v2.button` no lugar de `<a>`/`<button>` escritos à mão,
+os selos de duas letras (`DG`, `PL`, `DC`…) viram ícones da folha de símbolos, e a folha nova
+(`static/css/v2/sidebar.css`) lê **só** `v2/tokens.css`. A superfície é `--surface-brand` — a mesma
+do `c-v2.header`, porque a barra e a faixa de identidade são a mesma moldura da tela. Nenhuma regra
+consulta `html[data-theme]`.
+
+Os **nomes de classe e os `data-*` ficaram** (`AGENTS.md` §3.2): `static/js/components/sidebar.js`
+seleciona por eles, `layout/app-shell.css` desenha a gaveta móvel sobre eles e três testes os citam
+— renomear exigiria mover as quatro camadas no mesmo PR para não mudar um pixel.
+
+**Dois tokens novos, e por quê.** `--surface-on-brand` e `--surface-selected-on-brand` existem
+porque a escada `page → rail → field` não vale sobre a marca, e porque **a mesma porcentagem de
+branco dá contrastes diferentes nos dois azuis de marca**: 10% mede 1.257 sobre `#155b9a` (claro) e
+1.342 sobre `#062847` (escuro). O primeiro corte usava accent diluído no fundo do item escolhido e
+**ele sumia no tema claro** — `#004a90` sobre `#155b9a` lê como "mais escuro", não como "escolhido".
+Agora são 13% no claro e 10% no escuro, os dois em **1.34** — o mesmo alvo que o `--surface-selected`
+das listas persegue —, e o accent ficou no filete da borda.
+
+### NOVO-20260819-220313-df2a5685481a 🟢 RESOLVIDO · `NOVO` O login tinha um sistema de cor só dele · UI/HT · risco baixo
+
+`pages/auth.css` declarava **19 aliases `--auth-*`** sobre os tokens legados e o formulário emitia
+`WidgetStyle.AUTH_FIELD_INPUT` — uma classe de campo que não existia em nenhuma outra tela. O login
+é a primeira coisa que o usuário vê do produto e era o único lugar onde um campo e um botão tinham
+definição própria; foi por isso que ele divergiu do sistema, e por isso o `HT-01` precisou duplicar
+o piso de foco lá dentro.
+
+**Correção:** a tela passa a carregar `ui.bundle.css` — o **mesmo** bundle de `base.html` — e compõe
+`c-v2.field`, `c-v2.input`, `c-v2.button` e `c-v2.form_errors`. `LoginForm` emite `INPUT_V2`;
+`AUTH_FIELD_INPUT` saiu do enum. A folha nova (`static/css/v2/auth.css`) tem só o que é da página:
+casca, as duas colunas e o piso de foco que `base.css` daria se a tela estendesse a base. A coluna
+da esquerda é `--surface-brand` e a da direita é `rail → field`: quem entra já viu as duas
+superfícies do sistema antes de digitar a senha.
+
+A faixa de erro passou a ser a do sistema. Ela ficava de fora por falta do CSS que a pinta
+(`test_erro_de_formulario`, com o motivo escrito no teste); com `ui.bundle.css` no `<head>` o motivo
+caiu, e o teste virou o contrário — guarda que a faixa **está** lá.
+
+**Prova de morte de `pages/auth.css`:** `grep` de repositório inteiro em `.py`, `.html`, `.css` e
+`.js` — as 15 famílias `auth-*` só apareciam em `templates/core/login.html`, reescrito neste PR, e
+em teste/auditor, reapontados junto. `auth-field-input`, `auth-error` e `auth-submit` não têm mais
+nenhum emissor.
+
+**Dois defeitos que só o navegador mostrou**, e ambos vinham de a tela ser raiz própria: sem
+`base/utilities.css` a folha de símbolos ocupava 150px no corpo e empurrava o cartão para baixo do
+centro; sem `base/tokens.css` não havia `--font-sans` e a página caía na fonte serifada do
+navegador. O primeiro virou regra em `v2/auth.css`; o segundo virou token em `v2/tokens.css`, com o
+valor **idêntico** ao de `base/tokens.css` e o comentário dizendo que os dois têm de continuar
+iguais enquanto a folha legada existir.

@@ -32,7 +32,7 @@ CSS = RAIZ / "static" / "css"
 
 # So interessa foco de coisa que recebe foco de teclado.
 CONTROLE = re.compile(
-    r"input|textarea|select|button|field__control|form-control|auth-field"
+    r"input|textarea|select|button|field__control|form-control"
     r"|picker__input|picker__trigger|__toggle|a\[href\]|tabindex",
     re.I,
 )
@@ -102,7 +102,7 @@ def main(argv=None) -> int:
     if args.max is not None and len(achados) > args.max:
         print(
             f"\nERRO: subiu para {len(achados)}; o teto e {args.max}.\n"
-            "O piso de `:focus-visible` em base.css/pages/auth.css neutraliza os que ja\n"
+            "O piso de `:focus-visible` em base.css/v2/auth.css neutraliza os que ja\n"
             "existem, mas esta conta so desce (AGENTS.md, regra 5): cada bloco novo\n"
             "e um lugar a mais onde alguem vai ter de lembrar do piso.",
             file=sys.stderr,

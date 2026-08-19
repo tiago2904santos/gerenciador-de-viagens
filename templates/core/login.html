@@ -7,19 +7,33 @@
   <script src="{% static 'js/core/theme-shared.js' %}"></script>
   <script src="{% static 'js/core/theme-init.js' %}"></script>
   <title>Entrar — Central de Viagens 3</title>
+  {% comment %}
+    Três folhas, e cada uma tem um porquê:
+
+    - `fonts.css` — a família do produto;
+    - `ui.bundle.css` — os componentes v2 que esta tela usa (`button`, `input`,
+      `field`, `form_errors`) já vêm prontos daqui. É o MESMO bundle que
+      `base.html` carrega, então a tela pública e a interna leem a mesma fonte
+      de verdade; antes o login era o único lugar onde um campo e um botão
+      tinham definição própria, e foi por isso que ele divergiu do sistema;
+    - `v2/auth.css` — o que é só da página: a casca e as duas colunas.
+
+    `base.css` continua de fora, e é isso que obriga `v2/auth.css` a carregar o
+    piso de foco de teclado — está comentado lá.
+  {% endcomment %}
   <link rel="stylesheet" href="{% static 'css/base/fonts.css' %}">
-  <link rel="stylesheet" href="{% static 'css/base/tokens.css' %}">
-  <link rel="stylesheet" href="{% static 'css/base/03-theme-dark.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/auth.css' %}">
+  <link rel="stylesheet" href="{% static 'css/ui.bundle.css' %}">
+  <link rel="stylesheet" href="{% static 'css/v2/auth.css' %}">
 </head>
 <body class="auth-page">
   {% comment %}
-    HT-09: o login era a única das 25 telas sem skip link. Aqui ele não é
+    `HT-09`: o login era a única das 25 telas sem skip link. Aqui ele não é
     formalidade: não há nada focável antes do formulário, mas quem usa leitor
     de tela atravessa em sequência o título, o subtítulo e a lista de três
     recursos antes de chegar ao campo de usuário. O link pula esse bloco.
   {% endcomment %}
   <a class="skip-link" href="#auth-form">Ir para o formulário de acesso</a>
+  <c-ui.icons._sprite />
   <main class="auth-shell">
     <section class="auth-card" aria-labelledby="auth-title">
       <div class="auth-intro">
@@ -50,29 +64,23 @@
           {% csrf_token %}
           {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
 
-          {% if form.non_field_errors %}
-            <div class="auth-error" role="alert">
-              {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
-            </div>
-          {% endif %}
+          {% comment %}
+            A faixa de erro passou a ser a do sistema (`c-v2.form_errors`). Ela
+            ficava de fora porque a tela não carregava o CSS que a pinta — com
+            `ui.bundle.css` no `<head>`, o motivo caiu. Quem entra com a senha
+            errada e quem erra um campo lá dentro veem agora o mesmo aviso.
+          {% endcomment %}
+          <c-v2.form_errors :form="form" title="Não foi possível entrar" />
 
-          <div class="auth-field">
-            <label class="auth-field-label" for="id_username">Usuário</label>
-            {{ form.username }}
-            {% if form.username.errors %}
-              <div class="auth-field-error" id="id_username-error" role="alert">{% for error in form.username.errors %}<span>{{ error }}</span>{% endfor %}</div>
-            {% endif %}
-          </div>
+          <c-v2.field label="Usuário" label_for="id_username" :errors="form.username.errors" error_id="id_username-error">
+            <c-slot name="control"><c-v2.input :field="form.username" /></c-slot>
+          </c-v2.field>
 
-          <div class="auth-field">
-            <label class="auth-field-label" for="id_password">Senha</label>
-            {{ form.password }}
-            {% if form.password.errors %}
-              <div class="auth-field-error" id="id_password-error" role="alert">{% for error in form.password.errors %}<span>{{ error }}</span>{% endfor %}</div>
-            {% endif %}
-          </div>
+          <c-v2.field label="Senha" label_for="id_password" :errors="form.password.errors" error_id="id_password-error">
+            <c-slot name="control"><c-v2.input :field="form.password" /></c-slot>
+          </c-v2.field>
 
-          <c-ui.buttons.plain_button class_name="auth-submit" type="submit" only>Entrar</c-ui.buttons.plain_button>
+          <c-v2.button type="submit" variant="primary" label="Entrar" />
         </form>
 
         <footer class="auth-footer">

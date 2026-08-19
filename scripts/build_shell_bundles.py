@@ -165,6 +165,7 @@ UI_CSS: tuple[str, ...] = (
     "css/v2/font-try.css",
     "css/v2/download-picker.css",
     "css/v2/tooltip.css",
+    "css/v2/sidebar.css",
     "css/v2/surface.css",
     "css/ui/tokens.css",
     "css/ui/header.css",

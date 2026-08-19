@@ -14,6 +14,8 @@ arquivo não prova pixel na tela.
 
 from __future__ import annotations
 
+import re
+
 from pathlib import Path
 
 from django.conf import settings
@@ -40,25 +42,41 @@ class FocoVisivelTests(SimpleTestCase):
             with self.subTest(arquivo=arquivo):
                 self.assertIn("--color-focus-visible-ring:", ler(arquivo))
 
-    def test_o_piso_existe_em_base_e_tambem_em_auth(self):
+    def test_o_piso_existe_em_base_e_tambem_no_login(self):
         """São dois porque são dois carregamentos diferentes.
 
-        `templates/core/login.html` não estende `base.html`: carrega quatro
-        folhas e `base.css` não é uma delas. Um piso só em `base.css` deixa de
-        fora justamente a tela que o defeito citava.
+        `templates/core/login.html` não estende `base.html` e `base.css` não é
+        uma das folhas que ele carrega. Um piso só em `base.css` deixa de fora
+        justamente a tela que o defeito citava.
+
+        O token muda com o arquivo, e é o ponto: `base.css` é do sistema legado
+        e lê `--color-focus-visible-ring`; a folha do login foi reconstruída no
+        v2 (`NOVO-20260819-220313-df2a5685481a`) e lê `--focus-ring`, que é o
+        anel único do sistema novo. Exigir o token legado na folha nova traria
+        de volta a camada que a migração acabou de tirar.
         """
-        for arquivo in ("static/css/base/base.css", "static/css/pages/auth.css"):
+        for arquivo, token in (
+            ("static/css/base/base.css", "var(--color-focus-visible-ring)"),
+            ("static/css/v2/auth.css", "var(--focus-ring)"),
+        ):
             with self.subTest(arquivo=arquivo):
                 css = ler(arquivo)
                 self.assertIn(":focus-visible", css)
-                self.assertIn("var(--color-focus-visible-ring)", css)
+                self.assertIn(token, css)
 
     def test_o_login_nao_depende_de_base_css(self):
-        """Se um dia passar a depender, o piso duplicado em `auth.css` sai."""
+        """Se um dia passar a depender, o piso duplicado em `v2/auth.css` sai.
+
+        A busca é pelo `<link>`, não pelo nome solto: a asserção antiga casava
+        com a palavra dentro de um comentário do template — inclusive um que
+        dizia justamente que a folha está de fora.
+        """
         html = ler("templates/core/login.html")
 
-        self.assertNotIn("base.css", html)
-        self.assertIn("css/pages/auth.css", html)
+        folhas = re.findall(r'{%\s*static\s+[\'"]([^\'"]+\.css)[\'"]', html)
+
+        self.assertNotIn("css/base/base.css", folhas)
+        self.assertIn("css/v2/auth.css", folhas)
 
     def test_o_anel_leva_offset(self):
         """No tema escuro o âmbar dá 2,07:1 contra a borda do campo.
@@ -66,7 +84,7 @@ class FocoVisivelTests(SimpleTestCase):
         Colado nela reprovaria; o afastamento põe o fundo ao lado do anel, onde
         a medida é 7,76:1. O offset é requisito de contraste, não enfeite.
         """
-        for arquivo in ("static/css/base/base.css", "static/css/pages/auth.css"):
+        for arquivo in ("static/css/base/base.css", "static/css/v2/auth.css"):
             with self.subTest(arquivo=arquivo):
                 self.assertIn("outline-offset", ler(arquivo))
 
@@ -82,7 +100,7 @@ class SkipLinkDoLoginTests(SimpleTestCase):
 
     def test_o_estilo_do_skip_link_acompanha_a_tela_que_o_usa(self):
         """`app-shell.css` não entra nesta tela; sem isto o link ficaria visível."""
-        self.assertIn(".skip-link", ler("static/css/pages/auth.css"))
+        self.assertIn(".skip-link", ler("static/css/v2/auth.css"))
 
 
 class ErroDeLoginAssociadoTests(TestCase):

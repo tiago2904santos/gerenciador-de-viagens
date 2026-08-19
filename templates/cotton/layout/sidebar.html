@@ -1,48 +1,80 @@
 {% cotton:vars navigation_items request %}
+{% load icones %}
+{% comment %}
+  Barra de navegação do shell, reconstruída sobre o sistema v2
+  (`NOVO-20260819-220313-6c7bd5d89165`).
+
+  Continua FORA de `cotton/v2/` de propósito, e o inventário de
+  `test_componentes_sem_orfao` diz por quê: aqui mora a infraestrutura do shell,
+  não um componente de vitrine. A galeria do UI Lab é o consumidor de produção
+  de tudo que está em `v2/`; um componente de casca não teria como aparecer lá
+  sem que a vitrine renderizasse a barra inteira dentro de si.
+
+  O que mudou: o markup passa a compor `c-v2.button` e `c-v2.icon_button` em vez
+  de escrever `<a>`/`<button>` cru com classe de mão, os ícones vêm da folha de
+  símbolos (`{% templatetag openblock %} icone_svg {% templatetag closeblock %}`)
+  no lugar dos selos de duas letras, e a cor vem de `v2/sidebar.css` — que só lê
+  token do `v2/tokens.css`.
+
+  O que NÃO mudou, e é deliberado: os nomes de classe e os `data-*`.
+  `static/js/components/sidebar.js` seleciona por eles (`[data-sidebar]`,
+  `[data-sidebar-toggle]`, `.sidebar-item--collapsible`, `.sidebar-accordion`,
+  `.sidebar-drawer-close`) e a gaveta móvel de `layout/app-shell.css` desenha
+  sobre eles. Trocar os nomes obrigaria a mover template + CSS + JS + testes no
+  mesmo PR só para não mudar um pixel (`AGENTS.md` §3.2).
+{% endcomment %}
 <aside class="sidebar" id="app-sidebar" data-sidebar aria-label="Navegação principal">
   <div class="sidebar-header">
     <a class="sidebar-brand" href="{% url 'core:dashboard' %}" data-sidebar-root-link>
-      <span class="sidebar-brand-badge">CV</span>
-      <span>Central de Viagens 3</span>
+      <span class="sidebar-brand-badge" aria-hidden="true">CV</span>
+      <span class="sidebar-item-text">Central de Viagens 3</span>
     </a>
-    <button class="sidebar-drawer-close" type="button" aria-label="Fechar menu principal" data-sidebar-drawer-close>
-      <span aria-hidden="true">×</span>
-    </button>
+    <c-v2.button
+      class_name="sidebar-drawer-close"
+      type="button"
+      icon="x"
+      aria_label="Fechar menu principal"
+      data-sidebar-drawer-close
+      only
+    />
   </div>
+
   <nav class="sidebar-nav" aria-label="Módulos da Central de Viagens">
     {% for item in navigation_items %}
       {% if item.has_children %}
         <div class="sidebar-item sidebar-item--collapsible{% if item.is_open %} is-open{% endif %}" data-sidebar-item="{{ item.id }}" data-sidebar-group="{{ item.id }}" data-sidebar-expandable>
-          <div class="sidebar-row sidebar-row--top">
-            <button
+          <div class="sidebar-row--top">
+            <c-v2.button
+              class_name="sidebar-link sidebar-link--module sidebar-module-expand{% if item.is_active %} is-active{% endif %}"
               type="button"
-              class="sidebar-link sidebar-link--module sidebar-module-expand{% if item.is_active %} is-active{% endif %}"
               aria-expanded="{% if item.is_open %}true{% else %}false{% endif %}"
               aria-controls="{{ item.children_id }}"
-              aria-label="{{ item.label }}, alternar submenu"
+              aria_label="{{ item.label }}, alternar submenu"
               data-sidebar-toggle
               data-sidebar-expandable-control
+              only
             >
               <span class="sidebar-item-main">
-                {% if item.icon %}<span class="sidebar-item-icon" aria-hidden="true">{{ item.icon }}</span>{% endif %}
+                {% if item.icon %}<span class="sidebar-item-icon" aria-hidden="true">{% icone_svg item.icon %}</span>{% endif %}
                 <span class="sidebar-item-text">{{ item.label }}</span>
               </span>
-              <span class="sidebar-module-expand__chevron" aria-hidden="true">▾</span>
-            </button>
+              <span class="sidebar-module-expand__chevron" aria-hidden="true">{% icone_svg "chevron-down" %}</span>
+            </c-v2.button>
           </div>
           <div class="sidebar-accordion"{% if not item.is_open %} hidden{% endif %}>
             <div class="sidebar-accordion__inner">
               <div class="sidebar-panel" id="{{ item.children_id }}">
                 {% for child in item.children %}
                   {% if child.url %}
-                    <a
-                      class="sidebar-link sidebar-link--cadastros{% if child.sidebar_indent %} sidebar-link--nested{% endif %}{% if child.is_active %} is-active{% endif %}"
-                      href="{{ child.url }}"
+                    <c-v2.button
+                      class_name="sidebar-link sidebar-link--cadastros{% if child.sidebar_indent %} sidebar-link--nested{% endif %}{% if child.is_active %} is-active{% endif %}"
+                      :href="child.url"
+                      aria-current="{% if child.is_current %}page{% else %}false{% endif %}"
                       data-sidebar-panel-link
-                      {% if child.is_current %}aria-current="page"{% endif %}
+                      only
                     >
                       <span class="sidebar-link-text">{{ child.label }}</span>
-                    </a>
+                    </c-v2.button>
                   {% else %}
                     <span
                       class="sidebar-link sidebar-link--cadastros{% if child.sidebar_indent %} sidebar-link--nested{% endif %}"
@@ -59,16 +91,22 @@
       {% else %}
         <div class="sidebar-item">
           {% if item.url %}
-            <a class="sidebar-link sidebar-link--module{% if item.is_active %} is-active{% endif %} sidebar-link--root" href="{{ item.url }}" data-sidebar-root-link {% if item.is_current %}aria-current="page"{% endif %}>
+            <c-v2.button
+              class_name="sidebar-link sidebar-link--module sidebar-link--root{% if item.is_active %} is-active{% endif %}"
+              :href="item.url"
+              aria-current="{% if item.is_current %}page{% else %}false{% endif %}"
+              data-sidebar-root-link
+              only
+            >
               <span class="sidebar-item-main">
-                {% if item.icon %}<span class="sidebar-item-icon" aria-hidden="true">{{ item.icon }}</span>{% endif %}
+                {% if item.icon %}<span class="sidebar-item-icon" aria-hidden="true">{% icone_svg item.icon %}</span>{% endif %}
                 <span class="sidebar-item-text">{{ item.label }}</span>
               </span>
-            </a>
+            </c-v2.button>
           {% else %}
             <span class="sidebar-link sidebar-link--module sidebar-link--root" aria-disabled="true">
               <span class="sidebar-item-main">
-                {% if item.icon %}<span class="sidebar-item-icon" aria-hidden="true">{{ item.icon }}</span>{% endif %}
+                {% if item.icon %}<span class="sidebar-item-icon" aria-hidden="true">{% icone_svg item.icon %}</span>{% endif %}
                 <span class="sidebar-item-text">{{ item.label }}</span>
               </span>
             </span>
@@ -77,6 +115,7 @@
       {% endif %}
     {% endfor %}
   </nav>
+
   <div class="sidebar-footer">
     {% if request.user.is_authenticated %}
       <section class="sidebar-account" aria-label="Conta do usuário">
@@ -88,10 +127,10 @@
           {% endif %}
         </div>
         <div class="sidebar-account__actions">
-          <a class="sidebar-account__link" href="{% url 'core:perfil' %}">Perfil</a>
+          <c-v2.button href="{% url 'core:perfil' %}" label="Perfil" size="sm" />
           <form class="sidebar-logout-form" method="post" action="{% url 'core:logout' %}">
             {% csrf_token %}
-            <button class="sidebar-logout-btn" type="submit">Sair</button>
+            <c-v2.button type="submit" label="Sair" size="sm" />
           </form>
         </div>
       </section>

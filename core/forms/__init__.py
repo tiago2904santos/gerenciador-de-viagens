@@ -10,7 +10,7 @@ from .widgets import widget_attrs
 
 
 class LoginForm(AuthenticationForm):
-    """Formulario de login com foco inicial no usuario e classes para auth.css."""
+    """Formulario de login com foco inicial no usuario e o campo do sistema v2."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -18,13 +18,13 @@ class LoginForm(AuthenticationForm):
             {
                 "autofocus": True,
                 "autocomplete": "username",
-                **widget_attrs(WidgetStyle.AUTH_FIELD_INPUT),
+                **widget_attrs(WidgetStyle.INPUT_V2),
             }
         )
         self.fields["password"].widget.attrs.update(
             {
                 "autocomplete": "current-password",
-                **widget_attrs(WidgetStyle.AUTH_FIELD_INPUT),
+                **widget_attrs(WidgetStyle.INPUT_V2),
             }
         )
 

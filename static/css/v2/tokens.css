@@ -53,6 +53,23 @@
      escrevendo o seu valor foi como elas divergiram. */
   --shadow-menu: 0 12px 28px rgb(7 26 51 / 0.16);
 
+  /* Os dois degraus que existem SOBRE a faixa de marca — a barra lateral e o
+     `c-v2.header`. A escada `page → rail → field` não serve ali: ela é feita
+     para o fundo da página, e um `--surface-rail` sobre o azul-marinho vira uma
+     mancha clara no meio da faixa.
+     
+     São tokens por tema, e não um `color-mix` fixo na folha, porque a MESMA
+     porcentagem de branco dá contrastes diferentes sobre os dois azuis de
+     marca: 10% mede 1.257 sobre o claro (#155b9a) e 1.342 sobre o escuro
+     (#062847). O que precisa bater entre os temas é o contraste, não a
+     porcentagem — é a mesma decisão, e a mesma conta, do `--surface-selected`
+     logo acima. Medido com `scripts/` fora do repo, WCAG relative luminance. */
+  /* 8% → 1.201 (o claro) · 6% → 1.185 (o escuro). */
+  --surface-on-brand: color-mix(in srgb, var(--text-on-brand) 8%, transparent);
+  /* 13% → 1.347 (o claro) · 10% → 1.342 (o escuro) — o mesmo 1.34 que o
+     `--surface-selected` das listas persegue. */
+  --surface-selected-on-brand: color-mix(in srgb, var(--text-on-brand) 13%, transparent);
+
   /* ---- texto ---------------------------------------------------------- */
   --text-strong: #223348;
   --text-muted: #52657a;
@@ -115,6 +132,15 @@
   --control-height-sm: 28px;
 
   /* ---- tipografia ------------------------------------------------------ */
+  /* MESMO valor de `base/tokens.css:215`, e de proposito.
+   *
+   * Não é duplicação por descuido: são dois vocabulários convivendo, e o v2
+   * precisa ser completo o bastante para vestir uma tela sozinho — foi
+   * justamente o que o login exigiu ao sair da camada legada. Enquanto os dois
+   * arquivos existirem, os valores TÊM de ser idênticos, senão a fonte muda
+   * conforme a folha que a página carrega. Quando `base/tokens.css` for
+   * apagado, esta passa a ser a única definição e o comentário sai junto. */
+  --font-sans: "Inter Variable", Inter, "Segoe UI", system-ui, sans-serif;
   --text-size-eyebrow: 12px;
   --text-size-base: 14px;
   --text-size-title: 24px;
@@ -142,6 +168,8 @@
      com a cor na tela. */
   --surface-selected: color-mix(in srgb, var(--accent) 16%, var(--surface-field));
   --shadow-menu: 0 12px 28px rgb(2 10 18 / 0.28);
+  --surface-on-brand: color-mix(in srgb, var(--text-on-brand) 6%, transparent);
+  --surface-selected-on-brand: color-mix(in srgb, var(--text-on-brand) 10%, transparent);
 
   --text-strong: #ffffff;
   --text-muted: #afc0d3;

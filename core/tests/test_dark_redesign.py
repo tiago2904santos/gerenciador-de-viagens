@@ -767,16 +767,24 @@ class DarkRedesignContractTests(SimpleTestCase):
         self.assertNotIn("app-page-hero", cadastros)
 
     def test_login_is_a_solid_responsive_dark_surface_without_flow_changes(self):
+        """A folha mudou de lugar com a reconstrução no v2.
+
+        Os campos deixaram de ser `{{ form.username }}` cru: passam por
+        `c-v2.input`, que é quem os põe na mesma superfície do resto do sistema
+        (`NOVO-20260819-220313-df2a5685481a`). O que este contrato guarda
+        continua sendo o mesmo — o POST, o CSRF, as duas colunas, e a folha sem
+        gradiente, com quebra estreita e respeito a movimento reduzido.
+        """
         login = (
             Path(settings.BASE_DIR) / "templates" / "core" / "login.html"
         ).read_text(encoding="utf-8")
         auth_css = (
-            Path(settings.BASE_DIR) / "static" / "css" / "pages" / "auth.css"
+            Path(settings.BASE_DIR) / "static" / "css" / "v2" / "auth.css"
         ).read_text(encoding="utf-8")
 
         self.assertIn('method="post"', login)
-        self.assertIn("{{ form.username }}", login)
-        self.assertIn("{{ form.password }}", login)
+        self.assertIn(':field="form.username"', login)
+        self.assertIn(':field="form.password"', login)
         self.assertIn("{% csrf_token %}", login)
         self.assertIn("auth-intro", login)
         self.assertIn("auth-panel", login)
