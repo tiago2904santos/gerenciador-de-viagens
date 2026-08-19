@@ -141,6 +141,12 @@
    * conforme a folha que a página carrega. Quando `base/tokens.css` for
    * apagado, esta passa a ser a única definição e o comentário sai junto. */
   --font-sans: "Inter Variable", Inter, "Segoe UI", system-ui, sans-serif;
+  /* O degrau abaixo do eyebrow (2026-08-19). Nasceu para o rótulo do stepper,
+     que é NAVEGAÇÃO — nome de etapa lido de relance, não texto de leitura — e
+     que em 12px ainda competia com o conteúdo do painel. É o piso da escala:
+     abaixo de 11px o texto deixa de ser legível em tela comum, e um quinto
+     degrau seria escolher tamanho por gosto, não por hierarquia. */
+  --text-size-micro: 11px;
   --text-size-eyebrow: 12px;
   --text-size-base: 14px;
   --text-size-title: 24px;

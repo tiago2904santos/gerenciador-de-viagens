@@ -1,32 +1,24 @@
-{% if doc.assinado %}
-  <article class="oficio-documentos-traveller-tile oficio-documentos-traveller-tile--motorista docs-attach-tile" aria-label="{{ title }} anexado">
-    <span class="oficio-documentos-traveller-tile__avatar" aria-hidden="true">{{ abbr }}</span>
-    <div class="oficio-documentos-traveller-tile__main">
-      <div class="oficio-documentos-traveller-tile__title-row">
-        <strong class="oficio-documentos-traveller-tile__name">{{ title }}</strong>
-        <span class="oficio-documentos-traveller-tile__badge">Assinado</span>
-      </div>
-      <span class="oficio-documentos-traveller-tile__meta" title="{{ doc.nome_original }}">{{ doc.nome_original }}</span>
-    </div>
-    <div class="docs-attach-tile__actions" aria-label="Ações de {{ title }}">
-      {% if doc.view_url %}
-        <c-v2.icon_button :href="doc.view_url" action="preview" aria_label="Visualizar" tooltip="Visualizar" only />
-      {% endif %}
-      {% include "prestacoes_contas/partials/_docs_attach_trigger.html" with attach_kinds_json=attach_kinds_json doc=doc initial_kind=initial_kind reopen_key=reopen_key title=title only %}
-    </div>
-  </article>
-{% else %}
-  <div class="document-inline-card document-inline-card--static">
-    <div class="document-inline-card__header">
-      <span class="document-inline-card__title">
-        {{ title }}
-        <small class="docs-attach-card__file docs-attach-card__file--muted">{{ empty_label|default:"Nenhum arquivo anexado" }}</small>
-      </span>
-      <span class="document-inline-card__header-end">
-        <span class="document-inline-actions document-inline-actions--header" aria-label="Ações de {{ title }}">
-          {% include "prestacoes_contas/partials/_docs_attach_trigger.html" with attach_kinds_json=attach_kinds_json doc=doc initial_kind=initial_kind reopen_key=reopen_key title=title only %}
-        </span>
-      </span>
-    </div>
-  </div>
-{% endif %}
+{% firstof doc.nome_original empty_label "Nenhum arquivo anexado" as mensagem_vazia %}
+{% with prefixo_acao=doc.assinado|yesno:"Gerenciar,Anexar" %}
+{% with rotulo_acao=prefixo_acao|add:" "|add:title %}
+<c-v2.document_inline
+  :title="title"
+  :src="doc.view_url"
+  :frame_title="title"
+  :empty_message="mensagem_vazia"
+  actions_label="Ações do documento"
+>
+  <c-slot name="actions">
+    <c-v2.attach_signed_button
+      :url="doc.anexar_url"
+      :doc_label="title"
+      :signed="doc.assinado"
+      :current_name="doc.nome_original"
+      :current_view_url="doc.view_url"
+      :current_remove_url="doc.remover_url"
+      :aria_label="rotulo_acao"
+    />
+  </c-slot>
+</c-v2.document_inline>
+{% endwith %}
+{% endwith %}

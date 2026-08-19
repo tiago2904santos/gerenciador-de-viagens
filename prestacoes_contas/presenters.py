@@ -222,6 +222,7 @@ def apresentar_prestacao_servidor_card(
     trechos_display = []
     valor_diarias_display = ""
     valor_diarias_extenso = ""
+    quantidade_diarias_display = ""
     if oficio.roteiro_id:
         roteiro = oficio.roteiro
         for t in roteiro.trechos.all():
@@ -235,6 +236,7 @@ def apresentar_prestacao_servidor_card(
         if roteiro.valor_diarias:
             valor_diarias_display = _format_brl_diarias(roteiro.valor_diarias)
             valor_diarias_extenso = (roteiro.valor_diarias_extenso or "").strip()
+        quantidade_diarias_display = (roteiro.quantidade_diarias or "").strip()
 
     # `NOVO-08`: era uma consulta por card. A configuração é por área e a área
     # é fixa no request, então os 20 cards da página resolviam sempre o mesmo
@@ -345,6 +347,7 @@ def apresentar_prestacao_servidor_card(
         "trechos": trechos_display,
         "valor_diarias_display": valor_diarias_display,
         "valor_diarias_extenso": valor_diarias_extenso,
+        "quantidade_diarias_display": quantidade_diarias_display,
         "documentos_url": reverse("prestacoes_contas:documentos_servidor", args=[ps.pk]),
         "rt_url": reverse("prestacoes_contas:rt_servidor", args=[ps.pk]),
         "tem_rt": rt is not None,

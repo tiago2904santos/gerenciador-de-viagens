@@ -18,13 +18,19 @@
  * só então lê o valor. Invertido, ele lê seis valores sem saber do que são.
  */
 
-/* A grade se adapta ao número de fatos em vez de fixar colunas: um cartão com
-   dois fatos não deve deixar um terço vazio à direita, e um com cinco não pode
-   espremer cada um em 90px. */
+/* UMA COLUNA, sempre (2026-08-19, por decisão do dono). Dois fatos lado a lado
+   partem a largura ao meio, e o valor é justamente a peça que precisa dela: com
+   `auto-fit` a placa virava "Não informa…" e o total, "R$ 4.111,…" — o `fit-text`
+   já tinha encolhido o corpo até o piso e o resto virou reticência. Empilhados,
+   cada valor tem a faixa inteira.
+
+   É também o que a conta de altura destes blocos sempre supôs: os degraus de
+   `--fact-value-size` mais abaixo somam rótulo, valor e vão POR FATO, um embaixo
+   do outro. */
 :is(html[data-theme]) .fact-list {
   display: grid;
   gap: var(--gap);
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   min-width: 0;
 }
 
@@ -261,7 +267,9 @@
 :is(html[data-theme]) .form-block--v2 .route-legs {
   /* Dois trechos têm de caber no teto da faixa (170px) menos o recuo do bloco:
      ~146px, ou seja 69px por trecho. É por isso que a rota volta a caber em uma
-     linha aqui — ver a regra do `__path` abaixo. */
+     linha aqui — ver a regra do `__path` abaixo. Medido: a caixa do bloco entrega
+     146px, e 2 x 68,8 + 8 de vão fecham em 145,6. Subir para 4,4rem estoura por
+     2,8px e o segundo trecho volta a aparecer cortado. */
   --leg-height: 4.3rem;
   /* Uma coluna só: dentro de um terço do cartão não há largura para duas. */
   grid-template-columns: minmax(0, 1fr);
@@ -272,16 +280,23 @@
      SEM `height: 100%`: com ele a lista media 100% da caixa do bloco, recuo
      incluído, e vazava 24px por baixo. Quem estica é o `align-content: stretch`
      do corpo (`v2/record.css`), que respeita o recuo. */
-  /* CENTRALIZADOS, com altura natural. Esticados em `1fr` eles dividiam os
-     170px e abriam entre si um vão do tamanho de um trecho — o bloco parecia
-     dois blocos distantes. Centrado, o par fica junto e a folga se reparte em
-     cima e embaixo, alinhando com o miolo dos blocos vizinhos. */
+  /* CENTRALIZADOS quando cabem. Esticados em `1fr` eles dividiam os 170px e
+     abriam entre si um vão do tamanho de um trecho — o bloco parecia dois
+     blocos distantes. Centrado, o par fica junto e a folga se reparte em cima e
+     embaixo, alinhando com o miolo dos blocos vizinhos. Quando a lista rola,
+     a regra abaixo devolve o alinhamento ao topo.
+   *
+   * Fileiras de altura FIXA, e não `min-content`: é o que garante que a caixa
+   * mostre DOIS trechos inteiros. Com altura natural cada trecho media um tanto
+   * (65,7px aqui, 68,9px no que tinha rota mais longa) e o segundo terminava
+   * cortado ao meio, com a metade do terceiro aparecendo por baixo. */
   align-content: center;
-  grid-auto-rows: min-content;
+  grid-auto-rows: var(--leg-height);
 }
 
 :is(html[data-theme]) .form-block--v2 .route-legs__leg {
   overflow: hidden;
+  scroll-snap-align: start;
 }
 
 /* O teto e a barra só existem a partir do TERCEIRO trecho.
@@ -293,8 +308,16 @@
  * lista, sem cromo nenhum.
  */
 :is(html[data-theme]) .form-block--v2 .route-legs:has(> :nth-child(3)) {
+  /* Do TOPO quando rola: `align-content: center` numa caixa que rola empurra o
+     começo da lista para fora pela borda de cima, e o primeiro trecho fica
+     inalcançável — a rolagem só desce. */
+  align-content: start;
   max-height: calc(2 * var(--leg-height) + var(--gap-tight));
   overflow-y: auto;
+  /* A rolagem PARA em trecho inteiro. Sem isto ela para onde o dedo soltou, e
+     o que se vê é meio cartão em cima e meio embaixo — o mesmo corte que as
+     fileiras fixas resolvem no estado parado. */
+  scroll-snap-type: y mandatory;
   /* Aqui a calha vale: ela reserva o espaço da barra para o texto não mudar de
      largura enquanto se rola. */
   scrollbar-gutter: stable;
@@ -358,10 +381,6 @@
 
 :is(html[data-theme]) .route-summary__column {
   min-width: 0;
-}
-
-:is(html[data-theme]) .route-summary__column--details .fact-list {
-  grid-template-columns: minmax(0, 1fr);
 }
 
 @media (max-width: 900px) {

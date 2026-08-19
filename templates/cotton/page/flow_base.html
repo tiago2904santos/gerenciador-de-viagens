@@ -35,7 +35,17 @@
         <c-v2.header :title="page_title">
           {% if flow_back_url %}<c-slot name="aside"><c-v2.button :href="flow_back_url" :label="flow_back_label" icon="arrow-left" /></c-slot>{% endif %}
         </c-v2.header>
-        {% if wizard_page_steps %}<c-v2.stepper :steps="wizard_page_steps" :aria_label="flow_stepper_aria_label" />{% endif %}
+        {% comment %}
+          O stepper vai DENTRO de um rail, como no `c-v2.wizard_page`: a faixa
+          é o que lhe dá fundo e recuo quando ela descola do header e flutua
+          sobre o conteúdo. Solto, ele flutuaria sem superfície e o formulário
+          apareceria por baixo das etapas.
+        {% endcomment %}
+        {% if wizard_page_steps %}
+          <c-v2.rail>
+            <c-slot name="controls"><c-v2.stepper :steps="wizard_page_steps" :aria_label="flow_stepper_aria_label" /></c-slot>
+          </c-v2.rail>
+        {% endif %}
       {% endblock %}
 
       {% block flow_stepper %}{% endblock %}

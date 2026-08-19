@@ -129,6 +129,9 @@ class QuickAddComponentesV2SourceTests(SimpleTestCase):
 
         self.assertIn(".picker > .search-picker__native", css)
         self.assertIn("display: none !important", css)
+        self.assertIn(".search-picker__icon::before", css)
+        self.assertIn(".search-picker__icon::after", css)
+        self.assertIn(".search-picker--has-query .search-picker__clear", css)
 
     def test_controles_do_usuario_chamam_componentes_visuais_v2(self):
         identidade = (
@@ -147,7 +150,8 @@ class QuickAddComponentesV2SourceTests(SimpleTestCase):
         self.assertEqual((identidade + senha).count("<c-v2.input"), 5)
         self.assertNotIn("<c-v2.form_field", identidade + senha)
         self.assertIn('<c-v2.picker :field="form.area"', acesso)
-        self.assertIn('<c-v2.select :field="form.papel"', acesso)
+        self.assertIn('<c-v2.form_field :field="form.papel" :select="True"', acesso)
+        self.assertNotIn('<c-v2.select :field="form.papel"', acesso)
         self.assertNotIn("<c-v2.select_with_action", acesso)
         self.assertIn(".select > .custom-select__native", select_css)
 

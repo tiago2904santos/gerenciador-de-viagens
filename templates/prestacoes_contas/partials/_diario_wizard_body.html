@@ -8,7 +8,7 @@
 {% for item in trechos %}
   {% with form=item.form d=item.display %}
     {% with ordem_str=d.ordem|stringformat:"s" %}
-      {% with cotton_attr_title="Trecho "|add:ordem_str|add:" — "|add:d.rota %}<c-v2.form_block :title="cotton_attr_title" description="Dados do roteiro. Informe KM e abastecimento." variant="resource" extra_class="travel-document-block roteiro-editor__section--retorno route-section-block diario-trecho-block" body_extra_class="roteiro-editor__retorno-body" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_id="body_id" :data_hook="data_hook" :element_id="element_id" :heading_level="heading_level" :section_id="section_id" :shell="shell"><c-slot name="body">{% include "prestacoes_contas/partials/_diario_trecho_body.html" with d=d form=form only %}</c-slot></c-v2.form_block>{% endwith %}
+      {% with cotton_attr_title="Trecho "|add:ordem_str %}<c-v2.form_block :title="cotton_attr_title" :description="d.rota" extra_class="roteiro-trecho-card route-leg diario-trecho-block" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_id="body_id" :data_hook="data_hook" :element_id="element_id" :heading_level="heading_level" :section_id="section_id" :shell="shell"><c-slot name="body">{% include "prestacoes_contas/partials/_diario_trecho_body.html" with d=d form=form only %}</c-slot></c-v2.form_block>{% endwith %}
     {% endwith %}
   {% endwith %}
 {% empty %}

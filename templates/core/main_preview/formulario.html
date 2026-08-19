@@ -151,34 +151,6 @@
       </c-slot>
     </c-v2.panel>
 
-    {% comment %}
-      PROVA DE MODELO (2026-08-19): três desenhos de stepper com os MESMOS
-      dados e o mesmo estado — etapa 2 de 4. Quando um for escolhido, ele vira
-      o padrão do componente e este painel sai junto com as outras duas
-      variantes na folha.
-    {% endcomment %}
-    <h3 class="v2-lab__sub">Stepper — três modelos em prova</h3>
-
-    <c-v2.panel title="A · trilha" description="Marcador em cima, rótulo embaixo, e a linha ligando as etapas. O trecho andado vai no accent.">
-      <c-slot name="body">
-        <c-v2.stepper :steps="v2_etapas" extra_class="stepper--track" aria_label="Modelo A" />
-      </c-slot>
-    </c-v2.panel>
-
-    <c-v2.panel title="B · fita segmentada" description="As etapas como segmentos de uma faixa só — o mesmo desenho do toggle. Para o wizard que é hub, onde se clica na etapa que interessa.">
-      <c-slot name="body">
-        <c-v2.stepper :steps="v2_etapas" extra_class="stepper--fill" aria_label="Modelo B" />
-      </c-slot>
-    </c-v2.panel>
-
-    <c-v2.panel title="C · compacto" description="Uma linha: a etapa atual e uma barra com o quanto andou. Para tela estreita e formulário longo.">
-      <c-slot name="body">
-        <div style="--stepper-progresso: 50%">
-          <c-v2.stepper :steps="v2_etapas" extra_class="stepper--compact" aria_label="Modelo C" />
-        </div>
-      </c-slot>
-    </c-v2.panel>
-
     <h3 class="v2-lab__sub">Etapa de wizard</h3>
 
     <c-v2.wizard_page title="Ofício 153/2026" :steps="v2_etapas">

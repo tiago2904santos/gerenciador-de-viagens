@@ -17,6 +17,20 @@ TEMPLATES = Path(settings.BASE_DIR) / "templates"
 
 
 class ServidorComponentesV2SourceTests(TestCase):
+    def test_identificacao_usa_bloco_regular_e_quatro_campos_na_mesma_linha(self):
+        pagina = (TEMPLATES / "cadastros/servidores/form.html").read_text(encoding="utf-8")
+        identificacao = (
+            TEMPLATES / "cadastros/servidores/partials/_form_fields.html"
+        ).read_text(encoding="utf-8")
+
+        self.assertNotIn(
+            '<c-v2.form_block :split="True" title="Identificação funcional"',
+            pagina,
+        )
+        self.assertIn('class="field-grid field-grid--cols-4"', identificacao)
+        self.assertIn('<c-v2.form_field :field="form.nome" />', identificacao)
+        self.assertNotIn('extra_class="field--wide"', identificacao)
+
     def test_campos_relacionais_usam_componentes_especializados_v2(self):
         identificacao = (
             TEMPLATES / "cadastros/servidores/partials/_form_fields.html"

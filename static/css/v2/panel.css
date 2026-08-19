@@ -13,6 +13,17 @@
   padding: var(--gap);
 }
 
+/* O `gap` do painel separa cabeçalho, corpo e rodapé — mas o CORPO é um único
+   filho, então os blocos DENTRO dele não herdavam vão nenhum e encostavam um no
+   outro (dois `form_block` empilhados liam como um bloco só, de duas cabeças).
+   O corpo repete a grade do painel para que a distância entre blocos seja a
+   mesma distância entre as seções. */
+:is(html[data-theme]) .panel__body {
+  display: grid;
+  gap: var(--gap);
+  min-width: 0;
+}
+
 /* NOTA (2026-08-16): por algumas horas o painel de cartões ficou transparente,
    para acabar com a sensação de moldura dupla. Voltou a ser caixa: o que causava
    a moldura dupla não era o painel, era o CARTÃO ter ganhado cor de caixa e

@@ -183,7 +183,7 @@ class PrestacaoServidorDiariaOverrideTests(TestCase):
         self.assertEqual(build_relatorio_tecnico_context(self.relatorio, self.ps_a)["diaria"], "R$100,00")
         self.assertEqual(build_relatorio_tecnico_context(self.relatorio, self.ps_b)["diaria"], "R$80,00")
 
-    def test_rt_criar_get_mostra_selo_so_no_servidor_com_override(self):
+    def test_rt_criar_get_mostra_selo_sem_expor_campo_de_override(self):
         self.ps_b.diaria_valor_override = Decimal("80.00")
         self.ps_b.save(update_fields=["diaria_valor_override"])
 
@@ -191,8 +191,8 @@ class PrestacaoServidorDiariaOverrideTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Diária ajustada")
-        self.assertContains(response, f'id_ps-{self.ps_b.pk}-diaria_valor_override')
-        self.assertContains(response, 'value="R$80,00"')
+        self.assertNotContains(response, f'id_ps-{self.ps_b.pk}-diaria_valor_override')
+        self.assertNotContains(response, "Diária recebida por este servidor")
 
     def test_rt_autosave_salva_override_de_um_servidor_sem_afetar_o_outro(self):
         field_name = f"ps-{self.ps_b.pk}-diaria_valor_override"
@@ -313,6 +313,19 @@ class PrestacaoServidorDiariaOverrideTests(TestCase):
             servidor["pacote_url"],
             reverse("prestacoes_contas:consolidado_download", args=[self.ps_a.pk]),
         )
+
+    def test_card_expoe_quantidade_persistida_de_diarias(self):
+        roteiro = Roteiro.objects.create(
+            area=area_de_teste(),
+            quantidade_diarias="6 x 100% + 1 x 15%",
+        )
+        self.oficio.roteiro = roteiro
+        self.oficio.save(update_fields=["roteiro", "updated_at"])
+        self.ps_a.refresh_from_db()
+
+        card = apresentar_prestacao_servidor_card(self.ps_a)
+
+        self.assertEqual(card["quantidade_diarias_display"], "6 x 100% + 1 x 15%")
 
     def test_lista_cria_um_card_por_servidor_do_mesmo_oficio(self):
         response = self.client.get(reverse("prestacoes_contas:index"))

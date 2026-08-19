@@ -464,7 +464,11 @@ def apresentar_oficio_card(oficio, *, excluir_next_url=None, menus_sob_demanda=T
         "status_chip_tone_v2": tom_de_chip_v2(status_chip_tone),
         "chip_label": chip_label,
         "chip_tone_v2": chip_tone_v2,
-        "veiculo_placa_display": veiculo_placa or "Não informado",
+        # SEM fallback de texto: quem diz "Não informado" é o `c-v2.fact`, e ele
+        # diz em itálico apagado, no corpo do texto. Escrita aqui, a frase chegava
+        # como VALOR — e saía do outro lado no tamanho de uma placa, em negrito, com
+        # o mesmo peso do ofício que tem viatura.
+        "veiculo_placa_display": veiculo_placa,
         "cancel_note_display": (
             f"Ofício cancelado. Motivo: {oficio.motivo_cancelamento}"
             if oficio.cancelado and oficio.motivo_cancelamento
@@ -845,9 +849,14 @@ ESTADOS_DO_STEPPER_V2 = {
 def apresentar_oficio_wizard_page_steps(steps):
     """Adapta os passos do wizard de ofício para o `c-v2.stepper`.
 
-    Sem `url`: o wizard de ofício é LINEAR, e pular adiante deixaria o documento
-    pela metade. O stepper daqui é indicador, não navegação — ao contrário do
-    painel de evento, que é um hub e cujas etapas existem todas ao mesmo tempo.
+    COM `url` (2026-08-19, a pedido do dono): o stepper é navegação, e não só
+    indicador — clicar numa etapa vai para ela. A ordem das etapas continua
+    sendo a recomendada, mas ir e voltar por elas é decisão de quem preenche;
+    cada etapa já salva o que tem e o documento só é finalizado quando as
+    quatro fecham.
+
+    O `url` vem vazio enquanto o rascunho não existe — sem `pk` não há para
+    onde ir —, e nesse caso o passo volta a ser um indicador.
     """
     page_steps = []
     for step in steps or []:
@@ -857,6 +866,7 @@ def apresentar_oficio_wizard_page_steps(steps):
                 "label": step.get("title") or "",
                 "status": step.get("state_label") or "",
                 "state": ESTADOS_DO_STEPPER_V2.get(state, ""),
+                "url": step.get("url") or "",
             }
         )
     return page_steps

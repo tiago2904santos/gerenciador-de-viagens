@@ -47,6 +47,7 @@ class ViaturaComponentesV2SourceTests(TestCase):
 
         self.assertIn('<c-v2.select :field="form.tipo"', identidade)
         self.assertNotIn('<c-v2.form_field :field="form.tipo"', identidade)
+        self.assertIn('class="field-grid field-grid--cols-4"', identidade)
         self.assertIn('class="picker__action field-with-action__action"', picker)
         self.assertIn("search-picker__control-row", engine)
 

@@ -260,8 +260,8 @@
 
 /* ---- linha de prestação: a que se edita na própria lista --------------------
  *
- * Cada servidor traz um formulário com o número da solicitação e o intervalo de
- * liberação → saque. Ele fica ANTES do nome, na mesma linha: é o que se vem
+ * Cada servidor traz um formulário com o número da solicitação. Ele fica ANTES
+ * do nome, na mesma linha: é o que se vem
  * fazer nesta tela, e mandá-lo para baixo do nome faria a lista crescer o dobro.
  */
 :is(html[data-theme]) .prestacao-row__form {
@@ -274,6 +274,7 @@
 }
 
 :is(html[data-theme]) .prestacao-row__solicitacao {
+  background: var(--surface);
   flex: 1 1 140px;
   min-width: 0;
 }

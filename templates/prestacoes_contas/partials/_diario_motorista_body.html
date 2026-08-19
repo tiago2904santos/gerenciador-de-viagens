@@ -1,22 +1,18 @@
-<section class="oficio-documentos-admin-facts" aria-label="Motorista do diário">
-  <div class="oficio-documentos-card__body">
-    <dl class="oficio-documentos-facts oficio-documentos-facts--admin">
-      <div class="oficio-documentos-fact diario-motorista-fact">
-        <dt>Motorista</dt>
-        <dd>
-          <span>{{ motorista_resumo.nome }}</span>
-          {% if motorista_resumo.cpf %}<span class="diario-motorista-fact__cpf">CPF {{ motorista_resumo.cpf }}</span>{% endif %}
-        </dd>
-      </div>
-      <div class="oficio-documentos-fact diario-motorista-fact">
-        <dt>Origem do motorista</dt>
-        <dd>
-          <span>{{ motorista_resumo.origem }}</span>
-          {% if motorista_resumo.alterado %}
-            <c-v2.chip label="Alterado" tone="warning" size="compact" only />
-          {% endif %}
-        </dd>
-      </div>
-    </dl>
+{% if motorista_resumo.cpf %}
+  {% with cpf_motorista="CPF "|add:motorista_resumo.cpf %}
+    <div class="fact-list" aria-label="Motorista do diário">
+      <c-v2.fact label="Motorista" :value="motorista_resumo.nome" :note="cpf_motorista" />
+      <c-v2.fact label="Origem do motorista" :value="motorista_resumo.origem" />
+    </div>
+  {% endwith %}
+{% else %}
+  <div class="fact-list" aria-label="Motorista do diário">
+    <c-v2.fact label="Motorista" :value="motorista_resumo.nome" />
+    <c-v2.fact label="Origem do motorista" :value="motorista_resumo.origem" />
   </div>
-</section>
+{% endif %}
+{% if motorista_resumo.alterado %}
+  <div class="fact-chips">
+    <c-v2.chip label="Alterado" tone="warning" size="compact" only />
+  </div>
+{% endif %}

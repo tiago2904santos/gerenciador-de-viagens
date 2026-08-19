@@ -1,14 +1,21 @@
 {% comment %}
 Um campo de texto longo do RT: select de modelos (estilo justificativa do ofício) + textarea.
-O botão "Gerenciar modelos" fica no header do form_block (variant=resource).
+O gerenciamento integra o `select_with_action` global, sem botão separado no header.
 Espera a variável `c` (dict com select, textarea, label, manage_url, tem_modelos).
 {% endcomment %}
 <div class="cv-field--full-width">
-  <c-v2.form_field :field="c.select" label="Modelo" only />
+  <c-v2.form_field
+    :field="c.select"
+    label="Modelo"
+    :hide_label="True"
+    :action_url="c.manage_url"
+    action_label="Gerenciar modelos"
+    only
+  />
   {% if not c.tem_modelos %}
     <p class="field-help app-form-help">Nenhum modelo cadastrado para este campo. <a href="{{ c.manage_url }}">Cadastrar modelo</a></p>
   {% endif %}
 </div>
 <div class="oficio-justificativa-card__wide-field cv-field--full-width">
-  <c-v2.form_field :field="c.textarea" :label="c.label" only />
+  <c-v2.form_field :field="c.textarea" :label="c.label" :input="True" only />
 </div>

@@ -667,13 +667,13 @@ class RelatorioTecnicoForm(forms.ModelForm):
             )
             self._set_initial_custeio_value(campo)
 
-        # Textareas dos campos com modelo: classe padrão + data-attr para o JS encontrar.
+        # Textareas dos campos com modelo: controle global V2 + hook do motor do RT.
         rows = {"motivo": 4, "atividade": 4, "conclusao": 4, "medidas": 3, "info_complementares": 3}
         for campo, _label in CAMPOS_COM_MODELO:
             self.fields[campo].required = False
             self.fields[campo].widget = forms.Textarea(
                 attrs={
-                    **widget_attrs(WidgetStyle.FIELD_CONTROL_TEXTAREA),
+                    **widget_attrs(WidgetStyle.INPUT_V2_TEXTAREA),
                     "rows": rows.get(campo, 4),
                     "data-rt-textarea": campo,
                 },

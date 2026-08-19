@@ -5,7 +5,12 @@
 
   Sem folha própria: é composição de `header`, `rail` e `stepper`.
 {% endcomment %}
-<div class="wizard-page{% if extra_class %} {{ extra_class }}{% endif %}">
+{% comment %}
+  `data-wizard-sticky-header` é o gancho SEM VALOR que o loader usa para
+  buscar `wizard-sticky-header.js`: é ele quem marca `is-detached` no header
+  e na faixa quando ela descola e passa a flutuar.
+{% endcomment %}
+<div class="wizard-page{% if extra_class %} {{ extra_class }}{% endif %}" data-wizard-sticky-header>
   <c-v2.header :eyebrow="eyebrow" :title="title">
     {% if aside %}<c-slot name="aside">{{ aside }}</c-slot>{% endif %}
   </c-v2.header>

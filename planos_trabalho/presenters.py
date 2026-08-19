@@ -255,11 +255,11 @@ def _step_state_class(step: dict) -> str:
 
 
 def apresentar_plano_wizard_page_steps(steps):
-    """As etapas no vocabulário do ``c-v2.stepper``: ``label``, ``state``, ``status``.
+    """As etapas no vocabulário do ``c-v2.stepper``: ``label``, ``state``, ``status``, ``url``.
 
-    O wizard de plano de trabalho é LINEAR, ao contrário do painel do evento:
-    pular adiante deixaria o documento pela metade. Por isso nenhuma etapa
-    carrega ``url`` — sem ele o passo é indicador, e não link.
+    COM ``url`` (2026-08-19, a pedido do dono): o stepper é navegação, e não só
+    indicador — clicar numa etapa vai para ela. Enquanto o rascunho não existe
+    o ``url`` vem vazio, e o passo volta a ser um indicador.
 
     ``state`` só conhece três valores no v2 (``current``, ``done`` e vazio). O
     ciclo de vida daqui tem cinco (``locked``, ``incomplete``…), e a diferença
@@ -278,6 +278,7 @@ def apresentar_plano_wizard_page_steps(steps):
                     else ("done" if state_class == "is-complete" else "")
                 ),
                 "status": step.get("state_label") or "",
+                "url": step.get("url") or "",
                 # `title` e `aria_current` continuam porque a descrição do
                 # cabeçalho e os testes de navegação leem os dois.
                 "title": step.get("title") or "",

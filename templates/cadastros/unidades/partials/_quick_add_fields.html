@@ -1,7 +1,7 @@
 <c-v2.quick_add_section :split="True" title="Dados da unidade" description="Nome e sigla">
   <c-slot name="body">
-    <div class="field-grid field-grid--cols-2">
-      <c-v2.form_field :field="form.nome" />
+    <div class="field-grid field-grid--cols-3">
+      <c-v2.form_field :field="form.nome" extra_class="field-grid__span-2" />
       <c-v2.form_field :field="form.sigla" />
     </div>
   </c-slot>

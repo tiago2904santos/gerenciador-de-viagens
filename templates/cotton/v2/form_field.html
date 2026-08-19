@@ -1,4 +1,4 @@
-{% cotton:vars action_label action_url extra_class field help help_text hide_label label select size_class %}
+{% cotton:vars action_label action_url extra_class field help help_text hide_label input label select size_class %}
 {% comment %}
   Campo de formulário a partir de um `BoundField` do Django — rótulo, widget,
   ajuda e erro, no desenho do v2.
@@ -53,6 +53,8 @@
       />
     {% elif select %}
       <c-v2.select :field="field" />
+    {% elif input %}
+      <c-v2.input :field="field" />
     {% else %}
       {{ field }}
     {% endif %}
