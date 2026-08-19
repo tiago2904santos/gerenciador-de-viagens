@@ -12,7 +12,9 @@ vocabulário de dentro passou a ser o do sistema.
 """
 
 import re
+from datetime import datetime
 from pathlib import Path
+from types import SimpleNamespace
 
 from django.conf import settings
 from django.test import SimpleTestCase
@@ -34,6 +36,151 @@ def marcacao(template: Path) -> str:
 
 
 class ComponentesPrestacoesV2SourceTests(SimpleTestCase):
+    def test_documentos_da_prestacao_usam_componentes_globais_v2(self):
+        equipe = marcacao(PRESTACOES / "partials" / "_docs_equipe_body.html")
+        documento = marcacao(PRESTACOES / "partials" / "_docs_attach_card.html")
+
+        self.assertIn("<c-v2.person_row", equipe)
+        self.assertIn(":field=\"servidor.form.numero_solicitacao\"", equipe)
+        self.assertIn(":input=\"True\"", equipe)
+        self.assertNotIn("oficio-documentos-traveller", equipe)
+        self.assertNotIn("oficio-documentos-fact", equipe)
+
+        self.assertIn("<c-v2.document_inline", documento)
+        self.assertIn("<c-v2.attach_signed_button", documento)
+        self.assertNotIn("icon-btn--sign", documento)
+        self.assertNotIn("oficio-documentos-traveller", documento)
+
+    def test_identificacao_administrativa_usa_fatos_globais_v2(self):
+        source = marcacao(PRESTACOES / "partials" / "_rt_identificacao_body.html")
+
+        self.assertIn('class="fact-list"', source)
+        self.assertEqual(source.count("<c-v2.fact"), 4)
+        self.assertNotIn("oficio-documentos-admin-facts", source)
+        self.assertNotIn("oficio-documentos-facts", source)
+        self.assertNotIn("oficio-documentos-fact", source)
+
+    def test_resumo_do_motorista_usa_fatos_globais_v2(self):
+        source = marcacao(PRESTACOES / "partials" / "_diario_motorista_body.html")
+
+        self.assertIn('class="fact-list"', source)
+        self.assertIn('<c-v2.fact label="Motorista"', source)
+        self.assertIn('<c-v2.fact label="Origem do motorista"', source)
+        self.assertNotIn("oficio-documentos-admin-facts", source)
+        self.assertNotIn("oficio-documentos-facts", source)
+        self.assertNotIn("diario-motorista-fact", source)
+
+    def test_trechos_do_diario_reutilizam_a_composicao_v2_do_roteiro(self):
+        corpo = marcacao(PRESTACOES / "partials" / "_diario_trecho_body.html")
+        wizard = marcacao(PRESTACOES / "partials" / "_diario_wizard_body.html")
+
+        self.assertIn('extra_class="roteiro-trecho-card route-leg diario-trecho-block"', wizard)
+        self.assertIn(':description="d.rota"', wizard)
+        self.assertIn('class="route-return__legs"', corpo)
+        self.assertEqual(corpo.count('class="route-return__leg"'), 2)
+        self.assertIn('<span class="route-return__leg-title">Saída</span>', corpo)
+        self.assertIn('label="Cidade de saída"', corpo)
+        self.assertIn('label="Cidade de chegada"', corpo)
+        self.assertIn('class="route-return__times"', corpo)
+        self.assertIn(':field="form.km_inicial"', corpo)
+        self.assertIn(':field="form.km_final"', corpo)
+        self.assertIn(':field="form.abastecimento"', corpo)
+        self.assertNotIn("cv-field", corpo)
+        self.assertNotIn("roteiro-trecho-card__route-row", corpo)
+
+    def test_footer_do_relatorio_usa_rodape_global_sem_divisor(self):
+        source = marcacao(PRESTACOES / "partials" / "_rt_downloads_footer.html")
+
+        self.assertIn("<c-v2.card_footer>", source)
+        self.assertNotIn("card-footer-section", source)
+        self.assertNotIn("card-footer-section__divider", source)
+
+    def test_preview_do_relatorio_nao_expoe_ajuste_manual_de_diaria(self):
+        source = marcacao(PRESTACOES / "partials" / "_rt_downloads_body.html")
+
+        self.assertNotIn("diaria_form", source)
+        self.assertNotIn("diaria_valor_override", source)
+        self.assertNotIn("rt-diaria-override-field", source)
+
+    def test_textareas_do_relatorio_usam_controle_global_v2(self):
+        from prestacoes_contas.forms import CAMPOS_COM_MODELO
+        from prestacoes_contas.forms import RelatorioTecnicoForm
+
+        source = marcacao(PRESTACOES / "_campo_com_modelo.html")
+        form = RelatorioTecnicoForm()
+
+        self.assertIn(':field="c.textarea" :label="c.label" :input="True"', source)
+        for campo, _label in CAMPOS_COM_MODELO:
+            classes = form.fields[campo].widget.attrs.get("class", "").split()
+            self.assertIn("input__control", classes)
+            self.assertIn("input__control--textarea", classes)
+            self.assertNotIn("cv-field__control--textarea", classes)
+
+    def test_modelos_do_relatorio_usam_select_com_acao_v2(self):
+        campo = marcacao(PRESTACOES / "_campo_com_modelo.html")
+        wizard = marcacao(PRESTACOES / "partials" / "_rt_wizard_body.html")
+
+        self.assertIn(':action_url="c.manage_url"', campo)
+        self.assertIn('action_label="Gerenciar modelos"', campo)
+        self.assertIn(':hide_label="True"', campo)
+        self.assertNotIn('action_label="Gerenciar modelos"', wizard)
+
+    def test_custeios_do_relatorio_usam_controles_globais_v2(self):
+        source = marcacao(PRESTACOES / "partials" / "_rt_custeio_body.html")
+
+        self.assertIn(':select="True"', source)
+        self.assertIn(':input="True"', source)
+        self.assertNotIn(':label="item.label" only', source)
+
+    def test_equipe_do_relatorio_usa_linhas_de_pessoa_v2(self):
+        source = marcacao(PRESTACOES / "partials" / "_rt_equipe_body.html")
+
+        self.assertIn('class="person-list"', source)
+        self.assertIn("<c-v2.person_row", source)
+        self.assertNotIn("oficio-documentos-traveller-tile", source)
+        self.assertNotIn("oficio-documentos-travellers-grid", source)
+        self.assertNotIn("oficio-documentos-card--travellers", source)
+
+    def test_periodo_do_resumo_omite_o_ano_repetido_na_data_inicial(self):
+        from prestacoes_contas.view_common import _periodo_display
+
+        oficio = SimpleNamespace(
+            roteiro=SimpleNamespace(
+                saida_dt=datetime(2026, 8, 17, 8),
+                retorno_chegada_dt=datetime(2026, 8, 23, 15, 45),
+            )
+        )
+
+        self.assertEqual(_periodo_display(oficio), "17/08 a 23/08/2026")
+
+    def test_card_nao_exibe_mais_periodo_de_liberacao_e_saque(self):
+        source = marcacao(TEMPLATES / "cotton" / "v2" / "prestacao_card.html")
+
+        self.assertNotIn("Liberação → saque", source)
+        self.assertNotIn("periodo_saque", source)
+
+    def test_placa_e_modelo_usam_a_mesma_composicao_de_fato(self):
+        source = marcacao(TEMPLATES / "cotton" / "v2" / "prestacao_card.html")
+
+        self.assertIn('<c-v2.fact label="Placa" :value="card.veiculo_placa" />', source)
+        self.assertIn('<c-v2.fact label="Modelo" :value="card.veiculo_modelo" />', source)
+        self.assertNotIn(':note="card.veiculo_modelo"', source)
+
+    def test_card_exibe_quantidade_de_diarias_no_bloco_financeiro(self):
+        source = marcacao(TEMPLATES / "cotton" / "v2" / "prestacao_card.html")
+
+        self.assertIn(
+            '<c-v2.fact label="Quantidade de diárias" :value="card.quantidade_diarias_display" />',
+            source,
+        )
+
+    def test_solicitacao_usa_a_superficie_do_panel(self):
+        css = (ROOT / "static" / "css" / "v2" / "record.css").read_text(encoding="utf-8")
+        regra = css[css.index(".prestacao-row__solicitacao") :]
+        regra = regra[: regra.index("}")]
+
+        self.assertIn("background: var(--surface);", regra)
+
     def test_prestacoes_nao_chamam_componentes_visuais_anteriores_ao_v2(self):
         namespaces_legados = (
             "<c-ui.",

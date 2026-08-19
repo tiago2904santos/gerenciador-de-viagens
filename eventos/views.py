@@ -223,6 +223,7 @@ def _termos_servidor_rows_do_evento(evento):
                     servidor,
                     oficio=oficio_origem,
                     edit_url=reverse("termos:editar", args=[termo.pk]),
+                    delete_url=reverse("termos:excluir", args=[termo.pk]),
                     pdf_url=reverse("termos:termo_cadastro_servidor_pdf_inline", args=[termo.pk, servidor.pk]),
                     **termo_cadastro_assinado_info(termo, servidor.pk),
                 )

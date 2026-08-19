@@ -1,22 +1,6 @@
-<section class="oficio-documentos-admin-facts" aria-label="Dados administrativos">
-  <div class="oficio-documentos-card__body">
-    <dl class="oficio-documentos-facts oficio-documentos-facts--admin">
-      <div class="oficio-documentos-fact">
-        <dt>Número do ofício</dt>
-        <dd>{{ identificacao.numero }}</dd>
-      </div>
-      <div class="oficio-documentos-fact">
-        <dt>Protocolo</dt>
-        <dd>{{ identificacao.protocolo }}</dd>
-      </div>
-      <div class="oficio-documentos-fact">
-        <dt>Destino</dt>
-        <dd>{{ identificacao.destino }}</dd>
-      </div>
-      <div class="oficio-documentos-fact">
-        <dt>Período da viagem</dt>
-        <dd>{{ identificacao.periodo }}</dd>
-      </div>
-    </dl>
-  </div>
-</section>
+<div class="fact-list" aria-label="Dados administrativos">
+  <c-v2.fact label="Número do ofício" :value="identificacao.numero" />
+  <c-v2.fact label="Protocolo" :value="identificacao.protocolo" />
+  <c-v2.fact label="Destino" :value="identificacao.destino" />
+  <c-v2.fact label="Período da viagem" :value="identificacao.periodo" />
+</div>

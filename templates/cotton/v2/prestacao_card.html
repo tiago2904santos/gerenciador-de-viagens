@@ -10,8 +10,8 @@
   Três faixas:
 
   1. **quem viaja** — uma linha por servidor, e cada linha carrega um FORMULÁRIO
-     próprio, com autosave (`data-autosave-*`), o número da solicitação e o
-     intervalo "liberação → saque". É o único cartão do sistema que se edita sem
+     próprio, com autosave (`data-autosave-*`) e o número da solicitação. É o
+     único cartão do sistema que se edita sem
      sair da lista, e é por isso que o `<form>` mora dentro da linha;
   2. **a viagem** — placa, modelo, trechos e o valor das diárias;
   3. **o rodapé** — abrir a prestação, anexar o despacho assinado (13 ganchos do
@@ -68,24 +68,6 @@
               value="{{ servidor.numero_solicitacao }}"
             >
 
-            {% with ps_id=servidor.ps_pk|stringformat:"s" %}
-              {% with liberacao_name="ps-"|add:ps_id|add:"-data_liberacao_diarias" liberacao_id="id_ps_"|add:ps_id|add:"_data_liberacao_diarias" prazo_name="ps-"|add:ps_id|add:"-prazo_limite_saque" prazo_id="id_ps_"|add:ps_id|add:"_prazo_limite_saque" picker_id="id_ps_"|add:ps_id|add:"_periodo_saque" aria_saque="Selecionar data de liberação e prazo para saque de "|add:servidor.name %}
-                <c-v2.date_picker
-                  mode="range"
-                  :picker_id="picker_id"
-                  button_label="Liberação → saque"
-                  :trigger_aria_label="aria_saque"
-                  :start_hidden_id="liberacao_id"
-                  :end_hidden_id="prazo_id"
-                  :start_hidden_name="liberacao_name"
-                  :end_hidden_name="prazo_name"
-                  :start_hidden_value="servidor.data_liberacao_diarias"
-                  :end_hidden_value="servidor.prazo_limite_saque"
-                  :initial_date="servidor.data_liberacao_diarias"
-                  :show_summary="False"
-                />
-              {% endwith %}
-            {% endwith %}
           </form>
 
           <div class="person-row__body">
@@ -146,7 +128,8 @@
       <c-v2.form_block>
         <c-slot name="body">
           <div class="fact-list">
-            <c-v2.fact label="Placa" :value="card.veiculo_placa" :note="card.veiculo_modelo" note_label="Modelo" />
+            <c-v2.fact label="Placa" :value="card.veiculo_placa" />
+            <c-v2.fact label="Modelo" :value="card.veiculo_modelo" />
           </div>
         </c-slot>
       </c-v2.form_block>
@@ -154,23 +137,22 @@
       {% if card.trechos %}
         <c-v2.form_block>
           <c-slot name="body">
-            <span class="fact__label">Trechos encontrados</span>
             <c-v2.itinerary :legs="card.trechos" />
           </c-slot>
         </c-v2.form_block>
       {% endif %}
 
-      {% if card.valor_diarias_display %}
+      {% if card.valor_diarias_display or card.quantidade_diarias_display %}
         <c-v2.form_block>
           <c-slot name="body">
             <div class="fact-list">
               <c-v2.fact
                 label="Valor total"
                 :value="card.valor_diarias_display"
-                note_label="Valor por extenso"
                 :note="card.valor_diarias_extenso"
                 :strong="True"
               />
+              <c-v2.fact label="Quantidade de diárias" :value="card.quantidade_diarias_display" />
             </div>
           </c-slot>
         </c-v2.form_block>

@@ -2,8 +2,8 @@
   Identificação do servidor. O RG tem invólucro próprio (`data-rg-field-wrap`):
   `servidores-form.js` o esconde quando "sem RG" está marcado.
 {% endcomment %}
-<div class="field-grid">
-  <c-v2.form_field :field="form.nome" extra_class="field--wide" />
+<div class="field-grid field-grid--cols-4">
+  <c-v2.form_field :field="form.nome" />
   <c-v2.field :label="form.cargo.label" :label_for="form.cargo.id_for_label" :error="form.cargo.errors.0">
     <c-slot name="control">
       <c-v2.select_with_action

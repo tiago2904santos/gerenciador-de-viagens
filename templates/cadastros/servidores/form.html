@@ -34,7 +34,7 @@
 
       <c-v2.panel title="Dados do servidor" :description="page_description">
         <c-slot name="body">
-          <c-v2.form_block :split="True" title="Identificação funcional" description="Dados pessoais e cargo">
+          <c-v2.form_block title="Identificação funcional" description="Dados pessoais e cargo">
             <c-slot name="body">
               {% include "cadastros/servidores/partials/_form_fields.html" with form=form cargos_manage_url=cargos_manage_url only %}
             </c-slot>

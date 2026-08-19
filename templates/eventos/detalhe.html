@@ -195,7 +195,10 @@
       {% endif %}
 
       {% if etapa_atual == 5 %}
-        <c-v2.panel empty_message="Nenhum termo vinculado a este evento.">
+        <c-v2.panel
+          empty_message="Nenhum termo vinculado a este evento."
+          body_extra_class="list-page__panel-rows"
+        >
           <c-slot name="body">
             {% for row in termo_rows %}
               {% include "eventos/partials/_detalhe_termo_linha.html" with row=row row_index=forloop.counter only %}

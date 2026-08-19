@@ -129,6 +129,24 @@ class WizardJustificativaTests(TestCase):
         self.assertContains(response, "Justificativa")
         self.assertContains(response, "stepper__list")
 
+    def test_stepper_navega_para_as_outras_etapas(self):
+        """As etapas do stepper são LINKS (2026-08-19).
+
+        O wizard continua com a ordem recomendada, mas ir e voltar por ela é
+        decisão de quem preenche — e é pelo stepper que se faz isso.
+        """
+        oficio = self._oficio_ate_transporte()
+        self._roteiro_com_saida(oficio, 11)
+        response = self.client.get(reverse("oficios:wizard_justificativa", args=[oficio.pk]))
+        html = response.content.decode()
+        self.assertIn('class="stepper__link"', html)
+        for rota in (
+            "oficios:dados_viajantes",
+            "oficios:wizard_roteiro",
+            "oficios:wizard_documentos",
+        ):
+            self.assertIn(reverse(rota, args=[oficio.pk]), html)
+
     def test_exige_justificativa_menor_igual_10_dias(self):
         oficio = self._oficio_ate_transporte()
         self._roteiro_com_saida(oficio, 10)

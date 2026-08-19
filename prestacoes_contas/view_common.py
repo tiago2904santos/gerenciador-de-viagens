@@ -64,7 +64,7 @@ def _periodo_display(oficio) -> str:
             chegada = chegada_dt.astimezone(current_tz).date() if tz_module.is_aware(chegada_dt) else chegada_dt.date()
             if saida == chegada:
                 return saida.strftime("%d/%m/%Y")
-            return f"{saida.strftime('%d/%m/%Y')} a {chegada.strftime('%d/%m/%Y')}"
+            return f"{saida.strftime('%d/%m')} a {chegada.strftime('%d/%m/%Y')}"
         return saida.strftime("%d/%m/%Y")
     except (AttributeError, TypeError, ValueError):
         return ""
@@ -217,6 +217,16 @@ def _build_prestacao_steps(ps, atual: str) -> list:
             status = "Concluído"
         steps.append(
             {
+                # `label` e `state` são o vocabulário do `c-v2.stepper`, que é
+                # quem desenha esta faixa desde a migração do fluxo para o v2 —
+                # com só `title` e `state_class` a fileira saía sem nome de
+                # etapa e sem estado, quatro nós numerados e mudos.
+                "label": titulo,
+                "state": (
+                    "current"
+                    if state_class == "is-current"
+                    else ("done" if state_class == "is-complete" else "")
+                ),
                 "marker": "✓" if state_class == "is-complete" else str(len(steps) + 1),
                 "step_label": step_label,
                 "title": titulo,

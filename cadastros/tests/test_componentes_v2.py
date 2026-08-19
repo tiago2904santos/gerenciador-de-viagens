@@ -18,6 +18,14 @@ CADASTROS = TEMPLATES / "cadastros"
 
 
 class ComponentesCadastrosV2SourceTests(SimpleTestCase):
+    def test_quick_add_de_unidades_distribui_nome_e_sigla_em_dois_para_um(self):
+        source = (
+            CADASTROS / "unidades/partials/_quick_add_fields.html"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('class="field-grid field-grid--cols-3"', source)
+        self.assertIn('extra_class="field-grid__span-2"', source)
+
     def test_cadastros_nao_chamam_componentes_visuais_anteriores_ao_v2(self):
         namespaces_legados = (
             "<c-ui.",

@@ -1,10 +1,9 @@
-"""Caracterização do anexo assinado na etapa Documentos, antes do `H-03`.
+"""Caracterização do anexo assinado na etapa Documentos.
 
-A etapa Documentos oferece **cinco** tipos de anexo assinado no mesmo modal:
-despacho, ofício, relatório técnico, diário de bordo e comprovante. Hoje eles
-são identificados por **ordinal latino** (`primary`…`quinary`), tanto no
-contexto da view quanto em 30 atributos `data-*` planos no gatilho, e o JS
-carrega uma lista fixa `KINDS` de cinco nomes.
+A etapa Documentos oferece **cinco** anexos assinados no mesmo modal: despacho,
+ofício, relatório técnico, diário de bordo e comprovante. Cada cartão V2 leva
+ao modal sua própria URL e seus dados atuais, sem depender de uma posição numa
+lista compartilhada.
 
 Estes testes fotografam o que a tela entrega hoje — quais URLs de upload, quais
 rótulos e quais anexos atuais chegam ao HTML para cada um dos cinco tipos. Eles
@@ -77,12 +76,15 @@ class AnexoAssinadoTiposTests(PrestacaoFixturesMixin, TestCase):
             with self.subTest(rotulo=kind["option_label"]):
                 self.assertFalse(kind["current_name"])
 
-    def test_o_gatilho_do_modal_chega_renderizado_na_pagina(self):
-        """Se o gatilho não sai no HTML, o modal não abre e os 5 tipos não existem na tela."""
+    def test_os_cinco_gatilhos_v2_do_modal_chegam_renderizados_na_pagina(self):
+        """Cada documento tem um gatilho direto; nenhum depende do seletor legado."""
         html = self._contexto().content.decode()
 
-        self.assertIn("data-attach-signed-trigger", html)
-        self.assertIn("data-attach-signed-reopen-key", html)
+        self.assertEqual(html.count("data-attach-signed-trigger"), 5)
+        self.assertEqual(html.count("data-attach-signed-url="), 5)
+        self.assertEqual(html.count("data-attach-signed-doc-label="), 5)
+        self.assertNotIn("data-attach-signed-reopen-key", html)
+        self.assertNotIn("data-attach-signed-kinds", html)
 
     def test_o_html_carrega_as_cinco_urls_de_upload(self):
         """Prova de ponta a ponta: as 5 URLs do contexto chegam ao HTML entregue.

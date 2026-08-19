@@ -6,6 +6,13 @@
   var BAND = "[data-wizard-sticky-band]";
   var STEPPER = "[data-wizard-sticky-stepper]";
   var SENTINEL = "[data-wizard-sticky-sentinel]";
+  // Estrutura do v2: header e rail são componentes Cotton, e nenhum dos dois
+  // repassa atributo solto — não há onde pendurar os ganchos acima. Por isso a
+  // busca cai para os FILHOS DIRETOS do root, que é o wizard: lá o par
+  // header + rail é único. Os ganchos continuam tendo precedência, para as
+  // telas antigas que os declaram.
+  var BAND_V2 = ":scope > .header";
+  var STEPPER_V2 = ":scope > .rail";
 
   function prefersReducedMotion() {
     return Boolean(
@@ -36,6 +43,10 @@
     root.classList.toggle(DETACHED, on);
   }
 
+  // Descolou quando o rodapé do header já passou por cima do topo da faixa —
+  // é o que acontece quando ela para no topo da janela e ele segue subindo.
+  // Mede posição, e não `scrollY`: o mesmo teste vale em qualquer contêiner de
+  // rolagem e com qualquer altura de header.
   function measureDetached(band, stepper) {
     var bandBottom = band.getBoundingClientRect().bottom;
     var stepperTop = stepper.getBoundingClientRect().top;
@@ -44,8 +55,8 @@
 
   function bind(root) {
     if (!root || root.dataset.wizardStickyBound === "true") return;
-    var band = root.querySelector(BAND);
-    var stepper = root.querySelector(STEPPER);
+    var band = root.querySelector(BAND) || root.querySelector(BAND_V2);
+    var stepper = root.querySelector(STEPPER) || root.querySelector(STEPPER_V2);
     var sentinel = root.querySelector(SENTINEL);
     if (!band || !stepper) return;
 

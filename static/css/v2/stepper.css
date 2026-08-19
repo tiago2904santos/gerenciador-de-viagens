@@ -2,50 +2,131 @@
  *
  * O estado vem de `data-state`, não de classe: são três valores mutuamente
  * exclusivos, e atributo deixa isso explícito no markup.
+ *
+ * O desenho é uma CORDA COM NÓS, escolhido pelo dono em 2026-08-19 entre
+ * quatro modelos provados lado a lado na galeria (trilha segmentada, fita,
+ * compacto e este). Os outros três saíram da folha junto com o painel de
+ * prova; o histórico está no git.
+ *
+ * Duas ideias sustentam o desenho:
+ *
+ * 1. A corda é UMA. O trecho vai de centro a centro dos nós e some por trás do
+ *    círculo, que é opaco. O desenho anterior parava a linha antes de cada
+ *    marcador — eram quatro traços separados, e a fileira lia como corrente,
+ *    não como caminho.
+ *
+ * 2. Uma cor só. Accent no que já andou — trecho e nó —, e a diferença entre
+ *    feito e atual é INTENSIDADE (nó contornado × nó cheio), não outro matiz.
+ *    Verde de `--status-done` ao lado do accent punha duas cores saturadas
+ *    competindo na mesma fileira; no tema escuro, verde contra dourado.
+ *    `--status-done` segue verde nos selos, onde a leitura é mesmo de estado.
  */
 
+/* A corda ocupa o trilho INTEIRO, tenha ele três nós ou seis. O stepper entra
+   como filho da fila de controles do rail, que é um flex: sem `flex: 1` a
+   fileira fica do tamanho do conteúdo e a corda morre no meio da faixa, com o
+   vão sobrando à direita. */
+:is(html[data-theme]) .stepper {
+  flex: 1;
+  min-width: 0;
+}
+
 :is(html[data-theme]) .stepper__list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gap-loose);
+  display: grid;
+  gap: 0;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
+/* Colunas iguais (`1fr`), e não largura por conteúdo: com "Justificativa" e
+   "Dados e viajantes" na mesma fileira, a distância entre nós mudaria a cada
+   etapa e a corda sairia com vãos de tamanhos diferentes. */
 :is(html[data-theme]) .stepper__item {
-  align-items: center;
   color: var(--text-muted);
-  display: flex;
-  gap: var(--gap-tight);
+  display: grid;
+  gap: 8px;
   min-width: 0;
+  padding: 0 var(--gap-tight);
+  position: relative;
+  text-align: center;
 }
 
+:is(html[data-theme]) .stepper__item[data-state="current"] {
+  color: var(--text-strong);
+}
+
+/* O vão: do centro do nó anterior ao centro deste, na linha do meio do círculo
+   (13px, com os 2px do traço fechando os 14px de metade do nó). De centro a
+   centro, e não de borda a borda, para sumir POR TRÁS do nó — é o que faz os
+   trechos lerem como uma corda só. */
+:is(html[data-theme]) .stepper__item::before {
+  background: var(--line);
+  border-radius: var(--radius-pill);
+  content: "";
+  height: 2px;
+  left: -50%;
+  position: absolute;
+  top: 13px;
+  width: 100%;
+}
+
+:is(html[data-theme]) .stepper__item:first-child::before {
+  display: none;
+}
+
+/* O trecho que entra na etapa atual também é corda andada: foi por ele que se
+   chegou aqui. */
+:is(html[data-theme]) .stepper__item[data-state="done"]::before,
+:is(html[data-theme]) .stepper__item[data-state="current"]::before {
+  background: var(--accent);
+}
+
+/* O nó. Opaco de propósito — é ele que corta a corda que passa atrás. O
+   `--surface` do contêiner, com o trilho como reserva, porque nem toda camada
+   declara o token (em `v2/surface.css` quem declara são as camadas). */
 :is(html[data-theme]) .stepper__marker {
   align-items: center;
-  background: var(--surface-contrast, var(--surface-field));
+  background: var(--surface, var(--surface-rail));
+  border: 2px solid var(--line);
   border-radius: var(--radius-pill);
+  box-sizing: border-box;
+  color: var(--text-muted);
   display: inline-flex;
   flex: none;
   font-size: var(--text-size-eyebrow);
   font-weight: var(--weight-strong);
   height: 28px;
   justify-content: center;
+  justify-self: center;
+  position: relative;
   width: 28px;
+  z-index: 1;
 }
 
+/* Nó já dado: contorno em accent e check em accent, sem preenchimento. Cheio
+   ele pesaria igual ao da etapa atual; e preencher com accent DILUÍDO não é
+   opção — `color-mix` do dourado com a superfície escura cai em oliva
+   (medido: `#78611b`), que é a armadilha anotada em `v2/tokens.css`. */
 :is(html[data-theme]) .stepper__item[data-state="done"] .stepper__marker {
-  background: var(--status-done);
-  color: #ffffff;
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
+:is(html[data-theme]) .stepper__item[data-state="done"] .stepper__marker svg {
+  height: 14px;
+  width: 14px;
+}
+
+/* O nó apertado: accent cheio e um halo, que marca a etapa sem AUMENTAR o
+   círculo — crescer o nó levantaria a ponta da corda e o vão sairia torto. */
 :is(html[data-theme]) .stepper__item[data-state="current"] .stepper__marker {
   background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 20%, transparent);
   color: var(--text-on-accent);
-}
-
-:is(html[data-theme]) .stepper__item[data-state="current"] {
-  color: var(--text-strong);
 }
 
 :is(html[data-theme]) .stepper__copy {
@@ -54,23 +135,39 @@
   min-width: 0;
 }
 
+/* Rótulo no menor degrau da escala: a fileira é navegação, não conteúdo, e
+   quem carrega a etapa aqui é o nó. */
 :is(html[data-theme]) .stepper__label {
-  font-size: var(--text-size-base);
+  font-size: var(--text-size-micro);
   font-weight: var(--weight-normal);
+  line-height: 1.35;
 }
 
+:is(html[data-theme]) .stepper__item[data-state="current"] .stepper__label {
+  color: var(--text-strong);
+  font-weight: var(--weight-strong);
+}
+
+/* Fora da tela, não fora do documento: em caixa alta sob cada etapa o status
+   repetia o que o nó e o check já dizem, mas quem usa leitor de tela continua
+   ouvindo "Concluída" / "Em andamento" ao percorrer a lista. */
 :is(html[data-theme]) .stepper__status {
-  font-size: var(--text-size-eyebrow);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }
 
 /* A etapa navegável (painel do evento). O link herda a cor do item — pintá-lo
    de azul de link faria as cinco etapas competirem com o conteúdo da página —,
-   e é ele quem carrega o alvo do clique, do tamanho da etapa inteira. */
+   e é ele quem carrega o alvo do clique, do tamanho da etapa inteira. Repete o
+   empilhamento do item porque, com `url`, nó e rótulo são filhos DELE. */
 :is(html[data-theme]) .stepper__link {
-  align-items: center;
   color: inherit;
-  display: flex;
-  gap: var(--gap-tight);
+  display: grid;
+  gap: 8px;
   min-width: 0;
   text-decoration: none;
 }
@@ -79,251 +176,85 @@
   text-decoration: underline;
 }
 
+/* Em tela estreita a corda fica de pé: o mesmo trecho reto, agora de nó a nó
+   na vertical, e o rótulo passa para o lado. Quatro rótulos lado a lado em
+   360px quebram cada um em três linhas e a fileira perde a leitura. */
+@media (max-width: 720px) {
+  :is(html[data-theme]) .stepper__list {
+    gap: 14px;
+    grid-auto-flow: row;
+  }
+
+  :is(html[data-theme]) .stepper__item {
+    align-items: center;
+    grid-template-columns: auto 1fr;
+    padding: 0;
+    text-align: left;
+  }
+
+  :is(html[data-theme]) .stepper__item::before {
+    height: 14px;
+    left: 13px;
+    top: -14px;
+    width: 2px;
+  }
+
+  :is(html[data-theme]) .stepper__link {
+    align-items: center;
+    grid-template-columns: auto 1fr;
+  }
+}
+
 /* Header e stepper formam a navegação do wizard; o conteúdo da etapa começa
    depois de um intervalo completo, sem colar a primeira lista ao rail. */
 :is(html[data-theme]) .wizard-page > .rail + * {
   margin-top: var(--gap);
 }
 
+/* A faixa do stepper acompanha a rolagem (2026-08-19, a pedido do dono): fica
+   colada ao header enquanto ele está na tela e, quando ele sobe, para no topo
+   e passa a flutuar sobre o conteúdo da etapa. Em wizard longo é a única peça
+   que diz onde se está — rolando três telas de formulário, ela sumia.
+   `sticky`, e não JS: o comportamento é do navegador, e o componente legado
+   `wizard-sticky-header.js` media posição a cada quadro para chegar no mesmo
+   lugar. A sombra existe para a faixa não encostar no conteúdo que passa por
+   baixo dela. */
+:is(html[data-theme]) .wizard-page > .rail,
+:is(html[data-theme]) .wizard-sticky-scope > .rail {
+  box-shadow: var(--shadow-menu);
+  position: sticky;
+  /* Não `0`: parada no topo, a faixa fica colada na borda da janela e perde a
+     leitura de peça flutuante — o intervalo do sistema é o que a descola. */
+  top: var(--gap);
+  z-index: var(--z-sticky, 900);
+}
 
-/* ══ TRÊS MODELOS EM PROVA (2026-08-19) ═════════════════════════════════════
+/* Os cantos da junção se abrem quando a faixa descola.
  *
- * O stepper atual é quatro rótulos soltos numa linha: sem trilha, sem noção de
- * quanto falta, e a única diferença entre "concluída" e "não iniciada" é a cor
- * de um círculo de 28px. Estas três variantes existem para escolher — quando
- * uma for aprovada, ela vira o padrão e as outras duas saem daqui junto com o
- * painel de prova da galeria.
- */
-
-/* ── A · trilha ────────────────────────────────────────────────────────────
+ * Parada a peça é UMA: o header perde os cantos de baixo e a faixa os de cima,
+ * e a costura entre as duas é reta. Quando a faixa sobe e passa a flutuar, ela
+ * deixou de ser a metade de baixo de alguma coisa — e cada uma volta a ter o
+ * seu contorno inteiro. A transição faz o corte virar canto no tempo da
+ * rolagem, em vez de trocar de forma num quadro só.
  *
- * Marcador em cima, rótulo embaixo, e uma LINHA ligando os marcadores: é ela
- * que transforma quatro etapas soltas num caminho com começo e fim.
- *
- * A cor diz o estado, e cada cor tem UM significado: verde é o que já foi
- * feito — inclusive o trecho da trilha —, accent é onde se está agora, e o que
- * falta fica na cor da régua. Com o caminho andado em accent, como estava na
- * primeira prova, a cor da ação e a cor do passado eram a mesma.
- *
- * Colunas iguais (`1fr`) e não largura por conteúdo: com "Justificativa" e
- * "Dados e viajantes" na mesma fileira, a distância entre marcadores mudava a
- * cada etapa e a trilha saía torta.
- */
-:is(html[data-theme]) .stepper--track .stepper__list {
-  display: grid;
-  gap: 0;
-  grid-auto-columns: minmax(0, 1fr);
-  grid-auto-flow: column;
+ * `is-detached` vem de `wizard-sticky-header.js`, que compara o rodapé do
+ * header com o topo da faixa: CSS não tem seletor para "está parado no topo".
+ * O script zera a transição sob `prefers-reduced-motion`. */
+:is(html[data-theme]) .wizard-page > .header,
+:is(html[data-theme]) .wizard-page > .rail,
+:is(html[data-theme]) .wizard-sticky-scope > .header,
+:is(html[data-theme]) .wizard-sticky-scope > .rail {
+  transition: border-radius var(--ease);
 }
 
-:is(html[data-theme]) .stepper--track .stepper__item {
-  display: grid;
-  gap: 10px;
-  justify-items: center;
-  padding: 4px var(--gap-tight) 0;
-  position: relative;
-  text-align: center;
+:is(html[data-theme]) .wizard-page > .header.is-detached,
+:is(html[data-theme]) .wizard-sticky-scope > .header.is-detached {
+  border-bottom-left-radius: var(--radius-brand);
+  border-bottom-right-radius: var(--radius-brand);
 }
 
-/* A linha vai de um centro ao outro, mas PARA antes do marcador: os 22px de
-   folga de cada lado são o raio do marcador mais o anel da etapa atual. Linha
-   encostada no círculo faz a fileira parecer uma corrente amassada. */
-:is(html[data-theme]) .stepper--track .stepper__item::before {
-  background: var(--line);
-  border-radius: var(--radius-pill);
-  content: "";
-  height: 2px;
-  left: calc(-50% + 22px);
-  position: absolute;
-  top: 18px;
-  width: calc(100% - 44px);
-}
-
-:is(html[data-theme]) .stepper--track .stepper__item:first-child::before {
-  display: none;
-}
-
-/* Verde até onde se chegou: o trecho ANTES da concluída e o que entra na atual
-   são caminho andado. */
-:is(html[data-theme]) .stepper--track .stepper__item[data-state="done"]::before,
-:is(html[data-theme]) .stepper--track .stepper__item[data-state="current"]::before {
-  background: var(--status-done);
-}
-
-/* O marcador da etapa que ainda não começou é um VAZIO com contorno, não um
-   disco cinza: disco cheio pesa igual ao das outras e a fileira fica com
-   quatro pesos iguais, sem hierarquia nenhuma. */
-:is(html[data-theme]) .stepper--track .stepper__marker {
-  /* A cor do PRÓPRIO fundo, não transparente: é ela que corta a trilha atrás do
-     marcador. Com `transparent` a linha atravessava o círculo vazio e as etapas
-     que faltam pareciam furadas. O fallback existe porque nem todo contêiner
-     declara `--surface` — em `v2/surface.css` quem declara são as camadas. */
-  background: var(--surface, var(--surface-rail));
-  border: 2px solid var(--line);
-  box-sizing: border-box;
-  color: var(--text-muted);
-  height: 32px;
-  position: relative;
-  width: 32px;
-  z-index: 1;
-}
-
-:is(html[data-theme]) .stepper--track .stepper__item[data-state="done"] .stepper__marker {
-  background: var(--status-done);
-  border-color: var(--status-done);
-  color: #ffffff;
-}
-
-:is(html[data-theme]) .stepper--track .stepper__item[data-state="done"] .stepper__marker svg {
-  height: 16px;
-  width: 16px;
-}
-
-/* O anel marca a atual sem aumentá-la: crescer o círculo empurraria a linha de
-   base e a trilha deixaria de ser reta. */
-:is(html[data-theme]) .stepper--track .stepper__item[data-state="current"] .stepper__marker {
-  background: var(--accent);
-  border-color: var(--accent);
-  box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 20%, transparent);
-  color: var(--text-on-accent);
-}
-
-:is(html[data-theme]) .stepper--track .stepper__copy {
-  gap: 3px;
-  justify-items: center;
-}
-
-/* Só a atual tem nome em peso forte. As outras três são referência — lê-las com
-   o mesmo peso da atual é o que fazia a fileira parecer quatro títulos. */
-:is(html[data-theme]) .stepper--track .stepper__label {
-  font-size: var(--text-size-base);
-  line-height: 1.25;
-}
-
-:is(html[data-theme]) .stepper--track .stepper__item[data-state="current"] .stepper__label {
-  font-weight: var(--weight-strong);
-}
-
-:is(html[data-theme]) .stepper--track .stepper__status {
-  font-size: var(--text-size-eyebrow);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-/* O estado da atual repete a cor do marcador: as duas peças falam da mesma
-   etapa, e ler "EM ANDAMENTO" em cinza embaixo de um marcador em accent obriga
-   a juntar as duas metades. */
-:is(html[data-theme]) .stepper--track .stepper__item[data-state="current"] .stepper__status {
-  color: var(--accent);
-}
-
-:is(html[data-theme]) .stepper--track .stepper__item[data-state="done"] .stepper__status {
-  color: var(--status-done);
-}
-
-/* Numa tela estreita a trilha vira coluna: quatro rótulos lado a lado em 360px
-   quebram cada um em três linhas e a fileira perde a leitura horizontal. */
-@media (max-width: 720px) {
-  :is(html[data-theme]) .stepper--track .stepper__list {
-    grid-auto-flow: row;
-    gap: var(--gap-tight);
-  }
-
-  :is(html[data-theme]) .stepper--track .stepper__item {
-    grid-template-columns: auto 1fr;
-    justify-items: start;
-    text-align: left;
-  }
-
-  :is(html[data-theme]) .stepper--track .stepper__item::before {
-    display: none;
-  }
-}
-
-/* ── B · fita segmentada ───────────────────────────────────────────────────
- *
- * As etapas como segmentos de UMA faixa, no mesmo desenho do `toggle--fill`
- * que o sistema já usa para escolher entre vistas. Serve ao wizard que é HUB —
- * o painel do evento, onde as cinco etapas existem ao mesmo tempo e se clica
- * na que interessa.
- */
-:is(html[data-theme]) .stepper--fill .stepper__list {
-  background: var(--surface-contrast, var(--surface-field));
-  border-radius: var(--radius-field);
-  display: grid;
-  gap: 2px;
-  grid-auto-columns: minmax(0, 1fr);
-  grid-auto-flow: column;
-  padding: 3px;
-}
-
-:is(html[data-theme]) .stepper--fill .stepper__item {
-  border-radius: 6px;
-  gap: var(--gap-tight);
-  justify-content: center;
-  min-height: 38px;
-  padding: 0 10px;
-}
-
-:is(html[data-theme]) .stepper--fill .stepper__item[data-state="current"] {
-  background: var(--accent);
-  color: var(--text-on-accent);
-}
-
-:is(html[data-theme]) .stepper--fill .stepper__item[data-state="current"] .stepper__marker {
-  background: color-mix(in srgb, #000 18%, transparent);
-  color: inherit;
-}
-
-:is(html[data-theme]) .stepper--fill .stepper__item[data-state="done"] {
-  color: var(--text-strong);
-}
-
-:is(html[data-theme]) .stepper--fill .stepper__marker {
-  height: 22px;
-  width: 22px;
-}
-
-/* Dentro do segmento o texto é uma linha só: o status vira redundante quando o
-   próprio preenchimento já diz qual é a atual. */
-:is(html[data-theme]) .stepper--fill .stepper__status {
-  display: none;
-}
-
-/* ── C · compacto ──────────────────────────────────────────────────────────
- *
- * Uma linha: onde estou, de quantas, e uma barra fina com o quanto andou. Para
- * tela estreita e para wizard longo, onde a trilha inteira come altura que o
- * formulário precisa.
- *
- * Nesta prova as outras etapas somem por CSS — se este modelo for o escolhido,
- * a contagem passa a ser montada no componente, porque esconder etapa com
- * `display: none` também a esconde de quem usa leitor de tela.
- */
-:is(html[data-theme]) .stepper--compact .stepper__list {
-  display: grid;
-  gap: var(--gap-tight);
-}
-
-:is(html[data-theme]) .stepper--compact .stepper__item:not([data-state="current"]) {
-  display: none;
-}
-
-:is(html[data-theme]) .stepper--compact .stepper__item[data-state="current"] {
-  color: var(--text-strong);
-}
-
-:is(html[data-theme]) .stepper--compact .stepper__list::after {
-  background: var(--line);
-  border-radius: var(--radius-pill);
-  content: "";
-  height: 4px;
-}
-
-/* A barra é pintada por uma variável que o chamador calcula: sem ela, o
-   progresso seria adivinhado pelo CSS. */
-:is(html[data-theme]) .stepper--compact .stepper__list::after {
-  background:
-    linear-gradient(to right, var(--accent) var(--stepper-progresso, 0%), transparent var(--stepper-progresso, 0%)),
-    var(--line);
+:is(html[data-theme]) .wizard-page > .rail.is-detached,
+:is(html[data-theme]) .wizard-sticky-scope > .rail.is-detached {
+  border-top-left-radius: var(--radius-rail);
+  border-top-right-radius: var(--radius-rail);
 }

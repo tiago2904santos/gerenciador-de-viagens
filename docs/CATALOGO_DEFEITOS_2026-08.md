@@ -9632,3 +9632,192 @@ Saída e chegada eram divididas em uma grade de datas e outra grade de horas, ap
 único conjunto temporal. **Correção:** reunir o calendário de intervalo e os dois campos de hora
 em uma grade V2 de quatro colunas. O calendário ocupa as duas primeiras, uma por data, e as horas
 ocupam as duas restantes; a grade reduz para duas e depois uma coluna em larguras menores.
+
+### NOVO-20260819-184946-e05fd8bdafb7 🟢 RESOLVIDO · `NOVO` Linhas de termos do evento aparecem coladas · HT/UI · risco baixo
+
+Na etapa 5 do evento, os registros de termos eram renderizados diretamente no corpo do painel,
+sem o contêiner de ritmo usado pelas listas V2. **Correção:** aplicar ao corpo do painel a
+grade global `list-page__panel-rows`, que introduz o espaçamento padronizado entre cada termo sem
+alterar o conteúdo ou as ações das linhas.
+
+### NOVO-20260819-190036-a4714af21df5 🟢 RESOLVIDO · `NOVO` Termos individuais do evento não oferecem exclusão · HT/UI · risco baixo
+
+As linhas por servidor exibiam PDF, anexo assinado e edição, mas o presenter descartava a URL
+de exclusão que já existe para o cadastro do termo. **Correção:** propagar a mesma rota protegida
+do termo para as linhas individuais e habilitar nelas o botão e o modal globais de exclusão V2.
+
+### NOVO-20260819-190535-802e3e8737bc 🟢 RESOLVIDO · `NOVO` Card da prestação exibe etapa de liberação e saque desnecessária · HT/UI · risco baixo
+
+Cada servidor ocupava parte da linha com um calendário “Liberação → saque”, comprimindo a
+identificação e as ações do card. **Correção:** remover esse controle da lista e manter no
+formulário embutido somente o número da solicitação, sem alterar os dados já persistidos.
+
+### NOVO-20260819-190841-7db18f8e6edd 🟢 RESOLVIDO · `NOVO` Modelo da viatura tem menos destaque que a placa na prestação · HT/UI · risco baixo
+
+O modelo era renderizado como nota pequena da placa, embora ambos sejam dados principais do mesmo
+bloco. **Correção:** renderizar Placa e Modelo como dois fatos V2 independentes, fazendo os dois
+herdarem a mesma tipografia forte e o mesmo ajuste automático ao espaço disponível.
+
+### NOVO-20260819-191034-4fcafcc5a99b 🟢 RESOLVIDO · `NOVO` Resumo financeiro da prestação omite a quantidade de diárias · HT/UI · risco baixo
+
+O card mostrava o valor total e seu valor por extenso, mas escondia a composição persistida das
+diárias do roteiro. **Correção:** expor `quantidade_diarias` no presenter e renderizá-la como um
+segundo fato V2 no mesmo bloco financeiro, sem recalcular ou reinterpretar valores monetários.
+
+### NOVO-20260819-191444-e90138cb92e7 🟢 RESOLVIDO · `NOVO` Solicitação da prestação contrasta com a superfície do painel · UI · risco baixo
+
+O campo de solicitação herdava a superfície contrastante dos inputs, destacando-se como uma
+caixa autônoma dentro da linha. **Correção:** aplicar ao campo a superfície corrente do painel,
+preservando dimensões, foco, autosave e contraste do texto.
+
+### NOVO-20260819-193459-eeb5dde6d4df 🟢 RESOLVIDO · `NOVO` Período do relatório técnico repete o ano nas duas datas · HT/UI · risco baixo
+
+O resumo administrativo mostrava o ano completo tanto na saída quanto no retorno, alongando o
+período sem acrescentar informação. **Correção:** em intervalos com datas diferentes, apresentar
+o início como `dd/mm` e manter o ano na data final (`dd/mm/aaaa`); datas únicas continuam completas.
+
+### NOVO-20260819-193835-f78e7eae754c 🟢 RESOLVIDO · `NOVO` Equipe do relatório técnico ainda usa cards de viajante legados · HT/UI · risco baixo
+
+O bloco de equipe recriava avatares, identificação e selo de motorista com a família antiga
+`oficio-documentos-traveller-*`. **Correção:** eliminar essa estrutura e renderizar cada servidor
+com a lista e a linha de pessoa globais V2, preservando nome, função, unidade, CPF e motorista.
+
+### NOVO-20260819-194127-c04956dc3dd3 🟢 RESOLVIDO · `NOVO` Custeios do relatório técnico ignoram os controles globais V2 · HT/UI · risco baixo
+
+Diária, translado, combustível e passagem eram emitidos como widgets nativos dentro do campo,
+sem os invólucros e motores visuais globais. **Correção:** encaminhar Diária e campos auxiliares
+para `c-v2.input`, e os três campos de escolha para `c-v2.select`, preservando nomes, valores e hooks.
+
+### NOVO-20260819-194629-b99a8b1c8961 🟢 RESOLVIDO · `NOVO` Seletores de modelo do relatório separam a ação de gerenciamento · HT/UI · risco baixo
+
+Os cinco tópicos exibiam um select nativo no corpo e um botão textual isolado no cabeçalho,
+divergindo do padrão de campo com ação. **Correção:** remover as ações dos cabeçalhos e
+integrar cada seletor ao `c-v2.select_with_action` por meio do `c-v2.form_field` global.
+
+### NOVO-20260819-194827-bb8d4db4e6aa 🟢 RESOLVIDO · `NOVO` Textareas do relatório técnico ainda usam o controle legado · HT/UI · risco baixo
+
+Os cinco textos do relatório conservavam as classes `cv-field__control--textarea`, apesar de
+estarem em blocos V2. **Correção:** substituir a classe de widget pelo contrato
+`input__control input__control--textarea` e renderizar cada campo dentro do `c-v2.input` global.
+
+### NOVO-20260819-195211-6a860fb98852 🟢 RESOLVIDO · `NOVO` Tópicos do relatório repetem rótulo e ação de modelos · HT/UI · risco baixo
+
+Cada tópico repetia visualmente o rótulo genérico “Modelo” e ainda podia conservar a ação
+textual no cabeçalho. **Correção:** manter o rótulo apenas para leitores de tela e garantir que
+o gerenciamento exista somente como ação integrada ao select V2, sem botão separado no bloco.
+
+### NOVO-20260819-195412-3d4f316dea7c 🟢 RESOLVIDO · `NOVO` Preview do relatório expõe ajuste manual de diária · HT/UI · risco baixo
+
+O cartão do documento misturava a visualização do PDF com um campo excepcional de valor recebido,
+ajuda extensa e estado de formulário. **Correção:** remover o campo e seu formulário do contexto
+visual, preservando valores existentes, o selo informativo e as regras financeiras do backend.
+
+### NOVO-20260819-195843-df1cd129e145 🟢 RESOLVIDO · `NOVO` Footer do relatório técnico conserva divisor legado · HT/UI · risco baixo
+
+O rodapé aninhava `card-footer-section`, uma régua manual e a estrutura antiga de lados dentro
+do footer do painel, criando uma linha indevida. **Correção:** substituir toda a composição pelo
+`c-v2.card_footer`, preservando as três ações e deixando o espaçamento a cargo do painel V2.
+
+### NOVO-20260819-200120-4ced899c3e61 🟢 RESOLVIDO · `NOVO` Identificação do servidor empilha os campos em bloco split · HT/UI · risco baixo
+
+O cadastro distribuía a identificação funcional entre uma coluna lateral e um corpo de campos
+empilhados. **Correção:** remover o modo split e usar a grade global V2 de quatro colunas para
+Nome, Cargo, CPF e Telefone, mantendo o RG na linha seguinte e todos os contratos do formulário.
+
+### NOVO-20260819-200644-456b8bd1bd92 🟢 RESOLVIDO · `NOVO` Resumo administrativo das prestações recria fatos legados · HT/UI · risco baixo
+
+As etapas de Diário, Relatório Técnico, Documentos e Consolidado compartilhavam um parcial com
+`dl`, cards e fatos da família antiga `oficio-documentos-*`. **Correção:** eliminar essa árvore e
+renderizar número, protocolo, destino e período com `fact-list` e `c-v2.fact` globais.
+
+### NOVO-20260819-201046-4fa1a1c43d93 🟢 RESOLVIDO · `NOVO` Resumo do motorista do diário recria fatos legados · HT/UI · risco baixo
+
+Motorista e origem ainda eram montados com `dl` e a família antiga `oficio-documentos-*` dentro
+de um bloco V2. **Correção:** substituir os dois itens por `c-v2.fact`, levar o CPF para a nota
+do fato do motorista e conservar o estado “Alterado” como selo global V2 separado.
+
+### NOVO-20260819-201344-9c413aeddb9f 🟢 RESOLVIDO · `NOVO` Trechos do diário apenas imitam o editor V2 com campos legados · HT/UI · risco baixo
+
+Cada trecho conservava a grade `cv-field` antiga e um cabeçalho diferente do trecho do roteiro.
+**Correção:** reutilizar a composição V2 de Trecho, Saída e Chegada do editor, com a rota como
+descrição, e trocar sua faixa de tempos por KM inicial, KM final e Abastecimento globais V2.
+
+### NOVO-20260819-202556-7858e36f3cf2 🟢 RESOLVIDO · `NOVO` Etapa de documentos mistura fatos, pessoas e ações legadas · HT/UI · risco baixo
+
+O resumo de documentos ainda recriava a linha do servidor, o campo de solicitação e os cartões
+de anexos com as famílias `oficio-documentos-*` e `icon-btn--sign`. **Correção:** usar a linha de
+pessoa, o campo de formulário, o documento inline e o botão de anexo assinado globais V2,
+preservando o autosave da solicitação e todas as rotas de anexar, visualizar e remover arquivos.
+
+### NOVO-20260819-203852-153c9200cb6d 🟢 RESOLVIDO · `NOVO` Consolidado não garante explicitamente os resumos V2 · HT/UI · risco baixo
+
+O PDF Final dependia do fallback do parcial compartilhado para escolher a composição visual da
+equipe, permitindo que uma versão anterior da tela continuasse exibindo fatos e cartões de
+viajantes legados. **Correção:** fixar no Consolidado a lista de equipe V2, manter a identificação
+em `c-v2.fact` e adicionar uma trava de renderização que proíbe as quatro famílias antigas no HTML.
+
+### NOVO-20260819-172753-628e7ada6370 🟢 RESOLVIDO · `NOVO` Stepper do wizard não mostrava progresso e ocupava só parte do trilho · UI · risco baixo
+
+A fileira de etapas era quatro rótulos soltos: sem linha ligando os passos, com "concluída" e "não
+iniciada" separadas apenas pela cor de um círculo, o status repetido em caixa alta sob cada nome, e
+a fileira encolhida ao tamanho do conteúdo dentro do rail. **Correção:** o componente passa a ser
+uma corda com nós — trecho contínuo de centro a centro dos nós, cor única de progresso (accent no
+andado, nó contornado no feito e cheio na etapa atual), status só para leitor de tela e `flex: 1`
+para a corda ocupar o trilho inteiro, qualquer que seja o número de etapas. O desenho foi escolhido
+pelo dono entre quatro modelos provados lado a lado na galeria; os outros três e o painel de prova
+saíram da folha. Junto entrou `--text-size-micro` (11px) em `v2/tokens.css`, o degrau que faltava
+para o rótulo de navegação.
+
+### NOVO-20260819-173633-e60695f7ba72 🟢 RESOLVIDO · `NOVO` Stepper some ao rolar o wizard e não navega entre as etapas · UI/HT · risco baixo
+
+A faixa de etapas rolava junto com o formulário: em wizard longo, três telas abaixo não havia mais
+como saber em que etapa se estava. E o stepper era só indicador — voltar uma etapa exigia o botão
+do rodapé. **Correção:** a faixa vira `position: sticky` no topo (descola do header e flutua sobre o
+conteúdo, com a sombra da camada flutuante e um afastamento de `--gap` do topo da janela; ao
+descolar, os cantos da junção — os de baixo do header e os de cima da faixa — se abrem com
+transição, marcados por `is-detached` de `wizard-sticky-header.js`, que voltou a ter consumidor e
+agora reconhece a estrutura do v2), e as etapas do ofício e do plano de trabalho passam a
+carregar `url`, virando links do próprio componente — o `url` fica vazio enquanto o rascunho não
+existe, quando não há para onde ir. No caminho apareceram dois vizinhos: o stepper da prestação
+montava `title`/`state_class`, vocabulário do componente antigo, e por isso desenhava a fileira sem
+nome de etapa e sem estado; e o stepper do fluxo da prestação não morava num rail, sem superfície
+para flutuar. Os dois entraram no vocabulário do `c-v2.stepper`.
+
+### NOVO-20260819-204339-6da3814a897a 🟢 RESOLVIDO · `NOVO` Nome e sigla da unidade não respeitam proporção 2:1 · HT/UI · risco baixo
+
+O quick-add de Unidades empilhava Nome e Sigla apesar do espaço horizontal disponível.
+**Correção:** usar a grade global V2 de três colunas, com Nome ocupando duas e Sigla uma,
+preservando o colapso responsivo para uma coluna em telas estreitas.
+
+### NOVO-20260819-204744-edcba15151f4 🟢 RESOLVIDO · `NOVO` Identificação da viatura empilha quatro campos no desktop · HT/UI · risco baixo
+
+Placa, Modelo, Tipo e Combustível eram renderizados em uma grade sem definição de colunas,
+ocupando quatro linhas mesmo com espaço horizontal disponível. **Correção:** aplicar a grade
+global V2 de quatro colunas, preservando suas quebras responsivas para telas menores.
+
+### NOVO-20260819-204950-b04ac0d020cc 🟢 RESOLVIDO · `NOVO` Picker V2 depende do legado para lupa e limpeza · UI · risco baixo
+
+O campo de Área de trabalho já chamava `c-v2.picker`, mas sua lupa e a regra que ocultava o
+limpador vazio existiam somente no CSS antigo. Em páginas de bundle enxuto, o resultado era um
+campo sem lupa e com o texto “x” sempre exposto. **Correção:** tornar `v2/picker.css` responsável
+pelo desenho da lupa e pela visibilidade contextual do limpador, removendo a dependência visual.
+
+### NOVO-20260819-205639-8d3656f2f0e4 🟢 RESOLVIDO · `NOVO` Perfil de usuário monta manualmente o select V2 · HT/UI · risco baixo
+
+O campo Perfil na área combinava diretamente `c-v2.field` e `c-v2.select`, repetindo a
+composição que o campo global já oferece. **Correção:** substituir a montagem inteira por
+`c-v2.form_field` no modo select, centralizando rótulo, erros e controle no contrato global V2.
+
+### NOVO-20260819-175730-d711c9801427 🟢 RESOLVIDO · `NOVO` Cartão de lista corta valor, trecho e frase de ausência · UI · risco baixo
+
+Três defeitos na mesma faixa do cartão. **(1)** A `fact-list` distribuía os fatos em colunas por
+`auto-fit`: com dois fatos lado a lado cada valor recebia metade da largura, o `fit-text` chegava ao
+piso e o resto virava reticência — "Não informa…" no lugar da placa, "R$ 4.111,…" no lugar do total.
+**Correção:** uma coluna sempre, que é o que a conta de altura dos degraus de `--fact-value-size` já
+supunha. **(2)** A lista de trechos rolava com fileiras de altura natural (65,7px e 68,9px medidos)
+dentro de uma caixa de 145,6px, então o segundo trecho terminava cortado e meio terceiro aparecia
+por baixo. **Correção:** fileiras de altura fixa em `--leg-height`, alinhamento ao topo quando a
+lista rola (centrado, o primeiro trecho ficava inalcançável) e `scroll-snap` para a rolagem parar em
+trecho inteiro. **(3)** `veiculo_placa_display` escrevia "Não informado" como VALOR, e a frase saía
+no corpo de uma placa, em negrito, com o mesmo peso de um ofício que tem viatura — o `c-v2.fact` já
+diz isso em itálico apagado quando o valor não vem. **Correção:** o presenter entrega vazio.

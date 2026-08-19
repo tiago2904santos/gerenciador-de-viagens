@@ -37,7 +37,7 @@
   {% endif %}
 
   {% if body.strip %}
-    <div{% if body_extra_class %} class="{{ body_extra_class }}"{% endif %}>{{ body }}</div>
+    <div class="panel__body{% if body_extra_class %} {{ body_extra_class }}{% endif %}">{{ body }}</div>
     <div class="panel__empty" data-collection-empty hidden>
       <h2 class="panel__empty-title">{{ filter_empty_title|default:'Nenhum registro para este filtro' }}</h2>
       <p>{{ filter_empty_message|default:'Ajuste a busca ou limpe os filtros.' }}</p>

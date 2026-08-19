@@ -11,7 +11,6 @@ from documentos.services.async_generation import enfileirar_documento
 
 from .diario_services import diaria_info
 from .forms import (
-    PrestacaoServidorDiariaForm,
     RelatorioTecnicoForm,
 )
 from .rt_services import ESCOPO_EQUIPE
@@ -50,7 +49,6 @@ def _servidor_rt_ctx(ps):
             ps.diaria_valor_override is not None
             or ps.diaria_valor_override_observacao
         ),
-        "diaria_form": PrestacaoServidorDiariaForm(instance=ps, prefix=f"ps-{ps.pk}"),
         "download_pdf_url": reverse(
             "prestacoes_contas:rt_download_servidor_formato", args=[ps.pk, "pdf"]
         ),

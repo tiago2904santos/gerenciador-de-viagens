@@ -95,14 +95,55 @@
   color: var(--text-muted);
   display: inline-flex;
   flex: none;
+  height: 16px;
+  position: relative;
+  width: 16px;
+}
+
+/* O desenho da lupa pertence ao picker V2. Antes ele só existia na folha
+   legada `fields/search-picker.css`: páginas com bundle enxuto recebiam um
+   espaço vazio à esquerda e denunciavam a dependência do componente antigo. */
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__icon::before {
+  border: 2px solid currentColor;
+  border-radius: var(--radius-pill);
+  box-sizing: border-box;
+  content: "";
+  height: 12px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 12px;
+}
+
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__icon::after {
+  background: currentColor;
+  border-radius: var(--radius-pill);
+  content: "";
+  height: 2px;
+  position: absolute;
+  right: 0;
+  top: 11px;
+  transform: rotate(45deg);
+  transform-origin: center;
+  width: 8px;
 }
 
 :is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__clear {
+  align-items: center;
   background: none;
   border: 0;
   color: var(--text-muted);
   cursor: pointer;
+  display: none;
   flex: none;
+}
+
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker--has-query .search-picker__clear {
+  display: inline-flex;
+}
+
+:is(html[data-theme]) :is(.picker, .destination-row, .field) .search-picker__clear[hidden] {
+  display: none;
 }
 
 
