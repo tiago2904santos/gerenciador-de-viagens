@@ -6,7 +6,6 @@
 @import url("./base/tokens.css");
 @import url("./base/base.css");
 @import url("./layout/layout.css");
-@import url("./layout/sidebar.css");
 @import url("./fields/forms.css");
 @import url("./lists/lists.css");
 @import url("./lists/cards.css");
@@ -8641,40 +8640,13 @@ html[data-theme="dark"] ::selection {
   color: var(--color-heading);
 }
 
-html[data-theme="dark"] .sidebar-brand-badge {
-  box-shadow: none;
-}
-
-html[data-theme="dark"] .sidebar-item-icon {
-  border-color: rgba(255, 255, 255, 0.055);
-}
-
-html[data-theme="dark"] .sidebar-link--module.is-active,
-html[data-theme="dark"] .sidebar-module-expand.is-active,
-html[data-theme="dark"] .sidebar-link--cadastros.is-active {
-  box-shadow: inset 3px 0 var(--color-primary);
-}
-
-html[data-theme="dark"] .sidebar-footer {
-  background: rgba(0, 0, 0, 0.12);
-}
-
-html[data-theme="dark"] .sidebar-account {
-  background: #0b1c2a;
-  border-color: #1e3a50;
-}
-
-:is(html[data-theme="dark"])
-  .sidebar-account__label {
-  color: var(--color-muted-strong);
-  opacity: 1;
-}
-
-:is(html[data-theme="dark"])
-  :is(.sidebar-account__link, .sidebar-logout-btn):hover {
-  background: var(--color-primary-soft);
-  border-color: var(--color-border-strong);
-}
+/* As 7 regras `.sidebar-*` que moravam aqui sairam com a reconstrucao da barra
+   no v2 (`NOVO-20260819-220313-6c7bd5d89165`): a folha nova resolve os dois
+   temas por token e nenhuma delas tinha mais efeito, com uma excecao que era
+   defeito — `.sidebar-footer { background: rgba(0,0,0,0.12) }` continuava
+   tingindo o rodape SO no escuro, que e exatamente a excecao por tema que a
+   migracao existe para acabar. As regras de `.app-mobile-bar` ficaram: a
+   barra movel e do shell, nao da barra lateral. */
 
 :is(html[data-theme="dark"])
   .skip-link {

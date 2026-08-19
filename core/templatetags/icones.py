@@ -30,6 +30,8 @@ register = template.Library()
 ICONES = (
     "check",
     "plus",
+    "home",
+    "chevron-down",
     "arrow-right",
     "arrow-left",
     "list",

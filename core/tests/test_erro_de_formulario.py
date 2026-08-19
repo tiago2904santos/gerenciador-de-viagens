@@ -279,18 +279,26 @@ class UmPadraoSoTests(SimpleTestCase):
 
         self.assertGreaterEqual(len(producao), 19, "esperava 18 formulários + o editor de roteiros")
 
-    def test_o_login_fica_de_fora_e_o_motivo_esta_escrito(self):
-        """`core/login.html` é HTML autônomo: não estende `base.html`.
+    def test_o_login_usa_a_faixa_do_sistema_mesmo_sendo_raiz_propria(self):
+        """`core/login.html` continua HTML autônomo — mas não mais sem o sistema.
 
-        Não carrega `base.css` nem o bundle do shell — então não tem
-        `fields-init.js` para mover o foco, e a faixa do design system entraria
-        sem o CSS que a pinta. É o `HT-09`, que trata a tela inteira.
+        O motivo pelo qual ele ficava de fora era o CSS: a faixa entraria sem a
+        folha que a pinta, porque a tela não carrega o bundle do shell. Ela
+        passou a carregar `ui.bundle.css`, onde `v2/form-errors.css` mora, e com
+        isso a exceção deixou de ter causa
+        (`NOVO-20260819-220313-df2a5685481a`).
+
+        O que continua valendo: sem `base.html` e sem `shell.bundle.js`, não há
+        `fields-init.js` para mover o foco. Por isso a faixa aparece, mas quem
+        erra a senha não é levado até ela — o formulário tem dois campos e cabe
+        inteiro na tela, então a ida ao erro é olhar, não rolar.
         """
         login = (RAIZ / "templates/core/login.html").read_text(encoding="utf-8")
 
-        self.assertNotIn("base.html", login)
+        self.assertNotIn("{% extends", login)
         self.assertNotIn("shell.bundle.js", login)
-        self.assertIn("auth-error", login)
+        self.assertIn("c-v2.form_errors", login)
+        self.assertIn("css/ui.bundle.css", login)
 
 
 class FocoNoResumoTests(SimpleTestCase):

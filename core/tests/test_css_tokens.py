@@ -24,7 +24,6 @@ COLOR_LITERAL_ALLOWED = {
     "static/css/base/tokens.css",  # UI-03: absorveu base/theme.css na E7
     "static/css/base/03-theme-dark.css",
     "static/css/components/theme-dark-components.css",  # transitório — dissolver nas fases seguintes
-    "static/css/pages/auth.css",  # transitório — login fora do bundle global
     "static/css/shell.bundle.css",  # gerado (NOVO-12); literais vêm das fontes acima
     "static/css/shell.form-components.bundle.css",  # variante gerada (UI-04/HT-04)
 }

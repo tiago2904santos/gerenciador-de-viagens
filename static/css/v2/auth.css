@@ -1,0 +1,302 @@
+/* Login — a única tela pública, no vocabulário v2.
+ *
+ * Depende de `v2/tokens.css`. Substitui `pages/auth.css`, que declarava 19
+ * aliases `--auth-*` sobre os tokens legados e uma lista de cores próprias: a
+ * tela de entrada tinha um sistema de cor só dela, e era a primeira coisa que
+ * o usuário via do produto.
+ *
+ * ## A tela conta a estrutura do sistema
+ *
+ * A coluna da esquerda é `--surface-brand` — a MESMA faixa do sidebar e do
+ * `c-v2.header`. A da direita é a escada `rail → field`, que é o que o usuário
+ * encontra em toda página interna. Quem entra já viu as duas superfícies do
+ * sistema antes de digitar a senha; não é decoração, é o mesmo desenho.
+ *
+ * ## Por que existe folha própria
+ *
+ * O login é raiz de documento: não estende `base.html` e não recebe o bundle do
+ * shell. Ele carrega `ui.bundle.css` (onde vivem as folhas v2 dos componentes
+ * que usa) mais esta, que traz só o que é da PÁGINA — casca, as duas colunas e
+ * o piso de foco que `base.css` daria se ele estendesse a base.
+ */
+
+/* ---- casca ---------------------------------------------------------------- */
+
+:is(html[data-theme]) .auth-page {
+  background: var(--surface-page);
+  color: var(--text-strong);
+  font-family: var(--font-sans);
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* A folha de símbolos é um `<svg>` de verdade no corpo da página, e sem regra
+   ela ocupa a altura padrão de um SVG embutido — 150px que empurravam o cartão
+   para baixo do centro da tela. A regra existe em `base/utilities.css`, que
+   esta tela não carrega; enquanto o login for raiz própria, ela precisa
+   aparecer aqui também. */
+:is(html[data-theme]) .auth-page .icon-sprite {
+  height: 0;
+  overflow: hidden;
+  position: absolute;
+  width: 0;
+}
+
+:is(html[data-theme]) .auth-page *,
+:is(html[data-theme]) .auth-page *::before,
+:is(html[data-theme]) .auth-page *::after {
+  box-sizing: border-box;
+}
+
+/* Piso de foco da tela.
+ *
+ * `base/base.css` impõe um anel a todo controle do sistema com `!important`, e
+ * esta tela não o carrega. Sem este bloco, o único foco visível do login seria
+ * o que o `v2/input.css` acende na borda do campo — o link de pular e o botão
+ * ficariam sem nada. O `outline-offset` é requisito de contraste, não enfeite:
+ * colado à borda do campo o anel mede 2,07:1 no tema escuro; afastado, 7,76:1.
+ */
+:is(html[data-theme]) .auth-page :is(a, button, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+:is(html[data-theme]) .auth-page .skip-link {
+  background: var(--surface-field);
+  border-radius: var(--radius-field);
+  color: var(--text-strong);
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+  left: 16px;
+  padding: var(--gap-tight) var(--gap);
+  position: fixed;
+  text-decoration: none;
+  top: 12px;
+  transform: translateY(-160%);
+  transition: transform var(--ease);
+  z-index: 10;
+}
+
+:is(html[data-theme]) .auth-page .skip-link:focus {
+  transform: translateY(0);
+}
+
+:is(html[data-theme]) .auth-shell {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--gap-loose);
+}
+
+/* O cartão usa o raio de marca — o maior da escala, o mesmo do topo do
+   `c-v2.header`. É a peça que se apoia direto no fundo da página, e é a única
+   da tela que leva contorno (a regra de fronteira do `v2/surface.css`). */
+:is(html[data-theme]) .auth-card {
+  background: var(--surface-rail);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-brand);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);
+  max-width: 940px;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* ---- coluna da marca ------------------------------------------------------ */
+
+/* `align-content` EXPLÍCITO nos dois blocos abaixo. O padrão da grade é
+   `stretch`, e as linhas esticam quando a coluna fica mais alta que o conteúdo
+   — o que acontece assim que a faixa de erro entra e empurra o cartão. No
+   print da tela com senha errada isso abria um vão de ~100px entre o subtítulo
+   e a lista, e outro de ~55px entre os itens dela. Aqui a marca fica no topo,
+   a lista no pé e o espaço sobra no meio, de propósito. */
+:is(html[data-theme]) .auth-intro {
+  align-content: space-between;
+  background: var(--surface-brand);
+  color: var(--text-on-brand);
+  display: grid;
+  gap: var(--gap-loose);
+  padding: var(--gap-loose);
+}
+
+:is(html[data-theme]) .auth-intro__brand {
+  align-items: center;
+  display: flex;
+  gap: var(--gap-tight);
+}
+
+:is(html[data-theme]) .auth-logo {
+  align-items: center;
+  background: var(--accent);
+  border-radius: var(--radius-field);
+  color: var(--text-on-accent);
+  display: inline-flex;
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  height: 32px;
+  justify-content: center;
+  width: 32px;
+}
+
+:is(html[data-theme]) .auth-intro__product {
+  font-size: var(--text-size-base);
+  font-weight: var(--weight-strong);
+}
+
+:is(html[data-theme]) .auth-intro__copy {
+  align-content: start;
+  display: grid;
+  gap: var(--gap-tight);
+}
+
+/* O eyebrow aparece nas DUAS colunas, e elas têm fundos diferentes: o accent
+   serve sobre a caixa do formulário e não serve sobre a faixa de marca — no
+   tema claro ele mede 1.26:1 ali. A regra de baixo cobre o caso da faixa. */
+:is(html[data-theme]) .auth-eyebrow {
+  color: var(--accent);
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+:is(html[data-theme]) .auth-intro .auth-eyebrow {
+  color: var(--accent-on-brand);
+}
+
+:is(html[data-theme]) .auth-title {
+  font-size: var(--text-size-title);
+  font-weight: var(--weight-strong);
+  line-height: 1.2;
+  margin: 0;
+}
+
+:is(html[data-theme]) .auth-subtitle {
+  font-size: var(--text-size-base);
+  line-height: 1.5;
+  margin: 0;
+  opacity: 0.78;
+}
+
+:is(html[data-theme]) .auth-benefits {
+  align-content: start;
+  display: grid;
+  gap: var(--gap-tight);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+:is(html[data-theme]) .auth-benefits li {
+  align-items: center;
+  display: flex;
+  font-size: var(--text-size-base);
+  gap: var(--gap-tight);
+}
+
+/* O numeral é o marcador da lista; a lista perdeu o `list-style` porque um
+   bullet ao lado de "01" seria dois marcadores para o mesmo item. */
+:is(html[data-theme]) .auth-benefits li > span {
+  align-items: center;
+  background: var(--surface-on-brand);
+  border-radius: var(--radius-field);
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: var(--text-size-eyebrow);
+  font-weight: var(--weight-strong);
+  height: 26px;
+  justify-content: center;
+  width: 26px;
+}
+
+/* ---- coluna do formulário -------------------------------------------------- */
+
+:is(html[data-theme]) .auth-panel {
+  align-content: center;
+  display: grid;
+  gap: var(--gap-loose);
+  padding: var(--gap-loose);
+}
+
+:is(html[data-theme]) .auth-panel__header {
+  display: grid;
+  gap: var(--gap-tight);
+}
+
+:is(html[data-theme]) .auth-panel__header h2 {
+  color: var(--text-strong);
+  font-size: var(--text-size-title);
+  font-weight: var(--weight-strong);
+  margin: 0;
+}
+
+:is(html[data-theme]) .auth-panel__header p {
+  color: var(--text-muted);
+  font-size: var(--text-size-base);
+  line-height: 1.5;
+  margin: 0;
+}
+
+:is(html[data-theme]) .auth-form {
+  display: grid;
+  gap: var(--gap);
+}
+
+/* O campo do login fica sobre `--surface-rail`, então o degrau seguinte é
+   `field` — é o mesmo contrato que `c-v2.rail` dá aos controles dele. Sem esta
+   linha o `input__control` cairia no padrão do token e o campo ficaria da cor
+   da caixa que o contém. */
+:is(html[data-theme]) .auth-form .input {
+  --surface-contrast: var(--surface-field);
+}
+
+:is(html[data-theme]) .auth-form .button {
+  width: 100%;
+}
+
+:is(html[data-theme]) .auth-footer {
+  align-items: center;
+  color: var(--text-muted);
+  display: flex;
+  font-size: var(--text-size-eyebrow);
+  gap: var(--gap-tight);
+}
+
+:is(html[data-theme]) .auth-footer__dot {
+  background: var(--status-done);
+  border-radius: var(--radius-pill);
+  height: 8px;
+  width: 8px;
+}
+
+/* ---- telas estreitas ------------------------------------------------------- */
+
+/* A coluna da marca sai de cena, não encolhe: espremida ela vira um bloco de
+   texto sem função acima do formulário, e o que o usuário veio fazer aqui é
+   entrar. */
+@media (max-width: 820px) {
+  :is(html[data-theme]) .auth-shell {
+    padding: var(--gap);
+  }
+
+  :is(html[data-theme]) .auth-card {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 460px;
+  }
+
+  :is(html[data-theme]) .auth-intro__copy,
+  :is(html[data-theme]) .auth-benefits {
+    display: none;
+  }
+
+  :is(html[data-theme]) .auth-intro {
+    gap: var(--gap);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(html[data-theme]) .auth-page .skip-link {
+    transition: none;
+  }
+}
