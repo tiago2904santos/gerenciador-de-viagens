@@ -432,3 +432,35 @@ Fica aberto, medido e fora deste recorte:
 - [ ] `NOVO-20260818-221535-0258e76352d5` — 20 blocos de CSS morto (5,6 KB) em 6 arquivos.
 - [ ] `NOVO-20260818-221535-8858f5d13229` — `audit_paleta` em 12 (teto 0) e `audit_ui_patterns`
   em 2651 (teto 2583); mesmo corte de token do `NOVO-20260818-213938-228adea09e1d`.
+
+## Planos de Trabalho no v2 (18/08/2026)
+
+O último app inteiro fora do sistema v2. Vinte e quatro templates — as quatro etapas do wizard, a
+lista, os quatro catálogos e os parciais — passaram a usar exclusivamente `c-v2.*`, e nenhuma
+chamada anterior ao v2 pode voltar sem reprovar `planos_trabalho/tests/test_wizard_v2.py`.
+
+- [x] `NOVO-20260818-223338-aa3c31f87b9d` — as 63 chamadas de `c-ui.`, `c-form.card`,
+  `c-feedback.` e `c-travel.` saem; entram sete componentes que faltavam ao v2 (`pending_card`,
+  `choice_card`, `choice_grid`, `number_stepper`, `live_list`, `efetivo_row`,
+  `document_preview`), todos publicados na vitrine, e o inventário reconcilia em 156. Saem
+  também as duas folhas de página do app (49,4 KB, com prova de grep) e os marcadores
+  `data-travel-document-wizard-*`, que carregam o tema legado para dentro da tela nova. Os 22
+  ganchos `data-pt-*` foram preservados; cinco nomes internos mudaram dos dois lados no mesmo
+  corte.
+- [x] `NOVO-20260818-223339-bba28c52707d` — o `autoManage` do `location-rows.js` passa a ler a
+  rota de cidades da própria seção. A seção que "busca os próprios dados" dependia de a tela
+  repetir o atributo no `<form>`, e sem ele o motor LIMPAVA o select: a cidade escolhida sumia
+  da tela e voltava vazia no POST.
+- [x] `NOVO-20260818-223340-738ebc1515e4` — a grade de atividades do cadastro rápido de presets
+  chegava ao navegador sem folha de estilo; vira `c-v2.choice_grid` de `c-v2.choice_card`, e a
+  `WidgetStyle` morta sai do enum com prova de grep.
+
+Sete regressões da própria migração foram apontadas na revisão e fechadas no mesmo PR, cada uma
+com o motivo registrado no template: o `data-autosave-link` do "voltar", o tipo do valor da opção
+do preset, a unidade no chip de efetivo, a nota do `fact` que só nascia com texto, a associação da
+ajuda na grade de escolha, os erros dos campos de destino e o fato que nascia no desenho de vazio.
+Quatro delas ganharam teste de regressão.
+
+O gate do auditor de front continua vermelho por causa dos quatro ERROS já medidos e abertos acima
+(`NOVO-20260818-213938-228adea09e1d` e `NOVO-20260818-214024-f57647d8c996`), que reprovam
+igualmente na `main`. Os avisos deste recorte foram de 253 para 239.
