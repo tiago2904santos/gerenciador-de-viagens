@@ -1,26 +1,17 @@
-<details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
-  <summary class="document-inline-card__header">
-    <span class="document-inline-card__title">Diário de Bordo</span>
-    <span class="document-inline-card__header-end">
-      <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
-        <c-ui.buttons.icon_button :href="preview_inline_url" action="preview" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" only />
-        {% if preview_pdf_url %}
-          <c-ui.buttons.icon_button :href="preview_pdf_url" action="pdf" aria_label="Baixar PDF" tooltip="Baixar PDF" only />
-        {% endif %}
-        {% if preview_xlsx_url %}
-          <c-ui.buttons.icon_button :href="preview_xlsx_url" action="download" aria_label="Baixar XLSX" tooltip="Baixar XLSX" only />
-        {% endif %}
-      </span>
-    </span>
-  </summary>
-  <div class="document-inline-card__body">
-    <div class="document-inline-viewer">
-      <iframe
-        class="document-inline-viewer__frame"
-        data-src="{{ preview_inline_url }}"
-        title="Diário de Bordo"
-        loading="lazy"
-      ></iframe>
-    </div>
-  </div>
-</details>
+<c-v2.document_inline
+  title="Diário de Bordo"
+  :src="preview_inline_url"
+  frame_title="Diário de Bordo"
+  empty_message="O diário ainda não foi gerado."
+  actions_label="Ações do documento"
+>
+  <c-slot name="actions">
+    <c-v2.icon_button icon="eye" :href="preview_inline_url" target="_blank" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" />
+    {% if preview_pdf_url %}
+      <c-v2.icon_button icon="pdf" :href="preview_pdf_url" aria_label="Baixar PDF" tooltip="Baixar PDF" />
+    {% endif %}
+    {% if preview_xlsx_url %}
+      <c-v2.icon_button icon="download" :href="preview_xlsx_url" aria_label="Baixar XLSX" tooltip="Baixar XLSX" />
+    {% endif %}
+  </c-slot>
+</c-v2.document_inline>

@@ -1,39 +1,51 @@
-{% extends "cotton/page/flow_base.html" %}
+{% extends "prestacoes_contas/flow_base.html" %}
 {% load static %}
-{% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
-
-{% block component_js %}{% include 'includes/form_components_js.html' only %}{% endblock %}
-
-{% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/pages/oficios.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/prestacoes_contas.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/diario-troca.css' %}">
-{% endblock %}
 
 {% block extra_js %}
-  {# masks.js ja vem do base.html; carregar de novo executaria o mesmo motor duas vezes. #}
+  {# masks.js já vem do base.html; carregar de novo executaria o mesmo motor duas vezes. #}
   <script src="{% static 'js/pages/diario-motorista.js' %}" defer></script>
 {% endblock %}
 
 {% block flow_body %}
   {{ oficios_prefill|json_script:"dmv-oficios-source" }}
-  <form method="post" class="travel-document-wizard__form dmv-form"
-        novalidate
-        data-diario-motorista-form>
+
+  <form method="post" class="form-page__form dmv-form" novalidate data-diario-motorista-form>
     {% csrf_token %}
 
-    <c-ui.feedback.form_errors :form="form" only />
+    <c-v2.form_errors :form="form" />
 
-    <p class="dmv-lede">
-      Ajuste o <strong>motorista</strong> e a <strong>viatura</strong> apenas deste diário — o
-      ofício {{ identificacao.numero }} original não é alterado. Se houver troca, geramos uma prévia
-      da justificativa em <strong>Informações complementares</strong> do Relatório Técnico.
-    </p>
+    {% comment %}
+      A frase de contexto é um `alert`: ela avisa que o que se muda aqui NÃO
+      volta para o ofício, que é a dúvida que a tela levanta. No legado era um
+      `<p class="dmv-lede">`, com uma classe de página só para ela.
+    {% endcomment %}
+    {% with aviso_escopo="O motorista e a viatura mudam só neste diário — o ofício "|add:identificacao.numero|add:" não é alterado. Se houver troca, geramos uma prévia da justificativa em Informações complementares do Relatório Técnico." %}
+      <c-v2.alert tone="info" :message="aviso_escopo" />
+    {% endwith %}
 
-    {# ═══════════════ MOTORISTA ═══════════════ #}
-    <c-ui.forms.form_block shell="card" section_id="dmv-motorista-title" title="Motorista" description="Quem dirigiu o veículo nesta viagem?" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :element_id="element_id" :extra_class="extra_class" :heading_level="heading_level" :variant="variant"><c-slot name="body">{% include "prestacoes_contas/partials/_dmv_motorista_body.html" with form=form motorista_oficio_cpf=motorista_oficio_cpf motorista_oficio_nome=motorista_oficio_nome oficios_prefill=oficios_prefill only %}</c-slot></c-ui.forms.form_block>
+    <c-v2.panel title="Motorista e viatura deste diário" description="Quem dirigiu e qual veículo foi usado nesta viagem.">
+      <c-slot name="body">
+        <c-v2.form_block title="Motorista" description="Quem dirigiu o veículo nesta viagem?">
+          <c-slot name="body">
+            {% include "prestacoes_contas/partials/_dmv_motorista_body.html" with form=form motorista_oficio_cpf=motorista_oficio_cpf motorista_oficio_nome=motorista_oficio_nome oficios_prefill=oficios_prefill only %}
+          </c-slot>
+        </c-v2.form_block>
 
-    {# ═══════════════ VIATURA ═══════════════ #}
-    <c-ui.forms.form_block shell="card" section_id="dmv-viatura-title" title="Viatura" description="Qual veículo foi usado nesta viagem?" :action_autosave="action_autosave" :action_label="action_label" :action_url="action_url" :action_variant="action_variant" :aria_label="aria_label" :body_extra_class="body_extra_class" :body_id="body_id" :data_hook="data_hook" :element_id="element_id" :extra_class="extra_class" :heading_level="heading_level" :variant="variant"><c-slot name="body">{% include "prestacoes_contas/partials/_dmv_viatura_body.html" with form=form viatura_oficio=viatura_oficio only %}</c-slot><c-slot name="footer">{% include "prestacoes_contas/partials/_dmv_viatura_footer.html" with diario_url=diario_url only %}</c-slot></c-ui.forms.form_block>
+        <c-v2.form_block title="Viatura" description="Qual veículo foi usado nesta viagem?">
+          <c-slot name="body">
+            {% include "prestacoes_contas/partials/_dmv_viatura_body.html" with form=form viatura_oficio=viatura_oficio only %}
+          </c-slot>
+        </c-v2.form_block>
+
+        <c-v2.card_footer>
+          <c-slot name="secondary">
+            <c-v2.button label="Voltar ao Diário de Bordo" icon="arrow-left" :href="diario_url" />
+          </c-slot>
+          <c-slot name="primary">
+            <c-v2.button label="Salvar" variant="primary" icon="check" type="submit" />
+          </c-slot>
+        </c-v2.card_footer>
+      </c-slot>
+    </c-v2.panel>
   </form>
 {% endblock %}

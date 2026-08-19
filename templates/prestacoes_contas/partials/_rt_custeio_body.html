@@ -1,12 +1,20 @@
-<div class="field-grid field-grid--cols-4 rt-custeios-grid">
+{% comment %}
+  Custeios — quatro campos, e o campo extra que aparece quando a escolha é
+  "outro".
+
+  `data-rt-other-wrapper` é contrato de `js/pages/prestacoes-contas-rt.js`, que
+  revela e esconde o campo pelo valor do select. O invólucro é uma `<div>` nua
+  para que o `hidden` do HTML baste.
+{% endcomment %}
+<div class="field-grid">
   {% for item in campos_custeio %}
-    <div class="rt-cost-field-group{% if item.uses_other %} rt-cost-field-group--select{% endif %}">
-      <c-ui.forms.field :field="item.field" :label="item.label" only />
-      {% if item.uses_other %}
-        <div class="rt-cost-field__other" data-rt-other-wrapper="{{ item.campo }}" hidden>
-          {% with cotton_attr_label="Informe "|add:item.label|lower %}<c-ui.forms.field :field="item.other" :label="cotton_attr_label" only />{% endwith %}
-        </div>
-      {% endif %}
-    </div>
+    <c-v2.form_field :field="item.field" :label="item.label" />
+    {% if item.uses_other %}
+      <div data-rt-other-wrapper="{{ item.campo }}" hidden>
+        {% with alvo=item.label|lower %}{% with rotulo_outro="Informe "|add:alvo %}
+          <c-v2.form_field :field="item.other" :label="rotulo_outro" />
+        {% endwith %}{% endwith %}
+      </div>
+    {% endif %}
   {% endfor %}
 </div>

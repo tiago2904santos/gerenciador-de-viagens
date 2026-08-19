@@ -1,33 +1,34 @@
+{% comment %}
+  Pré-visualização do relatório por servidor, com o campo de diária ajustada
+  dentro do cartão.
+
+  O campo fica no CORPO do documento inline, e não fora: ele altera o valor que
+  o próprio PDF ali embaixo mostra, e separá-los faria a pessoa editar num lugar
+  e conferir noutro.
+{% endcomment %}
 {% for s in servidores %}
-  <details class="document-inline-card document-inline-card--lazy" data-lazy-inline>
-    <summary class="document-inline-card__header">
-      <span class="document-inline-card__title">
-        {{ s.nome }}
-        {% if s.is_motorista %} <span class="person-row__badge">Motorista</span>{% endif %}
-        {% if s.diaria_ajustada %} <c-ui.badges.chip label="Diária ajustada" tone="info" size="compact" only />{% endif %}
-      </span>
-      <span class="document-inline-card__header-end">
-        <span class="document-inline-actions document-inline-actions--header" aria-label="Ações do documento">
-          <c-ui.buttons.icon_button :href="s.preview_inline_url" action="preview" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" only />
-          <c-ui.buttons.icon_button :href="s.download_pdf_url" action="pdf" aria_label="Baixar PDF" tooltip="Baixar PDF" only />
-          <c-ui.buttons.icon_button :href="s.download_docx_url" action="docx" aria_label="Baixar DOCX" tooltip="Baixar DOCX" only />
-        </span>
-      </span>
-    </summary>
-    <div class="document-inline-card__body">
-      <div class="field app-form-field rt-diaria-override-field">
-        <label class="app-form-label" for="{{ s.diaria_form.diaria_valor_override.id_for_label }}">{{ s.diaria_form.diaria_valor_override.label }}</label>
-        {{ s.diaria_form.diaria_valor_override }}
-        <p class="field-help app-form-help">{{ s.diaria_form.diaria_valor_override.help_text }}</p>
-      </div>
-      <div class="document-inline-viewer">
-        <iframe
-          class="document-inline-viewer__frame"
-          data-src="{{ s.preview_inline_url }}"
-          title="Relatório técnico — {{ s.nome }}"
-          loading="lazy"
-        ></iframe>
-      </div>
-    </div>
-  </details>
+  <c-v2.document_inline
+    :title="s.nome"
+    status="{% if s.diaria_ajustada %}Diária ajustada{% elif s.is_motorista %}Motorista{% endif %}"
+    status_tone="{% if s.diaria_ajustada %}info{% else %}progress{% endif %}"
+    :src="s.preview_inline_url"
+    frame_title="Relatório técnico — {{ s.nome }}"
+    empty_message="O relatório deste servidor ainda não foi gerado."
+    actions_label="Ações do documento"
+  >
+    <c-slot name="actions">
+      <c-v2.icon_button icon="eye" :href="s.preview_inline_url" target="_blank" aria_label="Abrir em nova aba" tooltip="Abrir em nova aba" />
+      <c-v2.icon_button icon="pdf" :href="s.download_pdf_url" aria_label="Baixar PDF" tooltip="Baixar PDF" />
+      <c-v2.icon_button icon="docx" :href="s.download_docx_url" aria_label="Baixar DOCX" tooltip="Baixar DOCX" />
+    </c-slot>
+
+    {% comment %}
+      O `body` convive com o `src`: o campo vem antes, o visualizador depois. É
+      o único cartão do sistema com os dois, e por um motivo — o valor que se
+      digita aqui é o que o PDF logo abaixo imprime.
+    {% endcomment %}
+    <c-slot name="body">
+      <c-v2.form_field :field="s.diaria_form.diaria_valor_override" />
+    </c-slot>
+  </c-v2.document_inline>
 {% endfor %}

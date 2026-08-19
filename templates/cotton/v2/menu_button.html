@@ -1,4 +1,4 @@
-{% cotton:vars description hook icon icon_tone title tone %}
+{% cotton:vars description disabled hook hook_attr hook_value icon icon_tone title tone %}
 {% comment %}
   Item de menu que EXECUTA em vez de navegar — "Visualizar termos", que abre de
   uma vez todos os documentos do grupo.
@@ -13,8 +13,17 @@
 
   `hook` é o `data-*` do motor que executa a ação — `data-open-all-termos`, lido
   por `js/pages/oficios-documentos-inline.js`. É valeless, então atravessa o
-  escape sem estrago; um gancho COM valor não caberia aqui, pelo mesmo motivo
-  que não cabe no `c-v2.button`.
+  escape sem estrago.
+
+  Para o gancho COM valor existe o par `hook_attr`/`hook_value`, pelo mesmo
+  motivo e com o mesmo formato do `dialog_url_attr`/`dialog_url` do
+  `c-v2.button`: o nome do atributo vem do chamador e o valor sai por `{{ }}`,
+  em vez de os dois virem grudados num `hook` que o escape estragaria. É o que o
+  aviso de liberação da prestação usa (`data-wa-app="normal"`).
+
+  `disabled` é o item que EXISTE mas não pode ser acionado — "Diário de bordo:
+  ainda não foi criado". Some-lo daria a impressão de que o documento não faz
+  parte do conjunto; deixá-lo clicável levaria a um 404.
 {% endcomment %}
 {% load icones %}
 <button
@@ -22,7 +31,9 @@
   class="menu__item"
   role="menuitem"
   {% if tone %}data-tone="{{ tone }}"{% endif %}
+  {% if disabled %}disabled aria-disabled="true"{% endif %}
   {% if hook %}{{ hook }}{% endif %}
+  {% if hook_attr and hook_value %}{{ hook_attr }}="{{ hook_value }}"{% endif %}
 >
   {% if icon %}<span class="menu__icon"{% if icon_tone %} data-tone="{{ icon_tone }}"{% endif %} aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
   <span class="menu__copy">

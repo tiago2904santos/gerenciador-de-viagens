@@ -3,23 +3,22 @@
 {% block title %}Assinatura concluída{% endblock %}
 
 {% block content %}
-<section class="asgn-card asgn-card--center">
-  <div class="asgn-success" aria-hidden="true">✓</div>
-  <h1 class="asgn-title">Tudo certo!</h1>
-  <p class="asgn-lead">Sua assinatura foi registrada e o documento já está no sistema. Você pode fechar esta página.</p>
+  <c-v2.panel title="Tudo certo!" description="Sua assinatura foi registrada e o documento já está no sistema. Você pode fechar esta página.">
+    <c-slot name="body">
+      <c-v2.alert tone="success" message="Assinatura registrada." />
 
-  {% if docs %}
-  <ul class="asgn-doclist">
-    {% for d in docs %}
-    <li class="asgn-doc{% if d.assinada %} is-done{% endif %}">
-      <div class="asgn-doc__info">
-        <span class="asgn-doc__label">{{ d.label }}</span>
-        <span class="asgn-doc__who">{{ d.signatario }}</span>
-      </div>
-      <span class="asgn-doc__status">{% if d.assinada %}✓ Assinado{% else %}Pendente{% endif %}</span>
-    </li>
-    {% endfor %}
-  </ul>
-  {% endif %}
-</section>
+      {% if docs %}
+        <ul class="person-list">
+          {% for d in docs %}
+            <c-v2.person_row
+              initials="{% if d.assinada %}OK{% else %}··{% endif %}"
+              :name="d.label"
+              :meta="d.signatario"
+              badge="{% if d.assinada %}Assinado{% else %}Pendente{% endif %}"
+            />
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </c-slot>
+  </c-v2.panel>
 {% endblock %}

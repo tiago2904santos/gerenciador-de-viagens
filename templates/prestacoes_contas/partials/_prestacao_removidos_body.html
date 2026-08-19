@@ -1,22 +1,25 @@
-<div class="oficio-documentos-card__body">
-  <p class="prestacao-removidos__intro">
-    Estes servidores saíram da equipe do ofício. Nada do que eles já tinham entregue foi apagado —
-    para voltar a editar, basta incluí-los novamente na equipe do ofício.
-  </p>
-  <div class="oficio-documentos-travellers-grid" role="list">
-    {% for s in identificacao.servidores_removidos %}
-      <article class="oficio-documentos-traveller-tile prestacao-removidos__tile" role="listitem">
-        <span class="oficio-documentos-traveller-tile__avatar" aria-hidden="true">{{ s.iniciais }}</span>
-        <div class="oficio-documentos-traveller-tile__main">
-          <div class="oficio-documentos-traveller-tile__title-row">
-            <strong class="oficio-documentos-traveller-tile__name">{{ s.nome_servidor }}</strong>
-            <span class="oficio-documentos-traveller-tile__badge prestacao-removidos__badge">Fora da equipe</span>
-          </div>
-          <span class="oficio-documentos-traveller-tile__meta">
-            Saiu em {{ s.removida_em|date:"d/m/Y" }}{% if s.guardados %} · guardados: {{ s.guardados }}{% endif %}
-          </span>
-        </div>
-      </article>
-    {% endfor %}
-  </div>
-</div>
+{% comment %}
+  Saíram da equipe (`DB-06`) — quem foi retirado do ofício levando dados junto.
+
+  A frase de contexto é um `alert` informativo, e não um parágrafo solto: ela
+  responde à pergunta que o bloco levanta ("por que estas pessoas ainda estão
+  aqui?"), e é exatamente para isso que o aviso do sistema existe.
+
+  Cada pessoa é uma `person_row` com o selo "Fora da equipe" — a mesma linha da
+  equipe corrente, porque é a mesma informação com outro estado.
+{% endcomment %}
+<c-v2.alert
+  tone="info"
+  message="Estes servidores saíram da equipe do ofício. Nada do que eles já tinham entregue foi apagado — para voltar a editar, basta incluí-los novamente na equipe."
+/>
+
+<ul class="person-list">
+  {% for s in identificacao.servidores_removidos %}
+    <c-v2.person_row
+      :initials="s.iniciais"
+      :name="s.nome_servidor"
+      badge="Fora da equipe"
+      meta="Saiu em {{ s.removida_em|date:'d/m/Y' }}{% if s.guardados %} · guardados: {{ s.guardados }}{% endif %}"
+    />
+  {% endfor %}
+</ul>

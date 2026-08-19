@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block shell_css %}{% include 'includes/form_components_css.html' with shell_css_profile_path=shell_css_profile_path only %}{% endblock %}
+
+{% block component_js %}{% include 'includes/form_components_js.html' only %}{% endblock %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+  {% comment %}
+    Casca das quatro etapas da prestação, no sistema v2.
+
+    Antes, as cinco telas estendiam `cotton/page/flow_base.html` — o casco do
+    sistema anterior, com `page-shell`, cabeçalho grudento e
+    `main-form-panel`. Aquele arquivo CONTINUA vivo: ele ainda serve o cadastro
+    de usuário, o de área e o perfil, que são outra etapa. O que muda aqui é que
+    Prestações deixa de depender dele.
+
+    Saíram junto as folhas de página que cada tela carregava — até cinco por
+    tela, entre `oficios.css`, `prestacoes_contas.css`, `roteiros.css`,
+    `oficios-documentos-inline.css` e `prestacoes-documento-preview.css`. Tudo o
+    que elas vestiam agora é componente, e componente vem do `ui.bundle.css` que
+    o `base.html` já carrega em toda página.
+
+    O stepper daqui é NAVEGÁVEL, ao contrário do de ofício: as quatro etapas
+    existem ao mesmo tempo e se visita a que interessa. Quem decide isso é a
+    `url` de cada passo, que `_build_prestacao_steps` continua entregando.
+  {% endcomment %}
+  <c-v2.wizard_page :title="page_title" :steps="wizard_page_steps">
+    <c-slot name="aside">
+      {% if flow_status_label %}
+        <c-v2.chip :label="flow_status_label" :tone="flow_status_tone_v2" />
+      {% endif %}
+      {% comment %}
+        `autosave_link` no "Voltar": as quatro etapas salvam sozinhas, e sair
+        sem passar pelo autosave custaria o que acabou de ser digitado.
+      {% endcomment %}
+      <c-v2.button :label="flow_back_label" icon="arrow-left" :href="flow_back_url" :autosave_link="True" />
+    </c-slot>
+
+    <c-slot name="body">
+      {% block flow_body %}{% endblock %}
+    </c-slot>
+  </c-v2.wizard_page>
+
+  {% block flow_modals %}{% endblock %}
+{% endblock %}

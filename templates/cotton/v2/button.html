@@ -1,4 +1,4 @@
-{% cotton:vars aria_label autosave_link confirm_message controls dialog dialog_label dialog_label_attr dialog_url dialog_url_attr disabled extra_class form formaction formnovalidate hidden hook href icon icon_after label name size slot type value variant %}
+{% cotton:vars aria_label autosave_link confirm_message controls dialog dialog_label dialog_label_attr dialog_url dialog_url_attr disabled element_id extra_class form formaction formnovalidate hidden hook hook_attr hook_value href icon icon_after label name pressed size slot type value variant %}
 {% comment %}
   Button v2 — par de `static/css/v2/button.css`.
 
@@ -42,6 +42,16 @@
   solto porque o gancho é contrato do JS: se ele virar um atributo qualquer,
   ninguém percebe quando o nome muda e o botão para de responder calado.
 
+  Para o gancho COM valor existe o par `hook_attr`/`hook_value`, no mesmo
+  formato do `dialog_url_attr`/`dialog_url` logo acima: o nome vem do chamador e
+  o valor sai por `{{ }}`, porque grudados num `hook` só o escape os separaria.
+
+  `element_id` é o `id` do botão — não é enfeite, é como alguns motores o acham.
+  A tela de assinatura pública liga sete botões por `id` (`asgn-submit`,
+  `asgn-prev`, `asgn-next`…), e sem isto ela seria a única do sistema obrigada a
+  escrever `<button>` cru. Chama-se `element_id`, e não `id`, porque `id` é
+  atributo reservado do Cotton.
+
   `formaction`/`formnovalidate` mandam ESTE submit para outra URL sem exigir o
   formulário inteiro válido. É o que permite "Adicionar evento ao plano" e as
   ações de cada evento viverem DENTRO do `<form>` do wizard: formulário aninhado
@@ -50,6 +60,13 @@
   `confirm_message` liga o botão ao guarda de `js/core/app.js`
   (`data-confirm-submit` + `data-confirm-message`), que pergunta antes de enviar.
   Remover um evento do plano não tem desfazer.
+
+  `pressed` é o `aria-pressed` de um botão que é ESTADO, não ação: os segmentos
+  de um `c-v2.toggle variant="state"`. É uma string ("true"/"false") e não um
+  booleano porque o toggle precisa dos DOIS valores escritos — `aria-pressed`
+  ausente e `aria-pressed="false"` são coisas diferentes para o leitor de tela,
+  e a folha do toggle pinta o escolhido justamente por `[aria-pressed="true"]`.
+  Um booleano falso é indistinguível de "não passei o parâmetro".
 
   `hidden` é o botão que existe mas ainda não tem o que fazer — o "×" da única
   linha de uma coleção. Ele nasce oculto e o motor JS o revela quando aparece a
@@ -61,6 +78,7 @@
   <a
     class="button button--{{ variant|default:'secondary' }}{% if size %} button--{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
     href="{{ href }}"
+    {% if element_id %}id="{{ element_id }}"{% endif %}
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
     {% if autosave_link %}data-autosave-link="1"{% endif %}
     {% if disabled %}aria-disabled="true" tabindex="-1"{% endif %}
@@ -73,6 +91,7 @@
   <button
     class="button button--{{ variant|default:'secondary' }}{% if size %} button--{{ size }}{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"
     type="{{ type|default:'button' }}"
+    {% if element_id %}id="{{ element_id }}"{% endif %}
     {% if aria_label %}aria-label="{{ aria_label }}"{% endif %}
     {% if disabled %}disabled{% endif %}
     {% if controls %}aria-controls="{{ controls }}" aria-expanded="false"{% endif %}
@@ -97,7 +116,9 @@
     {% if formnovalidate %}formnovalidate{% endif %}
     {% if confirm_message %}data-confirm-submit data-confirm-message="{{ confirm_message }}"{% endif %}
     {% if hidden %}hidden{% endif %}
+    {% if pressed %}aria-pressed="{{ pressed }}"{% endif %}
     {% if hook %}{{ hook }}{% endif %}
+    {% if hook_attr and hook_value %}{{ hook_attr }}="{{ hook_value }}"{% endif %}
   >
     {% if icon and not icon_after %}<span class="button__icon" aria-hidden="true">{% icone_svg icon %}</span>{% endif %}
     {% if slot %}{{ slot }}{% elif label %}<span>{{ label }}</span>{% endif %}

@@ -1,0 +1,31 @@
+{% cotton:vars fontes nome %}
+{% comment %}
+  As fontes de assinatura da tela pública — cada chip mostra o próprio nome do
+  signatário DESENHADO naquela fonte, que é a prévia.
+
+  Mora em componente, e não solto no template da tela, pela razão de sempre:
+  cada chip carrega DOIS `data-*` com valor (`data-key` e `data-family`), e
+  `js/pages/prestacoes-assinatura.js` lê os dois — a `family` para carregar a
+  fonte e desenhar o PNG, a `key` para gravar qual foi escolhida. Dois valores
+  não cabem num `c-v2.button`, e `<button>` cru só é permitido dentro de
+  `templates/cotton/` (`test_raw_button_component`).
+
+  `.asgn-fontchip` é como o script acha os chips, e `.asgn-fontchip--<key>` é o
+  que carrega o `font-family` em `css/pages/prestacoes-assinatura.css`. As duas
+  classes são contrato — a segunda é a única razão de a folha daquela tela ainda
+  existir.
+
+  `is-selected` é posto pelo script no chip escolhido; a folha do v2 já pinta
+  esse estado no vocabulário do sistema.
+{% endcomment %}
+<div class="asgn-fontlist">
+  {% for f in fontes %}
+    <button
+      type="button"
+      class="asgn-fontchip asgn-fontchip--{{ f.key }}"
+      data-key="{{ f.key }}"
+      data-family="{{ f.family }}"
+      aria-label="Assinatura na fonte {{ f.family }}"
+    >{{ nome }}</button>
+  {% endfor %}
+</div>

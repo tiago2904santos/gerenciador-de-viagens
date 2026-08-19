@@ -201,28 +201,30 @@ def _build_prestacao_steps(ps, atual: str) -> list:
     ]
     steps = []
     atingiu_atual = False
-    for chave, step_label, titulo, url in etapas:
+    for chave, _step_label, titulo, url in etapas:
         if chave == atual:
-            state_class = "is-current"
-            aria_current = "step"
+            state = "current"
             atingiu_atual = True
             status = "Em edição"
         elif atingiu_atual:
-            state_class = ""
-            aria_current = ""
+            state = ""
             status = "A seguir"
         else:
-            state_class = "is-complete"
-            aria_current = ""
+            state = "done"
             status = "Concluído"
+        # Formato do `c-v2.stepper`: `label`, `status`, `state` e `url`. O
+        # legado carregava também `marker`, `step_label`, `state_class` e
+        # `aria_current` — quatro campos para dizer o que o componente novo
+        # deduz do `state` e do índice do laço.
+        #
+        # A `url` FICA, ao contrário do stepper de ofício: aqui as quatro etapas
+        # existem ao mesmo tempo e se visita a que interessa, como no painel do
+        # evento. É a mesma razão pela qual o componente aceita etapa navegável.
         steps.append(
             {
-                "marker": "✓" if state_class == "is-complete" else str(len(steps) + 1),
-                "step_label": step_label,
-                "title": titulo,
+                "label": titulo,
                 "status": status,
-                "state_class": state_class,
-                "aria_current": aria_current,
+                "state": state,
                 "url": url,
             }
         )
@@ -252,6 +254,9 @@ def contexto_do_fluxo(ps, atual: str, *, back_label=None, back_url=None) -> dict
         "flow_back_url": back_url or reverse("prestacoes_contas:index"),
         "flow_status_label": _ROTULO_DA_ETAPA[atual],
         "flow_status_variant": "draft",
+        # O selo da etapa no vocabulário do `c-v2.chip`: a prestação em curso é
+        # trabalho em andamento, não conclusão.
+        "flow_status_tone_v2": "progress",
     }
 
 

@@ -1,27 +1,20 @@
-<article class="oficio-documentos-card oficio-documentos-card--travellers" aria-label="Servidores da prestação">
-  <div class="oficio-documentos-card__body">
-    {% with n=identificacao.servidores_count %}
-    <div class="oficio-documentos-travellers-grid{% if n == 1 %} oficio-documentos-travellers-grid--single{% endif %}" role="list">
-      {% for s in identificacao.servidores %}
-        <article
-          class="oficio-documentos-traveller-tile{% if s.is_motorista %} oficio-documentos-traveller-tile--motorista{% endif %}"
-          role="listitem"
-        >
-          <span class="oficio-documentos-traveller-tile__avatar" aria-hidden="true">{{ s.iniciais }}</span>
-          <div class="oficio-documentos-traveller-tile__main">
-            <div class="oficio-documentos-traveller-tile__title-row">
-              <strong class="oficio-documentos-traveller-tile__name">{{ s.nome_servidor }}</strong>
-              {% if s.is_motorista %}
-                <span class="oficio-documentos-traveller-tile__badge">Motorista</span>
-              {% endif %}
-            </div>
-            <span class="oficio-documentos-traveller-tile__meta">{{ s.meta }}</span>
-          </div>
-        </article>
-      {% empty %}
-        <div class="oficio-documentos-travellers-empty">Nenhum servidor vinculado a esta prestação.</div>
-      {% endfor %}
-    </div>
-    {% endwith %}
-  </div>
-</article>
+{% comment %}
+  Equipe — uma linha por servidor da prestação.
+
+  É a `person_row` do sistema, a mesma do cartão de ofício e da etapa de
+  documentos. Os "ladrilhos" que moravam aqui eram uma segunda forma de desenhar
+  exatamente isto — avatar, nome, selo e meta —, com grade própria e um caso
+  especial para quando havia um servidor só.
+{% endcomment %}
+<ul class="person-list">
+  {% for s in identificacao.servidores %}
+    <c-v2.person_row
+      :initials="s.iniciais"
+      :name="s.nome_servidor"
+      :meta="s.meta"
+      badge="{% if s.is_motorista %}Motorista{% endif %}"
+    />
+  {% empty %}
+    <li class="person-row"><span class="person-row__meta">Nenhum servidor vinculado a esta prestação.</span></li>
+  {% endfor %}
+</ul>

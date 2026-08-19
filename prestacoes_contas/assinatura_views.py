@@ -160,7 +160,14 @@ def publico_identidade(request, token, tipo):
 
     erro = ""
     if request.method == "POST" and not bloqueado:
-        confirma_nome = request.POST.get("confirma_nome") == "on"
+        # Vale QUALQUER valor não vazio, e não o literal "on".
+        # `"on"` é o que o navegador manda quando o `<input type="checkbox">`
+        # não declara `value`; era o caso enquanto a caixa era escrita à mão
+        # nesta tela. O cartão de escolha do v2 declara `value="1"` — precisa,
+        # porque o widget de checkbox do Django lê `""` como FALSO —, e com a
+        # comparação literal a confirmação passou a ser recusada mesmo marcada.
+        # Medido no navegador na migração para o v2 (NOVO-20260819).
+        confirma_nome = bool(request.POST.get("confirma_nome"))
         cpf = request.POST.get("cpf", "")
         if not confirma_nome:
             erro = "Confirme que o nome exibido é o seu para continuar."

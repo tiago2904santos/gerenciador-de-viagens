@@ -1,29 +1,41 @@
-{% extends "cotton/page/flow_base.html" %}
-{% load static %}
-
-{% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/pages/oficios.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/prestacoes_contas.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pages/oficios-documentos-inline.css' %}">
-{% endblock %}
+{% extends "prestacoes_contas/flow_base.html" %}
 
 {% block flow_body %}
-  <form method="post"
-        class="travel-document-wizard__form"
-        novalidate
-        data-autosave="true"
-        data-autosave-model="prestacao_servidor"
-        data-autosave-step="documentos"
-        data-autosave-url="{{ servidor.solicitacao_autosave_url }}"
-        data-autosave-object-id="{{ servidor.ps_pk }}">
+  {% comment %}
+    Etapa 3 — Documentos. `data-travel-document-wizard-documentos` é um dos
+    escopos de menu do `overlay.js` e fica.
+  {% endcomment %}
+  <form
+    method="post"
+    class="form-page__form"
+    novalidate
+    data-autosave="true"
+    data-autosave-model="prestacao_servidor"
+    data-autosave-step="documentos"
+    data-autosave-url="{{ servidor.solicitacao_autosave_url }}"
+    data-autosave-object-id="{{ servidor.ps_pk }}"
+  >
     {% csrf_token %}
 
     <div data-travel-document-wizard-documentos>
-      <c-form.card title="Documentos da prestação" description="Resumo do ofício, solicitação e anexos assinados" title_id="docs-wizard-title" extra_class="docs-wizard-card" body_extra_class="docs-wizard-body" :actions_bare="actions_bare" :actions_extra_class="actions_extra_class" :aria_label="aria_label" :copy_extra_class="copy_extra_class" :data_hook="data_hook" :eyebrow="eyebrow" :footer_data_hook="footer_data_hook" :footer_extra_class="footer_extra_class" :footer_id="footer_id" :header_extra_class="header_extra_class" :heading_level="heading_level" :meta_extra_class="meta_extra_class"><c-slot name="body">{% include "prestacoes_contas/partials/_docs_wizard_body.html" with action_autosave=action_autosave action_label=action_label action_url=action_url action_variant=action_variant aria_label=aria_label body_id=body_id data_hook=data_hook element_id=element_id heading_level=heading_level shell=shell variant=variant body_extra_class=body_extra_class form_block_heading_level=form_block_heading_level identificacao=identificacao omit_equipe=omit_equipe despacho_assinado=despacho_assinado empty_label=empty_label oficio_assinado=oficio_assinado prestacao=prestacao servidor=servidor attach_kinds_json=attach_kinds_json only %}</c-slot><c-slot name="footer">{% include "prestacoes_contas/partials/_docs_footer.html" with consolidado_url=consolidado_url diario_url=diario_url only %}</c-slot></c-form.card>
+      <c-v2.panel title="Documentos da prestação" description="Resumo do ofício, solicitação e anexos assinados.">
+        <c-slot name="body">
+          {% include "prestacoes_contas/partials/_docs_wizard_body.html" with identificacao=identificacao omit_equipe=omit_equipe despacho_assinado=despacho_assinado empty_label=empty_label oficio_assinado=oficio_assinado prestacao=prestacao servidor=servidor attach_kinds_json=attach_kinds_json only %}
+
+          <c-v2.card_footer>
+            <c-slot name="secondary">
+              <c-v2.button label="Voltar ao Diário de Bordo" icon="arrow-left" :href="diario_url" :autosave_link="True" />
+            </c-slot>
+            <c-slot name="primary">
+              <c-v2.button label="Ir para PDF Final" variant="primary" icon="arrow-right" :icon_after="True" :href="consolidado_url" :autosave_link="True" />
+            </c-slot>
+          </c-v2.card_footer>
+        </c-slot>
+      </c-v2.panel>
     </div>
   </form>
 {% endblock %}
 
 {% block flow_modals %}
-  <c-ui.modals.attach_signed_modal />
+  <c-v2.attach_signed_modal />
 {% endblock %}

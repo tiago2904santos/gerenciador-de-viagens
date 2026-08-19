@@ -1,22 +1,11 @@
-<section class="oficio-documentos-admin-facts" aria-label="Motorista do diário">
-  <div class="oficio-documentos-card__body">
-    <dl class="oficio-documentos-facts oficio-documentos-facts--admin">
-      <div class="oficio-documentos-fact diario-motorista-fact">
-        <dt>Motorista</dt>
-        <dd>
-          <span>{{ motorista_resumo.nome }}</span>
-          {% if motorista_resumo.cpf %}<span class="diario-motorista-fact__cpf">CPF {{ motorista_resumo.cpf }}</span>{% endif %}
-        </dd>
-      </div>
-      <div class="oficio-documentos-fact diario-motorista-fact">
-        <dt>Origem do motorista</dt>
-        <dd>
-          <span>{{ motorista_resumo.origem }}</span>
-          {% if motorista_resumo.alterado %}
-            <c-ui.badges.chip label="Alterado" tone="warning" size="compact" only />
-          {% endif %}
-        </dd>
-      </div>
-    </dl>
-  </div>
-</section>
+{% comment %}
+  Motorista do diário — quem dirigiu, e de onde veio essa informação.
+
+  "Origem" ganha a linha de apoio quando houve troca: o selo de alterado é a
+  primeira coisa que quem confere procura, e como fato ele fica ao lado do valor
+  que mudou em vez de flutuar no cabeçalho.
+{% endcomment %}
+<div class="fact-list">
+  <c-v2.fact label="Motorista" :value="motorista_resumo.nome" note="{% if motorista_resumo.cpf %}CPF {{ motorista_resumo.cpf }}{% endif %}" />
+  <c-v2.fact label="Origem do motorista" :value="motorista_resumo.origem" note="{% if motorista_resumo.alterado %}Alterado nesta prestação{% endif %}" />
+</div>

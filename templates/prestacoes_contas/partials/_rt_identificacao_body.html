@@ -1,22 +1,13 @@
-<section class="oficio-documentos-admin-facts" aria-label="Dados administrativos">
-  <div class="oficio-documentos-card__body">
-    <dl class="oficio-documentos-facts oficio-documentos-facts--admin">
-      <div class="oficio-documentos-fact">
-        <dt>Número do ofício</dt>
-        <dd>{{ identificacao.numero }}</dd>
-      </div>
-      <div class="oficio-documentos-fact">
-        <dt>Protocolo</dt>
-        <dd>{{ identificacao.protocolo }}</dd>
-      </div>
-      <div class="oficio-documentos-fact">
-        <dt>Destino</dt>
-        <dd>{{ identificacao.destino }}</dd>
-      </div>
-      <div class="oficio-documentos-fact">
-        <dt>Período da viagem</dt>
-        <dd>{{ identificacao.periodo }}</dd>
-      </div>
-    </dl>
-  </div>
-</section>
+{% comment %}
+  Identificação — os dados administrativos do ofício, como fatos do sistema.
+
+  Era um `<dl>` com classes emprestadas da etapa de Documentos do ofício
+  (`oficio-documentos-facts`). É a mesma peça que o cartão da lista usa; um par
+  rótulo/valor não muda de desenho por estar numa etapa em vez de numa lista.
+{% endcomment %}
+<div class="fact-list">
+  <c-v2.fact label="Número do ofício" :value="identificacao.numero" />
+  <c-v2.fact label="Protocolo" :value="identificacao.protocolo" />
+  <c-v2.fact label="Destino" :value="identificacao.destino" />
+  <c-v2.fact label="Período da viagem" :value="identificacao.periodo" />
+</div>

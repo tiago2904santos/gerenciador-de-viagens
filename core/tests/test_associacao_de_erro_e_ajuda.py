@@ -377,11 +377,18 @@ class ContratoDosChamadoresTests(SimpleTestCase):
         quantidade) e o campo de atividades do cadastro rápido de modelos. Todos
         passaram ao `c-v2.form_field` ou ao `c-v2.field`, que trazem o erro
         embutido e emitem o `id` que o `aria-describedby` do Django aponta.
+
+        2026-08-19, migração de Prestações de Contas (`NOVO-20260819`): **15**.
+        Este é o maior corte de uma etapa só, e pelo mesmo motivo de todos os
+        anteriores — Prestações era o app com mais campos escritos à mão, e o
+        `c-v2.form_field` absorveu o erro de cada um. Os 15 que sobram estão nos
+        apps que ainda não migraram; quando o último sair, este teste vira uma
+        trava sobre o componente, não sobre os chamadores.
         """
         achados = list(chamadores_de_field_error())
 
-        self.assertGreaterEqual(len(achados), 30)
-        self.assertGreaterEqual(sum(1 for _, _, v, a in achados if "field_id=" in a), 30)
+        self.assertGreaterEqual(len(achados), 15)
+        self.assertGreaterEqual(sum(1 for _, _, v, a in achados if "field_id=" in a), 15)
 
 
 class DicaEscritaAMaoTests(SimpleTestCase):

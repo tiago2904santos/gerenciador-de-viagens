@@ -1,22 +1,47 @@
 {% extends "prestacoes_contas/assinatura/base_publico.html" %}
 
 {% block content %}
-<section class="asgn-card">
-  <h1 class="asgn-title">Assinatura de documentos</h1>
-  <p class="asgn-lead">Você recebeu <strong>{{ total }}</strong> documento(s) para assinar. Você vai confirmar sua identidade e assinar cada um.</p>
+  <c-v2.panel title="Assinatura de documentos" description="Você vai confirmar sua identidade e assinar cada documento.">
+    <c-slot name="body">
+      {% comment %}
+        O `stringformat` vem ANTES do `add`, e não depois. `add` tenta
+        `int(esquerda) + int(direita)`, falha no texto, tenta `esquerda + direita`,
+        e somar `str` com `int` falha de novo — o filtro cai no `except` e devolve
+        STRING VAZIA, sem erro nenhum. Com o `stringformat` no fim, o que ele
+        formata já é o vazio: a frase chegava na tela como " documento(s) para
+        assinar.", sem o começo e sem o número. Medido no navegador.
+      {% endcomment %}
+      {% with quantos=total|stringformat:"s" %}
+        {% with resumo="Você recebeu "|add:quantos|add:" documento(s) para assinar." %}
+          <c-v2.alert tone="info" :message="resumo" />
+        {% endwith %}
+      {% endwith %}
 
-  <ul class="asgn-doclist">
-    {% for d in docs %}
-    <li class="asgn-doc{% if d.assinada %} is-done{% endif %}">
-      <div class="asgn-doc__info">
-        <span class="asgn-doc__label">{{ d.label }}</span>
-        <span class="asgn-doc__who">{{ d.signatario }}</span>
-      </div>
-      <span class="asgn-doc__status">{% if d.assinada %}✓ Assinado{% else %}Pendente{% endif %}</span>
-    </li>
-    {% endfor %}
-  </ul>
+      {% comment %}
+        Cada documento é uma linha de pessoa: o selo diz se já foi assinado, e a
+        meta diz de quem é. É a mesma linha da equipe de um ofício — um documento
+        pendente e um servidor pendente se leem igual.
 
-  <a class="asgn-btn asgn-btn--primary" href="{{ continuar_url }}">Começar</a>
-</section>
+        As iniciais são a SIGLA do tipo — RT, DB —, que é como o documento se
+        chama no resto do sistema (a etapa Documentos usa as mesmas). Um par de
+        pontos no lugar delas seria uma marca que não quer dizer nada.
+      {% endcomment %}
+      <ul class="person-list">
+        {% for d in docs %}
+          <c-v2.person_row
+            initials="{{ d.tipo|upper }}"
+            :name="d.label"
+            :meta="d.signatario"
+            badge="{% if d.assinada %}Assinado{% else %}Pendente{% endif %}"
+          />
+        {% endfor %}
+      </ul>
+
+      <c-v2.card_footer>
+        <c-slot name="primary">
+          <c-v2.button label="Começar" variant="primary" icon="arrow-right" :icon_after="True" :href="continuar_url" />
+        </c-slot>
+      </c-v2.card_footer>
+    </c-slot>
+  </c-v2.panel>
 {% endblock %}

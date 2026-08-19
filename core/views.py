@@ -18,6 +18,7 @@ from core import entity_cards
 from core import login_throttle
 from core.errors import capture
 from eventos.models import Evento
+from prestacoes_contas.assinatura_views import FONTES_ASSINATURA
 
 from .forms import AlterarSenhaForm
 from .forms import LoginForm
@@ -377,6 +378,10 @@ def main_preview(request, secao=None):
                 },
             ),
             "v2_campo_exemplo": _campo_de_exemplo(),
+            # As fontes manuscritas da tela pública de assinatura. Vêm da
+            # MESMA constante que a tela serve, e não de uma cópia: chip com
+            # nome errado aqui é chip que ninguém vê quebrar lá.
+            "v2_fontes_assinatura": FONTES_ASSINATURA,
             "v2_linha_efetivo": _linha_de_efetivo_de_exemplo(),
             "v2_campo_numero": _campo_de_numero_de_exemplo(),
             # As pendências de uma etapa de wizard, no formato que os presenters

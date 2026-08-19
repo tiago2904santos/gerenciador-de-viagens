@@ -3,10 +3,9 @@
 {% block title %}Link indisponível{% endblock %}
 
 {% block content %}
-<section class="asgn-card asgn-card--center">
-  <div class="asgn-warn" aria-hidden="true">!</div>
-  <h1 class="asgn-title">Não foi possível abrir</h1>
-  <p class="asgn-lead">{{ mensagem }}</p>
-  <p class="asgn-help">Se você acredita que isso é um engano, peça um novo link a quem o enviou.</p>
-</section>
+  <c-v2.panel title="Não foi possível abrir" description="Se você acredita que isso é um engano, peça um novo link a quem o enviou.">
+    <c-slot name="body">
+      <c-v2.alert tone="error" :message="mensagem" />
+    </c-slot>
+  </c-v2.panel>
 {% endblock %}

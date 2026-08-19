@@ -497,3 +497,44 @@ igualmente na `main`. Os avisos deste recorte foram de 253 para 239.
   do `fact` nem no piso de 9px do `fit-text`; medido em 86 caracteres contra 346px. Atinge
   igualmente o resumo de diárias do roteiro. Decidir onde o extenso mora é mudança de desenho de
   componente global, e portanto corte próprio.
+
+## Prestações de Contas no v2, e o fluxo público junto (19/08/2026)
+
+O último app fora do sistema, e o único com uma tela PÚBLICA — servida sem barra lateral e sem
+login ao signatário externo, por um link. O dono decidiu migrá-la também: a casca continua sendo
+dela (`base_publico.html`, `<!doctype>` próprio), o vocabulário de dentro passou a ser o do sistema.
+
+- [x] `NOVO-20260819-023504-6c9fb7d85b4d` — as 135 chamadas anteriores ao v2 em 42 templates caem
+  para duas, ambas justificadas e travadas em
+  `prestacoes_contas/test_componentes_v2.py`. A casca do fluxo vira
+  `prestacoes_contas/flow_base.html` sobre o `c-v2.wizard_page`; entra `v2/signature_fonts.html`,
+  sai `ui/lists/file_list.html`, e o inventário fica em 160. Quinze arquivos apagados com prova de
+  grep. A folha da tela pública cai de 354 para 163 linhas e passa a ler os tokens do v2; as seis
+  `@font-face` viram `static/css/v2/signature-fonts.css`.
+- [x] `NOVO-20260819-023505-a1c4e0d92f38` — a confirmação de identidade do signatário era recusada
+  mesmo marcada: a view exigia o literal `"on"`, que é o que o navegador manda quando o checkbox
+  não declara `value`; o cartão de escolha do v2 manda `1`. O fluxo público ficava intransponível.
+- [x] `NOVO-20260819-023506-b73de1f4c8a9` — `element_id` não estava declarado no
+  `c-v2.icon_button`; o Cotton o descartava calado, e o motor da tela de assinatura morria no
+  primeiro `addEventListener`.
+- [x] `NOVO-20260819-023507-c5e2fa310d67` — `"texto"|add:<int>` devolvendo string vazia comeu três
+  frases: o resumo do link, o selo de progresso e a chave de reabertura do modal de anexar.
+- [x] `NOVO-20260819-023508-d84b1c7ee205` — a casca pública não incluía a folha de símbolos dos
+  ícones, e nenhum ícone daquelas telas tinha desenho.
+- [x] `NOVO-20260819-023509-e95c2d8ff316` — três descrições de bloco `split` passavam da coluna
+  fixa de 200px e invadiam a área do campo.
+
+**O que este corte deixa medido.** Com Prestações fechada, os cinco apps de fluxo estão no v2. Os
+chamadores de `field_error` em template de aplicação caíram de 30 para **15** — este foi o maior
+corte de uma etapa só, porque Prestações era o app com mais campos escritos à mão. Os 15 que sobram
+estão nos apps que ainda não migraram; quando o último sair, aquele teste vira trava sobre o
+componente e não sobre os chamadores.
+
+Cinco dos seis defeitos acima só apareceram no NAVEGADOR — nenhum deles levanta erro, o Django
+renderiza e a página abre. Dois são de método e valem além desta etapa: o contrato de componente
+cobre variável livre não declarada e **não** cobre atributo passado que o componente ignora; e
+`|add:` com inteiro continua sendo a armadilha mais cara do projeto, agora em três lugares novos.
+
+O gate do auditor de front continua vermelho pelos quatro ERROS já abertos
+(`NOVO-20260818-213938-228adea09e1d` e `NOVO-20260818-214024-f57647d8c996`), que reprovam
+igualmente na `main`. Os avisos deste recorte foram de 239 para 232.

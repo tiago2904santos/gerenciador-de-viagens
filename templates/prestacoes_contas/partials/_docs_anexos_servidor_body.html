@@ -1,4 +1,3 @@
-<div class="document-inline-stack docs-attach-stack">
   {% with ps_key=servidor.ps_pk|stringformat:"s" %}
     {% with reopen_rt="prestacao-servidor-"|add:ps_key|add:"-rt" %}
       {% include "prestacoes_contas/partials/_docs_attach_card.html" with title="Relatório técnico" abbr="RT" doc=servidor.rt_assinado reopen_key=reopen_rt initial_kind="rt" empty_label=empty_label attach_kinds_json=attach_kinds_json only %}
@@ -10,4 +9,3 @@
       {% include "prestacoes_contas/partials/_docs_attach_card.html" with title="Comprovante de saque/transferência" abbr="CP" doc=servidor.comprovante_anexo reopen_key=reopen_cp initial_kind="comprovante" empty_label=empty_label attach_kinds_json=attach_kinds_json only %}
     {% endwith %}
   {% endwith %}
-</div>

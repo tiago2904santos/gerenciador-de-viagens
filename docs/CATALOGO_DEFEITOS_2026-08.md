@@ -9251,3 +9251,97 @@ visual, por isso não entrou no PR da migração.
 Vale IGUAL para o resumo de diárias do roteiro (`c-v2.travel_allowance`), que tem a mesma forma e
 o mesmo `valor por extenso` na nota — o defeito não é da tela de Plano de Trabalho, é do par
 `fact__note` + texto por extenso.
+
+### NOVO-20260819-023504-6c9fb7d85b4d ✅ RESOLVIDO · `NOVO` Prestações de Contas fora do sistema v2 · UI · 1,0 d
+
+O último app com telas inteiras no vocabulário anterior: **135** chamadas a `c-ui.`, `c-form.`,
+`c-feedback.`, `c-lists.`, `c-travel.`, `c-documents.` e `c-page.` em 42 templates — as quatro
+etapas do fluxo (Relatório Técnico, Diário de Bordo, Documentos, PDF Final), a tela de motorista e
+viatura do diário, o catálogo de modelos de texto e o fluxo PÚBLICO de assinatura.
+
+Resolvido: sobram **duas** chamadas, ambas justificadas e travadas em teste — o cartão de
+assinatura PAUSADO pelo dono, que continua comentado porque a view ainda publica o contexto dele, e
+`<c-ui.icons._sprite />` na casca pública, que é a folha de `<symbol>` dos ícones e não peça
+visual. A casca do fluxo virou `prestacoes_contas/flow_base.html` sobre o `c-v2.wizard_page`;
+`cotton/page/flow_base.html` fica para os três chamadores de fora do app.
+
+Entrou UM componente (`v2/signature_fonts.html`, os seis chips de fonte da tela pública: dois
+`data-*` com valor por chip, que não cabem no `hook` de um `c-v2.button`) e saiu UM
+(`ui/lists/file_list.html`, sem consumidor depois do `c-v2.file_list`) — o inventário fica em 160.
+Saíram 15 arquivos ao todo, cada um com prova de grep. O `c-v2.button` ganhou `pressed`, o
+`c-v2.icon_button` ganhou `element_id`, e o `c-v2.document_inline` passou a aceitar corpo junto com
+visualizador e a mostrar o selo de estado.
+
+A folha da tela pública caiu de 354 para 163 linhas e passou a ler os tokens do v2 — os antigos
+`--color-*` vinham das duas folhas de base que a casca deixou de carregar, e `var()` sem valor não
+dá erro, só some. As seis `@font-face` viraram `static/css/v2/signature-fonts.css`, para o
+componente se vestir onde quer que seja usado.
+
+Verificação: 2.404 testes verdes (2.389 na base, +15 de contrato e regressão), auditor de front de
+239 para 232 avisos com os mesmos 4 erros pré-existentes, `audit_django_architecture` em 103 = 103,
+bundles e `ruff` limpos, 59 testes de JS verdes. As sete telas do app e as três da assinatura foram
+conferidas no navegador nos dois temas, e é de lá que vêm os cinco defeitos abaixo.
+
+### NOVO-20260819-023505-a1c4e0d92f38 ✅ RESOLVIDO · `NOVO` A confirmação de identidade do signatário era recusada mesmo marcada · Backend · 0,1 d
+
+`publico_identidade` comparava `request.POST.get("confirma_nome") == "on"`. `"on"` é o que o
+navegador manda quando o `<input type="checkbox">` NÃO declara `value` — o caso da caixa escrita à
+mão que existia naquela tela. O `c-v2.choice_card` declara `value="1"`, e precisa: o
+`CheckboxInput` do Django lê `""` como FALSO. Com a comparação literal, quem marcava a confirmação
+recebia "Confirme que o nome exibido é o seu para continuar" e não saía do lugar — o fluxo público
+inteiro ficava intransponível.
+
+Resolvido: a view aceita qualquer valor não vazio. Dois testes de regressão, um por sentido —
+marcada segue para a assinatura, ausente continua barrada.
+
+### NOVO-20260819-023506-b73de1f4c8a9 ✅ RESOLVIDO · `NOVO` `element_id` não declarado no `icon_button` matava o motor da tela de assinatura · UI · 0,1 d
+
+O Cotton DESCARTA calado o atributo que o componente não declara. Os dois botões de página do
+visualizador (`asgn-prev`, `asgn-next`) saíam sem `id`, `prestacoes-assinatura.js` achava `null` e
+a página inteira morria no primeiro `addEventListener`: sem visualizador, sem folha de criação da
+assinatura, sem envio. Nenhum erro no servidor e nenhum aviso no template — só um
+`Cannot read properties of null` no console.
+
+Resolvido: `element_id` declarado no `c-v2.icon_button`, como já estava no `c-v2.button`. Teste de
+regressão sobre os quatro `id` que a tela precisa. **Vale como aviso de método:** o contrato de
+componente cobre variável livre não declarada, e NÃO cobre atributo passado que o componente ignora
+— esse só aparece no navegador.
+
+### NOVO-20260819-023507-c5e2fa310d67 ✅ RESOLVIDO · `NOVO` `"texto"|add:<int>` comeu três frases da tela pública · UI · 0,1 d
+
+O mesmo filtro que já mordeu o corte de Ofícios, em três lugares novos: `add` tenta
+`int(esquerda) + int(direita)`, falha no texto, tenta `esquerda + direita`, e somar `str` com `int`
+falha de novo — cai no `except` e devolve STRING VAZIA. Pôr o `stringformat` DEPOIS do `add` não
+resolve: ele formata o vazio.
+
+- a frase de resumo do link chegava como " documento(s) para assinar.", sem o começo e sem o número;
+- o selo de progresso do cabeçalho (`1 de 2`) saía em branco;
+- a chave de reabertura do modal de anexar (`prestacao-servidor-<pk>`) ficava vazia, e o modal não
+  voltava a abrir sozinho depois do upload.
+
+Resolvido: `stringformat:"s"` num `{% with %}` ANTES do `add`, nos três. Dois testes de regressão
+sobre a resposta renderizada.
+
+### NOVO-20260819-023508-d84b1c7ee205 ✅ RESOLVIDO · `NOVO` Sem a folha de símbolos, a tela pública não tinha ícone nenhum · UI · 0,1 d
+
+Os ícones do sistema são `<use href="#cv-icon-…">`, e os `<symbol>` vêm de
+`<c-ui.icons._sprite />`, que o `base.html` inclui. A casca pública é a única tela do sistema que
+não estende o `base.html` — ela tem `<!doctype>` próprio porque não tem barra lateral nem sessão —,
+então cada `<use>` apontava para o nada: "Criar assinatura" e os dois botões de página abriam com
+o rótulo e um quadrado vazio de 16×16 no lugar do desenho.
+
+Resolvido: a folha entra no `<body>` da casca pública, com o motivo escrito ao lado. A trava de
+namespace da app tem exceção nominal para ela — é infraestrutura, não componente visual.
+
+### NOVO-20260819-023509-e95c2d8ff316 ✅ RESOLVIDO · `NOVO` Descrição comprida de bloco `split` invadia a coluna do campo · UI · 0,1 d
+
+`.form-block--split` tem coluna de rótulo FIXA em 200px e `white-space: nowrap` na descrição — as
+duas coisas de propósito, para que blocos empilhados comecem os campos no mesmo x. O preço, escrito
+na própria folha, é que a descrição precisa ser curta. Três blocos da prestação passavam: 212px
+("Número, protocolo, destino e período"), 240px ("Diária, translado, combustível e passagem") e
+~282px ("Dados preservados de quem foi retirado do ofício"). A primeira encostava no valor do
+primeiro fato.
+
+Resolvido: as três descrições foram encurtadas e medidas no navegador — 93px, 161px e 162px, todas
+dentro da coluna. O texto que saiu não se perdeu: os rótulos dos próprios fatos já dizem o que cada
+um é.

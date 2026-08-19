@@ -1,9 +1,4 @@
-<div class="roteiro-editor__empty diario-trechos-empty">
-  <p class="roteiro-editor__empty-title">Trechos ainda não disponíveis</p>
-  <p class="roteiro-editor__empty-text">Defina o roteiro do ofício para gerar o diário de bordo.</p>
-  {% if editar_roteiro_url %}
-    <div class="diario-trechos-empty__actions">
-      <c-ui.buttons.button :href="editar_roteiro_url" label="Definir roteiro" variant="secondary" icon="route" only />
-    </div>
-  {% endif %}
-</div>
+<c-v2.alert tone="info" message="Trechos ainda não disponíveis. Defina o roteiro do ofício para gerar o diário de bordo." />
+{% if editar_roteiro_url %}
+  <c-v2.button label="Definir roteiro" icon="route" :href="editar_roteiro_url" />
+{% endif %}

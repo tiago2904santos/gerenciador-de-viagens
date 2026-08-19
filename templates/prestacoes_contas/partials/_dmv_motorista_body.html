@@ -1,82 +1,67 @@
-<fieldset class="dmv-picker" data-dmv-picker="motorista">
-  <legend class="sr-only">Motorista do diário</legend>
-  <div class="dmv-picker__grid">
-    {% for radio in form.motorista_modo %}
-      <label class="dmv-option">
-        {{ radio.tag }}
-        <span class="dmv-option__mark" aria-hidden="true"></span>
-        <span class="dmv-option__content">
-          <span class="dmv-option__title">{{ radio.choice_label }}</span>
-          {% if radio.data.value == "OFICIO" %}
-            <span class="dmv-option__hint">{{ motorista_oficio_nome }}{% if motorista_oficio_cpf %} · CPF {{ motorista_oficio_cpf }}{% endif %}</span>
-          {% elif radio.data.value == "SERVIDOR" %}
-            <span class="dmv-option__hint">Um dos servidores deste ofício assumiu a direção.</span>
-          {% else %}
-            <span class="dmv-option__hint">Motorista vindo de outro ofício ou preenchido manualmente.</span>
-          {% endif %}
-        </span>
-      </label>
-    {% endfor %}
-  </div>
-  {% if form.motorista_modo.errors %}<c-ui.feedback.field_error :errors="form.motorista_modo.errors" :field_id="form.motorista_modo.auto_id" only />{% endif %}
-</fieldset>
+{% comment %}
+  Motorista do diário — de onde ele vem (ofício, servidor da equipe ou outro) e
+  os campos de cada caso.
 
-{# Outro servidor do mesmo ofício #}
-<div class="dmv-group" data-motorista-group="SERVIDOR" hidden>
-  <div class="field cv-field">
-    <label class="cv-field__label" for="{{ form.motorista_servidor.id_for_label }}">Servidor deste ofício</label>
-    {{ form.motorista_servidor }}
-    {% if form.motorista_servidor.errors %}<c-ui.feedback.field_error :errors="form.motorista_servidor.errors" :field_id="form.motorista_servidor.auto_id" only />{% endif %}
-  </div>
+  As três opções são `choice_card` numa `choice_grid`, montadas a partir do
+  `RadioSelect` do Django para o POST continuar chegando com o nome e o valor
+  que o form espera.
+
+  `data-motorista-group` é contrato de `js/pages/diario-motorista.js`; os
+  invólucros são `<div>` nuas para o `hidden` do HTML bastar.
+
+  `HT-02`: o campo do ofício declara `help_text` no `DiarioMotoristaForm`, e o
+  Django emite `aria-describedby="…_helptext"` no widget. O `c-v2.form_field`
+  renderiza a dica com esse mesmo `id` — antes ela era escrita à mão aqui, e o
+  ponteiro do navegador já tinha caído no vazio uma vez.
+{% endcomment %}
+<c-v2.choice_grid aria_label="Origem do motorista do diário">
+  <c-slot name="body">
+    {% for radio in form.motorista_modo %}
+      <c-v2.choice_card
+        input_type="radio"
+        :input_name="form.motorista_modo.html_name"
+        :input_id="radio.id_for_label"
+        :value="radio.data.value"
+        :checked="radio.data.selected"
+        hint="{% if radio.data.value == 'OFICIO' %}{{ motorista_oficio_nome }}{% if motorista_oficio_cpf %} · CPF {{ motorista_oficio_cpf }}{% endif %}{% elif radio.data.value == 'SERVIDOR' %}Um dos servidores deste ofício assumiu a direção.{% else %}Motorista vindo de outro ofício ou preenchido manualmente.{% endif %}"
+      >{{ radio.choice_label }}</c-v2.choice_card>
+    {% endfor %}
+  </c-slot>
+</c-v2.choice_grid>
+<c-v2.field_error :errors="form.motorista_modo.errors" />
+
+<div data-motorista-group="SERVIDOR" hidden>
+  <c-v2.form_field :field="form.motorista_servidor" label="Servidor deste ofício" />
 </div>
 
-{# Motorista de outro ofício / manual #}
-<div class="dmv-group" data-motorista-group="OUTRO_OFICIO" hidden>
+<div data-motorista-group="OUTRO_OFICIO" hidden>
   {% if oficios_prefill %}
-    <div class="dmv-prefill">
-      <div class="dmv-prefill__icon" aria-hidden="true">
-        <c-ui.icons.icon icon="download" only />
-      </div>
-      <div class="dmv-prefill__body">
-        <label class="cv-field__label" for="dmv-oficio-prefill">Puxar dados de um ofício existente <span class="dmv-muted">(opcional)</span></label>
-        <select id="dmv-oficio-prefill" class="form-select" data-oficio-prefill data-source-document="dmv-oficios-source">
+    {% comment %}
+      Puxar de um ofício existente é um ATALHO, não um campo do formulário: ele
+      não vai no POST, só preenche os quatro campos abaixo. Por isso é um select
+      avulso com os ganchos do `CV.documentSource`, e não um `form_field`.
+    {% endcomment %}
+    <c-v2.field label="Puxar dados de um ofício existente (opcional)" label_for="dmv-oficio-prefill" help="Preenche automaticamente motorista, ofício, protocolo e viatura — tudo continua editável.">
+      <c-slot name="control">
+        <select
+          id="dmv-oficio-prefill"
+          class="input__control"
+          data-oficio-prefill
+          data-source-document="dmv-oficios-source"
+        >
           <option value="">Selecione um ofício…</option>
           {% for o in oficios_prefill %}
             <option value="{{ o.id }}">{{ o.label }}</option>
           {% endfor %}
         </select>
-        <p class="cv-field__hint">Preenche automaticamente motorista, ofício, protocolo e viatura — tudo continua editável.</p>
-      </div>
-    </div>
+      </c-slot>
+    </c-v2.field>
   {% endif %}
 
-  <div class="dmv-fields">
-    <div class="field cv-field dmv-fields__wide">
-      <label class="cv-field__label" for="{{ form.motorista_manual_nome.id_for_label }}">Nome do motorista</label>
-      {{ form.motorista_manual_nome }}
-      {% if form.motorista_manual_nome.errors %}<c-ui.feedback.field_error :errors="form.motorista_manual_nome.errors" :field_id="form.motorista_manual_nome.auto_id" only />{% endif %}
-    </div>
-    <div class="field cv-field">
-      <label class="cv-field__label" for="{{ form.motorista_manual_cpf.id_for_label }}">CPF</label>
-      {{ form.motorista_manual_cpf }}
-      {% if form.motorista_manual_cpf.errors %}<c-ui.feedback.field_error :errors="form.motorista_manual_cpf.errors" :field_id="form.motorista_manual_cpf.auto_id" only />{% endif %}
-    </div>
-    <div class="field cv-field">
-      <label class="cv-field__label" for="{{ form.motorista_oficio_referencia.id_for_label }}">Ofício do motorista</label>
-      {{ form.motorista_oficio_referencia }}
-      {% comment %}
-        `HT-02`: este campo declara `help_text` no form (`DiarioMotoristaForm`), então
-        o Django já emite `aria-describedby="id_motorista_oficio_referencia_helptext"`
-        no widget. O `id` estava faltando aqui — a dica existia na tela e o ponteiro
-        do navegador caía no vazio.
-      {% endcomment %}
-      <p class="cv-field__hint" id="{{ form.motorista_oficio_referencia.auto_id }}_helptext">Formato número/ano (ex.: 15/2026).</p>
-      {% if form.motorista_oficio_referencia.errors %}<c-ui.feedback.field_error :errors="form.motorista_oficio_referencia.errors" :field_id="form.motorista_oficio_referencia.auto_id" only />{% endif %}
-    </div>
-    <div class="field cv-field">
-      <label class="cv-field__label" for="{{ form.motorista_protocolo_ref.id_for_label }}">Protocolo do motorista</label>
-      {{ form.motorista_protocolo_ref }}
-      {% if form.motorista_protocolo_ref.errors %}<c-ui.feedback.field_error :errors="form.motorista_protocolo_ref.errors" :field_id="form.motorista_protocolo_ref.auto_id" only />{% endif %}
-    </div>
+  <div class="field-grid">
+    <c-v2.form_field :field="form.motorista_manual_nome" label="Nome do motorista" />
+    <c-v2.form_field :field="form.motorista_manual_cpf" label="CPF" />
+    <c-v2.form_field :field="form.motorista_oficio_referencia" label="Ofício do motorista" />
+    <c-v2.form_field :field="form.motorista_protocolo_ref" label="Protocolo do motorista" />
   </div>
 </div>

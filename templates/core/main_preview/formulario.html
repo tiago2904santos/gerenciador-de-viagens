@@ -230,6 +230,23 @@
     </c-v2.panel>
 
     {% comment %}
+      As fontes de assinatura da tela PÚBLICA. Elas aparecem aqui pelo mesmo
+      motivo que tudo o mais: é a única página em que dá para conferir as seis
+      lado a lado, nos dois temas, sem abrir um link de assinatura real.
+
+      É o único componente do v2 cujo desenho mora numa folha de página
+      (`css/pages/prestacoes-assinatura.css`) — porque as seis `@font-face` são
+      dela, e carregá-las no pacote do sistema faria toda tela declarar seis
+      fontes manuscritas que nenhuma usa. A galeria puxa aquela folha no
+      `extra_css`, e é por isso que os chips aqui saem desenhados.
+    {% endcomment %}
+    <c-v2.panel title="Fontes de assinatura" description="Cada chip desenha o próprio nome do signatário na fonte que oferece; o escolhido vira o PNG da assinatura.">
+      <c-slot name="body">
+        <c-v2.signature_fonts :fontes="v2_fontes_assinatura" nome="ADEMAR SCHONS" />
+      </c-slot>
+    </c-v2.panel>
+
+    {% comment %}
       Campo a partir de um `BoundField` — é como os catálogos renderizam os
       formulários que vêm do Python, sem reescrever `name`, `value` e `required`
       à mão em cada tela.
